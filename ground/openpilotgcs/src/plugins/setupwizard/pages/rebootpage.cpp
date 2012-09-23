@@ -46,10 +46,12 @@ RebootPage::~RebootPage()
 
 void RebootPage::initializePage()
 {
-    connect(&m_timer, SIGNAL(timeout()), this, SLOT(toggleLabel()));
-    m_timer.setInterval(500);
-    m_timer.setSingleShot(false);
-    m_timer.start();
+    if(!m_timer.isActive()) {
+        connect(&m_timer, SIGNAL(timeout()), this, SLOT(toggleLabel()));
+        m_timer.setInterval(500);
+        m_timer.setSingleShot(false);
+        m_timer.start();
+    }
 }
 
 bool RebootPage::validatePage()
@@ -62,5 +64,4 @@ void RebootPage::toggleLabel()
     m_toggl = !m_toggl;
     ui->yellowLabel->setVisible(m_toggl);
     ui->redLabel->setVisible(!m_toggl);
-    qDebug() << "Toggle = " << m_toggl;
 }

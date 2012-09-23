@@ -61,6 +61,7 @@ class VehicleConfigurationHelper : public QObject
 public:
     VehicleConfigurationHelper(VehicleConfigurationSource* configSource);
     bool setupVehicle(bool save = true);
+    bool setupHardwareSettings(bool save = true);
     static const qint16 LEGACY_ESC_FREQUENCE;
     static const qint16 RAPID_ESC_FREQUENCE;
 
@@ -71,8 +72,6 @@ private:
     static const int MIXER_TYPE_DISABLED = 0;
     static const int MIXER_TYPE_MOTOR = 1;
     static const int MIXER_TYPE_SERVO = 2;
-
-    static const int PROGRESS_STEPS = 11;
 
     VehicleConfigurationSource *m_configSource;
     UAVObjectManager *m_uavoManager;

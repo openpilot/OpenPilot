@@ -90,6 +90,7 @@ void FlashPage::enableButtons(bool enable)
 
 void FlashPage::saveProgress(int total, int current, QString description)
 {
+    qDebug() << "Progress " << current << "(" << total << ")";
     if(ui->saveProgressBar->maximum() != total) {
         ui->saveProgressBar->setMaximum(total);
     }

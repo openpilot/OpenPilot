@@ -55,11 +55,11 @@ bool VehicleConfigurationHelper::setupVehicle(bool save)
     clearModifiedObjects();
     resetVehicleConfig();
     resetGUIData();
-    if(!saveChangesToController(save))
-    {
+    if(!saveChangesToController(save)) {
         return false;
     }
 
+    m_progress = 0;
     applyHardwareConfiguration();
     applyVehicleConfiguration();
     applyActuatorConfiguration();
@@ -69,12 +69,19 @@ bool VehicleConfigurationHelper::setupVehicle(bool save)
     applyManualControlDefaults();
 
     bool result = saveChangesToController(save);
-    if(result) {
-        emit saveProgress(PROGRESS_STEPS, ++m_progress, tr("Done!"));
-    }
-    else {
-        emit saveProgress(PROGRESS_STEPS, ++m_progress, tr("Failed!"));
-    }
+    emit saveProgress(m_modifiedObjects.count() + 1, ++m_progress, result ? tr("Done!") : tr("Failed!"));
+    return result;
+}
+
+bool VehicleConfigurationHelper::setupHardwareSettings(bool save)
+{
+    m_progress = 0;
+    clearModifiedObjects();
+    applyHardwareConfiguration();
+    applyManualControlDefaults();
+
+    bool result = saveChangesToController(save);
+    emit saveProgress(m_modifiedObjects.count() + 1, ++m_progress, result ? tr("Done!") : tr("Failed!"));
     return result;
 }
 
@@ -429,7 +436,7 @@ bool VehicleConfigurationHelper::saveChangesToController(bool save)
         QString objDescription = objPair->second;
         if(UAVObject::GetGcsAccess(obj->getMetadata()) != UAVObject::ACCESS_READONLY && obj->isSettings()) {
 
-            emit saveProgress(PROGRESS_STEPS, ++m_progress, objDescription);
+            emit saveProgress(m_modifiedObjects.count() + 1, ++m_progress, objDescription);
 
             m_currentTransactionObjectID = obj->getObjID();
 
@@ -490,7 +497,6 @@ bool VehicleConfigurationHelper::saveChangesToController(bool save)
 
     qDebug() << "Finished saving modified objects to controller. Success = " << m_transactionOK;
 
-    clearModifiedObjects();
     return m_transactionOK;
 }
 

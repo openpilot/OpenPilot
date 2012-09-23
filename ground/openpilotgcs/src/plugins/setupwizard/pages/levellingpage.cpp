@@ -54,8 +54,8 @@ bool LevellingPage::validatePage()
 
 bool LevellingPage::isComplete() const
 {
-    return const_cast<LevellingPage *>(this)->getWizard()->isLevellingPerformed() &&
-            ui->levelButton->isEnabled();
+    //const_cast<LevellingPage *>(this)->getWizard()->isLevellingPerformed() &&
+    return ui->levelButton->isEnabled();
 }
 
 void LevellingPage::enableButtons(bool enable)

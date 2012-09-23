@@ -62,7 +62,7 @@ bool InputPage::validatePage()
     else {
         getWizard()->setInputType(SetupWizard::INPUT_PWM);
     }
-    getWizard()->setRestartNeeded(restartNeeded(getWizard()->getInputType()));
+    getWizard()->setRestartNeeded(getWizard()->isRestartNeeded() || restartNeeded(getWizard()->getInputType()));
 
     return true;
 }

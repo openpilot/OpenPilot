@@ -96,6 +96,14 @@ int SetupWizard::nextId() const
         case PAGE_MULTI:
             return PAGE_OUTPUT;
         case PAGE_INPUT:
+            if(isRestartNeeded()) {
+                saveHardwareSettings();
+                return PAGE_REBOOT;
+            }
+            else {
+                return PAGE_VEHICLES;
+            }
+        case PAGE_REBOOT:
             return PAGE_VEHICLES;
         case PAGE_OUTPUT:
             return PAGE_SUMMARY;
@@ -106,13 +114,6 @@ int SetupWizard::nextId() const
         case PAGE_SUMMARY:
             return PAGE_LEVELLING;
         case PAGE_FLASH:
-            if(isRestartNeeded()) {
-                return PAGE_REBOOT;
-            }
-            else {
-                return PAGE_END;
-            }
-        case PAGE_REBOOT:
             return PAGE_END;
         case PAGE_NOTYETIMPLEMENTED:
             return PAGE_END;
@@ -270,4 +271,10 @@ void SetupWizard::createPages()
     setPage(PAGE_END, new EndPage(this));
 
     setStartId(PAGE_START);
+}
+
+bool SetupWizard::saveHardwareSettings() const
+{
+    VehicleConfigurationHelper helper(const_cast<SetupWizard *>(this));
+    return helper.setupHardwareSettings();
 }

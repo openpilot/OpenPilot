@@ -582,44 +582,6 @@ typedef bool ( *t_rfm22_RxDataCallback ) (void *data, uint8_t len);
 
 void PIOS_RFM22_EXT_Int(void);
 
-uint32_t rfm22_minFrequency(void);
-uint32_t rfm22_maxFrequency(void);
-
-void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz);
-uint32_t rfm22_getNominalCarrierFrequency(void);
-
-float rfm22_getFrequencyStepSize(void);
-
-void rfm22_setFreqHopChannel(uint8_t channel);
-uint8_t rfm22_freqHopChannel(void);
-
-uint32_t rfm22_freqHopSize(void);
-
-void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening);
-uint32_t rfm22_getDatarate(void);
-
-void rfm22_setFreqCalibration(uint8_t value);
-uint8_t rfm22_getFreqCalibration(void);
-
-void rfm22_setTxPower(uint8_t tx_pwr);
-uint8_t rfm22_getTxPower(void);
-
-void rfm22_setTxStream(void);	// TEST ONLY
-
-void rfm22_setTxNormal(void);
-void rfm22_setTxCarrierMode(void);
-void rfm22_setTxPNMode(void);
-
-int8_t rfm22_currentMode(void);
-bool rfm22_transmitting(void);
-
-bool rfm22_channelIsClear(void);
-
-bool rfm22_txReady(void);
-
-void rfm22_TxDataByte_SetCallback(t_rfm22_TxDataByteCallback new_function);
-void rfm22_RxData_SetCallback(t_rfm22_RxDataCallback new_function);
-
 #endif /* PIOS_RFM22B_PRIV_H */
 
 /**

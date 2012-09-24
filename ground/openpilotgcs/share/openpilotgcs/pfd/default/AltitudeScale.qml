@@ -2,26 +2,24 @@ import Qt 4.7
 
 Item {
     id: sceneItem
-    property variant sourceSize
+    property variant sceneSize
 
-    Image {
+    SvgElementImage {
         id: altitude_bg
-        source: "image://svg/pfd.svg!altitude-bg"
-        sourceSize: sceneItem.sourceSize
+        elementName: "altitude-bg"
+        sceneSize: sceneItem.sceneSize
         clip: true
 
         property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "altitude-bg")
 
-        x: scaledBounds.x * sceneItem.width
-        y: scaledBounds.y * sceneItem.height
-        width: scaledBounds.width * sceneItem.width
-        height: scaledBounds.height * sceneItem.height
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        Image {
+        SvgElementImage {
             id: altitude_scale
 
-            source: "image://svg/pfd.svg!altitude-scale"
-            sourceSize: sceneItem.sourceSize
+            elementName: "altitude-scale"
+            sceneSize: sceneItem.sceneSize
 
             anchors.verticalCenter: parent.verticalCenter
             // The altitude scale represents 30 meters,
@@ -55,12 +53,12 @@ Item {
     }
 
 
-    Image {
+    SvgElementImage {
         id: altitude_window
         clip: true
 
-        source: "image://svg/pfd.svg!altitude-window"
-        sourceSize: sceneItem.sourceSize
+        elementName: "altitude-window"
+        sceneSize: sceneItem.sceneSize
 
         property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "altitude-window")
 

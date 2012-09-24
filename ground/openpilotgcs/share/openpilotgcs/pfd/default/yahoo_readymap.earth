@@ -1,0 +1,25 @@
+<!--
+osgEarth Sample - SRTM global elevation
+
+This sample demonstrates the use of a global SRTM TMS data source for world-wide elevation.
+The heightfield is draped with the NASA Blue Marble imagery.
+-->
+
+<map name="srtm sample" type="globe" version="2">
+
+  <image name="yahoo aerial" driver="yahoo">
+          <dataset>satellite</dataset>
+  </image>
+  
+
+  <elevation name="ReadyMap.org - Elevation" driver="tms">
+        <url>http://readymap.org/readymap/tiles/1.0.0/9/</url>
+  </elevation>
+    
+  <options>
+        <terrain>
+            <lighting>false</lighting>
+            <lod_fall_off>6.0</lod_fall_off>
+        </terrain>
+   </options>
+</map>

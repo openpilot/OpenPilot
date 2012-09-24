@@ -39,7 +39,7 @@ public:
     void setQmlFile(QString fn);
 
     QString earthFile() const { return m_earthFile; }
-    bool terrainEnabled() const { return m_terrainEnabled; }
+    bool terrainEnabled() const { return m_terrainEnabled && m_openGLEnabled; }
 
     bool actualPositionUsed() const { return m_actualPositionUsed; }
     double latitude() const { return m_latitude; }
@@ -49,6 +49,7 @@ public:
 public slots:
     void setEarthFile(QString arg);
     void setTerrainEnabled(bool arg);
+    void setOpenGLEnabled(bool arg);
 
     void setLatitude(double arg);
     void setLongitude(double arg);
@@ -68,6 +69,7 @@ signals:
 private:
     QString m_qmlFileName;
     QString m_earthFile;
+    bool m_openGLEnabled;
     bool m_terrainEnabled;
 
     bool m_actualPositionUsed;

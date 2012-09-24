@@ -66,6 +66,7 @@ uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_vcp_id;
 uint32_t pios_com_gps_id;
 uint32_t pios_com_bridge_id;
+uint32_t pios_com_telem_fr_id;
 
 /**
  * Configuration for MPU6000 chip

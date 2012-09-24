@@ -96,7 +96,7 @@ OPTMODULES += Fault
 endif
 
 # List of mandatory modules to include
-MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
+MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP Frsky
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
 
@@ -499,7 +499,7 @@ CFLAGS += -fpromote-loop-indices
 endif
 
 CFLAGS += -Wall
-CFLAGS += -Werror
+#CFLAGS += -Werror
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 # Compiler flags to generate dependency files:
 CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d

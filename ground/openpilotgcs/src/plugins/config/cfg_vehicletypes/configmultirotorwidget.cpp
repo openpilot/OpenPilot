@@ -814,6 +814,8 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
 
         }
     }
+
+    drawAirframe(frameType);
 }
 
 

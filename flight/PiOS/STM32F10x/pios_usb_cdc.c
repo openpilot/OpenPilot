@@ -341,7 +341,7 @@ static struct usb_cdc_line_coding line_coding = {
 	.bDataBits   = 8,
 };
 
-RESULT PIOS_USB_CDC_SetLineCoding(void)
+uint8_t *PIOS_USB_CDC_SetLineCoding(uint16_t Length)
 {
 	struct pios_usb_cdc_dev * usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
 
@@ -351,7 +351,15 @@ RESULT PIOS_USB_CDC_SetLineCoding(void)
 		return NULL;
 	}
 
-	return USB_SUCCESS;
+	if (Length == 0) {
+		/* Report the number of bytes we're prepared to consume */
+		pInformation->Ctrl_Info.Usb_wLength = sizeof(line_coding);
+		pInformation->Ctrl_Info.Usb_rLength = sizeof(line_coding);
+		return NULL;
+	} else {
+		/* Give out a pointer to the data struct */
+		return ((uint8_t *) &line_coding);
+	}
 }
 
 const uint8_t *PIOS_USB_CDC_GetLineCoding(uint16_t Length)

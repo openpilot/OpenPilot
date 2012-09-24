@@ -2474,6 +2474,11 @@ static void osdgenTask(void *parameters)
 	//portTickType lastSysTime;
 	// Loop forever
 	//lastSysTime = xTaskGetTickCount();
+	OsdSettingsData OsdSettings;
+	OsdSettingsGet (&OsdSettings);
+
+	PIOS_Servo_Set(0,OsdSettings.White);
+	PIOS_Servo_Set(1,OsdSettings.Black);
 
 	// intro
 	for(int i=0; i<63; i++)

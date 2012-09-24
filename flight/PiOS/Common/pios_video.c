@@ -359,8 +359,9 @@ void PIOS_Video_Init(const struct pios_video_cfg * cfg)
 	PIOS_EXTI_Init(cfg->hsync);
 	PIOS_EXTI_Init(cfg->vsync);
 
-	PIOS_Servo_Set(0,40);
-	PIOS_Servo_Set(1,10);
+	//set levels to zero
+	PIOS_Servo_Set(0,0);
+	PIOS_Servo_Set(1,0);
 }
 
 /**

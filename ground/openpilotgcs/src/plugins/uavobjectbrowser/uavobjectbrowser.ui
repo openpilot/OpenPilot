@@ -128,14 +128,14 @@
      <item>
       <widget class="QToolButton" name="eraseSDButton">
        <property name="toolTip">
-        <string>Erase</string>
+        <string>Resets UAV object setting to default values at next boot</string>
        </property>
        <property name="text">
         <string>...</string>
        </property>
        <property name="icon">
         <iconset resource="uavobjectbrowser.qrc">
-         <normaloff>:/uavobjectbrowser/images/trash.png</normaloff>:/uavobjectbrowser/images/trash.png</iconset>
+         <normaloff>:/uavobjectbrowser/images/reset.png</normaloff>:/uavobjectbrowser/images/reset.png</iconset>
        </property>
        <property name="iconSize">
         <size>

@@ -644,7 +644,6 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
         *  4 bytes: Unix timestamp of last git commit
         *  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
         *  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
-        *   ---- 40 bytes limit ---
         *  20 bytes: SHA1 sum of the firmware.
         *  20 bytes: SHA1 sum of the UAVO definition files.
         *  20 bytes: free for now.
@@ -656,7 +655,7 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
            gitCommitHash = gitCommitHash << 8;
            gitCommitHash += desc.at(7-i) & 0xFF;
        }
-       struc.gitHash = QString::number(gitCommitHash, 16);
+       struc.gitHash = QString("%1").arg(gitCommitHash, 8, 16, QChar('0'));
 
        quint32 gitDate = desc.at(11) & 0xFF;
        for (int i = 1; i < 4; i++) {

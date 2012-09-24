@@ -1450,7 +1450,7 @@ font: bold 12px;
 margin:1px;</string>
                     </property>
                     <property name="text">
-                     <string>Multirotor Yaw Direction</string>
+                     <string>Multirotor Motor Direction</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>
@@ -1506,9 +1506,9 @@ margin:1px;</string>
                    </widget>
                   </item>
                   <item row="3" column="4">
-                   <widget class="QCheckBox" name="TricopterRevMixercheckBox">
+                   <widget class="QCheckBox" name="MultirotorRevMixercheckBox">
                     <property name="text">
-                     <string>Reverse Yaw Mix</string>
+                     <string>Reverse all motors</string>
                     </property>
                    </widget>
                   </item>

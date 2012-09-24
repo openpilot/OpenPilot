@@ -49,7 +49,7 @@ const QString ConfigMultiRotorWidget::CHANNELBOXNAME = QString("multiMotorChanne
 /**
  Constructor
  */
-ConfigMultiRotorWidget::ConfigMultiRotorWidget(Ui_AircraftWidget *aircraft, QWidget *parent) : VehicleConfig(parent)
+ConfigMultiRotorWidget::ConfigMultiRotorWidget(Ui_AircraftWidget *aircraft, QWidget *parent) : VehicleConfig(parent), invertMotors(1)
 {
     m_aircraft = aircraft;
 }
@@ -87,7 +87,6 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
 
     if (frameType == "Tri" || frameType == "Tricopter Y") {
         setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Tricopter Y"));
-        quad->setElementId("tri");
 
         //Enable all necessary motor channel boxes...
         enableComboBoxes(uiowner, CHANNELBOXNAME, 3, true);
@@ -100,7 +99,6 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     }
     else if (frameType == "QuadX" || frameType == "Quad X") {
         setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Quad X"));
-        quad->setElementId("quad-x");
 
         //Enable all necessary motor channel boxes...
         enableComboBoxes(uiowner, CHANNELBOXNAME, 4, true);
@@ -112,7 +110,6 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     }
     else if (frameType == "QuadP" || frameType == "Quad +") {
         setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Quad +"));
-        quad->setElementId("quad-plus");
 
         //Enable all necessary motor channel boxes...
         enableComboBoxes(uiowner, CHANNELBOXNAME, 4, true);
@@ -124,7 +121,6 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     else if (frameType == "Hexa" || frameType == "Hexacopter")
     {
         setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Hexacopter"));
-        quad->setElementId("quad-hexa");
 
         //Enable all necessary motor channel boxes...
         enableComboBoxes(uiowner, CHANNELBOXNAME, 6, true);
@@ -135,7 +131,6 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     }
     else if (frameType == "HexaX" || frameType == "Hexacopter X" ) {
         setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Hexacopter X"));
-        quad->setElementId("quad-hexa-H");
 
         //Enable all necessary motor channel boxes...
         enableComboBoxes(uiowner, CHANNELBOXNAME, 6, true);
@@ -148,7 +143,6 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     else if (frameType == "HexaCoax" || frameType == "Hexacopter Y6")
     {
         setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Hexacopter Y6"));
-        quad->setElementId("hexa-coax");
 
         //Enable all necessary motor channel boxes...
         enableComboBoxes(uiowner, CHANNELBOXNAME, 6, true);
@@ -161,7 +155,6 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     else if (frameType == "Octo" || frameType == "Octocopter")
     {
         setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Octocopter"));
-        quad->setElementId("quad-octo");
 
         //Enable all necessary motor channel boxes
         enableComboBoxes(uiowner, CHANNELBOXNAME, 8, true);
@@ -173,7 +166,6 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     else if (frameType == "OctoV" || frameType == "Octocopter V")
     {
         setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Octocopter V"));
-        quad->setElementId("quad-octo-v");
 
         //Enable all necessary motor channel boxes
         enableComboBoxes(uiowner, CHANNELBOXNAME, 8, true);
@@ -186,7 +178,6 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     else if (frameType == "OctoCoaxP" || frameType == "Octo Coax +")
     {
         setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Octo Coax +"));
-        quad->setElementId("octo-coax-P");
 
         //Enable all necessary motor channel boxes
         enableComboBoxes(uiowner, CHANNELBOXNAME, 8, true);
@@ -199,13 +190,89 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     else if (frameType == "OctoCoaxX" || frameType == "Octo Coax X")
     {
         setComboCurrentIndex( m_aircraft->multirotorFrameType, m_aircraft->multirotorFrameType->findText("Octo Coax X"));
-        quad->setElementId("octo-coax-X");
 
+        //Enable all necessary motor channel boxes
         enableComboBoxes(uiowner, CHANNELBOXNAME, 8, true);
 
         m_aircraft->mrRollMixLevel->setValue(50);
         m_aircraft->mrPitchMixLevel->setValue(50);
         setYawMixLevel(50);
+    }
+
+    //Draw the appropriate airframe
+    drawAirframe(frameType);
+}
+
+void ConfigMultiRotorWidget::drawAirframe(QString frameType){
+
+    invertMotors = m_aircraft->MultirotorRevMixercheckBox->isChecked() ? -1:1;
+
+    if (frameType == "Tri" || frameType == "Tricopter Y") {
+        if(invertMotors > 0)
+            quad->setElementId("tri");
+        else
+            quad->setElementId("tri_reverse");
+    }
+    else if (frameType == "QuadX" || frameType == "Quad X") {
+        if(invertMotors > 0)
+            quad->setElementId("quad-x");
+        else
+            quad->setElementId("quad-x_reverse");
+    }
+    else if (frameType == "QuadP" || frameType == "Quad +") {
+        if(invertMotors > 0)
+            quad->setElementId("quad-plus");
+        else
+            quad->setElementId("quad-plus_reverse");
+    }
+    else if (frameType == "Hexa" || frameType == "Hexacopter")
+    {
+        if(invertMotors > 0)
+            quad->setElementId("quad-hexa");
+        else
+            quad->setElementId("quad-hexa_reverse");
+    }
+    else if (frameType == "HexaX" || frameType == "Hexacopter X" ) {
+        if(invertMotors > 0)
+            quad->setElementId("quad-hexa-H");
+        else
+            quad->setElementId("quad-hexa-H_reverse");
+    }
+    else if (frameType == "HexaCoax" || frameType == "Hexacopter Y6")
+    {
+        if(invertMotors > 0)
+            quad->setElementId("hexa-coax");
+        else
+            quad->setElementId("hexa-coax_reverse");
+    }
+    else if (frameType == "Octo" || frameType == "Octocopter")
+    {
+        if(invertMotors > 0)
+            quad->setElementId("quad-octo");
+        else
+            quad->setElementId("quad-octo_reverse");
+    }
+    else if (frameType == "OctoV" || frameType == "Octocopter V")
+    {
+        if(invertMotors > 0)
+            quad->setElementId("quad-octo-v");
+        else
+            quad->setElementId("quad-octo-v_reverse");
+    }
+    else if (frameType == "OctoCoaxP" || frameType == "Octo Coax +")
+    {
+        if(invertMotors > 0)
+            quad->setElementId("octo-coax-P");
+        else
+            quad->setElementId("octo-coax-P_reverse");
+
+    }
+    else if (frameType == "OctoCoaxX" || frameType == "Octo Coax X")
+    {
+        if(invertMotors > 0)
+            quad->setElementId("octo-coax-X");
+        else
+            quad->setElementId("octo-coax-X_reverse");
 
     }
 }
@@ -264,12 +331,12 @@ void ConfigMultiRotorWidget::setYawMixLevel(int value)
     if(value<0)
     {
         m_aircraft->mrYawMixLevel->setValue((-1)*value);
-        m_aircraft->TricopterRevMixercheckBox->setChecked(true);
+        m_aircraft->MultirotorRevMixercheckBox->setChecked(true);
     }
     else
     {
         m_aircraft->mrYawMixLevel->setValue(value);
-        m_aircraft->TricopterRevMixercheckBox->setChecked(false);
+        m_aircraft->MultirotorRevMixercheckBox->setChecked(false);
     }
 
 }
@@ -974,8 +1041,8 @@ bool ConfigMultiRotorWidget::setupMultiRotorMixer(double mixerFactors[8][3])
     // and enable only the relevant channels:
     double pFactor = (double)m_aircraft->mrPitchMixLevel->value()/100;
     double rFactor = (double)m_aircraft->mrRollMixLevel->value()/100;
-    double invert=m_aircraft->TricopterRevMixercheckBox->isChecked() ? -1:1;
-    double yFactor =invert * (double)m_aircraft->mrYawMixLevel->value()/100;
+    invertMotors = m_aircraft->MultirotorRevMixercheckBox->isChecked() ? -1:1;
+    double yFactor =invertMotors * (double)m_aircraft->mrYawMixLevel->value()/100;
     for (int i=0 ; i<8; i++) {
         if(mmList.at(i)->isEnabled())
         {

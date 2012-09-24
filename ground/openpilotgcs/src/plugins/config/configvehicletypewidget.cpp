@@ -215,6 +215,9 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     connect(m_aircraft->ffTestBox2, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
     connect(m_aircraft->ffTestBox3, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
 
+    //Connect the multirotor motor reverse checkbox
+    connect(m_aircraft->MultirotorRevMixercheckBox, SIGNAL(clicked(bool)), this, SLOT(reverseMultirotorMotor()));
+
     // Connect the help pushbutton
     connect(m_aircraft->airframeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
     enableControls(false);
@@ -483,7 +486,7 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject * o)
     UAVObjectField *field = system->getField(QString("AirframeType"));
     Q_ASSERT(field);
     // At this stage, we will need to have some hardcoded settings in this code, this
-    // is not ideal, but here you go.
+    // is not ideal, but there you go.
     QString frameType = field->getValue().toString();
     setupAirframeUI(frameType);
 
@@ -765,6 +768,12 @@ void ConfigVehicleTypeWidget::setComboCurrentIndex(QComboBox* box, int index)
     if (index >= 0 && index < box->count())
         box->setCurrentIndex(index);
 }
+
+void ConfigVehicleTypeWidget::reverseMultirotorMotor(){
+    QString frameType = m_aircraft->multirotorFrameType->currentText();
+    m_multirotor->drawAirframe(frameType);
+}
+
 
 /**
  WHAT DOES THIS DO???

@@ -341,7 +341,7 @@ static RESULT PIOS_USBHOOK_Data_Setup(uint8_t RequestNo)
 		case 0:		/* CDC Call Control Interface */
 			switch (RequestNo) {
 			case USB_CDC_REQ_GET_LINE_CODING:
-				//CopyRoutine = PIOS_USB_CDC_GetLineCoding;
+				CopyInRoutine = PIOS_USB_CDC_GetLineCoding;
 				break;
 			}
 

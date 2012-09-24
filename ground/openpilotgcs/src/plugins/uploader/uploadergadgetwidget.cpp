@@ -684,7 +684,7 @@ void UploaderGadgetWidget::versionMatchCheck()
 
         QString warning = QString(tr(
             "GCS and firmware versions of the UAV objects set do not match which can cause configuration problems. "
-            "GCS version: %1. Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
+            "GCS version: %1 Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
         msg->showMessage(warning);
     }
   }

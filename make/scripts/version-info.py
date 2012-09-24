@@ -258,6 +258,11 @@ def GetHashofDirs(directory, verbose=0):
     
   try:
     for root, dirs, files in os.walk(directory):
+      # os.walk() is unsorted.  Must make sure we process files in sorted order so
+      # that the hash is stable across invocations and across OSes.
+      if files:
+          files.sort()
+
       for names in files:
         if verbose == 1:
           print 'Hashing', names
@@ -269,18 +274,30 @@ def GetHashofDirs(directory, verbose=0):
           f1.close()
           continue
 
-	while 1:
-	  # Read file in as little chunks
-  	  buf = f1.read(4096)
-	  if not buf : break
-	  SHAhash.update(hashlib.sha1(buf).hexdigest())
+        # Compute file hash.  Same as running "sha1sum <file>".
+        f1hash = hashlib.sha1()
+        while 1:
+          # Read file in as little chunks
+          buf = f1.read(4096)
+          if not buf : break
+          f1hash.update(buf)
         f1.close()
+
+        if verbose == 1:
+          print 'Hash is', f1hash.hexdigest()
+
+        # Append the hex representation of the current file's hash into the cumulative hash
+        SHAhash.update(f1hash.hexdigest())
 
   except:
     import traceback
     # Print the stack traceback
     traceback.print_exc()
     return -2
+
+  if verbose == 1:
+      print 'Final hash is', SHAhash.hexdigest()
+
   hex_stream = lambda s:",".join(['0x'+hex(ord(c))[2:].zfill(2) for c in s])
   return hex_stream(SHAhash.digest())
 

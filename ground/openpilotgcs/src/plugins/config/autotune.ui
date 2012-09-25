@@ -36,42 +36,10 @@
        <string>Pre-Autotune</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
-       <property name="leftMargin">
+       <property name="margin">
         <number>12</number>
        </property>
-       <property name="rightMargin">
-        <number>12</number>
-       </property>
-       <property name="bottomMargin">
-        <number>12</number>
-       </property>
-       <item row="1" column="0">
-        <spacer name="horizontalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="2">
-        <spacer name="horizontalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="0" colspan="3">
+       <item row="3" column="0" colspan="3">
         <widget class="QTextEdit" name="textEdit">
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
@@ -93,18 +61,45 @@ p, li { white-space: pre-wrap; }
 &lt;li style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Land and disarm.  (note - you &lt;span style=&quot; font-weight:600;&quot;&gt;MUST&lt;/span&gt; stay in autotune mode through this point, leaving autotune before disarming aborts the process)&lt;br /&gt;&lt;/li&gt;
 &lt;li style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;We'd recommend checking your stabilization settings before trying them out (ie: compare to what you currently use, if they are VASTLY different, probably a good indication bad things will happen).&lt;br /&gt;&lt;/li&gt;
 &lt;li style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Test fly the new settings.&lt;/li&gt;
-&lt;li style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you're ready to proceed, click the &lt;span style=&quot; font-style:italic;&quot;&gt;Enable Autotune Module&lt;/span&gt; checkbox below this text, click &lt;span style=&quot; font-style:italic;&quot;&gt;save&lt;/span&gt; and go to the next tab.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;li style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you're ready to proceed, click the &lt;span style=&quot; font-style:italic;&quot;&gt;Enable Autotune Module&lt;/span&gt; checkbox above this text, click &lt;span style=&quot; font-style:italic;&quot;&gt;save&lt;/span&gt; and go to the next tab.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QCheckBox" name="enableAutoTune">
-         <property name="text">
-          <string>Enable Autotune Module</string>
+       <item row="2" column="0" colspan="3">
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="title">
+          <string>Module Control</string>
          </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QCheckBox" name="enableAutoTune">
+            <property name="text">
+             <string>Enable Autotune Module</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>454</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+         <zorder>horizontalSpacer_5</zorder>
+         <zorder>enableAutoTune</zorder>
+         <zorder>horizontalSpacer_4</zorder>
+         <zorder>enableAutoTune</zorder>
+         <zorder>horizontalSpacer_5</zorder>
         </widget>
        </item>
       </layout>

@@ -26,12 +26,6 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
-   <property name="spacing">
-    <number>6</number>
-   </property>
-   <property name="margin">
-    <number>12</number>
-   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="sizePolicy">
@@ -48,9 +42,6 @@
        <string>Camera Stabilization</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="spacing">
-        <number>6</number>
-       </property>
        <property name="margin">
         <number>0</number>
        </property>
@@ -73,8 +64,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>742</width>
-            <height>604</height>
+            <width>741</width>
+            <height>559</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -1038,24 +1029,24 @@ value.</string>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="spacing">
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="horizontalSpacing">
       <number>4</number>
      </property>
-     <item>
+     <item row="0" column="0">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>321</width>
-         <height>10</height>
+         <width>288</width>
+         <height>18</height>
         </size>
        </property>
       </spacer>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QPushButton" name="camerastabilizationHelp">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1104,7 +1095,7 @@ value.</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="2">
       <widget class="QPushButton" name="camerastabilizationResetToDefaults">
        <property name="minimumSize">
         <size>
@@ -1135,7 +1126,7 @@ Apply or Save button afterwards.</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="3">
       <widget class="QPushButton" name="pushButton">
        <property name="minimumSize">
         <size>
@@ -1168,7 +1159,7 @@ Apply or Save button afterwards.</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="4">
       <widget class="QPushButton" name="camerastabilizationSaveRAM">
        <property name="minimumSize">
         <size>
@@ -1195,7 +1186,7 @@ Apply or Save button afterwards.</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="5">
       <widget class="QPushButton" name="camerastabilizationSaveSD">
        <property name="minimumSize">
         <size>

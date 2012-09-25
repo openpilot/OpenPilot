@@ -4,15 +4,13 @@ import "."
 Rectangle {
     color: "#666666"
 
-    Image {
+    SvgElementImage {
         id: background
-        source: "image://svg/pfd.svg!background"
-
+        elementName: "background"
         fillMode: Image.PreserveAspectFit
         anchors.fill: parent
 
-        sourceSize.width: width
-        sourceSize.height: height
+        sceneSize: Qt.size(width, height)
 
         Item {
             id: sceneItem
@@ -27,60 +25,74 @@ Rectangle {
                 source: qmlWidget.terrainEnabled ? "PfdTerrainView.qml" : "PfdWorldView.qml"
             }
 
-            Image {
+            SvgElementImage {
                 id: rollscale
-                source: "image://svg/pfd.svg!rollscale"
-                sourceSize: background.sourceSize
+                elementName: "rollscale"
+                sceneSize: background.sceneSize
+
                 smooth: true
-		anchors.centerIn: parent
-                 //rotate it around the center of scene
-		transform: Rotation {
-		angle: -AttitudeActual.Roll
-		origin.x : sceneItem.width/2 - x
-		origin.y : sceneItem.height/2 - y
-		}
+                anchors.centerIn: parent
+                //rotate it around the center of scene
+                transform: Rotation {
+                    angle: -AttitudeActual.Roll
+                    origin.x : sceneItem.width/2 - x
+                    origin.y : sceneItem.height/2 - y
+                }
             }
 
-            Image {
+            SvgElementImage {
                 id: foreground
-                source: "image://svg/pfd.svg!foreground"
-                sourceSize: background.sourceSize
+                elementName: "foreground"
+                sceneSize: background.sceneSize
+
                 anchors.centerIn: parent
             }
 
-            Image {
-                id: compass
-                source: "image://svg/pfd.svg!compass"
-                sourceSize: background.sourceSize
-                clip: true
+            SvgElementImage {
+                id: side_slip
+                elementName: "sideslip"
+                sceneSize: background.sceneSize
+                smooth: true
 
-                y: 12
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                Image {
-                    id: compass_band
-                    source: "image://svg/pfd.svg!compass-band"
-                    sourceSize: background.sourceSize
-
-                    anchors.centerIn: parent
-                    //the band is 540 degrees wide
-                    anchors.horizontalCenterOffset: -1*AttitudeActual.Yaw/540*width
+                property real sideSlip: Accels.y
+                //smooth side slip changes, a low pass filter replacement
+                //accels are updated once per second
+                Behavior on sideSlip {
+                    SmoothedAnimation {
+                        duration: 1000
+                        velocity: -1
+                    }
                 }
+
+                anchors.horizontalCenter: foreground.horizontalCenter
+                //0.5 coefficient is empirical to limit indicator movement
+                anchors.horizontalCenterOffset: -sideSlip*width*0.5
+                y: scaledBounds.y * sceneItem.height
+            }
+
+            Compass {
+                anchors.fill: parent
+                sceneSize: background.sceneSize
             }
 
             SpeedScale {
                 anchors.fill: parent
-                sourceSize: background.sourceSize
+                sceneSize: background.sceneSize
             }
 
             AltitudeScale {
                 anchors.fill: parent
-                sourceSize: background.sourceSize
+                sceneSize: background.sourceSize
+            }
+
+            VsiScale {
+                anchors.fill: parent
+                sceneSize: background.sourceSize
             }
 
             PfdIndicators {
                 anchors.fill: parent
-                sourceSize: background.sourceSize
+                sceneSize: background.sourceSize
             }
         }
     }

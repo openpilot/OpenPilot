@@ -92,6 +92,7 @@ plugin_uploader.subdir = uploader
 plugin_uploader.depends = plugin_coreplugin
 plugin_uploader.depends += plugin_uavobjects
 plugin_uploader.depends += plugin_rawhid
+plugin_uploader.depends += plugin_uavobjectutil
 SUBDIRS += plugin_uploader
 
 #Dial gadget

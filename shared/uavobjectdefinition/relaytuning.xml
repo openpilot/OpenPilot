@@ -3,7 +3,7 @@
         <description>The input to the relay tuning.</description>
 	<field name="Period" units="ms" type="float" elementnames="Roll,Pitch,Yaw"/>
 	<field name="Gain" units="(deg/s)/output" type="float" elementnames="Roll,Pitch,Yaw"/>
-        <access gcs="readwrite" flight="readwrite"/>
+        <access gcs="readonly" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>
         <logging updatemode="manual" period="0"/>

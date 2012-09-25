@@ -68,7 +68,7 @@ public:
         quint32 getFirmwareCRC();
         QByteArray getBoardDescription();
         deviceDescriptorStruct getBoardDescriptionStruct();
-        static bool descriptionToStructure(QByteArray desc,deviceDescriptorStruct * struc);
+        static bool descriptionToStructure(QByteArray desc,deviceDescriptorStruct & struc);
         UAVObjectManager* getObjectManager();
         void saveObjectToSD(UAVObject *obj);
 protected:

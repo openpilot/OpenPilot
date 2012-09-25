@@ -56,7 +56,6 @@ public slots:
 private slots:
     void recomputeStabilization();
     void saveStabilization();
-    void refreshValues();
 };
 
 #endif // CONFIGAUTOTUNE_H

@@ -453,6 +453,9 @@
    <bool>false</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="spacing">
+    <number>14</number>
+   </property>
    <property name="margin">
     <number>12</number>
    </property>
@@ -598,7 +601,7 @@
             <x>0</x>
             <y>0</y>
             <width>935</width>
-            <height>619</height>
+            <height>615</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_12" stretch="0,0,0,0">
@@ -6934,7 +6937,7 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>920</width>
+            <width>567</width>
             <height>644</height>
            </rect>
           </property>
@@ -16857,8 +16860,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>935</width>
-            <height>619</height>
+            <width>830</width>
+            <height>571</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">

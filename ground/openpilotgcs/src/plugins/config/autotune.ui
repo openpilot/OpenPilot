@@ -21,7 +21,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
-    <number>6</number>
+    <number>-1</number>
    </property>
    <item>
     <widget class="QTabWidget" name="Autotune_tabs">
@@ -194,8 +194,8 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>709</width>
-            <height>598</height>
+            <width>498</width>
+            <height>503</height>
            </rect>
           </property>
           <property name="sizePolicy">

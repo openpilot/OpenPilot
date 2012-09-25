@@ -145,13 +145,14 @@ enum pios_rfm22b_dev_magic {
 enum pios_rfm22b_state {
 	RFM22B_STATE_UNINITIALIZED,
 	RFM22B_STATE_INITIALIZING,
-	RFM22B_STATE_ERROR,
 	RFM22B_STATE_RX_MODE,
 	RFM22B_STATE_WAIT_PREAMBLE,
 	RFM22B_STATE_WAIT_SYNC,
 	RFM22B_STATE_RX_DATA,
 	RFM22B_STATE_TX_START,
 	RFM22B_STATE_TX_DATA,
+	RFM22B_STATE_TIMEOUT,
+	RFM22B_STATE_ERROR,
 	RFM22B_STATE_FATAL_ERROR,
 
 	RFM22B_STATE_NUM_STATES // Must be last
@@ -161,7 +162,6 @@ enum pios_rfm22b_event {
 	RFM22B_EVENT_INITIALIZE,
 	RFM22B_EVENT_INITIALIZED,
 	RFM22B_EVENT_INT_RECEIVED,
-	RFM22B_EVENT_TX_MODE,
 	RFM22B_EVENT_RX_MODE,
 	RFM22B_EVENT_PREAMBLE_DETECTED,
 	RFM22B_EVENT_SYNC_DETECTED,
@@ -257,6 +257,10 @@ struct pios_rfm22b_dev {
 	// afc correction reading (in Hz)
 	int32_t afc_correction_Hz;
 	int8_t rx_packet_start_afc_Hz;
+
+	// The maximum time (ms) that it should take to transmit / receive a packet.
+	uint32_t max_packet_time;
+	portTickType packet_start_time;
 };
 
 struct pios_rfm22b_transition {
@@ -301,6 +305,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_process_state_transition(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event);
+static enum pios_rfm22b_event rfm22_timeout(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_error(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_fatal_error(struct pios_rfm22b_dev *rfm22b_dev);
 
@@ -346,20 +351,13 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
 		},
 	},
-	[RFM22B_STATE_ERROR] = {
-		.entry_fn = rfm22_error,
-		.next_state = {
-			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
-			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
-		},
-	},
 	[RFM22B_STATE_RX_MODE] = {
 		.entry_fn = rfm22_setRxMode,
 		.next_state = {
 			[RFM22B_EVENT_INT_RECEIVED] = RFM22B_STATE_WAIT_PREAMBLE,
 			[RFM22B_EVENT_SEND_PACKET] = RFM22B_STATE_TX_START,
 			[RFM22B_EVENT_TX_START] = RFM22B_STATE_TX_START,
-			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TX_START,
+			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
 		},
@@ -371,7 +369,7 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 			[RFM22B_EVENT_PREAMBLE_DETECTED] = RFM22B_STATE_WAIT_SYNC,
 			[RFM22B_EVENT_SEND_PACKET] = RFM22B_STATE_TX_START,
 			[RFM22B_EVENT_TX_START] = RFM22B_STATE_TX_START,
-			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TX_START,
+			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
 		},
@@ -382,6 +380,7 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 			[RFM22B_EVENT_INT_RECEIVED] = RFM22B_STATE_WAIT_SYNC,
 			[RFM22B_EVENT_SYNC_DETECTED] = RFM22B_STATE_RX_DATA,
 			[RFM22B_EVENT_TX_START] = RFM22B_STATE_TX_START,
+			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
 		},
@@ -390,8 +389,8 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 		.entry_fn = rfm22_rxData,
 		.next_state = {
 			[RFM22B_EVENT_INT_RECEIVED] = RFM22B_STATE_RX_DATA,
-			[RFM22B_EVENT_TX_MODE] = RFM22B_STATE_TX_DATA,
 			[RFM22B_EVENT_RX_COMPLETE] = RFM22B_STATE_TX_START,
+			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
 		},
@@ -400,8 +399,8 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 		.entry_fn = rfm22_txStart,
 		.next_state = {
 			[RFM22B_EVENT_INT_RECEIVED] = RFM22B_STATE_TX_DATA,
-			[RFM22B_EVENT_TX_MODE] = RFM22B_STATE_TX_DATA,
 			[RFM22B_EVENT_RX_MODE] = RFM22B_STATE_RX_MODE,
+			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
 		},
@@ -410,8 +409,25 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 		.entry_fn = rfm22_txData,
 		.next_state = {
 			[RFM22B_EVENT_INT_RECEIVED] = RFM22B_STATE_TX_DATA,
-			[RFM22B_EVENT_TX_MODE] = RFM22B_STATE_TX_DATA,
 			[RFM22B_EVENT_TX_COMPLETE] = RFM22B_STATE_TX_START,
+			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
+			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
+			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
+		},
+	},
+	[RFM22B_STATE_TIMEOUT] = {
+		.entry_fn = rfm22_timeout,
+		.next_state = {
+			[RFM22B_EVENT_TX_START] = RFM22B_STATE_TX_START,
+			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
+			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
+			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
+		},
+	},
+	[RFM22B_STATE_ERROR] = {
+		.entry_fn = rfm22_error,
+		.next_state = {
+			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
 		},
@@ -568,6 +584,10 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 
 	*rfm22b_id = (uint32_t)rfm22b_dev;
 	g_rfm22b_dev = rfm22b_dev;
+
+	// Calculate the (approximate) maximum amount of time that it should take to transmit / receive a packet.
+	rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(rfm22b_dev->cfg.maxRFBandwidth) + 0.5);
+	rfm22b_dev->packet_start_time = 0;
 
 	// Create a semaphore to know if an ISR needs responding to
 	vSemaphoreCreateBinary( rfm22b_dev->isrPending );
@@ -803,8 +823,6 @@ static void PIOS_RFM22B_Task(void *parameters)
 			portTickType timeSinceEvent = xTaskGetTickCount() - lastEventTime;
 			if ((timeSinceEvent / portTICK_RATE_MS) > PIOS_RFM22B_SUPERVISOR_TIMEOUT)
 			{
-				rfm22b_dev->resets++;
-
  				// Transsition through an error event.
 				enum pios_rfm22b_event event = RFM22B_EVENT_ERROR;
 				while(event != RFM22B_EVENT_NUM_EVENTS)
@@ -816,6 +834,24 @@ static void PIOS_RFM22B_Task(void *parameters)
 				lastEventTime = xTaskGetTickCount();
 			}
 			else
+			{
+				enum pios_rfm22b_event event = RFM22B_EVENT_TIMEOUT;
+				while(event != RFM22B_EVENT_NUM_EVENTS)
+					event = rfm22_process_state_transition(rfm22b_dev, event);
+			}
+		}
+
+		// Have we locked up sending / receiving a packet?
+		if (rfm22b_dev->packet_start_time > 0)
+		{
+			portTickType cur_time = xTaskGetTickCount();
+
+			// Did the clock wrap around?
+			if (cur_time < rfm22b_dev->packet_start_time)
+				rfm22b_dev->packet_start_time = (cur_time > 0) ? cur_time : 1;
+
+			// Have we been sending this packet too long?
+			if ((cur_time - rfm22b_dev->packet_start_time) > (rfm22b_dev->max_packet_time * 5))
 			{
 				enum pios_rfm22b_event event = RFM22B_EVENT_TIMEOUT;
 				while(event != RFM22B_EVENT_NUM_EVENTS)
@@ -1165,6 +1201,7 @@ void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
 
 static enum pios_rfm22b_event rfm22_setRxMode(struct pios_rfm22b_dev *rfm22b_dev)
 {
+	rfm22b_dev->packet_start_time = 0;
 
 	// disable interrupts
 	rfm22_write(RFM22_interrupt_enable1, 0x00);
@@ -1212,6 +1249,9 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 		return RFM22B_EVENT_RX_MODE;
 	}
 	rfm22b_dev->tx_packet = p;
+	rfm22b_dev->packet_start_time = xTaskGetTickCount();
+	if (rfm22b_dev->packet_start_time == 0)
+		rfm22b_dev->packet_start_time = 1;
 
 	// disable interrupts
 	rfm22_write(RFM22_interrupt_enable1, 0x00);
@@ -1319,6 +1359,9 @@ static enum pios_rfm22b_event rfm22_detectPreamble(struct pios_rfm22b_dev *rfm22
 	// Valid preamble detected
 	if (rfm22b_dev->int_status2 & RFM22_is2_ipreaval)
 	{
+		rfm22b_dev->packet_start_time = xTaskGetTickCount();
+		if (rfm22b_dev->packet_start_time == 0)
+			rfm22b_dev->packet_start_time = 1;
 		RX_LED_ON;
 		return RFM22B_EVENT_PREAMBLE_DETECTED;
 	}
@@ -1452,6 +1495,7 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 		}
 
 		// Start a new transaction
+		rfm22b_dev->packet_start_time = 0;
 		return RFM22B_EVENT_RX_COMPLETE;
 	}
 
@@ -1506,6 +1550,7 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 		rfm22b_dev->tx_packet = 0;
 		rfm22b_dev->tx_data_wr = rfm22b_dev->tx_data_rd = 0;
 		// Start a new transaction
+		rfm22b_dev->packet_start_time = 0;
 		return RFM22B_EVENT_TX_COMPLETE;
 	}
 
@@ -1594,6 +1639,8 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22b_dev->frequency_hop_channel = 0;
 
 	rfm22b_dev->afc_correction_Hz = 0;
+
+	rfm22b_dev->packet_start_time = 0;
 
 	// ****************
 	// read the RF chip ID bytes
@@ -1781,8 +1828,17 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	return RFM22B_EVENT_INITIALIZED;
 }
 
+static enum pios_rfm22b_event rfm22_timeout(struct pios_rfm22b_dev *rfm22b_dev)
+{
+	rfm22b_dev->resets++;
+	rfm22b_dev->packet_start_time = 0;
+	return RFM22B_EVENT_TX_START;
+}
+
 static enum pios_rfm22b_event rfm22_error(struct pios_rfm22b_dev *rfm22b_dev)
 {
+	rfm22b_dev->resets++;
+	rfm22b_dev->packet_start_time = 0;
 	return RFM22B_EVENT_INITIALIZE;
 }
 

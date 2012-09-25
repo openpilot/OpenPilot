@@ -19,7 +19,7 @@
      <x>300</x>
      <y>40</y>
      <width>270</width>
-     <height>270</height>
+     <height>341</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -32,7 +32,7 @@
      <x>20</x>
      <y>40</y>
      <width>270</width>
-     <height>291</height>
+     <height>341</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -45,7 +45,7 @@
        <x>0</x>
        <y>10</y>
        <width>261</width>
-       <height>281</height>
+       <height>321</height>
       </rect>
      </property>
      <property name="text">
@@ -94,7 +94,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>200</y>
+       <y>250</y>
        <width>241</width>
        <height>19</height>
       </rect>
@@ -128,7 +128,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>240</y>
+       <y>290</y>
        <width>75</width>
        <height>23</height>
       </rect>
@@ -171,7 +171,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>200</y>
+       <y>250</y>
        <width>241</width>
        <height>19</height>
       </rect>
@@ -214,7 +214,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>240</y>
+       <y>290</y>
        <width>75</width>
        <height>23</height>
       </rect>
@@ -235,7 +235,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>240</y>
+       <y>290</y>
        <width>75</width>
        <height>23</height>
       </rect>
@@ -276,7 +276,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>200</y>
+       <y>250</y>
        <width>241</width>
        <height>20</height>
       </rect>
@@ -321,7 +321,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>90</x>
-       <y>240</y>
+       <y>290</y>
        <width>75</width>
        <height>23</height>
       </rect>
@@ -343,7 +343,7 @@ p, li { white-space: pre-wrap; }
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>200</y>
+       <y>250</y>
        <width>241</width>
        <height>20</height>
       </rect>
@@ -424,35 +424,6 @@ p, li { white-space: pre-wrap; }
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="nextPageButton">
-   <property name="geometry">
-    <rect>
-     <x>150</x>
-     <y>340</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>&gt;</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="backPageButton">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="geometry">
-    <rect>
-     <x>70</x>
-     <y>340</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>&lt;</string>
    </property>
   </widget>
  </widget>

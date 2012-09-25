@@ -48,13 +48,15 @@ public:
     void initializePage();
     bool validatePage();
 
+    bool isFinished() { return m_currentWizardIndex >= m_wizardIndexes.size() - 1; }
+
 protected:
     void showEvent(QShowEvent *event);
     
-private slots:
-    void on_nextPageButton_clicked();
-    void on_backPageButton_clicked();
+public slots:
+    void customBackClicked();
 
+private slots:
     void on_motorNeutralButton_toggled(bool checked);
     void on_motorNeutralSlider_valueChanged(int value);
 
@@ -84,7 +86,7 @@ private:
     QGraphicsScene *m_vehicleScene;
     QGraphicsSvgItem *m_vehicleBoundsItem;
 
-    quint16 m_currentWizardIndex;
+    qint16 m_currentWizardIndex;
 
     QList<QString> m_vehicleElementIds;
     QList<QGraphicsSvgItem*> m_vehicleItems;

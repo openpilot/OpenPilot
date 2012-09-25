@@ -35,7 +35,6 @@
 #include "vehicleconfigurationsource.h"
 #include "vehicleconfigurationhelper.h"
 
-
 class SetupWizard : public QWizard, public VehicleConfigurationSource
 {
     Q_OBJECT
@@ -79,7 +78,8 @@ public:
         }
         return m_connectionManager;
     }
-
+private slots:
+    void customBackClicked();
 private:
     enum {PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
           PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_LEVELLING, PAGE_CALIBRATION,
@@ -100,6 +100,8 @@ private:
     QList<actuatorChannelSettings> m_actuatorSettings;
 
     bool m_restartNeeded;
+
+    bool m_back;
 
     Core::ConnectionManager *m_connectionManager;
 };

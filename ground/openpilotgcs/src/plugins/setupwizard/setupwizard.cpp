@@ -39,9 +39,9 @@
 #include "pages/levellingpage.h"
 #include "pages/summarypage.h"
 #include "pages/flashpage.h"
-#include "pages/outputcalibrationpage.h"
 #include "pages/notyetimplementedpage.h"
 #include "pages/rebootpage.h"
+#include "pages/outputcalibrationpage.h"
 #include "extensionsystem/pluginmanager.h"
 #include "vehicleconfigurationhelper.h"
 #include "actuatorsettings.h"
@@ -53,12 +53,13 @@ SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfiguratio
 {
     setWindowTitle(tr("OpenPilot Setup Wizard"));
     setOption(QWizard::IndependentPages, false);
-    setFixedSize(640, 530);
     for(quint16 i = 0; i < ActuatorSettings::CHANNELMAX_NUMELEM; i++)
     {
         m_actuatorSettings << actuatorChannelSettings();
     }
     createPages();
+    setWizardStyle(QWizard::ModernStyle);
+    setFixedSize(640, 530);
 }
 
 int SetupWizard::nextId() const
@@ -245,9 +246,11 @@ QString SetupWizard::getSummaryText()
             summary.append(tr("Unknown"));
     }
 
+    /*
     summary.append("<br>");
     summary.append("<b>").append(tr("Reboot required: ")).append("</b>");
     summary.append(isRestartNeeded() ? tr("<font color='red'>Yes</font>") : tr("<font color='green'>No</font>"));
+    */
     return summary;
 }
 
@@ -271,6 +274,23 @@ void SetupWizard::createPages()
     setPage(PAGE_END, new EndPage(this));
 
     setStartId(PAGE_START);
+
+    connect(button(QWizard::CustomButton1), SIGNAL(clicked()), this, SLOT(customBackClicked()));
+    setButtonText(QWizard::CustomButton1, buttonText(QWizard::BackButton));
+    QList<QWizard::WizardButton> button_layout;
+    button_layout << QWizard::Stretch << QWizard::CustomButton1 << QWizard::NextButton << QWizard::CancelButton;
+    setButtonLayout(button_layout);
+
+}
+
+void SetupWizard::customBackClicked()
+{
+    if(currentId() == PAGE_CALIBRATION) {
+        static_cast<OutputCalibrationPage*>(currentPage())->customBackClicked();
+    }
+    else {
+        back();
+    }
 }
 
 bool SetupWizard::saveHardwareSettings() const

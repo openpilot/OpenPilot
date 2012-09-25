@@ -32,7 +32,7 @@
 
 OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent), ui(new Ui::OutputCalibrationPage), m_vehicleBoundsItem(0),
-    m_currentWizardIndex(0), m_calibrationUtil(0)
+    m_currentWizardIndex(-1), m_calibrationUtil(0)
 {
     ui->setupUi(this);
 
@@ -171,8 +171,6 @@ void OutputCalibrationPage::setWizardPage()
 {
     qDebug() << "Wizard index: " << m_currentWizardIndex;
     m_calibrationUtil->stopChannelOutput();
-    ui->backPageButton->setEnabled(m_currentWizardIndex > 0);
-    ui->nextPageButton->setEnabled(m_currentWizardIndex < m_wizardIndexes.size() - 1);
 
     QApplication::processEvents();
 
@@ -211,8 +209,14 @@ void OutputCalibrationPage::initializePage()
 
 bool OutputCalibrationPage::validatePage()
 {
-    getWizard()->setActuatorSettings(m_actuatorSettings);
-    return true;
+    if(isFinished()) {
+        getWizard()->setActuatorSettings(m_actuatorSettings);
+        return true;
+    } else {
+        m_currentWizardIndex++;
+        setWizardPage();
+        return false;
+    }
 }
 
 void OutputCalibrationPage::showEvent(QShowEvent *event)
@@ -224,19 +228,16 @@ void OutputCalibrationPage::showEvent(QShowEvent *event)
     }
 }
 
-void OutputCalibrationPage::on_nextPageButton_clicked()
+void OutputCalibrationPage::customBackClicked()
 {
-    if(m_currentWizardIndex < m_wizardIndexes.size() - 1) {
-        m_currentWizardIndex++;
-        setWizardPage();
-    }
-}
-
-void OutputCalibrationPage::on_backPageButton_clicked()
-{
-    if(m_currentWizardIndex > 0) {
+    if(m_currentWizardIndex > 0)
+    {
         m_currentWizardIndex--;
         setWizardPage();
+    }
+    else
+    {
+        getWizard()->back();
     }
 }
 
@@ -247,9 +248,8 @@ quint16 OutputCalibrationPage::getCurrentChannel()
 
 void OutputCalibrationPage::enableButtons(bool enable)
 {
-    ui->nextPageButton->setEnabled(enable && (m_currentWizardIndex < m_wizardIndexes.size() - 1));
-    ui->backPageButton->setEnabled(enable && (m_currentWizardIndex > 0));
     getWizard()->button(QWizard::NextButton)->setEnabled(enable);
+    getWizard()->button(QWizard::CustomButton1)->setEnabled(enable);
     getWizard()->button(QWizard::CancelButton)->setEnabled(enable);
     getWizard()->button(QWizard::BackButton)->setEnabled(enable);
     QApplication::processEvents();

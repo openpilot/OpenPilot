@@ -29,6 +29,7 @@ public:
 
     void setQmlFile(const QString &fileName) { m_qmlFile=fileName; }
     void setEarthFile(const QString &fileName) { m_earthFile=fileName; }
+    void setOpenGLEnabled(bool flag) { m_openGLEnabled = flag; }
     void setTerrainEnabled(bool flag) { m_terrainEnabled = flag; }
     void setActualPositionUsed(bool flag) { m_actualPositionUsed = flag; }
     void setLatitude(double value) { m_latitude = value; }
@@ -38,6 +39,7 @@ public:
 
     QString qmlFile() const { return m_qmlFile; }
     QString earthFile() const { return m_earthFile; }
+    bool openGLEnabled() const { return m_openGLEnabled; }
     bool terrainEnabled() const { return m_terrainEnabled; }
     bool actualPositionUsed() const { return m_actualPositionUsed; }
     double latitude() const { return m_latitude; }
@@ -51,6 +53,7 @@ public:
 private:
     QString m_qmlFile; // The name of the dial's SVG source file
     QString m_earthFile; // The name of osgearth terrain file
+    bool m_openGLEnabled;
     bool m_terrainEnabled;
     bool m_actualPositionUsed;
     double m_latitude;

@@ -296,6 +296,7 @@ static void SensorsTask(void *parameters)
 #endif
 				break;
 			case 0x02:  // MPU6000 board
+			case 0x03:  // MPU6000 board
 #if defined(PIOS_INCLUDE_MPU6000)
 			{
 				struct pios_mpu6000_data mpu6000_data;

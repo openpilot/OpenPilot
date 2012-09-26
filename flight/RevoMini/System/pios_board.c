@@ -296,7 +296,13 @@ void PIOS_Board_Init(void) {
 	/* Delay system */
 	PIOS_DELAY_Init();
 
-	PIOS_LED_Init(&pios_led_cfg);
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+	
+#if defined(PIOS_INCLUDE_LED)
+	const struct pios_led_cfg * led_cfg = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
+	PIOS_Assert(led_cfg);
+	PIOS_LED_Init(led_cfg);
+#endif	/* PIOS_INCLUDE_LED */
 
 	/* Set up the SPI interface to the gyro/acelerometer */
 	if (PIOS_SPI_Init(&pios_spi_gyro_id, &pios_spi_gyro_cfg)) {

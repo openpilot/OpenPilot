@@ -52,9 +52,51 @@ static const struct pios_led_cfg pios_led_cfg = {
 	.num_leds = NELEMENTS(pios_leds),
 };
 
+static const struct pios_led pios_leds_v2[] = {
+	[PIOS_LED_HEARTBEAT] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_5,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+				.GPIO_Mode  = GPIO_Mode_OUT,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd = GPIO_PuPd_UP
+			},
+		},
+	},
+	[PIOS_LED_ALARM] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_4,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+				.GPIO_Mode  = GPIO_Mode_OUT,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd = GPIO_PuPd_UP
+			},
+		},
+	},
+};
+
+static const struct pios_led_cfg pios_led_v2_cfg = {
+	.leds     = pios_leds_v2,
+	.num_leds = NELEMENTS(pios_leds_v2),
+};
+
 const struct pios_led_cfg * PIOS_BOARD_HW_DEFS_GetLedCfg (uint32_t board_revision)
 {
-	return &pios_led_cfg;
+	switch(board_revision) {
+		case 2:
+			return &pios_led_cfg;
+			break;
+		case 3:
+			return &pios_led_v2_cfg;
+			break;
+		default:
+			PIOS_DEBUG_Assert(0);
+	}
+	return NULL;
 }
 
 #endif	/* PIOS_INCLUDE_LED */

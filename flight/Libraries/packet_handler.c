@@ -475,12 +475,12 @@ static uint8_t PHLTransmitPacket(PHPacketDataHandle data, PHPacketHandle p)
 
 	// Set the sequence ID to the current ID.
 	p->header.tx_seq = data->tx_seq_id++;
+	p->header.source_id = data->cfg.source_id;
 
 	// Add the error correcting code.
 	encode_data((unsigned char*)p, PHPacketSize(p), (unsigned char*)p);
 
 	// Transmit the packet using the output stream.
-	p->header.source_id = data->cfg.source_id;
 	if(data->output_stream(p) == -1)
 		return 0;
 

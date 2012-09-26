@@ -835,6 +835,7 @@ static void PIOS_RFM22B_Task(void *parameters)
 			}
 			else
 			{
+				rfm22b_dev->resets = rfm22b_dev->state;
 				enum pios_rfm22b_event event = RFM22B_EVENT_TIMEOUT;
 				while(event != RFM22B_EVENT_NUM_EVENTS)
 					event = rfm22_process_state_transition(rfm22b_dev, event);
@@ -1399,6 +1400,11 @@ static enum pios_rfm22b_event rfm22_detectSync(struct pios_rfm22b_dev *rfm22b_de
 		rfm22b_dev->rx_packet_start_afc_Hz = rfm22b_dev->afc_correction_Hz;
 
 		return RFM22B_EVENT_SYNC_DETECTED;
+	}
+	else if (rfm22b_dev->int_status2 & !RFM22_is2_ipreaval)
+	{
+		// Waiting for sync timed out.
+		return RFM22B_EVENT_TX_START;
 	}
 
 	return RFM22B_EVENT_NUM_EVENTS;

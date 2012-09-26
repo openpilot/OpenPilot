@@ -20,12 +20,6 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_4">
-   <property name="margin">
-    <number>0</number>
-   </property>
-   <property name="spacing">
-    <number>0</number>
-   </property>
    <item row="0" column="0">
     <widget class="QScrollArea" name="scrollArea">
      <property name="frameShape">
@@ -42,8 +36,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>457</width>
-        <height>436</height>
+        <width>439</width>
+        <height>418</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
@@ -78,6 +72,16 @@
         </layout>
        </item>
        <item row="1" column="0" colspan="2">
+        <widget class="QCheckBox" name="useOpenGL">
+         <property name="text">
+          <string>Use OpenGL</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
         <widget class="QGroupBox" name="showTerrain">
          <property name="title">
           <string>Show Terrain:</string>
@@ -213,7 +217,7 @@
          </layout>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -249,12 +253,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>150</x>
-     <y>138</y>
+     <x>167</x>
+     <y>188</y>
     </hint>
     <hint type="destinationlabel">
-     <x>142</x>
-     <y>172</y>
+     <x>260</x>
+     <y>222</y>
     </hint>
    </hints>
   </connection>
@@ -265,12 +269,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>164</x>
-     <y>141</y>
+     <x>181</x>
+     <y>188</y>
     </hint>
     <hint type="destinationlabel">
-     <x>164</x>
-     <y>202</y>
+     <x>282</x>
+     <y>255</y>
     </hint>
    </hints>
   </connection>
@@ -281,12 +285,28 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>190</x>
-     <y>141</y>
+     <x>207</x>
+     <y>188</y>
     </hint>
     <hint type="destinationlabel">
-     <x>190</x>
-     <y>237</y>
+     <x>308</x>
+     <y>288</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>useOpenGL</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>showTerrain</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>99</x>
+     <y>57</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>99</x>
+     <y>89</y>
     </hint>
    </hints>
   </connection>

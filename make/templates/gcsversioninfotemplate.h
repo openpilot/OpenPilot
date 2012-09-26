@@ -26,7 +26,7 @@
  */
 
 #define GCS_REVISION ${TAG_OR_BRANCH}:${HASH8}${DIRTY} ${DATETIME}
-
+#define UAVO_HASH "{ ${UAVOSHA1} }"
 /**
  * @}
  */

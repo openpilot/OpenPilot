@@ -60,7 +60,7 @@ public slots:
 
 private:
     static const int STATS_UPDATE_PERIOD_MS = 4000;
-    static const int STATS_CONNECT_PERIOD_MS = 1000;
+    static const int STATS_CONNECT_PERIOD_MS = 2000;
     static const int CONNECTION_TIMEOUT_MS = 8000;
 
     UAVObjectManager* objMngr;

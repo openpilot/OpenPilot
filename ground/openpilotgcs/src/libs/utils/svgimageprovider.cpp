@@ -67,17 +67,57 @@ QSvgRenderer *SvgImageProvider::loadRenderer(const QString &svgFile)
 }
 
 /**
-  requestedSize is realted to the whole svg file, not to specific element
-  */
+   Supported id format: fileName[!elementName[?parameters]]
+   where parameters may be:
+   vslice=1:2;hslice=2:4 - use the 3rd horizontal slice of total 4 slices, slice numbering starts from 0
+   borders=1 - 1 pixel wide transparent border
+
+   requestedSize is related to the whole element size, even if slice is requested.
+
+   usage:
+
+   Image {
+       source: "image://svg/pfd.svg!world"
+   }
+*/
 QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
     QString svgFile = id;
     QString element;
+    QString parameters;
 
     int separatorPos = id.indexOf('!');
     if (separatorPos != -1) {
         svgFile = id.left(separatorPos);
         element = id.mid(separatorPos+1);
+    }
+
+    int parametersPos = element.indexOf('?');
+    if (parametersPos != -1) {
+        parameters = element.mid(parametersPos+1);
+        element = element.left(parametersPos);
+    }
+
+    int hSlicesCount = 0;
+    int hSlice = 0;
+    int vSlicesCount = 0;
+    int vSlice = 0;
+    int border = 0;
+    if (!parameters.isEmpty()) {
+        QRegExp hSliceRx("hslice=(\\d+):(\\d+)");
+        if (hSliceRx.indexIn(parameters) != -1) {
+            hSlice = hSliceRx.cap(1).toInt();
+            hSlicesCount = hSliceRx.cap(2).toInt();
+        }
+        QRegExp vSliceRx("vslice=(\\d+):(\\d+)");
+        if (vSliceRx.indexIn(parameters) != -1) {
+            vSlice = vSliceRx.cap(1).toInt();
+            vSlicesCount = vSliceRx.cap(2).toInt();
+        }
+        QRegExp borderRx("border=(\\d+)");
+        if (borderRx.indexIn(parameters) != -1) {
+            border = borderRx.cap(1).toInt();
+        }
     }
 
     if (size)
@@ -92,9 +132,15 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
 
     QSize docSize = renderer->defaultSize();
 
-    if (!requestedSize.isEmpty() && !docSize.isEmpty()) {
-        xScale = qreal(requestedSize.width())/docSize.width();
-        yScale = qreal(requestedSize.height())/docSize.height();
+    if (!requestedSize.isEmpty()) {
+        if (!element.isEmpty()) {
+            QRectF elementBounds = renderer->boundsOnElement(element);
+            xScale = qreal(requestedSize.width())/elementBounds.width();
+            yScale = qreal(requestedSize.height())/elementBounds.height();
+        } else if (!docSize.isEmpty()) {
+            xScale = qreal(requestedSize.width())/docSize.width();
+            yScale = qreal(requestedSize.height())/docSize.height();
+        }
     }
 
     //keep the aspect ratio
@@ -108,16 +154,37 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
         }
 
         QRectF elementBounds = renderer->boundsOnElement(element);
-        int w = qRound(elementBounds.width() * xScale);
-        int h = qRound(elementBounds.height() * yScale);
+        int elementWidth = qRound(elementBounds.width() * xScale);
+        int elementHeigh = qRound(elementBounds.height() * yScale);
+        int w = elementWidth;
+        int h = elementHeigh;
+        int x = 0;
+        int y = 0;
 
-        QImage img(w, h, QImage::Format_ARGB32_Premultiplied);
+        if (hSlicesCount > 1) {
+            x = (w*hSlice)/hSlicesCount;
+            w = (w*(hSlice+1))/hSlicesCount - x;
+        }
+
+        if (vSlicesCount > 1) {
+            y = (h*(vSlice))/vSlicesCount;
+            h = (h*(vSlice+1))/vSlicesCount - y;
+        }
+
+        QImage img(w+border*2, h+border*2, QImage::Format_ARGB32_Premultiplied);
         img.fill(0);
         QPainter p(&img);
-        renderer->render(&p, element);
+        p.setRenderHints(QPainter::TextAntialiasing |
+                         QPainter::Antialiasing |
+                         QPainter::SmoothPixmapTransform);
+
+        p.translate(-x+border,-y+border);
+        renderer->render(&p, element, QRectF(0, 0, elementWidth, elementHeigh));
 
         if (size)
             *size = QSize(w, h);
+
+        //img.save(element+parameters+".png");
         return img;
     } else {
         //render the whole svg file
@@ -127,7 +194,12 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
         QImage img(w, h, QImage::Format_ARGB32_Premultiplied);
         img.fill(0);
         QPainter p(&img);
-        renderer->render(&p);
+        p.setRenderHints(QPainter::TextAntialiasing |
+                         QPainter::Antialiasing |
+                         QPainter::SmoothPixmapTransform);
+
+        p.scale(xScale, yScale);
+        renderer->render(&p, QRectF(QPointF(), QSizeF(docSize)));
 
         if (size)
             *size = QSize(w, h);

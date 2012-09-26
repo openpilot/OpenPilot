@@ -30,8 +30,6 @@
 /**
  * We have 100 bytes for the whole description.
  *
- * Only the first 40 are visible on the FirmwareIAP uavobject, the remaining
- * 60 are ok to use for packaging and will be saved in the flash.
  *
  * Structure is:
  *   4 bytes: header: "OpFw".
@@ -39,9 +37,9 @@
  *   4 bytes: Unix timestamp of compile time.
  *   2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
  *  26 bytes: commit tag if it is there, otherwise branch name. '-dirty' may be added if needed. Zero-padded.
- *  ---- 40 bytes limit ---
  *  20 bytes: SHA1 sum of the firmware.
- *  40 bytes: free for now.
+ *  20 bytes: SHA1 sum of the uavo definitions.
+ *  20 bytes: free for now.
  *
  */
 
@@ -53,7 +51,8 @@ struct __attribute__((packed)) fw_version_info {
 	uint8_t board_revision;
 	uint8_t commit_tag_name[26];
 	uint8_t sha1sum[20];
-	uint8_t pad[40];
+	uint8_t uavosha1[20];
+	uint8_t pad[20];
 };
 
 const struct fw_version_info fw_version_blob __attribute__((used)) __attribute__((__section__(".fw_version_blob"))) = {
@@ -64,6 +63,7 @@ const struct fw_version_info fw_version_blob __attribute__((used)) __attribute__
 	.board_revision = ${BOARD_REVISION},
 	.commit_tag_name = "${FWTAG}",
 	.sha1sum = { ${SHA1} },
+	.uavosha1 = { ${UAVOSHA1} },
 }; 
 
 /**

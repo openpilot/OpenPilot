@@ -580,11 +580,13 @@ void ConfigTaskWidget::objectUpdated(UAVObject *obj)
  */
 bool ConfigTaskWidget::allObjectsUpdated()
 {
+    qDebug()<<"ConfigTaskWidge:allObjectsUpdated called";
     bool ret=true;
     foreach(UAVObject *obj, objectUpdates.keys())
     {
         ret=ret & objectUpdates[obj];
     }
+    qDebug()<<"Returned:"<<ret;
     return ret;
 }
 /**

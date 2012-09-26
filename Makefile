@@ -160,7 +160,7 @@ $(BUILD_DIR):
 ###############################################################
 
 # Set up QT toolchain
-QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-v1.2
+QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-v1.2.1
 
 .PHONY: qt_sdk_install
 qt_sdk_install: QT_SDK_URL  := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/8ea74da4-fec1-4277-8b26-c58cc82e204b/Qt_SDK_Lin32_offline

@@ -402,7 +402,7 @@ struct pios_rfm22b_cfg pios_rfm22b_cfg = {
 	.maxRFBandwidth = 128000,
 	.maxTxPower = RFM22_tx_pwr_txpow_7, // +20dBm .. 100mW
 	.slave_num = 0,
-	.gpio_direction = GPIO0_RX_GPIO1_TX,
+	.gpio_direction = GPIO0_TX_GPIO1_RX,
 };
 
 #endif /* PIOS_INCLUDE_RFM22B */
@@ -1283,9 +1283,9 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
 		},
 	},
 	.vsense = {
-		.gpio = GPIOB,
+		.gpio = GPIOC,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_13,
+			.GPIO_Pin   = GPIO_Pin_5,
 			.GPIO_Speed = GPIO_Speed_25MHz,
 			.GPIO_Mode  = GPIO_Mode_IN,
 			.GPIO_OType = GPIO_OType_OD,

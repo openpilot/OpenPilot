@@ -46,7 +46,6 @@
 
 #include "uavtalk/telemetrymanager.h"
 #include "uavobject.h"
-#include "uavobjectmanager.h"
 
 #include "positionactual.h"
 #include "homelocation.h"
@@ -590,6 +589,7 @@ void OPMapGadgetWidget::updatePosition()
     VelocityActual *velocityActualObj = VelocityActual::GetInstance(obm);
     Gyros *gyrosObj = Gyros::GetInstance(obm);
 
+    Q_ASSERT(attitudeActualObj);
     Q_ASSERT(positionActualObj);
     Q_ASSERT(velocityActualObj);
     Q_ASSERT(gyrosObj);

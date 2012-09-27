@@ -169,7 +169,7 @@ static bool PIOS_EXTI_generic_irq_handler(uint8_t line_index)
 #define PIOS_EXTI_HANDLE_LINE(line)				\
 	if (EXTI_GetITStatus(EXTI_Line##line) != RESET) {	\
 		EXTI_ClearITPendingBit(EXTI_Line##line);	\
-		xHigherPriorityTaskWoken |= PIOS_EXTI_generic_irq_handler(line);		\
+		xHigherPriorityTaskWoken = PIOS_EXTI_generic_irq_handler(line) ? pdTRUE : xHigherPriorityTaskWoken; \
 	}
 #else
 #define PIOS_EXTI_HANDLE_LINE(line)				\

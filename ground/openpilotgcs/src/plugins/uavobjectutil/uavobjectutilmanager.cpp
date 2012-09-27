@@ -323,7 +323,7 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
     homeLocationData.Latitude = LLA[0] * 1e7;
     homeLocationData.Longitude = LLA[1] * 1e7;
-    homeLocationData.Altitude = LLA[2] * 1e7;
+    homeLocationData.Altitude = LLA[2];
 
     homeLocationData.Be[0] = Be[0];
     homeLocationData.Be[1] = Be[1];

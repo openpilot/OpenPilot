@@ -44,7 +44,7 @@ HomeLocationUtil::HomeLocationUtil()
 }
 
 /*
-    /*Get world magnetic model
+    /*Get local magnetic field
      * input params: LLA
      * output params: Be
      */

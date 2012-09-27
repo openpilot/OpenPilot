@@ -55,13 +55,8 @@ public:
 
 	int setHomeLocation(double LLA[3], bool save_to_sdcard);
 	int getHomeLocation(bool &set, double LLA[3]);
-//	int getHomeLocation(bool &set, double LLA[3], double ECEF[3], double RNE[9], double Be[3]);
 
 	int getGPSPosition(double LLA[3]);
-
-//	int setTelemetrySerialPortSpeed(QString speed, bool save_to_sdcard);
-//	int getTelemetrySerialPortSpeed(QString &speed);
-//	int getTelemetrySerialPortSpeeds(QComboBox *comboBox);
 
         int getBoardModel();
         QByteArray getBoardCPUSerial();

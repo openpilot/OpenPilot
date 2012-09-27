@@ -120,7 +120,7 @@ void UAVObjectUtilManager::saveNextObject()
 
     // Get next object from the queue
     UAVObject* obj = queue.head();
-    qDebug() << "Request board to save object " << obj->getName();
+    qDebug() << "Send save object request to board " << obj->getName();
 
     ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
     connect(objper, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
@@ -332,7 +332,6 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
     homeLocationData.Set = HomeLocation::SET_TRUE;
 
     homeLocation->setData(homeLocationData);
-    homeLocation->updated();
 
     if (save_to_sdcard)
         saveObjectToSD(homeLocation);
@@ -370,56 +369,6 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])
 	return 0;	// OK
 }
 
-//int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3], double ECEF[3], double RNE[9], double Be[3])
-//{
-//	UAVObjectField *field;
-
-//	QMutexLocker locker(mutex);
-
-////	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-////	if (!pm) return -1;
-
-//	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-//	if (!om) return -2;
-
-//	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("HomeLocation")));
-//	if (!obj) return -3;
-
-////	obj->requestUpdate();
-
-//	field = obj->getField("Set");
-//	if (!field) return -4;
-//	set = field->getValue().toBool();
-
-//	field = obj->getField("Latitude");
-//	if (!field) return -5;
-//	LLA[0] = field->getDouble() * 1e-7;
-
-//	field = obj->getField("Longitude");
-//	if (!field) return -6;
-//	LLA[1] = field->getDouble() * 1e-7;
-
-//	field = obj->getField("Altitude");
-//	if (!field) return -7;
-//	LLA[2] = field->getDouble();
-
-//	field = obj->getField(QString("ECEF"));
-//	if (!field) return -8;
-//	for (int i = 0; i < 3; i++)
-//		ECEF[i] = field->getDouble(i);
-
-//	field = obj->getField(QString("RNE"));
-//	if (!field) return -9;
-//	for (int i = 0; i < 9; i++)
-//		RNE[i] = field->getDouble(i);
-
-//	field = obj->getField(QString("Be"));
-//	if (!field) return -10;
-//	for (int i = 0; i < 3; i++)
-//		Be[i] = field->getDouble(i);
-
-//	return 0;	// OK
-//}
 
 // ******************************
 // GPS
@@ -451,94 +400,6 @@ int UAVObjectUtilManager::getGPSPosition(double LLA[3])
 
 	return 0;	// OK
 }
-
-//// ******************************
-//// telemetry port
-
-//int UAVObjectUtilManager::setTelemetrySerialPortSpeed(QString speed, bool save_to_sdcard)
-//{
-//	UAVObjectField *field;
-
-//	QMutexLocker locker(mutex);
-
-//	// ******************
-//	// save the new settings
-
-////	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-////	if (!pm) return -1;
-
-//	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-//	if (!om) return -2;
-
-//	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("/*TelemetrySettings*/")));
-//	if (!obj) return -3;
-
-//	field = obj->getField(QString("Speed"));
-//	if (!field) return -4;
-//	field->setValue(speed);
-
-//	obj->updated();
-
-//	// ******************
-//	// save the new setting to SD card
-
-//	if (save_to_sdcard)
-//		saveObjectToSD(obj);
-
-//	// ******************
-
-//	return 0;	// OK
-//}
-
-//int UAVObjectUtilManager::getTelemetrySerialPortSpeed(QString &speed)
-//{
-//	UAVObjectField *field;
-
-//	QMutexLocker locker(mutex);
-
-////	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-////	if (!pm) return -1;
-
-//	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-//	if (!om) return -2;
-
-//	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("TelemetrySettings")));
-//	if (!obj) return -3;
-
-////	obj->requestUpdate();
-
-//	field = obj->getField(QString("Speed"));
-//	if (!field) return -4;
-//	speed = field->getValue().toString();
-
-//	return 0;	// OK
-//}
-
-//int UAVObjectUtilManager::getTelemetrySerialPortSpeeds(QComboBox *comboBox)
-//{
-//	UAVObjectField *field;
-
-//	QMutexLocker locker(mutex);
-
-//	if (!comboBox) return -1;
-
-////	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-////	if (!pm) return -2;
-
-//	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-//	if (!om) return -3;
-
-//	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("TelemetrySettings")));
-//	if (!obj) return -4;
-
-////	obj->requestUpdate();
-
-//	field = obj->getField(QString("Speed"));
-//	if (!field) return -5;
-//	comboBox->addItems(field->getOptions());
-
-//	return 0;	// OK
-//}
 
 deviceDescriptorStruct UAVObjectUtilManager::getBoardDescriptionStruct()
 {

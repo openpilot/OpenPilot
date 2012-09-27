@@ -40,13 +40,14 @@ namespace Utils {
 
 HomeLocationUtil::HomeLocationUtil()
 {
-    //        Initialize();
 }
 
 /*
-    /*Get local magnetic field
-     * input params: LLA
-     * output params: Be
+    /**
+     * @brief Get local magnetic field
+     * @param[in] LLA The longitude-latitude-altitude coordinate to compute the magnetic field at
+     * @param[out] Be The resulting magnetic field at that location and time in [mGau](?)
+     * @returns 0 if successful, -1 otherwise.
      */
     int HomeLocationUtil::getDetails(double LLA[3], double Be[3])
     {

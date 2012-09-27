@@ -349,8 +349,8 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])
 
     set = homeLocationData.Set;
 
-    LLA[0] = homeLocationData.Latitude;
-    LLA[1] = homeLocationData.Longitude;
+    LLA[0] = homeLocationData.Latitude*1e-7;
+    LLA[1] = homeLocationData.Longitude*1e-7;
     LLA[2] = homeLocationData.Altitude;
 
 	if (LLA[0] != LLA[0]) LLA[0] = 0; // nan detection

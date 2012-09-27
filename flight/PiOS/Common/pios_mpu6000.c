@@ -461,12 +461,15 @@ void PIOS_MPU6000_IRQHandler(void)
 	data.gyro_y = mpu6000_rec_buf[5] << 8 | mpu6000_rec_buf[6];
 	data.gyro_z = mpu6000_rec_buf[7] << 8 | mpu6000_rec_buf[8];
 #endif
-
-	xQueueSend(dev->queue, (void *) &data, 0);
+	
+	portBASE_TYPE xHigherPriorityTaskWoken;
+	xQueueSendToBackFromISR(dev->queue, (void *) &data, &xHigherPriorityTaskWoken);
 	
 	mpu6000_irq++;
 	
 	mpu6000_time_us = PIOS_DELAY_DiffuS(timeval);
+	
+	return xHigherPriorityTaskWoken == pdTRUE;	
 }
 
 #endif

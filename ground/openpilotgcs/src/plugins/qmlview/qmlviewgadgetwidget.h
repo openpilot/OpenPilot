@@ -29,7 +29,6 @@
 #define QMLVIEWGADGETWIDGET_H_
 
 #include "qmlviewgadgetconfiguration.h"
-#include "svgimageprovider.h"
 
 #include <QtDeclarative/qdeclarativeview.h>
 

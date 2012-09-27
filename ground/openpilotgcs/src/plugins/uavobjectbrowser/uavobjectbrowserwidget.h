@@ -36,7 +36,7 @@
 class QPushButton;
 class ObjectTreeItem;
 class Ui_UAVObjectBrowser;
-
+class Ui_viewoptions;
 
 class UAVObjectBrowserWidget : public QWidget
 {
@@ -49,11 +49,11 @@ public:
     void setManuallyChangedColor(QColor color) { m_manuallyChangedColor = color; m_model->setManuallyChangedColor(color); }
     void setRecentlyUpdatedTimeout(int timeout) { m_recentlyUpdatedTimeout = timeout; m_model->setRecentlyUpdatedTimeout(timeout); }
     void setOnlyHilightChangedValues(bool hilight) { m_onlyHilightChangedValues = hilight; m_model->setOnlyHilightChangedValues(hilight); }
-
-
+    void setViewOptions(bool categorized,bool scientific,bool metadata);
 public slots:
     void showMetaData(bool show);
     void categorize(bool categorize);
+    void useScientificNotation(bool scientific);
 
 private slots:
     void sendUpdate();
@@ -62,11 +62,16 @@ private slots:
     void loadObject();
     void eraseObject();
     void currentChanged(const QModelIndex &current, const QModelIndex &previous);
-
+    void viewSlot();
+    void viewOptionsChangedSlot();
+signals:
+    void viewOptionsChanged(bool categorized,bool scientific,bool metadata);
 private:
     QPushButton *m_requestUpdate;
     QPushButton *m_sendUpdate;
     Ui_UAVObjectBrowser *m_browser;
+    Ui_viewoptions *m_viewoptions;
+    QDialog *m_viewoptionsDialog;
     UAVObjectTreeModel *m_model;
 
     int m_recentlyUpdatedTimeout;

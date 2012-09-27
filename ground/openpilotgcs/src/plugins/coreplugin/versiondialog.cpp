@@ -67,6 +67,26 @@ VersionDialog::VersionDialog(QWidget *parent)
      //: This gets conditionally inserted as argument %8 into the description string.
      ideRev = tr("From revision %1<br/>").arg(QString::fromLatin1(GCS_REVISION_STR).left(60));
 #endif
+     QString uavoHashStr;
+ #ifdef UAVO_HASH
+      //: This gets conditionally inserted as argument %11 into the description string.
+     QByteArray uavoHashArray;
+     QString uavoHash = QString::fromLatin1(Core::Constants::UAVOSHA1_STR);
+     uavoHash.chop(2);
+     uavoHash.remove(0,2);
+     uavoHash=uavoHash.trimmed();
+     bool ok;
+     foreach(QString str,uavoHash.split(","))
+     {
+         uavoHashArray.append(str.toInt(&ok,16));
+     }
+     QString gcsUavoHashStr;
+     foreach(char i, uavoHashArray)
+     {
+         gcsUavoHashStr.append(QString::number(i,16).right(2));
+     }
+     uavoHashStr = tr("UAVO hash %1<br/>").arg(gcsUavoHashStr);
+ #endif
 
      const QString description = tr(
         "<h3>OpenPilot GCS %1 %9 (%10)</h3>"
@@ -76,7 +96,9 @@ VersionDialog::VersionDialog(QWidget *parent)
         "<br/>"
         "%8"
         "<br/>"
-        "Copyright 2008-%6 %7. All rights reserved.<br/>"
+        "%11"
+        "<br/>"
+        "Copyright 2010-%6 %7. All rights reserved.<br/>"
         "<br/>"
          "<small>This program is free software; you can redistribute it and/or modify<br/>"
          "it under the terms of the GNU General Public License as published by<br/>"
@@ -87,7 +109,7 @@ VersionDialog::VersionDialog(QWidget *parent)
         "PARTICULAR PURPOSE.</small><br/>")
         .arg(version, QLatin1String(QT_VERSION_STR), QString::number(QSysInfo::WordSize),
              QLatin1String(__DATE__), QLatin1String(__TIME__), QLatin1String(GCS_YEAR), 
-             (QLatin1String(GCS_AUTHOR)), ideRev).arg(QLatin1String(GCS_VERSION_TYPE), QLatin1String(GCS_VERSION_CODENAME));
+             (QLatin1String(GCS_AUTHOR)), ideRev).arg(QLatin1String(GCS_VERSION_TYPE), QLatin1String(GCS_VERSION_CODENAME), uavoHashStr);
 
     QLabel *copyRightLabel = new QLabel(description);
     copyRightLabel->setWordWrap(true);

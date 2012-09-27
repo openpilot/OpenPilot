@@ -46,6 +46,7 @@ QmlViewGadgetOptionsPage::QmlViewGadgetOptionsPage(QmlViewGadgetConfiguration *c
 //creates options page widget (uses the UI file)
 QWidget *QmlViewGadgetOptionsPage::createPage(QWidget *parent)
 {
+    Q_UNUSED(parent);
 
     options_page = new Ui::QmlViewGadgetOptionsPage();
     //main widget

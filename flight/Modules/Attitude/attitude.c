@@ -420,6 +420,10 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 		gyrosData->z += gyro_correct_int[2];
 	}
 
+	// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
+	// and make it average zero (weakly)
+	gyro_correct_int[2] += - gyrosData->z * yawBiasRate;
+
 	GyrosSet(gyrosData);
 	AccelsSet(accelsData);
 

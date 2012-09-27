@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:setting_attributes="http://schemas.android.com/apk/res/org.openpilot.androidgcs"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <org.openpilot.androidgcs.views.ScrollBarView
+                android:id="@+id/rollRateKp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                setting_attributes:setting_name="Roll Rate Kp"
+                setting_attributes:max_value="0.01" />
+
+            <org.openpilot.androidgcs.views.ScrollBarView
+                android:id="@+id/pitchRateKp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                setting_attributes:setting_name="Pitch Rate Kp"
+                setting_attributes:max_value="0.01" />
+
+            <org.openpilot.androidgcs.views.ScrollBarView
+                android:id="@+id/rollRateKi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                setting_attributes:setting_name="Roll Rate Ki"
+                setting_attributes:max_value="0.05" />
+
+            <org.openpilot.androidgcs.views.ScrollBarView
+                android:id="@+id/pitchRateKi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                setting_attributes:setting_name="Pitch Rate Ki"
+                setting_attributes:max_value="0.05" />
+
+            <org.openpilot.androidgcs.views.ScrollBarView
+                android:id="@+id/rollKp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                setting_attributes:setting_name="Roll Kp"
+                setting_attributes:max_value="5" />
+
+            <org.openpilot.androidgcs.views.ScrollBarView
+                android:id="@+id/pitchKp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                setting_attributes:setting_name="Pitch Kp"
+                setting_attributes:max_value="5" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right" >
+
+        <Button
+            android:id="@+id/applyBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/apply" />
+
+        <Button
+            android:id="@+id/saveBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save" />
+
+    </LinearLayout>
+
+</LinearLayout>
+

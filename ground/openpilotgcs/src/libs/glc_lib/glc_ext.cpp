@@ -63,7 +63,7 @@ bool glc::loadGlSlExtension()
 bool glc::loadPointSpriteExtension()
 {
 	bool result= true;
-#if !defined(Q_OS_MAC)
+#if !defined(Q_OS_MAC) && !defined(Q_OS_LINUX)
 	const QGLContext* pContext= QGLContext::currentContext();
 	glPointParameterf				= (PFNGLPOINTPARAMETERFARBPROC)pContext->getProcAddress(QLatin1String("glPointParameterf"));
 	if (!glPointParameterf) qDebug() << "not glPointParameterf";

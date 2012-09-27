@@ -28,7 +28,7 @@
 #define UAVOBJECTGENERATORJAVA_H
 
 #define JAVA_TEMPLATE_DIR "ground/openpilotgcs/src/libs/juavobjects/templates/"
-#define JAVA_GENERATED_DIR "java/src/org/openpilot/uavtalk"
+#define JAVA_CODE_DIR "java/src/org/openpilot/uavtalk"
 
 #include "../generator_common.h"
 
@@ -38,14 +38,12 @@ public:
     bool generate(UAVObjectParser* gen,QString templatepath,QString outputpath);
 
 private:
-    QString javaCodeTemplate;
-    QDir javaCodePath;
     bool process_object(ObjectInfo* info);
-    QString formatJavaValue(FieldInfo* info,int idx);
-    QString QStringList2JavaArray(QStringList strl);
-    QString serializeJavaValue(int type,QString name);
-    QString deSerializeJavaValue(int type,QString name);
-    QString getFieldTypeStr(int type,bool as_obj);
-};
+
+    QString javaCodeTemplate, javaIncludeTemplate;
+    QStringList fieldTypeStrCPP,fieldTypeStrCPPClass;
+    QDir javaCodePath;
+    QDir javaOutputPath;
+ };
 
 #endif

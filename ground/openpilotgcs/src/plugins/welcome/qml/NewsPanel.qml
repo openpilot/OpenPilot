@@ -28,6 +28,10 @@ Item {
         clip: true
     }
 
+    ScrollDecorator {
+        flickableItem: view
+    }
+
     XmlListModel {
         id: xmlModel
         source: "http://www.openpilot.org/feed/"

@@ -32,16 +32,16 @@
 /**
  * Constructor
  */
-ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),smartsave(NULL),dirty(false),outOfLimitsStyle("background-color: rgb(255, 0, 0);"),timeOut(NULL),allowWidgetUpdates(true)
+ConfigTaskWidget::ConfigTaskWidget(QWidget *parent) : QWidget(parent),isConnected(false),allowWidgetUpdates(true),smartsave(NULL),dirty(false),outOfLimitsStyle("background-color: rgb(255, 0, 0);"),timeOut(NULL)
 {
     pm = ExtensionSystem::PluginManager::instance();
     objManager = pm->getObject<UAVObjectManager>();
     TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
     utilMngr = pm->getObject<UAVObjectUtilManager>();
-    connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()));
-    connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
-    connect(telMngr, SIGNAL(connected()), this, SIGNAL(autoPilotConnected()));
-    connect(telMngr, SIGNAL(disconnected()), this, SIGNAL(autoPilotDisconnected()));
+    connect(telMngr, SIGNAL(connected()), this, SLOT(onAutopilotConnect()),Qt::UniqueConnection);
+    connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()),Qt::UniqueConnection);
+    connect(telMngr, SIGNAL(connected()), this, SIGNAL(autoPilotConnected()),Qt::UniqueConnection);
+    connect(telMngr, SIGNAL(disconnected()), this, SIGNAL(autoPilotDisconnected()),Qt::UniqueConnection);
     UAVSettingsImportExportFactory * importexportplugin =  pm->getObject<UAVSettingsImportExportFactory>();
     connect(importexportplugin,SIGNAL(importAboutToBegin()),this,SLOT(invalidateObjects()));
 }
@@ -277,17 +277,23 @@ void ConfigTaskWidget::onAutopilotDisconnect()
     invalidateObjects();
 }
 
+void ConfigTaskWidget::forceConnectedState()//dynamic widgets don't recieve the connected signal. This should be called instead.
+{
+    isConnected=true;
+    setDirty(false);
+}
+
 void ConfigTaskWidget::onAutopilotConnect()
 {
     if (utilMngr)
         currentBoard = utilMngr->getBoardModel();//TODO REMEMBER TO ADD THIS TO FORCE CONNECTED FUNC ON CC3D_RELEASE
     invalidateObjects();
-    dirty=false;
     isConnected=true;
     foreach(objectToWidget * ow,objOfInterest)
     {
         loadWidgetLimits(ow->widget,ow->field,ow->index,ow->isLimited,ow->scale);
     }
+    setDirty(false);
     enableControls(true);
     refreshWidgetsValues();
 }
@@ -336,6 +342,7 @@ void ConfigTaskWidget::refreshWidgetsValues(UAVObject * obj)
 
     }
     setDirty(dirtyBack);
+
 }
 /**
  * SLOT function used to update the uavobject fields from widgets with relation to
@@ -546,11 +553,13 @@ void ConfigTaskWidget::objectUpdated(UAVObject *obj)
  */
 bool ConfigTaskWidget::allObjectsUpdated()
 {
+    qDebug()<<"ConfigTaskWidge:allObjectsUpdated called";
     bool ret=true;
     foreach(UAVObject *obj, objectUpdates.keys())
     {
         ret=ret & objectUpdates[obj];
     }
+    qDebug()<<"Returned:"<<ret;
     return ret;
 }
 /**
@@ -857,10 +866,19 @@ void ConfigTaskWidget::reloadButtonClicked()
     QEventLoop * eventLoop=new QEventLoop(this);
     connect(timeOut, SIGNAL(timeout()),eventLoop,SLOT(quit()));
     connect(objper, SIGNAL(objectUpdated(UAVObject*)), eventLoop, SLOT(quit()));
+
+    QList<temphelper> temp;
     foreach(objectToWidget * oTw,*list)
     {
         if (oTw->object != NULL)
         {
+            temphelper value;
+            value.objid=oTw->object->getObjID();
+            value.objinstid=oTw->object->getInstID();
+            if(temp.contains(value))
+                continue;
+            else
+                temp.append(value);
             ObjectPersistence::DataFields data;
             data.Operation = ObjectPersistence::OPERATION_LOAD;
             data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
@@ -908,7 +926,7 @@ void ConfigTaskWidget::connectWidgetUpdatesToSlot(QWidget * widget,const char* f
     }
     else if(MixerCurveWidget * cb=qobject_cast<MixerCurveWidget *>(widget))
     {
-        connect(cb,SIGNAL(curveUpdated(QList<double>,double)),this,function);
+        connect(cb,SIGNAL(curveUpdated()),this,function);
     }
     else if(QTableWidget * cb=qobject_cast<QTableWidget *>(widget))
     {
@@ -951,7 +969,7 @@ void ConfigTaskWidget::disconnectWidgetUpdatesToSlot(QWidget * widget,const char
     }
     else if(MixerCurveWidget * cb=qobject_cast<MixerCurveWidget *>(widget))
     {
-        disconnect(cb,SIGNAL(curveUpdated(QList<double>,double)),this,function);
+        disconnect(cb,SIGNAL(curveUpdated()),this,function);
     }
     else if(QTableWidget * cb=qobject_cast<QTableWidget *>(widget))
     {

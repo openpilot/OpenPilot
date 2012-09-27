@@ -1,0 +1,70 @@
+------- TELEMETRY ---------
+The Telemetry system has been implemented, and is composed of a few
+major components:
+
+Telemetry.java - receives command to transmit objects through telemetry and
+also emits notification when transactions are completed
+
+TelemetryMonitor.java - monitors the FlightTelemetryStats and GCSTelemetryStats
+to establish when a working connection is in place.  Also initiates downloading
+all the objects on a new connection.
+
+UAVObjectManager.java - the central data store.  The data is actually stored
+within objects, but this maintains the handles to all of them.
+
+UAVTalk.java - the actual communication layer.  Can packetize an object and
+insert into stream and process the incoming stream and update objects
+accordingly.
+
+** Threading
+Currently object updates run within the thread of the function that called
+update.  This should be changed so that it adds a message to the Telemetry
+thread which will then send on its own time.
+
+---- MESSAGE PASSING ----
+The current implementation/analog to the slots/sockets in QT are Observers
+which are registered as added to an Observable.  This is used extensibly within
+the telemetry system.  I will continue to use this _within_ the Telemetry
+module so it doesn't depend on any android features.
+
+In android there is a constraint that UI operations should all be done from the
+UI thread.  The most common way to do this is for the UI object (such as
+Activity) to instantiate a Handler to which messages or runnables are posted.
+
+So for external objects they will register a runnable somehow...
+
+--- TELEMETRY SERVICE ---
+The telemetry connection will be maintained by a service separate from the the
+main activity(s).  Although it is a bit unusual, the service will support being
+started and stopped, as well as being bound.  Binding will be required to get
+access to the Object Manager.
+
+In addition, to make it forward looking, the start intent can specify a
+connection to open.  This will allow the service in future to monitor multiple
+connections.
+
+The service will destroy itself only when all active connections disappear and
+all activies are unbound.
+
+It will also handle any logging desired (I think).
+
+There will be a primary message handler thread.  This thread will separately
+launch telemetry threads when required.
+
+The service should send broadcast intents whenever a connection is estabilished
+or dropped.
+
+I dont think the service should have the options about which UAVs are
+supported.
+
+** Telemetry IBinder
+*** Give handle to the ObjectManager for each UAV
+*** Call disconnect
+*** Query conncetion status
+
+--- TELEMETRY WIDGET ---
+Listens for conncet/disconnect intents
+
+Also show if service is running?
+
+Ability to launch service?

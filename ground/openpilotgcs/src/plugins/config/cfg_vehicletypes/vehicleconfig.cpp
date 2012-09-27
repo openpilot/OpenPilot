@@ -44,11 +44,6 @@ VehicleConfig::VehicleConfig(QWidget *parent) : ConfigTaskWidget(parent)
         channelNames << QString("Channel%1").arg(i+1);
     }
 
-//    typedef enum { MIXERTYPE_DISABLED=0, MIXERTYPE_MOTOR=1, MIXERTYPE_SERVO=2,
-    //MIXERTYPE_CAMERAROLL=3, MIXERTYPE_CAMERAPITCH=4, MIXERTYPE_CAMERAYAW=5,
-    //MIXERTYPE_ACCESSORY0=6, MIXERTYPE_ACCESSORY1=7, MIXERTYPE_ACCESSORY2=8,
-    //MIXERTYPE_ACCESSORY3=9, MIXERTYPE_ACCESSORY4=10, MIXERTYPE_ACCESSORY5=11 } MixerTypeElem;
-
     mixerTypeDescriptions << "Disabled" << "Motor" << "Servo" << "CameraRoll" << "CameraPitch"
                           << "CameraYaw" << "Accessory0" << "Accessory1" << "Accessory2"
                           << "Accessory3" << "Accessory4" << "Accessory5";
@@ -100,29 +95,18 @@ void VehicleConfig::SetConfigData(GUIConfigDataUnion configData) {
     Q_ASSERT(systemSettings);
     SystemSettings::DataFields systemSettingsData = systemSettings->getData();
 
+    UAVObjectField* guiConfig = systemSettings->getField("GUIConfigData");
+    Q_ASSERT(guiConfig);
+    if(!guiConfig)
+        return;
+
     // copy parameter configData -> systemsettings
     for (i = 0; i < (int)(SystemSettings::GUICONFIGDATA_NUMELEM); i++)
-        systemSettingsData.GUIConfigData[i] = configData.UAVObject[i];
-
-    systemSettings->setData(systemSettingsData);
-    systemSettings->updated();
-
-    //emit ConfigurationChanged();
+        guiConfig->setValue(configData.UAVObject[i], i);
 }
 
 void VehicleConfig::ResetActuators(GUIConfigDataUnion* configData)
 {
-}
-QStringList VehicleConfig::getChannelDescriptions()
-{
-    QStringList channelDesc;
-
-    // init a channel_numelem list of channel desc defaults
-    for (int i=0; i < (int)(VehicleConfig::CHANNEL_NUMELEM); i++)
-    {
-        channelDesc.append(QString("-"));
-    }    
-    return channelDesc;
 }
 
 /**
@@ -140,15 +124,16 @@ void VehicleConfig::setComboCurrentIndex(QComboBox* box, int index)
 
 /**
   Helper function:
-  enables/disables the named combobox within supplied uiowner
+  enables/disables the named comboboxes within supplied uiowner
  */
-void VehicleConfig::enableComboBox(QWidget* owner, QString boxName, bool enable)
+void VehicleConfig::enableComboBoxes(QWidget* owner, QString boxName, int boxCount, bool enable)
 {
-    QComboBox* box = qFindChild<QComboBox*>(owner, boxName);
-    if (box)
-        box->setEnabled(enable);
+    for (int i = 1; i <= boxCount; i++) {
+        QComboBox* box = qFindChild<QComboBox*>(owner, QString("%0%1").arg(boxName).arg(i));
+        if (box)
+            box->setEnabled(enable);
+    }
 }
-
 QString VehicleConfig::getMixerType(UAVDataObject* mixer, int channel)
 {
     Q_ASSERT(mixer);
@@ -169,8 +154,6 @@ QString VehicleConfig::getMixerType(UAVDataObject* mixer, int channel)
 void VehicleConfig::setMixerType(UAVDataObject* mixer, int channel, MixerTypeElem mixerType)
 {
     Q_ASSERT(mixer);
-
-    qDebug() << QString("setMixerType channel %0, type %1").arg(channel).arg(mixerType);
 
     if (channel >= 0 && channel < mixerTypes.count()) {
         UAVObjectField *field = mixer->getField(mixerTypes.at(channel));
@@ -218,8 +201,6 @@ double VehicleConfig::getMixerVectorValue(UAVDataObject* mixer, int channel, Mix
 void VehicleConfig::setMixerVectorValue(UAVDataObject* mixer, int channel, MixerVectorElem elementName, double value)
 {
     Q_ASSERT(mixer);
-
-    qDebug() << QString("setMixerVectorValue channel %0, name %1, value %2").arg(channel).arg(elementName).arg(value);
 
     if (channel >= 0 && channel < mixerVectors.count()) {
         UAVObjectField *field = mixer->getField(mixerVectors.at(channel));

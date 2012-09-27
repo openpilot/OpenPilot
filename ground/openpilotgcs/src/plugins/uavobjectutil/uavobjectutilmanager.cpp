@@ -257,7 +257,12 @@ FirmwareIAPObj::DataFields UAVObjectUtilManager::getFirmwareIap()
 int UAVObjectUtilManager::getBoardModel()
 {
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
-    return (firmwareIapData.BoardType << 8) + firmwareIapData.BoardRevision;
+    qDebug()<<"Board type="<<firmwareIapData.BoardType;
+    qDebug()<<"Board revision="<<firmwareIapData.BoardRevision;
+    int ret=firmwareIapData.BoardType <<8;
+    ret = ret + firmwareIapData.BoardRevision;
+    qDebug()<<"Board info="<<ret;
+    return ret;
 }
 
 /**
@@ -268,7 +273,7 @@ QByteArray UAVObjectUtilManager::getBoardCPUSerial()
     QByteArray cpuSerial;
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    for (int i = 0; i < FirmwareIAPObj::CPUSERIAL_NUMELEM; i++)
+    for (unsigned int i = 0; i < FirmwareIAPObj::CPUSERIAL_NUMELEM; i++)
         cpuSerial.append(firmwareIapData.CPUSerial[i]);
 
     return cpuSerial;
@@ -288,7 +293,7 @@ QByteArray UAVObjectUtilManager::getBoardDescription()
     QByteArray ret;
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    for (int i = 0; i < FirmwareIAPObj::DESCRIPTION_NUMELEM; i++)
+    for (unsigned int i = 0; i < FirmwareIAPObj::DESCRIPTION_NUMELEM; i++)
         ret.append(firmwareIapData.Description[i]);
 
     return ret;
@@ -625,11 +630,11 @@ int UAVObjectUtilManager::getTelemetrySerialPortSpeeds(QComboBox *comboBox)
 deviceDescriptorStruct UAVObjectUtilManager::getBoardDescriptionStruct()
 {
     deviceDescriptorStruct ret;
-    descriptionToStructure(getBoardDescription(),&ret);
+    descriptionToStructure(getBoardDescription(),ret);
     return ret;
 }
 
-bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescriptorStruct *struc)
+bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescriptorStruct & struc)
 {
    if (desc.startsWith("OpFw")) {
        /*
@@ -639,9 +644,9 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
         *  4 bytes: Unix timestamp of last git commit
         *  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
         *  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
-        *   ---- 40 bytes limit ---
         *  20 bytes: SHA1 sum of the firmware.
-        *  40 bytes: free for now.
+        *  20 bytes: SHA1 sum of the UAVO definition files.
+        *  20 bytes: free for now.
         */
 
        // Note: the ARM binary is big-endian:
@@ -650,23 +655,26 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
            gitCommitHash = gitCommitHash << 8;
            gitCommitHash += desc.at(7-i) & 0xFF;
        }
-       struc->gitHash = QString::number(gitCommitHash, 16);
+       struc.gitHash = QString("%1").arg(gitCommitHash, 8, 16, QChar('0'));
 
        quint32 gitDate = desc.at(11) & 0xFF;
        for (int i = 1; i < 4; i++) {
            gitDate = gitDate << 8;
            gitDate += desc.at(11-i) & 0xFF;
        }
-       struc->gitDate = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyyMMdd HH:mm");
+       struc.gitDate = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyyMMdd HH:mm");
 
        QString gitTag = QString(desc.mid(14,26));
-       struc->gitTag = gitTag;
+       struc.gitTag = gitTag;
 
        // TODO: check platform compatibility
        QByteArray targetPlatform = desc.mid(12,2);
-       struc->boardType = (int)targetPlatform.at(0);
-       struc->boardRevision = (int)targetPlatform.at(1);
-
+       struc.boardType = (int)targetPlatform.at(0);
+       struc.boardRevision = (int)targetPlatform.at(1);
+       struc.fwHash.clear();
+       struc.fwHash=desc.mid(40,20);
+       struc.uavoHash.clear();
+       struc.uavoHash=desc.mid(60,20);
        return true;
    }
    return false;

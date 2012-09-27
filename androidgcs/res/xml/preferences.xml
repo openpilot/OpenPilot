@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<PreferenceCategory android:title="Connection Settings">
+		<CheckBoxPreference android:title="@string/preference_checkbox_autoconnect"
+			android:key="autoconnect" />
+		<ListPreference android:title="@string/preference_checkbox_connection_type"
+			android:key="connection_type" android:summary="@string/preference_connection_method_summary"
+			android:defaultValue="None" android:entries="@array/connectTypeArray"
+			android:entryValues="@array/connectTypeValues" />
+		<EditTextPreference android:name="ip_address"
+			android:summary="Enter a TCP/IP address here"
+			android:defaultValue="192.168.0.1" android:title="IP address:"
+			android:key="ip_address" />
+		<EditTextPreference android:name="port"
+			android:summary="Enter a TCP/IP port here"
+			android:defaultValue="9001" android:title="Port:"
+			android:key="port" />
+		<org.openpilot.androidgcs.BluetoothDevicePreference android:name="bt_adapter"
+		    android:key="bluetooth_mac"
+    		android:title="Bluetooth Device"
+    		android:dialogTitle="Choose Bluetooth Device" />
+	</PreferenceCategory>
+</PreferenceScreen>

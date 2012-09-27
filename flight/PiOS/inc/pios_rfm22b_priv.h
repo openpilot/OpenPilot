@@ -50,17 +50,6 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 
 // ************************************
 
-enum {	RX_SCAN_SPECTRUM = 0,
-		RX_WAIT_PREAMBLE_MODE,
-		RX_WAIT_SYNC_MODE,
-		RX_DATA_MODE,
-		TX_DATA_MODE,
-		TX_STREAM_MODE,
-		TX_CARRIER_MODE,
-		TX_PN_MODE};
-
-// ************************************
-
 #define BIT0									(1u << 0)
 #define BIT1									(1u << 1)
 #define BIT2									(1u << 2)
@@ -592,63 +581,6 @@ typedef bool ( *t_rfm22_RxDataCallback ) (void *data, uint8_t len);
 // ************************************
 
 void PIOS_RFM22_EXT_Int(void);
-
-uint32_t rfm22_minFrequency(void);
-uint32_t rfm22_maxFrequency(void);
-
-void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz);
-uint32_t rfm22_getNominalCarrierFrequency(void);
-
-float rfm22_getFrequencyStepSize(void);
-
-void rfm22_setFreqHopChannel(uint8_t channel);
-uint8_t rfm22_freqHopChannel(void);
-
-uint32_t rfm22_freqHopSize(void);
-
-void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening);
-uint32_t rfm22_getDatarate(void);
-
-void rfm22_setRxMode(uint8_t mode, bool multi_packet_mode);
-
-int8_t rfm22_getRSSI(void);
-
-int8_t rfm22_receivedRSSI(void);
-int32_t rfm22_receivedAFCHz(void);
-uint16_t rfm22_receivedLength(void);
-uint8_t * rfm22_receivedPointer(void);
-void rfm22_receivedDone(void);
-
-int32_t rfm22_sendData(void *data, uint16_t length, bool send_immediately);
-
-void rfm22_setFreqCalibration(uint8_t value);
-uint8_t rfm22_getFreqCalibration(void);
-
-void rfm22_setTxPower(uint8_t tx_pwr);
-uint8_t rfm22_getTxPower(void);
-
-void rfm22_setTxStream(void);	// TEST ONLY
-
-void rfm22_setTxNormal(void);
-void rfm22_setTxCarrierMode(void);
-void rfm22_setTxPNMode(void);
-
-int8_t rfm22_currentMode(void);
-bool rfm22_transmitting(void);
-
-bool rfm22_channelIsClear(void);
-
-bool rfm22_txReady(void);
-
-void rfm22_1ms_tick(void);
-
-void rfm22_TxDataByte_SetCallback(t_rfm22_TxDataByteCallback new_function);
-void rfm22_RxData_SetCallback(t_rfm22_RxDataCallback new_function);
-
-int rfm22_init_scan_spectrum(uint32_t min_frequency_hz, uint32_t max_frequency_hz);
-int rfm22_init_tx_stream(uint32_t min_frequency_hz, uint32_t max_frequency_hz);
-int rfm22_init_rx_stream(uint32_t min_frequency_hz, uint32_t max_frequency_hz);
-int rfm22_init_normal(uint32_t id, uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t freq_hop_step_size);
 
 #endif /* PIOS_RFM22B_PRIV_H */
 

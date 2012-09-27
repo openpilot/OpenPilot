@@ -41,13 +41,14 @@
 // ****************
 // Private constants
 
-#define STACK_SIZE_BYTES 150
+#define STACK_SIZE_BYTES 200
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define PACKET_QUEUE_SIZE PIOS_PH_WIN_SIZE
 #define MAX_PORT_DELAY 200
 #define STATS_UPDATE_PERIOD_MS 500
 #define RADIOSTATS_UPDATE_PERIOD_MS 250
 #define MAX_LOST_CONTACT_TIME 4
+#define PACKET_MAX_DELAY 50
 
 #ifndef LINK_LED_ON
 #define LINK_LED_ON
@@ -73,7 +74,6 @@ typedef struct {
 	// The task handles.
 	xTaskHandle radioReceiveTaskHandle;
 	xTaskHandle radioStatusTaskHandle;
-	xTaskHandle sendPacketTaskHandle;
 
 	// Queue handles.
 	xQueueHandle radioPacketQueue;
@@ -106,7 +106,6 @@ typedef struct {
 
 static void radioReceiveTask(void *parameters);
 static void radioStatusTask(void *parameters);
-static void sendPacketTask(void *parameters);
 static void StatusHandler(PHStatusPacketHandle p, int8_t rssi, int8_t afc);
 static int32_t transmitPacket(PHPacketHandle packet);
 static void PPMHandler(uint16_t *channels);
@@ -137,11 +136,9 @@ static int32_t RadioStart(void)
 	// Start the tasks.
 	xTaskCreate(radioReceiveTask, (signed char *)"RadioReceive", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioReceiveTaskHandle));
 	xTaskCreate(radioStatusTask, (signed char *)"RadioStatus", STACK_SIZE_BYTES * 2, NULL, TASK_PRIORITY, &(data->radioStatusTaskHandle));
-	xTaskCreate(sendPacketTask, (signed char *)"SendPacket", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->sendPacketTaskHandle));
 
 	// Install the monitors
 	TaskMonitorAdd(TASKINFO_RUNNING_MODEMRX, data->radioReceiveTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_MODEMTX, data->sendPacketTaskHandle);
 	TaskMonitorAdd(TASKINFO_RUNNING_MODEMSTAT, data->radioStatusTaskHandle);
 
 	// Register the watchdog timers.
@@ -166,8 +163,10 @@ static int32_t RadioInitialize(void)
 	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 	HwSettingsOptionalModulesGet(optionalModules);
-	if (optionalModules[HWSETTINGS_OPTIONALMODULES_RADIO] != HWSETTINGS_OPTIONALMODULES_ENABLED)
+	if (optionalModules[HWSETTINGS_OPTIONALMODULES_RADIO] != HWSETTINGS_OPTIONALMODULES_ENABLED) {
+		pios_packet_handler = 0;
 		return -1;
+	}
 #endif
 
 	// Initalize out UAVOs
@@ -233,20 +232,8 @@ static int32_t RadioInitialize(void)
 	}
 
 	/* Initalize the RFM22B radio COM device. */
-	{
-		if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg.slave_num, &pios_rfm22b_cfg)) {
-			return -1;
-		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_rfm22b_id, &pios_rfm22b_com_driver, pios_rfm22b_id,
-				  rx_buffer, PIOS_COM_RFM22B_RF_RX_BUF_LEN,
-				  tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
-			PIOS_Assert(0);
-		}
-	}
+	if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg.slave_num, &pios_rfm22b_cfg))
+		return -1;
 
 	// Initialize the packet handler
 	PacketHandlerConfig pios_ph_cfg = {
@@ -287,9 +274,6 @@ static int32_t RadioInitialize(void)
 	PipXSettingsPairIDGet(&(data->pairStats[0].pairID));
 	data->destination_id = data->pairStats[0].pairID ? data->pairStats[0].pairID : 0xffffffff;
 
-	// Create the packet queue.
-	data->radioPacketQueue = xQueueCreate(PACKET_QUEUE_SIZE, sizeof(PHPacketHandle));
-
 	// Register the callbacks with the packet handler
 	PHRegisterStatusHandler(pios_packet_handler, StatusHandler);
 	PHRegisterOutputStream(pios_packet_handler, transmitPacket);
@@ -315,18 +299,9 @@ static void radioReceiveTask(void *parameters)
 		PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORECEIVE);
 #endif /* PIOS_INCLUDE_WDG */
 
-		// Get a RX packet from the packet handler if required.
-		if (p == NULL)
-			p = PHGetRXPacket(pios_packet_handler);
-
-		if(p == NULL) {
-			// Wait a bit for a packet to come available.
-			vTaskDelay(5);
-			continue;
-		}
-
 		// Receive data from the radio port
-		rx_bytes = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, (uint8_t*)p, PIOS_PH_MAX_PACKET, MAX_PORT_DELAY);
+		p = NULL;
+		rx_bytes = PIOS_RFM22B_Receive_Packet(pios_rfm22b_id, &p, MAX_PORT_DELAY);
 		if(rx_bytes == 0)
 			continue;
 		data->rxBytes += rx_bytes;
@@ -341,27 +316,6 @@ static void radioReceiveTask(void *parameters)
 }
 
 /**
- * Send packets to the radio.
- */
-static void sendPacketTask(void *parameters)
-{
-	PHPacketHandle p;
-
-	// Loop forever
-	while (1) {
-#ifdef PIOS_INCLUDE_WDG
-		// Update the watchdog timer.
-		//PIOS_WDG_UpdateFlag(PIOS_WDG_SENDPACKET);
-#endif /* PIOS_INCLUDE_WDG */
-		// Wait for a packet on the queue.
-		if (xQueueReceive(data->radioPacketQueue, &p, MAX_PORT_DELAY) == pdTRUE) {
-			PIOS_COM_SendBuffer(PIOS_COM_RADIO, (uint8_t*)p, PH_PACKET_SIZE(p));
-			PHReleaseTXPacket(pios_packet_handler, p);
-		}
-	}
-}
-
-/**
  * Transmit a packet to the radio port.
  * \param[in] buf Data buffer to send
  * \param[in] length Length of buffer
@@ -372,7 +326,7 @@ static int32_t transmitPacket(PHPacketHandle p)
 {
 	uint16_t len = PH_PACKET_SIZE(p);
 	data->txBytes += len;
-	if (xQueueSend(data->radioPacketQueue, &p, portMAX_DELAY) != pdTRUE)
+	if (!PIOS_RFM22B_Send_Packet(pios_rfm22b_id, p, PACKET_MAX_DELAY))
 		return -1;
 	return len;
 }
@@ -441,11 +395,9 @@ static void StatusHandler(PHStatusPacketHandle status, int8_t rssi, int8_t afc)
  */
 static void radioStatusTask(void *parameters)
 {
-	static	portTickType lastSysTime;
 	PHStatusPacket status_packet;
-	while (1) {
-		lastSysTime = xTaskGetTickCount();
 
+	while (1) {
 		PipXStatusData pipxStatus;
 		uint32_t pairID;
 
@@ -524,12 +476,7 @@ static void radioStatusTask(void *parameters)
 			}
 		}
 
-		portTickType timeSinceUpdate;
-		do {
-			PIOS_RFM22_processPendingISR(5);
-			timeSinceUpdate = xTaskGetTickCount() - lastSysTime;
-		}
-		while(timeSinceUpdate < STATS_UPDATE_PERIOD_MS / portTICK_RATE_MS);
+		vTaskDelay(STATS_UPDATE_PERIOD_MS / portTICK_RATE_MS);
 	}
 }
 

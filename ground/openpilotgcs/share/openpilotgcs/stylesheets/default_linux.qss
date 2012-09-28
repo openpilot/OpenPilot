@@ -66,6 +66,8 @@ Utils--StyledBar { background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:
 		width: 6px;
 		border-radius: 2px;
 		margin 0px -10px;
+		margin-top: 5px;
+		margin-bottom: 5px;
 		}
 	QSlider::sub-page:vertical {
 		background: #fff;

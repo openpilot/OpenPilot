@@ -405,21 +405,21 @@ uint32_t mpu6000_interval_us;
 uint32_t mpu6000_time_us;
 uint32_t mpu6000_transfer_size;
 
-void PIOS_MPU6000_IRQHandler(void)
+bool PIOS_MPU6000_IRQHandler(void)
 {
 	static uint32_t timeval;
 	mpu6000_interval_us = PIOS_DELAY_DiffuS(timeval);
 	timeval = PIOS_DELAY_GetRaw();
 
 	if(!mpu6000_configured)
-		return;
+		return false;
 
 	mpu6000_count = PIOS_MPU6000_FifoDepth();
 	if(mpu6000_count < sizeof(struct pios_mpu6000_data))
-		return;
+		return false;
 		
 	if(PIOS_MPU6000_ClaimBus() != 0)
-		return;		
+		return false;
 		
 	uint8_t mpu6000_send_buf[1+sizeof(struct pios_mpu6000_data)] = {PIOS_MPU6000_FIFO_REG | 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
 	uint8_t mpu6000_rec_buf[1+sizeof(struct pios_mpu6000_data)];
@@ -427,7 +427,7 @@ void PIOS_MPU6000_IRQHandler(void)
 	if(PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
 		PIOS_MPU6000_ReleaseBus();
 		mpu6000_fails++;
-		return;
+		return false;
 	}
 
 	PIOS_MPU6000_ReleaseBus();
@@ -438,15 +438,12 @@ void PIOS_MPU6000_IRQHandler(void)
 	if (mpu6000_count >= (sizeof(data) * 2)) {
 		mpu6000_fifo_backup++;
 		if(PIOS_MPU6000_ClaimBus() != 0)
-			return;		
-		
-		uint8_t mpu6000_send_buf[1+sizeof(struct pios_mpu6000_data)] = {PIOS_MPU6000_FIFO_REG | 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
-		uint8_t mpu6000_rec_buf[1+sizeof(struct pios_mpu6000_data)];
+			return false;		
 		
 		if(PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
 			PIOS_MPU6000_ReleaseBus();
 			mpu6000_fails++;
-			return;
+			return false;
 		}
 		
 		PIOS_MPU6000_ReleaseBus();
@@ -510,12 +507,15 @@ void PIOS_MPU6000_IRQHandler(void)
 	data.gyro_z = -(mpu6000_rec_buf[7] << 8 | mpu6000_rec_buf[8]);
 	data.temperature = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2];
 #endif
-
-	xQueueSend(dev->queue, (void *) &data, 0);
+	
+	portBASE_TYPE xHigherPriorityTaskWoken;
+	xQueueSendToBackFromISR(dev->queue, (void *) &data, &xHigherPriorityTaskWoken);
 	
 	mpu6000_irq++;
 	
 	mpu6000_time_us = PIOS_DELAY_DiffuS(timeval);
+	
+	return xHigherPriorityTaskWoken == pdTRUE;	
 }
 
 #endif

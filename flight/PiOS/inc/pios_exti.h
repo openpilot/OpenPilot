@@ -36,7 +36,7 @@
 #include <pios_stm32.h>
 
 struct pios_exti_cfg {
-	void (* vector)(void);
+	bool (* vector)(void);
 	uint32_t line;		/* use EXTI_LineN macros */
 	struct stm32_gpio pin;
 	struct stm32_irq irq;

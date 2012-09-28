@@ -38,40 +38,41 @@
 
 namespace Utils {
 
-	HomeLocationUtil::HomeLocationUtil()
+HomeLocationUtil::HomeLocationUtil()
+{
+}
+
+/*
+    /**
+     * @brief Get local magnetic field
+     * @param[in] LLA The longitude-latitude-altitude coordinate to compute the magnetic field at
+     * @param[out] Be The resulting magnetic field at that location and time in [mGau](?)
+     * @returns 0 if successful, -1 otherwise.
+     */
+    int HomeLocationUtil::getDetails(double LLA[3], double Be[3])
     {
-//        Initialize();
-    }
+        // *************
+        // check input parms
 
-	// input params: LLA
-	//
-	// output params: ECEF, RNE and Be
-	int HomeLocationUtil::getDetails(double LLA[3], double ECEF[3], double RNE[9], double Be[3])
-    {
-		// *************
-		// check input parms
+        double latitude = LLA[0];
+        double longitude = LLA[1];
+        double altitude = LLA[2];
 
-		double latitude = LLA[0];
-		double longitude = LLA[1];
-		double altitude = LLA[2];
+        if (latitude != latitude) return -1;				// prevent nan error
+        if (longitude != longitude) return -2;				// prevent nan error
+        if (altitude != altitude) return -3;				// prevent nan error
 
-		if (latitude != latitude) return -1;				// prevent nan error
-		if (longitude != longitude) return -2;				// prevent nan error
-		if (altitude != altitude) return -3;				// prevent nan error
+        if (latitude < -90 || latitude > 90) return -4;		// range checking
+        if (longitude < -180 || longitude > 180) return -5;	// range checking
 
-		if (latitude < -90 || latitude > 90) return -4;		// range checking
-		if (longitude < -180 || longitude > 180) return -5;	// range checking
+        // *************
 
-		// *************
+        QDateTime dt = QDateTime::currentDateTime().toUTC();
 
-		QDateTime dt = QDateTime::currentDateTime().toUTC();
+        //Fetch world magnetic model
+        Q_ASSERT(WorldMagModel().GetMagVector(LLA, dt.date().month(), dt.date().day(), dt.date().year(), Be) >= 0);
 
-		CoordinateConversions().LLA2ECEF(LLA, ECEF);
-		CoordinateConversions().RneFromLLA(LLA, (double (*)[3])RNE);
-		if (WorldMagModel().GetMagVector(LLA, dt.date().month(), dt.date().day(), dt.date().year(), Be) < 0)
-			return -6;
-
-		return 0;	// OK
+        return 0;	// OK
     }
 
 }

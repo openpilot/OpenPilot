@@ -281,15 +281,7 @@ void OsgEarthItemRenderer::initScene()
 
     //setup caching
     osgEarth::MapNode *mapNode = osgEarth::MapNode::findMapNode(m_model.get());
-    if (mapNode) {
-        osgEarth::TMSCacheOptions cacheOptions;
-        //cacheOptions.cacheOnly() = true;
-        QString cacheDir = Utils::PathUtils().GetStoragePath()+QLatin1String("osgEarth_cache");
-        cacheOptions.setPath(cacheDir.toStdString());
-        osgEarth::Cache *cache= new osgEarth::TMSCache(cacheOptions);
-
-        mapNode->getMap()->setCache(cache);
-    } else {
+    if (!mapNode) {
         qWarning() << Q_FUNC_INFO << sceneFile << " doesn't look like an osgEarth file";
     }
 

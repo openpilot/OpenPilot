@@ -296,7 +296,7 @@ void ConfigInputWidget::goToWizard()
 {
     QMessageBox msgBox;
     msgBox.setText(tr("Arming Settings are now set to Always Disarmed for your safety."));
-    msgBox.setDetailedText(tr("You will have to reconfigure arming settings yourself afterwards."));
+    msgBox.setDetailedText(tr("You will have to reconfigure the arming settings manually when the wizard is finished."));
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
     msgBox.exec();
@@ -428,7 +428,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         m_config->wzText->setText(tr("Welcome to the inputs configuration wizard.\n"
                                      "Please follow the instructions on the screen and only move your controls when asked to.\n"
                                      "Make sure you already configured your hardware settings on the proper tab and restarted your board.\n"
-                                     "At any time you can press 'back' to return to the previous screeen or 'Cancel' to cancel the wizard.\n"));
+                                     "You can press 'back' at any time to return to the previous screeen or press 'Cancel' to quit the wizard.\n"));
         m_config->stackedWidget->setCurrentIndex(1);
         m_config->wzBack->setEnabled(false);
         break;
@@ -437,9 +437,9 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         m_config->graphicsView->setVisible(true);
         m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
         setTxMovement(nothing);
-        m_config->wzText->setText(tr("Please choose your transmiter type.\n"
-                                     "Mode 1 means your throttle stick is on the right\n"
-                                     "Mode 2 means your throttle stick is on the left\n"));
+        m_config->wzText->setText(tr("Please choose your transmitter type.\n"
+                                     "Mode 1 means your throttle stick is on the right.\n"
+                                     "Mode 2 means your throttle stick is on the left.\n"));
         m_config->wzBack->setEnabled(true);
         QRadioButton * mode1=new QRadioButton(tr("Mode 1"),this);
         QRadioButton * mode2=new QRadioButton(tr("Mode 2"),this);
@@ -453,10 +453,10 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         break;
     case wizardChooseType:
     {
-        m_config->wzText->setText(tr("Please choose your transmiter mode.\n"
-                                     "Acro means normal transmitter\n"
-                                     "Heli means there is a collective pitch and throttle input\n"
-                                     "If you are using a heli transmitter please engage throttle hold now please.\n"));
+        m_config->wzText->setText(tr("Please choose your transmitter mode.\n"
+                                     "Acro means normal transmitter.\n"
+                                     "Heli means there is a collective pitch and throttle input.\n"
+                                     "If you are using a heli transmitter please engage throttle hold now.\n"));
         m_config->wzBack->setEnabled(true);
         QRadioButton * typeAcro=new QRadioButton(tr("Acro"),this);
         QRadioButton * typeHeli=new QRadioButton(tr("Heli"),this);
@@ -480,7 +480,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         break;
     case wizardIdentifyCenter:
         setTxMovement(centerAll);
-        m_config->wzText->setText(QString(tr("Please center all control controls and press next when ready (if your FlightMode switch has only two positions, leave it on either position)")));
+        m_config->wzText->setText(QString(tr("Please center all controls and press next when ready (if your FlightMode switch has only two positions, leave it in either position).")));
         break;
     case wizardIdentifyLimits:
     {
@@ -488,7 +488,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         accessoryDesiredObj1 = AccessoryDesired::GetInstance(getObjectManager(),1);
         accessoryDesiredObj2 = AccessoryDesired::GetInstance(getObjectManager(),2);
         setTxMovement(nothing);
-        m_config->wzText->setText(QString(tr("Please move all controls to their maximum extents on both directions and press next when ready")));
+        m_config->wzText->setText(QString(tr("Please move all controls to their maximum extents on both directions and press next when ready.")));
         fastMdata();
         manualSettingsData=manualSettingsObj->getData();
         for(uint i=0;i<ManualControlSettings::CHANNELMAX_NUMELEM;++i)
@@ -530,7 +530,7 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
             }
         }
         connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
-        m_config->wzText->setText(QString(tr("Please check the picture below and check all the sticks which show an inverted movement and press next when ready")));
+        m_config->wzText->setText(QString(tr("Please check the picture below and correct all the sticks which show an inverted movement, press next when ready.")));
         fastMdata();
         break;
     case wizardFinish:
@@ -538,8 +538,8 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         connect(manualCommandObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         connect(flightStatusObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         connect(accessoryDesiredObj0, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
-        m_config->wzText->setText(QString(tr("You have completed this wizard, please check below if the picture below mimics your sticks movement.\n"
-                                             "This new settings aren't saved to the board yet, after pressing next you will go to the initial screen where you can do that.")));
+        m_config->wzText->setText(QString(tr("You have completed this wizard, please check below if the picture mimics your sticks movement.\n"
+                                             "These new settings aren't saved to the board yet, after pressing next you will go to the initial screen where you can save the configuration.")));
         fastMdata();
 
         manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE]=
@@ -665,11 +665,11 @@ void ConfigInputWidget::restoreMdata()
 void ConfigInputWidget::setChannel(int newChan)
 {
     if(newChan == ManualControlSettings::CHANNELGROUPS_COLLECTIVE)
-        m_config->wzText->setText(QString(tr("Please enable throttle hold mode and move the collective pitch stick")));
+        m_config->wzText->setText(QString(tr("Please enable the throttle hold mode and move the collective pitch stick.")));
     else if (newChan == ManualControlSettings::CHANNELGROUPS_FLIGHTMODE)
-        m_config->wzText->setText(QString(tr("Please flick the flight mode switch.  For switches you may have to repeat this rapidly.")));
+        m_config->wzText->setText(QString(tr("Please toggle the flight mode switch. For switches you may have to repeat this rapidly.")));
     else if((transmitterType == heli) && (newChan == ManualControlSettings::CHANNELGROUPS_THROTTLE))
-        m_config->wzText->setText(QString(tr("Please disable throttle hold mode and move the throttle stick")));
+        m_config->wzText->setText(QString(tr("Please disable throttle hold mode and move the throttle stick.")));
     else
         m_config->wzText->setText(QString(tr("Please move each control once at a time according to the instructions and picture below.\n\n"
                                  "Move the %1 stick")).arg(manualSettingsObj->getField("ChannelGroups")->getElementNames().at(newChan)));
@@ -1299,7 +1299,7 @@ void ConfigInputWidget::simpleCalibration(bool enable)
 
         QMessageBox msgBox;
         msgBox.setText(tr("Arming Settings are now set to Always Disarmed for your safety."));
-        msgBox.setDetailedText(tr("You will have to reconfigure arming settings yourself afterwards."));
+        msgBox.setDetailedText(tr("You will have to reconfigure the arming settings manually when the wizard is finished."));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
         msgBox.exec();

@@ -131,7 +131,8 @@ $(1).firmwareinfo.c: $(1) $(TOP)/make/templates/firmwareinfotemplate.c FORCE
 		--outfile=$$@ \
 		--image=$(1) \
 		--type=$(2) \
-		--revision=$(3)
+		--revision=$(3) \
+		--uavodir=$(TOP)/shared/uavobjectdefinition
 
 $(eval $(call COMPILE_C_TEMPLATE, $(1).firmwareinfo.c))
 

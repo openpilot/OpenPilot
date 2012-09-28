@@ -2,28 +2,24 @@ import Qt 4.7
 
 Item {
     id: sceneItem
-    property variant sourceSize
+    property variant sceneSize
     property real groundSpeed : 3.6 * Math.sqrt(Math.pow(VelocityActual.North,2)+
                                                 Math.pow(VelocityActual.East,2))
 
-    Image {
+    SvgElementImage {
         id: speed_bg
-        source: "image://svg/pfd.svg!speed-bg"
-        sourceSize: sceneItem.sourceSize
+        elementName: "speed-bg"
+        sceneSize: sceneItem.sceneSize
         clip: true
 
-        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "speed-bg")
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
 
-        x: scaledBounds.x * sceneItem.width
-        y: scaledBounds.y * sceneItem.height
-        width: scaledBounds.width * sceneItem.width
-        height: scaledBounds.height * sceneItem.height
-
-        Image {
+        SvgElementImage {
             id: speed_scale
 
-            source: "image://svg/pfd.svg!speed-scale"
-            sourceSize: sceneItem.sourceSize
+            elementName: "speed-scale"
+            sceneSize: sceneItem.sceneSize
 
             anchors.verticalCenter: parent.verticalCenter
             // The speed scale represents 30 meters,
@@ -63,14 +59,12 @@ Item {
     }
 
 
-    Image {
+    SvgElementImage {
         id: speed_window
         clip: true
 
-        source: "image://svg/pfd.svg!speed-window"
-        sourceSize: sceneItem.sourceSize
-
-        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "speed-window")
+        elementName: "speed-window"
+        sceneSize: sceneItem.sceneSize
 
         x: scaledBounds.x * sceneItem.width
         y: scaledBounds.y * sceneItem.height

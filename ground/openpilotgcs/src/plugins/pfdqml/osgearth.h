@@ -126,9 +126,6 @@ public slots:
 signals:
     void frameReady();
 
-private slots:
-    void updateFBO();
-
 private:
     enum { FboCount = 3 };
     OsgEarthItem *m_item;

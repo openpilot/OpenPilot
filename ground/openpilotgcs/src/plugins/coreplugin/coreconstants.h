@@ -52,8 +52,10 @@ const char * const GCS_YEAR              = "2012";
 const char * const GCS_HELP              = "http://wiki.openpilot.org";
 #ifdef GCS_REVISION
 const char * const GCS_REVISION_STR      = STRINGIFY(GCS_REVISION);
+const char * const UAVOSHA1_STR          = STRINGIFY(UAVO_HASH);
 #else
 const char * const GCS_REVISION_STR      = "";
+const char * const UAVOSHA1_STR          = "";
 #endif
 
 #undef GCS_VERSION

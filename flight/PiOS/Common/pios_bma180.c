@@ -434,7 +434,7 @@ int32_t PIOS_BMA180_Test()
  * @brief IRQ Handler.  Read data from the BMA180 FIFO and push onto a local fifo.
  */
 int32_t bma180_irqs = 0;
-void PIOS_BMA180_IRQHandler(void)
+bool PIOS_BMA180_IRQHandler(void)
 {
 	bma180_irqs++;
 	
@@ -470,7 +470,8 @@ void PIOS_BMA180_IRQHandler(void)
 	data.temperature = pios_bma180_dmabuf[7];
 	
 	fifoBuf_putData(&dev->fifo, (uint8_t *) &data, sizeof(data));
-
+	
+	return false;
 }
 
 #endif /* PIOS_INCLUDE_BMA180 */

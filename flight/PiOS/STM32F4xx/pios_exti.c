@@ -168,13 +168,13 @@ static bool PIOS_EXTI_generic_irq_handler(uint8_t line_index)
 /* Bind Interrupt Handlers */
 
 #ifdef PIOS_INCLUDE_FREERTOS
-#define PIOS_EXTI_HANDLE_LINE(line)				\
+#define PIOS_EXTI_HANDLE_LINE(line, woken)			\
 	if (EXTI_GetITStatus(EXTI_Line##line) != RESET) {	\
 		EXTI_ClearITPendingBit(EXTI_Line##line);	\
-		xHigherPriorityTaskWoken = PIOS_EXTI_generic_irq_handler(line) ? pdTRUE : xHigherPriorityTaskWoken; \
+		woken = PIOS_EXTI_generic_irq_handler(line) ? pdTRUE : woken; \
 	}
 #else
-#define PIOS_EXTI_HANDLE_LINE(line)				\
+#define PIOS_EXTI_HANDLE_LINE(line, woken)			\
 	if (EXTI_GetITStatus(EXTI_Line##line) != RESET) {	\
 		EXTI_ClearITPendingBit(EXTI_Line##line);	\
 		PIOS_EXTI_generic_irq_handler(line);		\
@@ -185,8 +185,10 @@ static void PIOS_EXTI_0_irq_handler (void)
 {
 #ifdef PIOS_INCLUDE_FREERTOS
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+#else
+	bool xHigherPriorityTaskWoken;
 #endif
-	PIOS_EXTI_HANDLE_LINE(0);
+	PIOS_EXTI_HANDLE_LINE(0, xHigherPriorityTaskWoken);
 #ifdef PIOS_INCLUDE_FREERTOS
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 #endif
@@ -197,8 +199,10 @@ static void PIOS_EXTI_1_irq_handler (void)
 {
 #ifdef PIOS_INCLUDE_FREERTOS
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+#else
+	bool xHigherPriorityTaskWoken;
 #endif
-	PIOS_EXTI_HANDLE_LINE(1);
+	PIOS_EXTI_HANDLE_LINE(1, xHigherPriorityTaskWoken);
 #ifdef PIOS_INCLUDE_FREERTOS
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 #endif
@@ -209,8 +213,10 @@ static void PIOS_EXTI_2_irq_handler (void)
 {
 #ifdef PIOS_INCLUDE_FREERTOS
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+#else
+	bool xHigherPriorityTaskWoken;
 #endif
-	PIOS_EXTI_HANDLE_LINE(2);
+	PIOS_EXTI_HANDLE_LINE(2, xHigherPriorityTaskWoken);
 #ifdef PIOS_INCLUDE_FREERTOS
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 #endif
@@ -221,8 +227,10 @@ static void PIOS_EXTI_3_irq_handler (void)
 {
 #ifdef PIOS_INCLUDE_FREERTOS
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+#else
+	bool xHigherPriorityTaskWoken;
 #endif
-	PIOS_EXTI_HANDLE_LINE(3);
+	PIOS_EXTI_HANDLE_LINE(3, xHigherPriorityTaskWoken);
 #ifdef PIOS_INCLUDE_FREERTOS
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 #endif
@@ -233,8 +241,10 @@ static void PIOS_EXTI_4_irq_handler (void)
 {
 #ifdef PIOS_INCLUDE_FREERTOS
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+#else
+	bool xHigherPriorityTaskWoken;
 #endif
-	PIOS_EXTI_HANDLE_LINE(4);
+	PIOS_EXTI_HANDLE_LINE(4, xHigherPriorityTaskWoken);
 #ifdef PIOS_INCLUDE_FREERTOS
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 #endif
@@ -245,12 +255,14 @@ static void PIOS_EXTI_9_5_irq_handler (void)
 {
 #ifdef PIOS_INCLUDE_FREERTOS
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+#else
+	bool xHigherPriorityTaskWoken;
 #endif
-	PIOS_EXTI_HANDLE_LINE(5);
-	PIOS_EXTI_HANDLE_LINE(6);
-	PIOS_EXTI_HANDLE_LINE(7);
-	PIOS_EXTI_HANDLE_LINE(8);
-	PIOS_EXTI_HANDLE_LINE(9);
+	PIOS_EXTI_HANDLE_LINE(5, xHigherPriorityTaskWoken);
+	PIOS_EXTI_HANDLE_LINE(6, xHigherPriorityTaskWoken);
+	PIOS_EXTI_HANDLE_LINE(7, xHigherPriorityTaskWoken);
+	PIOS_EXTI_HANDLE_LINE(8, xHigherPriorityTaskWoken);
+	PIOS_EXTI_HANDLE_LINE(9, xHigherPriorityTaskWoken);
 #ifdef PIOS_INCLUDE_FREERTOS
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 #endif
@@ -261,13 +273,15 @@ static void PIOS_EXTI_15_10_irq_handler (void)
 {
 #ifdef PIOS_INCLUDE_FREERTOS
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+#else
+	bool xHigherPriorityTaskWoken;
 #endif
-	PIOS_EXTI_HANDLE_LINE(10);
-	PIOS_EXTI_HANDLE_LINE(11);
-	PIOS_EXTI_HANDLE_LINE(12);
-	PIOS_EXTI_HANDLE_LINE(13);
-	PIOS_EXTI_HANDLE_LINE(14);
-	PIOS_EXTI_HANDLE_LINE(15);
+	PIOS_EXTI_HANDLE_LINE(10, xHigherPriorityTaskWoken);
+	PIOS_EXTI_HANDLE_LINE(11, xHigherPriorityTaskWoken);
+	PIOS_EXTI_HANDLE_LINE(12, xHigherPriorityTaskWoken);
+	PIOS_EXTI_HANDLE_LINE(13, xHigherPriorityTaskWoken);
+	PIOS_EXTI_HANDLE_LINE(14, xHigherPriorityTaskWoken);
+	PIOS_EXTI_HANDLE_LINE(15, xHigherPriorityTaskWoken);
 #ifdef PIOS_INCLUDE_FREERTOS
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 #endif

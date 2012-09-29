@@ -10,7 +10,8 @@
 #include <coreplugin/coreconstants.h>
 
 LogFile::LogFile(QObject *parent) :
-    QIODevice(parent)
+    QIODevice(parent),
+    timestampBufferIdx(0)
 {
     connect(&timer, SIGNAL(timeout()), this, SLOT(timerFired()));
 }
@@ -127,24 +128,27 @@ void LogFile::timerFired()
     if(file.bytesAvailable() > 4)
     {
 
-	int time;
-	time = myTime.elapsed();
+        int time;
+        time = myTime.elapsed();
 
         // TODO: going back in time will be a problem
-        while ((lastPlayed + ((time - timeOffset)* playbackSpeed) > lastTimeStamp)) {
-	    lastPlayed += ((time - timeOffset)* playbackSpeed);
+        while ((lastPlayTime + ((time - lastPlayTimeOffset)* playbackSpeed) > lastTimeStamp))
+        {
+            lastPlayTime += ((time - lastPlayTimeOffset)* playbackSpeed);
             if(file.bytesAvailable() < 4) {
                 stopReplay();
                 return;
             }
 
+            file.seek(lastTimeStampPos+sizeof(lastTimeStamp));
+
             file.read((char *) &dataSize, sizeof(dataSize));
 
-	    if (dataSize<1 || dataSize>(1024*1024)) {
-	        qDebug() << "Error: Logfile corrupted! Unlikely packet size: " << dataSize << "\n";
-		stopReplay();
-		return;
-	    }
+            if (dataSize<1 || dataSize>(1024*1024)) {
+                qDebug() << "Error: Logfile corrupted! Unlikely packet size: " << dataSize << "\n";
+                stopReplay();
+                return;
+            }
             if(file.bytesAvailable() < dataSize) {
                 stopReplay();
                 return;
@@ -161,16 +165,19 @@ void LogFile::timerFired()
             }
 
             int save=lastTimeStamp;
-            file.read((char *) &lastTimeStamp,sizeof(lastTimeStamp));
-	    // some validity checks
-	    if (lastTimeStamp<save // logfile goies back in time
-		    || (lastTimeStamp-save) > (60*60*1000)) { // gap of more than 60 minutes)
-		qDebug() << "Error: Logfile corrupted! Unlikely timestamp " << lastTimeStamp << " after "<< save << "\n";
-		stopReplay();
-		return;
+
+            lastTimeStampPos=timestampPos[timestampBufferIdx];
+            lastTimeStamp = timestampBuffer[timestampBufferIdx];
+            timestampBufferIdx++;
+            // some validity checks
+            if (lastTimeStamp<save // logfile goies back in time
+                    || (lastTimeStamp-save) > (60*60*1000)) { // gap of more than 60 minutes)
+                qDebug() << "Error: Logfile corrupted! Unlikely timestamp " << lastTimeStamp << " after "<< save << "\n";
+                stopReplay();
+                return;
             }
 
-            timeOffset = time;
+            lastPlayTimeOffset = time;
             time = myTime.elapsed();
 
         }
@@ -183,10 +190,33 @@ void LogFile::timerFired()
 bool LogFile::startReplay() {
     dataBuffer.clear();
     myTime.restart();
-    timeOffset = 0;
-    lastPlayed = 0;
+    lastPlayTimeOffset = 0;
+    lastPlayTime = 0;
     playbackSpeed = 1;
-    file.read((char *) &lastTimeStamp,sizeof(lastTimeStamp));
+
+    //Read all log timestamps into array
+    timestampBuffer.clear(); //Save beginning of log for later use
+    timestampPos.clear();
+    quint64 logFileStartIdx=file.pos();
+    timestampBufferIdx=0;
+
+    while (!file.atEnd()){
+        qint64 dataSize;
+        timestampPos.append(file.pos());
+        file.read((char *) &lastTimeStamp,sizeof(lastTimeStamp));
+        file.read((char *) &dataSize, sizeof(dataSize));
+
+        timestampBuffer.append(lastTimeStamp);
+
+        file.seek(file.pos()+dataSize);
+    }
+
+    //Reset to log beginning. WHY DOES PLAYBACK FAIL IF I DON'T DO THIS?
+    file.seek(logFileStartIdx+sizeof(lastTimeStamp));
+
+    lastTimeStampPos=timestampPos[timestampBufferIdx];
+    lastTimeStamp = timestampBuffer[timestampBufferIdx];
+    timestampBufferIdx++;
     timer.setInterval(10);
     timer.start();
     emit replayStarted();
@@ -206,7 +236,27 @@ void LogFile::pauseReplay()
 
 void LogFile::resumeReplay()
 {
-    timeOffset = myTime.elapsed();
+    lastPlayTimeOffset = myTime.elapsed();
     timer.start();
+}
+
+/**
+ * @brief LogFile::setReplayTime, sets the playback time
+ * @param val, the time in
+ */
+void LogFile::setReplayTime(double val)
+{
+    quint32 tmpIdx=0;
+    while(timestampBuffer[tmpIdx++] <= val*1000 && tmpIdx <= timestampBufferIdx){
+    }
+
+    lastTimeStampPos=timestampPos[tmpIdx];
+    lastTimeStamp=timestampBuffer[tmpIdx];
+    timestampBufferIdx=tmpIdx;
+
+    lastPlayTimeOffset = myTime.elapsed();
+    lastPlayTime=lastTimeStamp;
+
+    qDebug() << "Replaying at: " << lastTimeStamp << ", but requestion at" << val*1000;
 }
 

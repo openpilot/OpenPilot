@@ -92,7 +92,7 @@ void MultiPage::setupMultiTypesCombo()
     ui->typeCombo->addItem(tr("Hexacopter Coax (Y6)"), SetupWizard::MULTI_ROTOR_HEXA_COAX_Y);
     m_descriptions << tr("Hexacopter Coax (Y6)");
 
-    ui->typeCombo->addItem(tr("Hexacopter H"), SetupWizard::MULTI_ROTOR_HEXA_H);
+    ui->typeCombo->addItem(tr("Hexacopter X"), SetupWizard::MULTI_ROTOR_HEXA_H);
     m_descriptions << tr("Hexacopter H");
 
     // Fredrik Arvidsson(m_thread) 2012-08-26 Disable Octos until further notice

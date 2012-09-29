@@ -267,7 +267,7 @@ enum usb_cdc_requests {
 	USB_CDC_REQ_SET_LINE_CODING        = 0x20,
 	USB_CDC_REQ_GET_LINE_CODING        = 0x21,
 
-	USB_CDC_REQ_SET_CONTROL_LINE_STATE = 0x23,
+	USB_CDC_REQ_SET_CONTROL_LINE_STATE = 0x22,
 };
 
 struct usb_cdc_header_func_desc {

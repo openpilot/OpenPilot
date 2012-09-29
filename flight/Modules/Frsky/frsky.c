@@ -51,28 +51,21 @@ static xTaskHandle taskHandle;
 
 static uint32_t telemetryPort;
 
+struct FrFloat
+{
+	int16_t before;
+	uint16_t after;
+	uint16_t nbdecimal;
+};
+
 int16_t FrAccX;
 int16_t FrAccY;
 int16_t FrAccZ;
-//uint16_t FrGyroX;
-//uint16_t FrGyroY;
-int16_t FrAlti1;
-uint16_t FrAlti2;
 int16_t FrT1;
 int16_t FrT2;
 int16_t FrV;
 uint16_t FrRPM;
 
-uint16_t FrCourse1;
-uint16_t FrCourse2;
-uint16_t FrLat1;
-uint16_t FrLat2;
-uint16_t FrLong1;
-uint16_t FrLong2;
-uint16_t FrSpeed1;
-uint16_t FrSpeed2;
-uint16_t FrAlt1;
-uint16_t FrAlt2;
 uint16_t FrFuel;
 
 uint8_t F1Buff[45];
@@ -80,8 +73,9 @@ uint8_t SendPos;
         // Private functions
 static void frskyTask(void *parameters);
 static void updateSettings();
+void SeparateFloat(float Value,struct FrFloat * Fr);
 void SendF1(int16_t AccX,int16_t AccY,int16_t AccZ,int16_t Alti1,uint16_t Alti2,uint16_t T1,uint16_t T2,uint16_t V,uint16_t RPM);
-void SendF2(uint16_t Course1,uint16_t Course2,uint16_t Lat1,uint16_t Lat2,uint16_t Long1,uint16_t Long2,uint16_t Speed1,uint16_t Speed2,uint16_t Alt1,uint16_t Alt2,uint16_t Fuel);
+void SendF2(int16_t Course1,uint16_t Course2,int16_t Lat1,uint16_t Lat2,int16_t Long1,uint16_t Long2,uint16_t Speed1,uint16_t Speed2,int16_t Alt1,uint16_t Alt2,uint16_t Fuel);
 
 /**
  * Initialise the module, called on startup
@@ -122,6 +116,23 @@ static void frskyTask(void *parameters)
 	GPSPositionData pdata;
 	BaroAltitudeData bdata;
 
+	struct FrFloat course;
+	course.nbdecimal=100;
+	struct FrFloat lat;
+	lat.nbdecimal=1000000;
+	struct FrFloat lon;
+	lon.nbdecimal=1000000;
+	struct FrFloat speed;
+	speed.nbdecimal=100;
+	struct FrFloat galt;
+	galt.nbdecimal=100;
+	struct FrFloat balt;
+	balt.nbdecimal=100;
+
+	float LatTemp=0.0f;
+	float LongTemp=0.0f;
+
+
 	AccelsInitialize();
 	GyrosInitialize();
 	GPSPositionInitialize();
@@ -133,7 +144,15 @@ static void frskyTask(void *parameters)
 		if(SendPos>=6)
 		{
 			GPSPositionGet(&pdata);
-			SendF2(FrCourse1,FrCourse2,FrLat1,FrLat2,FrLong1,FrLong2,FrSpeed1,FrSpeed2,FrAlt1,FrAlt2,FrFuel);
+			SeparateFloat(pdata.Heading,&course);
+			LatTemp=((float)pdata.Latitude*0.0000001f);
+			SeparateFloat(LatTemp,&lat);
+			LongTemp=((float)pdata.Longitude*0.0000001f);
+			SeparateFloat(LatTemp,&lon);
+			SeparateFloat(pdata.Groundspeed,&speed);
+			SeparateFloat(pdata.Altitude,&galt);
+			FrFuel=0;
+			SendF2(course.before,course.after,lat.before,lat.after,lon.before,lon.after,speed.before,speed.after,galt.before,galt.after,FrFuel);
 			SendPos=0;
 		}
 		AccelsGet(&adata);
@@ -144,13 +163,14 @@ static void frskyTask(void *parameters)
 		FrAccZ=(int16_t)(adata.z/0.016f);//according to frsky protocol
 		//FrGyroX=(uint16_t)gdata.x;
 		//FrGyroY=(uint16_t)gdata.y;
-		FrAlti1=(int16_t)bdata.Altitude;
-		FrAlti2=(uint16_t)((bdata.Altitude-(float)FrAlti1)*100);
+		SeparateFloat(bdata.Altitude,&balt);
+		//FrAlti1=(int16_t)bdata.Altitude;
+		//FrAlti2=(uint16_t)((bdata.Altitude-(float)FrAlti1)*100);
 		FrT1=0;
 		FrT2=0;
 		FrV=0;
 		FrRPM=0;
-		SendF1(FrAccX,FrAccY,FrAccZ,FrAlti1,FrAlti2,FrT1,FrT2,FrV,FrRPM);
+		SendF1(FrAccX,FrAccY,FrAccZ,balt.before,balt.after,FrT1,FrT2,FrV,FrRPM);
 		SendPos++;
 		// Delay until it is time to read the next sample
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD / portTICK_RATE_MS);
@@ -219,7 +239,7 @@ void SendF1(int16_t AccX,int16_t AccY,int16_t AccZ,int16_t Alti1,uint16_t Alti2,
 	}
 }
 
-void SendF2(uint16_t Course1,uint16_t Course2,uint16_t Lat1,uint16_t Lat2,uint16_t Long1,uint16_t Long2,uint16_t Speed1,uint16_t Speed2,uint16_t Alt1,uint16_t Alt2,uint16_t Fuel)
+void SendF2(int16_t Course1,uint16_t Course2,int16_t Lat1,uint16_t Lat2,int16_t Long1,uint16_t Long2,uint16_t Speed1,uint16_t Speed2,int16_t Alt1,uint16_t Alt2,uint16_t Fuel)
 {
 	uint32_t outputPort;
 	F1Buff[0]=0x5e;
@@ -271,6 +291,12 @@ void SendF2(uint16_t Course1,uint16_t Course2,uint16_t Lat1,uint16_t Lat2,uint16
 		if (outputPort) {
 			PIOS_COM_SendBuffer(outputPort, F1Buff, 45);
 		}
+}
+
+void SeparateFloat(float Value,struct FrFloat * Fr)
+{
+	Fr->before=(int16_t)Value;
+	Fr->after=(uint16_t)(float)((Value-(float)Fr->before)*Fr->nbdecimal);
 }
 
 /**

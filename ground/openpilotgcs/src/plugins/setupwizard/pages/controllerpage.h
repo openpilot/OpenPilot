@@ -31,6 +31,7 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/connectionmanager.h>
 #include "setupwizard.h"
+#include "uavtalk/telemetrymanager.h"
 #include "abstractwizardpage.h"
 
 namespace Ui {
@@ -56,6 +57,7 @@ private:
     void setupBoardTypes();
     void setControllerType(SetupWizard::CONTROLLER_TYPE type);
     Core::ConnectionManager *m_connectionManager;
+    TelemetryManager *m_telemtryManager;
 
 private slots:
     void devicesChanged(QLinkedList<Core::DevListItem> devices);

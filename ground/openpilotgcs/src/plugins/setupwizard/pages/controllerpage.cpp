@@ -42,8 +42,12 @@ ControllerPage::ControllerPage(SetupWizard *wizard, QWidget *parent) :
     Q_ASSERT(m_connectionManager);
     connect(m_connectionManager, SIGNAL(availableDevicesChanged(QLinkedList<Core::DevListItem>)), this, SLOT(devicesChanged(QLinkedList<Core::DevListItem>)));
 
-    connect(m_connectionManager, SIGNAL(deviceConnected(QIODevice*)), this, SLOT(connectionStatusChanged()));
-    connect(m_connectionManager, SIGNAL(deviceDisconnected()), this, SLOT(connectionStatusChanged()));
+    ExtensionSystem::PluginManager *pluginManager = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pluginManager);
+    m_telemtryManager = pluginManager->getObject<TelemetryManager>();
+    Q_ASSERT(m_telemtryManager);
+    connect(m_telemtryManager, SIGNAL(connected()), this, SLOT(connectionStatusChanged()));
+    connect(m_telemtryManager, SIGNAL(disconnected()), this, SLOT(connectionStatusChanged()));
 
     connect(ui->connectButton, SIGNAL(clicked()), this, SLOT(connectDisconnect()));
 
@@ -70,7 +74,7 @@ void ControllerPage::initializePage()
 
 bool ControllerPage::isComplete() const
 {
-    return m_connectionManager->isConnected() && ui->boardTypeCombo->currentIndex() > 0 &&
+    return m_telemtryManager->isConnected() && ui->boardTypeCombo->currentIndex() > 0 &&
             m_connectionManager->getCurrentDevice().getConName().startsWith("USB:", Qt::CaseInsensitive);
 }
 
@@ -82,7 +86,7 @@ bool ControllerPage::validatePage()
 
 bool ControllerPage::anyControllerConnected()
 {
-    return m_connectionManager->isConnected();
+    return m_telemtryManager->isConnected();
 }
 
 SetupWizard::CONTROLLER_TYPE ControllerPage::getControllerType()
@@ -164,7 +168,7 @@ void ControllerPage::devicesChanged(QLinkedList<Core::DevListItem> devices)
     if(indexOfSelectedItem != -1) {
         ui->deviceCombo->setCurrentIndex(indexOfSelectedItem);
     }
-    connectionStatusChanged();
+    //connectionStatusChanged();
 }
 
 void ControllerPage::connectionStatusChanged()
@@ -183,6 +187,7 @@ void ControllerPage::connectionStatusChanged()
 
         SetupWizard::CONTROLLER_TYPE type = getControllerType();
         setControllerType(type);
+        qDebug() << "Connection status changed: Connected, controller type: " << getControllerType();
     }
     else {
         ui->deviceCombo->setEnabled(true);
@@ -190,6 +195,7 @@ void ControllerPage::connectionStatusChanged()
         ui->boardTypeCombo->setEnabled(false);
         ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(0, 0), QVariant(0), Qt::UserRole - 1);
         setControllerType(SetupWizard::CONTROLLER_UNKNOWN);
+        qDebug() << "Connection status changed: Disconnected";
     }
     emit completeChanged();
 }

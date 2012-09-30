@@ -301,7 +301,10 @@ void ConfigInputWidget::goToWizard()
     msgBox.setDefaultButton(QMessageBox::Ok);
     msgBox.exec();
 
-    m_config->tabWidget->setCurrentIndex(0);
+    // Set correct tab visible before starting wizard.
+    if(m_config->tabWidget->currentIndex() != 0) {
+        m_config->tabWidget->setCurrentIndex(0);
+    }
     wizardSetUpStep(wizardWelcome);
     m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
 }

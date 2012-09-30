@@ -80,6 +80,8 @@ void LevellingPage::performLevelling()
     }
 
     enableButtons(false);
+    ui->progressLabel->setText(QString(tr("Retrieving data...")));
+
 
     if(!m_levellingUtil)
     {
@@ -128,6 +130,7 @@ void LevellingPage::stopLevelling()
         disconnect(m_levellingUtil, SIGNAL(progress(long,long)), this, SLOT(levellingProgress(long,long)));
         disconnect(m_levellingUtil, SIGNAL(done(accelGyroBias)), this, SLOT(levellingDone(accelGyroBias)));
         disconnect(m_levellingUtil, SIGNAL(timeout(QString)), this, SLOT(levellingTimeout(QString)));
+        ui->progressLabel->setText(QString(tr("<font color='green'>Done!</font>")));
         enableButtons(true);
     }
 }

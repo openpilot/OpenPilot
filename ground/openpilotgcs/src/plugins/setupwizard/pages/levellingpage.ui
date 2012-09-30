@@ -44,7 +44,7 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>200</x>
-     <y>270</y>
+     <y>260</y>
      <width>200</width>
      <height>70</height>
     </rect>
@@ -95,6 +95,24 @@ QProgressBar::chunk {
     <number>0</number>
    </property>
    <property name="format">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QLabel" name="progressLabel">
+   <property name="geometry">
+    <rect>
+     <x>42</x>
+     <y>330</y>
+     <width>511</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
     <string/>
    </property>
   </widget>

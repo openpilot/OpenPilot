@@ -300,6 +300,8 @@ void ConfigInputWidget::goToWizard()
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
     msgBox.exec();
+
+    m_config->tabWidget->setCurrentIndex(0);
     wizardSetUpStep(wizardWelcome);
     m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
 }

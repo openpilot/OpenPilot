@@ -462,7 +462,7 @@ static const uint8_t                reg_23[] = {  0xC5,  0x89,  0x12,  0x25,  0x
 static const uint8_t                reg_24[] = {  0x00,  0x00,  0x00,  0x02,  0x07,  0x07,  0x07,  0x07,  0x07,   0x07,   0x07,   0x05,   0x07,   0x07}; // rfm22_clk_recovery_timing_loop_gain1
 static const uint8_t                reg_25[] = {  0x0A,  0x23,  0x85,  0x0E,  0xFF,  0xFF,  0xFF,  0xFF,  0xFF,   0xFF,   0xFF,   0x74,   0xFF,   0xFF}; // rfm22_clk_recovery_timing_loop_gain0
 
-static const uint8_t                reg_2A[] = {  0x0E,  0x0E,  0x0E,  0x0E,  0x0E,  0x0D,  0x0D,  0x0E,  0x12,   0x17,   0x31,   0x50,   0x50,   0x50}; // rfm22_afc_limiter .. AFC_pull_in_range = ±AFCLimiter[7:0] x (hbsel+1) x 625 Hz
+static const uint8_t                reg_2A[] = {  0x0E,  0x0E,  0x0E,  0x0E,  0x0E,  0x0D,  0x0D,  0x0E,  0x12,   0x17,   0x31,   0x50,   0x50,   0x50}; // rfm22_afc_limiter .. AFC_pull_in_range = ï¿½AFCLimiter[7:0] x (hbsel+1) x 625 Hz
 
 static const uint8_t                reg_6E[] = {  0x04,  0x08,  0x10,  0x20,  0x41,  0x4E,  0x83,  0x9D,  0xC4,   0x08,   0x10,   0x20,   0x31,   0x41}; // rfm22_tx_data_rate1
 static const uint8_t                reg_6F[] = {  0x19,  0x31,  0x62,  0xC5,  0x89,  0xA5,  0x12,  0x49,  0x9C,   0x31,   0x62,   0xC5,   0x27,   0x89}; // rfm22_tx_data_rate0
@@ -495,7 +495,7 @@ static const uint8_t ss_reg_23[] = {  0xC5, 0xD3}; // rfm22_clk_recovery_offset0
 static const uint8_t ss_reg_24[] = {  0x00, 0x07}; // rfm22_clk_recovery_timing_loop_gain1
 static const uint8_t ss_reg_25[] = {  0x0F, 0xFF}; // rfm22_clk_recovery_timing_loop_gain0
 
-static const uint8_t ss_reg_2A[] = {  0xFF, 0xFF}; // rfm22_afc_limiter .. AFC_pull_in_range = ±AFCLimiter[7:0] x (hbsel+1) x 625 Hz
+static const uint8_t ss_reg_2A[] = {  0xFF, 0xFF}; // rfm22_afc_limiter .. AFC_pull_in_range = ï¿½AFCLimiter[7:0] x (hbsel+1) x 625 Hz
 
 static const uint8_t ss_reg_70[] = {  0x24, 0x2D}; // rfm22_modulation_mode_control1
 static const uint8_t ss_reg_71[] = {  0x2B, 0x23}; // rfm22_modulation_mode_control2
@@ -633,13 +633,14 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 /**
  * The RFM22B external interrupt routine.
  */
-void PIOS_RFM22_EXT_Int(void)
+bool PIOS_RFM22_EXT_Int(void)
 {
 	if (!PIOS_RFM22B_validate(g_rfm22b_dev))
-	    return;
+	    return false;
 
 	// Inject an interrupt event into the state machine.
 	PIOS_RFM22B_InjectEvent(g_rfm22b_dev, RFM22B_EVENT_INT_RECEIVED, true);
+        return false;
 }
 
 /**
@@ -1746,7 +1747,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	// adc offset
 	rfm22_write(RFM22_adc_sensor_amp_offset, 0);
 
-	// temp sensor calibration .. –40C to +64C 0.5C resolution
+	// temp sensor calibration .. ï¿½40C to +64C 0.5C resolution
 	rfm22_write(RFM22_temp_sensor_calib, RFM22_tsc_tsrange0 | RFM22_tsc_entsoffs);
 
 	// temp sensor offset

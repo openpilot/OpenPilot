@@ -83,7 +83,7 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 #define RFM22_is1_icrerror						BIT0		// CRC Error. When set to 1 the cyclic redundancy check is failed.
 #define RFM22_is1_ipkvalid						BIT1		// Valid Packet Received.When set to 1 a valid packet has been received.
 #define RFM22_is1_ipksent						BIT2		// Packet Sent Interrupt. When set to1 a valid packet has been transmitted.
-#define RFM22_is1_iext							BIT3		// External Interrupt. When set to 1 an interrupt occurred on one of the GPIO’s if it is programmed so. The status can be checked in register 0Eh. See GPIOx Configuration section for the details.
+#define RFM22_is1_iext							BIT3		// External Interrupt. When set to 1 an interrupt occurred on one of the GPIOï¿½s if it is programmed so. The status can be checked in register 0Eh. See GPIOx Configuration section for the details.
 #define RFM22_is1_irxffafull					BIT4		// RX FIFO Almost Full.When set to 1 the RX FIFO has met its almost full threshold and needs to be read by the microcontroller.
 #define RFM22_is1_ixtffaem						BIT5		// TX FIFO Almost Empty. When set to 1 the TX FIFO is almost empty and needs to be filled.
 #define RFM22_is1_itxffafull					BIT6		// TX FIFO Almost Full. When set to 1 the TX FIFO has met its almost full threshold and needs to be transmitted.
@@ -123,7 +123,7 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 #define RFM22_opfc1_xton						0x01		// READY Mode (Xtal is ON).
 #define RFM22_opfc1_pllon						0x02		// TUNE Mode (PLL is ON). When pllon = 1 the PLL will remain enabled in Idle State. This will for faster turn-around time at the cost of increased current consumption in Idle State.
 #define RFM22_opfc1_rxon						0x04		// RX on in Manual Receiver Mode. Automatically cleared if Multiple Packets config. is disabled and a valid packet received.
-#define RFM22_opfc1_txon						0x08		// TX on in Manual Transmit Mode. Automatically cleared in FIFO mode once the packet is sent. Transmission can be aborted during packet transmission, however, when no data has been sent yet, transmission can only be aborted after the device is programmed to “unmodulated carrier” ("Register 71h. Modulation Mode Control 2").
+#define RFM22_opfc1_txon						0x08		// TX on in Manual Transmit Mode. Automatically cleared in FIFO mode once the packet is sent. Transmission can be aborted during packet transmission, however, when no data has been sent yet, transmission can only be aborted after the device is programmed to ï¿½unmodulated carrierï¿½ ("Register 71h. Modulation Mode Control 2").
 #define RFM22_opfc1_x32ksel						0x10		// 32,768 kHz Crystal Oscillator Select.   0: RC oscillator    1: 32 kHz crystal
 #define RFM22_opfc1_enwt						0x20		// Enable Wake-Up-Timer. Enabled when enwt = 1. If the Wake-up-Timer function is enabled it will operate in any mode and notify the microcontroller through the GPIO interrupt when the timer expires.
 #define RFM22_opfc1_enlbd						0x40		// Enable Low Battery Detect. When this bit is set to 1 the Low Battery Detector circuit and threshold comparison will be enabled.
@@ -303,8 +303,8 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 #define RFM22_temp_sensor_calib						0x12	// R/W
 #define RFM22_tsc_tstrim_mask					0x0F		// Temperature Sensor Trim Value.
 #define RFM22_tsc_entstrim						0x10		// Temperature Sensor Trim Enable.
-#define RFM22_tsc_entsoffs						0x20		// Temperature Sensor Offset to Convert from K to ºC.
-#define RFM22_tsc_tsrange0						0x00		// Temperature Sensor Range Selection. –64C to +64C 0.5C resolution
+#define RFM22_tsc_entsoffs						0x20		// Temperature Sensor Offset to Convert from K to ï¿½C.
+#define RFM22_tsc_tsrange0						0x00		// Temperature Sensor Range Selection. ï¿½64C to +64C 0.5C resolution
 #define RFM22_tsc_tsrange1						0x40		// -40 to +85C with 1.0C resolution
 #define RFM22_tsc_tsrange2						0x80		// 0C to 85C with 0.5C resolution
 #define RFM22_tsc_tsrange3						0xC0		// -40F to 216F with 1.0F resolution
@@ -350,7 +350,7 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 #define RFM22_antenna_diversity_register1			0x28	// R
 #define RFM22_antenna_diversity_register2			0x29	// R
 
-#define RFM22_afc_limiter							0x2A	// R/W .. AFC_pull_in_range = ±AFCLimiter[7:0] x (hbsel+1) x 625 Hz
+#define RFM22_afc_limiter							0x2A	// R/W .. AFC_pull_in_range = ï¿½AFCLimiter[7:0] x (hbsel+1) x 625 Hz
 
 #define RFM22_afc_correction_read					0x2B	// R
 
@@ -365,11 +365,11 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 #define RFM22_dac_crc_iec16						0x02		//
 #define RFM22_dac_crc_biacheva					0x03		//
 #define RFM22_dac_encrc							0x04		// CRC Enable. Cyclic Redundancy Check generation is enabled if this bit is set.
-#define RFM22_dac_enpactx						0x08		// Enable Packet TX Handling. If FIFO Mode (dtmod = 10) is being used automatic packet handling may be enabled. Setting enpactx = 1 will enable automatic packet handling in the TX path. Register 30–4D allow for various configurations of the packet structure. Setting enpactx = 0 will not do any packet handling in the TX path. It will only transmit what is loaded to the FIFO.
+#define RFM22_dac_enpactx						0x08		// Enable Packet TX Handling. If FIFO Mode (dtmod = 10) is being used automatic packet handling may be enabled. Setting enpactx = 1 will enable automatic packet handling in the TX path. Register 30ï¿½4D allow for various configurations of the packet structure. Setting enpactx = 0 will not do any packet handling in the TX path. It will only transmit what is loaded to the FIFO.
 #define RFM22_dac_skip2ph						0x10		// Skip 2nd Phase of Preamble Detection. If set, we skip the second phase of the preamble detection (under certain conditions) if antenna diversity is enabled.
 #define RFM22_dac_crcdonly						0x20		// CRC Data Only Enable. When this bit is set to 1 the CRC is calculated on and checked against the packet data fields only.
 #define RFM22_dac_lsbfrst						0x40		// LSB First Enable. The LSB of the data will be transmitted/received first if this bit is set.
-#define RFM22_dac_enpacrx						0x80		// Enable Packet RX Handling. If FIFO Mode (dtmod = 10) is being used automatic packet handling may be enabled. Setting enpacrx = 1 will enable automatic packet handling in the RX path. Register 30–4D allow for various configurations of the packet structure. Setting enpacrx = 0 will not do any packet handling in the RX path. It will only receive everything after the sync word and fill up the RX FIFO.
+#define RFM22_dac_enpacrx						0x80		// Enable Packet RX Handling. If FIFO Mode (dtmod = 10) is being used automatic packet handling may be enabled. Setting enpacrx = 1 will enable automatic packet handling in the RX path. Register 30ï¿½4D allow for various configurations of the packet structure. Setting enpacrx = 0 will not do any packet handling in the RX path. It will only receive everything after the sync word and fill up the RX FIFO.
 
 #define RFM22_ezmac_status							0x31	// R
 #define RFM22_ezmac_status_pksent				0x01		// Packet Sent. A 1 a packet has been sent by the radio. (Same bit as in register 03, but reading it does not reset the IRQ)
@@ -378,7 +378,7 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 #define RFM22_ezmac_status_pkvalid				0x08		// Valid Packet Received. When a 1 a valid packet has been received by the receiver. (Same bit as in register 03, but reading it does not reset the IRQ)
 #define RFM22_ezmac_status_pkrx					0x10		// Packet Receiving. When 1 the radio is currently receiving a valid packet.
 #define RFM22_ezmac_status_pksrch				0x20		// Packet Searching. When 1 the radio is searching for a valid packet.
-#define RFM22_ezmac_status_rxcrc1				0x40		// If high, it indicates the last CRC received is all one’s. May indicated Transmitter underflow in case of CRC error.
+#define RFM22_ezmac_status_rxcrc1				0x40		// If high, it indicates the last CRC received is all oneï¿½s. May indicated Transmitter underflow in case of CRC error.
 
 #define RFM22_header_control1						0x32	// R/W
 #define RFM22_header_cntl1_bcen_none			0x00		// No broadcast address enable.
@@ -580,7 +580,7 @@ typedef bool ( *t_rfm22_RxDataCallback ) (void *data, uint8_t len);
 
 // ************************************
 
-void PIOS_RFM22_EXT_Int(void);
+bool PIOS_RFM22_EXT_Int(void);
 
 #endif /* PIOS_RFM22B_PRIV_H */
 

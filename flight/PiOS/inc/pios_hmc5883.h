@@ -107,7 +107,7 @@ extern bool PIOS_HMC5883_NewDataAvailable(void);
 extern int32_t PIOS_HMC5883_ReadMag(int16_t out[3]);
 extern uint8_t PIOS_HMC5883_ReadID(uint8_t out[4]);
 extern int32_t PIOS_HMC5883_Test(void);
-bool void PIOS_HMC5883_IRQHandler();
+extern bool PIOS_HMC5883_IRQHandler();
 #endif /* PIOS_HMC5883_H */
 
 /** 

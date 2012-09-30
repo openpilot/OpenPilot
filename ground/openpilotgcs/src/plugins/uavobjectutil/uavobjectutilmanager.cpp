@@ -35,7 +35,10 @@
 #include <QEventLoop>
 #include <QTimer>
 #include <objectpersistence.h>
-#include <firmwareiapobj.h>
+
+#include "firmwareiapobj.h"
+#include "homelocation.h"
+#include "gpsposition.h"
 
 // ******************************
 // constructor/destructor
@@ -48,6 +51,18 @@ UAVObjectUtilManager::UAVObjectUtilManager()
     failureTimer.setSingleShot(true);
     failureTimer.setInterval(1000);
     connect(&failureTimer, SIGNAL(timeout()),this,SLOT(objectPersistenceOperationFailed()));
+
+    pm = NULL;
+    obm = NULL;
+    obum = NULL;
+
+    pm = ExtensionSystem::PluginManager::instance();
+    if (pm)
+    {
+        obm = pm->getObject<UAVObjectManager>();
+        obum = pm->getObject<UAVObjectUtilManager>();
+    }
+
 }
 
 UAVObjectUtilManager::~UAVObjectUtilManager()
@@ -67,10 +82,8 @@ UAVObjectUtilManager::~UAVObjectUtilManager()
 
 
 UAVObjectManager* UAVObjectUtilManager::getObjectManager() {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager * objMngr = pm->getObject<UAVObjectManager>();
-    Q_ASSERT(objMngr);
-    return objMngr;
+    Q_ASSERT(obm);
+    return obm;
 }
 
 
@@ -107,7 +120,7 @@ void UAVObjectUtilManager::saveNextObject()
 
     // Get next object from the queue
     UAVObject* obj = queue.head();
-    qDebug() << "Request board to save object " << obj->getName();
+    qDebug() << "Send save object request to board " << obj->getName();
 
     ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
     connect(objper, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
@@ -233,16 +246,7 @@ FirmwareIAPObj::DataFields UAVObjectUtilManager::getFirmwareIap()
 {
     FirmwareIAPObj::DataFields dummy;
 
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    Q_ASSERT(pm);
-    if (!pm)
-        return dummy;
-    UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-    Q_ASSERT(om);
-    if (!om)
-        return dummy;
-
-    FirmwareIAPObj *firmwareIap = FirmwareIAPObj::GetInstance(om);
+    FirmwareIAPObj *firmwareIap = FirmwareIAPObj::GetInstance(obm);
     Q_ASSERT(firmwareIap);
     if (!firmwareIap)
         return dummy;
@@ -257,7 +261,12 @@ FirmwareIAPObj::DataFields UAVObjectUtilManager::getFirmwareIap()
 int UAVObjectUtilManager::getBoardModel()
 {
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
-    return (firmwareIapData.BoardType << 8) + firmwareIapData.BoardRevision;
+    qDebug()<<"Board type="<<firmwareIapData.BoardType;
+    qDebug()<<"Board revision="<<firmwareIapData.BoardRevision;
+    int ret=firmwareIapData.BoardType <<8;
+    ret = ret + firmwareIapData.BoardRevision;
+    qDebug()<<"Board info="<<ret;
+    return ret;
 }
 
 /**
@@ -301,121 +310,47 @@ QByteArray UAVObjectUtilManager::getBoardDescription()
 
 int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 {
-	double ECEF[3];
-	double RNE[9];
-	double Be[3];
-	UAVObjectField *field;
+    double Be[3];
 
-	QMutexLocker locker(mutex);
+    Q_ASSERT (Utils::HomeLocationUtil().getDetails(LLA, Be) >= 0);
 
-	if (Utils::HomeLocationUtil().getDetails(LLA, ECEF, RNE, Be) < 0)
-		return -1;	// error
+    // ******************
+    // save the new settings
 
-	// ******************
-	// save the new settings
+    HomeLocation *homeLocation = HomeLocation::GetInstance(obm);
+    Q_ASSERT(homeLocation != NULL);
 
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (!pm) return -2;
+    HomeLocation::DataFields homeLocationData = homeLocation->getData();
+    homeLocationData.Latitude = LLA[0] * 1e7;
+    homeLocationData.Longitude = LLA[1] * 1e7;
+    homeLocationData.Altitude = LLA[2];
 
-	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-	if (!om) return -3;
+    homeLocationData.Be[0] = Be[0];
+    homeLocationData.Be[1] = Be[1];
+    homeLocationData.Be[2] = Be[2];
 
-	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("HomeLocation")));
-	if (!obj) return -4;
+    homeLocationData.Set = HomeLocation::SET_TRUE;
 
-	UAVObjectField *ECEF_field = obj->getField(QString("ECEF"));
-	if (!ECEF_field) return -5;
+    homeLocation->setData(homeLocationData);
 
-	UAVObjectField *RNE_field = obj->getField(QString("RNE"));
-	if (!RNE_field) return -6;
+    if (save_to_sdcard)
+        saveObjectToSD(homeLocation);
 
-	UAVObjectField *Be_field = obj->getField(QString("Be"));
-	if (!Be_field) return -7;
-
-	field = obj->getField("Latitude");
-	if (!field) return -8;
-	field->setDouble(LLA[0] * 10e6);
-
-	field = obj->getField("Longitude");
-	if (!field) return -9;
-	field->setDouble(LLA[1] * 10e6);
-
-	field = obj->getField("Altitude");
-	if (!field) return -10;
-	field->setDouble(LLA[2]);
-
-	for (int i = 0; i < 3; i++)
-		ECEF_field->setDouble(ECEF[i] * 100, i);
-
-	for (int i = 0; i < 9; i++)
-		RNE_field->setDouble(RNE[i], i);
-
-	for (int i = 0; i < 3; i++)
-		Be_field->setDouble(Be[i], i);
-
-	field = obj->getField("Set");
-	if (!field) return -11;
-	field->setValue("TRUE");
-
-	obj->updated();
-
-	// ******************
-	// save the new setting to SD card
-
-	if (save_to_sdcard)
-		saveObjectToSD(obj);
-
-	// ******************
-	// debug
-/*
-	qDebug() << "setting HomeLocation UAV Object .. " << endl;
-	QString s;
-	s = "        LAT:" + QString::number(LLA[0], 'f', 7) + " LON:" + QString::number(LLA[1], 'f', 7) + " ALT:" + QString::number(LLA[2], 'f', 1);
-	qDebug() << s << endl;
-	s = "        ECEF "; for (int i = 0; i < 3; i++) s += " " + QString::number((int)(ECEF[i] * 100));
-	qDebug() << s << endl;
-	s = "        RNE  ";  for (int i = 0; i < 9; i++) s += " " + QString::number(RNE[i], 'f', 7);
-	qDebug() << s << endl;
-	s = "        Be   ";  for (int i = 0; i < 3; i++) s += " " + QString::number(Be[i], 'f', 2);
-	qDebug() << s << endl;
-*/
-	// ******************
-
-	return 0;	// OK
+    return 0;
 }
 
 int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])
 {
-	UAVObjectField *field;
+    HomeLocation *homeLocation = HomeLocation::GetInstance(obm);
+    Q_ASSERT(homeLocation != NULL);
 
-	QMutexLocker locker(mutex);
+    HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (!pm) return -1;
+    set = homeLocationData.Set;
 
-	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-	if (!om) return -2;
-
-	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("HomeLocation")));
-	if (!obj) return -3;
-
-//	obj->requestUpdate();
-
-	field = obj->getField("Set");
-	if (!field) return -4;
-	set = field->getValue().toBool();
-
-	field = obj->getField("Latitude");
-	if (!field) return -5;
-	LLA[0] = field->getDouble() * 1e-7;
-
-	field = obj->getField("Longitude");
-	if (!field) return -6;
-	LLA[1] = field->getDouble() * 1e-7;
-
-	field = obj->getField("Altitude");
-	if (!field) return -7;
-	LLA[2] = field->getDouble();
+    LLA[0] = homeLocationData.Latitude*1e-7;
+    LLA[1] = homeLocationData.Longitude*1e-7;
+    LLA[2] = homeLocationData.Altitude;
 
 	if (LLA[0] != LLA[0]) LLA[0] = 0; // nan detection
 	else
@@ -434,88 +369,20 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])
 	return 0;	// OK
 }
 
-int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3], double ECEF[3], double RNE[9], double Be[3])
-{
-	UAVObjectField *field;
-
-	QMutexLocker locker(mutex);
-
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (!pm) return -1;
-
-	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-	if (!om) return -2;
-
-	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("HomeLocation")));
-	if (!obj) return -3;
-
-//	obj->requestUpdate();
-
-	field = obj->getField("Set");
-	if (!field) return -4;
-	set = field->getValue().toBool();
-
-	field = obj->getField("Latitude");
-	if (!field) return -5;
-	LLA[0] = field->getDouble() * 1e-7;
-
-	field = obj->getField("Longitude");
-	if (!field) return -6;
-	LLA[1] = field->getDouble() * 1e-7;
-
-	field = obj->getField("Altitude");
-	if (!field) return -7;
-	LLA[2] = field->getDouble();
-
-	field = obj->getField(QString("ECEF"));
-	if (!field) return -8;
-	for (int i = 0; i < 3; i++)
-		ECEF[i] = field->getDouble(i);
-
-	field = obj->getField(QString("RNE"));
-	if (!field) return -9;
-	for (int i = 0; i < 9; i++)
-		RNE[i] = field->getDouble(i);
-
-	field = obj->getField(QString("Be"));
-	if (!field) return -10;
-	for (int i = 0; i < 3; i++)
-		Be[i] = field->getDouble(i);
-
-	return 0;	// OK
-}
 
 // ******************************
 // GPS
 
 int UAVObjectUtilManager::getGPSPosition(double LLA[3])
 {
-	UAVObjectField *field;
+    GPSPosition *gpsPosition = GPSPosition::GetInstance(obm);
+    Q_ASSERT(gpsPosition != NULL);
 
-	QMutexLocker locker(mutex);
+    GPSPosition::DataFields gpsPositionData = gpsPosition->getData();
 
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (!pm) return -1;
-
-	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-	if (!om) return -2;
-
-	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("GPSPosition")));
-	if (!obj) return -3;
-
-//	obj->requestUpdate();
-
-	field = obj->getField(QString("Latitude"));
-	if (!field) return -4;
-	LLA[0] = field->getDouble() * 1e-7;
-
-	field = obj->getField(QString("Longitude"));
-	if (!field) return -5;
-	LLA[1] = field->getDouble() * 1e-7;
-
-	field = obj->getField(QString("Altitude"));
-	if (!field) return -6;
-	LLA[2] = field->getDouble();
+    LLA[0] = gpsPositionData.Latitude;
+    LLA[1] = gpsPositionData.Longitude;
+    LLA[2] = gpsPositionData.Altitude;
 
 	if (LLA[0] != LLA[0]) LLA[0] = 0; // nan detection
 	else
@@ -530,94 +397,6 @@ int UAVObjectUtilManager::getGPSPosition(double LLA[3])
 	if (LLA[1] < -180) LLA[1] = -180;
 
 	if (LLA[2] != LLA[2]) LLA[2] = 0; // nan detection
-
-	return 0;	// OK
-}
-
-// ******************************
-// telemetry port
-
-int UAVObjectUtilManager::setTelemetrySerialPortSpeed(QString speed, bool save_to_sdcard)
-{
-	UAVObjectField *field;
-
-	QMutexLocker locker(mutex);
-
-	// ******************
-	// save the new settings
-
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (!pm) return -1;
-
-	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-	if (!om) return -2;
-
-	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("/*TelemetrySettings*/")));
-	if (!obj) return -3;
-
-	field = obj->getField(QString("Speed"));
-	if (!field) return -4;
-	field->setValue(speed);
-
-	obj->updated();
-
-	// ******************
-	// save the new setting to SD card
-
-	if (save_to_sdcard)
-		saveObjectToSD(obj);
-
-	// ******************
-
-	return 0;	// OK
-}
-
-int UAVObjectUtilManager::getTelemetrySerialPortSpeed(QString &speed)
-{
-	UAVObjectField *field;
-
-	QMutexLocker locker(mutex);
-
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (!pm) return -1;
-
-	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-	if (!om) return -2;
-
-	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("TelemetrySettings")));
-	if (!obj) return -3;
-
-//	obj->requestUpdate();
-
-	field = obj->getField(QString("Speed"));
-	if (!field) return -4;
-	speed = field->getValue().toString();
-
-	return 0;	// OK
-}
-
-int UAVObjectUtilManager::getTelemetrySerialPortSpeeds(QComboBox *comboBox)
-{
-	UAVObjectField *field;
-
-	QMutexLocker locker(mutex);
-
-	if (!comboBox) return -1;
-
-	ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-	if (!pm) return -2;
-
-	UAVObjectManager *om = pm->getObject<UAVObjectManager>();
-	if (!om) return -3;
-
-	UAVDataObject *obj = dynamic_cast<UAVDataObject *>(om->getObject(QString("TelemetrySettings")));
-	if (!obj) return -4;
-
-//	obj->requestUpdate();
-
-	field = obj->getField(QString("Speed"));
-	if (!field) return -5;
-	comboBox->addItems(field->getOptions());
 
 	return 0;	// OK
 }
@@ -625,11 +404,11 @@ int UAVObjectUtilManager::getTelemetrySerialPortSpeeds(QComboBox *comboBox)
 deviceDescriptorStruct UAVObjectUtilManager::getBoardDescriptionStruct()
 {
     deviceDescriptorStruct ret;
-    descriptionToStructure(getBoardDescription(),&ret);
+    descriptionToStructure(getBoardDescription(),ret);
     return ret;
 }
 
-bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescriptorStruct *struc)
+bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescriptorStruct & struc)
 {
    if (desc.startsWith("OpFw")) {
        /*
@@ -639,9 +418,9 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
         *  4 bytes: Unix timestamp of last git commit
         *  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
         *  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
-        *   ---- 40 bytes limit ---
         *  20 bytes: SHA1 sum of the firmware.
-        *  40 bytes: free for now.
+        *  20 bytes: SHA1 sum of the UAVO definition files.
+        *  20 bytes: free for now.
         */
 
        // Note: the ARM binary is big-endian:
@@ -650,23 +429,26 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
            gitCommitHash = gitCommitHash << 8;
            gitCommitHash += desc.at(7-i) & 0xFF;
        }
-       struc->gitHash = QString::number(gitCommitHash, 16);
+       struc.gitHash = QString("%1").arg(gitCommitHash, 8, 16, QChar('0'));
 
        quint32 gitDate = desc.at(11) & 0xFF;
        for (int i = 1; i < 4; i++) {
            gitDate = gitDate << 8;
            gitDate += desc.at(11-i) & 0xFF;
        }
-       struc->gitDate = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyyMMdd HH:mm");
+       struc.gitDate = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyyMMdd HH:mm");
 
        QString gitTag = QString(desc.mid(14,26));
-       struc->gitTag = gitTag;
+       struc.gitTag = gitTag;
 
        // TODO: check platform compatibility
        QByteArray targetPlatform = desc.mid(12,2);
-       struc->boardType = (int)targetPlatform.at(0);
-       struc->boardRevision = (int)targetPlatform.at(1);
-
+       struc.boardType = (int)targetPlatform.at(0);
+       struc.boardRevision = (int)targetPlatform.at(1);
+       struc.fwHash.clear();
+       struc.fwHash=desc.mid(40,20);
+       struc.uavoHash.clear();
+       struc.uavoHash=desc.mid(60,20);
        return true;
    }
    return false;

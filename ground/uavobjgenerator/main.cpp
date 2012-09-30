@@ -161,6 +161,9 @@ int main(int argc, char *argv[])
         QString res = parser->parseXML(xmlstr, filename);
 
         if (!res.isNull()) {
+	    if (!verbose) {
+               cout << "Error in XML file: " << fileinfo.fileName().toStdString() << endl;
+            }
             cout << "Error parsing " << res.toStdString() << endl;
             return RETURN_ERR_XML;
         }

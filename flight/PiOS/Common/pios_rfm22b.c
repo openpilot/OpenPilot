@@ -172,7 +172,7 @@ uint32_t random32 = 0x459ab8d8;
 /* Local function forwared declarations */
 static void PIOS_RFM22B_Supervisor(uint32_t ppm_id);
 static void rfm22_processInt(void);
-static void PIOS_RFM22_EXT_Int(void);
+static bool PIOS_RFM22_EXT_Int(void);
 static void rfm22_setTxMode(uint8_t mode);
 
 // SPI read/write functions
@@ -751,12 +751,13 @@ uint8_t rfm22_read(uint8_t addr)
 // external interrupt
 
 
-static void PIOS_RFM22_EXT_Int(void)
+static bool PIOS_RFM22_EXT_Int(void)
 {
 	rfm22_setDebug("Ext Int");
 	if (!exec_using_spi)
 		rfm22_processInt();
 	rfm22_setDebug("Ext Done");
+	return false;
 }
 
 void rfm22_disableExtInt(void)

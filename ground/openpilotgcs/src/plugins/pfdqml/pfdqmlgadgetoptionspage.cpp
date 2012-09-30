@@ -53,6 +53,7 @@ QWidget *PfdQmlGadgetOptionsPage::createPage(QWidget *parent)
     options_page->earthFile->setPromptDialogTitle(tr("Choose OsgEarth terrain file"));
     options_page->earthFile->setPath(m_config->earthFile());
 
+    options_page->useOpenGL->setChecked(m_config->openGLEnabled());
     options_page->showTerrain->setChecked(m_config->terrainEnabled());
 
     options_page->useActualLocation->setChecked(m_config->actualPositionUsed());
@@ -80,7 +81,13 @@ void PfdQmlGadgetOptionsPage::apply()
 {
     m_config->setQmlFile(options_page->qmlSourceFile->path());
     m_config->setEarthFile(options_page->earthFile->path());
+    m_config->setOpenGLEnabled(options_page->useOpenGL->isChecked());
+
+#ifdef USE_OSG
     m_config->setTerrainEnabled(options_page->showTerrain->isChecked());
+#else
+    m_config->setTerrainEnabled(false);
+#endif
 
     m_config->setActualPositionUsed(options_page->useActualLocation->isChecked());
     m_config->setLatitude(options_page->latitude->text().toDouble());

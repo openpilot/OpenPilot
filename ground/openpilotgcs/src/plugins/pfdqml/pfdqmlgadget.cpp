@@ -38,6 +38,7 @@ PfdQmlGadget::~PfdQmlGadget()
 void PfdQmlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
 {
     PfdQmlGadgetConfiguration *m = qobject_cast<PfdQmlGadgetConfiguration*>(config);
+    m_widget->setOpenGLEnabled(m->openGLEnabled());
     m_widget->setQmlFile(m->qmlFile());
     m_widget->setEarthFile(m->earthFile());
     m_widget->setTerrainEnabled(m->terrainEnabled());
@@ -51,8 +52,10 @@ void PfdQmlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     if (m->cacheOnly()) {
         qputenv("OSGEARTH_CACHE_ONLY", "true");
     } else {
-        //how portable it is?
-        //unsetenv("OSGEARTH_CACHE_ONLY");
-        qputenv("OSGEARTH_CACHE_ONLY", "false");
+#ifdef Q_OS_WIN32
+        qputenv("OSGEARTH_CACHE_ONLY", "");
+#else
+        unsetenv("OSGEARTH_CACHE_ONLY");
+#endif
     }
 }

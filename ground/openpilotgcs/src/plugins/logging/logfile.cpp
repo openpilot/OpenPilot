@@ -219,7 +219,7 @@ bool LogFile::startReplay() {
 
     while (!file.atEnd()){
         qint64 dataSize;
-        char syncByte;
+        uint8_t syncByte;
 
         timestampPos.append(file.pos());
         file.read((char *) &lastTimeStamp, sizeof(lastTimeStamp));
@@ -228,7 +228,7 @@ bool LogFile::startReplay() {
 
         //Check if syncByte is correct.
         if (syncByte!=0x3C){
-            qDebug() << "Wrong sync byte. Got " << syncByte << ", but expected 60.";
+            qDebug() << "Wrong sync byte. Got 0x" << QString("%1").arg(syncByte,0,16) << ", but expected 0x""3c"".";
             file.seek(timestampPos.last()+1);
             timestampPos.pop_back();
             continue;

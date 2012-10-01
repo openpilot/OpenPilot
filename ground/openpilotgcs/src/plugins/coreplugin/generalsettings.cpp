@@ -39,7 +39,6 @@
 #include <QtCore/QSettings>
 
 #include "ui_generalsettings.h"
-#include <QKeyEvent>
 
 using namespace Utils;
 using namespace Core::Internal;
@@ -113,14 +112,8 @@ void GeneralSettings::fillLanguageBox() const
 QWidget *GeneralSettings::createPage(QWidget *parent)
 {
     m_page = new Ui::GeneralSettings();
-    globalSettingsWidget *w = new globalSettingsWidget(parent);
-    connect(w,SIGNAL(showHidden()),this,SLOT(showHidden()));
+    QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
-    m_page->labelUDP->setVisible(false);
-    m_page->cbUseUDPMirror->setVisible(false);
-    m_page->labelExpert->setVisible(false);
-    m_page->cbExpertMode->setVisible(false);
-
     fillLanguageBox();
     connect(m_page->checkAutoConnect,SIGNAL(stateChanged(int)),this,SLOT(slotAutoConnect(int)));
     m_page->checkBoxSaveOnExit->setChecked(m_saveSettingsOnExit);
@@ -262,22 +255,4 @@ void GeneralSettings::slotAutoConnect(int value)
         m_page->checkAutoSelect->setEnabled(false);
     else
         m_page->checkAutoSelect->setEnabled(true);
-}
-
-void GeneralSettings::showHidden()
-{
-    m_page->labelUDP->setVisible(true);
-    m_page->cbUseUDPMirror->setVisible(true);
-    m_page->labelExpert->setVisible(true);
-    m_page->cbExpertMode->setVisible(true);
-}
-
-globalSettingsWidget::globalSettingsWidget(QWidget *parent):QWidget(parent){}
-
-void globalSettingsWidget::keyPressEvent(QKeyEvent *event)
-{
-    if(event->key()==Qt::Key_F7)
-    {
-        emit showHidden();
-    }
 }

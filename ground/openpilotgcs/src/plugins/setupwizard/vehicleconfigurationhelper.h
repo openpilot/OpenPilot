@@ -50,10 +50,6 @@ struct mixerChannelSettings {
         : type(t), throttle1(th1), throttle2(th2), roll(r), pitch(p), yaw(y) {}
 };
 
-struct mixerSettings {
-    mixerChannelSettings channels[10];
-};
-
 class VehicleConfigurationHelper : public QObject
 {
     Q_OBJECT
@@ -88,7 +84,7 @@ private:
     void applyStabilizationConfiguration();
     void applyManualControlDefaults();
 
-    void applyMixerConfiguration(mixerSettings mixer);
+    void applyMixerConfiguration(mixerChannelSettings channels[]);
 
     GUIConfigDataUnion getGUIConfigData();
     void applyMultiGUISettings(SystemSettings::AirframeTypeOptions airframe, GUIConfigDataUnion guiConfig);

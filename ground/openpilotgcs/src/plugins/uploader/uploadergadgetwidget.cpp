@@ -71,8 +71,6 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
         onAutopilotConnect();
         versionMatchCheck();
     }
-
-
 }
 
 
@@ -687,7 +685,8 @@ void UploaderGadgetWidget::versionMatchCheck()
             "GCS version: %1 Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
         msg->showMessage(warning);
     }
-  }
+}
+
 void UploaderGadgetWidget::openHelp()
 {
 

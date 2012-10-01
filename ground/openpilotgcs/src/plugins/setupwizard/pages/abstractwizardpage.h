@@ -42,8 +42,6 @@ private:
 
 public:
     SetupWizard* getWizard() { return m_wizard; }
-    virtual bool isFinished() { return true; }
-    virtual quint16 stage() { return 0; }
 
 };
 

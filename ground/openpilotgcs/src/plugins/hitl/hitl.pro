@@ -1,8 +1,10 @@
 TEMPLATE = lib
 TARGET = HITL
 QT += network
+
 include(../../openpilotgcsplugin.pri)
 include(hitl_dependencies.pri)
+
 HEADERS += hitlplugin.h \
     hitlwidget.h \
     hitloptionspage.h \
@@ -31,3 +33,7 @@ OTHER_FILES += hitl.pluginspec
 FORMS += hitloptionspage.ui \
     hitlwidget.ui
 RESOURCES += hitlresources.qrc
+
+TEMPLATE = subdirs
+SUBDIRS = aerosimrc
+

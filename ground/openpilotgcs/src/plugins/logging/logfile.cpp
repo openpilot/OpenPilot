@@ -52,7 +52,7 @@ bool LogFile::open(OpenMode mode) {
     {
         QString gcsRevision = QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
         QTextStream out(&file);
-        out << "OpenPilot git hash:\n" <<  gcsRevision << "\n";
+        out << "OpenPilot git hash:\n" <<  gcsRevision << "\n##\n";
     }
     else if(mode == QIODevice::ReadOnly)
     {
@@ -65,9 +65,25 @@ bool LogFile::open(OpenMode mode) {
         if(logHashString != gcsRevision){
             QMessageBox msgBox;
             msgBox.setText("Possible log file incompatibility.");
-            msgBox.setInformativeText(QString("The log file was made with %1.").arg(logHashString));
+            msgBox.setInformativeText(QString("The log file was made with branch %1. GCS will attempt to play the file.").arg(logHashString));
             msgBox.exec();
         }
+
+        QString tmpLine=file.readLine(); //Look for the header/body separation string.
+        int cnt=0;
+        while (tmpLine!="##\n" && cnt < 10 && !file.atEnd()){
+            tmpLine=file.readLine().trimmed();
+            cnt++;
+        }
+
+        //Check if we reached the end of the file before finding the separation string
+        if (cnt >=10 || file.atEnd()){
+            QMessageBox msgBox;
+            msgBox.setText("Corrupted file.");
+            msgBox.setInformativeText("GCS cannot find the separation byte. GCS will attempt to play the file."); //<--TODO: add hyperlink to webpage with better description.
+            msgBox.exec();
+        }
+
     }
     else
     {
@@ -199,16 +215,47 @@ bool LogFile::startReplay() {
     timestampPos.clear();
     quint64 logFileStartIdx=file.pos();
     timestampBufferIdx=0;
+    lastTimeStamp=0;
 
     while (!file.atEnd()){
         qint64 dataSize;
+        char syncByte;
+
         timestampPos.append(file.pos());
-        file.read((char *) &lastTimeStamp,sizeof(lastTimeStamp));
+        file.read((char *) &lastTimeStamp, sizeof(lastTimeStamp));
         file.read((char *) &dataSize, sizeof(dataSize));
+        file.read((char *) &syncByte, sizeof(syncByte));
+
+        //Check if syncByte is correct.
+        if (syncByte!=0x3C){
+            qDebug() << "Wrong sync byte. Got " << syncByte << ", but expected 60.";
+            file.seek(timestampPos.last()+1);
+            timestampPos.pop_back();
+            continue;
+        }
+
+        //Check if timestamps are sequential.
+        if (!timestampBuffer.isEmpty() && lastTimeStamp < timestampBuffer.last()){
+            QMessageBox msgBox;
+            msgBox.setText("Corrupted file.");
+            msgBox.setInformativeText("Timestamps are not sequential. Playback may have unexpected behavior"); //<--TODO: add hyperlink to webpage with better description.
+            msgBox.exec();
+        }
 
         timestampBuffer.append(lastTimeStamp);
 
-        file.seek(file.pos()+dataSize);
+        file.seek(timestampPos.last()+sizeof(lastTimeStamp)+sizeof(dataSize)+dataSize);
+    }
+
+    //Check if any timestamps were successfully read
+    if (timestampBuffer.size() !=0){
+        QMessageBox msgBox;
+        msgBox.setText("Empty logfile.");
+        msgBox.setInformativeText("No log data can be found."); //<--TODO: add hyperlink to webpage with better description.
+        msgBox.exec();
+
+        stopReplay();
+        return false;
     }
 
     //Reset to log beginning. WHY DOES PLAYBACK FAIL IF I DON'T DO THIS?

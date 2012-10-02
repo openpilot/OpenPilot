@@ -2067,8 +2067,6 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     longitude = LLA[1];
     altitude = LLA[2];
 
-    qDebug()<<  " " << latitude << " " << longitude << " " << altitude;
-
     if (latitude != latitude) latitude = 0; // nan detection
     else if (latitude >  90) latitude =  90;
     else if (latitude < -90) latitude = -90;

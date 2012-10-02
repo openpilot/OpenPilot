@@ -77,6 +77,7 @@
 #define LOOP_RATE_MS  25.0f
 #define GRAV         -9.805f
 #define DEG2RAD       (3.141592654f/180.0f)
+#define RAD2DEG       (180.0f/3.141592654f)
 
 #define PI_MOD(x) (fmod(x + M_PI, M_PI * 2) - M_PI)
 // Private types
@@ -89,21 +90,7 @@ static bool gpsNew_flag;
 static HomeLocationData homeLocation;
 struct GlobalAttitudeVariables *glbl;
 
-//static float accelKi = 0;
-//static float accelKp = 0;
-//static float yawBiasRate = 0;
-//static float gyroGain = 0.42;
-//static int16_t accelbias[3];
-//static float q[4] = {1,0,0,0};
-//static float R[3][3];
-//static int8_t rotate = 0;
-//static bool zero_during_arming = false;
-//static bool bias_correct_gyro = true;
-//
-//// For running trim flights
-//static volatile bool trim_requested = false;
-//static volatile int32_t trim_accels[3];
-//static volatile int32_t trim_samples;
+// For running trim flights
 uint16_t const MAX_TRIM_FLIGHT_SAMPLES = 65535;
 
 
@@ -566,13 +553,18 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	glbl->bias_correct_gyro = (attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE);
 	glbl->filter_choice = attitudeSettings.FilterChoice;
 	
-	glbl->accelbias[0] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_X]/1000.0f; //Divide by 1000 because `accelbias` is in units
-	glbl->accelbias[1] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Y]/1000.0f; // of 1000*[m/s^2]
-	glbl->accelbias[2] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Z]/1000.0f;
+	//The sensor calibration values are all in the board sensor frame.
+	glbl->accelbias[0] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_X_S]/1000.0f; //Divide by 1000 because `accelbias` is in units
+	glbl->accelbias[1] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Y_S]/1000.0f; // of 1000*[m/s^2]
+	glbl->accelbias[2] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Z_S]/1000.0f;
+
+	glbl->accelscale[0] = attitudeSettings.AccelScale[ATTITUDESETTINGS_ACCELSCALE_X_S]/10000.0f; //Divide by 1000 because `accelbias` is in units
+	glbl->accelscale[1] = attitudeSettings.AccelScale[ATTITUDESETTINGS_ACCELSCALE_Y_S]/10000.0f; // of 1000*[m/s^2]
+	glbl->accelscale[2] = attitudeSettings.AccelScale[ATTITUDESETTINGS_ACCELSCALE_Z_S]/10000.0f;
 	
-	glbl->gyro_correct_int[0] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_X] / 100.0f; //Divide by 100 because `GyroBias` 
-	glbl->gyro_correct_int[1] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Y] / 100.0f; // is in units of 100*[deg/s]
-	glbl->gyro_correct_int[2] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Z] / 100.0f;
+	glbl->gyro_correct_int[0] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_X_S] / 100.0f; //Divide by 100 because `GyroBias` 
+	glbl->gyro_correct_int[1] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Y_S] / 100.0f; // is in units of 100*[deg/s]
+	glbl->gyro_correct_int[2] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Z_S] / 100.0f;
 	
 	//Calculate sensor to board rotation matrix. If the matrix is the identity, don't expend cycles on rotation
 	if(attitudeSettings.BoardRotation[0] == 0 && attitudeSettings.BoardRotation[1] == 0 &&
@@ -583,9 +575,9 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 		float rotationQuat[4] = {1,0,0,0};
 		Quaternion2R(rotationQuat, glbl->Rsb);
 	} else {
-		float rpy[3] = {attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_ROLL]*DEG2RAD,
-			attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_PITCH]*DEG2RAD,
-			attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_YAW]*DEG2RAD};
+		float rpy[3] = {attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_ROLL]*DEG2RAD/100.0f,
+			attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_PITCH]*DEG2RAD/100.0f,
+			attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_YAW]*DEG2RAD/100.0f};
 		Euler2R(rpy, glbl->Rsb);
 		glbl->rotate = true;
 	}
@@ -598,15 +590,16 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 		glbl->trim_requested = true;
 	} else if (attitudeSettings.TrimFlight == ATTITUDESETTINGS_TRIMFLIGHT_LOAD) {
 		glbl->trim_requested = false;
-		attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_X] = glbl->trim_accels[0] / glbl->trim_samples;
-		attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Y] = glbl->trim_accels[1] / glbl->trim_samples;
-		// Z should average -g
-		attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Z] = glbl->trim_accels[2] / glbl->trim_samples - GRAV;
+
+		attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_ROLL]  += atanf(glbl->trim_accels[1]/glbl->trim_accels[2])*RAD2DEG*100.0f;
+		attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_PITCH] += asinf(-(glbl->trim_accels[0] / glbl->trim_samples)/GRAV)*RAD2DEG*100.0f;
+
 		attitudeSettings.TrimFlight = ATTITUDESETTINGS_TRIMFLIGHT_NORMAL;
 		AttitudeSettingsSet(&attitudeSettings);
 	} else {
 		glbl->trim_requested = false;
 	}
+
 }
 
 /**

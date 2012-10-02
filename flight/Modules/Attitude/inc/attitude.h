@@ -39,6 +39,7 @@ struct GlobalAttitudeVariables {
 	float gyroGain[3];
 	float gyroGain_ref;
 	float accelbias[3];
+	float accelscale[3];
 	float gyro_correct_int[3];
 	float q[4];
 	float Rsb[3][3]; //Rotation matrix that transforms from the sensor frame to the body frame
@@ -48,9 +49,9 @@ struct GlobalAttitudeVariables {
 	uint8_t filter_choice;
 	
 	// For running trim flights
-	volatile bool trim_requested;
-	volatile int32_t trim_accels[3];
-	volatile int32_t trim_samples;
+	bool trim_requested;
+	float trim_accels[3];
+	int32_t trim_samples;
 	
 };
 

@@ -341,10 +341,11 @@ void PIOS_Board_Init(void) {
 	PIOS_TIM_InitClock(&tim_3_cfg);
 	PIOS_TIM_InitClock(&tim_4_cfg);
 	PIOS_TIM_InitClock(&tim_5_cfg);
+	PIOS_TIM_InitClock(&tim_8_cfg);
 	PIOS_TIM_InitClock(&tim_9_cfg);
 	PIOS_TIM_InitClock(&tim_10_cfg);
 	PIOS_TIM_InitClock(&tim_11_cfg);
-
+	PIOS_TIM_InitClock(&tim_12_cfg);
 	/* IAP System Setup */
 	PIOS_IAP_Init();
 	uint16_t boot_count = PIOS_IAP_ReadBootCount();
@@ -356,8 +357,8 @@ void PIOS_Board_Init(void) {
 		HwSettingsSetDefaults(HwSettingsHandle(), 0);
 		AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
 	}
-	
-	
+
+
 	//PIOS_IAP_Init();
 
 #if defined(PIOS_INCLUDE_USB)
@@ -470,8 +471,26 @@ void PIOS_Board_Init(void) {
 			PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_GPS_RX_BUF_LEN, -1, &pios_usart_com_driver, &pios_com_gps_id);
 			break;
 		case HWSETTINGS_CC_MAINPORT_SBUS:
-			// TODO
-			break;
+#if defined(PIOS_INCLUDE_SBUS)
+                        {
+                                uint32_t pios_usart_sbus_id;
+                                if (PIOS_USART_Init(&pios_usart_sbus_id, &pios_usart_sbus_main_cfg)) {
+                                        PIOS_Assert(0);
+                                }
+
+                                uint32_t pios_sbus_id;
+                                if (PIOS_SBus_Init(&pios_sbus_id, &pios_sbus_cfg, &pios_usart_com_driver, pios_usart_sbus_id)) {
+                                        PIOS_Assert(0);
+                                }
+
+                                uint32_t pios_sbus_rcvr_id;
+                                if (PIOS_RCVR_Init(&pios_sbus_rcvr_id, &pios_sbus_rcvr_driver, pios_sbus_id)) {
+                                        PIOS_Assert(0);
+                                }
+                                pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_SBUS] = pios_sbus_rcvr_id;
+                        }
+#endif
+                        break;
 		case HWSETTINGS_CC_MAINPORT_DSM2:
 		case HWSETTINGS_CC_MAINPORT_DSMX10BIT:
 		case HWSETTINGS_CC_MAINPORT_DSMX11BIT:
@@ -618,7 +637,7 @@ void PIOS_Board_Init(void) {
 	}
 	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
 #endif	/* PIOS_INCLUDE_GCSRCVR */
-	
+
 #ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
 	switch (hwsettings_rcvrport) {
 		case HWSETTINGS_RV_RCVRPORT_DISABLED:

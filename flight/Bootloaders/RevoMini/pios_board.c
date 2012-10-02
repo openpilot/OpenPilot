@@ -62,7 +62,7 @@ void PIOS_Board_Init() {
 	PIOS_USB_DESC_HID_ONLY_Init();
 
 	uint32_t pios_usb_id;
-	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
+	PIOS_USB_Init(&pios_usb_id, PIOS_BOARD_HW_DEFS_GetUsbCfg(bdinfo->board_rev));
 
 #if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_COM_MSG)
 	uint32_t pios_usb_hid_id;

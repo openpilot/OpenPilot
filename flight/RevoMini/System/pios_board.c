@@ -383,7 +383,7 @@ void PIOS_Board_Init(void) {
 #endif
 
 	uint32_t pios_usb_id;
-	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
+	PIOS_USB_Init(&pios_usb_id, PIOS_BOARD_HW_DEFS_GetUsbCfg(bdinfo->board_rev));
 
 #if defined(PIOS_INCLUDE_USB_CDC)
 

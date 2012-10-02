@@ -28,6 +28,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <pios.h>
+#include <pios_board_info.h>
 #include <openpilot.h>
 #include <gcsreceiver.h>
 #include <hwsettings.h>
@@ -120,8 +122,11 @@ static RadioData *data = 0;
 uint32_t pios_rfm22b_id = 0;
 uint32_t pios_com_rfm22b_id = 0;
 uint32_t pios_packet_handler = 0;
-extern struct pios_rfm22b_cfg pios_rfm22b_cfg;
+const struct pios_rfm22b_cfg *pios_rfm22b_cfg;
 
+// ***************
+// External functions
+extern const struct pios_rfm22b_cfg * PIOS_BOARD_HW_DEFS_GetRfm22Cfg (uint32_t board_revision);
 
 /**
  * Start the module
@@ -177,62 +182,70 @@ static int32_t RadioInitialize(void)
 	PipXSettingsGet(&pipxSettings);
 
 	/* Retrieve hardware settings. */
-	pios_rfm22b_cfg.frequencyHz = pipxSettings.Frequency;
-	pios_rfm22b_cfg.RFXtalCap = pipxSettings.FrequencyCalibration;
+	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+	pios_rfm22b_cfg = PIOS_BOARD_HW_DEFS_GetRfm22Cfg(bdinfo->board_rev);
+
+	// Not appropriate for a constant struct.  Is it necessary to make a local copy of the cfg? 
+	// We should probably be consistent with other drivers and allocate a device structure with
+	// dynamical configuration in it
+#if 0 
+	pios_rfm22b_cfg->frequencyHz = pipxSettings.Frequency;
+	pios_rfm22b_cfg->RFXtalCap = pipxSettings.FrequencyCalibration;
 	switch (pipxSettings.RFSpeed)
 	{
 	case PIPXSETTINGS_RFSPEED_2400:
-		pios_rfm22b_cfg.maxRFBandwidth = 2000;
+		pios_rfm22b_cfg->maxRFBandwidth = 2000;
 		break;
 	case PIPXSETTINGS_RFSPEED_4800:
-		pios_rfm22b_cfg.maxRFBandwidth = 4000;
+		pios_rfm22b_cfg->maxRFBandwidth = 4000;
 		break;
 	case PIPXSETTINGS_RFSPEED_9600:
-		pios_rfm22b_cfg.maxRFBandwidth = 9600;
+		pios_rfm22b_cfg->maxRFBandwidth = 9600;
 		break;
 	case PIPXSETTINGS_RFSPEED_19200:
-		pios_rfm22b_cfg.maxRFBandwidth = 19200;
+		pios_rfm22b_cfg->maxRFBandwidth = 19200;
 		break;
 	case PIPXSETTINGS_RFSPEED_38400:
-		pios_rfm22b_cfg.maxRFBandwidth = 32000;
+		pios_rfm22b_cfg->maxRFBandwidth = 32000;
 		break;
 	case PIPXSETTINGS_RFSPEED_57600:
-		pios_rfm22b_cfg.maxRFBandwidth = 64000;
+		pios_rfm22b_cfg->maxRFBandwidth = 64000;
 		break;
 	case PIPXSETTINGS_RFSPEED_115200:
-		pios_rfm22b_cfg.maxRFBandwidth = 128000;
+		pios_rfm22b_cfg->maxRFBandwidth = 128000;
 		break;
 	}
 	switch (pipxSettings.MaxRFPower)
 	{
 	case PIPXSETTINGS_MAXRFPOWER_125:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_0;
+		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_0;
 		break;
 	case PIPXSETTINGS_MAXRFPOWER_16:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_1;
+		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_1;
 		break;
 	case PIPXSETTINGS_MAXRFPOWER_316:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_2;
+		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_2;
 		break;
 	case PIPXSETTINGS_MAXRFPOWER_63:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_3;
+		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_3;
 		break;
 	case PIPXSETTINGS_MAXRFPOWER_126:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_4;
+		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_4;
 		break;
 	case PIPXSETTINGS_MAXRFPOWER_25:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_5;
+		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_5;
 		break;
 	case PIPXSETTINGS_MAXRFPOWER_50:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_6;
+		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_6;
 		break;
 	case PIPXSETTINGS_MAXRFPOWER_100:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_7;
+		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_7;
 		break;
 	}
+#endif
 
 	/* Initalize the RFM22B radio COM device. */
-	if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg.slave_num, &pios_rfm22b_cfg))
+	if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg->slave_num, pios_rfm22b_cfg))
 		return -1;
 
 	// Initialize the packet handler

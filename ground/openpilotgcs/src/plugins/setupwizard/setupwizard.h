@@ -78,12 +78,14 @@ public:
         }
         return m_connectionManager;
     }
+
 private slots:
     void customBackClicked();
+    void pageChanged(int currId);
 private:
     enum {PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
           PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_LEVELLING, PAGE_CALIBRATION,
-          PAGE_FLASH, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_REBOOT, PAGE_END};
+          PAGE_SAVE, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_REBOOT, PAGE_END};
     void createPages();
     bool saveHardwareSettings() const;
 

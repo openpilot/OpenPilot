@@ -228,7 +228,6 @@ plugin_setupwizard.subdir = setupwizard
 plugin_setupwizard.depends = plugin_coreplugin
 plugin_setupwizard.depends += plugin_uavobjects
 plugin_setupwizard.depends += plugin_config
-plugin_setupwizard.depends += plugin_uavsettingsimportexport
 SUBDIRS += plugin_setupwizard
 
 # Junsi Powerlog plugin

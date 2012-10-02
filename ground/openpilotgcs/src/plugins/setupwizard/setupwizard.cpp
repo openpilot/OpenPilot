@@ -38,7 +38,7 @@
 #include "pages/outputpage.h"
 #include "pages/levellingpage.h"
 #include "pages/summarypage.h"
-#include "pages/flashpage.h"
+#include "pages/savepage.h"
 #include "pages/notyetimplementedpage.h"
 #include "pages/rebootpage.h"
 #include "pages/outputcalibrationpage.h"
@@ -111,10 +111,10 @@ int SetupWizard::nextId() const
         case PAGE_LEVELLING:
             return PAGE_CALIBRATION;
         case PAGE_CALIBRATION:
-            return PAGE_FLASH;
+            return PAGE_SAVE;
         case PAGE_SUMMARY:
             return PAGE_LEVELLING;
-        case PAGE_FLASH:
+        case PAGE_SAVE:
             return PAGE_END;
         case PAGE_NOTYETIMPLEMENTED:
             return PAGE_END;
@@ -268,7 +268,7 @@ void SetupWizard::createPages()
     setPage(PAGE_LEVELLING, new LevellingPage(this));
     setPage(PAGE_CALIBRATION, new OutputCalibrationPage(this));
     setPage(PAGE_SUMMARY, new SummaryPage(this));
-    setPage(PAGE_FLASH, new FlashPage(this));
+    setPage(PAGE_SAVE, new SavePage(this));
     setPage(PAGE_REBOOT, new RebootPage(this));
     setPage(PAGE_NOTYETIMPLEMENTED, new NotYetImplementedPage(this));
     setPage(PAGE_END, new EndPage(this));
@@ -278,9 +278,9 @@ void SetupWizard::createPages()
     connect(button(QWizard::CustomButton1), SIGNAL(clicked()), this, SLOT(customBackClicked()));
     setButtonText(QWizard::CustomButton1, buttonText(QWizard::BackButton));
     QList<QWizard::WizardButton> button_layout;
-    button_layout << QWizard::Stretch << QWizard::CustomButton1 << QWizard::NextButton << QWizard::CancelButton;
+    button_layout << QWizard::Stretch << QWizard::CustomButton1 << QWizard::NextButton << QWizard::CancelButton << QWizard::FinishButton;
     setButtonLayout(button_layout);
-
+    connect(this, SIGNAL(currentIdChanged(int)), this, SLOT(pageChanged(int)));
 }
 
 void SetupWizard::customBackClicked()
@@ -291,6 +291,12 @@ void SetupWizard::customBackClicked()
     else {
         back();
     }
+}
+
+void SetupWizard::pageChanged(int currId)
+{
+    button(QWizard::CustomButton1)->setVisible(currId != PAGE_START);
+    button(QWizard::CancelButton)->setVisible(currId != PAGE_END);
 }
 
 bool SetupWizard::saveHardwareSettings() const

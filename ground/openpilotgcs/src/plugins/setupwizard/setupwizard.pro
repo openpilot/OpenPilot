@@ -23,7 +23,6 @@ HEADERS += setupwizardplugin.h \
     pages/outputpage.h \
     pages/inputpage.h \
     pages/summarypage.h \
-    pages/flashpage.h \
     pages/levellingpage.h \
     levellingutil.h \
     vehicleconfigurationsource.h \
@@ -31,7 +30,8 @@ HEADERS += setupwizardplugin.h \
     connectiondiagram.h \
     pages/outputcalibrationpage.h \
     outputcalibrationutil.h \
-    pages/rebootpage.h
+    pages/rebootpage.h \
+    pages/savepage.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -48,7 +48,6 @@ SOURCES += setupwizardplugin.cpp \
     pages/outputpage.cpp \
     pages/inputpage.cpp \
     pages/summarypage.cpp \
-    pages/flashpage.cpp \
     pages/levellingpage.cpp \
     levellingutil.cpp \
     vehicleconfigurationsource.cpp \
@@ -56,7 +55,8 @@ SOURCES += setupwizardplugin.cpp \
     connectiondiagram.cpp \
     pages/outputcalibrationpage.cpp \
     outputcalibrationutil.cpp \
-    pages/rebootpage.cpp
+    pages/rebootpage.cpp \
+    pages/savepage.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 
@@ -73,11 +73,11 @@ FORMS += \
     pages/outputpage.ui \
     pages/inputpage.ui \
     pages/summarypage.ui \
-    pages/flashpage.ui \
     pages/levellingpage.ui \
     connectiondiagram.ui \
     pages/outputcalibrationpage.ui \
-    pages/rebootpage.ui
+    pages/rebootpage.ui \
+    pages/savepage.ui
 
 RESOURCES += \
     wizardResources.qrc

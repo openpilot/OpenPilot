@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       flashpage.cpp
+ * @file       savepage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup FlashPage
+ * @addtogroup SavePage
  * @{
  * @brief
  *****************************************************************************/
@@ -26,35 +26,35 @@
  */
 
 #include <QMessageBox>
-#include "flashpage.h"
-#include "ui_flashpage.h"
+#include "savepage.h"
+#include "ui_savepage.h"
 #include "setupwizard.h"
 #include "vehicleconfigurationhelper.h"
 
-FlashPage::FlashPage(SetupWizard *wizard, QWidget *parent) :
+SavePage::SavePage(SetupWizard *wizard, QWidget *parent) :
         AbstractWizardPage(wizard, parent),
-    ui(new Ui::FlashPage), m_successfulWrite(false)
+    ui(new Ui::SavePage), m_successfulWrite(false)
 {
     ui->setupUi(this);
     connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(writeToController()));
 }
 
-FlashPage::~FlashPage()
+SavePage::~SavePage()
 {
     delete ui;
 }
 
-bool FlashPage::validatePage()
+bool SavePage::validatePage()
 {    
     return true;
 }
 
-bool FlashPage::isComplete() const
+bool SavePage::isComplete() const
 {
     return m_successfulWrite;
 }
 
-void FlashPage::writeToController()
+void SavePage::writeToController()
 {
     if(!getWizard()->getConnectionManager()->isConnected()) {
         QMessageBox msgBox;
@@ -79,7 +79,7 @@ void FlashPage::writeToController()
     emit completeChanged();
 }
 
-void FlashPage::enableButtons(bool enable)
+void SavePage::enableButtons(bool enable)
 {
     ui->saveButton->setEnabled(enable);
     getWizard()->button(QWizard::NextButton)->setEnabled(enable);
@@ -88,7 +88,7 @@ void FlashPage::enableButtons(bool enable)
     QApplication::processEvents();
 }
 
-void FlashPage::saveProgress(int total, int current, QString description)
+void SavePage::saveProgress(int total, int current, QString description)
 {
     qDebug() << "Progress " << current << "(" << total << ")";
     if(ui->saveProgressBar->maximum() != total) {

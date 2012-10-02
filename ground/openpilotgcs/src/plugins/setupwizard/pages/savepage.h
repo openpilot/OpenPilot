@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       flashpage.h
+ * @file       savepage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup FlashPage
+ * @addtogroup SavePage
  * @{
  * @brief
  *****************************************************************************/
@@ -25,27 +25,27 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef FLASHPAGE_H
-#define FLASHPAGE_H
+#ifndef SAVEPAGE_H
+#define SAVEPAGE_H
 
 #include "abstractwizardpage.h"
 
 namespace Ui {
-class FlashPage;
+class SavePage;
 }
 
-class FlashPage : public AbstractWizardPage
+class SavePage : public AbstractWizardPage
 {
     Q_OBJECT
 
 public:
-    explicit FlashPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~FlashPage();
+    explicit SavePage(SetupWizard *wizard, QWidget *parent = 0);
+    ~SavePage();
     bool validatePage();
     bool isComplete() const;
 
 private:
-    Ui::FlashPage *ui;
+    Ui::SavePage *ui;
     bool m_successfulWrite;
     void enableButtons(bool enable);
 
@@ -54,4 +54,4 @@ private slots:
     void saveProgress(int total, int current, QString description);
 };
 
-#endif // FLASHPAGE_H
+#endif // SAVEPAGE_H

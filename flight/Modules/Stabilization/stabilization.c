@@ -119,7 +119,7 @@ int32_t StabilizationInitialize()
 	// Initialize variables
 	StabilizationSettingsInitialize();
 	ActuatorDesiredInitialize();
-#if defined(DIAGNOSTICS)
+#if defined(RATEDESIRED_DIAGNOSTICS)
 	RateDesiredInitialize();
 #endif
 
@@ -172,8 +172,7 @@ static void stabilizationTask(void* parameters)
 		StabilizationDesiredGet(&stabDesired);
 		AttitudeActualGet(&attitudeActual);
 		GyrosGet(&gyrosData);
-		
-#if defined(DIAGNOSTICS)
+#if defined(RATEDESIRED_DIAGNOSTICS)
 		RateDesiredGet(&rateDesired);
 #endif
 		
@@ -350,7 +349,7 @@ static void stabilizationTask(void* parameters)
 		if (settings.VbarPiroComp == STABILIZATIONSETTINGS_VBARPIROCOMP_TRUE)
 			stabilization_virtual_flybar_pirocomp(gyro_filtered[2], dT);
 
-#if defined(DIAGNOSTICS)
+#if defined(RATEDESIRED_DIAGNOSTICS)
 		RateDesiredSet(&rateDesired);
 #endif
 

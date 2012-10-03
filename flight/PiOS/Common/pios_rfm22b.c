@@ -1137,6 +1137,7 @@ void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
 	int lookup_index = 0;
 	while (lookup_index < (LOOKUP_SIZE - 1) && data_rate[lookup_index] < datarate_bps)
 		lookup_index++;
+	lookup_index = 10;
 
 	datarate_bps = data_rate[lookup_index];
 
@@ -1166,12 +1167,14 @@ void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
 	// rfm22_afc_limiter
 	rfm22_write(0x2A, reg_2A[lookup_index]);
 
+/* This breaks all bit rates < 100000!
 	if (datarate_bps < 100000)
 		// rfm22_chargepump_current_trimming_override
 		rfm22_write(0x58, 0x80);
 	else
 		// rfm22_chargepump_current_trimming_override
 		rfm22_write(0x58, 0xC0);
+*/
 
 	// rfm22_tx_data_rate1
 	rfm22_write(0x6E, reg_6E[lookup_index]);
@@ -1550,7 +1553,7 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 	}
 
 	// Packet has been sent
-	if (rfm22b_dev->int_status1 & RFM22_is1_ipksent)
+	else if (rfm22b_dev->int_status1 & RFM22_is1_ipksent)
 	{
 		// Free the tx packet
 		PHReleaseTXPacket(pios_packet_handler, rfm22b_dev->tx_packet);

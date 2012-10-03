@@ -42,7 +42,7 @@ STACK_DIAGNOSTICS ?= NO
 MIXERSTATUS_DIAGNOSTICS ?= NO
 RATEDESIRED_DIAGNOSTICS ?= NO
 I2C_WDG_STATS_DIAGNOSTICS ?= NO
-DIAG_TASKS ?= YES
+DIAG_TASKS ?= NO
 
 #Or just turn on all the above diagnostics. WARNING: This consumes massive amounts of memory.
 ALL_DIGNOSTICS ?=NO

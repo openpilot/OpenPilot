@@ -65,6 +65,7 @@ public:
 public slots:
     void openUrl(const QString &url);
     void openPage(const QString &page);
+    void triggerAction(const QString &actionId);
 
 private:
     WelcomeModePrivate *m_d;

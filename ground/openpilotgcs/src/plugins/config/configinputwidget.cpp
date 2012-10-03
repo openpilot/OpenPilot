@@ -289,17 +289,24 @@ void ConfigInputWidget::resizeEvent(QResizeEvent *event)
 
 void ConfigInputWidget::openHelp()
 {
-
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/04Cf", QUrl::StrictMode) );
 }
+
 void ConfigInputWidget::goToWizard()
 {
     QMessageBox msgBox;
     msgBox.setText(tr("Arming Settings are now set to Always Disarmed for your safety."));
-    msgBox.setDetailedText(tr("You will have to reconfigure the arming settings manually when the wizard is finished."));
+    msgBox.setDetailedText(tr("You will have to reconfigure the arming settings manually "
+                              "when the wizard is finished. After the last step of the "
+                              "wizard you will be taken to the Arming Settings screen."));
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
     msgBox.exec();
+
+    // Set correct tab visible before starting wizard.
+    if(m_config->tabWidget->currentIndex() != 0) {
+        m_config->tabWidget->setCurrentIndex(0);
+    }
     wizardSetUpStep(wizardWelcome);
     m_config->graphicsView->fitInView(m_txBackground, Qt::KeepAspectRatio );
 }
@@ -365,6 +372,7 @@ void ConfigInputWidget::wzNext()
     case wizardFinish:
         wizardStep=wizardNone;
         m_config->stackedWidget->setCurrentIndex(0);
+        m_config->tabWidget->setCurrentIndex(2);
         break;
     default:
         Q_ASSERT(0);
@@ -539,7 +547,8 @@ void ConfigInputWidget::wizardSetUpStep(enum wizardSteps step)
         connect(flightStatusObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         connect(accessoryDesiredObj0, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(moveSticks()));
         m_config->wzText->setText(QString(tr("You have completed this wizard, please check below if the picture mimics your sticks movement.\n"
-                                             "These new settings aren't saved to the board yet, after pressing next you will go to the initial screen where you can save the configuration.")));
+                                             "These new settings aren't saved to the board yet, after pressing next you will go to the Arming Settings "
+                                             "screen where you can set your desired arming sequence and save the configuration.")));
         fastMdata();
 
         manualSettingsData.ChannelNeutral[ManualControlSettings::CHANNELNEUTRAL_THROTTLE]=

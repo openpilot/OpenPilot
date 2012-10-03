@@ -123,7 +123,10 @@ public class HidUAVTalk extends TelemetryTask {
 		while(deviceIterator.hasNext()){
 			UsbDevice dev = deviceIterator.next();
 			if (DEBUG) Log.d(TAG, "Testing device: " + dev);
-			usbManager.requestPermission(dev, permissionIntent);
+			if( ValidateFoundDevice(dev) ) {
+				usbManager.requestPermission(dev, permissionIntent);
+				break;
+			}
 		}
 
 		if (DEBUG) Log.d(TAG, "Registered the deviceAttachedFilter");

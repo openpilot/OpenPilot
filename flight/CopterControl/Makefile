@@ -44,6 +44,8 @@ RATEDESIRED_DIAGNOSTICS ?= NO
 I2C_WDG_STATS_DIAGNOSTICS ?= NO
 DIAG_TASKS ?= YES
 
+#Or just turn on all the above diagnostics. WARNING: This consumes massive amounts of memory.
+ALL_DIGNOSTICS ?=NO
 
 # Set to YES to build a FW version that will erase all flash memory
 ERASE_FLASH ?= NO
@@ -500,23 +502,25 @@ ifeq ($(DEBUG),YES)
 CFLAGS += -DDEBUG
 endif
 
-ifeq ($(STACK_DIAGNOSTICS),YES)
+#The following Makefile command, ifneq (, $(filter) $(A), $(B) $(C)) is equivalent 
+# to the pseudocode `if(A== B || A==C)`
+ifneq (,$(filter YES,$(STACK_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
 CFLAGS += -DSTACK_DIAGNOSTICS
 endif
 
-ifeq ($(MIXERSTATUS_DIAGNOSTICS),YES)
+ifneq (,$(filter YES,$(MIXERSTATUS_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
 CFLAGS += -DMIXERSTATUS_DIAGNOSTICS
 endif
 
-ifeq ($(RATEDESIRED_DIAGNOSTICS),YES)
+ifneq (,$(filter YES,$(RATEDESIRED_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
 CFLAGS += -DRATEDESIRED_DIAGNOSTICS
 endif
 
-ifeq ($(I2C_WDG_STATS_DIAGNOSTICS),YES)
+ifneq (,$(filter YES,$(I2C_WDG_STATS_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
 CFLAGS += -DI2C_WDG_STATS_DIAGNOSTICS
 endif
 
-ifeq ($(DIAG_TASKS),YES)
+ifneq (,$(filter YES,$(DIAG_TASKS) $(ALL_DIGNOSTICS)))
 CFLAGS += -DDIAG_TASKS
 endif
 

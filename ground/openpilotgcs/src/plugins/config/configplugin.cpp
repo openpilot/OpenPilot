@@ -99,7 +99,7 @@ void ConfigPlugin::extensionsInitialized()
 
 void ConfigPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 
 /**

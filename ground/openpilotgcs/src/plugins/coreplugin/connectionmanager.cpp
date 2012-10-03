@@ -101,7 +101,7 @@ void ConnectionManager::init()
 /**
 *   Method called when the user clicks the "Connect" button
 */
-bool ConnectionManager::connectDevice()
+bool ConnectionManager::connectDevice(DevListItem device)
 {
     DevListItem connection_device = findDevice(m_availableDevList->itemData(m_availableDevList->currentIndex(),Qt::ToolTipRole).toString());
     if (!connection_device.connection)
@@ -126,7 +126,7 @@ bool ConnectionManager::connectDevice()
     connect(m_connectionDevice.connection, SIGNAL(destroyed(QObject *)), this, SLOT(onConnectionDestroyed(QObject *)), Qt::QueuedConnection);
 
     // signal interested plugins that we connected to the device
-    emit deviceConnected(m_ioDev);
+    emit deviceConnected(io_dev);
     m_connectBtn->setText("Disconnect");
     m_availableDevList->setEnabled(false);
 
@@ -174,6 +174,7 @@ bool ConnectionManager::disconnectDevice()
     m_connectionDevice.connection = NULL;
     m_ioDev = NULL;
 
+    emit deviceDisconnected();
     m_connectBtn->setText("Connect");
     m_availableDevList->setEnabled(true);
 
@@ -230,8 +231,11 @@ void ConnectionManager::onConnectClicked()
 {
     // Check if we have a ioDev already created:
     if (!m_ioDev)
-    {	// connecting
-        connectDevice();
+    {
+        // connecting to currently selected device
+        DevListItem device = findDevice(m_availableDevList->itemData(m_availableDevList->currentIndex(), Qt::ToolTipRole).toString());
+        if (device.connection)
+            connectDevice(device);
     }
     else
     {	// disconnecting
@@ -427,6 +431,9 @@ void ConnectionManager::devChanged(IConnection *connection)
 
     updateConnectionDropdown();
 
+    qDebug() << "# devices " << m_devList.count();
+    emit availableDevicesChanged(m_devList);
+
 
     //disable connection button if the liNameif (m_availableDevList->count() > 0)
     if (m_availableDevList->count() > 0)
@@ -445,11 +452,12 @@ void ConnectionManager::updateConnectionDropdown()
         if(!m_ioDev && d.getConName().startsWith("USB"))
         {
             if(m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect())
-                m_availableDevList->setCurrentIndex(m_availableDevList->count()-1);
+                m_availableDevList->setCurrentIndex(m_availableDevList->count() - 1);
+
             if(m_mainWindow->generalSettings()->autoConnect() && polling)
             {
                 qDebug() << "Automatically opening device";
-                connectDevice();
+                connectDevice(d);
                 qDebug()<<"ConnectionManager::devChanged autoconnected USB device";
             }
         }

@@ -30,5 +30,7 @@
         <file>qml/images/bttn-txwizard-off.png</file>
         <file>qml/images/bttn-vehwizard-on.png</file>
         <file>qml/images/bttn-vehwizard-off.png</file>
+        <file>qml/images/wizard-off.png</file>
+        <file>qml/images/wizard-on.png</file>
     </qresource>
 </RCC>

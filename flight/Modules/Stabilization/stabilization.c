@@ -172,7 +172,6 @@ static void stabilizationTask(void* parameters)
 		StabilizationDesiredGet(&stabDesired);
 		AttitudeActualGet(&attitudeActual);
 		GyrosGet(&gyrosData);
-		
 #if defined(RATEDESIRED_DIAGNOSTICS)
 		RateDesiredGet(&rateDesired);
 #endif

@@ -434,18 +434,18 @@ static int32_t updateSensors(AccelsData * accels, GyrosData * gyros, bool cc3d_f
 		float tmpVec[3];
 		
 		//Rotate the vector into a temporary vector, and then copy back into the original vectors.
-		rot_mult(glbl->Rsb, prelim_accels, tmpVec, true);
+		rot_mult(glbl->Rsb, prelim_accels, tmpVec, false);
 		memcpy(prelim_accels, tmpVec, sizeof(tmpVec));
 		
-		rot_mult(glbl->Rsb, prelim_gyros,  tmpVec, true);
+		rot_mult(glbl->Rsb, prelim_gyros,  tmpVec, false);
 		memcpy(prelim_gyros,  tmpVec, sizeof(tmpVec));
 	}
 	
 	//Correct accels biases. 
-	// NOTE: At this point, prelim_accels has now been rotated into the body frame, as are the accel biases
-	accels->x = prelim_accels[0] - glbl->accelbias[0];
-	accels->y = prelim_accels[1] - glbl->accelbias[1];
-	accels->z = prelim_accels[2] - glbl->accelbias[2];
+	// NOTE: At this point, prelim_accels has now been rotated into the body frame
+	accels->x = prelim_accels[0];
+	accels->y = prelim_accels[1];
+	accels->z = prelim_accels[2];
 	
 	//Correct gyroscope biases. 
 	// NOTE: At this point, prelim_gyros has now been rotated into the body frame, as are the gyro biases
@@ -473,13 +473,13 @@ static int32_t updateSensors(AccelsData * accels, GyrosData * gyros, bool cc3d_f
 			float throttle;
 			FlightStatusArmedGet(&armed);
 			ManualControlCommandThrottleGet(&throttle);  // Until flight status indicates airborne
-			if ((armed == FLIGHTSTATUS_ARMED_ARMED) && (throttle > 0)) {
+//			if ((armed == FLIGHTSTATUS_ARMED_ARMED) && (throttle > 0)) {
 				glbl->trim_samples++;
 				// Store the digitally scaled version since that is what we use for bias
 				glbl->trim_accels[0] += accels->x;
 				glbl->trim_accels[1] += accels->y;
 				glbl->trim_accels[2] += accels->z;
-			}
+//			}
 		}
 	}
 	
@@ -553,7 +553,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	glbl->bias_correct_gyro = (attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE);
 	glbl->filter_choice = attitudeSettings.FilterChoice;
 	
-	//The sensor calibration values are all in the board sensor frame.
+	//The accelerometer sensor calibration values are all in the board sensor frame.
 	glbl->accelbias[0] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_X_S]/1000.0f; //Divide by 1000 because `accelbias` is in units
 	glbl->accelbias[1] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Y_S]/1000.0f; // of 1000*[m/s^2]
 	glbl->accelbias[2] = attitudeSettings.AccelBias[ATTITUDESETTINGS_ACCELBIAS_Z_S]/1000.0f;
@@ -562,9 +562,10 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	glbl->accelscale[1] = attitudeSettings.AccelScale[ATTITUDESETTINGS_ACCELSCALE_Y_S]/10000.0f; // of 1000*[m/s^2]
 	glbl->accelscale[2] = attitudeSettings.AccelScale[ATTITUDESETTINGS_ACCELSCALE_Z_S]/10000.0f;
 	
-	glbl->gyro_correct_int[0] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_X_S] / 100.0f; //Divide by 100 because `GyroBias` 
-	glbl->gyro_correct_int[1] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Y_S] / 100.0f; // is in units of 100*[deg/s]
-	glbl->gyro_correct_int[2] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Z_S] / 100.0f;
+	//The gyroscope sensor calibration values are all in the body frame.
+	glbl->gyro_correct_int[0] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_X_B] / 100.0f; //Divide by 100 because `GyroBias` 
+	glbl->gyro_correct_int[1] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Y_B] / 100.0f; // is in units of 100*[deg/s]
+	glbl->gyro_correct_int[2] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_Z_B] / 100.0f;
 	
 	//Calculate sensor to board rotation matrix. If the matrix is the identity, don't expend cycles on rotation
 	if(attitudeSettings.BoardRotation[0] == 0 && attitudeSettings.BoardRotation[1] == 0 &&
@@ -591,8 +592,31 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	} else if (attitudeSettings.TrimFlight == ATTITUDESETTINGS_TRIMFLIGHT_LOAD) {
 		glbl->trim_requested = false;
 
-		attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_ROLL]  += atanf(glbl->trim_accels[1]/glbl->trim_accels[2])*RAD2DEG*100.0f;
-		attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_PITCH] += asinf(-(glbl->trim_accels[0] / glbl->trim_samples)/GRAV)*RAD2DEG*100.0f;
+		//Get sensor data  mean 
+		float a_body[3]={glbl->trim_accels[0]/glbl->trim_samples, glbl->trim_accels[1]/glbl->trim_samples, glbl->trim_accels[2]/glbl->trim_samples};
+		
+		//Inverse rotation of sensor data, from body frame into sensor frame
+		float a_sensor[3];
+		rot_mult(glbl->Rsb, a_body, a_sensor, true);
+		
+		//Temporary variables
+		float psi, theta, phi;
+		
+		psi=attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_YAW]*DEG2RAD/100.0f;
+		
+		float cP=cosf(psi);
+		float sP=sinf(psi);
+
+		//In case psi is too small, we have to use a different equation to solve for theta
+		if (fabs(psi) > 3.14f/2)
+			theta=atanf((a_sensor[1]+cP*(sP*a_sensor[0]-cP*a_sensor[1]))/(sP*a_sensor[2]));
+		else
+			theta=atanf((a_sensor[0]-sP*(sP*a_sensor[0]-cP*a_sensor[1]))/(cP*a_sensor[2]));
+			
+		phi=atan2f((sP*a_sensor[0]-cP*a_sensor[1])/GRAV,(a_sensor[2]/cosf(theta)/GRAV));
+		
+		attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_ROLL]  = phi*RAD2DEG*100.0f;
+		attitudeSettings.BoardRotation[ATTITUDESETTINGS_BOARDROTATION_PITCH] = theta*RAD2DEG*100.0f;
 
 		attitudeSettings.TrimFlight = ATTITUDESETTINGS_TRIMFLIGHT_NORMAL;
 		AttitudeSettingsSet(&attitudeSettings);

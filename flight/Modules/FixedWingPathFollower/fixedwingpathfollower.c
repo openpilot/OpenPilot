@@ -482,22 +482,31 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 		
 		
 	//GET RID OF THE RAD2DEG. IT CAN BE FACTORED INTO HeadingPI
+#define ROLLLIMIT_NEUTRAL  fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_NEUTRAL]
+#define ROLLLIMIT_MIN      fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_MIN]
+#define ROLLLIMIT_MAX      fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_MAX]
+	if (fabs(headingError_R) > 20.0f*DEG2RAD){
+		if (headingError_R >0.0f)
+			stabDesired.Roll=ROLLLIMIT_MAX;
+		else
+			stabDesired.Roll=ROLLLIMIT_MIN;
+	}
+	else {
 #define HEADINGPI_KP fixedwingpathfollowerSettings.HeadingPI[FIXEDWINGPATHFOLLOWERSETTINGS_HEADINGPI_KP]
-	rollCommand = (/*rollFF*/ + headingError_R * HEADINGPI_KP)* RAD2DEG;
-
+		rollCommand = (/*rollFF*/ + headingError_R * HEADINGPI_KP)* RAD2DEG;
+		
+		//Turn heading 
+		
+		stabDesired.Roll = bound( ROLLLIMIT_NEUTRAL +
+								 rollCommand,
+								 ROLLLIMIT_MIN,
+								 ROLLLIMIT_MAX);
+	}
+	
 #ifdef SIM_OSX
 	fprintf(stderr, " headingError_R: %f, rollCommand: %f\n", headingError_R, rollCommand);
 #endif		
 	
-	//Turn heading 
-
-#define ROLLLIMIT_NEUTRAL  fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_NEUTRAL]
-#define ROLLLIMIT_MIN      fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_MIN]
-#define ROLLLIMIT_MAX      fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_MAX]
-	stabDesired.Roll = bound( ROLLLIMIT_NEUTRAL +
-							 rollCommand,
-							 ROLLLIMIT_MIN,
-							 ROLLLIMIT_MAX);
 
 	/**
 	 * Compute desired yaw command

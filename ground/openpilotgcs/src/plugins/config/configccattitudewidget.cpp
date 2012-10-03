@@ -143,12 +143,12 @@ void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject * obj) {
 
         AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(getObjectManager())->getData();
         // We offset the gyro bias by current bias to help precision
-        attitudeSettingsData.AccelBias[0] += x_bias;
-        attitudeSettingsData.AccelBias[1] += y_bias;
-        attitudeSettingsData.AccelBias[2] += z_bias;
-        attitudeSettingsData.GyroBias[0] = -x_gyro_bias;
-        attitudeSettingsData.GyroBias[1] = -y_gyro_bias;
-        attitudeSettingsData.GyroBias[2] = -z_gyro_bias;
+        attitudeSettingsData.AccelBias[AttitudeSettings::ACCELBIAS_X_S] += x_bias;
+        attitudeSettingsData.AccelBias[AttitudeSettings::ACCELBIAS_Y_S] += y_bias;
+        attitudeSettingsData.AccelBias[AttitudeSettings::ACCELBIAS_Z_S] += z_bias;
+        attitudeSettingsData.GyroBias[AttitudeSettings::GYROBIAS_X_B] = -x_gyro_bias;
+        attitudeSettingsData.GyroBias[AttitudeSettings::GYROBIAS_Y_B] = -y_gyro_bias;
+        attitudeSettingsData.GyroBias[AttitudeSettings::GYROBIAS_Z_B] = -z_gyro_bias;
         attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
         AttitudeSettings::GetInstance(getObjectManager())->setData(attitudeSettingsData);
         this->setDirty(true);

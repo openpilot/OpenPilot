@@ -188,7 +188,8 @@ void Quaternion2R(float q[4], float Rbe[3][3])
 	Rbe[2][2] = q0s - q1s - q2s + q3s;
 }
 
-//** Find Rbe, that rotates a vector from earth fixed to body frame, from euler angles **
+//** Find Rbe, that rotates a vector from earth fixed to body frame, from euler angles, using Tait-Bryan
+//**  convention, i.e. Rbe=Rot_x(roll)*Rot_y(pitch)*Rot_z(yaw) **
 void Euler2R(float rpy[3], float Rbe[3][3])
 {
 	

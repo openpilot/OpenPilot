@@ -717,7 +717,7 @@ static int32_t UAVTalkSend(UAVTalkComTaskParams *params, uint8_t *buf, int32_t l
 	}
 #endif /* PIOS_INCLUDE_USB */
 	if(outputPort)
-		return PIOS_COM_SendBuffer(outputPort, buf, length);
+		return PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
 	else
 		return -1;
 }

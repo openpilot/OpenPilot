@@ -54,6 +54,7 @@
 #include <pios_spi_priv.h>
 #include <packet_handler.h>
 #include <pios_rfm22b_priv.h>
+#include <ecc.h>
 
 /* Local Defines */
 #define STACK_SIZE_BYTES 200
@@ -62,10 +63,11 @@
 #define EVENT_QUEUE_SIZE 5
 #define PACKET_QUEUE_SIZE 3
 
-// RTC timer is running at 625Hz (1.6ms or 5 ticks == 8ms).
-// A 256 byte message at 56kbps should take less than 40ms
-// Note: This timeout should be rate dependent.
+// The maximum amount of time without activity before initiating a reset.
 #define PIOS_RFM22B_SUPERVISOR_TIMEOUT 100  // ms
+
+// The time between updates over the radio link.
+#define RADIOSTATS_UPDATE_PERIOD_MS 250
 
 // this is too adjust the RF module so that it is on frequency
 #define OSC_LOAD_CAP					0x7F	// cap = 12.5pf .. default
@@ -93,28 +95,6 @@
 #define SYNC_BYTE_2						0xD4    //
 #define SYNC_BYTE_3						0x4B    //
 #define SYNC_BYTE_4						0x59    //
-
-// ************************************
-// the default RF datarate
-
-//#define RFM22_DEFAULT_RF_DATARATE       500          // 500 bits per sec
-//#define RFM22_DEFAULT_RF_DATARATE       1000         // 1k bits per sec
-//#define RFM22_DEFAULT_RF_DATARATE       2000         // 2k bits per sec
-//#define RFM22_DEFAULT_RF_DATARATE       4000         // 4k bits per sec
-//#define RFM22_DEFAULT_RF_DATARATE       8000         // 8k bits per sec
-//#define RFM22_DEFAULT_RF_DATARATE       9600         // 9.6k bits per sec
-//#define RFM22_DEFAULT_RF_DATARATE       16000        // 16k bits per sec
-//#define RFM22_DEFAULT_RF_DATARATE       19200        // 19k2 bits per sec
-//#define RFM22_DEFAULT_RF_DATARATE       24000        // 24k bits per sec
-//#define RFM22_DEFAULT_RF_DATARATE       32000        // 32k bits per sec
-//#define RFM22_DEFAULT_RF_DATARATE       64000        // 64k bits per sec
-#define RFM22_DEFAULT_RF_DATARATE       128000       // 128k bits per sec
-//#define RFM22_DEFAULT_RF_DATARATE       192000       // 192k bits per sec
-//#define RFM22_DEFAULT_RF_DATARATE       256000       // 256k bits per sec .. NOT YET WORKING
-
-// ************************************
-
-#define RFM22_DEFAULT_SS_RF_DATARATE       125			// 128bps
 
 #ifndef RX_LED_ON
 #define RX_LED_ON
@@ -258,9 +238,12 @@ struct pios_rfm22b_dev {
 	int32_t afc_correction_Hz;
 	int8_t rx_packet_start_afc_Hz;
 
+	// The status packet
+	PHStatusPacket status_packet;
+
 	// The maximum time (ms) that it should take to transmit / receive a packet.
 	uint32_t max_packet_time;
-	portTickType packet_start_time;
+	portTickType packet_start_ticks;
 };
 
 struct pios_rfm22b_transition {
@@ -308,6 +291,7 @@ static enum pios_rfm22b_event rfm22_process_state_transition(struct pios_rfm22b_
 static enum pios_rfm22b_event rfm22_timeout(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_error(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_fatal_error(struct pios_rfm22b_dev *rfm22b_dev);
+static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev);
 
 // SPI read/write functions
 static void rfm22_assertCs();
@@ -587,7 +571,7 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 
 	// Calculate the (approximate) maximum amount of time that it should take to transmit / receive a packet.
 	rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(rfm22b_dev->cfg.maxRFBandwidth) + 0.5);
-	rfm22b_dev->packet_start_time = 0;
+	rfm22b_dev->packet_start_ticks = 0;
 
 	// Create a semaphore to know if an ISR needs responding to
 	vSemaphoreCreateBinary( rfm22b_dev->isrPending );
@@ -791,7 +775,8 @@ static void PIOS_RFM22B_Task(void *parameters)
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)parameters;
 	if (!PIOS_RFM22B_validate(rfm22b_dev))
 	    return;
-	static portTickType lastEventTime;
+	portTickType lastEventTicks = xTaskGetTickCount();
+	portTickType lastStatusTicks = lastEventTicks;
 
 	while(1)
 	{
@@ -803,7 +788,7 @@ static void PIOS_RFM22B_Task(void *parameters)
 		// Wait for a signal indicating an external interrupt or a pending send/receive request.
 		if ( xSemaphoreTake(g_rfm22b_dev->isrPending,  ISR_TIMEOUT / portTICK_RATE_MS) == pdTRUE ) {
 			rfm22b_dev->irqs_processed++;
-			lastEventTime = xTaskGetTickCount();
+			lastEventTicks = xTaskGetTickCount();
 
 			// Process events through the state machine.
 			enum pios_rfm22b_event event;
@@ -821,8 +806,11 @@ static void PIOS_RFM22B_Task(void *parameters)
 		else
 		{
 			// Has it been too long since the last event?
-			portTickType timeSinceEvent = xTaskGetTickCount() - lastEventTime;
-			if ((timeSinceEvent / portTICK_RATE_MS) > PIOS_RFM22B_SUPERVISOR_TIMEOUT)
+			portTickType curTicks = xTaskGetTickCount();
+			if (curTicks < lastEventTicks)
+				lastEventTicks = curTicks;
+			portTickType ticksSinceEvent = curTicks - lastEventTicks;
+			if ((ticksSinceEvent / portTICK_RATE_MS) > PIOS_RFM22B_SUPERVISOR_TIMEOUT)
 			{
  				// Transsition through an error event.
 				enum pios_rfm22b_event event = RFM22B_EVENT_ERROR;
@@ -832,34 +820,36 @@ static void PIOS_RFM22B_Task(void *parameters)
 				// Clear the event queue.
 				while (xQueueReceive(rfm22b_dev->eventQueue, &event, 0) == pdTRUE)
 					;
-				lastEventTime = xTaskGetTickCount();
-			}
-			else
-			{
-				rfm22b_dev->resets = rfm22b_dev->state;
-				enum pios_rfm22b_event event = RFM22B_EVENT_TIMEOUT;
-				while(event != RFM22B_EVENT_NUM_EVENTS)
-					event = rfm22_process_state_transition(rfm22b_dev, event);
+				lastEventTicks = xTaskGetTickCount();
 			}
 		}
 
 		// Have we locked up sending / receiving a packet?
-		if (rfm22b_dev->packet_start_time > 0)
+		if (rfm22b_dev->packet_start_ticks > 0)
 		{
-			portTickType cur_time = xTaskGetTickCount();
+			portTickType cur_ticks = xTaskGetTickCount();
 
 			// Did the clock wrap around?
-			if (cur_time < rfm22b_dev->packet_start_time)
-				rfm22b_dev->packet_start_time = (cur_time > 0) ? cur_time : 1;
+			if (cur_ticks < rfm22b_dev->packet_start_ticks)
+				rfm22b_dev->packet_start_ticks = (cur_ticks > 0) ? cur_ticks : 1;
 
 			// Have we been sending this packet too long?
-			if ((cur_time - rfm22b_dev->packet_start_time) > (rfm22b_dev->max_packet_time * 5))
+			if (((cur_ticks - rfm22b_dev->packet_start_ticks) / portTICK_RATE_MS) > (rfm22b_dev->max_packet_time * 3))
 			{
 				enum pios_rfm22b_event event = RFM22B_EVENT_TIMEOUT;
 				while(event != RFM22B_EVENT_NUM_EVENTS)
 					event = rfm22_process_state_transition(rfm22b_dev, event);
 			}
 		}
+
+		// Queue up a status packet if it's time.
+		portTickType curTicks = xTaskGetTickCount();
+		// Rollover
+		if (curTicks < lastStatusTicks)
+			lastStatusTicks = curTicks;
+		if (((curTicks - lastStatusTicks) / portTICK_RATE_MS) > RADIOSTATS_UPDATE_PERIOD_MS)
+			if (rfm22_sendStatus(rfm22b_dev))
+				lastStatusTicks = curTicks;
 	}
 }
 
@@ -1206,7 +1196,7 @@ void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
 
 static enum pios_rfm22b_event rfm22_setRxMode(struct pios_rfm22b_dev *rfm22b_dev)
 {
-	rfm22b_dev->packet_start_time = 0;
+	rfm22b_dev->packet_start_ticks = 0;
 
 	// disable interrupts
 	rfm22_write(RFM22_interrupt_enable1, 0x00);
@@ -1254,9 +1244,9 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 		return RFM22B_EVENT_RX_MODE;
 	}
 	rfm22b_dev->tx_packet = p;
-	rfm22b_dev->packet_start_time = xTaskGetTickCount();
-	if (rfm22b_dev->packet_start_time == 0)
-		rfm22b_dev->packet_start_time = 1;
+	rfm22b_dev->packet_start_ticks = xTaskGetTickCount();
+	if (rfm22b_dev->packet_start_ticks == 0)
+		rfm22b_dev->packet_start_ticks = 1;
 
 	// disable interrupts
 	rfm22_write(RFM22_interrupt_enable1, 0x00);
@@ -1319,6 +1309,36 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 	return RFM22B_EVENT_TX_STARTED;
 }
 
+static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
+{
+	PHPacketHandle sph = (PHPacketHandle)&(rfm22b_dev->status_packet);
+
+	// Queue the status message
+	rfm22b_dev->status_packet.header.source_id = rfm22b_dev->deviceID;
+	rfm22b_dev->status_packet.header.destination_id = 0xffffffff; // Broadcast
+	rfm22b_dev->status_packet.header.type = PACKET_TYPE_STATUS;
+	rfm22b_dev->status_packet.header.data_size = PH_STATUS_DATA_SIZE(&(rfm22b_dev->status_packet));
+	rfm22b_dev->status_packet.header.tx_seq = 0;
+	rfm22b_dev->status_packet.header.rx_seq = 0;
+	rfm22b_dev->status_packet.errors = rfm22b_dev->errors;
+	rfm22b_dev->status_packet.resets = rfm22b_dev->resets;
+	rfm22b_dev->status_packet.retries = 0;
+	rfm22b_dev->status_packet.uavtalk_errors = 0;
+	rfm22b_dev->status_packet.dropped = 0;
+
+	// Add the error correcting code.
+	encode_data((unsigned char*)sph, PHPacketSize(sph), (unsigned char*)sph);
+	if (xQueueSend(rfm22b_dev->packetQueue, &sph, 0) != pdTRUE)
+		return false;
+
+	// Process a SEND_PACKT event.
+	enum pios_rfm22b_event event = RFM22B_EVENT_SEND_PACKET;
+	while(event != RFM22B_EVENT_NUM_EVENTS)
+		event = rfm22_process_state_transition(rfm22b_dev, event);
+
+	return true;
+}
+
 // ************************************
 
 /**
@@ -1364,9 +1384,9 @@ static enum pios_rfm22b_event rfm22_detectPreamble(struct pios_rfm22b_dev *rfm22
 	// Valid preamble detected
 	if (rfm22b_dev->int_status2 & RFM22_is2_ipreaval)
 	{
-		rfm22b_dev->packet_start_time = xTaskGetTickCount();
-		if (rfm22b_dev->packet_start_time == 0)
-			rfm22b_dev->packet_start_time = 1;
+		rfm22b_dev->packet_start_ticks = xTaskGetTickCount();
+		if (rfm22b_dev->packet_start_ticks == 0)
+			rfm22b_dev->packet_start_ticks = 1;
 		RX_LED_ON;
 		return RFM22B_EVENT_PREAMBLE_DETECTED;
 	}
@@ -1505,7 +1525,7 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 		}
 
 		// Start a new transaction
-		rfm22b_dev->packet_start_time = 0;
+		rfm22b_dev->packet_start_ticks = 0;
 		return RFM22B_EVENT_RX_COMPLETE;
 	}
 
@@ -1560,7 +1580,7 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 		rfm22b_dev->tx_packet = 0;
 		rfm22b_dev->tx_data_wr = rfm22b_dev->tx_data_rd = 0;
 		// Start a new transaction
-		rfm22b_dev->packet_start_time = 0;
+		rfm22b_dev->packet_start_ticks = 0;
 		return RFM22B_EVENT_TX_COMPLETE;
 	}
 
@@ -1650,7 +1670,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 
 	rfm22b_dev->afc_correction_Hz = 0;
 
-	rfm22b_dev->packet_start_time = 0;
+	rfm22b_dev->packet_start_ticks = 0;
 
 	// ****************
 	// read the RF chip ID bytes
@@ -1733,9 +1753,6 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	freq_hop_step_size /= 10000;	// in 10kHz increments
 	if (freq_hop_step_size > 255) freq_hop_step_size = 255;
 	rfm22b_dev->frequency_hop_step_size_reg = freq_hop_step_size;
-
-	// set the RF datarate
-	rfm22_setDatarate(RFM22_DEFAULT_RF_DATARATE, true);
 
 	// FIFO mode, GFSK modulation
 	uint8_t fd_bit = rfm22_read(RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
@@ -1841,14 +1858,14 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 static enum pios_rfm22b_event rfm22_timeout(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	rfm22b_dev->resets++;
-	rfm22b_dev->packet_start_time = 0;
+	rfm22b_dev->packet_start_ticks = 0;
 	return RFM22B_EVENT_TX_START;
 }
 
 static enum pios_rfm22b_event rfm22_error(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	rfm22b_dev->resets++;
-	rfm22b_dev->packet_start_time = 0;
+	rfm22b_dev->packet_start_ticks = 0;
 	return RFM22B_EVENT_INITIALIZE;
 }
 

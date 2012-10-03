@@ -257,6 +257,12 @@ public class HidUAVTalk extends TelemetryTask {
 		UsbEndpoint ep1 = null;
 		UsbEndpoint ep2 = null;
 
+		if (connectDevice.getInterfaceCount() < 2) {
+			if (ERROR) Log.e(TAG, "Interface count for USB device incorrect");
+			telemService.toastMessage("Failed to connect");
+			return false;
+		}
+
 		// Using the same interface for reading and writing
 		usbInterface = connectDevice.getInterface(0x2);
 		if (usbInterface.getEndpointCount() == 2)

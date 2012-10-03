@@ -408,8 +408,6 @@ static void StatusHandler(PHStatusPacketHandle status, int8_t rssi, int8_t afc)
  */
 static void radioStatusTask(void *parameters)
 {
-	PHStatusPacket status_packet;
-
 	while (1) {
 		PipXStatusData pipxStatus;
 		uint32_t pairID;
@@ -467,27 +465,6 @@ static void radioStatusTask(void *parameters)
 
 		// Update the object
 		PipXStatusSet(&pipxStatus);
-
-		// Broadcast the status.
-		{
-			static uint16_t cntr = 0;
-			if(cntr++ == RADIOSTATS_UPDATE_PERIOD_MS / STATS_UPDATE_PERIOD_MS)
-			{
-				// Queue the status message
-				status_packet.header.destination_id = 0xffffffff;
-				status_packet.header.type = PACKET_TYPE_STATUS;
-				status_packet.header.data_size = PH_STATUS_DATA_SIZE(&status_packet);
-				status_packet.header.source_id = pipxStatus.DeviceID;
-				status_packet.retries = data->comTxRetries;
-				status_packet.errors = data->packetErrors;
-				status_packet.uavtalk_errors = data->UAVTalkErrors;
-				status_packet.dropped = data->droppedPackets;
-				status_packet.resets = PIOS_RFM22B_Resets(pios_rfm22b_id);
-				PHPacketHandle sph = (PHPacketHandle)&status_packet;
-				PHTransmitPacket(PIOS_PACKET_HANDLER, sph);
-				cntr = 0;
-			}
-		}
 
 		vTaskDelay(STATS_UPDATE_PERIOD_MS / portTICK_RATE_MS);
 	}

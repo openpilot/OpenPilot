@@ -118,7 +118,7 @@
    <item row="4" column="0">
     <widget class="QCheckBox" name="hilightBox">
      <property name="text">
-      <string>Only hilight nodes when value actually changes</string>
+      <string>Only highlight nodes when value actually changes</string>
      </property>
     </widget>
    </item>

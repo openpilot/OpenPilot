@@ -8,6 +8,8 @@
     <ExpertMode>false</ExpertMode>
     <OverrideLanguage>en_AU</OverrideLanguage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
+    <SettingsWindowHeight>600</SettingsWindowHeight>
+    <SettingsWindowWidth>800</SettingsWindowWidth>
     <StyleSheet>default</StyleSheet>
     <UDPMirror>false</UDPMirror>
   </General>

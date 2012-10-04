@@ -490,8 +490,8 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 #define RFM22_deltasigma_adc_tuning1				0x67	// R/W
 #define RFM22_deltasigma_adc_tuning2				0x68	// R/W
 */
-#define RFM22_agc_override1							0x69	// R/W
-#define RFM22_agc_ovr1_sgi						0x40		// AGC Loop, Set Gain Increase. If set to 0 then gain increasing will not be allowed. If set to 1 then gain increasing is allowed, default is 0.
+#define RFM22_agc_override1					0x69	// R/W
+#define RFM22_agc_ovr1_sgi					0x40		// AGC Loop, Set Gain Increase. If set to 0 then gain increasing will not be allowed. If set to 1 then gain increasing is allowed, default is 0.
 #define RFM22_agc_ovr1_agcen					0x20		// Automatic Gain Control Enable. When this bit is set then the result of the control can be read out from bits [4:0], otherwise the gain can be controlled manually by writing into bits [4:0].
 #define RFM22_agc_ovr1_lnagain					0x10		// LNA Gain Select. 0 = min gain = 5dB, 1 = max gain = 25 dB.
 #define RFM22_agc_ovr1_pga_mask					0x0F		// PGA Gain Override Value.
@@ -501,30 +501,22 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 //#define RFM22_gfsk_fir_coeff_addr					0x6B	// R/W
 //#define RFM22_gfsk_fir_coeff_value				0x6C	// R/W
 
-#define RFM22_tx_power								0x6D	// R/W
-#define RFM22_tx_pwr_txpow_0					0x00		//  +1dBm .. 1.25mW
-#define RFM22_tx_pwr_txpow_1					0x01		//  +2dBm .. 1.6mW
-#define RFM22_tx_pwr_txpow_2					0x02		//  +5dBm .. 3.16mW
-#define RFM22_tx_pwr_txpow_3					0x03		//  +8dBm .. 6.3mW
-#define RFM22_tx_pwr_txpow_4					0x04		// +11dBm .. 12.6mW
-#define RFM22_tx_pwr_txpow_5					0x05		// +14dBm .. 25mW
-#define RFM22_tx_pwr_txpow_6					0x06		// +17dBm .. 50mW
-#define RFM22_tx_pwr_txpow_7					0x07		// +20dBm .. 100mW
-#define RFM22_tx_pwr_lna_sw						0x08		// LNA Switch Controller. If set, lna_sw control from the digital will go high during TX modes, and low during other times. If reset, the digital control signal is low at all times.
+#define RFM22_tx_power						0x6D	// R/W
+#define RFM22_tx_pwr_lna_sw					0x08		// LNA Switch Controller. If set, lna_sw control from the digital will go high during TX modes, and low during other times. If reset, the digital control signal is low at all times.
 #define RFM22_tx_pwr_papeaklvl_0				0x10		//      "                   "
 #define RFM22_tx_pwr_papeaklvl_1				0x20		// PA Peak Detect Level (direct from register). 00 = 6.5, 01 = 7, 10 = 7.5, 11 = 8, 00 = default
 #define RFM22_tx_pwr_papeaken					0x40		// PA Peak Detector Enable.
 #define RFM22_tx_pwr_papeakval					0x80		// PA Peak Detector Value Read Register. Reading a 1 in this register when the papeaken=1 then the PA drain voltage is too high and the match network needs adjusting for optimal efficiency.
 
-#define RFM22_tx_data_rate1							0x6E	// R/W
-#define RFM22_tx_data_rate0							0x6F	// R/W
+#define RFM22_tx_data_rate1					0x6E	// R/W
+#define RFM22_tx_data_rate0					0x6F	// R/W
 
 #define RFM22_modulation_mode_control1				0x70	// R/W
-#define RFM22_mmc1_enwhite						0x01		// Data Whitening is Enabled if this bit is set.
-#define RFM22_mmc1_enmanch						0x02		// Manchester Coding is Enabled if this bit is set.
-#define RFM22_mmc1_enmaninv						0x04		// Manchester Data Inversion is Enabled if this bit is set.
-#define RFM22_mmc1_manppol						0x08		// Manchester Preamble Polarity (will transmit a series of 1 if set, or series of 0 if reset).
-#define RFM22_mmc1_enphpwdn						0x10		// If set, the Packet Handler will be powered down when chip is in low power mode.
+#define RFM22_mmc1_enwhite					0x01		// Data Whitening is Enabled if this bit is set.
+#define RFM22_mmc1_enmanch					0x02		// Manchester Coding is Enabled if this bit is set.
+#define RFM22_mmc1_enmaninv					0x04		// Manchester Data Inversion is Enabled if this bit is set.
+#define RFM22_mmc1_manppol					0x08		// Manchester Preamble Polarity (will transmit a series of 1 if set, or series of 0 if reset).
+#define RFM22_mmc1_enphpwdn					0x10		// If set, the Packet Handler will be powered down when chip is in low power mode.
 #define RFM22_mmc1_txdtrtscale					0x20		// This bit should be set for Data Rates below 30 kbps.
 
 #define RFM22_modulation_mode_control2				0x71	// R/W
@@ -533,8 +525,8 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 #define RFM22_mmc2_modtyp_ook					0x01		//
 #define RFM22_mmc2_modtyp_fsk					0x02		//
 #define RFM22_mmc2_modtyp_gfsk					0x03		//
-#define RFM22_mmc2_fd							0x04		// MSB of Frequency Deviation Setting, see "Register 72h. Frequency Deviation".
-#define RFM22_mmc2_eninv						0x08		// Invert TX and RX Data.
+#define RFM22_mmc2_fd						0x04		// MSB of Frequency Deviation Setting, see "Register 72h. Frequency Deviation".
+#define RFM22_mmc2_eninv					0x08		// Invert TX and RX Data.
 #define RFM22_mmc2_dtmod_mask					0x30		// Modulation source.
 #define RFM22_mmc2_dtmod_dm_gpio				0x00		//
 #define RFM22_mmc2_dtmod_dm_sdi					0x10		//

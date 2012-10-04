@@ -62,6 +62,7 @@
 #define ISR_TIMEOUT 5 // ms
 #define EVENT_QUEUE_SIZE 5
 #define PACKET_QUEUE_SIZE 3
+#define RFM22B_DEFAULT_RX_DATARATE RFM22_datarate_64000
 
 // The maximum amount of time without activity before initiating a reset.
 #define PIOS_RFM22B_SUPERVISOR_TIMEOUT 100  // ms
@@ -164,7 +165,11 @@ struct pios_rfm22b_dev {
 	uint32_t spi_id;
 	uint32_t slave_num;
 
+	// The device ID
 	uint32_t deviceID;
+
+	// The destination ID
+	uint32_t destination_id;
 
 	// The task handle
 	xTaskHandle taskHandle;
@@ -183,6 +188,9 @@ struct pios_rfm22b_dev {
 
 	// the transmit power to use for data transmissions
 	uint8_t	tx_power;
+
+	// The RF datarate lookup index.
+	uint8_t datarate;
 
 	// The state machine state and the current event
 	enum pios_rfm22b_state state;
@@ -558,6 +566,7 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 
 	// Bind the configuration to the device instance
 	rfm22b_dev->cfg = *cfg;
+	rfm22b_dev->datarate = RFM22B_DEFAULT_RX_DATARATE;
 
 	// Initialize the packets.
 	rfm22b_dev->rx_packet = NULL;
@@ -570,7 +579,6 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	g_rfm22b_dev = rfm22b_dev;
 
 	// Calculate the (approximate) maximum amount of time that it should take to transmit / receive a packet.
-	rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(rfm22b_dev->cfg.maxRFBandwidth) + 0.5);
 	rfm22b_dev->packet_start_ticks = 0;
 
 	// Create a semaphore to know if an ISR needs responding to
@@ -672,24 +680,20 @@ uint32_t PIOS_RFM22B_DeviceID(uint32_t rfm22b_id)
 		return 0;
 }
 
-void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, uint8_t tx_pwr)
+void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if(!PIOS_RFM22B_validate(rfm22b_dev))
 		return;
+	rfm22b_dev->tx_power = tx_pwr;
+}
 
-	switch (tx_pwr)
-	{
-	case 0: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_0; break;    // +1dBm ... 1.25mW
-	case 1: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_1; break;    // +2dBm ... 1.6mW
-	case 2: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_2; break;    // +5dBm ... 3.16mW
-	case 3: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_3; break;    // +8dBm ... 6.3mW
-	case 4: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_4; break;    // +11dBm .. 12.6mW
-	case 5: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_5; break;    // +14dBm .. 25mW
-	case 6: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_6; break;    // +17dBm .. 50mW
-	case 7: rfm22b_dev->tx_power = RFM22_tx_pwr_txpow_7; break;    // +20dBm .. 100mW
-	default: break;
-	}
+void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return;
+	rfm22b_dev->destination_id = (dest_id == 0) ? 0xffffffff : dest_id;
 }
 
 int16_t PIOS_RFM22B_Resets(uint32_t rfm22b_id)
@@ -1120,42 +1124,41 @@ uint32_t rfm22_freqHopSize(void)
 //
 // This gives 2(45 + 9.6) = 109.2kHz.
 
-void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
+void RFM22_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool data_whitening)
 {
+	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return;
 
-	// Find the closest data rate that is >= the value passed in
-	int lookup_index = 0;
-	while (lookup_index < (LOOKUP_SIZE - 1) && data_rate[lookup_index] < datarate_bps)
-		lookup_index++;
-	lookup_index = 10;
-
-	datarate_bps = data_rate[lookup_index];
+	uint32_t datarate_bps = data_rate[datarate];
+	rfm22b_dev->datarate = datarate;
+	rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(datarate_bps) + 0.5);
 
 	// rfm22_if_filter_bandwidth
-	rfm22_write(0x1C, reg_1C[lookup_index]);
+	rfm22_write(0x1C, reg_1C[datarate]);
 
 	// rfm22_afc_loop_gearshift_override
-	rfm22_write(0x1D, reg_1D[lookup_index]);
+	rfm22_write(0x1D, reg_1D[datarate]);
 	// RFM22_afc_timing_control
-	rfm22_write(0x1E, reg_1E[lookup_index]);
+	rfm22_write(0x1E, reg_1E[datarate]);
 
 	// RFM22_clk_recovery_gearshift_override
-	rfm22_write(0x1F, reg_1F[lookup_index]);
+	rfm22_write(0x1F, reg_1F[datarate]);
 	// rfm22_clk_recovery_oversampling_ratio
-	rfm22_write(0x20, reg_20[lookup_index]);
+	rfm22_write(0x20, reg_20[datarate]);
 	// rfm22_clk_recovery_offset2
-	rfm22_write(0x21, reg_21[lookup_index]);
+	rfm22_write(0x21, reg_21[datarate]);
 	// rfm22_clk_recovery_offset1
-	rfm22_write(0x22, reg_22[lookup_index]);
+	rfm22_write(0x22, reg_22[datarate]);
 	// rfm22_clk_recovery_offset0
-	rfm22_write(0x23, reg_23[lookup_index]);
+	rfm22_write(0x23, reg_23[datarate]);
 	// rfm22_clk_recovery_timing_loop_gain1
-	rfm22_write(0x24, reg_24[lookup_index]);
+	rfm22_write(0x24, reg_24[datarate]);
 	// rfm22_clk_recovery_timing_loop_gain0
-	rfm22_write(0x25, reg_25[lookup_index]);
+	rfm22_write(0x25, reg_25[datarate]);
 
 	// rfm22_afc_limiter
-	rfm22_write(0x2A, reg_2A[lookup_index]);
+	rfm22_write(0x2A, reg_2A[datarate]);
 
 /* This breaks all bit rates < 100000!
 	if (datarate_bps < 100000)
@@ -1167,9 +1170,9 @@ void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
 */
 
 	// rfm22_tx_data_rate1
-	rfm22_write(0x6E, reg_6E[lookup_index]);
+	rfm22_write(0x6E, reg_6E[datarate]);
 	// rfm22_tx_data_rate0
-	rfm22_write(0x6F, reg_6F[lookup_index]);
+	rfm22_write(0x6F, reg_6F[datarate]);
 
 	// Enable data whitening
 	//	uint8_t txdtrtscale_bit = rfm22_read(RFM22_modulation_mode_control1) & RFM22_mmc1_txdtrtscale;
@@ -1177,16 +1180,16 @@ void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening)
 
 	if (!data_whitening)
 		// rfm22_modulation_mode_control1
-		rfm22_write(0x70, reg_70[lookup_index] & ~RFM22_mmc1_enwhite);
+		rfm22_write(0x70, reg_70[datarate] & ~RFM22_mmc1_enwhite);
 	else
 		// rfm22_modulation_mode_control1
-		rfm22_write(0x70, reg_70[lookup_index] |  RFM22_mmc1_enwhite);
+		rfm22_write(0x70, reg_70[datarate] |  RFM22_mmc1_enwhite);
 
 	// rfm22_modulation_mode_control2
-	rfm22_write(0x71, reg_71[lookup_index]);
+	rfm22_write(0x71, reg_71[datarate]);
 
 	// rfm22_frequency_deviation
-	rfm22_write(0x72, reg_72[lookup_index]);
+	rfm22_write(0x72, reg_72[datarate]);
 
 	rfm22_write(RFM22_ook_counter_value1, 0x00);
 	rfm22_write(RFM22_ook_counter_value2, 0x00);
@@ -1850,7 +1853,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 
 	rfm22_setFreqCalibration(rfm22b_dev->cfg.RFXtalCap);
 	rfm22_setNominalCarrierFrequency(rfm22b_dev, rfm22b_dev->cfg.frequencyHz);
-	rfm22_setDatarate(rfm22b_dev->cfg.maxRFBandwidth, true);
+	RFM22_SetDatarate((uint32_t)rfm22b_dev, rfm22b_dev->datarate, true);
 
 	return RFM22B_EVENT_INITIALIZED;
 }

@@ -48,6 +48,8 @@ MultiPage::MultiPage(SetupWizard *wizard, QWidget *parent) :
     // Default to Quad X since it is the most common setup
     ui->typeCombo->setCurrentIndex(1);
     connect(ui->typeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(updateImageAndDescription()));
+    ui->typeGraphicsView->setSceneRect(multiPic->boundingRect());
+    ui->typeGraphicsView->fitInView(multiPic, Qt::KeepAspectRatio);
 }
 
 MultiPage::~MultiPage()

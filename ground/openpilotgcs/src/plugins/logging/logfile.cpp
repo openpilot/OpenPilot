@@ -82,6 +82,9 @@ bool LogFile::open(OpenMode mode) {
             msgBox.setText("Corrupted file.");
             msgBox.setInformativeText("GCS cannot find the separation byte. GCS will attempt to play the file."); //<--TODO: add hyperlink to webpage with better description.
             msgBox.exec();
+
+            //Since we could not find the file separator, we need to return to the beginning of the file
+            file.seek(0);
         }
 
     }
@@ -219,16 +222,18 @@ bool LogFile::startReplay() {
 
     while (!file.atEnd()){
         qint64 dataSize;
-        uint8_t syncByte;
 
+        //Get time stamp position
         timestampPos.append(file.pos());
+
+        //Read timestamp and logfile packet size
         file.read((char *) &lastTimeStamp, sizeof(lastTimeStamp));
         file.read((char *) &dataSize, sizeof(dataSize));
-        file.read((char *) &syncByte, sizeof(syncByte));
 
-        //Check if syncByte is correct.
-        if (syncByte!=0x3C){
-            qDebug() << "Wrong sync byte. Got 0x" << QString("%1").arg(syncByte,0,16) << ", but expected 0x""3c"".";
+        //Check if dataSize sync bytes are correct.
+        //TODO: LIKELY AS NOT, THIS WILL FAIL TO RESYNC BECAUSE THERE IS TOO LITTLE INFORMATION IN THE STRING OF SIX 0x00
+        if ((dataSize & 0xFFFFFFFFFFFF0000)!=0){
+            qDebug() << "Wrong sync byte. At file location 0x"  << QString("%1").arg(file.pos(),0,16) << "Got 0x" << QString("%1").arg(dataSize & 0xFFFFFFFFFFFF0000,0,16) << ", but expected 0x""00"".";
             file.seek(timestampPos.last()+1);
             timestampPos.pop_back();
             continue;
@@ -240,6 +245,8 @@ bool LogFile::startReplay() {
             msgBox.setText("Corrupted file.");
             msgBox.setInformativeText("Timestamps are not sequential. Playback may have unexpected behavior"); //<--TODO: add hyperlink to webpage with better description.
             msgBox.exec();
+
+            qDebug() << "Timestamp: " << timestampBuffer.last() << " " << lastTimeStamp;
         }
 
         timestampBuffer.append(lastTimeStamp);
@@ -248,7 +255,7 @@ bool LogFile::startReplay() {
     }
 
     //Check if any timestamps were successfully read
-    if (timestampBuffer.size() !=0){
+    if (timestampBuffer.size() == 0){
         QMessageBox msgBox;
         msgBox.setText("Empty logfile.");
         msgBox.setInformativeText("No log data can be found."); //<--TODO: add hyperlink to webpage with better description.

@@ -2751,7 +2751,7 @@
   </UAVGadgetManager>
   <Workspace>
     <AllowTabBarMovement>false</AllowTabBarMovement>
-    <Icon1>:\core\images\ah.png</Icon1>
+    <Icon1>:/core/images/ah.png</Icon1>
     <Icon10>:/core/images/openpilot_logo_64.png</Icon10>
     <Icon2>:/core/images/config.png</Icon2>
     <Icon3>:/core/images/cog.png</Icon3>

@@ -185,68 +185,65 @@ static int32_t RadioInitialize(void)
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 	pios_rfm22b_cfg = PIOS_BOARD_HW_DEFS_GetRfm22Cfg(bdinfo->board_rev);
 
-	// Not appropriate for a constant struct.  Is it necessary to make a local copy of the cfg? 
-	// We should probably be consistent with other drivers and allocate a device structure with
-	// dynamical configuration in it
-#if 0 
-	pios_rfm22b_cfg->frequencyHz = pipxSettings.Frequency;
-	pios_rfm22b_cfg->RFXtalCap = pipxSettings.FrequencyCalibration;
-	switch (pipxSettings.RFSpeed)
-	{
-	case PIPXSETTINGS_RFSPEED_2400:
-		pios_rfm22b_cfg->maxRFBandwidth = 2000;
-		break;
-	case PIPXSETTINGS_RFSPEED_4800:
-		pios_rfm22b_cfg->maxRFBandwidth = 4000;
-		break;
-	case PIPXSETTINGS_RFSPEED_9600:
-		pios_rfm22b_cfg->maxRFBandwidth = 9600;
-		break;
-	case PIPXSETTINGS_RFSPEED_19200:
-		pios_rfm22b_cfg->maxRFBandwidth = 19200;
-		break;
-	case PIPXSETTINGS_RFSPEED_38400:
-		pios_rfm22b_cfg->maxRFBandwidth = 32000;
-		break;
-	case PIPXSETTINGS_RFSPEED_57600:
-		pios_rfm22b_cfg->maxRFBandwidth = 64000;
-		break;
-	case PIPXSETTINGS_RFSPEED_115200:
-		pios_rfm22b_cfg->maxRFBandwidth = 128000;
-		break;
-	}
-	switch (pipxSettings.MaxRFPower)
-	{
-	case PIPXSETTINGS_MAXRFPOWER_125:
-		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_0;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_16:
-		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_1;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_316:
-		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_2;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_63:
-		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_3;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_126:
-		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_4;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_25:
-		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_5;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_50:
-		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_6;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_100:
-		pios_rfm22b_cfg->maxTxPower = RFM22_tx_pwr_txpow_7;
-		break;
-	}
-#endif
-
 	/* Initalize the RFM22B radio COM device. */
 	if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg->slave_num, pios_rfm22b_cfg))
 		return -1;
+
+	// Set the maximum radio RF power.
+	switch (pipxSettings.MaxRFPower)
+	{
+	case PIPXSETTINGS_MAXRFPOWER_125:
+		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_0);
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_16:
+		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_1);
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_316:
+		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_2);
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_63:
+		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_3);
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_126:
+		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_4);
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_25:
+		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_5);
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_50:
+		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_6);
+		break;
+	case PIPXSETTINGS_MAXRFPOWER_100:
+		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_7);
+		break;
+	}
+
+	switch (pipxSettings.RFSpeed) {
+	case PIPXSETTINGS_RFSPEED_2400:
+		RFM22_SetDatarate(pios_rfm22b_id, RFM22_datarate_2000, true);
+		break;
+	case PIPXSETTINGS_RFSPEED_4800:
+		RFM22_SetDatarate(pios_rfm22b_id, RFM22_datarate_4000, true);
+		break;
+	case PIPXSETTINGS_RFSPEED_9600:
+		RFM22_SetDatarate(pios_rfm22b_id, RFM22_datarate_9600, true);
+		break;
+	case PIPXSETTINGS_RFSPEED_19200:
+		RFM22_SetDatarate(pios_rfm22b_id, RFM22_datarate_19200, true);
+		break;
+	case PIPXSETTINGS_RFSPEED_38400:
+		RFM22_SetDatarate(pios_rfm22b_id, RFM22_datarate_32000, true);
+		break;
+	case PIPXSETTINGS_RFSPEED_57600:
+		RFM22_SetDatarate(pios_rfm22b_id, RFM22_datarate_64000, true);
+		break;
+	case PIPXSETTINGS_RFSPEED_115200:
+		RFM22_SetDatarate(pios_rfm22b_id, RFM22_datarate_128000, true);
+		break;
+	}
+
+	// Set the radio destination ID.
+	PIOS_RFM22B_SetDestinationId(pios_rfm22b_id, pipxSettings.PairID);
 
 	// Initialize the packet handler
 	PacketHandlerConfig pios_ph_cfg = {

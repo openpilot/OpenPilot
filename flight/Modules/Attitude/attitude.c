@@ -668,6 +668,38 @@ static void HomeLocationUpdatedCb(UAVObjEvent * objEv)
 	T[0] = alt+6.378137E6f;
 	T[1] = cosf(lat)*(alt+6.378137E6f);
 	T[2] = -1.0f;
+	
+	//Set NED coordinates relative to the new home location
+	uint8_t gpsStatus;
+	GPSPositionStatusGet(&gpsStatus);
+	if (gpsStatus == GPSPOSITION_STATUS_FIX3D) //NEED A BETTER TEST THAN THIS
+	{
+		float NED[3];
+		
+		int32_t LL_int[2];
+		int32_t tmpVal;
+		GPSPositionLatitudeGet(&tmpVal);
+		LL_int[0]=tmpVal;
+		GPSPositionLongitudeGet(&tmpVal);
+		LL_int[1]=tmpVal;
+		
+		float altitude;
+		GPSPositionAltitudeGet(&altitude);
+		
+		float geoidSeparation;
+		GPSPositionGeoidSeparationGet(&geoidSeparation);
+		
+		LLA2NED(LL_int, altitude, geoidSeparation, NED);
+		
+		PositionActualData positionActualData;
+		positionActualData.North=NED[0];
+		positionActualData.East=NED[1];
+		positionActualData.Down=NED[2];
+		
+		PositionActualSet(&positionActualData);
+
+	}
+	
 }
 
 

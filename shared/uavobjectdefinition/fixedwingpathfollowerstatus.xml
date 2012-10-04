@@ -7,7 +7,7 @@
 	<field name="Errors" units="" type="uint8" elementnames="Wind,Stallspeed,Lowspeed,Highspeed,Overspeed,Lowpower,Highpower,Pitchcontrol" />
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
-        <telemetryflight acked="false" updatemode="periodic" period="500"/>
+        <telemetryflight acked="false" updatemode="periodic" period="50000"/>
         <logging updatemode="manual" period="0"/>
     </object>
 </xml>

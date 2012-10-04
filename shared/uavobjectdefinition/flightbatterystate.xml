@@ -9,7 +9,7 @@
  	<field name="EstimatedFlightTime" units="sec"  type="float"  elements="1" defaultvalue="0.0"/>
         <access gcs="readonly" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
-        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <telemetryflight acked="false" updatemode="periodic" period="50000"/>
         <logging updatemode="manual" period="0"/>
     </object>
 </xml>

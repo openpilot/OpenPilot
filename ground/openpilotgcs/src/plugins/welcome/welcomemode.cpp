@@ -127,4 +127,9 @@ void WelcomeMode::openPage(const QString &page)
     Core::ModeManager::instance()->activateModeByWorkspaceName(page);
 }
 
+void WelcomeMode::triggerAction(const QString &actionId)
+{
+    Core::ModeManager::instance()->triggerAction(actionId);
+}
+
 } // namespace Welcome

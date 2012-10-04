@@ -64,9 +64,14 @@ private:
     void setupMotors(QList<QString> motorList);
     void setupQuadMotor(int channel, double roll, double pitch, double yaw);
 
+    float invertMotors;
+
     virtual void ResetActuators(GUIConfigDataUnion* configData);
     static QStringList getChannelDescriptions();
     static const QString CHANNELBOXNAME;
+    void setYawMixLevel(int);
+
+    void drawAirframe(QString multiRotorType);
 
 private slots:
     virtual void setupUI(QString airframeType);

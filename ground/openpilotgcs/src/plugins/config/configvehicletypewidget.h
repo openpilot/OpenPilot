@@ -95,6 +95,7 @@ private slots:
 
     void enableFFTest();
     void openHelp();
+    void reverseMultirotorMotor();
 
 protected:
     void showEvent(QShowEvent *event);

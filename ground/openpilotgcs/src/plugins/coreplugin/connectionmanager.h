@@ -92,7 +92,14 @@ public:
     void init();
 
     QIODevice* getCurrentConnection() { return m_ioDev; }
-    DevListItem getCurrentDevice() { return m_connectionDevice;}
+    DevListItem getCurrentDevice() { return m_connectionDevice; }
+    DevListItem findDevice(const QString &devName);
+
+    QLinkedList<DevListItem> getAvailableDevices() { return m_devList; }
+
+    bool isConnected() { return m_ioDev != 0; }
+
+    bool connectDevice(DevListItem device);
     bool disconnectDevice();
     void suspendPolling();
     void resumePolling();
@@ -101,11 +108,12 @@ protected:
     void updateConnectionList(IConnection *connection);
     void registerDevice(IConnection *conn, IConnection::device device);
     void updateConnectionDropdown();
-    DevListItem findDevice(const QString &devName);
 
 signals:
-    void deviceConnected(QIODevice *dev);
+    void deviceConnected(QIODevice *device);
     void deviceAboutToDisconnect();
+    void deviceDisconnected();
+    void availableDevicesChanged(const QLinkedList<Core::DevListItem> devices);
 
 public slots:
     void telemetryConnected();

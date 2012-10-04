@@ -301,7 +301,6 @@ void NMEAParser::nmeaProcessGPGSV(char *packet)
 
     const int sentence_total = tokenslist.at(1).toInt(); // Number of sentences for full data
     const int sentence_index = tokenslist.at(2).toInt(); // sentence x of y
-//    const int sat_count = tokenslist.at(3).toInt(); // Number of satellites in view
 
     int sats = (tokenslist.size() - 4) /4;
     for(int sat = 0; sat < sats; sat++) {

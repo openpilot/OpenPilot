@@ -82,7 +82,7 @@ static void objectUpdatedCb(UAVObjEvent * ev);
 static void updateStats();
 static void updateSystemAlarms();
 static void systemTask(void *parameters);
-#if defined(DIAGNOSTICS)
+#if defined(I2C_WDG_STATS_DIAGNOSTICS)
 static void updateI2Cstats();
 static void updateWDGstats();
 #endif
@@ -118,7 +118,7 @@ int32_t SystemModInitialize(void)
 #if defined(DIAG_TASKS)
 	TaskInfoInitialize();
 #endif
-#if defined(DIAGNOSTICS)
+#if defined(I2C_WDG_STATS_DIAGNOSTICS)
 	I2CStatsInitialize();
 	WatchdogStatusInitialize();
 #endif
@@ -168,7 +168,7 @@ static void systemTask(void *parameters)
 
 		// Update the system alarms
 		updateSystemAlarms();
-#if defined(DIAGNOSTICS)
+#if defined(I2C_WDG_STATS_DIAGNOSTICS)
 		updateI2Cstats();
 		updateWDGstats();
 #endif
@@ -312,7 +312,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 /**
  * Called periodically to update the I2C statistics 
  */
-#if defined(DIAGNOSTICS)
+#if defined(I2C_WDG_STATS_DIAGNOSTICS)
 static void updateI2Cstats() 
 {
 #if defined(PIOS_INCLUDE_I2C)

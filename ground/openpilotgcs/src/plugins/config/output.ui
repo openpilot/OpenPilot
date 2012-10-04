@@ -14,9 +14,6 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
-   <property name="spacing">
-    <number>6</number>
-   </property>
    <property name="margin">
     <number>12</number>
    </property>
@@ -120,12 +117,12 @@
             <x>0</x>
             <y>0</y>
             <width>668</width>
-            <height>671</height>
+            <height>654</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <property name="spacing">
-            <number>6</number>
+            <number>-1</number>
            </property>
            <property name="margin">
             <number>12</number>
@@ -148,11 +145,11 @@
               <string>Output Update Speed</string>
              </property>
              <layout class="QGridLayout" name="gridLayout">
-              <property name="margin">
-               <number>12</number>
-              </property>
               <property name="horizontalSpacing">
                <number>6</number>
+              </property>
+              <property name="margin">
+               <number>12</number>
               </property>
               <item row="0" column="0">
                <spacer name="horizontalSpacer_3">
@@ -528,14 +525,8 @@ Leave at 50Hz for fixed wing.</string>
               </property>
               <item>
                <layout class="QVBoxLayout" name="channelLayout">
-                <property name="spacing">
-                 <number>6</number>
-                </property>
                 <property name="sizeConstraint">
                  <enum>QLayout::SetDefaultConstraint</enum>
-                </property>
-                <property name="margin">
-                 <number>0</number>
                 </property>
                </layout>
               </item>

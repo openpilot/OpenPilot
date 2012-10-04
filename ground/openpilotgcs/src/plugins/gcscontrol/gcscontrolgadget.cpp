@@ -293,7 +293,6 @@ double GCSControlGadget::constrain(double value)
 
 void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
 {
-//    int state;
     if ((buttonSettings[number].ActionID>0)&&(buttonSettings[number].FunctionID>0)&&(pressed))
     {//this button is configured
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();

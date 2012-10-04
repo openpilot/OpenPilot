@@ -6,22 +6,34 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>789</width>
-    <height>615</height>
+    <width>786</width>
+    <height>566</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
-   <property name="spacing">
-    <number>6</number>
-   </property>
-   <property name="margin">
-    <number>12</number>
-   </property>
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -35,6 +47,12 @@
        </property>
        <item>
         <widget class="QScrollArea" name="scrollArea">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -46,19 +64,37 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>742</width>
-            <height>560</height>
+            <width>741</width>
+            <height>559</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
            <property name="spacing">
-            <number>6</number>
+            <number>12</number>
            </property>
            <property name="margin">
             <number>12</number>
            </property>
            <item>
             <widget class="QGroupBox" name="groupBox_2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
              <property name="title">
               <string>Module Control</string>
              </property>
@@ -86,7 +122,7 @@
            <item>
             <widget class="QGroupBox" name="groupBox_5">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -94,7 +130,13 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>131</height>
+               <height>130</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
               </size>
              </property>
              <property name="title">
@@ -340,7 +382,7 @@ margin:1px;</string>
            <item>
             <widget class="QGroupBox" name="groupBox">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -348,13 +390,22 @@ margin:1px;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>266</height>
+               <height>250</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
               </size>
              </property>
              <property name="title">
               <string>Advanced Settings (Control)</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_8">
+              <property name="verticalSpacing">
+               <number>6</number>
+              </property>
               <item row="0" column="3">
                <widget class="QLabel" name="label_32">
                 <property name="minimumSize">
@@ -924,6 +975,18 @@ value.</string>
            </item>
            <item>
             <widget class="QGroupBox" name="groupBox_4">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>71</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
              <property name="title">
               <string>Messages</string>
              </property>
@@ -946,6 +1009,9 @@ value.</string>
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
@@ -963,24 +1029,24 @@ value.</string>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="spacing">
+    <layout class="QGridLayout" name="gridLayout">
+     <property name="horizontalSpacing">
       <number>4</number>
      </property>
-     <item>
+     <item row="0" column="0">
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>321</width>
-         <height>16</height>
+         <width>288</width>
+         <height>18</height>
         </size>
        </property>
       </spacer>
      </item>
-     <item>
+     <item row="0" column="1">
       <widget class="QPushButton" name="camerastabilizationHelp">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1029,7 +1095,7 @@ value.</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="2">
       <widget class="QPushButton" name="camerastabilizationResetToDefaults">
        <property name="minimumSize">
         <size>
@@ -1060,7 +1126,7 @@ Apply or Save button afterwards.</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="3">
       <widget class="QPushButton" name="pushButton">
        <property name="minimumSize">
         <size>
@@ -1093,7 +1159,7 @@ Apply or Save button afterwards.</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="4">
       <widget class="QPushButton" name="camerastabilizationSaveRAM">
        <property name="minimumSize">
         <size>
@@ -1120,7 +1186,7 @@ Apply or Save button afterwards.</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="0" column="5">
       <widget class="QPushButton" name="camerastabilizationSaveSD">
        <property name="minimumSize">
         <size>

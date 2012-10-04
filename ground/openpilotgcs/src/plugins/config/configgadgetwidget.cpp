@@ -131,6 +131,14 @@ ConfigGadgetWidget::~ConfigGadgetWidget()
     // TODO: properly delete all the tabs in ftw before exiting
 }
 
+void ConfigGadgetWidget::startInputWizard()
+{
+    ftw->setCurrentIndex(ConfigGadgetWidget::input);
+    ConfigInputWidget* inputWidget = dynamic_cast<ConfigInputWidget*>(ftw->getWidget(ConfigGadgetWidget::input));
+    Q_ASSERT(inputWidget);
+    inputWidget->startInputWizard();
+}
+
 void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 {
 

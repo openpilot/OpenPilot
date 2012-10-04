@@ -51,7 +51,8 @@ private:
 signals:
 
 public slots:
-
+    void refreshWidgetsValues(UAVObject *obj);
+    void updateObjectsFromWidgets();
 private slots:
     void recomputeStabilization();
     void saveStabilization();

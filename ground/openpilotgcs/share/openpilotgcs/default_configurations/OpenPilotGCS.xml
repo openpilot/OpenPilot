@@ -2671,8 +2671,20 @@
         </side0>
         <side1>
           <side0>
-            <classId>EmptyGadget</classId>
-            <type>uavGadget</type>
+            <side0>
+              <classId>PfdQmlGadget</classId>
+              <gadget>
+                <activeConfiguration>NoTerrain</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side0>
+            <side1>
+              <classId>MagicWaypointGadget</classId>
+              <type>uavGadget</type>
+            </side1>
+            <splitterOrientation>1</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB7wAAAAIAAAGU)</splitterSizes>
+            <type>splitter</type>
           </side0>
           <side1>
             <classId>GCSControlGadget</classId>
@@ -2682,7 +2694,7 @@
             <type>uavGadget</type>
           </side1>
           <splitterOrientation>1</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB6AAAAAIAAADC)</splitterSizes>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAADhAAAAAIAAAIX)</splitterSizes>
           <type>splitter</type>
         </side1>
         <splitterOrientation>2</splitterOrientation>

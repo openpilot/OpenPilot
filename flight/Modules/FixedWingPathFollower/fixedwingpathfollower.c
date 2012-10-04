@@ -258,7 +258,7 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 	
 	if (flightStatusUpdate) {
 		if (flightMode == FLIGHTSTATUS_FLIGHTMODE_RETURNTOHOME) {
-			// Simple Return To Home mode - climb 10 meters and fly to home position
+			// Simple Return To Home mode: climb 10 meters and fly to home position
 			
 			pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North;
 			pathDesired.Start[PATHDESIRED_START_EAST] = positionActual.East;
@@ -269,10 +269,10 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 			pathDesired.StartingVelocity=fixedwingpathfollowerSettings.BestClimbRateSpeed;
 			pathDesired.EndingVelocity=fixedwingpathfollowerSettings.BestClimbRateSpeed;
 			pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
-		} else{
-			// Simple position hold - stay at present altitude and position
+		} else if (flightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD){
+			// Simple position hold: stay at present altitude and position
 			
-			pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North-1; //Offset by one so that the two points don't perfectly coincide
+			pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North-1; //Offset by one so that the start and end points don't perfectly coincide
 			pathDesired.Start[PATHDESIRED_START_EAST] = positionActual.East;
 			pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down;
 			pathDesired.End[PATHDESIRED_END_NORTH] = positionActual.North;

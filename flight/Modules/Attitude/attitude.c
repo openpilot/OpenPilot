@@ -697,9 +697,7 @@ static void HomeLocationUpdatedCb(UAVObjEvent * objEv)
 		positionActualData.Down=NED[2];
 		
 		PositionActualSet(&positionActualData);
-
 	}
-	
 }
 
 

@@ -88,7 +88,7 @@ public class RelayTuning extends UAVDataObject {
 		UAVObject.Metadata metadata = new UAVObject.Metadata();
     	metadata.flags =
 		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_ACCESS_SHIFT |
-		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READWRITE) << UAVOBJ_GCS_ACCESS_SHIFT |
+		    UAVObject.Metadata.AccessModeNum(UAVObject.AccessMode.ACCESS_READONLY) << UAVOBJ_GCS_ACCESS_SHIFT |
 		    0 << UAVOBJ_TELEMETRY_ACKED_SHIFT |
 		    0 << UAVOBJ_GCS_TELEMETRY_ACKED_SHIFT |
 		    UAVObject.Metadata.UpdateModeNum(UAVObject.UpdateMode.UPDATEMODE_PERIODIC) << UAVOBJ_TELEMETRY_UPDATE_MODE_SHIFT |

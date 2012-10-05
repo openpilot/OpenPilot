@@ -252,7 +252,7 @@ public class PipXSettings extends UAVDataObject {
 		getField("VCPConfig").setValue("Disabled");
 		getField("VCPSpeed").setValue("57600");
 		getField("RFSpeed").setValue("115200");
-		getField("MaxRFPower").setValue("100");
+		getField("MaxRFPower").setValue("1.25");
 		getField("MinPacketSize").setValue(50);
 		getField("FrequencyCalibration").setValue(127);
 		getField("AESKey").setValue(0,0);

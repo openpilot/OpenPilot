@@ -74,8 +74,8 @@ public class TaskInfo extends UAVDataObject {
 		StackRemainingElemNames.add("ModemRx");
 		StackRemainingElemNames.add("ModemTx");
 		StackRemainingElemNames.add("ModemStat");
-		StackRemainingElemNames.add("EventDispatcher");
 		StackRemainingElemNames.add("Autotune");
+		StackRemainingElemNames.add("EventDispatcher");
 		fields.add( new UAVObjectField("StackRemaining", "bytes", UAVObjectField.FieldType.UINT16, StackRemainingElemNames, null) );
 
 		List<String> RunningElemNames = new ArrayList<String>();
@@ -101,8 +101,8 @@ public class TaskInfo extends UAVDataObject {
 		RunningElemNames.add("ModemRx");
 		RunningElemNames.add("ModemTx");
 		RunningElemNames.add("ModemStat");
-		RunningElemNames.add("EventDispatcher");
 		RunningElemNames.add("Autotune");
+		RunningElemNames.add("EventDispatcher");
 		List<String> RunningEnumOptions = new ArrayList<String>();
 		RunningEnumOptions.add("False");
 		RunningEnumOptions.add("True");
@@ -131,8 +131,8 @@ public class TaskInfo extends UAVDataObject {
 		RunningTimeElemNames.add("ModemRx");
 		RunningTimeElemNames.add("ModemTx");
 		RunningTimeElemNames.add("ModemStat");
-		RunningTimeElemNames.add("EventDispatcher");
 		RunningTimeElemNames.add("Autotune");
+		RunningTimeElemNames.add("EventDispatcher");
 		fields.add( new UAVObjectField("RunningTime", "%", UAVObjectField.FieldType.UINT8, RunningTimeElemNames, null) );
 
 

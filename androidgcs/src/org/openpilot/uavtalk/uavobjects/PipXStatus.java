@@ -67,10 +67,6 @@ public class PipXStatus extends UAVDataObject {
 		DeviceIDElemNames.add("0");
 		fields.add( new UAVObjectField("DeviceID", "", UAVObjectField.FieldType.UINT32, DeviceIDElemNames, null) );
 
-		List<String> AFCElemNames = new ArrayList<String>();
-		AFCElemNames.add("0");
-		fields.add( new UAVObjectField("AFC", "", UAVObjectField.FieldType.INT32, AFCElemNames, null) );
-
 		List<String> PairIDsElemNames = new ArrayList<String>();
 		PairIDsElemNames.add("0");
 		PairIDsElemNames.add("1");
@@ -85,10 +81,6 @@ public class PipXStatus extends UAVDataObject {
 		List<String> RetriesElemNames = new ArrayList<String>();
 		RetriesElemNames.add("0");
 		fields.add( new UAVObjectField("Retries", "", UAVObjectField.FieldType.UINT16, RetriesElemNames, null) );
-
-		List<String> ErrorsElemNames = new ArrayList<String>();
-		ErrorsElemNames.add("0");
-		fields.add( new UAVObjectField("Errors", "", UAVObjectField.FieldType.UINT16, ErrorsElemNames, null) );
 
 		List<String> UAVTalkErrorsElemNames = new ArrayList<String>();
 		UAVTalkErrorsElemNames.add("0");
@@ -180,6 +172,10 @@ public class PipXStatus extends UAVDataObject {
 		RSSIElemNames.add("0");
 		fields.add( new UAVObjectField("RSSI", "dBm", UAVObjectField.FieldType.INT8, RSSIElemNames, null) );
 
+		List<String> LinkQualityElemNames = new ArrayList<String>();
+		LinkQualityElemNames.add("0");
+		fields.add( new UAVObjectField("LinkQuality", "", UAVObjectField.FieldType.UINT8, LinkQualityElemNames, null) );
+
 		List<String> LinkStateElemNames = new ArrayList<String>();
 		LinkStateElemNames.add("0");
 		List<String> LinkStateEnumOptions = new ArrayList<String>();
@@ -243,13 +239,11 @@ public class PipXStatus extends UAVDataObject {
 		getField("MaxFrequency").setValue(0);
 		getField("FrequencyStepSize").setValue(0);
 		getField("DeviceID").setValue(0);
-		getField("AFC").setValue(0);
 		getField("PairIDs").setValue(0,0);
 		getField("PairIDs").setValue(0,1);
 		getField("PairIDs").setValue(0,2);
 		getField("PairIDs").setValue(0,3);
 		getField("Retries").setValue(0);
-		getField("Errors").setValue(0);
 		getField("UAVTalkErrors").setValue(0);
 		getField("Dropped").setValue(0);
 		getField("Resets").setValue(0);
@@ -257,6 +251,7 @@ public class PipXStatus extends UAVDataObject {
 		getField("RXRate").setValue(0);
 		getField("FrequencyBand").setValue(0);
 		getField("RSSI").setValue(0);
+		getField("LinkQuality").setValue(0);
 		getField("LinkState").setValue("Disconnected");
 		getField("PairSignalStrengths").setValue(-127,0);
 		getField("PairSignalStrengths").setValue(-127,1);
@@ -290,7 +285,7 @@ public class PipXStatus extends UAVDataObject {
 	}
 
 	// Constants
-	protected static final long OBJID = 0x3FC68A86l;
+	protected static final long OBJID = 0x85D29F8Al;
 	protected static final String NAME = "PipXStatus";
 	protected static String DESCRIPTION = "PipXtreme device status.";
 	protected static final boolean ISSINGLEINST = 1 > 0;

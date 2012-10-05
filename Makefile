@@ -73,6 +73,7 @@ help:
 	@echo "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@echo "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
 	@echo "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
+	@echo "     android_sdk_install  - Install the Android SDK tools"
 	@echo
 	@echo "   [Big Hammer]"
 	@echo "     all                  - Generate UAVObjects, build openpilot firmware and gcs"
@@ -425,6 +426,27 @@ dfuutil_install: dfuutil_clean
 dfuutil_clean:
 	$(V0) @echo " CLEAN        $(DFUUTIL_DIR)"
 	$(V1) [ ! -d "$(DFUUTIL_DIR)" ] || $(RM) -r "$(DFUUTIL_DIR)"
+
+# see http://developer.android.com/sdk/ for latest versions
+ANDROID_SDK_DIR := $(TOOLS_DIR)/android-sdk-linux
+.PHONY: android_sdk_install
+android_sdk_install: ANDROID_SDK_URL  := http://dl.google.com/android/android-sdk_r20.0.3-linux.tgz
+android_sdk_install: ANDROID_SDK_FILE := $(notdir $(ANDROID_SDK_URL))
+# order-only prereq on directory existance:
+android_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
+android_sdk_install: android_sdk_clean
+        # download the source only if it's newer than what we already have
+	$(V0) @echo " DOWNLOAD     $(ANDROID_SDK_URL)"
+	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ANDROID_SDK_URL)"
+
+        # binary only release so just extract it
+	$(V0) @echo " EXTRACT      $(ANDROID_SDK_FILE)"
+	$(V1) tar -C $(TOOLS_DIR) -xf "$(DL_DIR)/$(ANDROID_SDK_FILE)"
+
+.PHONY: android_sdk_clean
+android_sdk_clean:
+	$(V0) @echo " CLEAN        $(ANDROID_SDK_DIR)"
+	$(V1) [ ! -d "$(ANDROID_SDK_DIR)" ] || $(RM) -r $(ANDROID_SDK_DIR)
 
 ##############################
 #

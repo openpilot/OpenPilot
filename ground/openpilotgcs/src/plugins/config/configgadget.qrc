@@ -27,5 +27,7 @@
         <file>images/hardware_selected.png</file>
         <file>images/vehicle_normal.png</file>
         <file>images/vehicle_selected.png</file>
+        <file>images/ins_selected.png</file>
+        <file>images/ins_normal.png</file>
     </qresource>
 </RCC>

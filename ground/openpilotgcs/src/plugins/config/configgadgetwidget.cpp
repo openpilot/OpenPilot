@@ -91,8 +91,11 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new ConfigOutputWidget(this);
     ftw->insertTab(ConfigGadgetWidget::output, qwd, *icon, QString("Output"));
 
+    icon = new QIcon();
+    icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
+    icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd = new DefaultAttitudeWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("INS"));
 
     qwd = new ConfigStabilizationWidget(this);
     ftw->insertTab(ConfigGadgetWidget::stabilization, qwd, QIcon(":/configgadget/images/gyroscope.png"), QString("Stabilization"));
@@ -106,7 +109,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new ConfigTxPIDWidget(this);
     ftw->insertTab(ConfigGadgetWidget::txpid, qwd, QIcon(":/configgadget/images/txpid.png"), QString("TxPID"));
 
-    ftw->setCurrentIndex(0);
+    ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
     // *********************
     // Listen to autopilot connection events
 
@@ -162,11 +165,14 @@ void ConfigGadgetWidget::onAutopilotDisconnect() {
     ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
     ftw->removeTab(ConfigGadgetWidget::sensors);
     QWidget *qwd = new DefaultAttitudeWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
+    QIcon *icon = new QIcon();
+    icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
+    icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
+    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("INS"));
     ftw->removeTab(ConfigGadgetWidget::hardware);
     qwd = new DefaultHwSettingsWidget(this);
 
-    QIcon *icon = new QIcon();
+    icon = new QIcon();
     icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
@@ -189,14 +195,17 @@ void ConfigGadgetWidget::onAutopilotConnect() {
             // Delete the INS panel, replace with CC Panel:
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
             ftw->removeTab(ConfigGadgetWidget::sensors);
+            QIcon *icon = new QIcon();
+            icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
+            icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
             QWidget *qwd = new ConfigCCAttitudeWidget(this);
-            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Attitude"));
+            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("INS"));
             ftw->removeTab(ConfigGadgetWidget::hardware);
             qwd = new ConfigCCHWWidget(this);
-            QIcon *icon = new QIcon();
+            icon = new QIcon();
             icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
             icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Selected, QIcon::Off);
-            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("HW Settings"));
+            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         } else if ((board & 0xff00) == 256 ) {
             // Mainboard family
@@ -216,10 +225,13 @@ void ConfigGadgetWidget::onAutopilotConnect() {
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
             ftw->removeTab(ConfigGadgetWidget::sensors);
             QWidget *qwd = new ConfigRevoWidget(this);
-            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("Revo"));
+            QIcon *icon = new QIcon();
+            icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
+            icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
+            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("Revo"));
             ftw->removeTab(ConfigGadgetWidget::hardware);
             qwd = new ConfigProHWWidget(this);
-            QIcon *icon = new QIcon();
+            icon = new QIcon();
             icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
             icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Normal, QIcon::On);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));

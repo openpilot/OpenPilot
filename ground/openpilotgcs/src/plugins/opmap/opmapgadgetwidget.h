@@ -212,6 +212,8 @@ private slots:
     void on_tbFind_clicked();
     void onHomeDoubleClick(HomeItem*);
     void onOverlayOpacityActGroup_triggered(QAction *action);
+    void on_leFind_returnPressed();
+
 private:
 	int m_min_zoom;
 	int m_max_zoom;

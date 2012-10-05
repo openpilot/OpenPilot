@@ -867,8 +867,10 @@ void OPMapGadgetWidget::onTelemetryConnect()
     setHome(internals::PointLatLng(LLA[0], LLA[1]),LLA[2]);
 
     if (m_map)
-		m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
-
+    {
+        if(m_map->UAV->GetMapFollowType()!=UAVMapFollowType::None)
+            m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
+    }
     // ***********************
 }
 
@@ -2151,6 +2153,7 @@ void OPMapGadgetWidget::on_tbFind_clicked()
     {
         pal.setColor( m_widget->leFind->backgroundRole(), Qt::green);
         m_widget->leFind->setPalette(pal);
+        m_map->SetZoom(12);
     }
     else
     {
@@ -2171,4 +2174,9 @@ void OPMapGadgetWidget::onOverlayOpacityActGroup_triggered(QAction *action)
 
     m_map->setOverlayOpacity(action->data().toReal()/100);
     emit overlayOpacityChanged(action->data().toReal()/100);
+}
+
+void OPMapGadgetWidget::on_leFind_returnPressed()
+{
+    on_tbFind_clicked();
 }

@@ -20,7 +20,7 @@
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
         <field name="OrbitFollowingGain" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
-        <field name="FollowerIntegralGain" units="(m/s)/m" type="float" elements="1" defaultvalue="0.0001"/>
+        <field name="FollowerIntegralGain" units="(m/s)/m" type="float" elements="1" defaultvalue="0.0000"/>
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
         <field name="VerticalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
                 <!-- proportional coefficient for desired vertical speed in relation to altitude displacement-->

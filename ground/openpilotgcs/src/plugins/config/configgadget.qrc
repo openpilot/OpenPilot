@@ -29,5 +29,7 @@
         <file>images/vehicle_selected.png</file>
         <file>images/ins_selected.png</file>
         <file>images/ins_normal.png</file>
+        <file>images/stabilization_selected.png</file>
+        <file>images/stabilization_normal.png</file>
     </qresource>
 </RCC>

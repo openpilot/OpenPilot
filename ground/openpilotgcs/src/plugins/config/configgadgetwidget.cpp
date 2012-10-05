@@ -97,8 +97,11 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new DefaultAttitudeWidget(this);
     ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("INS"));
 
+    icon = new QIcon();
+    icon->addFile(":/configgadget/images/stabilization_normal.png", QSize(), QIcon::Normal, QIcon::Off);
+    icon->addFile(":/configgadget/images/stabilization_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd = new ConfigStabilizationWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::stabilization, qwd, QIcon(":/configgadget/images/gyroscope.png"), QString("Stabilization"));
+    ftw->insertTab(ConfigGadgetWidget::stabilization, qwd, *icon, QString("Stabilization"));
 
     qwd = new ConfigAutotuneWidget(this);
     ftw->insertTab(ConfigGadgetWidget::autotune, qwd, QIcon(":/configgadget/images/gyroscope.png"), QString("Autotune"));

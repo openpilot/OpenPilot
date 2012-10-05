@@ -86,7 +86,7 @@ extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
 extern uint16_t PIOS_RFM22B_Resets(uint32_t rfm22b_id);
 extern uint16_t PIOS_RFM22B_Timeouts(uint32_t rfm22b_id);
 extern uint8_t PIOS_RFM22B_LinkQuality(uint32_t rfm22b_id);
-extern uint8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id);
+extern int8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id);
 extern bool PIOS_RFM22B_Send_Packet(uint32_t rfm22b_id, PHPacketHandle p, uint32_t max_delay);
 extern uint32_t PIOS_RFM22B_Receive_Packet(uint32_t rfm22b_id, PHPacketHandle *p, uint32_t max_delay);
 

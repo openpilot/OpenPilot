@@ -750,7 +750,7 @@ uint8_t PIOS_RFM22B_LinkQuality(uint32_t rfm22b_id)
 	return rfm22b_dev->slow_link_quality;
 }
 
-uint8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id)
+int8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if(!PIOS_RFM22B_validate(rfm22b_dev))

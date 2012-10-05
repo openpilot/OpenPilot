@@ -448,6 +448,11 @@ android_sdk_clean:
 	$(V0) @echo " CLEAN        $(ANDROID_SDK_DIR)"
 	$(V1) [ ! -d "$(ANDROID_SDK_DIR)" ] || $(RM) -r $(ANDROID_SDK_DIR)
 
+.PHONY: android_sdk_update
+android_sdk_update:
+	$(V0) @echo " UPDATE       $(ANDROID_SDK_DIR)"
+	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-16,addon-google_apis-google-16
+
 ##############################
 #
 # Set up paths to tools

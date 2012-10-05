@@ -48,6 +48,7 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
         toplevelLayout->addWidget(m_stackWidget);
         m_listWidget->setFlow(QListView::TopToBottom);
         m_listWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        m_listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     } else {
         toplevelLayout = new QVBoxLayout;
         toplevelLayout->addWidget(m_stackWidget);

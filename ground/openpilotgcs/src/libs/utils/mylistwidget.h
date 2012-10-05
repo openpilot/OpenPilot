@@ -31,28 +31,7 @@
 
 #include "utils_global.h"
 
-#include <QtGui>
 #include <QtGui/QListWidget>
-
-class ListWidgetItemDelegate : public QStyledItemDelegate
-{
-public:
-    ListWidgetItemDelegate(QObject* parent = 0) : QStyledItemDelegate(parent) {}
-
-    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
-    {
-        Q_ASSERT(index.isValid());
-
-        QStyleOptionViewItemV4 opt = option;
-        initStyleOption(&opt, index);
-
-        if (opt.state & QStyle::State_MouseOver) {
-            opt.icon = opt.icon.pixmap(opt.decorationSize, QIcon::Normal, QIcon::On);
-            opt.state &= ~QStyle::State_Selected;
-        }
-        QStyledItemDelegate::paint(painter, opt, index);
-    }
-};
 
 /*
  * MyListWidget is a plain QListWidget but with the added option
@@ -63,7 +42,7 @@ class QTCREATOR_UTILS_EXPORT MyListWidget : public QListWidget
 {
     Q_OBJECT
 public:
-    MyListWidget(QWidget *parent) : QListWidget(parent), m_iconAbove(false) { setItemDelegate(new ListWidgetItemDelegate());}
+    MyListWidget(QWidget *parent) : QListWidget(parent), m_iconAbove(false) {}
     void setIconAbove(bool iconAbove) { m_iconAbove = iconAbove; }
 protected:
     QStyleOptionViewItem viewOptions() const;

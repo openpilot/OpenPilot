@@ -83,7 +83,10 @@ extern void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_p
 extern void RFM22_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool data_whitening);
 extern void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id);
 extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
-extern int16_t PIOS_RFM22B_Resets(uint32_t rfm22b_id);
+extern uint16_t PIOS_RFM22B_Resets(uint32_t rfm22b_id);
+extern uint16_t PIOS_RFM22B_Timeouts(uint32_t rfm22b_id);
+extern uint8_t PIOS_RFM22B_LinkQuality(uint32_t rfm22b_id);
+extern uint8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id);
 extern bool PIOS_RFM22B_Send_Packet(uint32_t rfm22b_id, PHPacketHandle p, uint32_t max_delay);
 extern uint32_t PIOS_RFM22B_Receive_Packet(uint32_t rfm22b_id, PHPacketHandle *p, uint32_t max_delay);
 

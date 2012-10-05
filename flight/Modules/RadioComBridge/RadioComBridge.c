@@ -548,7 +548,7 @@ static void UAVTalkSendTask(void *parameters)
 			else if(ev.event == EV_PACKET_RECEIVED)
 			{
 				// Receive the packet.
-				PHReceivePacket(pios_packet_handler, (PHPacketHandle)ev.obj, false);
+				PHReceivePacket(pios_packet_handler, (PHPacketHandle)ev.obj);
 			}
 			else if(ev.event == EV_TRANSMIT_PACKET)
 			{

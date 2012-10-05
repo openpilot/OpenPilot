@@ -83,7 +83,6 @@ typedef struct {
 	// Error statistics.
 	uint32_t radioTxErrors;
 	uint32_t radioRxErrors;
-	uint32_t packetErrors;
 	uint16_t txBytes;
 	uint16_t rxBytes;
 
@@ -262,7 +261,6 @@ static int32_t RadioInitialize(void)
 	// Initialize the statistics.
 	data->radioTxErrors = 0;
 	data->radioRxErrors = 0;
-	data->packetErrors = 0;
 	data->droppedPackets = 0;
 	data->comTxRetries = 0;
 	data->UAVTalkErrors = 0;
@@ -315,12 +313,7 @@ static void radioReceiveTask(void *parameters)
 		if(rx_bytes == 0)
 			continue;
 		data->rxBytes += rx_bytes;
-
-		// Verify that the packet is valid and pass it on.
-		bool rx_error = PHVerifyPacket(pios_packet_handler, p, rx_bytes) < 0;
-		if(rx_error)
-			data->packetErrors++;
-		PHReceivePacket(pios_packet_handler, p, rx_error);
+		PHReceivePacket(pios_packet_handler, p);
 		p = NULL;
 	}
 }
@@ -416,7 +409,7 @@ static void radioStatusTask(void *parameters)
 		// Update the status
 		pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
 		pipxStatus.Retries = data->comTxRetries;
-		pipxStatus.Errors = data->packetErrors;
+		pipxStatus.LinkQuality = PIOS_RFM22B_LinkQuality(pios_rfm22b_id);
 		pipxStatus.UAVTalkErrors = data->UAVTalkErrors;
 		pipxStatus.Dropped = data->droppedPackets;
 		pipxStatus.Resets = PIOS_RFM22B_Resets(pios_rfm22b_id);
@@ -425,7 +418,7 @@ static void radioStatusTask(void *parameters)
 		pipxStatus.RXRate = (uint16_t)((float)(data->rxBytes * 1000) / STATS_UPDATE_PERIOD_MS);
 		data->rxBytes = 0;
 		pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_DISCONNECTED;
-		pipxStatus.RSSI = data->RSSI;
+		pipxStatus.RSSI = PIOS_RFM22B_LinkQuality(pios_rfm22b_id);
 		LINK_LED_OFF;
 
 		// Update the potential pairing contacts
@@ -450,7 +443,6 @@ static void radioStatusTask(void *parameters)
 			if(pairID && (data->pairStats[i].pairID == pairID) && (data->pairStats[i].rssi > -127))
 			{
 				pipxStatus.Retries += data->pairStats[i].retries;
-				pipxStatus.Errors += data->pairStats[i].errors;
 				pipxStatus.UAVTalkErrors += data->pairStats[i].uavtalk_errors;
 				pipxStatus.Dropped += data->pairStats[i].dropped;
 				pipxStatus.Resets += data->pairStats[i].resets;

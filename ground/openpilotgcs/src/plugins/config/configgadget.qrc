@@ -19,5 +19,13 @@
         <file>images/TX2.svg</file>
         <file>images/camera.png</file>
         <file>images/txpid.png</file>
+        <file>images/output_selected.png</file>
+        <file>images/output_normal.png</file>
+        <file>images/input_selected.png</file>
+        <file>images/input_normal.png</file>
+        <file>images/hardware_normal.png</file>
+        <file>images/hardware_selected.png</file>
+        <file>images/vehicle_normal.png</file>
+        <file>images/vehicle_selected.png</file>
     </qresource>
 </RCC>

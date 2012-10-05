@@ -750,6 +750,11 @@ sim_win32_%: uavobjects_flight
 # Packaging components
 #
 ##############################
+
 .PHONY: package
 package:
 	$(V1) cd $@ && $(MAKE) --no-print-directory $@
+
+.PHONY: package_resources
+package_resources:
+	$(V1) cd package && $(MAKE) --no-print-directory opfw_resource

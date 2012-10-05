@@ -60,8 +60,7 @@ typedef struct {
 	uint32_t source_id;
 	uint8_t type;
 	uint8_t data_size;
-	uint8_t tx_seq;
-	uint8_t rx_seq;
+	uint16_t seq_num;
 } PHPacketHeader;
 
 #define PH_MAX_DATA (PIOS_PH_MAX_PACKET - sizeof(PHPacketHeader) - RS_ECC_NPARITY)
@@ -116,8 +115,7 @@ PHPacketHandle PHGetTXPacket(PHInstHandle h);
 void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
 uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p);
 uint8_t PHTransmitData(PHInstHandle h, uint8_t *buf, uint16_t len);
-int32_t PHVerifyPacket(PHInstHandle h, PHPacketHandle p, uint16_t received_len);
-uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error);
+uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p);
 
 #endif // __PACKET_HANDLER_H__
 

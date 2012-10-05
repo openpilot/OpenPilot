@@ -52,7 +52,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	} else {
 		qDebug() << "Error: Object is unknown (PipXSettings).";
 	}
-    autoLoadWidgets();
+	autoLoadWidgets();
 	addApplySaveButtons(m_pipx->Apply, m_pipx->Save);
 
 	addUAVObjectToWidgetRelation("PipXSettings", "TelemetryConfig", m_pipx->TelemPortConfig);
@@ -75,7 +75,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("PipXStatus", "RSSI", m_pipx->RSSI);
 	addUAVObjectToWidgetRelation("PipXStatus", "AFC", m_pipx->RxAFC);
 	addUAVObjectToWidgetRelation("PipXStatus", "Retries", m_pipx->Retries);
-	addUAVObjectToWidgetRelation("PipXStatus", "Errors", m_pipx->Errors);
+	addUAVObjectToWidgetRelation("PipXStatus", "LinkQuality", m_pipx->LinkQuality);
 	addUAVObjectToWidgetRelation("PipXStatus", "UAVTalkErrors", m_pipx->UAVTalkErrors);
 	addUAVObjectToWidgetRelation("PipXStatus", "Resets", m_pipx->Resets);
 	addUAVObjectToWidgetRelation("PipXStatus", "Dropped", m_pipx->Dropped);

@@ -71,7 +71,7 @@
 #define RADIOSTATS_UPDATE_PERIOD_MS 250
 
 // this is too adjust the RF module so that it is on frequency
-#define OSC_LOAD_CAP					0x7F	// cap = 12.5pf .. default
+#define OSC_LOAD_CAP				0x7F	// cap = 12.5pf .. default
 #define OSC_LOAD_CAP_1				0x7D	// board 1
 #define OSC_LOAD_CAP_2				0x7B	// board 2
 #define OSC_LOAD_CAP_3				0x7E	// board 3
@@ -206,10 +206,26 @@ struct pios_rfm22b_dev {
 	// ezmac status register
 	uint8_t ezmac_status;
 
+	// The packet transmission counts
+	uint32_t tx_packet_count;
+	uint32_t rx_packet_count;
+
+	// The dropped packet counters
+	uint8_t slow_block;
+	uint8_t fast_block;
+	uint8_t slow_good_packets;
+	uint8_t fast_good_packets;
+	uint8_t slow_corrected_packets;
+	uint8_t fast_corrected_packets;
+	uint8_t slow_error_packets;
+	uint8_t fast_error_packets;
+	uint8_t slow_link_quality;
+	uint8_t fast_link_quality;
+
 	// Stats
 	uint16_t resets;
-	uint32_t errors;
-	uint32_t irqs_processed;
+	uint16_t timeouts;
+	uint16_t errors;
 	// the current RSSI (register value)
 	uint8_t rssi;
 	// RSSI in dBm
@@ -557,10 +573,24 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->int_status2 = 0;
 	rfm22b_dev->ezmac_status = 0;
 
+	// Initlize the link stats.
+	rfm22b_dev->slow_block = 0;
+	rfm22b_dev->fast_block = 0;
+	rfm22b_dev->slow_good_packets = 0;
+	rfm22b_dev->fast_good_packets = 0;
+	rfm22b_dev->slow_corrected_packets = 0;
+	rfm22b_dev->fast_corrected_packets = 0;
+	rfm22b_dev->slow_error_packets = 0;
+	rfm22b_dev->fast_error_packets = 0;
+	rfm22b_dev->slow_link_quality = 255;
+	rfm22b_dev->fast_link_quality = 255;
+
 	// Initialize the stats.
 	rfm22b_dev->resets = 0;
+	rfm22b_dev->timeouts = 0;
 	rfm22b_dev->errors = 0;
-	rfm22b_dev->irqs_processed = 0;
+	rfm22b_dev->tx_packet_count = 0;
+	rfm22b_dev->rx_packet_count = 0;
 	rfm22b_dev->rssi = 0;
 	rfm22b_dev->rssi_dBm = -127;
 
@@ -696,11 +726,36 @@ void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id)
 	rfm22b_dev->destination_id = (dest_id == 0) ? 0xffffffff : dest_id;
 }
 
-int16_t PIOS_RFM22B_Resets(uint32_t rfm22b_id)
+uint16_t PIOS_RFM22B_Resets(uint32_t rfm22b_id)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return 0;
 	return rfm22b_dev->resets;
+}
+
+uint16_t PIOS_RFM22B_Timeouts(uint32_t rfm22b_id)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return 0;
+	return rfm22b_dev->timeouts;
+}
+
+uint8_t PIOS_RFM22B_LinkQuality(uint32_t rfm22b_id)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return 0;
+	return rfm22b_dev->slow_link_quality;
+}
+
+int8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return 0;
+	return rfm22b_dev->rssi_dBm;
 }
 
 static void PIOS_RFM22B_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail)
@@ -741,11 +796,11 @@ bool PIOS_RFM22B_Send_Packet(uint32_t rfm22b_id, PHPacketHandle p, uint32_t max_
 /**
  * Receive a packet from the radio.
  * \param[in] rfm22b_id  The rfm22b device.
- * \param[in] p  A pointer to the packet handle.
+ * \param[in] pret  A pointer to the packet handle.
  * \param[in] max_delay  The maximum time to delay waiting for a packet.
  * \return  The number of bytes received.
  */
-uint32_t PIOS_RFM22B_Receive_Packet(uint32_t rfm22b_id, PHPacketHandle *p, uint32_t max_delay)
+uint32_t PIOS_RFM22B_Receive_Packet(uint32_t rfm22b_id, PHPacketHandle *pret, uint32_t max_delay)
 {
 	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if (!PIOS_RFM22B_validate(rfm22b_dev))
@@ -763,9 +818,60 @@ uint32_t PIOS_RFM22B_Receive_Packet(uint32_t rfm22b_id, PHPacketHandle *p, uint3
 	uint32_t rx_len = 0;
 	if (rfm22b_dev->rx_packet_prev)
 	{
-		*p = rfm22b_dev->rx_packet_prev;
+		PHPacketHandle p = rfm22b_dev->rx_packet_prev;
+		uint16_t len = PHPacketSizeECC(p);
+
+		// Attempt to correct any errors in the packet.
+		decode_data((unsigned char*)p, len);
+
+		// Check if there were any errors
+		bool rx_error = check_syndrome() != 0;
+		if(rx_error)
+		{
+
+			// We have an error.  Try to correct it.
+			if (correct_errors_erasures((unsigned char*)p, len, 0, 0) == 0)
+			{
+				// We couldn't correct the error, so drop the packet.
+				rfm22b_dev->fast_error_packets++;
+				PHReleaseRXPacket(pios_packet_handler, p);
+			}
+			else
+			{
+				// We corrected the error.
+				rfm22b_dev->fast_corrected_packets++;
+				rx_error = false;
+			}
+
+		}
+
+		// Return the packet if there were not uncorrectable errors.
+		if (!rx_error)
+		{
+			rfm22b_dev->fast_good_packets++;
+			*pret = p;
+			rx_len = rfm22b_dev->rx_packet_len;
+
+			// Update the link statistics if necessary.
+			uint8_t fast_block = (p->header.seq_num >> 2) & 0xff;
+			uint8_t slow_block = (p->header.seq_num >> 4) & 0xff;
+			if (rfm22b_dev->fast_block != fast_block)
+			{
+				rfm22b_dev->fast_link_quality = (uint8_t)(((4 + (uint16_t)rfm22b_dev->fast_good_packets - rfm22b_dev->fast_error_packets) << 5) - 1);
+				rfm22b_dev->slow_good_packets += rfm22b_dev->fast_good_packets;
+				rfm22b_dev->slow_corrected_packets += rfm22b_dev->fast_corrected_packets;
+				rfm22b_dev->slow_error_packets += rfm22b_dev->fast_error_packets;
+				rfm22b_dev->fast_good_packets = rfm22b_dev->fast_corrected_packets = rfm22b_dev->fast_error_packets = 0;
+				rfm22b_dev->fast_block = fast_block;
+			}
+			if (rfm22b_dev->slow_block != slow_block)
+			{
+				rfm22b_dev->slow_link_quality = (uint8_t)(((16 + (uint16_t)rfm22b_dev->slow_good_packets - rfm22b_dev->slow_error_packets) << 3) - 1);
+				rfm22b_dev->slow_good_packets = rfm22b_dev->slow_corrected_packets = rfm22b_dev->slow_error_packets = 0;
+				rfm22b_dev->slow_block = slow_block;
+			}
+		}
 		rfm22b_dev->rx_packet_prev = NULL;
-		rx_len = rfm22b_dev->rx_packet_len;
 	}
 
 	return rx_len;
@@ -791,7 +897,6 @@ static void PIOS_RFM22B_Task(void *parameters)
 
 		// Wait for a signal indicating an external interrupt or a pending send/receive request.
 		if ( xSemaphoreTake(g_rfm22b_dev->isrPending,  ISR_TIMEOUT / portTICK_RATE_MS) == pdTRUE ) {
-			rfm22b_dev->irqs_processed++;
 			lastEventTicks = xTaskGetTickCount();
 
 			// Process events through the state machine.
@@ -1246,6 +1351,12 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 		rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
 		return RFM22B_EVENT_RX_MODE;
 	}
+
+	// Add the error correcting code.
+	p->header.source_id = rfm22b_dev->deviceID;
+	p->header.seq_num = rfm22b_dev->tx_packet_count++;
+	encode_data((unsigned char*)p, PHPacketSize(p), (unsigned char*)p);
+
 	rfm22b_dev->tx_packet = p;
 	rfm22b_dev->packet_start_ticks = xTaskGetTickCount();
 	if (rfm22b_dev->packet_start_ticks == 0)
@@ -1317,20 +1428,14 @@ static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 	PHPacketHandle sph = (PHPacketHandle)&(rfm22b_dev->status_packet);
 
 	// Queue the status message
-	rfm22b_dev->status_packet.header.source_id = rfm22b_dev->deviceID;
 	rfm22b_dev->status_packet.header.destination_id = 0xffffffff; // Broadcast
 	rfm22b_dev->status_packet.header.type = PACKET_TYPE_STATUS;
 	rfm22b_dev->status_packet.header.data_size = PH_STATUS_DATA_SIZE(&(rfm22b_dev->status_packet));
-	rfm22b_dev->status_packet.header.tx_seq = 0;
-	rfm22b_dev->status_packet.header.rx_seq = 0;
 	rfm22b_dev->status_packet.errors = rfm22b_dev->errors;
 	rfm22b_dev->status_packet.resets = rfm22b_dev->resets;
 	rfm22b_dev->status_packet.retries = 0;
 	rfm22b_dev->status_packet.uavtalk_errors = 0;
 	rfm22b_dev->status_packet.dropped = 0;
-
-	// Add the error correcting code.
-	encode_data((unsigned char*)sph, PHPacketSize(sph), (unsigned char*)sph);
 	if (xQueueSend(rfm22b_dev->packetQueue, &sph, 0) != pdTRUE)
 		return false;
 

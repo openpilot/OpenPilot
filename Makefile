@@ -484,6 +484,13 @@ else
   OPENOCD ?= openocd
 endif
 
+ifeq ($(shell [ -d "$(ANDROID_SDK_DIR)" ] && echo "exists"), exists)
+  ANDROID := $(ANDROID_SDK_DIR)/tools/android
+else
+  # not installed, hope it's in the path...
+  ANDROID ?= android
+endif
+
 ##############################
 #
 # GCS related components
@@ -540,6 +547,35 @@ uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
 uavobjects_clean:
 	$(V0) @echo " CLEAN      $@"
 	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
+
+################################
+#
+# Android GCS related components
+#
+################################
+
+ANDROIDGCS_OUT_DIR := $(BUILD_DIR)/androidgcs
+#$(warning $(call toprel, $(ANDROIDGCS_OUT_DIR)/bin))
+
+ifeq ($(V), 1)
+	ANDROID_VERBOSE := -verbose
+else
+	ANDROID_VERBOSE :=
+endif
+.PHONY: androidgcs
+androidgcs:  uavobjects_java
+	$(V1) mkdir -p $(ANDROIDGCS_OUT_DIR)
+	$(V1) $(ANDROID) update project --target 'Google Inc.:Google APIs:16' --name androidgcs --path ./androidgcs
+	$(V1) ant -f ./androidgcs/build.xml \
+		$(ANDROID_VERBOSE) \
+		-Dout.dir="../$(call toprel, $(ANDROIDGCS_OUT_DIR)/bin)" \
+		-Dgen.absolute.dir="$(ANDROIDGCS_OUT_DIR)/gen" \
+		debug
+
+.PHONY: androidgcs_clean
+androidgcs_clean:
+	$(V0) @echo " CLEAN      $@"
+	$(V1) [ ! -d "$(ANDROIDGCS_OUT_DIR)" ] || $(RM) -r "$(ANDROIDGCS_OUT_DIR)"
 
 ##############################
 #

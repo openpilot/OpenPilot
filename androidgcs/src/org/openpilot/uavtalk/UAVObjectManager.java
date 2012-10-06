@@ -70,7 +70,6 @@ public class UAVObjectManager {
 	 */
 	public synchronized boolean registerObject(UAVDataObject obj) throws Exception
 	{
-		//  QMutexLocker locker(mutex);
 
 		ListIterator<List<UAVObject>> objIt = objects.listIterator(0);
 

@@ -277,6 +277,24 @@ public class OPTelemetryService extends Service {
 	};
 
 	/**
+	 * Delete the files in a directories
+	 * @param directory
+	 */
+	private static void deleteDirectoryContents(File directory)
+	{
+		File contents[] = directory.listFiles();
+		if (contents != null)
+		{
+			for (File file : contents)
+			{
+				if (file.isDirectory())
+					deleteDirectoryContents(file);
+
+				file.delete();
+			}
+		}
+	}
+	/**
 	 * Load the UAVObjects from a JAR file.  This method must be called in the
 	 * service context.
 	 * @return True if success, False otherwise
@@ -289,23 +307,22 @@ public class OPTelemetryService extends Service {
 		File dexDir = getDir(DEX_DIR, Context.MODE_WORLD_READABLE);
 
 		// Necessary to get dexOpt to run
-		//if (dexDir.exists())
-		//	deleteDirectoryContents(dexDir);
+		if (dexDir.exists())
+			deleteDirectoryContents(dexDir);
 
-		File jarsDir = getDir(JAR_DIR, MODE_WORLD_READABLE);
-		String classpath = new File(jarsDir, jar).getAbsolutePath();
+		//File jarsDir = getDir(JAR_DIR, MODE_WORLD_READABLE);
+		//String classpath = new File(jarsDir, jar).getAbsolutePath();
+		String classpath = "/data/org.openpilot.uavtalk.uavobjects.jar";
 		DexClassLoader loader = new DexClassLoader(classpath, dexDir.getAbsolutePath(), null, getClassLoader());
 
-		Object initInstance = null;
 		try {
 			Class<?> initClass = loader.loadClass("org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize");
-			initInstance = initClass.newInstance();
+			Log.d(TAG, "Got the initClass: " + initClass);
 			Method initMethod = initClass.getMethod("register", UAVObjectManager.class);
-			initMethod.invoke(initInstance, objMngr);
+			Log.d(TAG, "Got the method: " + initMethod);
+			initMethod.invoke(null, objMngr);
+			Log.d(TAG, "Invoked");
 		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (InstantiationException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		} catch (IllegalAccessException e1) {

@@ -30,7 +30,7 @@ package org.openpilot.uavtalk.uavobjects;
 
 import org.openpilot.uavtalk.UAVObjectManager;
 
-public class UAVObjectsInitialize {
+public class TelemObjectsInitialize {
 	
 	public static void register(UAVObjectManager objMngr) {
 		try {

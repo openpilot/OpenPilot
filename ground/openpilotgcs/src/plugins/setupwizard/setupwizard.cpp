@@ -45,6 +45,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "vehicleconfigurationhelper.h"
 #include "actuatorsettings.h"
+#include "pages/autoupdatepage.h"
 
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfigurationSource(),
     m_controllerType(CONTROLLER_UNKNOWN),
@@ -66,6 +67,8 @@ int SetupWizard::nextId() const
 {
     switch (currentId()) {
         case PAGE_START:
+            return PAGE_UPDATE;
+        case PAGE_UPDATE:
             return PAGE_CONTROLLER;
         case PAGE_CONTROLLER: {
             switch(getControllerType())
@@ -257,6 +260,7 @@ QString SetupWizard::getSummaryText()
 void SetupWizard::createPages()
 {
     setPage(PAGE_START, new StartPage(this));
+    setPage(PAGE_UPDATE, new AutoUpdatePage(this));
     setPage(PAGE_CONTROLLER, new ControllerPage(this));
     setPage(PAGE_VEHICLES, new VehiclePage(this));
     setPage(PAGE_MULTI, new MultiPage(this));

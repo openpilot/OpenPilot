@@ -7,6 +7,10 @@ TOOLS_DIR=$(ROOT_DIR)/tools
 BUILD_DIR=$(ROOT_DIR)/build
 DL_DIR=$(ROOT_DIR)/downloads
 
+# Function for converting an absolute path to one relative
+# to the top of the source tree.
+toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
+
 # Clean out undesirable variables from the environment and command-line
 # to remove the chance that they will cause problems with our build
 define SANITIZE_VAR

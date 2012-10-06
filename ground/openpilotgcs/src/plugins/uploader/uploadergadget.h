@@ -30,6 +30,7 @@
 
 #include <coreplugin/iuavgadget.h>
 #include "uploadergadgetwidget.h"
+#include "uploader_global.h"
 
 class IUAVGadget;
 class QWidget;
@@ -38,7 +39,7 @@ class UploaderGadgetWidget;
 
 using namespace Core;
 
-class UploaderGadget : public Core::IUAVGadget
+class UPLOADER_EXPORT UploaderGadget : public Core::IUAVGadget
 {
     Q_OBJECT
 public:

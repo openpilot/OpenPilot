@@ -42,8 +42,10 @@
 #include "devicedescriptorstruct.h"
 #include <QDir>
 #include <QCoreApplication>
+#include "uploader_global.h"
+
 using namespace OP_DFU;
-class deviceWidget : public QWidget
+class UPLOADER_EXPORT deviceWidget : public QWidget
 {
     Q_OBJECT
 public:

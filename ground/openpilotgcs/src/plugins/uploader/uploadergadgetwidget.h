@@ -56,12 +56,12 @@
 #include <QProgressDialog>
 #include <QErrorMessage>
 #include <QDesktopServices>
+#include "uploader_global.h"
 #include "enums.h"
 using namespace OP_DFU;
 using namespace uploader;
 
-
-class UploaderGadgetWidget : public QWidget
+class UPLOADER_EXPORT UploaderGadgetWidget : public QWidget
 {
     Q_OBJECT
 

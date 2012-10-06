@@ -55,14 +55,19 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
         toplevelLayout->addWidget(m_listWidget);
         m_listWidget->setFlow(QListView::LeftToRight);
         m_listWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        m_listWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     }
-    if (m_iconAbove && m_vertical)
+
+    if (m_iconAbove && m_vertical) {
         m_listWidget->setFixedWidth(90); // this should be computed instead
+        m_listWidget->setContentsMargins(0, 2, 0, 0);
+    } else {
+        m_listWidget->setContentsMargins(0, 0, 2, 0);
+    }
 
     toplevelLayout->setSpacing(0);
     toplevelLayout->setContentsMargins(0, 0, 0, 0);
     m_listWidget->setSpacing(0);
-    m_listWidget->setContentsMargins(0, 0, 0, 0);
     m_stackWidget->setContentsMargins(0, 0, 0, 0);
     setLayout(toplevelLayout);
 

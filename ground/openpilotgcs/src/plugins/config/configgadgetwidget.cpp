@@ -67,10 +67,10 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     // *********************
     QWidget *qwd;
 
-    qwd = new DefaultHwSettingsWidget(this);
     QIcon *icon = new QIcon();
     icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Selected, QIcon::Off);
+    qwd = new DefaultHwSettingsWidget(this);
     ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
 
     icon = new QIcon();
@@ -103,14 +103,23 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     qwd = new ConfigStabilizationWidget(this);
     ftw->insertTab(ConfigGadgetWidget::stabilization, qwd, *icon, QString("Stabilization"));
 
+    icon = new QIcon();
+    icon->addFile(":/configgadget/images/autotune_normal.png", QSize(), QIcon::Normal, QIcon::Off);
+    icon->addFile(":/configgadget/images/autotune_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd = new ConfigAutotuneWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::autotune, qwd, QIcon(":/configgadget/images/gyroscope.png"), QString("Autotune"));
+    ftw->insertTab(ConfigGadgetWidget::autotune, qwd, *icon, QString("Autotune"));
 
+    icon = new QIcon();
+    icon->addFile(":/configgadget/images/camstab_normal.png", QSize(), QIcon::Normal, QIcon::Off);
+    icon->addFile(":/configgadget/images/camstab_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd = new ConfigCameraStabilizationWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::camerastabilization, qwd, QIcon(":/configgadget/images/camera.png"), QString("Camera Stab"));
+    ftw->insertTab(ConfigGadgetWidget::camerastabilization, qwd, *icon, QString("Camera Stab"));
 
+    icon = new QIcon();
+    icon->addFile(":/configgadget/images/txpid_normal.png", QSize(), QIcon::Normal, QIcon::Off);
+    icon->addFile(":/configgadget/images/txpid_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd = new ConfigTxPIDWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::txpid, qwd, QIcon(":/configgadget/images/txpid.png"), QString("TxPID"));
+    ftw->insertTab(ConfigGadgetWidget::txpid, qwd, *icon, QString("TxPID"));
 
     ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
     // *********************
@@ -122,8 +131,9 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
 
     // And check whether by any chance we are not already connected
-    if (telMngr->isConnected())
+    if (telMngr->isConnected()) {
         onAutopilotConnect();    
+    }
 
     help = 0;
     connect(ftw,SIGNAL(currentAboutToShow(int,bool*)),this,SLOT(tabAboutToChange(int,bool*)));//,Qt::BlockingQueuedConnection);
@@ -134,7 +144,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     if (pipxStatusObj != NULL ) {
         connect(pipxStatusObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updatePipXStatus(UAVObject*)));
     } else {
-	qDebug() << "Error: Object is unknown (PipXStatus).";
+        qDebug() << "Error: Object is unknown (PipXStatus).";
     }
 
     // Create the timer that is used to timeout the connection to the PipX.
@@ -145,8 +155,6 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 
 ConfigGadgetWidget::~ConfigGadgetWidget()
 {
-   // Do nothing
-
     // TODO: properly delete all the tabs in ftw before exiting
 }
 
@@ -160,24 +168,24 @@ void ConfigGadgetWidget::startInputWizard()
 
 void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 {
-
     QWidget::resizeEvent(event);
 }
 
 void ConfigGadgetWidget::onAutopilotDisconnect() {
     ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
     ftw->removeTab(ConfigGadgetWidget::sensors);
-    QWidget *qwd = new DefaultAttitudeWidget(this);
+
     QIcon *icon = new QIcon();
     icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
+    QWidget *qwd = new DefaultAttitudeWidget(this);
     ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("INS"));
     ftw->removeTab(ConfigGadgetWidget::hardware);
-    qwd = new DefaultHwSettingsWidget(this);
 
     icon = new QIcon();
     icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Selected, QIcon::Off);
+    qwd = new DefaultHwSettingsWidget(this);
     ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
     ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
 
@@ -198,68 +206,64 @@ void ConfigGadgetWidget::onAutopilotConnect() {
             // Delete the INS panel, replace with CC Panel:
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
             ftw->removeTab(ConfigGadgetWidget::sensors);
+
             QIcon *icon = new QIcon();
             icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
             icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
             QWidget *qwd = new ConfigCCAttitudeWidget(this);
             ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("INS"));
             ftw->removeTab(ConfigGadgetWidget::hardware);
-            qwd = new ConfigCCHWWidget(this);
+
             icon = new QIcon();
             icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
             icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Selected, QIcon::Off);
+            qwd = new ConfigCCHWWidget(this);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-        } else if ((board & 0xff00) == 256 ) {
-            // Mainboard family
-            Q_ASSERT(0);
-            /*
-            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-            ftw->removeTab(ConfigGadgetWidget::sensors);
-            QWidget *qwd = new ConfigAHRSWidget(this);
-            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, QIcon(":/configgadget/images/AHRS-v1.3.png"), QString("INS"));
-            ftw->removeTab(ConfigGadgetWidget::hardware);
-            qwd = new ConfigProHWWidget(this);
-            ftw->insertTab(ConfigGadgetWidget::hardware, qwd, QIcon(":/configgadget/images/hw_config.png"), QString("HW Settings"));
-            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-            */
         } else if ((board & 0xff00) == 0x0900) {
             // Revolution sensor calibration
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
             ftw->removeTab(ConfigGadgetWidget::sensors);
-            QWidget *qwd = new ConfigRevoWidget(this);
+
             QIcon *icon = new QIcon();
             icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
             icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
+            QWidget *qwd = new ConfigRevoWidget(this);
             ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("Revo"));
             ftw->removeTab(ConfigGadgetWidget::hardware);
-            qwd = new ConfigProHWWidget(this);
+
             icon = new QIcon();
             icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
             icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Normal, QIcon::On);
+            qwd = new ConfigProHWWidget(this);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+        } else {
+            //Unknown board
+            Q_ASSERT(0);
         }
     }
     emit autopilotConnected();
 }
 
-void ConfigGadgetWidget::tabAboutToChange(int i,bool * proceed)
+void ConfigGadgetWidget::tabAboutToChange(int i, bool * proceed)
 {
     Q_UNUSED(i);
-    *proceed=true;
-    ConfigTaskWidget * wid=qobject_cast<ConfigTaskWidget *>(ftw->currentWidget());
-    if(!wid)
+    *proceed = true;
+    ConfigTaskWidget * wid = qobject_cast<ConfigTaskWidget *>(ftw->currentWidget());
+    if(!wid) {
         return;
+    }
     if(wid->isDirty())
     {
         int ans=QMessageBox::warning(this,tr("Unsaved changes"),tr("The tab you are leaving has unsaved changes,"
                                                            "if you proceed they will be lost."
                                                            "Do you still want to proceed?"),QMessageBox::Yes,QMessageBox::No);
-        if(ans==QMessageBox::No)
+        if(ans==QMessageBox::No) {
             *proceed=false;
-        else
+        } else {
             wid->setDirty(false);
+        }
     }
 }
 

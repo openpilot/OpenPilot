@@ -99,7 +99,7 @@ package_flight: | all_fw all_bu
 
 package_ground: | ground_package
 
-package: | package_flight package_ground
+package: | package_flight opfw_resource package_ground
 
 .PHONY: help uavobjects all_clean package_flight package_ground package
 

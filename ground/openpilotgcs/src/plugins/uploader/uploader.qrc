@@ -17,4 +17,7 @@
         <file>images/gcs-board-cc3d.png</file>
         <file>images/pipx.png</file>
     </qresource>
+    <qresource prefix="/firmware">
+        <file>firmware/fw_coptercontrol.opfw</file>
+    </qresource>
 </RCC>

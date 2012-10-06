@@ -27,6 +27,10 @@
 package org.openpilot.androidgcs.telemetry;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -37,6 +41,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -276,6 +281,52 @@ public class OPTelemetryService extends Service {
 		public UAVObjectManager getObjectManager();
 	};
 
+
+	/************************************************************/
+	/* Everything below here has to do with getting the UAVOs   */
+	/* from the package.  This shouldn't really be in the telem */
+	/* service class but needs to be in this context            */
+	/************************************************************/
+
+	private static void copyStream(InputStream inputStream, OutputStream outputStream) throws IOException
+    {
+        byte[] buffer = new byte[1024 * 10];
+        int numRead = inputStream.read(buffer);
+        while (numRead > 0)
+        {
+            outputStream.write(buffer, 0, numRead);
+            numRead = inputStream.read(buffer);
+        }
+    }
+	private void copyAssets(String JAR_DIR, String JAR_NAME)
+    {
+        File jarsDir = getDir(JAR_DIR, MODE_WORLD_READABLE);
+        AssetManager assetManager = getAssets();
+        try
+        {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try
+            {
+                File outputFile = new File(jarsDir, JAR_NAME);
+                inputStream = assetManager.open(JAR_NAME); //JAR_DIR + File.separatorChar + JAR_NAME);
+                outputStream = new FileOutputStream(outputFile);
+                copyStream(inputStream, outputStream);
+            }
+            finally
+            {
+                if (inputStream != null)
+                    inputStream.close();
+                if (outputStream != null)
+                    outputStream.close();
+            }
+        }
+        catch (IOException e)
+        {
+            Log.e(TAG, e.toString(), e);
+        }
+    }
+
 	/**
 	 * Delete the files in a directories
 	 * @param directory
@@ -294,14 +345,17 @@ public class OPTelemetryService extends Service {
 			}
 		}
 	}
+
 	/**
 	 * Load the UAVObjects from a JAR file.  This method must be called in the
 	 * service context.
 	 * @return True if success, False otherwise
 	 */
 	public boolean loadUavobjects(String jar, UAVObjectManager objMngr) {
-	    final String JAR_DIR = "/data/";
+	    final String JAR_DIR = "jars";
 	    final String DEX_DIR = "optimized_dex";
+
+	    copyAssets(JAR_DIR, jar);
 
 		Log.d(TAG, "Starting dex loader");
 		File dexDir = getDir(DEX_DIR, Context.MODE_WORLD_READABLE);
@@ -310,9 +364,9 @@ public class OPTelemetryService extends Service {
 		if (dexDir.exists())
 			deleteDirectoryContents(dexDir);
 
-		//File jarsDir = getDir(JAR_DIR, MODE_WORLD_READABLE);
-		//String classpath = new File(jarsDir, jar).getAbsolutePath();
-		String classpath = "/data/org.openpilot.uavtalk.uavobjects.jar";
+		File jarsDir = getDir(JAR_DIR, MODE_WORLD_READABLE);
+		String classpath = new File(jarsDir, jar).getAbsolutePath();
+
 		DexClassLoader loader = new DexClassLoader(classpath, dexDir.getAbsolutePath(), null, getClassLoader());
 
 		try {

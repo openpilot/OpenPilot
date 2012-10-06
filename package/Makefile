@@ -99,7 +99,7 @@ package_flight: | all_fw all_bu
 
 package_ground: | ground_package
 
-package: | package_flight package_ground
+package: | package_flight opfw_resource package_ground
 
 .PHONY: help uavobjects all_clean package_flight package_ground package
 
@@ -129,4 +129,21 @@ ifeq ($(UNAME), Darwin)
   PLATFORM := osx
 endif
 
+toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
+OPFW_FILES := $(foreach fw_targ, $(FW_TARGETS), $(call toprel, $(BUILD_DIR)/$(fw_targ)/$(fw_targ).opfw))
+OPFW_CONTENTS := \
+<!DOCTYPE RCC><RCC version="1.0"> \
+ <qresource> \
+     $(foreach fw_file, $(OPFW_FILES), <file>$(fw_file)</file>) \
+ </qresource> \
+</RCC>
+
+.PHONY: opfw_resource
+opfw_resource:
+	@echo Generating OPFW resource file $(call toprel, $(BUILD_DIR)/ground/$@)
+	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
+	$(V1) mkdir -p $(BUILD_DIR)/ground/$@/build
+	$(V1) echo '$(OPFW_CONTENTS)' > $(BUILD_DIR)/ground/$@/opfw_resource.qrc
+	$(V1) $(foreach fw_targ, $(FW_TARGETS), mkdir -p $(BUILD_DIR)/ground/$@/build/$(fw_targ);)
+	$(V1)$(foreach fw_targ, $(FW_TARGETS), cp $(BUILD_DIR)/$(fw_targ)/$(fw_targ).opfw $(BUILD_DIR)/ground/$@/build/$(fw_targ)/;)
 include $(WHEREAMI)/Makefile.$(PLATFORM)

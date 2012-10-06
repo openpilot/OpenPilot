@@ -555,8 +555,6 @@ uavobjects_clean:
 ################################
 
 ANDROIDGCS_OUT_DIR := $(BUILD_DIR)/androidgcs
-#$(warning $(call toprel, $(ANDROIDGCS_OUT_DIR)/bin))
-
 ifeq ($(V), 1)
 	ANDROID_VERBOSE := -verbose
 else

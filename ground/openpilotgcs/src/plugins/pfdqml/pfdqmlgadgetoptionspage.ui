@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>457</width>
-    <height>436</height>
+    <width>488</width>
+    <height>394</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,7 +24,7 @@
     <number>0</number>
    </property>
    <property name="spacing">
-    <number>0</number>
+    <number>-1</number>
    </property>
    <item row="0" column="0">
     <widget class="QScrollArea" name="scrollArea">
@@ -42,11 +42,14 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>457</width>
-        <height>436</height>
+        <width>488</width>
+        <height>394</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
+       <property name="margin">
+        <number>0</number>
+       </property>
        <item row="0" column="0">
         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
          <property name="spacing">

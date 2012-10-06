@@ -8,6 +8,7 @@ import java.util.Observer;
 
 import org.openpilot.uavtalk.Telemetry;
 import org.openpilot.uavtalk.TelemetryMonitor;
+import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectManager;
 import org.openpilot.uavtalk.UAVTalk;
 import org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize;
@@ -91,6 +92,17 @@ public abstract class TelemetryTask implements Runnable {
 	 */
 	abstract boolean attemptConnection();
 
+	private final Observer firmwareIapUpdated = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+			Log.d(TAG, "Received firmware IAP Updated message");
+			telemService.loadUavobjects("uavobjects.jar", objMngr);
+
+			UAVObject obj = objMngr.getObject("FirmwareIAPObj");
+			obj.removeUpdatedObserver(this);
+		}
+	};
+
 	/**
 	 * Called when a physical channel is opened
 	 *
@@ -104,6 +116,11 @@ public abstract class TelemetryTask implements Runnable {
 		// version number).
 		objMngr = new UAVObjectManager();
 		UAVObjectsInitialize.register(objMngr);
+
+		// Register to get an update from FirmwareIAP in order to register
+		// the appropriate objects
+		UAVObject obj = objMngr.getObject("FirmwareIAPObj");
+		obj.addUpdatedObserver(firmwareIapUpdated);
 
 		// Create the required telemetry objects attached to this
 		// data stream

@@ -26,11 +26,15 @@
  */
 package org.openpilot.androidgcs.telemetry;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import org.openpilot.uavtalk.UAVObjectManager;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
@@ -43,6 +47,7 @@ import android.os.Process;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
+import dalvik.system.DexClassLoader;
 
 public class OPTelemetryService extends Service {
 
@@ -270,4 +275,53 @@ public class OPTelemetryService extends Service {
 	public interface TelemTask {
 		public UAVObjectManager getObjectManager();
 	};
+
+	/**
+	 * Load the UAVObjects from a JAR file.  This method must be called in the
+	 * service context.
+	 * @return True if success, False otherwise
+	 */
+	public boolean loadUavobjects(String jar, UAVObjectManager objMngr) {
+	    final String JAR_DIR = "/data/";
+	    final String DEX_DIR = "optimized_dex";
+
+		Log.d(TAG, "Starting dex loader");
+		File dexDir = getDir(DEX_DIR, Context.MODE_WORLD_READABLE);
+
+		// Necessary to get dexOpt to run
+		//if (dexDir.exists())
+		//	deleteDirectoryContents(dexDir);
+
+		File jarsDir = getDir(JAR_DIR, MODE_WORLD_READABLE);
+		String classpath = new File(jarsDir, jar).getAbsolutePath();
+		DexClassLoader loader = new DexClassLoader(classpath, dexDir.getAbsolutePath(), null, getClassLoader());
+
+		Object initInstance = null;
+		try {
+			Class<?> initClass = loader.loadClass("org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize");
+			initInstance = initClass.newInstance();
+			Method initMethod = initClass.getMethod("register", UAVObjectManager.class);
+			initMethod.invoke(initInstance, objMngr);
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (InstantiationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IllegalAccessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (NoSuchMethodException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return true;
+	}
 }

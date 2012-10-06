@@ -60,13 +60,11 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
 
     if (m_iconAbove && m_vertical) {
         m_listWidget->setFixedWidth(90); // this should be computed instead
-        m_listWidget->setContentsMargins(0, 2, 0, 0);
-    } else {
-        m_listWidget->setContentsMargins(0, 0, 2, 0);
     }
 
     toplevelLayout->setSpacing(0);
     toplevelLayout->setContentsMargins(0, 0, 0, 0);
+    m_listWidget->setContentsMargins(0, 0, 0, 0);
     m_listWidget->setSpacing(0);
     m_stackWidget->setContentsMargins(0, 0, 0, 0);
     setLayout(toplevelLayout);

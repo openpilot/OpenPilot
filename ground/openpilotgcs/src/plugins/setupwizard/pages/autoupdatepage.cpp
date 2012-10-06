@@ -13,6 +13,8 @@ AutoUpdatePage::AutoUpdatePage(SetupWizard *wizard, QWidget *parent) :
     ui->setupUi(this);
     ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
     UploaderGadgetFactory * uploader=pm->getObject<UploaderGadgetFactory>();
+    if(!uploader->isAutoUpdateCapable())
+        wizard->next();//FIXME DOESN'T WORK
     connect(ui->startUpdate,SIGNAL(clicked()),uploader,SIGNAL(autoUpdate()));
     connect(uploader,SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep,QVariant)),this,SLOT(updateStatus(uploader::AutoUpdateStep,QVariant)));
 }

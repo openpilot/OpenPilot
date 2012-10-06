@@ -432,6 +432,11 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
     delete dfu; // Frees up the USB/Serial port too
     dfu = NULL;
 }
+bool UploaderGadgetWidget::autoUpdateCapable()
+{
+    return QFile::exists(":/build/fw_coptercontrol/fw_coptercontrol.opfw");
+}
+
 bool UploaderGadgetWidget::autoUpdate()
 {
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
@@ -495,18 +500,23 @@ bool UploaderGadgetWidget::autoUpdate()
     switch (dfu->devices[0].ID)
     {
     case 0x401:
-        filename="fw_coptercontrol.opfw";
+        filename="fw_coptercontrol";
         break;
     case 0x402:
-        filename="fw_coptercontrol.opfw";
+        filename="fw_coptercontrol";
         break;
     default:
         emit autoUpdateSignal(FAILURE,QVariant());
         return false;
         break;
     }
-    filename=":/firmware/firmware/"+filename;
+    filename=":/build/"+filename+"/"+filename+".opfw";
     QByteArray firmware;
+    if(!QFile::exists(filename))
+    {
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
         emit autoUpdateSignal(FAILURE,QVariant());

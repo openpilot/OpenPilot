@@ -70,7 +70,7 @@ public:
     UploaderGadgetWidget(QWidget *parent = 0);
    ~UploaderGadgetWidget();
     void log(QString str);
-
+    bool autoUpdateCapable();
 public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();

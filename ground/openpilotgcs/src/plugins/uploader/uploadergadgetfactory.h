@@ -47,6 +47,9 @@ public:
 
     Core::IUAVGadget *createGadget(QWidget *parent);
     IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    bool isAutoUpdateCapable();
+private:
+    bool isautocapable;
 signals:
     void autoUpdateSignal(uploader::AutoUpdateStep,QVariant);
     void autoUpdate();

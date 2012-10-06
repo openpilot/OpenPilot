@@ -28,9 +28,7 @@ package org.openpilot.androidgcs.telemetry;
 
 import java.lang.ref.WeakReference;
 
-import org.openpilot.uavtalk.UAVDataObject;
 import org.openpilot.uavtalk.UAVObjectManager;
-import org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize;
 
 import android.app.Service;
 import android.content.Intent;

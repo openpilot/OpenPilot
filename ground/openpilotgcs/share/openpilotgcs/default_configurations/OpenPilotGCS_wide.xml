@@ -6,7 +6,7 @@
     <LastPreferenceCategory>Notify Plugin</LastPreferenceCategory>
     <LastPreferencePage>settings</LastPreferencePage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
-    <SettingsWindowHeight>600</SettingsWindowHeight>
+    <SettingsWindowHeight>700</SettingsWindowHeight>
     <SettingsWindowWidth>800</SettingsWindowWidth>
     <UDPMirror>false</UDPMirror>
     <Description>Wide configuration</Description>
@@ -1679,7 +1679,7 @@
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>false</useOpenGL>
+          <useOpenGL>true</useOpenGL>
         </data>
       </Google__PCT__20Sat>
       <Memory__PCT__20Only>
@@ -1698,7 +1698,7 @@
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>airplanepip.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>false</useOpenGL>
+          <useOpenGL>true</useOpenGL>
         </data>
       </Memory__PCT__20Only>
       <default>
@@ -1717,7 +1717,7 @@
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>false</useOpenGL>
+          <useOpenGL>true</useOpenGL>
         </data>
       </default>
     </OPMapGadget>
@@ -2636,7 +2636,7 @@
             <type>uavGadget</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAClQAAAAIAAAB3)</splitterSizes>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABhAAAAAIAAAGE)</splitterSizes>
           <type>splitter</type>
         </side1>
         <splitterOrientation>1</splitterOrientation>

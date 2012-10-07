@@ -922,14 +922,14 @@
           <groundTruthEnabled>true</groundTruthEnabled>
           <groundTruthRate>100</groundTruthRate>
           <hostAddress>0.0.0.0</hostAddress>
-          <inPort>6756</inPort>
+          <inPort>40100</inPort>
           <inputCommand>true</inputCommand>
           <latitude></latitude>
           <longitude></longitude>
           <manualControlEnabled>false</manualControlEnabled>
           <manualOutput>false</manualOutput>
           <minOutputPeriod>40</minOutputPeriod>
-          <outPort>49000</outPort>
+          <outPort>40200</outPort>
           <remoteAddress>127.0.0.1</remoteAddress>
           <simulatorId>ASimRC</simulatorId>
           <startSim>false</startSim>

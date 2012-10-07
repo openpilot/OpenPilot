@@ -42,7 +42,7 @@ class QTCREATOR_UTILS_EXPORT MyListWidget : public QListWidget
 {
     Q_OBJECT
 public:
-    MyListWidget(QWidget *parent) : QListWidget(parent), m_iconAbove(false) { }
+    MyListWidget(QWidget *parent) : QListWidget(parent), m_iconAbove(false) {}
     void setIconAbove(bool iconAbove) { m_iconAbove = iconAbove; }
 protected:
     QStyleOptionViewItem viewOptions() const;

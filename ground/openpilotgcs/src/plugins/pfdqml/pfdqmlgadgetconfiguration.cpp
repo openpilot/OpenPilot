@@ -48,6 +48,10 @@ PfdQmlGadgetConfiguration::PfdQmlGadgetConfiguration(QString classId, QSettings 
         m_longitude = qSettings->value("longitude").toDouble();
         m_altitude = qSettings->value("altitude").toDouble();
         m_cacheOnly = qSettings->value("cacheOnly").toBool();
+
+        foreach (const QString &key, qSettings->childKeys()) {
+            m_settings.insert(key, qSettings->value(key));
+        }
     }
 }
 
@@ -67,6 +71,7 @@ IUAVGadgetConfiguration *PfdQmlGadgetConfiguration::clone()
     m->m_longitude = m_longitude;
     m->m_altitude = m_altitude;
     m->m_cacheOnly = m_cacheOnly;
+    m->m_settings = m_settings;
 
     return m;
 }

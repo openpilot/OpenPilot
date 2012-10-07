@@ -144,6 +144,11 @@ void PfdQmlGadgetWidget::setActualPositionUsed(bool arg)
     }
 }
 
+void PfdQmlGadgetWidget::setSettingsMap(const QVariantMap &settings)
+{
+    engine()->rootContext()->setContextProperty("settings", settings);
+}
+
 void PfdQmlGadgetWidget::setLatitude(double arg)
 {
     //not sure qFuzzyCompare is accurate enough for geo coordinates

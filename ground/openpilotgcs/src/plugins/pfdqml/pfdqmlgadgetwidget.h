@@ -56,6 +56,7 @@ public slots:
     void setAltitude(double arg);
 
     void setActualPositionUsed(bool arg);
+    void setSettingsMap(const QVariantMap &settings);
 
 signals:
     void earthFileChanged(QString arg);

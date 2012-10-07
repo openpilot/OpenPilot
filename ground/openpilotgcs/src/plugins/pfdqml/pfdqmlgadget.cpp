@@ -55,6 +55,7 @@ void PfdQmlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     m_widget->setLatitude(m->latitude());
     m_widget->setLongitude(m->longitude());
     m_widget->setAltitude(m->altitude());
+    m_widget->setSettingsMap(m->settings());
 
 #ifdef USE_OSG
     //setup terrain caching

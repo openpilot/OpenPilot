@@ -46,12 +46,13 @@ public:
     double longitude() const { return m_longitude; }
     double altitude() const { return m_altitude; }
     bool cacheOnly() const { return m_cacheOnly; }
+    QVariantMap settings() const { return m_settings; }
 
     void saveConfig(QSettings* settings) const;
     IUAVGadgetConfiguration *clone();
 
 private:
-    QString m_qmlFile; // The name of the dial's SVG source file
+    QString m_qmlFile;
     QString m_earthFile; // The name of osgearth terrain file
     bool m_openGLEnabled;
     bool m_terrainEnabled;
@@ -60,6 +61,8 @@ private:
     double m_longitude;
     double m_altitude;
     bool m_cacheOnly;
+
+    QVariantMap m_settings;
 };
 
 #endif // PfdQmlGADGETCONFIGURATION_H

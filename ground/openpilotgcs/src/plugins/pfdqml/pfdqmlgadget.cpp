@@ -18,6 +18,15 @@
 #include "pfdqmlgadgetwidget.h"
 #include "pfdqmlgadgetconfiguration.h"
 
+#include "utils/pathutils.h"
+
+#ifdef USE_OSG
+#include <osgEarth/Registry>
+#include <osgEarth/Cache>
+#include <osgEarth/CachePolicy>
+#include <osgEarthDrivers/cache_filesystem/FileSystemCache>
+#endif
+
 PfdQmlGadget::PfdQmlGadget(QString classId, PfdQmlGadgetWidget *widget, QWidget *parent) :
         IUAVGadget(classId, parent),
         m_widget(widget)
@@ -47,15 +56,19 @@ void PfdQmlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     m_widget->setLongitude(m->longitude());
     m_widget->setAltitude(m->altitude());
 
-    //setting OSGEARTH_CACHE_ONLY seems to work the most reliably
-    //between osgEarth versions I tried
-    if (m->cacheOnly()) {
-        qputenv("OSGEARTH_CACHE_ONLY", "true");
-    } else {
-#ifdef Q_OS_WIN32
-        qputenv("OSGEARTH_CACHE_ONLY", "");
-#else
-        unsetenv("OSGEARTH_CACHE_ONLY");
-#endif
+#ifdef USE_OSG
+    //setup terrain caching
+    QString cacheDir = Utils::PathUtils().GetStoragePath()+QLatin1String("osgEarth_cache");
+    osgEarth::Drivers::FileSystemCacheOptions cacheOptions;
+    cacheOptions.rootPath() = cacheDir.toStdString();
+
+    osgEarth::Cache *cache = osgEarth::Drivers::CacheFactory::create(cacheOptions);
+    if (cache) {
+        osgEarth::CachePolicy policy = m->cacheOnly() ?
+                    osgEarth::CachePolicy::USAGE_CACHE_ONLY :
+                    osgEarth::CachePolicy::USAGE_READ_WRITE;
+        osgEarth::Registry::instance()->setDefaultCachePolicy(policy);
+        osgEarth::Registry::instance()->setCache(cache);
     }
+#endif //USE_OSG
 }

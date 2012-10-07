@@ -92,7 +92,7 @@ QString WelcomeMode::name() const
 
 QIcon WelcomeMode::icon() const
 {
-    return QIcon(QLatin1String(":/core/images/openpilot_logo_64.png"));
+    return QIcon(QLatin1String(":/core/images/openpiloticon.png"));
 }
 
 int WelcomeMode::priority() const
@@ -125,6 +125,11 @@ void WelcomeMode::openUrl(const QString &url)
 void WelcomeMode::openPage(const QString &page)
 {
     Core::ModeManager::instance()->activateModeByWorkspaceName(page);
+}
+
+void WelcomeMode::triggerAction(const QString &actionId)
+{
+    Core::ModeManager::instance()->triggerAction(actionId);
 }
 
 } // namespace Welcome

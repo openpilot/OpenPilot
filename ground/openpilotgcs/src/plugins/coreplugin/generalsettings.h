@@ -69,7 +69,6 @@ private slots:
     void resetLanguage();
     void showHelpForExternalEditor();
     void slotAutoConnect(int);
-    void showHidden();
 
 private:
     void fillLanguageBox() const;
@@ -86,17 +85,6 @@ private:
     QList<QTextCodec *> m_codecs;
 
 };
-class globalSettingsWidget:public QWidget
-{
-    Q_OBJECT
-public:
-    globalSettingsWidget(QWidget * parent);
-protected:
-    void keyPressEvent(QKeyEvent *);
-signals:
-    void showHidden();
-};
-
 } // namespace Internal
 } // namespace Core
 

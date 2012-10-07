@@ -21,7 +21,10 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
-    <number>-1</number>
+    <number>6</number>
+   </property>
+   <property name="margin">
+    <number>12</number>
    </property>
    <item>
     <widget class="QTabWidget" name="Autotune_tabs">
@@ -33,42 +36,10 @@
        <string>Pre-Autotune</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_5">
-       <property name="leftMargin">
+       <property name="margin">
         <number>12</number>
        </property>
-       <property name="rightMargin">
-        <number>12</number>
-       </property>
-       <property name="bottomMargin">
-        <number>12</number>
-       </property>
-       <item row="1" column="0">
-        <spacer name="horizontalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="2">
-        <spacer name="horizontalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="0" colspan="3">
+       <item row="3" column="0" colspan="3">
         <widget class="QTextEdit" name="textEdit">
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
@@ -80,28 +51,55 @@
           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:20pt; font-weight:600; color:#ff0000;&quot;&gt;WARNING:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This is an experimental plugin for the GCS that is going to make your aircraft shake etc so test with lots of space and be &lt;span style=&quot; font-weight:600;&quot;&gt;very very wary&lt;/span&gt; for it creating bad tuning values.  Basically there is no reason to think this will work at all.&lt;br /&gt;&lt;br /&gt;To use autotuning, here are the steps:&lt;/p&gt;
-&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Go to the UAVOBrowser and under HwSettings.OptionalModules enable Autotune.  Click send then save.  Power cycle your board (disconnect battery AND usb).&lt;br /&gt;&lt;/li&gt;
-&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;In Input configuration set one of your flight modes to &amp;quot;Autotune&amp;quot;&lt;br /&gt;&lt;/li&gt;
-&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Take off, flip to autotune, keep it in the air while it's shaking&lt;br /&gt;&lt;/li&gt;
-&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Land and disarm.  (note - you &lt;span style=&quot; font-weight:600;&quot;&gt;MUST&lt;/span&gt; stay in autotune mode through this point, leaving autotune before disarming aborts the process)&lt;br /&gt;&lt;/li&gt;
-&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;We'd recommend checking your stabilization settings before trying them out. &lt;br /&gt;&lt;/li&gt;
-&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Test fly then new settings&lt;/li&gt;
-&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you're ready to proceed, click the &amp;quot;Enable Autotune Module&amp;quot; checkbox below this text, and go to the next tab.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:20pt; font-weight:600; color:#ff0000;&quot;&gt;WARNING:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Lucida Grande'; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot;&gt;This is an experimental plugin for the GCS that is going to make your aircraft shake, etc, so test with lots of space and be &lt;/span&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:13pt; font-weight:600;&quot;&gt;very very wary&lt;/span&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot;&gt; for it creating bad tuning values.  Basically there is no reason to think this will work at all.&lt;br /&gt;&lt;br /&gt;To use autotuning, here are the steps:&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;On the &lt;span style=&quot; font-style:italic;&quot;&gt;Input configuration&lt;/span&gt; tab, &lt;span style=&quot; font-style:italic;&quot;&gt;Flight Mode Switch Settings&lt;/span&gt;, set one of your flight modes to &amp;quot;Autotune&amp;quot;.&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Take off, change flight mode to autotune, keep it in the air while it's shaking.&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Land and disarm.  (note - you &lt;span style=&quot; font-weight:600;&quot;&gt;MUST&lt;/span&gt; stay in autotune mode through this point, leaving autotune before disarming aborts the process)&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;We'd recommend checking your stabilization settings before trying them out (ie: compare to what you currently use, if they are VASTLY different, probably a good indication bad things will happen).&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Test fly the new settings.&lt;/li&gt;
+&lt;li style=&quot; font-family:'Lucida Grande'; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you're ready to proceed, click the &lt;span style=&quot; font-style:italic;&quot;&gt;Enable Autotune Module&lt;/span&gt; checkbox above this text, click &lt;span style=&quot; font-style:italic;&quot;&gt;save&lt;/span&gt; and go to the next tab.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QCheckBox" name="enableAutoTune">
-         <property name="text">
-          <string>Enable Autotune Module</string>
+       <item row="2" column="0" colspan="3">
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="title">
+          <string>Module Control</string>
          </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QCheckBox" name="enableAutoTune">
+            <property name="text">
+             <string>Enable Autotune Module</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>454</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+         <zorder>horizontalSpacer_5</zorder>
+         <zorder>enableAutoTune</zorder>
+         <zorder>horizontalSpacer_4</zorder>
+         <zorder>enableAutoTune</zorder>
+         <zorder>horizontalSpacer_5</zorder>
         </widget>
        </item>
       </layout>
@@ -194,8 +192,8 @@ p, li { white-space: pre-wrap; }
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>709</width>
-            <height>588</height>
+            <width>711</width>
+            <height>596</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -690,8 +688,6 @@ Useful if you have accidentally changed some settings.</string>
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../coreplugin/core.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

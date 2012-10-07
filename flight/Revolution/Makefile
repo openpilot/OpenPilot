@@ -255,7 +255,10 @@ endif
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)
 
-CFLAGS += -DDIAGNOSTICS
+CFLAGS += -DSTACK_DIAGNOSTICS
+CFLAGS += -DMIXERSTATUS_DIAGNOSTICS
+CFLAGS += -DRATEDESIRED_DIAGNOSTICS
+CFLAGS += -DI2C_WDG_STATS_DIAGNOSTICS
 CFLAGS += -DDIAG_TASKS
 
 # This is not the best place for these.  Really should abstract out

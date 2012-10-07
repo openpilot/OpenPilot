@@ -1,23 +1,32 @@
 <RCC>
     <qresource prefix="/configgadget">
         <file>images/help2.png</file>
-        <file>images/Airframe.png</file>
-        <file>images/Servo.png</file>
         <file>images/ahrs-calib.svg</file>
-        <file>images/AHRS-v1.3.png</file>
         <file>images/paper-plane.svg</file>
         <file>images/curve-bg.svg</file>
         <file>images/multirotor-shapes.svg</file>
         <file>images/ccpm_setup.svg</file>
         <file>images/PipXtreme.png</file>
-        <file>images/Transmitter.png</file>
         <file>images/help.png</file>
         <file>images/coptercontrol.svg</file>
-        <file>images/hw_config.png</file>
-        <file>images/gyroscope.png</file>
-        <file>images/TX.svg</file>
         <file>images/TX2.svg</file>
-        <file>images/camera.png</file>
-        <file>images/txpid.png</file>
+        <file>images/output_selected.png</file>
+        <file>images/output_normal.png</file>
+        <file>images/input_selected.png</file>
+        <file>images/input_normal.png</file>
+        <file>images/hardware_normal.png</file>
+        <file>images/hardware_selected.png</file>
+        <file>images/vehicle_normal.png</file>
+        <file>images/vehicle_selected.png</file>
+        <file>images/ins_selected.png</file>
+        <file>images/ins_normal.png</file>
+        <file>images/stabilization_selected.png</file>
+        <file>images/stabilization_normal.png</file>
+        <file>images/autotune_selected.png</file>
+        <file>images/autotune_normal.png</file>
+        <file>images/txpid_selected.png</file>
+        <file>images/txpid_normal.png</file>
+        <file>images/camstab_selected.png</file>
+        <file>images/camstab_normal.png</file>
     </qresource>
 </RCC>

@@ -322,8 +322,6 @@ void ConfigCcpmWidget::UpdateType()
     AdjustmentAngle=SingleServoIndex*90;
 
     m_ccpm->PitchCurve->setVisible(1);
-    //m_ccpm->customThrottleCurve2Value->setVisible(1);
-    //m_ccpm->label_41->setVisible(1);
 
     NumServosDefined=4;
     //set values for pre defined heli types
@@ -339,7 +337,6 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=2;
 
     }
@@ -352,7 +349,6 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
         
     }
@@ -362,7 +358,6 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 180,360));
             m_ccpm->ccpmAngleZ->setValue(fmod(AdjustmentAngle + 270,360));
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             m_ccpm->ccpmSingleServo->setEnabled(0);
             m_ccpm->ccpmSingleServo->setCurrentIndex(0);
             NumServosDefined=4;
@@ -377,7 +372,6 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
             
     }
@@ -390,7 +384,6 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
 
     }
@@ -406,15 +399,12 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
 
             m_ccpm->ccpmCollectivespinBox->setEnabled(0);
             m_ccpm->ccpmCollectiveSlider->setEnabled(0);
             m_ccpm->ccpmCollectivespinBox->setValue(0);
             m_ccpm->ccpmCollectiveSlider->setValue(0);
             m_ccpm->PitchCurve->setVisible(0);
-            //m_ccpm->customThrottleCurve2Value->setVisible(0);
-            //m_ccpm->label_41->setVisible(0);
             NumServosDefined=2;
     }
     else if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive)==0)
@@ -429,15 +419,12 @@ void ConfigCcpmWidget::UpdateType()
         m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
         m_ccpm->ccpmServoYChannel->setEnabled(0);
         m_ccpm->ccpmServoZChannel->setEnabled(0);
-        //m_ccpm->ccpmCorrectionAngle->setValue(0);
 
         m_ccpm->ccpmCollectivespinBox->setEnabled(0);
         m_ccpm->ccpmCollectiveSlider->setEnabled(0);
         m_ccpm->ccpmCollectivespinBox->setValue(0);
         m_ccpm->ccpmCollectiveSlider->setValue(0);
         m_ccpm->PitchCurve->setVisible(0);
-        //m_ccpm->customThrottleCurve2Value->setVisible(0);
-        //m_ccpm->label_41->setVisible(0);
         NumServosDefined=2;
 
     }
@@ -474,11 +461,11 @@ void ConfigCcpmWidget::UpdateType()
     m_ccpm->ccpmAngleZ->setVisible(NumServosDefined>=4);
     
 
-        m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();
-        for (int i=0;i<6;i++) {
-            m_ccpm->ccpmAdvancedSettingsTable->setColumnWidth(i,(m_ccpm->ccpmAdvancedSettingsTable->width()-
-                                                            m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
-        }
+    m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();
+    for (int i=0;i<6;i++) {
+        m_ccpm->ccpmAdvancedSettingsTable->setColumnWidth(i,(m_ccpm->ccpmAdvancedSettingsTable->width()-
+                                                             m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
+    }
 
     //update UI
     ccpmSwashplateUpdate();

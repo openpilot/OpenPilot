@@ -40,7 +40,7 @@ namespace Utils {
         public:
 			HomeLocationUtil();
 
-			int getDetails(double LLA[3], double ECEF[3], double RNE[9], double Be[3]);
+            int getDetails(double LLA[3], double Be[3]);
 
         private:
 

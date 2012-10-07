@@ -25,7 +25,8 @@ PfdQmlGadgetConfiguration::PfdQmlGadgetConfiguration(QString classId, QSettings 
     IUAVGadgetConfiguration(classId, parent),
     m_qmlFile("Unknown"),
     m_earthFile("Unknown"),
-    m_terrainEnabled(true),
+    m_openGLEnabled(true),
+    m_terrainEnabled(false),
     m_actualPositionUsed(false),
     m_latitude(0),
     m_longitude(0),
@@ -40,6 +41,7 @@ PfdQmlGadgetConfiguration::PfdQmlGadgetConfiguration(QString classId, QSettings 
         m_earthFile = qSettings->value("earthFile").toString();
         m_earthFile=Utils::PathUtils().InsertDataPath(m_earthFile);
 
+        m_openGLEnabled = qSettings->value("openGLEnabled", true).toBool();
         m_terrainEnabled = qSettings->value("terrainEnabled").toBool();
         m_actualPositionUsed = qSettings->value("actualPositionUsed").toBool();
         m_latitude = qSettings->value("latitude").toDouble();
@@ -57,6 +59,7 @@ IUAVGadgetConfiguration *PfdQmlGadgetConfiguration::clone()
 {
     PfdQmlGadgetConfiguration *m = new PfdQmlGadgetConfiguration(this->classId());
     m->m_qmlFile = m_qmlFile;
+    m->m_openGLEnabled = m_openGLEnabled;
     m->m_earthFile = m_earthFile;
     m->m_terrainEnabled = m_terrainEnabled;
     m->m_actualPositionUsed = m_actualPositionUsed;
@@ -78,6 +81,7 @@ void PfdQmlGadgetConfiguration::saveConfig(QSettings* qSettings) const {
     QString earthFile = Utils::PathUtils().RemoveDataPath(m_earthFile);
     qSettings->setValue("earthFile", earthFile);
 
+    qSettings->setValue("openGLEnabled", m_openGLEnabled);
     qSettings->setValue("terrainEnabled", m_terrainEnabled);
     qSettings->setValue("actualPositionUsed", m_actualPositionUsed);
     qSettings->setValue("latitude", m_latitude);

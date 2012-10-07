@@ -88,6 +88,7 @@ private:
           PAGE_SAVE, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_REBOOT, PAGE_END, PAGE_UPDATE};
     void createPages();
     bool saveHardwareSettings() const;
+    bool canAutoUpdate() const;
 
     CONTROLLER_TYPE m_controllerType;
     VEHICLE_TYPE m_vehicleType;

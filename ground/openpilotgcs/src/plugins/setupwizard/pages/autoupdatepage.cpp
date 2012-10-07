@@ -11,10 +11,10 @@ AutoUpdatePage::AutoUpdatePage(SetupWizard *wizard, QWidget *parent) :
     ui(new Ui::AutoUpdatePage)
 {
     ui->setupUi(this);
-    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
-    UploaderGadgetFactory * uploader=pm->getObject<UploaderGadgetFactory>();
-    if(!uploader->isAutoUpdateCapable())
-        wizard->next();//FIXME DOESN'T WORK
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UploaderGadgetFactory *uploader = pm->getObject<UploaderGadgetFactory>();
+    Q_ASSERT(uploader);
     connect(ui->startUpdate,SIGNAL(clicked()),uploader,SIGNAL(autoUpdate()));
     connect(uploader,SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep,QVariant)),this,SLOT(updateStatus(uploader::AutoUpdateStep,QVariant)));
 }

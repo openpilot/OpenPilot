@@ -46,6 +46,7 @@
 #include "vehicleconfigurationhelper.h"
 #include "actuatorsettings.h"
 #include "pages/autoupdatepage.h"
+#include "uploader/uploadergadgetfactory.h"
 
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfigurationSource(),
     m_controllerType(CONTROLLER_UNKNOWN),
@@ -67,7 +68,11 @@ int SetupWizard::nextId() const
 {
     switch (currentId()) {
         case PAGE_START:
-            return PAGE_UPDATE;
+            if(canAutoUpdate()) {
+                return PAGE_UPDATE;
+            } else {
+                return PAGE_CONTROLLER;
+            }
         case PAGE_UPDATE:
             return PAGE_CONTROLLER;
         case PAGE_CONTROLLER: {
@@ -307,4 +312,13 @@ bool SetupWizard::saveHardwareSettings() const
 {
     VehicleConfigurationHelper helper(const_cast<SetupWizard *>(this));
     return helper.setupHardwareSettings();
+}
+
+bool SetupWizard::canAutoUpdate() const
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UploaderGadgetFactory *uploader = pm->getObject<UploaderGadgetFactory>();
+    Q_ASSERT(uploader);
+    return uploader->isAutoUpdateCapable();
 }

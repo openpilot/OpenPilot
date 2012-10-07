@@ -23,6 +23,7 @@
  #####
 
 BOARD_NAME=revolution
+TCHAIN_PREFIX ?= 
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
 TOP      := $(realpath $(WHEREAMI)/../../)
 include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
@@ -124,8 +125,6 @@ UAVOBJPYTHONSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/python
 
 MODNAMES = $(notdir ${MODULES})
 
-ifndef TESTAPP
-
 ## PyMite files
 SRC += $(OUTDIR)/pmlib_img.c
 SRC += $(OUTDIR)/pmlib_nat.c
@@ -146,18 +145,10 @@ SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
-else
-## TESTCODE
-SRC += $(OPTESTS)/test_common.c
-SRC += $(OPTESTS)/$(TESTAPP).c
-endif
 
 
 
-## UAVOBJECTS
-ifndef TESTAPP
-#include $(UAVOBJSYNTHDIR)/Makefile.inc
-include ./UAVObjects.inc
+include $(WHEREAMI)/UAVObjects.inc
 
 UAVOBJSRCFILENAMES += attitudesimulated
 UAVOBJSRC = $(foreach UAVOBJSRCFILE,$(UAVOBJSRCFILENAMES),$(UAVOBJSYNTHDIR)/$(UAVOBJSRCFILE).c )
@@ -165,7 +156,6 @@ UAVOBJDEFINE = $(foreach UAVOBJSRCFILE,$(UAVOBJSRCFILENAMES),-DUAVOBJ_INIT_$(UAV
 
 SRC += $(UAVOBJSRC)
 CFLAGS_UAVOBJECTS = $(UAVOBJDEFINE)
-endif
 
 ## PIOS Hardware (posix)
 SRC += $(PIOSPOSIX)/pios_crc.c
@@ -411,8 +401,18 @@ MSG_ASMFROMC = ${quote}Creating asm-File from C-Source:${quote}
 MSG_ASMFROMC_ARM = ${quote}Creating asm-File from C-Source (ARM-only):${quote}
 MSG_PYMITEINIT = ${quote}**** Generating PyMite intermediate code${quote}
 
+$(OUTDIR)/sim_osx_firmwareinfo.c: $(TOP)/make/templates/firmwareinfotemplate_sim.c
+	$(V1) python $(TOP)/make/scripts/version-info.py \
+		--path=$(TOP) \
+		--template=$(TOP)/make/templates/firmwareinfotemplate_sim.c \
+		--outfile=$(TOP)/build/sim_osx/sim_osx_firmwareinfo.c \
+		--image=$(TOP)/build/fw_revolution/fw_revolution.elf \
+		--type=9 \
+		--revision=1 \
+		--uavodir=$(TOP)/shared/uavobjectdefinition
+
 # List of all source files.
-ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
+ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC) $(OUTDIR)/sim_osx_firmwareinfo.c
 # List of all source files without directory and file-extension.
 ALLSRCBASE = $(notdir $(basename $(ALLSRC)))
 
@@ -512,21 +512,6 @@ sizeafter:
 gccversion :
 	@$(CC) --version
 #	@echo $(ALLOBJ)
-
-# Program the device.
-ifeq ($(USE_BOOTLOADER), YES)
-# Program the device with OP Upload Tool".
-program: $(OUTDIR)/$(TARGET).bin
-	@echo ${quote}Programming with OP Upload Tool${quote}
-	../../ground/src/experimental/upload-build-desktop/debug/OPUploadTool -d 0 -p $(OUTDIR)/$(TARGET).bin
-else
-ifeq ($(FLASH_TOOL),OPENOCD)
-# Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
-program: $(OUTDIR)/$(TARGET).elf
-	@echo ${quote}Programming with OPENOCD${quote}
-	$(OOCD_EXE) $(OOCD_CL)
-endif
-endif
 
 # Create final output file (.hex) from ELF output file.
 %.hex: %.elf

@@ -24,27 +24,6 @@ Rectangle {
         smooth: true
     }
 
-    Column {
-        id: wizarButtonsColumn
-
-        anchors {
-            top: parent.top
-            right: parent.right
-            margins: 8
-        }
-        spacing: 8
-
-        WelcomePageButton {
-            baseIconName: "bttn-vehwizard"
-            onClicked: welcomePlugin.openPage("VehWizard")
-        }
-
-        WelcomePageButton {
-            baseIconName: "bttn-txwizard"
-            onClicked: welcomePlugin.openPage("TxWizard")
-        }
-    }
-
 
     Column {
         id: buttonsGrid
@@ -58,8 +37,7 @@ Rectangle {
         Row {
             //if the buttons grid overlaps vertically with the wizard buttons,
             //move it left to use only the space left to wizard buttons
-            property real availableWidth: buttonsGrid.y > wizarButtonsColumn.y+wizarButtonsColumn.height ?
-                                           container.width : wizarButtonsColumn.x
+            property real availableWidth: container.width
             x: (availableWidth-width)/2
             spacing: 16
 
@@ -69,7 +47,7 @@ Rectangle {
                 anchors.verticalCenterOffset: -2 //it looks better aligned to icons grid
 
                 //hide the logo on the very small screen to fit the buttons
-                visible: parent.availableWidth > width + parent.spacing + buttons.width
+                visible: parent.availableWidth > width + parent.spacing + buttons.width + wizard.width
             }
 
             Grid {
@@ -96,7 +74,7 @@ Rectangle {
                     onClicked: welcomePlugin.openPage("System")
                 }
 
-                WelcomePageButton {
+               WelcomePageButton {
                     baseIconName: "scopes"
                     label: "Scopes"
                     onClicked: welcomePlugin.openPage("Scopes")
@@ -114,6 +92,14 @@ Rectangle {
                     onClicked: welcomePlugin.openPage("Firmware")
                 }
             } //icons grid
+
+            WelcomePageButton {
+                id: wizard
+                anchors.verticalCenter: parent.verticalCenter
+                baseIconName: "wizard"
+                onClicked: welcomePlugin.triggerAction("SetupWizardPlugin.ShowSetupWizard")
+            }
+
         } // images row
 
         CommunityPanel {

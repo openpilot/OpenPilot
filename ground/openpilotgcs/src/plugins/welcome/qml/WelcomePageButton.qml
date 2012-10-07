@@ -4,7 +4,7 @@ import QtQuick 1.1
 Item {
     id: welcomeButton
     width: Math.max(116, icon.width)
-    height: 116
+    height: icon.height
     z: 0
 
     property string baseIconName

@@ -128,7 +128,7 @@ static void PIOS_DSM_Bind(struct pios_dsm_dev *dsm_dev, uint8_t bind)
 	GPIO_SetBits(cfg->bind.gpio, cfg->bind.init.GPIO_Pin);
 
 	/* on CC works up to 140ms, guess bind window is around 20-140ms after power up */
-	PIOS_DELAY_WaitmS(60);
+	PIOS_DELAY_WaitmS(20);
 
 	for (int i = 0; i < bind ; i++) {
 		/* RX line, drive low for 120us */

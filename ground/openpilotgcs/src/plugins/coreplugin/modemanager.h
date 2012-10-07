@@ -82,6 +82,7 @@ public slots:
     void activateMode(const QString &id);
     void activateModeByWorkspaceName(const QString &id);
     void setFocusToCurrentMode();
+    void triggerAction(const QString &actionId);
 
 private slots:
     void objectAdded(QObject *obj);

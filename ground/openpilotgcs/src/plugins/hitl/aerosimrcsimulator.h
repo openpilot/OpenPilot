@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       hitlv2configuration.h
+ * @file       aerosimrc.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010-2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -25,37 +25,49 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef HITLV2CONFIGURATION_H
-#define HITLV2CONFIGURATION_H
+#ifndef AEROSIMRC_H
+#define AEROSIMRC_H
 
-#include <coreplugin/iuavgadgetconfiguration.h>
-#include <QtGui/QColor>
-#include <QString>
-#include <simulatorv2.h>
+#include <QObject>
+#include <QVector3D>
+#include <QQuaternion>
+#include <QMatrix4x4>
+#include "simulator.h"
 
-using namespace Core;
-
-class HITLConfiguration : public IUAVGadgetConfiguration
+class AeroSimRCSimulator: public Simulator
 {
-
     Q_OBJECT
 
-    Q_PROPERTY(SimulatorSettings settings READ Settings WRITE setSimulatorSettings)
-
 public:
-    explicit HITLConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+    AeroSimRCSimulator(const SimulatorSettings &params);
+    ~AeroSimRCSimulator();
 
-    void saveConfig(QSettings* settings) const;
-    IUAVGadgetConfiguration *clone();
+    bool setupProcess();
+    void setupUdpPorts(const QString& host, int inPort, int outPort);
 
-    SimulatorSettings Settings() const { return settings; }
-
-public slots:
-    void setSimulatorSettings (const SimulatorSettings& params ) { settings = params; }
-
+private slots:
+    void transmitUpdate();
 
 private:
-    SimulatorSettings settings;
+    quint32 udpCounterASrecv;   //keeps track of udp packets received by ASim
+
+    void processUpdate(const QByteArray &data);
+
+    void asMatrix2Quat(const QMatrix4x4 &m, QQuaternion &q);
+    void asMatrix2RPY(const QMatrix4x4 &m, QVector3D &rpy);
 };
 
-#endif // HITLV2CONFIGURATION_H
+class AeroSimRCSimulatorCreator : public SimulatorCreator
+{
+public:
+    AeroSimRCSimulatorCreator(const QString &classId, const QString &description)
+        : SimulatorCreator (classId, description)
+    {}
+
+    Simulator* createSimulator(const SimulatorSettings &params)
+    {
+        return new AeroSimRCSimulator(params);
+    }
+};
+
+#endif // AEROSIMRC_H

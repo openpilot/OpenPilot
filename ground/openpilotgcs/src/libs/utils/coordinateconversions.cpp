@@ -257,5 +257,26 @@ void CoordinateConversions::Quaternion2R(const float q[4], float Rbe[3][3])
 	Rbe[2][2] = q0s - q1s - q2s + q3s;
 }
 
+//** Find quaternion vector from a rotation matrix, Rbe, a matrix which rotates a vector from earth frame to body frame **
+void CoordinateConversions::R2Quaternion(float const Rbe[3][3], float q[4])
+{
+    qreal w, x, y, z;
+
+    // w always >= 0
+    w = sqrt(std::max(0.0, 1.0 + Rbe[0][0] + Rbe[1][1] + Rbe[2][2])) / 2.0;
+    x = sqrt(std::max(0.0, 1.0 + Rbe[0][0] - Rbe[1][1] - Rbe[2][2])) / 2.0;
+    y = sqrt(std::max(0.0, 1.0 - Rbe[0][0] + Rbe[1][1] - Rbe[2][2])) / 2.0;
+    z = sqrt(std::max(0.0, 1.0 - Rbe[0][0] - Rbe[1][1] + Rbe[2][2])) / 2.0;
+
+    x = copysign(x, (Rbe[1][2] - Rbe[2][1]));
+    y = copysign(y, (Rbe[2][0] - Rbe[0][2]));
+    z = copysign(z, (Rbe[0][1] - Rbe[1][0]));
+
+    q[0]=w;
+    q[1]=x;
+    q[2]=y;
+    q[3]=z;
+}
+
 
 }

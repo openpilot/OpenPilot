@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       mapplugin.cpp
+ * @file       hitlwidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -24,50 +24,49 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "hitlplugin.h"
-#include "hitlfactory.h"
-#include <QtPlugin>
-#include <QStringList>
-#include <extensionsystem/pluginmanager.h>
-#include "fgsimulator.h"
-#include "il2simulator.h"
-#include "xplanesimulator.h"
 
-QList<SimulatorCreator* > HITLPlugin::typeSimulators;
+#ifndef HITLWIDGET_H
+#define HITLWIDGET_H
 
-HITLPlugin::HITLPlugin()
+#include <QtGui/QWidget>
+#include <QProcess>
+#include "simulator.h"
+
+class Ui_HITLWidget;
+
+class HITLWidget : public QWidget
 {
-   // Do nothing
-}
+    Q_OBJECT
 
-HITLPlugin::~HITLPlugin()
-{
-   // Do nothing
-}
+public:
+    HITLWidget(QWidget *parent = 0);
+    ~HITLWidget();
 
-bool HITLPlugin::initialize(const QStringList& args, QString *errMsg)
-{
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new HITLFactory(this);
+	void setSettingParameters(const SimulatorSettings& params) {settings = params;}
+signals:
+	void deleteSimulator();
 
-   addAutoReleasedObject(mf);
+private slots:
+    void startButtonClicked();
+    void stopButtonClicked();
+	void buttonClearLogClicked();
+    void onProcessOutput(QString text);
+    void onAutopilotConnect();
+    void onAutopilotDisconnect();
+	void onSimulatorConnect();
+	void onSimulatorDisconnect();
 
-   addSimulator(new FGSimulatorCreator("FG","FlightGear"));
-   addSimulator(new IL2SimulatorCreator("IL2","IL2"));
-   addSimulator(new XplaneSimulatorCreator("X-Plane","X-Plane"));
+private:
+    Ui_HITLWidget* widget;
+	Simulator* simulator;
+	SimulatorSettings settings;
 
-   return true;
-}
+	QString greenColor;
+	QString strAutopilotDisconnected;
+	QString strSimulatorDisconnected;
+	QString strAutopilotConnected;
+    QString strStyleEnable;
+    QString strStyleDisable;
+};
 
-void HITLPlugin::extensionsInitialized()
-{
-   // Do nothing
-}
-
-void HITLPlugin::shutdown()
-{
-   // Do nothing
-}
-Q_EXPORT_PLUGIN(HITLPlugin)
-
+#endif /* HITLWIDGET_H */

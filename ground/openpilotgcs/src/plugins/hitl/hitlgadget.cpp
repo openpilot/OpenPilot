@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       hitlv2gadget.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010-2012.
+ * @file       hitl.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup HITLPlugin HITLv2 Plugin
+ * @addtogroup HITLPlugin HITL Plugin
  * @{
- * @brief The Hardware In The Loop plugin version 2
+ * @brief The Hardware In The Loop plugin 
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,37 +24,28 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#include "hitlgadget.h"
+#include "hitlwidget.h"
+#include "hitlconfiguration.h"
+#include "simulator.h"
 
-#ifndef HITLV2_H
-#define HITLV2_H
-
-#include <coreplugin/iuavgadget.h>
-#include "hitlv2widget.h"
-
-class IUAVGadget;
-class QWidget;
-class QString;
-class Simulator;
-
-using namespace Core;
-
-class HITLGadget : public Core::IUAVGadget
+HITLGadget::HITLGadget(QString classId, HITLWidget *widget, QWidget *parent) :
+        IUAVGadget(classId, parent),
+        m_widget(widget)
 {
-    Q_OBJECT
-public:
-    HITLGadget(QString classId, HITLWidget *widget, QWidget *parent = 0);
-    ~HITLGadget();
+	connect(this,SIGNAL(changeConfiguration(void)),m_widget,SLOT(stopButtonClicked(void)));
+}
 
-    QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+HITLGadget::~HITLGadget()
+{
+    delete m_widget;
+}
 
-signals:
-    void changeConfiguration();
+void HITLGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+{
+    HITLConfiguration *m = qobject_cast<HITLConfiguration*>(config);
+    // IL2 <-- Is this still necessary? [KDS]
+	emit changeConfiguration();
+	m_widget->setSettingParameters(m->Settings());
+}
 
-private:
-    HITLWidget* m_widget;
-    Simulator* simulator;
-};
-
-
-#endif // HITLV2_H

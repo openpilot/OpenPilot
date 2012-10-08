@@ -11,6 +11,7 @@
 
 #include "rtslam/gaussian.hpp"
 #include "image/Image.hpp"
+#include "jmath/jblas.hpp"
 
 namespace jafar {
 	namespace image {
@@ -34,9 +35,7 @@ namespace jafar {
 				return gauss2rect(x, dx, dy);
 		}
 
-		cv::Rect gauss2rect(const rtslam::Gaussian & g, double sigma = 3.0){
-			return gauss2rect(g.x(), g.P(), sigma);
-		}
+		cv::Rect gauss2rect(const rtslam::Gaussian & g, double sigma = 3.0);
 
 		/**
 		 * Extract patch from image.
@@ -44,13 +43,7 @@ namespace jafar {
 		 * \param pix central pixel of the patch
 		 * \param patch resulting patch
 		 */
-		void extractPatch(const Image & src, const vec2 & pix, Image & patch){
- 			int shift_x = (patch.width()-1)/2;
- 			int shift_y = (patch.height()-1)/2;
- 			int x_src = (int)(pix(0)-0.5) - shift_x;
- 			int y_src = (int)(pix(1)-0.5) - shift_y;
- 			src.copy(patch, x_src, y_src, 0, 0, patch.width(), patch.height());
-		}
+		void extractPatch(const Image & src, const jblas::vec2 & pix, Image & patch);
 
 		/**
 		 * Crate and extract patch from image.
@@ -60,12 +53,8 @@ namespace jafar {
 		 * \param height patch height in pixels (must be odd number)
 		 * \return patch resulting patch
 		 */
-		Image extractPatch(const Image & src, const vec2 & pix, int width, int height){
-			Image patch(width, height, src.depth(), src.colorSpace());
-			extractPatch(src, pix, width, height);
-			return patch;
-		}
-
+		Image extractPatch(const Image & src, const jblas::vec2 & pix, int width, int height);
+		
 	}
 }
 

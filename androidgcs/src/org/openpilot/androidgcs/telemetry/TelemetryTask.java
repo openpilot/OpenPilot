@@ -9,6 +9,7 @@ import java.util.Observer;
 import org.openpilot.uavtalk.Telemetry;
 import org.openpilot.uavtalk.TelemetryMonitor;
 import org.openpilot.uavtalk.UAVObject;
+import org.openpilot.uavtalk.UAVObjectField;
 import org.openpilot.uavtalk.UAVObjectManager;
 import org.openpilot.uavtalk.UAVTalk;
 import org.openpilot.uavtalk.uavobjects.TelemObjectsInitialize;
@@ -96,9 +97,21 @@ public abstract class TelemetryTask implements Runnable {
 		@Override
 		public void update(Observable observable, Object data) {
 			Log.d(TAG, "Received firmware IAP Updated message");
-			telemService.loadUavobjects("uavobjects.jar", objMngr);
 
 			UAVObject obj = objMngr.getObject("FirmwareIAPObj");
+			UAVObjectField description = obj.getField("Description");
+			if(description == null || description.getNumElements() < 100) {
+				telemService.toastMessage("Failed to determine UAVO set");
+			} else {
+				final int HASH_SIZE_USED = 8;
+				String jarName = new String();
+				for(int i = 0; i < HASH_SIZE_USED; i++)
+					jarName += Integer.toHexString((int) description.getDouble(i+60));
+				jarName += ".jar";
+				Log.d(TAG, "Attempting to load: " + jarName);
+				telemService.loadUavobjects(jarName, objMngr);
+			}
+
 			obj.removeUpdatedObserver(this);
 		}
 	};

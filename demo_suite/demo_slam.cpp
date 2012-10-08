@@ -157,6 +157,7 @@
 
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
 #include "rtslam/hardwareSensorCameraUeye.hpp"
+#include "rtslam/hardwareSensorCameraOpenCV.hpp"
 #include "rtslam/hardwareEstimatorMti.hpp"
 #include "rtslam/hardwareSensorGpsGenom.hpp"
 #include "rtslam/hardwareSensorMocap.hpp"
@@ -1096,7 +1097,13 @@ void demo_slam_init()
 				#endif
 			} else if (configSetup.CAMERA_TYPE == 2)
 			{ // V4L or VIAM ?
-				std::cerr << "Generic USB cameras not supported yet ; use firewire of ueye camera" << std::endl;
+				int camera_id;
+				std::stringstream ss(configSetup.CAMERA_DEVICE);
+				ss >> camera_id;
+				hardware::hardware_sensor_opencv_ptr_t hardSen11(new hardware::HardwareSensorCameraOpenCV(rawdata_condition, 200,
+					camera_id, cv::Size(img_width,img_height), mode, strOpts[sDataPath]));
+				hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
+				senPtr11->setHardwareSensor(hardSen11);
 			} else if (configSetup.CAMERA_TYPE == 3)
 			{ // UEYE
 				#ifdef HAVE_UEYE
@@ -1112,6 +1119,12 @@ void demo_slam_init()
 					senPtr11->setHardwareSensor(hardSen11);
 				}
 				#endif
+			} else if (configSetup.CAMERA_TYPE == 4)
+			{ // V4L or VIAM ?
+				hardware::hardware_sensor_opencv_ptr_t hardSen11(new hardware::HardwareSensorCameraOpenCV(rawdata_condition, 200,
+					(std::string) configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), mode, strOpts[sDataPath]));
+				hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
+				senPtr11->setHardwareSensor(hardSen11);
 			}
 
 			senPtr11->setIntegrationPolicy(false);

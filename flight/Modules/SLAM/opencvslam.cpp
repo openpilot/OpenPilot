@@ -27,8 +27,7 @@
  */
 
 #include "opencvslam.hpp"
-#include "pyramidsenhanced.hpp"
-#include "ccflow.hpp"
+#include "rtslam.h"
 
 // Private constants
 #define DEG2RAD (3.1415926535897932/180.0)
@@ -47,49 +46,22 @@ OpenCVslam::OpenCVslam(SLAMSettingsData * newsettings) {
 
 
 
-void OpenCVslam::shrinkAndEnhance(const Mat& src, Mat& dst) {
-
-	// Gauss kernel is
-	// 1 4 6 4 1
-	
-	// Laplacian kernel is
-	// -4-0 8 0 -4
-	
-	// target kernel is
-	// -3 4 14 4 -3
-	// or with double laplace
-	// -7 4 22 4 -7
-	/*
-	PyrDownEnhanced enhanced;
-	if (src.cols>320) {
-	//enhanced.pyrDownEnhanced(src,dst,-3,4,14);
-	//enhanced.pyrDownEnhanced(src,dst,-4,4,16);
-	//enhanced.pyrDownEnhanced(src,dst,-5,4,18);
-	//enhanced.pyrDownEnhanced(src,dst,1,4,6);
-	enhanced.pyrDownEnhanced(src,dst,-2,4,12);
-	}
-	else {
-	enhanced.pyrDownEnhanced(src,dst,1,4,6);
-	}*/
-	pyrDown(src,dst);
-	
-}
-
 
 void OpenCVslam::run() {
 
-	Mat* current[6]={NULL}; // "pyramid" of current frame
-	Mat* last[6]={NULL};    // "pyramid" of previous frame
 
-	RNG rng;
-	CCFlow *currentFlow=NULL;
-	CCFlow *lastFlow=NULL;
+	/* Initialize RTSlam */
+	rtslam = new RTSlam();
+
+	rtslam->init();
+
 	/* Initialize OpenCV */
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
 	VideoSource = cvCaptureFromFile("test.avi");
 	//VideoSource = cvCaptureFromCAM(0);
+	
+	VideoDest = NULL;
 	//CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
-	CvVideoWriter *VideoDest = NULL;
 
 	if (VideoSource) {
 		cvSetCaptureProperty(VideoSource, CV_CAP_PROP_FRAME_WIDTH,  settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]);
@@ -98,24 +70,8 @@ void OpenCVslam::run() {
 		currentFrame = cvRetrieveFrame(VideoSource, 0);
 	}
 
-	//Mat flow; // = Mat(480,640,CV_32FC1);
-	//Mat cflow;
-	Mat depthmap=Mat::zeros(120,160,CV_32FC1);
-
-
-	//pyrDown(Mat(currentFrame),current);
-	//
-	//if (currentFrame) lastFrame = cvCloneImage(currentFrame);
-	//Mat(currentFrame).convertTo(current, CV_32F,1/256);
-	//pyrDown(Mat(currentFrame),current);
-	//pyrDown(current,current);
-	//last=current;
-
 	// debug output
 	cvNamedWindow("debug",CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("debug1",CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("debug2",CV_WINDOW_AUTOSIZE);
-	cvNamedWindow("debug3",CV_WINDOW_AUTOSIZE);
 	
 	// synchronization delay, wait for attitude data - any attitude data
 	// this is an evil hack but necessary for tests with log data to synchronize video and telemetry
@@ -135,6 +91,8 @@ void OpenCVslam::run() {
 	int32_t writeextra=0;
 	fprintf(stderr,"init at %i increment is %i at %f fps\n",timeval, increment,settings->FrameRate);
 
+	/** start RTSLAM in its own thread (unknown to freertos since rtslam internally uses boost for thread control) **/
+	backgroundrtslam(rtslam);
 
 	// Main task loop
 	double oldpos=0;
@@ -144,7 +102,7 @@ void OpenCVslam::run() {
 	int iterations;
 	while (1) {
 		frame++;
-		cvWaitKey(1);
+		backgroundWaitKey(1);
 		if (VideoSource) {
 			double pos=cvGetCaptureProperty(VideoSource, CV_CAP_PROP_POS_MSEC);
 			increment=floor((pos-oldpos)*1000.);
@@ -187,6 +145,14 @@ void OpenCVslam::run() {
 		extraincrement = (increment+extraincrement)-PIOS_DELAY_DiffuS(timeval);
 		timeval = PIOS_DELAY_GetRaw();
 
+		// Get the object data
+		AttitudeActualGet(&attitudeActual);
+		PositionActualGet(&positionActual);
+		VelocityActualGet(&velocityActual);
+		rtslam->position(positionActual.North,positionActual.East,positionActual.Down);
+		rtslam->attitude(attitudeActual.q1,attitudeActual.q2,attitudeActual.q3,attitudeActual.q4);
+
+
 		// Grab the current camera image
 		if (VideoSource) {
 			// frame grabbing must take place outside of FreeRTOS scheduler,
@@ -194,112 +160,15 @@ void OpenCVslam::run() {
 			backgroundGrabFrame(VideoSource);
 		}
 		
-		// Get the object data
-		AttitudeActualGet(&attitudeActual);
-		PositionActualGet(&positionActual);
-		VelocityActualGet(&velocityActual);
+		//if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource,0);
+		if (VideoSource) currentFrame = backgroundRetrieveFrame(VideoSource);
 
-		if (VideoSource) currentFrame = cvRetrieveFrame(VideoSource,0);
-
-		vPortEnterCritical();
-		if (currentFrame) {
-			//last=current;
-			if (last[5]) delete last[5];
-			if (last[4])delete last[4];
-			if (last[3])delete last[3];
-			if (last[2])delete last[2];
-			if (last[1])delete last[1];
-			if (last[0])delete last[0];
-			last[5]=current[5];
-			last[4]=current[4];
-			last[3]=current[3];
-			last[2]=current[2];
-			last[1]=current[1];
-			last[0]=current[0];
-			//current[5] = NULL;
-			current[5] = new Mat(currentFrame);
-			current[4] = new Mat();
-			current[3] = new Mat();
-			current[2] = new Mat();
-			current[1] = new Mat();
-			current[0] = new Mat();
-			//current=Mat(currentFrame);
-			shrinkAndEnhance(*current[5],*current[4]);
-			shrinkAndEnhance(*current[4],*current[3]);
-			shrinkAndEnhance(*current[3],*current[2]);
-			shrinkAndEnhance(*current[2],*current[1]);
-			shrinkAndEnhance(*current[1],*current[0]);
-			//flow=*current[3];
-		}
-		if (currentFrame && lastFrame ) {
-			//Mat x1,x2;
-			//cvtColor(last,x1,CV_RGB2GRAY);
-			//cvtColor(current,x2,CV_RGB2GRAY);
-			//flow=x2;
-			//fprintf(stderr,"calculate flow...\n");
-			if (lastFlow) delete lastFlow;
-			lastFlow = currentFlow;
-			//currentFlow = new CCFlow(&rng, last,current,5,Vec3f(0,0,1000),lastFlow);
-			currentFlow = new CCFlow(&rng, last,current,3,Vec3f(0,0,1000),lastFlow);
-			iterations += currentFlow->iterations;
-			//fprintf(stderr,"rotation: %f degrees,\tx: %f\ty: %f\t  %f > %f\t checks: %i avg: %f\n",currentFlow->rotation,currentFlow->translation[0],currentFlow->translation[1],currentFlow->best,currentFlow->worst, currentFlow->iterations, (float)iterations/frame);
-			//vPortEnterCritical();
-			//calcOpticalFlowFarneback(x1,x2, flow, 0.5, 3, 9, 9, 5, 1.1, 0);
-			//calcOpticalFlowFarneback(x1,x2, flow, 0.5, 4, 13, 1, 5, 1.1, 0);
-			//calcOpticalFlowCorvus(last,curent,flow);
-			//vPortExitCritical();
-			//fprintf(stderr,"done\n");
-			//split(flow,sflow);
-			//sflow[2]=sflow[1];
-			//merge(sflow,3,cflow);
-			//fprintf(stderr,".");
-			Mat newdepthmap(120,160,CV_32FC1);
-			Mat cdepthmap(120,160,CV_32FC1);
-			float max=0;
-			float min=1000;
-			for (int x=0;x<160;x++) {
-				for ( int y=0;y<120;y++) {
-					Vec4f local = currentFlow->transrotationSmoothed(Point3f(x*4.,y*4.,5));
-					Vec3f reference = currentFlow->transrotation(Point3f(x/8.,y/8.,0));
-					Vec2f difference(local[0]-reference[0],local[1]-reference[1]);
-					//Vec2f difference(reference[0],reference[1]);
-
-					float length = sqrt(difference[0]*difference[0]+ difference[1]*difference[1]);
-
-					int refcordx=x+local[0]/4.;
-					int refcordy=y+local[1]/4.;
-					if (refcordx<0) refcordx=0;
-					if (refcordx>160-1) refcordx=160-1;
-					if (refcordy<0) refcordy=0;
-					if (refcordy>120-1) refcordy=120-1;
-					newdepthmap.at<float>(y,x)=depthmap.at<float>(refcordy,refcordx);
-					cdepthmap.at<float>(y,x)=length;
-					if (length<min) min=length;
-					if (length>max) max=length;
-				}
-			}
-			float scale=1./(max-min);
-			for (int x=0;x<160;x++) {
-				for ( int y=0;y<120;y++) {
-					Vec4f local = currentFlow->transrotationSmoothed(Point3f(x*4.,y*4.,5));
-					float length = scale*(cdepthmap.at<float>(y,x)-min);
-					float factor = 1/(sqrt(1.+(fabs(local[3]))));
-					float v=factor*newdepthmap.at<float>(y,x) + (1.-factor)*length;
-					if (v<0) v=0;
-					if (v>1) v=1;
-					depthmap.at<float>(y,x)=v;
-				}
-			}
-			imshow("debug2",depthmap);
-			
-		}
-		vPortExitCritical();
 		if (lastFrame) {
 			cvReleaseImage(&lastFrame);
 		}
 		if (currentFrame) {
+			rtslam->videoFrame(currentFrame);
 			lastFrame = cvCloneImage(currentFrame);
-
 
 			// draw a line in the video coresponding to artificial horizon (roll+pitch)
 			CvPoint center = cvPoint(
@@ -320,38 +189,8 @@ void OpenCVslam::run() {
 			CvPoint left = cvPoint(center.x-right.x,center.y-right.y);
 			right.x += center.x;
 			right.y += center.y;
-			//cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
-			center = cvPoint(settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/2,settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_Y]/2);
-			if (currentFlow) {
-				cvLine(lastFrame,center,cvPoint(center.x+(currentFlow->translation[0])*32,center.y+(currentFlow->translation[1])*32),CV_RGB(255,0,0),2,8,0);
-				cvLine(lastFrame,cvPoint(center.x+200,center.y),cvPoint(center.x+200,center.y-(currentFlow->rotation)*10),CV_RGB(0,0,255),2,8,0);
-				cvLine(lastFrame,cvPoint(center.x-200,center.y),cvPoint(center.x-200,center.y+(currentFlow->rotation)*10),CV_RGB(0,0,255),2,8,0);
-				//fprintf(stderr,".");
-				int div=Mat(currentFrame).rows/2;
-				for (int y = 8; y<Mat(currentFrame).rows; y+=16 ) {
-					for (int x = 8; x<Mat(currentFrame).cols; x+=16 ) {
-						Vec4f bla = currentFlow->transrotationSmoothed(Point3f(x,y,5));
-						float q=bla[3];
-						float red=-q*1024;
-						float green=q*1024;
-						float blue=128+q*64;
-						if (red<0) red=0;
-						if (red>255) red=255;
-						if (green<0) green=0;
-						if (green>255) green=255;
-						if (blue<0) blue=0;
-						if (blue>255) blue=255;
-						cvLine(lastFrame,cvPoint(x,y),cvPoint(x+bla[0],y+bla[1]),CV_RGB(red,green,blue),1,8,0);
-					}
-				}
-				fprintf(stderr,"overall quality: %f\n",currentFlow->quality);
-				fprintf(stderr,"best: %f\n",currentFlow->best);
-				fprintf(stderr,"worst %f\n",currentFlow->worst);
-			}
-
-			//IplImage xflow = flow;
+			cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
 			cvShowImage("debug",lastFrame);
-		//cvWaitKey(1);
 		}
 	
 

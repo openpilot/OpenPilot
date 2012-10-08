@@ -4,7 +4,7 @@
  * @{
  * @addtogroup OpenPilotLibraries OpenPilot System Libraries
  * @{
- * @file       opencvslam.hpp
+ * @file       opencvslam.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Include file of the task monitoring library
  * @see        The GNU Public License (GPL) Version 3
@@ -25,16 +25,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#ifndef RTSLAM_H
+#define RTSLAM_H
 
-#ifndef PYRAMIDSENHANCED_HPP
-#define PYRAMIDSENHANCED_HPP
+void rtslam_run(void* arg);
 
-class PyrDownEnhanced {
-public:
-	void pyrDownEnhanced( cv::InputArray _src, cv::OutputArray _dst, char CV1, char CV2, char CV3 );
-};
 
-#endif // PYRAMIDSENHANCED_HPP
+#endif // RTSLAM_H
 
 /**
  * @}

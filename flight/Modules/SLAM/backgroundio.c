@@ -32,6 +32,7 @@
 #include "openpilot.h"
 #include "signal.h"
 #include "pthread.h"
+#include "rtslam.h"
 
 static void* grabThread(void* arg) {
 	sigset_t set;
@@ -61,6 +62,14 @@ static void* writeThread(void* arg) {
 	sigfillset(&set);
 	pthread_sigmask(SIG_BLOCK, &set, NULL);
 	cvWriteFrame(((struct writeframestruct*)arg)->VideoDest,((struct writeframestruct*)arg)->frame);
+	return NULL;
+}
+
+static void* rtslamThread(void* arg) {
+	sigset_t set;
+	sigfillset(&set);
+	pthread_sigmask(SIG_BLOCK, &set, NULL);
+    rtslam_run(arg);
 	return NULL;
 }
 
@@ -105,6 +114,15 @@ void backgroundWriteFrame(struct writeframestruct info) {
 	pthread_create( &writer, &threadAttributes,
                           &writeThread, &info);
 	pthread_join(writer,NULL);
+}
+
+void backgroundrtslam(void * rtslam) {
+	pthread_t rts;
+	pthread_attr_t threadAttributes;
+	pthread_attr_init( &threadAttributes );
+	pthread_attr_setdetachstate( &threadAttributes, PTHREAD_CREATE_DETACHED );
+	pthread_create( &rts, &threadAttributes,
+                          &rtslamThread, rtslam);
 }
 
 

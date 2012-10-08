@@ -44,6 +44,8 @@ struct writeframestruct {
 
 void backgroundWriteFrame(struct writeframestruct info);
 
+void backgroundrtslam(void * rtslam);
+
 #endif // BACKGROUNDIO_H
 
 /**

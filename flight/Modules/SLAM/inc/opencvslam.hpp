@@ -31,6 +31,7 @@
 
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
+#include "rtslam.hpp"		// rtslam class
 extern "C" {
 	#include "openpilot.h"		// openpilot framework
 	#include "slamsettings.h"	// module settings
@@ -39,6 +40,7 @@ extern "C" {
 	#include "positionactual.h"	// 3d position
 	#include "opencvslam.h"		// c wrapper
 	#include "backgroundio.h"	// c wrapper
+	#include "rtslam.h"		// c wrapper
 };
 
 class OpenCVslam {
@@ -46,7 +48,6 @@ class OpenCVslam {
 
 public:
 	OpenCVslam(SLAMSettingsData * newsettings);
-	void shrinkAndEnhance(const cv::Mat& src, cv::Mat& dst);
 	void run();
 
 protected:
@@ -57,6 +58,8 @@ protected:
 	IplImage *currentFrame, *lastFrame;
 	uint32_t frame;
 	CvCapture *VideoSource;
+	CvVideoWriter *VideoDest;
+	RTSlam *rtslam;
 };
 
 #endif // OPENCVSLAM_HPP

@@ -73,6 +73,9 @@ PIOSINC = $(PIOS)/inc
 OPMODULEDIR = ../Modules
 FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = ../Libraries/inc
+JAFARDIR = ../jafar
+BOOSTSANDBOXDIR = ../jafar/boost-sandbox
+RTSLAMMODULES = kernel jmath image correl rtslam
 PIOSPOSIX = $(PIOS)/posix
 PIOSCOMMON = $(PIOS)/posix
 PIOSBOARDS = $(PIOS)/Boards
@@ -167,6 +170,9 @@ CPPSRC =
 ## MODULES
 CPPSRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.cpp}}
 
+## RTSLAM
+CPPSRC += ${foreach RTMOD, ${RTSLAMMODULES}, ${wildcard ${JAFARDIR}/${RTMOD}/src/*.cpp}}
+
 # List C++ source files here which must be compiled in ARM-Mode.
 # use file-extension .cpp for C++-files (not .C)
 #CPPSRCARM = $(TARGET).cpp
@@ -204,6 +210,9 @@ EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(BOOTINC)
 EXTRAINCDIRS  += $(PYMITEINC)
 EXTRAINCDIRS  += $(HWDEFSINC)
+EXTRAINCDIRS  += $(JAFARDIR)
+EXTRAINCDIRS  += $(BOOSTSANDBOXDIR)
+EXTRAINCDIRS  += ${foreach RTMOD, ${RTSLAMMODULES}, ${wildcard ${JAFARDIR}/${RTMOD}/include}}
 
 # Generate intermediate code
 gencode: ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
@@ -219,6 +228,12 @@ ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/p
 	@$(PYTHON) $(PYMITETOOLS)/pmGenPmFeatures.py $(PYMITEPLAT)/pmfeatures.py > $(OUTDIR)/pmfeatures.h
 	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
 EXTRAINCDIRS += ${foreach MOD, ${MODULES} ${PYMODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
+
+
+BOOST_VERSION = "-mt-1_48"
+BOOST_MODULES = boost_serialization boost_date_time boost_thread boost_system boost_filesystem boost_regex
+BOOSTLIBS += ${foreach MOD, ${BOOST_MODULES}, -l${MOD}${BOOST_VERSION}}
+
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for
@@ -351,7 +366,8 @@ LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
 LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc -lpthread -lrt
 LDFLAGS += `pkg-config --libs opencv`
-
+LDFLAGS += `pkg-config --libs lapack`
+LDFLAGS += $(BOOSTLIBS)
 #Linker scripts                                                                                                                                                                                                              
 LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
 

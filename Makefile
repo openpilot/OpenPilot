@@ -32,6 +32,7 @@ $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),de
 QT_SPEC=win32-g++
 UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/debug/uavobjgenerator.exe"
 UNAME := $(shell uname)
+ARCH := $(shell uname -m)
 ifeq ($(UNAME), Linux)
   QT_SPEC=linux-g++
   UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
@@ -161,10 +162,16 @@ $(BUILD_DIR):
 QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-v1.2.1
 
 .PHONY: qt_sdk_install
+# Choose the appropriate installer based on host architecture
+ifneq (,$(filter $(ARCH), x86_64 amd64))
+# 64-bit
+qt_sdk_install: QT_SDK_FILE := QtSdk-offline-linux-x86_64-v1.2.1.run
+qt_sdk_install: QT_SDK_URL := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/14b2039c-0e1f-4774-a4f2-9aa60b6d5313/Qt_SDK_Lin64_offline
+else
+# 32-bit
 qt_sdk_install: QT_SDK_URL  := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/8ea74da4-fec1-4277-8b26-c58cc82e204b/Qt_SDK_Lin32_offline
 qt_sdk_install: QT_SDK_FILE := QtSdk-offline-linux-x86-v1.2.1.run
-#qt_sdk_install: QT_SDK_URL  := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/c365bbf5-c2b9-4dda-9c1f-34b2c8d07785/Qt_SDK_Lin32_offline_v1_1_2
-#qt_sdk_install: QT_SDK_FILE := Qt_SDK_Lin32_offline_v1_1_2_en.run
+endif
 # order-only prereq on directory existance:
 qt_sdk_install : | $(DL_DIR) $(TOOLS_DIR)
 qt_sdk_install: qt_sdk_clean

@@ -1,12 +1,6 @@
 /*
-    FreeRTOS V7.0.1 - Copyright (C) 2011 Real Time Engineers Ltd.
-	
+    FreeRTOS V7.2.0 - Copyright (C) 2012 Real Time Engineers Ltd.
 
-	FreeRTOS supports many tools and architectures. V7.0.0 is sponsored by:
-	Atollic AB - Atollic provides professional embedded systems development 
-	tools for C/C++ development, code analysis and test automation.  
-	See http://www.atollic.com
-	
 
     ***************************************************************************
      *                                                                       *
@@ -47,14 +41,28 @@
 
     1 tab == 4 spaces!
 
-    http://www.FreeRTOS.org - Documentation, latest information, license and
-    contact details.
+	
+    ***************************************************************************
+     *                                                                       *
+     *    Having a problem?  Start by reading the FAQ "My application does   *
+	 *    not run, what could be wrong?                                      *
+	 *                                                                       *
+	 *    http://www.FreeRTOS.org/FAQHelp.html                               *
+	 *                                                                       *
+    ***************************************************************************
 
-    http://www.SafeRTOS.com - A version that is certified for use in safety
-    critical systems.
+	
+    http://www.FreeRTOS.org - Documentation, training, latest information, 
+    license and contact details.
+	
+	http://www.FreeRTOS.org/plus - Selection of FreeRTOS ecosystem products,
+	including FreeRTOS+Trace - an indispensable productivity tool.
 
-    http://www.OpenRTOS.com - Commercial support, development, porting,
-    licensing and training services.
+	Real Time Engineers ltd license FreeRTOS to High Integrity Systems, who sell 
+	the code with commercial support, indemnification, and middleware, under 
+	the OpenRTOS brand:  http://www.OpenRTOS.com.  High Integrity Systems also
+	provide a safety engineered and independently SIL3 certified version under 
+	the	SafeRTOS brand: http://www.SafeRTOS.com.
 */
 
 
@@ -76,7 +84,7 @@ extern "C" {
  * MACROS AND DEFINITIONS
  *----------------------------------------------------------*/
 
-#define tskKERNEL_VERSION_NUMBER "V7.0.1"
+#define tskKERNEL_VERSION_NUMBER "V7.2.0"
 
 /**
  * task. h
@@ -1007,6 +1015,20 @@ unsigned portBASE_TYPE uxTaskGetNumberOfTasks( void ) PRIVILEGED_FUNCTION;
 
 /**
  * task. h
+ * <PRE>signed char *pcTaskGetTaskName( xTaskHandle xTaskToQuery );</PRE>
+ *
+ * @return The text (human readable) name of the task referenced by the handle
+ * xTaskToQueury.  A task can query its own name by either passing in its own
+ * handle, or by setting xTaskToQuery to NULL.  INCLUDE_pcTaskGetTaskName must be
+ * set to 1 in FreeRTOSConfig.h for pcTaskGetTaskName() to be available.
+ *
+ * \page pcTaskGetTaskName pcTaskGetTaskName
+ * \ingroup TaskUtils
+ */
+signed char *pcTaskGetTaskName( xTaskHandle xTaskToQuery );
+
+/**
+ * task. h
  * <PRE>void vTaskList( char *pcWriteBuffer );</PRE>
  *
  * configUSE_TRACE_FACILITY must be defined as 1 for this function to be
@@ -1064,40 +1086,6 @@ void vTaskList( signed char *pcWriteBuffer ) PRIVILEGED_FUNCTION;
 void vTaskGetRunTimeStats( signed char *pcWriteBuffer ) PRIVILEGED_FUNCTION;
 
 /**
- * task. h
- * <PRE>void vTaskStartTrace( char * pcBuffer, unsigned portBASE_TYPE uxBufferSize );</PRE>
- *
- * Starts a real time kernel activity trace.  The trace logs the identity of
- * which task is running when.
- *
- * The trace file is stored in binary format.  A separate DOS utility called
- * convtrce.exe is used to convert this into a tab delimited text file which
- * can be viewed and plotted in a spread sheet.
- *
- * @param pcBuffer The buffer into which the trace will be written.
- *
- * @param ulBufferSize The size of pcBuffer in bytes.  The trace will continue
- * until either the buffer in full, or ulTaskEndTrace () is called.
- *
- * \page vTaskStartTrace vTaskStartTrace
- * \ingroup TaskUtils
- */
-void vTaskStartTrace( signed char * pcBuffer, unsigned long ulBufferSize ) PRIVILEGED_FUNCTION;
-
-/**
- * task. h
- * <PRE>unsigned long ulTaskEndTrace( void );</PRE>
- *
- * Stops a kernel activity trace.  See vTaskStartTrace ().
- *
- * @return The number of bytes that have been written into the trace buffer.
- *
- * \page usTaskEndTrace usTaskEndTrace
- * \ingroup TaskUtils
- */
-unsigned long ulTaskEndTrace( void ) PRIVILEGED_FUNCTION;
-
-/**
  * task.h
  * <PRE>unsigned portBASE_TYPE uxTaskGetStackHighWaterMark( xTaskHandle xTask );</PRE>
  *
@@ -1116,19 +1104,6 @@ unsigned long ulTaskEndTrace( void ) PRIVILEGED_FUNCTION;
  * since the task referenced by xTask was created.
  */
 unsigned portBASE_TYPE uxTaskGetStackHighWaterMark( xTaskHandle xTask ) PRIVILEGED_FUNCTION;
-
-/**
- * task.h
- * <PRE>unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask );</PRE>
- *
- * Returns the run time of selected task
- *
- * @param xTask Handle of the task associated with the stack to be checked.
- * Set xTask to NULL to check the stack of the calling task.
- *
- * @return The run time of selected task
- */
-unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask );
 
 /* When using trace macros it is sometimes necessary to include tasks.h before
 FreeRTOS.h.  When this is done pdTASK_HOOK_CODE will not yet have been defined,
@@ -1170,6 +1145,14 @@ constant. */
  */
 portBASE_TYPE xTaskCallApplicationTaskHook( xTaskHandle xTask, void *pvParameter ) PRIVILEGED_FUNCTION;
 
+/**
+ * xTaskGetIdleTaskHandle() is only available if 
+ * INCLUDE_xTaskGetIdleTaskHandle is set to 1 in FreeRTOSConfig.h.
+ *
+ * Simply returns the handle of the idle task.  It is not valid to call
+ * xTaskGetIdleTaskHandle() before the scheduler has been started.
+ */
+xTaskHandle xTaskGetIdleTaskHandle( void );
 
 /*-----------------------------------------------------------
  * SCHEDULER INTERNALS AVAILABLE FOR PORTING PURPOSES
@@ -1243,19 +1226,6 @@ void vTaskPlaceOnEventListRestricted( const xList * const pxEventList, portTickT
 signed portBASE_TYPE xTaskRemoveFromEventList( const xList * const pxEventList ) PRIVILEGED_FUNCTION;
 
 /*
- * THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS AN
- * INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
- *
- * INCLUDE_vTaskCleanUpResources and INCLUDE_vTaskSuspend must be defined as 1
- * for this function to be available.
- * See the configuration section for more information.
- *
- * Empties the ready and delayed queues of task control blocks, freeing the
- * memory allocated for the task control block and task stacks as it goes.
- */
-void vTaskCleanUpResources( void ) PRIVILEGED_FUNCTION;
-
-/*
  * THIS FUNCTION MUST NOT BE USED FROM APPLICATION CODE.  IT IS ONLY
  * INTENDED FOR USE WHEN IMPLEMENTING A PORT OF THE SCHEDULER AND IS
  * AN INTERFACE WHICH IS FOR THE EXCLUSIVE USE OF THE SCHEDULER.
@@ -1310,6 +1280,18 @@ void vTaskPriorityDisinherit( xTaskHandle * const pxMutexHolder ) PRIVILEGED_FUN
  * xTaskCreate() and xTaskCreateRestricted() macros.
  */
 signed portBASE_TYPE xTaskGenericCreate( pdTASK_CODE pxTaskCode, const signed char * const pcName, unsigned short usStackDepth, void *pvParameters, unsigned portBASE_TYPE uxPriority, xTaskHandle *pxCreatedTask, portSTACK_TYPE *puxStackBuffer, const xMemoryRegion * const xRegions ) PRIVILEGED_FUNCTION;
+
+/*
+ * Get the uxTCBNumber assigned to the task referenced by the xTask parameter.
+ */
+unsigned portBASE_TYPE uxTaskGetTaskNumber( xTaskHandle xTask );
+
+/* 
+ * Set the uxTCBNumber of the task referenced by the xTask parameter to
+ * ucHandle.
+ */
+void vTaskSetTaskNumber( xTaskHandle xTask, unsigned portBASE_TYPE uxHandle );
+
 
 #ifdef __cplusplus
 }

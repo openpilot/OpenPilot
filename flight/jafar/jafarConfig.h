@@ -19,7 +19,7 @@
 #define HAVE_OPENGL
 
 /* GDHE */
-//#define HAVE_GDHE
+#define HAVE_MODULE_GDHE
 
 /* posterLib */
 /* #undef HAVE_POSTERLIB */

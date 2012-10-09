@@ -107,107 +107,47 @@ typedef DataManagerOnePointRansac<RawImage, SensorPinhole, FeatureImagePoint, im
 typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinhole, simu::FeatureSimu, image::ConvexRoi, ActiveSearchGrid, simu::DetectorSimu<image::ConvexRoi>, simu::MatcherSimu<image::ConvexRoi> > DataManager_ImagePoint_Ransac_Simu;
 
 
-const struct option RTSlam::long_options[] = {
-    // int options
-    {"disp-2d", 2, 0, 0},
-    {"disp-3d", 2, 0, 0},
-    {"render-all", 2, 0, 0},
-    {"replay", 2, 0, 0},
-    {"dump", 2, 0, 0},
-    {"rand-seed", 2, 0, 0},
-    {"pause", 2, 0, 0},
-    {"verbose", 2, 0, 0},
-    {"map", 2, 0, 0},
-    {"robot", 2, 0, 0}, // should be in config file
-    {"camera", 2, 0, 0},
-    {"trigger", 2, 0, 0}, // should be in config file
-    {"gps", 2, 0, 0},
-    {"simu", 2, 0, 0},
-    {"export", 2, 0, 0},
-    // double options
-    {"freq", 2, 0, 0}, // should be in config file
-    {"shutter", 2, 0, 0}, // should be in config file
-    {"heading", 2, 0, 0},
-    // string options
-    {"data-path", 1, 0, 0},
-    {"config-setup", 1, 0, 0},
-    {"config-estimation", 1, 0, 0},
-    {"log", 1, 0, 0},
-    // breaking options
-    {"help",0,0,0},
-    {"usage",0,0,0},
-};
 
-
-/* stubs*/
+/* bridge to feed images from openpilot EKF to rtslam GPS sensor class */
 void RTSlam::position(float N, float E, float D) {
+	/**stub - rtslam fake GPS sensor not written yet**/
 }
+
+/* bridge to feed images from openpilot EKF to rtslam odometry sensor */
 void RTSlam::attitude(float Q1, float Q2, float Q3, float Q4) {
+	/**stub - rtslam fake INS sensor not written yet**/
 }
+
+/* bridge to feed images from openpilot camera sensor to rtslam hardware sensor class */
 void RTSlam::videoFrame(IplImage* image) {
+	if (openpilotcamera) {
+		openpilotcamera->capture(image);
+	}
 }
 
 
 
-RTSlam::RTSlam() : rawdata_condition(0),configSetup(this)
+RTSlam::RTSlam() :
+	openpilotcamera(NULL),
+	rawdata_condition(0),
+	configSetup(this)
 {
 
-    char *argv[]= {"meep","--disp-3d","--freq 15", "--camera 1", "--trigger=2"};
-    int argc=4;
+    for (int t=0;t<nIntOpts;t++) intOpts[t]=0;
+    for (int t=0;t<nFloatOpts;t++) floatOpts[t]=0;
 
     intOpts[iVerbose] = 5;
     intOpts[iMap] = 1;
     intOpts[iCamera] = 1;
-    floatOpts[fFreq] = 60.0;
+    intOpts[iDispGdhe] = 1;
+    intOpts[iTrigger] = 2;
+    floatOpts[fFreq] = 15.0;
     floatOpts[fShutter] = 0.0;
     strOpts[sDataPath] = ".";
     strOpts[sConfigSetup] = "#!@";
     strOpts[sConfigEstimation] = "data/estimation.cfg";
 
-    while (1)
-    {
-        int c, option_index = 0;
-        c = getopt_long_only(argc, argv, "", long_options, &option_index);
-        if (c == -1) break;
-        if (c == 0)
-        {
-            if (option_index <= nLastIntOpt)
-            {
-                intOpts[option_index] = 1;
-                if (optarg) intOpts[option_index-nFirstIntOpt] = atoi(optarg);
-            } else
-            if (option_index <= nLastFloatOpt)
-            {
-                if (optarg) floatOpts[option_index-nFirstFloatOpt] = atof(optarg);
-            } else
-            if (option_index <= nLastStrOpt)
-            {
-                if (optarg) strOpts[option_index-nFirstStrOpt] = optarg;
-            } else
-            {
-                std::cout << "Integer options:" << std::endl;
-                for(int i = 0; i < nIntOpts; ++i)
-                    std::cout << "\t--" << long_options[i+nFirstIntOpt].name << std::endl;
 
-                std::cout << "Float options:" << std::endl;
-                for(int i = 0; i < nFloatOpts; ++i)
-                    std::cout << "\t--" << long_options[i+nFirstFloatOpt].name << std::endl;
-
-                std::cout << "String options:" << std::endl;
-                for(int i = 0; i < nStrOpts; ++i)
-                    std::cout << "\t--" << long_options[i+nFirstStrOpt].name << std::endl;
-
-                std::cout << "Breaking options:" << std::endl;
-                for(int i = 0; i < 2; ++i)
-                    std::cout << "\t--" << long_options[i+nFirstBreakingOpt].name << std::endl;
-
-                return;
-            }
-        } else
-        {
-            std::cerr << "Unknown option " << c << std::endl;
-        }
-    }
 }
 
 
@@ -325,12 +265,13 @@ void RTSlam::init()
 
 		// write options to log
 		std::ostringstream oss;
-		for(int i = 0; i < nIntOpts; ++i)
+		/*for(int i = 0; i < nIntOpts; ++i)
 			{ oss << long_options[i+nFirstIntOpt].name << " = " << intOpts[i]; dataLogger->writeComment(oss.str()); oss.str(""); }
 		for(int i = 0; i < nFloatOpts; ++i)
 			{ oss << long_options[i+nFirstFloatOpt].name << " = " << floatOpts[i]; dataLogger->writeComment(oss.str()); oss.str(""); }
 		for(int i = 0; i < nStrOpts; ++i)
 			{ oss << long_options[i+nFirstStrOpt].name << " = " << strOpts[i]; dataLogger->writeComment(oss.str()); oss.str(""); }
+		*/
 		dataLogger->writeNewLine();
 
 	}
@@ -796,6 +737,12 @@ void RTSlam::init()
 					(std::string) configSetup.CAMERA_DEVICE, cv::Size(img_width,img_height), mode, strOpts[sDataPath]));
 				hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
 				senPtr11->setHardwareSensor(hardSen11);
+			} else if (configSetup.CAMERA_TYPE == 5)
+			{ // OpenPilot ?
+				openpilotcamera = new hardware::HardwareSensorCameraOpenPilot(rawdata_condition, 200, cv::Size(img_width,img_height), mode, strOpts[sDataPath]);
+				hardware::hardware_sensor_openpilot_ptr_t hardSen11(openpilotcamera);
+				hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
+				senPtr11->setHardwareSensor(hardSen11);
 			}
 
 			senPtr11->setIntegrationPolicy(false);
@@ -1115,8 +1062,9 @@ int n_innovation = 0;
  * Display function
  * ###########################################################################*/
 
-void RTSlam::display(world_ptr_t *world)
+void RTSlam::display(void)
 { try {
+	world_ptr_t *world = &worldPtr;
 //	static unsigned prev_t = 0;
 	kernel::Timer timer(display_period*1000);
 	while(true)
@@ -1271,7 +1219,7 @@ void RTSlam::run() {
 	{
 		#ifdef HAVE_MODULE_GDHE
 		kernel::setCurrentThreadPriority(display_priority);
-		boost::thread *thread_disp = new boost::thread(boost::bind(demo_slam_display,&worldPtr));
+		boost::thread *thread_disp = new boost::thread(boost::bind(&RTSlam::display,this));
 		kernel::setCurrentThreadPriority(slam_priority);
         this->main(&worldPtr);
 		delete thread_disp;

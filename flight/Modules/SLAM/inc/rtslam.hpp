@@ -78,6 +78,7 @@
 #include "rtslam/hardwareSensorCameraFirewire.hpp"
 #include "rtslam/hardwareSensorCameraUeye.hpp"
 #include "rtslam/hardwareSensorCameraOpenCV.hpp"
+#include "rtslam/hardwareSensorCameraOpenPilot.hpp"
 #include "rtslam/hardwareEstimatorMti.hpp"
 #include "rtslam/hardwareSensorGpsGenom.hpp"
 #include "rtslam/hardwareSensorMocap.hpp"
@@ -140,7 +141,7 @@ public:
     void run();
     void exit(world_ptr_t *world, boost::thread *thread_main);
     void main(world_ptr_t *world);
-    void display(world_ptr_t *world);
+    void display(void);
     int xmain(int argc, char* const* argv);
 
 
@@ -172,8 +173,6 @@ protected:
      * ###########################################################################*/
 
 
-    static const struct option long_options[];
-
     static const int slam_priority = -20; // needs to be started as root to be < 0
     static const int display_priority = 10;
     static const int display_period = 100; // ms
@@ -183,6 +182,13 @@ protected:
      * #############################################################################
      * Slam function
      * ###########################################################################*/
+    
+    /** pointer to camera sensor to get images fed from OP **/
+    hardware::HardwareSensorCameraOpenPilot *openpilotcamera;
+    /** pointer to GPS sensor to get data fed from OP **/
+    //hardware::HardwareSensorXXXOpenPilot * openpilotgps;
+    /** pointer to odometry sensor to get data fed from OP **/
+    //hardware::HardwareSensorXXXOpenPilot * openpilotins;
 
     world_ptr_t worldPtr;
     boost::scoped_ptr<kernel::DataLogger> dataLogger;

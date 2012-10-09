@@ -75,7 +75,7 @@ FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = ../Libraries/inc
 JAFARDIR = ../jafar
 BOOSTSANDBOXDIR = ../jafar/boost-sandbox
-RTSLAMMODULES = kernel jmath image correl rtslam
+RTSLAMMODULES = kernel jmath image correl gdhe rtslam
 PIOSPOSIX = $(PIOS)/posix
 PIOSCOMMON = $(PIOS)/posix
 PIOSBOARDS = $(PIOS)/Boards
@@ -367,6 +367,7 @@ LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc -lpthread -lrt
 LDFLAGS += `pkg-config --libs opencv`
 LDFLAGS += `pkg-config --libs lapack`
+LDFLAGS += `pkg-config --libs gdhe`
 LDFLAGS += $(BOOSTLIBS)
 #Linker scripts                                                                                                                                                                                                              
 LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))

@@ -49,11 +49,13 @@ public:
     void initializePage();
     bool validatePage();
 
+protected:
+    void resizeEvent(QResizeEvent *event);
     
 private:
     Ui::MultiPage *ui;
     void setupMultiTypesCombo();
-    QGraphicsSvgItem *multiPic;
+    QGraphicsSvgItem *m_multiPic;
     void updateAvailableTypes();
     QList<QString> m_descriptions;
 

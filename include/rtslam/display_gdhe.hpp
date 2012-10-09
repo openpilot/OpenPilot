@@ -8,9 +8,9 @@
 
 #ifndef DISPLAY_GDHE__HPP_
 #define DISPLAY_GDHE__HPP_
+#include "rtslam/display.hpp"
 #ifdef HAVE_MODULE_GDHE
 
-#include "rtslam/display.hpp"
 #include "gdhe/client.hpp"
 
 /*

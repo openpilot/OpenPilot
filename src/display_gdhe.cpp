@@ -5,9 +5,8 @@
  * \ingroup rtslam
  */
 
-#ifdef HAVE_MODULE_GDHE
-
 #include "rtslam/display_gdhe.hpp"
+#ifdef HAVE_MODULE_GDHE
 #include "rtslam/quatTools.hpp"
 #include "rtslam/ahpTools.hpp"
 #include "rtslam/landmarkAnchoredHomogeneousPointsLine.hpp"

@@ -403,16 +403,6 @@ void VehicleConfigurationHelper::applyManualControlDefaults()
     cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_PITCH] = 4;
     cData.ChannelNumber[ManualControlSettings::CHANNELGROUPS_FLIGHTMODE] = 5;
 
-    switch(m_configSource->getVehicleType())
-    {
-    case VehicleConfigurationSource::VEHICLE_MULTI:
-        cData.FlightModePosition[0]=ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED1;
-        cData.FlightModePosition[1]=ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED2;
-        cData.FlightModePosition[2]=ManualControlSettings::FLIGHTMODEPOSITION_STABILIZED3;
-        break;
-    default:
-        break;
-    }
     mcSettings->setData(cData);
     addModifiedObject(mcSettings, tr("Writing manual control defaults"));
 }

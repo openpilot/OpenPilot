@@ -10,7 +10,6 @@ SUBDIRS   = plugin_coreplugin
 #plugin_donothing.subdir = donothing
 #plugin_donothing.depends = plugin_coreplugin
 
-
 # Core plugin
 plugin_coreplugin.subdir = coreplugin
 
@@ -55,12 +54,14 @@ plugin_opmap.subdir = opmap
 plugin_opmap.depends = plugin_coreplugin
 plugin_opmap.depends += plugin_uavobjects
 plugin_opmap.depends += plugin_uavobjectutil
+plugin_opmap.depends += plugin_uavtalk
 SUBDIRS += plugin_opmap
 
 # Scope UAVGadget
 plugin_scope.subdir = scope
 plugin_scope.depends = plugin_coreplugin
 plugin_scope.depends += plugin_uavobjects
+plugin_scope.depends += plugin_uavtalk
 SUBDIRS += plugin_scope
 
 # UAVObject Browser gadget
@@ -75,57 +76,60 @@ plugin_modelview.depends = plugin_coreplugin
 plugin_modelview.depends += plugin_uavobjects
 SUBDIRS += plugin_modelview
 
-
 #Qt 4.8.0 / phonon may crash on Mac, fixed in Qt 4.8.1, QTBUG-23128
 macx:contains(QT_VERSION, ^4\\.8\\.0): CONFIG += disable_notify_plugin
 
+# Notify gadget
 !disable_notify_plugin {
-#Notify gadget
-plugin_notify.subdir = notify
-plugin_notify.depends = plugin_coreplugin
-plugin_notify.depends += plugin_uavobjects
-SUBDIRS += plugin_notify
+    plugin_notify.subdir = notify
+    plugin_notify.depends = plugin_coreplugin
+    plugin_notify.depends += plugin_uavobjects
+    plugin_notify.depends += plugin_uavtalk
+    SUBDIRS += plugin_notify
 }
 
-#Uploader gadget
+# Uploader gadget
 plugin_uploader.subdir = uploader
 plugin_uploader.depends = plugin_coreplugin
 plugin_uploader.depends += plugin_uavobjects
+plugin_uploader.depends += plugin_uavtalk
 plugin_uploader.depends += plugin_rawhid
 plugin_uploader.depends += plugin_uavobjectutil
 SUBDIRS += plugin_uploader
 
-#Dial gadget
+# Dial gadget
 plugin_dial.subdir = dial
 plugin_dial.depends = plugin_coreplugin
 plugin_dial.depends += plugin_uavobjects
 SUBDIRS += plugin_dial
 
-#Linear Dial gadget
+# Linear Dial gadget
 plugin_lineardial.subdir = lineardial
 plugin_lineardial.depends = plugin_coreplugin
 plugin_lineardial.depends += plugin_uavobjects
 SUBDIRS += plugin_lineardial
 
-#System Health gadget
+# System Health gadget
 plugin_systemhealth.subdir = systemhealth
 plugin_systemhealth.depends = plugin_coreplugin
 plugin_systemhealth.depends += plugin_uavobjects
 plugin_systemhealth.depends += plugin_uavtalk
 SUBDIRS += plugin_systemhealth
 
-#Config gadget
+# Config gadget
 plugin_config.subdir = config
 plugin_config.depends = plugin_coreplugin
+plugin_config.depends += plugin_uavtalk
 plugin_config.depends += plugin_uavobjects
+plugin_config.depends += plugin_uavobjectutil
 plugin_config.depends += plugin_uavobjectwidgetutils
 plugin_config.depends += plugin_uavsettingsimportexport
 SUBDIRS += plugin_config
 
-#GPS Display gadget
+# GPS Display gadget
 plugin_gpsdisplay.subdir = gpsdisplay
 plugin_gpsdisplay.depends = plugin_coreplugin
-plugin_gpsdisplay.depends += plugin_uavtalk
+plugin_gpsdisplay.depends += plugin_uavobjects
 SUBDIRS += plugin_gpsdisplay
 
 # Primary Flight Display (PFD) gadget
@@ -146,7 +150,7 @@ plugin_pfdqml.depends = plugin_coreplugin
 plugin_pfdqml.depends += plugin_uavobjects
 SUBDIRS += plugin_pfdqml
 
-#IP connection plugin
+# IP connection plugin
 plugin_ipconnection.subdir = ipconnection
 plugin_ipconnection.depends = plugin_coreplugin
 SUBDIRS += plugin_ipconnection
@@ -171,20 +175,19 @@ plugin_logging.depends += plugin_uavtalk
 plugin_logging.depends += plugin_scope
 SUBDIRS += plugin_logging
 
-#GCS Control of UAV gadget
+# GCS Control of UAV gadget
 plugin_gcscontrol.subdir = gcscontrol
 plugin_gcscontrol.depends = plugin_coreplugin
 plugin_gcscontrol.depends += plugin_uavobjects
-plugin_gcscontrol.depends += plugin_uavtalk
 SUBDIRS += plugin_gcscontrol
 
 # Antenna tracker
 #plugin_antennatrack.subdir = antennatrack
 #plugin_antennatrack.depends = plugin_coreplugin
-#plugin_antennatrack.depends += plugin_uavtalk
+#plugin_antennatrack.depends += plugin_uavobjects
 #SUBDIRS += plugin_antennatrack
 
-#Scope OpenGL Gadget
+# Scope OpenGL Gadget
 #plugin_scopeogl.subdir = scopeogl
 #plugin_scopeogl.depends = plugin_coreplugin
 #plugin_scopeogl.depends += plugin_uavobjects
@@ -206,6 +209,7 @@ SUBDIRS += plugin_magicwaypoint
 plugin_uavsettingsimportexport.subdir = uavsettingsimportexport
 plugin_uavsettingsimportexport.depends = plugin_coreplugin
 plugin_uavsettingsimportexport.depends += plugin_uavobjects
+plugin_uavsettingsimportexport.depends += plugin_uavobjectutil
 SUBDIRS += plugin_uavsettingsimportexport
 
 # UAV Object Widget Utility plugin
@@ -214,12 +218,13 @@ plugin_uavobjectwidgetutils.depends = plugin_coreplugin
 plugin_uavobjectwidgetutils.depends += plugin_uavobjects
 plugin_uavobjectwidgetutils.depends += plugin_uavobjectutil
 plugin_uavobjectwidgetutils.depends += plugin_uavsettingsimportexport
+plugin_uavobjectwidgetutils.depends += plugin_uavtalk
 SUBDIRS += plugin_uavobjectwidgetutils
 
 # Setup Wizard plugin
 plugin_setupwizard.subdir = setupwizard
 plugin_setupwizard.depends = plugin_coreplugin
-plugin_setupwizard.depends += plugin_uavobjects
+plugin_setupwizard.depends += plugin_uavobjectutil
 plugin_setupwizard.depends += plugin_config
 SUBDIRS += plugin_setupwizard
 

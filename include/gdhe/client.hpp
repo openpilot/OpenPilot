@@ -49,8 +49,7 @@ namespace gdhe {
 //			{ os << (int)R << " " << (int)G << " " << (int)B; return os; }
 	};
 
-	std::ostream& operator<<(std::ostream& os, const ColorRGB & c)
-		{ os << (int)c.R << " " << (int)c.G << " " << (int)c.B; return os; }
+	std::ostream& operator<<(std::ostream& os, const ColorRGB & c);
 	
 	extern const ColorRGB colorRed;
 	extern const ColorRGB colorGreen;
@@ -217,8 +216,7 @@ namespace gdhe {
 	
 	template<typename T> Client& operator<<(Client& oc, const T & element)
 		{ oc.oss << element; return oc; }
-	template<> Client& operator<<(Client& oc, const Client::SendToServer & element)
-		{ oc.eval(oc.oss.str()); oc.oss.str(""); return oc; }
+	template<> Client& operator<<(Client& oc, const Client::SendToServer & element);
 	
 	/** *************************************************************************/
 	/// Abstract objects definitions 

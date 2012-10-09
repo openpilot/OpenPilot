@@ -181,6 +181,11 @@ namespace gdhe {
 		maxdim = mindim;
 	}
 
+	std::ostream& operator<<(std::ostream& os, const ColorRGB & c)
+		{ os << (int)c.R << " " << (int)c.G << " " << (int)c.B; return os; }
+
+	template<> Client& operator<<(Client& oc, const Client::SendToServer & element)
+		{ oc.eval(oc.oss.str()); oc.oss.str(""); return oc; }
 
 }}
 

@@ -1134,6 +1134,19 @@ const struct pios_pwm_cfg pios_pwm_cfg = {
 	.channels = pios_tim_rcvrport_all_channels,
 	.num_channels = NELEMENTS(pios_tim_rcvrport_all_channels),
 };
+
+const struct pios_pwm_cfg pios_pwm_with_ppm_cfg = {
+	.tim_ic_init = {
+		.TIM_ICPolarity = TIM_ICPolarity_Rising,
+		.TIM_ICSelection = TIM_ICSelection_DirectTI,
+		.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+		.TIM_ICFilter = 0x0,
+	},
+	/* Leave the first channel for PPM use and use the rest for PWM */
+	.channels = &pios_tim_rcvrport_all_channels[1],
+	.num_channels = NELEMENTS(pios_tim_rcvrport_all_channels) - 1,
+};
+
 #endif
 
 #if defined(PIOS_INCLUDE_I2C)

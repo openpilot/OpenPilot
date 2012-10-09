@@ -2282,6 +2282,22 @@ tskTCB *pxNewTCB;
 #endif
 /*-----------------------------------------------------------*/
 
+#if ( INCLUDE_uxTaskGetRunTime == 1 )
+
+	unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask )
+	{
+		unsigned long runTime;
+
+		tskTCB *pxTCB;
+		pxTCB = prvGetTCBFromHandle( xTask );
+		runTime = pxTCB->ulRunTimeCounter;
+		pxTCB->ulRunTimeCounter = 0;
+		return runTime;
+	}
+
+#endif
+/*-----------------------------------------------------------*/
+
 #if ( INCLUDE_uxTaskGetStackHighWaterMark == 1 )
 
 	unsigned portBASE_TYPE uxTaskGetStackHighWaterMark( xTaskHandle xTask )

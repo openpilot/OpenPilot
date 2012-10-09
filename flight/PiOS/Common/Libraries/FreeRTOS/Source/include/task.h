@@ -1105,6 +1105,19 @@ void vTaskGetRunTimeStats( signed char *pcWriteBuffer ) PRIVILEGED_FUNCTION;
  */
 unsigned portBASE_TYPE uxTaskGetStackHighWaterMark( xTaskHandle xTask ) PRIVILEGED_FUNCTION;
 
+/**
+ * task.h
+ * <PRE>unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask );</PRE>
+ *
+ * Returns the run time of selected task
+ *
+ * @param xTask Handle of the task associated with the stack to be checked.
+ * Set xTask to NULL to check the stack of the calling task.
+ *
+ * @return The run time of selected task
+ */
+unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask );
+
 /* When using trace macros it is sometimes necessary to include tasks.h before
 FreeRTOS.h.  When this is done pdTASK_HOOK_CODE will not yet have been defined,
 so the following two prototypes will cause a compilation error.  This can be

@@ -566,16 +566,19 @@ $(ANDROIDGCS_ASSETS_DIR)/uavos:
 	$(V1) mkdir -p $@
 
 ifeq ($(V), 1)
-ANT_VERBOSE := -verbose
+ANT_QUIET :=
+ANDROID_SILENT := 
 else
-ANT_VERBOSE :=
+ANT_QUIET := -q
+ANDROID_SILENT := -s
 endif
 .PHONY: androidgcs
 androidgcs: uavo-collections_java
+	$(V0) @echo " ANDROID   $(call toprel, $(ANDROIDGCS_OUT_DIR))"
 	$(V1) mkdir -p $(ANDROIDGCS_OUT_DIR)
-	$(V1) $(ANDROID) update project --target 'Google Inc.:Google APIs:16' --name androidgcs --path ./androidgcs
+	$(V1) $(ANDROID) $(ANDROID_SILENT) update project --target 'Google Inc.:Google APIs:16' --name androidgcs --path ./androidgcs
 	$(V1) ant -f ./androidgcs/build.xml \
-		$(ANT_VERBOSE) \
+		$(ANT_QUIET) \
 		-Dout.dir="../$(call toprel, $(ANDROIDGCS_OUT_DIR)/bin)" \
 		-Dgen.absolute.dir="$(ANDROIDGCS_OUT_DIR)/gen" \
 		debug

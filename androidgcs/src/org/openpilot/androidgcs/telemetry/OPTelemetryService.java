@@ -309,7 +309,7 @@ public class OPTelemetryService extends Service {
             try
             {
                 File outputFile = new File(jarsDir, JAR_NAME);
-                inputStream = assetManager.open(JAR_NAME); //JAR_DIR + File.separatorChar + JAR_NAME);
+                inputStream = assetManager.open("uavos/" + JAR_NAME);
                 outputStream = new FileOutputStream(outputFile);
                 copyStream(inputStream, outputStream);
             }

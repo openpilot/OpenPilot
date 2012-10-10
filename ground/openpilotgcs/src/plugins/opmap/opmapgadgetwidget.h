@@ -222,6 +222,7 @@ private slots:
 
     void onMaxUpdateRateActGroup_triggered(QAction *action);
     void onChangeDefaultLocalAndZoom();
+    void on_tbFind_clicked();
     void onHomeDoubleClick(HomeItem*);
     void onOverlayOpacityActGroup_triggered(QAction *action);
     void on_leFind_returnPressed();

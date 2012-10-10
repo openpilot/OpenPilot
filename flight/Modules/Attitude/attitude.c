@@ -324,8 +324,8 @@ static void AttitudeTask(void *parameters)
 				PositionActualGet(&positionActualData);
 				VelocityActualGet(&velocityActualData);
 				
-				//Get NED coordinates
-				float NED[3];
+				//Get NED coordinates from GPS lat-lon
+				float gps_NED[3];
 				
 				int32_t LL_int[2];
 				int32_t tmpVal;
@@ -340,14 +340,14 @@ static void AttitudeTask(void *parameters)
 				float geoidSeparation;
 				GPSPositionGeoidSeparationGet(&geoidSeparation);
 				
-				LLA2NED(LL_int, altitude, geoidSeparation, NED);
+				LLA2NED(LL_int, altitude, geoidSeparation, gps_NED);
 				
 				//Calculate filter coefficients
-				float dT=.100;
-				float tauPosNorthEast=0.3;
-				float tauPosDown=0.5;
-				float tauVelNorthEast=0.3;
-				float tauVelDown=0.5;
+				float dT=.100f;
+				float tauPosNorthEast=0.3f;
+				float tauPosDown=0.5f;
+				float tauVelNorthEast=0.01f;
+				float tauVelDown=0.1f;
 				float alphaPosNorthEast=dT/(dT + tauPosNorthEast);
 				float alphaPosDown=dT/(dT + tauPosDown);
 				float alphaVelNorthEast=dT/(dT + tauVelNorthEast);
@@ -359,40 +359,37 @@ static void AttitudeTask(void *parameters)
 				velocityActualData.Down= (1-alphaVelDown)*velocityActualData.Down + alphaVelDown*gpsVelocityData.Down;
 				
 				//Complementary filter for position
-				positionActualData.North=(1-alphaPosNorthEast)*(positionActualData.North+(velocityActualData.North*dT)) + alphaPosNorthEast*NED[0];
-				positionActualData.East= (1-alphaPosNorthEast)*(positionActualData.East+(velocityActualData.East*dT)) + alphaPosNorthEast*NED[1];
-				positionActualData.Down= (1-alphaPosDown)*(positionActualData.Down+(velocityActualData.Down*dT)) + alphaPosDown*NED[2];
+				positionActualData.North=(1-alphaPosNorthEast)*(positionActualData.North+(velocityActualData.North*dT)) + alphaPosNorthEast*gps_NED[0];
+				positionActualData.East= (1-alphaPosNorthEast)*(positionActualData.East+(velocityActualData.East*dT)) + alphaPosNorthEast*gps_NED[1];
+				positionActualData.Down= (1-alphaPosDown)*(positionActualData.Down+(velocityActualData.Down*dT)) + alphaPosDown*gps_NED[2];
 
 				//Very slowly use GPS heading data to converge. This is a poor way of doing things, but will work in the short term for testing.
-				if (fabs(velocityActualData.North) > 4 || fabs(velocityActualData.East) > 4){
-					float heading;
-					
-					GPSPositionHeadingGet(&heading);
-					if (heading > 180.0f)
-						heading-=2.0f*360.0f;
-					
-					AttitudeActualData attitudeActual;
-					AttitudeActualGet(&attitudeActual);
-
-					while(heading-attitudeActual.Yaw < -180.0f){
-						heading+=360.0f;
+				if (fabs(velocityActualData.North) > 3.0f){ //Instead of calculating norm, use a gauge approach
+					if (fabs(velocityActualData.North) > 4.0f || fabs(velocityActualData.East) > 3.0f){
+						float heading=atan2f(velocityActualData.East, velocityActualData.North);
+						
+						AttitudeActualData attitudeActual;
+						AttitudeActualGet(&attitudeActual);
+						
+						while(heading-attitudeActual.Yaw < -180.0f){
+							heading+=360.0f;
+						}
+						while(heading-attitudeActual.Yaw > 180.0f){
+							heading-=360.0f;
+						}
+						
+						attitudeActual.Yaw=.9f*attitudeActual.Yaw+0.1f*heading;
+						
+						// Convert into quaternions degrees (makes assumptions about RPY order)
+						RPY2Quaternion(&attitudeActual.Roll, &attitudeActual.q1);
+						
+						//BOOOOOOOOOOOOOOO----------VVVVVVVVVV
+						
+						if (!AttitudeActualReadOnly()){
+							AttitudeActualSet(&attitudeActual);
+						}
 					}
-					while(heading-attitudeActual.Yaw > 180.0f){
-						heading-=360.0f;
-					}
-					
-					attitudeActual.Yaw=.997f*attitudeActual.Yaw+0.003f*heading;
-					
-					// Convert into quaternions degrees (makes assumptions about RPY order)
-					RPY2Quaternion(&attitudeActual.Roll, &attitudeActual.q1);
-					
-					//BOOOOOOOOOOOOOOO----------VVVVVVVVVV
-					
-					if (!AttitudeActualReadOnly()){
-						AttitudeActualSet(&attitudeActual);
-					}
-				}
-				
+			}
 				
 				// Do not update position and velocity estimates when in simulation mode
 				if (!PositionActualReadOnly()){
@@ -608,7 +605,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 		float sP=sinf(psi);
 
 		//In case psi is too small, we have to use a different equation to solve for theta
-		if (fabs(psi) > 3.14f/2)
+		if (fabs(psi) > 3.1415f/2)
 			theta=atanf((a_sensor[1]+cP*(sP*a_sensor[0]-cP*a_sensor[1]))/(sP*a_sensor[2]));
 		else
 			theta=atanf((a_sensor[0]-sP*(sP*a_sensor[0]-cP*a_sensor[1]))/(cP*a_sensor[2]));

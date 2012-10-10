@@ -250,7 +250,7 @@ def xtrim(string, suffix, length):
         assert n > 0, "length of truncated string+suffix exceeds maximum length"
         return ''.join([string[:n], '+', suffix])
 
-def GetHashofDirs(directory, verbose=0):
+def GetHashofDirs(directory, verbose=0, raw=0):
   import hashlib, os
   SHAhash = hashlib.sha1()
   if not os.path.exists (directory):
@@ -298,8 +298,11 @@ def GetHashofDirs(directory, verbose=0):
   if verbose == 1:
       print 'Final hash is', SHAhash.hexdigest()
 
-  hex_stream = lambda s:",".join(['0x'+hex(ord(c))[2:].zfill(2) for c in s])
-  return hex_stream(SHAhash.digest())
+  if raw == 1:
+      return SHAhash.hexdigest()
+  else:
+      hex_stream = lambda s:",".join(['0x'+hex(ord(c))[2:].zfill(2) for c in s])
+      return hex_stream(SHAhash.digest())
 
 def main():
     """This utility uses git repository in the current working directory
@@ -380,7 +383,8 @@ dependent targets.
         BOARD_TYPE = args.type,
         BOARD_REVISION = args.revision,
         SHA1 = sha1(args.image),
-	UAVOSHA1= GetHashofDirs(args.uavodir,0),
+        UAVOSHA1TXT = GetHashofDirs(args.uavodir,verbose=0,raw=1),
+        UAVOSHA1 = GetHashofDirs(args.uavodir,verbose=0,raw=0),
     )
 
     if args.info:

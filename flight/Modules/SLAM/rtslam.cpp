@@ -108,14 +108,11 @@ typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinhole, simu::FeatureSim
 
 
 
-/* bridge to feed images from openpilot EKF to rtslam GPS sensor class */
-void RTSlam::position(float N, float E, float D) {
-	/**stub - rtslam fake GPS sensor not written yet**/
-}
-
-/* bridge to feed images from openpilot EKF to rtslam odometry sensor */
-void RTSlam::attitude(float Q1, float Q2, float Q3, float Q4) {
-	/**stub - rtslam fake INS sensor not written yet**/
+/* bridge to feed data from openpilot EKF to rtslam openpilot state sensor class */
+void RTSlam::state(hardware::OpenPilotStateInformation * state) {
+	if (openpilotstate) {
+		openpilotstate->capture(state);
+	}
 }
 
 /* bridge to feed images from openpilot camera sensor to rtslam hardware sensor class */
@@ -129,6 +126,7 @@ void RTSlam::videoFrame(IplImage* image) {
 
 RTSlam::RTSlam() :
 	openpilotcamera(NULL),
+	openpilotstate(NULL),
 	rawdata_condition(0),
 	configSetup(this)
 {
@@ -139,6 +137,7 @@ RTSlam::RTSlam() :
     intOpts[iVerbose] = 5;
     intOpts[iMap] = 1;
     intOpts[iCamera] = 1;
+    intOpts[iGps] = 4;
     intOpts[iDispGdhe] = 1;
     intOpts[iTrigger] = 2;
     floatOpts[fFreq] = 15.0;
@@ -762,12 +761,17 @@ void RTSlam::init()
 		switch (intOpts[iGps])
 		{
 			case 1:
-				hardGps.reset(new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath]));
+				hardGps.reset(new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath])); break;
 			case 2:
 				hardGps.reset(new hardware::HardwareSensorGpsGenom(rawdata_condition, 200, "mana-base", mode, strOpts[sDataPath])); // TODO ask to ignore vel
+				break;
 			case 3:
 				hardGps.reset(new hardware::HardwareSensorMocap(rawdata_condition, 200, mode, strOpts[sDataPath]));
 				init = false;
+				break;
+			case 4:
+				openpilotstate = new hardware::HardwareSensorStateOpenPilot(rawdata_condition, 200, mode, strOpts[sDataPath]);
+				hardGps.reset(openpilotstate);
 		}
 
 		hardGps->setSyncConfig(configSetup.GPS_TIMESTAMP_CORRECTION);

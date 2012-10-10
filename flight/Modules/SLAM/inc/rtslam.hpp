@@ -82,6 +82,7 @@
 #include "rtslam/hardwareEstimatorMti.hpp"
 #include "rtslam/hardwareSensorGpsGenom.hpp"
 #include "rtslam/hardwareSensorMocap.hpp"
+#include "rtslam/hardwareSensorStateOpenPilot.hpp"
 #include "rtslam/hardwareEstimatorOdo.hpp" 
 #include "rtslam/hardwareSensorExternalLoc.hpp"
 
@@ -146,8 +147,7 @@ public:
 
 
 	void videoFrame(IplImage* image);
-	void position(float N, float E, float D);
-	void attitude(float Q1, float Q2, float Q3, float Q4);
+	void state(hardware::OpenPilotStateInformation * state);
 
 protected:
 
@@ -185,6 +185,7 @@ protected:
     
     /** pointer to camera sensor to get images fed from OP **/
     hardware::HardwareSensorCameraOpenPilot *openpilotcamera;
+    hardware::HardwareSensorStateOpenPilot *openpilotstate;
     /** pointer to GPS sensor to get data fed from OP **/
     //hardware::HardwareSensorXXXOpenPilot * openpilotgps;
     /** pointer to odometry sensor to get data fed from OP **/

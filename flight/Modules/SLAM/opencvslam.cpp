@@ -149,9 +149,16 @@ void OpenCVslam::run() {
 		AttitudeActualGet(&attitudeActual);
 		PositionActualGet(&positionActual);
 		VelocityActualGet(&velocityActual);
-		rtslam->position(positionActual.North,positionActual.East,positionActual.Down);
-		rtslam->attitude(attitudeActual.q1,attitudeActual.q2,attitudeActual.q3,attitudeActual.q4);
-
+		hardware::OpenPilotStateInformation state;
+		state.position.x=positionActual.North;
+		state.position.y=positionActual.East;
+		state.position.z=positionActual.Down;
+		state.attitude.roll=attitudeActual.Roll;
+		state.attitude.pitch=attitudeActual.Pitch;
+		state.attitude.yaw=attitudeActual.Yaw;
+		state.positionVariance = 100;
+		state.attitudeVariance = 1;
+		rtslam->state(&state);
 
 		// Grab the current camera image
 		if (VideoSource) {

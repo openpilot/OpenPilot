@@ -486,9 +486,11 @@ endif
 
 ifeq ($(shell [ -d "$(ANDROID_SDK_DIR)" ] && echo "exists"), exists)
   ANDROID := $(ANDROID_SDK_DIR)/tools/android
+  ANDROID_DX := $(ANDROID_SDK_DIR)/platform-tools/dx
 else
   # not installed, hope it's in the path...
   ANDROID ?= android
+  ANDROID_DX ?= dx
 endif
 
 ##############################
@@ -670,7 +672,7 @@ $$(UAVO_COLLECTION_DIR)/$(1)/uavohash/java-build/uavobjects.jar: $$(UAVO_COLLECT
 		   -d . && \
 		find ./org/openpilot/uavtalk/uavobjects -type f -name '*.class' > classlist.txt && \
 		jar cf tmp_uavobjects.jar @classlist.txt && \
-		$$(ANDROID_SDK_DIR)/platform-tools/dx \
+		$$(ANDROID_DX) \
 			--dex \
 			--output $$(ANDROIDGCS_ASSETS_DIR)/uavos/$$$${HASH}.jar \
 			tmp_uavobjects.jar && \

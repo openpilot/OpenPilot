@@ -32,6 +32,7 @@ StartPage::StartPage(SetupWizard *wizard, QWidget *parent) :
     ui(new Ui::StartPage)
 {
     ui->setupUi(this);
+     setFont(QFont("Ubuntu",2));
 }
 
 StartPage::~StartPage()

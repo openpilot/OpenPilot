@@ -59,9 +59,10 @@ SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfiguratio
     {
         m_actuatorSettings << actuatorChannelSettings();
     }
-    createPages();
     setWizardStyle(QWizard::ModernStyle);
-    setFixedSize(640, 530);
+    setMinimumSize(600, 450);
+    resize(600, 450);
+    createPages();
 }
 
 int SetupWizard::nextId() const

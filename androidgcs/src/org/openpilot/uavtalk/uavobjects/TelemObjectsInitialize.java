@@ -1,13 +1,14 @@
 /**
  ******************************************************************************
  *
- * @file       abstractwizardpage.cpp
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup
- * @{
- * @addtogroup AbstractWizardPage
- * @{
- * @brief
+ *
+ * @file       uavobjectsinittemplate.java
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      the template for the uavobjects init part
+ *             $(GENERATEDWARNING)
+ *
+ * @see        The GNU Public License (GPL) Version 3
+ *
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -25,11 +26,19 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "abstractwizardpage.h"
+package org.openpilot.uavtalk.uavobjects;
 
-AbstractWizardPage::AbstractWizardPage(SetupWizard* wizard, QWidget *parent) :
-    QWizardPage(parent)
-{
-    m_wizard = wizard;
-    //setFixedSize(600, 400);
+import org.openpilot.uavtalk.UAVObjectManager;
+
+public class TelemObjectsInitialize {
+	
+	public static void register(UAVObjectManager objMngr) {
+		try {
+			objMngr.registerObject( new FirmwareIAPObj() );
+			objMngr.registerObject( new FlightTelemetryStats() );
+			objMngr.registerObject( new GCSTelemetryStats() );
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }

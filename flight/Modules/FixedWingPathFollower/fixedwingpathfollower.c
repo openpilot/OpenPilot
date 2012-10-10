@@ -178,13 +178,15 @@ static void pathfollowerTask(void *parameters)
 		
 		FixedWingPathFollowerSettingsGet(&fixedwingpathfollowerSettings);  //IT WOULD BE NICE NOT TO DO THIS EVERY LOOP.
 		
-		// Continue collecting data if not enough time
+		// Wait.
 		vTaskDelayUntil(&lastUpdateTime, fixedwingpathfollowerSettings.UpdatePeriod / portTICK_RATE_MS);
 
 		// Check flightmode
 		if (flightStatusUpdate) {
 			FlightStatusFlightModeGet(&flightMode);
 		}
+		
+		// Computer path follower commands
 		switch(flightMode) {
 			case FLIGHTSTATUS_FLIGHTMODE_RETURNTOHOME:
 			case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
@@ -229,7 +231,7 @@ static void pathfollowerTask(void *parameters)
  */
 static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixedwingpathfollowerSettings)
 {
-	float dT = UPDATEPERIOD_MS / 1000.0f; //Convert from [ms] to [s]
+	float dT = fixedwingpathfollowerSettings.UpdatePeriod / 1000.0f; //Convert from [ms] to [s]
 
 	VelocityActualData velocityActual;
 	StabilizationDesiredData stabDesired;
@@ -485,23 +487,15 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 #define ROLLLIMIT_NEUTRAL  fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_NEUTRAL]
 #define ROLLLIMIT_MIN      fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_MIN]
 #define ROLLLIMIT_MAX      fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_MAX]
-	if (fabs(headingError_R) > 20.0f*DEG2RAD){
-		if (headingError_R >0.0f)
-			stabDesired.Roll=ROLLLIMIT_MAX;
-		else
-			stabDesired.Roll=ROLLLIMIT_MIN;
-	}
-	else {
 #define HEADINGPI_KP fixedwingpathfollowerSettings.HeadingPI[FIXEDWINGPATHFOLLOWERSETTINGS_HEADINGPI_KP]
-		rollCommand = (/*rollFF*/ + headingError_R * HEADINGPI_KP)* RAD2DEG;
-		
-		//Turn heading 
-		
-		stabDesired.Roll = bound( ROLLLIMIT_NEUTRAL +
-								 rollCommand,
-								 ROLLLIMIT_MIN,
-								 ROLLLIMIT_MAX);
-	}
+	rollCommand = (/*rollFF*/ + headingError_R * HEADINGPI_KP)* RAD2DEG;
+	
+	//Turn heading 
+	
+	stabDesired.Roll = bound( ROLLLIMIT_NEUTRAL +
+							 rollCommand,
+							 ROLLLIMIT_MIN,
+							 ROLLLIMIT_MAX);
 	
 #ifdef SIM_OSX
 	fprintf(stderr, " headingError_R: %f, rollCommand: %f\n", headingError_R, rollCommand);
@@ -551,6 +545,7 @@ float followOrbit(float c[3], float rho, bool direction, float p[3], float psi, 
 	float pncn=p[0]-c[0];
 	float pece=p[1]-c[1];
 	float d=sqrtf(pncn*pncn + pece*pece);
+	
 	float err_orbit=d-rho;
 	integral->circleError+=err_orbit*delT;
 

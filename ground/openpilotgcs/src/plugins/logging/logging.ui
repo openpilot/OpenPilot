@@ -154,6 +154,12 @@
            <height>16777215</height>
           </size>
          </property>
+         <property name="suffix">
+          <string>s</string>
+         </property>
+         <property name="maximum">
+          <double>9999999.000000000000000</double>
+         </property>
         </widget>
        </item>
        <item>

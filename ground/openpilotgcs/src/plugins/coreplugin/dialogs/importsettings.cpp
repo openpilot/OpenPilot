@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QSettings>
 #include <utils/xmlconfig.h>
+#include <QTimer>
 
 importSettings::importSettings(QWidget *parent) :
     QDialog(parent),
@@ -11,6 +12,7 @@ importSettings::importSettings(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->cbConfigs,SIGNAL(currentIndexChanged(int)),this,SLOT(updateDetails(int)));
     connect(ui->btnLoad,SIGNAL(clicked()),this,SLOT(accept()));
+    QTimer::singleShot(500,this,SLOT(repaint()));
 }
 void importSettings::loadFiles(QString path)
 {

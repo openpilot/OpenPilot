@@ -434,7 +434,7 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
 }
 bool UploaderGadgetWidget::autoUpdateCapable()
 {
-    return QFile::exists(":/build/fw_coptercontrol/fw_coptercontrol.opfw");
+    return QDir(":/build").exists();
 }
 
 bool UploaderGadgetWidget::autoUpdate()

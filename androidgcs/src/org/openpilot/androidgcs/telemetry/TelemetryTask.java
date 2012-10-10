@@ -96,7 +96,7 @@ public abstract class TelemetryTask implements Runnable {
 	private final Observer firmwareIapUpdated = new Observer() {
 		@Override
 		public void update(Observable observable, Object data) {
-			Log.d(TAG, "Received firmware IAP Updated message");
+			if (DEBUG) Log.d(TAG, "Received firmware IAP Updated message");
 
 			UAVObject obj = objMngr.getObject("FirmwareIAPObj");
 			UAVObjectField description = obj.getField("Description");
@@ -108,8 +108,11 @@ public abstract class TelemetryTask implements Runnable {
 				for(int i = 0; i < HASH_SIZE_USED; i++)
 					jarName += Integer.toHexString((int) description.getDouble(i+60));
 				jarName += ".jar";
-				Log.d(TAG, "Attempting to load: " + jarName);
-				telemService.loadUavobjects(jarName, objMngr);
+				if (DEBUG) Log.d(TAG, "Attempting to load: " + jarName);
+				if (telemService.loadUavobjects(jarName, objMngr) ) {
+					telemService.toastMessage("Loaded appropriate UAVO set");
+				} else
+					telemService.toastMessage("Failed to determine UAVO set");
 			}
 
 			obj.removeUpdatedObserver(this);

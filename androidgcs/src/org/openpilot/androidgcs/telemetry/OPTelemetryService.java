@@ -80,8 +80,6 @@ public class OPTelemetryService extends Service {
 	static final int MSG_DISCONNECT   = 3;
 	static final int MSG_TOAST        = 100;
 
-	private boolean terminate = false;
-
 	private Thread activeTelem;
 	private TelemetryTask telemTask;
 
@@ -111,7 +109,6 @@ public class OPTelemetryService extends Service {
 			stopSelf(msg.arg2);
 			break;
 		case MSG_CONNECT:
-			terminate = false;
 			int connection_type;
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
 			try {
@@ -146,7 +143,6 @@ public class OPTelemetryService extends Service {
 		case MSG_DISCONNECT:
 			Toast.makeText(getApplicationContext(), "Disconnect requested", Toast.LENGTH_SHORT).show();
 			if (DEBUG) Log.d(TAG, "Calling disconnect");
-			terminate = true;
 			if (telemTask != null) {
 				telemTask.disconnect();
 				telemTask = null;
@@ -371,26 +367,28 @@ public class OPTelemetryService extends Service {
 
 		try {
 			Class<?> initClass = loader.loadClass("org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize");
-			Log.d(TAG, "Got the initClass: " + initClass);
 			Method initMethod = initClass.getMethod("register", UAVObjectManager.class);
-			Log.d(TAG, "Got the method: " + initMethod);
 			initMethod.invoke(null, objMngr);
-			Log.d(TAG, "Invoked");
 		} catch (ClassNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			return false;
 		} catch (IllegalAccessException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			return false;
 		} catch (NoSuchMethodException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			return false;
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
 
 		return true;

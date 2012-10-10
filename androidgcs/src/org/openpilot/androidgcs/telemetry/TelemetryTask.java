@@ -8,9 +8,11 @@ import java.util.Observer;
 
 import org.openpilot.uavtalk.Telemetry;
 import org.openpilot.uavtalk.TelemetryMonitor;
+import org.openpilot.uavtalk.UAVObject;
+import org.openpilot.uavtalk.UAVObjectField;
 import org.openpilot.uavtalk.UAVObjectManager;
 import org.openpilot.uavtalk.UAVTalk;
-import org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize;
+import org.openpilot.uavtalk.uavobjects.TelemObjectsInitialize;
 
 import android.content.Intent;
 import android.os.Handler;
@@ -91,6 +93,32 @@ public abstract class TelemetryTask implements Runnable {
 	 */
 	abstract boolean attemptConnection();
 
+	private final Observer firmwareIapUpdated = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+			if (DEBUG) Log.d(TAG, "Received firmware IAP Updated message");
+
+			UAVObject obj = objMngr.getObject("FirmwareIAPObj");
+			UAVObjectField description = obj.getField("Description");
+			if(description == null || description.getNumElements() < 100) {
+				telemService.toastMessage("Failed to determine UAVO set");
+			} else {
+				final int HASH_SIZE_USED = 20;
+				String jarName = new String();
+				for(int i = 0; i < HASH_SIZE_USED; i++)
+					jarName += Integer.toHexString((int) description.getDouble(i+60));
+				jarName += ".jar";
+				if (DEBUG) Log.d(TAG, "Attempting to load: " + jarName);
+				if (telemService.loadUavobjects(jarName, objMngr) ) {
+					telemService.toastMessage("Loaded appropriate UAVO set");
+				} else
+					telemService.toastMessage("Failed to determine UAVO set");
+			}
+
+			obj.removeUpdatedObserver(this);
+		}
+	};
+
 	/**
 	 * Called when a physical channel is opened
 	 *
@@ -103,7 +131,12 @@ public abstract class TelemetryTask implements Runnable {
 		// be dependent on what is connected (e.g. board and
 		// version number).
 		objMngr = new UAVObjectManager();
-		UAVObjectsInitialize.register(objMngr);
+		TelemObjectsInitialize.register(objMngr);
+
+		// Register to get an update from FirmwareIAP in order to register
+		// the appropriate objects
+		UAVObject obj = objMngr.getObject("FirmwareIAPObj");
+		obj.addUpdatedObserver(firmwareIapUpdated);
 
 		// Create the required telemetry objects attached to this
 		// data stream

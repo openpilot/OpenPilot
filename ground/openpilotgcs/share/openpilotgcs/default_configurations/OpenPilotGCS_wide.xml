@@ -6,7 +6,7 @@
     <LastPreferenceCategory>Notify Plugin</LastPreferenceCategory>
     <LastPreferencePage>settings</LastPreferencePage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
-    <SettingsWindowHeight>600</SettingsWindowHeight>
+    <SettingsWindowHeight>700</SettingsWindowHeight>
     <SettingsWindowWidth>800</SettingsWindowWidth>
     <UDPMirror>false</UDPMirror>
     <Description>Wide configuration</Description>
@@ -1679,7 +1679,7 @@
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>false</useOpenGL>
+          <useOpenGL>true</useOpenGL>
         </data>
       </Google__PCT__20Sat>
       <Memory__PCT__20Only>
@@ -1698,7 +1698,7 @@
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>airplanepip.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>false</useOpenGL>
+          <useOpenGL>true</useOpenGL>
         </data>
       </Memory__PCT__20Only>
       <default>
@@ -1717,7 +1717,7 @@
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>false</useOpenGL>
+          <useOpenGL>true</useOpenGL>
         </data>
       </default>
     </OPMapGadget>
@@ -2636,7 +2636,7 @@
             <type>uavGadget</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAClQAAAAIAAAB3)</splitterSizes>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABhAAAAAIAAAGE)</splitterSizes>
           <type>splitter</type>
         </side1>
         <splitterOrientation>1</splitterOrientation>
@@ -2669,8 +2669,20 @@
         </side0>
         <side1>
           <side0>
-            <classId>EmptyGadget</classId>
-            <type>uavGadget</type>
+            <side0>
+              <classId>PfdQmlGadget</classId>
+              <gadget>
+                <activeConfiguration>NoTerrain</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side0>
+            <side1>
+              <classId>MagicWaypointGadget</classId>
+              <type>uavGadget</type>
+            </side1>
+            <splitterOrientation>1</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB7wAAAAIAAAGU)</splitterSizes>
+            <type>splitter</type>
           </side0>
           <side1>
             <classId>GCSControlGadget</classId>
@@ -2680,7 +2692,7 @@
             <type>uavGadget</type>
           </side1>
           <splitterOrientation>1</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB6AAAAAIAAADC)</splitterSizes>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAADhAAAAAIAAAIX)</splitterSizes>
           <type>splitter</type>
         </side1>
         <splitterOrientation>2</splitterOrientation>
@@ -2739,7 +2751,7 @@
   </UAVGadgetManager>
   <Workspace>
     <AllowTabBarMovement>false</AllowTabBarMovement>
-    <Icon1>:\core\images\ah.png</Icon1>
+    <Icon1>:/core/images/ah.png</Icon1>
     <Icon10>:/core/images/openpilot_logo_64.png</Icon10>
     <Icon2>:/core/images/config.png</Icon2>
     <Icon3>:/core/images/cog.png</Icon3>

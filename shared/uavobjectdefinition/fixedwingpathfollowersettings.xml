@@ -16,9 +16,9 @@
         <field name="VerticalVelMax" units="m/s" type="float" elements="1" defaultvalue="10"/>
                 <!-- maximum allowed climb or sink rate in guided flight-->
 
-        <field name="VectorFollowingGain" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
+        <field name="VectorFollowingGain" units="(m/s)/m" type="float" elements="1" defaultvalue="0.5"/>
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
-        <field name="OrbitFollowingGain" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
+        <field name="OrbitFollowingGain" units="(m/s)/m" type="float" elements="1" defaultvalue="0.5"/>
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
         <field name="FollowerIntegralGain" units="(m/s)/m" type="float" elements="1" defaultvalue="0.0000"/>
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->

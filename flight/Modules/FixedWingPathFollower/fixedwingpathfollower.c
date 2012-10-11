@@ -386,8 +386,8 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 	float *r = pathDesired.Start;
 	float q[3] = {pathDesired.End[0]-pathDesired.Start[0], pathDesired.End[1]-pathDesired.Start[1], pathDesired.End[2]-pathDesired.Start[2]};
 	
-	float k_path  = fixedwingpathfollowerSettings.VectorFollowingGain; //SHOULD BE DIVIDED BY THE DESIRED AIRSPEED OR TRUE AIRSPEED, WHICHEVER IS HIGHER
-	float k_orbit = fixedwingpathfollowerSettings.OrbitFollowingGain; //SHOULD BE DIVIDED BY THE DESIRED AIRSPEED OR TRUE AIRSPEED, WHICHEVER IS HIGHER
+	float k_path  = fixedwingpathfollowerSettings.VectorFollowingGain/pathDesired.EndingVelocity; //SHOULD BE DIVIDED BY THE DESIRED AIRSPEED OR TRUE AIRSPEED, WHICHEVER IS HIGHER
+	float k_orbit = fixedwingpathfollowerSettings.OrbitFollowingGain/pathDesired.EndingVelocity; //SHOULD BE DIVIDED BY THE DESIRED AIRSPEED OR TRUE AIRSPEED, WHICHEVER IS HIGHER
 	float k_psi_int = fixedwingpathfollowerSettings.FollowerIntegralGain; //PROBABLY ALSO IS AIRSPEED DEPENDENT
 //========================================
 	//SHOULD NOT BE HARD CODED

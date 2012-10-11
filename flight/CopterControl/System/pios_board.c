@@ -330,6 +330,25 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_COM */
 		break;
+	case HWSETTINGS_USB_VCPPORT_DEBUGCONSOLE:
+#if defined(PIOS_INCLUDE_COM)
+#if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
+		{
+			uint32_t pios_usb_cdc_id;
+			if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
+				PIOS_Assert(0);
+			}
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_debug_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
+						NULL, 0,
+						tx_buffer, PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_DEBUG_CONSOLE */
+#endif	/* PIOS_INCLUDE_COM */
+		break;
 	}
 #endif	/* PIOS_INCLUDE_USB_CDC */
 

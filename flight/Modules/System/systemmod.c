@@ -49,6 +49,14 @@
 #include "watchdogstatus.h"
 #include "taskmonitor.h"
 
+//#define DEBUG_THIS_FILE
+
+#if defined(PIOS_INCLUDE_DEBUG_CONSOLE) && defined(DEBUG_THIS_FILE)
+#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(PIOS_COM_DEBUG, format, ## __VA_ARGS__)
+#else
+#define DEBUG_MSG(format, ...)
+#endif
+
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
 #define LED_BLINK_RATE_HZ 5
@@ -181,6 +189,7 @@ static void systemTask(void *parameters)
 		// Flash the heartbeat LED
 #if defined(PIOS_LED_HEARTBEAT)
 		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+		DEBUG_MSG("+ 0x%08x\r\n", 0xDEADBEEF);
 #endif	/* PIOS_LED_HEARTBEAT */
 
 		// Turn on the error LED if an alarm is set

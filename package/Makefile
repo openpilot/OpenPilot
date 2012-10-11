@@ -99,9 +99,15 @@ package_flight: | all_fw all_bu
 
 package_ground: | ground_package
 
-package: | package_flight opfw_resource package_ground
+package: | package_flight package_ground
 
 .PHONY: help uavobjects all_clean package_flight package_ground package
+
+# opfw_resource must be generated before the ground package,
+# and it depends on flight firmware images
+ground_package: | opfw_resource
+
+opfw_resource: | all_fw
 
 # Decide on a verbosity level based on the V= parameter
 export AT := @

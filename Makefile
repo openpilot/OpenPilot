@@ -650,7 +650,7 @@ $$(UAVO_COLLECTION_DIR)/$(1)/uavohash: $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml
 	$$(V1) python $$(ROOT_DIR)/make/scripts/version-info.py \
 		--path=$$(ROOT_DIR) \
 		--uavodir=$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition \
-		--format='$$$${UAVOSHA1TXT}' | xargs -n1 -I{} ln -sf {} $$(UAVO_COLLECTION_DIR)/$(1)/uavohash
+		--format='$$$${UAVOSHA1TXT}' | sed -n 's/^\(................\).*/\1/p' | xargs -n1 -I{} ln -sf {} $$(UAVO_COLLECTION_DIR)/$(1)/uavohash
 
         # Create the target of the symlink (ie. a directory named by the actual UAVO hash)
 	$$(V0) @echo " UAVOHASH  $(1) ->" $$$$(readlink $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)

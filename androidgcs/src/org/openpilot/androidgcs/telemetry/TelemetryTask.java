@@ -103,7 +103,7 @@ public abstract class TelemetryTask implements Runnable {
 			if(description == null || description.getNumElements() < 100) {
 				telemService.toastMessage("Failed to determine UAVO set");
 			} else {
-				final int HASH_SIZE_USED = 20;
+				final int HASH_SIZE_USED = 8;
 				String jarName = new String();
 				for(int i = 0; i < HASH_SIZE_USED; i++)
 					jarName += Integer.toHexString((int) description.getDouble(i+60));

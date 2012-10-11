@@ -97,7 +97,6 @@ void OpenCVslam::run() {
 	// Main task loop
 	double oldpos=0;
 
-
 	// debugging iterations
 	int iterations;
 	while (1) {
@@ -150,14 +149,20 @@ void OpenCVslam::run() {
 		PositionActualGet(&positionActual);
 		VelocityActualGet(&velocityActual);
 		hardware::OpenPilotStateInformation state;
-		state.position.x=positionActual.North;
-		state.position.y=positionActual.East;
-		state.position.z=positionActual.Down;
-		state.attitude.roll=attitudeActual.Roll;
-		state.attitude.pitch=attitudeActual.Pitch;
-		state.attitude.yaw=attitudeActual.Yaw;
-		state.positionVariance = 100;
-		state.attitudeVariance = 1;
+		state.position.x = positionActual.North/500.;
+		state.position.y = positionActual.East/500.;
+		state.position.z = positionActual.Down/500.;
+		//state.position.x = 0; // +x
+		//state.position.y = 0; // +y
+		//state.position.z = 10; // +z
+		state.attitude.roll=attitudeActual.Roll * DEG2RAD;
+		state.attitude.pitch=attitudeActual.Pitch * DEG2RAD;
+		state.attitude.yaw=attitudeActual.Yaw * DEG2RAD;
+		//state.attitude.roll=0*DEG2RAD;
+		//state.attitude.pitch=0*DEG2RAD;
+		//state.attitude.yaw=0*DEG2RAD;
+		state.positionVariance = 1;
+		state.attitudeVariance = 0.1;
 		rtslam->state(&state);
 
 		// Grab the current camera image
@@ -174,7 +179,9 @@ void OpenCVslam::run() {
 			cvReleaseImage(&lastFrame);
 		}
 		if (currentFrame) {
-			rtslam->videoFrame(currentFrame);
+			if (frame>5) {
+				rtslam->videoFrame(currentFrame);
+			}
 			lastFrame = cvCloneImage(currentFrame);
 
 			// draw a line in the video coresponding to artificial horizon (roll+pitch)

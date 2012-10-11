@@ -738,7 +738,7 @@ void RTSlam::init()
 				senPtr11->setHardwareSensor(hardSen11);
 			} else if (configSetup.CAMERA_TYPE == 5)
 			{ // OpenPilot ?
-				openpilotcamera = new hardware::HardwareSensorCameraOpenPilot(rawdata_condition, 200, cv::Size(img_width,img_height), mode, strOpts[sDataPath]);
+				openpilotcamera = new hardware::HardwareSensorCameraOpenPilot(rawdata_condition, 2000, cv::Size(img_width,img_height), mode, strOpts[sDataPath]);
 				hardware::hardware_sensor_openpilot_ptr_t hardSen11(openpilotcamera);
 				hardSen11->setTimingInfos(1.0/hardSen11->getFreq(), 1.0/hardSen11->getFreq());
 				senPtr11->setHardwareSensor(hardSen11);
@@ -770,7 +770,8 @@ void RTSlam::init()
 				init = false;
 				break;
 			case 4:
-				openpilotstate = new hardware::HardwareSensorStateOpenPilot(rawdata_condition, 200, mode, strOpts[sDataPath]);
+				senPtr13->setAbsolute(true);
+				openpilotstate = new hardware::HardwareSensorStateOpenPilot(rawdata_condition, 2000, mode, strOpts[sDataPath]);
 				hardGps.reset(openpilotstate);
 		}
 

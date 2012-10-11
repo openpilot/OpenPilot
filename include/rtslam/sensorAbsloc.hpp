@@ -54,6 +54,9 @@ namespace jafar {
 				bool full_cov;
 
 			public:
+				void setAbsolute(bool abs) {
+					absolute=abs;
+				}
 				/**
 					@param absolute do we estimate the absolute position as returned by the sensor,
 					or do we estimate a relative position wrt the initial absolute position, and just

@@ -320,6 +320,19 @@ public class OPTelemetryService extends Service {
         catch (IOException e)
         {
             Log.e(TAG, e.toString(), e);
+            String[] list;
+			try {
+				list = assetManager.list("uavos/");
+				Log.i(TAG, "Listing found uavos");
+	            for(int i = 0; i < list.length; i++) {
+	            	Log.i(TAG, "Found: " + list[i]);
+	            }
+
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
         }
     }
 

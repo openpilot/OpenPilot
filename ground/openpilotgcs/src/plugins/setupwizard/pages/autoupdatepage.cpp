@@ -53,7 +53,7 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         ui->statusLabel->setText("Booting the board");
         break;
     case uploader::SUCCESS:
-        ui->statusLabel->setText("Board Updated");
+        ui->statusLabel->setText("Board Updated, please press the 'next' button below");
         break;
     case uploader::FAILURE:
         ui->statusLabel->setText("Something went wrong, you will have to manualy upgrade the board using the uploader plugin");

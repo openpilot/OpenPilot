@@ -3,11 +3,13 @@ TEMPLATE = lib
 TARGET = SetupWizard 
 QT += svg
 
-include(../../openpilotgcsplugin.pri) 
-include(../../plugins/coreplugin/coreplugin.pri) 
+
+include(../../openpilotgcsplugin.pri)
+include(../../plugins/coreplugin/coreplugin.pri)
 include(../../plugins/uavobjectutil/uavobjectutil.pri)
 include(../../plugins/config/config.pri)
 
+LIBS *= -l$$qtLibraryName(Uploader)
 HEADERS += setupwizardplugin.h \ 
     setupwizard.h \
     pages/startpage.h \
@@ -31,7 +33,8 @@ HEADERS += setupwizardplugin.h \
     pages/outputcalibrationpage.h \
     outputcalibrationutil.h \
     pages/rebootpage.h \
-    pages/savepage.h
+    pages/savepage.h \
+    pages/autoupdatepage.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -56,7 +59,8 @@ SOURCES += setupwizardplugin.cpp \
     pages/outputcalibrationpage.cpp \
     outputcalibrationutil.cpp \
     pages/rebootpage.cpp \
-    pages/savepage.cpp
+    pages/savepage.cpp \
+    pages/autoupdatepage.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 
@@ -77,7 +81,8 @@ FORMS += \
     connectiondiagram.ui \
     pages/outputcalibrationpage.ui \
     pages/rebootpage.ui \
-    pages/savepage.ui
+    pages/savepage.ui \
+    pages/autoupdatepage.ui
 
 RESOURCES += \
     wizardResources.qrc

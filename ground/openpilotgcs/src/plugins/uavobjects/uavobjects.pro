@@ -25,6 +25,7 @@ OTHER_FILES += UAVObjects.pluginspec
 # Add in all of the synthetic/generated uavobject files
 HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.h \
+    $$UAVOBJECT_SYNTHETICS/airspeedactual.h \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.h \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.h \
@@ -97,6 +98,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
 
 SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.cpp \
+    $$UAVOBJECT_SYNTHETICS/airspeedactual.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.cpp \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.cpp \

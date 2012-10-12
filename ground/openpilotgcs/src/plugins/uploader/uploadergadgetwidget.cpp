@@ -432,6 +432,128 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
     delete dfu; // Frees up the USB/Serial port too
     dfu = NULL;
 }
+bool UploaderGadgetWidget::autoUpdateCapable()
+{
+    return QDir(":/build").exists();
+}
+
+bool UploaderGadgetWidget::autoUpdate()
+{
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    cm->disconnectDevice();
+    cm->suspendPolling();
+    if (dfu) {
+        delete dfu;
+        dfu = NULL;
+    }
+    while(USBMonitor::instance()->availableDevices(0x20a0,-1,-1,-1).length()>0)
+    {
+        emit autoUpdateSignal(WAITING_DISCONNECT,QVariant());
+        if(QMessageBox::warning(this,tr("OpenPilot Uploader"),tr("Please disconnect all openpilot boards"),QMessageBox::Ok,QMessageBox::Cancel)==QMessageBox::Cancel)
+        {
+            emit autoUpdateSignal(FAILURE,QVariant());
+            return false;
+        }
+    }
+    emit autoUpdateSignal(WAITING_CONNECT,0);
+    autoUpdateConnectTimeout=0;
+    m_timer = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(performAuto()));
+    m_timer->start(1000);
+    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)),&m_eventloop, SLOT(quit()));
+    m_eventloop.exec();
+    if(!m_timer->isActive())
+    {
+        m_timer->stop();
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    m_timer->stop();
+    dfu = new DFUObject(DFU_DEBUG, false, QString());
+    dfu->AbortOperation();
+    emit autoUpdateSignal(JUMP_TO_BL,QVariant());
+    if(!dfu->enterDFU(0))
+    {
+        delete dfu;
+        dfu = NULL;
+        cm->resumePolling();
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    if(!dfu->findDevices() || (dfu->numberOfDevices != 1))
+    {
+        delete dfu;
+        dfu = NULL;
+        cm->resumePolling();
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    if (dfu->numberOfDevices > 5) {
+        delete dfu;
+        dfu = NULL;
+        cm->resumePolling();
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    QString filename;
+    emit autoUpdateSignal(LOADING_FW,QVariant());
+    switch (dfu->devices[0].ID)
+    {
+    case 0x401:
+        filename="fw_coptercontrol";
+        break;
+    case 0x402:
+        filename="fw_coptercontrol";
+        break;
+    default:
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+        break;
+    }
+    filename=":/build/"+filename+"/"+filename+".opfw";
+    QByteArray firmware;
+    if(!QFile::exists(filename))
+    {
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    firmware = file.readAll();
+    connect(dfu, SIGNAL(progressUpdated(int)), this, SLOT(autoUpdateProgress(int)));
+    connect(dfu, SIGNAL(uploadFinished(OP_DFU::Status)), &m_eventloop, SLOT(quit()));
+    emit autoUpdateSignal(UPLOADING_FW,QVariant());
+    if(!dfu->enterDFU(0))
+    {
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    dfu->AbortOperation();
+    if(!dfu->UploadFirmware(filename,false,0))
+    {
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    m_eventloop.exec();
+    QByteArray desc = firmware.right(100);
+    emit autoUpdateSignal(UPLOADING_DESC,QVariant());
+    if(dfu->UploadDescription(desc)!= OP_DFU::Last_operation_Success)
+    {
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    systemBoot();
+    emit autoUpdateSignal(SUCCESS,QVariant());
+    return true;
+}
+
+void UploaderGadgetWidget::autoUpdateProgress(int value)
+{
+    emit autoUpdateSignal(UPLOADING_FW,value);
+}
 
 /**
   Attempt a guided procedure to put both boards in BL mode when
@@ -555,6 +677,17 @@ void UploaderGadgetWidget::perform()
         m_eventloop.exit();
     }
     m_progress->setValue(m_progress->value()+1);
+}
+void UploaderGadgetWidget::performAuto()
+{
+    ++autoUpdateConnectTimeout;
+    emit autoUpdateSignal(WAITING_CONNECT,autoUpdateConnectTimeout*5);
+    if(autoUpdateConnectTimeout==20)
+    {
+        m_timer->stop();
+        m_eventloop.exit();
+    }
+
 }
 void UploaderGadgetWidget::cancel()
 {

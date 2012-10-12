@@ -34,5 +34,9 @@
         <file>resources/bttn-illustration-up.png</file>
         <file>resources/bttn-save-down.png</file>
         <file>resources/bttn-save-up.png</file>
+        <file>resources/bttn-flash-down.png</file>
+        <file>resources/bttn-flash-up.png</file>
+        <file>resources/bttn-upgrade-down.png</file>
+        <file>resources/bttn-upgrade-up.png</file>
     </qresource>
 </RCC>

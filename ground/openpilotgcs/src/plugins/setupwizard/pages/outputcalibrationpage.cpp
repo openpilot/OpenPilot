@@ -228,6 +228,15 @@ void OutputCalibrationPage::showEvent(QShowEvent *event)
     }
 }
 
+void OutputCalibrationPage::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+    if(m_vehicleBoundsItem) {
+        ui->vehicleView->setSceneRect(m_vehicleBoundsItem->boundingRect());
+        ui->vehicleView->fitInView(m_vehicleBoundsItem, Qt::KeepAspectRatio);
+    }
+}
+
 void OutputCalibrationPage::customBackClicked()
 {
     if(m_currentWizardIndex > 0)

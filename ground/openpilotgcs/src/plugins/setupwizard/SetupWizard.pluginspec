@@ -8,5 +8,6 @@
         <dependency name="Core" version="1.0.0"/>
         <dependency name="Config" version="1.0.0"/>
         <dependency name="UAVObjects" version="1.0.0"/>
+        <dependency name="Uploader" version="1.0.0"/>
     </dependencyList>
 </plugin>    

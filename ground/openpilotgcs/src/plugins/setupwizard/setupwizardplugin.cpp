@@ -82,7 +82,9 @@ void SetupWizardPlugin::shutdown()
 
 void SetupWizardPlugin::showSetupWizard()
 {
-    SetupWizard().exec();
+    SetupWizard *m_wiz = new SetupWizard();
+    m_wiz->setAttribute( Qt::WA_DeleteOnClose, true );
+    m_wiz->show();
 }
 
 Q_EXPORT_PLUGIN(SetupWizardPlugin)

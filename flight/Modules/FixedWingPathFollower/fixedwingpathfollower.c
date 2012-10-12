@@ -49,7 +49,7 @@
 #include "velocityactual.h"
 #include "manualcontrol.h"
 #include "flightstatus.h"
-#include "gpsairspeed.h"
+#include "airspeedactual.h"
 #include "homelocation.h"
 #include "stabilizationdesired.h" // object that will be updated by the module
 #include "pathdesired.h" // object that will be updated by the module
@@ -139,7 +139,7 @@ int32_t FixedWingPathFollowerInitialize()
 	
 	if (optionalModules[HWSETTINGS_OPTIONALMODULES_FIXEDWINGPATHFOLLOWER] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
 		FixedWingPathFollowerSettingsInitialize();
-		GPSAirspeedInitialize();
+		AirspeedActualInitialize();
 		PathDesiredInitialize();
 		
 		integral = (struct Integral *) pvPortMalloc(sizeof(struct Integral));
@@ -229,7 +229,7 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 
 	VelocityActualGet(&velocityActual);
 	StabilizationDesiredGet(&stabDesired);
-	GPSAirspeedTrueAirspeedGet(&trueAirspeed); //BOOOO!!! This not the way to get true airspeed. It needs to come from a UAVO that merges everything together.
+	AirspeedActualTrueAirspeedGet(&trueAirspeed); //BOOOO!!! This not the way to get true airspeed. It needs to come from a UAVO that merges everything together.
 
 
 	PositionActualData positionActual;
@@ -368,8 +368,8 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 	float *r = pathDesired.Start;
 	float q[3] = {pathDesired.End[0]-pathDesired.Start[0], pathDesired.End[1]-pathDesired.Start[1], pathDesired.End[2]-pathDesired.Start[2]};
 	
-	float k_path  = fixedwingpathfollowerSettings.VectorFollowingGain/pathDesired.EndingVelocity;
-	float k_orbit = fixedwingpathfollowerSettings.OrbitFollowingGain/pathDesired.EndingVelocity;
+	float k_path  = fixedwingpathfollowerSettings.VectorFollowingGain/pathDesired.EndingVelocity; //Divide gain by airspeed so that the turn rate is independent of airspeed
+	float k_orbit = fixedwingpathfollowerSettings.OrbitFollowingGain/pathDesired.EndingVelocity; //Divide gain by airspeed so that the turn rate is independent of airspeed
 	float k_psi_int = fixedwingpathfollowerSettings.FollowerIntegralGain;
 //========================================
 	//SHOULD NOT BE HARD CODED
@@ -383,7 +383,6 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 //========================================	
 	
 	float rho;
-//	float rollFF;
 	float headingCommand_R;
 	
 	float pncn=p[0]-c[0];

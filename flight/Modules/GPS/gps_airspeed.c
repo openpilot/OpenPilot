@@ -32,7 +32,7 @@
 
 #include "openpilot.h"
 #include "gps_airspeed.h"
-#include "gpsairspeed.h"
+#include "airspeedactual.h"
 #include "attitudeactual.h"
 #include "CoordinateConversions.h"
 
@@ -147,15 +147,15 @@ void gps_airspeed_update(const GPSVelocityData *gpsVelData)
 			
 			const float alpha = .1;
 			float gps_airspeed_old;
-			GPSAirspeedTrueAirspeedGet(&gps_airspeed_old);			
+			AirspeedActualTrueAirspeedGet(&gps_airspeed_old);			
 			
 			gps_airspeed=gps_airspeed*alpha + (1-alpha)*gps_airspeed_old;
 			
-			GPSAirspeedTrueAirspeedSet(&gps_airspeed);
+			AirspeedActualTrueAirspeedSet(&gps_airspeed);
 		}
 		else {
-			GPSAirspeedTrueAirspeedGet(&gps_airspeed);
-			GPSAirspeedTrueAirspeedSet(&gps_airspeed);
+			AirspeedActualTrueAirspeedGet(&gps_airspeed); //<--Why do we get the airspeed just to set it? So that the object is listed as updated?
+			AirspeedActualTrueAirspeedSet(&gps_airspeed);
 		}
 
 	}

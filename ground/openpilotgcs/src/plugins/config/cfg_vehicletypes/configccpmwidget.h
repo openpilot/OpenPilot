@@ -72,6 +72,8 @@ private:
         QGraphicsEllipseItem *ServosTextCircles[CCPM_MAX_SWASH_SERVOS];
         QSpinBox *SwashLvlSpinBoxes[CCPM_MAX_SWASH_SERVOS];
 
+        QString TypeText;
+
         bool SwashLvlConfigurationInProgress;
         UAVObject::Metadata SwashLvlaccInitialData;
         int SwashLvlState;

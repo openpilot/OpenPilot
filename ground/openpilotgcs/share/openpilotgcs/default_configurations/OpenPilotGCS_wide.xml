@@ -955,7 +955,7 @@
       </GPS__PCT__20Mouse>
     </GpsDisplayGadget>
     <HITL>
-      <AeroSimRC>
+      <AeroSimRC__PCT__20HITL>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
@@ -970,8 +970,8 @@
           <attRawRate>20</attRawRate>
           <baroAltRate>50</baroAltRate>
           <baroAltitudeEnabled>false</baroAltitudeEnabled>
-          <binPath>\home\lafargue\X-Plane 9\X-Plane-i686</binPath>
-          <dataPath>\usr\share\games\FlightGear</dataPath>
+          <binPath></binPath>
+          <dataPath></dataPath>
           <gcsReceiverEnabled>true</gcsReceiverEnabled>
           <gpsPosRate>100</gpsPosRate>
           <gpsPositionEnabled>false</gpsPositionEnabled>
@@ -990,7 +990,7 @@
           <simulatorId>ASimRC</simulatorId>
           <startSim>false</startSim>
         </data>
-      </AeroSimRC>
+      </AeroSimRC__PCT__20HITL>
       <Flightgear__PCT__20HITL>
         <configInfo>
           <locked>false</locked>
@@ -1042,8 +1042,8 @@
           <attRawRate>20</attRawRate>
           <baroAltRate>50</baroAltRate>
           <baroAltitudeEnabled>false</baroAltitudeEnabled>
-          <binPath>\home\lafargue\X-Plane 9\X-Plane-i686</binPath>
-          <dataPath>\usr\share\games\FlightGear</dataPath>
+          <binPath></binPath>
+          <dataPath></dataPath>
           <gcsReceiverEnabled>false</gcsReceiverEnabled>
           <gpsPosRate>100</gpsPosRate>
           <gpsPositionEnabled>false</gpsPositionEnabled>

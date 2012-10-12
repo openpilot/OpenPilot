@@ -26,15 +26,22 @@
  */
 package org.openpilot.androidgcs.telemetry;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-import org.openpilot.uavtalk.UAVDataObject;
 import org.openpilot.uavtalk.UAVObjectManager;
-import org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -45,6 +52,7 @@ import android.os.Process;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
+import dalvik.system.DexClassLoader;
 
 public class OPTelemetryService extends Service {
 
@@ -71,8 +79,6 @@ public class OPTelemetryService extends Service {
 	static final int MSG_CONNECT      = 1;
 	static final int MSG_DISCONNECT   = 3;
 	static final int MSG_TOAST        = 100;
-
-	private boolean terminate = false;
 
 	private Thread activeTelem;
 	private TelemetryTask telemTask;
@@ -103,7 +109,6 @@ public class OPTelemetryService extends Service {
 			stopSelf(msg.arg2);
 			break;
 		case MSG_CONNECT:
-			terminate = false;
 			int connection_type;
 			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(OPTelemetryService.this);
 			try {
@@ -115,10 +120,6 @@ public class OPTelemetryService extends Service {
 			switch(connection_type) {
 			case 0: // No connection
 				return;
-			case 1:
-				Toast.makeText(getApplicationContext(), "Attempting fake connection", Toast.LENGTH_SHORT).show();
-				activeTelem = new FakeTelemetryThread();
-				break;
 			case 2:
 				Toast.makeText(getApplicationContext(), "Attempting BT connection", Toast.LENGTH_SHORT).show();
 				telemTask = new BluetoothUAVTalk(this);
@@ -142,7 +143,6 @@ public class OPTelemetryService extends Service {
 		case MSG_DISCONNECT:
 			Toast.makeText(getApplicationContext(), "Disconnect requested", Toast.LENGTH_SHORT).show();
 			if (DEBUG) Log.d(TAG, "Calling disconnect");
-			terminate = true;
 			if (telemTask != null) {
 				telemTask.disconnect();
 				telemTask = null;
@@ -277,148 +277,120 @@ public class OPTelemetryService extends Service {
 		public UAVObjectManager getObjectManager();
 	};
 
-	// Fake class for testing, simply emits periodic updates on
-	private class FakeTelemetryThread extends Thread implements TelemTask  {
-		private final UAVObjectManager objMngr;
-		@Override
-		public UAVObjectManager getObjectManager() { return objMngr; };
 
-		FakeTelemetryThread() {
-			objMngr = new UAVObjectManager();
-			UAVObjectsInitialize.register(objMngr);
-		}
+	/************************************************************/
+	/* Everything below here has to do with getting the UAVOs   */
+	/* from the package.  This shouldn't really be in the telem */
+	/* service class but needs to be in this context            */
+	/************************************************************/
 
-		@Override
-		public void run() {
-			System.out.println("Running fake thread");
+	private static void copyStream(InputStream inputStream, OutputStream outputStream) throws IOException
+    {
+        byte[] buffer = new byte[1024 * 10];
+        int numRead = inputStream.read(buffer);
+        while (numRead > 0)
+        {
+            outputStream.write(buffer, 0, numRead);
+            numRead = inputStream.read(buffer);
+        }
+    }
+	private void copyAssets(String JAR_DIR, String JAR_NAME)
+    {
+        File jarsDir = getDir(JAR_DIR, MODE_WORLD_READABLE);
+        AssetManager assetManager = getAssets();
+        try
+        {
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            try
+            {
+                File outputFile = new File(jarsDir, JAR_NAME);
+                inputStream = assetManager.open("uavos/" + JAR_NAME);
+                outputStream = new FileOutputStream(outputFile);
+                copyStream(inputStream, outputStream);
+            }
+            finally
+            {
+                if (inputStream != null)
+                    inputStream.close();
+                if (outputStream != null)
+                    outputStream.close();
+            }
+        }
+        catch (IOException e)
+        {
+            Log.e(TAG, e.toString(), e);
+        }
+    }
 
-			Intent intent = new Intent();
-			intent.setAction(INTENT_ACTION_CONNECTED);
-			sendBroadcast(intent,null);
+	/**
+	 * Delete the files in a directories
+	 * @param directory
+	 */
+	private static void deleteDirectoryContents(File directory)
+	{
+		File contents[] = directory.listFiles();
+		if (contents != null)
+		{
+			for (File file : contents)
+			{
+				if (file.isDirectory())
+					deleteDirectoryContents(file);
 
-			//toastMessage("Started fake telemetry thread");
-			UAVDataObject systemStats = (UAVDataObject) objMngr.getObject("SystemStats");
-			UAVDataObject attitudeActual = (UAVDataObject) objMngr.getObject("AttitudeActual");
-			UAVDataObject homeLocation = (UAVDataObject) objMngr.getObject("HomeLocation");
-			UAVDataObject positionActual = (UAVDataObject) objMngr.getObject("PositionActual");
-			UAVDataObject systemAlarms = (UAVDataObject) objMngr.getObject("SystemAlarms");
-
-			systemAlarms.getField("Alarm").setValue("Warning",0);
-			systemAlarms.getField("Alarm").setValue("OK",1);
-			systemAlarms.getField("Alarm").setValue("Critical",2);
-			systemAlarms.getField("Alarm").setValue("Error",3);
-			systemAlarms.updated();
-
-			homeLocation.getField("Latitude").setDouble(379420315);
-			homeLocation.getField("Longitude").setDouble(-88330078);
-			homeLocation.getField("Be").setDouble(26702.78710938,0);
-			homeLocation.getField("Be").setDouble(-1468.33605957,1);
-			homeLocation.getField("Be").setDouble(34181.78515625,2);
-
-
-			double roll = 0;
-			double pitch = 0;
-			double yaw = 0;
-			double north = 0;
-			double east = 0;
-			while( !terminate ) {
-				attitudeActual.getField("Roll").setDouble(roll);
-				attitudeActual.getField("Pitch").setDouble(pitch);
-				attitudeActual.getField("Yaw").setDouble(yaw);
-				positionActual.getField("North").setDouble(north += 100);
-				positionActual.getField("East").setDouble(east += 100);
-				roll = (roll + 10) % 180;
-				pitch = (pitch + 10) % 180;
-				yaw = (yaw + 10) % 360;
-
-				systemStats.updated();
-				attitudeActual.updated();
-				positionActual.updated();
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					break;
-				}
+				file.delete();
 			}
 		}
 	}
 
-	/*
-	private class BTTelemetryThread extends Thread implements TelemTask {
+	/**
+	 * Load the UAVObjects from a JAR file.  This method must be called in the
+	 * service context.
+	 * @return True if success, False otherwise
+	 */
+	public boolean loadUavobjects(String jar, UAVObjectManager objMngr) {
+	    final String JAR_DIR = "jars";
+	    final String DEX_DIR = "optimized_dex";
 
-		private final UAVObjectManager objMngr;
-		private UAVTalk uavTalk;
-		private Telemetry tel;
-		private TelemetryMonitor mon;
+	    copyAssets(JAR_DIR, jar);
 
-		@Override
-		public UAVObjectManager getObjectManager() { return objMngr; };
+		Log.d(TAG, "Starting dex loader");
+		File dexDir = getDir(DEX_DIR, Context.MODE_WORLD_READABLE);
 
-		BTTelemetryThread() {
-			objMngr = new UAVObjectManager();
-			UAVObjectsInitialize.register(objMngr);
+		// Necessary to get dexOpt to run
+		if (dexDir.exists())
+			deleteDirectoryContents(dexDir);
+
+		File jarsDir = getDir(JAR_DIR, MODE_WORLD_READABLE);
+		String classpath = new File(jarsDir, jar).getAbsolutePath();
+
+		DexClassLoader loader = new DexClassLoader(classpath, dexDir.getAbsolutePath(), null, getClassLoader());
+
+		try {
+			Class<?> initClass = loader.loadClass("org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize");
+			Method initMethod = initClass.getMethod("register", UAVObjectManager.class);
+			initMethod.invoke(null, objMngr);
+		} catch (ClassNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return false;
+		} catch (IllegalAccessException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return false;
+		} catch (NoSuchMethodException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return false;
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
 		}
 
-		@Override
-		public void run() {
-			if (DEBUG) Log.d(TAG, "Telemetry Thread started");
-
-			Looper.prepare();
-
-			BluetoothUAVTalk bt = new BluetoothUAVTalk(OPTelemetryService.this);
-			for( int i = 0; i < 10; i++ ) {
-				if (DEBUG) Log.d(TAG, "Attempting Bluetooth Connection");
-
-				bt.connect(objMngr);
-
-				if (DEBUG) Log.d(TAG, "Done attempting connection");
-				if( bt.getConnected() )
-					break;
-
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					Log.e(TAG, "Thread interrupted while trying to connect");
-					e.printStackTrace();
-					return;
-				}
-			}
-			if( ! bt.getConnected() ) {
-				toastMessage("BT connection failed");
-				return;
-			}
-			toastMessage("BT Connected");
-
-			if (DEBUG) Log.d(TAG, "Connected via bluetooth");
-
-			uavTalk = bt.getUavtalk();
-			tel = new Telemetry(uavTalk, objMngr);
-			mon = new TelemetryMonitor(objMngr,tel);
-			mon.addObserver(new Observer() {
-				@Override
-				public void update(Observable arg0, Object arg1) {
-					if (DEBUG) Log.d(TAG, "Mon updated. Connected: " + mon.getConnected() + " objects updated: " + mon.getObjectsUpdated());
-					if(mon.getConnected() ) {
-						Intent intent = new Intent();
-						intent.setAction(INTENT_ACTION_CONNECTED);
-						sendBroadcast(intent,null);
-					}
-				}
-			});
-
-
-			if (DEBUG) Log.d(TAG, "Entering UAVTalk processing loop");
-			while( !terminate ) {
-				try {
-					if( !uavTalk.processInputStream() )
-						break;
-				} catch (IOException e) {
-					// This occurs when they communication stream fails
-					toastMessage("Connection dropped");
-					break;
-				}
-			}
-			if (DEBUG) Log.d(TAG, "UAVTalk stream disconnected");
-		}
-	};*/
+		return true;
+	}
 }

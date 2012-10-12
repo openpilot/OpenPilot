@@ -32,6 +32,7 @@
 #include "QString"
 #include <QStringList>
 #include <QDebug>
+#include "uploader_global.h"
 
 namespace Core {
 class IUAVGadgetConfiguration;
@@ -43,7 +44,7 @@ class QSpinBox;
 
 using namespace Core;
 
-class UploaderGadgetOptionsPage : public IOptionsPage
+class UPLOADER_EXPORT UploaderGadgetOptionsPage : public IOptionsPage
 {
 Q_OBJECT
 public:

@@ -29,10 +29,11 @@
 #define UPLOADERPLUGIN_H
 
 #include <extensionsystem/iplugin.h>
+#include "uploader_global.h"
 
 class UploaderGadgetFactory;
 
-class UploaderPlugin : public ExtensionSystem::IPlugin
+class UPLOADER_EXPORT UploaderPlugin : public ExtensionSystem::IPlugin
 {
 public:
         UploaderPlugin();

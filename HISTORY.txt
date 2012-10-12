@@ -1,4 +1,9 @@
 ﻿Short summary of changes.  For a complete list see the git log.
+
+2012-10-06
+Receiver port can now be configured as PPM *and* PWM inputs.
+Pin 1 is PPM, other pins are PWM inputs.
+
 2012-07-27
 Added the ability to load stylesheets from external file according to operating system:
 macos.qss, linux.qss, windows.qss

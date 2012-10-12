@@ -52,6 +52,7 @@ public:
 
 protected:
     void showEvent(QShowEvent *event);
+    void resizeEvent(QResizeEvent *event);
     
 public slots:
     void customBackClicked();

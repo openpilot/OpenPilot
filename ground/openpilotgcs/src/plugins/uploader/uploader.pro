@@ -1,12 +1,8 @@
 TEMPLATE = lib
 TARGET = Uploader
+DEFINES += UPLOADER_LIBRARY
 QT += svg
-include(../../openpilotgcsplugin.pri)
-include(../../plugins/coreplugin/coreplugin.pri)
-include(../../plugins/uavobjects/uavobjects.pri)
-include(../../plugins/uavtalk/uavtalk.pri)
-include(../../plugins/rawhid/rawhid.pri)
-include(../../plugins/uavobjectutil/uavobjectutil.pri)
+include(uploader_dependencies.pri)
 INCLUDEPATH += ../../libs/qextserialport/src
 
 HEADERS += uploadergadget.h \
@@ -22,7 +18,9 @@ HEADERS += uploadergadget.h \
     SSP/qssp.h \
     SSP/qsspt.h \
     SSP/common.h \
-    runningdevicewidget.h
+    runningdevicewidget.h \
+    uploader_global.h \
+    enums.h
 SOURCES += uploadergadget.cpp \
     uploadergadgetconfiguration.cpp \
     uploadergadgetfactory.cpp \
@@ -36,7 +34,7 @@ SOURCES += uploadergadget.cpp \
     SSP/qssp.cpp \
     SSP/qsspt.cpp \
     runningdevicewidget.cpp
-OTHER_FILES += Uploader.pluginspec
+OTHER_FILES += Uploader.pluginspec \
 
 FORMS += \
     uploader.ui \
@@ -45,3 +43,6 @@ FORMS += \
 
 RESOURCES += \
     uploader.qrc
+exists( ../../../../../build/ground/opfw_resource/opfw_resource.qrc ) {
+RESOURCES += ../../../../build/ground/opfw_resource/opfw_resource.qrc
+}

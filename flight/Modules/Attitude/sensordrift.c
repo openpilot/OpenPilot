@@ -54,7 +54,7 @@
  #include "magnetometer.h"
 #endif
 #if defined (PIOS_GPS_PROVIDES_AIRSPEED) //THIS PIOS DEFINE DOES NOT CURRENTLY EXIST, BUT WE SHOULD ADD IT IN ORDER TO SUPPORT ALL MAGS, NOT JUST THE HMC5883
- #include "gpsairspeed.h"
+ #include "airspeedactual.h"
 #endif
 
 //Global variables
@@ -314,9 +314,9 @@ void DcmCorrection(float * accels, float * gyros, float Rbe[3][3], const float d
 #endif
 		//In addition, we can calculate roll-pitch error with only the aid of an accelerometer
 #if defined(PIOS_GPS_PROVIDES_AIRSPEED)
-		GPSAirspeedData gpsAirspeedData;
-		GPSAirspeedGet(&gpsAirspeedData);
-		float airspeed_tas = gpsAirspeedData.TrueAirspeed;	
+		AirspeedActualData airspeedActualData;
+		AirspeedActualGet(&airspeedActualData);
+		float airspeed_tas = airspeedActualData.TrueAirspeed;	
 #else
 		float airspeed_tas = 0;
 #endif

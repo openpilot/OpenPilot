@@ -37,10 +37,10 @@ MultiPage::MultiPage(SetupWizard *wizard, QWidget *parent) :
 
     QSvgRenderer *renderer = new QSvgRenderer();
     renderer->load(QString(":/configgadget/images/multirotor-shapes.svg"));
-    multiPic = new QGraphicsSvgItem();
-    multiPic->setSharedRenderer(renderer);
+    m_multiPic = new QGraphicsSvgItem();
+    m_multiPic->setSharedRenderer(renderer);
     QGraphicsScene *scene = new QGraphicsScene(this);
-    scene->addItem(multiPic);
+    scene->addItem(m_multiPic);
     ui->typeGraphicsView->setScene(scene);
 
     setupMultiTypesCombo();
@@ -48,6 +48,8 @@ MultiPage::MultiPage(SetupWizard *wizard, QWidget *parent) :
     // Default to Quad X since it is the most common setup
     ui->typeCombo->setCurrentIndex(1);
     connect(ui->typeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(updateImageAndDescription()));
+    ui->typeGraphicsView->setSceneRect(m_multiPic->boundingRect());
+    ui->typeGraphicsView->fitInView(m_multiPic, Qt::KeepAspectRatio);
 }
 
 MultiPage::~MultiPage()
@@ -66,6 +68,15 @@ bool MultiPage::validatePage()
     SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE) ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
     getWizard()->setVehicleSubType(type);
     return true;
+}
+
+void MultiPage::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+    if(m_multiPic) {
+        ui->typeGraphicsView->setSceneRect(m_multiPic->boundingRect());
+        ui->typeGraphicsView->fitInView(m_multiPic, Qt::KeepAspectRatio);
+    }
 }
 
 void MultiPage::setupMultiTypesCombo()
@@ -163,9 +174,9 @@ void MultiPage::updateImageAndDescription()
             elementId = "";
             break;
     }
-    multiPic->setElementId(elementId);
-    ui->typeGraphicsView->setSceneRect(multiPic->boundingRect());
-    ui->typeGraphicsView->fitInView(multiPic, Qt::KeepAspectRatio);
+    m_multiPic->setElementId(elementId);
+    ui->typeGraphicsView->setSceneRect(m_multiPic->boundingRect());
+    ui->typeGraphicsView->fitInView(m_multiPic, Qt::KeepAspectRatio);
 
     ui->typeDescription->setText(description);
 }

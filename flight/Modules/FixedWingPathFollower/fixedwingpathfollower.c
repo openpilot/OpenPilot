@@ -49,7 +49,7 @@
 #include "velocityactual.h"
 #include "manualcontrol.h"
 #include "flightstatus.h"
-#include "gpsairspeed.h"
+#include "airspeedactual.h"
 #include "homelocation.h"
 #include "stabilizationdesired.h" // object that will be updated by the module
 #include "pathdesired.h" // object that will be updated by the module
@@ -85,6 +85,7 @@ static xTaskHandle pathfollowerTaskHandle;
 static uint8_t flightMode=FLIGHTSTATUS_FLIGHTMODE_MANUAL;
 static bool followerEnabled = false;
 static bool flightStatusUpdate = false;
+static bool homeOrbit=true;
 
 
 // Private functions
@@ -138,8 +139,7 @@ int32_t FixedWingPathFollowerInitialize()
 	
 	if (optionalModules[HWSETTINGS_OPTIONALMODULES_FIXEDWINGPATHFOLLOWER] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
 		FixedWingPathFollowerSettingsInitialize();
-//		FixedWingPathFollowerStatusInitialize();
-		GPSAirspeedInitialize();
+		AirspeedActualInitialize();
 		PathDesiredInitialize();
 		
 		integral = (struct Integral *) pvPortMalloc(sizeof(struct Integral));
@@ -172,9 +172,7 @@ static void pathfollowerTask(void *parameters)
 	// Main task loop
 	lastUpdateTime = xTaskGetTickCount();
 	while (1) {
-		// Conditions when this runs:
-		// 1. Must have FixedWing type airframe
-		// 2. Flight mode is PositionHold or ReturnToHome
+		// TODO: Conditions when this runs.
 		
 		FixedWingPathFollowerSettingsGet(&fixedwingpathfollowerSettings);  //IT WOULD BE NICE NOT TO DO THIS EVERY LOOP.
 		
@@ -205,24 +203,6 @@ static void pathfollowerTask(void *parameters)
 }
 
 /**
- * Compute desired attitude from a fixed preset
- *
- */
-//static void updateSteadyStateAttitude(float* attitude)
-//{
-//	StabilizationDesiredData stabDesired;
-//	StabilizationDesiredGet(&stabDesired);
-//	stabDesired.Roll     = attitude[0];
-//	stabDesired.Pitch    = attitude[1];
-//	stabDesired.Yaw      = attitude[2];
-//	stabDesired.Throttle = attitude[3];
-//	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-//	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-//	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
-//	StabilizationDesiredSet(&stabDesired);
-//}
-
-/**
  * Compute desired attitude from the desired velocity
  *
  * Takes in @ref NedActual which has the acceleration in the 
@@ -249,7 +229,7 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 
 	VelocityActualGet(&velocityActual);
 	StabilizationDesiredGet(&stabDesired);
-	GPSAirspeedTrueAirspeedGet(&trueAirspeed); //BOOOO!!! This not the way to get true airspeed. It needs to come from a UAVO that merges everything together.
+	AirspeedActualTrueAirspeedGet(&trueAirspeed); //BOOOO!!! This not the way to get true airspeed. It needs to come from a UAVO that merges everything together.
 
 
 	PositionActualData positionActual;
@@ -271,6 +251,8 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 			pathDesired.StartingVelocity=fixedwingpathfollowerSettings.BestClimbRateSpeed;
 			pathDesired.EndingVelocity=fixedwingpathfollowerSettings.BestClimbRateSpeed;
 			pathDesired.Mode = PATHDESIRED_MODE_FLYVECTOR;
+			
+			homeOrbit=false;
 		} else if (flightMode == FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD){
 			// Simple position hold: stay at present altitude and position
 			
@@ -334,7 +316,6 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 #define THROTTLELIMIT_MIN     fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MIN]
 #define THROTTLELIMIT_MAX     fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MAX]
 	
-	
 	// set throttle
 	stabDesired.Throttle = bound(powerCommand+THROTTLELIMIT_NEUTRAL,
 								 THROTTLELIMIT_MIN,
@@ -354,11 +335,12 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 									  AIRSPEED_ILIMIT/AIRSPEED_KI);
 	}				
 	
-//	//Compute the cross feed from vertical speed to pitch, with saturation
+	//Compute the cross feed from vertical speed to pitch, with saturation
 //	float verticalSpeedToPitchCommandComponent=bound (-descentspeedError * fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_KP],
 //													  -fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX],
 //													  fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX]
 //													  );
+	
 	//Compute the pitch command as err*Kp + errInt*Ki + X_feed.
 	pitchCommand= -(airspeedError*AIRSPEED_KP 
 					+ integral->airspeedError*AIRSPEED_KI);
@@ -386,9 +368,9 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 	float *r = pathDesired.Start;
 	float q[3] = {pathDesired.End[0]-pathDesired.Start[0], pathDesired.End[1]-pathDesired.Start[1], pathDesired.End[2]-pathDesired.Start[2]};
 	
-	float k_path  = fixedwingpathfollowerSettings.VectorFollowingGain; //SHOULD BE DIVIDED BY THE DESIRED AIRSPEED OR TRUE AIRSPEED, WHICHEVER IS HIGHER
-	float k_orbit = fixedwingpathfollowerSettings.OrbitFollowingGain; //SHOULD BE DIVIDED BY THE DESIRED AIRSPEED OR TRUE AIRSPEED, WHICHEVER IS HIGHER
-	float k_psi_int = fixedwingpathfollowerSettings.FollowerIntegralGain; //PROBABLY ALSO IS AIRSPEED DEPENDENT
+	float k_path  = fixedwingpathfollowerSettings.VectorFollowingGain/pathDesired.EndingVelocity; //Divide gain by airspeed so that the turn rate is independent of airspeed
+	float k_orbit = fixedwingpathfollowerSettings.OrbitFollowingGain/pathDesired.EndingVelocity; //Divide gain by airspeed so that the turn rate is independent of airspeed
+	float k_psi_int = fixedwingpathfollowerSettings.FollowerIntegralGain;
 //========================================
 	//SHOULD NOT BE HARD CODED
 	
@@ -401,7 +383,6 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 //========================================	
 	
 	float rho;
-//	float rollFF;
 	float headingCommand_R;
 	
 	float pncn=p[0]-c[0];
@@ -423,9 +404,9 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 	//Determine if we should fly on a line or orbit path.
 	switch (flightMode) {
 		case FLIGHTSTATUS_FLIGHTMODE_RETURNTOHOME:
-			//BAD. This should really be a one way function, where we never go back to line mode until the waypoint changes.
-			if (d < rho+5.0f*pathDesired.EndingVelocity){ //When approx five seconds from the circle, start integrating into it
+			if (d < rho+5.0f*pathDesired.EndingVelocity || homeOrbit==true){ //When approx five seconds from the circle, start integrating into it
 				pathType=ORBIT;
+				homeOrbit=true;
 			}
 			else {
 				pathType=LINE;
@@ -458,19 +439,16 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 	switch (pathType){
 		case ORBIT:
 			if(pathDesired.Mode==PATHDESIRED_MODE_FLYCIRCLELEFT) {
-//				rollFF=-ROLL_FOR_HOLDING_CIRCLE*DEG2RAD;
 				direction=false;
 			}
 			else {
 				//In the case where the direction is undefined, always fly in a clockwise fashion
 				direction=true;
-//				rollFF=ROLL_FOR_HOLDING_CIRCLE*DEG2RAD; 
 			}
 			
 			headingCommand_R=followOrbit(c, rho, direction, p, headingActual_R, k_orbit, k_psi_int, dT);
 			break;
 		case LINE:
-//			rollFF=0;
 			headingCommand_R=followStraightLine(r, q, p, headingActual_R, chi_inf, k_path, k_psi_int, dT);
 			break;
 	}
@@ -488,7 +466,7 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 #define ROLLLIMIT_MIN      fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_MIN]
 #define ROLLLIMIT_MAX      fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_MAX]
 #define HEADINGPI_KP fixedwingpathfollowerSettings.HeadingPI[FIXEDWINGPATHFOLLOWERSETTINGS_HEADINGPI_KP]
-	rollCommand = (/*rollFF*/ + headingError_R * HEADINGPI_KP)* RAD2DEG;
+	rollCommand = (headingError_R * HEADINGPI_KP)* RAD2DEG;
 	
 	//Turn heading 
 	

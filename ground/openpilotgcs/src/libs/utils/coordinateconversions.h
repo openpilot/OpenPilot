@@ -50,6 +50,7 @@ public:
     void Quaternion2RPY(const float q[4], float rpy[3]);
     void RPY2Quaternion(const float rpy[3], float q[4]);
     void Quaternion2R(const float q[4], float Rbe[3][3]);
+    void R2Quaternion(float const Rbe[3][3], float q[4]);
 };
 
 }

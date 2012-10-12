@@ -34,7 +34,7 @@
 #include "GPS.h"
 
 #include "gpsposition.h"
-#include "gpsairspeed.h"
+#include "airspeedactual.h"
 #include "homelocation.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
@@ -151,7 +151,7 @@ int32_t GPSInitialize(void)
 		HomeLocationInitialize();
 #endif
 #if defined(PIOS_GPS_PROVIDES_AIRSPEED)
-		GPSAirspeedInitialize();
+		AirspeedActualInitialize();
 #endif
 		updateSettings();
 	}

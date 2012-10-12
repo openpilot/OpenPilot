@@ -1,4 +1,4 @@
-<plugin name="HITLNEW" version="1.0.0" compatVersion="1.0.0">
+<plugin name="HITL" version="1.0.0" compatVersion="1.0.0">
     <vendor>The OpenPilot Project</vendor>
     <copyright>(C) 2010 OpenPilot Project</copyright>
     <license>The GNU Public License (GPL) Version 3</license>

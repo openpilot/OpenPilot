@@ -86,6 +86,7 @@ void SetupWizardPlugin::showSetupWizard()
         SetupWizard *m_wiz = new SetupWizard();
         connect(m_wiz, SIGNAL(finished(int)), this, SLOT(wizardTerminated()));
         m_wiz->setAttribute( Qt::WA_DeleteOnClose, true );
+        m_wiz->setWindowFlags(m_wiz->windowFlags() | Qt::WindowStaysOnTopHint);
         m_wiz->show();
     }
 }

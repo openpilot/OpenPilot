@@ -68,17 +68,16 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("PipXSettings", "FrequencyCalibration", m_pipx->FrequencyCalibration);
 	addUAVObjectToWidgetRelation("PipXSettings", "Frequency", m_pipx->Frequency);
 
-	addUAVObjectToWidgetRelation("PipXStatus", "MinFrequency", m_pipx->MinFrequency);
-	addUAVObjectToWidgetRelation("PipXStatus", "MaxFrequency", m_pipx->MaxFrequency);
-	addUAVObjectToWidgetRelation("PipXStatus", "FrequencyStepSize", m_pipx->FrequencyStepSize);
-	addUAVObjectToWidgetRelation("PipXStatus", "FrequencyBand", m_pipx->FreqBand);
-	addUAVObjectToWidgetRelation("PipXStatus", "RSSI", m_pipx->RSSI);
-	addUAVObjectToWidgetRelation("PipXStatus", "AFC", m_pipx->RxAFC);
-	addUAVObjectToWidgetRelation("PipXStatus", "Retries", m_pipx->Retries);
-	addUAVObjectToWidgetRelation("PipXStatus", "LinkQuality", m_pipx->LinkQuality);
+	addUAVObjectToWidgetRelation("PipXStatus", "RxGood", m_pipx->Good);
+	addUAVObjectToWidgetRelation("PipXStatus", "RxCorrected", m_pipx->Corrected);
+	addUAVObjectToWidgetRelation("PipXStatus", "RxErrors", m_pipx->Errors);
+	addUAVObjectToWidgetRelation("PipXStatus", "RxMissed", m_pipx->Missed);
 	addUAVObjectToWidgetRelation("PipXStatus", "UAVTalkErrors", m_pipx->UAVTalkErrors);
+	addUAVObjectToWidgetRelation("PipXStatus", "TxDropped", m_pipx->Dropped);
 	addUAVObjectToWidgetRelation("PipXStatus", "Resets", m_pipx->Resets);
-	addUAVObjectToWidgetRelation("PipXStatus", "Dropped", m_pipx->Dropped);
+	addUAVObjectToWidgetRelation("PipXStatus", "Timeouts", m_pipx->Timeouts);
+	addUAVObjectToWidgetRelation("PipXStatus", "RSSI", m_pipx->RSSI);
+	addUAVObjectToWidgetRelation("PipXStatus", "LinkQuality", m_pipx->LinkQuality);
 	addUAVObjectToWidgetRelation("PipXStatus", "RXRate", m_pipx->RXRate);
 	addUAVObjectToWidgetRelation("PipXStatus", "TXRate", m_pipx->TXRate);
 
@@ -97,7 +96,6 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 
 	// Request and update of the setting object.
 	settingsUpdated = false;
-	//pipxSettingsObj->requestUpdate();
 
 	disableMouseWheelEvents();
 }
@@ -182,15 +180,15 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 	}
 	UAVObjectField* pairRssiField = object->getField("PairSignalStrengths");
 	if (pairRssiField) {
-        m_pipx->PairSignalStrengthBar1->setValue(pairRssiField->getValue(0).toInt());
-        m_pipx->PairSignalStrengthBar2->setValue(pairRssiField->getValue(1).toInt());
-        m_pipx->PairSignalStrengthBar3->setValue(pairRssiField->getValue(2).toInt());
-        m_pipx->PairSignalStrengthBar4->setValue(pairRssiField->getValue(3).toInt());
-        m_pipx->PairSignalStrengthLabel1->setText(QString("%1dB").arg(pairRssiField->getValue(0).toInt()));
-        m_pipx->PairSignalStrengthLabel2->setText(QString("%1dB").arg(pairRssiField->getValue(1).toInt()));
-        m_pipx->PairSignalStrengthLabel3->setText(QString("%1dB").arg(pairRssiField->getValue(2).toInt()));
-        m_pipx->PairSignalStrengthLabel4->setText(QString("%1dB").arg(pairRssiField->getValue(3).toInt()));
-    } else {
+		m_pipx->PairSignalStrengthBar1->setValue(pairRssiField->getValue(0).toInt());
+		m_pipx->PairSignalStrengthBar2->setValue(pairRssiField->getValue(1).toInt());
+		m_pipx->PairSignalStrengthBar3->setValue(pairRssiField->getValue(2).toInt());
+		m_pipx->PairSignalStrengthBar4->setValue(pairRssiField->getValue(3).toInt());
+		m_pipx->PairSignalStrengthLabel1->setText(QString("%1dB").arg(pairRssiField->getValue(0).toInt()));
+		m_pipx->PairSignalStrengthLabel2->setText(QString("%1dB").arg(pairRssiField->getValue(1).toInt()));
+		m_pipx->PairSignalStrengthLabel3->setText(QString("%1dB").arg(pairRssiField->getValue(2).toInt()));
+		m_pipx->PairSignalStrengthLabel4->setText(QString("%1dB").arg(pairRssiField->getValue(3).toInt()));
+	} else {
 		qDebug() << "PipXtremeGadgetWidget: Count not read PairID field.";
 	}
 
@@ -269,10 +267,10 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
     Q_UNUSED(object);
 
     if (!settingsUpdated)
-	{
-		settingsUpdated = true;
-		enableControls(true);
-	}
+    {
+	    settingsUpdated = true;
+	    enableControls(true);
+    }
 }
 
 void ConfigPipXtremeWidget::disconnected()

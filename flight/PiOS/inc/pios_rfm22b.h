@@ -77,16 +77,28 @@ enum rfm22b_datarate {
 	RFM22_datarate_256000 = 13,
 };
 
+struct rfm22b_stats {
+	uint16_t packets_per_sec;
+	uint16_t tx_count;
+	uint16_t rx_count;
+	uint8_t rx_good;
+	uint8_t rx_corrected;
+	uint8_t rx_error;
+	uint8_t rx_missed;
+	uint8_t tx_dropped;
+	uint8_t resets;
+	uint8_t timeouts;
+	uint8_t link_quality;
+	int8_t rssi;
+};
+
 /* Public Functions */
 extern int32_t PIOS_RFM22B_Init(uint32_t *rfb22b_id, uint32_t spi_id, uint32_t slave_num, const struct pios_rfm22b_cfg *cfg);
 extern void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr);
 extern void RFM22_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool data_whitening);
 extern void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id);
 extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
-extern uint16_t PIOS_RFM22B_Resets(uint32_t rfm22b_id);
-extern uint16_t PIOS_RFM22B_Timeouts(uint32_t rfm22b_id);
-extern uint8_t PIOS_RFM22B_LinkQuality(uint32_t rfm22b_id);
-extern int8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id);
+extern void PIOS_RFM22B_GetStats(uint32_t rfm22b_id, struct rfm22b_stats *stats);
 extern bool PIOS_RFM22B_Send_Packet(uint32_t rfm22b_id, PHPacketHandle p, uint32_t max_delay);
 extern uint32_t PIOS_RFM22B_Receive_Packet(uint32_t rfm22b_id, PHPacketHandle *p, uint32_t max_delay);
 

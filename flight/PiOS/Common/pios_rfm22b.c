@@ -158,6 +158,14 @@ enum pios_rfm22b_event {
 	RFM22B_EVENT_NUM_EVENTS  // Must be last
 };
 
+#define RFM22B_RX_PACKET_STATS_LEN 4
+enum pios_rfm22b_rx_packet_status {
+	RFM22B_GOOD_RX_PACKET = 0x00,
+	RFM22B_CORRECTED_RX_PACKET = 0x01,
+	RFM22B_ERROR_RX_PACKET = 0x2,
+	RFM22B_MISSED_RX_PACKET = 0x3
+};
+
 struct pios_rfm22b_dev {
 	enum pios_rfm22b_dev_magic magic;
 	struct pios_rfm22b_cfg cfg;
@@ -210,24 +218,17 @@ struct pios_rfm22b_dev {
 	uint32_t tx_packet_count;
 	uint32_t rx_packet_count;
 
-	// The dropped packet counters
-	uint8_t slow_block;
-	uint8_t fast_block;
-	uint8_t slow_good_packets;
-	uint8_t fast_good_packets;
-	uint8_t slow_corrected_packets;
-	uint8_t fast_corrected_packets;
-	uint8_t slow_error_packets;
-	uint8_t fast_error_packets;
-	uint8_t slow_link_quality;
-	uint8_t fast_link_quality;
+	// The error statistics counters
+	uint16_t prev_rx_seq_num;
+	uint32_t rx_packet_stats[RFM22B_RX_PACKET_STATS_LEN];
+
+	// The packet statistics
+	struct rfm22b_stats stats;
 
 	// Stats
 	uint16_t resets;
 	uint16_t timeouts;
 	uint16_t errors;
-	// the current RSSI (register value)
-	uint8_t rssi;
 	// RSSI in dBm
 	int8_t rssi_dBm;
 
@@ -316,6 +317,7 @@ static enum pios_rfm22b_event rfm22_timeout(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_error(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_fatal_error(struct pios_rfm22b_dev *rfm22b_dev);
 static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev);
+static void rfm22b_add_rx_status(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_rx_packet_status status);
 
 // SPI read/write functions
 static void rfm22_assertCs();
@@ -574,25 +576,26 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->ezmac_status = 0;
 
 	// Initlize the link stats.
-	rfm22b_dev->slow_block = 0;
-	rfm22b_dev->fast_block = 0;
-	rfm22b_dev->slow_good_packets = 0;
-	rfm22b_dev->fast_good_packets = 0;
-	rfm22b_dev->slow_corrected_packets = 0;
-	rfm22b_dev->fast_corrected_packets = 0;
-	rfm22b_dev->slow_error_packets = 0;
-	rfm22b_dev->fast_error_packets = 0;
-	rfm22b_dev->slow_link_quality = 255;
-	rfm22b_dev->fast_link_quality = 255;
+	rfm22b_dev->prev_rx_seq_num = 0;
+	for (uint8_t i = 0; i < RFM22B_RX_PACKET_STATS_LEN; ++i)
+		rfm22b_dev->rx_packet_stats[i] = 0;
+
+	rfm22b_dev->stats.packets_per_sec = 0;
+	rfm22b_dev->stats.tx_count = 0;
+	rfm22b_dev->stats.rx_count = 0;
+	rfm22b_dev->stats.rx_good = 0;
+	rfm22b_dev->stats.rx_corrected = 0;
+	rfm22b_dev->stats.rx_error = 0;
+	rfm22b_dev->stats.rx_missed = 0;
+	rfm22b_dev->stats.tx_dropped = 0;
+	rfm22b_dev->stats.resets = 0;
+	rfm22b_dev->stats.timeouts = 0;
+	rfm22b_dev->stats.link_quality = 0;
+	rfm22b_dev->stats.rssi = 0;
 
 	// Initialize the stats.
-	rfm22b_dev->resets = 0;
-	rfm22b_dev->timeouts = 0;
-	rfm22b_dev->errors = 0;
 	rfm22b_dev->tx_packet_count = 0;
 	rfm22b_dev->rx_packet_count = 0;
-	rfm22b_dev->rssi = 0;
-	rfm22b_dev->rssi_dBm = -127;
 
 	// Bind the configuration to the device instance
 	rfm22b_dev->cfg = *cfg;
@@ -697,7 +700,7 @@ static void PIOS_RFM22B_InjectEvent(struct pios_rfm22b_dev *rfm22b_dev, enum pio
 }
 
 /**
- * Returns the unique device ID for th RFM22B device.
+ * Returns the unique device ID for the RFM22B device.
  * \param[in] rfm22b_id The RFM22B device index.
  * \return The unique device ID
  */
@@ -726,36 +729,52 @@ void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id)
 	rfm22b_dev->destination_id = (dest_id == 0) ? 0xffffffff : dest_id;
 }
 
-uint16_t PIOS_RFM22B_Resets(uint32_t rfm22b_id)
-{
+/**
+ * Returns the device statistics RFM22B device.
+ * \param[in] rfm22b_id The RFM22B device index.
+ * \param[out] stats The stats are returned in this structure
+ */
+void PIOS_RFM22B_GetStats(uint32_t rfm22b_id, struct rfm22b_stats *stats) {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if(!PIOS_RFM22B_validate(rfm22b_dev))
-		return 0;
-	return rfm22b_dev->resets;
-}
+		return;
+	*stats = rfm22b_dev->stats;
 
-uint16_t PIOS_RFM22B_Timeouts(uint32_t rfm22b_id)
-{
-	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(!PIOS_RFM22B_validate(rfm22b_dev))
-		return 0;
-	return rfm22b_dev->timeouts;
-}
+	// Add the RX packet statistics
+	stats->rx_count = rfm22b_dev->prev_rx_seq_num;
+	stats->tx_count = rfm22b_dev->tx_packet_count;
+	stats->rx_good = 0;
+	stats->rx_corrected = 0;
+	stats->rx_error = 0;
+	stats->rx_missed = 0;
+	for (uint8_t i = 0; i < RFM22B_RX_PACKET_STATS_LEN; ++i)
+	{
+		uint32_t val = rfm22b_dev->rx_packet_stats[i];
+		for (uint8_t j = 0; j < 16; ++j)
+		{
+			switch ((val >> (j * 2)) & 0x3)
+			{
+			case RFM22B_GOOD_RX_PACKET:
+				stats->rx_good++;
+				break;
+			case RFM22B_CORRECTED_RX_PACKET:
+				stats->rx_corrected++;
+				break;
+			case RFM22B_ERROR_RX_PACKET:
+				stats->rx_error++;
+				break;
+			case RFM22B_MISSED_RX_PACKET:
+				stats->rx_missed++;
+				break;
+			}
+		}
+	}
 
-uint8_t PIOS_RFM22B_LinkQuality(uint32_t rfm22b_id)
-{
-	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(!PIOS_RFM22B_validate(rfm22b_dev))
-		return 0;
-	return rfm22b_dev->slow_link_quality;
-}
-
-int8_t PIOS_RFM22B_RSSI(uint32_t rfm22b_id)
-{
-	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(!PIOS_RFM22B_validate(rfm22b_dev))
-		return 0;
-	return rfm22b_dev->rssi_dBm;
+	// Calculate the link quality metric, which is related to the number of good packets in relation to the number of bad packets.
+	// Note: This assumes that the number of packets sampled for the stats is 64.
+	// Using this equation, error and missed packets are counted as -2, and corrected packets are counted as -1.
+	// The rage is 0 (all error or missed packets) to 128 (all good packets).
+	stats->link_quality = 64 + stats->rx_good - stats->rx_error - stats->rx_missed;
 }
 
 static void PIOS_RFM22B_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail)
@@ -765,6 +784,24 @@ static void PIOS_RFM22B_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail)
 	bool valid = PIOS_RFM22B_validate(rfm22b_dev);
 	PIOS_Assert(valid);
 
+}
+
+static void PIOS_RFM22B_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail)
+{
+	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	bool valid = PIOS_RFM22B_validate(rfm22b_dev);
+	PIOS_Assert(valid);
+
+#ifdef NEVER
+	// Get some data to send
+	bool need_yield = false;
+	if(tx_pre_buffer_size == 0)
+		tx_pre_buffer_size = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, tx_pre_buffer,
+							     TX_BUFFER_SIZE, NULL, &need_yield);
+
+	// Inject a send packet event
+	PIOS_RFM22B_InjectEvent(g_rfm22b_dev, RFM22B_EVENT_TX_START, false);
+#endif
 }
 
 /**
@@ -820,6 +857,14 @@ uint32_t PIOS_RFM22B_Receive_Packet(uint32_t rfm22b_id, PHPacketHandle *pret, ui
 	{
 		PHPacketHandle p = rfm22b_dev->rx_packet_prev;
 		uint16_t len = PHPacketSizeECC(p);
+		uint16_t seq_num = p->header.seq_num;
+		uint16_t prev_seq_num = rfm22b_dev->prev_rx_seq_num;
+		uint16_t missed_packets = ((seq_num < prev_seq_num) ? (0xffff - prev_seq_num + seq_num) : (seq_num - prev_seq_num)) - 1;
+		rfm22b_dev->prev_rx_seq_num = seq_num;
+
+		// Add any missed packets into the stats.
+		for ( ; missed_packets > 0; --missed_packets)
+			rfm22b_add_rx_status(rfm22b_dev, RFM22B_MISSED_RX_PACKET);
 
 		// Attempt to correct any errors in the packet.
 		decode_data((unsigned char*)p, len);
@@ -833,43 +878,24 @@ uint32_t PIOS_RFM22B_Receive_Packet(uint32_t rfm22b_id, PHPacketHandle *pret, ui
 			if (correct_errors_erasures((unsigned char*)p, len, 0, 0) == 0)
 			{
 				// We couldn't correct the error, so drop the packet.
-				rfm22b_dev->fast_error_packets++;
+				rfm22b_add_rx_status(rfm22b_dev, RFM22B_ERROR_RX_PACKET);
 				PHReleaseRXPacket(pios_packet_handler, p);
 			}
 			else
 			{
 				// We corrected the error.
-				rfm22b_dev->fast_corrected_packets++;
+				rfm22b_add_rx_status(rfm22b_dev, RFM22B_CORRECTED_RX_PACKET);
 				rx_error = false;
 			}
 
-		}
+		} else
+			rfm22b_add_rx_status(rfm22b_dev, RFM22B_GOOD_RX_PACKET);
 
 		// Return the packet if there were not uncorrectable errors.
 		if (!rx_error)
 		{
-			rfm22b_dev->fast_good_packets++;
 			*pret = p;
 			rx_len = rfm22b_dev->rx_packet_len;
-
-			// Update the link statistics if necessary.
-			uint8_t fast_block = (p->header.seq_num >> 2) & 0xff;
-			uint8_t slow_block = (p->header.seq_num >> 4) & 0xff;
-			if (rfm22b_dev->fast_block != fast_block)
-			{
-				rfm22b_dev->fast_link_quality = (uint8_t)(((4 + (uint16_t)rfm22b_dev->fast_good_packets - rfm22b_dev->fast_error_packets) << 5) - 1);
-				rfm22b_dev->slow_good_packets += rfm22b_dev->fast_good_packets;
-				rfm22b_dev->slow_corrected_packets += rfm22b_dev->fast_corrected_packets;
-				rfm22b_dev->slow_error_packets += rfm22b_dev->fast_error_packets;
-				rfm22b_dev->fast_good_packets = rfm22b_dev->fast_corrected_packets = rfm22b_dev->fast_error_packets = 0;
-				rfm22b_dev->fast_block = fast_block;
-			}
-			if (rfm22b_dev->slow_block != slow_block)
-			{
-				rfm22b_dev->slow_link_quality = (uint8_t)(((16 + (uint16_t)rfm22b_dev->slow_good_packets - rfm22b_dev->slow_error_packets) << 3) - 1);
-				rfm22b_dev->slow_good_packets = rfm22b_dev->slow_corrected_packets = rfm22b_dev->slow_error_packets = 0;
-				rfm22b_dev->slow_block = slow_block;
-			}
 		}
 		rfm22b_dev->rx_packet_prev = NULL;
 	}
@@ -960,24 +986,6 @@ static void PIOS_RFM22B_Task(void *parameters)
 			if (rfm22_sendStatus(rfm22b_dev))
 				lastStatusTicks = curTicks;
 	}
-}
-
-static void PIOS_RFM22B_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail)
-{
-	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	bool valid = PIOS_RFM22B_validate(rfm22b_dev);
-	PIOS_Assert(valid);
-
-#ifdef NEVER
-	// Get some data to send
-	bool need_yield = false;
-	if(tx_pre_buffer_size == 0)
-		tx_pre_buffer_size = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, tx_pre_buffer,
-							     TX_BUFFER_SIZE, NULL, &need_yield);
-
-	// Inject a send packet event
-	PIOS_RFM22B_InjectEvent(g_rfm22b_dev, RFM22B_EVENT_TX_START, false);
-#endif
 }
 
 /**
@@ -1431,11 +1439,6 @@ static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22b_dev->status_packet.header.destination_id = 0xffffffff; // Broadcast
 	rfm22b_dev->status_packet.header.type = PACKET_TYPE_STATUS;
 	rfm22b_dev->status_packet.header.data_size = PH_STATUS_DATA_SIZE(&(rfm22b_dev->status_packet));
-	rfm22b_dev->status_packet.errors = rfm22b_dev->errors;
-	rfm22b_dev->status_packet.resets = rfm22b_dev->resets;
-	rfm22b_dev->status_packet.retries = 0;
-	rfm22b_dev->status_packet.uavtalk_errors = 0;
-	rfm22b_dev->status_packet.dropped = 0;
 	if (xQueueSend(rfm22b_dev->packetQueue, &sph, 0) != pdTRUE)
 		return false;
 
@@ -1446,8 +1449,6 @@ static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 
 	return true;
 }
-
-// ************************************
 
 /**
  * Read the RFM22B interrupt and device status registers
@@ -1480,6 +1481,21 @@ static bool rfm22_readStatus(struct pios_rfm22b_dev *rfm22b_dev)
 		return false;
 
 	return true;
+}
+
+/**
+ * Add a status value to the RX packet status array.
+ * \param[in] rfm22b_dev  The device structure
+ * \param[in] status  The packet status value
+ */
+static void rfm22b_add_rx_status(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_rx_packet_status status)
+{
+	// Shift the status registers
+	for (uint8_t i = RFM22B_RX_PACKET_STATS_LEN - 1; i > 0; --i)
+	{
+		rfm22b_dev->rx_packet_stats[i] = (rfm22b_dev->rx_packet_stats[i] << 2) | (rfm22b_dev->rx_packet_stats[i - 1] >> 30);
+	}
+	rfm22b_dev->rx_packet_stats[0] = (rfm22b_dev->rx_packet_stats[0] << 2) | status;
 }
 
 static enum pios_rfm22b_event rfm22_detectPreamble(struct pios_rfm22b_dev *rfm22b_dev)
@@ -1524,9 +1540,9 @@ static enum pios_rfm22b_event rfm22_detectSync(struct pios_rfm22b_dev *rfm22b_de
 		rfm22b_dev->afc_correction_Hz = (int32_t)(rfm22b_dev->frequency_step_size * afc_correction + 0.5f);
 
 		// read rx signal strength .. 45 = -100dBm, 205 = -20dBm
-		rfm22b_dev->rssi = rfm22_read(RFM22_rssi);
+		uint8_t rssi = rfm22_read(RFM22_rssi);
 		// convert to dBm
-		rfm22b_dev->rssi_dBm = (int8_t)(rfm22b_dev->rssi >> 1) - 122;
+		rfm22b_dev->rssi_dBm = (int8_t)(rssi >> 1) - 122;
 
 		// remember the afc value for this packet
 		rfm22b_dev->rx_packet_start_afc_Hz = rfm22b_dev->afc_correction_Hz;

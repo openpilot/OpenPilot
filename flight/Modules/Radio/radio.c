@@ -62,11 +62,6 @@
 
 typedef struct {
 	uint32_t pairID;
-	uint16_t retries;
-	uint16_t errors;
-	uint16_t uavtalk_errors;
-	uint16_t resets;
-	uint16_t dropped;
 	int8_t rssi;
 	uint8_t lastContact;
 } PairStats;
@@ -271,11 +266,6 @@ static int32_t RadioInitialize(void)
 	{
 		data->pairStats[i].pairID = 0;
 		data->pairStats[i].rssi = -127;
-		data->pairStats[i].retries = 0;
-		data->pairStats[i].errors = 0;
-		data->pairStats[i].uavtalk_errors = 0;
-		data->pairStats[i].resets = 0;
-		data->pairStats[i].dropped = 0;
 		data->pairStats[i].lastContact = 0;
 	}
 	// The first slot is reserved for our current pairID
@@ -355,11 +345,6 @@ static void StatusHandler(PHStatusPacketHandle status, int8_t rssi, int8_t afc)
 	if(found)
 	{
 		data->pairStats[id_idx].rssi = rssi;
-		data->pairStats[id_idx].retries = status->retries;
-		data->pairStats[id_idx].errors = status->errors;
-		data->pairStats[id_idx].uavtalk_errors = status->uavtalk_errors;
-		data->pairStats[id_idx].resets = status->resets;
-		data->pairStats[id_idx].dropped = status->dropped;
 		data->pairStats[id_idx].lastContact = 0;
 	}
 
@@ -384,11 +369,6 @@ static void StatusHandler(PHStatusPacketHandle status, int8_t rssi, int8_t afc)
 		}
 		data->pairStats[min_idx].pairID = id;
 		data->pairStats[min_idx].rssi = rssi;
-		data->pairStats[min_idx].retries = status->retries;
-		data->pairStats[min_idx].errors = status->errors;
-		data->pairStats[min_idx].uavtalk_errors = status->uavtalk_errors;
-		data->pairStats[min_idx].resets = status->resets;
-		data->pairStats[min_idx].dropped = status->dropped;
 		data->pairStats[min_idx].lastContact = 0;
 	}
 }
@@ -406,19 +386,27 @@ static void radioStatusTask(void *parameters)
 		PipXStatusGet(&pipxStatus);
 		PipXSettingsPairIDGet(&pairID);
 
+		// Get the stats from the radio device
+		struct rfm22b_stats radio_stats;
+		PIOS_RFM22B_GetStats(pios_rfm22b_id, &radio_stats);
+
 		// Update the status
 		pipxStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
-		pipxStatus.Retries = data->comTxRetries;
-		pipxStatus.LinkQuality = PIOS_RFM22B_LinkQuality(pios_rfm22b_id);
 		pipxStatus.UAVTalkErrors = data->UAVTalkErrors;
-		pipxStatus.Dropped = data->droppedPackets;
-		pipxStatus.Resets = PIOS_RFM22B_Resets(pios_rfm22b_id);
+		pipxStatus.RxGood = radio_stats.rx_good;
+		pipxStatus.RxCorrected = radio_stats.rx_corrected;
+		pipxStatus.RxErrors = radio_stats.rx_error;
+		pipxStatus.RxMissed = radio_stats.rx_missed;
+		pipxStatus.TxDropped = radio_stats.tx_dropped; // + data->droppedPackets;
+		pipxStatus.Resets = radio_stats.resets;
+		pipxStatus.Timeouts = radio_stats.timeouts;
+		pipxStatus.RSSI = radio_stats.rssi;
+		pipxStatus.LinkQuality = radio_stats.link_quality;
 		pipxStatus.TXRate = (uint16_t)((float)(data->txBytes * 1000) / STATS_UPDATE_PERIOD_MS);
 		data->txBytes = 0;
 		pipxStatus.RXRate = (uint16_t)((float)(data->rxBytes * 1000) / STATS_UPDATE_PERIOD_MS);
 		data->rxBytes = 0;
 		pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_DISCONNECTED;
-		pipxStatus.RSSI = PIOS_RFM22B_LinkQuality(pios_rfm22b_id);
 		LINK_LED_OFF;
 
 		// Update the potential pairing contacts
@@ -432,21 +420,11 @@ static void radioStatusTask(void *parameters)
 			{
 				data->pairStats[i].pairID = 0;
 				data->pairStats[i].rssi = -127;
-				data->pairStats[i].retries = 0;
-				data->pairStats[i].errors = 0;
-				data->pairStats[i].uavtalk_errors = 0;
-				data->pairStats[i].resets = 0;
-				data->pairStats[i].dropped = 0;
 				data->pairStats[i].lastContact = 0;
 			}
 			// Add the paired devices statistics to ours.
 			if(pairID && (data->pairStats[i].pairID == pairID) && (data->pairStats[i].rssi > -127))
 			{
-				pipxStatus.Retries += data->pairStats[i].retries;
-				pipxStatus.UAVTalkErrors += data->pairStats[i].uavtalk_errors;
-				pipxStatus.Dropped += data->pairStats[i].dropped;
-				pipxStatus.Resets += data->pairStats[i].resets;
-				pipxStatus.Dropped += data->pairStats[i].dropped;
 				pipxStatus.LinkState = PIPXSTATUS_LINKSTATE_CONNECTED;
 				LINK_LED_ON;
 			}

@@ -37,9 +37,8 @@
 #include <QKeySequence>
 #include <coreplugin/modemanager.h>
 
-SetupWizardPlugin::SetupWizardPlugin()
+SetupWizardPlugin::SetupWizardPlugin() : wizardRunning(false)
 {
-   // Do nothing
 }
 
 SetupWizardPlugin::~SetupWizardPlugin()
@@ -82,9 +81,19 @@ void SetupWizardPlugin::shutdown()
 
 void SetupWizardPlugin::showSetupWizard()
 {
-    SetupWizard *m_wiz = new SetupWizard();
-    m_wiz->setAttribute( Qt::WA_DeleteOnClose, true );
-    m_wiz->show();
+    if (!wizardRunning) {
+        wizardRunning = true;
+        SetupWizard *m_wiz = new SetupWizard();
+        connect(m_wiz, SIGNAL(finished(int)), this, SLOT(wizardTerminated()));
+        m_wiz->setAttribute( Qt::WA_DeleteOnClose, true );
+        m_wiz->show();
+    }
+}
+
+void SetupWizardPlugin::wizardTerminated()
+{
+    wizardRunning = false;
+    disconnect(this,SLOT(wizardTerminated()));
 }
 
 Q_EXPORT_PLUGIN(SetupWizardPlugin)

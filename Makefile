@@ -648,36 +648,30 @@ define UAVO_COLLECTION_BUILD_TEMPLATE
 $$(UAVO_COLLECTION_DIR)/$(1)/uavohash: $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml
         # Compute the sha1 hash for this UAVO collection
         # The sed bit truncates the UAVO hash to 16 hex digits
-        # The awk bit is just to get the arguments to ln in the right order without 
-        # using the '-I' option to xargs since it doesn't work on windows.
 	$$(V1) python $$(ROOT_DIR)/make/scripts/version-info.py \
 			--path=$$(ROOT_DIR) \
 			--uavodir=$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition \
 			--format='$$$${UAVOSHA1TXT}' | \
-		sed -e 's|\(................\).*|\1|' | \
-		awk '{ print $$$$1, "$$(UAVO_COLLECTION_DIR)/$(1)/uavohash" }' | \
-		xargs ln -sf
+		sed -e 's|\(................\).*|\1|' > $$@
 
-        # Create the target of the symlink (ie. a directory named by the actual UAVO hash)
-	$$(V0) @echo " UAVOHASH  $(1) ->" $$$$(readlink $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
-	$$(V1) mkdir -p $$(UAVO_COLLECTION_DIR)/$(1)/$$$$(readlink $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
+	$$(V0) @echo " UAVOHASH  $(1) ->" $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
 
 # Generate the java uavobjects for this UAVO collection
-$$(UAVO_COLLECTION_DIR)/$(1)/uavohash/java-build/java: $$(UAVO_COLLECTION_DIR)/$(1)/uavohash
-	$$(V0) @echo " UAVOJAVA  $(1)   " $$$$(readlink $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
+$$(UAVO_COLLECTION_DIR)/$(1)/java-build/java: $$(UAVO_COLLECTION_DIR)/$(1)/uavohash
+	$$(V0) @echo " UAVOJAVA  $(1)   " $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
 	$$(V1) mkdir -p $$@
 	$$(V1) ( \
-		cd $$(UAVO_COLLECTION_DIR)/$(1)/uavohash/java-build && \
+		cd $$(UAVO_COLLECTION_DIR)/$(1)/java-build && \
 		$$(UAVOBJGENERATOR) -java $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition $$(ROOT_DIR) ; \
 	)
 
 # Build a jar file for this UAVO collection
-$$(UAVO_COLLECTION_DIR)/$(1)/uavohash/java-build/uavobjects.jar: | $$(ANDROIDGCS_ASSETS_DIR)/uavos
-$$(UAVO_COLLECTION_DIR)/$(1)/uavohash/java-build/uavobjects.jar: $$(UAVO_COLLECTION_DIR)/$(1)/uavohash/java-build/java
-	$$(V0) @echo " UAVOJAR   $(1)   " $$$$(readlink $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
+$$(UAVO_COLLECTION_DIR)/$(1)/java-build/uavobjects.jar: | $$(ANDROIDGCS_ASSETS_DIR)/uavos
+$$(UAVO_COLLECTION_DIR)/$(1)/java-build/uavobjects.jar: $$(UAVO_COLLECTION_DIR)/$(1)/java-build/java
+	$$(V0) @echo " UAVOJAR   $(1)   " $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
 	$$(V1) ( \
-		HASH=$$$$(readlink $$(UAVO_COLLECTION_DIR)/$(1)/uavohash) && \
-		cd $$(UAVO_COLLECTION_DIR)/$(1)/uavohash/java-build && \
+		HASH=$$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash) && \
+		cd $$(UAVO_COLLECTION_DIR)/$(1)/java-build && \
 		javac java/*.java \
 		   $$(ROOT_DIR)/androidgcs/src/org/openpilot/uavtalk/UAVDataObject.java \
 		   $$(ROOT_DIR)/androidgcs/src/org/openpilot/uavtalk/UAVObject*.java \
@@ -701,7 +695,7 @@ $(foreach githash, $(UAVO_GIT_VERSIONS), $(eval $(call UAVO_COLLECTION_GIT_TEMPL
 $(foreach githash, $(UAVO_ALL_VERSIONS), $(eval $(call UAVO_COLLECTION_BUILD_TEMPLATE,$(githash))))
 
 .PHONY: uavo-collections_java
-uavo-collections_java: $(foreach githash, $(UAVO_ALL_VERSIONS), $(UAVO_COLLECTION_DIR)/$(githash)/uavohash/java-build/uavobjects.jar)
+uavo-collections_java: $(foreach githash, $(UAVO_ALL_VERSIONS), $(UAVO_COLLECTION_DIR)/$(githash)/java-build/uavobjects.jar)
 
 .PHONY: uavo-collections
 uavo-collections: uavo-collections_java

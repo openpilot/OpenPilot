@@ -647,10 +647,16 @@ define UAVO_COLLECTION_BUILD_TEMPLATE
 # This leaves us with a (broken) symlink that points to the full sha1sum of the collection
 $$(UAVO_COLLECTION_DIR)/$(1)/uavohash: $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml
         # Compute the sha1 hash for this UAVO collection
+        # The sed bit truncates the UAVO hash to 16 hex digits
+        # The awk bit is just to get the arguments to ln in the right order without 
+        # using the '-I' option to xargs since it doesn't work on windows.
 	$$(V1) python $$(ROOT_DIR)/make/scripts/version-info.py \
-		--path=$$(ROOT_DIR) \
-		--uavodir=$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition \
-		--format='$$$${UAVOSHA1TXT}' | sed -n 's/^\(................\).*/\1/p' | xargs -n1 -i{} ln -sf {} $$(UAVO_COLLECTION_DIR)/$(1)/uavohash
+			--path=$$(ROOT_DIR) \
+			--uavodir=$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition \
+			--format='$$$${UAVOSHA1TXT}' | \
+		sed -re 's|(.{16}).*|\1|' | \
+		awk '{ print $$$$1, "$$(UAVO_COLLECTION_DIR)/$(1)/uavohash" }' | \
+		xargs ln -sf
 
         # Create the target of the symlink (ie. a directory named by the actual UAVO hash)
 	$$(V0) @echo " UAVOHASH  $(1) ->" $$$$(readlink $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)

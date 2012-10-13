@@ -654,7 +654,7 @@ $$(UAVO_COLLECTION_DIR)/$(1)/uavohash: $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml
 			--path=$$(ROOT_DIR) \
 			--uavodir=$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition \
 			--format='$$$${UAVOSHA1TXT}' | \
-		sed -re 's|(.{16}).*|\1|' | \
+		sed -e 's|\(................\).*|\1|' | \
 		awk '{ print $$$$1, "$$(UAVO_COLLECTION_DIR)/$(1)/uavohash" }' | \
 		xargs ln -sf
 

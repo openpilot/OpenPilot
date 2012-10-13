@@ -630,7 +630,7 @@ $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml: $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml.tar
 	$$(V0) @echo " UAVOUNTAR $(1)"
 	$$(V1) rm -rf $$@
 	$$(V1) mkdir -p $$@
-	$$(V1) tar -C $$@ -xf $$< || rm -rf $$@
+	$$(V1) tar -C $$(call toprel, $$@) -xf $$(call toprel, $$<) || rm -rf $$@
 endef
 
 # Map the current working directory into the set of UAVO collections
@@ -650,7 +650,7 @@ $$(UAVO_COLLECTION_DIR)/$(1)/uavohash: $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml
 	$$(V1) python $$(ROOT_DIR)/make/scripts/version-info.py \
 		--path=$$(ROOT_DIR) \
 		--uavodir=$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition \
-		--format='$$$${UAVOSHA1TXT}' | sed -n 's/^\(................\).*/\1/p' | xargs -n1 -I{} ln -sf {} $$(UAVO_COLLECTION_DIR)/$(1)/uavohash
+		--format='$$$${UAVOSHA1TXT}' | sed -n 's/^\(................\).*/\1/p' | xargs -n1 -i{} ln -sf {} $$(UAVO_COLLECTION_DIR)/$(1)/uavohash
 
         # Create the target of the symlink (ie. a directory named by the actual UAVO hash)
 	$$(V0) @echo " UAVOHASH  $(1) ->" $$$$(readlink $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)

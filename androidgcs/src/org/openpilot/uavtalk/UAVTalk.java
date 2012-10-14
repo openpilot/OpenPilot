@@ -269,16 +269,18 @@ public class UAVTalk {
 	 * it wants to give up on one (after a timeout) then it can cancel it
 	 * @return True if that object was pending, False otherwise
 	 */
-	public synchronized boolean cancelPendingTransaction(UAVObject obj) {
-		if(respObj != null && respObj.getObjID() == obj.getObjID()) {
-			if(transactionListener != null) {
-				Log.d(TAG,"Canceling transaction: " + respObj.getName());
-				transactionListener.TransactionFailed(respObj);
-			}
-			respObj = null;
-			return true;
-		} else
-			return false;
+	public boolean cancelPendingTransaction(UAVObject obj) {
+		synchronized (respObj) {
+			if(respObj != null && respObj.getObjID() == obj.getObjID()) {
+				if(transactionListener != null) {
+					Log.d(TAG,"Canceling transaction: " + respObj.getName());
+					transactionListener.TransactionFailed(respObj);
+				}
+				respObj = null;
+				return true;
+			} else
+				return false;
+		}
 	}
 
 	/**
@@ -296,15 +298,16 @@ public class UAVTalk {
 	/**
 	 * This is the code that sets up a new UAVTalk packet that expects a response.
 	 */
-	private synchronized void setupTransaction(UAVObject obj, boolean allInstances, int type) {
+	private void setupTransaction(UAVObject obj, boolean allInstances, int type) {
+		synchronized (this) {
+			// Only cancel if it is for a different object
+			if(respObj != null && respObj.getObjID() != obj.getObjID())
+				cancelPendingTransaction(obj);
 
-		// Only cancel if it is for a different object
-		if(respObj != null && respObj.getObjID() != obj.getObjID())
-			cancelPendingTransaction(obj);
-
-		respObj = obj;
-		respAllInstances = allInstances;
-		respType = type;
+			respObj = obj;
+			respAllInstances = allInstances;
+			respType = type;
+		}
 	}
 
 	/**
@@ -315,7 +318,7 @@ public class UAVTalk {
 	 * Success (true), Failure (false)
 	 * @throws IOException
 	 */
-	private synchronized boolean objectTransaction(UAVObject obj, int type, boolean allInstances) throws IOException {
+	private boolean objectTransaction(UAVObject obj, int type, boolean allInstances) throws IOException {
 		if (type == TYPE_OBJ_ACK || type == TYPE_OBJ_REQ || type == TYPE_OBJ) {
 			return transmitObject(obj, type, allInstances);
 		} else {
@@ -701,21 +704,30 @@ public class UAVTalk {
 	 * Called when an object is received to check if this completes
 	 * a UAVTalk transaction
 	 */
-	private synchronized void updateObjReq(UAVObject obj) {
+	private void updateObjReq(UAVObject obj) {
 		// Check if this is not a possible candidate
 		Assert.assertNotNull(obj);
 
-		if(respObj != null && respType == TYPE_OBJ_REQ && respObj.getObjID() == obj.getObjID() &&
-				((respObj.getInstID() == obj.getInstID() || !respAllInstances))) {
+		boolean succeeded = false;
 
-			// Indicate complete
-			respObj = null;
+		// The lock on UAVTalk must be release before the transaction succeeded signal is sent
+		// because otherwise if a transaction timeout occurs at the same time we can get a
+		// deadlock:
+		// 1. processInputStream -> updateObjReq (locks uavtalk) -> tranactionCompleted (locks transInfo)
+		// 2. transactionTimeout (locks transInfo) -> sendObjectRequest -> É -> setupTransaction (locks uavtalk)
+		synchronized(this) {
+			if(respObj != null && respType == TYPE_OBJ_REQ && respObj.getObjID() == obj.getObjID() &&
+					((respObj.getInstID() == obj.getInstID() || !respAllInstances))) {
 
-			// Notify listener
-			if (transactionListener != null)
-				transactionListener.TransactionSucceeded(obj);
+				// Indicate complete
+				respObj = null;
+				succeeded = true;
+			}
 		}
 
+		// Notify listener
+		if (succeeded && transactionListener != null)
+				transactionListener.TransactionSucceeded(obj);
 	}
 
 	/**

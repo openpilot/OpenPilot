@@ -52,6 +52,7 @@ private slots:
 
 private:
     Ui::AutoUpdatePage *ui;
+    SetupWizard * m_wiz;
 };
 
 #endif // AUTOUPDATEPAGE_H

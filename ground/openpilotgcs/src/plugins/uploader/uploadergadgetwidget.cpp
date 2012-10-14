@@ -810,8 +810,8 @@ void UploaderGadgetWidget::versionMatchCheck()
         {
             gcsUavoHashStr.append(QString::number(i,16).right(2));
         }
-        QString gcsVersion = gcsGitDate + " (" + gcsGitHash + "-"+ gcsUavoHashStr.right(8) + ")";
-        QString fwVersion = boardDescription.gitDate + " (" + boardDescription.gitHash + "-" + fwUavoHashStr.right(8) + ")";
+        QString gcsVersion = gcsGitDate + " (" + gcsGitHash + "-"+ gcsUavoHashStr.left(8) + ")";
+        QString fwVersion = boardDescription.gitDate + " (" + boardDescription.gitHash + "-" + fwUavoHashStr.left(8) + ")";
 
         QString warning = QString(tr(
             "GCS and firmware versions of the UAV objects set do not match which can cause configuration problems. "

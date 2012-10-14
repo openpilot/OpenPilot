@@ -268,7 +268,7 @@ def GetHashofDirs(directory, verbose=0, raw=0):
           print 'Hashing', names
         filepath = os.path.join(root,names)
         try:
-          f1 = open(filepath, 'rb')
+          f1 = open(filepath, 'rU')
         except:
           # You can't open the file for some reason
           f1.close()

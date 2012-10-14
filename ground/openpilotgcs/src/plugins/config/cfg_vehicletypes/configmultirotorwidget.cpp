@@ -696,12 +696,12 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         if (channel > -1)
         {
             value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH);
-            m_aircraft->mrPitchMixLevel->setValue( value/1.27 );
+            m_aircraft->mrPitchMixLevel->setValue( 2*value/1.27 );
 
+            channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
             value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW);
             setYawMixLevel( value/1.27 );
 
-            channel = m_aircraft->multiMotorChannelBox2->currentIndex() - 1;
             value = getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL);
             m_aircraft->mrRollMixLevel->setValue( value/1.27);
         }

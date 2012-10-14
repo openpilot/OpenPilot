@@ -14,7 +14,10 @@
 
 5	jmath	git	http://trac.laas.fr/git/robots/jafar/modules/jmath.git	(master)
 
-6	rtslam	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/rtslam)
+6	qdisplay	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/qdisplay)
+#	(origin was git	http://trac.laas.fr/git/robots/jafar/modules/qdisplay.git (master))
+
+7	rtslam	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/rtslam)
 #(origin was git http://trac.laas.fr/git/robots/jafar/modules/rtslam.git (master))
 
 

@@ -79,7 +79,7 @@ void OpenCVslam::run() {
 	attitudeActual.Pitch=100;
 	AttitudeActualSet(&attitudeActual);
 	cvShowImage("debug",currentFrame);
-	cvWaitKey(1);
+	//cvWaitKey(1);
 	while (attitudeActual.Pitch==100) AttitudeActualGet(&attitudeActual);
 
 
@@ -101,7 +101,7 @@ void OpenCVslam::run() {
 	int iterations;
 	while (1) {
 		frame++;
-		backgroundWaitKey(1);
+		//backgroundWaitKey(1);
 		if (VideoSource) {
 			double pos=cvGetCaptureProperty(VideoSource, CV_CAP_PROP_POS_MSEC);
 			increment=floor((pos-oldpos)*1000.);

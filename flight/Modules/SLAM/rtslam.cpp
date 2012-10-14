@@ -139,6 +139,7 @@ RTSlam::RTSlam() :
     intOpts[iCamera] = 1;
     intOpts[iGps] = 4;
     intOpts[iDispGdhe] = 1;
+    intOpts[iDispQt] = 1;
     intOpts[iTrigger] = 2;
     floatOpts[fFreq] = 15.0;
     floatOpts[fShutter] = 0.0;
@@ -832,9 +833,10 @@ void RTSlam::init()
 
 
 
-void RTSlam::main(world_ptr_t *world)
+void RTSlam::main()
 { try {
 
+	world_ptr_t *world = &worldPtr;
 	robot_ptr_t robotPtr;
 		
 	// wait for display to be ready if enabled
@@ -1195,7 +1197,8 @@ void RTSlam::display(void)
  * Exit function
  * ###########################################################################*/
 
-void RTSlam::exit(world_ptr_t *world, boost::thread *thread_main) {
+void RTSlam::exit( boost::thread *thread_main) {
+	world_ptr_t *world = &worldPtr;
 	(*world)->exit(true);
 	(*world)->display_condition.notify_all();
 // 	std::cout << "EXITING !!!" << std::endl;
@@ -1215,7 +1218,7 @@ void RTSlam::run() {
 	if (intOpts[iDispQt]) // at least 2d
 	{
 		#ifdef HAVE_MODULE_QDISPLAY
-        qdisplay::QtAppStart((qdisplay::FUNC)&demo_slam_display,display_priority,(qdisplay::FUNC)&demo_slam_main,slam_priority,display_period,&worldPtr,(qdisplay::EXIT_FUNC)&this->exit);
+        qdisplay::QtAppStart((qdisplay::FUNC)&RTSlam::display,display_priority,(qdisplay::FUNC)&RTSlam::main,slam_priority,display_period,this,(qdisplay::EXIT_FUNC)&RTSlam::exit);
 		#else
 		std::cout << "Please install qdisplay module if you want 2D display" << std::endl;
 		#endif
@@ -1226,7 +1229,7 @@ void RTSlam::run() {
 		kernel::setCurrentThreadPriority(display_priority);
 		boost::thread *thread_disp = new boost::thread(boost::bind(&RTSlam::display,this));
 		kernel::setCurrentThreadPriority(slam_priority);
-        this->main(&worldPtr);
+        this->main();
 		delete thread_disp;
 		#else
 		std::cout << "Please install gdhe module if you want 3D display" << std::endl;
@@ -1234,7 +1237,7 @@ void RTSlam::run() {
 	} else // none
 	{
 		kernel::setCurrentThreadPriority(slam_priority);
-        this->main(&worldPtr);
+        this->main();
 	}
 
 	JFR_DEBUG("Terminated");

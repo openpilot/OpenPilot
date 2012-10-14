@@ -140,11 +140,9 @@ public:
     RTSlam(void);
 	void init();
     void run();
-    void exit(world_ptr_t *world, boost::thread *thread_main);
-    void main(world_ptr_t *world);
-    void display(void);
-    int xmain(int argc, char* const* argv);
-
+    void exit(boost::thread *thread_main);
+    void main();
+    void display();
 
 	void videoFrame(IplImage* image);
 	void state(hardware::OpenPilotStateInformation * state);

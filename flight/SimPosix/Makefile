@@ -75,7 +75,7 @@ FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = ../Libraries/inc
 JAFARDIR = ../jafar
 BOOSTSANDBOXDIR = ../jafar/boost-sandbox
-RTSLAMMODULES = kernel jmath image correl gdhe rtslam
+RTSLAMMODULES = kernel jmath image correl gdhe qdisplay rtslam
 PIOSPOSIX = $(PIOS)/posix
 PIOSCOMMON = $(PIOS)/posix
 PIOSBOARDS = $(PIOS)/Boards
@@ -265,6 +265,9 @@ CFLAGS += -O3
 endif
 
 CPPFLAGS += -O3 -march=core2
+CPPFLAGS += `pkg-config --cflags QtCore`
+CPPFLAGS += `pkg-config --cflags QtGui`
+CPPFLAGS += `pkg-config --cflags QtSvg`
    
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)
@@ -368,6 +371,9 @@ LDFLAGS += -lc -lgcc -lpthread -lrt
 LDFLAGS += `pkg-config --libs opencv`
 LDFLAGS += `pkg-config --libs lapack`
 LDFLAGS += `pkg-config --libs gdhe`
+LDFLAGS += `pkg-config --libs QtCore`
+LDFLAGS += `pkg-config --libs QtGui`
+LDFLAGS += `pkg-config --libs QtSvg`
 LDFLAGS += $(BOOSTLIBS)
 #Linker scripts                                                                                                                                                                                                              
 LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))

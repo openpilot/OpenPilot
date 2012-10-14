@@ -21,6 +21,9 @@
 /* GDHE */
 #define HAVE_MODULE_GDHE
 
+/* QDISPLAY */
+#define HAVE_MODULE_QDISPLAY
+
 /* posterLib */
 /* #undef HAVE_POSTERLIB */
 

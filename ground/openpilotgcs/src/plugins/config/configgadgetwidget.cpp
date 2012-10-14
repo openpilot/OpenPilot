@@ -278,9 +278,14 @@ void ConfigGadgetWidget::updatePipXStatus(UAVObject *object)
     pipxTimeout->start(5000);
     if (!pipxConnected)
     {
-        qDebug()<<"ConfigGadgetWidget onPipxtremeConnect";
+        qDebug() << "ConfigGadgetWidget onPipxtremeConnect";
+
+        QIcon *icon = new QIcon();
+        icon->addFile(":/configgadget/images/pipx_normal.png", QSize(), QIcon::Normal, QIcon::Off);
+        icon->addFile(":/configgadget/images/pipx_selected.png", QSize(), QIcon::Selected, QIcon::Off);
+
         QWidget *qwd = new ConfigPipXtremeWidget(this);
-        ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, QIcon(":/configgadget/images/PipXtreme.png"), QString("PipXtreme"));
+        ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, *icon, QString("PipXtreme"));
         pipxConnected = true;
     }
 }

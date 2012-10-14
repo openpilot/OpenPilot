@@ -28,5 +28,7 @@
         <file>images/txpid_normal.png</file>
         <file>images/camstab_selected.png</file>
         <file>images/camstab_normal.png</file>
+        <file>images/pipx-selected.png</file>
+        <file>images/pipx-normal.png</file>
     </qresource>
 </RCC>

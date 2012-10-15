@@ -5,6 +5,7 @@ Item {
     property variant sceneSize
     property real groundSpeed : 3.6 * Math.sqrt(Math.pow(VelocityActual.North,2)+
                                                 Math.pow(VelocityActual.East,2))
+    property real airspeed : 3.6 * AirspeedActual.CalibratedAirspeed
 
     SvgElementImage {
         id: speed_bg
@@ -24,10 +25,10 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             // The speed scale represents 30 meters,
             // move it in 0..5m range
-            anchors.verticalCenterOffset: height/30 * (sceneItem.groundSpeed-Math.floor(sceneItem.groundSpeed/5)*5)
+            anchors.verticalCenterOffset: height/30 * (sceneItem.airspeed-Math.floor(sceneItem.airspeed/5)*5)
             anchors.right: parent.right
 
-            property int topNumber: Math.floor(sceneItem.groundSpeed/5)*5+15
+            property int topNumber: Math.floor(sceneItem.airspeed/5)*5+15
 
             // speed numbers
             Column {
@@ -73,7 +74,7 @@ Item {
 
         Text {
             id: speed_text
-            text: Math.round(sceneItem.groundSpeed).toFixed()
+            text: Math.round(sceneItem.airspeed).toFixed()
             color: "white"
             font {
                 family: "Arial"

@@ -50,7 +50,7 @@ public class TelemetryMonitor extends Observable {
 	static final int STATS_CONNECT_PERIOD_MS = 1000;
 	static final int CONNECTION_TIMEOUT_MS = 8000;
 
-	private final boolean HANDSHAKE_IS_CONNECTED = false;
+	private final boolean HANDSHAKE_IS_CONNECTED = true;
 
 	private final UAVObjectManager objMngr;
 	private final Telemetry tel;
@@ -77,7 +77,8 @@ public class TelemetryMonitor extends Observable {
 		return objects_updated;
 	};
 
-	public TelemetryMonitor(UAVObjectManager objMngr, Telemetry tel, OPTelemetryService s) {
+	public TelemetryMonitor(UAVObjectManager objMngr, Telemetry tel,
+			OPTelemetryService s) {
 		this(objMngr, tel);
 		telemService = s;
 	}
@@ -373,7 +374,9 @@ public class TelemetryMonitor extends Observable {
 				startRetrievingObjects();
 			else
 				firmwareIapObj.updateRequested();
-			if (HANDSHAKE_IS_CONNECTED) setChanged(); // Enabling this line makes the opConnected signal occur whenever we get a handshake
+			if (HANDSHAKE_IS_CONNECTED)
+				setChanged(); // Enabling this line makes the opConnected signal
+								// occur whenever we get a handshake
 		}
 		if (gcsDisconnected && gcsStatusChanged) {
 			if (DEBUG)
@@ -423,16 +426,17 @@ public class TelemetryMonitor extends Observable {
 			if (DEBUG) Log.d(TAG, "Received firmware IAP Updated message");
 
 			UAVObjectField description = firmwareIapObj.getField("Description");
-			if(description == null || description.getNumElements() < 100) {
+			if (description == null || description.getNumElements() < 100) {
 				telemService.toastMessage("Failed to determine UAVO set");
 			} else {
 				final int HASH_SIZE_USED = 8;
 				String jarName = new String();
-				for(int i = 0; i < HASH_SIZE_USED; i++)
-					jarName += Integer.toHexString((int) description.getDouble(i+60));
+				for (int i = 0; i < HASH_SIZE_USED; i++)
+					jarName += Integer.toHexString((int) description
+							.getDouble(i + 60));
 				jarName += ".jar";
 				if (DEBUG) Log.d(TAG, "Attempting to load: " + jarName);
-				if (telemService.loadUavobjects(jarName, objMngr) ) {
+				if (telemService.loadUavobjects(jarName, objMngr)) {
 					telemService.toastMessage("Loaded appropriate UAVO set");
 					objectsRegistered = true;
 					try {

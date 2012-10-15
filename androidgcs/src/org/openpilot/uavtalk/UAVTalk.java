@@ -418,7 +418,7 @@ public class UAVTalk {
 				{
 					UAVObject rxObj = objMngr.getObject(rxObjId);
 					if (rxObj == null) {
-						if (DEBUG) Log.d(TAG, "Unknown ID: " + rxObjId);
+						if (WARN) Log.w(TAG, "Unknown ID: " + rxObjId);
 						stats.rxErrors++;
 						rxState = RxStateType.STATE_SYNC;
 						break;
@@ -432,17 +432,7 @@ public class UAVTalk {
 
 					// Check length and determine next state
 					if (rxLength >= MAX_PAYLOAD_LENGTH) {
-						stats.rxErrors++;
-						rxState = RxStateType.STATE_SYNC;
-						break;
-					}
-
-					// Check the lengths match
-					if ((rxPacketLength + rxLength) != packetSize) { // packet error
-						// -
-						// mismatched
-						// packet
-						// size
+						if (WARN) Log.w(TAG, "Greater than max payload length");
 						stats.rxErrors++;
 						rxState = RxStateType.STATE_SYNC;
 						break;
@@ -506,7 +496,7 @@ public class UAVTalk {
 				rxCSPacket = rxbyte;
 
 				if (rxCS != rxCSPacket) { // packet error - faulty CRC
-					if (DEBUG) Log.d(TAG,"Bad crc");
+					if (WARN) Log.w(TAG,"Bad crc");
 					stats.rxErrors++;
 					rxState = RxStateType.STATE_SYNC;
 					break;
@@ -515,7 +505,7 @@ public class UAVTalk {
 				if (rxPacketLength != (packetSize + 1)) { // packet error -
 					// mismatched packet
 					// size
-					if (DEBUG) Log.d(TAG,"Bad size");
+					if (WARN) Log.w(TAG,"Bad size");
 					stats.rxErrors++;
 					rxState = RxStateType.STATE_SYNC;
 					break;
@@ -532,6 +522,7 @@ public class UAVTalk {
 				break;
 
 			default:
+				if (WARN) Log.w(TAG, "Bad state");
 				rxState = RxStateType.STATE_SYNC;
 				stats.rxErrors++;
 			}

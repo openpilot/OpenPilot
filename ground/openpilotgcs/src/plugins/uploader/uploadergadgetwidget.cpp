@@ -446,14 +446,20 @@ bool UploaderGadgetWidget::autoUpdate()
         delete dfu;
         dfu = NULL;
     }
+    QEventLoop loop;
+    QTimer timer;
+    timer.setSingleShot(true);
+    connect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));
     while(USBMonitor::instance()->availableDevices(0x20a0,-1,-1,-1).length()>0)
     {
-        emit autoUpdateSignal(WAITING_DISCONNECT,QVariant());
-        if(QMessageBox::warning(this,tr("OpenPilot Uploader"),tr("Please disconnect all openpilot boards"),QMessageBox::Ok,QMessageBox::Cancel)==QMessageBox::Cancel)
-        {
-            emit autoUpdateSignal(FAILURE,QVariant());
-            return false;
-        }
+             emit autoUpdateSignal(WAITING_DISCONNECT,QVariant());
+             if(QMessageBox::warning(this,tr("OpenPilot Uploader"),tr("Please disconnect all openpilot boards"),QMessageBox::Ok,QMessageBox::Cancel)==QMessageBox::Cancel)
+             {
+                     emit autoUpdateSignal(FAILURE,QVariant());
+                     return false;
+             }
+             timer.start(500);
+             loop.exec();
     }
     emit autoUpdateSignal(WAITING_CONNECT,0);
     autoUpdateConnectTimeout=0;

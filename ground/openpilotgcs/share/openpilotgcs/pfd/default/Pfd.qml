@@ -1,5 +1,6 @@
 import Qt 4.7
 import "."
+import org.OpenPilot 1.0
 
 Rectangle {
     color: "#666666"
@@ -54,15 +55,11 @@ Rectangle {
                 sceneSize: background.sceneSize
                 smooth: true
 
-                property real sideSlip: Accels.y
-                //smooth side slip changes, a low pass filter replacement
-                //accels are updated once per second
-                Behavior on sideSlip {
-                    SmoothedAnimation {
-                        duration: 1000
-                        velocity: -1
-                    }
+                LowPassFilter {
+                    id: accelsYfiltered
+                    input: Accels.y
                 }
+                property real sideSlip: accelsYfiltered.value
 
                 anchors.horizontalCenter: foreground.horizontalCenter
                 //0.5 coefficient is empirical to limit indicator movement

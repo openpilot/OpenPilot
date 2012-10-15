@@ -17,7 +17,8 @@ HEADERS += \
     pfdqmlgadgetwidget.h \
     pfdqmlgadgetfactory.h \
     pfdqmlgadgetconfiguration.h \
-    pfdqmlgadgetoptionspage.h
+    pfdqmlgadgetoptionspage.h \
+    lowpassfilter.h
 
 SOURCES += \
     pfdqmlplugin.cpp \
@@ -25,7 +26,8 @@ SOURCES += \
     pfdqmlgadgetfactory.cpp \
     pfdqmlgadgetwidget.cpp \
     pfdqmlgadgetconfiguration.cpp \
-    pfdqmlgadgetoptionspage.cpp
+    pfdqmlgadgetoptionspage.cpp \
+    lowpassfilter.cpp
 
 
 contains(DEFINES,USE_OSG) {

@@ -31,6 +31,7 @@
 #include <QtDeclarative/qdeclarativeengine.h>
 #include <QtDeclarative/qdeclarativecontext.h>
 #include <QtDeclarative/qdeclarativeengine.h>
+#include "lowpassfilter.h"
 
 PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
     QDeclarativeView(parent),
@@ -75,6 +76,7 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
 #ifdef USE_OSG
     qmlRegisterType<OsgEarthItem>("org.OpenPilot", 1, 0, "OsgEarth");
 #endif
+    qmlRegisterType<LowPassFilter>("org.OpenPilot", 1, 0, "LowPassFilter");
 }
 
 PfdQmlGadgetWidget::~PfdQmlGadgetWidget()

@@ -394,6 +394,8 @@ static void AttitudeTask(void *parameters)
 				// Do not update position and velocity estimates when in simulation mode
 				if (!PositionActualReadOnly()){
 					PositionActualSet(&positionActualData);
+				}
+				if (!VelocityActualReadOnly()){
 					VelocityActualSet(&velocityActualData);
 				}
 			}

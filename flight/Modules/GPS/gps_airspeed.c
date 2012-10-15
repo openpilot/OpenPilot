@@ -151,11 +151,17 @@ void gps_airspeed_update(const GPSVelocityData *gpsVelData)
 			
 			gps_airspeed=gps_airspeed*alpha + (1-alpha)*gps_airspeed_old;
 			
-			AirspeedActualTrueAirspeedSet(&gps_airspeed);
+			// Do not update airspeed data in simulation mode
+			if (!AirspeedActualReadOnly()) {
+				AirspeedActualTrueAirspeedSet(&gps_airspeed);
+			}
 		}
 		else {
-			AirspeedActualTrueAirspeedGet(&gps_airspeed); //<--Why do we get the airspeed just to set it? So that the object is listed as updated?
-			AirspeedActualTrueAirspeedSet(&gps_airspeed);
+			// Do not update airspeed data in simulation mode
+			if (!AirspeedActualReadOnly()) {
+				AirspeedActualTrueAirspeedGet(&gps_airspeed); //<--Why do we get the airspeed just to set it? So that the object is listed as updated?
+				AirspeedActualTrueAirspeedSet(&gps_airspeed);
+			}
 		}
 
 	}

@@ -70,7 +70,6 @@ typedef struct _FLIGHT_PARAM {
     unsigned int i;
 
     // speeds
-    float ias; //Indicated airspeed
     float cas; //Calibrated airspeed
     float tas; //True airspeed
     float groundspeed;
@@ -101,6 +100,18 @@ typedef struct _FLIGHT_PARAM {
     float dRoll;
 
 } FLIGHT_PARAM;
+
+struct AirParameters
+{
+    float groundDensity;
+    float groundTemp;
+    float seaLevelPress;
+    float tempLapseRate;
+    float univGasConstant;
+    float dryAirConstant;
+    float relativeHumidity; //[%]
+    float M; //Molar mass
+};
 
 typedef struct _CONNECTION
 {
@@ -211,6 +222,10 @@ public:
     QString SimulatorId() const { return simulatorId; }
     void setSimulatorId(QString str) { simulatorId = str; }
 
+    float airDensityFromAltitude(float alt, AirParameters air, float gravity);
+    float airPressureFromAltitude(float alt, AirParameters air, float gravity);
+    float cas2tas(float CAS, float alt, AirParameters air, float gravity);
+    float tas2cas(float TAS, float alt, AirParameters air, float gravity);
 
 
     static bool IsStarted() { return isStarted; }
@@ -223,6 +238,9 @@ public:
 
     void resetInitialHomePosition();
     void updateUAVOs(Output2Hardware out);
+
+    AirParameters getAirParameters();
+    void setAirParameters(AirParameters airParameters);
 
 signals:
     void autopilotConnected();
@@ -314,6 +332,8 @@ private:
     void setupInputObject(UAVObject* obj, quint32 updatePeriod);
     void setupWatchedObject(UAVObject *obj, quint32 updatePeriod);
     void setupObjects();
+
+    AirParameters airParameters;
 };
 
 

@@ -42,7 +42,7 @@
  * can be found shipped with IL2 in the file DeviceLink.txt
  *
  * id's used in this file:
- * 30: IAS in km/h (float)
+ * 30: CAS in km/h (float)
  * 32: vario in m/s (float)
  * 38: angular speed °/s (float) (which direction? azimuth?)
  * 40: barometric alt in m (float)
@@ -68,25 +68,20 @@
 #include <math.h>
 #include <qxtlogger.h>
 
-const float IL2Simulator::FT2M = 0.3048;
+const float IL2Simulator::FT2M = 12*.254;
 const float IL2Simulator::KT2MPS = 0.514444444;
 const float IL2Simulator::MPS2KMH = 3.6;
 const float IL2Simulator::KMH2MPS = (1.0/3.6);
 const float IL2Simulator::INHG2KPA = 3.386;
 const float IL2Simulator::RAD2DEG = (180.0/M_PI);
 const float IL2Simulator::DEG2RAD = (M_PI/180.0);
-const float IL2Simulator::M2DEG =  60.*1852.; // 60 miles per degree times 1852 meters per mile
-const float IL2Simulator::DEG2M = (1.0/(60.*1852.));
-const float IL2Simulator::AIR_CONST = 287.058; // J/(kg*K)
-const float IL2Simulator::GROUNDDENSITY = 1.225; // kg/m³ ;)
-const float IL2Simulator::TEMP_GROUND = (15.0 + 273.0); // 15°C in Kelvin
-const float IL2Simulator::TEMP_LAPSE_RATE = -0.0065; //degrees per meter
-const float IL2Simulator::AIR_CONST_FACTOR = -0.0341631947363104; //several nature constants calculated into one
+const float IL2Simulator::NM2DEG =  60.*1852.; // 60 miles per degree times 1852 meters per mile
+const float IL2Simulator::DEG2NM = (1.0/(60.*1852.));
 
 IL2Simulator::IL2Simulator(const SimulatorSettings& params) :
     Simulator(params)
 {
-
+    airParameters=getAirParameters();
 }
 
 
@@ -126,31 +121,6 @@ void IL2Simulator::transmitUpdate()
 
 
 /**
- * calculate air density from altitude
- */
-float IL2Simulator::DENSITY(float alt) {
-    return (GROUNDDENSITY * pow(
-                ((TEMP_GROUND+(TEMP_LAPSE_RATE*alt))/TEMP_GROUND),
-                ((AIR_CONST_FACTOR/TEMP_LAPSE_RATE)-1) )
-            );
-}
-
-/**
- * calculate air pressure from altitude
- */
-float IL2Simulator::PRESSURE(float alt) {
-    return DENSITY(alt)*(TEMP_GROUND+(alt*TEMP_LAPSE_RATE))*AIR_CONST;
-
-}
-
-/**
- * calculate TAS from IAS and altitude
- */
-float IL2Simulator::TAS(float IAS, float alt) {
-        return (IAS*sqrt(GROUNDDENSITY/DENSITY(alt)));
-}
-
-/**
  * process data string from flight simulator
  */
 void IL2Simulator::processUpdate(const QByteArray& inp)
@@ -171,7 +141,7 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
             float value = values[1].toFloat();
             switch (id) {
             case 30:
-                current.ias=value * KMH2MPS;
+                current.cas=value * KMH2MPS;
                 break;
             case 32:
                 current.dZ=value;
@@ -206,8 +176,9 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
         old.ddX=0;
     }
 
-        // calculate TAS from alt and IAS
-        current.tas = TAS(current.ias,current.Z);
+    // calculate TAS from alt and CAS
+    float gravity =9.805;
+    current.tas = cas2tas(current.cas, current.Z, airParameters, gravity);
 
     // assume the plane actually flies straight and no wind
     // groundspeed is horizontal vector of TAS
@@ -269,7 +240,8 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
     out.longitude = LLA[1] * 1e7;
     out.groundspeed = current.groundspeed;
 
-    out.calibratedAirspeed = current.ias;
+    out.calibratedAirspeed = current.cas;
+    out.trueAirspeed=cas2tas(current.cas, current.Z, airParameters, gravity);
 
     out.dstN=current.Y;
     out.dstE=current.X;
@@ -277,8 +249,8 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 
     // Update BaroAltitude object
     out.altitude = current.Z;
-    out.temperature = TEMP_GROUND + (current.Z * TEMP_LAPSE_RATE) - 273.0;
-    out.pressure = PRESSURE(current.Z)/1000.0; // kpa
+    out.temperature = airParameters.groundTemp + (current.Z * airParameters.tempLapseRate) - 273.0;
+    out.pressure = airPressureFromAltitude(current.Z, airParameters, gravity) ; // kpa
 
 
     // Update attActual object

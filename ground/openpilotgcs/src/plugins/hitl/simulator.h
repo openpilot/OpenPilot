@@ -41,9 +41,9 @@
 #include "accels.h"
 #include "actuatorcommand.h"
 #include "actuatordesired.h"
+#include "airspeedactual.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
-#include "airspeedactual.h"
 #include "baroaltitude.h"
 #include "flightstatus.h"
 #include "gcsreceiver.h"
@@ -69,10 +69,10 @@ typedef struct _FLIGHT_PARAM {
     float dT;
     unsigned int i;
 
-    // speed (relative)
-    float ias;
-    float cas;
-    float tas;
+    // speeds
+    float ias; //Indicated airspeed
+    float cas; //Calibrated airspeed
+    float tas; //True airspeed
     float groundspeed;
 
     // position (absolute)
@@ -153,6 +153,9 @@ struct Output2Hardware{
     float heading;
     float groundspeed; //[m/s]
     float calibratedAirspeed;    //[m/s]
+    float trueAirspeed;    //[m/s]
+    float angleOfAttack;
+    float angleOfSlip;
     float roll;
     float pitch;
     float pressure;

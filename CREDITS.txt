@@ -177,6 +177,11 @@ E: dales (at) ksu (dot) edu
 D: Lead AHRS Developer
 D: Creator of the OpenPilot INS / EKF
 
+N: Professor Kenn Sebesta
+E: kenn (at) openpilot (dot) org
+D: Lead Fixed Wing Developer
+M: Fixed Wing support
+
 N: Oleg Semyonov
 E: os-openpilot-org (at) os-propo (dot) info
 D: Core tester & Project organisation

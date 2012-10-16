@@ -101,6 +101,7 @@ void LowPassFilter::updateValue()
         m_updateTimer.start(qRound(m_updatePeriod*1000), this);
 
     int dT = m_lastUpdateTime.elapsed();
+    m_lastUpdateTime.restart();
     if (dT == 0)
         return;
 

@@ -8,6 +8,9 @@
 
 #ifndef DISPLAY_QT__HPP_
 #define DISPLAY_QT__HPP_
+
+#include "jafarConfig.h"
+
 #ifdef HAVE_MODULE_QDISPLAY
 
 #include "qdisplay/ImageView.hpp"

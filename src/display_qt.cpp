@@ -5,10 +5,10 @@
  * \ingroup rtslam
  */
 
+#include "rtslam/display_qt.hpp"
 #ifdef HAVE_MODULE_QDISPLAY
 
 #include "qdisplay/imout.hpp"
-#include "rtslam/display_qt.hpp"
 #include "rtslam/observationPinHoleAnchoredHomogeneousPointsLine.hpp"
 #include "rtslam/appearanceSegment.hpp"
 #include "rtslam/simuData.hpp"

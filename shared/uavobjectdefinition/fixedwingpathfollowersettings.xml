@@ -32,9 +32,9 @@
         <field name="AirspeedPI" units="deg / (m/s^2)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue=".5, .5, 10"/>
                 <!-- coefficients for desired pitch
                      in relation to acceleration error -->
-        <field name="VerticalToPitchCrossFeed" units="deg / ((m/s)/(m/s))" type="float" elementnames="Kp,Max" defaultvalue="5, 10"/>
+        <field name="VerticalToPitchCrossFeed" units="deg / m" type="float" elementnames="Kp,Max" defaultvalue=".25, 5"/>
                 <!-- coefficients for adjusting desired pitch
-                     in relation to "vertical speed error relative to airspeed" (verror/IASactual) -->
+                     in relation to altitude error -->
         <field name="AirspeedToVerticalCrossFeed" units="(m/s) / ((m/s)/(m/s))" type="float" elementnames="Kp,Max" defaultvalue="10, 100"/>
                 <!-- proportional coefficient for adjusting vertical speed error for power calculation
                      in relation to relative airspeed error (IASerror/IASactual) -->

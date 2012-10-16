@@ -60,15 +60,13 @@
 
 // Private constants
 #define MAX_QUEUE_SIZE 4
-#define STACK_SIZE_BYTES 700
+#define STACK_SIZE_BYTES 750
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 #define F_PI 3.14159265358979323846f
 #define RAD2DEG (180.0f/F_PI)
 #define DEG2RAD (F_PI/180.0f)
 #define GEE 9.805f
 #define CRITICAL_ERROR_THRESHOLD_MS 5000 //Time in [ms] before an error becomes a critical error
-
-#define UPDATEPERIOD_MS 50
 
 // Private types
 static struct Integral {
@@ -335,19 +333,18 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 									  AIRSPEED_ILIMIT/AIRSPEED_KI);
 	}				
 	
-	//Compute the cross feed from vertical speed to pitch, with saturation
-//	float verticalSpeedToPitchCommandComponent=bound (-descentspeedError * fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_KP],
-//													  -fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX],
-//													  fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX]
-//													  );
+	//Compute the cross feed from altitude to pitch, with saturation
+#define PITCHCROSSFEED_KP fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_KP]	
+#define PITCHCROSSFEED_MIN	fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX]
+#define PITCHCROSSFEED_MAX fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX]
+	float alitudeError=pathDesired.End[2]-positionActual.Down;
+	float altitudeToPitchCommandComponent=bound ( alitudeError* PITCHCROSSFEED_KP,
+													  -PITCHCROSSFEED_MIN,
+													  PITCHCROSSFEED_MAX);
 	
 	//Compute the pitch command as err*Kp + errInt*Ki + X_feed.
 	pitchCommand= -(airspeedError*AIRSPEED_KP 
-					+ integral->airspeedError*AIRSPEED_KI);
-//	pitchCommand= -(airspeedError*fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KP] 
-//					+ integral->airspeedError*fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KI]
-//					)	+ verticalSpeedToPitchCommandComponent;
-	
+					+ integral->airspeedError*AIRSPEED_KI)	+ altitudeToPitchCommandComponent;	
 	
 	//Saturate pitch command
 #define PITCHLIMIT_NEUTRAL  fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_NEUTRAL]

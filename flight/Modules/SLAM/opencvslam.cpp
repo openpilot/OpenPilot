@@ -150,19 +150,21 @@ void OpenCVslam::run() {
 		VelocityActualGet(&velocityActual);
 		hardware::OpenPilotStateInformation state;
 		state.position.x = positionActual.North/500.;
-		state.position.y = positionActual.East/500.;
-		state.position.z = positionActual.Down/500.;
+		state.position.y = -positionActual.East/500.;
+		state.position.z = -positionActual.Down/500.;
 		//state.position.x = 0; // +x
-		//state.position.y = 0; // +y
-		//state.position.z = 10; // +z
+		//state.position.y = 0; // -y
+		//state.position.z = .1; // -z
 		state.attitude.roll=attitudeActual.Roll * DEG2RAD;
-		state.attitude.pitch=attitudeActual.Pitch * DEG2RAD;
-		state.attitude.yaw=attitudeActual.Yaw * DEG2RAD;
-		//state.attitude.roll=0*DEG2RAD;
-		//state.attitude.pitch=0*DEG2RAD;
-		//state.attitude.yaw=0*DEG2RAD;
-		state.positionVariance = 1;
-		state.attitudeVariance = 0.1;
+		state.attitude.pitch=-attitudeActual.Pitch * DEG2RAD;
+		state.attitude.yaw=-attitudeActual.Yaw * DEG2RAD;
+		//state.attitude.roll=0*DEG2RAD; // +roll
+		//state.attitude.pitch=0*DEG2RAD; // -pitch
+		//state.attitude.yaw=180*DEG2RAD; // -yaw
+		state.positionVariance = -1;
+		state.attitudeVariance = -1;
+		//state.positionVariance = powf(0.1,2);
+		//state.attitudeVariance = powf(0.1*DEG2RAD,2);
 		rtslam->state(&state);
 
 		// Grab the current camera image
@@ -179,7 +181,7 @@ void OpenCVslam::run() {
 			cvReleaseImage(&lastFrame);
 		}
 		if (currentFrame) {
-			if (frame>5) {
+			if (frame>=4) {
 				rtslam->videoFrame(currentFrame);
 			}
 			lastFrame = cvCloneImage(currentFrame);

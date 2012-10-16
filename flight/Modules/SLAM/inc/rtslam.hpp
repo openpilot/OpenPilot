@@ -209,6 +209,7 @@ protected:
         jblas::vec6 SENSOR_POSE_CONSTVEL; /// camera pose in constant velocity (x,y,z,roll,pitch,yaw) (m,deg)
         jblas::vec6 SENSOR_POSE_INERTIAL; /// camera pose in inertial (x,y,z,roll,pitch,yaw) (m,deg)
         jblas::vec6 GPS_POSE; /// GPS pose (x,y,z,roll,pitch,yaw) (m,deg)
+        jblas::vec2 GPS_VARIANCE; /// GPS pose (x,y,z,roll,pitch,yaw) (m,deg)
         jblas::vec6 ROBOT_POSE; /// the transformation between the slam robot (the main sensor, camera or imu) and the real robot = pose of the real robot in the slam robot frame, just like the other sensors
 
         unsigned CAMERA_TYPE;      /// camera type (0 = firewire, 1 = firewire format7, 2 = USB, 3 = UEYE)

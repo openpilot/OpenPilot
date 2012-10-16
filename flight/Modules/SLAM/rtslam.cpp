@@ -111,6 +111,10 @@ typedef DataManagerOnePointRansac<simu::RawSimu, SensorPinhole, simu::FeatureSim
 /* bridge to feed data from openpilot EKF to rtslam openpilot state sensor class */
 void RTSlam::state(hardware::OpenPilotStateInformation * state) {
 	if (openpilotstate) {
+		if (state->positionVariance<0)
+			state->positionVariance=configSetup.GPS_VARIANCE[0];
+		if (state->attitudeVariance<0)
+			state->attitudeVariance=configSetup.GPS_VARIANCE[1];
 		openpilotstate->capture(state);
 	}
 }
@@ -137,7 +141,9 @@ RTSlam::RTSlam() :
     intOpts[iVerbose] = 5;
     intOpts[iMap] = 1;
     intOpts[iCamera] = 1;
+    intOpts[iRobot] = 0;
     intOpts[iGps] = 4;
+    //intOpts[iGps] = 0;
     intOpts[iDispGdhe] = 1;
     intOpts[iDispQt] = 1;
     intOpts[iTrigger] = 2;
@@ -1317,8 +1323,10 @@ void RTSlam::ConfigSetup::processKeyValueFile(jafar::kernel::KeyValueFile& keyVa
 		KeyValueFile_processItem(SENSOR_POSE_INERTIAL)
 	else
 		KeyValueFile_processItem(SENSOR_POSE_CONSTVEL)
-	if (owner->intOpts[iGps])
+	if (owner->intOpts[iGps]) {
 		KeyValueFile_processItem(GPS_POSE);
+		KeyValueFile_processItem(GPS_VARIANCE);
+	}
 	KeyValueFile_processItem(ROBOT_POSE);
 	
 	if (owner->intOpts[iSimu])

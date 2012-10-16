@@ -61,6 +61,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/mixerstatus.h \
     $$UAVOBJECT_SYNTHETICS/velocitydesired.h \
     $$UAVOBJECT_SYNTHETICS/velocityactual.h \
+    $$UAVOBJECT_SYNTHETICS/groundtruth.h \
     $$UAVOBJECT_SYNTHETICS/guidancesettings.h \
     $$UAVOBJECT_SYNTHETICS/positiondesired.h \
     $$UAVOBJECT_SYNTHETICS/relaytuning.h \
@@ -132,6 +133,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/mixerstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/velocitydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/velocityactual.cpp \
+    $$UAVOBJECT_SYNTHETICS/groundtruth.cpp \
     $$UAVOBJECT_SYNTHETICS/guidancesettings.cpp \
     $$UAVOBJECT_SYNTHETICS/positiondesired.cpp \
     $$UAVOBJECT_SYNTHETICS/relaytuningsettings.cpp \

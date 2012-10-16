@@ -50,6 +50,7 @@
 #include "gcstelemetrystats.h"
 #include "gpsposition.h"
 #include "gpsvelocity.h"
+#include "groundtruth.h"
 #include "gyros.h"
 #include "homelocation.h"
 #include "manualcontrolcommand.h"
@@ -161,10 +162,11 @@ struct Output2Hardware{
     float latitude;
     float longitude;
     float altitude;
+    float agl;                //[m]
     float heading;
-    float groundspeed; //[m/s]
-    float calibratedAirspeed;    //[m/s]
-    float trueAirspeed;    //[m/s]
+    float groundspeed;        //[m/s]
+    float calibratedAirspeed; //[m/s]
+    float trueAirspeed;       //[m/s]
     float angleOfAttack;
     float angleOfSlip;
     float roll;
@@ -180,10 +182,10 @@ struct Output2Hardware{
     float accX;       //[m/s^2]
     float accY;       //[m/s^2]
     float accZ;       //[m/s^2]
-    float rollRate;     //[deg/s]
-    float pitchRate;     //[deg/s]
-    float yawRate;     //[deg/s]
-    float delT;
+    float rollRate;   //[deg/s]
+    float pitchRate;  //[deg/s]
+    float yawRate;    //[deg/s]
+    float delT;       //[s]
 
     float rc_channel[GCSReceiver::CHANNEL_NUMELEM]; //Elements in rc_channel are between -1 and 1
 
@@ -296,6 +298,7 @@ protected:
     Gyros*  gyros;
     GCSTelemetryStats* telStats;
     GCSReceiver* gcsReceiver;
+    GroundTruth* groundTruth;
 
     SimulatorSettings settings;
 

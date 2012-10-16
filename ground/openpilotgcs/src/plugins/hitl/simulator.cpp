@@ -245,8 +245,10 @@ void Simulator::setupObjects()
 
     setupOutputObject(posHome, 10000); //Hardcoded? Bleh.
 
-    if (settings.gpsPositionEnabled)
+    if (settings.gpsPositionEnabled){
         setupOutputObject(gpsPos, settings.gpsPosRate);
+        setupOutputObject(gpsVel, settings.gpsPosRate);
+    }
 
     if (settings.groundTruthEnabled){
         setupOutputObject(posActual, settings.groundTruthRate);

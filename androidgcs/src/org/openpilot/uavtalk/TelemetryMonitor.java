@@ -50,7 +50,7 @@ public class TelemetryMonitor extends Observable {
 	static final int STATS_CONNECT_PERIOD_MS = 1000;
 	static final int CONNECTION_TIMEOUT_MS = 8000;
 
-	private final boolean HANDSHAKE_IS_CONNECTED = true;
+	private final boolean HANDSHAKE_IS_CONNECTED = false;
 
 	private final UAVObjectManager objMngr;
 	private final Telemetry tel;

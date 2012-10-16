@@ -249,7 +249,7 @@ static void parse_ubx_nav_velned (const struct UBX_NAV_VELNED *velned, GPSPositi
 			GpsPosition->Groundspeed = (float)velned->gSpeed * 0.01f;
 			GpsPosition->Heading = (float)velned->heading * 1.0e-5f;
 #if defined(PIOS_GPS_PROVIDES_AIRSPEED)
-			gps_airspeed_update(&GpsVelocity);
+//			gps_airspeed_update(&GpsVelocity);
 #endif
 		}
 	}

@@ -118,6 +118,10 @@ N: Hallvard Kristiansen
 E: hal (at) fleshmx (dot) com
 D: GCS Artwork, Quad layout diagrams
 
+N: Mike Labranche
+E: mdlabranche (plus) openpilot (at) gmail (dot) com
+D: Tab bar Telem Monitor
+
 N: Edouard Lafargue
 E: edouard (at) lafargue (dot) name
 D: GCS Dial Plugins, GCS PFD Plugin, GCS GPS plugin, GCS Config plugin

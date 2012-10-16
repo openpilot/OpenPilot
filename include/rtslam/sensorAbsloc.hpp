@@ -172,6 +172,24 @@ namespace jafar {
 						ublas::subrange(expectation->x(), indexE_OriEuler,indexE_OriEuler+3) = e;
 						ublas::subrange(EXP_rs, indexE_OriEuler,indexE_OriEuler+3, 3,7) = ublas::prod(E_qr, QR_q);
 
+						// prevent observing measurements that lead to an innovation beyond 180 degrees
+						// as these are unobservable and most likely a rounding artifact
+						for (int i = 0; i<3; i++) {
+							// inovation is between half_revolutions*M_PI and
+							// (half_revolutions+1)*M_PI
+							int half_revolutions= ((reading.data(indexD_OriEuler+i) - e(i))/M_PI);
+
+							// correct measurement by multiples of 2*M_PI to minimize
+							// half_revolution
+							int cor_factor = 0;
+							if (half_revolutions>0) { 
+								cor_factor = -((( half_revolutions) + 1) / 2 );
+							} else if (half_revolutions<0) {
+								cor_factor =  (((-half_revolutions) + 1) / 2 );
+							}
+							reading.data(indexD_OriEuler+i) += (2*cor_factor*M_PI);
+						}
+
 						// fill measurement
 						ublas::subrange(measurement->x(), indexE_OriEuler,indexE_OriEuler+3) = ublas::subrange(reading.data, indexD_OriEuler,indexD_OriEuler+3);
 						for(int i = 0; i < 3; ++i) measurement->P()(indexE_OriEuler+i,indexE_OriEuler+i) = jmath::sqr(reading.data(indexD_OriEuler+i+dats));

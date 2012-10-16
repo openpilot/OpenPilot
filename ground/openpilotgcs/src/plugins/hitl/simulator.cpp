@@ -417,10 +417,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
         LLA[0]=out.latitude;
         LLA[1]=out.longitude;
         LLA[2]=out.altitude;
-        double ECEF[3];
-        double RNE[9];
-        Utils::CoordinateConversions().RneFromLLA(LLA,(double (*)[3])RNE);
-        Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
+
         homeData.Be[0]=0;
         homeData.Be[1]=0;
         homeData.Be[2]=0;

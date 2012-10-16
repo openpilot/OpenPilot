@@ -106,7 +106,7 @@ int8_t getSensorsCC(float * prelim_accels, float * prelim_gyros, xQueueHandle *g
 		x +=  accel_data.x;
 		y += -accel_data.y;
 		z += -accel_data.z;
-	} while ( (i < 32) && (samples_remaining > 0) );
+	} while ( (i < 32) && (samples_remaining > 0) ); //<-- i=32 being hardcoded means that if the accelerometer ADC sample rate is increased, we could wind up never being able to empty the buffer
 	
 	//	prelim_gyros[3] = samples_remaining; //COMMENTING OUT BECAUSE THIS ACTION CURRENTLY MAKES NO SENSE
 	

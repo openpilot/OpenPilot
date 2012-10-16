@@ -397,7 +397,6 @@ static void AttitudeTask(void *parameters)
 #if defined(PIOS_GPS_PROVIDES_AIRSPEED)
 				gps_airspeed_update(&gpsVelocityData);
 #endif				
-
 				
 				// Do not update position and velocity estimates when in simulation mode
 				if (!PositionActualReadOnly()){

@@ -145,7 +145,8 @@ void gps_airspeed_update(const GPSVelocityData *gpsVelData)
 			gps->RbeCol1_old[1] = Rbe[0][1];
 			gps->RbeCol1_old[2] = Rbe[0][2];
 			
-			const float alpha = .1;
+			//Low pass filter
+			const float alpha = .2;
 			float gps_airspeed_old;
 			AirspeedActualTrueAirspeedGet(&gps_airspeed_old);			
 			

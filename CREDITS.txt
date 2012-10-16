@@ -97,6 +97,10 @@ E: joe (dot) hlebasko(plus) openpilot (at) gmail (dot) com
 D: Early versions of Main Board & Production OP GPS
 M: Hardware Architecture Team
 
+N: Andy Honecker
+E: andywh (at) yahoo (dot) com
+D: Hardware design review and optimisation
+
 N: Mark James
 E: mjames (plus) openpilot (at) gmail (dot) com
 D: Some of Silk Icon set used in GCS - http://www.famfamfam.com/lab/icons/silk

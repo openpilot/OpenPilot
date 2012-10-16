@@ -638,11 +638,7 @@ public class Telemetry {
 						return;
 					}
 
-					// Store this as the active transaction
-					transPending = newTransactionPending;
-					transInfo = newTrans;
-
-					if (DEBUG) Log.d(TAG, "Process Object transaction for " + transInfo.obj.getName());
+					if (DEBUG) Log.d(TAG, "Process Object transaction for " + newTrans.obj.getName());
 
 					// Remove this one from the list of pending transactions
 					handler.removeActivatedQueue(objInfo);
@@ -650,12 +646,12 @@ public class Telemetry {
 					try {
 
 						// 3. Execute transaction by sending the appropriate UAVTalk command
-						if (transInfo.objRequest) {
-							if (DEBUG) Log.d(TAG, "Sending object request " + transInfo.obj.getName());
-							utalk.sendObjectRequest(transInfo.obj, transInfo.allInstances);
+						if (newTrans.objRequest) {
+							if (DEBUG) Log.d(TAG, "Sending object request " + newTrans.obj.getName());
+							utalk.sendObjectRequest(newTrans.obj, newTrans.allInstances);
 						} else {
-							if (DEBUG) Log.d(TAG, "Sending object " + transInfo.obj.getName());
-							utalk.sendObject(transInfo.obj, transInfo.acked, transInfo.allInstances);
+							if (DEBUG) Log.d(TAG, "Sending object " + newTrans.obj.getName());
+							utalk.sendObject(newTrans.obj, newTrans.acked, newTrans.allInstances);
 						}
 
 					} catch (IOException e) {
@@ -663,9 +659,17 @@ public class Telemetry {
 						e.printStackTrace();
 					}
 
-					// Post a timeout timer if a response is epxected
-					if (transPending)
+					// Store this as the active transaction.  However in the case
+					// of transPending && !newTransactionPending we need ot not
+					// override the previous pending transaction
+					if (!transPending && newTransactionPending) {
+						transPending = newTransactionPending;
+						transInfo = newTrans;
+
+						// Post a timeout timer if a response is epxected
 						handler.postDelayed(transactionTimeout, REQ_TIMEOUT_MS);
+					}
+
 				}
 			}
 		}
@@ -750,7 +754,7 @@ public class Telemetry {
 				//Send signal
 				obj.transactionCompleted(result);
 			} else {
-				if (ERROR) Log.e(TAG, "Error: received a transaction completed when did not expect it.");
+				if (ERROR) Log.e(TAG, "Error: received a transaction completed when did not expect it. " + obj.getName());
 				transPending = false;
 			}
 		}

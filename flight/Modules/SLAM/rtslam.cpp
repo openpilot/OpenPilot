@@ -141,7 +141,7 @@ RTSlam::RTSlam() :
     intOpts[iVerbose] = 5;
     intOpts[iMap] = 1;
     intOpts[iCamera] = 1;
-    intOpts[iRobot] = 0;
+    intOpts[iRobot] = 3;
     intOpts[iGps] = 4;
     //intOpts[iGps] = 0;
     intOpts[iDispGdhe] = 1;
@@ -504,6 +504,14 @@ void RTSlam::init()
 		hardEst2_->setSyncConfig(configSetup.POS_TIMESTAMP_CORRECTION);
 		hardEst2 = hardEst2_;
 		robPtr1_->setHardwareEstimator(hardEst2);	
+		robPtr1 = robPtr1_;
+	} else
+	if (intOpts[iRobot] == 3) // external movement
+	{
+		robext_ptr_t robPtr1_(new RobotExternal(mapPtr));
+		robPtr1_->setId();	
+		
+		// TODO hardware estimator (if any?)
 		robPtr1 = robPtr1_;
 	}
 

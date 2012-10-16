@@ -56,6 +56,7 @@
 #include "rtslam/rtSlam.hpp"
 #include "rtslam/rawProcessors.hpp"
 #include "rtslam/rawSegProcessors.hpp"
+#include "rtslam/robotExternal.hpp"
 #include "rtslam/robotOdometry.hpp"
 #include "rtslam/robotConstantVelocity.hpp"
 #include "rtslam/robotInertial.hpp"

@@ -8,7 +8,7 @@
 
 AutoUpdatePage::AutoUpdatePage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
-    ui(new Ui::AutoUpdatePage)
+    ui(new Ui::AutoUpdatePage),m_wiz(wizard)
 {
     ui->setupUi(this);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -29,9 +29,13 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
     switch(status)
     {
     case uploader::WAITING_DISCONNECT:
+        m_wiz->setWindowFlags(m_wiz->windowFlags() & ~Qt::WindowStaysOnTopHint);
         ui->statusLabel->setText("Waiting for all OP boards to be disconnected");
         break;
     case uploader::WAITING_CONNECT:
+        m_wiz->setWindowFlags(m_wiz->windowFlags() | Qt::WindowStaysOnTopHint);
+        m_wiz->setWindowIcon(qApp->windowIcon());
+        m_wiz->show();
         ui->statusLabel->setText("Please connect the board to the USB port (don't use external supply)");
         ui->levellinProgressBar->setValue(value.toInt());
         break;
@@ -56,6 +60,9 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         ui->statusLabel->setText("Board Updated, please press the 'next' button below");
         break;
     case uploader::FAILURE:
+        m_wiz->setWindowFlags(m_wiz->windowFlags() | Qt::WindowStaysOnTopHint);
+        m_wiz->setWindowIcon(qApp->windowIcon());
+        m_wiz->show();
         ui->statusLabel->setText("Something went wrong, you will have to manualy upgrade the board using the uploader plugin");
         break;
     }

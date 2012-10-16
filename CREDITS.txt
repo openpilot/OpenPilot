@@ -104,7 +104,7 @@ D: Some of Silk Icon set used in GCS - http://www.famfamfam.com/lab/icons/silk
 N: Sami Korhonen
 E: samik (dot) korhonen (plus) openpilot (at) gmail (dot) com
 D: GPS Module, Spektrum RC Module, OSD work
-M: OPenPilot OSD
+M: OpenPilot OSD
 
 N: Thorsten Klose
 E: thorsten (dot) klose (at) dmx (dot) de

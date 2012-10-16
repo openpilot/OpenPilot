@@ -431,9 +431,9 @@ public class TelemetryMonitor extends Observable {
 			} else {
 				final int HASH_SIZE_USED = 8;
 				String jarName = new String();
-				for (int i = 0; i < HASH_SIZE_USED; i++)
-					jarName += Integer.toHexString((int) description
-							.getDouble(i + 60));
+				for (int i = 0; i < HASH_SIZE_USED; i++) {
+					jarName += String.format("%02x", (int) description.getDouble(i + 60));
+				}
 				jarName += ".jar";
 				if (DEBUG) Log.d(TAG, "Attempting to load: " + jarName);
 				if (telemService.loadUavobjects(jarName, objMngr)) {

@@ -274,8 +274,8 @@ void ConfigGadgetWidget::updatePipXStatus(UAVObject *object)
         qDebug() << "ConfigGadgetWidget onPipxtremeConnect";
 
         QIcon *icon = new QIcon();
-        icon->addFile(":/configgadget/images/pipx_normal.png", QSize(), QIcon::Normal, QIcon::Off);
-        icon->addFile(":/configgadget/images/pipx_selected.png", QSize(), QIcon::Selected, QIcon::Off);
+        icon->addFile(":/configgadget/images/pipx-normal.png", QSize(), QIcon::Normal, QIcon::Off);
+        icon->addFile(":/configgadget/images/pipx-selected.png", QSize(), QIcon::Selected, QIcon::Off);
 
         QWidget *qwd = new ConfigPipXtremeWidget(this);
         ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, *icon, QString("PipXtreme"));

@@ -33,7 +33,7 @@
 
 #include "gpsvelocity.h"
 
-void gps_airspeed_update(const GPSVelocityData *gpsVelData);
+void gps_airspeed_update(const GPSVelocityData *gpsVelData, float staticAirDensity);
 void gps_airspeed_initialize(void);
 
 #endif // GPS_AIRSPEED_H

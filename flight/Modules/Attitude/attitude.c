@@ -227,6 +227,27 @@ static void AttitudeTask(void *parameters)
 		PIOS_ADC_Config((PIOS_ADC_RATE / 1000.0f) * LOOP_RATE_MS);
 #endif
 
+		//CC IS NOT CURRENTLY SUPPORTED BY NAV BRANCH. FORCE AN ALARM STATE.
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+		while(1){
+			vTaskDelay(1000);
+		}
+	}
+
+	float groundTemperature;
+	
+	//Grab temperature at bootup. The hope is that the temperature is close enough to real temperature to have a reasonable density altitude estimate
+	{
+		float prelim_accels[4];
+		float prelim_gyros[4];
+		if(cc3d_flag){
+			getSensorsCC3D(prelim_accels, prelim_gyros);
+		}
+		else {
+			getSensorsCC(prelim_accels, prelim_gyros, &gyro_queue);
+		}
+		
+		groundTemperature=prelim_accels[3];
 	}
 	
 	//Store the original filter specs. This is because we currently have a poor way of calibrating the Premerlani approach
@@ -395,7 +416,10 @@ static void AttitudeTask(void *parameters)
 				
 				//Get airspeed
 #if defined(PIOS_GPS_PROVIDES_AIRSPEED)
-				gps_airspeed_update(&gpsVelocityData);
+				float staticPressure=101325.0f * powf(1.0f - 2.2555e-5f * (homeLocation.Altitude-positionActualData.Down), 5.25588f); //http://www.engineeringtoolbox.com/air-altitude-pressure-d_462.html
+				float staticAirDensity=0.003483613507536f*staticPressure/(groundTemperature + 273.15f); //rho = PM/RT
+				
+				gps_airspeed_update(&gpsVelocityData, staticAirDensity);
 #endif				
 				
 				// Do not update position and velocity estimates when in simulation mode

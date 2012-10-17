@@ -42,6 +42,7 @@
 #define SAMPLING_DELAY_MS_GPS          100    //Needs to be settable in a UAVO
 #define GPS_AIRSPEED_TIME_CONSTANT_MS  500.0f //Needs to be settable in a UAVO
 
+#define STANDARD_AIR_DENSITY 1.225f //Density of sea level air, at 15C, 20% relative humidy, in [kg/m^3].
 #define F_PI 3.141526535897932f
 #define DEG2RAD (F_PI/180.0f)
 
@@ -104,7 +105,7 @@ void gps_airspeed_initialize(void)
  *  where "f" is the fuselage vector in earth coordinates.
  *  We then solve for |V| = |V_gps_2-V_gps_1|/ |f_2 - f1|.
  */
-void gps_airspeed_update(const GPSVelocityData *gpsVelData)
+void gps_airspeed_update(const GPSVelocityData *gpsVelData, float staticAirDensity)
 {	
 	float Rbe[3][3];
 	compute_rbe(Rbe);
@@ -155,6 +156,10 @@ void gps_airspeed_update(const GPSVelocityData *gpsVelData)
 			// Do not update airspeed data in simulation mode
 			if (!AirspeedActualReadOnly()) {
 				AirspeedActualTrueAirspeedSet(&gps_airspeed);
+
+				//Calculate calibrated airspeed, http://en.wikipedia.org/wiki/True_airspeed
+				gps_airspeed*=sqrtf(staticAirDensity/STANDARD_AIR_DENSITY);
+				AirspeedActualCalibratedAirspeedSet(&gps_airspeed);
 			}
 		}
 		else {

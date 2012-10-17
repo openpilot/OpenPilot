@@ -187,13 +187,13 @@ p, li { white-space: pre-wrap; }
         </font>
        </property>
        <property name="toolTip">
-        <string>Spectrum Satellite</string>
+        <string>Spektrum Satellite</string>
        </property>
        <property name="styleSheet">
         <string notr="true">QToolButton { border: none }</string>
        </property>
        <property name="text">
-        <string>Spectrum</string>
+        <string>Spektrum</string>
        </property>
        <property name="icon">
         <iconset resource="../wizardResources.qrc">

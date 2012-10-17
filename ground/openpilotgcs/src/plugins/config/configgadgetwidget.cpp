@@ -233,7 +233,7 @@ void ConfigGadgetWidget::onAutopilotConnect() {
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         } else {
             //Unknown board
-            Q_ASSERT(0);
+            qDebug() << "Unknown board " << board;
         }
     }
     emit autopilotConnected();

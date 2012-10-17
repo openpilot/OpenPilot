@@ -44,7 +44,10 @@ public:
 
 private slots:
    void showSetupWizard();
+   void wizardTerminated();
 
+private:
+   bool wizardRunning;
 };
 
 #endif // SETUPWIZARDPLUGIN_H

@@ -294,6 +294,7 @@ public class OPTelemetryService extends Service {
             numRead = inputStream.read(buffer);
         }
     }
+
 	private void copyAssets(String JAR_DIR, String JAR_NAME)
     {
         File jarsDir = getDir(JAR_DIR, MODE_WORLD_READABLE);
@@ -320,6 +321,19 @@ public class OPTelemetryService extends Service {
         catch (IOException e)
         {
             Log.e(TAG, e.toString(), e);
+            String[] list;
+			try {
+				list = assetManager.list("uavos/");
+				Log.i(TAG, "Listing found uavos");
+	            for(int i = 0; i < list.length; i++) {
+	            	Log.i(TAG, "Found: " + list[i]);
+	            }
+
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
         }
     }
 
@@ -351,6 +365,10 @@ public class OPTelemetryService extends Service {
 	    final String JAR_DIR = "jars";
 	    final String DEX_DIR = "optimized_dex";
 
+	    File jarsDir = getDir(JAR_DIR, MODE_WORLD_READABLE);
+	    if (jarsDir.exists())
+	    	deleteDirectoryContents(jarsDir);
+
 	    copyAssets(JAR_DIR, jar);
 
 		Log.d(TAG, "Starting dex loader");
@@ -360,7 +378,6 @@ public class OPTelemetryService extends Service {
 		if (dexDir.exists())
 			deleteDirectoryContents(dexDir);
 
-		File jarsDir = getDir(JAR_DIR, MODE_WORLD_READABLE);
 		String classpath = new File(jarsDir, jar).getAbsolutePath();
 
 		DexClassLoader loader = new DexClassLoader(classpath, dexDir.getAbsolutePath(), null, getClassLoader());

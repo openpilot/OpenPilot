@@ -54,9 +54,12 @@ public class TelemetryMonitor extends Observable {
 
 	private final UAVObjectManager objMngr;
 	private final Telemetry tel;
+
+	private boolean objectsRegistered;
 	// private UAVObject objPending;
 	private UAVObject gcsStatsObj;
 	private UAVObject flightStatsObj;
+	private final UAVObject firmwareIapObj;
 	private Timer periodicTask;
 	private int currentPeriod;
 	private long lastUpdateTime;
@@ -74,7 +77,8 @@ public class TelemetryMonitor extends Observable {
 		return objects_updated;
 	};
 
-	public TelemetryMonitor(UAVObjectManager objMngr, Telemetry tel, OPTelemetryService s) {
+	public TelemetryMonitor(UAVObjectManager objMngr, Telemetry tel,
+			OPTelemetryService s) {
 		this(objMngr, tel);
 		telemService = s;
 	}
@@ -85,9 +89,15 @@ public class TelemetryMonitor extends Observable {
 		// this.objPending = null;
 		queue = new ArrayList<UAVObject>();
 
+		objectsRegistered = false;
+
 		// Get stats objects
 		gcsStatsObj = objMngr.getObject("GCSTelemetryStats");
 		flightStatsObj = objMngr.getObject("FlightTelemetryStats");
+		firmwareIapObj = objMngr.getObject("FirmwareIAPObj");
+
+		// The first update of the firmwareIapObj will trigger registering the objects
+		firmwareIapObj.addUpdatedObserver(firmwareIapUpdated);
 
 		flightStatsObj.addUpdatedObserver(new Observer() {
 			@Override
@@ -360,8 +370,13 @@ public class TelemetryMonitor extends Observable {
 			setPeriod(STATS_UPDATE_PERIOD_MS);
 			connected = true;
 			objects_updated = false;
-			startRetrievingObjects();
-			if (HANDSHAKE_IS_CONNECTED) setChanged(); // Enabling this line makes the opConnected signal occur whenever we get a handshake
+			if (objectsRegistered)
+				startRetrievingObjects();
+			else
+				firmwareIapObj.updateRequested();
+			if (HANDSHAKE_IS_CONNECTED)
+				setChanged(); // Enabling this line makes the opConnected signal
+								// occur whenever we get a handshake
 		}
 		if (gcsDisconnected && gcsStatusChanged) {
 			if (DEBUG)
@@ -404,5 +419,38 @@ public class TelemetryMonitor extends Observable {
 		periodicTask.cancel();
 		periodicTask = null;
 	}
+
+	private final Observer firmwareIapUpdated = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+			if (DEBUG) Log.d(TAG, "Received firmware IAP Updated message");
+
+			UAVObjectField description = firmwareIapObj.getField("Description");
+			if (description == null || description.getNumElements() < 100) {
+				telemService.toastMessage("Failed to determine UAVO set");
+			} else {
+				final int HASH_SIZE_USED = 8;
+				String jarName = new String();
+				for (int i = 0; i < HASH_SIZE_USED; i++) {
+					jarName += String.format("%02x", (int) description.getDouble(i + 60));
+				}
+				jarName += ".jar";
+				if (DEBUG) Log.d(TAG, "Attempting to load: " + jarName);
+				if (telemService.loadUavobjects(jarName, objMngr)) {
+					telemService.toastMessage("Loaded appropriate UAVO set");
+					objectsRegistered = true;
+					try {
+						startRetrievingObjects();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				} else
+					telemService.toastMessage("Failed to load UAVO set: " + jarName);
+			}
+
+			firmwareIapObj.removeUpdatedObserver(this);
+		}
+	};
 
 }

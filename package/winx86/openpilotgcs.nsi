@@ -325,6 +325,7 @@ Section "un.OpenPilot GCS" UnSecProgram
   DeleteRegKey HKCU "Software\OpenPilot"
 
   ; Remove shortcuts, if any
+  SetShellVarContext all
   Delete /rebootok "$DESKTOP\OpenPilot GCS.lnk"
   Delete /rebootok "$SMPROGRAMS\OpenPilot\*"
   RMDir /rebootok "$SMPROGRAMS\OpenPilot"
@@ -332,17 +333,21 @@ SectionEnd
 
 Section "un.Maps cache" UnSecCache
   ; Remove maps cache
+  SetShellVarContext current
   RMDir /r /rebootok "$APPDATA\OpenPilot\mapscache"
 SectionEnd
 
 Section /o "un.Configuration" UnSecConfig
   ; Remove configuration
-  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.db"
-  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS.xml"
+  SetShellVarContext current
+  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS*.db"
+  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS*.xml"
+  Delete /rebootok "$APPDATA\OpenPilot\OpenPilotGCS*.ini"
 SectionEnd
 
 Section "-un.Profile" UnSecProfile
   ; Remove OpenPilot user profile subdirectory if empty
+  SetShellVarContext current
   RMDir "$APPDATA\OpenPilot"
 SectionEnd
 

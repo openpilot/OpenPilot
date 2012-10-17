@@ -155,9 +155,10 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) : VehicleConfig(parent)
     m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
 
     QStringList Types;
-    Types << QString::fromUtf8("CCPM 2 Servo 90º") << QString::fromUtf8("CCPM 3 Servo 90º") <<
-             QString::fromUtf8("CCPM 4 Servo 90º") << QString::fromUtf8("CCPM 3 Servo 120º") <<
-             QString::fromUtf8("CCPM 3 Servo 140º") << QString::fromUtf8("FP 2 Servo 90º")  <<
+    Types << QString::fromUtf8("CCPM 2 Servo 90º") << QString::fromUtf8("CCPM 3 Servo 90º") << QString::fromUtf8("CCPM 4 Servo 90º") <<
+             QString::fromUtf8("CCPM 3 Servo 120º") << QString::fromUtf8("CCPM 3 Servo 140º") <<
+             QString::fromUtf8("FP 2 Servo 90º")  <<
+             QString::fromUtf8("Coax 2 Servo 90º")  <<
              QString::fromUtf8("Custom - User Angles") << QString::fromUtf8("Custom - Advanced Settings");
     m_ccpm->ccpmType->addItems(Types);
     m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - 1);
@@ -287,7 +288,6 @@ QStringList ConfigCcpmWidget::getChannelDescriptions()
 void ConfigCcpmWidget::UpdateType()
 {
     int TypeInt,SingleServoIndex,NumServosDefined;
-    QString TypeText;
     double AdjustmentAngle=0;
 
     SetUIComponentVisibilities();
@@ -322,13 +322,11 @@ void ConfigCcpmWidget::UpdateType()
     AdjustmentAngle=SingleServoIndex*90;
 
     m_ccpm->PitchCurve->setVisible(1);
-    //m_ccpm->customThrottleCurve2Value->setVisible(1);
-    //m_ccpm->label_41->setVisible(1);
 
     NumServosDefined=4;
     //set values for pre defined heli types
-        if (TypeText.compare(QString::fromUtf8("CCPM 2 Servo 90º"), Qt::CaseInsensitive)==0)
-        {
+    if (TypeText.compare(QString::fromUtf8("CCPM 2 Servo 90º"), Qt::CaseInsensitive)==0)
+    {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
             m_ccpm->ccpmAngleY->setValue(0);
@@ -339,12 +337,11 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=2;
 
-        }
-        if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 90º"), Qt::CaseInsensitive)==0)
-        {
+    }
+    else if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 90º"), Qt::CaseInsensitive)==0)
+    {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 180,360));
@@ -352,24 +349,22 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
         
-        }
-        if (TypeText.compare(QString::fromUtf8("CCPM 4 Servo 90º"), Qt::CaseInsensitive)==0)
-        {
+    }
+    else if (TypeText.compare(QString::fromUtf8("CCPM 4 Servo 90º"), Qt::CaseInsensitive)==0)
+    {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 180,360));
             m_ccpm->ccpmAngleZ->setValue(fmod(AdjustmentAngle + 270,360));
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             m_ccpm->ccpmSingleServo->setEnabled(0);
             m_ccpm->ccpmSingleServo->setCurrentIndex(0);
             NumServosDefined=4;
         
-        }
-        if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 120º"), Qt::CaseInsensitive)==0)
-        {
+    }
+    else if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 120º"), Qt::CaseInsensitive)==0)
+    {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 120,360));
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 240,360));
@@ -377,12 +372,11 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
             
-        }
-        if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 140º"), Qt::CaseInsensitive)==0)
-        {
+    }
+    else if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 140º"), Qt::CaseInsensitive)==0)
+    {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 140,360));
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 220,360));
@@ -390,12 +384,11 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
 
-        }
-        if (TypeText.compare(QString::fromUtf8("FP 2 Servo 90º"), Qt::CaseInsensitive)==0)
-        {
+    }
+    else if (TypeText.compare(QString::fromUtf8("FP 2 Servo 90º"), Qt::CaseInsensitive)==0)
+    {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
             m_ccpm->ccpmAngleY->setValue(0);
@@ -406,17 +399,46 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
 
             m_ccpm->ccpmCollectivespinBox->setEnabled(0);
             m_ccpm->ccpmCollectiveSlider->setEnabled(0);
             m_ccpm->ccpmCollectivespinBox->setValue(0);
             m_ccpm->ccpmCollectiveSlider->setValue(0);
             m_ccpm->PitchCurve->setVisible(0);
-            //m_ccpm->customThrottleCurve2Value->setVisible(0);
-            //m_ccpm->label_41->setVisible(0);
             NumServosDefined=2;
-        }
+    }
+    else if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive)==0)
+    {
+        m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
+        m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
+        m_ccpm->ccpmAngleY->setValue(0);
+        m_ccpm->ccpmAngleZ->setValue(0);
+        m_ccpm->ccpmAngleY->setEnabled(0);
+        m_ccpm->ccpmAngleZ->setEnabled(0);
+        m_ccpm->ccpmServoYChannel->setCurrentIndex(0);
+        m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
+        m_ccpm->ccpmServoYChannel->setEnabled(0);
+        m_ccpm->ccpmServoZChannel->setEnabled(0);
+
+        m_ccpm->ccpmCollectivespinBox->setEnabled(0);
+        m_ccpm->ccpmCollectiveSlider->setEnabled(0);
+        m_ccpm->ccpmCollectivespinBox->setValue(0);
+        m_ccpm->ccpmCollectiveSlider->setValue(0);
+        m_ccpm->PitchCurve->setVisible(0);
+        NumServosDefined=2;
+
+    }
+
+    //Set the text of the motor boxes
+    if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive)==0)
+    {
+        m_ccpm->ccpmEngineLabel->setText("CW motor");
+        m_ccpm->ccpmTailLabel->setText("CCW motor");
+    }
+    else{
+        m_ccpm->ccpmEngineLabel->setText("Engine");
+        m_ccpm->ccpmTailLabel->setText("Tail rotor");
+    }
 
     //set the visibility of the swashplate servo selection boxes
     m_ccpm->ccpmServoWLabel->setVisible(NumServosDefined>=1);
@@ -439,15 +461,12 @@ void ConfigCcpmWidget::UpdateType()
     m_ccpm->ccpmAngleZ->setVisible(NumServosDefined>=4);
     
 
-        m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();
-        for (int i=0;i<6;i++) {
-            m_ccpm->ccpmAdvancedSettingsTable->setColumnWidth(i,(m_ccpm->ccpmAdvancedSettingsTable->width()-
-                                                            m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
-        }
+    m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();
+    for (int i=0;i<6;i++) {
+        m_ccpm->ccpmAdvancedSettingsTable->setColumnWidth(i,(m_ccpm->ccpmAdvancedSettingsTable->width()-
+                                                             m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
+    }
 
-    
-    
-    
     //update UI
     ccpmSwashplateUpdate();
     
@@ -630,25 +649,40 @@ void ConfigCcpmWidget::UpdateMixer()
         //go through the user data and update the mixer matrix
         for (i=0;i<6;i++)
         {
-            if ((MixerChannelData[i]>0)&&((ThisEnable[i])||(i<2)))
+            if ((MixerChannelData[i]>0) && ((ThisEnable[i])||(i<2)))
             {
                 m_ccpm->ccpmAdvancedSettingsTable->item(i,0)->setText(QString("%1").arg( MixerChannelData[i] ));
-                 //config the vector
-               if (i==0)
-                {//motor-engine
+
+                //Generate the mixer vector
+                if (i==0)
+                {//main motor-engine
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,1)->setText(QString("%1").arg(127));//ThrottleCurve1
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,2)->setText(QString("%1").arg(0));//ThrottleCurve2
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,3)->setText(QString("%1").arg(0));//Roll
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,4)->setText(QString("%1").arg(0));//Pitch
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(0));//Yaw
+
+                    if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive)==0)
+                        m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(-127));//Yaw
+                    else
+                        m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(0));//Yaw
+
                 }
                 if (i==1)
-                {//tailrotor
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,1)->setText(QString("%1").arg(0));//ThrottleCurve1
+                {//tailrotor --or-- counter-clockwise motor
+                    if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive)==0)
+                    {
+                        m_ccpm->ccpmAdvancedSettingsTable->item(i,1)->setText(QString("%1").arg(127));//ThrottleCurve1
+                        m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(127));//Yaw
+                    }
+                    else{
+                        m_ccpm->ccpmAdvancedSettingsTable->item(i,1)->setText(QString("%1").arg(0));//ThrottleCurve1
+                        m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(127));//Yaw
+                    }
+
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,2)->setText(QString("%1").arg(0));//ThrottleCurve2
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,3)->setText(QString("%1").arg(0));//Roll
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,4)->setText(QString("%1").arg(0));//Pitch
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(127));//Yaw
+
                 }
                 if (i>1)
                 {//Swashplate
@@ -915,12 +949,20 @@ void ConfigCcpmWidget::setMixer()
     {
         if (MixerChannelData[i]>0)
         {
-            //set the mixer type
-            *(mixerTypes[MixerChannelData[i] - 1]) = i==0 ?
-                        MixerSettings::MIXER1TYPE_MOTOR :
-                        MixerSettings::MIXER1TYPE_SERVO;
+            //Set the mixer type. If Coax, then first two are motors. Otherwise, only first is motor
+            if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive)==0)
+            {
+                *(mixerTypes[MixerChannelData[i] - 1]) = i > 1 ?
+                            MixerSettings::MIXER1TYPE_SERVO :
+                            MixerSettings::MIXER1TYPE_MOTOR;
+            }
+            else{
+                *(mixerTypes[MixerChannelData[i] - 1]) = i > 0 ?
+                            MixerSettings::MIXER1TYPE_SERVO :
+                            MixerSettings::MIXER1TYPE_MOTOR;
+            }
 
-            //config the vector
+            //Configure the vector
             for (j=0;j<5;j++)
                 mixers[MixerChannelData[i] - 1][j] = m_ccpm->ccpmAdvancedSettingsTable->item(i,j+1)->text().toInt();
         }
@@ -1455,60 +1497,64 @@ bool ConfigCcpmWidget::throwConfigError(QString airframeType)
 
     bool error = false;
 
-    if((m_ccpm->ccpmServoWChannel->currentIndex()==0)&&(m_ccpm->ccpmServoWChannel->isEnabled()))
+    if((m_ccpm->ccpmServoWChannel->currentIndex()==0) && (m_ccpm->ccpmServoWChannel->isEnabled()))
     {
-        m_ccpm->ccpmServoWLabel->setText("<font color=red>Servo W</font>");
+        m_ccpm->ccpmServoWLabel->setText("<font color=red>" + m_ccpm->ccpmServoWLabel->text() + "</font>");
         error = true;
     }
     else
     {
-        m_ccpm->ccpmServoWLabel->setText("<font color=black>Servo W</font>");
-    }
-    if((m_ccpm->ccpmServoXChannel->currentIndex()==0)&&(m_ccpm->ccpmServoXChannel->isEnabled()))
-    {
-        m_ccpm->ccpmServoXLabel->setText("<font color=red>Servo X</font>");
-        error = true;
-    }
-    else
-    {
-        m_ccpm->ccpmServoXLabel->setText("<font color=black>Servo X</font>");
-    }
-    if((m_ccpm->ccpmServoYChannel->currentIndex()==0)&&(m_ccpm->ccpmServoYChannel->isEnabled()))
-    {
-        m_ccpm->ccpmServoYLabel->setText("<font color=red>Servo Y</font>");
-        error = true;
-    }
-    else
-    {
-        m_ccpm->ccpmServoYLabel->setText("<font color=black>Servo Y</font>");
-    }
-    if((m_ccpm->ccpmServoZChannel->currentIndex()==0)&&(m_ccpm->ccpmServoZChannel->isEnabled()))
-    {
-        m_ccpm->ccpmServoZLabel->setText("<font color=red>Servo Z</font>");
-        error = true;
-    }
-    else
-    {
-        m_ccpm->ccpmServoZLabel->setText("<font color=black>Servo Z</font>");
+        m_ccpm->ccpmServoWLabel->setText(QTextEdit(m_ccpm->ccpmServoWLabel->text()).toPlainText());
     }
 
-    if((m_ccpm->ccpmEngineChannel->currentIndex()==0)&&(m_ccpm->ccpmEngineChannel->isEnabled()))
+    if((m_ccpm->ccpmServoXChannel->currentIndex()==0) && (m_ccpm->ccpmServoXChannel->isEnabled()))
     {
-        m_ccpm->ccpmEngineLabel->setText("<font color=red>Engine</font>");
-    }
-    else
-    {
-        m_ccpm->ccpmEngineLabel->setText("<font color=black>Engine</font>");
-    }
-
-    if((m_ccpm->ccpmTailChannel->currentIndex()==0)&&(m_ccpm->ccpmTailChannel->isEnabled()))
-    {
-        m_ccpm->ccpmTailLabel->setText("<font color=red>Tail Rotor</font>");
+        m_ccpm->ccpmServoXLabel->setText("<font color=red>" + m_ccpm->ccpmServoXLabel->text() + "</font>");
         error = true;
     }
     else
     {
-        m_ccpm->ccpmTailLabel->setText("<font color=black>Tail Rotor</font>");
+        m_ccpm->ccpmServoXLabel->setText(QTextEdit(m_ccpm->ccpmServoXLabel->text()).toPlainText());
+    }
+
+    if((m_ccpm->ccpmServoYChannel->currentIndex()==0) && (m_ccpm->ccpmServoYChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoYLabel->setText("<font color=red>" + m_ccpm->ccpmServoYLabel->text() + "</font>");
+        error = true;
+    }
+    else
+    {
+        m_ccpm->ccpmServoYLabel->setText(QTextEdit(m_ccpm->ccpmServoYLabel->text()).toPlainText());
+    }
+
+    if((m_ccpm->ccpmServoZChannel->currentIndex()==0) && (m_ccpm->ccpmServoZChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoZLabel->setText("<font color=red>" + m_ccpm->ccpmServoZLabel->text()+ "</font>");
+        error = true;
+    }
+    else
+    {
+        m_ccpm->ccpmServoZLabel->setText(QTextEdit(m_ccpm->ccpmServoZLabel->text()).toPlainText());
+    }
+
+    if((m_ccpm->ccpmEngineChannel->currentIndex()==0) && (m_ccpm->ccpmEngineChannel->isEnabled()))
+    {
+        m_ccpm->ccpmEngineLabel->setText("<font color=red>" + m_ccpm->ccpmEngineLabel->text() + "</font>");
+    }
+    else
+    {
+        m_ccpm->ccpmEngineLabel->setText(QTextEdit(m_ccpm->ccpmEngineLabel->text()).toPlainText());
+    }
+
+    if((m_ccpm->ccpmTailChannel->currentIndex()==0) && (m_ccpm->ccpmTailChannel->isEnabled()))
+    {
+        m_ccpm->ccpmTailLabel->setText("<font color=red>" + m_ccpm->ccpmTailLabel->text() + "</font>");
+        error = true;
+    }
+    else
+    {
+        m_ccpm->ccpmTailLabel->setText(QTextEdit(m_ccpm->ccpmTailLabel->text()).toPlainText());
+
     }
 
     return error;

@@ -13,15 +13,6 @@
     <Details>Default configuration built for wide screens (17"up)</Details>
     <StyleSheet>wide</StyleSheet>
   </General>
-  <IPconnection>
-    <Current>
-      <arr_1>
-        <Port>1</Port>
-        <UseTCP>0</UseTCP>
-      </arr_1>
-      <size>1</size>
-    </Current>
-  </IPconnection>
   <KeyBindings>
     <size>0</size>
   </KeyBindings>
@@ -1515,6 +1506,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </Aeroquad__PCT__20__PCT__2B>
+      <CC3D>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/boards/CC3D/CC3D.3ds</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </CC3D>
       <CopterControl>
         <configInfo>
           <locked>false</locked>
@@ -1526,6 +1528,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </CopterControl>
+      <Danker__PCT__27s__PCT__20Quad>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/dankers_quad/dankers_quad.3ds</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Danker__PCT__27s__PCT__20Quad>
       <Easyquad__PCT__20X>
         <configInfo>
           <locked>false</locked>
@@ -1647,6 +1660,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </Joe__PCT__27s__PCT__2014__PCT__22__PCT__20T__PCT__20Quad__PCT__20X>
+      <MattL__PCT__27s__PCT__20Y6>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/mattL_Y6/mattL_Y6.3ds</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </MattL__PCT__27s__PCT__20Y6>
       <Quadcopter>
         <configInfo>
           <locked>false</locked>
@@ -1717,6 +1741,7 @@
           <defaultZoom>2</defaultZoom>
           <mapProvider>GoogleSatellite</mapProvider>
           <maxUpdateRate>2000</maxUpdateRate>
+          <overlayOpacity>1</overlayOpacity>
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
@@ -1736,6 +1761,7 @@
           <defaultZoom>2</defaultZoom>
           <mapProvider>GoogleMap</mapProvider>
           <maxUpdateRate>2000</maxUpdateRate>
+          <overlayOpacity>1</overlayOpacity>
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>airplanepip.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
@@ -1755,6 +1781,7 @@
           <defaultZoom>2</defaultZoom>
           <mapProvider>GoogleMap</mapProvider>
           <maxUpdateRate>2000</maxUpdateRate>
+          <overlayOpacity>1</overlayOpacity>
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
@@ -1801,6 +1828,7 @@
           <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
           <latitude>46.6715</latitude>
           <longitude>10.1589</longitude>
+          <openGLEnabled>true</openGLEnabled>
           <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
           <terrainEnabled>false</terrainEnabled>
         </data>
@@ -1817,6 +1845,7 @@
           <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
           <latitude>46.6715</latitude>
           <longitude>10.1589</longitude>
+          <openGLEnabled>true</openGLEnabled>
           <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
           <terrainEnabled>false</terrainEnabled>
         </data>
@@ -2203,7 +2232,7 @@
           <plotCurve0>
             <color>4294901760</color>
             <mathFunction>None</mathFunction>
-            <uavField>X</uavField>
+            <uavField>x</uavField>
             <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2213,7 +2242,7 @@
           <plotCurve1>
             <color>4283782655</color>
             <mathFunction>None</mathFunction>
-            <uavField>Y</uavField>
+            <uavField>y</uavField>
             <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2223,7 +2252,7 @@
           <plotCurve2>
             <color>4283804160</color>
             <mathFunction>None</mathFunction>
-            <uavField>Z</uavField>
+            <uavField>z</uavField>
             <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2527,11 +2556,11 @@
                   <type>uavGadget</type>
                 </side1>
                 <splitterOrientation>1</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAsQAAAAIAAAEV)</splitterSizes>
+                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAYwAAAAIAAAB7)</splitterSizes>
                 <type>splitter</type>
               </side1>
               <splitterOrientation>1</splitterOrientation>
-              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAArgAAAAIAAAHH)</splitterSizes>
+              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAZgAAAAIAAADf)</splitterSizes>
               <type>splitter</type>
             </side0>
             <side1>
@@ -2561,11 +2590,11 @@
               <type>uavGadget</type>
             </side1>
             <splitterOrientation>1</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABIAAAAAIAAAFV)</splitterSizes>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB1AAAAAIAAAGI)</splitterSizes>
             <type>splitter</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB7wAAAAIAAAEf)</splitterSizes>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACegAAAAIAAAFC)</splitterSizes>
           <type>splitter</type>
         </side0>
         <side1>
@@ -2576,7 +2605,7 @@
           <type>uavGadget</type>
         </side1>
         <splitterOrientation>1</splitterOrientation>
-        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACdgAAAAIAAAMp)</splitterSizes>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAADXgAAAAIAAAQd)</splitterSizes>
         <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
@@ -2584,11 +2613,23 @@
     <Mode2>
       <showToolbars>false</showToolbars>
       <splitter>
-        <classId>ConfigGadget</classId>
-        <gadget>
-          <activeConfiguration>default</activeConfiguration>
-        </gadget>
-        <type>uavGadget</type>
+        <side0>
+          <classId>ConfigGadget</classId>
+          <gadget>
+            <activeConfiguration>default</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
+        </side0>
+        <side1>
+          <classId>UAVObjectBrowser</classId>
+          <gadget>
+            <activeConfiguration>default</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
+        </side1>
+        <splitterOrientation>1</splitterOrientation>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAEeQAAAAIAAAMC)</splitterSizes>
+        <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
     </Mode2>
@@ -2596,36 +2637,39 @@
       <showToolbars>false</showToolbars>
       <splitter>
         <side0>
+          <classId>UAVObjectBrowser</classId>
+          <gadget>
+            <activeConfiguration>default</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
+        </side0>
+        <side1>
           <side0>
-            <classId>UAVObjectBrowser</classId>
-            <gadget>
-              <activeConfiguration>default</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
+            <side0>
+              <classId>LoggingGadget</classId>
+              <type>uavGadget</type>
+            </side0>
+            <side1>
+              <classId>GpsDisplayGadget</classId>
+              <gadget>
+                <activeConfiguration>Flight GPS</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side1>
+            <splitterOrientation>2</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAcAAAAAIAAAHo)</splitterSizes>
+            <type>splitter</type>
           </side0>
           <side1>
             <classId>DebugGadget</classId>
             <type>uavGadget</type>
           </side1>
-          <splitterOrientation>1</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-          <type>splitter</type>
-        </side0>
-        <side1>
-          <side0>
-            <classId>EmptyGadget</classId>
-            <type>uavGadget</type>
-          </side0>
-          <side1>
-            <classId>EmptyGadget</classId>
-            <type>uavGadget</type>
-          </side1>
-          <splitterOrientation>1</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+          <splitterOrientation>2</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB3wAAAAIAAAEp)</splitterSizes>
           <type>splitter</type>
         </side1>
-        <splitterOrientation>2</splitterOrientation>
-        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACJgAAAAIAAADo)</splitterSizes>
+        <splitterOrientation>1</splitterOrientation>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAEvwAAAAIAAAK8)</splitterSizes>
         <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
@@ -2654,26 +2698,17 @@
         </side0>
         <side1>
           <side0>
-            <side0>
-              <classId>ScopeGadget</classId>
-              <gadget>
-                <activeConfiguration>Attitude</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side0>
-            <side1>
-              <classId>ScopeGadget</classId>
-              <gadget>
-                <activeConfiguration>Uptimes</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side1>
-            <splitterOrientation>2</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABhgAAAAIAAAEO)</splitterSizes>
-            <type>splitter</type>
+            <classId>ScopeGadget</classId>
+            <gadget>
+              <activeConfiguration>Attitude</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
           </side0>
           <side1>
-            <classId>LoggingGadget</classId>
+            <classId>ScopeGadget</classId>
+            <gadget>
+              <activeConfiguration>Uptimes</activeConfiguration>
+            </gadget>
             <type>uavGadget</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>

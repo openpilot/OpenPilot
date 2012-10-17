@@ -300,16 +300,21 @@ bool OutputCalibrationPage::checkAlarms()
     SystemAlarms::DataFields data = systemAlarms->getData();
 
     if(data.Alarm[SystemAlarms::ALARM_ACTUATOR] != SystemAlarms::ALARM_OK) {
-        QMessageBox mbox;
+        QMessageBox mbox(this);
         mbox.setText(QString(tr("The actuator module is in an error state.\n\n"
-                                "This error can be caused by not having the board correctly connected or\n"
-                                "if the board is not sufficiently powered by an external power source like\n"
-                                "a battery. To use only USB as power source is not enough when the USB can't\n"
-                                "power external components like ESCs and servos.\n\n"
-                                "Please fix the error before continuing calibration.")));
+                                "Please make sure the correct firmware version is used then "
+                                "restart the wizard and try again. If the problem persists please "
+                                "consult the openpilot.org support forum.")));
         mbox.setStandardButtons(QMessageBox::Ok);
         mbox.setIcon(QMessageBox::Critical);
+
+        getWizard()->setWindowFlags(getWizard()->windowFlags() & ~Qt::WindowStaysOnTopHint);
+
         mbox.exec();
+
+        getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);
+        getWizard()->setWindowIcon(qApp->windowIcon());
+        getWizard()->show();
         return false;
     }
     return true;

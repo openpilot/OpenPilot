@@ -446,14 +446,20 @@ bool UploaderGadgetWidget::autoUpdate()
         delete dfu;
         dfu = NULL;
     }
+    QEventLoop loop;
+    QTimer timer;
+    timer.setSingleShot(true);
+    connect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));
     while(USBMonitor::instance()->availableDevices(0x20a0,-1,-1,-1).length()>0)
     {
-        emit autoUpdateSignal(WAITING_DISCONNECT,QVariant());
-        if(QMessageBox::warning(this,tr("OpenPilot Uploader"),tr("Please disconnect all openpilot boards"),QMessageBox::Ok,QMessageBox::Cancel)==QMessageBox::Cancel)
-        {
-            emit autoUpdateSignal(FAILURE,QVariant());
-            return false;
-        }
+             emit autoUpdateSignal(WAITING_DISCONNECT,QVariant());
+             if(QMessageBox::warning(this,tr("OpenPilot Uploader"),tr("Please disconnect all openpilot boards"),QMessageBox::Ok,QMessageBox::Cancel)==QMessageBox::Cancel)
+             {
+                     emit autoUpdateSignal(FAILURE,QVariant());
+                     return false;
+             }
+             timer.start(500);
+             loop.exec();
     }
     emit autoUpdateSignal(WAITING_CONNECT,0);
     autoUpdateConnectTimeout=0;
@@ -810,8 +816,8 @@ void UploaderGadgetWidget::versionMatchCheck()
         {
             gcsUavoHashStr.append(QString::number(i,16).right(2));
         }
-        QString gcsVersion = gcsGitDate + " (" + gcsGitHash + "-"+ gcsUavoHashStr.right(8) + ")";
-        QString fwVersion = boardDescription.gitDate + " (" + boardDescription.gitHash + "-" + fwUavoHashStr.right(8) + ")";
+        QString gcsVersion = gcsGitDate + " (" + gcsGitHash + "-"+ gcsUavoHashStr.left(8) + ")";
+        QString fwVersion = boardDescription.gitDate + " (" + boardDescription.gitHash + "-" + fwUavoHashStr.left(8) + ")";
 
         QString warning = QString(tr(
             "GCS and firmware versions of the UAV objects set do not match which can cause configuration problems. "

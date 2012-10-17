@@ -229,13 +229,13 @@ QString SetupWizard::getSummaryText()
             summary.append(tr("Futaba S.Bus"));
             break;
         case INPUT_DSM2:
-            summary.append(tr("Spectrum satellite (DSM2)"));
+            summary.append(tr("Spektrum satellite (DSM2)"));
             break;
         case INPUT_DSMX10:
-            summary.append(tr("Spectrum satellite (DSMX10BIT)"));
+            summary.append(tr("Spektrum satellite (DSMX10BIT)"));
             break;
         case INPUT_DSMX11:
-            summary.append(tr("Spectrum satellite (DSMX11BIT)"));
+            summary.append(tr("Spektrum satellite (DSMX11BIT)"));
             break;
         default:
             summary.append(tr("Unknown"));

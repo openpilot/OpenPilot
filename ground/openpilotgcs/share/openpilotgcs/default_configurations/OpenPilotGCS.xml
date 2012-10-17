@@ -39,30 +39,49 @@
       <data>
         <Current>
           <arr_1>
-            <CurrentLanguage></CurrentLanguage>
-            <DataObject></DataObject>
+            <CurrentLanguage>default</CurrentLanguage>
+            <DataObject>FlightStatus</DataObject>
             <ExpireTimeout>0</ExpireTimeout>
             <Mute>false</Mute>
-            <ObjectField></ObjectField>
+            <ObjectField>Armed</ObjectField>
             <RangeLimit>0</RangeLimit>
             <Repeat>0</Repeat>
             <SayOrder>0</SayOrder>
-            <Sound1></Sound1>
+            <Sound1>armed</Sound1>
             <Sound2></Sound2>
             <Sound3></Sound3>
-            <SoundCollectionPath></SoundCollectionPath>
-            <Value1></Value1>
+            <SoundCollectionPath>%%DATAPATH%%sounds</SoundCollectionPath>
+            <Value1>Armed</Value1>
             <Value2>0</Value2>
           </arr_1>
           <size>1</size>
         </Current>
-        <EnableSound>false</EnableSound>
+        <EnableSound>true</EnableSound>
         <listNotifies>
-          <size>0</size>
+          <arr_1>
+            <CurrentLanguage>default</CurrentLanguage>
+            <DataObject>FlightStatus</DataObject>
+            <ExpireTimeout>15</ExpireTimeout>
+            <Mute>false</Mute>
+            <ObjectField>Armed</ObjectField>
+            <RangeLimit>0</RangeLimit>
+            <Repeat>0</Repeat>
+            <SayOrder>0</SayOrder>
+            <Sound1>armed</Sound1>
+            <Sound2></Sound2>
+            <Sound3></Sound3>
+            <SoundCollectionPath>%%DATAPATH%%sounds</SoundCollectionPath>
+            <Value1>Armed</Value1>
+            <Value2>0</Value2>
+          </arr_1>
+          <size>1</size>
         </listNotifies>
       </data>
     </SoundNotifyPlugin>
   </Plugins>
+  <SerialConnection>
+    <speed>57600</speed>
+  </SerialConnection>
   <UAVGadgetConfigurations>
     <ConfigGadget>
       <default>
@@ -1842,6 +1861,7 @@
           <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
           <latitude>46.6715</latitude>
           <longitude>10.1589</longitude>
+          <openGLEnabled>true</openGLEnabled>
           <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
           <terrainEnabled>false</terrainEnabled>
         </data>
@@ -1858,6 +1878,7 @@
           <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
           <latitude>46.6715</latitude>
           <longitude>10.1589</longitude>
+          <openGLEnabled>true</openGLEnabled>
           <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
           <terrainEnabled>false</terrainEnabled>
         </data>

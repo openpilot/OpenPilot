@@ -202,7 +202,7 @@ public class Telemetry {
 	/**
 	 * Register a new object for periodic updates (if enabled)
 	 */
-	private synchronized void registerObject(UAVObject obj) {
+	private void registerObject(UAVObject obj) {
 		// Setup object for periodic updates
 		addObject(obj);
 
@@ -213,24 +213,27 @@ public class Telemetry {
 	/**
 	 * Add an object in the list used for periodic updates
 	 */
-	private synchronized void addObject(UAVObject obj) {
-		// Check if object type is already in the list
-		ListIterator<ObjectTimeInfo> li = objList.listIterator();
-		while (li.hasNext()) {
-			ObjectTimeInfo n = li.next();
-			if (n.obj.getObjID() == obj.getObjID()) {
-				// Object type (not instance!) is already in the list, do
-				// nothing
-				return;
-			}
-		}
+	private void addObject(UAVObject obj) {
 
-		// If this point is reached, then the object type is new, let's add it
-		ObjectTimeInfo timeInfo = new ObjectTimeInfo();
-		timeInfo.obj = obj;
-		timeInfo.timeToNextUpdateMs = 0;
-		timeInfo.updatePeriodMs = 0;
-		objList.add(timeInfo);
+		synchronized (objList) {
+			// Check if object type is already in the list
+			ListIterator<ObjectTimeInfo> li = objList.listIterator();
+			while (li.hasNext()) {
+				ObjectTimeInfo n = li.next();
+				if (n.obj.getObjID() == obj.getObjID()) {
+					// Object type (not instance!) is already in the list, do
+					// nothing
+					return;
+				}
+			}
+
+			// If this point is reached, then the object type is new, let's add it
+			ObjectTimeInfo timeInfo = new ObjectTimeInfo();
+			timeInfo.obj = obj;
+			timeInfo.timeToNextUpdateMs = 0;
+			timeInfo.updatePeriodMs = 0;
+			objList.add(timeInfo);
+		}
 	}
 
 	/**
@@ -281,7 +284,7 @@ public class Telemetry {
 	 * Connect to all instances of an object depending on the event mask
 	 * specified
 	 */
-	private synchronized void connectToObjectInstances(UAVObject obj,
+	private void connectToObjectInstances(UAVObject obj,
 			int eventMask) {
 		List<UAVObject> objs = objMngr.getObjectInstances(obj.getObjID());
 		ListIterator<UAVObject> li = objs.listIterator();
@@ -312,43 +315,46 @@ public class Telemetry {
 	 * Update an object based on its metadata properties
 	 */
 	private void updateObject(UAVObject obj) {
-		// Get metadata
-		UAVObject.Metadata metadata = obj.getMetadata();
 
-		// Setup object depending on update mode
-		int eventMask;
-		if (metadata.GetGcsTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_PERIODIC) {
-			// Set update period
-			setUpdatePeriod(obj, metadata.gcsTelemetryUpdatePeriod);
-			// Connect signals for all instances
-			eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-			if (obj.isMetadata())
-				eventMask |= EV_UNPACKED; // we also need to act on remote
-			// updates (unpack events)
+		synchronized(obj) {
+			// Get metadata
+			UAVObject.Metadata metadata = obj.getMetadata();
 
-			connectToObjectInstances(obj, eventMask);
-		} else if (metadata.GetGcsTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) {
-			// Set update period
-			setUpdatePeriod(obj, 0);
-			// Connect signals for all instances
-			eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-			if (obj.isMetadata())
-				eventMask |= EV_UNPACKED; // we also need to act on remote
-			// updates (unpack events)
+			// Setup object depending on update mode
+			int eventMask;
+			if (metadata.GetGcsTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_PERIODIC) {
+				// Set update period
+				setUpdatePeriod(obj, metadata.gcsTelemetryUpdatePeriod);
+				// Connect signals for all instances
+				eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+				if (obj.isMetadata())
+					eventMask |= EV_UNPACKED; // we also need to act on remote
+				// updates (unpack events)
 
-			connectToObjectInstances(obj, eventMask);
-		} else if (metadata.GetGcsTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_THROTTLED) {
-			// TODO
-		} else if (metadata.GetGcsTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_MANUAL) {
-			// Set update period
-			setUpdatePeriod(obj, 0);
-			// Connect signals for all instances
-			eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-			if (obj.isMetadata())
-				eventMask |= EV_UNPACKED; // we also need to act on remote
-			// updates (unpack events)
+				connectToObjectInstances(obj, eventMask);
+			} else if (metadata.GetGcsTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_ONCHANGE) {
+				// Set update period
+				setUpdatePeriod(obj, 0);
+				// Connect signals for all instances
+				eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+				if (obj.isMetadata())
+					eventMask |= EV_UNPACKED; // we also need to act on remote
+				// updates (unpack events)
 
-			connectToObjectInstances(obj, eventMask);
+				connectToObjectInstances(obj, eventMask);
+			} else if (metadata.GetGcsTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_THROTTLED) {
+				// TODO
+			} else if (metadata.GetGcsTelemetryUpdateMode() == UAVObject.UpdateMode.UPDATEMODE_MANUAL) {
+				// Set update period
+				setUpdatePeriod(obj, 0);
+				// Connect signals for all instances
+				eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+				if (obj.isMetadata())
+					eventMask |= EV_UNPACKED; // we also need to act on remote
+				// updates (unpack events)
+
+				connectToObjectInstances(obj, eventMask);
+			}
 		}
 	}
 
@@ -448,7 +454,7 @@ public class Telemetry {
 		registerObject(obj);
 	}
 
-	private synchronized void newInstance(UAVObject obj) {
+	private void newInstance(UAVObject obj) {
 		registerObject(obj);
 	}
 
@@ -632,11 +638,7 @@ public class Telemetry {
 						return;
 					}
 
-					// Store this as the active transaction
-					transPending = newTransactionPending;
-					transInfo = newTrans;
-
-					if (DEBUG) Log.d(TAG, "Process Object transaction for " + transInfo.obj.getName());
+					if (DEBUG) Log.d(TAG, "Process Object transaction for " + newTrans.obj.getName());
 
 					// Remove this one from the list of pending transactions
 					handler.removeActivatedQueue(objInfo);
@@ -644,12 +646,12 @@ public class Telemetry {
 					try {
 
 						// 3. Execute transaction by sending the appropriate UAVTalk command
-						if (transInfo.objRequest) {
-							if (DEBUG) Log.d(TAG, "Sending object request " + transInfo.obj.getName());
-							utalk.sendObjectRequest(transInfo.obj, transInfo.allInstances);
+						if (newTrans.objRequest) {
+							if (DEBUG) Log.d(TAG, "Sending object request " + newTrans.obj.getName());
+							utalk.sendObjectRequest(newTrans.obj, newTrans.allInstances);
 						} else {
-							if (DEBUG) Log.d(TAG, "Sending object " + transInfo.obj.getName());
-							utalk.sendObject(transInfo.obj, transInfo.acked, transInfo.allInstances);
+							if (DEBUG) Log.d(TAG, "Sending object " + newTrans.obj.getName());
+							utalk.sendObject(newTrans.obj, newTrans.acked, newTrans.allInstances);
 						}
 
 					} catch (IOException e) {
@@ -657,9 +659,17 @@ public class Telemetry {
 						e.printStackTrace();
 					}
 
-					// Post a timeout timer if a response is epxected
-					if (transPending)
+					// Store this as the active transaction.  However in the case
+					// of transPending && !newTransactionPending we need ot not
+					// override the previous pending transaction
+					if (!transPending && newTransactionPending) {
+						transPending = newTransactionPending;
+						transInfo = newTrans;
+
+						// Post a timeout timer if a response is epxected
 						handler.postDelayed(transactionTimeout, REQ_TIMEOUT_MS);
+					}
+
 				}
 			}
 		}
@@ -744,7 +754,7 @@ public class Telemetry {
 				//Send signal
 				obj.transactionCompleted(result);
 			} else {
-				if (ERROR) Log.e(TAG, "Error: received a transaction completed when did not expect it.");
+				if (ERROR) Log.e(TAG, "Error: received a transaction completed when did not expect it. " + obj.getName());
 				transPending = false;
 			}
 		}

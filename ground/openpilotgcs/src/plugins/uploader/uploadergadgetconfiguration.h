@@ -30,10 +30,11 @@
 
 #include <coreplugin/iuavgadgetconfiguration.h>
 #include <qextserialport/src/qextserialport.h>
+#include "uploader_global.h"
 
 using namespace Core;
 
-class UploaderGadgetConfiguration : public IUAVGadgetConfiguration
+class UPLOADER_EXPORT UploaderGadgetConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:

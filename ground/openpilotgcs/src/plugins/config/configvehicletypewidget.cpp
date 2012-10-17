@@ -721,9 +721,30 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
         // Update the table:
         for (int channel=0; channel<(int)(VehicleConfig::CHANNEL_NUMELEM); channel++) {
             QComboBox* q = (QComboBox*)m_aircraft->customMixerTable->cellWidget(0,channel);
-
-            vconfig->setMixerType(mixer,channel,
-                q->currentText() == "Servo" ? VehicleConfig::MIXERTYPE_SERVO : VehicleConfig::MIXERTYPE_MOTOR);
+            if(q->currentText()=="Disabled")
+                vconfig->setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
+            else if(q->currentText()=="Motor")
+                vconfig->setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_MOTOR);
+            else if(q->currentText()=="Servo")
+                vconfig->setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
+            else if(q->currentText()=="CameraRoll")
+                vconfig->setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_CAMERAROLL);
+            else if(q->currentText()=="CameraPitch")
+                vconfig->setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_CAMERAPITCH);
+            else if(q->currentText()=="CameraYaw")
+                vconfig->setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_CAMERAYAW);
+            else if(q->currentText()=="Accessory0")
+                vconfig->setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_ACCESSORY0);
+            else if(q->currentText()=="Accessory1")
+                vconfig->setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_ACCESSORY1);
+            else if(q->currentText()=="Accessory2")
+                vconfig->setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_ACCESSORY2);
+            else if(q->currentText()=="Accessory3")
+                vconfig->setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_ACCESSORY3);
+            else if(q->currentText()=="Accessory4")
+                vconfig->setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_ACCESSORY4);
+            else if(q->currentText()=="Accessory5")
+                vconfig->setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_ACCESSORY5);
 
             vconfig->setMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_THROTTLECURVE1,
                                             m_aircraft->customMixerTable->item(1,channel)->text().toDouble());

@@ -223,6 +223,7 @@ SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/ratedesired.c
 SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
 SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
+SRC += $(OPUAVSYNTHDIR)/airspeedactual.c
 
 endif
 
@@ -444,8 +445,8 @@ CDEFS += -DUSE_$(BOARD)
 ifeq ($(ENABLE_DEBUG_PINS), YES)
 CDEFS += -DPIOS_ENABLE_DEBUG_PINS
 endif
-ifeq ($(ENABLE_AUX_UART), YES)
-CDEFS += -DPIOS_ENABLE_AUX_UART
+ifeq ($(ENABLE_DEBUG_CONSOLE), YES)
+CDEFS += -DPIOS_INCLUDE_DEBUG_CONSOLE
 endif
 ifeq ($(ERASE_FLASH), YES)
 CDEFS += -DERASE_FLASH

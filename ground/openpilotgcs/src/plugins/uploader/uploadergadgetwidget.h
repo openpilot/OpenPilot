@@ -56,11 +56,12 @@
 #include <QProgressDialog>
 #include <QErrorMessage>
 #include <QDesktopServices>
-
+#include "uploader_global.h"
+#include "enums.h"
 using namespace OP_DFU;
+using namespace uploader;
 
-
-class UploaderGadgetWidget : public QWidget
+class UPLOADER_EXPORT UploaderGadgetWidget : public QWidget
 {
     Q_OBJECT
 
@@ -68,14 +69,17 @@ class UploaderGadgetWidget : public QWidget
 public:
     UploaderGadgetWidget(QWidget *parent = 0);
    ~UploaderGadgetWidget();
-    typedef enum { IAP_STATE_READY, IAP_STATE_STEP_1, IAP_STATE_STEP_2, IAP_STEP_RESET, IAP_STATE_BOOTLOADER} IAPStep;
     void log(QString str);
-
+    bool autoUpdateCapable();
 public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
     void populate();
     void openHelp();
+    bool autoUpdate();
+    void autoUpdateProgress(int);
+signals:
+    void autoUpdateSignal(uploader::AutoUpdateStep,QVariant);
 private:
      Ui_UploaderWidget *m_config;
      DFUObject *dfu;
@@ -89,6 +93,7 @@ private:
      QEventLoop m_eventloop;
      QErrorMessage * msg;
      void connectSignalSlot(QWidget * widget);
+     int autoUpdateConnectTimeout;
 private slots:
     void onPhisicalHWConnect();
     void versionMatchCheck();
@@ -102,6 +107,7 @@ private slots:
     void systemRescue();
     void getSerialPorts();
     void perform();
+    void performAuto();
     void cancel();
     void uploadStarted();
     void uploadEnded(bool succeed);

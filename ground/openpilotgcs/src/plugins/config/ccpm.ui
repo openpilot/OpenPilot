@@ -126,7 +126,7 @@ QGroupBox::title {
               </size>
              </property>
              <property name="title">
-              <string>Outputs</string>
+              <string>Motor outputs</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_18">
               <property name="horizontalSpacing">
@@ -266,7 +266,7 @@ QGroupBox::title {
               </size>
              </property>
              <property name="title">
-              <string>Swashplate Outputs</string>
+              <string>Swashplate outputs</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_19">
               <property name="horizontalSpacing">

@@ -677,13 +677,13 @@ int ScopeGadgetWidget::csvLoggingAddData()
             }
             else
             {
-                ss  << QString().sprintf("%3.6g",plotData2->yData->last());
+                ss  << QString().sprintf("%3.10g",plotData2->yData->last());
                 m_csvLoggingDataValid=1;
             }
         }
         else
         {
-            ss  << QString().sprintf("%3.6g",plotData2->yDataHistory->last());
+            ss  << QString().sprintf("%3.10g",plotData2->yData->last());
             m_csvLoggingDataValid=1;
         }
     }

@@ -45,6 +45,8 @@
 #include "extensionsystem/pluginmanager.h"
 #include "vehicleconfigurationhelper.h"
 #include "actuatorsettings.h"
+#include "pages/autoupdatepage.h"
+#include "uploader/uploadergadgetfactory.h"
 
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfigurationSource(),
     m_controllerType(CONTROLLER_UNKNOWN),
@@ -57,15 +59,22 @@ SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfiguratio
     {
         m_actuatorSettings << actuatorChannelSettings();
     }
-    createPages();
     setWizardStyle(QWizard::ModernStyle);
-    setFixedSize(640, 530);
+    setMinimumSize(600, 450);
+    resize(600, 450);
+    createPages();
 }
 
 int SetupWizard::nextId() const
 {
     switch (currentId()) {
         case PAGE_START:
+            if(canAutoUpdate()) {
+                return PAGE_UPDATE;
+            } else {
+                return PAGE_CONTROLLER;
+            }
+        case PAGE_UPDATE:
             return PAGE_CONTROLLER;
         case PAGE_CONTROLLER: {
             switch(getControllerType())
@@ -220,13 +229,13 @@ QString SetupWizard::getSummaryText()
             summary.append(tr("Futaba S.Bus"));
             break;
         case INPUT_DSM2:
-            summary.append(tr("Spectrum satellite (DSM2)"));
+            summary.append(tr("Spektrum satellite (DSM2)"));
             break;
         case INPUT_DSMX10:
-            summary.append(tr("Spectrum satellite (DSMX10BIT)"));
+            summary.append(tr("Spektrum satellite (DSMX10BIT)"));
             break;
         case INPUT_DSMX11:
-            summary.append(tr("Spectrum satellite (DSMX11BIT)"));
+            summary.append(tr("Spektrum satellite (DSMX11BIT)"));
             break;
         default:
             summary.append(tr("Unknown"));
@@ -257,6 +266,7 @@ QString SetupWizard::getSummaryText()
 void SetupWizard::createPages()
 {
     setPage(PAGE_START, new StartPage(this));
+    setPage(PAGE_UPDATE, new AutoUpdatePage(this));
     setPage(PAGE_CONTROLLER, new ControllerPage(this));
     setPage(PAGE_VEHICLES, new VehiclePage(this));
     setPage(PAGE_MULTI, new MultiPage(this));
@@ -303,4 +313,13 @@ bool SetupWizard::saveHardwareSettings() const
 {
     VehicleConfigurationHelper helper(const_cast<SetupWizard *>(this));
     return helper.setupHardwareSettings();
+}
+
+bool SetupWizard::canAutoUpdate() const
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UploaderGadgetFactory *uploader = pm->getObject<UploaderGadgetFactory>();
+    Q_ASSERT(uploader);
+    return uploader->isAutoUpdateCapable();
 }

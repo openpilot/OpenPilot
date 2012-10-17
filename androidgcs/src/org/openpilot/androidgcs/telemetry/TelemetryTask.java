@@ -10,7 +10,7 @@ import org.openpilot.uavtalk.Telemetry;
 import org.openpilot.uavtalk.TelemetryMonitor;
 import org.openpilot.uavtalk.UAVObjectManager;
 import org.openpilot.uavtalk.UAVTalk;
-import org.openpilot.uavtalk.uavobjects.UAVObjectsInitialize;
+import org.openpilot.uavtalk.uavobjects.TelemObjectsInitialize;
 
 import android.content.Intent;
 import android.os.Handler;
@@ -103,7 +103,7 @@ public abstract class TelemetryTask implements Runnable {
 		// be dependent on what is connected (e.g. board and
 		// version number).
 		objMngr = new UAVObjectManager();
-		UAVObjectsInitialize.register(objMngr);
+		TelemObjectsInitialize.register(objMngr);
 
 		// Create the required telemetry objects attached to this
 		// data stream

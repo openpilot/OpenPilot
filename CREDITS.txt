@@ -1,5 +1,5 @@
-This is a credits file of people that are or have been key contributors to the OpenPilot project.
-Without the work of the people in this file OpenPilot would not be what it is today.
+This is a credits file of people that are or have been key contributors to the OpenPilot code base in this Git repository. 
+Without the work of the people in this file and many that are not who help the community, OpenPilot would not be what it is today.
 
 It is sorted alphabetically by name and formatted so that it allows for easy grepping and beautification by scripts.
 
@@ -15,7 +15,6 @@ Current maintainer function (M)
 N: Connor Abbott
 E: connor (at) abbott (dot) cx
 D: Win32 OpenPilot port
-M: SITL Win32
 
 N: David Ankers
 E: david (at) openpilot (dot) org
@@ -27,6 +26,11 @@ N: Pedro Assuncao
 E: pedro (dot) agda (plus) openpilot (at) gmail (dot) com
 D: Initial GCS Settings Gadget work
 
+N: Fredrik Arvidsson
+E: fredrik (at) arvidssons (dot) org
+W: GCS Setup Wizard
+M: GCS Setup Wizard
+
 N: Werner Backes
 E: werner (at) bit-1 (dot) de
 D: Port of CopterControl to PS3 Move Controller (MoveCopter)
@@ -34,30 +38,37 @@ D: Port of CopterControl to PS3 Move Controller (MoveCopter)
 N: Jose Barros
 E: josembarros (at) hotmail (dot) com
 D: Next-Gen OP Map Lib, Y-Modem Library, Uploader Plugin
-D: OP Bootloader, AHRS Bootloader, OPUploadTool
-M: Bootloader, OP MAP Lib
+D: OP Bootloader, AHRS Bootloader, OPUploadTool and much else
+M: Bootloader, OP MAP Lib 
 
 N: David "Buzz" Carlson
 E: chebuzz (plus) openpilot (at) gmail (dot) com
 D: 3D ModelView GCS Plugin, sponsor of HITL merge work and XPlane addition
-M: 3D Modelview
 
 N: James Cotton
 E: peabody124 (plus) openpilot (at) gmail (dot) com
 D: Multiplatform HID implementation (firmware & GCS), GCS Joystick control
 D: Posix OpenPilot work and Mac implementation
 D: Firmware implementation of Professor Schinstock's INS/GPS
-M: Architecture co-lead
+D: Android GCS and much else
+M: Architecture co-lead, Android GCS Lead
+
+N: Steve Doll
+E: speakfree07 (at) hotmail (dot) com 
+D: Much Artwork, Logo rework, Welcome page design
 
 N: Piotr Esden-Tempski
 E: esden (at) esden (dot) net
 D: Floss-JTAG Rev A, 4-layer initial design
 
+N: Darren Furniss
+E: furnibird (plus) openpilot (at) gmail (dot) com
+W: GCS Artwork and Android GCS Artwork
+
 N: Frederic Goddeeris
 E: fredericgoddeeris (at) hotmail (dot) com
 D: I2C work and FreeRTOS work, MK integration
 D: EagleTree OSD implementation
-M: OSD Module
 
 N: Daniel Godin
 E: dgodin (at) dnsct (dot) com
@@ -70,6 +81,7 @@ D: GCS Scope plugin
 N: Nuno Guedes
 E: muralha (plus) openpilot (at) gmail (dot) com
 D: 3D artwork, moving surfaces and work on ModelView
+D: PFD Artwork
 
 N: Peter Gunnarsson
 E: peter (at) pyne (dot) se
@@ -82,8 +94,12 @@ D: Creator of http://pythononachip.org
 
 N: Joe Hlebasko
 E: joe (dot) hlebasko(plus) openpilot (at) gmail (dot) com
-D: Production Main Board & Production OP GPS
+D: Early versions of Main Board & Production OP GPS
 M: Hardware Architecture Team
+
+N: Andy Honecker
+E: andywh (at) yahoo (dot) com
+D: Hardware design review and optimisation
 
 N: Mark James
 E: mjames (plus) openpilot (at) gmail (dot) com
@@ -92,6 +108,7 @@ D: Some of Silk Icon set used in GCS - http://www.famfamfam.com/lab/icons/silk
 N: Sami Korhonen
 E: samik (dot) korhonen (plus) openpilot (at) gmail (dot) com
 D: GPS Module, Spektrum RC Module, OSD work
+M: OpenPilot OSD
 
 N: Thorsten Klose
 E: thorsten (dot) klose (at) dmx (dot) de
@@ -101,11 +118,14 @@ N: Hallvard Kristiansen
 E: hal (at) fleshmx (dot) com
 D: GCS Artwork, Quad layout diagrams
 
+N: Mike Labranche
+E: mdlabranche (plus) openpilot (at) gmail (dot) com
+D: Tab bar Telem Monitor
+
 N: Edouard Lafargue
 E: edouard (at) lafargue (dot) name
 D: GCS Dial Plugins, GCS PFD Plugin, GCS GPS plugin, GCS Config plugin
 D: Artwork including standard display dials
-M: GCS Core
 
 N: Matt Lipski
 E: mattlipski (plus) openpilot (at) gmail (dot) com
@@ -113,7 +133,7 @@ D: Deluxe Dials Set artwork, (Artificial Horizon, Compass, Turn Indicator)
 
 N: Les Newell
 E: les (dot) newell (at) fastmail (dot) co (dot) uk
-D: Advanced mixer matrix, SPI protocol based on UAVObjects
+D: Advanced mixer matrix, SPI protocol based on UAVObjects, feedforward
 
 N: Ken Northup
 E: helos360 (at) bellsouth (dot) net
@@ -126,19 +146,22 @@ D: Artwork and design including work on the Deluxe Dial Set
 N: Cathy Moss
 E: cmoss296 (at) blueyonder (dot) co (dot) uk
 D: Hardware design Lead: Gen 2 Mainboard, PipXtreme, Current Sensor
-D: Lead dev PipXtreme, creator OP Map Plugin
-M: Hardware Architecture Team / PipX Modem
+D: PipXtreme designer, creator OP Map Plugin
 
 N: Angus Peart
 E: gussy (at) openpilot (dot) org
 D: Co-founder, Principal hardware architect.
-D: Hardware design of OpenPilot, AHRS, GPS and other hardware
-D: Core developer embedded code
+D: Hardware design of early OpenPilot, AHRS, GPS and other hardware
+
+N: Dmytro Poplavskiy
+E: dmytro (dot) poplavskiy (plus) openpilot (at) gmail (dot) com
+W: QML PFD, QML Welcome page
+M: Qml plugins
 
 N: Eric Price
 E: corvus (dot) corax (at) cybertrench (dot) com
 D: IL2 HITL GCS Plugin, Posix OpenPilot, Advanced stabilisation module
-M: SITL Posix
+M: SITL Posix, SLAM work
 
 N: Richard Querin
 E: rfquerin (plus) openpilot (at) gmail (dot) com
@@ -151,7 +174,6 @@ D: See: http://www.glc-lib.net/
 
 N: Julien Rouviere
 E: julien (dot) rouviere (plus) openpilot (at) gmail (dot) com
-D: GCS Core Developer
 D: GCS Framework and Plugins for the GCS
 
 N: Zik Saleeba
@@ -162,6 +184,11 @@ N: Professor Dale Schinstock
 E: dales (at) ksu (dot) edu
 D: Lead AHRS Developer
 D: Creator of the OpenPilot INS / EKF
+
+N: Professor Kenn Sebesta
+E: kenn (at) openpilot (dot) org
+D: Lead Fixed Wing Developer
+M: Fixed Wing support
 
 N: Oleg Semyonov
 E: os-openpilot-org (at) os-propo (dot) info
@@ -178,7 +205,6 @@ D: SPI protocol for AHRS, I2C rewrite and much core work
 N: Troy Schultz
 E: troy (dot) schultz (at) rogers (dot) com
 D: INS design review and optimisation
-M: Hardware Architecture Team
 
 N: Dr. Erhard Siegl
 E: Erhard (dot) Siegl (at) zogazoga (dot) at
@@ -202,8 +228,13 @@ N: Vassilis Varveropoulos
 E: vassilis (at) openpilot (dot) org
 D: Co-founder, Principal embedded software architect.
 D: Module architecture and UAVTalk/UAVObjects implementation.
-M: Architecture co-lead
 
 N: Alex Vrubel
 E: alex (dot) vrubel (plus) openpilot (at) gmail (dot) com
 D: Russian translation of the GCS
+
+N: Brian Webb
+E: webbbn (plus) openpilot (at) gmail (dot) com
+W: Modem lead developer
+M: OP Modems
+

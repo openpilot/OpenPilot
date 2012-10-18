@@ -1,6 +1,6 @@
 <xml>
     <object name="GroundTruth" singleinstance="true" settings="false">
-        <description>The updated Attitude estimation from @ref AHRSCommsModule.</description>
+        <description>Ground truth data output by a simulator.</description>
         <field name="PositionNED" units="m" type="float" elements="3"/>
         <field name="VelocityNED" units="m" type="float" elements="3"/>
         <field name="RPY" units="deg" type="float" elements="3"/>

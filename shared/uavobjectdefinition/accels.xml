@@ -1,6 +1,6 @@
 <xml>
     <object name="Accels" singleinstance="true" settings="false">
-        <description>The accel data.</description>
+        <description>The accelerometer sensor data, rotated into body frame.</description>
         <field name="x" units="m/s^2" type="float" elements="1"/>
         <field name="y" units="m/s^2" type="float" elements="1"/>
         <field name="z" units="m/s^2" type="float" elements="1"/>

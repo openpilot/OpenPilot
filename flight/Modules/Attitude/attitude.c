@@ -204,6 +204,7 @@ static void AttitudeTask(void *parameters)
 		glbl->gyroGain_ref=1.0f;
 	else
 		glbl->gyroGain_ref=0.42f;
+	
 	AttitudeSettingsGyroGainSet(&glbl->gyroGain_ref);	
 
 	// Force settings update to make sure rotation snf home location loaded
@@ -227,11 +228,6 @@ static void AttitudeTask(void *parameters)
 		PIOS_ADC_Config((PIOS_ADC_RATE / 1000.0f) * LOOP_RATE_MS);
 #endif
 
-		//CC IS NOT CURRENTLY SUPPORTED BY NAV BRANCH. FORCE AN ALARM STATE.
-		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-		while(1){
-			vTaskDelay(1000);
-		}
 	}
 
 	float groundTemperature;
@@ -300,7 +296,7 @@ static void AttitudeTask(void *parameters)
 
 		
 		// Only update attitude when sensor data is good
-		if (retval != 0)
+		if (retval != 0 || cc3d_flag==false) // <--CC IS NOT CURRENTLY SUPPORTED BY NAV BRANCH. FORCE AN ALARM STATE.
 			AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
 		else {
 			// Do not update attitude data in simulation mode

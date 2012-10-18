@@ -137,7 +137,7 @@ class RTSlam {
 
 
 public:
-    RTSlam(void);
+    RTSlam(int _gps=4, float _f=30.0, int _dispqt=1, int _dispgdhe=1);
 	void init();
     void run();
     void exit(boost::thread *thread_main);

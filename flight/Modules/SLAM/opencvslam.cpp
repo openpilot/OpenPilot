@@ -51,14 +51,15 @@ void OpenCVslam::run() {
 
 
 	/* Initialize RTSlam */
-	rtslam = new RTSlam();
+	//rtslam = new RTSlam(4,15);
+	rtslam = new RTSlam(0);
 
 	rtslam->init();
 
 	/* Initialize OpenCV */
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
-	VideoSource = cvCaptureFromFile("test.avi");
-	//VideoSource = cvCaptureFromCAM(0);
+	//VideoSource = cvCaptureFromFile("test.avi");
+	VideoSource = cvCaptureFromCAM(0);
 	
 	VideoDest = NULL;
 	//CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
@@ -159,8 +160,8 @@ void OpenCVslam::run() {
 		state.attitude.pitch=-attitudeActual.Pitch * DEG2RAD;
 		state.attitude.yaw=-attitudeActual.Yaw * DEG2RAD;
 		//state.attitude.roll=0*DEG2RAD; // +roll
-		//state.attitude.pitch=0*DEG2RAD; // -pitch
-		//state.attitude.yaw=180*DEG2RAD; // -yaw
+		//state.attitude.pitch=-0*DEG2RAD; // -pitch
+		//state.attitude.yaw=-0*DEG2RAD; // -yaw
 		state.positionVariance = -1;
 		state.attitudeVariance = -1;
 		//state.positionVariance = powf(0.1,2);

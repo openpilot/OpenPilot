@@ -128,7 +128,7 @@ void RTSlam::videoFrame(IplImage* image) {
 
 
 
-RTSlam::RTSlam() :
+RTSlam::RTSlam(int _gps, float _f, int _dispqt, int _dispgdhe) :
 	openpilotcamera(NULL),
 	openpilotstate(NULL),
 	rawdata_condition(0),
@@ -142,12 +142,11 @@ RTSlam::RTSlam() :
     intOpts[iMap] = 1;
     intOpts[iCamera] = 1;
     intOpts[iRobot] = 0;
-    intOpts[iGps] = 4;
-    //intOpts[iGps] = 0;
-    intOpts[iDispGdhe] = 1;
-    intOpts[iDispQt] = 1;
+    intOpts[iGps] = _gps;
+    intOpts[iDispGdhe] = _dispgdhe;
+    intOpts[iDispQt] = _dispqt;
     intOpts[iTrigger] = 2;
-    floatOpts[fFreq] = 15.0;
+    floatOpts[fFreq] = _f;
     floatOpts[fShutter] = 0.0;
     strOpts[sDataPath] = ".";
     strOpts[sConfigSetup] = "#!@";

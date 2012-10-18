@@ -359,16 +359,9 @@ void ConfigCCAttitudeWidget::doGetSixPointCalibrationMeasurement(UAVObject * obj
             Q_ASSERT(accels);
             Accels::DataFields accelsData = accels->getData();
 
-            //Don't use outliers. Consider that any acceleration over ~0.05g is an outlier.
-            //Rejecting outliers isn't strictly necessary, as so long as the board returns
-            //to the initial position the true average acceleration is 0.
-//            double normA=sqrt(pow(accelsData.x,2) + pow(accelsData.y,2) + pow(accelsData.z,2));
-//            if(normA > 9.805*0.95 && normA < 9.805*1.05)
-//            {
-                accel_accum_x.append(accelsData.x);
-                accel_accum_y.append(accelsData.y);
-                accel_accum_z.append(accelsData.z);
-//            }
+            accel_accum_x.append(accelsData.x);
+            accel_accum_y.append(accelsData.y);
+            accel_accum_z.append(accelsData.z);
         } else {
             Q_ASSERT(0);
         }
@@ -386,6 +379,8 @@ void ConfigCCAttitudeWidget::doGetSixPointCalibrationMeasurement(UAVObject * obj
         accel_data_x[position] = listMean(accel_accum_x);
         accel_data_y[position] = listMean(accel_accum_y);
         accel_data_z[position] = listMean(accel_accum_z);
+
+        qDebug() << "Average values at position[" << position << "]: a_x= " << accel_data_x[position] << ", " << " a_y= " << accel_data_y[position] << ", " << " a_z= " << accel_data_z[position] ;
 
         position = (position + 1) % 6;
         if(position == 1) {
@@ -464,6 +459,11 @@ void ConfigCCAttitudeWidget::computeScaleBias()
            attitudeSettingsData.AccelBias[AttitudeSettings::ACCELBIAS_Y_S]);
    good_calibration &= (attitudeSettingsData.AccelBias[AttitudeSettings::ACCELBIAS_Z_S] ==
            attitudeSettingsData.AccelBias[AttitudeSettings::ACCELBIAS_Z_S]);
+
+   //This can happen if, for instance, HomeLocation.g_e == 0
+   if((S[0]+S[1]+S[2])<0.0001){
+       good_calibration=false;
+   }
 
    if (good_calibration) {
        attitudeSettings->setData(attitudeSettingsData);

@@ -494,7 +494,7 @@ void UAVObject::emitNewInstance(UAVObject * obj)
 }
 
 /**
- * Initialize a UAVObjMetadata object.
+ * Initialize a default UAVObjMetadata object.
  * \param[in] metadata The metadata object
  */
 void UAVObject::MetadataInitialize(UAVObject::Metadata& metadata)

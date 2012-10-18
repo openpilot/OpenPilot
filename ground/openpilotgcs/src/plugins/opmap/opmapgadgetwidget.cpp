@@ -1663,16 +1663,19 @@ void OPMapGadgetWidget::onSetHomeAct_triggered()
 		return;
 
     float altitude=0;
-    bool ok;
+    bool ok=false;
 
     //Get desired HomeLocation altitude from dialog box.
     //TODO: Populate box with altitude already in HomeLocation UAVO
     altitude = QInputDialog::getDouble(this, tr("Set home altitude"),
                                       tr("In [m], referenced to WGS84:"), altitude, -100, 100000, 2, &ok);
 
-    setHome(m_context_menu_lat_lon, altitude);
+    if(ok){
+        setHome(m_context_menu_lat_lon, altitude);
+    }
 
     setHomeLocationObject();  // update the HomeLocation UAVObject
+
 }
 
 void OPMapGadgetWidget::onGoHomeAct_triggered()

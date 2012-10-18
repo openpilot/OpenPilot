@@ -587,6 +587,14 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	glbl->accelscale[0] = attitudeSettings.AccelScale[ATTITUDESETTINGS_ACCELSCALE_X_S]/10000.0f; //Divide by 1000 because `accelbias` is in units
 	glbl->accelscale[1] = attitudeSettings.AccelScale[ATTITUDESETTINGS_ACCELSCALE_Y_S]/10000.0f; // of 1000*[m/s^2]
 	glbl->accelscale[2] = attitudeSettings.AccelScale[ATTITUDESETTINGS_ACCELSCALE_Z_S]/10000.0f;
+
+	//Provide minimum for scale. This keeps the accels from accidentally being "turned off".
+	for (int i=0; i<3; i++){
+		if (glbl->accelscale[i] <.001f) {
+			glbl->accelscale[i]=.001f;
+		}
+	}
+	
 	
 	//The gyroscope sensor calibration values are all in the body frame.
 	glbl->gyro_correct_int[0] = attitudeSettings.GyroBias[ATTITUDESETTINGS_GYROBIAS_X_B] / 100.0f; //Divide by 100 because `GyroBias` 
@@ -723,6 +731,12 @@ static void HomeLocationUpdatedCb(UAVObjEvent * objEv)
 		positionActualData.Down=NED[2];
 		
 		PositionActualSet(&positionActualData);
+	}
+	
+	//Refuse to set gravity lower than Mars's gravity or greater than Jupiter's. Assume that if there was an attempt to do this, it was mistaken, and reset gravity to normal.
+	if (homeLocation.g_e < 3 || homeLocation.g_e > 25) {
+		homeLocation.g_e=9.805;
+		HomeLocationSet(&homeLocation);
 	}
 }
 

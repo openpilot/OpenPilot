@@ -499,7 +499,7 @@
              <bool>true</bool>
             </property>
             <property name="title">
-             <string>AttitudeActual</string>
+             <string>AttitudeActual (50Hz fixed rate)</string>
             </property>
             <property name="flat">
              <bool>true</bool>

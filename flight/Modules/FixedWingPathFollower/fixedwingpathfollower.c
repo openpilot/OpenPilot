@@ -490,11 +490,11 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 	StabilizationDesiredSet(&stabDesired);
 
 	//Stuff some debug variables into PathDesired, because right now these fields aren't being used.
-	pathDesired.ModeParameters[0]=headingCommand_R;
-	pathDesired.ModeParameters[1]=headingError_R;
-	pathDesired.ModeParameters[2]=integral->totalEnergyError;
-	pathDesired.ModeParameters[3]=integral->airspeedError;
-	pathDesired.UID=d*100;
+	pathDesired.ModeParameters[0]=pitchCommand;
+	pathDesired.ModeParameters[1]=airspeedError;
+	pathDesired.ModeParameters[2]=integral->airspeedError;
+	pathDesired.ModeParameters[3]=alitudeError;
+	pathDesired.UID=errorTotalEnergy;
 	
 	PathDesiredSet(&pathDesired);
 	

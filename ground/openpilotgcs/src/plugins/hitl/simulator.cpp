@@ -421,6 +421,11 @@ void Simulator::updateUAVOs(Output2Hardware out){
         homeData.Be[0]=0;
         homeData.Be[1]=0;
         homeData.Be[2]=0;
+
+        homeData.g_e=9.805;
+        homeData.GroundTemperature=15;
+        homeData.SeaLevelPressure=1013;
+
         posHome->setData(homeData);
         posHome->updated();
 

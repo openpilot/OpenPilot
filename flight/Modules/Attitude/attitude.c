@@ -230,8 +230,6 @@ static void AttitudeTask(void *parameters)
 
 	}
 
-	float groundTemperature;
-	
 	//Grab temperature at bootup. The hope is that the temperature is close enough to real temperature to have a reasonable density altitude estimate
 	{
 		float prelim_accels[4];
@@ -243,7 +241,9 @@ static void AttitudeTask(void *parameters)
 			getSensorsCC(prelim_accels, prelim_gyros, &gyro_queue);
 		}
 		
-		groundTemperature=prelim_accels[3];
+		int8_t groundTemperature=round(prelim_accels[3]);
+		
+		HomeLocationGroundTemperatureSet(&groundTemperature);
 	}
 	
 	//Store the original filter specs. This is because we currently have a poor way of calibrating the Premerlani approach
@@ -412,8 +412,8 @@ static void AttitudeTask(void *parameters)
 				
 				//Get airspeed
 #if defined(PIOS_GPS_PROVIDES_AIRSPEED)
-				float staticPressure=101325.0f * powf(1.0f - 2.2555e-5f * (homeLocation.Altitude-positionActualData.Down), 5.25588f); //http://www.engineeringtoolbox.com/air-altitude-pressure-d_462.html
-				float staticAirDensity=0.003483613507536f*staticPressure/(groundTemperature + 273.15f); //rho = PM/RT
+				float staticPressure=homeLocation.SeaLevelPressure * powf(1.0f - 2.2555e-5f * (homeLocation.Altitude-positionActualData.Down), 5.25588f); //http://www.engineeringtoolbox.com/air-altitude-pressure-d_462.html
+				float staticAirDensity=staticPressure*100*0.003483613507536f/(homeLocation.GroundTemperature + 273.15f); //rho = PM/RT, and convert from millibar to Pa.
 				
 				gps_airspeed_update(&gpsVelocityData, staticAirDensity);
 #endif				

@@ -173,7 +173,10 @@ void updateSensorDrift(AccelsData * accelsData, GyrosData * gyrosData, const flo
 			
 			firstpass_flag=false;
 		}
-		
+
+		drft->rollPitchKp = glbl->accelKp*1000.0f;
+		drft->rollPitchKi = glbl->accelKi*10000.0f;
+
 		
 		//Convert quaternions into rotation matrix
 		float Rbe[3][3];
@@ -278,7 +281,6 @@ void DcmCorrection(float * accels, float * gyros, float Rbe[3][3], const float d
 		//Check if the GPS has new information.
 		if(!(drft->gpsVelocityDataConsumption_flag & GPS_CONSUMED_BY_RPY)) {
 
-			
 			//Compute drift correction, errRollPitch_b, from GPS
 			rollPitch_drift_GPS(Rbe, drft->accels_e_integrator, drft->delT_between_GPS, errRollPitch_b);
 			

@@ -248,7 +248,10 @@ static void AttitudeTask(void *parameters)
 	
 	//Store the original filter specs. This is because we currently have a poor way of calibrating the Premerlani approach
 	uint8_t originalFilter=glbl->filter_choice;
-	
+
+	//Start clock for delT calculation
+	uint32_t rawtime = PIOS_DELAY_GetRaw();
+
 	// ----------------------------- //
 	// Main module loop. Never exits //
 	// ----------------------------- //
@@ -301,12 +304,12 @@ static void AttitudeTask(void *parameters)
 		else {
 			// Do not update attitude data in simulation mode
 			if (!AttitudeActualReadOnly()){
-				float delT;
-				portTickType thisSysTime = xTaskGetTickCount();
-				static portTickType lastSysTime = 0;
 				
-				delT = (thisSysTime == lastSysTime) ? 0.001 : (portMAX_DELAY & (thisSysTime - lastSysTime)) / portTICK_RATE_MS / 1000.0f;
-				lastSysTime = thisSysTime;
+				//Calculate delT, the time step between two attitude updates.
+				uint16_t dT_us = PIOS_DELAY_DiffuS(rawtime);
+				rawtime = PIOS_DELAY_GetRaw();
+				dT_us = (dT_us > 0) ? dT_us: 1;
+				float delT = dT_us * 1e-6f;
 				
 				//Update sensor estimation with drift PI feedback
 				if(glbl->bias_correct_gyro) { 

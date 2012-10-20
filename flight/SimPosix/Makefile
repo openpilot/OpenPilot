@@ -55,6 +55,7 @@ FLASH_TOOL = OPENOCD
 MODULES = ManualControl Stabilization GPS
 MODULES += CameraStab
 MODULES += Telemetry
+MODULES += FirmwareIAP
 #MODULES += OveroSync
 PYMODULES = 
 #FlightPlan
@@ -242,6 +243,19 @@ EXTRA_LIBS =
 # 0 = turn off optimization. s = optimize for size.
 # (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 
+
+BLONLY_CDEFS += -DBOARD_TYPE=$(BOARD_TYPE)
+BLONLY_CDEFS += -DBOARD_REVISION=$(BOARD_REVISION)
+BLONLY_CDEFS += -DHW_TYPE=$(HW_TYPE)
+BLONLY_CDEFS += -DBOOTLOADER_VERSION=$(BOOTLOADER_VERSION)
+BLONLY_CDEFS += -DFW_BANK_BASE=$(FW_BANK_BASE)
+BLONLY_CDEFS += -DFW_BANK_SIZE=$(FW_BANK_SIZE)
+BLONLY_CDEFS += -DFW_DESC_SIZE=$(FW_DESC_SIZE)
+
+# Since we are simulating all this firmware the code needs to know what the BL would
+# normally contain
+CFLAGS += $(BLONLY_CDEFS)
+
 ifeq ($(DEBUG),YES)
 CFLAGS += -O0
 CFLAGS += -DGENERAL_COV
@@ -370,7 +384,7 @@ ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
 ALLSRCBASE = $(notdir $(basename $(ALLSRC)))
 
 # Define all object files.
-ALLOBJ     = $(addprefix $(OUTDIR)/, $(addsuffix .o, $(ALLSRCBASE)))
+ALLOBJ     = $(addprefix $(OUTDIR)/, $(addsuffix .o, $(ALLSRCBASE) $(TARGET).bin.firmwareinfo ))
 
 # Define all listing files (used for make clean).
 LSTFILES   = $(addprefix $(OUTDIR)/, $(addsuffix .lst, $(ALLSRCBASE)))

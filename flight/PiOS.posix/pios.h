@@ -68,6 +68,13 @@
 #include <pios_crc.h>
 #include <pios_rcvr.h>
 
+#if defined(PIOS_INCLUDE_IAP)
+#include <pios_iap.h>
+#endif
+#if defined(PIOS_INCLUDE_BL_HELPER)
+#include <pios_bl_helper.h>
+#endif
+
 #define NELEMENTS(x) (sizeof(x) / sizeof(*(x)))
 
 #endif /* PIOS_H */

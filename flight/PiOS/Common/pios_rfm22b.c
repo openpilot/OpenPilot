@@ -63,6 +63,10 @@
 #define EVENT_QUEUE_SIZE 5
 #define PACKET_QUEUE_SIZE 3
 #define RFM22B_DEFAULT_RX_DATARATE RFM22_datarate_64000
+#define RFM22B_DEFAULT_FREQUENCY 434000000
+#define RFM22B_DEFAULT_MIN_FREQUENCY (RFM22B_DEFAULT_FREQUENCY - 2000000)
+#define RFM22B_DEFAULT_MAX_FREQUENCY (RFM22B_DEFAULT_FREQUENCY + 2000000)
+#define RFM22B_DEFAULT_TX_POWER RFM22_tx_pwr_txpow_7
 
 // The maximum amount of time without activity before initiating a reset.
 #define PIOS_RFM22B_SUPERVISOR_TIMEOUT 100  // ms
@@ -160,6 +164,7 @@ static enum pios_rfm22b_event rfm22_detectPreamble(struct pios_rfm22b_dev *rfm22
 static enum pios_rfm22b_event rfm22_detectSync(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_receiveStatus(struct pios_rfm22b_dev *rfm22b_dev);
+static enum pios_rfm22b_event rfm22_requestConnection(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_connectionAccepted(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_connectionDeclined(struct pios_rfm22b_dev *rfm22b_dev);
@@ -172,6 +177,7 @@ static enum pios_rfm22b_event rfm22_fatal_error(struct pios_rfm22b_dev *rfm22b_d
 static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22b_add_rx_status(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_rx_packet_status status);
 static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHandle p, uint16_t rx_len);
+static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev, uint32_t frequency_hz);
 
 // SPI read/write functions
 static void rfm22_assertCs();
@@ -194,7 +200,44 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 	[RFM22B_STATE_INITIALIZING] = {
 		.entry_fn = rfm22_init,
 		.next_state = {
+			//[RFM22B_EVENT_INITIALIZED] = RFM22B_STATE_REQUESTING_CONNECTION,
 			[RFM22B_EVENT_INITIALIZED] = RFM22B_STATE_TX_START,
+			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
+			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
+		},
+	},
+	[RFM22B_STATE_REQUESTING_CONNECTION] = {
+		.entry_fn = rfm22_requestConnection,
+		.next_state = {
+			[RFM22B_EVENT_REQUESTED_CONNECTION] = RFM22B_STATE_TX_START,
+			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
+			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
+			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
+		},
+	},
+	[RFM22B_STATE_ACCEPTING_CONNECTION] = {
+		.entry_fn = rfm22_acceptConnection,
+		.next_state = {
+			[RFM22B_EVENT_RX_COMPLETE] = RFM22B_STATE_TX_START,
+			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
+			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
+			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
+		},
+	},
+	[RFM22B_STATE_CONNECTION_ACCEPTED] = {
+		.entry_fn = rfm22_connectionAccepted,
+		.next_state = {
+			[RFM22B_EVENT_RX_COMPLETE] = RFM22B_STATE_TX_START,
+			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
+			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
+			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
+		},
+	},
+	[RFM22B_STATE_CONNECTION_DECLINED] = {
+		.entry_fn = rfm22_connectionDeclined,
+		.next_state = {
+			[RFM22B_EVENT_RX_COMPLETE] = RFM22B_STATE_TX_START,
+			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
 		},
@@ -249,33 +292,6 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 	},
 	[RFM22B_STATE_RECEIVING_STATUS] = {
 		.entry_fn = rfm22_receiveStatus,
-		.next_state = {
-			[RFM22B_EVENT_RX_COMPLETE] = RFM22B_STATE_TX_START,
-			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
-			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
-			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
-		},
-	},
-	[RFM22B_STATE_ACCEPTING_CONNECTION] = {
-		.entry_fn = rfm22_acceptConnection,
-		.next_state = {
-			[RFM22B_EVENT_RX_COMPLETE] = RFM22B_STATE_TX_START,
-			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
-			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
-			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
-		},
-	},
-	[RFM22B_STATE_CONNECTION_ACCEPTED] = {
-		.entry_fn = rfm22_connectionAccepted,
-		.next_state = {
-			[RFM22B_EVENT_RX_COMPLETE] = RFM22B_STATE_TX_START,
-			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
-			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
-			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
-		},
-	},
-	[RFM22B_STATE_CONNECTION_DECLINED] = {
-		.entry_fn = rfm22_connectionDeclined,
 		.next_state = {
 			[RFM22B_EVENT_RX_COMPLETE] = RFM22B_STATE_TX_START,
 			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
@@ -480,6 +496,8 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->stats.timeouts = 0;
 	rfm22b_dev->stats.link_quality = 0;
 	rfm22b_dev->stats.rssi = 0;
+	rfm22b_dev->tx_power = RFM22B_DEFAULT_TX_POWER;
+	rfm22b_dev->destination_id = 0xffffffff;
 
 	// Bind the configuration to the device instance
 	rfm22b_dev->cfg = *cfg;
@@ -504,9 +522,6 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 
 	// Create the packet queue.
 	rfm22b_dev->packetQueue = xQueueCreate(PACKET_QUEUE_SIZE, sizeof(PHPacketHandle));
-
-	// Initialize the max tx power level.
-	PIOS_RFM22B_SetTxPower(*rfm22b_id, cfg->maxTxPower);
 
 	// Create our (hopefully) unique 32 bit id from the processor serial number.
 	uint8_t crcs[] = { 0, 0, 0, 0 };
@@ -595,12 +610,33 @@ uint32_t PIOS_RFM22B_DeviceID(uint32_t rfm22b_id)
 		return 0;
 }
 
+/**
+ * Sets the radio device transmit power.
+ * \param[in] rfm22b_id The RFM22B device index.
+ * \param[in] tx_pwr The transmit power.
+ */
 void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if(!PIOS_RFM22B_validate(rfm22b_dev))
 		return;
 	rfm22b_dev->tx_power = tx_pwr;
+}
+
+/**
+ * Sets the radio frequency range and value.
+ * \param[in] rfm22b_id The RFM22B device index.
+ * \param[in] min_frequency The minimum frequency.
+ * \param[in] max_frequency The maximum frequency.
+ */
+void PIOS_RFM22B_SetFrequencyRange(uint32_t rfm22b_id, uint32_t min_frequency, uint32_t max_frequency)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return;
+	rfm22b_dev->min_frequency = min_frequency;
+	rfm22b_dev->max_frequency = max_frequency;
+	rfm22_setNominalCarrierFrequency(rfm22b_dev, (max_frequency - min_frequency) / 2);
 }
 
 void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id)
@@ -950,12 +986,10 @@ static enum pios_rfm22b_event rfm22_process_state_transition(struct pios_rfm22b_
 
 static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev, uint32_t frequency_hz)
 {
-	uint32_t min_frequency_hz = rfm22b_dev->cfg.minFrequencyHz;
-	uint32_t max_frequency_hz = rfm22b_dev->cfg.maxFrequencyHz;
-	if (frequency_hz < min_frequency_hz)
-		frequency_hz = min_frequency_hz;
-	else if (frequency_hz > max_frequency_hz)
-		frequency_hz = max_frequency_hz;
+	if (frequency_hz < rfm22b_dev->min_frequency)
+		frequency_hz = rfm22b_dev->min_frequency;
+	else if (frequency_hz > rfm22b_dev->max_frequency)
+		frequency_hz = rfm22b_dev->max_frequency;
 
 	// holds the hbsel (1 or 2)
 	uint8_t	hbsel;
@@ -1594,6 +1628,12 @@ static enum pios_rfm22b_event rfm22_receiveStatus(struct pios_rfm22b_dev *rfm22b
 	return RFM22B_EVENT_RX_COMPLETE;
 }
 
+static enum pios_rfm22b_event rfm22_requestConnection(struct pios_rfm22b_dev *rfm22b_dev)
+{
+	// Generate and set a connection request message.
+	return RFM22B_EVENT_RX_COMPLETE;
+}
+
 static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	return RFM22B_EVENT_RX_COMPLETE;
@@ -1647,8 +1687,6 @@ void rfm22_setFreqCalibration(uint8_t value)
 static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	uint32_t id = rfm22b_dev->deviceID;
-	uint32_t min_frequency_hz = rfm22b_dev->cfg.minFrequencyHz;
-	uint32_t max_frequency_hz = rfm22b_dev->cfg.maxFrequencyHz;
 	uint32_t freq_hop_step_size = 50000;
 
 	// software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
@@ -1726,21 +1764,9 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 
 	// ****************
 	// set the minimum and maximum carrier frequency allowed
-
-	if (min_frequency_hz < RFM22_MIN_CARRIER_FREQUENCY_HZ) min_frequency_hz = RFM22_MIN_CARRIER_FREQUENCY_HZ;
-	else
-		if (min_frequency_hz > RFM22_MAX_CARRIER_FREQUENCY_HZ) min_frequency_hz = RFM22_MAX_CARRIER_FREQUENCY_HZ;
-
-	if (max_frequency_hz < RFM22_MIN_CARRIER_FREQUENCY_HZ) max_frequency_hz = RFM22_MIN_CARRIER_FREQUENCY_HZ;
-	else
-		if (max_frequency_hz > RFM22_MAX_CARRIER_FREQUENCY_HZ) max_frequency_hz = RFM22_MAX_CARRIER_FREQUENCY_HZ;
-
-	if (min_frequency_hz > max_frequency_hz)
-	{	// swap them over
-		uint32_t tmp = min_frequency_hz;
-		min_frequency_hz = max_frequency_hz;
-		max_frequency_hz = tmp;
-	}
+	rfm22b_dev->min_frequency = RFM22B_DEFAULT_MIN_FREQUENCY;
+	rfm22b_dev->max_frequency = RFM22B_DEFAULT_MAX_FREQUENCY;
+	rfm22b_dev->frequency_hz = RFM22B_DEFAULT_FREQUENCY;
 
 	// ****************
 	// calibrate our RF module to be exactly on frequency .. different for every module
@@ -1855,9 +1881,6 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	// set frequency hopping channel step size (multiples of 10kHz)
 	rfm22_write(RFM22_frequency_hopping_step_size, rfm22b_dev->frequency_hop_step_size_reg);
 
-	// set our nominal carrier frequency
-	rfm22_setNominalCarrierFrequency(rfm22b_dev, (min_frequency_hz + max_frequency_hz) / 2);
-
 	// set the tx power
 	rfm22_write(RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | rfm22b_dev->tx_power);
 
@@ -1871,7 +1894,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22_write(RFM22_rx_fifo_control, RX_FIFO_HI_WATERMARK);
 
 	rfm22_setFreqCalibration(rfm22b_dev->cfg.RFXtalCap);
-	rfm22_setNominalCarrierFrequency(rfm22b_dev, rfm22b_dev->cfg.frequencyHz);
+	rfm22_setNominalCarrierFrequency(rfm22b_dev, rfm22b_dev->frequency_hz);
 	RFM22_SetDatarate((uint32_t)rfm22b_dev, rfm22b_dev->datarate, true);
 
 	return RFM22B_EVENT_INITIALIZED;

@@ -12,7 +12,8 @@
 		<field name="SendTimeout" units="ms" type="uint16" elements="1" defaultvalue="50"/>
 		<field name="MinPacketSize" units="bytes" type="uint8" elements="1" defaultvalue="50"/>
 		<field name="FrequencyCalibration" units="" type="uint8" elements="1" defaultvalue="127"/>
-		<field name="Frequency" units="" type="uint32" elements="1" defaultvalue="434000000"/>
+		<field name="MinFrequency" units="" type="uint32" elements="1" defaultvalue="432000000"/>
+		<field name="MaxFrequency" units="" type="uint32" elements="1" defaultvalue="436000000"/>
 		<field name="AESKey" units="" type="uint8" elements="32" defaultvalue="0123456789abcdef0123456789abcdef"/>
 
 		<access gcs="readwrite" flight="readwrite"/>

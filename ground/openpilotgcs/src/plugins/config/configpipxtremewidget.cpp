@@ -65,7 +65,8 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("OPLinkSettings", "SendTimeout", m_oplink->SendTimeout);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "MinPacketSize", m_oplink->MinPacketSize);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "FrequencyCalibration", m_oplink->FrequencyCalibration);
-	addUAVObjectToWidgetRelation("OPLinkSettings", "Frequency", m_oplink->Frequency);
+	addUAVObjectToWidgetRelation("OPLinkSettings", "MinFrequency", m_oplink->MinFrequency);
+	addUAVObjectToWidgetRelation("OPLinkSettings", "MaxFrequency", m_oplink->MaxFrequency);
 
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RxGood", m_oplink->Good);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RxCorrected", m_oplink->Corrected);

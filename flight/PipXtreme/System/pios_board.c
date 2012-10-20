@@ -246,38 +246,6 @@ void PIOS_Board_Init(void) {
 		}
 	}
 
-	// Set the maximum radio RF power.
-	switch (oplinkSettings.MaxRFPower)
-	{
-	case OPLINKSETTINGS_MAXRFPOWER_125:
-		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_0);
-		break;
-	case OPLINKSETTINGS_MAXRFPOWER_16:
-		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_1);
-		break;
-	case OPLINKSETTINGS_MAXRFPOWER_316:
-		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_2);
-		break;
-	case OPLINKSETTINGS_MAXRFPOWER_63:
-		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_3);
-		break;
-	case OPLINKSETTINGS_MAXRFPOWER_126:
-		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_4);
-		break;
-	case OPLINKSETTINGS_MAXRFPOWER_25:
-		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_5);
-		break;
-	case OPLINKSETTINGS_MAXRFPOWER_50:
-		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_6);
-		break;
-	case OPLINKSETTINGS_MAXRFPOWER_100:
-		PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_7);
-		break;
-	}
-
-	// Set the radio destination ID.
-	PIOS_RFM22B_SetDestinationId(pios_rfm22b_id, oplinkSettings.PairID);
-
 	// Initialize the packet handler
 	PacketHandlerConfig pios_ph_cfg = {
 		.default_destination_id = 0xffffffff, // Broadcast

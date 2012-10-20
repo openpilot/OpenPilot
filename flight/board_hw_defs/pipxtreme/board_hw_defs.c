@@ -222,12 +222,7 @@ static const struct pios_exti_cfg pios_exti_rfm22b_cfg __exti_config = {
 struct pios_rfm22b_cfg pios_rfm22b_pipx_cfg = {
 	.spi_cfg = &pios_spi_rfm22b_cfg,
 	.exti_cfg = &pios_exti_rfm22b_cfg,
-	.frequencyHz = 434000000,
-	.minFrequencyHz = 434000000 - 2000000,
-	.maxFrequencyHz = 434000000 + 2000000,
 	.RFXtalCap = 0x7f,
-	.maxRFBandwidth = 64000,
-	.maxTxPower = RFM22_tx_pwr_txpow_7, // +20dBm .. 100mW
 	.slave_num = 0,
 	.gpio_direction = GPIO0_TX_GPIO1_RX,
 };

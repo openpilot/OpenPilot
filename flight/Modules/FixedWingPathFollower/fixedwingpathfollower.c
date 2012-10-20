@@ -337,7 +337,7 @@ static uint8_t updateFixedDesiredAttitude(FixedWingPathFollowerSettingsData fixe
 #define PITCHCROSSFEED_KP fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_KP]	
 #define PITCHCROSSFEED_MIN	fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX]
 #define PITCHCROSSFEED_MAX fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX]
-	float alitudeError=pathDesired.End[2]-positionActual.Down;
+	float alitudeError=-(pathDesired.End[2]-positionActual.Down); //Negative to convert from Down to altitude
 	float altitudeToPitchCommandComponent=bound ( alitudeError* PITCHCROSSFEED_KP,
 													  -PITCHCROSSFEED_MIN,
 													  PITCHCROSSFEED_MAX);

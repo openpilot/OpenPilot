@@ -134,6 +134,8 @@ help:
 	@echo "     uavobjects_<group>   - Generate source files from a subset of the UAVObject definition XML files"
 	@echo "                            supported groups are ($(UAVOBJ_TARGETS))"
 	@echo
+	@echo "   Hint: Add V=1 to your command line to see verbose build output."
+	@echo
 	@echo "   Note: All tools will be installed into $(TOOLS_DIR)"
 	@echo "         All build output will be placed in $(BUILD_DIR)"
 	@echo

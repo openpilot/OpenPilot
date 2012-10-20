@@ -41,7 +41,8 @@ class QTCREATOR_UTILS_EXPORT CoordinateConversions
 {
 public:
     CoordinateConversions();
-    int GetLLA(double LLA[3], double NED[3], double position[3]);
+    int NED2LLA_HomeECEF(double BaseECEFcm[3], double NED[3], double position[3]);
+    int NED2LLA_HomeLLA(double LLA[3], double NED[3], double position[3]);
     void RneFromLLA(double LLA[3], double Rne[3][3]);
     void LLA2ECEF(double LLA[3], double ECEF[3]);
     int ECEF2LLA(double ECEF[3], double LLA[3]);
@@ -49,6 +50,7 @@ public:
     void Quaternion2RPY(const float q[4], float rpy[3]);
     void RPY2Quaternion(const float rpy[3], float q[4]);
     void Quaternion2R(const float q[4], float Rbe[3][3]);
+    void R2Quaternion(float const Rbe[3][3], float q[4]);
 };
 
 }

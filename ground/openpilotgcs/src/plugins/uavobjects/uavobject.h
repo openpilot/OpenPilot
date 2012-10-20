@@ -126,6 +126,7 @@ public:
     QString toStringBrief();
     QString toStringData();
     void emitTransactionCompleted(bool success);
+    void emitNewInstance(UAVObject *);
 
     // Metadata accessors
     static void MetadataInitialize(Metadata& meta);
@@ -154,6 +155,7 @@ signals:
     void objectUnpacked(UAVObject* obj);
     void updateRequested(UAVObject* obj);
     void transactionCompleted(UAVObject* obj, bool success);
+    void newInstance(UAVObject* obj);
 
 private slots:
     void fieldUpdated(UAVObjectField* field);

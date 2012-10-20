@@ -41,7 +41,7 @@ namespace Ui {
     class GeneralSettings;
 }
 
-class GeneralSettings : public IOptionsPage
+class CORE_EXPORT GeneralSettings : public IOptionsPage
 {
     Q_OBJECT
 
@@ -58,9 +58,10 @@ public:
     bool saveSettingsOnExit() const;
     bool autoConnect() const;
     bool autoSelect() const;
+    bool useUDPMirror() const;
     void readSettings(QSettings* qs);
     void saveSettings(QSettings* qs);
-
+    bool useExpertMode() const;
 signals:
 
 private slots:
@@ -78,11 +79,12 @@ private:
     bool m_saveSettingsOnExit;
     bool m_autoConnect;
     bool m_autoSelect;
+    bool m_useUDPMirror;
+    bool m_useExpertMode;
     QPointer<QWidget> m_dialog;
     QList<QTextCodec *> m_codecs;
 
 };
-
 } // namespace Internal
 } // namespace Core
 

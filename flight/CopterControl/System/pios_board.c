@@ -61,11 +61,18 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #define PIOS_COM_BRIDGE_RX_BUF_LEN 65
 #define PIOS_COM_BRIDGE_TX_BUF_LEN 12
 
+#if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
+#define PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN 40
+uint32_t pios_com_debug_id;
+#endif	/* PIOS_INCLUDE_DEBUG_CONSOLE */
+
 uint32_t pios_com_telem_rf_id;
 uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_vcp_id;
 uint32_t pios_com_gps_id;
 uint32_t pios_com_bridge_id;
+
+uint32_t pios_usb_rctx_id;
 
 /**
  * Configuration for MPU6000 chip
@@ -323,6 +330,25 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_COM */
 		break;
+	case HWSETTINGS_USB_VCPPORT_DEBUGCONSOLE:
+#if defined(PIOS_INCLUDE_COM)
+#if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
+		{
+			uint32_t pios_usb_cdc_id;
+			if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
+				PIOS_Assert(0);
+			}
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_debug_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
+						NULL, 0,
+						tx_buffer, PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_DEBUG_CONSOLE */
+#endif	/* PIOS_INCLUDE_COM */
+		break;
 	}
 #endif	/* PIOS_INCLUDE_USB_CDC */
 
@@ -357,6 +383,15 @@ void PIOS_Board_Init(void) {
 			}
 		}
 #endif	/* PIOS_INCLUDE_COM */
+		break;
+	case HWSETTINGS_USB_HIDPORT_RCTRANSMITTER:
+#if defined(PIOS_INCLUDE_USB_RCTX)
+		{
+			if (PIOS_USB_RCTX_Init(&pios_usb_rctx_id, &pios_usb_rctx_cfg, pios_usb_id)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_USB_RCTX */
 		break;
 	}
 
@@ -476,7 +511,25 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_DSM */
 		break;
-	case HWSETTINGS_CC_MAINPORT_COMAUX:
+	case HWSETTINGS_CC_MAINPORT_DEBUGCONSOLE:
+#if defined(PIOS_INCLUDE_COM)
+#if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
+		{
+			uint32_t pios_usart_generic_id;
+			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_main_cfg)) {
+				PIOS_Assert(0);
+			}
+
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_debug_id, &pios_usart_com_driver, pios_usart_generic_id,
+				NULL, 0,
+				tx_buffer, PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_DEBUG_CONSOLE */
+#endif	/* PIOS_INCLUDE_COM */
 		break;
 	case HWSETTINGS_CC_MAINPORT_COMBRIDGE:
 		{
@@ -602,7 +655,25 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_DSM */
 		break;
-	case HWSETTINGS_CC_FLEXIPORT_COMAUX:
+	case HWSETTINGS_CC_FLEXIPORT_DEBUGCONSOLE:
+#if defined(PIOS_INCLUDE_COM)
+#if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
+		{
+			uint32_t pios_usart_generic_id;
+			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_flexi_cfg)) {
+				PIOS_Assert(0);
+			}
+
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_debug_id, &pios_usart_com_driver, pios_usart_generic_id,
+				NULL, 0,
+				tx_buffer, PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_DEBUG_CONSOLE */
+#endif	/* PIOS_INCLUDE_COM */
 		break;
 	case HWSETTINGS_CC_FLEXIPORT_I2C:
 #if defined(PIOS_INCLUDE_I2C)
@@ -657,6 +728,33 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_PPM */
 		break;
+	case HWSETTINGS_CC_RCVRPORT_PPMPWM:
+		/* This is a combination of PPM and PWM inputs */
+#if defined(PIOS_INCLUDE_PPM)
+		{
+			uint32_t pios_ppm_id;
+			PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+
+			uint32_t pios_ppm_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
+				PIOS_Assert(0);
+			}
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM] = pios_ppm_rcvr_id;
+		}
+#endif	/* PIOS_INCLUDE_PPM */
+#if defined(PIOS_INCLUDE_PWM)
+		{
+			uint32_t pios_pwm_id;
+			PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_with_ppm_cfg);
+
+			uint32_t pios_pwm_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
+				PIOS_Assert(0);
+			}
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
+		}
+#endif	/* PIOS_INCLUDE_PWM */
+		break;
 	}
 
 #if defined(PIOS_INCLUDE_GCSRCVR)
@@ -678,6 +776,7 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_CC_RCVRPORT_DISABLED:
 		case HWSETTINGS_CC_RCVRPORT_PWM:
 		case HWSETTINGS_CC_RCVRPORT_PPM:
+		case HWSETTINGS_CC_RCVRPORT_PPMPWM:
 			PIOS_Servo_Init(&pios_servo_cfg);
 			break;
 		case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTS:

@@ -1134,6 +1134,19 @@ const struct pios_pwm_cfg pios_pwm_cfg = {
 	.channels = pios_tim_rcvrport_all_channels,
 	.num_channels = NELEMENTS(pios_tim_rcvrport_all_channels),
 };
+
+const struct pios_pwm_cfg pios_pwm_with_ppm_cfg = {
+	.tim_ic_init = {
+		.TIM_ICPolarity = TIM_ICPolarity_Rising,
+		.TIM_ICSelection = TIM_ICSelection_DirectTI,
+		.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+		.TIM_ICFilter = 0x0,
+	},
+	/* Leave the first channel for PPM use and use the rest for PWM */
+	.channels = &pios_tim_rcvrport_all_channels[1],
+	.num_channels = NELEMENTS(pios_tim_rcvrport_all_channels) - 1,
+};
+
 #endif
 
 
@@ -1327,6 +1340,16 @@ const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
 };
 
 #endif /* PIOS_INCLUDE_USB_HID */
+
+#if defined(PIOS_INCLUDE_USB_RCTX)
+#include <pios_usb_rctx_priv.h>
+
+const struct pios_usb_rctx_cfg pios_usb_rctx_cfg = {
+	.data_if = 2,
+	.data_tx_ep = 1,
+};
+
+#endif	/* PIOS_INCLUDE_USB_RCTX */
 
 #if defined(PIOS_INCLUDE_USB_CDC)
 #include <pios_usb_cdc_priv.h>

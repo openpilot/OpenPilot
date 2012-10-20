@@ -38,6 +38,8 @@ SerialPluginConfiguration::SerialPluginConfiguration(QString classId, QSettings*
     IUAVGadgetConfiguration(classId, parent),
     m_speed("57600")
 {
+    Q_UNUSED(qSettings);
+
     settings = Core::ICore::instance()->settings();
 }
 

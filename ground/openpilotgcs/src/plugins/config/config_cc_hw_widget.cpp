@@ -35,14 +35,44 @@
 #include <QtGui/QPushButton>
 #include <QDesktopServices>
 #include <QUrl>
+#include <extensionsystem/pluginmanager.h>
+#include <coreplugin/generalsettings.h>
+
 
 ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_telemetry = new Ui_CC_HW_Widget();
     m_telemetry->setupUi(this);
 
-    m_telemetry->label_2->setPixmap(QPixmap(":/configgadget/images/coptercontrol.svg"));
+    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
+    if(!settings->useExpertMode())
+        m_telemetry->saveTelemetryToRAM->setVisible(false);
 
+
+    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
+    int id = utilMngr->getBoardModel();
+
+    switch (id) {
+    case 0x0101:
+        m_telemetry->label_2->setPixmap(QPixmap(":/uploader/images/deviceID-0101.svg"));
+        break;
+    case 0x0301:
+        m_telemetry->label_2->setPixmap(QPixmap(":/uploader/images/deviceID-0301.svg"));
+        break;
+    case 0x0401:
+        m_telemetry->label_2->setPixmap(QPixmap(":/configgadget/images/coptercontrol.svg"));
+        break;
+    case 0x0402:
+        m_telemetry->label_2->setPixmap(QPixmap(":/configgadget/images/coptercontrol.svg"));
+        break;
+    case 0x0201:
+        m_telemetry->label_2->setPixmap(QPixmap(":/uploader/images/deviceID-0201.svg"));
+        break;
+    default:
+        m_telemetry->label_2->setPixmap(QPixmap(":/configgadget/images/coptercontrol.svg"));
+        break;
+    }
     addApplySaveButtons(m_telemetry->saveTelemetryToRAM,m_telemetry->saveTelemetryToSD);
     addUAVObjectToWidgetRelation("HwSettings","CC_FlexiPort",m_telemetry->cbFlexi);
     addUAVObjectToWidgetRelation("HwSettings","CC_MainPort",m_telemetry->cbTele);
@@ -56,6 +86,7 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     enableControls(false);
     populateWidgets();
     refreshWidgetsValues();
+    forceConnectedState();
 }
 
 ConfigCCHWWidget::~ConfigCCHWWidget()
@@ -70,10 +101,19 @@ void ConfigCCHWWidget::refreshValues()
 void ConfigCCHWWidget::widgetsContentsChanged()
 {
     ConfigTaskWidget::widgetsContentsChanged();
-
-    if (((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_TELEMETRY) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_TELEMETRY)) ||
+    if (((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_DEBUGCONSOLE) &&
+	 (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_DEBUGCONSOLE)) ||
+	((m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_DEBUGCONSOLE) &&
+	 (m_telemetry->cbUsbVcp->currentIndex() == HwSettings::USB_VCPPORT_DEBUGCONSOLE)) ||
+	((m_telemetry->cbUsbVcp->currentIndex() == HwSettings::USB_VCPPORT_DEBUGCONSOLE) &&
+	 (m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_DEBUGCONSOLE)))
+    {
+        enableControls(false);
+        m_telemetry->problems->setText(tr("Warning: you have configured more than one DebugConsole, this currently is not supported"));
+    }
+    else if (((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_TELEMETRY) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_TELEMETRY)) ||
         ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_GPS) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_GPS)) ||
-        ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_COMAUX) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_COMAUX)) ||
+        ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_DEBUGCONSOLE) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_DEBUGCONSOLE)) ||
         ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_COMBRIDGE) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_COMBRIDGE)))
     {
         enableControls(false);
@@ -98,7 +138,7 @@ void ConfigCCHWWidget::widgetsContentsChanged()
 
 void ConfigCCHWWidget::openHelp()
 {
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/CopterControl+HW+Settings", QUrl::StrictMode) );
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/D4AUAQ", QUrl::StrictMode) );
 }
 
 /**

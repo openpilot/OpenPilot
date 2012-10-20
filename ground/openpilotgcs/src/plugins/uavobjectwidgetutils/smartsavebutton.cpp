@@ -83,14 +83,19 @@ void smartSaveButton::processOperation(QPushButton * button,bool save)
         current_object=obj;
         for(int i=0;i<3;++i)
         {
-
+            qDebug()<<"SMARTSAVEBUTTON"<<"Upload try number"<<i<<"Object"<<obj->getName();
             connect(obj,SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(transaction_finished(UAVObject*, bool)));
             connect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));
             obj->updated();
             timer.start(3000);
             //qDebug()<<"begin loop";
             loop.exec();
-            //qDebug()<<"end loop";
+            if(timer.isActive())
+            {
+                qDebug()<<"SMARTSAVEBUTTON"<<"Upload did not timeout"<<i<<"Object"<<obj->getName();
+            }
+            else
+                qDebug()<<"SMARTSAVEBUTTON"<<"Upload TIMEOUT"<<i<<"Object"<<obj->getName();
             timer.stop();
             disconnect(obj,SIGNAL(transactionCompleted(UAVObject*,bool)),this,SLOT(transaction_finished(UAVObject*, bool)));
             disconnect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));
@@ -99,7 +104,7 @@ void smartSaveButton::processOperation(QPushButton * button,bool save)
         }
         if(up_result==false)
         {
-            qDebug()<<"Object upload error:"<<obj->getName();
+            qDebug()<<"SMARTSAVEBUTTON"<<"Object upload error:"<<obj->getName();
             error=true;
             continue;
         }
@@ -109,12 +114,18 @@ void smartSaveButton::processOperation(QPushButton * button,bool save)
         {
             for(int i=0;i<3;++i)
             {
-                qDebug()<<"try to save:"<<obj->getName();
+                qDebug()<<"SMARTSAVEBUTTON"<<"Save try number"<<i<<"Object"<<obj->getName();
                 connect(utilMngr,SIGNAL(saveCompleted(int,bool)),this,SLOT(saving_finished(int,bool)));
                 connect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));
                 utilMngr->saveObjectToSD(obj);
                 timer.start(3000);
                 loop.exec();
+                if(timer.isActive())
+                {
+                    qDebug()<<"SMARTSAVEBUTTON"<<"Saving did not timeout"<<i<<"Object"<<obj->getName();
+                }
+                else
+                    qDebug()<<"SMARTSAVEBUTTON"<<"Saving TIMEOUT"<<i<<"Object"<<obj->getName();
                 timer.stop();
                 disconnect(utilMngr,SIGNAL(saveCompleted(int,bool)),this,SLOT(saving_finished(int,bool)));
                 disconnect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));
@@ -123,7 +134,7 @@ void smartSaveButton::processOperation(QPushButton * button,bool save)
             }
             if(sv_result==false)
             {
-                qDebug()<<"failed to save:"<<obj->getName();
+                qDebug()<<"SMARTSAVEBUTTON"<<"failed to save:"<<obj->getName();
                 error=true;
             }
         }
@@ -151,6 +162,7 @@ void smartSaveButton::setObjects(QList<UAVDataObject *> list)
 
 void smartSaveButton::addObject(UAVDataObject * obj)
 {
+    Q_ASSERT(obj);
     if(!objects.contains(obj))
         objects.append(obj);
 }

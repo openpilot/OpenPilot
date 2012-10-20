@@ -2,7 +2,7 @@
 ******************************************************************************
 *
 * @file       trailitem.cpp
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
 * @brief      A graphicsItem representing a trail point
 * @see        The GNU Public License (GPL) Version 3
 * @defgroup   OPMapWidget
@@ -28,9 +28,8 @@
 #include <QDateTime>
 namespace mapcontrol
 {
-    TrailItem::TrailItem(internals::PointLatLng const& coord,int const& altitude, QBrush color, QGraphicsItem* parent):QGraphicsItem(parent),coord(coord)
+TrailItem::TrailItem(internals::PointLatLng const& coord,int const& altitude, QBrush color, MapGraphicItem *map):QGraphicsItem(map),coord(coord),m_brush(color),m_map(map)
     {
-        m_brush=color;
         QDateTime time=QDateTime::currentDateTime();
         QString coord_str = " " + QString::number(coord.Lat(), 'f', 6) + "   " + QString::number(coord.Lng(), 'f', 6);
         setToolTip(QString(tr("Position:")+"%1\n"+tr("Altitude:")+"%2\n"+tr("Time:")+"%3").arg(coord_str).arg(QString::number(altitude)).arg(time.toString()));
@@ -38,7 +37,9 @@ namespace mapcontrol
 
     void TrailItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
     {
-      //  painter->drawRect(QRectF(-3,-3,6,6));
+        Q_UNUSED(option);
+        Q_UNUSED(widget);
+
         painter->setBrush(m_brush);
         painter->drawEllipse(-2,-2,4,4);
     }
@@ -53,5 +54,8 @@ namespace mapcontrol
         return Type;
     }
 
-
+    void TrailItem::setPosSLOT()
+    {
+        setPos(m_map->FromLatLngToLocal(this->coord).X(),m_map->FromLatLngToLocal(this->coord).Y());
+    }
 }

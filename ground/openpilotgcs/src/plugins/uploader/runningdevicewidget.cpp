@@ -32,15 +32,10 @@ runningDeviceWidget::runningDeviceWidget(QWidget *parent) :
 {
     myDevice = new Ui_runningDeviceWidget();
     myDevice->setupUi(this);
-    devicePic = NULL; // Initialize pointer to null
 
     // Initialization of the Device icon display
     myDevice->devicePicture->setScene(new QGraphicsScene(this));
 
-    /*
-    QPixmap pix = QPixmap(QString(":uploader/images/view-refresh.svg"));
-    myDevice->statusIcon->setPixmap(pix);
-    */
 }
 
 
@@ -50,15 +45,13 @@ void runningDeviceWidget::showEvent(QShowEvent *event)
     // Thit fitInView method should only be called now, once the
     // widget is shown, otherwise it cannot compute its values and
     // the result is usually a ahrsbargraph that is way too small.
-    if (devicePic)
-       myDevice->devicePicture->fitInView(devicePic,Qt::KeepAspectRatio);
+    myDevice->devicePicture->fitInView(devicePic.rect(),Qt::KeepAspectRatio);
 }
 
 void runningDeviceWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
-    if (devicePic)
-        myDevice->devicePicture->fitInView(devicePic, Qt::KeepAspectRatio);
+    myDevice->devicePicture->fitInView(devicePic.rect(), Qt::KeepAspectRatio);
 }
 
 /**
@@ -79,40 +72,38 @@ void runningDeviceWidget::populate()
     // DeviceID tells us what sort of HW we have detected:
     // display a nice icon:
     myDevice->devicePicture->scene()->clear();
-    if (devicePic)
-        delete devicePic;
-    devicePic = new QGraphicsSvgItem();
-    devicePic->setSharedRenderer(new QSvgRenderer());
 
     switch (id) {
     case 0x0101:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0101.svg"));
-        break;
-    case 0x0301:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0301.svg"));
-        break;
-    case 0x0401:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0401.svg"));
+        devicePic.load("");//TODO
         break;
     case 0x0201:
-        devicePic->renderer()->load(QString(":/uploader/images/deviceID-0201.svg"));
+        devicePic.load("");//TODO
+        break;
+    case 0x0301:
+        devicePic.load(":/uploader/images/pipx.png");
+        break;
+    case 0x0401:
+        devicePic.load(":/uploader/images/gcs-board-cc.png");
+        break;
+    case 0x0402:
+        devicePic.load(":/uploader/images/gcs-board-cc3d.png");
         break;
     default:
         break;
     }
-    devicePic->setElementId("device");
-    myDevice->devicePicture->scene()->addItem(devicePic);
-    myDevice->devicePicture->setSceneRect(devicePic->boundingRect());
-    myDevice->devicePicture->fitInView(devicePic,Qt::KeepAspectRatio);
+    myDevice->devicePicture->scene()->addPixmap(devicePic);
+    myDevice->devicePicture->setSceneRect(devicePic.rect());
+    myDevice->devicePicture->fitInView(devicePic.rect(),Qt::KeepAspectRatio);
 
     QString serial = utilMngr->getBoardCPUSerial().toHex();
      myDevice->CPUSerial->setText(serial);
 
     QByteArray description = utilMngr->getBoardDescription();
     deviceDescriptorStruct devDesc;
-    if(UAVObjectUtilManager::descriptionToStructure(description,&devDesc))
+    if(UAVObjectUtilManager::descriptionToStructure(description,devDesc))
     {
-        if(devDesc.gitTag.startsWith("release",Qt::CaseInsensitive))
+        if (devDesc.gitTag.compare("master") == 0)
         {
             myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));

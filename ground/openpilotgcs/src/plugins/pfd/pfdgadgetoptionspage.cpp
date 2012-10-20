@@ -46,6 +46,7 @@ PFDGadgetOptionsPage::PFDGadgetOptionsPage(PFDGadgetConfiguration *config, QObje
 //creates options page widget (uses the UI file)
 QWidget *PFDGadgetOptionsPage::createPage(QWidget *parent)
 {
+    Q_UNUSED(parent);
 
     options_page = new Ui::PFDGadgetOptionsPage();
     //main widget

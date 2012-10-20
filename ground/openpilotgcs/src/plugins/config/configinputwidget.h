@@ -43,6 +43,9 @@
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
+#include "flightstatus.h"
+#include "accessorydesired.h"
+#include <QPointer>
 
 class Ui_InputWidget;
 
@@ -57,7 +60,7 @@ public:
         enum txMovements{moveLeftVerticalStick,moveRightVerticalStick,moveLeftHorizontalStick,moveRightHorizontalStick,moveAccess0,moveAccess1,moveAccess2,moveFlightMode,centerAll,moveAll,nothing};
         enum txMovementType{vertical,horizontal,jump,mix};
         enum txType {acro, heli};
-public slots:
+        void startInputWizard() { goToWizard(); }
 
 private:
         bool growing;
@@ -67,7 +70,7 @@ private:
         void setTxMovement(txMovements movement);
         Ui_InputWidget *m_config;
         wizardSteps wizardStep;
-        QList<QWidget*> extraWidgets;
+        QList<QPointer<QWidget> > extraWidgets;
         txMode transmitterMode;
         txType transmitterType;
         struct channelsStruct
@@ -91,6 +94,14 @@ private:
 
         ManualControlCommand * manualCommandObj;
         ManualControlCommand::DataFields manualCommandData;
+        FlightStatus * flightStatusObj;
+        FlightStatus::DataFields flightStatusData;
+        AccessoryDesired * accessoryDesiredObj0;
+        AccessoryDesired * accessoryDesiredObj1;
+        AccessoryDesired * accessoryDesiredObj2;
+        AccessoryDesired::DataFields accessoryDesiredData0;
+        AccessoryDesired::DataFields accessoryDesiredData1;
+        AccessoryDesired::DataFields accessoryDesiredData2;
         UAVObject::Metadata manualControlMdata;
         ManualControlSettings * manualSettingsObj;
         ManualControlSettings::DataFields manualSettingsData;
@@ -133,12 +144,13 @@ private:
 
         void wizardSetUpStep(enum wizardSteps);
         void wizardTearDownStep(enum wizardSteps);
+
 private slots:
         void wzNext();
         void wzBack();
         void wzCancel();
         void goToWizard();
-
+        void disableWizardButton(int);
         void openHelp();
         void identifyControls();
         void identifyLimits();
@@ -150,11 +162,10 @@ private slots:
         void invertControls();
         void simpleCalibration(bool state);
         void updateCalibration();
+
 protected:
         void resizeEvent(QResizeEvent *event);
         virtual void enableControls(bool enable);
-
-
 };
 
 #endif

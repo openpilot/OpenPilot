@@ -68,8 +68,8 @@ public:
 ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     ConfigTaskWidget(parent),
     collectingData(false),
-    position(-1),
-    m_ui(new Ui_RevoSensorsWidget())
+    m_ui(new Ui_RevoSensorsWidget()),
+    position(-1)
 {
     m_ui->setupUi(this);
 

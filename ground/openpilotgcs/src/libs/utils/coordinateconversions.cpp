@@ -121,19 +121,18 @@ int CoordinateConversions::ECEF2LLA(double ECEF[3], double LLA[3])
 }
 
 /**
-  * Get the current location in Longitude, Latitude Altitude (above WSG-48 ellipsoid)
-  * @param[in] BaseECEF the ECEF of the home location (in cm)
+  * Get the current location in Longitude, Latitude Altitude (above WSG-84 ellipsoid)
+  * @param[in] BaseECEF the ECEF of the home location (in m)
   * @param[in] NED the offset from the home location (in m)
-  * @param[out] position three element double for position in degrees and meters
+  * @param[out] position three element double for position in decimal degrees and altitude in meters
   * @returns
   *  @arg 0 success
   *  @arg -1 for failure
   */
-int CoordinateConversions::GetLLA(double BaseECEFcm[3], double NED[3], double position[3])
+int CoordinateConversions::NED2LLA_HomeECEF(double BaseECEFm[3], double NED[3], double position[3])
 {
     int i;
     // stored value is in cm, convert to m
-    double BaseECEFm[3] = {BaseECEFcm[0], BaseECEFcm[1], BaseECEFcm[2]};
     double BaseLLA[3];
     double ECEF[3];
     double Rne [3][3];
@@ -147,6 +146,29 @@ int CoordinateConversions::GetLLA(double BaseECEFcm[3], double NED[3], double po
         ECEF[i] = BaseECEFm[i] + Rne[0][i]*NED[0] + Rne[1][i]*NED[1] + Rne[2][i]*NED[2];
 
     ECEF2LLA(ECEF,position);
+
+    return 0;
+}
+
+/**
+  * Get the current location in Longitude, Latitude, Altitude (above WSG-84 ellipsoid)
+  * @param[in] homeLLA the latitude, longitude, and altitude of the home location (in [m])
+  * @param[in] NED the offset from the home location (in [m])
+  * @param[out] position three element double for position in decimal degrees and altitude in meters
+  * @returns
+  *  @arg 0 success
+  *  @arg -1 for failure
+  */
+int CoordinateConversions::NED2LLA_HomeLLA(double homeLLA[3], double NED[3], double position[3])
+{
+    double T[3];
+    T[0] = homeLLA[2]+6.378137E6f * M_PI / 180.0;
+    T[1] = cosf(homeLLA[0] * M_PI / 180.0)*(homeLLA[2]+6.378137E6f) * M_PI / 180.0;
+    T[2] = -1.0f;
+
+    position[0] = homeLLA[0] + NED[0] / T[0];
+    position[1] = homeLLA[1] + NED[1] / T[1];
+    position[2] = homeLLA[2] + NED[2] / T[2];
 
     return 0;
 }
@@ -233,6 +255,27 @@ void CoordinateConversions::Quaternion2R(const float q[4], float Rbe[3][3])
 	Rbe[2][0] = 2 * (q[1] * q[3] + q[0] * q[2]);
 	Rbe[2][1] = 2 * (q[2] * q[3] - q[0] * q[1]);
 	Rbe[2][2] = q0s - q1s - q2s + q3s;
+}
+
+//** Find quaternion vector from a rotation matrix, Rbe, a matrix which rotates a vector from earth frame to body frame **
+void CoordinateConversions::R2Quaternion(float const Rbe[3][3], float q[4])
+{
+    qreal w, x, y, z;
+
+    // w always >= 0
+    w = sqrt(std::max(0.0, 1.0 + Rbe[0][0] + Rbe[1][1] + Rbe[2][2])) / 2.0;
+    x = sqrt(std::max(0.0, 1.0 + Rbe[0][0] - Rbe[1][1] - Rbe[2][2])) / 2.0;
+    y = sqrt(std::max(0.0, 1.0 - Rbe[0][0] + Rbe[1][1] - Rbe[2][2])) / 2.0;
+    z = sqrt(std::max(0.0, 1.0 - Rbe[0][0] - Rbe[1][1] + Rbe[2][2])) / 2.0;
+
+    x = copysign(x, (Rbe[1][2] - Rbe[2][1]));
+    y = copysign(y, (Rbe[2][0] - Rbe[0][2]));
+    z = copysign(z, (Rbe[0][1] - Rbe[1][0]));
+
+    q[0]=w;
+    q[1]=x;
+    q[2]=y;
+    q[3]=z;
 }
 
 

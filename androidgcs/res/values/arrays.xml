@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string-array name="connectTypeArray">
+        <item>None</item>
+        <item>Bluetooth</item>
+        <item>Network</item>
+        <item>HID</item>
+    </string-array>
+    <string-array name="connectTypeValues">
+        <item>0</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+   </string-array>
+    <string-array name="controllerTypeArray">
+        <item>Mode 1</item>
+        <item>Mode 2</item>
+   </string-array>
+    <string-array name="controllerTypeValues">
+        <item>1</item>
+        <item>2</item>
+   </string-array>
+</resources>

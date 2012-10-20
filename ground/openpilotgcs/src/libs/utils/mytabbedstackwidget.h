@@ -52,6 +52,7 @@ public:
     void insertCornerWidget(int index, QWidget *widget);
     int cornerWidgetCount() { return m_cornerWidgetCount; }
     QWidget * currentWidget(){return m_stackWidget->currentWidget();}
+    QWidget * getWidget(int index) {return m_stackWidget->widget(index);}
 
 signals:
     void currentAboutToShow(int index,bool * proceed);

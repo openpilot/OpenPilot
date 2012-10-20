@@ -198,6 +198,8 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
 
 void GCSControlGadget::gamepads(quint8 count)
 {
+    Q_UNUSED(count);
+
 //    sdlGamepad.setGamepad(0);
 //    sdlGamepad.setTickRate(JOYSTICK_UPDATE_RATE);
 }
@@ -291,7 +293,6 @@ double GCSControlGadget::constrain(double value)
 
 void GCSControlGadget::buttonState(ButtonNumber number, bool pressed)
 {
-    int state;
     if ((buttonSettings[number].ActionID>0)&&(buttonSettings[number].FunctionID>0)&&(pressed))
     {//this button is configured
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();

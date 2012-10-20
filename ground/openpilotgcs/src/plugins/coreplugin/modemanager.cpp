@@ -84,6 +84,8 @@ void ModeManager::init()
 
 void ModeManager::addWidget(QWidget *widget)
 {
+    Q_UNUSED(widget);
+
     // We want the actionbar to stay on the bottom
     // so m_modeStack->cornerWidgetCount() -1 inserts it at the position immediately above
     // the actionbar
@@ -220,6 +222,8 @@ void ModeManager::aboutToRemoveObject(QObject *obj)
 
 void ModeManager::addAction(Command *command, int priority, QMenu *menu)
 {
+    Q_UNUSED(menu);
+
     m_actions.insert(command, priority);
 
     // Count the number of commands with a higher priority
@@ -320,5 +324,15 @@ void ModeManager::setFocusToCurrentMode()
             focusWidget->setFocus();
         else
             widget->setFocus();
+    }
+}
+
+void ModeManager::triggerAction(const QString &actionId)
+{
+    foreach(Command * command, m_actions.keys()){
+        if(command->action()->objectName() == actionId) {
+            command->action()->trigger();
+            break;
+        }
     }
 }

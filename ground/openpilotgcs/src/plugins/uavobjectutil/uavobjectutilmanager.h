@@ -55,20 +55,15 @@ public:
 
 	int setHomeLocation(double LLA[3], bool save_to_sdcard);
 	int getHomeLocation(bool &set, double LLA[3]);
-	int getHomeLocation(bool &set, double LLA[3], double ECEF[3], double RNE[9], double Be[3]);
 
 	int getGPSPosition(double LLA[3]);
-
-	int setTelemetrySerialPortSpeed(QString speed, bool save_to_sdcard);
-	int getTelemetrySerialPortSpeed(QString &speed);
-	int getTelemetrySerialPortSpeeds(QComboBox *comboBox);
 
         int getBoardModel();
         QByteArray getBoardCPUSerial();
         quint32 getFirmwareCRC();
         QByteArray getBoardDescription();
         deviceDescriptorStruct getBoardDescriptionStruct();
-        static bool descriptionToStructure(QByteArray desc,deviceDescriptorStruct * struc);
+        static bool descriptionToStructure(QByteArray desc,deviceDescriptorStruct & struc);
         UAVObjectManager* getObjectManager();
         void saveObjectToSD(UAVObject *obj);
 protected:
@@ -78,11 +73,15 @@ signals:
         void saveCompleted(int objectID, bool status);
 
 private:
-	QMutex *mutex;
-	QQueue<UAVObject *> queue;
-        enum {IDLE, AWAITING_ACK, AWAITING_COMPLETED} saveState;
-	void saveNextObject();
-        QTimer failureTimer;
+    QMutex *mutex;
+    QQueue<UAVObject *> queue;
+    enum {IDLE, AWAITING_ACK, AWAITING_COMPLETED} saveState;
+    void saveNextObject();
+    QTimer failureTimer;
+
+    ExtensionSystem::PluginManager *pm;
+    UAVObjectManager *obm;
+    UAVObjectUtilManager *obum;
 
 private slots:
         //void transactionCompleted(UAVObject *obj, bool success);

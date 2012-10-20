@@ -29,7 +29,7 @@
 #include "coreplugin.h"
 #include "coreimpl.h"
 #include "mainwindow.h"
-
+#include <QtPlugin>
 #include <extensionsystem/pluginmanager.h>
 
 #include <QtCore/QtPlugin>
@@ -78,4 +78,4 @@ void CorePlugin::shutdown()
     m_mainWindow->shutdown();
 }
 
-Q_EXPORT_PLUGIN(CorePlugin)
+Q_EXPORT_PLUGIN2(Core,CorePlugin)

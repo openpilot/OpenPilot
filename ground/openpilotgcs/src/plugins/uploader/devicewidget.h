@@ -42,8 +42,10 @@
 #include "devicedescriptorstruct.h"
 #include <QDir>
 #include <QCoreApplication>
+#include "uploader_global.h"
+
 using namespace OP_DFU;
-class deviceWidget : public QWidget
+class UPLOADER_EXPORT deviceWidget : public QWidget
 {
     Q_OBJECT
 public:
@@ -64,7 +66,7 @@ private:
     DFUObject *m_dfu;
     QByteArray downloadedFirmware;
     QString filename;
-    QGraphicsSvgItem *devicePic;
+    QPixmap devicePic;
     QByteArray descriptionArray;
     void status(QString str, StatusIcon ic);
     bool populateBoardStructuredDescription(QByteArray arr);

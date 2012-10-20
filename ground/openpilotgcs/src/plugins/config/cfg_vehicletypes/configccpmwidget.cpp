@@ -133,8 +133,12 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) : VehicleConfig(parent)
     }
 
     //initialize our two mixer curves
+    // mixercurve defaults to mixercurve_throttle
+    m_ccpm->ThrottleCurve->initLinearCurve(5, 1.0, 0.0);
+
+    // tell mixercurve this is a pitch curve
+    m_ccpm->PitchCurve->setMixerType(MixerCurve::MIXERCURVE_PITCH);
     m_ccpm->PitchCurve->initLinearCurve(5, 1.0, -1.0);
-    m_ccpm->ThrottleCurve->initLinearCurve(5, 1.0);
 
     //initialize channel names
     m_ccpm->ccpmEngineChannel->addItems(channelNames);
@@ -151,29 +155,18 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) : VehicleConfig(parent)
     m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
 
     QStringList Types;
-    Types << QString::fromUtf8("CCPM 2 Servo 90º") << QString::fromUtf8("CCPM 3 Servo 90º") <<
-             QString::fromUtf8("CCPM 4 Servo 90º") << QString::fromUtf8("CCPM 3 Servo 120º") <<
-             QString::fromUtf8("CCPM 3 Servo 140º") << QString::fromUtf8("FP 2 Servo 90º")  <<
+    Types << QString::fromUtf8("CCPM 2 Servo 90º") << QString::fromUtf8("CCPM 3 Servo 90º") << QString::fromUtf8("CCPM 4 Servo 90º") <<
+             QString::fromUtf8("CCPM 3 Servo 120º") << QString::fromUtf8("CCPM 3 Servo 140º") <<
+             QString::fromUtf8("FP 2 Servo 90º")  <<
+             QString::fromUtf8("Coax 2 Servo 90º")  <<
              QString::fromUtf8("Custom - User Angles") << QString::fromUtf8("Custom - Advanced Settings");
     m_ccpm->ccpmType->addItems(Types);
     m_ccpm->ccpmType->setCurrentIndex(m_ccpm->ccpmType->count() - 1);
-
-    UpdateCurveSettings();
-
-    //disable changing number of points in curves until UAVObjects have more than 5
-    m_ccpm->NumCurvePoints->setEnabled(0);
 
     refreshWidgetsValues(QString("HeliCP"));
 
     UpdateType();
 
-    //connect(m_ccpm->saveccpmToSD, SIGNAL(clicked()), this, SLOT(saveccpmUpdate()));
-    //connect(m_ccpm->saveccpmToRAM, SIGNAL(clicked()), this, SLOT(sendccpmUpdate()));
-    //connect(m_ccpm->getccpmCurrent, SIGNAL(clicked()), this, SLOT(requestccpmUpdate()));
-    connect(m_ccpm->ccpmGenerateCurve, SIGNAL(clicked()), this, SLOT(GenerateCurve()));
-    connect(m_ccpm->NumCurvePoints, SIGNAL(valueChanged(int)), this, SLOT(UpdateCurveSettings()));
-    connect(m_ccpm->CurveToGenerate, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateCurveSettings()));
-    connect(m_ccpm->CurveType, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateCurveSettings()));
     connect(m_ccpm->ccpmAngleW, SIGNAL(valueChanged(double)), this, SLOT(ccpmSwashplateUpdate()));
     connect(m_ccpm->ccpmAngleX, SIGNAL(valueChanged(double)), this, SLOT(ccpmSwashplateUpdate()));
     connect(m_ccpm->ccpmAngleY, SIGNAL(valueChanged(double)), this, SLOT(ccpmSwashplateUpdate()));
@@ -191,11 +184,7 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) : VehicleConfig(parent)
     connect(m_ccpm->ccpmCollectivespinBox, SIGNAL(valueChanged(int)), this, SLOT(UpdateMixer()));
     connect(m_ccpm->ccpmType, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateType()));
     connect(m_ccpm->ccpmSingleServo, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateType()));
-    connect(m_ccpm->CurveSettings, SIGNAL(cellChanged (int, int)), this, SLOT(UpdateCurveWidgets()));
     connect(m_ccpm->TabObject, SIGNAL(currentChanged ( QWidget * )), this, SLOT(UpdateType()));
-
-    connect(m_ccpm->PitchCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updatePitchCurveValue(QList<double>,double)));
-    connect(m_ccpm->ThrottleCurve, SIGNAL(curveUpdated(QList<double>,double)), this, SLOT(updateThrottleCurveValue(QList<double>,double)));
 
     connect(m_ccpm->SwashLvlStartButton, SIGNAL(clicked()), this, SLOT(SwashLvlStartButtonPressed()));
     connect(m_ccpm->SwashLvlNextButton, SIGNAL(clicked()), this, SLOT(SwashLvlNextButtonPressed()));
@@ -218,6 +207,7 @@ ConfigCcpmWidget::~ConfigCcpmWidget()
 
 void ConfigCcpmWidget::setupUI(QString frameType)
 {
+    Q_UNUSED(frameType);
 }
 
 void ConfigCcpmWidget::ResetActuators(GUIConfigDataUnion* configData)
@@ -298,7 +288,6 @@ QStringList ConfigCcpmWidget::getChannelDescriptions()
 void ConfigCcpmWidget::UpdateType()
 {
     int TypeInt,SingleServoIndex,NumServosDefined;
-    QString TypeText;
     double AdjustmentAngle=0;
 
     SetUIComponentVisibilities();
@@ -332,16 +321,12 @@ void ConfigCcpmWidget::UpdateType()
 
     AdjustmentAngle=SingleServoIndex*90;
 
-    m_ccpm->CurveToGenerate->setEnabled(1);
-    m_ccpm->CurveSettings->setColumnHidden(1,0);
     m_ccpm->PitchCurve->setVisible(1);
-    //m_ccpm->customThrottleCurve2Value->setVisible(1);
-    //m_ccpm->label_41->setVisible(1);
 
     NumServosDefined=4;
     //set values for pre defined heli types
-        if (TypeText.compare(QString::fromUtf8("CCPM 2 Servo 90º"), Qt::CaseInsensitive)==0)
-        {
+    if (TypeText.compare(QString::fromUtf8("CCPM 2 Servo 90º"), Qt::CaseInsensitive)==0)
+    {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
             m_ccpm->ccpmAngleY->setValue(0);
@@ -352,12 +337,11 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=2;
 
-        }
-        if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 90º"), Qt::CaseInsensitive)==0)
-        {
+    }
+    else if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 90º"), Qt::CaseInsensitive)==0)
+    {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 180,360));
@@ -365,24 +349,22 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
         
-        }
-        if (TypeText.compare(QString::fromUtf8("CCPM 4 Servo 90º"), Qt::CaseInsensitive)==0)
-        {
+    }
+    else if (TypeText.compare(QString::fromUtf8("CCPM 4 Servo 90º"), Qt::CaseInsensitive)==0)
+    {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 180,360));
             m_ccpm->ccpmAngleZ->setValue(fmod(AdjustmentAngle + 270,360));
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             m_ccpm->ccpmSingleServo->setEnabled(0);
             m_ccpm->ccpmSingleServo->setCurrentIndex(0);
             NumServosDefined=4;
         
-        }
-        if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 120º"), Qt::CaseInsensitive)==0)
-        {
+    }
+    else if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 120º"), Qt::CaseInsensitive)==0)
+    {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 120,360));
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 240,360));
@@ -390,12 +372,11 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
             
-        }
-        if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 140º"), Qt::CaseInsensitive)==0)
-        {
+    }
+    else if (TypeText.compare(QString::fromUtf8("CCPM 3 Servo 140º"), Qt::CaseInsensitive)==0)
+    {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 140,360));
             m_ccpm->ccpmAngleY->setValue(fmod(AdjustmentAngle + 220,360));
@@ -403,12 +384,11 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmAngleZ->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
             NumServosDefined=3;
 
-        }
-        if (TypeText.compare(QString::fromUtf8("FP 2 Servo 90º"), Qt::CaseInsensitive)==0)
-        {
+    }
+    else if (TypeText.compare(QString::fromUtf8("FP 2 Servo 90º"), Qt::CaseInsensitive)==0)
+    {
             m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
             m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
             m_ccpm->ccpmAngleY->setValue(0);
@@ -419,20 +399,46 @@ void ConfigCcpmWidget::UpdateType()
             m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
             m_ccpm->ccpmServoYChannel->setEnabled(0);
             m_ccpm->ccpmServoZChannel->setEnabled(0);
-            //m_ccpm->ccpmCorrectionAngle->setValue(0);
 
             m_ccpm->ccpmCollectivespinBox->setEnabled(0);
             m_ccpm->ccpmCollectiveSlider->setEnabled(0);
             m_ccpm->ccpmCollectivespinBox->setValue(0);
             m_ccpm->ccpmCollectiveSlider->setValue(0);
-            m_ccpm->CurveToGenerate->setCurrentIndex(0);
-            m_ccpm->CurveToGenerate->setEnabled(0);
-            m_ccpm->CurveSettings->setColumnHidden(1,1);
             m_ccpm->PitchCurve->setVisible(0);
-            //m_ccpm->customThrottleCurve2Value->setVisible(0);
-            //m_ccpm->label_41->setVisible(0);
             NumServosDefined=2;
-        }
+    }
+    else if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive)==0)
+    {
+        m_ccpm->ccpmAngleW->setValue(AdjustmentAngle + 0);
+        m_ccpm->ccpmAngleX->setValue(fmod(AdjustmentAngle + 90,360));
+        m_ccpm->ccpmAngleY->setValue(0);
+        m_ccpm->ccpmAngleZ->setValue(0);
+        m_ccpm->ccpmAngleY->setEnabled(0);
+        m_ccpm->ccpmAngleZ->setEnabled(0);
+        m_ccpm->ccpmServoYChannel->setCurrentIndex(0);
+        m_ccpm->ccpmServoZChannel->setCurrentIndex(0);
+        m_ccpm->ccpmServoYChannel->setEnabled(0);
+        m_ccpm->ccpmServoZChannel->setEnabled(0);
+
+        m_ccpm->ccpmCollectivespinBox->setEnabled(0);
+        m_ccpm->ccpmCollectiveSlider->setEnabled(0);
+        m_ccpm->ccpmCollectivespinBox->setValue(0);
+        m_ccpm->ccpmCollectiveSlider->setValue(0);
+        m_ccpm->PitchCurve->setVisible(0);
+        NumServosDefined=2;
+
+    }
+
+    //Set the text of the motor boxes
+    if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive)==0)
+    {
+        m_ccpm->ccpmEngineLabel->setText("CW motor");
+        m_ccpm->ccpmTailLabel->setText("CCW motor");
+    }
+    else{
+        m_ccpm->ccpmEngineLabel->setText("Engine");
+        m_ccpm->ccpmTailLabel->setText("Tail rotor");
+    }
 
     //set the visibility of the swashplate servo selection boxes
     m_ccpm->ccpmServoWLabel->setVisible(NumServosDefined>=1);
@@ -455,285 +461,18 @@ void ConfigCcpmWidget::UpdateType()
     m_ccpm->ccpmAngleZ->setVisible(NumServosDefined>=4);
     
 
-        m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();
-        for (int i=0;i<6;i++) {
-            m_ccpm->ccpmAdvancedSettingsTable->setColumnWidth(i,(m_ccpm->ccpmAdvancedSettingsTable->width()-
-                                                            m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
-        }
+    m_ccpm->ccpmAdvancedSettingsTable->resizeColumnsToContents();
+    for (int i=0;i<6;i++) {
+        m_ccpm->ccpmAdvancedSettingsTable->setColumnWidth(i,(m_ccpm->ccpmAdvancedSettingsTable->width()-
+                                                             m_ccpm->ccpmAdvancedSettingsTable->verticalHeader()->width())/6);
+    }
 
-    
-    
-    
     //update UI
     ccpmSwashplateUpdate();
     
 }
 
-void ConfigCcpmWidget::UpdateCurveWidgets()
-{
-    int NumCurvePoints,i,Changed;
-    QList<double> curveValues;
-    QList<double> OldCurveValues;
-    double ThisValue;
-    //get the user settings
-    NumCurvePoints=m_ccpm->NumCurvePoints->value();
 
-    curveValues.clear();
-    Changed=0;
-    OldCurveValues=m_ccpm->ThrottleCurve->getCurve();
-    for (i=0; i<NumCurvePoints; i++)
-    {
-        ThisValue=m_ccpm->CurveSettings->item(i, 0 )->text().toDouble();
-        curveValues.append(ThisValue);
-        if (ThisValue!=OldCurveValues.at(i))Changed=1;
-    }
-    // Setup all Throttle1 curves for all types of airframes
-    if (Changed==1)
-        m_ccpm->ThrottleCurve->setCurve(&curveValues);
-
-    curveValues.clear();
-    Changed=0;
-    OldCurveValues=m_ccpm->PitchCurve->getCurve();
-    for (i=0; i<NumCurvePoints; i++)
-    {
-        ThisValue=m_ccpm->CurveSettings->item(i, 1 )->text().toDouble();
-        curveValues.append(ThisValue);
-        if (ThisValue!=OldCurveValues.at(i))Changed=1;
-    }
-    // Setup all Throttle1 curves for all types of airframes
-    if (Changed==1)
-        m_ccpm->PitchCurve->setCurve(&curveValues);
-}
-
-void ConfigCcpmWidget::updatePitchCurveValue(QList<double> curveValues0,double Value0)
-{
-    Q_UNUSED(curveValues0);
-    Q_UNUSED(Value0);
-
-    int NumCurvePoints,i;
-    double CurrentValue;
-    QList<double> internalCurveValues;
-    //get the user settings
-    NumCurvePoints=m_ccpm->NumCurvePoints->value();
-    internalCurveValues=m_ccpm->PitchCurve->getCurve();
-
-    for (i=0; i<internalCurveValues.length(); i++)
-    {
-        CurrentValue=m_ccpm->CurveSettings->item(i, 1 )->text().toDouble();
-        if (CurrentValue!=internalCurveValues[i])
-        {
-            m_ccpm->CurveSettings->item(i, 1)->setText(QString().sprintf("%.3f",internalCurveValues.at(i)));
-        }
-
-    }
-
-}
-
-void ConfigCcpmWidget::updateThrottleCurveValue(QList<double> curveValues0,double Value0)
-{
-    Q_UNUSED(curveValues0);
-    Q_UNUSED(Value0);
-
-    int NumCurvePoints,i;
-    double CurrentValue;
-    QList<double> internalCurveValues;
-    //get the user settings
-    NumCurvePoints=m_ccpm->NumCurvePoints->value();
-    internalCurveValues=m_ccpm->ThrottleCurve->getCurve();
-
-    for (i=0; i<internalCurveValues.length(); i++)
-    {
-        CurrentValue=m_ccpm->CurveSettings->item(i, 0 )->text().toDouble();
-        if (CurrentValue!=internalCurveValues[i])
-        {
-            m_ccpm->CurveSettings->item(i, 0)->setText(QString().sprintf("%.3f",internalCurveValues.at(i)));
-        }
-
-    }
-
-}
-
-
-void ConfigCcpmWidget::UpdateCurveSettings()
-{
-    int NumCurvePoints,i;
-    double scale;
-    QString CurveType;
-    QStringList vertHeaders;
-
-    //get the user settings
-    NumCurvePoints=m_ccpm->NumCurvePoints->value();
-    CurveType=m_ccpm->CurveType->currentText();
-
-    vertHeaders << "-" << "-" << "-" << "-" << "-" << "-" << "-" << "-" << "-" << "-" ;
-    for (i=0;i<NumCurvePoints;i++)
-    {
-        scale =((double)i/(double)(NumCurvePoints-1));
-        vertHeaders[i] = tr( "%1%" ).arg(100.00*scale, 0, 'f', 1);
-    }
-    m_ccpm->CurveSettings->setVerticalHeaderLabels( vertHeaders );
-
-    if (m_ccpm->CurveToGenerate->currentIndex()==0)
-    {
-        m_ccpm->CurveValue1->setMinimum(0.0);
-        m_ccpm->CurveValue2->setMinimum(0.0);
-        m_ccpm->CurveValue3->setMinimum(0.0);
-    }
-    else
-    {
-        m_ccpm->CurveValue1->setMinimum(-1.0);
-        m_ccpm->CurveValue2->setMinimum(-1.0);
-        m_ccpm->CurveValue3->setMinimum(0.0);
-    }
-    m_ccpm->CurveValue1->setMaximum(1.0);
-    m_ccpm->CurveValue2->setMaximum(1.0);
-    m_ccpm->CurveValue3->setMaximum(100.0);
-    m_ccpm->CurveValue1->setSingleStep(0.1);
-    m_ccpm->CurveValue2->setSingleStep(0.1);
-    m_ccpm->CurveValue3->setSingleStep(1.0);
-    m_ccpm->CurveValue1->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);;
-    m_ccpm->CurveValue2->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);
-    m_ccpm->CurveValue3->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);
-
-    //set default visible
-    m_ccpm->CurveLabel1->setVisible(true);
-    m_ccpm->CurveValue1->setVisible(true);
-    m_ccpm->CurveLabel2->setVisible(false);
-    m_ccpm->CurveValue2->setVisible(false);
-    m_ccpm->CurveLabel3->setVisible(false);
-    m_ccpm->CurveValue3->setVisible(false);
-    m_ccpm->ccpmGenerateCurve->setVisible(true);
-    m_ccpm->CurveToGenerate->setVisible(true);
-
-    if ( CurveType.compare("Flat")==0)
-    {
-        m_ccpm->CurveLabel1->setText("Value");
-    }
-    if ( CurveType.compare("Linear")==0)
-    {
-        m_ccpm->CurveLabel1->setText("Min");
-        m_ccpm->CurveLabel2->setText("Max");
-        m_ccpm->CurveLabel2->setVisible(true);
-        m_ccpm->CurveValue2->setVisible(true);
-    }
-    if ( CurveType.compare("Step")==0)
-    {
-        m_ccpm->CurveLabel1->setText("Min");
-        m_ccpm->CurveLabel2->setText("Max");
-        m_ccpm->CurveLabel2->setVisible(true);
-        m_ccpm->CurveValue2->setVisible(true);
-        m_ccpm->CurveLabel3->setText("Step at");
-        m_ccpm->CurveLabel3->setVisible(true);
-        m_ccpm->CurveValue3->setVisible(true);
-    }
-    if ( CurveType.compare("Exp")==0)
-    {
-        m_ccpm->CurveLabel1->setText("Min");
-        m_ccpm->CurveLabel2->setText("Max");
-        m_ccpm->CurveLabel2->setVisible(true);
-        m_ccpm->CurveValue2->setVisible(true);
-        m_ccpm->CurveLabel3->setText("Strength");
-        m_ccpm->CurveLabel3->setVisible(true);
-        m_ccpm->CurveValue3->setVisible(true);
-        m_ccpm->CurveValue3->setMinimum(1.0);
-        m_ccpm->CurveValue3->setMaximum(100.0);
-        m_ccpm->CurveValue3->setSingleStep(1.0);
-        m_ccpm->CurveValue3->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);;
-    }
-    if ( CurveType.compare("Log")==0)
-    {
-        m_ccpm->CurveLabel1->setText("Min");
-        m_ccpm->CurveLabel2->setText("Max");
-        m_ccpm->CurveLabel2->setVisible(true);
-        m_ccpm->CurveValue2->setVisible(true);
-        m_ccpm->CurveLabel3->setText("Strength");
-        m_ccpm->CurveLabel3->setVisible(true);
-        m_ccpm->CurveValue3->setVisible(true);
-        m_ccpm->CurveValue3->setMinimum(1.0);
-        m_ccpm->CurveValue3->setMaximum(100.0);
-        m_ccpm->CurveValue3->setSingleStep(1.0);
-        m_ccpm->CurveValue3->setCorrectionMode(QAbstractSpinBox::CorrectToNearestValue);
-    }
-    if ( CurveType.compare("Custom")==0)
-    {
-        m_ccpm->CurveLabel1->setVisible(false);
-        m_ccpm->CurveValue1->setVisible(false);
-        m_ccpm->ccpmGenerateCurve->setVisible(false);
-        m_ccpm->CurveToGenerate->setVisible(false);
-    }
-
-    UpdateCurveWidgets();
-
-}
-void ConfigCcpmWidget::GenerateCurve()
-{
-   int NumCurvePoints,CurveToGenerate,i;
-   double value1, value2, value3, scale;
-   QString CurveType;
-   QTableWidgetItem *item;
-   double newValue;
-
-
-   //get the user settings
-   NumCurvePoints=m_ccpm->NumCurvePoints->value();
-   value1=m_ccpm->CurveValue1->value();
-   value2=m_ccpm->CurveValue2->value();
-   value3=m_ccpm->CurveValue3->value();
-   CurveToGenerate=m_ccpm->CurveToGenerate->currentIndex();
-   CurveType=m_ccpm->CurveType->currentText();
-
-
-
-   for (i=0;i<NumCurvePoints;i++)
-   {
-       scale =((double)i/(double)(NumCurvePoints-1));
-       item =m_ccpm->CurveSettings->item(i, CurveToGenerate );
-
-       if ( CurveType.compare("Flat")==0)
-       {
-           //item->setText( tr( "%1" ).arg( value1 ) );
-           item->setText(QString().sprintf("%.3f",value1));
-       }
-       if ( CurveType.compare("Linear")==0)
-       {
-           newValue =value1 +(scale*(value2-value1));
-           //item->setText( tr( "%1" ).arg(value1 +(scale*(value2-value1))) );
-           item->setText(QString().sprintf("%.3f",newValue));
-       }
-       if ( CurveType.compare("Step")==0)
-       {
-           if (scale*100<value3)
-           {
-               //item->setText( tr( "%1" ).arg(value1) );
-               item->setText(QString().sprintf("%.3f",value1));
-           }
-           else
-           {
-               //item->setText( tr( "%1" ).arg(value2) );
-               item->setText(QString().sprintf("%.3f",value2));
-           }
-       }
-       if ( CurveType.compare("Exp")==0)
-       {
-           newValue =value1 +(((exp(scale*(value3/10))-1))/(exp((value3/10))-1)*(value2-value1));
-           //item->setText( tr( "%1" ).arg(value1 +(((exp(scale*(value3/10))-1))/(exp((value3/10))-1)*(value2-value1))) );
-           item->setText(QString().sprintf("%.3f",newValue));
-       }
-       if ( CurveType.compare("Log")==0)
-       {
-           newValue = value1 +(((log(scale*(value3*2)+1))/(log(1+(value3*2))))*(value2-value1));
-           //item->setText( tr( "%1" ).arg(value1 +(((log(scale*(value3*2)+1))/(log(1+(value3*2))))*(value2-value1))) );
-           item->setText(QString().sprintf("%.3f",newValue));
-       }
-   }
-   for (i=NumCurvePoints;i<10;i++)
-   {
-       item =m_ccpm->CurveSettings->item(i, CurveToGenerate );
-       item->setText( tr( "" ) );
-   }
-    UpdateCurveWidgets();
-
-}
 
 void ConfigCcpmWidget::ccpmSwashplateRedraw()
 {
@@ -910,25 +649,40 @@ void ConfigCcpmWidget::UpdateMixer()
         //go through the user data and update the mixer matrix
         for (i=0;i<6;i++)
         {
-            if ((MixerChannelData[i]>0)&&((ThisEnable[i])||(i<2)))
+            if ((MixerChannelData[i]>0) && ((ThisEnable[i])||(i<2)))
             {
                 m_ccpm->ccpmAdvancedSettingsTable->item(i,0)->setText(QString("%1").arg( MixerChannelData[i] ));
-                 //config the vector
-               if (i==0)
-                {//motor-engine
+
+                //Generate the mixer vector
+                if (i==0)
+                {//main motor-engine
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,1)->setText(QString("%1").arg(127));//ThrottleCurve1
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,2)->setText(QString("%1").arg(0));//ThrottleCurve2
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,3)->setText(QString("%1").arg(0));//Roll
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,4)->setText(QString("%1").arg(0));//Pitch
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(0));//Yaw
+
+                    if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive)==0)
+                        m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(-127));//Yaw
+                    else
+                        m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(0));//Yaw
+
                 }
                 if (i==1)
-                {//tailrotor
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,1)->setText(QString("%1").arg(0));//ThrottleCurve1
+                {//tailrotor --or-- counter-clockwise motor
+                    if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive)==0)
+                    {
+                        m_ccpm->ccpmAdvancedSettingsTable->item(i,1)->setText(QString("%1").arg(127));//ThrottleCurve1
+                        m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(127));//Yaw
+                    }
+                    else{
+                        m_ccpm->ccpmAdvancedSettingsTable->item(i,1)->setText(QString("%1").arg(0));//ThrottleCurve1
+                        m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(127));//Yaw
+                    }
+
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,2)->setText(QString("%1").arg(0));//ThrottleCurve2
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,3)->setText(QString("%1").arg(0));//Roll
                     m_ccpm->ccpmAdvancedSettingsTable->item(i,4)->setText(QString("%1").arg(0));//Pitch
-                    m_ccpm->ccpmAdvancedSettingsTable->item(i,5)->setText(QString("%1").arg(127));//Yaw
+
                 }
                 if (i>1)
                 {//Swashplate
@@ -1111,21 +865,33 @@ void ConfigCcpmWidget::getMixer()
 {
     if (SwashLvlConfigurationInProgress)return;
     if (updatingToHardware)return;
+
     updatingFromHardware=TRUE;
     
-    int i;
+    UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
 
-    // Get existing mixer settings
-    MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
-    MixerSettings::DataFields mixerSettingsData = mixerSettings->getData();
+    QPointer<VehicleConfig> vconfig = new VehicleConfig();
 
-    //get the settings for the curve from the mixer settings
-    for (i=0;i<5;i++)
-    {
-        m_ccpm->CurveSettings->item(i, 0)->setText(QString().sprintf("%.3f",
-                                                                     mixerSettingsData.ThrottleCurve1[i]));
-        m_ccpm->CurveSettings->item(i, 1)->setText(QString().sprintf("%.3f",
-                                                                     mixerSettingsData.ThrottleCurve2[i]));
+    QList<double> curveValues;
+    vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, &curveValues);
+
+    // is at least one of the curve values != 0?
+    if (vconfig->isValidThrottleCurve(&curveValues)) {
+        m_ccpm->ThrottleCurve->setCurve(&curveValues);
+    }
+    else {
+        m_ccpm->ThrottleCurve->ResetCurve();
+    }
+
+
+    vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, &curveValues);
+    // is at least one of the curve values != 0?
+    if (vconfig->isValidThrottleCurve(&curveValues)) {
+        m_ccpm->PitchCurve->setCurve(&curveValues);
+    }
+    else {
+        m_ccpm->PitchCurve->ResetCurve();
     }
 
     updatingFromHardware=FALSE;
@@ -1183,21 +949,31 @@ void ConfigCcpmWidget::setMixer()
     {
         if (MixerChannelData[i]>0)
         {
-            //set the mixer type
-            *(mixerTypes[MixerChannelData[i] - 1]) = i==0 ?
-                        MixerSettings::MIXER1TYPE_MOTOR :
-                        MixerSettings::MIXER1TYPE_SERVO;
+            //Set the mixer type. If Coax, then first two are motors. Otherwise, only first is motor
+            if (TypeText.compare(QString::fromUtf8("Coax 2 Servo 90º"), Qt::CaseInsensitive)==0)
+            {
+                *(mixerTypes[MixerChannelData[i] - 1]) = i > 1 ?
+                            MixerSettings::MIXER1TYPE_SERVO :
+                            MixerSettings::MIXER1TYPE_MOTOR;
+            }
+            else{
+                *(mixerTypes[MixerChannelData[i] - 1]) = i > 0 ?
+                            MixerSettings::MIXER1TYPE_SERVO :
+                            MixerSettings::MIXER1TYPE_MOTOR;
+            }
 
-            //config the vector
+            //Configure the vector
             for (j=0;j<5;j++)
                 mixers[MixerChannelData[i] - 1][j] = m_ccpm->ccpmAdvancedSettingsTable->item(i,j+1)->text().toInt();
         }
     }
 
     //get the user data for the curve into the mixer settings
+    QList<double> curve1 = m_ccpm->ThrottleCurve->getCurve();
+    QList<double> curve2 = m_ccpm->PitchCurve->getCurve();
     for (i=0;i<5;i++) {
-        mixerSettingsData.ThrottleCurve1[i] = m_ccpm->CurveSettings->item(i, 0)->text().toDouble();
-        mixerSettingsData.ThrottleCurve2[i] = m_ccpm->CurveSettings->item(i, 1)->text().toDouble();
+        mixerSettingsData.ThrottleCurve1[i] = curve1.at(i);
+        mixerSettingsData.ThrottleCurve2[i] = curve2.at(i);
     }
     
     //mapping of collective input to curve 2...
@@ -1721,60 +1497,64 @@ bool ConfigCcpmWidget::throwConfigError(QString airframeType)
 
     bool error = false;
 
-    if((m_ccpm->ccpmServoWChannel->currentIndex()==0)&&(m_ccpm->ccpmServoWChannel->isEnabled()))
+    if((m_ccpm->ccpmServoWChannel->currentIndex()==0) && (m_ccpm->ccpmServoWChannel->isEnabled()))
     {
-        m_ccpm->ccpmServoWLabel->setText("<font color=red>Servo W</font>");
+        m_ccpm->ccpmServoWLabel->setText("<font color=red>" + m_ccpm->ccpmServoWLabel->text() + "</font>");
         error = true;
     }
     else
     {
-        m_ccpm->ccpmServoWLabel->setText("<font color=black>Servo W</font>");
-    }
-    if((m_ccpm->ccpmServoXChannel->currentIndex()==0)&&(m_ccpm->ccpmServoXChannel->isEnabled()))
-    {
-        m_ccpm->ccpmServoXLabel->setText("<font color=red>Servo X</font>");
-        error = true;
-    }
-    else
-    {
-        m_ccpm->ccpmServoXLabel->setText("<font color=black>Servo X</font>");
-    }
-    if((m_ccpm->ccpmServoYChannel->currentIndex()==0)&&(m_ccpm->ccpmServoYChannel->isEnabled()))
-    {
-        m_ccpm->ccpmServoYLabel->setText("<font color=red>Servo Y</font>");
-        error = true;
-    }
-    else
-    {
-        m_ccpm->ccpmServoYLabel->setText("<font color=black>Servo Y</font>");
-    }
-    if((m_ccpm->ccpmServoZChannel->currentIndex()==0)&&(m_ccpm->ccpmServoZChannel->isEnabled()))
-    {
-        m_ccpm->ccpmServoZLabel->setText("<font color=red>Servo Z</font>");
-        error = true;
-    }
-    else
-    {
-        m_ccpm->ccpmServoZLabel->setText("<font color=black>Servo Z</font>");
+        m_ccpm->ccpmServoWLabel->setText(QTextEdit(m_ccpm->ccpmServoWLabel->text()).toPlainText());
     }
 
-    if((m_ccpm->ccpmEngineChannel->currentIndex()==0)&&(m_ccpm->ccpmEngineChannel->isEnabled()))
+    if((m_ccpm->ccpmServoXChannel->currentIndex()==0) && (m_ccpm->ccpmServoXChannel->isEnabled()))
     {
-        m_ccpm->ccpmEngineLabel->setText("<font color=red>Engine</font>");
-    }
-    else
-    {
-        m_ccpm->ccpmEngineLabel->setText("<font color=black>Engine</font>");
-    }
-
-    if((m_ccpm->ccpmTailChannel->currentIndex()==0)&&(m_ccpm->ccpmTailChannel->isEnabled()))
-    {
-        m_ccpm->ccpmTailLabel->setText("<font color=red>Tail Rotor</font>");
+        m_ccpm->ccpmServoXLabel->setText("<font color=red>" + m_ccpm->ccpmServoXLabel->text() + "</font>");
         error = true;
     }
     else
     {
-        m_ccpm->ccpmTailLabel->setText("<font color=black>Tail Rotor</font>");
+        m_ccpm->ccpmServoXLabel->setText(QTextEdit(m_ccpm->ccpmServoXLabel->text()).toPlainText());
+    }
+
+    if((m_ccpm->ccpmServoYChannel->currentIndex()==0) && (m_ccpm->ccpmServoYChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoYLabel->setText("<font color=red>" + m_ccpm->ccpmServoYLabel->text() + "</font>");
+        error = true;
+    }
+    else
+    {
+        m_ccpm->ccpmServoYLabel->setText(QTextEdit(m_ccpm->ccpmServoYLabel->text()).toPlainText());
+    }
+
+    if((m_ccpm->ccpmServoZChannel->currentIndex()==0) && (m_ccpm->ccpmServoZChannel->isEnabled()))
+    {
+        m_ccpm->ccpmServoZLabel->setText("<font color=red>" + m_ccpm->ccpmServoZLabel->text()+ "</font>");
+        error = true;
+    }
+    else
+    {
+        m_ccpm->ccpmServoZLabel->setText(QTextEdit(m_ccpm->ccpmServoZLabel->text()).toPlainText());
+    }
+
+    if((m_ccpm->ccpmEngineChannel->currentIndex()==0) && (m_ccpm->ccpmEngineChannel->isEnabled()))
+    {
+        m_ccpm->ccpmEngineLabel->setText("<font color=red>" + m_ccpm->ccpmEngineLabel->text() + "</font>");
+    }
+    else
+    {
+        m_ccpm->ccpmEngineLabel->setText(QTextEdit(m_ccpm->ccpmEngineLabel->text()).toPlainText());
+    }
+
+    if((m_ccpm->ccpmTailChannel->currentIndex()==0) && (m_ccpm->ccpmTailChannel->isEnabled()))
+    {
+        m_ccpm->ccpmTailLabel->setText("<font color=red>" + m_ccpm->ccpmTailLabel->text() + "</font>");
+        error = true;
+    }
+    else
+    {
+        m_ccpm->ccpmTailLabel->setText(QTextEdit(m_ccpm->ccpmTailLabel->text()).toPlainText());
+
     }
 
     return error;

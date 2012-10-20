@@ -59,8 +59,8 @@ static const char *fixedOptionsC =
 "    -client             Attempt to connect to already running instance\n"
 "    -clean-config       Delete all existing configuration settings\n"
 "    -exit-after-config  Exit GCS after manipulating configuration settings\n"
-"    -D key=value        Override configuration settings e.g: -D General/OverrideLanguage=de\n";
-
+"    -D key=value        Override configuration settings e.g: -D General/OverrideLanguage=de\n"
+"    -configfile=value       Default configuration file to load if settings file is empty\n";
 static const char *HELP_OPTION1 = "-h";
 static const char *HELP_OPTION2 = "-help";
 static const char *HELP_OPTION3 = "/h";
@@ -238,7 +238,9 @@ int main(int argc, char **argv)
     rl.rlim_cur = rl.rlim_max;
     setrlimit(RLIMIT_NOFILE, &rl);
 #endif
-
+#ifdef Q_OS_LINUX
+    QApplication::setAttribute(Qt::AA_X11InitThreads, true);
+#endif
     QApplication::setGraphicsSystem("raster");
 
     SharedTools::QtSingleApplication app((QLatin1String(appNameC)), argc, argv);
@@ -250,7 +252,7 @@ int main(int argc, char **argv)
             QCoreApplication::applicationDirPath()+QLatin1String(SHARE_PATH));
     // keep this in sync with the MainWindow ctor in coreplugin/mainwindow.cpp
     QSettings settings(XmlConfig::XmlSettingsFormat, QSettings::UserScope,
-                                 QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"));
+                                 QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS_config"));
 
     overrideSettings(settings, argc, argv);
     locale = settings.value("General/OverrideLanguage", locale).toString();
@@ -336,7 +338,6 @@ int main(int argc, char **argv)
         printHelp(QFileInfo(app.applicationFilePath()).baseName(), pluginManager);
         return 0;
     }
-
     const bool isFirstInstance = !app.isRunning();
     if (!isFirstInstance && foundAppOptions.contains(QLatin1String(CLIENT_OPTION)))
         return sendArguments(app, pluginManager.arguments()) ? 0 : -1;

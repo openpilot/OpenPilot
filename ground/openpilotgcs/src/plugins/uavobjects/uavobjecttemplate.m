@@ -55,49 +55,54 @@ if ~strcmpi(outputType,'mat') && ~strcmpi(outputType,'csv')
 	error('Incorrect file format specified. Second argument must be ''mat'' or ''csv''.');
 end
 
-$(ALLOCATIONCODE)
+$(INSTANTIATIONCODE)
 
 
 fid = fopen(logfile);
+buffer=fread(fid,Inf,'uchar=>uchar');
+fseek(fid, 0, 'bof');
+
+bufferIdx=1;
+
 correctMsgByte=hex2dec('20');
 correctSyncByte=hex2dec('3C');
 unknownObjIDList=zeros(1,2);
 
 % Parse log file, entry by entry
-prebuf = fread(fid, 12, 'uint8');
-log_size = dir(logfile);
-log_size = log_size.bytes;
-last_print = 0;
+% prebuf = buffer(1:12);
+
+last_print = -1e10;
 
 startTime=clock;
 
 while (1)
-	if (feof(fid)); break; end
-
 	%% Read message header
 	% get sync field (0x3C, 1 byte)
-	sync = fread(fid, 1, 'uint8');
-	if sync ~= correctSyncByte
-        	prebuf = [prebuf(2:end); sync];
-		wrongSyncByte = wrongSyncByte + 1;	
-       		continue
-    	end
-    
-    	%% Process header if we are aligned
-	timestamp = typecast(uint8(prebuf(1:4)), 'uint32');
-	datasize = typecast(uint8(prebuf(5:12)), 'uint64');
+	sync = buffer(bufferIdx+12);
+	
+	
+	if buffer(bufferIdx+12) ~= correctSyncByte
+		bufferIdx=bufferIdx+1;
+		wrongSyncByte = wrongSyncByte + 1;
+		continue
+	end
+	
+  	%% Process header, if we are aligned
+% 	timestamp = typecast(buffer(bufferIdx:bufferIdx + 4-1), 'uint32'); %We do this one later
+	datasizeBufferIdx = bufferIdx; %Just grab the index. We'll do a typecast later, if necessary
+% 	sync = buffer(bufferIdx+12); %This one has already been done
+	msgType = buffer(bufferIdx+13); % get msg type (quint8 1 byte ) should be 0x20, ignore the rest?
+% 	msgSize = typecast(buffer(bufferIdx+14:bufferIdx+ 14+2-1), 'uint16'); % NOT USED: get msg size (quint16 2 bytes) excludes crc, include msg header and data payload
+	objID = typecast(buffer(bufferIdx+16:bufferIdx+ 16+4-1), 'uint32'); % get obj id (quint32 4 bytes)
 
-	% get msg type (quint8 1 byte ) should be 0x20, ignore the rest?
-	msgType = fread(fid, 1, 'uint8');
+	%Advance buffer past header
+	bufferIdx=bufferIdx+20;
+
+	%Check that message type is correct
 	if msgType ~= correctMsgByte
 		wrongMessageByte = wrongMessageByte + 1;	
 		continue
 	end
-
-	% get msg size (quint16 2 bytes) excludes crc, include msg header and data payload
-	msgSize = fread(fid, 1, 'uint16');
-	% get obj id (quint32 4 bytes)
-	objID = fread(fid, 1, 'uint32');
 	
 	if (isempty(objID)) 	%End of file
 		break;
@@ -110,15 +115,18 @@ $(SWITCHCODE)
 		otherwise
 			unknownObjIDListIdx=find(unknownObjIDList(:,1)==objID, 1, 'first');
 			if isempty(unknownObjIDListIdx)
-				unknownObjIDList=[unknownObjIDList; objID 1]; 
+				unknownObjIDList=[unknownObjIDList; uint32(objID) 1]; %#ok<AGROW>
 			else
-				unknownObjIDList(unknownObjIDListIdx,2)=unknownObjIDList(unknownObjIDListIdx,2)+1;
+				unknownObjIDList(unknownObjIDListIdx,2)=unknownObjIDList(unknownObjIDListIdx,2)+1; 
 			end
+			
+			datasize = typecast(buffer(datasizeBufferIdx + 4:datasizeBufferIdx + 12-1), 'uint64');
+
 			msgBytesLeft = datasize - 1 - 1 - 2 - 4;
 			if msgBytesLeft > 255
 				msgBytesLeft = 0;
 			end
-			fread(fid, msgBytesLeft, 'uint8');
+			bufferIdx=bufferIdx+double(msgBytesLeft);
 	end
 	catch
 		% One of the reads failed - indicates EOF
@@ -126,42 +134,41 @@ $(SWITCHCODE)
 	end
 
 	if (wrongSyncByte ~= lastWrongSyncByte || wrongMessageByte~=lastWrongMessageByte ) ||...
-			(ftell(fid) / log_size - last_print) > 0.01
+			bufferIdx - last_print > 5e4 %Every 50,000 bytes show the status update
 
 		lastWrongSyncByte=wrongSyncByte;
 		lastWrongMessageByte=wrongMessageByte;
 
 		str1=[];
 		for i=1:length([str2 str3 str4 str5]);
-			str1=[str1 sprintf('\b')];
+			str1=[str1 sprintf('\b')]; %#ok<AGROW>
 		end
 		str2=sprintf('wrongSyncByte instances:    % 10d\n', wrongSyncByte );
 		str3=sprintf('wrongMessageByte instances: % 10d\n\n', wrongMessageByte );
 		
-		str4=sprintf('Completed bytes: % 9d of % 9d\n', ftell(fid), log_size);
+		str4=sprintf('Completed bytes: % 9d of % 9d\n', bufferIdx, length(buffer));
 		
 	        % Arbitrary times two so that it is at least as long	
-		estTimeRemaining=(log_size-ftell(fid))/(ftell(fid)/etime(clock,startTime)) * 2;
+		estTimeRemaining=(length(buffer)-bufferIdx)/(bufferIdx/etime(clock,startTime)) * 2;
 		h=floor(estTimeRemaining/3600);
 		m=floor((estTimeRemaining-h*3600)/60);
 		s=ceil(estTimeRemaining-h*3600-m*60);
 		
 		str5=sprintf('Est. time remaining, %02dh:%02dm:%02ds \n', h,m,s);
 
-		last_print = ftell(fid) / log_size;
+		last_print = bufferIdx;
 		
 		fprintf([str1 str2 str3 str4 str5]);
 	end
 
+	%Check if at end of file. If not, load next prebuffer
+	if bufferIdx+12-1 > length(buffer)
+		break;
+	end
+% 	bufferIdx=bufferIdx+12;
 
-	prebuf = fread(fid, 12, 'uint8');
 end
 
-fprintf('%d records in %0.2f seconds.\n', ftell(fid), etime(clock,startTime));
-
-for i=2:size(unknownObjIDList,1) %Don't show the first one, as it was simply a dummy placeholder
-   disp(['Unknown object ID: 0x' dec2hex(unknownObjIDList(i,1),8) ' appeared ' int2str(unknownObjIDList(i,2)) ' times.']);
-end
 
 for i=2:size(unknownObjIDList,1) %Don't show the first one, as it was simply a dummy placeholder
    disp(['Unknown object ID: 0x' dec2hex(unknownObjIDList(i,1),8) ' appeared ' int2str(unknownObjIDList(i,2)) ' times.']);
@@ -170,28 +177,25 @@ end
 %% Clean Up and Save mat file
 fclose(fid);
 
-% Trim output structs
+%% Prune vectors
 $(CLEANUPCODE)
 
+
+%% Perform typecasting on vectors
+$(ALLOCATIONCODE)
+
+%% Save data to file
 if strcmpi(outputType,'mat')
-	matfile = strrep(logfile,'opl','mat');
+	[path, name]=fileparts(logfile);
+	matfile = fullfile(path,[name '.mat']);
 	save(matfile $(SAVEOBJECTSCODE));
 else
-$(EXPORTCSVCODE);
+$(EXPORTCSVCODE)
 end
 
+fprintf('%d records in %0.2f seconds.\n', length(buffer), etime(clock,startTime));
 
 
-%% Object reading functions
-$(FUNCTIONSCODE)
-
-% This function prunes the excess pre-allocated space
-function [structOut]=PruneStructOfArrays(structIn, lastIndex)
-
-	fieldNames = fieldnames(structIn);
-	for i=1:length(fieldNames)
-		structOut.(fieldNames{i})=structIn.(fieldNames{i})(:,1:lastIndex);
-	end
 
 	
 function	OPLog2csv(structIn, structName, logfile)
@@ -229,3 +233,28 @@ function crc = compute_crc(data)
         crc = crc_table(1+bitxor(data(i),crc));
     end
 
+function out=mcolon(inStart, inFinish)
+%% This function was inspired by Bruno Luong's 'mcolon'. The name is kept the same as his 'mcolon'
+% function, found on Matlab's file exchange. The two functions return identical
+% results, although his is much faster. Unfortunately, C-compiled mex
+% code would make this function non-cross-platform, so a Matlab scripted
+% version is provided here.
+	if size(inStart,1) > 1 || size(inFinish,1) > 1
+		if size(inStart,2) > 1 || size(inFinish,2) > 1
+			error('Inputs must be vectors, i.e just one column wide.')		
+		else
+			inStart=inStart';
+			inFinish=inFinish';
+		end
+	end
+	
+	diffIn=diff([inStart; inFinish]);
+	numElements=sum(diffIn)+length(inStart);
+	
+	out=zeros(1,numElements);
+	
+	idx=1;
+	for i=1:length(inStart)
+		out(idx:idx+diffIn(i))=inStart(i):inFinish(i);
+		idx=idx+diffIn(i)+1;
+	end

@@ -147,7 +147,7 @@ enum usb_ep_attr {
 #define HID_LOCAL_ITEM_0(tag) HID_SHORT_ITEM((tag), HID_ITEM_TYPE_LOCAL, HID_ITEM_SIZE_0)
 #define HID_LOCAL_ITEM_1(tag) HID_SHORT_ITEM((tag), HID_ITEM_TYPE_LOCAL, HID_ITEM_SIZE_1)
 #define HID_LOCAL_ITEM_2(tag) HID_SHORT_ITEM((tag), HID_ITEM_TYPE_LOCAL, HID_ITEM_SIZE_2)
-#define HID_LOCAL_ITEM_3(tag) HID_SHORT_ITEM((tag), HID_ITEM_TYPE_LOCAL, HID_ITEM_SIZE_3)
+#define HID_LOCAL_ITEM_4(tag) HID_SHORT_ITEM((tag), HID_ITEM_TYPE_LOCAL, HID_ITEM_SIZE_4)
 
 struct usb_device_desc {
 	uint8_t  bLength;
@@ -267,7 +267,7 @@ enum usb_cdc_requests {
 	USB_CDC_REQ_SET_LINE_CODING        = 0x20,
 	USB_CDC_REQ_GET_LINE_CODING        = 0x21,
 
-	USB_CDC_REQ_SET_CONTROL_LINE_STATE = 0x23,
+	USB_CDC_REQ_SET_CONTROL_LINE_STATE = 0x22,
 };
 
 struct usb_cdc_header_func_desc {

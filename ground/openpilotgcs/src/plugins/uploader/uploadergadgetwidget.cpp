@@ -71,8 +71,6 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
         onAutopilotConnect();
         versionMatchCheck();
     }
-
-
 }
 
 
@@ -249,8 +247,8 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 
         // The board is now reset: we have to disconnect telemetry
         Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-        QString dli = cm->getCurrentDevice().Name;
-        QString dlj = cm->getCurrentDevice().devName;
+        QString dli = cm->getCurrentDevice().getConName();
+        QString dlj = cm->getCurrentDevice().getConName();
         cm->disconnectDevice();
         QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
         m_eventloop.exec();
@@ -378,7 +376,8 @@ void UploaderGadgetWidget::systemSafeBoot()
 }
 
 /**
-  Tells the system to boot (from Bootloader state)
+  * Tells the system to boot (from Bootloader state)
+  * @param[in] safeboot Indicates whether the firmware should use the stock HWSettings
   */
 void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
 {
@@ -433,6 +432,134 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
     delete dfu; // Frees up the USB/Serial port too
     dfu = NULL;
 }
+bool UploaderGadgetWidget::autoUpdateCapable()
+{
+    return QDir(":/build").exists();
+}
+
+bool UploaderGadgetWidget::autoUpdate()
+{
+    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
+    cm->disconnectDevice();
+    cm->suspendPolling();
+    if (dfu) {
+        delete dfu;
+        dfu = NULL;
+    }
+    QEventLoop loop;
+    QTimer timer;
+    timer.setSingleShot(true);
+    connect(&timer,SIGNAL(timeout()),&loop,SLOT(quit()));
+    while(USBMonitor::instance()->availableDevices(0x20a0,-1,-1,-1).length()>0)
+    {
+             emit autoUpdateSignal(WAITING_DISCONNECT,QVariant());
+             if(QMessageBox::warning(this,tr("OpenPilot Uploader"),tr("Please disconnect all openpilot boards"),QMessageBox::Ok,QMessageBox::Cancel)==QMessageBox::Cancel)
+             {
+                     emit autoUpdateSignal(FAILURE,QVariant());
+                     return false;
+             }
+             timer.start(500);
+             loop.exec();
+    }
+    emit autoUpdateSignal(WAITING_CONNECT,0);
+    autoUpdateConnectTimeout=0;
+    m_timer = new QTimer(this);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(performAuto()));
+    m_timer->start(1000);
+    connect(USBMonitor::instance(), SIGNAL(deviceDiscovered(USBPortInfo)),&m_eventloop, SLOT(quit()));
+    m_eventloop.exec();
+    if(!m_timer->isActive())
+    {
+        m_timer->stop();
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    m_timer->stop();
+    dfu = new DFUObject(DFU_DEBUG, false, QString());
+    dfu->AbortOperation();
+    emit autoUpdateSignal(JUMP_TO_BL,QVariant());
+    if(!dfu->enterDFU(0))
+    {
+        delete dfu;
+        dfu = NULL;
+        cm->resumePolling();
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    if(!dfu->findDevices() || (dfu->numberOfDevices != 1))
+    {
+        delete dfu;
+        dfu = NULL;
+        cm->resumePolling();
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    if (dfu->numberOfDevices > 5) {
+        delete dfu;
+        dfu = NULL;
+        cm->resumePolling();
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    QString filename;
+    emit autoUpdateSignal(LOADING_FW,QVariant());
+    switch (dfu->devices[0].ID)
+    {
+    case 0x401:
+        filename="fw_coptercontrol";
+        break;
+    case 0x402:
+        filename="fw_coptercontrol";
+        break;
+    default:
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+        break;
+    }
+    filename=":/build/"+filename+"/"+filename+".opfw";
+    QByteArray firmware;
+    if(!QFile::exists(filename))
+    {
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    firmware = file.readAll();
+    connect(dfu, SIGNAL(progressUpdated(int)), this, SLOT(autoUpdateProgress(int)));
+    connect(dfu, SIGNAL(uploadFinished(OP_DFU::Status)), &m_eventloop, SLOT(quit()));
+    emit autoUpdateSignal(UPLOADING_FW,QVariant());
+    if(!dfu->enterDFU(0))
+    {
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    dfu->AbortOperation();
+    if(!dfu->UploadFirmware(filename,false,0))
+    {
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    m_eventloop.exec();
+    QByteArray desc = firmware.right(100);
+    emit autoUpdateSignal(UPLOADING_DESC,QVariant());
+    if(dfu->UploadDescription(desc)!= OP_DFU::Last_operation_Success)
+    {
+        emit autoUpdateSignal(FAILURE,QVariant());
+        return false;
+    }
+    systemBoot();
+    emit autoUpdateSignal(SUCCESS,QVariant());
+    return true;
+}
+
+void UploaderGadgetWidget::autoUpdateProgress(int value)
+{
+    emit autoUpdateSignal(UPLOADING_FW,value);
+}
 
 /**
   Attempt a guided procedure to put both boards in BL mode when
@@ -456,7 +583,7 @@ void UploaderGadgetWidget::systemRescue()
         delete dfu;
         dfu = NULL;
     }
-    // Avoid dumb users pressing Rescue twice. It can happen.
+    // Avoid users pressing Rescue twice.
     m_config->rescueButton->setEnabled(false);
 
     // Now we're good to go:
@@ -523,25 +650,6 @@ void UploaderGadgetWidget::systemRescue()
         m_config->rescueButton->setEnabled(true);
         return;
     }
-    if ((eBoardCC != dfu->GetBoardType(0)) && (QMessageBox::question(this,tr("OpenPilot Uploader"),tr("If you want to search for other boards connect power now and press Yes"),QMessageBox::Yes,QMessageBox::No)==QMessageBox::Yes))
-    {
-        log("\nWaiting...");
-        QTimer::singleShot(3000, &m_eventloop, SLOT(quit()));
-        m_eventloop.exec();
-        log("Detecting second board...");
-        repaint();
-        if(!dfu->findDevices())
-        {
-            // We will only end up here in case somehow all the boards
-            // disappeared, including the one we detected earlier.
-            log("Could not detect any board, aborting!");
-            delete dfu;
-            dfu = NULL;
-            cm->resumePolling();
-            m_config->rescueButton->setEnabled(true);
-            return;
-        }
-    }
     log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
     if (dfu->numberOfDevices > 5) {
         log("Inconsistent number of devices, aborting!");
@@ -566,6 +674,7 @@ void UploaderGadgetWidget::systemRescue()
     m_config->rescueButton->setEnabled(false);
     currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
 }
+
 void UploaderGadgetWidget::perform()
 {
     if(m_progress->value()==19)
@@ -574,6 +683,17 @@ void UploaderGadgetWidget::perform()
         m_eventloop.exit();
     }
     m_progress->setValue(m_progress->value()+1);
+}
+void UploaderGadgetWidget::performAuto()
+{
+    ++autoUpdateConnectTimeout;
+    emit autoUpdateSignal(WAITING_CONNECT,autoUpdateConnectTimeout*5);
+    if(autoUpdateConnectTimeout==20)
+    {
+        m_timer->stop();
+        m_eventloop.exit();
+    }
+
 }
 void UploaderGadgetWidget::cancel()
 {
@@ -667,23 +787,47 @@ void UploaderGadgetWidget::versionMatchCheck()
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectUtilManager *utilMngr = pm->getObject<UAVObjectUtilManager>();
     deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
+    QByteArray uavoHashArray;
+    QString uavoHash = QString::fromLatin1(Core::Constants::UAVOSHA1_STR);
+    uavoHash.chop(2);
+    uavoHash.remove(0,2);
+    uavoHash=uavoHash.trimmed();
+    bool ok;
+    foreach(QString str,uavoHash.split(","))
+    {
+        uavoHashArray.append(str.toInt(&ok,16));
+    }
 
-    QString gcsDescription = QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
-    QString gcsGitHash = gcsDescription.mid(gcsDescription.indexOf(":")+1, 8);
-    gcsGitHash.remove( QRegExp("^[0]*") );
-    QString gcsGitDate = gcsDescription.mid(gcsDescription.indexOf(" ")+1, 14);
-    QString gcsVersion = gcsGitDate + " (" + gcsGitHash + ")";
-    QString fwVersion = boardDescription.gitDate + " (" + boardDescription.gitHash + ")";
+    QByteArray fwVersion=boardDescription.uavoHash;
+    if (fwVersion != uavoHashArray) {
 
-    if (boardDescription.gitHash != gcsGitHash) {
+        QString gcsDescription = QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
+        QString gcsGitHash = gcsDescription.mid(gcsDescription.indexOf(":")+1, 8);
+        gcsGitHash.remove( QRegExp("^[0]*") );
+        QString gcsGitDate = gcsDescription.mid(gcsDescription.indexOf(" ")+1, 14);
+
+        QString gcsUavoHashStr;
+        QString fwUavoHashStr;
+        foreach(char i, fwVersion)
+        {
+            fwUavoHashStr.append(QString::number(i,16).right(2));
+        }
+        foreach(char i, uavoHashArray)
+        {
+            gcsUavoHashStr.append(QString::number(i,16).right(2));
+        }
+        QString gcsVersion = gcsGitDate + " (" + gcsGitHash + "-"+ gcsUavoHashStr.left(8) + ")";
+        QString fwVersion = boardDescription.gitDate + " (" + boardDescription.gitHash + "-" + fwUavoHashStr.left(8) + ")";
+
         QString warning = QString(tr(
-            "GCS and firmware versions do not match which can cause configuration problems. "
-            "GCS version: %1. Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
+            "GCS and firmware versions of the UAV objects set do not match which can cause configuration problems. "
+            "GCS version: %1 Firmware version: %2.")).arg(gcsVersion).arg(fwVersion);
         msg->showMessage(warning);
     }
-  }
+}
+
 void UploaderGadgetWidget::openHelp()
 {
 
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Uploader+Plugin", QUrl::StrictMode) );
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/AoBZ", QUrl::StrictMode) );
 }

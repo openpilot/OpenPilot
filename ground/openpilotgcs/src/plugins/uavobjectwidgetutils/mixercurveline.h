@@ -35,23 +35,23 @@
 
 #include <QGraphicsItem>
 
-class Node;
+class MixerNode;
 
 class Edge : public QGraphicsItem
 {
 public:
-    Edge(Node *sourceNode, Node *destNode);
+    Edge(MixerNode *sourceNode, MixerNode *destNode);
     ~Edge();
 
-    Node *sourceNode() const;
-    void setSourceNode(Node *node);
+    MixerNode *sourceNode() const;
+    void setSourceNode(MixerNode *node);
 
-    Node *destNode() const;
-    void setDestNode(Node *node);
+    MixerNode *destNode() const;
+    void setDestNode(MixerNode *node);
 
     void adjust();
 
-    enum { Type = UserType + 2 };
+    enum { Type = UserType + 12 };
     int type() const { return Type; }
     
 protected:
@@ -59,7 +59,7 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     
 private:
-    Node *source, *dest;
+    MixerNode *source, *dest;
 
     QPointF sourcePoint;
     QPointF destPoint;

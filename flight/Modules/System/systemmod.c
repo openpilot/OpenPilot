@@ -49,6 +49,14 @@
 #include "watchdogstatus.h"
 #include "taskmonitor.h"
 
+//#define DEBUG_THIS_FILE
+
+#if defined(PIOS_INCLUDE_DEBUG_CONSOLE) && defined(DEBUG_THIS_FILE)
+#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(PIOS_COM_DEBUG, format, ## __VA_ARGS__)
+#else
+#define DEBUG_MSG(format, ...)
+#endif
+
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
 #define LED_BLINK_RATE_HZ 5
@@ -82,7 +90,7 @@ static void objectUpdatedCb(UAVObjEvent * ev);
 static void updateStats();
 static void updateSystemAlarms();
 static void systemTask(void *parameters);
-#if defined(DIAGNOSTICS)
+#if defined(I2C_WDG_STATS_DIAGNOSTICS)
 static void updateI2Cstats();
 static void updateWDGstats();
 #endif
@@ -118,7 +126,7 @@ int32_t SystemModInitialize(void)
 #if defined(DIAG_TASKS)
 	TaskInfoInitialize();
 #endif
-#if defined(DIAGNOSTICS)
+#if defined(I2C_WDG_STATS_DIAGNOSTICS)
 	I2CStatsInitialize();
 	WatchdogStatusInitialize();
 #endif
@@ -168,7 +176,7 @@ static void systemTask(void *parameters)
 
 		// Update the system alarms
 		updateSystemAlarms();
-#if defined(DIAGNOSTICS)
+#if defined(I2C_WDG_STATS_DIAGNOSTICS)
 		updateI2Cstats();
 		updateWDGstats();
 #endif
@@ -181,6 +189,7 @@ static void systemTask(void *parameters)
 		// Flash the heartbeat LED
 #if defined(PIOS_LED_HEARTBEAT)
 		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+		DEBUG_MSG("+ 0x%08x\r\n", 0xDEADBEEF);
 #endif	/* PIOS_LED_HEARTBEAT */
 
 		// Turn on the error LED if an alarm is set
@@ -301,7 +310,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 /**
  * Called periodically to update the I2C statistics 
  */
-#if defined(DIAGNOSTICS)
+#if defined(I2C_WDG_STATS_DIAGNOSTICS)
 static void updateI2Cstats() 
 {
 #if defined(PIOS_INCLUDE_I2C)
@@ -462,15 +471,6 @@ static void updateSystemAlarms()
 	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_STACKOVERFLOW);
 	}
-
-#if defined(PIOS_INCLUDE_SDCARD)
-	// Check for SD card
-	if (PIOS_SDCARD_IsMounted() == 0) {
-		AlarmsSet(SYSTEMALARMS_ALARM_SDCARD, SYSTEMALARMS_ALARM_ERROR);
-	} else {
-		AlarmsClear(SYSTEMALARMS_ALARM_SDCARD);
-	}
-#endif
 
 	// Check for event errors
 	UAVObjGetStats(&objStats);

@@ -25,6 +25,7 @@ inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
         delete ui->legend3;
         delete ui->legend4;
         delete ui->legend5;
+
     }
 
     connect(ui->channelMin,SIGNAL(valueChanged(int)),this,SLOT(minMaxUpdated()));

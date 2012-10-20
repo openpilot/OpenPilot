@@ -51,6 +51,7 @@ public:
 signals:
     void connected();
     void disconnected();
+    void telemetryUpdated(double txRate, double rxRate);
 
 public slots:
     void transactionCompleted(UAVObject* obj, bool success);
@@ -59,7 +60,7 @@ public slots:
 
 private:
     static const int STATS_UPDATE_PERIOD_MS = 4000;
-    static const int STATS_CONNECT_PERIOD_MS = 1000;
+    static const int STATS_CONNECT_PERIOD_MS = 2000;
     static const int CONNECTION_TIMEOUT_MS = 8000;
 
     UAVObjectManager* objMngr;

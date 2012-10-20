@@ -29,7 +29,8 @@
 #define UPLOADERGADGETFACTORY_H
 
 #include <coreplugin/iuavgadgetfactory.h>
-
+#include "uploader_global.h"
+#include "enums.h"
 namespace Core {
 class IUAVGadget;
 class IUAVGadgetFactory;
@@ -37,7 +38,7 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class UploaderGadgetFactory : public Core::IUAVGadgetFactory
+class UPLOADER_EXPORT UploaderGadgetFactory : public Core::IUAVGadgetFactory
 {
     Q_OBJECT
 public:
@@ -46,6 +47,12 @@ public:
 
     Core::IUAVGadget *createGadget(QWidget *parent);
     IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    bool isAutoUpdateCapable();
+private:
+    bool isautocapable;
+signals:
+    void autoUpdateSignal(uploader::AutoUpdateStep,QVariant);
+    void autoUpdate();
 };
 
 #endif // UPLOADERGADGETFACTORY_H

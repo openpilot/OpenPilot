@@ -165,7 +165,7 @@ bool ChronoPlotData::append(UAVObject* obj)
 
             //Perform scope math, if necessary
             if (mathFunction  == "Boxcar average" || mathFunction  == "Standard deviation"){
-                //Put the new value at the front
+                //Put the new value at the back
                 yDataHistory->append( currentValue );
 
                 // calculate average value

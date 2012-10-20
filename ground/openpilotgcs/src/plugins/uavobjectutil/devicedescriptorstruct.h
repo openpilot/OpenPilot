@@ -8,6 +8,8 @@ public:
        QString gitHash;
        QString gitDate;
        QString gitTag;
+       QByteArray fwHash;
+       QByteArray uavoHash;
        int boardType;
        int boardRevision;
        static QString idToBoardName(int id)
@@ -20,7 +22,7 @@ public:
                return QString("OpenPilot INS");
                break;
            case 0x0301://PipX
-               return QString("PipXtreame");
+               return QString("PipXtreme");
                break;
            case 0x0401://Coptercontrol
                return QString("CopterControl");

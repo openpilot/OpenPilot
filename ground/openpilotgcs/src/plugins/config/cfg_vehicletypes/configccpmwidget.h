@@ -72,6 +72,8 @@ private:
         QGraphicsEllipseItem *ServosTextCircles[CCPM_MAX_SWASH_SERVOS];
         QSpinBox *SwashLvlSpinBoxes[CCPM_MAX_SWASH_SERVOS];
 
+        QString TypeText;
+
         bool SwashLvlConfigurationInProgress;
         UAVObject::Metadata SwashLvlaccInitialData;
         int SwashLvlState;
@@ -88,7 +90,7 @@ private:
         bool updatingToHardware;
 
         virtual void ResetActuators(GUIConfigDataUnion* configData);
-        virtual QStringList getChannelDescriptions();
+        static QStringList getChannelDescriptions();
 
         QString updateConfigObjects();
     private slots:
@@ -99,13 +101,8 @@ private:
 
         void ccpmSwashplateUpdate();
         void ccpmSwashplateRedraw();
-        void UpdateCurveSettings();
-        void GenerateCurve();
         void UpdateMixer();
         void UpdateType();
-        void UpdateCurveWidgets();
-        void updatePitchCurveValue(QList<double>,double);
-        void updateThrottleCurveValue(QList<double>,double);
 
         void SwashLvlStartButtonPressed();
         void SwashLvlNextButtonPressed();

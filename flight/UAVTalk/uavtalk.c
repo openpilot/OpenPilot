@@ -559,6 +559,73 @@ UAVTalkRxState UAVTalkProcessInputStream(UAVTalkConnection connectionHandle, uin
 }
 
 /**
+ * Process an byte from the telemetry stream, sending the packet out the output stream when it's complete
+ * This allows the interlieving of packets on an output UAVTalk stream, and is used by the OPLink device to
+ * relay packets from an input com port to a different output com port without sending one packet in the middle
+ * of another packet.  Because this uses both the receive buffer and transmit buffer, it should only be used
+ * for relaying a packet, not for the standard sending and receiving of packets.
+ * \param[in] connection UAVTalkConnection to be used
+ * \param[in] rxbyte Received byte
+ * \return UAVTalkRxState
+ */
+UAVTalkRxState UAVTalkRelayInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte)
+{
+	UAVTalkRxState state = UAVTalkProcessInputStreamQuiet(connectionHandle, rxbyte);
+
+	if (state == UAVTALK_STATE_COMPLETE)
+	{
+		UAVTalkConnectionData *connection;
+		CHECKCONHANDLE(connectionHandle,connection,return -1);
+		UAVTalkInputProcessor *iproc = &connection->iproc;
+
+		if (!connection->outStream) return -1;
+
+		// Setup type and object id fields
+		connection->txBuffer[0] = UAVTALK_SYNC_VAL;  // sync byte
+		connection->txBuffer[1] = iproc->type;
+		// data length inserted here below
+		connection->txBuffer[4] = (uint8_t)(iproc->objId & 0xFF);
+		connection->txBuffer[5] = (uint8_t)((iproc->objId >> 8) & 0xFF);
+		connection->txBuffer[6] = (uint8_t)((iproc->objId >> 16) & 0xFF);
+		connection->txBuffer[7] = (uint8_t)((iproc->objId >> 24) & 0xFF);
+	
+		// Setup instance ID if one is required
+		int32_t dataOffset = 8;
+		if (iproc->instanceLength > 0)
+		{
+			connection->txBuffer[8] = (uint8_t)(iproc->instId & 0xFF);
+			connection->txBuffer[9] = (uint8_t)((iproc->instId >> 8) & 0xFF);
+			dataOffset = 10;
+		}
+
+		// Add timestamp when the transaction type is appropriate
+		if (iproc->type & UAVTALK_TIMESTAMPED)
+		{
+			portTickType time = xTaskGetTickCount();
+			connection->txBuffer[dataOffset] = (uint8_t)(time & 0xFF);
+			connection->txBuffer[dataOffset + 1] = (uint8_t)((time >> 8) & 0xFF);
+			dataOffset += 2;
+		}
+	
+		// Copy data (if any)
+		memcpy(&connection->txBuffer[dataOffset], connection->rxBuffer, iproc->length);
+	
+		// Store the packet length
+		connection->txBuffer[2] = (uint8_t)((dataOffset + iproc->length) & 0xFF);
+		connection->txBuffer[3] = (uint8_t)(((dataOffset + iproc->length) >> 8) & 0xFF);
+	
+		// Copy the checksum
+		connection->txBuffer[dataOffset + iproc->length] = iproc->cs;
+
+		// Send the buffer.
+		if (UAVTalkSendBuf(connectionHandle, connection->txBuffer, iproc->rxPacketLength) < 0)
+			return UAVTALK_STATE_ERROR;
+	}
+
+	return state;
+}
+
+/**
  * Send a ACK through the telemetry link.
  * \param[in] connectionHandle UAVTalkConnection to be used
  * \param[in] objId Object ID to send a NACK for

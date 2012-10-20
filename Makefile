@@ -533,11 +533,17 @@ openpilotgcs_clean:
 	$(V0) @echo " CLEAN      $@"
 	$(V1) [ ! -d "$(BUILD_DIR)/ground/openpilotgcs" ] || $(RM) -r "$(BUILD_DIR)/ground/openpilotgcs"
 
+ifeq ($(V), 1)
+UAVOGEN_SILENT := 
+else
+UAVOGEN_SILENT := silent
+endif
+
 .PHONY: uavobjgenerator
 uavobjgenerator:
 	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
 	$(V1) ( cd $(BUILD_DIR)/ground/$@ && \
-	  $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+=debug && \
+	  $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+="debug $(UAVOGEN_SILENT)" && \
 	  $(MAKE) --no-print-directory -w ; \
 	)
 

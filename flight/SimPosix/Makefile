@@ -384,7 +384,7 @@ ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
 ALLSRCBASE = $(notdir $(basename $(ALLSRC)))
 
 # Define all object files.
-ALLOBJ     = $(addprefix $(OUTDIR)/, $(addsuffix .o, $(ALLSRCBASE) $(TARGET).bin.firmwareinfo ))
+ALLOBJ     = $(addprefix $(OUTDIR)/, $(addsuffix .o, $(ALLSRCBASE) uavobjectsinit.o.firmwareinfo ))
 
 # Define all listing files (used for make clean).
 LSTFILES   = $(addprefix $(OUTDIR)/, $(addsuffix .lst, $(ALLSRCBASE)))
@@ -439,6 +439,8 @@ $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 
 $(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
+
+$(eval $(call OPFW_TEMPLATE,$(OUTDIR)/uavobjectsinit.o,$(BOARD_TYPE),$(BOARD_REVISION)))
 
 # Add jtag targets (program and wipe)
 $(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE),$(OPENOCD_JTAG_CONFIG),$(OPENOCD_CONFIG)))

@@ -1,6 +1,6 @@
 <xml>
-	<object name="PipXStatus" singleinstance="true" settings="false">
-		<description>PipXtreme device status.</description>
+	<object name="OPLinkStatus" singleinstance="true" settings="false">
+		<description>OPLink device status.</description>
 		<field name="Description" units="" type="uint8" elements="40"/> 
 		<field name="CPUSerial" units="" type="uint8" elements="12" /> 
 		<field name="BoardRevision" units="" type="uint16" elements="1"/> 
@@ -15,6 +15,7 @@
 		<field name="Resets" units="" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="Timeouts" units="" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="RSSI" units="dBm" type="int8" elements="1" defaultvalue="0"/>
+		<field name="AFCCorrection" units="Hz" type="int8" elements="1" defaultvalue="0"/>
 		<field name="LinkQuality" units="" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="TXRate" units="Bps" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="RXRate" units="Bps" type="uint16" elements="1" defaultvalue="0"/>

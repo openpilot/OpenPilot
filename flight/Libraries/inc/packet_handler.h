@@ -40,19 +40,14 @@
 // Public types
 typedef enum {
 	PACKET_TYPE_NONE = 0,
-	PACKET_TYPE_CONNECT,        // for requesting a connection
-	PACKET_TYPE_DISCONNECT,     // to tell the other modem they cannot connect to us
-	PACKET_TYPE_READY,          // tells the other modem we are ready to accept more data
-	PACKET_TYPE_NOTREADY,       // tells the other modem we're not ready to accept more data - we can also send user data in this packet type
 	PACKET_TYPE_STATUS,         // broadcasts status of this modem
-	PACKET_TYPE_DATARATE,       // for changing the RF data rate
-	PACKET_TYPE_PING,           // used to check link is still up
-	PACKET_TYPE_ADJUST_TX_PWR,  // used to ask the other modem to adjust it's tx power
+	PACKET_TYPE_CON_REQUEST,    // request a connection to another modem
+	PACKET_TYPE_CON_ACCEPT,     // accecpt a connection to another modem
+	PACKET_TYPE_CON_DECLINE,    // decline a connection to another modem
 	PACKET_TYPE_DATA,           // data packet (packet contains user data)
-	PACKET_TYPE_ACKED_DATA,     // data packet that requies an ACK
 	PACKET_TYPE_PPM,            // PPM relay values
 	PACKET_TYPE_ACK,
-	PACKET_TYPE_NACK
+	PACKET_TYPE_NACK,
 } PHPacketType;
 
 typedef struct {
@@ -85,6 +80,17 @@ typedef struct {
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHStatusPacket, *PHStatusPacketHandle;
 
+#define PH_CONNECTION_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
+typedef struct {
+	PHPacketHeader header;
+	uint32_t datarate;
+	uint32_t frequencyHz;
+	uint32_t minFrequencyHz;
+	uint32_t maxFrequencyHz;
+	uint8_t maxTxPower;
+	uint8_t ecc[RS_ECC_NPARITY];
+} PHConnectionPacket, *PHConnectionPacketHandle;
+
 typedef struct {
 	uint32_t default_destination_id;
 	uint32_t source_id;
@@ -112,7 +118,6 @@ PHPacketHandle PHGetTXPacket(PHInstHandle h);
 void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
 uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p);
 uint8_t PHTransmitData(PHInstHandle h, uint8_t *buf, uint16_t len);
-uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p);
 
 #endif // __PACKET_HANDLER_H__
 

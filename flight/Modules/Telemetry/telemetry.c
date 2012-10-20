@@ -35,10 +35,6 @@
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "hwsettings.h"
-#if defined(PIOS_PACKET_HANDLER)
-#include "pipxstatus.h"
-#include "packet_handler.h"
-#endif
 
 // Private constants
 #define MAX_QUEUE_SIZE   TELEM_QUEUE_SIZE
@@ -85,9 +81,6 @@ static void updateTelemetryStats();
 static void gcsTelemetryStatsUpdated();
 static void updateSettings();
 static uint32_t getComPort();
-#ifdef PIOS_PACKET_HANDLER
-static void receivePacketData(uint8_t *buf, uint8_t len, int8_t rssi, int8_t afc);
-#endif
 
 /**
  * Initialise the telemetry module
@@ -101,13 +94,6 @@ int32_t TelemetryStart(void)
     
 	// Listen to objects of interest
 	GCSTelemetryStatsConnectQueue(priorityQueue);
-
-	// Register to receive data from the radio packet handler.
-	// This must be after the radio module is initialized.
-#ifdef PIOS_PACKET_HANDLER
-	if (PIOS_PACKET_HANDLER)
-		PHRegisterDataHandler(PIOS_PACKET_HANDLER, receivePacketData);
-#endif
     
 	// Start telemetry tasks
 	xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
@@ -261,11 +247,6 @@ static void processObjEvent(UAVObjEvent * ev)
 		retries = 0;
 		success = -1;
 		if (ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL || ((ev->event == EV_UPDATED_PERIODIC) && (updateMode != UPDATEMODE_THROTTLED))) {
-#ifdef PIOS_PACKET_HANDLER
-			// Don't send PipXStatus objects over the radio link.
-			if (PIOS_PACKET_HANDLER && (ev->obj == PipXStatusHandle()) && (getComPort() == 0))
-				return;
-#endif
 			// Send update to GCS (with retries)
 			while (retries < MAX_RETRIES && success == -1) {
 				success = UAVTalkSendObject(uavTalkCon, ev->obj, ev->instId, UAVObjGetTelemetryAcked(&metadata), REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout
@@ -374,14 +355,9 @@ static int32_t transmitData(uint8_t * data, int32_t length)
 {
 	uint32_t outputPort = getComPort();
 
-	if (outputPort) {
+	if (outputPort)
 		return PIOS_COM_SendBuffer(outputPort, data, length);
-	}
-#ifdef PIOS_PACKET_HANDLER
-	if (PIOS_PACKET_HANDLER)
-		if (PHTransmitData(PIOS_PACKET_HANDLER, data, length))
-			return length;
-#endif
+
 	return -1;
 }
 
@@ -579,19 +555,6 @@ static uint32_t getComPort() {
 #endif /* PIOS_INCLUDE_USB */
 		return telemetryPort;
 }
-
-#ifdef PIOS_PACKET_HANDLER
-/**
- * Receive a packet
- * \param[in] buf The received data buffer
- * \param[in] length Length of buffer
- */
-static void receivePacketData(uint8_t *buf, uint8_t len, int8_t rssi, int8_t afc)
-{
-	for (uint8_t i = 0; i < len; ++i)
-		UAVTalkProcessInputStream(uavTalkCon, buf[i]);
-}
-#endif
 
 /**
   * @}

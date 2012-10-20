@@ -79,6 +79,8 @@ enum rfm22b_datarate {
 
 struct rfm22b_stats {
 	uint16_t packets_per_sec;
+	uint16_t tx_byte_count;
+	uint16_t rx_byte_count;
 	uint16_t tx_count;
 	uint16_t rx_count;
 	uint8_t rx_good;
@@ -90,6 +92,8 @@ struct rfm22b_stats {
 	uint8_t timeouts;
 	uint8_t link_quality;
 	int8_t rssi;
+	int8_t afc_correction;
+	bool connected;
 };
 
 /* Public Functions */
@@ -100,7 +104,10 @@ extern void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id);
 extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
 extern void PIOS_RFM22B_GetStats(uint32_t rfm22b_id, struct rfm22b_stats *stats);
 extern bool PIOS_RFM22B_Send_Packet(uint32_t rfm22b_id, PHPacketHandle p, uint32_t max_delay);
-extern uint32_t PIOS_RFM22B_Receive_Packet(uint32_t rfm22b_id, PHPacketHandle *p, uint32_t max_delay);
+extern uint8_t PIOS_RFM2B_GetPairStats(uint32_t rfm22b_id, uint32_t *device_ids, int8_t *RSSIs, uint8_t max_pairs);
+
+/* Global Variables */
+extern const struct pios_com_driver pios_rfm22b_com_driver;
 
 #endif /* PIOS_RFM22B_H */
 

@@ -315,56 +315,6 @@ uint8_t PHTransmitData(PHInstHandle h, uint8_t *buf, uint16_t len)
 }
 
 /**
- * Process a packet that has been received.
- * \param[in] h The packet handler instance data pointer.
- * \param[in] p A pointer to the packet buffer.
- * \param[in] received_len The length of data received.
- * \return 0 Failure
- * \return 1 Success
- */
-uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p)
-{
-	PHPacketDataHandle data = (PHPacketDataHandle)h;
-	uint16_t len = PHPacketSizeECC(p);
-
-	// Extract the RSSI and AFC.
-	int8_t rssi = *(((int8_t*)p) + len);
-	int8_t afc = *(((int8_t*)p) + len + 1);
-
-	switch (p->header.type) {
-
-	case PACKET_TYPE_STATUS:
-
-		// Pass on the channels to the status handler.
-		if(data->status_handler)
-			data->status_handler((PHStatusPacketHandle)p, rssi, afc);
-		break;
-
-	case PACKET_TYPE_PPM:
-
-		// Pass on the channels to the PPM handler.
-		if(data->ppm_handler)
-			data->ppm_handler(((PHPpmPacketHandle)p)->channels);
-		break;
-
-	case PACKET_TYPE_DATA:
-
-		// Pass on the data to the data handler.
-		if(data->data_handler)
-			data->data_handler(p->data, p->header.data_size, rssi, afc);
-		break;
-
-	default:
-		break;
-	}
-
-	// Release the packet.
-	PHReleaseRXPacket(h, p);
-	
-	return 1;
-}
-
-/**
  * Transmit a packet from the transmit packet buffer window.
  * \param[in] data The packet handler instance data pointer.
  * \param[in] p A pointer to the packet buffer.

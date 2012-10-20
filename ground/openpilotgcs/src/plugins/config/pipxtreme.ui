@@ -750,7 +750,7 @@
             <item row="7" column="0">
              <widget class="QLabel" name="RxAFCLabel">
               <property name="text">
-               <string>Rx AFC</string>
+               <string>AFC Corr.</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -758,7 +758,7 @@
              </widget>
             </item>
             <item row="7" column="1">
-             <widget class="QLineEdit" name="RxAFC">
+             <widget class="QLineEdit" name="AFCCorrection">
               <property name="maximumSize">
                <size>
                 <width>101</width>
@@ -1305,18 +1305,39 @@
          <string>Configuration</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
-         <item row="0" column="0">
-          <widget class="QLabel" name="TelemPortConfigLabel">
+	 <item row="0" column="1">
+	  <widget class="QCheckBox" name="Coordinator">
+	   <property name="text">
+	    <string>Coordinator</string>
+	   </property>
+	  </widget>
+	 </item>
+	 <item row="1" column="1">
+	  <widget class="QCheckBox" name="PPM">
+	   <property name="text">
+	    <string>PPM</string>
+	   </property>
+	  </widget>
+	 </item>
+	 <item row="2" column="1">
+	  <widget class="QCheckBox" name="UAVTalk">
+	   <property name="text">
+	    <string>UAVTalk</string>
+	   </property>
+	  </widget>
+	 </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="InputConnectionLabel">
            <property name="text">
-            <string>Telemetry Port Config.</string>
+            <string>Input Connection</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="TelemPortConfig">
+         <item row="3" column="1">
+          <widget class="QComboBox" name="InputConnection">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -1324,22 +1345,45 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Set the telemetry port configuration</string>
+            <string>Choose which port to communicate over on this modem</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="TelemPortSpeedLabel">
+         <item row="4" column="0">
+          <widget class="QLabel" name="OutputConnectionLabel">
            <property name="text">
-            <string>Telemetry Port Speed</string>
+            <string>Output Connection</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="TelemPortSpeed">
+         <item row="4" column="1">
+          <widget class="QComboBox" name="OutputConnection">
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Choose which port to communicate over on the remote modem</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="ComSpeedLabel">
+           <property name="text">
+            <string>COM Speed</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QComboBox" name="ComSpeed">
            <property name="maximumSize">
             <size>
              <width>16777215</width>
@@ -1351,122 +1395,7 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="FlexiPortConfigLabel">
-           <property name="text">
-            <string>Flexi Port Configuration</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="FlexiPortConfig">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Set the flexi port configuration</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="FlexiPortSpeedConfig">
-           <property name="text">
-            <string>Flexi Port Speed</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QComboBox" name="FlexiPortSpeed">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Set the flexi port speed</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="VCPConfigLabel">
-           <property name="text">
-            <string>VCP Configuration</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QComboBox" name="VCPConfig">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Set the virtual serial port configuration</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="VCPSpeedLabel">
-           <property name="text">
-            <string>VCP Speed</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QComboBox" name="VCPSpeed">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Set the virtual serial port speed</string>
-           </property>
-          </widget>
-         </item>
          <item row="6" column="0">
-          <widget class="QLabel" name="MaxRFDatarateLabel">
-           <property name="text">
-            <string>Max RF Datarate (bits/s)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="QComboBox" name="MaxRFDatarate">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Set the maximum RF datarate/channel bandwidth the modem will use</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
           <widget class="QLabel" name="MaxRFTxPowerLabel">
            <property name="text">
             <string>Max RF Tx Power(mW)</string>
@@ -1476,7 +1405,7 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
+         <item row="6" column="1">
           <widget class="QComboBox" name="MaxRFTxPower">
            <property name="maximumSize">
             <size>
@@ -1495,7 +1424,7 @@
            </property>
           </widget>
          </item>
-         <item row="8" column="0">
+         <item row="7" column="0">
           <widget class="QLabel" name="SendTimeoutLabel">
            <property name="text">
             <string>Send Timeout (ms)</string>
@@ -1505,7 +1434,7 @@
            </property>
           </widget>
          </item>
-         <item row="8" column="1">
+         <item row="7" column="1">
           <widget class="QSpinBox" name="SendTimeout">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1530,7 +1459,7 @@
            </property>
           </widget>
          </item>
-         <item row="9" column="0">
+         <item row="8" column="0">
           <widget class="QLabel" name="MinPacketSizeLabel">
            <property name="text">
             <string>Min Packet Size</string>
@@ -1540,7 +1469,7 @@
            </property>
           </widget>
          </item>
-         <item row="9" column="1">
+         <item row="8" column="1">
           <widget class="QSpinBox" name="MinPacketSize">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1565,7 +1494,7 @@
            </property>
           </widget>
          </item>
-         <item row="10" column="0">
+         <item row="9" column="0">
           <widget class="QLabel" name="FreqCalLabel">
            <property name="text">
             <string>Frequency Calibration</string>
@@ -1575,7 +1504,7 @@
            </property>
           </widget>
          </item>
-         <item row="10" column="1">
+         <item row="9" column="1">
           <widget class="QSpinBox" name="FrequencyCalibration">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1600,7 +1529,7 @@
            </property>
           </widget>
          </item>
-         <item row="11" column="0">
+         <item row="10" column="0">
           <widget class="QLabel" name="label_5">
            <property name="text">
             <string>Frequency (Hz)</string>
@@ -1610,7 +1539,7 @@
            </property>
           </widget>
          </item>
-         <item row="11" column="1">
+         <item row="10" column="1">
           <widget class="QSpinBox" name="Frequency">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -1644,7 +1573,7 @@
            </property>
           </widget>
          </item>
-         <item row="15" column="0" colspan="2">
+         <item row="11" column="0" colspan="2">
           <widget class="QGroupBox" name="groupBox_4">
            <property name="title">
             <string>AES Encryption</string>
@@ -1713,7 +1642,7 @@
            </layout>
           </widget>
          </item>
-         <item row="16" column="0">
+         <item row="12" column="0">
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -1725,16 +1654,6 @@
             </size>
            </property>
           </spacer>
-         </item>
-         <item row="14" column="0" colspan="2">
-          <widget class="QPushButton" name="ScanSpectrum">
-           <property name="toolTip">
-            <string>Scan whole band to see where their is interference and/or used channels</string>
-           </property>
-           <property name="text">
-            <string>    Scan Spectrum    </string>
-           </property>
-          </widget>
          </item>
         </layout>
        </widget>

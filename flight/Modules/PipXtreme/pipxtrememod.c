@@ -39,8 +39,10 @@
  */
 
 #include <openpilot.h>
-#include <pipxstatus.h>
+#include <oplinkstatus.h>
+#include <pios_rfm22b.h>
 #include <pios_board_info.h>
+#include <oplinksettings.h>
 #include "systemmod.h"
 
 // Private constants
@@ -94,20 +96,20 @@ int32_t PipXtremeModInitialize(void)
 	// Must registers objects here for system thread because ObjectManager started in OpenPilotInit
 
 	// Initialize out status object.
-	PipXStatusInitialize();
-	PipXStatusData pipxStatus;
-	PipXStatusGet(&pipxStatus);
+	OPLinkStatusInitialize();
+	OPLinkStatusData oplinkStatus;
+	OPLinkStatusGet(&oplinkStatus);
 
 	// Get our hardware information.
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 
-	pipxStatus.BoardType= bdinfo->board_type;
-	PIOS_BL_HELPER_FLASH_Read_Description(pipxStatus.Description, PIPXSTATUS_DESCRIPTION_NUMELEM);
-	PIOS_SYS_SerialNumberGetBinary(pipxStatus.CPUSerial);
-	pipxStatus.BoardRevision= bdinfo->board_rev;
+	oplinkStatus.BoardType= bdinfo->board_type;
+	PIOS_BL_HELPER_FLASH_Read_Description(oplinkStatus.Description, OPLINKSTATUS_DESCRIPTION_NUMELEM);
+	PIOS_SYS_SerialNumberGetBinary(oplinkStatus.CPUSerial);
+	oplinkStatus.BoardRevision= bdinfo->board_rev;
 
 	// Update the object
-	PipXStatusSet(&pipxStatus);
+	OPLinkStatusSet(&oplinkStatus);
 
 	// Call the module start function.
 	PipXtremeModStart();
@@ -123,6 +125,9 @@ MODULE_INITCALL(PipXtremeModInitialize, 0)
 static void systemTask(void *parameters)
 {
 	portTickType lastSysTime;
+	uint16_t prev_tx_count = 0;
+	uint16_t prev_rx_count = 0;
+	bool first_time = true;
 
 	/* create all modules thread */
 	MODULE_TASKCREATE_ALL;
@@ -147,6 +152,54 @@ static void systemTask(void *parameters)
 #if defined(PIOS_LED_HEARTBEAT)
 		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 #endif	/* PIOS_LED_HEARTBEAT */
+
+		// Update the PipXstatus UAVO
+		OPLinkStatusData oplinkStatus;
+		uint32_t pairID;
+		OPLinkStatusGet(&oplinkStatus);
+		OPLinkSettingsPairIDGet(&pairID);
+
+		// Get the other device stats.
+		PIOS_RFM2B_GetPairStats(pios_rfm22b_id, oplinkStatus.PairIDs, oplinkStatus.PairSignalStrengths, OPLINKSTATUS_PAIRIDS_NUMELEM);
+
+		// Get the stats from the radio device
+		struct rfm22b_stats radio_stats;
+		PIOS_RFM22B_GetStats(pios_rfm22b_id, &radio_stats);
+
+		// Update the status
+		oplinkStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
+		//oplinkStatus.UAVTalkErrors = data->UAVTalkErrors;
+		oplinkStatus.RxGood = radio_stats.rx_good;
+		oplinkStatus.RxCorrected = radio_stats.rx_corrected;
+		oplinkStatus.RxErrors = radio_stats.rx_error;
+		oplinkStatus.RxMissed = radio_stats.rx_missed;
+		oplinkStatus.TxDropped = radio_stats.tx_dropped; // + data->droppedPackets;
+		oplinkStatus.Resets = radio_stats.resets;
+		oplinkStatus.Timeouts = radio_stats.timeouts;
+		oplinkStatus.RSSI = radio_stats.rssi;
+		oplinkStatus.AFCCorrection = radio_stats.afc_correction;
+		oplinkStatus.LinkQuality = radio_stats.link_quality;
+		if (first_time)
+			first_time = false;
+		else
+		{
+			uint16_t tx_count = radio_stats.tx_byte_count;
+			uint16_t rx_count = radio_stats.rx_byte_count;
+			uint16_t tx_bytes = (tx_count < prev_tx_count) ? (0xffff - prev_tx_count + tx_count) : (tx_count - prev_tx_count);
+			uint16_t rx_bytes = (rx_count < prev_rx_count) ? (0xffff - prev_rx_count + rx_count) : (rx_count - prev_rx_count);
+			oplinkStatus.TXRate = (uint16_t)((float)(tx_bytes * 1000) / SYSTEM_UPDATE_PERIOD_MS);
+			oplinkStatus.RXRate = (uint16_t)((float)(rx_bytes * 1000) / SYSTEM_UPDATE_PERIOD_MS);
+			prev_tx_count = tx_count;
+			prev_rx_count = rx_count;
+		}
+		oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
+		if (radio_stats.connected)
+			LINK_LED_ON;
+		else
+			LINK_LED_OFF;
+
+		// Update the object
+		OPLinkStatusSet(&oplinkStatus);
 
 		// Wait until next period
 		vTaskDelayUntil(&lastSysTime, SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS);

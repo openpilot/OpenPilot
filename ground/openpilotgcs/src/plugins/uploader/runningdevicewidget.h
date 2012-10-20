@@ -39,8 +39,9 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavobjectutilmanager.h"
+#include "uploader_global.h"
 
-class runningDeviceWidget : public QWidget
+class UPLOADER_EXPORT runningDeviceWidget : public QWidget
 {
     Q_OBJECT
 public:

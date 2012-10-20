@@ -38,8 +38,14 @@ OUTDIR := $(TOP)/build/$(TARGET)
 DEBUG ?= NO
 
 # Include objects that are just nice information to show
-DIAGNOSTICS ?= NO
+STACK_DIAGNOSTICS ?= NO
+MIXERSTATUS_DIAGNOSTICS ?= NO
+RATEDESIRED_DIAGNOSTICS ?= NO
+I2C_WDG_STATS_DIAGNOSTICS ?= NO
 DIAG_TASKS ?= NO
+
+#Or just turn on all the above diagnostics. WARNING: This consumes massive amounts of memory.
+ALL_DIGNOSTICS ?=NO
 
 # Set to YES to build a FW version that will erase all flash memory
 ERASE_FLASH ?= NO
@@ -217,6 +223,7 @@ SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/ratedesired.c
 SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
 SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
+SRC += $(OPUAVSYNTHDIR)/airspeedactual.c
 
 endif
 
@@ -438,8 +445,8 @@ CDEFS += -DUSE_$(BOARD)
 ifeq ($(ENABLE_DEBUG_PINS), YES)
 CDEFS += -DPIOS_ENABLE_DEBUG_PINS
 endif
-ifeq ($(ENABLE_AUX_UART), YES)
-CDEFS += -DPIOS_ENABLE_AUX_UART
+ifeq ($(ENABLE_DEBUG_CONSOLE), YES)
+CDEFS += -DPIOS_INCLUDE_DEBUG_CONSOLE
 endif
 ifeq ($(ERASE_FLASH), YES)
 CDEFS += -DERASE_FLASH
@@ -485,11 +492,25 @@ ifeq ($(DEBUG),YES)
 CFLAGS += -DDEBUG
 endif
 
-ifeq ($(DIAGNOSTICS),YES)
-CFLAGS += -DDIAGNOSTICS
+#The following Makefile command, ifneq (, $(filter) $(A), $(B) $(C)) is equivalent 
+# to the pseudocode `if(A== B || A==C)`
+ifneq (,$(filter YES,$(STACK_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
+CFLAGS += -DSTACK_DIAGNOSTICS
 endif
 
-ifeq ($(DIAG_TASKS),YES)
+ifneq (,$(filter YES,$(MIXERSTATUS_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
+CFLAGS += -DMIXERSTATUS_DIAGNOSTICS
+endif
+
+ifneq (,$(filter YES,$(RATEDESIRED_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
+CFLAGS += -DRATEDESIRED_DIAGNOSTICS
+endif
+
+ifneq (,$(filter YES,$(I2C_WDG_STATS_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
+CFLAGS += -DI2C_WDG_STATS_DIAGNOSTICS
+endif
+
+ifneq (,$(filter YES,$(DIAG_TASKS) $(ALL_DIGNOSTICS)))
 CFLAGS += -DDIAG_TASKS
 endif
 

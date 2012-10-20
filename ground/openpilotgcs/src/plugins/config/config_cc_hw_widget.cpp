@@ -101,10 +101,19 @@ void ConfigCCHWWidget::refreshValues()
 void ConfigCCHWWidget::widgetsContentsChanged()
 {
     ConfigTaskWidget::widgetsContentsChanged();
-
-    if (((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_TELEMETRY) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_TELEMETRY)) ||
+    if (((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_DEBUGCONSOLE) &&
+	 (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_DEBUGCONSOLE)) ||
+	((m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_DEBUGCONSOLE) &&
+	 (m_telemetry->cbUsbVcp->currentIndex() == HwSettings::USB_VCPPORT_DEBUGCONSOLE)) ||
+	((m_telemetry->cbUsbVcp->currentIndex() == HwSettings::USB_VCPPORT_DEBUGCONSOLE) &&
+	 (m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_DEBUGCONSOLE)))
+    {
+        enableControls(false);
+        m_telemetry->problems->setText(tr("Warning: you have configured more than one DebugConsole, this currently is not supported"));
+    }
+    else if (((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_TELEMETRY) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_TELEMETRY)) ||
         ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_GPS) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_GPS)) ||
-        ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_COMAUX) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_COMAUX)) ||
+        ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_DEBUGCONSOLE) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_DEBUGCONSOLE)) ||
         ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_COMBRIDGE) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_COMBRIDGE)))
     {
         enableControls(false);

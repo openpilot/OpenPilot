@@ -393,9 +393,11 @@ int32_t PIOS_HMC5883_Test(void)
 /**
  * @brief IRQ Handler
  */
-void PIOS_HMC5883_IRQHandler(void)
+bool PIOS_HMC5883_IRQHandler(void)
 {
 	pios_hmc5883_data_ready = true;
+	
+	return false;
 }
 
 #endif /* PIOS_INCLUDE_HMC5883 */

@@ -6,22 +6,13 @@
     <LastPreferenceCategory>Notify Plugin</LastPreferenceCategory>
     <LastPreferencePage>settings</LastPreferencePage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
-    <SettingsWindowHeight>600</SettingsWindowHeight>
+    <SettingsWindowHeight>700</SettingsWindowHeight>
     <SettingsWindowWidth>800</SettingsWindowWidth>
     <UDPMirror>false</UDPMirror>
     <Description>Wide configuration</Description>
     <Details>Default configuration built for wide screens (17"up)</Details>
     <StyleSheet>wide</StyleSheet>
   </General>
-  <IPconnection>
-    <Current>
-      <arr_1>
-        <Port>1</Port>
-        <UseTCP>0</UseTCP>
-      </arr_1>
-      <size>1</size>
-    </Current>
-  </IPconnection>
   <KeyBindings>
     <size>0</size>
   </KeyBindings>
@@ -955,19 +946,74 @@
       </GPS__PCT__20Mouse>
     </GpsDisplayGadget>
     <HITL>
+      <AeroSimRC__PCT__20HITL>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <addNoise>false</addNoise>
+          <attActCalc>false</attActCalc>
+          <attActHW>false</attActHW>
+          <attActSim>true</attActSim>
+          <attActualEnabled>true</attActualEnabled>
+          <attRawEnabled>true</attRawEnabled>
+          <attRawRate>20</attRawRate>
+          <baroAltRate>50</baroAltRate>
+          <baroAltitudeEnabled>false</baroAltitudeEnabled>
+          <binPath></binPath>
+          <dataPath></dataPath>
+          <gcsReceiverEnabled>true</gcsReceiverEnabled>
+          <gpsPosRate>100</gpsPosRate>
+          <gpsPositionEnabled>false</gpsPositionEnabled>
+          <groundTruthEnabled>true</groundTruthEnabled>
+          <groundTruthRate>100</groundTruthRate>
+          <hostAddress>0.0.0.0</hostAddress>
+          <inPort>40100</inPort>
+          <inputCommand>true</inputCommand>
+          <latitude></latitude>
+          <longitude></longitude>
+          <manualControlEnabled>false</manualControlEnabled>
+          <manualOutput>false</manualOutput>
+          <minOutputPeriod>40</minOutputPeriod>
+          <outPort>40200</outPort>
+          <remoteAddress>127.0.0.1</remoteAddress>
+          <simulatorId>ASimRC</simulatorId>
+          <startSim>false</startSim>
+        </data>
+      </AeroSimRC__PCT__20HITL>
       <Flightgear__PCT__20HITL>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
         </configInfo>
         <data>
+          <addNoise>false</addNoise>
+          <attActCalc>false</attActCalc>
+          <attActHW>false</attActHW>
+          <attActSim>true</attActSim>
+          <attActualEnabled>true</attActualEnabled>
+          <attRawEnabled>true</attRawEnabled>
+          <attRawRate>20</attRawRate>
+          <baroAltRate>50</baroAltRate>
+          <baroAltitudeEnabled>false</baroAltitudeEnabled>
           <binPath>\usr\games\fgfs</binPath>
           <dataPath>\usr\share\games\FlightGear</dataPath>
+          <gcsReceiverEnabled>false</gcsReceiverEnabled>
+          <gpsPosRate>100</gpsPosRate>
+          <gpsPositionEnabled>false</gpsPositionEnabled>
+          <groundTruthEnabled>true</groundTruthEnabled>
+          <groundTruthRate>100</groundTruthRate>
           <hostAddress>127.0.0.1</hostAddress>
           <inPort>9009</inPort>
-          <manual>false</manual>
+          <inputCommand>true</inputCommand>
+          <latitude></latitude>
+          <longitude></longitude>
+          <manualControlEnabled>true</manualControlEnabled>
+          <manualOutput>false</manualOutput>
+          <minOutputPeriod>40</minOutputPeriod>
           <outPort>9010</outPort>
-          <remoteHostAddress>127.0.0.1</remoteHostAddress>
+          <remoteAddress>127.0.0.1</remoteAddress>
           <simulatorId>FG</simulatorId>
           <startSim>true</startSim>
         </data>
@@ -978,51 +1024,37 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <binPath>\home\lafargue\X-Plane 9\X-Plane-i686</binPath>
-          <dataPath>\usr\share\games\FlightGear</dataPath>
-          <hostAddress>127.0.0.3</hostAddress>
+          <addNoise>false</addNoise>
+          <attActCalc>false</attActCalc>
+          <attActHW>false</attActHW>
+          <attActSim>true</attActSim>
+          <attActualEnabled>true</attActualEnabled>
+          <attRawEnabled>true</attRawEnabled>
+          <attRawRate>20</attRawRate>
+          <baroAltRate>50</baroAltRate>
+          <baroAltitudeEnabled>false</baroAltitudeEnabled>
+          <binPath></binPath>
+          <dataPath></dataPath>
+          <gcsReceiverEnabled>false</gcsReceiverEnabled>
+          <gpsPosRate>100</gpsPosRate>
+          <gpsPositionEnabled>false</gpsPositionEnabled>
+          <groundTruthEnabled>true</groundTruthEnabled>
+          <groundTruthRate>100</groundTruthRate>
+          <hostAddress>0.0.0.0</hostAddress>
           <inPort>6756</inPort>
-          <manual>false</manual>
+          <inputCommand>true</inputCommand>
+          <latitude></latitude>
+          <longitude></longitude>
+          <manualControlEnabled>true</manualControlEnabled>
+          <manualOutput>false</manualOutput>
+          <minOutputPeriod>40</minOutputPeriod>
           <outPort>49000</outPort>
-          <remoteHostAddress>127.0.0.1</remoteHostAddress>
+          <remoteAddress>127.0.0.1</remoteAddress>
           <simulatorId>X-Plane</simulatorId>
           <startSim>false</startSim>
         </data>
       </XPlane__PCT__20HITL>
     </HITL>
-    <HITLv2>
-      <default>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <attActCalc>false</attActCalc>
-          <attActHW>false</attActHW>
-          <attActSim>true</attActSim>
-          <attActual>true</attActual>
-          <attRaw>true</attRaw>
-          <attRawRate>20</attRawRate>
-          <gcsReciever>true</gcsReciever>
-          <gpsPosRate>200</gpsPosRate>
-          <gpsPosition>true</gpsPosition>
-          <homeLocRate>0</homeLocRate>
-          <homeLocation>true</homeLocation>
-          <hostAddress>127.0.0.1</hostAddress>
-          <inPort>40100</inPort>
-          <inputCommand>true</inputCommand>
-          <manualControl>false</manualControl>
-          <manualOutput>false</manualOutput>
-          <outPort>40200</outPort>
-          <outputRate>20</outputRate>
-          <remoteAddress>127.0.0.1</remoteAddress>
-          <simulatorId>ASimRC</simulatorId>
-          <sonarAltRate>50</sonarAltRate>
-          <sonarAltitude>false</sonarAltitude>
-          <sonarMaxAlt>@Variant(AAAAh0CgAAA=)</sonarMaxAlt>
-        </data>
-      </default>
-    </HITLv2>
     <LineardialGadget>
       <Accel__PCT__20Horizontal__PCT__20X>
         <configInfo>
@@ -1474,6 +1506,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </Aeroquad__PCT__20__PCT__2B>
+      <CC3D>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/boards/CC3D/CC3D.3ds</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </CC3D>
       <CopterControl>
         <configInfo>
           <locked>false</locked>
@@ -1485,6 +1528,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </CopterControl>
+      <Danker__PCT__27s__PCT__20Quad>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/dankers_quad/dankers_quad.3ds</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Danker__PCT__27s__PCT__20Quad>
       <Easyquad__PCT__20X>
         <configInfo>
           <locked>false</locked>
@@ -1606,6 +1660,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </Joe__PCT__27s__PCT__2014__PCT__22__PCT__20T__PCT__20Quad__PCT__20X>
+      <MattL__PCT__27s__PCT__20Y6>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/multi/mattL_Y6/mattL_Y6.3ds</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </MattL__PCT__27s__PCT__20Y6>
       <Quadcopter>
         <configInfo>
           <locked>false</locked>
@@ -1676,10 +1741,11 @@
           <defaultZoom>2</defaultZoom>
           <mapProvider>GoogleSatellite</mapProvider>
           <maxUpdateRate>2000</maxUpdateRate>
+          <overlayOpacity>1</overlayOpacity>
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>false</useOpenGL>
+          <useOpenGL>true</useOpenGL>
         </data>
       </Google__PCT__20Sat>
       <Memory__PCT__20Only>
@@ -1695,10 +1761,11 @@
           <defaultZoom>2</defaultZoom>
           <mapProvider>GoogleMap</mapProvider>
           <maxUpdateRate>2000</maxUpdateRate>
+          <overlayOpacity>1</overlayOpacity>
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>airplanepip.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>false</useOpenGL>
+          <useOpenGL>true</useOpenGL>
         </data>
       </Memory__PCT__20Only>
       <default>
@@ -1714,10 +1781,11 @@
           <defaultZoom>2</defaultZoom>
           <mapProvider>GoogleMap</mapProvider>
           <maxUpdateRate>2000</maxUpdateRate>
+          <overlayOpacity>1</overlayOpacity>
           <showTileGridLines>false</showTileGridLines>
           <uavSymbol>mapquad.png</uavSymbol>
           <useMemoryCache>true</useMemoryCache>
-          <useOpenGL>false</useOpenGL>
+          <useOpenGL>true</useOpenGL>
         </data>
       </default>
     </OPMapGadget>
@@ -1760,6 +1828,7 @@
           <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
           <latitude>46.6715</latitude>
           <longitude>10.1589</longitude>
+          <openGLEnabled>true</openGLEnabled>
           <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
           <terrainEnabled>false</terrainEnabled>
         </data>
@@ -1776,6 +1845,7 @@
           <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
           <latitude>46.6715</latitude>
           <longitude>10.1589</longitude>
+          <openGLEnabled>true</openGLEnabled>
           <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
           <terrainEnabled>false</terrainEnabled>
         </data>
@@ -2162,7 +2232,7 @@
           <plotCurve0>
             <color>4294901760</color>
             <mathFunction>None</mathFunction>
-            <uavField>X</uavField>
+            <uavField>x</uavField>
             <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2172,7 +2242,7 @@
           <plotCurve1>
             <color>4283782655</color>
             <mathFunction>None</mathFunction>
-            <uavField>Y</uavField>
+            <uavField>y</uavField>
             <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2182,7 +2252,7 @@
           <plotCurve2>
             <color>4283804160</color>
             <mathFunction>None</mathFunction>
-            <uavField>Z</uavField>
+            <uavField>z</uavField>
             <uavObject>Magnetometer</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
@@ -2486,11 +2556,11 @@
                   <type>uavGadget</type>
                 </side1>
                 <splitterOrientation>1</splitterOrientation>
-                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAsQAAAAIAAAEV)</splitterSizes>
+                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAYwAAAAIAAAB7)</splitterSizes>
                 <type>splitter</type>
               </side1>
               <splitterOrientation>1</splitterOrientation>
-              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAArgAAAAIAAAHH)</splitterSizes>
+              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAZgAAAAIAAADf)</splitterSizes>
               <type>splitter</type>
             </side0>
             <side1>
@@ -2520,11 +2590,11 @@
               <type>uavGadget</type>
             </side1>
             <splitterOrientation>1</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABIAAAAAIAAAFV)</splitterSizes>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB1AAAAAIAAAGI)</splitterSizes>
             <type>splitter</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB7wAAAAIAAAEf)</splitterSizes>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACegAAAAIAAAFC)</splitterSizes>
           <type>splitter</type>
         </side0>
         <side1>
@@ -2535,7 +2605,7 @@
           <type>uavGadget</type>
         </side1>
         <splitterOrientation>1</splitterOrientation>
-        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACdgAAAAIAAAMp)</splitterSizes>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAADXgAAAAIAAAQd)</splitterSizes>
         <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
@@ -2543,11 +2613,23 @@
     <Mode2>
       <showToolbars>false</showToolbars>
       <splitter>
-        <classId>ConfigGadget</classId>
-        <gadget>
-          <activeConfiguration>default</activeConfiguration>
-        </gadget>
-        <type>uavGadget</type>
+        <side0>
+          <classId>ConfigGadget</classId>
+          <gadget>
+            <activeConfiguration>default</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
+        </side0>
+        <side1>
+          <classId>UAVObjectBrowser</classId>
+          <gadget>
+            <activeConfiguration>default</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
+        </side1>
+        <splitterOrientation>1</splitterOrientation>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAEeQAAAAIAAAMC)</splitterSizes>
+        <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
     </Mode2>
@@ -2555,36 +2637,39 @@
       <showToolbars>false</showToolbars>
       <splitter>
         <side0>
+          <classId>UAVObjectBrowser</classId>
+          <gadget>
+            <activeConfiguration>default</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
+        </side0>
+        <side1>
           <side0>
-            <classId>UAVObjectBrowser</classId>
-            <gadget>
-              <activeConfiguration>default</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
+            <side0>
+              <classId>LoggingGadget</classId>
+              <type>uavGadget</type>
+            </side0>
+            <side1>
+              <classId>GpsDisplayGadget</classId>
+              <gadget>
+                <activeConfiguration>Flight GPS</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side1>
+            <splitterOrientation>2</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAcAAAAAIAAAHo)</splitterSizes>
+            <type>splitter</type>
           </side0>
           <side1>
             <classId>DebugGadget</classId>
             <type>uavGadget</type>
           </side1>
-          <splitterOrientation>1</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-          <type>splitter</type>
-        </side0>
-        <side1>
-          <side0>
-            <classId>EmptyGadget</classId>
-            <type>uavGadget</type>
-          </side0>
-          <side1>
-            <classId>EmptyGadget</classId>
-            <type>uavGadget</type>
-          </side1>
-          <splitterOrientation>1</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+          <splitterOrientation>2</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB3wAAAAIAAAEp)</splitterSizes>
           <type>splitter</type>
         </side1>
-        <splitterOrientation>2</splitterOrientation>
-        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACJgAAAAIAAADo)</splitterSizes>
+        <splitterOrientation>1</splitterOrientation>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAEvwAAAAIAAAK8)</splitterSizes>
         <type>splitter</type>
       </splitter>
       <version>UAVGadgetManagerV1</version>
@@ -2613,30 +2698,21 @@
         </side0>
         <side1>
           <side0>
-            <side0>
-              <classId>ScopeGadget</classId>
-              <gadget>
-                <activeConfiguration>Attitude</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side0>
-            <side1>
-              <classId>ScopeGadget</classId>
-              <gadget>
-                <activeConfiguration>Uptimes</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side1>
-            <splitterOrientation>2</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABhgAAAAIAAAEO)</splitterSizes>
-            <type>splitter</type>
+            <classId>ScopeGadget</classId>
+            <gadget>
+              <activeConfiguration>Attitude</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
           </side0>
           <side1>
-            <classId>LoggingGadget</classId>
+            <classId>ScopeGadget</classId>
+            <gadget>
+              <activeConfiguration>Uptimes</activeConfiguration>
+            </gadget>
             <type>uavGadget</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAClQAAAAIAAAB3)</splitterSizes>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABhAAAAAIAAAGE)</splitterSizes>
           <type>splitter</type>
         </side1>
         <splitterOrientation>1</splitterOrientation>
@@ -2669,8 +2745,20 @@
         </side0>
         <side1>
           <side0>
-            <classId>EmptyGadget</classId>
-            <type>uavGadget</type>
+            <side0>
+              <classId>PfdQmlGadget</classId>
+              <gadget>
+                <activeConfiguration>NoTerrain</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side0>
+            <side1>
+              <classId>MagicWaypointGadget</classId>
+              <type>uavGadget</type>
+            </side1>
+            <splitterOrientation>1</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB7wAAAAIAAAGU)</splitterSizes>
+            <type>splitter</type>
           </side0>
           <side1>
             <classId>GCSControlGadget</classId>
@@ -2680,7 +2768,7 @@
             <type>uavGadget</type>
           </side1>
           <splitterOrientation>1</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB6AAAAAIAAADC)</splitterSizes>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAADhAAAAAIAAAIX)</splitterSizes>
           <type>splitter</type>
         </side1>
         <splitterOrientation>2</splitterOrientation>
@@ -2739,7 +2827,7 @@
   </UAVGadgetManager>
   <Workspace>
     <AllowTabBarMovement>false</AllowTabBarMovement>
-    <Icon1>:\core\images\ah.png</Icon1>
+    <Icon1>:/core/images/ah.png</Icon1>
     <Icon10>:/core/images/openpilot_logo_64.png</Icon10>
     <Icon2>:/core/images/config.png</Icon2>
     <Icon3>:/core/images/cog.png</Icon3>

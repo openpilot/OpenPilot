@@ -49,6 +49,7 @@ public:
     ConfigGadgetWidget(QWidget *parent = 0);
     ~ConfigGadgetWidget();
     enum widgetTabs {hardware=0, aircraft, input, output, sensors, stabilization, camerastabilization, txpid, pipxtreme, autotune};
+    void startInputWizard();
 
 public slots:
     void onAutopilotConnect();

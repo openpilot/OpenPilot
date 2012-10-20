@@ -1,0 +1,42 @@
+<RCC>
+    <qresource prefix="/setupwizard">
+        <file>resources/bttn-heli-down.png</file>
+        <file>resources/bttn-heli-over.png</file>
+        <file>resources/bttn-heli-up.png</file>
+        <file>resources/bttn-land-down.png</file>
+        <file>resources/bttn-land-over.png</file>
+        <file>resources/bttn-land-up.png</file>
+        <file>resources/bttn-multi-down.png</file>
+        <file>resources/bttn-multi-over.png</file>
+        <file>resources/bttn-multi-up.png</file>
+        <file>resources/bttn-plane-down.png</file>
+        <file>resources/bttn-plane-over.png</file>
+        <file>resources/bttn-plane-up.png</file>
+        <file>resources/bttn-ESC-down.png</file>
+        <file>resources/bttn-ESC-up.png</file>
+        <file>resources/bttn-ppm-down.png</file>
+        <file>resources/bttn-ppm-up.png</file>
+        <file>resources/bttn-pwm-down.png</file>
+        <file>resources/bttn-pwm-up.png</file>
+        <file>resources/bttn-sat-down.png</file>
+        <file>resources/bttn-sat-up.png</file>
+        <file>resources/bttn-sbus-down.png</file>
+        <file>resources/bttn-sbus-up.png</file>
+        <file>resources/bttn-txwizard-off.png</file>
+        <file>resources/bttn-txwizard-on.png</file>
+        <file>resources/connection-diagrams.svg</file>
+        <file>resources/bttn-calculate-down.png</file>
+        <file>resources/bttn-calculate-up.png</file>
+        <file>resources/bttn-turbo-down.png</file>
+        <file>resources/bttn-turbo-up.png</file>
+        <file>resources/multirotor-shapes.svg</file>
+        <file>resources/bttn-illustration-down.png</file>
+        <file>resources/bttn-illustration-up.png</file>
+        <file>resources/bttn-save-down.png</file>
+        <file>resources/bttn-save-up.png</file>
+        <file>resources/bttn-flash-down.png</file>
+        <file>resources/bttn-flash-up.png</file>
+        <file>resources/bttn-upgrade-down.png</file>
+        <file>resources/bttn-upgrade-up.png</file>
+    </qresource>
+</RCC>

@@ -252,7 +252,7 @@ int main(int argc, char **argv)
             QCoreApplication::applicationDirPath()+QLatin1String(SHARE_PATH));
     // keep this in sync with the MainWindow ctor in coreplugin/mainwindow.cpp
     QSettings settings(XmlConfig::XmlSettingsFormat, QSettings::UserScope,
-                                 QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS"));
+                                 QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS_config"));
 
     overrideSettings(settings, argc, argv);
     locale = settings.value("General/OverrideLanguage", locale).toString();

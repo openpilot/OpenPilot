@@ -7,6 +7,10 @@ TOOLS_DIR=$(ROOT_DIR)/tools
 BUILD_DIR=$(ROOT_DIR)/build
 DL_DIR=$(ROOT_DIR)/downloads
 
+# Function for converting an absolute path to one relative
+# to the top of the source tree.
+toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
+
 # Clean out undesirable variables from the environment and command-line
 # to remove the chance that they will cause problems with our build
 define SANITIZE_VAR
@@ -32,6 +36,7 @@ $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),de
 QT_SPEC=win32-g++
 UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/debug/uavobjgenerator.exe"
 UNAME := $(shell uname)
+ARCH := $(shell uname -m)
 ifeq ($(UNAME), Linux)
   QT_SPEC=linux-g++
   UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
@@ -73,6 +78,7 @@ help:
 	@echo "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@echo "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
 	@echo "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
+	@echo "     android_sdk_install  - Install the Android SDK tools"
 	@echo
 	@echo "   [Big Hammer]"
 	@echo "     all                  - Generate UAVObjects, build openpilot firmware and gcs"
@@ -163,10 +169,16 @@ $(BUILD_DIR):
 QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-v1.2.1
 
 .PHONY: qt_sdk_install
+# Choose the appropriate installer based on host architecture
+ifneq (,$(filter $(ARCH), x86_64 amd64))
+# 64-bit
+qt_sdk_install: QT_SDK_FILE := QtSdk-offline-linux-x86_64-v1.2.1.run
+qt_sdk_install: QT_SDK_URL := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/14b2039c-0e1f-4774-a4f2-9aa60b6d5313/Qt_SDK_Lin64_offline
+else
+# 32-bit
 qt_sdk_install: QT_SDK_URL  := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/8ea74da4-fec1-4277-8b26-c58cc82e204b/Qt_SDK_Lin32_offline
 qt_sdk_install: QT_SDK_FILE := QtSdk-offline-linux-x86-v1.2.1.run
-#qt_sdk_install: QT_SDK_URL  := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/c365bbf5-c2b9-4dda-9c1f-34b2c8d07785/Qt_SDK_Lin32_offline_v1_1_2
-#qt_sdk_install: QT_SDK_FILE := Qt_SDK_Lin32_offline_v1_1_2_en.run
+endif
 # order-only prereq on directory existance:
 qt_sdk_install : | $(DL_DIR) $(TOOLS_DIR)
 qt_sdk_install: qt_sdk_clean
@@ -428,6 +440,32 @@ dfuutil_clean:
 	$(V0) @echo " CLEAN        $(DFUUTIL_DIR)"
 	$(V1) [ ! -d "$(DFUUTIL_DIR)" ] || $(RM) -r "$(DFUUTIL_DIR)"
 
+# see http://developer.android.com/sdk/ for latest versions
+ANDROID_SDK_DIR := $(TOOLS_DIR)/android-sdk-linux
+.PHONY: android_sdk_install
+android_sdk_install: ANDROID_SDK_URL  := http://dl.google.com/android/android-sdk_r20.0.3-linux.tgz
+android_sdk_install: ANDROID_SDK_FILE := $(notdir $(ANDROID_SDK_URL))
+# order-only prereq on directory existance:
+android_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
+android_sdk_install: android_sdk_clean
+        # download the source only if it's newer than what we already have
+	$(V0) @echo " DOWNLOAD     $(ANDROID_SDK_URL)"
+	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ANDROID_SDK_URL)"
+
+        # binary only release so just extract it
+	$(V0) @echo " EXTRACT      $(ANDROID_SDK_FILE)"
+	$(V1) tar -C $(TOOLS_DIR) -xf "$(DL_DIR)/$(ANDROID_SDK_FILE)"
+
+.PHONY: android_sdk_clean
+android_sdk_clean:
+	$(V0) @echo " CLEAN        $(ANDROID_SDK_DIR)"
+	$(V1) [ ! -d "$(ANDROID_SDK_DIR)" ] || $(RM) -r $(ANDROID_SDK_DIR)
+
+.PHONY: android_sdk_update
+android_sdk_update:
+	$(V0) @echo " UPDATE       $(ANDROID_SDK_DIR)"
+	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-16,addon-google_apis-google-16
+
 ##############################
 #
 # Set up paths to tools
@@ -453,6 +491,15 @@ ifeq ($(shell [ -d "$(OPENOCD_DIR)" ] && echo "exists"), exists)
 else
   # not installed, hope it's in the path...
   OPENOCD ?= openocd
+endif
+
+ifeq ($(shell [ -d "$(ANDROID_SDK_DIR)" ] && echo "exists"), exists)
+  ANDROID := $(ANDROID_SDK_DIR)/tools/android
+  ANDROID_DX := $(ANDROID_SDK_DIR)/platform-tools/dx
+else
+  # not installed, hope it's in the path...
+  ANDROID ?= android
+  ANDROID_DX ?= dx
 endif
 
 ##############################
@@ -511,6 +558,154 @@ uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
 uavobjects_clean:
 	$(V0) @echo " CLEAN      $@"
 	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
+
+################################
+#
+# Android GCS related components
+#
+################################
+
+
+# Build the output directory for the Android GCS build
+ANDROIDGCS_OUT_DIR := $(BUILD_DIR)/androidgcs
+$(ANDROIDGCS_OUT_DIR):
+	$(V1) mkdir -p $@
+
+# Build the asset directory for the android assets
+ANDROIDGCS_ASSETS_DIR := $(ANDROIDGCS_OUT_DIR)/assets
+$(ANDROIDGCS_ASSETS_DIR)/uavos:
+	$(V1) mkdir -p $@
+
+ifeq ($(V), 1)
+ANT_QUIET :=
+ANDROID_SILENT := 
+else
+ANT_QUIET := -q
+ANDROID_SILENT := -s
+endif
+.PHONY: androidgcs
+androidgcs: uavo-collections_java
+	$(V0) @echo " ANDROID   $(call toprel, $(ANDROIDGCS_OUT_DIR))"
+	$(V1) mkdir -p $(ANDROIDGCS_OUT_DIR)
+	$(V1) $(ANDROID) $(ANDROID_SILENT) update project --target 'Google Inc.:Google APIs:16' --name androidgcs --path ./androidgcs
+	$(V1) ant -f ./androidgcs/build.xml \
+		$(ANT_QUIET) \
+		-Dout.dir="../$(call toprel, $(ANDROIDGCS_OUT_DIR)/bin)" \
+		-Dgen.absolute.dir="$(ANDROIDGCS_OUT_DIR)/gen" \
+		debug
+
+.PHONY: androidgcs_clean
+androidgcs_clean:
+	$(V0) @echo " CLEAN      $@"
+	$(V1) [ ! -d "$(ANDROIDGCS_OUT_DIR)" ] || $(RM) -r "$(ANDROIDGCS_OUT_DIR)"
+
+# We want to take snapshots of the UAVOs at each point that they change
+# to allow the GCS to be compatible with as many versions as possible.
+#
+# Find the git hashes of each commit that changes uavobjects with:
+#   git log --format=%h -- shared/uavobjectdefinition/ | head -n 2
+UAVO_GIT_VERSIONS := 684620d 43f85d9
+
+# All versions includes a pseudo collection called "working" which represents
+# the UAVOs in the source tree
+UAVO_ALL_VERSIONS := $(UAVO_GIT_VERSIONS) srctree
+
+# This is where the UAVO collections are stored
+UAVO_COLLECTION_DIR := $(BUILD_DIR)/uavo-collections
+
+# $(1) git hash of a UAVO snapshot
+define UAVO_COLLECTION_GIT_TEMPLATE
+
+# Make the output directory that will contain all of the synthetics for the
+# uavo collection referenced by the git hash $(1)
+$$(UAVO_COLLECTION_DIR)/$(1):
+	$$(V1) mkdir -p $$(UAVO_COLLECTION_DIR)/$(1)
+
+# Extract the snapshot of shared/uavobjectdefinition from git hash $(1)
+$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml.tar: | $$(UAVO_COLLECTION_DIR)/$(1)
+$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml.tar:
+	$$(V0) @echo " UAVOTAR   $(1)"
+	$$(V1) git archive $(1) -o $$@ -- shared/uavobjectdefinition/
+
+# Extract the uavo xml files from our snapshot
+$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml: $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml.tar
+	$$(V0) @echo " UAVOUNTAR $(1)"
+	$$(V1) rm -rf $$@
+	$$(V1) mkdir -p $$@
+	$$(V1) tar -C $$(call toprel, $$@) -xf $$(call toprel, $$<) || rm -rf $$@
+endef
+
+# Map the current working directory into the set of UAVO collections
+$(UAVO_COLLECTION_DIR)/srctree:
+	$(V1) mkdir -p $@
+
+$(UAVO_COLLECTION_DIR)/srctree/uavo-xml: | $(UAVO_COLLECTION_DIR)/srctree
+$(UAVO_COLLECTION_DIR)/srctree/uavo-xml: $(UAVOBJ_XML_DIR)
+	$(V1) ln -sf $(ROOT_DIR) $(UAVO_COLLECTION_DIR)/srctree/uavo-xml
+
+# $(1) git hash (or symbolic name) of a UAVO snapshot
+define UAVO_COLLECTION_BUILD_TEMPLATE
+
+# This leaves us with a (broken) symlink that points to the full sha1sum of the collection
+$$(UAVO_COLLECTION_DIR)/$(1)/uavohash: $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml
+        # Compute the sha1 hash for this UAVO collection
+        # The sed bit truncates the UAVO hash to 16 hex digits
+	$$(V1) python $$(ROOT_DIR)/make/scripts/version-info.py \
+			--path=$$(ROOT_DIR) \
+			--uavodir=$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition \
+			--format='$$$${UAVOSHA1TXT}' | \
+		sed -e 's|\(................\).*|\1|' > $$@
+
+	$$(V0) @echo " UAVOHASH  $(1) ->" $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
+
+# Generate the java uavobjects for this UAVO collection
+$$(UAVO_COLLECTION_DIR)/$(1)/java-build/java: $$(UAVO_COLLECTION_DIR)/$(1)/uavohash
+	$$(V0) @echo " UAVOJAVA  $(1)   " $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
+	$$(V1) mkdir -p $$@
+	$$(V1) ( \
+		cd $$(UAVO_COLLECTION_DIR)/$(1)/java-build && \
+		$$(UAVOBJGENERATOR) -java $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition $$(ROOT_DIR) ; \
+	)
+
+# Build a jar file for this UAVO collection
+$$(UAVO_COLLECTION_DIR)/$(1)/java-build/uavobjects.jar: | $$(ANDROIDGCS_ASSETS_DIR)/uavos
+$$(UAVO_COLLECTION_DIR)/$(1)/java-build/uavobjects.jar: $$(UAVO_COLLECTION_DIR)/$(1)/java-build/java
+	$$(V0) @echo " UAVOJAR   $(1)   " $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
+	$$(V1) ( \
+		HASH=$$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash) && \
+		cd $$(UAVO_COLLECTION_DIR)/$(1)/java-build && \
+		javac java/*.java \
+		   $$(ROOT_DIR)/androidgcs/src/org/openpilot/uavtalk/UAVDataObject.java \
+		   $$(ROOT_DIR)/androidgcs/src/org/openpilot/uavtalk/UAVObject*.java \
+		   $$(ROOT_DIR)/androidgcs/src/org/openpilot/uavtalk/UAVMetaObject.java \
+		   -d . && \
+		find ./org/openpilot/uavtalk/uavobjects -type f -name '*.class' > classlist.txt && \
+		jar cf tmp_uavobjects.jar @classlist.txt && \
+		$$(ANDROID_DX) \
+			--dex \
+			--output $$(ANDROIDGCS_ASSETS_DIR)/uavos/$$$${HASH}.jar \
+			tmp_uavobjects.jar && \
+		ln -sf $$(ANDROIDGCS_ASSETS_DIR)/uavos/$$$${HASH}.jar uavobjects.jar \
+	)
+
+endef
+
+# One of these for each element of UAVO_GIT_VERSIONS so we can extract the UAVOs from git
+$(foreach githash, $(UAVO_GIT_VERSIONS), $(eval $(call UAVO_COLLECTION_GIT_TEMPLATE,$(githash))))
+
+# One of these for each UAVO_ALL_VERSIONS which includes the ones in the srctree
+$(foreach githash, $(UAVO_ALL_VERSIONS), $(eval $(call UAVO_COLLECTION_BUILD_TEMPLATE,$(githash))))
+
+.PHONY: uavo-collections_java
+uavo-collections_java: $(foreach githash, $(UAVO_ALL_VERSIONS), $(UAVO_COLLECTION_DIR)/$(githash)/java-build/uavobjects.jar)
+
+.PHONY: uavo-collections
+uavo-collections: uavo-collections_java
+
+.PHONY: uavo-collections_clean
+uavo-collections_clean:
+	$(V0) @echo " CLEAN  $(UAVO_COLLECTION_DIR)"
+	$(V1) [ ! -d "$(UAVO_COLLECTION_DIR)" ] || $(RM) -r $(UAVO_COLLECTION_DIR)
 
 ##############################
 #
@@ -774,6 +969,11 @@ sim_osx_%: uavobjects_flight
 # Packaging components
 #
 ##############################
+
 .PHONY: package
 package:
 	$(V1) cd $@ && $(MAKE) --no-print-directory $@
+
+.PHONY: package_resources
+package_resources:
+	$(V1) cd package && $(MAKE) --no-print-directory opfw_resource

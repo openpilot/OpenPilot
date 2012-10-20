@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>965</width>
-    <height>797</height>
+    <height>687</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -505,9 +505,6 @@
        <string>Basic</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
-       <property name="spacing">
-        <number>6</number>
-       </property>
        <property name="margin">
         <number>0</number>
        </property>
@@ -603,24 +600,15 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>935</width>
-            <height>714</height>
+            <width>937</width>
+            <height>595</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_12" stretch="0,0,0,0">
            <property name="spacing">
             <number>12</number>
            </property>
-           <property name="leftMargin">
-            <number>12</number>
-           </property>
-           <property name="topMargin">
-            <number>5</number>
-           </property>
-           <property name="rightMargin">
-            <number>12</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>12</number>
            </property>
            <item>
@@ -640,7 +628,7 @@
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>181</height>
+               <height>195</height>
               </size>
              </property>
              <property name="title">
@@ -3496,7 +3484,7 @@ value as the Kp.</string>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>181</height>
+               <height>195</height>
               </size>
              </property>
              <property name="palette">
@@ -6866,9 +6854,6 @@ border-radius: 5;</string>
        <string>Advanced</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_10">
-       <property name="spacing">
-        <number>6</number>
-       </property>
        <property name="margin">
         <number>0</number>
        </property>
@@ -6952,17 +6937,14 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>935</width>
-            <height>714</height>
+            <width>540</width>
+            <height>663</height>
            </rect>
           </property>
           <property name="autoFillBackground">
            <bool>true</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_16">
-           <property name="spacing">
-            <number>6</number>
-           </property>
            <property name="margin">
             <number>12</number>
            </property>
@@ -6977,7 +6959,7 @@ border-radius: 5;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>210</height>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -10299,7 +10281,7 @@ Then lower the value by 20% or so.</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>170</height>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -13429,7 +13411,7 @@ border-radius: 5;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>195</height>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -16792,9 +16774,6 @@ border-radius: 5;</string>
        <string>Expert</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
-       <property name="spacing">
-        <number>6</number>
-       </property>
        <property name="margin">
         <number>0</number>
        </property>
@@ -16881,14 +16860,11 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>935</width>
-            <height>714</height>
+            <width>802</width>
+            <height>607</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
-           <property name="spacing">
-            <number>6</number>
-           </property>
            <property name="margin">
             <number>12</number>
            </property>
@@ -16903,7 +16879,7 @@ border-radius: 5;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>150</height>
+               <height>0</height>
               </size>
              </property>
              <property name="autoFillBackground">
@@ -19508,7 +19484,7 @@ border-radius: 5;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>180</height>
+               <height>0</height>
               </size>
              </property>
              <property name="title">
@@ -21916,7 +21892,7 @@ border-radius: 5;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>150</height>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">

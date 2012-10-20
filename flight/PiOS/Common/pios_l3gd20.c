@@ -353,7 +353,7 @@ uint8_t PIOS_L3GD20_Test(void)
 /**
 * @brief IRQ Handler.  Read all the data from onboard buffer
 */
-void PIOS_L3GD20_IRQHandler(void)
+bool PIOS_L3GD20_IRQHandler(void)
 {
 	l3gd20_irq++;
 
@@ -363,11 +363,11 @@ void PIOS_L3GD20_IRQHandler(void)
 
 	/* This code duplicates ReadGyros above but uses ClaimBusIsr */
 	if(PIOS_L3GD20_ClaimBusIsr() != 0)
-		return;
+		return false;
 	
 	if(PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
 		PIOS_L3GD20_ReleaseBus();
-		return;
+		return false;
 	}
 	
 	PIOS_L3GD20_ReleaseBus();
@@ -375,7 +375,10 @@ void PIOS_L3GD20_IRQHandler(void)
 	memcpy((uint8_t *) &(data.gyro_x), &rec[1], 6);
 	data.temperature = PIOS_L3GD20_GetReg(PIOS_L3GD20_OUT_TEMP);
 	
-	xQueueSend(dev->queue, (void *) &data, 0);
+	portBASE_TYPE xHigherPriorityTaskWoken;
+	xQueueSendToBackFromISR(dev->queue, (void *) &data, &xHigherPriorityTaskWoken);
+	
+	return xHigherPriorityTaskWoken == pdTRUE;
 }
 
 #endif /* L3GD20 */

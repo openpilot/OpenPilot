@@ -84,7 +84,7 @@ struct overosync {
 
 struct overosync *overosync;
 
-static void PIOS_OVERO_IRQHandler();
+static bool PIOS_OVERO_IRQHandler();
 
 static const struct pios_exti_cfg pios_exti_overo_cfg __exti_config = {
 	.vector = PIOS_OVERO_IRQHandler,
@@ -123,7 +123,7 @@ static const struct pios_exti_cfg pios_exti_overo_cfg __exti_config = {
  * Overo deasserting the CS line.  We don't want to spin that long in an
  * isr
  */
-void PIOS_OVERO_IRQHandler()
+bool PIOS_OVERO_IRQHandler()
 {
 	// transmitData must not block to get semaphore for when we get out of
 	// frame and transaction is still running here.  -1 indicates the transaction
@@ -131,6 +131,8 @@ void PIOS_OVERO_IRQHandler()
 	// error occurred.  This shouldn't happen.  Race condition?
 	if(transmitData() == -1)
 		overosync->framesync_error++;
+
+	return false;
 }
 
 /**

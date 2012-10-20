@@ -326,3 +326,13 @@ void ModeManager::setFocusToCurrentMode()
             widget->setFocus();
     }
 }
+
+void ModeManager::triggerAction(const QString &actionId)
+{
+    foreach(Command * command, m_actions.keys()){
+        if(command->action()->objectName() == actionId) {
+            command->action()->trigger();
+            break;
+        }
+    }
+}

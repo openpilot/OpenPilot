@@ -66,8 +66,8 @@ extern TTime timex;
 
 extern void PIOS_Video_Init(const struct pios_video_cfg * cfg);
 uint16_t PIOS_Video_GetOSDLines(void);
-extern void PIOS_Hsync_ISR();
-extern void PIOS_Vsync_ISR();
+extern bool PIOS_Hsync_ISR();
+extern bool PIOS_Vsync_ISR();
 
 // First OSD line
 #define GRAPHICS_LINE 32

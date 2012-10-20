@@ -85,7 +85,7 @@ void swap_buffers()
         SWAP_BUFFS(tmp, disp_buffer_level, draw_buffer_level);
 }
 
-void PIOS_Hsync_ISR() {
+bool PIOS_Hsync_ISR() {
 
 	if(dev_cfg->hsync->pin.gpio->IDR & dev_cfg->hsync->pin.init.GPIO_Pin) {
 		//rising
@@ -117,9 +117,11 @@ void PIOS_Hsync_ISR() {
 			DMA_SetCurrDataCounter(dev_cfg->mask.dma.tx.channel,BUFFER_LINE_LENGTH);
 		}
 	}
+
+	return false;
 }
 
-void PIOS_Vsync_ISR() {
+bool PIOS_Vsync_ISR() {
 	static portBASE_TYPE xHigherPriorityTaskWoken;
 	//PIOS_LED_Toggle(LED3);
 
@@ -137,6 +139,8 @@ void PIOS_Vsync_ISR() {
 		}
 	}
 	portEND_SWITCHING_ISR(xHigherPriorityTaskWoken); 	//portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
+
+	return xHigherPriorityTaskWoken == pdTRUE;
 }
 
 uint16_t PIOS_Video_GetOSDLines(void) {

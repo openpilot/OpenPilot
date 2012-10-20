@@ -434,7 +434,7 @@ int32_t PIOS_BMA180_Test()
  * @brief IRQ Handler.  Read data from the BMA180 FIFO and push onto a local fifo.
  */
 int32_t bma180_irqs = 0;
-void PIOS_BMA180_IRQHandler(void)
+bool PIOS_BMA180_IRQHandler(void)
 {
 	bma180_irqs++;
 	
@@ -443,7 +443,7 @@ void PIOS_BMA180_IRQHandler(void)
 
 	// If we can't get the bus then just move on for efficiency
 	if(PIOS_BMA180_ClaimBusISR() != 0) {
-		return; // Something else is using bus, miss this data
+		return false; // Something else is using bus, miss this data
 	}
 		
 	PIOS_SPI_TransferBlock(dev->spi_id,pios_bma180_req_buf,(uint8_t *) pios_bma180_dmabuf, 
@@ -457,7 +457,7 @@ void PIOS_BMA180_IRQHandler(void)
 	
 	// Must not return before releasing bus
 	if(fifoBuf_getFree(&dev->fifo) < sizeof(data))
-		return;
+		return false;
 	
 	// Bottom two bits indicate new data and are constant zeros.  Don't right 
 	// shift because it drops sign bit
@@ -470,7 +470,8 @@ void PIOS_BMA180_IRQHandler(void)
 	data.temperature = pios_bma180_dmabuf[7];
 	
 	fifoBuf_putData(&dev->fifo, (uint8_t *) &data, sizeof(data));
-
+	
+	return false;
 }
 
 #endif /* PIOS_INCLUDE_BMA180 */

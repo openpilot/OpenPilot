@@ -158,7 +158,7 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
     {
         myDevice->lblGitTag->setText(onBoardDescription.gitHash);
         myDevice->lblBuildDate->setText(onBoardDescription.gitDate.insert(4,"-").insert(7,"-"));
-        if(onBoardDescription.gitTag.startsWith("release",Qt::CaseInsensitive))
+        if (onBoardDescription.gitTag.compare("master") == 0)
         {
             myDevice->lblDescription->setText(QString("Firmware tag: ")+onBoardDescription.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
@@ -188,7 +188,7 @@ bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
     {
         myDevice->lblGitTagL->setText(LoadedDescription.gitHash);
         myDevice->lblBuildDateL->setText( LoadedDescription.gitDate.insert(4,"-").insert(7,"-"));
-        if(LoadedDescription.gitTag.startsWith("release",Qt::CaseInsensitive))
+        if (LoadedDescription.gitTag.compare("master") == 0)
         {
             myDevice->lblDescritpionL->setText(LoadedDescription.gitTag);
             myDevice->description->setText(LoadedDescription.gitTag);
@@ -302,7 +302,7 @@ void deviceWidget::loadFirmware()
             myDevice->statusLabel->setText(tr("The board has newer firmware than loaded. Are you sure you want to update?"));
             px.load(QString(":/uploader/images/warning.svg"));
         }
-        else if(!LoadedDescription.gitTag.startsWith("release",Qt::CaseInsensitive))
+        else if (LoadedDescription.gitTag.compare("master"))
         {
             myDevice->statusLabel->setText(tr("The loaded firmware is untagged or custom build. Update only if it was received from a trusted source (official website or your own build)"));
             px.load(QString(":/uploader/images/warning.svg"));

@@ -514,11 +514,17 @@ all_ground: openpilotgcs
 gcs: openpilotgcs
 gcs_clean: openpilotgcs_clean
 
+ifeq ($(V), 1)
+GCS_SILENT := 
+else
+GCS_SILENT := silent
+endif
+
 .PHONY: openpilotgcs
 openpilotgcs:  uavobjects_gcs
 	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
 	$(V1) ( cd $(BUILD_DIR)/ground/$@ && \
-	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+=$(GCS_BUILD_CONF) $(GCS_QMAKE_OPTS) && \
+	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) && \
 	  $(MAKE) -w ; \
 	)
 

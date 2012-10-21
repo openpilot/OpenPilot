@@ -17,6 +17,7 @@
 #ifndef PFDQMLGADGETWIDGET_H_
 #define PFDQMLGADGETWIDGET_H_
 
+#include "uavobjectmanager.h"
 #include "pfdqmlgadgetconfiguration.h"
 #include <QtDeclarative/qdeclarativeview.h>
 
@@ -68,6 +69,9 @@ signals:
     void altitudeChanged(double arg);
 
 private:
+    UAVObjectManager *m_objManager;
+    void exportUAVOInstance(const QString &objectName, int instId);
+
     QString m_qmlFileName;
     QString m_earthFile;
     bool m_openGLEnabled;

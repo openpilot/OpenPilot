@@ -149,7 +149,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 
     // Create the timer that is used to timeout the connection to the OPLink.
     oplinkTimeout = new QTimer(this);
-    connect(oplinkTimeout, SIGNAL(timeout()),this,SLOT(onOPLinktremeDisconnect()));
+    connect(oplinkTimeout, SIGNAL(timeout()), this, SLOT(onOPLinkDisconnect()));
     oplinkConnected = false;
 }
 

@@ -52,6 +52,9 @@ private slots:
     void timeout();
     void startAccelCalibration();
     void openHelp();
+    void doStartSixPointCalibration();
+    void doGetSixPointCalibrationMeasurement(UAVObject * obj);
+    void savePositionData();
 
 private:
     Ui_ccattitude *ui;
@@ -62,13 +65,26 @@ private:
     int accelUpdates;
     int gyroUpdates;
 
-    QList<double> x_accum, y_accum, z_accum;
-    QList<double> x_gyro_accum, y_gyro_accum, z_gyro_accum;
+    QList<double> gyro_accum_x;
+    QList<double> gyro_accum_y;
+    QList<double> gyro_accum_z;
+    QList<double> accel_accum_x;
+    QList<double> accel_accum_y;
+    QList<double> accel_accum_z;
+
+    double accel_data_x[6], accel_data_y[6], accel_data_z[6];
+
+    QMutex sensorsUpdateLock;
+    bool collectingData;
+    int position;
 
     static const int NUM_SENSOR_UPDATES = 300;
-    static const float ACCEL_SCALE = 0.004f * 9.81f;
+
+    double boardRotation[3];
 protected:
     virtual void enableControls(bool enable);
+
+    void computeScaleBias();
 
 };
 

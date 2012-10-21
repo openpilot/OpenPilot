@@ -94,7 +94,7 @@ void OsgEarthItem::geometryChanged(const QRectF &newGeometry, const QRectF &oldG
     Q_UNUSED(newGeometry);
 
     //Dynamic gyometry changes are not supported yet,
-    //terrain is rendered to fixed geompetry and scalled for now
+    //terrain is rendered to fixed geometry and scaled for now
 
     /*
     qDebug() << Q_FUNC_INFO << newGeometry;

@@ -21,6 +21,7 @@
 			<elementname>Usb2ComBridge</elementname>
 			<elementname>OveroSync</elementname>
 			<elementname>Autotune</elementname>
+			<elementname>FixedWingPathFollower</elementname>
 			<elementname>EventDispatcher</elementname>
 		</elementnames>
 	</field> 
@@ -44,6 +45,7 @@
 			<elementname>Usb2ComBridge</elementname>
 			<elementname>OveroSync</elementname>
 			<elementname>Autotune</elementname>
+			<elementname>FixedWingPathFollower</elementname>
 			<elementname>EventDispatcher</elementname>
 		</elementnames>
 		<options>
@@ -71,6 +73,7 @@
 			<elementname>Usb2ComBridge</elementname>
 			<elementname>OveroSync</elementname>
 			<elementname>Autotune</elementname>
+			<elementname>FixedWingPathFollower</elementname>
 			<elementname>EventDispatcher</elementname>
 		</elementnames>
 	</field> 

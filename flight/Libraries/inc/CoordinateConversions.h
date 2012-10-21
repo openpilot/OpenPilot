@@ -30,6 +30,8 @@
 #ifndef COORDINATECONVERSIONS_H_
 #define COORDINATECONVERSIONS_H_
 
+#include <stdbool.h>
+
     // ****** convert Lat,Lon,Alt to ECEF  ************
 void LLA2ECEF(float LLA[3], float ECEF[3]);
 
@@ -49,6 +51,9 @@ void RPY2Quaternion(const float rpy[3], float q[4]);
 
 	//** Find Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
 void Quaternion2R(float q[4], float Rbe[3][3]);
+
+//** Find Rbe, that rotates a vector from earth fixed to body frame, from Tait-Bryan angles **
+void Euler2R(float rpy[3], float Rbe[3][3]); //WHAT TO DO ABOUT ALL THE CONST? SHOULD EVERY INPUT BE A CONST?
 
 	// ****** Express LLA in a local NED Base Frame ********
 void LLA2Base(float LLA[3], float BaseECEF[3], float Rne[3][3], float NED[3]);
@@ -74,6 +79,6 @@ float VectorMagnitude(const float v[3]);
 void quat_inverse(float q[4]);
 void quat_copy(const float q[4], float qnew[4]);
 void quat_mult(const float q1[4], const float q2[4], float qout[4]);
-void rot_mult(float R[3][3], const float vec[3], float vec_out[3]);
+void rot_mult(float R[3][3], const float vec[3], float vec_out[3], bool transpose);
 
 #endif // COORDINATECONVERSIONS_H_

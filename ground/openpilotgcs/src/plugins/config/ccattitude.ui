@@ -110,8 +110,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>750</width>
-            <height>466</height>
+            <width>759</width>
+            <height>679</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -143,11 +143,14 @@ margin:1px;</string>
               </item>
               <item row="1" column="1">
                <widget class="QSpinBox" name="rollBias">
+                <property name="suffix">
+                 <string>e-2</string>
+                </property>
                 <property name="minimum">
-                 <number>-180</number>
+                 <number>-18000</number>
                 </property>
                 <property name="maximum">
-                 <number>180</number>
+                 <number>18000</number>
                 </property>
                </widget>
               </item>
@@ -166,11 +169,14 @@ margin:1px;</string>
               </item>
               <item row="1" column="5">
                <widget class="QSpinBox" name="yawBias">
+                <property name="suffix">
+                 <string>e-2</string>
+                </property>
                 <property name="minimum">
-                 <number>-180</number>
+                 <number>-18000</number>
                 </property>
                 <property name="maximum">
-                 <number>180</number>
+                 <number>18000</number>
                 </property>
                </widget>
               </item>
@@ -223,11 +229,14 @@ margin:1px;</string>
               </item>
               <item row="1" column="3">
                <widget class="QSpinBox" name="pitchBias">
+                <property name="suffix">
+                 <string>e-2</string>
+                </property>
                 <property name="minimum">
-                 <number>-90</number>
+                 <number>-9000</number>
                 </property>
                 <property name="maximum">
-                 <number>90</number>
+                 <number>9000</number>
                 </property>
                </widget>
               </item>
@@ -283,6 +292,12 @@ margin:1px;</string>
                 </item>
                 <item>
                  <widget class="QLabel" name="label">
+                  <property name="minimumSize">
+                   <size>
+                    <width>366</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string>Place aircraft very flat, and then click level to compute the accelerometer and gyro bias</string>
                   </property>
@@ -397,6 +412,54 @@ arming it in that case!</string>
             </widget>
            </item>
            <item>
+            <widget class="QTextEdit" name="sixPointCalibInstructions">
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="toolTip">
+              <string>Six Point Calibration instructions</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_3">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>250</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="title">
+              <string>Six point accelerometer calibration</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="1" column="1">
+               <widget class="QPushButton" name="sixPointsStart">
+                <property name="text">
+                 <string>Start</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QPushButton" name="sixPointsSave">
+                <property name="text">
+                 <string>Save Position</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer_2">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -489,6 +552,12 @@ arming it in that case!</string>
         <size>
          <width>0</width>
          <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>32</height>
         </size>
        </property>
        <property name="toolTip">

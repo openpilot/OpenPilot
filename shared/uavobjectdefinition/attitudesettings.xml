@@ -1,16 +1,18 @@
 <xml>
     <object name="AttitudeSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref Attitude module used on CopterControl</description>
-        <field name="AccelBias" units="lsb" type="int16" elementnames="X,Y,Z" defaultvalue="0"/>
-        <field name="GyroBias" units="deg/s * 100" type="int16" elementnames="X,Y,Z" defaultvalue="0"/>
-        <field name="BoardRotation" units="deg" type="int16" elementnames="Roll,Pitch,Yaw" defaultvalue="0,0,0"/>
+        <field name="AccelBias" units="[-]*1000" type="int16" elementnames="X_s,Y_s,Z_s" defaultvalue="0"/>
+        <field name="AccelScale" units="[-]*10000" type="int16" elementnames="X_s,Y_s,Z_s" defaultvalue="10000"/>
+        <field name="GyroBias" units="deg/s * 100" type="int16" elementnames="X_b,Y_b,Z_b" defaultvalue="0"/>
+        <field name="BoardRotation" units="deg * 100" type="int16" elementnames="Roll,Pitch,Yaw" defaultvalue="0,0,0"/>
         <field name="GyroGain" units="(rad/s)/lsb" type="float" elements="1" defaultvalue="0.42"/>
         <field name="AccelKp" units="channel" type="float" elements="1" defaultvalue="0.05"/>
         <field name="AccelKi" units="channel" type="float" elements="1" defaultvalue="0.0001"/>
         <field name="YawBiasRate" units="channel" type="float" elements="1" defaultvalue="0.000001"/>
-	<field name="ZeroDuringArming" units="channel" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
-	<field name="BiasCorrectGyro" units="channel" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
-	<field name="TrimFlight" units="channel" type="enum" elements="1" options="NORMAL,START,LOAD" defaultvalue="NORMAL"/>
+        <field name="ZeroDuringArming" units="channel" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
+        <field name="BiasCorrectGyro" units="channel" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
+        <field name="FilterChoice" units="channel" type="enum" elements="1" options="CCC,PREMERLANI,PREMERLANI_GPS" defaultvalue="CCC"/>
+        <field name="TrimFlight" units="channel" type="enum" elements="1" options="NORMAL,START,LOAD" defaultvalue="NORMAL"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

@@ -58,7 +58,9 @@ void LoggingGadgetWidget::setPlugin(LoggingPlugin * p)
     connect(m_logging->playButton, SIGNAL(clicked()), scpPlugin, SLOT(startPlotting()));
     connect(m_logging->pauseButton,SIGNAL(clicked()),p->getLogfile(),SLOT(pauseReplay()));
     connect(m_logging->pauseButton, SIGNAL(clicked()), scpPlugin, SLOT(stopPlotting()));
-    connect(m_logging->playbackSpeed,SIGNAL(valueChanged(double)),p->getLogfile(),SLOT(setReplaySpeed(double)));
+    connect(m_logging->playbackSpeedSpinBox,SIGNAL(valueChanged(double)),p->getLogfile(),SLOT(setReplaySpeed(double)));
+    connect(m_logging->jumpToTimeSpinBox,SIGNAL(valueChanged(double)),p->getLogfile(),SLOT(setReplayTime(double)));
+
     void pauseReplay();
     void resumeReplay();
 }

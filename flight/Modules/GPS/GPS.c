@@ -34,17 +34,19 @@
 #include "GPS.h"
 
 #include "gpsposition.h"
+#include "airspeedactual.h"
 #include "homelocation.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
 #include "gpsvelocity.h"
-#include "gpssettings.h"
+#include "systemsettings.h"
 #include "WorldMagModel.h"
 #include "CoordinateConversions.h"
 #include "hwsettings.h"
 
 #include "NMEA.h"
 #include "UBX.h"
+#include "gps_airspeed.h"
 
 
 // ****************
@@ -148,17 +150,20 @@ int32_t GPSInitialize(void)
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 		HomeLocationInitialize();
 #endif
+#if defined(PIOS_GPS_PROVIDES_AIRSPEED)
+		AirspeedActualInitialize();
+#endif
 		updateSettings();
 	}
 
 	if (gpsPort && gpsEnabled) {
-		GPSSettingsInitialize();
-		GPSSettingsDataProtocolGet(&gpsProtocol);
+		SystemSettingsInitialize();
+		SystemSettingsGPSDataProtocolGet(&gpsProtocol);
 		switch (gpsProtocol) {
-			case GPSSETTINGS_DATAPROTOCOL_NMEA:
+			case SYSTEMSETTINGS_GPSDATAPROTOCOL_NMEA:
 				gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
 				break;
-			case GPSSETTINGS_DATAPROTOCOL_UBX:
+			case SYSTEMSETTINGS_GPSDATAPROTOCOL_UBX:
 				gps_rx_buffer = pvPortMalloc(sizeof(struct UBXPacket));
 				break;
 			default:
@@ -187,7 +192,11 @@ static void gpsTask(void *parameters)
 	GPSPositionData gpsposition;
 	uint8_t	gpsProtocol;
 
-	GPSSettingsDataProtocolGet(&gpsProtocol);
+	SystemSettingsGPSDataProtocolGet(&gpsProtocol);
+
+#if defined(PIOS_GPS_PROVIDES_AIRSPEED)
+	gps_airspeed_initialize();
+#endif
 
 	timeOfLastUpdateMs = timeNowMs;
 	timeOfLastCommandMs = timeNowMs;
@@ -204,12 +213,12 @@ static void gpsTask(void *parameters)
 			int res;
 			switch (gpsProtocol) {
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
-				case GPSSETTINGS_DATAPROTOCOL_NMEA:
+				case SYSTEMSETTINGS_GPSDATAPROTOCOL_NMEA:
 					res = parse_nmea_stream (c,gps_rx_buffer, &gpsposition, &gpsRxStats);
 					break;
 #endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
-				case GPSSETTINGS_DATAPROTOCOL_UBX:
+				case SYSTEMSETTINGS_GPSDATAPROTOCOL_UBX:
 					res = parse_ubx_stream (c,gps_rx_buffer, &gpsposition, &gpsRxStats);
 					break;
 #endif

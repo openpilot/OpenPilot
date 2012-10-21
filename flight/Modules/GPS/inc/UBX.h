@@ -217,8 +217,6 @@ struct UBXPacket {
 	UBXPayload	payload;
 };
 
-bool checksum_ubx_message(struct UBXPacket *);
-uint32_t parse_ubx_message(struct UBXPacket *, GPSPositionData *);
 int  parse_ubx_stream(uint8_t, char *, GPSPositionData *, struct GPS_RX_STATS *);
 
 #endif /* UBX_H */

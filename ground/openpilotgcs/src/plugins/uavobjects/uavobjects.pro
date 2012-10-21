@@ -53,7 +53,6 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/gpsposition.h \
     $$UAVOBJECT_SYNTHETICS/gpstime.h \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.h \
-    $$UAVOBJECT_SYNTHETICS/gpssettings.h \
     $$UAVOBJECT_SYNTHETICS/gpsvelocity.h \
     $$UAVOBJECT_SYNTHETICS/positionactual.h \
     $$UAVOBJECT_SYNTHETICS/flightbatterystate.h \
@@ -62,6 +61,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/mixerstatus.h \
     $$UAVOBJECT_SYNTHETICS/velocitydesired.h \
     $$UAVOBJECT_SYNTHETICS/velocityactual.h \
+    $$UAVOBJECT_SYNTHETICS/groundtruth.h \
     $$UAVOBJECT_SYNTHETICS/guidancesettings.h \
     $$UAVOBJECT_SYNTHETICS/positiondesired.h \
     $$UAVOBJECT_SYNTHETICS/relaytuning.h \
@@ -85,6 +85,10 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/txpidsettings.h \
     $$UAVOBJECT_SYNTHETICS/cameradesired.h \
     $$UAVOBJECT_SYNTHETICS/faultsettings.h \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.h \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.h \
+    $$UAVOBJECT_SYNTHETICS/pathstatus.h \
+    $$UAVOBJECT_SYNTHETICS/pathdesired.h \
     $$UAVOBJECT_SYNTHETICS/pipxsettings.h \
     $$UAVOBJECT_SYNTHETICS/pipxstatus.h \
     $$UAVOBJECT_SYNTHETICS/waypoint.h \
@@ -121,7 +125,6 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsposition.cpp \
     $$UAVOBJECT_SYNTHETICS/gpstime.cpp \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.cpp \
-    $$UAVOBJECT_SYNTHETICS/gpssettings.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsvelocity.cpp \
     $$UAVOBJECT_SYNTHETICS/positionactual.cpp \
     $$UAVOBJECT_SYNTHETICS/flightbatterystate.cpp \
@@ -130,6 +133,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/mixerstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/velocitydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/velocityactual.cpp \
+    $$UAVOBJECT_SYNTHETICS/groundtruth.cpp \
     $$UAVOBJECT_SYNTHETICS/guidancesettings.cpp \
     $$UAVOBJECT_SYNTHETICS/positiondesired.cpp \
     $$UAVOBJECT_SYNTHETICS/relaytuningsettings.cpp \
@@ -154,6 +158,10 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/txpidsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/cameradesired.cpp \
     $$UAVOBJECT_SYNTHETICS/faultsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/pipxsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/pipxstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/waypoint.cpp \

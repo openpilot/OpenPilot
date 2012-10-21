@@ -2,12 +2,13 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{ 
- * @addtogroup Attitude Attitude Module
+ * @addtogroup GPSModule GPS Module
+ * @brief Calculate airspeed as a function of the difference between sequential GPS velocity and attitude measurements
  * @{ 
  *
- * @file       attitude.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
- * @brief      Acquires sensor data and fuses it into attitude estimate for CC
+ * @file       gps_airspeed.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      GPS airspeed module
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -27,36 +28,17 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef ATTITUDE_H
-#define ATTITUDE_H
+#ifndef GPS_AIRSPEED_H
+#define GPS_AIRSPEED_H
 
-#include "openpilot.h"
+#include "gpsvelocity.h"
 
-struct GlobalAttitudeVariables {
-	float accelKi;
-	float accelKp;
-	float yawBiasRate;
-	float gyroGain[3];
-	float gyroGain_ref;
-	float accelbias[3];
-	float accelscale[3];
-	float gyro_correct_int[3];
-	float q[4];
-	float Rsb[3][3]; //Rotation matrix that transforms from the sensor frame to the body frame
-	bool rotate;
-	bool zero_during_arming;
-	bool bias_correct_gyro;	
-	uint8_t filter_choice;
-	
-	// For running trim flights
-	bool trim_requested;
-	float trim_accels[3];
-	int32_t trim_samples;
-	
-};
+void gps_airspeed_update(const GPSVelocityData *gpsVelData, float staticAirDensity);
+void gps_airspeed_initialize(void);
 
+#endif // GPS_AIRSPEED_H
 
-int32_t AttitudeInitialize(void);
-
-
-#endif // ATTITUDE_H
+/**
+ * @}
+ * @}
+ */

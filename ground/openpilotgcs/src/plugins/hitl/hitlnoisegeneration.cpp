@@ -73,6 +73,7 @@ Noise HitlNoiseGeneration::generateNoise(){
     noise.accelData.z=0;
 
     noise.airspeedActual.CalibratedAirspeed=0;
+    noise.airspeedActual.TrueAirspeed=0;
 
     return noise;
 }

@@ -569,12 +569,13 @@ void OPMapGadgetWidget::updatePosition()
 	uav_pos = internals::PointLatLng(uav_latitude, uav_longitude);
 
 	// *************
-    // get the current GPS position and heading
+    // Load GPSPosition UAVO
     GPSPosition *gpsPositionObj = GPSPosition::GetInstance(obm);
     Q_ASSERT(gpsPositionObj);
 
     GPSPosition::DataFields gpsPositionData = gpsPositionObj->getData();
 
+    // get current GPS heading, latitude, longitude, and altitude
     gps_heading = gpsPositionData.Heading;
     gps_latitude = gpsPositionData.Latitude;
     gps_longitude = gpsPositionData.Longitude;
@@ -1662,16 +1663,19 @@ void OPMapGadgetWidget::onSetHomeAct_triggered()
 		return;
 
     float altitude=0;
-    bool ok;
+    bool ok=false;
 
     //Get desired HomeLocation altitude from dialog box.
     //TODO: Populate box with altitude already in HomeLocation UAVO
     altitude = QInputDialog::getDouble(this, tr("Set home altitude"),
                                       tr("In [m], referenced to WGS84:"), altitude, -100, 100000, 2, &ok);
 
-    setHome(m_context_menu_lat_lon, altitude);
+    if(ok){
+        setHome(m_context_menu_lat_lon, altitude);
+    }
 
     setHomeLocationObject();  // update the HomeLocation UAVObject
+
 }
 
 void OPMapGadgetWidget::onGoHomeAct_triggered()
@@ -2097,25 +2101,8 @@ double OPMapGadgetWidget::getUAV_Yaw()
 	return yaw;
 }
 
-bool OPMapGadgetWidget::getGPSPosition(double &latitude, double &longitude, double &altitude)
-{
-	double LLA[3];
-
-	if (!obum)
-		return false;
-
-	if (obum->getGPSPosition(LLA) < 0)
-		return false;	// error
-
-	latitude = LLA[0];
-	longitude = LLA[1];
-	altitude = LLA[2];
-
-    return true;
-}
 
 // *************************************************************************************
-
 void OPMapGadgetWidget::setMapFollowingMode()
 {
     if (!m_widget || !m_map)

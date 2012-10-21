@@ -195,11 +195,15 @@ void XplaneSimulator::transmitUpdate()
  */
 void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 {
-    float altitude = 0;
+    float altitude_msl = 0;
+    float altitude_agl = 0;
     float latitude = 0;
     float longitude = 0;
     float airspeed_keas = 0;
+    float airspeed_ktas = 0;
     float groundspeed_ktgs = 0;
+    float alpha_D=0;
+    float beta_D=0;
     float pitch = 0;
     float roll = 0;
     float heading = 0;
@@ -239,12 +243,19 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
             case XplaneSimulator::LatitudeLongitudeAltitude:
                 latitude = *((float*)(buf.data()+4*1));
                 longitude = *((float*)(buf.data()+4*2));
-                altitude = *((float*)(buf.data()+4*3))* FT2M;
+                altitude_msl = *((float*)(buf.data()+4*3))* FT2M;
+                altitude_agl = *((float*)(buf.data()+4*4))* FT2M;
                 break;
 
             case XplaneSimulator::Speed:
                 airspeed_keas = *((float*)(buf.data()+4*2));
+                airspeed_ktas = *((float*)(buf.data()+4*3));
                 groundspeed_ktgs = *((float*)(buf.data()+4*4));
+                break;
+
+            case XplaneSimulator::AoA:
+                alpha_D = *((float*)(buf.data()+4*1));
+                beta_D = *((float*)(buf.data()+4*2));
                 break;
 
             case XplaneSimulator::PitchRollHeading:
@@ -302,10 +313,14 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
         // Update GPS Position objects
         out.latitude = latitude * 1e7;
         out.longitude = longitude * 1e7;
-        out.altitude = altitude;
+        out.altitude = altitude_msl;
+        out.agl = altitude_agl;
         out.groundspeed = groundspeed_ktgs*1.15*1.6089/3.6; //Convert from [kts] to [m/s]
 
         out.calibratedAirspeed = airspeed_keas*1.15*1.6089/3.6;  //Convert from [kts] to [m/s]
+        out.trueAirspeed = airspeed_ktas*1.15*1.6089/3.6;  //Convert from [kts] to [m/s]
+        out.angleOfAttack=alpha_D;
+        out.angleOfSlip=beta_D;
 
         // Update BaroAltitude object
         out.temperature = temperature;

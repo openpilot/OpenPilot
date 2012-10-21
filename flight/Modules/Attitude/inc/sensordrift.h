@@ -5,7 +5,7 @@
  * @addtogroup Attitude Attitude Module
  * @{ 
  *
- * @file       attitude.h
+ * @file       sensordrift.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
  * @brief      Acquires sensor data and fuses it into attitude estimate for CC
  *
@@ -27,36 +27,15 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef ATTITUDE_H
-#define ATTITUDE_H
+#ifndef SENSORDRIFT_H
+#define SENSORDRIFT_H
 
 #include "openpilot.h"
+#include "gyros.h"
+#include "accels.h"
 
-struct GlobalAttitudeVariables {
-	float accelKi;
-	float accelKp;
-	float yawBiasRate;
-	float gyroGain[3];
-	float gyroGain_ref;
-	float accelbias[3];
-	float accelscale[3];
-	float gyro_correct_int[3];
-	float q[4];
-	float Rsb[3][3]; //Rotation matrix that transforms from the sensor frame to the body frame
-	bool rotate;
-	bool zero_during_arming;
-	bool bias_correct_gyro;	
-	uint8_t filter_choice;
-	
-	// For running trim flights
-	bool trim_requested;
-	float trim_accels[3];
-	int32_t trim_samples;
-	
-};
+void updateSensorDrift(AccelsData * accelsData, GyrosData * gyrosData, const float delT);
+void CottonComplementaryCorrection(float * accels, float * gyros, const float delT);
+void DcmCorrection(float * accels, float * gyros, float Rbe[3][3], const float delT, bool GPS_Drift_Compensation);
 
-
-int32_t AttitudeInitialize(void);
-
-
-#endif // ATTITUDE_H
+#endif // SENSORDRIFT_H

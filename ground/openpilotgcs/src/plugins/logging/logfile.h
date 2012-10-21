@@ -16,9 +16,9 @@ class LogFile : public QIODevice
 public:
     explicit LogFile(QObject *parent = 0);
     qint64 bytesAvailable() const;
-    qint64 bytesToWrite() { return file.bytesToWrite(); };
+    qint64 bytesToWrite() { return file.bytesToWrite(); }
     bool open(OpenMode mode);
-    void setFileName(QString name) { file.setFileName(name); };
+    void setFileName(QString name) { file.setFileName(name); }
     void close();
     qint64 writeData(const char * data, qint64 dataSize);
     qint64 readData(char * data, qint64 maxlen);
@@ -27,7 +27,8 @@ public:
     bool stopReplay();
 
 public slots:
-    void setReplaySpeed(double val) { playbackSpeed = val; qDebug() << playbackSpeed; };
+    void setReplaySpeed(double val) { playbackSpeed = val; qDebug() << "New playback speed: " << playbackSpeed; }
+    void setReplayTime(double val);
     void pauseReplay();
     void resumeReplay();
 
@@ -45,12 +46,18 @@ protected:
     QTime myTime;
     QFile file;
     qint32 lastTimeStamp;
-    qint32 lastPlayed;
+    qint32 lastPlayTime;
     QMutex mutex;
 
 
-    int timeOffset;
+    int lastPlayTimeOffset;
     double playbackSpeed;
+
+private:
+    QList<qint32> timestampBuffer;
+    QList<qint32> timestampPos;
+    quint32 timestampBufferIdx;
+    qint32 lastTimeStampPos;
 };
 
 #endif // LOGFILE_H

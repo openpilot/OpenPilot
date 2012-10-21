@@ -38,17 +38,17 @@
 // ****** convert Lat,Lon,Alt to ECEF  ************
 void LLA2ECEF(float LLA[3], float ECEF[3])
 {
-	const float a = 6378137.0;	// Equatorial Radius
-	const float e = 8.1819190842622e-2;	// Eccentricity
+	const float a = 6378137.0f;	// Equatorial Radius
+	const float e = 8.1819190842622e-2f;	// Eccentricity
 	float sinLat, sinLon, cosLat, cosLon;
 	float N;
 
-	sinLat = sin(DEG2RAD * LLA[0]);
-	sinLon = sin(DEG2RAD * LLA[1]);
-	cosLat = cos(DEG2RAD * LLA[0]);
-	cosLon = cos(DEG2RAD * LLA[1]);
+	sinLat = sinf(DEG2RAD * LLA[0]);
+	sinLon = sinf(DEG2RAD * LLA[1]);
+	cosLat = cosf(DEG2RAD * LLA[0]);
+	cosLon = cosf(DEG2RAD * LLA[1]);
 
-	N = a / sqrt(1.0 - e * e * sinLat * sinLat);	//prime vertical radius of curvature
+	N = a / sqrtf(1.0f - e * e * sinLat * sinLat);	//prime vertical radius of curvature
 
 	ECEF[0] = (N + LLA[2]) * cosLat * cosLon;
 	ECEF[1] = (N + LLA[2]) * cosLat * sinLon;
@@ -67,29 +67,29 @@ uint16_t ECEF2LLA(float ECEF[3], float LLA[3])
 	 * Suggestion: [0,0,0]
 	 **/
 
-	const float a = 6378137.0;	// Equatorial Radius
-	const float e = 8.1819190842622e-2;	// Eccentricity
+	const float a = 6378137.0f;	// Equatorial Radius
+	const float e = 8.1819190842622e-2f;	// Eccentricity
 	float x = ECEF[0], y = ECEF[1], z = ECEF[2];
 	float Lat, N, NplusH, delta, esLat;
 	uint16_t iter;
 #define MAX_ITER 10		// should not take more than 5 for valid coordinates
-#define ACCURACY 1.0e-11	// used to be e-14, but we don't need sub micrometer exact calculations
+#define ACCURACY 1.0e-11f	// used to be e-14, but we don't need sub micrometer exact calculations
 
-	LLA[1] = RAD2DEG * atan2(y, x);
+	LLA[1] = RAD2DEG * atan2f(y, x);
 	Lat = DEG2RAD * LLA[0];
-	esLat = e * sin(Lat);
-	N = a / sqrt(1 - esLat * esLat);
+	esLat = e * sinf(Lat);
+	N = a / sqrtf(1 - esLat * esLat);
 	NplusH = N + LLA[2];
 	delta = 1;
 	iter = 0;
 
 	while (((delta > ACCURACY) || (delta < -ACCURACY))
 	       && (iter < MAX_ITER)) {
-		delta = Lat - atan(z / (sqrt(x * x + y * y) * (1 - (N * e * e / NplusH))));
+		delta = Lat - atanf(z / (sqrtf(x * x + y * y) * (1 - (N * e * e / NplusH))));
 		Lat = Lat - delta;
-		esLat = e * sin(Lat);
-		N = a / sqrt(1 - esLat * esLat);
-		NplusH = sqrt(x * x + y * y) / cos(Lat);
+		esLat = e * sinf(Lat);
+		N = a / sqrtf(1 - esLat * esLat);
+		NplusH = sqrtf(x * x + y * y) / cosf(Lat);
 		iter += 1;
 	}
 
@@ -104,10 +104,10 @@ void RneFromLLA(float LLA[3], float Rne[3][3])
 {
 	float sinLat, sinLon, cosLat, cosLon;
 
-	sinLat = (float)sin(DEG2RAD * LLA[0]);
-	sinLon = (float)sin(DEG2RAD * LLA[1]);
-	cosLat = (float)cos(DEG2RAD * LLA[0]);
-	cosLon = (float)cos(DEG2RAD * LLA[1]);
+	sinLat = (float)sinf(DEG2RAD * LLA[0]);
+	sinLon = (float)sinf(DEG2RAD * LLA[1]);
+	cosLat = (float)cosf(DEG2RAD * LLA[0]);
+	cosLon = (float)cosf(DEG2RAD * LLA[1]);
 
 	Rne[0][0] = -sinLat * cosLon;
 	Rne[0][1] = -sinLat * sinLon;
@@ -174,9 +174,9 @@ void RPY2Quaternion(const float rpy[3], float q[4])
 //** Find Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
 void Quaternion2R(float q[4], float Rbe[3][3])
 {
-
+	
 	float q0s = q[0] * q[0], q1s = q[1] * q[1], q2s = q[2] * q[2], q3s = q[3] * q[3];
-
+	
 	Rbe[0][0] = q0s + q1s - q2s - q3s;
 	Rbe[0][1] = 2 * (q[1] * q[2] + q[0] * q[3]);
 	Rbe[0][2] = 2 * (q[1] * q[3] - q[0] * q[2]);
@@ -186,6 +186,26 @@ void Quaternion2R(float q[4], float Rbe[3][3])
 	Rbe[2][0] = 2 * (q[1] * q[3] + q[0] * q[2]);
 	Rbe[2][1] = 2 * (q[2] * q[3] - q[0] * q[1]);
 	Rbe[2][2] = q0s - q1s - q2s + q3s;
+}
+
+//** Find Rbe, that rotates a vector from earth fixed to body frame, from euler angles, using Tait-Bryan
+//**  convention, i.e. Rbe=Rot_x(roll)*Rot_y(pitch)*Rot_z(yaw) **
+void Euler2R(float rpy[3], float Rbe[3][3])
+{
+	
+	float sF = sinf(rpy[0]), cF = cosf(rpy[0]);
+	float sT = sinf(rpy[1]), cT = cosf(rpy[1]);
+	float sP = sinf(rpy[2]), cP = cosf(rpy[2]);
+	
+	Rbe[0][0] = cT*cP;
+	Rbe[0][1] = cT*sP;
+	Rbe[0][2] = -sT;
+	Rbe[1][0] = sF*sT*cP - cF*sP;
+	Rbe[1][1] = sF*sT*sP + cF*cP;
+	Rbe[1][2] = cT*sF;
+	Rbe[2][0] = cF*sT*cP + sF*sP;
+	Rbe[2][1] = cF*sT*sP - sF*cP;
+	Rbe[2][2] = cT*cF;
 }
 
 // ****** Express LLA in a local NED Base Frame ********
@@ -419,11 +439,21 @@ void quat_mult(const float q1[4], const float q2[4], float qout[4])
  * @brief Rotate a vector by a rotation matrix
  * @param[in] R a three by three rotation matrix (first index is row)
  * @param[in] vec the source vector
+ * @param[in] transpose If false use R, else if true use R'
  * @param[out] vec_out the output vector
  */
-void rot_mult(float R[3][3], const float vec[3], float vec_out[3]) 
+void rot_mult(float R[3][3], const float vec[3], float vec_out[3], bool transpose) 
 {
-	vec_out[0] = R[0][0] * vec[0] + R[0][1] * vec[1] + R[0][2] * vec[2];
-	vec_out[1] = R[1][0] * vec[0] + R[1][1] * vec[1] + R[1][2] * vec[2];
-	vec_out[2] = R[2][0] * vec[0] + R[2][1] * vec[1] + R[2][2] * vec[2];
+	if (!transpose){
+		vec_out[0] = R[0][0] * vec[0] + R[0][1] * vec[1] + R[0][2] * vec[2];
+		vec_out[1] = R[1][0] * vec[0] + R[1][1] * vec[1] + R[1][2] * vec[2];
+		vec_out[2] = R[2][0] * vec[0] + R[2][1] * vec[1] + R[2][2] * vec[2];
+	}
+	else {
+		vec_out[0] = R[0][0] * vec[0] + R[1][0] * vec[1] + R[2][0] * vec[2];
+		vec_out[1] = R[0][1] * vec[0] + R[1][1] * vec[1] + R[2][1] * vec[2];
+		vec_out[2] = R[0][2] * vec[0] + R[1][2] * vec[1] + R[2][2] * vec[2];
+		
+	}
+
 }

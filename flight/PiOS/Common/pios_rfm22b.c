@@ -178,6 +178,7 @@ static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22b_add_rx_status(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_rx_packet_status status);
 static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHandle p, uint16_t rx_len);
 static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev, uint32_t frequency_hz);
+static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev);
 
 // SPI read/write functions
 static void rfm22_assertCs();
@@ -661,56 +662,25 @@ void PIOS_RFM22B_GetStats(uint32_t rfm22b_id, struct rfm22b_stats *stats) {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if(!PIOS_RFM22B_validate(rfm22b_dev))
 		return;
-	*stats = rfm22b_dev->stats;
 
-	// Add the RX packet statistics
-	stats->rx_good = 0;
-	stats->rx_corrected = 0;
-	stats->rx_error = 0;
-	stats->rx_missed = 0;
-	for (uint8_t i = 0; i < RFM22B_RX_PACKET_STATS_LEN; ++i)
-	{
-		uint32_t val = rfm22b_dev->rx_packet_stats[i];
-		for (uint8_t j = 0; j < 16; ++j)
-		{
-			switch ((val >> (j * 2)) & 0x3)
-			{
-			case RFM22B_GOOD_RX_PACKET:
-				stats->rx_good++;
-				break;
-			case RFM22B_CORRECTED_RX_PACKET:
-				stats->rx_corrected++;
-				break;
-			case RFM22B_ERROR_RX_PACKET:
-				stats->rx_error++;
-				break;
-			case RFM22B_MISSED_RX_PACKET:
-				stats->rx_missed++;
-				break;
-			}
-		}
-	}
-
-	// Calculate the link quality metric, which is related to the number of good packets in relation to the number of bad packets.
-	// Note: This assumes that the number of packets sampled for the stats is 64.
-	// Using this equation, error and missed packets are counted as -2, and corrected packets are counted as -1.
-	// The rage is 0 (all error or missed packets) to 128 (all good packets).
-	stats->link_quality = 64 + stats->rx_good - stats->rx_error - stats->rx_missed;
+	// Calculate the current link quality
+	rfm22_calculateLinkQuality(rfm22b_dev);
 
 	// We are connected if our destination ID is in the pair stats.
-	stats->connected = false;
+	rfm22b_dev->stats.connected = false;
 	if (rfm22b_dev->destination_id != 0xffffffff)
 		for (uint8_t i = 0; i < OPLINKSTATUS_PAIRIDS_NUMELEM; ++i)
 		{
 			if ((rfm22b_dev->pair_stats[i].pairID == rfm22b_dev->destination_id) &&
 			    (rfm22b_dev->pair_stats[i].rssi > -127))
 			{
-				stats->rssi = rfm22b_dev->pair_stats[i].rssi;
-				stats->afc_correction = rfm22b_dev->pair_stats[i].afc_correction;
-				stats->connected = true;
+				rfm22b_dev->stats.rssi = rfm22b_dev->pair_stats[i].rssi;
+				rfm22b_dev->stats.afc_correction = rfm22b_dev->pair_stats[i].afc_correction;
+				rfm22b_dev->stats.connected = true;
 				break;
 			}
 		}
+	*stats = rfm22b_dev->stats;
 }
 
  /**
@@ -845,6 +815,90 @@ static void PIOS_RFM22B_Task(void *parameters)
 			if (rfm22_sendStatus(rfm22b_dev))
 				lastStatusTicks = curTicks;
 	}
+}
+
+// ************************************
+// radio datarate about 19200 Baud
+// radio frequency deviation 45kHz
+// radio receiver bandwidth 67kHz.
+//
+// Carson's rule:
+//  The signal bandwidth is about 2(Delta-f + fm) ..
+//
+// Delta-f = frequency deviation
+// fm = maximum frequency of the signal
+//
+// This gives 2(45 + 9.6) = 109.2kHz.
+
+void RFM22_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool data_whitening)
+{
+	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return;
+
+	uint32_t datarate_bps = data_rate[datarate];
+	rfm22b_dev->datarate = datarate;
+	rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(datarate_bps) + 0.5);
+
+	// rfm22_if_filter_bandwidth
+	rfm22_write(0x1C, reg_1C[datarate]);
+
+	// rfm22_afc_loop_gearshift_override
+	rfm22_write(0x1D, reg_1D[datarate]);
+	// RFM22_afc_timing_control
+	rfm22_write(0x1E, reg_1E[datarate]);
+
+	// RFM22_clk_recovery_gearshift_override
+	rfm22_write(0x1F, reg_1F[datarate]);
+	// rfm22_clk_recovery_oversampling_ratio
+	rfm22_write(0x20, reg_20[datarate]);
+	// rfm22_clk_recovery_offset2
+	rfm22_write(0x21, reg_21[datarate]);
+	// rfm22_clk_recovery_offset1
+	rfm22_write(0x22, reg_22[datarate]);
+	// rfm22_clk_recovery_offset0
+	rfm22_write(0x23, reg_23[datarate]);
+	// rfm22_clk_recovery_timing_loop_gain1
+	rfm22_write(0x24, reg_24[datarate]);
+	// rfm22_clk_recovery_timing_loop_gain0
+	rfm22_write(0x25, reg_25[datarate]);
+
+	// rfm22_afc_limiter
+	rfm22_write(0x2A, reg_2A[datarate]);
+
+/* This breaks all bit rates < 100000!
+	if (datarate_bps < 100000)
+		// rfm22_chargepump_current_trimming_override
+		rfm22_write(0x58, 0x80);
+	else
+		// rfm22_chargepump_current_trimming_override
+		rfm22_write(0x58, 0xC0);
+*/
+
+	// rfm22_tx_data_rate1
+	rfm22_write(0x6E, reg_6E[datarate]);
+	// rfm22_tx_data_rate0
+	rfm22_write(0x6F, reg_6F[datarate]);
+
+	// Enable data whitening
+	//	uint8_t txdtrtscale_bit = rfm22_read(RFM22_modulation_mode_control1) & RFM22_mmc1_txdtrtscale;
+	//	rfm22_write(RFM22_modulation_mode_control1, txdtrtscale_bit | RFM22_mmc1_enwhite);
+
+	if (!data_whitening)
+		// rfm22_modulation_mode_control1
+		rfm22_write(0x70, reg_70[datarate] & ~RFM22_mmc1_enwhite);
+	else
+		// rfm22_modulation_mode_control1
+		rfm22_write(0x70, reg_70[datarate] |  RFM22_mmc1_enwhite);
+
+	// rfm22_modulation_mode_control2
+	rfm22_write(0x71, reg_71[datarate]);
+
+	// rfm22_frequency_deviation
+	rfm22_write(0x72, reg_72[datarate]);
+
+	rfm22_write(RFM22_ook_counter_value1, 0x00);
+	rfm22_write(RFM22_ook_counter_value2, 0x00);
 }
 
 // ************************************
@@ -1026,99 +1080,54 @@ static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev,
 	rfm22_write(RFM22_nominal_carrier_frequency0, fc & 0xff);
 }
 
-void rfm22_setFreqHopChannel(uint8_t channel)
+/*
+static void rfm22_setFreqHopChannel(uint8_t channel)
 {	// set the frequency hopping channel
 	g_rfm22b_dev->frequency_hop_channel = channel;
 	rfm22_write(RFM22_frequency_hopping_channel_select, channel);
 }
 
-uint32_t rfm22_freqHopSize(void)
+static uint32_t rfm22_freqHopSize(void)
 {	// return the frequency hopping step size
 	return ((uint32_t)g_rfm22b_dev->frequency_hop_step_size_reg * 10000);
 }
-
-// ************************************
-// radio datarate about 19200 Baud
-// radio frequency deviation 45kHz
-// radio receiver bandwidth 67kHz.
-//
-// Carson's rule:
-//  The signal bandwidth is about 2(Delta-f + fm) ..
-//
-// Delta-f = frequency deviation
-// fm = maximum frequency of the signal
-//
-// This gives 2(45 + 9.6) = 109.2kHz.
-
-void RFM22_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool data_whitening)
-{
-	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(!PIOS_RFM22B_validate(rfm22b_dev))
-		return;
-
-	uint32_t datarate_bps = data_rate[datarate];
-	rfm22b_dev->datarate = datarate;
-	rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(datarate_bps) + 0.5);
-
-	// rfm22_if_filter_bandwidth
-	rfm22_write(0x1C, reg_1C[datarate]);
-
-	// rfm22_afc_loop_gearshift_override
-	rfm22_write(0x1D, reg_1D[datarate]);
-	// RFM22_afc_timing_control
-	rfm22_write(0x1E, reg_1E[datarate]);
-
-	// RFM22_clk_recovery_gearshift_override
-	rfm22_write(0x1F, reg_1F[datarate]);
-	// rfm22_clk_recovery_oversampling_ratio
-	rfm22_write(0x20, reg_20[datarate]);
-	// rfm22_clk_recovery_offset2
-	rfm22_write(0x21, reg_21[datarate]);
-	// rfm22_clk_recovery_offset1
-	rfm22_write(0x22, reg_22[datarate]);
-	// rfm22_clk_recovery_offset0
-	rfm22_write(0x23, reg_23[datarate]);
-	// rfm22_clk_recovery_timing_loop_gain1
-	rfm22_write(0x24, reg_24[datarate]);
-	// rfm22_clk_recovery_timing_loop_gain0
-	rfm22_write(0x25, reg_25[datarate]);
-
-	// rfm22_afc_limiter
-	rfm22_write(0x2A, reg_2A[datarate]);
-
-/* This breaks all bit rates < 100000!
-	if (datarate_bps < 100000)
-		// rfm22_chargepump_current_trimming_override
-		rfm22_write(0x58, 0x80);
-	else
-		// rfm22_chargepump_current_trimming_override
-		rfm22_write(0x58, 0xC0);
 */
 
-	// rfm22_tx_data_rate1
-	rfm22_write(0x6E, reg_6E[datarate]);
-	// rfm22_tx_data_rate0
-	rfm22_write(0x6F, reg_6F[datarate]);
+static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev)
+{
+	// Add the RX packet statistics
+	rfm22b_dev->stats.rx_good = 0;
+	rfm22b_dev->stats.rx_corrected = 0;
+	rfm22b_dev->stats.rx_error = 0;
+	rfm22b_dev->stats.rx_missed = 0;
+	for (uint8_t i = 0; i < RFM22B_RX_PACKET_STATS_LEN; ++i)
+	{
+		uint32_t val = rfm22b_dev->rx_packet_stats[i];
+		for (uint8_t j = 0; j < 16; ++j)
+		{
+			switch ((val >> (j * 2)) & 0x3)
+			{
+			case RFM22B_GOOD_RX_PACKET:
+				rfm22b_dev->stats.rx_good++;
+				break;
+			case RFM22B_CORRECTED_RX_PACKET:
+				rfm22b_dev->stats.rx_corrected++;
+				break;
+			case RFM22B_ERROR_RX_PACKET:
+				rfm22b_dev->stats.rx_error++;
+				break;
+			case RFM22B_MISSED_RX_PACKET:
+				rfm22b_dev->stats.rx_missed++;
+				break;
+			}
+		}
+	}
 
-	// Enable data whitening
-	//	uint8_t txdtrtscale_bit = rfm22_read(RFM22_modulation_mode_control1) & RFM22_mmc1_txdtrtscale;
-	//	rfm22_write(RFM22_modulation_mode_control1, txdtrtscale_bit | RFM22_mmc1_enwhite);
-
-	if (!data_whitening)
-		// rfm22_modulation_mode_control1
-		rfm22_write(0x70, reg_70[datarate] & ~RFM22_mmc1_enwhite);
-	else
-		// rfm22_modulation_mode_control1
-		rfm22_write(0x70, reg_70[datarate] |  RFM22_mmc1_enwhite);
-
-	// rfm22_modulation_mode_control2
-	rfm22_write(0x71, reg_71[datarate]);
-
-	// rfm22_frequency_deviation
-	rfm22_write(0x72, reg_72[datarate]);
-
-	rfm22_write(RFM22_ook_counter_value1, 0x00);
-	rfm22_write(RFM22_ook_counter_value2, 0x00);
+	// Calculate the link quality metric, which is related to the number of good packets in relation to the number of bad packets.
+	// Note: This assumes that the number of packets sampled for the stats is 64.
+	// Using this equation, error and missed packets are counted as -2, and corrected packets are counted as -1.
+	// The rage is 0 (all error or missed packets) to 128 (all good packets).
+	rfm22b_dev->stats.link_quality = 64 + rfm22b_dev->stats.rx_good - rfm22b_dev->stats.rx_error - rfm22b_dev->stats.rx_missed;
 }
 
 // ************************************
@@ -1248,10 +1257,15 @@ static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	PHPacketHandle sph = (PHPacketHandle)&(rfm22b_dev->status_packet);
 
+	// Update the link quality metric.
+	rfm22_calculateLinkQuality(rfm22b_dev);
+
 	// Queue the status message
 	rfm22b_dev->status_packet.header.destination_id = 0xffffffff; // Broadcast
 	rfm22b_dev->status_packet.header.type = PACKET_TYPE_STATUS;
 	rfm22b_dev->status_packet.header.data_size = PH_STATUS_DATA_SIZE(&(rfm22b_dev->status_packet));
+	rfm22b_dev->status_packet.link_quality = rfm22b_dev->stats.link_quality;
+	rfm22b_dev->status_packet.received_rssi = rfm22b_dev->rssi_dBm;
 	if (xQueueSend(rfm22b_dev->packetQueue, &sph, 0) != pdTRUE)
 		return false;
 
@@ -1406,7 +1420,8 @@ static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHand
 			rx_error = false;
 		}
 
-	} else
+	}
+	else
 		rfm22b_add_rx_status(rfm22b_dev, RFM22B_GOOD_RX_PACKET);
 
 	return !rx_error;
@@ -1624,6 +1639,9 @@ static enum pios_rfm22b_event rfm22_receiveStatus(struct pios_rfm22b_dev *rfm22b
 		rfm22b_dev->pair_stats[min_idx].afc_correction = afc;
 		rfm22b_dev->pair_stats[min_idx].lastContact = 0;
 	}
+
+	rfm22b_dev->stats.link_quality = status->link_quality;
+	rfm22b_dev->stats.rssi = status->received_rssi;
 
 	return RFM22B_EVENT_RX_COMPLETE;
 }
@@ -1904,6 +1922,14 @@ static enum pios_rfm22b_event rfm22_timeout(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	rfm22b_dev->resets++;
 	rfm22b_dev->packet_start_ticks = 0;
+	// Release the Tx packet if it's set.
+	if (rfm22b_dev->tx_packet != 0)
+	{
+		PHReleaseTXPacket(pios_packet_handler, rfm22b_dev->tx_packet);
+		rfm22b_dev->tx_packet = 0;
+		rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
+	}
+	rfm22b_dev->rx_buffer_wr = 0;
 	return RFM22B_EVENT_TX_START;
 }
 
@@ -1911,6 +1937,14 @@ static enum pios_rfm22b_event rfm22_error(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	rfm22b_dev->resets++;
 	rfm22b_dev->packet_start_ticks = 0;
+	// Release the Tx packet if it's set.
+	if (rfm22b_dev->tx_packet != 0)
+	{
+		PHReleaseTXPacket(pios_packet_handler, rfm22b_dev->tx_packet);
+		rfm22b_dev->tx_packet = 0;
+		rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
+	}
+	rfm22b_dev->rx_buffer_wr = 0;
 	return RFM22B_EVENT_INITIALIZE;
 }
 

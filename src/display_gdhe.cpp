@@ -125,6 +125,8 @@ JFR_DEBUG("robot EULER: " << uncertEuler);*/
 		uncertEll->refresh();
 		// camera target
 		//viewerGdhe->client.setCameraTarget(poseEuler(0), poseEuler(1), poseEuler(2));
+		viewerGdhe->client.setCameraTarget(poseEuler(0), poseEuler(1), poseEuler(2));
+		//viewerGdhe->client.setCameraPos(-poseEuler(3)-90, 10, 3);
 		robot->refresh();
 		
 		// trajectory

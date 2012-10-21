@@ -56,7 +56,7 @@ namespace display {
 			ViewerGdhe(std::string _robot_model = "", double _ellipsesScale = 3.0, std::string _host="localhost"):
 				ellipsesScale(_ellipsesScale), robot_model(_robot_model), client(_host)
 			{
-				client.launch_server();
+				//client.launch_server();
 				client.connect();
 				client.clear();
 				client.setCameraTarget(0.04,0,0.15);

@@ -16,6 +16,7 @@
 
 #include "pfdqmlgadgetwidget.h"
 #include "extensionsystem/pluginmanager.h"
+#include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "utils/svgimageprovider.h"
 #ifdef USE_OSG

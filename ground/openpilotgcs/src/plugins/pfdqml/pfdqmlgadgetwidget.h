@@ -21,6 +21,8 @@
 #include "pfdqmlgadgetconfiguration.h"
 #include <QtDeclarative/qdeclarativeview.h>
 
+class UAVObjectManager;
+
 class PfdQmlGadgetWidget : public QDeclarativeView
 {
     Q_OBJECT
@@ -59,6 +61,8 @@ public slots:
     void setActualPositionUsed(bool arg);
     void setSettingsMap(const QVariantMap &settings);
 
+    void exportUAVOInstance(const QString &objectName, int instId);
+
 signals:
     void earthFileChanged(QString arg);
     void terrainEnabledChanged(bool arg);
@@ -81,6 +85,8 @@ private:
     double m_latitude;
     double m_longitude;
     double m_altitude;
+
+    UAVObjectManager *m_objManager;
 };
 
 #endif /* PFDQMLGADGETWIDGET_H_ */

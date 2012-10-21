@@ -42,6 +42,28 @@ Rectangle {
             }
 
             SvgElementImage {
+                id: roll_desired
+
+                elementName: "roll-desired"
+                sceneSize: background.sceneSize
+
+                smooth: true
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.top: rollscale.top
+
+                //rotate it around the center of scene
+                transform: Rotation {
+                    angle: -StabilizationDesired.Roll
+                    origin.x : sceneItem.width/2 - x
+                    origin.y : sceneItem.height/2 - y
+                }
+
+                //hide if not set
+                opacity: StabilizationDesired.Roll == 0 ? 0 : 1
+                Behavior on opacity { NumberAnimation { duration: 1000 } }
+            }
+
+            SvgElementImage {
                 id: foreground
                 elementName: "foreground"
                 sceneSize: background.sceneSize

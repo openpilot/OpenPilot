@@ -20,7 +20,7 @@ Item {
             sceneSize: sceneItem.sceneSize
 
             //the scale in 1000 ft/min with height == 5200 ft/min
-            height: (-VelocityActual.Down*3.28*60/1000)*(vsi_scale.height/5.2)
+            height: (-VelocityActual.Down*3.28*60/1000)*vsi_scale.unitHeight
 
 
             anchors.bottom: parent.verticalCenter
@@ -35,6 +35,7 @@ Item {
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
+            property real unitHeight: vsi_scale.height / 5.2 //the scale height is 5200
 
             //Text labels
             Column {
@@ -44,7 +45,7 @@ Item {
                 Repeater {
                     model: [2, 1, 0, 1, 2]
                     Item {
-                        height: vsi_scale.height / 5.2 //the scale height is 5200
+                        height: vsi_scale.unitHeight
                         width: vsi_bg.width - vsi_scale.width //fill area right to scale
 
                         Text {
@@ -59,6 +60,21 @@ Item {
                     }
                 }
             }
+        }
+
+        SvgElementImage {
+            id: vsi_desired
+
+            elementName: "vsi-desired"
+            border: 1
+            sceneSize: sceneItem.sceneSize
+
+            anchors.verticalCenter: parent.verticalCenter
+            //the scale in 1000 ft/min with height == 5200 ft/min
+            anchors.verticalCenterOffset: (VelocityDesired.Down*3.28*60/1000)*vsi_scale.unitHeight
+            anchors.left: parent.left
+
+            visible: VelocityDesired.Down != 0
         }
     }
 

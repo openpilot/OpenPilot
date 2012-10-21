@@ -30,7 +30,7 @@
 
 #include <QtDeclarative/qdeclarativeengine.h>
 #include <QtDeclarative/qdeclarativecontext.h>
-#include <QtDeclarative/qdeclarativeengine.h>
+#include <QtDeclarative/qdeclarative.h>
 #include "lowpassfilter.h"
 
 PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
@@ -57,19 +57,19 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
                        "VelocityDesired" <<
                        "PositionDesired" <<
                        "AttitudeHoldDesired" <<
+                       "StabilizationDesired" <<
+                       "PathDesired" <<
+                       "Waypoint" <<
+                       "WaypointActive" <<
                        "GPSPosition" <<
                        "GCSTelemetryStats" <<
                        "FlightBatteryState";
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    m_objManager = pm->getObject<UAVObjectManager>();
 
     foreach (const QString &objectName, objectsToExport) {
-        UAVObject* object = objManager->getObject(objectName);
-        if (object)
-            engine()->rootContext()->setContextProperty(objectName, object);
-        else
-            qWarning() << "Failed to load object" << objectName;
+        exportUAVOInstance(objectName, 0);
     }
 
     //to expose settings values
@@ -83,6 +83,16 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
 PfdQmlGadgetWidget::~PfdQmlGadgetWidget()
 {
 }
+
+void PfdQmlGadgetWidget::exportUAVOInstance(const QString &objectName, int instId)
+{
+    UAVObject* object = m_objManager->getObject(objectName, instId);
+    if (object)
+        engine()->rootContext()->setContextProperty(objectName, object);
+    else
+        qWarning() << "Failed to load object" << objectName;
+}
+
 
 void PfdQmlGadgetWidget::setQmlFile(QString fn)
 {

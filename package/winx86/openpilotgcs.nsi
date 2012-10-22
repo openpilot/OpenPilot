@@ -72,7 +72,7 @@
   VIAddVersionKey "Comments" "${INSTALLER_NAME}. ${BUILD_DESCRIPTION}"
   VIAddVersionKey "CompanyName" "The OpenPilot Team, http://www.openpilot.org"
   VIAddVersionKey "LegalTrademarks" "${PRODUCT_NAME} is a trademark of The OpenPilot Team"
-  VIAddVersionKey "LegalCopyright" "© 2010-2011 The OpenPilot Team"
+  VIAddVersionKey "LegalCopyright" "© 2010-2012 The OpenPilot Team"
   VIAddVersionKey "FileDescription" "${INSTALLER_NAME}"
 
 ;--------------------------------

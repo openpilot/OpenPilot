@@ -167,7 +167,7 @@ class Repo:
         print "hash:       ", self.hash()
         print "short hash: ", self.hash(8)
         print "branch:     ", self.branch()
-        print "commit tag: ", self.tag()
+        print "commit tag: ", self.tag('')
         print "dirty:      ", self.dirty('yes', 'no')
 
 def file_from_template(tpl_name, out_name, dict):
@@ -377,6 +377,7 @@ string given.
         ORIGIN = r.origin(),
         HASH = r.hash(),
         HASH8 = r.hash(8),
+        TAG = r.tag(''),
         TAG_OR_BRANCH = r.tag(r.branch('unreleased')),
         TAG_OR_HASH8 = r.tag(r.hash(8, 'untagged')),
         DIRTY = r.dirty(),

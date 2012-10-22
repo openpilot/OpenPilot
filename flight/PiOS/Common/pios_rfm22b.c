@@ -314,7 +314,7 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 		.entry_fn = rfm22_txData,
 		.next_state = {
 			[RFM22B_EVENT_INT_RECEIVED] = RFM22B_STATE_TX_DATA,
-			[RFM22B_EVENT_TX_COMPLETE] = RFM22B_STATE_TX_START,
+			[RFM22B_EVENT_TX_COMPLETE] = RFM22B_STATE_RX_MODE,
 			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
@@ -785,6 +785,15 @@ static void PIOS_RFM22B_Task(void *parameters)
 				while (xQueueReceive(rfm22b_dev->eventQueue, &event, 0) == pdTRUE)
 					;
 				lastEventTicks = xTaskGetTickCount();
+			} else
+			{
+				if (rfm22b_dev->state == RFM22B_STATE_RX_MODE)
+				{
+					// Try to start a transmission
+					enum pios_rfm22b_event event = RFM22B_EVENT_TX_START;
+					while(event != RFM22B_EVENT_NUM_EVENTS)
+						event = rfm22_process_state_transition(rfm22b_dev, event);
+				}
 			}
 		}
 

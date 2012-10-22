@@ -103,7 +103,7 @@ void runningDeviceWidget::populate()
     deviceDescriptorStruct devDesc;
     if(UAVObjectUtilManager::descriptionToStructure(description,devDesc))
     {
-        if (devDesc.gitTag.compare("master") == 0)
+        if(devDesc.gitTag.startsWith("release",Qt::CaseInsensitive))
         {
             myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));

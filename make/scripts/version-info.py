@@ -324,6 +324,12 @@ variable substitution and writes the result into output file. Output
 file will be overwritten only if its content differs from expected.
 Otherwise it will not be touched, so make utility will not remake
 dependent targets.
+
+Optional positional arguments may be used to add more dictionary
+strings for replacement. Each argument has the form:
+    VARIABLE=replacement
+and each ${VARIABLE} reference will be replaced with replacement
+string given.
     """
 
     # Parse command line.
@@ -359,8 +365,6 @@ dependent targets.
     parser.add_option('--uavodir', default = "",
                         help='uav object definition directory');
     (args, positional_args) = parser.parse_args()
-    if len(positional_args) != 0:
-        parser.error("incorrect number of arguments, try --help for help")
 
     # Process arguments.  No advanced error handling is here.
     # Any error will raise an exception and terminate process
@@ -386,6 +390,12 @@ dependent targets.
         UAVOSHA1TXT = GetHashofDirs(args.uavodir,verbose=0,raw=1),
         UAVOSHA1 = GetHashofDirs(args.uavodir,verbose=0,raw=0),
     )
+
+    # Process positional arguments in the form of:
+    #   VAR1=str1 VAR2="string 2"
+    for var in positional_args:
+        (key, value) = var.split('=', 1)
+        dictionary[key] = value
 
     if args.info:
         r.info()

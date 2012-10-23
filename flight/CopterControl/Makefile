@@ -106,7 +106,7 @@ OPTMODULES += Autotune
 endif
 
 # List of mandatory modules to include
-MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
+MODULES = State Stabilization Actuator ManualControl FirmwareIAP
 MODULES += FixedWingPathFollower
 # MODULES += FixedWingPathFollower/coptercontrol
 # Telemetry must be last to grab the optional modules (why?)

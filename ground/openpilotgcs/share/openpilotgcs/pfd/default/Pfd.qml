@@ -53,7 +53,7 @@ Rectangle {
 
                 //rotate it around the center of scene
                 transform: Rotation {
-                    angle: -StabilizationDesired.Roll
+                    angle: StabilizationDesired.Roll-AttitudeActual.Roll
                     origin.x : sceneItem.width/2 - x
                     origin.y : sceneItem.height/2 - y
                 }

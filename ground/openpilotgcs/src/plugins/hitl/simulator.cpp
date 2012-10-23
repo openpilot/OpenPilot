@@ -138,7 +138,7 @@ void Simulator::onStart()
     actDesired = ActuatorDesired::GetInstance(objManager);
     actCommand = ActuatorCommand::GetInstance(objManager);
     manCtrlCommand = ManualControlCommand::GetInstance(objManager);
-    gcsReceiver= GCSReceiver::GetInstance(objManager);
+    gcsReceiver = GCSReceiver::GetInstance(objManager);
     flightStatus = FlightStatus::GetInstance(objManager);
     posHome = HomeLocation::GetInstance(objManager);
     velActual = VelocityActual::GetInstance(objManager);
@@ -152,6 +152,7 @@ void Simulator::onStart()
     gpsPos = GPSPosition::GetInstance(objManager);
     gpsVel = GPSVelocity::GetInstance(objManager);
     telStats = GCSTelemetryStats::GetInstance(objManager);
+    groundTruth = GroundTruth::GetInstance(objManager);
 
     // Listen to autopilot connection events
     TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
@@ -392,6 +393,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
         memset(&noise, 0, sizeof(Noise));
     }
 
+    /*******************************/
     HomeLocation::DataFields homeData = posHome->getData();
     if(!once)
     {
@@ -401,7 +403,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
         // Update homelocation
         homeData.Latitude = out.latitude;   //Already in *10^7 integer format
         homeData.Longitude = out.longitude; //Already in *10^7 integer format
-        homeData.Altitude = out.altitude;
+        homeData.Altitude = out.agl;
         double LLA[3];
         LLA[0]=out.latitude;
         LLA[1]=out.longitude;
@@ -424,7 +426,36 @@ void Simulator::updateUAVOs(Output2Hardware out){
         once=true;
     }
 
+    /*******************************/
+    //Copy everything to the ground truth object. GroundTruth is Noise-free.
+    GroundTruth::DataFields groundTruthData;
+    groundTruthData = groundTruth->getData();
 
+    groundTruthData.AngularRates[0]=out.rollRate;
+    groundTruthData.AngularRates[1]=out.pitchRate;
+    groundTruthData.AngularRates[2]=out.yawRate;
+
+    groundTruthData.CalibratedAirspeed=out.calibratedAirspeed;
+    groundTruthData.TrueAirspeed=out.trueAirspeed;
+    groundTruthData.AngleOfAttack=out.angleOfAttack;
+    groundTruthData.AngleOfSlip=out.angleOfSlip;
+
+    groundTruthData.PositionNED[0]=out.dstN-initN;
+    groundTruthData.PositionNED[1]=out.dstE-initD;
+    groundTruthData.PositionNED[2]=out.dstD-initD;
+
+    groundTruthData.VelocityNED[0]=out.velNorth;
+    groundTruthData.VelocityNED[1]=out.velEast;
+    groundTruthData.VelocityNED[2]=out.velDown;
+
+    groundTruthData.RPY[0]=out.roll;
+    groundTruthData.RPY[0]=out.pitch;
+    groundTruthData.RPY[0]=out.heading;
+
+    //Set UAVO
+    groundTruth->setData(groundTruthData);
+
+/*******************************/
     // Update attActual object
     AttitudeActual::DataFields attActualData;
     attActualData = attActual->getData();
@@ -574,6 +605,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
         /*****************************************/
     }
 
+    /*******************************/
     if (settings.gcsReceiverEnabled) {
         if (gcsRcvrTime.msecsTo(currentTime) >= settings.minOutputPeriod) {
             GCSReceiver::DataFields gcsRcvrData;
@@ -591,6 +623,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
     }
 
 
+    /*******************************/
     if (settings.gpsPositionEnabled) {
         if (gpsPosTime.msecsTo(currentTime) >= settings.gpsPosRate) {
             qDebug()<< " GPS time:" << gpsPosTime << ", currentTime: " << currentTime  << ", difference: "  << gpsPosTime.msecsTo(currentTime);
@@ -623,6 +656,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
         }
     }
 
+    /*******************************/
     // Update VelocityActual.{North,East,Down}
     if (settings.groundTruthEnabled) {
         if (groundTruthTime.msecsTo(currentTime) >= settings.groundTruthRate) {
@@ -645,6 +679,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
         }
     }
 
+//    /*******************************/
 //    if (settings.sonarAltitude) {
 //        static QTime sonarAltTime = currentTime;
 //        if (sonarAltTime.msecsTo(currentTime) >= settings.sonarAltRate) {
@@ -666,6 +701,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
 //        }
 //    }
 
+    /*******************************/
     // Update BaroAltitude object
     if (settings.baroAltitudeEnabled){
         if (baroAltTime.msecsTo(currentTime) >= settings.baroAltRate) {
@@ -680,6 +716,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
         }
     }
 
+    /*******************************/
     // Update AirspeedActual object
     if (settings.airspeedActualEnabled){
         if (airspeedActualTime.msecsTo(currentTime) >= settings.airspeedActualRate) {
@@ -692,6 +729,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
         }
     }
 
+    /*******************************/
     // Update raw attitude sensors
     if (settings.attRawEnabled) {
         if (attRawTime.msecsTo(currentTime) >= settings.attRawRate) {

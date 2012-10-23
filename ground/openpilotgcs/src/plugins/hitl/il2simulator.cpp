@@ -277,8 +277,9 @@ void IL2Simulator::processUpdate(const QByteArray& inp)
 
     // Update BaroAltitude object
     out.altitude = current.Z;
-    out.temperature = TEMP_GROUND + (current.Z * TEMP_LAPSE_RATE) - 273.0;
-    out.pressure = PRESSURE(current.Z)/1000.0; // kpa
+    out.agl = current.Z;
+    out.temperature = airParameters.groundTemp + (current.Z * airParameters.tempLapseRate) - 273.0;
+    out.pressure = airPressureFromAltitude(current.Z, airParameters, gravity) ; // kpa
 
 
     // Update attActual object

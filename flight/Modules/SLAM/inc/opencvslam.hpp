@@ -32,8 +32,10 @@
 #include "opencv/cv.h"
 #include "opencv/highgui.h"
 #include "rtslam.hpp"		// rtslam class
+#include "geometrics/Draw.hpp"
 extern "C" {
 	#include "openpilot.h"		// openpilot framework
+	#include "CoordinateConversions.h"		// some math gimmicks
 	#include "slamsettings.h"	// module settings
 	#include "attitudeactual.h"	// orientation in space
 	#include "velocityactual.h"	// 3d velocity

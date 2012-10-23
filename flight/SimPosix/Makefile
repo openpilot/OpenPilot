@@ -265,6 +265,7 @@ CFLAGS += -O3
 endif
 
 CPPFLAGS += -O3 -march=core2
+//CPPFLAGS += -O0 -march=core2
 CPPFLAGS += `pkg-config --cflags QtCore`
 CPPFLAGS += `pkg-config --cflags QtGui`
 CPPFLAGS += `pkg-config --cflags QtSvg`

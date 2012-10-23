@@ -73,9 +73,10 @@ public:
 	double fraction(cv::Point3d P) {
 		// we can calculate this on any dimension that has a non zero derivative
 		cv::Vec3d x(perpendicular(P).P0 - P0);
-		for (int t=0;t<3;t++) {
+		for (int t=0;t<2;t++) {
 			if (u[t]!=0) return x[t]/u[t];
 		}
+		return x[2]/u[2];
 	}
 	
 	// returns true if two lines are parallel

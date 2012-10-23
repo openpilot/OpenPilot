@@ -49,17 +49,16 @@ OpenCVslam::OpenCVslam(SLAMSettingsData * newsettings) {
 
 void OpenCVslam::run() {
 
-
 	/* Initialize RTSlam */
-	//rtslam = new RTSlam(4,15);
-	rtslam = new RTSlam(0);
+	rtslam = new RTSlam(4,15);
+	//rtslam = new RTSlam(0);
 
 	rtslam->init();
 
 	/* Initialize OpenCV */
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
-	//VideoSource = cvCaptureFromFile("test.avi");
-	VideoSource = cvCaptureFromCAM(0);
+	VideoSource = cvCaptureFromFile("test.avi");
+	//VideoSource = cvCaptureFromCAM(0);
 	
 	VideoDest = NULL;
 	//CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
@@ -186,7 +185,7 @@ void OpenCVslam::run() {
 				rtslam->videoFrame(currentFrame);
 			}
 			lastFrame = cvCloneImage(currentFrame);
-
+			/*
 			// draw a line in the video coresponding to artificial horizon (roll+pitch)
 			CvPoint center = cvPoint(
 				  (settings->FrameDimensions[SLAMSETTINGS_FRAMEDIMENSIONS_X]/2)
@@ -207,7 +206,59 @@ void OpenCVslam::run() {
 			right.x += center.x;
 			right.y += center.y;
 			cvLine(lastFrame,left,right,CV_RGB(255,255,0),3,8,0);
+			*/
+			// draw coordinate system
+			float q1[4]={attitudeActual.q1,attitudeActual.q2,attitudeActual.q3,attitudeActual.q4};
+			fprintf(stderr," %f  %f  %f  %f \n",q1[0],q1[1],q1[2],q1[3]);
+			float q2[4]={0,0,0,0};
+			float q[4]={0,0,0,0};
+			float tilt[3]={4,-12,-3};
+			RPY2Quaternion(tilt,q2);
+			quat_mult(q1,q2,q);
+			float Rbe[3][3];
+			Quaternion2R(q,Rbe);
+			Mat rotation(3,3,CV_64F);
+			for (int a=0;a<3;a++) {
+				for (int b=0;b<3;b++) {
+					rotation.at<double>(a,b)=Rbe[a][b];
+				}
+			}
+			
+			Mat translation(Mat::zeros(3,4,CV_64F));
+			translation.at<double>(0,0)=1.0;
+			translation.at<double>(1,1)=1.0;
+			translation.at<double>(2,2)=1.0;
+			translation.at<double>(0,3)=-positionActual.North;
+			translation.at<double>(1,3)=-positionActual.East;
+			translation.at<double>(2,3)=-positionActual.Down;
+			fprintf(stderr," %f  %f  %f\n",(double)positionActual.North,(double)positionActual.East,(double)positionActual.Down);
+			
+			Mat correction(Mat::zeros(3,3,CV_64F));
+			correction.at<double>(0,1)=1;
+			correction.at<double>(1,2)=1;
+			correction.at<double>(2,0)=1;
+
+			Mat camera(correction*rotation*translation);
+			//camera.diag() = Mat::ones(3,1,CV_64F);
+			Draw3d d(Vec2i(320,240),Vec2i(1100,1100),Vec3d(0,0,0),camera);
+			Mat lf(lastFrame);
+			Scalar c1(0,255,0);
+			Scalar c11(255,255,0);
+			Scalar c2(0,255,255);
+			Scalar c3(0,64,255);
+			// z plane
+			vPortEnterCritical();
+			d.drawGrid(lf,geo::Plane(Point3d(-1e5,-1e5,4000),Point3d(1e5,-1e5,4000),Point3d(-1e5,1e5,4000)),5e3,c1,1,8,0);
+			d.drawGrid(lf,geo::Plane(Point3d(-1e7,-1e7,4000),Point3d(1e7,-1e7,4000),Point3d(-1e7,1e7,4000)),1e6,c1,1,8,0);
+			//d.drawGrid(lf,geo::Plane(Point3d(-100000,-100000,10000),Point3d(100000,-100000,0),Point3d(-100000,100000,-10000)),5000,c11,1,8,0);
+			// xplane
+			//d.drawGrid(lf,geo::Plane(Point3d(-100000,-100000,-1000),Point3d(-100000,100000,-1000),Point3d(-100000,-100000,1000)),5000,c2,1,8,0);
+			//d.drawGrid(lf,geo::Plane(Point3d(100000,-100000,-100000),Point3d(100000,100000,-100000),Point3d(-10000,-100000,100000)),5000,c2,1,8,0);
+			// yplane
+			//d.drawGrid(lf,geo::Plane(Point3d(-100000,-100000,-1000),Point3d(100000,-100000,-1000),Point3d(-100000,-100000,1000)),5000,c3,1,8,0);
+			//d.drawGrid(lf,geo::Plane(Point3d(-100000,100000,-100000),Point3d(100000,100000,-100000),Point3d(-100000,100000,100000)),5000,c3,1,8,0);
 			cvShowImage("debug",lastFrame);
+			vPortExitCritical();
 		}
 	
 

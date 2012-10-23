@@ -40,8 +40,22 @@ Item {
                 property real desiredSpeed : 3.6 * PathDesired.EndingVelocity
 
                 anchors.right: parent.right
+                anchors.rightMargin: 3 //to avoid clipping the border
                 anchors.verticalCenter: parent.top
                 anchors.verticalCenterOffset: (speed_scale.topNumber-desiredSpeed)*speed_scale.unitHeight
+
+                //high contrast border
+                Repeater {
+                    model: 3
+                    Rectangle {
+                        color: "transparent"
+                        border.color: index % 2 ? "white" : "black"
+                        border.width: 1
+                        anchors.centerIn: parent
+                        width: parent.width+index*2
+                        height: parent.height+index*2
+                    }
+                }
             }
 
             // speed numbers

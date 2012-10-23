@@ -52,6 +52,19 @@ Item {
             //convert bearing-compass.yaw to -180..180 range as compass_band_composed
             //the band is 540 degrees wide
             anchors.horizontalCenterOffset: ((bearing-compass.yaw+180+720) % 360 - 180)/540*compass_band_composed.width
+
+            //high contrast border
+            Repeater {
+                model: 3
+                Rectangle {
+                    color: "transparent"
+                    border.color: index % 2 ? "white" : "black"
+                    border.width: 1
+                    anchors.centerIn: parent
+                    width: parent.width+index*2
+                    height: parent.height+index*2-4 //-4 to avoid clipping
+                }
+            }
         }
 
         SvgElementImage {
@@ -71,6 +84,19 @@ Item {
             //convert bearing-compass.yaw to -180..180 range as compass_band_composed
             //the band is 540 degrees wide
             anchors.horizontalCenterOffset: ((bearing-compass.yaw+180+720) % 360 - 180)/540*compass_band_composed.width
+
+            //high contrast border
+            Repeater {
+                model: 3
+                Rectangle {
+                    color: "transparent"
+                    border.color: index % 2 ? "white" : "black"
+                    border.width: 1
+                    anchors.centerIn: parent
+                    width: parent.width+index*2
+                    height: parent.height+index*2-4 //-4 to avoid clipping
+                }
+            }
         }
     }
 }

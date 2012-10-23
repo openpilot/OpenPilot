@@ -40,8 +40,22 @@ Item {
                 property real desiredAltitude : -PathDesired.End_Down
 
                 anchors.left: parent.left
+                anchors.leftMargin: 3 //to avoid clipping the border
                 anchors.verticalCenter: parent.top
                 anchors.verticalCenterOffset: (altitude_scale.topNumber-desiredAltitude)*altitude_scale.unitHeight
+
+                //high contrast border
+                Repeater {
+                    model: 3
+                    Rectangle {
+                        color: "transparent"
+                        border.color: index % 2 ? "white" : "black"
+                        border.width: 1
+                        anchors.centerIn: parent
+                        width: parent.width+index*2
+                        height: parent.height+index*2
+                    }
+                }
             }
 
             // Altitude numbers

@@ -71,6 +71,15 @@ Simulator::Simulator(const SimulatorSettings& params) :
     baroAltTime = currentTime;
     airspeedActualTime=currentTime;
 
+    //Define standard atmospheric constants
+    airParameters.univGasConstant=8.31447; //[J/(mol·K)]
+    airParameters.dryAirConstant=287.058;  //[J/(kg*K)]
+    airParameters.groundDensity=1.225;     //[kg/m^3]
+    airParameters.groundTemp=15+273.15;    //[K]
+    airParameters.tempLapseRate=0.0065;    //[deg/m]
+    airParameters.M=0.0289644;             //[kg/mol]
+    airParameters.relativeHumidity=20;     //[%]
+    airParameters.seaLevelPress=101.325;   //[kPa]
 }
 
 Simulator::~Simulator()
@@ -408,10 +417,7 @@ void Simulator::updateUAVOs(Output2Hardware out){
         LLA[0]=out.latitude;
         LLA[1]=out.longitude;
         LLA[2]=out.altitude;
-        double ECEF[3];
-        double RNE[9];
-        Utils::CoordinateConversions().RneFromLLA(LLA,(double (*)[3])RNE);
-        Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
+
         homeData.Be[0]=0;
         homeData.Be[1]=0;
         homeData.Be[2]=0;
@@ -727,6 +733,9 @@ void Simulator::updateUAVOs(Output2Hardware out){
         AirspeedActual::DataFields airspeedActualData;
         memset(&airspeedActualData, 0, sizeof(AirspeedActual::DataFields));
         airspeedActualData.CalibratedAirspeed = out.calibratedAirspeed + noise.airspeedActual.CalibratedAirspeed;
+        airspeedActualData.TrueAirspeed = out.trueAirspeed + noise.airspeedActual.TrueAirspeed;
+        airspeedActualData.alpha=out.angleOfAttack;
+        airspeedActualData.beta=out.angleOfSlip;
         airspeedActual->setData(airspeedActualData);
 
         airspeedActualTime=airspeedActualTime.addMSecs(settings.airspeedActualRate);
@@ -756,4 +765,69 @@ void Simulator::updateUAVOs(Output2Hardware out){
             attRawTime=attRawTime.addMSecs(settings.attRawRate);
         }
     }
+}
+
+/**
+ * calculate air density from altitude. http://en.wikipedia.org/wiki/Density_of_air
+ */
+float Simulator::airDensityFromAltitude(float alt, AirParameters air, float gravity) {
+    float p= airPressureFromAltitude(alt, air, gravity);
+    float rho=p*air.M/(air.univGasConstant*(air.groundTemp-air.tempLapseRate*alt));
+
+    return rho;
+}
+
+/**
+ * @brief Simulator::airPressureFromAltitude Get air pressure from altitude and atmospheric conditions.
+ * @param alt altitude
+ * @param air atmospheric conditions
+ * @param gravity
+ * @return
+ */
+float Simulator::airPressureFromAltitude(float alt, AirParameters air, float gravity) {
+    return air.seaLevelPress* pow(1 - air.tempLapseRate * alt /air.groundTemp, gravity * air.M/(air.univGasConstant*air.tempLapseRate));
+}
+
+/**
+ * @brief Simulator::cas2tas calculate TAS from CAS and altitude. http://en.wikipedia.org/wiki/Airspeed
+ * @param CAS Calibrated airspeed
+ * @param alt altitude
+ * @param air atmospheric conditions
+ * @param gravity
+ * @return True airspeed
+ */
+float Simulator::cas2tas(float CAS, float alt, AirParameters air, float gravity) {
+    float rho=airDensityFromAltitude(alt, air, gravity);
+
+    return (CAS * sqrt(air.groundDensity/rho));
+}
+
+/**
+ * @brief Simulator::tas2cas calculate CAS from TAS and altitude. http://en.wikipedia.org/wiki/Airspeed
+ * @param TAS True airspeed
+ * @param alt altitude
+ * @param air atmospheric conditions
+ * @param gravity
+ * @return Calibrated airspeed
+ */
+float Simulator::tas2cas(float TAS, float alt, AirParameters air, float gravity) {
+    float rho=airDensityFromAltitude(alt, air, gravity);
+
+    return (TAS / sqrt(air.groundDensity/rho));
+}
+
+/**
+ * @brief Simulator::getAirParameters get air parameters
+ * @return airParameters
+ */
+AirParameters Simulator::getAirParameters(){
+    return airParameters;
+}
+
+/**
+ * @brief Simulator::setAirParameters set air parameters
+ * @param airParameters
+ */
+void Simulator::setAirParameters(AirParameters airParameters){
+    this->airParameters=airParameters;
 }

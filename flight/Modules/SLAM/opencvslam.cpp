@@ -51,7 +51,7 @@ void OpenCVslam::run() {
 
 	/* Initialize RTSlam */
 	rtslam = new RTSlam(4,15);
-	//rtslam = new RTSlam(0);
+	//rtslam = new RTSlam(0,30);
 
 	rtslam->init();
 
@@ -149,9 +149,9 @@ void OpenCVslam::run() {
 		PositionActualGet(&positionActual);
 		VelocityActualGet(&velocityActual);
 		hardware::OpenPilotStateInformation state;
-		state.position.x = positionActual.North/500.;
-		state.position.y = -positionActual.East/500.;
-		state.position.z = -positionActual.Down/500.;
+		state.position.x = positionActual.North/100.;
+		state.position.y = -positionActual.East/100.;
+		state.position.z = -positionActual.Down/100.;
 		//state.position.x = 0; // +x
 		//state.position.y = 0; // -y
 		//state.position.z = .1; // -z
@@ -240,7 +240,7 @@ void OpenCVslam::run() {
 
 			Mat camera(correction*rotation*translation);
 			//camera.diag() = Mat::ones(3,1,CV_64F);
-			Draw3d d(Vec2i(320,240),Vec2i(1100,1100),Vec3d(0,0,0),camera);
+			Draw3d d(Vec2i(320,240),Vec2i(1015,1015),Vec3d(0.0,0.0,0),camera);
 			Mat lf(lastFrame);
 			Scalar c1(0,255,0);
 			Scalar c11(255,255,0);

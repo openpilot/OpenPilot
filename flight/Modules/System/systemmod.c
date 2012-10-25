@@ -40,6 +40,7 @@
 
 #include "openpilot.h"
 #include "systemmod.h"
+#include "sanitycheck.h"
 #include "objectpersistence.h"
 #include "flightstatus.h"
 #include "systemstats.h"
@@ -171,6 +172,9 @@ static void systemTask(void *parameters)
 	while (1) {
 		// Update the system statistics
 		updateStats();
+
+		// TODO: Make this only be called when configuration settings change
+		configuration_check();
 
 		// Update the system alarms
 		updateSystemAlarms();

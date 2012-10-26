@@ -51,16 +51,13 @@ static int32_t check_stabilization_settings(int index, bool multirotor);
 int32_t configuration_check()
 {
 	int32_t status = SYSTEMALARMS_ALARM_OK;
-	// TODO: Check manual control settings for any modes that can be accessed without the
-	// necessary module running
 
-	// TODO: Get board type
+	// Get board type
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;	
 	bool coptercontrol = bdinfo->board_type == 0x04;
 
 	// Classify airframe type
 	bool multirotor = true;
-
 	uint8_t airframe_type;
 	SystemSettingsAirframeTypeGet(&airframe_type);
 	switch(airframe_type) {
@@ -112,14 +109,29 @@ int32_t configuration_check()
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEHOLD:
 				if (coptercontrol)
 					status = SYSTEMALARMS_ALARM_ERROR;
+				else {
+					// Revo supports altitude hold
+					if(running[TASKINFO_RUNNING_ALTITUDEHOLD] != TASKINFO_RUNNING_TRUE)
+						status = SYSTEMALARMS_ALARM_ERROR;
+				}
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL:
 				if (coptercontrol)
 					status = SYSTEMALARMS_ALARM_ERROR;
+				else {
+					// Revo supports altitude hold
+					if(running[TASKINFO_RUNNING_GUIDANCE] != TASKINFO_RUNNING_TRUE)
+						status = SYSTEMALARMS_ALARM_ERROR;
+				}
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
 				if (coptercontrol)
 					status = SYSTEMALARMS_ALARM_ERROR;
+				else {
+					// Revo supports altitude hold
+					if(running[TASKINFO_RUNNING_GUIDANCE] != TASKINFO_RUNNING_TRUE)
+						status = SYSTEMALARMS_ALARM_ERROR;
+				}
 				break;
 			default:
 				// Uncovered modes are automatically an error

@@ -67,7 +67,7 @@
 #define RFM22B_DEFAULT_MIN_FREQUENCY (RFM22B_DEFAULT_FREQUENCY - 2000000)
 #define RFM22B_DEFAULT_MAX_FREQUENCY (RFM22B_DEFAULT_FREQUENCY + 2000000)
 #define RFM22B_DEFAULT_TX_POWER RFM22_tx_pwr_txpow_7
-
+#define RFM22B_LINK_QUALITY_THRESHOLD 20
 // The maximum amount of time without activity before initiating a reset.
 #define PIOS_RFM22B_SUPERVISOR_TIMEOUT 100  // ms
 
@@ -730,6 +730,19 @@ bool PIOS_RFM22B_Send_Packet(uint32_t rfm22b_id, PHPacketHandle p, uint32_t max_
 
 	// Success
 	return true;
+}
+
+/**
+ * Check the radio device for a valid connection
+ * \param[in] rfm22b_id  The rfm22b device.
+ * Returns true if there is a valid connection to paired radio, false otherwise.
+ */
+bool PIOS_RFM22B_LinkStatus(uint32_t rfm22b_id)
+{
+ 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return false;
+	return rfm22b_dev->stats.connected  && (rfm22b_dev->stats.link_quality > RFM22B_LINK_QUALITY_THRESHOLD);
 }
 
 /**

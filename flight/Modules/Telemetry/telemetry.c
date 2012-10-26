@@ -545,15 +545,18 @@ static void updateSettings()
 }
 
 /**
- * Determine input/output com port (USB takes priority over telemetry port)
+ * Determine input/output com port as highest priority available 
  */
 static uint32_t getComPort() {
 #if defined(PIOS_INCLUDE_USB)
-	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
+	if ( PIOS_COM_Available(PIOS_COM_TELEM_USB) )
 		return PIOS_COM_TELEM_USB;
 	else
 #endif /* PIOS_INCLUDE_USB */
-		return telemetryPort;
+		if ( PIOS_COM_Available(telemetryPort) )
+			return telemetryPort;
+		else
+			return 0;
 }
 
 /**

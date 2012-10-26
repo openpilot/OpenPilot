@@ -34,19 +34,21 @@
 #include <pios_rfm22b_priv.h>
 
 /* Provide a COM driver */
-static void PIOS_RFM22B_ChangeBaud(uint32_t rfm22b_id, uint32_t baud);
-static void PIOS_RFM22B_RegisterRxCallback(uint32_t rfm22b_id, pios_com_callback rx_in_cb, uint32_t context);
-static void PIOS_RFM22B_RegisterTxCallback(uint32_t rfm22b_id, pios_com_callback tx_out_cb, uint32_t context);
-static void PIOS_RFM22B_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail);
-static void PIOS_RFM22B_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail);
+static void PIOS_RFM22B_COM_ChangeBaud(uint32_t rfm22b_id, uint32_t baud);
+static void PIOS_RFM22B_COM_RegisterRxCallback(uint32_t rfm22b_id, pios_com_callback rx_in_cb, uint32_t context);
+static void PIOS_RFM22B_COM_RegisterTxCallback(uint32_t rfm22b_id, pios_com_callback tx_out_cb, uint32_t context);
+static void PIOS_RFM22B_COM_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail);
+static void PIOS_RFM22B_COM_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail);
+static bool PIOS_RFM22B_COM_Available(uint32_t rfm22b_com_id);
 
 /* Local variables */
 const struct pios_com_driver pios_rfm22b_com_driver = {
-	.set_baud   = PIOS_RFM22B_ChangeBaud,
-	.tx_start   = PIOS_RFM22B_TxStart,
-	.rx_start   = PIOS_RFM22B_RxStart,
-	.bind_tx_cb = PIOS_RFM22B_RegisterTxCallback,
-	.bind_rx_cb = PIOS_RFM22B_RegisterRxCallback,
+	.set_baud   = PIOS_RFM22B_COM_ChangeBaud,
+	.tx_start   = PIOS_RFM22B_COM_TxStart,
+	.rx_start   = PIOS_RFM22B_COM_RxStart,
+	.bind_tx_cb = PIOS_RFM22B_COM_RegisterTxCallback,
+	.bind_rx_cb = PIOS_RFM22B_COM_RegisterRxCallback,
+	.available  = PIOS_RFM22B_COM_Available
 };
 
 /**
@@ -54,7 +56,7 @@ const struct pios_com_driver pios_rfm22b_com_driver = {
  * \param[in] rfm22b_id RFM22B name (GPS, TELEM, AUX)
  * \param[in] baud Requested baud rate
  */
-static void PIOS_RFM22B_ChangeBaud(uint32_t rfm22b_id, uint32_t baud)
+static void PIOS_RFM22B_COM_ChangeBaud(uint32_t rfm22b_id, uint32_t baud)
 {
 	// Set the RF data rate on the modem to ~2X the selected buad rate because the modem is half duplex.
 	enum rfm22b_datarate datarate = RFM22_datarate_64000;
@@ -77,11 +79,11 @@ static void PIOS_RFM22B_ChangeBaud(uint32_t rfm22b_id, uint32_t baud)
 	RFM22_SetDatarate(rfm22b_id, datarate, true);
 }
 
-static void PIOS_RFM22B_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail)
+static void PIOS_RFM22B_COM_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail)
 {
 }
 
-static void PIOS_RFM22B_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail)
+static void PIOS_RFM22B_COM_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if (!PIOS_RFM22B_validate(rfm22b_dev))
@@ -112,7 +114,7 @@ static void PIOS_RFM22B_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail)
 	}
 }
 
-static void PIOS_RFM22B_RegisterRxCallback(uint32_t rfm22b_id, pios_com_callback rx_in_cb, uint32_t context)
+static void PIOS_RFM22B_COM_RegisterRxCallback(uint32_t rfm22b_id, pios_com_callback rx_in_cb, uint32_t context)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if (!PIOS_RFM22B_validate(rfm22b_dev))
@@ -126,7 +128,7 @@ static void PIOS_RFM22B_RegisterRxCallback(uint32_t rfm22b_id, pios_com_callback
 	rfm22b_dev->rx_in_cb = rx_in_cb;
 }
 
-static void PIOS_RFM22B_RegisterTxCallback(uint32_t rfm22b_id, pios_com_callback tx_out_cb, uint32_t context)
+static void PIOS_RFM22B_COM_RegisterTxCallback(uint32_t rfm22b_id, pios_com_callback tx_out_cb, uint32_t context)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if (!PIOS_RFM22B_validate(rfm22b_dev))
@@ -138,4 +140,9 @@ static void PIOS_RFM22B_RegisterTxCallback(uint32_t rfm22b_id, pios_com_callback
 	 */
 	rfm22b_dev->tx_out_context = context;
 	rfm22b_dev->tx_out_cb = tx_out_cb;
+}
+
+static bool PIOS_RFM22B_COM_Available(uint32_t rfm22b_id)
+{
+	return PIOS_RFM22B_LinkStatus(rfm22b_id);
 }

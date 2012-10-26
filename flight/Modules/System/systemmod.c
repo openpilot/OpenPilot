@@ -43,6 +43,7 @@
 #include "sanitycheck.h"
 #include "objectpersistence.h"
 #include "flightstatus.h"
+#include "manualcontrolsettings.h"
 #include "systemstats.h"
 #include "systemsettings.h"
 #include "i2cstats.h"
@@ -88,6 +89,7 @@ static bool mallocFailed;
 
 // Private functions
 static void objectUpdatedCb(UAVObjEvent * ev);
+static void configurationUpdatedCb(UAVObjEvent * ev);
 static void updateStats();
 static void updateSystemAlarms();
 static void systemTask(void *parameters);
@@ -168,13 +170,18 @@ static void systemTask(void *parameters)
 	// Listen for SettingPersistance object updates, connect a callback function
 	ObjectPersistenceConnectQueue(objectPersistenceQueue);
 
+	// Whenever the configuration changes, make sure it is safe to fly
+	SystemSettingsConnectCallback(configurationUpdatedCb);
+	ManualControlSettingsConnectCallback(configurationUpdatedCb);
+	TaskInfoConnectCallback(configurationUpdatedCb);
+
+	// Run this initially to make sure the configuration is checked
+	configuration_check();
+
 	// Main system loop
 	while (1) {
 		// Update the system statistics
 		updateStats();
-
-		// TODO: Make this only be called when configuration settings change
-		configuration_check();
 
 		// Update the system alarms
 		updateSystemAlarms();
@@ -305,6 +312,14 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 				break;
 		}
 	}
+}
+
+/**
+ * Called whenever a critical configuration component changes
+ */
+static void configurationUpdatedCb(UAVObjEvent * ev)
+{
+	configuration_check();
 }
 
 /**

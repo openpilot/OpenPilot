@@ -29,7 +29,6 @@
 #include "openpilot.h"
 #include <pios_board_info.h>
 #include "sanitycheck.h"
-#include "hwsettings.h"
 #include "taskinfo.h"
 #include "manualcontrolsettings.h"
 #include "systemalarms.h"

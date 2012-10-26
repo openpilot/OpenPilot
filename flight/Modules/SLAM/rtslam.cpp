@@ -1,7 +1,7 @@
 /**
  * based on demp_slam.cpp by jsola@laas.fr
  */
-
+#include "fenv.h"
 #include "rtslam.hpp" // class header
 
 /** ############################################################################
@@ -841,6 +841,7 @@ void RTSlam::init()
 void RTSlam::main()
 { try {
 
+	feenableexcept(FE_INVALID);
 	world_ptr_t *world = &worldPtr;
 	robot_ptr_t robotPtr;
 		
@@ -945,6 +946,7 @@ int n_innovation = 0;
 				
 				robot_ptr_t robPtr = pinfo.sen->robotPtr();
 //std::cout << "Frame " << (*world)->t << " using sen " << pinfo.sen->id() << " at time " << std::setprecision(16) << newt << std::endl;
+				JFR_DEBUG("Robot " << robPtr->id() << " state after move " << robPtr->state.x() << " ; euler " << quaternion::q2e(ublas::subrange(robPtr->state.x(), 3, 7)));
 				robPtr->move(newt);
 				
 				JFR_DEBUG("Robot " << robPtr->id() << " state after move " << robPtr->state.x() << " ; euler " << quaternion::q2e(ublas::subrange(robPtr->state.x(), 3, 7)));

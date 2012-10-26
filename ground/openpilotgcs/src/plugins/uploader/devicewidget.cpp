@@ -160,7 +160,7 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
         myDevice->lblBuildDate->setText(onBoardDescription.gitDate.insert(4,"-").insert(7,"-"));
         if(onBoardDescription.gitTag.startsWith("RELEASE",Qt::CaseSensitive))
         {
-            myDevice->lblDescription->setText(QString("Firmware tag: ")+onBoardDescription.gitTag);
+            myDevice->lblDescription->setText(onBoardDescription.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Tagged officially released firmware build"));

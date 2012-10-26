@@ -170,13 +170,13 @@ static void systemTask(void *parameters)
 	// Listen for SettingPersistance object updates, connect a callback function
 	ObjectPersistenceConnectQueue(objectPersistenceQueue);
 
+	// Run this initially to make sure the configuration is checked
+	configuration_check();
+
 	// Whenever the configuration changes, make sure it is safe to fly
 	SystemSettingsConnectCallback(configurationUpdatedCb);
 	ManualControlSettingsConnectCallback(configurationUpdatedCb);
 	TaskInfoConnectCallback(configurationUpdatedCb);
-
-	// Run this initially to make sure the configuration is checked
-	configuration_check();
 
 	// Main system loop
 	while (1) {

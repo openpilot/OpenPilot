@@ -304,8 +304,11 @@ namespace jafar {
 					int_center->im_high_curv = (double) sm + sr; // Smallest eigenvalue.
 					int_center->im_low_curv = (double) sm - sr; // Largest eigenvalue.
 
+					if (int_center->im_low_curv!=0.)
 					// detect and write pixel corresponding to strongest corner, with score.
 					corner_ratio = int_center->im_high_curv / int_center->im_low_curv; // CAUTION should be high/low
+					else corner_ratio=m_edge;
+
 					if (corner_ratio < m_edge) {
 						if (int_center->im_low_curv > im_low_curv_max) {
 							im_low_curv_max = int_center->im_low_curv;

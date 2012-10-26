@@ -50,15 +50,15 @@ OpenCVslam::OpenCVslam(SLAMSettingsData * newsettings) {
 void OpenCVslam::run() {
 
 	/* Initialize RTSlam */
-	rtslam = new RTSlam(4,15);
-	//rtslam = new RTSlam(0,30);
+	//rtslam = new RTSlam(4,15);
+	rtslam = new RTSlam(0,30);
 
 	rtslam->init();
 
 	/* Initialize OpenCV */
 	//VideoSource = NULL; //cvCaptureFromFile("test.avi");
-	VideoSource = cvCaptureFromFile("test.avi");
-	//VideoSource = cvCaptureFromCAM(0);
+	//VideoSource = cvCaptureFromFile("test.avi");
+	VideoSource = cvCaptureFromCAM(0);
 	
 	VideoDest = NULL;
 	//CvVideoWriter *VideoDest = cvCreateVideoWriter("output.avi",CV_FOURCC('F','M','P','4'),settings->FrameRate,cvSize(640,480),1);
@@ -80,6 +80,10 @@ void OpenCVslam::run() {
 	AttitudeActualSet(&attitudeActual);
 	cvShowImage("debug",currentFrame);
 	//cvWaitKey(1);
+	
+	/** start RTSLAM in its own thread (unknown to freertos since rtslam internally uses boost for thread control) **/
+	backgroundrtslam(rtslam);
+
 	while (attitudeActual.Pitch==100) AttitudeActualGet(&attitudeActual);
 
 
@@ -90,9 +94,6 @@ void OpenCVslam::run() {
 	int32_t extraincrement=0;
 	int32_t writeextra=0;
 	fprintf(stderr,"init at %i increment is %i at %f fps\n",timeval, increment,settings->FrameRate);
-
-	/** start RTSLAM in its own thread (unknown to freertos since rtslam internally uses boost for thread control) **/
-	backgroundrtslam(rtslam);
 
 	// Main task loop
 	double oldpos=0;
@@ -240,7 +241,7 @@ void OpenCVslam::run() {
 
 			Mat camera(correction*rotation*translation);
 			//camera.diag() = Mat::ones(3,1,CV_64F);
-			Draw3d d(Vec2i(320,240),Vec2i(1015,1015),Vec3d(0.0,0.0,0),camera);
+			Draw3d d(Vec2i(276,234),Vec2f(1013.5,998.5),Vec3d(-0.316416,7.546875,-58.177987),camera);
 			Mat lf(lastFrame);
 			Scalar c1(0,255,0);
 			Scalar c11(255,255,0);

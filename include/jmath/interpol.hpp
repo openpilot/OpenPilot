@@ -77,8 +77,13 @@ static inline void parabolicInterpolation(double  y0, double  y1, double  y2, do
 	double  b = (y2-y0)/2.0;
 	double  c = y1;
 
-	extremum_x = -b/(a*2.0);
-	extremum_y = c-b*b/(a*4.0);
+	if (a!=0.) {
+		extremum_x = -b/(a*2.0);
+		extremum_y = c-b*b/(a*4.0);
+	} else {
+		extremum_x = y1;
+		extremum_y = y1;
+	}
 }
 
 /**

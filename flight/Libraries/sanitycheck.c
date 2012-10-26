@@ -155,7 +155,7 @@ int32_t configuration_check()
  */
 static int32_t check_stabilization_settings(int index, bool multirotor)
 {
-	// Make sure the modes are all similar
+	// Make sure the modes have identical sizes
 	if (MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION2SETTINGS_NUMELEM ||
 		MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_NUMELEM)
 		return SYSTEMALARMS_ALARM_ERROR;

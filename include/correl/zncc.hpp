@@ -131,7 +131,7 @@ namespace jafar {
 					// this second bound seems globally less efficient, but more efficient at the end, after height/2
 //					double best_remain2 = sqrt(partialSumSqr1*partialSumSqr2) - mean2*partialSum1 - mean1*partialSum2 + partialCount*mean12;
 					
-					best_score1 = (current + best_remain1) / (sigma12);
+					best_score1 = (sigma12 < 1e-6 ? -1 : (current + best_remain1) / (sigma12));
 //					best_score2 = (current + best_remain2) / (sigma12);
 					if (best_score1 < minScore) return -2;
 //					if (best_score2 < minScore) return -1;

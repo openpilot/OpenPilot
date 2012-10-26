@@ -102,8 +102,10 @@ namespace correl {
 		// finish
 		mean1 /= zncc_count;
 		mean2 /= zncc_count;
-		sigma1 = sqrt(sigma1/zncc_count - mean1*mean1);
-		sigma2 = sqrt(sigma2/zncc_count - mean2*mean2);
+		double tmp1=sigma1/zncc_count - mean1*mean1;
+		double tmp2=sigma2/zncc_count - mean2*mean2;
+		if (tmp1<=0) sigma1=0; else sigma1 = sqrt(tmp1);
+		if (tmp2<=0) sigma2=0; else sigma2 = sqrt(tmp2);
 		sigma12 = sigma1*sigma2;
 // std::cout << "normal: zncc_sum " << zncc_sum << ", count " << zncc_count << ", mean12 " << mean1*mean2 << ", sigma12 " << sigma1*sigma2 << std::endl;
 		zncc_sum = (sigma12 < 1e-6 ? -1 : (zncc_sum/zncc_count - mean1*mean2) / sigma12);

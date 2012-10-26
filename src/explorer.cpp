@@ -355,8 +355,11 @@ namespace correl {
 				if (a1 > a2-ambiguity_thres && a3 > a2-ambiguity_thres) ambiguous = true;
 			} else ambiguous = true;
 			xres += bestx+0.5;
-			xstd = -1.0/(2*xstd);
-			if (ambiguous) xstd = 1e6;
+			
+			if (ambiguous)
+				xstd = 1e6;
+			else 
+				xstd = -1.0/(2*xstd);
 			
 			// interpolate y
 			best_score_y = best_score; yres = 0; a1 = a2 = a3 = -2;
@@ -372,8 +375,11 @@ namespace correl {
 				if (a1 > a2-ambiguity_thres && a3 > a2-ambiguity_thres) ambiguous = true;
 			} else ambiguous = true;
 			yres += besty+0.5;
-			ystd = -1.0/(2*ystd);
-			if (ambiguous) ystd = 1e6;
+			if (ambiguous)
+				ystd = 1e6;
+			else
+				ystd = -1.0/(2*ystd);
+				
 
 			// merge score interpolations
 			// we could do better, with 3+3+2 interpolations, but it's too much work

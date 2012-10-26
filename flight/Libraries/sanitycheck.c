@@ -86,7 +86,7 @@ int32_t configuration_check()
 	ManualControlSettingsFlightModeNumberGet(&num_modes);
 	ManualControlSettingsFlightModePositionGet(modes);
 
-	for(int i = 0; i < num_modes; i++) {
+	for(uint32_t i = 0; i < num_modes; i++) {
 		switch(modes[i]) {
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_MANUAL:
 				if (multirotor)
@@ -179,7 +179,7 @@ static int32_t check_stabilization_settings(int index, bool multirotor)
 
 	// For multirotors verify that nothing is set to "none"
 	if (multirotor) {
-		for(int i = 0; i < NELEMENTS(modes); i++) {
+		for(uint32_t i = 0; i < NELEMENTS(modes); i++) {
 			if (modes[i] == MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NONE)
 				return SYSTEMALARMS_ALARM_ERROR;
 		}

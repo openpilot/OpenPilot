@@ -69,9 +69,9 @@ public:
 
 		cv::Point3d c(0,0,0);
 		cv::Point3d ul(-center[0]/focal[0],-center[1]/focal[1],1.);
-		cv::Point3d ur(center[0]/focal[0],-center[1]/focal[1],1.);
-		cv::Point3d bl(-center[0]/focal[0],center[1]/focal[1],1.);
-		cv::Point3d br(center[0]/focal[0],center[1]/focal[1],1.);
+		cv::Point3d ur((img.cols-center[0])/focal[0],-center[1]/focal[1],1.);
+		cv::Point3d bl(-center[0]/focal[0],(img.rows-center[1])/focal[1],1.);
+		cv::Point3d br((img.cols-center[0])/focal[0],(img.rows-center[1])/focal[1],1.);
 		
 		// cut parts above image
 		l=l.cut(geo::Plane(c,ul,ur));

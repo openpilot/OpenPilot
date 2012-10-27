@@ -27,9 +27,9 @@
  */
 
 #include "openpilot.h"
+#include "taskmonitor.h"
 #include <pios_board_info.h>
 #include "sanitycheck.h"
-#include "taskinfo.h"
 #include "manualcontrolsettings.h"
 #include "systemalarms.h"
 #include "systemsettings.h"
@@ -75,10 +75,6 @@ int32_t configuration_check()
 			multirotor = false;
 	}
 
-	// Get the running modules
-	uint8_t running[TASKINFO_RUNNING_NUMELEM];
-	TaskInfoRunningGet(running);
-
 	// For each available flight mode position sanity check the available
 	// modes
 	uint8_t num_modes;
@@ -102,7 +98,7 @@ int32_t configuration_check()
 					status = (status == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(3, multirotor) : status;
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
-				if (running[TASKINFO_RUNNING_AUTOTUNE] != TASKINFO_RUNNING_TRUE)
+				if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_AUTOTUNE))
 					status = SYSTEMALARMS_ALARM_ERROR;
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEHOLD:
@@ -110,7 +106,7 @@ int32_t configuration_check()
 					status = SYSTEMALARMS_ALARM_ERROR;
 				else {
 					// Revo supports altitude hold
-					if(running[TASKINFO_RUNNING_ALTITUDEHOLD] != TASKINFO_RUNNING_TRUE)
+				if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_ALTITUDEHOLD))
 						status = SYSTEMALARMS_ALARM_ERROR;
 				}
 				break;
@@ -119,7 +115,7 @@ int32_t configuration_check()
 					status = SYSTEMALARMS_ALARM_ERROR;
 				else {
 					// Revo supports altitude hold
-					if(running[TASKINFO_RUNNING_GUIDANCE] != TASKINFO_RUNNING_TRUE)
+					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_GUIDANCE))
 						status = SYSTEMALARMS_ALARM_ERROR;
 				}
 				break;
@@ -128,7 +124,7 @@ int32_t configuration_check()
 					status = SYSTEMALARMS_ALARM_ERROR;
 				else {
 					// Revo supports altitude hold
-					if(running[TASKINFO_RUNNING_GUIDANCE] != TASKINFO_RUNNING_TRUE)
+					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_GUIDANCE))
 						status = SYSTEMALARMS_ALARM_ERROR;
 				}
 				break;

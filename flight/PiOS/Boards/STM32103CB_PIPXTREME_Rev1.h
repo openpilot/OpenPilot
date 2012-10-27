@@ -217,8 +217,7 @@ extern uint32_t pios_ppm_rcvr_id;
 // Receiver PPM input
 //-------------------------
 #define PIOS_PPM_MAX_DEVS     1
-#define PIOS_PPM_NUM_INPUTS   12
-#define PIOS_PPM_PACKET_UPDATE_PERIOD_MS 25
+#define PIOS_PPM_NUM_INPUTS   8
 
 //-------------------------
 // Servo outputs

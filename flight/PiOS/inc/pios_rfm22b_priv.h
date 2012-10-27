@@ -738,6 +738,11 @@ struct pios_rfm22b_dev {
 	// The status packet
 	PHStatusPacket status_packet;
 
+#ifdef PIOS_PPM_RECEIVER
+	// The PPM packet
+	PHPpmPacket ppm_packet;
+#endif
+
 	// The maximum time (ms) that it should take to transmit / receive a packet.
 	uint32_t max_packet_time;
 	portTickType packet_start_ticks;

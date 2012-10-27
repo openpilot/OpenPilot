@@ -59,7 +59,7 @@
 /* Local Defines */
 #define STACK_SIZE_BYTES 200
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 2)
-#define ISR_TIMEOUT 5 // ms
+#define ISR_TIMEOUT 2 // ms
 #define EVENT_QUEUE_SIZE 5
 #define PACKET_QUEUE_SIZE 3
 #define RFM22B_DEFAULT_RX_DATARATE RFM22_datarate_64000
@@ -71,8 +71,11 @@
 // The maximum amount of time without activity before initiating a reset.
 #define PIOS_RFM22B_SUPERVISOR_TIMEOUT 100  // ms
 
-// The time between updates over the radio link.
+// The time between updates for sending stats the radio link.
 #define RADIOSTATS_UPDATE_PERIOD_MS 250
+
+// The time between PPM updates
+#define PPM_UPDATE_PERIOD_MS 40
 
 // this is too adjust the RF module so that it is on frequency
 #define OSC_LOAD_CAP				0x7F	// cap = 12.5pf .. default
@@ -171,10 +174,12 @@ static enum pios_rfm22b_event rfm22_connectionDeclined(struct pios_rfm22b_dev *r
 static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_process_state_transition(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event);
+static void rfm22_process_event(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event);
 static enum pios_rfm22b_event rfm22_timeout(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_error(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_fatal_error(struct pios_rfm22b_dev *rfm22b_dev);
 static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev);
+static bool rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22b_add_rx_status(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_rx_packet_status status);
 static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHandle p, uint16_t rx_len);
 static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev, uint32_t frequency_hz);
@@ -605,7 +610,7 @@ static void PIOS_RFM22B_InjectEvent(struct pios_rfm22b_dev *rfm22b_dev, enum pio
 uint32_t PIOS_RFM22B_DeviceID(uint32_t rfm22b_id)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(PIOS_RFM22B_validate(rfm22b_dev))
+	if (PIOS_RFM22B_validate(rfm22b_dev))
 		return rfm22b_dev->deviceID;
 	else
 		return 0;
@@ -619,7 +624,7 @@ uint32_t PIOS_RFM22B_DeviceID(uint32_t rfm22b_id)
 void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(!PIOS_RFM22B_validate(rfm22b_dev))
+	if (!PIOS_RFM22B_validate(rfm22b_dev))
 		return;
 	rfm22b_dev->tx_power = tx_pwr;
 }
@@ -633,17 +638,22 @@ void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr)
 void PIOS_RFM22B_SetFrequencyRange(uint32_t rfm22b_id, uint32_t min_frequency, uint32_t max_frequency)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(!PIOS_RFM22B_validate(rfm22b_dev))
+	if (!PIOS_RFM22B_validate(rfm22b_dev))
 		return;
 	rfm22b_dev->min_frequency = min_frequency;
 	rfm22b_dev->max_frequency = max_frequency;
 	rfm22_setNominalCarrierFrequency(rfm22b_dev, (max_frequency - min_frequency) / 2);
 }
 
+/**
+ * Sets the radio destination ID.
+ * \param[in] rfm22b_id The RFM22B device index.
+ * \param[in] dest_id The destination ID.
+ */
 void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(!PIOS_RFM22B_validate(rfm22b_dev))
+	if (!PIOS_RFM22B_validate(rfm22b_dev))
 		return;
 	rfm22b_dev->destination_id = (dest_id == 0) ? 0xffffffff : dest_id;
 	// The first slot is reserved for our current pairID
@@ -755,6 +765,7 @@ static void PIOS_RFM22B_Task(void *parameters)
 	    return;
 	portTickType lastEventTicks = xTaskGetTickCount();
 	portTickType lastStatusTicks = lastEventTicks;
+	portTickType lastPPMTicks = lastEventTicks;
 
 	while(1)
 	{
@@ -774,10 +785,7 @@ static void PIOS_RFM22B_Task(void *parameters)
 				if ((event == RFM22B_EVENT_INT_RECEIVED) &&
 				    ((rfm22b_dev->state == RFM22B_STATE_UNINITIALIZED) || (rfm22b_dev->state == RFM22B_STATE_INITIALIZING)))
 					continue;
-
-				// Process all state transitions.
-				while(event != RFM22B_EVENT_NUM_EVENTS)
-					event = rfm22_process_state_transition(rfm22b_dev, event);
+				rfm22_process_event(rfm22b_dev, event);
 			}
 		}
 		else
@@ -790,24 +798,17 @@ static void PIOS_RFM22B_Task(void *parameters)
 			if ((ticksSinceEvent / portTICK_RATE_MS) > PIOS_RFM22B_SUPERVISOR_TIMEOUT)
 			{
  				// Transsition through an error event.
-				enum pios_rfm22b_event event = RFM22B_EVENT_ERROR;
-				while(event != RFM22B_EVENT_NUM_EVENTS)
-					event = rfm22_process_state_transition(rfm22b_dev, event);
+				rfm22_process_event(rfm22b_dev, RFM22B_EVENT_ERROR);
 
 				// Clear the event queue.
+				enum pios_rfm22b_event event;
 				while (xQueueReceive(rfm22b_dev->eventQueue, &event, 0) == pdTRUE)
 					;
 				lastEventTicks = xTaskGetTickCount();
-			} else
-			{
-				if (rfm22b_dev->state == RFM22B_STATE_RX_MODE)
-				{
-					// Try to start a transmission
-					enum pios_rfm22b_event event = RFM22B_EVENT_TX_START;
-					while(event != RFM22B_EVENT_NUM_EVENTS)
-						event = rfm22_process_state_transition(rfm22b_dev, event);
-				}
 			}
+			else if (rfm22b_dev->state == RFM22B_STATE_RX_MODE)
+				// Try to start a transmission
+				rfm22_process_event(rfm22b_dev, RFM22B_EVENT_TX_START);
 		}
 
 		// Have we locked up sending / receiving a packet?
@@ -821,18 +822,21 @@ static void PIOS_RFM22B_Task(void *parameters)
 
 			// Have we been sending this packet too long?
 			if (((cur_ticks - rfm22b_dev->packet_start_ticks) / portTICK_RATE_MS) > (rfm22b_dev->max_packet_time * 3))
-			{
-				enum pios_rfm22b_event event = RFM22B_EVENT_TIMEOUT;
-				while(event != RFM22B_EVENT_NUM_EVENTS)
-					event = rfm22_process_state_transition(rfm22b_dev, event);
-			}
+				rfm22_process_event(rfm22b_dev, RFM22B_EVENT_TIMEOUT);
 		}
 
-		// Queue up a status packet if it's time.
+		// Queue up a ppm packet if it's time.
 		portTickType curTicks = xTaskGetTickCount();
+		// Rollover
+		if (curTicks < lastPPMTicks)
+			lastPPMTicks = curTicks;
+		if (((curTicks - lastPPMTicks) / portTICK_RATE_MS) > PPM_UPDATE_PERIOD_MS)
+			if (rfm22_sendPPM(rfm22b_dev))
+				lastPPMTicks = curTicks;
 		// Rollover
 		if (curTicks < lastStatusTicks)
 			lastStatusTicks = curTicks;
+		// Queue up a status packet if it's time.
 		if (((curTicks - lastStatusTicks) / portTICK_RATE_MS) > RADIOSTATS_UPDATE_PERIOD_MS)
 			if (rfm22_sendStatus(rfm22b_dev))
 				lastStatusTicks = curTicks;
@@ -1056,6 +1060,13 @@ static enum pios_rfm22b_event rfm22_process_state_transition(struct pios_rfm22b_
 		return rfm22b_transitions[rfm22b_dev->state].entry_fn(rfm22b_dev);
 
 	return RFM22B_EVENT_NUM_EVENTS;
+}
+
+static void rfm22_process_event(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event)
+{
+	// Process all state transitions.
+	while(event != RFM22B_EVENT_NUM_EVENTS)
+		event = rfm22_process_state_transition(rfm22b_dev, event);
 }
 
 // ************************************
@@ -1292,9 +1303,43 @@ static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 		return false;
 
 	// Process a SEND_PACKT event.
-	enum pios_rfm22b_event event = RFM22B_EVENT_SEND_PACKET;
-	while(event != RFM22B_EVENT_NUM_EVENTS)
-		event = rfm22_process_state_transition(rfm22b_dev, event);
+	rfm22_process_event(rfm22b_dev, RFM22B_EVENT_SEND_PACKET);
+
+	return true;
+}
+
+static bool rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev)
+{
+#ifdef PIOS_PPM_RECEIVER
+	// Just return if the PPM receiver is not configured.
+	if (PIOS_PPM_RECEIVER == 0)
+		return true;
+
+	// See if we have any valid channels.
+	bool valid_input_detected = false;
+	for (uint8_t i = 1; i <= PIOS_PPM_NUM_INPUTS; ++i)
+	{
+		rfm22b_dev->ppm_packet.channels[i - 1] = PIOS_RCVR_Read(PIOS_PPM_RECEIVER, i);
+		if(rfm22b_dev->ppm_packet.channels[i - 1] != PIOS_RCVR_TIMEOUT)
+			valid_input_detected = true;
+	}
+
+	// Send the PPM packet if it's valid
+	if (valid_input_detected)
+	{
+		rfm22b_dev->ppm_packet.header.destination_id = rfm22b_dev->destination_id;
+		rfm22b_dev->ppm_packet.header.type = PACKET_TYPE_PPM;
+		rfm22b_dev->ppm_packet.header.data_size = PH_PPM_DATA_SIZE(&(rfm22b_dev->ppm_packet));
+
+		// Queue the packet
+		PHPacketHandle pph = (PHPacketHandle)&(rfm22b_dev->ppm_packet);
+		if (xQueueSend(rfm22b_dev->packetQueue, &pph, 0) != pdTRUE)
+			return false;
+
+		// Process a SEND_PACKT event.
+		rfm22_process_event(rfm22b_dev, RFM22B_EVENT_SEND_PACKET);
+	}
+#endif
 
 	return true;
 }
@@ -1599,7 +1644,7 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 	else if (rfm22b_dev->int_status1 & RFM22_is1_ipksent)
 	{
 		rfm22b_dev->stats.tx_count++;
-		rfm22b_dev->stats.tx_byte_count += rfm22b_dev->tx_packet->header.data_size;
+		rfm22b_dev->stats.tx_byte_count += PH_PACKET_SIZE(rfm22b_dev->tx_packet);
 		// Free the tx packet
 		PHReleaseTXPacket(pios_packet_handler, rfm22b_dev->tx_packet);
 		rfm22b_dev->tx_packet = 0;

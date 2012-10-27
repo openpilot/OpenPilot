@@ -104,6 +104,7 @@ bool TaskMonitorQueryRunning(TaskInfoRunningElem task)
  */
 void TaskMonitorUpdateAll(void)
 {
+#if defined(DIAG_TASKS)
 	TaskInfoData data;
 	int n;
 
@@ -154,4 +155,5 @@ void TaskMonitorUpdateAll(void)
 
 	// Done
 	xSemaphoreGiveRecursive(lock);
+#endif
 }

@@ -126,7 +126,9 @@ int32_t SystemModInitialize(void)
 	SystemStatsInitialize();
 	FlightStatusInitialize();
 	ObjectPersistenceInitialize();
+#if defined(DIAG_TASKS)
 	TaskInfoInitialize();
+#endif
 #if defined(I2C_WDG_STATS_DIAGNOSTICS)
 	I2CStatsInitialize();
 	WatchdogStatusInitialize();
@@ -190,8 +192,10 @@ static void systemTask(void *parameters)
 		updateWDGstats();
 #endif
 
+#if defined(DIAG_TASKS)
 		// Update the task status object
 		TaskMonitorUpdateAll();
+#endif
 
 		// Flash the heartbeat LED
 #if defined(PIOS_LED_HEARTBEAT)

@@ -40,7 +40,6 @@ opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent,QAbstract
     connect(ui->checkBoxLocked,SIGNAL(toggled(bool)),this,SLOT(enableEditWidgets(bool)));
     connect(ui->cbMode,SIGNAL(currentIndexChanged(int)),this,SLOT(setupModeWidgets()));
     connect(ui->cbCondition,SIGNAL(currentIndexChanged(int)),this,SLOT(setupConditionWidgets()));
-    connect(ui->pushButtonApply,SIGNAL(clicked()),this,SLOT(pushButtonApply_clicked()));
     connect(ui->pushButtonCancel,SIGNAL(clicked()),this,SLOT(pushButtonCancel_clicked()));
     MapDataDelegate::loadComboBox(ui->cbMode,flightDataModel::MODE);
     MapDataDelegate::loadComboBox(ui->cbCondition,flightDataModel::CONDITION);
@@ -50,7 +49,7 @@ opmap_edit_waypoint_dialog::opmap_edit_waypoint_dialog(QWidget *parent,QAbstract
     mapper->setItemDelegate(new MapDataDelegate(this));
     connect(mapper,SIGNAL(currentIndexChanged(int)),this,SLOT(currentIndexChanged(int)));
     mapper->setModel(model);
-    mapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
+    mapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
     mapper->addMapping(ui->checkBoxLocked,flightDataModel::LOCKED);
     mapper->addMapping(ui->doubleSpinBoxLatitude,flightDataModel::LATPOSITION);
     mapper->addMapping(ui->doubleSpinBoxLongitude,flightDataModel::LNGPOSITION);
@@ -233,10 +232,6 @@ void opmap_edit_waypoint_dialog::pushButtonCancel_clicked()
 {
     mapper->revert();
     close();
-}
-void opmap_edit_waypoint_dialog::pushButtonApply_clicked()
-{
-    mapper->submit();
 }
 void opmap_edit_waypoint_dialog::editWaypoint(mapcontrol::WayPointItem *waypoint_item)
 {

@@ -386,6 +386,9 @@
            <property name="maximum">
             <double>999999999.000000000000000</double>
            </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
+           </property>
           </widget>
          </item>
          <item row="1" column="0">
@@ -469,6 +472,9 @@
            <property name="maximum">
             <double>999999999.000000000000000</double>
            </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
+           </property>
           </widget>
          </item>
          <item row="3" column="1">
@@ -476,12 +482,18 @@
            <property name="maximum">
             <double>999999999.000000000000000</double>
            </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
+           </property>
           </widget>
          </item>
          <item row="4" column="1">
           <widget class="QDoubleSpinBox" name="dsb_modeParam4">
            <property name="maximum">
             <double>999999999.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
            </property>
           </widget>
          </item>
@@ -544,6 +556,9 @@
           <widget class="QDoubleSpinBox" name="dsb_condParam1">
            <property name="maximum">
             <double>999999999.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
            </property>
           </widget>
          </item>
@@ -628,6 +643,9 @@
            <property name="maximum">
             <double>999999999.000000000000000</double>
            </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
+           </property>
           </widget>
          </item>
          <item row="3" column="1">
@@ -635,12 +653,18 @@
            <property name="maximum">
             <double>999999999.000000000000000</double>
            </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
+           </property>
           </widget>
          </item>
          <item row="4" column="1">
           <widget class="QDoubleSpinBox" name="dsb_condParam4">
            <property name="maximum">
             <double>999999999.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.010000000000000</double>
            </property>
           </widget>
          </item>
@@ -795,13 +819,6 @@
       <widget class="QPushButton" name="pushButtonOK">
        <property name="text">
         <string>OK</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonApply">
-       <property name="text">
-        <string>Apply</string>
        </property>
       </widget>
      </item>

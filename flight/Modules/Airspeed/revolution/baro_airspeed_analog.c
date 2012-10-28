@@ -36,18 +36,15 @@
  *
  */
 
-#define AIRSPEED_STORED_IN_A_PROPER_UAVO FALSE //AIRSPEED SHOULD NOT GO INTO BaroAirspeed. IT IS A STATE VARIABLE, AND NOT A MEASUREMENT
-
 #include "openpilot.h"
 #include "hwsettings.h"
 #include "airspeed.h"
 #include "airspeedsettings.h"
 #include "baroairspeed.h"	// object that will be updated by the module
 
+#if defined(PIOS_INCLUDE_MPXV7002) || defined (PIOS_INCLUDE_MPXV5004)
 
-#define SAMPLING_DELAY_MS_ETASV3                50     //Update at 20Hz
 #define SAMPLING_DELAY_MS_MPXV                  10     //Update at 100Hz
-#define ETS_AIRSPEED_SCALE                      1.0f   //???
 #define CALIBRATION_IDLE_MS                     2000   //Time to wait before calibrating, in [ms]
 #define CALIBRATION_COUNT_MS                    2000   //Time to spend calibrating, in [ms]
 #define ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS   100.0f //Needs to be settable in a UAVO
@@ -58,29 +55,14 @@
 
 // Private functions
 
-#if defined(PIOS_INCLUDE_ETASV3) || defined(PIOS_INCLUDE_MPXV7002) || defined (PIOS_INCLUDE_MPXV5004)
 static uint16_t calibrationCount=0;
-#endif
 
-void baro_airspeedGet(BaroAirspeedData *baroAirspeedData, portTickType *lastSysTime, uint8_t airspeedSensorType, int8_t airspeedADCPin){
-	
-#if defined(PIOS_INCLUDE_ETASV3)	
-	static uint32_t calibrationSum = 0;
-#endif	
-	
-	//Find out which sensor we're using.
-	if (airspeedSensorType==AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV7002 || airspeedSensorType==AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV5004){ 		//MPXV5004 and MPXV7002 sensors
-		
-#if defined(PIOS_INCLUDE_MPXV7002) || defined (PIOS_INCLUDE_MPXV5004)
+
+void baro_airspeedGetAnalog(BaroAirspeedData *baroAirspeedData, portTickType *lastSysTime, uint8_t airspeedSensorType, int8_t airspeedADCPin){
+
 		//Ensure that the ADC pin is properly configured
 		if(airspeedADCPin <0){ //It's not, so revert to former sensor type
 			baroAirspeedData->BaroConnected = BAROAIRSPEED_BAROCONNECTED_FALSE;
-			AirspeedSettingsData airspeedSettingsData;
-			AirspeedSettingsGet(&airspeedSettingsData);
-			
-			airspeedSettingsData.AirspeedSensorType=AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GPSONLY;
-			
-			AirspeedSettingsSet(&airspeedSettingsData); 			// IS THERE ANY WAY TO SET A MUTEX ON THIS BEFORE SETTING IT?
 			
 			return;
 		}
@@ -93,20 +75,15 @@ void baro_airspeedGet(BaroAirspeedData *baroAirspeedData, portTickType *lastSysT
 			return;
 		} else if (calibrationCount <= (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/SAMPLING_DELAY_MS_MPXV) { //Then compute the average.
 			calibrationCount++; /*DO NOT MOVE FROM BEFORE sensorCalibration=... LINE, OR ELSE WILL HAVE DIVIDE BY ZERO */
-			AirspeedSettingsData airspeedSettingsData;
-			AirspeedSettingsGet(&airspeedSettingsData);
-			
 
-
+			uint16_t sensorCalibration;
 			if(airspeedSensorType==AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV7002){
-				uint16_t sensorCalibration=PIOS_MPXV7002_Calibrate(airspeedADCPin, calibrationCount-CALIBRATION_IDLE_MS/SAMPLING_DELAY_MS_MPXV);
-				airspeedSettingsData.ZeroPoint=sensorCalibration;
-				PIOS_MPXV7002_UpdateCalibration(airspeedSettingsData.ZeroPoint); //This makes sense for the user if the initial calibration was not good and the user does not wish to reboot.
+				sensorCalibration=PIOS_MPXV7002_Calibrate(airspeedADCPin, calibrationCount-CALIBRATION_IDLE_MS/SAMPLING_DELAY_MS_MPXV);
+				PIOS_MPXV7002_UpdateCalibration(sensorCalibration); //This makes sense for the user if the initial calibration was not good and the user does not wish to reboot.
 			}
 			else if(airspeedSensorType==AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV5004){
-				uint16_t sensorCalibration=PIOS_MPXV5004_Calibrate(airspeedADCPin, calibrationCount-CALIBRATION_IDLE_MS/SAMPLING_DELAY_MS_MPXV);
-				airspeedSettingsData.ZeroPoint=sensorCalibration;
-				PIOS_MPXV5004_UpdateCalibration(airspeedSettingsData.ZeroPoint); //This makes sense for the user if the initial calibration was not good and the user does not wish to reboot.
+				sensorCalibration=PIOS_MPXV5004_Calibrate(airspeedADCPin, calibrationCount-CALIBRATION_IDLE_MS/SAMPLING_DELAY_MS_MPXV);
+				PIOS_MPXV5004_UpdateCalibration(sensorCalibration); //This makes sense for the user if the initial calibration was not good and the user does not wish to reboot.
 			}
 
 
@@ -114,7 +91,7 @@ void baro_airspeedGet(BaroAirspeedData *baroAirspeedData, portTickType *lastSysT
 			
 			//Set settings UAVO. The airspeed UAVO is set elsewhere in the function.
 			if (calibrationCount == (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/SAMPLING_DELAY_MS_MPXV)
-				AirspeedSettingsSet(&airspeedSettingsData); 			// IS THERE ANY WAY TO SET A MUTEX ON THIS BEFORE SETTING IT?
+				AirspeedSettingsZeroPointSet(&sensorCalibration);
 			
 			return;
 		}
@@ -155,68 +132,10 @@ void baro_airspeedGet(BaroAirspeedData *baroAirspeedData, portTickType *lastSysT
 		
 		//Set two values, one for the UAVO airspeed sensor reading, and the other for the GPS corrected one
 		baroAirspeedData->CalibratedAirspeed = filteredAirspeed;
-#else
-		//Whoops, no sensor defined in pios_config.h. Revert to GPS.
-		baroAirspeedData->BaroConnected = BAROAIRSPEED_BAROCONNECTED_FALSE;
-		AirspeedSettingsData airspeedSettingsData;
-		AirspeedSettingsGet(&airspeedSettingsData);
-		airspeedSettingsData.AirspeedSensorType=AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GPSONLY;
-		
-		AirspeedSettingsSet(&airspeedSettingsData); 	// IS THERE ANY WAY TO SET A MUTEX ON THIS BEFORE SETTING IT?
-		
-		return;		
-#endif
-	}
-	else if (airspeedSensorType==AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_EAGLETREEAIRSPEEDV3){ //Eagletree Airspeed v3
-#if defined(PIOS_INCLUDE_ETASV3)
-		AirspeedSettingsData airspeedSettingsData;
-		AirspeedSettingsGet(&airspeedSettingsData);
 
-		//Wait until our turn. //THIS SHOULD BE, IF OUR TURN GO IN, OTHERWISE CONTINUE
-		vTaskDelayUntil(lastSysTime, SAMPLING_DELAY_MS_ETASV3 / portTICK_RATE_MS);
-		
-		//Check to see if airspeed sensor is returning baroAirspeedData
-		baroAirspeedData->SensorValue = PIOS_ETASV3_ReadAirspeed();
-		if (baroAirspeedData->SensorValue==-1) {
-			baroAirspeedData->BaroConnected = BAROAIRSPEED_BAROCONNECTED_FALSE;
-			baroAirspeedData->CalibratedAirspeed = 0;
-			BaroAirspeedSet(&baroAirspeedData);
-			return;
-		}
-		
-		//Calibrate sensor by averaging zero point value //THIS SHOULD NOT BE DONE IF THERE IS AN IN-AIR RESET. HOW TO DETECT THIS?
-		if (calibrationCount < CALIBRATION_IDLE_MS/SAMPLING_DELAY_MS_ETASV3) {
-			calibrationCount++;
-			return;
-		} else if (calibrationCount < (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/SAMPLING_DELAY_MS_ETASV3) {
-			calibrationCount++;
-			calibrationSum +=  baroAirspeedData->SensorValue;
-			if (calibrationCount == (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/SAMPLING_DELAY_MS_ETASV3) {
-				
-				airspeedSettingsData.ZeroPoint=(uint16_t) (((float)calibrationSum) / CALIBRATION_COUNT_MS +0.5f);
-				AirspeedSettingsSet(&airspeedSettingsData);				
-			} else {
-				return;
-			}
-		}
-		
-		//Compute airspeed
-		float calibratedAirspeed = ETS_AIRSPEED_SCALE * sqrtf((float)abs(baroAirspeedData->SensorValue - airspeedSettingsData.ZeroPoint)); //Is this calibrated or indicated airspeed?
-		
-		baroAirspeedData->BaroConnected = BAROAIRSPEED_BAROCONNECTED_TRUE;
-		baroAirspeedData->CalibratedAirspeed = calibratedAirspeed;
-#else
-		//Whoops, no EagleTree sensor defined in pios_config.h. Declare it unconnected...
-		baroAirspeedData->BaroConnected = BAROAIRSPEED_BAROCONNECTED_FALSE;
-		
-		//...and revert to GPS.
-		if (airspeedSensorType!=AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GPSONLY) {
-			uint8_t tmpVal=AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GPSONLY;			
-			AirspeedSettingsAirspeedSensorTypeSet(&tmpVal);  // IS THERE ANY WAY TO SET A MUTEX ON THIS BEFORE SETTING IT?
-		}
-#endif
-	}
 }
+
+#endif
 
 /**
  * @}

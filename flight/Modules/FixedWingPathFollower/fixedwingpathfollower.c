@@ -282,7 +282,6 @@ static void updatePathVelocity()
 		case PATHDESIRED_MODE_FLYCIRCLELEFT:
 		case PATHDESIRED_MODE_DRIVECIRCLELEFT:
 			groundspeed = pathDesired.EndingVelocity;
-//			groundspeed = fixedwingpathfollowerSettings.BestClimbRateSpeed;
 			altitudeSetpoint = pathDesired.End[2];
 			break;
 		case PATHDESIRED_MODE_FLYENDPOINT:
@@ -291,16 +290,19 @@ static void updatePathVelocity()
 		case PATHDESIRED_MODE_DRIVEVECTOR:
 		default:
 			groundspeed = pathDesired.StartingVelocity + (pathDesired.EndingVelocity - pathDesired.StartingVelocity) *
-			bound(progress.fractional_progress,0,1);
+				bound(progress.fractional_progress,0,1);
 			altitudeSetpoint = pathDesired.Start[2] + (pathDesired.End[2] - pathDesired.Start[2]) *
-			bound(progress.fractional_progress,0,1);
+				bound(progress.fractional_progress,0,1);
 			break;
 	}
+	// this ensures a significant forward component at least close to the real trajectory
+	if (groundspeed<fixedwingpathfollowerSettings.BestClimbRateSpeed/10.)
+		groundspeed=fixedwingpathfollowerSettings.BestClimbRateSpeed/10.;
 	
 	// calculate velocity - can be zero if waypoints are too close
 	VelocityDesiredData velocityDesired;
-	velocityDesired.North = progress.path_direction[0] * fmaxf(groundspeed,1e-6);
-	velocityDesired.East = progress.path_direction[1] * fmaxf(groundspeed,1e-6);
+	velocityDesired.North = progress.path_direction[0] * groundspeed;
+	velocityDesired.East = progress.path_direction[1] * groundspeed;
 	
 	float error_speed = progress.error * fixedwingpathfollowerSettings.HorizontalPosP;
 
@@ -366,10 +368,6 @@ static uint8_t updateFixedDesiredAttitude()
 	float indicatedAirspeedActual;
 	float indicatedAirspeedDesired;
 	float airspeedError;
-	float accelActual;
-	float accelDesired;
-	float accelError;
-	float accelCommand;
 	
 	float pitchCommand;
 
@@ -522,66 +520,28 @@ static uint8_t updateFixedDesiredAttitude()
 	/**
 	 * Compute desired pitch command
 	 */
-	// compute desired acceleration
-	if(0){
-		accelDesired = bound( (airspeedError/indicatedAirspeedActual) * fixedwingpathfollowerSettings.SpeedP[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDP_KP],
-			-fixedwingpathfollowerSettings.SpeedP[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDP_MAX],
-			fixedwingpathfollowerSettings.SpeedP[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDP_MAX]);
-		fixedwingpathfollowerStatus.Error[FIXEDWINGPATHFOLLOWERSTATUS_ERROR_SPEED] = airspeedError;
-		fixedwingpathfollowerStatus.ErrorInt[FIXEDWINGPATHFOLLOWERSTATUS_ERRORINT_SPEED] = 0.0f;
-		fixedwingpathfollowerStatus.Command[FIXEDWINGPATHFOLLOWERSTATUS_COMMAND_SPEED] = accelDesired;
-
-		// exclude gravity from acceleration. If the aicraft is flying at high pitch, it fights gravity without getting faster
-		accelActual = accels.x - (sinf( DEG2RAD * attitudeActual.Pitch) * GEE);
-
-		accelError = accelDesired - accelActual;
-		if (fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KI] > 0){
-			accelIntegral = bound(accelIntegral + accelError * dT, 
-				-fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_ILIMIT]/fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KI],
-				fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_ILIMIT]/fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KI]);
-		}
 		
-		accelCommand = (accelError * fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KP] + 
-			accelIntegral*fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KI]);
+	if (fixedwingpathfollowerSettings.SpeedPI[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDPI_KI] > 0){
+		//Integrate with saturation
+		airspeedErrorInt=bound(airspeedErrorInt + airspeedError * dT, 
+				-fixedwingpathfollowerSettings.SpeedPI[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDPI_ILIMIT]/fixedwingpathfollowerSettings.SpeedPI[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDPI_KI],
+				fixedwingpathfollowerSettings.SpeedPI[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDPI_ILIMIT]/fixedwingpathfollowerSettings.SpeedPI[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDPI_KI]);
+	}				
 	
-		fixedwingpathfollowerStatus.Error[FIXEDWINGPATHFOLLOWERSTATUS_ERROR_ACCEL] = accelError;
-		fixedwingpathfollowerStatus.ErrorInt[FIXEDWINGPATHFOLLOWERSTATUS_ERRORINT_ACCEL] = accelIntegral;
-		fixedwingpathfollowerStatus.Command[FIXEDWINGPATHFOLLOWERSTATUS_COMMAND_ACCEL] = accelCommand;
-		
-		pitchCommand= -accelCommand + bound ( (-descentspeedError/indicatedAirspeedActual) * fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_KP],
-			-fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX],
-			fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX]
-			);
-	}
-	else {
-		
-		if (fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KI] > 0){
-			//Integrate with saturation
-			airspeedErrorInt=bound(airspeedErrorInt + airspeedError * dT, 
-					-fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_ILIMIT]/fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KI],
-					fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_ILIMIT]/fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KI]);
-		}				
-		
-		//Compute the cross feed from vertical speed to pitch, with saturation
-		float verticalSpeedToPitchCommandComponent=bound (-descentspeedError * fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_KP],
-				 -fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX],
-				 fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX]
-				 );
-		
-		//Compute the pitch command as err*Kp + errInt*Ki + X_feed.
-		pitchCommand= -(airspeedError*fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KP] 
-							 + airspeedErrorInt*fixedwingpathfollowerSettings.AccelPI[FIXEDWINGPATHFOLLOWERSETTINGS_ACCELPI_KI]
-							 )	+ verticalSpeedToPitchCommandComponent;
-		
-		fixedwingpathfollowerStatus.Error[FIXEDWINGPATHFOLLOWERSTATUS_ERROR_SPEED] = airspeedError;
-		fixedwingpathfollowerStatus.ErrorInt[FIXEDWINGPATHFOLLOWERSTATUS_ERRORINT_SPEED] = airspeedErrorInt;
-		fixedwingpathfollowerStatus.Command[FIXEDWINGPATHFOLLOWERSTATUS_COMMAND_SPEED] = indicatedAirspeedDesired;
-		
-		fixedwingpathfollowerStatus.Error[FIXEDWINGPATHFOLLOWERSTATUS_ERROR_ACCEL] = -123;
-		fixedwingpathfollowerStatus.ErrorInt[FIXEDWINGPATHFOLLOWERSTATUS_ERRORINT_ACCEL] = -123;
-		fixedwingpathfollowerStatus.Command[FIXEDWINGPATHFOLLOWERSTATUS_COMMAND_ACCEL] = pitchCommand;
-		
-	}
+	//Compute the cross feed from vertical speed to pitch, with saturation
+	float verticalSpeedToPitchCommandComponent=bound (-descentspeedError * fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_KP],
+			 -fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX],
+			 fixedwingpathfollowerSettings.VerticalToPitchCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_VERTICALTOPITCHCROSSFEED_MAX]
+			 );
+	
+	//Compute the pitch command as err*Kp + errInt*Ki + X_feed.
+	pitchCommand= -(airspeedError*fixedwingpathfollowerSettings.SpeedPI[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDPI_KP] 
+						 + airspeedErrorInt*fixedwingpathfollowerSettings.SpeedPI[FIXEDWINGPATHFOLLOWERSETTINGS_SPEEDPI_KI]
+						 )	+ verticalSpeedToPitchCommandComponent;
+	
+	fixedwingpathfollowerStatus.Error[FIXEDWINGPATHFOLLOWERSTATUS_ERROR_SPEED] = airspeedError;
+	fixedwingpathfollowerStatus.ErrorInt[FIXEDWINGPATHFOLLOWERSTATUS_ERRORINT_SPEED] = airspeedErrorInt;
+	fixedwingpathfollowerStatus.Command[FIXEDWINGPATHFOLLOWERSTATUS_COMMAND_SPEED] = pitchCommand;
 
 	stabDesired.Pitch = bound(fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_NEUTRAL] +
 		pitchCommand,

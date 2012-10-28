@@ -249,7 +249,7 @@ int32_t PIOS_Flash_Jedec_ReadStatus()
  */
 int32_t PIOS_Flash_Jedec_ReadID()
 {
-	uint8_t out[] = {JEDEC_DEVICE_ID};
+	uint8_t out[] = {JEDEC_DEVICE_ID, 0, 0, 0};
 	uint8_t in[4];
 	if (PIOS_Flash_Jedec_ClaimBus() < 0) 
 		return -1;

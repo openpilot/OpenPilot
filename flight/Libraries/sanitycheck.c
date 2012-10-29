@@ -89,13 +89,13 @@ int32_t configuration_check()
 					status = SYSTEMALARMS_ALARM_ERROR;
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
-					status = (status == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(1, multirotor) : status;
+				status = (status == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(1, multirotor) : status;
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED2:
-					status = (status == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(2, multirotor) : status;
+				status = (status == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(2, multirotor) : status;
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED3:
-					status = (status == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(3, multirotor) : status;
+				status = (status == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(3, multirotor) : status;
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
 				if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_AUTOTUNE))

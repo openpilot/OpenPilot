@@ -43,9 +43,9 @@
 #include "magnetometer.h"
 
 // Private constants
-#define STACK_SIZE_BYTES 620
+#define STACK_SIZE_BYTES 600
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
-#define UPDATE_PERIOD 50
+#define UPDATE_PERIOD 100
 
 // Private types
 
@@ -53,14 +53,20 @@
 static xTaskHandle taskHandle;
 
 // down sampling variables
+static bool magbaroEnabled;
+
+#if defined(PIOS_INCLUDE_BMP085)
 #define alt_ds_size    4
 static int32_t alt_ds_temp = 0;
 static int32_t alt_ds_pres = 0;
 static int alt_ds_count = 0;
+#endif
+
+#if defined(PIOS_INCLUDE_HMC5883)
 int32_t mag_test;
-static bool magbaroEnabled;
 static float mag_bias[3] = {0,0,0};
 static float mag_scale[3] = {1,1,1};
+#endif
 
         // Private functions
 static void magbaroTask(void *parameters);
@@ -75,7 +81,7 @@ int32_t MagBaroStart()
 	if (magbaroEnabled) {
 		// Start main task
 		xTaskCreate(magbaroTask, (signed char *)"MagBaro", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-		//TaskMonitorAdd(TASKINFO_RUNNING_MAGBARO, taskHandle);
+		TaskMonitorAdd(TASKINFO_RUNNING_MAGBARO, taskHandle);
 		return 0;
 	}
 	return -1;
@@ -102,13 +108,18 @@ int32_t MagBaroInitialize()
 
 	if(magbaroEnabled)
 	{
+#if defined(PIOS_INCLUDE_HMC5883)
 		MagnetometerInitialize();
+#endif
+
+#if defined(PIOS_INCLUDE_BMP085)
 		BaroAltitudeInitialize();
 
 		// init down-sampling data
 		alt_ds_temp = 0;
 		alt_ds_pres = 0;
 		alt_ds_count = 0;
+#endif
 	}
 	return 0;
 }
@@ -116,7 +127,7 @@ MODULE_INITCALL(MagBaroInitialize, MagBaroStart)
 /**
  * Module thread, should not return.
  */
-
+#if defined(PIOS_INCLUDE_HMC5883)
 static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 #ifdef PIOS_HMC5883_HAS_GPIOS
 	.exti_cfg = 0,
@@ -127,27 +138,25 @@ static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 	.Mode = PIOS_HMC5883_MODE_CONTINUOUS,
 
 };
+#endif
 
 static void magbaroTask(void *parameters)
 {
-	BaroAltitudeData data;
 	portTickType lastSysTime;
 	
 #if defined(PIOS_INCLUDE_BMP085)
+	BaroAltitudeData data;
 	PIOS_BMP085_Init();
-#endif
-#if defined(PIOS_INCLUDE_HMC5883)
-	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
 #endif
 
 #if defined(PIOS_INCLUDE_HMC5883)
-	//mag_test = PIOS_HMC5883_Test();
-#else
-	mag_test = 0;
+	MagnetometerData mag;
+	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+	uint32_t mag_update_time = PIOS_DELAY_GetRaw();
 #endif
+
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
-	uint32_t mag_update_time = PIOS_DELAY_GetRaw();
 	while (1)
 	{
 #if defined(PIOS_INCLUDE_BMP085)
@@ -160,7 +169,7 @@ static void magbaroTask(void *parameters)
 #endif
 		PIOS_BMP085_ReadADC();
 		alt_ds_temp += PIOS_BMP085_GetTemperature();
-		
+
 		// Update the pressure data
 		PIOS_BMP085_StartADC(PressureConv);
 #ifdef PIOS_BMP085_HAS_GPIOS
@@ -170,7 +179,7 @@ static void magbaroTask(void *parameters)
 #endif
 		PIOS_BMP085_ReadADC();
 		alt_ds_pres += PIOS_BMP085_GetPressure();
-		
+
 		if (++alt_ds_count >= alt_ds_size)
 		{
 			alt_ds_count = 0;
@@ -192,7 +201,6 @@ static void magbaroTask(void *parameters)
 #endif
 
 #if defined(PIOS_INCLUDE_HMC5883)
-		MagnetometerData mag;
 		if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 100000) {
 			int16_t values[3];
 			PIOS_HMC5883_ReadMag(values);

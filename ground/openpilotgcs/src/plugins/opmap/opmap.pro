@@ -18,6 +18,7 @@ HEADERS += opmapplugin.h \
     opmap_edit_waypoint_dialog.h \
     opmap_zoom_slider_widget.h \
     opmap_statusbar_widget.h \
+    modelmapproxy.h \
     widgetdelegates.h \
     homeeditor.h
 
@@ -30,6 +31,7 @@ SOURCES += opmapplugin.cpp \
     opmap_edit_waypoint_dialog.cpp \
     opmap_zoom_slider_widget.cpp \
     opmap_statusbar_widget.cpp \
+    modelmapproxy.cpp \
     widgetdelegates.cpp \
     homeeditor.cpp
 

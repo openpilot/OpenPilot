@@ -414,7 +414,6 @@ static void manualControlTask(void *parameters)
 						altitudeHoldDesired(&cmd, lastFlightMode != flightStatus.FlightMode);
 						break;
 					case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
-						updatePathDesired(&cmd, lastFlightMode != flightStatus.FlightMode, false);
 					case FLIGHTSTATUS_FLIGHTMODE_POI:
 						updatePathDesired(&cmd, lastFlightMode != flightStatus.FlightMode, false);
 						break;

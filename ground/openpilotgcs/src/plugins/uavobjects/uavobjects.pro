@@ -59,7 +59,6 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/gpsposition.h \
     $$UAVOBJECT_SYNTHETICS/gpstime.h \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.h \
-    $$UAVOBJECT_SYNTHETICS/gpssettings.h \
     $$UAVOBJECT_SYNTHETICS/pathaction.h \
     $$UAVOBJECT_SYNTHETICS/pathdesired.h \
     $$UAVOBJECT_SYNTHETICS/pathplannersettings.h \
@@ -142,7 +141,6 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsposition.cpp \
     $$UAVOBJECT_SYNTHETICS/gpstime.cpp \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.cpp \
-    $$UAVOBJECT_SYNTHETICS/gpssettings.cpp \
     $$UAVOBJECT_SYNTHETICS/pathaction.cpp \
     $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/pathplannersettings.cpp \

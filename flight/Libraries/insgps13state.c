@@ -359,6 +359,9 @@ void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
 	Nav.q[1] = X[7];
 	Nav.q[2] = X[8];
 	Nav.q[3] = X[9];
+	Nav.gyro_bias[0] = X[10];
+	Nav.gyro_bias[1] = X[11];
+	Nav.gyro_bias[2] = X[12];
 }
 
 //  *************  CovariancePrediction *************

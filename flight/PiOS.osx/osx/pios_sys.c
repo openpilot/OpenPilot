@@ -1,13 +1,16 @@
 /**
  ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_SYS System Functions
+ * @brief PIOS System Initialization code
+ * @{
  *
  * @file       pios_sys.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
- * @brief      Sets up basic system hardware, functions are called from Main.
+ * @brief      Sets up basic STM32 system hardware, functions are called from Main.
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   PIOS_SYS System Functions
- * @{
  *
  *****************************************************************************/
 /* 
@@ -26,38 +29,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 /* Project Includes */
 #include "pios.h"
 
 #if defined(PIOS_INCLUDE_SYS)
 
 
-/* Private Function Prototypes */
-void NVIC_Configuration(void);
-void SysTick_Handler(void);
-
-/* Local Macros */
-#define MEM8(addr)  (*((volatile uint8_t  *)(addr)))
-
 /**
 * Initialises all system peripherals
 */
 void PIOS_SYS_Init(void)
 {
-
-	/**
-	 * stub
-	 */
-	printf("PIOS_SYS_Init\n");
-
-	/* Initialise Basic NVIC */
-	NVIC_Configuration();
-
-#if defined(PIOS_INCLUDE_LED)
-	/* Initialise LEDs */
-	PIOS_LED_Init();
-#endif
+	
 }
 
 /**
@@ -72,21 +55,33 @@ void PIOS_SYS_Init(void)
 */
 int32_t PIOS_SYS_Reset(void)
 {
-	/**
-	 * stub
-	 */
-	printf("PIOS_SYS_Reset\n");
-	/* Disable all RTOS tasks */
-#if defined(PIOS_INCLUDE_FREERTOS)
-	/* port specific FreeRTOS function to disable tasks (nested) */
-	portENTER_CRITICAL();
-#endif
-
-
-	while(1);
-
 	/* We will never reach this point */
 	return -1;
+}
+
+/**
+* Returns the CPU's flash size (in bytes)
+*/
+uint32_t PIOS_SYS_getCPUFlashSize(void)
+{
+	return 1024000;
+}
+
+/**
+* Returns the serial number as a string
+* param[out] uint8_t pointer to a string which can store at least 12 bytes
+* (12 bytes returned for STM32)
+* return < 0 if feature not supported
+*/
+int32_t PIOS_SYS_SerialNumberGetBinary(uint8_t *array)
+{
+	/* Stored in the so called "electronic signature" */
+	for (int i = 0; i < PIOS_SYS_SERIAL_NUM_BINARY_LEN; ++i) {
+		array[i] = 0xff;
+	}
+
+	/* No error */
+	return 0;
 }
 
 /**
@@ -97,69 +92,20 @@ int32_t PIOS_SYS_Reset(void)
 */
 int32_t PIOS_SYS_SerialNumberGet(char *str)
 {
-	int i;
-
 	/* Stored in the so called "electronic signature" */
-	for(i=0; i<24; ++i) {
-		//uint8_t b = MEM8(0x1ffff7e8 + (i/2));
-		//if( !(i & 1) )
-		//b >>= 4;
-		//b &= 0x0f;
-
-		//str[i] = ((b > 9) ? ('A'-10) : '0') + b;
-		str[i]='6';
+	int i;
+	for (i = 0; i < PIOS_SYS_SERIAL_NUM_ASCII_LEN; ++i) {
+		str[i] = 'F';
 	}
-	str[i] = 0;
+	str[i] = '\0';
 
 	/* No error */
 	return 0;
 }
 
-/**
-* Configures Vector Table base location and SysTick
-*/
-void NVIC_Configuration(void)
-{
-	/**
-	 * stub
-	 */
-	printf("NVIC_Configuration\n");
-	/* Set the Vector Table base address as specified in .ld file */
-	//NVIC_SetVectorTable(PIOS_NVIC_VECTTAB_FLASH, 0x0);
-
-	/* 4 bits for Interrupt priorities so no sub priorities */
-	//NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
-
-	/* Configure HCLK clock as SysTick clock source. */
-	//SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
-}
-
-#ifdef USE_FULL_ASSERT
-/**
-* Reports the name of the source file and the source line number
-*   where the assert_param error has occurred.
-* \param[in]  file pointer to the source file name
-* \param[in]  line assert_param error line source number
-* \retval None
-*/
-void assert_failed(uint8_t* file, uint32_t line)
-{
-	/* When serial debugging is implemented, use something like this. */
-	/* printf("Wrong parameters value: file %s on line %d\r\n", file, line); */
-	printf("Wrong parameters value: file %s on line %d\r\n", file, line);
-
-	/* Setup the LEDs to Alternate */
-	PIOS_LED_On(LED1);
-	PIOS_LED_Off(LED2);
-
-	/* Infinite loop */
-	while (1)
-	{
-		PIOS_LED_Toggle(LED1);
-		PIOS_LED_Toggle(LED2);
-		for(int i = 0; i < 1000000; i++);
-	}
-}
 #endif
 
-#endif
+/**
+  * @}
+  * @}
+  */

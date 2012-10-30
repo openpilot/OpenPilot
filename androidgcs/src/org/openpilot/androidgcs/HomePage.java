@@ -84,6 +84,22 @@ public class HomePage extends ObjectManagerActivity {
 			}
 		});
 
+		Button tester = (Button) findViewById(R.id.launch_tester);
+		tester.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				startActivity(new Intent(HomePage.this, FragmentTester.class));
+			}
+		});
+
+		Button osgViewer = (Button) findViewById(R.id.launch_osgViewer);
+		osgViewer.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				startActivity(new Intent(HomePage.this, OsgViewer.class));
+			}
+		});
+
 		Button tuning = (Button) findViewById(R.id.launch_tuning);
 		tuning.setOnClickListener(new OnClickListener() {
 			@Override

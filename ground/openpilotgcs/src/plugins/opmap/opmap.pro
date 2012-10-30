@@ -18,11 +18,7 @@ HEADERS += opmapplugin.h \
     opmap_edit_waypoint_dialog.h \
     opmap_zoom_slider_widget.h \
     opmap_statusbar_widget.h \
-    flightdatamodel.h \
-    modelmapproxy.h \
     widgetdelegates.h \
-    pathplanner.h \
-    modeluavoproxy.h \
     homeeditor.h
 
 SOURCES += opmapplugin.cpp \
@@ -34,11 +30,7 @@ SOURCES += opmapplugin.cpp \
     opmap_edit_waypoint_dialog.cpp \
     opmap_zoom_slider_widget.cpp \
     opmap_statusbar_widget.cpp \
-    flightdatamodel.cpp \
-    modelmapproxy.cpp \
     widgetdelegates.cpp \
-    pathplanner.cpp \
-    modeluavoproxy.cpp \
     homeeditor.cpp
 
 OTHER_FILES += OPMapGadget.pluginspec

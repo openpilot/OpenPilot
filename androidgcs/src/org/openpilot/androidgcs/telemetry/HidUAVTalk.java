@@ -123,7 +123,10 @@ public class HidUAVTalk extends TelemetryTask {
 		while(deviceIterator.hasNext()){
 			UsbDevice dev = deviceIterator.next();
 			if (DEBUG) Log.d(TAG, "Testing device: " + dev);
-			usbManager.requestPermission(dev, permissionIntent);
+			if( ValidateFoundDevice(dev) ) {
+				usbManager.requestPermission(dev, permissionIntent);
+				break;
+			}
 		}
 
 		if (DEBUG) Log.d(TAG, "Registered the deviceAttachedFilter");
@@ -253,6 +256,12 @@ public class HidUAVTalk extends TelemetryTask {
 		if (DEBUG) Log.d(TAG, "ConnectToDeviceInterface:");
 		UsbEndpoint ep1 = null;
 		UsbEndpoint ep2 = null;
+
+		if (connectDevice.getInterfaceCount() < 2) {
+			if (ERROR) Log.e(TAG, "Interface count for USB device incorrect");
+			telemService.toastMessage("Failed to connect");
+			return false;
+		}
 
 		// Using the same interface for reading and writing
 		usbInterface = connectDevice.getInterface(0x2);

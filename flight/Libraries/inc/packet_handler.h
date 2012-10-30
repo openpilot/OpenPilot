@@ -30,6 +30,9 @@
 #ifndef __PACKET_HANDLER_H__
 #define __PACKET_HANDLER_H__
 
+#include <uavobjectmanager.h>
+#include <gcsreceiver.h>
+
 // Public defines / macros
 #define PHPacketSize(p) ((uint8_t*)(p->data) + p->header.data_size - (uint8_t*)p)
 #define PHPacketSizeECC(p) ((uint8_t*)(p->data) + p->header.data_size  + RS_ECC_NPARITY - (uint8_t*)p)
@@ -57,8 +60,7 @@ typedef struct {
 	uint32_t source_id;
 	uint8_t type;
 	uint8_t data_size;
-	uint8_t tx_seq;
-	uint8_t rx_seq;
+	uint16_t seq_num;
 } PHPacketHeader;
 
 #define PH_MAX_DATA (PIOS_PH_MAX_PACKET - sizeof(PHPacketHeader) - RS_ECC_NPARITY)
@@ -71,7 +73,7 @@ typedef struct {
 #define PH_PPM_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
 typedef struct {
 	PHPacketHeader header;
-	uint16_t channels[PIOS_RCVR_MAX_CHANNELS];
+	uint16_t channels[GCSRECEIVER_CHANNEL_NUMELEM];
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHPpmPacket, *PHPpmPacketHandle;
 
@@ -87,8 +89,10 @@ typedef struct {
 } PHStatusPacket, *PHStatusPacketHandle;
 
 typedef struct {
-	uint8_t winSize;
-	uint16_t maxConnections;
+	uint32_t default_destination_id;
+	uint32_t source_id;
+	uint16_t max_connections;
+	uint8_t win_size;
 } PacketHandlerConfig;
 
 typedef int32_t (*PHOutputStream)(PHPacketHandle packet);
@@ -110,8 +114,8 @@ void PHReleaseRXPacket(PHInstHandle h, PHPacketHandle p);
 PHPacketHandle PHGetTXPacket(PHInstHandle h);
 void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
 uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p);
-int32_t PHVerifyPacket(PHInstHandle h, PHPacketHandle p, uint16_t received_len);
-uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p, bool rx_error);
+uint8_t PHTransmitData(PHInstHandle h, uint8_t *buf, uint16_t len);
+uint8_t PHReceivePacket(PHInstHandle h, PHPacketHandle p);
 
 #endif // __PACKET_HANDLER_H__
 

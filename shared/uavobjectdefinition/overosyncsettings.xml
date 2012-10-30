@@ -1,0 +1,10 @@
+<xml>
+    <object name="OveroSyncSettings" singleinstance="true" settings="true">
+        <description>Settings to control the behavior of the overo sync module</description>
+        <field name="LogOn" units="" type="enum" options="Never,Always,Armed" elements="1" defaultvalue="Armed"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="onchange" period="0"/>
+        <logging updatemode="periodic" period="1000"/>
+    </object>
+</xml>

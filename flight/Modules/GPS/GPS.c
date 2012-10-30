@@ -66,7 +66,7 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
-	#define STACK_SIZE_BYTES            784
+	#define STACK_SIZE_BYTES            850
 #else
 #if defined(PIOS_GPS_MINIMAL)
 	#define STACK_SIZE_BYTES            500
@@ -139,8 +139,9 @@ int32_t GPSInitialize(void)
 #endif
 
 #if defined(REVOLUTION)
-	// Revolution expects these objects to always be defined.  Not doing so will fail some
-	// queue connections in navigation
+	// These objects MUST be initialized for Revolution
+	// because the rest of the system expects to just
+	// attach to their queues
 	GPSPositionInitialize();
 	GPSVelocityInitialize();
 	GPSTimeInitialize();

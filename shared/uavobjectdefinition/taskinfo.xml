@@ -22,6 +22,9 @@
 			<elementname>Com2UsbBridge</elementname>
 			<elementname>Usb2ComBridge</elementname>
 			<elementname>OveroSync</elementname>
+			<elementname>ModemRx</elementname>
+			<elementname>ModemTx</elementname>
+			<elementname>ModemStat</elementname>
 			<elementname>Autotune</elementname>
 			<elementname>EventDispatcher</elementname>
 		</elementnames>
@@ -47,6 +50,9 @@
 			<elementname>Com2UsbBridge</elementname>
 			<elementname>Usb2ComBridge</elementname>
 			<elementname>OveroSync</elementname>
+			<elementname>ModemRx</elementname>
+			<elementname>ModemTx</elementname>
+			<elementname>ModemStat</elementname>
 			<elementname>Autotune</elementname>
 			<elementname>EventDispatcher</elementname>
 		</elementnames>
@@ -76,6 +82,9 @@
 			<elementname>Com2UsbBridge</elementname>
 			<elementname>Usb2ComBridge</elementname>
 			<elementname>OveroSync</elementname>
+			<elementname>ModemRx</elementname>
+			<elementname>ModemTx</elementname>
+			<elementname>ModemStat</elementname>
 			<elementname>Autotune</elementname>
 			<elementname>EventDispatcher</elementname>
 		</elementnames>

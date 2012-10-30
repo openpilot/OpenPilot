@@ -3,9 +3,9 @@
  *
  * @file       vtolpathfollower.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      This module compared @ref PositionActuatl to @ref ActiveWaypoint 
- * and sets @ref AttitudeDesired.  It only does this when the FlightMode field
- * of @ref ManualControlCommand is Auto.
+ * @brief      This module compared @ref PositionActual to @ref PathDesired 
+ * and sets @ref Stabilization.  It only does this when the FlightMode field
+ * of @ref FlightStatus is PathPlanner or RTH.
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -27,12 +27,15 @@
  */
 
 /**
- * Input object: ActiveWaypoint
+ * Input object: FlightStatus
+ * Input object: PathDesired
  * Input object: PositionActual
- * Input object: ManualControlCommand
- * Output object: AttitudeDesired
+ * Output object: StabilizationDesired
  *
- * This module will periodically update the value of the AttitudeDesired object.
+ * This module will periodically update the value of the @ref StabilizationDesired object based on 
+ * @ref PathDesired and @PositionActual when the Flight Mode selected in @FlightStatus is supported
+ * by this module.  Otherwise another module (e.g. @ref ManualControlCommand) is expected to be
+ * writing to @ref StabilizationDesired.
  *
  * The module executes in its own thread in this example.
  *
@@ -48,8 +51,8 @@
 
 #include "vtolpathfollower.h"
 #include "accels.h"
-#include "hwsettings.h"
 #include "attitudeactual.h"
+#include "hwsettings.h"
 #include "pathdesired.h"        // object that will be updated by the module
 #include "positionactual.h"
 #include "manualcontrol.h"
@@ -76,7 +79,6 @@
 // Private types
 
 // Private variables
-static bool followerEnabled = false;
 static xTaskHandle pathfollowerTaskHandle;
 static PathDesiredData pathDesired;
 static VtolPathFollowerSettingsData vtolpathfollowerSettings;
@@ -90,6 +92,7 @@ static void updateEndpointVelocity();
 static void updateFixedAttitude(float* attitude);
 static void updateVtolDesiredAttitude();
 static float bound(float val, float min, float max);
+static bool vtolpathfollower_enabled;
 
 /**
  * Initialise the module, called on startup
@@ -97,9 +100,9 @@ static float bound(float val, float min, float max);
  */
 int32_t VtolPathFollowerStart()
 {
-	if (followerEnabled) {
+	if (vtolpathfollower_enabled) {
 		// Start main task
-		xTaskCreate(vtolPathFollowerTask, (signed char *)"PathFollower", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
+		xTaskCreate(vtolPathFollowerTask, (signed char *)"VtolPathFollower", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
 		TaskMonitorAdd(TASKINFO_RUNNING_PATHFOLLOWER, pathfollowerTaskHandle);
 	}
 
@@ -112,18 +115,19 @@ int32_t VtolPathFollowerStart()
  */
 int32_t VtolPathFollowerInitialize()
 {
-	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+	
 	HwSettingsOptionalModulesGet(optionalModules);
+	
 	if (optionalModules[HWSETTINGS_OPTIONALMODULES_VTOLPATHFOLLOWER] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
-		followerEnabled = true;
 		VtolPathFollowerSettingsInitialize();
 		NedAccelInitialize();
 		PathDesiredInitialize();
 		PathStatusInitialize();
 		VelocityDesiredInitialize();
+		vtolpathfollower_enabled = true;
 	} else {
-		followerEnabled = false;
+		vtolpathfollower_enabled = false;
 	}
 	
 	return 0;
@@ -251,6 +255,9 @@ static void vtolPathFollowerTask(void *parameters)
 
 				break;
 		}
+
+		AlarmsClear(SYSTEMALARMS_ALARM_GUIDANCE);
+
 	}
 }
 

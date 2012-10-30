@@ -49,39 +49,20 @@ endif
 FLASH_TOOL = OPENOCD
 
 # Optional module and driver defaults
-USE_CAMERASTAB ?= YES
 USE_COMUSBBRIDGE ?= NO
-USE_GPS ?= YES
 USE_TXPID ?= NO
 USE_I2C ?= NO
 USE_ALTITUDE ?= NO
 TEST_FAULTS ?= NO
 USE_MAGBARO ?= NO
-USE_OVEROSYNC ?= YES
-USE_BATTERY ?= YES
-USE_VTOLPATHFOLLOWER ?= YES
-USE_FIXEDWINGPATHFOLLOWER ?= YES
 
 # List of optional modules to include
 OPTMODULES =
-ifeq ($(USE_CAMERASTAB), YES)
-OPTMODULES += CameraStab
-endif
 ifeq ($(USE_COMUSBBRIDGE), YES)
 OPTMODULES += ComUsbBridge
 endif
-ifeq ($(USE_GPS), YES)
-OPTMODULES += GPS
-endif
 ifeq ($(USE_TXPID), YES)
 OPTMODULES += TxPID
-endif
-ifeq ($(USE_ALTITUDE), YES)
-ifeq ($(USE_I2C), YES)
-OPTMODULES += Altitude
-else
-$(error "Altitude module (USE_ALTITUDE=YES) requires i2c (USE_I2C=YES)")
-endif
 endif
 ifeq ($(TEST_FAULTS), YES)
 OPTMODULES += Fault
@@ -93,25 +74,14 @@ else
 $(error "MagBaro module (USE_MAGBARO=YES) requires i2c (USE_I2C=YES)")
 endif
 endif
-ifeq ($(USE_OVEROSYNC), YES)
-OPTMODULES += OveroSync
-endif
-ifeq ($(USE_BATTERY), YES)
-OPTMODULES += Battery
-endif
-ifeq ($(USE_VTOLPATHFOLLOWER), YES)
-OPTMODULES += VtolPathFollower
-endif
-ifeq ($(USE_FIXEDWINGPATHFOLLOWER), YES)
-OPTMODULES += FixedWingPathFollower
-endif
-
 
 # List of modules to include
 MODULES = Sensors Attitude/revolution ManualControl Stabilization Actuator
 MODULES += Altitude/revolution FirmwareIAP
 MODULES += Airspeed/revolution
-MODULES += AltitudeHold PathPlanner
+MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
+MODULES += CameraStab
+MODULES += OveroSync
 MODULES += Telemetry
 PYMODULES = 
 #FlightPlan
@@ -213,6 +183,7 @@ SRC += $(PIOSCOMMON)/pios_bma180.c
 SRC += $(PIOSCOMMON)/pios_etasv3.c
 SRC += $(PIOSCOMMON)/pios_mpxv5004.c
 SRC += $(PIOSCOMMON)/pios_mpxv7002.c
+SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
 SRC += $(PIOSCOMMON)/pios_l3gd20.c
 SRC += $(PIOSCOMMON)/pios_hmc5883.c
 SRC += $(PIOSCOMMON)/pios_ms5611.c

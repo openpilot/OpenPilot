@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V7.0.2 - Copyright (C) 2011 Real Time Engineers Ltd.
+    FreeRTOS V7.2.0 - Copyright (C) 2012 Real Time Engineers Ltd.
 
 
     ***************************************************************************
@@ -41,14 +41,28 @@
 
     1 tab == 4 spaces!
 
-    http://www.FreeRTOS.org - Documentation, latest information, license and
-    contact details.
+	
+    ***************************************************************************
+     *                                                                       *
+     *    Having a problem?  Start by reading the FAQ "My application does   *
+	 *    not run, what could be wrong?                                      *
+	 *                                                                       *
+	 *    http://www.FreeRTOS.org/FAQHelp.html                               *
+	 *                                                                       *
+    ***************************************************************************
 
-    http://www.SafeRTOS.com - A version that is certified for use in safety
-    critical systems.
+	
+    http://www.FreeRTOS.org - Documentation, training, latest information, 
+    license and contact details.
+	
+	http://www.FreeRTOS.org/plus - Selection of FreeRTOS ecosystem products,
+	including FreeRTOS+Trace - an indispensable productivity tool.
 
-    http://www.OpenRTOS.com - Commercial support, development, porting,
-    licensing and training services.
+	Real Time Engineers ltd license FreeRTOS to High Integrity Systems, who sell 
+	the code with commercial support, indemnification, and middleware, under 
+	the OpenRTOS brand:  http://www.OpenRTOS.com.  High Integrity Systems also
+	provide a safety engineered and independently SIL3 certified version under 
+	the	SafeRTOS brand: http://www.SafeRTOS.com.
 */
 
 
@@ -70,7 +84,7 @@ extern "C" {
  * MACROS AND DEFINITIONS
  *----------------------------------------------------------*/
 
-#define tskKERNEL_VERSION_NUMBER "V7.0.1"
+#define tskKERNEL_VERSION_NUMBER "V7.2.0"
 
 /**
  * task. h
@@ -1072,40 +1086,6 @@ void vTaskList( signed char *pcWriteBuffer ) PRIVILEGED_FUNCTION;
 void vTaskGetRunTimeStats( signed char *pcWriteBuffer ) PRIVILEGED_FUNCTION;
 
 /**
- * task. h
- * <PRE>void vTaskStartTrace( char * pcBuffer, unsigned portBASE_TYPE uxBufferSize );</PRE>
- *
- * Starts a real time kernel activity trace.  The trace logs the identity of
- * which task is running when.
- *
- * The trace file is stored in binary format.  A separate DOS utility called
- * convtrce.exe is used to convert this into a tab delimited text file which
- * can be viewed and plotted in a spread sheet.
- *
- * @param pcBuffer The buffer into which the trace will be written.
- *
- * @param ulBufferSize The size of pcBuffer in bytes.  The trace will continue
- * until either the buffer in full, or ulTaskEndTrace () is called.
- *
- * \page vTaskStartTrace vTaskStartTrace
- * \ingroup TaskUtils
- */
-void vTaskStartTrace( signed char * pcBuffer, unsigned long ulBufferSize ) PRIVILEGED_FUNCTION;
-
-/**
- * task. h
- * <PRE>unsigned long ulTaskEndTrace( void );</PRE>
- *
- * Stops a kernel activity trace.  See vTaskStartTrace ().
- *
- * @return The number of bytes that have been written into the trace buffer.
- *
- * \page usTaskEndTrace usTaskEndTrace
- * \ingroup TaskUtils
- */
-unsigned long ulTaskEndTrace( void ) PRIVILEGED_FUNCTION;
-
-/**
  * task.h
  * <PRE>unsigned portBASE_TYPE uxTaskGetStackHighWaterMark( xTaskHandle xTask );</PRE>
  *
@@ -1313,6 +1293,18 @@ void vTaskPriorityDisinherit( xTaskHandle * const pxMutexHolder ) PRIVILEGED_FUN
  * xTaskCreate() and xTaskCreateRestricted() macros.
  */
 signed portBASE_TYPE xTaskGenericCreate( pdTASK_CODE pxTaskCode, const signed char * const pcName, unsigned short usStackDepth, void *pvParameters, unsigned portBASE_TYPE uxPriority, xTaskHandle *pxCreatedTask, portSTACK_TYPE *puxStackBuffer, const xMemoryRegion * const xRegions ) PRIVILEGED_FUNCTION;
+
+/*
+ * Get the uxTCBNumber assigned to the task referenced by the xTask parameter.
+ */
+unsigned portBASE_TYPE uxTaskGetTaskNumber( xTaskHandle xTask );
+
+/* 
+ * Set the uxTCBNumber of the task referenced by the xTask parameter to
+ * ucHandle.
+ */
+void vTaskSetTaskNumber( xTaskHandle xTask, unsigned portBASE_TYPE uxHandle );
+
 
 #ifdef __cplusplus
 }

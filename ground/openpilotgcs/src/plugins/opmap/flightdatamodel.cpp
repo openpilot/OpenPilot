@@ -565,11 +565,14 @@ void flightDataModel::readFromFile(QString fileName)
     //TODO warning message
     removeRows(0,rowCount());
     QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
     QDomDocument doc("PathPlan");
-    if (!doc.setContent(file.readAll())) {
+    QByteArray array=file.readAll();
+    QString error;
+    if (!doc.setContent(array,&error)) {
         QMessageBox msgBox;
         msgBox.setText(tr("File Parsing Failed."));
-        msgBox.setInformativeText(tr("This file is not a correct XML file"));
+        msgBox.setInformativeText(QString(tr("This file is not a correct XML file:%0")).arg(error));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
         return;
@@ -616,7 +619,7 @@ void flightDataModel::readFromFile(QString fileName)
                     else if(field.attribute("name")=="altitude")
                         data->altitude=field.attribute("value").toDouble();
                     else if(field.attribute("name")=="velocity")
-                        data->velocity=field.attribute("value").toDouble();
+                        data->velocity=field.attribute("value").toFloat();
                     else if(field.attribute("name")=="mode")
                         data->mode=field.attribute("value").toInt();
                     else if(field.attribute("name")=="mode_param0")

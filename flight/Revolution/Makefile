@@ -79,7 +79,7 @@ endif
 MODULES = Sensors Attitude/revolution ManualControl Stabilization Actuator
 MODULES += Altitude/revolution FirmwareIAP
 MODULES += Airspeed/revolution
-MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
+MODULES += GPS AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
 MODULES += CameraStab
 MODULES += OveroSync
 MODULES += Telemetry

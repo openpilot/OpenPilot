@@ -34,7 +34,7 @@ namespace mapcontrol
         pic=pic.scaled(30,30,Qt::IgnoreAspectRatio);
         this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
         this->setFlag(QGraphicsItem::ItemIsMovable,false);
-        this->setFlag(QGraphicsItem::ItemIsSelectable,false);
+        this->setFlag(QGraphicsItem::ItemIsSelectable,true);
         localposition=map->FromLatLngToLocal(mapwidget->CurrentPosition());
         this->setPos(localposition.X(),localposition.Y());
         this->setZValue(4);
@@ -142,5 +142,14 @@ namespace mapcontrol
         }
             QGraphicsItem::mouseMoveEvent(event);
     }
+
+    //Set clickable area as smaller than the bounding rect.
+    QPainterPath HomeItem::shape() const
+     {
+         QPainterPath path;
+         path.addEllipse(QRectF(-12, -25, 24, 50));
+         return path;
+     }
+
 }
 

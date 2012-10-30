@@ -213,7 +213,6 @@ SRC += $(OPUAVSYNTHDIR)/camerastabsettings.c
 SRC += $(OPUAVSYNTHDIR)/cameradesired.c
 SRC += $(OPUAVSYNTHDIR)/gpsposition.c
 SRC += $(OPUAVSYNTHDIR)/gpsvelocity.c
-SRC += $(OPUAVSYNTHDIR)/gpssettings.c
 SRC += $(OPUAVSYNTHDIR)/hwsettings.c
 SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
 SRC += $(OPUAVSYNTHDIR)/receiveractivity.c

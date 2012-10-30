@@ -72,6 +72,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/mixerstatus.h \
     $$UAVOBJECT_SYNTHETICS/velocitydesired.h \
     $$UAVOBJECT_SYNTHETICS/velocityactual.h \
+    $$UAVOBJECT_SYNTHETICS/groundtruth.h \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.h \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.h \
     $$UAVOBJECT_SYNTHETICS/vtolpathfollowersettings.h \
@@ -152,6 +153,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/mixerstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/velocitydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/velocityactual.cpp \
+    $$UAVOBJECT_SYNTHETICS/groundtruth.cpp \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/vtolpathfollowersettings.cpp \

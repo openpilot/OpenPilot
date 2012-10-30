@@ -56,7 +56,7 @@ public:
         ConfigInputWidget(QWidget *parent = 0);
         ~ConfigInputWidget();
         enum wizardSteps{wizardWelcome,wizardChooseMode,wizardChooseType,wizardIdentifySticks,wizardIdentifyCenter,wizardIdentifyLimits,wizardIdentifyInverted,wizardFinish,wizardNone};
-        enum txMode{mode1,mode2};
+        enum txMode{mode1,mode2,mode3,mode4};
         enum txMovements{moveLeftVerticalStick,moveRightVerticalStick,moveLeftHorizontalStick,moveRightHorizontalStick,moveAccess0,moveAccess1,moveAccess2,moveFlightMode,centerAll,moveAll,nothing};
         enum txMovementType{vertical,horizontal,jump,mix};
         enum txType {acro, heli};
@@ -81,6 +81,7 @@ private:
             }
             int group;
             int number;
+            int channelIndex;
         }lastChannel;
         channelsStruct currentChannel;
         QList<channelsStruct> usedChannels;

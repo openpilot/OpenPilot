@@ -195,7 +195,8 @@ void XplaneSimulator::transmitUpdate()
  */
 void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
 {
-    float altitude = 0;
+    float altitude_msl = 0;
+    float altitude_agl = 0;
     float latitude = 0;
     float longitude = 0;
     float airspeed_keas = 0;
@@ -239,7 +240,8 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
             case XplaneSimulator::LatitudeLongitudeAltitude:
                 latitude = *((float*)(buf.data()+4*1));
                 longitude = *((float*)(buf.data()+4*2));
-                altitude = *((float*)(buf.data()+4*3))* FT2M;
+                altitude_msl = *((float*)(buf.data()+4*3))* FT2M;
+                altitude_agl = *((float*)(buf.data()+4*4))* FT2M;
                 break;
 
             case XplaneSimulator::Speed:
@@ -302,7 +304,8 @@ void XplaneSimulator::processUpdate(const QByteArray& dataBuf)
         // Update GPS Position objects
         out.latitude = latitude * 1e7;
         out.longitude = longitude * 1e7;
-        out.altitude = altitude;
+        out.altitude = altitude_msl;
+        out.agl = altitude_agl;
         out.groundspeed = groundspeed_ktgs*1.15*1.6089/3.6; //Convert from [kts] to [m/s]
 
         out.calibratedAirspeed = airspeed_keas*1.15*1.6089/3.6;  //Convert from [kts] to [m/s]

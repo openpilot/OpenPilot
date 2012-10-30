@@ -415,9 +415,14 @@ static void manualControlTask(void *parameters)
 						break;
 					case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
 						updatePathDesired(&cmd, lastFlightMode != flightStatus.FlightMode, false);
+					case FLIGHTSTATUS_FLIGHTMODE_POI:
+						updatePathDesired(&cmd, lastFlightMode != flightStatus.FlightMode, false);
 						break;
 					case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
 						updatePathDesired(&cmd, lastFlightMode != flightStatus.FlightMode, true);
+						break;
+					case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
+						// No need to call anything.  This just avoids errors.
 						break;
 					default:
 						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);

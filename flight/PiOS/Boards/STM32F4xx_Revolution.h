@@ -95,6 +95,7 @@ TIM8  |           |           |           |
 #define PIOS_WDG_ATTITUDE        0x0004
 #define PIOS_WDG_MANUAL          0x0008
 #define PIOS_WDG_SENSORS         0x0010
+#define PIOS_WDG_AUTOTUNE        0x0020
 
 //------------------------
 // PIOS_I2C
@@ -236,8 +237,9 @@ extern uint32_t pios_com_vcp_id;
 // ADC
 // PIOS_ADC_PinGet(0) = Current sensor
 // PIOS_ADC_PinGet(1) = Voltage sensor
-// PIOS_ADC_PinGet(4) = VREF
-// PIOS_ADC_PinGet(5) = Temperature sensor
+// PIOS_ADC_PinGet(2) = VREF
+// PIOS_ADC_PinGet(3) = Temperature sensor
+// PIOS_ADC_PinGet(4) = Board Power
 //-------------------------
 #define PIOS_DMA_PIN_CONFIG                                                                         \
 {                                                                                                   \
@@ -255,6 +257,7 @@ extern uint32_t pios_com_vcp_id;
 #define PIOS_ADC_MAX_OVERSAMPLING       2
 #define PIOS_ADC_USE_ADC2               0
 #define PIOS_ADC_VOLTAGE_SCALE 3.30/4096.0
+#define PIOS_ADC_USE_TEMP_SENSOR		1
 
 //-------------------------
 // USB

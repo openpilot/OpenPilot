@@ -1,0 +1,12 @@
+<xml>
+    <object name="PoiLocation" singleinstance="true" settings="false">
+        <description>Contains the current Point of interest relative to @ref HomeLocation</description>
+        <field name="North" units="m" type="float" elements="1"/>
+        <field name="East" units="m" type="float" elements="1"/>
+        <field name="Down" units="m" type="float" elements="1"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="periodic" period="1000"/>
+    </object>
+</xml>

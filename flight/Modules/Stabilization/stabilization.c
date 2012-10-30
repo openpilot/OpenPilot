@@ -53,6 +53,9 @@
 #include "relay_tuning.h"
 #include "virtualflybar.h"
 
+// Includes for various stabilization algorithms
+#include "relay_tuning.h"
+
 // Private constants
 #define MAX_QUEUE_SIZE 1
 
@@ -122,7 +125,6 @@ int32_t StabilizationInitialize()
 #if defined(RATEDESIRED_DIAGNOSTICS)
 	RateDesiredInitialize();
 #endif
-
 	// Code required for relay tuning
 	sin_lookup_initalize();
 	RelayTuningSettingsInitialize();
@@ -276,6 +278,7 @@ static void stabilizationTask(void* parameters)
 					stabilization_virtual_flybar(gyro_filtered[i], rateDesiredAxis[i], &actuatorDesiredAxis[i], dT, reinit, i, &settings);
 
 					break;
+
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING:
 				{
 					if (reinit)
@@ -291,6 +294,7 @@ static void stabilizationTask(void* parameters)
 
 					break;
 				}
+
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK:
 					if (reinit)
 						pids[PID_RATE_ROLL + i].iAccumulator = 0;
@@ -306,7 +310,7 @@ static void stabilizationTask(void* parameters)
 						rateDesiredAxis[i] = pid_apply(&pids[PID_ROLL + i], axis_lock_accum[i], dT);
 					}
 
-					rateDesiredAxis[i] = bound(rateDesiredAxis[i], settings.MaximumRate[i]);
+					rateDesiredAxis[i] = bound(rateDesiredAxis[i], settings.ManualRate[i]);
 
 					actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i],  gyro_filtered[i], dT);
 					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);

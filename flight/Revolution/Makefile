@@ -83,6 +83,7 @@ MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
 MODULES += CameraStab
 MODULES += OveroSync
 MODULES += Telemetry
+MODULES += Autotune
 PYMODULES = 
 #FlightPlan
 

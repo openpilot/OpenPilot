@@ -332,7 +332,7 @@ static void simulateModelQuadcopter()
 	static float baro_offset = 0.0f;
 	float Rbe[3][3];
 	
-	const float ACTUATOR_ALPHA = 0.8;
+	const float ACTUATOR_ALPHA = 0.99;
 	const float MAX_THRUST = GRAV * 2;
 	const float K_FRICTION = 1;
 	const float GPS_PERIOD = 0.1;
@@ -372,9 +372,9 @@ static void simulateModelQuadcopter()
 	RateDesiredData rateDesired;
 	RateDesiredGet(&rateDesired);
 	
-	rpy[0] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Roll * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
-	rpy[1] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
-	rpy[2] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
+	rpy[0] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * actuatorDesired.Roll * 250 * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
+	rpy[1] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * actuatorDesired.Pitch * 250 * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
+	rpy[2] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * actuatorDesired.Yaw * 250 *(1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
 	
 	GyrosData gyrosData; // Skip get as we set all the fields
 	gyrosData.x = rpy[0] + rand_gauss();

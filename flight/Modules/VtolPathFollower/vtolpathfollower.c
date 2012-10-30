@@ -70,11 +70,18 @@
 #include "velocityactual.h"
 #include "CoordinateConversions.h"
 
+#include "cameradesired.h"
+#include "poilearnsettings.h"
+#include "poilocation.h"
+#include "accessorydesired.h"
+
+
 // Private constants
 #define MAX_QUEUE_SIZE 4
 #define STACK_SIZE_BYTES 1548
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 #define F_PI 3.14159265358979323846f
+#define RAD2DEG(rad) ((rad)*(180.0f/F_PI))
 
 // Private types
 
@@ -87,12 +94,14 @@ static VtolPathFollowerSettingsData vtolpathfollowerSettings;
 static void vtolPathFollowerTask(void *parameters);
 static void SettingsUpdatedCb(UAVObjEvent * ev);
 static void updateNedAccel();
+static void updatePOIBearing();
 static void updatePathVelocity();
 static void updateEndpointVelocity();
 static void updateFixedAttitude(float* attitude);
-static void updateVtolDesiredAttitude();
+static void updateVtolDesiredAttitude(bool yaw_attitude);
 static float bound(float val, float min, float max);
 static bool vtolpathfollower_enabled;
+static void accessoryUpdated(UAVObjEvent* ev);
 
 /**
  * Initialise the module, called on startup
@@ -125,6 +134,10 @@ int32_t VtolPathFollowerInitialize()
 		PathDesiredInitialize();
 		PathStatusInitialize();
 		VelocityDesiredInitialize();
+		CameraDesiredInitialize();
+		AccessoryDesiredInitialize();
+		PoiLearnSettingsInitialize();
+		PoiLocationInitialize();
 		vtolpathfollower_enabled = true;
 	} else {
 		vtolpathfollower_enabled = false;
@@ -157,6 +170,7 @@ static void vtolPathFollowerTask(void *parameters)
 	
 	VtolPathFollowerSettingsConnectCallback(SettingsUpdatedCb);
 	PathDesiredConnectCallback(SettingsUpdatedCb);
+	AccessoryDesiredConnectCallback(accessoryUpdated);
 	
 	VtolPathFollowerSettingsGet(&vtolpathfollowerSettings);
 	PathDesiredGet(&pathDesired);
@@ -203,7 +217,7 @@ static void vtolPathFollowerTask(void *parameters)
 			case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
 				if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
 					updateEndpointVelocity();
-					updateVtolDesiredAttitude();
+					updateVtolDesiredAttitude(false);
 					AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
 				} else {
 					AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
@@ -216,14 +230,14 @@ static void vtolPathFollowerTask(void *parameters)
 					// TODO: Make updateVtolDesiredAttitude and velocity report success and update PATHSTATUS_STATUS accordingly
 					case PATHDESIRED_MODE_FLYENDPOINT:
 						updateEndpointVelocity();
-						updateVtolDesiredAttitude();
+						updateVtolDesiredAttitude(false);
 						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
 						break;
 					case PATHDESIRED_MODE_FLYVECTOR:
 					case PATHDESIRED_MODE_FLYCIRCLERIGHT:
 					case PATHDESIRED_MODE_FLYCIRCLELEFT:
 						updatePathVelocity();
-						updateVtolDesiredAttitude();
+						updateVtolDesiredAttitude(false);
 						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_OK);
 						break;
 					case PATHDESIRED_MODE_FIXEDATTITUDE:
@@ -237,6 +251,15 @@ static void vtolPathFollowerTask(void *parameters)
 						pathStatus.Status = PATHSTATUS_STATUS_CRITICAL;
 						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
 						break;
+				}
+				break;
+			case FLIGHTSTATUS_FLIGHTMODE_POI:
+				if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
+					updateEndpointVelocity();
+					updateVtolDesiredAttitude(true);
+					updatePOIBearing();
+				} else {
+					AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
 				}
 				break;
 			default:
@@ -260,6 +283,54 @@ static void vtolPathFollowerTask(void *parameters)
 
 	}
 }
+
+/**
+ * Compute bearing and elevation between current position and POI
+ */
+static void updatePOIBearing()
+{
+	PositionActualData positionActual;
+	PositionActualGet(&positionActual);
+	CameraDesiredData cameraDesired;
+	CameraDesiredGet(&cameraDesired);
+	StabilizationDesiredData stabDesired;
+	StabilizationDesiredGet(&stabDesired);
+	PoiLocationData poi;
+	PoiLocationGet(&poi);
+	//use poi here
+	//HomeLocationData poi;
+	//HomeLocationGet (&poi);
+
+	float dLoc[3];
+	float yaw=0;
+	float elevation=0;
+
+	dLoc[0]=positionActual.North-poi.North;
+	dLoc[1]=positionActual.East-poi.East;
+	dLoc[2]=positionActual.Down-poi.Down;
+
+	if(dLoc[1]<0)
+		yaw=RAD2DEG(atan2f(dLoc[1],dLoc[0]))+180;
+	else
+		yaw=RAD2DEG(atan2f(dLoc[1],dLoc[0]))-180;
+
+	// distance
+	float distance = sqrtf(powf(dLoc[0],2)+powf(dLoc[1],2));
+
+	//not above
+	if(distance!=0) {
+		//You can feed this into camerastabilization
+		elevation=RAD2DEG(atan2f(dLoc[2],distance));
+	}
+	stabDesired.Yaw=yaw;
+	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+	cameraDesired.Yaw=yaw;
+	cameraDesired.Pitch=elevation;
+
+	CameraDesiredSet(&cameraDesired);
+	StabilizationDesiredSet(&stabDesired);
+}
+
 
 /**
  * Compute desired velocity from the current position and path
@@ -421,7 +492,7 @@ static void updateFixedAttitude(float* attitude)
  * NED frame as the feedback term and then compares the 
  * @ref VelocityActual against the @ref VelocityDesired
  */
-static void updateVtolDesiredAttitude()
+static void updateVtolDesiredAttitude(bool yaw_attitude)
 {
 	float dT = vtolpathfollowerSettings.UpdatePeriod / 1000.0f;
 
@@ -540,7 +611,10 @@ static void updateVtolDesiredAttitude()
 	
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
+	if(yaw_attitude)
+		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+	else
+		stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
 	
 	StabilizationDesiredSet(&stabDesired);
 }
@@ -602,5 +676,30 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 {
 	VtolPathFollowerSettingsGet(&vtolpathfollowerSettings);
 	PathDesiredGet(&pathDesired);
+}
+
+static void accessoryUpdated(UAVObjEvent* ev)
+{
+	if (ev->obj != AccessoryDesiredHandle())
+		return;
+
+	PositionActualData positionActual;
+	PositionActualGet(&positionActual);
+	AccessoryDesiredData accessory;
+	PoiLearnSettingsData poiLearn;
+	PoiLearnSettingsGet(&poiLearn);
+	PoiLocationData poi;
+	PoiLocationGet(&poi);
+	if (poiLearn.Input != POILEARNSETTINGS_INPUT_NONE) {
+		if (AccessoryDesiredInstGet(poiLearn.Input - POILEARNSETTINGS_INPUT_ACCESSORY0, &accessory) == 0) {
+			if(accessory.AccessoryVal<-0.5f)
+			{
+				poi.North=positionActual.North;
+				poi.East=positionActual.East;
+				poi.Down=positionActual.Down;
+				PoiLocationSet(&poi);
+			}
+		}
+	}
 }
 

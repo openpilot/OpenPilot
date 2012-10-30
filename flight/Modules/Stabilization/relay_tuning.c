@@ -32,14 +32,10 @@
  */
 
 #include "openpilot.h"
+#include "stabilization.h"
 #include "relaytuning.h"
 #include "relaytuningsettings.h"
 #include "sin_lookup.h"
-
-//! Private variables
-static const int SIN_RESOLUTION = 180;
-
-#define MAX_AXES 3
 
 /**
  * Apply a step function for the stabilization controller and monitor the 
@@ -108,7 +104,7 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 	if(phase >= 360)
 		phase = 0;
 	accum_sin += sin_lookup_deg(phase) * error;
-	accum_cos += sin_lookup_deg(phase + 90) * error;
+	accum_cos += cos_lookup_deg(phase) * error;
 	accumulated ++;
 
 	// Make sure we've had enough time since last transition then check for a change in the output
@@ -147,5 +143,4 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 
 	return 0;
 }
-
 

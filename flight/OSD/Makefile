@@ -53,10 +53,10 @@ USE_CAMERASTAB ?= NO
 USE_COMUSBBRIDGE ?= NO
 USE_GPS ?= NO
 USE_TXPID ?= NO
-USE_I2C ?= NO
+USE_I2C ?= YES
 USE_ALTITUDE ?= NO
 TEST_FAULTS ?= NO
-USE_MAGBARO ?= NO
+USE_MAGBARO ?= YES
 
 # List of optional modules to include
 OPTMODULES =
@@ -94,8 +94,8 @@ endif
 MODULES = Osd/osdgen
 MODULES += GPS
 MODULES += Osd/osdinput
-MODULES += Osd/WavPlayer
-MODULES += Extensions/MagBaro
+#MODULES += Osd/WavPlayer
+#MODULES += Extensions/MagBaro
 MODULES += Telemetry
 MODULES += FirmwareIAP
 

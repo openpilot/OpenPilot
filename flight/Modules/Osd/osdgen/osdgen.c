@@ -2198,6 +2198,9 @@ void updateGraphics() {
 	HomeLocationGet(&home);
 	BaroAltitudeData baro;
 	BaroAltitudeGet(&baro);
+
+	PIOS_Servo_Set(0,OsdSettings.White);
+	PIOS_Servo_Set(1,OsdSettings.Black);
 	
 	switch (OsdSettings.Screen) {
 		case 0: // Dave simple
@@ -2371,7 +2374,7 @@ void updateGraphics() {
 			draw_artificial_horizon(-attitude.Roll,attitude.Pitch,APPLY_HDEADBAND(x),APPLY_VDEADBAND(y),size);
 			hud_draw_vertical_scale((int)gpsData.Groundspeed, 20, +1, APPLY_HDEADBAND(GRAPHICS_RIGHT-(x-1)),
 					APPLY_VDEADBAND(y+(size/2)), size, 5, 10, 4, 7, 10, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
-			if(1)
+			if(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_BARO)
 			{
 				hud_draw_vertical_scale((int)baro.Altitude, 50, -1, APPLY_HDEADBAND((x+size+1)),
 					APPLY_VDEADBAND(y+(size/2)), size, 10, 20, 4, 7, 10, 500, 0);
@@ -2387,6 +2390,17 @@ void updateGraphics() {
 		case 3:
 		{
 			lamas();
+		}
+		break;
+		case 4:
+		case 5:
+		case 6:
+		{
+			int image=OsdSettings.Screen-4;
+			struct splashEntry splash_info;
+			splash_info = splash[image];
+
+			copyimage(APPLY_HDEADBAND(GRAPHICS_RIGHT/2-(splash_info.width)/2), APPLY_VDEADBAND(GRAPHICS_BOTTOM/2-(splash_info.height)/2),image);
 		}
 		break;
 	default:
@@ -2420,7 +2434,7 @@ int32_t osdgenStart(void)
 	// Start gps task
 	vSemaphoreCreateBinary( osdSemaphore);
 	xTaskCreate(osdgenTask, (signed char *)"OSDGEN", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &osdgenTaskHandle);
-	//TaskMonitorAdd(TASKINFO_RUNNING_GPS, osdgenTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_OSDGEN, osdgenTaskHandle);
 
 	return 0;
 }
@@ -2460,6 +2474,11 @@ static void osdgenTask(void *parameters)
 	//portTickType lastSysTime;
 	// Loop forever
 	//lastSysTime = xTaskGetTickCount();
+	OsdSettingsData OsdSettings;
+	OsdSettingsGet (&OsdSettings);
+
+	PIOS_Servo_Set(0,OsdSettings.White);
+	PIOS_Servo_Set(1,OsdSettings.Black);
 
 	// intro
 	for(int i=0; i<63; i++)

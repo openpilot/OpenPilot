@@ -35,9 +35,9 @@
 static const struct pios_led pios_leds[] = {
 	[PIOS_LED_HEARTBEAT] = {
 		.pin = {
-			.gpio = GPIOC,
+			.gpio = GPIOB,
 			.init = {
-				.GPIO_Pin   = GPIO_Pin_5,
+				.GPIO_Pin   = GPIO_Pin_0,
 				.GPIO_Speed = GPIO_Speed_50MHz,
 				.GPIO_Mode  = GPIO_Mode_OUT,
 				.GPIO_OType = GPIO_OType_PP,
@@ -49,7 +49,7 @@ static const struct pios_led pios_leds[] = {
 		.pin = {
 			.gpio = GPIOC,
 			.init = {
-				.GPIO_Pin   = GPIO_Pin_4,
+				.GPIO_Pin   = GPIO_Pin_5,
 				.GPIO_Speed = GPIO_Speed_50MHz,
 				.GPIO_Mode  = GPIO_Mode_OUT,
 				.GPIO_OType = GPIO_OType_PP,
@@ -202,6 +202,7 @@ void PIOS_SPI_sdcard_irq_handler(void)
 #include <pios_usart_priv.h>
 
 #if defined(PIOS_INCLUDE_GPS)
+
 /*
  * GPS USART
  */
@@ -246,7 +247,6 @@ static const struct pios_usart_cfg pios_usart_gps_cfg = {
 		},
 	},
 };
-
 #endif /* PIOS_INCLUDE_GPS */
 
 #ifdef PIOS_INCLUDE_COM_AUX
@@ -521,14 +521,91 @@ const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
 
 #if defined(PIOS_INCLUDE_VIDEO)
 
+static const TIM_TimeBaseInitTypeDef tim_8_time_base = {
+	.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / 1000000) - 1,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = ((1000000 / 50000) - 1),
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+static const struct pios_tim_clock_cfg tim_8_cfg = {
+	.timer = TIM8,
+	.time_base_init = &tim_8_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM8_CC_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+/**
+ * Pios servo configuration structures
+ */
+#include <pios_servo_priv.h>
+static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
+		{
+			.timer = TIM8,
+			.timer_chan = TIM_Channel_3,
+			.pin = {
+				.gpio = GPIOC,
+				.init = {
+					.GPIO_Pin = GPIO_Pin_8,
+					.GPIO_Speed = GPIO_Speed_2MHz,
+					.GPIO_Mode  = GPIO_Mode_AF,
+					.GPIO_OType = GPIO_OType_PP,
+					.GPIO_PuPd  = GPIO_PuPd_UP
+				},
+				.pin_source = GPIO_PinSource8,
+			},
+			.remap = GPIO_AF_TIM8,
+		},
+		{
+			.timer = TIM8,
+			.timer_chan = TIM_Channel_4,
+			.pin = {
+				.gpio = GPIOC,
+				.init = {
+					.GPIO_Pin = GPIO_Pin_9,
+					.GPIO_Speed = GPIO_Speed_2MHz,
+					.GPIO_Mode  = GPIO_Mode_AF,
+					.GPIO_OType = GPIO_OType_PP,
+					.GPIO_PuPd  = GPIO_PuPd_UP
+				},
+				.pin_source = GPIO_PinSource9,
+			},
+			.remap = GPIO_AF_TIM8,
+		},
+};
+
+const struct pios_servo_cfg pios_servo_cfg = {
+	.tim_oc_init = {
+		.TIM_OCMode = TIM_OCMode_PWM1,
+		.TIM_OutputState = TIM_OutputState_Enable,
+		.TIM_OutputNState = TIM_OutputNState_Disable,
+		.TIM_Pulse = 0,
+		.TIM_OCPolarity = TIM_OCPolarity_High,
+		.TIM_OCNPolarity = TIM_OCPolarity_High,
+		.TIM_OCIdleState = TIM_OCIdleState_Reset,
+		.TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+	},
+	.channels = pios_tim_servoport_all_pins,
+	.num_channels = NELEMENTS(pios_tim_servoport_all_pins),
+};
+
+
+
 #include <pios_video.h>
 static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 	.vector = PIOS_Hsync_ISR,
-	.line = EXTI_Line2,
+	.line = EXTI_Line7,
 	.pin = {
-		.gpio = GPIOD,
+		.gpio = GPIOB,
 		.init = {
-			.GPIO_Pin = GPIO_Pin_2,
+			.GPIO_Pin = GPIO_Pin_7,
 			.GPIO_Speed = GPIO_Speed_100MHz,
 			.GPIO_Mode = GPIO_Mode_IN,
 			.GPIO_OType = GPIO_OType_OD,
@@ -537,28 +614,30 @@ static const struct pios_exti_cfg pios_exti_hsync_cfg __exti_config = {
 	},
 	.irq = {
 		.init = {
-			.NVIC_IRQChannel = EXTI2_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = 0,
+			.NVIC_IRQChannel = EXTI9_5_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 			.NVIC_IRQChannelSubPriority = 0,
 			.NVIC_IRQChannelCmd = ENABLE,
 		},
 	},
 	.exti = {
 		.init = {
-			.EXTI_Line = EXTI_Line2, // matches above GPIO pin
+			.EXTI_Line = EXTI_Line7, // matches above GPIO pin
 			.EXTI_Mode = EXTI_Mode_Interrupt,
-			.EXTI_Trigger = EXTI_Trigger_Rising_Falling,
+			//.EXTI_Trigger = EXTI_Trigger_Rising_Falling,
+			.EXTI_Trigger = EXTI_Trigger_Falling,
+			//.EXTI_Trigger = EXTI_Trigger_Rising,
 			.EXTI_LineCmd = ENABLE,
 		},
 	},
 };
 static const struct pios_exti_cfg pios_exti_vsync_cfg __exti_config = {
 		.vector = PIOS_Vsync_ISR,
-		.line = EXTI_Line11,
+		.line = EXTI_Line5,
 		.pin = {
-			.gpio = GPIOC,
+			.gpio = GPIOB,
 			.init = {
-				.GPIO_Pin = GPIO_Pin_11,
+				.GPIO_Pin = GPIO_Pin_5,
 				.GPIO_Speed = GPIO_Speed_100MHz,
 				.GPIO_Mode = GPIO_Mode_IN,
 				.GPIO_OType = GPIO_OType_OD,
@@ -567,7 +646,7 @@ static const struct pios_exti_cfg pios_exti_vsync_cfg __exti_config = {
 		},
 		.irq = {
 			.init = {
-				.NVIC_IRQChannel = EXTI15_10_IRQn,
+				.NVIC_IRQChannel = EXTI9_5_IRQn,
 				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 				.NVIC_IRQChannelSubPriority = 0,
 				.NVIC_IRQChannelCmd = ENABLE,
@@ -575,7 +654,7 @@ static const struct pios_exti_cfg pios_exti_vsync_cfg __exti_config = {
 		},
 		.exti = {
 			.init = {
-				.EXTI_Line = EXTI_Line11, // matches above GPIO pin
+				.EXTI_Line = EXTI_Line5, // matches above GPIO pin
 				.EXTI_Mode = EXTI_Mode_Interrupt,
 				.EXTI_Trigger = EXTI_Trigger_Falling,
 				.EXTI_LineCmd = ENABLE,
@@ -589,7 +668,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 		.regs = SPI3,
 		.remap = GPIO_AF_SPI3,
 		.init = {
-			.SPI_Mode              = SPI_Mode_Master,
+			.SPI_Mode              = SPI_Mode_Slave,
 			.SPI_Direction         = SPI_Direction_1Line_Tx,
 			.SPI_DataSize          = SPI_DataSize_8b,
 			.SPI_NSS               = SPI_NSS_Soft,
@@ -597,7 +676,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 			.SPI_CRCPolynomial     = 7,
 			.SPI_CPOL              = SPI_CPOL_Low,
 			.SPI_CPHA              = SPI_CPHA_2Edge,
-			.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4,
+			.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2,
 		},
 		.use_crc = false,
 		.dma = {
@@ -606,12 +685,11 @@ static const struct pios_video_cfg pios_video_cfg = {
 				.flags = (DMA_IT_TCIF7),
 				.init = {
 					.NVIC_IRQChannel = DMA1_Stream7_IRQn,
-					.NVIC_IRQChannelPreemptionPriority = 0,
+					.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 					.NVIC_IRQChannelSubPriority = 0,
 					.NVIC_IRQChannelCmd = ENABLE,
 				},
 			},
-
 			.rx = {},
 			.tx = {
 				.channel = DMA1_Stream7,
@@ -626,9 +704,9 @@ static const struct pios_video_cfg pios_video_cfg = {
 					.DMA_MemoryDataSize     = DMA_MemoryDataSize_Word,
 					.DMA_Mode               = DMA_Mode_Normal,
 					.DMA_Priority           = DMA_Priority_VeryHigh,
-					.DMA_FIFOMode           = DMA_FIFOMode_Disable,
+					.DMA_FIFOMode           = DMA_FIFOMode_Enable,
 					.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
-					.DMA_MemoryBurst        = DMA_MemoryBurst_Single,
+					.DMA_MemoryBurst        = DMA_MemoryBurst_INC4,
 					.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
 				},
 			},
@@ -653,16 +731,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 				.GPIO_PuPd = GPIO_PuPd_NOPULL
 			},
 		},
-		.mosi = {
-			.gpio = GPIOC,
-			.init = {
-				.GPIO_Pin = GPIO_Pin_12,
-				.GPIO_Speed = GPIO_Speed_50MHz,
-				.GPIO_Mode = GPIO_Mode_AF,
-				.GPIO_OType = GPIO_OType_PP,
-				.GPIO_PuPd = GPIO_PuPd_NOPULL
-			},
-		},
+		.mosi = {},
 		.slave_count = 1,
 	},
 	.level = {
@@ -685,12 +754,11 @@ static const struct pios_video_cfg pios_video_cfg = {
 					.flags   = (DMA_IT_TCIF5),
 					.init    = {
 						.NVIC_IRQChannel                   = DMA2_Stream5_IRQn,
-						.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+						.NVIC_IRQChannelPreemptionPriority = 0,
 						.NVIC_IRQChannelSubPriority        = 0,
 						.NVIC_IRQChannelCmd                = ENABLE,
 					},
 				},
-
 				.rx = {},
 				.tx = {
 					.channel = DMA2_Stream5,
@@ -705,9 +773,9 @@ static const struct pios_video_cfg pios_video_cfg = {
 						.DMA_MemoryDataSize     = DMA_MemoryDataSize_Word,
 						.DMA_Mode               = DMA_Mode_Normal,
 						.DMA_Priority           = DMA_Priority_VeryHigh,
-						.DMA_FIFOMode           = DMA_FIFOMode_Disable,
+						.DMA_FIFOMode           = DMA_FIFOMode_Enable,
 						.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
-		                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
+		                .DMA_MemoryBurst        = DMA_MemoryBurst_INC4,
 		                .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
 					},
 				},
@@ -732,23 +800,56 @@ static const struct pios_video_cfg pios_video_cfg = {
 					.GPIO_PuPd = GPIO_PuPd_UP
 				},
 			},
-			.mosi = {
-				.gpio = GPIOB,
-				.init = {
-					.GPIO_Pin   = GPIO_Pin_5,
-					.GPIO_Speed = GPIO_Speed_50MHz,
-					.GPIO_Mode  = GPIO_Mode_AF,
-					.GPIO_OType = GPIO_OType_PP,
-					.GPIO_PuPd = GPIO_PuPd_UP
-				},
-			},
+			.mosi = {},
 			.slave_count = 1,
 
 	},
-	/////////////////
 
 	.hsync = &pios_exti_hsync_cfg,
 	.vsync = &pios_exti_vsync_cfg,
+	
+	.pixel_timer = {
+		.timer = TIM4,
+		.timer_chan = TIM_Channel_1,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin = GPIO_Pin_6,
+				.GPIO_Speed = GPIO_Speed_100MHz,
+				.GPIO_Mode  = GPIO_Mode_AF,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd  = GPIO_PuPd_UP
+			},
+			.pin_source = GPIO_PinSource6,
+		},
+		.remap = GPIO_AF_TIM4,
+	},
+	.hsync_capture = {
+		.timer = TIM4,
+		.timer_chan = TIM_Channel_2,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin = GPIO_Pin_7,
+				.GPIO_Speed = GPIO_Speed_100MHz,
+				.GPIO_Mode  = GPIO_Mode_AF,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd  = GPIO_PuPd_UP
+			},
+			.pin_source = GPIO_PinSource7,
+		},
+		.remap = GPIO_AF_TIM4,
+	},
+	.tim_oc_init = {
+		.TIM_OCMode = TIM_OCMode_PWM1,
+		.TIM_OutputState = TIM_OutputState_Enable,
+		.TIM_OutputNState = TIM_OutputNState_Disable,
+		.TIM_Pulse = 1,
+		.TIM_OCPolarity = TIM_OCPolarity_High,
+		.TIM_OCNPolarity = TIM_OCPolarity_High,
+		.TIM_OCIdleState = TIM_OCIdleState_Reset,
+		.TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+	},
 };
 
 #endif

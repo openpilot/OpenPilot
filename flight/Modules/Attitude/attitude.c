@@ -444,7 +444,7 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	float * gyros = &gyrosData->x;
 	float * accels = &accelsData->x;
 	
-	float grot[3];
+	static float grot[3];
 	float accel_err[3];
 
 	// Apply smoothing to accel values, to reduce vibration noise before main calculations.
@@ -455,9 +455,9 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	accels_filtered[2] = accels_filtered[2] * accel_alpha + accels[2] * (1 - accel_alpha);
 	
 	// Rotate gravity to body frame and cross with accels
-	grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
-	grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
-	grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
+	grot[0] = grot[0] * accel_alpha - (2 * (q[1] * q[3] - q[0] * q[2])) * (1 - accel_alpha);
+	grot[1] = grot[1] * accel_alpha - (2 * (q[2] * q[3] + q[0] * q[1])) * (1 - accel_alpha);
+	grot[2] = grot[2] * accel_alpha - (q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]) * (1 - accel_alpha);
 	CrossProduct((const float *) accels_filtered, (const float *) grot, accel_err);
 	
 	// Account for accel magnitude

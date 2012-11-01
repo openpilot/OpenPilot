@@ -38,6 +38,7 @@ UAVOBJSRCFILENAMES += magnetometer
 UAVOBJSRCFILENAMES += magbias
 UAVOBJSRCFILENAMES += baroaltitude
 UAVOBJSRCFILENAMES += baroairspeed
+UAVOBJSRCFILENAMES += airspeedactual
 UAVOBJSRCFILENAMES += fixedwingpathfollowersettings
 UAVOBJSRCFILENAMES += fixedwingpathfollowerstatus
 UAVOBJSRCFILENAMES += flightbatterysettings

@@ -78,6 +78,10 @@
 #define PIOS_INCLUDE_COM_FLEXI
 
 #define PIOS_INCLUDE_GPS
+#define PIOS_INCLUDE_GPS_NMEA_PARSER
+#define PIOS_INCLUDE_GPS_UBX_PARSER
+#define PIOS_GPS_SETS_HOMELOCATION
+
 #define PIOS_OVERO_SPI
 /* Supported receiver interfaces */
 #define PIOS_INCLUDE_RCVR
@@ -85,7 +89,7 @@
 //#define PIOS_INCLUDE_SBUS
 #define PIOS_INCLUDE_PPM
 #define PIOS_INCLUDE_PWM
-//#define PIOS_INCLUDE_GCSRCVR
+#define PIOS_INCLUDE_GCSRCVR
 
 #define PIOS_INCLUDE_SETTINGS
 #define PIOS_INCLUDE_FLASH
@@ -99,17 +103,14 @@
 #define PIOS_INCLUDE_INITCALL           /* Include init call structures */
 #define PIOS_TELEM_PRIORITY_QUEUE       /* Enable a priority queue in telemetry */
 //#define PIOS_QUATERNION_STABILIZATION   /* Stabilization options */
-#define PIOS_GPS_SETS_HOMELOCATION      /* GPS options */
-#define PIOS_INCLUDE_GPS_NMEA_PARSER /* Include the NMEA protocol parser */
-#define PIOS_INCLUDE_GPS_UBX_PARSER  /* Include the UBX protocol parser */
 
 /* Alarm Thresholds */
-#define HEAP_LIMIT_WARNING       1000
-#define HEAP_LIMIT_CRITICAL       500
-#define IRQSTACK_LIMIT_WARNING    150
-#define IRQSTACK_LIMIT_CRITICAL    80
-#define CPULOAD_LIMIT_WARNING      80
-#define CPULOAD_LIMIT_CRITICAL     95
+#define HEAP_LIMIT_WARNING		1000
+#define HEAP_LIMIT_CRITICAL		500
+#define IRQSTACK_LIMIT_WARNING		150
+#define IRQSTACK_LIMIT_CRITICAL		80
+#define CPULOAD_LIMIT_WARNING		80
+#define CPULOAD_LIMIT_CRITICAL		95
 
 // This actually needs calibrating
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD (8379692)

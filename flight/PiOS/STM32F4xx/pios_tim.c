@@ -127,6 +127,15 @@ int32_t PIOS_TIM_InitClock(const struct pios_tim_clock_cfg * cfg)
 		case (uint32_t)TIM11:
 			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM11, ENABLE);
 			break;
+                case (uint32_t)TIM12:
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM12, ENABLE);
+			break;
+                case (uint32_t)TIM13:
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM13, ENABLE);
+			break;         
+                case (uint32_t)TIM14:
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM14, ENABLE);
+			break;
 #endif
 	}
 
@@ -485,6 +494,13 @@ static void PIOS_TIM_8_CC_irq_handler (void)
 {
 	PIOS_TIM_generic_irq_handler (TIM8);
 }
+
+void TIM8_BRK_TIM12_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_12_irq_handler")));
+static void PIOS_TIM_12_irq_handler (void)
+{
+	PIOS_TIM_generic_irq_handler (TIM12);
+}
+
 
 /**
  * @}

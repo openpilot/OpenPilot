@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V7.0.1 - Copyright (C) 2011 Real Time Engineers Ltd.
+    FreeRTOS V7.2.0 - Copyright (C) 2012 Real Time Engineers Ltd.
 	
 
     ***************************************************************************
@@ -40,22 +40,33 @@
     FreeRTOS WEB site.
 
     1 tab == 4 spaces!
+    
+    ***************************************************************************
+     *                                                                       *
+     *    Having a problem?  Start by reading the FAQ "My application does   *
+     *    not run, what could be wrong?                                      *
+     *                                                                       *
+     *    http://www.FreeRTOS.org/FAQHelp.html                               *
+     *                                                                       *
+    ***************************************************************************
 
-    http://www.FreeRTOS.org - Documentation, latest information, license and
-    contact details.
+    
+    http://www.FreeRTOS.org - Documentation, training, latest information, 
+    license and contact details.
+    
+    http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
+    including FreeRTOS+Trace - an indispensable productivity tool.
 
-    http://www.SafeRTOS.com - A version that is certified for use in safety
-    critical systems.
-
-    http://www.OpenRTOS.com - Commercial support, development, porting,
-    licensing and training services.
+    Real Time Engineers ltd license FreeRTOS to High Integrity Systems, who sell 
+    the code with commercial support, indemnification, and middleware, under 
+    the OpenRTOS brand: http://www.OpenRTOS.com.  High Integrity Systems also
+    provide a safety engineered and independently SIL3 certified version under 
+    the SafeRTOS brand: http://www.SafeRTOS.com.
 */
 
 
 #ifndef PORTMACRO_H
 #define PORTMACRO_H
-
-#include "stdint.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -121,7 +132,8 @@ extern void vPortYieldFromISR( void );
 	
 /*
  * Set basepri back to 0 without effective other registers.
- * r0 is clobbered.
+ * r0 is clobbered.  FAQ:  Setting BASEPRI to 0 is not a bug.  Please see 
+ * http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html before disagreeing.
  */
 #define portCLEAR_INTERRUPT_MASK()			\
 	__asm volatile							\
@@ -131,15 +143,15 @@ extern void vPortYieldFromISR( void );
 		:::"r0"								\
 	)
 
+/* FAQ:  Setting BASEPRI to 0 in portCLEAR_INTERRUPT_MASK_FROM_ISR() is not a 
+bug.  Please see http://www.FreeRTOS.org/RTOS-Cortex-M3-M4.html before 
+disagreeing. */
 #define portSET_INTERRUPT_MASK_FROM_ISR()		0;portSET_INTERRUPT_MASK()
 #define portCLEAR_INTERRUPT_MASK_FROM_ISR(x)	portCLEAR_INTERRUPT_MASK();(void)x
 
 
 extern void vPortEnterCritical( void );
 extern void vPortExitCritical( void );
-
-void PIOS_RTC_Init();
-uint32_t PIOS_RTC_Counter();
 
 #define portDISABLE_INTERRUPTS()	portSET_INTERRUPT_MASK()
 #define portENABLE_INTERRUPTS()		portCLEAR_INTERRUPT_MASK()

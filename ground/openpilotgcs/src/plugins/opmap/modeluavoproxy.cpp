@@ -74,7 +74,7 @@ void modelUavoProxy::modelToObjects()
         index=myModel->index(x,flightDataModel::ALTITUDERELATIVE);
         altitude=myModel->data(index).toFloat();
         index=myModel->index(x,flightDataModel::VELOCITY);
-        waypoint.Velocity=myModel->data(index).toFloat();
+        waypoint.Velocity[0]=myModel->data(index).toFloat();
 
         waypoint.Position[Waypoint::POSITION_NORTH]=distance*cos(bearing/180*M_PI);
         waypoint.Position[Waypoint::POSITION_EAST]=distance*sin(bearing/180*M_PI);

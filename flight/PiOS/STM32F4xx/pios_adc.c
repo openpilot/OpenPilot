@@ -292,6 +292,7 @@ void PIOS_ADC_Config(uint32_t oversampling)
  * @param[in] pin number
  * @return ADC pin value averaged over the set of samples since the last reading.
  * @return -1 if pin doesn't exist
+ * @return -2 if no data acquired since last read
  */
 int32_t last_conv_value;
 int32_t PIOS_ADC_PinGet(uint32_t pin)
@@ -304,6 +305,9 @@ int32_t PIOS_ADC_PinGet(uint32_t pin)
 		return -1;
 	}
 	
+	if (accumulator[pin].accumulator <= 0)
+		return -2;
+
 	/* return accumulated result and clear accumulator */
 	result = accumulator[pin].accumulator / (accumulator[pin].count ?: 1);
 	accumulator[pin].accumulator = result;

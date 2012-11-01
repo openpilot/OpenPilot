@@ -131,7 +131,7 @@ static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 #if defined(PIOS_INCLUDE_MS5611)
 #include "pios_ms5611.h"
 static const struct pios_ms5611_cfg pios_ms5611_cfg = {
-	.oversampling = 1,
+	.oversampling = MS5611_OSR_512,
 };
 #endif /* PIOS_INCLUDE_MS5611 */
 
@@ -217,14 +217,15 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 	.exti_cfg = &pios_exti_mpu6000_cfg,
 	.Fifo_store = PIOS_MPU6000_FIFO_TEMP_OUT | PIOS_MPU6000_FIFO_GYRO_X_OUT | PIOS_MPU6000_FIFO_GYRO_Y_OUT | PIOS_MPU6000_FIFO_GYRO_Z_OUT,
 	// Clock at 8 khz, downsampled by 8 for 1khz
-	.Smpl_rate_div = 15,
+	.Smpl_rate_div = 11,
 	.interrupt_cfg = PIOS_MPU6000_INT_CLR_ANYRD,
 	.interrupt_en = PIOS_MPU6000_INTEN_DATA_RDY,
 	.User_ctl = PIOS_MPU6000_USERCTL_FIFO_EN | PIOS_MPU6000_USERCTL_DIS_I2C,
 	.Pwr_mgmt_clk = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
 	.accel_range = PIOS_MPU6000_ACCEL_8G,
 	.gyro_range = PIOS_MPU6000_SCALE_500_DEG,
-	.filter = PIOS_MPU6000_LOWPASS_256_HZ
+	.filter = PIOS_MPU6000_LOWPASS_256_HZ,
+	.orientation = PIOS_MPU6000_TOP_0DEG
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
 
@@ -310,6 +311,7 @@ uint32_t pios_com_gps_id = 0;
 uint32_t pios_com_telem_usb_id = 0;
 uint32_t pios_com_telem_rf_id = 0;
 uint32_t pios_com_bridge_id = 0;
+uint32_t pios_com_overo_id = 0;
 
 /* 
  * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
@@ -401,13 +403,6 @@ void PIOS_Board_Init(void) {
 	PIOS_Flash_Jedec_Init(pios_spi_accel_id, 1, &flash_m25p_cfg);
 #endif
 	PIOS_FLASHFS_Init(&flashfs_m25p_cfg);
-	
-#if defined(PIOS_OVERO_SPI)
-	/* Set up the SPI interface to the gyro */
-	if (PIOS_SPI_Init(&pios_spi_overo_id, &pios_spi_overo_cfg)) {
-		PIOS_DEBUG_Assert(0);
-	}
-#endif
 
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
@@ -427,6 +422,7 @@ void PIOS_Board_Init(void) {
 
 	/* Set up pulse timers */
 	PIOS_TIM_InitClock(&tim_1_cfg);
+	PIOS_TIM_InitClock(&tim_2_cfg);
 	PIOS_TIM_InitClock(&tim_3_cfg);
 	PIOS_TIM_InitClock(&tim_4_cfg);
 	PIOS_TIM_InitClock(&tim_5_cfg);
@@ -785,6 +781,30 @@ void PIOS_Board_Init(void) {
 		
 			break;
 	}
+
+#if defined(PIOS_OVERO_SPI)
+	/* Set up the SPI based PIOS_COM interface to the overo */
+	{
+		HwSettingsData hwSettings;
+		HwSettingsGet(&hwSettings);
+		if(hwSettings.OptionalModules[HWSETTINGS_OPTIONALMODULES_OVERO] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+			if (PIOS_OVERO_Init(&pios_overo_id, &pios_overo_cfg)) {
+				PIOS_DEBUG_Assert(0);
+			}
+			const uint32_t PACKET_SIZE = 1024;
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PACKET_SIZE);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PACKET_SIZE);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_overo_id, &pios_overo_com_driver, pios_overo_id,
+							  rx_buffer, PACKET_SIZE,
+							  tx_buffer, PACKET_SIZE)) {
+				PIOS_Assert(0);
+			}
+		}
+	}
+
+#endif
 
 #if defined(PIOS_INCLUDE_GCSRCVR)
 	GCSReceiverInitialize();

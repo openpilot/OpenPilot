@@ -705,7 +705,7 @@ public class UAVTalk {
 		// because otherwise if a transaction timeout occurs at the same time we can get a
 		// deadlock:
 		// 1. processInputStream -> updateObjReq (locks uavtalk) -> tranactionCompleted (locks transInfo)
-		// 2. transactionTimeout (locks transInfo) -> sendObjectRequest -> É -> setupTransaction (locks uavtalk)
+		// 2. transactionTimeout (locks transInfo) -> sendObjectRequest -> ? -> setupTransaction (locks uavtalk)
 		synchronized(this) {
 			if(respObj != null && respType == TYPE_OBJ_REQ && respObj.getObjID() == obj.getObjID() &&
 					((respObj.getInstID() == obj.getInstID() || !respAllInstances))) {

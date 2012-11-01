@@ -1051,9 +1051,9 @@
              </widget>
             </item>
             <item row="8" column="2">
-             <widget class="QLabel" name="label_19">
+             <widget class="QLabel" name="LinkQualityLabel">
               <property name="text">
-               <string>Errors</string>
+               <string>Link Quality</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1061,7 +1061,7 @@
              </widget>
             </item>
             <item row="8" column="3">
-             <widget class="QLineEdit" name="Errors">
+             <widget class="QLineEdit" name="LinkQuality">
               <property name="maximumSize">
                <size>
                 <width>101</width>

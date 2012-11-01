@@ -189,6 +189,7 @@ extern uint32_t pios_com_vcp_id;
 //------------------------
 #define PIOS_RCVR_MAX_DEVS           3
 #define PIOS_RCVR_MAX_CHANNELS       12
+#define PIOS_GCSRCVR_TIMEOUT_MS      100
 
 //-------------------------
 // Receiver PPM input
@@ -242,8 +243,9 @@ extern uint32_t pios_com_vcp_id;
 {                                                                                                   \
 	{GPIOC, GPIO_Pin_0,     ADC_Channel_10},                                                        \
 	{GPIOC, GPIO_Pin_1,     ADC_Channel_11},                                                        \
-	{NULL,  0,              ADC_Channel_Vrefint},           /* Voltage reference */         \
-	{NULL,  0,              ADC_Channel_TempSensor}         /* Temperature sensor */        \
+	{NULL,  0,                      ADC_Channel_Vrefint},           /* Voltage reference */         \
+	{NULL,  0,                      ADC_Channel_TempSensor},         /* Temperature sensor */        \
+	{GPIOC, GPIO_Pin_2,     ADC_Channel_12}  \
 }
 
 /* we have to do all this to satisfy the PIOS_ADC_MAX_SAMPLES define in pios_adc.h */
@@ -252,6 +254,7 @@ extern uint32_t pios_com_vcp_id;
 #define PIOS_ADC_NUM_CHANNELS           4
 #define PIOS_ADC_MAX_OVERSAMPLING       2
 #define PIOS_ADC_USE_ADC2               0
+#define PIOS_ADC_VOLTAGE_SCALE 3.30/4096.0
 
 //-------------------------
 // USB

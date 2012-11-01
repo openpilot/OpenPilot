@@ -30,7 +30,6 @@ import org.openpilot.uavtalk.UAVObject;
 import org.openpilot.uavtalk.UAVObjectField;
 import org.openpilot.uavtalk.UAVObjectManager;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -73,16 +72,7 @@ public class SystemAlarmsFragment extends ObjectManagerFragment {
 		if (DEBUG)
 			Log.d(TAG, "Updated");
 		if (obj.getName().compareTo("SystemAlarms") == 0) {
-			Activity activity = getActivity();
-			if (activity == null) {
-				// TODO: Need to unregister all the callbacks
-				return;
-			}
 			TextView alarms = (TextView) getActivity().findViewById(R.id.system_alarms_fragment_field);
-			if (alarms == null) {
-				// TODO: Need to figure out how to unregister all the callbacks
-				return;
-			}
 			UAVObjectField a = obj.getField("Alarm");
 			List<String> names = a.getElementNames();
 			String contents = new String();

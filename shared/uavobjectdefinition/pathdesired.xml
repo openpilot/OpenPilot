@@ -11,6 +11,7 @@
 		DriveEndpoint,DriveVector,DriveCircleLeft,DriveCircleRight,
 		FixedAttitude,
 		SetAccessory,
+		Land,
 		DisarmAlarm" default="0"/>
 	<!-- Endpoint mode - move directly towards endpoint regardless of position -->
 	<!-- Straight Mode - move across linear path through Start towards the waypoint end, adjusting velocity - continue straight -->
@@ -22,7 +23,7 @@
 
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
-        <telemetryflight acked="false" updatemode="onchange" period="0"/>
+        <telemetryflight acked="false" updatemode="onchange" period="1000"/>
         <logging updatemode="onchange" period="0"/>
     </object>
 </xml>

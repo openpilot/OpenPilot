@@ -82,7 +82,7 @@ public abstract class ObjectManagerActivity extends Activity {
 	private HashMap<Observer, UAVObject> listeners;
 	/** Called when the activity is first created. */
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
 
@@ -254,6 +254,7 @@ public abstract class ObjectManagerActivity extends Activity {
 		// Bind to the telemetry service (which will start it)
 		Intent intent = new Intent(getApplicationContext(),
 				org.openpilot.androidgcs.telemetry.OPTelemetryService.class);
+		startService(intent);
 		if (DEBUG)
 			Log.d(TAG, "Attempting to bind: " + intent);
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);

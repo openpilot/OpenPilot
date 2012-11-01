@@ -44,7 +44,7 @@
 #include "waypointactive.h"
 
 // Private constants
-#define STACK_SIZE_BYTES 1024 // TODO profile and reduce!
+#define STACK_SIZE_BYTES 1024
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 #define MAX_QUEUE_SIZE 2
 #define F_PI 3.141526535897932f

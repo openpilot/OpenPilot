@@ -407,7 +407,6 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	accelsData->x = accels[0] - accelbias[0] * ACCEL_SCALE; // Applying arbitrary scale here to match CC v1
 	accelsData->y = accels[1] - accelbias[1] * ACCEL_SCALE;
 	accelsData->z = accels[2] - accelbias[2] * ACCEL_SCALE;
-	AccelsSet(&accelsData);
 
 	gyrosData->x = gyros[0];
 	gyrosData->y = gyros[1];

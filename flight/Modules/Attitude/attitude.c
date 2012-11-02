@@ -87,6 +87,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv);
 static float accelKi = 0;
 static float accelKp = 0;
 static float accel_alpha = 0;
+static float accel_alpha_setting = 0;
 static float yawBiasRate = 0;
 static float gyroGain = 0.42;
 static int16_t accelbias[3];
@@ -216,18 +217,21 @@ static void AttitudeTask(void *parameters)
 			accelKp = 1;
 			accelKi = 0.9;
 			yawBiasRate = 0.23;
+			accel_alpha = 0;
 			init = 0;
 		}
 		else if (zero_during_arming && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
 			accelKp = 1;
 			accelKi = 0.9;
 			yawBiasRate = 0.23;
+			accel_alpha = 0;
 			init = 0;
 		} else if (init == 0) {
 			// Reload settings (all the rates)
 			AttitudeSettingsAccelKiGet(&accelKi);
 			AttitudeSettingsAccelKpGet(&accelKp);
 			AttitudeSettingsYawBiasRateGet(&yawBiasRate);
+			accel_alpha = accel_alpha_setting;
 			init = 1;
 		}
 		
@@ -543,10 +547,12 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	// Calculate accel filter alpha, in the same way as for gyro data in stabilization module.
 	const float fakeDt = 0.0025;
 	if(attitudeSettings.AccelTau < 0.0001)
-		accel_alpha = 0;   // not trusting this to resolve to 0
+		accel_alpha_setting = 0;   // not trusting this to resolve to 0
 	else
-		accel_alpha = expf(-fakeDt  / attitudeSettings.AccelTau);
+		accel_alpha_setting = expf(-fakeDt  / attitudeSettings.AccelTau);
 	
+	accel_alpha = accel_alpha_setting;
+
 	zero_during_arming = attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE;
 	bias_correct_gyro = attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE;
 	

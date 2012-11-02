@@ -543,6 +543,9 @@ void PIOS_Board_Init(void) {
 	switch (hwsettings_flexiport) {
 		case HWSETTINGS_RM_FLEXIPORT_DISABLED:
 			break;
+                case HWSETTINGS_RM_FLEXIPORT_TELEMETRY:
+                        PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
+			break;
 		case HWSETTINGS_RM_FLEXIPORT_I2C:
 #if defined(PIOS_INCLUDE_I2C)
 			{

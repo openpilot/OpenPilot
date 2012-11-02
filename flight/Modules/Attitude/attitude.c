@@ -469,9 +469,14 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	if(accel_mag < 1.0e-3f)
 		return;
 
-	accel_err[0] /= accel_mag;
-	accel_err[1] /= accel_mag;
-	accel_err[2] /= accel_mag;
+	// Account for filtered gravity vector magnitude
+	float grot_mag = sqrtf(grot[0]*grot[0] + grot[1]*grot[1] + grot[2]*grot[2]);
+	if(grot_mag < 1.0e-3f)
+		return;
+
+	accel_err[0] /= (accel_mag*grot_mag);
+	accel_err[1] /= (accel_mag*grot_mag);
+	accel_err[2] /= (accel_mag*grot_mag);
 	
 	// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
 	gyro_correct_int[0] += accel_err[0] * accelKi;

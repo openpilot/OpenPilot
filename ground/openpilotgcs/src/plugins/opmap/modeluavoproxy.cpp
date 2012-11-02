@@ -74,7 +74,7 @@ void modelUavoProxy::modelToObjects()
         index=myModel->index(x,flightDataModel::ALTITUDERELATIVE);
         altitude=myModel->data(index).toFloat();
         index=myModel->index(x,flightDataModel::VELOCITY);
-        waypoint.Velocity[0]=myModel->data(index).toFloat();
+        waypoint.Velocity=myModel->data(index).toFloat();
 
         waypoint.Position[Waypoint::POSITION_NORTH]=distance*cos(bearing/180*M_PI);
         waypoint.Position[Waypoint::POSITION_EAST]=distance*sin(bearing/180*M_PI);
@@ -143,7 +143,8 @@ void modelUavoProxy::objectsToModel()
         myModel->setData(index,wpfields.Velocity);
         distance=sqrt(wpfields.Position[Waypoint::POSITION_NORTH]*wpfields.Position[Waypoint::POSITION_NORTH]+
                       wpfields.Position[Waypoint::POSITION_EAST]*wpfields.Position[Waypoint::POSITION_EAST]);
-        bearing=acos(wpfields.Position[Waypoint::POSITION_NORTH]/wpfields.Position[Waypoint::POSITION_EAST])*180/M_PI;
+        bearing=atan2(wpfields.Position[Waypoint::POSITION_EAST],wpfields.Position[Waypoint::POSITION_NORTH])*180/M_PI;
+
         if(bearing!=bearing)
             bearing=0;
         index=myModel->index(x,flightDataModel::DISRELATIVE);

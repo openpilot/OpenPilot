@@ -119,7 +119,8 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 	.Pwr_mgmt_clk = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
 	.accel_range = PIOS_MPU6000_ACCEL_8G,
 	.gyro_range = PIOS_MPU6000_SCALE_500_DEG,
-	.filter = PIOS_MPU6000_LOWPASS_256_HZ
+	.filter = PIOS_MPU6000_LOWPASS_256_HZ,
+	.orientation = PIOS_MPU6000_TOP_180DEG
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
 

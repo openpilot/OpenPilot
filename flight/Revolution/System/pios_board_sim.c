@@ -39,9 +39,7 @@
 #include "manualcontrolsettings.h"
 
 #include "pios_rcvr_priv.h"
-
-struct pios_rcvr_channel_map pios_rcvr_channel_to_id_map[PIOS_RCVR_MAX_CHANNELS];
-uint32_t pios_rcvr_max_channel;
+#include "pios_gcsrcvr_priv.h"
 
 void Stack_Change() {
 }
@@ -212,6 +210,17 @@ void PIOS_Board_Init(void) {
 	}
 #endif	/* PIOS_INCLUDE_GPS */
 #endif
+
+#if defined(PIOS_INCLUDE_GCSRCVR)
+	GCSReceiverInitialize();
+	uint32_t pios_gcsrcvr_id;
+	PIOS_GCSRCVR_Init(&pios_gcsrcvr_id);
+	uint32_t pios_gcsrcvr_rcvr_id;
+	if (PIOS_RCVR_Init(&pios_gcsrcvr_rcvr_id, &pios_gcsrcvr_rcvr_driver, pios_gcsrcvr_id)) {
+		PIOS_Assert(0);
+	}
+	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
+#endif	/* PIOS_INCLUDE_GCSRCVR */
 
 }
 

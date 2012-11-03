@@ -863,7 +863,7 @@ all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter ef_$(1), $$(EF_TARGETS)))
 endef
 
-ALL_BOARDS := coptercontrol pipxtreme revolution simposix osd
+ALL_BOARDS := coptercontrol pipxtreme revolution revomini simposix osd
 ALL_BOARDS_BU := coptercontrol pipxtreme simposix
 
 # SimPosix only builds on Linux so drop it from the list for
@@ -873,30 +873,19 @@ ALL_BOARDS  := $(filter-out simposix, $(ALL_BOARDS))
 ALL_BOARDS_BU  := $(filter-out simposix, $(ALL_BOARDS_BU))
 endif
 
-# SimPosix only builds on Linux so drop it from the list for
-# all other platforms.
-ifneq ($(UNAME), Linux)
-ALL_BOARDS  := $(filter-out simposix, $(ALL_BOARDS))
-endif
-
 # Friendly names of each board (used to find source tree)
 coptercontrol_friendly := CopterControl
 pipxtreme_friendly     := PipXtreme
 revolution_friendly    := Revolution
+revomini_friendly      := RevoMini
 simposix_friendly      := SimPosix
 osd_friendly           := OSD
 
-# Short hames of each board (used to display board name in parallel builds)
+# Short names of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '
 pipxtreme_short        := 'pipx'
 revolution_short       := 'revo'
-simposix_short         := 'posx'
-osd_short              := 'osd '
-
-# Short hames of each board (used to display board name in parallel builds)
-coptercontrol_short    := 'cc  '
-pipxtreme_short        := 'pipx'
-revolution_short       := 'revo'
+revomini_short         := 'rm  '
 simposix_short         := 'posx'
 osd_short              := 'osd '
 

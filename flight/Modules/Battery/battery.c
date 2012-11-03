@@ -55,7 +55,6 @@
 // Configuration
 //
 #define SAMPLE_PERIOD_MS		500
-
 // Private types
 
 // Private variables
@@ -82,7 +81,6 @@ int32_t BatteryInitialize(void)
 #ifdef MODULE_BATTERY_BUILTIN
 	batteryEnabled = true;
 #else
-	HwSettingsInitialize();
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 
 	HwSettingsOptionalModulesGet(optionalModules);
@@ -125,16 +123,16 @@ int32_t BatteryInitialize(void)
 }
 
 MODULE_INITCALL(BatteryInitialize, 0)
-
+#define HAS_SENSOR(x) batterySettings.SensorType[x]==FLIGHTBATTERYSETTINGS_SENSORTYPE_ENABLED 
 static void onTimer(UAVObjEvent* ev)
 {
 	static FlightBatteryStateData flightBatteryData;
-
 	FlightBatterySettingsData batterySettings;
-	static float dT = SAMPLE_PERIOD_MS / 1000.0f;
-	float energyRemaining;
 
 	FlightBatterySettingsGet(&batterySettings);
+
+	static float dT = SAMPLE_PERIOD_MS / 1000.0f;
+	float energyRemaining;
 
 	//calculate the battery parameters
 	if (voltageADCPin >=0) {
@@ -201,7 +199,7 @@ static void onTimer(UAVObjEvent* ev)
 		else 
 			AlarmsClear(SYSTEMALARMS_ALARM_BATTERY);
 	}
-
+	
 	FlightBatteryStateSet(&flightBatteryData);
 }
 

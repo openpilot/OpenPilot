@@ -196,6 +196,7 @@ int32_t PIOS_Flash_Jedec_Init(uint32_t spi_id, uint32_t slave_num, const struct 
  */
 int32_t PIOS_Flash_Jedec_StartTransaction()
 {
+	return 0;
 #if defined(FLASH_FREERTOS)
 	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
@@ -212,6 +213,7 @@ int32_t PIOS_Flash_Jedec_StartTransaction()
  */
 int32_t PIOS_Flash_Jedec_EndTransaction()
 {
+	return 0;
 #if defined(FLASH_FREERTOS)
 	if(PIOS_Flash_Jedec_Validate(flash_dev) != 0)
 		return -1;
@@ -249,7 +251,7 @@ int32_t PIOS_Flash_Jedec_ReadStatus()
  */
 int32_t PIOS_Flash_Jedec_ReadID()
 {
-	uint8_t out[] = {JEDEC_DEVICE_ID};
+	uint8_t out[] = {JEDEC_DEVICE_ID, 0, 0, 0};
 	uint8_t in[4];
 	if (PIOS_Flash_Jedec_ClaimBus() < 0) 
 		return -1;
@@ -333,8 +335,11 @@ int32_t PIOS_Flash_Jedec_EraseChip()
 	while(PIOS_Flash_Jedec_Busy() != 0) {
 #if defined(FLASH_FREERTOS)
 		vTaskDelay(1);
-#endif
+		if ((i++) % 100 == 0)
+#else
 		if ((i++) % 10000 == 0)
+#endif
+
 			PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 	
 }

@@ -75,7 +75,7 @@
 #define F_PI 3.14159265358979323846f
 #define RAD2DEG (180.0f/F_PI)
 #define DEG2RAD (F_PI/180.0f)
-#define GEE 9.805f
+#define GEE 9.81f
 // Private types
 
 // Private variables

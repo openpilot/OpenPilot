@@ -198,7 +198,6 @@ SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
 SRC += $(OPUAVSYNTHDIR)/homelocation.c
 SRC += $(OPUAVSYNTHDIR)/gpsposition.c
 SRC += $(OPUAVSYNTHDIR)/gpssatellites.c
-SRC += $(OPUAVSYNTHDIR)/gpssettings.c
 SRC += $(OPUAVSYNTHDIR)/gpsvelocity.c
 SRC += $(OPUAVSYNTHDIR)/gpstime.c
 SRC += $(OPUAVSYNTHDIR)/osdsettings.c

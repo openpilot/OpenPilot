@@ -54,7 +54,7 @@ signals:
 
 protected slots:
     void waypointsUpdated(UAVObject *);
-
+    void doNewInstance(UAVObject*);
 public slots:
 
 private:

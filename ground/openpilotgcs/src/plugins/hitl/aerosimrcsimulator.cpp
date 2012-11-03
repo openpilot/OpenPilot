@@ -202,6 +202,7 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
 
     /**********************************************************************************************/
     out.altitude = posZ;
+    out.agl = posZ;
     out.heading = yaw * RAD2DEG;
     out.latitude = lat * 10e6;
     out.longitude = lon * 10e6;

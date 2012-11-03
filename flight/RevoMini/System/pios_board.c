@@ -131,7 +131,7 @@ static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 #if defined(PIOS_INCLUDE_MS5611)
 #include "pios_ms5611.h"
 static const struct pios_ms5611_cfg pios_ms5611_cfg = {
-	.oversampling = 1,
+	.oversampling = MS5611_OSR_512,
 };
 #endif /* PIOS_INCLUDE_MS5611 */
 
@@ -542,6 +542,9 @@ void PIOS_Board_Init(void) {
 	HwSettingsRM_FlexiPortGet(&hwsettings_flexiport);
 	switch (hwsettings_flexiport) {
 		case HWSETTINGS_RM_FLEXIPORT_DISABLED:
+			break;
+                case HWSETTINGS_RM_FLEXIPORT_TELEMETRY:
+                        PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_TELEM_RF_RX_BUF_LEN, PIOS_COM_TELEM_RF_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_telem_rf_id);
 			break;
 		case HWSETTINGS_RM_FLEXIPORT_I2C:
 #if defined(PIOS_INCLUDE_I2C)

@@ -42,8 +42,6 @@ typedef enum {
 	PACKET_TYPE_NONE = 0,
 	PACKET_TYPE_STATUS,         // broadcasts status of this modem
 	PACKET_TYPE_CON_REQUEST,    // request a connection to another modem
-	PACKET_TYPE_CON_ACCEPT,     // accecpt a connection to another modem
-	PACKET_TYPE_CON_DECLINE,    // decline a connection to another modem
 	PACKET_TYPE_DATA,           // data packet (packet contains user data)
 	PACKET_TYPE_PPM,            // PPM relay values
 	PACKET_TYPE_ACK,
@@ -59,11 +57,18 @@ typedef struct {
 } PHPacketHeader;
 
 #define PH_MAX_DATA (PIOS_PH_MAX_PACKET - sizeof(PHPacketHeader) - RS_ECC_NPARITY)
-#define PH_PACKET_SIZE(p) (p->data + p->header.data_size - (uint8_t*)p + RS_ECC_NPARITY)
+#define PH_PACKET_SIZE(p) ((p)->data + (p)->header.data_size - (uint8_t*)(p) + RS_ECC_NPARITY)
 typedef struct {
 	PHPacketHeader header;
 	uint8_t data[PH_MAX_DATA + RS_ECC_NPARITY];
 } PHPacket, *PHPacketHandle;
+
+typedef struct {
+	PHPacketHeader header;
+	uint16_t seq_num;
+	bool ready_to_send;
+	uint8_t ecc[RS_ECC_NPARITY];
+} PHAckNackPacket, *PHAckNackPacketHandle;
 
 #define PH_PPM_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
 typedef struct {
@@ -83,11 +88,11 @@ typedef struct {
 #define PH_CONNECTION_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
 typedef struct {
 	PHPacketHeader header;
-	uint32_t datarate;
-	uint32_t frequencyHz;
-	uint32_t minFrequencyHz;
-	uint32_t maxFrequencyHz;
-	uint8_t maxTxPower;
+	uint8_t datarate;
+	uint32_t frequency_hz;
+	uint32_t min_frequency;
+	uint32_t max_frequency;
+	uint8_t max_tx_power;
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHConnectionPacket, *PHConnectionPacketHandle;
 

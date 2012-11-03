@@ -192,16 +192,11 @@ static void systemTask(void *parameters)
 			prev_tx_count = tx_count;
 			prev_rx_count = rx_count;
 		}
-		if (radio_stats.connected)
-		{
-			oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_CONNECTED;
+		oplinkStatus.LinkState = radio_stats.link_state;
+		if (radio_stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED)
 			LINK_LED_ON;
-		}
 		else
-		{
-			oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
 			LINK_LED_OFF;
-		}
 
 		// Update the object
 		OPLinkStatusSet(&oplinkStatus);

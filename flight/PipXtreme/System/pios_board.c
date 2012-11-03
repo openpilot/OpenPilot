@@ -246,6 +246,9 @@ void PIOS_Board_Init(void) {
 		}
 	}
 
+	/* Configure the RFM22B device as coordinator or not */
+	PIOS_RFM22B_SetCoordinator(pios_rfm22b_id, oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
+
 	// Initialize the packet handler
 	PacketHandlerConfig pios_ph_cfg = {
 		.default_destination_id = 0xffffffff, // Broadcast

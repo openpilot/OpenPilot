@@ -306,7 +306,7 @@ static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length)
 	uint32_t outputPort = PIOS_COM_TELEMETRY;
 #if defined(PIOS_INCLUDE_USB)
 	// Determine output port (USB takes priority over telemetry port)
-	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
+	if (PIOS_COM_TELEM_USB && PIOS_COM_Available(PIOS_COM_TELEM_USB))
 		outputPort = PIOS_COM_TELEM_USB;
 #endif /* PIOS_INCLUDE_USB */
 	if(outputPort)
@@ -325,10 +325,12 @@ static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length)
 static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
 {
 	uint32_t outputPort = PIOS_COM_RADIO;
-	if(outputPort)
+	// Don't send any data unless the radio port is available.
+	if(outputPort && PIOS_COM_Available(outputPort))
 		return PIOS_COM_SendBuffer(outputPort, buf, length);
 	else
-		return -1;
+		// For some reason, if this function returns failure, it prevents saving settings.
+		return length;
 }
 
 static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte)

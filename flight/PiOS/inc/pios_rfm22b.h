@@ -83,12 +83,13 @@ struct rfm22b_stats {
 	uint8_t rx_error;
 	uint8_t rx_missed;
 	uint8_t tx_dropped;
+	uint8_t tx_resent;
 	uint8_t resets;
 	uint8_t timeouts;
 	uint8_t link_quality;
 	int8_t rssi;
 	int8_t afc_correction;
-	bool connected;
+	uint8_t link_state;
 };
 
 /* Public Functions */
@@ -97,6 +98,7 @@ extern void PIOS_RFM22B_SetFrequencyRange(uint32_t rfm22b_id, uint32_t min_frequ
 extern void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr);
 extern void RFM22_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool data_whitening);
 extern void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id);
+extern void PIOS_RFM22B_SetCoordinator(uint32_t rfm22b_id, bool coordinator);
 extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
 extern void PIOS_RFM22B_GetStats(uint32_t rfm22b_id, struct rfm22b_stats *stats);
 extern bool PIOS_RFM22B_Send_Packet(uint32_t rfm22b_id, PHPacketHandle p, uint32_t max_delay);

@@ -578,10 +578,11 @@ enum pios_rfm22b_state {
 	RFM22B_STATE_UNINITIALIZED,
 	RFM22B_STATE_INITIALIZING,
 	RFM22B_STATE_INITIALIZED,
+	RFM22B_STATE_INITIATING_CONNECTION,
+	RFM22B_STATE_WAIT_FOR_CONNECTION,
 	RFM22B_STATE_REQUESTING_CONNECTION,
 	RFM22B_STATE_ACCEPTING_CONNECTION,
 	RFM22B_STATE_CONNECTION_ACCEPTED,
-	RFM22B_STATE_CONNECTION_DECLINED,
 	RFM22B_STATE_RX_MODE,
 	RFM22B_STATE_WAIT_PREAMBLE,
 	RFM22B_STATE_WAIT_SYNC,
@@ -589,6 +590,10 @@ enum pios_rfm22b_state {
 	RFM22B_STATE_RECEIVING_STATUS,
 	RFM22B_STATE_TX_START,
 	RFM22B_STATE_TX_DATA,
+	RFM22B_STATE_SENDING_ACK,
+	RFM22B_STATE_SENDING_NACK,
+	RFM22B_STATE_RECEIVING_ACK,
+	RFM22B_STATE_RECEIVING_NACK,
 	RFM22B_STATE_TIMEOUT,
 	RFM22B_STATE_ERROR,
 	RFM22B_STATE_FATAL_ERROR,
@@ -601,16 +606,18 @@ enum pios_rfm22b_event {
 	RFM22B_EVENT_INITIALIZE,
 	RFM22B_EVENT_INITIALIZED,
 	RFM22B_EVENT_REQUEST_CONNECTION,
-	RFM22B_EVENT_REQUESTED_CONNECTION,
-	RFM22B_EVENT_CONNECTION_REQUEST,
-	RFM22B_EVENT_CONNECTION_ACCEPT,
-	RFM22B_EVENT_CONNECTION_DECLINED,
+	RFM22B_EVENT_WAIT_FOR_CONNECTION,
+	RFM22B_EVENT_CONNECTION_REQUESTED,
+	RFM22B_EVENT_CONNECTION_ACCEPTED,
+	RFM22B_EVENT_PACKET_ACKED,
+	RFM22B_EVENT_PACKET_NACKED,
 	RFM22B_EVENT_RX_MODE,
 	RFM22B_EVENT_PREAMBLE_DETECTED,
 	RFM22B_EVENT_SYNC_DETECTED,
 	RFM22B_EVENT_RX_COMPLETE,
 	RFM22B_EVENT_STATUS_RECEIVED,
 	RFM22B_EVENT_SEND_PACKET,
+	RFM22B_EVENT_START_TRANSFER,
 	RFM22B_EVENT_TX_START,
 	RFM22B_EVENT_TX_STARTED,
 	RFM22B_EVENT_TX_COMPLETE,
@@ -648,6 +655,9 @@ struct pios_rfm22b_dev {
 
 	// The destination ID
 	uint32_t destination_id;
+
+	// Is this device a coordinator?
+	bool coordinator;
 
 	// The task handle
 	xTaskHandle taskHandle;
@@ -704,8 +714,12 @@ struct pios_rfm22b_dev {
 	// The packet queue handle
 	xQueueHandle packetQueue;
 
+	// The tx data packet
+	PHPacket data_packet;
 	// The current tx packet
 	PHPacketHandle tx_packet;
+	// The previous tx packet (waiting for an ACK)
+	PHPacketHandle prev_tx_packet;
 	// the tx data read index
 	uint16_t tx_data_rd;
 	// the tx data write index
@@ -713,12 +727,31 @@ struct pios_rfm22b_dev {
 	// The tx packet sequence number
 	uint16_t tx_seq;
 
-	// The rx packet
+	// The rx data packet
 	PHPacket rx_packet;
 	// the receive buffer write index
 	uint16_t rx_buffer_wr;
 	// the receive buffer write index
 	uint16_t rx_packet_len;
+
+	// The status packet
+	PHStatusPacket status_packet;
+
+	// The ACK/NACK packet
+	PHAckNackPacket ack_nack_packet;
+
+#ifdef PIOS_PPM_RECEIVER
+	// The PPM packet
+	PHPpmPacket ppm_packet;
+#endif
+
+	// The connection packet.
+	PHConnectionPacket con_packet;
+
+	// Send flags
+	bool send_status;
+	bool send_ppm;
+	bool send_connection_request;
 
 	// The minimum frequency
 	uint32_t min_frequency;
@@ -735,17 +768,11 @@ struct pios_rfm22b_dev {
 	// afc correction reading (in Hz)
 	int8_t afc_correction_Hz;
 
-	// The status packet
-	PHStatusPacket status_packet;
-
-#ifdef PIOS_PPM_RECEIVER
-	// The PPM packet
-	PHPpmPacket ppm_packet;
-#endif
-
 	// The maximum time (ms) that it should take to transmit / receive a packet.
 	uint32_t max_packet_time;
 	portTickType packet_start_ticks;
+	portTickType tx_complete_ticks;
+	uint8_t max_ack_delay;
 };
 
 
@@ -753,6 +780,7 @@ struct pios_rfm22b_dev {
 
 bool PIOS_RFM22_EXT_Int(void);
 bool PIOS_RFM22B_validate(struct pios_rfm22b_dev * rfm22b_dev);
+void PIOS_RFM22B_InjectEvent(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event, bool inISR);
 
 
 // Global variable definitions

@@ -89,29 +89,8 @@ static void PIOS_RFM22B_COM_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail)
 	if (!PIOS_RFM22B_validate(rfm22b_dev))
 		return;
 
-	// Get a packet when we see the sync
-	PHPacketHandle p = PHGetTXPacket(pios_packet_handler);
-	if (!p)
-		return;
-
-	// Get some data to send
-	bool need_yield = false;
-	p->header.type = PACKET_TYPE_DATA;
-	p->header.destination_id = rfm22b_dev->destination_id;
-	p->header.data_size = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, p->data,
-						      PH_MAX_DATA, NULL, &need_yield);
-	if (p->header.data_size == 0)
-	{
-		PHReleaseTXPacket(pios_packet_handler, p);
-		return;
-	}
-
-	// Send the data packet.
-	if (!PIOS_RFM22B_Send_Packet(rfm22b_id, p, 5))
-	{
-		rfm22b_dev->stats.tx_dropped++;
-		PHReleaseTXPacket(pios_packet_handler, p);
-	}
+	// Send a signal to the radio to start a transmit.
+	PIOS_RFM22B_InjectEvent(rfm22b_dev, RFM22B_EVENT_SEND_PACKET, false);
 }
 
 static void PIOS_RFM22B_COM_RegisterRxCallback(uint32_t rfm22b_id, pios_com_callback rx_in_cb, uint32_t context)

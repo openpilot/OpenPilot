@@ -61,7 +61,6 @@
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define ISR_TIMEOUT 2 // ms
 #define EVENT_QUEUE_SIZE 5
-#define PACKET_QUEUE_SIZE 3
 #define RFM22B_DEFAULT_RX_DATARATE RFM22_datarate_64000
 #define RFM22B_DEFAULT_FREQUENCY 434000000
 #define RFM22B_DEFAULT_MIN_FREQUENCY (RFM22B_DEFAULT_FREQUENCY - 2000000)
@@ -604,9 +603,6 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	// Create a semaphore to know when an rx packet is available
 	vSemaphoreCreateBinary( rfm22b_dev->rxsem );
 
-	// Create the packet queue.
-	rfm22b_dev->packetQueue = xQueueCreate(PACKET_QUEUE_SIZE, sizeof(PHPacketHandle));
-
 	// Create our (hopefully) unique 32 bit id from the processor serial number.
 	uint8_t crcs[] = { 0, 0, 0, 0 };
 	{
@@ -782,7 +778,6 @@ void PIOS_RFM22B_GetStats(uint32_t rfm22b_id, struct rfm22b_stats *stats) {
 				break;
 			}
 		}
-	rfm22b_dev->stats.tx_resent = rfm22b_dev->state;
 	*stats = rfm22b_dev->stats;
 }
 
@@ -807,32 +802,6 @@ uint8_t PIOS_RFM2B_GetPairStats(uint32_t rfm22b_id, uint32_t *device_ids, int8_t
  	}
 
 	return mp;
-}
-
-/**
- * Insert a packet on the packet queue for sending.
- * Note: If this finction succedds, the packet will be released by the driver, so no release is necessary.
- *       If this function doesn't success, the caller is still responsible for the packet.
- * \param[in] rfm22b_id  The rfm22b device.
- * \param[in] p  The packet handle.
- * \param[in] max_delay  The maximum time to delay waiting to queue the packet.
- * \return  true on success, false on failue to queue the packet.
- */
-bool PIOS_RFM22B_Send_Packet(uint32_t rfm22b_id, PHPacketHandle p, uint32_t max_delay)
-{
- 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(!PIOS_RFM22B_validate(rfm22b_dev))
-		return false;
-
-	// Store the packet handle in the packet queue
-	if (xQueueSend(rfm22b_dev->packetQueue, &p, max_delay) != pdTRUE)
-		return false;
- 
-	// Inject a send packet event
-	PIOS_RFM22B_InjectEvent(rfm22b_dev, RFM22B_EVENT_SEND_PACKET, false);
-
-	// Success
-	return true;
 }
 
 /**
@@ -1305,9 +1274,25 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 		if (rfm22b_dev->prev_tx_packet)
 			return RFM22B_EVENT_RX_MODE;
 
-		// Is there a packet in the queue to send?
-		if (xQueueReceive(rfm22b_dev->packetQueue, &p, 0) != pdTRUE)
-			p = NULL;
+		if (!p && rfm22b_dev->send_connection_request)
+		{
+			p = (PHPacketHandle)&(rfm22b_dev->con_packet);
+			rfm22b_dev->send_connection_request = false;
+		}
+
+#ifdef PIOS_PPM_RECEIVER
+		if (!p && rfm22b_dev->send_ppm)
+		{
+			p = (PHPacketHandle)&(rfm22b_dev->ppm_packet);
+			rfm22b_dev->send_ppm = false;
+		}
+#endif
+
+		if (!p && rfm22b_dev->send_status)
+		{
+			p = (PHPacketHandle)&(rfm22b_dev->status_packet);
+			rfm22b_dev->send_status = false;
+		}
 
 		if (!p)
 		{
@@ -1412,7 +1397,6 @@ static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22_calculateLinkQuality(rfm22b_dev);
 
 	// Queue the status message
-	PHPacketHandle sph = (PHPacketHandle)&(rfm22b_dev->status_packet);
 	if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED)
 		rfm22b_dev->status_packet.header.destination_id = rfm22b_dev->destination_id;
 	else
@@ -1421,9 +1405,7 @@ static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22b_dev->status_packet.header.data_size = PH_STATUS_DATA_SIZE(&(rfm22b_dev->status_packet));
 	rfm22b_dev->status_packet.link_quality = rfm22b_dev->stats.link_quality;
 	rfm22b_dev->status_packet.received_rssi = rfm22b_dev->rssi_dBm;
-	//rfm22b_dev->send_status = true;
-	if (xQueueSend(rfm22b_dev->packetQueue, &sph, 0) != pdTRUE)
-		return false;
+	rfm22b_dev->send_status = true;
 	rfm22_process_event(rfm22b_dev, RFM22B_EVENT_START_TRANSFER);
 
 	return true;
@@ -1451,13 +1433,7 @@ static bool rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev)
 		rfm22b_dev->ppm_packet.header.destination_id = rfm22b_dev->destination_id;
 		rfm22b_dev->ppm_packet.header.type = PACKET_TYPE_PPM;
 		rfm22b_dev->ppm_packet.header.data_size = PH_PPM_DATA_SIZE(&(rfm22b_dev->ppm_packet));
-
-		// Queue the packet
-		PHPacketHandle pph = (PHPacketHandle)&(rfm22b_dev->ppm_packet);
-		if (xQueueSend(rfm22b_dev->packetQueue, &pph, 0) != pdTRUE)
-			return false;
-
-		// Process a SEND_PACKT event.
+		rfm22b_dev->send_ppm = true;
 		rfm22_process_event(rfm22b_dev, RFM22B_EVENT_SEND_PACKET);
 	}
 #endif
@@ -1731,8 +1707,6 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 	// Read the device status registers
 	if (!rfm22_readStatus(rfm22b_dev))
 	{
-		// Free the tx packet
-		PHReleaseTXPacket(pios_packet_handler, rfm22b_dev->tx_packet);
 		rfm22b_dev->tx_packet = 0;
 		rfm22b_dev->tx_data_wr = rfm22b_dev->tx_data_rd = 0;
 		return RFM22B_EVENT_ERROR;
@@ -1741,8 +1715,6 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 	// FIFO under/over flow error.  Back to RX mode.
 	if (rfm22b_dev->device_status & (RFM22_ds_ffunfl | RFM22_ds_ffovfl))
 	{
-		// Free the tx packet
-		PHReleaseTXPacket(pios_packet_handler, rfm22b_dev->tx_packet);
 		rfm22b_dev->tx_packet = 0;
 		rfm22b_dev->tx_data_wr = rfm22b_dev->tx_data_rd = 0;
 		return RFM22B_EVENT_ERROR;
@@ -1778,9 +1750,6 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 			rfm22b_dev->prev_tx_packet = rfm22b_dev->tx_packet;
 			rfm22b_dev->tx_complete_ticks = xTaskGetTickCount();
 		}
-		else
-			// Free the tx packet
-			PHReleaseTXPacket(pios_packet_handler, rfm22b_dev->tx_packet);
 
 		rfm22b_dev->tx_packet = 0;
 		rfm22b_dev->tx_data_wr = rfm22b_dev->tx_data_rd = 0;
@@ -1855,7 +1824,7 @@ static enum pios_rfm22b_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_d
 	// Resend the previous TX packet.
 	rfm22b_dev->tx_packet = rfm22b_dev->prev_tx_packet;
 	rfm22b_dev->prev_tx_packet = NULL;
-	//rfm22b_dev->stats.tx_resent++;
+	rfm22b_dev->stats.tx_resent++;
 	return RFM22B_EVENT_START_TRANSFER;
 }
 
@@ -1939,7 +1908,7 @@ static enum pios_rfm22b_event rfm22_requestConnection(struct pios_rfm22b_dev *rf
 	cph->min_frequency = rfm22b_dev->min_frequency;
 	cph->max_frequency = rfm22b_dev->max_frequency;
 	cph->max_tx_power = rfm22b_dev->tx_power;
-	rfm22b_dev->tx_packet = (PHPacketHandle)cph;
+	rfm22b_dev->send_connection_request = true;
 
 	return RFM22B_EVENT_START_TRANSFER;
 }
@@ -2240,7 +2209,6 @@ static enum pios_rfm22b_event rfm22_timeout(struct pios_rfm22b_dev *rfm22b_dev)
 	// Release the Tx packet if it's set.
 	if (rfm22b_dev->tx_packet != 0)
 	{
-		PHReleaseTXPacket(pios_packet_handler, rfm22b_dev->tx_packet);
 		rfm22b_dev->tx_packet = 0;
 		rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
 	}
@@ -2255,7 +2223,6 @@ static enum pios_rfm22b_event rfm22_error(struct pios_rfm22b_dev *rfm22b_dev)
 	// Release the Tx packet if it's set.
 	if (rfm22b_dev->tx_packet != 0)
 	{
-		PHReleaseTXPacket(pios_packet_handler, rfm22b_dev->tx_packet);
 		rfm22b_dev->tx_packet = 0;
 		rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
 	}

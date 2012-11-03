@@ -174,6 +174,7 @@ static void systemTask(void *parameters)
 		oplinkStatus.RxErrors = radio_stats.rx_error;
 		oplinkStatus.RxMissed = radio_stats.rx_missed;
 		oplinkStatus.TxDropped = radio_stats.tx_dropped; // + data->droppedPackets;
+		oplinkStatus.TxResent = radio_stats.tx_resent;
 		oplinkStatus.Resets = radio_stats.resets;
 		oplinkStatus.Timeouts = radio_stats.timeouts;
 		oplinkStatus.RSSI = radio_stats.rssi;

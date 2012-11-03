@@ -44,8 +44,11 @@
 #include "gps_airspeed.h"
 #include "baroaltitude.h"
 #include "baroairspeed.h" // object that will be updated by the module
+#include "airspeedactual.h" // object that will be updated by the module
 #include "attitudeactual.h"
 #include "CoordinateConversions.h"
+#include "baro_airspeed_etasv3.h"
+#include "baro_airspeed_analog.h"
 
 // Private constants
 #if defined (PIOS_INCLUDE_GPS)
@@ -164,6 +167,7 @@ int32_t AirspeedInitialize()
 #endif	
 	
 	BaroAirspeedInitialize();
+	AirspeedActualInitialize();
 	AirspeedSettingsInitialize();
 	
 	AirspeedSettingsConnectCallback(AirspeedSettingsUpdatedCb);	
@@ -181,7 +185,9 @@ static void airspeedTask(void *parameters)
 	AirspeedSettingsUpdatedCb(AirspeedSettingsHandle());
 	
 	BaroAirspeedData airspeedData;
+	AirspeedActualData airspeedActualData;
 	BaroAirspeedGet(&airspeedData);
+	AirspeedActualGet(&airspeedActualData);
 
 
 	airspeedData.BaroConnected = BAROAIRSPEED_BAROCONNECTED_FALSE;
@@ -205,6 +211,7 @@ static void airspeedTask(void *parameters)
 	{
 		// Update the airspeed object
 		BaroAirspeedGet(&airspeedData);
+		AirspeedActualGet(&airspeedActualData);
 		
 #ifdef BARO_AIRSPEED_PRESENT
 		float airspeed_tas_baro=0;
@@ -308,7 +315,10 @@ static void airspeedTask(void *parameters)
  #endif
 #endif
 		//Set the UAVO
+		airspeedActualData.TrueAirspeed = airspeedData.TrueAirspeed;
+		airspeedActualData.CalibratedAirspeed = airspeedData.CalibratedAirspeed;
 		BaroAirspeedSet(&airspeedData);
+		AirspeedActualSet(&airspeedActualData);
 			
 	}
 }
@@ -320,6 +330,32 @@ static void GPSVelocityUpdatedCb(UAVObjEvent * ev)
 	gpsNew=true;
 }
 #endif
+
+void baro_airspeedGet(BaroAirspeedData *baroAirspeedData, portTickType *lastSysTime, uint8_t airspeedSensorType, int8_t airspeedADCPin){
+	
+	//Find out which sensor we're using.
+	switch (airspeedSensorType) {
+#if defined(PIOS_INCLUDE_MPXV7002)
+		case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV7002:
+#endif
+#if defined(PIOS_INCLUDE_MPXV5004)
+		case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV5004:
+#endif
+#if defined(PIOS_INCLUDE_MPXV7002) || defined(PIOS_INCLUDE_MPXV5004)
+			//MPXV5004 and MPXV7002 sensors
+			baro_airspeedGetAnalog(baroAirspeedData, lastSysTime, airspeedSensorType, airspeedADCPin);
+			break;
+#endif
+#if defined(PIOS_INCLUDE_ETASV3)
+		case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_EAGLETREEAIRSPEEDV3:
+			//Eagletree Airspeed v3
+			baro_airspeedGetETASV3(baroAirspeedData, lastSysTime, airspeedSensorType, airspeedADCPin);
+			break;
+#endif
+		default:
+			baroAirspeedData->BaroConnected = BAROAIRSPEED_BAROCONNECTED_FALSE;
+	}
+}
 
 
 static void AirspeedSettingsUpdatedCb(UAVObjEvent * ev)

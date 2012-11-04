@@ -6,9 +6,9 @@
         <field name="AirSpeedMax" units="m/s" type="float" elements="1" defaultvalue="20"/>
                 <!-- Vne, i.e. maximum airspeed the airframe can handle -->
         <field name="CruiseSpeed" units="m/s" type="float" elements="1" defaultvalue="20"/>
-                <!-- Cruise speed the in level flight - leave some safety margin -->
+                <!-- Maximum speed the autopilot will try to achieve, usually for long distances -->
         <field name="BestClimbRateSpeed" units="m/s" type="float" elements="1" defaultvalue="10"/>
-                <!-- V_y, i.e. airspeed at which plane climbs the best -->
+                <!-- V_y, Minimum speed the autopilot will try to fly, for example when loitering -->
         <field name="StallSpeedClean" units="m/s" type="float" elements="1" defaultvalue="8"/>
                 <!-- Vs1, i.e. stall speed in clean configuration- leave some safety margin -->
         <field name="StallSpeedDirty" units="m/s" type="float" elements="1" defaultvalue="8"/>
@@ -28,12 +28,9 @@
         <field name="BearingPI" units="deg/deg" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.2, 0, 0"/>
                 <!-- coefficients for desired bank angle in relation to ground bearing error - this controls heading -->
 
-        <field name="SpeedP" units="(m/s^2) / ((m/s)/(m/s)" type="float" elementnames="Kp,Max" defaultvalue="10,10"/>
-                <!-- coefficients for desired acceleration
-                     in relation to relative airspeed error (IASerror/IASactual)-->
-        <field name="AccelPI" units="deg / (m/s^2)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="1.5, .15, 20"/>
+        <field name="SpeedPI" units="deg / (m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="1.5, .15, 20"/>
                 <!-- coefficients for desired pitch
-                     in relation to acceleration error -->
+                     in relation to relative speed error (IASerror/IASactual) -->
         <field name="VerticalToPitchCrossFeed" units="deg / ((m/s)/(m/s))" type="float" elementnames="Kp,Max" defaultvalue="5, 10"/>
                 <!-- coefficients for adjusting desired pitch
                      in relation to "vertical speed error relative to airspeed" (verror/IASactual) -->

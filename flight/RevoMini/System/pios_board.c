@@ -519,14 +519,14 @@ void PIOS_Board_Init(void) {
 							&pios_usart_com_driver, &proto, MANUALCONTROLSETTINGS_CHANNELGROUPS_DSMMAINPORT,&hwsettings_DSMxBind);
 			}
 			break;
-		case HWSETTINGS_CC_MAINPORT_DEBUGCONSOLE:
+		case HWSETTINGS_RM_MAINPORT_DEBUGCONSOLE:
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
 			{
 				PIOS_Board_configure_com(&pios_usart_main_cfg, 0, PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
 			}
 #endif	/* PIOS_INCLUDE_DEBUG_CONSOLE */
 			break;
-		case HWSETTINGS_CC_MAINPORT_COMBRIDGE:
+		case HWSETTINGS_RM_MAINPORT_COMBRIDGE:
 			PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
 			break;
 			
@@ -597,12 +597,12 @@ void PIOS_Board_Init(void) {
 	
 	/* Configure the receiver port*/
 	uint8_t hwsettings_rcvrport;
-	HwSettingsRV_RcvrPortGet(&hwsettings_rcvrport);
+	HwSettingsRM_RcvrPortGet(&hwsettings_rcvrport);
 	//   
 	switch (hwsettings_rcvrport){
-		case HWSETTINGS_RV_RCVRPORT_DISABLED:
+		case HWSETTINGS_RM_RCVRPORT_DISABLED:
 			break;
-		case HWSETTINGS_RV_RCVRPORT_PWM:
+		case HWSETTINGS_RM_RCVRPORT_PWM:
 #if defined(PIOS_INCLUDE_PWM)
 		{
 			/* Set up the receiver port.  Later this should be optional */
@@ -617,8 +617,8 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_PWM */
 			break;
-		case HWSETTINGS_RV_RCVRPORT_PPM:
-		case HWSETTINGS_RV_RCVRPORT_PPMOUTPUTS:
+		case HWSETTINGS_RM_RCVRPORT_PPM:
+		case HWSETTINGS_RM_RCVRPORT_PPMOUTPUTS:
 #if defined(PIOS_INCLUDE_PPM)
 		{
 			uint32_t pios_ppm_id;
@@ -631,7 +631,7 @@ void PIOS_Board_Init(void) {
 			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM] = pios_ppm_rcvr_id;
 		}
 #endif	/* PIOS_INCLUDE_PPM */
-		case HWSETTINGS_RV_RCVRPORT_OUTPUTS:
+		case HWSETTINGS_RM_RCVRPORT_OUTPUTS:
 		
 			break;
 	}
@@ -650,14 +650,14 @@ void PIOS_Board_Init(void) {
 
 #ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
 	switch (hwsettings_rcvrport) {
-		case HWSETTINGS_RV_RCVRPORT_DISABLED:
-		case HWSETTINGS_RV_RCVRPORT_PWM:
-		case HWSETTINGS_RV_RCVRPORT_PPM:
+		case HWSETTINGS_RM_RCVRPORT_DISABLED:
+		case HWSETTINGS_RM_RCVRPORT_PWM:
+		case HWSETTINGS_RM_RCVRPORT_PPM:
 			/* Set up the servo outputs */
 			PIOS_Servo_Init(&pios_servo_cfg);
 			break;
-		case HWSETTINGS_RV_RCVRPORT_PPMOUTPUTS:
-		case HWSETTINGS_RV_RCVRPORT_OUTPUTS:
+		case HWSETTINGS_RM_RCVRPORT_PPMOUTPUTS:
+		case HWSETTINGS_RM_RCVRPORT_OUTPUTS:
 			//PIOS_Servo_Init(&pios_servo_rcvr_cfg);
 			//TODO: Prepare the configurations on board_hw_defs and handle here:
 			PIOS_Servo_Init(&pios_servo_cfg);

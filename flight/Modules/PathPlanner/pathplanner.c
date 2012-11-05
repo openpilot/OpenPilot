@@ -76,7 +76,6 @@ static uint8_t conditionImmediate();
 
 // Private variables
 static xTaskHandle taskHandle;
-static xQueueHandle queue;
 static PathPlannerSettingsData pathPlannerSettings;
 static WaypointActiveData waypointActive;
 static WaypointData waypoint;
@@ -115,9 +114,6 @@ int32_t PathPlannerInitialize()
 	WaypointInitialize();
 	WaypointActiveInitialize();
 	
-	// Create object queue
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-
 	return 0;
 }
 

@@ -77,19 +77,22 @@ void baro_airspeedGetETASV3(BaroAirspeedData *baroAirspeedData, portTickType *la
 		return;
 	}
 	
-	//Calibrate sensor by averaging zero point value //THIS SHOULD NOT BE DONE IF THERE IS AN IN-AIR RESET. HOW TO DETECT THIS?
-	if (calibrationCount < CALIBRATION_IDLE_MS/SAMPLING_DELAY_MS_ETASV3) {
-		calibrationCount++;
-		return;
-	} else if (calibrationCount < (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/SAMPLING_DELAY_MS_ETASV3) {
-		calibrationCount++;
-		calibrationSum +=  baroAirspeedData->SensorValue;
-		if (calibrationCount == (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/SAMPLING_DELAY_MS_ETASV3) {
-
-			airspeedSettingsData.ZeroPoint = (int16_t) (((float)calibrationSum) / CALIBRATION_COUNT_MS +0.5f);
-			AirspeedSettingsZeroPointSet( &airspeedSettingsData.ZeroPoint );
-		} else {
+	// only calibrate if no stored calibration is available
+	if (!airspeedSettingsData.ZeroPoint) {
+		//Calibrate sensor by averaging zero point value
+		if (calibrationCount < CALIBRATION_IDLE_MS/SAMPLING_DELAY_MS_ETASV3) {
+			calibrationCount++;
 			return;
+		} else if (calibrationCount < (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/SAMPLING_DELAY_MS_ETASV3) {
+			calibrationCount++;
+			calibrationSum +=  baroAirspeedData->SensorValue;
+			if (calibrationCount == (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/SAMPLING_DELAY_MS_ETASV3) {
+
+				airspeedSettingsData.ZeroPoint = (int16_t) (((float)calibrationSum) / CALIBRATION_COUNT_MS +0.5f);
+				AirspeedSettingsZeroPointSet( &airspeedSettingsData.ZeroPoint );
+			} else {
+				return;
+			}
 		}
 	}
 	

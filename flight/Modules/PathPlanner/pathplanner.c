@@ -49,6 +49,7 @@
 #define MAX_QUEUE_SIZE 2
 #define F_PI 3.141526535897932f
 #define RAD2DEG (180.0f/F_PI)
+#define PATH_PLANNER_UPDATE_RATE_MS 20
 
 // Private types
 
@@ -142,7 +143,7 @@ static void pathPlannerTask(void *parameters)
 	while (1)
 	{
 
-		vTaskDelay(20);
+		vTaskDelay(PATH_PLANNER_UPDATE_RATE_MS);
 
 		FlightStatusGet(&flightStatus);
 		if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {

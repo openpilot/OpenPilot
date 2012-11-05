@@ -384,7 +384,6 @@ static uint8_t updateFixedDesiredAttitude()
 	FixedWingPathFollowerStatusGet(&fixedwingpathfollowerStatus);
 	
 	VelocityActualGet(&velocityActual);
-//	VelocityDesiredGet(&velocityDesired);
 	StabilizationDesiredGet(&stabDesired);
 	VelocityDesiredGet(&velocityDesired);
 	AttitudeActualGet(&attitudeActual);

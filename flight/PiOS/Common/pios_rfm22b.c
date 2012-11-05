@@ -189,6 +189,7 @@ static void rfm22b_add_rx_status(struct pios_rfm22b_dev *rfm22b_dev, enum pios_r
 static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHandle p, uint16_t rx_len);
 static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev, uint32_t frequency_hz);
 static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev);
+static bool rfm22_ready_to_send(struct pios_rfm22b_dev *rfm22b_dev);
 
 // SPI read/write functions
 static void rfm22_assertCs();
@@ -304,6 +305,7 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 		.next_state = {
 			[RFM22B_EVENT_INT_RECEIVED] = RFM22B_STATE_RX_DATA,
 			[RFM22B_EVENT_RX_COMPLETE] = RFM22B_STATE_SENDING_ACK,
+			[RFM22B_EVENT_RX_ERROR] = RFM22B_STATE_SENDING_NACK,
 			[RFM22B_EVENT_STATUS_RECEIVED] = RFM22B_STATE_RECEIVING_STATUS,
 			[RFM22B_EVENT_CONNECTION_REQUESTED] = RFM22B_STATE_ACCEPTING_CONNECTION,
 			[RFM22B_EVENT_PACKET_ACKED] = RFM22B_STATE_RECEIVING_ACK,
@@ -555,7 +557,6 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	}
 
 	// Initlize the link stats.
-	rfm22b_dev->prev_rx_seq_num = 0;
 	for (uint8_t i = 0; i < RFM22B_RX_PACKET_STATS_LEN; ++i)
 		rfm22b_dev->rx_packet_stats[i] = 0;
 
@@ -590,6 +591,8 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->tx_packet = NULL;
 	rfm22b_dev->prev_tx_packet = NULL;
 	rfm22b_dev->tx_seq = 0;
+	rfm22b_dev->prev_rx_seq_num = 0;
+	rfm22b_dev->data_packet.header.data_size = 0;
 
 	*rfm22b_id = (uint32_t)rfm22b_dev;
 	g_rfm22b_dev = rfm22b_dev;
@@ -828,7 +831,6 @@ static void PIOS_RFM22B_Task(void *parameters)
 	portTickType lastEventTicks = xTaskGetTickCount();
 	portTickType lastStatusTicks = lastEventTicks;
 	portTickType lastPPMTicks = lastEventTicks;
-	portTickType lastConnectTicks = lastEventTicks;
 
 	while(1)
 	{
@@ -873,12 +875,6 @@ static void PIOS_RFM22B_Task(void *parameters)
 		if ((rfm22b_dev->packet_start_ticks > 0) && (timeDifferenceMs(rfm22b_dev->packet_start_ticks, curTicks) > (rfm22b_dev->max_packet_time * 3)))
 			rfm22_process_event(rfm22b_dev, RFM22B_EVENT_TIMEOUT);
 
-		// Queue up a connection request packet if it's necessary
-		else if (rfm22b_dev->coordinator && (rfm22b_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED) && (timeDifferenceMs(lastConnectTicks, curTicks) > CONNECT_ATTEMPT_PERIOD_MS))
-		{
-			lastConnectTicks = curTicks;
-			rfm22_process_event(rfm22b_dev, RFM22B_EVENT_INITIALIZE);
-		}
 		else
 		{
 			// Queue up a PPM packet if it's time.
@@ -891,7 +887,10 @@ static void PIOS_RFM22B_Task(void *parameters)
 
 			// Can we kick of a transmit?
 			if (rfm22b_dev->prev_tx_packet && timeDifferenceMs(rfm22b_dev->tx_complete_ticks, curTicks) > rfm22b_dev->max_ack_delay)
+			{
+				rfm22b_dev->tx_complete_ticks = curTicks;
 				rfm22_process_event(rfm22b_dev, RFM22B_EVENT_PACKET_NACKED);
+			}
 		}
 	}
 }
@@ -1186,7 +1185,7 @@ static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22b_dev->stats.rx_good = 0;
 	rfm22b_dev->stats.rx_corrected = 0;
 	rfm22b_dev->stats.rx_error = 0;
-	rfm22b_dev->stats.rx_missed = 0;
+	rfm22b_dev->stats.tx_resent = 0;
 	for (uint8_t i = 0; i < RFM22B_RX_PACKET_STATS_LEN; ++i)
 	{
 		uint32_t val = rfm22b_dev->rx_packet_stats[i];
@@ -1203,8 +1202,8 @@ static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev)
 			case RFM22B_ERROR_RX_PACKET:
 				rfm22b_dev->stats.rx_error++;
 				break;
-			case RFM22B_MISSED_RX_PACKET:
-				rfm22b_dev->stats.rx_missed++;
+			case RFM22B_RESENT_TX_PACKET:
+				rfm22b_dev->stats.tx_resent++;
 				break;
 			}
 		}
@@ -1212,9 +1211,9 @@ static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev)
 
 	// Calculate the link quality metric, which is related to the number of good packets in relation to the number of bad packets.
 	// Note: This assumes that the number of packets sampled for the stats is 64.
-	// Using this equation, error and missed packets are counted as -2, and corrected packets are counted as -1.
-	// The rage is 0 (all error or missed packets) to 128 (all good packets).
-	rfm22b_dev->stats.link_quality = 64 + rfm22b_dev->stats.rx_good - rfm22b_dev->stats.rx_error - rfm22b_dev->stats.rx_missed;
+	// Using this equation, error and resent packets are counted as -2, and corrected packets are counted as -1.
+	// The range is 0 (all error or resent packets) to 128 (all good packets).
+	rfm22b_dev->stats.link_quality = 64 + rfm22b_dev->stats.rx_good - rfm22b_dev->stats.rx_error - rfm22b_dev->stats.tx_resent;
 }
 
 // ************************************
@@ -1257,6 +1256,26 @@ static enum pios_rfm22b_event rfm22_setRxMode(struct pios_rfm22b_dev *rfm22b_dev
 }
 
 // ************************************
+
+static bool rfm22_ready_to_send(struct pios_rfm22b_dev *rfm22b_dev)
+{
+	// Is there a status of PPM packet ready to send?
+	if (rfm22b_dev->send_ppm || rfm22b_dev->send_status)
+		return true;
+
+	// Is there some data ready to sent?
+	PHPacketHandle dp = &rfm22b_dev->data_packet;
+	if (dp->header.data_size > 0)
+		return true;
+	bool need_yield = false;
+	dp->header.data_size = 
+		(rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, dp->data,
+					PH_MAX_DATA, NULL, &need_yield);
+	if (dp->header.data_size > 0)
+		return true;
+
+	return false;
+}
 
 static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 {
@@ -1302,23 +1321,28 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 			p = &rfm22b_dev->data_packet;
 			p->header.type = PACKET_TYPE_DATA;
 			p->header.destination_id = rfm22b_dev->destination_id;
-			p->header.data_size = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, p->data,
-								      PH_MAX_DATA, NULL, &need_yield);
+			if (p->header.data_size == 0)
+				p->header.data_size = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, p->data,
+									      PH_MAX_DATA, NULL, &need_yield);
 			if (p->header.data_size == 0)
 				p = NULL;
 
 			// Don't send any data until we're connected.
 			else if (rfm22b_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED)
+			{
+				p->header.data_size = 0;
 				return RFM22B_EVENT_RX_MODE;
+			}
 		}
 
+		if (p)
+			p->header.seq_num = rfm22b_dev->tx_seq++;
 	}
 	if (!p)
 		return RFM22B_EVENT_RX_MODE;
 
 	// Add the error correcting code.
 	p->header.source_id = rfm22b_dev->deviceID;
-	p->header.seq_num = rfm22b_dev->tx_seq++;
 	encode_data((unsigned char*)p, PHPacketSize(p), (unsigned char*)p);
 
 	rfm22b_dev->tx_packet = p;
@@ -1549,46 +1573,47 @@ static enum pios_rfm22b_event rfm22_detectSync(struct pios_rfm22b_dev *rfm22b_de
 
 static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHandle p, uint16_t rx_len)
 {
-	static bool first_packet = true;
-	uint16_t seq_num = p->header.seq_num;
-	uint16_t prev_seq_num = rfm22b_dev->prev_rx_seq_num;
-	uint16_t missed_packets = ((seq_num < prev_seq_num) ? (0xffff - prev_seq_num + seq_num) : (seq_num - prev_seq_num)) - 1;
-	rfm22b_dev->prev_rx_seq_num = seq_num;
-	if (first_packet)
-	{
-		missed_packets = 0;
-		first_packet = false;
-	}
-
-	// Add any missed packets into the stats.
-	for ( ; missed_packets > 0; --missed_packets)
-		rfm22b_add_rx_status(rfm22b_dev, RFM22B_MISSED_RX_PACKET);
 
 	// Attempt to correct any errors in the packet.
 	decode_data((unsigned char*)p, rx_len);
 
-	// Check if there were any errors
-	bool rx_error = check_syndrome() != 0;
-	if(rx_error)
+	bool good_packet = check_syndrome() == 0;
+	bool corrected_packet = false;
+	// We have an error.  Try to correct it.
+	if(!good_packet && (correct_errors_erasures((unsigned char*)p, rx_len, 0, 0) != 0))
+		// We corrected it
+		corrected_packet = true;
+
+	// Add any missed packets into the stats.
+	bool ack_nack_packet = ((p->header.type == PACKET_TYPE_ACK) || (p->header.type == PACKET_TYPE_NACK));
+	if (!ack_nack_packet && (good_packet || corrected_packet) && (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED))
 	{
-		// We have an error.  Try to correct it.
-		if (correct_errors_erasures((unsigned char*)p, rx_len, 0, 0) == 0)
-		{
-			// We couldn't correct the error, so drop the packet.
-			rfm22b_add_rx_status(rfm22b_dev, RFM22B_ERROR_RX_PACKET);
-		}
+		static bool first_time = true;
+		uint16_t seq_num = p->header.seq_num;
+		uint16_t missed_packets = 0;
+		if (first_time)
+			first_time = false;
 		else
 		{
-			// We corrected the error.
-			rfm22b_add_rx_status(rfm22b_dev, RFM22B_CORRECTED_RX_PACKET);
-			rx_error = false;
+			uint16_t prev_seq_num = rfm22b_dev->prev_rx_seq_num;
+			if (seq_num > prev_seq_num)
+				missed_packets = seq_num - prev_seq_num - 1;
 		}
-
+		rfm22b_dev->stats.rx_missed += missed_packets;
+		rfm22b_dev->prev_rx_seq_num = seq_num;
 	}
-	else
-		rfm22b_add_rx_status(rfm22b_dev, RFM22B_GOOD_RX_PACKET);
 
-	return !rx_error;
+	// Set the packet status
+	if (good_packet)
+ 		rfm22b_add_rx_status(rfm22b_dev, RFM22B_GOOD_RX_PACKET);
+	else if(corrected_packet)
+		// We corrected the error.
+		rfm22b_add_rx_status(rfm22b_dev, RFM22B_CORRECTED_RX_PACKET);
+	else
+		// We couldn't correct the error, so drop the packet.
+		rfm22b_add_rx_status(rfm22b_dev, RFM22B_ERROR_RX_PACKET);
+
+	return good_packet || corrected_packet;
 }
 
 static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
@@ -1689,6 +1714,8 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 					break;
 				}
 			}
+			else
+				ret_event = RFM22B_EVENT_RX_ERROR;
 			rfm22b_dev->rx_buffer_wr = 0;
 		}
 
@@ -1769,10 +1796,9 @@ static enum pios_rfm22b_event rfm22_sendAck(struct pios_rfm22b_dev *rfm22b_dev)
 	PHAckNackPacketHandle aph = (PHAckNackPacketHandle)(&(rfm22b_dev->ack_nack_packet));
 	aph->header.destination_id = rfm22b_dev->rx_packet.header.source_id;
 	aph->header.type = PACKET_TYPE_ACK;
-	aph->header.data_size = 0;
-	aph->seq_num = rfm22b_dev->rx_packet.header.seq_num;
-	//aph->ready_to_send = (uxQueueMessagesWaiting(rfm22b_dev->packetQueue) > 0);
-	aph->ready_to_send = false;
+	aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
+	aph->header.seq_num = rfm22b_dev->rx_packet.header.seq_num;
+	aph->ready_to_send = rfm22_ready_to_send(rfm22b_dev);
 	rfm22b_dev->tx_packet = (PHPacketHandle)aph;
 	return RFM22B_EVENT_START_TRANSFER;
 }
@@ -1786,8 +1812,8 @@ static enum pios_rfm22b_event rfm22_sendNack(struct pios_rfm22b_dev *rfm22b_dev)
 	PHAckNackPacketHandle aph = (PHAckNackPacketHandle)(&(rfm22b_dev->ack_nack_packet));
 	aph->header.destination_id = rfm22b_dev->rx_packet.header.source_id;
 	aph->header.type = PACKET_TYPE_NACK;
-	aph->header.data_size = 0;
-	aph->seq_num = rfm22b_dev->rx_packet.header.seq_num;
+	aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
+	aph->header.seq_num = rfm22b_dev->rx_packet.header.seq_num;
 	rfm22b_dev->tx_packet = (PHPacketHandle)aph;
 	return RFM22B_EVENT_START_TRANSFER;
 }
@@ -1799,16 +1825,22 @@ static enum pios_rfm22b_event rfm22_sendNack(struct pios_rfm22b_dev *rfm22b_dev)
 static enum pios_rfm22b_event rfm22_receiveAck(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	PHPacketHandle prev = rfm22b_dev->prev_tx_packet;
-	PHAckNackPacketHandle aph = (PHAckNackPacketHandle)&(rfm22b_dev->rx_packet);
 
 	// Clear the previous TX packet.
 	rfm22b_dev->prev_tx_packet = NULL;
 
 	// Was this a connection request?
-	if (prev->header.type == PACKET_TYPE_CON_REQUEST)
+	switch (prev->header.type)
+	{
+	case PACKET_TYPE_CON_REQUEST:
 		return RFM22B_EVENT_CONNECTION_ACCEPTED;
+	case PACKET_TYPE_DATA:
+		rfm22b_dev->data_packet.header.data_size = 0;
+		break;
+	}
 
 	// Should we try to start another TX?
+	PHAckNackPacketHandle aph = (PHAckNackPacketHandle)&(rfm22b_dev->rx_packet);
 	if (aph->ready_to_send)
 		return RFM22B_EVENT_RX_MODE;
 	else
@@ -1824,7 +1856,8 @@ static enum pios_rfm22b_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_d
 	// Resend the previous TX packet.
 	rfm22b_dev->tx_packet = rfm22b_dev->prev_tx_packet;
 	rfm22b_dev->prev_tx_packet = NULL;
-	rfm22b_dev->stats.tx_resent++;
+	if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED)
+		rfm22b_add_rx_status(rfm22b_dev, RFM22B_RESENT_TX_PACKET);
 	return RFM22B_EVENT_START_TRANSFER;
 }
 

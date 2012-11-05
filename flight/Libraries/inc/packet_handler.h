@@ -63,9 +63,9 @@ typedef struct {
 	uint8_t data[PH_MAX_DATA + RS_ECC_NPARITY];
 } PHPacket, *PHPacketHandle;
 
+#define PH_ACK_NACK_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
 typedef struct {
 	PHPacketHeader header;
-	uint16_t seq_num;
 	bool ready_to_send;
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHAckNackPacket, *PHAckNackPacketHandle;

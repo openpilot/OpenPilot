@@ -30,180 +30,266 @@
 
 /* Project Includes */
 #include "pios.h"
+#include "pios_hcsr04_priv.h"
 
 #if defined(PIOS_INCLUDE_HCSR04)
-#if !(defined(PIOS_INCLUDE_DSM) || defined(PIOS_INCLUDE_SBUS))
-#error Only supported with Spektrum/JR DSM or S.Bus interface!
-#endif
+//------------------------------------------
 
 /* Local Variables */
+/* 100 ms timeout without updates on channels */
+const static uint32_t PWM_SUPERVISOR_TIMEOUT = 100000;
 
-static TIM_ICInitTypeDef TIM_ICInitStructure;
-static uint8_t CaptureState;
-static uint16_t RiseValue;
-static uint16_t FallValue;
-static uint32_t CaptureValue;
-static uint32_t CapCounter;
+struct pios_hcsr04_dev * hcsr04_dev_loc;
 
-#define PIOS_HCSR04_TRIG_GPIO_PORT                  GPIOD
-#define PIOS_HCSR04_TRIG_PIN                        GPIO_Pin_2
+enum pios_hcsr04_dev_magic {
+	PIOS_HCSR04_DEV_MAGIC = 0xab3029AA,
+};
+
+struct pios_hcsr04_dev {
+	enum pios_hcsr04_dev_magic     magic;
+	const struct pios_hcsr04_cfg * cfg;
+
+	uint8_t CaptureState[PIOS_PWM_NUM_INPUTS];
+	uint16_t RiseValue[PIOS_PWM_NUM_INPUTS];
+	uint16_t FallValue[PIOS_PWM_NUM_INPUTS];
+	uint32_t CaptureValue[PIOS_PWM_NUM_INPUTS];
+	uint32_t CapCounter[PIOS_PWM_NUM_INPUTS];
+	uint32_t us_since_update[PIOS_PWM_NUM_INPUTS];
+};
+
+static bool PIOS_HCSR04_validate(struct pios_hcsr04_dev * hcsr04_dev)
+{
+	return (hcsr04_dev->magic == PIOS_HCSR04_DEV_MAGIC);
+}
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+static struct pios_hcsr04_dev * PIOS_PWM_alloc(void)
+{
+	struct pios_hcsr04_dev * hcsr04_dev;
+
+	hcsr04_dev = (struct pios_hcsr04_dev *)pvPortMalloc(sizeof(*hcsr04_dev));
+	if (!hcsr04_dev) return(NULL);
+
+	hcsr04_dev->magic = PIOS_HCSR04_DEV_MAGIC;
+	return(hcsr04_dev);
+}
+#else
+static struct pios_hcsr04_dev pios_hcsr04_devs[PIOS_PWM_MAX_DEVS];
+static uint8_t pios_hcsr04_num_devs;
+static struct pios_hcsr04_dev * PIOS_PWM_alloc(void)
+{
+	struct pios_hcsr04_dev * hcsr04_dev;
+
+	if (pios_pwm_num_devs >= PIOS_PWM_MAX_DEVS) {
+		return (NULL);
+	}
+
+	hcsr04_dev = &pios_hcsr04_devs[pios_hcsr04_num_devs++];
+	hcsr04_dev->magic = PIOS_HCSR04_DEV_MAGIC;
+
+	return (hcsr04_dev);
+}
+#endif
+
+static void PIOS_HCSR04_tim_overflow_cb (uint32_t id, uint32_t context, uint8_t channel, uint16_t count);
+static void PIOS_HCSR04_tim_edge_cb (uint32_t id, uint32_t context, uint8_t channel, uint16_t count);
+const static struct pios_tim_callbacks tim_callbacks = {
+	.overflow = PIOS_HCSR04_tim_overflow_cb,
+	.edge     = PIOS_HCSR04_tim_edge_cb,
+};
+
 
 /**
-* Initialise the HC-SR04 sensor
+* Initialises all the pins
 */
-void PIOS_HCSR04_Init(void)
+int32_t PIOS_HCSR04_Init(uint32_t * pwm_id, const struct pios_hcsr04_cfg * cfg)
 {
-	/* Init triggerpin */
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Pin = PIOS_HCSR04_TRIG_PIN;
-	GPIO_Init(PIOS_HCSR04_TRIG_GPIO_PORT, &GPIO_InitStructure);
-	PIOS_HCSR04_TRIG_GPIO_PORT->BSRR = PIOS_HCSR04_TRIG_PIN;
+	PIOS_DEBUG_Assert(pwm_id);
+	PIOS_DEBUG_Assert(cfg);
 
-	/* Flush counter variables */
-	CaptureState = 0;
-	RiseValue = 0;
-	FallValue = 0;
-	CaptureValue = 0;
+	struct pios_hcsr04_dev * hcsr04_dev;
 
-	/* Setup RCC */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+	hcsr04_dev = (struct pios_hcsr04_dev *) PIOS_PWM_alloc();
+	if (!hcsr04_dev) goto out_fail;
 
-	/* Enable timer interrupts */
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-	NVIC_Init(&NVIC_InitStructure);
+	/* Bind the configuration to the device instance */
+	hcsr04_dev->cfg = cfg;
+	hcsr04_dev_loc = hcsr04_dev;
 
-	/* Partial pin remap for TIM3 (PB5) */
-	GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE);
+	for (uint8_t i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
+		/* Flush counter variables */
+		hcsr04_dev->CaptureState[i] = 0;
+		hcsr04_dev->RiseValue[i] = 0;
+		hcsr04_dev->FallValue[i] = 0;
+		hcsr04_dev->CaptureValue[i] = PIOS_RCVR_TIMEOUT;
+	}
 
-	/* Configure input pins */
-	GPIO_StructInit(&GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
-	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	uint32_t tim_id;
+	if (PIOS_TIM_InitChannels(&tim_id, cfg->channels, cfg->num_channels, &tim_callbacks, (uint32_t)hcsr04_dev)) {
+		return -1;
+	}
 
-	/* Configure timer for input capture */
-	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
-	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-	TIM_ICInitStructure.TIM_ICFilter = 0x0;
-	TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
-	TIM_ICInit(TIM3, &TIM_ICInitStructure);
+	/* Configure the channels to be in capture/compare mode */
+	for (uint8_t i = 0; i < cfg->num_channels; i++) {
+		const struct pios_tim_channel * chan = &cfg->channels[i];
 
-	/* Configure timer clocks */
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
-	TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
-	TIM_TimeBaseStructure.TIM_Period = 0xFFFF;
-	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 500000) - 1;
-	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-	TIM_InternalClockConfig(TIM3);
-	TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
+		/* Configure timer for input capture */
+		TIM_ICInitTypeDef TIM_ICInitStructure = cfg->tim_ic_init;
+		TIM_ICInitStructure.TIM_Channel = chan->timer_chan;
+		TIM_ICInit(chan->timer, &TIM_ICInitStructure);
 
-	/* Enable the Capture Compare Interrupt Request */
-	//TIM_ITConfig(PIOS_PWM_CH8_TIM_PORT, PIOS_PWM_CH8_CCR, ENABLE);
-	TIM_ITConfig(TIM3, TIM_IT_CC2, DISABLE);
+		/* Enable the Capture Compare Interrupt Request */
+		switch (chan->timer_chan) {
+		case TIM_Channel_1:
+			TIM_ITConfig(chan->timer, TIM_IT_CC1, ENABLE);
+			break;
+		case TIM_Channel_2:
+			TIM_ITConfig(chan->timer, TIM_IT_CC2, ENABLE);
+			break;
+		case TIM_Channel_3:
+			TIM_ITConfig(chan->timer, TIM_IT_CC3, ENABLE);
+			break;
+		case TIM_Channel_4:
+			TIM_ITConfig(chan->timer, TIM_IT_CC4, ENABLE);
+			break;
+		}
 
-	/* Enable timers */
-	TIM_Cmd(TIM3, ENABLE);
+		// Need the update event for that timer to detect timeouts
+		TIM_ITConfig(chan->timer, TIM_IT_Update, ENABLE);
 
-	/* Setup local variable which stays in this scope */
-	/* Doing this here and using a local variable saves doing it in the ISR */
-	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-	TIM_ICInitStructure.TIM_ICFilter = 0x0;
+	}
+
+#ifndef STM32F4XX
+	/* Enable the peripheral clock for the GPIO */
+	switch ((uint32_t)hcsr04_dev->cfg->trigger.gpio) {
+	case (uint32_t) GPIOA:
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+		break;
+	case (uint32_t) GPIOB:
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+		break;
+	case (uint32_t) GPIOC:
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+		break;
+	default:
+		PIOS_Assert(0);
+		break;
+	}
+#endif
+	GPIO_Init(hcsr04_dev->cfg->trigger.gpio, &hcsr04_dev->cfg->trigger.init);
+
+	*pwm_id = (uint32_t) hcsr04_dev;
+
+	return (0);
+
+out_fail:
+	return (-1);
+}
+
+void PIOS_HCSR04_Trigger(void)
+{
+	GPIO_SetBits(hcsr04_dev_loc->cfg->trigger.gpio,hcsr04_dev_loc->cfg->trigger.init.GPIO_Pin);
+	PIOS_DELAY_WaituS(15);
+	GPIO_ResetBits(hcsr04_dev_loc->cfg->trigger.gpio,hcsr04_dev_loc->cfg->trigger.init.GPIO_Pin);
 }
 
 /**
-* Get the value of an sonar timer
-* \output >0 timer value
+* Get the value of an input channel
+* \param[in] Channel Number of the channel desired
+* \output -1 Channel not available
+* \output >0 Channel value
 */
 int32_t PIOS_HCSR04_Get(void)
 {
-	return CaptureValue;
+	return hcsr04_dev_loc->CaptureValue[0];
 }
 
-/**
-* Get the value of an sonar timer
-* \output >0 timer value
-*/
 int32_t PIOS_HCSR04_Completed(void)
 {
-	return CapCounter;
-}
-/**
-* Trigger sonar sensor
-*/
-void PIOS_HCSR04_Trigger(void)
-{
-	CapCounter=0;
-	PIOS_HCSR04_TRIG_GPIO_PORT->BSRR = PIOS_HCSR04_TRIG_PIN;
-	PIOS_DELAY_WaituS(15);
-	PIOS_HCSR04_TRIG_GPIO_PORT->BRR = PIOS_HCSR04_TRIG_PIN;
-	TIM_ITConfig(TIM3, TIM_IT_CC2, ENABLE);
+	return hcsr04_dev_loc->CapCounter[0];
 }
 
-
-/**
-* Handle TIM3 global interrupt request
-*/
-//void PIOS_PWM_irq_handler(TIM_TypeDef * timer)
-void TIM3_IRQHandler(void)
+static void PIOS_HCSR04_tim_overflow_cb (uint32_t tim_id, uint32_t context, uint8_t channel, uint16_t count)
 {
-	/* Zero value always will be changed but this prevents compiler warning */
-	int32_t i = 0;
+	struct pios_hcsr04_dev * hcsr04_dev = (struct pios_hcsr04_dev *)context;
 
-	/* Do this as it's more efficient */
-	if (TIM_GetITStatus(TIM3, TIM_IT_CC2) == SET) {
-		i = 7;
-		if (CaptureState == 0) {
-			RiseValue = TIM_GetCapture2(TIM3);
-		} else {
-			FallValue = TIM_GetCapture2(TIM3);
-		}
+	if (!PIOS_HCSR04_validate(hcsr04_dev)) {
+		/* Invalid device specified */
+		return;
 	}
 
-	/* Clear TIM3 Capture compare interrupt pending bit */
-	TIM_ClearITPendingBit(TIM3, TIM_IT_CC2);
+	if (channel >= hcsr04_dev->cfg->num_channels) {
+		/* Channel out of range */
+		return;
+	}
 
+	hcsr04_dev->us_since_update[channel] += count;
+	if(hcsr04_dev->us_since_update[channel] >= PWM_SUPERVISOR_TIMEOUT) {
+		hcsr04_dev->CaptureState[channel] = 0;
+		hcsr04_dev->RiseValue[channel] = 0;
+		hcsr04_dev->FallValue[channel] = 0;
+		hcsr04_dev->CaptureValue[channel] = PIOS_RCVR_TIMEOUT;
+		hcsr04_dev->us_since_update[channel] = 0;
+	}
+
+	return;
+}
+
+static void PIOS_HCSR04_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count)
+{
+	/* Recover our device context */
+	struct pios_hcsr04_dev * hcsr04_dev = (struct pios_hcsr04_dev *)context;
+
+	if (!PIOS_HCSR04_validate(hcsr04_dev)) {
+		/* Invalid device specified */
+		return;
+	}
+
+	if (chan_idx >= hcsr04_dev->cfg->num_channels) {
+		/* Channel out of range */
+		return;
+	}
+
+	const struct pios_tim_channel * chan = &hcsr04_dev->cfg->channels[chan_idx];
+
+	if (hcsr04_dev->CaptureState[chan_idx] == 0) {
+		hcsr04_dev->RiseValue[chan_idx] = count;
+		hcsr04_dev->us_since_update[chan_idx] = 0;
+	} else {
+		hcsr04_dev->FallValue[chan_idx] = count;
+	}
+
+	// flip state machine and capture value here
 	/* Simple rise or fall state machine */
-	if (CaptureState == 0) {
+	TIM_ICInitTypeDef TIM_ICInitStructure = hcsr04_dev->cfg->tim_ic_init;
+	if (hcsr04_dev->CaptureState[chan_idx] == 0) {
 		/* Switch states */
-		CaptureState = 1;
+		hcsr04_dev->CaptureState[chan_idx] = 1;
 
 		/* Switch polarity of input capture */
 		TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
-		TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
-		TIM_ICInit(TIM3, &TIM_ICInitStructure);
-
+		TIM_ICInitStructure.TIM_Channel = chan->timer_chan;
+		TIM_ICInit(chan->timer, &TIM_ICInitStructure);
 	} else {
 		/* Capture computation */
-		if (FallValue > RiseValue) {
-			CaptureValue = (FallValue - RiseValue);
+		if (hcsr04_dev->FallValue[chan_idx] > hcsr04_dev->RiseValue[chan_idx]) {
+			hcsr04_dev->CaptureValue[chan_idx] = (hcsr04_dev->FallValue[chan_idx] - hcsr04_dev->RiseValue[chan_idx]);
 		} else {
-			CaptureValue = ((0xFFFF - RiseValue) + FallValue);
+			hcsr04_dev->CaptureValue[chan_idx] = ((chan->timer->ARR - hcsr04_dev->RiseValue[chan_idx]) + hcsr04_dev->FallValue[chan_idx]);
 		}
 
 		/* Switch states */
-		CaptureState = 0;
+		hcsr04_dev->CaptureState[chan_idx] = 0;
 
 		/* Increase supervisor counter */
-		CapCounter++;
-		TIM_ITConfig(TIM3, TIM_IT_CC2, DISABLE);
+		hcsr04_dev->CapCounter[chan_idx]++;
 
 		/* Switch polarity of input capture */
 		TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
-		TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
-		TIM_ICInit(TIM3, &TIM_ICInitStructure);
-
+		TIM_ICInitStructure.TIM_Channel = chan->timer_chan;
+		TIM_ICInit(chan->timer, &TIM_ICInitStructure);
 	}
+
 }
 
 

@@ -1226,6 +1226,50 @@ const struct pios_pwm_cfg pios_pwm_with_ppm_cfg = {
 
 #endif
 
+
+
+/*
+ * SONAR Inputs
+ */
+#if defined(PIOS_INCLUDE_HCSR04)
+#include <pios_hcsr04_priv.h>
+
+static const struct pios_tim_channel pios_tim_hcsr04_port_all_channels[] = {
+{
+	.timer = TIM3,
+	.timer_chan = TIM_Channel_2,
+	.pin = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_5,
+			.GPIO_Mode  = GPIO_Mode_IPD,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+		},
+	},
+	.remap = GPIO_PartialRemap_TIM3,
+},
+};
+
+const struct pios_hcsr04_cfg pios_hcsr04_cfg = {
+	.tim_ic_init = {
+		.TIM_ICPolarity = TIM_ICPolarity_Rising,
+		.TIM_ICSelection = TIM_ICSelection_DirectTI,
+		.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+		.TIM_ICFilter = 0x0,
+	},
+	.channels = pios_tim_hcsr04_port_all_channels,
+	.num_channels = NELEMENTS(pios_tim_hcsr04_port_all_channels),
+	.trigger = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_6,
+			.GPIO_Mode  = GPIO_Mode_Out_PP,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+		},
+	},
+};
+#endif
+
 #if defined(PIOS_INCLUDE_I2C)
 
 #include <pios_i2c_priv.h>

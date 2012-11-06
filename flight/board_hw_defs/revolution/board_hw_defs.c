@@ -1338,7 +1338,15 @@ static const TIM_TimeBaseInitTypeDef tim_1_time_base = {
 	.TIM_RepetitionCounter = 0x0000,
 };
 
-// Set up timers that only have inputs on APB2
+static const TIM_TimeBaseInitTypeDef tim_8_time_base = {
+	.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / 1000000) - 1,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = 0xFFFF,
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+// Set up timers that only have inputs on APB1
 static const TIM_TimeBaseInitTypeDef tim_4_time_base = {
 	.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / 1000000) - 1,
 	.TIM_ClockDivision = TIM_CKD_DIV1,
@@ -1383,6 +1391,19 @@ static const struct pios_tim_clock_cfg tim_5_cfg = {
 	.irq = {
 		.init = {
 			.NVIC_IRQChannel                   = TIM5_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+static const struct pios_tim_clock_cfg tim_8_cfg = {
+	.timer = TIM8,
+	.time_base_init = &tim_8_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM8_CC_IRQn,
 			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
 			.NVIC_IRQChannelSubPriority        = 0,
 			.NVIC_IRQChannelCmd                = ENABLE,
@@ -1815,6 +1836,52 @@ static const struct pios_ppm_cfg pios_ppm_cfg = {
 #if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"
 #endif /* PIOS_INCLUDE_RCVR */
+
+/*
+ * SONAR Inputs
+ */
+#if defined(PIOS_INCLUDE_HCSR04)
+#include <pios_hcsr04_priv.h>
+
+static const struct pios_tim_channel pios_tim_hcsr04_port_all_channels[] = {
+{
+	.timer = TIM8,
+	.timer_chan = TIM_Channel_3,
+	.pin = {
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_8,
+			.GPIO_Mode  = GPIO_Mode_AF,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_PuPd  = GPIO_PuPd_DOWN
+		},
+		.pin_source = GPIO_PinSource8,
+	},
+	.remap = GPIO_AF_TIM8,
+},
+};
+
+const struct pios_hcsr04_cfg pios_hcsr04_cfg = {
+	.tim_ic_init = {
+		.TIM_ICPolarity = TIM_ICPolarity_Rising,
+		.TIM_ICSelection = TIM_ICSelection_DirectTI,
+		.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+		.TIM_ICFilter = 0x0,
+	},
+	.channels = pios_tim_hcsr04_port_all_channels,
+	.num_channels = NELEMENTS(pios_tim_hcsr04_port_all_channels),
+	.trigger = {
+		.gpio = GPIOD,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_10,
+			.GPIO_Mode  = GPIO_Mode_OUT,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_UP,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+		},
+	},
+};
+#endif
 
 #if defined(PIOS_INCLUDE_USB)
 #include "pios_usb_priv.h"

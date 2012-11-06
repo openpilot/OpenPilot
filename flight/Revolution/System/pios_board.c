@@ -806,6 +806,15 @@ void PIOS_Board_Init(void) {
 
 #endif
 
+#if defined(PIOS_INCLUDE_HCSR04)
+		{
+			PIOS_TIM_InitClock(&tim_8_cfg);
+			uint32_t pios_hcsr04_id;
+			PIOS_HCSR04_Init(&pios_hcsr04_id, &pios_hcsr04_cfg);
+		}
+#endif
+
+
 #if defined(PIOS_INCLUDE_GCSRCVR)
 	GCSReceiverInitialize();
 	uint32_t pios_gcsrcvr_id;

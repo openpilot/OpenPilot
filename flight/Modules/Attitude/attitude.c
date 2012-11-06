@@ -87,7 +87,9 @@ static void settingsUpdatedCb(UAVObjEvent * objEv);
 static float accelKi = 0;
 static float accelKp = 0;
 static float accel_alpha = 0;
-static float accel_alpha_setting = 0;
+static bool accel_filter_enabled = false;
+static float accels_filtered[3];
+static float grot_filtered[3];
 static float yawBiasRate = 0;
 static float gyroGain = 0.42;
 static int16_t accelbias[3];
@@ -217,21 +219,22 @@ static void AttitudeTask(void *parameters)
 			accelKp = 1;
 			accelKi = 0.9;
 			yawBiasRate = 0.23;
-			accel_alpha = 0;
+			accel_filter_enabled = false;
 			init = 0;
 		}
 		else if (zero_during_arming && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
 			accelKp = 1;
 			accelKi = 0.9;
 			yawBiasRate = 0.23;
-			accel_alpha = 0;
+			accel_filter_enabled = false;
 			init = 0;
 		} else if (init == 0) {
 			// Reload settings (all the rates)
 			AttitudeSettingsAccelKiGet(&accelKi);
 			AttitudeSettingsAccelKpGet(&accelKp);
 			AttitudeSettingsYawBiasRateGet(&yawBiasRate);
-			accel_alpha = accel_alpha_setting;
+			if(accel_alpha > 0.0f)
+				accel_filter_enabled = true;
 			init = 1;
 		}
 		
@@ -435,6 +438,19 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	return 0;
 }
 
+static inline void apply_accel_filter(const float * raw, float * filtered)
+{
+	if(accel_filter_enabled) {
+		filtered[0] = filtered[0] * accel_alpha + raw[0] * (1 - accel_alpha);
+		filtered[1] = filtered[1] * accel_alpha + raw[1] * (1 - accel_alpha);
+		filtered[2] = filtered[2] * accel_alpha + raw[2] * (1 - accel_alpha);
+	} else {
+		filtered[0] = raw[0];
+		filtered[1] = raw[1];
+		filtered[2] = raw[2];
+	}
+}
+
 static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 {
 	float dT;
@@ -448,21 +464,20 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	float * gyros = &gyrosData->x;
 	float * accels = &accelsData->x;
 	
-	static float grot[3];
+	float grot[3];
 	float accel_err[3];
 
 	// Apply smoothing to accel values, to reduce vibration noise before main calculations.
-	static float accels_filtered[3];
+	apply_accel_filter(accels,accels_filtered);
 	
-	accels_filtered[0] = accels_filtered[0] * accel_alpha + accels[0] * (1 - accel_alpha);
-	accels_filtered[1] = accels_filtered[1] * accel_alpha + accels[1] * (1 - accel_alpha);
-	accels_filtered[2] = accels_filtered[2] * accel_alpha + accels[2] * (1 - accel_alpha);
+	// Rotate gravity to body frame, filter and cross with accels
+	grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
+	grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
+	grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
+
+	apply_accel_filter(grot,grot_filtered);
 	
-	// Rotate gravity to body frame and cross with accels
-	grot[0] = grot[0] * accel_alpha - (2 * (q[1] * q[3] - q[0] * q[2])) * (1 - accel_alpha);
-	grot[1] = grot[1] * accel_alpha - (2 * (q[2] * q[3] + q[0] * q[1])) * (1 - accel_alpha);
-	grot[2] = grot[2] * accel_alpha - (q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]) * (1 - accel_alpha);
-	CrossProduct((const float *) accels_filtered, (const float *) grot, accel_err);
+	CrossProduct((const float *) accels_filtered, (const float *) grot_filtered, accel_err);
 	
 	// Account for accel magnitude
 	float accel_mag = sqrtf(accels_filtered[0]*accels_filtered[0] + accels_filtered[1]*accels_filtered[1] + accels_filtered[2]*accels_filtered[2]);
@@ -470,7 +485,9 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 		return;
 
 	// Account for filtered gravity vector magnitude
-	float grot_mag = sqrtf(grot[0]*grot[0] + grot[1]*grot[1] + grot[2]*grot[2]);
+	float grot_mag;
+	if(accel_filter_enabled) grot_mag = sqrtf(grot[0]*grot[0] + grot[1]*grot[1] + grot[2]*grot[2]);
+	else grot_mag = 1.0f;
 	if(grot_mag < 1.0e-3f)
 		return;
 
@@ -551,13 +568,14 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 
 	// Calculate accel filter alpha, in the same way as for gyro data in stabilization module.
 	const float fakeDt = 0.0025;
-	if(attitudeSettings.AccelTau < 0.0001)
-		accel_alpha_setting = 0;   // not trusting this to resolve to 0
-	else
-		accel_alpha_setting = expf(-fakeDt  / attitudeSettings.AccelTau);
+	if(attitudeSettings.AccelTau < 0.0001) {
+		accel_alpha = 0;   // not trusting this to resolve to 0
+		accel_filter_enabled = false;
+	} else {
+		accel_alpha = expf(-fakeDt  / attitudeSettings.AccelTau);
+		accel_filter_enabled = true;
+	}
 	
-	accel_alpha = accel_alpha_setting;
-
 	zero_during_arming = attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE;
 	bias_correct_gyro = attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE;
 	

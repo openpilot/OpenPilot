@@ -61,6 +61,6 @@ typedef struct{
 
 uint16_t PIOS_MPXV_Measure(PIOS_MPXV_descriptor *desc);
 uint16_t PIOS_MPXV_Calibrate(PIOS_MPXV_descriptor *desc, uint16_t measurement);
-float PIOS_MPXV5004_CalcAirspeed (PIOS_MPXV_descriptor *desc,uint16_t measurement);
+float PIOS_MPXV_CalcAirspeed (PIOS_MPXV_descriptor *desc,uint16_t measurement);
 
 #endif // PIOS_MPXV_H__

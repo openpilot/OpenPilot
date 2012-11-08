@@ -53,6 +53,8 @@
 #include "attitude.h"
 
 #include "accels.h"
+#include "airspeedsensor.h"
+#include "airspeedactual.h"
 #include "attitudeactual.h"
 #include "attitudesettings.h"
 #include "baroaltitude.h"
@@ -82,6 +84,11 @@
 // reasoning: updates at: 10 Hz, tau= 300 s settle time
 // exp(-(1/f) / tau ) ~=~ 0.9997
 #define BARO_OFFSET_LOWPASS_ALPHA 0.9997f 
+
+// simple IAS to TAS aproximation - 2% increase per 1000ft
+// since we do not have flowing air temperature information
+#define IAS2TAS(alt) (1.0f + (0.02f*(alt)/304.8f))
+
 // Private types
 
 // Private variables
@@ -90,6 +97,7 @@ static xTaskHandle attitudeTaskHandle;
 static xQueueHandle gyroQueue;
 static xQueueHandle accelQueue;
 static xQueueHandle magQueue;
+static xQueueHandle airspeedQueue;
 static xQueueHandle baroQueue;
 static xQueueHandle gpsQueue;
 static xQueueHandle gpsVelQueue;
@@ -126,6 +134,8 @@ static int32_t getNED(GPSPositionData * gpsPosition, float * NED);
 int32_t AttitudeInitialize(void)
 {
 	AttitudeActualInitialize();
+	AirspeedActualInitialize();
+	AirspeedSensorInitialize();
 	AttitudeSettingsInitialize();
 	PositionActualInitialize();
 	VelocityActualInitialize();
@@ -170,6 +180,7 @@ int32_t AttitudeStart(void)
 	gyroQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 	accelQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 	magQueue = xQueueCreate(1, sizeof(UAVObjEvent));
+	airspeedQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 	baroQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 	gpsQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 	gpsVelQueue = xQueueCreate(1, sizeof(UAVObjEvent));
@@ -182,6 +193,7 @@ int32_t AttitudeStart(void)
 	GyrosConnectQueue(gyroQueue);
 	AccelsConnectQueue(accelQueue);
 	MagnetometerConnectQueue(magQueue);
+	AirspeedSensorConnectQueue(airspeedQueue);
 	BaroAltitudeConnectQueue(baroQueue);
 	GPSPositionConnectQueue(gpsQueue);
 	GPSVelocityConnectQueue(gpsVelQueue);
@@ -473,6 +485,25 @@ static int32_t updateAttitudeComplementary(bool first_run)
 		velocityActual.Down = gpsVelocity.Down;
 		VelocityActualSet(&velocityActual);
 	}
+	
+	if ( xQueueReceive(airspeedQueue, &ev, 0) == pdTRUE ) {
+		// Calculate true airspeed from indicated airspeed
+		AirspeedSensorData airspeedSensor;
+		AirspeedSensorGet(&airspeedSensor);
+
+		AirspeedActualData airspeed;
+		AirspeedActualGet(&airspeed);
+
+		PositionActualData positionActual;
+		PositionActualGet(&positionActual);
+
+		if (airspeedSensor.SensorConnected==AIRSPEEDSENSOR_SENSORCONNECTED_TRUE) {
+			// we have airspeed available
+			airspeed.CalibratedAirspeed = airspeedSensor.CalibratedAirspeed;
+			airspeed.TrueAirspeed = airspeed.CalibratedAirspeed * IAS2TAS( homeLocation.Altitude - positionActual.Down );
+			AirspeedActualSet(&airspeed);
+		}
+	}
 
 
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
@@ -497,6 +528,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	GyrosData gyrosData;
 	AccelsData accelsData;
 	MagnetometerData magData;
+	AirspeedSensorData airspeedData;
 	BaroAltitudeData baroData;
 	GPSPositionData gpsData;
 	GPSVelocityData gpsVelData;
@@ -504,6 +536,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 	static bool mag_updated = false;
 	static bool baro_updated;
+	static bool airspeed_updated;
 	static bool gps_updated;
 	static bool gps_vel_updated;
 
@@ -534,6 +567,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	if (inited) {
 		mag_updated = 0;
 		baro_updated = 0;
+		airspeed_updated = 0;
 		gps_updated = 0;
 		gps_vel_updated = 0;
 	}
@@ -544,6 +578,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 		mag_updated = 0;
 		baro_updated = 0;
+		airspeed_updated = 0;
 		gps_updated = 0;
 		gps_vel_updated = 0;
 
@@ -554,6 +589,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 	mag_updated |= (xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE);
 	baro_updated |= xQueueReceive(baroQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
+	airspeed_updated |= xQueueReceive(airspeedQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
 	gps_updated |= (xQueueReceive(gpsQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
 	gps_vel_updated |= (xQueueReceive(gpsVelQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
 
@@ -562,6 +598,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	AccelsGet(&accelsData);
 	MagnetometerGet(&magData);
 	BaroAltitudeGet(&baroData);
+	AirspeedSensorGet(&airspeedData);
 	GPSPositionGet(&gpsData);
 	GPSVelocityGet(&gpsVelData);
 	GyrosBiasGet(&gyrosBias);
@@ -571,6 +608,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	// Don't require HomeLocation.Set to be true but at least require a mag configuration (allows easily
 	// switching between indoor and outdoor mode with Set = false)
 	mag_updated &= (homeLocation.Be[0] != 0 || homeLocation.Be[1] != 0 || homeLocation.Be[2]);
+
+	// Discard airspeed if sensor not connected
+	airspeed_updated &= ( airspeedData.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE );
 
 	// Have a minimum requirement for gps usage
 	gps_updated &= (gpsData.Satellites >= 7) && (gpsData.PDOP <= 4.0f) && (homeLocation.Set == HOMELOCATION_SET_TRUE);
@@ -768,7 +808,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		    * ( -NED[2] - baroData.Altitude );
 
 	} else if (!outdoor_mode) {
-		INSSetPosVelVar(1e2f, 1e2f);
+		INSSetPosVelVar(1e6f, 1e5f);
 		vel[0] = vel[1] = vel[2] = 0;
 		NED[0] = NED[1] = 0;
 		NED[2] = -(baroData.Altitude + baroOffset);
@@ -781,6 +821,27 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		vel[0] = gpsVelData.North;
 		vel[1] = gpsVelData.East;
 		vel[2] = gpsVelData.Down;
+	}
+
+	if (airspeed_updated) {
+		// we have airspeed available
+		AirspeedActualData airspeed;
+		AirspeedActualGet(&airspeed);
+
+		airspeed.CalibratedAirspeed = airspeedData.CalibratedAirspeed;
+		airspeed.TrueAirspeed = airspeed.CalibratedAirspeed * IAS2TAS( homeLocation.Altitude - Nav.Pos[2] );
+		AirspeedActualSet(&airspeed);
+		
+		if ( !gps_vel_updated && !gps_updated) {
+			// feed airspeed into EKF, treat wind as 1e2 variance
+			sensors |= HORIZ_SENSORS | VERT_SENSORS;
+			INSSetPosVelVar(1e6f, 1e2f);
+			// rotate airspeed vector into NED frame - airspeed is measured in X axis only
+			float R[3][3];
+			Quaternion2R(Nav.q,R);
+			float vtas[3] = {airspeed.TrueAirspeed,0,0};
+			rot_mult(R,vtas,vel);
+		}
 	}
 	
 	/*

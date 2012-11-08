@@ -39,6 +39,7 @@
 #include "utlist.h"
 #include "uavobjectmanager.h"
 #include "eventdispatcher.h"
+#include "callbackscheduler.h"
 #include "alarms.h"
 #include "taskmonitor.h"
 #include "uavtalk.h"

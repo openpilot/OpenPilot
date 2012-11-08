@@ -152,6 +152,7 @@ SRC += $(OPSYSTEM)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
+SRC += $(OPUAVOBJ)/callbackscheduler.c
 
 #ifeq ($(DEBUG),YES)
 SRC += $(OPSYSTEM)/dcc_stdio.c

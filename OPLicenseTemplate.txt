@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       autoupdatepage.h
+ * @file       %FILENAME%
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup
+ * @addtogroup [Group]
  * @{
- * @addtogroup AutoUpdatePage
+ * @addtogroup %CLASS%
  * @{
- * @brief
+ * @brief [Brief]
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,37 +24,3 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-#ifndef AUTOUPDATEPAGE_H
-#define AUTOUPDATEPAGE_H
-
-#include <coreplugin/icore.h>
-#include <coreplugin/connectionmanager.h>
-#include "setupwizard.h"
-#include "uavtalk/telemetrymanager.h"
-#include "abstractwizardpage.h"
-#include "uploader/enums.h"
-
-namespace Ui {
-class AutoUpdatePage;
-}
-
-class AutoUpdatePage : public AbstractWizardPage
-{
-    Q_OBJECT
-
-public:
-    explicit AutoUpdatePage(SetupWizard *wizard, QWidget *parent = 0);
-    ~AutoUpdatePage();
-
-private slots:
-    void updateStatus(uploader::AutoUpdateStep ,QVariant);
-    void disableButtons(){ enableButtons(false); }
-    void enableButtons(bool enable);
-
-private:
-    Ui::AutoUpdatePage *ui;
-
-};
-
-#endif // AUTOUPDATEPAGE_H

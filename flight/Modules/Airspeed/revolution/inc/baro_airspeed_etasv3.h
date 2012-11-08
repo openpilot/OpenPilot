@@ -28,14 +28,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef ETASV3_AIRSPEED_H
-#define ETASV3_AIRSPEED_H
+#ifndef BARO_AIRSPEED_ETASV3_H
+#define BARO_AIRSPEED_ETASV3_H
 #if defined(PIOS_INCLUDE_ETASV3)
 
-void baro_airspeedGetETASV3(BaroAirspeedData *baroAirspeedData, portTickType *lastSysTime, uint8_t airspeedSensorType, int8_t airspeedADCPin);
+void baro_airspeedGetETASV3(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings);
 
 #endif
-#endif // ETASV3_AIRSPEED_H
+#endif // BARO_AIRSPEED_ETASV3_H
 
 /**
  * @}

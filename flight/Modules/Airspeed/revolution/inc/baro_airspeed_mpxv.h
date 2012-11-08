@@ -6,7 +6,7 @@
  * @brief Calculate airspeed as a function of the difference between sequential GPS velocity and attitude measurements
  * @{ 
  *
- * @file       baro_airspeed_analog.h
+ * @file       baro_airspeed_mpxv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      Airspeed module, reads temperature and pressure from BMP085
  *
@@ -28,14 +28,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef ANALOG_AIRSPEED_H
-#define ANALOG_AIRSPEED_H
-#if defined(PIOS_INCLUDE_MPXV7002) || defined (PIOS_INCLUDE_MPXV5004)
+#ifndef BARO_AIRSPEED_MPXV_H
+#define BARO_AIRSPEED_MPXV_H
+#if defined(PIOS_INCLUDE_MPXV)
 
-void baro_airspeedGetAnalog(BaroAirspeedData *baroAirspeedData, portTickType *lastSysTime, uint8_t airspeedSensorType, int8_t airspeedADCPin);
+void baro_airspeedGetMPXV(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings, int8_t airspeedADCPin);
 
 #endif
-#endif // ANALOG_AIRSPEED_H
+#endif // BARO_AIRSPEED_MPXV_H
 
 /**
  * @}

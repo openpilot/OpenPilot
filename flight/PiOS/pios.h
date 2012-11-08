@@ -101,11 +101,8 @@
 /* PIOS Hardware Includes (Common) */
 #include <pios_sdcard.h>
 #include <pios_com.h>
-#if defined(PIOS_INCLUDE_MPXV7002)
-#include <pios_mpxv7002.h>
-#endif
-#if defined(PIOS_INCLUDE_MPXV5004)
-#include <pios_mpxv5004.h>
+#if defined(PIOS_INCLUDE_MPXV)
+#include <pios_mpxv.h>
 #endif
 #if defined(PIOS_INCLUDE_ETASV3)
 #include <pios_etasv3.h>

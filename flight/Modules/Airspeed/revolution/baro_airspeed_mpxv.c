@@ -41,10 +41,11 @@
 #include "airspeedsettings.h"
 #include "airspeedsensor.h"	// object that will be updated by the module
 
-#if defined(PIOS_INCLUDE_ETASV3)
+#if defined(PIOS_INCLUDE_MPXV)
 
 #define CALIBRATION_IDLE_MS                     2000   //Time to wait before calibrating, in [ms]
 #define CALIBRATION_COUNT_MS                    2000   //Time to spend calibrating, in [ms]
+#define ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS    100   //low pass filter
 
 // Private types
 
@@ -53,45 +54,61 @@
 // Private functions
 
 static uint16_t calibrationCount=0;
-static uint16_t calibrationCount2=0;
-static uint32_t calibrationSum = 0;
+
+PIOS_MPXV_descriptor sensor = { .type=PIOS_MPXV_UNKNOWN };
 
 
-void baro_airspeedGetETASV3(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings){
+void baro_airspeedGetMPXV(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings, int8_t airspeedADCPin){
 
-	//Check to see if airspeed sensor is returning airspeedSensor
-	airspeedSensor->SensorValue = PIOS_ETASV3_ReadAirspeed();
-	if (airspeedSensor->SensorValue==-1) {
+	//Ensure that the ADC pin is properly configured
+	if(airspeedADCPin <0){
 		airspeedSensor->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
-		airspeedSensor->CalibratedAirspeed = 0;
+		
 		return;
 	}
-	
-	// only calibrate if no stored calibration is available
+	if (sensor.type==PIOS_MPXV_UNKNOWN) {
+		switch (airspeedSettings->AirspeedSensorType) {
+			case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV7002:
+				sensor = PIOS_MPXV_7002_DESC(airspeedADCPin);
+				break;
+			case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV5004:
+				sensor = PIOS_MPXV_5004_DESC(airspeedADCPin);
+				break;
+			default:
+				airspeedSensor->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+				return;
+		}
+	}
+
+	airspeedSensor->SensorValue = PIOS_MPXV_Measure(&sensor);
+
 	if (!airspeedSettings->ZeroPoint) {
 		//Calibrate sensor by averaging zero point value
-		if (calibrationCount <= CALIBRATION_IDLE_MS/airspeedSettings->SamplePeriod) {
+		if (calibrationCount < CALIBRATION_IDLE_MS/airspeedSettings->SamplePeriod) { //First let sensor warm up and stabilize.
 			calibrationCount++;
-			calibrationCount2++;
 			return;
-		} else if (calibrationCount <= (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/airspeedSettings->SamplePeriod) {
-			calibrationCount++;
-			calibrationCount2++;
-			calibrationSum +=  airspeedSensor->SensorValue;
-			if (calibrationCount > (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/airspeedSettings->SamplePeriod) {
+		} else if (calibrationCount <= (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/airspeedSettings->SamplePeriod) { //Then compute the average.
+			calibrationCount++; /*DO NOT MOVE FROM BEFORE sensorCalibration=... LINE, OR ELSE WILL HAVE DIVIDE BY ZERO */
 
-				airspeedSettings->ZeroPoint = (int16_t) (((float)calibrationSum) / calibrationCount2);
-				AirspeedSettingsZeroPointSet( &airspeedSettings->ZeroPoint );
+			PIOS_MPXV_Calibrate(&sensor,airspeedSensor->SensorValue);
+
+			//Set settings UAVO. The airspeed UAVO is set elsewhere in the function.
+			if (calibrationCount > (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/airspeedSettings->SamplePeriod) {
+				airspeedSettings->ZeroPoint = sensor.zeroPoint;
+				AirspeedSettingsZeroPointSet(&airspeedSettings->ZeroPoint);
 			}
 			return;
 		}
 	}
+	sensor.zeroPoint = airspeedSettings->ZeroPoint;
+		
+	//Filter CAS
+	float alpha=airspeedSettings->SamplePeriod/(airspeedSettings->SamplePeriod + ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS); //Low pass filter.
 	
-	//Compute airspeed
-	airspeedSensor->CalibratedAirspeed = airspeedSettings->Scale * sqrtf((float)abs(airspeedSensor->SensorValue - airspeedSettings->ZeroPoint));
+	airspeedSensor->CalibratedAirspeed = PIOS_MPXV_CalcAirspeed(&sensor,airspeedSensor->SensorValue) * (alpha) + airspeedSensor->CalibratedAirspeed*(1.0f-alpha);
 	airspeedSensor->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
-}
 
+}
 
 #endif
 

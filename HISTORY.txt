@@ -1,5 +1,18 @@
 ﻿Short summary of changes.  For a complete list see the git log.
 
+2012-11-11
+Added support for Mode 3 and Mode 4 to the TX Configuration Wizard.
+Few minor bugfixes.
+
+--- RELEASE-12.10.1 ---
+
+2012-10-26
+Temporary disabled AutoTune GCS GUI. It was listed as an experimental
+feature in the previous release, there were however a few cases where
+it did not behave as expected.
+
+--- RELEASE-12.10 ---
+
 2012-10-06
 Receiver port can now be configured as PPM *and* PWM inputs.
 Pin 1 is PPM, other pins are PWM inputs.

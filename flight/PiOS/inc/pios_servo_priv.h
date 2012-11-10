@@ -42,6 +42,11 @@ struct pios_servo_cfg {
 	uint32_t remap;
 	const struct pios_tim_channel * channels;
 	uint8_t num_channels;
+#if defined(PIOS_STEPPER)
+	int32_t StepRemaining[3];//3 first axes
+	uint32_t OldPosition[3];//3 first axes
+	bool Direction[3];
+#endif
 };
 
 extern int32_t PIOS_Servo_Init(const struct pios_servo_cfg * cfg);

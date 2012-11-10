@@ -690,10 +690,10 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool 
 		PathDesiredGet(&pathDesired);
 		pathDesired.Start[PATHDESIRED_END_NORTH] = positionActual.North;
 		pathDesired.Start[PATHDESIRED_END_EAST] = positionActual.East;
-		pathDesired.Start[PATHDESIRED_END_DOWN] = positionActual.Down - 10;
+		pathDesired.Start[PATHDESIRED_END_DOWN] = positionActual.Down;
 		pathDesired.End[PATHDESIRED_END_NORTH] = positionActual.North;
 		pathDesired.End[PATHDESIRED_END_EAST] = positionActual.East;
-		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 10;
+		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
 		pathDesired.StartingVelocity=1;
 		pathDesired.EndingVelocity=0;
 		pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;

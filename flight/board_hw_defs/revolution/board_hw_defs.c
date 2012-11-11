@@ -997,6 +997,7 @@ static const struct pios_dsm_cfg pios_dsm_flexi_cfg = {
 
 static const struct pios_usart_cfg pios_usart_sbus_auxsbus_cfg = {
 	.regs = UART4,
+        .remap = GPIO_AF_UART4,
 	.init = {
 		.USART_BaudRate            = 100000,
 		.USART_WordLength          = USART_WordLength_8b,
@@ -1046,9 +1047,10 @@ static const struct pios_sbus_cfg pios_sbus_cfg = {
 			.GPIO_Speed = GPIO_Speed_2MHz,
 		},
 	},
-	.gpio_clk_func = RCC_AHB1PeriphClockCmd,
-	.gpio_clk_periph = RCC_AHB1Periph_GPIOB,
 	.gpio_inv_enable = Bit_SET,
+	.gpio_inv_disable = Bit_RESET,
+        .gpio_clk_func = RCC_AHB1PeriphClockCmd,
+	.gpio_clk_periph = RCC_AHB1Periph_GPIOC,
 };
 
 #endif	/* PIOS_INCLUDE_SBUS */

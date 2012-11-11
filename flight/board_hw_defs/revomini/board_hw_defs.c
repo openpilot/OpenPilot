@@ -550,11 +550,14 @@ static const struct pios_dsm_cfg pios_dsm_main_cfg = {
 
 #include <pios_sbus_priv.h>
 #if defined(PIOS_INCLUDE_SBUS)
-/*
- * S.Bus USART
- */
+ /*
+  * S.Bus USART
+  */
+#include <pios_sbus_priv.h>
+
 static const struct pios_usart_cfg pios_usart_sbus_main_cfg = {
 	.regs = USART1,
+        .remap = GPIO_AF_USART1,
 	.init = {
 		.USART_BaudRate            = 100000,
 		.USART_WordLength          = USART_WordLength_8b,
@@ -576,7 +579,9 @@ static const struct pios_usart_cfg pios_usart_sbus_main_cfg = {
 		.init = {
 			.GPIO_Pin   = GPIO_Pin_10,
 			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Mode  = GPIO_Mode_IPU,
+			.GPIO_Mode  = GPIO_Mode_AF,
+        		.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_UP
 		},
 	},
 	.tx = {
@@ -584,7 +589,9 @@ static const struct pios_usart_cfg pios_usart_sbus_main_cfg = {
 		.init = {
 			.GPIO_Pin   = GPIO_Pin_9,
 			.GPIO_Speed = GPIO_Speed_2MHz,
-			.GPIO_Mode  = GPIO_Mode_IN_FLOATING,
+			.GPIO_Mode  = GPIO_Mode_OUT,
+			.GPIO_OType = GPIO_OType_PP,
+			.GPIO_PuPd  = GPIO_PuPd_NOPULL
 		},
 	},
 };
@@ -606,6 +613,8 @@ static const struct pios_sbus_cfg pios_sbus_cfg = {
 	},
 	.gpio_inv_enable = Bit_SET,
 	.gpio_inv_disable = Bit_RESET,
+        .gpio_clk_func = RCC_AHB1PeriphClockCmd,
+	.gpio_clk_periph = RCC_AHB1Periph_GPIOC,
 };
 
 

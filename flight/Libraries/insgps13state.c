@@ -121,7 +121,7 @@ void INSGPSInit()		//pretty much just a place holder for now
 	R[3] = R[4] = 0.004f;   // High freq GPS horizontal velocity noise variance (m/s)^2
 	R[5] = 100.0f;          // High freq GPS vertical velocity noise variance (m/s)^2
 	R[6] = R[7] = R[8] = 0.005f;    // magnetometer unit vector noise variance
-	R[9] = .05f;                    // High freq altimeter noise variance (m^2)
+	R[9] = .25f;                    // High freq altimeter noise variance (m^2)
 }
 
 void INSResetP(float PDiag[NUMX])
@@ -183,7 +183,7 @@ void INSSetPosVelVar(float PosVar, float VelVar)
 	R[2] = PosVar;
 	R[3] = VelVar;
 	R[4] = VelVar;
-//    R[5] = PosVar;  // Don't change vertical velocity, not measured
+	R[5] = VelVar;
 }
 
 void INSSetGyroBias(float gyro_bias[3])
@@ -214,11 +214,17 @@ void INSSetMagVar(float scaled_mag_var[3])
 	R[8] = scaled_mag_var[2];
 }
 
+void INSSetBaroVar(float baro_var)
+{
+	R[9] = baro_var;
+}
+
 void INSSetMagNorth(float B[3])
 {
-	Be[0] = B[0];
-	Be[1] = B[1];
-	Be[2] = B[2];
+	float mag = sqrtf(B[0] * B[0] + B[1] * B[1] + B[2] * B[2]);
+	Be[0] = B[0] / mag;
+	Be[1] = B[1] / mag;
+	Be[2] = B[2] / mag;
 }
 
 void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT)
@@ -353,6 +359,9 @@ void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
 	Nav.q[1] = X[7];
 	Nav.q[2] = X[8];
 	Nav.q[3] = X[9];
+	Nav.gyro_bias[0] = X[10];
+	Nav.gyro_bias[1] = X[11];
+	Nav.gyro_bias[2] = X[12];
 }
 
 //  *************  CovariancePrediction *************
@@ -1397,7 +1406,7 @@ void RungeKutta(float X[NUMX], float U[NUMU], float dT)
 {
 
 	float dT2 =
-	    dT / 2, K1[NUMX], K2[NUMX], K3[NUMX], K4[NUMX], Xlast[NUMX];
+	    dT / 2.0f, K1[NUMX], K2[NUMX], K3[NUMX], K4[NUMX], Xlast[NUMX];
 	uint8_t i;
 
 	for (i = 0; i < NUMX; i++)
@@ -1417,8 +1426,8 @@ void RungeKutta(float X[NUMX], float U[NUMU], float dT)
 	// Xnew  = X + dT*(k1+2*k2+2*k3+k4)/6
 	for (i = 0; i < NUMX; i++)
 		X[i] =
-		    Xlast[i] + dT * (K1[i] + 2 * K2[i] + 2 * K3[i] +
-				     K4[i]) / 6;
+		    Xlast[i] + dT * (K1[i] + 2.0f * K2[i] + 2.0f * K3[i] +
+				     K4[i]) / 6.0f;
 }
 
 //  *************  Model Specific Stuff  ***************************
@@ -1463,23 +1472,23 @@ void StateEq(float X[NUMX], float U[NUMU], float Xdot[NUMX])
 
 	// Vdot = Reb*a
 	Xdot[3] =
-	    (q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) * ax + 2 * (q1 * q2 -
+	    (q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) * ax + 2.0f * (q1 * q2 -
 								q0 * q3) *
-	    ay + 2 * (q1 * q3 + q0 * q2) * az;
+	    ay + 2.0f * (q1 * q3 + q0 * q2) * az;
 	Xdot[4] =
-	    2 * (q1 * q2 + q0 * q3) * ax + (q0 * q0 - q1 * q1 + q2 * q2 -
+	    2.0f * (q1 * q2 + q0 * q3) * ax + (q0 * q0 - q1 * q1 + q2 * q2 -
 					    q3 * q3) * ay + 2 * (q2 * q3 -
 								 q0 * q1) *
 	    az;
 	Xdot[5] =
-	    2 * (q1 * q3 - q0 * q2) * ax + 2 * (q2 * q3 + q0 * q1) * ay +
-	    (q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3) * az + 9.81;
+	    2.0f * (q1 * q3 - q0 * q2) * ax + 2 * (q2 * q3 + q0 * q1) * ay +
+	    (q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3) * az + 9.81f;
 
 	// qdot = Q*w
-	Xdot[6] = (-q1 * wx - q2 * wy - q3 * wz) / 2;
-	Xdot[7] = (q0 * wx - q3 * wy + q2 * wz) / 2;
-	Xdot[8] = (q3 * wx + q0 * wy - q1 * wz) / 2;
-	Xdot[9] = (-q2 * wx + q1 * wy + q0 * wz) / 2;
+	Xdot[6] = (-q1 * wx - q2 * wy - q3 * wz) / 2.0f;
+	Xdot[7] = (q0 * wx - q3 * wy + q2 * wz) / 2.0f;
+	Xdot[8] = (q3 * wx + q0 * wy - q1 * wz) / 2.0f;
+	Xdot[9] = (-q2 * wx + q1 * wy + q0 * wz) / 2.0f;
 
 	// best guess is that bias stays constant
 	Xdot[10] = Xdot[11] = Xdot[12] = 0;
@@ -1503,21 +1512,21 @@ void LinearizeFG(float X[NUMX], float U[NUMU], float F[NUMX][NUMX],
 	q3 = X[9];
 
 	// Pdot = V
-	F[0][3] = F[1][4] = F[2][5] = 1;
+	F[0][3] = F[1][4] = F[2][5] = 1.0f;
 
 	// dVdot/dq
-	F[3][6] = 2 * (q0 * ax - q3 * ay + q2 * az);
-	F[3][7] = 2 * (q1 * ax + q2 * ay + q3 * az);
-	F[3][8] = 2 * (-q2 * ax + q1 * ay + q0 * az);
-	F[3][9] = 2 * (-q3 * ax - q0 * ay + q1 * az);
-	F[4][6] = 2 * (q3 * ax + q0 * ay - q1 * az);
-	F[4][7] = 2 * (q2 * ax - q1 * ay - q0 * az);
-	F[4][8] = 2 * (q1 * ax + q2 * ay + q3 * az);
-	F[4][9] = 2 * (q0 * ax - q3 * ay + q2 * az);
-	F[5][6] = 2 * (-q2 * ax + q1 * ay + q0 * az);
-	F[5][7] = 2 * (q3 * ax + q0 * ay - q1 * az);
-	F[5][8] = 2 * (-q0 * ax + q3 * ay - q2 * az);
-	F[5][9] = 2 * (q1 * ax + q2 * ay + q3 * az);
+	F[3][6] = 2.0f * (q0 * ax - q3 * ay + q2 * az);
+	F[3][7] = 2.0f * (q1 * ax + q2 * ay + q3 * az);
+	F[3][8] = 2.0f * (-q2 * ax + q1 * ay + q0 * az);
+	F[3][9] = 2.0f * (-q3 * ax - q0 * ay + q1 * az);
+	F[4][6] = 2.0f * (q3 * ax + q0 * ay - q1 * az);
+	F[4][7] = 2.0f * (q2 * ax - q1 * ay - q0 * az);
+	F[4][8] = 2.0f * (q1 * ax + q2 * ay + q3 * az);
+	F[4][9] = 2.0f * (q0 * ax - q3 * ay + q2 * az);
+	F[5][6] = 2.0f * (-q2 * ax + q1 * ay + q0 * az);
+	F[5][7] = 2.0f * (q3 * ax + q0 * ay - q1 * az);
+	F[5][8] = 2.0f * (-q0 * ax + q3 * ay - q2 * az);
+	F[5][9] = 2.0f * (q1 * ax + q2 * ay + q3 * az);
 
 	// dVdot/dabias & dVdot/dna  - NO BIAS STATES ON ACCELS - S0 REPEAT FOR G BELOW
 	// F[3][13]=G[3][3]=-q0*q0-q1*q1+q2*q2+q3*q3; F[3][14]=G[3][4]=2*(-q1*q2+q0*q3);         F[3][15]=G[3][5]=-2*(q1*q3+q0*q2);
@@ -1526,63 +1535,63 @@ void LinearizeFG(float X[NUMX], float U[NUMU], float F[NUMX][NUMX],
 
 	// dqdot/dq
 	F[6][6] = 0;
-	F[6][7] = -wx / 2;
-	F[6][8] = -wy / 2;
-	F[6][9] = -wz / 2;
-	F[7][6] = wx / 2;
+	F[6][7] = -wx / 2.0f;
+	F[6][8] = -wy / 2.0f;
+	F[6][9] = -wz / 2.0f;
+	F[7][6] = wx / 2.0f;
 	F[7][7] = 0;
-	F[7][8] = wz / 2;
-	F[7][9] = -wy / 2;
-	F[8][6] = wy / 2;
-	F[8][7] = -wz / 2;
+	F[7][8] = wz / 2.0f;
+	F[7][9] = -wy / 2.0f;
+	F[8][6] = wy / 2.0f;
+	F[8][7] = -wz / 2.0f;
 	F[8][8] = 0;
-	F[8][9] = wx / 2;
-	F[9][6] = wz / 2;
-	F[9][7] = wy / 2;
-	F[9][8] = -wx / 2;
+	F[8][9] = wx / 2.0f;
+	F[9][6] = wz / 2.0f;
+	F[9][7] = wy / 2.0f;
+	F[9][8] = -wx / 2.0f;
 	F[9][9] = 0;
 
 	// dqdot/dwbias
-	F[6][10] = q1 / 2;
-	F[6][11] = q2 / 2;
-	F[6][12] = q3 / 2;
-	F[7][10] = -q0 / 2;
-	F[7][11] = q3 / 2;
-	F[7][12] = -q2 / 2;
-	F[8][10] = -q3 / 2;
-	F[8][11] = -q0 / 2;
-	F[8][12] = q1 / 2;
-	F[9][10] = q2 / 2;
-	F[9][11] = -q1 / 2;
-	F[9][12] = -q0 / 2;
+	F[6][10] = q1 / 2.0f;
+	F[6][11] = q2 / 2.0f;
+	F[6][12] = q3 / 2.0f;
+	F[7][10] = -q0 / 2.0f;
+	F[7][11] = q3 / 2.0f;
+	F[7][12] = -q2 / 2.0f;
+	F[8][10] = -q3 / 2.0f;
+	F[8][11] = -q0 / 2.0f;
+	F[8][12] = q1 / 2.0f;
+	F[9][10] = q2 / 2.0f;
+	F[9][11] = -q1 / 2.0f;
+	F[9][12] = -q0 / 2.0f;
 
 	// dVdot/dna  - NO BIAS STATES ON ACCELS - S0 REPEAT FOR G HERE
 	G[3][3] = -q0 * q0 - q1 * q1 + q2 * q2 + q3 * q3;
-	G[3][4] = 2 * (-q1 * q2 + q0 * q3);
-	G[3][5] = -2 * (q1 * q3 + q0 * q2);
-	G[4][3] = -2 * (q1 * q2 + q0 * q3);
+	G[3][4] = 2.0f * (-q1 * q2 + q0 * q3);
+	G[3][5] = -2.0f * (q1 * q3 + q0 * q2);
+	G[4][3] = -2.0f * (q1 * q2 + q0 * q3);
 	G[4][4] = -q0 * q0 + q1 * q1 - q2 * q2 + q3 * q3;
-	G[4][5] = 2 * (-q2 * q3 + q0 * q1);
-	G[5][3] = 2 * (-q1 * q3 + q0 * q2);
-	G[5][4] = -2 * (q2 * q3 + q0 * q1);
+	G[4][5] = 2.0f * (-q2 * q3 + q0 * q1);
+	G[5][3] = 2.0f * (-q1 * q3 + q0 * q2);
+	G[5][4] = -2.0f * (q2 * q3 + q0 * q1);
 	G[5][5] = -q0 * q0 + q1 * q1 + q2 * q2 - q3 * q3;
 
 	// dqdot/dnw
-	G[6][0] = q1 / 2;
-	G[6][1] = q2 / 2;
-	G[6][2] = q3 / 2;
-	G[7][0] = -q0 / 2;
-	G[7][1] = q3 / 2;
-	G[7][2] = -q2 / 2;
-	G[8][0] = -q3 / 2;
-	G[8][1] = -q0 / 2;
-	G[8][2] = q1 / 2;
-	G[9][0] = q2 / 2;
-	G[9][1] = -q1 / 2;
-	G[9][2] = -q0 / 2;
+	G[6][0] = q1 / 2.0f;
+	G[6][1] = q2 / 2.0f;
+	G[6][2] = q3 / 2.0f;
+	G[7][0] = -q0 / 2.0f;
+	G[7][1] = q3 / 2.0f;
+	G[7][2] = -q2 / 2.0f;
+	G[8][0] = -q3 / 2.0f;
+	G[8][1] = -q0 / 2.0f;
+	G[8][2] = q1 / 2.0f;
+	G[9][0] = q2 / 2.0f;
+	G[9][1] = -q1 / 2.0f;
+	G[9][2] = -q0 / 2.0f;
 
 	// dwbias = random walk noise
-	G[10][6] = G[11][7] = G[12][8] = 1;
+	G[10][6] = G[11][7] = G[12][8] = 1.0f;
 	// dabias = random walk noise
 	// G[13][9]=G[14][10]=G[15][11]=1;  // NO BIAS STATES ON ACCELS
 }
@@ -1607,19 +1616,19 @@ void MeasurementEq(float X[NUMX], float Be[3], float Y[NUMV])
 	// Bb=Rbe*Be
 	Y[6] =
 	    (q0 * q0 + q1 * q1 - q2 * q2 - q3 * q3) * Be[0] +
-	    2 * (q1 * q2 + q0 * q3) * Be[1] + 2 * (q1 * q3 -
+	    2.0f * (q1 * q2 + q0 * q3) * Be[1] + 2.0f * (q1 * q3 -
 						   q0 * q2) * Be[2];
 	Y[7] =
-	    2 * (q1 * q2 - q0 * q3) * Be[0] + (q0 * q0 - q1 * q1 +
+	    2.0f * (q1 * q2 - q0 * q3) * Be[0] + (q0 * q0 - q1 * q1 +
 					       q2 * q2 - q3 * q3) * Be[1] +
-	    2 * (q2 * q3 + q0 * q1) * Be[2];
+	    2.0f * (q2 * q3 + q0 * q1) * Be[2];
 	Y[8] =
-	    2 * (q1 * q3 + q0 * q2) * Be[0] + 2 * (q2 * q3 -
+	    2.0f * (q1 * q3 + q0 * q2) * Be[0] + 2.0f * (q2 * q3 -
 						   q0 * q1) * Be[1] +
 	    (q0 * q0 - q1 * q1 - q2 * q2 + q3 * q3) * Be[2];
 
 	// Alt = -Pz
-	Y[9] = -X[2];
+	Y[9] = -1.0f * X[2];
 }
 
 void LinearizeH(float X[NUMX], float Be[3], float H[NUMV][NUMX])
@@ -1632,26 +1641,26 @@ void LinearizeH(float X[NUMX], float Be[3], float H[NUMV][NUMX])
 	q3 = X[9];
 
 	// dP/dP=I;
-	H[0][0] = H[1][1] = H[2][2] = 1;
+	H[0][0] = H[1][1] = H[2][2] = 1.0f;
 	// dV/dV=I;
-	H[3][3] = H[4][4] = H[5][5] = 1;
+	H[3][3] = H[4][4] = H[5][5] = 1.0f;
 
 	// dBb/dq
-	H[6][6] = 2 * (q0 * Be[0] + q3 * Be[1] - q2 * Be[2]);
-	H[6][7] = 2 * (q1 * Be[0] + q2 * Be[1] + q3 * Be[2]);
-	H[6][8] = 2 * (-q2 * Be[0] + q1 * Be[1] - q0 * Be[2]);
-	H[6][9] = 2 * (-q3 * Be[0] + q0 * Be[1] + q1 * Be[2]);
-	H[7][6] = 2 * (-q3 * Be[0] + q0 * Be[1] + q1 * Be[2]);
-	H[7][7] = 2 * (q2 * Be[0] - q1 * Be[1] + q0 * Be[2]);
-	H[7][8] = 2 * (q1 * Be[0] + q2 * Be[1] + q3 * Be[2]);
-	H[7][9] = 2 * (-q0 * Be[0] - q3 * Be[1] + q2 * Be[2]);
-	H[8][6] = 2 * (q2 * Be[0] - q1 * Be[1] + q0 * Be[2]);
-	H[8][7] = 2 * (q3 * Be[0] - q0 * Be[1] - q1 * Be[2]);
-	H[8][8] = 2 * (q0 * Be[0] + q3 * Be[1] - q2 * Be[2]);
-	H[8][9] = 2 * (q1 * Be[0] + q2 * Be[1] + q3 * Be[2]);
+	H[6][6] = 2.0f * (q0 * Be[0] + q3 * Be[1] - q2 * Be[2]);
+	H[6][7] = 2.0f * (q1 * Be[0] + q2 * Be[1] + q3 * Be[2]);
+	H[6][8] = 2.0f * (-q2 * Be[0] + q1 * Be[1] - q0 * Be[2]);
+	H[6][9] = 2.0f * (-q3 * Be[0] + q0 * Be[1] + q1 * Be[2]);
+	H[7][6] = 2.0f * (-q3 * Be[0] + q0 * Be[1] + q1 * Be[2]);
+	H[7][7] = 2.0f * (q2 * Be[0] - q1 * Be[1] + q0 * Be[2]);
+	H[7][8] = 2.0f * (q1 * Be[0] + q2 * Be[1] + q3 * Be[2]);
+	H[7][9] = 2.0f * (-q0 * Be[0] - q3 * Be[1] + q2 * Be[2]);
+	H[8][6] = 2.0f * (q2 * Be[0] - q1 * Be[1] + q0 * Be[2]);
+	H[8][7] = 2.0f * (q3 * Be[0] - q0 * Be[1] - q1 * Be[2]);
+	H[8][8] = 2.0f * (q0 * Be[0] + q3 * Be[1] - q2 * Be[2]);
+	H[8][9] = 2.0f * (q1 * Be[0] + q2 * Be[1] + q3 * Be[2]);
 
 	// dAlt/dPz = -1
-	H[9][2] = -1;
+	H[9][2] = -1.0f;
 }
 
 /**

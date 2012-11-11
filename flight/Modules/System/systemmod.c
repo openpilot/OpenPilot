@@ -154,6 +154,9 @@ static void systemTask(void *parameters)
 	/* create all modules thread */
 	MODULE_TASKCREATE_ALL;
 
+	/* start the delayed callback scheduler */
+	CallbackSchedulerStart();
+
 	if (mallocFailed) {
 		/* We failed to malloc during task creation,
 		 * system behaviour is undefined.  Reset and let
@@ -243,8 +246,19 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 		ObjectPersistenceGet(&objper);
 
 		int retval = 1;
-		// Execute action
-		if (objper.Operation == OBJECTPERSISTENCE_OPERATION_LOAD) {
+		FlightStatusData flightStatus;
+		FlightStatusGet(&flightStatus);
+
+		// When this is called because of this method don't do anything
+		if (objper.Operation == OBJECTPERSISTENCE_OPERATION_ERROR ||
+			objper.Operation == OBJECTPERSISTENCE_OPERATION_COMPLETED) {
+			return;
+		}
+
+		// Execute action if disarmed
+		if(flightStatus.Armed != FLIGHTSTATUS_ARMED_DISARMED) {
+			retval = -1;
+		} else if (objper.Operation == OBJECTPERSISTENCE_OPERATION_LOAD) {
 			if (objper.Selection == OBJECTPERSISTENCE_SELECTION_SINGLEOBJECT) {
 				// Get selected object
 				obj = UAVObjGetByID(objper.ObjectID);

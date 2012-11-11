@@ -78,6 +78,29 @@
         android:text="@string/alarms" />
 
     <Button
+        android:id="@+id/launch_tester"
+        android:layout_width="132dp"
+        android:layout_height="wrap_content"
+        android:layout_row="8"
+        android:layout_column="0"
+        android:layout_rowSpan="2"
+        android:background="@android:color/transparent"
+        android:drawableTop="@drawable/ic_alarms"
+        android:text="@string/tester" />    
+
+	 <Button
+	     android:id="@+id/launch_osgViewer"
+	     android:layout_width="132dp"
+	     android:layout_height="wrap_content"
+	     android:layout_column="1"
+	     android:layout_gravity="right"
+	     android:layout_row="8"
+	     android:layout_rowSpan="2"
+	     android:background="@android:color/transparent"
+	     android:drawableTop="@drawable/ic_alarms"
+	     android:text="@string/_3dview" />
+        
+	<Button
         android:id="@+id/launch_tuning"
         android:layout_width="132dp"
         android:layout_height="wrap_content"

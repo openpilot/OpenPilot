@@ -59,6 +59,7 @@ public slots:
    void updateAttitude(UAVObject *object1);
    void updateHeading(UAVObject *object1);
    void updateGPS(UAVObject *object1);
+   void updateGroundspeed(UAVObject *object1);
    void updateAirspeed(UAVObject *object1);
    void updateAltitude(UAVObject *object1);
    void updateBattery(UAVObject *object1);
@@ -119,6 +120,8 @@ private:
    double headingValue;
    double groundspeedTarget;
    double groundspeedValue;
+   double airspeedTarget;
+   double airspeedValue;
    double altitudeTarget;
    double altitudeValue;
 
@@ -130,6 +133,7 @@ private:
    UAVDataObject* airspeedObj;
    UAVDataObject* altitudeObj;
    UAVDataObject* attitudeObj;
+   UAVDataObject* groundspeedObj;
    UAVDataObject* headingObj;
    UAVDataObject* gpsObj;
    UAVDataObject* gcsTelemetryObj;

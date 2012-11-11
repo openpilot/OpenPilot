@@ -163,6 +163,16 @@ C: Eric Price (Corvus Corax)
 D: December 2011
 V: http://www.youtube.com/watch?v=nWNWuUiUTNg
  
+M: First CopterControl over 5km FixedWing navigation flight
+C: Kavin Gustafson (k_g)
+D: October 2012
+V: http://www.youtube.com/watch?v=MGO68TqIwKk
+
+M: First CopterControl over 10km FixedWing navigation flight
+C: 
+D: 
+V: 
+
 M: First successful flight using the GCS only and no RC TX
 C: 
 D: 
@@ -211,9 +221,9 @@ D:
 V:
 
 M: First Revo 5km Navigated flight on a FixedWing
-C:
-D:
-V:
+C: Eric Price (Corvus Corax)
+D: March 2012
+V: 
 
 M: First Revo 1km Navigated flight on a Heli
 C:
@@ -230,13 +240,8 @@ C:
 D:
 V:
 
-M: First Auto landing on a fixed Wing using CC
-C:
-D:
-V:
-
 M: First Auto landing on a fixed Wing using Revo
-C:
+C: 
 D:
 V:
 

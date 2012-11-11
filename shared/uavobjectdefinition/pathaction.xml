@@ -9,8 +9,8 @@
 	<field name="ModeParameters" units="" type="float" elements="4" default="0"/>
 
 	<field name="EndCondition" units="" type="enum" elements="1" options="None,TimeOut,
-		DistanceToTarget,LegRemaining,
-		AboveAltitude,
+		DistanceToTarget,LegRemaining,BelowError,
+		AboveAltitude,AboveSpeed,
 		PointingTowardsNext,
 		PythonScript,
 		Immediate" default="None" />
@@ -19,8 +19,8 @@
 	<field name="Command" units="" type="enum" elements="1" options="OnConditionNextWaypoint,OnNotConditionNextWaypoint,
 	OnConditionJumpWaypoint,OnNotConditionJumpWaypoint,
 	IfConditionJumpWaypointElseNextWaypoint" default="OnConditionNextWaypoint" />
-	<field name="JumpDestination" units="waypoint" type="uint8" elements="1" default="0"/>
-	<field name="ErrorDestination" units="waypoint" type="uint8" elements="1" default="0"/>
+	<field name="JumpDestination" units="waypoint" type="int16" elements="1" default="0"/>
+	<field name="ErrorDestination" units="waypoint" type="int16" elements="1" default="0"/>
 
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>

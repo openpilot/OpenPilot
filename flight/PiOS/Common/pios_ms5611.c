@@ -56,7 +56,6 @@ static uint32_t oversampling;
 static const struct pios_ms5611_cfg * dev_cfg;
 static int32_t i2c_id;
 
-static enum pios_ms5611_osr osr = MS5611_OSR_256;
 
 /**
  * Initialise the MS5611 sensor
@@ -90,10 +89,10 @@ int32_t PIOS_MS5611_StartADC(ConversionTypeTypeDef Type)
 {
 	/* Start the conversion */
 	if (Type == TemperatureConv) {
-		while (PIOS_MS5611_WriteCommand(MS5611_TEMP_ADDR + osr) != 0)
+		while (PIOS_MS5611_WriteCommand(MS5611_TEMP_ADDR + oversampling) != 0)
 			continue;
 	} else if (Type == PressureConv) {
-		while (PIOS_MS5611_WriteCommand(MS5611_PRES_ADDR + osr) != 0)
+		while (PIOS_MS5611_WriteCommand(MS5611_PRES_ADDR + oversampling) != 0)
 			continue;
 	}
 
@@ -106,7 +105,7 @@ int32_t PIOS_MS5611_StartADC(ConversionTypeTypeDef Type)
  * @brief Return the delay for the current osr
  */
 int32_t PIOS_MS5611_GetDelay() {
-	switch(osr) {
+	switch(oversampling) {
 		case MS5611_OSR_256:
 			return 2;
 		case MS5611_OSR_512:
@@ -144,7 +143,7 @@ int32_t PIOS_MS5611_ReadADC(void)
 
 		RawTemperature = (Data[0] << 16) | (Data[1] << 8) | Data[2];
 		
-		deltaTemp = RawTemperature - (CalibData.C[4] << 8);
+		deltaTemp = ((int32_t) RawTemperature) - (CalibData.C[4] << 8);
 		Temperature = 2000l + ((deltaTemp * CalibData.C[5]) >> 23);
 
 	} else {	

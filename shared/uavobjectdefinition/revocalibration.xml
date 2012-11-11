@@ -1,19 +1,26 @@
 <xml>
     <object name="RevoCalibration" singleinstance="true" settings="true">
         <description>Settings for the INS to control the algorithm and what is updated</description>
-        <field name="BiasCorrectedRaw" units="" type="enum" elements="1" options="TRUE,FALSE" defaultvalue="TRUE"/>
+
 
 	<!-- Sensor noises -->
         <field name="accel_bias" units="m/s" type="float" elementnames="X,Y,Z" defaultvalue="0,0,0"/>
         <field name="accel_scale" units="gain" type="float" elementnames="X,Y,Z" defaultvalue="1,1,1"/>
-        <field name="accel_var" units="(m/s)^2" type="float" elementnames="X,Y,Z" defaultvalue="1"/>
+        <field name="accel_var" units="(m/s)^2" type="float" elementnames="X,Y,Z" defaultvalue="0.01"/>
         <field name="gyro_bias" units="deg/s" type="float" elementnames="X,Y,Z" defaultvalue="0,0,0"/>
         <field name="gyro_scale" units="gain" type="float" elementnames="X,Y,Z" defaultvalue="1,1,1"/>
-        <field name="gyro_var" units="(deg/s)^2" type="float" elementnames="X,Y,Z" defaultvalue="1"/>
+        <field name="gyro_var" units="(deg/s)^2" type="float" elementnames="X,Y,Z" defaultvalue="0.01"/>
 	<field name="gyro_tempcoeff" units="(deg/s)/deg" type="float" elementnames="X,Y,Z" defaultvalue="1"/>
         <field name="mag_bias" units="mGau" type="float" elementnames="X,Y,Z" defaultvalue="0,0,0"/>
         <field name="mag_scale" units="gain" type="float" elementnames="X,Y,Z" defaultvalue="1"/>
-        <field name="mag_var" units="mGau^2" type="float" elementnames="X,Y,Z" defaultvalue="50"/>
+        <field name="mag_var" units="mGau^2" type="float" elementnames="X,Y,Z" defaultvalue="0.01,0.01,10"/>
+
+	<field name="gps_var" units="m^2" type="float" elementnames="Pos,Vel" defaultvalue="1,1"/>
+	<field name="baro_var" units="m^2" type="float" elements="1" defaultvalue="1"/>
+
+	<!-- These settings are related to how the sensors are post processed -->
+	<field name="BiasCorrectedRaw" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
+	<field name="MagBiasNullingRate" units="" type="float" elements="1" defaultvalue="0"/>
 
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>

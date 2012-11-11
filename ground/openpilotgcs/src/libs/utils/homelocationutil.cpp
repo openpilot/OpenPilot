@@ -42,7 +42,6 @@ HomeLocationUtil::HomeLocationUtil()
 {
 }
 
-/*
     /**
      * @brief Get local magnetic field
      * @param[in] LLA The longitude-latitude-altitude coordinate to compute the magnetic field at

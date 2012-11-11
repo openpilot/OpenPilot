@@ -26,6 +26,9 @@ flight/Project/OpenPilotOSX/build
 # /flight/PipBee/
 /flight/PipBee/Build
 
+# /flight/Project/OpenPilotOSX/
+/flight/Project/OpenPilotOSX/build/
+
 # /ground/
 /ground/Build
 

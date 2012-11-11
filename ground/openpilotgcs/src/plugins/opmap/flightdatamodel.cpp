@@ -100,7 +100,7 @@ bool flightDataModel::setColumnByIndex(pathPlanData  *row,const int index,const 
         return true;
         break;
     case ISRELATIVE:
-        row->isRelative=value.toDouble();
+        row->isRelative=value.toBool();
         return true;
         break;
     case ALTITUDE:
@@ -116,19 +116,19 @@ bool flightDataModel::setColumnByIndex(pathPlanData  *row,const int index,const 
         return true;
         break;
     case MODE_PARAMS0:
-        row->mode_params[0]=value.toInt();
+        row->mode_params[0]=value.toFloat();
         return true;
         break;
     case MODE_PARAMS1:
-        row->mode_params[1]=value.toInt();
+        row->mode_params[1]=value.toFloat();
         return true;
         break;
     case MODE_PARAMS2:
-        row->mode_params[2]=value.toInt();
+        row->mode_params[2]=value.toFloat();
         return true;
         break;
     case MODE_PARAMS3:
-        row->mode_params[3]=value.toInt();
+        row->mode_params[3]=value.toFloat();
         return true;
         break;
     case CONDITION:
@@ -136,19 +136,19 @@ bool flightDataModel::setColumnByIndex(pathPlanData  *row,const int index,const 
         return true;
         break;
     case CONDITION_PARAMS0:
-        row->condition_params[0]=value.toInt();
+        row->condition_params[0]=value.toFloat();
         return true;
         break;
     case CONDITION_PARAMS1:
-        row->condition_params[1]=value.toInt();
+        row->condition_params[1]=value.toFloat();
         return true;
         break;
     case CONDITION_PARAMS2:
-        row->condition_params[2]=value.toInt();
+        row->condition_params[2]=value.toFloat();
         return true;
         break;
     case CONDITION_PARAMS3:
-        row->condition_params[3]=value.toInt();
+        row->condition_params[3]=value.toFloat();
         return true;
         break;
     case COMMAND:
@@ -366,15 +366,15 @@ bool flightDataModel::insertRows(int row, int count, const QModelIndex &/*parent
         data->disRelative=0;
         data->beaRelative=0;
         data->altitudeRelative=0;
-        data->isRelative=0;
+        data->isRelative=true;
         data->altitude=0;
         data->velocity=0;
-        data->mode=0;
+        data->mode=1;
         data->mode_params[0]=0;
         data->mode_params[1]=0;
         data->mode_params[2]=0;
         data->mode_params[3]=0;
-        data->condition=0;
+        data->condition=3;
         data->condition_params[0]=0;
         data->condition_params[1]=0;
         data->condition_params[2]=0;
@@ -383,6 +383,25 @@ bool flightDataModel::insertRows(int row, int count, const QModelIndex &/*parent
         data->jumpdestination=0;
         data->errordestination=0;
         data->locked=false;
+        if(rowCount()>0)
+        {
+            data->altitude=this->data(this->index(rowCount()-1,ALTITUDE)).toDouble();
+            data->altitudeRelative=this->data(this->index(rowCount()-1,ALTITUDERELATIVE)).toDouble();
+            data->isRelative=this->data(this->index(rowCount()-1,ISRELATIVE)).toBool();
+            data->velocity=this->data(this->index(rowCount()-1,VELOCITY)).toFloat();
+            data->mode=this->data(this->index(rowCount()-1,MODE)).toInt();
+            data->mode_params[0]=this->data(this->index(rowCount()-1,MODE_PARAMS0)).toFloat();
+            data->mode_params[1]=this->data(this->index(rowCount()-1,MODE_PARAMS1)).toFloat();
+            data->mode_params[2]=this->data(this->index(rowCount()-1,MODE_PARAMS2)).toFloat();
+            data->mode_params[3]=this->data(this->index(rowCount()-1,MODE_PARAMS3)).toFloat();
+            data->condition=this->data(this->index(rowCount()-1,CONDITION)).toInt();
+            data->condition_params[0]=this->data(this->index(rowCount()-1,CONDITION_PARAMS0)).toFloat();
+            data->condition_params[1]=this->data(this->index(rowCount()-1,CONDITION_PARAMS1)).toFloat();
+            data->condition_params[2]=this->data(this->index(rowCount()-1,CONDITION_PARAMS2)).toFloat();
+            data->condition_params[3]=this->data(this->index(rowCount()-1,CONDITION_PARAMS3)).toFloat();
+            data->command=this->data(this->index(rowCount()-1,COMMAND)).toInt();
+            data->errordestination=this->data(this->index(rowCount()-1,ERRORDESTINATION)).toInt();
+        }
         dataStorage.insert(row,data);
     }
     endInsertRows();
@@ -546,11 +565,14 @@ void flightDataModel::readFromFile(QString fileName)
     //TODO warning message
     removeRows(0,rowCount());
     QFile file(fileName);
+    file.open(QIODevice::ReadOnly);
     QDomDocument doc("PathPlan");
-    if (!doc.setContent(file.readAll())) {
+    QByteArray array=file.readAll();
+    QString error;
+    if (!doc.setContent(array,&error)) {
         QMessageBox msgBox;
         msgBox.setText(tr("File Parsing Failed."));
-        msgBox.setInformativeText(tr("This file is not a correct XML file"));
+        msgBox.setInformativeText(QString(tr("This file is not a correct XML file:%0")).arg(error));
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.exec();
         return;
@@ -597,17 +619,17 @@ void flightDataModel::readFromFile(QString fileName)
                     else if(field.attribute("name")=="altitude")
                         data->altitude=field.attribute("value").toDouble();
                     else if(field.attribute("name")=="velocity")
-                        data->velocity=field.attribute("value").toDouble();
+                        data->velocity=field.attribute("value").toFloat();
                     else if(field.attribute("name")=="mode")
                         data->mode=field.attribute("value").toInt();
                     else if(field.attribute("name")=="mode_param0")
-                        data->mode_params[0]=field.attribute("value").toDouble();
+                        data->mode_params[0]=field.attribute("value").toFloat();
                     else if(field.attribute("name")=="mode_param1")
-                        data->mode_params[1]=field.attribute("value").toDouble();
+                        data->mode_params[1]=field.attribute("value").toFloat();
                     else if(field.attribute("name")=="mode_param2")
-                        data->mode_params[2]=field.attribute("value").toDouble();
+                        data->mode_params[2]=field.attribute("value").toFloat();
                     else if(field.attribute("name")=="mode_param3")
-                        data->mode_params[3]=field.attribute("value").toDouble();
+                        data->mode_params[3]=field.attribute("value").toFloat();
                     else if(field.attribute("name")=="condition")
                         data->condition=field.attribute("value").toDouble();
                     else if(field.attribute("name")=="condition_param0")

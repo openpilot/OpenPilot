@@ -1,0 +1,2 @@
+
+LIBS += -losgEarth -losgEarthUtil -losgEarthQt

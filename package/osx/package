@@ -22,7 +22,9 @@ device=$(hdiutil attach  "${TEMP_FILE}" | \
 cp -r "${APP_PATH}" "/Volumes/${VOL_NAME}"
 #cp -r "${FW_DIR}" "/Volumes/${VOL_NAME}/firmware"
 cp "${FW_DIR}/fw_coptercontrol-${PACKAGE_LBL}.opfw" "/Volumes/${VOL_NAME}/Firmware"
+cp "${FW_DIR}/fw_revomini-${PACKAGE_LBL}.opfw" "/Volumes/${VOL_NAME}/Firmware"
 cp "${FW_DIR}/fw_pipxtreme-${PACKAGE_LBL}.opfw" "/Volumes/${VOL_NAME}/Firmware"
+cp "${FW_DIR}/fw_revolution-${PACKAGE_LBL}.opfw" "/Volumes/${VOL_NAME}/Firmware"
 
 cp "${BUILD_DIR}/uavobject-synthetics/matlab/OPLogConvert.m" "/Volumes/${VOL_NAME}/Utilities"
 

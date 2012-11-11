@@ -49,8 +49,9 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 
     ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
-    if(!settings->useExpertMode())
+    if(!settings->useExpertMode() || true)
         m_stabilization->saveStabilizationToRAM_6->setVisible(false);
+    m_stabilization->saveStabilizationToRAM_6->setVisible(true);
 
     
 

@@ -35,7 +35,7 @@ EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/inc
 #
 include $(PIOSCOMMONLIB)/CMSIS2/library.mk
 CMSIS2_DEVICEDIR	:=	$(PIOS_DEVLIB)/Libraries/CMSIS2/Device/ST/STM32F4xx
-SRC					+=	$(wildcard $(CMSIS2_DEVICEDIR)/Source/*.c)
+SRC					+=	$(wildcard $(CMSIS2_DEVICEDIR)/Source/$(BOARD_NAME)/*.c)
 EXTRAINCDIRS		+=	$(CMSIS2_DEVICEDIR)/Include
 
 #
@@ -68,7 +68,6 @@ EXTRAINCDIRS			+=	$(USBDEVLIB)/Core/inc
 #
 ifneq ($(FREERTOS_DIR),)
 FREERTOS_PORTDIR	:=	$(PIOS_DEVLIB)/Libraries/FreeRTOS/Source
-SRC					+=	$(wildcard $(FREERTOS_PORTDIR)/portable/GCC/ARM_CM4/*.c)
-EXTRAINCDIRS		+=	$(FREERTOS_PORTDIR)/portable/GCC/ARM_CM4
+SRC					+=	$(wildcard $(FREERTOS_PORTDIR)/portable/GCC/ARM_CM4F/*.c)
+EXTRAINCDIRS		+=	$(FREERTOS_PORTDIR)/portable/GCC/ARM_CM4F
 endif
-

@@ -39,6 +39,8 @@
   * @{
   */
 #define POS_SENSORS 0x007
+#define HORIZ_POS_SENSORS 0x003
+#define VER_POS_SENSORS 0x004
 #define HORIZ_SENSORS 0x018
 #define VERT_SENSORS  0x020
 #define MAG_SENSORS 0x1C0
@@ -64,6 +66,7 @@ void INSSetAccelVar(float accel_var[3]);
 void INSSetGyroVar(float gyro_var[3]);
 void INSSetMagNorth(float B[3]);
 void INSSetMagVar(float scaled_mag_var[3]);
+void INSSetBaroVar(float baro_var);
 void INSPosVelReset(float pos[3], float vel[3]);
 
 void MagCorrection(float mag_data[3]);

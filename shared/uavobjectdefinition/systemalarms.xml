@@ -20,6 +20,7 @@
 			<elementname>I2C</elementname>
 			<elementname>GPS</elementname>
 			<elementname>BootFault</elementname>
+			<elementname>Power</elementname>
 		</elementnames>
 	</field>
         <access gcs="readwrite" flight="readwrite"/>

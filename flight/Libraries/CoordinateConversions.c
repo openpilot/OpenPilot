@@ -43,12 +43,12 @@ void LLA2ECEF(float LLA[3], float ECEF[3])
 	float sinLat, sinLon, cosLat, cosLon;
 	float N;
 
-	sinLat = sin(DEG2RAD * LLA[0]);
-	sinLon = sin(DEG2RAD * LLA[1]);
-	cosLat = cos(DEG2RAD * LLA[0]);
-	cosLon = cos(DEG2RAD * LLA[1]);
+	sinLat = sinf(DEG2RAD * LLA[0]);
+	sinLon = sinf(DEG2RAD * LLA[1]);
+	cosLat = cosf(DEG2RAD * LLA[0]);
+	cosLon = cosf(DEG2RAD * LLA[1]);
 
-	N = a / sqrt(1.0 - e * e * sinLat * sinLat);	//prime vertical radius of curvature
+	N = a / sqrtf(1.0f - e * e * sinLat * sinLat);	//prime vertical radius of curvature
 
 	ECEF[0] = (N + LLA[2]) * cosLat * cosLon;
 	ECEF[1] = (N + LLA[2]) * cosLat * sinLon;
@@ -68,28 +68,28 @@ uint16_t ECEF2LLA(float ECEF[3], float LLA[3])
 	 **/
 
 	const float a = 6378137.0;	// Equatorial Radius
-	const float e = 8.1819190842622e-2;	// Eccentricity
+	const float e = 8.1819190842622e-2f;	// Eccentricity
 	float x = ECEF[0], y = ECEF[1], z = ECEF[2];
 	float Lat, N, NplusH, delta, esLat;
 	uint16_t iter;
 #define MAX_ITER 10		// should not take more than 5 for valid coordinates
 #define ACCURACY 1.0e-11	// used to be e-14, but we don't need sub micrometer exact calculations
 
-	LLA[1] = RAD2DEG * atan2(y, x);
+	LLA[1] = RAD2DEG * atan2f(y, x);
 	Lat = DEG2RAD * LLA[0];
-	esLat = e * sin(Lat);
-	N = a / sqrt(1 - esLat * esLat);
+	esLat = e * sinf(Lat);
+	N = a / sqrtf(1 - esLat * esLat);
 	NplusH = N + LLA[2];
 	delta = 1;
 	iter = 0;
 
 	while (((delta > ACCURACY) || (delta < -ACCURACY))
 	       && (iter < MAX_ITER)) {
-		delta = Lat - atan(z / (sqrt(x * x + y * y) * (1 - (N * e * e / NplusH))));
+		delta = Lat - atanf(z / (sqrtf(x * x + y * y) * (1 - (N * e * e / NplusH))));
 		Lat = Lat - delta;
-		esLat = e * sin(Lat);
-		N = a / sqrt(1 - esLat * esLat);
-		NplusH = sqrt(x * x + y * y) / cos(Lat);
+		esLat = e * sinf(Lat);
+		N = a / sqrtf(1 - esLat * esLat);
+		NplusH = sqrtf(x * x + y * y) / cosf(Lat);
 		iter += 1;
 	}
 
@@ -104,10 +104,10 @@ void RneFromLLA(float LLA[3], float Rne[3][3])
 {
 	float sinLat, sinLon, cosLat, cosLon;
 
-	sinLat = (float)sin(DEG2RAD * LLA[0]);
-	sinLon = (float)sin(DEG2RAD * LLA[1]);
-	cosLat = (float)cos(DEG2RAD * LLA[0]);
-	cosLon = (float)cos(DEG2RAD * LLA[1]);
+	sinLat = (float)sinf(DEG2RAD * LLA[0]);
+	sinLon = (float)sinf(DEG2RAD * LLA[1]);
+	cosLat = (float)cosf(DEG2RAD * LLA[0]);
+	cosLon = (float)cosf(DEG2RAD * LLA[1]);
 
 	Rne[0][0] = -sinLat * cosLon;
 	Rne[0][1] = -sinLat * sinLon;

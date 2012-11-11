@@ -87,6 +87,7 @@
 
 /* User control functionality */
 #define PIOS_MPU6000_USERCTL_FIFO_EN      0X40
+#define PIOS_MPU6000_USERCTL_DIS_I2C      0X10
 #define PIOS_MPU6000_USERCTL_FIFO_RST     0X02
 #define PIOS_MPU6000_USERCTL_GYRO_RST     0X01
 
@@ -122,6 +123,13 @@ enum pios_mpu6000_accel_range {
 	PIOS_MPU6000_ACCEL_16G = 0x18
 };
 
+enum pios_mpu6000_orientation { // clockwise rotation from board forward
+	PIOS_MPU6000_TOP_0DEG    = 0x00,
+	PIOS_MPU6000_TOP_90DEG   = 0x01,
+	PIOS_MPU6000_TOP_180DEG  = 0x02,
+	PIOS_MPU6000_TOP_270DEG  = 0x03
+};
+
 struct pios_mpu6000_data {
 	int16_t gyro_x;
 	int16_t gyro_y;
@@ -146,6 +154,7 @@ struct pios_mpu6000_cfg {
 	enum pios_mpu6000_accel_range accel_range;
 	enum pios_mpu6000_range gyro_range;
 	enum pios_mpu6000_filter filter;
+	enum pios_mpu6000_orientation orientation;
 };
 
 /* Public Functions */
@@ -153,7 +162,7 @@ extern int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const stru
 extern xQueueHandle PIOS_MPU6000_GetQueue();
 extern int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * buffer);
 extern int32_t PIOS_MPU6000_ReadID();
-extern uint8_t PIOS_MPU6000_Test();
+extern int32_t PIOS_MPU6000_Test();
 extern float PIOS_MPU6000_GetScale();
 extern float PIOS_MPU6000_GetAccelScale();
 extern bool PIOS_MPU6000_IRQHandler(void);

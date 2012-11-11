@@ -1,7 +1,7 @@
 
 // http://gladman.plushost.co.uk/oldsite/AES/index.php
 
-//#include <stdio.h>
+#include <stdint.h>
 
 #include "aes.h"
 

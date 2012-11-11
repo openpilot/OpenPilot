@@ -53,6 +53,9 @@ FLASH_TOOL = OPENOCD
 
 # List of modules to include
 MODULES = ManualControl Stabilization GPS
+MODULES += PathPlanner
+MODULES += FixedWingPathFollower
+MODULES += VtolPathFollower
 MODULES += CameraStab
 MODULES += Telemetry
 MODULES += FirmwareIAP
@@ -127,6 +130,7 @@ SRC += $(OPSYSTEM)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
+SRC += $(OPUAVOBJ)/callbackscheduler.c
 SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
 
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
@@ -135,6 +139,7 @@ SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/insgps13state.c
 SRC += $(FLIGHTLIB)/taskmonitor.c
 SRC += $(FLIGHTLIB)/sanitycheck.c
+SRC += $(FLIGHTLIB)/paths.c
 
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c

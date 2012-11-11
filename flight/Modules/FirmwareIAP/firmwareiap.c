@@ -108,6 +108,17 @@ int32_t FirmwareIAPInitialize()
 	return 0;
 }
 
+/**
+ * Initialise the module, called on startup
+ * \returns 0 on success or -1 if initialisation failed
+ */
+int32_t FirmwareIAPStart(void)
+{
+	/* nothing, no running task */
+	return 0;
+}
+
+
 /*!
  * \brief	FirmwareIAPCallback - callback function for firmware IAP requests
  * \param[in]  ev - pointer objevent

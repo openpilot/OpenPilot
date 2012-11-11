@@ -1,5 +1,9 @@
 ﻿Short summary of changes.  For a complete list see the git log.
 
+2012-11-11
+[OP-691] Camera/accessory mixers won't be reset when a vehicle configuration changed.
+Still no fix for helicopter configuration changes, though (some code refactoring is desired).
+
 2012-10-06
 Receiver port can now be configured as PPM *and* PWM inputs.
 Pin 1 is PPM, other pins are PWM inputs.

@@ -233,7 +233,7 @@ static void AttitudeTask(void *parameters)
 			AttitudeSettingsAccelKiGet(&accelKi);
 			AttitudeSettingsAccelKpGet(&accelKp);
 			AttitudeSettingsYawBiasRateGet(&yawBiasRate);
-			if(accel_alpha > 0.0f)
+			if (accel_alpha > 0.0f)
 				accel_filter_enabled = true;
 			init = 1;
 		}
@@ -438,9 +438,9 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	return 0;
 }
 
-static inline void apply_accel_filter(const float * raw, float * filtered)
+static inline void apply_accel_filter(const float *raw, float *filtered)
 {
-	if(accel_filter_enabled) {
+	if (accel_filter_enabled) {
 		filtered[0] = filtered[0] * accel_alpha + raw[0] * (1 - accel_alpha);
 		filtered[1] = filtered[1] * accel_alpha + raw[1] * (1 - accel_alpha);
 		filtered[2] = filtered[2] * accel_alpha + raw[2] * (1 - accel_alpha);
@@ -468,27 +468,31 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	float accel_err[3];
 
 	// Apply smoothing to accel values, to reduce vibration noise before main calculations.
-	apply_accel_filter(accels,accels_filtered);
+	apply_accel_filter(accels, accels_filtered);
 	
 	// Rotate gravity to body frame, filter and cross with accels
 	grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
 	grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
 	grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
 
-	apply_accel_filter(grot,grot_filtered);
+	apply_accel_filter(grot, grot_filtered);
 	
-	CrossProduct((const float *) accels_filtered, (const float *) grot_filtered, accel_err);
+	CrossProduct((const float *)accels_filtered, (const float *)grot_filtered, accel_err);
 	
 	// Account for accel magnitude
 	float accel_mag = sqrtf(accels_filtered[0]*accels_filtered[0] + accels_filtered[1]*accels_filtered[1] + accels_filtered[2]*accels_filtered[2]);
-	if(accel_mag < 1.0e-3f)
+	if (accel_mag < 1.0e-3f)
 		return;
 
 	// Account for filtered gravity vector magnitude
 	float grot_mag;
-	if(accel_filter_enabled) grot_mag = sqrtf(grot[0]*grot[0] + grot[1]*grot[1] + grot[2]*grot[2]);
-	else grot_mag = 1.0f;
-	if(grot_mag < 1.0e-3f)
+
+	if (accel_filter_enabled)
+		grot_mag = sqrtf(grot[0]*grot[0] + grot[1]*grot[1] + grot[2]*grot[2]);
+	else
+		grot_mag = 1.0f;
+
+	if (grot_mag < 1.0e-3f)
 		return;
 
 	accel_err[0] /= (accel_mag*grot_mag);
@@ -568,7 +572,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 
 	// Calculate accel filter alpha, in the same way as for gyro data in stabilization module.
 	const float fakeDt = 0.0025;
-	if(attitudeSettings.AccelTau < 0.0001) {
+	if (attitudeSettings.AccelTau < 0.0001) {
 		accel_alpha = 0;   // not trusting this to resolve to 0
 		accel_filter_enabled = false;
 	} else {

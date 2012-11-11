@@ -50,6 +50,7 @@
 #include "taskinfo.h"
 #include "watchdogstatus.h"
 #include "taskmonitor.h"
+#include "hwsettings.h"
 
 //#define DEBUG_THIS_FILE
 
@@ -90,6 +91,7 @@ static bool mallocFailed;
 // Private functions
 static void objectUpdatedCb(UAVObjEvent * ev);
 static void configurationUpdatedCb(UAVObjEvent * ev);
+static void hwSettingsUpdatedCb(UAVObjEvent * ev);
 static void updateStats();
 static void updateSystemAlarms();
 static void systemTask(void *parameters);
@@ -178,6 +180,7 @@ static void systemTask(void *parameters)
 	// Whenever the configuration changes, make sure it is safe to fly
 	SystemSettingsConnectCallback(configurationUpdatedCb);
 	ManualControlSettingsConnectCallback(configurationUpdatedCb);
+	HwSettingsConnectCallback(hwSettingsUpdatedCb);
 
 	// Main system loop
 	while (1) {
@@ -323,6 +326,14 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 static void configurationUpdatedCb(UAVObjEvent * ev)
 {
 	configuration_check();
+}
+
+/**
+ * Called whenever hardware settings changed
+ */
+static void hwSettingsUpdatedCb(UAVObjEvent * ev)
+{
+	AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT,SYSTEMALARMS_ALARM_ERROR);
 }
 
 /**

@@ -470,7 +470,7 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	// Apply smoothing to accel values, to reduce vibration noise before main calculations.
 	apply_accel_filter(accels, accels_filtered);
 	
-	// Rotate gravity to body frame, filter and cross with accels
+	// Rotate gravity unit vector to body frame, filter and cross with accels
 	grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
 	grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
 	grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);

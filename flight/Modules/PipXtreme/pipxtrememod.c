@@ -193,6 +193,8 @@ static void systemTask(void *parameters)
 			prev_tx_count = tx_count;
 			prev_rx_count = rx_count;
 		}
+		oplinkStatus.TXSeq = radio_stats.tx_seq;
+		oplinkStatus.RXSeq = radio_stats.rx_seq;
 		oplinkStatus.LinkState = radio_stats.link_state;
 		if (radio_stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED)
 			LINK_LED_ON;

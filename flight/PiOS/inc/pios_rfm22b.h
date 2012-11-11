@@ -76,8 +76,8 @@ struct rfm22b_stats {
 	uint16_t packets_per_sec;
 	uint16_t tx_byte_count;
 	uint16_t rx_byte_count;
-	uint16_t tx_count;
-	uint16_t rx_count;
+	uint16_t tx_seq;
+	uint16_t rx_seq;
 	uint8_t rx_good;
 	uint8_t rx_corrected;
 	uint8_t rx_error;
@@ -96,7 +96,7 @@ struct rfm22b_stats {
 extern int32_t PIOS_RFM22B_Init(uint32_t *rfb22b_id, uint32_t spi_id, uint32_t slave_num, const struct pios_rfm22b_cfg *cfg);
 extern void PIOS_RFM22B_SetFrequencyRange(uint32_t rfm22b_id, uint32_t min_frequency, uint32_t max_frequency);
 extern void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr);
-extern void RFM22_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool data_whitening);
+extern void PIOS_RFM22B_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool data_whitening);
 extern void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id);
 extern void PIOS_RFM22B_SetCoordinator(uint32_t rfm22b_id, bool coordinator);
 extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);

@@ -80,6 +80,8 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RSSI", m_oplink->RSSI);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "AFCCorrection", m_oplink->AFCCorrection);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "LinkQuality", m_oplink->LinkQuality);
+	addUAVObjectToWidgetRelation("OPLinkStatus", "RXSeq", m_oplink->RXSeq);
+	addUAVObjectToWidgetRelation("OPLinkStatus", "TXSeq", m_oplink->TXSeq);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RXRate", m_oplink->RXRate);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "TXRate", m_oplink->TXRate);
 

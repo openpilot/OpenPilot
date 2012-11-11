@@ -235,6 +235,10 @@ void PIOS_Board_Init(void) {
 		if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg->slave_num, pios_rfm22b_cfg)) {
 			PIOS_Assert(0);
 		}
+
+		/* Configure the RFM22B device as coordinator or not */
+		PIOS_RFM22B_SetCoordinator(pios_rfm22b_id, oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
+
 		uint8_t *rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
 		uint8_t *tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
@@ -245,9 +249,6 @@ void PIOS_Board_Init(void) {
 			PIOS_Assert(0);
 		}
 	}
-
-	/* Configure the RFM22B device as coordinator or not */
-	PIOS_RFM22B_SetCoordinator(pios_rfm22b_id, oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
 
 	// Initialize the packet handler
 	PacketHandlerConfig pios_ph_cfg = {

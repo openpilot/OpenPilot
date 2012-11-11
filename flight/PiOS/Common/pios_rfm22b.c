@@ -61,7 +61,7 @@
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define ISR_TIMEOUT 2 // ms
 #define EVENT_QUEUE_SIZE 5
-#define RFM22B_DEFAULT_RX_DATARATE RFM22_datarate_64000
+#define RFM22B_DEFAULT_RX_DATARATE RFM22_datarate_32000
 #define RFM22B_DEFAULT_FREQUENCY 434000000
 #define RFM22B_DEFAULT_MIN_FREQUENCY (RFM22B_DEFAULT_FREQUENCY - 2000000)
 #define RFM22B_DEFAULT_MAX_FREQUENCY (RFM22B_DEFAULT_FREQUENCY + 2000000)
@@ -75,6 +75,9 @@
 
 // The time between updates for sending stats the radio link.
 #define RADIOSTATS_UPDATE_PERIOD_MS 250
+
+// The number of stats updates that a modem can miss before it's considered disconnected
+#define MAX_RADIOSTATS_MISS_COUNT 3
 
 // The time between PPM updates
 #define PPM_UPDATE_PERIOD_MS 40
@@ -162,6 +165,7 @@ static const uint8_t OUT_FF[64] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,
 /* Local function forwared declarations */
 static void PIOS_RFM22B_Task(void *parameters);
 static bool rfm22_readStatus(struct pios_rfm22b_dev *rfm22b_dev);
+static void rfm22_setDatarate(struct pios_rfm22b_dev * rfm22b_dev, enum rfm22b_datarate datarate, bool data_whitening);
 static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_setRxMode(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_detectPreamble(struct pios_rfm22b_dev *rfm22b_dev);
@@ -175,7 +179,6 @@ static enum pios_rfm22b_event rfm22_sendNack(struct pios_rfm22b_dev *rfm22b_dev)
 static enum pios_rfm22b_event rfm22_requestConnection(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_initConnection(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm22b_dev);
-static enum pios_rfm22b_event rfm22_connectionAccepted(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_process_state_transition(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event);
@@ -190,6 +193,7 @@ static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHand
 static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev, uint32_t frequency_hz);
 static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev);
 static bool rfm22_ready_to_send(struct pios_rfm22b_dev *rfm22b_dev);
+static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev);
 
 // SPI read/write functions
 static void rfm22_assertCs();
@@ -245,16 +249,6 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 		.entry_fn = rfm22_acceptConnection,
 		.next_state = {
 			[RFM22B_EVENT_CONNECTION_ACCEPTED] = RFM22B_STATE_SENDING_ACK,
-			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
-			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
-			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
-			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
-		},
-	},
-	[RFM22B_STATE_CONNECTION_ACCEPTED] = {
-		.entry_fn = rfm22_connectionAccepted,
-		.next_state = {
-			[RFM22B_EVENT_RX_COMPLETE] = RFM22B_STATE_TX_START,
 			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
@@ -319,7 +313,6 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 	[RFM22B_STATE_RECEIVING_ACK] = {
 		.entry_fn = rfm22_receiveAck,
 		.next_state = {
-			[RFM22B_EVENT_CONNECTION_ACCEPTED] = RFM22B_STATE_CONNECTION_ACCEPTED,
 			[RFM22B_EVENT_TX_START] = RFM22B_STATE_TX_START,
 			[RFM22B_EVENT_RX_MODE] = RFM22B_STATE_RX_MODE,
 			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
@@ -342,6 +335,15 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 		.entry_fn = rfm22_receiveStatus,
 		.next_state = {
 			[RFM22B_EVENT_RX_COMPLETE] = RFM22B_STATE_SENDING_ACK,
+			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
+			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
+			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
+			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
+		},
+	},
+	[RFM22B_STATE_TX_DELAY] = {
+		.next_state = {
+			[RFM22B_EVENT_TX_START] = RFM22B_STATE_TX_START,
 			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
@@ -562,8 +564,6 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 
 	// Initialize the stats.
 	rfm22b_dev->stats.packets_per_sec = 0;
-	rfm22b_dev->stats.tx_count = 0;
-	rfm22b_dev->stats.rx_count = 0;
 	rfm22b_dev->stats.rx_good = 0;
 	rfm22b_dev->stats.rx_corrected = 0;
 	rfm22b_dev->stats.rx_error = 0;
@@ -590,8 +590,8 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->rx_packet_len = 0;
 	rfm22b_dev->tx_packet = NULL;
 	rfm22b_dev->prev_tx_packet = NULL;
-	rfm22b_dev->tx_seq = 0;
-	rfm22b_dev->prev_rx_seq_num = 0;
+	rfm22b_dev->stats.tx_seq = 0;
+	rfm22b_dev->stats.rx_seq = 0;
 	rfm22b_dev->data_packet.header.data_size = 0;
 
 	*rfm22b_id = (uint32_t)rfm22b_dev;
@@ -875,22 +875,35 @@ static void PIOS_RFM22B_Task(void *parameters)
 		if ((rfm22b_dev->packet_start_ticks > 0) && (timeDifferenceMs(rfm22b_dev->packet_start_ticks, curTicks) > (rfm22b_dev->max_packet_time * 3)))
 			rfm22_process_event(rfm22b_dev, RFM22B_EVENT_TIMEOUT);
 
+		else if (rfm22b_dev->state == RFM22B_STATE_TX_DELAY)
+			rfm22_process_event(rfm22b_dev, RFM22B_EVENT_TX_START);
+
 		else
 		{
-			// Queue up a PPM packet if it's time.
-			if ((timeDifferenceMs(lastPPMTicks, curTicks) > PPM_UPDATE_PERIOD_MS) && rfm22_sendPPM(rfm22b_dev))
-				lastPPMTicks = curTicks;
-
-			// Queue up a status packet if it's time.
-			if ((timeDifferenceMs(lastStatusTicks, curTicks) > RADIOSTATS_UPDATE_PERIOD_MS) && rfm22_sendStatus(rfm22b_dev))
-				lastStatusTicks = curTicks;
-
-			// Can we kick of a transmit?
-			if (rfm22b_dev->prev_tx_packet && timeDifferenceMs(rfm22b_dev->tx_complete_ticks, curTicks) > rfm22b_dev->max_ack_delay)
+				
+			// Are we waiting for an ACK?
+			if (rfm22b_dev->prev_tx_packet)
 			{
-				rfm22b_dev->tx_complete_ticks = curTicks;
-				rfm22_process_event(rfm22b_dev, RFM22B_EVENT_PACKET_NACKED);
+
+				// Should be resend the packet?
+				if (timeDifferenceMs(rfm22b_dev->tx_complete_ticks, curTicks) > rfm22b_dev->max_ack_delay)
+				{
+					rfm22b_dev->tx_complete_ticks = curTicks;
+					rfm22_process_event(rfm22b_dev, RFM22B_EVENT_PACKET_NACKED);
+				}
 			}
+			else
+			{
+
+				// Queue up a PPM packet if it's time.
+				if ((timeDifferenceMs(lastPPMTicks, curTicks) > PPM_UPDATE_PERIOD_MS) && rfm22_sendPPM(rfm22b_dev))
+					lastPPMTicks = curTicks;
+
+				// Queue up a status packet if it's time.
+				if ((timeDifferenceMs(lastStatusTicks, curTicks) > RADIOSTATS_UPDATE_PERIOD_MS) && rfm22_sendStatus(rfm22b_dev))
+					lastStatusTicks = curTicks;
+			}
+
 		}
 	}
 }
@@ -908,16 +921,15 @@ static void PIOS_RFM22B_Task(void *parameters)
 //
 // This gives 2(45 + 9.6) = 109.2kHz.
 
-void RFM22_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool data_whitening)
+static void rfm22_setDatarate(struct pios_rfm22b_dev * rfm22b_dev, enum rfm22b_datarate datarate, bool data_whitening)
 {
-	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(!PIOS_RFM22B_validate(rfm22b_dev))
-		return;
-
 	uint32_t datarate_bps = data_rate[datarate];
-	rfm22b_dev->datarate = datarate;
 	rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(datarate_bps) + 0.5);
-	rfm22b_dev->max_ack_delay = 25;
+	if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED)
+		//rfm22b_dev->max_ack_delay = (uint16_t)((float)(sizeof(PHPacketHeader) * 8 * 1000) / (float)(datarate_bps) + 0.5) * 4;
+		rfm22b_dev->max_ack_delay = 50;
+	else
+		rfm22b_dev->max_ack_delay = CONNECT_ATTEMPT_PERIOD_MS;
 
 	// rfm22_if_filter_bandwidth
 	rfm22_write(0x1C, reg_1C[datarate]);
@@ -945,23 +957,10 @@ void RFM22_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool d
 	// rfm22_afc_limiter
 	rfm22_write(0x2A, reg_2A[datarate]);
 
-/* This breaks all bit rates < 100000!
-	if (datarate_bps < 100000)
-		// rfm22_chargepump_current_trimming_override
-		rfm22_write(0x58, 0x80);
-	else
-		// rfm22_chargepump_current_trimming_override
-		rfm22_write(0x58, 0xC0);
-*/
-
 	// rfm22_tx_data_rate1
 	rfm22_write(0x6E, reg_6E[datarate]);
 	// rfm22_tx_data_rate0
 	rfm22_write(0x6F, reg_6F[datarate]);
-
-	// Enable data whitening
-	//	uint8_t txdtrtscale_bit = rfm22_read(RFM22_modulation_mode_control1) & RFM22_mmc1_txdtrtscale;
-	//	rfm22_write(RFM22_modulation_mode_control1, txdtrtscale_bit | RFM22_mmc1_enwhite);
 
 	if (!data_whitening)
 		// rfm22_modulation_mode_control1
@@ -978,6 +977,17 @@ void RFM22_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool d
 
 	rfm22_write(RFM22_ook_counter_value1, 0x00);
 	rfm22_write(RFM22_ook_counter_value2, 0x00);
+}
+
+void PIOS_RFM22B_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool data_whitening)
+{
+	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return;
+	rfm22b_dev->datarate = datarate;
+
+	// Re-initialize the radio device.
+	PIOS_RFM22B_InjectEvent(rfm22b_dev, RFM22B_EVENT_INITIALIZE, false);
 }
 
 // ************************************
@@ -1260,7 +1270,7 @@ static enum pios_rfm22b_event rfm22_setRxMode(struct pios_rfm22b_dev *rfm22b_dev
 static bool rfm22_ready_to_send(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	// Is there a status of PPM packet ready to send?
-	if (rfm22b_dev->send_ppm || rfm22b_dev->send_status)
+	if (rfm22b_dev->prev_tx_packet || rfm22b_dev->send_ppm || rfm22b_dev->send_status)
 		return true;
 
 	// Is there some data ready to sent?
@@ -1315,7 +1325,6 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 
 		if (!p)
 		{
-
 			// Try to get some data to send
 			bool need_yield = false;
 			p = &rfm22b_dev->data_packet;
@@ -1324,19 +1333,16 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 			if (p->header.data_size == 0)
 				p->header.data_size = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, p->data,
 									      PH_MAX_DATA, NULL, &need_yield);
-			if (p->header.data_size == 0)
-				p = NULL;
 
 			// Don't send any data until we're connected.
-			else if (rfm22b_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED)
-			{
+			if (rfm22b_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED)
 				p->header.data_size = 0;
-				return RFM22B_EVENT_RX_MODE;
-			}
+			if (p->header.data_size == 0)
+				p = NULL;
 		}
 
 		if (p)
-			p->header.seq_num = rfm22b_dev->tx_seq++;
+			p->header.seq_num = rfm22b_dev->stats.tx_seq++;
 	}
 	if (!p)
 		return RFM22B_EVENT_RX_MODE;
@@ -1413,9 +1419,29 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 
 static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 {
-	// We don't send status if we're a coordinator
-	if (rfm22b_dev->coordinator)
-		return true;
+	// Remove any modems that have been disconnected too long.
+	bool disconnected = false;
+	uint8_t id_idx;
+	for (id_idx = 0; id_idx < OPLINKSTATUS_PAIRIDS_NUMELEM; ++id_idx)
+	{
+		if ((rfm22b_dev->pair_stats[id_idx].pairID != 0) && (rfm22b_dev->pair_stats[id_idx].lastContact++ > MAX_RADIOSTATS_MISS_COUNT))
+		{
+			if (id_idx > 0)
+				rfm22b_dev->pair_stats[id_idx].pairID = 0;
+			else
+				disconnected = true;
+			rfm22b_dev->pair_stats[id_idx].rssi = -127;
+			rfm22b_dev->pair_stats[id_idx].afc_correction = 0;
+			rfm22b_dev->pair_stats[id_idx].lastContact = 0;
+		}
+	}
+
+	// We need to re-connect if we lost connection to our remote modem.
+	if (disconnected)
+	{
+		rfm22_process_event(rfm22b_dev, RFM22B_EVENT_INITIALIZE);
+		return false;
+	}
 
 	// Update the link quality metric.
 	rfm22_calculateLinkQuality(rfm22b_dev);
@@ -1586,21 +1612,24 @@ static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHand
 
 	// Add any missed packets into the stats.
 	bool ack_nack_packet = ((p->header.type == PACKET_TYPE_ACK) || (p->header.type == PACKET_TYPE_NACK));
-	if (!ack_nack_packet && (good_packet || corrected_packet) && (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED))
+	if (!ack_nack_packet && (good_packet || corrected_packet))
 	{
-		static bool first_time = true;
 		uint16_t seq_num = p->header.seq_num;
-		uint16_t missed_packets = 0;
-		if (first_time)
-			first_time = false;
-		else
+		if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED)
 		{
-			uint16_t prev_seq_num = rfm22b_dev->prev_rx_seq_num;
-			if (seq_num > prev_seq_num)
-				missed_packets = seq_num - prev_seq_num - 1;
+			static bool first_time = true;
+			uint16_t missed_packets = 0;
+			if (first_time)
+				first_time = false;
+			else
+			{
+				uint16_t prev_seq_num = rfm22b_dev->stats.rx_seq;
+				if (seq_num > prev_seq_num)
+					missed_packets = seq_num - prev_seq_num - 1;
+			}
+			rfm22b_dev->stats.rx_missed += missed_packets;
 		}
-		rfm22b_dev->stats.rx_missed += missed_packets;
-		rfm22b_dev->prev_rx_seq_num = seq_num;
+		rfm22b_dev->stats.rx_seq = seq_num;
 	}
 
 	// Set the packet status
@@ -1684,7 +1713,6 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 		enum pios_rfm22b_event ret_event = RFM22B_EVENT_RX_COMPLETE;
 		if (rfm22b_dev->rx_buffer_wr > 0)
 		{
-			rfm22b_dev->stats.rx_count++;
 			rfm22b_dev->stats.rx_byte_count += rfm22b_dev->rx_buffer_wr;
 			// Check the packet for errors.
 			if (rfm22_receivePacket(rfm22b_dev, &(rfm22b_dev->rx_packet), rfm22b_dev->rx_buffer_wr))
@@ -1767,13 +1795,22 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 	// Packet has been sent
 	else if (rfm22b_dev->int_status1 & RFM22_is1_ipksent)
 	{
-		rfm22b_dev->stats.tx_count++;
 		rfm22b_dev->stats.tx_byte_count += PH_PACKET_SIZE(rfm22b_dev->tx_packet);
-		ret_event = (rfm22b_dev->tx_packet->header.type == PACKET_TYPE_ACK) ? RFM22B_EVENT_TX_START : RFM22B_EVENT_RX_MODE;
 
-		// Do we require an ACK?
-		if ((rfm22b_dev->tx_packet->header.type != PACKET_TYPE_ACK) && (rfm22b_dev->tx_packet->header.type != PACKET_TYPE_NACK))
+		// Is this an ACK?
+		bool is_ack = (rfm22b_dev->tx_packet->header.type == PACKET_TYPE_ACK);
+		ret_event = is_ack ? RFM22B_EVENT_TX_START : RFM22B_EVENT_RX_MODE;
+		if (is_ack)
 		{
+			// If this is an ACK for a connection request message we need to
+			// configure this modem from the connection request message.
+			if (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_CON_REQUEST)
+				rfm22_setConnectionParameters(rfm22b_dev);
+
+		}
+		else if (rfm22b_dev->tx_packet->header.type != PACKET_TYPE_NACK)
+		{
+			// We need to wait for an ACK if this packet it not an ACK or NACK.
 			rfm22b_dev->prev_tx_packet = rfm22b_dev->tx_packet;
 			rfm22b_dev->tx_complete_ticks = xTaskGetTickCount();
 		}
@@ -1833,7 +1870,8 @@ static enum pios_rfm22b_event rfm22_receiveAck(struct pios_rfm22b_dev *rfm22b_de
 	switch (prev->header.type)
 	{
 	case PACKET_TYPE_CON_REQUEST:
-		return RFM22B_EVENT_CONNECTION_ACCEPTED;
+		rfm22_setConnectionParameters(rfm22b_dev);
+		break;
 	case PACKET_TYPE_DATA:
 		rfm22b_dev->data_packet.header.data_size = 0;
 		break;
@@ -1946,6 +1984,21 @@ static enum pios_rfm22b_event rfm22_requestConnection(struct pios_rfm22b_dev *rf
 	return RFM22B_EVENT_START_TRANSFER;
 }
 
+static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev)
+{
+	PHConnectionPacketHandle cph = &(rfm22b_dev->con_packet);
+
+	// Set our connection state to connected
+	rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTED;
+ 
+ 	// Configure this modem from the connection request message.
+	rfm22_setDatarate(rfm22b_dev, cph->datarate, true);
+ 	PIOS_RFM22B_SetTxPower((uint32_t)rfm22b_dev, cph->max_tx_power);
+ 	rfm22b_dev->min_frequency = cph->min_frequency;
+ 	rfm22b_dev->max_frequency = cph->max_frequency;
+ 	rfm22_setNominalCarrierFrequency(rfm22b_dev, cph->frequency_hz);
+}
+
 static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	// Set our connection state to connected
@@ -1956,64 +2009,10 @@ static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm
 	PHConnectionPacketHandle lcph = (PHConnectionPacketHandle)(&(rfm22b_dev->con_packet));
 	memcpy((uint8_t*)lcph, (uint8_t*)cph, PH_PACKET_SIZE((PHPacketHandle)cph));
 
-	// Configure this modem from the connection request message.
+	// Set the destination ID to the source of the connection request message.
 	PIOS_RFM22B_SetDestinationId((uint32_t)rfm22b_dev, cph->header.source_id);
-	RFM22_SetDatarate((uint32_t)rfm22b_dev, cph->datarate, true);
-	PIOS_RFM22B_SetTxPower((uint32_t)rfm22b_dev, cph->max_tx_power);
-	rfm22b_dev->min_frequency = cph->min_frequency;
-	rfm22b_dev->max_frequency = cph->max_frequency;
-	rfm22_setNominalCarrierFrequency(rfm22b_dev, cph->frequency_hz);
 
 	return RFM22B_EVENT_CONNECTION_ACCEPTED;
-}
-
-static enum pios_rfm22b_event rfm22_connectionAccepted(struct pios_rfm22b_dev *rfm22b_dev)
-{
-	PHConnectionPacketHandle cph = (PHConnectionPacketHandle)(&(rfm22b_dev->con_packet));
-
-	// Set our connection state to connected
-	rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTED;
-
-	// Configure this modem from the connection request message.
-	RFM22_SetDatarate((uint32_t)rfm22b_dev, cph->datarate, true);
-	PIOS_RFM22B_SetTxPower((uint32_t)rfm22b_dev, cph->max_tx_power);
-	rfm22b_dev->min_frequency = cph->min_frequency;
-	rfm22b_dev->max_frequency = cph->max_frequency;
-	rfm22_setNominalCarrierFrequency(rfm22b_dev, cph->frequency_hz);
-
-	return RFM22B_EVENT_RX_COMPLETE;
-}
-
-// ************************************
-
-// return the current mode
-int8_t rfm22_currentMode(void)
-{
-	return g_rfm22b_dev->state;
-}
-
-// return true if we are transmitting
-bool rfm22_transmitting(void)
-{
-	return (g_rfm22b_dev->state == RFM22B_STATE_TX_DATA);
-}
-
-// return true if the channel is clear to transmit on
-bool rfm22_channelIsClear(void)
-{
-	if (g_rfm22b_dev->state != RFM22B_STATE_RX_MODE && g_rfm22b_dev->state != RFM22B_STATE_WAIT_PREAMBLE && g_rfm22b_dev->state != RFM22B_STATE_WAIT_SYNC)
-		// we are receiving something or we are transmitting or we are scanning the spectrum
-		return false;
-
-	return true;
-}
-
-// ************************************
-// set/get the frequency calibration value
-
-void rfm22_setFreqCalibration(uint8_t value)
-{
-	rfm22_write(RFM22_xtal_osc_load_cap, value);
 }
 
 // ************************************
@@ -2228,9 +2227,12 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	// RX FIFO Almost Full Threshold (0 - 63)
 	rfm22_write(RFM22_rx_fifo_control, RX_FIFO_HI_WATERMARK);
 
-	rfm22_setFreqCalibration(rfm22b_dev->cfg.RFXtalCap);
-	rfm22_setNominalCarrierFrequency(rfm22b_dev, rfm22b_dev->frequency_hz);
-	RFM22_SetDatarate((uint32_t)rfm22b_dev, rfm22b_dev->datarate, true);
+	// Set the frequency calibration
+	rfm22_write(RFM22_xtal_osc_load_cap, rfm22b_dev->cfg.RFXtalCap);
+
+	// Initialize the frequency and datarate to te default.
+	rfm22_setNominalCarrierFrequency(rfm22b_dev, RFM22B_DEFAULT_FREQUENCY);
+	rfm22_setDatarate(rfm22b_dev, RFM22B_DEFAULT_RX_DATARATE, true);
 
 	return RFM22B_EVENT_INITIALIZED;
 }

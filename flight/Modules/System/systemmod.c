@@ -174,8 +174,11 @@ static void systemTask(void *parameters)
 	// Listen for SettingPersistance object updates, connect a callback function
 	ObjectPersistenceConnectQueue(objectPersistenceQueue);
 
+#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
+#else
 	// Run this initially to make sure the configuration is checked
 	configuration_check();
+#endif
 
 	// Whenever the configuration changes, make sure it is safe to fly
 	SystemSettingsConnectCallback(configurationUpdatedCb);
@@ -325,7 +328,12 @@ static void objectUpdatedCb(UAVObjEvent * ev)
  */
 static void configurationUpdatedCb(UAVObjEvent * ev)
 {
+#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
+	// configuration_check requires board_info blobs and other structures
+	// that are not present on all architectures
+#else
 	configuration_check();
+#endif
 }
 
 /**

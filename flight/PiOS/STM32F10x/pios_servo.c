@@ -37,39 +37,16 @@
 
 static const struct pios_servo_cfg * servo_cfg;
 
-#if defined(PIOS_STEPPER)
-struct pios_pwm_out_dev {
-	const struct pios_servo_cfg servo_cfg;
-	int32_t StepRemaining;//3 first axes
-	uint32_t OldPosition;//3 first axes
-	bool Direction;
-
-};
-
-static struct pios_pwm_out_dev * stepper_cfg;
-
-static void PIOS_STEPPER_tim_edge_cb (uint32_t id, uint32_t context, uint8_t channel, uint16_t count);
-const static struct pios_tim_callbacks tim_callbacks = {
-	.overflow = NULL,
-	.edge     = PIOS_STEPPER_tim_edge_cb,
-};
-#endif
-
 /**
 * Initialise Servos
 */
 int32_t PIOS_Servo_Init(const struct pios_servo_cfg * cfg)
 {
 	uint32_t tim_id;
-#if defined(PIOS_STEPPER)
+
 	if (PIOS_TIM_InitChannels(&tim_id, cfg->channels, cfg->num_channels, NULL, 0)) {
 		return -1;
 	}
-#else
-	if (PIOS_TIM_InitChannels(&tim_id, cfg->channels, cfg->num_channels, NULL, 0)) {
-		return -1;
-	}
-#endif
 
 	/* Store away the requested configuration */
 	servo_cfg = cfg;
@@ -151,87 +128,6 @@ void PIOS_Servo_Set(uint8_t servo, uint16_t position)
 	if (!servo_cfg || servo >= servo_cfg->num_channels) {
 		return;
 	}
-
-#if defined(PIOS_STEPPER)
-	if(servo<3)
-	{
-		servo_cfg.StepRemaining[servo]=position-servo_cfg.OldPosition[servo];
-		const struct pios_tim_channel * chan = &servo_cfg->channels[servo];
-		if(servo_cfg.StepRemaining[servo]!=0)
-		{
-		/* Update the position */
-			switch(chan->timer_chan) {
-				case TIM_Channel_1:
-					TIM_SetCompare1(chan->timer, 1000);
-					break;
-				case TIM_Channel_2:
-					TIM_SetCompare2(chan->timer, 1000);
-					break;
-				case TIM_Channel_3:
-					TIM_SetCompare3(chan->timer, 1000);
-					break;
-				case TIM_Channel_4:
-					TIM_SetCompare4(chan->timer, 1000);
-					break;
-			}
-		}
-		else
-		{
-		/* Update the position */
-			switch(chan->timer_chan) {
-				case TIM_Channel_1:
-					TIM_SetCompare1(chan->timer, 0);
-					break;
-				case TIM_Channel_2:
-					TIM_SetCompare2(chan->timer, 0);
-					break;
-				case TIM_Channel_3:
-					TIM_SetCompare3(chan->timer, 0);
-					break;
-				case TIM_Channel_4:
-					TIM_SetCompare4(chan->timer, 0);
-					break;
-			}
-		}
-		if(servo_cfg.StepRemaining[servo]<0)
-		{
-			servo_cfg.StepRemaining[servo]=-servo_cfg.StepRemaining[servo];
-			chan = &servo_cfg->channels[servo+3];
-			switch(chan->timer_chan) {
-				case TIM_Channel_1:
-					TIM_SetCompare1(chan->timer, 2000);
-					break;
-				case TIM_Channel_2:
-					TIM_SetCompare2(chan->timer, 2000);
-					break;
-				case TIM_Channel_3:
-					TIM_SetCompare3(chan->timer, 2000);
-					break;
-				case TIM_Channel_4:
-					TIM_SetCompare4(chan->timer, 2000);
-					break;
-			}
-		}
-		else
-		{
-			chan = &servo_cfg->channels[servo+3];
-			switch(chan->timer_chan) {
-				case TIM_Channel_1:
-					TIM_SetCompare1(chan->timer, 0);
-					break;
-				case TIM_Channel_2:
-					TIM_SetCompare2(chan->timer, 0);
-					break;
-				case TIM_Channel_3:
-					TIM_SetCompare3(chan->timer, 0);
-					break;
-				case TIM_Channel_4:
-					TIM_SetCompare4(chan->timer, 0);
-					break;
-			}
-		}
-	}
-#else
 	/* Update the position */
 	const struct pios_tim_channel * chan = &servo_cfg->channels[servo];
 	switch(chan->timer_chan) {
@@ -248,64 +144,4 @@ void PIOS_Servo_Set(uint8_t servo, uint16_t position)
 			TIM_SetCompare4(chan->timer, position);
 			break;
 	}
-#endif
 }
-
-#if defined(PIOS_STEPPER)
-static void PIOS_STEPPER_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count)
-{
-	/* Recover our device context */
-	struct pios_pwm_dev * pwm_dev = (struct pios_pwm_dev *)context;
-
-	if (!PIOS_PWM_validate(pwm_dev)) {
-		/* Invalid device specified */
-		return;
-	}
-
-	if (chan_idx >= pwm_dev->cfg->num_channels) {
-		/* Channel out of range */
-		return;
-	}
-
-	const struct pios_tim_channel * chan = &pwm_dev->cfg->channels[chan_idx];
-
-	if (pwm_dev->CaptureState[chan_idx] == 0) {
-		pwm_dev->RiseValue[chan_idx] = count;
-		pwm_dev->us_since_update[chan_idx] = 0;
-	} else {
-		pwm_dev->FallValue[chan_idx] = count;
-	}
-
-	// flip state machine and capture value here
-	/* Simple rise or fall state machine */
-	TIM_ICInitTypeDef TIM_ICInitStructure = pwm_dev->cfg->tim_ic_init;
-	if (pwm_dev->CaptureState[chan_idx] == 0) {
-		/* Switch states */
-		pwm_dev->CaptureState[chan_idx] = 1;
-
-		/* Switch polarity of input capture */
-		TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
-		TIM_ICInitStructure.TIM_Channel = chan->timer_chan;
-		TIM_ICInit(chan->timer, &TIM_ICInitStructure);
-	} else {
-		/* Capture computation */
-		if (pwm_dev->FallValue[chan_idx] > pwm_dev->RiseValue[chan_idx]) {
-			pwm_dev->CaptureValue[chan_idx] = (pwm_dev->FallValue[chan_idx] - pwm_dev->RiseValue[chan_idx]);
-		} else {
-			pwm_dev->CaptureValue[chan_idx] = ((chan->timer->ARR - pwm_dev->RiseValue[chan_idx]) + pwm_dev->FallValue[chan_idx]);
-		}
-
-		/* Switch states */
-		pwm_dev->CaptureState[chan_idx] = 0;
-
-		/* Increase supervisor counter */
-		pwm_dev->CapCounter[chan_idx]++;
-
-		/* Switch polarity of input capture */
-		TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
-		TIM_ICInitStructure.TIM_Channel = chan->timer_chan;
-		TIM_ICInit(chan->timer, &TIM_ICInitStructure);
-	}
-
-}
-#endif

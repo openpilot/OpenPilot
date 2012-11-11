@@ -584,6 +584,10 @@ static const struct pios_tim_channel pios_tim_rcvrport_all_channels[] = {
 };
 
 #if defined(PIOS_STEPPER)
+#include <pios_stepper_priv.h>
+
+uint32_t pios_stepper_id;
+
 static const struct pios_tim_channel pios_tim_stepperport_all_pins[] = {
 	{
 		.timer = TIM4,
@@ -659,7 +663,23 @@ static const struct pios_tim_channel pios_tim_stepperport_all_pins[] = {
 		},
 	},
 };
+
+const struct pios_stepper_out_cfg pios_stepper_out_cfg = {
+         .tim_oc_init = {
+        		 .TIM_OCMode = TIM_OCMode_PWM1,
+ 	 	 		 .TIM_OutputState = TIM_OutputState_Enable,
+ 	 	 		 .TIM_OutputNState = TIM_OutputNState_Disable,
+ 	 	 		 .TIM_Pulse = PIOS_SERVOS_INITIAL_POSITION,
+ 	 	 		 .TIM_OCPolarity = TIM_OCPolarity_Low,
+ 	 	 		 .TIM_OCNPolarity = TIM_OCPolarity_Low,
+ 	 	 		 .TIM_OCIdleState = TIM_OCIdleState_Reset,
+ 	 	 		 .TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+         },
+         .channels = pios_tim_stepperport_all_pins,
+         .num_channels = NELEMENTS(pios_tim_stepperport_all_pins),
+};
 #endif
+
 static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 	{
 		.timer = TIM4,

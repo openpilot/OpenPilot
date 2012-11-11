@@ -106,7 +106,7 @@ OPTMODULES += Autotune
 endif
 
 # List of mandatory modules to include
-MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
+MODULES =  Actuator ManualControl FirmwareIAP
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
 
@@ -248,6 +248,7 @@ SRC += $(PIOSSTM32F10X)/pios_wdg.c
 SRC += $(PIOSSTM32F10X)/pios_iap.c
 SRC += $(PIOSSTM32F10X)/pios_tim.c
 SRC += $(PIOSSTM32F10X)/pios_bl_helper.c
+SRC += $(PIOSSTM32F10X)/pios_stepper.c
 
 # PIOS USB related files (separated to make code maintenance more easy)
 SRC += $(PIOSSTM32F10X)/pios_usb.c
@@ -533,7 +534,7 @@ CFLAGS += -fpromote-loop-indices
 endif
 
 CFLAGS += -Wall
-CFLAGS += -Werror
+#CFLAGS += -Werror
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 # Compiler flags to generate dependency files:
@@ -557,7 +558,7 @@ MATH_LIB = -lm
 #  -Wl,...:     tell GCC to pass this to linker.
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
-LDFLAGS = -nostartfiles -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
+LDFLAGS = -nostartfiles -Wl,--cref,--gc-sections
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += -lc
 LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))

@@ -488,7 +488,7 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	float grot_mag;
 
 	if (accel_filter_enabled)
-		grot_mag = sqrtf(grot[0]*grot[0] + grot[1]*grot[1] + grot[2]*grot[2]);
+		grot_mag = sqrtf(grot_filtered[0]*grot_filtered[0] + grot_filtered[1]*grot_filtered[1] + grot_filtered[2]*grot_filtered[2]);
 	else
 		grot_mag = 1.0f;
 

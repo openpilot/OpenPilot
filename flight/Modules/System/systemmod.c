@@ -40,10 +40,8 @@
 
 #include "openpilot.h"
 #include "systemmod.h"
-#include "sanitycheck.h"
 #include "objectpersistence.h"
 #include "flightstatus.h"
-#include "manualcontrolsettings.h"
 #include "systemstats.h"
 #include "systemsettings.h"
 #include "i2cstats.h"
@@ -90,7 +88,6 @@ static bool mallocFailed;
 
 // Private functions
 static void objectUpdatedCb(UAVObjEvent * ev);
-static void configurationUpdatedCb(UAVObjEvent * ev);
 static void hwSettingsUpdatedCb(UAVObjEvent * ev);
 static void updateStats();
 static void updateSystemAlarms();
@@ -177,12 +174,7 @@ static void systemTask(void *parameters)
 	// Listen for SettingPersistance object updates, connect a callback function
 	ObjectPersistenceConnectQueue(objectPersistenceQueue);
 
-	// Run this initially to make sure the configuration is checked
-	configuration_check();
-
 	// Whenever the configuration changes, make sure it is safe to fly
-	SystemSettingsConnectCallback(configurationUpdatedCb);
-	ManualControlSettingsConnectCallback(configurationUpdatedCb);
 	HwSettingsConnectCallback(hwSettingsUpdatedCb);
 
 	// Main system loop
@@ -332,14 +324,6 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 				break;
 		}
 	}
-}
-
-/**
- * Called whenever a critical configuration component changes
- */
-static void configurationUpdatedCb(UAVObjEvent * ev)
-{
-	configuration_check();
 }
 
 /**

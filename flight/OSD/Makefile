@@ -163,6 +163,7 @@ SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/taskmonitor.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
+SRC += $(FLIGHTLIB)/sanitycheck.c
 
 ## UAVOBJECTS
 #SRC += $(OPUAVSYNTHDIR)/accessorydesired.c

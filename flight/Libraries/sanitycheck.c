@@ -115,7 +115,7 @@ int32_t configuration_check()
 					status = SYSTEMALARMS_ALARM_ERROR;
 				else {
 					// Revo supports altitude hold
-					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_GUIDANCE))
+					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER))
 						status = SYSTEMALARMS_ALARM_ERROR;
 				}
 				break;
@@ -124,7 +124,7 @@ int32_t configuration_check()
 					status = SYSTEMALARMS_ALARM_ERROR;
 				else {
 					// Revo supports altitude hold
-					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_GUIDANCE))
+					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER))
 						status = SYSTEMALARMS_ALARM_ERROR;
 				}
 				break;

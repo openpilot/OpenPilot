@@ -31,10 +31,19 @@
 // Private constants
 
 // Private types
+union genTaskHandle{
+	xTaskHandle task;
+	DelayedCallbackInfo *dci;
+};
+typedef enum{TASK_TYPE_VOID=0,TASK_TYPE_TASK,TASK_TYPE_CALLBACK} task_type;
+typedef struct {
+	union genTaskHandle handle;
+	task_type type;
+} task_handle;
 
 // Private variables
 static xSemaphoreHandle lock;
-static xTaskHandle handles[TASKINFO_RUNNING_NUMELEM];
+static task_handle handles[TASKINFO_RUNNING_NUMELEM];
 static uint32_t lastMonitorTime;
 
 // Private functions
@@ -61,7 +70,27 @@ int32_t TaskMonitorAdd(TaskInfoRunningElem task, xTaskHandle handle)
 	if (task < TASKINFO_RUNNING_NUMELEM)
 	{
 	    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
-		handles[task] = handle;
+		handles[task].handle.task = handle;
+		handles[task].type=TASK_TYPE_TASK;
+		xSemaphoreGiveRecursive(lock);
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+/**
+ * Register a delayed callback handle with the library
+ */
+int32_t TaskMonitorAddCallback(TaskInfoRunningElem task, DelayedCallbackInfo *handle)
+{
+	if (task < TASKINFO_RUNNING_NUMELEM)
+	{
+	    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
+		handles[task].handle.dci = handle;
+		handles[task].type=TASK_TYPE_CALLBACK;
 		xSemaphoreGiveRecursive(lock);
 		return 0;
 	}
@@ -79,7 +108,7 @@ int32_t TaskMonitorRemove(TaskInfoRunningElem task)
 	if (task < TASKINFO_RUNNING_NUMELEM)
 	{
 	    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
-		handles[task] = 0;
+		handles[task].type=TASK_TYPE_VOID;
 		xSemaphoreGiveRecursive(lock);
 		return 0;
 	}
@@ -94,7 +123,7 @@ int32_t TaskMonitorRemove(TaskInfoRunningElem task)
  */
 bool TaskMonitorQueryRunning(TaskInfoRunningElem task)
 {
-	if (task < TASKINFO_RUNNING_NUMELEM && handles[task] != 0)
+	if (task < TASKINFO_RUNNING_NUMELEM && handles[task].type != TASK_TYPE_VOID)
 		return true;
 	return false;
 }
@@ -128,19 +157,32 @@ void TaskMonitorUpdateAll(void)
 	// Update all task information
 	for (n = 0; n < TASKINFO_RUNNING_NUMELEM; ++n)
 	{
-		if (handles[n] != 0)
+		if (handles[n].type == TASK_TYPE_TASK)
 		{
 			data.Running[n] = TASKINFO_RUNNING_TRUE;
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
 			data.StackRemaining[n] = 10000;
 #else
-			data.StackRemaining[n] = uxTaskGetStackHighWaterMark(handles[n]) * 4;
+			data.StackRemaining[n] = uxTaskGetStackHighWaterMark(handles[n].handle.task) * 4;
 #endif
 #if ( configGENERATE_RUN_TIME_STATS == 1 )
 			/* Generate run time stats */
-			data.RunningTime[n] = uxTaskGetRunTime(handles[n]) / deltaTime;
+			data.RunningTime[n] = uxTaskGetRunTime(handles[n].handle.task) / deltaTime;
 #endif
 			
+		}
+		else if (handles[n].type == TASK_TYPE_CALLBACK)
+		{
+			data.Running[n] = TASKINFO_RUNNING_TRUE;
+#if defined(ARCH_POSIX) || defined(ARCH_WIN32)
+			data.StackRemaining[n] = 10000;
+#else
+			data.StackRemaining[n] = uxTaskGetStackHighWaterMark(handles[TASKINFO_RUNNING_CALLBACKSCHEDULER].handle.task) * 4;
+#endif
+#if ( configGENERATE_RUN_TIME_STATS == 1 )
+			/* Generate run time stats */
+			data.RunningTime[n] = CallBackSchedulerRunTime(handles[n].handle.dci) / deltaTime;
+#endif
 		}
 		else
 		{

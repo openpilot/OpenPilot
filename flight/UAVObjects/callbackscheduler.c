@@ -41,6 +41,9 @@
 struct DelayedCallbackInfoStruct {
 	DelayedCallback cb;
 	bool volatile waiting;
+#if ( configGENERATE_RUN_TIME_STATS == 1 )
+	uint32_t runTime;
+#endif
 	struct DelayedCallbackInfoStruct *next;
 };
 
@@ -101,6 +104,8 @@ int32_t CallbackSchedulerStart()
  */
 int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo)
 {
+	if (!cbinfo) return -1;
+
 	// no semaphore needed
 	cbinfo->waiting=true;
 	// Push to queue
@@ -126,6 +131,9 @@ DelayedCallbackInfo* DelayedCallbackCreate(DelayedCallback cb, DelayedCallbackPr
 	DelayedCallbackInfo *info = (DelayedCallbackInfo*)pvPortMalloc(sizeof(DelayedCallbackInfo));
 	info->next     = NULL;
 	info->waiting  = false;
+#if ( configGENERATE_RUN_TIME_STATS == 1 )
+	info->runTime  = 0;
+#endif
 	info->cb       = cb;
 
 	// add to scheduling queue
@@ -133,6 +141,19 @@ DelayedCallbackInfo* DelayedCallbackCreate(DelayedCallback cb, DelayedCallbackPr
 
 	return info;
 }
+
+#if ( configGENERATE_RUN_TIME_STATS == 1 )
+/**
+ * Query runTimeInformation
+ * \param[in] *cbinfo the callback queried
+ * \return ticks spent in callback
+ */
+int32_t CallBackSchedulerRunTime(DelayedCallbackInfo* cbinfo)
+{
+	if (!cbinfo) return 0;
+	return cbinfo->runTime;
+}
+#endif
 
 /**
  * Scheduler subtask
@@ -163,7 +184,13 @@ static bool runNextCallback(DelayedCallbackPriority priority) {
 			if (current->waiting) {
 				queueCursor[priority]=next;
 				current->waiting=false; // flag is reset just before execution.
+#if ( configGENERATE_RUN_TIME_STATS == 1 )
+				uint32_t old = uxTaskGetRunTime(callbackSchedulerTaskHandle);
+#endif
 				current->cb(); // call the callback
+#if ( configGENERATE_RUN_TIME_STATS == 1 )
+				current->runTime += uxTaskGetRunTime(callbackSchedulerTaskHandle) - old;
+#endif
 				return true;
 			}
 		}

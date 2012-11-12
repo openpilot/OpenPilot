@@ -40,5 +40,6 @@ int32_t CallbackSchedulerInitialize();
 int32_t CallbackSchedulerStart();
 int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo);
 DelayedCallbackInfo* DelayedCallbackCreate(DelayedCallback cb, DelayedCallbackPriority priority, uint32_t stacksize);
+int32_t CallBackSchedulerRunTime(DelayedCallbackInfo* cbinfo);
 
 #endif // CALLBACKSCHEDULER_H

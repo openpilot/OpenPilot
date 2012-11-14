@@ -61,12 +61,16 @@
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 2)
 #define ISR_TIMEOUT 2 // ms
 #define EVENT_QUEUE_SIZE 5
-#define RFM22B_DEFAULT_RX_DATARATE RFM22_datarate_32000
+#define RFM22B_DEFAULT_RX_DATARATE RFM22_datarate_9600
 #define RFM22B_DEFAULT_FREQUENCY 434000000
 #define RFM22B_DEFAULT_MIN_FREQUENCY (RFM22B_DEFAULT_FREQUENCY - 2000000)
 #define RFM22B_DEFAULT_MAX_FREQUENCY (RFM22B_DEFAULT_FREQUENCY + 2000000)
 #define RFM22B_DEFAULT_TX_POWER RFM22_tx_pwr_txpow_7
 #define RFM22B_LINK_QUALITY_THRESHOLD 20
+
+// The maximum amount of time since the last message received to consider the connection broken.
+#define DISCONNECT_TIMEOUT_MS 1000 // ms
+
 // The maximum amount of time without activity before initiating a reset.
 #define PIOS_RFM22B_SUPERVISOR_TIMEOUT 100  // ms
 
@@ -533,78 +537,26 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *) PIOS_RFM22B_alloc();
 	if (!rfm22b_dev)
 		return(-1);
+	*rfm22b_id = (uint32_t)rfm22b_dev;
+	g_rfm22b_dev = rfm22b_dev;
 
 	// Store the SPI handle
 	rfm22b_dev->slave_num = slave_num;
 	rfm22b_dev->spi_id = spi_id;
 
-	// Set the state to initializing.
-	rfm22b_dev->state = RFM22B_STATE_UNINITIALIZED;
+	// Initialize our configuration parameters
+	rfm22b_dev->coordinator = false;
+	rfm22b_dev->send_ppm = false;
+	rfm22b_dev->datarate = RFM22B_DEFAULT_RX_DATARATE;
+
 	// Create the event queue
 	rfm22b_dev->eventQueue = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(enum pios_rfm22b_event));
 
-	// Initialize the register values.
-	rfm22b_dev->device_status = 0;
-	rfm22b_dev->int_status1 = 0;
-	rfm22b_dev->int_status2 = 0;
-	rfm22b_dev->ezmac_status = 0;
-
-	// Initialize the detected device statistics.
-	for (uint8_t i = 0; i < OPLINKSTATUS_PAIRIDS_NUMELEM; ++i)
-	{
-		rfm22b_dev->pair_stats[i].pairID = 0;
-		rfm22b_dev->pair_stats[i].rssi = -127;
-		rfm22b_dev->pair_stats[i].afc_correction = 0;
-		rfm22b_dev->pair_stats[i].lastContact = 0;
-	}
-
-	// Initlize the link stats.
-	for (uint8_t i = 0; i < RFM22B_RX_PACKET_STATS_LEN; ++i)
-		rfm22b_dev->rx_packet_stats[i] = 0;
-
-	// Initialize the stats.
-	rfm22b_dev->stats.packets_per_sec = 0;
-	rfm22b_dev->stats.rx_good = 0;
-	rfm22b_dev->stats.rx_corrected = 0;
-	rfm22b_dev->stats.rx_error = 0;
-	rfm22b_dev->stats.rx_missed = 0;
-	rfm22b_dev->stats.tx_dropped = 0;
-	rfm22b_dev->stats.tx_resent = 0;
-	rfm22b_dev->stats.resets = 0;
-	rfm22b_dev->stats.timeouts = 0;
-	rfm22b_dev->stats.link_quality = 0;
-	rfm22b_dev->stats.rssi = 0;
-	rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
-	rfm22b_dev->tx_power = RFM22B_DEFAULT_TX_POWER;
-	rfm22b_dev->destination_id = 0xffffffff;
-	rfm22b_dev->coordinator = false;
-	rfm22b_dev->send_status = false;
-	rfm22b_dev->send_ppm = false;
-	rfm22b_dev->send_connection_request = false;
-
 	// Bind the configuration to the device instance
 	rfm22b_dev->cfg = *cfg;
-	rfm22b_dev->datarate = RFM22B_DEFAULT_RX_DATARATE;
-
-	// Initialize the packets.
-	rfm22b_dev->rx_packet_len = 0;
-	rfm22b_dev->tx_packet = NULL;
-	rfm22b_dev->prev_tx_packet = NULL;
-	rfm22b_dev->stats.tx_seq = 0;
-	rfm22b_dev->stats.rx_seq = 0;
-	rfm22b_dev->data_packet.header.data_size = 0;
-
-	*rfm22b_id = (uint32_t)rfm22b_dev;
-	g_rfm22b_dev = rfm22b_dev;
-
-	// Calculate the (approximate) maximum amount of time that it should take to transmit / receive a packet.
-	rfm22b_dev->packet_start_ticks = 0;
 
 	// Create a semaphore to know if an ISR needs responding to
 	vSemaphoreCreateBinary( rfm22b_dev->isrPending );
-
-	// Create a semaphore to know when an rx packet is available
-	vSemaphoreCreateBinary( rfm22b_dev->rxsem );
 
 	// Create our (hopefully) unique 32 bit id from the processor serial number.
 	uint8_t crcs[] = { 0, 0, 0, 0 };
@@ -626,11 +578,14 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	PIOS_WDG_RegisterFlag(PIOS_WDG_RFM22B);
 #endif /* PIOS_WDG_RFM22B */
 
-	// Start the driver task.  This task controls the radio state machine and removed all of the IO from the IRQ handler.
-	xTaskCreate(PIOS_RFM22B_Task, (signed char *)"PIOS_RFM22B_Task", STACK_SIZE_BYTES, (void*)rfm22b_dev, TASK_PRIORITY, &(rfm22b_dev->taskHandle));
+	// Set the state to initializing.
+	rfm22b_dev->state = RFM22B_STATE_UNINITIALIZED;
 
 	// Initialize the radio device.
 	PIOS_RFM22B_InjectEvent(rfm22b_dev, RFM22B_EVENT_INITIALIZE, false);
+
+	// Start the driver task.  This task controls the radio state machine and removed all of the IO from the IRQ handler.
+	xTaskCreate(PIOS_RFM22B_Task, (signed char *)"PIOS_RFM22B_Task", STACK_SIZE_BYTES, (void*)rfm22b_dev, TASK_PRIORITY, &(rfm22b_dev->taskHandle));
 
 	return(0);
 }
@@ -877,6 +832,10 @@ static void PIOS_RFM22B_Task(void *parameters)
 
 		else if (rfm22b_dev->state == RFM22B_STATE_TX_DELAY)
 			rfm22_process_event(rfm22b_dev, RFM22B_EVENT_TX_START);
+
+		// Have it been too long since we received a packet
+		else if ((rfm22b_dev->rx_complete_ticks > 0) && (timeDifferenceMs(rfm22b_dev->rx_complete_ticks, curTicks) > DISCONNECT_TIMEOUT_MS))
+			rfm22_process_event(rfm22b_dev, RFM22B_EVENT_ERROR);
 
 		else
 		{
@@ -1419,29 +1378,6 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 
 static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 {
-	// Remove any modems that have been disconnected too long.
-	bool disconnected = false;
-	uint8_t id_idx;
-	for (id_idx = 0; id_idx < OPLINKSTATUS_PAIRIDS_NUMELEM; ++id_idx)
-	{
-		if ((rfm22b_dev->pair_stats[id_idx].pairID != 0) && (rfm22b_dev->pair_stats[id_idx].lastContact++ > MAX_RADIOSTATS_MISS_COUNT))
-		{
-			if (id_idx > 0)
-				rfm22b_dev->pair_stats[id_idx].pairID = 0;
-			else
-				disconnected = true;
-			rfm22b_dev->pair_stats[id_idx].rssi = -127;
-			rfm22b_dev->pair_stats[id_idx].afc_correction = 0;
-			rfm22b_dev->pair_stats[id_idx].lastContact = 0;
-		}
-	}
-
-	// We need to re-connect if we lost connection to our remote modem.
-	if (disconnected)
-	{
-		rfm22_process_event(rfm22b_dev, RFM22B_EVENT_INITIALIZE);
-		return false;
-	}
 
 	// Update the link quality metric.
 	rfm22_calculateLinkQuality(rfm22b_dev);
@@ -1626,6 +1562,8 @@ static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHand
 				uint16_t prev_seq_num = rfm22b_dev->stats.rx_seq;
 				if (seq_num > prev_seq_num)
 					missed_packets = seq_num - prev_seq_num - 1;
+				else if((seq_num == prev_seq_num) && (p->header.type == PACKET_TYPE_DATA))
+					p->header.type = PACKET_TYPE_DUPLICATE_DATA;
 			}
 			rfm22b_dev->stats.rx_missed += missed_packets;
 		}
@@ -1642,7 +1580,7 @@ static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHand
 		// We couldn't correct the error, so drop the packet.
 		rfm22b_add_rx_status(rfm22b_dev, RFM22B_ERROR_RX_PACKET);
 
-	return good_packet || corrected_packet;
+	return (good_packet || corrected_packet);
 }
 
 static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
@@ -1727,11 +1665,13 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 					break;
 				case PACKET_TYPE_DATA:
 				{
-					// Send the data to the com port.
+					// Send the data to the com port
 					bool rx_need_yield;
 					(rfm22b_dev->rx_in_cb)(rfm22b_dev->rx_in_context, rfm22b_dev->rx_packet.data, rfm22b_dev->rx_packet.header.data_size, NULL, &rx_need_yield);
 					break;
 				}
+				case PACKET_TYPE_DUPLICATE_DATA:
+					break;
 				case PACKET_TYPE_ACK:
 					ret_event = RFM22B_EVENT_PACKET_ACKED;
 					break;
@@ -1745,6 +1685,9 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 			else
 				ret_event = RFM22B_EVENT_RX_ERROR;
 			rfm22b_dev->rx_buffer_wr = 0;
+			rfm22b_dev->rx_complete_ticks = xTaskGetTickCount();
+			if (rfm22b_dev->rx_complete_ticks == 0)
+				rfm22b_dev->rx_complete_ticks = 1;
 		}
 
 		// Start a new transaction
@@ -2020,8 +1963,54 @@ static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm
 
 static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 {
-	uint32_t id = rfm22b_dev->deviceID;
-	uint32_t freq_hop_step_size = 50000;
+
+	// Initialize the register values.
+	rfm22b_dev->device_status = 0;
+	rfm22b_dev->int_status1 = 0;
+	rfm22b_dev->int_status2 = 0;
+	rfm22b_dev->ezmac_status = 0;
+
+	// Initialize the detected device statistics.
+	for (uint8_t i = 0; i < OPLINKSTATUS_PAIRIDS_NUMELEM; ++i)
+	{
+		rfm22b_dev->pair_stats[i].pairID = 0;
+		rfm22b_dev->pair_stats[i].rssi = -127;
+		rfm22b_dev->pair_stats[i].afc_correction = 0;
+		rfm22b_dev->pair_stats[i].lastContact = 0;
+	}
+
+	// Initlize the link stats.
+	for (uint8_t i = 0; i < RFM22B_RX_PACKET_STATS_LEN; ++i)
+		rfm22b_dev->rx_packet_stats[i] = 0;
+
+	// Initialize the stats.
+	rfm22b_dev->stats.packets_per_sec = 0;
+	rfm22b_dev->stats.rx_good = 0;
+	rfm22b_dev->stats.rx_corrected = 0;
+	rfm22b_dev->stats.rx_error = 0;
+	rfm22b_dev->stats.rx_missed = 0;
+	rfm22b_dev->stats.tx_dropped = 0;
+	rfm22b_dev->stats.tx_resent = 0;
+	rfm22b_dev->stats.resets = 0;
+	rfm22b_dev->stats.timeouts = 0;
+	rfm22b_dev->stats.link_quality = 0;
+	rfm22b_dev->stats.rssi = 0;
+	rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
+	rfm22b_dev->tx_power = RFM22B_DEFAULT_TX_POWER;
+	rfm22b_dev->destination_id = 0xffffffff;
+	rfm22b_dev->send_status = false;
+	rfm22b_dev->send_connection_request = false;
+
+	// Initialize the packets.
+	rfm22b_dev->rx_packet_len = 0;
+	rfm22b_dev->tx_packet = NULL;
+	rfm22b_dev->prev_tx_packet = NULL;
+	rfm22b_dev->stats.tx_seq = 0;
+	rfm22b_dev->stats.rx_seq = 0;
+	rfm22b_dev->data_packet.header.data_size = 0;
+
+	// Calculate the (approximate) maximum amount of time that it should take to transmit / receive a packet.
+	rfm22b_dev->packet_start_ticks = 0;
 
 	// software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
 	rfm22_write(RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);
@@ -2065,6 +2054,8 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22b_dev->afc_correction_Hz = 0;
 
 	rfm22b_dev->packet_start_ticks = 0;
+	rfm22b_dev->tx_complete_ticks = 0;
+	rfm22b_dev->rx_complete_ticks = 0;
 
 	// ****************
 	// read the RF chip ID bytes
@@ -2132,6 +2123,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	// ****************
 
 	// initialize the frequency hopping step size
+	uint32_t freq_hop_step_size = 50000;
 	freq_hop_step_size /= 10000;	// in 10kHz increments
 	if (freq_hop_step_size > 255) freq_hop_step_size = 255;
 	rfm22b_dev->frequency_hop_step_size_reg = freq_hop_step_size;
@@ -2193,6 +2185,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22_write(RFM22_header_enable2, 0xff);
 	rfm22_write(RFM22_header_enable3, 0xff);
 	// Set the ID to be checked
+	uint32_t id = rfm22b_dev->deviceID;
 	rfm22_write(RFM22_check_header0, id & 0xff);
 	rfm22_write(RFM22_check_header1, (id >> 8) & 0xff);
 	rfm22_write(RFM22_check_header2, (id >> 16) & 0xff);
@@ -2239,7 +2232,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 
 static enum pios_rfm22b_event rfm22_timeout(struct pios_rfm22b_dev *rfm22b_dev)
 {
-	rfm22b_dev->resets++;
+	rfm22b_dev->stats.timeouts++;
 	rfm22b_dev->packet_start_ticks = 0;
 	// Release the Tx packet if it's set.
 	if (rfm22b_dev->tx_packet != 0)
@@ -2253,15 +2246,7 @@ static enum pios_rfm22b_event rfm22_timeout(struct pios_rfm22b_dev *rfm22b_dev)
 
 static enum pios_rfm22b_event rfm22_error(struct pios_rfm22b_dev *rfm22b_dev)
 {
-	rfm22b_dev->resets++;
-	rfm22b_dev->packet_start_ticks = 0;
-	// Release the Tx packet if it's set.
-	if (rfm22b_dev->tx_packet != 0)
-	{
-		rfm22b_dev->tx_packet = 0;
-		rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
-	}
-	rfm22b_dev->rx_buffer_wr = 0;
+	rfm22b_dev->stats.resets++;
 	return RFM22B_EVENT_INITIALIZE;
 }
 

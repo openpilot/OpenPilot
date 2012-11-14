@@ -43,6 +43,7 @@ typedef enum {
 	PACKET_TYPE_STATUS,         // broadcasts status of this modem
 	PACKET_TYPE_CON_REQUEST,    // request a connection to another modem
 	PACKET_TYPE_DATA,           // data packet (packet contains user data)
+	PACKET_TYPE_DUPLICATE_DATA, // a duplicate data packet
 	PACKET_TYPE_PPM,            // PPM relay values
 	PACKET_TYPE_ACK,
 	PACKET_TYPE_NACK,

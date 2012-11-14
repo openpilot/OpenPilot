@@ -670,9 +670,6 @@ struct pios_rfm22b_dev {
 	// ISR pending
 	xSemaphoreHandle isrPending;
 
-	// Receive packet complete
-	xSemaphoreHandle rxsem;
-
 	// The COM callback functions.
 	pios_com_callback rx_in_cb;
 	uint32_t rx_in_context;
@@ -707,9 +704,8 @@ struct pios_rfm22b_dev {
 	struct rfm22b_stats stats;
 
 	// Stats
-	uint16_t resets;
-	uint16_t timeouts;
 	uint16_t errors;
+
 	// RSSI in dBm
 	int8_t rssi_dBm;
 
@@ -774,6 +770,7 @@ struct pios_rfm22b_dev {
 	uint32_t max_packet_time;
 	portTickType packet_start_ticks;
 	portTickType tx_complete_ticks;
+	portTickType rx_complete_ticks;
 	uint8_t max_ack_delay;
 };
 

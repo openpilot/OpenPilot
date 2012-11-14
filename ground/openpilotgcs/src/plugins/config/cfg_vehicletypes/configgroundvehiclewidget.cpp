@@ -295,7 +295,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleMotorcycle(QString airframeTyp
 	
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
-    resetMixers(mixer);
+    resetMotorAndServoMixers(mixer);
 
     //motor
     int channel = m_aircraft->gvMotor2ChannelBox->currentIndex()-1;
@@ -346,7 +346,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleDifferential(QString airframeT
 	
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
-    resetMixers(mixer);
+    resetMotorAndServoMixers(mixer);
 
     //left motor
     int channel = m_aircraft->gvMotor1ChannelBox->currentIndex()-1;
@@ -395,7 +395,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleCar(QString airframeType)
 
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
-    resetMixers(mixer);
+    resetMotorAndServoMixers(mixer);
 
     int channel = m_aircraft->gvSteering1ChannelBox->currentIndex()-1;
     setMixerType(mixer,channel, VehicleConfig::MIXERTYPE_SERVO);

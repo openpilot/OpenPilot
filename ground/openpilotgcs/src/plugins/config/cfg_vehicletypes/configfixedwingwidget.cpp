@@ -281,7 +281,7 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
 	
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
-    resetMixers(mixer);
+    resetMotorAndServoMixers(mixer);
 
     // ... and compute the matrix:
     // In order to make code a bit nicer, we assume:
@@ -352,7 +352,7 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
 	    
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
-    resetMixers(mixer);
+    resetMotorAndServoMixers(mixer);
 
     // Save the curve:
     // ... and compute the matrix:
@@ -424,7 +424,7 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
 	    
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
-    resetMixers(mixer);
+    resetMotorAndServoMixers(mixer);
 
     // Save the curve:
     // ... and compute the matrix:

@@ -182,7 +182,7 @@ void VehicleConfig::resetMixerVector(UAVDataObject* mixer, int channel)
 }
 
 // Disable all servo/motor mixers (but keep camera and accessory ones)
-void VehicleConfig::resetMixers(UAVDataObject *mixer)
+void VehicleConfig::resetMotorAndServoMixers(UAVDataObject *mixer)
 {
     for (int channel = 0; channel < (int)VehicleConfig::CHANNEL_NUMELEM; channel++) {
         QString type = getMixerType(mixer, channel);

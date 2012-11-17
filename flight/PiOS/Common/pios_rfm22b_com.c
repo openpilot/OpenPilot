@@ -96,7 +96,7 @@ static void PIOS_RFM22B_COM_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail)
 		return;
 
 	// Send a signal to the radio to start a transmit.
-	PIOS_RFM22B_InjectEvent(rfm22b_dev, RFM22B_EVENT_SEND_PACKET, false);
+	PIOS_RFM22B_InjectEvent(rfm22b_dev, RFM22B_EVENT_SEND_DATA, false);
 }
 
 static void PIOS_RFM22B_COM_RegisterRxCallback(uint32_t rfm22b_id, pios_com_callback rx_in_cb, uint32_t context)

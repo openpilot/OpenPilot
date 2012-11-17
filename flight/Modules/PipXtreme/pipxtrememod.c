@@ -168,13 +168,14 @@ static void systemTask(void *parameters)
 
 		// Update the status
 		oplinkStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
-		//oplinkStatus.UAVTalkErrors = data->UAVTalkErrors;
 		oplinkStatus.RxGood = radio_stats.rx_good;
 		oplinkStatus.RxCorrected = radio_stats.rx_corrected;
 		oplinkStatus.RxErrors = radio_stats.rx_error;
 		oplinkStatus.RxMissed = radio_stats.rx_missed;
-		oplinkStatus.TxDropped = radio_stats.tx_dropped; // + data->droppedPackets;
+		oplinkStatus.RxFailure = radio_stats.rx_failure;
+		oplinkStatus.TxDropped = radio_stats.tx_dropped;
 		oplinkStatus.TxResent = radio_stats.tx_resent;
+		oplinkStatus.TxFailure = radio_stats.tx_failure;
 		oplinkStatus.Resets = radio_stats.resets;
 		oplinkStatus.Timeouts = radio_stats.timeouts;
 		oplinkStatus.RSSI = radio_stats.rssi;

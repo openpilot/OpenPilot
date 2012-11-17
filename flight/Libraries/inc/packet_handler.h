@@ -45,8 +45,9 @@ typedef enum {
 	PACKET_TYPE_DATA,           // data packet (packet contains user data)
 	PACKET_TYPE_DUPLICATE_DATA, // a duplicate data packet
 	PACKET_TYPE_PPM,            // PPM relay values
-	PACKET_TYPE_ACK,
-	PACKET_TYPE_NACK,
+	PACKET_TYPE_ACK,            // Acknowlege the receipt of a packet
+	PACKET_TYPE_ACK_RTS,        // Acknowlege the receipt of a packet and indicate that the receiving side has data to send (ready to send)
+	PACKET_TYPE_NACK,           // Acknowlege the receipt of an uncorrectable packet
 } PHPacketType;
 
 typedef struct {
@@ -67,7 +68,6 @@ typedef struct {
 #define PH_ACK_NACK_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
 typedef struct {
 	PHPacketHeader header;
-	bool ready_to_send;
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHAckNackPacket, *PHAckNackPacketHandle;
 

@@ -72,9 +72,11 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RxCorrected", m_oplink->Corrected);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RxErrors", m_oplink->Errors);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RxMissed", m_oplink->Missed);
+	addUAVObjectToWidgetRelation("OPLinkStatus", "RxFailure", m_oplink->RxFailure);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "UAVTalkErrors", m_oplink->UAVTalkErrors);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "TxDropped", m_oplink->Dropped);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "TxResent", m_oplink->Resent);
+	addUAVObjectToWidgetRelation("OPLinkStatus", "TxFailure", m_oplink->TxFailure);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "Resets", m_oplink->Resets);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "Timeouts", m_oplink->Timeouts);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RSSI", m_oplink->RSSI);

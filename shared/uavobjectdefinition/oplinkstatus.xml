@@ -10,9 +10,11 @@
 		<field name="RxCorrected" units="%" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="RxErrors" units="%" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="RxMissed" units="%" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="RxFailure" units="%" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="UAVTalkErrors" units="" type="uint16" elements="1" defaultvalue="0"/>
-		<field name="TxDropped" units="%" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="TxResent" units="%" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="TxDropped" units="%" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="TxFailure" units="%" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="Resets" units="" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="Timeouts" units="" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="RSSI" units="dBm" type="int8" elements="1" defaultvalue="0"/>

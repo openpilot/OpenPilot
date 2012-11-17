@@ -211,13 +211,6 @@ void ConfigCCAttitudeWidget::openHelp()
 
 void ConfigCCAttitudeWidget::setAccelFiltering(bool active)
 {
-    AttitudeSettings* settings = AttitudeSettings::GetInstance(getObjectManager());
-    Q_ASSERT(settings);
-    AttitudeSettings::DataFields data = settings->getData();
-
-    data.AccelTau = active ? DEFAULT_ENABLED_ACCEL_TAU : 0.0f;
-
-    settings->setData(data);
     setDirty(true);
 }
 
@@ -225,6 +218,9 @@ void ConfigCCAttitudeWidget::enableControls(bool enable)
 {
     if(ui->zeroBias) {
         ui->zeroBias->setEnabled(enable);
+    }
+    if(ui->zeroGyroBiasOnArming) {
+        ui->zeroGyroBiasOnArming->setEnabled(enable);
     }
     if(ui->accelFiltering) {
         ui->accelFiltering->setEnabled(enable);
@@ -244,6 +240,14 @@ void ConfigCCAttitudeWidget::refreshWidgetsValues(UAVObject *obj)
 
 void ConfigCCAttitudeWidget::updateObjectsFromWidgets()
 {
+    AttitudeSettings* settings = AttitudeSettings::GetInstance(getObjectManager());
+    Q_ASSERT(settings);
+    AttitudeSettings::DataFields data = settings->getData();
+
+    data.AccelTau = ui->accelFiltering->isChecked() ? DEFAULT_ENABLED_ACCEL_TAU : 0.0f;
+
+    settings->setData(data);
+
     ConfigTaskWidget::updateObjectsFromWidgets();
 
     ui->zeroBiasProgress->setValue(0);

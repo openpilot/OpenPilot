@@ -77,6 +77,9 @@ USE_ALTITUDE ?= NO
 USE_AUTOTUNE ?= YES
 TEST_FAULTS ?= NO
 
+# Camera gimbal options
+USE_INPUT_LPF ?= YES
+
 # List of optional modules to include
 OPTMODULES =
 ifeq ($(USE_CAMERASTAB), YES)
@@ -457,6 +460,10 @@ endif
 
 ifeq ($(USE_I2C), YES)
 CDEFS += -DUSE_I2C
+endif
+
+ifeq ($(USE_INPUT_LPF), YES)
+CDEFS += -DUSE_INPUT_LPF
 endif
 
 # Declare all non-optional modules as built-in to force inclusion

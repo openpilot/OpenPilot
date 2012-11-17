@@ -200,6 +200,17 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->dsb_condParam4->setVisible(false);
         ui->condParam1->setText("Relative Distance(0=complete,1=just starting)");
         break;
+    case MapDataDelegate::ENDCONDITION_BELOWERROR:
+        ui->condParam1->setVisible(true);
+        ui->condParam2->setVisible(false);
+        ui->condParam3->setVisible(false);
+        ui->condParam4->setVisible(false);
+        ui->dsb_condParam1->setVisible(true);
+        ui->dsb_condParam2->setVisible(false);
+        ui->dsb_condParam3->setVisible(false);
+        ui->dsb_condParam4->setVisible(false);
+        ui->condParam1->setText("error margin (in m)");
+        break;
     case MapDataDelegate::ENDCONDITION_ABOVEALTITUDE:
         ui->condParam1->setVisible(true);
         ui->condParam2->setVisible(false);
@@ -210,6 +221,18 @@ void opmap_edit_waypoint_dialog::setupConditionWidgets()
         ui->dsb_condParam3->setVisible(false);
         ui->dsb_condParam4->setVisible(false);
         ui->condParam1->setText("Altitude in meters (negative)");
+        break;
+    case MapDataDelegate::ENDCONDITION_ABOVESPEED:
+        ui->condParam1->setVisible(true);
+        ui->condParam2->setVisible(true);
+        ui->condParam3->setVisible(false);
+        ui->condParam4->setVisible(false);
+        ui->dsb_condParam1->setVisible(true);
+        ui->dsb_condParam2->setVisible(true);
+        ui->dsb_condParam3->setVisible(false);
+        ui->dsb_condParam4->setVisible(false);
+        ui->condParam1->setText("Speed in meters/second");
+        ui->condParam2->setText("flag: 0=groundspeed 1=airspeed");
         break;
     case MapDataDelegate::ENDCONDITION_POINTINGTOWARDSNEXT:
         ui->condParam1->setVisible(true);

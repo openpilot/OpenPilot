@@ -688,9 +688,9 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool 
 		
 		PathDesiredData pathDesired;
 		PathDesiredGet(&pathDesired);
-		pathDesired.Start[PATHDESIRED_END_NORTH] = positionActual.North;
-		pathDesired.Start[PATHDESIRED_END_EAST] = positionActual.East;
-		pathDesired.Start[PATHDESIRED_END_DOWN] = positionActual.Down;
+		pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North;
+		pathDesired.Start[PATHDESIRED_START_EAST] = positionActual.East;
+		pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down;
 		pathDesired.End[PATHDESIRED_END_NORTH] = positionActual.North;
 		pathDesired.End[PATHDESIRED_END_EAST] = positionActual.East;
 		pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;

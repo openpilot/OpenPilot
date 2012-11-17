@@ -88,6 +88,7 @@
 // Private variables
 static xTaskHandle pathfollowerTaskHandle;
 static PathDesiredData pathDesired;
+static PathStatusData pathStatus;
 static VtolPathFollowerSettingsData vtolpathfollowerSettings;
 
 // Private functions
@@ -164,7 +165,6 @@ static void vtolPathFollowerTask(void *parameters)
 {
 	SystemSettingsData systemSettings;
 	FlightStatusData flightStatus;
-	PathStatusData pathStatus;
 
 	portTickType lastUpdateTime;
 	
@@ -252,6 +252,7 @@ static void vtolPathFollowerTask(void *parameters)
 						AlarmsSet(SYSTEMALARMS_ALARM_GUIDANCE,SYSTEMALARMS_ALARM_ERROR);
 						break;
 				}
+				PathStatusSet(&pathStatus);
 				break;
 			case FLIGHTSTATUS_FLIGHTMODE_POI:
 				if (pathDesired.Mode == PATHDESIRED_MODE_FLYENDPOINT) {
@@ -383,6 +384,10 @@ static void updatePathVelocity()
 	velocityDesired.Down = bound(downCommand,
 								 -vtolpathfollowerSettings.VerticalVelMax,
 								 vtolpathfollowerSettings.VerticalVelMax);
+
+	// update pathstatus
+	pathStatus.error = progress.error;
+	pathStatus.fractional_progress = progress.fractional_progress;
 
 	VelocityDesiredSet(&velocityDesired);
 }

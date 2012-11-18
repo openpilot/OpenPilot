@@ -295,16 +295,10 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleMotorcycle(QString airframeTyp
 	
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
-
-    int channel;
-    //disable all
-    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++) {
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
-        resetMixerVector(mixer, channel);
-    }
+    resetMotorAndServoMixers(mixer);
 
     //motor
-    channel = m_aircraft->gvMotor2ChannelBox->currentIndex()-1;
+    int channel = m_aircraft->gvMotor2ChannelBox->currentIndex()-1;
     setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
@@ -352,16 +346,10 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleDifferential(QString airframeT
 	
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
-
-    int channel;
-    //disable all
-    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++) {
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
-        resetMixerVector(mixer, channel);
-    }
+    resetMotorAndServoMixers(mixer);
 
     //left motor
-    channel = m_aircraft->gvMotor1ChannelBox->currentIndex()-1;
+    int channel = m_aircraft->gvMotor1ChannelBox->currentIndex()-1;
     setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
@@ -407,15 +395,9 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleCar(QString airframeType)
 
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
+    resetMotorAndServoMixers(mixer);
 
-    int channel;
-    //disable all
-    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++) {
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
-        resetMixerVector(mixer, channel);
-    }
-
-    channel = m_aircraft->gvSteering1ChannelBox->currentIndex()-1;
+    int channel = m_aircraft->gvSteering1ChannelBox->currentIndex()-1;
     setMixerType(mixer,channel, VehicleConfig::MIXERTYPE_SERVO);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
 

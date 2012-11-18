@@ -1368,7 +1368,8 @@ channel value for each flight mode.</string>
                    <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="toolTip">
-                   <string>After the time indicated here, the frame go back to disarmed state.</string>
+                   <string>After the time indicated here, the frame go back to disarmed state.
+Set to 0 to disable (recommended for soaring fixed wings).</string>
                   </property>
                   <property name="maximum">
                    <number>64</number>
@@ -1378,7 +1379,7 @@ channel value for each flight mode.</string>
                 <item>
                  <widget class="QLabel" name="label_19">
                   <property name="text">
-                   <string>seconds.</string>
+                   <string>seconds (0 to disable).</string>
                   </property>
                  </widget>
                 </item>

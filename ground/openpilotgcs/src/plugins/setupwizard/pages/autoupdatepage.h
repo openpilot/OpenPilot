@@ -49,10 +49,12 @@ public:
 
 private slots:
     void updateStatus(uploader::AutoUpdateStep ,QVariant);
+    void disableButtons(){ enableButtons(false); }
+    void enableButtons(bool enable);
 
 private:
     Ui::AutoUpdatePage *ui;
-    SetupWizard * m_wiz;
+
 };
 
 #endif // AUTOUPDATEPAGE_H

@@ -127,6 +127,7 @@ class VehicleConfig: public ConfigTaskWidget
         double  getMixerVectorValue(UAVDataObject* mixer, int channel, MixerVectorElem elementName);
         void    setMixerVectorValue(UAVDataObject* mixer, int channel, MixerVectorElem elementName, double value);
         void    resetMixerVector(UAVDataObject* mixer, int channel);
+        void    resetMotorAndServoMixers(UAVDataObject* mixer);
         QString getMixerType(UAVDataObject* mixer, int channel);
         void    setMixerType(UAVDataObject* mixer, int channel, MixerTypeElem mixerType);
         double  getMixerValue(UAVDataObject* mixer, QString elementName);

@@ -42,12 +42,12 @@
 #define SET_BITS(var, shift, value, mask) var = (var & ~(mask << shift)) | (value << shift);
 
 /* Table of UAVO handles registered at compile time */
-extern struct UAVOData * __start__uavo_handles __attribute__((weak));
-extern struct UAVOData * __stop__uavo_handles __attribute__((weak));
+extern struct UAVOData * __start__uavo_handles[] __attribute__((weak));
+extern struct UAVOData * __stop__uavo_handles[] __attribute__((weak));
 
 #define UAVO_LIST_ITERATE(_item) \
-for (struct UAVOData ** _uavo_slot = &__start__uavo_handles; \
-     _uavo_slot <= &__stop__uavo_handles; \
+for (struct UAVOData ** _uavo_slot = __start__uavo_handles; \
+     _uavo_slot && _uavo_slot < __stop__uavo_handles; \
      _uavo_slot++) { \
 	struct UAVOData * _item = *_uavo_slot; \
 	if (_item == NULL) continue;
@@ -198,6 +198,10 @@ int32_t UAVObjInitialize()
 {
 	// Initialize variables
 	memset(&stats, 0, sizeof(UAVObjStats));
+
+	// Initialize the uavo handle table
+	memset(__start__uavo_handles, 0,
+		(uintptr_t)__stop__uavo_handles - (uintptr_t)__start__uavo_handles);
 
 	// Create mutex
 	mutex = xSemaphoreCreateRecursiveMutex();

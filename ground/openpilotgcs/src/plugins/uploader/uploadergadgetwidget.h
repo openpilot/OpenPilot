@@ -100,6 +100,7 @@ private slots:
     void error(QString errorString,int errorNumber);
     void info(QString infoString,int infoNumber);
     void goToBootloader(UAVObject* = NULL, bool = false);
+    void systemHalt();
     void systemReset();
     void systemBoot();
     void systemSafeBoot();

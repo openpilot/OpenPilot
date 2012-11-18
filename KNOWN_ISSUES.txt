@@ -8,3 +8,4 @@
 + XAircraft ESCs uses non-standard PPM range which may cause issues with Vehicle Wizard.
 + Spectrum Satellite Receivers setup in Radio Wizard may have wrong protocol set.
 + Old Intel 965 have an OpenGL bug that turns the QML PFD black and while.
++ [OP-691] Helicopter configuration change still resets camera/accessory mixers (some code refactoring is desired).

@@ -1032,13 +1032,7 @@ bool ConfigMultiRotorWidget::setupMultiRotorMixer(double mixerFactors[8][3])
 
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
-
-    //disable all
-    for (int channel=0; channel<(int)VehicleConfig::CHANNEL_NUMELEM; channel++)
-    {
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
-        resetMixerVector(mixer, channel);
-    }
+    resetMotorAndServoMixers(mixer);
 
     // and enable only the relevant channels:
     double pFactor = (double)m_aircraft->mrPitchMixLevel->value()/100;

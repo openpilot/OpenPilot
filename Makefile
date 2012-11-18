@@ -228,8 +228,8 @@ OPENOCD_BUILD_DIR := $(DL_DIR)/openocd-build
 
 .PHONY: openocd_install
 openocd_install: | $(DL_DIR) $(TOOLS_DIR)
-openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/openocd/0.5.0/openocd-0.5.0.tar.bz2/download
-openocd_install: OPENOCD_FILE := openocd-0.5.0.tar.bz2
+openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/openocd/0.6.1/openocd-0.6.1.tar.bz2/download
+openocd_install: OPENOCD_FILE := openocd-0.6.1.tar.bz2
 openocd_install: openocd_clean
         # download the source only if it's newer than what we already have
 	$(V1) wget -N -P "$(DL_DIR)" --trust-server-name "$(OPENOCD_URL)"
@@ -239,11 +239,19 @@ openocd_install: openocd_clean
 	$(V1) mkdir -p "$(OPENOCD_BUILD_DIR)"
 	$(V1) tar -C $(OPENOCD_BUILD_DIR) -xjf "$(DL_DIR)/$(OPENOCD_FILE)"
 
+        # apply patches
+	$(V0) @echo " PATCH        $(OPENOCD_DIR)"
+	$(V1) ( \
+	  cd $(OPENOCD_BUILD_DIR)/openocd-0.6.1 ; \
+	  patch -p1 < $(ROOT_DIR)/flight/Project/OpenOCD/0001-armv7m-remove-dummy-FP-regs-for-new-gdb.patch ; \
+	  patch -p1 < $(ROOT_DIR)/flight/Project/OpenOCD/0002-rtos-add-stm32_stlink-to-FreeRTOS-targets.patch ; \
+	)
+
         # build and install
 	$(V1) mkdir -p "$(OPENOCD_DIR)"
 	$(V1) ( \
-	  cd $(OPENOCD_BUILD_DIR)/openocd-0.5.0 ; \
-	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi ; \
+	  cd $(OPENOCD_BUILD_DIR)/openocd-0.6.1 ; \
+	  ./configure --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-stlink ; \
 	  $(MAKE) --silent ; \
 	  $(MAKE) --silent install ; \
 	)

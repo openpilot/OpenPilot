@@ -158,9 +158,9 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
     {
         myDevice->lblGitTag->setText(onBoardDescription.gitHash);
         myDevice->lblBuildDate->setText(onBoardDescription.gitDate.insert(4,"-").insert(7,"-"));
-        if (onBoardDescription.gitTag.compare("master") == 0)
+        if(onBoardDescription.gitTag.startsWith("RELEASE",Qt::CaseSensitive))
         {
-            myDevice->lblDescription->setText(QString("Firmware tag: ")+onBoardDescription.gitTag);
+            myDevice->lblDescription->setText(onBoardDescription.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Tagged officially released firmware build"));
@@ -188,7 +188,7 @@ bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
     {
         myDevice->lblGitTagL->setText(LoadedDescription.gitHash);
         myDevice->lblBuildDateL->setText( LoadedDescription.gitDate.insert(4,"-").insert(7,"-"));
-        if (LoadedDescription.gitTag.compare("master") == 0)
+        if(LoadedDescription.gitTag.startsWith("RELEASE",Qt::CaseSensitive))
         {
             myDevice->lblDescritpionL->setText(LoadedDescription.gitTag);
             myDevice->description->setText(LoadedDescription.gitTag);
@@ -302,7 +302,7 @@ void deviceWidget::loadFirmware()
             myDevice->statusLabel->setText(tr("The board has newer firmware than loaded. Are you sure you want to update?"));
             px.load(QString(":/uploader/images/warning.svg"));
         }
-        else if (LoadedDescription.gitTag.compare("master"))
+        else if(!LoadedDescription.gitTag.startsWith("RELEASE",Qt::CaseSensitive))
         {
             myDevice->statusLabel->setText(tr("The loaded firmware is untagged or custom build. Update only if it was received from a trusted source (official website or your own build)"));
             px.load(QString(":/uploader/images/warning.svg"));

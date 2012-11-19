@@ -281,6 +281,7 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
 	
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
+    resetMotorAndServoMixers(mixer);
 
     // ... and compute the matrix:
     // In order to make code a bit nicer, we assume:
@@ -288,16 +289,8 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
 
     // 1. Assign the servo/motor/none for each channel
 
-    int channel;
-    //disable all
-    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++)
-    {
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
-        resetMixerVector(mixer, channel);
-    }
-
     //motor
-    channel = m_aircraft->fwEngineChannelBox->currentIndex()-1;
+    int channel = m_aircraft->fwEngineChannelBox->currentIndex()-1;
     setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_MOTOR);
     setMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
 
@@ -359,6 +352,7 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
 	    
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
+    resetMotorAndServoMixers(mixer);
 
     // Save the curve:
     // ... and compute the matrix:
@@ -367,17 +361,10 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
 
     // 1. Assign the servo/motor/none for each channel
 
-    int channel;
     double value;
-    //disable all
-    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++)
-    {
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
-        resetMixerVector(mixer, channel);
-    }
 
     //motor
-    channel = m_aircraft->fwEngineChannelBox->currentIndex()-1;
+    int channel = m_aircraft->fwEngineChannelBox->currentIndex()-1;
     setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_MOTOR);
     setMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
 
@@ -437,6 +424,7 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
 	    
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
+    resetMotorAndServoMixers(mixer);
 
     // Save the curve:
     // ... and compute the matrix:
@@ -445,17 +433,10 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
 
     // 1. Assign the servo/motor/none for each channel
 
-    int channel;
     double value;
-    //disable all
-    for (channel=0; (unsigned int) channel < VehicleConfig::CHANNEL_NUMELEM; channel++)
-    {
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_DISABLED);
-        resetMixerVector(mixer, channel);
-    }
 
     //motor
-    channel = m_aircraft->fwEngineChannelBox->currentIndex()-1;
+    int channel = m_aircraft->fwEngineChannelBox->currentIndex()-1;
     setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_MOTOR);
     setMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
 

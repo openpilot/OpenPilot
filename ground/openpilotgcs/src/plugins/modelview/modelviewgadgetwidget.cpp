@@ -114,7 +114,7 @@ void ModelViewGadgetWidget::initializeGL()
     m_Light.setAmbientColor(Qt::lightGray);
 
     m_GlView.cameraHandle()->setDefaultUpVector(glc::Z_AXIS);
-    m_GlView.cameraHandle()->setFrontView();
+    m_GlView.cameraHandle()->setRearView();
     m_GlView.setToOrtho(true); // orthogonal view
 
     glEnable(GL_NORMALIZE);

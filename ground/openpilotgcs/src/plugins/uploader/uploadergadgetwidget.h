@@ -61,6 +61,8 @@
 using namespace OP_DFU;
 using namespace uploader;
 
+class FlightStatus;
+
 class UPLOADER_EXPORT UploaderGadgetWidget : public QWidget
 {
     Q_OBJECT
@@ -94,6 +96,7 @@ private:
      QErrorMessage * msg;
      void connectSignalSlot(QWidget * widget);
      int autoUpdateConnectTimeout;
+     FlightStatus * getFlightStatus();
 private slots:
     void onPhisicalHWConnect();
     void versionMatchCheck();

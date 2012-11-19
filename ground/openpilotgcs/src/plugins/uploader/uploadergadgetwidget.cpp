@@ -121,6 +121,18 @@ void UploaderGadgetWidget::connectSignalSlot(QWidget *widget)
     connect(qobject_cast<deviceWidget *>(widget),SIGNAL(uploadStarted()),this,SLOT(uploadStarted()));
     connect(qobject_cast<deviceWidget *>(widget),SIGNAL(uploadEnded(bool)),this,SLOT(uploadEnded(bool)));
 }
+
+FlightStatus *UploaderGadgetWidget::getFlightStatus()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objManager);
+    FlightStatus *status = dynamic_cast<FlightStatus*>(objManager->getObject(QString("FlightStatus")));
+    Q_ASSERT(status);
+    return status;
+}
+
 void UploaderGadgetWidget::onPhisicalHWConnect()
 {
     m_config->bootButton->setEnabled(false);
@@ -351,12 +363,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 
 void UploaderGadgetWidget::systemHalt()
 {
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    Q_ASSERT(pm);
-    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    Q_ASSERT(objManager);
-    FlightStatus *status = dynamic_cast<FlightStatus*>(objManager->getObject(QString("FlightStatus")));
-    Q_ASSERT(status);
+    FlightStatus* status = getFlightStatus();
 
     // The board can not be halted when in armed state.
     // If board is armed, or arming. Show message with notice.
@@ -366,7 +373,9 @@ void UploaderGadgetWidget::systemHalt()
     else {
         QMessageBox mbox(this);
         mbox.setText(QString(tr("The controller board is armed and can not be halted.\n"
-                                "Please make sure the board is not armed and then press halt again to proceed.")));
+                                "Please make sure the board is not armed and then press halt again to proceed.\n"
+                                "Or.\n"
+                                "Use the rescue option to force a firmware upgrade.")));
         mbox.setStandardButtons(QMessageBox::Ok);
         mbox.setIcon(QMessageBox::Warning);
         mbox.exec();
@@ -380,14 +389,30 @@ void UploaderGadgetWidget::systemHalt()
    */
 void UploaderGadgetWidget::systemReset()
 {
-    resetOnly = true;
-    if (dfu) {
-        delete dfu;
-        dfu = NULL;
+    FlightStatus* status = getFlightStatus();
+
+    // The board can not be reset when in armed state.
+    // If board is armed, or arming. Show message with notice.
+    if (status->getArmed() == FlightStatus::ARMED_DISARMED) {
+        resetOnly = true;
+        if (dfu) {
+            delete dfu;
+            dfu = NULL;
+        }
+        m_config->textBrowser->clear();
+        log("Board Reset initiated.");
+        goToBootloader();
     }
-    m_config->textBrowser->clear();
-    log("Board Reset initiated.");
-    goToBootloader();
+    else {
+        QMessageBox mbox(this);
+        mbox.setText(QString(tr("The controller board is armed and can not be reset.\n"
+                                "Please make sure the board is not armed and then press reset again to proceed.\n"
+                                "Or.\n"
+                                "Use the rescue option to force a firmware upgrade.")));
+        mbox.setStandardButtons(QMessageBox::Ok);
+        mbox.setIcon(QMessageBox::Warning);
+        mbox.exec();
+    }
 }
 
 void UploaderGadgetWidget::systemBoot()

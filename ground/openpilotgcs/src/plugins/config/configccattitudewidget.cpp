@@ -57,8 +57,8 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     // Connect the help button
     connect(ui->ccAttitudeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 
-    connect(ui->accelFiltering, SIGNAL(toggled(bool)), this, SLOT(setAccelFiltering(bool)));
     addUAVObjectToWidgetRelation("AttitudeSettings","ZeroDuringArming",ui->zeroGyroBiasOnArming);
+    addUAVObjectToWidgetRelation("AttitudeSettings", "AccelTau", ui->accelTauSpinnbox);
 
     addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->rollBias,AttitudeSettings::BOARDROTATION_ROLL);
     addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->pitchBias,AttitudeSettings::BOARDROTATION_PITCH);
@@ -75,8 +75,8 @@ ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
 void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject * obj) {
 
     if (!timer.isActive()) { 
-	// ignore updates that come in after the timer has expired	
-	return; 
+        // ignore updates that come in after the timer has expired
+        return;
     }
 
     Accels * accels = Accels::GetInstance(getObjectManager());
@@ -222,33 +222,14 @@ void ConfigCCAttitudeWidget::enableControls(bool enable)
     if(ui->zeroGyroBiasOnArming) {
         ui->zeroGyroBiasOnArming->setEnabled(enable);
     }
-    if(ui->accelFiltering) {
-        ui->accelFiltering->setEnabled(enable);
+    if(ui->accelTauSpinnbox) {
+        ui->accelTauSpinnbox->setEnabled(enable);
     }
     ConfigTaskWidget::enableControls(enable);
 }
 
-void ConfigCCAttitudeWidget::refreshWidgetsValues(UAVObject *obj)
-{
-    AttitudeSettings* settings = AttitudeSettings::GetInstance(getObjectManager());
-    Q_ASSERT(settings);
-    AttitudeSettings::DataFields data = settings->getData();
-    ui->accelFiltering->setChecked(data.AccelTau > 0.0f);
-
-    ConfigTaskWidget::refreshWidgetsValues(obj);
-}
-
 void ConfigCCAttitudeWidget::updateObjectsFromWidgets()
 {
-    AttitudeSettings* settings = AttitudeSettings::GetInstance(getObjectManager());
-    Q_ASSERT(settings);
-    AttitudeSettings::DataFields data = settings->getData();
-
-    data.AccelTau = ui->accelFiltering->isChecked() ? DEFAULT_ENABLED_ACCEL_TAU : 0.0f;
-
-    settings->setData(data);
-
     ConfigTaskWidget::updateObjectsFromWidgets();
-
     ui->zeroBiasProgress->setValue(0);
 }

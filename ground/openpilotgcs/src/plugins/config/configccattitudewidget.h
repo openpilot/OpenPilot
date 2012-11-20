@@ -72,9 +72,6 @@ private:
 protected:
     virtual void enableControls(bool enable);
 
-protected slots:
-    void refreshWidgetsValues(UAVObject * obj=NULL);
-
 };
 
 #endif // CCATTITUDEWIDGET_H

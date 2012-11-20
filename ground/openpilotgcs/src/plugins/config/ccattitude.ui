@@ -367,30 +367,90 @@ margin:1px;</string>
                  </spacer>
                 </item>
                 <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_2">
-                  <item>
-                   <widget class="QCheckBox" name="zeroGyroBiasOnArming">
-                    <property name="toolTip">
-                     <string>If enabled, a fast recalibration of gyro zero point will be done
+                 <widget class="QCheckBox" name="zeroGyroBiasOnArming">
+                  <property name="toolTip">
+                   <string>If enabled, a fast recalibration of gyro zero point will be done
 whenever the frame is armed. Do not move the airframe while
 arming it in that case!</string>
+                  </property>
+                  <property name="text">
+                   <string>Zero gyros while arming aircraft</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_4">
+                  <item>
+                   <widget class="QLabel" name="label_5">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Set value to 0 to disable accelerators filtering.</string>
                     </property>
                     <property name="text">
-                     <string>Zero gyros while arming aircraft</string>
+                     <string>AccelTau</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QCheckBox" name="accelFiltering">
-                    <property name="text">
-                     <string>Accel filtering</string>
+                   <spacer name="horizontalSpacer_12">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Fixed</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>10</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="accelTauSpinnbox">
+                    <property name="minimumSize">
+                     <size>
+                      <width>60</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Set value to 0 to disable accelerators filtering.</string>
+                    </property>
+                    <property name="decimals">
+                     <number>2</number>
+                    </property>
+                    <property name="maximum">
+                     <double>0.200000000000000</double>
+                    </property>
+                    <property name="singleStep">
+                     <double>0.010000000000000</double>
                     </property>
                    </widget>
                   </item>
                  </layout>
                 </item>
                 <item>
-                 <spacer name="horizontalSpacer_6">
+                 <spacer name="horizontalSpacer_11">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>

@@ -402,7 +402,7 @@ arming it in that case!</string>
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Set value to 0 to disable accelerators filtering.</string>
+                     <string/>
                     </property>
                     <property name="text">
                      <string>AccelTau</string>
@@ -434,7 +434,16 @@ arming it in that case!</string>
                      </size>
                     </property>
                     <property name="toolTip">
-                     <string>Set value to 0 to disable accelerators filtering.</string>
+                     <string>Accelerometer filtering.
+
+Sets the amount of lowpass filtering of accelerometer data 
+for the attitude estimation. Higher values apply a stronger 
+filter, which may help with drifting in attitude mode.
+
+Range: 0.00 - 0.20, Good starting value: 0.05 - 0.10
+Start low and raise until drift stops.
+
+A setting of 0.00 disables the filter.</string>
                     </property>
                     <property name="decimals">
                      <number>2</number>

@@ -68,6 +68,7 @@ private:
     static const int MIXER_TYPE_DISABLED = 0;
     static const int MIXER_TYPE_MOTOR = 1;
     static const int MIXER_TYPE_SERVO = 2;
+    static const float DEFAULT_ENABLED_ACCEL_TAU = 0.1;
 
     VehicleConfigurationSource *m_configSource;
     UAVObjectManager *m_uavoManager;

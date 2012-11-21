@@ -111,7 +111,7 @@
             <x>0</x>
             <y>0</y>
             <width>750</width>
-            <height>466</height>
+            <height>483</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -380,6 +380,86 @@ arming it in that case!</string>
                 </item>
                 <item>
                  <spacer name="horizontalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_4">
+                  <item>
+                   <widget class="QLabel" name="label_5">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string/>
+                    </property>
+                    <property name="text">
+                     <string>AccelTau</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_12">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Fixed</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>10</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="accelTauSpinbox">
+                    <property name="minimumSize">
+                     <size>
+                      <width>60</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Accelerometer filtering.
+
+Sets the amount of lowpass filtering of accelerometer data 
+for the attitude estimation. Higher values apply a stronger 
+filter, which may help with drifting in attitude mode.
+
+Range: 0.00 - 0.20, Good starting value: 0.05 - 0.10
+Start low and raise until drift stops.
+
+A setting of 0.00 disables the filter.</string>
+                    </property>
+                    <property name="decimals">
+                     <number>2</number>
+                    </property>
+                    <property name="maximum">
+                     <double>0.200000000000000</double>
+                    </property>
+                    <property name="singleStep">
+                     <double>0.010000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_11">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>

@@ -58,7 +58,7 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
     connect(ui->ccAttitudeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 
     addUAVObjectToWidgetRelation("AttitudeSettings","ZeroDuringArming",ui->zeroGyroBiasOnArming);
-    addUAVObjectToWidgetRelation("AttitudeSettings", "AccelTau", ui->accelTauSpinnbox);
+    addUAVObjectToWidgetRelation("AttitudeSettings", "AccelTau", ui->accelTauSpinbox);
 
     addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->rollBias,AttitudeSettings::BOARDROTATION_ROLL);
     addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->pitchBias,AttitudeSettings::BOARDROTATION_PITCH);
@@ -222,8 +222,8 @@ void ConfigCCAttitudeWidget::enableControls(bool enable)
     if(ui->zeroGyroBiasOnArming) {
         ui->zeroGyroBiasOnArming->setEnabled(enable);
     }
-    if(ui->accelTauSpinnbox) {
-        ui->accelTauSpinnbox->setEnabled(enable);
+    if(ui->accelTauSpinbox) {
+        ui->accelTauSpinbox->setEnabled(enable);
     }
     ConfigTaskWidget::enableControls(enable);
 }

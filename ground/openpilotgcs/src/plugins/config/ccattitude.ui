@@ -426,7 +426,7 @@ arming it in that case!</string>
                    </spacer>
                   </item>
                   <item>
-                   <widget class="QDoubleSpinBox" name="accelTauSpinnbox">
+                   <widget class="QDoubleSpinBox" name="accelTauSpinbox">
                     <property name="minimumSize">
                      <size>
                       <width>60</width>

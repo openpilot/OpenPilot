@@ -372,10 +372,9 @@ void UploaderGadgetWidget::systemHalt()
     }
     else {
         QMessageBox mbox(this);
-        mbox.setText(QString(tr("The controller board is armed and can not be halted.\n"
-                                "Please make sure the board is not armed and then press halt again to proceed.\n"
-                                "Or.\n"
-                                "Use the rescue option to force a firmware upgrade.")));
+        mbox.setText(QString(tr("The controller board is armed and can not be halted.\n\n"
+                                "Please make sure the board is not armed and then press halt again to proceed\n"
+                                "or use the rescue option to force a firmware upgrade.")));
         mbox.setStandardButtons(QMessageBox::Ok);
         mbox.setIcon(QMessageBox::Warning);
         mbox.exec();
@@ -405,10 +404,9 @@ void UploaderGadgetWidget::systemReset()
     }
     else {
         QMessageBox mbox(this);
-        mbox.setText(QString(tr("The controller board is armed and can not be reset.\n"
-                                "Please make sure the board is not armed and then press reset again to proceed.\n"
-                                "Or.\n"
-                                "Use the rescue option to force a firmware upgrade.")));
+        mbox.setText(QString(tr("The controller board is armed and can not be reset.\n\n"
+                                "Please make sure the board is not armed and then press reset again to proceed\n"
+                                "or power cycle to force a board reset.")));
         mbox.setStandardButtons(QMessageBox::Ok);
         mbox.setIcon(QMessageBox::Warning);
         mbox.exec();

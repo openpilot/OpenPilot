@@ -3,7 +3,7 @@
         <description>Settings for the @ref FixedWingPathFollowerModule</description>
 
         <!-- these coefficients control desired movement in airspace -->
-        <field name="AirSpeedMax" units="m/s" type="float" elements="1" defaultvalue="20"/>
+        <field name="AirSpeedMax" units="m/s" type="float" elements="1" defaultvalue="30"/>
                 <!-- Vne, i.e. maximum airspeed the airframe can handle -->
         <field name="CruiseSpeed" units="m/s" type="float" elements="1" defaultvalue="20"/>
                 <!-- Maximum speed the autopilot will try to achieve, usually for long distances -->

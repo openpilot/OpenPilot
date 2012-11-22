@@ -62,47 +62,33 @@ $(DATAFIELDS)
  * @brief Populate a $(NAME)Data object
  * @param[out] dataOut 
  */
-static inline __attribute__((always_inline))
-int32_t $(NAME)Get($(NAME)Data *dataOut) { return UAVObjGetData($(NAME)Handle(), dataOut); }
+static inline int32_t $(NAME)Get($(NAME)Data *dataOut) { return UAVObjGetData($(NAME)Handle(), dataOut); }
 
-static inline __attribute__((always_inline))
-int32_t $(NAME)Set(const $(NAME)Data *dataIn) { return UAVObjSetData($(NAME)Handle(), dataIn); }
+static inline int32_t $(NAME)Set(const $(NAME)Data *dataIn) { return UAVObjSetData($(NAME)Handle(), dataIn); }
 
-static inline __attribute__((always_inline))
-int32_t $(NAME)InstGet(uint16_t instId, $(NAME)Data *dataOut) { return UAVObjGetInstanceData($(NAME)Handle(), instId, dataOut); }
+static inline int32_t $(NAME)InstGet(uint16_t instId, $(NAME)Data *dataOut) { return UAVObjGetInstanceData($(NAME)Handle(), instId, dataOut); }
 
-static inline __attribute__((always_inline))
-int32_t $(NAME)InstSet(uint16_t instId, const $(NAME)Data *dataIn) { return UAVObjSetInstanceData($(NAME)Handle(), instId, dataIn); }
+static inline int32_t $(NAME)InstSet(uint16_t instId, const $(NAME)Data *dataIn) { return UAVObjSetInstanceData($(NAME)Handle(), instId, dataIn); }
 
-static inline __attribute__((always_inline))
-int32_t $(NAME)ConnectQueue(xQueueHandle queue) { return UAVObjConnectQueue($(NAME)Handle(), queue, EV_MASK_ALL_UPDATES); }
+static inline int32_t $(NAME)ConnectQueue(xQueueHandle queue) { return UAVObjConnectQueue($(NAME)Handle(), queue, EV_MASK_ALL_UPDATES); }
 
-static inline __attribute__((always_inline))
-int32_t $(NAME)ConnectCallback(UAVObjEventCallback cb) { return UAVObjConnectCallback($(NAME)Handle(), cb, EV_MASK_ALL_UPDATES); }
+static inline int32_t $(NAME)ConnectCallback(UAVObjEventCallback cb) { return UAVObjConnectCallback($(NAME)Handle(), cb, EV_MASK_ALL_UPDATES); }
 
-static inline __attribute__((always_inline))
-uint16_t $(NAME)CreateInstance() { return UAVObjCreateInstance($(NAME)Handle(), &$(NAME)SetDefaults); }
+static inline uint16_t $(NAME)CreateInstance() { return UAVObjCreateInstance($(NAME)Handle(), &$(NAME)SetDefaults); }
 
-static inline __attribute__((always_inline))
-void $(NAME)RequestUpdate() { UAVObjRequestUpdate($(NAME)Handle()); }
+static inline void $(NAME)RequestUpdate() { UAVObjRequestUpdate($(NAME)Handle()); }
 
-static inline __attribute__((always_inline))
-void $(NAME)RequestInstUpdate(uint16_t instId) { UAVObjRequestInstanceUpdate($(NAME)Handle(), instId); }
+static inline void $(NAME)RequestInstUpdate(uint16_t instId) { UAVObjRequestInstanceUpdate($(NAME)Handle(), instId); }
 
-static inline __attribute__((always_inline))
-void $(NAME)Updated() { UAVObjUpdated($(NAME)Handle()); }
+static inline void $(NAME)Updated() { UAVObjUpdated($(NAME)Handle()); }
 
-static inline __attribute__((always_inline))
-void $(NAME)InstUpdated(uint16_t instId) { UAVObjInstanceUpdated($(NAME)Handle(), instId); }
+static inline void $(NAME)InstUpdated(uint16_t instId) { UAVObjInstanceUpdated($(NAME)Handle(), instId); }
 
-static inline __attribute__((always_inline))
-int32_t $(NAME)GetMetadata(UAVObjMetadata *dataOut) { return UAVObjGetMetadata($(NAME)Handle(), dataOut); }
+static inline int32_t $(NAME)GetMetadata(UAVObjMetadata *dataOut) { return UAVObjGetMetadata($(NAME)Handle(), dataOut); }
 
-static inline __attribute__((always_inline))
-int32_t $(NAME)SetMetadata(const UAVObjMetadata *dataIn) { return UAVObjSetMetadata($(NAME)Handle(), dataIn); }
+static inline int32_t $(NAME)SetMetadata(const UAVObjMetadata *dataIn) { return UAVObjSetMetadata($(NAME)Handle(), dataIn); }
 
-static inline __attribute__((always_inline))
-int8_t $(NAME)ReadOnly() { return UAVObjReadOnly($(NAME)Handle()); }
+static inline int8_t $(NAME)ReadOnly() { return UAVObjReadOnly($(NAME)Handle()); }
 
 // Field information
 $(DATAFIELDINFO)

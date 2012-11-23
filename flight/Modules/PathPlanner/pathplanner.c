@@ -357,7 +357,7 @@ static uint8_t conditionDistanceToTarget() {
 				+powf( waypoint.Position[1]-positionActual.East ,2));
 	}
 
-	if (distance>=pathAction.ConditionParameters[0]) {
+	if (distance<=pathAction.ConditionParameters[0]) {
 		return true;
 	}
 	return false;

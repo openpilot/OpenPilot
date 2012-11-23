@@ -293,7 +293,7 @@ static void updatePathVelocity()
 			break;
 	}
 	// make sure groundspeed is not zero
-	if (groundspeed<1e-6) groundspeed=1e-6;
+	if (groundspeed<1e-2) groundspeed=1e-2;
 	
 	// calculate velocity - can be zero if waypoints are too close
 	VelocityDesiredData velocityDesired;

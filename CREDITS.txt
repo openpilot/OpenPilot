@@ -163,7 +163,7 @@ M: Fixed Wing support CC3D
 
 N: Oleg Semyonov
 D: Core Developer & Project organisation
-D: Camera Gimbal work
+M: TxPID module
 M: Common part of multi-platform packaging system
 M: Windows NSIS Installer
 

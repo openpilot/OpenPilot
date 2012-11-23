@@ -67,7 +67,7 @@ void PIOS_MS5611_Init(const struct pios_ms5611_cfg * cfg, int32_t i2c_device)
 
 	oversampling = cfg->oversampling;
 	dev_cfg = cfg;	// Store cfg before enabling interrupt
-
+        PIOS_I2C_lock(i2c_id);
 	PIOS_MS5611_WriteCommand(MS5611_RESET);
 	PIOS_DELAY_WaitmS(20);			
 
@@ -78,6 +78,8 @@ void PIOS_MS5611_Init(const struct pios_ms5611_cfg * cfg, int32_t i2c_device)
 		PIOS_MS5611_Read(MS5611_CALIB_ADDR + i * 2, data, 2);
 		CalibData.C[i] = (data[0] << 8) | data[1];
 	}
+       	PIOS_I2C_release(i2c_id);
+
 }
 
 /**
@@ -87,6 +89,7 @@ void PIOS_MS5611_Init(const struct pios_ms5611_cfg * cfg, int32_t i2c_device)
 */
 int32_t PIOS_MS5611_StartADC(ConversionTypeTypeDef Type)
 {
+        PIOS_I2C_lock(i2c_id);
 	/* Start the conversion */
 	if (Type == TemperatureConv) {
 		while (PIOS_MS5611_WriteCommand(MS5611_TEMP_ADDR + oversampling) != 0)
@@ -97,7 +100,7 @@ int32_t PIOS_MS5611_StartADC(ConversionTypeTypeDef Type)
 	}
 
 	CurrentRead = Type;
-	
+	PIOS_I2C_release(i2c_id);
 	return 0;
 }
 
@@ -134,11 +137,16 @@ int32_t PIOS_MS5611_ReadADC(void)
 	Data[2] = 0;
 	
 	static int64_t deltaTemp;
-
+        static int32_t ret;
+        
 	/* Read and store the 16bit result */
 	if (CurrentRead == TemperatureConv) {
 		/* Read the temperature conversion */
-		if (PIOS_MS5611_Read(MS5611_ADC_READ, Data, 3) != 0)
+                PIOS_I2C_lock(i2c_id);    
+                ret = PIOS_MS5611_Read(MS5611_ADC_READ, Data, 3);
+                PIOS_I2C_release(i2c_id);
+    
+		if ( ret != 0)
 			return -1;
 
 		RawTemperature = (Data[0] << 16) | (Data[1] << 8) | Data[2];
@@ -149,9 +157,11 @@ int32_t PIOS_MS5611_ReadADC(void)
 	} else {	
 		int64_t Offset;
 		int64_t Sens;
-
 		/* Read the pressure conversion */
-		if (PIOS_MS5611_Read(MS5611_ADC_READ, Data, 3) != 0)
+                PIOS_I2C_lock(i2c_id);    
+                ret = PIOS_MS5611_Read(MS5611_ADC_READ, Data, 3);
+                PIOS_I2C_release(i2c_id);
+		if (ret != 0)
 			return -1;
 		RawPressure = ((Data[0] << 16) | (Data[1] << 8) | Data[2]);
 		
@@ -245,16 +255,20 @@ int32_t PIOS_MS5611_Test()
 	int32_t cur_value = 0;
 
 	cur_value = Temperature;
+        PIOS_I2C_lock(i2c_id);
 	PIOS_MS5611_StartADC(TemperatureConv);
 	PIOS_DELAY_WaitmS(5);
 	PIOS_MS5611_ReadADC();
+        PIOS_I2C_release(i2c_id);
 	if (cur_value == Temperature)
 		return -1;
 
 	cur_value=Pressure;
+        PIOS_I2C_lock(i2c_id);
 	PIOS_MS5611_StartADC(PressureConv);
 	PIOS_DELAY_WaitmS(26);
 	PIOS_MS5611_ReadADC();
+        PIOS_I2C_release(i2c_id);
 	if (cur_value == Pressure)
 		return -1;
 	

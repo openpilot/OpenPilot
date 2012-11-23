@@ -69,7 +69,8 @@ extern int32_t PIOS_I2C_Transfer_Callback(uint32_t i2c_id, const struct pios_i2c
 extern void PIOS_I2C_EV_IRQ_Handler(uint32_t i2c_id);
 extern void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id);
 extern void PIOS_I2C_GetDiagnostics(struct pios_i2c_fault_history * data, uint8_t * error_counts);
-
+extern int32_t PIOS_I2C_lock(uint32_t i2c_id);
+extern void PIOS_I2C_release(uint32_t i2c_id);
 #endif /* PIOS_I2C_H */
 
 /**

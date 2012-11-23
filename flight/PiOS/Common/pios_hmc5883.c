@@ -60,8 +60,8 @@ void PIOS_HMC5883_Init(const struct pios_hmc5883_cfg * cfg)
 
 	int32_t val = PIOS_HMC5883_Config(cfg);
 	
-	PIOS_Assert(val == 0);
-	
+	//PIOS_Assert(val == 0);
+	 
 	pios_hmc5883_data_ready = false;
 }
 
@@ -245,6 +245,7 @@ bool PIOS_HMC5883_NewDataAvailable(void)
  */
 static int32_t PIOS_HMC5883_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 {
+        int32_t res;
 	uint8_t addr_buffer[] = {
 		address,
 	};
@@ -266,8 +267,12 @@ static int32_t PIOS_HMC5883_Read(uint8_t address, uint8_t * buffer, uint8_t len)
 			.buf = buffer,
 		}
 	};
-	
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+        
+        PIOS_I2C_lock(PIOS_I2C_MAIN_ADAPTER);
+	res = PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+        PIOS_I2C_release(PIOS_I2C_MAIN_ADAPTER);
+        
+        return res;
 }
 
 /**
@@ -280,7 +285,8 @@ static int32_t PIOS_HMC5883_Read(uint8_t address, uint8_t * buffer, uint8_t len)
  */
 static int32_t PIOS_HMC5883_Write(uint8_t address, uint8_t buffer)
 {
-	uint8_t data[] = {
+        int32_t res;
+        uint8_t data[] = {
 		address,
 		buffer,
 	};
@@ -295,8 +301,12 @@ static int32_t PIOS_HMC5883_Write(uint8_t address, uint8_t buffer)
 		}
 		,
 	};
-	;
-	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+	
+        PIOS_I2C_lock(PIOS_I2C_MAIN_ADAPTER);
+        res = PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
+        PIOS_I2C_release(PIOS_I2C_MAIN_ADAPTER);
+        
+        return res;
 }
 
 /**
@@ -320,7 +330,7 @@ int32_t PIOS_HMC5883_Test(void)
 	PIOS_HMC5883_ReadID((uint8_t *)id);
 	if((id[0] != 'H') || (id[1] != '4') || (id[2] != '3')) // Expect H43
 		return -1;
-	
+	//return 0;
 	/* Backup existing configuration */
 	if (PIOS_HMC5883_Read(PIOS_HMC5883_CONFIG_REG_A,registers,3) != 0)
 		return -1;

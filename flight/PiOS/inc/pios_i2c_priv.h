@@ -91,7 +91,7 @@ struct pios_i2c_adapter {
 #else
 	uint8_t busy;
 #endif
-
+        xSemaphoreHandle sem_lock;
 	bool bus_error;
 	bool nack;
 

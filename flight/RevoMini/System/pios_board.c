@@ -116,7 +116,9 @@ static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
 };
 
 static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
+#ifdef PIOS_HMC5883_HAS_GPIOS
 	.exti_cfg = &pios_exti_hmc5883_cfg,
+#endif
 	.M_ODR = PIOS_HMC5883_ODR_75,
 	.Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL,
 	.Gain = PIOS_HMC5883_GAIN_1_9,

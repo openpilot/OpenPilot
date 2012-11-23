@@ -928,6 +928,8 @@ int32_t PIOS_I2C_Init(uint32_t * i2c_id, const struct pios_i2c_adapter_cfg * cfg
 	i2c_adapter->cfg = cfg;
 
 #ifdef USE_FREERTOS
+        vSemaphoreCreateBinary(i2c_adapter->sem_lock);
+
 	/* 
 	 * Must be done prior to calling i2c_adapter_fsm_init()
 	 * since the sem_ready mutex is used in the initial state.
@@ -1229,6 +1231,34 @@ void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id)
 		i2c_adapter_inject_event(i2c_adapter, I2C_EVENT_BUS_ERROR);
 	}	
 }
+
+int32_t PIOS_I2C_lock(uint32_t i2c_id)
+{
+	struct pios_i2c_adapter * i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
+	
+        bool valid = PIOS_I2C_validate(i2c_adapter);
+	PIOS_Assert(valid);
+        	/* Lock the bus */
+	bool semaphore_success = true;
+        portTickType timeout;
+	timeout = 500 / portTICK_RATE_MS;
+	semaphore_success = (xSemaphoreTake(i2c_adapter->sem_lock, timeout) == pdTRUE);
+        if(semaphore_success)
+            return 0;
+        return -1;
+}
+
+void PIOS_I2C_release(uint32_t i2c_id)
+{
+	struct pios_i2c_adapter * i2c_adapter = (struct pios_i2c_adapter *)i2c_id;
+
+	bool valid = PIOS_I2C_validate(i2c_adapter);
+	PIOS_Assert(valid);
+        xSemaphoreGive(i2c_adapter->sem_lock);
+}               
+
+
+
 
 #endif
 

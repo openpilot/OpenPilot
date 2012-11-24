@@ -8,7 +8,7 @@
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
     <SettingsWindowHeight>700</SettingsWindowHeight>
     <SettingsWindowWidth>800</SettingsWindowWidth>
-    <OverrideLanguage>en_US</OverrideLanguage>
+    <OverrideLanguage>C</OverrideLanguage>
     <UDPMirror>false</UDPMirror>
     <Description>Wide configuration</Description>
     <Details>Default configuration built for wide screens (17"up)</Details>

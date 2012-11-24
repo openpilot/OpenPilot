@@ -1,9 +1,14 @@
 ﻿Short summary of changes.  For a complete list see the git log.
 
+2012-11-17
+Advanced camera stabilization features.
+They include optional manual control input filtering (moved from camera
+stabilization to manual control input and now available also for main controls),
+optional airframe attitude filtering used by camera stabilization, and optional
+camera actuator feed forward to improve gimbal response.
+
 2012-11-12
 Implemented smoothing filter for accelerometer data.
-
-2012-11-11
 Added support for Mode 3 and Mode 4 to the TX Configuration Wizard.
 
 --- RELEASE-12.10.1 ---

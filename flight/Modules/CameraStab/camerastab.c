@@ -57,7 +57,6 @@
 // Configuration
 //
 #define SAMPLE_PERIOD_MS		10
-#define BOOT_DELAY			7000
 
 // Private types
 
@@ -213,23 +212,20 @@ static void attitudeUpdated(UAVObjEvent* ev)
 			applyFeedForward(i, dT, &attitude, &cameraStab);
 #endif
 
-		// set output channels (but wait BOOT_DELAY after board reset)
+		// set output channels
 		float output = bound((attitude + csd->inputs[i]) / cameraStab.OutputRange[i], 1.0f);
-		if (thisSysTime > (portTICK_RATE_MS * BOOT_DELAY )) {
-
-			switch (i) {
-			case CAMERASTABSETTINGS_INPUT_ROLL:
-				CameraDesiredRollSet(&output);
-				break;
-			case CAMERASTABSETTINGS_INPUT_PITCH:
-				CameraDesiredPitchSet(&output);
-				break;
-			case CAMERASTABSETTINGS_INPUT_YAW:
-				CameraDesiredYawSet(&output);
-				break;
-			default:
-				PIOS_Assert(0);
-			}
+		switch (i) {
+		case CAMERASTABSETTINGS_INPUT_ROLL:
+			CameraDesiredRollSet(&output);
+			break;
+		case CAMERASTABSETTINGS_INPUT_PITCH:
+			CameraDesiredPitchSet(&output);
+			break;
+		case CAMERASTABSETTINGS_INPUT_YAW:
+			CameraDesiredYawSet(&output);
+			break;
+		default:
+			PIOS_Assert(0);
 		}
 	}
 }

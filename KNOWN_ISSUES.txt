@@ -1,7 +1,10 @@
+Here is a list of some known unresolved issues. If an issue has JIRA ID [OP-XXX], you may track it using the
+following URL: http://bugs.openpilot.org/browse/OP-XXX
+
 + Missing Translations, use English.
 + Radio Wizard confused by a reversed throttle, fix it on your transmitter before starting wizard.
 + Radio Wizard Throttle display does not show full range properly.
-+ [Windows 8] USB Driver is broken.     
++ [Windows 8] USB Driver is broken.
 + Firmware Update Instructions on Firmware Tab not entirely accurate for all upgrade paths.
 + Tricopter's using Vehicle Wizard need to check servo does not need reversed manually.
 + XAircraft ESCs uses non-standard PPM range which may cause issues with Vehicle Wizard.

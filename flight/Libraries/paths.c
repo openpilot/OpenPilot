@@ -176,6 +176,7 @@ static void path_circle(float * start_point, float * end_point, float * cur_poin
 	float radius_north, radius_east, diff_north, diff_east;
 	float radius,cradius;
 	float normal[2];
+	float progress;
 
 	// Radius
 	radius_north = end_point[0] - start_point[0];
@@ -185,8 +186,8 @@ static void path_circle(float * start_point, float * end_point, float * cur_poin
 	diff_north = cur_point[0] - end_point[0];
 	diff_east = cur_point[1] - end_point[1];
 
-	radius = sqrtf( radius_north * radius_north + radius_east * radius_east );
-	cradius = sqrtf(  diff_north * diff_north   +   diff_east * diff_east );
+	radius = sqrtf( powf(radius_north,2) + powf(radius_east,2) );
+	cradius = sqrtf( powf(diff_north,2) + powf(diff_east,2) );
 
 	if (cradius < 1e-6) {
 		// cradius is zero, just fly somewhere and make sure correction is still a normal
@@ -209,7 +210,18 @@ static void path_circle(float * start_point, float * end_point, float * cur_poin
 		normal[1] = -diff_north / cradius;
 	}
 	
-	status->fractional_progress = (clockwise?1:-1) * atan2f( diff_north, diff_east) - atan2f( radius_north, radius_east);
+
+	// normalize progress to 0..1
+	progress = (atan2f( diff_north, diff_east) - atan2f( radius_north, radius_east) + M_PI)/(2*M_PI);
+
+	if(progress>1)
+		progress-=1.0;
+
+	if(clockwise)
+	{
+		progress=1-progress;
+	}
+	status->fractional_progress = progress;
 
 	// error is current radius minus wanted radius - positive if too close
 	status->error = radius - cradius;

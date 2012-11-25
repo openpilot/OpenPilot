@@ -351,11 +351,26 @@ static void updatePathVelocity()
 	struct path_status progress;
 	
 	path_progress(pathDesired.Start, pathDesired.End, cur, &progress, pathDesired.Mode);
-	
-	float groundspeed = pathDesired.StartingVelocity + 
-	    (pathDesired.EndingVelocity - pathDesired.StartingVelocity) * bound ( progress.fractional_progress,0,1);
-	if(progress.fractional_progress > 1)
-		groundspeed = 0;
+
+	float groundspeed;
+	switch (pathDesired.Mode) {
+		case PATHDESIRED_MODE_FLYCIRCLERIGHT:
+		case PATHDESIRED_MODE_DRIVECIRCLERIGHT:
+		case PATHDESIRED_MODE_FLYCIRCLELEFT:
+		case PATHDESIRED_MODE_DRIVECIRCLELEFT:
+			groundspeed = pathDesired.EndingVelocity;
+			break;
+		case PATHDESIRED_MODE_FLYENDPOINT:
+		case PATHDESIRED_MODE_DRIVEENDPOINT:
+		case PATHDESIRED_MODE_FLYVECTOR:
+		case PATHDESIRED_MODE_DRIVEVECTOR:
+		default:
+			groundspeed = pathDesired.StartingVelocity + (pathDesired.EndingVelocity - pathDesired.StartingVelocity) *
+				bound(progress.fractional_progress,0,1);
+			if(progress.fractional_progress > 1)
+				groundspeed = 0;
+			break;
+	}
 	
 	VelocityDesiredData velocityDesired;
 	velocityDesired.North = progress.path_direction[0] * groundspeed;

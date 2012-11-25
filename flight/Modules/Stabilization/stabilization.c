@@ -359,14 +359,14 @@ static void stabilizationTask(void* parameters)
 		actuatorDesired.Throttle = stabDesired.Throttle;
 
 		// Suppress desired output while disarmed or throttle low, for configured axis
-		if(flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED || stabDesired.Throttle < 0) {
-			if(lowThrottleZeroAxis[0])
+		if (flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED || stabDesired.Throttle < 0) {
+			if (lowThrottleZeroAxis[0])
 				actuatorDesired.Roll = 0;
 
-			if(lowThrottleZeroAxis[1])
+			if (lowThrottleZeroAxis[1])
 				actuatorDesired.Pitch = 0;
 
-			if(lowThrottleZeroAxis[2])
+			if (lowThrottleZeroAxis[2])
 				actuatorDesired.Yaw = 0;
 		}
 
@@ -478,7 +478,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	lowThrottleZeroAxis[0] = settings.LowThrottleZeroAxis[STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_ROLL] == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
 	lowThrottleZeroAxis[1] = settings.LowThrottleZeroAxis[STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_PITCH] == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
 	lowThrottleZeroAxis[2] = settings.LowThrottleZeroAxis[STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_YAW] == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
-	
+
 	// The dT has some jitter iteration to iteration that we don't want to
 	// make thie result unpredictable.  Still, it's nicer to specify the constant
 	// based on a time (in ms) rather than a fixed multiplier.  The error between

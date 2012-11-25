@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>786</width>
-    <height>745</height>
+    <height>791</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -64,8 +64,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>745</width>
-            <height>687</height>
+            <width>762</width>
+            <height>658</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -884,7 +884,7 @@ value.</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>162</height>
+               <height>187</height>
               </size>
              </property>
              <property name="title">
@@ -978,7 +978,87 @@ margin:1px;</string>
                 </property>
                </widget>
               </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>AF Response Time</string>
+                </property>
+               </widget>
+              </item>
               <item row="1" column="1">
+               <widget class="QSpinBox" name="rollResponseTime">
+                <property name="toolTip">
+                 <string>Roll axis attitude filter response time
+
+Range: 0-250ms, 0 disables filter (default).
+
+Smoothes estimated airframe attitude used by camera stabilization.</string>
+                </property>
+                <property name="maximum">
+                 <number>250</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:ResponseTime</string>
+                  <string>element:Roll</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QSpinBox" name="pitchResponseTime">
+                <property name="toolTip">
+                 <string>Pitch axis attitude filter response time
+
+Range: 0-250ms, 0 disables filter (default).
+
+Smoothes estimated airframe attitude used by camera stabilization.</string>
+                </property>
+                <property name="maximum">
+                 <number>250</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:ResponseTime</string>
+                  <string>element:Pitch</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3">
+               <widget class="QSpinBox" name="yawResponseTime">
+                <property name="toolTip">
+                 <string>Yaw axis attitude filter response time
+
+Range: 0-250ms, 0 disables filter (default).
+
+Smoothes estimated airframe attitude used by camera stabilization.</string>
+                </property>
+                <property name="maximum">
+                 <number>250</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:ResponseTime</string>
+                  <string>element:Yaw</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>FF Servo Acceleration</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
                <widget class="QSpinBox" name="rollFeedForward">
                 <property name="toolTip">
                  <string>Roll servo feed forward acceleration
@@ -1003,7 +1083,7 @@ Too high value may burn your servo!</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="2">
+              <item row="2" column="2">
                <widget class="QSpinBox" name="pitchFeedForward">
                 <property name="toolTip">
                  <string>Pitch servo feed forward acceleration
@@ -1028,7 +1108,7 @@ Too high value may burn your servo!</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="3">
+              <item row="2" column="3">
                <widget class="QSpinBox" name="yawFeedForward">
                 <property name="toolTip">
                  <string>Yaw servo feed forward acceleration
@@ -1053,14 +1133,166 @@ Too high value may burn your servo!</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="0">
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_48">
+                <property name="text">
+                 <string>FF Accel Time Constant</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="rollAccelTime">
+                <property name="toolTip">
+                 <string>Roll servo feed forward acceleration time constant
+
+Range: 0-50ms, default is 5.</string>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:AccelTime</string>
+                  <string>element:Roll</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="2">
+               <widget class="QSpinBox" name="pitchAccelTime">
+                <property name="toolTip">
+                 <string>Pitch servo feed forward acceleration time constant
+
+Range: 0-50ms, default is 5.</string>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:AccelTime</string>
+                  <string>element:Pitch</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="3">
+               <widget class="QSpinBox" name="yawAccelTime">
+                <property name="toolTip">
+                 <string>Yaw servo feed forward acceleration time constant
+
+Range: 0-50ms, default is 5.</string>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:AccelTime</string>
+                  <string>element:Yaw</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>FF Decel Time Constant</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QSpinBox" name="rollDecelTime">
+                <property name="toolTip">
+                 <string>Roll servo feed forward deceleration time constant
+
+Range: 0-50ms, default is 5.</string>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:DecelTime</string>
+                  <string>element:Roll</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="2">
+               <widget class="QSpinBox" name="pitchDecelTime">
+                <property name="toolTip">
+                 <string>Pitch servo feed forward deceleration time constant
+
+Range: 0-50ms, default is 5.</string>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:DecelTime</string>
+                  <string>element:Pitch</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="3">
+               <widget class="QSpinBox" name="yawDecelTime">
+                <property name="toolTip">
+                 <string>Yaw servo feed forward deceleration time constant
+
+Range: 0-50ms, default is 5.</string>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:DecelTime</string>
+                  <string>element:Yaw</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
                <widget class="QLabel" name="label_47">
                 <property name="text">
                  <string>Gimbal Type:</string>
                 </property>
                </widget>
               </item>
-              <item row="2" column="1">
+              <item row="5" column="1">
                <widget class="QComboBox" name="gimbalType">
                 <property name="focusPolicy">
                  <enum>Qt::StrongFocus</enum>
@@ -1084,105 +1316,14 @@ Used to limit feed forward acceleration at extreme angles.</string>
                 </item>
                </widget>
               </item>
-              <item row="2" column="2">
-               <widget class="QLabel" name="label_48">
-                <property name="text">
-                 <string>FF Accel Time Constant</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="3">
-               <widget class="QSpinBox" name="accelTime">
-                <property name="toolTip">
-                 <string>Feed forward acceleration time constant
-
-Range: 0-50ms, default is 5.
-
-The same value is used for all axes.</string>
-                </property>
-                <property name="maximum">
-                 <number>50</number>
-                </property>
-                <property name="value">
-                 <number>5</number>
-                </property>
-                <property name="objrelation" stdset="0">
-                 <stringlist>
-                  <string>objname:CameraStabSettings</string>
-                  <string>fieldname:AccelTime</string>
-                  <string>buttongroup:1</string>
-                 </stringlist>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="0">
-               <widget class="QLabel" name="label_2">
-                <property name="text">
-                 <string>AF Response Time</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="1">
-               <widget class="QSpinBox" name="responseTime">
-                <property name="toolTip">
-                 <string>Attitude filter response time
-
-Range: 0-250ms, 0 disables filter (default).
-
-Smoothes estimated airframe attitude used by camera stabilization.
-The same value is used for all axes.</string>
-                </property>
-                <property name="maximum">
-                 <number>250</number>
-                </property>
-                <property name="objrelation" stdset="0">
-                 <stringlist>
-                  <string>objname:CameraStabSettings</string>
-                  <string>fieldname:ResponseTime</string>
-                  <string>buttongroup:1</string>
-                 </stringlist>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="2">
-               <widget class="QLabel" name="label_5">
-                <property name="text">
-                 <string>FF Decel Time Constant</string>
-                </property>
-               </widget>
-              </item>
-              <item row="3" column="3">
-               <widget class="QSpinBox" name="decelTime">
-                <property name="toolTip">
-                 <string>Feed forward deceleration time constant
-
-Range: 0-50ms, default is 5.
-
-The same value is used for all axes.</string>
-                </property>
-                <property name="maximum">
-                 <number>50</number>
-                </property>
-                <property name="value">
-                 <number>5</number>
-                </property>
-                <property name="objrelation" stdset="0">
-                 <stringlist>
-                  <string>objname:CameraStabSettings</string>
-                  <string>fieldname:DecelTime</string>
-                  <string>buttongroup:1</string>
-                 </stringlist>
-                </property>
-               </widget>
-              </item>
-              <item row="4" column="2">
+              <item row="5" column="2">
                <widget class="QLabel" name="label_6">
                 <property name="text">
                  <string>FF Max Acceleration</string>
                 </property>
                </widget>
               </item>
-              <item row="4" column="3">
+              <item row="5" column="3">
                <widget class="QSpinBox" name="maxAccel">
                 <property name="toolTip">
                  <string>Feed forward maximum acceleration
@@ -1206,13 +1347,6 @@ The same value is used for all axes.</string>
                 </property>
                </widget>
               </item>
-              <item row="1" column="0">
-               <widget class="QLabel" name="label_4">
-                <property name="text">
-                 <string>FF Servo Acceleration</string>
-                </property>
-               </widget>
-              </item>
              </layout>
             </widget>
            </item>
@@ -1221,37 +1355,6 @@ The same value is used for all axes.</string>
              <property name="text">
               <string>Input configuration also provides smoothing for controls. Look for RT options on the RC Input tab.</string>
              </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QGroupBox" name="groupBox_4">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>50</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="title">
-              <string>Messages</string>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <widget class="QLabel" name="message">
-                <property name="autoFillBackground">
-                 <bool>false</bool>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-             </layout>
             </widget>
            </item>
            <item>
@@ -1273,6 +1376,37 @@ The same value is used for all axes.</string>
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Messages</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QLabel" name="message">
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -1468,7 +1602,44 @@ Apply or Save button afterwards.</string>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>scrollArea</tabstop>
+  <tabstop>enableCameraStabilization</tabstop>
+  <tabstop>rollChannel</tabstop>
+  <tabstop>pitchChannel</tabstop>
+  <tabstop>yawChannel</tabstop>
+  <tabstop>rollOutputRange</tabstop>
+  <tabstop>pitchOutputRange</tabstop>
+  <tabstop>yawOutputRange</tabstop>
+  <tabstop>rollInputChannel</tabstop>
+  <tabstop>pitchInputChannel</tabstop>
+  <tabstop>yawInputChannel</tabstop>
+  <tabstop>rollStabilizationMode</tabstop>
+  <tabstop>pitchStabilizationMode</tabstop>
+  <tabstop>yawStabilizationMode</tabstop>
+  <tabstop>rollInputRange</tabstop>
+  <tabstop>pitchInputRange</tabstop>
+  <tabstop>yawInputRange</tabstop>
+  <tabstop>rollInputRate</tabstop>
+  <tabstop>pitchInputRate</tabstop>
+  <tabstop>yawInputRate</tabstop>
+  <tabstop>MaxAxisLockRate</tabstop>
+  <tabstop>rollResponseTime</tabstop>
+  <tabstop>pitchResponseTime</tabstop>
+  <tabstop>yawResponseTime</tabstop>
+  <tabstop>rollFeedForward</tabstop>
+  <tabstop>pitchFeedForward</tabstop>
+  <tabstop>yawFeedForward</tabstop>
+  <tabstop>rollAccelTime</tabstop>
+  <tabstop>pitchAccelTime</tabstop>
+  <tabstop>yawAccelTime</tabstop>
+  <tabstop>rollDecelTime</tabstop>
+  <tabstop>pitchDecelTime</tabstop>
+  <tabstop>yawDecelTime</tabstop>
+  <tabstop>gimbalType</tabstop>
+  <tabstop>maxAccel</tabstop>
+  <tabstop>camerastabilizationResetToDefaults</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>camerastabilizationSaveRAM</tabstop>
+  <tabstop>camerastabilizationSaveSD</tabstop>
  </tabstops>
  <resources>
   <include location="../coreplugin/core.qrc"/>

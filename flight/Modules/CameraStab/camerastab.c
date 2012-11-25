@@ -202,7 +202,7 @@ static void attitudeUpdated(UAVObjEvent* ev)
 
 #ifdef USE_GIMBAL_LPF
 		if (cameraStab.ResponseTime) {
-			float rt = (float)cameraStab.ResponseTime;
+			float rt = (float)cameraStab.ResponseTime[i];
 			attitude = csd->attitudeFiltered[i] = ((rt * csd->attitudeFiltered[i]) + (dT * attitude)) / (rt + dT);
 		}
 #endif
@@ -270,7 +270,7 @@ void applyFeedForward(uint8_t index, float dT, float *attitude, CameraStabSettin
 	csd->ffLastAttitude[index] = *attitude;
 	*attitude += accumulator;
 
-	float filter = (float)((accumulator > 0.0f) ? cameraStab->AccelTime : cameraStab->DecelTime) / dT;
+	float filter = (float)((accumulator > 0.0f) ? cameraStab->AccelTime[index] : cameraStab->DecelTime[index]) / dT;
 	if (filter < 1.0f)
 		filter = 1.0f;
 	accumulator -= accumulator / filter;

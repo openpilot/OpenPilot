@@ -1,8 +1,10 @@
 ﻿Short summary of changes.  For a complete list see the git log.
 
+2012-11-12
+Implemented smoothing filter for accelerometer data.
+
 2012-11-11
 Added support for Mode 3 and Mode 4 to the TX Configuration Wizard.
-Few minor bugfixes.
 
 --- RELEASE-12.10.1 ---
 

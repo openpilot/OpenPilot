@@ -39,15 +39,24 @@
 #define PIOS_COM_TELEM_USB_RX_BUF_LEN 256
 #define PIOS_COM_TELEM_USB_TX_BUF_LEN 256
 
+#define PIOS_COM_TELEM_VCP_RX_BUF_LEN 256
+#define PIOS_COM_TELEM_VCP_TX_BUF_LEN 256
+
 #define PIOS_COM_RFM22B_RF_RX_BUF_LEN 256
 #define PIOS_COM_RFM22B_RF_TX_BUF_LEN 256
 
 uint32_t pios_com_telem_usb_id = 0;
+uint32_t pios_com_telem_vcp_id = 0;
+uint32_t pios_com_telem_uart_telem_id = 0;
+uint32_t pios_com_telem_uart_flexi_id = 0;
 uint32_t pios_com_telemetry_id = 0;
+#if defined(PIOS_INCLUDE_PPM)
 uint32_t pios_ppm_rcvr_id = 0;
+#endif
 #if defined(PIOS_INCLUDE_RFM22B)
 uint32_t pios_rfm22b_id = 0;
 uint32_t pios_com_rfm22b_id = 0;
+uint32_t pios_com_radio_id = 0;
 uint32_t pios_packet_handler = 0;
 #endif
 
@@ -132,14 +141,14 @@ void PIOS_Board_Init(void) {
 	uint32_t pios_usb_id;
 	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
 
-	/* We always onfigure the usb HID port */
+	/* Configure the USB HID port */
 	{
 		uint32_t pios_usb_hid_id;
 		if (PIOS_USB_HID_Init(&pios_usb_hid_id, &pios_usb_hid_cfg, pios_usb_id)) {
 			PIOS_Assert(0);
 		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
+		uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_RX_BUF_LEN);
+		uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_USB_TX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
 		PIOS_Assert(tx_buffer);
 		if (PIOS_COM_Init(&pios_com_telem_usb_id, &pios_usb_hid_com_driver, pios_usb_hid_id,
@@ -149,54 +158,45 @@ void PIOS_Board_Init(void) {
 		}
 	}
 
-	/* Configure the requested com port */
-	switch (oplinkSettings.InputConnection)
-	{
-	case OPLINKSETTINGS_INPUTCONNECTION_HID:
-		// This is always configured
-		break;
-	case OPLINKSETTINGS_INPUTCONNECTION_VCP:
-	{
+	/* Configure the USB virtual com port (VCP) */
 #if defined(PIOS_INCLUDE_USB_CDC)
-		if (!usb_cdc_present)
-			break;
+	if (usb_cdc_present)
+	{
 		uint32_t pios_usb_cdc_id;
 		if (PIOS_USB_CDC_Init(&pios_usb_cdc_id, &pios_usb_cdc_cfg, pios_usb_id)) {
 			PIOS_Assert(0);
 		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
+		uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_VCP_RX_BUF_LEN);
+		uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_VCP_TX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
 		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telemetry_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
-											rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
-											tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
+		if (PIOS_COM_Init(&pios_com_telem_vcp_id, &pios_usb_cdc_com_driver, pios_usb_cdc_id,
+											rx_buffer, PIOS_COM_TELEM_VCP_RX_BUF_LEN,
+											tx_buffer, PIOS_COM_TELEM_VCP_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
-#endif
-		break;
 	}
-	case OPLINKSETTINGS_INPUTCONNECTION_TELEMETRY:
+#endif
+
+	/* Configure the telemetry serial port */
 	{
-		// Configure the telemetry port.
 		uint32_t pios_usart1_id;
 		if (PIOS_USART_Init(&pios_usart1_id, &pios_usart_serial_cfg)) {
 			PIOS_Assert(0);
 		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
+		uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
+		uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
 		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telemetry_id, &pios_usart_com_driver, pios_usart1_id,
+		if (PIOS_COM_Init(&pios_com_telem_uart_telem_id, &pios_usart_com_driver, pios_usart1_id,
 											rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
 											tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
-		break;
 	}
-	case OPLINKSETTINGS_INPUTCONNECTION_FLEXI:
+
+	/* Configure the flexi serial port */
 	{
-		// Configure the flexi port.
 		uint32_t pios_usart3_id;
 		if (PIOS_USART_Init(&pios_usart3_id, &pios_usart_telem_flexi_cfg)) {
 			PIOS_Assert(0);
@@ -205,13 +205,11 @@ void PIOS_Board_Init(void) {
 		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
 		PIOS_Assert(rx_buffer);
 		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telemetry_id, &pios_usart_com_driver, pios_usart3_id,
+		if (PIOS_COM_Init(&pios_com_telem_uart_flexi_id, &pios_usart_com_driver, pios_usart3_id,
 											rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
 											tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
-		break;
-	}
 	}
 
 	/* Configure PPM input */
@@ -235,9 +233,6 @@ void PIOS_Board_Init(void) {
 		if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg->slave_num, pios_rfm22b_cfg)) {
 			PIOS_Assert(0);
 		}
-
-		/* Configure the RFM22B device as coordinator or not */
-		PIOS_RFM22B_SetCoordinator(pios_rfm22b_id, oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
 
 		uint8_t *rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
 		uint8_t *tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);

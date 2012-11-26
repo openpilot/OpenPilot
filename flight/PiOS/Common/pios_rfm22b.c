@@ -578,6 +578,9 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->send_ppm = false;
 	rfm22b_dev->datarate = RFM22B_DEFAULT_RX_DATARATE;
 
+	// Initialize the com configuration callback.
+	rfm22b_dev->com_config_cb = NULL;
+
 	// Initialize the stats.
 	rfm22b_dev->stats.packets_per_sec = 0;
 	rfm22b_dev->stats.rx_good = 0;
@@ -751,6 +754,34 @@ void PIOS_RFM22B_SetCoordinator(uint32_t rfm22b_id, bool coordinator)
 
 	// Re-initialize the radio device.
 	PIOS_RFM22B_InjectEvent(rfm22b_dev, RFM22B_EVENT_INITIALIZE, false);
+}
+
+/**
+ * Set the remote com port configuration parameters.
+ * \param[in] rfm22b_id  The rfm22b device.
+ * \param[in] com_port  The remote com port
+ * \param[in] com_speed  The remote com port speed
+ */
+void PIOS_RFM22B_SetRemoteComConfig(uint32_t rfm22b_id, OPLinkSettingsOutputConnectionOptions com_port, OPLinkSettingsComSpeedOptions com_speed)
+{
+ 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return;
+	rfm22b_dev->con_packet.port = com_port;
+	rfm22b_dev->con_packet.com_speed = com_speed;
+}
+
+/**
+ * Set the com port configuration callback (to receive com configuration over the air)
+ * \param[in] rfm22b_id  The rfm22b device.
+ * \param[in] cb  A pointer to the callback function
+ */
+void PIOS_RFM22B_SetComConfigCallback(uint32_t rfm22b_id, PIOS_RFM22B_ComConfigCallback cb)
+{
+ 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return;
+	rfm22b_dev->com_config_cb = cb;
 }
 
 /**
@@ -1987,6 +2018,10 @@ static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev)
  	rfm22b_dev->min_frequency = cph->min_frequency;
  	rfm22b_dev->max_frequency = cph->max_frequency;
  	rfm22_setNominalCarrierFrequency(rfm22b_dev, cph->frequency_hz);
+
+	// Call the com port configuration function
+	if (rfm22b_dev->com_config_cb && !rfm22b_dev->coordinator)
+		rfm22b_dev->com_config_cb(cph->port, cph->com_speed);
 }
 
 static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm22b_dev)

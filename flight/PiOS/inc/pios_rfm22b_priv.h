@@ -672,6 +672,9 @@ struct pios_rfm22b_dev {
 	// ISR pending
 	xSemaphoreHandle isrPending;
 
+	// The com configuration callback
+	PIOS_RFM22B_ComConfigCallback com_config_cb;
+
 	// The COM callback functions.
 	pios_com_callback rx_in_cb;
 	uint32_t rx_in_context;

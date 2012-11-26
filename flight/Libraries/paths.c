@@ -177,6 +177,7 @@ static void path_circle(float * start_point, float * end_point, float * cur_poin
 	float radius,cradius;
 	float normal[2];
 	float progress;
+	float a_diff, a_radius;
 
 	// Radius
 	radius_north = end_point[0] - start_point[0];
@@ -212,9 +213,19 @@ static void path_circle(float * start_point, float * end_point, float * cur_poin
 	
 
 	// normalize progress to 0..1
-	progress = (atan2f( diff_north, diff_east) - atan2f( radius_north, radius_east) + M_PI)/(2*M_PI);
+	a_diff = atan2f( diff_north, diff_east);
+	a_radius = atan2f( radius_north, radius_east);
+	
+	if(a_diff<0)
+		a_diff+=2*M_PI;
+	if(a_radius<0)
+		a_radius+=2*M_PI;
+		
+	progress = (a_diff - a_radius + M_PI) / (2 * M_PI);
 
-	if(progress>1)
+	if(progress<0)
+		progress+=1.0;
+	else if(progress>=1)
 		progress-=1.0;
 
 	if(clockwise)

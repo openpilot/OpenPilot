@@ -57,7 +57,7 @@ p, li { white-space: pre-wrap; }
      <item>
       <widget class="QToolButton" name="startUpdate">
        <property name="toolTip">
-        <string>Calculate gyro and accelerometer bias</string>
+        <string>Upgrade now</string>
        </property>
        <property name="styleSheet">
         <string notr="true">QToolButton { border: none }</string>

@@ -63,7 +63,7 @@ p, li { white-space: pre-wrap; }
         <string notr="true">QToolButton { border: none }</string>
        </property>
        <property name="text">
-        <string>Calculate</string>
+        <string>Upgrade</string>
        </property>
        <property name="icon">
         <iconset resource="../wizardResources.qrc">

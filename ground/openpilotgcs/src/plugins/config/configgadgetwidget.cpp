@@ -278,7 +278,7 @@ void ConfigGadgetWidget::updatePipXStatus(UAVObject *object)
         icon->addFile(":/configgadget/images/pipx-selected.png", QSize(), QIcon::Selected, QIcon::Off);
 
         QWidget *qwd = new ConfigPipXtremeWidget(this);
-        ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, *icon, QString("PipXtreme"));
+        ftw->insertTab(ConfigGadgetWidget::pipxtreme, qwd, *icon, QString("OPLink"));
         pipxConnected = true;
     }
 }

@@ -22,7 +22,7 @@ public:
                return QString("OpenPilot INS");
                break;
            case 0x0301://PipX
-               return QString("PipXtreme");
+               return QString("OPLink");
                break;
            case 0x0401://Coptercontrol
                return QString("CopterControl");

@@ -23,7 +23,7 @@
  #####
 
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
-TOP      := $(realpath $(WHEREAMI)/../../)
+TOP      := $(realpath $(WHEREAMI)/../../../)
 include $(TOP)/make/firmware-defs.mk
 include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
 
@@ -78,16 +78,16 @@ MODULES = Radio RadioComBridge
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = ../UAVTalk
+OPUAVTALK = ../../UAVTalk
 OPUAVTALKINC = $(OPUAVTALK)/inc
-OPUAVOBJ = ../UAVObjects
+OPUAVOBJ = ../../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 OPTESTS  = ./Tests
-OPMODULEDIR = ../Modules
-FLIGHTLIB = ../Libraries
+OPMODULEDIR = ../../Modules
+FLIGHTLIB = ../../Libraries
 FLIGHTLIBINC = $(FLIGHTLIB)/inc
 RSCODEINC = $(FLIGHTLIB)/rscode
-PIOS = ../PiOS
+PIOS = ../../PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common

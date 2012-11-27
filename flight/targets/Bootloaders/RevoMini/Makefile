@@ -23,7 +23,7 @@
  #####
 
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
-TOP      := $(realpath $(WHEREAMI)/../../../)
+TOP      := $(realpath $(WHEREAMI)/../../../../)
 include $(TOP)/make/firmware-defs.mk
 include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
 
@@ -47,12 +47,12 @@ REMOVE_CMD = rm
 endif
 
 # Paths
-OSD_BL = $(WHEREAMI)
-OSD_BLINC = $(OSD_BL)/inc
-PIOS = ../../PiOS
+REVO_BL = $(WHEREAMI)
+REVO_BLINC = $(REVO_BL)/inc
+PIOS = ../../../PiOS
 PIOSINC = $(PIOS)/inc
-FLIGHTLIB = ../../Libraries
-FLIGHTLIBINC = ../../Libraries/inc
+FLIGHTLIB = ../../../Libraries
+FLIGHTLIBINC = $(FLIGHTLIB)/inc
 PIOSSTM32F4XX = $(PIOS)/STM32F4xx
 PIOSCOMMON = $(PIOS)/Common
 PIOSBOARDS = $(PIOS)/Boards
@@ -107,7 +107,7 @@ EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
-EXTRAINCDIRS  += $(OSD_BLINC)
+EXTRAINCDIRS  += $(REVO_BLINC)
 EXTRAINCDIRS  += $(HWDEFSINC)
 
 # List any extra directories to look for library files here.

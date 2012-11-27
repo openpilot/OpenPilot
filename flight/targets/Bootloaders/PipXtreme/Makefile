@@ -23,7 +23,7 @@
  #####
 
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
-TOP      := $(realpath $(WHEREAMI)/../../../)
+TOP      := $(realpath $(WHEREAMI)/../../../../)
 include $(TOP)/make/firmware-defs.mk
 include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
 
@@ -58,15 +58,9 @@ FLASH_TOOL = OPENOCD
 # Paths
 OPSYSTEM = .
 OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = ./UAVTalk
-OPUAVTALKINC = $(OPUAVTALK)/inc
-OPUAVOBJ = ./UAVObjects
-OPUAVOBJINC = $(OPUAVOBJ)/inc
-OPTESTS  = ./Tests
-OPMODULEDIR = ./Modules
-FLIGHTLIB = ../../Libraries
-FLIGHTLIBINC = ../../Libraries/inc
-PIOS = ../../PiOS
+FLIGHTLIB = ../../../Libraries
+FLIGHTLIBINC = $(FLIGHTLIB)/inc
+PIOS = ../../../PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common
@@ -91,7 +85,7 @@ HWDEFSINC = ../../board_hw_defs/$(BOARD_NAME)
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
-## COPTERCONTROL_BL CORE:
+## OPENPILOT_BL CORE:
 SRC += $(OPSYSTEM)/main.c
 SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(OPSYSTEM)/op_dfu.c
@@ -259,6 +253,8 @@ BLONLY_CDEFS += -DBOOTLOADER_VERSION=$(BOOTLOADER_VERSION)
 BLONLY_CDEFS += -DFW_BANK_BASE=$(FW_BANK_BASE)
 BLONLY_CDEFS += -DFW_BANK_SIZE=$(FW_BANK_SIZE)
 BLONLY_CDEFS += -DFW_DESC_SIZE=$(FW_DESC_SIZE)
+BLONLY_CDEFS += -DEE_BANK_BASE=$(EE_BANK_BASE)
+BLONLY_CDEFS += -DEE_BANK_SIZE=$(EE_BANK_SIZE)
 
 # Place project-specific -D and/or -U options for 
 # Assembler with preprocessor here.

@@ -1,10 +1,10 @@
 #####
-# Project: OpenPilot INS
+# Project: OpenPilot RevoMini
 #
 #
-# Makefile for OpenPilot INS project
+# Makefile for OpenPilot RevoMini project
 #
-# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
+# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2012.
 #
 #
 # This program is free software; you can redistribute it and/or modify
@@ -23,10 +23,7 @@
 #####
 
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
-TOP      := $(realpath $(WHEREAMI)/../../)
-
-override TCHAIN_PREFIX :=
-override THUMB :=
+TOP      := $(realpath $(WHEREAMI)/../../../)
 include $(TOP)/make/firmware-defs.mk
 include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
 
@@ -38,7 +35,7 @@ OUTDIR := $(TOP)/build/$(TARGET)
 
 # Set developer code and compile options
 # Set to YES for debugging
-DEBUG ?= YES
+DEBUG ?= NO
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= NO
@@ -52,39 +49,49 @@ endif
 FLASH_TOOL = OPENOCD
 
 # List of modules to include
-MODULES = ManualControl Stabilization GPS
-MODULES += PathPlanner
-MODULES += FixedWingPathFollower
-MODULES += VtolPathFollower
+MODULES = Sensors
+MODULES += Attitude/revolution 
+MODULES += ManualControl Stabilization Actuator
+MODULES += Battery
+MODULES += Altitude/revolution
+MODULES += GPS FirmwareIAP
+MODULES += Airspeed/revolution
+MODULES += AltitudeHold FixedWingPathFollower PathPlanner TxPID
+#MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
 MODULES += CameraStab
-MODULES += Telemetry
 #MODULES += OveroSync
+MODULES += Radio
+MODULES += Telemetry
 PYMODULES = 
 #FlightPlan
 
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = ../UAVTalk
+OPUAVTALK = ../../UAVTalk
 OPUAVTALKINC = $(OPUAVTALK)/inc
-OPUAVOBJ = ../UAVObjects
+OPUAVOBJ = ../../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
-PIOS = ../PiOS.posix
+PIOS = ../../PiOS
 PIOSINC = $(PIOS)/inc
-OPMODULEDIR = ../Modules
-FLIGHTLIB = ../Libraries
-FLIGHTLIBINC = ../Libraries/inc
-MATHLIB = ../Libraries/math
-MATHLIBINC = ../Libraries/math
-PIOSPOSIX = $(PIOS)/posix
-PIOSCOMMON = $(PIOS)/posix
+OPMODULEDIR = ../../Modules
+FLIGHTLIB = ../../Libraries
+FLIGHTLIBINC = $(FLIGHTLIB)/inc
+MATHLIB = $(FLIGHTLIB)/math
+MATHLIBINC = $(FLIGHTLIB)/math
+RSCODE = $(FLIGHTLIB)/rscode
+RSCODEINC = $(FLIGHTLIB)/rscode
+PIOSSTM32F4XX = $(PIOS)/STM32F4xx
+PIOSCOMMON = $(PIOS)/Common
 PIOSBOARDS = $(PIOS)/Boards
 PIOSCOMMONLIB = $(PIOSCOMMON)/Libraries
-#APPLIBDIR = $(PIOSSTM32F4XX)/Libraries
-OPUAVOBJ = ../UAVObjects
+APPLIBDIR = $(PIOSSTM32F4XX)/Libraries
+STMLIBDIR = $(APPLIBDIR)
+STMSPDDIR = $(STMLIBDIR)/STM32F4xx_StdPeriph_Driver
+STMSPDSRCDIR = $(STMSPDDIR)/src
+STMSPDINCDIR = $(STMSPDDIR)/inc
+OPUAVOBJ = ../../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
-BOOT = 
-BOOTINC = 
 PYMITE = $(FLIGHTLIB)/PyMite
 PYMITELIB = $(PYMITE)/lib
 PYMITEPLAT = $(PYMITE)/platform/openpilot
@@ -102,7 +109,7 @@ SRC =
 # optional component libraries
 include $(PIOSCOMMONLIB)/FreeRTOS/library.mk
 #include $(PIOSCOMMONLIB)/dosfs/library.mk
-#include $(PIOSCOMMONLIB)/msheap/library.mk
+include $(PIOSCOMMONLIB)/msheap/library.mk
 
 
 # List C source files here. (C dependencies are automatically generated.)
@@ -120,44 +127,60 @@ SRC += $(PYSRC)
 
 ## MODULES
 SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
-SRC += ${OUTDIR}/InitMods.c
 ## OPENPILOT CORE:
 SRC += ${OPMODULEDIR}/System/systemmod.c
-SRC += $(OPSYSTEM)/simposix.c
+SRC += $(OPSYSTEM)/revolution.c
 SRC += $(OPSYSTEM)/pios_board.c
+SRC += $(OPSYSTEM)/pios_usb_board_data.c
 SRC += $(OPSYSTEM)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
-SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
+
+#ifeq ($(DEBUG),YES)
+SRC += $(OPSYSTEM)/dcc_stdio.c
+SRC += $(OPSYSTEM)/cm3_fault_handlers.c
+#endif
 
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
+SRC += $(FLIGHTLIB)/paths.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/insgps13state.c
 SRC += $(FLIGHTLIB)/taskmonitor.c
-SRC += $(FLIGHTLIB)/paths.c
-
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 
+## For RFM22b
+SRC += $(FLIGHTLIB)/packet_handler.c
+SRC += $(RSCODE)/berlekamp.c
+SRC += $(RSCODE)/crcgen.c
+SRC += $(RSCODE)/galois.c
+SRC += $(RSCODE)/rs.c
+
 ## PIOS Hardware (STM32F4xx)
-include $(PIOS)/posix/library.mk
+include $(PIOS)/STM32F4xx/library.mk
 
 ## PIOS Hardware (Common)
-#SRC += $(PIOSCOMMON)/pios_mpu6000.c
-#SRC += $(PIOSCOMMON)/pios_bma180.c
-#SRC += $(PIOSCOMMON)/pios_l3gd20.c
-#SRC += $(PIOSCOMMON)/pios_hmc5883.c
-#SRC += $(PIOSCOMMON)/pios_ms5611.c
-#SRC += $(PIOSCOMMON)/pios_crc.c
-#SRC += $(PIOSCOMMON)/pios_com.c
-#SRC += $(PIOSCOMMON)/pios_rcvr.c
-#SRC += $(PIOSCOMMON)/pios_flash_jedec.c
-#SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
-#SRC += $(PIOSCOMMON)/printf-stdarg.c
-#SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
-#SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+SRC += $(PIOSCOMMON)/pios_mpu6000.c
+SRC += $(PIOSCOMMON)/pios_bma180.c
+SRC += $(PIOSCOMMON)/pios_etasv3.c
+SRC += $(PIOSCOMMON)/pios_mpxv.c
+SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
+SRC += $(PIOSCOMMON)/pios_l3gd20.c
+SRC += $(PIOSCOMMON)/pios_hmc5883.c
+SRC += $(PIOSCOMMON)/pios_ms5611.c
+SRC += $(PIOSCOMMON)/pios_crc.c
+SRC += $(PIOSCOMMON)/pios_com.c
+SRC += $(PIOSCOMMON)/pios_rfm22b.c
+SRC += $(PIOSCOMMON)/pios_rcvr.c
+SRC += $(PIOSCOMMON)/pios_sbus.c
+SRC += $(PIOSCOMMON)/pios_flash_jedec.c
+SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
+SRC += $(PIOSCOMMON)/printf-stdarg.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 include ./UAVObjects.inc
 SRC += $(UAVOBJSRC)
@@ -200,10 +223,11 @@ EXTRAINCDIRS  += $(OPUAVOBJINC)
 EXTRAINCDIRS  += $(UAVOBJSYNTHDIR)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
 EXTRAINCDIRS  += $(MATHLIBINC)
-#EXTRAINCDIRS  += $(PIOSSTM32F4XX)
+EXTRAINCDIRS  += $(RSCODEINC)
+EXTRAINCDIRS  += $(PIOSSTM32F4XX)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(PIOSBOARDS)
-#EXTRAINCDIRS  += $(STMSPDINCDIR)
+EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(BOOTINC)
@@ -240,7 +264,7 @@ EXTRA_LIBDIRS =
 EXTRA_LIBS =
 
 # Path to Linker-Scripts
-#LINKERSCRIPTPATH = $(PIOSSTM32F4XX)
+LINKERSCRIPTPATH = $(PIOSSTM32F4XX)
 
 # Optimization level, can be [0, 1, 2, 3, s].
 # 0 = turn off optimization. s = optimize for size.
@@ -259,17 +283,12 @@ endif
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)
 
-CFLAGS += $(UAVOBJDEFINE)
-
-CFLAGS += -DSTACK_DIAGNOSTICS
-CFLAGS += -DMIXERSTATUS_DIAGNOSTICS
-CFLAGS += -DRATEDESIRED_DIAGNOSTICS
-CFLAGS += -DI2C_WDG_STATS_DIAGNOSTICS
+CFLAGS += -DDIAGNOSTICS
 CFLAGS += -DDIAG_TASKS
 
 # This is not the best place for these.  Really should abstract out
 # to the board file or something
-#CFLAGS += -DSTM32F4XX
+CFLAGS += -DSTM32F4XX
 CFLAGS += -DMEM_SIZE=1024000000
 
 # Output format. (can be ihex or binary or both)
@@ -288,6 +307,9 @@ CDEFS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
 CDEFS += -DSYSCLK_FREQ=$(SYSCLK_FREQ)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
+ifeq ($(ENABLE_DEBUG_CONSOLE), YES)
+CDEFS += -DPIOS_INCLUDE_DEBUG_CONSOLE
+endif
 
 # Place project-specific -D and/or -U options for
 # Assembler with preprocessor here.
@@ -318,11 +340,11 @@ CFLAGS += -g$(DEBUGF)
 
 CFLAGS += -ffast-math
 
-#CFLAGS += -mcpu=$(MCU)
+CFLAGS += -mcpu=$(MCU)
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
-#CFLAGS += -mapcs-frame
+CFLAGS += -mapcs-frame
 CFLAGS += -fomit-frame-pointer
 ifeq ($(CODE_SOURCERY), YES)
 CFLAGS += -fpromote-loop-indices
@@ -341,7 +363,7 @@ CONLYFLAGS += $(CSTANDARD)
 # Assembler flags.
 #  -Wa,...:    tell GCC to pass this to the assembler.
 #  -ahlns:     create listing
-ASFLAGS  = $(ARCHFLAGS) -I. -x assembler-with-cpp
+ASFLAGS  = $(ARCHFLAGS) -mthumb -I. -x assembler-with-cpp
 ASFLAGS += $(ADEFS)
 ASFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 ASFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
@@ -352,13 +374,12 @@ MATH_LIB = -lm
 #  -Wl,...:     tell GCC to pass this to linker.
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
-#LDFLAGS = -nostartfiles -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
-LDFLAGS = -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
+LDFLAGS = -nostartfiles -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += -lc
 LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
 LDFLAGS += $(MATH_LIB)
-LDFLAGS += -lc -lgcc -lpthread -lrt
+LDFLAGS += -lc -lgcc
 
 #Linker scripts                                                                                                                                                                                                              
 LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
@@ -493,33 +514,6 @@ ifdef ComSpec
 else
 -include $(shell mkdir $(OUTDIR) 2>/dev/null) $(shell mkdir $(OUTDIR)/dep 2>/dev/null) $(wildcard $(OUTDIR)/dep/*)
 endif
-
-#create compile-time module auto-initialisation
-MODNAMES = ${notdir $(subst /revolution,,$(MODULES))}
-
-# Test if quotes are needed for the echo-command
-result = ${shell echo "test"}
-ifeq (${result}, test)
-	quote = '
-else
-	quote =
-endif
-
-# Generate intermediate code
-gencode: ${OUTDIR}/InitMods.c ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
-
-# Generate code for module initialization
-${OUTDIR}/InitMods.c: Makefile
-	@echo ${MSG_MODINIT}
-	@echo ${quote}// Autogenerated file${quote} > ${OUTDIR}/InitMods.c
-	@echo ${quote}${foreach MOD, ${MODNAMES}, extern unsigned int ${MOD}Initialize(void);}${quote}  >> ${OUTDIR}/InitMods.c
-	@echo ${quote}${foreach MOD, ${MODNAMES}, extern unsigned int ${MOD}Start(void);}${quote}  >> ${OUTDIR}/InitMods.c
-	@echo ${quote}void InitModules() {${quote} >> ${OUTDIR}/InitMods.c
-	@echo ${quote}${foreach MOD, ${MODNAMES}, ${MOD}Initialize();}${quote}  >> ${OUTDIR}/InitMods.c
-	@echo ${quote}}${quote} >> ${OUTDIR}/InitMods.c
-	@echo ${quote}void StartModules() {${quote} >> ${OUTDIR}/InitMods.c
-	@echo ${quote}${foreach MOD, ${MODNAMES}, ${MOD}Start();}${quote}  >> ${OUTDIR}/InitMods.c
-	@echo ${quote}}${quote} >> ${OUTDIR}/InitMods.c
 
 # Listing of phony targets.
 .PHONY : all build clean clean_list install

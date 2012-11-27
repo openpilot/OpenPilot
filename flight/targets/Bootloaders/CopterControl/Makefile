@@ -1,8 +1,8 @@
  #####
- # Project: OpenPilot INS_BOOTLOADER
+ # Project: OpenPilot
  #    
  #  
- # Makefile for OpenPilot INS project
+ # Makefile for OpenPilot project build PiOS and the AP.
  #
  # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
  #    
@@ -23,7 +23,7 @@
  #####
 
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
-TOP      := $(realpath $(WHEREAMI)/../../../)
+TOP      := $(realpath $(WHEREAMI)/../../../../)
 include $(TOP)/make/firmware-defs.mk
 include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
 
@@ -34,54 +34,117 @@ TARGET := bl_$(BOARD_NAME)
 OUTDIR := $(TOP)/build/$(TARGET)
 
 # Set developer code and compile options
-# Set to YES for debugging
+# Set to YES to compile for debugging
 DEBUG ?= NO
+
+# Set to YES to use the Servo output pins for debugging via scope or logic analyser
+ENABLE_DEBUG_PINS ?= NO
+
+# Set to Yes to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs  
+ENABLE_AUX_UART ?= NO
 
 # Set to YES when using Code Sourcery toolchain
 CODE_SOURCERY ?= NO
 
+# Remove command is different for Code Sourcery on Windows
 ifeq ($(CODE_SOURCERY), YES)
 REMOVE_CMD = cs-rm
 else
 REMOVE_CMD = rm
 endif
 
+FLASH_TOOL = OPENOCD
+
 # Paths
-REVO_BL = $(WHEREAMI)
-REVO_BLINC = $(REVO_BL)/inc
-PIOS = ../../PiOS
+OPSYSTEM = .
+OPSYSTEMINC = $(OPSYSTEM)/inc
+FLIGHTLIB = ../../../Libraries
+FLIGHTLIBINC = $(FLIGHTLIB)/inc
+PIOS = ../../../PiOS
 PIOSINC = $(PIOS)/inc
-FLIGHTLIB = ../../Libraries
-FLIGHTLIBINC = ../../Libraries/inc
-PIOSSTM32F4XX = $(PIOS)/STM32F4xx
+PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common
 PIOSBOARDS = $(PIOS)/Boards
-PIOSCOMMONLIB = $(PIOSCOMMON)/Libraries
-APPLIBDIR = $(PIOSSTM32F4XX)/Libraries
+APPLIBDIR = $(PIOSSTM32F10X)/Libraries
 STMLIBDIR = $(APPLIBDIR)
-STMSPDDIR = $(STMLIBDIR)/STM32F4xx_StdPeriph_Driver
+STMSPDDIR = $(STMLIBDIR)/STM32F10x_StdPeriph_Driver
+STMUSBDIR = $(STMLIBDIR)/STM32_USB-FS-Device_Driver
 STMSPDSRCDIR = $(STMSPDDIR)/src
 STMSPDINCDIR = $(STMSPDDIR)/inc
+STMUSBSRCDIR = $(STMUSBDIR)/src
+STMUSBINCDIR = $(STMUSBDIR)/inc
+CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
+DOSFSDIR  = $(APPLIBDIR)/dosfs
+MSDDIR  = $(APPLIBDIR)/msd
+RTOSDIR = $(APPLIBDIR)/FreeRTOS
+RTOSSRCDIR = $(RTOSDIR)/Source
+RTOSINCDIR = $(RTOSSRCDIR)/include
+DOXYGENDIR = ../Doc/Doxygen
 HWDEFSINC = ../../board_hw_defs/$(BOARD_NAME)
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
 
-## BOOTLOADER:
-SRC += main.c
-SRC += pios_board.c
-SRC += pios_usb_board_data.c
-SRC += op_dfu.c
+## COPTERCONTROL_BL CORE:
+SRC += $(OPSYSTEM)/main.c
+SRC += $(OPSYSTEM)/pios_board.c
+SRC += $(OPSYSTEM)/op_dfu.c
 
-## PIOS Hardware (STM32F4xx)
-include $(PIOS)/STM32F4xx/library.mk
+## PIOS Hardware (STM32F10x)
+SRC += $(PIOSSTM32F10X)/pios_sys.c
+SRC += $(PIOSSTM32F10X)/pios_led.c
+SRC += $(PIOSSTM32F10X)/pios_delay.c
+SRC += $(PIOSSTM32F10X)/pios_usart.c
+SRC += $(PIOSSTM32F10X)/pios_irq.c
+SRC += $(PIOSSTM32F10X)/pios_debug.c
+SRC += $(PIOSSTM32F10X)/pios_gpio.c
+SRC += $(PIOSSTM32F10X)/pios_iap.c
+SRC += $(PIOSSTM32F10X)/pios_bl_helper.c
 
-# PIOS Hardware (Common)
+# PIOS USB related files (seperated to make code maintenance more easy)
+SRC += $(PIOSSTM32F10X)/pios_usb.c
+SRC += $(PIOSSTM32F10X)/pios_usbhook.c
+SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
+SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
+SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
+SRC += $(OPSYSTEM)/pios_usb_board_data.c
+SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+SRC += $(PIOSCOMMON)/pios_usb_util.c
+
+## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_board_info.c
 SRC += $(PIOSCOMMON)/pios_com_msg.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
-SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
-SRC += $(PIOSCOMMON)/pios_usb_util.c
+
+## Libraries for flight calculations
+SRC += $(FLIGHTLIB)/fifo_buffer.c
+
+## CMSIS for STM32
+SRC += $(CMSISDIR)/core_cm3.c
+SRC += $(CMSISDIR)/system_stm32f10x.c
+
+## Used parts of the STM-Library
+SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_dma.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_exti.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_flash.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_gpio.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_rcc.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_spi.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
+SRC += $(STMSPDSRCDIR)/stm32f10x_dbgmcu.c
+SRC += $(STMSPDSRCDIR)/misc.c
+
+## STM32 USB Library
+SRC += $(STMUSBSRCDIR)/usb_core.c
+SRC += $(STMUSBSRCDIR)/usb_init.c
+SRC += $(STMUSBSRCDIR)/usb_int.c
+SRC += $(STMUSBSRCDIR)/usb_mem.c
+SRC += $(STMUSBSRCDIR)/usb_regs.c
+SRC += $(STMUSBSRCDIR)/usb_sil.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # use file-extension c for "c-only"-files
@@ -97,17 +160,40 @@ CPPSRC =
 #CPPSRCARM = $(TARGET).cpp
 CPPSRCARM = 
 
+# List Assembler source files here.
+# Make them always end in a capital .S. Files ending in a lowercase .s
+# will not be considered source files but generated files (assembler
+# output from the compiler), and will be deleted upon "make clean"!
+# Even though the DOS/Win* filesystem matches both .s and .S the same,
+# it will preserve the spelling of the filenames, and gcc itself does
+# care about how the name is spelled on its command-line.
+ASRC = $(PIOSSTM32F10X)/startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
+
+# List Assembler source files here which must be assembled in ARM-Mode..
+ASRCARM = 
+
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
+EXTRAINCDIRS  =  $(OPSYSTEM)
+EXTRAINCDIRS  += $(OPSYSTEMINC)
+EXTRAINCDIRS  += $(OPUAVTALK)
+EXTRAINCDIRS  += $(OPUAVTALKINC)
+EXTRAINCDIRS  += $(OPUAVOBJ)
+EXTRAINCDIRS  += $(OPUAVOBJINC)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
-EXTRAINCDIRS  += $(PIOSSTM34FXX)
+EXTRAINCDIRS  += $(PIOSSTM32F10X)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(STMSPDINCDIR)
+EXTRAINCDIRS  += $(STMUSBINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
-EXTRAINCDIRS  += $(REVO_BLINC)
+EXTRAINCDIRS  += $(DOSFSDIR)
+EXTRAINCDIRS  += $(MSDDIR)
+EXTRAINCDIRS  += $(RTOSINCDIR)
+EXTRAINCDIRS  += $(APPLIBDIR)
+EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
 EXTRAINCDIRS  += $(HWDEFSINC)
 
 # List any extra directories to look for library files here.
@@ -125,7 +211,7 @@ EXTRA_LIBDIRS =
 EXTRA_LIBS =
 
 # Path to Linker-Scripts
-LINKERSCRIPTPATH = $(PIOSSTM32FXX)
+LINKERSCRIPTPATH = $(PIOSSTM32F10X)
 
 # Optimization level, can be [0, 1, 2, 3, s]. 
 # 0 = turn off optimization. s = optimize for size.
@@ -149,11 +235,15 @@ DEBUGF = dwarf-2
 
 # Place project-specific -D (define) and/or 
 # -U options for C here.
-CDEFS = -DSTM32F4XX
-CDEFS += -DSYSCLK_FREQ=$(SYSCLK_FREQ)
-CDEFS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
+CDEFS = -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
+ifeq ($(ENABLE_DEBUG_PINS), YES)
+CDEFS += -DPIOS_ENABLE_DEBUG_PINS
+endif
+ifeq ($(ENABLE_AUX_UART), YES)
+CDEFS += -DPIOS_ENABLE_AUX_UART
+endif
 
 # Provide (only) the bootloader with board-specific defines
 BLONLY_CDEFS += -DBOARD_TYPE=$(BOARD_TYPE)
@@ -190,19 +280,15 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = 
+CFLAGS += -DDEBUG
 endif
-
-# This is not the best place for these.  Really should abstract out
-# to the board file or something
-CFLAGS += -DSTM32F4XX
-CFLAGS += -DMEM_SIZE=1024000000
 
 CFLAGS += -g$(DEBUGF)
 CFLAGS += -O$(OPT)
 ifeq ($(DEBUG),NO)
-CFLAGS += -fdata-sections -ffunction-sections
+CFLAGS += -ffunction-sections
 endif
+
 CFLAGS += -mcpu=$(MCU)
 CFLAGS += $(CDEFS)
 CFLAGS += $(BLONLY_CDEFS)
@@ -214,8 +300,8 @@ ifeq ($(CODE_SOURCERY), YES)
 CFLAGS += -fpromote-loop-indices
 endif
 
-CFLAGS += -Wall
-#CFLAGS += -Werror
+CFLAGS += -Wall 
+CFLAGS += -Werror
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 # Compiler flags to generate dependency files:
 CFLAGS += -MD -MP -MF $(OUTDIR)/dep/$(@F).d
@@ -248,8 +334,9 @@ LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
 LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc 
 
-#Linker scripts                                                                                                                                                                                                              
-LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_BL))
+# Set linker-script name depending on selected submodel name
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_memory.ld
+LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_BL_sections.ld
 
 # Define programs and commands.
 REMOVE  = $(REMOVE_CMD) -f
@@ -284,6 +371,14 @@ endif
 endif
 endif
 
+${OUTDIR}/InitMods.c: Makefile
+	@echo $(MSG_MODINIT) $(call toprel, $@)
+	@echo ${quote}// Autogenerated file${quote} > ${OUTDIR}/InitMods.c 
+	@echo ${quote}${foreach MOD, ${MODNAMES}, extern unsigned int ${MOD}Initialize(void);}${quote}  >> ${OUTDIR}/InitMods.c
+	@echo ${quote}void InitModules() {${quote} >> ${OUTDIR}/InitMods.c
+	@echo ${quote}${foreach MOD, ${MODNAMES}, ${MOD}Initialize();}${quote}  >> ${OUTDIR}/InitMods.c
+	@echo ${quote}}${quote} >> ${OUTDIR}/InitMods.c
+
 # Link: create ELF output file from object files.
 $(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))
 
@@ -312,8 +407,6 @@ $(eval $(call PARTIAL_COMPILE_TEMPLATE, SRC))
 $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
 $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
-
-$(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
 
 # Add jtag targets (program and wipe)
 $(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BL_BANK_BASE),$(BL_BANK_SIZE),$(OPENOCD_JTAG_CONFIG),$(OPENOCD_CONFIG)))

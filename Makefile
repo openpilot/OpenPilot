@@ -737,7 +737,7 @@ fw_$(1): fw_$(1)_opfw
 
 fw_$(1)_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/fw_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/$(2) && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/$(2) && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(3) \
@@ -762,7 +762,7 @@ bl_$(1)_bino: bl_$(1)_bin
 
 bl_$(1)_%:
 	$(V1) mkdir -p $(BUILD_DIR)/bl_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/$(2) && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/$(2) && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(3) \
@@ -798,7 +798,7 @@ bu_$(1): bu_$(1)_opfw
 
 bu_$(1)_%: bl_$(1)_bino
 	$(V1) mkdir -p $(BUILD_DIR)/bu_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/Bootloaders/BootloaderUpdater && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/BootloaderUpdater && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(3) \
@@ -820,7 +820,7 @@ ef_$(1): ef_$(1)_bin
 
 ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 	$(V1) mkdir -p $(BUILD_DIR)/ef_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/EntireFlash && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/EntireFlash && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(3) \
@@ -958,7 +958,7 @@ sim_win32: sim_win32_exe
 sim_win32_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/sitl_win32
 	$(V1) $(MAKE) --no-print-directory \
-		-C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.win32 $*
+		-C $(ROOT_DIR)/flight/targets/OpenPilot --file=$(ROOT_DIR)/flight/targets/OpenPilot/Makefile.win32 $*
 
 .PHONY: sim_osx
 sim_osx: sim_osx_elf
@@ -966,7 +966,7 @@ sim_osx: sim_osx_elf
 sim_osx_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/sim_osx
 	$(V1) $(MAKE) --no-print-directory \
-		-C $(ROOT_DIR)/flight/Revolution --file=$(ROOT_DIR)/flight/Revolution/Makefile.osx $*
+		-C $(ROOT_DIR)/flight/targets/Revolution --file=$(ROOT_DIR)/flight/targets/Revolution/Makefile.osx $*
 ##############################
 #
 # Packaging components

@@ -1,0 +1,11 @@
+<xml>
+  <object name="GeofenceFaces" singleinstance="false" settings="false">
+    <description>Triangular face in the geofence.</description>
+    <field name="Vertices" units="-" type="uint8" elementnames="A,B,C"/>
+    <!-- Currently only support 256 faces-->
+    <access gcs="readwrite" flight="readwrite"/>
+    <telemetrygcs acked="false" updatemode="manual" period="0"/>
+    <telemetryflight acked="false" updatemode="periodic" period="4000"/>
+    <logging updatemode="periodic" period="1000"/>
+  </object>
+</xml> 

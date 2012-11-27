@@ -33,8 +33,10 @@
 
 #include "flightdatamodel.h"
 #include "pathplanner.h"
+#include "geofencedialog.h"
 #include "modelmapproxy.h"
 #include "modeluavoproxy.h"
+#include "geofencemodelmapproxy.h"
 
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
@@ -198,6 +200,17 @@ private slots:
     void onDeleteWayPointAct_triggered();
     void onClearWayPointsAct_triggered();
 
+    void onGeofenceOpenEditorAct_triggered();
+    void onGeofenceBeginCreatePolygonAct_triggered();
+    void onGeofenceEndCreatePolygonAct_triggered(QMouseEvent *event);
+    void onGeofenceAddVertexAct_triggeredFromThis();
+    void onGeofenceCreatePolyModeAddVertexAct_triggered(QMouseEvent *event);
+    void onGeofenceAddVertexAct_triggeredFromContextMenu();
+    void onGeofenceAddVertexAct_triggered(internals::PointLatLng coord);
+    void onGeofenceEditVertexAct_triggered();
+    void onGeofenceDeleteVertexAct_triggered();
+    void onGeofenceClearVerticesAct_triggered();
+
     void onMapModeActGroup_triggered(QAction *action);
     void onZoomActGroup_triggered(QAction *action);
     void onHomeMagicWaypointAct_triggered();
@@ -234,11 +247,11 @@ private:
 	UAVObjectManager *obm;
 	UAVObjectUtilManager *obum;
     QPointer<opmap_edit_waypoint_dialog> waypoint_edit_dialog;
-    QStandardItemModel wayPoint_treeView_model;
+    //QStandardItemModel wayPoint_treeView_model;
     mapcontrol::WayPointItem *m_mouse_waypoint;
     QPointer<modelUavoProxy> UAVProxy;
     QMutex m_map_mutex;
-	bool m_telemetry_connected;
+    bool m_telemetry_connected;
     QAction *closeAct1;
     QAction *closeAct2;
     QAction *reloadAct;
@@ -267,6 +280,15 @@ private:
     QAction *lockWayPointAct;
     QAction *deleteWayPointAct;
     QAction *clearWayPointsAct;
+
+    QAction *geofenceOpenEditorAct;
+    QAction *geofenceBeginCreatePolygon;
+    QAction *geofenceEndCreatePolygonAct;
+    QAction *geofenceAddVertexActFromThis;
+    QAction *geofenceAddVertexActFromContextMenu;
+    QAction *geofenceEditVertexAct;
+    QAction *geofenceDeleteVertexAct;
+    QAction *geofenceClearVerticesAct;
 
     QAction *homeMagicWaypointAct;
 
@@ -317,10 +339,14 @@ private:
     internals::PointLatLng lastLatLngMouse;
     WayPointItem * magicWayPoint;
 
-    QPointer<flightDataModel> model;
-    QPointer<pathPlanner> table;
-    QPointer<modelMapProxy> mapProxy;
-    QPointer<QItemSelectionModel> selectionModel;
+    QPointer<flightDataModel> modelWP;
+    QPointer<GeofenceDataModel> modelGF;
+    QPointer<pathPlanner> pathPlannerTable;
+    QPointer<GeofenceDialog> geofenceTable;
+    QPointer<modelMapProxy> mapProxyWP;
+    QPointer<GeofenceModelMapProxy> mapProxyGF;
+    QPointer<QItemSelectionModel> selectionModelWP;
+    QPointer<QItemSelectionModel> selectionModelGF;
 };
 
 #endif /* OPMAP_GADGETWIDGET_H_ */

@@ -351,6 +351,17 @@ namespace mapcontrol
         */
         void WPRenumber(WayPointItem* item,int const& newnumber);
 
+        /**
+        * @brief Inserts a new WayPoint representing a geofence vertex
+        * on the specified position
+        *
+        * @param coord the coordinates in LatLng of the WayPoint
+        * @param altitude the Altitude of the WayPoint
+        * @param position index of the WayPoint
+        * @return WayPointItem a pointer to the WayPoint Inserted
+        */
+        WayPointItem* VertexInsert(internals::PointLatLng const& coord, int const& altitude, int const& position);
+
         void SetShowCompass(bool const& value);
 
         void setOverlayOpacity(qreal value);
@@ -375,6 +386,10 @@ namespace mapcontrol
         void WPDelete(int number);
         WayPointItem *WPFind(int number);
         void setSelectedWP(QList<WayPointItem *> list);
+        void setSelectedVertex(QList<WayPointItem *> list);
+        void VertexDelete(int number);
+        bool geofencePolyMode(){return m_createGeofencePolyMode;}
+        void setGeofencePolyMode(bool set){m_createGeofencePolyMode = set;}
       private:
         internals::Core *core;
         MapGraphicItem *map;
@@ -386,6 +401,7 @@ namespace mapcontrol
         internals::PointLatLng currentmouseposition;
         bool followmouse;
         void ConnectWP(WayPointItem* item);
+        void ConnectVertex(WayPointItem* item);
         QGraphicsSvgItem *compass;
         bool showuav;
         bool showhome;
@@ -393,6 +409,7 @@ namespace mapcontrol
         QGraphicsTextItem * diagGraphItem;
         bool showDiag;
         qreal overlayOpacity;
+        bool m_createGeofencePolyMode;
     private slots:
         void diagRefresh();
         //   WayPointItem* item;//apagar
@@ -401,6 +418,8 @@ namespace mapcontrol
         void showEvent ( QShowEvent * event );
         void closeEvent(QCloseEvent *event);
         void mouseMoveEvent ( QMouseEvent * event );
+        void mouseReleaseEvent(QMouseEvent *event);
+        void mouseDoubleClickEvent(QMouseEvent *event);
         //    private slots:
     signals:
         void zoomChanged(double zoomt,double zoom, double zoomd);
@@ -504,6 +523,48 @@ namespace mapcontrol
         void OnTilesStillToLoad(int number);
         void OnWayPointDoubleClicked(WayPointItem * waypoint);
         void selectedWPChanged(QList<WayPointItem*>);
+
+        /**
+        * @brief Fires when a new WayPoint representing a geofence vertex is inserted
+        *
+        * @param number new WayPoint number
+        * @param waypoint WayPoint inserted
+        */
+        void VertexInserted(int const& number,WayPointItem* waypoint);
+        /**
+        * @brief fires when one of the geofence vertex WayPoints numbers changes (not
+        * fired if due to a auto-renumbering)
+        *
+        * @param oldnumber WayPoint old number
+        * @param newnumber WayPoint new number
+        * @param waypoint a pointer to the WayPoint that was renumbered
+        */
+        void VertexNumberChanged(int const& oldnumber,int const& newnumber,WayPointItem* waypoint);
+        /**
+        * @brief Fires when new WayPoints representing geofence vertices are selected
+        *
+        * @param vertices list of selected vertices
+        */
+        void SelectedVertexChanged(QList<WayPointItem*> vertices);
+        /**
+        * @brief Fired when the altitude or coordinates of a WayPoint representing
+        * a geofence vertex is changed
+        *
+        * @param vertex a pointer to the WayPoint
+        */
+        void VertexValuesChanged(WayPointItem* vertex);
+        /**
+        * @brief Fires When a WayPoint representing a geofence vertex is deleted
+        *
+        * @param number number of the deleted WayPoint
+        */
+        void VertexDeleted(int const& number,WayPointItem* waypoint);
+
+        void VertexLocalPositionChanged(QPointF,WayPointItem*);
+        void VertexManualCoordChange(WayPointItem*);
+
+        void onCreateGeofencePolyModeAddVertex(QMouseEvent* event);
+        void onEndCreateGeofencePolyMode(QMouseEvent* event);
     public slots:
         /**
         * @brief Ripps the current selection to the DB

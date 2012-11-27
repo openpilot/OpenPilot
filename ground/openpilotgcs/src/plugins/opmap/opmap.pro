@@ -9,6 +9,9 @@ include(../../plugins/uavobjectutil/uavobjectutil.pri)
 include(../../plugins/uavtalk/uavtalk.pri)
 include(../../libs/utils/utils.pri)
 
+DEFINES += USE_PATHPLANNER \
+    USE_GEOFENCE
+
 HEADERS += opmapplugin.h \
     opmapgadgetoptionspage.h \
     opmapgadgetfactory.h \
@@ -23,7 +26,10 @@ HEADERS += opmapplugin.h \
     widgetdelegates.h \
     pathplanner.h \
     modeluavoproxy.h \
-    homeeditor.h
+    homeeditor.h \
+    geofencedatamodel.h \
+    geofencemodelmapproxy.h \
+    geofencedialog.h
 
 SOURCES += opmapplugin.cpp \
     opmapgadgetwidget.cpp \
@@ -39,7 +45,10 @@ SOURCES += opmapplugin.cpp \
     widgetdelegates.cpp \
     pathplanner.cpp \
     modeluavoproxy.cpp \
-    homeeditor.cpp
+    homeeditor.cpp \
+    geofencedatamodel.cpp \
+    geofencemodelmapproxy.cpp \
+    geofencedialog.cpp
 
 OTHER_FILES += OPMapGadget.pluginspec
 
@@ -50,6 +59,7 @@ FORMS += opmapgadgetoptionspage.ui \
     opmap_statusbar_widget.ui \
     opmap_overlay_widget.ui \
     pathplanner.ui \
-    homeeditor.ui
+    homeeditor.ui \
+    geofencedialog.ui
 
 RESOURCES += opmap.qrc

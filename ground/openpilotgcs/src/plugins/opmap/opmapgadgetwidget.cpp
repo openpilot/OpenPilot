@@ -105,7 +105,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
 
     m_maxUpdateRate = max_update_rate_list[4];	// 2 seconds //SHOULDN'T THIS BE LOADED FROM THE USER PREFERENCES?
 
-	m_telemetry_connected = false;
+    m_telemetry_connected = false;
 
 	m_context_menu_lat_lon = m_mouse_lat_lon = internals::PointLatLng(0, 0);
 
@@ -209,6 +209,8 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_map, SIGNAL(OnTileLoadStart()), this, SLOT(OnTileLoadStart()));					// tile loading start signals
     connect(m_map, SIGNAL(OnTilesStillToLoad(int)), this, SLOT(OnTilesStillToLoad(int)));				// tile loading signals
     connect(m_map,SIGNAL(OnWayPointDoubleClicked(WayPointItem*)),this,SLOT(wpDoubleClickEvent(WayPointItem*)));
+    connect(m_map, SIGNAL(onCreateGeofencePolyModeAddVertex(QMouseEvent*)), this, SLOT(onGeofenceCreatePolyModeAddVertexAct_triggered(QMouseEvent*)));
+//    connect(m_map, SIGNAL(onEndCreateGeofencePolyMode(QMouseEvent*)), this, SLOT(onGeofenceEndCreatePolygonAct_triggered(QMouseEvent*)));
 	m_map->SetCurrentPosition(m_home_position.coord);         // set the map position
 	m_map->Home->SetCoord(m_home_position.coord);             // set the HOME position
 	m_map->UAV->SetUAVPos(m_home_position.coord, 0.0);        // set the UAV position
@@ -216,15 +218,24 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     if(m_map->GPS)
         m_map->GPS->SetUAVPos(m_home_position.coord, 0.0);        // set the GPS position
 #ifdef USE_PATHPLANNER
-    model=new flightDataModel(this);
-    table=new pathPlanner();
-    selectionModel=new QItemSelectionModel(model);
-    mapProxy=new modelMapProxy(this,m_map,model,selectionModel);
-    table->setModel(model,selectionModel);
-    waypoint_edit_dialog=new opmap_edit_waypoint_dialog(this,model,selectionModel);
-    UAVProxy=new modelUavoProxy(this,model);
-    connect(table,SIGNAL(sendPathPlanToUAV()),UAVProxy,SLOT(modelToObjects()));
-    connect(table,SIGNAL(receivePathPlanFromUAV()),UAVProxy,SLOT(objectsToModel()));
+    modelWP=new flightDataModel(this);
+    pathPlannerTable=new pathPlanner();
+    selectionModelWP=new QItemSelectionModel(modelWP);
+    mapProxyWP=new modelMapProxy(this,m_map,modelWP,selectionModelWP);
+    pathPlannerTable->setModel(modelWP,selectionModelWP);
+    waypoint_edit_dialog=new opmap_edit_waypoint_dialog(this,modelWP,selectionModelWP);
+    UAVProxy=new modelUavoProxy(this,modelWP);
+    connect(pathPlannerTable,SIGNAL(sendPathPlanToUAV()),UAVProxy,SLOT(modelToObjects()));
+    connect(pathPlannerTable,SIGNAL(receivePathPlanFromUAV()),UAVProxy,SLOT(objectsToModel()));
+#endif
+#ifdef USE_GEOFENCE
+    modelGF = new GeofenceDataModel(this);
+    selectionModelGF=new QItemSelectionModel(modelGF);
+    mapProxyGF = new GeofenceModelMapProxy(this, m_map, modelGF, selectionModelGF);
+    geofenceTable = new GeofenceDialog();
+    geofenceTable->setModel(modelGF, selectionModelGF);
+    connect(mapProxyGF, SIGNAL(requestGeofenceEditDialog()), this, SLOT(onGeofenceOpenEditorAct_triggered()));
+    connect(m_map, SIGNAL(onEndCreateGeofencePolyMode(QMouseEvent*)), mapProxyGF, SLOT(endGeofencePolygon(QMouseEvent*)));
 #endif
     magicWayPoint=m_map->magicWPCreate();
     magicWayPoint->setVisible(false);
@@ -292,14 +303,22 @@ OPMapGadgetWidget::~OPMapGadgetWidget()
 		delete m_map;
 		m_map = NULL;
 	}
-    if(!model.isNull())
-        delete model;
-    if(!table.isNull())
-        delete table;
-    if(!selectionModel.isNull())
-        delete selectionModel;
-    if(!mapProxy.isNull())
-        delete mapProxy;
+    if(!modelWP.isNull())
+        delete modelWP;
+    if(!modelGF.isNull())
+        delete modelGF;
+    if(!pathPlannerTable.isNull())
+        delete pathPlannerTable;
+    if(!geofenceTable.isNull())
+        delete geofenceTable;
+    if(!selectionModelWP.isNull())
+        delete selectionModelWP;
+    if(!selectionModelGF.isNull())
+        delete selectionModelGF;
+    if(!mapProxyWP.isNull())
+        delete mapProxyWP;
+    if(!mapProxyGF.isNull())
+        delete mapProxyGF;
     if(!waypoint_edit_dialog.isNull())
         delete waypoint_edit_dialog;
     if(!UAVProxy.isNull())
@@ -517,6 +536,16 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 #endif
     // *********
 
+    // *********
+#ifdef USE_GEOFENCE
+    contextMenu.addSeparator()->setText(tr("Geofence"));
+    contextMenu.addAction(geofenceOpenEditorAct);
+    contextMenu.addAction(geofenceBeginCreatePolygon);
+    contextMenu.addAction(geofenceAddVertexActFromContextMenu);
+    contextMenu.addSeparator();
+#endif
+    // *********
+
     QMenu overlaySubMenu(tr("&Overlay Opacity "),this);
     for (int i = 0; i < overlayOpacityAct.count(); i++)
         overlaySubMenu.addAction(overlayOpacityAct.at(i));
@@ -532,7 +561,8 @@ void OPMapGadgetWidget::contextMenuEvent(QContextMenuEvent *event)
 
 void OPMapGadgetWidget::closeEvent(QCloseEvent *event)
 {
-    table->close();
+    pathPlannerTable->close();
+    geofenceTable->close();
     QWidget::closeEvent(event);
 }
 
@@ -1368,6 +1398,19 @@ void OPMapGadgetWidget::createActions()
     clearWayPointsAct->setStatusTip(tr("Clear waypoints"));
     connect(clearWayPointsAct, SIGNAL(triggered()), this, SLOT(onClearWayPointsAct_triggered()));
 #endif
+
+#ifdef USE_GEOFENCE
+    geofenceOpenEditorAct = new QAction(tr("Geofence editor"), this);
+    geofenceOpenEditorAct->setStatusTip(tr("Open the geofence editor"));
+
+    geofenceBeginCreatePolygon = new QAction(tr("Begin create from polygon"), this);
+    geofenceBeginCreatePolygon->setStatusTip(tr("Begin a new geofence polygon"));
+//    connect(geofenceBeginCreatePolygon, SIGNAL(triggered()), this, SLOT(onGeofenceBeginCreatePolygonAct_triggered()));
+    connect(geofenceBeginCreatePolygon, SIGNAL(triggered()), mapProxyGF, SLOT(beginGeofencePolygon()));
+
+    geofenceAddVertexActFromContextMenu = new QAction(tr("Add geofence vertex"), this);
+    geofenceAddVertexActFromContextMenu->setStatusTip(tr("Add geofence vertex"));
+#endif
     overlayOpacityActGroup = new QActionGroup(this);
     connect(overlayOpacityActGroup, SIGNAL(triggered(QAction *)), this, SLOT(onOverlayOpacityActGroup_triggered(QAction *)));
     overlayOpacityAct.clear();
@@ -1765,7 +1808,7 @@ void OPMapGadgetWidget::onUAVTrailDistanceActGroup_triggered(QAction *action)
 
 void OPMapGadgetWidget::onOpenWayPointEditorAct_triggered()
 {
-    table->show();
+    pathPlannerTable->show();
 }
 void OPMapGadgetWidget::onAddWayPointAct_triggeredFromContextMenu()
 {
@@ -1784,7 +1827,7 @@ void OPMapGadgetWidget::onAddWayPointAct_triggered(internals::PointLatLng coord)
     if (m_map_mode != Normal_MapMode)
         return;
 
-    mapProxy->createWayPoint(coord);
+    mapProxyWP->createWayPoint(coord);
 }
 
 
@@ -1846,7 +1889,7 @@ void OPMapGadgetWidget::onDeleteWayPointAct_triggered()
     if (!m_mouse_waypoint)
         return;
 
-    mapProxy->deleteWayPoint(m_mouse_waypoint->Number());
+    mapProxyWP->deleteWayPoint(m_mouse_waypoint->Number());
 }
 
 void OPMapGadgetWidget::onClearWayPointsAct_triggered()
@@ -1870,9 +1913,64 @@ void OPMapGadgetWidget::onClearWayPointsAct_triggered()
     if (m_map_mode != Normal_MapMode)
         return;
 
-    mapProxy->deleteAll();
+    mapProxyWP->deleteAll();
 
- }
+}
+
+void OPMapGadgetWidget::onGeofenceOpenEditorAct_triggered()
+{
+    geofenceTable->show();
+}
+
+void OPMapGadgetWidget::onGeofenceBeginCreatePolygonAct_triggered()
+{
+}
+
+void OPMapGadgetWidget::onGeofenceEndCreatePolygonAct_triggered(QMouseEvent *event)
+{
+}
+
+void OPMapGadgetWidget::onGeofenceAddVertexAct_triggeredFromThis()
+{
+    onGeofenceAddVertexAct_triggered(m_mouse_lat_lon);
+}
+
+void OPMapGadgetWidget::onGeofenceCreatePolyModeAddVertexAct_triggered(QMouseEvent *event)
+{
+    QPoint p = event->pos();
+    internals::PointLatLng lat_lon = m_map->GetFromLocalToLatLng(p);    // fetch the current lat/lon mouse position
+    if (m_map->contentsRect().contains(p)){
+        onGeofenceAddVertexAct_triggered(lat_lon);
+    }
+}
+
+void OPMapGadgetWidget::onGeofenceAddVertexAct_triggeredFromContextMenu()
+{
+    onGeofenceAddVertexAct_triggered(m_context_menu_lat_lon);
+}
+
+void OPMapGadgetWidget::onGeofenceAddVertexAct_triggered(internals::PointLatLng coord)
+{
+    if (!m_widget || !m_map)
+        return;
+
+    if (m_map_mode != Normal_MapMode)
+        return;
+
+    mapProxyGF->createVertexPoint(coord);
+}
+
+void OPMapGadgetWidget::onGeofenceEditVertexAct_triggered()
+{
+}
+
+void OPMapGadgetWidget::onGeofenceDeleteVertexAct_triggered()
+{
+}
+
+void OPMapGadgetWidget::onGeofenceClearVerticesAct_triggered()
+{
+}
 
 
 void OPMapGadgetWidget::onHomeMagicWaypointAct_triggered()

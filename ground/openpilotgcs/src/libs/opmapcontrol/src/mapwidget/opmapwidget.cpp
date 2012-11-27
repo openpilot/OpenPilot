@@ -35,6 +35,7 @@ namespace mapcontrol
 
     OPMapWidget::OPMapWidget(QWidget *parent, Configuration *config):QGraphicsView(parent),configuration(config),UAV(0),GPS(0),Home(0)
       ,followmouse(true),compass(0),showuav(false),showhome(false),diagTimer(0),diagGraphItem(0),showDiag(false),overlayOpacity(1)
+      ,m_createGeofencePolyMode(false)
     {
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         core=new internals::Core;
@@ -227,6 +228,23 @@ namespace mapcontrol
         QPointF p=event->posF();
         p=map->mapFromParent(p);
         currentmouseposition=map->FromLocalToLatLng(p.x(),p.y());
+    }
+
+    void OPMapWidget::mouseReleaseEvent(QMouseEvent *event)
+    {
+        if(m_createGeofencePolyMode){
+            emit onCreateGeofencePolyModeAddVertex(event);
+        }
+        QGraphicsView::mouseReleaseEvent(event);
+    }
+
+    void OPMapWidget::mouseDoubleClickEvent(QMouseEvent *event)
+    {
+        if(m_createGeofencePolyMode){
+            emit onEndCreateGeofencePolyMode(event);
+            m_createGeofencePolyMode = false;
+        }
+        QGraphicsView::mouseDoubleClickEvent(event);
     }
     ////////////////WAYPOINT////////////////////////
     WayPointItem* OPMapWidget::WPCreate()
@@ -452,6 +470,28 @@ namespace mapcontrol
         item->SetNumber(newnumber);
     }
 
+    WayPointItem *OPMapWidget::VertexInsert(const internals::PointLatLng &coord, const int &altitude, const int &position)
+    {
+        internals::PointLatLng mcoord;
+        bool reloc=false;
+        if(mcoord==internals::PointLatLng(0,0))
+        {
+            mcoord=CurrentPosition();
+            reloc=true;
+        }
+        else
+            mcoord=coord;
+        WayPointItem* item=new WayPointItem(mcoord,altitude,map);
+        item->SetNumber(position);
+        ConnectVertex(item);
+        item->setParentItem(map);
+        emit VertexInserted(position,item);
+        if(reloc)
+            emit VertexValuesChanged(item);
+        setOverlayOpacity(overlayOpacity);
+        return item;
+    }
+
     void OPMapWidget::ConnectWP(WayPointItem *item)
     {
         connect(item,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),Qt::DirectConnection);
@@ -461,6 +501,17 @@ namespace mapcontrol
         connect(this,SIGNAL(WPInserted(int,WayPointItem*)),item,SLOT(WPInserted(int,WayPointItem*)),Qt::DirectConnection);
         connect(this,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),item,SLOT(WPRenumbered(int,int,WayPointItem*)),Qt::DirectConnection);
         connect(this,SIGNAL(WPDeleted(int,WayPointItem*)),item,SLOT(WPDeleted(int,WayPointItem*)),Qt::DirectConnection);
+    }
+
+    void OPMapWidget::ConnectVertex(WayPointItem *item)
+    {
+        connect(item,SIGNAL(WPNumberChanged(int,int,WayPointItem*)),this,SIGNAL(VertexNumberChanged(int,int,WayPointItem*)),Qt::DirectConnection);
+        connect(item,SIGNAL(WPValuesChanged(WayPointItem*)),this,SIGNAL(VertexValuesChanged(WayPointItem*)),Qt::DirectConnection);
+        connect(item,SIGNAL(localPositionChanged(QPointF,WayPointItem*)),this,SIGNAL(VertexLocalPositionChanged(QPointF,WayPointItem*)),Qt::DirectConnection);
+        connect(item,SIGNAL(manualCoordChange(WayPointItem*)),this,SIGNAL(VertexManualCoordChange(WayPointItem*)),Qt::DirectConnection);
+        connect(this,SIGNAL(VertexInserted(int,WayPointItem*)),item,SLOT(WPInserted(int,WayPointItem*)),Qt::DirectConnection);
+        connect(this,SIGNAL(VertexNumberChanged(int,int,WayPointItem*)),item,SLOT(WPRenumbered(int,int,WayPointItem*)),Qt::DirectConnection);
+        connect(this,SIGNAL(VertexDeleted(int,WayPointItem*)),item,SLOT(WPDeleted(int,WayPointItem*)),Qt::DirectConnection);
     }
     void OPMapWidget::diagRefresh()
     {
@@ -531,6 +582,32 @@ namespace mapcontrol
         foreach(WayPointItem * wp,list)
         {
             wp->setSelected(true);
+        }
+    }
+
+    void OPMapWidget::setSelectedVertex(QList<WayPointItem *> list)
+    {
+        this->scene()->clearSelection();
+        foreach(WayPointItem * wp,list)
+        {
+            wp->setSelected(true);
+        }
+    }
+
+    void OPMapWidget::VertexDelete(int number)
+    {
+        foreach(QGraphicsItem* i,map->childItems())
+        {
+            WayPointItem* w=qgraphicsitem_cast<WayPointItem*>(i);
+            if(w)
+            {
+                if(w->Number()==number)
+                {
+                    emit VertexDeleted(w->Number(),w);
+                    delete w;
+                    return;
+                }
+            }
         }
     }
 

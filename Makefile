@@ -424,8 +424,8 @@ uavo-collections_clean:
 PIOS          := $(ROOT_DIR)/flight/PiOS
 FLIGHTLIB     := $(ROOT_DIR)/flight/Libraries
 OPMODULEDIR   := $(ROOT_DIR)/flight/Modules
-OPUAVOBJ      := $(ROOT_DIR)/flight/UAVObjects
-OPUAVTALK     := $(ROOT_DIR)/flight/UAVTalk
+OPUAVOBJ      := $(ROOT_DIR)/flight/targets/UAVObjects
+OPUAVTALK     := $(ROOT_DIR)/flight/targets/UAVTalk
 HWDEFS        := $(ROOT_DIR)/flight/targets/board_hw_defs
 DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
 OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight

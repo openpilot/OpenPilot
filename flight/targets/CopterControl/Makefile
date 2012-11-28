@@ -27,12 +27,6 @@ TOP      := $(realpath $(WHEREAMI)/../../../)
 include $(TOP)/make/firmware-defs.mk
 include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
 
-# Target file name (without extension).
-TARGET := fw_$(BOARD_NAME)
-
-# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR := $(TOP)/build/$(TARGET)
-
 # Set developer code and compile options
 # Set to YES to compile for debugging
 DEBUG ?= NO
@@ -118,17 +112,12 @@ MODULES += Telemetry
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = ../../UAVTalk
 OPUAVTALKINC = $(OPUAVTALK)/inc
-OPUAVOBJ = ../../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 OPTESTS  = ./Tests
-OPMODULEDIR = ../../Modules
-FLIGHTLIB = ../../Libraries
 FLIGHTLIBINC = $(FLIGHTLIB)/inc
-MATHLIB = ../../Libraries/math
-MATHLIBINC = ../../Libraries/math
-PIOS = ../../PiOS
+MATHLIB = $(FLIGHTLIB)/math
+MATHLIBINC = $(FLIGHTLIB)/math
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common
@@ -149,8 +138,6 @@ RTOSSRCDIR = $(RTOSDIR)/Source
 RTOSINCDIR = $(RTOSSRCDIR)/include
 RTOSPORTDIR = $(APPLIBDIR)/FreeRTOS/Source
 DOXYGENDIR = ../Doc/Doxygen
-AHRSBOOTLOADER = ../Bootloaders/AHRS/
-AHRSBOOTLOADERINC = $(AHRSBOOTLOADER)/inc
 PYMITE = $(FLIGHTLIB)/PyMite
 PYMITELIB = $(PYMITE)/lib
 PYMITEPLAT = $(PYMITE)/platform/openpilot
@@ -161,9 +148,6 @@ PYMITEINC += $(PYMITEPLAT)
 PYMITEINC += $(OUTDIR)
 FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
 FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
-HWDEFSINC = ../board_hw_defs/$(BOARD_NAME)
-
-OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files

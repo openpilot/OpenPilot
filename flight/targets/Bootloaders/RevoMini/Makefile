@@ -27,12 +27,6 @@ TOP      := $(realpath $(WHEREAMI)/../../../../)
 include $(TOP)/make/firmware-defs.mk
 include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
 
-# Target file name (without extension).
-TARGET := bl_$(BOARD_NAME)
-
-# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR := $(TOP)/build/$(TARGET)
-
 # Set developer code and compile options
 # Set to YES for debugging
 DEBUG ?= NO
@@ -49,9 +43,7 @@ endif
 # Paths
 REVO_BL = $(WHEREAMI)
 REVO_BLINC = $(REVO_BL)/inc
-PIOS = ../../../PiOS
 PIOSINC = $(PIOS)/inc
-FLIGHTLIB = ../../../Libraries
 FLIGHTLIBINC = $(FLIGHTLIB)/inc
 PIOSSTM32F4XX = $(PIOS)/STM32F4xx
 PIOSCOMMON = $(PIOS)/Common
@@ -62,7 +54,6 @@ STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F4xx_StdPeriph_Driver
 STMSPDSRCDIR = $(STMSPDDIR)/src
 STMSPDINCDIR = $(STMSPDDIR)/inc
-HWDEFSINC = ../../board_hw_defs/$(BOARD_NAME)
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files

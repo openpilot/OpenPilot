@@ -27,12 +27,6 @@ TOP      := $(realpath $(WHEREAMI)/../../../../)
 include $(TOP)/make/firmware-defs.mk
 include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
 
-# Target file name (without extension).
-TARGET = bu_$(BOARD_NAME)
-
-# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR := $(TOP)/build/$(TARGET)
-
 # Set developer code and compile options
 # Set to YES to compile for debugging
 DEBUG ?= NO
@@ -61,7 +55,6 @@ FLASH_TOOL = OPENOCD
 # Paths
 OPSYSTEM = .
 OPSYSTEMINC = $(OPSYSTEM)/inc
-PIOS = ../../../PiOS
 PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common
@@ -80,8 +73,6 @@ MSDDIR  = $(APPLIBDIR)/msd
 RTOSDIR = $(APPLIBDIR)/FreeRTOS
 RTOSSRCDIR = $(RTOSDIR)/Source
 RTOSINCDIR = $(RTOSSRCDIR)/include
-DOXYGENDIR = ../Doc/Doxygen
-HWDEFSINC = $(TOP)/flight/targets/board_hw_defs/$(BOARD_NAME)
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files

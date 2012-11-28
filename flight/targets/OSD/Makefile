@@ -27,12 +27,6 @@ TOP      := $(realpath $(WHEREAMI)/../../../)
 include $(TOP)/make/firmware-defs.mk
 include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
 
-# Target file name (without extension).
-TARGET := fw_$(BOARD_NAME)
-
-# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR := $(TOP)/build/$(TARGET)
-
 # Set developer code and compile options
 # Set to YES for debugging
 DEBUG ?= NO
@@ -102,12 +96,8 @@ MODULES += FirmwareIAP
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = ../../UAVTalk
 OPUAVTALKINC = $(OPUAVTALK)/inc
-OPMODULEDIR = ../../Modules
-PIOS = ../../PiOS
 PIOSINC = $(PIOS)/inc
-FLIGHTLIB = ../../Libraries
 FLIGHTLIBINC = $(FLIGHTLIB)/inc
 PIOSSTM32F4XX = $(PIOS)/STM32F4xx
 PIOSCOMMON = $(PIOS)/Common
@@ -124,15 +114,7 @@ CMSISDIR  = $(STMLIBDIR)/CMSIS/Core/CM3
 RTOSDIR = $(PIOSCOMMONLIB)/FreeRTOS
 RTOSSRCDIR = $(RTOSDIR)/Source
 RTOSINCDIR = $(RTOSSRCDIR)/include
-OPDIR = ../OSD
-OPUAVOBJ = ../../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
-OPSYSINC = $(OPDIR)/System/inc
-BOOT = ../Bootloaders/OSD
-BOOTINC = $(BOOT)/inc
-HWDEFSINC = ../board_hw_defs/$(BOARD_NAME)
-
-OPUAVSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
@@ -274,7 +256,6 @@ EXTRAINCDIRS  += $(RTOSINCDIR)
 EXTRAINCDIRS  += $(APPLIBDIR)
 EXTRAINCDIRS  += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
 EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
-EXTRAINCDIRS  += $(BOOTINC)
 EXTRAINCDIRS  += $(HWDEFSINC)
 
 EXTRAINCDIRS += ${foreach MOD, ${OPTMODULES} ${MODULES}, ${OPMODULEDIR}/${MOD}/inc} ${OPMODULEDIR}/System/inc

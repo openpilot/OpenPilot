@@ -79,7 +79,7 @@ uint8_t max_axislock_rate = 0;
 float weak_leveling_kp = 0;
 uint8_t weak_leveling_max = 0;
 bool lowThrottleZeroIntegral;
-bool lowThrottleZeroAxis[3];
+bool lowThrottleZeroAxis[MAX_AXES];
 float vbar_decay = 0.991f;
 struct pid pids[PID_MAX];
 
@@ -360,14 +360,14 @@ static void stabilizationTask(void* parameters)
 
 		// Suppress desired output while disarmed or throttle low, for configured axis
 		if (flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED || stabDesired.Throttle < 0) {
-			if (lowThrottleZeroAxis[0])
-				actuatorDesired.Roll = 0;
+			if (lowThrottleZeroAxis[ROLL])
+				actuatorDesired.Roll = 0.0f;
 
-			if (lowThrottleZeroAxis[1])
-				actuatorDesired.Pitch = 0;
+			if (lowThrottleZeroAxis[PITCH])
+				actuatorDesired.Pitch = 0.0f;
 
-			if (lowThrottleZeroAxis[2])
-				actuatorDesired.Yaw = 0;
+			if (lowThrottleZeroAxis[YAW])
+				actuatorDesired.Yaw = 0.0f;
 		}
 
 		if(PARSE_FLIGHT_MODE(flightStatus.FlightMode) != FLIGHTMODE_MANUAL) {
@@ -475,9 +475,9 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	lowThrottleZeroIntegral = settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE;
 
 	// Whether to suppress (zero) the StabilizationDesired output for each axis while disarmed or throttle is low
-	lowThrottleZeroAxis[0] = settings.LowThrottleZeroAxis[STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_ROLL] == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
-	lowThrottleZeroAxis[1] = settings.LowThrottleZeroAxis[STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_PITCH] == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
-	lowThrottleZeroAxis[2] = settings.LowThrottleZeroAxis[STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_YAW] == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
+	lowThrottleZeroAxis[ROLL] = settings.LowThrottleZeroAxis[STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_ROLL] == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
+	lowThrottleZeroAxis[PITCH] = settings.LowThrottleZeroAxis[STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_PITCH] == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
+	lowThrottleZeroAxis[YAW] = settings.LowThrottleZeroAxis[STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_YAW] == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
 
 	// The dT has some jitter iteration to iteration that we don't want to
 	// make thie result unpredictable.  Still, it's nicer to specify the constant

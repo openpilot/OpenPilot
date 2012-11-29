@@ -35,6 +35,8 @@
 
 	<field name="LowThrottleZeroIntegral" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="TRUE"/>
 
+	<field name="LowThrottleZeroAxis" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="FALSE,TRUE" defaultvalue="FALSE,FALSE,FALSE"/>
+
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
 	<telemetryflight acked="true" updatemode="onchange" period="0"/>

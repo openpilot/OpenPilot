@@ -1498,7 +1498,7 @@ font: bold 12px;
 margin:1px;</string>
                     </property>
                     <property name="text">
-                     <string>Tricopter Yaw Motor channel</string>
+                     <string>Tricopter Yaw Servo channel</string>
                     </property>
                     <property name="alignment">
                      <set>Qt::AlignCenter</set>

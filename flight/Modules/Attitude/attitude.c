@@ -218,14 +218,14 @@ static void AttitudeTask(void *parameters)
 			// For first 7 seconds use accels to get gyro bias
 			accelKp = 1;
 			accelKi = 0.9;
-			yawBiasRate = 0.23;
+			yawBiasRate = 0.01;
 			accel_filter_enabled = false;
 			init = 0;
 		}
 		else if (zero_during_arming && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
 			accelKp = 1;
 			accelKi = 0.9;
-			yawBiasRate = 0.23;
+			yawBiasRate = 0.01;
 			accel_filter_enabled = false;
 			init = 0;
 		} else if (init == 0) {

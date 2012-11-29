@@ -8,7 +8,7 @@
         <field name="MaxAxisLockRate" units="deg/s" type="float" elements="1" defaultvalue="1"/>
         <field name="OutputRange" units="deg" type="uint8" elementnames="Roll,Pitch,Yaw" defaultvalue="20"/>
         <field name="ResponseTime" units="ms" type="uint8" elementnames="Roll,Pitch,Yaw" defaultvalue="0"/>
-        <field name="GimbalType" units="" type="enum" elements="1" options="Yaw-Roll-Pitch,Yaw-Pitch-Roll" defaultvalue="Yaw-Roll-Pitch"/>
+        <field name="GimbalType" units="" type="enum" elements="1" options="Generic,Yaw-Roll-Pitch,Yaw-Pitch-Roll" defaultvalue="Generic"/>
         <field name="FeedForward" units="" type="uint8" elementnames="Roll,Pitch,Yaw" defaultvalue="0"/>
         <field name="MaxAccel" units="units/sec" type="uint16" elements="1" defaultvalue="500"/>
         <field name="AccelTime" units="ms" type="uint8" elementnames="Roll,Pitch,Yaw" defaultvalue="5"/>

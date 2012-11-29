@@ -1300,7 +1300,8 @@ Range: 0-50ms, default is 5.</string>
                 <property name="toolTip">
                  <string>Gimbal type
 
-Used to limit feed forward acceleration at extreme angles.</string>
+Used to limit feed forward acceleration at extreme angles.
+Generic type provides no limit.</string>
                 </property>
                 <property name="objrelation" stdset="0">
                  <stringlist>

@@ -244,6 +244,9 @@ void applyFeedForward(uint8_t index, float dT, float *attitude, CameraStabSettin
 	float gimbalTypeCorrection = 1.0f;
 
 	switch (cameraStab->GimbalType) {
+	case CAMERASTABSETTINGS_GIMBALTYPE_GENERIC:
+		// no correction
+		break;
 	case CAMERASTABSETTINGS_GIMBALTYPE_YAWROLLPITCH:
 		if (index == CAMERASTABSETTINGS_INPUT_ROLL) {
 			float pitch;

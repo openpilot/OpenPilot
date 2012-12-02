@@ -302,6 +302,27 @@ static void updatePathVelocity()
 	
 	float error_speed = progress.error * fixedwingpathfollowerSettings.HorizontalPosP;
 
+	// if a plane is crossing its desired flightpath facing the wrong way (away from flight direction)
+	// it would turn towards the flightpath to get on its desired course. This however would reverse the correction vector
+	// once it crosses the flightpath again, which would make it again turn towards the flightpath (but away from its desired heading)
+	// leading to an S-shape snake course the wrong way
+	// this only happens especially if HorizontalPosP is too high, as otherwise the angle between velocity desired and path_direction won't
+	// turn steep unless there is enough space complete the turn before crossing the flightpath
+	// in this case the plane effectively needs to be turned around
+	// indicators:
+	// difference between correction_direction and velocityactual >90 degrees and
+	// difference between path_direction and velocityactual >90 degrees  ( 4th sector, facing away from eerything )
+	// fix: ignore correction, steer in path direction until the situation has become better (condition doesn't apply anymore)
+	float angle1=RAD2DEG * ( atan2f(progress.path_direction[1],progress.path_direction[0]) - atan2f(velocityActual.East,velocityActual.North));
+	float angle2=RAD2DEG * ( atan2f(progress.correction_direction[1],progress.correction_direction[0]) - atan2f(velocityActual.East,velocityActual.North));
+	if (angle1<-180.0f) angle1+=360.0f;
+	if (angle1>180.0f) angle1-=360.0f;
+	if (angle2<-180.0f) angle2+=360.0f;
+	if (angle2>180.0f) angle2-=360.0f;
+	if (fabs(angle1)>=90.0f && fabs(angle2)>=90.0f) {
+		error_speed=0;
+	}
+
 	// calculate correction - can also be zero if correction vector is 0 or no error present
 	velocityDesired.North += progress.correction_direction[0] * error_speed;
 	velocityDesired.East += progress.correction_direction[1] * error_speed;
@@ -565,8 +586,8 @@ static uint8_t updateFixedDesiredAttitude()
 	if (groundspeedDesired> 1e-6) {
 		bearingError = RAD2DEG * (atan2f(velocityDesired.East,velocityDesired.North) - atan2f(velocityActual.East,velocityActual.North));
 	} else {
-		// if we are not supposed to move, keep going wherever we are now. Don't make things worse by changing direction.
-		bearingError = 0;
+		// if we are not supposed to move, run in a circle
+		bearingError = -90.0f;
 	}
 	
 	if (bearingError<-180.0f) bearingError+=360.0f;

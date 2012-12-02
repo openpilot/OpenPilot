@@ -156,9 +156,9 @@ static void attitudeUpdated(UAVObjEvent* ev)
 
 	// check how long since last update, time delta between calls in ms
 	portTickType thisSysTime = xTaskGetTickCount();
-	float dT = (thisSysTime > csd->lastSysTime) ?
-			(float)((thisSysTime - csd->lastSysTime) * portTICK_RATE_MS) :
-			(float)SAMPLE_PERIOD_MS;
+	float dT_millis = (thisSysTime > csd->lastSysTime) ?
+				(float)((thisSysTime - csd->lastSysTime) * portTICK_RATE_MS) :
+				(float)SAMPLE_PERIOD_MS;
 	csd->lastSysTime = thisSysTime;
 
 	// process axes
@@ -175,7 +175,7 @@ static void attitudeUpdated(UAVObjEvent* ev)
 				case CAMERASTABSETTINGS_STABILIZATIONMODE_AXISLOCK:
 					input_rate = accessory.AccessoryVal * cameraStab.InputRate[i];
 					if (fabs(input_rate) > cameraStab.MaxAxisLockRate)
-						csd->inputs[i] = bound(csd->inputs[i] + input_rate * 0.001f * dT, cameraStab.InputRange[i]);
+						csd->inputs[i] = bound(csd->inputs[i] + input_rate * 0.001f * dT_millis, cameraStab.InputRange[i]);
 					break;
 				default:
 					PIOS_Assert(0);
@@ -203,13 +203,13 @@ static void attitudeUpdated(UAVObjEvent* ev)
 #ifdef USE_GIMBAL_LPF
 		if (cameraStab.ResponseTime) {
 			float rt = (float)cameraStab.ResponseTime[i];
-			attitude = csd->attitudeFiltered[i] = ((rt * csd->attitudeFiltered[i]) + (dT * attitude)) / (rt + dT);
+			attitude = csd->attitudeFiltered[i] = ((rt * csd->attitudeFiltered[i]) + (dT_millis * attitude)) / (rt + dT_millis);
 		}
 #endif
 
 #ifdef USE_GIMBAL_FF
 		if (cameraStab.FeedForward[i])
-			applyFeedForward(i, dT, &attitude, &cameraStab);
+			applyFeedForward(i, dT_millis, &attitude, &cameraStab);
 #endif
 
 		// set output channels
@@ -238,7 +238,7 @@ float bound(float val, float limit)
 }
 
 #ifdef USE_GIMBAL_FF
-void applyFeedForward(uint8_t index, float dT, float *attitude, CameraStabSettingsData *cameraStab)
+void applyFeedForward(uint8_t index, float dT_millis, float *attitude, CameraStabSettingsData *cameraStab)
 {
 	// compensate high feed forward values depending on gimbal type
 	float gimbalTypeCorrection = 1.0f;
@@ -273,7 +273,7 @@ void applyFeedForward(uint8_t index, float dT, float *attitude, CameraStabSettin
 	csd->ffLastAttitude[index] = *attitude;
 	*attitude += accumulator;
 
-	float filter = (float)((accumulator > 0.0f) ? cameraStab->AccelTime[index] : cameraStab->DecelTime[index]) / dT;
+	float filter = (float)((accumulator > 0.0f) ? cameraStab->AccelTime[index] : cameraStab->DecelTime[index]) / dT_millis;
 	if (filter < 1.0f)
 		filter = 1.0f;
 	accumulator -= accumulator / filter;
@@ -282,7 +282,7 @@ void applyFeedForward(uint8_t index, float dT, float *attitude, CameraStabSettin
 
 	// apply acceleration limit
 	float delta = *attitude - csd->ffLastAttitudeFiltered[index];
-	float maxDelta = (float)cameraStab->MaxAccel * 0.001f * dT;
+	float maxDelta = (float)cameraStab->MaxAccel * 0.001f * dT_millis;
 
 	if (fabs(delta) > maxDelta) {
 		// we are accelerating too hard

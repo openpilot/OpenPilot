@@ -352,7 +352,6 @@ static void manualControlTask(void *parameters)
 						(float)UPDATE_PERIOD_MS;
 				lastSysTimeLPF = thisSysTime;
 
-				applyLPF(&cmd.Throttle, MANUALCONTROLSETTINGS_RESPONSETIME_THROTTLE, &settings, dT);
 				applyLPF(&cmd.Roll, MANUALCONTROLSETTINGS_RESPONSETIME_ROLL, &settings, dT);
 				applyLPF(&cmd.Pitch, MANUALCONTROLSETTINGS_RESPONSETIME_PITCH, &settings, dT);
 				applyLPF(&cmd.Yaw, MANUALCONTROLSETTINGS_RESPONSETIME_YAW, &settings, dT);

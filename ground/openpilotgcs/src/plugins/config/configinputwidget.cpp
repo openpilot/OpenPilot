@@ -92,7 +92,6 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
 
         // Input filter response time fields supported for some channels only
         switch (index) {
-        case ManualControlSettings::CHANNELGROUPS_THROTTLE:
         case ManualControlSettings::CHANNELGROUPS_ROLL:
         case ManualControlSettings::CHANNELGROUPS_PITCH:
         case ManualControlSettings::CHANNELGROUPS_YAW:
@@ -102,6 +101,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
             addUAVObjectToWidgetRelation("ManualControlSettings", "ResponseTime", inpForm->ui->channelResponseTime, indexRT);
             ++indexRT;
             break;
+        case ManualControlSettings::CHANNELGROUPS_THROTTLE:
         case ManualControlSettings::CHANNELGROUPS_FLIGHTMODE:
         case ManualControlSettings::CHANNELGROUPS_COLLECTIVE:
             inpForm->ui->channelResponseTime->setEnabled(false);

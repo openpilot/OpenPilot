@@ -55,7 +55,7 @@ MODULES += ManualControl Stabilization Actuator
 MODULES += Battery
 MODULES += Altitude/revolution
 MODULES += GPS FirmwareIAP
-#MODULES += Airspeed/revolution
+MODULES += Airspeed/revolution
 MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner TxPID
 MODULES += CameraStab
 MODULES += Radio
@@ -163,6 +163,7 @@ include $(PIOS)/STM32F4xx/library.mk
 SRC += $(PIOSCOMMON)/pios_mpu6000.c
 SRC += $(PIOSCOMMON)/pios_bma180.c
 SRC += $(PIOSCOMMON)/pios_etasv3.c
+SRC += $(PIOSCOMMON)/pios_mpxv.c
 SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
 SRC += $(PIOSCOMMON)/pios_l3gd20.c
 SRC += $(PIOSCOMMON)/pios_hmc5883.c

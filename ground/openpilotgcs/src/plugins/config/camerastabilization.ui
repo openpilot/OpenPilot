@@ -981,7 +981,7 @@ margin:1px;</string>
               <item row="1" column="0">
                <widget class="QLabel" name="label_2">
                 <property name="text">
-                 <string>AF Response Time</string>
+                 <string>Attitude Filter RT</string>
                 </property>
                </widget>
               </item>
@@ -990,7 +990,7 @@ margin:1px;</string>
                 <property name="toolTip">
                  <string>Roll axis attitude filter response time
 
-Range: 0-250ms, 0 disables filter (default).
+Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</string>
                 </property>
@@ -1012,7 +1012,7 @@ Smoothes estimated airframe attitude used by camera stabilization.</string>
                 <property name="toolTip">
                  <string>Pitch axis attitude filter response time
 
-Range: 0-250ms, 0 disables filter (default).
+Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</string>
                 </property>
@@ -1034,7 +1034,7 @@ Smoothes estimated airframe attitude used by camera stabilization.</string>
                 <property name="toolTip">
                  <string>Yaw axis attitude filter response time
 
-Range: 0-250ms, 0 disables filter (default).
+Range: 0-250ms, 0 disables the filter (default).
 
 Smoothes estimated airframe attitude used by camera stabilization.</string>
                 </property>

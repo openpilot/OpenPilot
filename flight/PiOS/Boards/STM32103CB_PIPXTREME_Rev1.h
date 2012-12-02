@@ -90,6 +90,12 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define PIOS_LED_LINK	1
 #define PIOS_LED_RX	2
 #define PIOS_LED_TX	3
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
+#define PIOS_LED_D1     4
+#define PIOS_LED_D2     5
+#define PIOS_LED_D3     6
+#define PIOS_LED_D4     7
+#endif
 
 #define PIOS_LED_HEARTBEAT PIOS_LED_USB
 #define PIOS_LED_ALARM PIOS_LED_TX
@@ -109,6 +115,24 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define TX_LED_ON					PIOS_LED_On(PIOS_LED_TX)
 #define TX_LED_OFF					PIOS_LED_Off(PIOS_LED_TX)
 #define TX_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_TX)
+
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
+#define D1_LED_ON					PIOS_LED_On(PIOS_LED_D1)
+#define D1_LED_OFF					PIOS_LED_Off(PIOS_LED_D1)
+#define D1_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_D1)
+
+#define D2_LED_ON					PIOS_LED_On(PIOS_LED_D2)
+#define D2_LED_OFF					PIOS_LED_Off(PIOS_LED_D2)
+#define D2_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_D2)
+
+#define D3_LED_ON					PIOS_LED_On(PIOS_LED_D3)
+#define D3_LED_OFF					PIOS_LED_Off(PIOS_LED_D3)
+#define D3_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_D3)
+
+#define D4_LED_ON					PIOS_LED_On(PIOS_LED_D4)
+#define D4_LED_OFF					PIOS_LED_Off(PIOS_LED_D4)
+#define D4_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_D4)
+#endif
 
 //-------------------------
 // System Settings

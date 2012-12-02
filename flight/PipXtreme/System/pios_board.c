@@ -179,6 +179,7 @@ void PIOS_Board_Init(void) {
 #endif
 
 	/* Configure the telemetry serial port */
+#ifndef PIOS_RFM22B_DEBUG_ON_TELEM
 	{
 		uint32_t pios_usart1_id;
 		if (PIOS_USART_Init(&pios_usart1_id, &pios_usart_serial_cfg)) {
@@ -194,6 +195,7 @@ void PIOS_Board_Init(void) {
 			PIOS_Assert(0);
 		}
 	}
+#endif
 
 	/* Configure the flexi serial port */
 	{

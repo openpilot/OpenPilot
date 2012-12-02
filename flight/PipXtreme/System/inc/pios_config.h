@@ -99,8 +99,8 @@
 /* PIOS Initcall infrastructure */
 #define PIOS_INCLUDE_INITCALL
 
-/* Always include the radio module */
-#define RADIO_BUILTIN
+/* Turn on debugging signals on the telemetry port */
+//#define PIOS_RFM22B_DEBUG_ON_TELEM
 
 #endif /* PIOS_CONFIG_H */
 /**

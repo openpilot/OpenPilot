@@ -799,16 +799,6 @@ void MainWindow::registerDefaultActions()
     mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
 #endif
 
-    //About Plugins Action
-    tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &Plugins..."), this);
-    cmd = am->registerAction(tmpaction, Constants::ABOUT_PLUGINS, m_globalContext);
-    mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
-    tmpaction->setEnabled(true);
-#ifdef Q_WS_MAC
-    cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
-#endif
-    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutPlugins()));
-
     // About GCS Action
 #ifdef Q_WS_MAC
     tmpaction = new QAction(QIcon(Constants::ICON_OPENPILOT), tr("About &OpenPilot GCS"), this); // it's convention not to add dots to the about menu
@@ -822,6 +812,16 @@ void MainWindow::registerDefaultActions()
     cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
 #endif
     connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutOpenPilotGCS()));
+
+    //About Plugins Action
+    tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &Plugins..."), this);
+    cmd = am->registerAction(tmpaction, Constants::ABOUT_PLUGINS, m_globalContext);
+    mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
+    tmpaction->setEnabled(true);
+#ifdef Q_WS_MAC
+    cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
+#endif
+    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutPlugins()));
 
     //Credits Action
     tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &Authors..."), this);

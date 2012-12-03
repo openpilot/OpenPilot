@@ -612,7 +612,11 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSet
 			return true;
 		}
 		case ACTUATORSETTINGS_CHANNELTYPE_PWM:
+#if defined(PIOS_STEPPER)
+			PIOS_Stepper_Set(actuatorSettings->ChannelAddr[mixer_channel], value);
+#else
 			PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel], value);
+#endif
 			return true;
 #if defined(PIOS_INCLUDE_I2C_ESC)
 		case ACTUATORSETTINGS_CHANNELTYPE_MK:
@@ -646,7 +650,10 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData * actuato
 		memcpy (prevChannelUpdateFreq,
 			actuatorSettings->ChannelUpdateFreq,
 			sizeof(prevChannelUpdateFreq));
+#if defined(PIOS_STEPPER)
+#else
 		PIOS_Servo_SetHz(actuatorSettings->ChannelUpdateFreq, ACTUATORSETTINGS_CHANNELUPDATEFREQ_NUMELEM);
+#endif
 	}
 }
 

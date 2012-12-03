@@ -1,0 +1,12 @@
+<xml>
+    <object name="StepperCommand" singleinstance="true" settings="false">
+        <description>The output from the @ref StepperCommand which descodes the receiver inputs.  Overriden by GCS for fly-by-wire control.</description>
+        <field name="Connected" units="" type="enum" elements="1" options="False,True"/>
+	<field name="Channel" units="us" type="int32" elements="3"/>
+	<field name="Direction" units="us" type="int32" elements="3"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

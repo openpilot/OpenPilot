@@ -756,6 +756,133 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 	},
 };
 
+#include <pios_stepper_priv.h>
+
+uint32_t pios_stepper_id;
+
+static const struct pios_stepper_dir_cfg pios_dir_stepperport_all_pins[] = {
+		[0] ={
+				.pin = {
+					.gpio = GPIOB,
+					.init = {
+						.GPIO_Pin   = GPIO_Pin_8,
+						.GPIO_Mode  = GPIO_Mode_AF_PP,
+						.GPIO_Speed = GPIO_Speed_2MHz,
+					},
+				},
+			},
+			[1] ={
+				.pin = {
+					.gpio = GPIOB,
+					.init = {
+							.GPIO_Pin   = GPIO_Pin_7,
+							.GPIO_Mode  = GPIO_Mode_AF_PP,
+							.GPIO_Speed = GPIO_Speed_2MHz,
+					},
+				},
+			},
+			[2] ={
+				.pin = {
+						.gpio = GPIOA,
+						.init = {
+								.GPIO_Pin   = GPIO_Pin_2,
+								.GPIO_Mode  = GPIO_Mode_AF_PP,
+								.GPIO_Speed = GPIO_Speed_2MHz,
+						},
+				},
+			},
+};
+static const struct pios_tim_channel pios_tim_stepperport_all_pins[] = {
+	{
+		.timer = TIM1,
+		.timer_chan = TIM_Channel_1,
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_8,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+	},
+	{
+		.timer = TIM3,
+		.timer_chan = TIM_Channel_1,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_4,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+		.remap = GPIO_PartialRemap_TIM3,
+	},
+	{
+			.timer = TIM4,
+			.timer_chan = TIM_Channel_4,
+			.pin = {
+				.gpio = GPIOB,
+				.init = {
+					.GPIO_Pin   = GPIO_Pin_9,
+					.GPIO_Mode  = GPIO_Mode_AF_PP,
+					.GPIO_Speed = GPIO_Speed_2MHz,
+				},
+			},
+		},
+		/*{
+			.timer = TIM4,
+			.timer_chan = TIM_Channel_3,
+			.pin = {
+				.gpio = GPIOB,
+				.init = {
+					.GPIO_Pin   = GPIO_Pin_8,
+					.GPIO_Mode  = GPIO_Mode_AF_PP,
+					.GPIO_Speed = GPIO_Speed_2MHz,
+				},
+			},
+		},
+		{
+			.timer = TIM4,
+			.timer_chan = TIM_Channel_2,
+			.pin = {
+				.gpio = GPIOB,
+				.init = {
+					.GPIO_Pin   = GPIO_Pin_7,
+					.GPIO_Mode  = GPIO_Mode_AF_PP,
+					.GPIO_Speed = GPIO_Speed_2MHz,
+				},
+			},
+		},
+		{
+				.timer = TIM2,
+				.timer_chan = TIM_Channel_3,
+				.pin = {
+					.gpio = GPIOA,
+					.init = {
+						.GPIO_Pin   = GPIO_Pin_2,
+						.GPIO_Mode  = GPIO_Mode_AF_PP,
+						.GPIO_Speed = GPIO_Speed_2MHz,
+					},
+				},
+			},*/
+};
+
+const struct pios_stepper_out_cfg pios_stepper_out_cfg = {
+         .tim_oc_init = {
+        		 .TIM_OCMode = TIM_OCMode_PWM1,
+ 	 	 		 .TIM_OutputState = TIM_OutputState_Enable,
+ 	 	 		 .TIM_OutputNState = TIM_OutputNState_Disable,
+ 	 	 		 .TIM_Pulse = PIOS_SERVOS_INITIAL_POSITION,
+ 	 	 		 .TIM_OCPolarity = TIM_OCPolarity_Low,
+ 	 	 		 .TIM_OCNPolarity = TIM_OCPolarity_Low,
+ 	 	 		 .TIM_OCIdleState = TIM_OCIdleState_Reset,
+ 	 	 		 .TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+         },
+         .channels = pios_tim_stepperport_all_pins,
+         .directions =pios_dir_stepperport_all_pins,
+         .num_channels = NELEMENTS(pios_tim_stepperport_all_pins),
+};
 
 static const struct pios_tim_channel pios_tim_servoport_rcvrport_pins[] = {
 	{

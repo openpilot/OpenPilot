@@ -14,3 +14,4 @@ following URL: http://bugs.openpilot.org/browse/OP-XXX
            Workaround: update firmware, power cycle, enable modules, power cycle, import configuration.
 + [OP-747] Board infinitely reboots itself after firmware upgrade (settings erase firmware is a workaround).
 + [OP-723] GCS uses the system language ot the 1st run. After restart it uses English (can be changed later).
++ [OP-725] GCS camera stab config error message disappears too fast (but config error is cleared as it should)

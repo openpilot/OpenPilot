@@ -13,3 +13,4 @@ following URL: http://bugs.openpilot.org/browse/OP-XXX
 + [OP-732] Import UAV Settings for inactive modules crashes the running firmware (board restarts).
            Workaround: update firmware, power cycle, enable modules, power cycle, import configuration.
 + [OP-747] Board infinitely reboots itself after firmware upgrade (settings erase firmware is a workaround).
++ [OP-723] GCS uses the system language ot the 1st run. After restart it uses English (can be changed later).

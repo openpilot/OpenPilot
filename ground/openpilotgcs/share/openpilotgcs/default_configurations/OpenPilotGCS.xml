@@ -6,7 +6,7 @@
     <Description>Default configuration</Description>
     <Details>Default configuration built to work on all screen sizes</Details>
     <ExpertMode>false</ExpertMode>
-    <OverrideLanguage>en_AU</OverrideLanguage>
+    <OverrideLanguage>C</OverrideLanguage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
     <SettingsWindowHeight>700</SettingsWindowHeight>
     <SettingsWindowWidth>800</SettingsWindowWidth>
@@ -2666,27 +2666,18 @@
         </side0>
         <side1>
           <side0>
-            <side0>
-              <classId>LoggingGadget</classId>
-              <type>uavGadget</type>
-            </side0>
-            <side1>
-              <classId>GpsDisplayGadget</classId>
-              <gadget>
-                <activeConfiguration>Flight GPS</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side1>
-            <splitterOrientation>2</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAcAAAAAIAAAHo)</splitterSizes>
-            <type>splitter</type>
+            <classId>LoggingGadget</classId>
+            <type>uavGadget</type>
           </side0>
           <side1>
-            <classId>DebugGadget</classId>
+            <classId>GpsDisplayGadget</classId>
+            <gadget>
+              <activeConfiguration>Flight GPS</activeConfiguration>
+            </gadget>
             <type>uavGadget</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB3wAAAAIAAAEp)</splitterSizes>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAVAAAAAIAAAGu)</splitterSizes>
           <type>splitter</type>
         </side1>
         <splitterOrientation>1</splitterOrientation>

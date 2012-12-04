@@ -166,7 +166,7 @@ class Repo:
             return ''.join([self.tag(''), self.dirty()])
 
     def revision(self):
-        """Return full revison string (tag if defined, or branch:hash date time if no tag"""
+        """Return full revison string (tag if defined, or branch:hash date time if no tag)"""
         if self._tag == None:
             return ''.join([self.branch('no-branch'), ":", self.hash(8, 'no-hash'), self.dirty(), self.time(' %Y%m%d %H:%M')])
         else:

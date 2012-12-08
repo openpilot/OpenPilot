@@ -217,8 +217,12 @@ arm_sdk_install: arm_sdk_clean
 	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ARM_SDK_URL)"
 	# download libraries recompiled for CC/CC3D (armv7-m target)  
 	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ARM_ARMV7_M_URL)"
-
-        # binary only release so just extract it
+	$(V1) echo fd18a6b3f9fad0f8d3eba60511f7f0c4 *$(DL_DIR)/$(ARM_ARMV7_M_FILE) >\
+	"$(DL_DIR)/$(ARM_ARMV7_M_FILE).md5" 
+	#verifying checksum...
+	$(V1) md5sum -c --status "$(DL_DIR)/$(ARM_ARMV7_M_FILE).md5" 
+	
+	# binary only release so just extract it
 	$(V1) tar -C $(TOOLS_DIR) -xjf "$(DL_DIR)/$(ARM_SDK_FILE)"
 	$(V1) tar -C $(ARM_SDK_DIR) -xzf "$(DL_DIR)/$(ARM_ARMV7_M_FILE)"
 	

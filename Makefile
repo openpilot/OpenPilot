@@ -208,7 +208,7 @@ ARM_SDK_DIR := $(TOOLS_DIR)/gcc-arm-none-eabi-4_6-2012q2
 .PHONY: arm_sdk_install
 arm_sdk_install: ARM_SDK_URL  := https://launchpad.net/gcc-arm-embedded/4.6/4.6-2012-q2-update/+download/gcc-arm-none-eabi-4_6-2012q2-20120614.tar.bz2
 arm_sdk_install: ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
-arm_sdk_install: ARM_ARMV7_M_URL  := http://www.alessiomorale.com/OpenPilot/arm-none-eabi.tar.gz
+arm_sdk_install: ARM_ARMV7_M_URL  := http://wiki.openpilot.org/download/attachments/17170592/arm-none-eabi.tar.gz
 arm_sdk_install: ARM_ARMV7_M_FILE := $(notdir $(ARM_ARMV7_M_URL))
 # order-only prereq on directory existance:
 arm_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
@@ -216,11 +216,14 @@ arm_sdk_install: arm_sdk_clean
         # download the source only if it's newer than what we already have
 	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ARM_SDK_URL)"
 	# download libraries recompiled for CC/CC3D (armv7-m target)  
+	# check http://wiki.openpilot.org/display/Doc/Rebuilding+newlib+for+CopterControl+and+ARM+mantained+toolchains for more informations
+	#
 	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ARM_ARMV7_M_URL)"
 	$(V1) echo fd18a6b3f9fad0f8d3eba60511f7f0c4 *$(DL_DIR)/$(ARM_ARMV7_M_FILE) >\
 	"$(DL_DIR)/$(ARM_ARMV7_M_FILE).md5" 
-	#verifying checksum...
+	# verifying checksum...
 	$(V1) md5sum -c --status "$(DL_DIR)/$(ARM_ARMV7_M_FILE).md5" 
+	# verified, ok
 	
 	# binary only release so just extract it
 	$(V1) tar -C $(TOOLS_DIR) -xjf "$(DL_DIR)/$(ARM_SDK_FILE)"

@@ -203,20 +203,25 @@ qt_sdk_clean:
 	$(V1) [ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf $(QT_SDK_DIR)
 
 # Set up ARM (STM32) SDK
-ARM_SDK_DIR := $(TOOLS_DIR)/gcc-arm-none-eabi-4_6-2012q1
+ARM_SDK_DIR := $(TOOLS_DIR)/gcc-arm-none-eabi-4_6-2012q2
 
 .PHONY: arm_sdk_install
-arm_sdk_install: ARM_SDK_URL  := https://launchpad.net/gcc-arm-embedded/4.6/4.6-2012-q1-update/+download/gcc-arm-none-eabi-4_6-2012q1-20120316.tar.bz2
+arm_sdk_install: ARM_SDK_URL  := https://launchpad.net/gcc-arm-embedded/4.6/4.6-2012-q2-update/+download/gcc-arm-none-eabi-4_6-2012q2-20120614.tar.bz2
 arm_sdk_install: ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
+arm_sdk_install: ARM_ARMV7_M_URL  := http://www.alessiomorale.com/OpenPilot/arm-none-eabi.tar.gz
+arm_sdk_install: ARM_ARMV7_M_FILE := $(notdir $(ARM_ARMV7_M_URL))
 # order-only prereq on directory existance:
 arm_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
 arm_sdk_install: arm_sdk_clean
         # download the source only if it's newer than what we already have
 	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ARM_SDK_URL)"
+	# download libraries recompiled for CC/CC3D (armv7-m target)  
+	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ARM_ARMV7_M_URL)"
 
         # binary only release so just extract it
 	$(V1) tar -C $(TOOLS_DIR) -xjf "$(DL_DIR)/$(ARM_SDK_FILE)"
-
+	$(V1) tar -C $(ARM_SDK_DIR) -xzf "$(DL_DIR)/$(ARM_ARMV7_M_FILE)"
+	
 .PHONY: arm_sdk_clean
 arm_sdk_clean:
 	$(V1) [ ! -d "$(ARM_SDK_DIR)" ] || $(RM) -r $(ARM_SDK_DIR)

@@ -158,6 +158,20 @@ class Repo:
         else:
             return clean
 
+    def label(self):
+        """Return package label (tag if defined, or date-hash if no tag)"""
+        if self._tag == None:
+            return ''.join([self.time('%Y%m%d'), "-", self.hash(8, 'untagged'), self.dirty()])
+        else:
+            return ''.join([self.tag(''), self.dirty()])
+
+    def revision(self):
+        """Return full revison string (tag if defined, or branch:hash date time if no tag)"""
+        if self._tag == None:
+            return ''.join([self.branch('no-branch'), ":", self.hash(8, 'no-hash'), self.dirty(), self.time(' %Y%m%d %H:%M')])
+        else:
+            return ''.join([self.tag(''), self.dirty()])
+
     def info(self):
         """Print some repository info"""
         print "path:       ", self.path()
@@ -169,6 +183,8 @@ class Repo:
         print "branch:     ", self.branch()
         print "commit tag: ", self.tag('')
         print "dirty:      ", self.dirty('yes', 'no')
+        print "label:      ", self.label()
+        print "revision:   ", self.revision()
 
 def file_from_template(tpl_name, out_name, dict):
     """Create or update file from template using dictionary
@@ -380,10 +396,15 @@ string given.
         TAG = r.tag(''),
         TAG_OR_BRANCH = r.tag(r.branch('unreleased')),
         TAG_OR_HASH8 = r.tag(r.hash(8, 'untagged')),
+        LABEL = r.label(),
+        REVISION = r.revision(),
         DIRTY = r.dirty(),
         FWTAG = xtrim(r.tag(r.branch('unreleased')), r.dirty(), 25),
         UNIXTIME = r.time(),
         DATE = r.time('%Y%m%d'),
+        DAY=r.time('%d'),
+        MONTH=r.time('%m'),
+        YEAR=r.time('%Y'),
         DATETIME = r.time('%Y%m%d %H:%M'),
         BOARD_TYPE = args.type,
         BOARD_REVISION = args.revision,

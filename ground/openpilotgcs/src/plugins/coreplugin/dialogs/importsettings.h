@@ -1,3 +1,4 @@
+
 #ifndef IMPORTSETTINGS_H
 #define IMPORTSETTINGS_H
 
@@ -10,8 +11,7 @@ class importSettings;
 class importSettings : public QDialog
 {
     Q_OBJECT
-    struct fileInfo
-    {
+    struct fileInfo {
         QString file;
         QString description;
         QString details;
@@ -23,9 +23,11 @@ public:
     
     void loadFiles(QString path);
     QString choosenConfig();
+
 private:
     Ui::importSettings *ui;
     QMap<int,fileInfo*> configList;
+
 private slots:
     void updateDetails(int);
 };

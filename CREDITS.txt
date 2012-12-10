@@ -198,3 +198,6 @@ D: Russian translation of the GCS
 N: Brian Webb
 D: Modem lead developer
 M: OP Modems
+
+N: Dmitriy Zaitsev
+D: AeroSim-RC HiTL plugin

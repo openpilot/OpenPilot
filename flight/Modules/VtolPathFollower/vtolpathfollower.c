@@ -60,9 +60,9 @@
 #include "pathstatus.h"
 #include "gpsvelocity.h"
 #include "gpsposition.h"
+#include "homelocation.h"
 #include "vtolpathfollowersettings.h"
 #include "nedaccel.h"
-#include "nedposition.h"
 #include "stabilizationdesired.h"
 #include "stabilizationsettings.h"
 #include "systemsettings.h"
@@ -81,6 +81,7 @@
 #define STACK_SIZE_BYTES 1548
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
 #define F_PI 3.14159265358979323846f
+#define DEG2RAD (F_PI/180.0f)
 #define RAD2DEG(rad) ((rad)*(180.0f/F_PI))
 
 // Private types
@@ -439,11 +440,24 @@ void updateEndpointVelocity()
 			break;
 		case VTOLPATHFOLLOWERSETTINGS_POSITIONSOURCE_GPSPOS:
 		{
-			NEDPositionData nedPosition;
-			NEDPositionGet(&nedPosition);
-			northPos = nedPosition.North;
-			eastPos = nedPosition.East;
-			downPos = nedPosition.Down;
+			// this used to work with the NEDposition UAVObject
+			// however this UAVObject has been removed
+			GPSPositionData gpsPosition;
+			GPSPositionGet(&gpsPosition);
+			HomeLocationData homeLocation;
+			HomeLocationGet(&homeLocation);
+			float lat = homeLocation.Latitude / 10.0e6f * DEG2RAD;
+			float alt = homeLocation.Altitude;
+			float T[3] = { alt+6.378137E6f,
+				     cosf(lat)*(alt+6.378137E6f),
+				     -1.0f};
+			float NED[3] = {T[0] * ((gpsPosition.Latitude - homeLocation.Latitude) / 10.0e6f * DEG2RAD),
+				T[1] * ((gpsPosition.Longitude - homeLocation.Longitude) / 10.0e6f * DEG2RAD),
+				T[2] * ((gpsPosition.Altitude + gpsPosition.GeoidSeparation - homeLocation.Altitude))};
+
+			northPos = NED[0];
+			eastPos = NED[1];
+			downPos = NED[2];
 		}
 			break;
 		default:

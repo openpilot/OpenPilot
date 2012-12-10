@@ -60,7 +60,6 @@
 #include "fixedwingpathfollowersettings.h"
 #include "fixedwingpathfollowerstatus.h"
 #include "homelocation.h"
-#include "nedposition.h"
 #include "stabilizationdesired.h"
 #include "stabilizationsettings.h"
 #include "systemsettings.h"
@@ -139,7 +138,6 @@ static float downVelIntegral = 0;
 
 static float bearingIntegral = 0;
 static float speedIntegral = 0;
-static float accelIntegral = 0;
 static float powerIntegral = 0;
 static float airspeedErrorInt=0;
 
@@ -243,7 +241,6 @@ static void pathfollowerTask(void *parameters)
 				downVelIntegral = 0;
 				bearingIntegral = 0;
 				speedIntegral = 0;
-				accelIntegral = 0;
 				powerIntegral = 0;
 
 				break;
@@ -295,20 +292,45 @@ static void updatePathVelocity()
 				bound(progress.fractional_progress,0,1);
 			break;
 	}
-	// this ensures a significant forward component at least close to the real trajectory
-	if (groundspeed<fixedwingpathfollowerSettings.BestClimbRateSpeed/10.)
-		groundspeed=fixedwingpathfollowerSettings.BestClimbRateSpeed/10.;
+	// make sure groundspeed is not zero
+	if (groundspeed<1e-2) groundspeed=1e-2;
 	
 	// calculate velocity - can be zero if waypoints are too close
 	VelocityDesiredData velocityDesired;
-	velocityDesired.North = progress.path_direction[0] * groundspeed;
-	velocityDesired.East = progress.path_direction[1] * groundspeed;
+	velocityDesired.North = progress.path_direction[0];
+	velocityDesired.East = progress.path_direction[1];
 	
 	float error_speed = progress.error * fixedwingpathfollowerSettings.HorizontalPosP;
+
+	// if a plane is crossing its desired flightpath facing the wrong way (away from flight direction)
+	// it would turn towards the flightpath to get on its desired course. This however would reverse the correction vector
+	// once it crosses the flightpath again, which would make it again turn towards the flightpath (but away from its desired heading)
+	// leading to an S-shape snake course the wrong way
+	// this only happens especially if HorizontalPosP is too high, as otherwise the angle between velocity desired and path_direction won't
+	// turn steep unless there is enough space complete the turn before crossing the flightpath
+	// in this case the plane effectively needs to be turned around
+	// indicators:
+	// difference between correction_direction and velocityactual >90 degrees and
+	// difference between path_direction and velocityactual >90 degrees  ( 4th sector, facing away from eerything )
+	// fix: ignore correction, steer in path direction until the situation has become better (condition doesn't apply anymore)
+	float angle1=RAD2DEG * ( atan2f(progress.path_direction[1],progress.path_direction[0]) - atan2f(velocityActual.East,velocityActual.North));
+	float angle2=RAD2DEG * ( atan2f(progress.correction_direction[1],progress.correction_direction[0]) - atan2f(velocityActual.East,velocityActual.North));
+	if (angle1<-180.0f) angle1+=360.0f;
+	if (angle1>180.0f) angle1-=360.0f;
+	if (angle2<-180.0f) angle2+=360.0f;
+	if (angle2>180.0f) angle2-=360.0f;
+	if (fabs(angle1)>=90.0f && fabs(angle2)>=90.0f) {
+		error_speed=0;
+	}
 
 	// calculate correction - can also be zero if correction vector is 0 or no error present
 	velocityDesired.North += progress.correction_direction[0] * error_speed;
 	velocityDesired.East += progress.correction_direction[1] * error_speed;
+
+	//scale to correct length
+	float l=sqrtf(velocityDesired.North*velocityDesired.North + velocityDesired.East*velocityDesired.East);
+	velocityDesired.North *= groundspeed/l;
+	velocityDesired.East *= groundspeed/l;
 	
 	float downError = altitudeSetpoint - positionActual.Down;
 	velocityDesired.Down = downError * fixedwingpathfollowerSettings.VerticalPosP;
@@ -373,7 +395,6 @@ static uint8_t updateFixedDesiredAttitude()
 
 	float descentspeedDesired;
 	float descentspeedError;
-	float powerError;
 	float powerCommand;
 
 	float bearingError;
@@ -384,7 +405,6 @@ static uint8_t updateFixedDesiredAttitude()
 	FixedWingPathFollowerStatusGet(&fixedwingpathfollowerStatus);
 	
 	VelocityActualGet(&velocityActual);
-//	VelocityDesiredGet(&velocityDesired);
 	StabilizationDesiredGet(&stabDesired);
 	VelocityDesiredGet(&velocityDesired);
 	AttitudeActualGet(&attitudeActual);
@@ -460,14 +480,6 @@ static uint8_t updateFixedDesiredAttitude()
 	/**
 	 * Compute desired throttle command
 	 */
-	// compute proportional throttle response
-	powerError = -descentspeedError +
-		bound (
-			 (airspeedError/fixedwingpathfollowerSettings.BestClimbRateSpeed)* fixedwingpathfollowerSettings.AirspeedToVerticalCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_AIRSPEEDTOVERTICALCROSSFEED_KP] ,
-			 -fixedwingpathfollowerSettings.AirspeedToVerticalCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_AIRSPEEDTOVERTICALCROSSFEED_MAX],
-			 fixedwingpathfollowerSettings.AirspeedToVerticalCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_AIRSPEEDTOVERTICALCROSSFEED_MAX]
-			 );
-	
 	// compute saturated integral error throttle response. Make integral leaky for better performance. Approximately 30s time constant.
 	if (fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_KI] >0) {
 		powerIntegral =	bound(powerIntegral + -descentspeedError * dT, 
@@ -476,20 +488,27 @@ static uint8_t updateFixedDesiredAttitude()
 										)*(1.0f-1.0f/(1.0f+30.0f/dT));
 	} else powerIntegral = 0;
 	
+	//Compute the cross feed from vertical speed to pitch, with saturation
+	float speedErrorToPowerCommandComponent = bound (
+		 (airspeedError/fixedwingpathfollowerSettings.BestClimbRateSpeed)* fixedwingpathfollowerSettings.AirspeedToPowerCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_AIRSPEEDTOPOWERCROSSFEED_KP] ,
+		 -fixedwingpathfollowerSettings.AirspeedToPowerCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_AIRSPEEDTOPOWERCROSSFEED_MAX],
+		 fixedwingpathfollowerSettings.AirspeedToPowerCrossFeed[FIXEDWINGPATHFOLLOWERSETTINGS_AIRSPEEDTOPOWERCROSSFEED_MAX]
+		 );
+
 	// Compute final throttle response
-	powerCommand = bound(
-			(powerError * fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_KP] +
-			powerIntegral*	fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_KI]) + fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_NEUTRAL],
-			fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MIN],
-			fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MAX]);
+	powerCommand = -descentspeedError * fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_KP] +
+			powerIntegral*	fixedwingpathfollowerSettings.PowerPI[FIXEDWINGPATHFOLLOWERSETTINGS_POWERPI_KI] +
+			speedErrorToPowerCommandComponent;
 
 	//Output internal state to telemetry
-	fixedwingpathfollowerStatus.Error[FIXEDWINGPATHFOLLOWERSTATUS_ERROR_POWER] = powerError;
+	fixedwingpathfollowerStatus.Error[FIXEDWINGPATHFOLLOWERSTATUS_ERROR_POWER] = descentspeedError;
 	fixedwingpathfollowerStatus.ErrorInt[FIXEDWINGPATHFOLLOWERSTATUS_ERRORINT_POWER] = powerIntegral;
 	fixedwingpathfollowerStatus.Command[FIXEDWINGPATHFOLLOWERSTATUS_COMMAND_POWER] = powerCommand;
 
 	// set throttle
-	stabDesired.Throttle = powerCommand;
+	stabDesired.Throttle = bound(fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_NEUTRAL] + powerCommand,
+				fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MIN],
+				fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MAX]);
 
 	// Error condition: plane cannot hold altitude at current speed.
 	fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWPOWER] = 0;
@@ -567,8 +586,8 @@ static uint8_t updateFixedDesiredAttitude()
 	if (groundspeedDesired> 1e-6) {
 		bearingError = RAD2DEG * (atan2f(velocityDesired.East,velocityDesired.North) - atan2f(velocityActual.East,velocityActual.North));
 	} else {
-		// if we are not supposed to move, keep going wherever we are now. Don't make things worse by changing direction.
-		bearingError = 0;
+		// if we are not supposed to move, run in a circle
+		bearingError = -90.0f;
 	}
 	
 	if (bearingError<-180.0f) bearingError+=360.0f;

@@ -61,7 +61,6 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.h \
     $$UAVOBJECT_SYNTHETICS/pathaction.h \
     $$UAVOBJECT_SYNTHETICS/pathdesired.h \
-    $$UAVOBJECT_SYNTHETICS/pathplannersettings.h \
     $$UAVOBJECT_SYNTHETICS/pathstatus.h \
     $$UAVOBJECT_SYNTHETICS/gpsvelocity.h \
     $$UAVOBJECT_SYNTHETICS/positionactual.h \
@@ -87,7 +86,6 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/flightplancontrol.h \
     $$UAVOBJECT_SYNTHETICS/watchdogstatus.h \
     $$UAVOBJECT_SYNTHETICS/nedaccel.h \
-    $$UAVOBJECT_SYNTHETICS/nedposition.h \
     $$UAVOBJECT_SYNTHETICS/sonaraltitude.h \
     $$UAVOBJECT_SYNTHETICS/flightstatus.h \
     $$UAVOBJECT_SYNTHETICS/hwsettings.h \
@@ -143,7 +141,6 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.cpp \
     $$UAVOBJECT_SYNTHETICS/pathaction.cpp \
     $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
-    $$UAVOBJECT_SYNTHETICS/pathplannersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/pathstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsvelocity.cpp \
     $$UAVOBJECT_SYNTHETICS/positionactual.cpp \
@@ -169,7 +166,6 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/flightplancontrol.cpp \
     $$UAVOBJECT_SYNTHETICS/watchdogstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/nedaccel.cpp \
-    $$UAVOBJECT_SYNTHETICS/nedposition.cpp \
     $$UAVOBJECT_SYNTHETICS/sonaraltitude.cpp \
     $$UAVOBJECT_SYNTHETICS/uavobjectsinit.cpp \
     $$UAVOBJECT_SYNTHETICS/flightstatus.cpp \

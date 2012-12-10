@@ -63,7 +63,6 @@
 #include "gyrosbias.h"
 #include "homelocation.h"
 #include "magnetometer.h"
-#include "nedposition.h"
 #include "positionactual.h"
 #include "revocalibration.h"
 #include "revosettings.h"
@@ -128,7 +127,6 @@ int32_t AttitudeInitialize(void)
 {
 	AttitudeActualInitialize();
 	AttitudeSettingsInitialize();
-	NEDPositionInitialize();
 	PositionActualInitialize();
 	VelocityActualInitialize();
 	RevoSettingsInitialize();
@@ -455,13 +453,6 @@ static int32_t updateAttitudeComplementary(bool first_run)
 		GPSPositionGet(&gpsPosition);
 		getNED(&gpsPosition, NED);
 		
-		NEDPositionData nedPosition;
-		NEDPositionGet(&nedPosition);
-		nedPosition.North = NED[0];
-		nedPosition.East = NED[1];
-		nedPosition.Down = NED[2];
-		NEDPositionSet(&nedPosition);
-
 		PositionActualData positionActual;
 		PositionActualGet(&positionActual);
 		positionActual.North = NED[0];
@@ -776,16 +767,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		    (1.0f - BARO_OFFSET_LOWPASS_ALPHA )
 		    * ( -NED[2] - baroData.Altitude );
 
-		// Store this for inspecting offline
-		NEDPositionData nedPos;
-		NEDPositionGet(&nedPos);
-		nedPos.North = NED[0];
-		nedPos.East = NED[1];
-		nedPos.Down = NED[2];
-		NEDPositionSet(&nedPos);
-
 	} else if (!outdoor_mode) {
-		baroOffset = 0;
 		INSSetPosVelVar(1e2f, 1e2f);
 		vel[0] = vel[1] = vel[2] = 0;
 		NED[0] = NED[1] = 0;

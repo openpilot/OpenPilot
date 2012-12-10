@@ -3,7 +3,7 @@
         <description>Settings for the @ref FixedWingPathFollowerModule</description>
 
         <!-- these coefficients control desired movement in airspace -->
-        <field name="AirSpeedMax" units="m/s" type="float" elements="1" defaultvalue="20"/>
+        <field name="AirSpeedMax" units="m/s" type="float" elements="1" defaultvalue="30"/>
                 <!-- Vne, i.e. maximum airspeed the airframe can handle -->
         <field name="CruiseSpeed" units="m/s" type="float" elements="1" defaultvalue="20"/>
                 <!-- Maximum speed the autopilot will try to achieve, usually for long distances -->
@@ -30,13 +30,13 @@
 
         <field name="SpeedPI" units="deg / (m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="1.5, .15, 20"/>
                 <!-- coefficients for desired pitch
-                     in relation to relative speed error (IASerror/IASactual) -->
-        <field name="VerticalToPitchCrossFeed" units="deg / ((m/s)/(m/s))" type="float" elementnames="Kp,Max" defaultvalue="5, 10"/>
+                     in relation to speed error IASerror -->
+        <field name="VerticalToPitchCrossFeed" units="deg / (m/s)" type="float" elementnames="Kp,Max" defaultvalue="5, 10"/>
                 <!-- coefficients for adjusting desired pitch
-                     in relation to "vertical speed error relative to airspeed" (verror/IASactual) -->
-        <field name="AirspeedToVerticalCrossFeed" units="(m/s) / ((m/s)/(m/s))" type="float" elementnames="Kp,Max" defaultvalue="10, 100"/>
+                     in relation to "vertical speed error -->
+        <field name="AirspeedToPowerCrossFeed" units="1 / (m/s)" type="float" elementnames="Kp,Max" defaultvalue="0.1, 1"/>
                 <!-- proportional coefficient for adjusting vertical speed error for power calculation
-                     in relation to relative airspeed error (IASerror/IASactual) -->
+                     in relation to airspeed error IASerror -->
         <field name="PowerPI" units="1/(m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.01,0.01,0.8"/>
                 <!-- proportional coefficient for desired throttle
                      in relation to vertical speed error (absolute but including crossfeed) -->

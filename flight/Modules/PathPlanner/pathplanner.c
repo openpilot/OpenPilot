@@ -37,7 +37,6 @@
 #include "pathaction.h"
 #include "pathdesired.h"
 #include "pathstatus.h"
-#include "pathplannersettings.h"
 #include "positionactual.h"
 #include "velocityactual.h"
 #include "waypoint.h"
@@ -49,17 +48,14 @@
 #define MAX_QUEUE_SIZE 2
 #define F_PI 3.141526535897932f
 #define RAD2DEG (180.0f/F_PI)
+#define PATH_PLANNER_UPDATE_RATE_MS 20
 
 // Private types
 
 // Private functions
 static void pathPlannerTask(void *parameters);
-static void settingsUpdated(UAVObjEvent * ev);
 static void updatePathDesired(UAVObjEvent * ev);
 static void setWaypoint(uint16_t num);
-static void WaypointCreateInstances(uint16_t num);
-static void createPathBox();
-static void createPathLogo();
 
 static uint8_t pathConditionCheck();
 static uint8_t conditionNone();
@@ -76,8 +72,6 @@ static uint8_t conditionImmediate();
 
 // Private variables
 static xTaskHandle taskHandle;
-static xQueueHandle queue;
-static PathPlannerSettingsData pathPlannerSettings;
 static WaypointActiveData waypointActive;
 static WaypointData waypoint;
 static PathActionData pathAction;
@@ -105,7 +99,6 @@ int32_t PathPlannerInitialize()
 {
 	taskHandle = NULL;
 
-	PathPlannerSettingsInitialize();
 	PathActionInitialize();
 	PathStatusInitialize();
 	PathDesiredInitialize();
@@ -115,9 +108,6 @@ int32_t PathPlannerInitialize()
 	WaypointInitialize();
 	WaypointActiveInitialize();
 	
-	// Create object queue
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
-
 	return 0;
 }
 
@@ -128,10 +118,6 @@ MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart)
  */
 static void pathPlannerTask(void *parameters)
 {
-	// update settings on change
-	PathPlannerSettingsConnectCallback(settingsUpdated);
-	settingsUpdated(PathPlannerSettingsHandle());
-
 	// when the active waypoint changes, update pathDesired
 	WaypointConnectCallback(updatePathDesired);
 	WaypointActiveConnectCallback(updatePathDesired);
@@ -146,7 +132,7 @@ static void pathPlannerTask(void *parameters)
 	while (1)
 	{
 
-		vTaskDelay(20);
+		vTaskDelay(PATH_PLANNER_UPDATE_RATE_MS);
 
 		FlightStatusGet(&flightStatus);
 		if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER) {
@@ -221,25 +207,6 @@ static void pathPlannerTask(void *parameters)
 	}
 }
 
-// standard settings updated callback
-void settingsUpdated(UAVObjEvent * ev) {
-	uint8_t preprogrammedPath = pathPlannerSettings.PreprogrammedPath;
-	PathPlannerSettingsGet(&pathPlannerSettings);
-	if (pathPlannerSettings.PreprogrammedPath != preprogrammedPath) {
-		switch(pathPlannerSettings.PreprogrammedPath) {
-			case PATHPLANNERSETTINGS_PREPROGRAMMEDPATH_NONE:
-				break;
-			case PATHPLANNERSETTINGS_PREPROGRAMMEDPATH_10M_BOX:
-				createPathBox();
-				break;
-			case PATHPLANNERSETTINGS_PREPROGRAMMEDPATH_LOGO:
-				createPathLogo();
-				break;
-				
-		}
-	}
-}
-
 // callback function when waypoints changed in any way, update pathDesired
 void updatePathDesired(UAVObjEvent * ev) {
 
@@ -305,17 +272,6 @@ static void setWaypoint(uint16_t num) {
 
 	waypointActive.Index = num;
 	WaypointActiveSet(&waypointActive);
-
-}
-
-// helper function to make sure there are enough waypoint instances
-static void WaypointCreateInstances(uint16_t num) {
-
-	uint16_t t;
-	for (t=UAVObjGetNumInstances(WaypointHandle());t<num;t++) {
-		WaypointCreateInstance();
-	}
-
 
 }
 
@@ -406,7 +362,7 @@ static uint8_t conditionDistanceToTarget() {
 				+powf( waypoint.Position[1]-positionActual.East ,2));
 	}
 
-	if (distance>=pathAction.ConditionParameters[0]) {
+	if (distance<=pathAction.ConditionParameters[0]) {
 		return true;
 	}
 	return false;
@@ -547,150 +503,6 @@ static uint8_t conditionPythonScript() {
 /* the immediate condition is always true */
 static uint8_t conditionImmediate() {
 	return true;
-}
-
-// demo path - box
-static void createPathBox()
-{
-
-	uint16_t t;
-	for (t=UAVObjGetNumInstances(PathActionHandle());t<10;t++) {
-		PathActionCreateInstance();
-	}
-	PathActionData action;
-	PathActionInstGet(0,&action);
-	action.Mode = PATHACTION_MODE_FLYVECTOR;
-	action.ModeParameters[0]=0;
-	action.ModeParameters[1]=0;
-	action.ModeParameters[2]=0;
-	action.ModeParameters[3]=0;
-	action.EndCondition = PATHACTION_ENDCONDITION_LEGREMAINING;
-	action.ConditionParameters[0] = 0;
-	action.ConditionParameters[1] = 0;
-	action.ConditionParameters[2] = 0;
-	action.ConditionParameters[3] = 0;
-	action.Command = PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT;
-	action.JumpDestination = 0;
-	action.ErrorDestination = 0;
-	PathActionInstSet(0,&action);
-	PathActionInstSet(1,&action);
-	PathActionInstSet(2,&action);
-
-	WaypointCreateInstances(6);
-
-	// Draw O
-	WaypointData waypoint;
-	waypoint.Action = 0;
-	waypoint.Velocity = 2;
-
-	waypoint.Position[0] = 5;
-	waypoint.Position[1] = 5;
-	waypoint.Position[2] = -10;
-	WaypointInstSet(0, &waypoint);
-
-	waypoint.Position[0] = -5;
-	waypoint.Position[1] = 5;
-	WaypointInstSet(1, &waypoint);
-
-	waypoint.Position[0] = -5;
-	waypoint.Position[1] = -5;
-	WaypointInstSet(2, &waypoint);
-
-	waypoint.Position[0] = 5;
-	waypoint.Position[1] = -5;
-	WaypointInstSet(3, &waypoint);
-
-	waypoint.Position[0] = 5;
-	waypoint.Position[1] = 5;
-	WaypointInstSet(4, &waypoint);
-
-	waypoint.Position[0] = 0;
-	waypoint.Position[1] = 0;
-	WaypointInstSet(5, &waypoint);
-}
-
-// demo path - logo
-static void createPathLogo()
-{
-	#define SIZE 10.0f
-	PathActionData action;
-	PathActionInstGet(0,&action);
-	action.Mode = PATHACTION_MODE_FLYVECTOR;
-	action.ModeParameters[0]=0;
-	action.ModeParameters[1]=0;
-	action.ModeParameters[2]=0;
-	action.ModeParameters[3]=0;
-	action.EndCondition = PATHACTION_ENDCONDITION_LEGREMAINING;
-	action.ConditionParameters[0] = 0;
-	action.ConditionParameters[1] = 0;
-	action.ConditionParameters[2] = 0;
-	action.ConditionParameters[3] = 0;
-	action.Command = PATHACTION_COMMAND_ONCONDITIONNEXTWAYPOINT;
-	action.JumpDestination = 0;
-	action.ErrorDestination = 0;
-	PathActionInstSet(0,&action);
-	uint16_t t;
-	for (t=UAVObjGetNumInstances(PathActionHandle());t<10;t++) {
-		PathActionCreateInstance();
-	}
-
-	WaypointCreateInstances(42);
-
-	// Draw O
-	WaypointData waypoint;
-	waypoint.Velocity = 2; // Since for now this isn't directional just set a mag
-	waypoint.Action = 0;
-	for(uint32_t i = 0; i < 20; i++) {
-		waypoint.Position[1] = SIZE * 30 * cos(i / 19.0 * 2 * M_PI);
-		waypoint.Position[0] = SIZE * 50 * sin(i / 19.0 * 2 * M_PI);
-		waypoint.Position[2] = -50;
-		WaypointInstSet(i, &waypoint);
-	}
-	
-	// Draw P
-	for(uint32_t i = 20; i < 35; i++) {
-		waypoint.Position[1] = SIZE * (55 + 20 * cos(i / 10.0 * M_PI - M_PI / 2));
-		waypoint.Position[0] = SIZE * (25 + 25 * sin(i / 10.0 * M_PI - M_PI / 2));
-		waypoint.Position[2] = -50;
-		WaypointInstSet(i, &waypoint);
-	}
-		
-	waypoint.Position[1] = SIZE * 35;
-	waypoint.Position[0] = SIZE * -50;
-	waypoint.Position[2] = -50;
-	WaypointInstSet(35, &waypoint);
-	
-	// Draw Box
-	waypoint.Position[1] = SIZE * 35;
-	waypoint.Position[0] = SIZE * -60;
-	waypoint.Position[2] = -30;
-	WaypointInstSet(36, &waypoint);
-
-	waypoint.Position[1] = SIZE *  85;
-	waypoint.Position[0] = SIZE * -60;
-	waypoint.Position[2] = -30;
-	WaypointInstSet(37, &waypoint);
-
-	waypoint.Position[1] = SIZE * 85;
-	waypoint.Position[0] = SIZE * 60;
-	waypoint.Position[2] = -30;
-	WaypointInstSet(38, &waypoint);
-	
-	waypoint.Position[1] = SIZE * -40;
-	waypoint.Position[0] = SIZE * 60;
-	waypoint.Position[2] = -30;
-	WaypointInstSet(39, &waypoint);
-
-	waypoint.Position[1] = SIZE * -40;
-	waypoint.Position[0] = SIZE * -60;
-	waypoint.Position[2] = -30;
-	WaypointInstSet(40, &waypoint);
-
-	waypoint.Position[1] = SIZE * 35;
-	waypoint.Position[0] = SIZE * -60;
-	waypoint.Position[2] = -30;
-	WaypointInstSet(41, &waypoint);
-
 }
 
 /**

@@ -16,7 +16,8 @@ HEADERS += hitlplugin.h \
     aerosimrcsimulator.h \
     fgsimulator.h \
     il2simulator.h \
-    xplanesimulator.h
+    xplanesimulator.h \
+    mavlinksimulator.h
 SOURCES += hitlplugin.cpp \
     hitlwidget.cpp \
     hitloptionspage.cpp \
@@ -28,7 +29,8 @@ SOURCES += hitlplugin.cpp \
     aerosimrcsimulator.cpp \
     fgsimulator.cpp \
     il2simulator.cpp \
-    xplanesimulator.cpp
+    xplanesimulator.cpp \
+    mavlinksimulator.cpp
 OTHER_FILES += hitl.pluginspec
 FORMS += hitloptionspage.ui \
     hitlwidget.ui

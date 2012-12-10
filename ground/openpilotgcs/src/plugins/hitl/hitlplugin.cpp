@@ -33,6 +33,7 @@
 #include "fgsimulator.h"
 #include "il2simulator.h"
 #include "xplanesimulator.h"
+#include "mavlinksimulator.h"
 
 QList<SimulatorCreator* > HITLPlugin::typeSimulators;
 
@@ -58,6 +59,7 @@ bool HITLPlugin::initialize(const QStringList& args, QString *errMsg)
    addSimulator(new FGSimulatorCreator("FG","FlightGear"));
    addSimulator(new IL2SimulatorCreator("IL2","IL2"));
    addSimulator(new XplaneSimulatorCreator("X-Plane","X-Plane"));
+   addSimulator(new MavlinkSimulatorCreator("Mavlink","Mavlink"));
 
    return true;
 }

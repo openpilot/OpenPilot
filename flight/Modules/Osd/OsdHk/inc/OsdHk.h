@@ -31,7 +31,7 @@
 #ifndef OSDHK_H
 #define OSDHK_H
 
-extern void OsdHkConnect(uint32_t com_id);
+int32_t OsdHkInitialize(void);
 
 #endif	/* OSDHK_H */
 

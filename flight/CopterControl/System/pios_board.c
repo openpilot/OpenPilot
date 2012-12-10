@@ -568,8 +568,6 @@ void PIOS_Board_Init(void) {
 						tx_buffer, PIOS_COM_HKOSD_TX_BUF_LEN)) {
 				PIOS_Assert(0);
 			}
-
-			OsdHkConnect(pios_com_hkosd_id);
 		}
 		break;
 	}
@@ -722,8 +720,6 @@ void PIOS_Board_Init(void) {
 						tx_buffer, PIOS_COM_HKOSD_TX_BUF_LEN)) {
 				PIOS_Assert(0);
 			}
-
-			OsdHkConnect(pios_com_hkosd_id);
 		}
 		break;
 	}

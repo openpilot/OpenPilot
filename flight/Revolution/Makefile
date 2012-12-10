@@ -84,6 +84,7 @@ MODULES += CameraStab
 MODULES += OveroSync
 MODULES += Telemetry
 MODULES += Autotune
+MODULES += Osd/OsdHk
 PYMODULES = 
 #FlightPlan
 

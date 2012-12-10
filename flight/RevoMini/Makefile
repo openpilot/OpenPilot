@@ -59,6 +59,7 @@ MODULES += GPS FirmwareIAP
 MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner TxPID
 MODULES += CameraStab
 MODULES += Radio
+MODULES += Osd/OsdHk
 MODULES += Telemetry
 PYMODULES = 
 #FlightPlan

@@ -244,35 +244,28 @@ static void send_update(UAVObjEvent * ev)
 #if FLIGHTBATTERYSTATE_SUPPORTED
 static void FlightBatteryStateUpdatedCb(UAVObjEvent * ev)
 {
-	newBattData = TRUE;
+	newBattData = true;
 }
 #endif
 
 #if POSITIONACTUAL_SUPPORTED
 static void PositionActualUpdatedCb(UAVObjEvent * ev)
 {
-	newPositionActualData = TRUE;
+	newPositionActualData = true;
 }
 #endif
 
 static void AttitudeActualUpdatedCb(UAVObjEvent * ev)
 {
-	newAttitudeData = TRUE;
+	newAttitudeData = true;
 }
 
 static void SystemAlarmsUpdatedCb(UAVObjEvent * ev)
 {
-	newAlarmData = TRUE;
+	newAlarmData = true;
 }
 
 static UAVObjEvent ev;
-
-void OsdHkConnect(uint32_t com_id)
-{
-	/* Bind to the com_id passed in */
-	osd_hk_com_id = com_id;
-}
-
 
 static int32_t OsdHkStart(void)
 {
@@ -299,6 +292,7 @@ static int32_t OsdHkStart(void)
 
 static int32_t OsdHkInitialize(void)
 {
+	osd_hk_com_id = PIOS_COM_OSDHK;
 #ifdef MODULE_OsdHk_BUILTIN
 	osdhkEnabled = 1;
 #else

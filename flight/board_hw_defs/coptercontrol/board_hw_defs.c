@@ -1024,7 +1024,6 @@ static const struct pios_sbus_cfg pios_sbus_cfg = {
 
 #endif	/* PIOS_INCLUDE_SBUS */
 
-#include "OsdHk.h"
 /*
  * HK OSD
  */

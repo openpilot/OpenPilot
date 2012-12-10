@@ -64,7 +64,7 @@
   !include "${GCS_BUILD_TREE}\openpilotgcs.nsh"
 
   Name "${PRODUCT_NAME}"
-  OutFile "${PACKAGE_DIR}\${OUT_FILE}"
+  OutFile "${PACKAGE_DIR}\..\${OUT_FILE}"
 
   VIProductVersion ${PRODUCT_VERSION}
   VIAddVersionKey "ProductName" "${INSTALLER_NAME}"

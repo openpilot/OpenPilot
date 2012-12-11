@@ -589,7 +589,6 @@ enum pios_rfm22b_state {
 	RFM22B_STATE_RX_DATA,
 	RFM22B_STATE_RX_FAILURE,
 	RFM22B_STATE_RECEIVING_STATUS,
-	RFM22B_STATE_TX_DELAY,
 	RFM22B_STATE_TX_START,
 	RFM22B_STATE_TX_DATA,
 	RFM22B_STATE_TX_FAILURE,
@@ -621,10 +620,7 @@ enum pios_rfm22b_event {
 	RFM22B_EVENT_RX_COMPLETE,
 	RFM22B_EVENT_RX_ERROR,
 	RFM22B_EVENT_STATUS_RECEIVED,
-	RFM22B_EVENT_SEND_DATA,
 	RFM22B_EVENT_TX_START,
-	RFM22B_EVENT_TX_STARTED,
-	RFM22B_EVENT_TX_COMPLETE,
 	RFM22B_EVENT_FAILURE,
 	RFM22B_EVENT_TIMEOUT,
 	RFM22B_EVENT_ERROR,
@@ -652,6 +648,7 @@ struct pios_rfm22b_dev {
 	enum pios_rfm22b_dev_magic magic;
 	struct pios_rfm22b_cfg cfg;
 
+	// The SPI bus information
 	uint32_t spi_id;
 	uint32_t slave_num;
 
@@ -670,7 +667,7 @@ struct pios_rfm22b_dev {
 	// The potential paired statistics
 	rfm22b_pair_stats pair_stats[OPLINKSTATUS_PAIRIDS_NUMELEM];
 
-	// ISR pending
+	// ISR pending semaphore
 	xSemaphoreHandle isrPending;
 
 	// The com configuration callback
@@ -690,6 +687,7 @@ struct pios_rfm22b_dev {
 
 	// The state machine state and the current event
 	enum pios_rfm22b_state state;
+
 	// The event queue handle
 	xQueueHandle eventQueue;
 
@@ -724,19 +722,21 @@ struct pios_rfm22b_dev {
 	PHPacketHandle tx_packet;
 	// The previous tx packet (waiting for an ACK)
 	PHPacketHandle prev_tx_packet;
-	// the tx data read index
+	// The tx data read index
 	uint16_t tx_data_rd;
-	// the tx data write index
+	// The tx data write index
 	uint16_t tx_data_wr;
 	// The tx packet sequence number
 	uint16_t tx_seq;
 
 	// The rx data packet
 	PHPacket rx_packet;
-	// the receive buffer write index
+	// The receive buffer write index
 	uint16_t rx_buffer_wr;
-	// the receive buffer write index
+	// The receive buffer write index
 	uint16_t rx_packet_len;
+	// Is the modem currently in Rx mode?
+	bool in_rx_mode;
 
 	// The status packet
 	PHStatusPacket status_packet;
@@ -756,6 +756,8 @@ struct pios_rfm22b_dev {
 	bool send_status;
 	bool send_ppm;
 	bool send_connection_request;
+	bool time_to_send;
+	uint8_t time_to_send_offset;
 
 	// The minimum frequency
 	uint32_t min_frequency;

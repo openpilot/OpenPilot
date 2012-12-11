@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # the following environment variables must be set
-: ${ROOT_DIR?} ${BUILD_DIR?} ${PACKAGE_LBL?} ${PACKAGE_DIR?} ${FW_DIR?}
+: ${ROOT_DIR?} ${BUILD_DIR?} ${PACKAGE_LBL?} ${PACKAGE_DIR?} ${FW_DIR?} ${PACKAGE_NAME?} ${PACKAGE_SEP?}
 
 # more variables
 APP_PATH="${BUILD_DIR}/ground/openpilotgcs/bin/OpenPilot GCS.app"
 TEMP_FILE="${PACKAGE_DIR}/OpenPilot-temp.dmg"
-OUT_FILE="${PACKAGE_DIR}/OpenPilot-${PACKAGE_LBL}.dmg"
+OUT_FILE="${PACKAGE_DIR}/${PACKAGE_NAME}${PACKAGE_SEP}${PACKAGE_LBL}.dmg"
 VOL_NAME="OpenPilot"
 
 # prepare the stage

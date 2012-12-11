@@ -11,5 +11,5 @@ Vcs-Browser: http://git.openpilot.org/changelog/OpenPilot
 Package: openpilot
 Architecture: i386
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: OpenPilot GCS & FW
- OpenPilot GCS and Firmware for CopterControl (CC) board.
+Description: OpenPilot GCS
+ OpenPilot Ground Control Station software

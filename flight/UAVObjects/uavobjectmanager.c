@@ -41,17 +41,6 @@
 // Macros
 #define SET_BITS(var, shift, value, mask) var = (var & ~(mask << shift)) | (value << shift);
 
-/* Table of UAVO handles registered at compile time */
-extern struct UAVOData * __start__uavo_handles[] __attribute__((weak));
-extern struct UAVOData * __stop__uavo_handles[] __attribute__((weak));
-
-#define UAVO_LIST_ITERATE(_item) \
-for (struct UAVOData ** _uavo_slot = __start__uavo_handles; \
-     _uavo_slot && _uavo_slot < __stop__uavo_handles; \
-     _uavo_slot++) { \
-	struct UAVOData * _item = *_uavo_slot; \
-	if (_item == NULL) continue;
-
 /**
  * List of event queues and the eventmask associated with the queue.
  */
@@ -109,6 +98,7 @@ struct UAVOData {
 	 * inside the payload for this UAVO.
 	 */
 	struct UAVOMeta   metaObj;
+	struct UAVOData * next;
 	uint16_t          instance_size;
 } __attribute__((packed));
 
@@ -174,6 +164,7 @@ static void customSPrintf(uint8_t * buffer, uint8_t * format, ...);
 #endif
 
 // Private variables
+static struct UAVOData * uavo_list;
 static xSemaphoreHandle mutex;
 static const UAVObjMetadata defMetadata = {
 	.flags = (ACCESS_READWRITE << UAVOBJ_ACCESS_SHIFT |
@@ -197,11 +188,8 @@ static UAVObjStats stats;
 int32_t UAVObjInitialize()
 {
 	// Initialize variables
+	uavo_list = NULL;
 	memset(&stats, 0, sizeof(UAVObjStats));
-
-	// Initialize the uavo handle table
-	memset(__start__uavo_handles, 0,
-		(uintptr_t)__stop__uavo_handles - (uintptr_t)__start__uavo_handles);
 
 	// Create mutex
 	mutex = xSemaphoreCreateRecursiveMutex();
@@ -350,6 +338,9 @@ UAVObjHandle UAVObjRegister(uint32_t id,
 	/* Initialize the embedded meta UAVO */
 	UAVObjInitMetaData (&uavo_data->metaObj);
 
+	/* Add the newly created object to the global list of objects */
+	LL_APPEND(uavo_list, uavo_data);
+
 	/* Initialize object fields and metadata to default values */
 	if (initCb)
 		initCb((UAVObjHandle) uavo_data, 0);
@@ -383,7 +374,8 @@ UAVObjHandle UAVObjGetByID(uint32_t id)
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	// Look for object
-	UAVO_LIST_ITERATE(tmp_obj)
+	struct UAVOData * tmp_obj;
+	LL_FOREACH(uavo_list, tmp_obj) {
 		if (tmp_obj->id == id) {
 			found_obj = (UAVObjHandle *)tmp_obj;
 			goto unlock_exit;
@@ -1027,13 +1019,15 @@ int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
  */
 int32_t UAVObjSaveSettings()
 {
+	struct UAVOData *obj;
+
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	int32_t rc = -1;
 
 	// Save all settings objects
-	UAVO_LIST_ITERATE(obj)
+	LL_FOREACH(uavo_list, obj) {
 		// Check if this is a settings object
 		if (UAVObjIsSettings(obj)) {
 			// Save object
@@ -1057,13 +1051,15 @@ unlock_exit:
  */
 int32_t UAVObjLoadSettings()
 {
+	struct UAVOData *obj;
+
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	int32_t rc = -1;
 
 	// Load all settings objects
-	UAVO_LIST_ITERATE(obj)
+	LL_FOREACH(uavo_list, obj) {
 		// Check if this is a settings object
 		if (UAVObjIsSettings(obj)) {
 			// Load object
@@ -1087,13 +1083,15 @@ unlock_exit:
  */
 int32_t UAVObjDeleteSettings()
 {
+	struct UAVOData *obj;
+
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	int32_t rc = -1;
 
 	// Save all settings objects
-	UAVO_LIST_ITERATE(obj)
+	LL_FOREACH(uavo_list, obj) {
 		// Check if this is a settings object
 		if (UAVObjIsSettings(obj)) {
 			// Save object
@@ -1117,13 +1115,15 @@ unlock_exit:
  */
 int32_t UAVObjSaveMetaobjects()
 {
+	struct UAVOData *obj;
+
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	int32_t rc = -1;
 
 	// Save all settings objects
-	UAVO_LIST_ITERATE(obj)
+	LL_FOREACH(uavo_list, obj) {
 		// Save object
 		if (UAVObjSave( (UAVObjHandle) MetaObjectPtr(obj), 0) ==
 			-1) {
@@ -1144,13 +1144,15 @@ unlock_exit:
  */
 int32_t UAVObjLoadMetaobjects()
 {
+	struct UAVOData *obj;
+
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	int32_t rc = -1;
 
 	// Load all settings objects
-	UAVO_LIST_ITERATE(obj)
+	LL_FOREACH(uavo_list, obj) {
 		// Load object
 		if (UAVObjLoad((UAVObjHandle) MetaObjectPtr(obj), 0) ==
 			-1) {
@@ -1171,13 +1173,15 @@ unlock_exit:
  */
 int32_t UAVObjDeleteMetaobjects()
 {
+	struct UAVOData *obj;
+
 	// Get lock
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	int32_t rc = -1;
 
 	// Load all settings objects
-	UAVO_LIST_ITERATE(obj)
+	LL_FOREACH(uavo_list, obj) {
 		// Load object
 		if (UAVObjDelete((UAVObjHandle) MetaObjectPtr(obj), 0)
 			== -1) {
@@ -1783,7 +1787,8 @@ void UAVObjIterate(void (*iterator) (UAVObjHandle obj))
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	// Iterate through the list and invoke iterator for each object
-	UAVO_LIST_ITERATE(obj)
+	struct UAVOData *obj;
+	LL_FOREACH(uavo_list, obj) {
 		(*iterator) ((UAVObjHandle) obj);
 		(*iterator) ((UAVObjHandle) &obj->metaObj);
 	}

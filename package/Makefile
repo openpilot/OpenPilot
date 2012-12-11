@@ -16,6 +16,8 @@ BUILD_DIR    := $(ROOT_DIR)/build
 VERSION_CMD  := python $(ROOT_DIR)/make/scripts/version-info.py --path="$(ROOT_DIR)"
 PACKAGE_LBL  := $(shell $(VERSION_CMD) --format=\$${LABEL})
 PACKAGE_DIR  := $(BUILD_DIR)/package-$(PACKAGE_LBL)
+PACKAGE_NAME := OpenPilot
+PACKAGE_SEP  := -
 FW_DIR       := $(PACKAGE_DIR)/firmware-$(PACKAGE_LBL)
 BL_DIR       := $(FW_DIR)/bootloaders
 BU_DIR       := $(FW_DIR)/bootloader-updaters

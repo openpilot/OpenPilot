@@ -14,8 +14,8 @@
         <field name="Heading" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
         <field name="HeadingSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="168,240"/>
 		<field name="Screen" units=""  type="uint8"  elements="1" defaultvalue="0"/>
-		<field name="White" units=""  type="uint8"  elements="1" defaultvalue="18"/>
-		<field name="Black" units=""  type="uint8"  elements="1" defaultvalue="0"/>
+		<field name="White" units=""  type="uint8"  elements="1" defaultvalue="4"/>
+		<field name="Black" units=""  type="uint8"  elements="1" defaultvalue="1"/>
 		<field name="AltitudeSource" units="" type="enum" elements="1" options="GPS,Baro" defaultvalue="GPS"/>
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>

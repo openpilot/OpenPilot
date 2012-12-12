@@ -6,7 +6,7 @@
 # more variables
 APP_PATH="${BUILD_DIR}/ground/openpilotgcs/bin/OpenPilot GCS.app"
 TEMP_FILE="${PACKAGE_DIR}/OpenPilot-temp.dmg"
-OUT_FILE="${PACKAGE_DIR}/${PACKAGE_NAME}${PACKAGE_SEP}${PACKAGE_LBL}.dmg"
+OUT_FILE="${PACKAGE_DIR}/../${PACKAGE_NAME}${PACKAGE_SEP}${PACKAGE_LBL}${PACKAGE_SEP}osx.dmg"
 VOL_NAME="OpenPilot"
 
 # prepare the stage

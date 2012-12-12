@@ -1,15 +1,13 @@
 /**
  ******************************************************************************
- * @addtogroup Revolution Revolution configuration files
- * @{
- * @brief Configures the revolution board
- * @{
- *
  * @file       pios_board.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
- * @brief      Defines board specific static initializers for hardware for the Revolution board.
- * @see        The GNU Public License (GPL) Version 3
- *
+ * @author     PhoenixPilot, http://github.com/PhoenixPilot, Copyright (C) 2012
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotCore OpenPilot Core
+ * @{
+ * @brief Defines board specific static initializers for hardware for the revomini board.
  *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
@@ -188,20 +186,6 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
 
-static const struct flashfs_cfg flashfs_m25p_cfg = {
-	.table_magic = 0x85FB3D35,
-	.obj_magic = 0x3015A371,
-	.obj_table_start = 0x00000010,
-	.obj_table_end = 0x00010000,
-	.sector_size = 0x00010000,
-	.chip_size = 0x00200000,
-};
-
-static const struct pios_flash_jedec_cfg flash_m25p_cfg = {
-	.sector_erase = 0xD8,
-	.chip_erase = 0xC7
-};
-
 /* One slot per selectable receiver group.
  *  eg. PWM, PPM, GCS, SPEKTRUM1, SPEKTRUM2, SBUS
  * NOTE: No slot in this map for NONE.
@@ -317,8 +301,10 @@ void PIOS_Board_Init(void) {
 
 #if defined(PIOS_INCLUDE_FLASH)
 	/* Connect flash to the approrpiate interface and configure it */
-	PIOS_Flash_Jedec_Init(pios_spi_telem_flash_id, 1, &flash_m25p_cfg);
-	PIOS_FLASHFS_Init(&flashfs_m25p_cfg);
+	uint32_t flash_id;
+	PIOS_Flash_Jedec_Init(&flash_id, pios_spi_telem_flash_id, 1, &flash_m25p_cfg);
+	uint32_t fs_id;
+	PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_m25p_cfg, &pios_jedec_flash_driver, flash_id);
 #endif
 
 	/* Initialize UAVObject libraries */

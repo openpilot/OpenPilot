@@ -1,11 +1,13 @@
-#####
-# Project: OpenPilot INS
-#
-#
-# Makefile for OpenPilot INS project
-#
-# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
-#
+###############################################################################
+# @file       Makefile
+# @author     The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
+# @author     PhoenixPilot, http://github.com/PhoenixPilot, Copyright (C) 2012
+# @addtogroup 
+# @{
+# @addtogroup 
+# @{
+# @brief Makefile to build firmware for the Revolution board.
+###############################################################################
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,7 +22,7 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-#####
+#
 
 WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
 TOP      := $(realpath $(WHEREAMI)/../../../)
@@ -177,7 +179,7 @@ SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_sbus.c
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
-SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
+SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c

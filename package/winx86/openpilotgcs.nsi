@@ -208,6 +208,7 @@ Section "Firmware" InSecFirmware
   SetOutPath "$INSTDIR\firmware"
   File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_coptercontrol-${PACKAGE_LBL}.opfw"
   File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_pipxtreme-${PACKAGE_LBL}.opfw"
+  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_revomini-${PACKAGE_LBL}.opfw"
 SectionEnd
 
 ; Copy utility files

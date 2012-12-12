@@ -158,6 +158,20 @@ class Repo:
         else:
             return clean
 
+    def label(self):
+        """Return package label (tag if defined, or date-hash if no tag)"""
+        if self._tag == None:
+            return ''.join([self.time('%Y%m%d'), "-", self.hash(8, 'untagged'), self.dirty()])
+        else:
+            return ''.join([self.tag(''), self.dirty()])
+
+    def revision(self):
+        """Return full revison string (tag if defined, or branch:hash date time if no tag"""
+        if self._tag == None:
+            return ''.join([self.branch('no-branch'), ":", self.hash(8, 'no-hash'), self.dirty(), self.time(' %Y%m%d %H:%M')])
+        else:
+            return ''.join([self.tag(''), self.dirty()])
+
     def info(self):
         """Print some repository info"""
         print "path:       ", self.path()
@@ -167,8 +181,10 @@ class Repo:
         print "hash:       ", self.hash()
         print "short hash: ", self.hash(8)
         print "branch:     ", self.branch()
-        print "commit tag: ", self.tag()
+        print "commit tag: ", self.tag('')
         print "dirty:      ", self.dirty('yes', 'no')
+        print "label:      ", self.label()
+        print "revision:   ", self.revision()
 
 def file_from_template(tpl_name, out_name, dict):
     """Create or update file from template using dictionary
@@ -324,6 +340,12 @@ variable substitution and writes the result into output file. Output
 file will be overwritten only if its content differs from expected.
 Otherwise it will not be touched, so make utility will not remake
 dependent targets.
+
+Optional positional arguments may be used to add more dictionary
+strings for replacement. Each argument has the form:
+    VARIABLE=replacement
+and each ${VARIABLE} reference will be replaced with replacement
+string given.
     """
 
     # Parse command line.
@@ -359,8 +381,6 @@ dependent targets.
     parser.add_option('--uavodir', default = "",
                         help='uav object definition directory');
     (args, positional_args) = parser.parse_args()
-    if len(positional_args) != 0:
-        parser.error("incorrect number of arguments, try --help for help")
 
     # Process arguments.  No advanced error handling is here.
     # Any error will raise an exception and terminate process
@@ -373,12 +393,18 @@ dependent targets.
         ORIGIN = r.origin(),
         HASH = r.hash(),
         HASH8 = r.hash(8),
+        TAG = r.tag(''),
         TAG_OR_BRANCH = r.tag(r.branch('unreleased')),
         TAG_OR_HASH8 = r.tag(r.hash(8, 'untagged')),
+        LABEL = r.label(),
+        REVISION = r.revision(),
         DIRTY = r.dirty(),
         FWTAG = xtrim(r.tag(r.branch('unreleased')), r.dirty(), 25),
         UNIXTIME = r.time(),
         DATE = r.time('%Y%m%d'),
+        DAY=r.time('%d'),
+        MONTH=r.time('%m'),
+        YEAR=r.time('%Y'),
         DATETIME = r.time('%Y%m%d %H:%M'),
         BOARD_TYPE = args.type,
         BOARD_REVISION = args.revision,
@@ -386,6 +412,12 @@ dependent targets.
         UAVOSHA1TXT = GetHashofDirs(args.uavodir,verbose=0,raw=1),
         UAVOSHA1 = GetHashofDirs(args.uavodir,verbose=0,raw=0),
     )
+
+    # Process positional arguments in the form of:
+    #   VAR1=str1 VAR2="string 2"
+    for var in positional_args:
+        (key, value) = var.split('=', 1)
+        dictionary[key] = value
 
     if args.info:
         r.info()

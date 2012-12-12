@@ -8,6 +8,8 @@ osx_package: gcs package_flight
 	  BUILD_DIR="$(BUILD_DIR)" \
 	  PACKAGE_LBL="$(PACKAGE_LBL)" \
 	  PACKAGE_DIR="$(PACKAGE_DIR)" \
+	  PACKAGE_NAME="$(PACKAGE_NAME)" \
+	  PACKAGE_SEP="$(PACKAGE_SEP)" \
 	  FW_DIR="$(FW_DIR)" \
 	  "$(ROOT_DIR)/package/osx/package" \
 	)

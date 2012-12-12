@@ -925,7 +925,7 @@ static void PIOS_RFM22B_Task(void *parameters)
 		}
 
 		// Send a packet if it's our time slice
-		rfm22b_dev->time_to_send = (((curTicks - rfm22b_dev->time_to_send_offset) & 0xC) == 0);
+		rfm22b_dev->time_to_send = (((curTicks - rfm22b_dev->time_to_send_offset) & 0x6) == 0);
 #ifdef PIOS_RFM22B_DEBUG_ON_TELEM
 		if (rfm22b_dev->time_to_send)
 			D4_LED_ON;
@@ -1869,7 +1869,7 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 		// Set the Tx period
 		portTickType curTicks = xTaskGetTickCount();
 		if (rfm22b_dev->tx_packet->header.type == PACKET_TYPE_ACK)
-			rfm22b_dev->time_to_send_offset = curTicks + 0x8;
+			rfm22b_dev->time_to_send_offset = curTicks + 0x4;
 		else if (rfm22b_dev->tx_packet->header.type == PACKET_TYPE_ACK_RTS)
 			rfm22b_dev->time_to_send_offset = curTicks;
 		rfm22b_dev->tx_packet = 0;
@@ -1957,7 +1957,7 @@ static enum pios_rfm22b_event rfm22_receiveAck(struct pios_rfm22b_dev *rfm22b_de
 	}
 	else
 	{
-		rfm22b_dev->time_to_send_offset = curTicks + 0x8;
+		rfm22b_dev->time_to_send_offset = curTicks + 0x4;
 		return RFM22B_EVENT_RX_MODE;
 	}
 }

@@ -197,6 +197,19 @@ void PIOS_Board_Init(void) {
 	}
 #endif
 
+	/* Configure PPM input */
+#if defined(PIOS_INCLUDE_PPM)
+	if (oplinkSettings.PPM == OPLINKSETTINGS_PPM_TRUE)
+	{
+		uint32_t pios_ppm_id;
+		PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+
+		if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id))
+			PIOS_Assert(0);
+	}
+	else
+#endif	/* PIOS_INCLUDE_PPM */
+
 	/* Configure the flexi serial port */
 	{
 		uint32_t pios_usart3_id;
@@ -213,18 +226,6 @@ void PIOS_Board_Init(void) {
 			PIOS_Assert(0);
 		}
 	}
-
-	/* Configure PPM input */
-#if defined(PIOS_INCLUDE_PPM)
-	if (oplinkSettings.PPM == OPLINKSETTINGS_PPM_TRUE)
-	{
-		uint32_t pios_ppm_id;
-		PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
-
-		if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id))
-			PIOS_Assert(0);
-	}
-#endif	/* PIOS_INCLUDE_PPM */
 
 	/* Initalize the RFM22B radio COM device. */
 #if defined(PIOS_INCLUDE_RFM22B)

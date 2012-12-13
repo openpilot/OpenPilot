@@ -1500,7 +1500,6 @@ static bool rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev)
 		if(rfm22b_dev->ppm_packet.channels[i - 1] != PIOS_RCVR_TIMEOUT)
 			valid_input_detected = true;
 	}
-	valid_input_detected = true;
 
 	// Send the PPM packet if it's valid
 	if (valid_input_detected)

@@ -79,10 +79,10 @@ static uintptr_t logfs_get_addr(uint8_t arena_id, uint16_t slot_id)
  * of earlier ones in NOR flash without an erase cycle.
  */
 enum arena_state {
-	ARENA_STATE_ERASED   = 0xEEEEEEEE,
-	ARENA_STATE_RESERVED = 0xE6E6E6E6,
-	ARENA_STATE_ACTIVE   = 0x66666666,
-	ARENA_STATE_OBSOLETE = 0x44444444,
+	ARENA_STATE_ERASED   = 0xFFFFFFFF,
+	ARENA_STATE_RESERVED = 0x5555FFFF,
+	ARENA_STATE_ACTIVE   = 0x0000FFFF,
+	ARENA_STATE_OBSOLETE = 0x00000000,
 };
 
 struct arena_header {
@@ -305,9 +305,9 @@ static int32_t logfs_find_active_arena()
  */
 enum slot_state {
 	SLOT_STATE_EMPTY    = 0xFFFFFFFF,
-	SLOT_STATE_RESERVED = 0xFAFAFAFA,
-	SLOT_STATE_ACTIVE   = 0xAAAAAAAA,
-	SLOT_STATE_OBSOLETE = 0x88888888,
+	SLOT_STATE_RESERVED = 0xAAAAFFFF,
+	SLOT_STATE_ACTIVE   = 0x0000FFFF,
+	SLOT_STATE_OBSOLETE = 0x00000000,
 };
 
 struct slot_header {

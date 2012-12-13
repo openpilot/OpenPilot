@@ -1,0 +1,12 @@
+<xml>
+    <object name="RecoverySettings" singleinstance="true" settings="true">
+        <description>Settings used by new Recovery Module, TODO insert docu </description>
+	<field name="Roll" units="degrees" type="float" elements="1" defaultvalue="0" limits="%BE:-180:180"/>
+	<field name="Pitch" units="degrees" type="float" elements="1" defaultvalue="5" limits="%BE:-90:90"/>
+	<field name="Throttle" units="1" type="float" elements="1" defaultvalue="0.8" limits="%BE:0:1"/>
+	<access gcs="readwrite" flight="readwrite"/>
+	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
+	<telemetryflight acked="true" updatemode="onchange" period="0"/>
+	<logging updatemode="manual" period="0"/>
+    </object>
+</xml>

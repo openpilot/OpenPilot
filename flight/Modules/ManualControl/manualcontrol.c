@@ -439,6 +439,8 @@ static void manualControlTask(void *parameters)
 					case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:
 						altitudeHoldDesired(&cmd);
 						break;
+                    case FLIGHTSTATUS_FLIGHTMODE_RECOVERY:
+                        break;
 					default:
 						AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_CRITICAL);
 				}

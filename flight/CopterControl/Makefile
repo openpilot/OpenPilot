@@ -111,7 +111,7 @@ OPTMODULES += Autotune
 endif
 
 # List of mandatory modules to include
-MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
+MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP Recovery
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
 
@@ -228,6 +228,7 @@ SRC += $(OPUAVSYNTHDIR)/ratedesired.c
 SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
 SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
 SRC += $(OPUAVSYNTHDIR)/airspeedactual.c
+SRC += $(OPUAVSYNTHDIR)/recoverysettings.c
 
 endif
 

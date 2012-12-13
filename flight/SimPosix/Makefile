@@ -55,6 +55,7 @@ FLASH_TOOL = OPENOCD
 MODULES = ManualControl Stabilization GPS
 MODULES += CameraStab
 MODULES += Telemetry
+MODULES += Recovery
 #MODULES += OveroSync
 PYMODULES = 
 #FlightPlan

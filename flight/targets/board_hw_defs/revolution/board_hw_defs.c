@@ -452,7 +452,7 @@ void PIOS_SPI_flash_irq_handler(void)
 #include "pios_flash_jedec_priv.h"
 
 static const struct flashfs_logfs_cfg flashfs_m25p_cfg = {
-	.fs_magic      = 0x89abceef,
+	.fs_magic      = 0x99abceef,
 	.total_fs_size = 0x00200000, /* 2M bytes (32 sectors = entire chip) */
 	.arena_size    = 0x00010000, /* 256 * slot size */
 	.slot_size     = 0x00000100, /* 256 bytes */

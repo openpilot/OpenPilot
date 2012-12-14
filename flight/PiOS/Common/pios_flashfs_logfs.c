@@ -79,13 +79,12 @@ static uintptr_t logfs_get_addr(uint8_t arena_id, uint16_t slot_id)
  * of earlier ones in NOR flash without an erase cycle.
  */
 enum arena_state {
-#ifdef STM32F30X
 	/*
 	 * The STM32F30X flash subsystem is only capable of
 	 * writing words or halfwords. In this case we use halfwords.
 	 * In addition to that it is only capable to write to erased
 	 * cells (0xffff) or write a cell from anything to (0x0000).
-	 * To cope with this, the F3 gets different enum values.
+	 * To cope with this, the F3 needs carefully crafted enum values.
 	 * For this to work the underlying flash driver has to
 	 * check each halfword if it has changed before writing.
 	 */
@@ -93,12 +92,6 @@ enum arena_state {
 	ARENA_STATE_RESERVED = 0xE6E6FFFF,
 	ARENA_STATE_ACTIVE   = 0xE6E66666,
 	ARENA_STATE_OBSOLETE = 0x00000000,
-#else
-	ARENA_STATE_ERASED   = 0xEEEEEEEE,
-	ARENA_STATE_RESERVED = 0xE6E6E6E6,
-	ARENA_STATE_ACTIVE   = 0x66666666,
-	ARENA_STATE_OBSOLETE = 0x44444444,
-#endif
 };
 
 struct arena_header {
@@ -320,13 +313,12 @@ static int32_t logfs_find_active_arena()
  * of earlier ones in NOR flash without an erase cycle.
  */
 enum slot_state {
-#ifdef STM32F30X
 	/*
 	 * The STM32F30X flash subsystem is only capable of
 	 * writing words or halfwords. In this case we use halfwords.
 	 * In addition to that it is only capable to write to erased
 	 * cells (0xffff) or write a cell from anything to (0x0000).
-	 * To cope with this, the F3 gets different enum values.
+	 * To cope with this, the F3 needs carfully crafted enum values.
 	 * For this to work the underlying flash driver has to
 	 * check each halfword if it has changed before writing.
 	 */
@@ -334,12 +326,6 @@ enum slot_state {
 	SLOT_STATE_RESERVED = 0xFAFAFFFF,
 	SLOT_STATE_ACTIVE   = 0xFAFAAAAA,
 	SLOT_STATE_OBSOLETE = 0x00000000,
-#else
-	SLOT_STATE_EMPTY    = 0xFFFFFFFF,
-	SLOT_STATE_RESERVED = 0xFAFAFAFA,
-	SLOT_STATE_ACTIVE   = 0xAAAAAAAA,
-	SLOT_STATE_OBSOLETE = 0x88888888,
-#endif
 };
 
 struct slot_header {

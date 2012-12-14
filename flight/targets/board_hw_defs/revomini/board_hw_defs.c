@@ -567,7 +567,7 @@ const struct pios_rfm22b_cfg * PIOS_BOARD_HW_DEFS_GetRfm22Cfg (uint32_t board_re
 #include "pios_flash_jedec_priv.h"
 
 static const struct flashfs_logfs_cfg flashfs_m25p_cfg = {
-	.fs_magic      = 0x89abceef,
+	.fs_magic      = 0x99abceef,
 	.total_fs_size = 0x00200000, /* 2M bytes (32 sectors = entire chip) */
 	.arena_size    = 0x00010000, /* 256 * slot size */
 	.slot_size     = 0x00000100, /* 256 bytes */

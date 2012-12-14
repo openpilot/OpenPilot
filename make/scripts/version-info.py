@@ -390,7 +390,7 @@ string given.
     dictionary = dict(
         TEMPLATE = args.template,
         OUTFILENAME = args.outfile,
-        ORIGIN = r.origin(),
+        ORIGIN = r.origin("local repository or using build servers"),
         HASH = r.hash(),
         HASH8 = r.hash(8),
         TAG = r.tag(''),

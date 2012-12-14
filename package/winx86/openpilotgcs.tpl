@@ -22,4 +22,4 @@
 ; Installer version info
 !define PRODUCT_VERSION "0.0.0.0"
 !define FILE_VERSION "${TAG_OR_BRANCH}:${HASH8}${DIRTY} ${DATETIME}"
-!define BUILD_DESCRIPTION "${PACKAGE_LBL} built using ${ORIGIN} as origin, committed ${DATETIME} as ${HASH}"
+!define BUILD_DESCRIPTION "${PACKAGE_LBL} built from ${ORIGIN}, committed ${DATETIME} as ${HASH}"

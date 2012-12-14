@@ -58,7 +58,8 @@
 /* Variables related to the RFM22B functionality */
 #define PIOS_INCLUDE_RFM22B
 #define PIOS_INCLUDE_RFM22B_COM
- 
+#define PIOS_INCLUDE_RFM22B_RCVR
+
 /* Select the sensors to include */
 #define PIOS_INCLUDE_HMC5883
 #define PIOS_HMC5883_HAS_GPIOS

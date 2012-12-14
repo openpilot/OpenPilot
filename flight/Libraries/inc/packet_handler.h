@@ -33,6 +33,7 @@
 #include <uavobjectmanager.h>
 #include <gcsreceiver.h>
 #include <oplinksettings.h>
+#include <pios_rfm22b_rcvr.h>
 
 // Public defines / macros
 #define PHPacketSize(p) ((uint8_t*)(p->data) + p->header.data_size - (uint8_t*)p)
@@ -75,7 +76,7 @@ typedef struct {
 #define PH_PPM_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
 typedef struct {
 	PHPacketHeader header;
-	uint16_t channels[GCSRECEIVER_CHANNEL_NUMELEM];
+	uint16_t channels[PIOS_RFM22B_RCVR_MAX_CHANNELS];
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHPpmPacket, *PHPpmPacketHandle;
 

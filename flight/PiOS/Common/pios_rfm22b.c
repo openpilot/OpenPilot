@@ -1767,6 +1767,14 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 				case PACKET_TYPE_NACK:
 					ret_event = RFM22B_EVENT_PACKET_NACKED;
 					break;
+				case PACKET_TYPE_PPM:
+				{
+					PHPpmPacketHandle ppmp = (PHPpmPacketHandle)&(rfm22b_dev->rx_packet);
+					for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i)
+						rfm22b_dev->ppm_channel[i] = ppmp->channels[i];
+					rfm22b_dev->ppm_fresh = true;
+					break;
+				}
 				default:
 					break;
 				}

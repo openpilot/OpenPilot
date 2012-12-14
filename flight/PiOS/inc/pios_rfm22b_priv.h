@@ -36,6 +36,7 @@
 #include <uavobjectmanager.h>
 #include <oplinkstatus.h>
 #include "pios_rfm22b.h"
+#include "pios_rfm22b_rcvr.h"
 
 // ************************************
 
@@ -780,6 +781,11 @@ struct pios_rfm22b_dev {
 	portTickType tx_complete_ticks;
 	portTickType rx_complete_ticks;
 	uint8_t max_ack_delay;
+
+	// The PPM channel values
+	uint16_t ppm_channel[PIOS_RFM22B_RCVR_MAX_CHANNELS];
+	uint8_t ppm_supv_timer;
+	bool ppm_fresh;
 };
 
 

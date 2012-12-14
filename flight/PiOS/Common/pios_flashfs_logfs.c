@@ -25,10 +25,10 @@
  */
 
 #include "openpilot.h"
-#include "uavobjectmanager.h"	/* UAVObjHandle, UAVObj* */
 
-#include "pios_flashfs.h"	/* API for flash filesystem */
 #include "pios_flashfs_logfs_priv.h"
+
+#include <stdbool.h>
 
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
 
@@ -312,9 +312,9 @@ enum slot_state {
 
 struct slot_header {
 	enum slot_state state;
-	uint32_t objid;
-	uint16_t instid;
-	uint16_t size;
+	uint32_t obj_id;
+	uint16_t obj_inst_id;
+	uint16_t obj_size;
 } __attribute__((packed));
 
 /* NOTE: Must be called while holding the flash transaction lock */
@@ -553,7 +553,7 @@ static int32_t logfs_garbage_collect (void) {
 		if (slot_hdr.state == SLOT_STATE_ACTIVE) {
 			uintptr_t dst_addr = logfs_get_addr (dst_arena_id, dst_slot_id);
 			if (logfs_raw_copy_bytes(src_addr,
-							sizeof(slot_hdr) + slot_hdr.size,
+							sizeof(slot_hdr) + slot_hdr.obj_size,
 							dst_addr) != 0) {
 				/* Failed to copy all bytes */
 				return -4;
@@ -586,7 +586,7 @@ static int32_t logfs_garbage_collect (void) {
 }
 
 /* NOTE: Must be called while holding the flash transaction lock */
-static int16_t logfs_object_find_next (struct slot_header * slot_hdr, uint16_t * curr_slot, uint32_t objid, uint16_t instid)
+static int16_t logfs_object_find_next (struct slot_header * slot_hdr, uint16_t * curr_slot, uint32_t obj_id, uint16_t obj_inst_id)
 {
 	PIOS_Assert(slot_hdr);
 	PIOS_Assert(curr_slot);
@@ -610,8 +610,8 @@ static int16_t logfs_object_find_next (struct slot_header * slot_hdr, uint16_t *
 			break;
 		}
 		if (slot_hdr->state == SLOT_STATE_ACTIVE &&
-			slot_hdr->objid == objid &&
-			slot_hdr->instid == instid) {
+			slot_hdr->obj_id      == obj_id &&
+			slot_hdr->obj_inst_id == obj_inst_id) {
 			/* Found what we were looking for */
 			*curr_slot = slot_id;
 			return 0;
@@ -624,7 +624,7 @@ static int16_t logfs_object_find_next (struct slot_header * slot_hdr, uint16_t *
 
 /* NOTE: Must be called while holding the flash transaction lock */
 /* OPTIMIZE: could trust that there is at most one active version of every object and terminate the search when we find one */
-static int8_t logfs_delete_object (uint32_t objid, uint16_t instid)
+static int8_t logfs_delete_object (uint32_t obj_id, uint16_t obj_inst_id)
 {
 	int8_t rc;
 
@@ -632,7 +632,7 @@ static int8_t logfs_delete_object (uint32_t objid, uint16_t instid)
 	uint16_t curr_slot_id = 0;
 	do {
 		struct slot_header slot_hdr;
-		switch (logfs_object_find_next (&slot_hdr, &curr_slot_id, objid, instid)) {
+		switch (logfs_object_find_next (&slot_hdr, &curr_slot_id, obj_id, obj_inst_id)) {
 		case 0:
 			/* Found a matching slot.  Obsolete it. */
 			slot_hdr.state = SLOT_STATE_OBSOLETE;
@@ -663,7 +663,7 @@ out_exit:
 }
 
 /* NOTE: Must be called while holding the flash transaction lock */
-static int8_t logfs_reserve_free_slot (uint16_t * slot_id, struct slot_header * slot_hdr, uint32_t objid, uint16_t instid, uint16_t objsize)
+static int8_t logfs_reserve_free_slot (uint16_t * slot_id, struct slot_header * slot_hdr, uint32_t obj_id, uint16_t obj_inst_id, uint16_t obj_size)
 {
 	PIOS_Assert(slot_id);
 	PIOS_Assert(slot_hdr);
@@ -673,7 +673,7 @@ static int8_t logfs_reserve_free_slot (uint16_t * slot_id, struct slot_header * 
 		return -1;
 	}
 
-	if (objsize > (logfs.cfg->slot_size - sizeof (slot_hdr))) {
+	if (obj_size > (logfs.cfg->slot_size - sizeof (slot_hdr))) {
 		/* This object is too big for the slot */
 		return -2;
 	}
@@ -698,10 +698,10 @@ static int8_t logfs_reserve_free_slot (uint16_t * slot_id, struct slot_header * 
 	}
 
 	/* Mark this slot as RESERVED */
-	slot_hdr->state = SLOT_STATE_RESERVED;
-	slot_hdr->objid = objid;
-	slot_hdr->instid = instid;
-	slot_hdr->size = objsize;
+	slot_hdr->state       = SLOT_STATE_RESERVED;
+	slot_hdr->obj_id      = obj_id;
+	slot_hdr->obj_inst_id = obj_inst_id;
+	slot_hdr->obj_size    = obj_size;
 
 	if (logfs.driver->write_data(logfs.flash_id,
 					slot_addr,
@@ -719,12 +719,12 @@ static int8_t logfs_reserve_free_slot (uint16_t * slot_id, struct slot_header * 
 }
 
 /* NOTE: Must be called while holding the flash transaction lock */
-static int8_t logfs_append_to_log (uint32_t objid, uint16_t instid, uint8_t * data, uint16_t data_len)
+static int8_t logfs_append_to_log (uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
 {
 	/* Reserve a free slot for our new object */
 	uint16_t free_slot_id;
 	struct slot_header slot_hdr;
-	if (logfs_reserve_free_slot (&free_slot_id, &slot_hdr, objid, instid, data_len) != 0) {
+	if (logfs_reserve_free_slot (&free_slot_id, &slot_hdr, obj_id, obj_inst_id, obj_size) != 0) {
 		/* Failed to reserve a free slot */
 		return -1;
 	}
@@ -734,22 +734,22 @@ static int8_t logfs_append_to_log (uint32_t objid, uint16_t instid, uint8_t * da
 
 	/* Write the data into the reserved slot, starting after the slot header */
 	uintptr_t slot_offset = sizeof(slot_hdr);
-	while (data_len > 0) {
+	while (obj_size > 0) {
 		/* Individual writes must fit entirely within a single page buffer. */
 		uint16_t page_remaining = logfs.cfg->page_size - (slot_offset % logfs.cfg->page_size);
-		uint16_t write_size = MIN(data_len, page_remaining);
+		uint16_t write_size = MIN(obj_size, page_remaining);
 		if (logfs.driver->write_data (logfs.flash_id,
 						slot_addr + slot_offset,
-						data,
+						obj_data,
 						write_size) != 0) {
 			/* Failed to write the object data to the slot */
 			return -2;
 		}
 
 		/* Update our accounting */
-		data += write_size;
+		obj_data    += write_size;
 		slot_offset += write_size;
-		data_len -= write_size;
+		obj_size    -= write_size;
 	}
 
 	/* Mark this slot active in one atomic step */
@@ -767,27 +767,41 @@ static int8_t logfs_append_to_log (uint32_t objid, uint16_t instid, uint8_t * da
 	return 0;
 }
 
+
+/**********************************
+ *
+ * Provide a PIOS_FLASHFS_* driver
+ *
+ *********************************/
+#include "pios_flashfs.h"	/* API for flash filesystem */
+
 /**
- * @brief Saves one object instance per sector
- * @param[in] obj UAVObjHandle the object to save
- * @param[in] instId The instance of the object to save
- * @return 0 if success or -1 if failure
+ * @brief Saves one object instance to the filesystem
+ * @param[in] fs_id The filesystem to use for this action
+ * @param[in] obj UAVObject ID of the object to save
+ * @param[in] obj_inst_id The instance number of the object being saved
+ * @param[in] obj_data Contents of the object being saved
+ * @param[in] obj_size Size of the object being saved
+ * @return 0 if success or error code
+ * @retval -1 if failed to start transaction
+ * @retval -2 if failure to delete any previous versions of the object
+ * @retval -3 if filesystem is entirely full and garbage collection won't help
+ * @retval -4 if garbage collection failed
+ * @retval -5 if filesystem is full even after garbage collection should have freed space
+ * @retval -6 if writing the new object to the filesystem failed
  */
-int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instid, uint8_t * data)
+int32_t PIOS_FLASHFS_ObjSave(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
 {
 	int8_t rc;
 
-	uint32_t objid = UAVObjGetID(obj);
-	uint16_t objsize = UAVObjGetNumBytes(obj);
-
-	PIOS_Assert(objsize <= (logfs.cfg->slot_size - sizeof(struct slot_header)));
+	PIOS_Assert(obj_size <= (logfs.cfg->slot_size - sizeof(struct slot_header)));
 
 	if (logfs.driver->start_transaction(logfs.flash_id) != 0) {
 		rc = -1;
 		goto out_exit;
 	}
 
-	if (logfs_delete_object (objid, instid) != 0) {
+	if (logfs_delete_object (obj_id, obj_inst_id) != 0) {
 		rc = -2;
 		goto out_end_trans;
 	}
@@ -825,7 +839,7 @@ int32_t PIOS_FLASHFS_ObjSave(UAVObjHandle obj, uint16_t instid, uint8_t * data)
 	}
 
 	/* We have room for our new object.  Append it to the log. */
-	if (logfs_append_to_log(objid, instid, data, objsize) != 0) {
+	if (logfs_append_to_log(obj_id, obj_inst_id, obj_data, obj_size) != 0) {
 		/* Error during append */
 		rc = -6;
 		goto out_end_trans;
@@ -842,25 +856,23 @@ out_exit:
 }
 
 /**
- * @brief Load one object instance per sector
- * @param[in] obj UAVObjHandle the object to save
- * @param[in] instId The instance of the object to save
+ * @brief Load one object instance from the filesystem
+ * @param[in] fs_id The filesystem to use for this action
+ * @param[in] obj UAVObject ID of the object to load
+ * @param[in] obj_inst_id The instance of the object to load
+ * @param[in] obj_data Buffer to hold the contents of the loaded object
+ * @param[in] obj_size Size of the object to be loaded
  * @return 0 if success or error code
- * @retval -1 if object not in file table
- * @retval -2 if unable to retrieve object header
- * @retval -3 if loaded data instId or objId don't match
- * @retval -4 if unable to retrieve instance data
- * @retval -5 if unable to read CRC
- * @retval -6 if CRC doesn't match
+ * @retval -1 if failed to start transaction
+ * @retval -2 if object not found in filesystem
+ * @retval -3 if object size in filesystem does not exactly match buffer size
+ * @retval -4 if reading the object data from flash fails
  */
-int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instid, uint8_t * data)
+int32_t PIOS_FLASHFS_ObjLoad(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
 {
 	int8_t rc;
 
-	uint32_t objid = UAVObjGetID(obj);
-	uint16_t objsize = UAVObjGetNumBytes(obj);
-
-	PIOS_Assert(objsize <= (logfs.cfg->slot_size - sizeof(struct slot_header)));
+	PIOS_Assert(obj_size <= (logfs.cfg->slot_size - sizeof(struct slot_header)));
 
 	if (logfs.driver->start_transaction(logfs.flash_id) != 0) {
 		rc = -1;
@@ -870,14 +882,14 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instid, uint8_t * data)
 	/* Find the object in the log */
 	uint16_t slot_id = 0;
 	struct slot_header slot_hdr;
-	if (logfs_object_find_next (&slot_hdr, &slot_id, objid, instid) != 0) {
+	if (logfs_object_find_next (&slot_hdr, &slot_id, obj_id, obj_inst_id) != 0) {
 		/* Object does not exist in fs */
 		rc = -2;
 		goto out_end_trans;
 	}
 
 	/* Sanity check what we've found */
-	if (slot_hdr.size != objsize) {
+	if (slot_hdr.obj_size != obj_size) {
 		/* Object sizes don't match.  Not safe to copy contents. */
 		rc = -3;
 		goto out_end_trans;
@@ -887,8 +899,8 @@ int32_t PIOS_FLASHFS_ObjLoad(UAVObjHandle obj, uint16_t instid, uint8_t * data)
 	uintptr_t slot_addr = logfs_get_addr (logfs.active_arena_id, slot_id);
 	if (logfs.driver->read_data(logfs.flash_id,
 					slot_addr + sizeof(slot_hdr),
-					(uint8_t *)data,
-					objsize) != 0) {
+					(uint8_t *)obj_data,
+					obj_size) != 0) {
 		/* Failed to read object data from the log */
 		rc = -4;
 		goto out_end_trans;
@@ -905,31 +917,24 @@ out_exit:
 }
 
 /**
- * @brief Delete object from flash
- * @param[in] obj UAVObjHandle the object to save
- * @param[in] instId The instance of the object to save
+ * @brief Delete one instance of an object from the filesystem
+ * @param[in] fs_id The filesystem to use for this action
+ * @param[in] obj UAVObject ID of the object to delete
+ * @param[in] obj_inst_id The instance of the object to delete
  * @return 0 if success or error code
- * @retval -1 if object not in file table
- * @retval -2 Erase failed
- * @note To avoid buffering the file table (1k ram!) the entry in the file table
- * remains but destination sector is erased.  This will make the load fail as the
- * file header won't match the object.  At next save it goes back there.
+ * @retval -1 if failed to start transaction
+ * @retval -2 if failed to delete the object from the filesystem
  */
-int32_t PIOS_FLASHFS_ObjDelete(UAVObjHandle obj, uint16_t instid)
+int32_t PIOS_FLASHFS_ObjDelete(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id)
 {
 	int8_t rc;
-
-	uint32_t objid = UAVObjGetID(obj);
-	uint16_t objsize = UAVObjGetNumBytes(obj);
-
-	PIOS_Assert(objsize <= (logfs.cfg->slot_size - sizeof(struct slot_header)));
 
 	if (logfs.driver->start_transaction(logfs.flash_id) != 0) {
 		rc = -1;
 		goto out_exit;
 	}
 
-	if (logfs_delete_object (objid, instid) != 0) {
+	if (logfs_delete_object (obj_id, obj_inst_id) != 0) {
 		rc = -2;
 		goto out_end_trans;
 	}
@@ -944,7 +949,16 @@ out_exit:
 	return rc;
 }
 
-int32_t PIOS_FLASHFS_Format()
+/**
+ * @brief Erases all filesystem arenas and activate the first arena
+ * @param[in] fs_id The filesystem to use for this action
+ * @return 0 if success or error code
+ * @retval -1 if failed to start transaction
+ * @retval -2 if failed to erase all arenas
+ * @retval -3 if failed to activate arena 0
+ * @retval -4 if failed to mount arena 0
+ */
+int32_t PIOS_FLASHFS_Format(uint32_t fs_id)
 {
 	int32_t rc;
 

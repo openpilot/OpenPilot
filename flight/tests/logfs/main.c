@@ -31,7 +31,7 @@ int main (int argc, char * argv[])
 
 	/* dd if=/dev/zero bs=1 count=2MiB | tr '\000' '\377' > theflash.bin */
 
-	uint32_t flash_id;
+	uintptr_t flash_id;
 	rc = PIOS_Flash_UT_Init(&flash_id, &flash_config);
 	if (rc != 0) {
 		printf ("flash init failed (%d)\n", rc);

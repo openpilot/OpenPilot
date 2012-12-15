@@ -162,7 +162,7 @@ void PIOS_Board_Init(void) {
 
 #endif
 
-	uint32_t flash_id;
+	uintptr_t flash_id;
 	uintptr_t fs_id;
 	switch(bdinfo->board_rev) {
 		case BOARD_REVISION_CC:

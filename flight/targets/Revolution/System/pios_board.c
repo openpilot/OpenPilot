@@ -381,12 +381,12 @@ void PIOS_Board_Init(void) {
 	if (PIOS_SPI_Init(&pios_spi_flash_id, &pios_spi_flash_cfg)) {
 		PIOS_DEBUG_Assert(0);
 	}
-	/* Connect flash to the approrpiate interface and configure it */
-	uint32_t flash_id;
+	/* Connect flash to the appropriate interface and configure it */
+	uintptr_t flash_id;
 	PIOS_Flash_Jedec_Init(&flash_id, pios_spi_flash_id, 0, &flash_m25p_cfg);
 #else
-	/* Connect flash to the approrpiate interface and configure it */
-	uint32_t flash_id;
+	/* Connect flash to the appropriate interface and configure it */
+	uintptr_t flash_id;
 	PIOS_Flash_Jedec_Init(&flash_id, pios_spi_accel_id, 1, &flash_m25p_cfg);
 #endif
 	uintptr_t fs_id;

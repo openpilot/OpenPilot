@@ -26,7 +26,7 @@ static struct flash_ut_dev * PIOS_Flash_UT_Alloc(void)
 	return flash_dev;
 }
 
-int32_t PIOS_Flash_UT_Init(uint32_t * flash_id, const struct pios_flash_ut_cfg * cfg)
+int32_t PIOS_Flash_UT_Init(uintptr_t * flash_id, const struct pios_flash_ut_cfg * cfg)
 {
 	/* Check inputs */
 	assert(flash_id);
@@ -50,7 +50,7 @@ int32_t PIOS_Flash_UT_Init(uint32_t * flash_id, const struct pios_flash_ut_cfg *
 		return -2;
 	}
 
-	*flash_id = (uint32_t)flash_dev;
+	*flash_id = (uintptr_t)flash_dev;
 
 	return 0;
 }
@@ -62,7 +62,7 @@ int32_t PIOS_Flash_UT_Init(uint32_t * flash_id, const struct pios_flash_ut_cfg *
  *********************************/
 #include "pios_flash.h"
 
-static int32_t PIOS_Flash_UT_StartTransaction(uint32_t flash_id)
+static int32_t PIOS_Flash_UT_StartTransaction(uintptr_t flash_id)
 {
 	struct flash_ut_dev * flash_dev = (struct flash_ut_dev *)flash_id;
 
@@ -73,7 +73,7 @@ static int32_t PIOS_Flash_UT_StartTransaction(uint32_t flash_id)
 	return 0;
 }
 
-static int32_t PIOS_Flash_UT_EndTransaction(uint32_t flash_id)
+static int32_t PIOS_Flash_UT_EndTransaction(uintptr_t flash_id)
 {
 	struct flash_ut_dev * flash_dev = (struct flash_ut_dev *)flash_id;
 
@@ -84,7 +84,7 @@ static int32_t PIOS_Flash_UT_EndTransaction(uint32_t flash_id)
 	return 0;
 }
 
-static int32_t PIOS_Flash_UT_EraseSector(uint32_t flash_id, uint32_t addr)
+static int32_t PIOS_Flash_UT_EraseSector(uintptr_t flash_id, uint32_t addr)
 {
 	struct flash_ut_dev * flash_dev = (struct flash_ut_dev *)flash_id;
 
@@ -106,7 +106,7 @@ static int32_t PIOS_Flash_UT_EraseSector(uint32_t flash_id, uint32_t addr)
 	return 0;
 }
 
-static int32_t PIOS_Flash_UT_WriteData(uint32_t flash_id, uint32_t addr, uint8_t * data, uint16_t len)
+static int32_t PIOS_Flash_UT_WriteData(uintptr_t flash_id, uint32_t addr, uint8_t * data, uint16_t len)
 {
 	/* Check inputs */
 	assert(data);
@@ -127,7 +127,7 @@ static int32_t PIOS_Flash_UT_WriteData(uint32_t flash_id, uint32_t addr, uint8_t
 	return 0;
 }
 
-static int32_t PIOS_Flash_UT_ReadData(uint32_t flash_id, uint32_t addr, uint8_t * data, uint16_t len)
+static int32_t PIOS_Flash_UT_ReadData(uintptr_t flash_id, uint32_t addr, uint8_t * data, uint16_t len)
 {
 	/* Check inputs */
 	assert(data);

@@ -35,6 +35,6 @@ struct pios_flash_internal_cfg {
 	;
 };
 
-extern int32_t PIOS_Flash_Internal_Init(uint32_t * flash_id, const struct pios_flash_internal_cfg * cfg);
+extern int32_t PIOS_Flash_Internal_Init(uintptr_t * flash_id, const struct pios_flash_internal_cfg * cfg);
 
 #endif	/* PIOS_FLASH_INTERNAL_H_ */

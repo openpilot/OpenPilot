@@ -38,7 +38,7 @@ int main (int argc, char * argv[])
 		abort();
 	}
 
-	uint32_t fs_id;
+	uintptr_t fs_id;
 	rc = PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_config, &pios_ut_flash_driver, flash_id);
 	if (rc != 0) {
 		printf ("flash filesystem init failed (%d)\n", rc);

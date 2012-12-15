@@ -163,7 +163,7 @@ void PIOS_Board_Init(void) {
 #endif
 
 	uint32_t flash_id;
-	uint32_t fs_id;
+	uintptr_t fs_id;
 	switch(bdinfo->board_rev) {
 		case BOARD_REVISION_CC:
 			PIOS_Flash_Jedec_Init(&flash_id, pios_spi_flash_accel_id, 1, &flash_w25x_cfg);

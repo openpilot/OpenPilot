@@ -41,6 +41,6 @@ struct flashfs_logfs_cfg {
 	uint32_t page_size;	/* Maximum flash burst write size */
 };
 
-int32_t PIOS_FLASHFS_Logfs_Init(uint32_t * fs_id, const struct flashfs_logfs_cfg * cfg, const struct pios_flash_driver * driver, uint32_t flash_id);
+int32_t PIOS_FLASHFS_Logfs_Init(uintptr_t * fs_id, const struct flashfs_logfs_cfg * cfg, const struct pios_flash_driver * driver, uint32_t flash_id);
 
 #endif	/* PIOS_FLASHFS_LOGFS_PRIV_H_ */

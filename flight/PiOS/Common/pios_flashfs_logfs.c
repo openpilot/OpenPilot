@@ -461,7 +461,7 @@ static int32_t logfs_mount_log(uint8_t arena_id)
  * @brief Initialize the flash object setting FS
  * @return 0 if success, -1 if failure
  */
-int32_t PIOS_FLASHFS_Logfs_Init(uint32_t * fs_id, const struct flashfs_logfs_cfg * cfg, const struct pios_flash_driver * driver, uint32_t flash_id)
+int32_t PIOS_FLASHFS_Logfs_Init(uintptr_t * fs_id, const struct flashfs_logfs_cfg * cfg, const struct pios_flash_driver * driver, uint32_t flash_id)
 {
 	PIOS_Assert(cfg);
 	PIOS_Assert(fs_id);
@@ -524,7 +524,7 @@ int32_t PIOS_FLASHFS_Logfs_Init(uint32_t * fs_id, const struct flashfs_logfs_cfg
 	/* Log has been mounted */
 	rc = 0;
 
-	*fs_id = (uint32_t) &logfs;
+	*fs_id = (uintptr_t) &logfs;
 
 out_end_trans:
 	logfs.driver->end_transaction(logfs.flash_id);

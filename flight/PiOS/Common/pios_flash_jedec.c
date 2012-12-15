@@ -49,8 +49,6 @@
 #define JEDEC_STATUS_SEC             0x40
 #define JEDEC_STATUS_SRP0            0x80
 
-static uint8_t device_type;
-
 enum pios_jedec_dev_magic {
 	PIOS_JEDEC_DEV_MAGIC = 0xcb55aa55,
 };
@@ -60,8 +58,11 @@ struct jedec_flash_dev {
 	uint32_t spi_id;
 	uint32_t slave_num;
 	bool claimed;
-	uint32_t device_type;
-	uint32_t capacity;
+
+	uint8_t manufacturer;
+	uint8_t memorytype;
+	uint8_t capacity;
+
 	const struct pios_flash_jedec_cfg * cfg;
 #if defined(FLASH_FREERTOS)
 	xSemaphoreHandle transaction_lock;
@@ -124,9 +125,13 @@ int32_t PIOS_Flash_Jedec_Init(uintptr_t * flash_id, uint32_t spi_id, uint32_t sl
 	flash_dev->slave_num = slave_num;
 	flash_dev->cfg = cfg;
 
-	device_type = PIOS_Flash_Jedec_ReadID(flash_dev);
-	if (device_type == 0)
+	(void) PIOS_Flash_Jedec_ReadID(flash_dev);
+	if ((flash_dev->manufacturer != flash_dev->cfg->expect_manufacturer) ||
+		(flash_dev->memorytype != flash_dev->cfg->expect_memorytype) ||
+		(flash_dev->capacity != flash_dev->cfg->expect_capacity)) {
+		/* Mismatched device has been discovered */
 		return -1;
+	}
 
 	/* Give back a handle to this flash device */
 	*flash_id = (uintptr_t) flash_dev;
@@ -227,10 +232,11 @@ static int32_t PIOS_Flash_Jedec_ReadID(struct jedec_flash_dev * flash_dev)
 
 	PIOS_Flash_Jedec_ReleaseBus(flash_dev);
 
-	flash_dev->device_type = in[1];
-	flash_dev->capacity = in[3];
+	flash_dev->manufacturer = in[1];
+	flash_dev->memorytype   = in[2];
+	flash_dev->capacity     = in[3];
 
-	return in[1];
+	return flash_dev->manufacturer;
 }
 
 /**********************************

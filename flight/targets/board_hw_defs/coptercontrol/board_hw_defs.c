@@ -415,8 +415,11 @@ static const struct flashfs_logfs_cfg flashfs_w25x_cfg = {
 };
 
 static const struct pios_flash_jedec_cfg flash_w25x_cfg = {
-	.sector_erase = 0x20,
-	.chip_erase = 0x60
+	.expect_manufacturer = JEDEC_MANUFACTURER_WINBOND,
+	.expect_memorytype   = 0x30,
+	.expect_capacity     = 0x13,
+	.sector_erase        = 0x20,
+	.chip_erase          = 0x60
 };
 
 static const struct flashfs_logfs_cfg flashfs_m25p_cfg = {
@@ -431,8 +434,11 @@ static const struct flashfs_logfs_cfg flashfs_m25p_cfg = {
 };
 
 static const struct pios_flash_jedec_cfg flash_m25p_cfg = {
-	.sector_erase = 0xD8,
-	.chip_erase = 0xC7
+	.expect_manufacturer = JEDEC_MANUFACTURER_ST,
+	.expect_memorytype   = 0x20,
+	.expect_capacity     = 0x15,
+	.sector_erase        = 0xD8,
+	.chip_erase          = 0xC7,
 };
 
 #include "pios_flash.h"

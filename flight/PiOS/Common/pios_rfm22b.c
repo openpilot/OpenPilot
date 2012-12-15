@@ -192,8 +192,8 @@ static void rfm22_process_event(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rf
 static enum pios_rfm22b_event rfm22_timeout(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_error(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_fatal_error(struct pios_rfm22b_dev *rfm22b_dev);
-static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev);
-static bool rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev);
+static void rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev);
+static void rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22b_add_rx_status(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_rx_packet_status status);
 static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHandle p, uint16_t rx_len);
 static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev, uint32_t frequency_hz);
@@ -914,12 +914,18 @@ static void PIOS_RFM22B_Task(void *parameters)
 			{
 
 				// Queue up a PPM packet if it's time.
-				if ((timeDifferenceMs(lastPPMTicks, curTicks) > PPM_UPDATE_PERIOD_MS) && rfm22_sendPPM(rfm22b_dev))
+				if (timeDifferenceMs(lastPPMTicks, curTicks) > PPM_UPDATE_PERIOD_MS)
+				{
+					rfm22_sendPPM(rfm22b_dev);
 					lastPPMTicks = curTicks;
+				}
 
 				// Queue up a status packet if it's time.
-				if ((timeDifferenceMs(lastStatusTicks, curTicks) > RADIOSTATS_UPDATE_PERIOD_MS) && rfm22_sendStatus(rfm22b_dev))
+				if (timeDifferenceMs(lastStatusTicks, curTicks) > RADIOSTATS_UPDATE_PERIOD_MS)
+				{
+					rfm22_sendStatus(rfm22b_dev);
 					lastStatusTicks = curTicks;
+				}
 			}
 
 		}
@@ -1465,8 +1471,11 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 	return RFM22B_EVENT_NUM_EVENTS;
 }
 
-static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
+static void rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 {
+	// Only send status if we're connected
+	if (rfm22b_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED)
+		return;
 
 	// Update the link quality metric.
 	rfm22_calculateLinkQuality(rfm22b_dev);
@@ -1482,15 +1491,19 @@ static bool rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22b_dev->status_packet.received_rssi = rfm22b_dev->rssi_dBm;
 	rfm22b_dev->send_status = true;
 
-	return true;
+	return;
 }
 
-static bool rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev)
+static void rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev)
 {
 #ifdef PIOS_PPM_RECEIVER
+	// Only send PPM if we're connected
+	if (rfm22b_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED)
+		return;
+
 	// Just return if the PPM receiver is not configured.
 	if (PIOS_PPM_RECEIVER == 0)
-		return true;
+		return;
 
 	// See if we have any valid channels.
 	bool valid_input_detected = false;
@@ -1510,8 +1523,6 @@ static bool rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev)
 		rfm22b_dev->send_ppm = true;
 	}
 #endif
-
-	return true;
 }
 
 /**
@@ -2025,9 +2036,6 @@ static enum pios_rfm22b_event rfm22_receiveStatus(struct pios_rfm22b_dev *rfm22b
 		rfm22b_dev->pair_stats[min_idx].afc_correction = afc;
 		rfm22b_dev->pair_stats[min_idx].lastContact = 0;
 	}
-
-	rfm22b_dev->stats.link_quality = status->link_quality;
-	rfm22b_dev->stats.rssi = status->received_rssi;
 
 	return RFM22B_EVENT_RX_COMPLETE;
 }

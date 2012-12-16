@@ -185,10 +185,10 @@ $(BUILD_DIR):
 ##############################
 
 ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && echo "exists"), exists)
-  QMAKE=$(QT_SDK_DIR)/Desktop/Qt/4.8.1/gcc/bin/qmake
+  QMAKE = $(QT_SDK_QMAKE_PATH)
 else
   # not installed, hope it's in the path...
-  QMAKE=qmake
+  QMAKE = qmake
 endif
 
 ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && echo "exists"), exists)

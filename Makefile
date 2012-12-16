@@ -58,14 +58,17 @@ export V1    := $(AT)
 else ifeq ($(V), 1)
 endif
 
+# Make sure we know a few things about the architecture before including
+# the tools.mk to ensure that we download/install the right tools.
+UNAME := $(shell uname)
+ARCH := $(shell uname -m)
+
 include $(ROOT_DIR)/make/tools.mk
 
 # We almost need to consider autoconf/automake instead of this
 # I don't know if windows supports uname :-(
 QT_SPEC=win32-g++
 UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/debug/uavobjgenerator.exe"
-UNAME := $(shell uname)
-ARCH := $(shell uname -m)
 ifeq ($(UNAME), Linux)
   QT_SPEC=linux-g++
   UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"

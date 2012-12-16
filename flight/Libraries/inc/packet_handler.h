@@ -101,34 +101,6 @@ typedef struct {
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHConnectionPacket, *PHConnectionPacketHandle;
 
-typedef struct {
-	uint32_t default_destination_id;
-	uint32_t source_id;
-	uint16_t max_connections;
-	uint8_t win_size;
-} PacketHandlerConfig;
-
-typedef int32_t (*PHOutputStream)(PHPacketHandle packet);
-typedef void (*PHDataHandler)(uint8_t *data, uint8_t len, int8_t rssi, int8_t afc);
-typedef void (*PHStatusHandler)(PHStatusPacketHandle s, int8_t rssi, int8_t afc);
-typedef void (*PHPPMHandler)(uint16_t *channels);
-
-typedef uint32_t PHInstHandle;
-
-// Public functions
-PHInstHandle PHInitialize(PacketHandlerConfig *cfg);
-void PHRegisterOutputStream(PHInstHandle h, PHOutputStream f);
-void PHRegisterDataHandler(PHInstHandle h, PHDataHandler f);
-void PHRegisterStatusHandler(PHInstHandle h, PHStatusHandler f);
-void PHRegisterPPMHandler(PHInstHandle h, PHPPMHandler f);
-uint32_t PHConnect(PHInstHandle h, uint32_t dest_id);
-PHPacketHandle PHGetRXPacket(PHInstHandle h);
-void PHReleaseRXPacket(PHInstHandle h, PHPacketHandle p);
-PHPacketHandle PHGetTXPacket(PHInstHandle h);
-void PHReleaseTXPacket(PHInstHandle h, PHPacketHandle p);
-uint8_t PHTransmitPacket(PHInstHandle h, PHPacketHandle p);
-uint8_t PHTransmitData(PHInstHandle h, uint8_t *buf, uint16_t len);
-
 #endif // __PACKET_HANDLER_H__
 
 /**

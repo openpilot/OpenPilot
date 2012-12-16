@@ -149,7 +149,6 @@ SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 
 ## For RFM22b
-SRC += $(FLIGHTLIB)/packet_handler.c
 SRC += $(RSCODE)/berlekamp.c
 SRC += $(RSCODE)/crcgen.c
 SRC += $(RSCODE)/galois.c

@@ -234,7 +234,6 @@ uint32_t pios_com_bridge_id = 0;
 uint32_t pios_com_overo_id = 0;
 #if defined(PIOS_INCLUDE_RFM22B)
 uint32_t pios_rfm22b_id = 0;
-uint32_t pios_packet_handler = 0;
 #endif
 
 /* 

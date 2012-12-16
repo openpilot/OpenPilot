@@ -567,8 +567,10 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->send_ppm = false;
 	rfm22b_dev->datarate = RFM22B_DEFAULT_RX_DATARATE;
 
-	// Initialize the com configuration callback.
+	// Initialize the com callbacks.
 	rfm22b_dev->com_config_cb = NULL;
+	rfm22b_dev->rx_in_cb = NULL;
+	rfm22b_dev->tx_out_cb = NULL;
 
 	// Initialize the stats.
 	rfm22b_dev->stats.packets_per_sec = 0;
@@ -1319,9 +1321,8 @@ static bool rfm22_ready_to_send(struct pios_rfm22b_dev *rfm22b_dev)
 	if (dp->header.data_size > 0)
 		return true;
 	bool need_yield = false;
-	dp->header.data_size = 
-		(rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, dp->data,
-					PH_MAX_DATA, NULL, &need_yield);
+	if (rfm22b_dev->tx_out_cb)
+		dp->header.data_size = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, dp->data, PH_MAX_DATA, NULL, &need_yield);
 	if (dp->header.data_size > 0)
 		return true;
 
@@ -1375,9 +1376,8 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 			p = &rfm22b_dev->data_packet;
 			p->header.type = PACKET_TYPE_DATA;
 			p->header.destination_id = rfm22b_dev->destination_id;
-			if (p->header.data_size == 0)
-				p->header.data_size = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, p->data,
-									      PH_MAX_DATA, NULL, &need_yield);
+			if (rfm22b_dev->tx_out_cb && (p->header.data_size == 0))
+				p->header.data_size = (rfm22b_dev->tx_out_cb)(rfm22b_dev->tx_out_context, p->data, PH_MAX_DATA, NULL, &need_yield);
 
 			// Don't send any data until we're connected.
 			if (rfm22b_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED)
@@ -1766,7 +1766,8 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 				{
 					// Send the data to the com port
 					bool rx_need_yield;
-					(rfm22b_dev->rx_in_cb)(rfm22b_dev->rx_in_context, rfm22b_dev->rx_packet.data, rfm22b_dev->rx_packet.header.data_size, NULL, &rx_need_yield);
+					if (rfm22b_dev->rx_in_cb)
+						(rfm22b_dev->rx_in_cb)(rfm22b_dev->rx_in_context, rfm22b_dev->rx_packet.data, rfm22b_dev->rx_packet.header.data_size, NULL, &rx_need_yield);
 					break;
 				}
 				case PACKET_TYPE_DUPLICATE_DATA:

@@ -27,7 +27,7 @@
 CPPFLAGS += -I$(GTEST_DIR)/include
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra
+CXXFLAGS += -g -Wall -Wextra -std=gnu++0x
 
 # All Google Test headers.
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
@@ -61,13 +61,6 @@ $(foreach src,$(ALLSRC),$(eval $(call COMPILE_C_TEMPLATE,$(src))))
 $(foreach src,$(ALLCPPSRC),$(eval $(call COMPILE_CXX_TEMPLATE,$(src))))
 
 $(eval $(call LINK_CXX_TEMPLATE,$(OUTDIR)/$(TARGET).elf,$(ALLOBJ) $(GTEST_LIBS)))
-
-.PHONY: tap
-tap: $(OUTDIR)/$(TARGET).tap
-
-$(OUTDIR)/$(TARGET).tap: $(OUTDIR)/$(TARGET).elf
-	$(V0) @echo " TAP       $(MSG_EXTRA)  $(call toprel, $@)"
-	$(V1) $< > $@
 
 .PHONY: run
 run: $(OUTDIR)/$(TARGET).elf

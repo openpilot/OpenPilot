@@ -786,7 +786,7 @@ ut_$(1)_%: $$(UT_OUT_DIR)
 		\
 		GTEST_DIR=$(GTEST_DIR) \
 		\
-		$$*
+		$*
 
 .PHONY: ut_$(1)_clean
 ut_$(1)_clean:

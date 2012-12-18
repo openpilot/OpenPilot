@@ -90,8 +90,6 @@ typedef struct {
 static void telemetryTxTask(void *parameters);
 static void radioRxTask(void *parameters);
 static void radioTxTask(void *parameters);
-static void testRxTask(void *parameters);
-static void testTxTask(void *parameters);
 static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length);
 static int32_t RadioSendHandler(uint8_t *buf, int32_t length);
 static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte);
@@ -123,11 +121,13 @@ static int32_t RadioComBridgeStart(void)
 		xTaskCreate(telemetryTxTask, (signed char *)"telemTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
 		xTaskCreate(radioRxTask, (signed char *)"radioRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioRxTaskHandle));
 		xTaskCreate(radioTxTask, (signed char *)"radioTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioTxTaskHandle));
-		if (0)
-		{
-			xTaskCreate(testRxTask, (signed char *)"testRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioRxTaskHandle));
-			xTaskCreate(testTxTask, (signed char *)"testTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioTxTaskHandle));
-		}
+
+		// Register the watchdog timers.
+#ifdef PIOS_INCLUDE_WDG
+		PIOS_WDG_RegisterFlag(PIOS_WDG_TELEMETRY);
+		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIORX);
+		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIOTX);
+#endif
 
 		return 0;
 	}
@@ -163,7 +163,6 @@ static int32_t RadioComBridgeInitialize(void)
 	// Configure our UAVObjects for updates.
 	UAVObjConnectQueue(UAVObjGetByID(OPLINKSTATUS_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
 	UAVObjConnectQueue(UAVObjGetByID(OBJECTPERSISTENCE_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL);
-	//UAVObjConnectQueue(UAVObjGetByID(GCSRECEIVER_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
 
 	// Initialize the statistics.
 	data->comTxErrors = 0;
@@ -183,8 +182,11 @@ static void telemetryTxTask(void *parameters)
 
 	// Loop forever
 	while (1) {
+#ifdef PIOS_INCLUDE_WDG
+		PIOS_WDG_UpdateFlag(PIOS_WDG_TELEMETRY);
+#endif
 		// Wait for queue message
-		if (xQueueReceive(data->uavtalkEventQueue, &ev, portMAX_DELAY) == pdTRUE) {
+		if (xQueueReceive(data->uavtalkEventQueue, &ev, MAX_PORT_DELAY) == pdTRUE) {
 			if ((ev.event == EV_UPDATED) || (ev.event == EV_UPDATE_REQ))
 			{
 				// Send update (with retries)
@@ -232,6 +234,9 @@ static void radioRxTask(void *parameters)
 {
 	// Task loop
 	while (1) {
+#ifdef PIOS_INCLUDE_WDG
+		PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORX);
+#endif
 		uint8_t serial_data[1];
 		uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
 		if (bytes_to_process > 0)
@@ -249,6 +254,9 @@ static void radioTxTask(void *parameters)
 	// Task loop
 	while (1) {
 		uint32_t inputPort = PIOS_COM_TELEMETRY;
+#ifdef PIOS_INCLUDE_WDG
+		PIOS_WDG_UpdateFlag(PIOS_WDG_RADIOTX);
+#endif
 #if defined(PIOS_INCLUDE_USB)
 		// Determine output port (USB takes priority over telemetry port)
 		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
@@ -261,39 +269,6 @@ static void radioTxTask(void *parameters)
 			if (bytes_to_process > 0)
 				for (uint8_t i = 0; i < bytes_to_process; i++)
 					ProcessInputStream(data->inUAVTalkCon, serial_data[i]);
-		}
-	}
-}
-
-static void testTxTask(void *parameters)
-{
-	uint8_t buf[100];
-	for (uint8_t i = 0; i < 100; ++i)
-		buf[i] = i;
-
-	// Task loop
-	uint16_t packets_sent = 0;
-	while (1) {
-		PIOS_COM_SendBuffer(PIOS_COM_RADIO, buf, 100);
-		packets_sent++;
-		OPLinkStatusTXRateSet(&packets_sent);
-		vTaskDelay(1000);
-	}
-}
-
-/**
- * Radio rx task.  Receive data from a com port and pass it on to the radio.
- */
-static void testRxTask(void *parameters)
-{
-	// Task loop
-	uint16_t packets_recv = 0;
-	while (1) {
-		uint8_t buf[100];
-		int16_t bytes_received = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, buf, 100, MAX_PORT_DELAY);
-		if (bytes_received > 0) {
-			packets_recv++;
-			OPLinkStatusRXRateSet(&packets_recv);
 		}
 	}
 }
@@ -314,7 +289,7 @@ static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length)
 		outputPort = PIOS_COM_TELEM_USB;
 #endif /* PIOS_INCLUDE_USB */
 	if(outputPort)
-		return PIOS_COM_SendBuffer(outputPort, buf, length);
+		return PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
 	else
 		return -1;
 }

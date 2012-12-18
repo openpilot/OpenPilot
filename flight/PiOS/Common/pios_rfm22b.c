@@ -614,6 +614,9 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	PIOS_WDG_RegisterFlag(PIOS_WDG_RFM22B);
 #endif /* PIOS_WDG_RFM22B */
 
+	// Initialize the ECC library.
+	initialize_ecc();
+
 	// Set the state to initializing.
 	rfm22b_dev->state = RFM22B_STATE_UNINITIALIZED;
 

@@ -914,14 +914,16 @@ int32_t PIOS_FLASHFS_ObjLoad(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_
 	}
 
 	/* Read the contents of the object from the log */
-	uintptr_t slot_addr = logfs_get_addr (logfs.active_arena_id, slot_id);
-	if (logfs.driver->read_data(logfs.flash_id,
-					slot_addr + sizeof(slot_hdr),
-					(uint8_t *)obj_data,
-					obj_size) != 0) {
-		/* Failed to read object data from the log */
-		rc = -4;
-		goto out_end_trans;
+	if (obj_size > 0) {
+		uintptr_t slot_addr = logfs_get_addr (logfs.active_arena_id, slot_id);
+		if (logfs.driver->read_data(logfs.flash_id,
+						slot_addr + sizeof(slot_hdr),
+						(uint8_t *)obj_data,
+						obj_size) != 0) {
+			/* Failed to read object data from the log */
+			rc = -4;
+			goto out_end_trans;
+		}
 	}
 
 	/* Object successfully loaded */

@@ -385,7 +385,7 @@ static int32_t logfs_raw_copy_bytes (uintptr_t src_addr, uint16_t src_size, uint
  */
 static bool logfs_fs_is_full(void)
 {
-	return (logfs.num_active_slots == (logfs.cfg->arena_size / logfs.cfg->slot_size));
+	return (logfs.num_active_slots == (logfs.cfg->arena_size / logfs.cfg->slot_size) - 1);
 }
 
 /*
@@ -663,6 +663,8 @@ static int8_t logfs_delete_object (uint32_t obj_id, uint16_t obj_inst_id)
 				rc = -2;
 				goto out_exit;
 			}
+			/* Object has been successfully obsoleted and is no longer active */
+			logfs.num_active_slots--;
 			break;
 		case -1:
 			/* Search completed, object not found */

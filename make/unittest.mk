@@ -23,12 +23,35 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
+# Flags passed to the preprocessor.
+CPPFLAGS += -I$(GTEST_DIR)/include
+
+# Flags passed to the C++ compiler.
+CXXFLAGS += -g -Wall -Wextra
+
+# All Google Test headers.
+GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
+                $(GTEST_DIR)/include/gtest/internal/*.h
+
+# Google Test libraries
+GTEST_LIBS = $(GTEST_DIR)/lib/.libs/libgtest_main.a $(GTEST_DIR)/lib/.libs/libgtest.a
+
+# Google Test needs the pthread library
+LDFLAGS += -lpthread
+
+#################################
+#
+# Template to build the user test
+#
+#################################
+
 # Need to disable THUMB mode for unit tests
 override THUMB :=
 
 EXTRAINCDIRS    += .
 ALLSRC          := $(SRC) $(wildcard ./*.c)
-ALLSRCBASE      := $(notdir $(basename $(ALLSRC)))
+ALLCPPSRC       := $(wildcard ./*.cpp)
+ALLSRCBASE      := $(notdir $(basename $(ALLSRC) $(ALLCPPSRC)))
 ALLOBJ          := $(addprefix $(OUTDIR)/, $(addsuffix .o, $(ALLSRCBASE)))
 
 .PHONY: $(TARGET)
@@ -39,5 +62,7 @@ $(OUTDIR):
 	$(V1) mkdir -p $@
 
 $(foreach src,$(ALLSRC),$(eval $(call COMPILE_C_TEMPLATE,$(src))))
-$(eval $(call LINK_TEMPLATE,$(OUTDIR)/$(TARGET).elf,$(ALLOBJ)))
+$(foreach src,$(ALLCPPSRC),$(eval $(call COMPILE_CXX_TEMPLATE,$(src))))
+
+$(eval $(call LINK_CXX_TEMPLATE,$(OUTDIR)/$(TARGET).elf,$(ALLOBJ) $(GTEST_LIBS)))
 

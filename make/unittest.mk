@@ -54,15 +54,22 @@ ALLCPPSRC       := $(wildcard ./*.cpp)
 ALLSRCBASE      := $(notdir $(basename $(ALLSRC) $(ALLCPPSRC)))
 ALLOBJ          := $(addprefix $(OUTDIR)/, $(addsuffix .o, $(ALLSRCBASE)))
 
-.PHONY: $(TARGET)
-$(TARGET): | $(OUTDIR)
-$(TARGET): $(OUTDIR)/$(TARGET).elf
-
-$(OUTDIR):
-	$(V1) mkdir -p $@
+.PHONY: elf
+elf: $(OUTDIR)/$(TARGET).elf
 
 $(foreach src,$(ALLSRC),$(eval $(call COMPILE_C_TEMPLATE,$(src))))
 $(foreach src,$(ALLCPPSRC),$(eval $(call COMPILE_CXX_TEMPLATE,$(src))))
 
 $(eval $(call LINK_CXX_TEMPLATE,$(OUTDIR)/$(TARGET).elf,$(ALLOBJ) $(GTEST_LIBS)))
 
+.PHONY: tap
+tap: $(OUTDIR)/$(TARGET).tap
+
+$(OUTDIR)/$(TARGET).tap: $(OUTDIR)/$(TARGET).elf
+	$(V0) @echo " TAP       $(MSG_EXTRA)  $(call toprel, $@)"
+	$(V1) $< > $@
+
+.PHONY: run
+run: $(OUTDIR)/$(TARGET).elf
+	$(V0) @echo " TAP RUN   $(MSG_EXTRA)  $(call toprel, $<)"
+	$(V1) $<

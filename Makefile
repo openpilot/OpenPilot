@@ -116,6 +116,10 @@ help:
 	@echo "     all_<board>          - Build all available images for <board>"
 	@echo "     all_<board>_clean    - Remove all available images for <board>"
 	@echo
+	@echo "     all_ut               - Build all unit tests"
+	@echo "     all_ut_tap           - Run all unit tests and capture all TAP output to files"
+	@echo "     all_ut_run           - Run all unit tests and dump TAP output to console"
+	@echo
 	@echo "   [Firmware]"
 	@echo "     <board>              - Build firmware for <board>"
 	@echo "                            supported boards are ($(ALL_BOARDS))"
@@ -138,6 +142,10 @@ help:
 	@echo "   [Unbrick a board]"
 	@echo "     unbrick_<board>      - Use the STM32's built in boot ROM to write a bootloader to <board>"
 	@echo "                            supported boards are ($(BL_BOARDS))"
+	@echo "   [Unittests]"
+	@echo "     ut_<test>            - Build unit test <test>"
+	@echo "     ut_<test>_tap        - Run test and capture TAP output into a file"
+	@echo "     ut_<test>_run        - Run test and dump TAP output to console"
 	@echo
 	@echo "   [Simulation]"
 	@echo "     sim_osx              - Build OpenPilot simulation firmware for OSX"
@@ -733,37 +741,69 @@ sim_osx_%: uavobjects_flight
 #
 ##############################
 
-UT_TARGETS := logfs
-.PHONY: ut_all
-ut_all: $(addprefix ut_, $(UT_TARGETS))
+ALL_UNITTESTS := logfs
 
 UT_OUT_DIR := $(BUILD_DIR)/unit_tests
 
 $(UT_OUT_DIR):
 	$(V1) mkdir -p $@
 
-ut_%: $(UT_OUT_DIR)
-	$(V1) cd $(ROOT_DIR)/flight/tests/$* && \
-		$(MAKE) --no-print-directory \
+.PHONY: all_ut
+all_ut: $(addsuffix _elf, $(addprefix ut_, $(ALL_UNITTESTS)))
+
+.PHONY: all_ut_tap
+all_ut_tap: $(addsuffix _tap, $(addprefix ut_, $(ALL_UNITTESTS)))
+
+.PHONY: all_ut_run
+all_ut_run: $(addsuffix _run, $(addprefix ut_, $(ALL_UNITTESTS)))
+
+.PHONY: ut_all_clean
+all_ut_clean:
+	$(V0) @echo " CLEAN      $@"
+	$(V1) [ ! -d "$(UT_OUT_DIR)" ] || $(RM) -r "$(UT_OUT_DIR)"
+
+# $(1) = Unit test name
+define UT_TEMPLATE
+.PHONY: ut_$(1)
+ut_$(1): ut_$(1)_run
+
+ut_$(1)_%: $$(UT_OUT_DIR)
+	$(V1) mkdir -p $(UT_OUT_DIR)/$(1)
+	$(V1) cd $(ROOT_DIR)/flight/tests/$(1) && \
+		$$(MAKE) -r --no-print-directory \
 		BUILD_TYPE=ut \
-		BOARD_SHORT_NAME=$* \
+		BOARD_SHORT_NAME=$(1) \
 		TCHAIN_PREFIX="" \
 		REMOVE_CMD="$(RM)" \
 		\
-		TARGET=$* \
-		OUTDIR="$(UT_OUT_DIR)/$*" \
+		TARGET=$(1) \
+		OUTDIR="$(UT_OUT_DIR)/$(1)" \
 		\
 		PIOS=$(PIOS) \
 		OPUAVOBJ=$(OPUAVOBJ) \
 		OPUAVTALK=$(OPUAVTALK) \
 		FLIGHTLIB=$(FLIGHTLIB) \
 		\
-		$*
+		GTEST_DIR=$(GTEST_DIR) \
+		\
+		$$*
 
-.PHONY: ut_clean
-ut_clean:
-	$(V0) @echo " CLEAN      $@"
-	$(V1) [ ! -d "$(UT_OUT_DIR)" ] || $(RM) -r "$(UT_OUT_DIR)"
+.PHONY: ut_$(1)_clean
+ut_$(1)_clean:
+	$(V0) @echo " CLEAN      $(1)"
+	$(V1) [ ! -d "$(UT_OUT_DIR)/$(1)" ] || $(RM) -r "$(UT_OUT_DIR)/$(1)"
+
+endef
+
+# Expand the unittest rules
+$(foreach ut, $(ALL_UNITTESTS), $(eval $(call UT_TEMPLATE,$(ut))))
+
+# Disable parallel make when the all_ut_run target is requested otherwise the TAP
+# output is interleaved with the rest of the make output.
+ifneq ($(strip $(filter all_ut_run,$(MAKECMDGOALS))),)
+.NOTPARALLEL:
+$(info *NOTE*     Parallel make disabled by all_ut_run target so we have sane console output)
+endif
 
 ##############################
 #

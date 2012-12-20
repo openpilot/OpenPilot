@@ -350,9 +350,6 @@ gtest_install: gtest_clean
 	  $(MAKE) $(GTEST_SILENT) ; \
 	)
 
-        # delete the extracted source when we're done
-	#$(V1) [ ! -d "$(GTEST_BUILD_DIR)" ] || $(RM) -rf "$(GTEST_BUILD_DIR)"
-
 .PHONY: gtest_clean
 gtest_clean:
 	$(V0) @echo " CLEAN        $(GTEST_DIR)"

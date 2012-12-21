@@ -19,3 +19,4 @@ following URL: http://bugs.openpilot.org/browse/OP-XXX
 + [OP-768] GCS does not show UAV position on the map (master or next CC branches, but works in Revo branches)
 + [OP-682] GCS crashes on firmware page. Noted on Windows and OSX platforms, difficult to reproduce.
            Workaround: use Vehicle setup wizard to update the firmware.
++ [OP-769] Can't enter "12,45" on German system. Workaround: change GCS language (in fact, locale) to German.

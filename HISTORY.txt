@@ -7,6 +7,15 @@ stabilization to manual control input and now available also for main controls),
 optional airframe attitude filtering used by camera stabilization, and optional
 camera actuator feed forward to improve gimbal response.
 
+--- RELEASE-12.10.2 --- Mayan Apocalypse Release ---
+
+List of issues resolved in this maintenance release:
+http://progress.openpilot.org/issues/?filter=10361
+
+OP-459, OP-545, OP-674, OP-679, OP-685, OP-686, OP-687, OP-690, OP-691,
+OP-702, OP-703, OP-714, OP-715, OP-716, OP-721, OP-728, OP-746, OP-748,
+OP-749, OP-750, OP-758, OP-759, OP-760
+
 2012-11-12
 Implemented smoothing filter for accelerometer data.
 Added support for Mode 3 and Mode 4 to the TX Configuration Wizard.
@@ -34,7 +43,7 @@ Several UI changes.
 MixerCurveWidget refactoring, now as a simple and advanced view.
 
 2012-07-27
-Added “advanced mode” option to general settings. Right now it only shows the hidden apply buttons.
+Added "advanced mode" option to general settings. Right now it only shows the hidden apply buttons.
 To enable go to tools->options->General and click one of the checkboxes to give focus to the form,
 then press F7
 

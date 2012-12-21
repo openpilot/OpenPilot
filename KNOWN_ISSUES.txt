@@ -15,3 +15,7 @@ following URL: http://bugs.openpilot.org/browse/OP-XXX
 + [OP-747] Board infinitely reboots itself after firmware upgrade (settings erase firmware is a workaround).
 + [OP-723] GCS uses the system language ot the 1st run. After restart it uses English (can be changed later).
 + [OP-725] GCS camera stab config error message disappears too fast (but config error is cleared as it should)
++ [OP-767] GCS does not send AttitudeActual packets over serial port when GPS is connected and system is armed
++ [OP-768] GCS does not show UAV position on the map (master or next CC branches, but works in Revo branches)
++ [OP-682] GCS crashes on firmware page. Noted on Windows and OSX platforms, difficult to reproduce.
+           Workaround: use Vehicle setup wizard to update the firmware.

@@ -122,6 +122,9 @@ D: 3D Modelling, Easystar adaption from FMS
 N: Guy McCaldin
 D: Artwork and design including work on the Deluxe Dial Set
 
+N: Alessio Morale
+D: Firmware/Architecture Lead
+
 N: Cathy Moss
 D: Hardware design Lead: Gen 2 Mainboard, PipXtreme, Current Sensor
 D: PipXtreme designer, creator OP Map Plugin
@@ -156,7 +159,6 @@ D: Lead INS Developer
 D: Creator of the OpenPilot INS / EKF
 
 N: Professor Kenn Sebesta
-E: kenn (at) openpilot (dot) org
 D: Lead Fixed Wing Developer CC3D / Controls
 D: GCS improvments including HiTL Merge
 M: Fixed Wing support CC3D

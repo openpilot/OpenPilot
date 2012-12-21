@@ -79,7 +79,8 @@ endif
 MODULES = Sensors Attitude/revolution ManualControl Stabilization Actuator
 MODULES += Altitude/revolution FirmwareIAP
 MODULES += Airspeed/revolution
-MODULES += GPS AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
+MODULES += GPS AltitudeHold FixedWingPathFollower PathPlanner
+#MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
 MODULES += CameraStab
 MODULES += OveroSync
 MODULES += Telemetry

@@ -274,21 +274,21 @@ QString pjrc_rawhid::getserial(int num) {
     CFTypeRef serialnum = IOHIDDeviceGetProperty(dev, CFSTR(kIOHIDSerialNumberKey));
     if(serialnum && CFGetTypeID(serialnum) == CFStringGetTypeID())
     {
-		//Note: I'm not sure it will always succeed if encoded as MacRoman but that
-		//is a superset of UTF8 so I think this is fine
-		CFStringRef str = (CFStringRef)serialnum;
+        //Note: I'm not sure it will always succeed if encoded as MacRoman but that
+        //is a superset of UTF8 so I think this is fine
+        CFStringRef str = (CFStringRef)serialnum;
 //        const char * buf = CFStringGetCStringPtr(str, kCFStringEncodingMacRoman);
-		//return QString(buf);
-		int length = CFStringGetLength(str);
-		if( length == 0 )
-			return "";
-		char* ptr = (char*)malloc( length+1 );
-		Boolean ret = CFStringGetCString( str, ptr, length+1, kCFStringEncodingMacRoman );
-		QString strResult;
-		if( ret == true )
-		strResult = ptr;
-		free( ptr );
-		return strResult;
+        //return QString(buf);
+        int length = CFStringGetLength(str);
+        if( length == 0 )
+            return "";
+        char* ptr = (char*)malloc( length+1 );
+        Boolean ret = CFStringGetCString( str, ptr, length+1, kCFStringEncodingMacRoman );
+        QString strResult;
+        if( ret == true )
+          strResult = ptr;
+        free( ptr );
+        return strResult;
     }
 
     return QString("Error");

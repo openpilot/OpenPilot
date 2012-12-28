@@ -87,6 +87,9 @@ MODULES += Telemetry
 PYMODULES = 
 #FlightPlan
 
+#Enable ARM DSP lib usage
+USE_DSP_LIB = 1
+
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc

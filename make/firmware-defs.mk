@@ -191,7 +191,7 @@ define LINK_TEMPLATE
 .PRECIOUS : $(2)
 $(1):  $(2)
 	@echo $(MSG_LINKING) $$(call toprel, $$@)
-	$(V1) echo $(2) > "$(OUTDIR)/ldlist.txt"
+	$(V1) echo > "$(OUTDIR)/ldlist.txt" <<EOF $(2) 
 	$(V1) $(CC) $(THUMB) $$(CFLAGS) @"$(OUTDIR)/ldlist.txt" --output $$@ $$(LDFLAGS)
 endef
 

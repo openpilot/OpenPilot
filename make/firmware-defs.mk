@@ -191,7 +191,8 @@ define LINK_TEMPLATE
 .PRECIOUS : $(2)
 $(1):  $(2)
 	@echo $(MSG_LINKING) $$(call toprel, $$@)
-	$(V1) $(CC) $(THUMB) $$(CFLAGS) $(2) --output $$@ $$(LDFLAGS)
+	$(V1) echo $(2) > "$(OUTDIR)/ldlist.txt"
+	$(V1) $(CC) $(THUMB) $$(CFLAGS) @"$(OUTDIR)/ldlist.txt" --output $$@ $$(LDFLAGS)
 endef
 
 # Compile: create assembler files from C source files. ARM/Thumb

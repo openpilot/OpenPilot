@@ -66,7 +66,8 @@
 #define PIOS_INCLUDE_MPU6000
 #define PIOS_MPU6000_ACCEL
 #define PIOS_INCLUDE_MS5611
-//#define PIOS_INCLUDE_ETASV3
+#define PIOS_INCLUDE_ETASV3
+#define PIOS_INCLUDE_MPXV
 //#define PIOS_INCLUDE_HCSR04
 #define FLASH_FREERTOS
 /* Com systems to include */

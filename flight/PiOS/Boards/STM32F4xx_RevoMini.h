@@ -272,7 +272,6 @@ extern uint32_t pios_packet_handler;
 	{GPIOC, GPIO_Pin_2,     ADC_Channel_12},                                                \
 	{NULL,  0,              ADC_Channel_Vrefint},           /* Voltage reference */         \
 	{NULL,  0,              ADC_Channel_TempSensor},        /* Temperature sensor */        \
-	{GPIOC, GPIO_Pin_2,     ADC_Channel_12}  \
 }
 
 /* we have to do all this to satisfy the PIOS_ADC_MAX_SAMPLES define in pios_adc.h */

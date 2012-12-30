@@ -59,6 +59,7 @@ MODULES += Airspeed/revolution
 MODULES += AltitudeHold FixedWingPathFollower PathPlanner TxPID
 #MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
 MODULES += CameraStab
+#MODULES += OveroSync
 MODULES += Radio
 MODULES += Telemetry
 PYMODULES = 

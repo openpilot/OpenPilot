@@ -268,7 +268,7 @@ ASRCARM =
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
-EXTRAINCDIRS  =  $(OPSYSTEM)
+EXTRAINCDIRS  += $(OPSYSTEM)
 EXTRAINCDIRS  += $(OPSYSTEMINC)
 EXTRAINCDIRS  += $(OPUAVTALK)
 EXTRAINCDIRS  += $(OPUAVTALKINC)
@@ -301,7 +301,7 @@ EXTRAINCDIRS += ${foreach MOD, ${OPTMODULES} ${MODULES}, ${OPMODULEDIR}/${MOD}/i
 # Also add directories where the linker should search for
 # includes from linker-script to the list
 #     Each directory must be seperated by a space.
-EXTRA_LIBDIRS =
+#EXTRA_LIBDIRS +=
 
 # Extra Libraries
 #    Each library-name must be seperated by a space.
@@ -309,7 +309,7 @@ EXTRA_LIBDIRS =
 #    EXTRA_LIBS = xyz abc efsl
 # for newlib-lpc (file: libnewlibc-lpc.a):
 #    EXTRA_LIBS = newlib-lpc
-EXTRA_LIBS =
+#EXTRA_LIBS +=
 
 # Path to Linker-Scripts
 LINKERSCRIPTPATH = $(PIOSSTM32F10X)
@@ -336,7 +336,7 @@ DEBUGF = dwarf-2
 
 # Place project-specific -D (define) and/or
 # -U options for C here.
-CDEFS = -DSTM32F10X_$(MODEL)
+CDEFS += -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
 ifeq ($(ENABLE_DEBUG_PINS), YES)

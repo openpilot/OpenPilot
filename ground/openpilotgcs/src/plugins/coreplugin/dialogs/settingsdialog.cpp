@@ -38,6 +38,7 @@
 #include <QtCore/QSettings>
 #include <QtGui/QHeaderView>
 #include <QtGui/QPushButton>
+#include <QtGui/QLabel>
 
 namespace {
     struct PageData {
@@ -91,10 +92,12 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
 #endif
     QString initialCategory = categoryId;
     QString initialPage = pageId;
+    qDebug() << "SettingsDialog constructor initial category: " << initialCategory << ", initial page: " << initialPage;
     if (initialCategory.isEmpty() && initialPage.isEmpty()) {
         QSettings *settings = ICore::instance()->settings();
         initialCategory = settings->value("General/LastPreferenceCategory", QVariant(QString())).toString();
         initialPage = settings->value("General/LastPreferencePage", QVariant(QString())).toString();
+        qDebug() << "SettingsDialog settings initial category: " << initialCategory << ", initial page: " << initialPage;
         m_windowWidth = settings->value("General/SettingsWindowWidth", 0).toInt();
         m_windowHeight = settings->value("General/SettingsWindowHeight", 0).toInt();
     }
@@ -123,6 +126,8 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
 
     QList<IOptionsPage*> pages = sortedOptionsPages();
 
+    QTreeWidgetItem *initialItem = 0;
+
     int index = 0;
     bool firstUavGadgetOptionsPageFound = false;
     foreach (IOptionsPage *page, pages) {
@@ -137,6 +142,9 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
 
         QString trCategories = page->trCategory();
         QString currentCategory = page->category();
+
+        //qDebug() << "currentCategory: " << currentCategory;
+        //qDebug() << "page id: " << page->id();
 
         QTreeWidgetItem *categoryItem;
         if (!categories.contains(currentCategory)) {
@@ -165,11 +173,17 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
         categoryItemList->append(item);
 
         m_pages.append(page);
-        stackedPages->addWidget(page->createPage(stackedPages));
+
+        // creating all option pages upfront is slow, so we create placeholder widgets instead
+        // the real option page widget will be created later when the user selects it
+        // the placeholder is a QLabel and we assume that no option page will be a QLabel...
+        QLabel * placeholderWidget = new QLabel(stackedPages);
+        placeholderWidget->setText("page placeholder");
+        // add widget
+        stackedPages->addWidget(placeholderWidget);
 
         if (page->id() == initialPage && currentCategory == initialCategory) {
-            stackedPages->setCurrentIndex(stackedPages->count());
-            pageTree->setCurrentItem(item);
+            initialItem = item;
         }
 
         index++;
@@ -183,6 +197,22 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
                 categoryItem->addChild(item);
             }
         }
+    }
+
+    qDebug() << "initialItem: " << initialItem;
+    if (initialItem) {
+        qDebug() << "initialItem text: " << initialItem->text(0);
+        qDebug() << "initialItem selected: " << initialItem->isSelected();
+        qDebug() << "initialItem parent: " << initialItem->parent();
+    	if (!initialItem->parent()) {
+    		// item has no parent, meaning it is single child
+    		// so select category item instead
+    		initialItem = categories.value(initialCategory);
+            qDebug() << "initialItem text: " << initialItem->text(0);
+            qDebug() << "initialItem selected: " << initialItem->isSelected();
+            qDebug() << "initialItem parent: " << initialItem->parent();
+    	}
+    	pageTree->setCurrentItem(initialItem);
     }
 
     QList<int> sizes;
@@ -199,11 +229,19 @@ SettingsDialog::~SettingsDialog()
         QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(category);
         delete categoryItemList;
     }
+    // delete placeholders
+    for(int i = 0; i < stackedPages->count(); i++) {
+    	QLabel * widget = dynamic_cast<QLabel*>(stackedPages->widget(i));
+        if (widget) {
+        	delete widget;
+        }
+    }
 }
 
 void SettingsDialog::pageSelected()
 {
     QTreeWidgetItem *item = pageTree->currentItem();
+    qDebug() << "pageSelected: " << item;
     if (!item)
         return;
 
@@ -211,6 +249,16 @@ void SettingsDialog::pageSelected()
     int index = data.index;
     m_currentCategory = data.category;
     m_currentPage = data.id;
+    // check if we are looking at a placeholder or not
+    QWidget * widget = dynamic_cast<QLabel*>(stackedPages->widget(index));
+    if (widget) {
+    	// get rid of placeholder
+    	stackedPages->removeWidget(widget);
+    	delete widget;
+    	// insert real page
+    	IOptionsPage *page = m_pages.at(index);
+    	stackedPages->insertWidget(index, page->createPage(stackedPages));
+    }
     stackedPages->setCurrentIndex(index);
     // If user selects a toplevel item, select the first child for them
     // I.e. Top level items are not really selectable
@@ -296,27 +344,41 @@ void SettingsDialog::disableApplyOk(bool disable)
 
 void SettingsDialog::accept()
 {
-    m_applied = true;
-    foreach (IOptionsPage *page, m_pages) {
-        page->apply();
-        page->finish();
-    }
-    done(QDialog::Accepted);
+	m_applied = true;
+	for(int i = 0; i < m_pages.size(); i++) {
+		QWidget * widget = dynamic_cast<QLabel*>(stackedPages->widget(i));
+		if (!widget) {
+			IOptionsPage * page = m_pages.at(i);
+			page->apply();
+			page->finish();
+		}
+	}
+	done(QDialog::Accepted);
 }
 
 void SettingsDialog::reject()
 {
-    foreach (IOptionsPage *page, m_pages)
-        page->finish();
-
+	//    foreach (IOptionsPage *page, m_pages)
+	for(int i = 0; i < m_pages.size(); i++) {
+		QWidget * widget = dynamic_cast<QLabel*>(stackedPages->widget(i));
+		if (!widget) {
+			IOptionsPage * page = m_pages.at(i);
+			page->finish();
+		}
+	}
     done(QDialog::Rejected);
 }
 
 void SettingsDialog::apply()
 {
-    foreach (IOptionsPage *page, m_pages)
-        page->apply();
-
+//	foreach (IOptionsPage *page, m_pages)
+	for(int i = 0; i < m_pages.size(); i++) {
+		QWidget * widget = dynamic_cast<QLabel*>(stackedPages->widget(i));
+		if (!widget) {
+			IOptionsPage * page = m_pages.at(i);
+			page->apply();
+		}
+	}
     m_applied = true;
 }
 

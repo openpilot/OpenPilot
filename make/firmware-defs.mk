@@ -210,12 +210,13 @@ endef
 # Link: create ELF output file from object files.
 #   $1 = elf file to produce
 #   $2 = list of object files that make up the elf file
+#   $3 = optional list of libraries to build and link
 define LINK_TEMPLATE
 .SECONDARY : $(1)
-.PRECIOUS : $(2)
-$(1):  $(2)
+.PRECIOUS : $(2) $(3)
+$(1):  $(2) $(3)
 	@echo $(MSG_LINKING) $$(call toprel, $$@)
-	$(V1) $(CC) $(THUMB) $$(CFLAGS) $(2) --output $$@ $$(LDFLAGS)
+	$(V1) $(CC) $(THUMB) $$(CFLAGS) $(2) $(3) --output $$@ $$(LDFLAGS)
 endef
 
 # Compile: create assembler files from C source files. ARM/Thumb

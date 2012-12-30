@@ -611,7 +611,7 @@ endif
 #	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
 
 # Link: create ELF output file from object files.
-$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))
+$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ), $(ALLLIB)))
 
 # Assemble: create object files from assembler source files.
 $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))

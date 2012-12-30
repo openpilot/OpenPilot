@@ -98,6 +98,7 @@ SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(OPSYSTEM)/op_dfu.c
 
 ## PIOS Hardware (STM32F10x)
+include $(PIOS)/STM32F10x/library.mk
 SRC += $(PIOSSTM32F10X)/pios_sys.c
 SRC += $(PIOSSTM32F10X)/pios_led.c
 SRC += $(PIOSSTM32F10X)/pios_delay.c

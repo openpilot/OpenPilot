@@ -2,11 +2,11 @@
   ******************************************************************************
   * @addtogroup PIOS PIOS Core hardware abstraction layer
   * @{
-  * @addtogroup PIOS_MPXV5004 MPXV5004 Functions
-  * @brief Hardware functions to deal with the DIYDrones airspeed kit, using MPXV5004
+  * @addtogroup PIOS_MPXV MPXV* Functions
+  * @brief Hardware functions to deal with the DIYDrones airspeed kit, using MPXV5004, 7002 or similar
   * @{
   *
-  * @file       pios_mpxv5004.h
+  * @file       pios_mpxv.h
   * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
   * @brief      ETASV3 Airspeed Sensor Driver
   * @see        The GNU Public License (GPL) Version 3
@@ -28,16 +28,39 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_MPXV5004_H__
+#ifndef PIOS_MPXV_H__
+#define PIOS_MPXV_H__
 
-#define A0 340.27f        //speed of sound at standard sea level in [m/s]
-#define P0 101.325f       //static air pressure at standard sea level in kPa
-#define VCC 5.0f           //Supply voltage in V
-#define POWER (2.0f/7.0f)
+typedef enum{ PIOS_MPXV_UNKNOWN,PIOS_MPXV_5004,PIOS_MPXV_7002 } PIOS_MPXV_sensortype;
+typedef struct{
+	PIOS_MPXV_sensortype type;
+	uint8_t airspeedADCPin;
+	uint16_t calibrationCount;
+	uint32_t calibrationSum;
+	uint16_t zeroPoint;
+	float maxSpeed;
+} PIOS_MPXV_descriptor;
 
-uint16_t PIOS_MPXV5004_Measure(uint8_t airspeedADCPin);
-uint16_t PIOS_MPXV5004_Calibrate(uint8_t airspeedADCPin, uint16_t calibrationCount);
-void PIOS_MPXV5004_UpdateCalibration(uint16_t zeroPoint);
-float PIOS_MPXV5004_ReadAirspeed (uint8_t airspeedADCPin);
+#define PIOS_MPXV_5004_DESC(pin) \
+	(PIOS_MPXV_descriptor){ \
+		.type           = PIOS_MPXV_5004, \
+		.airspeedADCPin = pin, \
+		.maxSpeed       = 80.0f, \
+		.calibrationCount = 0, \
+		.calibrationSum = 0, \
+	}
+#define PIOS_MPXV_7002_DESC(pin) \
+	(PIOS_MPXV_descriptor){ \
+		.type           = PIOS_MPXV_7002, \
+		.airspeedADCPin = pin, \
+		.maxSpeed       = 56.0f, \
+		.calibrationCount = 0, \
+		.calibrationSum = 0, \
+	}
 
-#endif // PIOS_MPXV5004_H__
+
+uint16_t PIOS_MPXV_Measure(PIOS_MPXV_descriptor *desc);
+uint16_t PIOS_MPXV_Calibrate(PIOS_MPXV_descriptor *desc, uint16_t measurement);
+float PIOS_MPXV_CalcAirspeed (PIOS_MPXV_descriptor *desc,uint16_t measurement);
+
+#endif // PIOS_MPXV_H__

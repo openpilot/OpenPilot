@@ -10,16 +10,18 @@
 3	correl	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/correl)
 #	(origin was git http://trac.laas.fr/git/robots/jafar/modules/correl.git (master))
 
-4	gdhe	git	http://trac.laas.fr/git/robots/jafar/modules/gdhe.git	(master)
+4	gdhe	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/gdhe)
+#	(origin was http://trac.laas.fr/git/robots/jafar/modules/gdhe.git (master))
 
 5	image	git	http://trac.laas.fr/git/robots/jafar/modules/image.git	(master)
 
-6	jmath	git	http://trac.laas.fr/git/robots/jafar/modules/jmath.git	(master)
+6	jmath	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/jmath)
+#	(origin was http://trac.laas.fr/git/robots/jafar/modules/jmath.git (master))
 
 7	qdisplay	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/qdisplay)
 #	(origin was git	http://trac.laas.fr/git/robots/jafar/modules/qdisplay.git (master))
 
 8	rtslam	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/rtslam)
-#(origin was git http://trac.laas.fr/git/robots/jafar/modules/rtslam.git (master))
+#	(origin was git http://trac.laas.fr/git/robots/jafar/modules/rtslam.git (master))
 
 

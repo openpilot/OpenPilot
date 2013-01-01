@@ -5,19 +5,21 @@
 
 1	boost-sandbox	svn	http://svn.boost.org/svn/boost/sandbox/numeric_bindings
 
-2	correl	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/correl)
+2	kernel	git	http://trac.laas.fr/git/robots/jafar/jafar.git	(master) (use subdirectory modules/kernel !!!)
+
+3	correl	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/correl)
 #	(origin was git http://trac.laas.fr/git/robots/jafar/modules/correl.git (master))
 
-3	gdhe	git	http://trac.laas.fr/git/robots/jafar/modules/gdhe.git	(master)
+4	gdhe	git	http://trac.laas.fr/git/robots/jafar/modules/gdhe.git	(master)
 
-4	image	git	http://trac.laas.fr/git/robots/jafar/modules/image.git	(master)
+5	image	git	http://trac.laas.fr/git/robots/jafar/modules/image.git	(master)
 
-5	jmath	git	http://trac.laas.fr/git/robots/jafar/modules/jmath.git	(master)
+6	jmath	git	http://trac.laas.fr/git/robots/jafar/modules/jmath.git	(master)
 
-6	qdisplay	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/qdisplay)
+7	qdisplay	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/qdisplay)
 #	(origin was git	http://trac.laas.fr/git/robots/jafar/modules/qdisplay.git (master))
 
-7	rtslam	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/rtslam)
+8	rtslam	git	ssh://gitolite@git.openpilot.org/OpenPilot	(corvuscorax/rtslam/rtslam)
 #(origin was git http://trac.laas.fr/git/robots/jafar/modules/rtslam.git (master))
 
 

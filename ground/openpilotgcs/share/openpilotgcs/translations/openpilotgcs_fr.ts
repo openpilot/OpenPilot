@@ -6066,12 +6066,12 @@ Update</source>
     <message>
         <location filename="../../../src/plugins/hitlnew/hitlfactory.cpp" line="+35"/>
         <source>HITL Simulation</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Simulation HITL</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/hitlv2/hitlv2factory.cpp" line="+36"/>
         <source>HITL Simulation (v2)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Simulation HITL (v2)</translation>
     </message>
 </context>
 <context>
@@ -6084,7 +6084,7 @@ Update</source>
     <message>
         <location line="+1"/>
         <source>Choose 3D model</source>
-        <translation>Choir le modèle 3D</translation>
+        <translation>Choisir le modèle 3D</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -13144,12 +13144,12 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+306"/>
         <location line="+1072"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
-        <translation type="unfinished">Les Paramètres d&apos;Armement sont à présent réglés à &apos;Toujours Désarmé&apos; pour votre sécurité.</translation>
+        <translation>Les Paramètres d&apos;Armement sont à présent réglés à &apos;Toujours Désarmé&apos; pour votre sécurité.</translation>
     </message>
     <message>
         <location line="-1071"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
-        <translation type="unfinished">Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape vous serez dirigé sur l&apos;écran Paramètres d&apos;Armement.</translation>
+        <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape vous serez dirigé sur l&apos;écran Paramètres d&apos;Armement.</translation>
     </message>
     <message>
         <location line="+166"/>
@@ -13160,7 +13160,7 @@ Make sure you already configured your hardware settings on the proper tab and re
 
 You can press &apos;back&apos; at any time to return to the previous screen or press &apos;Cancel&apos; to quit the wizard.
 </source>
-        <translation type="unfinished">Bienvenue sur l&apos;assistant de configuration des entrées.
+        <translation>Bienvenue sur l&apos;assistant de configuration des entrées.
 
 Veuillez suivre les instructions à l&apos;écran et uniquement bouger les commandes lorsque on vous le demande.
 Soyez certain d&apos;avoir déjà configuré vos paramètres matériels dans l&apos;onglet approprié et redémarré votre carte.
@@ -13191,7 +13191,7 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
     <message>
         <location line="+13"/>
         <source>Please choose your transmitter mode:</source>
-        <translation type="unfinished">Veuillez choisir votre mode de pilotage :</translation>
+        <translation>Veuillez choisir votre mode de pilotage :</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -13236,39 +13236,46 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
     <message>
         <location line="+3"/>
         <source>For a Quad: Elevator is Pitch, Ailerons are Roll, and Rudder is Yaw.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour un Quad : Profondeur correspond à Pitch, Ailerons à Roll et Dérive correspond à Yaw.</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Please center all controls and trims and press Next when ready.
 
 If your FlightMode switch has only two positions, leave it in either position.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez centrer tous les manches et trims et appuyer sur Suivant lorsque vous êtes prêt.
+
+Si votre interrupteur de Mode de Vol a seulement deux positions, laissez-le dans n&apos;importe quelle position. </translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Please move all controls to their maximum extents on both directions.
 
 Press Next when ready.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez bouger les manches et les commandes d&apos;accessoires au maximum, dans toutes les directions.
+
+Appuyez sur Suivant lorsque vous êtes prêt.</translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Please check the picture below and correct all the sticks which show an inverted movement. Press Next when ready.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez vérifier l&apos;image ci-dessous et corriger les manches qui s&apos;affichent en sens inverse. Appuyer sur Suivant lorsque vous êtes prêt.</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>You have completed this wizard, please check below if the picture mimics your sticks movement.
 
 IMPORTANT: These new settings have not been saved to the board yet. After pressing Next you will go to the Arming Settings tab where you can set your desired arming sequence and save the configuration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous avez terminé cet assistant, veuillez vérifier ci-dessous si l&apos;image correspond à vos mouvements de manches
+
+IMPORTANT : Ces nouveaux paramètres ne sont pas encore enregistrés sur la carte. Après avoir appuyé sur Suivant vous serez dirigé vers l&apos;onglet Paramètres d&apos;Armement où vous pourrez choisir votre séquence d&apos;armement et enregistrer la configuration.</translation>
     </message>
     <message>
         <location line="+116"/>
         <source>Please enable throttle hold mode.
 
 Move the Collective Pitch stick.</source>
+        <translatorcomment>hélico ? à traduire</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13276,13 +13283,16 @@ Move the Collective Pitch stick.</source>
         <source>Please toggle the Flight Mode switch.
 
 For switches you may have to repeat this rapidly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez activer l&apos;interrupteur Mode de Vol.
+
+Pour les interrupteurs vous pourriez avoir à répéter l&apos;opération rapidement.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Please disable throttle hold mode.
 
 Move the Throttle stick.</source>
+        <translatorcomment>hélico ? à traduire</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13290,17 +13300,17 @@ Move the Throttle stick.</source>
         <source>Please move each control one at a time according to the instructions and picture below.
 
 Move the %1 stick.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez bouger chaque organe de contrôle, un seul à la fois, en fonction des instructions et de l&apos;image ci-dessous. Bougez le manche %1.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source> Alternatively, click Next to skip this channel.</source>
-        <translation type="unfinished"></translation>
+        <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer cette voie.</translation>
     </message>
     <message>
         <location line="+645"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous devrez reconfigurer les paramètres d&apos;armement manuellement lorsque l&apos;assistant sera terminé.</translation>
     </message>
 </context>
 <context>

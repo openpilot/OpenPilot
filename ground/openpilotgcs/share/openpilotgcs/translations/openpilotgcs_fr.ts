@@ -62,7 +62,8 @@
     <message>
         <location line="+15"/>
         <source>&lt;System Language&gt;</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Other languages aren&apos;t translated : English and dynamicaly generated... Check in ground/openpilotgcs/src/plugins/coreplugin/generalsettings.cpp</translatorcomment>
+        <translation>&lt;Langue Système&gt;</translation>
     </message>
     <message>
         <location line="+107"/>
@@ -170,7 +171,7 @@
     <message>
         <location line="-9"/>
         <source>Save &amp;GCS Default Settings</source>
-        <translation type="unfinished">Enregistrer Paramètres par &amp;Défaut</translation>
+        <translation>Enregistrer Paramètres GCS par &amp;Défaut</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -232,7 +233,7 @@
     <message>
         <location line="+19"/>
         <source>Edit Gadgets Mode</source>
-        <translation type="unfinished">Editer Mode Gadgets</translation>
+        <translation>Editer Mode Gadgets</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -414,7 +415,7 @@
     <message>
         <location line="+27"/>
         <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: %2&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
-        <translation type="unfinished">&lt;h3&gt;Station de Contrôle au Sol&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: %2&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</translation>
+        <translation>&lt;h3&gt;Station de Contrôle au Sol (GCS)&lt;/h3&gt;Révision GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
@@ -1552,7 +1553,7 @@ Raison : %3</translation>
     <message>
         <location filename="../../../src/plugins/coreplugin/workspacesettings.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -1857,13 +1858,13 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/hitlnew/hitlwidget.ui"/>
         <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Request update</source>
-        <translation type="unfinished"></translation>
+        <translation>Demander mise à jour</translation>
     </message>
     <message>
         <location/>
@@ -1902,12 +1903,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>AP OFF</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Sim OFF</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1915,12 +1916,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>Dial SVG: </source>
-        <translation type="unfinished"></translation>
+        <translation>SVG Dial :</translation>
     </message>
     <message>
         <location/>
@@ -1955,7 +1956,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Input:</source>
-        <translation type="unfinished">Entrée :</translation>
+        <translation>Entrée :</translation>
     </message>
     <message>
         <location/>
@@ -1970,7 +1971,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Dial font:</source>
-        <translation type="unfinished">Police Dial :</translation>
+        <translation>Police Dial :</translation>
     </message>
     <message>
         <location/>
@@ -1985,7 +1986,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Factor:</source>
-        <translation type="unfinished"></translation>
+        <translation>Facteur :</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.cpp" line="+61"/>
@@ -2056,7 +2057,7 @@ Cela améliore les performances, mais c&apos;est à utiliser à vos risques et p
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -2096,7 +2097,7 @@ Cela améliore les performances, mais c&apos;est à utiliser à vos risques et p
     <message>
         <location/>
         <source>Sound Collection</source>
-        <translation type="unfinished"></translation>
+        <translation>Bibliothèque Sons</translation>
     </message>
     <message>
         <location/>
@@ -2110,7 +2111,11 @@ Cela améliore les performances, mais c&apos;est à utiliser à vos risques et p
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Select the sound collection&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Sélectionner la bibliothèque de sons&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -2145,7 +2150,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+21"/>
         <source>Choose sound collection directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Choisir le dossier de la bibliothèque de sons</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.h" line="+67"/>
@@ -2155,7 +2160,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+2"/>
         <source>Notify Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>Plugin de Notification</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
@@ -2467,7 +2472,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -2537,12 +2542,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.ui"/>
         <source>UAV Symbol</source>
-        <translation type="unfinished">Symbole Appareil</translation>
+        <translation>Symbole Appareil</translation>
     </message>
     <message>
         <location/>
         <source>Default Max Update Rate </source>
-        <translation type="unfinished">Fréquence d&apos;Actualisation Maximale par Défaut</translation>
+        <translation>Fréquence d&apos;Actualisation Maximale par Défaut</translation>
     </message>
 </context>
 <context>
@@ -2550,7 +2555,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/scope/scopegadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -2611,7 +2616,8 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Add
 Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter
+Mise à Jour</translation>
     </message>
     <message>
         <location/>
@@ -2675,12 +2681,12 @@ Update</source>
     <message>
         <location filename="../../../src/plugins/systemhealth/systemhealthgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>Subsystem SVG:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sous-système SVG :</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/systemhealth/systemhealthgadgetoptionspage.cpp" line="+55"/>
@@ -2698,12 +2704,12 @@ Update</source>
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjectbrowser.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>Request</source>
-        <translation type="unfinished">Demander</translation>
+        <translation>Demander</translation>
     </message>
     <message>
         <location/>
@@ -2713,7 +2719,7 @@ Update</source>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">Enregistrer</translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <location/>
@@ -2728,7 +2734,7 @@ Update</source>
     <message>
         <location/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -6058,7 +6064,7 @@ Update</source>
     <message>
         <location line="+1"/>
         <source>Maybe you first have to choose Edit Gadgets Mode in the Window menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Peut-être avez-vous besoin de d&apos;abord cocher Editer Gadgets Mode dans le menu Fenêtre.</translation>
     </message>
 </context>
 <context>
@@ -6857,7 +6863,7 @@ Update</source>
     <message>
         <location filename="../../../src/plugins/gpsdisplay/gpsdisplaygadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -6956,7 +6962,7 @@ Update</source>
         <location/>
         <source>Heading:</source>
         <translatorcomment>Direction ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation>Direction :</translation>
     </message>
     <message>
         <location/>
@@ -6988,9 +6994,9 @@ Update</source>
         <source>Displays the SNR for each detected sat.
 Satellite number (PRN) is displayed inside the green bar.
 Sat SNR is displayed above (in dBHz)</source>
-        <translation type="unfinished">Affiche le SNR pour chaue satellite détecté.
+        <translation>Affiche le SNR pour chaque satellite détecté.
 Le numéro du satellite (PRN) est affiché sur une barre verte.
-Le SNR du satellite est affiche au dessus (en dBHz)</translation>
+Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     </message>
 </context>
 <context>
@@ -6998,7 +7004,7 @@ Le SNR du satellite est affiche au dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -7243,12 +7249,12 @@ Le SNR du satellite est affiche au dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>PFD SVG: </source>
-        <translation type="unfinished"></translation>
+        <translation>QVG PFD :</translation>
     </message>
     <message>
         <location/>
@@ -7273,7 +7279,7 @@ Le SNR du satellite est affiche au dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.ui"/>
         <source>Smooth updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Mises à jour lissées</translation>
     </message>
 </context>
 <context>
@@ -7322,7 +7328,7 @@ Le SNR du satellite est affiche au dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/plugins/config/airframe.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -7403,7 +7409,7 @@ Le SNR du satellite est affiche au dessus (en dBHz)</translation>
         <location/>
         <source>Vehicle type:</source>
         <translatorcomment>véhicule / appareil ?</translatorcomment>
-        <translation type="unfinished">Type de Véhicule :</translation>
+        <translation>Type de Véhicule :</translation>
     </message>
     <message>
         <location/>
@@ -7661,17 +7667,17 @@ Typical value is 50% for + or X configuration on quads.</source>
     <message>
         <location/>
         <source>Curve 1</source>
-        <translation type="unfinished">Courbe 1</translation>
+        <translation>Courbe 1</translation>
     </message>
     <message>
         <location/>
         <source>Curve 2</source>
-        <translation type="unfinished">Courbe 2</translation>
+        <translation>Courbe 2</translation>
     </message>
     <message>
         <location/>
         <source>Type</source>
-        <translation type="unfinished">Type</translation>
+        <translation>Type</translation>
     </message>
     <message>
         <location/>
@@ -7726,7 +7732,7 @@ Typical value is 50% for + or X configuration on quads.</source>
     <message>
         <location/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
     <message>
         <location/>
@@ -7815,7 +7821,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Takes you to the wiki page</source>
-        <translation type="unfinished">Vous renvoie à la page wiki</translation>
+        <translation>Vous renvoie à la page wiki</translation>
     </message>
     <message>
         <location/>
@@ -7825,7 +7831,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished">Appliquer</translation>
+        <translation>Appliquer</translation>
     </message>
     <message>
         <location/>
@@ -7835,7 +7841,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">Enregistrer</translation>
+        <translation>Enregistrer</translation>
     </message>
 </context>
 <context>
@@ -7871,7 +7877,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/importexport/importexportdialog.ui"/>
         <source>Dialog</source>
-        <translation type="unfinished">Boîte de dialogue</translation>
+        <translation>Boîte de dialogue</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/importexport/importexportdialog.cpp" line="+9"/>
@@ -7884,33 +7890,33 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/importexport/importexportgadgetwidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>Items</source>
-        <translation type="unfinished"></translation>
+        <translation>Eléments</translation>
     </message>
     <message>
         <location/>
         <source>General (Workspace, Key-Bindings)</source>
-        <translation type="unfinished"></translation>
+        <translation>Général (Espace de Travail, Raccourcis Clavier)</translation>
     </message>
     <message>
         <location/>
         <source>All Gadgets</source>
-        <translation type="unfinished"></translation>
+        <translation>Tous les Gadgets</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/importexport/importexportgadgetwidget.cpp" line="+75"/>
         <location line="+77"/>
         <source>GCS Settings file (*.xml)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier Paramètres GCS (*.xml)</translation>
     </message>
     <message>
         <location line="-76"/>
         <source>Save GCS Settings too file ..</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistre Paramètres GCS vers fichier ..</translation>
     </message>
     <message>
         <location line="+16"/>
@@ -7925,7 +7931,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+54"/>
         <source>Load GCS Settings from file ..</source>
-        <translation type="unfinished"></translation>
+        <translation>Charge Paramètres GCS depuis fichier ..</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -7935,7 +7941,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+7"/>
         <source>The settings have been imported from </source>
-        <translation>Les paramètrs ont été importés depuis </translation>
+        <translation>Les paramètres ont été importés depuis </translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7945,17 +7951,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+37"/>
         <source>All your settings will be deleted!</source>
-        <translation type="unfinished"></translation>
+        <translation>Tous vos réglages seront effacés !</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>You must restart the GCS in order to activate the changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous devez redémarrer le GCS pour activer les modifications.</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/importexport/importexportgadgetwidget.ui"/>
         <source>Plugins</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7993,17 +7999,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/logging/logging.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>Play</source>
-        <translation type="unfinished">Jouer</translation>
+        <translation>Lecture</translation>
     </message>
     <message>
         <location/>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>Pause</translation>
     </message>
     <message>
         <location/>
@@ -8062,7 +8068,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/antennatrack/antennatrackgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -8092,7 +8098,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Timeout(ms):</source>
-        <translation type="unfinished">Temps de latence (ms) :</translation>
+        <translation>Temps de latence (ms) :</translation>
     </message>
     <message>
         <location/>
@@ -8115,42 +8121,42 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/antennatrack/antennatrackwidget.ui"/>
         <source>Coord:</source>
-        <translation type="unfinished"></translation>
+        <translation>Coord :</translation>
     </message>
     <message>
         <location/>
         <source>Unknown</source>
-        <translation type="unfinished">Inconnu</translation>
+        <translation>Inconnu</translation>
     </message>
     <message>
         <location/>
         <source>HomeCoord:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HomeCoord :</translation>
     </message>
     <message>
         <location/>
         <source>Azimuth</source>
-        <translation type="unfinished"></translation>
+        <translation>Azimuth</translation>
     </message>
     <message>
         <location/>
         <source>Elevation</source>
-        <translation type="unfinished"></translation>
+        <translation>Elévation</translation>
     </message>
     <message>
         <location/>
         <source>Connect</source>
-        <translation type="unfinished">Connecter</translation>
+        <translation>Connecter</translation>
     </message>
     <message>
         <location/>
         <source>Disconnect</source>
-        <translation type="unfinished">Déconnecter</translation>
+        <translation>Déconnecter</translation>
     </message>
     <message>
         <location/>
         <source>Output</source>
-        <translation type="unfinished">Sortie</translation>
+        <translation>Sortie</translation>
     </message>
 </context>
 <context>
@@ -8406,27 +8412,27 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Camera Stabilization</source>
-        <translation type="unfinished"></translation>
+        <translation>Stabilisation Caméra</translation>
     </message>
     <message>
         <location/>
         <source>Module Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Module de Contrôle</translation>
     </message>
     <message>
         <location/>
         <source>Enable CameraStabilization module</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer le module de Stabilisation Caméra</translation>
     </message>
     <message>
         <location/>
         <source>After enabling the module, you must power cycle before using and configuring.</source>
-        <translation type="unfinished"></translation>
+        <translation>Après activation du module, vous devez redémarrer la carte avant de l&apos;utiliser et le configurer.</translation>
     </message>
     <message>
         <location/>
         <source>Basic Settings (Stabilization)</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres de Base (Stabilisation)</translation>
     </message>
     <message>
         <location/>
@@ -8434,36 +8440,44 @@ Useful if you have accidentally changed some settings.</source>
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Angle caméra en Yaw pour une valeur de sortie de 100%, degrés.
+
+Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous devez également ajuster la plage de sortie du canal dans l&apos;onglet Output.</translation>
     </message>
     <message>
         <location/>
         <source>objname:CameraStabSettings</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:OutputRange</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>element:Yaw</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:no</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>scale:1</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:1</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8472,11 +8486,14 @@ have to define channel output range using Output configuration tab.</source>
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Angle caméra en Pitch pour une valeur de sortie de 100%, degrés.
+
+Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous devez également ajuster la plage de sortie du canal dans l&apos;onglet Output.</translation>
     </message>
     <message>
         <location/>
         <source>element:Pitch</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8485,73 +8502,83 @@ have to define channel output range using Output configuration tab.</source>
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Angle caméra en Roll pour une valeur de sortie de 100%, degrés.
+
+Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous devez également ajuster la plage de sortie du canal dans l&apos;onglet Output.</translation>
     </message>
     <message>
         <location/>
         <source>element:Roll</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Yaw output channel for camera gimbal</source>
-        <translation type="unfinished"></translation>
+        <translation>Canal de sortie Yaw pour la nacelle caméra</translation>
     </message>
     <message>
         <location/>
         <source>None</source>
-        <translation type="unfinished">Aucune</translation>
+        <translatorcomment>Stay None in GCS ! </translatorcomment>
+        <translation>Aucun</translation>
     </message>
     <message>
         <location/>
         <source>Pitch output channel for camera gimbal</source>
-        <translation type="unfinished"></translation>
+        <translation>Canal de sortie Pitch pour la nacelle caméra</translation>
     </message>
     <message>
         <location/>
         <source>Roll output channel for camera gimbal</source>
-        <translation type="unfinished"></translation>
+        <translation>Canal de sortie Roll pour la nacelle caméra</translation>
     </message>
     <message>
         <location/>
         <source>Output Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Canal Sortie</translation>
     </message>
     <message>
         <location/>
         <source>Output Range</source>
-        <translation type="unfinished"></translation>
+        <translation>Plage Sortie</translation>
     </message>
     <message>
         <location/>
         <source>Yaw</source>
+        <translatorcomment>Pas toucher, terme technique ?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
+        <translatorcomment>Pas toucher, terme technique ?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
+        <translatorcomment>Pas toucher, terme technique ?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Advanced Settings (Control)</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Avancés (Contrôle)</translation>
     </message>
     <message>
         <location/>
         <source>Input channel to control camera yaw
 
 Don&apos;t forget to map this channel using Input configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>Canal d&apos;entrée pour contrôler la caméra en Yaw
+
+N&apos;oubliez pas de déclarer ce canal dans l&apos;onglet Input.</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Input</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8559,19 +8586,23 @@ Don&apos;t forget to map this channel using Input configuration tab.</source>
         <source>Input channel to control camera pitch
 
 Don&apos;t forget to map this channel using Input configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>Canal d&apos;entrée pour contrôler la caméra en Pitch
+
+N&apos;oubliez pas de déclarer ce canal dans l&apos;onglet Input.</translation>
     </message>
     <message>
         <location/>
         <source>Input channel to control camera roll
 
 Don&apos;t forget to map this channel using Input configuration tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>Canal d&apos;entrée pour contrôler la caméra en Roll
+
+N&apos;oubliez pas de déclarer ce canal dans l&apos;onglet Input.</translation>
     </message>
     <message>
         <location/>
         <source>Input Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Canal d&apos;Entrée</translation>
     </message>
     <message>
         <location/>
@@ -8584,11 +8615,13 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
     <message>
         <location/>
         <source>fieldname:StabilizationMode</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Attitude</source>
+        <translatorcomment>Pas toucher, terme technique ?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8599,6 +8632,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
     <message>
         <location/>
         <source>fieldname:InputRange</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8609,6 +8643,7 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
     <message>
         <location/>
         <source>fieldname:InputRate</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8621,6 +8656,7 @@ This option smoothes the stick input. Zero value disables LPF.</source>
     <message>
         <location/>
         <source>fieldname:ResponseTime</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8665,7 +8701,7 @@ This option smoothes the stick input. Zero value disables LPF.</source>
     <message>
         <location/>
         <source>Response Time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Temps de Réponse</translation>
     </message>
     <message>
         <location/>
@@ -8680,12 +8716,12 @@ This option smoothes the stick input. Zero value disables LPF.</source>
     <message>
         <location/>
         <source>Stabilization Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode Stabilisation</translation>
     </message>
     <message>
         <location/>
         <source>(the same value for Roll, Pitch, Yaw)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">(Les mêmes valeurs pour Roll, Pitch, Yaw)</translation>
     </message>
     <message>
         <location/>
@@ -8702,6 +8738,7 @@ value.</source>
     <message>
         <location/>
         <source>fieldname:MaxAxisLockRate</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8717,6 +8754,7 @@ value.</source>
     <message>
         <location/>
         <source>button:help</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8735,11 +8773,12 @@ Apply or Save button afterwards.</source>
     <message>
         <location/>
         <source>Reset To Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Restaurer les paramètres par défaut</translation>
     </message>
     <message>
         <location/>
         <source>button:default</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -8755,41 +8794,44 @@ Apply or Save button afterwards.</source>
     <message>
         <location/>
         <source>Reload Board Data</source>
-        <translation type="unfinished">Recharger Données Carte</translation>
+        <translation>Recharger Données Carte</translation>
     </message>
     <message>
         <location/>
         <source>button:reload</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte sans enregistrer dans la mémoire</translation>
+        <translation>Envoyer les paramètres sur la carte sans enregistrer dans la mémoire non-volatile</translation>
     </message>
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished">Appliquer</translation>
+        <translation>Appliquer</translation>
     </message>
     <message>
         <location/>
         <source>button:apply</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte et enregistrer dans la mémoire</translation>
+        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire non-volatile</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">Enregistrer</translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <location/>
         <source>button:save</source>
+        <translatorcomment>Pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -8798,7 +8840,7 @@ Apply or Save button afterwards.</source>
     <message>
         <location filename="../../../src/plugins/config/cc_hw_settings.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -8895,7 +8937,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location filename="../../../src/plugins/config/ccattitude.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -8925,7 +8967,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Calibration</source>
-        <translation type="unfinished">Calibration</translation>
+        <translation>Calibration</translation>
     </message>
     <message>
         <location/>
@@ -8953,7 +8995,7 @@ la carte est armée. Dans ce cas ne bougez pas l&apos;appareil lors de l&apos;ar
     <message>
         <location/>
         <source>Zero gyros while arming aircraft</source>
-        <translation type="unfinished">Mettre les gyros à zéro lors de l&apos;armement</translation>
+        <translation>Mettre les gyros à zéro lors de l&apos;armement</translation>
     </message>
     <message>
         <location/>
@@ -8972,12 +9014,19 @@ Range: 0.00 - 0.20, Good starting value: 0.05 - 0.10
 Start low and raise until drift stops.
 
 A setting of 0.00 disables the filter.</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrage accéléromètres.
+
+Ajuste le niveau de filtrage passe-bas des données d&apos;accéléromètres pour l&apos;estimation de l&apos;inclinaison. Des valeurs élevées donnent un filtrage plus important qui peut aider pour le glissement en mode stabilisé.
+
+Plage : 0.00 - 0.20, Bonne valeur de départ : 0.05 - 0.10
+Commencez à un niveau bas et augmentez jusqu&apos;à ce que le glissement s&apos;arrête.
+
+Une valeur de 0.00 désactive le filtre.</translation>
     </message>
     <message>
         <location/>
         <source>Takes you to the wiki page</source>
-        <translation type="unfinished">Vous renvoie à la page wiki</translation>
+        <translation>Vous renvoie à la page wiki</translation>
     </message>
     <message>
         <location/>
@@ -9304,7 +9353,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/defaulthwsettings.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -9331,7 +9380,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/input.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -9391,7 +9440,8 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Terme tech à laisser ?</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9406,12 +9456,14 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Terme tech à laisser ?</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Terme tech à laisser ?</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9426,32 +9478,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Pos. 1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pos. 2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pos. 3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pos. 4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pos. 5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pos. 6</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9485,7 +9537,12 @@ It will be 2 or 3 for most of setups, but it also can be up to 6.
 In that case you have to configure your radio mixers so the whole range
 from min to max is split into N equal intervals, and you may set arbitrary
 channel value for each flight mode.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre de positions de votre interrupteur Mode de Vol.
+
+La valeur par défaut est 3.
+
+Cela peut être 2 ou 3 dans la plupart des configurations, mais cela peut aller jusqu&apos;à 6.
+Dans ce cas vous devez configurer les mixages de votre radio pour que la plage mini à maxi soit divisée en N intervales égaux et ainsi vous pouvez définir une valeur arbitraire du canal de sortie pour chaque mode de vol.</translation>
     </message>
     <message>
         <location/>
@@ -9565,7 +9622,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location filename="../../../src/plugins/config/inputchannelform.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -9585,7 +9642,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Min</source>
-        <translation type="unfinished">Mini</translation>
+        <translation>Mini</translation>
     </message>
     <message>
         <location/>
@@ -9600,17 +9657,17 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>TextLabel</source>
-        <translation type="unfinished">Label de texte</translation>
+        <translation>Label de texte</translation>
     </message>
     <message>
         <location/>
         <source>Rev</source>
-        <translation type="unfinished">Inv</translation>
+        <translation>Inv</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+130"/>
         <source>Chan %1</source>
-        <translation type="unfinished">Canal %1</translation>
+        <translation>Canal %1</translation>
     </message>
 </context>
 <context>
@@ -9623,6 +9680,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Throttle Curve</source>
+        <translatorcomment>Not translated.. see code source ?</translatorcomment>
         <translation>Courbe Gaz</translation>
     </message>
     <message>
@@ -9708,7 +9766,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
         <location/>
         <source>Step</source>
         <translatorcomment>Saut ?</translatorcomment>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -9731,7 +9789,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location filename="../../../src/plugins/config/output.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -9855,7 +9913,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location filename="../../../src/plugins/config/outputchannelform.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -10296,7 +10354,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location filename="../../../src/plugins/config/pro_hw_settings.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -10307,7 +10365,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Set the serial speed of your onboard telemetry modem here. It is the speed between the OpenPilot board and the onboard modem, and could be different from the radio link speed.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Beware of not locking yourself out! You should only modify this setting when the OpenPilot board is connected through the USB port.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -10761,17 +10819,17 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>When the throttle is low, zero the intergral term to prevent intergral wind-up</source>
-        <translation type="unfinished">Quand les gaz sont faibles, mettre à zero le terme intégral pour éviter les secousses</translation>
+        <translation>Quand les gaz sont faibles, mettre à zero le terme intégral pour éviter les secousses</translation>
     </message>
     <message>
         <location/>
         <source>Zero the integral when throttle is low</source>
-        <translation>Mettre l&apos;intégrale à zéro lorsque les gaz sont faibles</translation>
+        <translation type="unfinished">Mettre l&apos;intégrale à zéro lorsque les gaz sont bas</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:LowThrottleZeroIntegral</source>
-        <translation></translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -11198,12 +11256,12 @@ Up to 3 separate PID options (or option pairs) can be selected and updated.</sou
     <message>
         <location/>
         <source>Min</source>
-        <translation type="unfinished">Mini</translation>
+        <translation>Mini</translation>
     </message>
     <message>
         <location/>
         <source>Max</source>
-        <translation type="unfinished">Maxi</translation>
+        <translation>Maxi</translation>
     </message>
     <message>
         <location/>
@@ -11574,7 +11632,7 @@ Please choose from one of the default configurations</source>
     <message>
         <location/>
         <source>Channels</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Canaux</translation>
     </message>
 </context>
 <context>
@@ -11582,7 +11640,7 @@ Please choose from one of the default configurations</source>
     <message>
         <location filename="../../../src/plugins/magicwaypoint/magicwaypoint.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -11595,7 +11653,7 @@ Please choose from one of the default configurations</source>
     <message>
         <location filename="../../../src/plugins/opmap/homeeditor.ui"/>
         <source>Dialog</source>
-        <translation type="unfinished">Boîte de dialogue</translation>
+        <translation>Boîte de dialogue</translation>
     </message>
     <message>
         <location/>
@@ -11805,7 +11863,7 @@ Please choose from one of the default configurations</source>
     <message>
         <location filename="../../../src/plugins/setupwizard/connectiondiagram.ui"/>
         <source>Dialog</source>
-        <translation type="unfinished">Boîte de dialogue</translation>
+        <translation>Boîte de dialogue</translation>
     </message>
     <message>
         <location/>
@@ -11878,7 +11936,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/controllerpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11894,7 +11952,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;If your board is not connected, please connect the board to a USB port on your computer and select the device from the list below.  Then press &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Connect&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translatorcomment>&apos;moyen de connexion&apos;, à affiner...</translatorcomment>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -11904,7 +11962,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Si la carte est déjà branchée et correctement détectée, le type de carte sera déjà affiché. Vous pouvez &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Déconnecter&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; et sélectionner un autre moyen de connexion si vous avez besoin de détecter une autre carte.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Si votre carte n&apos;est pas connectée, branchez votre carte sur un port USB de votre ordinateur et sélectionnez le moyen de connexion dans la liste ci-dessous. Appuyez ensuite sur &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Connecter&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Si votre carte n&apos;est pas connectée, branchez-là sur un port USB de votre ordinateur et sélectionnez le moyen de connexion dans la liste ci-dessous. Appuyez ensuite sur &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Connecter&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12029,7 +12087,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/inputpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12042,7 +12100,15 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The OpenPilot controller supports many different types of input signals. Please select the type of input that matches your receiver configuration. If you are unsure, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Some input options require the OpenPilot controller to be rebooted before the changes can take place. If an option that requires a reboot is selected, you will be instructed to do so on the next page of this wizard.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Configuration de base du signal d&apos;entrée&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La carte controleur OpenPilot supporte plusieurs types de signaux d&apos;entrée. Veuillez sélectionner le type d&apos;entrée qui correspond à votre configuration de récepteur. Si vous n&apos;êtes pas certain, laissez juste l&apos;option par défaut sélectionnée et continuez l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Quelques options requièrent un redémarrage du controleur OpenPilot avant que les changements ne prennent effet. Si une option demandant un redémarrage est sélectionnée, cela vous sera demandé de le faire dans la prochaine page de l&apos;assistant.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12166,7 +12232,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>The Tricopter uses three motors and one servo. The servo is used to give yaw authority to the rear motor. The front motors are rotating in opposite directions. The Tricopter is known for its sweeping yaw movement and it is very well suited for FPV since the front rotors are spread wide apart.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le tricoptère utilise trois moteurs et un servo. Le servo est utilisé pour permettre au moteur arrière d&apos;agir sur le Yaw (Lacet). Les moteurs de devant tournent dans des sens opposés. Le tricoptère est connu pour son mouvement de balayage en lacet et il est très adapté pour le FPV car les moteurs de devant sont écartés.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -12176,7 +12242,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>The X Quadcopter uses four motors and is the most common multi rotor configuration. Two of the motors rotate clockwise and two counter clockwise. The motors positioned diagonal to each other rotate in the same direction. This setup is perfect for sport flying and is also commonly used for FPV platforms.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le Quadricoptère X utilise quatre moteurs et c&apos;est la configuration la plus commune en multirotor. Deux des moteurs tournent dans le sens horaire et les deux dans le sens anti-horaire. Les moteurs situés en diagonale tournent dans le même sens. Cette configuration est idéale pour le vol sportif et couramment utilisé pour des plates-formes FPV.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -12186,29 +12252,29 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>The Plus(+) Quadcopter uses four motors and is similar to the X Quadcopter but the forward direction is offset by 45 degrees. The motors front and rear rotate in clockwise and the motors right and left rotate counter-clockwise. This setup was one of the first to be used and is still used for sport flying. This configuration is not that well suited for FPV since the fore rotor tend to be in the way of the camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le Quadricoptère (+) utilise quatres moteurs et il est similaire au Quadricoptère X mais la direction de déplacement est décalée de 45 degrés. Les moteurs avant et arrière tournent dans le sens horaire et les moteurs gauche et droit tournent dans le sens anti-horaire. Cette configuration a été l&apos;une des premières à être utilisée et est encore utilisée pour le vol sportif. Cette agencement n&apos;est pas bien adapté pour que FPV car le moteur de devant a tendance à être dans le champ de vision de la caméra.</translation>
     </message>
     <message>
         <location line="+5"/>
         <location line="+1"/>
         <source>Hexacopter</source>
-        <translation type="unfinished"></translation>
+        <translation>Hexacoptère</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+1"/>
         <source>Hexacopter Coax (Y6)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hexacoptère Coax (Y6)</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Hexacopter X</source>
-        <translation type="unfinished"></translation>
+        <translation>Hexacoptère X</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Hexacopter H</source>
-        <translation type="unfinished"></translation>
+        <translation>Hexacoptère H</translation>
     </message>
 </context>
 <context>
@@ -12383,7 +12449,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/savepage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12401,7 +12467,20 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Press the Save button to save the configuration.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Configuration OpenPilot prête à être enregistrée&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;L&apos;assistant est maintenant prêt à enregistrer les paramètres directement dans votre carte contrôleur OpenPilot. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Si une des sélections nécessite un redémarrage de la carte contrôleur, alors vous devrez éteindre / allumer la carte contrôleur OpenPilot après avoir enregistré dans cette étape.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Appuyer sur le bouton Enregistrer pour enregistrer la configuration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12506,7 +12585,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/vehiclepage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12536,12 +12615,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Tricopter, Quadcopter, Hexacopter</source>
-        <translation type="unfinished">Tricoptère, Quadricopter, Hexacopter</translation>
+        <translation>Tricoptère, Quadricoptère, Hexacoptère</translation>
     </message>
     <message>
         <location/>
         <source>Multirotor</source>
-        <translation type="unfinished"></translation>
+        <translation>Multirotor</translation>
     </message>
     <message>
         <location/>
@@ -13469,7 +13548,7 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/logging/loggingplugin.cpp" line="+79"/>
         <source>Open file</source>
-        <translation type="unfinished">Ouvrir fichier</translation>
+        <translation>Ouvrir fichier</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -14014,7 +14093,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+1"/>
         <source>This file is not a correct XML file</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce fichier n&apos;est pas un fichier XML valide</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -14040,7 +14119,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+23"/>
         <source>UAV Settings Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Export des Paramètres UAV</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -14060,7 +14139,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+1"/>
         <source>This option is only useful for passing your current system data to the technical support staff. Do you really want to export?</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette option est seulement utile pour transmettre vos données actuelles du système à l&apos;équipe du support technique. Voulez-vous vraiment procéder à l&apos;exportation ?</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -14070,7 +14149,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+23"/>
         <source>UAV Data Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Export des Paramètres UAV</translation>
     </message>
     <message>
         <location line="+1"/>

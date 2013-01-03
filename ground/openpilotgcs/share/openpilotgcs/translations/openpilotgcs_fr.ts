@@ -13756,7 +13756,7 @@ Move the %1 stick.</source>
     <message>
         <location line="+3"/>
         <source>Quadcopter +</source>
-        <translation type="unfinished">Quadricopter +</translation>
+        <translation>Quadricopter +</translation>
     </message>
     <message>
         <location line="+3"/>

@@ -4,7 +4,7 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../../../src/app/main.cpp" line="+128"/>
+        <location filename="../../../src/app/main.cpp" line="+136"/>
         <source>Failed to load core: %1</source>
         <translation>Falló la carga de la aplicación: %1</translation>
     </message>
@@ -15,12 +15,12 @@
         <translation>No fue posible enviar los argumentos de línea de comandos a la instancia en ejecución. Aparentemente no está respondiendo.</translation>
     </message>
     <message>
-        <location line="+135"/>
+        <location line="+183"/>
         <source>Could not find &apos;Core.pluginspec&apos; in %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+38"/>
         <source>OpenPilot GCS - Plugin loader messages</source>
         <translation type="unfinished"></translation>
     </message>
@@ -36,7 +36,7 @@
 <context>
     <name>Core::Internal::GeneralSettings</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/generalsettings.cpp" line="+54"/>
+        <location filename="../../../src/plugins/coreplugin/generalsettings.cpp" line="+63"/>
         <source>General</source>
         <translation></translation>
     </message>
@@ -46,9 +46,24 @@
         <translation>Entorno</translation>
     </message>
     <message>
-        <location line="+73"/>
+        <location line="+15"/>
+        <source>&lt;System Language&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+107"/>
         <source>Variables</source>
         <translation>Variables</translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Restart required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The language change will take effect after a restart of the OpenPilot GCS.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../src/plugins/coreplugin/generalsettings.ui"/>
@@ -67,49 +82,44 @@
     </message>
     <message>
         <location/>
-        <source>Terminal:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>External editor:</source>
-        <translation>Editor externo:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>?</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>When files are externally modified:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Always ask</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Reload all modified files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ignore modifications</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>User interface color:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save configuration settings on exit:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Automatically connect an OpenPilot USB device:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Automatically select an OpenPilot USB device:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use UDP Mirror</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Expert Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Language:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>Core::Internal::MainWindow</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/mainwindow.cpp" line="+384"/>
+        <location filename="../../../src/plugins/coreplugin/mainwindow.cpp" line="+473"/>
         <source>&amp;File</source>
         <translation>&amp;Archivo</translation>
     </message>
@@ -134,55 +144,17 @@
         <translation>A&amp;yuda</translation>
     </message>
     <message>
-        <location line="-281"/>
+        <location line="-376"/>
         <source>OpenPilot GCS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+343"/>
-        <source>&amp;New File or Project...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>&amp;Open File or Project...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>&amp;Open File With...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>Recent Files</source>
-        <translation>Archivos recientes</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <location line="+4"/>
-        <source>&amp;Save</source>
-        <translation>&amp;Guardar</translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <location line="+6"/>
-        <source>Save &amp;As...</source>
-        <translation>Guardar co&amp;mo...</translation>
-    </message>
-    <message>
-        <location line="-3"/>
-        <location line="+10"/>
+        <location line="+493"/>
         <source>Ctrl+Shift+S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-3"/>
-        <source>Save A&amp;ll</source>
-        <translation>Guardar t&amp;odo</translation>
-    </message>
-    <message>
-        <location line="+130"/>
+        <location line="+168"/>
         <source>About &amp;OpenPilot GCS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -192,17 +164,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+491"/>
+        <location line="+21"/>
+        <source>About &amp;Authors...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+654"/>
         <source>Settings...</source>
         <translation type="unfinished">Ajustes...</translation>
     </message>
     <message>
-        <location line="-614"/>
+        <location line="-839"/>
         <source>E&amp;xit</source>
         <translation>&amp;Salir</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-9"/>
+        <source>Save &amp;GCS Default Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
         <source>Ctrl+Q</source>
         <translation type="unfinished"></translation>
     </message>
@@ -259,12 +241,82 @@
         <translation>Pantalla completa</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+19"/>
+        <source>Edit Gadgets Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Ctrl+Shift+F10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Meta+Shift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Ctrl+Shift</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Split</source>
+        <translation type="unfinished">Dividir</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1+Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Split Side by Side</source>
+        <translation type="unfinished">Dividir lado a lado</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1+Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Close Current View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Close All Other Views</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1+A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Goto Next View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1+N</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>&amp;Help...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+29"/>
         <source>About &amp;Plugins...</source>
         <translation>Acerca de los &amp;plugins...</translation>
     </message>
@@ -361,21 +413,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+11"/>
-        <source>From revision %1&lt;br/&gt;</source>
-        <extracomment>This gets conditionally inserted as argument %8 into the description string.</extracomment>
-        <translation>Revisión %1&lt;br/&gt;</translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>&lt;h3&gt;OpenPilot GCS %1&lt;/h3&gt;Based on Qt %2 (%3 bit)&lt;br/&gt;&lt;br/&gt;Built on %4 at %5&lt;br /&gt;&lt;br/&gt;%8&lt;br/&gt;Copyright 2008-%6 %7. All rights reserved.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;br/&gt;</source>
+        <location line="+27"/>
+        <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: %2&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>Core::ModeManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/modemanager.cpp" line="+148"/>
+        <location filename="../../../src/plugins/coreplugin/modemanager.cpp" line="+161"/>
         <source>Switch to %1 mode</source>
         <translation>Alternar al modo %1</translation>
     </message>
@@ -958,7 +1004,7 @@
 <context>
     <name>ExtensionSystem::PluginManager</name>
     <message>
-        <location filename="../../../src/libs/extensionsystem/pluginmanager.cpp" line="+617"/>
+        <location filename="../../../src/libs/extensionsystem/pluginmanager.cpp" line="+619"/>
         <source>Circular dependency detected:
 </source>
         <translation>Dependencia circular detectada:
@@ -993,12 +1039,14 @@ Razón: %3</translation>
 <context>
     <name>MainWindow</name>
     <message>
+        <location filename="../../../src/experimental/finaltest/mainwindow.ui"/>
         <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+274"/>
         <source>MainWindow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
+        <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
         <source>Go</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1055,6 +1103,120 @@ Razón: %3</translation>
     <message>
         <location/>
         <source>namespace</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/experimental/finaltest/mainwindow.ui"/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>MapType</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>PushButton</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>Goto Place</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>GO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>GeoCoderStatusCode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>Rotate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>Center</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>ZoomIncrement</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>CurrentZoom=</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>Misc</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>ShowGridLines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>UseOpenGL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
+        <source>ReloadMap</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1316,86 +1478,11 @@ Razón: %3</translation>
     </message>
 </context>
 <context>
-    <name>Welcome::Internal::CommunityWelcomePageWidget</name>
-    <message>
-        <location filename="../../../src/plugins/welcome/communitywelcomepagewidget.ui"/>
-        <source>Form</source>
-        <translation type="unfinished">Formulario</translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/welcome/communitywelcomepagewidget.cpp" line="+46"/>
-        <source>News From the OpenPilot Project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>OpenPilot Websites</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>http://forums.openpilot.org/blog/rss/4-openpilot-development-blog</source>
-        <extracomment>Add localized feed here only if one exists</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>OpenPilot Home</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>OpenPilot Wiki</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>OpenPilot Store</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>OpenPilot Forums</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>OpenPilot Bug Tracker</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>Welcome::WelcomeMode</name>
     <message>
-        <location filename="../../../src/plugins/welcome/welcomemode.ui"/>
-        <source>#gradientWidget {
-  background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.5, y2:1, stop:0 rgba(247, 247, 247, 255), stop:1 rgba(215, 215, 215, 255));
-}</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>#headerFrame {
-    border-image: url(:/welcome/images/center_frame_header.png) 0;
-    border-width: 0;
-}
-</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Feedback</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+115"/>
+        <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+90"/>
         <source>Welcome</source>
         <translation type="unfinished">Bienvenida</translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/welcome/welcomemode.ui"/>
-        <source>Help us make OpenPilot even better</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1409,7 +1496,7 @@ Razón: %3</translation>
 <context>
     <name>OpenWith::Editors</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/coreconstants.h" line="+91"/>
+        <location filename="../../../src/plugins/coreplugin/coreconstants.h" line="+110"/>
         <source>Plain Text Editor</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1422,7 +1509,7 @@ Razón: %3</translation>
 <context>
     <name>Core::Internal::SettingsDialog</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/dialogs/settingsdialog.cpp" line="+85"/>
+        <location filename="../../../src/plugins/coreplugin/dialogs/settingsdialog.cpp" line="+88"/>
         <source>Preferences</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1430,14 +1517,6 @@ Razón: %3</translation>
         <location line="+2"/>
         <source>Options</source>
         <translation type="unfinished">Opciones</translation>
-    </message>
-</context>
-<context>
-    <name>Welcome::Internal::CommunityWelcomePage</name>
-    <message>
-        <location filename="../../../src/plugins/welcome/communitywelcomepage.h" line="+48"/>
-        <source>Community</source>
-        <translation type="unfinished">Comunidad</translation>
     </message>
 </context>
 <context>
@@ -1530,78 +1609,241 @@ p, li { white-space: pre-wrap; }
         <source>Choose icon</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/workspacesettings.ui"/>
+        <source>Workspace panel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Placement:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Allow reordering:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>HITLOptionsPage</name>
     <message>
         <location filename="../../../src/plugins/hitlnew/hitloptionspage.ui"/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+185"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Form</source>
         <translation type="unfinished">Formulario</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+7"/>
-        <location line="+2"/>
         <source>Manual aircraft control (can be used when hardware is not available)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="-8"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Choose flight simulator:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
         <source>Latitude in degrees:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
         <source>Longitude in degrees:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Path executable:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Data directory:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+5"/>
-        <source>Host Address:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Output Port:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitloptionspage.h" line="+1"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Input Port:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../../src/plugins/hitlnew/hitloptionspage.cpp" line="+65"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.cpp" line="+56"/>
         <source>Choose flight simulator executable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.cpp" line="+2"/>
         <source>Choose flight simulator data directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/hitlnew/hitloptionspage.ui"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
+        <source>For receiving data from sim</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Check this box to start the simulator on the local computer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start simulator on local machine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
+        <source>Local interface (IP):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
+        <source>For communication with sim computer via network. Should be the IP address of one of the interfaces of the GCS computer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
+        <source>Remote interface (IP):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
+        <source>Only required if running simulator on remote machine. Should be the IP of the machine on which the simulator is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
+        <source>For sending data to sim</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
+        <source>Attitude data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>AttitudeRaw (gyro, accels)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Refresh rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>AttitudeActual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>send raw data to board</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>use values from simulator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>calculate from AttitudeRaw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Other data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HomeLocation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0 - update once, or every N seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>GPSPosition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>SonarAltitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Range detection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>m</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Map command from simulator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>to GCSReciver</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>to ManualCtrll (not implemented)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum output rate</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1609,50 +1851,58 @@ p, li { white-space: pre-wrap; }
     <name>HITLWidget</name>
     <message>
         <location filename="../../../src/plugins/hitlnew/hitlwidget.ui"/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+331"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Form</source>
         <translation type="unfinished">Formulario</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+2"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Request update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+2"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+2"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Send update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+2"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Stop</source>
         <translation type="unfinished">Detener</translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+1"/>
         <source>AutoPilot disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+1"/>
         <source> Simulator disconnected </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_hitlwidget.h" line="+1"/>
+        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
         <source>Clear Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/hitlv2/hitlv2widget.ui"/>
+        <source>AP OFF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sim OFF</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1734,13 +1984,18 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.cpp" line="+59"/>
+        <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.cpp" line="+61"/>
         <source>SVG image (*.svg)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Choose SVG image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/lineardial/lineardialgadgetoptionspage.ui"/>
+        <source>Use OpenGL</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1771,6 +2026,23 @@ p, li { white-space: pre-wrap; }
         <source>Enable VBOs:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Select the image that is shown in the background.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select the 3D model file here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Click to enable the use of Vertical Blanking.
+It is not enabled by default because some graphic cards do not
+support it, and crash the GCS. Enabling improves performance, though, so you can experiment at your own risk.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotifyPluginOptionsPage</name>
@@ -1785,58 +2057,28 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
+        <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+63"/>
         <source>Equal to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
-        <source>Greater than</source>
+        <location line="+1"/>
+        <source>Large than</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
-        <source>Less than</source>
+        <location line="+1"/>
+        <source>Lower than</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
+        <location line="+1"/>
+        <source>In range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
         <source>Sound1:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select if the value of the object should be spoken and if so, either before the configured sound or after it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Never</source>
-        <translation type="unfinished">Nunca</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Before first</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>After first</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>After second</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Value is</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Say Order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1894,12 +2136,12 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+78"/>
+        <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+21"/>
         <source>Choose sound collection directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/notify/notifypluginoptionspage.h" line="+62"/>
+        <location filename="../../../src/plugins/notify/notifypluginoptionspage.h" line="+67"/>
         <source>settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1918,66 +2160,70 @@ p, li { white-space: pre-wrap; }
         <source>Sound3:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location/>
-        <source>After third</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>OPMap_Widget</name>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Form</source>
         <translation type="unfinished">Formulario</translation>
     </message>
     <message>
-        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Find place</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Zoom out</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Zoom in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Zoom level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Map position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelMapPos</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Mouse position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelMousePos</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>%v</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Enter place to find</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2052,22 +2298,25 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished">Agregar</translation>
     </message>
     <message>
-        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Center map over home position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Center map over UAV position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Map rotation follows UAV heading</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>UAV hold position</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2082,12 +2331,13 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Move UAV to previous waypoint</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2117,28 +2367,91 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>UAV position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelUAVPos</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Show/Hide the UAV trail</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Clear the UAV trail</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelMapZoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
+        <source>Normal Map Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
+        <source>   Normal   </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
+        <source>Magic Waypoint Map Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
+        <source>   Magic Waypoint   </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Go To Place:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
+        <source>Click to move the UAV to the magic waypoint position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
+        <source>Move to WP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
+        <source>Move the magic waypoint to the home position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
+        <source>Home WP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
+        <source>UAV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
+        <source>Heading</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2210,8 +2523,18 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.cpp" line="+82"/>
+        <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.cpp" line="+97"/>
         <source>Choose Cache Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmapgadgetoptionspage.ui"/>
+        <source>UAV Symbol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Default Max Update Rate </source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2250,16 +2573,6 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>UAVField:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Scale:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Plot curves</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2304,6 +2617,51 @@ Update</source>
 </source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Y-axis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Y-axis scale factor:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Math window size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source> samples</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Math function:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Log data to csv file (not interpolated)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>New file on connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Logging path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/scope/scopegadgetoptionspage.cpp" line="+130"/>
+        <source>Choose Logging Directory</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SystemHealthGadgetOptionsPage</name>
@@ -2318,7 +2676,7 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/systemhealth/systemhealthgadgetoptionspage.cpp" line="+54"/>
+        <location filename="../../../src/plugins/systemhealth/systemhealthgadgetoptionspage.cpp" line="+55"/>
         <source>SVG image (*.svg)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2337,17 +2695,7 @@ Update</source>
     </message>
     <message>
         <location/>
-        <source>Request update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Request</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Send update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2357,27 +2705,12 @@ Update</source>
     </message>
     <message>
         <location/>
-        <source>Save to SD Card</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Save</source>
         <translation type="unfinished">Guardar</translation>
     </message>
     <message>
         <location/>
-        <source>Load from SD Card</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Load</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Erase from SD card</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2387,7 +2720,12 @@ Update</source>
     </message>
     <message>
         <location/>
-        <source>Show Meta Data</source>
+        <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>View Options</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2411,6 +2749,11 @@ Update</source>
     <message>
         <location/>
         <source>Recently updated timeout (ms):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Only highlight nodes when value actually changes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5625,8 +5968,13 @@ Update</source>
 <context>
     <name>ConfigGadgetFactory</name>
     <message>
-        <location filename="../../../src/plugins/config/configgadgetfactory.cpp" line="+35"/>
+        <location filename="../../../src/plugins/config/configgadgetfactory.cpp" line="+38"/>
         <source>Config Gadget</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Radio Setup Wizard</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5650,82 +5998,21 @@ Update</source>
 <context>
     <name>Core::UAVGadgetInstanceManager</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavgadgetinstancemanager.cpp" line="+132"/>
+        <location filename="../../../src/plugins/coreplugin/uavgadgetinstancemanager.cpp" line="+90"/>
+        <source>Migrating UAVGadgetConfigurations from version 1.1.0 to </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>You might want to save your old config NOW since it might be replaced by broken one when you exit the GCS!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+53"/>
+        <location line="+1"/>
+        <location line="+48"/>
         <location line="+1"/>
         <source>default</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Core::UAVGadgetManager</name>
-    <message>
-        <location filename="../../../src/plugins/coreplugin/uavgadgetmanager/uavgadgetmanager.cpp" line="+196"/>
-        <source>Edit Gadgets Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Ctrl+Shift+F10</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+12"/>
-        <source>Meta+Shift</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Ctrl+Shift</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Split</source>
-        <translation type="unfinished">Dividir</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>%1+Down</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Split Side by Side</source>
-        <translation type="unfinished">Dividir lado a lado</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>%1+Right</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Close Current View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>%1+C</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Close All Other Views</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>%1+A</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Goto Next View</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>%1+N</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5773,20 +6060,9 @@ Update</source>
         <source>HITL Simulation</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>LineardialGadgetFactory</name>
     <message>
-        <location filename="../../../src/plugins/lineardial/lineardialgadgetfactory.cpp" line="+36"/>
-        <source>Bargraph Dial Gadget</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ModelViewGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/modelview/modelviewgadgetfactory.cpp" line="+36"/>
-        <source>ModelView Gadget</source>
+        <location filename="../../../src/plugins/hitlv2/hitlv2factory.cpp" line="+36"/>
+        <source>HITL Simulation (v2)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5822,17 +6098,9 @@ Update</source>
     </message>
 </context>
 <context>
-    <name>OPMapGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetfactory.cpp" line="+35"/>
-        <source>OPMap Gadget</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>OPMapGadgetWidget</name>
     <message>
-        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+431"/>
+        <location filename="../../../src/plugins/opmap/opmapgadgetwidget.cpp" line="+434"/>
         <source>&amp;Zoom </source>
         <translation type="unfinished"></translation>
     </message>
@@ -5842,27 +6110,19 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-171"/>
-        <source>Flight path 62</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+157"/>
+        <location line="-27"/>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+89"/>
+        <location line="+22"/>
         <source>Waypoints</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+499"/>
-        <source>&amp;Close menu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
+        <location line="+709"/>
+        <location line="+3"/>
         <source>Close the context menu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5882,7 +6142,7 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+7"/>
         <source>Mouse latitude and longitude</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5912,29 +6172,18 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>&amp;Find place</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <location line="+51"/>
+        <location line="+71"/>
         <location line="+7"/>
         <source>Ctrl+F</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-57"/>
-        <source>Find a location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
+        <location line="-75"/>
         <source>Show compass</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+34"/>
         <source>Zoom &amp;In</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5944,7 +6193,7 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Zoom &amp;Out</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5954,12 +6203,12 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Go to where you right clicked the mouse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+11"/>
         <source>Go to &amp;Home location</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5969,7 +6218,7 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+5"/>
         <source>Follow UAV position</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5984,7 +6233,7 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+10"/>
         <source>&amp;Waypoint editor</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5994,27 +6243,28 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-43"/>
+        <location line="-41"/>
         <source>Center the map onto where you right clicked the mouse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-568"/>
+        <location line="-852"/>
         <source>HOME</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
+        <location line="+26"/>
         <source>UAV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+534"/>
+        <location line="+772"/>
         <source>Show/Hide the compass</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+17"/>
         <source>Show Home</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6034,7 +6284,7 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+33"/>
         <source>Ctrl+H</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6054,32 +6304,12 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>Set Home location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Set the current UAV location as the HOME location</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location line="+5"/>
         <source>Keep the map centered onto the UAV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
-        <source>Show UAV trail</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Show/Hide the UAV trail</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
+        <location line="+166"/>
         <source>Clear UAV trail</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6089,27 +6319,141 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-149"/>
         <source>Ctrl+W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location line="-960"/>
+        <source>&amp;Max Update Rate </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source> (Normal)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source> (Magic Waypoint)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source> (Unknown)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Map mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Safe Area Radius</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+38"/>
+        <source>UAV Trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>UAV trail type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>UAV trail time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>UAV trail distance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+56"/>
+        <source>&amp;Overlay Opacity </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+701"/>
+        <location line="+3"/>
+        <source>Close menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>&amp;Rip map</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Rip the map tiles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Show Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show/Hide the diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Show UAV Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show/Hide the UAV info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Set default zoom and location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Changes the map default zoom and location to the current values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Set the home location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Set the home location to where you clicked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+40"/>
         <location line="+5"/>
         <source>&amp;Add waypoint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="-4"/>
+        <location line="+5"/>
         <source>Ctrl+A</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="-4"/>
+        <location line="+5"/>
         <source>Add waypoint</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>&amp;Edit waypoint</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6164,24 +6508,73 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-366"/>
-        <source>OpenPilot GCS</source>
+        <location line="+14"/>
+        <source>Home magic waypoint</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>ScopeGadgetFactory</name>
     <message>
-        <location filename="../../../src/plugins/scope/scopegadgetfactory.cpp" line="+36"/>
-        <source>Scope Gadget</source>
+        <location line="+1"/>
+        <source>Move the magic waypoint to the home position</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>SystemHealthGadgetFactory</name>
     <message>
-        <location filename="../../../src/plugins/systemhealth/systemhealthgadgetfactory.cpp" line="+36"/>
-        <source>System Health Gadget</source>
+        <location line="+9"/>
+        <source>Normal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Magic Waypoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>Show Safe Area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show/Hide the Safe Area around the home location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>Show Trail dots</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show/Hide the Trail dots</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Show Trail lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Show/Hide the Trail lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+191"/>
+        <source>Set home altitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>In [m], referenced to WGS84:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+187"/>
+        <source>Are you sure you want to clear waypoints?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>All associated data will be lost.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6196,7 +6589,7 @@ Update</source>
 <context>
     <name>UAVObjectTreeModel</name>
     <message>
-        <location filename="../../../src/plugins/uavobjectbrowser/uavobjecttreemodel.cpp" line="+66"/>
+        <location filename="../../../src/plugins/uavobjectbrowser/uavobjecttreemodel.cpp" line="+70"/>
         <source>Property</source>
         <translation type="unfinished">Propiedad</translation>
     </message>
@@ -6216,17 +6609,17 @@ Update</source>
         <translation type="unfinished">Ajustes</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+3"/>
         <source>Data Objects</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+72"/>
         <source>Meta Data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+24"/>
         <source>Instance</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6234,63 +6627,53 @@ Update</source>
 <context>
     <name>UAVMetaObject</name>
     <message>
-        <location filename="../../../src/plugins/uavobjects/uavmetaobject.cpp" line="+51"/>
-        <source>False</source>
+        <location filename="../../../src/plugins/uavobjects/uavmetaobject.cpp" line="+42"/>
+        <source>FlightReadOnly</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
-        <source>True</source>
+        <source>GCSReadOnly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>FlightTelemetryAcked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>GCSTelemetryAcked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>FlightUpdatePeriodic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>FlightUpdateOnChange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>GCSUpdatePeriodic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>GCSUpdateOnChange</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
-        <source>Periodic</source>
+        <source>Modes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+0"/>
-        <source>On Change</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Manual</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Never</source>
-        <translation type="unfinished">Nunca</translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Read/Write</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Read Only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>Flight Access Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>GCS Access Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Flight Telemetry Acked</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Flight Telemetry Update Mode</source>
+        <source>boolean</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6299,23 +6682,15 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location line="+0"/>
         <location line="+1"/>
-        <source>GCS Telemetry Acked</source>
+        <location line="+1"/>
+        <source>ms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>GCS Telemetry Update Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
+        <location line="-1"/>
         <source>GCS Telemetry Update Period</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Logging Update Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6327,7 +6702,7 @@ Update</source>
 <context>
     <name>Telemetry</name>
     <message>
-        <location filename="../../../src/plugins/uavtalk/telemetry.cpp" line="+303"/>
+        <location filename="../../../src/plugins/uavtalk/telemetry.cpp" line="+333"/>
         <source>Telemetry: priority event queue is full, event lost (%1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6335,29 +6710,8 @@ Update</source>
 <context>
     <name>TelemetryMonitor</name>
     <message>
-        <location filename="../../../src/plugins/uavtalk/telemetrymonitor.cpp" line="+95"/>
+        <location filename="../../../src/plugins/uavtalk/telemetrymonitor.cpp" line="+107"/>
         <source>Starting to retrieve meta and settings objects from the autopilot (%1 objects)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>UploaderGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/uploader/uploadergadgetfactory.cpp" line="+36"/>
-        <source>Uploader Gadget</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>UploaderGadgetWidget</name>
-    <message>
-        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+134"/>
-        <source>QFileDialog::getOpenFileName()</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <source>All Files (*);;Text Files (*.bin)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6444,13 +6798,48 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.cpp" line="+85"/>
+        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.cpp" line="+86"/>
         <source>SVG image (*.svg)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Choose SVG image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/dial/dialgadgetoptionspage.ui"/>
+        <source>XML ID of the SVG source file used to display the dial background.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>XML ID of the SVG source file used to display the dial foreground (above everything else, needles included).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use OpenGL for rendering. Will lower CPU usage, depending on the capabilities of your graphics card, but might slightly alter the look &amp; feel of the dial.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use OpenGL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>When checked, the Dial plugin will make needle moves smoother by simulating inertia.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Smooth updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>XML ID of the SVG source file used to display the first needle/indicator.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6584,6 +6973,13 @@ Update</source>
         <source>GPS Data Stream</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Displays the SNR for each detected sat.
+Satellite number (PRN) is displayed inside the green bar.
+Sat SNR is displayed above (in dBHz)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>IPconnectionOptionsPage</name>
@@ -6615,6 +7011,11 @@ Update</source>
     <message>
         <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.h" line="+53"/>
         <source>settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/ipconnection/ipconnectionoptionspage.ui"/>
+        <source>IP Network Telemetry</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6677,13 +7078,108 @@ Update</source>
     </message>
     <message>
         <location/>
-        <source>Revert</source>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <source>Relative to Home </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bearing </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Distance </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Velocity </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Relative altitude </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>m/s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>param1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>param2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>param3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>param4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>End condition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Condition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Command</source>
+        <translation type="unfinished">Comando</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Jump Destination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Error Destination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Previous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6723,74 +7219,6 @@ Update</source>
     </message>
 </context>
 <context>
-    <name>opmap_waypointeditor_dialog</name>
-    <message>
-        <location filename="../../../src/plugins/opmap/opmap_waypointeditor_dialog.ui"/>
-        <source>OpenPilot GCS Waypoint Editor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Waypoints</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Num</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Locked</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Latitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Longitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Altitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Hold Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Height and Timeline</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/opmap/opmap_waypointeditor_dialog.cpp" line="+146"/>
-        <source>Waypoint 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Waypoint 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Waypoint 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>opmap_zoom_slider_widget</name>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_zoom_slider_widget.ui"/>
@@ -6821,13 +7249,18 @@ Update</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.cpp" line="+60"/>
+        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.cpp" line="+61"/>
         <source>SVG image (*.svg)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Choose SVG image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/pfd/pfdgadgetoptionspage.ui"/>
+        <source>Smooth updates</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6846,30 +7279,6 @@ Update</source>
     <message>
         <location line="+0"/>
         <source>Time:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DialGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/dial/dialgadgetfactory.cpp" line="+37"/>
-        <source>Analog Dial Gadget</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GpsDisplayGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/gpsdisplay/gpsdisplaygadgetfactory.cpp" line="+36"/>
-        <source>GPS Display Gadget</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>PFDGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/pfd/pfdgadgetfactory.cpp" line="+36"/>
-        <source>Primary Flight Display Gadget</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6897,175 +7306,11 @@ Update</source>
     </message>
 </context>
 <context>
-    <name>AHRSWidget</name>
-    <message>
-        <location filename="../../../src/plugins/config/ahrs.ui"/>
-        <source>Form</source>
-        <translation type="unfinished">Formulario</translation>
-    </message>
-    <message>
-        <location/>
-        <source>These are the sensor variance values computed by the AHRS.
-
-Tip: lower is better!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Telemetry link not established.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Press to start a calibration procedure, about 15 seconds.
-
-Hint: run this with engines at cruising speed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Start</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>AHRS Algorithm:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select the sensor integration algorithm here.
-&quot;Simple&quot; only uses accelerometer values
-&quot;INSGPS&quot; the full featured algorithm integrating all sensors</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Nice paper plane, eh?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Six Point Calibration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Launch a sensor range and bias calibration.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Six Point Calibration instructions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Saves the Home Location. This is only enabled
-if the Home Location is set, i.e. if the GPS fix is
-successful.
-
-Disabled if there is no GPS fix.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>buttonGroup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Refresh this screen with current values from the board.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Request</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sensor noise calibration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save settings (only enabled when calibration is running)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save Position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Check this box if you are flying indoors and have no GPS fix.
-Only makes sense with the &quot;INSGPS&quot; algorithm.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Indoor flight mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save settings to the OP board (RAM only).
-
-This does not save the calibration settings, this is done using the
-specific calibration button on top of the screen.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to RAM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Send settings to OP board, and save to the microSD card.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to SD</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Clears the HomeLocation: only makes sense if you save
-to SD. This will force the AHRS to use the next GPS fix as the
-new home location unless it is in indoor mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Clear</source>
-        <translation type="unfinished">Limpiar</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Home Location:</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>AircraftWidget</name>
     <message>
         <location filename="../../../src/plugins/config/airframe.ui"/>
         <source>Form</source>
         <translation type="unfinished">Formulario</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Aircraft type:</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -7109,37 +7354,12 @@ new home location unless it is in indoor mode.</source>
     </message>
     <message>
         <location/>
-        <source>Rudder</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Elevator 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Throttle Curve</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Frame type:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Idle Throttle</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Cyclic Rate</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tricopter Yaw Ch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7159,123 +7379,362 @@ new home location unless it is in indoor mode.</source>
     </message>
     <message>
         <location/>
-        <source>Motor 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Motor 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Motor 3</source>
+        <source>Mixer Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Motor 4</source>
+        <source>Vehicle type:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Motor 5</source>
+        <source>Output Channel Assignments</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Motor 6</source>
+        <source>Select output channel for the engine</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Motor 7</source>
+        <source>Select output channel for the first aileron (or elevon)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Motor 8</source>
+        <source>Select output channel for the second aileron (or elevon)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>CCPM Heli</source>
+        <source>Select output channel for the first elevator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>This is not implemented yet, sorry</source>
+        <source>Select output channel for a secondary elevator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Custom / Advanced setup UI</source>
+        <source>Rudder 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Retrieve settings from OpenPilot</source>
+        <source>Select output channel for the first rudder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Get Current</source>
+        <source>Rudder 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Send to OpenPilot but don&apos;t write in SD.</source>
+        <source>Select output channel for a secondary rudder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Save to RAM</source>
+        <source>Elevon Mix</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Applies and Saves all settings to SD</source>
+        <source>Rudder %</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Save to SD</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SettingsWidget</name>
-    <message>
-        <location filename="../../../src/plugins/config/settingswidget.ui"/>
-        <source>Form</source>
-        <translation type="unfinished">Formulario</translation>
-    </message>
-    <message>
-        <location/>
-        <source>RC Input</source>
+        <source>50</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum channel value&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>Pitch %</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>2000</source>
+        <source>Frame Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Current channel value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>Select the Multirotor frame type here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mix Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>100</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weight of Roll mixing in percent.
+Typical values are 100% for + configuration and 50% for X configuration on quads.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weight of Pitch mixing in percent.
+Typical values are 100% for + configuration and 50% for X configuration on quads.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weight of Yaw mixing in percent.
+Typical value is 50% for + or X configuration on quads.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor output channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Multirotor Motor Direction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tricopter Yaw Servo channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reverse all motors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output channel asignmets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for the first motor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for a second motor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Front Steering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for the first steering actuator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rear Steering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select output channel for a second steering actuator</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Differential Steering Mix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Left %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Right %</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Front throttle curve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rear throttle curve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ch 10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Feed Forward Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>When tuning: Slowly raise decel time from zero to just
+under the level where the motor starts to undershoot
+its target speed when decelerating.
+
+Do it after accel time is setup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>In miliseconds.
+When tuning: Slowly raise accel time from zero to just
+under the level where the motor starts to overshoot
+its target speed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7285,34 +7744,28 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>Retrieve settings from OpenPilot</source>
+        <source>Overall level of feed forward (in percentage).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Get Current</source>
+        <source>Limits how much the engines can accelerate or decelerate.
+In &apos;units per second&apos;, a sound default is 1000.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Be sure to set the Neutral position on all sliders before sending!
-Applies and Saves all settings to SD</source>
+        <source>MaxAccel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Save to SD</source>
+        <source>000</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Send to OpenPilot but don&apos;t write in SD.
-Be sure to set the Neutral position on all sliders before sending!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to RAM</source>
+        <source>FeedForward </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7320,82 +7773,14 @@ Be sure to set the Neutral position on all sliders before sending!</source>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Minimum channel value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Beware! Check &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:600;&quot;&gt;all three&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt; checkboxes to test Feed Forward.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;It will run only if your airframe armed.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Start calibrating the RC Inputs.
-Uncheck/Check to restart calibration.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Run Calibration</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Indicates whether OpenPilot is getting a signal from the RC receiver.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>RC Receiver Not Connected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select the receiver type here:
-- PWM is the most usual type
-- PPM is connected to input XXX 
-- Spektrum is used with Spektrum &apos;satellite&apos; receivers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>RC Receiver Type:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Servo Output</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Aircraft type: undefined</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 5</source>
+        <source>Enable FF tuning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7403,149 +7788,41 @@ Uncheck/Check to restart calibration.</source>
         <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Select the kind of actuator (servo) connected to this output channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:14pt; font-weight:600; color:#ff0000;&quot;&gt;SETTING UP FEED FORWARD REQUIRES CAUTION&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Beware: Feed Forward Tuning will launch all engines around mid-throttle, you have been warned!&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Remove your props initially, and for fine-tuning, make sure your airframe is safely held in place. Wear glasses and protect your face and body.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Minimum PWM value, beware of not overdriving your servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>Takes you to the wiki page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Maximum PWM value, beware of not overdriving your servo.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>Send to board, but don&apos;t save permanently (flash or SD).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Move the servos using the sliders. Two important things:
-- Take extra care if the output is connected to an motor controller!
-- Will only work if the RC receiver is working (failsafe)</source>
+        <source>Apply</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Test outputs</source>
+        <source>Applies and Saves all settings to flash or SD depending on board.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Channel 6</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Update rate:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 0-3</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Channel 4-7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Current value of slider.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0000</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;FreeSans&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Check to invert the channel.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Rev.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>TelemetryWidget</name>
-    <message>
-        <location filename="../../../src/plugins/config/telemetry.ui"/>
-        <source>Form</source>
-        <translation type="unfinished">Formulario</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Sans&apos;; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Set the serial speed of your telemetry modem here. It is the speed between the OpenPilot board and the modem, and could be different from the radio link speed.&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Beware of not locking yourself out! You should only modify this setting when the OpenPilot board is connected through the USB port.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Telemetry speed:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select the speed here.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Send to OpenPilot but don&apos;t write in SD.
-Beware of not locking yourself out!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to RAM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Retrieve settings from OpenPilot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Get Current</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Applies and Saves all settings to SD.
-Beware of not locking yourself out!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save to SD</source>
-        <translation type="unfinished"></translation>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
     </message>
 </context>
 <context>
@@ -7570,32 +7847,9 @@ Beware of not locking yourself out!</source>
         <source>Flight Mode:</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>FGOptionsPage</name>
-    <message>
-        <location filename="../../../src/plugins/hitlnew/fgoptionspage.ui"/>
-        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+102"/>
-        <source>Form</source>
-        <translation type="unfinished">Formulario</translation>
-    </message>
     <message>
         <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+1"/>
-        <source>FlightGear executable:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+1"/>
-        <source>FlightGear data directory:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <location filename="../../../src/plugins/hitlnew/ui_fgoptionspage.h" line="+2"/>
-        <location line="+2"/>
-        <source>Manual aircraft control (can be used when hardware is not available)</source>
+        <source>UDP Control</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7607,31 +7861,8 @@ Beware of not locking yourself out!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../src/plugins/importexport/importexportdialog.cpp" line="+10"/>
+        <location filename="../../../src/plugins/importexport/importexportdialog.cpp" line="+9"/>
         <source>Import Export Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImportExportGadgetOptionsPage</name>
-    <message>
-        <location filename="../../../src/plugins/importexport/importexportgadgetoptionspage.ui"/>
-        <source>Form</source>
-        <translation type="unfinished">Formulario</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Default Config File </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/importexport/importexportgadgetoptionspage.cpp" line="+55"/>
-        <source>INI file (*.ini)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Choose configuration file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7641,21 +7872,6 @@ Beware of not locking yourself out!</source>
         <location filename="../../../src/plugins/importexport/importexportgadgetwidget.ui"/>
         <source>Form</source>
         <translation type="unfinished">Formulario</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This is experimental. Use at own risk.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Please report bugs!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Config File</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -7673,22 +7889,18 @@ Beware of not locking yourself out!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
-        <source>Export</source>
+        <location filename="../../../src/plugins/importexport/importexportgadgetwidget.cpp" line="+75"/>
+        <location line="+77"/>
+        <source>GCS Settings file (*.xml)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
-        <source>Import</source>
+        <location line="-76"/>
+        <source>Save GCS Settings too file ..</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location/>
-        <source>Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../src/plugins/importexport/importexportgadgetwidget.cpp" line="+81"/>
+        <location line="+16"/>
         <source>Can&apos;t write file </source>
         <translation type="unfinished"></translation>
     </message>
@@ -7698,7 +7910,12 @@ Beware of not locking yourself out!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+54"/>
+        <source>Load GCS Settings from file ..</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
         <source>Can&apos;t read file </source>
         <translation type="unfinished"></translation>
     </message>
@@ -7710,6 +7927,51 @@ Beware of not locking yourself out!</source>
     <message>
         <location line="+1"/>
         <source>. Restart the application.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+37"/>
+        <source>All your settings will be deleted!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>You must restart the GCS in order to activate the changes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/importexport/importexportgadgetwidget.ui"/>
+        <source>Plugins</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Export the GCS settings selected in the checkboxes above.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Export...</source>
+        <translation type="unfinished">Exportar...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Import settings from the config file, only for the items checked above.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Import...</source>
+        <translation type="unfinished">Importar...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Resets your GCS configuration to its default configuration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset Config</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7740,11 +8002,16 @@ Beware of not locking yourself out!</source>
         <source>Idle</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Playback speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Core::UAVConfigInfo</name>
     <message>
-        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+77"/>
+        <location filename="../../../src/plugins/coreplugin/uavconfiginfo.cpp" line="+180"/>
         <source>Do you want to continue the import?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7764,24 +8031,8 @@ Beware of not locking yourself out!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+13"/>
         <source>Unknown compatibility level: </source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GCSControlGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/gcscontrol/gcscontrolgadgetfactory.cpp" line="+34"/>
-        <source>UAV Control</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ImportExportGadgetFactory</name>
-    <message>
-        <location filename="../../../src/plugins/importexport/importexportgadgetfactory.cpp" line="+38"/>
-        <source>Import/Export GCS Config</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7790,6 +8041,6025 @@ Beware of not locking yourself out!</source>
     <message>
         <location filename="../../../src/plugins/logging/logginggadgetfactory.cpp" line="+34"/>
         <source>Logging</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AntennaTrackGadgetOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/antennatrack/antennatrackgadgetoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Serial Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Data Bits:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stop Bits:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Parity:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Timeout(ms):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port Speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flow Control:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AntennaTrackWidget</name>
+    <message>
+        <location filename="../../../src/plugins/antennatrack/antennatrackwidget.ui"/>
+        <source>Coord:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HomeCoord:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Azimuth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Elevation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output</source>
+        <translation type="unfinished">Salida</translation>
+    </message>
+</context>
+<context>
+    <name>AutotuneWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/autotune.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pre-Autotune</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:20pt; font-weight:600; color:#ff0000;&quot;&gt;WARNING:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;This is an experimental plugin for the GCS that is going to make your aircraft shake, etc, so test with lots of space and be &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:600;&quot;&gt;very very wary&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt; for it creating bad tuning values.  Basically there is no reason to think this will work at all.&lt;br /&gt;&lt;br /&gt;To use autotuning, here are the steps:&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;On the &lt;span style=&quot; font-style:italic;&quot;&gt;Input configuration&lt;/span&gt; tab, &lt;span style=&quot; font-style:italic;&quot;&gt;Flight Mode Switch Settings&lt;/span&gt;, set one of your flight modes to &amp;quot;Autotune&amp;quot;.&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Take off, change flight mode to autotune, keep it in the air while it&apos;s shaking.&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Land and disarm.  (note - you &lt;span style=&quot; font-weight:600;&quot;&gt;MUST&lt;/span&gt; stay in autotune mode through this point, leaving autotune before disarming aborts the process)&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;We&apos;d recommend checking your stabilization settings before trying them out (ie: compare to what you currently use, if they are VASTLY different, probably a good indication bad things will happen).&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Test fly the new settings.&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you&apos;re ready to proceed, click the &lt;span style=&quot; font-style:italic;&quot;&gt;Enable Autotune Module&lt;/span&gt; checkbox above this text, click &lt;span style=&quot; font-style:italic;&quot;&gt;save&lt;/span&gt; and go to the next tab.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Module Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enable Autotune Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Autotune Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tuning Aggressiveness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rate Tuning:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Attitude Tuning:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>objname:RelayTuningSettings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:RateGain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>scale:0.01</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>haslimits:no</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:AttitudeGain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Measured Properties</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>objname:RelayTuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:Period</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>element:Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:Gain</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Period (ms)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Gain (deg/s) / output</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>element:Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Computed Values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>RateKi</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>AttitudeKp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>RateKp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>AttitudeKi</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply Computed Values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Step Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:Amplitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The Apply and Save buttons below save the autotuning settings which
+will alter settings for the next autotuning flight</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reloads the saved settings into GCS.
+Useful if you have accidentally changed some settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reload Board Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:reload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board but do not save to the non-volatile memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board and save to the non-volatile memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:save</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CameraStabilizationWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/camerastabilization.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Camera Stabilization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Module Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enable CameraStabilization module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>After enabling the module, you must power cycle before using and configuring.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Basic Settings (Stabilization)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Camera yaw angle for 100% output value, deg.
+
+This value should be tuned for particular gimbal and servo. You also
+have to define channel output range using Output configuration tab.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>objname:CameraStabSettings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:OutputRange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>element:Yaw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>haslimits:no</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>scale:1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Camera pitch angle for 100% output value, deg.
+
+This value should be tuned for particular gimbal and servo. You also
+have to define channel output range using Output configuration tab.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>element:Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Camera roll angle for 100% output value, deg.
+
+This value should be tuned for particular gimbal and servo. You also
+have to define channel output range using Output configuration tab.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>element:Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw output channel for camera gimbal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch output channel for camera gimbal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll output channel for camera gimbal</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output Range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Advanced Settings (Control)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input channel to control camera yaw
+
+Don&apos;t forget to map this channel using Input configuration tab.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input channel to control camera pitch
+
+Don&apos;t forget to map this channel using Input configuration tab.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input channel to control camera roll
+
+Don&apos;t forget to map this channel using Input configuration tab.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Axis stabilization mode
+
+Attitude: camera tracks level for the axis. Input controls the deflection.
+AxisLock: camera remembers tracking attitude. Input controls the rate of deflection.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:StabilizationMode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Attitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum camera yaw deflection for 100% input in Attitude mode, deg.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:InputRange</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum camera yaw rate for 100% input in AxisLock mode, deg/s.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:InputRate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input low-pass filter response time for yaw axis, ms.
+
+This option smoothes the stick input. Zero value disables LPF.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:ResponseTime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum camera pitch deflection for 100% input in Attitude mode, deg.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum camera pitch rate for 100% input in AxisLock mode, deg/s.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input low-pass filter response time for pitch axis, ms.
+
+This option smoothes the stick input. Zero value disables LPF.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum camera roll deflection for 100% input in Attitude mode, deg.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum camera roll rate for 100% input in AxisLock mode, deg/s.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input low-pass filter response time for roll axis, ms.
+
+This option smoothes the stick input. Zero value disables LPF.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>MaxAxisLockRate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Response Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Input Range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stabilization Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>(the same value for Roll, Pitch, Yaw)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stick input deadband for all axes in AxisLock mode, deg/s.
+
+When stick input is within the MaxAxisLockRate range, camera tracks
+current attitude. Otherwise it starts moving according to input with
+rate depending on input value.
+
+If you have drift in your Tx controls, you may want to increase this
+value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:MaxAxisLockRate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ctrl+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>url:http://wiki.openpilot.org/display/Doc/Camera+Stabilization+Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Load default CameraStabilization settings except output channels into GCS.
+
+Loaded settings are not applied automatically. You have to click the
+Apply or Save button afterwards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset To Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reloads saved CameraStabilization settings  except output channels
+from board into GCS. Useful if you have accidentally changed some
+settings.
+
+Loaded settings are not applied automatically. You have to click the
+Apply or Save button afterwards.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reload Board Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:reload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board but do not save to the non-volatile memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board and save to the non-volatile memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:save</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CC_HW_Widget</name>
+    <message>
+        <location filename="../../../src/plugins/config/cc_hw_settings.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HW settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Changes on this page only take effect after board reset or power cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Telemetry speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>GPS speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ComUsbBridge speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select the speed here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>USB HID Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>MainPort</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>FlexiPort</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>USB VCP Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>RcvrPort</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Takes you to the wiki page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send to OpenPilot but don&apos;t write in SD.
+Beware of not locking yourself out!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applies and Saves all settings to SD.
+Beware of not locking yourself out!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+</context>
+<context>
+    <name>ccattitude</name>
+    <message>
+        <location filename="../../../src/plugins/config/ccattitude.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Attitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rotate virtual attitude relative to board</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Place aircraft very flat, and then click level to compute the accelerometer and gyro bias</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Launch horizontal calibration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>If enabled, a fast recalibration of gyro zero point will be done
+whenever the frame is armed. Do not move the airframe while
+arming it in that case!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Zero gyros while arming aircraft</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>AccelTau</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Accelerometer filtering.
+
+Sets the amount of lowpass filtering of accelerometer data 
+for the attitude estimation. Higher values apply a stronger 
+filter, which may help with drifting in attitude mode.
+
+Range: 0.00 - 0.20, Good starting value: 0.05 - 0.10
+Start low and raise until drift stops.
+
+A setting of 0.00 disables the filter.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Takes you to the wiki page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Click to permanently save the accel bias in the CopterControl Flash.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+</context>
+<context>
+    <name>ccpmWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/ccpm.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate config:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select aircraft type here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Basic settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tail Rotor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate Outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Servo W</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Servo X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Front</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>1st Servo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Servo Z</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Servo Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate Servo Angles</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Angle W</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Angle X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Angle Y</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Angle Z</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Correction Angle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>CCPM Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Collective Pass through</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Link Roll/Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Link Cyclic/Collective</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>REVO</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>100%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>CCPM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Collective</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cyclic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate Levelling</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Commands</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Finish</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Neutral</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Verify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Swashplate Adjustment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Advanced settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Curve 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>defaultattitude</name>
+    <message>
+        <location filename="../../../src/plugins/config/defaultattitude.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Attitude / INS calibration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This panel will be updated to provide the relevant controls to let you calibrate your OpenPilot INS or your CopterControl unit, depending on the board which is detected once telemetry is connected and running.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>defaulthwsettings</name>
+    <message>
+        <location filename="../../../src/plugins/config/defaulthwsettings.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Hardware Configuration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This panel will be updated to provide the relevant controls to let you configure your hardware once telemetry is connected and running.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>InputWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/input.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>RC Input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll/Pitch/Yaw stick deadband</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stick deadband in percents of full range (0-10), zero to disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calibration and Configuration Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start Configuration Wizard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Manual Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flight Mode Switch Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Configure each stabilization mode for each axis</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stabilized1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stabilized2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stabilized3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>FlightMode Switch Positions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pos. 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pos. 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pos. 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pos. 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pos. 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pos. 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>This slider moves when you move the flight mode switch
+on your remote. It shows currently active flight mode.
+
+Setup the flight mode channel on the RC Input tab if you have not done so already.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select the stabilization mode on this position (manual/stabilized/auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Number of flight modes:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Number of positions your FlightMode switch has.
+
+Default is 3.
+
+It will be 2 or 3 for most of setups, but it also can be up to 6.
+In that case you have to configure your radio mixers so the whole range
+from min to max is split into N equal intervals, and you may set arbitrary
+channel value for each flight mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Avoid &quot;Manual&quot; for multirotors!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Arming Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Arm airframe using throttle off and:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Indicate the control used for arming the airframe, in addition to setting the throttle to its minimum position. In other terms &quot;Throttle Off&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Arming timeout:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>After the time indicated here, the frame go back to disarmed state.
+Set to 0 to disable (recommended for soaring fixed wings).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds (0 to disable).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Airframe disarm is done by throttle off and opposite of above combination.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Takes you to the wiki page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send to OpenPilot but don&apos;t write in SD.
+Be sure to set the Neutral position on all sliders before sending!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Be sure to set the Neutral position on all sliders before sending!
+Applies and Saves all settings to SD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+</context>
+<context>
+    <name>inputChannelForm</name>
+    <message>
+        <location filename="../../../src/plugins/config/inputchannelform.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Function</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Neutral</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rev</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/config/inputchannelform.cpp" line="+130"/>
+        <source>Chan %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MixerCurve</name>
+    <message>
+        <location filename="../../../src/plugins/config/mixercurve.ui"/>
+        <source>MixerCurve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Throttle Curve</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Value</source>
+        <translation type="unfinished">Valor</translation>
+    </message>
+    <message>
+        <location/>
+        <source>1.0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>.75</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>.50</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>.25</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>.00</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Linear</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Step</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Generate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset</source>
+        <translation type="unfinished">Restablecer</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Advanced...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>OutputWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/output.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output</source>
+        <translation type="unfinished">Salida</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output Update Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Update rate:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Setup &quot;TurboPWM&quot; here: usual value is 400 Hz for multirotor airframes.
+Leave at 50Hz for fixed wing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>50</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>60</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>125</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>165</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>270</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>330</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>400</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motors spin at neutral output when armed and throttle below zero (be careful)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Move the servos using the sliders. Two important things:
+- Take extra care if the output is connected to an motor controller!
+- Will only work if the RC receiver is working (failsafe)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Test outputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Takes you to the wiki page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send to OpenPilot but don&apos;t write in SD.
+Be sure to set the Neutral position on all sliders before sending!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Be sure to set the Neutral position on all sliders before sending!
+Applies and Saves all settings to SD</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+</context>
+<context>
+    <name>outputChannelForm</name>
+    <message>
+        <location filename="../../../src/plugins/config/outputchannelform.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Current value of slider.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>0000</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Link</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>#</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channel Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Minimum PWM value, beware of not overdriving your servo.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Check to invert the channel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Neutral (slowest for motor)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Assignment</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rev</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum PWM value, beware of not overdriving your servo.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PipXtremeWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/pipxtreme.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>url:http://wiki.openpilot.org/x/dACrAQ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board but do not save to the non-volatile memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board and save to the non-volatile memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pairing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Broadcast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Broadcast Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>12345678</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>%v dBm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>-100dB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Firmware Ver.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Serial Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The modems serial number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Device ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pair ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>90ABCDEF</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The modems minimum allowed frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The modems maximum allowed frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Freq. Step Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The modems minimum frequency step size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Freq. Band</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The current frequency band</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>RSSI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rx AFC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>TX Rate (B/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>RX Rate (B/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Link State</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The modems current state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Retries</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UAVTalk Errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Resets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Dropped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Telemetry Port Config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set the telemetry port configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Telemetry Port Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set the telemetry port speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flexi Port Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set the flexi port configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flexi Port Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set the flexi port speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>VCP Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set the virtual serial port configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>VCP Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set the virtual serial port speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max RF Datarate (bits/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set the maximum RF datarate/channel bandwidth the modem will use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max RF Tx Power(mW)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set the maximum TX output power the modem will use</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send Timeout (ms)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calibrate the modems RF carrier frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min Packet Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frequency Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frequency (Hz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set the modems RF carrier frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>AES Encryption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The AES encryption key - has to be the same key on the remote modem.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Radomise the AES encryption key</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source> Rand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enable/Disable AES encryption</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Scan whole band to see where their is interference and/or used channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>    Scan Spectrum    </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PRO_HW_Widget</name>
+    <message>
+        <location filename="../../../src/plugins/config/pro_hw_settings.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Set the serial speed of your onboard telemetry modem here. It is the speed between the OpenPilot board and the onboard modem, and could be different from the radio link speed.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Sans&apos;; font-size:10pt;&quot;&gt;Beware of not locking yourself out! You should only modify this setting when the OpenPilot board is connected through the USB port.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Telemetry speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select the speed here.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send to OpenPilot but don&apos;t write in SD.
+Beware of not locking yourself out!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applies and Saves all settings to SD.
+Beware of not locking yourself out!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+</context>
+<context>
+    <name>RevoSensorsWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/revosensors.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>#1: Multi-Point Calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Nice paper plane, eh?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Launch a sensor range and bias calibration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save settings (only enabled when calibration is running)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>#2: Sensor noise calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>These are the sensor variance values computed by the AHRS.
+
+Tip: lower is better!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Press to start a calibration procedure, about 15 seconds.
+
+Hint: run this with engines at cruising speed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>#3: Accelerometer Bias calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>#4 Gyro temperature drift calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Temp:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Currently measured temperature on the system. This is actually the
+MB temperature, be careful if somehow you know that your INS
+temperature is very different from your MB temp...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Current drift:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Saved drift:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start gathering data for temperature drift calibration.
+Avoid sudden moves once you have started gathering!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Launch drift measurement based on gathered data.
+
+TODO: is this necessary? Measurement could be auto updated every second or so, or done when we stop measuring...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Measure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Updates the XYZ drift values into the AHRS (saves to SD)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Six Point Calibration instructions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Help&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Step #1 and #2 are really necessary. Steps #3 and #4 will help you achieve the best possible results.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;#1: Multi-Point calibration:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This calibration will compute the scale for all sensors on the INS. Press &amp;quot;Start&amp;quot; to begin calibration, and follow the instructions which will be displayed here.  Note that your HomeLocation must be set first, including the local magnetic field vector (Be) and acceleration due to gravity (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;#2: Sensor noise calibration:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This calibration will compute sensor variance under standard conditions. You can leave your engines running at low to mid throttle to take their vibration into account before pressing &amp;quot;Start&amp;quot;.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;#3: Accelerometer bias calibration:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This step will ensure that accelerometer bias is accurate. Place your airframe as horizontally as possible (use a spirit level if necessary), then press Start below and do not move your airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;#4 Gyro temp drift calibration:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Settings</source>
+        <translation type="unfinished">Ajustes</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Attitude Algorithm:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select the sensor integration algorithm here.
+&quot;Simple&quot; only uses accelerometer values
+&quot;INSGPS&quot; the full featured algorithm integrating all sensors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Home Location:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Saves the Home Location. This is only enabled
+if the Home Location is set, i.e. if the GPS fix is
+successful.
+
+Disabled if there is no GPS fix.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttonGroup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clears the HomeLocation: only makes sense if you save
+to SD. This will force the INS to use the next GPS fix as the
+new home location unless it is in indoor mode.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clear</source>
+        <translation type="unfinished">Limpiar</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Telemetry link not established.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ctrl+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save settings to the board (RAM only).
+
+This does not save the calibration settings, this is done using the
+specific calibration button on top of the screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board, and save to the non-volatile memory.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StabilizationWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/stabilization.ui"/>
+        <source>Stabilization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rate Stabilization (Inner Loop)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Link Roll and Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset all values to GCS defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Yaw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Proportional</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Slowly raise Proportional until you start seeing clear oscillations when you fly.
+Then lower the value by 5 or so.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>objname:StabilizationSettings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:RollRatePID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>element:Kp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>haslimits:yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>scale:0.0001</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:1,10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:PitchRatePID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:YawRatePID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Integral</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>As a rule of thumb, you can set the Integral at roughly the same
+value as the Kp.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>element:Ki</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Attitude Stabilization (Outer Loop)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:RollPI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>scale:0.1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:2,10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:PitchPI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:YawPI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>When the throttle is low, zero the intergral term to prevent intergral wind-up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Zero the integral when throttle is low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:LowThrottleZeroIntegral</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Advanced</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rate Stabization Coefficients (Inner Loop)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>element:Kd</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>haslimits:no</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>scale:1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:4,20</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>As a rule of thumb, you can set the Ki at roughly the same
+value as the Kp.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Slowly raise Kp until you start seeing clear oscillations when you fly.
+Then lower the value by 20% or so.
+
+You can usually go for higher values for Yaw factors.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Slowly raise Kp until you start seeing clear oscillations when you fly.
+Then lower the value by 20% or so.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Derivative</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Attitude Stabization Coefficients (Outer Loop)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:5,20</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stick Range and Limits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:PitchMax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:6,20</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max rate attitude (deg/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:MaximumRate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>element:Roll</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:ManualRate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>element:Yaw</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:YawMax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>element:Pitch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Full stick angle (deg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:RollMax</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Full stick rate (deg/s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Expert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weak Leveling / Axis Lock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weak Leveling Kp </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Weak Leveling Rate </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max Axis Lock </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max Axis Lock Rate </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:WeakLevelingKp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:MaxWeakLevelingRate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:MaxAxisLock</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:MaxAxisLockRate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Integral Limits</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:13</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>element:ILimit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ILimit Attitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ILimit Rate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sensor Tuning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The proportional term for the accelerometer, the higher this term the more weight the  accel is given</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>objname:AttitudeSettings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:AccelKp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>buttongroup:8,10</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>GyroTau</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>AccelKp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>GyroTau is a gyro filter, the higher the factor the more filtering is applied to the gyros</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:GyroTau</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>AccelKi</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The intergral term for the accelerometer within the filter </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>fieldname:AccelKi</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Real Time Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>If you check this, the GCS will udpate the stabilization factors
+automatically every 300ms, which will help for fast tuning.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Update in real time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Takes you to the wiki page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>url:http://wiki.openpilot.org/x/DAO9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reloads the saved settings into GCS.
+Useful if you have accidentally changed some settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reload Board Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:reload</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board but do not save to the non-volatile memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board and save to the non-volatile memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:save</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>TxPIDWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/txpid.ui"/>
+        <source>TxPID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tx PID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Module Control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>This module will periodically update values of stabilization PID settings
+depending on configured input control channels. New values of stabilization
+settings are not saved to flash, but updated in RAM. It is expected that the
+module will be enabled only for tuning. When desired values are found, they
+can be read via GCS and saved permanently. Then this module should be
+disabled again.
+
+Up to 3 separate PID options (or option pairs) can be selected and updated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enable TxPID module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>After enabling the module, you must power cycle before using and configuring.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>PID option</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Control Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Min</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Max</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Instance 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select PID option or option pair to update.
+Set to Disabled if not used.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select input used as a control source for this instance.
+It can be one of Accessory channels or Throttle channel.
+
+If Accessory channel is chosen then its range [0..1] will be mapped
+to PID range [Min..Max] defined for this instance.
+
+If Throttle channel is chosen then Throttle range [Min..Max] will
+be mapped to PID range [Min..Max] defined for this instance. If
+Throttle is out of bounds then PID Min and Max values will be used
+accordingly.
+
+Note that it is possible to set PID Min &gt; Max. In that case increasing
+control input value will decrease the PID option value. This can be
+used, for instance, to decrease PID value when increasing Throttle.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Minimum PID value mapped to Accessory channel = 0 or
+Throttle channel lesser or equal to Throttle Min value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum PID value mapped to Accessory channel = 1 or
+Throttle channel greater or equal to Throttle Max value.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Instance 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Instance 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Update Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>PID values update mode which can be set to:
+- Never: this disables PID updates (but module still will be run if enabled),
+- When Armed: PID updated only when system is armed,
+- Always: PID updated always regardless of arm state.
+
+Since the GCS updates GUI PID values in real time on change, could be
+tricky to change other PID values from the GUI if the module is enabled
+and constantly updates stabilization settings object. As a workaround,
+this option can be used to temporarily disable updates or enable them
+only when system is armed without disabling the module.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Throttle Range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Throttle channel lower bound mapped to PID Min value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Throttle channel upper bound mapped to PID Max value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button:help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>url:http://wiki.openpilot.org/x/DACiAQ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board but do not save to the non-volatile memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send settings to the board and save to the non-volatile memory</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+</context>
+<context>
+    <name>VernierWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/vernier.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+</context>
+<context>
+    <name>importSettings</name>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/dialogs/importsettings.ui"/>
+        <source>OpenPilotGCS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>No configuration file could be found.
+Please choose from one of the default configurations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Load</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Form</name>
+    <message>
+        <location filename="../../../src/plugins/debuggadget/debug.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GCSControlGadgetOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/gcscontrol/gcscontrolgadgetoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Control Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>External input Device:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Only joystick is implemented at this stage, so this control is disabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Joystick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Available controllers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Joystick Axes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rev</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Move your joystick controls to identify channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Joystick Buttons</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Press buttons on controller to identify mappings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button 2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button 8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button 7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button 6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button 5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button 4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>button 3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>by</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audio: soundcard-based PPM decoding for trainer port. Not implemented yet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UDP Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UDP Port Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Host:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>127.0.0.1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>2323</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Widget</name>
+    <message>
+        <location filename="../../../src/plugins/hitlv2/aerosimrc/src/udptestwidget.ui"/>
+        <source>send data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flight mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Armed state</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disarmed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Arming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Armed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MagicWaypoint</name>
+    <message>
+        <location filename="../../../src/plugins/magicwaypoint/magicwaypoint.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Scale:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>homeEditor</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/homeeditor.ui"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Latitude:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Longitude:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Altitude:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>pathPlannerUI</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/pathplanner.ui"/>
+        <source>PathPlanner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add Leg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Delete Leg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Insert Leg</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Read from file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Send to UAV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Fetch from UAV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Open Details</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PfdQmlGadgetOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/pfdqml/pfdqmlgadgetoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>QML file: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use OpenGL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show Terrain:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>OsgEarth file:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use actual location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use pre-defined location:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Latitude:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Longitude:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Altitude:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use only cache data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pre seed terrain cache</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/pfdqml/pfdqmlgadgetoptionspage.cpp" line="+46"/>
+        <source>QML file (*.qml)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Choose QML file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>OsgEarth (*.earth)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Choose OsgEarth terrain file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QmlViewGadgetOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/qmlview/qmlviewgadgetoptionspage.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use OpenGL for rendering</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>QML file: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/qmlview/qmlviewgadgetoptionspage.cpp" line="+61"/>
+        <source>QML file (*.qml)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Choose QML file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SerialPluginOptionsPage</name>
+    <message>
+        <location filename="../../../src/plugins/serialconnection/serialpluginoptions.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Serial Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Serial telemetry speed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/serialconnection/serialpluginoptionspage.h" line="+57"/>
+        <source>settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConnectionDiagram</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/connectiondiagram.ui"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Close</source>
+        <translation type="unfinished">Cerrar</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/connectiondiagram.cpp" line="+38"/>
+        <source>Connection Diagram</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+151"/>
+        <source>Save File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Images (*.png *.xpm *.jpg)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AutoUpdatePage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Firmware Update Wizard&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;It is necessary that your firmware and ground control software are the same version.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;To update your firmware to the correct version now:&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Unplug all batteries and USB from OpenPilot&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Ensure your board is powered down &amp;amp; no LED&apos;s are active.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;When you are ready you can start the upgrade below by pushing the button and follow the onscreen prompts, it is critical that nothing disturbs the board while the firmware is being written.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Upgrade now</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Upgrade</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ready...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ControllerPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/controllerpage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot board identification&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To continue, the wizard needs to determine the configuration required for the type of OpenPilot controller you have. When connected, the wizard will attempt to automatically detect the type of board.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;If the board is already connected and successfully detected, the board type will already be displayed. You can &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Disconnect&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; and select another device if you need to detect another board.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;If your board is not connected, please connect the board to a USB port on your computer and select the device from the list below.  Then press &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;Connect&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Connection device:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Detected board type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/setupwizard/pages/controllerpage.cpp" line="+194"/>
+        <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/controllerpage.cpp" line="-73"/>
+        <source>&lt;Unknown&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OpenPilot CopterControl</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OpenPilot CopterControl 3D</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OpenPilot Revolution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>OpenPilot OPLink Radio Modem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+52"/>
+        <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EndPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/endpage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Congratulations!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Setup wizard is completed.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This part of the setup procedure is now complete and you are one step away from completing the setup of your OpenPilot controller.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To complete the setup please click the Radio Setup Wizard button below to close this wizard and go directly to the Radio Setup Wizard.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Go to Input Wizard...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/endpage.cpp" line="+60"/>
+        <source>Unable to open Input Wizard since the Config Plugin is not
+loaded in the current workspace.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FixedWingPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/fixedwingpage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;The Fixed Wing section of the OpenPilot Setup Wizard is not yet implemented&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>HeliPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/helipage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;The Helicopter section of the OpenPilot Setup Wizard is not yet implemented&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>InputPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/inputpage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot basic input signal configuration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The OpenPilot controller supports many different types of input signals. Please select the type of input that matches your receiver configuration. If you are unsure, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Some input options require the OpenPilot controller to be rebooted before the changes can take place. If an option that requires a reboot is selected, you will be instructed to do so on the next page of this wizard.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>PWM - One cable per channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>PWM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>PPM - One cable for all channels</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>PPM</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Futaba S-BUS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Futaba</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Spektrum Satellite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Spektrum</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LevellingPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/levellingpage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot controller leveling calibration procedure&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;The wizard needs to get information from the controller to determine in which position the vehicle is normally considered to be level. To be able to successfully perform these measurements, you need to place the vehicle on a surface that is as flat and level as possible. Examples of such surfaces could be a table top or the floor. Be careful to ensure that the vehicle really is level, since this step will affect the accelerometer and gyro bias in the controller software.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To perform the leveling, please push the Calculate button and wait for the process to finish. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate gyro and accelerometer bias</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/levellingpage.cpp" line="+75"/>
+        <source>An OpenPilot controller must be connected to your computer to perform bias calculations.
+Please connect your OpenPilot controller to your computer and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Retrieving data...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+50"/>
+        <source>&lt;font color=&apos;green&apos;&gt;Done!&lt;/font&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MultiPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/multipage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot multirotor configuration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This part of the wizard will set up the OpenPilot controller for use with a flying platform utilizing multiple rotors. The wizard supports the most common types of multirotors. Other variants of multirotors can be configured by using custom configuration options in the Configuration plugin in the GCS.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Please select the type of multirotor you want to create a configuration for below:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Multirotor type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/multipage.cpp" line="+84"/>
+        <source>Tricopter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The Tricopter uses three motors and one servo. The servo is used to give yaw authority to the rear motor. The front motors are rotating in opposite directions. The Tricopter is known for its sweeping yaw movement and it is very well suited for FPV since the front rotors are spread wide apart.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Quadcopter X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The X Quadcopter uses four motors and is the most common multi rotor configuration. Two of the motors rotate clockwise and two counter clockwise. The motors positioned diagonal to each other rotate in the same direction. This setup is perfect for sport flying and is also commonly used for FPV platforms.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Quadcopter +</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>The Plus(+) Quadcopter uses four motors and is similar to the X Quadcopter but the forward direction is offset by 45 degrees. The motors front and rear rotate in clockwise and the motors right and left rotate counter-clockwise. This setup was one of the first to be used and is still used for sport flying. This configuration is not that well suited for FPV since the fore rotor tend to be in the way of the camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <location line="+1"/>
+        <source>Hexacopter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location line="+1"/>
+        <source>Hexacopter Coax (Y6)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Hexacopter X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Hexacopter H</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NotYetImplementedPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/notyetimplementedpage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;This section of the OpenPilot Setup Wizard is not yet implemented&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>OutputCalibrationPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Output calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;It is now time to calibrate the output levels for the signals controlling your vehicle. &lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;VERY IMPORTANT!&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;REMOVE ALL PROPELLERS FROM THE VEHICLE BEFORE PROCEEDING!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Connect all components according to the illustration on the summary page, and provide power using an external power supply such as a battery before continuing.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Depending on what vehicle you have selected, both the motors controlled by ESCs and/or servos controlled directly by the OpenPilot controller may have to be calibrated. The following steps will guide you safely through this process. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Plase pay attention to the details and in particular the motors position and its rotation direction.&lt;/p&gt;&lt;p&gt;To find the neutral rate for this engine, press the Start button below and slide the slider to the right until the engine just starts to spin stably. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="+269"/>
+        <location line="+74"/>
+        <location line="+27"/>
+        <location line="+18"/>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This step calibrates the center position of the servo. To set the center position for this servo, press the Start button below and slide the slider to center the servo. &lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To save the servo and other hardware from damage we have to set the max and min angles for the servo. &lt;/p&gt;&lt;p&gt;To set the minimum angle for the servo, press the Start button below and select the top slider and slide it to the left until min angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To set the maximum angle for the servo, press the Start button below and select the top slider and slide it to the right until max angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-119"/>
+        <location line="+74"/>
+        <location line="+27"/>
+        <location line="+18"/>
+        <source>Stop</source>
+        <translation type="unfinished">Detener</translation>
+    </message>
+    <message>
+        <location line="-84"/>
+        <source>The actuator module is in an error state.
+
+Please make sure the correct firmware version is used then restart the wizard and try again. If the problem persists please consult the openpilot.org support forum.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>OutputPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/outputpage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot basic output signal configuration&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To set an optimal configuration of the output signals powering your motors, the wizard needs to know what type of Electronic Speed Controllers (ESCs) you will use and what their capabilities are.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Please select one of the options below. If you are unsure about the capabilities of your ESCs, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To read more regarding ESC refresh rates, please see &lt;/span&gt;&lt;a href=&quot;http://wiki.openpilot.org/x/HIEu&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;this article&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; in the OpenPilot Wiki&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Standard ESC 50Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Standard ESC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Turbo PWM ESC 400Hz</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Turbo PWM</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>RebootPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/rebootpage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt; color:#ff0000;&quot;&gt;PLEASE REBOOT YOUR CONTROLLER&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt; color:#ffd500;&quot;&gt;PLEASE REBOOT YOUR CONTROLLER&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; color:#000000;&quot;&gt;The configuration created by the wizard contains settings that require a reboot of your controller. Please power cycle the controller before continuing. To power cycle the controller remove all batteries and the USB cable for at least 30 seconds.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; color:#000000;&quot;&gt;After 30 seconds, plug in the board again and wait for it to connect, this can take a few seconds. Then press next.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SavePage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/savepage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot configuration ready to save&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The wizard is now ready to save the configuration directly to your OpenPilot controller. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;If any of the selections made in this wizard require a reboot of the controller, then power cycling the OpenPilot controller board will have to be performed after you save in this step.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Press the Save button to save the configuration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Write configuration to controller</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save</source>
+        <translation type="unfinished">Guardar</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ready...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/savepage.cpp" line="+61"/>
+        <source>An OpenPilot controller must be connected to your computer to save the configuration.
+Please connect your OpenPilot controller to your computer and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StartPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/startpage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Welcome to the OpenPilot Setup Wizard&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This wizard will guide you through the basic steps required to setup your OpenPilot controller for the first time.  You will be asked questions about your platform (multirotor/heli/fixed-wing) which this wizard will use to configure your aircraft for your maiden flight. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;This wizard does not configure all of the advanced settings available in the GCS Configuration. All basic and advanced configuration parameters can be modified later by using the GCS Configuration plugin.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;WARNING: YOU MUST REMOVE ALL PROPELLERS &lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;FROM THE VEHICLE BEFORE PROCEEDING!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Disregarding this warning puts you at&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#000000;&quot;&gt; risk of very serious injury&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;!&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Now that your props are removed we can get started. Ready?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SummaryPage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/summarypage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;OpenPilot configuration summary&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The first part of this wizard is now complete. All information required to create a basic OpenPilot controller configuration for a specific vehicle has been collected.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Below is a summary of the configuration and a button that links to a diagram illustrating how to connect required hardware and the OpenPilot Controller with the current configuration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To continue the wizard and go through some basic configuration steps, please continue to the next step of this wizard.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The following steps require that your OpenPilot controller is set up according to the diagram, it is &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;connected to the computer&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; by USB, and that the vehicle is&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt; powered by a battery&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show connection diagram for configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SurfacePage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/surfacepage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;The Surface Vehicle section of the OpenPilot Setup Wizard is not yet implemented&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VehiclePage</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/pages/vehiclepage.ui"/>
+        <source>WizardPage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Vehicle type selection&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To continue, the wizard needs to know what type of vehicle the OpenPilot controller board is going to be used with. This step is crucial since much of the following configuration is unique per vehicle type.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Go ahead and select the type of vehicle for which you want to create a configuration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;(The current version only provides functionality for multirotors.)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tricopter, Quadcopter, Hexacopter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Multirotor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>CCPM Helicopters</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Helicopter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Airplane, Sloper, Jet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Fixed wing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Car, Boat, U-Boat</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Surface</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>viewoptions</name>
+    <message>
+        <location filename="../../../src/plugins/uavobjectbrowser/viewoptions.ui"/>
+        <source>View Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show MetaData</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show Categorized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show Scientific</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ImportSummaryDialog</name>
+    <message>
+        <location filename="../../../src/plugins/uavsettingsimportexport/importsummarydialog.ui"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>UAV Settings import summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save all settings checked above to persistent board storage,
+then close the dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Save to Board Flash</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Close this dialog without saving to persistent storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Close</source>
+        <translation type="unfinished">Cerrar</translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/uavsettingsimportexport/importsummary.cpp" line="+34"/>
+        <source>Import Summary</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>deviceWidget</name>
+    <message>
+        <location filename="../../../src/plugins/uploader/devicewidget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Device Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>lblDevName</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>DeviceID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>lblHWRev</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>RW</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>BL Version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>MaxCodeSize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Open a file with new firmware image to be flashed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Open...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>I know what I&apos;m doing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Write loaded firmware image to the board</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Flash</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Read and save current board firmware to a file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Retrieve...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>ic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Firmware:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Board name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Firmware tag:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Firmware date:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Git commit hash:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>CRC:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>On Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>lblBrdName</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>lblDescription</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>lblBuildDate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>lblGitTag</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>lblCRC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>lblCertified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Loaded</source>
+        <translation type="unfinished">Cargado</translation>
+    </message>
+    <message>
+        <location/>
+        <source>lblDescritpionL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>lblCertifiedL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Custom description:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/uploader/devicewidget.cpp" line="+88"/>
+        <source>HW Revision: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+43"/>
+        <source>Custom Firmware Build</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+35"/>
+        <location line="+31"/>
+        <source>Tagged officially released firmware build</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-23"/>
+        <location line="+31"/>
+        <source>Untagged or custom firmware build</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+76"/>
+        <source>Can&apos;t calculate, file too big for device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>The board has the same firmware as loaded. No need to update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>WARNING: the loaded firmware is for different hardware. Do not update!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>The board has newer firmware than loaded. Are you sure you want to update?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>The loaded firmware is untagged or custom build. Update only if it was received from a trusted source (official website or your own build)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>This is the tagged officially released OpenPilot firmware</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>WARNING: the loaded firmware was not packaged with the OpenPilot format. Do not update unless you know what you are doing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+212"/>
+        <location line="+16"/>
+        <source>Select firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-14"/>
+        <source>Firmware Files (*.opfw *.bin)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Firmware Files (*.bin)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>runningDeviceWidget</name>
+    <message>
+        <location filename="../../../src/plugins/uploader/runningdevicewidget.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Device Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>CPU Serial:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Firmware Information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../src/plugins/uploader/runningdevicewidget.cpp" line="+69"/>
+        <source>HW Revision: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Firmware CRC: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+40"/>
+        <source>Tagged officially released firmware build</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Untagged or custom firmware build</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Custom Firmware Build</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UploaderWidget</name>
+    <message>
+        <location filename="../../../src/plugins/uploader/uploader.ui"/>
+        <source>Form</source>
+        <translation type="unfinished">Formulario</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tells the mainboard to go down
+to bootloader mode.
+(Only enabled if telemetry link is established, either
+through serial or USB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Halt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Boots the system.
+Only useful if the system is halted
+(mainboard blue LED blinking slowly, green LED on)
+
+If telemetry is not running, select the link using the dropdown
+menu on the right.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Boot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Boots the system into safe mode (ie. default HwSettings).
+Only useful if the system is halted
+(mainboard blue LED blinking slowly, orange LED off)
+
+If telemetry is not running, select the link using the dropdown
+menu on the right.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Safe Boot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset the system.
+(Only enabled if telemetry link is established, either
+through serial or USB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset</source>
+        <translation type="unfinished">Restablecer</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start a guided procedure to manually
+recover a system which does not boot.
+
+Rescue is possible in USB mode only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rescue</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>When telemetry is not connected, select the communication
+method using this combo box.
+
+You can use this to force a communication channel when doing
+a &quot;Boot&quot; (button on the left). It is updated automatically when
+halting a running board.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Refresh the list of serial ports</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Running</source>
+        <translation type="unfinished">Corriendo</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mainboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;To upgrade the firmware in your boards, proceed as follows:&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Connect telemetry&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- Once telemetry is running, press &amp;quot;Halt&amp;quot; above&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- You will get a list of devices.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- You can then upload/download to/from each board as you wish&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;- You can resume operations by pressing &amp;quot;Boot&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NewsPanel</name>
+    <message>
+        <location filename="../../../src/plugins/welcome/qml/NewsPanel.qml" line="+13"/>
+        <source>Project News</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SitesPanel</name>
+    <message>
+        <location filename="../../../src/plugins/welcome/qml/SitesPanel.qml" line="+13"/>
+        <source>OpenPilot Websites</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>XmlConfig</name>
+    <message>
+        <location filename="../../../src/libs/utils/xmlconfig.cpp" line="+61"/>
+        <source>GCS config</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Parse error at line %1, column %2:
+%3</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AntennaTrackGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/antennatrack/antennatrackgadgetfactory.cpp" line="+36"/>
+        <source>Antenna Track Gadget</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConfigMultiRotorWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/cfg_vehicletypes/configmultirotorwidget.cpp" line="+543"/>
+        <location line="+403"/>
+        <source>Configuration OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConfigCCHWWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/config_cc_hw_widget.cpp" line="+111"/>
+        <source>Warning: you have configured both MainPort and FlexiPort for the same function, this currently is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Warning: you have configured both USB HID Port and USB VCP Port for the same function, this currently is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Warning: you have disabled USB Telemetry on both USB HID Port and USB VCP Port, this currently is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConfigCCAttitudeWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configccattitudewidget.cpp" line="+151"/>
+        <source>Calibration timed out before receiving required updates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConfigGadgetWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configgadgetwidget.cpp" line="+252"/>
+        <source>Unsaved changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>The tab you are leaving has unsaved changes,if you proceed they will be lost.Do you still want to proceed?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConfigInputWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+306"/>
+        <location line="+1072"/>
+        <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-1071"/>
+        <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+166"/>
+        <source>Welcome to the inputs configuration wizard.
+
+Please follow the instructions on the screen and only move your controls when asked to.
+Make sure you already configured your hardware settings on the proper tab and restarted your board.
+
+You can press &apos;back&apos; at any time to return to the previous screen or press &apos;Cancel&apos; to quit the wizard.
+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Please choose your transmitter type:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Acro: normal transmitter for fixed-wing or quad</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Helicopter: has collective pitch and throttle input</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>If selecting the Helicopter option, please engage throttle hold now.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Please choose your transmitter mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Mode 1: Fore/Aft Cyclic and Yaw on the left, Throttle/Collective and Left/Right Cyclic on the right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Mode 2: Throttle/Collective and Yaw on the left, Cyclic on the right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Mode 3: Cyclic on the left, Throttle/Collective and Yaw on the right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Mode 4: Throttle/Collective and Left/Right Cyclic on the left, Fore/Aft Cyclic and Yaw on the right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Mode 1: Elevator and Rudder on the left, Throttle and Ailerons on the right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Mode 2: Throttle and Rudder on the left, Elevator and Ailerons on the right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Mode 3: Elevator and Ailerons on the left, Throttle and Rudder on the right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Mode 4: Throttle and Ailerons on the left, Elevator and Rudder on the right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>For a Quad: Elevator is Pitch, Ailerons are Roll, and Rudder is Yaw.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Please center all controls and trims and press Next when ready.
+
+If your FlightMode switch has only two positions, leave it in either position.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Please move all controls to their maximum extents on both directions.
+
+Press Next when ready.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+40"/>
+        <source>Please check the picture below and correct all the sticks which show an inverted movement. Press Next when ready.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>You have completed this wizard, please check below if the picture mimics your sticks movement.
+
+IMPORTANT: These new settings have not been saved to the board yet. After pressing Next you will go to the Arming Settings tab where you can set your desired arming sequence and save the configuration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+116"/>
+        <source>Please enable throttle hold mode.
+
+Move the Collective Pitch stick.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Please toggle the Flight Mode switch.
+
+For switches you may have to repeat this rapidly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Please disable throttle hold mode.
+
+Move the Throttle stick.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Please move each control one at a time according to the instructions and picture below.
+
+Move the %1 stick.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source> Alternatively, click Next to skip this channel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+645"/>
+        <source>You will have to reconfigure the arming settings manually when the wizard is finished.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConfigOutputWidget</name>
+    <message>
+        <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+135"/>
+        <source>The actuator module is in an error state.  This can also occur because there are no inputs.  Please fix these before testing outputs.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>This option will start your motors by the amount selected on the sliders regardless of transmitter.  It is recommended to remove any blades from motors.  Are you sure you want to do this?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ConfigPlugin</name>
+    <message>
+        <location filename="../../../src/plugins/config/configplugin.cpp" line="+61"/>
+        <source>Erase all settings from board...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+67"/>
+        <source>Are you sure you want to erase all board settings?.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>All settings stored in your board flash will be deleted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+41"/>
+        <location line="+25"/>
+        <source>Error trying to erase settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-24"/>
+        <location line="+25"/>
+        <source>Power-cycle your board after removing all blades. Settings might be inconsistent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-4"/>
+        <source>Settings are now erased.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Please wait for the status LED to begin flashing regularly (up to a minute) then power-cycle your board to complete reset.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Core::Internal::AuthorsDialog</name>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/authorsdialog.cpp" line="+57"/>
+        <source>About OpenPilot Authors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>From revision %1&lt;br/&gt;</source>
+        <extracomment>This gets conditionally inserted as argument %8 into the description string.</extracomment>
+        <translation type="unfinished">Revisión %1&lt;br/&gt;</translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>&lt;h3&gt;The OpenPilot Project&lt;/h3&gt;Proudly brought to you by this fine team:&lt;br/&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Core::ConnectionManager</name>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/connectionmanager.cpp" line="+60"/>
+        <source>Connections:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DebugGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/debuggadget/debuggadgetfactory.cpp" line="+34"/>
+        <source>DebugGadget</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DebugGadgetWidget</name>
+    <message>
+        <location filename="../../../src/plugins/debuggadget/debuggadgetwidget.cpp" line="+80"/>
+        <source>Save log File As</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Log Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Unable to save log: </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>DialGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/dial/dialgadgetfactory.cpp" line="+37"/>
+        <source>Analog Dial</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GCSControlGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/gcscontrol/gcscontrolgadgetfactory.cpp" line="+34"/>
+        <source>Controller</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>GpsDisplayGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/gpsdisplay/gpsdisplaygadgetfactory.cpp" line="+36"/>
+        <source>GPS Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ImportExportPlugin</name>
+    <message>
+        <location filename="../../../src/plugins/importexport/importexportplugin.cpp" line="+67"/>
+        <source>GCS Settings Import/Export...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LineardialGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/lineardial/lineardialgadgetfactory.cpp" line="+36"/>
+        <source>Bargraph Dial</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LoggingConnection</name>
+    <message>
+        <location filename="../../../src/plugins/logging/loggingplugin.cpp" line="+79"/>
+        <source>Open file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>OpenPilot Log (*.opl)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LoggingThread</name>
+    <message>
+        <location line="+166"/>
+        <source>Logging: retrieve settings objects from the autopilot (%1 objects)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LoggingPlugin</name>
+    <message>
+        <location line="+120"/>
+        <source>Start Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OP-%0.opl</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>OpenPilot Log (*.opl)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <source>Stop logging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Start logging...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MagicWaypointGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/magicwaypoint/magicwaypointgadgetfactory.cpp" line="+35"/>
+        <source>Magic Waypoint</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ModelViewGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/modelview/modelviewgadgetfactory.cpp" line="+36"/>
+        <source>ModelView</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NotificationItem</name>
+    <message>
+        <location filename="../../../src/plugins/notify/notificationitem.cpp" line="+74"/>
+        <source>Never</source>
+        <translation type="unfinished">Nunca</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Before first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Before second</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>After second</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Repeat Once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Repeat Once per update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Repeat Instantly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Repeat 10 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Repeat 30 seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Repeat 1 minute</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>flightDataModel</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/flightdatamodel.cpp" line="+410"/>
+        <source>Unable to open file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+142"/>
+        <source>File Parsing Failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This file is not a correct XML file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Wrong file contents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This file does not contain correct UAVSettings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>OPMapGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/opmapgadgetfactory.cpp" line="+35"/>
+        <source>OPMap</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>pathPlanner</name>
+    <message>
+        <location filename="../../../src/plugins/opmap/pathplanner.cpp" line="+93"/>
+        <source>Open File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Save File</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PFDGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/pfd/pfdgadgetfactory.cpp" line="+36"/>
+        <source>Primary Flight Display</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PfdQmlGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/pfdqml/pfdqmlgadgetfactory.cpp" line="+25"/>
+        <source>PFD (qml)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PowerlogPlugin</name>
+    <message>
+        <location filename="../../../src/plugins/powerlog/powerlogplugin.cpp" line="+295"/>
+        <source>Log filename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>PowerLog-%0.csv</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Comma Separated Values (*.csv)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QmlViewGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/qmlview/qmlviewgadgetfactory.cpp" line="+36"/>
+        <source>QML Viewer, QML</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScopeGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/scope/scopegadgetfactory.cpp" line="+36"/>
+        <source>Scope</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ScopeGadgetWidget</name>
+    <message>
+        <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+221"/>
+        <source>Click legend to show/hide scope trace</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LevellingUtil</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/levellingutil.cpp" line="+125"/>
+        <source>Calibration timed out before receiving required updates.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SetupWizard</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+56"/>
+        <source>OpenPilot Setup Wizard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+82"/>
+        <source>Controller type: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>OpenPilot CopterControl</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>OpenPilot CopterControl 3D</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>OpenPilot Revolution</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>OpenPilot OPLink Radio Modem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <location line="+46"/>
+        <location line="+15"/>
+        <location line="+26"/>
+        <location line="+14"/>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-96"/>
+        <source>Vehicle type: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Multirotor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Vehicle sub type: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Tricopter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Quadcopter X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Quadcopter +</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Hexacopter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Hexacopter Coax (Y6)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Hexacopter X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Octocopter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Octocopter Coax X</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Octocopter Coax +</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Octocopter V</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Fixed wing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Helicopter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Surface vehicle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Input type: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>PWM (One cable per channel)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>PPM (One cable for all channels)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Futaba S.Bus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Spektrum satellite (DSM2)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Spektrum satellite (DSMX10BIT)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Spektrum satellite (DSMX11BIT)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>ESC type: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Legacy ESC (50 Hz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Rapid ESC (400 Hz)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SetupWizardPlugin</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/setupwizardplugin.cpp" line="+62"/>
+        <source>Vehicle Setup Wizard</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>VehicleConfigurationHelper</name>
+    <message>
+        <location filename="../../../src/plugins/setupwizard/vehicleconfigurationhelper.cpp" line="+72"/>
+        <location line="+12"/>
+        <source>Done!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-12"/>
+        <location line="+12"/>
+        <source>Failed!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+66"/>
+        <source>Writing hardware settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+104"/>
+        <source>Writing actuator settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <source>Writing flight mode settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+21"/>
+        <source>Writing gyro and accelerometer bias settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>Writing stabilization settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+28"/>
+        <source>Writing mixer settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Writing vehicle settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+43"/>
+        <source>Writing manual control defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+157"/>
+        <source>Preparing mixer settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Preparing vehicle settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SystemHealthGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/systemhealth/systemhealthgadgetfactory.cpp" line="+36"/>
+        <source>System Health</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SystemHealthGadgetWidget</name>
+    <message>
+        <location filename="../../../src/plugins/systemhealth/systemhealthgadgetwidget.cpp" line="+66"/>
+        <source>Displays flight system errors. Click on an alarm for more information.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UAVObjectField</name>
+    <message>
+        <location filename="../../../src/plugins/uavobjects/uavobjectfield.cpp" line="+91"/>
+        <source>0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PopupWidget</name>
+    <message>
+        <location filename="../../../src/plugins/uavobjectwidgetutils/popupwidget.cpp" line="+17"/>
+        <source>Close</source>
+        <translation type="unfinished">Cerrar</translation>
+    </message>
+</context>
+<context>
+    <name>UAVSettingsImportExportFactory</name>
+    <message>
+        <location filename="../../../src/plugins/uavsettingsimportexport/uavsettingsimportexportfactory.cpp" line="+69"/>
+        <source>Export UAV Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Import UAV Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Export UAV Data...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>UAVObjects XML files (*.uav);; XML files (*.xml)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Import UAV Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>File Parsing Failed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This file is not a correct XML file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+17"/>
+        <source>Wrong file contents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This file does not contain correct UAVSettings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+211"/>
+        <location line="+51"/>
+        <source>UAVObjects XML files (*.uav)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-49"/>
+        <source>Save UAVSettings File As</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>UAV Settings Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Unable to save settings: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Settings saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>Are you sure?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>This option is only useful for passing your current system data to the technical support staff. Do you really want to export?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Save UAVData File As</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>UAV Data Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Unable to save data: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Data saved.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UploaderGadgetFactory</name>
+    <message>
+        <location filename="../../../src/plugins/uploader/uploadergadgetfactory.cpp" line="+36"/>
+        <source>Uploader</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>UploaderGadgetWidget</name>
+    <message>
+        <location filename="../../../src/plugins/uploader/uploadergadgetwidget.cpp" line="+375"/>
+        <source>The controller board is armed and can not be halted.
+
+Please make sure the board is not armed and then press halt again to proceed
+or use the rescue option to force a firmware upgrade.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>The controller board is armed and can not be reset.
+
+Please make sure the board is not armed and then press reset again to proceed
+or power cycle to force a board reset.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+96"/>
+        <location line="+141"/>
+        <source>OpenPilot Uploader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-141"/>
+        <location line="+141"/>
+        <source>Please disconnect all openpilot boards</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Please connect the board (USB only!)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>Cancel</source>
+        <translation type="unfinished">Cancelar</translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Openpilot Uploader</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+0"/>
+        <source>No board connection was detected!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+197"/>
+        <source>GCS and firmware versions of the UAV objects set do not match which can cause configuration problems. GCS version: %1 Firmware version: %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

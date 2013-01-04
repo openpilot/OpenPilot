@@ -56,8 +56,8 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addApplySaveButtons(m_oplink->Apply, m_oplink->Save);
 
 	addUAVObjectToWidgetRelation("OPLinkSettings", "Coordinator", m_oplink->Coordinator);
-	addUAVObjectToWidgetRelation("OPLinkSettings", "PPM", m_oplink->PPM);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "UAVTalk", m_oplink->UAVTalk);
+	addUAVObjectToWidgetRelation("OPLinkSettings", "PPM", m_oplink->PPM);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "InputConnection", m_oplink->InputConnection);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "OutputConnection", m_oplink->OutputConnection);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed);

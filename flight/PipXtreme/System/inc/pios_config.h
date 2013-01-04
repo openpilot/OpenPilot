@@ -64,6 +64,7 @@
 #define PIOS_INCLUDE_FLASH_EEPROM
 #define PIOS_INCLUDE_RFM22B
 #define PIOS_INCLUDE_PACKET_HANDLER
+#define PIOS_INCLUDE_PPM_OUT
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"

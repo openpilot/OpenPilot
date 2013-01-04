@@ -53,6 +53,9 @@ uint32_t pios_com_telemetry_id = 0;
 #if defined(PIOS_INCLUDE_PPM)
 uint32_t pios_ppm_rcvr_id = 0;
 #endif
+#if defined(PIOS_INCLUDE_PPM_OUT)
+uint32_t pios_ppm_out_id = 0;
+#endif
 #if defined(PIOS_INCLUDE_RFM22B)
 uint32_t pios_rfm22b_id = 0;
 uint32_t pios_com_rfm22b_id = 0;
@@ -197,20 +200,29 @@ void PIOS_Board_Init(void) {
 #endif
 
 	/* Configure PPM input */
+	switch (oplinkSettings.PPM)
+	{
 #if defined(PIOS_INCLUDE_PPM)
-	if (oplinkSettings.PPM == OPLINKSETTINGS_PPM_TRUE)
+	case OPLINKSETTINGS_PPM_INPUT:
 	{
 		uint32_t pios_ppm_id;
 		PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
 
 		if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id))
 			PIOS_Assert(0);
+		break;
 	}
-	else
 #endif	/* PIOS_INCLUDE_PPM */
 
-	/* Configure the flexi serial port */
+#if defined(PIOS_INCLUDE_PPM_OUT)
+	case OPLINKSETTINGS_PPM_OUTPUT:
+		PIOS_PPM_Out_Init(&pios_ppm_out_id, &pios_ppm_out_cfg);
+		break;
+#endif	/* PIOS_INCLUDE_PPM_OUT */
+
+	default:
 	{
+		/* Configure the flexi serial port if PPM not selected */
 		uint32_t pios_usart3_id;
 		if (PIOS_USART_Init(&pios_usart3_id, &pios_usart_telem_flexi_cfg)) {
 			PIOS_Assert(0);
@@ -224,6 +236,7 @@ void PIOS_Board_Init(void) {
 											tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
+	}
 	}
 
 	/* Initalize the RFM22B radio COM device. */

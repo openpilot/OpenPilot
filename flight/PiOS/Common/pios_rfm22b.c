@@ -54,6 +54,7 @@
 #include <pios_spi_priv.h>
 #include <packet_handler.h>
 #include <pios_rfm22b_priv.h>
+#include <pios_ppm_out_priv.h>
 #include <ecc.h>
 
 /* Local Defines */
@@ -1786,7 +1787,13 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 				{
 					PHPpmPacketHandle ppmp = (PHPpmPacketHandle)&(rfm22b_dev->rx_packet);
 					for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i)
+					{
 						rfm22b_dev->ppm_channel[i] = ppmp->channels[i];
+#if defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT)
+						if (PIOS_PPM_OUTPUT)
+							PIOS_PPM_OUT_Set(PIOS_PPM_OUTPUT, i, ppmp->channels[i]);
+#endif /* PIOS_INCLUDE_PPM_OUT && PIOS_PPM_OUTPUT */
+					}
 					rfm22b_dev->ppm_fresh = true;
 					break;
 				}

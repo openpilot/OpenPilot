@@ -554,6 +554,46 @@ const struct pios_ppm_cfg pios_ppm_cfg = {
 
 #endif	/* PIOS_INCLUDE_PPM */
 
+/*
+ * PPM Output
+ */
+#if defined(PIOS_INCLUDE_PPM_OUT)
+#include <pios_ppm_out_priv.h>
+
+uint32_t pios_ppm_id;
+
+static const struct pios_tim_channel pios_tim_ppmout[] = {
+	{
+		.timer = TIM2,
+		.timer_chan = TIM_Channel_3,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_10,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+		.remap = GPIO_FullRemap_TIM2,
+	}
+};
+
+const struct pios_ppm_out_cfg pios_ppm_out_cfg = {
+	.tim_oc_init = {
+		.TIM_OCMode = TIM_OCMode_PWM1,
+		.TIM_OutputState = TIM_OutputState_Enable,
+		.TIM_OutputNState = TIM_OutputNState_Disable,
+		.TIM_Pulse = PIOS_SERVOS_INITIAL_POSITION,
+		.TIM_OCPolarity = TIM_OCPolarity_Low,
+		.TIM_OCNPolarity = TIM_OCPolarity_Low,
+		.TIM_OCIdleState = TIM_OCIdleState_Reset,
+		.TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+	},
+	.channel = pios_tim_ppmout,
+};
+
+#endif /* PIOS_INCLUDE_PPM_OUT */
+
 #if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"
 

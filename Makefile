@@ -757,7 +757,7 @@ all_ut_xml: $(addsuffix _xml, $(addprefix ut_, $(ALL_UNITTESTS)))
 .PHONY: all_ut_run
 all_ut_run: $(addsuffix _run, $(addprefix ut_, $(ALL_UNITTESTS)))
 
-.PHONY: ut_all_clean
+.PHONY: all_ut_clean
 all_ut_clean:
 	$(V0) @echo " CLEAN      $@"
 	$(V1) [ ! -d "$(UT_OUT_DIR)" ] || $(RM) -r "$(UT_OUT_DIR)"

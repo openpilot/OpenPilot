@@ -47,26 +47,8 @@ struct pios_tim_dev {
 	const struct pios_tim_callbacks * callbacks;
 	uint32_t context;
 };
+#define PIOS_TIM_ALL_FLAGS TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_Trigger | TIM_IT_Update
 
-#if 0
-static bool PIOS_TIM_validate(struct pios_tim_dev * tim_dev)
-{
-	return (tim_dev->magic == PIOS_TIM_DEV_MAGIC);
-}
-#endif
-
-#if defined(PIOS_INCLUDE_FREERTOS) && 0
-static struct pios_tim_dev * PIOS_TIM_alloc(void)
-{
-	struct pios_tim_dev * tim_dev;
-
-	tim_dev = (struct pios_tim_dev *)malloc(sizeof(*tim_dev));
-	if (!tim_dev) return(NULL);
-
-	tim_dev->magic = PIOS_TIM_DEV_MAGIC;
-	return(tim_dev);
-}
-#else
 static struct pios_tim_dev pios_tim_devs[PIOS_TIM_MAX_DEVS];
 static uint8_t pios_tim_num_devs;
 static struct pios_tim_dev * PIOS_TIM_alloc(void)
@@ -82,8 +64,6 @@ static struct pios_tim_dev * PIOS_TIM_alloc(void)
 
 	return (tim_dev);
 }
-#endif
-
 
 
 
@@ -414,7 +394,7 @@ static void PIOS_TIM_9_CC_irq_handler (void)
 	{
 		PIOS_TIM_generic_irq_handler(TIM1);
 	}
-	else if (TIM_GetITStatus(TIM9, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_Trigger))
+	else if (TIM_GetITStatus(TIM9, PIOS_TIM_ALL_FLAGS))
 	{
 		PIOS_TIM_generic_irq_handler (TIM9);
 	}
@@ -427,7 +407,7 @@ static void PIOS_TIM_10_CC_irq_handler (void)
 	{
 		PIOS_TIM_generic_irq_handler(TIM1);
 	}
-	else if (TIM_GetITStatus(TIM10, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_Trigger))
+	else if (TIM_GetITStatus(TIM10, PIOS_TIM_ALL_FLAGS))
 	{
 		PIOS_TIM_generic_irq_handler (TIM10);
 	}
@@ -440,7 +420,7 @@ static void PIOS_TIM_11_CC_irq_handler (void)
 	{
 		PIOS_TIM_generic_irq_handler (TIM1);
 	}
-	else if (TIM_GetITStatus(TIM11, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_Trigger))
+	else if (TIM_GetITStatus(TIM11, PIOS_TIM_ALL_FLAGS))
 	{
 		PIOS_TIM_generic_irq_handler (TIM11);
 	}
@@ -453,7 +433,7 @@ static void PIOS_TIM_12_irq_handler (void)
 	{
 		PIOS_TIM_generic_irq_handler (TIM8);
 	}
-	else if (TIM_GetITStatus(TIM12, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_Trigger))
+	else if (TIM_GetITStatus(TIM12, PIOS_TIM_ALL_FLAGS))
 	{
 		PIOS_TIM_generic_irq_handler (TIM12);
 	}
@@ -466,7 +446,7 @@ static void PIOS_TIM8_UP_TIM13_IRQHandler (void)
 	{
 		PIOS_TIM_generic_irq_handler (TIM8);
 	}
-	else if (TIM_GetITStatus(TIM13, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_Trigger))
+	else if (TIM_GetITStatus(TIM13, PIOS_TIM_ALL_FLAGS))
 	{
 		PIOS_TIM_generic_irq_handler (TIM13);
 	}
@@ -479,7 +459,7 @@ static void PIOS_TIM8_TRG_COM_TIM14_IRQHandler (void)
 	{
 		PIOS_TIM_generic_irq_handler (TIM8);
 	}
-	else if (TIM_GetITStatus(TIM14, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_Trigger))
+	else if (TIM_GetITStatus(TIM14, PIOS_TIM_ALL_FLAGS))
 	{
 		PIOS_TIM_generic_irq_handler (TIM14);
 	}

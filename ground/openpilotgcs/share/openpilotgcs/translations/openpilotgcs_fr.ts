@@ -1709,52 +1709,52 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/hitlnew/hitloptionspage.ui"/>
         <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>For receiving data from sim</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour reçevoir les données du simulateur</translation>
     </message>
     <message>
         <location/>
         <source>Check this box to start the simulator on the local computer</source>
-        <translation type="unfinished"></translation>
+        <translation>Cochez cette case pour démarrer le simulateur sur l&apos;ordinateur local</translation>
     </message>
     <message>
         <location/>
         <source>Start simulator on local machine</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer le simulateur sur la machine locale</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Local interface (IP):</source>
-        <translation type="unfinished"></translation>
+        <translation>Interface locale (IP) :</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>For communication with sim computer via network. Should be the IP address of one of the interfaces of the GCS computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour la communication avec l&apos;ordinateur de simulation via le réseau. Doit-être l&apos;adresse IP d&apos;une des interfaces de l&apos;ordinateur avec GCS.</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Remote interface (IP):</source>
-        <translation type="unfinished"></translation>
+        <translation>Interface distante (IP) :</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Only required if running simulator on remote machine. Should be the IP of the machine on which the simulator is running.</source>
-        <translation type="unfinished"></translation>
+        <translation>Seulement nécessaire si le simulateur est lancé sur une machine distante. Doit être l&apos;IP de la machine sur laquelle le simulateur est lancé.</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>For sending data to sim</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour envoyer les données au simulateur</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Attitude data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Données attitude</translation>
     </message>
     <message>
         <location/>
@@ -1764,7 +1764,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Refresh rate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fréquence de raffraichissement</translation>
     </message>
     <message>
         <location/>
@@ -1779,22 +1779,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>send raw data to board</source>
-        <translation type="unfinished"></translation>
+        <translation>envoyer les données brutes vers la carte</translation>
     </message>
     <message>
         <location/>
         <source>use values from simulator</source>
-        <translation type="unfinished"></translation>
+        <translation>utiliser les données du simulateur</translation>
     </message>
     <message>
         <location/>
         <source>calculate from AttitudeRaw</source>
-        <translation type="unfinished"></translation>
+        <translation>calculer avec AttitudeRaw</translation>
     </message>
     <message>
         <location/>
         <source>Other data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Autres données</translation>
     </message>
     <message>
         <location/>
@@ -9542,7 +9542,9 @@ channel value for each flight mode.</source>
 La valeur par défaut est 3.
 
 Cela peut être 2 ou 3 dans la plupart des configurations, mais cela peut aller jusqu&apos;à 6.
-Dans ce cas vous devez configurer les mixages de votre radio pour que la plage mini à maxi soit divisée en N intervales égaux et ainsi vous pouvez définir une valeur arbitraire du canal de sortie pour chaque mode de vol.</translation>
+Dans ce cas vous devez configurer les mixages de votre radio pour que la plage mini à 
+maxi soit divisée en N intervales égaux et ainsi vous pouvez définir une valeur arbitraire 
+du canal de sortie pour chaque mode de vol.</translation>
     </message>
     <message>
         <location/>
@@ -10728,41 +10730,49 @@ Then lower the value by 5 or so.</source>
     <message>
         <location/>
         <source>objname:StabilizationSettings</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:RollRatePID</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>element:Kp</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:yes</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>scale:0.0001</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:1,10</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:PitchRatePID</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:YawRatePID</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10779,6 +10789,7 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>element:Ki</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10789,31 +10800,37 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>buttongroup:2</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:RollPI</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>scale:0.1</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:2,10</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:PitchPI</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:YawPI</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10824,11 +10841,12 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>Zero the integral when throttle is low</source>
-        <translation type="unfinished">Mettre l&apos;intégrale à zéro lorsque les gaz sont bas</translation>
+        <translation>Mettre l&apos;intégrale à zéro lorsque les gaz sont bas</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:LowThrottleZeroIntegral</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10844,26 +10862,31 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>buttongroup:4</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>element:Kd</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:no</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>scale:1</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:4,20</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10899,11 +10922,13 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>buttongroup:5</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:5,20</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10914,12 +10939,14 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>buttongroup:6</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:PitchMax</source>
-        <translation></translation>
+        <translatorcomment>pas toucher !</translatorcomment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -10934,31 +10961,37 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>fieldname:MaximumRate</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>element:Roll</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:ManualRate</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>element:Yaw</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:YawMax</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>element:Pitch</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10969,6 +11002,7 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>fieldname:RollMax</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -10979,7 +11013,7 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>Expert</source>
-        <translation type="unfinished"></translation>
+        <translation>Expert</translation>
     </message>
     <message>
         <location/>
@@ -10989,6 +11023,7 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>buttongroup:10</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11014,21 +11049,25 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>fieldname:WeakLevelingKp</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxWeakLevelingRate</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxAxisLock</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxAxisLockRate</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11044,16 +11083,19 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>element:ILimit</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>ILimit Attitude</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>ILimit Rate</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11064,6 +11106,7 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>buttongroup:8</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11074,16 +11117,19 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>objname:AttitudeSettings</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:AccelKp</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:8,10</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11104,6 +11150,7 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>fieldname:GyroTau</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11119,6 +11166,7 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>fieldname:AccelKi</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11135,12 +11183,12 @@ automatically every 300ms, which will help for fast tuning.</source>
     <message>
         <location/>
         <source>Update in real time</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour en temps réel</translation>
     </message>
     <message>
         <location/>
         <source>Takes you to the wiki page</source>
-        <translation type="unfinished">Vous renvoie à la page wiki</translation>
+        <translation>Vous renvoie à la page wiki</translation>
     </message>
     <message>
         <location/>
@@ -11150,13 +11198,13 @@ automatically every 300ms, which will help for fast tuning.</source>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/DAO9</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Reloads the saved settings into GCS.
 Useful if you have accidentally changed some settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Recharge les donnés enregistrées, dans GCS. Utile si vous avez accidentellement modifié des paramètres.</translation>
     </message>
     <message>
         <location/>
@@ -11389,7 +11437,7 @@ only when system is armed without disabling the module.</source>
     <message>
         <location filename="../../../src/plugins/config/vernier.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
 </context>
 <context>
@@ -11397,18 +11445,19 @@ only when system is armed without disabling the module.</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/dialogs/importsettings.ui"/>
         <source>OpenPilotGCS</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>No configuration file could be found.
 Please choose from one of the default configurations</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun fichier de configuration n&apos;a pu être trouvé.
+Veuillez en choisir un dans les configurations par défaut</translation>
     </message>
     <message>
         <location/>
         <source>TextLabel</source>
-        <translation type="unfinished">Label de texte</translation>
+        <translation>Label de texte</translation>
     </message>
     <message>
         <location/>
@@ -11421,12 +11470,12 @@ Please choose from one of the default configurations</source>
     <message>
         <location filename="../../../src/plugins/debuggadget/debug.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>Save to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistre dans un fichier</translation>
     </message>
 </context>
 <context>
@@ -11434,32 +11483,32 @@ Please choose from one of the default configurations</source>
     <message>
         <location filename="../../../src/plugins/gcscontrol/gcscontrolgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>Control Mode:</source>
-        <translation type="unfinished">Mode de pilotage : </translation>
+        <translation>Mode de pilotage : </translation>
     </message>
     <message>
         <location/>
         <source>Mode 1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Mode 2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Mode 3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Mode 4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11484,12 +11533,12 @@ Please choose from one of the default configurations</source>
     <message>
         <location/>
         <source>Available controllers</source>
-        <translation type="unfinished">Controleurs disponibles</translation>
+        <translation>Controleurs disponibles</translation>
     </message>
     <message>
         <location/>
         <source>Default</source>
-        <translation type="unfinished">Défaut</translation>
+        <translation>Défaut</translation>
     </message>
     <message>
         <location/>
@@ -11499,12 +11548,12 @@ Please choose from one of the default configurations</source>
     <message>
         <location/>
         <source>Rev</source>
-        <translation type="unfinished">Inv</translation>
+        <translation>Inv</translation>
     </message>
     <message>
         <location/>
         <source>Move your joystick controls to identify channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Bougez votre joystick pour identifier les canaux</translation>
     </message>
     <message>
         <location/>
@@ -11519,11 +11568,13 @@ Please choose from one of the default configurations</source>
     <message>
         <location/>
         <source>button 1</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>button 2</source>
+        <translatorcomment>pas toucher !</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11579,7 +11630,7 @@ Please choose from one of the default configurations</source>
     <message>
         <location/>
         <source>Host:</source>
-        <translation type="unfinished">Hôte :</translation>
+        <translation>Hôte :</translation>
     </message>
     <message>
         <location/>
@@ -11729,57 +11780,58 @@ Please choose from one of the default configurations</source>
     <message>
         <location filename="../../../src/plugins/pfdqml/pfdqmlgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>QML file: </source>
-        <translation type="unfinished">Fichier  QML :</translation>
+        <translation>Fichier  QML :</translation>
     </message>
     <message>
         <location/>
         <source>Use OpenGL</source>
-        <translation type="unfinished">Utiliser OpenGL</translation>
+        <translation>Utiliser OpenGL</translation>
     </message>
     <message>
         <location/>
         <source>Show Terrain:</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher terrain :</translation>
     </message>
     <message>
         <location/>
         <source>OsgEarth file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier OsgEarth :</translation>
     </message>
     <message>
         <location/>
         <source>Use actual location</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser position actuelle</translation>
     </message>
     <message>
         <location/>
         <source>Use pre-defined location:</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser une position prédéfinie :</translation>
     </message>
     <message>
         <location/>
         <source>Latitude:</source>
-        <translation type="unfinished">Latitude :</translation>
+        <translation>Latitude :</translation>
     </message>
     <message>
         <location/>
         <source>Longitude:</source>
-        <translation type="unfinished">Longitude :</translation>
+        <translation>Longitude :</translation>
     </message>
     <message>
         <location/>
         <source>Altitude:</source>
-        <translation type="unfinished">Altitude :</translation>
+        <translation>Altitude :</translation>
     </message>
     <message>
         <location/>
         <source>Use only cache data</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser uniquement 
+les données en cache</translation>
     </message>
     <message>
         <location/>
@@ -11789,22 +11841,22 @@ Please choose from one of the default configurations</source>
     <message>
         <location filename="../../../src/plugins/pfdqml/pfdqmlgadgetoptionspage.cpp" line="+46"/>
         <source>QML file (*.qml)</source>
-        <translation type="unfinished">Fichier QML (*.qml)</translation>
+        <translation>Fichier QML (*.qml)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Choose QML file</source>
-        <translation type="unfinished">Choisir un fichier QML</translation>
+        <translation>Choisir un fichier QML</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>OsgEarth (*.earth)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Choose OsgEarth terrain file</source>
-        <translation type="unfinished"></translation>
+        <translation>Choisir un fichier de terrain OsgEarth</translation>
     </message>
 </context>
 <context>
@@ -11989,22 +12041,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>OpenPilot CopterControl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot CopterControl 3D</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+1"/>
         <source>OpenPilot Revolution</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>OpenPilot OPLink Radio Modem</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+52"/>
@@ -12156,7 +12208,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/levellingpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -13410,39 +13462,39 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/config/configplugin.cpp" line="+61"/>
         <source>Erase all settings from board...</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer tous les paramètres sur la carte...</translation>
     </message>
     <message>
         <location line="+67"/>
         <source>Are you sure you want to erase all board settings?.</source>
-        <translation type="unfinished"></translation>
+        <translation>Êtes-vous certain de vouloir supprimer tous les paramètres sur la carte ?. </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>All settings stored in your board flash will be deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tous les paramètres stockés sur la flash de votre carte seront supprimés.</translation>
     </message>
     <message>
         <location line="+41"/>
         <location line="+25"/>
         <source>Error trying to erase settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur en essayant de supprimer les paramètres.</translation>
     </message>
     <message>
         <location line="-24"/>
         <location line="+25"/>
         <source>Power-cycle your board after removing all blades. Settings might be inconsistent.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eteindre / Allumer votre carte après avoir enlevé toutes les hélices. Les paramètres peuvent-être incorrects. </translation>
     </message>
     <message>
         <location line="-4"/>
         <source>Settings are now erased.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les paramètres sont maintenant supprimés.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Please wait for the status LED to begin flashing regularly (up to a minute) then power-cycle your board to complete reset.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez attendre que la LED de statut commence à clignoter régulièrement (environ une minute) puis éteindre / allumer votre carte pour terminer la réinitialisation.</translation>
     </message>
 </context>
 <context>
@@ -13450,18 +13502,18 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/coreplugin/authorsdialog.cpp" line="+57"/>
         <source>About OpenPilot Authors</source>
-        <translation type="unfinished"></translation>
+        <translation>A propos des auteurs d&apos;OpenPilot</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>From revision %1&lt;br/&gt;</source>
         <extracomment>This gets conditionally inserted as argument %8 into the description string.</extracomment>
-        <translation type="unfinished">Depuis la révision %1&lt;br/&gt;</translation>
+        <translation>Depuis la révision %1&lt;br/&gt;</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&lt;h3&gt;The OpenPilot Project&lt;/h3&gt;Proudly brought to you by this fine team:&lt;br/&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;h3&gt;Le Projet OpenPilot&lt;/h3&gt;Fièrement présenté par cette fine équipe :&lt;br/&gt;</translation>
     </message>
 </context>
 <context>

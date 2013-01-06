@@ -32,7 +32,7 @@
 #include "setupwizard.h"
 
 LevellingPage::LevellingPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::LevellingPage),  m_levellingUtil(0)
 {
     ui->setupUi(this);

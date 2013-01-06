@@ -32,7 +32,7 @@
 #include "vehicleconfigurationhelper.h"
 
 SavePage::SavePage(SetupWizard *wizard, QWidget *parent) :
-        AbstractWizardPage(wizard, parent),
+        AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::SavePage), m_successfulWrite(false)
 {
     ui->setupUi(this);

@@ -32,7 +32,7 @@
 #include <QMessageBox>
 
 EndPage::EndPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::EndPage)
 {
     ui->setupUi(this);

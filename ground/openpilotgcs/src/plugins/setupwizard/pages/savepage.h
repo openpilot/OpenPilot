@@ -29,12 +29,13 @@
 #define SAVEPAGE_H
 
 #include "abstractwizardpage.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class SavePage;
 }
 
-class SavePage : public AbstractWizardPage
+class SavePage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
 

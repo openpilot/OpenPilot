@@ -38,7 +38,7 @@ namespace Ui {
 class ControllerPage;
 }
 
-class ControllerPage : public AbstractWizardPage
+class ControllerPage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
     

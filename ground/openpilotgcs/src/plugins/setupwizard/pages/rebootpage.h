@@ -29,12 +29,13 @@
 #define REBOOTPAGE_H
 
 #include "abstractwizardpage.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class RebootPage;
 }
 
-class RebootPage : public AbstractWizardPage
+class RebootPage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
     

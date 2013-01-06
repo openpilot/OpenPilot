@@ -33,12 +33,13 @@
 #include <QList>
 
 #include "abstractwizardpage.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class MultiPage;
 }
 
-class MultiPage : public AbstractWizardPage
+class MultiPage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
     

@@ -29,12 +29,13 @@
 #define VEHICLEPAGE_H
 
 #include "abstractwizardpage.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class VehiclePage;
 }
 
-class VehiclePage : public AbstractWizardPage
+class VehiclePage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
     

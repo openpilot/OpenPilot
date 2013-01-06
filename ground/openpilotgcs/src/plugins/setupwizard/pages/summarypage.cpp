@@ -31,7 +31,7 @@
 #include "connectiondiagram.h"
 
 SummaryPage::SummaryPage(SetupWizard *wizard, QWidget *parent) :
-        AbstractWizardPage(wizard, parent),
+        AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::SummaryPage)
 {
     ui->setupUi(this);

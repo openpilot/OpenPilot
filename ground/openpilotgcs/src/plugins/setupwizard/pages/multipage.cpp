@@ -30,7 +30,7 @@
 #include "setupwizard.h"
 
 MultiPage::MultiPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::MultiPage)
 {
     ui->setupUi(this);    

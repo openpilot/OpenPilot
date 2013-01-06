@@ -29,12 +29,13 @@
 #define SURFACEPAGE_H
 
 #include "abstractwizardpage.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class SurfacePage;
 }
 
-class SurfacePage : public AbstractWizardPage
+class SurfacePage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
     

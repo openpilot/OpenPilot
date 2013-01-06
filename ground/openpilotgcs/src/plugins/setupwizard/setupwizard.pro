@@ -49,7 +49,6 @@ SOURCES += setupwizardplugin.cpp \
     pages/fixedwingpage.cpp \
     pages/helipage.cpp \
     pages/surfacepage.cpp \
-    pages/abstractwizardpage.cpp \
     pages/outputpage.cpp \
     pages/inputpage.cpp \
     pages/summarypage.cpp \

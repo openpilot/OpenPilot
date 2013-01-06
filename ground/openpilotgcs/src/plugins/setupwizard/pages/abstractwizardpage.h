@@ -29,19 +29,22 @@
 #define ABSTRACTWIZARDPAGE_H
 
 #include <QWizardPage>
-#include "setupwizard.h"
 
-class AbstractWizardPage : public QWizardPage
+template <class WizardClass> class AbstractWizardPage : public QWizardPage
 {
-    Q_OBJECT
-protected:
-    explicit AbstractWizardPage(SetupWizard *wizard, QWidget *parent = 0);
+
+protected:    
+    explicit AbstractWizardPage(WizardClass* wizard, QWidget *parent = 0) :
+        QWizardPage(parent)
+    {
+        m_wizard = wizard;
+    }
 
 private:
-    SetupWizard *m_wizard;
+    WizardClass *m_wizard;
 
 public:
-    SetupWizard* getWizard() { return m_wizard; }
+    WizardClass* getWizard() { return m_wizard; }
 
 };
 

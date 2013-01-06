@@ -29,12 +29,13 @@
 #define FIXEDWINGPAGE_H
 
 #include "abstractwizardpage.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class FixedWingPage;
 }
 
-class FixedWingPage : public AbstractWizardPage
+class FixedWingPage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
     

@@ -30,7 +30,7 @@
 #include "setupwizard.h"
 
 OutputPage::OutputPage(SetupWizard *wizard, QWidget *parent) :
-        AbstractWizardPage(wizard, parent),
+        AbstractWizardPage<SetupWizard>(wizard, parent),
 
     ui(new Ui::OutputPage)
 {

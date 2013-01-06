@@ -33,7 +33,7 @@
 #include <uavobjectutil/uavobjectutilmanager.h>
 
 ControllerPage::ControllerPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::ControllerPage)
 {
     ui->setupUi(this);

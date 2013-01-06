@@ -29,7 +29,7 @@
 #include "ui_vehiclepage.h"
 
 VehiclePage::VehiclePage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::VehiclePage)
 {
     ui->setupUi(this);

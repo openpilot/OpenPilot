@@ -29,7 +29,7 @@
 #include "ui_surfacepage.h"
 
 SurfacePage::SurfacePage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::SurfacePage)
 {
     ui->setupUi(this);

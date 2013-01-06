@@ -29,12 +29,13 @@
 #define NOTYETIMPLEMENTEDPAGE_H
 
 #include "abstractwizardpage.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class NotYetImplementedPage;
 }
 
-class NotYetImplementedPage : public AbstractWizardPage
+class NotYetImplementedPage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
     

@@ -29,7 +29,7 @@
 #include "ui_notyetimplementedpage.h"
 
 NotYetImplementedPage::NotYetImplementedPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::NotYetImplementedPage)
 {
     ui->setupUi(this);

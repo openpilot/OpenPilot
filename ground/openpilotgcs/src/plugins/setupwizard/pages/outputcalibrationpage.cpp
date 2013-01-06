@@ -31,7 +31,7 @@
 #include "uavobjectmanager.h"
 
 OutputCalibrationPage::OutputCalibrationPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent), ui(new Ui::OutputCalibrationPage), m_vehicleBoundsItem(0),
+    AbstractWizardPage<SetupWizard>(wizard, parent), ui(new Ui::OutputCalibrationPage), m_vehicleBoundsItem(0),
     m_currentWizardIndex(-1), m_calibrationUtil(0)
 {
     ui->setupUi(this);

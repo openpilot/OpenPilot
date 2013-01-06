@@ -29,7 +29,7 @@
 #include "ui_helipage.h"
 
 HeliPage::HeliPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::HeliPage)
 {
     ui->setupUi(this);

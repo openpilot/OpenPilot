@@ -29,12 +29,13 @@
 #define ENDPAGE_H
 
 #include "abstractwizardpage.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class EndPage;
 }
 
-class EndPage : public AbstractWizardPage
+class EndPage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
     

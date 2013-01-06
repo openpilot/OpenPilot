@@ -33,7 +33,7 @@
 #include "hwsettings.h"
 
 InputPage::InputPage(SetupWizard *wizard, QWidget *parent) :
-        AbstractWizardPage(wizard, parent),
+        AbstractWizardPage<SetupWizard>(wizard, parent),
 
     ui(new Ui::InputPage)
 {

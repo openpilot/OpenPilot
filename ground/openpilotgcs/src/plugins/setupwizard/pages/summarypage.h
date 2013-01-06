@@ -29,12 +29,13 @@
 #define SUMMARYPAGE_H
 
 #include "abstractwizardpage.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class SummaryPage;
 }
 
-class SummaryPage : public AbstractWizardPage
+class SummaryPage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
 

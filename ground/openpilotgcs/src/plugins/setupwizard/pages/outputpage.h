@@ -29,12 +29,13 @@
 #define OUTPUTPAGE_H
 
 #include "abstractwizardpage.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class OutputPage;
 }
 
-class OutputPage : public AbstractWizardPage
+class OutputPage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
     

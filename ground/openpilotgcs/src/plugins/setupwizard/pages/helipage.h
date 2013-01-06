@@ -29,12 +29,13 @@
 #define HELIPAGE_H
 
 #include "abstractwizardpage.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class HeliPage;
 }
 
-class HeliPage : public AbstractWizardPage
+class HeliPage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
     

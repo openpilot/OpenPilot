@@ -30,12 +30,13 @@
 
 #include "abstractwizardpage.h"
 #include "levellingutil.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class LevellingPage;
 }
 
-class LevellingPage : public AbstractWizardPage
+class LevellingPage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
 

@@ -29,7 +29,7 @@
 #include "ui_fixedwingpage.h"
 
 FixedWingPage::FixedWingPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::FixedWingPage)
 {
     ui->setupUi(this);

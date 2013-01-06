@@ -28,12 +28,13 @@
 #define STARTPAGE_H
 
 #include "abstractwizardpage.h"
+#include "setupwizard.h"
 
 namespace Ui {
 class StartPage;
 }
 
-class StartPage : public AbstractWizardPage
+class StartPage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
     

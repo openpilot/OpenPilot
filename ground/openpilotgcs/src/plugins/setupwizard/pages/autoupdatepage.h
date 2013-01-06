@@ -39,7 +39,7 @@ namespace Ui {
 class AutoUpdatePage;
 }
 
-class AutoUpdatePage : public AbstractWizardPage
+class AutoUpdatePage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
 

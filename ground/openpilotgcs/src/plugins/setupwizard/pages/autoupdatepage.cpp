@@ -7,7 +7,7 @@
 #include "uploader/uploadergadgetfactory.h"
 
 AutoUpdatePage::AutoUpdatePage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::AutoUpdatePage)
 {
     ui->setupUi(this);

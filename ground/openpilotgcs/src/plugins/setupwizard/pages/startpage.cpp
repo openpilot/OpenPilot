@@ -28,11 +28,11 @@
 #include "ui_startpage.h"
 
 StartPage::StartPage(SetupWizard *wizard, QWidget *parent) :
-    AbstractWizardPage(wizard, parent),
+    AbstractWizardPage<SetupWizard>(wizard, parent),
     ui(new Ui::StartPage)
 {
     ui->setupUi(this);
-     setFont(QFont("Ubuntu",2));
+    setFont(QFont("Ubuntu",2));
 }
 
 StartPage::~StartPage()

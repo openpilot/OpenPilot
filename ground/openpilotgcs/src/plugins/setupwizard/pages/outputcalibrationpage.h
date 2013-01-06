@@ -38,7 +38,7 @@ namespace Ui {
 class OutputCalibrationPage;
 }
 
-class OutputCalibrationPage : public AbstractWizardPage
+class OutputCalibrationPage : public AbstractWizardPage<SetupWizard>
 {
     Q_OBJECT
     

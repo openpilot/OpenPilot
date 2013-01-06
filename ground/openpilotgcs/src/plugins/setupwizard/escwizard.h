@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       %FILENAME%
+ * @file       escwizard.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup [Group]
  * @{
- * @addtogroup %CLASS%
+ * @addtogroup ESCWizard
  * @{
  * @brief [Brief]
  *****************************************************************************/
@@ -24,3 +24,25 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
+#ifndef ESCWIZARD_H
+#define ESCWIZARD_H
+
+#include "abstractwizard.h"
+
+class ESCWizard : public AbstractWizard
+{
+    Q_OBJECT
+public:
+    explicit ESCWizard(QWidget *parent = 0);
+    
+private:
+    void createPages();
+
+signals:
+    
+public slots:
+    
+};
+
+#endif // ESCWIZARD_H

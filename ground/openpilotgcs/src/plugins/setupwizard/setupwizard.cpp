@@ -48,10 +48,10 @@
 #include "pages/autoupdatepage.h"
 #include "uploader/uploadergadgetfactory.h"
 
-SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfigurationSource(),
+SetupWizard::SetupWizard(QWidget *parent) : AbstractWizard(parent), VehicleConfigurationSource(),
     m_controllerType(CONTROLLER_UNKNOWN),
     m_vehicleType(VEHICLE_UNKNOWN), m_inputType(INPUT_UNKNOWN), m_escType(ESC_UNKNOWN),
-    m_levellingPerformed(false), m_restartNeeded(false), m_connectionManager(0)
+    m_levellingPerformed(false), m_restartNeeded(false)
 {
     setWindowTitle(tr("OpenPilot Setup Wizard"));
     setOption(QWizard::IndependentPages, false);

@@ -34,7 +34,9 @@ HEADERS += setupwizardplugin.h \
     outputcalibrationutil.h \
     pages/rebootpage.h \
     pages/savepage.h \
-    pages/autoupdatepage.h
+    pages/autoupdatepage.h \
+    abstractwizard.h \
+    escwizard.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -60,7 +62,9 @@ SOURCES += setupwizardplugin.cpp \
     outputcalibrationutil.cpp \
     pages/rebootpage.cpp \
     pages/savepage.cpp \
-    pages/autoupdatepage.cpp
+    pages/autoupdatepage.cpp \
+    abstractwizard.cpp \
+    escwizard.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 

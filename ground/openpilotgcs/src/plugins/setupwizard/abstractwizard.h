@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       %FILENAME%
+ * @file       abstractwizard.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
- * @addtogroup [Group]
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup %CLASS%
+ * @addtogroup Setup Wizard  Plugin
  * @{
- * @brief [Brief]
+ * @brief An abstract Wizard class to base wizards on.
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,3 +24,32 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
+#ifndef ABSTRACTWIZARD_H
+#define ABSTRACTWIZARD_H
+
+#include <QWizard>
+#include <coreplugin/icore.h>
+#include <coreplugin/connectionmanager.h>
+
+class AbstractWizard : public QWizard
+{
+    Q_OBJECT
+
+public:
+    AbstractWizard(QWidget *parent = 0);
+
+    Core::ConnectionManager* getConnectionManager() {
+        if (!m_connectionManager) {
+            m_connectionManager = Core::ICore::instance()->connectionManager();
+            Q_ASSERT(m_connectionManager);
+        }
+        return m_connectionManager;
+    }
+
+private:
+    Core::ConnectionManager *m_connectionManager;
+
+};
+
+#endif // ABSTRACTWIZARD_H

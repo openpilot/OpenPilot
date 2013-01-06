@@ -28,14 +28,12 @@
 #ifndef SETUPWIZARD_H
 #define SETUPWIZARD_H
 
-#include <QWizard>
+#include "abstractwizard.h"
 #include "levellingutil.h"
-#include <coreplugin/icore.h>
-#include <coreplugin/connectionmanager.h>
 #include "vehicleconfigurationsource.h"
 #include "vehicleconfigurationhelper.h"
 
-class SetupWizard : public QWizard, public VehicleConfigurationSource
+class SetupWizard : public AbstractWizard, public VehicleConfigurationSource
 {
     Q_OBJECT
 
@@ -71,14 +69,6 @@ public:
 
     QString getSummaryText();
 
-    Core::ConnectionManager* getConnectionManager() {
-        if (!m_connectionManager) {
-            m_connectionManager = Core::ICore::instance()->connectionManager();
-            Q_ASSERT(m_connectionManager);
-        }
-        return m_connectionManager;
-    }
-
 private slots:
     void customBackClicked();
     void pageChanged(int currId);
@@ -103,10 +93,7 @@ private:
     QList<actuatorChannelSettings> m_actuatorSettings;
 
     bool m_restartNeeded;
-
     bool m_back;
-
-    Core::ConnectionManager *m_connectionManager;
 };
 
 #endif // SETUPWIZARD_H

@@ -25,6 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "setupwizardplugin.h"
+#include "escwizard.h"
 
 #include <QDebug>
 #include <QtPlugin>
@@ -53,21 +54,34 @@ bool SetupWizardPlugin::initialize(const QStringList& args, QString *errMsg)
     // Add Menu entry
     Core::ActionManager* am = Core::ICore::instance()->actionManager();
     Core::ActionContainer* ac = am->actionContainer(Core::Constants::M_TOOLS);
-
-    Core::Command* cmd = am->registerAction(new QAction(this),
-                                            "SetupWizardPlugin.ShowSetupWizard",
-                                            QList<int>() <<
-                                            Core::Constants::C_GLOBAL_ID);
-    cmd->setDefaultKeySequence(QKeySequence("Ctrl+V"));
-    cmd->action()->setText(tr("Vehicle Setup Wizard"));
-
-    Core::ModeManager::instance()->addAction(cmd, 1);
-
     ac->menu()->addSeparator();
     ac->appendGroup("Wizard");
+
+    Core::Command* cmd = am->registerAction(new QAction(this), "SetupWizardPlugin.ShowSetupWizard",
+                                            QList<int>() << Core::Constants::C_GLOBAL_ID);
+    cmd->setDefaultKeySequence(QKeySequence("Ctrl+Alt+V"));
+    cmd->action()->setText(tr("Vehicle Setup Wizard"));
+
+    //This is to prevent user to open more than one wizard at the time.
+    //The RadioSetupWizard will be added to this logic when it is moved from the config plugin.
+    connect(this, SIGNAL(wizardIsOpen(bool)), cmd->action(), SLOT(setDisabled(bool)));
+    connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(showSetupWizard()));
+
+    Core::ModeManager::instance()->addAction(cmd, 1);
     ac->addAction(cmd, "Wizard");
 
-    connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(showSetupWizard()));
+
+    cmd = am->registerAction(new QAction(this), "SetupWizardPlugin.ShowESCWizard",
+                                            QList<int>() << Core::Constants::C_GLOBAL_ID);
+    cmd->setDefaultKeySequence(QKeySequence("Ctrl+Alt+E"));
+    cmd->action()->setText(tr("ESC Calibration Wizard"));
+
+    connect(this, SIGNAL(wizardIsOpen(bool)), cmd->action(), SLOT(setDisabled(bool)));
+    connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(showESCWizard()));
+
+    Core::ModeManager::instance()->addAction(cmd, 1);
+    ac->addAction(cmd, "Wizard");
+
     return true;
 }
 
@@ -83,18 +97,33 @@ void SetupWizardPlugin::showSetupWizard()
 {
     if (!wizardRunning) {
         wizardRunning = true;
-        SetupWizard *m_wiz = new SetupWizard();
-        connect(m_wiz, SIGNAL(finished(int)), this, SLOT(wizardTerminated()));
-        m_wiz->setAttribute( Qt::WA_DeleteOnClose, true );
-        m_wiz->setWindowFlags(m_wiz->windowFlags() | Qt::WindowStaysOnTopHint);
-        m_wiz->show();
+        SetupWizard *wiz = new SetupWizard();
+        connect(wiz, SIGNAL(finished(int)), this, SLOT(wizardTerminated()));
+        wiz->setAttribute( Qt::WA_DeleteOnClose, true );
+        wiz->setWindowFlags(wiz->windowFlags() | Qt::WindowStaysOnTopHint);
+        emit wizardIsOpen(true);
+        wiz->show();
+    }
+}
+
+void SetupWizardPlugin::showESCWizard()
+{
+    if (!wizardRunning) {
+        wizardRunning = true;
+        ESCWizard *wiz = new ESCWizard();
+        connect(wiz, SIGNAL(finished(int)), this, SLOT(wizardTerminated()));
+        wiz->setAttribute( Qt::WA_DeleteOnClose, true );
+        wiz->setWindowFlags(wiz->windowFlags() | Qt::WindowStaysOnTopHint);
+        emit wizardIsOpen(true);
+        wiz->show();
     }
 }
 
 void SetupWizardPlugin::wizardTerminated()
 {
     wizardRunning = false;
-    disconnect(this,SLOT(wizardTerminated()));
+    emit wizardIsOpen(false);
+    disconnect(this, SLOT(wizardTerminated()));
 }
 
 Q_EXPORT_PLUGIN(SetupWizardPlugin)

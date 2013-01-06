@@ -44,10 +44,14 @@ public:
 
 private slots:
    void showSetupWizard();
+   void showESCWizard();
    void wizardTerminated();
 
 private:
    bool wizardRunning;
+
+signals:
+   void wizardIsOpen(bool open);
 };
 
 #endif // SETUPWIZARDPLUGIN_H

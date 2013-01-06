@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       %FILENAME%
+ * @file       escwizard.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup [Group]
  * @{
- * @addtogroup %CLASS%
+ * @addtogroup ESCWizard
  * @{
  * @brief [Brief]
  *****************************************************************************/
@@ -24,3 +24,21 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
+#include "escwizard.h"
+
+ESCWizard::ESCWizard(QWidget *parent) :
+    AbstractWizard(parent)
+{
+    setWindowTitle(tr("OpenPilot ESC Calibration Wizard"));
+    setOption(QWizard::IndependentPages, false);
+    setWizardStyle(QWizard::ModernStyle);
+    setMinimumSize(600, 450);
+    resize(600, 450);
+    createPages();
+}
+
+void ESCWizard::createPages()
+{
+
+}

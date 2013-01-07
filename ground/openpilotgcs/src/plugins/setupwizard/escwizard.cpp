@@ -26,6 +26,12 @@
  */
 
 #include "escwizard.h"
+#include "pages/escstartpage.h"
+#include "pages/escvehiclepage.h"
+#include "pages/escupdateratepage.h"
+#include <pages/esccalibrationpage.h>
+#include <pages/escendpage.h>
+
 
 ESCWizard::ESCWizard(QWidget *parent) :
     AbstractWizard(parent)
@@ -38,7 +44,22 @@ ESCWizard::ESCWizard(QWidget *parent) :
     createPages();
 }
 
+int ESCWizard::nextId() const
+{
+    switch (currentId()) {
+        case PAGE_START: return PAGE_VEHICLE;
+        case PAGE_VEHICLE: return PAGE_UPDATERATE;
+        case PAGE_UPDATERATE: return PAGE_CALIBRATION;
+        case PAGE_CALIBRATION: return PAGE_END;
+        default: return -1;
+    }
+}
+
 void ESCWizard::createPages()
 {
-
+    setPage(PAGE_START, new ESCStartPage(this));
+    setPage(PAGE_VEHICLE, new ESCVehiclePage(this));
+    setPage(PAGE_UPDATERATE, new ESCUpdateRatePage(this));
+    setPage(PAGE_CALIBRATION, new ESCCalibrationPage(this));
+    setPage(PAGE_END, new ESCEndPage(this));
 }

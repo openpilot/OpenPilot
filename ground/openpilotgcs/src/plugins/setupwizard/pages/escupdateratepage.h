@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       escwizard.h
+ * @file       escupdateratepage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup [Group]
  * @{
- * @addtogroup ESCWizard
+ * @addtogroup ESCUpdateRatePage
  * @{
  * @brief [Brief]
  *****************************************************************************/
@@ -25,27 +25,26 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef ESCWIZARD_H
-#define ESCWIZARD_H
+#ifndef ESCUPDATERATEPAGE_H
+#define ESCUPDATERATEPAGE_H
 
-#include "abstractwizard.h"
+#include "abstractwizardpage.h"
+#include "escwizard.h"
 
-class ESCWizard : public AbstractWizard
+namespace Ui {
+class ESCUpdateRatePage;
+}
+
+class ESCUpdateRatePage : public AbstractWizardPage<ESCWizard>
 {
     Q_OBJECT
+    
 public:
-    explicit ESCWizard(QWidget *parent = 0);
-    int nextId() const;
+    explicit ESCUpdateRatePage(ESCWizard *wizard, QWidget *parent = 0);
+    ~ESCUpdateRatePage();
     
 private:
-    enum {PAGE_START, PAGE_VEHICLE, PAGE_UPDATERATE, PAGE_CALIBRATION, PAGE_END};
-
-    void createPages();
-
-signals:
-    
-public slots:
-    
+    Ui::ESCUpdateRatePage *ui;
 };
 
-#endif // ESCWIZARD_H
+#endif // ESCUPDATERATEPAGE_H

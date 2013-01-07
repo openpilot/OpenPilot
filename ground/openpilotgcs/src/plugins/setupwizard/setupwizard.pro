@@ -36,7 +36,12 @@ HEADERS += setupwizardplugin.h \
     pages/savepage.h \
     pages/autoupdatepage.h \
     abstractwizard.h \
-    escwizard.h
+    escwizard.h \
+    pages/escstartpage.h \
+    pages/escvehiclepage.h \
+    pages/escupdateratepage.h \
+    pages/esccalibrationpage.h \
+    pages/escendpage.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -63,7 +68,12 @@ SOURCES += setupwizardplugin.cpp \
     pages/savepage.cpp \
     pages/autoupdatepage.cpp \
     abstractwizard.cpp \
-    escwizard.cpp
+    escwizard.cpp \
+    pages/escstartpage.cpp \
+    pages/escvehiclepage.cpp \
+    pages/escupdateratepage.cpp \
+    pages/esccalibrationpage.cpp \
+    pages/escendpage.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 
@@ -85,7 +95,12 @@ FORMS += \
     pages/outputcalibrationpage.ui \
     pages/rebootpage.ui \
     pages/savepage.ui \
-    pages/autoupdatepage.ui
+    pages/autoupdatepage.ui \
+    pages/escstartpage.ui \
+    pages/escvehiclepage.ui \
+    pages/escupdateratepage.ui \
+    pages/esccalibrationpage.ui \
+    pages/escendpage.ui
 
 RESOURCES += \
     wizardResources.qrc

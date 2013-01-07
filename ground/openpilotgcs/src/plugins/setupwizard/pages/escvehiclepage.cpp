@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       escwizard.h
+ * @file       escvehiclepage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup [Group]
  * @{
- * @addtogroup ESCWizard
+ * @addtogroup ESCVehiclePage
  * @{
  * @brief [Brief]
  *****************************************************************************/
@@ -25,27 +25,17 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef ESCWIZARD_H
-#define ESCWIZARD_H
+#include "escvehiclepage.h"
+#include "ui_escvehiclepage.h"
 
-#include "abstractwizard.h"
-
-class ESCWizard : public AbstractWizard
+ESCVehiclePage::ESCVehiclePage(ESCWizard *wizard, QWidget *parent) :
+    AbstractWizardPage<ESCWizard>(wizard, parent),
+    ui(new Ui::ESCVehiclePage)
 {
-    Q_OBJECT
-public:
-    explicit ESCWizard(QWidget *parent = 0);
-    int nextId() const;
-    
-private:
-    enum {PAGE_START, PAGE_VEHICLE, PAGE_UPDATERATE, PAGE_CALIBRATION, PAGE_END};
+    ui->setupUi(this);
+}
 
-    void createPages();
-
-signals:
-    
-public slots:
-    
-};
-
-#endif // ESCWIZARD_H
+ESCVehiclePage::~ESCVehiclePage()
+{
+    delete ui;
+}

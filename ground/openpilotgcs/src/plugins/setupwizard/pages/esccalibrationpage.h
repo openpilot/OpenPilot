@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       escwizard.h
+ * @file       esccalibrationpage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup [Group]
  * @{
- * @addtogroup ESCWizard
+ * @addtogroup ESCCalibrationPage
  * @{
  * @brief [Brief]
  *****************************************************************************/
@@ -25,27 +25,26 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef ESCWIZARD_H
-#define ESCWIZARD_H
+#ifndef ESCCALIBRATIONPAGE_H
+#define ESCCALIBRATIONPAGE_H
 
-#include "abstractwizard.h"
+#include "abstractwizardpage.h"
+#include "escwizard.h"
 
-class ESCWizard : public AbstractWizard
+namespace Ui {
+class ESCCalibrationPage;
+}
+
+class ESCCalibrationPage : public AbstractWizardPage<ESCWizard>
 {
     Q_OBJECT
+    
 public:
-    explicit ESCWizard(QWidget *parent = 0);
-    int nextId() const;
+    explicit ESCCalibrationPage(ESCWizard *wizard, QWidget *parent = 0);
+    ~ESCCalibrationPage();
     
 private:
-    enum {PAGE_START, PAGE_VEHICLE, PAGE_UPDATERATE, PAGE_CALIBRATION, PAGE_END};
-
-    void createPages();
-
-signals:
-    
-public slots:
-    
+    Ui::ESCCalibrationPage *ui;
 };
 
-#endif // ESCWIZARD_H
+#endif // ESCCALIBRATIONPAGE_H

@@ -146,7 +146,7 @@
     <message>
         <location line="-376"/>
         <source>OpenPilot GCS</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+493"/>
@@ -293,7 +293,7 @@
     <message>
         <location line="+3"/>
         <source>Goto Next View</source>
-        <translation type="unfinished">Aller à la Vue Suivante</translation>
+        <translation>Aller Vue Suivante</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -793,17 +793,17 @@
     <message>
         <location filename="../../../src/libs/utils/filewizardpage.ui"/>
         <source>Choose the location</source>
-        <translation type="unfinished">Choisir l&apos;emplacement</translation>
+        <translation>Choisir l&apos;emplacement</translation>
     </message>
     <message>
         <location/>
         <source>Name:</source>
-        <translation type="unfinished">Nom :</translation>
+        <translation>Nom :</translation>
     </message>
     <message>
         <location/>
         <source>Path:</source>
-        <translation type="unfinished">Chemin :</translation>
+        <translation>Chemin :</translation>
     </message>
 </context>
 <context>
@@ -1483,7 +1483,7 @@ Raison : %3</translation>
     <message>
         <location filename="../../../src/plugins/welcome/welcomemode.cpp" line="+90"/>
         <source>Welcome</source>
-        <translation type="unfinished">Accueil</translation>
+        <translation>Accueil</translation>
     </message>
 </context>
 <context>
@@ -1646,7 +1646,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/hitlnew/hitloptionspage.ui"/>
         <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -1754,7 +1754,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>Attitude data</source>
-        <translation type="unfinished">Données attitude</translation>
+        <translation>Données attitude</translation>
     </message>
     <message>
         <location/>
@@ -1764,12 +1764,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Refresh rate</source>
-        <translation type="unfinished">Fréquence de raffraichissement</translation>
+        <translation>Fréquence de raffraichissement</translation>
     </message>
     <message>
         <location/>
         <source>ms</source>
-        <translation type="unfinished">ms</translation>
+        <translation>ms</translation>
     </message>
     <message>
         <location/>
@@ -1794,7 +1794,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Other data</source>
-        <translation type="unfinished">Autres données</translation>
+        <translation>Autres données</translation>
     </message>
     <message>
         <location/>
@@ -1804,12 +1804,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>0 - update once, or every N seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>0 - MàJ unique, ou chaque N secondes</translation>
     </message>
     <message>
         <location/>
         <source>sec</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -1824,12 +1824,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Range detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Plage de détection</translation>
     </message>
     <message>
         <location/>
         <source>m</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -1926,7 +1926,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Whole range:</source>
-        <translation type="unfinished"></translation>
+        <translation>Plage totale :</translation>
     </message>
     <message>
         <location/>
@@ -1961,12 +1961,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>ObjectName</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>ObjectField</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -1981,7 +1981,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Decimal places:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nb décimales :</translation>
     </message>
     <message>
         <location/>
@@ -2184,7 +2184,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Find place</source>
-        <translation type="unfinished">Chercher un lieu</translation>
+        <translation>Chercher un lieu</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
@@ -2208,7 +2208,7 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Map position</source>
-        <translation type="unfinished">Position carte</translation>
+        <translation>Position carte</translation>
     </message>
     <message>
         <location/>
@@ -2220,7 +2220,7 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Mouse position</source>
-        <translation type="unfinished">Position souris</translation>
+        <translation>Position souris</translation>
     </message>
     <message>
         <location/>
@@ -2257,7 +2257,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source> Places </source>
-        <translation type="unfinished">Lieux</translation>
+        <translation>Lieux</translation>
     </message>
     <message>
         <location/>
@@ -2267,22 +2267,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source> Waypoints </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>New waypoints</source>
-        <translation type="unfinished">Nouveau waypoint</translation>
+        <translation>Nouveau waypoint</translation>
     </message>
     <message>
         <location/>
         <source>New</source>
-        <translation type="unfinished">Nouveau</translation>
+        <translation>Nouveau</translation>
     </message>
     <message>
         <location/>
         <source>Open waypoints</source>
-        <translation type="unfinished">Ouvrir waypoint</translation>
+        <translation>Ouvrir waypoint</translation>
     </message>
     <message>
         <location/>
@@ -2319,54 +2319,54 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Center map over UAV position</source>
-        <translation type="unfinished">Centrer la carte sur la position de l&apos;appareil</translation>
+        <translation>Centrer la carte sur la position de l&apos;appareil</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Map rotation follows UAV heading</source>
-        <translation type="unfinished">La rotation de la carte suit la direction de l&apos;appareil</translation>
+        <translation>La rotation de la carte suit la direction de l&apos;appareil</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>UAV hold position</source>
-        <translation type="unfinished">L&apos;appareil reste sur sa position</translation>
+        <translation>L&apos;appareil reste sur sa position</translation>
     </message>
     <message>
         <location/>
         <source>Hold</source>
-        <translation type="unfinished">Maintenir</translation>
+        <translation>Maintenir</translation>
     </message>
     <message>
         <location/>
         <source>UAV go home</source>
-        <translation type="unfinished">L&apos;appareil revient au point de départ</translation>
+        <translation>L&apos;appareil revient au point de départ</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Home</source>
-        <translation type="unfinished">Maison</translation>
+        <translation>Maison</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Move UAV to previous waypoint</source>
-        <translation type="unfinished">Déplacer l&apos;appareil au précédent waypoint</translation>
+        <translation>Déplacer l&apos;appareil au précédent waypoint</translation>
     </message>
     <message>
         <location/>
         <source>Previous WP</source>
-        <translation type="unfinished">Précédent WP</translation>
+        <translation>Précédent WP</translation>
     </message>
     <message>
         <location/>
         <source>Move UAV to next waypoint</source>
-        <translation type="unfinished">Déplacer l&apos;appareil au waypoint suivant</translation>
+        <translation>Déplacer l&apos;appareil au waypoint suivant</translation>
     </message>
     <message>
         <location/>
         <source>Next WP</source>
-        <translation type="unfinished">WP Suivant</translation>
+        <translation>WP Suivant</translation>
     </message>
     <message>
         <location/>
@@ -2382,7 +2382,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/opmap/opmap_widget.ui"/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>UAV position</source>
-        <translation type="unfinished">Position de l&apos;appareil</translation>
+        <translation>Position de l&apos;appareil</translation>
     </message>
     <message>
         <location/>
@@ -2400,71 +2400,71 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Normal Map Mode</source>
-        <translation type="unfinished">Mode Carte Normale</translation>
+        <translation>Mode Carte Normale</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>   Normal   </source>
-        <translation type="unfinished">   Normal </translation>
+        <translation>   Normal </translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Magic Waypoint Map Mode</source>
-        <translation type="unfinished">Mode Carte Waypoint Magique</translation>
+        <translation>Mode Carte Waypoint Magique</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>   Magic Waypoint   </source>
-        <translation type="unfinished">   Waypoint Magique </translation>
+        <translation>   Waypoint Magique </translation>
     </message>
     <message>
         <location/>
         <source>Go To Place:</source>
-        <translation type="unfinished">Aller Au Lieu :</translation>
+        <translation>Aller Au Lieu :</translation>
     </message>
     <message>
         <location/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Click to move the UAV to the magic waypoint position</source>
-        <translation type="unfinished">Cliquer pour déplacer l&apos;appareil à la position du waypoint magique</translation>
+        <translation>Cliquer pour déplacer l&apos;appareil à la position du waypoint magique</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Move to WP</source>
-        <translation type="unfinished">Dépacer au Waypoint</translation>
+        <translation>Dépacer au Waypoint</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Move the magic waypoint to the home position</source>
-        <translation type="unfinished">Déplacer le Waypoint magique au point de départ</translation>
+        <translation>Déplacer le Waypoint magique au point de départ</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Home WP</source>
-        <translation type="unfinished">WP Maison</translation>
+        <translation>WP Maison</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>UAV</source>
-        <translation type="unfinished">Appareil</translation>
+        <translation>Appareil</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Heading</source>
-        <translation type="unfinished">Orientation</translation>
+        <translation>Direction</translation>
     </message>
 </context>
 <context>
@@ -2575,7 +2575,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>UAVObject:</source>
-        <translation type="unfinished"></translation>
+        <translation>UAVObject :</translation>
     </message>
     <message>
         <location/>
@@ -2585,7 +2585,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>UAVField:</source>
-        <translation type="unfinished"></translation>
+        <translation>UAVField :</translation>
     </message>
     <message>
         <location/>
@@ -2610,6 +2610,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Add a new curve to the scope, or update it if the UAVObject and UAVField is the same.</source>
+        <translatorcomment>Oscilloscope ?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2622,6 +2623,7 @@ Mise à Jour</translation>
     <message>
         <location/>
         <source>Remove the curve from the scope.</source>
+        <translatorcomment>Oscilloscope ?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2648,17 +2650,18 @@ Mise à Jour</translation>
     <message>
         <location/>
         <source> samples</source>
+        <translatorcomment>échantillons ?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Math function:</source>
-        <translation type="unfinished"></translation>
+        <translation>Fonction Mathématique :</translation>
     </message>
     <message>
         <location/>
         <source>Log data to csv file (not interpolated)</source>
-        <translation type="unfinished"></translation>
+        <translation>Données journal dans un fichier csv (non interpolées)</translation>
     </message>
     <message>
         <location/>
@@ -2775,7 +2778,7 @@ Mise à Jour</translation>
     <message>
         <location filename="../../../src/libs/glc_lib/3rdparty/quazip/quazipfile.cpp" line="+141"/>
         <source>ZIP/UNZIP API error %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur %1 de l&apos;API ZIP/UNZIP</translation>
     </message>
 </context>
 <context>
@@ -6108,7 +6111,7 @@ Mise à Jour</translation>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginfactory.cpp" line="+36"/>
         <source>Notify Plugin</source>
-        <translation type="unfinished"></translation>
+        <translation>Plugin de Notification</translation>
     </message>
 </context>
 <context>
@@ -6735,12 +6738,12 @@ Mise à Jour</translation>
     <message>
         <location filename="../../../src/plugins/dial/dialgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>Dial SVG: </source>
-        <translation type="unfinished"></translation>
+        <translation>SVG Dial :</translation>
     </message>
     <message>
         <location/>
@@ -6755,62 +6758,62 @@ Mise à Jour</translation>
     <message>
         <location/>
         <source>Dial font:</source>
-        <translation type="unfinished">Police Dial :</translation>
+        <translation>Police Dial :</translation>
     </message>
     <message>
         <location/>
         <source>Select...</source>
-        <translation type="unfinished">Sélectionner...</translation>
+        <translation>Sélectionner...</translation>
     </message>
     <message>
         <location/>
         <source>Indicator 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Indicateur 1</translation>
     </message>
     <message>
         <location/>
         <source>Movement:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mouvement :</translation>
     </message>
     <message>
         <location/>
         <source>ID:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Min:</source>
-        <translation type="unfinished">Mini :</translation>
+        <translation>Mini :</translation>
     </message>
     <message>
         <location/>
         <source>Max:</source>
-        <translation type="unfinished">Maxi :</translation>
+        <translation>Maxi :</translation>
     </message>
     <message>
         <location/>
         <source>Factor:</source>
-        <translation type="unfinished"></translation>
+        <translation>Facteur :</translation>
     </message>
     <message>
         <location/>
         <source>DataObject</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>ObjectField</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Indicator 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Indicateur 2</translation>
     </message>
     <message>
         <location/>
         <source>Indicator 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Indicateur 3</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/dial/dialgadgetoptionspage.cpp" line="+86"/>
@@ -6967,12 +6970,12 @@ Mise à Jour</translation>
     <message>
         <location/>
         <source>H / V / P DOP:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>0 / 0 / 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7474,7 +7477,7 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>50</source>
-        <translation type="unfinished">50</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -7499,7 +7502,7 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>100</source>
-        <translation type="unfinished">100</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -7849,7 +7852,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/gcscontrol/gcscontrol.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -8131,7 +8134,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>HomeCoord:</source>
-        <translation type="unfinished">HomeCoord :</translation>
+        <translation>HomeCoord :</translation>
     </message>
     <message>
         <location/>
@@ -8407,7 +8410,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location filename="../../../src/plugins/config/camerastabilization.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -8440,7 +8443,7 @@ Useful if you have accidentally changed some settings.</source>
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation type="unfinished">Angle caméra en Yaw pour une valeur de sortie de 100%, degrés.
+        <translation>Angle caméra en Yaw pour une valeur de sortie de 100%, degrés.
 
 Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous devez également ajuster la plage de sortie du canal dans l&apos;onglet Output.</translation>
     </message>
@@ -8486,7 +8489,7 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation type="unfinished">Angle caméra en Pitch pour une valeur de sortie de 100%, degrés.
+        <translation>Angle caméra en Pitch pour une valeur de sortie de 100%, degrés.
 
 Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous devez également ajuster la plage de sortie du canal dans l&apos;onglet Output.</translation>
     </message>
@@ -8502,7 +8505,7 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation type="unfinished">Angle caméra en Roll pour une valeur de sortie de 100%, degrés.
+        <translation>Angle caméra en Roll pour une valeur de sortie de 100%, degrés.
 
 Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous devez également ajuster la plage de sortie du canal dans l&apos;onglet Output.</translation>
     </message>
@@ -8701,7 +8704,7 @@ This option smoothes the stick input. Zero value disables LPF.</source>
     <message>
         <location/>
         <source>Response Time</source>
-        <translation type="unfinished">Temps de Réponse</translation>
+        <translation>Temps de Réponse</translation>
     </message>
     <message>
         <location/>
@@ -8716,12 +8719,12 @@ This option smoothes the stick input. Zero value disables LPF.</source>
     <message>
         <location/>
         <source>Stabilization Mode</source>
-        <translation type="unfinished">Mode Stabilisation</translation>
+        <translation>Mode Stabilisation</translation>
     </message>
     <message>
         <location/>
         <source>(the same value for Roll, Pitch, Yaw)</source>
-        <translation type="unfinished">(Les mêmes valeurs pour Roll, Pitch, Yaw)</translation>
+        <translation>(Les mêmes valeurs pour Roll, Pitch, Yaw)</translation>
     </message>
     <message>
         <location/>
@@ -8744,7 +8747,7 @@ value.</source>
     <message>
         <location/>
         <source>Messages</source>
-        <translation type="unfinished">Messages</translation>
+        <translation>Messages</translation>
     </message>
     <message>
         <location/>
@@ -8880,27 +8883,27 @@ Apply or Save button afterwards.</source>
     <message>
         <location/>
         <source>USB HID Port</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>MainPort</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>FlexiPort</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>USB VCP Port</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>RcvrPort</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -8942,27 +8945,27 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Attitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Attitude</translation>
     </message>
     <message>
         <location/>
         <source>Rotate virtual attitude relative to board</source>
-        <translation type="unfinished"></translation>
+        <translation>Pivoter l&apos;attitude virtuelle par rapport à la carte</translation>
     </message>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9000,7 +9003,7 @@ la carte est armée. Dans ce cas ne bougez pas l&apos;appareil lors de l&apos;ar
     <message>
         <location/>
         <source>AccelTau</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9016,7 +9019,9 @@ Start low and raise until drift stops.
 A setting of 0.00 disables the filter.</source>
         <translation>Filtrage accéléromètres.
 
-Ajuste le niveau de filtrage passe-bas des données d&apos;accéléromètres pour l&apos;estimation de l&apos;inclinaison. Des valeurs élevées donnent un filtrage plus important qui peut aider pour le glissement en mode stabilisé.
+Ajuste le niveau de filtrage passe-bas des données d&apos;accéléromètres pour 
+l&apos;estimation de l&apos;inclinaison. Des valeurs élevées donnent un filtrage plus 
+important qui peut aider pour le glissement en mode stabilisé.
 
 Plage : 0.00 - 0.20, Bonne valeur de départ : 0.05 - 0.10
 Commencez à un niveau bas et augmentez jusqu&apos;à ce que le glissement s&apos;arrête.
@@ -9050,7 +9055,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location filename="../../../src/plugins/config/ccpm.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -9060,12 +9065,12 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Select aircraft type here</source>
-        <translation type="unfinished">Sélectionner ici le type d&apos;appareil</translation>
+        <translation>Sélectionner ici le type d&apos;appareil</translation>
     </message>
     <message>
         <location/>
         <source>Basic settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres de base</translation>
     </message>
     <message>
         <location/>
@@ -9075,7 +9080,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Tail Rotor</source>
-        <translation type="unfinished"></translation>
+        <translation>Rotor queue</translation>
     </message>
     <message>
         <location/>
@@ -9310,12 +9315,12 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Curve 1</source>
-        <translation type="unfinished">Courbe 1</translation>
+        <translation>Courbe 1</translation>
     </message>
     <message>
         <location/>
         <source>Curve 2</source>
-        <translation type="unfinished">Courbe 2</translation>
+        <translation>Courbe 2</translation>
     </message>
     <message>
         <location/>
@@ -9325,7 +9330,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9333,7 +9338,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location filename="../../../src/plugins/config/defaultattitude.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -9345,7 +9350,14 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This panel will be updated to provide the relevant controls to let you calibrate your OpenPilot INS or your CopterControl unit, depending on the board which is detected once telemetry is connected and running.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Attitude / calibration INS&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Ce panneau sera mis à jour pour vous fournir les contrôles pertinents afin de vous permettre de calibrer votre INS OpenPilot ou votre carte CopterControl, en fonction du matériel détecté, une fois que la télémétrie est connectée et en cours d&apos;exécution.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -9693,17 +9705,17 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>4</source>
-        <translation type="unfinished">4</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>3</source>
-        <translation type="unfinished">3</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>2</source>
-        <translation type="unfinished">2</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9718,57 +9730,57 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>1.0</source>
-        <translation type="unfinished">1.0</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>.75</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>.50</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>.25</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>.00</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Linear</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Log</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Exp</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Flat</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Step</source>
         <translatorcomment>Saut ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9829,37 +9841,37 @@ Laisser à 50Hz pour une aile volante.</translation>
     <message>
         <location/>
         <source>50</source>
-        <translation type="unfinished">50</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>60</source>
-        <translation type="unfinished">60</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>125</source>
-        <translation type="unfinished">125</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>165</source>
-        <translation type="unfinished">165</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>270</source>
-        <translation type="unfinished">270</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>330</source>
-        <translation type="unfinished">330</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>400</source>
-        <translation type="unfinished">400</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9925,22 +9937,22 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>0000</source>
-        <translation type="unfinished">0000</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Link</source>
-        <translation type="unfinished"></translation>
+        <translation>Lien</translation>
     </message>
     <message>
         <location/>
         <source>TextLabel</source>
-        <translation type="unfinished">Label de texte</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>#</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10415,12 +10427,12 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès distant !</translation>
     <message>
         <location filename="../../../src/plugins/config/revosensors.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>Calibration</source>
-        <translation type="unfinished">Calibration</translation>
+        <translation>Calibration</translation>
     </message>
     <message>
         <location/>
@@ -10430,7 +10442,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès distant !</translation>
     <message>
         <location/>
         <source>Nice paper plane, eh?</source>
-        <translation type="unfinished">Joli avion en papier, hein ?</translation>
+        <translation>Joli avion en papier, hein ?</translation>
     </message>
     <message>
         <location/>
@@ -10440,17 +10452,17 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès distant !</translation>
     <message>
         <location/>
         <source>Start</source>
-        <translation type="unfinished">Démarrer</translation>
+        <translation>Démarrer</translation>
     </message>
     <message>
         <location/>
         <source>Save settings (only enabled when calibration is running)</source>
-        <translation type="unfinished">Enregistrer les paramètres (actif uniquement lorsque la calibration est en route)</translation>
+        <translation>Enregistrer les paramètres (actif uniquement lorsque la calibration est en route)</translation>
     </message>
     <message>
         <location/>
         <source>Save Position</source>
-        <translation type="unfinished">Enregistre Position</translation>
+        <translation>Enregistre Position</translation>
     </message>
     <message>
         <location/>
@@ -10469,7 +10481,7 @@ Tip: lower is better!</source>
         <source>Press to start a calibration procedure, about 15 seconds.
 
 Hint: run this with engines at cruising speed.</source>
-        <translation type="unfinished">Appuyer pour démarrer la procédure de calibration, environ 15 secondes.
+        <translation>Appuyer pour démarrer la procédure de calibration, environ 15 secondes.
 
 Astuce : Faites-le avec le moteur en vitesse de croisière.</translation>
     </message>
@@ -10491,7 +10503,7 @@ Astuce : Faites-le avec le moteur en vitesse de croisière.</translation>
     <message>
         <location/>
         <source>Min</source>
-        <translation type="unfinished">Mini</translation>
+        <translation>Mini</translation>
     </message>
     <message>
         <location/>
@@ -10503,7 +10515,7 @@ temperature is very different from your MB temp...</source>
     <message>
         <location/>
         <source>Max</source>
-        <translation type="unfinished">Maxi</translation>
+        <translation>Maxi</translation>
     </message>
     <message>
         <location/>
@@ -10541,7 +10553,7 @@ TODO: is this necessary? Measurement could be auto updated every second or so, o
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">Enregistrer</translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <location/>
@@ -10576,7 +10588,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Settings</source>
-        <translation type="unfinished">Paramètres</translation>
+        <translation>Paramètres</translation>
     </message>
     <message>
         <location/>
@@ -10588,7 +10600,7 @@ p, li { white-space: pre-wrap; }
         <source>Select the sensor integration algorithm here.
 &quot;Simple&quot; only uses accelerometer values
 &quot;INSGPS&quot; the full featured algorithm integrating all sensors</source>
-        <translation type="unfinished">Sélectionner ici l&apos;algorithme d&apos;intégration des capteurs.
+        <translation>Sélectionner ici l&apos;algorithme d&apos;intégration des capteurs.
 &quot;Simple&quot; utilise seulement les valeurs des accéléromètres
 &quot;INSGPS&quot; l&apos;algorithme complet intégrant tous les capteurs</translation>
     </message>
@@ -10649,7 +10661,7 @@ specific calibration button on top of the screen.</source>
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished">Appliquer</translation>
+        <translation>Appliquer</translation>
     </message>
     <message>
         <location/>
@@ -10704,17 +10716,17 @@ specific calibration button on top of the screen.</source>
     <message>
         <location/>
         <source>Roll</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Yaw</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10725,7 +10737,8 @@ specific calibration button on top of the screen.</source>
         <location/>
         <source>Slowly raise Proportional until you start seeing clear oscillations when you fly.
 Then lower the value by 5 or so.</source>
-        <translation type="unfinished"></translation>
+        <translation>Augmentez doucement Prportionnel jusqu&apos;à commencer à observer des 
+oscillations claires en vol. Baissez ensuite la valeur de 5 ou plus.</translation>
     </message>
     <message>
         <location/>
@@ -10784,7 +10797,8 @@ Then lower the value by 5 or so.</source>
         <location/>
         <source>As a rule of thumb, you can set the Integral at roughly the same
 value as the Kp.</source>
-        <translation type="unfinished"></translation>
+        <translation>En règle générale, vous pouvez définir l&apos;intégrale 
+à peu près à la même valeur que Kp.</translation>
     </message>
     <message>
         <location/>
@@ -11073,7 +11087,7 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>Integral Limits</source>
-        <translation type="unfinished"></translation>
+        <translation>Limites Intégrales</translation>
     </message>
     <message>
         <location/>
@@ -11101,7 +11115,7 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>Sensor Tuning</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglages Capteurs</translation>
     </message>
     <message>
         <location/>
@@ -11172,13 +11186,14 @@ Then lower the value by 20% or so.</source>
     <message>
         <location/>
         <source>Real Time Updates</source>
-        <translation type="unfinished"></translation>
+        <translation>MàJ Temps Réel</translation>
     </message>
     <message>
         <location/>
         <source>If you check this, the GCS will udpate the stabilization factors
 automatically every 300ms, which will help for fast tuning.</source>
-        <translation type="unfinished"></translation>
+        <translation>Si vous cochez, GCS mettra à jour les facteurs de stabilisation 
+automatiquement toutes les 300ms, ce qui aidera pour un réglage rapide. </translation>
     </message>
     <message>
         <location/>
@@ -11404,6 +11419,7 @@ only when system is armed without disabling the module.</source>
     <message>
         <location/>
         <source>button:help</source>
+        <translatorcomment>Pas toucher.</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11513,22 +11529,22 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location/>
         <source>External input Device:</source>
-        <translation type="unfinished"></translation>
+        <translation>Périphérique d&apos;entrée :</translation>
     </message>
     <message>
         <location/>
         <source>Only joystick is implemented at this stage, so this control is disabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Actuellement seulement le joystick est implémenté , donc ce contôle est désactivé.</translation>
     </message>
     <message>
         <location/>
         <source>Joystick</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Audio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11543,7 +11559,7 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location/>
         <source>Joystick Axes</source>
-        <translation type="unfinished"></translation>
+        <translation>Axes Joystick</translation>
     </message>
     <message>
         <location/>
@@ -11558,64 +11574,64 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location/>
         <source>Joystick Buttons</source>
-        <translation type="unfinished"></translation>
+        <translation>Boutons Joystick</translation>
     </message>
     <message>
         <location/>
         <source>Press buttons on controller to identify mappings</source>
-        <translation type="unfinished"></translation>
+        <translation>Appuyer sur les boutons du contrôleur pour identifier les attributions</translation>
     </message>
     <message>
         <location/>
         <source>button 1</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation>bouton 1</translation>
     </message>
     <message>
         <location/>
         <source>button 2</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation>bouton 2</translation>
     </message>
     <message>
         <location/>
         <source>button 8</source>
-        <translation type="unfinished"></translation>
+        <translation>bouton 8</translation>
     </message>
     <message>
         <location/>
         <source>button 7</source>
-        <translation type="unfinished"></translation>
+        <translation>bouton 7</translation>
     </message>
     <message>
         <location/>
         <source>button 6</source>
-        <translation type="unfinished"></translation>
+        <translation>bouton 6</translation>
     </message>
     <message>
         <location/>
         <source>button 5</source>
-        <translation type="unfinished"></translation>
+        <translation>bouton 5</translation>
     </message>
     <message>
         <location/>
         <source>button 4</source>
-        <translation type="unfinished"></translation>
+        <translation>bouton 4</translation>
     </message>
     <message>
         <location/>
         <source>button 3</source>
-        <translation type="unfinished"></translation>
+        <translation>bouton 3</translation>
     </message>
     <message>
         <location/>
         <source>by</source>
-        <translation type="unfinished"></translation>
+        <translation>par</translation>
     </message>
     <message>
         <location/>
         <source>Audio: soundcard-based PPM decoding for trainer port. Not implemented yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio : décodage du signal PPM par la carte son. Pas encore implémenté.</translation>
     </message>
     <message>
         <location/>
@@ -11635,7 +11651,7 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location/>
         <source>127.0.0.1</source>
-        <translation type="unfinished">127.0.0.1</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11645,7 +11661,7 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location/>
         <source>2323</source>
-        <translation type="unfinished">2323</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -11653,12 +11669,12 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location filename="../../../src/plugins/hitlv2/aerosimrc/src/udptestwidget.ui"/>
         <source>send data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Envoi données</translation>
     </message>
     <message>
         <location/>
         <source>Flight mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode de vol</translation>
     </message>
     <message>
         <location/>
@@ -11948,7 +11964,7 @@ les données en cache</translation>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12069,7 +12085,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/endpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12084,18 +12100,29 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To complete the setup please click the Radio Setup Wizard button below to close this wizard and go directly to the Radio Setup Wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Félicitations !&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;L&apos;Assistant de Configuration est terminé.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cette partie de la procédure de configuration est maintenant terminée et il vous reste une étape pour arriver au terme de la configuration de votre contrôleur OpenPilot.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour terminer la configuration veuillez appuyer sur le bouton Aller à l&apos;Assistant des Entrées... ci-dessous pour fermer cet assistant et aller directement à l&apos;Assistant de Configuration Radio.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Go to Input Wizard...</source>
-        <translation type="unfinished"></translation>
+        <translation>Aller à l&apos;Assistant des Entrées...</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/endpage.cpp" line="+60"/>
         <source>Unable to open Input Wizard since the Config Plugin is not
 loaded in the current workspace.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir l&apos;Assistant des Entrées car le Plugin de 
+Configuration n&apos;est pas chargé dans l&apos;espace de travail actuel.</translation>
     </message>
 </context>
 <context>
@@ -12103,7 +12130,7 @@ loaded in the current workspace.</source>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/fixedwingpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12113,7 +12140,12 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;The Fixed Wing section of the OpenPilot Setup Wizard is not yet implemented&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;La partie Voilure Fixe de l&apos;Assistant de Configuration OpenPilot n&apos;est pas encore implémentée.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -12121,7 +12153,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/helipage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12131,7 +12163,12 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;The Helicopter section of the OpenPilot Setup Wizard is not yet implemented&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;La partie Hélicoptère de l&apos;Assistant de Configuration OpenPilot n&apos;est pas encore implémentée&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -12221,7 +12258,15 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;The wizard needs to get information from the controller to determine in which position the vehicle is normally considered to be level. To be able to successfully perform these measurements, you need to place the vehicle on a surface that is as flat and level as possible. Examples of such surfaces could be a table top or the floor. Be careful to ensure that the vehicle really is level, since this step will affect the accelerometer and gyro bias in the controller software.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To perform the leveling, please push the Calculate button and wait for the process to finish. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Procédure de calibration de la mise à niveau du contrôleur OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;L&apos;assistant a besoin de récupérer des informations du contrôleur pour déterminer dans quelle position le véhicule est habituellement considéré comme étant de niveau. Pour être en mesure de réaliser ces mesures correctement, vous devez placer le véhicule sur une surface aussi plane et horizontale que possible. De telles surfaces peut être une table ou le sol par exemple. Veillez à ce que le véhicule soit vraiment de niveau, car cette étape aura une incidence sur les ajustements de l&apos;accéléromètre et du gyroscope dans le logiciel de la carte.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Veuillez appuyer sur le bouton Calculer pour effectuer la mise à niveau et attendez la fin du processus. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12334,7 +12379,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/notyetimplementedpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12344,7 +12389,12 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;This section of the OpenPilot Setup Wizard is not yet implemented&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Cette partie de l&apos;Assistant de Configuration OpenPilot n&apos;est pas encore implémentée&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -12352,12 +12402,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Output calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>Calibration des sorties</translation>
     </message>
     <message>
         <location/>
@@ -12370,12 +12420,20 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Connect all components according to the illustration on the summary page, and provide power using an external power supply such as a battery before continuing.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Depending on what vehicle you have selected, both the motors controlled by ESCs and/or servos controlled directly by the OpenPilot controller may have to be calibrated. The following steps will guide you safely through this process. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Il est à présent temps de calibrer les niveaux de sortie des signaux controlant votre véhicule. &lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;TRES IMPORTANT !&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;ENLEVER TOUTES LES HELICES DE VOTRE VEHICULE AVANT DE CONTINUER !&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Branchez tous les composants comme sur l&apos;illustration dans la page de résumé et alimentez avec une source externe comme une batterie avant de continuer.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;En fonction du véhicule que vous avez sélectionné, les moteurs pilotés par des variateurs et/ou les servos contrôlés directement par la carte OpenPilot devront-être calibrés. Les étapes suivantes vous guideront en toute sécurité dans ce processus. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In this step we will set the neutral rate for the motor highlighted in the illustration to the right. &lt;br/&gt;Plase pay attention to the details and in particular the motors position and its rotation direction.&lt;/p&gt;&lt;p&gt;To find the neutral rate for this engine, press the Start button below and slide the slider to the right until the engine just starts to spin stably. &lt;br/&gt;&lt;br/&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans cette étape nous allons régler le neutre du moteur mis en évidence dans l&apos;illustration de droite. &lt;br/&gt;Veuillez faire attention aux détails, en particulier la position du moteur et son sens de rotation.&lt;/p&gt;&lt;p&gt;Pour trouver le neutre pour ce moteur, appuyer sur le bouton Démarrer et déplacez le curseur vers la droite jusqu&apos;à ce que le moteur commence à tourner régulièrement. &lt;br/&gt;&lt;br/&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12384,22 +12442,22 @@ p, li { white-space: pre-wrap; }
         <location line="+27"/>
         <location line="+18"/>
         <source>Start</source>
-        <translation type="unfinished">Démarrer</translation>
+        <translation>Démarrer</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This step calibrates the center position of the servo. To set the center position for this servo, press the Start button below and slide the slider to center the servo. &lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette étape calibre la position centrale d&apos;un servo. Pour régler la position centrale pour ce servo, appuyez sur le bouton Démarrer ci-dessous et bougez le curseur pour centrer le servo. &lt;/p&gt;&lt;p&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To save the servo and other hardware from damage we have to set the max and min angles for the servo. &lt;/p&gt;&lt;p&gt;To set the minimum angle for the servo, press the Start button below and select the top slider and slide it to the left until min angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pour protéger le servo ou tout autre matériel contre des dommages nous devons régler l&apos;angle maxi et mini pour le servo. &lt;/p&gt;&lt;p&gt;Pour régler l&apos;angle minimum du servo, appuyez sur le bouton Démarrer ci-dessous, sélectionnez le curseur du haut puis bougez-le vers la gauche jusqu&apos;à atteindre l&apos;angle minimum.&lt;/p&gt;&lt;p&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To set the maximum angle for the servo, press the Start button below and select the top slider and slide it to the right until max angle is reached.&lt;/p&gt;&lt;p&gt;When done press button again to stop.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pour régler l&apos;angle maximum du servo, appuyez sur le bouton Démarrer ci-dessous, sélectionnez le curseur du haut puis bougez-le vers la droite jusqu&apos;à atteindre l&apos;angle maximum.&lt;/p&gt;&lt;p&gt;Lorsque c&apos;est fait, appuyez à nouveau sur le bouton pour arrêter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.cpp" line="-119"/>
@@ -12407,14 +12465,16 @@ p, li { white-space: pre-wrap; }
         <location line="+27"/>
         <location line="+18"/>
         <source>Stop</source>
-        <translation type="unfinished">Arrêter</translation>
+        <translation>Arrêter</translation>
     </message>
     <message>
         <location line="-84"/>
         <source>The actuator module is in an error state.
 
 Please make sure the correct firmware version is used then restart the wizard and try again. If the problem persists please consult the openpilot.org support forum.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le module de sortie est dans un état d&apos;erreur.
+
+Soyez certain d&apos;utiliser la bonne version de firmware puis redémarrer l&apos;assistant et essayez à nouveau. Si le problème persiste, consultez le forum openpilot.org.</translation>
     </message>
 </context>
 <context>
@@ -12422,7 +12482,7 @@ Please make sure the correct firmware version is used then restart the wizard an
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12437,27 +12497,37 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Please select one of the options below. If you are unsure about the capabilities of your ESCs, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To read more regarding ESC refresh rates, please see &lt;/span&gt;&lt;a href=&quot;http://wiki.openpilot.org/x/HIEu&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;this article&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; in the OpenPilot Wiki&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;Configuration de base des signaux de sortie OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:12pt; font-weight:600;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Pour régler une configuration optimale des signaux de sortie pilotant vos moteurs, l&apos;assistant doit connaître quel type de variateurs (ESC) vous allez utiliser et quelles sont leur capacités.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Veuillez sélectionner une des options ci-dessous. Si vous n&apos;êtes pas certain des capacités de vos variateurs laissez juste l&apos;option par défaut sélectionnée et continuez l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Pour en savoir plus à propos des fréquences de raffraichissement des variateurs, veuillez consulter &lt;/span&gt;&lt;a href=&quot;http://wiki.openpilot.org/x/HIEu&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;cet article&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; sur le Wiki OpenPilot (en anglais)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Standard ESC 50Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>Variateur Standard 50Hz</translation>
     </message>
     <message>
         <location/>
         <source>Standard ESC</source>
-        <translation type="unfinished"></translation>
+        <translation>Variateur Standard</translation>
     </message>
     <message>
         <location/>
         <source>Turbo PWM ESC 400Hz</source>
-        <translation type="unfinished"></translation>
+        <translation>Variateur Turbo PWM 400Hz</translation>
     </message>
     <message>
         <location/>
         <source>Turbo PWM</source>
-        <translation type="unfinished"></translation>
+        <translation>Turbo PWM</translation>
     </message>
 </context>
 <context>
@@ -12465,7 +12535,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/rebootpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12474,7 +12544,11 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt; color:#ff0000;&quot;&gt;PLEASE REBOOT YOUR CONTROLLER&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt; color:#ff0000;&quot;&gt;VEUILLEZ REDEMARRER VOTRE CONTRÔLEUR&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12483,7 +12557,11 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt; color:#ffd500;&quot;&gt;PLEASE REBOOT YOUR CONTROLLER&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:18pt; color:#ffd500;&quot;&gt;VEUILLEZ REDEMARRER VOTRE CONTRÔLEUR&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12493,7 +12571,12 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; color:#000000;&quot;&gt;The configuration created by the wizard contains settings that require a reboot of your controller. Please power cycle the controller before continuing. To power cycle the controller remove all batteries and the USB cable for at least 30 seconds.&lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; color:#000000;&quot;&gt;After 30 seconds, plug in the board again and wait for it to connect, this can take a few seconds. Then press next.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; color:#000000;&quot;&gt;La configuration générée par l&apos;assistant contient des paramètres qui nécessitent un redémarrage de votre contrôleur. Veuillez éteindre / allumer le contrôleur avant de continuer. Enlevez toutes les batteries et débranchez le câble USB durant au moins 30 secondes.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; color:#000000;&quot;&gt;Après 30 secondes, branchez à nouveau votre carte et attendez qu&apos;elle se connecte, cela peut prendre quelques secondes. Puis appuyez sur Suivant.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -12562,7 +12645,7 @@ Connectez votre carte OpenPilot et essayez à nouveau.</translation>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/startpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12582,7 +12665,22 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Disregarding this warning puts you at&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#000000;&quot;&gt; risk of very serious injury&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;!&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Now that your props are removed we can get started. Ready?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Bienvenue sur l&apos;assistant de configuration OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cet assistant va vous guider à travers les étapes de base nécessaires à la configuration de votre contrôleur OpenPilot pour la première fois. Des questions vous seront posées sur votre plate-forme (multirotor / hélicoptère / voilure fixe), cet assistant les utilisera afin de configurer votre appareil pour votre premier vol.  &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Cet assistant ne configure pas tous les paramètres avancés disponibles dans le module Configuration de GCS. Tous les paramètres de configuration de base et avancés pourront être modifiés plus tard en utilisant le plugin de Configuration de GCS.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;ATTENTION : VOUS DEVEZ RETIRER TOUTES LES HELICES &lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#ff0000;&quot;&gt;DU VEHICULE AVANT DE CONTINUER !&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Ne pas tenir compte de cet avertissement vous expose à des&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600; color:#000000;&quot;&gt; risques de blessures très graves&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; !&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Dès que vos hélices seront retirées nous pourrons continuer. Êtes-vous prêt ?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -12590,7 +12688,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/summarypage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12606,12 +12704,24 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To continue the wizard and go through some basic configuration steps, please continue to the next step of this wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The following steps require that your OpenPilot controller is set up according to the diagram, it is &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;connected to the computer&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; by USB, and that the vehicle is&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt; powered by a battery&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Sommaire de configuration OpenPilot&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La première partie de cet assistant est maintenant terminée. Toutes les informations nécessaires à la création d&apos;une configuration de base du contrôleur OpenPilot pour un céhicule particulier ont été collectées.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Vous trouverez ci-dessous un résumé de la configuration et un bouton vous renvoyant vers un diagramme décrivant comment brancher le matériel nécessaire avec le Contrôleur OpenPilot dans la configuration actuelle.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour continuer l&apos;assistant et passer par quelques étapes de configuration de base, veuillez passez à l&apos;étape suivante de l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les étapes suivantes requièrent que votre contrôleur OpenPilot soit mis en oeuvre comme sur le diagramme, &lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt;connecté à l&apos;ordinateur&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt; par le port USB et que le véhicule soit&lt;/span&gt;&lt;span style=&quot; font-size:10pt; font-weight:600;&quot;&gt; alimenté par une batterie&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Show connection diagram for configuration</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Afficher le diagramme de branchement pour la configuration</translatorcomment>
+        <translation>Afficher le diagramme de branchement pour la configuration</translation>
     </message>
 </context>
 <context>
@@ -12619,7 +12729,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/surfacepage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12629,7 +12739,12 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;The Surface Vehicle section of the OpenPilot Setup Wizard is not yet implemented&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;La partie Véhicule de Surface de l&apos;Assistant de Configuration OpenPilot n&apos;est pas encore implémentée&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -12652,17 +12767,17 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Go ahead and select the type of vehicle for which you want to create a configuration.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;(The current version only provides functionality for multirotors.)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Sélection du type de véhicule&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;To continue, the wizard needs to know what type of vehicle the OpenPilot controller board is going to be used with. This step is crucial since much of the following configuration is unique per vehicle type.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour continuer, l&apos;assistant a besoin de connaître sur quel type de véhicule la carte Openpilot va être utilisée. Cette étape est cruciale car une grande partie de la configuration qui suit est spécifique au type de véhicule.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Go ahead and select the type of vehicle for which you want to create a configuration.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Allez-y et sélectionnez le type de véhicule pour lequel vous souhaitez créer une configuration.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;(The current version only provides functionality for multirotors.)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;(La version actuelle ne fournit des fonctionnalités que pour les multirotors.)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12677,7 +12792,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>CCPM Helicopters</source>
-        <translation type="unfinished"></translation>
+        <translation>Hélicoptères CCPM</translation>
     </message>
     <message>
         <location/>
@@ -12692,7 +12807,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Fixed wing</source>
-        <translation type="unfinished">Aile</translation>
+        <translation>Aile</translation>
     </message>
     <message>
         <location/>
@@ -12702,7 +12817,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Surface</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -12710,22 +12825,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/viewoptions.ui"/>
         <source>View Options</source>
-        <translation type="unfinished">Voir Options</translation>
+        <translation>Voir Options</translation>
     </message>
     <message>
         <location/>
         <source>Show MetaData</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Afficher Metadata</translation>
     </message>
     <message>
         <location/>
         <source>Show Categorized</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Afficher par Catégories</translation>
     </message>
     <message>
         <location/>
         <source>Show Scientific</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Afficher Scientifique</translation>
     </message>
 </context>
 <context>
@@ -12733,28 +12848,29 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/uavsettingsimportexport/importsummarydialog.ui"/>
         <source>Dialog</source>
-        <translation type="unfinished">Boîte de dialogue</translation>
+        <translation>Boîte de dialogue</translation>
     </message>
     <message>
         <location/>
         <source>UAV Settings import summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Résumé d&apos;importation des paramètres UAV</translation>
     </message>
     <message>
         <location/>
         <source>Save all settings checked above to persistent board storage,
 then close the dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistre tous les paramètres cochés ci-dessus dans le stockage 
+persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     </message>
     <message>
         <location/>
         <source>Save to Board Flash</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer sur Carte Flash</translation>
     </message>
     <message>
         <location/>
         <source>Close this dialog without saving to persistent storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Ferme cette boite de dialogue sans enregistrer vers le stockage persistant</translation>
     </message>
     <message>
         <location/>
@@ -12772,7 +12888,7 @@ then close the dialog.</source>
     <message>
         <location filename="../../../src/plugins/uploader/devicewidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -12877,17 +12993,17 @@ then close the dialog.</source>
     <message>
         <location/>
         <source>Git commit hash:</source>
-        <translation type="unfinished">Git commit hash :</translation>
+        <translation>Hash de commit GIT :</translation>
     </message>
     <message>
         <location/>
         <source>CRC:</source>
-        <translation type="unfinished">CRC :</translation>
+        <translation>CRC :</translation>
     </message>
     <message>
         <location/>
         <source>On Device</source>
-        <translation type="unfinished">Sur la Carte</translation>
+        <translation>Sur la Carte</translation>
     </message>
     <message>
         <location/>
@@ -12922,7 +13038,7 @@ then close the dialog.</source>
     <message>
         <location/>
         <source>Loaded</source>
-        <translation type="unfinished">Chargé</translation>
+        <translation>Chargé</translation>
     </message>
     <message>
         <location/>
@@ -13018,7 +13134,7 @@ then close the dialog.</source>
     <message>
         <location filename="../../../src/plugins/uploader/runningdevicewidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -13033,22 +13149,22 @@ then close the dialog.</source>
     <message>
         <location/>
         <source>CPU Serial:</source>
-        <translation type="unfinished"></translation>
+        <translation>N° Série CPU :</translation>
     </message>
     <message>
         <location/>
         <source>Firmware Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Information Firmware</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/uploader/runningdevicewidget.cpp" line="+69"/>
         <source>HW Revision: </source>
-        <translation type="unfinished">Révision Matériel :</translation>
+        <translation>Révision Matériel :</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Firmware CRC: </source>
-        <translation type="unfinished"></translation>
+        <translation>CRC Firmware : </translation>
     </message>
     <message>
         <location line="+40"/>
@@ -13201,13 +13317,13 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/libs/utils/xmlconfig.cpp" line="+61"/>
         <source>GCS config</source>
-        <translation type="unfinished"></translation>
+        <translation>Config GCS</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Parse error at line %1, column %2:
 %3</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur d&apos;analyse à la ligne %1, colonne %2 : %3</translation>
     </message>
 </context>
 <context>
@@ -13449,12 +13565,12 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+135"/>
         <source>The actuator module is in an error state.  This can also occur because there are no inputs.  Please fix these before testing outputs.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le module de sortie est en erreur. Cela peut arriver parce-qu&apos;il n&apos;y a pas d&apos;entrées. Veuillez réparer ça avant de tester les sorties.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>This option will start your motors by the amount selected on the sliders regardless of transmitter.  It is recommended to remove any blades from motors.  Are you sure you want to do this?</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette option démarrera vos moteurs à un niveau sélectionné par les curseurs sans tenir compte de l&apos;émetteur. Il est recommandé d&apos;enlever toutes les hélices des moteurs. Êtes-vous certain de vouloir faire cela ?</translation>
     </message>
 </context>
 <context>
@@ -13833,32 +13949,32 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/setupwizard/setupwizard.cpp" line="+56"/>
         <source>OpenPilot Setup Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Assistant Configuration OpenPilot</translation>
     </message>
     <message>
         <location line="+82"/>
         <source>Controller type: </source>
-        <translation type="unfinished"></translation>
+        <translation>Type de contrôleur : </translation>
     </message>
     <message>
         <location line="+4"/>
         <source>OpenPilot CopterControl</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot CopterControl 3D</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot Revolution</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>OpenPilot OPLink Radio Modem</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
@@ -13877,12 +13993,12 @@ Move the %1 stick.</source>
     <message>
         <location line="+4"/>
         <source>Multirotor</source>
-        <translation type="unfinished"></translation>
+        <translation>Multirotor</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Vehicle sub type: </source>
-        <translation type="unfinished"></translation>
+        <translation>Sous-type véhicule : </translation>
     </message>
     <message>
         <location line="+4"/>
@@ -13902,52 +14018,52 @@ Move the %1 stick.</source>
     <message>
         <location line="+3"/>
         <source>Hexacopter</source>
-        <translation type="unfinished"></translation>
+        <translation>Hexacoptère</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Hexacopter Coax (Y6)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hexacoptère Coax (Y6)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Hexacopter X</source>
-        <translation type="unfinished"></translation>
+        <translation>Hexacoptère X</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Octocopter</source>
-        <translation type="unfinished"></translation>
+        <translation>Octocoptère</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Octocopter Coax X</source>
-        <translation type="unfinished"></translation>
+        <translation>Octocoptère Coax X</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Octocopter Coax +</source>
-        <translation type="unfinished"></translation>
+        <translation>Octocoptère Coax +</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Octocopter V</source>
-        <translation type="unfinished"></translation>
+        <translation>Octocoptère V</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Fixed wing</source>
-        <translation type="unfinished">Aile</translation>
+        <translation>Aile</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Helicopter</source>
-        <translation type="unfinished">Hélicoptère</translation>
+        <translation>Hélicoptère</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Surface vehicle</source>
-        <translation type="unfinished"></translation>
+        <translation>Véhicule surface</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -13967,22 +14083,22 @@ Move the %1 stick.</source>
     <message>
         <location line="+3"/>
         <source>Futaba S.Bus</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Spektrum satellite (DSM2)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Spektrum satellite (DSMX10BIT)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Spektrum satellite (DSMX11BIT)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+7"/>
@@ -14005,7 +14121,7 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/setupwizard/setupwizardplugin.cpp" line="+62"/>
         <source>Vehicle Setup Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Assistant Configuration Véhicule</translation>
     </message>
 </context>
 <context>

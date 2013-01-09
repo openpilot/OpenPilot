@@ -5,7 +5,7 @@
     <UDPMirror>false</UDPMirror>
     <Description>Default configuration</Description>
     <Details>Default configuration built to work on all screen sizes</Details>
-    <ExpertMode>true</ExpertMode>
+    <ExpertMode>false</ExpertMode>
     <OverrideLanguage>en_AU</OverrideLanguage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
     <SettingsWindowHeight>700</SettingsWindowHeight>

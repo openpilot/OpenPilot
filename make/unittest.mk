@@ -29,13 +29,6 @@ CPPFLAGS += -I$(GTEST_DIR)/include
 # Flags passed to the C++ compiler.
 CXXFLAGS += -g -Wall -Wextra -std=gnu++0x
 
-# All Google Test headers.
-GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
-                $(GTEST_DIR)/include/gtest/internal/*.h
-
-# Google Test libraries
-GTEST_LIBS = $(GTEST_DIR)/lib/.libs/libgtest_main.a $(GTEST_DIR)/lib/.libs/libgtest.a
-
 # Google Test needs the pthread library
 LDFLAGS += -lpthread
 
@@ -50,19 +43,31 @@ override THUMB :=
 
 EXTRAINCDIRS    += .
 ALLSRC          := $(SRC) $(wildcard ./*.c)
-ALLCPPSRC       := $(wildcard ./*.cpp)
+ALLCPPSRC       := $(wildcard ./*.cpp) $(GTEST_DIR)/src/gtest_main.cc
 ALLSRCBASE      := $(notdir $(basename $(ALLSRC) $(ALLCPPSRC)))
 ALLOBJ          := $(addprefix $(OUTDIR)/, $(addsuffix .o, $(ALLSRCBASE)))
-
-.PHONY: elf
-elf: $(OUTDIR)/$(TARGET).elf
 
 $(foreach src,$(ALLSRC),$(eval $(call COMPILE_C_TEMPLATE,$(src))))
 $(foreach src,$(ALLCPPSRC),$(eval $(call COMPILE_CXX_TEMPLATE,$(src))))
 
-$(eval $(call LINK_CXX_TEMPLATE,$(OUTDIR)/$(TARGET).elf,$(ALLOBJ) $(GTEST_LIBS)))
+
+# Specific extensions to CPPFLAGS only for the google test library
+$(OUTDIR)/gtest-all.o : CPPFLAGS += -I$(GTEST_DIR)
+$(eval $(call COMPILE_CXX_TEMPLATE, $(GTEST_DIR)/src/gtest-all.cc))
+
+$(eval $(call LINK_CXX_TEMPLATE,$(OUTDIR)/$(TARGET).elf,$(ALLOBJ) $(OUTDIR)/gtest-all.o))
+
+.PHONY: elf
+elf: $(OUTDIR)/$(TARGET).elf
+
+.PHONY: xml
+xml: $(OUTDIR)/$(TARGET).xml
+
+$(OUTDIR)/$(TARGET).xml: $(OUTDIR)/$(TARGET).elf
+	$(V0) @echo " TEST XML  $(MSG_EXTRA)  $(call toprel, $@)"
+	$(V1) $< --gtest_output=xml:$(OUTDIR)/$(TARGET).xml > /dev/null
 
 .PHONY: run
 run: $(OUTDIR)/$(TARGET).elf
-	$(V0) @echo " TAP RUN   $(MSG_EXTRA)  $(call toprel, $<)"
+	$(V0) @echo " TEST RUN  $(MSG_EXTRA)  $(call toprel, $<)"
 	$(V1) $<

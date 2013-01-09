@@ -751,8 +751,14 @@ $(UT_OUT_DIR):
 .PHONY: all_ut
 all_ut: $(addsuffix _elf, $(addprefix ut_, $(ALL_UNITTESTS)))
 
+# The all_ut_tap goal is a legacy alias for the all_ut_xml target so that Jenkins
+# can still build old branches.  This can be deleted in a few months when all
+# branches are using the newer targets.
 .PHONY: all_ut_tap
-all_ut_tap: $(addsuffix _tap, $(addprefix ut_, $(ALL_UNITTESTS)))
+all_ut_tap: all_ut_xml
+
+.PHONY: all_ut_xml
+all_ut_xml: $(addsuffix _xml, $(addprefix ut_, $(ALL_UNITTESTS)))
 
 .PHONY: all_ut_run
 all_ut_run: $(addsuffix _run, $(addprefix ut_, $(ALL_UNITTESTS)))

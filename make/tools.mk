@@ -319,14 +319,7 @@ android_sdk_update:
 	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-16,addon-google_apis-google-16
 
 # Set up Google Test (gtest) tools
-ifeq ($(V), 1)
-GTEST_SILENT :=
-else
-GTEST_SILENT := --silent
-endif
-
 GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
-GTEST_BUILD_DIR := $(DL_DIR)/gtest-build
 
 .PHONY: gtest_install
 gtest_install: | $(DL_DIR) $(TOOLS_DIR)
@@ -343,14 +336,8 @@ gtest_install: gtest_clean
 	$(V1) mkdir -p "$(GTEST_DIR)"
 	$(V1) unzip -q -d "$(TOOLS_DIR)" "$(DL_DIR)/$(GTEST_FILE)"
 
-        # build
-	$(V1) ( \
-	  cd $(GTEST_DIR) ; \
-	  ./configure $(GTEST_SILENT) ; \
-	  $(MAKE) $(GTEST_SILENT) ; \
-	)
-
 .PHONY: gtest_clean
 gtest_clean:
 	$(V0) @echo " CLEAN        $(GTEST_DIR)"
 	$(V1) [ ! -d "$(GTEST_DIR)" ] || $(RM) -rf "$(GTEST_DIR)"
+

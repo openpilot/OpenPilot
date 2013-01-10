@@ -128,11 +128,11 @@ void PFDGadgetWidget::connectNeedles() {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    airspeedObj = dynamic_cast<UAVDataObject*>(objManager->getObject("BaroAirspeed"));
+	airspeedObj = dynamic_cast<UAVDataObject*>(objManager->getObject("AirspeedActual"));
     if (airspeedObj != NULL ) {
-        connect(airspeedObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAirspeed(UAVObject*)));
+		connect(airspeedObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAirspeed(UAVObject*)));
     } else {
-         qDebug() << "Error: Object is unknown (BaroAirspeed).";
+		 qDebug() << "Error: Object is unknown (AirspeedActual).";
     }
 
     groundspeedObj = dynamic_cast<UAVDataObject*>(objManager->getObject("VelocityActual"));
@@ -323,10 +323,10 @@ void PFDGadgetWidget::updateGroundspeed(UAVObject *object) {
 
 
 /*!
-  \brief Called by updates to @BaroAirspeed
+  \brief Called by updates to @AirspeedActual
   */
 void PFDGadgetWidget::updateAirspeed(UAVObject *object) {
-    UAVObjectField* airspeedField = object->getField("CalibratedAirspeed");
+	UAVObjectField* airspeedField = object->getField("CalibratedAirspeed");
     if (airspeedField) {
         airspeedTarget = airspeedField->getDouble();
 
@@ -1007,31 +1007,31 @@ void PFDGadgetWidget::moveNeedles()
     //////
     if (groundspeedValue != groundspeedTarget) {
         groundspeedValue = groundspeedTarget;
-//        qreal x = m_speedscale->transform().dx();
-//        //opd = QPointF(x,fmod(groundspeedValue,speedScaleHeight/6));
-//        // fmod does rounding errors!! the formula below works better:
-//        QPointF opd = QPointF(x,groundspeedValue-floor(groundspeedValue/speedScaleHeight*6)*speedScaleHeight/6);
-//        m_speedscale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
+		qreal x = m_speedscale->transform().dx();
+		//opd = QPointF(x,fmod(groundspeedValue,speedScaleHeight/6));
+		// fmod does rounding errors!! the formula below works better:
+		QPointF opd = QPointF(x,groundspeedValue-floor(groundspeedValue/speedScaleHeight*6)*speedScaleHeight/6);
+		m_speedscale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
 
-//        double speedText = groundspeedValue/speedScaleHeight*30;
-//        QString s = QString().sprintf("%.0f",speedText);
-//        m_speedtext->setPlainText(s);
+		double speedText = groundspeedValue/speedScaleHeight*30;
+		QString s = QString().sprintf("%.0f",speedText);
+		m_speedtext->setPlainText(s);
 
-//        // Now update the text elements inside the scale:
-//        // (Qt documentation states that the list has the same order
-//        // as the item add order in the QGraphicsItemGroup)
-//        QList <QGraphicsItem *> textList = m_speedscale->childItems();
-//        qreal val = 5*floor(groundspeedValue/speedScaleHeight*6)+20;
-//        foreach( QGraphicsItem * item, textList) {
-//            if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
-//                QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
-//                if (text->toPlainText() == s)
-//                    break; // This should happen at element one if is has not changed, indicating
-//                           // that it's not necessary to do the rest of the list
-//                text->setPlainText(s);
-//                val -= 5;
-//            }
-//        }
+		// Now update the text elements inside the scale:
+		// (Qt documentation states that the list has the same order
+		// as the item add order in the QGraphicsItemGroup)
+		QList <QGraphicsItem *> textList = m_speedscale->childItems();
+		qreal val = 5*floor(groundspeedValue/speedScaleHeight*6)+20;
+		foreach( QGraphicsItem * item, textList) {
+			if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
+				QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
+				if (text->toPlainText() == s)
+					break; // This should happen at element one if is has not changed, indicating
+						   // that it's not necessary to do the rest of the list
+				text->setPlainText(s);
+				val -= 5;
+			}
+		}
     }
 
     //////

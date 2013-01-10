@@ -10010,192 +10010,193 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location filename="../../../src/plugins/config/pipxtreme.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>button:help</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/dACrAQ</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board but do not save to the non-volatile memory</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte sans enregistrer dans la mémoire</translation>
+        <translation>Envoyer les paramètres sur la carte sans enregistrer dans la mémoire</translation>
     </message>
     <message>
         <location/>
         <source>Apply</source>
-        <translation type="unfinished">Appliquer</translation>
+        <translation>Appliquer</translation>
     </message>
     <message>
         <location/>
         <source>Send settings to the board and save to the non-volatile memory</source>
-        <translation type="unfinished">Envoyer les paramètres sur la carte et enregistrer dans la mémoire</translation>
+        <translation>Envoyer les paramètres sur la carte et enregistrer dans la mémoire</translation>
     </message>
     <message>
         <location/>
         <source>Save</source>
-        <translation type="unfinished">Enregistrer</translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <location/>
         <source>Pairing</source>
-        <translation type="unfinished"></translation>
+        <translation>Appairage</translation>
     </message>
     <message>
         <location/>
         <source>Broadcast</source>
-        <translation type="unfinished"></translation>
+        <translation>Diffusion</translation>
     </message>
     <message>
         <location/>
         <source>Broadcast Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse Diffusion</translation>
     </message>
     <message>
         <location/>
         <source>12345678</source>
-        <translation type="unfinished">12345678</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>%v dBm</source>
-        <translation type="unfinished"></translation>
+        <translation>%v dBm</translation>
     </message>
     <message>
         <location/>
         <source>-100dB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Status</source>
-        <translation type="unfinished">Statut</translation>
+        <translation>Statut</translation>
     </message>
     <message>
         <location/>
         <source>Firmware Ver.</source>
-        <translation type="unfinished"></translation>
+        <translation>Version Firm.</translation>
     </message>
     <message>
         <location/>
         <source>Serial Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Numéro Série</translation>
     </message>
     <message>
         <location/>
         <source>The modems serial number</source>
-        <translation type="unfinished"></translation>
+        <translation>Le numéro de série du modem</translation>
     </message>
     <message>
         <location/>
         <source>Device ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID Appareil</translation>
     </message>
     <message>
         <location/>
         <source>Pair ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID Appairage</translation>
     </message>
     <message>
         <location/>
         <source>90ABCDEF</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Min Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence Mini</translation>
     </message>
     <message>
         <location/>
         <source>The modems minimum allowed frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>La fréquence modem minimale autorisée</translation>
     </message>
     <message>
         <location/>
         <source>Max Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence Maxi</translation>
     </message>
     <message>
         <location/>
         <source>The modems maximum allowed frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>La fréquence modem maximale autorisée</translation>
     </message>
     <message>
         <location/>
         <source>Freq. Step Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille Saut Fréq.</translation>
     </message>
     <message>
         <location/>
         <source>The modems minimum frequency step size</source>
-        <translation type="unfinished"></translation>
+        <translation>La taille minimale du saut de fréauence du modem</translation>
     </message>
     <message>
         <location/>
         <source>Freq. Band</source>
-        <translation type="unfinished"></translation>
+        <translation>Bande Fréquence</translation>
     </message>
     <message>
         <location/>
         <source>The current frequency band</source>
-        <translation type="unfinished"></translation>
+        <translation>La bande de fréquences actuelle</translation>
     </message>
     <message>
         <location/>
         <source>RSSI</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Rx AFC</source>
-        <translation type="unfinished"></translation>
+        <translation>AFC Rx</translation>
     </message>
     <message>
         <location/>
         <source>TX Rate (B/s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Débit TX (B/s)</translation>
     </message>
     <message>
         <location/>
         <source>RX Rate (B/s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Débit RX (B/s)</translation>
     </message>
     <message>
         <location/>
         <source>Link State</source>
-        <translation type="unfinished"></translation>
+        <translation>Etat Liaison</translation>
     </message>
     <message>
         <location/>
         <source>The modems current state</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;état actuel du modem</translation>
     </message>
     <message>
         <location/>
         <source>Disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Déconnecté</translation>
     </message>
     <message>
         <location/>
         <source>Errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreurs</translation>
     </message>
     <message>
         <location/>
         <source>Retries</source>
-        <translation type="unfinished"></translation>
+        <translation>Essais</translation>
     </message>
     <message>
         <location/>
         <source>UAVTalk Errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreurs UAVTalk</translation>
     </message>
     <message>
         <location/>
@@ -10210,157 +10211,157 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Configuration</source>
-        <translation type="unfinished">Configuration</translation>
+        <translation>Configuration</translation>
     </message>
     <message>
         <location/>
         <source>Telemetry Port Config.</source>
-        <translation type="unfinished"></translation>
+        <translation>Config. Port Télémétrie</translation>
     </message>
     <message>
         <location/>
         <source>Set the telemetry port configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Régler la configuration du port de télémétrie</translation>
     </message>
     <message>
         <location/>
         <source>Telemetry Port Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse Port Télémétrie</translation>
     </message>
     <message>
         <location/>
         <source>Set the telemetry port speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Régler la vitesse du port de télémétrie</translation>
     </message>
     <message>
         <location/>
         <source>Flexi Port Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration FlexiPort</translation>
     </message>
     <message>
         <location/>
         <source>Set the flexi port configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Régler la configuration du FlexiPort</translation>
     </message>
     <message>
         <location/>
         <source>Flexi Port Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse FlexiPort</translation>
     </message>
     <message>
         <location/>
         <source>Set the flexi port speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Régler la vitesse du FlexiPort</translation>
     </message>
     <message>
         <location/>
         <source>VCP Configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration VCP</translation>
     </message>
     <message>
         <location/>
         <source>Set the virtual serial port configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Régler la configuration du port série virtuel</translation>
     </message>
     <message>
         <location/>
         <source>VCP Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse VCP</translation>
     </message>
     <message>
         <location/>
         <source>Set the virtual serial port speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Régler la vitesse du port série virtuel</translation>
     </message>
     <message>
         <location/>
         <source>Max RF Datarate (bits/s)</source>
-        <translation type="unfinished"></translation>
+        <translation>Débit Données Maxi HF (bits/s)</translation>
     </message>
     <message>
         <location/>
         <source>Set the maximum RF datarate/channel bandwidth the modem will use</source>
-        <translation type="unfinished"></translation>
+        <translation>Régler le débit de données HF maxi / canal bande-passante utilisée par le modem</translation>
     </message>
     <message>
         <location/>
         <source>Max RF Tx Power(mW)</source>
-        <translation type="unfinished"></translation>
+        <translation>Puissance HF Tx Maxi (mW)</translation>
     </message>
     <message>
         <location/>
         <source>Set the maximum TX output power the modem will use</source>
-        <translation type="unfinished"></translation>
+        <translation>Régler la puissance TX maximale utilisée par le modem</translation>
     </message>
     <message>
         <location/>
         <source>Send Timeout (ms)</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps de Latence Envoi (ms)</translation>
     </message>
     <message>
         <location/>
         <source>Calibrate the modems RF carrier frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajuster la fréquence de porteuse du modem</translation>
     </message>
     <message>
         <location/>
         <source>Min Packet Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille Paquet Mini</translation>
     </message>
     <message>
         <location/>
         <source>Frequency Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>Calibration Fréquence</translation>
     </message>
     <message>
         <location/>
         <source>Frequency (Hz)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fréquence (Hz)</translation>
     </message>
     <message>
         <location/>
         <source>Set the modems RF carrier frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Régler la fréquence de la porteuse HF du modem</translation>
     </message>
     <message>
         <location/>
         <source>AES Encryption</source>
-        <translation type="unfinished"></translation>
+        <translation>Cryptage AES</translation>
     </message>
     <message>
         <location/>
         <source>The AES encryption key - has to be the same key on the remote modem.</source>
-        <translation type="unfinished"></translation>
+        <translation>La clé d&apos;encryptage AES - doit être la même clé sur le modem distant. </translation>
     </message>
     <message>
         <location/>
         <source>Radomise the AES encryption key</source>
-        <translation type="unfinished"></translation>
+        <translation>Rendre aléatoire la clé de cryptage AES</translation>
     </message>
     <message>
         <location/>
         <source> Rand</source>
-        <translation type="unfinished"></translation>
+        <translation> Aléatoire</translation>
     </message>
     <message>
         <location/>
         <source>Enable/Disable AES encryption</source>
-        <translation type="unfinished"></translation>
+        <translation>Active / Désactive le cryptage AES</translation>
     </message>
     <message>
         <location/>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation>Activé</translation>
     </message>
     <message>
         <location/>
         <source>Scan whole band to see where their is interference and/or used channels</source>
-        <translation type="unfinished"></translation>
+        <translation>Balayer toute la bande pour voir les interférences et/ou les canaux utilisés</translation>
     </message>
     <message>
         <location/>
         <source>    Scan Spectrum    </source>
-        <translation type="unfinished"></translation>
+        <translation>Balayage Bande</translation>
     </message>
 </context>
 <context>
@@ -10437,7 +10438,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès distant !</translation>
     <message>
         <location/>
         <source>#1: Multi-Point Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>#1 : Calibration Multi-Points</translation>
     </message>
     <message>
         <location/>
@@ -10447,7 +10448,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès distant !</translation>
     <message>
         <location/>
         <source>Launch a sensor range and bias calibration.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lancer la calibration de la plage et des ajustements capteurs.</translation>
     </message>
     <message>
         <location/>
@@ -10467,14 +10468,16 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès distant !</translation>
     <message>
         <location/>
         <source>#2: Sensor noise calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>#2 . Calibration du bruit capteur</translation>
     </message>
     <message>
         <location/>
         <source>These are the sensor variance values computed by the AHRS.
 
 Tip: lower is better!</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce sont les valeurs de variation calculées par le AHRS
+
+Astuce : le plus bas est le meilleur !</translation>
     </message>
     <message>
         <location/>
@@ -10488,17 +10491,17 @@ Astuce : Faites-le avec le moteur en vitesse de croisière.</translation>
     <message>
         <location/>
         <source>#3: Accelerometer Bias calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>#3 : Calibration ajustement accéléromètres</translation>
     </message>
     <message>
         <location/>
         <source>#4 Gyro temperature drift calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>#4: Calibration dérive en température Gyro</translation>
     </message>
     <message>
         <location/>
         <source>Temp:</source>
-        <translation type="unfinished"></translation>
+        <translation>Temp :</translation>
     </message>
     <message>
         <location/>
@@ -10510,7 +10513,9 @@ Astuce : Faites-le avec le moteur en vitesse de croisière.</translation>
         <source>Currently measured temperature on the system. This is actually the
 MB temperature, be careful if somehow you know that your INS
 temperature is very different from your MB temp...</source>
-        <translation type="unfinished"></translation>
+        <translation>Température mesurée actuellement sur le système. C&apos;est actuellement 
+la température MB, soyez prudent si vous savez que votre température INS
+est très différente de votre température MB...</translation>
     </message>
     <message>
         <location/>
@@ -10520,12 +10525,12 @@ temperature is very different from your MB temp...</source>
     <message>
         <location/>
         <source>Current drift:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dérive actuelle :</translation>
     </message>
     <message>
         <location/>
         <source>Saved drift:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dérive enregistrée :</translation>
     </message>
     <message>
         <location/>
@@ -10543,7 +10548,7 @@ TODO: is this necessary? Measurement could be auto updated every second or so, o
     <message>
         <location/>
         <source>Measure</source>
-        <translation type="unfinished"></translation>
+        <translation>Mesurer</translation>
     </message>
     <message>
         <location/>
@@ -10737,7 +10742,7 @@ specific calibration button on top of the screen.</source>
         <location/>
         <source>Slowly raise Proportional until you start seeing clear oscillations when you fly.
 Then lower the value by 5 or so.</source>
-        <translation>Augmentez doucement Prportionnel jusqu&apos;à commencer à observer des 
+        <translation>Augmentez doucement Proportionnel jusqu&apos;à commencer à observer des 
 oscillations claires en vol. Baissez ensuite la valeur de 5 ou plus.</translation>
     </message>
     <message>
@@ -11267,17 +11272,17 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location filename="../../../src/plugins/config/txpid.ui"/>
         <source>TxPID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Tx PID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Module Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôle du Module</translation>
     </message>
     <message>
         <location/>
@@ -11289,32 +11294,39 @@ can be read via GCS and saved permanently. Then this module should be
 disabled again.
 
 Up to 3 separate PID options (or option pairs) can be selected and updated.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce module mettra régulièrement à jour les valeurs des paramètres PID de stabilisation
+configurés en fonction de canaux de contrôle d&apos;entrée. Les nouvelles valeurs des paramètres
+de stabilisation ne sont pas enregistrés dans la flash, mais mis à jour dans la mémoire RAM.
+Il est prévu que le module soit activé uniquement pour les réglages. Lorsque les valeurs 
+désirées sont trouvés, elles peuvent être lues via GCS et sauvegardées de manière permanente.
+Ensuite, ce module devrait être à nouveau désactivé.
+
+Jusqu&apos;à 3 options distinctes (PID ou paires d&apos;options) peuvent être sélectionnées et mises à jour. </translation>
     </message>
     <message>
         <location/>
         <source>Enable TxPID module</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer module TxPID</translation>
     </message>
     <message>
         <location/>
         <source>After enabling the module, you must power cycle before using and configuring.</source>
-        <translation type="unfinished"></translation>
+        <translation>Après activation du module, vous devez redémarrer la carte avant de l&apos;utiliser et le configurer.</translation>
     </message>
     <message>
         <location/>
         <source>Module Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Module</translation>
     </message>
     <message>
         <location/>
         <source>PID option</source>
-        <translation type="unfinished"></translation>
+        <translation>Option PID</translation>
     </message>
     <message>
         <location/>
         <source>Control Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Source Contrôle</translation>
     </message>
     <message>
         <location/>
@@ -11329,13 +11341,14 @@ Up to 3 separate PID options (or option pairs) can be selected and updated.</sou
     <message>
         <location/>
         <source>Instance 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglage 1</translation>
     </message>
     <message>
         <location/>
         <source>Select PID option or option pair to update.
 Set to Disabled if not used.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner l&apos;option PID ou une paire d&apos;options PID à actualiser.
+Réglé à Disabled si non utilisé.</translation>
     </message>
     <message>
         <location/>
@@ -11353,34 +11366,49 @@ accordingly.
 Note that it is possible to set PID Min &gt; Max. In that case increasing
 control input value will decrease the PID option value. This can be
 used, for instance, to decrease PID value when increasing Throttle.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner l&apos;entrée utilisé comme source de contrôle pour ce réglage
+Cela peut être un des canaux Accessoires ou la commande des gaz.
+
+Si un canal Accessoire est choisi alors sa plage [0..1] sera associée à 
+la plage PID [Mini..Maxi) définie pour ce réglage.
+
+Si la commande des gaz est choisie alors la plage [0..1] sera associée 
+la plage PID [Mini..Maxi) définie pour ce réglage. Si les gaz dépassent 
+les limites alors les valeurs PID Mini et Maxi seront utilisées en conséquence.
+
+Notez qu&apos;il est possible de définir un PID Mini &gt; Maxi. Dans ce cas en augmentant 
+la valeur de contrôle en entrée la valeur de loption PID diminue. Cela peut être
+utilisé par exemple pour diminuer la valeur PID lors de l&apos;augmentation des gaz.
+</translation>
     </message>
     <message>
         <location/>
         <source>Minimum PID value mapped to Accessory channel = 0 or
 Throttle channel lesser or equal to Throttle Min value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valeur Minimale du PID associée à la valeur 0 du canal d&apos;Accessoire ou
+d&apos;une valeur de gaz inférieure ou égale à la la valeur minimale des gaz.</translation>
     </message>
     <message>
         <location/>
         <source>Maximum PID value mapped to Accessory channel = 1 or
 Throttle channel greater or equal to Throttle Max value.</source>
-        <translation type="unfinished"></translation>
+        <translation>Valeur Maximale du PID associée à la valeur 1 du canal d&apos;Accessoire ou
+d&apos;une valeur de gaz supérieure ou égale à la la valeur maximale des gaz.</translation>
     </message>
     <message>
         <location/>
         <source>Instance 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglage 2</translation>
     </message>
     <message>
         <location/>
         <source>Instance 3</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglage 3</translation>
     </message>
     <message>
         <location/>
         <source>Update Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode Mise à Jour</translation>
     </message>
     <message>
         <location/>
@@ -11394,22 +11422,31 @@ tricky to change other PID values from the GUI if the module is enabled
 and constantly updates stabilization settings object. As a workaround,
 this option can be used to temporarily disable updates or enable them
 only when system is armed without disabling the module.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode de mise à jour des valeurs PID qui peut être réglé à :
+- Never : ceci désactive les mises à jour PID (mais le module continue de fonctionner, si activé,)
+- When Armed : Les PID sont mis à jours lorsque le système est armé,
+- Always : les PID sont toujours mis à jour, indépendamment de l&apos;état d&apos;armement.
+
+Since the GCS updates GUI PID values in real time on change, could be
+tricky to change other PID values from the GUI if the module is enabled
+and constantly updates stabilization settings object. As a workaround,
+this option can be used to temporarily disable updates or enable them
+only when system is armed without disabling the module.</translation>
     </message>
     <message>
         <location/>
         <source>Throttle Range</source>
-        <translation type="unfinished"></translation>
+        <translation>Plage Gaz</translation>
     </message>
     <message>
         <location/>
         <source>Throttle channel lower bound mapped to PID Min value</source>
-        <translation type="unfinished"></translation>
+        <translation>Seuil inférieur des gaz associé à la valeur PID minimale</translation>
     </message>
     <message>
         <location/>
         <source>Throttle channel upper bound mapped to PID Max value</source>
-        <translation type="unfinished"></translation>
+        <translation>Seuil supérieur des gaz associé à la valeur PID maximale</translation>
     </message>
     <message>
         <location/>
@@ -11420,7 +11457,7 @@ only when system is armed without disabling the module.</source>
         <location/>
         <source>button:help</source>
         <translatorcomment>Pas toucher.</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -11669,7 +11706,7 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location filename="../../../src/plugins/hitlv2/aerosimrc/src/udptestwidget.ui"/>
         <source>send data</source>
-        <translation type="unfinished">Envoi données</translation>
+        <translation type="unfinished">envoi données</translation>
     </message>
     <message>
         <location/>
@@ -11694,7 +11731,7 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location/>
         <source>Armed</source>
-        <translation type="unfinished">Armé</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -13367,7 +13404,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configccattitudewidget.cpp" line="+151"/>
         <source>Calibration timed out before receiving required updates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps d&apos;attente dépassé avant d&apos;avoir reçu les mises à jour demandées.</translation>
     </message>
 </context>
 <context>
@@ -13834,27 +13871,27 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/opmap/flightdatamodel.cpp" line="+410"/>
         <source>Unable to open file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;ouvrir le fichier</translation>
     </message>
     <message>
         <location line="+142"/>
         <source>File Parsing Failed.</source>
-        <translation type="unfinished">Echec Parsing Fichier.</translation>
+        <translation>Echec Analyse Fichier.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This file is not a correct XML file</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce fichier n&apos;est pas un fichier XML valide</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Wrong file contents</source>
-        <translation type="unfinished">Mauvais contenu de fichier</translation>
+        <translation>Mauvais contenu de fichier</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>This file does not contain correct UAVSettings</source>
-        <translation type="unfinished">Ce fichier ne contient pas de paramètres UAV corrects</translation>
+        <translation>Ce fichier ne contient pas de paramètres UAV valides</translation>
     </message>
 </context>
 <context>
@@ -13899,7 +13936,7 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/powerlog/powerlogplugin.cpp" line="+295"/>
         <source>Log filename</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier de journal</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -13941,7 +13978,7 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/setupwizard/levellingutil.cpp" line="+125"/>
         <source>Calibration timed out before receiving required updates.</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps d&apos;attente dépassé avant d&apos;avoir reçu les mises à jour demandées.</translation>
     </message>
 </context>
 <context>
@@ -14108,12 +14145,12 @@ Move the %1 stick.</source>
     <message>
         <location line="+4"/>
         <source>Legacy ESC (50 Hz)</source>
-        <translation type="unfinished"></translation>
+        <translation>Variateur Classique (50Hz)</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Rapid ESC (400 Hz)</source>
-        <translation type="unfinished"></translation>
+        <translation>Variateur Rapide (400Hz)</translation>
     </message>
 </context>
 <context>
@@ -14130,48 +14167,48 @@ Move the %1 stick.</source>
         <location filename="../../../src/plugins/setupwizard/vehicleconfigurationhelper.cpp" line="+72"/>
         <location line="+12"/>
         <source>Done!</source>
-        <translation type="unfinished"></translation>
+        <translation>Terminé !</translation>
     </message>
     <message>
         <location line="-12"/>
         <location line="+12"/>
         <source>Failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>Echoué !</translation>
     </message>
     <message>
         <location line="+66"/>
         <source>Writing hardware settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ecriture paramètres matériels</translation>
     </message>
     <message>
         <location line="+104"/>
         <source>Writing actuator settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ecriture paramètres actionneurs</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Writing flight mode settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ecriture paramètres mode vol</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Writing gyro and accelerometer bias settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ecriture paramètres d&apos;ajustement gyro et accéléromètres</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Writing stabilization settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ecriture paramètres de stabilisation</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Writing mixer settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ecriture paramètres mixer</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Writing vehicle settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ecriture paramètres véhicule</translation>
     </message>
     <message>
         <location line="+43"/>

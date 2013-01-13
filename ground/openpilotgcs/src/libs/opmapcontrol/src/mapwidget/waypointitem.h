@@ -234,13 +234,6 @@ signals:
     * @param waypoint a pointer to this WayPoint
     */
 
-    /**
-    * @brief Fired when the waypoint is dropped somewhere
-    *
-    * @param waypoint a pointer to this WayPoint
-    */
-    void WPDropped(WayPointItem* waypoint);
-
     void WPValuesChanged(WayPointItem* waypoint);
     void waypointdoubleclick(WayPointItem* waypoint);
     void localPositionChanged(QPointF point,WayPointItem* waypoint);

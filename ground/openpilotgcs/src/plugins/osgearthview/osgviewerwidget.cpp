@@ -265,7 +265,7 @@ void OsgViewerWidget::paintEvent( QPaintEvent* event )
         double homeLLA[3] = {homeLocation.Latitude / 10.0e6, homeLocation.Longitude / 10.0e6, homeLocation.Altitude};
 
         double LLA[3];
-        CoordinateConversions().GetLLA(homeLLA, NED, LLA);
+		CoordinateConversions().NED2LLA_HomeLLA(homeLLA, NED, LLA);
         uavPos->getLocator()->setPosition( osg::Vec3d(LLA[1], LLA[0], LLA[2]) );  // Note this takes longtitude first
     } else {
         GPSPosition *gpsPosObj = GPSPosition::GetInstance(objMngr);

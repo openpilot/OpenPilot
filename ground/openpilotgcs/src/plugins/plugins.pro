@@ -150,12 +150,6 @@ plugin_pathactioneditor.depends = plugin_coreplugin
 plugin_pathactioneditor.depends += plugin_uavobjects
 SUBDIRS += plugin_pathactioneditor
 
-# Waypoint Editor gadget
-plugin_waypointeditor.subdir = waypointeditor
-plugin_waypointeditor.depends = plugin_coreplugin
-plugin_waypointeditor.depends += plugin_uavobjects
-SUBDIRS += plugin_waypointeditor
-
 # Primary Flight Display (PFD) gadget, QML version
 plugin_pfdqml.subdir = pfdqml
 plugin_pfdqml.depends = plugin_coreplugin

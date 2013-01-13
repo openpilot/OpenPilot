@@ -2538,22 +2538,6 @@
         </data>
       </default>
     </UAVObjectBrowser>
-    <Uploader>
-      <default>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <defaultDataBits>3</defaultDataBits>
-          <defaultFlow>0</defaultFlow>
-          <defaultParity>0</defaultParity>
-          <defaultPort>/dev/ttyS0</defaultPort>
-          <defaultSpeed>14</defaultSpeed>
-          <defaultStopBits>0</defaultStopBits>
-        </data>
-      </default>
-    </Uploader>
     <configInfo>
       <locked>false</locked>
       <version>1.2.0</version>

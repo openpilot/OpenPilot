@@ -27,19 +27,18 @@
 
 #include "videogadgetconfiguration.h"
 
-VideoGadgetConfiguration::VideoGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
-    IUAVGadgetConfiguration(classId, parent),
-    m_pipelineDesc(""), m_pipelineInfo("")
+VideoGadgetConfiguration::VideoGadgetConfiguration(QString classId, QSettings *qSettings, QObject *parent) :
+        IUAVGadgetConfiguration(classId, parent), m_pipelineDesc(""), m_pipelineInfo("")
 {
     // if a saved configuration exists load it
-    if(qSettings != 0) {
+    if (qSettings != 0) {
         m_displayVideo = qSettings->value("displayVideo").toBool();
         m_autoStart = qSettings->value("autoStart").toBool();
         m_displayControls = qSettings->value("displayControls").toBool();
         m_respectAspectRatio = qSettings->value("respectAspectRatio").toBool();
         m_pipelineDesc = qSettings->value("pipelineDesc").toString();
         m_pipelineInfo = qSettings->value("pipelineInfo").toString();
-     }
+    }
 }
 
 IUAVGadgetConfiguration *VideoGadgetConfiguration::clone()
@@ -58,11 +57,12 @@ IUAVGadgetConfiguration *VideoGadgetConfiguration::clone()
  * Saves a configuration.
  *
  */
-void VideoGadgetConfiguration::saveConfig(QSettings* qSettings) const {
-	   qSettings->setValue("displayVideo", m_displayVideo);
-	   qSettings->setValue("autoStart", m_autoStart);
-	   qSettings->setValue("displayControls", m_displayControls);
-	   qSettings->setValue("respectAspectRatio", m_respectAspectRatio);
-	   qSettings->setValue("pipelineDesc", m_pipelineDesc);
-	   qSettings->setValue("pipelineInfo", m_pipelineInfo);
+void VideoGadgetConfiguration::saveConfig(QSettings *qSettings) const
+{
+    qSettings->setValue("displayVideo", m_displayVideo);
+    qSettings->setValue("autoStart", m_autoStart);
+    qSettings->setValue("displayControls", m_displayControls);
+    qSettings->setValue("respectAspectRatio", m_respectAspectRatio);
+    qSettings->setValue("pipelineDesc", m_pipelineDesc);
+    qSettings->setValue("pipelineInfo", m_pipelineInfo);
 }

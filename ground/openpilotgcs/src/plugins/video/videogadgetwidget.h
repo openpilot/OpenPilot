@@ -47,10 +47,10 @@ public:
     VideoGadgetWidget(QWidget *parent = 0);
     ~VideoGadgetWidget();
 
-    void setConfiguration(VideoGadgetConfiguration * config);
+    void setConfiguration(VideoGadgetConfiguration *config);
 private:
     Ui_Form *m_config;
-    VideoGadgetConfiguration * config;
+    VideoGadgetConfiguration *config;
 private slots:
 	void start();
 	void pause();

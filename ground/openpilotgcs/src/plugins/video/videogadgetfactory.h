@@ -37,15 +37,14 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class VideoGadgetFactory : public IUAVGadgetFactory
-{
-    Q_OBJECT
+class VideoGadgetFactory: public IUAVGadgetFactory {
+Q_OBJECT
 public:
     VideoGadgetFactory(QObject *parent = 0);
     ~VideoGadgetFactory();
 
     IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 

@@ -33,61 +33,73 @@
 using namespace Core;
 
 class VideoGadgetConfiguration: public IUAVGadgetConfiguration {
-Q_OBJECT
+    Q_OBJECT
 public:
-	explicit VideoGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+    explicit VideoGadgetConfiguration(QString classId, QSettings *qSettings = 0, QObject *parent = 0);
 
-	void saveConfig(QSettings* settings) const;
-	IUAVGadgetConfiguration *clone();
-	bool displayVideo() {
-		return m_displayVideo;
-	}
-	void setDisplayVideo(bool displayVideo) {
-		m_displayVideo = displayVideo;
-	}
-	bool displayControls() {
-		return m_displayControls;
-	}
-	void setDisplayControls(bool displayControls) {
-		m_displayControls = displayControls;
-	}
-	bool autoStart() {
-		return m_autoStart;
-	}
-	void setAutoStart(bool autoStart) {
-		m_autoStart = autoStart;
-	}
-	bool respectAspectRatio() {
-		return m_respectAspectRatio;
-	}
-	void setRespectAspectRatio(bool respectAspectRatio) {
-		m_respectAspectRatio = respectAspectRatio;
-	}
-	QString pipelineDesc() {
-		return m_pipelineDesc;
-	}
-	void setPipelineDesc(QString pipelineDesc) {
-		m_pipelineDesc = pipelineDesc;
-	}
-	QString pipelineInfo() {
-		return m_pipelineInfo;
-	}
-	void setPipelineInfo(QString pipelineInfo) {
-		m_pipelineInfo = pipelineInfo;
-	}
+    void saveConfig(QSettings *settings) const;
+    IUAVGadgetConfiguration *clone();
+    bool displayVideo()
+    {
+        return m_displayVideo;
+    }
+    void setDisplayVideo(bool displayVideo)
+    {
+        m_displayVideo = displayVideo;
+    }
+    bool displayControls()
+    {
+        return m_displayControls;
+    }
+    void setDisplayControls(bool displayControls)
+    {
+        m_displayControls = displayControls;
+    }
+    bool autoStart()
+    {
+        return m_autoStart;
+    }
+    void setAutoStart(bool autoStart)
+    {
+        m_autoStart = autoStart;
+    }
+    bool respectAspectRatio()
+    {
+        return m_respectAspectRatio;
+    }
+    void setRespectAspectRatio(bool respectAspectRatio)
+    {
+        m_respectAspectRatio = respectAspectRatio;
+    }
+    QString pipelineDesc()
+    {
+        return m_pipelineDesc;
+    }
+    void setPipelineDesc(QString pipelineDesc)
+    {
+        m_pipelineDesc = pipelineDesc;
+    }
+    QString pipelineInfo()
+    {
+        return m_pipelineInfo;
+    }
+    void setPipelineInfo(QString pipelineInfo)
+    {
+        m_pipelineInfo = pipelineInfo;
+    }
 //signals:
 
 //public slots:
 
 public:
-	// video
-	bool m_displayVideo;
-	bool m_respectAspectRatio;
-	// controls
-	bool m_displayControls;
-	bool m_autoStart;
-	QString m_pipelineDesc;
-	QString m_pipelineInfo;
+    // video
+    bool m_displayVideo;
+    bool m_respectAspectRatio;
+    // controls
+    bool m_displayControls;
+    bool m_autoStart;
+    QString m_pipelineDesc;
+    QString m_pipelineInfo;
 };
 
 #endif // VIDEOGADGETCONFIGURATION_H

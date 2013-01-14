@@ -2508,6 +2508,134 @@
         </data>
       </default>
     </UAVObjectBrowser>
+
+    <VideoGadget>
+      <Default>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>true</autoStart>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>videotestsrc ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <respectAspectRatio>false</respectAspectRatio>
+        </data>
+      </Default>
+      <Empty>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>true</autoStart>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc></pipelineDesc>
+          <respectAspectRatio>false</respectAspectRatio>
+        </data>
+      </Empty>
+      <Bad>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>true</autoStart>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>bade ! pipeline</pipelineDesc>
+          <respectAspectRatio>false</respectAspectRatio>
+        </data>
+      </Bad>
+      <Screen__PCT__20capture__PCT__20__PCT__28dx9__PCT__2C__PCT__20no__PCT__20mouse__PCT__29__PCT__20__PCT__232>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>false</autoStart>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>dx9screencapsrc x=0 y=0 width=640 height=480  ! ffmpegcolorspace ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <respectAspectRatio>false</respectAspectRatio>
+        </data>
+      </Screen__PCT__20capture__PCT__20__PCT__28dx9__PCT__2C__PCT__20no__PCT__20mouse__PCT__29__PCT__20__PCT__232>
+      <Screen__PCT__20capture__PCT__20__PCT__28dx9__PCT__2C__PCT__20no__PCT__20mouse__PCT__29>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>true</autoStart>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>dx9screencapsrc  ! ffmpegcolorspace ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <respectAspectRatio>false</respectAspectRatio>
+        </data>
+      </Screen__PCT__20capture__PCT__20__PCT__28dx9__PCT__2C__PCT__20no__PCT__20mouse__PCT__29>
+      <Screen__PCT__20capture__PCT__20__PCT__28gdi__PCT__2C__PCT__20with__PCT__20mouse__PCT__29>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>false</autoStart>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>gdiscreencapsrc cursor=true x=0 y=0 width=100 height=100  ! ffmpegcolorspace ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <respectAspectRatio>false</respectAspectRatio>
+        </data>
+      </Screen__PCT__20capture__PCT__20__PCT__28gdi__PCT__2C__PCT__20with__PCT__20mouse__PCT__29>
+      <Webcam__PCT__20__PCT__232>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>true</autoStart>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>dshowvideosrc ! ffmpegcolorspace ! directdrawsink</pipelineDesc>
+          <respectAspectRatio>true</respectAspectRatio>
+        </data>
+      </Webcam__PCT__20__PCT__232>
+      <Webcam>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>true</autoStart>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>ksvideosrc ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <respectAspectRatio>true</respectAspectRatio>
+        </data>
+      </Webcam>
+      <PIP>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <autoStart>true</autoStart>
+          <displayVideo>true</displayVideo>
+          <pipelineDesc>desktop.
+    ! ffmpegcolorspace
+    ! video/x-raw-yuv,rate=10/1
+    ! ffmpegcolorspace
+    ! vmix.sink_0
+webcam.
+    ! ffmpegcolorspace
+    ! video/x-raw-yuv,width=640,height=480,rate=30/1
+    ! ffmpegcolorspace
+    ! vmix.sink_1
+vmix.
+    ! ffmpegcolorspace
+    ! dshowvideosink
+dx9screencapsrc name=desktop
+dshowvideosrc name=webcam
+videomixer name=vmix
+    sink_0::xpos=0 sink_0::ypos=0 sink_0::zorder=0
+    sink_1::xpos=640 sink_1::ypos=0 sink_1::zorder=1</pipelineDesc>
+          <respectAspectRatio>true</respectAspectRatio>
+        </data>
+      </PIP>
+    </VideoGadget>
     <configInfo>
       <locked>false</locked>
       <version>1.2.0</version>
@@ -2803,6 +2931,315 @@
             <splitterOrientation>1</splitterOrientation>
             <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
             <type>splitter</type>
+          </side1>
+          <splitterOrientation>2</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABLwAAAAIAAAHf)</splitterSizes>
+          <type>splitter</type>
+        </side1>
+        <splitterOrientation>1</splitterOrientation>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAADVQAAAAIAAAJK)</splitterSizes>
+        <type>splitter</type>
+      </splitter>
+      <version>UAVGadgetManagerV1</version>
+    </Mode6>
+  </UAVGadgetManager>
+  <Workspace>
+    <AllowTabBarMovement>false</AllowTabBarMovement>
+    <Icon1>:/core/images/ah.png</Icon1>
+    <Icon10>:/core/images/openpilot_logo_64.png</Icon10>
+    <Icon2>:/core/images/config.png</Icon2>
+    <Icon3>:/core/images/cog.png</Icon3>
+    <Icon4>:/core/images/scopes.png</Icon4>
+    <Icon5>:/core/images/joystick.png</Icon5>
+    <Icon6>:/core/images/cpu.png</Icon6>
+    <Icon7>:/core/images/openpilot_logo_64.png</Icon7>
+    <Icon8>:/core/images/openpilot_logo_64.png</Icon8>
+    <Icon9>:/core/images/openpilot_logo_64.png</Icon9>
+    <NumberOfWorkspaces>6</NumberOfWorkspaces>
+    <TabBarPlacementIndex>1</TabBarPlacementIndex>
+    <Workspace1>Flight data</Workspace1>
+    <Workspace10>Workspace10</Workspace10>
+    <Workspace2>Configuration</Workspace2>
+    <Workspace3>System</Workspace3>
+    <Workspace4>Scopes</Workspace4>
+    <Workspace5>HITL</Workspace5>
+    <Workspace6>Firmware</Workspace6>
+    <Workspace7>Workspace7</Workspace7>
+    <Workspace8>Workspace8</Workspace8>
+    <Workspace9>Workspace9</Workspace9>
+  </Workspace>
+</gcs>
+    <configInfo>
+      <locked>false</locked>
+      <version>1.2.0</version>
+    </configInfo>
+  </UAVGadgetConfigurations>
+  <UAVGadgetManager>
+    <Mode1>
+      <showToolbars>false</showToolbars>
+      <splitter>
+        <side0>
+          <side0>
+            <side0>
+              <side0>
+                <classId>LineardialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Flight Time</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side0>
+              <side1>
+                <side0>
+                  <classId>LineardialGadget</classId>
+                  <gadget>
+                    <activeConfiguration>Arm Status</activeConfiguration>
+                  </gadget>
+                  <type>uavGadget</type>
+                </side0>
+                <side1>
+                  <classId>LineardialGadget</classId>
+                  <gadget>
+                    <activeConfiguration>Flight mode</activeConfiguration>
+                  </gadget>
+                  <type>uavGadget</type>
+                </side1>
+                <splitterOrientation>1</splitterOrientation>
+                <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAYwAAAAIAAAB7)</splitterSizes>
+                <type>splitter</type>
+              </side1>
+              <splitterOrientation>1</splitterOrientation>
+              <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAZgAAAAIAAADf)</splitterSizes>
+              <type>splitter</type>
+            </side0>
+            <side1>
+              <classId>PfdQmlGadget</classId>
+              <gadget>
+                <activeConfiguration>NoTerrain</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side1>
+            <splitterOrientation>2</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAQAAAAAIAAAG4)</splitterSizes>
+            <type>splitter</type>
+          </side0>
+          <side1>
+            <side0>
+              <classId>ModelViewGadget</classId>
+              <gadget>
+                <activeConfiguration>Test Quad X</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side0>
+            <side1>
+              <classId>SystemHealthGadget</classId>
+              <gadget>
+                <activeConfiguration>default</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side1>
+            <splitterOrientation>1</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABIAAAAAIAAAFV)</splitterSizes>
+            <type>splitter</type>
+          </side1>
+          <splitterOrientation>2</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB7wAAAAIAAAEf)</splitterSizes>
+          <type>splitter</type>
+        </side0>
+        <side1>
+          <classId>OPMapGadget</classId>
+          <gadget>
+            <activeConfiguration>Google Sat</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
+        </side1>
+        <splitterOrientation>1</splitterOrientation>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACdgAAAAIAAAMp)</splitterSizes>
+        <type>splitter</type>
+      </splitter>
+      <version>UAVGadgetManagerV1</version>
+    </Mode1>
+    <Mode2>
+      <showToolbars>false</showToolbars>
+      <splitter>
+        <classId>ConfigGadget</classId>
+        <gadget>
+          <activeConfiguration>default</activeConfiguration>
+        </gadget>
+        <type>uavGadget</type>
+      </splitter>
+      <version>UAVGadgetManagerV1</version>
+    </Mode2>
+    <Mode3>
+      <showToolbars>false</showToolbars>
+      <splitter>
+        <side0>
+          <classId>UAVObjectBrowser</classId>
+          <gadget>
+            <activeConfiguration>default</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
+        </side0>
+        <side1>
+          <side0>
+            <classId>LoggingGadget</classId>
+            <type>uavGadget</type>
+          </side0>
+          <side1>
+            <classId>GpsDisplayGadget</classId>
+            <gadget>
+              <activeConfiguration>Flight GPS</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
+          </side1>
+          <splitterOrientation>2</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAVAAAAAIAAAGu)</splitterSizes>
+          <type>splitter</type>
+        </side1>
+        <splitterOrientation>1</splitterOrientation>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACJgAAAAIAAADo)</splitterSizes>
+        <type>splitter</type>
+      </splitter>
+      <version>UAVGadgetManagerV1</version>
+    </Mode3>
+    <Mode4>
+      <showToolbars>false</showToolbars>
+      <splitter>
+        <side0>
+          <side0>
+            <classId>ScopeGadget</classId>
+            <gadget>
+              <activeConfiguration>Accel</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
+          </side0>
+          <side1>
+            <classId>ScopeGadget</classId>
+            <gadget>
+              <activeConfiguration>Raw Gyros</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
+          </side1>
+          <splitterOrientation>2</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+          <type>splitter</type>
+        </side0>
+        <side1>
+          <side0>
+            <classId>ScopeGadget</classId>
+            <gadget>
+              <activeConfiguration>Attitude</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
+          </side0>
+          <side1>
+            <classId>ScopeGadget</classId>
+            <gadget>
+              <activeConfiguration>Uptimes</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
+          </side1>
+          <splitterOrientation>2</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABhAAAAAIAAAGE)</splitterSizes>
+          <type>splitter</type>
+        </side1>
+        <splitterOrientation>1</splitterOrientation>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAACjQAAAAIAAAKU)</splitterSizes>
+        <type>splitter</type>
+      </splitter>
+      <version>UAVGadgetManagerV1</version>
+    </Mode4>
+    <Mode5>
+      <showToolbars>false</showToolbars>
+      <splitter>
+        <side0>
+          <side0>
+            <classId>HITL</classId>
+            <gadget>
+              <activeConfiguration>XPlane HITL</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
+          </side0>
+          <side1>
+            <classId>HITLv2</classId>
+            <gadget>
+              <activeConfiguration>default</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
+          </side1>
+          <splitterOrientation>1</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+          <type>splitter</type>
+        </side0>
+        <side1>
+          <side0>
+            <side0>
+              <classId>PfdQmlGadget</classId>
+              <gadget>
+                <activeConfiguration>NoTerrain</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side0>
+            <side1>
+              <classId>MagicWaypointGadget</classId>
+              <type>uavGadget</type>
+            </side1>
+            <splitterOrientation>1</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB7wAAAAIAAAGU)</splitterSizes>
+            <type>splitter</type>
+          </side0>
+          <side1>
+            <classId>GCSControlGadget</classId>
+            <gadget>
+              <activeConfiguration>MS Sidewinder</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
+          </side1>
+          <splitterOrientation>1</splitterOrientation>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAADhAAAAAIAAAIX)</splitterSizes>
+          <type>splitter</type>
+        </side1>
+        <splitterOrientation>2</splitterOrientation>
+        <splitterSizes>@Variant(AAAACQAAAAIAAAACAAADDAAAAAIAAAJJ)</splitterSizes>
+        <type>splitter</type>
+      </splitter>
+      <version>UAVGadgetManagerV1</version>
+    </Mode5>
+    <Mode6>
+      <showToolbars>false</showToolbars>
+      <splitter>
+        <side0>
+          <classId>Uploader</classId>
+          <gadget>
+            <activeConfiguration>default</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
+        </side0>
+        <side1>
+          <side0>
+            <side0>
+              <classId>LineardialGadget</classId>
+              <gadget>
+                <activeConfiguration>Flight Time</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side0>
+            <side1>
+              <classId>SystemHealthGadget</classId>
+              <gadget>
+                <activeConfiguration>default</activeConfiguration>
+              </gadget>
+              <type>uavGadget</type>
+            </side1>
+            <splitterOrientation>1</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABQgAAAAIAAAGM)</splitterSizes>
+            <type>splitter</type>
+          </side0>
+          <side1>
+            <classId>PFDGadget</classId>
+            <gadget>
+              <activeConfiguration>raw</activeConfiguration>
+            </gadget>
+            <type>uavGadget</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
           <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABLwAAAAIAAAHf)</splitterSizes>

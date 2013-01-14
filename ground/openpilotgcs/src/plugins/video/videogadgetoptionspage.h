@@ -35,20 +35,31 @@
 class VideoGadgetConfiguration;
 
 namespace Ui {
-    class VideoOptionsPage;
+class VideoOptionsPage;
 }
 
 using namespace Core;
 
-class VideoGadgetOptionsPage : public IOptionsPage
-{
+class VideoGadgetOptionsPage: public IOptionsPage {
 Q_OBJECT
 public:
     explicit VideoGadgetOptionsPage(VideoGadgetConfiguration *config, QObject *parent = 0);
-    QString id() const { return ""; }
-    QString trName() const { return ""; }
-    QString category() const { return ""; }
-    QString trCategory() const { return ""; }
+    QString id() const
+    {
+        return "";
+    }
+    QString trName() const
+    {
+        return "";
+    }
+    QString category() const
+    {
+        return "";
+    }
+    QString trCategory() const
+    {
+        return "";
+    }
 
     QWidget *createPage(QWidget *parent);
     void apply();

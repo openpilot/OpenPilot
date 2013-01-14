@@ -42,22 +42,29 @@ class VideoGadgetWidget;
 
 using namespace Core;
 
-class VideoGadget : public Core::IUAVGadget
-{
-    Q_OBJECT
+class VideoGadget: public Core::IUAVGadget {
+Q_OBJECT
 public:
     VideoGadget(QString classId, VideoGadgetWidget *widget, QWidget *parent = 0);
     ~VideoGadget();
 
-    QList<int> context() const { return m_context; }
-    QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
-    QString contextHelpId() const { return QString(); }
+    QList<int> context() const
+    {
+        return m_context;
+    }
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    void loadConfiguration(IUAVGadgetConfiguration *config);
+    QString contextHelpId() const
+    {
+        return QString();
+    }
 
 private:
     VideoGadgetWidget *m_widget;
-	QList<int> m_context;
+    QList<int> m_context;
 };
-
 
 #endif // VIDEOGADGET_H_

@@ -39,8 +39,8 @@ VideoGadget::~VideoGadget()
     delete m_widget;
 }
 
-void VideoGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void VideoGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
-    VideoGadgetConfiguration *m = qobject_cast<VideoGadgetConfiguration*>(config);
+    VideoGadgetConfiguration *m = qobject_cast<VideoGadgetConfiguration *>(config);
     m_widget->setConfiguration(m);
 }

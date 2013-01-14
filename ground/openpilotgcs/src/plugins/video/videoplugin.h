@@ -32,16 +32,15 @@
 
 class VideoGadgetFactory;
 
-class VideoPlugin : public ExtensionSystem::IPlugin
-{
+class VideoPlugin: public ExtensionSystem::IPlugin {
 public:
-        VideoPlugin();
-   ~VideoPlugin();
+    VideoPlugin();
+    ~VideoPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList &arguments, QString *errorString);
+    void shutdown();
 private:
-   VideoGadgetFactory *mf;
+    VideoGadgetFactory *mf;
 };
 #endif /* VIDEOPLUGIN_H_ */

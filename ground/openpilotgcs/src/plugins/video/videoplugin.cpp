@@ -31,35 +31,34 @@
 #include <QStringList>
 #include <extensionsystem/pluginmanager.h>
 
-
 VideoPlugin::VideoPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 VideoPlugin::~VideoPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 bool VideoPlugin::initialize(const QStringList& args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new VideoGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new VideoGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void VideoPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void VideoPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
-Q_EXPORT_PLUGIN(VideoPlugin)
 
+Q_EXPORT_PLUGIN(VideoPlugin)

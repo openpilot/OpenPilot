@@ -36,89 +36,97 @@
 #include "pipeline.h"
 
 VideoGadgetWidget::VideoGadgetWidget(QWidget *parent) :
-		QFrame(parent) {
-	m_config = new Ui_Form();
-	m_config->setupUi(this);
+        QFrame(parent)
+{
+    m_config = new Ui_Form();
+    m_config->setupUi(this);
 
-	m_config->textBrowser->hide();
+    m_config->textBrowser->hide();
 
-	connect(m_config->video, SIGNAL(stateChanged(Pipeline::State)), this, SLOT(onStateChanged(Pipeline::State)));
+    connect(m_config->video, SIGNAL(stateChanged(Pipeline::State)), this, SLOT(onStateChanged(Pipeline::State)));
 
-	connect(m_config->startButton, SIGNAL(clicked()), m_config->video, SLOT(start()));
-	connect(m_config->pauseButton, SIGNAL(clicked()), m_config->video, SLOT(pause()));
-	connect(m_config->stopButton, SIGNAL(clicked()), m_config->video, SLOT(stop()));
+    connect(m_config->startButton, SIGNAL(clicked()), m_config->video, SLOT(start()));
+    connect(m_config->pauseButton, SIGNAL(clicked()), m_config->video, SLOT(pause()));
+    connect(m_config->stopButton, SIGNAL(clicked()), m_config->video, SLOT(stop()));
 }
 
-void VideoGadgetWidget::onStateChanged(Pipeline::State newState) {
+void VideoGadgetWidget::onStateChanged(Pipeline::State newState)
+{
 //	msg(QString("start"));
 //	m_config->video->start();
-	switch (newState) {
-	case Pipeline::Paused:
-		m_config->startButton->setVisible(true);
-		m_config->startButton->setEnabled(true);
-		m_config->pauseButton->setVisible(false);
-		m_config->pauseButton->setEnabled(false);
-		m_config->stopButton->setEnabled(true);
-		break;
-	case Pipeline::Playing:
-		m_config->startButton->setVisible(false);
-		m_config->startButton->setEnabled(false);
-		m_config->pauseButton->setVisible(true);
-		m_config->pauseButton->setEnabled(true);
-		m_config->stopButton->setEnabled(true);
-		break;
-	default:
-		m_config->startButton->setVisible(true);
-		m_config->startButton->setEnabled(true);
-		m_config->pauseButton->setVisible(false);
-		m_config->pauseButton->setEnabled(false);
-		m_config->stopButton->setEnabled(false);
-		break;
-	}
+    switch (newState) {
+    case Pipeline::Paused:
+        m_config->startButton->setVisible(true);
+        m_config->startButton->setEnabled(true);
+        m_config->pauseButton->setVisible(false);
+        m_config->pauseButton->setEnabled(false);
+        m_config->stopButton->setEnabled(true);
+        break;
+    case Pipeline::Playing:
+        m_config->startButton->setVisible(false);
+        m_config->startButton->setEnabled(false);
+        m_config->pauseButton->setVisible(true);
+        m_config->pauseButton->setEnabled(true);
+        m_config->stopButton->setEnabled(true);
+        break;
+    default:
+        m_config->startButton->setVisible(true);
+        m_config->startButton->setEnabled(true);
+        m_config->pauseButton->setVisible(false);
+        m_config->pauseButton->setEnabled(false);
+        m_config->stopButton->setEnabled(false);
+        break;
+    }
 }
 
-VideoGadgetWidget::~VideoGadgetWidget() {
-	m_config = 0;
+VideoGadgetWidget::~VideoGadgetWidget()
+{
+    m_config = 0;
 }
 
-void VideoGadgetWidget::setConfiguration(VideoGadgetConfiguration * config) {
-	msg(QString("setting configuration"));
-	m_config->video->setVisible(config->m_displayVideo);
-	//m_config->control->setEnabled(config->m_displayControls);
-	bool b = m_config->video->isPlaying();
-	if (b) {
-		stop();
-	}
-	m_config->video->setPipelineDesc(config->m_pipelineDesc);
-	if (b || config->m_autoStart) {
-		start();
-	}
+void VideoGadgetWidget::setConfiguration(VideoGadgetConfiguration *config)
+{
+    msg(QString("setting configuration"));
+    m_config->video->setVisible(config->m_displayVideo);
+    //m_config->control->setEnabled(config->m_displayControls);
+    bool b = m_config->video->isPlaying();
+    if (b) {
+        stop();
+    }
+    m_config->video->setPipelineDesc(config->m_pipelineDesc);
+    if (b || config->m_autoStart) {
+        start();
+    }
 }
 
-void VideoGadgetWidget::start() {
-	msg(QString("start"));
-	m_config->startButton->setEnabled(false);
-	m_config->video->start();
+void VideoGadgetWidget::start()
+{
+    msg(QString("start"));
+    m_config->startButton->setEnabled(false);
+    m_config->video->start();
 }
 
-void VideoGadgetWidget::pause() {
-	msg(QString("pause"));
-	m_config->pauseButton->setEnabled(false);
-	m_config->video->pause();
+void VideoGadgetWidget::pause()
+{
+    msg(QString("pause"));
+    m_config->pauseButton->setEnabled(false);
+    m_config->video->pause();
 }
 
-void VideoGadgetWidget::stop() {
-	msg(QString("stop"));
+void VideoGadgetWidget::stop()
+{
+    msg(QString("stop"));
 //	m_config->startButton->setEnabled(false);
 //	m_config->pauseButton->setEnabled(false);
 //	m_config->stopButton->setEnabled(false);
-	m_config->video->stop();
+    m_config->video->stop();
 }
 
-void VideoGadgetWidget::msg(const QString &str) {
-	qDebug() << str;
-	if (m_config) {
-		m_config->textBrowser->append(str);
-	}
+void VideoGadgetWidget::msg(const QString &str)
+{
+    qDebug() << str;
+    if (m_config) {
+        m_config->textBrowser->append(str);
+    }
 }
 

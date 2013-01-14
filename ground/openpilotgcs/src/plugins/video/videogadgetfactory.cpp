@@ -33,9 +33,7 @@
 #include <coreplugin/iuavgadget.h>
 
 VideoGadgetFactory::VideoGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("VideoGadget"),
-                          tr("VideoGadget"),
-                          parent)
+        IUAVGadgetFactory(QString("VideoGadget"), tr("VideoGadget"), parent)
 {
 }
 
@@ -44,17 +42,18 @@ VideoGadgetFactory::~VideoGadgetFactory()
 
 }
 
-Core::IUAVGadget* VideoGadgetFactory::createGadget(QWidget *parent) {
-    VideoGadgetWidget* gadgetWidget = new VideoGadgetWidget(parent);
+Core::IUAVGadget *VideoGadgetFactory::createGadget(QWidget *parent)
+{
+    VideoGadgetWidget *gadgetWidget = new VideoGadgetWidget(parent);
     return new VideoGadget(QString("VideoGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *VideoGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *VideoGadgetFactory::createConfiguration(QSettings *qSettings)
 {
     return new VideoGadgetConfiguration(QString("VideoGadget"), qSettings);
 }
 
 IOptionsPage *VideoGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new VideoGadgetOptionsPage(qobject_cast<VideoGadgetConfiguration*>(config));
+    return new VideoGadgetOptionsPage(qobject_cast<VideoGadgetConfiguration *>(config));
 }

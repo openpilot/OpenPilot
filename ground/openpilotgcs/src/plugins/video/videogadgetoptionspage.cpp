@@ -30,12 +30,10 @@
 
 #include "ui_videooptionspage.h"
 
-
 VideoGadgetOptionsPage::VideoGadgetOptionsPage(VideoGadgetConfiguration *config, QObject *parent) :
-    IOptionsPage(parent),
-    m_config(config)
+        IOptionsPage(parent), m_config(config)
 {
-	m_page = 0;
+    m_page = 0;
 }
 
 QWidget *VideoGadgetOptionsPage::createPage(QWidget *parent)
@@ -44,9 +42,9 @@ QWidget *VideoGadgetOptionsPage::createPage(QWidget *parent)
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
 
-	m_page->respectAspectRatioCheckBox->setVisible(false);
+    m_page->respectAspectRatioCheckBox->setVisible(false);
 
-	m_page->displayVideoCheckBox->setChecked(m_config->displayVideo());
+    m_page->displayVideoCheckBox->setChecked(m_config->displayVideo());
     m_page->displayControlsCheckBox->setChecked(m_config->displayControls());
     m_page->autoStartCheckBox->setChecked(m_config->autoStart());
     m_page->respectAspectRatioCheckBox->setChecked(m_config->respectAspectRatio());

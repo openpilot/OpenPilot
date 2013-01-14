@@ -44,43 +44,43 @@ class BusSyncHandler;
 class GST_LIB_EXPORT VideoWidget: public QWidget {
 Q_OBJECT
 public:
-	VideoWidget(QWidget * parent = 0);
-	~VideoWidget();
+    VideoWidget(QWidget *parent = 0);
+    ~VideoWidget();
 public:
-	void setPipelineDesc(QString pipelineDesc);
-	bool isPlaying();
+    void setPipelineDesc(QString pipelineDesc);
+    bool isPlaying();
 public slots:
-	void start();
-	void pause();
-	void stop();
+    void start();
+    void pause();
+    void stop();
 //public slots:
-//	void onMessage(GstMessage * message);
+//	void onMessage(GstMessage *message);
 //signals:
 //	void message(QString msg);
 signals:
-	void stateChanged(Pipeline::State newState);
+    void stateChanged(Pipeline::State newState);
 protected:
-	QString getStatus();
-	QString getStatusMessage();
-	void paintStatus(QPaintEvent *);
-	// QWidget overrides
-	void paintEvent(QPaintEvent *);
-	void resizeEvent(QResizeEvent *);
-	void mouseDoubleClickEvent(QMouseEvent *);
+    QString getStatus();
+    QString getStatusMessage();
+    void paintStatus(QPaintEvent *);
+    // QWidget overrides
+    void paintEvent(QPaintEvent *);
+    void resizeEvent(QResizeEvent *);
+    void mouseDoubleClickEvent(QMouseEvent *);
 private:
-	void init();
-	void dispose();
-	void setOverlay(Overlay *);
-	// QWidget overrides
-	bool event(QEvent *);
-	QPaintEngine * paintEngine() const;
+    void init();
+    void dispose();
+    void setOverlay(Overlay *);
+    // QWidget overrides
+    bool event(QEvent *);
+    QPaintEngine * paintEngine() const;
 private:
-	QString pipelineDesc;
-	QString lastError;
-	GstElement * pipeline;
-	Overlay * overlay;
-	BusSyncHandler * handler;
-	bool reset;
+    QString pipelineDesc;
+    QString lastError;
+    GstElement *pipeline;
+    Overlay *overlay;
+    BusSyncHandler *handler;
+    bool reset;
 };
 
 #endif /* VIDEOWIDGET_H_ */

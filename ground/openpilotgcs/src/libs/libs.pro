@@ -12,7 +12,6 @@ SUBDIRS   = \
     qwt \
     qextserialport \
     glc_lib\
+    gst_lib \
     sdlgamepad \
     libqxt
-
-SUBDIRS +=

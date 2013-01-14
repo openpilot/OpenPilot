@@ -238,3 +238,7 @@ plugin_setupwizard.depends += plugin_config
 plugin_setupwizard.depends += plugin_uploader
 SUBDIRS += plugin_setupwizard
 
+# Video plugin
+plugin_video.subdir = video
+plugin_video.depends = plugin_coreplugin
+SUBDIRS += plugin_video

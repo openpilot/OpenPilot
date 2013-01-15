@@ -83,7 +83,7 @@ VideoWidget::VideoWidget(QWidget *parent) :
 
     // set black background
     QPalette pal(palette());
-    //pal.setColor(backgroundRole(), Qt::yellow);
+    pal.setColor(backgroundRole(), Qt::black);
     setPalette(pal);
 
     WId wid = winId();

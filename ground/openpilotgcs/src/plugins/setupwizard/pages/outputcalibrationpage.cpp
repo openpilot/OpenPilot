@@ -110,7 +110,7 @@ void OutputCalibrationPage::setupVehicle()
             break;
     }
 
-    VehicleConfigurationHelper helper(getWizard());
+    VehicleConfigurationHelper helper(getWizard(), getWizard()->getUAVObjectManager());
     helper.setupVehicle(false);
 
     if(m_calibrationUtil) {

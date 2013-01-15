@@ -26,7 +26,6 @@
  */
 
 #include "vehicleconfigurationhelper.h"
-#include "extensionsystem/pluginmanager.h"
 #include "hwsettings.h"
 #include "actuatorsettings.h"
 #include "attitudesettings.h"
@@ -38,15 +37,12 @@
 const qint16 VehicleConfigurationHelper::LEGACY_ESC_FREQUENCE = 50;
 const qint16 VehicleConfigurationHelper::RAPID_ESC_FREQUENCE = 400;
 
-VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSource *configSource)
-    : m_configSource(configSource), m_uavoManager(0),
+VehicleConfigurationHelper::VehicleConfigurationHelper(VehicleConfigurationSource *configSource, UAVObjectManager *uavoManager)
+    : m_configSource(configSource),
       m_transactionOK(false), m_transactionTimeout(false), m_currentTransactionObjectID(-1),
-      m_progress(0)
+      m_progress(0), m_uavoManager(uavoManager)
 {
     Q_ASSERT(m_configSource);
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    m_uavoManager = pm->getObject<UAVObjectManager>();
-    Q_ASSERT(m_uavoManager);
 }
 
 bool VehicleConfigurationHelper::setupVehicle(bool save)

@@ -67,7 +67,7 @@ void SavePage::writeToController()
     }
 
     enableButtons(false);
-    VehicleConfigurationHelper helper(getWizard());
+    VehicleConfigurationHelper helper(getWizard(), getWizard()->getUAVObjectManager());
     connect(&helper, SIGNAL(saveProgress(int, int, QString)),this, SLOT(saveProgress(int, int, QString)));
 
     m_successfulWrite = helper.setupVehicle();

@@ -29,8 +29,10 @@
 #define ABSTRACTWIZARD_H
 
 #include <QWizard>
+#include "uavobjectmanager.h"
 #include <coreplugin/icore.h>
 #include <coreplugin/connectionmanager.h>
+#include "extensionsystem/pluginmanager.h"
 
 class AbstractWizard : public QWizard
 {
@@ -47,8 +49,18 @@ public:
         return m_connectionManager;
     }
 
+    UAVObjectManager* getUAVObjectManager() {
+        if(!m_uavoManager) {
+            ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+            m_uavoManager = pm->getObject<UAVObjectManager>();
+            Q_ASSERT(m_uavoManager);
+        }
+        return m_uavoManager;
+    }
+
 private:
     Core::ConnectionManager *m_connectionManager;
+    UAVObjectManager *m_uavoManager;
 
 };
 

@@ -27,6 +27,6 @@
 
 #include "abstractwizard.h"
 
-AbstractWizard::AbstractWizard(QWidget *parent) : QWizard(parent), m_connectionManager(0)
+AbstractWizard::AbstractWizard(QWidget *parent) : QWizard(parent), m_connectionManager(0), m_uavoManager(0)
 {
 }

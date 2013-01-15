@@ -311,7 +311,8 @@ void SetupWizard::pageChanged(int currId)
 
 bool SetupWizard::saveHardwareSettings() const
 {
-    VehicleConfigurationHelper helper(const_cast<SetupWizard *>(this));
+    VehicleConfigurationHelper helper(const_cast<SetupWizard *>(this),
+                                      const_cast<SetupWizard *>(this)->getUAVObjectManager());
     return helper.setupHardwareSettings();
 }
 

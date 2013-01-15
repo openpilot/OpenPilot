@@ -31,7 +31,6 @@
 #include <QList>
 #include <QPair>
 #include "vehicleconfigurationsource.h"
-#include "uavobjectmanager.h"
 #include "systemsettings.h"
 #include "cfg_vehicletypes/vehicleconfig.h"
 #include "actuatorsettings.h"
@@ -55,7 +54,7 @@ class VehicleConfigurationHelper : public QObject
     Q_OBJECT
 
 public:
-    VehicleConfigurationHelper(VehicleConfigurationSource* configSource);
+    VehicleConfigurationHelper(VehicleConfigurationSource* configSource, UAVObjectManager *uavoManager);
     bool setupVehicle(bool save = true);
     bool setupHardwareSettings(bool save = true);
     static const qint16 LEGACY_ESC_FREQUENCE;
@@ -71,7 +70,6 @@ private:
     static const float DEFAULT_ENABLED_ACCEL_TAU = 0.1;
 
     VehicleConfigurationSource *m_configSource;
-    UAVObjectManager *m_uavoManager;
 
     QList<QPair<UAVDataObject*, QString>* > m_modifiedObjects;
     void addModifiedObject(UAVDataObject* object, QString description);
@@ -96,6 +94,8 @@ private:
     bool m_transactionTimeout;
     int m_currentTransactionObjectID;
     int m_progress;
+    UAVObjectManager *m_uavoManager;
+
 
     void resetVehicleConfig();
     void resetGUIData();

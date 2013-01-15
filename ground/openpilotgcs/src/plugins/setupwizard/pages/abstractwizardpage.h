@@ -29,6 +29,8 @@
 #define ABSTRACTWIZARDPAGE_H
 
 #include <QWizardPage>
+#include "uavobjectmanager.h"
+
 
 template <class WizardClass> class AbstractWizardPage : public QWizardPage
 {

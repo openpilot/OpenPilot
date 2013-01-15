@@ -27,15 +27,94 @@
 
 #include "escvehiclepage.h"
 #include "ui_escvehiclepage.h"
+#include "cfg_vehicletypes/vehicleconfig.h"
+#include "systemsettings.h"
 
 ESCVehiclePage::ESCVehiclePage(ESCWizard *wizard, QWidget *parent) :
     AbstractWizardPage<ESCWizard>(wizard, parent),
     ui(new Ui::ESCVehiclePage)
 {
     ui->setupUi(this);
+    QSvgRenderer *renderer = new QSvgRenderer();
+    renderer->load(QString(":/configgadget/images/multirotor-shapes.svg"));
+    m_multiPic = new QGraphicsSvgItem();
+    m_multiPic->setSharedRenderer(renderer);
+    QGraphicsScene *scene = new QGraphicsScene(this);
+    scene->addItem(m_multiPic);
+    ui->typeGraphicsView->setScene(scene);
+
+    //setupVehicleImage(SystemSettings::AIRFRAMETYPE_QUADX);
 }
 
 ESCVehiclePage::~ESCVehiclePage()
 {
     delete ui;
+}
+
+void ESCVehiclePage::initializePage()
+{
+    //GUIConfigDataUnion configData;
+
+    SystemSettings * systemSettings = SystemSettings::GetInstance(getWizard()->getUAVObjectManager());
+    Q_ASSERT(systemSettings);
+    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
+
+    for(int i = 0; i < (int)(SystemSettings::GUICONFIGDATA_NUMELEM); i++) {
+        //configData.UAVObject[i] = systemSettingsData.;
+    }
+
+    setupVehicleImage(systemSettingsData.AirframeType);
+}
+
+void ESCVehiclePage::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event);
+    if(m_multiPic) {
+        ui->typeGraphicsView->setSceneRect(m_multiPic->boundingRect());
+        ui->typeGraphicsView->fitInView(m_multiPic, Qt::KeepAspectRatio);
+    }
+}
+
+void ESCVehiclePage::setupVehicleImage(quint8 type)
+{
+    QString elementId;
+    switch(type)
+    {
+        case SystemSettings::AIRFRAMETYPE_TRI:
+            elementId = "tri";
+            break;
+        case SystemSettings::AIRFRAMETYPE_QUADX:
+            elementId = "quad-x";
+            break;
+        case SystemSettings::AIRFRAMETYPE_QUADP:
+            elementId = "quad-plus";
+            break;
+        case SystemSettings::AIRFRAMETYPE_HEXA:
+            elementId = "quad-hexa";
+            break;
+        case SystemSettings::AIRFRAMETYPE_HEXACOAX:
+            elementId = "hexa-coax";
+            break;
+        case SystemSettings::AIRFRAMETYPE_HEXAX:
+            elementId = "quad-hexa-H";
+            break;
+        case SystemSettings::AIRFRAMETYPE_OCTO:
+            elementId = "quad-octo";
+            break;
+        case SystemSettings::AIRFRAMETYPE_OCTOCOAXX:
+            elementId = "octo-coax-X";
+            break;
+        case SystemSettings::AIRFRAMETYPE_OCTOCOAXP:
+            elementId = "octo-coax-P";
+            break;
+        case SystemSettings::AIRFRAMETYPE_OCTOV:
+            elementId = "quad-octo-v";
+            break;
+        default:
+            elementId = "";
+            break;
+    }
+    m_multiPic->setElementId(elementId);
+    ui->typeGraphicsView->setSceneRect(m_multiPic->boundingRect());
+    ui->typeGraphicsView->fitInView(m_multiPic, Qt::KeepAspectRatio);
 }

@@ -28,9 +28,10 @@
 #ifndef ESCVEHICLEPAGE_H
 #define ESCVEHICLEPAGE_H
 
+#include <QtSvg/QGraphicsSvgItem>
+#include <QtSvg/QSvgRenderer>
 #include "abstractwizardpage.h"
 #include "escwizard.h"
-
 
 namespace Ui {
 class ESCVehiclePage;
@@ -43,9 +44,16 @@ class ESCVehiclePage : public AbstractWizardPage<ESCWizard>
 public:
     explicit ESCVehiclePage(ESCWizard *wizard, QWidget *parent = 0);
     ~ESCVehiclePage();
+    void initializePage();
     
+protected:
+    void resizeEvent(QResizeEvent *event);
+
 private:
     Ui::ESCVehiclePage *ui;
+    QGraphicsSvgItem *m_multiPic;
+    void setupVehicleImage(quint8 type);
+
 };
 
 #endif // ESCVEHICLEPAGE_H

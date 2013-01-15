@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/app">
+        <file>loadingblue13.gif</file>
+    </qresource>
+</RCC>

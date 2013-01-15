@@ -28,3 +28,6 @@ win32 {
 }
 
 OTHER_FILES += openpilotgcs.rc
+
+RESOURCES += \
+    appresources.qrc

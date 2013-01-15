@@ -46,6 +46,7 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
+#include <QtGui/QSplashScreen>
 
 enum { OptionIndent = 4, DescriptionIndent = 24 };
 
@@ -250,6 +251,11 @@ int main(int argc, char **argv)
 
     SharedTools::QtSingleApplication app((QLatin1String(appNameC)), argc, argv);
 
+    //Open Splashscreen
+    QPixmap logoPixmap(":/app/loadingblue13.gif");
+    QSplashScreen splash(logoPixmap);
+    splash.show();
+
     QString locale = QLocale::system().name();
 
     // Must be done before any QSettings class is created
@@ -374,5 +380,8 @@ int main(int argc, char **argv)
 
     // Do this after the event loop has started
     QTimer::singleShot(100, &pluginManager, SLOT(startTests()));
+
+    //Close splashscreen
+    splash.close();
     return app.exec();
 }

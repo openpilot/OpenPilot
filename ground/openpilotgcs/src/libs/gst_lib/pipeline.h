@@ -20,8 +20,8 @@ public:
     Pipeline();
     virtual ~Pipeline();
 private:
-    //GstElement * pipeline;
-    //BusSyncHandler * handler;
+    //GstElement *pipeline;
+    //BusSyncHandler *handler;
 };
 
 #endif /* PIPELINE_H_ */

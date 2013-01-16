@@ -64,12 +64,12 @@ public:
     QWidget *createPage(QWidget *parent);
     void apply();
     void finish();
-private:
 
-signals:
+//private signals:
 
-public slots:
+//public slots:
 private slots:
+    void openHelpDialog();
 
 private:
     VideoGadgetConfiguration *m_config;

@@ -27,6 +27,7 @@
 
 #include "videogadgetoptionspage.h"
 #include "videogadgetconfiguration.h"
+#include "helpdialog.h"
 
 #include "ui_videooptionspage.h"
 
@@ -51,6 +52,8 @@ QWidget *VideoGadgetOptionsPage::createPage(QWidget *parent)
     m_page->descPlainTextEdit->setPlainText(m_config->pipelineDesc());
     m_page->infoPlainTextEdit->setPlainText(m_config->pipelineInfo());
 
+    connect(m_page->helpButton, SIGNAL(clicked()), this, SLOT(openHelpDialog()));
+
     return w;
 }
 
@@ -69,3 +72,8 @@ void VideoGadgetOptionsPage::finish()
     delete m_page;
 }
 
+void VideoGadgetOptionsPage::openHelpDialog()
+{
+    HelpDialog dlg(0);
+    dlg.execDialog();
+}

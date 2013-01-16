@@ -87,7 +87,7 @@ public:
     {
         m_pipelineInfo = pipelineInfo;
     }
-//signals:
+//public signals:
 
 //public slots:
 

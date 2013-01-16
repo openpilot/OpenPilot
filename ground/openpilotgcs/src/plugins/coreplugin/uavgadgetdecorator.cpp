@@ -45,8 +45,8 @@ UAVGadgetDecorator::UAVGadgetDecorator(IUAVGadget *gadget, QList<IUAVGadgetConfi
     foreach (IUAVGadgetConfiguration *config, *m_configurations)
         m_toolbar->addItem(config->name());
     connect(m_toolbar, SIGNAL(activated(int)), this, SLOT(loadConfiguration(int)));
-    if (m_configurations->count() > 0)
-        loadConfiguration(0);
+//    if (m_configurations->count() > 0)
+//        loadConfiguration(0);
     updateToolbar();
 }
 

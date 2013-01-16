@@ -265,11 +265,29 @@ void UAVGadgetView::saveState(QSettings* qSettings)
 void UAVGadgetView::restoreState(QSettings* qSettings)
 {
     QString classId = qSettings->value("classId").toString();
+
     int index = indexOfClassId(classId);
-    listSelectionActivated(index);
+    if (index < 0) {
+        index = m_defaultIndex;
+    }
+
+    classId = m_uavGadgetList->itemData(index).toString();
+
+
+    IUAVGadget *newGadget;
+    UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
     if(qSettings->childGroups().contains("gadget")) {
+        newGadget = im->createGadget(classId, this, false);
         qSettings->beginGroup("gadget");
-        gadget()->restoreState(qSettings);
+        newGadget->restoreState(qSettings);
         qSettings->endGroup();
     }
+    else {
+        newGadget = im->createGadget(classId, this);
+    }
+
+    IUAVGadget *gadgetToRemove = m_uavGadget;
+    setGadget(newGadget);
+    m_uavGadgetManager->setCurrentGadget(newGadget);
+    im->removeGadget(gadgetToRemove);
 }

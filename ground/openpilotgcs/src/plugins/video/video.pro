@@ -7,6 +7,7 @@ include(../../libs/gst_lib/gst_lib.pri)
 include(video_dependencies.pri)
 
 HEADERS += \
+    helpdialog.h \
 	videoplugin.h \
 	videogadgetconfiguration.h \
 	videogadget.h \
@@ -15,7 +16,8 @@ HEADERS += \
 	videogadgetoptionspage.h 
 
 SOURCES += \
-	videoplugin.cpp \
+    helpdialog.cpp \
+    videoplugin.cpp \
 	videogadgetconfiguration.cpp \
 	videogadget.cpp \
 	videogadgetfactory.cpp \
@@ -29,6 +31,7 @@ OTHER_FILES += \
 	VideoGadget.pluginspec
 
 FORMS += \
+    helpdialog.ui \
 	video.ui \
 	videooptionspage.ui
 

@@ -34,6 +34,9 @@
 namespace gst {
 GST_LIB_EXPORT void init(int *argc, char **argv[]);
 GST_LIB_EXPORT QString version();
+
+GST_LIB_EXPORT QList<QString> pluginList();
+GST_LIB_EXPORT QList<QString> elementList(QString pluginName);
 }
 
 /**********************************************************************/

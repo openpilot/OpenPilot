@@ -252,3 +252,24 @@ void UAVGadgetView::currentGadgetChanged(IUAVGadget *gadget)
 {
     m_activeLabel->setVisible(m_uavGadget == gadget);
 }
+
+void UAVGadgetView::saveState(QSettings* qSettings)
+{
+    qSettings->setValue("type", "uavGadget");
+    qSettings->setValue("classId", gadget()->classId());
+    qSettings->beginGroup("gadget");
+    gadget()->saveState(qSettings);
+    qSettings->endGroup();
+}
+
+void UAVGadgetView::restoreState(QSettings* qSettings)
+{
+    QString classId = qSettings->value("classId").toString();
+    int index = indexOfClassId(classId);
+    listSelectionActivated(index);
+    if(qSettings->childGroups().contains("gadget")) {
+        qSettings->beginGroup("gadget");
+        gadget()->restoreState(qSettings);
+        qSettings->endGroup();
+    }
+}

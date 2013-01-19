@@ -33,9 +33,10 @@ public:
                return QString("CopterControl");
                break;
            case 0x0901://Revolution
-               // It would be nice to say CC3D here but since currently we use string comparisons
-               // for firmware compatibility and the filename path that would break
                return QString("Revolution");
+               break;
+           case 0x0903://Revomini
+               return QString("Revomini");
                break;
            default:
                return QString("");

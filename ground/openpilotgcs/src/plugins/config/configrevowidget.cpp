@@ -54,7 +54,7 @@
 #define sign(x) ((x < 0) ? -1 : 1)
 
 // Uncomment this to enable 6 point calibration on the accels
-//#define SIX_POINT_CAL_ACCEL
+#define SIX_POINT_CAL_ACCEL
 
 const double ConfigRevoWidget::maxVarValue = 0.1;
 

@@ -53,6 +53,9 @@ FLASH_TOOL = OPENOCD
 
 # List of modules to include
 MODULES = ManualControl Stabilization GPS
+MODULES += PathPlanner
+MODULES += FixedWingPathFollower
+MODULES += VtolPathFollower
 MODULES += CameraStab
 MODULES += Telemetry
 #MODULES += OveroSync
@@ -133,6 +136,7 @@ SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/insgps13state.c
 SRC += $(FLIGHTLIB)/taskmonitor.c
+SRC += $(FLIGHTLIB)/paths.c
 
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c

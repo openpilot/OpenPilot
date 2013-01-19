@@ -569,6 +569,95 @@ static void setFailsafe(const ActuatorSettingsData * actuatorSettings, const Mix
 	ActuatorCommandChannelSet(Channel);
 }
 
+/**
+ * determine buzzer or blink sequence
+ **/
+
+typedef enum {BUZZ_BUZZER=0,BUZZ_ARMING=1,BUZZ_INFO=2,BUZZ_MAX=3} buzzertype;
+
+static inline bool buzzerState(buzzertype type)
+{
+	// This is for buzzers that take a PWM input
+
+	static uint32_t tune[BUZZ_MAX]={0};
+	static uint32_t tunestate[BUZZ_MAX]={0};
+
+
+	uint32_t newTune = 0;
+	if(type==BUZZ_BUZZER)
+	{
+		// Decide what tune to play
+		if (AlarmsGet(SYSTEMALARMS_ALARM_BATTERY) > SYSTEMALARMS_ALARM_WARNING) {
+			newTune = 0b11110110110000;	// pause, short, short, short, long
+		} else if (AlarmsGet(SYSTEMALARMS_ALARM_GPS) >= SYSTEMALARMS_ALARM_WARNING) {
+			newTune = 0x80000000;			// pause, short
+		} else {
+			newTune = 0;
+		}
+
+	} else { // BUZZ_ARMING || BUZZ_INFO
+		uint8_t arming;
+		FlightStatusArmedGet(&arming);
+		//base idle tune  
+		newTune =  0x80000000;	  // 0b1000...
+		
+		// Merge the error pattern for InfoLed
+		if(type==BUZZ_INFO)
+		{
+			if (AlarmsGet(SYSTEMALARMS_ALARM_BATTERY) > SYSTEMALARMS_ALARM_WARNING) 
+			{
+				newTune |= 0b00000000001111111011111110000000;
+			}
+			else if(AlarmsGet(SYSTEMALARMS_ALARM_GPS) >= SYSTEMALARMS_ALARM_WARNING) 
+			{			 
+				newTune |= 0b00000000000000110110110000000000;
+			}
+		}
+		// fast double blink pattern if armed 
+		if (arming == FLIGHTSTATUS_ARMED_ARMED) 
+		   newTune |= 0xA0000000;   // 0b101000... 
+
+	}
+
+	// Do we need to change tune?
+	if (newTune != tune[type]) {
+		tune[type] = newTune;
+		// resynchronize all tunes on change, so they stay in sync
+		for (int i=0;i<BUZZ_MAX;i++) {
+			tunestate[i] = tune[i];
+		}
+	}
+
+	// Play tune
+	bool buzzOn = false;
+	static portTickType lastSysTime = 0;
+	portTickType thisSysTime = xTaskGetTickCount();
+	portTickType dT = 0;
+
+	// For now, only look at the battery alarm, because functions like AlarmsHasCritical() can block for some time; to be discussed
+	if (tune[type]) {
+		if(thisSysTime > lastSysTime) {
+			dT = thisSysTime - lastSysTime;
+		} else {
+			lastSysTime = 0; // avoid the case where SysTimeMax-lastSysTime <80
+		}
+
+		buzzOn = (tunestate[type]&1);
+
+		if (dT > 80) {
+			// Go to next bit in alarm_seq_state
+			for (int i=0;i<BUZZ_MAX;i++) {
+				tunestate[i] >>=1;
+				if (tunestate[i]==0) // All done, re-start the tune
+					tunestate[i]=tune[i];
+			}
+			lastSysTime = thisSysTime;
+		}
+	}
+	return buzzOn;
+}
+
+
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
 static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSettingsData * actuatorSettings)
 {
@@ -578,52 +667,18 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSet
 static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSettingsData * actuatorSettings)
 {
 	switch(actuatorSettings->ChannelType[mixer_channel]) {
-		case ACTUATORSETTINGS_CHANNELTYPE_PWMALARMBUZZER: {
-			// This is for buzzers that take a PWM input
-
-			static uint32_t currBuzzTune = 0;
-			static uint32_t currBuzzTuneState;
-			uint32_t bewBuzzTune;
-
-			// Decide what tune to play
-			if (AlarmsGet(SYSTEMALARMS_ALARM_BATTERY) > SYSTEMALARMS_ALARM_WARNING) {
-				bewBuzzTune = 0b11110110110000;	// pause, short, short, short, long
-			} else if (AlarmsGet(SYSTEMALARMS_ALARM_GPS) >= SYSTEMALARMS_ALARM_WARNING) {
-				bewBuzzTune = 0x80000000;			// pause, short
-			} else {
-				bewBuzzTune = 0;
-			}
-
-			// Do we need to change tune?
-			if (bewBuzzTune != currBuzzTune) {
-				currBuzzTune = bewBuzzTune;
-				currBuzzTuneState = currBuzzTune;
-			}
-
-
-			// Play tune
-			bool buzzOn = false;
-			static portTickType lastSysTime = 0;
-			portTickType thisSysTime = xTaskGetTickCount();
-			portTickType dT = 0;
-
-			// For now, only look at the battery alarm, because functions like AlarmsHasCritical() can block for some time; to be discussed
-			if (currBuzzTune) {
-				if(thisSysTime > lastSysTime)
-					dT = thisSysTime - lastSysTime;
-				buzzOn = (currBuzzTuneState&1);	// Buzz when the LS bit is 1
-				if (dT > 80) {
-					// Go to next bit in alarm_seq_state
-					currBuzzTuneState >>= 1;
-					if (currBuzzTuneState == 0)
-						currBuzzTuneState = currBuzzTune;	// All done, re-start the tune
-					lastSysTime = thisSysTime;
-				}
-			}
+		case ACTUATORSETTINGS_CHANNELTYPE_PWMALARMBUZZER: 
 			PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel],
-							buzzOn?actuatorSettings->ChannelMax[mixer_channel]:actuatorSettings->ChannelMin[mixer_channel]);
+			              buzzerState(BUZZ_BUZZER)?actuatorSettings->ChannelMax[mixer_channel]:actuatorSettings->ChannelMin[mixer_channel]);
 			return true;
-		}
+		case ACTUATORSETTINGS_CHANNELTYPE_ARMINGLED:
+			PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel],
+			              buzzerState(BUZZ_ARMING)?actuatorSettings->ChannelMax[mixer_channel]:actuatorSettings->ChannelMin[mixer_channel]);
+			return true;
+		case ACTUATORSETTINGS_CHANNELTYPE_INFOLED:
+			PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel],
+			              buzzerState(BUZZ_INFO)?actuatorSettings->ChannelMax[mixer_channel]:actuatorSettings->ChannelMin[mixer_channel]);
+			return true;
 		case ACTUATORSETTINGS_CHANNELTYPE_PWM:
 			PIOS_Servo_Set(actuatorSettings->ChannelAddr[mixer_channel], value);
 			return true;
@@ -632,7 +687,6 @@ static bool set_channel(uint8_t mixer_channel, uint16_t value, const ActuatorSet
 			return PIOS_SetMKSpeed(actuatorSettings->ChannelAddr[mixer_channel],value);
 		case ACTUATORSETTINGS_CHANNELTYPE_ASTEC4:
 			return PIOS_SetAstec4Speed(actuatorSettings->ChannelAddr[mixer_channel],value);
-			break;
 #endif
 		default:
 			return false;

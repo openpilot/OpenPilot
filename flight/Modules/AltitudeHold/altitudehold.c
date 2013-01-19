@@ -60,6 +60,7 @@
 #define MAX_QUEUE_SIZE 2
 #define STACK_SIZE_BYTES 1024
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
+#define ACCEL_DOWNSAMPLE 4
 // Private types
 
 // Private variables
@@ -178,11 +179,10 @@ static void altitudeHoldTask(void *parameters)
 			float P[4][4], K[4][2], x[2];
 			float G[4] = {1.0e-15f, 1.0e-15f, 1.0e-3f, 1.0e-7};
 			static float V[4][4] = {{10.0f, 0, 0, 0}, {0, 100.0f, 0, 0}, {0, 0, 100.0f, 0}, {0, 0, 0, 1000.0f}};
-
+			static uint32_t accel_downsample_count = 0;
+			static float accels_accum[3] = {0,0,0};
 			float dT;
 			static float S[2] = {1.0f,10.0f};
-
-			thisTime = xTaskGetTickCount();
 
 			/* Somehow this always assigns to zero.  Compiler bug? Race condition? */
 			S[0] = altitudeHoldSettings.PressureNoise;
@@ -195,6 +195,23 @@ static void altitudeHoldTask(void *parameters)
 			AttitudeActualGet(&attitudeActual);
 			BaroAltitudeData baro;
 			BaroAltitudeGet(&baro);
+
+			/* Downsample accels to stop this calculation consuming too much CPU */
+			accels_accum[0] += accels.x;
+			accels_accum[1] += accels.y;
+			accels_accum[2] += accels.z;
+			accel_downsample_count++;
+
+			if (accel_downsample_count < ACCEL_DOWNSAMPLE)
+				continue;
+
+			accel_downsample_count = 0;
+			accels.x = accels_accum[0] / ACCEL_DOWNSAMPLE;
+			accels.y = accels_accum[1] / ACCEL_DOWNSAMPLE;
+			accels.z = accels_accum[2] / ACCEL_DOWNSAMPLE;
+			accels_accum[0] = accels_accum[1] = accels_accum[2] = 0;
+
+			thisTime = xTaskGetTickCount();
 
 			if (init == WAITIING_INIT) {
 				z[0] = baro.Altitude;

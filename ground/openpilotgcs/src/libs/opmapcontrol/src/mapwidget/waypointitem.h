@@ -227,6 +227,7 @@ signals:
     * @param waypoint a pointer to this WayPoint
     */
     void WPNumberChanged(int const& oldnumber,int const& newnumber,WayPointItem* waypoint);
+
     /**
     * @brief Fired when the description, altitude or coordinates change
     *

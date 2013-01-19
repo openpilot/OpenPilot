@@ -9,6 +9,8 @@ include(openpilotgcs.pri)
 TEMPLATE  = subdirs
 CONFIG   += ordered
 
+DEFINES += USE_PATHPLANNER
+
 SUBDIRS = src share copydata
 unix:!macx:!isEmpty(copydata):SUBDIRS += bin
 

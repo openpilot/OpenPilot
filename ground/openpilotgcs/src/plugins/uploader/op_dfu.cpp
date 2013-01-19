@@ -1040,7 +1040,7 @@ int DFUObject::receiveData(void * data,int size)
 #define BOARD_ID_INS    2
 #define BOARD_ID_PIP    3
 #define BOARD_ID_CC     4
-//#define BOARD_ID_PRO     ?
+#define BOARD_ID_REVO   9
 
 /**
   Gets the type of board connected
@@ -1065,11 +1065,9 @@ OP_DFU::eBoardType DFUObject::GetBoardType(int boardNum)
         case BOARD_ID_CC: // CopterControl family
             brdType = eBoardCC;
             break;
-#if 0 // Someday ;-)
-        case BOARD_ID_PRO: // Pro board
-            brdType = eBoardPro;
+        case BOARD_ID_REVO: // Revo board
+            brdType = eBoardRevo;
             break;
-#endif
     } 
     return brdType;
 }

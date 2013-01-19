@@ -33,20 +33,17 @@
 #include <pipxsettings.h>
 #include <board_hw_defs.c>
 
-#define PIOS_COM_SERIAL_RX_BUF_LEN 128
-#define PIOS_COM_SERIAL_TX_BUF_LEN 128
+#define PIOS_COM_SERIAL_RX_BUF_LEN 256
+#define PIOS_COM_SERIAL_TX_BUF_LEN 256
 
-#define PIOS_COM_FLEXI_RX_BUF_LEN 128
+#define PIOS_COM_FLEXI_RX_BUF_LEN 256
 #define PIOS_COM_FLEXI_TX_BUF_LEN 128
 
-#define PIOS_COM_TELEM_USB_RX_BUF_LEN 128
-#define PIOS_COM_TELEM_USB_TX_BUF_LEN 128
+#define PIOS_COM_TELEM_USB_RX_BUF_LEN 256
+#define PIOS_COM_TELEM_USB_TX_BUF_LEN 256
 
-#define PIOS_COM_VCP_USB_RX_BUF_LEN 128
-#define PIOS_COM_VCP_USB_TX_BUF_LEN 128
-
-#define PIOS_COM_RFM22B_RF_RX_BUF_LEN 128
-#define PIOS_COM_RFM22B_RF_TX_BUF_LEN 128
+#define PIOS_COM_VCP_USB_RX_BUF_LEN 256
+#define PIOS_COM_VCP_USB_TX_BUF_LEN 256
 
 uint32_t pios_com_telem_usb_id = 0;
 uint32_t pios_com_telemetry_id;
@@ -56,8 +53,6 @@ uint32_t pios_com_uavtalk_com_id = 0;
 uint32_t pios_com_gcs_com_id = 0;
 uint32_t pios_com_trans_com_id = 0;
 uint32_t pios_com_debug_id = 0;
-uint32_t pios_com_rfm22b_id = 0;
-uint32_t pios_rfm22b_id = 0;
 uint32_t pios_ppm_rcvr_id = 0;
 
 /**
@@ -70,14 +65,14 @@ void PIOS_Board_Init(void) {
 	/* Delay system */
 	PIOS_DELAY_Init();
 
-	/* Set up the SPI interface to the serial flash */
-	if (PIOS_SPI_Init(&pios_spi_port_id, &pios_spi_port_cfg)) {
-		PIOS_Assert(0);
-	}
-
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
+	
+	/* Set up the SPI interface to the rfm22b */
+	if (PIOS_SPI_Init(&pios_spi_rfm22b_id, &pios_spi_rfm22b_cfg)) {
+		PIOS_DEBUG_Assert(0);
+	}
 
 #ifdef PIOS_INCLUDE_WDG
 	/* Initialize watchdog as early as possible to catch faults during init */
@@ -119,10 +114,6 @@ void PIOS_Board_Init(void) {
 	PIOS_TIM_InitClock(&tim_3_cfg);
 	PIOS_TIM_InitClock(&tim_4_cfg);
 #endif	/* PIOS_INCLUDE_TIM */
-
-#if defined(PIOS_INCLUDE_PACKET_HANDLER)
-	pios_packet_handler = PHInitialize(&pios_ph_cfg);
-#endif /* PIOS_INCLUDE_PACKET_HANDLER */
 
 #if defined(PIOS_INCLUDE_USB)
 	/* Initialize board specific USB data */
@@ -308,88 +299,6 @@ void PIOS_Board_Init(void) {
 	case PIPXSETTINGS_FLEXICONFIG_DISABLED:
 		break;
 	}
-
-#if defined(PIOS_INCLUDE_RFM22B)
-	struct pios_rfm22b_cfg pios_rfm22b_cfg = {
-		.frequencyHz = 434000000,
-		.minFrequencyHz = 434000000 - 2000000,
-		.maxFrequencyHz = 434000000 + 2000000,
-		.RFXtalCap = 0x7f,
-		.maxRFBandwidth = 128000,
-		.maxTxPower = RFM22_tx_pwr_txpow_7, // +20dBm .. 100mW
-	};
-
-	/* Retrieve hardware settings. */
-	pios_rfm22b_cfg.frequencyHz = pipxSettings.Frequency;
-	pios_rfm22b_cfg.RFXtalCap = pipxSettings.FrequencyCalibration;
-	switch (pipxSettings.RFSpeed)
-	{
-	case PIPXSETTINGS_RFSPEED_2400:
-		pios_rfm22b_cfg.maxRFBandwidth = 2000;
-		break;
-	case PIPXSETTINGS_RFSPEED_4800:
-		pios_rfm22b_cfg.maxRFBandwidth = 4000;
-		break;
-	case PIPXSETTINGS_RFSPEED_9600:
-		pios_rfm22b_cfg.maxRFBandwidth = 9600;
-		break;
-	case PIPXSETTINGS_RFSPEED_19200:
-		pios_rfm22b_cfg.maxRFBandwidth = 19200;
-		break;
-	case PIPXSETTINGS_RFSPEED_38400:
-		pios_rfm22b_cfg.maxRFBandwidth = 32000;
-		break;
-	case PIPXSETTINGS_RFSPEED_57600:
-		pios_rfm22b_cfg.maxRFBandwidth = 64000;
-		break;
-	case PIPXSETTINGS_RFSPEED_115200:
-		pios_rfm22b_cfg.maxRFBandwidth = 128000;
-		break;
-	}
-	switch (pipxSettings.MaxRFPower)
-	{
-	case PIPXSETTINGS_MAXRFPOWER_125:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_0;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_16:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_1;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_316:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_2;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_63:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_3;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_126:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_4;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_25:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_5;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_50:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_6;
-		break;
-	case PIPXSETTINGS_MAXRFPOWER_100:
-		pios_rfm22b_cfg.maxTxPower = RFM22_tx_pwr_txpow_7;
-		break;
-	}
-
-	/* Initalize the RFM22B radio COM device. */
-	{
-		if (PIOS_RFM22B_Init(&pios_rfm22b_id, &pios_rfm22b_cfg)) {
-			PIOS_Assert(0);
-		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_rfm22b_id, &pios_rfm22b_com_driver, pios_rfm22b_id,
-											rx_buffer, PIOS_COM_RFM22B_RF_RX_BUF_LEN,
-											tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
-			PIOS_Assert(0);
-		}
-	}
-#endif /* PIOS_INCLUDE_RFM22B */
 
 	/* Remap AFIO pin */
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);

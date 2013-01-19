@@ -128,9 +128,16 @@ void PFDGadgetWidget::connectNeedles() {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    airspeedObj = dynamic_cast<UAVDataObject*>(objManager->getObject("VelocityActual"));
+	airspeedObj = dynamic_cast<UAVDataObject*>(objManager->getObject("AirspeedActual"));
     if (airspeedObj != NULL ) {
-        connect(airspeedObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAirspeed(UAVObject*)));
+		connect(airspeedObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateAirspeed(UAVObject*)));
+    } else {
+		 qDebug() << "Error: Object is unknown (AirspeedActual).";
+    }
+
+    groundspeedObj = dynamic_cast<UAVDataObject*>(objManager->getObject("VelocityActual"));
+    if (groundspeedObj != NULL ) {
+        connect(groundspeedObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateGroundspeed(UAVObject*)));
     } else {
          qDebug() << "Error: Object is unknown (VelocityActual).";
     }
@@ -297,14 +304,31 @@ void PFDGadgetWidget::updateHeading(UAVObject *object) {
 }
 
 /*!
-  \brief Called by updates to @PositionActual to compute airspeed from velocity
+  \brief Called by updates to @PositionActual to compute groundspeed from velocity
   */
-void PFDGadgetWidget::updateAirspeed(UAVObject *object) {
+void PFDGadgetWidget::updateGroundspeed(UAVObject *object) {
     UAVObjectField* northField = object->getField("North");
     UAVObjectField* eastField = object->getField("East");
     if (northField && eastField) {
         double val = floor(sqrt(pow(northField->getDouble(),2) + pow(eastField->getDouble(),2))*10)/10;
         groundspeedTarget = 3.6*val*speedScaleHeight/30;
+
+        if (!dialTimer.isActive())
+            dialTimer.start(); // Rearm the dial Timer which might be stopped.
+
+    } else {
+        qDebug() << "UpdateHeading: Wrong field, maybe an issue with object disconnection ?";
+    }
+}
+
+
+/*!
+  \brief Called by updates to @AirspeedActual
+  */
+void PFDGadgetWidget::updateAirspeed(UAVObject *object) {
+	UAVObjectField* airspeedField = object->getField("CalibratedAirspeed");
+    if (airspeedField) {
+        airspeedTarget = airspeedField->getDouble();
 
         if (!dialTimer.isActive())
             dialTimer.start(); // Rearm the dial Timer which might be stopped.
@@ -320,8 +344,8 @@ void PFDGadgetWidget::updateAirspeed(UAVObject *object) {
 void PFDGadgetWidget::updateAltitude(UAVObject *object) {
     UAVObjectField* downField = object->getField("Down");
     if (downField) {
-        // The altitude scale represents 30 meters
-        altitudeTarget = -floor(downField->getDouble()*10)/10*altitudeScaleHeight/30;
+        altitudeTarget = -downField->getDouble();
+
         if (!dialTimer.isActive())
             dialTimer.start(); // Rearm the dial Timer which might be stopped.
 
@@ -936,22 +960,26 @@ void PFDGadgetWidget::moveNeedles()
     }
 
     //////
-    // Speed
+    // Airspeed
     //////
-    if (groundspeedValue != groundspeedTarget) {
-        if ((abs(groundspeedValue-groundspeedTarget) > speedScaleHeight/100) && beSmooth ) {
-            groundspeedValue += (groundspeedTarget-groundspeedValue)/2;
+    if (airspeedValue != airspeedTarget) {
+        if ((abs(airspeedValue-airspeedTarget) > speedScaleHeight/100) && beSmooth ) {
+            airspeedValue += (airspeedTarget-airspeedValue)/2;
         } else {
-            groundspeedValue = groundspeedTarget;
+            airspeedValue = airspeedTarget;
             dialCount--;
         }
+
+        float airspeed_kph=airspeedValue*3.6;
+        float airspeed_kph_scale = airspeed_kph*speedScaleHeight/30;
+
         qreal x = m_speedscale->transform().dx();
-        //opd = QPointF(x,fmod(groundspeedValue,speedScaleHeight/6));
+        //opd = QPointF(x,fmod(airspeed_kph,speedScaleHeight/6));
         // fmod does rounding errors!! the formula below works better:
-        QPointF opd = QPointF(x,groundspeedValue-floor(groundspeedValue/speedScaleHeight*6)*speedScaleHeight/6);
+        QPointF opd = QPointF(x, airspeed_kph_scale-floor(airspeed_kph_scale/speedScaleHeight*6)*speedScaleHeight/6);
         m_speedscale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
 
-        double speedText = groundspeedValue/speedScaleHeight*30;
+        double speedText = airspeed_kph;
         QString s = QString().sprintf("%.0f",speedText);
         m_speedtext->setPlainText(s);
 
@@ -959,7 +987,7 @@ void PFDGadgetWidget::moveNeedles()
         // (Qt documentation states that the list has the same order
         // as the item add order in the QGraphicsItemGroup)
         QList <QGraphicsItem *> textList = m_speedscale->childItems();
-        qreal val = 5*floor(groundspeedValue/speedScaleHeight*6)+20;
+        qreal val = 5*floor(airspeed_kph_scale/speedScaleHeight*6)+20;
         foreach( QGraphicsItem * item, textList) {
             if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
                 QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
@@ -975,6 +1003,38 @@ void PFDGadgetWidget::moveNeedles()
     }
 
     //////
+    // Groundspeed
+    //////
+    if (groundspeedValue != groundspeedTarget) {
+        groundspeedValue = groundspeedTarget;
+		qreal x = m_speedscale->transform().dx();
+		//opd = QPointF(x,fmod(groundspeedValue,speedScaleHeight/6));
+		// fmod does rounding errors!! the formula below works better:
+		QPointF opd = QPointF(x,groundspeedValue-floor(groundspeedValue/speedScaleHeight*6)*speedScaleHeight/6);
+		m_speedscale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
+
+		double speedText = groundspeedValue/speedScaleHeight*30;
+		QString s = QString().sprintf("%.0f",speedText);
+		m_speedtext->setPlainText(s);
+
+		// Now update the text elements inside the scale:
+		// (Qt documentation states that the list has the same order
+		// as the item add order in the QGraphicsItemGroup)
+		QList <QGraphicsItem *> textList = m_speedscale->childItems();
+		qreal val = 5*floor(groundspeedValue/speedScaleHeight*6)+20;
+		foreach( QGraphicsItem * item, textList) {
+			if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
+				QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);
+				if (text->toPlainText() == s)
+					break; // This should happen at element one if is has not changed, indicating
+						   // that it's not necessary to do the rest of the list
+				text->setPlainText(s);
+				val -= 5;
+			}
+		}
+    }
+
+    //////
     // Altitude
     //////
     if (altitudeValue != altitudeTarget) {
@@ -984,12 +1044,17 @@ void PFDGadgetWidget::moveNeedles()
             altitudeValue = altitudeTarget;
             dialCount--;
         }
+
+        // The altitude scale represents 30 meters
+        float altitudeValue_scale = floor(altitudeValue*10)/10*altitudeScaleHeight/30;
+
         qreal x = m_altitudescale->transform().dx();
         //opd = QPointF(x,fmod(altitudeValue,altitudeScaleHeight/6));
         // fmod does rounding errors!! the formula below works better:
-        QPointF opd = QPointF(x,altitudeValue-floor(altitudeValue/altitudeScaleHeight*6)*altitudeScaleHeight/6);
+        QPointF opd = QPointF(x,altitudeValue_scale-floor(altitudeValue_scale/altitudeScaleHeight*6)*altitudeScaleHeight/6);
         m_altitudescale->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
-        double altitudeText = altitudeValue/altitudeScaleHeight*30;
+
+        double altitudeText = altitudeValue;
         QString s = QString().sprintf("%.0f",altitudeText);
         m_altitudetext->setPlainText(s);
 
@@ -997,7 +1062,7 @@ void PFDGadgetWidget::moveNeedles()
         // (Qt documentation states that the list has the same order
         // as the item add order in the QGraphicsItemGroup)
         QList <QGraphicsItem *> textList = m_altitudescale->childItems();
-        qreal val = 5*floor(altitudeValue/altitudeScaleHeight*6)+20;
+        qreal val = 5*floor(altitudeValue_scale/altitudeScaleHeight*6)+20;
         foreach( QGraphicsItem * item, textList) {
             if (QGraphicsTextItem *text = qgraphicsitem_cast<QGraphicsTextItem *>(item)) {
                 QString s = (val<0) ? QString() : QString().sprintf("%.0f",val);

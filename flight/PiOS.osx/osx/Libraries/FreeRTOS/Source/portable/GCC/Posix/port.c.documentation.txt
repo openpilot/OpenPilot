@@ -1,0 +1,188 @@
+File: port.c.documentation.txt
+Author: Corvus Corax
+Desc: Description of port.c Functions and Directions about porting.
+See FreeRTOS documentation ebook for details.
+
+
+FreeRTOS is an architecture independent real time operating system.
+Most architecture dependant code sits in a single file: port.c
+Architecture dependant definitions sit in: portmacro.h
+
+Other important files:
+
+Source/portable/MemMang/head_3.c - memory management - very simple. Provides
+functions like malloc and free - very easy to make a wrapper for on any system
+that provides memory management.
+
+FreeRTOS has internal scheduling. The real time scheduler sits in Source/task.c and calls low level functions of port.c for thread management.
+
+For that port.c needs to provide functions to switch between threads on
+request, as well as a tick handler that preempts threads on a periodic basis.
+
+Only one FreeRTOS thread is active at any time!
+
+
+port.c provides the API defined in portmacro.h.
+
+Only a subset of the functions is explained here (with the naming from the
+posix port. Their macros are sometimes named a bit different)
+
+
+void vPortEnterCritical(void);
+
+This function is called if a thread enters a "critical section".
+In a critical sections the thread must not be preempted.
+
+(To preempt a thread means to halt its execution when a timer interrupt comes
+in, and give execution to another thread)
+This function should increase a counter for that thread, since several
+"Critical Sections" could be cascaded. Only if the outermost critical section
+is exited, is preemtion allowed again.
+
+void vPortExitCritical(void);
+This function is called if a thread leaves a "critical section".
+If a thread leaves the outermost critical section, the scheduler is allowed to
+preempt it on timer interrupt (or other interrupts)
+
+
+void vPortEnableInterrupts(void);
+void vPortDisableInterrupts(void);
+
+functions to enable and disable interrupts. On "real systems" this means all
+interrupts including IO. When "simulating" this means the tick handler/ timer
+/ timer interrupt. The tick handler is supposed to not do anything if interrupts are disabled.
+
+
+portSTACK_TYPE *pxPortInitialiseStack( portSTACK_TYPE *pxTopOfStack,
+pdTASK_CODE pxCode, void *pvParameters );
+
+Used to initialize a new thread. The stack memory area, command line
+parameters for this task and the entry function (pxCode) are given
+
+This function needs to initialize the new task/thread, but suspend it
+immediately. It is only to be executed later if the scheduler says so.
+
+returns pxTopOfStack if success and 0 on failure.
+
+THIS WILL BE THE FIRST FUNCTION FreeRTOS CALLS.
+The first thread to be created is likely the idle thread. At this time the
+scheduler has not been started yet. Therefore it's important to start all
+threads in suspended state!
+
+void vPortEndScheduler(void);
+
+Needs to end the scheduler (and as such all Tasks/threads) This means FreeRTOS
+terminates - as in (simulated) system shutdown.
+
+
+portBASE_TYPE xPortStartScheduler(void);
+
+This function doesn't return until someone (another thread) calls
+vPortEndScheduler(). You can set up your timer and tick handler here and start
+the first thread. Then do what a scheduler does (manage threads)
+
+
+vPortYield()
+
+Sometimes threads go sleeping on purpose (for example during one of FreeRTOS
+system calls - including sleep() )
+This function should send the thread that calls it into suspended state and
+not return until the scheduler gives back execution to this thread.
+
+
+===========
+The scheduler.
+
+What your scheduler needs to do:
+
+Basically what your self written scheduler is allowed to do is the "dirty
+work" for the high level scheduler logic provided by FreeRTOS task.c
+
+The scheduler is supposed to run a timer interrupt/tick handler that gets
+called every portTICK_RATE_MICROSECONDS microseconds.
+That value is defined somewhere in OpenPilot and has to be exact as well as
+the same on all architectures.
+
+If you cannot set up a timer with that accuracy you are screwed!
+
+Anyway. Every time the timer tick happens, you have to
+
+- check whether you are allowed to execute the tick handler.
+  If interrupts are disabled and/or the thread is in a critical section, the
+  tick handler should do nothing
+
+- Tell FreeRTOS that the tick has happened
+  Increment the Tick Count using the FreeRTOS function
+  vTaskIncrementTick();
+
+- If preemption is enabled (and in OpenPilot it is!)
+  Tell the high level Scheduler of FreeRTOS to do its magic, using the
+  function
+  vTaskSwitchContext();
+
+- You can find out which thread is SUPPOSED to be running with the function
+  xTaskGetCurrentTaskHandle();
+
+- If this is for some reason not the currently running thread, SUSPEND that
+  thread with whatever method possible (signals, events, operating system
+  thread.suspend() - I don't know how to do that in Qt.
+
+- Make the thread returned by xTaskGetCurrentTaskHandle() resume operation as
+  normal.
+
+- Make sure that when you return from the tick handler, exactly one thread is
+  running and that is the one by xTaskGetCurrentTaskHandle() and all others
+  are suspended!
+
+
+
+On top of that, threads can suspend themselves just like that. That happens
+every time they call any blocking FreeRTOS function.
+
+They do that with above mentioned function
+
+vPortYield()
+
+When vPortYield is called your scheduler must:
+
+- Tell the high level Scheduler of FreeRTOS to do its magic, using the
+  function
+  vTaskSwitchContext();
+
+- You can then find out which thread is SUPPOSED to be running with the function
+  xTaskGetCurrentTaskHandle();
+
+- Make sure that the thread calling this function SUSPENDS and the thread
+  returned by xTaskGetCurrentTaskHandle() gets executed. Be aware that they
+  could be the same in which case vPortYield does exactly NOTHING!
+
+- This function does not return (since the current thread is sent to sleep)
+  until the scheduler makes it wake up - either by the tick handler, or by
+  another thread calling vPortYield().
+
+- So it must not ever return until xTaskGetCurrentTaskHandle() says the
+  calling thread is the current task handle.
+
+- Then it returns to the caller.
+ 
+
+
+=====
+
+What emthod you use to send threads/tasks to sleep and wake them up again is
+up to you.
+
+The posix implementation uses signals and a signal handler in each thread that
+sleeps until a resume signal is received
+
+The native STM32 implementation manually switches contexts by and uses actual
+system interrupts
+(so does the native x86 implementation)
+
+The native Win32 implementation uses win32 API calls to manipulate windows
+threads (windows actually provides a call to remote-suspend and resume a
+thread - posix doesn't)
+
+I have no clue what measures for thread control and suspension/interruption Qt
+offers. (I hope there are some)
+

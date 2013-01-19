@@ -108,6 +108,11 @@ int32_t FirmwareIAPInitialize()
 	return 0;
 }
 
+int32_t FirmwareIAPStart()
+{
+	return 0;
+}
+
 /*!
  * \brief	FirmwareIAPCallback - callback function for firmware IAP requests
  * \param[in]  ev - pointer objevent

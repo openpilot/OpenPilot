@@ -93,7 +93,9 @@
 
 
 struct pios_hmc5883_cfg {
+#ifdef PIOS_HMC5883_HAS_GPIOS
 	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
+#endif
 	uint8_t M_ODR;		/* OUTPUT DATA RATE --> here below the relative define (See datasheet page 11 for more details) */
 	uint8_t Meas_Conf;	/* Measurement Configuration,: Normal, positive bias, or negative bias --> here below the relative define */
 	uint8_t Gain;		/* Gain Configuration, select the full scale --> here below the relative define (See datasheet page 11 for more details) */
@@ -107,7 +109,7 @@ extern bool PIOS_HMC5883_NewDataAvailable(void);
 extern int32_t PIOS_HMC5883_ReadMag(int16_t out[3]);
 extern uint8_t PIOS_HMC5883_ReadID(uint8_t out[4]);
 extern int32_t PIOS_HMC5883_Test(void);
-bool void PIOS_HMC5883_IRQHandler();
+extern bool PIOS_HMC5883_IRQHandler();
 #endif /* PIOS_HMC5883_H */
 
 /** 

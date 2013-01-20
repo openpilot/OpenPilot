@@ -2750,7 +2750,7 @@ Mise à Jour</translation>
     <message>
         <location filename="../../../src/plugins/uavobjectbrowser/uavobjectbrowseroptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -10131,7 +10131,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Freq. Step Size</source>
-        <translation>Taille Saut Fréq.</translation>
+        <translation>Valeur Saut Fréquence</translation>
     </message>
     <message>
         <location/>
@@ -10912,7 +10912,8 @@ value as the Kp.</source>
         <location/>
         <source>As a rule of thumb, you can set the Ki at roughly the same
 value as the Kp.</source>
-        <translation type="unfinished"></translation>
+        <translation>En règle générale, vous pouvez définir l&apos;intégrale 
+à peu près à la même valeur que Kp.</translation>
     </message>
     <message>
         <location/>
@@ -10920,13 +10921,17 @@ value as the Kp.</source>
 Then lower the value by 20% or so.
 
 You can usually go for higher values for Yaw factors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Augmentez doucement Proportionnel jusqu&apos;à commencer à observer des 
+oscillations claires en vol. Baissez ensuite la valeur de 20% ou plus.
+
+Vous pouvez généralement utiliser pour des valeurs plus élevées pour les facteurs de Yaw.</translation>
     </message>
     <message>
         <location/>
         <source>Slowly raise Kp until you start seeing clear oscillations when you fly.
 Then lower the value by 20% or so.</source>
-        <translation type="unfinished"></translation>
+        <translation>Augmentez doucement Proportionnel jusqu&apos;à commencer à observer des 
+oscillations claires en vol. Baissez ensuite la valeur de 20% ou plus.</translation>
     </message>
     <message>
         <location/>
@@ -11422,16 +11427,16 @@ tricky to change other PID values from the GUI if the module is enabled
 and constantly updates stabilization settings object. As a workaround,
 this option can be used to temporarily disable updates or enable them
 only when system is armed without disabling the module.</source>
-        <translation type="unfinished">Mode de mise à jour des valeurs PID qui peut être réglé à :
+        <translation>Mode de mise à jour des valeurs PID qui peut être réglé à :
 - Never : ceci désactive les mises à jour PID (mais le module continue de fonctionner, si activé,)
-- When Armed : Les PID sont mis à jours lorsque le système est armé,
+- When Armed : Les PID sont mis à jour lorsque le système est armé,
 - Always : les PID sont toujours mis à jour, indépendamment de l&apos;état d&apos;armement.
 
-Since the GCS updates GUI PID values in real time on change, could be
-tricky to change other PID values from the GUI if the module is enabled
-and constantly updates stabilization settings object. As a workaround,
-this option can be used to temporarily disable updates or enable them
-only when system is armed without disabling the module.</translation>
+Puisque la mise à jour des valeurs PID se fait en temps réel lors des changements, il peut-être
+difficile de changer les valeurs PID à partir de l&apos;interface graphique si le module est activé
+et actualise les paramètres de stabilisation. Pour contourner ce problème,
+cette option peut être utilisée pour désactiver temporairement les mises à jour ou les permettre
+uniquement lorsque le système est armé, sans désactiver le module.</translation>
     </message>
     <message>
         <location/>
@@ -12018,22 +12023,34 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Ensure your board is powered down &amp;amp; no LED&apos;s are active.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;When you are ready you can start the upgrade below by pushing the button and follow the onscreen prompts, it is critical that nothing disturbs the board while the firmware is being written.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Assistant de Mise à Jour Firmware&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Il est nécessaire d&apos;avoir la même version de firmware et de logiciel de station au sol (GCS).&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Pour mettre à jour la version correcte de firmware maintenant :&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Débrancher toutes les batteries et le cordon USB de la carte&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; - Vérifier que la carte n&apos;est pas alimentée et qu&apos;aucune LED n&apos;est allumée.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Lorsque vous êtes prêt vous pouvez démarrer la mise à jour en appuyant sur le bouton ci-dessous et suivre les intructions à l&apos;écran. Il est essentiel que rien ne vienne perturber le fonctionnement de la carte tant que le firmware est en cours d&apos;écriture.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Upgrade now</source>
-        <translation type="unfinished"></translation>
+        <translation>Mettre à jour maintenant</translation>
     </message>
     <message>
         <location/>
         <source>Upgrade</source>
-        <translation type="unfinished"></translation>
+        <translation>Mettre à Jour</translation>
     </message>
     <message>
         <location/>
         <source>Ready...</source>
-        <translation type="unfinished">Prêt...</translation>
+        <translation>Prêt...</translation>
     </message>
 </context>
 <context>
@@ -12867,17 +12884,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Show MetaData</source>
-        <translation type="unfinished">Afficher Metadata</translation>
+        <translation>Afficher Metadata</translation>
     </message>
     <message>
         <location/>
         <source>Show Categorized</source>
-        <translation type="unfinished">Afficher par Catégories</translation>
+        <translation>Afficher par Catégories</translation>
     </message>
     <message>
         <location/>
         <source>Show Scientific</source>
-        <translation type="unfinished">Afficher Scientifique</translation>
+        <translation>Afficher Scientifique</translation>
     </message>
 </context>
 <context>
@@ -13100,19 +13117,19 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location line="+43"/>
         <source>Custom Firmware Build</source>
-        <translation type="unfinished"></translation>
+        <translation>Version Firmware Personnelle</translation>
     </message>
     <message>
         <location line="+35"/>
         <location line="+31"/>
         <source>Tagged officially released firmware build</source>
-        <translation type="unfinished"></translation>
+        <translation>Firmware certifié OpenPilot, publié officellement</translation>
     </message>
     <message>
         <location line="-23"/>
         <location line="+31"/>
         <source>Untagged or custom firmware build</source>
-        <translation type="unfinished"></translation>
+        <translation>Firmware non-certifié ou version personnelle</translation>
     </message>
     <message>
         <location line="+76"/>
@@ -13137,12 +13154,13 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location line="+5"/>
         <source>The loaded firmware is untagged or custom build. Update only if it was received from a trusted source (official website or your own build)</source>
-        <translation type="unfinished"></translation>
+        <translation>Le firmware chargé n&apos;est certifié ou est une version personnelle. Mettez à jour uniquement si
+vous l&apos;avez reçue d&apos;une source sûre (site web officiel ou votre propre version)</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>This is the tagged officially released OpenPilot firmware</source>
-        <translation type="unfinished"></translation>
+        <translation>Ceci est un firmware certifié OpenPilot, publié officellement</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -13181,7 +13199,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>TextLabel</source>
-        <translation type="unfinished">Label de texte</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -13206,17 +13224,17 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location line="+40"/>
         <source>Tagged officially released firmware build</source>
-        <translation type="unfinished"></translation>
+        <translation>Firmware certifié OpenPilot, publié officellement</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Untagged or custom firmware build</source>
-        <translation type="unfinished"></translation>
+        <translation>Firmware non-certifié ou version personnelle</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Custom Firmware Build</source>
-        <translation type="unfinished"></translation>
+        <translation>Version Firmware Personnelle</translation>
     </message>
 </context>
 <context>
@@ -14239,7 +14257,7 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/systemhealth/systemhealthgadgetwidget.cpp" line="+66"/>
         <source>Displays flight system errors. Click on an alarm for more information.</source>
-        <translation type="unfinished">Affiche les erreurs du système de vol. Cliquer sur une alarme pour plus d&apos;informations.</translation>
+        <translation>Affiche les erreurs du système de vol. Cliquer sur une alarme pour plus d&apos;informations.</translation>
     </message>
 </context>
 <context>

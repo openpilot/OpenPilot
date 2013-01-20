@@ -230,14 +230,14 @@ void UAVGadgetView::updateToolBar()
 
 void UAVGadgetView::listSelectionActivated(int index)
 {
-    if (index < 0) // this could happen when called from SplitterOrView::restoreState()
-        index = m_defaultIndex;
     QString classId = m_uavGadgetList->itemData(index).toString();
     if (m_uavGadget && (m_uavGadget->classId() == classId))
         return;
+
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
-    IUAVGadget *gadgetToRemove = m_uavGadget;
     IUAVGadget *gadget = im->createGadget(classId, this);
+
+    IUAVGadget *gadgetToRemove = m_uavGadget;
     setGadget(gadget);
     m_uavGadgetManager->setCurrentGadget(gadget);
     im->removeGadget(gadgetToRemove);
@@ -265,14 +265,11 @@ void UAVGadgetView::saveState(QSettings* qSettings)
 void UAVGadgetView::restoreState(QSettings* qSettings)
 {
     QString classId = qSettings->value("classId").toString();
-
     int index = indexOfClassId(classId);
     if (index < 0) {
         index = m_defaultIndex;
     }
-
     classId = m_uavGadgetList->itemData(index).toString();
-
 
     IUAVGadget *newGadget;
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();

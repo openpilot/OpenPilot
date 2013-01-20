@@ -115,17 +115,18 @@ void UAVGadgetDecorator::updateToolbar()
 void UAVGadgetDecorator::saveState(QSettings* qSettings)
 {
     if (m_activeConfiguration) {
-        qSettings->setValue("activeConfiguration",m_activeConfiguration->name());
+        qSettings->setValue("activeConfiguration", m_activeConfiguration->name());
     }
 }
 
-void UAVGadgetDecorator::restoreState(QSettings* qSetting)
+void UAVGadgetDecorator::restoreState(QSettings* qSettings)
 {
-    QString configName = qSetting->value("activeConfiguration").toString();
+    QString configName = qSettings->value("activeConfiguration").toString();
     foreach (IUAVGadgetConfiguration *config, *m_configurations) {
         if (config->name() == configName) {
             m_activeConfiguration = config;
             loadConfiguration(config);
+            break;
         }
     }
 }

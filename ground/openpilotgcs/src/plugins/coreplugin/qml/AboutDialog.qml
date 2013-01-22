@@ -41,10 +41,12 @@
  import QtQuick 1.1
  import QtWebKit 1.0 
  
+ // This is a tabbed pane element. Add a nested Rectangle to add a tab.
+ 
  TabWidget {
       id: tabs
       width: 640; height: 480
- 	  
+ // 	  This  tab is for the GCS version information
       Rectangle {
           property string title: "OpenPilot GCS"
           anchors.fill: parent
@@ -67,7 +69,7 @@
               }
           }
       }
- 
+// This is a stub for the Plugins if I can ever figure that out.
       // Rectangle {
       //      property string title: "Plugins"
       //      anchors.fill: parent
@@ -85,7 +87,7 @@
       //          }
       //      }
       //  }
- 
+//  This tab is for the authors/contributors/credits
       Rectangle {
           property string title: "Authors"
           anchors.fill: parent; color: "#e3e3e3"

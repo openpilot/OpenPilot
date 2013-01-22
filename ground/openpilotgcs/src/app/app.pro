@@ -1,5 +1,6 @@
 include(../../openpilotgcs.pri)
 include(../shared/qtsingleapplication/qtsingleapplication.pri)
+include(gcsversioninfo.pri)
 
 TEMPLATE = app
 TARGET = $$GCS_APP_TARGET

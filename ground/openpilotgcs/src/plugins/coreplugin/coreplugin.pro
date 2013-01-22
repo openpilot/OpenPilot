@@ -142,5 +142,3 @@ unix:!macx {
     INSTALLS += images
 }
 OTHER_FILES += Core.pluginspec
-
-include(gcsversioninfo.pri)

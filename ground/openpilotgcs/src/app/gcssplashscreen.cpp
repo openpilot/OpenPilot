@@ -33,6 +33,7 @@ const QChar CopyrightSymbol(0x00a9);
 GCSSplashScreen::GCSSplashScreen() :
     QSplashScreen(), m_pixmap(0), m_painter(0)
 {
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     m_pixmap = new QPixmap(":/app/splash.png");
 
     m_painter = new QPainter(m_pixmap);
@@ -57,10 +58,19 @@ GCSSplashScreen::~GCSSplashScreen()
 {
 }
 
-void GCSSplashScreen::showPluginLoadingProgress(ExtensionSystem::PluginSpec *pluginSpec)
+void GCSSplashScreen::drawMessageText(const QString &message)
 {
+    QPixmap pix(*m_pixmap);
+    QPainter progressPainter(&pix);
+    progressPainter.setPen(Qt::lightGray);
     QFont font("Tahoma", 13);
-    m_painter->setFont(font);
-    m_painter->drawText(170, 385, pluginSpec->name());
-    setPixmap(*m_pixmap);
+    progressPainter.setFont(font);
+    progressPainter.drawText(170, 385, message);
+    setPixmap(pix);
+}
+
+void GCSSplashScreen::showPluginLoadingProgress(ExtensionSystem::PluginSpec *pluginSpec)
+{    
+    QString message(tr("Loading ") + pluginSpec->name() + " plugin...");
+    drawMessageText(message);
 }

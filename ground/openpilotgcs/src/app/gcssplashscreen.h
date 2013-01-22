@@ -42,11 +42,13 @@ public:
     
 public slots:
     void showPluginLoadingProgress(ExtensionSystem::PluginSpec *pluginSpec);
+    void showProgressMessage(const QString &message) { drawMessageText(message); }
 
 private:
     QPixmap *m_pixmap;
     QPainter *m_painter;
-    
+    void drawMessageText(const QString &message);
+
 };
 
 #endif // GCSSPLASHSCREEN_H

@@ -33,6 +33,20 @@ const QChar CopyrightSymbol(0x00a9);
 GCSSplashScreen::GCSSplashScreen() :
     QSplashScreen(), m_pixmap(0), m_painter(0)
 {
+    QString revision;
+    QString year;
+#ifdef GCS_REVISION
+    revision = GCS_REVISION;
+#else
+    revision = tr("N/A");
+#endif
+
+#ifdef GCS_YEAR
+    year = GCS_YEAR;
+#else
+    year = "2013";
+#endif
+
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     m_pixmap = new QPixmap(":/app/splash.png");
 
@@ -41,17 +55,10 @@ GCSSplashScreen::GCSSplashScreen() :
     QFont font("Tahoma", 8);
     m_painter->setFont(font);
     m_painter->drawText(405, 170, QString(CopyrightSymbol) +
-                        QString(" 2010-") + QString(GCS_YEAR) +
+                        QString(" 2010-") + year +
                         QString(tr(" The OpenPilot Project - All Rights Reserved")));
-    QString revision;
 
-#ifdef GCS_REVISION
-    revision = GCS_REVISION;
-#else
-    revision = tr("N/A");
-#endif
-
-    m_painter->drawText(406, 175, 310, 100, Qt::TextWordWrap|Qt::AlignTop|Qt::AlignLeft,
+    m_painter->drawText(406, 173, 310, 100, Qt::TextWordWrap|Qt::AlignTop|Qt::AlignLeft,
                         QString(tr("GCS Revision - ")) + revision);
     setPixmap(*m_pixmap);
 }

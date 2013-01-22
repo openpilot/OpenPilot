@@ -583,7 +583,9 @@ void PluginManagerPrivate::loadPlugins()
     QListIterator<PluginSpec *> it(queue);
     it.toBack();
     while (it.hasPrevious()) {
-        loadPlugin(it.previous(), PluginSpec::Running);
+        PluginSpec* plugin = it.previous();
+        emit q->pluginAboutToBeLoaded(plugin);
+        loadPlugin(plugin, PluginSpec::Running);
     }
     emit q->pluginsChanged();
     q->m_allPluginsLoaded=true;

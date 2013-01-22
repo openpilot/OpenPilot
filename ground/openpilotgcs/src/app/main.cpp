@@ -287,6 +287,8 @@ int main(int argc, char **argv)
     }
     app.setProperty("qtc_locale", locale); // Do we need this?
 
+    splash.showProgressMessage(QObject::tr("Application starting..."));
+
     // Load
     ExtensionSystem::PluginManager pluginManager;
     pluginManager.setFileExtension(QLatin1String("pluginspec"));
@@ -356,11 +358,14 @@ int main(int argc, char **argv)
 
     QObject::connect(&pluginManager, SIGNAL(pluginAboutToBeLoaded(ExtensionSystem::PluginSpec*)),
                      &splash, SLOT(showPluginLoadingProgress(ExtensionSystem::PluginSpec*)));
+
     pluginManager.loadPlugins();
+
     if (coreplugin->hasError()) {
         displayError(msgCoreLoadFailure(coreplugin->errorString()));
         return 1;
     }
+
     {
         QStringList errors;
         foreach (ExtensionSystem::PluginSpec *p, pluginManager.plugins())
@@ -384,7 +389,9 @@ int main(int argc, char **argv)
     // Do this after the event loop has started
     QTimer::singleShot(100, &pluginManager, SLOT(startTests()));
 
-    //Close splashscreen
-    splash.close();
+    //Close splashscreen after 5 seconds
+    QTimer::singleShot(5 * 1000, &splash, SLOT(close()));
+    splash.showProgressMessage(QObject::tr("Application started."));
+
     return app.exec();
 }

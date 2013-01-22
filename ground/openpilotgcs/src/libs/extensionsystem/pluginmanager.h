@@ -114,6 +114,7 @@ signals:
     void objectAdded(QObject *obj);
     void aboutToRemoveObject(QObject *obj);
 
+    void pluginAboutToBeLoaded(ExtensionSystem::PluginSpec* pluginSpec);
     void pluginsChanged();
     void pluginsLoadEnded();
 private slots:

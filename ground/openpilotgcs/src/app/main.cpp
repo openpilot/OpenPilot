@@ -28,6 +28,7 @@
 
 #include "qtsingleapplication.h"
 #include "utils/xmlconfig.h"
+#include "gcssplashscreen.h"
 
 #include <extensionsystem/pluginmanager.h>
 #include <extensionsystem/pluginspec.h>
@@ -47,6 +48,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
 #include <QtGui/QSplashScreen>
+#include <QtGui/QPainter>
 
 enum { OptionIndent = 4, DescriptionIndent = 24 };
 
@@ -252,8 +254,7 @@ int main(int argc, char **argv)
     SharedTools::QtSingleApplication app((QLatin1String(appNameC)), argc, argv);
 
     //Open Splashscreen
-    QPixmap logoPixmap(":/app/loadingblue13.gif");
-    QSplashScreen splash(logoPixmap);
+    GCSSplashScreen splash;
     splash.show();
 
     QString locale = QLocale::system().name();
@@ -325,7 +326,7 @@ int main(int argc, char **argv)
             break;
         }
     }
-    if (!coreplugin) {
+    if(!coreplugin){
         QString nativePaths = QDir::toNativeSeparators(pluginPaths.join(QLatin1String(",")));
         const QString reason = QCoreApplication::translate("Application", "Could not find 'Core.pluginspec' in %1").arg(nativePaths);
         displayError(msgCoreLoadFailure(reason));
@@ -353,6 +354,8 @@ int main(int argc, char **argv)
     if (!isFirstInstance && foundAppOptions.contains(QLatin1String(CLIENT_OPTION)))
         return sendArguments(app, pluginManager.arguments()) ? 0 : -1;
 
+    QObject::connect(&pluginManager, SIGNAL(pluginAboutToBeLoaded(ExtensionSystem::PluginSpec*)),
+                     &splash, SLOT(showPluginLoadingProgress(ExtensionSystem::PluginSpec*)));
     pluginManager.loadPlugins();
     if (coreplugin->hasError()) {
         displayError(msgCoreLoadFailure(coreplugin->errorString()));

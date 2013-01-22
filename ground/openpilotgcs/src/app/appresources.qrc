@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/app">
-        <file>loadingblue13.gif</file>
+        <file>splash.png</file>
     </qresource>
 </RCC>

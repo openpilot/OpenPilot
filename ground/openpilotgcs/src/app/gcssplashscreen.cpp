@@ -41,7 +41,8 @@ GCSSplashScreen::GCSSplashScreen() :
     QFont font("Tahoma", 8);
     m_painter->setFont(font);
     m_painter->drawText(405, 170, QString(CopyrightSymbol) +
-                     QString(tr("2010-2013 The OpenPilot Project - All Rights Reserved")));
+                        QString(" 2010-") + QString(GCS_YEAR) +
+                        QString(tr(" The OpenPilot Project - All Rights Reserved")));
     QString revision;
 
 #ifdef GCS_REVISION
@@ -50,7 +51,8 @@ GCSSplashScreen::GCSSplashScreen() :
     revision = tr("N/A");
 #endif
 
-    m_painter->drawText(405, 190, QString(tr("GCS Revision - ")) + revision);
+    m_painter->drawText(406, 175, 310, 100, Qt::TextWordWrap|Qt::AlignTop|Qt::AlignLeft,
+                        QString(tr("GCS Revision - ")) + revision);
     setPixmap(*m_pixmap);
 }
 

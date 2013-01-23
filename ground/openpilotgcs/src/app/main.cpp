@@ -389,9 +389,9 @@ int main(int argc, char **argv)
     // Do this after the event loop has started
     QTimer::singleShot(100, &pluginManager, SLOT(startTests()));
 
-    //Close splashscreen after 5 seconds
-    QTimer::singleShot(5 * 1000, &splash, SLOT(close()));
+    //Update message and postpone closing of splashscreen 3 seconds
     splash.showProgressMessage(QObject::tr("Application started."));
+    QTimer::singleShot(3 * 1000, &splash, SLOT(close()));
 
     return app.exec();
 }

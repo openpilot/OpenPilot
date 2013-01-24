@@ -141,7 +141,7 @@ extern int32_t PIOS_L3GD20_SetRange(enum pios_l3gd20_range range);
 extern float PIOS_L3GD20_GetScale();
 extern int32_t PIOS_L3GD20_ReadID();
 extern uint8_t PIOS_L3GD20_Test();
-bool void PIOS_L3GD20_IRQHandler();
+extern bool PIOS_L3GD20_IRQHandler();
 
 #endif /* PIOS_L3GD20_H */
 

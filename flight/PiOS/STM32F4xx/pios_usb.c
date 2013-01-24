@@ -217,7 +217,7 @@ void USB_OTG_BSP_EnableInterrupt(USB_OTG_CORE_HANDLE *pdev)
 	bool valid = PIOS_USB_validate(usb_dev);
 	PIOS_Assert(valid);
 
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
 	NVIC_Init(&usb_dev->cfg->irq.init);
 }

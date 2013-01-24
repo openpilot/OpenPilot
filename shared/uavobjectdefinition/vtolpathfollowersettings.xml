@@ -1,0 +1,22 @@
+<xml>
+    <object name="VtolPathFollowerSettings" singleinstance="true" settings="true">
+        <description>Settings for the @ref VtolPathFollowerModule</description>
+        <field name="GuidanceMode" units="" type="enum" elements="1" options="DUAL_LOOP,VELOCITY_CONTROL" defaultvalue="DUAL_LOOP"/>
+	<field name="HorizontalVelMax" units="m/s" type="uint16" elements="1" defaultvalue="10"/>
+        <field name="VerticalVelMax" units="m/s" type="uint16" elements="1" defaultvalue="1"/>
+        <field name="HorizontalPosPI" units="(m/s)/m" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="1,0,0"/>
+        <field name="HorizontalVelPID" units="deg/(m/s)" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="5,0,1,0"/>
+        <field name="VerticalPosPI" units="" type="float" elementnames="Kp,Ki,ILimit" defaultvalue="0.1,0.001,200"/>
+        <field name="VerticalVelPID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.1,0,0,0"/>
+	<field name="VelocityFeedforward" units="deg/(m/s)" type="float" elements="1" defaultvalue="0"/>
+	<field name="ThrottleControl" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
+        <field name="VelocitySource" units="" type="enum" elements="1" options="EKF,NEDVEL,GPSPOS" defaultvalue="EKF"/>
+        <field name="PositionSource" units="" type="enum" elements="1" options="EKF,GPSPOS" defaultvalue="EKF"/>
+        <field name="MaxRollPitch" units="deg" type="float" elements="1" defaultvalue="20"/>
+        <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="100"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

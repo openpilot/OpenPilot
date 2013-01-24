@@ -10,22 +10,21 @@
 		<field name="FrequencyBand" units="" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="FrequencyStepSize" units="" type="float" elements="1" defaultvalue="0"/>
 		<field name="DeviceID" units="" type="uint32" elements="1" defaultvalue="0"/>
-		<field name="AFC" units="" type="int32" elements="1" defaultvalue="0"/>
 		<field name="Retries" units="" type="uint16" elements="1" defaultvalue="0"/>
-		<field name="Errors" units="" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="UAVTalkErrors" units="" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="Dropped" units="" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="Resets" units="" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="TXRate" units="Bps" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="RXRate" units="Bps" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="RSSI" units="dBm" type="int8" elements="1" defaultvalue="0"/>
+		<field name="LinkQuality" units="" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="LinkState" units="function" type="enum" elements="1" options="Disconnected,Connecting,Connected" defaultvalue="Disconnected"/>
 		<field name="PairIDs" units="" type="uint32" elements="4" defaultvalue="0"/>
 		<field name="PairSignalStrengths" units="dBm" type="int8" elements="4" defaultvalue="-127"/>
 
 		<access gcs="readonly" flight="readwrite"/>
 		<telemetrygcs acked="false" updatemode="manual" period="0"/>
-		<telemetryflight acked="false" updatemode="manual" period="0"/>
+		<telemetryflight acked="false" updatemode="periodic" period="1000"/>
 		<logging updatemode="periodic" period="1000"/>
 	</object>
 </xml>

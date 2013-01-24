@@ -51,7 +51,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>#1: Multi-Point Calibration</string>
+                   <string>#1: Magnetometer calibrtion</string>
                   </property>
                  </widget>
                 </item>
@@ -157,7 +157,7 @@
                </layout>
               </item>
               <item>
-               <widget class="QGraphicsView" name="ahrsBargraph">
+               <widget class="QGraphicsView" name="sensorsBargraph">
                 <property name="toolTip">
                  <string>These are the sensor variance values computed by the AHRS.
 
@@ -174,7 +174,7 @@ Tip: lower is better!</string>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout">
                 <item>
-                 <widget class="QPushButton" name="ahrsCalibStart">
+                 <widget class="QPushButton" name="noiseMeasurementStart">
                   <property name="enabled">
                    <bool>false</bool>
                   </property>
@@ -189,12 +189,12 @@ Hint: run this with engines at cruising speed.</string>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QProgressBar" name="calibProgress">
+                 <widget class="QProgressBar" name="noiseMeasurementProgress">
                   <property name="enabled">
                    <bool>true</bool>
                   </property>
                   <property name="maximum">
-                   <number>15</number>
+                   <number>100</number>
                   </property>
                   <property name="value">
                    <number>0</number>
@@ -630,7 +630,7 @@ new home location unless it is in indoor mode.</string>
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="ahrsHelp">
+      <widget class="QPushButton" name="Help">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -670,10 +670,16 @@ new home location unless it is in indoor mode.</string>
        <property name="flat">
         <bool>true</bool>
        </property>
+       <property name="objrelation" stdset="0">
+        <stringlist>
+         <string>button:help</string>
+         <string>url:http://wiki.openpilot.org/display/Doc/Revo+Configuration</string>
+        </stringlist>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="ahrsSettingsSaveRAM">
+      <widget class="QPushButton" name="revoCalSettingsSaveRAM">
        <property name="toolTip">
         <string>Save settings to the board (RAM only).
 
@@ -683,10 +689,13 @@ specific calibration button on top of the screen.</string>
        <property name="text">
         <string>Apply</string>
        </property>
+       <property name="objrelation" stdset="0">
+        <string>button:apply</string>
+       </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="ahrsSettingsSaveSD">
+      <widget class="QPushButton" name="revoCalSettingsSaveSD">
        <property name="toolTip">
         <string>Send settings to the board, and save to the non-volatile memory.</string>
        </property>
@@ -695,6 +704,9 @@ specific calibration button on top of the screen.</string>
        </property>
        <property name="checked">
         <bool>false</bool>
+       </property>
+       <property name="objrelation" stdset="0">
+        <string>button:save</string>
        </property>
       </widget>
      </item>

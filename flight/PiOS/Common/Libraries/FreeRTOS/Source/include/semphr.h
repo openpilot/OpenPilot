@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V7.0.2 - Copyright (C) 2011 Real Time Engineers Ltd.
+    FreeRTOS V7.2.0 - Copyright (C) 2012 Real Time Engineers Ltd.
 
 
     ***************************************************************************
@@ -40,22 +40,35 @@
     FreeRTOS WEB site.
 
     1 tab == 4 spaces!
+    
+    ***************************************************************************
+     *                                                                       *
+     *    Having a problem?  Start by reading the FAQ "My application does   *
+     *    not run, what could be wrong?                                      *
+     *                                                                       *
+     *    http://www.FreeRTOS.org/FAQHelp.html                               *
+     *                                                                       *
+    ***************************************************************************
 
-    http://www.FreeRTOS.org - Documentation, latest information, license and
-    contact details.
+    
+    http://www.FreeRTOS.org - Documentation, training, latest information, 
+    license and contact details.
+    
+    http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
+    including FreeRTOS+Trace - an indispensable productivity tool.
 
-    http://www.SafeRTOS.com - A version that is certified for use in safety
-    critical systems.
-
-    http://www.OpenRTOS.com - Commercial support, development, porting,
-    licensing and training services.
+    Real Time Engineers ltd license FreeRTOS to High Integrity Systems, who sell 
+    the code with commercial support, indemnification, and middleware, under 
+    the OpenRTOS brand: http://www.OpenRTOS.com.  High Integrity Systems also
+    provide a safety engineered and independently SIL3 certified version under 
+    the SafeRTOS brand: http://www.SafeRTOS.com.
 */
 
 #ifndef SEMAPHORE_H
 #define SEMAPHORE_H
 
 #ifndef INC_FREERTOS_H
-	#error "#include FreeRTOS.h" must appear in source files before "#include semphr.h"
+	#error "include FreeRTOS.h" must appear in source files before "include semphr.h"
 #endif
 
 #include "queue.h"
@@ -105,13 +118,14 @@ typedef xQueueHandle xSemaphoreHandle;
  * \defgroup vSemaphoreCreateBinary vSemaphoreCreateBinary
  * \ingroup Semaphores
  */
-#define vSemaphoreCreateBinary( xSemaphore )		{																									\
-														( xSemaphore ) = xQueueCreate( ( unsigned portBASE_TYPE ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH );	\
-														if( ( xSemaphore ) != NULL )																	\
-														{																								\
-															xSemaphoreGive( ( xSemaphore ) );															\
-														}																								\
-													}
+#define vSemaphoreCreateBinary( xSemaphore )																									\
+	{																																			\
+		( xSemaphore ) = xQueueGenericCreate( ( unsigned portBASE_TYPE ) 1, semSEMAPHORE_QUEUE_ITEM_LENGTH, queueQUEUE_TYPE_BINARY_SEMAPHORE );	\
+		if( ( xSemaphore ) != NULL )																											\
+		{																																		\
+			xSemaphoreGive( ( xSemaphore ) );																									\
+		}																																		\
+	}
 
 /**
  * semphr. h
@@ -542,6 +556,40 @@ typedef xQueueHandle xSemaphoreHandle;
 
 /**
  * semphr. h
+ * <pre>
+ xSemaphoreTakeFromISR( 
+                          xSemaphoreHandle xSemaphore, 
+                          signed portBASE_TYPE *pxHigherPriorityTaskWoken
+                      )</pre>
+ *
+ * <i>Macro</i> to  take a semaphore from an ISR.  The semaphore must have 
+ * previously been created with a call to vSemaphoreCreateBinary() or 
+ * xSemaphoreCreateCounting().
+ *
+ * Mutex type semaphores (those created using a call to xSemaphoreCreateMutex())
+ * must not be used with this macro.
+ *
+ * This macro can be used from an ISR, however taking a semaphore from an ISR
+ * is not a common operation.  It is likely to only be useful when taking a
+ * counting semaphore when an interrupt is obtaining an object from a resource
+ * pool (when the semaphore count indicates the number of resources available).
+ *
+ * @param xSemaphore A handle to the semaphore being taken.  This is the
+ * handle returned when the semaphore was created.
+ *
+ * @param pxHigherPriorityTaskWoken xSemaphoreTakeFromISR() will set
+ * *pxHigherPriorityTaskWoken to pdTRUE if taking the semaphore caused a task
+ * to unblock, and the unblocked task has a priority higher than the currently
+ * running task.  If xSemaphoreTakeFromISR() sets this value to pdTRUE then
+ * a context switch should be requested before the interrupt is exited.
+ *
+ * @return pdTRUE if the semaphore was successfully taken, otherwise 
+ * pdFALSE
+ */
+#define xSemaphoreTakeFromISR( xSemaphore, pxHigherPriorityTaskWoken )			xQueueReceiveFromISR( ( xQueueHandle ) ( xSemaphore ), NULL, ( pxHigherPriorityTaskWoken ) )
+
+/**
+ * semphr. h
  * <pre>xSemaphoreHandle xSemaphoreCreateMutex( void )</pre>
  *
  * <i>Macro</i> that implements a mutex semaphore by using the existing queue 
@@ -585,7 +633,7 @@ typedef xQueueHandle xSemaphoreHandle;
  * \defgroup vSemaphoreCreateMutex vSemaphoreCreateMutex
  * \ingroup Semaphores
  */
-#define xSemaphoreCreateMutex() xQueueCreateMutex()
+#define xSemaphoreCreateMutex() xQueueCreateMutex( queueQUEUE_TYPE_MUTEX )
 
 
 /**
@@ -640,7 +688,7 @@ typedef xQueueHandle xSemaphoreHandle;
  * \defgroup vSemaphoreCreateMutex vSemaphoreCreateMutex
  * \ingroup Semaphores
  */
-#define xSemaphoreCreateRecursiveMutex() xQueueCreateMutex()
+#define xSemaphoreCreateRecursiveMutex() xQueueCreateMutex( queueQUEUE_TYPE_RECURSIVE_MUTEX )
 
 /**
  * semphr. h
@@ -717,7 +765,22 @@ typedef xQueueHandle xSemaphoreHandle;
  * \page vSemaphoreDelete vSemaphoreDelete
  * \ingroup Semaphores
  */
-#define vSemaphoreDelete( xSemaphore ) vQueueDelete( ( xQueueHandle ) xSemaphore )
+#define vSemaphoreDelete( xSemaphore ) vQueueDelete( ( xQueueHandle ) ( xSemaphore ) )
+
+/**
+ * semphr.h
+ * <pre>xTaskHandle xSemaphoreGetMutexHolder( xSemaphoreHandle xMutex );</pre>
+ *
+ * If xMutex is indeed a mutex type semaphore, return the current mutex holder.
+ * If xMutex is not a mutex type semaphore, or the mutex is available (not held
+ * by a task), return NULL.
+ *
+ * Note: This Is is a good way of determining if the calling task is the mutex 
+ * holder, but not a good way of determining the identity of the mutex holder as
+ * the holder may change between the function exiting and the returned value
+ * being tested.
+ */
+#define xSemaphoreGetMutexHolder( xSemaphore ) xQueueGetMutexHolder( ( xSemaphore ) )
 
 #endif /* SEMAPHORE_H */
 

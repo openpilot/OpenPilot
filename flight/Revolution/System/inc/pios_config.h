@@ -39,7 +39,7 @@
 #define PIOS_INCLUDE_BL_HELPER
 
 /* Enable/Disable PiOS Modules */
-//#define PIOS_INCLUDE_ADC
+#define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
 #define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_IRQ
@@ -59,10 +59,13 @@
 /* Select the sensors to include */
 #define PIOS_INCLUDE_BMA180
 #define PIOS_INCLUDE_HMC5883
+#define PIOS_HMC5883_HAS_GPIOS
 #define PIOS_INCLUDE_MPU6000
 #define PIOS_MPU6000_ACCEL
 #define PIOS_INCLUDE_L3GD20
 #define PIOS_INCLUDE_MS5611
+#define PIOS_INCLUDE_ETASV3
+#define PIOS_INCLUDE_MPXV
 //#define PIOS_INCLUDE_HCSR04
 #define PIOS_FLASH_ON_ACCEL /* true for second revo */
 #define FLASH_FREERTOS
@@ -74,6 +77,10 @@
 #define PIOS_INCLUDE_COM_FLEXI
 
 #define PIOS_INCLUDE_GPS
+#define PIOS_INCLUDE_GPS_NMEA_PARSER
+#define PIOS_INCLUDE_GPS_UBX_PARSER
+#define PIOS_GPS_SETS_HOMELOCATION
+
 #define PIOS_OVERO_SPI
 /* Supported receiver interfaces */
 #define PIOS_INCLUDE_RCVR
@@ -81,7 +88,7 @@
 //#define PIOS_INCLUDE_SBUS
 #define PIOS_INCLUDE_PPM
 #define PIOS_INCLUDE_PWM
-//#define PIOS_INCLUDE_GCSRCVR
+#define PIOS_INCLUDE_GCSRCVR
 
 #define PIOS_INCLUDE_SETTINGS
 #define PIOS_INCLUDE_FLASH
@@ -94,14 +101,11 @@
 /* Flags that alter behaviors - mostly to lower resources for CC */
 #define PIOS_INCLUDE_INITCALL           /* Include init call structures */
 #define PIOS_TELEM_PRIORITY_QUEUE       /* Enable a priority queue in telemetry */
-#define PIOS_QUATERNION_STABILIZATION   /* Stabilization options */
-#define PIOS_GPS_SETS_HOMELOCATION      /* GPS options */
-#define PIOS_INCLUDE_GPS_NMEA_PARSER /* Include the NMEA protocol parser */
-#define PIOS_INCLUDE_GPS_UBX_PARSER  /* Include the UBX protocol parser */
+//#define PIOS_QUATERNION_STABILIZATION   /* Stabilization options */
 
 /* Alarm Thresholds */
-#define HEAP_LIMIT_WARNING		4000
-#define HEAP_LIMIT_CRITICAL		1000
+#define HEAP_LIMIT_WARNING		1000
+#define HEAP_LIMIT_CRITICAL		500
 #define IRQSTACK_LIMIT_WARNING		150
 #define IRQSTACK_LIMIT_CRITICAL		80
 #define CPULOAD_LIMIT_WARNING		80

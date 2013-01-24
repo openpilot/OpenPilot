@@ -1,0 +1,29 @@
+<xml>
+    <object name="PathDesired" singleinstance="true" settings="false">
+        <description>The endpoint or path the craft is trying to achieve.  Can come from @ref ManualControl or @ref PathPlanner </description>
+
+	<field name="Start" units="m" type="float" elementnames="North,East,Down" default="0"/>
+        <field name="End" units="m" type="float" elementnames="North,East,Down" default="0"/>
+	<field name="StartingVelocity" units="m/s" type="float" elements="1" default="0"/>
+	<field name="EndingVelocity" units="m/s" type="float" elements="1" default="0"/>
+
+	<field name="Mode" units="" type="enum" elements="1" options="FlyEndpoint,FlyVector,FlyCircleRight,FlyCircleLeft,
+		DriveEndpoint,DriveVector,DriveCircleLeft,DriveCircleRight,
+		FixedAttitude,
+		SetAccessory,
+		Land,
+		DisarmAlarm" default="0"/>
+	<!-- Endpoint mode - move directly towards endpoint regardless of position -->
+	<!-- Straight Mode - move across linear path through Start towards the waypoint end, adjusting velocity - continue straight -->
+	<!-- Circle Mode - move a circular pattern around End with radius End-Start (straight line in the vertical)-->
+	<field name="ModeParameters" units="" type="float" elements="4" default="0"/>
+
+	<field name="UID" units="" type="int16" elements="1" default="0"/>
+	<!-- unique ID confirmed with pathfollower in pathstatus to acknowledge a change in PathDesired -->
+
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="onchange" period="1000"/>
+        <logging updatemode="onchange" period="0"/>
+    </object>
+</xml>

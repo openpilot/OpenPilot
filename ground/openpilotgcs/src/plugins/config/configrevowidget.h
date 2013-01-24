@@ -54,11 +54,13 @@ public:
 private:
     void drawVariancesGraph();
     void displayPlane(QString elementID);
-    virtual void enableControls(bool enable);
+
+    //! Computes the scale and bias of the mag based on collected data
+    void computeScaleBias();
 
     Ui_RevoSensorsWidget *m_ui;
     QGraphicsSvgItem *paperplane;
-    QGraphicsSvgItem *ahrsbargraph;
+    QGraphicsSvgItem *sensorsBargraph;
     QGraphicsSvgItem *accel_x;
     QGraphicsSvgItem *accel_y;
     QGraphicsSvgItem *accel_z;
@@ -68,11 +70,9 @@ private:
     QGraphicsSvgItem *mag_x;
     QGraphicsSvgItem *mag_y;
     QGraphicsSvgItem *mag_z;
-    QMutex attitudeRawUpdateLock;
+    QMutex sensorsUpdateLock;
     double maxBarHeight;
     int phaseCounter;
-    int progressBarIndex;
-    QTimer progressBarTimer;
     const static double maxVarValue;
     const static int calibrationDelay = 10;
 
@@ -91,23 +91,32 @@ private:
     double accel_data_x[6], accel_data_y[6], accel_data_z[6];
     double mag_data_x[6], mag_data_y[6], mag_data_z[6];
 
-    UAVObject::Metadata initialMdata;
+    UAVObject::Metadata initialAccelsMdata;
+    UAVObject::Metadata initialGyrosMdata;
+    UAVObject::Metadata initialMagMdata;
+    UAVObject::Metadata initialBaroMdata;
+    float initialMagCorrectionRate;
+
     int position;
 
-private slots:
-    void openHelp();
-    void launchAccelBiasCalibration();
-    void incrementProgress();
+    static const int NOISE_SAMPLES = 100;
 
-    virtual void refreshValues();
-    //void ahrsSettingsRequest();
-    void SettingsToRAM();
-    void SettingsToFlash();
+private slots:
+    //! Overriden method from the configTaskWidget to update UI
+    virtual void refreshWidgetsValues(UAVObject * obj=NULL);
+
+    // Slots for calibrating the mags
+    void doStartSixPointCalibration();
+    void doGetSixPointCalibrationMeasurement(UAVObject * obj);
     void savePositionData();
-    void computeScaleBias();
-    void sixPointCalibrationMode();
-    void sensorsUpdated(UAVObject * obj);
-    void accelBiasattitudeRawUpdated(UAVObject*);
+
+    // Slots for calibrating the accel and gyro
+    void doStartAccelGyroBiasCalibration();
+    void doGetAccelGyroBiasData(UAVObject*);
+
+    // Slots for measuring the sensor noise
+    void doStartNoiseMeasurement();
+    void doGetNoiseSample(UAVObject *);
 
 protected:
     void showEvent(QShowEvent *event);

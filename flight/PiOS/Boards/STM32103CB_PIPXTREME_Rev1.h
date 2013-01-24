@@ -71,13 +71,12 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //------------------------
 #define PIOS_WATCHDOG_TIMEOUT    500
 #define PIOS_WDG_REGISTER        BKP_DR4
-#define PIOS_WDG_COMUAVTALK      0x0001
-#define PIOS_WDG_RADIORECEIVE    0x0002
-#define PIOS_WDG_SENDPACKET      0x0004
+#define PIOS_WDG_COMGCS          0x0001
+#define PIOS_WDG_COMUAVTALK      0x0002
+#define PIOS_WDG_RADIORECEIVE    0x0004
 #define PIOS_WDG_SENDDATA        0x0008
-#define PIOS_WDG_TRANSCOMM       0x0010
-#define PIOS_WDG_PPMINPUT        0x0020
-#define PIOS_WDG_COMGCS          0x0040
+#define PIOS_WDG_TRANSCOMM       0x0008
+#define PIOS_WDG_PPMINPUT        0x0010
 
 //------------------------
 // TELEMETRY
@@ -138,8 +137,6 @@ extern uint32_t pios_i2c_flexi_adapter_id;
 // See also pios_board.c
 //------------------------
 #define PIOS_SPI_MAX_DEVS               1
-extern uint32_t pios_spi_port_id;
-#define PIOS_SPI_PORT                   (pios_spi_port_id)
 
 //-------------------------
 // PIOS_USART
@@ -270,30 +267,40 @@ extern uint32_t pios_ppm_rcvr_id;
 // RFM22
 //-------------------------
 
-extern uint32_t pios_rfm22b_id;
+#if defined(PIOS_INCLUDE_RFM22B)
+#define PIOS_COM_RFM22B_RF_RX_BUF_LEN 256
+#define PIOS_COM_RFM22B_RF_TX_BUF_LEN 256
+extern uint32_t pios_com_rfm22b_id;
+#define PIOS_COM_RADIO                  (pios_com_rfm22b_id)
+extern uint32_t pios_spi_rfm22b_id;
+#define PIOS_RFM22_SPI_PORT             (pios_spi_rfm22b_id)
 #define RFM22_EXT_INT_USE
-#define RFM22_PIOS_SPI	PIOS_SPI_PORT	// SPIx
+extern uint32_t pios_rfm22b_id;
+#endif /* PIOS_INCLUDE_RFM22B */
 
-#if defined(RFM22_EXT_INT_USE)
-#define PIOS_RFM22_EXTI_GPIO_PORT               GPIOA
-#define PIOS_RFM22_EXTI_GPIO_PIN                GPIO_Pin_2
-#define PIOS_RFM22_EXTI_PORT_SOURCE             GPIO_PortSourceGPIOA
-#define PIOS_RFM22_EXTI_PIN_SOURCE              GPIO_PinSource2
-#define PIOS_RFM22_EXTI_CLK                     RCC_APB2Periph_GPIOA
-#define PIOS_RFM22_EXTI_LINE                    EXTI_Line2
-#define PIOS_RFM22_EXTI_IRQn                    EXTI2_IRQn
-#define PIOS_RFM22_EXTI_PRIO                    PIOS_IRQ_PRIO_LOW
-#endif
+//-------------------------
+// Packet Handler
+//-------------------------
+#if defined(PIOS_INCLUDE_PACKET_HANDLER)
+extern uint32_t pios_packet_handler;
+#define PIOS_PACKET_HANDLER (pios_packet_handler)
+#define PIOS_PH_MAX_PACKET 255
+#define PIOS_PH_WIN_SIZE 3
+#define PIOS_PH_MAX_CONNECTIONS 1
+#define RS_ECC_NPARITY 4
+#endif /* PIOS_INCLUDE_PACKET_HANDLER */
 
 //-------------------------
 // Packet Handler
 //-------------------------
 
+#if defined(PIOS_INCLUDE_PACKET_HANDLER)
 uint32_t pios_packet_handler;
-#define PIOS_INCLUDE_PACKET_HANDLER
+#define PIOS_PACKET_HANDLER (pios_packet_handler)
 #define PIOS_PH_MAX_PACKET 255
 #define PIOS_PH_WIN_SIZE 3
 #define PIOS_PH_MAX_CONNECTIONS 1
+#endif /* PIOS_INCLUDE_PACKET_HANDLER */
 
 //-------------------------
 // Reed-Solomon ECC

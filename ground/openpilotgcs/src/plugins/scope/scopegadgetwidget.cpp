@@ -422,7 +422,7 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
     }
     UAVObjectField* field = obj->getField(plotData->uavField);
     if(!field) {
-        qDebug() << "Field " << plotData->uavField << " of object " << plotData->uavObject << " is missing";
+        qDebug() << "In scope gadget, in fields loaded from GCS config file, field" << plotData->uavField << " of object " << plotData->uavObject << " is missing";
         return;
     }
     QString units = field->getUnits();

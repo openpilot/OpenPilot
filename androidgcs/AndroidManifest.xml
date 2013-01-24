@@ -43,7 +43,17 @@
 			android:theme="@android:style/Theme.Dialog" />
 		<activity android:name="Logger" android:label="Logger"
 		    android:theme="@android:style/Theme.Dialog" />
+		       		
+		       		
+		       		
+		<activity
+		    android:name="FragmentTester"
+		    android:label="FragmentTester" />
 
+        <activity
+            android:name="OsgViewer"
+            android:label="3DView" />
+		
 		<receiver android:name="TelemetryWidget">
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

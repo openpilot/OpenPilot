@@ -144,6 +144,8 @@ void deviceWidget::populate()
 void deviceWidget::freeze()
 {
     myDevice->description->setEnabled(false);
+    myDevice->pbLoad->setEnabled(false);
+    myDevice->youdont->setEnabled(false);
     myDevice->updateButton->setEnabled(false);
     myDevice->retrieveButton->setEnabled(false);
 }

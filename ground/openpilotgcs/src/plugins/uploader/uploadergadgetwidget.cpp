@@ -398,7 +398,7 @@ void UploaderGadgetWidget::systemReset()
             delete dfu;
             dfu = NULL;
         }
-        m_config->textBrowser->clear();
+        clearLog();
         log("Board Reset initiated.");
         goToBootloader();
     }
@@ -470,8 +470,10 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
         // Freeze the tabs, they are not useful anymore and their buttons
         // will cause segfaults or weird stuff if we use them.
         for (int i=0; i< m_config->systemElements->count(); i++) {
-             deviceWidget *qw = (deviceWidget*)m_config->systemElements->widget(i);
-             qw->freeze();
+            deviceWidget *qw = dynamic_cast<deviceWidget*>(m_config->systemElements->widget(i));
+            if (qw) {
+                qw->freeze();
+            }
         }
     }
     currentStep = IAP_STATE_READY;
@@ -479,6 +481,7 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
     delete dfu; // Frees up the USB/Serial port too
     dfu = NULL;
 }
+
 bool UploaderGadgetWidget::autoUpdateCapable()
 {
     return QDir(":/build").exists();
@@ -766,9 +769,9 @@ void UploaderGadgetWidget::uploadEnded(bool succeed)
   */
 void UploaderGadgetWidget::log(QString str)
 {
+   qDebug() << str;
    m_config->textBrowser->append(str);
    m_config->textBrowser->repaint();
-
 }
 
 void UploaderGadgetWidget::clearLog()
@@ -815,6 +818,7 @@ void UploaderGadgetWidget::error(QString errorString, int errorNumber)
     msgBox.exec();
     m_config->boardStatus->setText(errorString);
 }
+
 /**
 Shows a message box with an information string.
 

@@ -65,13 +65,14 @@
                     anchors.fill: parent
                     anchors.centerIn: parent
                    Text {
-  					 id: versionLabel
-                     x: 156; y: 0
-                     width: 430; height: 379
-                       horizontalAlignment: Qt.AlignLeft
-                       font.pixelSize: 12
-                       wrapMode: Text.WordWrap
-  					 text: version
+					   id: versionLabel
+					   x: 156; y: 0
+					   width: 430; height: 379
+					   horizontalAlignment: Qt.AlignLeft
+					   font.pixelSize: 12
+					   wrapMode: Text.WordWrap
+					// @var version exposed in authorsdialog.cpp
+					   text: version
                    }
                 }
             }
@@ -88,7 +89,6 @@
         //          Text {
         //              width: parent.width - 20
         //              anchors.centerIn: parent; horizontalAlignment: Qt.AlignHCenter
-        //              text: "Flower stems are green"
         //              font.pixelSize: 20
         //              wrapMode: Text.WordWrap
         //          }
@@ -96,19 +96,16 @@
         //  }
   //  This tab is for the authors/contributors/credits
         Rectangle {
-            property string title: "Authors"
-             anchors.fill: parent; color: "#e3e3e3"
-   		 
-            Rectangle {
-                anchors.fill: parent; anchors.margins: 20
-                 color: "#e3e3e3"
-  
-                  FlickableWebView {
-   		           id: webView
-                z: 0
-   		           url: "../CREDITS.html"
-   		           // onProgressChanged: header.urlChanged = false
-   		           anchors { top: parent.top; left: parent.left; right: parent.right; bottom: parent.bottom }
+			property string title: "Authors"
+			anchors.fill: parent; color: "#e3e3e3"
+			 Rectangle {
+				anchors.fill: parent; anchors.margins: 20
+				color: "#e3e3e3"
+				 FlickableWebView {
+					  id: webView
+					  z: 0
+					  url: "../CREDITS.html"
+					  anchors { top: parent.top; left: parent.left; right: parent.right; bottom: parent.bottom }
                   }
                 }
         }

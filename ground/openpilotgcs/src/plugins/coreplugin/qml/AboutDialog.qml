@@ -41,68 +41,76 @@
  import QtQuick 1.1
  import QtWebKit 1.0 
  
- // This is a tabbed pane element. Add a nested Rectangle to add a tab.
- 
- TabWidget {
-      id: tabs
-      width: 640; height: 480
- // 	  This  tab is for the GCS version information
-      Rectangle {
-          property string title: "OpenPilot GCS"
-          anchors.fill: parent
-          color: "#e3e3e3"
- 
-          Rectangle {
-              anchors.fill: parent; anchors.margins: 20
-              color: "#e3e3e3"
-              Flickable  {
-                  anchors.fill: parent
-                  anchors.centerIn: parent
-                 Text {
-					 id: versionLabel
-                     width: parent.width - 20
-                     anchors.centerIn: parent; horizontalAlignment: Qt.AlignLeft
-                     font.pixelSize: 12
-                     wrapMode: Text.WordWrap
-					 text: version
-                 }
-              }
-          }
-      }
-// This is a stub for the Plugins if I can ever figure that out.
-      // Rectangle {
-      //      property string title: "Plugins"
-      //      anchors.fill: parent
-      //      color: "#e3e3e3"
-      //  
-      //      Rectangle {
-      //          anchors.fill: parent; anchors.margins: 20
-      //          color: "#7fff7f"
-      //          Text {
-      //              width: parent.width - 20
-      //              anchors.centerIn: parent; horizontalAlignment: Qt.AlignHCenter
-      //              text: "Flower stems are green"
-      //              font.pixelSize: 20
-      //              wrapMode: Text.WordWrap
-      //          }
-      //      }
-      //  }
-//  This tab is for the authors/contributors/credits
-      Rectangle {
-          property string title: "Authors"
-          anchors.fill: parent; color: "#e3e3e3"
- 		 
-          Rectangle {
-              anchors.fill: parent; anchors.margins: 20
-              color: "#e3e3e3"
-
-                FlickableWebView {
- 		           id: webView
- 		           url: "../CREDITS.html"
- 		           // onProgressChanged: header.urlChanged = false
- 		           anchors { top: parent.top; left: parent.left; right: parent.right; bottom: parent.bottom }
+ // This is a tabbed pane element. Add a nested Rectangle to add a tab.		
+   
+   TabWidget {
+        id: tabs
+        width: 640; height: 480
+   // 	  This  tab is for the GCS version information
+        Rectangle {
+            property string title: "OpenPilot GCS"
+            anchors.fill: parent
+            color: "#e3e3e3"
+   
+            Rectangle {
+                anchors.fill: parent; anchors.margins: 20
+                color: "#e3e3e3"
+				Image {
+                    source: "../images/openpilot_logo_128.png"
+					x: 0; y: 0
+                    z: 100
+					fillMode: Image.PreserveAspectFit
+				}
+                Flickable  {
+                    anchors.fill: parent
+                    anchors.centerIn: parent
+                   Text {
+  					 id: versionLabel
+                     x: 156; y: 0
+                     width: 430; height: 379
+                       horizontalAlignment: Qt.AlignLeft
+                       font.pixelSize: 12
+                       wrapMode: Text.WordWrap
+  					 text: version
+                   }
                 }
-              }
-      }
-  }
+            }
+        }
+  // This is a stub for the Plugins.
+        // Rectangle {
+        //      property string title: "Plugins"
+        //      anchors.fill: parent
+        //      color: "#e3e3e3"
+        //  
+        //      Rectangle {
+        //          anchors.fill: parent; anchors.margins: 20
+        //          color: "#7fff7f"
+        //          Text {
+        //              width: parent.width - 20
+        //              anchors.centerIn: parent; horizontalAlignment: Qt.AlignHCenter
+        //              text: "Flower stems are green"
+        //              font.pixelSize: 20
+        //              wrapMode: Text.WordWrap
+        //          }
+        //      }
+        //  }
+  //  This tab is for the authors/contributors/credits
+        Rectangle {
+            property string title: "Authors"
+             anchors.fill: parent; color: "#e3e3e3"
+   		 
+            Rectangle {
+                anchors.fill: parent; anchors.margins: 20
+                 color: "#e3e3e3"
+  
+                  FlickableWebView {
+   		           id: webView
+                z: 0
+   		           url: "../CREDITS.html"
+   		           // onProgressChanged: header.urlChanged = false
+   		           anchors { top: parent.top; left: parent.left; right: parent.right; bottom: parent.bottom }
+                  }
+                }
+        }
+    }
  

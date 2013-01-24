@@ -391,7 +391,7 @@ int main(int argc, char **argv)
 
     //Update message and postpone closing of splashscreen 3 seconds
     splash.showProgressMessage(QObject::tr("Application started."));
-    QTimer::singleShot(3 * 1000, &splash, SLOT(close()));
+    QTimer::singleShot(1500, &splash, SLOT(close()));
 
     return app.exec();
 }

@@ -33,7 +33,7 @@
 #include "paths.h"
 
 #include "flightstatus.h"
-#include "baroairspeed.h" // TODO: make baroairspeed optional
+#include "airspeedactual.h"
 #include "pathaction.h"
 #include "pathdesired.h"
 #include "pathstatus.h"
@@ -103,7 +103,7 @@ int32_t PathPlannerInitialize()
 	PathStatusInitialize();
 	PathDesiredInitialize();
 	PositionActualInitialize();
-	BaroAirspeedInitialize();
+	AirspeedActualInitialize();
 	VelocityActualInitialize();
 	WaypointInitialize();
 	WaypointActiveInitialize();
@@ -443,11 +443,9 @@ static uint8_t conditionAboveSpeed() {
 
 	// use airspeed if requested and available
 	if (pathAction.ConditionParameters[1]>0.5f) {
-		BaroAirspeedData baroAirspeed;
-		BaroAirspeedGet (&baroAirspeed);
-		if (baroAirspeed.BaroConnected == BAROAIRSPEED_BAROCONNECTED_TRUE) {
-			velocity = baroAirspeed.TrueAirspeed;
-		}
+		AirspeedActualData airspeed;
+		AirspeedActualGet (&airspeed);
+		velocity = airspeed.CalibratedAirspeed;
 	}
 
 	if ( velocity >= pathAction.ConditionParameters[0]) {

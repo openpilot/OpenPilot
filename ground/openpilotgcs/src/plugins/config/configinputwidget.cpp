@@ -77,6 +77,7 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
 
 	//Generate the rows of buttons in the input channel form GUI
     unsigned int index=0;
+    unsigned int indexRT = 0;
     foreach (QString name, manualSettingsObj->getField("ChannelNumber")->getElementNames())
     {
         Q_ASSERT(index < ManualControlSettings::CHANNELGROUPS_NUMELEM);
@@ -88,6 +89,28 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelMin",inpForm->ui->channelMin,index);
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelNeutral",inpForm->ui->channelNeutral,index);
         addUAVObjectToWidgetRelation("ManualControlSettings","ChannelMax",inpForm->ui->channelMax,index);
+
+        // Input filter response time fields supported for some channels only
+        switch (index) {
+        case ManualControlSettings::CHANNELGROUPS_ROLL:
+        case ManualControlSettings::CHANNELGROUPS_PITCH:
+        case ManualControlSettings::CHANNELGROUPS_YAW:
+        case ManualControlSettings::CHANNELGROUPS_ACCESSORY0:
+        case ManualControlSettings::CHANNELGROUPS_ACCESSORY1:
+        case ManualControlSettings::CHANNELGROUPS_ACCESSORY2:
+            addUAVObjectToWidgetRelation("ManualControlSettings", "ResponseTime", inpForm->ui->channelResponseTime, indexRT);
+            ++indexRT;
+            break;
+        case ManualControlSettings::CHANNELGROUPS_THROTTLE:
+        case ManualControlSettings::CHANNELGROUPS_FLIGHTMODE:
+        case ManualControlSettings::CHANNELGROUPS_COLLECTIVE:
+            inpForm->ui->channelResponseTime->setEnabled(false);
+            break;
+        default:
+            Q_ASSERT(0);
+            break;
+        }
+
         ++index;
     }
 

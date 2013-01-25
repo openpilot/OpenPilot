@@ -240,8 +240,8 @@ C:
 D:
 V:
 
-M: First Auto landing on a fixed Wing using Revo
-C: 
+M: First Auto spot landing on a fixed Wing using Revo
+C:
 D:
 V:
 

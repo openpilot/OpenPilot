@@ -59,16 +59,7 @@ VersionDialog::VersionDialog(QWidget *parent)
     QGridLayout *layout = new QGridLayout(this);
     layout->setSizeConstraint(QLayout::SetFixedSize);
 
-    QString version = QLatin1String(GCS_VERSION_LONG);
-    version += QDate(2007, 25, 10).toString(Qt::SystemLocaleDate);
-
-    QString ideRev;
-#ifdef GCS_REVISION
-     //: This gets conditionally inserted as argument %8 into the description string.
-     ideRev = tr("From revision %1<br/>").arg(QString::fromLatin1(GCS_REVISION_STR).left(60));
-#endif
-     QString uavoHashStr;
- #ifdef UAVO_HASH
+#ifdef UAVO_HASH
       //: This gets conditionally inserted as argument %11 into the description string.
      QByteArray uavoHashArray;
      QString uavoHash = QString::fromLatin1(Core::Constants::UAVOSHA1_STR);
@@ -85,31 +76,41 @@ VersionDialog::VersionDialog(QWidget *parent)
      {
          gcsUavoHashStr.append(QString::number(i,16).right(2));
      }
-     uavoHashStr = tr("UAVO hash %1<br/>").arg(gcsUavoHashStr);
- #endif
+     QString uavoHashStr = gcsUavoHashStr;
+#else
+    QString uavoHashStr = "N/A";
+#endif
 
      const QString description = tr(
-        "<h3>OpenPilot GCS %1 %9 (%10)</h3>"
-        "Based on Qt %2 (%3 bit)<br/>"
+        "<h3>OpenPilot Ground Control Station</h3>"
+        "GCS Revision: <b>%1</b><br/>"
+        "UAVO Hash: %2<br/>"
         "<br/>"
-        "Built on %4 at %5<br />"
+        "Built from %3<br/>"
+        "Built on %4 at %5<br/>"
+        "Based on Qt %6 (%7 bit)<br/>"
         "<br/>"
-        "%8"
+        "&copy; %8, 2010-%9. All rights reserved.<br/>"
         "<br/>"
-        "%11"
+        "<small>This program is free software; you can redistribute it and/or modify<br/>"
+        "it under the terms of the GNU General Public License as published by<br/>"
+        "the Free Software Foundation; either version 3 of the License, or<br/>"
+        "(at your option) any later version.<br/>"
         "<br/>"
-        "Copyright 2010-%6 %7. All rights reserved.<br/>"
-        "<br/>"
-         "<small>This program is free software; you can redistribute it and/or modify<br/>"
-         "it under the terms of the GNU General Public License as published by<br/>"
-         "the Free Software Foundation; either version 3 of the License, or<br/>"
-         "(at your option) any later version.<br/><br/>"
         "The program is provided AS IS with NO WARRANTY OF ANY KIND, "
         "INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A "
-        "PARTICULAR PURPOSE.</small><br/>")
-        .arg(version, QLatin1String(QT_VERSION_STR), QString::number(QSysInfo::WordSize),
-             QLatin1String(__DATE__), QLatin1String(__TIME__), QLatin1String(GCS_YEAR), 
-             (QLatin1String(GCS_AUTHOR)), ideRev).arg(QLatin1String(GCS_VERSION_TYPE), QLatin1String(GCS_VERSION_CODENAME), uavoHashStr);
+        "PARTICULAR PURPOSE.</small>"
+     ).arg(
+        QString::fromLatin1(GCS_REVISION_STR).left(60), // %1
+        uavoHashStr,                                    // %2
+        QLatin1String(GCS_ORIGIN_STR),                  // $3
+        QLatin1String(__DATE__),                        // %4
+        QLatin1String(__TIME__),                        // %5
+        QLatin1String(QT_VERSION_STR),                  // %6
+        QString::number(QSysInfo::WordSize),            // %7
+        QLatin1String(GCS_AUTHOR),                      // %8
+        QLatin1String(GCS_YEAR_STR)                     // %9
+    );
 
     QLabel *copyRightLabel = new QLabel(description);
     copyRightLabel->setWordWrap(true);

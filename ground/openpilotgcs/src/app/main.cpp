@@ -241,6 +241,11 @@ int main(int argc, char **argv)
 #ifdef Q_OS_LINUX
     QApplication::setAttribute(Qt::AA_X11InitThreads, true);
 #endif
+
+    //Set the default locale to EN, if this is not set the system locale will be used
+    //and as of now we dont want that behaviour.
+    QLocale::setDefault(QLocale::English);
+
     QApplication::setGraphicsSystem("raster");
 
     SharedTools::QtSingleApplication app((QLatin1String(appNameC)), argc, argv);

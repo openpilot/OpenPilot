@@ -292,12 +292,12 @@ void VehicleConfigurationHelper::applyFlighModeConfiguration()
 
 void VehicleConfigurationHelper::applyLevellingConfiguration()
 {
+    AttitudeSettings* attitudeSettings = AttitudeSettings::GetInstance(m_uavoManager);
+    Q_ASSERT(attitudeSettings);
+    AttitudeSettings::DataFields data = attitudeSettings->getData();
     if(m_configSource->isLevellingPerformed())
     {
         accelGyroBias bias = m_configSource->getLevellingBias();
-        AttitudeSettings* attitudeSettings = AttitudeSettings::GetInstance(m_uavoManager);
-        Q_ASSERT(attitudeSettings);
-        AttitudeSettings::DataFields data = attitudeSettings->getData();
 
         data.AccelBias[0] += bias.m_accelerometerXBias;
         data.AccelBias[1] += bias.m_accelerometerYBias;
@@ -305,10 +305,10 @@ void VehicleConfigurationHelper::applyLevellingConfiguration()
         data.GyroBias[0] = -bias.m_gyroXBias;
         data.GyroBias[1] = -bias.m_gyroYBias;
         data.GyroBias[2] = -bias.m_gyroZBias;
-
-        attitudeSettings->setData(data);
-        addModifiedObject(attitudeSettings, tr("Writing gyro and accelerometer bias settings"));
     }
+    data.AccelTau = DEFAULT_ENABLED_ACCEL_TAU;
+    attitudeSettings->setData(data);
+    addModifiedObject(attitudeSettings, tr("Writing gyro and accelerometer bias settings"));
 }
 
 void VehicleConfigurationHelper::applyStabilizationConfiguration()

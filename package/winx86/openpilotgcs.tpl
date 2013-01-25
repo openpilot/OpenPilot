@@ -17,9 +17,9 @@
 !define PACKAGE_SEP "${PACKAGE_SEP}"
 !define PACKAGE_DIR "..\..\build\package-$${PACKAGE_LBL}"
 !define FIRMWARE_DIR "firmware-$${PACKAGE_LBL}"
-!define OUT_FILE "$${PACKAGE_NAME}$${PACKAGE_SEP}$${PACKAGE_LBL}$${PACKAGE_SEP}install.exe"
+!define OUT_FILE "$${PACKAGE_NAME}$${PACKAGE_SEP}$${PACKAGE_LBL}$${PACKAGE_SEP}win32.exe"
 
 ; Installer version info
 !define PRODUCT_VERSION "0.0.0.0"
 !define FILE_VERSION "${TAG_OR_BRANCH}:${HASH8}${DIRTY} ${DATETIME}"
-!define BUILD_DESCRIPTION "${PACKAGE_LBL} built using ${ORIGIN} as origin, committed ${DATETIME} as ${HASH}"
+!define BUILD_DESCRIPTION "${PACKAGE_LBL} built from ${ORIGIN}, committed ${DATETIME} as ${HASH}"

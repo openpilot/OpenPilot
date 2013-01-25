@@ -57,7 +57,8 @@ USE_THUMB_MODE = YES
 
 # List of modules to include
 MODULES +=  Actuator ManualControl Stabilization 
-MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
+MODULES += AltitudeHold FixedWingPathFollower PathPlanner
+#MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
 MODULES += Attitude/revolution
 MODULES += FirmwareIAP
 #MODULES += OveroSync/simulated

@@ -6,47 +6,41 @@ It is sorted alphabetically by name and formatted so that it allows for easy gre
 The fields are:
 
 Name (N)
-Email (E),
 Description of work (D)
 Current maintainer function (M)
 
 ----------
 
 N: Connor Abbott
-E: connor (at) abbott (dot) cx
 D: Win32 OpenPilot port
 
 N: David Ankers
-E: david (at) openpilot (dot) org
 D: Co-founder, Project Coordination
 D: Minor GCS infrastructure, updating the credit file
 M: Admin
 
+N: Sergiy Anikeyev
+D: Improvments to Camera Gimbal control
+
 N: Pedro Assuncao
-E: pedro (dot) agda (plus) openpilot (at) gmail (dot) com
 D: Initial GCS Settings Gadget work
 
 N: Fredrik Arvidsson
-E: fredrik (at) arvidssons (dot) org
-W: GCS Setup Wizard
+D: GCS Setup Wizard
 M: GCS Setup Wizard
 
 N: Werner Backes
-E: werner (at) bit-1 (dot) de
 D: Port of CopterControl to PS3 Move Controller (MoveCopter)
 
 N: Jose Barros
-E: josembarros (at) hotmail (dot) com
 D: Next-Gen OP Map Lib, Y-Modem Library, Uploader Plugin
 D: OP Bootloader, AHRS Bootloader, OPUploadTool and much else
 M: Bootloader, OP MAP Lib 
 
 N: David "Buzz" Carlson
-E: chebuzz (plus) openpilot (at) gmail (dot) com
 D: 3D ModelView GCS Plugin, sponsor of HITL merge work and XPlane addition
 
 N: James Cotton
-E: peabody124 (plus) openpilot (at) gmail (dot) com
 D: Multiplatform HID implementation (firmware & GCS), GCS Joystick control
 D: Posix OpenPilot work and Mac implementation
 D: Firmware implementation of Professor Schinstock's INS/GPS
@@ -54,187 +48,159 @@ D: Android GCS and much else
 M: Architecture co-lead, Android GCS Lead
 
 N: Steve Doll
-E: speakfree07 (at) hotmail (dot) com 
 D: Much Artwork, Logo rework, Welcome page design
 
 N: Piotr Esden-Tempski
-E: esden (at) esden (dot) net
 D: Floss-JTAG Rev A, 4-layer initial design
 
+N: Richard Flay
+D: Multiple fixes / Review guru
+
 N: Darren Furniss
-E: furnibird (plus) openpilot (at) gmail (dot) com
-W: GCS Artwork and Android GCS Artwork
+D: GCS Artwork and Android GCS Artwork
 
 N: Frederic Goddeeris
-E: fredericgoddeeris (at) hotmail (dot) com
 D: I2C work and FreeRTOS work, MK integration
 D: EagleTree OSD implementation
 
 N: Daniel Godin
-E: dgodin (at) dnsct (dot) com
-W: Sponsor: Notify Plugin for the GCS
+D: Sponsor: Notify Plugin for the GCS
 
 N: Bani Greyling
-E: bani (dot) greyling (plus) openpilot (at) gmail (dot) com
 D: GCS Scope plugin
 
 N: Nuno Guedes
-E: muralha (plus) openpilot (at) gmail (dot) com
 D: 3D artwork, moving surfaces and work on ModelView
 D: PFD Artwork
 
+N: Erik Gustavsson
+D: Attitude LPF improvments to Self Level
+
 N: Peter Gunnarsson
-E: peter (at) pyne (dot) se
 D: GCS Core Developer
 D: Multiple GCS plugins, Gadget foundations, UAVObject viewer
 
 N: Dean Hall
-E: dwhall256 (plus) openpilot (at) gmail (dot) com
 D: Creator of http://pythononachip.org
 
 N: Joe Hlebasko
-E: joe (dot) hlebasko(plus) openpilot (at) gmail (dot) com
 D: Early versions of Main Board & Production OP GPS
 M: Hardware Architecture Team
 
 N: Andy Honecker
-E: andywh (at) yahoo (dot) com
 D: Hardware design review and optimisation
 
 N: Mark James
-E: mjames (plus) openpilot (at) gmail (dot) com
 D: Some of Silk Icon set used in GCS - http://www.famfamfam.com/lab/icons/silk
 
 N: Sami Korhonen
-E: samik (dot) korhonen (plus) openpilot (at) gmail (dot) com
 D: GPS Module, Spektrum RC Module, OSD work
 M: OpenPilot OSD
 
 N: Thorsten Klose
-E: thorsten (dot) klose (at) dmx (dot) de
 D: Embedded STM32 infrastructure
 
 N: Hallvard Kristiansen
-E: hal (at) fleshmx (dot) com
 D: GCS Artwork, Quad layout diagrams
 
 N: Mike Labranche
-E: mdlabranche (plus) openpilot (at) gmail (dot) com
 D: Tab bar Telem Monitor
 
 N: Edouard Lafargue
-E: edouard (at) lafargue (dot) name
 D: GCS Dial Plugins, GCS PFD Plugin, GCS GPS plugin, GCS Config plugin
 D: Artwork including standard display dials
 
 N: Matt Lipski
-E: mattlipski (plus) openpilot (at) gmail (dot) com
 D: Deluxe Dials Set artwork, (Artificial Horizon, Compass, Turn Indicator)
 
 N: Les Newell
-E: les (dot) newell (at) fastmail (dot) co (dot) uk
 D: Advanced mixer matrix, SPI protocol based on UAVObjects, feedforward
 
 N: Ken Northup
-E: helos360 (at) bellsouth (dot) net
 D: 3D Modelling, Easystar adaption from FMS
 
 N: Guy McCaldin
-E: guymcc (at) gmail (dot) com
 D: Artwork and design including work on the Deluxe Dial Set
 
+N: Alessio Morale
+D: Firmware/Architecture Lead
+
 N: Cathy Moss
-E: cmoss296 (at) blueyonder (dot) co (dot) uk
 D: Hardware design Lead: Gen 2 Mainboard, PipXtreme, Current Sensor
 D: PipXtreme designer, creator OP Map Plugin
 
 N: Angus Peart
-E: gussy (at) openpilot (dot) org
 D: Co-founder, Principal hardware architect.
 D: Hardware design of early OpenPilot, AHRS, GPS and other hardware
 
 N: Dmytro Poplavskiy
-E: dmytro (dot) poplavskiy (plus) openpilot (at) gmail (dot) com
-W: QML PFD, QML Welcome page
+D: QML PFD, QML Welcome page
 M: Qml plugins
 
 N: Eric Price
-E: corvus (dot) corax (at) cybertrench (dot) com
 D: IL2 HITL GCS Plugin, Posix OpenPilot, Advanced stabilisation module
 M: SITL Posix, SLAM work
 
 N: Richard Querin
-E: rfquerin (plus) openpilot (at) gmail (dot) com
 D: Graphic Design, OpenPilot Logo
 
 N: Laurent Ribon
-E: ribon (dot) l (at) club-internet (dot) fr
 D: The GLC_lib as used in the ModelView Plugin
 D: See: http://www.glc-lib.net/
 
 N: Julien Rouviere
-E: julien (dot) rouviere (plus) openpilot (at) gmail (dot) com
 D: GCS Framework and Plugins for the GCS
 
 N: Zik Saleeba
-E: zik (at) zikzak (dot) net
 D: Initial schematic based on Zik's Flying Fox schematic
 
 N: Professor Dale Schinstock
-E: dales (at) ksu (dot) edu
-D: Lead AHRS Developer
+D: Lead INS Developer
 D: Creator of the OpenPilot INS / EKF
 
 N: Professor Kenn Sebesta
-E: kenn (at) openpilot (dot) org
-D: Lead Fixed Wing Developer
-M: Fixed Wing support
+D: Lead Fixed Wing Developer CC3D / Controls
+D: GCS improvments including HiTL Merge
+M: Fixed Wing support CC3D
 
 N: Oleg Semyonov
-E: os-openpilot-org (at) os-propo (dot) info
-D: Core tester & Project organisation
+D: Core Developer & Project organisation
+D: TxPID module
+M: CameraStab module
 M: Common part of multi-platform packaging system
 M: Windows NSIS Installer
-M: Russian Documentation Lead
 
 N: Stacey Sheldon
-E: stac (at) solidgoldbomb (dot) org
 D: Core Embedded Developer
 D: SPI protocol for AHRS, I2C rewrite and much core work
 
 N: Troy Schultz
-E: troy (dot) schultz (at) rogers (dot) com
 D: INS design review and optimisation
 
 N: Dr. Erhard Siegl
-E: Erhard (dot) Siegl (at) zogazoga (dot) at
 D: Configuration engine for the GCS
 
 N: Pete Stapley
-E: pete (at) stapleylabs (dot) com
 D: PPM inputs
 
 N: Rowan Taubitz
-E: rowan (at) zantek (dot) com (dot) au
 D: Hardware debugging and testing, creation of 2-layer Floss-JTAG Rev B
 D: Creation of Next-Gen FOSS-JTAG board
 
 N: Andrew Thoms
-E: electronics (at) andrewspizza (dot) net
 D: IP Telemtry plugin for the GCS
 D: Helicopter support code and mixing for CCPM
 
 N: Vassilis Varveropoulos
-E: vassilis (at) openpilot (dot) org
 D: Co-founder, Principal embedded software architect.
 D: Module architecture and UAVTalk/UAVObjects implementation.
 
 N: Alex Vrubel
-E: alex (dot) vrubel (plus) openpilot (at) gmail (dot) com
 D: Russian translation of the GCS
 
 N: Brian Webb
-E: webbbn (plus) openpilot (at) gmail (dot) com
-W: Modem lead developer
+D: Modem lead developer
 M: OP Modems
 
+N: Dmitriy Zaitsev
+D: AeroSim-RC HiTL plugin

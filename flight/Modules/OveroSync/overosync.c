@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{ 
- * @addtogroup TelemetryModule Telemetry Module
- * @brief Main telemetry module
- * Starts three tasks (RX, TX, and priority TX) that watch event queues
- * and handle all the telemetry of the UAVobjects
+ * @addtogroup Overo Sync Module
+ * @brief Overo sync module
+ * Starts a sync tasks  that watch event queues
+ * and push to Overo spi port UAVobjects
  * @{ 
  *
- * @file       telemetry.c
+ * @file       overosync.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Telemetry module, handles telemetry and UAVObject updates
  * @see        The GNU Public License (GPL) Version 3
@@ -37,7 +37,6 @@
 #include "systemstats.h"
 
 // Private constants
-#define OVEROSYNC_PACKET_SIZE 1024
 #define MAX_QUEUE_SIZE   200
 #define STACK_SIZE_BYTES 512
 #define TASK_PRIORITY (tskIDLE_PRIORITY + 0)
@@ -48,8 +47,6 @@
 static xQueueHandle queue;
 static UAVTalkConnection uavTalkCon;
 static xTaskHandle overoSyncTaskHandle;
-volatile bool buffer_swap_failed;
-volatile uint32_t buffer_swap_timeval;
 static bool overoEnabled;
 
 // Private functions
@@ -71,7 +68,7 @@ struct overosync {
 struct overosync *overosync;
 
 /**
- * Initialise the telemetry module
+ * Initialise the overosync module
  * \return -1 if initialisation failed
  * \return 0 on success
  */
@@ -108,7 +105,7 @@ int32_t OveroSyncInitialize(void)
 }
 
 /**
- * Initialise the telemetry module
+ * Initialise the overosync module
  * \return -1 if initialisation failed
  * \return 0 on success
  */
@@ -128,7 +125,7 @@ int32_t OveroSyncStart(void)
 	// Process all registered objects and connect queue for updates
 	UAVObjIterate(&registerObject);
 	
-	// Start telemetry tasks
+	// Start overosync tasks
 	xTaskCreate(overoSyncTask, (signed char *)"OveroSync", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &overoSyncTaskHandle);
 	
 	TaskMonitorAdd(TASKINFO_RUNNING_OVEROSYNC, overoSyncTaskHandle);

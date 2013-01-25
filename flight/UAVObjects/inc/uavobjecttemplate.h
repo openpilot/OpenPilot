@@ -46,39 +46,52 @@
 #define $(NAMEUC)_ISSETTINGS $(ISSETTINGS)
 #define $(NAMEUC)_NUMBYTES sizeof($(NAME)Data)
 
-// Object access macros
-/**
- * @function $(NAME)Get(dataOut)
- * @brief Populate a $(NAME)Data object
- * @param[out] dataOut 
- */
-#define $(NAME)Get(dataOut) UAVObjGetData($(NAME)Handle(), dataOut)
-#define $(NAME)Set(dataIn) UAVObjSetData($(NAME)Handle(), dataIn)
-#define $(NAME)InstGet(instId, dataOut) UAVObjGetInstanceData($(NAME)Handle(), instId, dataOut)
-#define $(NAME)InstSet(instId, dataIn) UAVObjSetInstanceData($(NAME)Handle(), instId, dataIn)
-#define $(NAME)ConnectQueue(queue) UAVObjConnectQueue($(NAME)Handle(), queue, EV_MASK_ALL_UPDATES)
-#define $(NAME)ConnectCallback(cb) UAVObjConnectCallback($(NAME)Handle(), cb, EV_MASK_ALL_UPDATES)
-#define $(NAME)CreateInstance() UAVObjCreateInstance($(NAME)Handle(),&$(NAME)SetDefaults)
-#define $(NAME)RequestUpdate() UAVObjRequestUpdate($(NAME)Handle())
-#define $(NAME)RequestInstUpdate(instId) UAVObjRequestInstanceUpdate($(NAME)Handle(), instId)
-#define $(NAME)Updated() UAVObjUpdated($(NAME)Handle())
-#define $(NAME)InstUpdated(instId) UAVObjUpdated($(NAME)Handle(), instId)
-#define $(NAME)GetMetadata(dataOut) UAVObjGetMetadata($(NAME)Handle(), dataOut)
-#define $(NAME)SetMetadata(dataIn) UAVObjSetMetadata($(NAME)Handle(), dataIn)
-#define $(NAME)ReadOnly() UAVObjReadOnly($(NAME)Handle())
+// Generic interface functions
+int32_t $(NAME)Initialize();
+UAVObjHandle $(NAME)Handle();
+void $(NAME)SetDefaults(UAVObjHandle obj, uint16_t instId);
 
 // Object data
 typedef struct {
 $(DATAFIELDS)
 } __attribute__((packed)) $(NAME)Data;
 
+// Typesafe Object access functions
+/**
+ * @function $(NAME)Get(dataOut)
+ * @brief Populate a $(NAME)Data object
+ * @param[out] dataOut 
+ */
+static inline int32_t $(NAME)Get($(NAME)Data *dataOut) { return UAVObjGetData($(NAME)Handle(), dataOut); }
+
+static inline int32_t $(NAME)Set(const $(NAME)Data *dataIn) { return UAVObjSetData($(NAME)Handle(), dataIn); }
+
+static inline int32_t $(NAME)InstGet(uint16_t instId, $(NAME)Data *dataOut) { return UAVObjGetInstanceData($(NAME)Handle(), instId, dataOut); }
+
+static inline int32_t $(NAME)InstSet(uint16_t instId, const $(NAME)Data *dataIn) { return UAVObjSetInstanceData($(NAME)Handle(), instId, dataIn); }
+
+static inline int32_t $(NAME)ConnectQueue(xQueueHandle queue) { return UAVObjConnectQueue($(NAME)Handle(), queue, EV_MASK_ALL_UPDATES); }
+
+static inline int32_t $(NAME)ConnectCallback(UAVObjEventCallback cb) { return UAVObjConnectCallback($(NAME)Handle(), cb, EV_MASK_ALL_UPDATES); }
+
+static inline uint16_t $(NAME)CreateInstance() { return UAVObjCreateInstance($(NAME)Handle(), &$(NAME)SetDefaults); }
+
+static inline void $(NAME)RequestUpdate() { UAVObjRequestUpdate($(NAME)Handle()); }
+
+static inline void $(NAME)RequestInstUpdate(uint16_t instId) { UAVObjRequestInstanceUpdate($(NAME)Handle(), instId); }
+
+static inline void $(NAME)Updated() { UAVObjUpdated($(NAME)Handle()); }
+
+static inline void $(NAME)InstUpdated(uint16_t instId) { UAVObjInstanceUpdated($(NAME)Handle(), instId); }
+
+static inline int32_t $(NAME)GetMetadata(UAVObjMetadata *dataOut) { return UAVObjGetMetadata($(NAME)Handle(), dataOut); }
+
+static inline int32_t $(NAME)SetMetadata(const UAVObjMetadata *dataIn) { return UAVObjSetMetadata($(NAME)Handle(), dataIn); }
+
+static inline int8_t $(NAME)ReadOnly() { return UAVObjReadOnly($(NAME)Handle()); }
+
 // Field information
 $(DATAFIELDINFO)
-
-// Generic interface functions
-int32_t $(NAME)Initialize();
-UAVObjHandle $(NAME)Handle();
-void $(NAME)SetDefaults(UAVObjHandle obj, uint16_t instId);
 
 // set/Get functions
 $(SETGETFIELDSEXTERN)

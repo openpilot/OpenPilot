@@ -28,6 +28,7 @@
 #include "../../../../../build/ground/openpilotgcs/gcsversioninfo.h"
 #include <coreplugin/coreconstants.h>
 #include <QDebug>
+#include "flightstatus.h"
 
 #define DFU_DEBUG true
 
@@ -49,7 +50,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 
     connect(telMngr, SIGNAL(disconnected()), this, SLOT(onAutopilotDisconnect()));
 
-    connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(goToBootloader()));
+    connect(m_config->haltButton, SIGNAL(clicked()), this, SLOT(systemHalt()));
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
     connect(m_config->bootButton, SIGNAL(clicked()), this, SLOT(systemBoot()));
     connect(m_config->safeBootButton, SIGNAL(clicked()), this, SLOT(systemSafeBoot()));
@@ -120,6 +121,18 @@ void UploaderGadgetWidget::connectSignalSlot(QWidget *widget)
     connect(qobject_cast<deviceWidget *>(widget),SIGNAL(uploadStarted()),this,SLOT(uploadStarted()));
     connect(qobject_cast<deviceWidget *>(widget),SIGNAL(uploadEnded(bool)),this,SLOT(uploadEnded(bool)));
 }
+
+FlightStatus *UploaderGadgetWidget::getFlightStatus()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Q_ASSERT(pm);
+    UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objManager);
+    FlightStatus *status = dynamic_cast<FlightStatus*>(objManager->getObject(QString("FlightStatus")));
+    Q_ASSERT(status);
+    return status;
+}
+
 void UploaderGadgetWidget::onPhisicalHWConnect()
 {
     m_config->bootButton->setEnabled(false);
@@ -348,6 +361,26 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
 
 }
 
+void UploaderGadgetWidget::systemHalt()
+{
+    FlightStatus* status = getFlightStatus();
+
+    // The board can not be halted when in armed state.
+    // If board is armed, or arming. Show message with notice.
+    if (status->getArmed() == FlightStatus::ARMED_DISARMED) {
+        goToBootloader();
+    }
+    else {
+        QMessageBox mbox(this);
+        mbox.setText(QString(tr("The controller board is armed and can not be halted.\n\n"
+                                "Please make sure the board is not armed and then press halt again to proceed\n"
+                                "or use the rescue option to force a firmware upgrade.")));
+        mbox.setStandardButtons(QMessageBox::Ok);
+        mbox.setIcon(QMessageBox::Warning);
+        mbox.exec();
+    }
+}
+
 /**
   Tell the mainboard to reset:
    - Send the relevant IAP commands
@@ -355,14 +388,29 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
    */
 void UploaderGadgetWidget::systemReset()
 {
-    resetOnly = true;
-    if (dfu) {
-        delete dfu;
-        dfu = NULL;
+    FlightStatus* status = getFlightStatus();
+
+    // The board can not be reset when in armed state.
+    // If board is armed, or arming. Show message with notice.
+    if (status->getArmed() == FlightStatus::ARMED_DISARMED) {
+        resetOnly = true;
+        if (dfu) {
+            delete dfu;
+            dfu = NULL;
+        }
+        m_config->textBrowser->clear();
+        log("Board Reset initiated.");
+        goToBootloader();
     }
-    m_config->textBrowser->clear();
-    log("Board Reset initiated.");
-    goToBootloader();
+    else {
+        QMessageBox mbox(this);
+        mbox.setText(QString(tr("The controller board is armed and can not be reset.\n\n"
+                                "Please make sure the board is not armed and then press reset again to proceed\n"
+                                "or power cycle to force a board reset.")));
+        mbox.setStandardButtons(QMessageBox::Ok);
+        mbox.setIcon(QMessageBox::Warning);
+        mbox.exec();
+    }
 }
 
 void UploaderGadgetWidget::systemBoot()
@@ -381,7 +429,6 @@ void UploaderGadgetWidget::systemSafeBoot()
   */
 void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
 {
-
     clearLog();
     m_config->bootButton->setEnabled(false);
     m_config->safeBootButton->setEnabled(false);
@@ -828,6 +875,5 @@ void UploaderGadgetWidget::versionMatchCheck()
 
 void UploaderGadgetWidget::openHelp()
 {
-
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/AoBZ", QUrl::StrictMode) );
 }

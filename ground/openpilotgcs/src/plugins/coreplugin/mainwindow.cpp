@@ -266,18 +266,15 @@ void MainWindow::modeChanged(Core::IMode */*mode*/)
 
 void MainWindow::extensionsInitialized()
 {
-
-    QSettings* qs = m_settings;
-    QSettings * settings;
+    QSettings *qs = m_settings;
+    QSettings *settings;
     QString commandLine;
-    if ( ! qs->allKeys().count() ){
-        foreach(QString str,qApp->arguments())
-        {
-            if(str.contains("configfile"))
-            {
-                qDebug()<<"ass";
-                commandLine=str.split("=").at(1);
-                qDebug()<<commandLine;
+    if ( ! qs->allKeys().count() ) {
+        foreach(QString str, qApp->arguments()) {
+            if(str.contains("configfile")) {
+                qDebug() << "ass";
+                commandLine = str.split("=").at(1);
+                qDebug() << commandLine;
             }
         }
         QDir directory(QCoreApplication::applicationDirPath());
@@ -289,37 +286,34 @@ void MainWindow::extensionsInitialized()
             directory.cd("share");
             directory.cd("openpilotgcs");
 #endif
-            directory.cd("default_configurations");
+        directory.cd("default_configurations");
 
-            qDebug() << "Looking for default config files in: " + directory.absolutePath();
-        bool showDialog=true;
+        qDebug() << "Looking for default config files in: " + directory.absolutePath();
+        bool showDialog = true;
         QString filename;
-        if(!commandLine.isEmpty())
-        {
-            if(QFile::exists(directory.absolutePath()+QDir::separator()+commandLine))
-            {
-                filename=directory.absolutePath()+QDir::separator()+commandLine;
-                qDebug()<<"Load configuration from command line";
-                settings=new QSettings(filename, XmlConfig::XmlSettingsFormat);
-                showDialog=false;
+        if(!commandLine.isEmpty()) {
+            if(QFile::exists(directory.absolutePath() + QDir::separator()+commandLine)) {
+                filename = directory.absolutePath() + QDir::separator()+commandLine;
+                qDebug() << "Load configuration from command line";
+                settings = new QSettings(filename, XmlConfig::XmlSettingsFormat);
+                showDialog = false;
             }
         }
-        if(showDialog)
-        {
-            importSettings * dialog=new importSettings(this);
+        if(showDialog) {
+            importSettings *dialog = new importSettings(this);
             dialog->loadFiles(directory.absolutePath());
             dialog->exec();
-            filename=dialog->choosenConfig();
-            settings=new QSettings(filename, XmlConfig::XmlSettingsFormat);
+            filename = dialog->choosenConfig();
+            settings = new QSettings(filename, XmlConfig::XmlSettingsFormat);
             delete dialog;
         }
-        qs=settings;
-        qDebug() << "Load default config from resource "<<filename;
+        qs = settings;
+        qDebug() << "Load default config from resource " << filename;
     }
     qs->beginGroup("General");
-    m_config_description=qs->value("Description","none").toString();
-    m_config_details=qs->value("Details","none").toString();
-    m_config_stylesheet=qs->value("StyleSheet","none").toString();
+    m_config_description=qs->value("Description", "none").toString();
+    m_config_details=qs->value("Details", "none").toString();
+    m_config_stylesheet=qs->value("StyleSheet", "none").toString();
     loadStyleSheet(m_config_stylesheet);
     qs->endGroup();
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
@@ -799,16 +793,6 @@ void MainWindow::registerDefaultActions()
     mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
 #endif
 
-    //About Plugins Action
-    tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &Plugins..."), this);
-    cmd = am->registerAction(tmpaction, Constants::ABOUT_PLUGINS, m_globalContext);
-    mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
-    tmpaction->setEnabled(true);
-#ifdef Q_WS_MAC
-    cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
-#endif
-    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutPlugins()));
-
     // About GCS Action
 #ifdef Q_WS_MAC
     tmpaction = new QAction(QIcon(Constants::ICON_OPENPILOT), tr("About &OpenPilot GCS"), this); // it's convention not to add dots to the about menu
@@ -822,6 +806,16 @@ void MainWindow::registerDefaultActions()
     cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
 #endif
     connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutOpenPilotGCS()));
+
+    //About Plugins Action
+    tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &Plugins..."), this);
+    cmd = am->registerAction(tmpaction, Constants::ABOUT_PLUGINS, m_globalContext);
+    mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
+    tmpaction->setEnabled(true);
+#ifdef Q_WS_MAC
+    cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
+#endif
+    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutPlugins()));
 
     //Credits Action
     tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &Authors..."), this);

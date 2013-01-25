@@ -56,7 +56,9 @@ ConfigCCAttitudeWidget::ConfigCCAttitudeWidget(QWidget *parent) :
 
     // Connect the help button
     connect(ui->ccAttitudeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+
     addUAVObjectToWidgetRelation("AttitudeSettings","ZeroDuringArming",ui->zeroGyroBiasOnArming);
+    addUAVObjectToWidgetRelation("AttitudeSettings", "AccelTau", ui->accelTauSpinbox);
 
     addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->rollBias,AttitudeSettings::BOARDROTATION_ROLL);
     addUAVObjectToWidgetRelation("AttitudeSettings","BoardRotation",ui->pitchBias,AttitudeSettings::BOARDROTATION_PITCH);
@@ -73,8 +75,8 @@ ConfigCCAttitudeWidget::~ConfigCCAttitudeWidget()
 void ConfigCCAttitudeWidget::sensorsUpdated(UAVObject * obj) {
 
     if (!timer.isActive()) { 
-	// ignore updates that come in after the timer has expired	
-	return; 
+        // ignore updates that come in after the timer has expired
+        return;
     }
 
     Accels * accels = Accels::GetInstance(getObjectManager());
@@ -207,16 +209,27 @@ void ConfigCCAttitudeWidget::openHelp()
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/44Cf", QUrl::StrictMode) );
 }
 
+void ConfigCCAttitudeWidget::setAccelFiltering(bool active)
+{
+    setDirty(true);
+}
+
 void ConfigCCAttitudeWidget::enableControls(bool enable)
 {
-    if(ui->zeroBias)
+    if(ui->zeroBias) {
         ui->zeroBias->setEnabled(enable);
+    }
+    if(ui->zeroGyroBiasOnArming) {
+        ui->zeroGyroBiasOnArming->setEnabled(enable);
+    }
+    if(ui->accelTauSpinbox) {
+        ui->accelTauSpinbox->setEnabled(enable);
+    }
     ConfigTaskWidget::enableControls(enable);
 }
 
 void ConfigCCAttitudeWidget::updateObjectsFromWidgets()
 {
     ConfigTaskWidget::updateObjectsFromWidgets();
-
     ui->zeroBiasProgress->setValue(0);
 }

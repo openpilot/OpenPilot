@@ -69,7 +69,7 @@ int main()
 	 * (see pios_board.c for your arch)
 	 * */
 	PIOS_Board_Init();
-	PIOS_WDG_Clear();
+
 #ifdef ERASE_FLASH
 	PIOS_Flash_Jedec_EraseChip();
 #if defined(PIOS_LED_HEARTBEAT)

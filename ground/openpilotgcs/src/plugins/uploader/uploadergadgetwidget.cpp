@@ -470,8 +470,13 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
         // Freeze the tabs, they are not useful anymore and their buttons
         // will cause segfaults or weird stuff if we use them.
         for (int i=0; i< m_config->systemElements->count(); i++) {
+            // OP-682 arriving here too "early" (before the devices are refreshed) was leading to a crash
+            // OP-682 the crash was due to an unchecked cast in the line below that would cast a RunningDeviceGadget to a DeviceGadget
             deviceWidget *qw = dynamic_cast<deviceWidget*>(m_config->systemElements->widget(i));
             if (qw) {
+                // OP-682 fixed a second crash by disabling *all* buttons in the device widget
+                // disabling the buttons is only half of the solution as even if the buttons are enabled
+                // the app should not crash
                 qw->freeze();
             }
         }

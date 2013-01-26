@@ -562,7 +562,6 @@ void PIOS_Board_Init(void) {
 
 			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_HKOSD_TX_BUF_LEN);
 			PIOS_Assert(tx_buffer);
-			uint32_t pios_com_hkosd_id;
 			if (PIOS_COM_Init(&pios_com_hkosd_id, &pios_usart_com_driver, pios_usart_hkosd_id,
 						NULL, 0,
 						tx_buffer, PIOS_COM_HKOSD_TX_BUF_LEN)) {
@@ -714,7 +713,6 @@ void PIOS_Board_Init(void) {
 
 			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_HKOSD_TX_BUF_LEN);
 			PIOS_Assert(tx_buffer);
-			uint32_t pios_com_hkosd_id;
 			if (PIOS_COM_Init(&pios_com_hkosd_id, &pios_usart_com_driver, pios_usart_hkosd_id,
 						NULL, 0,
 						tx_buffer, PIOS_COM_HKOSD_TX_BUF_LEN)) {

@@ -37,7 +37,7 @@
 #define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_DELAY
 //#if defined(USE_I2C)
-#define PIOS_INCLUDE_I2C
+//#define PIOS_INCLUDE_I2C
 //#define PIOS_INCLUDE_I2C_ESC
 //#endif
 #define PIOS_INCLUDE_IRQ
@@ -82,8 +82,8 @@
 #define PIOS_INCLUDE_MPU6000
 #define PIOS_MPU6000_ACCEL
 //#define PIOS_INCLUDE_HCSR04
-#define PIOS_INCLUDE_BMP085
-#define PIOS_INCLUDE_HMC5883
+//#define PIOS_INCLUDE_BMP085
+//#define PIOS_INCLUDE_HMC5883
 
 /* A really shitty setting saving implementation */
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS

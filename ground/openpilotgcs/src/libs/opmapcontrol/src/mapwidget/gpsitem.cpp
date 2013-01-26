@@ -28,7 +28,7 @@
 #include "gpsitem.h"
 namespace mapcontrol
 {
-    GPSItem::GPSItem(MapGraphicItem* map,OPMapWidget* parent,QString uavPic):map(map),mapwidget(parent),showtrail(true),showtrailline(true),trailtime(5),traildistance(50),autosetreached(true)
+    GPSItem::GPSItem(MapGraphicItem* map,OPMapWidget* parent,QString uavPic):map(map),mapwidget(parent),showtrail(true),showtrailline(true),trailtime(1),traildistance(2),autosetreached(true)
     ,autosetdistance(100)
     {
         pic.load(uavPic);
@@ -42,8 +42,10 @@ namespace mapcontrol
         trailLine=new QGraphicsItemGroup(this);
         trailLine->setParentItem(map);
         this->setFlag(QGraphicsItem::ItemIgnoresTransformations,true);
+        setCacheMode(QGraphicsItem::ItemCoordinateCache);
         mapfollowtype=UAVMapFollowType::None;
-        trailtype=UAVTrailType::ByDistance;
+        //trailtype=UAVTrailType::ByDistance;
+        trailtype=UAVTrailType::ByTimeElapsed;
         timer.start();
         connect(map,SIGNAL(childRefreshPosition()),this,SLOT(RefreshPos()));
         connect(map,SIGNAL(childSetOpacity(qreal)),this,SLOT(setOpacitySlot(qreal)));
@@ -74,12 +76,12 @@ namespace mapcontrol
             {
                 if(timer.elapsed()>trailtime*1000)
                 {
-                    TrailItem * ob=new TrailItem(position,altitude,Qt::green,map);
+                    TrailItem * ob=new TrailItem(position,altitude,Qt::red,map);
                     trail->addToGroup(ob);
                     connect(this,SIGNAL(setChildPosition()),ob,SLOT(setPosSLOT()));
                     if(!lasttrailline.IsEmpty())
                     {
-                        TrailLineItem * obj=new TrailLineItem(lasttrailline,position,Qt::red,map);
+                        TrailLineItem * obj=new TrailLineItem(lasttrailline,position,Qt::green,map);
                         trailLine->addToGroup(obj);
                         connect(this,SIGNAL(setChildLine()),obj,SLOT(setLineSlot()));
                     }
@@ -92,12 +94,12 @@ namespace mapcontrol
             {
                 if(qAbs(internals::PureProjection::DistanceBetweenLatLng(lastcoord,position)*1000)>traildistance)
                 {
-                    TrailItem * ob=new TrailItem(position,altitude,Qt::green,map);
+                    TrailItem * ob=new TrailItem(position,altitude,Qt::red,map);
                     trail->addToGroup(ob);
                     connect(this,SIGNAL(setChildPosition()),ob,SLOT(setPosSLOT()));
                     if(!lasttrailline.IsEmpty())
                     {
-                        TrailLineItem * obj=new TrailLineItem(lasttrailline,position,Qt::red,map);
+                        TrailLineItem * obj=new TrailLineItem(lasttrailline,position,Qt::green,map);
                         trailLine->addToGroup(obj);
                         connect(this,SIGNAL(setChildLine()),obj,SLOT(setLineSlot()));
                     }

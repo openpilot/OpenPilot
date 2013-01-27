@@ -249,8 +249,6 @@ int main(int argc, char **argv)
     //and as of now we dont want that behaviour.
     QLocale::setDefault(QLocale::English);
 
-    QApplication::setGraphicsSystem("raster");
-
     SharedTools::QtSingleApplication app((QLatin1String(appNameC)), argc, argv);
 
     //Open Splashscreen

@@ -47,11 +47,14 @@ void gst::init(int *argc, char **argv[])
 
 QString gst::version(void)
 {
+    init(NULL, NULL);
     return QString(gst_version_string());
 }
 
 QList<QString> gst::pluginList()
 {
+    init(NULL, NULL);
+
     QList<QString> pluginList;
 
     GList *plugins, *orig_plugins;
@@ -77,7 +80,90 @@ QList<QString> gst::pluginList()
 
 QList<QString> gst::elementList(QString pluginName)
 {
+    init(NULL, NULL);
+
     QList<QString> elementList;
+
+    //int plugincount = 0, featurecount = 0, blacklistcount = 0;
+    GList *plugins, *orig_plugins;
+
+    orig_plugins = plugins = gst_default_registry_get_plugin_list();
+    while (plugins) {
+        GList *features, *orig_features;
+        GstPlugin *plugin;
+
+        plugin = (GstPlugin *) (plugins->data);
+        plugins = g_list_next(plugins);
+        //plugincount++;
+
+        if (plugin->flags & GST_PLUGIN_FLAG_BLACKLISTED) {
+            //blacklistcount++;
+            continue;
+        }
+
+        orig_features = features = gst_registry_get_feature_list_by_plugin(gst_registry_get_default(),
+                plugin->desc.name);
+        while (features) {
+            GstPluginFeature *feature;
+
+            if (G_UNLIKELY(features->data == NULL))
+                goto next;
+            feature = GST_PLUGIN_FEATURE(features->data);
+            //featurecount++;
+
+            if (GST_IS_ELEMENT_FACTORY(feature)) {
+                GstElementFactory *factory;
+
+                factory = GST_ELEMENT_FACTORY(feature);
+                elementList << QString(GST_PLUGIN_FEATURE_NAME(factory));
+//                if (print_all)
+//                    print_element_info(factory, TRUE);
+//                else
+//                    g_print("%s:  %s: %s\n", plugin->desc.name, GST_PLUGIN_FEATURE_NAME(factory),
+//                            gst_element_factory_get_longname(factory));
+            } else if (GST_IS_INDEX_FACTORY(feature)) {
+                GstIndexFactory *factory;
+
+                factory = GST_INDEX_FACTORY(feature);
+                elementList << QString(GST_PLUGIN_FEATURE_NAME(factory));
+//                if (!print_all)
+//                    g_print("%s:  %s: %s\n", plugin->desc.name, GST_PLUGIN_FEATURE_NAME(factory), factory->longdesc);
+            } else if (GST_IS_TYPE_FIND_FACTORY(feature)) {
+                GstTypeFindFactory *factory;
+
+                factory = GST_TYPE_FIND_FACTORY(feature);
+                elementList << QString(gst_plugin_feature_get_name(feature));
+
+//                if (!print_all)
+//                    g_print("%s: %s: ", plugin->desc.name, gst_plugin_feature_get_name(feature));
+//                if (factory->extensions) {
+//                    guint i = 0;
+//
+//                    while (factory->extensions[i]) {
+//                        if (!print_all)
+//                            g_print("%s%s", i > 0 ? ", " : "", factory->extensions[i]);
+//                        i++;
+//                    }
+//                    if (!print_all)
+//                        g_print("\n");
+//                } else {
+//                    if (!print_all)
+//                        g_print("no extensions\n");
+//                }
+            } else {
+//                if (!print_all)
+//                    n_print("%s:  %s (%s)\n", plugin->desc.name, GST_PLUGIN_FEATURE_NAME(feature),
+//                            g_type_name(G_OBJECT_TYPE(feature)));
+            }
+
+            next: features = g_list_next(features);
+        }
+
+        gst_plugin_feature_list_free(orig_features);
+    }
+
+    gst_plugin_list_free(orig_plugins);
+
     return elementList;
 }
 

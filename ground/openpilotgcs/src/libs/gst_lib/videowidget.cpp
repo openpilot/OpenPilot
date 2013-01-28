@@ -370,6 +370,7 @@ bool VideoWidget::event(QEvent *event)
         if (lastError.isEmpty()) {
             // remember first error only (usually the most useful)
             lastError = QString("Pipeline error: %0").arg(ee->getMessage());
+            // TODO stop pipeline...
             // force reset on next start
             reset = true;
             // need to repaint to display error message
@@ -425,17 +426,28 @@ void VideoWidget::setOverlay(Overlay *overlay)
 static GstElement *createPipelineFromDesc(const char *desc, QString &lastError)
 {
     qDebug() << QString("creating pipeline : %0").arg(desc);
-    GError *err = NULL;
-    GstElement *pipeline = gst_parse_launch(desc, &err);
-    g_assert((pipeline == NULL && err != NULL) || (pipeline != NULL && err == NULL));
-    if (err != NULL) {
-        // Report error to user, and free error
-        g_assert(pipeline == NULL);
-        qCritical() << QString("Failed to create pipeline: %0").arg(err->message);
-        lastError = QString("Failed to create pipeline: %0").arg(err->message);
-        g_error_free(err);
-    } else {
-        g_assert(pipeline != NULL);
+    GError *error = NULL;
+    GstElement *pipeline = gst_parse_launch_full(desc, NULL, GST_PARSE_FLAG_FATAL_ERRORS, &error);
+    if (!pipeline) {
+        if (error != NULL) {
+            // no pipeline and error...
+            // report error to user
+            qCritical() << QString("Failed to create pipeline: %0").arg(error->message);
+            lastError = QString("Failed to create pipeline: %0").arg(error->message);
+            g_error_free(error);
+        } else {
+            // no pipeline and no error...
+            // report generic error
+            qCritical() << QString("Failed to create pipeline");
+            lastError = QString("Failed to create pipeline");
+        }
+    } else if (error) {
+        // pipeline and error...
+        // report error to user?
+        // warning?
+        qCritical() << QString("Failed to create pipeline: %0").arg(error->message);
+
+        g_error_free(error);
     }
     return pipeline;
 }

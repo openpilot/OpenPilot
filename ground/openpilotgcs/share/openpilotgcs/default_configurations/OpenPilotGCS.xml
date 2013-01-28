@@ -2516,35 +2516,16 @@
         </configInfo>
         <data>
           <autoStart>true</autoStart>
+          <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
-          <pipelineDesc>videotestsrc ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <pipelineDesc>videotestsrc ! video/x-raw-yuv, width=640, height=480 ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <pipelineInfo>Displays test video.
+
+Supported OS : Windows
+</pipelineInfo>
           <respectAspectRatio>false</respectAspectRatio>
         </data>
       </Default>
-      <Empty>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <autoStart>true</autoStart>
-          <displayVideo>true</displayVideo>
-          <pipelineDesc></pipelineDesc>
-          <respectAspectRatio>false</respectAspectRatio>
-        </data>
-      </Empty>
-      <Bad>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <autoStart>true</autoStart>
-          <displayVideo>true</displayVideo>
-          <pipelineDesc>bade ! pipeline</pipelineDesc>
-          <respectAspectRatio>false</respectAspectRatio>
-        </data>
-      </Bad>
       <Screen__PCT__20capture__PCT__20__PCT__28dx9__PCT__2C__PCT__20no__PCT__20mouse__PCT__29__PCT__20__PCT__232>
         <configInfo>
           <locked>false</locked>
@@ -2552,8 +2533,12 @@
         </configInfo>
         <data>
           <autoStart>false</autoStart>
+          <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
           <pipelineDesc>dx9screencapsrc x=0 y=0 width=640 height=480  ! ffmpegcolorspace ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <pipelineInfo>Same as Screen capture (dx9, no mouse) constrained to a rectangular area.
+
+Supported OS : Windows</pipelineInfo>
           <respectAspectRatio>false</respectAspectRatio>
         </data>
       </Screen__PCT__20capture__PCT__20__PCT__28dx9__PCT__2C__PCT__20no__PCT__20mouse__PCT__29__PCT__20__PCT__232>
@@ -2564,8 +2549,14 @@
         </configInfo>
         <data>
           <autoStart>true</autoStart>
+          <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
           <pipelineDesc>dx9screencapsrc  ! ffmpegcolorspace ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <pipelineInfo>Screen capture video with DX9.
+No sound. No mouse. Not saved to file.
+
+Supported OS : Windows
+</pipelineInfo>
           <respectAspectRatio>false</respectAspectRatio>
         </data>
       </Screen__PCT__20capture__PCT__20__PCT__28dx9__PCT__2C__PCT__20no__PCT__20mouse__PCT__29>
@@ -2576,23 +2567,35 @@
         </configInfo>
         <data>
           <autoStart>false</autoStart>
+          <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
           <pipelineDesc>gdiscreencapsrc cursor=true x=0 y=0 width=100 height=100  ! ffmpegcolorspace ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <pipelineInfo>Screen capture video with GDI.
+Mouse is captured.
+No sound. Not saved.
+
+WARNING : not stable, will crash GCS after some time when running.
+
+Supported OS : Windows</pipelineInfo>
           <respectAspectRatio>false</respectAspectRatio>
         </data>
       </Screen__PCT__20capture__PCT__20__PCT__28gdi__PCT__2C__PCT__20with__PCT__20mouse__PCT__29>
-      <Webcam__PCT__20__PCT__232>
+      <Webcam__PCT__20__PCT__28DirectShow__PCT__29>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
         </configInfo>
         <data>
           <autoStart>true</autoStart>
+          <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
           <pipelineDesc>dshowvideosrc ! ffmpegcolorspace ! directdrawsink</pipelineDesc>
+          <pipelineInfo>Plays an usb camera.
+
+Supported OS : Windows</pipelineInfo>
           <respectAspectRatio>true</respectAspectRatio>
         </data>
-      </Webcam__PCT__20__PCT__232>
+      </Webcam__PCT__20__PCT__28DirectShow__PCT__29>
       <Webcam>
         <configInfo>
           <locked>false</locked>
@@ -2600,8 +2603,12 @@
         </configInfo>
         <data>
           <autoStart>true</autoStart>
+          <displayControls>false</displayControls>
           <displayVideo>true</displayVideo>
           <pipelineDesc>ksvideosrc ! d3dvideosink force-aspect-ratio = true</pipelineDesc>
+          <pipelineInfo>Plays an usb camera.
+
+Supported OS : Windows</pipelineInfo>
           <respectAspectRatio>true</respectAspectRatio>
         </data>
       </Webcam>

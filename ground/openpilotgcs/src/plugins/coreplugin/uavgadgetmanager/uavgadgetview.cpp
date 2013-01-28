@@ -230,6 +230,9 @@ void UAVGadgetView::updateToolBar()
 
 void UAVGadgetView::listSelectionActivated(int index)
 {
+    if (index < 0 || index >= m_uavGadgetList->count())
+        index = m_defaultIndex;
+
     QString classId = m_uavGadgetList->itemData(index).toString();
     if (m_uavGadget && (m_uavGadget->classId() == classId))
         return;

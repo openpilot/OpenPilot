@@ -6,7 +6,8 @@
     <message>
         <location filename="../../../src/app/main.cpp" line="+136"/>
         <source>Failed to load core: %1</source>
-        <translation>Échec dans le chargement du core : %1</translation>
+        <translatorcomment>[Platypus] core-&gt; noyau</translatorcomment>
+        <translation type="unfinished">Échec dans le chargement du noyau : %1</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -16,12 +17,13 @@
     <message>
         <location line="+183"/>
         <source>Could not find &apos;Core.pluginspec&apos; in %1</source>
-        <translation>&apos;Core.pluginspec&apos; introuvable dans %1</translation>
+        <translatorcomment>[Platypus]Ajout de &quot;est&quot;</translatorcomment>
+        <translation type="unfinished">&apos;Core.pluginspec&apos; est introuvable dans %1</translation>
     </message>
     <message>
         <location line="+38"/>
         <source>OpenPilot GCS - Plugin loader messages</source>
-        <translation>Openpilot GCS - Messages du chargeur de plugins</translation>
+        <translation type="unfinished">Openpilot GCS - Messages du chargeur de modules complémentaires</translation>
     </message>
 </context>
 <context>
@@ -37,7 +39,7 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/generalsettings.ui"/>
         <source>General settings</source>
-        <translation>Réglages généraux</translation>
+        <translation type="unfinished">Paramètres généraux</translation>
     </message>
     <message>
         <location/>
@@ -131,7 +133,7 @@
     <message>
         <location line="+11"/>
         <source>&amp;Tools</source>
-        <translation>O&amp;utils</translation>
+        <translation type="unfinished">O&amp;utils</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -151,7 +153,7 @@
     <message>
         <location line="+493"/>
         <source>Ctrl+Shift+S</source>
-        <translation>Ctrl+Shift+S</translation>
+        <translation type="unfinished">Ctrl+Maj+S</translation>
     </message>
     <message>
         <location line="+168"/>
@@ -171,7 +173,7 @@
     <message>
         <location line="-9"/>
         <source>Save &amp;GCS Default Settings</source>
-        <translation>Enregistrer Paramètres GCS par &amp;Défaut</translation>
+        <translation type="unfinished">Enregistrer les paramètres GCS par &amp;Défaut</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -188,7 +190,7 @@
         <location line="+5"/>
         <location line="+4"/>
         <source>&amp;Redo</source>
-        <translation>Re&amp;faire</translation>
+        <translation type="unfinished">Réta&amp;blir</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -218,7 +220,7 @@
     <message>
         <location line="+11"/>
         <source>Minimize</source>
-        <translation>Minimiser</translation>
+        <translation type="unfinished">Réduire</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -233,7 +235,7 @@
     <message>
         <location line="+19"/>
         <source>Edit Gadgets Mode</source>
-        <translation>Editer Mode Gadgets</translation>
+        <translation type="unfinished">Editer le Mode des Gadgets</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -243,12 +245,13 @@
     <message>
         <location line="+10"/>
         <source>Meta+Shift</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>[Platypus]pomme pour Mac ?</translatorcomment>
+        <translation type="unfinished">Win+Maj</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Ctrl+Shift</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ctrl+Maj</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -258,7 +261,7 @@
     <message>
         <location line="+2"/>
         <source>%1+Down</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1+Fl^che du bas</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -268,17 +271,17 @@
     <message>
         <location line="+2"/>
         <source>%1+Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1+Flêche du haut</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Close Current View</source>
-        <translation>Fermer Vue Actuelle</translation>
+        <translation type="unfinished">Fermer la Vue Actuelle</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1+C</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1+C</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -288,17 +291,17 @@
     <message>
         <location line="+2"/>
         <source>%1+A</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1+A</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Goto Next View</source>
-        <translation>Aller Vue Suivante</translation>
+        <translation type="unfinished">Aller à laVue Suivante</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>%1+N</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1+N</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -308,7 +311,8 @@
     <message>
         <location line="+29"/>
         <source>About &amp;Plugins...</source>
-        <translation>À propos des &amp;Plugins...</translation>
+        <translatorcomment>[Platypus]Trop long ?</translatorcomment>
+        <translation type="unfinished">À propos des &amp;Modules complémentaires...</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -349,18 +353,18 @@
     <message>
         <location line="+15"/>
         <source>Installed Plugins</source>
-        <translation>Plugins installés</translation>
+        <translation type="unfinished">Modules complémentaires installés</translation>
     </message>
     <message>
         <location line="+36"/>
         <source>Plugin Details of %1</source>
         <translatorcomment>Détail sur le plugin %1 ?</translatorcomment>
-        <translation>Détails du plugin %1</translation>
+        <translation type="unfinished">Détails du module complémentaire %1</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Plugin Errors of %1</source>
-        <translation>Erreurs du plugin %1</translation>
+        <translation type="unfinished">Erreurs du module complémentaire %1</translation>
     </message>
 </context>
 <context>
@@ -378,7 +382,8 @@
     <message>
         <location line="+157"/>
         <source>Import Keyboard Mapping Scheme</source>
-        <translation>Importer le mapping clavier</translation>
+        <translatorcomment>[Platypus]Je pense qu&apos;il y a meilleure traduction pour mapping</translatorcomment>
+        <translation type="unfinished">Importer le mapping clavier</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -415,7 +420,7 @@
     <message>
         <location line="+27"/>
         <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: %2&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
-        <translation>&lt;h3&gt;Station de Contrôle au Sol (GCS)&lt;/h3&gt;Révision GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</translation>
+        <translation type="unfinished">&lt;h3&gt;Station de Contrôle au Sol OpenPilot(GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la license GNU General Public License publiée par&lt;br/&gt;the Free Software Foundation; soit à la version 3 de la License, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans GARANTIE DE QUELCONQUE TYPE, COMPRENANT LA GRARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
@@ -436,7 +441,7 @@
     <message>
         <location/>
         <source>TextLabel</source>
-        <translation>Label de texte</translation>
+        <translation type="unfinished">Étiquette de texte</translation>
     </message>
     <message>
         <location/>
@@ -449,7 +454,7 @@
     <message>
         <location filename="../../../src/libs/utils/classnamevalidatinglineedit.cpp" line="+83"/>
         <source>The class name must not contain namespace delimiters.</source>
-        <translation>Le nom de classe ne doit pas contenir de délimiteur d&apos;espace de nommage.</translation>
+        <translation type="unfinished">Le nom de laclasse ne doit pas contenir de délimiteur d&apos;espace de nommage.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -459,7 +464,7 @@
     <message>
         <location line="+4"/>
         <source>The class name contains invalid characters.</source>
-        <translation>Le nom de classe contient des caractères invalides.</translation>
+        <translation type="unfinished">Le nom de la classe contient des caractères invalides.</translation>
     </message>
 </context>
 <context>
@@ -487,7 +492,8 @@
     <message>
         <location line="+5"/>
         <source>Unexpected output from helper program.</source>
-        <translation>Sortie imprévue du logiciel externe.</translation>
+        <translatorcomment>[Platypus]Helper = externe ?</translatorcomment>
+        <translation type="unfinished">Arrêt imprévu du logiciel externe.</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -502,7 +508,7 @@
     <message>
         <location filename="../../../src/libs/utils/consoleprocess_unix.cpp" line="+110"/>
         <source>Cannot start the terminal emulator &apos;%1&apos;.</source>
-        <translation>Impossible de démarrer l&apos;émulateur de terminal &apos;%1&apos;.</translation>
+        <translation type="unfinished">Impossible de démarrer le terminal de l&apos;émulateur &apos;%1&apos;.</translation>
     </message>
     <message>
         <location line="+49"/>
@@ -522,7 +528,7 @@
     <message>
         <location line="+30"/>
         <source>Cannot obtain exit status from inferior: %1</source>
-        <translation>Impossible d&apos;obtenir la valeur de retour du processus : %1</translation>
+        <translation type="unfinished">Impossible d&apos;obtenir l&apos;état de retour du processus : %1</translation>
     </message>
 </context>
 <context>
@@ -530,22 +536,22 @@
     <message>
         <location filename="../../../src/libs/utils/filenamevalidatinglineedit.cpp" line="+94"/>
         <source>The name must not be empty</source>
-        <translation>Le nom ne peut pas être vide</translation>
+        <translation type="unfinished">Le nom ne doit pas être vide</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>The name must not contain any of the characters &apos;%1&apos;.</source>
-        <translation>Le nom ne peut pas contenir un des caractères suivant : &apos;%1&apos;.</translation>
+        <translation type="unfinished">Le nom ne doit pas contenir un des caractères suivants : &apos;%1&apos;.</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>The name must not contain &apos;%1&apos;.</source>
-        <translation>Le nom ne peut pas contenir &apos;%1&apos;.</translation>
+        <translation type="unfinished">Le nom ne doit pas contenir &apos;%1&apos;.</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>The name must not match that of a MS Windows device. (%1).</source>
-        <translation>Le nom ne peut pas correspondre à un périphérique MS Windows. (%1).</translation>
+        <translation type="unfinished">Le nom ne doit pas correspondre à un périphérique MS Windows. (%1).</translation>
     </message>
 </context>
 <context>
@@ -554,8 +560,8 @@
         <location filename="../../../src/libs/utils/filesearch.cpp" line="+46"/>
         <source>%1: canceled. %n occurrences found in %2 files.</source>
         <translation>
-            <numerusform>%1 : annulé. %n entrée trouvée dans %2 fichiers.</numerusform>
-            <numerusform>%1 : annulé. %n entrées trouvées dans %2 fichiers.</numerusform>
+            <numerusform>%1 : annulé. %n entrée trouvée dans %2 fichiers.</numerusform>
+            <numerusform>%1 : annulé. %n entrées trouvées dans %2 fichiers.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -569,9 +575,9 @@
     <message numerus="yes">
         <location line="+8"/>
         <source>%1: %n occurrences found in %2 of %3 files.</source>
-        <translation>
-            <numerusform>%1 : %n occurence trouvé dans %2 de %3 fichiers.</numerusform>
-            <numerusform>%1 : %n occurences trouvés dans %2 de %3 fichiers.</numerusform>
+        <translation type="unfinished">
+            <numerusform>%1 : %n occurence trouvée dans %2 de %3 fichiers.</numerusform>
+            <numerusform>%1 : %n occurences trouvées dans %2 de %3 fichiers.</numerusform>
         </translation>
     </message>
 </context>
@@ -615,22 +621,22 @@
     <message>
         <location filename="../../../src/libs/utils/newclasswidget.cpp" line="+416"/>
         <source>Invalid base class name</source>
-        <translation>Nom de la classe parente invalide</translation>
+        <translation type="unfinished">Nom de la classe parente incorrect</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Invalid header file name: &apos;%1&apos;</source>
-        <translation>Nom du fichier d&apos;en-tête invalide : &apos;%1&apos;</translation>
+        <translation type="unfinished">Nom du fichier d&apos;en-tête incorrect : &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Invalid source file name: &apos;%1&apos;</source>
-        <translation>Nom du fichier source invalide : &apos;%1&apos;</translation>
+        <translation type="unfinished">Nom du fichier source incorrect : &apos;%1&apos;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Invalid form file name: &apos;%1&apos;</source>
-        <translation>Nom du fichier d&apos;interface invalide : &apos;%1&apos;</translation>
+        <translation type="unfinished">Nom du fichier d&apos;interface incorrect : &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../../../src/libs/utils/newclasswidget.ui"/>

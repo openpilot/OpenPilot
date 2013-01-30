@@ -155,7 +155,7 @@ void ConfigCameraStabilizationWidget::refreshWidgetsValues(UAVObject *obj)
         // Then search for any mixer channels set to this
         outputs[i]->setCurrentIndex(0);
         for (int j = 0; j < NUM_MIXERS; j++)
-            if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLL + i) &&
+            if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLLORSERVO1 + i) &&
                     outputs[i]->currentIndex() != (j + 1))
                 outputs[i]->setCurrentIndex(j + 1);
     }
@@ -219,7 +219,7 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
 
             if ((mixerNum >= 0) && // Short circuit in case of none
                 (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_DISABLED) &&
-                (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_CAMERAROLL + i) ) {
+                (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_CAMERAROLLORSERVO1 + i) ) {
                 // If the mixer channel already mapped to something, it should not be
                 // used for camera output, we reset it to none
                 outputs[i]->setCurrentIndex(0);
@@ -230,13 +230,13 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
             } else {
                 // Make sure no other channels have this output set
                 for (int j = 0; j < NUM_MIXERS; j++)
-                    if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLL + i))
+                    if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLLORSERVO1 + i))
                         *mixerTypes[j] = MixerSettings::MIXER1TYPE_DISABLED;
 
                 // If this channel is assigned to one of the outputs that is not disabled
                 // set it
                 if ((mixerNum >= 0) && (mixerNum < NUM_MIXERS))
-                    *mixerTypes[mixerNum] = MixerSettings::MIXER1TYPE_CAMERAROLL + i;
+                    *mixerTypes[mixerNum] = MixerSettings::MIXER1TYPE_CAMERAROLLORSERVO1 + i;
             }
         }
     } while(widgetUpdated);

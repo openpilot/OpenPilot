@@ -597,7 +597,8 @@ void PIOS_Board_Init(void) {
 		}
 		break;
 	case HWSETTINGS_CC_FLEXIPORT_GPS:
-#if defined(PIOS_INCLUDE_GPS)
+	case HWSETTINGS_CC_FLEXIPORT_PPMGPS:
+#if defined(PIOS_INCLUDE_GPS) || defined(PIOS_INCLUDE_PPM_GPS_FLEXI)
 		{
 			uint32_t pios_usart_generic_id;
 			if (PIOS_USART_Init(&pios_usart_generic_id, &pios_usart_generic_flexi_cfg)) {
@@ -612,6 +613,20 @@ void PIOS_Board_Init(void) {
 			}
 		}
 #endif	/* PIOS_INCLUDE_GPS */
+		if (hwsettings_cc_flexiport == HWSETTINGS_CC_FLEXIPORT_GPS)
+			break;
+#if defined(PIOS_INCLUDE_PPM_GPS_FLEXI)
+		{
+			uint32_t pios_ppm_id;
+			PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_gps_flexi_cfg);
+
+			uint32_t pios_ppm_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
+				PIOS_Assert(0);
+			}
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM] = pios_ppm_rcvr_id;
+		}
+#endif	/* PIOS_INCLUDE_PPM_GPS_FLEXI */
 		break;
 	case HWSETTINGS_CC_FLEXIPORT_PPM:
 #if defined(PIOS_INCLUDE_PPM_FLEXI)

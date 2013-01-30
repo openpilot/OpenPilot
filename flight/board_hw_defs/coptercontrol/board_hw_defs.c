@@ -787,6 +787,7 @@ static const struct pios_tim_channel pios_tim_servoport_rcvrport_pins[] = {
 	},
 };
 
+#if defined(PIOS_INCLUDE_PPM_FLEXI)
 static const struct pios_tim_channel pios_tim_ppm_flexi_port = {
 	.timer = TIM2,
 	.timer_chan = TIM_Channel_4,
@@ -800,6 +801,23 @@ static const struct pios_tim_channel pios_tim_ppm_flexi_port = {
 	},
 	.remap = GPIO_PartialRemap2_TIM2,
 };
+#endif	/* PIOS_INCLUDE_PPM_FLEXI */
+
+#if defined(PIOS_INCLUDE_PPM_GPS_FLEXI)
+static const struct pios_tim_channel pios_tim_ppm_gps_flexi_port = {
+	.timer = TIM2,
+	.timer_chan = TIM_Channel_3,
+	.pin = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_10,
+			.GPIO_Mode  = GPIO_Mode_IPD,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+		},
+	},
+	.remap = GPIO_PartialRemap2_TIM2,
+};
+#endif	/* PIOS_INCLUDE_PPM_GPS_FLEXI */
 
 #if defined(PIOS_INCLUDE_USART)
 
@@ -1148,6 +1166,22 @@ const struct pios_ppm_cfg pios_ppm_flexi_cfg = {
 };
 
 #endif	/* PIOS_INCLUDE_PPM_FLEXI */
+
+#if defined(PIOS_INCLUDE_PPM_GPS_FLEXI)
+#include <pios_ppm_priv.h>
+
+const struct pios_ppm_cfg pios_ppm_gps_flexi_cfg = {
+	.tim_ic_init = {
+		.TIM_ICPolarity = TIM_ICPolarity_Rising,
+		.TIM_ICSelection = TIM_ICSelection_DirectTI,
+		.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+		.TIM_ICFilter = 0x0,
+	},
+	.channels = &pios_tim_ppm_gps_flexi_port,
+	.num_channels = 1,
+};
+
+#endif	/* PIOS_INCLUDE_PPM_GPS_FLEXI */
 
 /* 
  * PWM Inputs 

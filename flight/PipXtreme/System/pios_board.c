@@ -199,45 +199,6 @@ void PIOS_Board_Init(void) {
 	}
 #endif
 
-	/* Configure PPM input */
-	switch (oplinkSettings.PPM)	{
-#if defined(PIOS_INCLUDE_PPM)
-	case OPLINKSETTINGS_PPM_INPUT:
-	{
-		uint32_t pios_ppm_id;
-		PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
-
-		if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id))
-			PIOS_Assert(0);
-		break;
-	}
-#endif	/* PIOS_INCLUDE_PPM */
-
-#if defined(PIOS_INCLUDE_PPM_OUT)
-	case OPLINKSETTINGS_PPM_OUTPUT:
-		PIOS_PPM_Out_Init(&pios_ppm_out_id, &pios_ppm_out_cfg);
-		break;
-#endif	/* PIOS_INCLUDE_PPM_OUT */
-
-	default:
-	{
-		/* Configure the flexi serial port if PPM not selected */
-		uint32_t pios_usart3_id;
-		if (PIOS_USART_Init(&pios_usart3_id, &pios_usart_telem_flexi_cfg)) {
-			PIOS_Assert(0);
-		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telem_uart_flexi_id, &pios_usart_com_driver, pios_usart3_id,
-											rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
-											tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
-			PIOS_Assert(0);
-		}
-	}
-	}
-
 	/* Initalize the RFM22B radio COM device. */
 #if defined(PIOS_INCLUDE_RFM22B)
 	{
@@ -259,6 +220,51 @@ void PIOS_Board_Init(void) {
 		}
 	}
 #endif /* PIOS_INCLUDE_RFM22B */
+
+	/* Configure PPM input */
+	bool is_coordinator = PIOS_RFM22B_IsCoordinator(pios_rfm22b_id);
+	switch (oplinkSettings.PPM)	{
+#if defined(PIOS_INCLUDE_PPM)
+	case OPLINKSETTINGS_PPM_PPM:
+	case OPLINKSETTINGS_PPM_PPMTELEMETRY:
+	{
+		/* PPM input is configured on the coordinator modem and output on the remote modem. */
+		if (is_coordinator)
+		{
+			uint32_t pios_ppm_id;
+			PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+
+			if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id))
+				PIOS_Assert(0);
+		}
+#if defined(PIOS_INCLUDE_PPM_OUT)
+		else
+		{
+			PIOS_PPM_Out_Init(&pios_ppm_out_id, &pios_ppm_out_cfg);
+		}
+#endif	/* PIOS_INCLUDE_PPM_OUT */
+		break;
+	}
+#endif	/* PIOS_INCLUDE_PPM */
+
+	default:
+	{
+		/* Configure the flexi serial port if PPM not selected */
+		uint32_t pios_usart3_id;
+		if (PIOS_USART_Init(&pios_usart3_id, &pios_usart_telem_flexi_cfg)) {
+			PIOS_Assert(0);
+		}
+		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
+		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
+		PIOS_Assert(rx_buffer);
+		PIOS_Assert(tx_buffer);
+		if (PIOS_COM_Init(&pios_com_telem_uart_flexi_id, &pios_usart_com_driver, pios_usart3_id,
+											rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
+											tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
+			PIOS_Assert(0);
+		}
+	}
+	}
 
 	/* Remap AFIO pin */
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);

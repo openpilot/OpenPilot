@@ -155,9 +155,7 @@ static void systemTask(void *parameters)
 
 		// Update the PipXstatus UAVO
 		OPLinkStatusData oplinkStatus;
-		uint32_t pairID;
 		OPLinkStatusGet(&oplinkStatus);
-		OPLinkSettingsPairIDGet(&pairID);
 
 		// Get the other device stats.
 		PIOS_RFM2B_GetPairStats(pios_rfm22b_id, oplinkStatus.PairIDs, oplinkStatus.PairSignalStrengths, OPLINKSTATUS_PAIRIDS_NUMELEM);

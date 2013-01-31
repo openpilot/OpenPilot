@@ -489,19 +489,19 @@ static void configureComCallback(OPLinkSettingsOutputConnectionOptions com_port,
  */
 static void updateSettings()
 {
-
 	// Get the settings.
 	OPLinkSettingsData oplinkSettings;
 	OPLinkSettingsGet(&oplinkSettings);
 
-	bool is_coordinator = (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
+	// Set the bindings.
+	PIOS_RFM22B_SetBindings(pios_rfm22b_id, oplinkSettings.Bindings);
+
+	//bool is_coordinator = (oplinkSettings.PairID != 0);
+	bool is_coordinator = PIOS_RFM22B_IsCoordinator(pios_rfm22b_id);
 	if (is_coordinator)
 	{
 		// Set the remote com configuration parameters
 		PIOS_RFM22B_SetRemoteComConfig(pios_rfm22b_id, oplinkSettings.OutputConnection, oplinkSettings.ComSpeed);
-
-		// Configure the RFM22B device as coordinator or not
-		PIOS_RFM22B_SetCoordinator(pios_rfm22b_id, true);
 
 		// Set the frequencies.
 		PIOS_RFM22B_SetFrequencyRange(pios_rfm22b_id, oplinkSettings.MinFrequency, oplinkSettings.MaxFrequency);
@@ -534,9 +534,6 @@ static void updateSettings()
 			PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_7);
 			break;
 		}
-
-		// Set the radio destination ID.
-		PIOS_RFM22B_SetDestinationId(pios_rfm22b_id, oplinkSettings.PairID);
 	}
 
 	// Determine what com ports we're using.
@@ -600,4 +597,8 @@ static void updateSettings()
 		if (PIOS_COM_TELEMETRY)  PIOS_COM_ChangeBaud(PIOS_COM_TELEMETRY, 115200);
 		break;
 	}
+
+	// Reinitilize the modem.
+	if (is_coordinator)
+		PIOS_RFM22B_Reinit(pios_rfm22b_id);
 }

@@ -27,6 +27,8 @@
 #ifndef CONFIGPIPXTREMEWIDGET_H
 #define CONFIGPIPXTREMEWIDGET_H
 
+#include <oplinksettings.h>
+
 #include "ui_pipxtreme.h"
 #include "configtaskwidget.h"
 
@@ -41,6 +43,7 @@ public:
 public slots:
 	void updateStatus(UAVObject *object1);
 	void updateSettings(UAVObject *object1);
+	void refreshBindingsList();
 
 private:
 	Ui_PipXtremeWidget *m_oplink;
@@ -49,7 +52,7 @@ private:
 	UAVDataObject* oplinkStatusObj;
 
 	// The OPLink ssettins UAVObject
-	UAVDataObject* oplinkSettingsObj;
+	OPLinkSettings* oplinkSettingsObj;
 
 	bool settingsUpdated;
 
@@ -58,12 +61,10 @@ private slots:
 	void applySettings();
 	void saveSettings();
 	void disconnected();
-	void pairIDToggled(bool checked, quint8 idx);
-	void pair1Toggled(bool checked);
-	void pair2Toggled(bool checked);
-	void pair3Toggled(bool checked);
-	void pair4Toggled(bool checked);
-	void pairBToggled(bool checked);
+	void pairIDToggled(bool checked);
+	void addBinding();
+	void removeBinding();
+	void bindingsSelectionChanged();
 };
 
 #endif // CONFIGTXPIDWIDGET_H

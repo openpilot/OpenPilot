@@ -46,7 +46,7 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	}
 
 	// Connect to the OPLinkSettings object updates
-	oplinkSettingsObj = dynamic_cast<UAVDataObject*>(objManager->getObject("OPLinkSettings"));
+	oplinkSettingsObj = dynamic_cast<OPLinkSettings*>(objManager->getObject("OPLinkSettings"));
 	if (oplinkSettingsObj != NULL ) {
 		connect(oplinkSettingsObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(updateSettings(UAVObject*)));
 	} else {
@@ -55,7 +55,6 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	autoLoadWidgets();
 	addApplySaveButtons(m_oplink->Apply, m_oplink->Save);
 
-	addUAVObjectToWidgetRelation("OPLinkSettings", "Coordinator", m_oplink->Coordinator);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "UAVTalk", m_oplink->UAVTalk);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "PPM", m_oplink->PPM);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "InputConnection", m_oplink->InputConnection);
@@ -88,11 +87,19 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("OPLinkStatus", "TXRate", m_oplink->TXRate);
 
 	// Connect to the pair ID radio buttons.
-	connect(m_oplink->PairSelectB, SIGNAL(toggled(bool)), this, SLOT(pairBToggled(bool)));
-	connect(m_oplink->PairSelect1, SIGNAL(toggled(bool)), this, SLOT(pair1Toggled(bool)));
-	connect(m_oplink->PairSelect2, SIGNAL(toggled(bool)), this, SLOT(pair2Toggled(bool)));
-	connect(m_oplink->PairSelect3, SIGNAL(toggled(bool)), this, SLOT(pair3Toggled(bool)));
-	connect(m_oplink->PairSelect4, SIGNAL(toggled(bool)), this, SLOT(pair4Toggled(bool)));
+	connect(m_oplink->PairSelect1, SIGNAL(toggled(bool)), this, SLOT(pairIDToggled(bool)));
+	connect(m_oplink->PairSelect2, SIGNAL(toggled(bool)), this, SLOT(pairIDToggled(bool)));
+	connect(m_oplink->PairSelect3, SIGNAL(toggled(bool)), this, SLOT(pairIDToggled(bool)));
+	connect(m_oplink->PairSelect4, SIGNAL(toggled(bool)), this, SLOT(pairIDToggled(bool)));
+
+	// Connect to the binding buttons.
+	connect(m_oplink->BindingAdd, SIGNAL(pressed()), this, SLOT(addBinding()));
+	connect(m_oplink->BindingRemove, SIGNAL(pressed()), this, SLOT(removeBinding()));
+	m_oplink->BindingAdd->setEnabled(false);
+	m_oplink->BindingRemove->setEnabled(false);
+
+	// Connect to changes to the bindings widgets.
+	connect(m_oplink->Bindings, SIGNAL(itemSelectionChanged()), this, SLOT(bindingsSelectionChanged()));
 
 	//Add scroll bar when necessary
 	QScrollArea *scroll = new QScrollArea;
@@ -131,7 +138,6 @@ void ConfigPipXtremeWidget::applySettings()
 		pairID = m_oplink->PairID3->text().toUInt(&okay, 16);
 	else if (m_oplink->PairSelect4->isChecked())
 		pairID = m_oplink->PairID4->text().toUInt(&okay, 16);
-	oplinkSettingsData.PairID = pairID;
 	oplinkSettings->setData(oplinkSettingsData);
 }
 
@@ -153,10 +159,8 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 		oplinkSettingsObj->requestUpdate();
 
 	// Get the current pairID
-	OPLinkSettings *oplinkSettings = OPLinkSettings::GetInstance(getObjectManager());
+	//OPLinkSettings *oplinkSettings = OPLinkSettings::GetInstance(getObjectManager());
 	quint32 pairID = 0;
-	if (oplinkSettings)
-		pairID = oplinkSettings->getPairID();
 
 	// Update the detected devices.
 	UAVObjectField* pairIdField = object->getField("PairIDs");
@@ -253,9 +257,6 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 		qDebug() << "PipXtremeGadgetWidget: Count not read DeviceID field.";
 	}
 
-	// Update the PairID field
-	m_oplink->PairID->setText(QString::number(pairID, 16).toUpper());
-
  	// Update the link state
  	UAVObjectField* linkField = object->getField("LinkState");
  	if (linkField) {
@@ -270,13 +271,16 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
   */
 void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
 {
-    Q_UNUSED(object);
+	Q_UNUSED(object);
 
-    if (!settingsUpdated)
-    {
-	    settingsUpdated = true;
-	    enableControls(true);
-    }
+	if (!settingsUpdated)
+	{
+		settingsUpdated = true;
+		enableControls(true);
+
+		// Refresh the list widget.
+		refreshBindingsList();
+	}
 }
 
 void ConfigPipXtremeWidget::disconnected()
@@ -288,52 +292,88 @@ void ConfigPipXtremeWidget::disconnected()
 	}
 }
 
-void ConfigPipXtremeWidget::pairIDToggled(bool checked, quint8 idx)
+void ConfigPipXtremeWidget::pairIDToggled(bool checked)
 {
-	if(checked)
-	{
-		OPLinkStatus *oplinkStatus = OPLinkStatus::GetInstance(getObjectManager());
-		OPLinkSettings *oplinkSettings = OPLinkSettings::GetInstance(getObjectManager());
+	bool enabled = (m_oplink->PairSelect1->isChecked() || m_oplink->PairSelect2->isChecked() || m_oplink->PairSelect3->isChecked() || m_oplink->PairSelect4->isChecked());
+	m_oplink->BindingAdd->setEnabled(enabled);
+}
 
-		if (oplinkStatus && oplinkSettings)
-		{
-			if (idx == 4)
-			{
-				oplinkSettings->setPairID(0);
-			}
-			else
-			{
-				quint32 pairID = oplinkStatus->getPairIDs(idx);
-				if (pairID)
-					oplinkSettings->setPairID(pairID);
-			}
-		}
+void ConfigPipXtremeWidget::bindingsSelectionChanged()
+{
+	bool enabled = (m_oplink->Bindings->selectedItems().size() > 0);
+	m_oplink->BindingRemove->setEnabled(enabled);
+}
+
+void ConfigPipXtremeWidget::refreshBindingsList()
+{
+	m_oplink->Bindings->clear();
+	for (quint32 slot = 0; slot < OPLinkSettings::BINDINGS_NUMELEM; ++slot)
+	{
+		quint32 id = oplinkSettingsObj->getBindings(slot);
+		if (id != 0)
+			m_oplink->Bindings->addItem(QString::number(id, 16).toUpper());
 	}
 }
 
-void ConfigPipXtremeWidget::pair1Toggled(bool checked)
+void ConfigPipXtremeWidget::addBinding()
 {
-	pairIDToggled(checked, 0);
+
+	// Get the pair ID out of the selection widget
+	quint32 pairID = 0;
+	bool okay;
+	if (m_oplink->PairSelect1->isChecked())
+		pairID = m_oplink->PairID1->text().toUInt(&okay, 16);
+	else if (m_oplink->PairSelect2->isChecked())
+		pairID = m_oplink->PairID2->text().toUInt(&okay, 16);
+	else if (m_oplink->PairSelect3->isChecked())
+		pairID = m_oplink->PairID3->text().toUInt(&okay, 16);
+	else if (m_oplink->PairSelect4->isChecked())
+		pairID = m_oplink->PairID4->text().toUInt(&okay, 16);
+
+	// Find a slot for this pair ID in the binding list.
+	quint32 slot = 0;
+	for ( ; slot < OPLinkSettings::BINDINGS_NUMELEM - 1; ++slot)
+	{
+		quint32 id = oplinkSettingsObj->getBindings(slot);
+
+		// Is this ID already in the list?
+		if (id == pairID)
+			return;
+
+		// Is this slot empty?
+		if (id == 0)
+			break;
+	}
+
+	// Store the ID in the first open slot (or the last slot if all are full).
+	oplinkSettingsObj->setBindings(slot, pairID);
+
+	// Refresh the list widget.
+	refreshBindingsList();
 }
 
-void ConfigPipXtremeWidget::pair2Toggled(bool checked)
+void ConfigPipXtremeWidget::removeBinding()
 {
-	pairIDToggled(checked, 1);
-}
+	// Get the selected rows from the bindings list widget.
+	QList<QListWidgetItem*> selected = m_oplink->Bindings->selectedItems();
 
-void ConfigPipXtremeWidget::pair3Toggled(bool checked)
-{
-	pairIDToggled(checked, 2);
-}
+	// Zero out the selected rows in the bindings list.
+	for (int i = 0; i < selected.size(); ++i)
+		oplinkSettingsObj->setBindings(m_oplink->Bindings->row(selected[i]), 0);
 
-void ConfigPipXtremeWidget::pair4Toggled(bool checked)
-{
-	pairIDToggled(checked, 3);
-}
-
-void ConfigPipXtremeWidget::pairBToggled(bool checked)
-{
-	pairIDToggled(checked, 4);
+	// Refresh the list widget and compact the bindings list.
+	m_oplink->Bindings->clear();
+	quint32 outSlot = 0;
+	for (quint32 slot = 0; slot < OPLinkSettings::BINDINGS_NUMELEM; ++slot)
+	{
+		quint32 id = oplinkSettingsObj->getBindings(slot);
+		if (id != 0) {
+			oplinkSettingsObj->setBindings(outSlot++, id);
+			m_oplink->Bindings->addItem(QString::number(id, 16).toUpper());
+		}
+	}
+	for ( ; outSlot < OPLinkSettings::BINDINGS_NUMELEM; ++outSlot)
+		oplinkSettingsObj->setBindings(outSlot, 0);
 }
 
 /**

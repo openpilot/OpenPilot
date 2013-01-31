@@ -659,6 +659,10 @@ struct pios_rfm22b_dev {
 	// The destination ID
 	uint32_t destination_id;
 
+	// The list of bound radios.
+	uint32_t bindings[OPLINKSETTINGS_BINDINGS_NUMELEM];
+	uint8_t cur_binding;
+
 	// Is this device a coordinator?
 	bool coordinator;
 

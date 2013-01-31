@@ -564,7 +564,6 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->spi_id = spi_id;
 
 	// Initialize our configuration parameters
-	rfm22b_dev->coordinator = false;
 	rfm22b_dev->send_ppm = false;
 	rfm22b_dev->datarate = RFM22B_DEFAULT_RX_DATARATE;
 
@@ -585,6 +584,11 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->stats.timeouts = 0;
 	rfm22b_dev->stats.link_quality = 0;
 	rfm22b_dev->stats.rssi = 0;
+
+	// Initialize the bindings.
+	for (uint32_t i = 0; i < OPLINKSETTINGS_BINDINGS_NUMELEM; ++i)
+		rfm22b_dev->bindings[i] = 0;
+	rfm22b_dev->coordinator = false;
 
 	// Create the event queue
 	rfm22b_dev->eventQueue = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(enum pios_rfm22b_event));
@@ -628,6 +632,16 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	xTaskCreate(PIOS_RFM22B_Task, (signed char *)"PIOS_RFM22B_Task", STACK_SIZE_BYTES, (void*)rfm22b_dev, TASK_PRIORITY, &(rfm22b_dev->taskHandle));
 
 	return(0);
+}
+
+/**
+ * Re-initialize the modem after a configuration change.
+ */
+void PIOS_RFM22B_Reinit(uint32_t rfm22b_id)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if (PIOS_RFM22B_validate(rfm22b_dev))
+		PIOS_RFM22B_InjectEvent(rfm22b_dev, RFM22B_EVENT_INITIALIZE, false);
 }
 
 /**
@@ -689,6 +703,20 @@ uint32_t PIOS_RFM22B_DeviceID(uint32_t rfm22b_id)
 }
 
 /**
+ * Returns true if the modem is configured as a coordinator.
+ * \param[in] rfm22b_id The RFM22B device index.
+ * \return True if the modem is configured as a coordinator.
+ */
+bool PIOS_RFM22B_IsCoordinator(uint32_t rfm22b_id)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if (PIOS_RFM22B_validate(rfm22b_dev))
+		return rfm22b_dev->coordinator;
+	else
+		return false;
+}
+
+/**
  * Sets the radio device transmit power.
  * \param[in] rfm22b_id The RFM22B device index.
  * \param[in] tx_pwr The transmit power.
@@ -718,40 +746,6 @@ void PIOS_RFM22B_SetFrequencyRange(uint32_t rfm22b_id, uint32_t min_frequency, u
 }
 
 /**
- * Sets the radio destination ID.
- * \param[in] rfm22b_id The RFM22B device index.
- * \param[in] dest_id The destination ID.
- */
-void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id)
-{
-	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if (!PIOS_RFM22B_validate(rfm22b_dev))
-		return;
-	rfm22b_dev->destination_id = (dest_id == 0) ? 0xffffffff : dest_id;
-	// The first slot is reserved for our current pairID
-	rfm22b_dev->pair_stats[0].pairID = dest_id;
-	rfm22b_dev->pair_stats[0].rssi = -127;
-	rfm22b_dev->pair_stats[0].afc_correction = 0;
-	rfm22b_dev->pair_stats[0].lastContact = 0;
-}
-
-/**
- * Configures the radio as a coordinator or not.
- * \param[in] rfm22b_id The RFM22B device index.
- * \param[in] coordinator Sets as coordinator if true.
- */
-void PIOS_RFM22B_SetCoordinator(uint32_t rfm22b_id, bool coordinator)
-{
-	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if (!PIOS_RFM22B_validate(rfm22b_dev))
-		return;
-	rfm22b_dev->coordinator = coordinator;
-
-	// Re-initialize the radio device.
-	PIOS_RFM22B_InjectEvent(rfm22b_dev, RFM22B_EVENT_INITIALIZE, false);
-}
-
-/**
  * Set the remote com port configuration parameters.
  * \param[in] rfm22b_id  The rfm22b device.
  * \param[in] com_port  The remote com port
@@ -777,6 +771,25 @@ void PIOS_RFM22B_SetComConfigCallback(uint32_t rfm22b_id, PIOS_RFM22B_ComConfigC
 	if(!PIOS_RFM22B_validate(rfm22b_dev))
 		return;
 	rfm22b_dev->com_config_cb = cb;
+}
+
+/**
+ * Set the list of modems that this modem will bind with.
+ * \param[in] rfm22b_id  The rfm22b device.
+ * \param[in] bindings  The array of bindings.
+ */
+void PIOS_RFM22B_SetBindings(uint32_t rfm22b_id, const uint32_t bindings[])
+{
+ 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if(!PIOS_RFM22B_validate(rfm22b_dev))
+		return;
+	// This modem will be considered a coordinator if any bindings have been set.
+	rfm22b_dev->coordinator = false;
+	for (uint32_t i = 0; i < OPLINKSETTINGS_BINDINGS_NUMELEM; ++i)
+	{
+		rfm22b_dev->bindings[i] = bindings[i];
+		rfm22b_dev->coordinator |= (rfm22b_dev->bindings[i] != 0);
+	}
 }
 
 /**
@@ -1029,9 +1042,6 @@ void PIOS_RFM22B_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, 
 	if(!PIOS_RFM22B_validate(rfm22b_dev))
 		return;
 	rfm22b_dev->datarate = datarate;
-
-	// Re-initialize the radio device.
-	PIOS_RFM22B_InjectEvent(rfm22b_dev, RFM22B_EVENT_INITIALIZE, false);
 }
 
 // ************************************
@@ -1477,8 +1487,8 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 
 static void rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 {
-	// Only send status if we're connected
-	if (rfm22b_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED)
+	// Don't send status if we're the coordinator.
+	if (rfm22b_dev->coordinator)
 		return;
 
 	// Update the link quality metric.
@@ -1991,6 +2001,18 @@ static enum pios_rfm22b_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_d
 	// Resend the previous TX packet.
 	rfm22b_dev->tx_packet = rfm22b_dev->prev_tx_packet;
 	rfm22b_dev->prev_tx_packet = NULL;
+
+	// Go to the next binding, if the previous tx packet was a connection request
+	if (rfm22b_dev->tx_packet->header.type == PACKET_TYPE_CON_REQUEST)
+	{
+		// Increment the current binding index, and make sure that we didn't run off the end of the buffer, or past the last nonzero ID
+		if ((++(rfm22b_dev->cur_binding) >= OPLINKSETTINGS_BINDINGS_NUMELEM) || (rfm22b_dev->bindings[rfm22b_dev->cur_binding] == 0))
+			rfm22b_dev->cur_binding = 0;
+		rfm22b_dev->destination_id = rfm22b_dev->bindings[rfm22b_dev->cur_binding];
+		rfm22b_dev->tx_packet->header.destination_id = rfm22b_dev->destination_id;
+	}
+
+	// Increment the reset packet counter if we're connected.
 	if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED)
 		rfm22b_add_rx_status(rfm22b_dev, RFM22B_RESENT_TX_PACKET);
 	rfm22b_dev->time_to_send = true;
@@ -2007,8 +2029,9 @@ static enum pios_rfm22b_event rfm22_receiveStatus(struct pios_rfm22b_dev *rfm22b
 	int8_t rssi = rfm22b_dev->rssi_dBm;
 	int8_t afc = rfm22b_dev->afc_correction_Hz;
 	uint32_t id = status->header.source_id;
-	bool found = false;
+
 	// Have we seen this device recently?
+	bool found = false;
 	uint8_t id_idx = 0;
 	for ( ; id_idx < OPLINKSTATUS_PAIRIDS_NUMELEM; ++id_idx)
 		if(rfm22b_dev->pair_stats[id_idx].pairID == id)
@@ -2026,19 +2049,16 @@ static enum pios_rfm22b_event rfm22_receiveStatus(struct pios_rfm22b_dev *rfm22b
 	}
 
 	// If we haven't seen it, find a slot to put it in.
-	if (!found)
+	else
 	{
 		uint8_t min_idx = 0;
-		if(id != rfm22b_dev->destination_id)
+		int8_t min_rssi = rfm22b_dev->pair_stats[0].rssi;
+		for (id_idx = 1; id_idx < OPLINKSTATUS_PAIRIDS_NUMELEM; ++id_idx)
 		{
-			int8_t min_rssi = rfm22b_dev->pair_stats[0].rssi;
-			for (id_idx = 1; id_idx < OPLINKSTATUS_PAIRIDS_NUMELEM; ++id_idx)
+			if(rfm22b_dev->pair_stats[id_idx].rssi < min_rssi)
 			{
-				if(rfm22b_dev->pair_stats[id_idx].rssi < min_rssi)
-				{
-					min_rssi = rfm22b_dev->pair_stats[id_idx].rssi;
-					min_idx = id_idx;
-				}
+				min_rssi = rfm22b_dev->pair_stats[id_idx].rssi;
+				min_idx = id_idx;
 			}
 		}
 		rfm22b_dev->pair_stats[min_idx].pairID = id;
@@ -2066,6 +2086,7 @@ static enum pios_rfm22b_event rfm22_requestConnection(struct pios_rfm22b_dev *rf
 	rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTING;
 
 	// Fill in the connection request
+	rfm22b_dev->destination_id = rfm22b_dev->bindings[rfm22b_dev->cur_binding];
 	cph->header.destination_id = rfm22b_dev->destination_id;
 	cph->header.type = PACKET_TYPE_CON_REQUEST;
 	cph->header.data_size = PH_CONNECTION_DATA_SIZE(&(rfm22b_dev->con_packet));
@@ -2110,7 +2131,7 @@ static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm
 	memcpy((uint8_t*)lcph, (uint8_t*)cph, PH_PACKET_SIZE((PHPacketHandle)cph));
 
 	// Set the destination ID to the source of the connection request message.
-	PIOS_RFM22B_SetDestinationId((uint32_t)rfm22b_dev, cph->header.source_id);
+	rfm22b_dev->destination_id = cph->header.source_id;
 
 	return RFM22B_EVENT_CONNECTION_ACCEPTED;
 }

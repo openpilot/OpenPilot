@@ -971,7 +971,7 @@
     <message>
         <location line="+3"/>
         <source>Resolved</source>
-        <translatorcomment>[Platypus]Féminin peut-être ?</translatorcomment>
+        <translatorcomment>[Platypus]Féminin peut-être ? [soh]Concerne les plugins &gt; masculin</translatorcomment>
         <translation>Résolu</translation>
     </message>
     <message>
@@ -982,7 +982,7 @@
     <message>
         <location line="+3"/>
         <source>Loaded</source>
-        <translatorcomment>[Platypus]Féminin peut-être ?</translatorcomment>
+        <translatorcomment>[Platypus]Féminin peut-être ? [soh]Concerne les plugins &gt; masculin</translatorcomment>
         <translation>Chargé</translation>
     </message>
     <message>
@@ -993,7 +993,7 @@
     <message>
         <location line="+3"/>
         <source>Initialized</source>
-        <translatorcomment>[Platypus]Féminin peut-être ?</translatorcomment>
+        <translatorcomment>[Platypus]Féminin peut-être ? [soh]Concerne les plugins &gt; masculin</translatorcomment>
         <translation>Initialisé</translation>
     </message>
     <message>
@@ -1075,7 +1075,7 @@ Raison : %3</translation>
         <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+274"/>
         <source>MainWindow</source>
-        <translation type="unfinished">FenêtrePrincipale</translation>
+        <translation type="unfinished">Fenêtre Principale</translation>
     </message>
     <message>
         <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
@@ -1096,7 +1096,8 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Choose Path</source>
-        <translation type="unfinished">Sélectionnez un empplacement</translation>
+        <translatorcomment>Bouton dans formulaire &gt; taille. Par certain que ce soit utiisé par Gcs : form. QT</translatorcomment>
+        <translation type="unfinished">Chemin</translation>
     </message>
     <message>
         <location/>

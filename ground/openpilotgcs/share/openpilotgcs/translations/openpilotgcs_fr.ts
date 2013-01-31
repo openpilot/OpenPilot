@@ -133,7 +133,7 @@
     <message>
         <location line="+11"/>
         <source>&amp;Tools</source>
-        <translation type="unfinished">O&amp;utils</translation>
+        <translation>O&amp;utils</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -190,7 +190,7 @@
         <location line="+5"/>
         <location line="+4"/>
         <source>&amp;Redo</source>
-        <translation type="unfinished">Réta&amp;blir</translation>
+        <translation>Réta&amp;blir</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -220,7 +220,7 @@
     <message>
         <location line="+11"/>
         <source>Minimize</source>
-        <translation type="unfinished">Réduire</translation>
+        <translation>Réduire</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -261,7 +261,7 @@
     <message>
         <location line="+2"/>
         <source>%1+Down</source>
-        <translation type="unfinished">%1+Fl^che du bas</translation>
+        <translation type="unfinished">%1+Flèche du bas</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -271,7 +271,7 @@
     <message>
         <location line="+2"/>
         <source>%1+Right</source>
-        <translation type="unfinished">%1+Flêche du haut</translation>
+        <translation type="unfinished">%1+Flèche du haut</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -296,7 +296,7 @@
     <message>
         <location line="+3"/>
         <source>Goto Next View</source>
-        <translation type="unfinished">Aller à laVue Suivante</translation>
+        <translation type="unfinished">Aller à la Vue Suivante</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -383,7 +383,7 @@
         <location line="+157"/>
         <source>Import Keyboard Mapping Scheme</source>
         <translatorcomment>[Platypus]Je pense qu&apos;il y a meilleure traduction pour mapping</translatorcomment>
-        <translation type="unfinished">Importer le mapping clavier</translation>
+        <translation type="unfinished">Importer le Mapping Clavier</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -420,7 +420,7 @@
     <message>
         <location line="+27"/>
         <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: %2&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
-        <translation type="unfinished">&lt;h3&gt;Station de Contrôle au Sol OpenPilot(GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la license GNU General Public License publiée par&lt;br/&gt;the Free Software Foundation; soit à la version 3 de la License, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans GARANTIE DE QUELCONQUE TYPE, COMPRENANT LA GRARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
+        <translation type="unfinished">&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la license GNU General Public License publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la License, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans GARANTIE DE QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>

@@ -206,10 +206,10 @@ static void actuatorTask(void* parameters)
 
 		// Check how long since last update
 		thisSysTime = xTaskGetTickCount();
-        // reuse dt in case of wraparound
-        // todo (theothercliff thinks this might be needed):
-        //  if dT actually matters...
-        //  fix it to know max value and subtract for currently correct dT on wrap
+		// reuse dt in case of wraparound
+		// todo:
+		//  if dT actually matters...
+		//  fix it to know max value and subtract for currently correct dT on wrap
 		if(thisSysTime > lastSysTime)
 			dT = (thisSysTime - lastSysTime) * (portTICK_RATE_MS * 0.001f);
 		lastSysTime = thisSysTime;

@@ -47,7 +47,7 @@ GCSSplashScreen::GCSSplashScreen() :
     year = "2013";
 #endif
 
-    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+    setWindowFlags(windowFlags());
     m_pixmap = new QPixmap(":/app/splash.png");
 
     m_painter = new QPainter(m_pixmap);

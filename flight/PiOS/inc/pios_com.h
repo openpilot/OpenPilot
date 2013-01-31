@@ -43,6 +43,7 @@ struct pios_com_driver {
 	void (*rx_start)(uint32_t id, uint16_t rx_bytes_avail);
 	void (*bind_rx_cb)(uint32_t id, pios_com_callback rx_in_cb, uint32_t context);
 	void (*bind_tx_cb)(uint32_t id, pios_com_callback tx_out_cb, uint32_t context);
+	bool (*available)(uint32_t id);
 };
 
 /* Public Functions */
@@ -56,6 +57,7 @@ extern int32_t PIOS_COM_SendString(uint32_t com_id, const char *str);
 extern int32_t PIOS_COM_SendFormattedStringNonBlocking(uint32_t com_id, const char *format, ...);
 extern int32_t PIOS_COM_SendFormattedString(uint32_t com_id, const char *format, ...);
 extern uint16_t PIOS_COM_ReceiveBuffer(uint32_t com_id, uint8_t * buf, uint16_t buf_len, uint32_t timeout_ms);
+extern bool PIOS_COM_Available(uint32_t com_id);
 
 #endif /* PIOS_COM_H */
 

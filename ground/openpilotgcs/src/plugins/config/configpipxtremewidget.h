@@ -43,13 +43,13 @@ public slots:
 	void updateSettings(UAVObject *object1);
 
 private:
-	Ui_PipXtremeWidget *m_pipx;
+	Ui_PipXtremeWidget *m_oplink;
 
-	// The PipXtreme status UAVObject
-	UAVDataObject* pipxStatusObj;
+	// The OPLink status UAVObject
+	UAVDataObject* oplinkStatusObj;
 
-	// The PipXtreme ssettins UAVObject
-	UAVDataObject* pipxSettingsObj;
+	// The OPLink ssettins UAVObject
+	UAVDataObject* oplinkSettingsObj;
 
 	bool settingsUpdated;
 

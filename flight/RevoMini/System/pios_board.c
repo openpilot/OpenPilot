@@ -219,6 +219,9 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #define PIOS_COM_BRIDGE_RX_BUF_LEN 65
 #define PIOS_COM_BRIDGE_TX_BUF_LEN 12
 
+#define PIOS_COM_RFM22B_RF_RX_BUF_LEN 512
+#define PIOS_COM_RFM22B_RF_TX_BUF_LEN 512
+
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
 #define PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN 40
 uint32_t pios_com_debug_id;
@@ -229,6 +232,9 @@ uint32_t pios_com_telem_usb_id = 0;
 uint32_t pios_com_telem_rf_id = 0;
 uint32_t pios_com_bridge_id = 0;
 uint32_t pios_com_overo_id = 0;
+#if defined(PIOS_INCLUDE_RFM22B)
+uint32_t pios_rfm22b_id = 0;
+#endif
 
 /* 
  * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
@@ -522,7 +528,7 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_RM_MAINPORT_DEBUGCONSOLE:
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
 			{
-				PIOS_Board_configure_com(&pios_usart_main_cfg, 0, PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
+				PIOS_Board_configure_com(&pios_usart_main_cfg, 0, PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_debug_id);
 			}
 #endif	/* PIOS_INCLUDE_DEBUG_CONSOLE */
 			break;
@@ -585,16 +591,53 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_RM_FLEXIPORT_DEBUGCONSOLE:
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
 			{
-				PIOS_Board_configure_com(&pios_usart_flexi_cfg, 0, PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_aux_id);
+				PIOS_Board_configure_com(&pios_usart_main_cfg, 0, PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_debug_id);
 			}
 #endif	/* PIOS_INCLUDE_DEBUG_CONSOLE */
 			break;
 		case HWSETTINGS_RM_FLEXIPORT_COMBRIDGE:
 			PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
 			break;
-	} /* hwsettings_rm_flexiport */
-	
-	
+	} /* hwsettings_rv_flexiport */
+
+	/* Initalize the RFM22B radio COM device. */
+#if defined(PIOS_INCLUDE_RFM22B)
+	uint8_t hwsettings_radioport;
+	HwSettingsRadioPortGet(&hwsettings_radioport);
+	switch (hwsettings_radioport) {
+		case HWSETTINGS_RADIOPORT_DISABLED:
+			break;
+		case HWSETTINGS_RADIOPORT_TELEMETRY:
+		{
+			extern const struct pios_rfm22b_cfg * PIOS_BOARD_HW_DEFS_GetRfm22Cfg (uint32_t board_revision);
+			const struct pios_board_info * bdinfo = &pios_board_info_blob;
+			const struct pios_rfm22b_cfg *pios_rfm22b_cfg = PIOS_BOARD_HW_DEFS_GetRfm22Cfg(bdinfo->board_rev);
+			if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg->slave_num, pios_rfm22b_cfg)) {
+				PIOS_Assert(0);
+			}
+#ifdef PIOS_INCLUDE_RFM22B_COM
+			uint8_t *rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
+			uint8_t *tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_rfm22b_com_driver, pios_rfm22b_id,
+					  rx_buffer, PIOS_COM_RFM22B_RF_RX_BUF_LEN,
+					  tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN))
+				PIOS_Assert(0);
+#endif
+#ifdef PIOS_INCLUDE_RFM22B_RCVR
+			if (PIOS_RFM22B_RCVR_Init(pios_rfm22b_id) != 0)
+				PIOS_Assert(0);
+			uint32_t pios_rfm22b_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_rfm22b_rcvr_id, &pios_rfm22b_rcvr_driver, pios_rfm22b_id))
+				PIOS_Assert(0);
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_OPLINK] = pios_rfm22b_rcvr_id;
+#endif
+			break;
+		}
+	}
+#endif /* PIOS_INCLUDE_RFM22B */
+
 	/* Configure the receiver port*/
 	uint8_t hwsettings_rcvrport;
 	HwSettingsRM_RcvrPortGet(&hwsettings_rcvrport);

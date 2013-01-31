@@ -399,9 +399,6 @@ static uint8_t PIOS_USBHOOK_CLASS_EP0_RxReady(__attribute__((unused)) void *pdev
 
 static uint8_t PIOS_USBHOOK_CLASS_DataIn(void *pdev, uint8_t epnum)
 {
-	/* Make sure the previous transfer has completed before starting a new one */
-	DCD_EP_Flush(pdev, epnum);	/* NOT SURE IF THIS IS REQUIRED */
-
 	/* Remove the direction bit so we can use this as an index */
 	uint8_t epnum_idx = epnum & 0x7F;
 

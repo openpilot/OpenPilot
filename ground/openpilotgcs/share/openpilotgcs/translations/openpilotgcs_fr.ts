@@ -664,7 +664,8 @@
     <message>
         <location filename="../../../src/libs/utils/pathchooser.cpp" line="+48"/>
         <source>Choose...</source>
-        <translation>Choisir...</translation>
+        <translatorcomment>[Platypus]On utilise plus sélectionner en français je crois</translatorcomment>
+        <translation type="unfinished">Sélectionner...</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -674,6 +675,7 @@
     <message>
         <location line="+126"/>
         <source>Choose a directory</source>
+        <translatorcomment>[Platypus]Comme là en fait</translatorcomment>
         <translation>Sélectionner un répertoire</translation>
     </message>
     <message>
@@ -684,7 +686,7 @@
     <message>
         <location line="+33"/>
         <source>The path must not be empty.</source>
-        <translation>Le chemin ne peut pas être vide.</translation>
+        <translation type="unfinished">Le chemin ne doit pas être vide.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -727,7 +729,7 @@
     <message>
         <location line="+1"/>
         <source>Clear</source>
-        <translation>Effacer tout</translation>
+        <translation type="unfinished">Effacer</translation>
     </message>
     <message>
         <location line="+130"/>
@@ -765,7 +767,7 @@
     <message>
         <location line="+4"/>
         <source>A file with that name already exists.</source>
-        <translation>Un fichier existe déjà avec ce nom.</translation>
+        <translation type="unfinished">Ce nom de fichier existe déjà.</translation>
     </message>
 </context>
 <context>
@@ -773,7 +775,7 @@
     <message>
         <location filename="../../../src/libs/utils/projectnamevalidatinglineedit.cpp" line="+49"/>
         <source>The name must not contain the &apos;.&apos;-character.</source>
-        <translation>Le nom ne peut pas contenir le caractère &apos;.&apos;.</translation>
+        <translation type="unfinished">Le nom ne doit pas contenir le caractère &apos;.&apos;.</translation>
     </message>
 </context>
 <context>
@@ -781,7 +783,7 @@
     <message>
         <location filename="../../../src/libs/utils/submiteditorwidget.ui"/>
         <source>Subversion Submit</source>
-        <translation>Submit Subversion</translation>
+        <translation type="unfinished">Soumettre la Subversion</translation>
     </message>
     <message>
         <location/>
@@ -799,7 +801,7 @@
     <message>
         <location filename="../../../src/libs/utils/filewizardpage.ui"/>
         <source>Choose the location</source>
-        <translation>Choisir l&apos;emplacement</translation>
+        <translation type="unfinished">Sélectionner l&apos;emplacement</translation>
     </message>
     <message>
         <location/>
@@ -817,12 +819,13 @@
     <message>
         <location filename="../../../src/libs/utils/reloadpromptutils.cpp" line="+41"/>
         <source>File Changed</source>
-        <translation>Fichier modifié</translation>
+        <translation type="unfinished">Fichier Modifié</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>The unsaved file %1 has been changed outside Qt Creator. Do you want to reload it and discard your changes?</source>
-        <translation>Le fichier %1 n&apos;est pas enregistré et a été modifé en dehors de Qt Creator. Voulez-vous le recharger et ignorer vos changements ?</translation>
+        <translatorcomment>[Platypus]Recharger -&gt; ouvrir cette version ?</translatorcomment>
+        <translation type="unfinished">Le fichier %1 n&apos;est pas enregistré et a été modifé en dehors de Qt Creator. Voulez-vous le charger à nouveau et ignorer vos changements ?</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -865,13 +868,13 @@
     <message>
         <location/>
         <source>Copyright:</source>
-        <translatorcomment>Droit d&apos;auteur ?</translatorcomment>
+        <translatorcomment>Droit d&apos;auteur ? [Platypus]oui pour moi même si peu utilisé</translatorcomment>
         <translation>Copyright :</translation>
     </message>
     <message>
         <location/>
         <source>License:</source>
-        <translation>Licence :</translation>
+        <translation type="unfinished">License :</translation>
     </message>
     <message>
         <location/>
@@ -912,7 +915,7 @@
     <message>
         <location line="+16"/>
         <source>Error parsing file %1: %2, at line %3, column %4</source>
-        <translation>Erreur pendant l&apos;analyse du fichier %1 : %2, ligne %3, colonne %4</translation>
+        <translation type="unfinished">Erreur pendant l&apos;analyse du fichier %1 : %2, à la ligne %3, et la colonne %4</translation>
     </message>
 </context>
 <context>
@@ -953,7 +956,7 @@
     <message>
         <location line="+1"/>
         <source>Description file found, but error on read</source>
-        <translation>Fichier de description trouvé, mais erreur de lecture</translation>
+        <translation type="unfinished">Fichier de description trouvé, mais il y a des erreurs à la lecture</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -968,6 +971,7 @@
     <message>
         <location line="+3"/>
         <source>Resolved</source>
+        <translatorcomment>[Platypus]Féminin peut-être ?</translatorcomment>
         <translation>Résolu</translation>
     </message>
     <message>
@@ -978,6 +982,7 @@
     <message>
         <location line="+3"/>
         <source>Loaded</source>
+        <translatorcomment>[Platypus]Féminin peut-être ?</translatorcomment>
         <translation>Chargé</translation>
     </message>
     <message>
@@ -988,12 +993,13 @@
     <message>
         <location line="+3"/>
         <source>Initialized</source>
+        <translatorcomment>[Platypus]Féminin peut-être ?</translatorcomment>
         <translation>Initialisé</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Plugin&apos;s initialization method succeeded</source>
-        <translation>Méthode d&apos;initialisation du plugin réussie</translation>
+        <translation type="unfinished">Méthode d&apos;initialisation du module complémentaire réussie</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1003,7 +1009,7 @@
     <message>
         <location line="+1"/>
         <source>Plugin successfully loaded and running</source>
-        <translation>Plugin correctement chargé et démarré</translation>
+        <translation type="unfinished">Module complémentaire correctement chargé et démarré</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1013,7 +1019,7 @@
     <message>
         <location line="+1"/>
         <source>Plugin was shut down</source>
-        <translation>Plugin arrêté</translation>
+        <translation type="unfinished">Module complémentaire arrêté</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1023,7 +1029,8 @@
     <message>
         <location line="+1"/>
         <source>Plugin ended its life cycle and was deleted</source>
-        <translation>Le plugin a terminé son cycle de vie et a été supprimé</translation>
+        <translatorcomment>[Platypus]Je pense qu&apos;il existe une meilleur traduction de cycle de vie</translatorcomment>
+        <translation type="unfinished">Le module complémentaire a terminé son cycle de vie et a été supprimé</translation>
     </message>
 </context>
 <context>
@@ -1032,7 +1039,7 @@
         <location filename="../../../src/libs/extensionsystem/pluginmanager.cpp" line="+619"/>
         <source>Circular dependency detected:
 </source>
-        <translation>Dépendance circulaire détecté :
+        <translation type="unfinished">Dépendance circulaire détectée :
 </translation>
     </message>
     <message>
@@ -1050,15 +1057,15 @@
     <message>
         <location line="+8"/>
         <source>Cannot load plugin because dependencies are not resolved</source>
-        <translation>Impossible de charger le plugin car les dépendances ne sont pas résolues</translation>
+        <translation type="unfinished">Impossible de charger le module complémentaire car les dépendances ne sont pas résolues</translation>
     </message>
     <message>
         <location line="+8"/>
         <location line="+29"/>
         <source>Cannot load plugin because dependency failed to load: %1(%2)
 Reason: %3</source>
-        <translation>Impossible de charger le plugin car une des dépendances n&apos;a pas pu être chargé : %1(%2)
-Raison : %3</translation>
+        <translation type="unfinished">Impossible de charger le module complémentaire car une des dépendances n&apos;a pas pu être chargée : %1(%2)
+Raison : %3</translation>
     </message>
 </context>
 <context>
@@ -1068,27 +1075,28 @@ Raison : %3</translation>
         <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+274"/>
         <source>MainWindow</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">FenêtrePrincipale</translation>
     </message>
     <message>
         <location filename="../../../src/experimental/tools/DocumentationHelper/mainwindow.ui"/>
         <source>Go</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>[Platypus]Féminin peut-être ?</translatorcomment>
+        <translation type="unfinished">Y aller</translation>
     </message>
     <message>
         <location/>
         <source>Current File:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Fichier en cours :</translation>
     </message>
     <message>
         <location/>
         <source>Current Path:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Emplacement en cours :</translation>
     </message>
     <message>
         <location/>
         <source>Choose Path</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sélectionnez un empplacement</translation>
     </message>
     <message>
         <location/>

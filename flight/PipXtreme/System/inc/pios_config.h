@@ -62,6 +62,9 @@
 #define PIOS_INCLUDE_BL_HELPER
 #define PIOS_INCLUDE_FLASH_EEPROM
 
+#define PIOS_INCLUDE_I2C
+#define PIOS_INCLUDE_SSD1308
+
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"
 #define STARTUP_LOG_ENABLED		1

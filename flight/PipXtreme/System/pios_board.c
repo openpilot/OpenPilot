@@ -249,9 +249,25 @@ void PIOS_Board_Init(void) {
 		}
 		break;
 	}
+	case PIPXSETTINGS_TELEMETRYCONFIG_PPM_IN:
+#if defined(PIOS_INCLUDE_PPM)
+	{
+			uint32_t pios_ppm_id;
+			PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg2);
+
+			if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
+				PIOS_Assert(0);
+			}
+		}
+#endif	/* PIOS_INCLUDE_PPM */
 	case PIPXSETTINGS_TELEMETRYCONFIG_DISABLED:
 		break;
 	}
+
+
+#if defined(PIOS_INCLUDE_SSD1308)//force i2c//crappy, to be changed...
+pipxSettings.FlexiConfig=PIPXSETTINGS_FLEXICONFIG_I2C;
+#endif
 
 	/* Configure USART3 */
 	switch (pipxSettings.FlexiConfig)
@@ -291,6 +307,15 @@ void PIOS_Board_Init(void) {
 		}
 		break;
 	}
+	case PIPXSETTINGS_FLEXICONFIG_I2C:
+	#if defined(PIOS_INCLUDE_I2C)
+		{
+			if (PIOS_I2C_Init(&pios_i2c_flexi_adapter_id, &pios_i2c_flexi_adapter_cfg)) {
+				PIOS_Assert(0);
+			}
+		}
+	#endif	/* PIOS_INCLUDE_I2C */
+		break;
 	case PIPXSETTINGS_FLEXICONFIG_PPM_IN:
 #if defined(PIOS_INCLUDE_PPM)
 	{

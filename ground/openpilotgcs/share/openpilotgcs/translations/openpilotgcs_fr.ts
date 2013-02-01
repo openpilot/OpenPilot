@@ -1101,12 +1101,12 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Created #IF statements</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Créer #IF statements</translation>
     </message>
     <message>
         <location/>
         <source>Create NameSpace</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Créer un NomEspace</translation>
     </message>
     <message>
         <location/>

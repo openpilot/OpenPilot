@@ -200,8 +200,7 @@ void PIOS_Board_Init(void) {
 #endif
 
 	/* Configure PPM input */
-	switch (oplinkSettings.PPM)
-	{
+	switch (oplinkSettings.PPM)	{
 #if defined(PIOS_INCLUDE_PPM)
 	case OPLINKSETTINGS_PPM_INPUT:
 	{

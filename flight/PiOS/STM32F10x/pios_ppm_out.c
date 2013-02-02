@@ -128,72 +128,65 @@ int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg * 
 		return -1;
 
 	// Configure the channels to be in output compare mode
-	{
-		const struct pios_tim_channel *chan = cfg->channel;
+	const struct pios_tim_channel *chan = cfg->channel;
 
-		/* Set up for output compare function */
-		switch(chan->timer_chan) {
-		case TIM_Channel_1:
-			TIM_OC1Init(chan->timer, &cfg->tim_oc_init);
-			TIM_OC1PreloadConfig(chan->timer, TIM_OCPreload_Enable);
-			break;
-		case TIM_Channel_2:
-			TIM_OC2Init(chan->timer, &cfg->tim_oc_init);
-			TIM_OC2PreloadConfig(chan->timer, TIM_OCPreload_Enable);
-			break;
-		case TIM_Channel_3:
-			TIM_OC3Init(chan->timer, &cfg->tim_oc_init);
-			TIM_OC3PreloadConfig(chan->timer, TIM_OCPreload_Enable);
-			break;
-		case TIM_Channel_4:
-			TIM_OC4Init(chan->timer, &cfg->tim_oc_init);
-			TIM_OC4PreloadConfig(chan->timer, TIM_OCPreload_Enable);
-			break;
-		}
-		switch (chan->timer_chan) {
-		case TIM_Channel_1:
-			TIM_ITConfig(chan->timer, TIM_IT_CC1 | TIM_IT_Update, ENABLE);
-			break;
-		case TIM_Channel_2:
-			TIM_ITConfig(chan->timer, TIM_IT_CC2 | TIM_IT_Update, ENABLE);
-			break;
-		case TIM_Channel_3:
-			TIM_ITConfig(chan->timer, TIM_IT_CC3 | TIM_IT_Update, ENABLE);
-			break;
-		case TIM_Channel_4:
-			TIM_ITConfig(chan->timer, TIM_IT_CC4 | TIM_IT_Update, ENABLE);
-			break;
-		}
-
-		TIM_ARRPreloadConfig(chan->timer, ENABLE);
-		TIM_CtrlPWMOutputs(chan->timer, ENABLE);
-		TIM_Cmd(chan->timer, ENABLE);
+	/* Set up for output compare function */
+	switch(chan->timer_chan) {
+	case TIM_Channel_1:
+		TIM_OC1Init(chan->timer, &cfg->tim_oc_init);
+		TIM_OC1PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+		break;
+	case TIM_Channel_2:
+		TIM_OC2Init(chan->timer, &cfg->tim_oc_init);
+		TIM_OC2PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+		break;
+	case TIM_Channel_3:
+		TIM_OC3Init(chan->timer, &cfg->tim_oc_init);
+		TIM_OC3PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+		break;
+	case TIM_Channel_4:
+		TIM_OC4Init(chan->timer, &cfg->tim_oc_init);
+		TIM_OC4PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+		break;
 	}
+	switch (chan->timer_chan) {
+	case TIM_Channel_1:
+		TIM_ITConfig(chan->timer, TIM_IT_CC1 | TIM_IT_Update, ENABLE);
+		break;
+	case TIM_Channel_2:
+		TIM_ITConfig(chan->timer, TIM_IT_CC2 | TIM_IT_Update, ENABLE);
+		break;
+	case TIM_Channel_3:
+		TIM_ITConfig(chan->timer, TIM_IT_CC3 | TIM_IT_Update, ENABLE);
+		break;
+	case TIM_Channel_4:
+		TIM_ITConfig(chan->timer, TIM_IT_CC4 | TIM_IT_Update, ENABLE);
+		break;
+	}
+
+	TIM_ARRPreloadConfig(chan->timer, ENABLE);
+	TIM_CtrlPWMOutputs(chan->timer, ENABLE);
+	TIM_Cmd(chan->timer, ENABLE);
 
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
 	TIM_TimeBaseStructure.TIM_Period = ((1000000 / 100) - 1);
-	const struct pios_tim_channel * chan = cfg->channel;
 	TIM_TimeBaseInit(chan->timer, &TIM_TimeBaseStructure);
-
-	{
-		const struct pios_tim_channel * chan = cfg->channel;
-		switch(chan->timer_chan) {
-		case TIM_Channel_1:
-			TIM_SetCompare1(chan->timer, ppm_dev->triggering_period);
-			break;
-		case TIM_Channel_2:
-			TIM_SetCompare2(chan->timer, ppm_dev->triggering_period);
-			break;
-		case TIM_Channel_3:
-			TIM_SetCompare3(chan->timer, ppm_dev->triggering_period);
-			break;
-		case TIM_Channel_4:
-			TIM_SetCompare4(chan->timer, ppm_dev->triggering_period);
-			break;
-		}
+	switch(chan->timer_chan) {
+	case TIM_Channel_1:
+		TIM_SetCompare1(chan->timer, ppm_dev->triggering_period);
+		break;
+	case TIM_Channel_2:
+		TIM_SetCompare2(chan->timer, ppm_dev->triggering_period);
+		break;
+	case TIM_Channel_3:
+		TIM_SetCompare3(chan->timer, ppm_dev->triggering_period);
+		break;
+	case TIM_Channel_4:
+		TIM_SetCompare4(chan->timer, ppm_dev->triggering_period);
+		break;
 	}
 	return 0;
 }
@@ -222,8 +215,7 @@ static void PIOS_PPM_OUT_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t
 
 	// Finish out the frame if we reached the last channel.
 	uint32_t pulse_width;
-	if ((ppm_dev->NumChannelCounter >= PIOS_PPM_OUT_MAX_CHANNELS))
-	{
+	if ((ppm_dev->NumChannelCounter >= PIOS_PPM_OUT_MAX_CHANNELS)) {
 		pulse_width = PIOS_PPM_OUT_FRAME_PERIOD_US - ppm_dev->ChannelSum;
 		ppm_dev->NumChannelCounter = 0;
 		ppm_dev->ChannelSum = 0;

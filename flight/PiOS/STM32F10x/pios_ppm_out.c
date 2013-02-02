@@ -219,8 +219,7 @@ static void PIOS_PPM_OUT_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t
 		pulse_width = PIOS_PPM_OUT_FRAME_PERIOD_US - ppm_dev->ChannelSum;
 		ppm_dev->NumChannelCounter = 0;
 		ppm_dev->ChannelSum = 0;
-	}
-	else
+	} else
 		ppm_dev->ChannelSum += (pulse_width = ppm_dev->ChannelValue[ppm_dev->NumChannelCounter++]);
 
 	// Initiate the pulse

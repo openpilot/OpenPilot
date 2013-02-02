@@ -445,7 +445,7 @@ dfuutil_clean:
 # see http://developer.android.com/sdk/ for latest versions
 ANDROID_SDK_DIR := $(TOOLS_DIR)/android-sdk-linux
 .PHONY: android_sdk_install
-android_sdk_install: ANDROID_SDK_URL  := http://dl.google.com/android/android-sdk_r20.0.3-linux.tgz
+android_sdk_install: ANDROID_SDK_URL  := http://dl.google.com/android/android-sdk_r21.0.1-linux.tgz
 android_sdk_install: ANDROID_SDK_FILE := $(notdir $(ANDROID_SDK_URL))
 # order-only prereq on directory existance:
 android_sdk_install: | $(DL_DIR) $(TOOLS_DIR)

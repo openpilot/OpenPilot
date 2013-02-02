@@ -35,7 +35,7 @@
 #include <coreplugin/modemanager.h>
 
 ConfigGadgetFactory::ConfigGadgetFactory(QObject *parent) :
-    IUAVGadgetFactory(QString("ConfigGadget"), tr("Config Gadget"), parent),
+    IUAVGadgetFactory(QString("ConfigGadget"), tr("Config"), parent),
     gadgetWidget(0)
 {
 }
@@ -69,14 +69,16 @@ Core::IUAVGadget* ConfigGadgetFactory::createGadget(QWidget *parent)
     return new ConfigGadget(QString("ConfigGadget"), gadgetWidget, parent);
 }
 
+// TODO should be removed as ConfigGadgetConfiguration is an empty class
 IUAVGadgetConfiguration *ConfigGadgetFactory::createConfiguration(QSettings* qSettings)
 {
     return new ConfigGadgetConfiguration(QString("ConfigGadget"), qSettings);
 }
 
+// TODO should be removed as ConfigGadgetConfiguration is an empty class
 IOptionsPage *ConfigGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new ConfigGadgetOptionsPage(qobject_cast<ConfigGadgetConfiguration*>(config));
+    return 0; //new ConfigGadgetOptionsPage(qobject_cast<ConfigGadgetConfiguration*>(config));
 }
 
 void ConfigGadgetFactory::startInputWizard()

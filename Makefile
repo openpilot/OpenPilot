@@ -466,7 +466,7 @@ android_sdk_clean:
 .PHONY: android_sdk_update
 android_sdk_update:
 	$(V0) @echo " UPDATE       $(ANDROID_SDK_DIR)"
-	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-16,addon-google_apis-google-16
+	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-14,addon-google_apis-google-14
 
 ##############################
 #
@@ -601,7 +601,7 @@ endif
 androidgcs: uavo-collections_java
 	$(V0) @echo " ANDROID   $(call toprel, $(ANDROIDGCS_OUT_DIR))"
 	$(V1) mkdir -p $(ANDROIDGCS_OUT_DIR)
-	$(V1) $(ANDROID) $(ANDROID_SILENT) update project --target 'Google Inc.:Google APIs:16' --name androidgcs --path ./androidgcs
+	$(V1) $(ANDROID) $(ANDROID_SILENT) update project --target 'Google Inc.:Google APIs:14' --name androidgcs --path ./androidgcs
 	$(V1) ant -f ./androidgcs/build.xml \
 		$(ANT_QUIET) \
 		-Dout.dir="../$(call toprel, $(ANDROIDGCS_OUT_DIR)/bin)" \

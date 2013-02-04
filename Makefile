@@ -980,3 +980,12 @@ package:
 .PHONY: package_resources
 package_resources:
 	$(V1) cd package && $(MAKE) --no-print-directory opfw_resource
+
+.PHONY: build-info
+build-info:
+	$(V1) mkdir -p $(BUILD_DIR)
+	$(V1) python $(ROOT_DIR)/make/scripts/version-info.py \
+		--path=$(ROOT_DIR) \
+		--uavodir=$(ROOT_DIR)/shared/uavobjectdefinition \
+		--template="make/templates/$@.txt" \
+		--outfile="$(BUILD_DIR)/$@.txt"

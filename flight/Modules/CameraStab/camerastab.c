@@ -241,19 +241,29 @@ static void attitudeUpdated(UAVObjEvent* ev)
 			if (cameraStab.GimbalType == CAMERASTABSETTINGS_GIMBALTYPE_ELEVONSSGYAWPITCHROLL) {
 				float elevon_pitch;
 				elevon_pitch = output;
-				output = (elevon_pitch + elevon_roll) / 2;
-				CameraDesiredRollOrServo1Set(&output);
 				// elevon reversing works like this:
-				// first use the normal reversing facilities to get servo 1 working in the correct direction
-				//   for both roll and pitch
-				// then use the new reversing switches to reverse servo 2 roll and/or pitch as needed
-				if (cameraStab.ElevonSSGServo2RollReverse == CAMERASTABSETTINGS_ELEVONSSGSERVO2ROLLREVERSE_TRUE) {
-					elevon_roll = 1.0 - elevon_roll;
+				//   first use the normal reversing facilities to get servo 1 roll working in the correct direction
+				//   then use the normal reversing facilities to get servo 2 roll working in the correct direction
+				//   then use these new reversing switches to reverse servo 1 and/or 2 pitch as needed
+				// if servo 1 pitch is reversed 
+				if (cameraStab.ElevonSSGServo1PitchReverse == CAMERASTABSETTINGS_ELEVONSSGSERVO1PITCHREVERSE_TRUE) {
+					// use (reversed pitch) + roll
+					output = ((1.0 - elevon_pitch) + elevon_roll) / 2;
 				}
+				else {
+					// use pitch + roll
+					output = (elevon_pitch + elevon_roll) / 2;
+				}
+				CameraDesiredRollOrServo1Set(&output);
+				// if servo 2 pitch is reversed 
 				if (cameraStab.ElevonSSGServo2PitchReverse == CAMERASTABSETTINGS_ELEVONSSGSERVO2PITCHREVERSE_TRUE) {
-					elevon_pitch = 1.0 - elevon_pitch;
+					// use (reversed pitch) - roll
+					output = ((1.0 - elevon_pitch) - elevon_roll) / 2;
 				}
-				output = (elevon_pitch - elevon_roll) / 2;
+				else {
+					// use pitch - roll
+					output = (elevon_pitch - elevon_roll) / 2;
+				}
 				CameraDesiredPitchOrServo2Set(&output);
 			}
 			else {

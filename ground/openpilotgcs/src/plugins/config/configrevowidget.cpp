@@ -34,12 +34,15 @@
 #include <QtGui/QTextEdit>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
+#include <QMessageBox>
 #include <QThread>
 #include <QErrorMessage>
 #include <iostream>
 #include <QDesktopServices>
 #include <QUrl>
+#include <attitudesettings.h>
 #include <revocalibration.h>
+#include <homelocation.h>
 #include <accels.h>
 #include <gyros.h>
 #include <magnetometer.h>
@@ -49,6 +52,9 @@
 #include "calibration.h"
 
 #define sign(x) ((x < 0) ? -1 : 1)
+
+// Uncomment this to enable 6 point calibration on the accels
+#define SIX_POINT_CAL_ACCEL
 
 const double ConfigRevoWidget::maxVarValue = 0.1;
 
@@ -84,16 +90,16 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     m_ui->sixPointsHelp->setSceneRect(paperplane->boundingRect());
 
     // Initialization of the Revo sensor noise bargraph graph
-    m_ui->ahrsBargraph->setScene(new QGraphicsScene(this));
+    m_ui->sensorsBargraph->setScene(new QGraphicsScene(this));
 
     QSvgRenderer *renderer = new QSvgRenderer();
-    ahrsbargraph = new QGraphicsSvgItem();
+    sensorsBargraph = new QGraphicsSvgItem();
     renderer->load(QString(":/configgadget/images/ahrs-calib.svg"));
-    ahrsbargraph->setSharedRenderer(renderer);
-    ahrsbargraph->setElementId("background");
-    ahrsbargraph->setObjectName("background");
-    m_ui->ahrsBargraph->scene()->addItem(ahrsbargraph);
-    m_ui->ahrsBargraph->setSceneRect(ahrsbargraph->boundingRect());
+    sensorsBargraph->setSharedRenderer(renderer);
+    sensorsBargraph->setElementId("background");
+    sensorsBargraph->setObjectName("background");
+    m_ui->sensorsBargraph->scene()->addItem(sensorsBargraph);
+    m_ui->sensorsBargraph->setSceneRect(sensorsBargraph->boundingRect());
 
     // Initialize the 9 bargraph values:
 
@@ -110,7 +116,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     accel_x = new QGraphicsSvgItem();
     accel_x->setSharedRenderer(renderer);
     accel_x->setElementId("accel_x");
-    m_ui->ahrsBargraph->scene()->addItem(accel_x);
+    m_ui->sensorsBargraph->scene()->addItem(accel_x);
     accel_x->setPos(startX, startY);
     accel_x->setTransform(QTransform::fromScale(1,0),true);
 
@@ -121,7 +127,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     accel_y = new QGraphicsSvgItem();
     accel_y->setSharedRenderer(renderer);
     accel_y->setElementId("accel_y");
-    m_ui->ahrsBargraph->scene()->addItem(accel_y);
+    m_ui->sensorsBargraph->scene()->addItem(accel_y);
     accel_y->setPos(startX,startY);
     accel_y->setTransform(QTransform::fromScale(1,0),true);
 
@@ -132,7 +138,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     accel_z = new QGraphicsSvgItem();
     accel_z->setSharedRenderer(renderer);
     accel_z->setElementId("accel_z");
-    m_ui->ahrsBargraph->scene()->addItem(accel_z);
+    m_ui->sensorsBargraph->scene()->addItem(accel_z);
     accel_z->setPos(startX,startY);
     accel_z->setTransform(QTransform::fromScale(1,0),true);
 
@@ -143,7 +149,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     gyro_x = new QGraphicsSvgItem();
     gyro_x->setSharedRenderer(renderer);
     gyro_x->setElementId("gyro_x");
-    m_ui->ahrsBargraph->scene()->addItem(gyro_x);
+    m_ui->sensorsBargraph->scene()->addItem(gyro_x);
     gyro_x->setPos(startX,startY);
     gyro_x->setTransform(QTransform::fromScale(1,0),true);
 
@@ -154,7 +160,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     gyro_y = new QGraphicsSvgItem();
     gyro_y->setSharedRenderer(renderer);
     gyro_y->setElementId("gyro_y");
-    m_ui->ahrsBargraph->scene()->addItem(gyro_y);
+    m_ui->sensorsBargraph->scene()->addItem(gyro_y);
     gyro_y->setPos(startX,startY);
     gyro_y->setTransform(QTransform::fromScale(1,0),true);
 
@@ -166,7 +172,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     gyro_z = new QGraphicsSvgItem();
     gyro_z->setSharedRenderer(renderer);
     gyro_z->setElementId("gyro_z");
-    m_ui->ahrsBargraph->scene()->addItem(gyro_z);
+    m_ui->sensorsBargraph->scene()->addItem(gyro_z);
     gyro_z->setPos(startX,startY);
     gyro_z->setTransform(QTransform::fromScale(1,0),true);
 
@@ -177,7 +183,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     mag_x = new QGraphicsSvgItem();
     mag_x->setSharedRenderer(renderer);
     mag_x->setElementId("mag_x");
-    m_ui->ahrsBargraph->scene()->addItem(mag_x);
+    m_ui->sensorsBargraph->scene()->addItem(mag_x);
     mag_x->setPos(startX,startY);
     mag_x->setTransform(QTransform::fromScale(1,0),true);
 
@@ -188,7 +194,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     mag_y = new QGraphicsSvgItem();
     mag_y->setSharedRenderer(renderer);
     mag_y->setElementId("mag_y");
-    m_ui->ahrsBargraph->scene()->addItem(mag_y);
+    m_ui->sensorsBargraph->scene()->addItem(mag_y);
     mag_y->setPos(startX,startY);
     mag_y->setTransform(QTransform::fromScale(1,0),true);
 
@@ -199,35 +205,20 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     mag_z = new QGraphicsSvgItem();
     mag_z->setSharedRenderer(renderer);
     mag_z->setElementId("mag_z");
-    m_ui->ahrsBargraph->scene()->addItem(mag_z);
+    m_ui->sensorsBargraph->scene()->addItem(mag_z);
     mag_z->setPos(startX,startY);
     mag_z->setTransform(QTransform::fromScale(1,0),true);
 
+    // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
+    // will be dealing with some null pointers
+    addUAVObject("RevoCalibration");
+    autoLoadWidgets();
+
     // Connect the signals
-    connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(launchAccelBiasCalibration()));
-
-    RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-    Q_ASSERT(revoCalibration);
-    connect(revoCalibration, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(refreshValues()));
-
-    connect(m_ui->ahrsSettingsSaveRAM, SIGNAL(clicked()), this, SLOT(SettingsToRAM()));
-    connect(m_ui->ahrsSettingsSaveSD, SIGNAL(clicked()), this, SLOT(SettingsToFlash()));
-    connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(sixPointCalibrationMode()));
+    connect(m_ui->accelBiasStart, SIGNAL(clicked()), this, SLOT(doStartAccelGyroBiasCalibration()));
+    connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(doStartSixPointCalibration()));
     connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
-
-    // Leave this timer permanently connected.  The timer itself is started and stopped.
-    connect(&progressBarTimer, SIGNAL(timeout()), this, SLOT(incrementProgress()));
-
-    // Order is important: 1st request the settings (it will also enable the controls)
-    // then explicitely disable them. They will be re-enabled right afterwards by the
-    // configgadgetwidget if the autopilot is actually connected.
-    refreshValues();
-    // when the AHRS Widget is instanciated, the autopilot is always connected // enableControls(false);
-    connect(parent, SIGNAL(autopilotConnected()),this, SLOT(onAutopilotConnect()));
-    connect(parent, SIGNAL(autopilotDisconnected()), this, SLOT(onAutopilotDisconnect()));
-
-    // Connect the help button
-    connect(m_ui->ahrsHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
+    connect(m_ui->noiseMeasurementStart, SIGNAL(clicked()), this, SLOT(doStartNoiseMeasurement()));
 }
 
 ConfigRevoWidget::~ConfigRevoWidget()
@@ -241,29 +232,22 @@ void ConfigRevoWidget::showEvent(QShowEvent *event)
     Q_UNUSED(event)
     // Thit fitInView method should only be called now, once the
     // widget is shown, otherwise it cannot compute its values and
-    // the result is usually a ahrsbargraph that is way too small.
-    m_ui->ahrsBargraph->fitInView(ahrsbargraph, Qt::KeepAspectRatio);
+    // the result is usually a sensorsBargraph that is way too small.
+    m_ui->sensorsBargraph->fitInView(sensorsBargraph, Qt::KeepAspectRatio);
     m_ui->sixPointsHelp->fitInView(paperplane,Qt::KeepAspectRatio);
 }
 
 void ConfigRevoWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event)
-    m_ui->ahrsBargraph->fitInView(ahrsbargraph, Qt::KeepAspectRatio);
+    m_ui->sensorsBargraph->fitInView(sensorsBargraph, Qt::KeepAspectRatio);
     m_ui->sixPointsHelp->fitInView(paperplane,Qt::KeepAspectRatio);
 }
 
-
-void ConfigRevoWidget::enableControls(bool enable)
-{
-    //m_ui->ahrsSettingsSaveRAM->setEnabled(enable);
-    m_ui->ahrsSettingsSaveSD->setEnabled(enable);
-}
-
 /**
-  Starts an accelerometer bias calibration.
+  * Starts an accelerometer bias calibration.
   */
-void ConfigRevoWidget::launchAccelBiasCalibration()
+void ConfigRevoWidget::doStartAccelGyroBiasCalibration()
 {
     m_ui->accelBiasStart->setEnabled(false);
     m_ui->accelBiasProgress->setValue(0);
@@ -275,47 +259,98 @@ void ConfigRevoWidget::launchAccelBiasCalibration()
     revoCalibration->setData(revoCalibrationData);
     revoCalibration->updated();
 
+    // Disable gyro bias correction while calibrating
+    AttitudeSettings * attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
+    Q_ASSERT(attitudeSettings);
+    AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
+    attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_FALSE;
+    attitudeSettings->setData(attitudeSettingsData);
+    attitudeSettings->updated();
+
     accel_accum_x.clear();
     accel_accum_y.clear();
     accel_accum_z.clear();
+    gyro_accum_x.clear();
+    gyro_accum_y.clear();
+    gyro_accum_z.clear();
 
-    /* Need to get as many AttitudeRaw updates as possible */
+    UAVObject::Metadata mdata;
+
+    /* Need to get as many accel updates as possible */
     Accels * accels = Accels::GetInstance(getObjectManager());
     Q_ASSERT(accels);
-    initialMdata = accels->getMetadata();
-    UAVObject::Metadata mdata = initialMdata;
+    initialAccelsMdata = accels->getMetadata();
+    mdata = initialAccelsMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     accels->setMetadata(mdata);
 
+    Gyros * gyros = Gyros::GetInstance(getObjectManager());
+    Q_ASSERT(gyros);
+    initialGyrosMdata = gyros->getMetadata();
+    mdata = initialGyrosMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    gyros->setMetadata(mdata);
+
     // Now connect to the accels and mag updates, gather for 100 samples
     collectingData = true;
-    connect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(accelBiasattitudeRawUpdated(UAVObject*)));
+    connect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetAccelGyroBiasData(UAVObject*)));
+    connect(gyros, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetAccelGyroBiasData(UAVObject*)));
 }
 
 /**
   Updates the accel bias raw values
   */
-void ConfigRevoWidget::accelBiasattitudeRawUpdated(UAVObject *obj)
+void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
 {
-    Q_UNUSED(obj);
+    QMutexLocker lock(&sensorsUpdateLock);
+    Q_UNUSED(lock);
 
-    Accels * accels = Accels::GetInstance(getObjectManager());
-    Q_ASSERT(accels);
-    Accels::DataFields accelsData = accels->getData();
+    switch(obj->getObjID()) {
+    case Accels::OBJID:
+    {
+        Accels * accels = Accels::GetInstance(getObjectManager());
+        Q_ASSERT(accels);
+        Accels::DataFields accelsData = accels->getData();
 
-    // This is necessary to prevent a race condition on disconnect signal and another update
-    if (collectingData == true) {
         accel_accum_x.append(accelsData.x);
         accel_accum_y.append(accelsData.y);
         accel_accum_z.append(accelsData.z);
+        break;
+    }
+    case Gyros::OBJID:
+    {
+        Gyros * gyros = Gyros::GetInstance(getObjectManager());
+        Q_ASSERT(gyros);
+        Gyros::DataFields gyrosData = gyros->getData();
+
+        gyro_accum_x.append(gyrosData.x);
+        gyro_accum_y.append(gyrosData.y);
+        gyro_accum_z.append(gyrosData.z);
+        break;
+    }
+    default:
+        Q_ASSERT(0);
     }
 
-    m_ui->accelBiasProgress->setValue(m_ui->accelBiasProgress->value()+1);
+    // Work out the progress based on whichever has less
+    double p1 = (double) accel_accum_x.size() / (double) NOISE_SAMPLES;
+    double p2 = (double) accel_accum_y.size() / (double) NOISE_SAMPLES;
+    m_ui->accelBiasProgress->setValue(((p1 < p2) ? p1 : p2) * 100);
 
-    if(accel_accum_x.size() >= 100 && collectingData == true) {
+    if(accel_accum_x.size() >= NOISE_SAMPLES &&
+            gyro_accum_y.size() >= NOISE_SAMPLES &&
+            collectingData == true) {
+
         collectingData = false;
-        disconnect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(accelBiasattitudeRawUpdated(UAVObject*)));
+
+        Accels * accels = Accels::GetInstance(getObjectManager());
+        Gyros * gyros = Gyros::GetInstance(getObjectManager());
+
+        disconnect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetAccelGyroBiasData(UAVObject*)));
+        disconnect(gyros,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetAccelGyroBiasData(UAVObject*)));
+
         m_ui->accelBiasStart->setEnabled(true);
 
         RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
@@ -323,148 +358,30 @@ void ConfigRevoWidget::accelBiasattitudeRawUpdated(UAVObject *obj)
         RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
         revoCalibrationData.BiasCorrectedRaw = RevoCalibration::BIASCORRECTEDRAW_TRUE;
 
-        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] -= listMean(accel_accum_x);
-        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] -= listMean(accel_accum_y);
-        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] -= GRAVITY + listMean(accel_accum_z);
+        // Update the biases based on collected data
+        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] += listMean(accel_accum_x);
+        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] += listMean(accel_accum_y);
+        revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] += ( listMean(accel_accum_z) + GRAVITY );
+        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_X] = listMean(gyro_accum_x);
+        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Y] = listMean(gyro_accum_y);
+        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Z] = listMean(gyro_accum_z);
 
         revoCalibration->setData(revoCalibrationData);
         revoCalibration->updated();
 
-        accels->setMetadata(initialMdata);
+        AttitudeSettings * attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
+        Q_ASSERT(attitudeSettings);
+        AttitudeSettings::DataFields attitudeSettingsData = attitudeSettings->getData();
+        attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
+        attitudeSettings->setData(attitudeSettingsData);
+        attitudeSettings->updated();
+
+        accels->setMetadata(initialAccelsMdata);
+        gyros->setMetadata(initialGyrosMdata);
     }
 }
 
-/**
-  Increment progress bar for noise measurements (not really based on feedback)
-  */
-void ConfigRevoWidget::incrementProgress()
-{
-    m_ui->calibProgress->setValue(m_ui->calibProgress->value()+1);
-    if (m_ui->calibProgress->value() >= m_ui->calibProgress->maximum()) {
-        progressBarTimer.stop();
 
-        RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-        Q_ASSERT(revoCalibration);
-        disconnect(revoCalibration, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(noiseMeasured()));
-        collectingData = false;
-
-        QErrorMessage err(this);
-        err.showMessage("Noise measurement timed out.  State undetermined.  Please power cycle.");
-        err.exec();
-    }
-}
-
-void ConfigRevoWidget::sensorsUpdated(UAVObject * obj)
-{
-    QMutexLocker lock(&attitudeRawUpdateLock);
-
-       qDebug() << "Data";
-    // This is necessary to prevent a race condition on disconnect signal and another update
-    if (collectingData == true) {
-        qDebug() << "Collecting";
-        if( obj->getObjID() == Accels::OBJID ) {
-            qDebug() << "Accels";
-            Accels * accels = Accels::GetInstance(getObjectManager());
-            Q_ASSERT(accels);
-            Accels::DataFields accelsData = accels->getData();
-            accel_accum_x.append(accelsData.x);
-            accel_accum_y.append(accelsData.y);
-            accel_accum_z.append(accelsData.z);
-        } else if( obj->getObjID() == Magnetometer::OBJID ) {
-            qDebug() << "Mag";
-            Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
-            Q_ASSERT(mag);
-            Magnetometer::DataFields magData = mag->getData();
-            mag_accum_x.append(magData.x);
-            mag_accum_y.append(magData.y);
-            mag_accum_z.append(magData.z);
-        } else {
-            Q_ASSERT(0);
-        }
-    }
-
-    if(accel_accum_x.size() >= 20 && mag_accum_x.size() >= 20 && collectingData == true) {
-        collectingData = false;
-
-        Accels * accels = Accels::GetInstance(getObjectManager());
-        Q_ASSERT(accels);
-        Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
-        Q_ASSERT(mag);
-        disconnect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(sensorsUpdated(UAVObject*)));
-        disconnect(mag,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(sensorsUpdated(UAVObject*)));
-
-        m_ui->sixPointsSave->setEnabled(true);
-
-        accel_data_x[position] = listMean(accel_accum_x);
-        accel_data_y[position] = listMean(accel_accum_y);
-        accel_data_z[position] = listMean(accel_accum_z);
-        mag_data_x[position] = listMean(mag_accum_x);
-        mag_data_y[position] = listMean(mag_accum_y);
-        mag_data_z[position] = listMean(mag_accum_z);
-
-        position = (position + 1) % 6;
-        if(position == 1) {
-            m_ui->sixPointCalibInstructions->append("Place with left side down and click save position...");
-            displayPlane("plane-left");
-        }
-        if(position == 2) {
-            m_ui->sixPointCalibInstructions->append("Place upside down and click save position...");
-            displayPlane("plane-flip");
-        }
-        if(position == 3) {
-            m_ui->sixPointCalibInstructions->append("Place with right side down and click save position...");
-            displayPlane("plane-right");
-        }
-        if(position == 4) {
-            m_ui->sixPointCalibInstructions->append("Place with nose up and click save position...");
-            displayPlane("plane-up");
-        }
-        if(position == 5) {
-            m_ui->sixPointCalibInstructions->append("Place with nose down and click save position...");
-            displayPlane("plane-down");
-        }
-        if(position == 0) {
-            computeScaleBias();
-            m_ui->sixPointsStart->setEnabled(true);
-            m_ui->sixPointsSave->setEnabled(false);
-
-            /* Cleanup original settings */
-            accels->setMetadata(initialMdata);
-            mag->setMetadata(initialMdata);
-        }
-    }
-}
-
-/**
-  * Saves the data from the aircraft in one of six positions
-  */
-void ConfigRevoWidget::savePositionData()
-{    
-    QMutexLocker lock(&attitudeRawUpdateLock);
-    m_ui->sixPointsSave->setEnabled(false);
-
-    accel_accum_x.clear();
-    accel_accum_y.clear();
-    accel_accum_z.clear();
-    mag_accum_x.clear();
-    mag_accum_y.clear();
-    mag_accum_z.clear();
-    gyro_accum_x.clear();
-    gyro_accum_y.clear();
-    gyro_accum_z.clear();
-
-    collectingData = true;
-
-    Accels * accels = Accels::GetInstance(getObjectManager());
-    Q_ASSERT(accels);
-    Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
-    Q_ASSERT(mag);
-
-    connect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(sensorsUpdated(UAVObject*)));
-    connect(mag, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(sensorsUpdated(UAVObject*)));
-
-    m_ui->sixPointCalibInstructions->append("Hold...");
-}
 
 int LinearEquationsSolving(int nDim, double* pfMatr, double* pfVect, double* pfSolution)
 {
@@ -567,49 +484,36 @@ int SixPointInConstFieldCal( double ConstMag, double x[6], double y[6], double z
  return 1;
 }
 
-void ConfigRevoWidget::computeScaleBias()
-{
-   double S[3], b[3];
-   RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-   Q_ASSERT(revoCalibration);
-   RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
-
-   // Calibration accel
-   SixPointInConstFieldCal( GRAVITY, accel_data_x, accel_data_y, accel_data_z, S, b);
-   revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X] = fabs(S[0]);
-   revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y] = fabs(S[1]);
-   revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z] = fabs(S[2]);
-
-   revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] = -sign(S[0]) * b[0];
-   revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] = -sign(S[1]) * b[1];
-   revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] = -sign(S[2]) * b[2];
-
-   // Calibration mag
-   SixPointInConstFieldCal( 1000, mag_data_x, mag_data_y, mag_data_z, S, b);
-   revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] = fabs(S[0]);
-   revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] = fabs(S[1]);
-   revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] = fabs(S[2]);
-
-   revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] = -sign(S[0]) * b[0];
-   revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] = -sign(S[1]) * b[1];
-   revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] = -sign(S[2]) * b[2];
-
-   revoCalibration->setData(revoCalibrationData);
-
-   position = -1; //set to run again
-   m_ui->sixPointCalibInstructions->append("Computed accel and mag scale and bias...");
-
-}
+/********** Functions for six point calibration **************/
 
 /**
-  Six point calibration mode
+  * Called by the "Start" button.  Sets up the meta data and enables the
+  * buttons to perform six point calibration of the magnetometer (optionally
+  * accel) to compute the scale and bias of this sensor based on the current
+  * home location magnetic strength.
   */
-void ConfigRevoWidget::sixPointCalibrationMode()
+void ConfigRevoWidget::doStartSixPointCalibration()
 {
     RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+    HomeLocation * homeLocation = HomeLocation::GetInstance(getObjectManager());
     Q_ASSERT(revoCalibration);
+    Q_ASSERT(homeLocation);
     RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+    HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
+    //check if Homelocation is set
+    if(!homeLocationData.Set)
+    {
+        QMessageBox msgBox;
+        msgBox.setInformativeText(tr("<p>HomeLocation not SET.</p><p>Please set your HomeLocation and try again. Aborting calibration!</p>"));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.exec();
+        return;
+    }
+
+#ifdef SIX_POINT_CAL_ACCEL
     // Calibration accel
     revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X] = 1;
     revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y] = 1;
@@ -617,6 +521,11 @@ void ConfigRevoWidget::sixPointCalibrationMode()
     revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] = 0;
     revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] = 0;
     revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] = 0;
+
+    accel_accum_x.clear();
+    accel_accum_y.clear();
+    accel_accum_z.clear();
+#endif
 
     // Calibration mag
     revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] = 1;
@@ -626,48 +535,280 @@ void ConfigRevoWidget::sixPointCalibrationMode()
     revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] = 0;
     revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] = 0;
 
+    // Disable adaptive mag nulling
+    initialMagCorrectionRate = revoCalibrationData.MagBiasNullingRate;
+    revoCalibrationData.MagBiasNullingRate = 0;
+
     revoCalibration->setData(revoCalibrationData);
 
-   Thread::usleep(100000);
+    Thread::usleep(100000);
 
-   gyro_accum_x.clear();
-   gyro_accum_y.clear();
-   gyro_accum_z.clear();
-   accel_accum_x.clear();
-   accel_accum_y.clear();
-   accel_accum_z.clear();
-   mag_accum_x.clear();
-   mag_accum_y.clear();
-   mag_accum_z.clear();
+    gyro_accum_x.clear();
+    gyro_accum_y.clear();
+    gyro_accum_z.clear();
+    mag_accum_x.clear();
+    mag_accum_y.clear();
+    mag_accum_z.clear();
 
-   /* Need to get as many accel and mag updates as possible */
-   Accels * accels = Accels::GetInstance(getObjectManager());
-   Q_ASSERT(accels);
-   Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
-   Q_ASSERT(mag);
+    UAVObject::Metadata mdata;
 
-   initialMdata = accels->getMetadata();
-   UAVObject::Metadata mdata = initialMdata;
-   UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-   mdata.flightTelemetryUpdatePeriod = 100;
-   accels->setMetadata(mdata);
+#ifdef SIX_POINT_CAL_ACCEL
+    /* Need to get as many accel updates as possible */
+    Accels * accels = Accels::GetInstance(getObjectManager());
+    Q_ASSERT(accels);
 
-   mdata = mag->getMetadata();
-   UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
-   mdata.flightTelemetryUpdatePeriod = 100;
-   mag->setMetadata(mdata);
+    initialAccelsMdata = accels->getMetadata();
+    mdata = initialAccelsMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    accels->setMetadata(mdata);
+#endif
 
-   /* Show instructions and enable controls */
-   m_ui->sixPointCalibInstructions->clear();
-   m_ui->sixPointCalibInstructions->append("Place horizontally and click save position...");
-   displayPlane("plane-horizontal");
-   m_ui->sixPointsStart->setEnabled(false);
-   m_ui->sixPointsSave->setEnabled(true);
-   position = 0;
-   qDebug() << "Starting";
+    /* Need to get as many mag updates as possible */
+    Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
+    Q_ASSERT(mag);
+    initialMagMdata = mag->getMetadata();
+    mdata = initialMagMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    mag->setMetadata(mdata);
+
+    /* Show instructions and enable controls */
+    m_ui->sixPointCalibInstructions->clear();
+    m_ui->sixPointCalibInstructions->append("Place horizontally and click save position...");
+    displayPlane("plane-horizontal");
+    m_ui->sixPointsStart->setEnabled(false);
+    m_ui->sixPointsSave->setEnabled(true);
+    position = 0;
 }
 
+/**
+  * Saves the data from the aircraft in one of six positions.
+  * This is called when they click "save position" and starts
+  * averaging data for this position.
+  */
+void ConfigRevoWidget::savePositionData()
+{
+    QMutexLocker lock(&sensorsUpdateLock);
+    m_ui->sixPointsSave->setEnabled(false);
 
+    accel_accum_x.clear();
+    accel_accum_y.clear();
+    accel_accum_z.clear();
+    mag_accum_x.clear();
+    mag_accum_y.clear();
+    mag_accum_z.clear();
+
+    collectingData = true;
+
+    Accels * accels = Accels::GetInstance(getObjectManager());
+    Q_ASSERT(accels);
+    Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
+    Q_ASSERT(mag);
+
+    connect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject*)));
+    connect(mag, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject*)));
+
+    m_ui->sixPointCalibInstructions->append("Hold...");
+}
+
+/**
+  * Grab a sample of mag (optionally accel) data while in this position and
+  * store it for averaging.  When sufficient points are collected advance
+  * to the next position (give message to user) or compute the scale and bias
+  */
+void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject * obj)
+{
+    QMutexLocker lock(&sensorsUpdateLock);
+
+    // This is necessary to prevent a race condition on disconnect signal and another update
+    if (collectingData == true) {
+        if( obj->getObjID() == Accels::OBJID ) {
+#ifdef SIX_POINT_CAL_ACCEL
+            Accels * accels = Accels::GetInstance(getObjectManager());
+            Q_ASSERT(accels);
+            Accels::DataFields accelsData = accels->getData();
+            accel_accum_x.append(accelsData.x);
+            accel_accum_y.append(accelsData.y);
+            accel_accum_z.append(accelsData.z);
+#endif
+        } else if( obj->getObjID() == Magnetometer::OBJID ) {
+            Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
+            Q_ASSERT(mag);
+            Magnetometer::DataFields magData = mag->getData();
+            mag_accum_x.append(magData.x);
+            mag_accum_y.append(magData.y);
+            mag_accum_z.append(magData.z);
+        } else {
+            Q_ASSERT(0);
+        }
+    }
+
+#ifdef SIX_POINT_CAL_ACCEL
+    if(accel_accum_x.size() >= 20 && mag_accum_x.size() >= 20 && collectingData == true) {
+#else
+    if(mag_accum_x.size() >= 20 && collectingData == true) {
+#endif
+        collectingData = false;
+
+        m_ui->sixPointsSave->setEnabled(true);
+
+#ifdef SIX_POINT_CAL_ACCEL
+        // Store the mean for this position for the accel
+        Accels * accels = Accels::GetInstance(getObjectManager());
+        Q_ASSERT(accels);
+        disconnect(accels,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetSixPointCalibrationMeasurement(UAVObject*)));
+        accel_data_x[position] = listMean(accel_accum_x);
+        accel_data_y[position] = listMean(accel_accum_y);
+        accel_data_z[position] = listMean(accel_accum_z);
+#endif
+
+        // Store the mean for this position for the mag
+        Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
+        Q_ASSERT(mag);
+        disconnect(mag,SIGNAL(objectUpdated(UAVObject*)),this,SLOT(doGetSixPointCalibrationMeasurement(UAVObject*)));
+        mag_data_x[position] = listMean(mag_accum_x);
+        mag_data_y[position] = listMean(mag_accum_y);
+        mag_data_z[position] = listMean(mag_accum_z);
+
+        position = (position + 1) % 6;
+        if(position == 1) {
+            m_ui->sixPointCalibInstructions->append("Place with left side down and click save position...");
+            displayPlane("plane-left");
+        }
+        if(position == 2) {
+            m_ui->sixPointCalibInstructions->append("Place upside down and click save position...");
+            displayPlane("plane-flip");
+        }
+        if(position == 3) {
+            m_ui->sixPointCalibInstructions->append("Place with right side down and click save position...");
+            displayPlane("plane-right");
+        }
+        if(position == 4) {
+            m_ui->sixPointCalibInstructions->append("Place with nose up and click save position...");
+            displayPlane("plane-up");
+        }
+        if(position == 5) {
+            m_ui->sixPointCalibInstructions->append("Place with nose down and click save position...");
+            displayPlane("plane-down");
+        }
+        if(position == 0) {
+            computeScaleBias();
+            m_ui->sixPointsStart->setEnabled(true);
+            m_ui->sixPointsSave->setEnabled(false);
+
+            /* Cleanup original settings */
+#ifdef SIX_POINT_CAL_ACCEL
+            accels->setMetadata(initialAccelsMdata);
+#endif
+            mag->setMetadata(initialMagMdata);
+        }
+    }
+}
+
+/**
+  * Computes the scale and bias for the magnetomer and (compile option)
+  * for the accel once all the data has been collected in 6 positions.
+  */
+void ConfigRevoWidget::computeScaleBias()
+{
+   double S[3], b[3];
+   double Be_length;
+   RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+   HomeLocation * homeLocation = HomeLocation::GetInstance(getObjectManager());
+   Q_ASSERT(revoCalibration);
+   Q_ASSERT(homeLocation);
+   RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+   HomeLocation::DataFields homeLocationData = homeLocation->getData();
+
+#ifdef SIX_POINT_CAL_ACCEL
+   // Calibration accel
+   SixPointInConstFieldCal( homeLocationData.g_e, accel_data_x, accel_data_y, accel_data_z, S, b);
+   revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X] = fabs(S[0]);
+   revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y] = fabs(S[1]);
+   revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z] = fabs(S[2]);
+
+   revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] = -sign(S[0]) * b[0];
+   revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] = -sign(S[1]) * b[1];
+   revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] = -sign(S[2]) * b[2];
+#endif
+
+   // Calibration mag
+   Be_length = sqrt(pow(homeLocationData.Be[0],2)+pow(homeLocationData.Be[1],2)+pow(homeLocationData.Be[2],2));
+   SixPointInConstFieldCal( Be_length, mag_data_x, mag_data_y, mag_data_z, S, b);
+   revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] = fabs(S[0]);
+   revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] = fabs(S[1]);
+   revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] = fabs(S[2]);
+
+   revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] = -sign(S[0]) * b[0];
+   revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] = -sign(S[1]) * b[1];
+   revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] = -sign(S[2]) * b[2];
+
+   // Restore the previous setting
+   revoCalibrationData.MagBiasNullingRate = initialMagCorrectionRate;
+
+#ifdef SIX_POINT_CAL_ACCEL
+   bool good_calibration = true;
+
+   // Check the mag calibration is good
+   good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] ==
+           revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X];
+   good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] ==
+           revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y];
+   good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] ==
+           revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z];
+   good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] ==
+           revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X];
+   good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] ==
+           revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y];
+   good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] ==
+           revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z];
+
+   // Check the accel calibration is good
+   good_calibration &= revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X] ==
+           revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_X];
+   good_calibration &= revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y] ==
+           revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Y];
+   good_calibration &= revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z] ==
+           revoCalibrationData.accel_scale[RevoCalibration::ACCEL_SCALE_Z];
+   good_calibration &= revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] ==
+           revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X];
+   good_calibration &= revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] ==
+           revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y];
+   good_calibration &= revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] ==
+           revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z];
+   if (good_calibration) {
+       revoCalibration->setData(revoCalibrationData);
+       m_ui->sixPointCalibInstructions->append("Computed accel and mag scale and bias...");
+   } else {
+       revoCalibrationData = revoCalibration->getData();
+       m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
+   }
+#else
+   bool good_calibration = true;
+   good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] ==
+           revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X];
+   good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] ==
+           revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y];
+   good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] ==
+           revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z];
+   good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] ==
+           revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X];
+   good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] ==
+           revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y];
+   good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z] ==
+           revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z];
+   if (good_calibration) {
+       revoCalibration->setData(revoCalibrationData);
+       m_ui->sixPointCalibInstructions->append("Computed mag scale and bias...");
+   } else {
+       revoCalibrationData = revoCalibration->getData();
+       m_ui->sixPointCalibInstructions->append("Bad calibration. Please repeat.");
+   }
+#endif
+
+   position = -1; //set to run again
+}
 
 /**
   Rotate the paper plane
@@ -680,7 +821,164 @@ void ConfigRevoWidget::displayPlane(QString elementID)
 
 }
 
+/*********** Noise measurement functions **************/
+/**
+  * Connect sensor updates and timeout for measuring the noise
+  */
+void ConfigRevoWidget::doStartNoiseMeasurement()
+{
+    QMutexLocker lock(&sensorsUpdateLock);
+    Q_UNUSED(lock);
 
+    RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+    HomeLocation * homeLocation = HomeLocation::GetInstance(getObjectManager());
+    Q_ASSERT(revoCalibration);
+    Q_ASSERT(homeLocation);
+    RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+    HomeLocation::DataFields homeLocationData = homeLocation->getData();
+
+    //check if Homelocation is set
+    if(!homeLocationData.Set)
+    {
+        QMessageBox msgBox;
+        msgBox.setInformativeText(tr("<p>HomeLocation not SET.</p><p>Please set your HomeLocation and try again. Aborting calibration!</p>"));
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setDefaultButton(QMessageBox::Ok);
+        msgBox.setIcon(QMessageBox::Information);
+        msgBox.exec();
+        return;
+    }
+
+    accel_accum_x.clear();
+    accel_accum_y.clear();
+    accel_accum_z.clear();
+    gyro_accum_x.clear();
+    gyro_accum_y.clear();
+    gyro_accum_z.clear();
+    mag_accum_x.clear();
+    mag_accum_y.clear();
+    mag_accum_z.clear();
+
+    /* Need to get as many accel, mag and gyro updates as possible */
+    Accels * accels = Accels::GetInstance(getObjectManager());
+    Q_ASSERT(accels);
+    Gyros * gyros = Gyros::GetInstance(getObjectManager());
+    Q_ASSERT(gyros);
+    Magnetometer * mag = Magnetometer::GetInstance(getObjectManager());
+    Q_ASSERT(mag);
+
+    UAVObject::Metadata mdata;
+
+    initialAccelsMdata = accels->getMetadata();
+    mdata = initialAccelsMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    accels->setMetadata(mdata);
+
+    initialGyrosMdata = gyros->getMetadata();
+    mdata = initialGyrosMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    gyros->setMetadata(mdata);
+
+    initialMagMdata = mag->getMetadata();
+    mdata = initialMagMdata;
+    UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
+    mdata.flightTelemetryUpdatePeriod = 100;
+    mag->setMetadata(mdata);
+
+    /* Connect for updates */
+    connect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
+    connect(gyros, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
+    connect(mag, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
+}
+
+/**
+  * Called when any of the sensors are updated.  Stores the sample for measuring the
+  * variance at the end
+  */
+void ConfigRevoWidget::doGetNoiseSample(UAVObject * obj)
+{
+    QMutexLocker lock(&sensorsUpdateLock);
+    Q_UNUSED(lock);
+
+    Q_ASSERT(obj);
+
+    switch(obj->getObjID()) {
+    case Gyros::OBJID:
+    {
+        Gyros * gyros = Gyros::GetInstance(getObjectManager());
+        Q_ASSERT(gyros);
+        Gyros::DataFields gyroData = gyros->getData();
+        gyro_accum_x.append(gyroData.x);
+        gyro_accum_y.append(gyroData.y);
+        gyro_accum_z.append(gyroData.z);
+        break;
+    }
+    case Accels::OBJID:
+    {
+        Accels * accels = Accels::GetInstance(getObjectManager());
+        Q_ASSERT(accels);
+        Accels::DataFields accelsData = accels->getData();
+        accel_accum_x.append(accelsData.x);
+        accel_accum_y.append(accelsData.y);
+        accel_accum_z.append(accelsData.z);
+        break;
+    }
+    case Magnetometer::OBJID:
+    {
+        Magnetometer * mags = Magnetometer::GetInstance(getObjectManager());
+        Q_ASSERT(mags);
+        Magnetometer::DataFields magData = mags->getData();
+        mag_accum_x.append(magData.x);
+        mag_accum_y.append(magData.y);
+        mag_accum_z.append(magData.z);
+        break;
+    }
+    default:
+        Q_ASSERT(0);
+    }
+
+    float p1 = (float) mag_accum_x.length() / (float) NOISE_SAMPLES;
+    float p2 = (float) gyro_accum_x.length() / (float) NOISE_SAMPLES;
+    float p3 = (float) accel_accum_x.length() / (float) NOISE_SAMPLES;
+
+    float prog = (p1 < p2) ? p1 : p2;
+    prog = (prog < p3) ? prog : p3;
+
+    m_ui->noiseMeasurementProgress->setValue(prog * 100);
+
+    if(mag_accum_x.length() >= NOISE_SAMPLES &&
+            gyro_accum_x.length() >= NOISE_SAMPLES &&
+            accel_accum_x.length() >= NOISE_SAMPLES) {
+
+        // No need to for more updates
+        Magnetometer * mags = Magnetometer::GetInstance(getObjectManager());
+        Accels * accels = Accels::GetInstance(getObjectManager());
+        Gyros * gyros = Gyros::GetInstance(getObjectManager());
+        disconnect(accels, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
+        disconnect(gyros, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
+        disconnect(mags, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
+
+        RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
+        Q_ASSERT(revoCalibration);
+        if(revoCalibration) {
+            RevoCalibration::DataFields revoCalData = revoCalibration->getData();
+            revoCalData.accel_var[RevoCalibration::ACCEL_VAR_X] = listVar(accel_accum_x);
+            revoCalData.accel_var[RevoCalibration::ACCEL_VAR_Y] = listVar(accel_accum_y);
+            revoCalData.accel_var[RevoCalibration::ACCEL_VAR_Z] = listVar(accel_accum_z);
+            revoCalData.gyro_var[RevoCalibration::GYRO_VAR_X] = listVar(gyro_accum_x);
+            revoCalData.gyro_var[RevoCalibration::GYRO_VAR_Y] = listVar(gyro_accum_y);
+            revoCalData.gyro_var[RevoCalibration::GYRO_VAR_Z] = listVar(gyro_accum_z);
+            revoCalData.mag_var[RevoCalibration::MAG_VAR_X] = listVar(mag_accum_x);
+            revoCalData.mag_var[RevoCalibration::MAG_VAR_Y] = listVar(mag_accum_y);
+            revoCalData.mag_var[RevoCalibration::MAG_VAR_Z] = listVar(mag_accum_z);
+            revoCalibration->setData(revoCalData);
+        }
+    }
+}
+
+/********** UI Functions *************/
 /**
   Draws the sensor variances bargraph
   */
@@ -688,74 +986,58 @@ void ConfigRevoWidget::drawVariancesGraph()
 {
     RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
     Q_ASSERT(revoCalibration);
+    if(!revoCalibration)
+        return;
     RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
 
     // The expected range is from 1E-6 to 1E-1
     double steps = 6; // 6 bars on the graph
     float accel_x_var = -1/steps*(1+steps+log10(revoCalibrationData.accel_var[RevoCalibration::ACCEL_VAR_X]));
-    accel_x->setTransform(QTransform::fromScale(1,accel_x_var),false);
+    if(accel_x)
+        accel_x->setTransform(QTransform::fromScale(1,accel_x_var),false);
     float accel_y_var = -1/steps*(1+steps+log10(revoCalibrationData.accel_var[RevoCalibration::ACCEL_VAR_Y]));
-    accel_y->setTransform(QTransform::fromScale(1,accel_y_var),false);
+    if(accel_y)
+        accel_y->setTransform(QTransform::fromScale(1,accel_y_var),false);
     float accel_z_var = -1/steps*(1+steps+log10(revoCalibrationData.accel_var[RevoCalibration::ACCEL_VAR_Z]));
-    accel_z->setTransform(QTransform::fromScale(1,accel_z_var),false);
+    if(accel_z)
+        accel_z->setTransform(QTransform::fromScale(1,accel_z_var),false);
 
     float gyro_x_var = -1/steps*(1+steps+log10(revoCalibrationData.gyro_var[RevoCalibration::GYRO_VAR_X]));
-    gyro_x->setTransform(QTransform::fromScale(1,gyro_x_var),false);
+    if(gyro_x)
+        gyro_x->setTransform(QTransform::fromScale(1,gyro_x_var),false);
     float gyro_y_var = -1/steps*(1+steps+log10(revoCalibrationData.gyro_var[RevoCalibration::GYRO_VAR_Y]));
-    gyro_y->setTransform(QTransform::fromScale(1,gyro_y_var),false);
+    if(gyro_y)
+        gyro_y->setTransform(QTransform::fromScale(1,gyro_y_var),false);
     float gyro_z_var = -1/steps*(1+steps+log10(revoCalibrationData.gyro_var[RevoCalibration::GYRO_VAR_Z]));
-    gyro_z->setTransform(QTransform::fromScale(1,gyro_z_var),false);
+    if(gyro_z)
+        gyro_z->setTransform(QTransform::fromScale(1,gyro_z_var),false);
 
     // Scale by 1e-3 because mag vars are much higher.
     float mag_x_var = -1/steps*(1+steps+log10(1e-3*revoCalibrationData.mag_var[RevoCalibration::MAG_VAR_X]));
-    mag_x->setTransform(QTransform::fromScale(1,mag_x_var),false);
+    if(mag_x)
+        mag_x->setTransform(QTransform::fromScale(1,mag_x_var),false);
     float mag_y_var = -1/steps*(1+steps+log10(1e-3*revoCalibrationData.mag_var[RevoCalibration::MAG_VAR_Y]));
-    mag_y->setTransform(QTransform::fromScale(1,mag_y_var),false);
+    if(mag_y)
+        mag_y->setTransform(QTransform::fromScale(1,mag_y_var),false);
     float mag_z_var = -1/steps*(1+steps+log10(1e-3*revoCalibrationData.mag_var[RevoCalibration::MAG_VAR_Z]));
-    mag_z->setTransform(QTransform::fromScale(1,mag_z_var),false);
+    if(mag_z)
+        mag_z->setTransform(QTransform::fromScale(1,mag_z_var),false);
 }
 
 /**
-  Request current settings from the AHRS
+  * Called by the ConfigTaskWidget parent when RevoCalibration is updated
+  * to update the UI
   */
-void ConfigRevoWidget::refreshValues()
+void ConfigRevoWidget::refreshWidgetsValues(UAVObject *)
 {
     drawVariancesGraph();
 
-    m_ui->ahrsCalibStart->setEnabled(true);
+    m_ui->noiseMeasurementStart->setEnabled(true);
     m_ui->sixPointsStart->setEnabled(true);
     m_ui->accelBiasStart->setEnabled(true);
     m_ui->startDriftCalib->setEnabled(true);
 
     m_ui->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
-}
-
-
-/**
-  Save current settings to RAM
-  */
-void ConfigRevoWidget::SettingsToRAM()
-{
-    RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-    Q_ASSERT(revoCalibration);
-    revoCalibration->updated();
-}
-
-/**
-Save Revo calibration settings to flash
-  */
-void ConfigRevoWidget::SettingsToFlash()
-{
-    SettingsToRAM();
-
-    RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-    Q_ASSERT(revoCalibration);
-    saveObjectToSD(revoCalibration);
-}
-
-void ConfigRevoWidget::openHelp()
-{
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/Revo+Configuration", QUrl::StrictMode) );
 }
 
 /**

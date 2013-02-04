@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V7.0.2 - Copyright (C) 2011 Real Time Engineers Ltd.
+    FreeRTOS V7.2.0 - Copyright (C) 2012 Real Time Engineers Ltd.
 
 
     ***************************************************************************
@@ -40,15 +40,28 @@
     FreeRTOS WEB site.
 
     1 tab == 4 spaces!
+    
+    ***************************************************************************
+     *                                                                       *
+     *    Having a problem?  Start by reading the FAQ "My application does   *
+     *    not run, what could be wrong?                                      *
+     *                                                                       *
+     *    http://www.FreeRTOS.org/FAQHelp.html                               *
+     *                                                                       *
+    ***************************************************************************
 
-    http://www.FreeRTOS.org - Documentation, latest information, license and
-    contact details.
+    
+    http://www.FreeRTOS.org - Documentation, training, latest information, 
+    license and contact details.
+    
+    http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
+    including FreeRTOS+Trace - an indispensable productivity tool.
 
-    http://www.SafeRTOS.com - A version that is certified for use in safety
-    critical systems.
-
-    http://www.OpenRTOS.com - Commercial support, development, porting,
-    licensing and training services.
+    Real Time Engineers ltd license FreeRTOS to High Integrity Systems, who sell 
+    the code with commercial support, indemnification, and middleware, under 
+    the OpenRTOS brand: http://www.OpenRTOS.com.  High Integrity Systems also
+    provide a safety engineered and independently SIL3 certified version under 
+    the SafeRTOS brand: http://www.SafeRTOS.com.
 */
 
 /*
@@ -127,6 +140,15 @@ typedef struct xLIST
 #define listSET_LIST_ITEM_OWNER( pxListItem, pxOwner )		( pxListItem )->pvOwner = ( void * ) ( pxOwner )
 
 /*
+ * Access macro to get the owner of a list item.  The owner of a list item
+ * is the object (usually a TCB) that contains the list item.
+ *
+ * \page listSET_LIST_ITEM_OWNER listSET_LIST_ITEM_OWNER
+ * \ingroup LinkedList
+ */
+#define listGET_LIST_ITEM_OWNER( pxListItem )		( pxListItem )->pvOwner
+
+/*
  * Access macro to set the value of the list item.  In most cases the value is
  * used to sort the list in descending order.
  *
@@ -136,7 +158,7 @@ typedef struct xLIST
 #define listSET_LIST_ITEM_VALUE( pxListItem, xValue )		( pxListItem )->xItemValue = ( xValue )
 
 /*
- * Access macro the retrieve the value of the list item.  The value can
+ * Access macro to retrieve the value of the list item.  The value can
  * represent anything - for example a the priority of a task, or the time at
  * which a task should be unblocked.
  *
@@ -230,6 +252,13 @@ xList * const pxConstList = ( pxList );													\
  * pointer against
  */
 #define listIS_CONTAINED_WITHIN( pxList, pxListItem ) ( ( pxListItem )->pvContainer == ( void * ) ( pxList ) )
+
+/*
+ * This provides a crude means of knowing if a list has been initialised, as
+ * pxList->xListEnd.xItemValue is set to portMAX_DELAY by the vListInitialise()
+ * function.
+ */
+#define listLIST_IS_INITIALISED( pxList ) ( ( pxList )->xListEnd.xItemValue == portMAX_DELAY )
 
 /*
  * Must be called before a list is used!  This initialises all the members

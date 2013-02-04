@@ -150,7 +150,7 @@ namespace mapcontrol
         QString uavoInfoStrLine3, uavoInfoStrLine4;
         QString uavoInfoStrLine5;
 
-        uavoInfoStrLine1.append(QString("CAS: %1 kph").arg(CAS_mps));
+		uavoInfoStrLine1.append(QString("CAS: %1 kph").arg(CAS_mps * 3.6));
         uavoInfoStrLine2.append(QString("Groundspeed: %1 kph").arg(groundspeed_kph, 0, 'f',1));
         uavoInfoStrLine3.append(QString("Lat-Lon: %1, %2").arg(coord.Lat(), 0, 'f',7).arg(coord.Lng(), 0, 'f',7));
         uavoInfoStrLine4.append(QString("North-East: %1 m, %2 m").arg(NED[0], 0, 'f',1).arg(NED[1], 0, 'f',1));

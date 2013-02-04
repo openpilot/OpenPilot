@@ -39,6 +39,7 @@
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
 #define PIOS_INCLUDE_RFM22B
+#define PIOS_INCLUDE_RFM22B_COM
 #define PIOS_INCLUDE_RCVR
 #define PIOS_INCLUDE_TIM
 
@@ -61,6 +62,8 @@
 #define PIOS_INCLUDE_WDG
 #define PIOS_INCLUDE_BL_HELPER
 #define PIOS_INCLUDE_FLASH_EEPROM
+#define PIOS_INCLUDE_RFM22B
+#define PIOS_INCLUDE_PACKET_HANDLER
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"
@@ -95,6 +98,9 @@
 
 /* PIOS Initcall infrastructure */
 #define PIOS_INCLUDE_INITCALL
+
+/* Turn on debugging signals on the telemetry port */
+//#define PIOS_RFM22B_DEBUG_ON_TELEM
 
 #endif /* PIOS_CONFIG_H */
 /**

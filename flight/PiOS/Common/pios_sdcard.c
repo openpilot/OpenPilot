@@ -126,7 +126,7 @@ int32_t PIOS_SDCARD_PowerOn(void)
 
 	SDCARD_MUTEX_TAKE;
 	/* Ensure that chip select line deactivated */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 1);	/* spi, pin_value */
 
 	/* Init SPI port for slow frequency access (ca. 0.3 MBit/s) */
 	PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_256);
@@ -137,7 +137,7 @@ int32_t PIOS_SDCARD_PowerOn(void)
 	}
 
 	/* Activate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0);	/* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 0);	/* spi, pin_value */
 
 	/* wait for 1 mS */
 	PIOS_DELAY_WaituS(1000);
@@ -202,7 +202,7 @@ int32_t PIOS_SDCARD_PowerOn(void)
 
 error:
 	/* Deactivate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 1);	/* spi, pin_value */
 
 	/* Send dummy byte once deactivated to drop cards DO */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
@@ -272,7 +272,7 @@ int32_t PIOS_SDCARD_CheckAvailable(uint8_t was_available)
 		PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_4);
 
 		/* Activate chip select */
-		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0);	/* spi, pin_value */
+		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 0);	/* spi, pin_value */
 
 		/* Send STATUS command to check if media is available */
 		ret = PIOS_SDCARD_SendSDCCmd(SDCMD_SEND_STATUS, 0, SDCMD_SEND_STATUS_CRC);
@@ -281,7 +281,7 @@ int32_t PIOS_SDCARD_CheckAvailable(uint8_t was_available)
 		PIOS_SPI_SetClockSpeed(PIOS_SDCARD_SPI, PIOS_SPI_PRESCALER_256);
 
 		/* Deactivate chip select */
-		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
+		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 1);	/* spi, pin_value */
 		/* send 80 clock cycles to start up */
 		uint8_t i;
 		for (i = 0; i < 10; ++i) {
@@ -289,7 +289,7 @@ int32_t PIOS_SDCARD_CheckAvailable(uint8_t was_available)
 		}
 
 		/* Activate chip select */
-		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0);	/* spi, pin_value */
+		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 0);	/* spi, pin_value */
 
 		/* Send CMD0 to reset the media */
 		if ((ret = (PIOS_SDCARD_SendSDCCmd(SDCMD_GO_IDLE_STATE, 0, SDCMD_GO_IDLE_STATE_CRC))) < 0) {
@@ -297,7 +297,7 @@ int32_t PIOS_SDCARD_CheckAvailable(uint8_t was_available)
 		}
 
 		/* Deactivate chip select */
-		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
+		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 1);	/* spi, pin_value */
 
 		SDCARD_MUTEX_GIVE;
 		/* Run power-on sequence (negative return = not available) */
@@ -306,7 +306,7 @@ int32_t PIOS_SDCARD_CheckAvailable(uint8_t was_available)
 
 not_available:
 	/* Deactivate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 1);	/* spi, pin_value */
 	/* Send dummy byte once deactivated to drop cards DO */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 	SDCARD_MUTEX_GIVE;
@@ -336,7 +336,7 @@ int32_t PIOS_SDCARD_SendSDCCmd(uint8_t cmd, uint32_t addr, uint8_t crc)
 	}
 
 	/* Activate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0);	/* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 0);	/* spi, pin_value */
 
 	/* Transfer to card */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, (uint8_t) cmd);
@@ -385,7 +385,7 @@ int32_t PIOS_SDCARD_SendSDCCmd(uint8_t cmd, uint32_t addr, uint8_t crc)
 
 	/* Deactivate chip-select on timeout, and return error code */
 	if (timeout) {
-		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
+		PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 1);	/* spi, pin_value */
 
 		/* Send dummy byte once deactivated to drop cards DO */
 		PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
@@ -458,7 +458,7 @@ int32_t PIOS_SDCARD_SectorRead(uint32_t sector, uint8_t * buffer)
 
 error:
 	/* Deactivate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	// spi, pin_value
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 1);	// spi, pin_value
 
 	/* Send dummy byte once deactivated to drop cards DO */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
@@ -540,7 +540,7 @@ int32_t PIOS_SDCARD_SectorWrite(uint32_t sector, uint8_t * buffer)
 
 error:
 	/* Deactivate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 1);	/* spi, pin_value */
 	/* Send dummy byte once deactivated to drop cards DO */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 
@@ -629,7 +629,7 @@ int32_t PIOS_SDCARD_CIDRead(SDCARDCidTypeDef * cid)
 
 error:
 	/* deactivate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 1);	/* spi, pin_value */
 	/* Send dummy byte once deactivated to drop cards DO */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 	SDCARD_MUTEX_GIVE;
@@ -747,7 +747,7 @@ int32_t PIOS_SDCARD_CSDRead(SDCARDCsdTypeDef * csd)
 
 error:
 	/* Deactivate chip select */
-	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 1);	/* spi, pin_value */
+	PIOS_SPI_RC_PinSet(PIOS_SDCARD_SPI, 0, 1);	/* spi, pin_value */
 	/* Send dummy byte once deactivated to drop cards DO */
 	PIOS_SPI_TransferByte(PIOS_SDCARD_SPI, 0xff);
 	SDCARD_MUTEX_GIVE;

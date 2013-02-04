@@ -7,8 +7,8 @@
         <field name="Capacity" units="mAh"  type="uint32"  elements="1" defaultvalue="2200"/>
 
         <field name="VoltageThresholds" units="V"  type="float" elementnames="Warning, Alarm" defaultvalue="9.8, 9.2"/>
-               
-        <field name="SensorType" units="" type="enum" elements="1" options="None" defaultvalue="None"/>        
+          
+        <field name="SensorType" units="" type="enum" elementnames="BatteryCurrent,BatteryVoltage" options="Disabled,Enabled" defaultvalue="Enabled,Enabled"/>
         <field name="SensorCalibrations" units="" type="float" elementnames="VoltageFactor, CurrentFactor" defaultvalue="1.0, 1.0"/>
        
         <access gcs="readwrite" flight="readwrite"/>

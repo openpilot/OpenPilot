@@ -248,7 +248,7 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
             emit localPositionChanged(this->pos(),this);
             emit WPValuesChanged(this);
         }
-        QGraphicsItem::mouseReleaseEvent(event);
+		QGraphicsItem::mouseReleaseEvent(event);
     }
     void WayPointItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {

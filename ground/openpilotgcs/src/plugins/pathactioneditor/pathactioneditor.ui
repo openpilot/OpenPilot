@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PathActionEditor</class>
+ <widget class="QWidget" name="PathActionEditor">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>653</width>
+    <height>296</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QTreeView" name="pathactions">
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="buttonNewPathAction">
+     <property name="text">
+      <string>New PathAction</string>
+     </property>
+    </widget>
+   </item>
+    <item>
+    <widget class="QPushButton" name="buttonNewWaypoint">
+     <property name="text">
+      <string>New Waypoint</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="buttonSaveFile">
+     <property name="text">
+      <string>Save to File</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="buttonLoadFile">
+     <property name="text">
+      <string>Load from File</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

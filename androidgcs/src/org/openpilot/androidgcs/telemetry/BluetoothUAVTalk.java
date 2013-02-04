@@ -143,7 +143,7 @@ public class BluetoothUAVTalk extends TelemetryTask {
 		socket = null;
 
 		try {
-			socket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
+			socket = device.createRfcommSocketToServiceRecord(MY_UUID);
 		} catch (IOException e) {
 			if (ERROR) Log.e(TAG,"Unable to create Rfcomm socket");
 			return false;

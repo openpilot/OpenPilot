@@ -34,10 +34,14 @@
 
 #if defined(PIOS_INCLUDE_SYS)
 
-#define MEM8(addr)  (*((volatile uint8_t  *)(addr)))
-
 /* Private Function Prototypes */
-static void NVIC_Configuration(void);
+void NVIC_Configuration(void);
+void SysTick_Handler(void);
+
+/* Local Macros */
+#define MEM8(addr)  (*((volatile uint8_t  *)(addr)))
+#define MEM16(addr)  (*((volatile uint16_t  *)(addr)))
+#define MEM32(addr)  (*((volatile uint32_t  *)(addr)))
 
 /**
 * Initialises all system peripherals
@@ -194,12 +198,12 @@ int32_t PIOS_SYS_Reset(void)
 	PIOS_IRQ_Disable();
 
 	// turn off all board LEDs
-#if (PIOS_LED_NUM == 1)
-	PIOS_LED_Off(LED1);
-#elif (PIOS_LED_NUM == 2)
-	PIOS_LED_Off(LED1);
-	PIOS_LED_Off(LED2);
-#endif
+#if defined(PIOS_LED_HEARTBEAT)
+	PIOS_LED_Off(PIOS_LED_HEARTBEAT);
+#endif	/* PIOS_LED_HEARTBEAT */
+#if defined(PIOS_LED_ALARM)
+	PIOS_LED_Off(PIOS_LED_ALARM);
+#endif	/* PIOS_LED_ALARM */
 
 	/* XXX F10x port resets most (but not all) peripherals ... do we care? */
 
@@ -217,7 +221,7 @@ int32_t PIOS_SYS_Reset(void)
 */
 uint32_t PIOS_SYS_getCPUFlashSize(void)
 {
-	return ((uint32_t) MEM_SIZE);	// it might be possible to locate in the OTP area, but haven't looked and not documented
+	return ((uint32_t) MEM16(0x1fff7a10) * 1000);	// it might be possible to locate in the OTP area, but haven't looked and not documented
 }
 
 /**
@@ -231,8 +235,8 @@ int32_t PIOS_SYS_SerialNumberGetBinary(uint8_t *array)
 	int i;
 	
 	/* Stored in the so called "electronic signature" */
-	for (i = 0; i < 12; ++i) {
-		uint8_t b = MEM8(0x1ffff7e8 + i);
+	for (i = 0; i < PIOS_SYS_SERIAL_NUM_BINARY_LEN; ++i) {
+		uint8_t b = MEM8(0x1fff7a10 + i);
 		
 		array[i] = b;
 	}
@@ -252,8 +256,8 @@ int32_t PIOS_SYS_SerialNumberGet(char *str)
 	int i;
 
 	/* Stored in the so called "electronic signature" */
-	for (i = 0; i < 24; ++i) {
-		uint8_t b = *(uint8_t *)(0x1fff7a10 + i/2);
+	for (i = 0; i < PIOS_SYS_SERIAL_NUM_ASCII_LEN; ++i) {
+		uint8_t b = MEM8(0x1fff7a10 + (i / 2));
 		if (!(i & 1))
 			b >>= 4;
 		b &= 0x0f;
@@ -269,7 +273,7 @@ int32_t PIOS_SYS_SerialNumberGet(char *str)
 /**
 * Configures Vector Table base location and SysTick
 */
-static void NVIC_Configuration(void)
+void NVIC_Configuration(void)
 {
 	/* Set the Vector Table base address as specified in .ld file */
 	extern void *pios_isr_vector_table_base;
@@ -296,17 +300,21 @@ void assert_failed(uint8_t * file, uint32_t line)
 	/* printf("Wrong parameters value: file %s on line %d\r\n", file, line); */
 
 	/* Setup the LEDs to Alternate */
+#if defined(PIOS_LED_HEARTBEAT)
+	PIOS_LED_On(PIOS_LED_HEARTBEAT);
+#endif	/* PIOS_LED_HEARTBEAT */
 #if defined(PIOS_LED_ALARM)
-	PIOS_LED_On(PIOS_LED_ALARM);
-#endif
-#if defiend(PIOS_LED_HEARTBEAT)
-	PIOS_LED_Off(PIOS_LED_HEARTBEAT);
-#endif
+	PIOS_LED_Off(PIOS_LED_ALARM);
+#endif	/* PIOS_LED_ALARM */
 
 	/* Infinite loop */
 	while (1) {
-		PIOS_LED_Toggle(LED1);
-		PIOS_LED_Toggle(LED2);
+#if defined(PIOS_LED_HEARTBEAT)
+		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+#endif	/* PIOS_LED_HEARTBEAT */
+#if defined(PIOS_LED_ALARM)
+		PIOS_LED_Toggle(PIOS_LED_ALARM);
+#endif	/* PIOS_LED_ALARM */
 		for (int i = 0; i < 1000000; i++) ;
 	}
 }

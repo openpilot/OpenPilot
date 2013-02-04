@@ -79,6 +79,7 @@ struct pios_sbus_cfg {
 	void (*gpio_clk_func)(uint32_t periph, FunctionalState state);
 	uint32_t gpio_clk_periph;
 	BitAction gpio_inv_enable;
+	BitAction gpio_inv_disable;
 };
 
 extern const struct pios_rcvr_driver pios_sbus_rcvr_driver;

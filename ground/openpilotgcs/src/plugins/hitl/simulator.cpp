@@ -734,8 +734,8 @@ void Simulator::updateUAVOs(Output2Hardware out){
         memset(&airspeedActualData, 0, sizeof(AirspeedActual::DataFields));
         airspeedActualData.CalibratedAirspeed = out.calibratedAirspeed + noise.airspeedActual.CalibratedAirspeed;
         airspeedActualData.TrueAirspeed = out.trueAirspeed + noise.airspeedActual.TrueAirspeed;
-        airspeedActualData.alpha=out.angleOfAttack;
-        airspeedActualData.beta=out.angleOfSlip;
+        //airspeedActualData.alpha=out.angleOfAttack; // to be implemented
+        //airspeedActualData.beta=out.angleOfSlip;
         airspeedActual->setData(airspeedActualData);
 
         airspeedActualTime=airspeedActualTime.addMSecs(settings.airspeedActualRate);

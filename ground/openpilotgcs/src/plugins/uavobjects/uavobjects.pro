@@ -25,23 +25,29 @@ OTHER_FILES += UAVObjects.pluginspec
 # Add in all of the synthetic/generated uavobject files
 HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.h \
+    $$UAVOBJECT_SYNTHETICS/airspeedsensor.h \
+    $$UAVOBJECT_SYNTHETICS/airspeedsettings.h \
     $$UAVOBJECT_SYNTHETICS/airspeedactual.h \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.h \
+    $$UAVOBJECT_SYNTHETICS/attitudesimulated.h \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.h \
     $$UAVOBJECT_SYNTHETICS/revocalibration.h \
+    $$UAVOBJECT_SYNTHETICS/revosettings.h \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/gyros.h \
     $$UAVOBJECT_SYNTHETICS/gyrosbias.h \
     $$UAVOBJECT_SYNTHETICS/accels.h \
     $$UAVOBJECT_SYNTHETICS/magnetometer.h \
+    $$UAVOBJECT_SYNTHETICS/magbias.h \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.h \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/systemstats.h \
     $$UAVOBJECT_SYNTHETICS/systemalarms.h \
     $$UAVOBJECT_SYNTHETICS/objectpersistence.h \
     $$UAVOBJECT_SYNTHETICS/overosyncstats.h \
+    $$UAVOBJECT_SYNTHETICS/overosyncsettings.h \
     $$UAVOBJECT_SYNTHETICS/systemsettings.h \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.h \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.h \
@@ -53,6 +59,9 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/gpsposition.h \
     $$UAVOBJECT_SYNTHETICS/gpstime.h \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.h \
+    $$UAVOBJECT_SYNTHETICS/pathaction.h \
+    $$UAVOBJECT_SYNTHETICS/pathdesired.h \
+    $$UAVOBJECT_SYNTHETICS/pathstatus.h \
     $$UAVOBJECT_SYNTHETICS/gpsvelocity.h \
     $$UAVOBJECT_SYNTHETICS/positionactual.h \
     $$UAVOBJECT_SYNTHETICS/flightbatterystate.h \
@@ -62,8 +71,9 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/velocitydesired.h \
     $$UAVOBJECT_SYNTHETICS/velocityactual.h \
     $$UAVOBJECT_SYNTHETICS/groundtruth.h \
-    $$UAVOBJECT_SYNTHETICS/guidancesettings.h \
-    $$UAVOBJECT_SYNTHETICS/positiondesired.h \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.h \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.h \
+    $$UAVOBJECT_SYNTHETICS/vtolpathfollowersettings.h \
     $$UAVOBJECT_SYNTHETICS/relaytuning.h \
     $$UAVOBJECT_SYNTHETICS/relaytuningsettings.h \
     $$UAVOBJECT_SYNTHETICS/ratedesired.h \
@@ -85,31 +95,37 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/txpidsettings.h \
     $$UAVOBJECT_SYNTHETICS/cameradesired.h \
     $$UAVOBJECT_SYNTHETICS/faultsettings.h \
-    $$UAVOBJECT_SYNTHETICS/pipxsettings.h \
-    $$UAVOBJECT_SYNTHETICS/pipxstatus.h \
+    $$UAVOBJECT_SYNTHETICS/oplinksettings.h \
+    $$UAVOBJECT_SYNTHETICS/oplinkstatus.h \
+    $$UAVOBJECT_SYNTHETICS/osdsettings.h \
     $$UAVOBJECT_SYNTHETICS/waypoint.h \
-    $$UAVOBJECT_SYNTHETICS/waypointactive.h \
-    $$UAVOBJECT_SYNTHETICS/pathaction.h
+    $$UAVOBJECT_SYNTHETICS/waypointactive.h
 
 SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.cpp \
+    $$UAVOBJECT_SYNTHETICS/airspeedsensor.cpp \
+    $$UAVOBJECT_SYNTHETICS/airspeedsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/airspeedactual.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudeactual.cpp \
+    $$UAVOBJECT_SYNTHETICS/attitudesimulated.cpp \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/revocalibration.cpp \
+    $$UAVOBJECT_SYNTHETICS/revosettings.cpp \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.cpp \
     $$UAVOBJECT_SYNTHETICS/accels.cpp \
     $$UAVOBJECT_SYNTHETICS/gyros.cpp \
     $$UAVOBJECT_SYNTHETICS/gyrosbias.cpp \
     $$UAVOBJECT_SYNTHETICS/magnetometer.cpp \
+    $$UAVOBJECT_SYNTHETICS/magbias.cpp \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemstats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemalarms.cpp \
     $$UAVOBJECT_SYNTHETICS/objectpersistence.cpp \
     $$UAVOBJECT_SYNTHETICS/overosyncstats.cpp \
+    $$UAVOBJECT_SYNTHETICS/overosyncsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/systemsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/stabilizationsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/manualcontrolsettings.cpp \
@@ -121,6 +137,9 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsposition.cpp \
     $$UAVOBJECT_SYNTHETICS/gpstime.cpp \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathaction.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
+    $$UAVOBJECT_SYNTHETICS/pathstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsvelocity.cpp \
     $$UAVOBJECT_SYNTHETICS/positionactual.cpp \
     $$UAVOBJECT_SYNTHETICS/flightbatterystate.cpp \
@@ -130,8 +149,9 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/velocitydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/velocityactual.cpp \
     $$UAVOBJECT_SYNTHETICS/groundtruth.cpp \
-    $$UAVOBJECT_SYNTHETICS/guidancesettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/positiondesired.cpp \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/vtolpathfollowersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/relaytuningsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/relaytuning.cpp \
     $$UAVOBJECT_SYNTHETICS/ratedesired.cpp \
@@ -154,8 +174,8 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/txpidsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/cameradesired.cpp \
     $$UAVOBJECT_SYNTHETICS/faultsettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/pipxsettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/pipxstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/oplinksettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/oplinkstatus.cpp \
+    $$UAVOBJECT_SYNTHETICS/osdsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/waypoint.cpp \
-    $$UAVOBJECT_SYNTHETICS/waypointactive.cpp \
-    $$UAVOBJECT_SYNTHETICS/pathaction.cpp
+    $$UAVOBJECT_SYNTHETICS/waypointactive.cpp

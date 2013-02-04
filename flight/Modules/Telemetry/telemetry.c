@@ -79,6 +79,7 @@ static void processObjEvent(UAVObjEvent * ev);
 static void updateTelemetryStats();
 static void gcsTelemetryStatsUpdated();
 static void updateSettings();
+static uint32_t getComPort();
 
 /**
  * Initialise the telemetry module
@@ -341,19 +342,10 @@ static void telemetryTxPriTask(void *parameters)
  */
 static void telemetryRxTask(void *parameters)
 {
-	uint32_t inputPort;
 
 	// Task loop
 	while (1) {
-#if defined(PIOS_INCLUDE_USB)
-		// Determine input port (USB takes priority over telemetry port)
-		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB) {
-			inputPort = PIOS_COM_TELEM_USB;
-		} else
-#endif /* PIOS_INCLUDE_USB */
-		{
-			inputPort = telemetryPort;
-		}
+		uint32_t inputPort = getComPort();
 
 		if (inputPort) {
 			// Block until data are available
@@ -381,23 +373,12 @@ static void telemetryRxTask(void *parameters)
  */
 static int32_t transmitData(uint8_t * data, int32_t length)
 {
-	uint32_t outputPort;
+	uint32_t outputPort = getComPort();
 
-	// Determine input port (USB takes priority over telemetry port)
-#if defined(PIOS_INCLUDE_USB)
-	if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB) {
-		outputPort = PIOS_COM_TELEM_USB;
-	} else
-#endif /* PIOS_INCLUDE_USB */
-	{
-		outputPort = telemetryPort;
-	}
-
-	if (outputPort) {
+	if (outputPort)
 		return PIOS_COM_SendBuffer(outputPort, data, length);
-	} else {
-		return -1;
-	}
+
+	return -1;
 }
 
 /**
@@ -564,6 +545,21 @@ static void updateSettings()
 			break;
 		}
 	}
+}
+
+/**
+ * Determine input/output com port as highest priority available 
+ */
+static uint32_t getComPort() {
+#if defined(PIOS_INCLUDE_USB)
+	if ( PIOS_COM_Available(PIOS_COM_TELEM_USB) )
+		return PIOS_COM_TELEM_USB;
+	else
+#endif /* PIOS_INCLUDE_USB */
+		if ( PIOS_COM_Available(telemetryPort) )
+			return telemetryPort;
+		else
+			return 0;
 }
 
 /**

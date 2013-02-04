@@ -5,14 +5,16 @@ PLUGINS="${APP}/Contents/Plugins"
 OP_PLUGINS="${APP}/Contents/Plugins/OpenPilot"
 QT_LIBS="QtDeclarative QtXmlPatterns QtGui QtTest QtCore QtSvg QtSql QtOpenGL QtNetwork QtXml QtDBus QtScript phonon"
 QT_DIR=$(otool -L "${APP}/Contents/MacOS/OpenPilot GCS"  | sed -n -e 's/\/QtCore\.framework.*//p' | sed -n -E 's:^.::p')
-QT_EXTRA="accessible/libqtaccessiblewidgets.dylib bearer/libqgenericbearer.dylib codecs/libqcncodecs.dylib codecs/libqjpcodecs.dylib  codecs/libqkrcodecs.dylib codecs/libqtwcodecs.dylib graphicssystems/libqtracegraphicssystem.dylib imageformats/libqgif.dylib imageformats/libqico.dylib imageformats/libqjpeg.dylib imageformats/libqmng.dylib imageformats/libqtiff.dylib imageformats/libqsvg.dylib qmltooling/libqmldbg_inspector.dylib qmltooling/libqmldbg_tcp.dylib"
+QT_EXTRA="accessible/libqtaccessiblewidgets.dylib bearer/libqgenericbearer.dylib codecs/libqcncodecs.dylib codecs/libqjpcodecs.dylib  codecs/libqkrcodecs.dylib codecs/libqtwcodecs.dylib graphicssystems/libqtracegraphicssystem.dylib imageformats/libqgif.dylib imageformats/libqico.dylib imageformats/libqjpeg.dylib imageformats/libqmng.dylib imageformats/libqtiff.dylib imageformats/libqsvg.dylib qmltooling/libqmldbg_inspector.dylib qmltooling/libqmldbg_tcp.dylib graphicssystems/libqglgraphicssystem.dylib sqldrivers/libqsqlodbc.dylib sqldrivers/libqsqlpsql.dylib sqldrivers/libqsqlite.dylib imageformats/libqtga.dylib iconengines/libqsvgicon.dylib"
 
+OSG_EXTRA="libosgViewer.90.dylib"
 
 echo "Qt library directory is \"${QT_DIR}\""
 
-echo "Processing Qt libraries in $1"
+echo "Running macdeployqt"
 macdeployqt "${APP}"
 
+echo "Processing Qt libraries in $1"
 for f in "${PLUGINS}/"*.dylib "${OP_PLUGINS}/"*.dylib
 do
     for g in $QT_LIBS
@@ -24,7 +26,7 @@ do
     done
 done
 
-
+echo "Copying other libraries that were missed"
 # should be redundant but some libs missed by main app and macdeployqt
 for f in ${QT_LIBS}
 do
@@ -80,6 +82,18 @@ install_name_tool -change \
 	"${APP}/Contents/Plugins/libsdlgamepad.1.dylib"
 
 # deleting unnecessary files
+
+echo "Copying OSG libraries"
+for f in ${OSG_EXTRA}
+do
+	echo "Copying library ${f}
+	cp /usr/local/lib/{$f} "${APP}/Contents/Plugins/${f}"
+	echo "Changing package identification of ${f}
+	install_name_tool -id \
+		@executable_path/../Frameworks/SDL.framework/Versions/A/SDL \
+		"${APP}/Contents/Frameworks/SDL.framework/Versions/A/SDL"
+done
+
 echo "Deleting unnecessary files"
 find "${APP}/Contents/Frameworks" -iname "current" -exec rm -rf \{\} \;
 find "${APP}/Contents/Frameworks" -iname "4.0" -exec rm -rf \{\} \;

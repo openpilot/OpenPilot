@@ -32,10 +32,11 @@
 #define PIOS_RFM22B_PRIV_H
 
 #include <pios.h>
-#include "fifo_buffer.h"
+#include <fifo_buffer.h>
+#include <uavobjectmanager.h>
+#include <oplinkstatus.h>
 #include "pios_rfm22b.h"
-
-extern const struct pios_com_driver pios_rfm22b_com_driver;
+#include "pios_rfm22b_rcvr.h"
 
 // ************************************
 
@@ -47,17 +48,6 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 
 #define RFM22_MIN_CARRIER_FREQUENCY_HZ 		240000000ul
 #define RFM22_MAX_CARRIER_FREQUENCY_HZ 		930000000ul
-
-// ************************************
-
-enum {	RX_SCAN_SPECTRUM = 0,
-		RX_WAIT_PREAMBLE_MODE,
-		RX_WAIT_SYNC_MODE,
-		RX_DATA_MODE,
-		TX_DATA_MODE,
-		TX_STREAM_MODE,
-		TX_CARRIER_MODE,
-		TX_PN_MODE};
 
 // ************************************
 
@@ -94,7 +84,7 @@ enum {	RX_SCAN_SPECTRUM = 0,
 #define RFM22_is1_icrerror						BIT0		// CRC Error. When set to 1 the cyclic redundancy check is failed.
 #define RFM22_is1_ipkvalid						BIT1		// Valid Packet Received.When set to 1 a valid packet has been received.
 #define RFM22_is1_ipksent						BIT2		// Packet Sent Interrupt. When set to1 a valid packet has been transmitted.
-#define RFM22_is1_iext							BIT3		// External Interrupt. When set to 1 an interrupt occurred on one of the GPIO’s if it is programmed so. The status can be checked in register 0Eh. See GPIOx Configuration section for the details.
+#define RFM22_is1_iext							BIT3		// External Interrupt. When set to 1 an interrupt occurred on one of the GPIOï¿½s if it is programmed so. The status can be checked in register 0Eh. See GPIOx Configuration section for the details.
 #define RFM22_is1_irxffafull					BIT4		// RX FIFO Almost Full.When set to 1 the RX FIFO has met its almost full threshold and needs to be read by the microcontroller.
 #define RFM22_is1_ixtffaem						BIT5		// TX FIFO Almost Empty. When set to 1 the TX FIFO is almost empty and needs to be filled.
 #define RFM22_is1_itxffafull					BIT6		// TX FIFO Almost Full. When set to 1 the TX FIFO has met its almost full threshold and needs to be transmitted.
@@ -134,7 +124,7 @@ enum {	RX_SCAN_SPECTRUM = 0,
 #define RFM22_opfc1_xton						0x01		// READY Mode (Xtal is ON).
 #define RFM22_opfc1_pllon						0x02		// TUNE Mode (PLL is ON). When pllon = 1 the PLL will remain enabled in Idle State. This will for faster turn-around time at the cost of increased current consumption in Idle State.
 #define RFM22_opfc1_rxon						0x04		// RX on in Manual Receiver Mode. Automatically cleared if Multiple Packets config. is disabled and a valid packet received.
-#define RFM22_opfc1_txon						0x08		// TX on in Manual Transmit Mode. Automatically cleared in FIFO mode once the packet is sent. Transmission can be aborted during packet transmission, however, when no data has been sent yet, transmission can only be aborted after the device is programmed to “unmodulated carrier” ("Register 71h. Modulation Mode Control 2").
+#define RFM22_opfc1_txon						0x08		// TX on in Manual Transmit Mode. Automatically cleared in FIFO mode once the packet is sent. Transmission can be aborted during packet transmission, however, when no data has been sent yet, transmission can only be aborted after the device is programmed to ï¿½unmodulated carrierï¿½ ("Register 71h. Modulation Mode Control 2").
 #define RFM22_opfc1_x32ksel						0x10		// 32,768 kHz Crystal Oscillator Select.   0: RC oscillator    1: 32 kHz crystal
 #define RFM22_opfc1_enwt						0x20		// Enable Wake-Up-Timer. Enabled when enwt = 1. If the Wake-up-Timer function is enabled it will operate in any mode and notify the microcontroller through the GPIO interrupt when the timer expires.
 #define RFM22_opfc1_enlbd						0x40		// Enable Low Battery Detect. When this bit is set to 1 the Low Battery Detector circuit and threshold comparison will be enabled.
@@ -314,8 +304,8 @@ enum {	RX_SCAN_SPECTRUM = 0,
 #define RFM22_temp_sensor_calib						0x12	// R/W
 #define RFM22_tsc_tstrim_mask					0x0F		// Temperature Sensor Trim Value.
 #define RFM22_tsc_entstrim						0x10		// Temperature Sensor Trim Enable.
-#define RFM22_tsc_entsoffs						0x20		// Temperature Sensor Offset to Convert from K to ºC.
-#define RFM22_tsc_tsrange0						0x00		// Temperature Sensor Range Selection. –64C to +64C 0.5C resolution
+#define RFM22_tsc_entsoffs						0x20		// Temperature Sensor Offset to Convert from K to ï¿½C.
+#define RFM22_tsc_tsrange0						0x00		// Temperature Sensor Range Selection. ï¿½64C to +64C 0.5C resolution
 #define RFM22_tsc_tsrange1						0x40		// -40 to +85C with 1.0C resolution
 #define RFM22_tsc_tsrange2						0x80		// 0C to 85C with 0.5C resolution
 #define RFM22_tsc_tsrange3						0xC0		// -40F to 216F with 1.0F resolution
@@ -361,7 +351,7 @@ enum {	RX_SCAN_SPECTRUM = 0,
 #define RFM22_antenna_diversity_register1			0x28	// R
 #define RFM22_antenna_diversity_register2			0x29	// R
 
-#define RFM22_afc_limiter							0x2A	// R/W .. AFC_pull_in_range = ±AFCLimiter[7:0] x (hbsel+1) x 625 Hz
+#define RFM22_afc_limiter							0x2A	// R/W .. AFC_pull_in_range = ï¿½AFCLimiter[7:0] x (hbsel+1) x 625 Hz
 
 #define RFM22_afc_correction_read					0x2B	// R
 
@@ -376,11 +366,11 @@ enum {	RX_SCAN_SPECTRUM = 0,
 #define RFM22_dac_crc_iec16						0x02		//
 #define RFM22_dac_crc_biacheva					0x03		//
 #define RFM22_dac_encrc							0x04		// CRC Enable. Cyclic Redundancy Check generation is enabled if this bit is set.
-#define RFM22_dac_enpactx						0x08		// Enable Packet TX Handling. If FIFO Mode (dtmod = 10) is being used automatic packet handling may be enabled. Setting enpactx = 1 will enable automatic packet handling in the TX path. Register 30–4D allow for various configurations of the packet structure. Setting enpactx = 0 will not do any packet handling in the TX path. It will only transmit what is loaded to the FIFO.
+#define RFM22_dac_enpactx						0x08		// Enable Packet TX Handling. If FIFO Mode (dtmod = 10) is being used automatic packet handling may be enabled. Setting enpactx = 1 will enable automatic packet handling in the TX path. Register 30ï¿½4D allow for various configurations of the packet structure. Setting enpactx = 0 will not do any packet handling in the TX path. It will only transmit what is loaded to the FIFO.
 #define RFM22_dac_skip2ph						0x10		// Skip 2nd Phase of Preamble Detection. If set, we skip the second phase of the preamble detection (under certain conditions) if antenna diversity is enabled.
 #define RFM22_dac_crcdonly						0x20		// CRC Data Only Enable. When this bit is set to 1 the CRC is calculated on and checked against the packet data fields only.
 #define RFM22_dac_lsbfrst						0x40		// LSB First Enable. The LSB of the data will be transmitted/received first if this bit is set.
-#define RFM22_dac_enpacrx						0x80		// Enable Packet RX Handling. If FIFO Mode (dtmod = 10) is being used automatic packet handling may be enabled. Setting enpacrx = 1 will enable automatic packet handling in the RX path. Register 30–4D allow for various configurations of the packet structure. Setting enpacrx = 0 will not do any packet handling in the RX path. It will only receive everything after the sync word and fill up the RX FIFO.
+#define RFM22_dac_enpacrx						0x80		// Enable Packet RX Handling. If FIFO Mode (dtmod = 10) is being used automatic packet handling may be enabled. Setting enpacrx = 1 will enable automatic packet handling in the RX path. Register 30ï¿½4D allow for various configurations of the packet structure. Setting enpacrx = 0 will not do any packet handling in the RX path. It will only receive everything after the sync word and fill up the RX FIFO.
 
 #define RFM22_ezmac_status							0x31	// R
 #define RFM22_ezmac_status_pksent				0x01		// Packet Sent. A 1 a packet has been sent by the radio. (Same bit as in register 03, but reading it does not reset the IRQ)
@@ -389,7 +379,7 @@ enum {	RX_SCAN_SPECTRUM = 0,
 #define RFM22_ezmac_status_pkvalid				0x08		// Valid Packet Received. When a 1 a valid packet has been received by the receiver. (Same bit as in register 03, but reading it does not reset the IRQ)
 #define RFM22_ezmac_status_pkrx					0x10		// Packet Receiving. When 1 the radio is currently receiving a valid packet.
 #define RFM22_ezmac_status_pksrch				0x20		// Packet Searching. When 1 the radio is searching for a valid packet.
-#define RFM22_ezmac_status_rxcrc1				0x40		// If high, it indicates the last CRC received is all one’s. May indicated Transmitter underflow in case of CRC error.
+#define RFM22_ezmac_status_rxcrc1				0x40		// If high, it indicates the last CRC received is all oneï¿½s. May indicated Transmitter underflow in case of CRC error.
 
 #define RFM22_header_control1						0x32	// R/W
 #define RFM22_header_cntl1_bcen_none			0x00		// No broadcast address enable.
@@ -501,8 +491,8 @@ enum {	RX_SCAN_SPECTRUM = 0,
 #define RFM22_deltasigma_adc_tuning1				0x67	// R/W
 #define RFM22_deltasigma_adc_tuning2				0x68	// R/W
 */
-#define RFM22_agc_override1							0x69	// R/W
-#define RFM22_agc_ovr1_sgi						0x40		// AGC Loop, Set Gain Increase. If set to 0 then gain increasing will not be allowed. If set to 1 then gain increasing is allowed, default is 0.
+#define RFM22_agc_override1					0x69	// R/W
+#define RFM22_agc_ovr1_sgi					0x40		// AGC Loop, Set Gain Increase. If set to 0 then gain increasing will not be allowed. If set to 1 then gain increasing is allowed, default is 0.
 #define RFM22_agc_ovr1_agcen					0x20		// Automatic Gain Control Enable. When this bit is set then the result of the control can be read out from bits [4:0], otherwise the gain can be controlled manually by writing into bits [4:0].
 #define RFM22_agc_ovr1_lnagain					0x10		// LNA Gain Select. 0 = min gain = 5dB, 1 = max gain = 25 dB.
 #define RFM22_agc_ovr1_pga_mask					0x0F		// PGA Gain Override Value.
@@ -512,30 +502,22 @@ enum {	RX_SCAN_SPECTRUM = 0,
 //#define RFM22_gfsk_fir_coeff_addr					0x6B	// R/W
 //#define RFM22_gfsk_fir_coeff_value				0x6C	// R/W
 
-#define RFM22_tx_power								0x6D	// R/W
-#define RFM22_tx_pwr_txpow_0					0x00		//  +1dBm .. 1.25mW
-#define RFM22_tx_pwr_txpow_1					0x01		//  +2dBm .. 1.6mW
-#define RFM22_tx_pwr_txpow_2					0x02		//  +5dBm .. 3.16mW
-#define RFM22_tx_pwr_txpow_3					0x03		//  +8dBm .. 6.3mW
-#define RFM22_tx_pwr_txpow_4					0x04		// +11dBm .. 12.6mW
-#define RFM22_tx_pwr_txpow_5					0x05		// +14dBm .. 25mW
-#define RFM22_tx_pwr_txpow_6					0x06		// +17dBm .. 50mW
-#define RFM22_tx_pwr_txpow_7					0x07		// +20dBm .. 100mW
-#define RFM22_tx_pwr_lna_sw						0x08		// LNA Switch Controller. If set, lna_sw control from the digital will go high during TX modes, and low during other times. If reset, the digital control signal is low at all times.
+#define RFM22_tx_power						0x6D	// R/W
+#define RFM22_tx_pwr_lna_sw					0x08		// LNA Switch Controller. If set, lna_sw control from the digital will go high during TX modes, and low during other times. If reset, the digital control signal is low at all times.
 #define RFM22_tx_pwr_papeaklvl_0				0x10		//      "                   "
 #define RFM22_tx_pwr_papeaklvl_1				0x20		// PA Peak Detect Level (direct from register). 00 = 6.5, 01 = 7, 10 = 7.5, 11 = 8, 00 = default
 #define RFM22_tx_pwr_papeaken					0x40		// PA Peak Detector Enable.
 #define RFM22_tx_pwr_papeakval					0x80		// PA Peak Detector Value Read Register. Reading a 1 in this register when the papeaken=1 then the PA drain voltage is too high and the match network needs adjusting for optimal efficiency.
 
-#define RFM22_tx_data_rate1							0x6E	// R/W
-#define RFM22_tx_data_rate0							0x6F	// R/W
+#define RFM22_tx_data_rate1					0x6E	// R/W
+#define RFM22_tx_data_rate0					0x6F	// R/W
 
 #define RFM22_modulation_mode_control1				0x70	// R/W
-#define RFM22_mmc1_enwhite						0x01		// Data Whitening is Enabled if this bit is set.
-#define RFM22_mmc1_enmanch						0x02		// Manchester Coding is Enabled if this bit is set.
-#define RFM22_mmc1_enmaninv						0x04		// Manchester Data Inversion is Enabled if this bit is set.
-#define RFM22_mmc1_manppol						0x08		// Manchester Preamble Polarity (will transmit a series of 1 if set, or series of 0 if reset).
-#define RFM22_mmc1_enphpwdn						0x10		// If set, the Packet Handler will be powered down when chip is in low power mode.
+#define RFM22_mmc1_enwhite					0x01		// Data Whitening is Enabled if this bit is set.
+#define RFM22_mmc1_enmanch					0x02		// Manchester Coding is Enabled if this bit is set.
+#define RFM22_mmc1_enmaninv					0x04		// Manchester Data Inversion is Enabled if this bit is set.
+#define RFM22_mmc1_manppol					0x08		// Manchester Preamble Polarity (will transmit a series of 1 if set, or series of 0 if reset).
+#define RFM22_mmc1_enphpwdn					0x10		// If set, the Packet Handler will be powered down when chip is in low power mode.
 #define RFM22_mmc1_txdtrtscale					0x20		// This bit should be set for Data Rates below 30 kbps.
 
 #define RFM22_modulation_mode_control2				0x71	// R/W
@@ -544,8 +526,8 @@ enum {	RX_SCAN_SPECTRUM = 0,
 #define RFM22_mmc2_modtyp_ook					0x01		//
 #define RFM22_mmc2_modtyp_fsk					0x02		//
 #define RFM22_mmc2_modtyp_gfsk					0x03		//
-#define RFM22_mmc2_fd							0x04		// MSB of Frequency Deviation Setting, see "Register 72h. Frequency Deviation".
-#define RFM22_mmc2_eninv						0x08		// Invert TX and RX Data.
+#define RFM22_mmc2_fd						0x04		// MSB of Frequency Deviation Setting, see "Register 72h. Frequency Deviation".
+#define RFM22_mmc2_eninv					0x08		// Invert TX and RX Data.
 #define RFM22_mmc2_dtmod_mask					0x30		// Modulation source.
 #define RFM22_mmc2_dtmod_dm_gpio				0x00		//
 #define RFM22_mmc2_dtmod_dm_sdi					0x10		//
@@ -584,69 +566,239 @@ enum {	RX_SCAN_SPECTRUM = 0,
 
 #define RFM22_fifo_access							0x7F	// R/W
 
-// ************************************
 
-typedef int16_t ( *t_rfm22_TxDataByteCallback ) (void);
-typedef bool ( *t_rfm22_RxDataCallback ) (void *data, uint8_t len);
+// External type definitions
 
-// ************************************
+typedef int16_t (*t_rfm22_TxDataByteCallback) (void);
+typedef bool (*t_rfm22_RxDataCallback) (void *data, uint8_t len);
+enum pios_rfm22b_dev_magic {
+	PIOS_RFM22B_DEV_MAGIC = 0x68e971b6,
+};
 
-uint32_t rfm22_minFrequency(void);
-uint32_t rfm22_maxFrequency(void);
+enum pios_rfm22b_state {
+	RFM22B_STATE_UNINITIALIZED,
+	RFM22B_STATE_INITIALIZING,
+	RFM22B_STATE_INITIALIZED,
+	RFM22B_STATE_INITIATING_CONNECTION,
+	RFM22B_STATE_WAIT_FOR_CONNECTION,
+	RFM22B_STATE_REQUESTING_CONNECTION,
+	RFM22B_STATE_ACCEPTING_CONNECTION,
+	RFM22B_STATE_CONNECTION_ACCEPTED,
+	RFM22B_STATE_RX_MODE,
+	RFM22B_STATE_WAIT_PREAMBLE,
+	RFM22B_STATE_WAIT_SYNC,
+	RFM22B_STATE_RX_DATA,
+	RFM22B_STATE_RX_FAILURE,
+	RFM22B_STATE_RECEIVING_STATUS,
+	RFM22B_STATE_TX_START,
+	RFM22B_STATE_TX_DATA,
+	RFM22B_STATE_TX_FAILURE,
+	RFM22B_STATE_SENDING_ACK,
+	RFM22B_STATE_SENDING_NACK,
+	RFM22B_STATE_RECEIVING_ACK,
+	RFM22B_STATE_RECEIVING_NACK,
+	RFM22B_STATE_TIMEOUT,
+	RFM22B_STATE_ERROR,
+	RFM22B_STATE_FATAL_ERROR,
 
-void rfm22_setNominalCarrierFrequency(uint32_t frequency_hz);
-uint32_t rfm22_getNominalCarrierFrequency(void);
+	RFM22B_STATE_NUM_STATES // Must be last
+};
 
-float rfm22_getFrequencyStepSize(void);
+enum pios_rfm22b_event {
+	RFM22B_EVENT_INT_RECEIVED,
+	RFM22B_EVENT_INITIALIZE,
+	RFM22B_EVENT_INITIALIZED,
+	RFM22B_EVENT_REQUEST_CONNECTION,
+	RFM22B_EVENT_WAIT_FOR_CONNECTION,
+	RFM22B_EVENT_CONNECTION_REQUESTED,
+	RFM22B_EVENT_CONNECTION_ACCEPTED,
+	RFM22B_EVENT_PACKET_ACKED,
+	RFM22B_EVENT_PACKET_NACKED,
+	RFM22B_EVENT_ACK_TIMEOUT,
+	RFM22B_EVENT_RX_MODE,
+	RFM22B_EVENT_PREAMBLE_DETECTED,
+	RFM22B_EVENT_SYNC_DETECTED,
+	RFM22B_EVENT_RX_COMPLETE,
+	RFM22B_EVENT_RX_ERROR,
+	RFM22B_EVENT_STATUS_RECEIVED,
+	RFM22B_EVENT_TX_START,
+	RFM22B_EVENT_FAILURE,
+	RFM22B_EVENT_TIMEOUT,
+	RFM22B_EVENT_ERROR,
+	RFM22B_EVENT_FATAL_ERROR,
 
-void rfm22_setFreqHopChannel(uint8_t channel);
-uint8_t rfm22_freqHopChannel(void);
+	RFM22B_EVENT_NUM_EVENTS  // Must be last
+};
 
-uint32_t rfm22_freqHopSize(void);
+#define RFM22B_RX_PACKET_STATS_LEN 4
+enum pios_rfm22b_rx_packet_status {
+	RFM22B_GOOD_RX_PACKET = 0x00,
+	RFM22B_CORRECTED_RX_PACKET = 0x01,
+	RFM22B_ERROR_RX_PACKET = 0x2,
+	RFM22B_RESENT_TX_PACKET = 0x3
+};
 
-void rfm22_setDatarate(uint32_t datarate_bps, bool data_whitening);
-uint32_t rfm22_getDatarate(void);
+typedef struct {
+	uint32_t pairID;
+	int8_t rssi;
+	int8_t afc_correction;
+	uint8_t lastContact;
+} rfm22b_pair_stats;
 
-void rfm22_setRxMode(uint8_t mode, bool multi_packet_mode);
+struct pios_rfm22b_dev {
+	enum pios_rfm22b_dev_magic magic;
+	struct pios_rfm22b_cfg cfg;
 
-int8_t rfm22_getRSSI(void);
+	// The SPI bus information
+	uint32_t spi_id;
+	uint32_t slave_num;
 
-int8_t rfm22_receivedRSSI(void);
-int32_t rfm22_receivedAFCHz(void);
-uint16_t rfm22_receivedLength(void);
-uint8_t * rfm22_receivedPointer(void);
-void rfm22_receivedDone(void);
+	// The device ID
+	uint32_t deviceID;
 
-int32_t rfm22_sendData(void *data, uint16_t length, bool send_immediately);
+	// The destination ID
+	uint32_t destination_id;
 
-void rfm22_setFreqCalibration(uint8_t value);
-uint8_t rfm22_getFreqCalibration(void);
+	// Is this device a coordinator?
+	bool coordinator;
 
-void rfm22_setTxPower(uint8_t tx_pwr);
-uint8_t rfm22_getTxPower(void);
+	// The task handle
+	xTaskHandle taskHandle;
 
-void rfm22_setTxStream(void);	// TEST ONLY
+	// The potential paired statistics
+	rfm22b_pair_stats pair_stats[OPLINKSTATUS_PAIRIDS_NUMELEM];
 
-void rfm22_setTxNormal(void);
-void rfm22_setTxCarrierMode(void);
-void rfm22_setTxPNMode(void);
+	// ISR pending semaphore
+	xSemaphoreHandle isrPending;
 
-int8_t rfm22_currentMode(void);
-bool rfm22_transmitting(void);
+	// The com configuration callback
+	PIOS_RFM22B_ComConfigCallback com_config_cb;
 
-bool rfm22_channelIsClear(void);
+	// The COM callback functions.
+	pios_com_callback rx_in_cb;
+	uint32_t rx_in_context;
+	pios_com_callback tx_out_cb;
+	uint32_t tx_out_context;
 
-bool rfm22_txReady(void);
+	// the transmit power to use for data transmissions
+	uint8_t	tx_power;
 
-void rfm22_1ms_tick(void);
+	// The RF datarate lookup index.
+	uint8_t datarate;
 
-void rfm22_TxDataByte_SetCallback(t_rfm22_TxDataByteCallback new_function);
-void rfm22_RxData_SetCallback(t_rfm22_RxDataCallback new_function);
+	// The state machine state and the current event
+	enum pios_rfm22b_state state;
 
-int rfm22_init_scan_spectrum(uint32_t min_frequency_hz, uint32_t max_frequency_hz);
-int rfm22_init_tx_stream(uint32_t min_frequency_hz, uint32_t max_frequency_hz);
-int rfm22_init_rx_stream(uint32_t min_frequency_hz, uint32_t max_frequency_hz);
-int rfm22_init_normal(uint32_t id, uint32_t min_frequency_hz, uint32_t max_frequency_hz, uint32_t freq_hop_step_size);
+	// The event queue handle
+	xQueueHandle eventQueue;
+
+	// device status register
+	uint8_t device_status;
+	// interrupt status register 1
+	uint8_t int_status1;
+	// interrupt status register 2
+	uint8_t int_status2;
+	// ezmac status register
+	uint8_t ezmac_status;
+
+	// The error statistics counters
+	uint16_t prev_rx_seq_num;
+	uint32_t rx_packet_stats[RFM22B_RX_PACKET_STATS_LEN];
+
+	// The packet statistics
+	struct rfm22b_stats stats;
+
+	// Stats
+	uint16_t errors;
+
+	// RSSI in dBm
+	int8_t rssi_dBm;
+
+	// The packet queue handle
+	xQueueHandle packetQueue;
+
+	// The tx data packet
+	PHPacket data_packet;
+	// The current tx packet
+	PHPacketHandle tx_packet;
+	// The previous tx packet (waiting for an ACK)
+	PHPacketHandle prev_tx_packet;
+	// The tx data read index
+	uint16_t tx_data_rd;
+	// The tx data write index
+	uint16_t tx_data_wr;
+	// The tx packet sequence number
+	uint16_t tx_seq;
+
+	// The rx data packet
+	PHPacket rx_packet;
+	// The receive buffer write index
+	uint16_t rx_buffer_wr;
+	// The receive buffer write index
+	uint16_t rx_packet_len;
+	// Is the modem currently in Rx mode?
+	bool in_rx_mode;
+
+	// The status packet
+	PHStatusPacket status_packet;
+
+	// The ACK/NACK packet
+	PHAckNackPacket ack_nack_packet;
+
+#ifdef PIOS_PPM_RECEIVER
+	// The PPM packet
+	PHPpmPacket ppm_packet;
+#endif
+
+	// The connection packet.
+	PHConnectionPacket con_packet;
+
+	// Send flags
+	bool send_status;
+	bool send_ppm;
+	bool send_connection_request;
+	bool time_to_send;
+	uint8_t time_to_send_offset;
+
+	// The minimum frequency
+	uint32_t min_frequency;
+	// The maximum frequency
+	uint32_t max_frequency;
+	// The current nominal frequency
+	uint32_t frequency_hz;
+	// The frequency hopping step size
+	float frequency_step_size;
+	// current frequency hop channel
+	uint8_t	frequency_hop_channel;
+	// the frequency hop step size
+	uint8_t frequency_hop_step_size_reg;
+	// afc correction reading (in Hz)
+	int8_t afc_correction_Hz;
+
+	// The maximum time (ms) that it should take to transmit / receive a packet.
+	uint32_t max_packet_time;
+	portTickType packet_start_ticks;
+	portTickType tx_complete_ticks;
+	portTickType rx_complete_ticks;
+	uint8_t max_ack_delay;
+
+	// The PPM channel values
+	uint16_t ppm_channel[PIOS_RFM22B_RCVR_MAX_CHANNELS];
+	uint8_t ppm_supv_timer;
+	bool ppm_fresh;
+};
+
+
+// External function definitions
+
+bool PIOS_RFM22_EXT_Int(void);
+bool PIOS_RFM22B_validate(struct pios_rfm22b_dev * rfm22b_dev);
+void PIOS_RFM22B_InjectEvent(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event, bool inISR);
+
+
+// Global variable definitions
+
+extern const struct pios_com_driver pios_rfm22b_com_driver;
 
 #endif /* PIOS_RFM22B_PRIV_H */
 

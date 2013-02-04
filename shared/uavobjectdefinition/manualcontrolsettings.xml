@@ -3,7 +3,7 @@
         <description>Settings to indicate how to decode receiver input by @ref ManualControlModule.</description>
         <field name="ChannelGroups" units="Channel Group" type="enum" 
 	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"
-	       options="PWM,PPM,DSM (MainPort),DSM (FlexiPort),S.Bus,GCS,None" defaultvalue="None"/>
+	       options="PWM,PPM,DSM (MainPort),DSM (FlexiPort),S.Bus,GCS,OPLink,None" defaultvalue="None"/>
 	<field name="ChannelNumber" units="channel" type="uint8" defaultvalue="0"
 	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"/>
 	<field name="ChannelMin" units="us" type="int16" defaultvalue="1000"
@@ -26,9 +26,10 @@
 
 	<!-- Note these options values should be identical to those defined in FlightMode -->
         <field name="FlightModeNumber" units="" type="uint8" elements="1" defaultvalue="3"/>
-        <field name="FlightModePosition" units="" type="enum" elements="6" options="Manual,Stabilized1,Stabilized2,Stabilized3,Autotune,AltitudeHold,VelocityControl,PositionHold" defaultvalue="Manual,Stabilized1,Stabilized2,Stabilized3,Stabilized1,Stabilized2" limits="%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold"/>
+        <field name="FlightModePosition" units="" type="enum" elements="6" options="Manual,Stabilized1,Stabilized2,Stabilized3,Autotune,AltitudeHold,VelocityControl,PositionHold,ReturnToBase,Land,PathPlanner" defaultvalue="Manual,Stabilized1,Stabilized2,Stabilized3,AltitudeHold,PositionHold" limits="%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold,%0401NE:AltitudeHold:VelocityControl:PositionHold;%0402NE:AltitudeHold:VelocityControl:PositionHold"/>
 
         <field name="ArmedTimeout" units="ms" type="uint16" elements="1" defaultvalue="30000"/>
+        <field name="FailsafeBehavior" units="" type="enum" elements="1" options="None" defaultvalue="None"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

@@ -74,7 +74,7 @@ help:
 	@echo
 	@echo "   [Tool Installers]"
 	@echo "     qt_sdk_install       - Install the QT v4.7.3 tools"
-	@echo "     arm_sdk_install      - Install the Code Sourcery ARM gcc toolchain"
+	@echo "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
 	@echo "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@echo "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
 	@echo "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
@@ -120,6 +120,8 @@ help:
 	@echo "                            supported boards are ($(BL_BOARDS))"
 	@echo
 	@echo "   [Simulation]"
+	@echo "     sim_osx              - Build OpenPilot simulation firmware for OSX"
+	@echo "     sim_osx_clean        - Delete all build output for the osx simulation"
 	@echo "     sim_win32            - Build OpenPilot simulation firmware for"
 	@echo "                            Windows using mingw and msys"
 	@echo "     sim_win32_clean      - Delete all build output for the win32 simulation"
@@ -201,10 +203,10 @@ qt_sdk_clean:
 	$(V1) [ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf $(QT_SDK_DIR)
 
 # Set up ARM (STM32) SDK
-ARM_SDK_DIR := $(TOOLS_DIR)/arm-2011.03
+ARM_SDK_DIR := $(TOOLS_DIR)/gcc-arm-none-eabi-4_6-2012q1
 
 .PHONY: arm_sdk_install
-arm_sdk_install: ARM_SDK_URL  := https://sourcery.mentor.com/sgpp/lite/arm/portal/package8736/public/arm-none-eabi/arm-2011.03-42-arm-none-eabi-i686-pc-linux-gnu.tar.bz2
+arm_sdk_install: ARM_SDK_URL  := https://launchpad.net/gcc-arm-embedded/4.6/4.6-2012-q1-update/+download/gcc-arm-none-eabi-4_6-2012q1-20120316.tar.bz2
 arm_sdk_install: ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
 # order-only prereq on directory existance:
 arm_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
@@ -443,7 +445,7 @@ dfuutil_clean:
 # see http://developer.android.com/sdk/ for latest versions
 ANDROID_SDK_DIR := $(TOOLS_DIR)/android-sdk-linux
 .PHONY: android_sdk_install
-android_sdk_install: ANDROID_SDK_URL  := http://dl.google.com/android/android-sdk_r20.0.3-linux.tgz
+android_sdk_install: ANDROID_SDK_URL  := http://dl.google.com/android/android-sdk_r21.0.1-linux.tgz
 android_sdk_install: ANDROID_SDK_FILE := $(notdir $(ANDROID_SDK_URL))
 # order-only prereq on directory existance:
 android_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
@@ -464,7 +466,7 @@ android_sdk_clean:
 .PHONY: android_sdk_update
 android_sdk_update:
 	$(V0) @echo " UPDATE       $(ANDROID_SDK_DIR)"
-	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-16,addon-google_apis-google-16
+	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-14,addon-google_apis-google-14
 
 ##############################
 #
@@ -577,6 +579,7 @@ uavobjects_clean:
 #
 ################################
 
+ANDROIDGCS_BUILD_CONF ?= debug
 
 # Build the output directory for the Android GCS build
 ANDROIDGCS_OUT_DIR := $(BUILD_DIR)/androidgcs
@@ -599,12 +602,12 @@ endif
 androidgcs: uavo-collections_java
 	$(V0) @echo " ANDROID   $(call toprel, $(ANDROIDGCS_OUT_DIR))"
 	$(V1) mkdir -p $(ANDROIDGCS_OUT_DIR)
-	$(V1) $(ANDROID) $(ANDROID_SILENT) update project --target 'Google Inc.:Google APIs:16' --name androidgcs --path ./androidgcs
+	$(V1) $(ANDROID) $(ANDROID_SILENT) update project --target 'Google Inc.:Google APIs:14' --name androidgcs --path ./androidgcs
 	$(V1) ant -f ./androidgcs/build.xml \
 		$(ANT_QUIET) \
 		-Dout.dir="../$(call toprel, $(ANDROIDGCS_OUT_DIR)/bin)" \
 		-Dgen.absolute.dir="$(ANDROIDGCS_OUT_DIR)/gen" \
-		debug
+		$(ANDROIDGCS_BUILD_CONF)
 
 .PHONY: androidgcs_clean
 androidgcs_clean:
@@ -616,7 +619,7 @@ androidgcs_clean:
 #
 # Find the git hashes of each commit that changes uavobjects with:
 #   git log --format=%h -- shared/uavobjectdefinition/ | head -n 2
-UAVO_GIT_VERSIONS := 684620d 43f85d9
+UAVO_GIT_VERSIONS := 5e14f53
 
 # All versions includes a pseudo collection called "working" which represents
 # the UAVOs in the source tree
@@ -861,43 +864,47 @@ all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter ef_$(1), $$(EF_TARGETS)))
 endef
 
-ALL_BOARDS := coptercontrol pipxtreme simposix
+ALL_BOARDS := coptercontrol pipxtreme revolution revomini simposix osd
+ALL_BOARDS_BU := coptercontrol pipxtreme simposix
 
 # SimPosix only builds on Linux so drop it from the list for
 # all other platforms.
 ifneq ($(UNAME), Linux)
 ALL_BOARDS  := $(filter-out simposix, $(ALL_BOARDS))
+ALL_BOARDS_BU  := $(filter-out simposix, $(ALL_BOARDS_BU))
 endif
 
 # Friendly names of each board (used to find source tree)
 coptercontrol_friendly := CopterControl
 pipxtreme_friendly     := PipXtreme
 revolution_friendly    := Revolution
+revomini_friendly      := RevoMini
 simposix_friendly      := SimPosix
+osd_friendly           := OSD
 
-# SimPosix only builds on Linux so drop it from the list for
-# all other platforms.
-ifneq ($(UNAME), Linux)
-ALL_BOARDS  := $(filter-out simposix, $(ALL_BOARDS))
-endif
-
-# Short hames of each board (used to display board name in parallel builds)
+# Short names of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '
 pipxtreme_short        := 'pipx'
 revolution_short       := 'revo'
+revomini_short         := 'rm  '
 simposix_short         := 'posx'
 osd_short              := 'osd '
 
 # Start out assuming that we'll build fw, bl and bu for all boards
 FW_BOARDS  := $(ALL_BOARDS)
 BL_BOARDS  := $(ALL_BOARDS)
-BU_BOARDS  := $(ALL_BOARDS)
+BU_BOARDS  := $(ALL_BOARDS_BU)
 EF_BOARDS  := $(ALL_BOARDS)
 
-# FIXME: The INS build doesn't have a bootloader or bootloader
-#        updater yet so we need to filter them out to prevent errors.
-BL_BOARDS  := $(filter-out ins, $(BL_BOARDS))
-BU_BOARDS  := $(filter-out ins, $(BU_BOARDS))
+# FIXME: The BU image doesn't work for F4 boards so we need to
+#        filter them out to prevent errors.
+BU_BOARDS  := $(filter-out revolution osd, $(BU_BOARDS))
+
+# SimPosix doesn't have a BL, BU or EF target so we need to
+# filter them out to prevent errors on the all_flight target.
+BL_BOARDS  := $(filter-out simposix, $(BL_BOARDS))
+BU_BOARDS  := $(filter-out simposix, $(BU_BOARDS))
+EF_BOARDS  := $(filter-out simposix, $(EF_BOARDS))
 
 # SimPosix doesn't have a BL, BU or EF target so we need to
 # filter them out to prevent errors on the all_flight target.
@@ -954,6 +961,13 @@ sim_win32_%: uavobjects_flight
 	$(V1) $(MAKE) --no-print-directory \
 		-C $(ROOT_DIR)/flight/OpenPilot --file=$(ROOT_DIR)/flight/OpenPilot/Makefile.win32 $*
 
+.PHONY: sim_osx
+sim_osx: sim_osx_elf
+
+sim_osx_%: uavobjects_flight
+	$(V1) mkdir -p $(BUILD_DIR)/sim_osx
+	$(V1) $(MAKE) --no-print-directory \
+		-C $(ROOT_DIR)/flight/Revolution --file=$(ROOT_DIR)/flight/Revolution/Makefile.osx $*
 ##############################
 #
 # Packaging components
@@ -967,3 +981,12 @@ package:
 .PHONY: package_resources
 package_resources:
 	$(V1) cd package && $(MAKE) --no-print-directory opfw_resource
+
+.PHONY: build-info
+build-info:
+	$(V1) mkdir -p $(BUILD_DIR)
+	$(V1) python $(ROOT_DIR)/make/scripts/version-info.py \
+		--path=$(ROOT_DIR) \
+		--uavodir=$(ROOT_DIR)/shared/uavobjectdefinition \
+		--template="make/templates/$@.txt" \
+		--outfile="$(BUILD_DIR)/$@.txt"

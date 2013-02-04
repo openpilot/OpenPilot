@@ -100,6 +100,13 @@ static void altitudeTask(void *parameters)
 
 	// TODO: Check the pressure sensor and set a warning if it fails test
 	
+// Option to change the interleave between Temp and Pressure conversions
+// Undef for normal operation
+//#define PIOS_MS5611_SLOW_TEMP_RATE 20
+ 
+#ifdef PIOS_MS5611_SLOW_TEMP_RATE
+	uint8_t temp_press_interleave_count = 1;
+#endif
 	// Main task loop
 	while (1)
 	{
@@ -128,11 +135,20 @@ static void altitudeTask(void *parameters)
 		}
 #endif
 		float temp, press;
-		
+#ifdef PIOS_MS5611_SLOW_TEMP_RATE
+		temp_press_interleave_count --;
+		if(temp_press_interleave_count == 0)
+		{
+#endif
 		// Update the temperature data
 		PIOS_MS5611_StartADC(TemperatureConv);
 		vTaskDelay(PIOS_MS5611_GetDelay());
 		PIOS_MS5611_ReadADC();
+			
+#ifdef PIOS_MS5611_SLOW_TEMP_RATE
+			temp_press_interleave_count=PIOS_MS5611_SLOW_TEMP_RATE;
+		}
+#endif
 		
 		// Update the pressure data
 		PIOS_MS5611_StartADC(PressureConv);

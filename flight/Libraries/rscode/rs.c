@@ -159,7 +159,7 @@ debug_check_syndrome (void)
 static void
 compute_genpoly (int nbytes, int genpoly[])
 {
-  int i, tp[256], tp1[256];
+  int i, tp[MAXDEG], tp1[MAXDEG];
 	
   /* multiply (x + a^n) for n = 1 to nbytes */
 

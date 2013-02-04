@@ -98,9 +98,9 @@ namespace OP_DFU {
         eBoardUnkwn = 0,
         eBoardMainbrd = 1,
         eBoardINS,
-        eBoardPip,
-        eBoardCC,
-        eBoardPro,
+        eBoardPip = 3,
+        eBoardCC = 4,
+        eBoardRevo = 9,
     };
 
     struct device

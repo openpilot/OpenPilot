@@ -7,6 +7,7 @@
  * @{
  *
  * @file       pios_adc.c  
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @author     Michael Smith Copyright (C) 2011.
  * @brief      Analog to Digital converstion routines
  * @see        The GNU Public License (GPL) Version 3
@@ -44,12 +45,55 @@
 #include "pios.h"
 #include <pios_adc_priv.h>
 
-extern struct pios_adc_cfg pios_adc_cfg;
+#if defined(PIOS_INCLUDE_ADC)
+
+#if !defined(PIOS_ADC_MAX_SAMPLES)
+#define PIOS_ADC_MAX_SAMPLES 0
+#endif
+
+#if !defined(PIOS_ADC_MAX_OVERSAMPLING)
+#define PIOS_ADC_MAX_OVERSAMPLING 0
+#endif
+
+#if !defined(PIOS_ADC_USE_ADC2)
+#define PIOS_ADC_USE_ADC2 0
+#endif
+
+#if !defined(PIOS_ADC_NUM_CHANNELS)
+#define PIOS_ADC_NUM_CHANNELS 0
+#endif
+
+// Private types
+enum pios_adc_dev_magic {
+	PIOS_ADC_DEV_MAGIC = 0x58375124,
+};
+
+struct pios_adc_dev {
+	const struct pios_adc_cfg * cfg;	
+	ADCCallback callback_function;
+#if defined(PIOS_INCLUDE_FREERTOS)
+	xQueueHandle data_queue;
+#endif
+	volatile int16_t *valid_data_buffer;
+	volatile uint8_t adc_oversample;
+	uint8_t dma_block_size;
+	uint16_t dma_half_buffer_size;
+//	int16_t fir_coeffs[PIOS_ADC_MAX_SAMPLES+1]  __attribute__ ((aligned(4)));
+//	volatile int16_t raw_data_buffer[PIOS_ADC_MAX_SAMPLES]  __attribute__ ((aligned(4)));
+//	float downsampled_buffer[PIOS_ADC_NUM_CHANNELS]  __attribute__ ((aligned(4)));
+	enum pios_adc_dev_magic magic;
+};
+
+struct pios_adc_dev * pios_adc_dev;
+
+// Private functions
+void PIOS_ADC_downsample_data();
+static struct pios_adc_dev * PIOS_ADC_Allocate();
+static bool PIOS_ADC_validate(struct pios_adc_dev *);
 
 #if defined(PIOS_INCLUDE_ADC)
 static void init_pins(void);
 static void init_dma(void);
-static void init_timer(void);
 static void init_adc(void);
 #endif
 
@@ -65,16 +109,14 @@ struct adc_accumulator {
 };
 
 #if defined(PIOS_INCLUDE_ADC)
-static struct dma_config config[] = PIOS_DMA_PIN_CONFIG;
+static const struct dma_config config[] = PIOS_DMA_PIN_CONFIG;
 #define PIOS_ADC_NUM_PINS	(sizeof(config) / sizeof(config[0]))
 
 static struct adc_accumulator accumulator[PIOS_ADC_NUM_PINS];
 
+// Two buffers here for double buffering
 static uint16_t adc_raw_buffer[2][PIOS_ADC_MAX_SAMPLES][PIOS_ADC_NUM_PINS];
 #endif
-
-#define PIOS_ADC_TIMER		TIM3		/* might want this to come from the config */
-#define PIOS_LOWRATE_ADC	ADC1
 
 #if defined(PIOS_INCLUDE_ADC)
 static void
@@ -87,6 +129,8 @@ init_pins(void)
 	GPIO_InitStructure.GPIO_Mode	= GPIO_Mode_AIN;
 	
 	for (int32_t i = 0; i < PIOS_ADC_NUM_PINS; i++) {
+		if (config[i].port == NULL)
+			continue;
 		GPIO_InitStructure.GPIO_Pin = config[i].pin;
 		GPIO_Init(config[i].port, &GPIO_InitStructure);
 	}
@@ -96,11 +140,11 @@ static void
 init_dma(void)
 {
 	/* Disable interrupts */
-	DMA_ITConfig(pios_adc_cfg.dma.rx.channel, pios_adc_cfg.dma.irq.flags, DISABLE);
+	DMA_ITConfig(pios_adc_dev->cfg->dma.rx.channel, pios_adc_dev->cfg->dma.irq.flags, DISABLE);
 
 	/* Configure DMA channel */
-	DMA_DeInit(pios_adc_cfg.dma.rx.channel);
-	DMA_InitTypeDef DMAInit = pios_adc_cfg.dma.rx.init;
+	DMA_DeInit(pios_adc_dev->cfg->dma.rx.channel);
+	DMA_InitTypeDef DMAInit = pios_adc_dev->cfg->dma.rx.init;
 	DMAInit.DMA_Memory0BaseAddr		= (uint32_t)&adc_raw_buffer[0];
 	DMAInit.DMA_BufferSize			= sizeof(adc_raw_buffer[0]) / sizeof(uint16_t);
 	DMAInit.DMA_DIR					= DMA_DIR_PeripheralToMemory;
@@ -115,54 +159,27 @@ init_dma(void)
 	DMAInit.DMA_MemoryBurst			= DMA_MemoryBurst_Single;
 	DMAInit.DMA_PeripheralBurst		= DMA_PeripheralBurst_Single;
 
-	DMA_Init(pios_adc_cfg.dma.rx.channel, &DMAInit);	/* channel is actually stream ... */
+	DMA_Init(pios_adc_dev->cfg->dma.rx.channel, &DMAInit);	/* channel is actually stream ... */
 
 	/* configure for double-buffered mode and interrupt on every buffer flip */
-	DMA_DoubleBufferModeConfig(pios_adc_cfg.dma.rx.channel, (uint32_t)&adc_raw_buffer[1], DMA_Memory_0);
-	DMA_DoubleBufferModeCmd(pios_adc_cfg.dma.rx.channel, ENABLE);
-	DMA_ITConfig(pios_adc_cfg.dma.rx.channel, DMA_IT_TC, ENABLE);
+	DMA_DoubleBufferModeConfig(pios_adc_dev->cfg->dma.rx.channel, (uint32_t)&adc_raw_buffer[1], DMA_Memory_0);
+	DMA_DoubleBufferModeCmd(pios_adc_dev->cfg->dma.rx.channel, ENABLE);
+	DMA_ITConfig(pios_adc_dev->cfg->dma.rx.channel, DMA_IT_TC, ENABLE);
+	//DMA_ITConfig(pios_adc_dev->cfg->dma.rx.channel, DMA_IT_HT, ENABLE);
 
 	/* enable DMA */
-	DMA_Cmd(pios_adc_cfg.dma.rx.channel, ENABLE);
+	DMA_Cmd(pios_adc_dev->cfg->dma.rx.channel, ENABLE);
 
 	/* Configure DMA interrupt */
-	NVIC_InitTypeDef NVICInit = pios_adc_cfg.dma.irq.init;
-	NVICInit.NVIC_IRQChannelPreemptionPriority	= PIOS_IRQ_PRIO_LOW;
-	NVICInit.NVIC_IRQChannelSubPriority			= 0;
-	NVICInit.NVIC_IRQChannelCmd					= ENABLE;
+	NVIC_InitTypeDef NVICInit = pios_adc_dev->cfg->dma.irq.init;
 	NVIC_Init(&NVICInit);
-}
-
-static void
-init_timer(void)
-{
-	RCC_ClocksTypeDef	clocks;
-	TIM_TimeBaseInitTypeDef TIMInit;
-
-	/* get clock info */
-	RCC_GetClocksFreq(&clocks);
-
-	/* reset/disable the timer */
-	TIM_DeInit(PIOS_ADC_TIMER);
-
-	/* configure for 1kHz auto-reload cycle */
-	TIM_TimeBaseStructInit(&TIMInit);
-	TIMInit.TIM_Prescaler							= clocks.PCLK1_Frequency / 1000000;	/* 1MHz base clock*/
-	TIMInit.TIM_CounterMode							= TIM_CounterMode_Down;
-	TIMInit.TIM_Period								= 1000;							/* 1kHz conversion rate */
-	TIMInit.TIM_ClockDivision						= TIM_CKD_DIV1;					/* no additional divisor */
-	TIM_TimeBaseInit(PIOS_ADC_TIMER, &TIMInit);
-
-	PIOS_COM_SendFormattedString(PIOS_COM_DEBUG, "TIM_Prescaler %d\r\n",TIMInit.TIM_Prescaler);
-
-	/* configure trigger output on reload */
-	TIM_SelectOutputTrigger(PIOS_ADC_TIMER, TIM_TRGOSource_Update);
-	TIM_Cmd(PIOS_ADC_TIMER, ENABLE);
 }
 
 static void
 init_adc(void)
 {
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+
 	ADC_DeInit();
 
 	/* turn on VREFInt in case we need it */
@@ -172,7 +189,7 @@ init_adc(void)
 	ADC_CommonInitTypeDef ADC_CommonInitStructure;
 	ADC_CommonStructInit(&ADC_CommonInitStructure);
 	ADC_CommonInitStructure.ADC_Mode				= ADC_Mode_Independent;
-	ADC_CommonInitStructure.ADC_Prescaler			= ADC_Prescaler_Div2;
+	ADC_CommonInitStructure.ADC_Prescaler			= ADC_Prescaler_Div8;
 	ADC_CommonInitStructure.ADC_DMAAccessMode		= ADC_DMAAccessMode_Disabled;
 	ADC_CommonInitStructure.ADC_TwoSamplingDelay	= ADC_TwoSamplingDelay_5Cycles;
 	ADC_CommonInit(&ADC_CommonInitStructure);
@@ -181,42 +198,84 @@ init_adc(void)
 	ADC_StructInit(&ADC_InitStructure);
 	ADC_InitStructure.ADC_Resolution				= ADC_Resolution_12b;
 	ADC_InitStructure.ADC_ScanConvMode				= ENABLE;
-	ADC_InitStructure.ADC_ContinuousConvMode		= DISABLE;
-	ADC_InitStructure.ADC_ExternalTrigConv			= ADC_ExternalTrigConv_T3_TRGO;
-	ADC_InitStructure.ADC_ExternalTrigConvEdge		= ADC_ExternalTrigConvEdge_Rising;
+	ADC_InitStructure.ADC_ContinuousConvMode		= ENABLE;
+	ADC_InitStructure.ADC_ExternalTrigConvEdge		= ADC_ExternalTrigConvEdge_None;
 	ADC_InitStructure.ADC_DataAlign					= ADC_DataAlign_Right;
 	ADC_InitStructure.ADC_NbrOfConversion			= ((PIOS_ADC_NUM_PINS)/* >> 1*/);
-	ADC_Init(PIOS_LOWRATE_ADC, &ADC_InitStructure);
+	ADC_Init(pios_adc_dev->cfg->adc_dev, &ADC_InitStructure);
 
-	/* Enable PIOS_LOWRATE_ADC->DMA request */
-		ADC_DMACmd(PIOS_LOWRATE_ADC, ENABLE);
+	/* Enable DMA request */
+	ADC_DMACmd(pios_adc_dev->cfg->adc_dev, ENABLE);
 
 	/* Configure input scan */
 	for (int32_t i = 0; i < PIOS_ADC_NUM_PINS; i++) {
-		ADC_RegularChannelConfig(PIOS_LOWRATE_ADC,
+		ADC_RegularChannelConfig(pios_adc_dev->cfg->adc_dev,
 				config[i].channel,
 				i+1,
 				ADC_SampleTime_56Cycles);		/* XXX this is totally arbitrary... */
 	}
 
-	ADC_DMARequestAfterLastTransferCmd(PIOS_LOWRATE_ADC, ENABLE);
+	ADC_DMARequestAfterLastTransferCmd(pios_adc_dev->cfg->adc_dev, ENABLE);
 
 	/* Finally start initial conversion */
-	ADC_Cmd(PIOS_LOWRATE_ADC, ENABLE);
+	ADC_Cmd(pios_adc_dev->cfg->adc_dev, ENABLE);
+	ADC_ContinuousModeCmd(pios_adc_dev->cfg->adc_dev, ENABLE);
+	ADC_SoftwareStartConv(pios_adc_dev->cfg->adc_dev);
+}
+#endif
+
+static bool PIOS_ADC_validate(struct pios_adc_dev * dev)
+{
+	if (dev == NULL)
+		return false;
+	
+	return (dev->magic == PIOS_ADC_DEV_MAGIC);
+}
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+static struct pios_adc_dev * PIOS_ADC_Allocate()
+{
+	struct pios_adc_dev * adc_dev;
+	
+	adc_dev = (struct pios_adc_dev *)pvPortMalloc(sizeof(*adc_dev));
+	if (!adc_dev) return (NULL);
+	
+	adc_dev->magic = PIOS_ADC_DEV_MAGIC;
+	return(adc_dev);
+}
+#else
+#if defined(PIOS_INCLUDE_ADC)
+#error Not implemented
+#endif
+static struct pios_adc_dev * PIOS_ADC_Allocate()
+{
+	return (struct pios_adc_dev *) NULL;
 }
 #endif
 
 /**
  * @brief Init the ADC.
  */
-void PIOS_ADC_Init()
+int32_t PIOS_ADC_Init(const struct pios_adc_cfg * cfg)
 {
+	pios_adc_dev = PIOS_ADC_Allocate();
+	if (pios_adc_dev == NULL)
+		return -1;
+	
+	pios_adc_dev->cfg = cfg;
+	pios_adc_dev->callback_function = NULL;
+	
+#if defined(PIOS_INCLUDE_FREERTOS)
+	pios_adc_dev->data_queue = NULL;
+#endif
+
 #if defined(PIOS_INCLUDE_ADC)
 	init_pins();
 	init_dma();
-	init_timer();
 	init_adc();
 #endif
+
+	return 0;
 }
 
 /**
@@ -233,21 +292,26 @@ void PIOS_ADC_Config(uint32_t oversampling)
  * @param[in] pin number
  * @return ADC pin value averaged over the set of samples since the last reading.
  * @return -1 if pin doesn't exist
+ * @return -2 if no data acquired since last read
  */
+int32_t last_conv_value;
 int32_t PIOS_ADC_PinGet(uint32_t pin)
 {
 #if defined(PIOS_INCLUDE_ADC)
 	int32_t	result;
-
+	
 	/* Check if pin exists */
 	if (pin >= PIOS_ADC_NUM_PINS) {
 		return -1;
 	}
+	
+	if (accumulator[pin].accumulator <= 0)
+		return -2;
 
 	/* return accumulated result and clear accumulator */
 	result = accumulator[pin].accumulator / (accumulator[pin].count ?: 1);
-	accumulator[pin].accumulator = 0;
-	accumulator[pin].count = 0;
+	accumulator[pin].accumulator = result;
+	accumulator[pin].count = 1;
 
 	return result;
 #endif
@@ -261,7 +325,7 @@ int32_t PIOS_ADC_PinGet(uint32_t pin)
  */
 void PIOS_ADC_SetCallback(ADCCallback new_function) 
 {
-	// XXX might be nice to do something here
+	pios_adc_dev->callback_function = new_function;
 }
 
 #if defined(PIOS_INCLUDE_FREERTOS)
@@ -271,7 +335,7 @@ void PIOS_ADC_SetCallback(ADCCallback new_function)
  */
 void PIOS_ADC_SetQueue(xQueueHandle data_queue) 
 {
-	// XXX it might make sense? to do this
+	pios_adc_dev->data_queue = data_queue;
 }
 #endif
 
@@ -343,16 +407,18 @@ void accumulate(uint16_t *buffer, uint32_t count)
 	
 #if defined(PIOS_INCLUDE_FREERTOS)
 	// XXX should do something with this
-#if 0
-	if (pios_adc_devs[0].data_queue) {
+	if (pios_adc_dev->data_queue) {
 		static portBASE_TYPE xHigherPriorityTaskWoken;
-		xQueueSendFromISR(pios_adc_devs[0].data_queue, pios_adc_devs[0].downsampled_buffer, &xHigherPriorityTaskWoken);
+//		xQueueSendFromISR(pios_adc_dev->data_queue, pios_adc_dev->downsampled_buffer, &xHigherPriorityTaskWoken);
 		portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);		
 	}
+
 #endif
 #endif
-#endif
-	// XXX callback?
+
+//	if(pios_adc_dev->callback_function)
+//		pios_adc_dev->callback_function(pios_adc_dev->downsampled_buffer);
+
 }
 
 /**
@@ -362,24 +428,23 @@ void accumulate(uint16_t *buffer, uint32_t count)
  */
 void PIOS_ADC_DMA_Handler(void)
 {
+	if (!PIOS_ADC_validate(pios_adc_dev))
+		return;
+
 #if defined(PIOS_INCLUDE_ADC)
 	/* terminal count, buffer has flipped */
-	if (DMA_GetITStatus(pios_adc_cfg.dma.rx.channel, pios_adc_cfg.full_flag)) {
-		DMA_ClearITPendingBit(pios_adc_cfg.dma.rx.channel, pios_adc_cfg.full_flag);
+	if (DMA_GetITStatus(pios_adc_dev->cfg->dma.rx.channel, pios_adc_dev->cfg->full_flag)) {
+		DMA_ClearITPendingBit(pios_adc_dev->cfg->dma.rx.channel, pios_adc_dev->cfg->full_flag);
 
 		/* accumulate results from the buffer that was just completed */
-		accumulate(&adc_raw_buffer[DMA_GetCurrentMemoryTarget(pios_adc_cfg.dma.rx.channel) ? 0 : 1][0][0],
+		accumulate(&adc_raw_buffer[DMA_GetCurrentMemoryTarget(pios_adc_dev->cfg->dma.rx.channel) ? 0 : 1][0][0],
 				PIOS_ADC_MAX_SAMPLES);
 
-//		static uint8_t outputcounter = 0;
-//		if (outputcounter == 0)
-//			{
-//			PIOS_COM_SendFormattedString(PIOS_COM_DEBUG, "adc vals %d %d %d %d %d %d\r\n", adc_raw_buffer[0][0][0], adc_raw_buffer[0][0][1], adc_raw_buffer[0][0][2], adc_raw_buffer[0][0][3], adc_raw_buffer[0][0][4], adc_raw_buffer[0][0][5]);
-//			}
-//		outputcounter++;
 	}
 #endif
 }
+
+#endif /* PIOS_INCLUDE_ADC */
 
 /** 
  * @}

@@ -28,6 +28,7 @@
 
 #include "qtsingleapplication.h"
 #include "utils/xmlconfig.h"
+#include "gcssplashscreen.h"
 
 #include <extensionsystem/pluginmanager.h>
 #include <extensionsystem/pluginspec.h>
@@ -46,6 +47,8 @@
 #include <QtGui/QMessageBox>
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
+#include <QtGui/QSplashScreen>
+#include <QtGui/QPainter>
 
 enum { OptionIndent = 4, DescriptionIndent = 24 };
 
@@ -246,9 +249,11 @@ int main(int argc, char **argv)
     //and as of now we dont want that behaviour.
     QLocale::setDefault(QLocale::English);
 
-    QApplication::setGraphicsSystem("raster");
-
     SharedTools::QtSingleApplication app((QLatin1String(appNameC)), argc, argv);
+
+    //Open Splashscreen
+    GCSSplashScreen splash;
+    splash.show();
 
     QString locale = QLocale::system().name();
 
@@ -279,6 +284,8 @@ int main(int argc, char **argv)
         }
     }
     app.setProperty("qtc_locale", locale); // Do we need this?
+
+    splash.showProgressMessage(QObject::tr("Application starting..."));
 
     // Load
     ExtensionSystem::PluginManager pluginManager;
@@ -319,7 +326,7 @@ int main(int argc, char **argv)
             break;
         }
     }
-    if (!coreplugin) {
+    if(!coreplugin){
         QString nativePaths = QDir::toNativeSeparators(pluginPaths.join(QLatin1String(",")));
         const QString reason = QCoreApplication::translate("Application", "Could not find 'Core.pluginspec' in %1").arg(nativePaths);
         displayError(msgCoreLoadFailure(reason));
@@ -347,11 +354,16 @@ int main(int argc, char **argv)
     if (!isFirstInstance && foundAppOptions.contains(QLatin1String(CLIENT_OPTION)))
         return sendArguments(app, pluginManager.arguments()) ? 0 : -1;
 
+    QObject::connect(&pluginManager, SIGNAL(pluginAboutToBeLoaded(ExtensionSystem::PluginSpec*)),
+                     &splash, SLOT(showPluginLoadingProgress(ExtensionSystem::PluginSpec*)));
+
     pluginManager.loadPlugins();
+
     if (coreplugin->hasError()) {
         displayError(msgCoreLoadFailure(coreplugin->errorString()));
         return 1;
     }
+
     {
         QStringList errors;
         foreach (ExtensionSystem::PluginSpec *p, pluginManager.plugins())
@@ -374,5 +386,10 @@ int main(int argc, char **argv)
 
     // Do this after the event loop has started
     QTimer::singleShot(100, &pluginManager, SLOT(startTests()));
+
+    //Update message and postpone closing of splashscreen 3 seconds
+    splash.showProgressMessage(QObject::tr("Application started."));
+    QTimer::singleShot(1500, &splash, SLOT(close()));
+
     return app.exec();
 }

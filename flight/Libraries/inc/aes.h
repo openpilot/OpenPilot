@@ -2,8 +2,6 @@
 #ifndef _AES_H_
 #define _AES_H_
 
-#include "stm32f10x.h"
-
 #define N_ROW			4
 #define N_COL			4
 #define N_BLOCK			(N_ROW * N_COL)

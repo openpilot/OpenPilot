@@ -445,7 +445,7 @@ dfuutil_clean:
 # see http://developer.android.com/sdk/ for latest versions
 ANDROID_SDK_DIR := $(TOOLS_DIR)/android-sdk-linux
 .PHONY: android_sdk_install
-android_sdk_install: ANDROID_SDK_URL  := http://dl.google.com/android/android-sdk_r20.0.3-linux.tgz
+android_sdk_install: ANDROID_SDK_URL  := http://dl.google.com/android/android-sdk_r21.0.1-linux.tgz
 android_sdk_install: ANDROID_SDK_FILE := $(notdir $(ANDROID_SDK_URL))
 # order-only prereq on directory existance:
 android_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
@@ -466,7 +466,7 @@ android_sdk_clean:
 .PHONY: android_sdk_update
 android_sdk_update:
 	$(V0) @echo " UPDATE       $(ANDROID_SDK_DIR)"
-	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-16,addon-google_apis-google-16
+	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-14,addon-google_apis-google-14
 
 ##############################
 #
@@ -579,6 +579,7 @@ uavobjects_clean:
 #
 ################################
 
+ANDROIDGCS_BUILD_CONF ?= debug
 
 # Build the output directory for the Android GCS build
 ANDROIDGCS_OUT_DIR := $(BUILD_DIR)/androidgcs
@@ -601,12 +602,12 @@ endif
 androidgcs: uavo-collections_java
 	$(V0) @echo " ANDROID   $(call toprel, $(ANDROIDGCS_OUT_DIR))"
 	$(V1) mkdir -p $(ANDROIDGCS_OUT_DIR)
-	$(V1) $(ANDROID) $(ANDROID_SILENT) update project --target 'Google Inc.:Google APIs:16' --name androidgcs --path ./androidgcs
+	$(V1) $(ANDROID) $(ANDROID_SILENT) update project --target 'Google Inc.:Google APIs:14' --name androidgcs --path ./androidgcs
 	$(V1) ant -f ./androidgcs/build.xml \
 		$(ANT_QUIET) \
 		-Dout.dir="../$(call toprel, $(ANDROIDGCS_OUT_DIR)/bin)" \
 		-Dgen.absolute.dir="$(ANDROIDGCS_OUT_DIR)/gen" \
-		debug
+		$(ANDROIDGCS_BUILD_CONF)
 
 .PHONY: androidgcs_clean
 androidgcs_clean:
@@ -618,7 +619,7 @@ androidgcs_clean:
 #
 # Find the git hashes of each commit that changes uavobjects with:
 #   git log --format=%h -- shared/uavobjectdefinition/ | head -n 2
-UAVO_GIT_VERSIONS := 684620d 43f85d9
+UAVO_GIT_VERSIONS := 5e14f53
 
 # All versions includes a pseudo collection called "working" which represents
 # the UAVOs in the source tree

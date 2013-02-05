@@ -1,0 +1,16 @@
+<xml>
+	<object name="ODisplaySettings" singleinstance="true" settings="true">
+		<description>Oled Display configurations options.</description>
+		<field name="L0" units="" type="enum" elements="1" options="None,TX,RX,RSSI,Baro Altitude,Baro Variometer,GPS Altitude, GPS Speed,Baro Temperature,Battery" defaultvalue="TX"/>
+		<field name="L1" units="" type="enum" elements="1" options="None,TX,RX,RSSI,Baro Altitude,Baro Variometer,GPS Altitude, GPS Speed,Baro Temperature,Battery" defaultvalue="RX"/>
+		<field name="L2" units="" type="enum" elements="1" options="None,TX,RX,RSSI,Baro Altitude,Baro Variometer,GPS Altitude, GPS Speed,Baro Temperature,Battery" defaultvalue="RSSI"/>
+		<field name="L3" units="" type="enum" elements="1" options="None,TX,RX,RSSI,Baro Altitude,Baro Variometer,GPS Altitude, GPS Speed,Baro Temperature,Battery" defaultvalue="None"/>
+		<field name="L4" units="" type="enum" elements="1" options="None,TX,RX,RSSI,Baro Altitude,Baro Variometer,GPS Altitude, GPS Speed,Baro Temperature,Battery" defaultvalue="None"/>
+		<field name="L5" units="" type="enum" elements="1" options="None,TX,RX,RSSI,Baro Altitude,Baro Variometer,GPS Altitude, GPS Speed,Baro Temperature,Battery" defaultvalue="None"/>
+
+		<access gcs="readwrite" flight="readwrite"/>
+		<telemetrygcs acked="true" updatemode="onchange" period="0"/>
+		<telemetryflight acked="true" updatemode="onchange" period="0"/>
+		<logging updatemode="manual" period="0"/>
+	</object>
+</xml>

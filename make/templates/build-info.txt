@@ -1,5 +1,5 @@
 #
-# This is an automatic software build created by the OpenPilot CI build server.
+# This is an unattended software build created by the OpenPilot CI build server.
 # It comes absolutely with no warranty. Use it at your own risk and be careful.
 #
 # Officially released OpenPilot software can be downloaded from:

@@ -183,18 +183,24 @@ void PIOS_Board_Init(void) {
 	/* Configure the telemetry serial port */
 #ifndef PIOS_RFM22B_DEBUG_ON_TELEM
 	{
-		uint32_t pios_usart1_id;
-		if (PIOS_USART_Init(&pios_usart1_id, &pios_usart_serial_cfg)) {
-			PIOS_Assert(0);
+		if(oplinkSettings.PPMOnMain)
+		{
 		}
-		uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
-		uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telem_uart_telem_id, &pios_usart_com_driver, pios_usart1_id,
-											rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
-											tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
-			PIOS_Assert(0);
+		else
+		{
+			uint32_t pios_usart1_id;
+			if (PIOS_USART_Init(&pios_usart1_id, &pios_usart_serial_cfg)) {
+				PIOS_Assert(0);
+			}
+			uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
+			uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_telem_uart_telem_id, &pios_usart_com_driver, pios_usart1_id,
+												rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
+												tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
 		}
 	}
 #endif
@@ -206,8 +212,14 @@ void PIOS_Board_Init(void) {
 	case OPLINKSETTINGS_PPM_INPUT:
 	{
 		uint32_t pios_ppm_id;
-		PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
-
+		if(oplinkSettings.PPMOnMain)
+		{
+			PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg2);
+		}
+		else
+		{
+			PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+		}
 		if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id))
 			PIOS_Assert(0);
 		break;
@@ -216,7 +228,14 @@ void PIOS_Board_Init(void) {
 
 #if defined(PIOS_INCLUDE_PPM_OUT)
 	case OPLINKSETTINGS_PPM_OUTPUT:
-		PIOS_PPM_Out_Init(&pios_ppm_out_id, &pios_ppm_out_cfg);
+		if(oplinkSettings.PPMOnMain)
+		{
+			PIOS_PPM_Out_Init(&pios_ppm_out_id, &pios_ppm_out_cfg2);
+		}
+		else
+		{
+			PIOS_PPM_Out_Init(&pios_ppm_out_id, &pios_ppm_out_cfg);
+		}
 		break;
 #endif	/* PIOS_INCLUDE_PPM_OUT */
 
@@ -238,6 +257,15 @@ void PIOS_Board_Init(void) {
 		}
 	}
 	}
+	
+#if defined(PIOS_INCLUDE_I2C)
+	if(oplinkSettings.I2C)// && ((oplinkSettings.PPM==OPLINKSETTINGS_PPM_INPUT || oplinkSettings.PPM==OPLINKSETTINGS_PPM_OUTPUT) || oplinkSettings.PPMOnMain))//make also a test on ppm
+	{
+		if (PIOS_I2C_Init(&pios_i2c_flexi_adapter_id, &pios_i2c_flexi_adapter_cfg)) {
+			PIOS_Assert(0);
+		}
+	}
+#endif
 
 	/* Initalize the RFM22B radio COM device. */
 #if defined(PIOS_INCLUDE_RFM22B)

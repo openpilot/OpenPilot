@@ -4,6 +4,7 @@
         <field name="Altitude" units="m" type="float" elements="1"/>
         <field name="Temperature" units="C" type="float" elements="1"/>
         <field name="Pressure" units="kPa" type="float" elements="1"/>
+		<field name="Variometer" units="m/s" type="float" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="1000"/>

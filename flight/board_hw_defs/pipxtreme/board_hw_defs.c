@@ -410,7 +410,95 @@ static const struct pios_tim_channel pios_tim_ppm_flexi_port = {
 	.remap = GPIO_PartialRemap2_TIM2,
 };
 
+static const struct pios_tim_channel pios_tim_ppm_main_port = {
+	.timer = TIM2,
+	.timer_chan = TIM_Channel_2,
+	.pin = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_1,
+			.GPIO_Mode  = GPIO_Mode_IPD,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+		},
+	},
+};
+
 #endif	/* PIOS_INCLUDE_TIM */
+
+#if defined(PIOS_INCLUDE_I2C)
+
+#include <pios_i2c_priv.h>
+
+/*
+ * I2C Adapters
+ */
+
+void PIOS_I2C_flexi_adapter_ev_irq_handler(void);
+void PIOS_I2C_flexi_adapter_er_irq_handler(void);
+void I2C2_EV_IRQHandler() __attribute__ ((alias ("PIOS_I2C_flexi_adapter_ev_irq_handler")));
+void I2C2_ER_IRQHandler() __attribute__ ((alias ("PIOS_I2C_flexi_adapter_er_irq_handler")));
+
+static const struct pios_i2c_adapter_cfg pios_i2c_flexi_adapter_cfg = {
+  .regs = I2C2,
+  .init = {
+    .I2C_Mode                = I2C_Mode_I2C,
+    .I2C_OwnAddress1         = 0,
+    .I2C_Ack                 = I2C_Ack_Enable,
+    .I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit,
+    .I2C_DutyCycle           = I2C_DutyCycle_2,
+    .I2C_ClockSpeed          = 400000,	/* bits/s */
+  },
+  .transfer_timeout_ms = 50,
+  .scl = {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_10,
+      .GPIO_Speed = GPIO_Speed_10MHz,
+      .GPIO_Mode  = GPIO_Mode_AF_OD,
+    },
+  },
+  .sda = {
+    .gpio = GPIOB,
+    .init = {
+      .GPIO_Pin   = GPIO_Pin_11,
+      .GPIO_Speed = GPIO_Speed_10MHz,
+      .GPIO_Mode  = GPIO_Mode_AF_OD,
+    },
+  },
+  .event = {
+    .flags   = 0,		/* FIXME: check this */
+    .init = {
+      .NVIC_IRQChannel                   = I2C2_EV_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+  .error = {
+    .flags   = 0,		/* FIXME: check this */
+    .init = {
+      .NVIC_IRQChannel                   = I2C2_ER_IRQn,
+      .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGHEST,
+      .NVIC_IRQChannelSubPriority        = 0,
+      .NVIC_IRQChannelCmd                = ENABLE,
+    },
+  },
+};
+
+uint32_t pios_i2c_flexi_adapter_id;
+void PIOS_I2C_flexi_adapter_ev_irq_handler(void)
+{
+  /* Call into the generic code to handle the IRQ for this specific device */
+  PIOS_I2C_EV_IRQ_Handler(pios_i2c_flexi_adapter_id);
+}
+
+void PIOS_I2C_flexi_adapter_er_irq_handler(void)
+{
+  /* Call into the generic code to handle the IRQ for this specific device */
+  PIOS_I2C_ER_IRQ_Handler(pios_i2c_flexi_adapter_id);
+}
+
+#endif /* PIOS_INCLUDE_I2C */
 
 #if defined(PIOS_INCLUDE_USART)
 
@@ -552,6 +640,17 @@ const struct pios_ppm_cfg pios_ppm_cfg = {
 	.num_channels = 1,
 };
 
+const struct pios_ppm_cfg pios_ppm_cfg2 = {
+	.tim_ic_init = {
+		.TIM_ICPolarity = TIM_ICPolarity_Rising,
+		.TIM_ICSelection = TIM_ICSelection_DirectTI,
+		.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+		.TIM_ICFilter = 0x0,
+	},
+	.channels = &pios_tim_ppm_main_port,
+	.num_channels = 1,
+};
+
 #endif	/* PIOS_INCLUDE_PPM */
 
 /*
@@ -590,6 +689,35 @@ const struct pios_ppm_out_cfg pios_ppm_out_cfg = {
 		.TIM_OCNIdleState = TIM_OCNIdleState_Reset,
 	},
 	.channel = pios_tim_ppmout,
+};
+
+static const struct pios_tim_channel pios_tim_ppmoutM[] = {
+	{
+		.timer = TIM2,
+		.timer_chan = TIM_Channel_2,
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_1,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+	}
+};
+
+const struct pios_ppm_out_cfg pios_ppm_out_cfg2 = {
+	.tim_oc_init = {
+		.TIM_OCMode = TIM_OCMode_PWM1,
+		.TIM_OutputState = TIM_OutputState_Enable,
+		.TIM_OutputNState = TIM_OutputNState_Disable,
+		.TIM_Pulse = PIOS_SERVOS_INITIAL_POSITION,
+		.TIM_OCPolarity = TIM_OCPolarity_Low,
+		.TIM_OCNPolarity = TIM_OCPolarity_Low,
+		.TIM_OCIdleState = TIM_OCIdleState_Reset,
+		.TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+	},
+	.channel = pios_tim_ppmoutM,
 };
 
 #endif /* PIOS_INCLUDE_PPM_OUT */

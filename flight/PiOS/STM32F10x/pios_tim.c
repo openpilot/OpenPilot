@@ -64,6 +64,7 @@ int32_t PIOS_TIM_InitClock(const struct pios_tim_clock_cfg * cfg)
 	switch((uint32_t) cfg->timer) {
 		case (uint32_t)TIM1:
 			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+			//TIM_CtrlPWMOutputs(TIM1,ENABLE);
 			break;
 		case (uint32_t)TIM2:
 			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);

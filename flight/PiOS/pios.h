@@ -152,6 +152,9 @@
 #if defined(PIOS_INCLUDE_WAVE)
 #include <pios_wavplay.h>
 #endif
+#if defined(PIOS_INCLUDE_SSD1308)
+#include <pios_ssd1308.h>
+#endif
 
 #if defined(PIOS_INCLUDE_FLASH)
 #include <pios_flash_jedec.h>

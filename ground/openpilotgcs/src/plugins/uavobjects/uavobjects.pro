@@ -99,7 +99,11 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/oplinkstatus.h \
     $$UAVOBJECT_SYNTHETICS/osdsettings.h \
     $$UAVOBJECT_SYNTHETICS/waypoint.h \
-    $$UAVOBJECT_SYNTHETICS/waypointactive.h
+    $$UAVOBJECT_SYNTHETICS/waypointactive.h \
+	$$UAVOBJECT_SYNTHETICS/adcs.h \
+	$$UAVOBJECT_SYNTHETICS/baroairspeedsettings.h \
+	$$UAVOBJECT_SYNTHETICS/baroairspeed.h \
+	$$UAVOBJECT_SYNTHETICS/odisplaysettings.h
 
 SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/baroaltitude.cpp \
@@ -178,4 +182,8 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/oplinkstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/osdsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/waypoint.cpp \
-    $$UAVOBJECT_SYNTHETICS/waypointactive.cpp
+    $$UAVOBJECT_SYNTHETICS/waypointactive.cpp \
+	$$UAVOBJECT_SYNTHETICS/adcs.cpp \
+	$$UAVOBJECT_SYNTHETICS/baroairspeedsettings.cpp \
+	$$UAVOBJECT_SYNTHETICS/baroairspeed.cpp \
+	$$UAVOBJECT_SYNTHETICS/odisplaysettings.cpp

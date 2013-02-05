@@ -72,7 +72,7 @@ USE_CAMERASTAB ?= YES
 USE_COMUSBBRIDGE ?= YES
 USE_GPS ?= YES
 USE_TXPID ?= YES
-USE_I2C ?= NO
+USE_I2C ?= YES
 USE_ALTITUDE ?= NO
 USE_AUTOTUNE ?= YES
 TEST_FAULTS ?= NO
@@ -558,7 +558,7 @@ MATH_LIB = -lm
 #  -Wl,...:     tell GCC to pass this to linker.
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
-LDFLAGS = -nostartfiles -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
+LDFLAGS = -nostartfiles -Wl,--cref,--gc-sections
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += -lc
 LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))

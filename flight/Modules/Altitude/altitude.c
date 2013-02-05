@@ -47,7 +47,7 @@
 // Private constants
 #define STACK_SIZE_BYTES 500
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
-#define UPDATE_PERIOD 50
+#define UPDATE_PERIOD 250
 
 // Private types
 
@@ -55,10 +55,17 @@
 static xTaskHandle taskHandle;
 
 // down sampling variables
-#define alt_ds_size    4
+#define alt_ds_size    1
 static int32_t alt_ds_temp = 0;
 static int32_t alt_ds_pres = 0;
 static int alt_ds_count = 0;
+
+static float AltiBuffer[4];
+static uint8_t PosInBuff=0;
+static float OldAlt=0.0f;
+static float OldVario=0.0f;
+
+static float VarioFactor=0.5f;
 
 static bool altitudeEnabled;
 
@@ -120,7 +127,7 @@ static void altitudeTask(void *parameters)
 {
 	BaroAltitudeData data;
 	portTickType lastSysTime;
-	
+
 #if defined(PIOS_INCLUDE_HCSR04)
 	SonarAltitudeData sonardata;
 	int32_t value=0,timeout=5;
@@ -128,8 +135,17 @@ static void altitudeTask(void *parameters)
 	PIOS_HCSR04_Init();
 	PIOS_HCSR04_Trigger();
 #endif
+#if defined(PIOS_INCLUDE_MS5611)
+	static const struct pios_ms5611_cfg ms5611_cfg = {
+
+	        .oversampling = MS5611_OSR_512,
+
+	};
+	PIOS_MS5611_Init(&ms5611_cfg, pios_i2c_aux_adapter_id);
+#else
 	PIOS_BMP085_Init();
-	
+#endif
+
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1)
@@ -158,6 +174,17 @@ static void altitudeTask(void *parameters)
 			PIOS_HCSR04_Trigger();
 		}
 #endif
+#if defined(PIOS_INCLUDE_MS5611)
+		PIOS_MS5611_StartADC(TemperatureConv);
+		vTaskDelay(5 / portTICK_RATE_MS);
+		PIOS_MS5611_ReadADC();
+		alt_ds_temp = PIOS_MS5611_GetTemperature();
+		PIOS_MS5611_StartADC(PressureConv);
+		vTaskDelay(26 / portTICK_RATE_MS);
+		PIOS_MS5611_ReadADC();
+		alt_ds_pres = PIOS_MS5611_GetPressure();
+
+#else
 		// Update the temperature data
 		PIOS_BMP085_StartADC(TemperatureConv);
 #ifdef PIOS_BMP085_HAS_GPIOS
@@ -177,11 +204,23 @@ static void altitudeTask(void *parameters)
 #endif
 		PIOS_BMP085_ReadADC();
 		alt_ds_pres += PIOS_BMP085_GetPressure();
-		
-		if (++alt_ds_count >= alt_ds_size)
+#endif
+		//if (++alt_ds_count >= alt_ds_size)
 		{
 			alt_ds_count = 0;
 
+#if defined(PIOS_INCLUDE_MS5611)//MS5611_P0
+			// Convert from 1/10ths of degC to degC
+			data.Temperature = PIOS_MS5611_GetTemperature();
+			alt_ds_temp = 0;
+
+			// Convert from Pa to kPa
+			data.Pressure = PIOS_MS5611_GetPressure();
+			alt_ds_pres = 0;
+
+			// Compute the current altitude (all pressures in kPa)
+			data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / (MS5611_P0 / 1.0)), (1.0 / 5.255)));
+#else
 			// Convert from 1/10ths of degC to degC
 			data.Temperature = alt_ds_temp / (10.0 * alt_ds_size);
 			alt_ds_temp = 0;
@@ -192,7 +231,20 @@ static void altitudeTask(void *parameters)
 
 			// Compute the current altitude (all pressures in kPa)
 			data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / (BMP085_P0 / 1000.0)), (1.0 / 5.255)));
-
+#endif
+			AltiBuffer[PosInBuff]=data.Altitude;
+			if(PosInBuff>=3)
+			{
+				PosInBuff=0;
+			}
+			else
+			{
+				PosInBuff++;
+			}
+			data.Altitude =(AltiBuffer[0]+AltiBuffer[1]+AltiBuffer[2]+AltiBuffer[3])/4.0f;
+			data.Variometer=((data.Altitude-OldAlt)*VarioFactor)+(OldVario*(1.0f-VarioFactor));
+			OldVario=data.Variometer;
+			OldAlt=data.Altitude;
 			// Update the AltitudeActual UAVObject
 			BaroAltitudeSet(&data);
 		}

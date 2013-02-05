@@ -411,12 +411,12 @@ static const struct pios_tim_channel pios_tim_ppm_flexi_port = {
 };
 
 static const struct pios_tim_channel pios_tim_ppm_main_port = {
-	.timer = TIM2,
-	.timer_chan = TIM_Channel_2,
+	.timer = TIM4,
+	.timer_chan = TIM_Channel_3,
 	.pin = {
-		.gpio = GPIOA,
+		.gpio = GPIOB,
 		.init = {
-			.GPIO_Pin   = GPIO_Pin_1,
+			.GPIO_Pin   = GPIO_Pin_8,
 			.GPIO_Mode  = GPIO_Mode_IPD,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 		},

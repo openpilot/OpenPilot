@@ -57,7 +57,7 @@
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <property name="margin">
-        <number>12</number>
+        <number>0</number>
        </property>
        <item row="6" column="0" colspan="2">
         <layout class="QHBoxLayout" name="horizontalLayout_2">

@@ -218,6 +218,9 @@ void PIOS_Board_Init(void) {
 											tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
+
+		/* Set the RFM22B bindings. */
+		PIOS_RFM22B_SetBindings(pios_rfm22b_id, oplinkSettings.Bindings);
 	}
 #endif /* PIOS_INCLUDE_RFM22B */
 

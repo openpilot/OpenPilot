@@ -239,8 +239,9 @@ void UAVGadgetInstanceManager::createOptionsPages()
         m_pm->removeObject(m_optionsPages.takeLast());
     }
 
-    foreach (IUAVGadgetConfiguration *config, m_configurations)
-    {
+    QMutableListIterator<IUAVGadgetConfiguration*> ite(m_configurations);
+    while (ite.hasNext()) {
+        IUAVGadgetConfiguration *config = ite.next();
         IUAVGadgetFactory *f = factory(config->classId());
         IOptionsPage *p = f->createOptionsPage(config);
         if (p) {
@@ -248,6 +249,14 @@ void UAVGadgetInstanceManager::createOptionsPages()
             page->setIcon(f->icon());
             m_optionsPages.append(page);
             m_pm->addObject(page);
+        }
+        else {
+            qWarning()
+                    << "UAVGadgetInstanceManager::createOptionsPages - failed to create options page for configuration "
+                            + config->classId() + ":" + config->name() + ", configuration will be removed.";
+            // The m_optionsPages list and m_configurations list must be in synch otherwise nasty issues happen later
+            // so if we fail to create an options page we must remove the associated configuration
+            ite.remove();
         }
     }
 }

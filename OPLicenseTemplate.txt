@@ -1,12 +1,13 @@
 /**
  ******************************************************************************
- * @file       waypointeditorgadget.cpp
+ *
+ * @file       %FILENAME%
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup Waypoint Editor GCS Plugins
+ * @addtogroup [Group]
  * @{
- * @addtogroup WaypointEditorGadgetPlugin Waypoint Editor Gadget Plugin
+ * @addtogroup %CLASS%
  * @{
- * @brief A gadget to edit a list of waypoints
+ * @brief [Brief]
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -23,26 +24,3 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "waypointeditorgadget.h"
-#include "waypointeditorgadgetwidget.h"
-
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-#include <QDebug>
-
-WaypointEditorGadget::WaypointEditorGadget(QString classId, WaypointEditorGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
-
-WaypointEditorGadget::~WaypointEditorGadget()
-{
-    delete m_widget;
-}
-
-void WaypointEditorGadget::loadConfiguration(IUAVGadgetConfiguration* config)
-{
-    Q_UNUSED(config);
-}

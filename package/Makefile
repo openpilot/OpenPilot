@@ -155,4 +155,5 @@ opfw_resource:
 	$(V1) echo '$(OPFW_CONTENTS)' > $(BUILD_DIR)/ground/$@/opfw_resource.qrc
 	$(V1) $(foreach fw_targ, $(FW_TARGETS), mkdir -p $(BUILD_DIR)/ground/$@/build/$(fw_targ);)
 	$(V1)$(foreach fw_targ, $(FW_TARGETS), cp $(BUILD_DIR)/$(fw_targ)/$(fw_targ).opfw $(BUILD_DIR)/ground/$@/build/$(fw_targ)/;)
+
 include $(WHEREAMI)/Makefile.$(PLATFORM)

@@ -199,8 +199,7 @@ void ImportExportGadgetWidget::importConfiguration(const QString& fileName)
 
 void ImportExportGadgetWidget::on_helpButton_clicked()
 {
-    qDebug() << "Show Help";
-    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/Import_Export_plugin"));
+    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/OQBj"));
 }
 
 

@@ -62,7 +62,7 @@ equals(copydata, 1) {
                      libgcc_s_dw2-1.dll \
                      mingwm10.dll
         for(dll, MINGW_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_BINS]/../../../../../mingw/bin/$$dll\") $$targetPath(\"$$SIM_DIR/$$dll\") $$addNewline()
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$dll\") $$targetPath(\"$$SIM_DIR/$$dll\") $$addNewline()
         }
 
         data_copy.target = FORCE

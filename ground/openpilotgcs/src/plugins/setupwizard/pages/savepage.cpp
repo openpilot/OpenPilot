@@ -85,6 +85,7 @@ void SavePage::enableButtons(bool enable)
     getWizard()->button(QWizard::NextButton)->setEnabled(enable);
     getWizard()->button(QWizard::CancelButton)->setEnabled(enable);
     getWizard()->button(QWizard::BackButton)->setEnabled(enable);
+    getWizard()->button(QWizard::CustomButton1)->setEnabled(enable);
     QApplication::processEvents();
 }
 

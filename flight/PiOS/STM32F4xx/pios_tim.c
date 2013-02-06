@@ -47,26 +47,8 @@ struct pios_tim_dev {
 	const struct pios_tim_callbacks * callbacks;
 	uint32_t context;
 };
+#define PIOS_TIM_ALL_FLAGS TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4 | TIM_IT_Trigger | TIM_IT_Update
 
-#if 0
-static bool PIOS_TIM_validate(struct pios_tim_dev * tim_dev)
-{
-	return (tim_dev->magic == PIOS_TIM_DEV_MAGIC);
-}
-#endif
-
-#if defined(PIOS_INCLUDE_FREERTOS) && 0
-static struct pios_tim_dev * PIOS_TIM_alloc(void)
-{
-	struct pios_tim_dev * tim_dev;
-
-	tim_dev = (struct pios_tim_dev *)malloc(sizeof(*tim_dev));
-	if (!tim_dev) return(NULL);
-
-	tim_dev->magic = PIOS_TIM_DEV_MAGIC;
-	return(tim_dev);
-}
-#else
 static struct pios_tim_dev pios_tim_devs[PIOS_TIM_MAX_DEVS];
 static uint8_t pios_tim_num_devs;
 static struct pios_tim_dev * PIOS_TIM_alloc(void)
@@ -82,8 +64,6 @@ static struct pios_tim_dev * PIOS_TIM_alloc(void)
 
 	return (tim_dev);
 }
-#endif
-
 
 
 
@@ -105,7 +85,6 @@ int32_t PIOS_TIM_InitClock(const struct pios_tim_clock_cfg * cfg)
 		case (uint32_t)TIM4:
 			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
 			break;
-#ifdef STM32F10X_HD
 		case (uint32_t)TIM5:
 			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5, ENABLE);
 			break;
@@ -127,16 +106,15 @@ int32_t PIOS_TIM_InitClock(const struct pios_tim_clock_cfg * cfg)
 		case (uint32_t)TIM11:
 			RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM11, ENABLE);
 			break;
-                case (uint32_t)TIM12:
+		case (uint32_t)TIM12:
 			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM12, ENABLE);
 			break;
-                case (uint32_t)TIM13:
+		case (uint32_t)TIM13:
 			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM13, ENABLE);
 			break;         
-                case (uint32_t)TIM14:
+		case (uint32_t)TIM14:
 			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM14, ENABLE);
 			break;
-#endif
 	}
 
 	/* Configure the dividers for this timer */
@@ -348,68 +326,6 @@ static void PIOS_TIM_generic_irq_handler(TIM_TypeDef * timer)
 		}
 	}
 }
-#if 0
-	uint16_t val = 0;
-	for(uint8_t i = 0; i < pios_pwm_cfg.num_channels; i++) {
-		struct pios_pwm_channel channel = pios_pwm_cfg.channels[i];
-		if ((channel.timer == timer) && (TIM_GetITStatus(channel.timer, channel.ccr) == SET)) {
-			
-			TIM_ClearITPendingBit(channel.timer, channel.ccr);
-			
-			switch(channel.channel) {
-				case TIM_Channel_1:
-					val = TIM_GetCapture1(channel.timer);
-					break;
-				case TIM_Channel_2:
-					val = TIM_GetCapture2(channel.timer);
-					break;
-				case TIM_Channel_3:
-					val = TIM_GetCapture3(channel.timer);
-					break;
-				case TIM_Channel_4:
-					val = TIM_GetCapture4(channel.timer);
-					break;					
-			}
-			
-			if (CaptureState[i] == 0) {
-				RiseValue[i] = val; 
-			} else {
-				FallValue[i] = val;
-			}
-			
-			// flip state machine and capture value here
-			/* Simple rise or fall state machine */
-			TIM_ICInitTypeDef TIM_ICInitStructure = pios_pwm_cfg.tim_ic_init;
-			if (CaptureState[i] == 0) {
-				/* Switch states */
-				CaptureState[i] = 1;
-				
-				/* Switch polarity of input capture */
-				TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
-				TIM_ICInitStructure.TIM_Channel = channel.channel;
-				TIM_ICInit(channel.timer, &TIM_ICInitStructure);				
-			} else {
-				/* Capture computation */
-				if (FallValue[i] > RiseValue[i]) {
-					CaptureValue[i] = (FallValue[i] - RiseValue[i]);
-				} else {
-					CaptureValue[i] = ((channel.timer->ARR - RiseValue[i]) + FallValue[i]);
-				}
-				
-				/* Switch states */
-				CaptureState[i] = 0;
-				
-				/* Increase supervisor counter */
-				CapCounter[i]++;
-				
-				/* Switch polarity of input capture */
-				TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
-				TIM_ICInitStructure.TIM_Channel = channel.channel;
-				TIM_ICInit(channel.timer, &TIM_ICInitStructure);
-			}
-		}		
-	}
-#endif
 
 /* Bind Interrupt Handlers
  *
@@ -420,31 +336,6 @@ void TIM1_CC_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_1_CC_irq_handler"
 static void PIOS_TIM_1_CC_irq_handler (void)
 {
 	PIOS_TIM_generic_irq_handler (TIM1);
-}
-
-// The rest of TIM1 interrupts are overlapped
-void TIM1_BRK_TIM9_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_9_CC_irq_handler")));
-static void PIOS_TIM_9_CC_irq_handler (void)
-{
-	// TODO: Check for TIM1_BRK
-	PIOS_TIM_generic_irq_handler (TIM9);
-}
-
-void TIM1_UP_TIM10_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_10_CC_irq_handler")));
-static void PIOS_TIM_10_CC_irq_handler (void)
-{
-	if (TIM_GetITStatus(TIM1, TIM_IT_Update)) {
-		PIOS_TIM_generic_irq_handler(TIM1);
-	} else if (TIM_GetITStatus(TIM10, TIM_IT_CC1 | TIM_IT_CC2 | TIM_IT_CC3 | TIM_IT_CC4)) {
-		PIOS_TIM_generic_irq_handler (TIM10);
-	}
-}
-
-void TIM1_TRG_COM_TIM11_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_11_CC_irq_handler")));
-static void PIOS_TIM_11_CC_irq_handler (void)
-{
-	// TODO: Check for TIM1_TRG
-	PIOS_TIM_generic_irq_handler (TIM11);
 }
 
 void TIM2_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_2_irq_handler")));
@@ -495,12 +386,84 @@ static void PIOS_TIM_8_CC_irq_handler (void)
 	PIOS_TIM_generic_irq_handler (TIM8);
 }
 
+// The rest of TIM1 interrupts are overlapped
+void TIM1_BRK_TIM9_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_9_CC_irq_handler")));
+static void PIOS_TIM_9_CC_irq_handler (void)
+{
+	if (TIM_GetITStatus(TIM1, TIM_IT_Break))
+	{
+		PIOS_TIM_generic_irq_handler(TIM1);
+	}
+	else if (TIM_GetITStatus(TIM9, PIOS_TIM_ALL_FLAGS))
+	{
+		PIOS_TIM_generic_irq_handler (TIM9);
+	}
+}
+
+void TIM1_UP_TIM10_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_10_CC_irq_handler")));
+static void PIOS_TIM_10_CC_irq_handler (void)
+{
+	if (TIM_GetITStatus(TIM1, TIM_IT_Update))
+	{
+		PIOS_TIM_generic_irq_handler(TIM1);
+	}
+	else if (TIM_GetITStatus(TIM10, PIOS_TIM_ALL_FLAGS))
+	{
+		PIOS_TIM_generic_irq_handler (TIM10);
+	}
+}
+
+void TIM1_TRG_COM_TIM11_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_11_CC_irq_handler")));
+static void PIOS_TIM_11_CC_irq_handler (void)
+{
+	if(TIM_GetITStatus(TIM1, TIM_IT_COM | TIM_IT_Trigger))
+	{
+		PIOS_TIM_generic_irq_handler (TIM1);
+	}
+	else if (TIM_GetITStatus(TIM11, PIOS_TIM_ALL_FLAGS))
+	{
+		PIOS_TIM_generic_irq_handler (TIM11);
+	}
+}
+
 void TIM8_BRK_TIM12_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM_12_irq_handler")));
 static void PIOS_TIM_12_irq_handler (void)
 {
-	PIOS_TIM_generic_irq_handler (TIM12);
+	if(TIM_GetITStatus(TIM8, TIM_IT_Break))
+	{
+		PIOS_TIM_generic_irq_handler (TIM8);
+	}
+	else if (TIM_GetITStatus(TIM12, PIOS_TIM_ALL_FLAGS))
+	{
+		PIOS_TIM_generic_irq_handler (TIM12);
+	}
 }
 
+void TIM8_UP_TIM13_IRQHandler(void) __attribute__ ((alias ("PIOS_TIM8_UP_TIM13_IRQHandler")));
+static void PIOS_TIM8_UP_TIM13_IRQHandler (void)
+{
+	if(TIM_GetITStatus(TIM8, TIM_IT_Update))
+	{
+		PIOS_TIM_generic_irq_handler (TIM8);
+	}
+	else if (TIM_GetITStatus(TIM13, PIOS_TIM_ALL_FLAGS))
+	{
+		PIOS_TIM_generic_irq_handler (TIM13);
+	}
+}
+
+void TIM8_TRG_COM_TIM14_IRQHandler (void) __attribute__ ((alias ("PIOS_TIM8_TRG_COM_TIM14_IRQHandler")));
+static void PIOS_TIM8_TRG_COM_TIM14_IRQHandler (void)
+{
+	if(TIM_GetITStatus(TIM8, TIM_IT_COM | TIM_IT_Trigger))
+	{
+		PIOS_TIM_generic_irq_handler (TIM8);
+	}
+	else if (TIM_GetITStatus(TIM14, PIOS_TIM_ALL_FLAGS))
+	{
+		PIOS_TIM_generic_irq_handler (TIM14);
+	}
+}
 
 /**
  * @}

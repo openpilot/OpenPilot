@@ -148,7 +148,7 @@ QString SetupWizard::getSummaryText()
             summary.append(tr("OpenPilot Revolution"));
             break;
         case CONTROLLER_PIPX:
-            summary.append(tr("OpenPilot PipX Radio Modem"));
+            summary.append(tr("OpenPilot OPLink Radio Modem"));
             break;
         default:
             summary.append(tr("Unknown"));

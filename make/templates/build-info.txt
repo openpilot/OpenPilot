@@ -1,0 +1,33 @@
+#
+# This is an unattended software build created by the OpenPilot CI build server.
+# It comes absolutely with no warranty. Use it at your own risk and be careful.
+#
+# Officially released OpenPilot software can be downloaded from:
+#     http://wiki.openpilot.org/display/BUILDS/OpenPilot+Software+Downloads
+#
+# Built from:       ${ORIGIN}
+# Git tag/branch:   ${TAG_OR_BRANCH}
+# Git hash:         ${HASH8}${DIRTY}
+# Git date/time:    ${DATETIME}
+# Version label:    ${LABEL}
+#
+
+ORIGIN='${ORIGIN}'
+REVISION='${REVISION}'
+HASH='${HASH}'
+UAVOSHA1='${UAVOSHA1TXT}'
+LABEL='${LABEL}'
+TAG='${TAG}'
+TAG_OR_BRANCH='${TAG_OR_BRANCH}'
+TAG_OR_HASH8='${TAG_OR_HASH8}'
+HASH8='${HASH8}'
+FWTAG='${FWTAG}'
+UNIXTIME='${UNIXTIME}'
+DATETIME='${DATETIME}'
+DATE='${DATE}'
+DAY='${DAY}'
+MONTH='${MONTH}'
+YEAR='${YEAR}'
+HOUR='${HOUR}'
+MINUTE='${MINUTE}'
+DIRTY='${DIRTY}'

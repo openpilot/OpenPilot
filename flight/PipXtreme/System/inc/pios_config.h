@@ -39,6 +39,7 @@
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
 #define PIOS_INCLUDE_RFM22B
+#define PIOS_INCLUDE_RFM22B_COM
 #define PIOS_INCLUDE_RCVR
 #define PIOS_INCLUDE_TIM
 
@@ -98,8 +99,8 @@
 /* PIOS Initcall infrastructure */
 #define PIOS_INCLUDE_INITCALL
 
-/* Always include the radio module */
-#define RADIO_BUILTIN
+/* Turn on debugging signals on the telemetry port */
+//#define PIOS_RFM22B_DEBUG_ON_TELEM
 
 #endif /* PIOS_CONFIG_H */
 /**

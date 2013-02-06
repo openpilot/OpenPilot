@@ -19,12 +19,14 @@ inputChannelForm::inputChannelForm(QWidget *parent,bool showlegend) :
         layout()->removeWidget(ui->legend3);
         layout()->removeWidget(ui->legend4);
         layout()->removeWidget(ui->legend5);
+        layout()->removeWidget(ui->legend6);
         delete ui->legend0;
         delete ui->legend1;
         delete ui->legend2;
         delete ui->legend3;
         delete ui->legend4;
         delete ui->legend5;
+        delete ui->legend6;
 
     }
 
@@ -109,6 +111,7 @@ void inputChannelForm::groupUpdated()
         count = 8; // Need to make this 6 for CC
         break;
     case ManualControlSettings::CHANNELGROUPS_PPM:
+    case ManualControlSettings::CHANNELGROUPS_OPLINK:
     case ManualControlSettings::CHANNELGROUPS_DSMMAINPORT:
     case ManualControlSettings::CHANNELGROUPS_DSMFLEXIPORT:
         count = 12;

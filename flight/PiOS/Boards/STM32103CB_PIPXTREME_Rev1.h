@@ -71,12 +71,10 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //------------------------
 #define PIOS_WATCHDOG_TIMEOUT    500
 #define PIOS_WDG_REGISTER        BKP_DR4
-#define PIOS_WDG_COMGCS          0x0001
-#define PIOS_WDG_COMUAVTALK      0x0002
-#define PIOS_WDG_RADIORECEIVE    0x0004
-#define PIOS_WDG_SENDDATA        0x0008
-#define PIOS_WDG_TRANSCOMM       0x0008
-#define PIOS_WDG_PPMINPUT        0x0010
+#define PIOS_WDG_TELEMETRY       0x0001
+#define PIOS_WDG_RADIORX         0x0002
+#define PIOS_WDG_RADIOTX         0x0004
+#define PIOS_WDG_RFM22B          0x0008
 
 //------------------------
 // TELEMETRY
@@ -90,6 +88,12 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define PIOS_LED_LINK	1
 #define PIOS_LED_RX	2
 #define PIOS_LED_TX	3
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
+#define PIOS_LED_D1     4
+#define PIOS_LED_D2     5
+#define PIOS_LED_D3     6
+#define PIOS_LED_D4     7
+#endif
 
 #define PIOS_LED_HEARTBEAT PIOS_LED_USB
 #define PIOS_LED_ALARM PIOS_LED_TX
@@ -109,6 +113,24 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define TX_LED_ON					PIOS_LED_On(PIOS_LED_TX)
 #define TX_LED_OFF					PIOS_LED_Off(PIOS_LED_TX)
 #define TX_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_TX)
+
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
+#define D1_LED_ON					PIOS_LED_On(PIOS_LED_D1)
+#define D1_LED_OFF					PIOS_LED_Off(PIOS_LED_D1)
+#define D1_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_D1)
+
+#define D2_LED_ON					PIOS_LED_On(PIOS_LED_D2)
+#define D2_LED_OFF					PIOS_LED_Off(PIOS_LED_D2)
+#define D2_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_D2)
+
+#define D3_LED_ON					PIOS_LED_On(PIOS_LED_D3)
+#define D3_LED_OFF					PIOS_LED_Off(PIOS_LED_D3)
+#define D3_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_D3)
+
+#define D4_LED_ON					PIOS_LED_On(PIOS_LED_D4)
+#define D4_LED_OFF					PIOS_LED_Off(PIOS_LED_D4)
+#define D4_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_D4)
+#endif
 
 //-------------------------
 // System Settings
@@ -151,29 +173,24 @@ extern uint32_t pios_i2c_flexi_adapter_id;
 #define PIOS_COM_MAX_DEVS			5
 
 extern uint32_t pios_com_telem_usb_id;
+extern uint32_t pios_com_telem_vcp_id;
+extern uint32_t pios_com_telem_uart_telem_id;
+extern uint32_t pios_com_telem_uart_flexi_id;
 extern uint32_t pios_com_telemetry_id;
-extern uint32_t pios_com_flexi_id;
-extern uint32_t pios_com_vcp_id;
-extern uint32_t pios_com_uavtalk_com_id;
-extern uint32_t pios_com_gcs_com_id;
-extern uint32_t pios_com_trans_com_id;
-extern uint32_t pios_com_debug_id;
 extern uint32_t pios_com_rfm22b_id;
+extern uint32_t pios_com_radio_id;
 extern uint32_t pios_ppm_rcvr_id;
-#define PIOS_COM_USB_HID           (pios_com_telem_usb_id)
+#define PIOS_COM_TELEM_USB         (pios_com_telem_usb_id)
+#define PIOS_COM_TELEM_VCP         (pios_com_telem_vcp_id)
+#define PIOS_COM_TELEM_UART_FLEXI  (pios_com_telem_uart_flexi_id)
+#define PIOS_COM_TELEM_UART_TELEM  (pios_com_telem_uart_telem_id)
 #define PIOS_COM_TELEMETRY         (pios_com_telemetry_id)
-#define PIOS_COM_FLEXI             (pios_com_flexi_id)
-#define PIOS_COM_VCP               (pios_com_vcp_id)
-#define PIOS_COM_UAVTALK           (pios_com_uavtalk_com_id)
-#define PIOS_COM_GCS               (pios_com_gcs_com_id)
-#define PIOS_COM_TRANS_COM         (pios_com_trans_com_id)
-#define PIOS_COM_DEBUG             (pios_com_debug_id)
-#define PIOS_COM_RADIO             (pios_com_rfm22b_id)
-#define PIOS_COM_TELEM_USB         PIOS_COM_USB_HID
+#define PIOS_COM_RFM22B            (pios_com_rfm22b_id)
+#define PIOS_COM_RADIO             (pios_com_radio_id)
 #define PIOS_PPM_RECEIVER          (pios_ppm_rcvr_id)
 
 #define DEBUG_LEVEL 2
-#if DEBUG_LEVEL > 0
+#if DEBUG_LEVEL > 1000
 #define DEBUG_PRINTF(level, ...) {if(level <= DEBUG_LEVEL && PIOS_COM_DEBUG > 0) { PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__); }}
 #else
 #define DEBUG_PRINTF(...)
@@ -230,8 +247,7 @@ extern uint32_t pios_ppm_rcvr_id;
 // Receiver PPM input
 //-------------------------
 #define PIOS_PPM_MAX_DEVS     1
-#define PIOS_PPM_NUM_INPUTS   12
-#define PIOS_PPM_PACKET_UPDATE_PERIOD_MS 25
+#define PIOS_PPM_NUM_INPUTS   8
 
 //-------------------------
 // Servo outputs
@@ -268,13 +284,8 @@ extern uint32_t pios_ppm_rcvr_id;
 //-------------------------
 
 #if defined(PIOS_INCLUDE_RFM22B)
-#define PIOS_COM_RFM22B_RF_RX_BUF_LEN 256
-#define PIOS_COM_RFM22B_RF_TX_BUF_LEN 256
-extern uint32_t pios_com_rfm22b_id;
-#define PIOS_COM_RADIO                  (pios_com_rfm22b_id)
 extern uint32_t pios_spi_rfm22b_id;
 #define PIOS_RFM22_SPI_PORT             (pios_spi_rfm22b_id)
-#define RFM22_EXT_INT_USE
 extern uint32_t pios_rfm22b_id;
 #endif /* PIOS_INCLUDE_RFM22B */
 

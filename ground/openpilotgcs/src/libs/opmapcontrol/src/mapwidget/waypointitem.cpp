@@ -229,7 +229,6 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
     }
     void WayPointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     {
-        QGraphicsItem::mouseReleaseEvent(event);
         if(event->button()==Qt::LeftButton)
         {
             if(text)
@@ -242,15 +241,14 @@ WayPointItem::WayPointItem(MapGraphicItem *map, bool magicwaypoint):reached(fals
                 delete textBG;
                 textBG=NULL;
             }
-            coord=map->FromLocalToLatLng(this->pos().x(),this->pos().y());
 
             isDragging=false;
             RefreshToolTip();
             emit manualCoordChange(this);
             emit localPositionChanged(this->pos(),this);
             emit WPValuesChanged(this);
-            emit WPDropped(this);
         }
+		QGraphicsItem::mouseReleaseEvent(event);
     }
     void WayPointItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     {

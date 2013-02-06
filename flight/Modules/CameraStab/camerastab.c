@@ -64,12 +64,27 @@
 static struct CameraStab_data {
 	portTickType lastSysTime;
 	float inputs[CAMERASTABSETTINGS_INPUT_NUMELEM];
-	float inputs_filtered[CAMERASTABSETTINGS_INPUT_NUMELEM];
+
+#ifdef USE_GIMBAL_LPF
+	float attitudeFiltered[CAMERASTABSETTINGS_INPUT_NUMELEM];
+#endif
+
+#ifdef USE_GIMBAL_FF
+	float ffLastAttitude[CAMERASTABSETTINGS_INPUT_NUMELEM];
+	float ffLastAttitudeFiltered[CAMERASTABSETTINGS_INPUT_NUMELEM];
+	float ffFilterAccumulator[CAMERASTABSETTINGS_INPUT_NUMELEM];
+#endif
+
 } *csd;
 
 // Private functions
 static void attitudeUpdated(UAVObjEvent* ev);
 static float bound(float val, float limit);
+
+#ifdef USE_GIMBAL_FF
+static void applyFeedForward(uint8_t index, float dT, float *attitude, CameraStabSettingsData *cameraStab);
+#endif
+
 
 /**
  * Initialise the module, called on startup
@@ -100,7 +115,7 @@ int32_t CameraStabInitialize(void)
 		if (!csd)
 			return -1;
 
-		// make sure that all inputs[] and inputs_filtered[] are zeroed
+		// initialize camera state variables
 		memset(csd, 0, sizeof(struct CameraStab_data));
 		csd->lastSysTime = xTaskGetTickCount();
 
@@ -139,15 +154,17 @@ static void attitudeUpdated(UAVObjEvent* ev)
 	CameraStabSettingsData cameraStab;
 	CameraStabSettingsGet(&cameraStab);
 
-	// Check how long since last update, time delta between calls in ms
+	// check how long since last update, time delta between calls in ms
 	portTickType thisSysTime = xTaskGetTickCount();
-	float dT = (thisSysTime > csd->lastSysTime) ?
-			(thisSysTime - csd->lastSysTime) / portTICK_RATE_MS :
-			(float)SAMPLE_PERIOD_MS / 1000.0f;
+	float dT_millis = (thisSysTime > csd->lastSysTime) ?
+				(float)((thisSysTime - csd->lastSysTime) * portTICK_RATE_MS) :
+				(float)SAMPLE_PERIOD_MS;
 	csd->lastSysTime = thisSysTime;
 
-	// Read any input channels and apply LPF
+	// process axes
 	for (uint8_t i = 0; i < CAMERASTABSETTINGS_INPUT_NUMELEM; i++) {
+
+		// read and process control input
 		if (cameraStab.Input[i] != CAMERASTABSETTINGS_INPUT_NONE) {
 			if (AccessoryDesiredInstGet(cameraStab.Input[i] - CAMERASTABSETTINGS_INPUT_ACCESSORY0, &accessory) == 0) {
 				float input_rate;
@@ -158,38 +175,59 @@ static void attitudeUpdated(UAVObjEvent* ev)
 				case CAMERASTABSETTINGS_STABILIZATIONMODE_AXISLOCK:
 					input_rate = accessory.AccessoryVal * cameraStab.InputRate[i];
 					if (fabs(input_rate) > cameraStab.MaxAxisLockRate)
-						csd->inputs[i] = bound(csd->inputs[i] + input_rate * dT / 1000.0f, cameraStab.InputRange[i]);
+						csd->inputs[i] = bound(csd->inputs[i] + input_rate * 0.001f * dT_millis, cameraStab.InputRange[i]);
 					break;
 				default:
 					PIOS_Assert(0);
 				}
-
-				// bypass LPF calculation if ResponseTime is zero
-				float rt = (float)cameraStab.ResponseTime[i];
-				if (rt)
-					csd->inputs_filtered[i] = (rt / (rt + dT)) * csd->inputs_filtered[i]
-								+ (dT / (rt + dT)) * csd->inputs[i];
-				else
-					csd->inputs_filtered[i] = csd->inputs[i];
 			}
 		}
+
+		// calculate servo output
+		float attitude;
+
+		switch (i) {
+		case CAMERASTABSETTINGS_INPUT_ROLL:
+			AttitudeActualRollGet(&attitude);
+			break;
+		case CAMERASTABSETTINGS_INPUT_PITCH:
+			AttitudeActualPitchGet(&attitude);
+			break;
+		case CAMERASTABSETTINGS_INPUT_YAW:
+			AttitudeActualYawGet(&attitude);
+			break;
+		default:
+			PIOS_Assert(0);
+		}
+
+#ifdef USE_GIMBAL_LPF
+		if (cameraStab.ResponseTime) {
+			float rt = (float)cameraStab.ResponseTime[i];
+			attitude = csd->attitudeFiltered[i] = ((rt * csd->attitudeFiltered[i]) + (dT_millis * attitude)) / (rt + dT_millis);
+		}
+#endif
+
+#ifdef USE_GIMBAL_FF
+		if (cameraStab.FeedForward[i])
+			applyFeedForward(i, dT_millis, &attitude, &cameraStab);
+#endif
+
+		// set output channels
+		float output = bound((attitude + csd->inputs[i]) / cameraStab.OutputRange[i], 1.0f);
+		switch (i) {
+		case CAMERASTABSETTINGS_INPUT_ROLL:
+			CameraDesiredRollSet(&output);
+			break;
+		case CAMERASTABSETTINGS_INPUT_PITCH:
+			CameraDesiredPitchSet(&output);
+			break;
+		case CAMERASTABSETTINGS_INPUT_YAW:
+			CameraDesiredYawSet(&output);
+			break;
+		default:
+			PIOS_Assert(0);
+		}
 	}
-
-	// Set output channels
-	float attitude;
-	float output;
-
-	AttitudeActualRollGet(&attitude);
-	output = bound((attitude + csd->inputs_filtered[CAMERASTABSETTINGS_INPUT_ROLL]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL], 1.0f);
-	CameraDesiredRollSet(&output);
-
-	AttitudeActualPitchGet(&attitude);
-	output = bound((attitude + csd->inputs_filtered[CAMERASTABSETTINGS_INPUT_PITCH]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH], 1.0f);
-	CameraDesiredPitchSet(&output);
-
-	AttitudeActualYawGet(&attitude);
-	output = bound((attitude + csd->inputs_filtered[CAMERASTABSETTINGS_INPUT_YAW]) / cameraStab.OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_YAW], 1.0f);
-	CameraDesiredYawSet(&output);
 }
 
 float bound(float val, float limit)
@@ -198,6 +236,62 @@ float bound(float val, float limit)
 		(val < -limit) ? -limit :
 		val;
 }
+
+#ifdef USE_GIMBAL_FF
+void applyFeedForward(uint8_t index, float dT_millis, float *attitude, CameraStabSettingsData *cameraStab)
+{
+	// compensate high feed forward values depending on gimbal type
+	float gimbalTypeCorrection = 1.0f;
+
+	switch (cameraStab->GimbalType) {
+	case CAMERASTABSETTINGS_GIMBALTYPE_GENERIC:
+		// no correction
+		break;
+	case CAMERASTABSETTINGS_GIMBALTYPE_YAWROLLPITCH:
+		if (index == CAMERASTABSETTINGS_INPUT_ROLL) {
+			float pitch;
+			AttitudeActualPitchGet(&pitch);
+			gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH] - fabs(pitch))
+							/ cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH];
+		}
+		break;
+	case CAMERASTABSETTINGS_GIMBALTYPE_YAWPITCHROLL:
+		if (index == CAMERASTABSETTINGS_INPUT_PITCH) {
+			float roll;
+			AttitudeActualRollGet(&roll);
+			gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL] - fabs(roll))
+							/ cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL];
+		}
+		break;
+	default:
+		PIOS_Assert(0);
+	}
+
+	// apply feed forward
+	float accumulator = csd->ffFilterAccumulator[index];
+	accumulator += (*attitude - csd->ffLastAttitude[index]) * (float)cameraStab->FeedForward[index] * gimbalTypeCorrection;
+	csd->ffLastAttitude[index] = *attitude;
+	*attitude += accumulator;
+
+	float filter = (float)((accumulator > 0.0f) ? cameraStab->AccelTime[index] : cameraStab->DecelTime[index]) / dT_millis;
+	if (filter < 1.0f)
+		filter = 1.0f;
+	accumulator -= accumulator / filter;
+	csd->ffFilterAccumulator[index] = accumulator;
+	*attitude += accumulator;
+
+	// apply acceleration limit
+	float delta = *attitude - csd->ffLastAttitudeFiltered[index];
+	float maxDelta = (float)cameraStab->MaxAccel * 0.001f * dT_millis;
+
+	if (fabs(delta) > maxDelta) {
+		// we are accelerating too hard
+		*attitude = csd->ffLastAttitudeFiltered[index] + ((delta > 0.0f) ? maxDelta : -maxDelta);
+	}
+	csd->ffLastAttitudeFiltered[index] = *attitude;
+}
+#endif // USE_GIMBAL_FF
+
 /**
   * @}
   */

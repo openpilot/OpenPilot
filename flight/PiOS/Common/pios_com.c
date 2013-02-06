@@ -503,6 +503,27 @@ uint16_t PIOS_COM_ReceiveBuffer(uint32_t com_id, uint8_t * buf, uint16_t buf_len
 	return (bytes_from_fifo);
 }
 
+/**
+ * Query if a com port is available for use.  That can be
+ * used to check a link is established even if the device
+ * is valid.
+ */
+bool PIOS_COM_Available(uint32_t com_id)
+{
+	struct pios_com_dev * com_dev = (struct pios_com_dev *)com_id;
+
+	if (!PIOS_COM_validate(com_dev)) {
+		return false;
+	}
+
+	// If a driver does not provide a query method assume always
+	// available if valid
+	if (com_dev->driver->available == NULL)
+		return true;
+
+	return (com_dev->driver->available)(com_dev->lower_id);
+}
+
 #endif
 
 /**

@@ -12,7 +12,7 @@
 
 #include "gst_global.h"
 
-#include "gst-plugins-bad/sys/winscreencap/gstwinscreencap.h"
+//#include "gst-plugins-bad/sys/winscreencap/gstwinscreencap.h"
 
 //#include <gst/controller/gstcontroller.h>
 
@@ -22,8 +22,8 @@
 
 static bool initialized = false;
 
-static void print_element_list(gboolean print_all);
-static int print_element_info(GstElementFactory *factory, gboolean print_names);
+//static void print_element_list(gboolean print_all);
+//static int print_element_info(GstElementFactory *factory, gboolean print_names);
 
 // Not thread safe. Does it need to be?
 void gst::init(int *argc, char **argv[])
@@ -38,9 +38,9 @@ void gst::init(int *argc, char **argv[])
     qDebug() << QString("gstreamer - version %0").arg(gst_version_string());
 
     qDebug() << "gstreamer - registering plugins";
-    if (!register_plugin2()) {
-        qDebug() << "gstreamer - failed to register plugin";
-    }
+//    if (!register_plugin2()) {
+//        qDebug() << "gstreamer - failed to register plugin";
+//    }
 
 //    print_element_list(false);
 }
@@ -121,13 +121,15 @@ QList<QString> gst::elementList(QString pluginName)
 //                else
 //                    g_print("%s:  %s: %s\n", plugin->desc.name, GST_PLUGIN_FEATURE_NAME(factory),
 //                            gst_element_factory_get_longname(factory));
-            } else if (GST_IS_INDEX_FACTORY(feature)) {
+#if 0
+                } else if (GST_IS_INDEX_FACTORY(feature)) {
                 GstIndexFactory *factory;
 
                 factory = GST_INDEX_FACTORY(feature);
                 elementList << QString(GST_PLUGIN_FEATURE_NAME(factory));
 //                if (!print_all)
 //                    g_print("%s:  %s: %s\n", plugin->desc.name, GST_PLUGIN_FEATURE_NAME(factory), factory->longdesc);
+#endif
             } else if (GST_IS_TYPE_FIND_FACTORY(feature)) {
                 GstTypeFindFactory *factory;
 
@@ -167,6 +169,7 @@ QList<QString> gst::elementList(QString pluginName)
     return elementList;
 }
 
+#if 0
 static char *_name = NULL;
 
 static void n_print(const char *format, ...)
@@ -212,6 +215,7 @@ static void print_caps(const GstCaps * caps, const gchar * pfx)
         gst_structure_foreach(structure, print_field, (gpointer) pfx);
     }
 }
+#endif
 
 #if 0
 static void
@@ -232,6 +236,7 @@ print_formats (const GstFormat * formats)
 }
 #endif
 
+#if 0
 static void print_query_types(const GstQueryType * types)
 {
     while (types && *types) {
@@ -246,6 +251,7 @@ static void print_query_types(const GstQueryType * types)
         types++;
     }
 }
+#endif
 
 #if 0
 static void
@@ -297,6 +303,7 @@ print_event_masks (const GstEventMask * masks)
 }
 #endif
 
+#if 0
 static const char *
 get_rank_name(char *s, gint rank)
 {
@@ -837,3 +844,4 @@ static int print_element_info(GstElementFactory *factory, gboolean print_names)
 
     return 0;
 }
+#endif

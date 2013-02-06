@@ -47,16 +47,17 @@ OTHER_FILES += COPYING \
                sdlgamepad.dox \
                sdlgamepad.doc
 
-INCLUDEPATH += $(GSTREAMER_SDK)/include \
-	$(GSTREAMER_SDK)/include/gstreamer-0.10 \
-	$(GSTREAMER_SDK)/include/glib-2.0 \
-	$(GSTREAMER_SDK)/lib/glib-2.0/include \
-	$(GSTREAMER_SDK)/include/libxml2
+INCLUDEPATH += \
+    $(GSTREAMER_SDK_DIR)/include \
+	$(GSTREAMER_SDK_DIR)/include/gstreamer-0.10 \
+    $(GSTREAMER_SDK_DIR)/include/libxml2 \
+	$(GSTREAMER_SDK_DIR)/include/glib-2.0 \
+	$(GSTREAMER_SDK_DIR)/lib/glib-2.0/include
 
-LIBS += -L$(GSTREAMER_SDK)/lib
+LIBS += -L$(GSTREAMER_SDK_DIR)/lib
 LIBS += -lgobject-2.0 -lglib-2.0 -lgstreamer-0.10 -lgstinterfaces-0.10
 
-win32 {
-	# compile missing winscreencap plugin (should be removed once it is available with the GStreamer SDK)
-	include(gst-plugins-bad/gst-plugins-bad.pro)
-}
+#win32 {
+#	# compile missing winscreencap plugin (should be removed once it is available with the GStreamer SDK)
+#	include(gst-plugins-bad/gst-plugins-bad.pro)
+#}

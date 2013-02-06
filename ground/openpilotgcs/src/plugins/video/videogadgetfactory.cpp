@@ -33,7 +33,7 @@
 #include <coreplugin/iuavgadget.h>
 
 VideoGadgetFactory::VideoGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("VideoGadget"), tr("VideoGadget"), parent)
+        IUAVGadgetFactory(QString("VideoGadget"), tr("Video"), parent)
 {
 }
 

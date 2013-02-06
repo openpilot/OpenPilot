@@ -85,13 +85,13 @@ HelpDialog::HelpDialog(QWidget *parent, const QString &elementId)
 //    pageTree->header()->setVisible(false);
 //    pageTree->setIconSize(QSize(24, 24));
 
-    connect(elementList, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
+    connect(elementListWidget, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
         this, SLOT(pageSelected()));
 
     QList<QString> plugins = gst::pluginList();
 
     foreach (QString pluginName, plugins) {
-        new QListWidgetItem(pluginName, elementList);
+        new QListWidgetItem(pluginName, elementListWidget);
     }
 //    foreach (IOptionsPage *page, pages) {
 //        PageData pageData;

@@ -231,7 +231,7 @@ void VideoWidget::paintStatus(QPaintEvent *event)
 //			"<p>The text can be really long and contain many "
 //			"paragraphs. It is properly wrapped and such...</p>";
     QString html = "<p align=center><b><font size=+2>" + getStatus() + "</font></b></p>"
-            "<p align=center>" + getStatusMessage() + "</font></p>";
+            "<p align=center>" + getStatusMessage() + "</p>";
 
     QRect widgetRect = QWidget::rect();
     int x = 0;

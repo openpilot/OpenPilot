@@ -3,15 +3,26 @@
 # Copyright (c) 2010-2013, The OpenPilot Team, http://www.openpilot.org
 #
 
+TARGET = uavobjgenerator
+TEMPLATE = app
+
 QT += xml
 QT -= gui
-macx {
-    QMAKE_CXXFLAGS  += -fpermissive
-}
-TARGET = uavobjgenerator
+
 CONFIG += console
 CONFIG -= app_bundle
-TEMPLATE = app
+
+macx {
+    QMAKE_CXXFLAGS += -fpermissive
+}
+
+win32 {
+    # Fix ((packed)) pragma handling issue introduced when upgrading MinGW from 4.4 to 4.8
+    # See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=52991
+    # The ((packet)) pragma is used in uav metadata struct and other places
+    QMAKE_CXXFLAGS += -mno-ms-bitfields
+}
+
 SOURCES += main.cpp \
     uavobjectparser.cpp \
     generators/generator_io.cpp \
@@ -22,6 +33,7 @@ SOURCES += main.cpp \
     generators/python/uavobjectgeneratorpython.cpp \
     generators/wireshark/uavobjectgeneratorwireshark.cpp \
     generators/generator_common.cpp
+
 HEADERS += uavobjectparser.h \
     generators/generator_io.h \
     generators/java/uavobjectgeneratorjava.h \

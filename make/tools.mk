@@ -25,6 +25,8 @@
 #    stm32flash_install
 #    dfuutil_install
 #    android_sdk_install
+#    marble_install
+#    gstreamer_install
 #
 # TODO:
 #    help in the top Makefile
@@ -77,6 +79,7 @@ else ifeq ($(UNAME), Windows)
     NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
+    GSTREAMER_URL  := http://wiki.openpilot.org/download/attachments/18612236/gstreamer-sdk-x86-2013.6.msi
 endif
 
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
@@ -90,6 +93,7 @@ NSIS_DIR        := $(TOOLS_DIR)/nsis-2.46-unicode
 UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
 GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
+GSTREAMER_SDK_DIR := $(TOOLS_DIR)/gstreamer-sdk/0.10/x86
 
 ##############################
 #
@@ -236,21 +240,25 @@ $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
 	@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(4))
 	$(V1) ( \
 		cd "$(DL_DIR)" && \
-		$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4).md5" "$(3).md5" && \
 		if [ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(4),!=) ]; then \
 			$(ECHO) $(MSG_DOWNLOADING) $(3) && \
-			$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4)" "$(3)" && \
 			$(ECHO) $(MSG_CHECKSUMMING) $$(call toprel, $(DL_DIR)/$(4)) && \
 			[ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(4),=) ]; \
 		fi; \
 	)
 
-	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
-	$(if $(filter $(suffix $(4)), .zip),
-		$(V1) $(UNZIP) $(UNZIP_SILENT) -d $$(call toprel, $(dir $(2))) $$(call toprel, $(DL_DIR)/$(4)),
-		$(V1) $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(dir $(2))) -xf $$(call toprel, $(DL_DIR)/$(4))
+	#$(if $(filter $(suffix $(4)), .zip),
+	#	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
+	#	$(V1) $(UNZIP) $(UNZIP_SILENT) -d $$(call toprel, $(dir $(2))) $$(call toprel, $(DL_DIR)/$(4)),
+	#	$(V1) $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(dir $(2))) -xf $$(call toprel, $(DL_DIR)/$(4))
+	#)
+	$(if $(filter $(suffix $(4)), .msi),
+		@$(ECHO) $(MSG_INSTALLING) $$(call toprel, $(2))
+		$(V1) msiexec /passive INSTALLDIR=$(OPENPILOT_TOOLS_DIR) /i $$(call toprel, $(DL_DIR)/$(4))
 	)
+#D:\Projects\OpenPilot\downloads>msiexec /passive INSTALLDIR=D:\Projects\OpenPilot\downloads\test /x gstreamer-sdk-x86-2013.6.msi
+#D:\Projects\OpenPilot\downloads>msiexec /passive INSTALLDIR=D:\Projects\OpenPilot\downloads\test /i gstreamer-sdk-x86-2013.6.msi
 
 	$(5)
 
@@ -552,6 +560,35 @@ gtest_version:
 
 
 
+##############################
+#
+# gstreamer
+#
+##############################
+
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,gstreamer,$(GSTREAMER_SDK_DIR),$(GSTREAMER_URL),$(notdir $(GSTREAMER_URL))))
+
+else # Linux or Mac
+
+all_sdk_version: gstreamer_version
+
+endif
+
+ifeq ($(shell [ -d "$(GSTREAMER_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+	export GSTREAMER_SDK_DIR
+    export GSTREAMER := $(GSTREAMER_SDK_DIR)/bin/gst-launch-0.10
+    export PATH := $(GSTREAMER_SDK_DIR/bin):$(PATH)
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(GSTREAMER_SDK_DIR)) not found (make gstreamer_install), using system PATH)
+    export GSTREAMER := gst-launch-0.10
+endif
+
+.PHONY: gstreamer_version
+gstreamer_version:
+	-$(V1) $(GSTREAMER) --version
 
 
 ##############################

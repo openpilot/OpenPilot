@@ -47,6 +47,7 @@
 #define PIOS_INCLUDE_PPM
 
 /* Supported USART-based PIOS modules */
+#define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS

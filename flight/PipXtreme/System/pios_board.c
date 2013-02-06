@@ -293,7 +293,7 @@ void PIOS_Board_Init(void) {
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
 
 #ifdef PIOS_INCLUDE_ADC
-	PIOS_ADC_Init();
+	PIOS_ADC_Init(NULL);
 #endif
  	PIOS_GPIO_Init();
 }

@@ -32,30 +32,15 @@
 
 // Private types
 
-enum pios_adc_dev_magic {
-	PIOS_ADC_DEV_MAGIC = 0x58375124,
-};
-
-struct pios_adc_dev {
-	const struct pios_adc_cfg * cfg;	
-	ADCCallback callback_function;
-#if defined(PIOS_INCLUDE_FREERTOS)
-	xQueueHandle data_queue;
-#endif
-	volatile int16_t *valid_data_buffer;
-	volatile uint8_t adc_oversample;
-	uint8_t dma_block_size;
-	uint16_t dma_half_buffer_size;
-#if defined(PIOS_INCLUDE_ADC)
-	int16_t fir_coeffs[PIOS_ADC_MAX_SAMPLES+1]  __attribute__ ((aligned(4)));
-	volatile int16_t raw_data_buffer[PIOS_ADC_MAX_SAMPLES]  __attribute__ ((aligned(4)));	// Double buffer that DMA just used
-	float downsampled_buffer[PIOS_ADC_NUM_CHANNELS]  __attribute__ ((aligned(4)));
-#endif
-	enum pios_adc_dev_magic magic;
-};
-
 #if defined(PIOS_INCLUDE_FREERTOS)
 struct pios_adc_dev * pios_adc_dev;
+#endif
+
+#if defined(PIOS_INCLUDE_AD7998)
+#define UPDATE_RATE 20
+#define AD7998_TASK_PRIORITY	(tskIDLE_PRIORITY + 1)	// 
+#define AD7998_TASK_STACK		(200)
+void PIOS_AD7998_Task(void *parameters);
 #endif
 
 // Private functions
@@ -109,7 +94,17 @@ int32_t PIOS_ADC_Init(const struct pios_adc_cfg * cfg)
 #if defined(PIOS_INCLUDE_FREERTOS)
 	pios_adc_dev->data_queue = NULL;
 #endif
+
+#if defined(PIOS_INCLUDE_AD7998)
+	if(pios_i2c_flexi_adapter_id!=0)
+	{
+		pios_adc_dev->i2c_id=pios_i2c_flexi_adapter_id;
+		PIOS_AD7998_Init(pios_i2c_flexi_adapter_id);
+	}
 	
+	int result = xTaskCreate(PIOS_AD7998_Task, (const signed char *)"PIOS_AD7998_Task",AD7998_TASK_STACK, NULL, AD7998_TASK_PRIORITY, &pios_adc_dev->TaskHandle);
+	PIOS_Assert(result == pdPASS);
+#else
 	/* Setup analog pins */
 	GPIO_InitTypeDef GPIO_InitStructure;
 	GPIO_StructInit(&GPIO_InitStructure);
@@ -123,6 +118,7 @@ int32_t PIOS_ADC_Init(const struct pios_adc_cfg * cfg)
 	}
 
 	PIOS_ADC_Config(PIOS_ADC_MAX_OVERSAMPLING);	
+#endif
 	
 	return 0;
 }
@@ -241,8 +237,13 @@ int32_t PIOS_ADC_PinGet(uint32_t pin)
 		return -1;
 	}
 	
+#if defined(PIOS_INCLUDE_AD7998)
+	return (int32_t)PIOS_AD7998_ReadConv(pin);
+#else
+	
 	/* Return last conversion result */
 	return pios_adc_dev->downsampled_buffer[pin];
+#endif
 }
 
 /**
@@ -360,6 +361,25 @@ void PIOS_ADC_DMA_Handler(void)
 		DMA_ClearFlag(pios_adc_dev->cfg->dma.irq.flags /*DMA1_FLAG_GL1*/);
 	}
 }
+
+#if defined(PIOS_INCLUDE_AD7998)
+/**
+ * @brief Task that will get AD7998 data
+ * 
+ */
+void PIOS_AD7998_Task(void *parameters)
+{
+	while(1)
+	{
+		for (uint8_t i=0;i<PIOS_ADC_RCVR_MAX_CHANNELS;i++)
+		{
+			adc_dev->ppm_channel[i]=(uint16_t)PIOS_AD7998_ReadConv(i);
+		}
+		adc_dev->ppm_fresh=true;
+		vTaskDelay(UPDATE_RATE/portTICK_RATE_MS);
+	}
+}
+#endif
 
 /** 
  * @}

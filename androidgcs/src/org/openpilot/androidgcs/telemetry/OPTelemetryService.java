@@ -55,6 +55,8 @@ import android.widget.Toast;
 import dalvik.system.DexClassLoader;
 
 public class OPTelemetryService extends Service {
+	// Track lifecycle
+	private static int _startupRequests = 0;
 
 	// Logging settings
 	private final String TAG = OPTelemetryService.class.getSimpleName();
@@ -66,6 +68,7 @@ public class OPTelemetryService extends Service {
 	public final static String INTENT_CATEGORY_GCS        = "org.openpilot.intent.category.GCS";
 
 	// Intent actions
+	public final static String INTENT_ACTION_TELEMETRYTASK_STARTED = "org.openpilot.intent.action.TELEMETRYTASK_STARTED";
 	public final static String INTENT_ACTION_CONNECTED    = "org.openpilot.intent.action.CONNECTED";
 	public final static String INTENT_ACTION_DISCONNECTED = "org.openpilot.intent.action.DISCONNECTED";
 
@@ -139,6 +142,9 @@ public class OPTelemetryService extends Service {
 				throw new Error("Unsupported");
 			}
 			activeTelem.start();
+			Intent startedIntent = new Intent();
+			startedIntent.setAction(OPTelemetryService.INTENT_ACTION_TELEMETRYTASK_STARTED);
+			sendBroadcast(startedIntent,null);
 			break;
 		case MSG_DISCONNECT:
 			Toast.makeText(getApplicationContext(), "Disconnect requested", Toast.LENGTH_SHORT).show();
@@ -184,6 +190,9 @@ public class OPTelemetryService extends Service {
 	 * and based on the stored preference will send itself a connect signal if needed.
 	 */
 	public void startup() {
+		synchronized (this) {
+			_startupRequests++;
+		}
 		Toast.makeText(getApplicationContext(), "Telemetry service starting", Toast.LENGTH_SHORT).show();
 
 		thread = new HandlerThread("TelemetryServiceHandler", Process.THREAD_PRIORITY_BACKGROUND);
@@ -237,6 +246,9 @@ public class OPTelemetryService extends Service {
 				e.printStackTrace();
 			}
 		}
+		synchronized (this) {
+			_startupRequests = 0;
+		}
 		Log.d(TAG, "onDestory() shut down telemetry task");
 		Toast.makeText(this, "Telemetry service done", Toast.LENGTH_SHORT).show();
 	}
@@ -246,6 +258,9 @@ public class OPTelemetryService extends Service {
 			if (telemTask != null)
 				return telemTask.getTelemTaskIface();
 			return null;
+		}
+		public TelemetryTask getTelemetryTask(int id){
+			return telemTask;
 		}
 		public void openConnection() {
 			Toast.makeText(getApplicationContext(), "Requested open connection", Toast.LENGTH_SHORT).show();
@@ -409,5 +424,9 @@ public class OPTelemetryService extends Service {
 		}
 
 		return true;
+	}
+
+	public static int getNumStartupRequests() {
+		return _startupRequests;
 	}
 }

@@ -819,13 +819,13 @@
     <message>
         <location filename="../../../src/libs/utils/reloadpromptutils.cpp" line="+41"/>
         <source>File Changed</source>
-        <translation type="unfinished">Fichier Modifié</translation>
+        <translation>Fichier Modifié</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>The unsaved file %1 has been changed outside Qt Creator. Do you want to reload it and discard your changes?</source>
         <translatorcomment>[Platypus]Recharger -&gt; ouvrir cette version ?</translatorcomment>
-        <translation type="unfinished">Le fichier %1 n&apos;est pas enregistré et a été modifé en dehors de Qt Creator. Voulez-vous le charger à nouveau et ignorer vos changements ?</translation>
+        <translation>Le fichier %1 n&apos;est pas enregistré et a été modifié en dehors de Qt Creator. Voulez-vous le charger à nouveau et ignorer vos changements ?</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1316,7 +1316,7 @@ Raison : %3</translation>
     <message>
         <location filename="../../../src/libs/extensionsystem/pluginspec.cpp" line="+22"/>
         <source>&apos;%1&apos; misses attribute &apos;%2&apos;</source>
-        <translation>L&apos;attribute &apos;%1&apos; est manquant pour &apos;%2&apos;</translation>
+        <translation>L&apos;attribut &apos;%1&apos; est manquant pour &apos;%2&apos;</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1386,7 +1386,7 @@ Raison : %3</translation>
     <message>
         <location line="+5"/>
         <source>Internal error: have no plugin instance to perform extensionsInitialized</source>
-        <translation>Erreur interne: aucune instance de l&apos;extention sur laquelle exécuter extensionsInitialized</translation>
+        <translation type="unfinished">Erreur interne : aucune instance de l&apos;extension sur laquelle exécuter extensionsInitialized</translation>
     </message>
 </context>
 <context>
@@ -1407,7 +1407,7 @@ Raison : %3</translation>
     <message>
         <location filename="../../../src/plugins/coreplugin/dialogs/shortcutsettings.ui"/>
         <source>Keyboard Shortcuts</source>
-        <translation>Rarccourcis clavier</translation>
+        <translation>Raccourcis clavier</translation>
     </message>
     <message>
         <location/>
@@ -1779,7 +1779,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Refresh rate</source>
-        <translation>Fréquence de raffraichissement</translation>
+        <translation type="unfinished">Fréquence de rafraîchissement</translation>
     </message>
     <message>
         <location/>
@@ -2615,7 +2615,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Update Interval:</source>
-        <translation>Intervale de MAJ :</translation>
+        <translation type="unfinished">Intervalle de MAJ :</translation>
     </message>
     <message>
         <location/>
@@ -6171,7 +6171,7 @@ Mise à Jour</translation>
     <message>
         <location line="+1"/>
         <source>Reload the map tiles</source>
-        <translation type="unfinished">Recherger les dalles de la carte</translation>
+        <translation type="unfinished">Recharger les dalles de la carte</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -6192,7 +6192,7 @@ Mise à Jour</translation>
     <message>
         <location line="+1"/>
         <source>Copy the mouse latitude to the clipboard</source>
-        <translation type="unfinished">Copier la latitude de saouris dans le presse-papier</translation>
+        <translation type="unfinished">Copier la latitude de la souris dans le presse-papier</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -7502,12 +7502,12 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>Frame Type</source>
-        <translation>Type de Chassis</translation>
+        <translation type="unfinished">Type de Châssis</translation>
     </message>
     <message>
         <location/>
         <source>Select the Multirotor frame type here.</source>
-        <translation>Sélectionner ici le type de chassis de Multirotor.</translation>
+        <translation type="unfinished">Sélectionner ici le type de châssis de Multirotor.</translation>
     </message>
     <message>
         <location/>
@@ -9538,7 +9538,7 @@ p, li { white-space: pre-wrap; }
 on your remote. It shows currently active flight mode.
 
 Setup the flight mode channel on the RC Input tab if you have not done so already.</source>
-        <translation>Le curseur se déplace lorque vous bougez l&apos;inter de mode de vol sur votre radiocommande.
+        <translation type="unfinished">Le curseur se déplace lorsque vous bougez l&apos;inter de mode de vol sur votre radiocommande.
 Il affiche le mode actif actuellement.
 
 Configurez le canal de mode de vol dans l&apos;onglet Entrées RC si vous ne l&apos;avez pas déjà fait.
@@ -9564,13 +9564,13 @@ It will be 2 or 3 for most of setups, but it also can be up to 6.
 In that case you have to configure your radio mixers so the whole range
 from min to max is split into N equal intervals, and you may set arbitrary
 channel value for each flight mode.</source>
-        <translation>Nombre de positions de votre interrupteur Mode de Vol.
+        <translation type="unfinished">Nombre de positions de votre interrupteur Mode de Vol.
 
 La valeur par défaut est 3.
 
 Cela peut être 2 ou 3 dans la plupart des configurations, mais cela peut aller jusqu&apos;à 6.
 Dans ce cas vous devez configurer les mixages de votre radio pour que la plage mini à 
-maxi soit divisée en N intervales égaux et ainsi vous pouvez définir une valeur arbitraire 
+maxi soit divisée en N intervalles égaux et ainsi vous pouvez définir une valeur arbitraire 
 du canal de sortie pour chaque mode de vol.</translation>
     </message>
     <message>
@@ -9844,7 +9844,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Update rate:</source>
-        <translation>Fréquence de raffraichissement :</translation>
+        <translation type="unfinished">Fréquence de rafraîchissement :</translation>
     </message>
     <message>
         <location/>
@@ -9898,8 +9898,8 @@ Laisser à 50Hz pour une aile volante.</translation>
         <source>Move the servos using the sliders. Two important things:
 - Take extra care if the output is connected to an motor controller!
 - Will only work if the RC receiver is working (failsafe)</source>
-        <translation>Déplacer les servos en utilisant les curseurs. Deux choses importantes :
-- Faire très attention si la sortie est branchée sur un controleur de moteur !
+        <translation type="unfinished">Déplacer les servos en utilisant les curseurs. Deux choses importantes :
+- Faire très attention si la sortie est branchée sur un contrôleur de moteur !
 - Marche seulement si le récepteur RC est en fonctionnement (par sécurité)</translation>
     </message>
     <message>
@@ -10870,7 +10870,7 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>When the throttle is low, zero the intergral term to prevent intergral wind-up</source>
-        <translation>Quand les gaz sont faibles, mettre à zero le terme intégral pour éviter les secousses</translation>
+        <translation type="unfinished">Quand les gaz sont faibles, mettre à zéro le terme intégral pour éviter les secousses</translation>
     </message>
     <message>
         <location/>
@@ -11606,7 +11606,7 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location/>
         <source>Available controllers</source>
-        <translation>Controleurs disponibles</translation>
+        <translation type="unfinished">Contrôleurs disponibles</translation>
     </message>
     <message>
         <location/>
@@ -12258,15 +12258,15 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The OpenPilot controller supports many different types of input signals. Please select the type of input that matches your receiver configuration. If you are unsure, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Some input options require the OpenPilot controller to be rebooted before the changes can take place. If an option that requires a reboot is selected, you will be instructed to do so on the next page of this wizard.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Configuration de base du signal d&apos;entrée&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La carte controleur OpenPilot supporte plusieurs types de signaux d&apos;entrée. Veuillez sélectionner le type d&apos;entrée qui correspond à votre configuration de récepteur. Si vous n&apos;êtes pas certain, laissez juste l&apos;option par défaut sélectionnée et continuez l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La carte contrôleur OpenPilot supporte plusieurs types de signaux d&apos;entrée. Veuillez sélectionner le type d&apos;entrée qui correspond à votre configuration de récepteur. Si vous n&apos;êtes pas certain, laissez juste l&apos;option par défaut sélectionnée et continuez l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Quelques options requièrent un redémarrage du controleur OpenPilot avant que les changements ne prennent effet. Si une option demandant un redémarrage est sélectionnée, cela vous sera demandé de le faire dans la prochaine page de l&apos;assistant.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Quelques options requièrent un redémarrage du contrôleur OpenPilot avant que les changements ne prennent effet. Si une option demandant un redémarrage est sélectionnée, cela vous sera demandé de le faire dans la prochaine page de l&apos;assistant.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12351,7 +12351,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/setupwizard/pages/levellingpage.cpp" line="+75"/>
         <source>An OpenPilot controller must be connected to your computer to perform bias calculations.
 Please connect your OpenPilot controller to your computer and try again.</source>
-        <translation>Un controleur OpenPilot doit être connecté à votre PC pour calculer l&apos;ajustement du niveau.
+        <translation type="unfinished">Un contrôleur OpenPilot doit être connecté à votre PC pour calculer l&apos;ajustement du niveau.
 Connectez votre carte OpenPilot et essayez à nouveau.</translation>
     </message>
     <message>
@@ -12418,7 +12418,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>The Plus(+) Quadcopter uses four motors and is similar to the X Quadcopter but the forward direction is offset by 45 degrees. The motors front and rear rotate in clockwise and the motors right and left rotate counter-clockwise. This setup was one of the first to be used and is still used for sport flying. This configuration is not that well suited for FPV since the fore rotor tend to be in the way of the camera.</source>
-        <translation>Le Quadricoptère (+) utilise quatres moteurs et il est similaire au Quadricoptère X mais la direction de déplacement est décalée de 45 degrés. Les moteurs avant et arrière tournent dans le sens horaire et les moteurs gauche et droit tournent dans le sens anti-horaire. Cette configuration a été l&apos;une des premières à être utilisée et est encore utilisée pour le vol sportif. Cette agencement n&apos;est pas bien adapté pour que FPV car le moteur de devant a tendance à être dans le champ de vision de la caméra.</translation>
+        <translation type="unfinished">Le Quadricoptère (+) utilise quatre moteurs et il est similaire au Quadricoptère X mais la direction de déplacement est décalée de 45 degrés. Les moteurs avant et arrière tournent dans le sens horaire et les moteurs gauche et droit tournent dans le sens anti-horaire. Cette configuration a été l&apos;une des premières à être utilisée et est encore utilisée pour le vol sportif. Cette agencement n&apos;est pas bien adapté pour que FPV car le moteur de devant a tendance à être dans le champ de vision de la caméra.</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -12566,7 +12566,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Please select one of the options below. If you are unsure about the capabilities of your ESCs, just leave the default option selected and continue the wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;To read more regarding ESC refresh rates, please see &lt;/span&gt;&lt;a href=&quot;http://wiki.openpilot.org/x/HIEu&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;this article&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; in the OpenPilot Wiki&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -12576,7 +12576,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Veuillez sélectionner une des options ci-dessous. Si vous n&apos;êtes pas certain des capacités de vos variateurs laissez juste l&apos;option par défaut sélectionnée et continuez l&apos;assistant.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Pour en savoir plus à propos des fréquences de raffraichissement des variateurs, veuillez consulter &lt;/span&gt;&lt;a href=&quot;http://wiki.openpilot.org/x/HIEu&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;cet article&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; sur le Wiki OpenPilot (en anglais)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt;Pour en savoir plus à propos des fréquences de rafraîchissement des variateurs, veuillez consulter &lt;/span&gt;&lt;a href=&quot;http://wiki.openpilot.org/x/HIEu&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;cet article&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:10pt;&quot;&gt; sur le Wiki OpenPilot (en anglais)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12689,7 +12689,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Write configuration to controller</source>
-        <translation>Ecrire la configuration dans le controleur</translation>
+        <translation type="unfinished">Ecrire la configuration dans le contrôleur</translation>
     </message>
     <message>
         <location/>
@@ -12705,7 +12705,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/setupwizard/pages/savepage.cpp" line="+61"/>
         <source>An OpenPilot controller must be connected to your computer to save the configuration.
 Please connect your OpenPilot controller to your computer and try again.</source>
-        <translation>Un controleur OpenPilot doit être connecté à votre PC pour enregistrer la configuration.
+        <translation type="unfinished">Un contrôleur OpenPilot doit être connecté à votre PC pour enregistrer la configuration.
 Connectez votre carte OpenPilot et essayez à nouveau.</translation>
     </message>
 </context>
@@ -13180,7 +13180,7 @@ vous l&apos;avez reçue d&apos;une source sûre (site web officiel ou votre prop
     <message>
         <location line="+6"/>
         <source>WARNING: the loaded firmware was not packaged with the OpenPilot format. Do not update unless you know what you are doing</source>
-        <translation>ATTENTION : le firmware chargé n&apos;est pas empaquetté avec le format OpenPilot. Ne le mettez pas à jour, à moins de savoir ce que vous faites</translation>
+        <translation type="unfinished">ATTENTION : le firmware chargé n&apos;est pas empaqueté avec le format OpenPilot. Ne le mettez pas à jour, à moins de savoir ce que vous faites</translation>
     </message>
     <message>
         <location line="+212"/>
@@ -13754,7 +13754,7 @@ Move the %1 stick.</source>
     <message>
         <location filename="../../../src/plugins/gcscontrol/gcscontrolgadgetfactory.cpp" line="+34"/>
         <source>Controller</source>
-        <translation>Controleur</translation>
+        <translation type="unfinished">Contrôleur</translation>
     </message>
 </context>
 <context>

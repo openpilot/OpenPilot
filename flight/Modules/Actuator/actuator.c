@@ -57,6 +57,8 @@
 #define FAILSAFE_TIMEOUT_MS 100
 #define MAX_MIX_ACTUATORS ACTUATORCOMMAND_CHANNEL_NUMELEM
 
+#define CAMERA_BOOT_DELAY_MS	7000
+
 // Private types
 
 
@@ -205,7 +207,7 @@ static void actuatorTask(void* parameters)
 		// Check how long since last update
 		thisSysTime = xTaskGetTickCount();
 		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
-			dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
+			dT = (thisSysTime - lastSysTime) * (portTICK_RATE_MS * 0.001f);
 		lastSysTime = thisSysTime;
 
 		FlightStatusGet(&flightStatus);
@@ -277,10 +279,15 @@ static void actuatorTask(void* parameters)
 
 		for(int ct=0; ct < MAX_MIX_ACTUATORS; ct++)
 		{
+			// During boot all camera actuators should be completely disabled (PWM pulse = 0).
+			// command.Channel[i] is reused below as a channel PWM activity flag:
+			// 0 - PWM disabled, >0 - PWM set to real mixer value using scaleChannel() later.
+			// Setting it to 1 by default means "Rescale this channel and enable PWM on its output".
+			command.Channel[ct] = 1;
+
 			if(mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_DISABLED) {
 				// Set to minimum if disabled.  This is not the same as saying PWM pulse = 0 us
 				status[ct] = -1;
-				command.Channel[ct] = 0;
 				continue;
 			}
 
@@ -288,8 +295,6 @@ static void actuatorTask(void* parameters)
 				status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dT);
 			else
 				status[ct] = -1;
-
-
 
 			// Motors have additional protection for when to be on
 			if(mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) {
@@ -322,6 +327,7 @@ static void actuatorTask(void* parameters)
 				else
 					status[ct] = -1;
 			}
+
 			if( (mixers[ct].type >= MIXERSETTINGS_MIXER1TYPE_CAMERAROLL) &&
 			   (mixers[ct].type <= MIXERSETTINGS_MIXER1TYPE_CAMERAYAW))
 			{
@@ -343,19 +349,26 @@ static void actuatorTask(void* parameters)
 				}
 				else
 					status[ct] = -1;
+
+				// Disable camera actuators for CAMERA_BOOT_DELAY_MS after boot
+				if (thisSysTime < (CAMERA_BOOT_DELAY_MS / portTICK_RATE_MS))
+					command.Channel[ct] = 0;
 			}
 		}
-		
-		for(int i = 0; i < MAX_MIX_ACTUATORS; i++) 
-			command.Channel[i] = scaleChannel(status[i],
+
+		// Set real actuator output values scaling them from mixers. All channels
+		// will be set except explicitly disabled (which will have PWM pulse = 0).
+		for (int i = 0; i < MAX_MIX_ACTUATORS; i++)
+			if (command.Channel[i])
+				command.Channel[i] = scaleChannel(status[i],
 							   actuatorSettings.ChannelMax[i],
 							   actuatorSettings.ChannelMin[i],
 							   actuatorSettings.ChannelNeutral[i]);
-			
+
 		// Store update time
-		command.UpdateTime = 1000.0f*dT;
-		if(1000.0f*dT > command.MaxUpdateTime)
-			command.MaxUpdateTime = 1000.0f*dT;
+		command.UpdateTime = dT * 1000.0f;
+		if (command.UpdateTime > command.MaxUpdateTime)
+			command.MaxUpdateTime = command.UpdateTime;
 		
 		// Update output object
 		ActuatorCommandSet(&command);

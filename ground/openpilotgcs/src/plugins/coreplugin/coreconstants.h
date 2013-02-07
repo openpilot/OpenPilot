@@ -35,8 +35,6 @@ namespace Constants {
 #define GCS_VERSION_MAJOR 1
 #define GCS_VERSION_MINOR 0
 #define GCS_VERSION_RELEASE 0
-const char * const GCS_VERSION_TYPE = "Alpha";
-const char * const GCS_VERSION_CODENAME = "Pascal";
 
 #define STRINGIFY_INTERNAL(x) #x
 #define STRINGIFY(x) STRINGIFY_INTERNAL(x)
@@ -46,17 +44,33 @@ const char * const GCS_VERSION_CODENAME = "Pascal";
     "." STRINGIFY(GCS_VERSION_RELEASE)
 
 const char * const GCS_VERSION_LONG      = GCS_VERSION;
-const char * const GCS_AUTHOR            = "OpenPilot Project";
-const char * const GCS_YEAR              = "2012";
 
-const char * const GCS_HELP              = "http://wiki.openpilot.org";
 #ifdef GCS_REVISION
-const char * const GCS_REVISION_STR      = STRINGIFY(GCS_REVISION);
+const char * const GCS_REVISION_STR      = GCS_REVISION;
+#else
+const char * const GCS_REVISION_STR      = "N/A";
+#endif
+
+#ifdef GCS_YEAR
+const char * const GCS_YEAR_STR          = GCS_YEAR;
+#else
+const char * const GCS_YEAR_STR          = "2013";
+#endif
+
+#ifdef GCS_ORIGIN
+const char * const GCS_ORIGIN_STR        = GCS_ORIGIN;
+#else
+const char * const GCS_ORIGIN_STR        = "unknown repository";
+#endif
+
+#ifdef UAVO_HASH
 const char * const UAVOSHA1_STR          = STRINGIFY(UAVO_HASH);
 #else
-const char * const GCS_REVISION_STR      = "";
 const char * const UAVOSHA1_STR          = "";
 #endif
+
+const char * const GCS_AUTHOR            = "The OpenPilot Project";
+const char * const GCS_HELP              = "http://wiki.openpilot.org";
 
 #undef GCS_VERSION
 #undef STRINGIFY

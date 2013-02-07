@@ -1,11 +1,13 @@
 include(../../openpilotgcs.pri)
 include(../shared/qtsingleapplication/qtsingleapplication.pri)
+include(gcsversioninfo.pri)
 
 TEMPLATE = app
 TARGET = $$GCS_APP_TARGET
 DESTDIR = $$GCS_APP_PATH
 QT += xml
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    gcssplashscreen.cpp
 include(../rpath.pri)
 include(../libs/utils/utils.pri)
 
@@ -28,3 +30,9 @@ win32 {
 }
 
 OTHER_FILES += openpilotgcs.rc
+
+RESOURCES += \
+    appresources.qrc
+
+HEADERS += \
+    gcssplashscreen.h

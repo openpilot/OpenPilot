@@ -38,16 +38,13 @@ public:
     ~UAVSettingsImportExportFactory();
 
 private:
-    enum storedData { Settings, Data, Waypoints, Both };
+    enum storedData { Settings, Data, Both };
     QString createXMLDocument(const enum storedData, const bool fullExport);
 
 private slots:
     void importUAVSettings();
     void exportUAVSettings();
     void exportUAVData();
-
-    void exportWaypoints();
-    void importWaypoints();
 signals:
     void importAboutToBegin();
     void importEnded();

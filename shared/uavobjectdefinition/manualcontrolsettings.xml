@@ -12,7 +12,9 @@
 	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"/>
 	<field name="ChannelMax" units="us" type="int16" defaultvalue="2000"
 	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"/>
-	       
+	<field name="ResponseTime" units="ms" type="uint16" defaultvalue="0"
+	       elementnames="Roll,Pitch,Yaw,Accessory0,Accessory1,Accessory2"/>
+
         <field name="Deadband" units="%" type="float" elements="1" defaultvalue="0"/>
 
         <field name="Arming" units="" type="enum" elements="1" options="Always Disarmed,Always Armed,Roll Left,Roll Right,Pitch Forward,Pitch Aft,Yaw Left,Yaw Right" defaultvalue="Always Disarmed"/>

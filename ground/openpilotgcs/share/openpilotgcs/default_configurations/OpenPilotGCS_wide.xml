@@ -8,6 +8,7 @@
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
     <SettingsWindowHeight>700</SettingsWindowHeight>
     <SettingsWindowWidth>800</SettingsWindowWidth>
+    <OverrideLanguage>C</OverrideLanguage>
     <UDPMirror>false</UDPMirror>
     <Description>Wide configuration</Description>
     <Details>Default configuration built for wide screens (17"up)</Details>
@@ -2505,22 +2506,6 @@
         </data>
       </default>
     </UAVObjectBrowser>
-    <Uploader>
-      <default>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <defaultDataBits>3</defaultDataBits>
-          <defaultFlow>0</defaultFlow>
-          <defaultParity>0</defaultParity>
-          <defaultPort>/dev/ttyS0</defaultPort>
-          <defaultSpeed>14</defaultSpeed>
-          <defaultStopBits>0</defaultStopBits>
-        </data>
-      </default>
-    </Uploader>
     <configInfo>
       <locked>false</locked>
       <version>1.2.0</version>
@@ -2645,27 +2630,18 @@
         </side0>
         <side1>
           <side0>
-            <side0>
-              <classId>LoggingGadget</classId>
-              <type>uavGadget</type>
-            </side0>
-            <side1>
-              <classId>GpsDisplayGadget</classId>
-              <gadget>
-                <activeConfiguration>Flight GPS</activeConfiguration>
-              </gadget>
-              <type>uavGadget</type>
-            </side1>
-            <splitterOrientation>2</splitterOrientation>
-            <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAcAAAAAIAAAHo)</splitterSizes>
-            <type>splitter</type>
+            <classId>LoggingGadget</classId>
+            <type>uavGadget</type>
           </side0>
           <side1>
-            <classId>DebugGadget</classId>
+            <classId>GpsDisplayGadget</classId>
+            <gadget>
+              <activeConfiguration>Flight GPS</activeConfiguration>
+            </gadget>
             <type>uavGadget</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAB3wAAAAIAAAEp)</splitterSizes>
+          <splitterSizes>@Variant(AAAACQAAAAIAAAACAAAAVAAAAAIAAAGu)</splitterSizes>
           <type>splitter</type>
         </side1>
         <splitterOrientation>1</splitterOrientation>

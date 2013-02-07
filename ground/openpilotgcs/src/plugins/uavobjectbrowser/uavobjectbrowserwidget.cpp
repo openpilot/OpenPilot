@@ -132,6 +132,7 @@ void UAVObjectBrowserWidget::useScientificNotation(bool scientific)
 
 void UAVObjectBrowserWidget::sendUpdate()
 {
+    this->setFocus();
     ObjectTreeItem *objItem = findCurrentObjectTreeItem();
     Q_ASSERT(objItem);
     objItem->apply();
@@ -165,6 +166,7 @@ ObjectTreeItem *UAVObjectBrowserWidget::findCurrentObjectTreeItem()
 
 void UAVObjectBrowserWidget::saveObject()
 {
+    this->setFocus();
     // Send update so that the latest value is saved
     sendUpdate();
     // Save object

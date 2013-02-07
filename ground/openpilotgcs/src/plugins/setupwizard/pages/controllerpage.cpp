@@ -123,7 +123,7 @@ void ControllerPage::setupBoardTypes()
     ui->boardTypeCombo->addItem(tr("OpenPilot CopterControl 3D"), SetupWizard::CONTROLLER_CC3D);
     ui->boardTypeCombo->addItem(tr("OpenPilot Revolution"), SetupWizard::CONTROLLER_REVO);
     //ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(ui->boardTypeCombo->count() - 1, 0), v, Qt::UserRole - 1);
-    ui->boardTypeCombo->addItem(tr("OpenPilot PipX Radio Modem"), SetupWizard::CONTROLLER_PIPX);
+    ui->boardTypeCombo->addItem(tr("OpenPilot OPLink Radio Modem"), SetupWizard::CONTROLLER_PIPX);
     //ui->boardTypeCombo->model()->setData(ui->boardTypeCombo->model()->index(ui->boardTypeCombo->count() - 1, 0), v, Qt::UserRole - 1);
 }
 

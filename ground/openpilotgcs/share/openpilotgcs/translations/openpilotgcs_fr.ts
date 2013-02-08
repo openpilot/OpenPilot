@@ -105,7 +105,7 @@
     <message>
         <location/>
         <source>Use UDP Mirror</source>
-        <translation>Utiliser Mirroir UDP</translation>
+        <translation type="unfinished">Utiliser Miroir UDP</translation>
     </message>
     <message>
         <location/>
@@ -420,7 +420,7 @@
     <message>
         <location line="+27"/>
         <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: %2&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
-        <translation type="unfinished">&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la license GNU General Public License publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la License, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans GARANTIE DE QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
+        <translation type="unfinished">&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public License publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la License, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans GARANTIE DE QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
@@ -454,7 +454,7 @@
     <message>
         <location filename="../../../src/libs/utils/classnamevalidatinglineedit.cpp" line="+83"/>
         <source>The class name must not contain namespace delimiters.</source>
-        <translation type="unfinished">Le nom de laclasse ne doit pas contenir de délimiteur d&apos;espace de nommage.</translation>
+        <translation type="unfinished">Le nom de la classe ne doit pas contenir de délimiteur d&apos;espace de nommage.</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -503,7 +503,7 @@
     <message>
         <location line="+5"/>
         <source>Cannot execute &apos;%1&apos;: %2</source>
-        <translation>Impossible d&apos;éxecuter &apos;%1&apos;: %2</translation>
+        <translation type="unfinished">Impossible d&apos;exécuter &apos;%1&apos;: %2</translation>
     </message>
     <message>
         <location filename="../../../src/libs/utils/consoleprocess_unix.cpp" line="+110"/>
@@ -874,7 +874,7 @@
     <message>
         <location/>
         <source>License:</source>
-        <translation type="unfinished">License :</translation>
+        <translation type="unfinished">Licence :</translation>
     </message>
     <message>
         <location/>
@@ -1725,7 +1725,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/hitlnew/hitloptionspage.ui"/>
         <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>For receiving data from sim</source>
-        <translation>Pour reçevoir les données du simulateur</translation>
+        <translation type="unfinished">Pour recevoir les données du simulateur</translation>
     </message>
     <message>
         <location/>
@@ -1747,7 +1747,7 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/hitlv2/hitlv2optionspage.ui"/>
         <source>For communication with sim computer via network. Should be the IP address of one of the interfaces of the GCS computer.</source>
-        <translation>Pour la communication avec l&apos;ordinateur de simulation via le réseau. Doit-être l&apos;adresse IP d&apos;une des interfaces de l&apos;ordinateur avec GCS.</translation>
+        <translation type="unfinished">Pour la communication avec l&apos;ordinateur de simulation via le réseau. Doit être l&apos;adresse IP d&apos;une des interfaces de l&apos;ordinateur avec GCS.</translation>
     </message>
     <message>
         <location/>
@@ -1820,7 +1820,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>0 - update once, or every N seconds</source>
-        <translation>0 - MàJ unique, ou chaque N secondes</translation>
+        <translation>0 - Mise à jour unique, ou chaque N secondes</translation>
     </message>
     <message>
         <location/>
@@ -2041,7 +2041,7 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>VBO allow for performance gains for GPUs that support it (most cards).  This may cause cards with faulty drivers to crash.</source>
         <translatorcomment>Les VBOs (de l&apos;anglais Vertex Buffer Object dont une traduction pourrait être objet tampon de vertex) @Wikipedia</translatorcomment>
-        <translation>VBO permet des gains de performance avec les cartes graphiques le supportant (la plupart). Cela peut entrainer des plantages avec des pilotes défectueux.</translation>
+        <translation type="unfinished">VBO permet des gains de performance avec les cartes graphiques le supportant (la plupart). Cela peut entraîner des plantages avec des pilotes défectueux.</translation>
     </message>
     <message>
         <location/>
@@ -10297,7 +10297,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>Set the maximum RF datarate/channel bandwidth the modem will use</source>
-        <translation>Régler le débit de données HF maxi / canal bande-passante utilisée par le modem</translation>
+        <translation type="unfinished">Régler le débit de données HF maxi / canal bande-passante utilisée par le modem</translation>
     </message>
     <message>
         <location/>
@@ -11212,7 +11212,7 @@ oscillations claires en vol. Baissez ensuite la valeur de 20% ou plus.</translat
     <message>
         <location/>
         <source>Real Time Updates</source>
-        <translation>MàJ Temps Réel</translation>
+        <translation type="unfinished">MAJ Temps Réel</translation>
     </message>
     <message>
         <location/>
@@ -11368,6 +11368,7 @@ Jusqu&apos;à 3 options distinctes (PID ou paires d&apos;options) peuvent être 
         <location/>
         <source>Select PID option or option pair to update.
 Set to Disabled if not used.</source>
+        <translatorcomment>Disabled : dépend d&apos;une liste d&apos;options pas encore traduites.</translatorcomment>
         <translation>Sélectionner l&apos;option PID ou une paire d&apos;options PID à actualiser.
 Réglé à Disabled si non utilisé.</translation>
     </message>
@@ -12490,11 +12491,11 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Connect all components according to the illustration on the summary page, and provide power using an external power supply such as a battery before continuing.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Depending on what vehicle you have selected, both the motors controlled by ESCs and/or servos controlled directly by the OpenPilot controller may have to be calibrated. The following steps will guide you safely through this process. &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Il est à présent temps de calibrer les niveaux de sortie des signaux controlant votre véhicule. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Il est à présent temps de calibrer les niveaux de sortie des signaux contrôlant votre véhicule. &lt;/span&gt;&lt;/p&gt;
 &lt;p align=&quot;center&quot; style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;TRES IMPORTANT !&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt; font-weight:600; color:#ff0000;&quot;&gt;ENLEVER TOUTES LES HELICES DE VOTRE VEHICULE AVANT DE CONTINUER !&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;Branchez tous les composants comme sur l&apos;illustration dans la page de résumé et alimentez avec une source externe comme une batterie avant de continuer.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -13139,7 +13140,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
         <location line="+35"/>
         <location line="+31"/>
         <source>Tagged officially released firmware build</source>
-        <translation>Firmware certifié OpenPilot, publié officellement</translation>
+        <translation type="unfinished">Firmware certifié OpenPilot, publié officiellement</translation>
     </message>
     <message>
         <location line="-23"/>
@@ -13688,7 +13689,7 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+67"/>
         <source>Are you sure you want to erase all board settings?.</source>
-        <translation>Êtes-vous certain de vouloir supprimer tous les paramètres sur la carte ?. </translation>
+        <translation type="unfinished">Êtes-vous certain de vouloir supprimer tous les paramètres sur la carte ?</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -13705,7 +13706,7 @@ Bougez le manche %1.</translation>
         <location line="-24"/>
         <location line="+25"/>
         <source>Power-cycle your board after removing all blades. Settings might be inconsistent.</source>
-        <translation>Eteindre / Allumer votre carte après avoir enlevé toutes les hélices. Les paramètres peuvent-être incorrects. </translation>
+        <translation type="unfinished">Eteindre / Allumer votre carte après avoir enlevé toutes les hélices. Les paramètres peuvent-être incorrects.</translation>
     </message>
     <message>
         <location line="-4"/>

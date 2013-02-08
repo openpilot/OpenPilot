@@ -1102,7 +1102,8 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Created #IF statements</source>
-        <translation type="unfinished">Créer #IF statements</translation>
+        <translatorcomment>Created = Créé ?</translatorcomment>
+        <translation type="unfinished">#IF statements créés</translation>
     </message>
     <message>
         <location/>
@@ -13461,12 +13462,14 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+306"/>
         <location line="+1072"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
-        <translation type="unfinished">Pour des raisons de sécurité le Réglage de l&apos;Armement a été modifié à  &apos;Toujours Désarmé&apos;.</translation>
+        <translatorcomment>Contexte : Onglet &quot;Paramètres d&apos;Armement&quot;</translatorcomment>
+        <translation type="unfinished">Pour des raisons de sécurité les Paramètres d&apos;Armement ont été modifiés à &apos;Toujours Désarmé&apos;.</translation>
     </message>
     <message>
         <location line="-1071"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
-        <translation type="unfinished">Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé sur l&apos;écran des Paramètres d&apos;Armement.</translation>
+        <translatorcomment>redirigé vers / sur ?</translatorcomment>
+        <translation type="unfinished">Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé vers l&apos;écran des Paramètres d&apos;Armement.</translation>
     </message>
     <message>
         <location line="+166"/>
@@ -13515,56 +13518,80 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
     <message>
         <location line="+6"/>
         <source>Mode 1: Fore/Aft Cyclic and Yaw on the left, Throttle/Collective and Left/Right Cyclic on the right</source>
-        <translation type="unfinished">Mode 1 : Rotation Avant/Arrière et Lacet à gauche, Gaz/Collectif et Rotation Droite/Gauche à droite</translation>
+        <translatorcomment>Mode pilotage Hélicoptères: (Notice Graupner)
+1: Longitudinal, Anti-couple, à gauche et Moteur/Pas, Latéral, à droite
+2: Moteur/Pas, Anti-couple, à gauche et Longitufinal, Latéral, à doite
+3: Longitudinal, Latéral, à gauche et Moteur/Pas, Anti-couple, à droite
+4: Moteur/Pas, Latéral, à gauche et Longitudinal, Anti-couple, à droite
+</translatorcomment>
+        <translation type="unfinished">Mode 1 : Rotation Avant/Arrière et Anti-Couple à gauche, Gaz/Collectif et Rotation Droite/Gauche à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 2: Throttle/Collective and Yaw on the left, Cyclic on the right</source>
-        <translation type="unfinished">Mode 2 : Gaz/Collectif et Lacet à gauche, Rotations à droite</translation>
+        <translatorcomment>Mode pilotage Hélicoptères: (Notice Graupner)
+1: Longitudinal, Anti-couple, à gauche et Moteur/Pas, Latéral, à droite
+2: Moteur/Pas, Anti-couple, à gauche et Longitufinal, Latéral, à doite
+3: Longitudinal, Latéral, à gauche et Moteur/Pas, Anti-couple, à droite
+4: Moteur/Pas, Latéral, à gauche et Longitudinal, Anti-couple, à droite
+</translatorcomment>
+        <translation type="unfinished">Mode 2 : Gaz/Collectif et Anti-Couple à gauche, Rotations à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 3: Cyclic on the left, Throttle/Collective and Yaw on the right</source>
-        <translation type="unfinished">Mode 3 : Rotations à gauche, Gaz/Collectif et Lacet à droite</translation>
+        <translation type="unfinished">Mode 3 : Rotations à gauche, Gaz/Collectif et Anti-couple à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 4: Throttle/Collective and Left/Right Cyclic on the left, Fore/Aft Cyclic and Yaw on the right</source>
-        <translation type="unfinished">Mode 4 : Gaz/Collectif et Rotation Droite/Gauche, Rotation Avant/Arrière et Lacet à droite</translation>
+        <translatorcomment>Mode pilotage Hélicoptères: (Notice Graupner)
+1: Longitudinal, Anti-couple, à gauche et Moteur/Pas, Latéral, à droite
+2: Moteur/Pas, Anti-couple, à gauche et Longitufinal, Latéral, à doite
+3: Longitudinal, Latéral, à gauche et Moteur/Pas, Anti-couple, à droite
+4: Moteur/Pas, Latéral, à gauche et Longitudinal, Anti-couple, à droite
+</translatorcomment>
+        <translation type="unfinished">Mode 4 : Gaz/Collectif et Rotation Droite/Gauche, Rotation Avant/Arrière et Anti-couple à droite</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Mode 1: Elevator and Rudder on the left, Throttle and Ailerons on the right</source>
-        <translation type="unfinished">Mde 1 : Élevation et Gouvernail, Gaz et Ailerons à droite</translation>
+        <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
+        <translation type="unfinished">Mode 1 : Profondeur et Dérive à gauche, Gaz et Ailerons à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 2: Throttle and Rudder on the left, Elevator and Ailerons on the right</source>
-        <translation type="unfinished">Mode 2 : Gaz et Gouvernail à gauche, Élévation et Ailerons à la droite</translation>
+        <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
+        <translation type="unfinished">Mode 2 : Gaz et Dérive à gauche, Profondeur et Ailerons à la droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 3: Elevator and Ailerons on the left, Throttle and Rudder on the right</source>
-        <translation type="unfinished">Mode 3 : Élevation et Ailerons à gauche, Gaz et Gouvernail à droite</translation>
+        <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
+        <translation type="unfinished">Mode 3 : Profondeur et Ailerons à gauche, Gaz et Dérive à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 4: Throttle and Ailerons on the left, Elevator and Rudder on the right</source>
-        <translation type="unfinished">Mode 4 : Gaz et Ailerons à gauche, Élevation et Gouvernail à droite</translation>
+        <translatorcomment>Profondeur - Dérive - Gaz - ailerons : mode avion</translatorcomment>
+        <translation type="unfinished">Mode 4 : Gaz et Ailerons à gauche, Profondeur et Dérive à droite</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>For a Quad: Elevator is Pitch, Ailerons are Roll, and Rudder is Yaw.</source>
-        <translation type="unfinished">Pour un Quadricopter : Profondeur correspond à la ROtation Avant, Ailerons à Roulis et Gouvernail correspond à Lacet.</translation>
+        <translatorcomment>Dérive / gouvernail ?</translatorcomment>
+        <translation type="unfinished">Pour un Quadricopter : Profondeur correspond à la Rotation Avant, Ailerons à Roulis et Dérive correspond à Lacet.</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Please center all controls and trims and press Next when ready.
 
 If your FlightMode switch has only two positions, leave it in either position.</source>
-        <translation type="unfinished">Veuillez positionner tous les manches et compensateurs en position centrale et appuyer sur Suivant lorsque vous êtes prêt.
+        <translatorcomment>compensateur (me parle pas bcp) Laisser Trim ? Répétition &apos;et&apos;.</translatorcomment>
+        <translation type="unfinished">Veuillez positionner tous les manches/trims en position centrale et appuyer sur Suivant lorsque vous êtes prêt.
 
-Si votre interrupteur de Mode de Vol a seulement deux positions, laissez-le dans n&apos;importe quelle position. </translation>
+Si votre interrupteur de Mode de Vol a seulement deux positions, laissez-le dans n&apos;importe quelle position.</translation>
     </message>
     <message>
         <location line="+9"/>
@@ -13594,10 +13621,10 @@ IMPORTANT : Ces nouveaux paramètres ne sont pas encore enregistrés sur la cart
         <source>Please enable throttle hold mode.
 
 Move the Collective Pitch stick.</source>
-        <translatorcomment>hélico ? à traduire [Platypus] Ca convient ?</translatorcomment>
+        <translatorcomment>hélico ? à traduire [Platypus] Ca convient ? [soh] A confirmer par un héliqueux.</translatorcomment>
         <translation type="unfinished">Veuillez activer les gaz en position maintenue.
 
-Bouger le manche du Collectif de tangage</translation>
+Bougez le manche du Collectif de tangage.</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -13616,16 +13643,16 @@ Move the Throttle stick.</source>
         <translatorcomment>hélico ? à traduire</translatorcomment>
         <translation type="unfinished">Veuillez désactiver les gaz en position maintenue.
 
-Bouger le manche des Gaz.</translation>
+Bougez le manche des Gaz.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Please move each control one at a time according to the instructions and picture below.
 
 Move the %1 stick.</source>
-        <translation type="unfinished">Veuillez bouger chaque organe de contrôle, un seul à la fois, en fonction des instructions et de l&apos;image ci-dessous
+        <translation type="unfinished">Veuillez bouger chaque organe de contrôle, un seul à la fois, en fonction des instructions et de l&apos;image ci-dessous.
 
- Bougez le manche %1.</translation>
+Bougez le manche %1.</translation>
     </message>
     <message>
         <location line="+6"/>

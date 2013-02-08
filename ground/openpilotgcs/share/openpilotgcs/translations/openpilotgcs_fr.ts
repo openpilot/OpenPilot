@@ -13461,12 +13461,12 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/config/configinputwidget.cpp" line="+306"/>
         <location line="+1072"/>
         <source>Arming Settings are now set to &apos;Always Disarmed&apos; for your safety.</source>
-        <translation>Les Paramètres d&apos;Armement sont à présent réglés à &apos;Toujours Désarmé&apos; pour votre sécurité.</translation>
+        <translation type="unfinished">Pour des raisons de sécurité le Réglage de l&apos;Armement a été modifié à  &apos;Toujours Désarmé&apos;.</translation>
     </message>
     <message>
         <location line="-1071"/>
         <source>You will have to reconfigure the arming settings manually when the wizard is finished. After the last step of the wizard you will be taken to the Arming Settings screen.</source>
-        <translation>Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape vous serez dirigé sur l&apos;écran Paramètres d&apos;Armement.</translation>
+        <translation type="unfinished">Vous devrez reconfigurer manuellement les paramètres d&apos;armement lorsque l&apos;assistant sera terminé. Après la dernière étape de l&apos;assistant, vous serez redirigé sur l&apos;écran des Paramètres d&apos;Armement.</translation>
     </message>
     <message>
         <location line="+166"/>
@@ -13477,10 +13477,10 @@ Make sure you already configured your hardware settings on the proper tab and re
 
 You can press &apos;back&apos; at any time to return to the previous screen or press &apos;Cancel&apos; to quit the wizard.
 </source>
-        <translation>Bienvenue sur l&apos;assistant de configuration des entrées.
+        <translation type="unfinished">Bienvenu(e) dans l&apos;assistant de configuration des entrées.
 
-Veuillez suivre les instructions à l&apos;écran et uniquement bouger les commandes lorsque on vous le demande.
-Soyez certain d&apos;avoir déjà configuré vos paramètres matériels dans l&apos;onglet approprié et redémarré votre carte.
+Veuillez suivre les instructions à l&apos;écran et bouger les commandes uniquement lorsque demandé.
+Vérifiez que vous avez déjà bien configuré vos paramètres matériels dans l&apos;onglet correspondant et redémarré votre carte.
 
 Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l&apos;écran précédent ou appuyer sur &apos;Annuler&apos; pour quitter l&apos;assistant.</translation>
     </message>
@@ -13492,6 +13492,7 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
     <message>
         <location line="+2"/>
         <source>Acro: normal transmitter for fixed-wing or quad</source>
+        <translatorcomment>[Platypus]mettre quadicopter ?</translatorcomment>
         <translation>Acro : émetteur normal pour une aile ou un quad</translation>
     </message>
     <message>
@@ -13502,65 +13503,66 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
     <message>
         <location line="+7"/>
         <source>If selecting the Helicopter option, please engage throttle hold now.</source>
-        <translatorcomment>please engage throttle hold now... à confirmer !</translatorcomment>
+        <translatorcomment>please engage throttle hold now... à confirmer ! [Platypus] Ca me semble bien</translatorcomment>
         <translation type="unfinished">Si vous avez sélectionné l&apos;option Hélicoptère, veuillez enclencher et maintenir les gaz.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Please choose your transmitter mode:</source>
-        <translation>Veuillez choisir votre mode de pilotage :</translation>
+        <translatorcomment>[Platypus] Préférence sur le mot sélectionner</translatorcomment>
+        <translation type="unfinished">Veuillez sélectionner votre mode de pilotage :</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Mode 1: Fore/Aft Cyclic and Yaw on the left, Throttle/Collective and Left/Right Cyclic on the right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode 1 : Rotation Avant/Arrière et Lacet à gauche, Gaz/Collectif et Rotation Droite/Gauche à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 2: Throttle/Collective and Yaw on the left, Cyclic on the right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode 2 : Gaz/Collectif et Lacet à gauche, Rotations à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 3: Cyclic on the left, Throttle/Collective and Yaw on the right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode 3 : Rotations à gauche, Gaz/Collectif et Lacet à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 4: Throttle/Collective and Left/Right Cyclic on the left, Fore/Aft Cyclic and Yaw on the right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode 4 : Gaz/Collectif et Rotation Droite/Gauche, Rotation Avant/Arrière et Lacet à droite</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Mode 1: Elevator and Rudder on the left, Throttle and Ailerons on the right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mde 1 : Élevation et Gouvernail, Gaz et Ailerons à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 2: Throttle and Rudder on the left, Elevator and Ailerons on the right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode 2 : Gaz et Gouvernail à gauche, Élévation et Ailerons à la droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 3: Elevator and Ailerons on the left, Throttle and Rudder on the right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode 3 : Élevation et Ailerons à gauche, Gaz et Gouvernail à droite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mode 4: Throttle and Ailerons on the left, Elevator and Rudder on the right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode 4 : Gaz et Ailerons à gauche, Élevation et Gouvernail à droite</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>For a Quad: Elevator is Pitch, Ailerons are Roll, and Rudder is Yaw.</source>
-        <translation>Pour un Quad : Profondeur correspond à Pitch, Ailerons à Roll et Dérive correspond à Yaw.</translation>
+        <translation type="unfinished">Pour un Quadricopter : Profondeur correspond à la ROtation Avant, Ailerons à Roulis et Gouvernail correspond à Lacet.</translation>
     </message>
     <message>
         <location line="+21"/>
         <source>Please center all controls and trims and press Next when ready.
 
 If your FlightMode switch has only two positions, leave it in either position.</source>
-        <translation>Veuillez centrer tous les manches et trims et appuyer sur Suivant lorsque vous êtes prêt.
+        <translation type="unfinished">Veuillez positionner tous les manches et compensateurs en position centrale et appuyer sur Suivant lorsque vous êtes prêt.
 
 Si votre interrupteur de Mode de Vol a seulement deux positions, laissez-le dans n&apos;importe quelle position. </translation>
     </message>
@@ -13592,15 +13594,17 @@ IMPORTANT : Ces nouveaux paramètres ne sont pas encore enregistrés sur la cart
         <source>Please enable throttle hold mode.
 
 Move the Collective Pitch stick.</source>
-        <translatorcomment>hélico ? à traduire</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translatorcomment>hélico ? à traduire [Platypus] Ca convient ?</translatorcomment>
+        <translation type="unfinished">Veuillez activer les gaz en position maintenue.
+
+Bouger le manche du Collectif de tangage</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Please toggle the Flight Mode switch.
 
 For switches you may have to repeat this rapidly.</source>
-        <translation>Veuillez activer l&apos;interrupteur Mode de Vol.
+        <translation type="unfinished">Veuillez activer l&apos;interrupteur de Mode de Vol.
 
 Pour les interrupteurs vous pourriez avoir à répéter l&apos;opération rapidement.</translation>
     </message>
@@ -13610,19 +13614,23 @@ Pour les interrupteurs vous pourriez avoir à répéter l&apos;opération rapide
 
 Move the Throttle stick.</source>
         <translatorcomment>hélico ? à traduire</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Veuillez désactiver les gaz en position maintenue.
+
+Bouger le manche des Gaz.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Please move each control one at a time according to the instructions and picture below.
 
 Move the %1 stick.</source>
-        <translation>Veuillez bouger chaque organe de contrôle, un seul à la fois, en fonction des instructions et de l&apos;image ci-dessous. Bougez le manche %1.</translation>
+        <translation type="unfinished">Veuillez bouger chaque organe de contrôle, un seul à la fois, en fonction des instructions et de l&apos;image ci-dessous
+
+ Bougez le manche %1.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source> Alternatively, click Next to skip this channel.</source>
-        <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer cette voie.</translation>
+        <translation type="unfinished"> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
         <location line="+645"/>

@@ -61,11 +61,11 @@ public:
 
         return QAbstractItemModel::flags(index) | Qt::ItemIsEditable | Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
     }
-    //QStringList mimeTypes() const;
+    QStringList mimeTypes() const;
     Qt::DropActions supportedDropActions() const;
-    //bool dropMimeData( const QMimeData * data, Qt::DropAction action, int row,
-    //                                   int column, const QModelIndex& parent);
-    //QMimeData* mimeData(const QModelIndexList &indexes) const;
+    bool dropMimeData( const QMimeData * data, Qt::DropAction action, int row,
+                                       int column, const QModelIndex& parent);
+    QMimeData* mimeData(const QModelIndexList &indexes) const;
 
 
     bool setData(const QModelIndex &index, const QVariant &value, int role);

@@ -174,16 +174,13 @@ Qt::DropActions NotifyTableModel::supportedDropActions() const
     return Qt::MoveAction;
 }
 
-/*
 QStringList NotifyTableModel::mimeTypes() const
 {
     QStringList types;
     types << mime_type_notify_table;
     return types;
 }
-*/
 
-/*
 bool NotifyTableModel::dropMimeData( const QMimeData * data, Qt::DropAction action, int row,
                    int column, const QModelIndex& parent)
 {
@@ -242,9 +239,7 @@ bool NotifyTableModel::dropMimeData( const QMimeData * data, Qt::DropAction acti
     emit dataChanged(idxTopLeft, idxBotRight);
     return true;
 }
-*/
 
-/*
 QMimeData* NotifyTableModel::mimeData(const QModelIndexList& indexes) const
 {
     QMimeData* mimeData = new QMimeData();
@@ -262,7 +257,6 @@ QMimeData* NotifyTableModel::mimeData(const QModelIndexList& indexes) const
     mimeData->setData(mime_type_notify_table, encodedData);
     return mimeData;
 }
-*/
 
 void NotifyTableModel::dropRows(int position, int count) const
 {

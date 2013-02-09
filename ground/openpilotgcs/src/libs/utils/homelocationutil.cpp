@@ -38,9 +38,9 @@
 
 namespace Utils {
 
-HomeLocationUtil::HomeLocationUtil()
-{
-}
+    HomeLocationUtil::HomeLocationUtil()
+    {
+    }
 
     /**
      * @brief Get local magnetic field
@@ -68,8 +68,9 @@ HomeLocationUtil::HomeLocationUtil()
 
         QDateTime dt = QDateTime::currentDateTime().toUTC();
 
-        //Fetch world magnetic model
-        Q_ASSERT(WorldMagModel().GetMagVector(LLA, dt.date().month(), dt.date().day(), dt.date().year(), Be) >= 0);
+        // Fetch world magnetic model
+        int result = WorldMagModel().GetMagVector(LLA, dt.date().month(), dt.date().day(), dt.date().year(), Be);
+        Q_ASSERT(result >= 0);
 
         return 0;	// OK
     }

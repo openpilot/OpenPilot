@@ -23,7 +23,6 @@
  */
 package org.openpilot.androidgcs.test.telemetryservice;
 
-import org.junit.Ignore;
 import org.openpilot.androidgcs.telemetry.HidUAVTalk;
 import org.openpilot.androidgcs.telemetry.TcpUAVTalk;
 import org.openpilot.androidgcs.telemetry.BluetoothUAVTalk;
@@ -42,6 +41,9 @@ import android.test.mock.MockContext;
 public class OPTelemetryServiceTests extends
 		ServiceTestCase<OPTelemetryService> {
 
+	private static final int PREF_BLUETOOTH_CONN = 2;
+	private static final int PREF_TCP_CONN = 3;
+	private static final int PREF_USB_CONN = 4;
 	private Object _syncTelemetryTaskStarted = new Object();
 	private Object _syncTelemetryConnected = new Object();
 	private BroadcastReceiver _connectBroadcastReceiver;
@@ -130,13 +132,13 @@ public class OPTelemetryServiceTests extends
 	}
 
 	public void testStartBluetoothTelemetryTask(){
-		LocalBinder binder = startTelemetryTask(Integer.valueOf(2));
+		LocalBinder binder = startTelemetryTask(Integer.valueOf(PREF_BLUETOOTH_CONN));
 		
 		assertTrue("Started wrong telemetry service type", binder.getTelemetryTask(0) instanceof BluetoothUAVTalk);
 	}
 
 	public void testStartBluetoothConnection() throws InterruptedException{
-		LocalBinder binder = startTelemetryTask(Integer.valueOf(2));
+		LocalBinder binder = startTelemetryTask(Integer.valueOf(PREF_BLUETOOTH_CONN));
 		
 		synchronized (_syncTelemetryConnected) {
 			_syncTelemetryConnected.wait(2000);
@@ -148,15 +150,39 @@ public class OPTelemetryServiceTests extends
 	}
 	
 	public void testStartTCPTelemetryTask(){
-		LocalBinder binder = startTelemetryTask(Integer.valueOf(3));
+		LocalBinder binder = startTelemetryTask(Integer.valueOf(PREF_TCP_CONN));
+		
+		assertTrue("Started wrong telemetry service type", binder.getTelemetryTask(0) instanceof TcpUAVTalk);
+	}
+
+	public void testStartTCPConnection() throws InterruptedException{
+		LocalBinder binder = startTelemetryTask(Integer.valueOf(PREF_TCP_CONN));
+		
+		synchronized (_syncTelemetryConnected) {
+			_syncTelemetryConnected.wait(2000);
+		}
+		
+		assertTrue("Failed to connect to telemetry service", binder.isConnected());
 		
 		assertTrue("Started wrong telemetry service type", binder.getTelemetryTask(0) instanceof TcpUAVTalk);
 	}
 	
 	public void testStartUSBTelemetryTask(){
-		LocalBinder binder = startTelemetryTask(Integer.valueOf(4));
+		LocalBinder binder = startTelemetryTask(Integer.valueOf(PREF_USB_CONN));
 		
 		assertTrue("Started wrong telemetry service type", binder.getTelemetryTask(0) instanceof HidUAVTalk);		
+	}
+
+	public void testStartUSBConnection() throws InterruptedException{
+		LocalBinder binder = startTelemetryTask(Integer.valueOf(PREF_USB_CONN));
+		
+		synchronized (_syncTelemetryConnected) {
+			_syncTelemetryConnected.wait(2000);
+		}
+		
+		assertTrue("Failed to connect to telemetry service", binder.isConnected());
+		
+		assertTrue("Started wrong telemetry service type", binder.getTelemetryTask(0) instanceof HidUAVTalk);
 	}
 
 	private LocalBinder startTelemetryTask(Integer telemetryType) {

@@ -241,7 +241,13 @@ public class OPTelemetryService extends Service {
 			telemTask = null;
 
 			try {
-				activeTelem.join();
+				// Race condition - if we shut the service down before the telemetry task
+				// thread has started, this will hang so we need to check thread is runnable.
+				if(activeTelem.getState() == Thread.State.RUNNABLE){
+					activeTelem.join();
+				}else{
+					Log.d(TAG, "onDestroy() shut down telemetry task before it has started");
+				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

@@ -48,6 +48,7 @@ const struct pios_com_driver pios_usb_cdc_com_driver = {
 	.rx_start    = PIOS_USB_CDC_RxStart,
 	.bind_tx_cb  = PIOS_USB_CDC_RegisterTxCallback,
 	.bind_rx_cb  = PIOS_USB_CDC_RegisterRxCallback,
+	.available   = PIOS_USB_CheckAvailable,	
 };
 
 enum pios_usb_cdc_dev_magic {

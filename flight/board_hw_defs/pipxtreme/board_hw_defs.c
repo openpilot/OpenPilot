@@ -45,6 +45,48 @@ static const struct pios_led pios_leds[] = {
 			},
 		},
 	},
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
+	[PIOS_LED_D1] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_14,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_D2] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_15,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_D3] = {
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_9,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_D4] = {
+		.pin = {
+			.gpio = GPIOA,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_10,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+#endif
 };
 
 static const struct pios_led_cfg pios_led_cfg = {
@@ -222,12 +264,7 @@ static const struct pios_exti_cfg pios_exti_rfm22b_cfg __exti_config = {
 struct pios_rfm22b_cfg pios_rfm22b_pipx_cfg = {
 	.spi_cfg = &pios_spi_rfm22b_cfg,
 	.exti_cfg = &pios_exti_rfm22b_cfg,
-	.frequencyHz = 434000000,
-	.minFrequencyHz = 434000000 - 2000000,
-	.maxFrequencyHz = 434000000 + 2000000,
 	.RFXtalCap = 0x7f,
-	.maxRFBandwidth = 64000,
-	.maxTxPower = RFM22_tx_pwr_txpow_7, // +20dBm .. 100mW
 	.slave_num = 0,
 	.gpio_direction = GPIO0_TX_GPIO1_RX,
 };
@@ -516,6 +553,46 @@ const struct pios_ppm_cfg pios_ppm_cfg = {
 };
 
 #endif	/* PIOS_INCLUDE_PPM */
+
+/*
+ * PPM Output
+ */
+#if defined(PIOS_INCLUDE_PPM_OUT)
+#include <pios_ppm_out_priv.h>
+
+uint32_t pios_ppm_id;
+
+static const struct pios_tim_channel pios_tim_ppmout[] = {
+	{
+		.timer = TIM2,
+		.timer_chan = TIM_Channel_3,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_10,
+				.GPIO_Mode  = GPIO_Mode_AF_PP,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+			},
+		},
+		.remap = GPIO_FullRemap_TIM2,
+	}
+};
+
+const struct pios_ppm_out_cfg pios_ppm_out_cfg = {
+	.tim_oc_init = {
+		.TIM_OCMode = TIM_OCMode_PWM1,
+		.TIM_OutputState = TIM_OutputState_Enable,
+		.TIM_OutputNState = TIM_OutputNState_Disable,
+		.TIM_Pulse = PIOS_SERVOS_INITIAL_POSITION,
+		.TIM_OCPolarity = TIM_OCPolarity_Low,
+		.TIM_OCNPolarity = TIM_OCPolarity_Low,
+		.TIM_OCIdleState = TIM_OCIdleState_Reset,
+		.TIM_OCNIdleState = TIM_OCNIdleState_Reset,
+	},
+	.channel = pios_tim_ppmout,
+};
+
+#endif /* PIOS_INCLUDE_PPM_OUT */
 
 #if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"

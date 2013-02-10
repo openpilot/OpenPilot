@@ -58,8 +58,9 @@
 
 /* Variables related to the RFM22B functionality */
 #define PIOS_INCLUDE_RFM22B
-#define RFM22_EXT_INT_USE
- 
+#define PIOS_INCLUDE_RFM22B_COM
+#define PIOS_INCLUDE_RFM22B_RCVR
+
 /* Select the sensors to include */
 #define PIOS_INCLUDE_HMC5883
 #define PIOS_HMC5883_HAS_GPIOS
@@ -92,6 +93,8 @@
 #define PIOS_INCLUDE_FLASH
 /* A really shitty setting saving implementation */
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
+
+//#define PIOS_INCLUDE_DEBUG_CONSOLE
 
 /* Other Interfaces */
 //#define PIOS_INCLUDE_I2C_ESC

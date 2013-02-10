@@ -33,7 +33,7 @@
 
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
 #define DEBUG_LEVEL 0
-#define DEBUG_PRINTF(level, ...) {if(level <= DEBUG_LEVEL && pios_com_aux_id > 0) { PIOS_COM_SendFormattedStringNonBlocking(pios_com_aux_id, __VA_ARGS__); }}
+#define DEBUG_PRINTF(level, ...) {if(level <= DEBUG_LEVEL && pios_com_debug_id > 0) { PIOS_COM_SendFormattedStringNonBlocking(pios_com_debug_id, __VA_ARGS__); }}
 #else
 #define DEBUG_PRINTF(level, ...)
 #endif	/* PIOS_INCLUDE_DEBUG_CONSOLE */
@@ -143,10 +143,7 @@ extern uint32_t pios_com_debug_id;
 #endif	/* PIOS_INCLUDE_DEBUG_CONSOLE */
 
 #if defined(PIOS_INCLUDE_RFM22B)
-#define PIOS_COM_RFM22B_RF_RX_BUF_LEN 512
-#define PIOS_COM_RFM22B_RF_TX_BUF_LEN 512
-extern uint32_t pios_com_rfm22b_id;
-#define PIOS_COM_RADIO                  (pios_com_rfm22b_id)
+extern uint32_t pios_rfm22b_id;
 extern uint32_t pios_spi_telem_flash_id;
 #define PIOS_RFM22_SPI_PORT             (pios_spi_telem_flash_id)
 #endif /* PIOS_INCLUDE_RFM22B */
@@ -217,6 +214,7 @@ extern uint32_t pios_packet_handler;
 #define PIOS_RCVR_MAX_DEVS           3
 #define PIOS_RCVR_MAX_CHANNELS       12
 #define PIOS_GCSRCVR_TIMEOUT_MS      100
+#define PIOS_RFM22B_RCVR_TIMEOUT_MS  100
 
 //-------------------------
 // Receiver PPM input

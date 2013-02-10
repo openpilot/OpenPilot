@@ -3,7 +3,7 @@
         <description>Settings to indicate how to decode receiver input by @ref ManualControlModule.</description>
         <field name="ChannelGroups" units="Channel Group" type="enum" 
 	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"
-	       options="PWM,PPM,DSM (MainPort),DSM (FlexiPort),S.Bus,GCS,None" defaultvalue="None"/>
+	       options="PWM,PPM,DSM (MainPort),DSM (FlexiPort),S.Bus,GCS,OPLink,None" defaultvalue="None"/>
 	<field name="ChannelNumber" units="channel" type="uint8" defaultvalue="0"
 	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"/>
 	<field name="ChannelMin" units="us" type="int16" defaultvalue="1000"

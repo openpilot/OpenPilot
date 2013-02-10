@@ -497,21 +497,24 @@ uint16_t PIOS_COM_ReceiveBuffer(uint32_t com_id, uint8_t * buf, uint16_t buf_len
 }
 
 /**
-* Get the number of bytes waiting in the buffer
-* \param[in] port COM port
-* \return Number of bytes used in buffer
-*/
-int32_t PIOS_COM_ReceiveBufferUsed(uint32_t com_id)
+ * Query if a com port is available for use.  That can be
+ * used to check a link is established even if the device
+ * is valid.
+ */
+bool PIOS_COM_Available(uint32_t com_id)
 {
 	struct pios_com_dev * com_dev = PIOS_COM_find_dev(com_id);
 
 	if (!PIOS_COM_validate(com_dev)) {
-		/* Undefined COM port for this board (see pios_board.c) */
-		PIOS_Assert(0);
+		return false;
 	}
 
-	PIOS_Assert(com_dev->has_rx);
-	return (fifoBuf_getUsed(&com_dev->rx));
+	// If a driver does not provide a query method assume always
+	// available if valid
+	if (com_dev->driver->available == NULL)
+		return true;
+
+	return (com_dev->driver->available)(com_dev->lower_id);
 }
 
 #endif

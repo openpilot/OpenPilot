@@ -3,7 +3,7 @@
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
  * @addtogroup   PIOS_PPM PPM Functions
- * @brief PIOS interface to read and write from ppm port
+ * @brief PIOS interface to read from ppm port
  * @{
  *
  * @file       pios_ppm_priv.h

@@ -1,0 +1,36 @@
+<xml>
+	<object name="OPLinkStatus" singleinstance="true" settings="false">
+		<description>OPLink device status.</description>
+		<field name="Description" units="" type="uint8" elements="40"/> 
+		<field name="CPUSerial" units="" type="uint8" elements="12" /> 
+		<field name="BoardRevision" units="" type="uint16" elements="1"/> 
+		<field name="BoardType" units="" type="uint8" elements="1"/> 
+		<field name="DeviceID" units="" type="uint32" elements="1" defaultvalue="0"/>
+		<field name="RxGood" units="%" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="RxCorrected" units="%" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="RxErrors" units="%" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="RxMissed" units="%" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="RxFailure" units="%" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="UAVTalkErrors" units="" type="uint16" elements="1" defaultvalue="0"/>
+		<field name="TxResent" units="%" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="TxDropped" units="%" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="TxFailure" units="%" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="Resets" units="" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="Timeouts" units="" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="RSSI" units="dBm" type="int8" elements="1" defaultvalue="0"/>
+		<field name="AFCCorrection" units="Hz" type="int8" elements="1" defaultvalue="0"/>
+		<field name="LinkQuality" units="" type="uint8" elements="1" defaultvalue="0"/>
+		<field name="TXRate" units="Bps" type="uint16" elements="1" defaultvalue="0"/>
+		<field name="RXRate" units="Bps" type="uint16" elements="1" defaultvalue="0"/>
+		<field name="TXSeq" units="" type="uint16" elements="1" defaultvalue="0"/>
+		<field name="RXSeq" units="" type="uint16" elements="1" defaultvalue="0"/>
+		<field name="LinkState" units="function" type="enum" elements="1" options="Disconnected,Connecting,Connected" defaultvalue="Disconnected"/>
+		<field name="PairIDs" units="" type="uint32" elements="4" defaultvalue="0"/>
+		<field name="PairSignalStrengths" units="dBm" type="int8" elements="4" defaultvalue="-127"/>
+
+		<access gcs="readonly" flight="readwrite"/>
+		<telemetrygcs acked="false" updatemode="manual" period="0"/>
+		<telemetryflight acked="false" updatemode="periodic" period="1000"/>
+		<logging updatemode="periodic" period="1000"/>
+	</object>
+</xml>

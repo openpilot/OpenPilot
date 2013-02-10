@@ -223,7 +223,7 @@ bool PIOS_USB_CableConnected(uint8_t id)
  * \return 0: interface not available
  * \note Applications shouldn't call this function directly, instead please use \ref PIOS_COM layer functions
  */
-bool PIOS_USB_CheckAvailable(uint8_t id)
+bool PIOS_USB_CheckAvailable(uint32_t id)
 {
 	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_com_id;
 

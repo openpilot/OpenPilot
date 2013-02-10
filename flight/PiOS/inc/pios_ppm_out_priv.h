@@ -2,12 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_USB USB Functions
+ * @addtogroup   PIOS_PPM PPM Functions
+ * @brief PIOS interface to write to ppm port
  * @{
  *
- * @file       pios_usb.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      USB HID layer functions header
+ * @file       pios_ppm_out_priv.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      ppm private structures.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -27,20 +28,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_USB_H
-#define PIOS_USB_H
+#ifndef PIOS_PPM_OUT_PRIV_H
+#define PIOS_PPM_OUT_PRIV_H
 
-#include <stdbool.h>
+#include <pios.h>
 
-/* Global functions */
-extern int32_t PIOS_USB_Reenumerate();
-extern int32_t PIOS_USB_ChangeConnectionState(bool connected);
-extern bool PIOS_USB_CableConnected(uint8_t id);
-extern bool PIOS_USB_CheckAvailable(uint32_t id);
+struct pios_ppm_out_cfg {
+	TIM_OCInitTypeDef tim_oc_init;
+	const struct pios_tim_channel * channel;
+};
 
-#endif /* PIOS_USB_H */
+extern int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg * cfg);
+extern void PIOS_PPM_OUT_Set(uint32_t ppm_out_id, uint8_t servo, uint16_t position);
+
+#endif /* PIOS_PPM_PRIV_H */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

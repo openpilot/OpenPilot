@@ -12,7 +12,7 @@
     <message>
         <location line="+5"/>
         <source>Unable to send command line arguments to the already running instance. It appears to be not responding.</source>
-        <translation>Impossible de passer les arguments de la ligne de commande à l&apos;instance en cours d&apos;execution. Elle semble ne pas répondre.</translation>
+        <translation type="unfinished">Impossible de passer les arguments de la ligne de commande à l&apos;instance en cours d&apos;exécution. Elle semble ne pas répondre.</translation>
     </message>
     <message>
         <location line="+183"/>
@@ -420,7 +420,7 @@
     <message>
         <location line="+27"/>
         <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: %2&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
-        <translation type="unfinished">&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public License publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la License, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans GARANTIE DE QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
+        <translation type="unfinished">&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public Licence publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la Licence, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans GARANTIE DE QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
@@ -441,7 +441,7 @@
     <message>
         <location/>
         <source>TextLabel</source>
-        <translation type="unfinished">Étiquette de texte</translation>
+        <translation>Étiquette de texte</translation>
     </message>
     <message>
         <location/>
@@ -2456,7 +2456,7 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Move to WP</source>
-        <translation>Dépacer au Waypoint</translation>
+        <translation type="unfinished">Déplacer au Waypoint</translation>
     </message>
     <message>
         <location/>
@@ -10152,7 +10152,7 @@ Applique et Enregistre tous les paramètres sur la SD</translation>
     <message>
         <location/>
         <source>The modems minimum frequency step size</source>
-        <translation>La taille minimale du saut de fréauence du modem</translation>
+        <translation type="unfinished">La taille minimale du saut de fréquence du modem</translation>
     </message>
     <message>
         <location/>
@@ -11593,7 +11593,7 @@ Veuillez en choisir un dans les configurations par défaut</translation>
     <message>
         <location/>
         <source>Only joystick is implemented at this stage, so this control is disabled.</source>
-        <translation>Actuellement seulement le joystick est implémenté , donc ce contôle est désactivé.</translation>
+        <translation type="unfinished">Actuellement seulement le joystick est implémenté , donc ce contrôle est désactivé.</translation>
     </message>
     <message>
         <location/>
@@ -13177,7 +13177,7 @@ vous l&apos;avez reçue d&apos;une source sûre (site web officiel ou votre prop
     <message>
         <location line="+5"/>
         <source>This is the tagged officially released OpenPilot firmware</source>
-        <translation>Ceci est un firmware certifié OpenPilot, publié officellement</translation>
+        <translation type="unfinished">Ceci est un firmware certifié OpenPilot, publié officiellement</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -13241,7 +13241,7 @@ vous l&apos;avez reçue d&apos;une source sûre (site web officiel ou votre prop
     <message>
         <location line="+40"/>
         <source>Tagged officially released firmware build</source>
-        <translation>Firmware certifié OpenPilot, publié officellement</translation>
+        <translation type="unfinished">Firmware certifié OpenPilot, publié officiellement</translation>
     </message>
     <message>
         <location line="+8"/>

@@ -409,10 +409,10 @@ static void PIOS_USB_CDC_CTRL_EP_IN_Callback(void)
 	uart_state.bmUartState = htousbs(0x0003);
 
 	UserToPMABufferCopy((uint8_t *) &uart_state,
-			GetEPTxAddr(usb_cdc_dev->cfg->data_tx_ep),
+			GetEPTxAddr(usb_cdc_dev->cfg->ctrl_tx_ep),
 			sizeof(uart_state));
-	SetEPTxCount(usb_cdc_dev->cfg->data_tx_ep, PIOS_USB_BOARD_CDC_MGMT_LENGTH);
-	SetEPTxValid(usb_cdc_dev->cfg->data_tx_ep);
+	SetEPTxCount(usb_cdc_dev->cfg->ctrl_tx_ep, PIOS_USB_BOARD_CDC_MGMT_LENGTH);
+	SetEPTxValid(usb_cdc_dev->cfg->ctrl_tx_ep);
 }
 
 #endif /* PIOS_INCLUDE_USB_CDC */

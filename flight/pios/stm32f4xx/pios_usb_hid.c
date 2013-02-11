@@ -114,7 +114,7 @@ static struct pios_usb_hid_dev * PIOS_USB_HID_alloc(void)
 static void PIOS_USB_HID_IF_Init(uint32_t usb_hid_id);
 static void PIOS_USB_HID_IF_DeInit(uint32_t usb_hid_id);
 static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request *req);
-static void PIOS_USB_HID_IF_CtrlDataOut(uint32_t usb_hid_id, struct usb_setup_request *req);
+static void PIOS_USB_HID_IF_CtrlDataOut(uint32_t usb_hid_id, const struct usb_setup_request *req);
 
 static struct pios_usb_ifops usb_hid_ifops = {
 	.init          = PIOS_USB_HID_IF_Init,
@@ -425,7 +425,7 @@ static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request 
 	return true;
 }
 
-static void PIOS_USB_HID_IF_CtrlDataOut(__attribute__((unused)) uint32_t usb_hid_id, __attribute__((unused)) struct usb_setup_request *req)
+static void PIOS_USB_HID_IF_CtrlDataOut(__attribute__((unused)) uint32_t usb_hid_id, __attribute__((unused)) const struct usb_setup_request *req)
 {
 	/* HID devices don't have any OUT data stages on the control endpoint */
 	PIOS_Assert(0);

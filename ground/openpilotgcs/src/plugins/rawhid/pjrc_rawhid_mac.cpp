@@ -276,7 +276,7 @@ QString pjrc_rawhid::getserial(int num) {
     {
         //Note: I'm not sure it will always succeed if encoded as MacRoman but that
         //is a superset of UTF8 so I think this is fine
-        CFStringRef str = static_cast<CFStringRef*>(serialnum);
+		CFStringRef str = static_cast<CFStringRef>(serialnum);
         int length = CFStringGetLength(str);
         if (length == 0) {
             return "";

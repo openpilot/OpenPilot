@@ -180,6 +180,10 @@ static void telemetryTxTask(void *parameters)
 {
 	UAVObjEvent ev;
 
+#if defined(PIOS_INCLUDE_AD7998)
+		PIOS_AD7998_Init(pios_i2c_flexi_adapter_id);
+#endif
+
 	// Loop forever
 	while (1) {
 #ifdef PIOS_INCLUDE_WDG

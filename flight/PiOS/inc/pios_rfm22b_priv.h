@@ -748,6 +748,8 @@ struct pios_rfm22b_dev {
 #ifdef PIOS_PPM_RECEIVER
 	// The PPM packet
 	PHPpmPacket ppm_packet;
+	
+	bool Use_AD7998_As_PPM;
 #endif
 
 	// The connection packet.

@@ -43,6 +43,7 @@ struct pios_rfm22b_cfg {
 	uint8_t RFXtalCap;
 	uint8_t slave_num;
 	enum gpio_direction gpio_direction;
+	bool Use_AD7998;
 };
 
 enum rfm22b_tx_power {

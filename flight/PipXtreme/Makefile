@@ -73,7 +73,7 @@ FLASH_TOOL = OPENOCD
 
 # List of modules to include
 OPTMODULES = 
-MODULES = Odisplay RadioComBridge
+MODULES = RadioComBridge
 
 # Paths
 OPSYSTEM = ./System
@@ -137,6 +137,7 @@ SRC += $(OPSYSTEM)/pios_board.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
+
 else
 ## TESTCODE
 SRC += $(OPTESTS)/test_common.c
@@ -160,11 +161,13 @@ SRC += $(OPUAVSYNTHDIR)/baroairspeed.c
 
 SRC += $(OPUAVSYNTHDIR)/odisplaysettings.c
 
+SRC += $(OPUAVSYNTHDIR)/adcs.c
+
 endif
 
 ## PIOS Hardware (STM32F10x)
 SRC += $(PIOSSTM32F10X)/pios_sys.c
-SRC += $(PIOSSTM32F10X)/pios_adc.c
+#SRC += $(PIOSSTM32F10X)/pios_adc.c
 SRC += $(PIOSSTM32F10X)/pios_led.c
 SRC += $(PIOSSTM32F10X)/pios_delay.c
 SRC += $(PIOSSTM32F10X)/pios_usart.c
@@ -223,7 +226,7 @@ SRC += $(CMSISDIR)/system_stm32f10x.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
-SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
+#SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_dma.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_exti.c
 SRC += $(STMSPDSRCDIR)/stm32f10x_flash.c

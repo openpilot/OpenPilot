@@ -267,12 +267,29 @@ struct pios_rfm22b_cfg pios_rfm22b_pipx_cfg = {
 	.RFXtalCap = 0x7f,
 	.slave_num = 0,
 	.gpio_direction = GPIO0_TX_GPIO1_RX,
+	.Use_AD7998 = 0,
+};
+
+struct pios_rfm22b_cfg pios_rfm22b_pipx_AD_cfg = {
+	.spi_cfg = &pios_spi_rfm22b_cfg,
+	.exti_cfg = &pios_exti_rfm22b_cfg,
+	.RFXtalCap = 0x7f,
+	.slave_num = 0,
+	.gpio_direction = GPIO0_TX_GPIO1_RX,
+	.Use_AD7998 = 1,
 };
 
 //! Compatibility layer for various hardware revisions
-const struct pios_rfm22b_cfg * PIOS_BOARD_HW_DEFS_GetRfm22Cfg (uint32_t board_revision)
+const struct pios_rfm22b_cfg * PIOS_BOARD_HW_DEFS_GetRfm22Cfg (uint32_t board_revision, uint8_t Use_AD7998)
 {
-	return &pios_rfm22b_pipx_cfg;
+	if(Use_AD7998)
+	{
+		return &pios_rfm22b_pipx_AD_cfg;
+	}
+	else
+	{
+		return &pios_rfm22b_pipx_cfg;
+	}
 }
 
 #endif /* PIOS_INCLUDE_RFM22B */

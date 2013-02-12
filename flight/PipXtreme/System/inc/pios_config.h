@@ -47,7 +47,7 @@
 #define PIOS_INCLUDE_PPM
 
 /* Supported USART-based PIOS modules */
-#define PIOS_INCLUDE_ADC
+//#define PIOS_INCLUDE_ADC
 #define PIOS_INCLUDE_I2C
 #define PIOS_INCLUDE_SPI
 #define PIOS_INCLUDE_SYS
@@ -67,7 +67,8 @@
 #define PIOS_INCLUDE_RFM22B
 #define PIOS_INCLUDE_PACKET_HANDLER
 #define PIOS_INCLUDE_PPM_OUT
-#define PIOS_INCLUDE_SSD1308
+//#define PIOS_INCLUDE_SSD1308
+#define PIOS_INCLUDE_AD7998
 
 /* Defaults for Logging */
 #define LOG_FILENAME 			"PIOS.LOG"

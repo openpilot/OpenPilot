@@ -241,19 +241,26 @@ void PIOS_Board_Init(void) {
 
 	default:
 	{
-		/* Configure the flexi serial port if PPM not selected */
-		uint32_t pios_usart3_id;
-		if (PIOS_USART_Init(&pios_usart3_id, &pios_usart_telem_flexi_cfg)) {
-			PIOS_Assert(0);
+		if(oplinkSettings.I2C)
+		{
+
 		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telem_uart_flexi_id, &pios_usart_com_driver, pios_usart3_id,
-											rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
-											tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
-			PIOS_Assert(0);
+		else
+		{
+			/* Configure the flexi serial port if PPM not selected */
+			uint32_t pios_usart3_id;
+			if (PIOS_USART_Init(&pios_usart3_id, &pios_usart_telem_flexi_cfg)) {
+				PIOS_Assert(0);
+			}
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_telem_uart_flexi_id, &pios_usart_com_driver, pios_usart3_id,
+												rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
+												tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
 		}
 	}
 	}
@@ -270,9 +277,17 @@ void PIOS_Board_Init(void) {
 	/* Initalize the RFM22B radio COM device. */
 #if defined(PIOS_INCLUDE_RFM22B)
 	{
-		extern const struct pios_rfm22b_cfg * PIOS_BOARD_HW_DEFS_GetRfm22Cfg (uint32_t board_revision);
+		extern const struct pios_rfm22b_cfg * PIOS_BOARD_HW_DEFS_GetRfm22Cfg (uint32_t board_revision, uint8_t Use_AD7998);
 		const struct pios_board_info * bdinfo = &pios_board_info_blob;
-		const struct pios_rfm22b_cfg *pios_rfm22b_cfg = PIOS_BOARD_HW_DEFS_GetRfm22Cfg(bdinfo->board_rev);
+		const struct pios_rfm22b_cfg *pios_rfm22b_cfg;
+		if(oplinkSettings.AD7998 && oplinkSettings.I2C)
+		{
+			pios_rfm22b_cfg = PIOS_BOARD_HW_DEFS_GetRfm22Cfg(bdinfo->board_rev,1);
+		}
+		else
+		{
+			pios_rfm22b_cfg = PIOS_BOARD_HW_DEFS_GetRfm22Cfg(bdinfo->board_rev,0);
+		}
 		if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg->slave_num, pios_rfm22b_cfg)) {
 			PIOS_Assert(0);
 		}
@@ -293,7 +308,7 @@ void PIOS_Board_Init(void) {
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
 
 #ifdef PIOS_INCLUDE_ADC
-	PIOS_ADC_Init(NULL);
+	//PIOS_ADC_Init(NULL);
 #endif
  	PIOS_GPIO_Init();
 }

@@ -558,6 +558,10 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 		return(-1);
 	*rfm22b_id = (uint32_t)rfm22b_dev;
 	g_rfm22b_dev = rfm22b_dev;
+	
+#ifdef PIOS_PPM_RECEIVER
+	rfm22b_dev->Use_AD7998_As_PPM=cfg->Use_AD7998;
+#endif
 
 	// Store the SPI handle
 	rfm22b_dev->slave_num = slave_num;
@@ -1500,6 +1504,30 @@ static void rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 
 static void rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev)
 {
+if(rfm22b_dev->Use_AD7998_As_PPM)
+{
+	// Only send PPM if we're connected
+	if (rfm22b_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED)
+	return;
+	// See if we have any valid channels.
+	bool valid_input_detected = false;
+	for (uint8_t i = 0; i <= 7; ++i)
+	{
+		rfm22b_dev->ppm_packet.channels[i] = PIOS_AD7998_ReadConv(i);
+		valid_input_detected = true;
+	}
+
+	// Send the PPM packet if it's valid
+	if (valid_input_detected)
+	{
+		rfm22b_dev->ppm_packet.header.destination_id = rfm22b_dev->destination_id;
+		rfm22b_dev->ppm_packet.header.type = PACKET_TYPE_PPM;
+		rfm22b_dev->ppm_packet.header.data_size = PH_PPM_DATA_SIZE(&(rfm22b_dev->ppm_packet));
+		rfm22b_dev->send_ppm = true;
+	}
+}
+else
+{
 #ifdef PIOS_PPM_RECEIVER
 	// Only send PPM if we're connected
 	if (rfm22b_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED)
@@ -1527,6 +1555,7 @@ static void rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev)
 		rfm22b_dev->send_ppm = true;
 	}
 #endif
+}
 }
 
 /**

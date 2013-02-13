@@ -34,7 +34,7 @@
 #if defined(PIOS_INCLUDE_AD7998)
 uint8_t PIOS_AD7998_MODE2_ADDR_CH[] = {   0x80, 0x90, 0xa0, 0xb0, 0xc0, 0xd0, 0xe0, 0xf0 };
 
-static struct pios_ad7998_cfg * dev_cfg;
+static struct pios_ad7998_cfg dev_cfg;
 
 static int32_t i2c_id;
 
@@ -45,9 +45,9 @@ static int32_t i2c_id;
 /* Local Variables */
 
 /* Private constants */
-#define AD7998_TASK_PRIORITY	(tskIDLE_PRIORITY + 1)	// 
+#define AD7998_TASK_PRIORITY	(tskIDLE_PRIORITY + 2)	//
 #define AD7998_TASK_STACK		(384 / 4)
-#define UPDATE_RATE				10.0f//100hz
+#define UPDATE_RATE				20.0f//100hz
 
 static void PIOS_AD7998_Config(void);
 static int32_t PIOS_AD7998_Read(uint8_t address, uint8_t * buffer, uint8_t len);
@@ -56,9 +56,15 @@ void PIOS_AD7998_Task(void *parameters);
 
 int32_t PIOS_AD7998_Start(int32_t i2c)
 {
-	dev_cfg->i2c_id=i2c;
-	int result = xTaskCreate(PIOS_AD7998_Task, (const signed char *)"PIOS_AD7998_Task", AD7998_TASK_STACK, NULL, AD7998_TASK_PRIORITY,	&dev_cfg->TaskHandle);
-	
+	dev_cfg.i2c_id=i2c;
+	if(dev_cfg.i2c_id==0)
+	{
+
+	}
+	else
+	{
+		int result = xTaskCreate(PIOS_AD7998_Task, (const signed char *)"PIOS_AD7998_Task", AD7998_TASK_STACK, NULL, AD7998_TASK_PRIORITY,	&dev_cfg.TaskHandle);
+	}
 	return 0;
 }
 
@@ -93,7 +99,7 @@ static void PIOS_AD7998_Config(void)
 	{
 		continue;
 	}
-	//PIOS_DELAY_WaitmS(100);
+	PIOS_DELAY_WaitmS(100);
 	
 	
 //	ad7998_configured = true;
@@ -109,6 +115,7 @@ uint16_t PIOS_AD7998_ReadConv(uint8_t channel)
 	PIOS_DELAY_WaituS(3);
 	PIOS_AD7998_Read(cmd,&out, 2);
 	Result=(((uint16_t)out[0]<<8)|(uint16_t)out[1])&0x0FFF;
+	//Result=(((uint16_t)out[0]));
 	return Result;
 }
 
@@ -213,18 +220,19 @@ static int32_t PIOS_AD7998_Write(uint8_t address, uint8_t * buffer, uint8_t len)
 
 uint16_t PIOS_AD7998_GetValue(uint8_t channel)
 {
-	return dev_cfg->Value.V[channel];
+	return dev_cfg.Value.V[channel];
 }
 
 void PIOS_AD7998_Task(void *parameters)
 {
-	PIOS_AD7998_Init(dev_cfg->i2c_id);
+	PIOS_AD7998_Init(dev_cfg.i2c_id);
 	vTaskDelay(100.0f/portTICK_RATE_MS);
 	while(1)
 	{
 		for(uint8_t i=0;i<7;i++)
 		{
-			dev_cfg->Value.V[i]=PIOS_AD7998_ReadConv(i);
+			dev_cfg.Value.V[i]=PIOS_AD7998_ReadConv(i);
+			//vTaskDelay(2/portTICK_RATE_MS);
 		}
 		vTaskDelay(UPDATE_RATE/portTICK_RATE_MS);
 	}

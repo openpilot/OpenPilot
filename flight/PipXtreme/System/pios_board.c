@@ -272,6 +272,8 @@ void PIOS_Board_Init(void) {
 			PIOS_Assert(0);
 		}
 	}
+#else
+	pios_i2c_flexi_adapter_id=0;
 #endif
 
 	/* Initalize the RFM22B radio COM device. */

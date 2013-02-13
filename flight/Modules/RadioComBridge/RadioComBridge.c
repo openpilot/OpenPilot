@@ -129,6 +129,11 @@ static int32_t RadioComBridgeStart(void)
 		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIOTX);
 #endif
 
+#if defined(PIOS_INCLUDE_AD7998)
+		//PIOS_AD7998_Init(pios_i2c_flexi_adapter_id);
+	PIOS_AD7998_Start(pios_i2c_flexi_adapter_id);
+#endif
+
 		return 0;
 	}
 
@@ -179,10 +184,6 @@ MODULE_INITCALL(RadioComBridgeInitialize, RadioComBridgeStart)
 static void telemetryTxTask(void *parameters)
 {
 	UAVObjEvent ev;
-
-#if defined(PIOS_INCLUDE_AD7998)
-		PIOS_AD7998_Init(pios_i2c_flexi_adapter_id);
-#endif
 
 	// Loop forever
 	while (1) {

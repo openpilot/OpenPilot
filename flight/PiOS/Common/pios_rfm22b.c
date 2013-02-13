@@ -1511,10 +1511,16 @@ if(rfm22b_dev->Use_AD7998_As_PPM)
 	return;
 	// See if we have any valid channels.
 	bool valid_input_detected = false;
+	//uint16_t essai= 400+(PIOS_AD7998_ReadConv(6)/2);
 	for (uint8_t i = 0; i <= 7; ++i)
 	{
-		rfm22b_dev->ppm_packet.channels[i] = PIOS_AD7998_ReadConv(i);
+		rfm22b_dev->ppm_packet.channels[i] = PIOS_AD7998_GetValue(i)-500;//(PIOS_AD7998_ReadConv(i))-600;//PIOS_AD7998_GetValue(i);
+		//PIOS_DELAY_WaituS(20);
 		valid_input_detected = true;
+	}
+	for (uint8_t i = 8; i <= PIOS_PPM_NUM_INPUTS; ++i)
+	{
+		rfm22b_dev->ppm_packet.channels[i] = 0;
 	}
 
 	// Send the PPM packet if it's valid

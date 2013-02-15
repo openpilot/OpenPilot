@@ -32,14 +32,14 @@
  *
  * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
  */
-#include "board_hw_defs.c"
 
-#include <pios.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
+
+#include "board_hw_defs.c"
 
 
 /* One slot per selectable receiver group.

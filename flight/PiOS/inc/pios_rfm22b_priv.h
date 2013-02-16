@@ -32,10 +32,11 @@
 #define PIOS_RFM22B_PRIV_H
 
 #include <pios.h>
-#include "fifo_buffer.h"
+#include <fifo_buffer.h>
+#include <uavobjectmanager.h>
+#include <oplinkstatus.h>
 #include "pios_rfm22b.h"
-
-extern const struct pios_com_driver pios_rfm22b_com_driver;
+#include "pios_rfm22b_rcvr.h"
 
 // ************************************
 
@@ -565,14 +566,239 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 
 #define RFM22_fifo_access							0x7F	// R/W
 
-// ************************************
 
-typedef int16_t ( *t_rfm22_TxDataByteCallback ) (void);
-typedef bool ( *t_rfm22_RxDataCallback ) (void *data, uint8_t len);
+// External type definitions
 
-// ************************************
+typedef int16_t (*t_rfm22_TxDataByteCallback) (void);
+typedef bool (*t_rfm22_RxDataCallback) (void *data, uint8_t len);
+enum pios_rfm22b_dev_magic {
+	PIOS_RFM22B_DEV_MAGIC = 0x68e971b6,
+};
+
+enum pios_rfm22b_state {
+	RFM22B_STATE_UNINITIALIZED,
+	RFM22B_STATE_INITIALIZING,
+	RFM22B_STATE_INITIALIZED,
+	RFM22B_STATE_INITIATING_CONNECTION,
+	RFM22B_STATE_WAIT_FOR_CONNECTION,
+	RFM22B_STATE_REQUESTING_CONNECTION,
+	RFM22B_STATE_ACCEPTING_CONNECTION,
+	RFM22B_STATE_CONNECTION_ACCEPTED,
+	RFM22B_STATE_RX_MODE,
+	RFM22B_STATE_WAIT_PREAMBLE,
+	RFM22B_STATE_WAIT_SYNC,
+	RFM22B_STATE_RX_DATA,
+	RFM22B_STATE_RX_FAILURE,
+	RFM22B_STATE_RECEIVING_STATUS,
+	RFM22B_STATE_TX_START,
+	RFM22B_STATE_TX_DATA,
+	RFM22B_STATE_TX_FAILURE,
+	RFM22B_STATE_SENDING_ACK,
+	RFM22B_STATE_SENDING_NACK,
+	RFM22B_STATE_RECEIVING_ACK,
+	RFM22B_STATE_RECEIVING_NACK,
+	RFM22B_STATE_TIMEOUT,
+	RFM22B_STATE_ERROR,
+	RFM22B_STATE_FATAL_ERROR,
+
+	RFM22B_STATE_NUM_STATES // Must be last
+};
+
+enum pios_rfm22b_event {
+	RFM22B_EVENT_INT_RECEIVED,
+	RFM22B_EVENT_INITIALIZE,
+	RFM22B_EVENT_INITIALIZED,
+	RFM22B_EVENT_REQUEST_CONNECTION,
+	RFM22B_EVENT_WAIT_FOR_CONNECTION,
+	RFM22B_EVENT_CONNECTION_REQUESTED,
+	RFM22B_EVENT_CONNECTION_ACCEPTED,
+	RFM22B_EVENT_PACKET_ACKED,
+	RFM22B_EVENT_PACKET_NACKED,
+	RFM22B_EVENT_ACK_TIMEOUT,
+	RFM22B_EVENT_RX_MODE,
+	RFM22B_EVENT_PREAMBLE_DETECTED,
+	RFM22B_EVENT_SYNC_DETECTED,
+	RFM22B_EVENT_RX_COMPLETE,
+	RFM22B_EVENT_RX_ERROR,
+	RFM22B_EVENT_STATUS_RECEIVED,
+	RFM22B_EVENT_TX_START,
+	RFM22B_EVENT_FAILURE,
+	RFM22B_EVENT_TIMEOUT,
+	RFM22B_EVENT_ERROR,
+	RFM22B_EVENT_FATAL_ERROR,
+
+	RFM22B_EVENT_NUM_EVENTS  // Must be last
+};
+
+#define RFM22B_RX_PACKET_STATS_LEN 4
+enum pios_rfm22b_rx_packet_status {
+	RFM22B_GOOD_RX_PACKET = 0x00,
+	RFM22B_CORRECTED_RX_PACKET = 0x01,
+	RFM22B_ERROR_RX_PACKET = 0x2,
+	RFM22B_RESENT_TX_PACKET = 0x3
+};
+
+typedef struct {
+	uint32_t pairID;
+	int8_t rssi;
+	int8_t afc_correction;
+	uint8_t lastContact;
+} rfm22b_pair_stats;
+
+struct pios_rfm22b_dev {
+	enum pios_rfm22b_dev_magic magic;
+	struct pios_rfm22b_cfg cfg;
+
+	// The SPI bus information
+	uint32_t spi_id;
+	uint32_t slave_num;
+
+	// The device ID
+	uint32_t deviceID;
+
+	// The destination ID
+	uint32_t destination_id;
+
+	// Is this device a coordinator?
+	bool coordinator;
+
+	// The task handle
+	xTaskHandle taskHandle;
+
+	// The potential paired statistics
+	rfm22b_pair_stats pair_stats[OPLINKSTATUS_PAIRIDS_NUMELEM];
+
+	// ISR pending semaphore
+	xSemaphoreHandle isrPending;
+
+	// The com configuration callback
+	PIOS_RFM22B_ComConfigCallback com_config_cb;
+
+	// The COM callback functions.
+	pios_com_callback rx_in_cb;
+	uint32_t rx_in_context;
+	pios_com_callback tx_out_cb;
+	uint32_t tx_out_context;
+
+	// the transmit power to use for data transmissions
+	uint8_t	tx_power;
+
+	// The RF datarate lookup index.
+	uint8_t datarate;
+
+	// The state machine state and the current event
+	enum pios_rfm22b_state state;
+
+	// The event queue handle
+	xQueueHandle eventQueue;
+
+	// device status register
+	uint8_t device_status;
+	// interrupt status register 1
+	uint8_t int_status1;
+	// interrupt status register 2
+	uint8_t int_status2;
+	// ezmac status register
+	uint8_t ezmac_status;
+
+	// The error statistics counters
+	uint16_t prev_rx_seq_num;
+	uint32_t rx_packet_stats[RFM22B_RX_PACKET_STATS_LEN];
+
+	// The packet statistics
+	struct rfm22b_stats stats;
+
+	// Stats
+	uint16_t errors;
+
+	// RSSI in dBm
+	int8_t rssi_dBm;
+
+	// The packet queue handle
+	xQueueHandle packetQueue;
+
+	// The tx data packet
+	PHPacket data_packet;
+	// The current tx packet
+	PHPacketHandle tx_packet;
+	// The previous tx packet (waiting for an ACK)
+	PHPacketHandle prev_tx_packet;
+	// The tx data read index
+	uint16_t tx_data_rd;
+	// The tx data write index
+	uint16_t tx_data_wr;
+	// The tx packet sequence number
+	uint16_t tx_seq;
+
+	// The rx data packet
+	PHPacket rx_packet;
+	// The receive buffer write index
+	uint16_t rx_buffer_wr;
+	// The receive buffer write index
+	uint16_t rx_packet_len;
+	// Is the modem currently in Rx mode?
+	bool in_rx_mode;
+
+	// The status packet
+	PHStatusPacket status_packet;
+
+	// The ACK/NACK packet
+	PHAckNackPacket ack_nack_packet;
+
+#ifdef PIOS_PPM_RECEIVER
+	// The PPM packet
+	PHPpmPacket ppm_packet;
+#endif
+
+	// The connection packet.
+	PHConnectionPacket con_packet;
+
+	// Send flags
+	bool send_status;
+	bool send_ppm;
+	bool send_connection_request;
+	bool time_to_send;
+	uint8_t time_to_send_offset;
+
+	// The minimum frequency
+	uint32_t min_frequency;
+	// The maximum frequency
+	uint32_t max_frequency;
+	// The current nominal frequency
+	uint32_t frequency_hz;
+	// The frequency hopping step size
+	float frequency_step_size;
+	// current frequency hop channel
+	uint8_t	frequency_hop_channel;
+	// the frequency hop step size
+	uint8_t frequency_hop_step_size_reg;
+	// afc correction reading (in Hz)
+	int8_t afc_correction_Hz;
+
+	// The maximum time (ms) that it should take to transmit / receive a packet.
+	uint32_t max_packet_time;
+	portTickType packet_start_ticks;
+	portTickType tx_complete_ticks;
+	portTickType rx_complete_ticks;
+	uint8_t max_ack_delay;
+
+	// The PPM channel values
+	uint16_t ppm_channel[PIOS_RFM22B_RCVR_MAX_CHANNELS];
+	uint8_t ppm_supv_timer;
+	bool ppm_fresh;
+};
+
+
+// External function definitions
 
 bool PIOS_RFM22_EXT_Int(void);
+bool PIOS_RFM22B_validate(struct pios_rfm22b_dev * rfm22b_dev);
+void PIOS_RFM22B_InjectEvent(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event, bool inISR);
+
+
+// Global variable definitions
+
+extern const struct pios_com_driver pios_rfm22b_com_driver;
 
 #endif /* PIOS_RFM22B_PRIV_H */
 

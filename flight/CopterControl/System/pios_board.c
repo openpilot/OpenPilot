@@ -632,6 +632,20 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_GPS */
 		break;
+	case HWSETTINGS_CC_FLEXIPORT_PPM:
+#if defined(PIOS_INCLUDE_PPM_FLEXI)
+		{
+			uint32_t pios_ppm_id;
+			PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_flexi_cfg);
+
+			uint32_t pios_ppm_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
+				PIOS_Assert(0);
+			}
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM] = pios_ppm_rcvr_id;
+		}
+#endif	/* PIOS_INCLUDE_PPM_FLEXI */
+		break;
 	case HWSETTINGS_CC_FLEXIPORT_DSM2:
 	case HWSETTINGS_CC_FLEXIPORT_DSMX10BIT:
 	case HWSETTINGS_CC_FLEXIPORT_DSMX11BIT:

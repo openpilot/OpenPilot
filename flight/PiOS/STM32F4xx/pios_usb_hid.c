@@ -52,6 +52,7 @@ const struct pios_com_driver pios_usb_hid_com_driver = {
 	.rx_start    = PIOS_USB_HID_RxStart,
 	.bind_tx_cb  = PIOS_USB_HID_RegisterTxCallback,
 	.bind_rx_cb  = PIOS_USB_HID_RegisterRxCallback,
+	.available   = PIOS_USB_CheckAvailable,	
 };
 
 enum pios_usb_hid_dev_magic {

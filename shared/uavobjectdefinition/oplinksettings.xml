@@ -1,0 +1,24 @@
+<xml>
+	<object name="OPLinkSettings" singleinstance="true" settings="true">
+		<description>OPLink configurations options.</description>
+		<field name="PairID" units="" type="uint32" elements="1" defaultvalue="0"/>
+		<field name="Coordinator" units="binary" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
+		<field name="UAVTalk" units="binary" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
+		<field name="PPM" units="" type="enum" elements="1" options="Disabled,Input,Output" defaultvalue="Disabled"/>
+		<field name="InputConnection" units="function" type="enum" elements="1" options="HID,VCP,Telemetry,Flexi" defaultvalue="HID"/>
+		<field name="OutputConnection" units="function" type="enum" elements="1" options="RemoteHID,RemoteVCP,RemoteTelemetry,RemoteFlexi,Telemetry,Flexi" defaultvalue="RemoteTelemetry"/>
+		<field name="ComSpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="38400"/>
+		<field name="MaxRFPower" units="mW" type="enum" elements="1" options="1.25,1.6,3.16,6.3,12.6,25,50,100" defaultvalue="100"/>
+		<field name="SendTimeout" units="ms" type="uint16" elements="1" defaultvalue="50"/>
+		<field name="MinPacketSize" units="bytes" type="uint8" elements="1" defaultvalue="50"/>
+		<field name="FrequencyCalibration" units="" type="uint8" elements="1" defaultvalue="127"/>
+		<field name="MinFrequency" units="" type="uint32" elements="1" defaultvalue="432000000"/>
+		<field name="MaxFrequency" units="" type="uint32" elements="1" defaultvalue="436000000"/>
+		<field name="AESKey" units="" type="uint8" elements="32" defaultvalue="0123456789abcdef0123456789abcdef"/>
+
+		<access gcs="readwrite" flight="readwrite"/>
+		<telemetrygcs acked="true" updatemode="onchange" period="0"/>
+		<telemetryflight acked="true" updatemode="onchange" period="0"/>
+		<logging updatemode="manual" period="0"/>
+	</object>
+</xml>

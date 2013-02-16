@@ -115,6 +115,9 @@ MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
 # Telemetry must be last to grab the optional modules (why?)
 MODULES += Telemetry
 
+# Enable ARM DSP library
+USE_DSP_LIB = NO
+
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
@@ -133,6 +136,7 @@ PIOSINC = $(PIOS)/inc
 PIOSSTM32F10X = $(PIOS)/STM32F10x
 PIOSCOMMON = $(PIOS)/Common
 PIOSBOARDS = $(PIOS)/Boards
+PIOSCOMMONLIB = $(PIOSCOMMON)/Libraries
 APPLIBDIR = $(PIOSSTM32F10X)/Libraries
 STMLIBDIR = $(APPLIBDIR)
 STMSPDDIR = $(STMLIBDIR)/STM32F10x_StdPeriph_Driver
@@ -233,6 +237,7 @@ SRC += $(OPUAVSYNTHDIR)/airspeedactual.c
 endif
 
 ## PIOS Hardware (STM32F10x)
+include $(PIOS)/STM32F10x/library.mk
 SRC += $(PIOSSTM32F10X)/pios_sys.c
 SRC += $(PIOSSTM32F10X)/pios_led.c
 SRC += $(PIOSSTM32F10X)/pios_delay.c
@@ -376,7 +381,7 @@ ASRCARM =
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
-EXTRAINCDIRS  =  $(OPSYSTEM)
+EXTRAINCDIRS  += $(OPSYSTEM)
 EXTRAINCDIRS  += $(OPSYSTEMINC)
 EXTRAINCDIRS  += $(OPUAVTALK)
 EXTRAINCDIRS  += $(OPUAVTALKINC)
@@ -409,7 +414,7 @@ EXTRAINCDIRS += ${foreach MOD, ${OPTMODULES} ${MODULES}, ${OPMODULEDIR}/${MOD}/i
 # Also add directories where the linker should search for
 # includes from linker-script to the list
 #     Each directory must be seperated by a space.
-EXTRA_LIBDIRS =
+#EXTRA_LIBDIRS +=
 
 # Extra Libraries
 #    Each library-name must be seperated by a space.
@@ -417,7 +422,7 @@ EXTRA_LIBDIRS =
 #    EXTRA_LIBS = xyz abc efsl
 # for newlib-lpc (file: libnewlibc-lpc.a):
 #    EXTRA_LIBS = newlib-lpc
-EXTRA_LIBS =
+#EXTRA_LIBS +=
 
 # Path to Linker-Scripts
 LINKERSCRIPTPATH = $(PIOSSTM32F10X)
@@ -444,7 +449,7 @@ DEBUGF = dwarf-2
 
 # Place project-specific -D (define) and/or
 # -U options for C here.
-CDEFS = -DSTM32F10X_$(MODEL)
+CDEFS += -DSTM32F10X_$(MODEL)
 CDEFS += -DUSE_STDPERIPH_DRIVER
 CDEFS += -DUSE_$(BOARD)
 ifeq ($(ENABLE_DEBUG_PINS), YES)
@@ -628,7 +633,7 @@ endif
 #	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
 
 # Link: create ELF output file from object files.
-$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))
+$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ), $(ALLLIB)))
 
 # Assemble: create object files from assembler source files.
 $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))

@@ -40,6 +40,7 @@ MSG_BIN_OBJ          = ${quote} BINO      $(MSG_EXTRA) ${quote}
 MSG_STRIP_FILE       = ${quote} STRIP     $(MSG_EXTRA) ${quote}
 MSG_EXTENDED_LISTING = ${quote} LIS       $(MSG_EXTRA) ${quote}
 MSG_SYMBOL_TABLE     = ${quote} NM        $(MSG_EXTRA) ${quote}
+MSG_ARCHIVING        = ${quote} AR        $(MSG_EXTRA) ${quote}
 MSG_LINKING          = ${quote} LD        $(MSG_EXTRA) ${quote}
 MSG_COMPILING        = ${quote} CC        ${MSG_EXTRA} ${quote}
 MSG_COMPILING_ARM    = ${quote} CC-ARM    $(MSG_EXTRA) ${quote}
@@ -183,15 +184,39 @@ $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 	$(V1) $(CC) -c $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
 endef
 
-# Link: create ELF output file from object files.
-#   $1 = elf file to produce
-#   $2 = list of object files that make up the elf file
-define LINK_TEMPLATE
+# Archive: create ar library file from object files.
+#   $1 = library file to produce
+#   $2 = list of object files that make up the library file
+#   $3 = optional object files directory
+define ARCHIVE_TEMPLATE
 .SECONDARY : $(1)
 .PRECIOUS : $(2)
 $(1):  $(2)
+	@echo $(MSG_ARCHIVING) $$(call toprel, $$@)
+ifeq ($(3),)
+	$(V1) $(AR) rcs $$@ $(2)
+else
+#	This is a workaround for Windows CreateProcess() line length
+#	limitation. It is assumed that if the object files directory
+#	is given, all object files are in that directory.
+	$(V1) ( \
+		pushd $(3) >/dev/null && \
+		$(AR) rcs $$@ $(notdir $(2)) && \
+		popd >/dev/null \
+	      )
+endif
+endef
+
+# Link: create ELF output file from object files.
+#   $1 = elf file to produce
+#   $2 = list of object files that make up the elf file
+#   $3 = optional list of libraries to build and link
+define LINK_TEMPLATE
+.SECONDARY : $(1)
+.PRECIOUS : $(2) $(3)
+$(1):  $(2) $(3)
 	@echo $(MSG_LINKING) $$(call toprel, $$@)
-	$(V1) $(CC) $(THUMB) $$(CFLAGS) $(2) --output $$@ $$(LDFLAGS)
+	$(V1) $(CC) $(THUMB) $$(CFLAGS) $(2) $(3) --output $$@ $$(LDFLAGS)
 endef
 
 # Compile: create assembler files from C source files. ARM/Thumb

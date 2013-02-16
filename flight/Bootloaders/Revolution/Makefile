@@ -114,7 +114,7 @@ EXTRAINCDIRS  += $(HWDEFSINC)
 # Also add directories where the linker should search for
 # includes from linker-script to the list
 #     Each directory must be seperated by a space.
-EXTRA_LIBDIRS = 
+#EXTRA_LIBDIRS +=
 
 # Extra Libraries
 #    Each library-name must be seperated by a space.
@@ -122,7 +122,7 @@ EXTRA_LIBDIRS =
 #    EXTRA_LIBS = xyz abc efsl
 # for newlib-lpc (file: libnewlibc-lpc.a):
 #    EXTRA_LIBS = newlib-lpc
-EXTRA_LIBS =
+#EXTRA_LIBS +=
 
 # Path to Linker-Scripts
 LINKERSCRIPTPATH = $(PIOSSTM32FXX)
@@ -149,7 +149,7 @@ DEBUGF = dwarf-2
 
 # Place project-specific -D (define) and/or 
 # -U options for C here.
-CDEFS = -DSTM32F4XX
+CDEFS += -DSTM32F4XX
 CDEFS += -DSYSCLK_FREQ=$(SYSCLK_FREQ)
 CDEFS += -DHSE_VALUE=$(OSCILLATOR_FREQ)
 CDEFS += -DUSE_STDPERIPH_DRIVER

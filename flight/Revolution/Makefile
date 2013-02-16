@@ -87,6 +87,9 @@ MODULES += Telemetry
 PYMODULES = 
 #FlightPlan
 
+# Enable ARM DSP library
+USE_DSP_LIB = NO
+
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
@@ -268,7 +271,7 @@ EXTRAINCDIRS += ${foreach MOD, ${OPTMODULES} ${MODULES} ${PYMODULES}, $(OPMODULE
 # Also add directories where the linker should search for
 # includes from linker-script to the list
 #     Each directory must be seperated by a space.
-EXTRA_LIBDIRS =
+#EXTRA_LIBDIRS +=
 
 # Extra Libraries
 #    Each library-name must be seperated by a space.
@@ -276,7 +279,7 @@ EXTRA_LIBDIRS =
 #    EXTRA_LIBS = xyz abc efsl
 # for newlib-lpc (file: libnewlibc-lpc.a):
 #    EXTRA_LIBS = newlib-lpc
-EXTRA_LIBS =
+#EXTRA_LIBS +=
 
 # Path to Linker-Scripts
 LINKERSCRIPTPATH = $(PIOSSTM32F4XX)
@@ -405,7 +408,7 @@ LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
 
 # Define programs and commands.
 REMOVE  = $(REMOVE_CMD) -f
-PYHON   = python
+PYTHON  = python
 
 # List of all source files.
 ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
@@ -439,7 +442,7 @@ endif
 
 
 # Link: create ELF output file from object files.
-$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))
+$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ), $(ALLLIB)))
 
 # Assemble: create object files from assembler source files.
 $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))

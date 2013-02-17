@@ -142,12 +142,16 @@ public abstract class TelemetryTask implements Runnable {
 		}
 
 		// Stop the master telemetry thread
-		handler.post(new Runnable() {
-			@Override
-			public void run() {
-				Looper.myLooper().quit();
-			}
-		});
+		// Check handler is not null: if we attempt to disconnect before
+		// the connect process has completed, handler may be null.
+		if(handler != null){
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					Looper.myLooper().quit();
+				}
+			});
+		}
 
 		if (inputProcessThread != null) {
 			inputProcessThread.interrupt();

@@ -327,7 +327,7 @@ static void updatePOIBearing()
 	stabDesired.Yaw=yaw;
 	stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 	cameraDesired.Yaw=yaw;
-	cameraDesired.Pitch=elevation;
+	cameraDesired.PitchOrServo2=elevation;
 
 	CameraDesiredSet(&cameraDesired);
 	StabilizationDesiredSet(&stabDesired);

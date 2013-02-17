@@ -233,6 +233,7 @@ SRC += $(OPUAVSYNTHDIR)/ratedesired.c
 SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
 SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
 SRC += $(OPUAVSYNTHDIR)/airspeedactual.c
+SRC += $(OPUAVSYNTHDIR)/mpu6000settings.c
 
 endif
 

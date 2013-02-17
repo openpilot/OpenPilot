@@ -222,9 +222,9 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 	.interrupt_en = PIOS_MPU6000_INTEN_DATA_RDY,
 	.User_ctl = PIOS_MPU6000_USERCTL_FIFO_EN | PIOS_MPU6000_USERCTL_DIS_I2C,
 	.Pwr_mgmt_clk = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
-	.accel_range = PIOS_MPU6000_ACCEL_8G,
-	.gyro_range = PIOS_MPU6000_SCALE_500_DEG,
-	.filter = PIOS_MPU6000_LOWPASS_256_HZ,
+	.accel_range = PIOS_MPU6000_ACCEL_FROM_SETTINGS,
+	.gyro_range = PIOS_MPU6000_SCALE_FROM_SETTINGS,
+	.filter = PIOS_MPU6000_LOWPASS_FROM_SETTINGS,
 	.orientation = PIOS_MPU6000_TOP_0DEG
 };
 #endif /* PIOS_INCLUDE_MPU6000 */

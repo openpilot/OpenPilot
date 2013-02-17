@@ -206,7 +206,11 @@ static void actuatorTask(void* parameters)
 
 		// Check how long since last update
 		thisSysTime = xTaskGetTickCount();
-		if(thisSysTime > lastSysTime) // reuse dt in case of wraparound
+		// reuse dt in case of wraparound
+		// todo:
+		//  if dT actually matters...
+		//  fix it to know max value and subtract for currently correct dT on wrap
+		if(thisSysTime > lastSysTime)
 			dT = (thisSysTime - lastSysTime) * (portTICK_RATE_MS * 0.001f);
 		lastSysTime = thisSysTime;
 
@@ -328,17 +332,17 @@ static void actuatorTask(void* parameters)
 					status[ct] = -1;
 			}
 
-			if( (mixers[ct].type >= MIXERSETTINGS_MIXER1TYPE_CAMERAROLL) &&
+			if( (mixers[ct].type >= MIXERSETTINGS_MIXER1TYPE_CAMERAROLLORSERVO1) &&
 			   (mixers[ct].type <= MIXERSETTINGS_MIXER1TYPE_CAMERAYAW))
 			{
 				CameraDesiredData cameraDesired;
 				if( CameraDesiredGet(&cameraDesired) == 0 ) {
 					switch(mixers[ct].type) {
-						case MIXERSETTINGS_MIXER1TYPE_CAMERAROLL:
-							status[ct] = cameraDesired.Roll;
+						case MIXERSETTINGS_MIXER1TYPE_CAMERAROLLORSERVO1:
+							status[ct] = cameraDesired.RollOrServo1;
 							break;
-						case MIXERSETTINGS_MIXER1TYPE_CAMERAPITCH:
-							status[ct] = cameraDesired.Pitch;
+						case MIXERSETTINGS_MIXER1TYPE_CAMERAPITCHORSERVO2:
+							status[ct] = cameraDesired.PitchOrServo2;
 							break;
 						case MIXERSETTINGS_MIXER1TYPE_CAMERAYAW:
 							status[ct] = cameraDesired.Yaw;

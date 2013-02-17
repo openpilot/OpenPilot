@@ -10,7 +10,7 @@ Item {
 
     Text {
         id: header
-        text: "Project News"
+        text: qsTr("Project News")
         width: parent.width
         color: "#44515c"
         font {

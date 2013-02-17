@@ -151,8 +151,11 @@ struct pios_mpu6000_cfg {
 	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
 	
 	uint8_t Fifo_store;		/* FIFO storage of different readings (See datasheet page 31 for more details) */
-	uint8_t Smpl_rate_div;	/* Sample rate divider to use (See datasheet page 32 for more details) */
-	uint8_t interrupt_cfg;	/* Interrupt configuration (See datasheet page 35 for more details) */
+                                        
+                                        /* Sample rate divider to use (See datasheet page 32 for more details).*/
+        uint8_t Smpl_rate_div_no_dlp;   /* used when no dlp is applied (fs=8KHz)*/
+	uint8_t Smpl_rate_div_dlp;	/* used when dlp is on (fs=1kHz)*/
+        uint8_t interrupt_cfg;	/* Interrupt configuration (See datasheet page 35 for more details) */
 	uint8_t interrupt_en;	/* Interrupt configuration (See datasheet page 35 for more details) */
 	uint8_t User_ctl;		/* User control settings (See datasheet page 41 for more details)  */
 	uint8_t Pwr_mgmt_clk;	/* Power management and clock selection (See datasheet page 32 for more details) */

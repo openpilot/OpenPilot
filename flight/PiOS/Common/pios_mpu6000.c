@@ -136,64 +136,66 @@ int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const struct pios
  * @brief Initialize the MPU6000 3-axis gyro sensor
  * \return none
  * \param[in] PIOS_MPU6000_ConfigTypeDef struct to be used to configure sensor.
-*
-*/
+ *
+ */
 static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 {
 
 	PIOS_MPU6000_Test();
-	
+
 	//initialize settings for acc/gyro Scale and filter
 	Mpu6000SettingsInitialize();
-	
+
 	// Reset chip
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_PWR_MGMT_REG, PIOS_MPU6000_PWRMGMT_IMU_RST) != 0);
 	PIOS_DELAY_WaitmS(300);
-	
+
 	// Reset chip and fifo
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_USER_CTRL_REG, 
-		PIOS_MPU6000_USERCTL_GYRO_RST | 
-		PIOS_MPU6000_USERCTL_SIG_COND | 
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_USER_CTRL_REG,
+		PIOS_MPU6000_USERCTL_GYRO_RST |
+		PIOS_MPU6000_USERCTL_SIG_COND |
 		PIOS_MPU6000_USERCTL_FIFO_RST) != 0);
-	
+
 	// Wait for reset to finish
-	while (PIOS_MPU6000_GetReg(PIOS_MPU6000_USER_CTRL_REG) & 
-		(PIOS_MPU6000_USERCTL_GYRO_RST | 
-		PIOS_MPU6000_USERCTL_SIG_COND | 
+	while (PIOS_MPU6000_GetReg(PIOS_MPU6000_USER_CTRL_REG) &
+		(PIOS_MPU6000_USERCTL_GYRO_RST |
+		PIOS_MPU6000_USERCTL_SIG_COND |
 		PIOS_MPU6000_USERCTL_FIFO_RST));
-	
+
 	//Power management configuration
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_PWR_MGMT_REG, cfg->Pwr_mgmt_clk) != 0) ;
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_PWR_MGMT_REG, cfg->Pwr_mgmt_clk) != 0);
 
 	// Interrupt configuration
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_INT_CFG_REG, cfg->interrupt_cfg) != 0) ;
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_INT_CFG_REG, cfg->interrupt_cfg) != 0);
 
 	// Interrupt configuration
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_INT_EN_REG, cfg->interrupt_en) != 0) ;
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_INT_EN_REG, cfg->interrupt_en) != 0);
 
 	// FIFO storage
 #if defined(PIOS_MPU6000_ACCEL)
 	// Set the accel range
 	dev->accel_range = getAccelRange(cfg->accel_range);
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_ACCEL_CFG_REG, dev->accel_range) != 0);
-	
+
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_FIFO_EN_REG, cfg->Fifo_store | PIOS_MPU6000_ACCEL_OUT) != 0);
 #else
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_FIFO_EN_REG, cfg->Fifo_store) != 0);
 #endif
-	
-	// Sample rate divider
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_SMPLRT_DIV_REG, cfg->Smpl_rate_div) != 0) ;
-	
-	// Digital low-pass filter and scale
+	// Digital low-pass filter
 	uint8_t filterSetting;
 	filterSetting = getFilterSetting(cfg->filter);
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_DLPF_CFG_REG, filterSetting) != 0) ;
-	
+
+	// Sample rate divider, chosen upon digital filtering settings
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_SMPLRT_DIV_REG, 
+		filterSetting == PIOS_MPU6000_LOWPASS_256_HZ ? 
+		cfg->Smpl_rate_div_no_dlp : cfg->Smpl_rate_div_dlp) != 0);
+
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_DLPF_CFG_REG, filterSetting) != 0);
+
 	// Gyro range
 	dev->gyro_range = getGyroRange(cfg->gyro_range);
-	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_GYRO_CFG_REG, dev->gyro_range) != 0) ;
-	
+	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_GYRO_CFG_REG, dev->gyro_range) != 0);
+
 	// Interrupt configuration
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_USER_CTRL_REG, cfg->User_ctl) != 0) ;
 	

@@ -1,6 +1,6 @@
 <xml>
     <object name="Mpu6000Settings" singleinstance="true" settings="true" category="Sensors">
-        <description>Settings for the @ref MPU6000 sensor used on CC3D and Revolution</description>
+        <description>Settings for the @ref MPU6000 sensor used on CC3D and Revolution. Reboot the board for this to takes effect</description>
         <field name="GyroScale" units="deg/s" type="enum" elements="1" defaultvalue="Scale_2000">
             <options>
                 <option>Scale_250</option>

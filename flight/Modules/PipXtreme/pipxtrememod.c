@@ -165,6 +165,7 @@ static void systemTask(void *parameters)
 		PIOS_RFM22B_GetStats(pios_rfm22b_id, &radio_stats);
 
 		// Update the status
+                oplinkStatus.HeapRemaining = xPortGetFreeHeapSize();
 		oplinkStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
 		oplinkStatus.RxGood = radio_stats.rx_good;
 		oplinkStatus.RxCorrected = radio_stats.rx_corrected;
@@ -177,7 +178,6 @@ static void systemTask(void *parameters)
 		oplinkStatus.Resets = radio_stats.resets;
 		oplinkStatus.Timeouts = radio_stats.timeouts;
 		oplinkStatus.RSSI = radio_stats.rssi;
-		oplinkStatus.AFCCorrection = radio_stats.afc_correction;
 		oplinkStatus.LinkQuality = radio_stats.link_quality;
 		if (first_time)
 			first_time = false;

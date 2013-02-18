@@ -645,6 +645,14 @@ typedef struct {
 	uint8_t lastContact;
 } rfm22b_pair_stats;
 
+typedef struct {
+	uint32_t pairID;
+	OPLinkSettingsRemoteMainPortOptions main_port;
+	OPLinkSettingsRemoteFlexiPortOptions flexi_port;
+	OPLinkSettingsRemoteVCPPortOptions vcp_port;
+	OPLinkSettingsComSpeedOptions com_speed;
+} rfm22b_binding;
+
 struct pios_rfm22b_dev {
 	enum pios_rfm22b_dev_magic magic;
 	struct pios_rfm22b_cfg cfg;
@@ -660,7 +668,7 @@ struct pios_rfm22b_dev {
 	uint32_t destination_id;
 
 	// The list of bound radios.
-	uint32_t bindings[OPLINKSETTINGS_BINDINGS_NUMELEM];
+	rfm22b_binding bindings[OPLINKSETTINGS_BINDINGS_NUMELEM];
 	uint8_t cur_binding;
 
 	// Is this device a coordinator?

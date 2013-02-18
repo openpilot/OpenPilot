@@ -91,12 +91,13 @@ typedef struct {
 #define PH_CONNECTION_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
 typedef struct {
 	PHPacketHeader header;
-	uint8_t datarate;
 	uint32_t frequency_hz;
 	uint32_t min_frequency;
 	uint32_t max_frequency;
 	uint8_t max_tx_power;
-	OPLinkSettingsOutputConnectionOptions port;
+	OPLinkSettingsMainPortOptions main_port;
+	OPLinkSettingsFlexiPortOptions flexi_port;
+	OPLinkSettingsVCPPortOptions vcp_port;
 	OPLinkSettingsComSpeedOptions com_speed;
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHConnectionPacket, *PHConnectionPacketHandle;

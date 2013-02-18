@@ -587,7 +587,7 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 
 	// Initialize the bindings.
 	for (uint32_t i = 0; i < OPLINKSETTINGS_BINDINGS_NUMELEM; ++i)
-		rfm22b_dev->bindings[i] = 0;
+		rfm22b_dev->bindings[i].pairID = 0;
 	rfm22b_dev->coordinator = false;
 
 	// Create the event queue
@@ -746,21 +746,6 @@ void PIOS_RFM22B_SetFrequencyRange(uint32_t rfm22b_id, uint32_t min_frequency, u
 }
 
 /**
- * Set the remote com port configuration parameters.
- * \param[in] rfm22b_id  The rfm22b device.
- * \param[in] com_port  The remote com port
- * \param[in] com_speed  The remote com port speed
- */
-void PIOS_RFM22B_SetRemoteComConfig(uint32_t rfm22b_id, OPLinkSettingsOutputConnectionOptions com_port, OPLinkSettingsComSpeedOptions com_speed)
-{
- 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(!PIOS_RFM22B_validate(rfm22b_dev))
-		return;
-	rfm22b_dev->con_packet.port = com_port;
-	rfm22b_dev->con_packet.com_speed = com_speed;
-}
-
-/**
  * Set the com port configuration callback (to receive com configuration over the air)
  * \param[in] rfm22b_id  The rfm22b device.
  * \param[in] cb  A pointer to the callback function
@@ -778,17 +763,21 @@ void PIOS_RFM22B_SetComConfigCallback(uint32_t rfm22b_id, PIOS_RFM22B_ComConfigC
  * \param[in] rfm22b_id  The rfm22b device.
  * \param[in] bindings  The array of bindings.
  */
-void PIOS_RFM22B_SetBindings(uint32_t rfm22b_id, const uint32_t bindings[])
+void PIOS_RFM22B_SetBindings(uint32_t rfm22b_id, const uint32_t bindingPairIDs[], const uint8_t mainPortSettings[],
+			     const uint8_t flexiPortSettings[], const uint8_t vcpPortSettings[], const uint8_t comSpeeds[])
 {
  	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if(!PIOS_RFM22B_validate(rfm22b_dev))
 		return;
 	// This modem will be considered a coordinator if any bindings have been set.
 	rfm22b_dev->coordinator = false;
-	for (uint32_t i = 0; i < OPLINKSETTINGS_BINDINGS_NUMELEM; ++i)
-	{
-		rfm22b_dev->bindings[i] = bindings[i];
-		rfm22b_dev->coordinator |= (rfm22b_dev->bindings[i] != 0);
+	for (uint32_t i = 0; i < OPLINKSETTINGS_BINDINGS_NUMELEM; ++i) {
+		rfm22b_dev->bindings[i].pairID = bindingPairIDs[i];
+		rfm22b_dev->bindings[i].main_port = mainPortSettings[i];
+		rfm22b_dev->bindings[i].flexi_port = flexiPortSettings[i];
+		rfm22b_dev->bindings[i].vcp_port = vcpPortSettings[i];
+		rfm22b_dev->bindings[i].com_speed = comSpeeds[i];
+		rfm22b_dev->coordinator |= (rfm22b_dev->bindings[i].pairID != 0);
 	}
 }
 
@@ -1034,14 +1023,6 @@ static void rfm22_setDatarate(struct pios_rfm22b_dev * rfm22b_dev, enum rfm22b_d
 
 	rfm22_write(rfm22b_dev, RFM22_ook_counter_value1, 0x00);
 	rfm22_write(rfm22b_dev, RFM22_ook_counter_value2, 0x00);
-}
-
-void PIOS_RFM22B_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool data_whitening)
-{
-	struct pios_rfm22b_dev * rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(!PIOS_RFM22B_validate(rfm22b_dev))
-		return;
-	rfm22b_dev->datarate = datarate;
 }
 
 // ************************************
@@ -2005,11 +1986,20 @@ static enum pios_rfm22b_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_d
 	// Go to the next binding, if the previous tx packet was a connection request
 	if (rfm22b_dev->tx_packet->header.type == PACKET_TYPE_CON_REQUEST)
 	{
-		// Increment the current binding index, and make sure that we didn't run off the end of the buffer, or past the last nonzero ID
-		if ((++(rfm22b_dev->cur_binding) >= OPLINKSETTINGS_BINDINGS_NUMELEM) || (rfm22b_dev->bindings[rfm22b_dev->cur_binding] == 0))
-			rfm22b_dev->cur_binding = 0;
-		rfm22b_dev->destination_id = rfm22b_dev->bindings[rfm22b_dev->cur_binding];
-		rfm22b_dev->tx_packet->header.destination_id = rfm22b_dev->destination_id;
+		PHConnectionPacketHandle cph = &(rfm22b_dev->con_packet);
+		// Increment the current binding index to the next non-zero binding.
+                for (uint8_t i = 0; OPLINKSETTINGS_BINDINGS_NUMELEM; ++i) {
+                    if (++(rfm22b_dev->cur_binding) >= OPLINKSETTINGS_BINDINGS_NUMELEM)
+                        rfm22b_dev->cur_binding = 0;
+                    if (rfm22b_dev->bindings[rfm22b_dev->cur_binding].pairID != 0)
+                        break;
+                }
+		rfm22b_dev->destination_id = rfm22b_dev->bindings[rfm22b_dev->cur_binding].pairID;
+		cph->header.destination_id = rfm22b_dev->destination_id;
+		cph->main_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].main_port;
+		cph->flexi_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].flexi_port;
+		cph->vcp_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].vcp_port;
+		cph->com_speed = rfm22b_dev->bindings[rfm22b_dev->cur_binding].com_speed;
 	}
 
 	// Increment the reset packet counter if we're connected.
@@ -2086,11 +2076,14 @@ static enum pios_rfm22b_event rfm22_requestConnection(struct pios_rfm22b_dev *rf
 	rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTING;
 
 	// Fill in the connection request
-	rfm22b_dev->destination_id = rfm22b_dev->bindings[rfm22b_dev->cur_binding];
+	rfm22b_dev->destination_id = rfm22b_dev->bindings[rfm22b_dev->cur_binding].pairID;
 	cph->header.destination_id = rfm22b_dev->destination_id;
 	cph->header.type = PACKET_TYPE_CON_REQUEST;
 	cph->header.data_size = PH_CONNECTION_DATA_SIZE(&(rfm22b_dev->con_packet));
-	cph->datarate = rfm22b_dev->datarate;
+	cph->main_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].main_port;
+	cph->flexi_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].flexi_port;
+	cph->vcp_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].vcp_port;
+	cph->com_speed = rfm22b_dev->bindings[rfm22b_dev->cur_binding].com_speed;
 	cph->frequency_hz = rfm22b_dev->frequency_hz;
 	cph->min_frequency = rfm22b_dev->min_frequency;
 	cph->max_frequency = rfm22b_dev->max_frequency;
@@ -2107,17 +2100,17 @@ static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev)
 
 	// Set our connection state to connected
 	rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTED;
+
+	// Call the com port configuration function
+	if (rfm22b_dev->com_config_cb)
+		rfm22b_dev->com_config_cb(cph->main_port, cph->flexi_port, cph->vcp_port, cph->com_speed);
  
  	// Configure this modem from the connection request message.
-	rfm22_setDatarate(rfm22b_dev, cph->datarate, true);
+	rfm22_setDatarate(rfm22b_dev, rfm22b_dev->datarate, true);
  	PIOS_RFM22B_SetTxPower((uint32_t)rfm22b_dev, cph->max_tx_power);
  	rfm22b_dev->min_frequency = cph->min_frequency;
  	rfm22b_dev->max_frequency = cph->max_frequency;
  	rfm22_setNominalCarrierFrequency(rfm22b_dev, cph->frequency_hz);
-
-	// Call the com port configuration function
-	if (rfm22b_dev->com_config_cb && !rfm22b_dev->coordinator)
-		rfm22b_dev->com_config_cb(cph->port, cph->com_speed);
 }
 
 static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm22b_dev)

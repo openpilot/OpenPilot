@@ -43,28 +43,27 @@ public:
 public slots:
 	void updateStatus(UAVObject *object1);
 	void updateSettings(UAVObject *object1);
-	void refreshBindingsList();
 
 private:
 	Ui_PipXtremeWidget *m_oplink;
 
 	// The OPLink status UAVObject
-	UAVDataObject* oplinkStatusObj;
+	UAVDataObject *oplinkStatusObj;
 
 	// The OPLink ssettins UAVObject
 	OPLinkSettings* oplinkSettingsObj;
 
+	// Are the settings current?
 	bool settingsUpdated;
 
+	// Signal mappers to add arguments to signals.
+	QSignalMapper *signalMapperAddBinding;
+	QSignalMapper *signalMapperRemBinding;
+
 private slots:
-	void refreshValues();
-	void applySettings();
-	void saveSettings();
 	void disconnected();
-	void pairIDToggled(bool checked);
-	void addBinding();
-	void removeBinding();
-	void bindingsSelectionChanged();
+	void addBinding(QWidget *w);
+	void removeBinding(QWidget *w);
 };
 
 #endif // CONFIGTXPIDWIDGET_H

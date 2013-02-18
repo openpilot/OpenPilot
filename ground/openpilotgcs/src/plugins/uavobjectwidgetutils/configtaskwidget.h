@@ -68,6 +68,13 @@ public:
         double scale;
         bool isLimited;
         QList<shadow *> shadowsList;
+        QString getUnits() const {
+            if (field) {
+                return field->getUnits();
+            } else {
+                return QString("");
+            }
+        }
     };
 
     struct temphelper
@@ -181,8 +188,9 @@ private:
     bool dirty;
     bool setFieldFromWidget(QWidget *widget, UAVObjectField *field, int index, double scale);
     bool setWidgetFromField(QWidget *widget, UAVObjectField *field, int index, double scale, bool hasLimits);
-    QVariant getVariantFromWidget(QWidget *widget, double scale);
-    bool setWidgetFromVariant(QWidget *widget,QVariant value,double scale);
+    QVariant getVariantFromWidget(QWidget *widget, double scale, QString units);
+    bool setWidgetFromVariant(QWidget *widget, QVariant value, double scale, QString units);
+    bool setWidgetFromVariant(QWidget *widget, QVariant value, double scale);
     void connectWidgetUpdatesToSlot(QWidget *widget, const char *function);
     void disconnectWidgetUpdatesToSlot(QWidget *widget, const char *function);
     void loadWidgetLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, double sclale);

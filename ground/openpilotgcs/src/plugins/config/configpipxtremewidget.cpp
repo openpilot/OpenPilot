@@ -27,6 +27,7 @@
 
 #include "configpipxtremewidget.h"
 
+#include <coreplugin/generalsettings.h>
 #include <oplinksettings.h>
 #include <oplinkstatus.h>
 
@@ -53,20 +54,20 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 		qDebug() << "Error: Object is unknown (OPLinkSettings).";
 	}
 	autoLoadWidgets();
+	Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
+	if(!settings->useExpertMode())
+		m_oplink->Apply->setVisible(false);
 	addApplySaveButtons(m_oplink->Apply, m_oplink->Save);
 
-	addUAVObjectToWidgetRelation("OPLinkSettings", "UAVTalk", m_oplink->UAVTalk);
-	addUAVObjectToWidgetRelation("OPLinkSettings", "PPM", m_oplink->PPM);
-	addUAVObjectToWidgetRelation("OPLinkSettings", "InputConnection", m_oplink->InputConnection);
-	addUAVObjectToWidgetRelation("OPLinkSettings", "OutputConnection", m_oplink->OutputConnection);
-	addUAVObjectToWidgetRelation("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed);
+	addUAVObjectToWidgetRelation("OPLinkSettings", "MainPort", m_oplink->MainPort);
+	addUAVObjectToWidgetRelation("OPLinkSettings", "FlexiPort", m_oplink->FlexiPort);
+	addUAVObjectToWidgetRelation("OPLinkSettings", "VCPPort", m_oplink->VCPPort);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "MaxRFPower", m_oplink->MaxRFTxPower);
-	addUAVObjectToWidgetRelation("OPLinkSettings", "SendTimeout", m_oplink->SendTimeout);
-	addUAVObjectToWidgetRelation("OPLinkSettings", "MinPacketSize", m_oplink->MinPacketSize);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "FrequencyCalibration", m_oplink->FrequencyCalibration);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "MinFrequency", m_oplink->MinFrequency);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "MaxFrequency", m_oplink->MaxFrequency);
 
+	addUAVObjectToWidgetRelation("OPLinkStatus", "DeviceID", m_oplink->DeviceID);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RxGood", m_oplink->Good);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RxCorrected", m_oplink->Corrected);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RxErrors", m_oplink->Errors);
@@ -79,27 +80,89 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("OPLinkStatus", "Resets", m_oplink->Resets);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "Timeouts", m_oplink->Timeouts);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RSSI", m_oplink->RSSI);
-	addUAVObjectToWidgetRelation("OPLinkStatus", "AFCCorrection", m_oplink->AFCCorrection);
+	addUAVObjectToWidgetRelation("OPLinkStatus", "HeapRemaining", m_oplink->FreeHeap);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "LinkQuality", m_oplink->LinkQuality);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RXSeq", m_oplink->RXSeq);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "TXSeq", m_oplink->TXSeq);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RXRate", m_oplink->RXRate);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "TXRate", m_oplink->TXRate);
 
-	// Connect to the pair ID radio buttons.
-	connect(m_oplink->PairSelect1, SIGNAL(toggled(bool)), this, SLOT(pairIDToggled(bool)));
-	connect(m_oplink->PairSelect2, SIGNAL(toggled(bool)), this, SLOT(pairIDToggled(bool)));
-	connect(m_oplink->PairSelect3, SIGNAL(toggled(bool)), this, SLOT(pairIDToggled(bool)));
-	connect(m_oplink->PairSelect4, SIGNAL(toggled(bool)), this, SLOT(pairIDToggled(bool)));
-
-	// Connect to the binding buttons.
-	connect(m_oplink->BindingAdd, SIGNAL(pressed()), this, SLOT(addBinding()));
-	connect(m_oplink->BindingRemove, SIGNAL(pressed()), this, SLOT(removeBinding()));
-	m_oplink->BindingAdd->setEnabled(false);
-	m_oplink->BindingRemove->setEnabled(false);
-
-	// Connect to changes to the bindings widgets.
-	connect(m_oplink->Bindings, SIGNAL(itemSelectionChanged()), this, SLOT(bindingsSelectionChanged()));
+        signalMapperAddBinding = new QSignalMapper(this);
+        signalMapperRemBinding = new QSignalMapper(this);
+        connect(m_oplink->BindingAdd_1, SIGNAL(clicked()), signalMapperAddBinding, SLOT(map()));
+	signalMapperAddBinding->setMapping(m_oplink->BindingAdd_1, (QWidget*)(m_oplink->BindingID_1));
+        connect(m_oplink->BindingRemove_1, SIGNAL(clicked()), signalMapperRemBinding, SLOT(map()));
+	signalMapperRemBinding->setMapping(m_oplink->BindingRemove_1, (QWidget*)(m_oplink->BindingID_1));
+	addUAVObjectToWidgetRelation("OPLinkSettings", "Bindings", m_oplink->BindingID_1, "0");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteMainPort", m_oplink->RemoteMainPort_1, "0");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteFlexiPort", m_oplink->RemoteFlexiPort_1, "0");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteVCPPort", m_oplink->RemoteVCPPort_1, "0");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed_1, "0");
+        connect(m_oplink->BindingAdd_2, SIGNAL(clicked()), signalMapperAddBinding, SLOT(map()));
+	signalMapperAddBinding->setMapping(m_oplink->BindingAdd_2, (QWidget*)(m_oplink->BindingID_2));
+        connect(m_oplink->BindingRemove_2, SIGNAL(clicked()), signalMapperRemBinding, SLOT(map()));
+	signalMapperRemBinding->setMapping(m_oplink->BindingRemove_2, (QWidget*)(m_oplink->BindingID_2));
+	addUAVObjectToWidgetRelation("OPLinkSettings", "Bindings", m_oplink->BindingID_2, "1");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteMainPort", m_oplink->RemoteMainPort_2, "1");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteFlexiPort", m_oplink->RemoteFlexiPort_2, "1");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteVCPPort", m_oplink->RemoteVCPPort_2, "1");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed_2, "1");
+        connect(m_oplink->BindingAdd_3, SIGNAL(clicked()), signalMapperAddBinding, SLOT(map()));
+	signalMapperAddBinding->setMapping(m_oplink->BindingAdd_3, (QWidget*)(m_oplink->BindingID_3));
+        connect(m_oplink->BindingRemove_3, SIGNAL(clicked()), signalMapperRemBinding, SLOT(map()));
+	signalMapperRemBinding->setMapping(m_oplink->BindingRemove_3, (QWidget*)(m_oplink->BindingID_3));
+	addUAVObjectToWidgetRelation("OPLinkSettings", "Bindings", m_oplink->BindingID_3, "2");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteMainPort", m_oplink->RemoteMainPort_3, "2");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteFlexiPort", m_oplink->RemoteFlexiPort_3, "2");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteVCPPort", m_oplink->RemoteVCPPort_3, "2");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed_3, "2");
+        connect(m_oplink->BindingAdd_4, SIGNAL(clicked()), signalMapperAddBinding, SLOT(map()));
+	signalMapperAddBinding->setMapping(m_oplink->BindingAdd_4, (QWidget*)(m_oplink->BindingID_4));
+        connect(m_oplink->BindingRemove_4, SIGNAL(clicked()), signalMapperRemBinding, SLOT(map()));
+	signalMapperRemBinding->setMapping(m_oplink->BindingRemove_4, (QWidget*)(m_oplink->BindingID_4));
+	addUAVObjectToWidgetRelation("OPLinkSettings", "Bindings", m_oplink->BindingID_4, "3");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteMainPort", m_oplink->RemoteMainPort_4, "3");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteFlexiPort", m_oplink->RemoteFlexiPort_4, "3");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteVCPPort", m_oplink->RemoteVCPPort_4, "3");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed_4, "3");
+        connect(m_oplink->BindingAdd_5, SIGNAL(clicked()), signalMapperAddBinding, SLOT(map()));
+	signalMapperAddBinding->setMapping(m_oplink->BindingAdd_5, (QWidget*)(m_oplink->BindingID_5));
+        connect(m_oplink->BindingRemove_5, SIGNAL(clicked()), signalMapperRemBinding, SLOT(map()));
+	signalMapperRemBinding->setMapping(m_oplink->BindingRemove_5, (QWidget*)(m_oplink->BindingID_5));
+	addUAVObjectToWidgetRelation("OPLinkSettings", "Bindings", m_oplink->BindingID_5, "4");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteMainPort", m_oplink->RemoteMainPort_5, "4");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteFlexiPort", m_oplink->RemoteFlexiPort_5, "4");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteVCPPort", m_oplink->RemoteVCPPort_5, "4");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed_5, "4");
+        connect(m_oplink->BindingAdd_6, SIGNAL(clicked()), signalMapperAddBinding, SLOT(map()));
+	signalMapperAddBinding->setMapping(m_oplink->BindingAdd_6, (QWidget*)(m_oplink->BindingID_6));
+        connect(m_oplink->BindingRemove_6, SIGNAL(clicked()), signalMapperRemBinding, SLOT(map()));
+	signalMapperRemBinding->setMapping(m_oplink->BindingRemove_6, (QWidget*)(m_oplink->BindingID_6));
+	addUAVObjectToWidgetRelation("OPLinkSettings", "Bindings", m_oplink->BindingID_6, "5");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteMainPort", m_oplink->RemoteMainPort_6, "5");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteFlexiPort", m_oplink->RemoteFlexiPort_6, "5");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteVCPPort", m_oplink->RemoteVCPPort_6, "5");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed_6, "5");
+        connect(m_oplink->BindingAdd_7, SIGNAL(clicked()), signalMapperAddBinding, SLOT(map()));
+	signalMapperAddBinding->setMapping(m_oplink->BindingAdd_7, (QWidget*)(m_oplink->BindingID_7));
+        connect(m_oplink->BindingRemove_7, SIGNAL(clicked()), signalMapperRemBinding, SLOT(map()));
+	signalMapperRemBinding->setMapping(m_oplink->BindingRemove_7, (QWidget*)(m_oplink->BindingID_7));
+	addUAVObjectToWidgetRelation("OPLinkSettings", "Bindings", m_oplink->BindingID_7, "6");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteMainPort", m_oplink->RemoteMainPort_7, "6");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteFlexiPort", m_oplink->RemoteFlexiPort_7, "6");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteVCPPort", m_oplink->RemoteVCPPort_7, "6");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed_7, "6");
+        connect(m_oplink->BindingAdd_8, SIGNAL(clicked()), signalMapperAddBinding, SLOT(map()));
+	signalMapperAddBinding->setMapping(m_oplink->BindingAdd_8, (QWidget*)(m_oplink->BindingID_8));
+        connect(m_oplink->BindingRemove_8, SIGNAL(clicked()), signalMapperRemBinding, SLOT(map()));
+	signalMapperRemBinding->setMapping(m_oplink->BindingRemove_8, (QWidget*)(m_oplink->BindingID_8));
+	addUAVObjectToWidgetRelation("OPLinkSettings", "Bindings", m_oplink->BindingID_8, "7");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteMainPort", m_oplink->RemoteMainPort_8, "7");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteFlexiPort", m_oplink->RemoteFlexiPort_8, "7");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "RemoteVCPPort", m_oplink->RemoteVCPPort_8, "7");
+	addUAVObjectToWidgetRelation("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed_8, "7");
+        connect(signalMapperAddBinding, SIGNAL(mapped(QWidget *)), this, SLOT(addBinding(QWidget *)));
+        connect(signalMapperRemBinding, SIGNAL(mapped(QWidget *)), this, SLOT(removeBinding(QWidget *)));
 
 	//Add scroll bar when necessary
 	QScrollArea *scroll = new QScrollArea;
@@ -115,37 +178,8 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 
 ConfigPipXtremeWidget::~ConfigPipXtremeWidget()
 {
-	// Do nothing
-}
-
-void ConfigPipXtremeWidget::refreshValues()
-{
-}
-
-void ConfigPipXtremeWidget::applySettings()
-{
-	OPLinkSettings *oplinkSettings = OPLinkSettings::GetInstance(getObjectManager());
-	OPLinkSettings::DataFields oplinkSettingsData = oplinkSettings->getData();
-
-	// Get the pair ID.
-	quint32 pairID = 0;
-	bool okay;
-	if (m_oplink->PairSelect1->isChecked())
-		pairID = m_oplink->PairID1->text().toUInt(&okay, 16);
-	else if (m_oplink->PairSelect2->isChecked())
-		pairID = m_oplink->PairID2->text().toUInt(&okay, 16);
-	else if (m_oplink->PairSelect3->isChecked())
-		pairID = m_oplink->PairID3->text().toUInt(&okay, 16);
-	else if (m_oplink->PairSelect4->isChecked())
-		pairID = m_oplink->PairID4->text().toUInt(&okay, 16);
-	oplinkSettings->setData(oplinkSettingsData);
-}
-
-void ConfigPipXtremeWidget::saveSettings()
-{
-	//applySettings();
-	UAVObject *obj = OPLinkSettings::GetInstance(getObjectManager());
-	saveObjectToSD(obj);
+    delete signalMapperAddBinding;
+    delete signalMapperRemBinding;
 }
 
 /*!
@@ -158,32 +192,24 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
 	if (!settingsUpdated)
 		oplinkSettingsObj->requestUpdate();
 
-	// Get the current pairID
-	//OPLinkSettings *oplinkSettings = OPLinkSettings::GetInstance(getObjectManager());
-	quint32 pairID = 0;
-
 	// Update the detected devices.
 	UAVObjectField* pairIdField = object->getField("PairIDs");
 	if (pairIdField) {
 		quint32 pairid1 = pairIdField->getValue(0).toUInt();
 		m_oplink->PairID1->setText(QString::number(pairid1, 16).toUpper());
 		m_oplink->PairID1->setEnabled(false);
-		m_oplink->PairSelect1->setChecked(pairID && (pairID == pairid1));
 		m_oplink->PairSelect1->setEnabled(pairid1);
 		quint32 pairid2 = pairIdField->getValue(1).toUInt();
 		m_oplink->PairID2->setText(QString::number(pairIdField->getValue(1).toUInt(), 16).toUpper());
 		m_oplink->PairID2->setEnabled(false);
-		m_oplink->PairSelect2->setChecked(pairID && (pairID == pairid2));
 		m_oplink->PairSelect2->setEnabled(pairid2);
 		quint32 pairid3 = pairIdField->getValue(2).toUInt();
 		m_oplink->PairID3->setText(QString::number(pairIdField->getValue(2).toUInt(), 16).toUpper());
 		m_oplink->PairID3->setEnabled(false);
-		m_oplink->PairSelect3->setChecked(pairID && (pairID == pairid3));
 		m_oplink->PairSelect3->setEnabled(pairid3);
 		quint32 pairid4 = pairIdField->getValue(3).toUInt();
 		m_oplink->PairID4->setText(QString::number(pairIdField->getValue(3).toUInt(), 16).toUpper());
 		m_oplink->PairID4->setEnabled(false);
-		m_oplink->PairSelect4->setChecked(pairID && (pairID == pairid4));
 		m_oplink->PairSelect4->setEnabled(pairid4);
 	} else {
 		qDebug() << "PipXtremeGadgetWidget: Count not read PairID field.";
@@ -249,14 +275,6 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
  		qDebug() << "PipXtremeGadgetWidget: Count not read Description field.";
  	}
 
-	// Update the DeviceID field
-	UAVObjectField* idField = object->getField("DeviceID");
-	if (idField) {
-		m_oplink->DeviceID->setText(QString::number(idField->getValue().toUInt(), 16).toUpper());
-	} else {
-		qDebug() << "PipXtremeGadgetWidget: Count not read DeviceID field.";
-	}
-
  	// Update the link state
  	UAVObjectField* linkField = object->getField("LinkState");
  	if (linkField) {
@@ -277,9 +295,6 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
 	{
 		settingsUpdated = true;
 		enableControls(true);
-
-		// Refresh the list widget.
-		refreshBindingsList();
 	}
 }
 
@@ -292,88 +307,32 @@ void ConfigPipXtremeWidget::disconnected()
 	}
 }
 
-void ConfigPipXtremeWidget::pairIDToggled(bool checked)
+void ConfigPipXtremeWidget::addBinding(QWidget *w)
 {
-	bool enabled = (m_oplink->PairSelect1->isChecked() || m_oplink->PairSelect2->isChecked() || m_oplink->PairSelect3->isChecked() || m_oplink->PairSelect4->isChecked());
-	m_oplink->BindingAdd->setEnabled(enabled);
+    if(QLineEdit *le = qobject_cast<QLineEdit *>(w)) {
+
+        // Get the pair ID out of the selection widget
+        quint32 pairID = 0;
+        bool okay;
+        if (m_oplink->PairSelect1->isChecked())
+            pairID = m_oplink->PairID1->text().toUInt(&okay, 16);
+        else if (m_oplink->PairSelect2->isChecked())
+            pairID = m_oplink->PairID2->text().toUInt(&okay, 16);
+        else if (m_oplink->PairSelect3->isChecked())
+            pairID = m_oplink->PairID3->text().toUInt(&okay, 16);
+        else if (m_oplink->PairSelect4->isChecked())
+            pairID = m_oplink->PairID4->text().toUInt(&okay, 16);
+
+        // Store the ID in the first open slot (or the last slot if all are full).
+        le->setText(QString::number(pairID, 16).toUpper());
+    }
 }
 
-void ConfigPipXtremeWidget::bindingsSelectionChanged()
+void ConfigPipXtremeWidget::removeBinding(QWidget *w)
 {
-	bool enabled = (m_oplink->Bindings->selectedItems().size() > 0);
-	m_oplink->BindingRemove->setEnabled(enabled);
-}
-
-void ConfigPipXtremeWidget::refreshBindingsList()
-{
-	m_oplink->Bindings->clear();
-	for (quint32 slot = 0; slot < OPLinkSettings::BINDINGS_NUMELEM; ++slot)
-	{
-		quint32 id = oplinkSettingsObj->getBindings(slot);
-		if (id != 0)
-			m_oplink->Bindings->addItem(QString::number(id, 16).toUpper());
-	}
-}
-
-void ConfigPipXtremeWidget::addBinding()
-{
-
-	// Get the pair ID out of the selection widget
-	quint32 pairID = 0;
-	bool okay;
-	if (m_oplink->PairSelect1->isChecked())
-		pairID = m_oplink->PairID1->text().toUInt(&okay, 16);
-	else if (m_oplink->PairSelect2->isChecked())
-		pairID = m_oplink->PairID2->text().toUInt(&okay, 16);
-	else if (m_oplink->PairSelect3->isChecked())
-		pairID = m_oplink->PairID3->text().toUInt(&okay, 16);
-	else if (m_oplink->PairSelect4->isChecked())
-		pairID = m_oplink->PairID4->text().toUInt(&okay, 16);
-
-	// Find a slot for this pair ID in the binding list.
-	quint32 slot = 0;
-	for ( ; slot < OPLinkSettings::BINDINGS_NUMELEM - 1; ++slot)
-	{
-		quint32 id = oplinkSettingsObj->getBindings(slot);
-
-		// Is this ID already in the list?
-		if (id == pairID)
-			return;
-
-		// Is this slot empty?
-		if (id == 0)
-			break;
-	}
-
-	// Store the ID in the first open slot (or the last slot if all are full).
-	oplinkSettingsObj->setBindings(slot, pairID);
-
-	// Refresh the list widget.
-	refreshBindingsList();
-}
-
-void ConfigPipXtremeWidget::removeBinding()
-{
-	// Get the selected rows from the bindings list widget.
-	QList<QListWidgetItem*> selected = m_oplink->Bindings->selectedItems();
-
-	// Zero out the selected rows in the bindings list.
-	for (int i = 0; i < selected.size(); ++i)
-		oplinkSettingsObj->setBindings(m_oplink->Bindings->row(selected[i]), 0);
-
-	// Refresh the list widget and compact the bindings list.
-	m_oplink->Bindings->clear();
-	quint32 outSlot = 0;
-	for (quint32 slot = 0; slot < OPLinkSettings::BINDINGS_NUMELEM; ++slot)
-	{
-		quint32 id = oplinkSettingsObj->getBindings(slot);
-		if (id != 0) {
-			oplinkSettingsObj->setBindings(outSlot++, id);
-			m_oplink->Bindings->addItem(QString::number(id, 16).toUpper());
-		}
-	}
-	for ( ; outSlot < OPLinkSettings::BINDINGS_NUMELEM; ++outSlot)
-		oplinkSettingsObj->setBindings(outSlot, 0);
+    if(QLineEdit *le = qobject_cast<QLineEdit *>(w)) {
+        le->setText(QString::number(0, 16).toUpper());
+    }
 }
 
 /**

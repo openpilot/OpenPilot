@@ -53,6 +53,9 @@
 
 #include <pios_spi_priv.h>
 #include <packet_handler.h>
+#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER)
+#include <gcsreceiver.h>
+#endif
 #include <pios_rfm22b_priv.h>
 #include <pios_ppm_out_priv.h>
 #include <ecc.h>
@@ -610,6 +613,11 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	}
 	rfm22b_dev->deviceID = crcs[0] | crcs[1] << 8 | crcs[2] << 16 | crcs[3] << 24;
 	DEBUG_PRINTF(2, "RF device ID: %x\n\r", rfm22b_dev->deviceID);
+
+#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER)
+        // Initialize the GCSReceive object
+	GCSReceiverInitialize();
+#endif
 
 	// Initialize the external interrupt.
 	PIOS_EXTI_Init(cfg->exti_cfg);
@@ -1776,16 +1784,26 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 					break;
 				case PACKET_TYPE_PPM:
 				{
-					PHPpmPacketHandle ppmp = (PHPpmPacketHandle)&(rfm22b_dev->rx_packet);
-					for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i) {
-						rfm22b_dev->ppm_channel[i] = ppmp->channels[i];
+                                    PHPpmPacketHandle ppmp = (PHPpmPacketHandle)&(rfm22b_dev->rx_packet);
+                                    bool ppm_output = false;
 #if defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT)
-						if (PIOS_PPM_OUTPUT)
-							PIOS_PPM_OUT_Set(PIOS_PPM_OUTPUT, i, ppmp->channels[i]);
-#endif /* PIOS_INCLUDE_PPM_OUT && PIOS_PPM_OUTPUT */
-					}
-					rfm22b_dev->ppm_fresh = true;
-					break;
+                                    if (PIOS_PPM_OUTPUT) {
+                                        ppm_output = true;
+                                        for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i) {
+                                            PIOS_PPM_OUT_Set(PIOS_PPM_OUTPUT, i, ppmp->channels[i]);
+                                        }
+                                    }
+#endif
+#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER)
+                                    if (!ppm_output) {
+                                        GCSReceiverData gcsRcvr;
+                                        for (uint8_t i = 0; (i < PIOS_RFM22B_RCVR_MAX_CHANNELS) && (i < GCSRECEIVER_CHANNEL_NUMELEM); ++i) {
+                                            gcsRcvr.Channel[i] = ppmp->channels[i];
+                                        }
+                                        GCSReceiverSet(&gcsRcvr);                                        
+                                    }
+#endif
+                                    break;
 				}
 				default:
 					break;

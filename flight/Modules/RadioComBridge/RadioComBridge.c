@@ -203,7 +203,6 @@ static int32_t RadioComBridgeInitialize(void)
 		return -1;
 
 	// Initialize the UAVObjects that we use
-	GCSReceiverInitialize();
 	OPLinkStatusInitialize();
 	ObjectPersistenceInitialize();
 
@@ -217,6 +216,9 @@ static int32_t RadioComBridgeInitialize(void)
 	// Configure our UAVObjects for updates.
 	UAVObjConnectQueue(UAVObjGetByID(OPLINKSTATUS_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
 	UAVObjConnectQueue(UAVObjGetByID(OBJECTPERSISTENCE_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL);
+#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER)
+	UAVObjConnectQueue(UAVObjGetByID(GCSRECEIVER_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
+#endif
 
 	// Initialize the statistics.
 	data->comTxErrors = 0;

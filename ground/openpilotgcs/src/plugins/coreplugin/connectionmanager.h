@@ -29,7 +29,7 @@
 #ifndef CONNECTIONMANAGER_H
 #define CONNECTIONMANAGER_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include "mainwindow.h"
 #include "generalsettings.h"
 #include "telemetrymonitorwidget.h"
@@ -37,8 +37,8 @@
 #include <QtCore/QVector>
 #include <QtCore/QIODevice>
 #include <QtCore/QLinkedList>
-#include <QtGui/QPushButton>
-#include <QtGui/QComboBox>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QComboBox>
 
 #include "core_global.h"
 #include <QTimer>

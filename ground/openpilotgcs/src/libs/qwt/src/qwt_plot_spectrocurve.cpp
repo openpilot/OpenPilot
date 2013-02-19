@@ -227,7 +227,7 @@ void QwtPlotSpectroCurve::drawSeries( QPainter *painter,
     if ( from < 0 )
         from = 0;
 
-    if ( from >= to )
+    if ( from > to )
         return;
 
     drawDots( painter, xMap, yMap, canvasRect, from, to );

@@ -28,7 +28,7 @@
 #ifndef GCSSPLASHSCREEN_H
 #define GCSSPLASHSCREEN_H
 
-#include <QSplashScreen>
+#include <QtWidgets/QSplashScreen>
 #include <QPixmap>
 #include <QPainter>
 #include <extensionsystem/pluginspec.h>

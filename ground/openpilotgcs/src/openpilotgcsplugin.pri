@@ -48,3 +48,4 @@ CONFIG += plugin plugin_with_soname
     pluginspec.path = /$$GCS_LIBRARY_BASENAME/openpilotgcs/plugins/$$PROVIDER
     INSTALLS += target pluginspec
 }
+QT += widgets

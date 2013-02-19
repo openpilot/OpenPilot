@@ -62,5 +62,5 @@ void LineardialPlugin::shutdown()
 {
    // Do nothing
 }
-Q_EXPORT_PLUGIN(LineardialPlugin)
+//Q_EXPORT_PLUGIN(LineardialPlugin)
 

@@ -17,41 +17,29 @@
 /*!
   \brief The Counter Widget
 
-  A Counter consists of a label displaying a number and
+  A Counter consists of a lineEdit displaying a number and
   one ore more (up to three) push buttons on each side
-  of the label which can be used to increment or decrement
+  of the lineEdit which can be used to increment or decrement
   the counter's value.
 
   A Counter has a range from a minimum value to a maximum value
-  and a step size. The range can be specified using
-  QwtDblRange::setRange().
-  The counter's value is an integer multiple of the step size.
+  and a step size. The range can be specified using setRange().
   The number of steps by which a button increments or decrements
-  the value can be specified using QwtCounter::setIncSteps().
-  The number of buttons can be changed with
-  QwtCounter::setNumButtons().
-
-  Holding the space bar down with focus on a button is the
-  fastest method to step through the counter values.
-  When the counter underflows/overflows, the focus is set
-  to the smallest up/down button and counting is disabled.
-  Counting is re-enabled on a button release event (mouse or
-  space bar).
+  the value can be specified using setIncSteps().
+  The number of buttons can be changed with setNumButtons().
 
   Example:
 \code
-#include "../include/qwt_counter.h>
+#include <qwt_counter.h>
 
-QwtCounter *cnt;
+QwtCounter *counter = new QwtCounter(parent);
 
-cnt = new QwtCounter(parent, name);
+counter->setRange(0.0, 100.0, 1.0);             // From 0.0 to 100, step 1.0
+counter->setNumButtons(2);                      // Two buttons each side
+counter->setIncSteps(QwtCounter::Button1, 1);   // Button 1 increments 1 step
+counter->setIncSteps(QwtCounter::Button2, 20);  // Button 2 increments 20 steps
 
-cnt->setRange(0.0, 100.0, 1.0);             // From 0.0 to 100, step 1.0
-cnt->setNumButtons(2);                      // Two buttons each side
-cnt->setIncSteps(QwtCounter::Button1, 1);   // Button 1 increments 1 step
-cnt->setIncSteps(QwtCounter::Button2, 20);  // Button 2 increments 20 steps
-
-connect(cnt, SIGNAL(valueChanged(double)), my_class, SLOT(newValue(double)));
+connect(counter, SIGNAL(valueChanged(double)), my_class, SLOT(newValue(double)));
 \endcode
  */
 

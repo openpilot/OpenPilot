@@ -32,7 +32,7 @@
 
 #include <QtGui/QPaintEvent>
 #include <QtGui/QPainter>
-#include <QtGui/QSplitterHandle>
+#include <QtWidgets/QSplitterHandle>
 
 namespace Core {
 namespace Internal {

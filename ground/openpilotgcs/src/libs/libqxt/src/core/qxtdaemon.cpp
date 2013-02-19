@@ -211,7 +211,7 @@ bool QxtDaemon::daemonize(bool pidfile)
 
 
     assert(logfile->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append));
-    qInstallMsgHandler(QxtDaemon::messageHandler);
+    //qInstallMessageHandler(QxtDaemon::messageHandler);
 
     return true;
 #else

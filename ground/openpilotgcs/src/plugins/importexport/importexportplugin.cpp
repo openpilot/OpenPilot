@@ -91,7 +91,7 @@ void ImportExportPlugin::shutdown()
 {
     // Do nothing
 }
-Q_EXPORT_PLUGIN(ImportExportPlugin)
+//Q_EXPORT_PLUGIN(ImportExportPlugin)
 
 /**
  * @}

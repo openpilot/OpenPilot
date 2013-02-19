@@ -26,7 +26,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "mytabwidget.h"
-#include <QtGui/QTabBar>
+#include <QTabBar>
 
 MyTabWidget::MyTabWidget(QWidget *parent)
     : QTabWidget(parent)

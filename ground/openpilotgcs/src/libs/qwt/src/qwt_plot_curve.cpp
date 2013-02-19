@@ -192,6 +192,10 @@ QwtPlotCurve::CurveStyle QwtPlotCurve::style() const
 /*!
   Assign a symbol
 
+  The curve will take the ownership of the symbol, hence the previously
+  set symbol will be delete by setting a new one. If \p symbol is 
+  \c NULL no symbol will be drawn.
+
   \param symbol Symbol
   \sa symbol()
 */
@@ -792,33 +796,29 @@ void QwtPlotCurve::drawSymbols( QPainter *painter, const QwtSymbol &symbol,
 
     if ( usePixmap )
     {
-        QPixmap pm( symbol.boundingSize() );
-        pm.fill( Qt::transparent );
+        const QSize sz = ( 2 * symbol.boundingSize() + QSize( 1, 1 ) ) / 2;
+        const int w2 = sz.width() / 2;
+        const int h2 = sz.height() / 2;
 
-        const double pw2 = 0.5 * pm.width();
-        const double ph2 = 0.5 * pm.height();
+        QPixmap pm( sz );
+        pm.fill( Qt::transparent );
 
         QPainter p( &pm );
         p.setRenderHints( painter->renderHints() );
-        symbol.drawSymbol( &p, QPointF( pw2, ph2 ) );
+        symbol.drawSymbol( &p, QPointF( w2, h2 ) );
         p.end();
 
         for ( int i = from; i <= to; i++ )
         {
             const QPointF sample = d_series->sample( i );
 
-            double xi = xMap.transform( sample.x() );
-            double yi = yMap.transform( sample.y() );
-            if ( doAlign )
-            {
-                xi = qRound( xi );
-                yi = qRound( yi );
-            }
+            const double xi = xMap.transform( sample.x() );
+            const double yi = yMap.transform( sample.y() );
 
             if ( canvasRect.contains( xi, yi ) )
             {
-                const int left = qCeil( xi ) - pw2;
-                const int top = qCeil( yi ) - ph2;
+                const int left = qRound( xi ) - w2;
+                const int top = qRound( yi ) - h2;
 
                 painter->drawPixmap( left, top, pm );
             }
@@ -855,15 +855,16 @@ void QwtPlotCurve::drawSymbols( QPainter *painter, const QwtSymbol &symbol,
 
   The baseline is needed for filling the curve with a brush or
   the Sticks drawing style.
-  The interpretation of the baseline depends on the CurveType.
-  With QwtPlotCurve::Yfx, the baseline is interpreted as a horizontal line
-  at y = baseline(), with QwtPlotCurve::Yfy, it is interpreted as a vertical
+
+  The interpretation of the baseline depends on the orientation().
+  With Qt::Horizontal, the baseline is interpreted as a horizontal line
+  at y = baseline(), with Qt::Vertical, it is interpreted as a vertical
   line at x = baseline().
 
   The default value is 0.0.
 
   \param value Value of the baseline
-  \sa baseline(), setBrush(), setStyle(), setStyle()
+  \sa baseline(), setBrush(), setStyle(), QwtPlotAbstractSeriesItem::orientation()
 */
 void QwtPlotCurve::setBaseline( double value )
 {
@@ -984,9 +985,9 @@ void QwtPlotCurve::drawLegendIdentifier(
     if ( rect.isEmpty() )
         return;
 
-    const int dim = qMin( rect.width(), rect.height() );
+    const double dim = qMin( rect.width(), rect.height() );
 
-    QSize size( dim, dim );
+    QSizeF size( dim, dim );
 
     QRectF r( 0, 0, size.width(), size.height() );
     r.moveCenter( rect.center() );

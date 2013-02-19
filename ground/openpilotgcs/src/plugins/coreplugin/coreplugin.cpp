@@ -78,4 +78,4 @@ void CorePlugin::shutdown()
     m_mainWindow->shutdown();
 }
 
-Q_EXPORT_PLUGIN2(Core,CorePlugin)
+//Q_EXPORT_PLUGIN2(Core,CorePlugin)

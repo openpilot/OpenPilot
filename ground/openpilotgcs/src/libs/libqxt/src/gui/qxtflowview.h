@@ -50,7 +50,7 @@
 #ifndef QXT_FLOWVIEW_H
 #define QXT_FLOWVIEW_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <QAbstractItemModel>
 #include "qxtglobal.h"
 

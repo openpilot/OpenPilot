@@ -25,7 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include "savepage.h"
 #include "ui_savepage.h"
 #include "setupwizard.h"

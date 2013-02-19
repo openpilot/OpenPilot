@@ -62,4 +62,4 @@ void SystemHealthPlugin::shutdown()
 {
    // Do nothing
 }
-Q_EXPORT_PLUGIN(SystemHealthPlugin)
+//Q_EXPORT_PLUGIN(SystemHealthPlugin)

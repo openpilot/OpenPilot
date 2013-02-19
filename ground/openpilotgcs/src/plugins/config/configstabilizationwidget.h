@@ -33,7 +33,7 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "stabilizationsettings.h"
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QTimer>
 
 

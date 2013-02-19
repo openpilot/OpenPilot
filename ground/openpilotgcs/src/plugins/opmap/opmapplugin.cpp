@@ -60,4 +60,4 @@ void OPMapPlugin::shutdown()
 {
    // Do nothing
 }
-Q_EXPORT_PLUGIN(OPMapPlugin)
+//Q_EXPORT_PLUGIN(OPMapPlugin)

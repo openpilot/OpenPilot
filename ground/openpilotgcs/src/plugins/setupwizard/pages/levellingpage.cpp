@@ -25,7 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QDebug>
 #include "levellingpage.h"
 #include "ui_levellingpage.h"

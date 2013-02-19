@@ -139,7 +139,13 @@ void QwtPlotMarker::draw( QPainter *painter,
     if ( d_data->symbol &&
         ( d_data->symbol->style() != QwtSymbol::NoSymbol ) )
     {
-        d_data->symbol->drawSymbol( painter, pos );
+        const QSizeF sz = d_data->symbol->size();
+
+        const QRectF clipRect = canvasRect.adjusted( 
+            -sz.width(), -sz.height(), sz.width(), sz.height() );
+
+        if ( clipRect.contains( pos ) )
+            d_data->symbol->drawSymbol( painter, pos );
     }
 
     drawLabel( painter, canvasRect, pos );

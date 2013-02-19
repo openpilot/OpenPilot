@@ -326,7 +326,7 @@ QVariant QxtXmlRpc::deserialize(QXmlStreamReader & xml)
             }
             else if (xml.name().toString() == "base64")
             {
-                return QByteArray::fromBase64(xml.readElementText().toAscii());
+                return QByteArray::fromBase64(xml.readElementText().toLatin1());
             }
             else if (xml.name().toString() == "boolean")
             {

@@ -105,7 +105,7 @@
 */
 
 #include "uavconfiginfo.h"
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 #define VERSION_DEFAULT  "0.0.0"
 

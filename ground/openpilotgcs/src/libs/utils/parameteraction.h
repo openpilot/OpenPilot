@@ -31,7 +31,7 @@
 
 #include "utils_global.h"
 
-#include <QtGui/QAction>
+#include <QAction>
 
 namespace Utils {
 

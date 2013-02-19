@@ -28,7 +28,7 @@
 #ifndef UDPTESTWIDGET_H
 #define UDPTESTWIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <QUdpSocket>
 #include <QTime>
 #include <qmath.h>

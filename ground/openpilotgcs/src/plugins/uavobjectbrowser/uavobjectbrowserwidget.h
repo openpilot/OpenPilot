@@ -28,8 +28,8 @@
 #ifndef UAVOBJECTBROWSERWIDGET_H_
 #define UAVOBJECTBROWSERWIDGET_H_
 
-#include <QtGui/QWidget>
-#include <QtGui/QTreeView>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QTreeView>
 #include "objectpersistence.h"
 #include "uavobjecttreemodel.h"
 

@@ -97,4 +97,4 @@ void SetupWizardPlugin::wizardTerminated()
     disconnect(this,SLOT(wizardTerminated()));
 }
 
-Q_EXPORT_PLUGIN(SetupWizardPlugin)
+//Q_EXPORT_PLUGIN(SetupWizardPlugin)

@@ -263,7 +263,7 @@ QString pjrc_rawhid::getserial(int num) {
     if (!hid || !hid->open) return QString("");
 
     int retlen = usb_get_string_simple(hid->usb, 3, buf, 128);
-    return QString().fromAscii(buf,-1);
+    return QString().fromLatin1(buf,-1);
 }
 
 //  close - close a device

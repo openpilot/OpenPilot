@@ -36,8 +36,8 @@
 #include <utils/stylehelper.h>
 
 #include <QtGui/QApplication>
-#include <QtGui/QComboBox>
-#include <QtGui/QDialog>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QDialog>
 #include <QtGui/QDialogButtonBox>
 #include <QtGui/QDockWidget>
 #include <QtGui/QLabel>
@@ -47,7 +47,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QPixmap>
 #include <QtGui/QPixmapCache>
-#include <QtGui/QPushButton>
+#include <QtWidgets/QPushButton>
 #include <QtGui/QScrollArea>
 #include <QtGui/QSplitter>
 #include <QtGui/QStatusBar>

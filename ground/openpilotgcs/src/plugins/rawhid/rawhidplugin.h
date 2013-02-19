@@ -83,6 +83,7 @@ class RAWHID_EXPORT RawHIDPlugin
     : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Openpilot")
 
 public:
     RawHIDPlugin();

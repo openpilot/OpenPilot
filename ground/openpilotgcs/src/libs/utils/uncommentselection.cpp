@@ -27,7 +27,7 @@
  */
 
 #include "uncommentselection.h"
-#include <QtGui/QPlainTextEdit>
+#include <QPlainTextEdit>
 #include <QtGui/QTextCursor>
 #include <QtGui/QTextBlock>
 #include <QtGui/QTextDocument>

@@ -33,8 +33,8 @@
 #include <QtCore/QVariant>
 #include <QtGui/QPainter>
 #include <QtGui/QPixmapCache>
-#include <QtGui/QStyle>
-#include <QtGui/QStyleOption>
+#include <QStyle>
+#include <QStyleOption>
 
 using namespace Utils;
 

@@ -8,21 +8,36 @@ include(../../../openpilotgcslibrary.pri)
 # event driven device enumeration on windows requires the gui module
 !win32:QT               -= gui
 
-HEADERS                 = qextserialport.h \
-                          qextserialenumerator.h \
-                          qextserialport_global.h
-SOURCES                 = qextserialport.cpp
+PUBLIC_HEADERS         += $$PWD/qextserialport.h \
+                          $$PWD/qextserialenumerator.h \
+                          $$PWD/qextserialport_global.h
 
-unix:SOURCES           += posix_qextserialport.cpp
-unix:!macx:SOURCES     += qextserialenumerator_unix.cpp
-macx {
-  SOURCES          += qextserialenumerator_osx.cpp
-  LIBS             += -framework IOKit -framework CoreFoundation
+HEADERS                += $$PUBLIC_HEADERS \
+                          $$PWD/qextserialport_p.h \
+                          $$PWD/qextserialenumerator_p.h \
+
+SOURCES                += $$PWD/qextserialport.cpp \
+                          $$PWD/qextserialenumerator.cpp
+unix {
+    SOURCES            += $$PWD/qextserialport_unix.cpp
+    linux* {
+        SOURCES        += $$PWD/qextserialenumerator_linux.cpp
+    } else:macx {
+        SOURCES        += $$PWD/qextserialenumerator_osx.cpp
+    } else {
+        SOURCES        += $$PWD/qextserialenumerator_unix.cpp
+    }
+}
+win32:SOURCES          += $$PWD/qextserialport_win.cpp \
+                          $$PWD/qextserialenumerator_win.cpp
+
+linux*{
+    !qesp_linux_udev:DEFINES += QESP_NO_UDEV
+    qesp_linux_udev: LIBS += -ludev
 }
 
-win32 {
-  SOURCES          += win_qextserialport.cpp qextserialenumerator_win.cpp
-  DEFINES          += WINVER=0x0501 # needed for mingw to pull in appropriate dbt business...probably a better way to do this
-  LIBS             += -lsetupapi
-}
+macx:LIBS              += -framework IOKit -framework CoreFoundation
+win32:LIBS             += -lsetupapi -ladvapi32 -luser32
 
+# moc doesn't detect Q_OS_LINUX correctly, so add this to make it work
+linux*:DEFINES += __linux__

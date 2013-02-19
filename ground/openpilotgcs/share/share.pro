@@ -1,7 +1,7 @@
 include(../openpilotgcs.pri)
 
 TEMPLATE = subdirs
-SUBDIRS = openpilotgcs/translations
+#SUBDIRS = openpilotgcs/translations
 
 DATACOLLECTIONS = dials models pfd sounds diagrams mapicons stylesheets default_configurations
 

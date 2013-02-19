@@ -209,12 +209,12 @@ void QxtMailMessage::removeAttachment(const QString& filename)
 QByteArray qxt_fold_mime_header(const QString& key, const QString& value, QTextCodec* latin1, const QByteArray& prefix)
 {
     QByteArray rv = "";
-    QByteArray line = key.toAscii() + ": ";
+    QByteArray line = key.toLatin1() + ": ";
     if (!prefix.isEmpty()) line += prefix;
     if (!value.contains("=?") && latin1->canEncode(value))
     {
         bool firstWord = true;
-        foreach(const QByteArray& word, value.toAscii().split(' '))
+        foreach(const QByteArray& word, value.toLatin1().split(' '))
         {
             if (line.size() > 78)
             {
@@ -335,7 +335,7 @@ QByteArray QxtMailMessage::rfc2822() const
     if (attach.count())
     {
         if (qxt_d->boundary.isEmpty())
-            qxt_d->boundary = QUuid::createUuid().toString().toAscii().replace("{", "").replace("}", "");
+            qxt_d->boundary = QUuid::createUuid().toString().toLatin1().replace("{", "").replace("}", "");
         if (!hasExtraHeader("MIME-Version"))
             rv += "MIME-Version: 1.0\r\n";
         if (!hasExtraHeader("Content-Type"))
@@ -362,7 +362,7 @@ QByteArray QxtMailMessage::rfc2822() const
             // Since we're in multipart mode, we'll be outputting this later
             continue;
         }
-        rv += qxt_fold_mime_header(r.toAscii(), extraHeader(r), latin1);
+        rv += qxt_fold_mime_header(r.toLatin1(), extraHeader(r), latin1);
     }
 
     rv += "\r\n";

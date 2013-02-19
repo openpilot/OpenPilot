@@ -31,9 +31,9 @@
 #include <math.h>
 #include <QDebug>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QPushButton>
 
 // Message Codes
 #define NMEA_NODATA		0	// No data. Packet not available, bad, or not decoded
@@ -151,7 +151,7 @@ void NMEAParser::nmeaTerminateAtChecksum(char* gps_buffer)
 uint8_t NMEAParser::nmeaProcess(cBuffer* rxBuffer)
 {
         uint8_t foundpacket = NMEA_NODATA;
-        uint8_t startFlag = FALSE;
+        uint8_t startFlag = false;
         //u08 data;
         uint16_t i,j;
 
@@ -163,7 +163,7 @@ uint8_t NMEAParser::nmeaProcess(cBuffer* rxBuffer)
                 if(bufferGetAtIndex(rxBuffer,0) == '$')
                 {
                         // found start
-                        startFlag = TRUE;
+                        startFlag = true;
                         // when start is found, we leave it intact in the receive buffer
                         // in case the full NMEA string is not completely received.  The
                         // start will be detected in the next nmeaProcess iteration.

@@ -72,18 +72,40 @@ public:
      */
     enum RttiValues
     {
+        //! Unspecific value, that can be used, when it doesn't matter
         Rtti_PlotItem = 0,
 
+        //! For QwtPlotGrid
         Rtti_PlotGrid,
+
+        //! For QwtPlotScaleItem
         Rtti_PlotScale,
+
+        //! For QwtPlotMarker
         Rtti_PlotMarker,
+
+        //! For QwtPlotCurve
         Rtti_PlotCurve,
+
+        //! For QwtPlotSpectroCurve
         Rtti_PlotSpectroCurve,
+
+        //! For QwtPlotIntervalCurve
         Rtti_PlotIntervalCurve,
+
+        //! For QwtPlotHistogram
         Rtti_PlotHistogram,
+
+        //! For QwtPlotSpectrogram
         Rtti_PlotSpectrogram,
+
+        //! For QwtPlotSvgItem
         Rtti_PlotSVG,
 
+        /*! 
+           Values >= Rtti_PlotUserItem are reserved for plot items
+           not implemented in the Qwt library.
+         */
         Rtti_PlotUserItem = 1000
     };
 

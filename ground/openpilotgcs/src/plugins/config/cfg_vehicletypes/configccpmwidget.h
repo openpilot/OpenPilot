@@ -36,7 +36,7 @@
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QGraphicsEllipseItem>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QList>
 
 #define CCPM_MAX_SWASH_SERVOS 4

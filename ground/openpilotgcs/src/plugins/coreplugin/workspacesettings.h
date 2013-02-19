@@ -31,7 +31,7 @@
 #include <coreplugin/dialogs/ioptionspage.h>
 #include <QtCore/QObject>
 #include <QtCore/QStringList>
-#include <QtGui/QTabWidget>
+#include <QtWidgets/QTabWidget>
 
 class QSettings;
 

@@ -39,10 +39,10 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QtPlugin>
-#include <QtGui/QAction>
-#include <QtGui/QMenu>
-#include <QtGui/QMessageBox>
-#include <QtGui/QPushButton>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QPushButton>
 
 using namespace Welcome::Internal;
 
@@ -92,4 +92,4 @@ void WelcomePlugin::extensionsInitialized()
     Core::ModeManager::instance()->activateMode(m_welcomeMode->uniqueModeName());
 }
 
-Q_EXPORT_PLUGIN(WelcomePlugin)
+//Q_EXPORT_PLUGIN(WelcomePlugin)

@@ -32,7 +32,7 @@
 #include <utils/qtcolorbutton.h>
 #include <utils/consoleprocess.h>
 #include <coreplugin/icore.h>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtCore/QDir>
 
 #include <QtCore/QLibraryInfo>

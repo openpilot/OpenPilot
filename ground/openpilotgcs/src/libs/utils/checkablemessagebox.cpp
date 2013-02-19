@@ -29,7 +29,7 @@
 #include "checkablemessagebox.h"
 #include "ui_checkablemessagebox.h"
 
-#include <QtGui/QPushButton>
+#include <QPushButton>
 #include <QtCore/QDebug>
 
 namespace Utils {

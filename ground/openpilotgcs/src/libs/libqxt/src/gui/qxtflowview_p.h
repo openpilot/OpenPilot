@@ -64,7 +64,7 @@
 #include <QPixmap>
 #include <QTimer>
 #include <QVector>
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <QAbstractItemModel>
 #include <QPersistentModelIndex>
 #include <QList>

@@ -29,9 +29,9 @@ plugin_welcome.depends = plugin_coreplugin
 SUBDIRS += plugin_welcome
 
 # RawHID connection plugin
-SUBDIRS += plugin_rawhid
-plugin_rawhid.subdir = rawhid
-plugin_rawhid.depends = plugin_coreplugin
+#SUBDIRS += plugin_rawhid
+#plugin_rawhid.subdir = rawhid
+#plugin_rawhid.depends = plugin_coreplugin
 
 # Serial port connection plugin
 SUBDIRS += plugin_serial
@@ -50,12 +50,12 @@ plugin_uavtalk.depends = plugin_uavobjects
 plugin_uavtalk.depends += plugin_coreplugin
 
 # OPMap UAVGadget
-plugin_opmap.subdir = opmap
-plugin_opmap.depends = plugin_coreplugin
-plugin_opmap.depends += plugin_uavobjects
-plugin_opmap.depends += plugin_uavobjectutil
-plugin_opmap.depends += plugin_uavtalk
-SUBDIRS += plugin_opmap
+#plugin_opmap.subdir = opmap
+#plugin_opmap.depends = plugin_coreplugin
+#plugin_opmap.depends += plugin_uavobjects
+#plugin_opmap.depends += plugin_uavobjectutil
+#plugin_opmap.depends += plugin_uavtalk
+#SUBDIRS += plugin_opmap
 
 # Scope UAVGadget
 plugin_scope.subdir = scope
@@ -71,31 +71,31 @@ plugin_uavobjectbrowser.depends += plugin_uavobjects
 SUBDIRS += plugin_uavobjectbrowser
 
 # ModelView UAVGadget
-plugin_modelview.subdir = modelview
-plugin_modelview.depends = plugin_coreplugin
-plugin_modelview.depends += plugin_uavobjects
-SUBDIRS += plugin_modelview
+#plugin_modelview.subdir = modelview
+#plugin_modelview.depends = plugin_coreplugin
+#plugin_modelview.depends += plugin_uavobjects
+#SUBDIRS += plugin_modelview
 
 #Qt 4.8.0 / phonon may crash on Mac, fixed in Qt 4.8.1, QTBUG-23128
 macx:contains(QT_VERSION, ^4\\.8\\.0): CONFIG += disable_notify_plugin
 
 # Notify gadget
-!disable_notify_plugin {
-    plugin_notify.subdir = notify
-    plugin_notify.depends = plugin_coreplugin
-    plugin_notify.depends += plugin_uavobjects
-    plugin_notify.depends += plugin_uavtalk
-    SUBDIRS += plugin_notify
-}
+#!disable_notify_plugin {
+#    plugin_notify.subdir = notify
+#    plugin_notify.depends = plugin_coreplugin
+#    plugin_notify.depends += plugin_uavobjects
+#    plugin_notify.depends += plugin_uavtalk
+#    SUBDIRS += plugin_notify
+#}
 
 # Uploader gadget
-plugin_uploader.subdir = uploader
-plugin_uploader.depends = plugin_coreplugin
-plugin_uploader.depends += plugin_uavobjects
-plugin_uploader.depends += plugin_uavtalk
-plugin_uploader.depends += plugin_rawhid
-plugin_uploader.depends += plugin_uavobjectutil
-SUBDIRS += plugin_uploader
+#plugin_uploader.subdir = uploader
+#plugin_uploader.depends = plugin_coreplugin
+#plugin_uploader.depends += plugin_uavobjects
+#plugin_uploader.depends += plugin_uavtalk
+#plugin_uploader.depends += plugin_rawhid
+#plugin_uploader.depends += plugin_uavobjectutil
+#SUBDIRS += plugin_uploader
 
 # Dial gadget
 plugin_dial.subdir = dial
@@ -117,20 +117,20 @@ plugin_systemhealth.depends += plugin_uavtalk
 SUBDIRS += plugin_systemhealth
 
 # Config gadget
-plugin_config.subdir = config
-plugin_config.depends = plugin_coreplugin
-plugin_config.depends += plugin_uavtalk
-plugin_config.depends += plugin_uavobjects
-plugin_config.depends += plugin_uavobjectutil
-plugin_config.depends += plugin_uavobjectwidgetutils
-plugin_config.depends += plugin_uavsettingsimportexport
-SUBDIRS += plugin_config
+#plugin_config.subdir = config
+#plugin_config.depends = plugin_coreplugin
+#plugin_config.depends += plugin_uavtalk
+#plugin_config.depends += plugin_uavobjects
+#plugin_config.depends += plugin_uavobjectutil
+#plugin_config.depends += plugin_uavobjectwidgetutils
+#plugin_config.depends += plugin_uavsettingsimportexport
+#SUBDIRS += plugin_config
 
 # GPS Display gadget
-plugin_gpsdisplay.subdir = gpsdisplay
-plugin_gpsdisplay.depends = plugin_coreplugin
-plugin_gpsdisplay.depends += plugin_uavobjects
-SUBDIRS += plugin_gpsdisplay
+#plugin_gpsdisplay.subdir = gpsdisplay
+#plugin_gpsdisplay.depends = plugin_coreplugin
+#plugin_gpsdisplay.depends += plugin_uavobjects
+#SUBDIRS += plugin_gpsdisplay
 
 # Primary Flight Display (PFD) gadget
 plugin_pfd.subdir = pfd
@@ -162,11 +162,11 @@ plugin_ipconnection.depends = plugin_coreplugin
 SUBDIRS += plugin_ipconnection
 
 #HITL Simulation gadget
-plugin_hitl.subdir = hitl
-plugin_hitl.depends = plugin_coreplugin
-plugin_hitl.depends += plugin_uavobjects
-plugin_hitl.depends += plugin_uavtalk
-SUBDIRS += plugin_hitl
+#plugin_hitl.subdir = hitl
+#plugin_hitl.depends = plugin_coreplugin
+#plugin_hitl.depends += plugin_uavobjects
+#plugin_hitl.depends += plugin_uavtalk
+#SUBDIRS += plugin_hitl
 
 # Export and Import GCS Configuration
 plugin_importexport.subdir = importexport
@@ -237,12 +237,12 @@ plugin_uavobjectwidgetutils.depends += plugin_uavtalk
 SUBDIRS += plugin_uavobjectwidgetutils
 
 # Setup Wizard plugin
-plugin_setupwizard.subdir = setupwizard
-plugin_setupwizard.depends = plugin_coreplugin
-plugin_setupwizard.depends += plugin_uavobjectutil
-plugin_setupwizard.depends += plugin_config
-plugin_setupwizard.depends += plugin_uploader
-SUBDIRS += plugin_setupwizard
+#plugin_setupwizard.subdir = setupwizard
+#plugin_setupwizard.depends = plugin_coreplugin
+#plugin_setupwizard.depends += plugin_uavobjectutil
+#plugin_setupwizard.depends += plugin_config
+#plugin_setupwizard.depends += plugin_uploader
+#SUBDIRS += plugin_setupwizard
 
 # Junsi Powerlog plugin
 #plugin_powerlog.subdir = powerlog

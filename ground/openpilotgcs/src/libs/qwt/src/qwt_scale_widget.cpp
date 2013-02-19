@@ -201,19 +201,20 @@ void QwtScaleWidget::setTitle( const QwtText &title )
 */
 void QwtScaleWidget::setAlignment( QwtScaleDraw::Alignment alignment )
 {
+    if ( d_data->scaleDraw )
+        d_data->scaleDraw->setAlignment( alignment );
+
     if ( !testAttribute( Qt::WA_WState_OwnSizePolicy ) )
     {
         QSizePolicy policy( QSizePolicy::MinimumExpanding,
             QSizePolicy::Fixed );
         if ( d_data->scaleDraw->orientation() == Qt::Vertical )
             policy.transpose();
-        setSizePolicy( policy );
 
+        setSizePolicy( policy );
         setAttribute( Qt::WA_WState_OwnSizePolicy, false );
     }
 
-    if ( d_data->scaleDraw )
-        d_data->scaleDraw->setAlignment( alignment );
     layoutScale();
 }
 
@@ -645,7 +646,7 @@ void QwtScaleWidget::drawTitle( QPainter *painter,
 
     QwtText title = d_data->title;
     title.setRenderFlags( flags );
-    title.draw( painter, QRect( 0, 0, r.width(), r.height() ) );
+    title.draw( painter, QRectF( 0.0, 0.0, r.width(), r.height() ) );
 
     painter->restore();
 }
@@ -712,7 +713,7 @@ QSize QwtScaleWidget::minimumSizeHint() const
 
 int QwtScaleWidget::titleHeightForWidth( int width ) const
 {
-    return d_data->title.heightForWidth( width, font() );
+    return qCeil( d_data->title.heightForWidth( width, font() ) );
 }
 
 /*!

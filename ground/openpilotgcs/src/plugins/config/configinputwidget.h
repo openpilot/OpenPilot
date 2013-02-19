@@ -32,7 +32,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QList>
 #include "inputchannelform.h"
 #include "ui_inputchannelform.h"

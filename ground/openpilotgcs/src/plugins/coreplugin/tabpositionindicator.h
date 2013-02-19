@@ -29,7 +29,7 @@
 #ifndef TABPOSITIONINDICATOR_H
 #define TABPOSITIONINDICATOR_H
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 namespace Core {
 namespace Internal {

@@ -32,7 +32,7 @@
 #include "utils_global.h"
 #include "../extensionsystem/pluginmanager.h"
 #include <QDir>
-#include <QApplication>
+#include <QtWidgets/QApplication>
 #include <QSettings>
 
 namespace Utils {

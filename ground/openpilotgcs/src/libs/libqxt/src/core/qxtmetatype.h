@@ -111,7 +111,7 @@ public:
 
 inline void* qxtConstructByName(const char* typeName, const void* copy = 0)
 {
-    return QMetaType::construct(QMetaType::type(typeName), copy);
+    return QMetaType::create(QMetaType::type(typeName), copy);
 }
 
 inline void qxtDestroyByName(const char* typeName, void* data)

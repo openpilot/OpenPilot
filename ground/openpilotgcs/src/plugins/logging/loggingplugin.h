@@ -53,6 +53,7 @@ class LoggingConnection
     : public Core::IConnection
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Openpilot")
 public:
     LoggingConnection();
     virtual ~LoggingConnection();

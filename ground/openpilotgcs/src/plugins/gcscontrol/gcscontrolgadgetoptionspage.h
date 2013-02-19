@@ -34,10 +34,10 @@
 #include <SDL/SDL.h>
 
 #include <QDebug>
-#include <QtGui/QCheckBox>
-#include <QtGui/QComboBox>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QLabel>
+#include <QCheckBox>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QDoubleSpinBox>
+#include <QtWidgets/QLabel>
 
 namespace Core {
 class IUAVGadgetConfiguration;

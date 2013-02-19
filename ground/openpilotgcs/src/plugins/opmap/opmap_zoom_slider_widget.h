@@ -28,7 +28,7 @@
 #ifndef OPMAP_ZOOM_SLIDER_WIDGET_H
 #define OPMAP_ZOOM_SLIDER_WIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 namespace Ui {
     class opmap_zoom_slider_widget;

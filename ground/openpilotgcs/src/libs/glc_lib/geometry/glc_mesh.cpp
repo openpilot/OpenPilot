@@ -662,7 +662,7 @@ void GLC_Mesh::setCurrentLod(const int value)
 	{
 		const int numberOfLod= m_MeshData.lodCount() - 1;
 		// Clamp value to number of load
-		m_CurrentLod= qRound(static_cast<int>((static_cast<double>(value) / 100.0) * numberOfLod));
+        m_CurrentLod= qRound(((static_cast<double>(value) / 100.0) * numberOfLod));
 	}
 	else
 	{

@@ -20,8 +20,8 @@ class QwtRoundScaleDraw::PrivateData
 {
 public:
     PrivateData():
-        center( 50, 50 ),
-        radius( 50 ),
+        center( 50.0, 50.0 ),
+        radius( 50.0 ),
         startAngle( -135 * 16 ),
         endAngle( 135 * 16 )
     {
@@ -77,7 +77,7 @@ void QwtRoundScaleDraw::setRadius( int radius )
 */
 int QwtRoundScaleDraw::radius() const
 {
-    return d_data->radius;
+    return qCeil( d_data->radius );
 }
 
 /*!
@@ -220,14 +220,17 @@ void QwtRoundScaleDraw::drawTick( QPainter *painter, double value, double len ) 
 */
 void QwtRoundScaleDraw::drawBackbone( QPainter *painter ) const
 {
-    const double a1 = qMin( scaleMap().p1(), scaleMap().p2() ) - 90 * 16;
-    const double a2 = qMax( scaleMap().p1(), scaleMap().p2() ) - 90 * 16;
+    const double deg1 = scaleMap().p1();
+    const double deg2 = scaleMap().p2();
+
+    const int a1 = qRound( qMin( deg1, deg2 ) - 90 * 16 );
+    const int a2 = qRound( qMax( deg1, deg2 ) - 90 * 16 );
 
     const double radius = d_data->radius;
     const double x = d_data->center.x() - radius;
     const double y = d_data->center.y() - radius;
 
-    painter->drawArc( x, y, 2 * radius, 2 * radius,
+    painter->drawArc( QRectF( x, y, 2 * radius, 2 * radius ),
         -a2, a2 - a1 + 1 );          // counterclockwise
 }
 

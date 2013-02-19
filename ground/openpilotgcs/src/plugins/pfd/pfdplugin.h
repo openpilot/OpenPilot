@@ -34,6 +34,8 @@ class PFDGadgetFactory;
 
 class PFDPlugin : public ExtensionSystem::IPlugin
 {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Openpilot")
 public:
         PFDPlugin();
    ~PFDPlugin();

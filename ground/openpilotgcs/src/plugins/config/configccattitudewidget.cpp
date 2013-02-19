@@ -29,7 +29,7 @@
 #include "utils/coordinateconversions.h"
 #include "attitudesettings.h"
 #include <QMutexLocker>
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QUrl>

@@ -1085,7 +1085,7 @@ void GLC_WorldTo3dxml::addImageTextureTo3dxml(const QImage& image, const QString
 		success= m_pCurrentZipFile->open(QIODevice::WriteOnly, quazipNewInfo);
 		if (success)
 		{
-			image.save(m_pCurrentZipFile, QFileInfo(fileName).suffix().toAscii().constData());
+			image.save(m_pCurrentZipFile, QFileInfo(fileName).suffix().toLatin1().constData());
 			m_pCurrentZipFile->close();
 			delete m_pCurrentZipFile;
 			m_pCurrentZipFile= NULL;
@@ -1098,7 +1098,7 @@ void GLC_WorldTo3dxml::addImageTextureTo3dxml(const QImage& image, const QString
 		success= m_pCurrentFile->open(QIODevice::WriteOnly);
 		if (success)
 		{
-			image.save(m_pCurrentFile, QFileInfo(fileName).suffix().toAscii().constData());
+			image.save(m_pCurrentFile, QFileInfo(fileName).suffix().toLatin1().constData());
 			delete m_pCurrentFile;
 			m_pCurrentFile= NULL;
 		}

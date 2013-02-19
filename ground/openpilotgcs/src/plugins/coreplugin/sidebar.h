@@ -31,8 +31,8 @@
 
 #include <QtCore/QMap>
 #include <QtCore/QPointer>
-#include <QtGui/QWidget>
-#include <QtGui/QComboBox>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QComboBox>
 
 #include <coreplugin/minisplitter.h>
 

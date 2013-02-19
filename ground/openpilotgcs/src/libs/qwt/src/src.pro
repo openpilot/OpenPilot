@@ -205,3 +205,5 @@ contains(QWT_CONFIG, QwtWidgets) {
         qwt_thermo.cpp \
         qwt_wheel.cpp
 }
+
+QT += printsupport

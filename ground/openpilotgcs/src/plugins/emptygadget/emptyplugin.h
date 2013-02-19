@@ -34,6 +34,8 @@ class EmptyGadgetFactory;
 
 class EmptyPlugin : public ExtensionSystem::IPlugin
 {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Openpilot.plugin.EmptyPlugin")
 public:
         EmptyPlugin();
    ~EmptyPlugin();

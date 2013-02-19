@@ -31,7 +31,7 @@
 
 #include "utils_global.h"
 
-#include <QtGui/QListWidget>
+#include <QListWidget>
 
 /*
  * MyListWidget is a plain QListWidget but with the added option

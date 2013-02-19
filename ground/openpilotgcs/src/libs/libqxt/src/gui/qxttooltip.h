@@ -27,7 +27,7 @@
 
 #include <QRect>
 #include <QPointer>
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include "qxtglobal.h"
 
 class QXT_GUI_EXPORT QxtToolTip
@@ -52,7 +52,7 @@ public:
 };
 
 QT_BEGIN_NAMESPACE
-inline uint qHash(const QPointer<QWidget> key)
+inline uint qHash(const QPointer<QtWidgets/QWidget> key)
 {
     return reinterpret_cast<quint64>(key ? (&*key) : 0);
 }

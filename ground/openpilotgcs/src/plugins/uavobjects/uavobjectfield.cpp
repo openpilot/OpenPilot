@@ -1030,7 +1030,7 @@ void UAVObjectField::setValue(const QVariant& value, quint32 index)
         case STRING:
         {
             QString str = value.toString();
-            QByteArray barray = str.toAscii();
+            QByteArray barray = str.toLatin1();
             quint32 index;
             for (index = 0; index < (quint32)barray.length() && index < (numElements-1); ++index)
             {

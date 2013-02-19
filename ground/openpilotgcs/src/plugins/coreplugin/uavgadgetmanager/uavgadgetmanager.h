@@ -34,7 +34,7 @@
 #include <coreplugin/icorelistener.h>
 #include <coreplugin/imode.h>
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QtCore/QList>
 #include <QtCore/QPointer>
 #include <QtCore/QSettings>

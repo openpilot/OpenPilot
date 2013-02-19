@@ -30,7 +30,7 @@
 #define MYTABBEDSTACKWIDGET_H
 
 #include "utils/mylistwidget.h"
-#include <QtGui/QStackedWidget>
+#include <QStackedWidget>
 
 /*
  * MyTabbedStackWidget is a MyListWidget combined with a QStackedWidget,

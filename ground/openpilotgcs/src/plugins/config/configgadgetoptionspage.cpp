@@ -26,7 +26,7 @@
  */
 #include "configgadgetoptionspage.h"
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 ConfigGadgetOptionsPage::ConfigGadgetOptionsPage(ConfigGadgetConfiguration *config, QObject *parent)
 {

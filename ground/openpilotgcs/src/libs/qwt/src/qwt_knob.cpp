@@ -22,8 +22,8 @@
 #if QT_VERSION < 0x040601
 #define qAtan2(y, x) ::atan2(y, x)
 #define qFabs(x) ::fabs(x)
-#define qFastCos(x) ::cos(x)
-#define qFastSin(x) ::sin(x)
+#define qFastCos(x) qCos(x)
+#define qFastSin(x) qSin(x)
 #endif
 
 class QwtKnob::PrivateData
@@ -254,19 +254,21 @@ double QwtKnob::getValue( const QPoint &pos )
 void QwtKnob::getScrollMode( const QPoint &pos, 
     QwtAbstractSlider::ScrollMode &scrollMode, int &direction ) const
 {
-    const int r = d_data->knobRect.width() / 2;
+    const double r = 0.5 * d_data->knobRect.width();
+    const double dx = d_data->knobRect.x() + r - pos.x();
+    const double dy = d_data->knobRect.y() + r - pos.y();
 
-    const int dx = d_data->knobRect.x() + r - pos.x();
-    const int dy = d_data->knobRect.y() + r - pos.y();
-
-    if ( ( dx * dx ) + ( dy * dy ) <= ( r * r ) ) // point is inside the knob
+    if ( qwtSqr( dx ) + qwtSqr( dy ) <= qwtSqr( r ) ) 
     {
+        // point is inside the knob
+
         scrollMode = QwtAbstractSlider::ScrMouse;
         direction = 0;
     }
     else                                // point lies outside
     {
         scrollMode = QwtAbstractSlider::ScrTimer;
+
         double arc = qAtan2( double( -dx ), double( dy ) ) * 180.0 / M_PI;
         if ( arc < d_data->angle )
             direction = -1;
@@ -375,8 +377,7 @@ void QwtKnob::paintEvent( QPaintEvent *event )
   \param painter painter
   \param knobRect Bounding rectangle of the knob (without scale)
 */
-void QwtKnob::drawKnob( QPainter *painter, 
-    const QRectF &knobRect ) const
+void QwtKnob::drawKnob( QPainter *painter, const QRectF &knobRect ) const
 {
     double dim = qMin( knobRect.width(), knobRect.height() );
     dim -= d_data->borderWidth * 0.5;
@@ -406,7 +407,7 @@ void QwtKnob::drawKnob( QPainter *painter,
         {
             double off = 0.3 * knobRect.width();
             QRadialGradient gradient( knobRect.center(),
-                knobRect.width(), knobRect.topLeft() + QPoint( off, off ) );
+                knobRect.width(), knobRect.topLeft() + QPointF( off, off ) );
             
             gradient.setColorAt( 0.0, palette().color( QPalette::Midlight ) );
             gradient.setColorAt( 1.0, palette().color( QPalette::Button ) );
@@ -521,7 +522,7 @@ void QwtKnob::drawMarker( QPainter *painter,
             const double rb = qMax( radius - d_data->markerSize, 1.0 );
             const double re = radius;
 
-            const QLine line( xm - sinA * rb, ym - cosA * rb,
+            const QLineF line( xm - sinA * rb, ym - cosA * rb,
                 xm - sinA * re, ym - cosA * re );
 
             QPen pen( palette().color( QPalette::ButtonText ), 0 );
@@ -615,9 +616,7 @@ int QwtKnob::markerSize() const
 */
 void QwtKnob::recalcAngle()
 {
-    //
     // calculate the angle corresponding to the value
-    //
     if ( maxValue() == minValue() )
     {
         d_data->angle = 0;

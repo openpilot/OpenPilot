@@ -61,5 +61,5 @@ void EmptyPlugin::shutdown()
 {
    // Do nothing
 }
-Q_EXPORT_PLUGIN(EmptyPlugin)
+//Q_EXPORT_PLUGIN(EmptyPlugin)
 

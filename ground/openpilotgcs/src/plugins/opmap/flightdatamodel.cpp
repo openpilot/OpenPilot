@@ -26,7 +26,7 @@
  */
 
 #include "flightdatamodel.h"
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QDomDocument>
 flightDataModel::flightDataModel(QObject *parent):QAbstractTableModel(parent)
 {
@@ -556,7 +556,7 @@ bool flightDataModel::writeToFile(QString fileName)
         waypoint.appendChild(field);
 
     }
-    file.write(doc.toString().toAscii());
+    file.write(doc.toString().toLatin1());
     file.close();
     return true;
 }

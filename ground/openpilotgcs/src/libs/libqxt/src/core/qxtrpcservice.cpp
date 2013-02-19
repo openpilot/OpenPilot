@@ -694,8 +694,8 @@ bool QxtRPCService::attachSlot(const QString& rpcFunction, QObject* recv, const 
 
     // If the RPC function name appears to be a signal or slot, normalize the signature.
     QString rpcFunc = rpcFunction;
-    if(QxtMetaObject::isSignalOrSlot(rpcFunction.toAscii().constData()))
-        rpcFunc = QxtMetaObject::methodSignature(rpcFunction.toAscii().constData());
+    if(QxtMetaObject::isSignalOrSlot(rpcFunction.toLatin1().constData()))
+        rpcFunc = QxtMetaObject::methodSignature(rpcFunction.toLatin1().constData());
 
     // Construct a slot definition and associate it with the RPC function name.
     QxtRPCServicePrivate::SlotDef slotDef;
@@ -750,8 +750,8 @@ void QxtRPCService::call(QString fn, const QVariant& p1, const QVariant& p2, con
 {
     if(isClient()) {
         // Normalize the function name if it has the form of a signal or slot.
-        if(QxtMetaObject::isSignalOrSlot(fn.toAscii().constData()))
-            fn = QxtMetaObject::methodSignature(fn.toAscii().constData());
+        if(QxtMetaObject::isSignalOrSlot(fn.toLatin1().constData()))
+            fn = QxtMetaObject::methodSignature(fn.toLatin1().constData());
 
         // Serialize the parameters and write the result to the device.
         QByteArray data = qxt_d().serializer->serialize(fn, p1, p2, p3, p4, p5, p6, p7, p8);

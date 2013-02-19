@@ -31,7 +31,7 @@
 #define FANCYACTIONBAR_H
 
 #include <QtCore/QMap>
-#include <QtGui/QToolButton>
+#include <QtWidgets/QToolButton>
 
 QT_BEGIN_NAMESPACE
 class QMenu;

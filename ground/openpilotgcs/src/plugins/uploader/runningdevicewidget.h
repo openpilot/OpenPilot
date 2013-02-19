@@ -30,7 +30,7 @@
 
 #include "ui_runningdevicewidget.h"
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <QErrorMessage>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QtSvg/QSvgRenderer>

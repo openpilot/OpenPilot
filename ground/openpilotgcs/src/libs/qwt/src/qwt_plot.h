@@ -55,7 +55,7 @@ QwtPlot *myPlot = new QwtPlot("Two Curves", parent);
 QwtPlotCurve *curve1 = new QwtPlotCurve("Curve 1");
 QwtPlotCurve *curve2 = new QwtPlotCurve("Curve 2");
 
-// copy the data into the curves
+// connect or copy the data to the curves
 curve1->setData(...);
 curve2->setData(...);
 

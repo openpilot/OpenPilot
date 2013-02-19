@@ -168,14 +168,14 @@ $(BUILD_DIR):
 ###############################################################
 
 # Set up QT toolchain
-QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-v1.2.1
+QT_SDK_DIR := $(TOOLS_DIR)/Qt5.0.1
 
 .PHONY: qt_sdk_install
 # Choose the appropriate installer based on host architecture
 ifneq (,$(filter $(ARCH), x86_64 amd64))
 # 64-bit
-qt_sdk_install: QT_SDK_FILE := QtSdk-offline-linux-x86_64-v1.2.1.run
-qt_sdk_install: QT_SDK_URL := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/14b2039c-0e1f-4774-a4f2-9aa60b6d5313/Qt_SDK_Lin64_offline
+qt_sdk_install: QT_SDK_FILE := qt-linux-opensource-5.0.1-x86_64-offline.run
+qt_sdk_install: QT_SDK_URL := http://releases.qt-project.org/qt5/5.0.1/qt-linux-opensource-5.0.1-x86_64-offline.run
 else
 # 32-bit
 qt_sdk_install: QT_SDK_URL  := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/8ea74da4-fec1-4277-8b26-c58cc82e204b/Qt_SDK_Lin32_offline
@@ -475,7 +475,7 @@ android_sdk_update:
 ##############################
 
 ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && echo "exists"), exists)
-  QMAKE=$(QT_SDK_DIR)/Desktop/Qt/4.8.1/gcc/bin/qmake
+  QMAKE=$(QT_SDK_DIR)/5.0.1/gcc_64/bin/qmake
 else
   # not installed, hope it's in the path...
   QMAKE=qmake

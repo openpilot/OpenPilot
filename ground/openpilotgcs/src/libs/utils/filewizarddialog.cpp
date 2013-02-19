@@ -29,7 +29,7 @@
 #include "filewizarddialog.h"
 #include "filewizardpage.h"
 
-#include <QtGui/QAbstractButton>
+#include <QAbstractButton>
 
 namespace Utils {
 

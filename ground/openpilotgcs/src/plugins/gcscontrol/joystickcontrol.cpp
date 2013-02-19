@@ -28,7 +28,7 @@
 #include "joystickcontrol.h"
 #include "extensionsystem/pluginmanager.h"
 #include <QDebug>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QtOpenGL/QGLWidget>
 #include <QMouseEvent>
 

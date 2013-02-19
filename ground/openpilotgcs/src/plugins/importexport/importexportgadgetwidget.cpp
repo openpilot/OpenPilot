@@ -35,7 +35,7 @@
 #include <extensionsystem/pluginspec.h>
 #include <QtDebug>
 #include <QSettings>
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QFileInfo>
 #include <QFileDialog>
 #include <QDesktopServices>

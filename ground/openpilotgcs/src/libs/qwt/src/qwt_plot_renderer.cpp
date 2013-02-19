@@ -23,7 +23,7 @@
 #include <qpainter.h>
 #include <qpaintengine.h>
 #include <qtransform.h>
-#include <qprinter.h>
+#include <QtPrintSupport/QPrinter>
 #include <qstyle.h>
 #include <qstyleoption.h>
 #include <qimagewriter.h>
@@ -238,7 +238,7 @@ void QwtPlotRenderer::renderDocument( QwtPlot *plot,
     const QRectF documentRect( 0.0, 0.0, size.width(), size.height() );
 
     const QString fmt = format.toLower();
-    if ( fmt == "pdf" || fmt == "ps" )
+    if ( fmt == "pdf" )
     {
 #ifndef QT_NO_PRINTER
         QPrinter printer;
@@ -246,8 +246,22 @@ void QwtPlotRenderer::renderDocument( QwtPlot *plot,
         printer.setPaperSize( sizeMM, QPrinter::Millimeter );
         printer.setDocName( title );
         printer.setOutputFileName( fileName );
-        printer.setOutputFormat( ( format == "pdf" )
-            ? QPrinter::PdfFormat : QPrinter::PostScriptFormat );
+        printer.setOutputFormat( QPrinter::PdfFormat );
+        printer.setResolution( resolution );
+
+        QPainter painter( &printer );
+        render( plot, &painter, documentRect );
+#endif
+    }
+    else if ( fmt == "ps" )
+    {
+#ifndef QT_NO_PRINTER
+        QPrinter printer;
+        printer.setFullPage( true );
+        printer.setPaperSize( sizeMM, QPrinter::Millimeter );
+        printer.setDocName( title );
+        printer.setOutputFileName( fileName );
+        printer.setOutputFormat( QPrinter::NativeFormat );
         printer.setResolution( resolution );
 
         QPainter painter( &printer );
@@ -411,7 +425,17 @@ void QwtPlotRenderer::render( QwtPlot *plot,
         double( painter->device()->logicalDpiX() ) / plot->logicalDpiX(),
         double( painter->device()->logicalDpiY() ) / plot->logicalDpiY() );
 
-    painter->save();
+
+    QRectF layoutRect = transform.inverted().mapRect( plotRect );
+
+    if ( !( d_data->discardFlags & DiscardBackground ) )
+    {
+        // subtract the contents margins
+
+        int left, top, right, bottom;
+        plot->getContentsMargins( &left, &top, &right, &bottom );
+        layoutRect.adjust( left, top, -right, -bottom );
+    }
 
     int baseLineDists[QwtPlot::axisCnt];
     if ( d_data->layoutFlags & FrameWithScales )
@@ -424,18 +448,53 @@ void QwtPlotRenderer::render( QwtPlot *plot,
                 baseLineDists[axisId] = scaleWidget->margin();
                 scaleWidget->setMargin( 0 );
             }
+
+            if ( !plot->axisEnabled( axisId ) )
+            {
+                int left = 0;
+                int right = 0;
+                int top = 0;
+                int bottom = 0;
+
+                // When we have a scale the frame is painted on
+                // the position of the backbone - otherwise we
+                // need to introduce a margin around the canvas
+
+                switch( axisId )
+                {
+                    case QwtPlot::yLeft:
+                        layoutRect.adjust( 1, 0, 0, 0 );
+                        break;
+                    case QwtPlot::yRight:
+                        layoutRect.adjust( 0, 0, -1, 0 );
+                        break;
+                    case QwtPlot::xTop:
+                        layoutRect.adjust( 0, 1, 0, 0 );
+                        break;
+                    case QwtPlot::xBottom:
+                        layoutRect.adjust( 0, 0, 0, -1 );
+                        break;
+                    default:
+                        break;
+                }
+                layoutRect.adjust( left, top, right, bottom );
+            }
         }
     }
-    // Calculate the layout for the print.
+
+    // Calculate the layout for the document.
 
     QwtPlotLayout::Options layoutOptions = 
         QwtPlotLayout::IgnoreScrollbars | QwtPlotLayout::IgnoreFrames;
+
     if ( d_data->discardFlags & DiscardLegend )
         layoutOptions |= QwtPlotLayout::IgnoreLegend;
 
-    const QRectF layoutRect = transform.inverted().mapRect( plotRect );
     plot->plotLayout()->activate( plot, layoutRect, layoutOptions );
 
+    // now start painting
+
+    painter->save();
     painter->setWorldTransform( transform, true );
 
     // canvas
@@ -536,9 +595,18 @@ void QwtPlotRenderer::renderLegend( const QwtPlot *plot,
     if ( legendLayout == NULL )
         return;
 
-    uint numCols = legendLayout->columnsForWidth( rect.width() );
+    int left, right, top, bottom;
+    plot->legend()->getContentsMargins( &left, &top, &right, &bottom );
+
+    QRect layoutRect;
+    layoutRect.setLeft( qCeil( rect.left() ) + left );
+    layoutRect.setTop( qCeil( rect.top() ) + top );
+    layoutRect.setRight( qFloor( rect.right() ) - right );
+    layoutRect.setBottom( qFloor( rect.bottom() ) - bottom );
+
+    uint numCols = legendLayout->columnsForWidth( layoutRect.width() );
     QList<QRect> itemRects =
-        legendLayout->layoutItems( rect.toRect(), numCols );
+        legendLayout->layoutItems( layoutRect, numCols );
 
     int index = 0;
 
@@ -634,12 +702,7 @@ void QwtPlotRenderer::renderScale( const QwtPlot *plot,
         && scaleWidget->colorBarWidth() > 0 )
     {
         scaleWidget->drawColorBar( painter, scaleWidget->colorBarRect( rect ) );
-
-        const int off = scaleWidget->colorBarWidth() + scaleWidget->spacing();
-        if ( scaleWidget->scaleDraw()->orientation() == Qt::Horizontal )
-            baseDist += off;
-        else
-            baseDist += off;
+        baseDist += scaleWidget->colorBarWidth() + scaleWidget->spacing();
     }
 
     painter->save();
@@ -816,7 +879,10 @@ void QwtPlotRenderer::buildCanvasMaps( const QwtPlot *plot,
         }
         else
         {
-            int margin = plot->plotLayout()->canvasMargin( axisId );
+            int margin = 0;
+            if ( !plot->plotLayout()->alignCanvasToScales() )
+                margin = plot->plotLayout()->canvasMargin( axisId );
+
             if ( axisId == QwtPlot::yLeft || axisId == QwtPlot::yRight )
             {
                 from = canvasRect.bottom() - margin;

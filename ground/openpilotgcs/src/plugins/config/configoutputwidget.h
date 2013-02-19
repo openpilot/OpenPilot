@@ -34,7 +34,7 @@
 #include "uavobject.h"
 #include "uavobjectutilmanager.h"
 #include "cfg_vehicletypes/vehicleconfig.h"
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QList>
 
 class Ui_OutputWidget;

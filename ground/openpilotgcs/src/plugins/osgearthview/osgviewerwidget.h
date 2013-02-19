@@ -26,7 +26,7 @@
 #ifndef OSGVIEWERWIDGET_H
 #define OSGVIEWERWIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 #include "osgearthviewgadgetconfiguration.h"
 #include "extensionsystem/pluginmanager.h"

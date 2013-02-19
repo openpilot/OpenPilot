@@ -10,52 +10,60 @@ equals(copydata, 1) {
     win32:CONFIG(release, debug|release) {
 
         # copy Qt DLLs and phonon4
-        QT_DLLS = phonon4.dll \
-                  QtCore4.dll \
-                  QtGui4.dll \
-                  QtNetwork4.dll \
-                  QtOpenGL4.dll \
-                  QtSql4.dll \
-                  QtSvg4.dll \
-                  QtTest4.dll \
-                  QtXml4.dll \
-                  QtDeclarative4.dll \
-                  QtXmlPatterns4.dll \
-                  QtScript4.dll
+        QT_DLLS = Qt5Core.dll \
+                  Qt5Gui.dll \
+                  Qt5Network.dll \
+                  Qt5OpenGL.dll \
+                  Qt5Sql.dll \
+                  Qt5Svg.dll \
+                  Qt5Test.dll \
+                  Qt5Xml.dll \
+                  Qt5Declarative.dll \
+                  Qt5XmlPatterns.dll \
+                  Qt5Script.dll \
+                  Qt5Concurrent.dll \
+                  Qt5Widgets.dll \
+                  libEGL.dll \
+                  libGLESv2.dll \
+                  icuin49.dll \
+                  icudt49.dll \
+                  libstdc++-6.dll \
+                  icuuc49.dll \
+                  libwinpthread-1.dll
         for(dll, QT_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_BINS]/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
         # copy MinGW DLLs
-        MINGW_DLLS = libgcc_s_dw2-1.dll \
-                     mingwm10.dll
-        for(dll, MINGW_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
-        }
+        #MINGW_DLLS = libgcc_s_dw2-1.dll \
+        #             mingwm10.dll
+        #for(dll, MINGW_DLLS) {
+        #    data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
+        #}
 
         # copy iconengines
-        QT_ICONENGINE_DLLS = qsvgicon4.dll
+        QT_ICONENGINE_DLLS = qsvgicon.dll
         data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/iconengines\") $$addNewline()
         for(dll, QT_ICONENGINE_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/iconengines/$$dll\") $$targetPath(\"$$GCS_APP_PATH/iconengines/$$dll\") $$addNewline()
         }
 
         # copy imageformats
-        QT_IMAGEFORMAT_DLLS = qgif4.dll qico4.dll qjpeg4.dll qmng4.dll qsvg4.dll qtiff4.dll
+        QT_IMAGEFORMAT_DLLS = qgif.dll qico.dll qjpeg.dll qmng.dll qsvg.dll qtiff.dll
         data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/imageformats\") $$addNewline()
         for(dll, QT_IMAGEFORMAT_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/imageformats/$$dll\") $$targetPath(\"$$GCS_APP_PATH/imageformats/$$dll\") $$addNewline()
         }
 
         # copy phonon_backend
-        QT_PHONON_BACKEND_DLLS = phonon_ds94.dll
-        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/phonon_backend\") $$addNewline()
-        for(dll, QT_PHONON_BACKEND_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/phonon_backend/$$dll\") $$targetPath(\"$$GCS_APP_PATH/phonon_backend/$$dll\") $$addNewline()
-        }
+        #QT_PHONON_BACKEND_DLLS = phonon_ds94.dll
+        #data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/phonon_backend\") $$addNewline()
+        #for(dll, QT_PHONON_BACKEND_DLLS) {
+        #    data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/phonon_backend/$$dll\") $$targetPath(\"$$GCS_APP_PATH/phonon_backend/$$dll\") $$addNewline()
+        #}
 
         # copy sqldrivers
-        QT_SQLDRIVERS_DLLS = qsqlite4.dll
+        QT_SQLDRIVERS_DLLS = qsqlite.dll
         data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/sqldrivers\") $$addNewline()
         for(dll, QT_SQLDRIVERS_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/sqldrivers/$$dll\") $$targetPath(\"$$GCS_APP_PATH/sqldrivers/$$dll\") $$addNewline()

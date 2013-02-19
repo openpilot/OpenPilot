@@ -43,7 +43,7 @@ SOURCES += mainwindow.cpp \
     modemanager.cpp \
     coreimpl.cpp \
     plugindialog.cpp \
-    manhattanstyle.cpp \
+#    manhattanstyle.cpp \
     minisplitter.cpp \
     styleanimator.cpp \
     rightpane.cpp \
@@ -107,7 +107,7 @@ HEADERS += mainwindow.h \
     modemanager.h \
     coreimpl.h \
     plugindialog.h \
-    manhattanstyle.h \
+#    manhattanstyle.h \
     minisplitter.h \
     styleanimator.h \
     rightpane.h \

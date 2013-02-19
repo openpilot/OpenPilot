@@ -291,7 +291,7 @@ quint32 UAVObjectParser::updateHash(quint32 value, quint32 hash)
  */
 quint32 UAVObjectParser::updateHash(QString& value, quint32 hash)
 {
-    QByteArray bytes = value.toAscii();
+    QByteArray bytes = value.toLatin1();
     quint32 hashout = hash;
     for (int n = 0; n < bytes.length(); ++n)
         hashout = updateHash(bytes[n], hashout);

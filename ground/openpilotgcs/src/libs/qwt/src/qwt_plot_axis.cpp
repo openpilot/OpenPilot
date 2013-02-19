@@ -619,8 +619,12 @@ void QwtPlot::updateAxes()
         if ( axisAutoScale( item->xAxis() ) || axisAutoScale( item->yAxis() ) )
         {
             const QRectF rect = item->boundingRect();
-            intv[item->xAxis()] |= QwtInterval( rect.left(), rect.right() );
-            intv[item->yAxis()] |= QwtInterval( rect.top(), rect.bottom() );
+
+            if ( rect.width() >= 0.0 )
+                intv[item->xAxis()] |= QwtInterval( rect.left(), rect.right() );
+
+            if ( rect.height() >= 0.0 )
+                intv[item->yAxis()] |= QwtInterval( rect.top(), rect.bottom() );
         }
     }
 

@@ -9,6 +9,7 @@
 
 #include "qwt_analog_clock.h"
 #include <qmath.h>
+#include <qlocale.h>
 
 /*!
   Constructor
@@ -87,7 +88,7 @@ void QwtAnalogClock::setNeedle( QwtDialNeedle * )
 */
 void QwtAnalogClock::setHand( Hand hand, QwtDialNeedle *needle )
 {
-    if ( hand >= 0 || hand < NHands )
+    if ( hand >= 0 && hand < NHands )
     {
         delete d_hand[hand];
         d_hand[hand] = needle;
@@ -151,10 +152,10 @@ void QwtAnalogClock::setTime( const QTime &time )
 */
 QwtText QwtAnalogClock::scaleLabel( double value ) const
 {
-    if ( value == 0.0 )
+    if ( qFuzzyCompare( value + 1.0, 1.0 ) )
         value = 60.0 * 60.0 * 12.0;
 
-    return QString::number( int( value / ( 60.0 * 60.0 ) ) );
+    return QLocale().toString( qRound( value / ( 60.0 * 60.0 ) ) );
 }
 
 /*!

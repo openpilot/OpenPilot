@@ -62,5 +62,5 @@ void QmlViewPlugin::shutdown()
 {
    // Do nothing
 }
-Q_EXPORT_PLUGIN(QmlViewPlugin)
+//Q_EXPORT_PLUGIN(QmlViewPlugin)
 

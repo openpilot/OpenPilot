@@ -30,9 +30,9 @@
 #define ACTIONCONTAINER_H
 
 #include <QtCore/QObject>
-#include <QtGui/QMenu>
-#include <QtGui/QMenuBar>
-#include <QtGui/QAction>
+#include <QMenu>
+#include <QMenuBar>
+#include <QAction>
 
 namespace Core {
 

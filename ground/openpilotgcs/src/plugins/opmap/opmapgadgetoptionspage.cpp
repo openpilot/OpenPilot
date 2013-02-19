@@ -27,13 +27,13 @@
 
 #include "opmapgadgetoptionspage.h"
 #include "opmapgadgetconfiguration.h"
-#include <QtGui/QLabel>
-#include <QtGui/QComboBox>
-#include <QtGui/QSpinBox>
-#include <QtGui/QDoubleSpinBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QFileDialog>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QDoubleSpinBox>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QFileDialog>
 
 #include "opmapcontrol/opmapcontrol.h"
 #include "utils/pathutils.h"

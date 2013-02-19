@@ -31,7 +31,7 @@
 
 #include "utils_global.h"
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
 class QStringList;

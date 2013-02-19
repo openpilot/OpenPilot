@@ -1,28 +1,44 @@
+/****************************************************************************
+** Copyright (c) 2000-2003 Wayne Roth
+** Copyright (c) 2004-2007 Stefan Sander
+** Copyright (c) 2007 Michal Policht
+** Copyright (c) 2008 Brandon Fosdick
+** Copyright (c) 2009-2010 Liam Staskawicz
+** Copyright (c) 2011 Debao Zhang
+** All right reserved.
+** Web: http://code.google.com/p/qextserialport/
+**
+** Permission is hereby granted, free of charge, to any person obtaining
+** a copy of this software and associated documentation files (the
+** "Software"), to deal in the Software without restriction, including
+** without limitation the rights to use, copy, modify, merge, publish,
+** distribute, sublicense, and/or sell copies of the Software, and to
+** permit persons to whom the Software is furnished to do so, subject to
+** the following conditions:
+**
+** The above copyright notice and this permission notice shall be
+** included in all copies or substantial portions of the Software.
+**
+** THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+** EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+** MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+** NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+** LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+** OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+** WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+**
+****************************************************************************/
 
 #ifndef _QEXTSERIALPORT_H_
 #define _QEXTSERIALPORT_H_
 
+#include <QtCore/QIODevice>
 #include "qextserialport_global.h"
-
-/*if all warning messages are turned off, flag portability warnings to be turned off as well*/
-#ifdef _TTY_NOWARN_
-#define _TTY_NOWARN_PORT_
+#ifdef Q_OS_UNIX
+#include <termios.h>
 #endif
-
-/*macros for warning and debug messages*/
-#ifdef _TTY_NOWARN_PORT_
-#define TTY_PORTABILITY_WARNING(s)
-#else
-#define TTY_PORTABILITY_WARNING(s) qWarning(s)
-#endif /*_TTY_NOWARN_PORT_*/
-#ifdef _TTY_NOWARN_
-#define TTY_WARNING(s)
-#else
-#define TTY_WARNING(s) qWarning(s)
-#endif /*_TTY_NOWARN_*/
-
-
 /*line status constants*/
+// ### QESP2.0 move to enum
 #define LS_CTS  0x01
 #define LS_DSR  0x02
 #define LS_DCD  0x04
@@ -33,6 +49,7 @@
 #define LS_SR   0x80
 
 /*error constants*/
+// ### QESP2.0 move to enum
 #define E_NO_ERROR                   0
 #define E_INVALID_FD                 1
 #define E_NO_MEMORY                  2
@@ -49,42 +66,62 @@
 #define E_READ_FAILED               13
 #define E_WRITE_FAILED              14
 #define E_FILE_NOT_FOUND            15
+#define E_PERMISSION_DENIED         16
+#define E_AGAIN                     17
 
 enum BaudRateType
 {
-    BAUD50,                //POSIX ONLY
-    BAUD75,                //POSIX ONLY
-    BAUD110,
-    BAUD134,               //POSIX ONLY
-    BAUD150,               //POSIX ONLY
-    BAUD200,               //POSIX ONLY
-    BAUD300,
-    BAUD600,
-    BAUD1200,
-    BAUD1800,              //POSIX ONLY
-    BAUD2400,
-    BAUD4800,
-    BAUD9600,
-    BAUD14400,             //WINDOWS ONLY
-    BAUD19200,
-    BAUD38400,
-    BAUD56000,             //WINDOWS ONLY
-    BAUD57600,
-    BAUD76800,             //POSIX ONLY
-    BAUD115200,
-    BAUD128000,            //WINDOWS ONLY
-	BAUD230400,            //WINDOWS ONLY
-	BAUD256000,            //WINDOWS ONLY
-	BAUD460800,            //WINDOWS ONLY
-	BAUD921600             //WINDOWS ONLY
+#if defined(Q_OS_UNIX) || defined(qdoc)
+    BAUD50 = 50,                //POSIX ONLY
+    BAUD75 = 75,                //POSIX ONLY
+    BAUD134 = 134,              //POSIX ONLY
+    BAUD150 = 150,              //POSIX ONLY
+    BAUD200 = 200,              //POSIX ONLY
+    BAUD1800 = 1800,            //POSIX ONLY
+#  if defined(B76800) || defined(qdoc)
+    BAUD76800 = 76800,          //POSIX ONLY
+#  endif
+#  if (defined(B230400) && defined(B4000000)) || defined(qdoc)
+    BAUD230400 = 230400,        //POSIX ONLY
+    BAUD460800 = 460800,        //POSIX ONLY
+    BAUD500000 = 500000,        //POSIX ONLY
+    BAUD576000 = 576000,        //POSIX ONLY
+    BAUD921600 = 921600,        //POSIX ONLY
+    BAUD1000000 = 1000000,      //POSIX ONLY
+    BAUD1152000 = 1152000,      //POSIX ONLY
+    BAUD1500000 = 1500000,      //POSIX ONLY
+    BAUD2000000 = 2000000,      //POSIX ONLY
+    BAUD2500000 = 2500000,      //POSIX ONLY
+    BAUD3000000 = 3000000,      //POSIX ONLY
+    BAUD3500000 = 3500000,      //POSIX ONLY
+    BAUD4000000 = 4000000,      //POSIX ONLY
+#  endif
+#endif //Q_OS_UNIX
+#if defined(Q_OS_WIN) || defined(qdoc)
+    BAUD14400 = 14400,          //WINDOWS ONLY
+    BAUD56000 = 56000,          //WINDOWS ONLY
+    BAUD128000 = 128000,        //WINDOWS ONLY
+    BAUD256000 = 256000,        //WINDOWS ONLY
+#endif  //Q_OS_WIN
+    BAUD110 = 110,
+    BAUD300 = 300,
+    BAUD600 = 600,
+    BAUD1200 = 1200,
+    BAUD2400 = 2400,
+    BAUD4800 = 4800,
+    BAUD9600 = 9600,
+    BAUD19200 = 19200,
+    BAUD38400 = 38400,
+    BAUD57600 = 57600,
+    BAUD115200 = 115200
 };
 
 enum DataBitsType
 {
-    DATA_5,
-    DATA_6,
-    DATA_7,
-    DATA_8
+    DATA_5 = 5,
+    DATA_6 = 6,
+    DATA_7 = 7,
+    DATA_8 = 8
 };
 
 enum ParityType
@@ -92,14 +129,18 @@ enum ParityType
     PAR_NONE,
     PAR_ODD,
     PAR_EVEN,
+#if defined(Q_OS_WIN) || defined(qdoc)
     PAR_MARK,               //WINDOWS ONLY
+#endif
     PAR_SPACE
 };
 
 enum StopBitsType
 {
     STOP_1,
+#if defined(Q_OS_WIN) || defined(qdoc)
     STOP_1_5,               //WINDOWS ONLY
+#endif
     STOP_2
 };
 
@@ -123,218 +164,77 @@ struct PortSettings
     long Timeout_Millisec;
 };
 
-#include <QIODevice>
-#include <QMutex>
-#ifdef Q_OS_UNIX
-#include <stdio.h>
-#include <termios.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <sys/ioctl.h>
-#include <sys/select.h>
-#include <QSocketNotifier>
-#elif (defined Q_OS_WIN)
-#include <QTimer>
-#include <windows.h>
-#include <QThread>
-#include <QReadWriteLock>
-#include "utils/qwineventnotifier_p.h"
-#endif
-
-/*!
-Encapsulates a serial port on both POSIX and Windows systems.
-
-\note
-Be sure to check the full list of members, as QIODevice provides quite a lot of
-functionality for QextSerialPort.
-
-\section Usage
-QextSerialPort offers both a polling and event driven API.  Event driven is typically easier
-to use, since you never have to worry about checking for new data.
-
-\b Example
-\code
-QextSerialPort* port = new QextSerialPort("COM1", QextSerialPort::EventDriven);
-connect(port, SIGNAL(readyRead()), myClass, SLOT(onDataAvailable()));
-port->open();
-
-void MyClass::onDataAvailable() {
-    int avail = port->bytesAvailable();
-    if( avail > 0 ) {
-        QByteArray usbdata;
-        usbdata.resize(avail);
-        int read = port->read(usbdata.data(), usbdata.size());
-        if( read > 0 ) {
-            processNewData(usbdata);
-        }
-    }
-}
-\endcode
-
-\section Compatibility
-The user will be notified of errors and possible portability conflicts at run-time
-by default - this behavior can be turned off by defining _TTY_NOWARN_
-(to turn off all warnings) or _TTY_NOWARN_PORT_ (to turn off portability warnings) in the project.
-
-On Windows NT/2000/XP this class uses Win32 serial port functions by default.  The user may
-select POSIX behavior under NT, 2000, or XP ONLY by defining Q_OS_UNIX in the project.
-No guarantees are made as to the quality of POSIX support under NT/2000 however.
-
-\author Stefan Sander, Michal Policht, Brandon Fosdick, Liam Staskawicz
-*/
+class QextSerialPortPrivate;
 class QEXTSERIALPORT_EXPORT QextSerialPort: public QIODevice
 {
     Q_OBJECT
-    public:
-        enum QueryMode {
-            Polling,
-            EventDriven
-        };
+    Q_DECLARE_PRIVATE(QextSerialPort)
+    Q_ENUMS(QueryMode)
+    Q_PROPERTY(QString portName READ portName WRITE setPortName)
+    Q_PROPERTY(QueryMode queryMode READ queryMode WRITE setQueryMode)
+public:
+    enum QueryMode {
+        Polling,
+        EventDriven
+    };
 
-        QextSerialPort(QueryMode mode = EventDriven);
-        QextSerialPort(const QString & name, QueryMode mode = EventDriven);
-        QextSerialPort(PortSettings const& s, QueryMode mode = EventDriven);
-        QextSerialPort(const QString & name, PortSettings const& s, QueryMode mode = EventDriven);
-        ~QextSerialPort();
+    explicit QextSerialPort(QueryMode mode = EventDriven, QObject *parent = 0);
+    explicit QextSerialPort(const QString &name, QueryMode mode = EventDriven, QObject *parent = 0);
+    explicit QextSerialPort(const PortSettings &s, QueryMode mode = EventDriven, QObject *parent = 0);
+    QextSerialPort(const QString &name, const PortSettings &s, QueryMode mode = EventDriven, QObject *parent=0);
 
-        void setPortName(const QString & name);
-        QString portName() const;
+    ~QextSerialPort();
 
-        /**!
-         * Get query mode.
-         * \return query mode.
-         */
-        inline QueryMode queryMode() const { return _queryMode; }
+    QString portName() const;
+    QueryMode queryMode() const;
+    BaudRateType baudRate() const;
+    DataBitsType dataBits() const;
+    ParityType parity() const;
+    StopBitsType stopBits() const;
+    FlowType flowControl() const;
 
-        /*!
-         * Set desired serial communication handling style. You may choose from polling
-         * or event driven approach. This function does nothing when port is open; to
-         * apply changes port must be reopened.
-         *
-         * In event driven approach read() and write() functions are acting
-         * asynchronously. They return immediately and the operation is performed in
-         * the background, so they doesn't freeze the calling thread.
-         * To determine when operation is finished, QextSerialPort runs separate thread
-         * and monitors serial port events. Whenever the event occurs, adequate signal
-         * is emitted.
-         *
-         * When polling is set, read() and write() are acting synchronously. Signals are
-         * not working in this mode and some functions may not be available. The advantage
-         * of polling is that it generates less overhead due to lack of signals emissions
-         * and it doesn't start separate thread to monitor events.
-         *
-         * Generally event driven approach is more capable and friendly, although some
-         * applications may need as low overhead as possible and then polling comes.
-         *
-         * \param mode query mode.
-         */
-        void setQueryMode(QueryMode mode);
+    bool open(OpenMode mode);
+    bool isSequential() const;
+    void close();
+    void flush();
+    qint64 bytesAvailable() const;
+    bool canReadLine() const;
+    QByteArray readAll();
 
-        void setBaudRate(BaudRateType);
-        BaudRateType baudRate() const;
+    ulong lastError() const;
 
-        void setDataBits(DataBitsType);
-        DataBitsType dataBits() const;
+    ulong lineStatus();
+    QString errorString();
 
-        void setParity(ParityType);
-        ParityType parity() const;
+public Q_SLOTS:
+    void setPortName(const QString &name);
+    void setQueryMode(QueryMode mode);
+    void setBaudRate(BaudRateType);
+    void setDataBits(DataBitsType);
+    void setParity(ParityType);
+    void setStopBits(StopBitsType);
+    void setFlowControl(FlowType);
+    void setTimeout(long);
 
-        void setStopBits(StopBitsType);
-        StopBitsType stopBits() const;
+    void setDtr(bool set=true);
+    void setRts(bool set=true);
 
-        void setFlowControl(FlowType);
-        FlowType flowControl() const;
+Q_SIGNALS:
+    void dsrChanged(bool status);
 
-        void setTimeout(long);
+protected:
+    qint64 readData(char *data, qint64 maxSize);
+    qint64 writeData(const char *data, qint64 maxSize);
 
-        bool open(OpenMode mode);
-        bool isSequential() const;
-        void close();
-        void flush();
-
-        qint64 size() const;
-        qint64 bytesAvailable() const;
-        QByteArray readAll();
-
-        void ungetChar(char c);
-
-        ulong lastError() const;
-        void translateError(ulong error);
-
-        void setDtr(bool set=true);
-        void setRts(bool set=true);
-        ulong lineStatus();
-        QString errorString();
-
-#ifdef Q_OS_WIN
-        virtual bool waitForReadyRead(int msecs);  ///< @todo implement.
-        virtual qint64 bytesToWrite() const;
-        static QString fullPortNameWin(const QString & name);
-#endif
-
-    protected:
-        QMutex* mutex;
-        QString port;
-        PortSettings Settings;
-        ulong lastErr;
-        QueryMode _queryMode;
-
-        // platform specific members
-#ifdef Q_OS_UNIX
-        int fd;
-        QSocketNotifier *readNotifier;
-        struct termios Posix_CommConfig;
-        struct termios old_termios;
-        struct timeval Posix_Timeout;
-        struct timeval Posix_Copy_Timeout;
-#elif (defined Q_OS_WIN)
-        HANDLE Win_Handle;
-        OVERLAPPED overlap;
-        COMMCONFIG Win_CommConfig;
-        COMMTIMEOUTS Win_CommTimeouts;
-        QWinEventNotifier *winEventNotifier;
-        DWORD eventMask;
-        QList<OVERLAPPED*> pendingWrites;
-        QReadWriteLock* bytesToWriteLock;
-        qint64 _bytesToWrite;
-#endif
-
-        void construct(); // common construction
-        void platformSpecificDestruct();
-        void platformSpecificInit();
-        qint64 readData(char * data, qint64 maxSize);
-        qint64 writeData(const char * data, qint64 maxSize);
-
-#ifdef Q_OS_WIN
-    private slots:
-        void onWinEvent(HANDLE h);
-        void triggerTxEmpty();
 private:
-        QTimer fakeTxEmpty;
+    Q_DISABLE_COPY(QextSerialPort)
+
+#ifdef Q_OS_WIN
+    Q_PRIVATE_SLOT(d_func(), void _q_onWinEvent(HANDLE))
 #endif
+    Q_PRIVATE_SLOT(d_func(), void _q_canRead())
 
-    private:
-        Q_DISABLE_COPY(QextSerialPort)
-
-    signals:
-//        /**
-//         * This signal is emitted whenever port settings are updated.
-//         * 	\param valid \p true if settings are valid, \p false otherwise.
-//         *
-//         * 	@todo implement.
-//         */
-//        // void validSettings(bool valid);
-
-        /*!
-         * This signal is emitted whenever dsr line has changed its state. You may
-         * use this signal to check if device is connected.
-         * 	\param status \p true when DSR signal is on, \p false otherwise.
-         *
-         * 	\see lineStatus().
-         */
-        void dsrChanged(bool status);
-
+    QextSerialPortPrivate * const d_ptr;
 };
 
 #endif

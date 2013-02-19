@@ -35,7 +35,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 
-#include <QtGui/QApplication>
+#include <QApplication>
 
 #include <limits.h>
 

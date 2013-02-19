@@ -35,7 +35,7 @@
 #include "objectpersistence.h"
 
 
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 
 class ConfigGadgetFactory;
@@ -43,6 +43,7 @@ class ConfigGadgetFactory;
 class ConfigPlugin : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "Openpilot")
 
 public:
     ConfigPlugin();

@@ -2,7 +2,7 @@
 #define GPSSNRWIDGET_H
 
 #include <QGraphicsView>
-#include <QtGui/QGraphicsRectItem>
+#include <QGraphicsRectItem>
 
 class GpsSnrWidget : public QGraphicsView
 {

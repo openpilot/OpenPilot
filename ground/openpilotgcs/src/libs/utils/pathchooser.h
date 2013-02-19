@@ -31,8 +31,8 @@
 
 #include "utils_global.h"
 
-#include <QtGui/QWidget>
-#include <QtGui/QAbstractButton>
+#include <QtWidgets/QWidget>
+#include <QAbstractButton>
 
 namespace Utils {
 

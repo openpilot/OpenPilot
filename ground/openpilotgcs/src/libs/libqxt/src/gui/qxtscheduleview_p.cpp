@@ -33,7 +33,7 @@
 #include <QApplication>
 #include <QTimer>
 #include <QStringList>
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <QList>
 #include <QListIterator>
 #include <QMutableLinkedListIterator>

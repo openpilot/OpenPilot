@@ -62,5 +62,5 @@ void PFDPlugin::shutdown()
 {
    // Do nothing
 }
-Q_EXPORT_PLUGIN(PFDPlugin)
+//Q_EXPORT_PLUGIN(PFDPlugin)
 

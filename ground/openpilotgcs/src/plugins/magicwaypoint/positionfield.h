@@ -29,7 +29,7 @@
 #ifndef POSITIONFIELD_H
 #define POSITIONFIELD_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>

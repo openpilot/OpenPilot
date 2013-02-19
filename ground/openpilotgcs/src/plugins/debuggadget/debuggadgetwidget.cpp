@@ -28,15 +28,15 @@
 
 #include <QDebug>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QTextEdit>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QPushButton>
 #include "qxtlogger.h"
 #include "debugengine.h"
 #include <QFile>
 #include <QFileDialog>
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QScrollBar>
 #include <QTime>
 DebugGadgetWidget::DebugGadgetWidget(QWidget *parent) : QLabel(parent)
@@ -84,7 +84,7 @@ void DebugGadgetWidget::saveLog()
 
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly) &&
-            (file.write(m_config->plainTextEdit->toHtml().toAscii()) != -1)) {
+            (file.write(m_config->plainTextEdit->toHtml().toLatin1()) != -1)) {
         file.close();
     } else {
         QMessageBox::critical(0,

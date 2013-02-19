@@ -29,10 +29,11 @@
 #include "qtcolorbutton.h"
 
 #include <QtCore/QMimeData>
-#include <QtGui/QApplication>
-#include <QtGui/QColorDialog>
-#include <QtGui/QDragEnterEvent>
-#include <QtGui/QPainter>
+#include <QApplication>
+#include <QColorDialog>
+#include <QDragEnterEvent>
+#include <QDrag>
+#include <QPainter>
 
 namespace Utils {
 

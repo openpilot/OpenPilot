@@ -51,4 +51,4 @@ void UAVObjectWidgetUtilsPlugin::shutdown()
 {
 }
 
-Q_EXPORT_PLUGIN(UAVObjectWidgetUtilsPlugin)
+//Q_EXPORT_PLUGIN(UAVObjectWidgetUtilsPlugin)

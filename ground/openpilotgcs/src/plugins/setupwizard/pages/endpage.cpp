@@ -29,7 +29,7 @@
 #include <coreplugin/modemanager.h>
 #include <extensionsystem/pluginmanager.h>
 #include <configgadgetfactory.h>
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 EndPage::EndPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),

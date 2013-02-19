@@ -29,7 +29,7 @@
 #ifndef PLUGINDIALOG_H
 #define PLUGINDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 QT_BEGIN_NAMESPACE
 class QPushButton;

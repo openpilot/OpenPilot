@@ -61,14 +61,14 @@ inline QwtIntervalSample::QwtIntervalSample(
 }
 
 //! Compare operator
-inline bool QwtIntervalSample::operator==( 
+inline bool QwtIntervalSample::operator==(
     const QwtIntervalSample &other ) const
 {
     return value == other.value && interval == other.interval;
 }
 
 //! Compare operator
-inline bool QwtIntervalSample::operator!=( 
+inline bool QwtIntervalSample::operator!=(
     const QwtIntervalSample &other ) const
 {
     return !( *this == other );
@@ -117,12 +117,33 @@ inline bool QwtSetSample::operator!=( const QwtSetSample &other ) const
    but in situations, where data of an application specific format
    needs to be displayed, without having to copy it, it is recommended
    to implement an individual data access.
+
+   A subclass of QwtSeriesData<QPointF> must implement: 
+
+   - size()\n 
+     Should return number of data points.
+
+   - sample()\n
+     Should return values x and y values of the sample at specific position
+     as QPointF object.
+
+   - boundingRect()\n 
+     Should return the bounding rectangle of the data series.
+     It is used for autoscaling and might help certain algorithms for displaying
+     the data. You can use qwtBoundingRect() for an implementation
+     but often it is possible to implement a more efficient alogrithm 
+     depending on the characteristics of the series.
+     The member d_boundingRect is intended for caching the calculated rectangle.
+    
 */
 template <typename T>
 class QwtSeriesData
 {
 public:
+    //! Constructor
     QwtSeriesData();
+
+    //! Destructor
     virtual ~QwtSeriesData();
 
     //! \return Number of samples
@@ -147,7 +168,18 @@ public:
      */
     virtual QRectF boundingRect() const = 0;
 
-    virtual void setRectOfInterest( const QRectF & );
+    /*!
+       Set a the "rect of interest"
+
+       QwtPlotSeriesItem defines the current area of the plot canvas
+       as "rect of interest" ( QwtPlotSeriesItem::updateScaleDiv() ).
+       It can be used to implement different levels of details.
+
+       The default implementation does nothing.
+   
+       \param rect Rectangle of interest
+    */
+    virtual void setRectOfInterest( const QRectF &rect );
 
 protected:
     //! Can be used to cache a calculated bounding rectangle
@@ -157,28 +189,17 @@ private:
     QwtSeriesData<T> &operator=( const QwtSeriesData<T> & );
 };
 
-//! Constructor
 template <typename T>
 QwtSeriesData<T>::QwtSeriesData():
     d_boundingRect( 0.0, 0.0, -1.0, -1.0 )
 {
 }
 
-//! Destructor
 template <typename T>
 QwtSeriesData<T>::~QwtSeriesData()
 {
 }
 
-/*!
-   Set a the "rect of interest"
-
-   QwtPlotSeriesItem defines the current area of the plot canvas
-   as "rect of interest" ( QwtPlotSeriesItem::updateScaleDiv() ).
-   It can be used to implement different levels of details.
-
-   The default implementation does nothing.
-*/
 template <typename T>
 void QwtSeriesData<T>::setRectOfInterest( const QRectF & )
 {
@@ -194,40 +215,51 @@ template <typename T>
 class QwtArraySeriesData: public QwtSeriesData<T>
 {
 public:
+    //! Constructor
     QwtArraySeriesData();
-    QwtArraySeriesData( const QVector<T> & );
 
-    void setSamples( const QVector<T> & );
+    /*!
+       Constructor
+       \param samples Array of samples
+    */
+    QwtArraySeriesData( const QVector<T> &samples );
+
+    /*!
+      Assign an array of samples
+      \param samples Array of samples
+    */
+    void setSamples( const QVector<T> &samples );
+
+    //! \return Array of samples
     const QVector<T> samples() const;
 
+    //! \return Number of samples
     virtual size_t size() const;
-    virtual T sample( size_t ) const;
+
+    /*!
+      \return Sample at a specific position
+
+      \param index Index
+      \return Sample at position i
+    */
+    virtual T sample( size_t index ) const;
 
 protected:
     //! Vector of samples
     QVector<T> d_samples;
 };
 
-//! Constructor
 template <typename T>
 QwtArraySeriesData<T>::QwtArraySeriesData()
 {
 }
 
-/*!
-   Constructor
-   \param samples Array of samples
-*/
 template <typename T>
 QwtArraySeriesData<T>::QwtArraySeriesData( const QVector<T> &samples ):
     d_samples( samples )
 {
 }
 
-/*!
-  Assign an array of samples
-  \param samples Array of samples
-*/
 template <typename T>
 void QwtArraySeriesData<T>::setSamples( const QVector<T> &samples )
 {
@@ -235,29 +267,22 @@ void QwtArraySeriesData<T>::setSamples( const QVector<T> &samples )
     d_samples = samples;
 }
 
-//! \return Array of samples
 template <typename T>
 const QVector<T> QwtArraySeriesData<T>::samples() const
 {
     return d_samples;
 }
 
-//! \return Number of samples
 template <typename T>
 size_t QwtArraySeriesData<T>::size() const
 {
     return d_samples.size();
 }
 
-/*!
-  Return a sample
-  \param i Index
-  \return Sample at position i
-*/
 template <typename T>
 T QwtArraySeriesData<T>::sample( size_t i ) const
 {
-    return d_samples[i];
+    return d_samples[ static_cast<int>( i ) ];
 }
 
 //! Interface for iterating over an array of points
@@ -439,4 +464,4 @@ QWT_EXPORT QRectF qwtBoundingRect(
 QWT_EXPORT QRectF qwtBoundingRect(
     const QwtSeriesData<QwtSetSample> &, int from = 0, int to = -1 );
 
-#endif 
+#endif

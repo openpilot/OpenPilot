@@ -11,7 +11,7 @@
 #ifndef IMPORTEXPORTGADGETWIDGET_H
 #define IMPORTEXPORTGADGETWIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <QString>
 #include "importexport_global.h"
 #include <coreplugin/iconfigurableplugin.h>

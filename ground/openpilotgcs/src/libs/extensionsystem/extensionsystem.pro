@@ -7,7 +7,7 @@ include(extensionsystem_dependencies.pri)
 unix:!macx:!freebsd*:LIBS += -ldl
 
 DEFINES += GCS_TEST_DIR=\\\"$$GCS_SOURCE_TREE\\\"
-
+QT += widgets
 HEADERS += pluginerrorview.h \
     plugindetailsview.h \
     iplugin.h \

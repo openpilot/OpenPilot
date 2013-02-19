@@ -19,7 +19,7 @@ void QxtMDNS::doLookup(QString n, QObject * r, const char * m)
 	                              &ref,
 	                              0,
 	                              0,
-	                              name.toAscii().constData(),
+	                              name.toLatin1().constData(),
 	                              kDNSServiceType_SRV,
 	                              kDNSServiceClass_IN,
 	                              QxtMDNS::DNSServiceQueryRecordCallback,

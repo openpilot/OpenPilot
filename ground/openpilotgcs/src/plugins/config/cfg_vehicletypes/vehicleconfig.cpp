@@ -129,7 +129,7 @@ void VehicleConfig::setComboCurrentIndex(QComboBox* box, int index)
 void VehicleConfig::enableComboBoxes(QWidget* owner, QString boxName, int boxCount, bool enable)
 {
     for (int i = 1; i <= boxCount; i++) {
-        QComboBox* box = qFindChild<QComboBox*>(owner, QString("%0%1").arg(boxName).arg(i));
+        QComboBox* box = owner->findChild<QComboBox*>(QString("%0%1").arg(boxName).arg(i));
         if (box)
             box->setEnabled(enable);
     }

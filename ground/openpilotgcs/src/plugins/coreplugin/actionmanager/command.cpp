@@ -27,8 +27,8 @@
  */
 
 #include <QtCore/QDebug>
-#include <QtGui/QAction>
-#include <QtGui/QShortcut>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QShortcut>
 
 #include "command_p.h"
 

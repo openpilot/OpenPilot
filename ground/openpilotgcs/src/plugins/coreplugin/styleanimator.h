@@ -32,9 +32,9 @@
 #include <QtCore/QPointer>
 #include <QtCore/QTime>
 #include <QtCore/QBasicTimer>
-#include <QtGui/QStyle>
+#include <QtWidgets/QStyle>
 #include <QtGui/QPainter>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 /* 
  * This is a set of helper classes to allow for widget animations in

@@ -27,7 +27,7 @@
 #ifndef OUTPUTCHANNELFORM_H
 #define OUTPUTCHANNELFORM_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include "ui_outputchannelform.h"
 #include "configtaskwidget.h"
 

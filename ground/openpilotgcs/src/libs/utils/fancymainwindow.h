@@ -34,7 +34,7 @@
 #include <QtCore/QList>
 #include <QtCore/QHash>
 
-#include <QtGui/QMainWindow>
+#include <QtWidgets/QMainWindow>
 
 QT_BEGIN_NAMESPACE
 class QSettings;

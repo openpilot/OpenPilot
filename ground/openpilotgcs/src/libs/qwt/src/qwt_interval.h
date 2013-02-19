@@ -199,6 +199,19 @@ inline double QwtInterval::maxValue() const
 }
 
 /*!
+   A interval is valid when minValue() <= maxValue().
+   In case of QwtInterval::ExcludeBorders it is true
+   when minValue() < maxValue()
+*/
+inline bool QwtInterval::isValid() const
+{
+    if ( ( d_borderFlags & ExcludeBorders ) == 0 )
+        return d_minValue <= d_maxValue;
+    else
+        return d_minValue < d_maxValue;
+}
+
+/*!
    Return the width of an interval
    The width of invalid intervals is 0.0, otherwise the result is
    maxValue() - minValue().
@@ -260,19 +273,6 @@ inline QwtInterval QwtInterval::operator|( double value ) const
 inline bool QwtInterval::isNull() const
 {
     return isValid() && d_minValue >= d_maxValue;
-}
-
-/*!
-   A interval is valid when minValue() <= maxValue().
-   In case of QwtInterval::ExcludeBorders it is true
-   when minValue() < maxValue()
-*/
-inline bool QwtInterval::isValid() const
-{
-    if ( ( d_borderFlags & ExcludeBorders ) == 0 )
-        return d_minValue <= d_maxValue;
-    else
-        return d_minValue < d_maxValue;
 }
 
 /*!

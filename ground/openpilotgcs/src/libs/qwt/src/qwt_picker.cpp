@@ -42,6 +42,7 @@ public:
 
 protected:
     virtual void paintEvent( QPaintEvent * );
+    virtual void resizeEvent( QResizeEvent * );
 
     QwtPicker *d_picker;
     Type d_type;
@@ -194,6 +195,13 @@ void QwtPicker::PickerWidget::paintEvent( QPaintEvent *e )
             d_picker->drawTracker( &painter );
         }
     }
+}
+
+void QwtPicker::PickerWidget::resizeEvent( QResizeEvent *event )
+{
+    QWidget::resizeEvent( event );
+    if ( isVisible() )
+        updateMask();
 }
 
 /*!
@@ -820,32 +828,50 @@ bool QwtPicker::eventFilter( QObject *object, QEvent *event )
                 break;
             }
             case QEvent::Enter:
+            {
                 widgetEnterEvent( event );
                 break;
+            }
             case QEvent::Leave:
+            {
                 widgetLeaveEvent( event );
                 break;
+            }
             case QEvent::MouseButtonPress:
+            {
                 widgetMousePressEvent( ( QMouseEvent * )event );
                 break;
+            }
             case QEvent::MouseButtonRelease:
+            {
                 widgetMouseReleaseEvent( ( QMouseEvent * )event );
                 break;
+            }
             case QEvent::MouseButtonDblClick:
+            {
                 widgetMouseDoubleClickEvent( ( QMouseEvent * )event );
                 break;
+            }
             case QEvent::MouseMove:
+            {
                 widgetMouseMoveEvent( ( QMouseEvent * )event );
                 break;
+            }
             case QEvent::KeyPress:
+            {
                 widgetKeyPressEvent( ( QKeyEvent * )event );
                 break;
+            }
             case QEvent::KeyRelease:
+            {
                 widgetKeyReleaseEvent( ( QKeyEvent * )event );
                 break;
+            }
             case QEvent::Wheel:
+            {
                 widgetWheelEvent( ( QWheelEvent * )event );
                 break;
+            }
             default:
                 break;
         }
@@ -1396,6 +1422,7 @@ void QwtPicker::updateDisplay()
         if ( rw.isNull() )
         {
             rw = new PickerWidget( this, w, PickerWidget::RubberBand );
+            rw->setObjectName( "PickerRubberBand" );
             rw->resize( w->size() );
         }
         rw->updateMask();
@@ -1410,6 +1437,7 @@ void QwtPicker::updateDisplay()
         if ( tw.isNull() )
         {
             tw = new PickerWidget( this, w, PickerWidget::Text );
+            tw->setObjectName( "PickerTracker" );
             tw->resize( w->size() );
         }
         tw->setFont( d_data->trackerFont );

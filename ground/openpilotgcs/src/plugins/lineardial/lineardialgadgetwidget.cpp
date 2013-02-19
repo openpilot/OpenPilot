@@ -27,7 +27,7 @@
 
 #include "lineardialgadgetwidget.h"
 #include <utils/stylehelper.h>
-#include <QtGui/QFileDialog>
+#include <QtWidgets/QFileDialog>
 #include <QtOpenGL/QGLWidget>
 #include <QDebug>
 

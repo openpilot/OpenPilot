@@ -33,7 +33,7 @@
 #include "imode.h"
 
 #include <QtCore/QObject>
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QtGui/QIcon>
 
 namespace Core {

@@ -71,5 +71,5 @@ void HITLPlugin::shutdown()
 {
    // Do nothing
 }
-Q_EXPORT_PLUGIN(HITLPlugin)
+//Q_EXPORT_PLUGIN(HITLPlugin)
 

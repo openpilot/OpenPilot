@@ -35,7 +35,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include <QtGui/QColor>
 //#include <QtGui/QIcon>
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QtCore/QSignalMapper>
 #include <QtCore/QDebug>
 #include "waypoint.h"

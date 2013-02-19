@@ -188,10 +188,10 @@ QByteArray QxtMailAttachment::mimeData()
     }
 
     QTextCodec* latin1 = QTextCodec::codecForName("latin1");
-    QByteArray rv = "Content-Type: " + qxt_d->contentType.toAscii() + "\r\nContent-Transfer-Encoding: base64\r\n";
+    QByteArray rv = "Content-Type: " + qxt_d->contentType.toLatin1() + "\r\nContent-Transfer-Encoding: base64\r\n";
     foreach(const QString& r, qxt_d->extraHeaders.keys())
     {
-        rv += qxt_fold_mime_header(r.toAscii(), extraHeader(r), latin1);
+        rv += qxt_fold_mime_header(r.toLatin1(), extraHeader(r), latin1);
     }
     rv += "\r\n";
 

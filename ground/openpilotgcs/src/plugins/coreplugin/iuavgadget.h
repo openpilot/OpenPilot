@@ -31,7 +31,7 @@
 
 #include <coreplugin/icontext.h>
 #include <coreplugin/core_global.h>
-#include <QtGui/QComboBox>
+#include <QtWidgets/QComboBox>
 #include <QtCore/QSettings>
 
 QT_BEGIN_NAMESPACE

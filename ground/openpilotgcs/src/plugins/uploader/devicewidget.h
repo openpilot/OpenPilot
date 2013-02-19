@@ -31,7 +31,7 @@
 #include "ui_devicewidget.h"
 #include "uploadergadgetwidget.h"
 #include "op_dfu.h"
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <QFileDialog>
 #include <QErrorMessage>
 #include <QByteArray>

@@ -47,5 +47,5 @@ const char* GLC_FileFormatException::what() const throw()
 	exceptionmsg.append(m_ErrorDescription);
 	exceptionmsg.append(" in file : ");
 	exceptionmsg.append(m_FileName);
-	return exceptionmsg.toAscii().data();
+    return exceptionmsg.toLatin1().data();
 }

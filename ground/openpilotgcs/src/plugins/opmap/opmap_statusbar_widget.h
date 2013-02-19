@@ -28,7 +28,7 @@
 #ifndef OPMAP_STATUSBAR_WIDGET_H
 #define OPMAP_STATUSBAR_WIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 namespace Ui {
     class opmap_statusbar_widget;

@@ -145,13 +145,13 @@ void QwtDial::initDial()
     QPalette p = palette();
     for ( int i = 0; i < QPalette::NColorGroups; i++ )
     {
-        const QPalette::ColorGroup cg = ( QPalette::ColorGroup )i;
+        const QPalette::ColorGroup colorGroup = ( QPalette::ColorGroup )i;
 
         // Base: background color of the circle inside the frame.
         // WindowText: background color of the circle inside the scale
 
-        p.setColor( cg, QPalette::WindowText,
-            p.color( cg, QPalette::Base ) );
+        p.setColor( colorGroup, QPalette::WindowText,
+            p.color( colorGroup, QPalette::Base ) );
     }
     setPalette( p );
 
@@ -159,7 +159,7 @@ void QwtDial::initDial()
     d_data->scaleDraw->setRadius( 0 );
 
     setScaleArc( 0.0, 360.0 ); // scale as a full circle
-    setRange( 0.0, 360.0, 1.0, 10 ); // degrees as deafult
+    setRange( 0.0, 360.0, 1.0, 10 ); // degrees as default
 }
 
 //!  Destructor
@@ -634,7 +634,7 @@ void QwtDial::drawScale( QPainter *painter, const QPointF &center,
     painter->setFont( font() );
 
     d_data->scaleDraw->setAngleRange( minArc, maxArc );
-    d_data->scaleDraw->setRadius( radius );
+    d_data->scaleDraw->setRadius( qFloor( radius ) );
     d_data->scaleDraw->moveCenter( center );
 
     QPalette pal = palette();
@@ -837,10 +837,8 @@ void QwtDial::setScaleTicks( int minLen, int medLen,
 */
 QwtText QwtDial::scaleLabel( double value ) const
 {
-#if 1
-    if ( value == -0 )
-        value = 0;
-#endif
+    if ( value == -0.0 )
+        value = 0.0;
 
     return QString::number( value );
 }
@@ -944,13 +942,15 @@ QSize QwtDial::minimumSizeHint() const
     return QSize( d, d );
 }
 
-static double line2Radians( const QPointF &p1, const QPointF &p2 )
+static double line2Degrees( const QPointF &p1, const QPointF &p2 )
 {
     const QPointF p = p2 - p1;
 
     double angle;
-    if ( p.x() == 0 )
+    if ( p.x() == 0.0 )
+    {
         angle = ( p.y() <= 0.0 ) ? M_PI_2 : 3 * M_PI_2;
+    }
     else
     {
         angle = qAtan( double( -p.y() ) / double( p.x() ) );
@@ -973,7 +973,7 @@ double QwtDial::getValue( const QPoint &pos )
     if ( d_data->maxScaleArc == d_data->minScaleArc || maxValue() == minValue() )
         return minValue();
 
-    double dir = line2Radians( innerRect().center(), pos ) - d_data->origin;
+    double dir = line2Degrees( innerRect().center(), pos ) - d_data->origin;
     if ( dir < 0.0 )
         dir += 360.0;
 
@@ -1122,7 +1122,8 @@ void QwtDial::keyPressEvent( QKeyEvent *event )
     if ( !isValid() )
         return;
 
-    double previous = prevValue();
+    const double previousValue = value();
+
     switch ( event->key() )
     {
         case Qt::Key_Down:
@@ -1150,6 +1151,6 @@ void QwtDial::keyPressEvent( QKeyEvent *event )
             event->ignore();
     }
 
-    if ( value() != previous )
+    if ( value() != previousValue )
         Q_EMIT sliderMoved( value() );
 }

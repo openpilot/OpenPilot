@@ -26,13 +26,13 @@
 #define QXTTOOLTIP_P_H
 
 #include <QPointer>
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <QHash>
 #include "qxttooltip.h"
 
 QT_FORWARD_DECLARE_CLASS(QVBoxLayout)
 
-typedef QPointer<QWidget> WidgetPtr;
+typedef QPointer<QtWidgets/QWidget> WidgetPtr;
 typedef QPair<WidgetPtr, QRect> WidgetArea;
 
 class QxtToolTipPrivate : public QWidget

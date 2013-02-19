@@ -337,22 +337,22 @@ void QwtWheel::drawWheelBackground(
     if ( orientation() == Qt::Horizontal )
     {
         painter->setPen( lightPen );
-        painter->drawLine( rect.left(), rect.top() + bw2, 
-            rect.right(), rect.top() + bw2 );
+        painter->drawLine( QPointF( rect.left(), rect.top() + bw2 ), 
+            QPointF( rect.right(), rect.top() + bw2 ) );
 
         painter->setPen( darkPen );
-        painter->drawLine( rect.left(), rect.bottom() - bw2, 
-            rect.right(), rect.bottom() - bw2 );
+        painter->drawLine( QPointF( rect.left(), rect.bottom() - bw2 ), 
+            QPointF( rect.right(), rect.bottom() - bw2 ) );
     }
     else // Qt::Vertical
     {
         painter->setPen( lightPen );
-        painter->drawLine( rect.left() + bw2, rect.top(), 
-            rect.left() + bw2, rect.bottom() );
+        painter->drawLine( QPointF( rect.left() + bw2, rect.top() ), 
+            QPointF( rect.left() + bw2, rect.bottom() ) );
 
         painter->setPen( darkPen );
-        painter->drawLine( rect.right() - bw2, rect.top(), 
-            rect.right() - bw2, rect.bottom() );
+        painter->drawLine( QPointF( rect.right() - bw2, rect.top() ), 
+            QPointF( rect.right() - bw2, rect.bottom() ) );
     }
 
     painter->restore();
@@ -367,7 +367,9 @@ void QwtWheel::drawWheelBackground(
 void QwtWheel::drawTicks( QPainter *painter, const QRectF &rect )
 {
     if ( maxValue() == minValue() || d_data->totalAngle == 0.0 )
+    {
         return;
+    }
 
     const QPen lightPen( palette().color( QPalette::Light ), 
         0, Qt::SolidLine, Qt::FlatCap );
@@ -400,7 +402,7 @@ void QwtWheel::drawTicks( QPainter *painter, const QRectF &rect )
         const double minpos = rect.left() + 2;
 
         // draw tick marks
-        for ( double tickValue = qwtCeilF( loValue / tickWidth ) * tickWidth;
+        for ( double tickValue = ::ceil( loValue / tickWidth ) * tickWidth;
             tickValue < hiValue; tickValue += tickWidth )
         {
             const double angle = ( tickValue - value() ) * M_PI / 180.0;
@@ -412,9 +414,11 @@ void QwtWheel::drawTicks( QPainter *painter, const QRectF &rect )
             if ( ( tickPos <= maxpos ) && ( tickPos > minpos ) )
             {
                 painter->setPen( darkPen );
-                painter->drawLine( tickPos - 1 , l1, tickPos - 1,  l2 );
+                painter->drawLine( QPointF( tickPos - 1 , l1 ), 
+                    QPointF( tickPos - 1,  l2 ) );
                 painter->setPen( lightPen );
-                painter->drawLine( tickPos, l1, tickPos, l2 );
+                painter->drawLine( QPointF( tickPos, l1 ), 
+                    QPointF( tickPos, l2 ) );
             }
         }
     }
@@ -434,7 +438,7 @@ void QwtWheel::drawTicks( QPainter *painter, const QRectF &rect )
         const double maxpos = rect.bottom() - 2;
         const double minpos = rect.top() + 2;
 
-        for ( double tickValue = qwtCeilF( loValue / tickWidth ) * tickWidth;
+        for ( double tickValue = ::ceil( loValue / tickWidth ) * tickWidth;
             tickValue < hiValue; tickValue += tickWidth )
         {
             const double angle = ( tickValue - value() ) * M_PI / 180.0;
@@ -446,9 +450,11 @@ void QwtWheel::drawTicks( QPainter *painter, const QRectF &rect )
             if ( ( tickPos <= maxpos ) && ( tickPos > minpos ) )
             {
                 painter->setPen( darkPen );
-                painter->drawLine( l1, tickPos - 1 , l2, tickPos - 1 );
+                painter->drawLine( QPointF( l1, tickPos - 1 ), 
+                    QPointF( l2, tickPos - 1 ) );
                 painter->setPen( lightPen );
-                painter->drawLine( l1, tickPos, l2, tickPos );
+                painter->drawLine( QPointF( l1, tickPos ), 
+                    QPointF( l2, tickPos ) );
             }
         }
     }

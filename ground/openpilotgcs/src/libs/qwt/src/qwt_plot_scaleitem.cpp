@@ -46,8 +46,6 @@ public:
 void QwtPlotScaleItem::PrivateData::updateBorders( const QRectF &canvasRect,
     const QwtScaleMap &xMap, const QwtScaleMap &yMap )
 {
-    canvasRectCache = canvasRect;
-
     QwtInterval interval;
     if ( scaleDraw->orientation() == Qt::Horizontal )
     {
@@ -64,6 +62,7 @@ void QwtPlotScaleItem::PrivateData::updateBorders( const QRectF &canvasRect,
     scaleDiv.setInterval( interval );
     scaleDraw->setScaleDiv( scaleDiv );
 }
+
 /*!
    \brief Constructor for scale item at the position pos.
 
@@ -350,7 +349,10 @@ void QwtPlotScaleItem::draw( QPainter *painter,
     if ( d_data->scaleDivFromAxis )
     {
         if ( canvasRect != d_data->canvasRectCache )
+        {
             d_data->updateBorders( canvasRect, xMap, yMap );
+            d_data->canvasRectCache = canvasRect;
+        }
     }
 
     QPen pen = painter->pen();
@@ -438,6 +440,7 @@ void QwtPlotScaleItem::updateScaleDiv( const QwtScaleDiv& xScaleDiv,
         {
             d_data->updateBorders( plt->canvas()->contentsRect(),
                 plt->canvasMap( xAxis() ), plt->canvasMap( yAxis() ) );
+            d_data->canvasRectCache = QRect();
         }
     }
 }

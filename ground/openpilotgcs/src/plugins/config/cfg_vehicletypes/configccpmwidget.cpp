@@ -28,13 +28,13 @@
 
 #include <QDebug>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QTextEdit>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QPushButton>
 #include <QBrush>
 #include <math.h>
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 #include "mixersettings.h"
 #include "systemsettings.h"
@@ -49,8 +49,8 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) : VehicleConfig(parent)
     SwashLvlConfigurationInProgress=0;
     SwashLvlState=0;
     SwashLvlServoInterlock=0;
-    updatingFromHardware=FALSE;
-    updatingToHardware=FALSE;
+    updatingFromHardware=false;
+    updatingToHardware=false;
 
     m_ccpm = new Ui_ccpmWidget();
     m_ccpm->setupUi(this);
@@ -719,9 +719,9 @@ QString ConfigCcpmWidget::updateConfigObjects()
     bool useCCPM;
     bool useCyclic;
 
-    if (updatingFromHardware == TRUE) return airframeType;
+    if (updatingFromHardware == true) return airframeType;
 
-    updatingFromHardware = TRUE;
+    updatingFromHardware = true;
 
     //get the user options
     GUIConfigDataUnion config = GetConfigData();
@@ -772,7 +772,7 @@ QString ConfigCcpmWidget::updateConfigObjects()
 
     SetConfigData(config);
 
-    updatingFromHardware = FALSE;
+    updatingFromHardware = false;
     return airframeType;
 }
 
@@ -866,7 +866,7 @@ void ConfigCcpmWidget::getMixer()
     if (SwashLvlConfigurationInProgress)return;
     if (updatingToHardware)return;
 
-    updatingFromHardware=TRUE;
+    updatingFromHardware=true;
     
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
@@ -894,7 +894,7 @@ void ConfigCcpmWidget::getMixer()
         m_ccpm->PitchCurve->ResetCurve();
     }
 
-    updatingFromHardware=FALSE;
+    updatingFromHardware=false;
 
     ccpmSwashplateUpdate();
 }
@@ -908,9 +908,9 @@ void ConfigCcpmWidget::setMixer()
     int i,j;
 
     if (SwashLvlConfigurationInProgress)return;
-    if (updatingToHardware == TRUE) return;
+    if (updatingToHardware == true) return;
 
-    updatingToHardware=TRUE;
+    updatingToHardware=true;
 
     MixerSettings * mixerSettings = MixerSettings::GetInstance(getObjectManager());
     Q_ASSERT(mixerSettings);
@@ -986,7 +986,7 @@ void ConfigCcpmWidget::setMixer()
     
     mixerSettings->setData(mixerSettingsData);
     mixerSettings->updated();
-    updatingToHardware=FALSE;
+    updatingToHardware=false;
 
 }
 

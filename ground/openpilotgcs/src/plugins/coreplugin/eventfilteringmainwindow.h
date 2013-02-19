@@ -29,7 +29,7 @@
 #ifndef EVENTFILTERINGMAINWINDOW_H
 #define EVENTFILTERINGMAINWINDOW_H
 
-#include <QtGui/QMainWindow>
+#include <QtWidgets/QMainWindow>
 
 namespace Core {
 namespace Internal {

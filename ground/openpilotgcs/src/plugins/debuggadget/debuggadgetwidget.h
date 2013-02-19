@@ -28,7 +28,7 @@
 #ifndef DEBUGGADGETWIDGET_H_
 #define DEBUGGADGETWIDGET_H_
 
-#include <QtGui/QLabel>
+#include <QtWidgets/QLabel>
 #include "ui_debug.h"
 class DebugGadgetWidget : public QLabel
 {

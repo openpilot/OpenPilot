@@ -27,7 +27,7 @@
 #ifndef MAPRIPFORM_H
 #define MAPRIPFORM_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 
 namespace Ui {
     class MapRipForm;

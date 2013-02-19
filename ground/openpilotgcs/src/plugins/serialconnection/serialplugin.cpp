@@ -31,7 +31,7 @@
 #include <coreplugin/icore.h>
 
 #include <QtCore/QtPlugin>
-#include <QtGui/QMainWindow>
+#include <QtWidgets/QMainWindow>
 
 #include <QDebug>
 
@@ -208,8 +208,6 @@ BaudRateType SerialConnection::stringToBaud(QString str)
 {   
     if(str=="1200")
         return BAUD1200;
-    if(str=="1800")
-        return BAUD1800;
     else if(str=="2400")
         return BAUD2400;
     else if(str== "4800")
@@ -226,20 +224,12 @@ BaudRateType SerialConnection::stringToBaud(QString str)
         return BAUD56000;
     else if(str== "57600")
         return BAUD57600;
-    else if(str== "76800")
-        return BAUD76800;
     else if(str== "115200")
         return BAUD115200;
     else if(str== "128000")
         return BAUD128000;
-    else if(str== "230400")
-        return BAUD230400;
     else if(str== "256000")
         return BAUD256000;
-    else if(str== "460800")
-        return BAUD460800;
-    else if(str== "921600")
-        return BAUD921600;
     else
         return BAUD57600;
 }
@@ -270,4 +260,4 @@ bool SerialPlugin::initialize(const QStringList &arguments, QString *errorString
     return true;
 }
 
-Q_EXPORT_PLUGIN(SerialPlugin)
+//Q_EXPORT_PLUGIN(SerialPlugin)

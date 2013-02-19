@@ -88,7 +88,7 @@ void XmlConfig::handleNode(QDomElement* node, QSettings::SettingsMap &map, QStri
     // Xml tags are restrictive with allowed characters,
     // so we urlencode and replace % with __PCT__ on file
     nodeName = nodeName.replace("__PCT__", "%");
-    nodeName = QUrl::fromPercentEncoding(nodeName.toAscii());
+    nodeName = QUrl::fromPercentEncoding(nodeName.toLatin1());
 
     if ( nodeName == XmlConfig::rootName )
         ;

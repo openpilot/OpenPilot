@@ -26,7 +26,7 @@
 #define QXTITEMEDITORCREATORBASE_H
 
 #include <QHash>
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <QVariant>
 #include <QByteArray>
 #include <QHashIterator>

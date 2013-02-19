@@ -63,7 +63,7 @@
 
 #ifdef Q_OS_WIN
 #ifdef QT_GUI_LIB
-#include <QWidget>
+#include <QtWidgets/QWidget>
 class USBMonitor;
 
 class USBRegistrationWidget : public QWidget

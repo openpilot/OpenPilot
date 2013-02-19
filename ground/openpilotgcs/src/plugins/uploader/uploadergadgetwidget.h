@@ -46,11 +46,11 @@
 #include "coreplugin/connectionmanager.h"
 
 #include "rawhid/rawhidplugin.h"
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 #include <QLabel>
 #include <QLineEdit>
 #include <QThread>
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 #include <QTimer>
 #include "devicedescriptorstruct.h"
 #include <QProgressDialog>

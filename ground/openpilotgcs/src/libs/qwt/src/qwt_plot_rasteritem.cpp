@@ -643,11 +643,11 @@ void QwtPlotRasterItem::draw( QPainter *painter,
     QRectF pixelRect = pixelHint(area);
     if ( !pixelRect.isEmpty() )
     {
-        const QRectF r = QwtScaleMap::invTransform( 
-            xxMap, yyMap, QRectF(0, 0, 1, 1) ).normalized();
+        // pixel in target device resolution 
+        const double dx = qAbs( xxMap.invTransform( 1 ) - xxMap.invTransform( 0 ) );
+        const double dy = qAbs( yyMap.invTransform( 1 ) - yyMap.invTransform( 0 ) );
 
-        if ( r.width() > pixelRect.width() &&
-            r.height() > pixelRect.height() )
+        if ( dx > pixelRect.width() && dy > pixelRect.height() )
         {
             /*
               When the resolution of the data pixels is higher than

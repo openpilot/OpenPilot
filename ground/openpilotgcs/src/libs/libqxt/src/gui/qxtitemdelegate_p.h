@@ -52,7 +52,7 @@ public:
     QString progressFormat;
     Qt::TextElideMode elide;
     Qxt::DecorationStyle style;
-    typedef QPointer<QWidget> QWidgetPointer;
+    typedef QPointer<QtWidgets/QWidget> QWidgetPointer;
     mutable QWidgetPointer currentEditor;
     mutable QPersistentModelIndex currentEdited;
     mutable QMultiHash<QWidget*, QPersistentModelIndex> updatedItems;

@@ -61,5 +61,5 @@ void ModelViewPlugin::shutdown()
 {
    // Do nothing
 }
-Q_EXPORT_PLUGIN(ModelViewPlugin)
+//Q_EXPORT_PLUGIN(ModelViewPlugin)
 

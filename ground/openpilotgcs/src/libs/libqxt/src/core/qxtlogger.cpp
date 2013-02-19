@@ -586,7 +586,7 @@ void QxtLoggerMessageHandler(QtMsgType type, const char *msg)
 void QxtLogger::installAsMessageHandler()
 {
     QMutexLocker lock(qxt_d().mut_lock);
-    qInstallMsgHandler(QxtLoggerMessageHandler);
+    //qInstallMessageHandler(QxtLoggerMessageHandler);
 }
 
 /*! \brief Tells Qt to use it's own message handling again.
@@ -594,7 +594,7 @@ void QxtLogger::installAsMessageHandler()
 void QxtLogger::removeAsMessageHandler()
 {
     QMutexLocker lock(qxt_d().mut_lock);
-    qInstallMsgHandler(0);
+    qInstallMessageHandler(0);
 }
 
 /*****************************************************************************

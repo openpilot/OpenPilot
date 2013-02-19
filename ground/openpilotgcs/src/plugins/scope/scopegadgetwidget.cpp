@@ -47,9 +47,9 @@
 #include <QDebug>
 #include <QColor>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QPushButton>
 #include <QMutexLocker>
 #include <QWheelEvent>
 
@@ -626,7 +626,7 @@ int ScopeGadgetWidget::csvLoggingInsertHeader()
     if (m_csvLoggingDataSaved) return -3;
 
     m_csvLoggingHeaderSaved=1;
-    if(m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append)== FALSE)
+    if(m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append)== false)
     {
         qDebug() << "Unable to open " << m_csvLoggingFile.fileName() << " for csv logging Header";
     }
@@ -702,7 +702,7 @@ int ScopeGadgetWidget::csvLoggingInsertData()
     if (!m_csvLoggingStarted) return -1;
     m_csvLoggingDataSaved=1;
 
-    if(m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append)== FALSE)
+    if(m_csvLoggingFile.open(QIODevice::WriteOnly | QIODevice::Append)== false)
     {
         qDebug() << "Unable to open " << m_csvLoggingFile.fileName() << " for csv logging Data";
     }

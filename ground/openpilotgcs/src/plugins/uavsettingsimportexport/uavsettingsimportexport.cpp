@@ -48,7 +48,7 @@
 
 // for file dialog and error messages
 #include <QFileDialog>
-#include <QMessageBox>
+#include <QtWidgets/QMessageBox>
 
 UAVSettingsImportExportPlugin::UAVSettingsImportExportPlugin() 
 { 
@@ -76,6 +76,6 @@ void UAVSettingsImportExportPlugin::shutdown()
 void UAVSettingsImportExportPlugin::extensionsInitialized()
 {
 }
-Q_EXPORT_PLUGIN(UAVSettingsImportExportPlugin)
+//Q_EXPORT_PLUGIN(UAVSettingsImportExportPlugin)
 
 

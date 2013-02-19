@@ -291,7 +291,7 @@ void QxtToolTip::setToolTip(QWidget* parent, QWidget* tooltip, const QRect& rect
     {
         // set
         tooltip->hide();
-        QxtToolTipPrivate::instance()->tooltips[parent] = qMakePair(QPointer<QWidget>(tooltip), rect);
+        QxtToolTipPrivate::instance()->tooltips[parent] = qMakePair(QPointer<QtWidgets/QWidget>(tooltip), rect);
     }
     else
     {

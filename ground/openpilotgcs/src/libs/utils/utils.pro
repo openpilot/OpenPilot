@@ -6,7 +6,8 @@ QT += gui \
     xml \
     svg \
     opengl \
-    declarative
+    declarative \
+    widgets
 
 DEFINES += QTCREATOR_UTILS_LIB
 

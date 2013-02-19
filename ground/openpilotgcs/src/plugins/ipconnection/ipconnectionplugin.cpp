@@ -35,8 +35,8 @@
 #include "ipconnection_internal.h"
 
 #include <QtCore/QtPlugin>
-#include <QtGui/QMainWindow>
-#include <QtGui/QMessageBox>
+#include <QtWidgets/QMainWindow>
+#include <QtWidgets/QMessageBox>
 #include <QtNetwork/QAbstractSocket>
 #include <QtNetwork/QTcpSocket>
 #include <QtNetwork/QUdpSocket>
@@ -262,4 +262,4 @@ bool IPconnectionPlugin::initialize(const QStringList &arguments, QString *error
     return true;
 }
 
-Q_EXPORT_PLUGIN(IPconnectionPlugin)
+//Q_EXPORT_PLUGIN(IPconnectionPlugin)

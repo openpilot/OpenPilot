@@ -114,7 +114,7 @@ void IL2Simulator::transmitUpdate()
             .arg(ailerons)
             .arg(elevator)
             .arg(rudder);
-    QByteArray data = cmd.toAscii();
+    QByteArray data = cmd.toLatin1();
     //outSocket->write(data);
     inSocket->write(data);  // for IL2 must send to the same port as input!!!!!!!!!!!!!
 }

@@ -29,11 +29,12 @@
 #include "opmapgadgetwidget.h"
 #include "ui_opmap_widget.h"
 
-#include <QtGui/QApplication>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QInputDialog>
 #include <QtGui/QClipboard>
-#include <QtGui/QMenu>
+#include <QtWidgets/QMenu>
 #include <QStringList>
 #include <QDir>
 #include <QFile>

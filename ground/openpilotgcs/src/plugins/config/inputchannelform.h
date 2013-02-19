@@ -1,7 +1,7 @@
 #ifndef INPUTCHANNELFORM_H
 #define INPUTCHANNELFORM_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include "configinputwidget.h"
 namespace Ui {
     class inputChannelForm;

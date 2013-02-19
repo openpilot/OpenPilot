@@ -1,7 +1,7 @@
 #ifndef TELEMETRYMONITORWIDGET_H
 #define TELEMETRYMONITORWIDGET_H
 
-#include <QWidget>
+#include <QtWidgets/QWidget>
 #include <QObject>
 #include <QGraphicsView>
 #include <QtSvg/QSvgRenderer>

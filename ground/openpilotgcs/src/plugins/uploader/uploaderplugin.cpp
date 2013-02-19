@@ -59,5 +59,5 @@ void UploaderPlugin::shutdown()
 {
    // Do nothing
 }
-Q_EXPORT_PLUGIN(UploaderPlugin)
+//Q_EXPORT_PLUGIN(UploaderPlugin)
 

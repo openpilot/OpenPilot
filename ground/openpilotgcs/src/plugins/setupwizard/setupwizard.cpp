@@ -26,8 +26,8 @@
  */
 
 #include "setupwizard.h"
-#include "pages/startpage.h"
-#include "pages/endpage.h"
+#include "pages/opstartpage.h"
+#include "pages/opendpage.h"
 #include "pages/controllerpage.h"
 #include "pages/vehiclepage.h"
 #include "pages/multipage.h"

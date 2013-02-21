@@ -23,6 +23,7 @@ equals(copydata, 1) {
                   Qt5Script.dll \
                   Qt5Concurrent.dll \
                   Qt5Widgets.dll \
+                  Qt5PrintSupport.dll \
                   libEGL.dll \
                   libGLESv2.dll \
                   icuin49.dll \

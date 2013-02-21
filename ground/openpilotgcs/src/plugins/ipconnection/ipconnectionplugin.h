@@ -50,7 +50,6 @@ class IPconnection_EXPORT IPconnectionConnection
     : public Core::IConnection
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "Openpilot")
 public:
     IPconnectionConnection();
     virtual ~IPconnectionConnection();
@@ -87,7 +86,7 @@ class IPconnection_EXPORT IPconnectionPlugin
     : public ExtensionSystem::IPlugin
 {
     Q_OBJECT
-
+    Q_PLUGIN_METADATA(IID "Openpilot")
 public:
     IPconnectionPlugin();
     ~IPconnectionPlugin();

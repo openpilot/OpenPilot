@@ -35,11 +35,12 @@ equals(copydata, 1) {
         }
 
         # copy MinGW DLLs
-        #MINGW_DLLS = libgcc_s_dw2-1.dll \
+        MINGW_DLLS = libgcc_s_sjlj-1.dll
+#libgcc_s_dw2-1.dll \
         #             mingwm10.dll
-        #for(dll, MINGW_DLLS) {
-        #    data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
-        #}
+        for(dll, MINGW_DLLS) {
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
+        }
 
         # copy iconengines
         QT_ICONENGINE_DLLS = qsvgicon.dll

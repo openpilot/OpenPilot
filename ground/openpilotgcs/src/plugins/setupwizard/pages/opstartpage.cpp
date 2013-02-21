@@ -24,18 +24,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "startpage.h"
-#include "ui_startpage.h"
+#include "opstartpage.h"
+#include "ui_opstartpage.h"
 
-StartPage::StartPage(SetupWizard *wizard, QWidget *parent) :
+OPStartPage::OPStartPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
-    ui(new Ui::StartPage)
+    ui(new Ui::OPStartPage)
 {
     ui->setupUi(this);
      setFont(QFont("Ubuntu",2));
 }
 
-StartPage::~StartPage()
+OPStartPage::~OPStartPage()
 {
     delete ui;
 }

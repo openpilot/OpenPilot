@@ -12,8 +12,6 @@ include(../../plugins/config/config.pri)
 LIBS *= -l$$qtLibraryName(Uploader)
 HEADERS += setupwizardplugin.h \ 
     setupwizard.h \
-    pages/startpage.h \
-    pages/endpage.h \
     pages/controllerpage.h \
     pages/vehiclepage.h \
     pages/notyetimplementedpage.h \
@@ -34,12 +32,12 @@ HEADERS += setupwizardplugin.h \
     outputcalibrationutil.h \
     pages/rebootpage.h \
     pages/savepage.h \
-    pages/autoupdatepage.h
+    pages/autoupdatepage.h \
+    pages/opendpage.h \
+    pages/opstartpage.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
-    pages/startpage.cpp \
-    pages/endpage.cpp \
     pages/controllerpage.cpp \
     pages/vehiclepage.cpp \
     pages/notyetimplementedpage.cpp \
@@ -60,13 +58,13 @@ SOURCES += setupwizardplugin.cpp \
     outputcalibrationutil.cpp \
     pages/rebootpage.cpp \
     pages/savepage.cpp \
-    pages/autoupdatepage.cpp
+    pages/autoupdatepage.cpp \
+    pages/opstartpage.cpp \
+    pages/opendpage.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 
 FORMS += \
-    pages/startpage.ui \
-    pages/endpage.ui \
     pages/controllerpage.ui \
     pages/vehiclepage.ui \
     pages/notyetimplementedpage.ui \
@@ -82,7 +80,9 @@ FORMS += \
     pages/outputcalibrationpage.ui \
     pages/rebootpage.ui \
     pages/savepage.ui \
-    pages/autoupdatepage.ui
+    pages/autoupdatepage.ui \
+    pages/opendpage.ui \
+    pages/opstartpage.ui
 
 RESOURCES += \
     wizardResources.qrc

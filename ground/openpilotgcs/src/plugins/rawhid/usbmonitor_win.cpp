@@ -130,24 +130,32 @@ DEFINE_GUID(GUID_DEVCLASS_PORTS, //0x4d1e55b2, 0xf16f, 0x11cf, 0x88, 0xcb, 0x00,
 
 void USBMonitor::setUpNotifications( )
 {
-#ifdef QT_GUI_LIB
-    if(notificationWidget)
+
+#ifndef QT_GUI_LIB
+    qWarning("USBMonitor: GUI not enabled - can't register for device notifications.");
+    return;
+#else
+    //Q_Q(USBMonitor);
+    if (notificationWidget) //already setup
         return;
     notificationWidget = new USBRegistrationWidget(this);
 
     DEV_BROADCAST_DEVICEINTERFACE dbh;
-    ZeroMemory(&dbh, sizeof(dbh));
+    ::ZeroMemory(&dbh, sizeof(dbh));
     dbh.dbcc_size = sizeof(dbh);
     dbh.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+    // dbh.dbcc_classguid = GUID_DEVCLASS_PORTS; //Ignored in such case
     CopyMemory(&dbh.dbcc_classguid, &guid_hid, sizeof(GUID));
-    if( RegisterDeviceNotification( notificationWidget->winId( ), &dbh, DEVICE_NOTIFY_WINDOW_HANDLE ) == NULL)
+    DWORD flags = DEVICE_NOTIFY_WINDOW_HANDLE;
+    if (::RegisterDeviceNotification((HWND)notificationWidget->winId(), &dbh, flags) == NULL) {
         qWarning() << "RegisterDeviceNotification failed:" << GetLastError();
+        return;
+    }
     // setting up notifications doesn't tell us about devices already connected
     // so get those manually
     foreach( USBPortInfo port,availableDevices() )
-      emit deviceDiscovered( port );
-#else
-    qWarning("GUI not enabled - can't register for device notifications.");
+        Q_EMIT deviceDiscovered(port);
+    return;
 #endif // QT_GUI_LIB
 }
 LRESULT USBMonitor::onDeviceChangeWin( WPARAM wParam, LPARAM lParam )

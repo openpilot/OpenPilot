@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       endpage.h
+ * @file       startpage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- * @addtogroup
+ * @addtogroup Setup Wizard  Plugin
  * @{
- * @brief
+ * @brief A Wizard to make the initial setup easy for everyone.
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,29 +24,25 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-#ifndef ENDPAGE_H
-#define ENDPAGE_H
+#ifndef STARTPAGE_H
+#define STARTPAGE_H
 
 #include "abstractwizardpage.h"
 
 namespace Ui {
-class EndPage;
+class OPStartPage;
 }
 
-class EndPage : public AbstractWizardPage
+class OPStartPage : public AbstractWizardPage
 {
     Q_OBJECT
     
 public:
-    explicit EndPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~EndPage();
+    explicit OPStartPage(SetupWizard *wizard, QWidget *parent = 0);
+    ~OPStartPage();
     
-private slots:
-    void openInputWizard();
-
 private:
-    Ui::EndPage *ui;
+    Ui::OPStartPage *ui;
 };
 
-#endif // ENDPAGE_H
+#endif // STARTPAGE_H

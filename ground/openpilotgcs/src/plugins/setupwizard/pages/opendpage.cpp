@@ -24,28 +24,28 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "endpage.h"
-#include "ui_endpage.h"
+#include "opendpage.h"
+#include "ui_opendpage.h"
 #include <coreplugin/modemanager.h>
 #include <extensionsystem/pluginmanager.h>
 #include <configgadgetfactory.h>
 #include <QtWidgets/QMessageBox>
 
-EndPage::EndPage(SetupWizard *wizard, QWidget *parent) :
+OPEndPage::OPEndPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
-    ui(new Ui::EndPage)
+    ui(new Ui::OPEndPage)
 {
     ui->setupUi(this);
     setFinalPage(true);
     connect(ui->inputWizardButton, SIGNAL(clicked()), this, SLOT(openInputWizard()));
 }
 
-EndPage::~EndPage()
+OPEndPage::~OPEndPage()
 {
     delete ui;
 }
 
-void EndPage::openInputWizard()
+void OPEndPage::openInputWizard()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     ConfigGadgetFactory* configGadgetFactory = pm->getObject<ConfigGadgetFactory>();

@@ -2465,14 +2465,7 @@
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve0>
-          <plotCurve1>
-            <color>0</color>
-            <yMaximum>0</yMaximum>
-            <yMeanSamples>1</yMeanSamples>
-            <yMinimum>0</yMinimum>
-            <yScalePower>0</yScalePower>
-          </plotCurve1>
-          <plotCurveCount>2</plotCurveCount>
+          <plotCurveCount>1</plotCurveCount>
           <plotType>1</plotType>
           <refreshInterval>800</refreshInterval>
         </data>

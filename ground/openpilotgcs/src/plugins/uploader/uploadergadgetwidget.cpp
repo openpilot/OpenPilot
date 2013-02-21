@@ -120,6 +120,8 @@ void UploaderGadgetWidget::connectSignalSlot(QWidget *widget)
 {
     connect(qobject_cast<deviceWidget *>(widget),SIGNAL(uploadStarted()),this,SLOT(uploadStarted()));
     connect(qobject_cast<deviceWidget *>(widget),SIGNAL(uploadEnded(bool)),this,SLOT(uploadEnded(bool)));
+    connect(qobject_cast<deviceWidget *>(widget),SIGNAL(downloadStarted()),this,SLOT(downloadStarted()));
+    connect(qobject_cast<deviceWidget *>(widget),SIGNAL(downloadEnded(bool)),this,SLOT(downloadEnded(bool)));
 }
 
 FlightStatus *UploaderGadgetWidget::getFlightStatus()
@@ -758,15 +760,44 @@ void UploaderGadgetWidget::cancel()
 
 void UploaderGadgetWidget::uploadStarted()
 {
+    m_config->haltButton->setEnabled(false);
     m_config->bootButton->setEnabled(false);
     m_config->safeBootButton->setEnabled(false);
+    m_config->resetButton->setEnabled(false);
+    m_config->rescueButton->setEnabled(false);
 }
 
 void UploaderGadgetWidget::uploadEnded(bool succeed)
 {
     Q_UNUSED(succeed);
+    // device is halted so no halt
+    m_config->haltButton->setEnabled(false);
     m_config->bootButton->setEnabled(true);
     m_config->safeBootButton->setEnabled(true);
+    // device is halted so no reset
+    m_config->resetButton->setEnabled(false);
+    m_config->rescueButton->setEnabled(true);
+}
+
+void UploaderGadgetWidget::downloadStarted()
+{
+    m_config->haltButton->setEnabled(false);
+    m_config->bootButton->setEnabled(false);
+    m_config->safeBootButton->setEnabled(false);
+    m_config->resetButton->setEnabled(false);
+    m_config->rescueButton->setEnabled(false);
+}
+
+void UploaderGadgetWidget::downloadEnded(bool succeed)
+{
+    Q_UNUSED(succeed);
+    // device is halted so no halt
+    m_config->haltButton->setEnabled(false);
+    m_config->bootButton->setEnabled(true);
+    m_config->safeBootButton->setEnabled(true);
+    // device is halted so no reset
+    m_config->resetButton->setEnabled(false);
+    m_config->rescueButton->setEnabled(true);
 }
 
 /**

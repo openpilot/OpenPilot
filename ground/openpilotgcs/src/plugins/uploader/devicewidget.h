@@ -71,10 +71,13 @@ private:
     void status(QString str, StatusIcon ic);
     bool populateBoardStructuredDescription(QByteArray arr);
     bool populateLoadedStructuredDescription(QByteArray arr);
+    void updateButtons(bool enabled);
 
 signals:
     void uploadStarted();
     void uploadEnded(bool success);
+    void downloadStarted();
+    void downloadEnded(bool success);
 public slots:
     void uploadFirmware();
     void loadFirmware();

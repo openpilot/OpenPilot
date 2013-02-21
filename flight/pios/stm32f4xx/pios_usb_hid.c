@@ -67,10 +67,10 @@ struct pios_usb_hid_dev {
 
 	bool usb_if_enabled;
 
-	uint8_t rx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH];
+	uint8_t rx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH] __attribute__ ((aligned(4)));
 	bool rx_active;
 
-	uint8_t tx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH];
+	uint8_t tx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH] __attribute__ ((aligned(4)));
 	bool tx_active;
 
 	uint32_t rx_dropped;

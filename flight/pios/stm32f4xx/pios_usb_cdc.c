@@ -69,13 +69,13 @@ struct pios_usb_cdc_dev {
 	bool usb_ctrl_if_enabled;
 	bool usb_data_if_enabled;
 
-	uint8_t rx_packet_buffer[PIOS_USB_BOARD_CDC_DATA_LENGTH];
+	uint8_t rx_packet_buffer[PIOS_USB_BOARD_CDC_DATA_LENGTH] __attribute__ ((aligned(4)));
 	volatile bool rx_active;
 
-	uint8_t tx_packet_buffer[PIOS_USB_BOARD_CDC_DATA_LENGTH];
+	uint8_t tx_packet_buffer[PIOS_USB_BOARD_CDC_DATA_LENGTH] __attribute__ ((aligned(4)));
 	volatile bool tx_active;
 
-	uint8_t ctrl_tx_packet_buffer[PIOS_USB_BOARD_CDC_MGMT_LENGTH];
+	uint8_t ctrl_tx_packet_buffer[PIOS_USB_BOARD_CDC_MGMT_LENGTH] __attribute__ ((aligned(4)));
 
 	uint32_t rx_dropped;
 	uint32_t rx_oversize;

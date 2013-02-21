@@ -214,24 +214,26 @@ BaudRateType SerialConnection::stringToBaud(QString str)
         return BAUD4800;
     else if(str== "9600")
         return BAUD9600;
-    else if(str== "14400")
-        return BAUD14400;
     else if(str== "19200")
         return BAUD19200;
     else if(str== "38400")
         return BAUD38400;
-    else if(str== "56000")
-        return BAUD56000;
-    else if(str== "57600")
+	else if(str== "57600")
         return BAUD57600;
     else if(str== "115200")
-        return BAUD115200;
-    else if(str== "128000")
+		return BAUD115200;
+#if defined(Q_OS_WIN) || defined(qdoc)
+	else if(str== "14400")
+		return BAUD14400;
+	else if(str== "56000")
+		return BAUD56000;
+	else if(str== "128000")
         return BAUD128000;
-    else if(str== "256000")
+	else if(str== "256000")
         return BAUD256000;
-    else
-        return BAUD57600;
+#endif
+	else
+		return BAUD57600;
 }
 
 SerialPlugin::SerialPlugin()

@@ -474,10 +474,12 @@ android_sdk_update:
 #
 ##############################
 
-ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && echo "exists"), exists)
+ifeq ($(shell [ -d "$(QT_SDK_DIR)/5.0.1/gcc_64" ] && echo "exists"), exists)
   QMAKE=$(QT_SDK_DIR)/5.0.1/gcc_64/bin/qmake
+else ifeq ($(shell [ -d "$(QT_SDK_DIR)/5.0.1/gcc" ] && echo "exists"), exists)
+  QMAKE=$(QT_SDK_DIR)/5.0.1/gcc/bin/qmake
 else
-  # not installed, hope it's in the path...
+# not installed, hope it's in the path...
   QMAKE=qmake
 endif
 

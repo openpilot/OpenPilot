@@ -30,10 +30,8 @@
 #include "homelocationutil.h"
 
 #include <stdint.h>
-#include <QDebug>
 #include <QDateTime>
 
-#include "coordinateconversions.h"
 #include "worldmagmodel.h"
 
 namespace Utils {
@@ -46,7 +44,7 @@ namespace Utils {
      * @brief Get local magnetic field
      * @param[in] LLA The longitude-latitude-altitude coordinate to compute the magnetic field at
      * @param[out] Be The resulting magnetic field at that location and time in [mGau](?)
-     * @returns 0 if successful, -1 otherwise.
+     * @returns 0 if successful, negative otherwise.
      */
     int HomeLocationUtil::getDetails(double LLA[3], double Be[3])
     {
@@ -64,15 +62,13 @@ namespace Utils {
         if (latitude < -90 || latitude > 90) return -4;		// range checking
         if (longitude < -180 || longitude > 180) return -5;	// range checking
 
-        // *************
-
         QDateTime dt = QDateTime::currentDateTime().toUTC();
 
         // Fetch world magnetic model
         int result = WorldMagModel().GetMagVector(LLA, dt.date().month(), dt.date().day(), dt.date().year(), Be);
-        Q_ASSERT(result >= 0);
+        Q_ASSERT(result == 0);
 
-        return 0;	// OK
+        return result;
     }
 
 }

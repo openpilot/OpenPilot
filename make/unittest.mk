@@ -61,11 +61,11 @@ $(eval $(call LINK_CXX_TEMPLATE,$(OUTDIR)/$(TARGET).elf,$(ALLOBJ) $(OUTDIR)/gtes
 elf: $(OUTDIR)/$(TARGET).elf
 
 .PHONY: xml
-xml: $(OUTDIR)/$(TARGET).xml
+xml: $(OUTDIR)/test-reports/$(TARGET).xml
 
-$(OUTDIR)/$(TARGET).xml: $(OUTDIR)/$(TARGET).elf
+$(OUTDIR)/test-reports/$(TARGET).xml: $(OUTDIR)/$(TARGET).elf
 	$(V0) @echo " TEST XML  $(MSG_EXTRA)  $(call toprel, $@)"
-	$(V1) $< --gtest_output=xml:$(OUTDIR)/$(TARGET).xml > /dev/null
+	$(V1) $< --gtest_output=xml:$@ > /dev/null
 
 .PHONY: run
 run: $(OUTDIR)/$(TARGET).elf

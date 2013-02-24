@@ -42,22 +42,21 @@
 // Public types
 typedef enum {
 	PACKET_TYPE_NONE = 0,
-	PACKET_TYPE_STATUS,         // broadcasts status of this modem
-	PACKET_TYPE_CON_REQUEST,    // request a connection to another modem
-	PACKET_TYPE_DATA,           // data packet (packet contains user data)
-	PACKET_TYPE_DUPLICATE_DATA, // a duplicate data packet
-	PACKET_TYPE_PPM,            // PPM relay values
-	PACKET_TYPE_ACK,            // Acknowlege the receipt of a packet
-	PACKET_TYPE_ACK_RTS,        // Acknowlege the receipt of a packet and indicate that the receiving side has data to send (ready to send)
-	PACKET_TYPE_NACK,           // Acknowlege the receipt of an uncorrectable packet
+	PACKET_TYPE_STATUS,              // broadcasts status of this modem
+	PACKET_TYPE_CON_REQUEST,         // request a connection to another modem
+	PACKET_TYPE_DATA,                // data packet (packet contains user data)
+	PACKET_TYPE_DUPLICATE_DATA,      // a duplicate data packet
+	PACKET_TYPE_PPM,                 // PPM relay values
+	PACKET_TYPE_ACK,                 // Acknowlege the receipt of a packet
+	PACKET_TYPE_ACK_RTS,             // Acknowlege the receipt of a packet and indicate that the receiving side has data to send (ready to send)
+	PACKET_TYPE_NACK,                // Acknowlege the receipt of an uncorrectable packet
 } PHPacketType;
 
 typedef struct {
 	uint32_t destination_id;
-	uint32_t source_id;
+	uint16_t seq_num;
 	uint8_t type;
 	uint8_t data_size;
-	uint16_t seq_num;
 } PHPacketHeader;
 
 #define PH_MAX_DATA (PIOS_PH_MAX_PACKET - sizeof(PHPacketHeader) - RS_ECC_NPARITY)
@@ -83,6 +82,7 @@ typedef struct {
 #define PH_STATUS_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
 typedef struct {
 	PHPacketHeader header;
+        uint32_t source_id;
 	uint8_t link_quality;
 	int8_t received_rssi;
 	uint8_t ecc[RS_ECC_NPARITY];
@@ -91,14 +91,12 @@ typedef struct {
 #define PH_CONNECTION_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
 typedef struct {
 	PHPacketHeader header;
-	uint32_t frequency_hz;
-	uint32_t min_frequency;
-	uint32_t max_frequency;
-	uint8_t max_tx_power;
+        uint32_t source_id;
 	OPLinkSettingsMainPortOptions main_port;
 	OPLinkSettingsFlexiPortOptions flexi_port;
 	OPLinkSettingsVCPPortOptions vcp_port;
 	OPLinkSettingsComSpeedOptions com_speed;
+	uint8_t max_tx_power;
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHConnectionPacket, *PHConnectionPacketHandle;
 

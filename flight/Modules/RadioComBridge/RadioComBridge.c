@@ -135,9 +135,6 @@ static int32_t RadioComBridgeStart(void)
             OPLinkSettingsData oplinkSettings;
             OPLinkSettingsGet(&oplinkSettings);
 
-            // Set the frequencies.
-            PIOS_RFM22B_SetFrequencyRange(pios_rfm22b_id, oplinkSettings.MinFrequency, oplinkSettings.MaxFrequency);
-
             // Set the maximum radio RF power.
             switch (oplinkSettings.MaxRFPower)
             {

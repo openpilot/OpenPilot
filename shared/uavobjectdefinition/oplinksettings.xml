@@ -10,9 +10,6 @@
 		<field name="FlexiPort" units="" type="enum" elements="1" options="Disabled,Telemetry,Serial,PPM" defaultvalue="Disabled"/>
 		<field name="VCPPort" units="" type="enum" elements="1" options="Disabled,Serial" defaultvalue="Disabled"/>
 		<field name="MaxRFPower" units="mW" type="enum" elements="1" options="1.25,1.6,3.16,6.3,12.6,25,50,100" defaultvalue="100"/>
-		<field name="FrequencyCalibration" units="" type="uint8" elements="1" defaultvalue="127"/>
-		<field name="MinFrequency" units="" type="uint32" elements="1" defaultvalue="432000000"/>
-		<field name="MaxFrequency" units="" type="uint32" elements="1" defaultvalue="436000000"/>
 
 		<access gcs="readwrite" flight="readwrite"/>
 		<telemetrygcs acked="true" updatemode="onchange" period="0"/>

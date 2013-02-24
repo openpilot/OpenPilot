@@ -63,9 +63,6 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
 	addUAVObjectToWidgetRelation("OPLinkSettings", "FlexiPort", m_oplink->FlexiPort);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "VCPPort", m_oplink->VCPPort);
 	addUAVObjectToWidgetRelation("OPLinkSettings", "MaxRFPower", m_oplink->MaxRFTxPower);
-	addUAVObjectToWidgetRelation("OPLinkSettings", "FrequencyCalibration", m_oplink->FrequencyCalibration);
-	addUAVObjectToWidgetRelation("OPLinkSettings", "MinFrequency", m_oplink->MinFrequency);
-	addUAVObjectToWidgetRelation("OPLinkSettings", "MaxFrequency", m_oplink->MaxFrequency);
 
 	addUAVObjectToWidgetRelation("OPLinkStatus", "DeviceID", m_oplink->DeviceID);
 	addUAVObjectToWidgetRelation("OPLinkStatus", "RxGood", m_oplink->Good);

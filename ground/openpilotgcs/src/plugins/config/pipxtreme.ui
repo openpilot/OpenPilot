@@ -1429,19 +1429,6 @@
               </property>
              </widget>
             </item>
-            <item row="4" column="2">
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
            </layout>
           </widget>
          </item>
@@ -2548,129 +2535,6 @@
            </property>
           </widget>
          </item>
-         <item row="8" column="0">
-          <widget class="QLabel" name="FreqCalLabel">
-           <property name="text">
-            <string>Frequency Calibration</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="1">
-          <widget class="QSpinBox" name="FrequencyCalibration">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Calibrate the modems RF carrier frequency</string>
-           </property>
-           <property name="accelerated">
-            <bool>true</bool>
-           </property>
-           <property name="maximum">
-            <number>255</number>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Min. Frequency (Hz)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="1">
-          <widget class="QSpinBox" name="MinFrequency">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Set the modems minimum RF carrier frequency</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-           <property name="accelerated">
-            <bool>true</bool>
-           </property>
-           <property name="minimum">
-            <number>400000000</number>
-           </property>
-           <property name="maximum">
-            <number>1000000000</number>
-           </property>
-           <property name="singleStep">
-            <number>100000</number>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="0">
-          <widget class="QLabel" name="MaxFrequencyLabel">
-           <property name="text">
-            <string>Max. Frequency (Hz)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="1">
-          <widget class="QSpinBox" name="MaxFrequency">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Set the modems maximum RF carrier frequency</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-           </property>
-           <property name="accelerated">
-            <bool>true</bool>
-           </property>
-           <property name="minimum">
-            <number>400000000</number>
-           </property>
-           <property name="maximum">
-            <number>1000000000</number>
-           </property>
-           <property name="singleStep">
-            <number>100000</number>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -2704,7 +2568,6 @@
   <tabstop>FirmwareVersion</tabstop>
   <tabstop>SerialNumber</tabstop>
   <tabstop>MaxRFTxPower</tabstop>
-  <tabstop>FrequencyCalibration</tabstop>
   <tabstop>Apply</tabstop>
   <tabstop>Save</tabstop>
  </tabstops>

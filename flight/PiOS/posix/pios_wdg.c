@@ -51,8 +51,9 @@
  * @param[in] delayMs The delay period in ms
  * @returns Maximum recommended delay between updates
  */
-void PIOS_WDG_Init()
+uint16_t PIOS_WDG_Init()
 {
+	return 0;
 }
 
 /**

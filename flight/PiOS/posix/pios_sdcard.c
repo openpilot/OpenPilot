@@ -38,7 +38,7 @@
 * \param[in] mode currently only mode 0 supported
 * \return < 0 if initialisation failed
 */
-int32_t PIOS_SDCARD_Init(void)
+int32_t PIOS_SDCARD_Init(uint32_t spi_id)
 {
 	/* No error */
 	return 0;

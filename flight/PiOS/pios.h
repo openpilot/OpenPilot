@@ -27,7 +27,9 @@
 
 #ifndef PIOS_H
 #define PIOS_H
-
+#ifdef USE_SIM_POSIX
+#include <pios_sim_posix.h>
+#else
 /* PIOS Feature Selection */
 #include "pios_config.h"
 
@@ -169,5 +171,5 @@
 #include <pios_crc.h>
 
 #define NELEMENTS(x) (sizeof(x) / sizeof(*(x)))
-
+#endif /* USE_SIMPOSIX */
 #endif /* PIOS_H */

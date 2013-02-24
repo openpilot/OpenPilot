@@ -17,6 +17,8 @@
 #include "STM32F4xx_OSD.h"
 #elif USE_STM32F4xx_RM
 #include "STM32F4xx_RevoMini.h"
+#elif USE_SIM_POSIX
+#include "sim_posix.h"
 #else
 #error Board definition has not been provided.
 #endif

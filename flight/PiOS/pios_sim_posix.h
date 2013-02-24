@@ -25,8 +25,8 @@
  */
 
 
-#ifndef PIOS_H
-#define PIOS_H
+#ifndef PIOS_SIM_POSIX_H
+#define PIOS_SIM_POSIX_H
 
 /* PIOS Feature Selection */
 #include "pios_config.h"
@@ -49,7 +49,7 @@
 #include <unistd.h>
 
 /* Generic initcall infrastructure */
-#include "pios_initcall.h"
+#include <pios_initcall.h>
 
 /* PIOS Board Specific Device Configuration */
 #include "pios_board.h"
@@ -77,4 +77,4 @@
 
 #define NELEMENTS(x) (sizeof(x) / sizeof(*(x)))
 
-#endif /* PIOS_H */
+#endif /* PIOS_POSIX_H */

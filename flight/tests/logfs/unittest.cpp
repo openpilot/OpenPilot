@@ -35,7 +35,7 @@ class LogfsTestRaw : public testing::Test {
 protected:
   virtual void SetUp() {
     /* create an empty, appropriately sized flash filesystem */
-    FILE * theflash = fopen("theflash.bin", "w");
+    FILE * theflash = fopen("theflash.bin", "wb");
     uint8_t sector[flash_config.size_of_sector];
     memset(sector, 0xFF, sizeof(sector));
     for (uint32_t i = 0; i < flash_config.size_of_flash / flash_config.size_of_sector; i++) {

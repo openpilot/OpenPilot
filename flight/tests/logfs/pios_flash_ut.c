@@ -41,7 +41,7 @@ int32_t PIOS_Flash_UT_Init(uintptr_t * flash_id, const struct pios_flash_ut_cfg 
 	flash_dev->cfg = cfg;
 	flash_dev->transaction_in_progress = false;
 
-	flash_dev->flash_file = fopen ("theflash.bin", "r+");
+	flash_dev->flash_file = fopen ("theflash.bin", "rb+");
 	if (flash_dev->flash_file == NULL) {
 		return -1;
 	}

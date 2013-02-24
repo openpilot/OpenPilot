@@ -34,6 +34,8 @@ CFLAGS += -Wall -Werror
 CFLAGS += -g
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
+CFLAGS += "-DFLASH_IMAGE_FILE=\"$(OUTDIR)/theflash.bin\""
+
 CONLYFLAGS += -std=gnu99
 
 SRC := $(PIOS)/Common/pios_flashfs_logfs.c

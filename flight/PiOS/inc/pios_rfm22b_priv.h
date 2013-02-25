@@ -792,6 +792,13 @@ struct pios_rfm22b_dev {
 
 	// The maximum time to wait for an ACK.
 	uint8_t max_ack_delay;
+
+#ifdef PIOS_INCLUDE_RFM22B_RCVR
+	// The PPM channel values
+	uint16_t ppm_channel[PIOS_RFM22B_RCVR_MAX_CHANNELS];
+	uint8_t ppm_supv_timer;
+	bool ppm_fresh;
+#endif
 };
 
 

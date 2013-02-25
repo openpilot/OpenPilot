@@ -1781,8 +1781,10 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 					break;
 				case PACKET_TYPE_PPM:
 				{
+#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER) || (defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT))
 					PHPpmPacketHandle ppmp = (PHPpmPacketHandle)&(rfm22b_dev->rx_packet);
 					bool ppm_output = false;
+#endif
 #if defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT)
 					if (PIOS_PPM_OUTPUT) {
 						ppm_output = true;

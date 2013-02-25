@@ -42,6 +42,12 @@
 #include "hwsettings.h"
 #include "manualcontrolsettings.h"
 
+#if defined(PIOS_INCLUDE_RFM22B)
+// Forward declarations
+static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
+				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed);
+#endif
+
 /**
  * Sensor configurations 
  */
@@ -633,6 +639,10 @@ void PIOS_Board_Init(void) {
 				PIOS_Assert(0);
 			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_OPLINK] = pios_rfm22b_rcvr_id;
 #endif
+
+                        // Set the com port configuration callback.
+                        PIOS_RFM22B_SetComConfigCallback(pios_rfm22b_id, &configureComCallback);
+
 			break;
 		}
 	}
@@ -733,6 +743,48 @@ void PIOS_Board_Init(void) {
 #endif
 
 }
+
+#if defined(PIOS_INCLUDE_RFM22B)
+/**
+ * Configure the radio com port based on a configuration event from the remote coordinator.
+ * \param[in] main_port  The main com port options
+ * \param[in] flexi_port The flexi com port options
+ * \param[in] vcp_port   The USB virtual com port options
+ * \param[in] com_speed  The com port speed
+ */
+static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
+				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed)
+{
+    uint32_t comBaud = 9600;
+    switch (com_speed) {
+    case OPLINKSETTINGS_COMSPEED_2400:
+        comBaud = 2400;
+        break;
+    case OPLINKSETTINGS_COMSPEED_4800:
+        comBaud = 4800;
+        break;
+    case OPLINKSETTINGS_COMSPEED_9600:
+        comBaud = 9600;
+        break;
+    case OPLINKSETTINGS_COMSPEED_19200:
+        comBaud = 19200;
+        break;
+    case OPLINKSETTINGS_COMSPEED_38400:
+        comBaud = 38400;
+        break;
+    case OPLINKSETTINGS_COMSPEED_57600:
+        comBaud = 57600;
+        break;
+    case OPLINKSETTINGS_COMSPEED_115200:
+        comBaud = 115200;
+        break;
+    }
+    if (PIOS_COM_TELEM_RF) {
+        PIOS_COM_ChangeBaud(PIOS_COM_TELEM_RF, comBaud);
+    }
+}
+
+#endif
 
 /**
  * @}

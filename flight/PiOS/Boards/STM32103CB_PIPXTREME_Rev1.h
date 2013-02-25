@@ -182,6 +182,7 @@ extern uint32_t pios_com_radio_id;
 extern uint32_t pios_ppm_rcvr_id;
 extern uint32_t pios_ppm_out_id;
 #define PIOS_COM_TELEM_USB_HID     (pios_com_telem_usb_id)
+#define PIOS_COM_TELEM_USB         PIOS_COM_TELEM_USB_HID
 #define PIOS_COM_TELEM_USB_VCP     (pios_com_telem_vcp_id)
 #define PIOS_COM_TELEM_UART_MAIN   (pios_com_telem_uart_main_id)
 #define PIOS_COM_TELEM_UART_FLEXI  (pios_com_telem_uart_flexi_id)

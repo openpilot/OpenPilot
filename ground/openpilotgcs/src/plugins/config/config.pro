@@ -17,7 +17,6 @@ HEADERS += configplugin.h \
     configinputwidget.h \
     configoutputwidget.h \
     configvehicletypewidget.h \
-    config_pro_hw_widget.h \
     config_cc_hw_widget.h \
     configccattitudewidget.h \
     configpipxtremewidget.h \
@@ -39,7 +38,8 @@ HEADERS += configplugin.h \
     config_global.h \
     mixercurve.h \
     dblspindelegate.h \
-    configautotunewidget.h
+    configautotunewidget.h \
+    configrevohwwidget.h
 SOURCES += configplugin.cpp \
     configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
@@ -50,7 +50,6 @@ SOURCES += configplugin.cpp \
     configinputwidget.cpp \
     configoutputwidget.cpp \
     configvehicletypewidget.cpp \
-    config_pro_hw_widget.cpp \
     config_cc_hw_widget.cpp \
     configccattitudewidget.cpp \
     configstabilizationwidget.cpp \
@@ -73,10 +72,10 @@ SOURCES += configplugin.cpp \
     cfg_vehicletypes/vehicleconfig.cpp \
     mixercurve.cpp \
     dblspindelegate.cpp \
-    configautotunewidget.cpp
+    configautotunewidget.cpp \
+    configrevohwwidget.cpp
 FORMS += airframe.ui \
     cc_hw_settings.ui \
-    pro_hw_settings.ui \
     ccpm.ui \
     stabilization.ui \
     input.ui \
@@ -91,7 +90,8 @@ FORMS += airframe.ui \
     txpid.ui \
     pipxtreme.ui \
     mixercurve.ui \
-    autotune.ui
+    autotune.ui \
+    configrevohwwidget.ui
 RESOURCES += configgadget.qrc
 
 

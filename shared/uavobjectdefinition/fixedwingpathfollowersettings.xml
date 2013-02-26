@@ -1,0 +1,58 @@
+<xml>
+    <object name="FixedWingPathFollowerSettings" singleinstance="true" settings="true">
+        <description>Settings for the @ref FixedWingPathFollowerModule</description>
+
+        <!-- these coefficients control desired movement in airspace -->
+        <field name="AirSpeedMax" units="m/s" type="float" elements="1" defaultvalue="30"/>
+                <!-- Vne, i.e. maximum airspeed the airframe can handle -->
+        <field name="CruiseSpeed" units="m/s" type="float" elements="1" defaultvalue="20"/>
+                <!-- Maximum speed the autopilot will try to achieve, usually for long distances -->
+        <field name="BestClimbRateSpeed" units="m/s" type="float" elements="1" defaultvalue="10"/>
+                <!-- V_y, Minimum speed the autopilot will try to fly, for example when loitering -->
+        <field name="StallSpeedClean" units="m/s" type="float" elements="1" defaultvalue="8"/>
+                <!-- Vs1, i.e. stall speed in clean configuration- leave some safety margin -->
+        <field name="StallSpeedDirty" units="m/s" type="float" elements="1" defaultvalue="8"/>
+                <!-- Vs0, i.e. stall speed with flaps and landing gear deployed - leave some safety margin -->
+        <field name="VerticalVelMax" units="m/s" type="float" elements="1" defaultvalue="10"/>
+                <!-- maximum allowed climb or sink rate in guided flight-->
+
+        <field name="HeadingFeedForward" units="s" type="float" elements="1" defaultvalue="3.0"/>
+                <!-- how many seconds to plan the flight vector ahead when initiating necessary heading changes - increase for planes with sluggish response -->
+
+        <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
+                <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
+        <field name="VerticalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
+                <!-- proportional coefficient for desired vertical speed in relation to altitude displacement-->
+
+        <!-- these coefficients control actual control outputs -->
+        <field name="BearingPI" units="deg/deg" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.2, 0, 0"/>
+                <!-- coefficients for desired bank angle in relation to ground bearing error - this controls heading -->
+
+        <field name="SpeedPI" units="deg / (m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="1.5, .15, 20"/>
+                <!-- coefficients for desired pitch
+                     in relation to speed error IASerror -->
+        <field name="VerticalToPitchCrossFeed" units="deg / (m/s)" type="float" elementnames="Kp,Max" defaultvalue="5, 10"/>
+                <!-- coefficients for adjusting desired pitch
+                     in relation to "vertical speed error -->
+        <field name="AirspeedToPowerCrossFeed" units="1 / (m/s)" type="float" elementnames="Kp,Max" defaultvalue="0.1, 1"/>
+                <!-- proportional coefficient for adjusting vertical speed error for power calculation
+                     in relation to airspeed error IASerror -->
+        <field name="PowerPI" units="1/(m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.01,0.01,0.8"/>
+                <!-- proportional coefficient for desired throttle
+                     in relation to vertical speed error (absolute but including crossfeed) -->
+
+        <!-- output limits -->
+        <field name="RollLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-35,0,35" />
+                <!-- maximum allowed bank angles in navigates flight -->
+        <field name="PitchLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-10,5,10" />
+                <!-- maximum allowed pitch angles and setpoint for neutral pitch -->
+        <field name="ThrottleLimit" units="" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="0.1,0.5,0.9" />
+                <!-- minimum and maximum allowed throttle and setpoint for cruise speed -->
+
+        <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="100"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

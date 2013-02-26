@@ -65,6 +65,8 @@ public class HidUAVTalk extends TelemetryTask {
 	private boolean readPending = false;
 	private boolean writePending = false;
 	private IntentFilter deviceAttachedFilter;
+	private boolean usbReceiverRegistered = false;
+	private boolean usbPermissionReceiverRegistered = false;
 
 	public HidUAVTalk(OPTelemetryService service) {
 		super(service);
@@ -74,8 +76,14 @@ public class HidUAVTalk extends TelemetryTask {
 	public void disconnect() {
 
 		CleanUpAndClose();
-		telemService.unregisterReceiver(usbReceiver);
-		telemService.unregisterReceiver(usbPermissionReceiver);
+		if(usbReceiverRegistered){
+			telemService.unregisterReceiver(usbReceiver);
+			usbReceiverRegistered = false;
+		}
+		if(usbPermissionReceiverRegistered){
+			telemService.unregisterReceiver(usbPermissionReceiver);
+			usbPermissionReceiverRegistered = false;
+		}
 
 		super.disconnect();
 
@@ -110,11 +118,13 @@ public class HidUAVTalk extends TelemetryTask {
 		permissionIntent = PendingIntent.getBroadcast(telemService, 0, new Intent(ACTION_USB_PERMISSION), 0);
 		permissionFilter = new IntentFilter(ACTION_USB_PERMISSION);
 		telemService.registerReceiver(usbPermissionReceiver, permissionFilter);
+		usbPermissionReceiverRegistered = true;
 
 		deviceAttachedFilter = new IntentFilter();
 		deviceAttachedFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
 		deviceAttachedFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
 		telemService.registerReceiver(usbReceiver, deviceAttachedFilter);
+		usbReceiverRegistered = true;
 
 		// Go through all the devices plugged in
 		HashMap<String, UsbDevice> deviceList = usbManager.getDeviceList();
@@ -123,7 +133,10 @@ public class HidUAVTalk extends TelemetryTask {
 		while(deviceIterator.hasNext()){
 			UsbDevice dev = deviceIterator.next();
 			if (DEBUG) Log.d(TAG, "Testing device: " + dev);
-			usbManager.requestPermission(dev, permissionIntent);
+			if( ValidateFoundDevice(dev) ) {
+				usbManager.requestPermission(dev, permissionIntent);
+				break;
+			}
 		}
 
 		if (DEBUG) Log.d(TAG, "Registered the deviceAttachedFilter");
@@ -253,6 +266,12 @@ public class HidUAVTalk extends TelemetryTask {
 		if (DEBUG) Log.d(TAG, "ConnectToDeviceInterface:");
 		UsbEndpoint ep1 = null;
 		UsbEndpoint ep2 = null;
+
+		if (connectDevice.getInterfaceCount() < 2) {
+			if (ERROR) Log.e(TAG, "Interface count for USB device incorrect");
+			telemService.toastMessage("Failed to connect");
+			return false;
+		}
 
 		// Using the same interface for reading and writing
 		usbInterface = connectDevice.getInterface(0x2);

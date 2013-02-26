@@ -54,6 +54,7 @@
 #include "attitudeactual.h"
 #include "positionactual.h"
 #include "velocityactual.h"
+#include "airspeedactual.h"
 
 #define allow_manual_home_location_move
 
@@ -587,16 +588,21 @@ void OPMapGadgetWidget::updatePosition()
     AttitudeActual *attitudeActualObj = AttitudeActual::GetInstance(obm);
     PositionActual *positionActualObj = PositionActual::GetInstance(obm);
     VelocityActual *velocityActualObj = VelocityActual::GetInstance(obm);
+	AirspeedActual *airspeedActualObj = AirspeedActual::GetInstance(obm);
+
     Gyros *gyrosObj = Gyros::GetInstance(obm);
 
     Q_ASSERT(attitudeActualObj);
     Q_ASSERT(positionActualObj);
     Q_ASSERT(velocityActualObj);
+	Q_ASSERT(airspeedActualObj);
     Q_ASSERT(gyrosObj);
 
     AttitudeActual::DataFields attitudeActualData = attitudeActualObj->getData();
     PositionActual::DataFields positionActualData = positionActualObj->getData();
     VelocityActual::DataFields velocityActualData = velocityActualObj->getData();
+	AirspeedActual::DataFields airspeedActualData = airspeedActualObj->getData();
+
     Gyros::DataFields gyrosData = gyrosObj->getData();
 
     double NED[3]={positionActualData.North, positionActualData.East, positionActualData.Down};
@@ -604,7 +610,7 @@ void OPMapGadgetWidget::updatePosition()
 
     //Set the position and heading estimates in the painter module
     m_map->UAV->SetNED(NED);
-    m_map->UAV->SetCAS(-1); //THIS NEEDS TO BECOME AIRSPEED, ONCE WE SETTLE ON A UAVO
+	m_map->UAV->SetCAS(airspeedActualData.CalibratedAirspeed);
     m_map->UAV->SetGroundspeed(vNED, m_maxUpdateRate);
 
     //Convert angular velocities into a rotationg rate around the world-frame yaw axis. This is found by simply taking the dot product of the angular Euler-rate matrix with the angular rates.

@@ -111,15 +111,16 @@ static const struct pios_exti_cfg pios_exti_mpu6000_cfg __exti_config = {
 static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 	.exti_cfg = &pios_exti_mpu6000_cfg,
 	.Fifo_store = PIOS_MPU6000_FIFO_TEMP_OUT | PIOS_MPU6000_FIFO_GYRO_X_OUT | PIOS_MPU6000_FIFO_GYRO_Y_OUT | PIOS_MPU6000_FIFO_GYRO_Z_OUT,
-	// Clock at 8 khz, downsampled by 8 for 1khz
+	// Clock at 8 khz, downsampled by 16 for 500 Hz
 	.Smpl_rate_div = 15,
 	.interrupt_cfg = PIOS_MPU6000_INT_CLR_ANYRD,
 	.interrupt_en = PIOS_MPU6000_INTEN_DATA_RDY,
-	.User_ctl = PIOS_MPU6000_USERCTL_FIFO_EN,
+	.User_ctl = PIOS_MPU6000_USERCTL_FIFO_EN | PIOS_MPU6000_USERCTL_DIS_I2C,
 	.Pwr_mgmt_clk = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
 	.accel_range = PIOS_MPU6000_ACCEL_8G,
 	.gyro_range = PIOS_MPU6000_SCALE_500_DEG,
-	.filter = PIOS_MPU6000_LOWPASS_256_HZ
+	.filter = PIOS_MPU6000_LOWPASS_256_HZ,
+	.orientation = PIOS_MPU6000_TOP_180DEG
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
 
@@ -611,6 +612,20 @@ void PIOS_Board_Init(void) {
 			}
 		}
 #endif	/* PIOS_INCLUDE_GPS */
+		break;
+	case HWSETTINGS_CC_FLEXIPORT_PPM:
+#if defined(PIOS_INCLUDE_PPM_FLEXI)
+		{
+			uint32_t pios_ppm_id;
+			PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_flexi_cfg);
+
+			uint32_t pios_ppm_rcvr_id;
+			if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
+				PIOS_Assert(0);
+			}
+			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM] = pios_ppm_rcvr_id;
+		}
+#endif	/* PIOS_INCLUDE_PPM_FLEXI */
 		break;
 	case HWSETTINGS_CC_FLEXIPORT_DSM2:
 	case HWSETTINGS_CC_FLEXIPORT_DSMX10BIT:

@@ -1,0 +1,13 @@
+<xml>
+    <object name="AirspeedSettings" singleinstance="true" settings="true">
+        <description>Settings for the @ref BaroAirspeed module used on CopterControl or Revolution</description>
+        <field name="SamplePeriod" units="ms" type="uint8" elements="1" defaultvalue="100"/>
+        <field name="ZeroPoint" units="raw" type="uint16" elements="1" defaultvalue="0"/>
+        <field name="Scale" units="raw" type="float" elements="1" defaultvalue="1.0"/>
+        <field name="AirspeedSensorType" units="" type="enum" elements="1" options="EagleTreeAirspeedV3,DIYDronesMPXV5004,DIYDronesMPXV7002"  defaultvalue="DIYDronesMPXV7002"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

@@ -225,9 +225,11 @@ bool NotifyTableModel::dropMimeData( const QMimeData * data, Qt::DropAction acti
         // addiional check in case dropping of multiple rows
         if(rows + direction > _list.size()) continue;
 
-        Q_ASSERT(insertRows(rows + direction, 1, QModelIndex()));
+        bool success = insertRows(rows + direction, 1, QModelIndex());
+        Q_ASSERT(success);
         _list.replace(rows + direction, item);
-        Q_ASSERT(removeRows(dragged, 1, QModelIndex()));
+        success = removeRows(dragged, 1, QModelIndex());
+        Q_ASSERT(success);
         if (direction == UP_DIRECTION)
             ++rows;
     };

@@ -98,7 +98,10 @@ uint16_t PIOS_WDG_Init()
  */
 bool PIOS_WDG_RegisterFlag(uint16_t flag_requested) 
 {
-	
+	// flag are being registered so we are in module initialization phase
+	// clear the WDG to prevent timeout while initializing modules. (OP-815)
+	PIOS_WDG_Clear();
+
 	/* Fail if flag already registered */
 	if(wdg_configuration.used_flags & flag_requested)
 		return false;

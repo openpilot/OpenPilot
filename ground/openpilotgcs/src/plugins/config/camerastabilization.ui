@@ -340,7 +340,7 @@ font: bold 12px;
 margin:1px;</string>
                 </property>
                 <property name="text">
-                 <string>Pitch</string>
+                 <string>Pitch Or Servo2</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
@@ -369,7 +369,7 @@ font: bold 12px;
 margin:1px;</string>
                 </property>
                 <property name="text">
-                 <string>Roll</string>
+                 <string>Roll Or Servo1</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>

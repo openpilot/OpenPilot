@@ -32,6 +32,12 @@ public:
                // for firmware compatibility and the filename path that would break
                return QString("CopterControl");
                break;
+           case 0x0901://Revolution
+               return QString("Revolution");
+               break;
+           case 0x0903://Revomini
+               return QString("Revomini");
+               break;
            default:
                return QString("");
                break;

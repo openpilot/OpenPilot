@@ -1,5 +1,5 @@
 /*
-    FreeRTOS V7.0.2 - Copyright (C) 2011 Real Time Engineers Ltd.
+    FreeRTOS V7.2.0 - Copyright (C) 2012 Real Time Engineers Ltd.
 
 
     ***************************************************************************
@@ -40,15 +40,28 @@
     FreeRTOS WEB site.
 
     1 tab == 4 spaces!
+    
+    ***************************************************************************
+     *                                                                       *
+     *    Having a problem?  Start by reading the FAQ "My application does   *
+     *    not run, what could be wrong?                                      *
+     *                                                                       *
+     *    http://www.FreeRTOS.org/FAQHelp.html                               *
+     *                                                                       *
+    ***************************************************************************
 
-    http://www.FreeRTOS.org - Documentation, latest information, license and
-    contact details.
+    
+    http://www.FreeRTOS.org - Documentation, training, latest information, 
+    license and contact details.
+    
+    http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
+    including FreeRTOS+Trace - an indispensable productivity tool.
 
-    http://www.SafeRTOS.com - A version that is certified for use in safety
-    critical systems.
-
-    http://www.OpenRTOS.com - Commercial support, development, porting,
-    licensing and training services.
+    Real Time Engineers ltd license FreeRTOS to High Integrity Systems, who sell 
+    the code with commercial support, indemnification, and middleware, under 
+    the OpenRTOS brand: http://www.OpenRTOS.com.  High Integrity Systems also
+    provide a safety engineered and independently SIL3 certified version under 
+    the SafeRTOS brand: http://www.SafeRTOS.com.
 */
 
 
@@ -92,7 +105,7 @@ typedef void (*tmrTIMER_CALLBACK)( xTimerHandle xTimer );
 
 /**
  * xTimerHandle xTimerCreate( 	const signed char *pcTimerName,
- * 								portTickType xTimerPeriod,
+ * 								portTickType xTimerPeriodInTicks,
  * 								unsigned portBASE_TYPE uxAutoReload,
  * 								void * pvTimerID,
  * 								tmrTIMER_CALLBACK pxCallbackFunction );
@@ -110,15 +123,15 @@ typedef void (*tmrTIMER_CALLBACK)( xTimerHandle xTimer );
  * purely to assist debugging.  The kernel itself only ever references a timer by
  * its handle, and never by its name.
  *
- * @param xTimerPeriod The timer period.  The time is defined in tick periods so
+ * @param xTimerPeriodInTicks The timer period.  The time is defined in tick periods so
  * the constant portTICK_RATE_MS can be used to convert a time that has been
  * specified in milliseconds.  For example, if the timer must expire after 100
- * ticks, then xTimerPeriod should be set to 100.  Alternatively, if the timer
+ * ticks, then xTimerPeriodInTicks should be set to 100.  Alternatively, if the timer
  * must expire after 500ms, then xPeriod can be set to ( 500 / portTICK_RATE_MS )
  * provided configTICK_RATE_HZ is less than or equal to 1000.
  *
  * @param uxAutoReload If uxAutoReload is set to pdTRUE then the timer will
- * expire repeatedly with a frequency set by the xTimerPeriod parameter.  If
+ * expire repeatedly with a frequency set by the xTimerPeriodInTicks parameter.  If
  * uxAutoReload is set to pdFALSE then the timer will be a one-shot timer and
  * enter the dormant state after it expires.
  *
@@ -137,7 +150,6 @@ typedef void (*tmrTIMER_CALLBACK)( xTimerHandle xTimer );
  * structures, or the timer period was set to 0) then 0 is returned.
  *
  * Example usage:
- *
  *
  * #define NUM_TIMERS 5
  *
@@ -929,7 +941,7 @@ xTaskHandle xTimerGetTimerDaemonTaskHandle( void );
  * for use by the kernel only.
  */
 portBASE_TYPE xTimerCreateTimerTask( void ) PRIVILEGED_FUNCTION;
-portBASE_TYPE xTimerGenericCommand( xTimerHandle xTimer, portBASE_TYPE xCommandID, portTickType xOptionalValue, portBASE_TYPE *pxHigherPriorityTaskWoken, portTickType xBlockTime ) PRIVILEGED_FUNCTION;
+portBASE_TYPE xTimerGenericCommand( xTimerHandle xTimer, portBASE_TYPE xCommandID, portTickType xOptionalValue, signed portBASE_TYPE *pxHigherPriorityTaskWoken, portTickType xBlockTime ) PRIVILEGED_FUNCTION;
 
 #ifdef __cplusplus
 }

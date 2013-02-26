@@ -63,7 +63,7 @@
 #include <dosfs.h>
 
 /* Mass Storage Device Includes */
-#include <msd.h>
+//#include <msd.h>
 #endif
 
 /* Generic initcall infrastructure */
@@ -86,6 +86,7 @@
 #include <pios_rtc.h>
 #include <pios_i2c.h>
 #include <pios_spi.h>
+#include <pios_overo.h>
 #include <pios_ppm.h>
 #include <pios_pwm.h>
 #include <pios_rcvr.h>
@@ -100,6 +101,12 @@
 /* PIOS Hardware Includes (Common) */
 #include <pios_sdcard.h>
 #include <pios_com.h>
+#if defined(PIOS_INCLUDE_MPXV)
+#include <pios_mpxv.h>
+#endif
+#if defined(PIOS_INCLUDE_ETASV3)
+#include <pios_etasv3.h>
+#endif
 #if defined(PIOS_INCLUDE_BMP085)
 #include <pios_bmp085.h>
 #endif
@@ -139,6 +146,12 @@
 #if defined(PIOS_INCLUDE_BMA180)
 #include <pios_bma180.h>
 #endif
+#if defined(PIOS_INCLUDE_VIDEO)
+#include <pios_video.h>
+#endif
+#if defined(PIOS_INCLUDE_WAVE)
+#include <pios_wavplay.h>
+#endif
 
 #if defined(PIOS_INCLUDE_FLASH)
 #include <pios_flash_jedec.h>
@@ -151,6 +164,16 @@
 
 #if defined(PIOS_INCLUDE_USB)
 #include <pios_usb.h>
+#endif
+
+#if defined(PIOS_INCLUDE_RFM22B)
+#include <pios_rfm22b.h>
+#ifdef PIOS_INCLUDE_RFM22B_COM
+#include <pios_rfm22b_com.h>
+#endif
+#ifdef PIOS_INCLUDE_RFM22B_RCVR
+#include <pios_rfm22b_rcvr.h>
+#endif
 #endif
 
 #include <pios_crc.h>

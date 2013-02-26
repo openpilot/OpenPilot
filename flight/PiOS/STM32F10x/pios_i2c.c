@@ -933,7 +933,8 @@ int32_t PIOS_I2C_Transfer(uint32_t i2c_id, const struct pios_i2c_txn txn_list[],
 	/* Lock the bus */
 	portTickType timeout;
 	timeout = i2c_adapter->cfg->transfer_timeout_ms / portTICK_RATE_MS;
-	semaphore_success &= (xSemaphoreTake(i2c_adapter->sem_busy, timeout) == pdTRUE);
+	if (xSemaphoreTake(i2c_adapter->sem_busy, timeout) == pdFALSE)
+		return -2;
 #else
 	uint32_t timeout = 0xfff;
 	while(i2c_adapter->busy && --timeout);

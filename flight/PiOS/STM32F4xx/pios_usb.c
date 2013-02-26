@@ -155,7 +155,7 @@ int32_t PIOS_USB_ChangeConnectionState(bool connected)
  * \return 0: interface not available
  */
 uint32_t usb_found;
-bool PIOS_USB_CheckAvailable(uint8_t id)
+bool PIOS_USB_CheckAvailable(uint32_t id)
 {
 	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_id;
 
@@ -217,7 +217,7 @@ void USB_OTG_BSP_EnableInterrupt(USB_OTG_CORE_HANDLE *pdev)
 	bool valid = PIOS_USB_validate(usb_dev);
 	PIOS_Assert(valid);
 
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
 
 	NVIC_Init(&usb_dev->cfg->irq.init);
 }

@@ -22,6 +22,12 @@
  # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  #####
 
+BOARD_NAME=revolution
+TCHAIN_PREFIX ?= 
+WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
+TOP      := $(realpath $(WHEREAMI)/../../)
+include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
+
 
 # Set developer code and compile options
 # Set to YES to compile for debugging
@@ -51,8 +57,10 @@ USE_THUMB_MODE = YES
 
 # List of modules to include
 MODULES +=  Actuator ManualControl Stabilization 
-MODULES += AltitudeHold VtolPathFollower FixedWingPathFollower PathPlanner
+MODULES += AltitudeHold FixedWingPathFollower PathPlanner
+#MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
 MODULES += Attitude/revolution
+MODULES += FirmwareIAP
 #MODULES += OveroSync/simulated
 
 # To run simulation instead of connect to SITL
@@ -60,20 +68,17 @@ MODULES += Sensors/simulated
 
 MODULES += Telemetry
 
-# MCU name, submodel and board
-# - MCU used for compiler-option (-mtune)
-# - MODEL used for linker-script name (-T) and passed as define
-# - BOARD just passed as define (optional)
-MCU      = i686
-#CHIP     = STM32F103RET
-#BOARD    = STM3210E_OP
-MODEL	 = HD
-ifeq ($(USE_BOOTLOADER), YES)
-BOOT_MODEL    = $(MODEL)_BL
+BLONLY_CDEFS += -DBOARD_TYPE=$(BOARD_TYPE)
+BLONLY_CDEFS += -DBOARD_REVISION=$(BOARD_REVISION)
+BLONLY_CDEFS += -DHW_TYPE=$(HW_TYPE)
+BLONLY_CDEFS += -DBOOTLOADER_VERSION=$(BOOTLOADER_VERSION)
+BLONLY_CDEFS += -DFW_BANK_BASE=$(FW_BANK_BASE)
+BLONLY_CDEFS += -DFW_BANK_SIZE=$(FW_BANK_SIZE)
+BLONLY_CDEFS += -DFW_DESC_SIZE=$(FW_DESC_SIZE)
 
-else
-BOOT_MODEL    = $(MODEL)_NB
-endif
+# Since we are simulating all this firmware the code needs to know what the BL would
+# normally contain
+CFLAGS += $(BLONLY_CDEFS)
 
 # Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
 OUTDIR = ../../build/sim_osx
@@ -92,6 +97,8 @@ OPTESTS  = ./Tests
 OPMODULEDIR = ../Modules
 FLIGHTLIB = ../Libraries
 FLIGHTLIBINC = $(FLIGHTLIB)/inc
+MATHLIB = ../Libraries/math
+MATHLIBINC = ../Libraries/math
 PIOS = ../PiOS.osx
 PIOSINC = $(PIOS)/inc
 PIOSPOSIX = $(PIOS)/osx
@@ -119,8 +126,6 @@ UAVOBJPYTHONSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/python
 
 MODNAMES = $(notdir ${MODULES})
 
-ifndef TESTAPP
-
 ## PyMite files
 SRC += $(OUTDIR)/pmlib_img.c
 SRC += $(OUTDIR)/pmlib_nat.c
@@ -141,18 +146,10 @@ SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
 SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
-else
-## TESTCODE
-SRC += $(OPTESTS)/test_common.c
-SRC += $(OPTESTS)/$(TESTAPP).c
-endif
 
 
 
-## UAVOBJECTS
-ifndef TESTAPP
-#include $(UAVOBJSYNTHDIR)/Makefile.inc
-include ./UAVObjects.inc
+include $(WHEREAMI)/UAVObjects.inc
 
 UAVOBJSRCFILENAMES += attitudesimulated
 UAVOBJSRC = $(foreach UAVOBJSRCFILE,$(UAVOBJSRCFILENAMES),$(UAVOBJSYNTHDIR)/$(UAVOBJSRCFILE).c )
@@ -160,7 +157,6 @@ UAVOBJDEFINE = $(foreach UAVOBJSRCFILE,$(UAVOBJSRCFILENAMES),-DUAVOBJ_INIT_$(UAV
 
 SRC += $(UAVOBJSRC)
 CFLAGS_UAVOBJECTS = $(UAVOBJDEFINE)
-endif
 
 ## PIOS Hardware (posix)
 SRC += $(PIOSPOSIX)/pios_crc.c
@@ -175,6 +171,9 @@ SRC += $(PIOSPOSIX)/pios_com.c
 SRC += $(PIOSPOSIX)/pios_servo.c
 SRC += $(PIOSPOSIX)/pios_wdg.c
 SRC += $(PIOSPOSIX)/pios_debug.c
+SRC += $(PIOSPOSIX)/pios_bl_helper.c
+SRC += $(PIOSPOSIX)/pios_iap.c
+SRC += $(PIOSPOSIX)/pios_board_info.c
 
 SRC += $(PIOSPOSIX)/pios_rcvr.c
 SRC += $(PIOSPOSIX)/pios_gcsrcvr.c
@@ -186,6 +185,9 @@ SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/paths.c
 SRC += $(FLIGHTLIB)/insgps13state.c
 SRC += $(FLIGHTLIB)/taskmonitor.c
+SRC += $(MATHLIB)/pid.c
+SRC += $(MATHLIB)/sin_lookup.c
+
 
 ## RTOS and RTOS Portable 
 SRC += $(RTOSSRCDIR)/list.c
@@ -225,6 +227,8 @@ EXTRAINCDIRS  += $(UAVOBJSYNTHDIR)
 EXTRAINCDIRS  += $(PIOS)
 EXTRAINCDIRS  += $(PIOSINC)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
+EXTRAINCDIRS  += $(MATHLIBINC)
+EXTRAINCDIRS  += $(FLIGTH)
 EXTRAINCDIRS  += $(PIOSPOSIX)
 EXTRAINCDIRS  += $(RTOSINCDIR)
 EXTRAINCDIRS  += $(APPLIBDIR)
@@ -304,7 +308,7 @@ CSTANDARD = -std=gnu99
 # Flags for C and C++ (arm-elf-gcc/arm-elf-g++)
 
 ifeq ($(DEBUG),YES)
-CFLAGS = -g$(DEBUGF) -DDEBUG
+CFLAGS += -g$(DEBUGF) -DDEBUG
 endif
 
 CFLAGS += -DDIAGNOSTICS
@@ -313,7 +317,6 @@ CFLAGS += -DDIAG_TASKS
 CFLAGS += $(CFLAGS_UAVOBJECTS)
 CFLAGS += -DARCH_POSIX
 CFLAGS += -O$(OPT)
-CFLAGS += -mtune=$(MCU)
 CFLAGS += $(CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 
@@ -399,8 +402,18 @@ MSG_ASMFROMC = ${quote}Creating asm-File from C-Source:${quote}
 MSG_ASMFROMC_ARM = ${quote}Creating asm-File from C-Source (ARM-only):${quote}
 MSG_PYMITEINIT = ${quote}**** Generating PyMite intermediate code${quote}
 
+$(OUTDIR)/sim_osx_firmwareinfo.c: $(TOP)/make/templates/firmwareinfotemplate_sim.c
+	$(V1) python $(TOP)/make/scripts/version-info.py \
+		--path=$(TOP) \
+		--template=$(TOP)/make/templates/firmwareinfotemplate_sim.c \
+		--outfile=$(TOP)/build/sim_osx/sim_osx_firmwareinfo.c \
+		--image=$(TOP)/build/fw_revolution/fw_revolution.elf \
+		--type=9 \
+		--revision=1 \
+		--uavodir=$(TOP)/shared/uavobjectdefinition
+
 # List of all source files.
-ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
+ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC) $(OUTDIR)/sim_osx_firmwareinfo.c
 # List of all source files without directory and file-extension.
 ALLSRCBASE = $(notdir $(basename $(ALLSRC)))
 
@@ -500,21 +513,6 @@ sizeafter:
 gccversion :
 	@$(CC) --version
 #	@echo $(ALLOBJ)
-
-# Program the device.
-ifeq ($(USE_BOOTLOADER), YES)
-# Program the device with OP Upload Tool".
-program: $(OUTDIR)/$(TARGET).bin
-	@echo ${quote}Programming with OP Upload Tool${quote}
-	../../ground/src/experimental/upload-build-desktop/debug/OPUploadTool -d 0 -p $(OUTDIR)/$(TARGET).bin
-else
-ifeq ($(FLASH_TOOL),OPENOCD)
-# Program the device with Dominic Rath's OPENOCD in "batch-mode", needs cfg and "reset-script".
-program: $(OUTDIR)/$(TARGET).elf
-	@echo ${quote}Programming with OPENOCD${quote}
-	$(OOCD_EXE) $(OOCD_CL)
-endif
-endif
 
 # Create final output file (.hex) from ELF output file.
 %.hex: %.elf

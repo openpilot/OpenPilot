@@ -2,7 +2,7 @@
     <object name="SystemAlarms" singleinstance="true" settings="false">
         <description>Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.</description>
         <field name="Alarm" units="" type="enum" options="Uninitialised,OK,Warning,Error,Critical"
-        elementnames="OutOfMemory,StackOverflow,CPUOverload,EventSystem,Telemetry,ManualControl,Actuator,Attitude,Sensors,Stabilization,Guidance,Battery,FlightTime,I2C,GPS,BootFault" defaultvalue="Uninitialised"/>
+        elementnames="OutOfMemory,StackOverflow,CPUOverload,EventSystem,Telemetry,ManualControl,Actuator,Attitude,Sensors,Stabilization,Guidance,Battery,FlightTime,I2C,GPS,BootFault,Power" defaultvalue="Uninitialised"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

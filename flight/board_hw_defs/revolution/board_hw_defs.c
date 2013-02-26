@@ -27,6 +27,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include <pios_config.h>
+#include <pios_board_info.h>
 
 #if defined(PIOS_INCLUDE_LED)
 
@@ -62,6 +63,11 @@ static const struct pios_led_cfg pios_led_cfg = {
 	.leds     = pios_leds,
 	.num_leds = NELEMENTS(pios_leds),
 };
+
+const struct pios_led_cfg * PIOS_BOARD_HW_DEFS_GetLedCfg (uint32_t board_revision)
+{
+	return &pios_led_cfg;
+}
 
 #endif	/* PIOS_INCLUDE_LED */
 
@@ -441,14 +447,16 @@ void PIOS_SPI_flash_irq_handler(void)
 }
 #endif /* PIOS_FLASH_ON_ACCEL */
 
+#endif /* PIOS_INCLUDE_SPI */
+
 #if defined(PIOS_OVERO_SPI)
 /* SPI3 Interface
  *      - Used for flash communications
  */
-void PIOS_SPI_overo_irq_handler(void);
-void DMA1_Stream0_IRQHandler(void) __attribute__((alias("PIOS_SPI_overo_irq_handler")));
-void DMA1_Stream7_IRQHandler(void) __attribute__((alias("PIOS_SPI_overo_irq_handler")));
-static const struct pios_spi_cfg pios_spi_overo_cfg = {
+#include <pios_overo_priv.h>
+void PIOS_OVERO_irq_handler(void);
+void DMA1_Stream7_IRQHandler(void) __attribute__((alias("PIOS_OVERO_irq_handler")));
+static const struct pios_overo_cfg pios_overo_cfg = {
 	.regs = SPI3,
 	.remap = GPIO_AF_SPI3,
 	.init = {
@@ -463,12 +471,12 @@ static const struct pios_spi_cfg pios_spi_overo_cfg = {
 		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2,
 	},
 	.use_crc = false,
-	.dma = {
+	.dma = {		
 		.irq = {
-			// Note this is the stream ID that triggers interrupts (in this case RX)
-			.flags = (DMA_IT_TCIF0 | DMA_IT_TEIF0 | DMA_IT_HTIF0),
+			// Note this is the stream ID that triggers interrupts (in this case TX)
+			.flags = (DMA_IT_TCIF7),
 			.init = {
-				.NVIC_IRQChannel = DMA1_Stream0_IRQn,
+				.NVIC_IRQChannel = DMA1_Stream7_IRQn,
 				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 				.NVIC_IRQChannelSubPriority = 0,
 				.NVIC_IRQChannelCmd = ENABLE,
@@ -485,13 +493,13 @@ static const struct pios_spi_cfg pios_spi_overo_cfg = {
 				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
 				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
 				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
-				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Mode               = DMA_Mode_Circular,
 				.DMA_Priority           = DMA_Priority_Medium,
 				//TODO: Enable FIFO
 				.DMA_FIFOMode           = DMA_FIFOMode_Disable,
-                .DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
-                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-                .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
+				.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
+				.DMA_MemoryBurst        = DMA_MemoryBurst_Single,
+				.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
 			},
 		},
 		.tx = {
@@ -504,12 +512,12 @@ static const struct pios_spi_cfg pios_spi_overo_cfg = {
 				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
 				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
 				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
-				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Mode               = DMA_Mode_Circular,
 				.DMA_Priority           = DMA_Priority_Medium,
 				.DMA_FIFOMode           = DMA_FIFOMode_Disable,
-                .DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
-                .DMA_MemoryBurst        = DMA_MemoryBurst_Single,
-                .DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
+				.DMA_FIFOThreshold      = DMA_FIFOThreshold_Full,
+				.DMA_MemoryBurst        = DMA_MemoryBurst_Single,
+				.DMA_PeripheralBurst    = DMA_PeripheralBurst_Single,
 			},
 		},
 	},
@@ -555,18 +563,17 @@ static const struct pios_spi_cfg pios_spi_overo_cfg = {
 		},
 	} },
 };
-
-uint32_t pios_spi_overo_id;
-void PIOS_SPI_overo_irq_handler(void)
+uint32_t pios_overo_id = 0;
+void PIOS_OVERO_irq_handler(void)
 {
 	/* Call into the generic code to handle the IRQ for this specific device */
-	PIOS_SPI_IRQ_Handler(pios_spi_overo_id);
+	PIOS_OVERO_DMA_irq_handler(pios_overo_id);
 }
 #else
-uint32_t pios_spi_overo_id = 0;
+
 #endif /* PIOS_OVERO_SPI */
 
-#endif /* PIOS_INCLUDE_SPI */
+
 
 
 
@@ -990,6 +997,7 @@ static const struct pios_dsm_cfg pios_dsm_flexi_cfg = {
 
 static const struct pios_usart_cfg pios_usart_sbus_auxsbus_cfg = {
 	.regs = UART4,
+        .remap = GPIO_AF_UART4,
 	.init = {
 		.USART_BaudRate            = 100000,
 		.USART_WordLength          = USART_WordLength_8b,
@@ -1039,9 +1047,10 @@ static const struct pios_sbus_cfg pios_sbus_cfg = {
 			.GPIO_Speed = GPIO_Speed_2MHz,
 		},
 	},
-	.gpio_clk_func = RCC_AHB1PeriphClockCmd,
-	.gpio_clk_periph = RCC_AHB1Periph_GPIOB,
 	.gpio_inv_enable = Bit_SET,
+	.gpio_inv_disable = Bit_RESET,
+        .gpio_clk_func = RCC_AHB1PeriphClockCmd,
+	.gpio_clk_periph = RCC_AHB1Periph_GPIOC,
 };
 
 #endif	/* PIOS_INCLUDE_SBUS */
@@ -1217,7 +1226,7 @@ static const struct pios_i2c_adapter_cfg pios_i2c_pressure_adapter_cfg = {
 		.I2C_Ack                 = I2C_Ack_Enable,
 		.I2C_AcknowledgedAddress = I2C_AcknowledgedAddress_7bit,
 		.I2C_DutyCycle           = I2C_DutyCycle_2,
-		.I2C_ClockSpeed          = 40000,	/* bits/s */
+		.I2C_ClockSpeed          = 400000,	/* bits/s */
 	},
 	.transfer_timeout_ms = 50,
 	.scl = {
@@ -1306,13 +1315,14 @@ void PIOS_RTC_IRQ_Handler (void)
 
 #include "pios_tim_priv.h"
 
-static const TIM_TimeBaseInitTypeDef tim_3_5_time_base = {
+static const TIM_TimeBaseInitTypeDef tim_2_3_5_time_base = {
 	.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / 1000000) - 1,
 	.TIM_ClockDivision = TIM_CKD_DIV1,
 	.TIM_CounterMode = TIM_CounterMode_Up,
 	.TIM_Period = ((1000000 / PIOS_SERVO_UPDATE_HZ) - 1),
 	.TIM_RepetitionCounter = 0x0000,
 };
+
 static const TIM_TimeBaseInitTypeDef tim_9_10_11_time_base = {
 	.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / 1000000) - 1,
 	.TIM_ClockDivision = TIM_CKD_DIV1,
@@ -1321,9 +1331,43 @@ static const TIM_TimeBaseInitTypeDef tim_9_10_11_time_base = {
 	.TIM_RepetitionCounter = 0x0000,
 };
 
+// Set up timers that only have inputs on APB2
+static const TIM_TimeBaseInitTypeDef tim_1_time_base = {
+	.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / 1000000) - 1,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = 0xFFFF,
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+// Set up timers that only have inputs on APB2
+static const TIM_TimeBaseInitTypeDef tim_4_time_base = {
+	.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / 1000000) - 1,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = 0xFFFF,
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+
+
+static const struct pios_tim_clock_cfg tim_2_cfg = {
+	.timer = TIM2,
+	.time_base_init = &tim_2_3_5_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM2_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_MID,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	},
+};
+
+
 static const struct pios_tim_clock_cfg tim_3_cfg = {
 	.timer = TIM3,
-	.time_base_init = &tim_3_5_time_base,
+	.time_base_init = &tim_2_3_5_time_base,
 	.irq = {
 		.init = {
 			.NVIC_IRQChannel                   = TIM3_IRQn,
@@ -1334,9 +1378,10 @@ static const struct pios_tim_clock_cfg tim_3_cfg = {
 	},
 };
 
+
 static const struct pios_tim_clock_cfg tim_5_cfg = {
 	.timer = TIM5,
-	.time_base_init = &tim_3_5_time_base,
+	.time_base_init = &tim_2_3_5_time_base,
 	.irq = {
 		.init = {
 			.NVIC_IRQChannel                   = TIM5_IRQn,
@@ -1384,23 +1429,6 @@ static const struct pios_tim_clock_cfg tim_11_cfg = {
 			.NVIC_IRQChannelCmd                = ENABLE,
 		},
 	},
-};
-
-// Set up timers that only have inputs on APB2
-static const TIM_TimeBaseInitTypeDef tim_1_time_base = {
-	.TIM_Prescaler = (PIOS_PERIPHERAL_APB2_CLOCK / 1000000) - 1,
-	.TIM_ClockDivision = TIM_CKD_DIV1,
-	.TIM_CounterMode = TIM_CounterMode_Up,
-	.TIM_Period = 0xFFFF,
-	.TIM_RepetitionCounter = 0x0000,
-};
-// Set up timers that only have inputs on APB2
-static const TIM_TimeBaseInitTypeDef tim_4_time_base = {
-	.TIM_Prescaler = (PIOS_PERIPHERAL_APB1_CLOCK / 1000000) - 1,
-	.TIM_ClockDivision = TIM_CKD_DIV1,
-	.TIM_CounterMode = TIM_CounterMode_Up,
-	.TIM_Period = 0xFFFF,
-	.TIM_RepetitionCounter = 0x0000,
 };
 
 static const struct pios_tim_clock_cfg tim_1_cfg = {
@@ -1559,6 +1587,40 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
 			.pin_source = GPIO_PinSource1,
+		},
+		.remap = GPIO_AF_TIM3,
+	},
+	// PB3 - TIM2 CH2 LED1
+	{
+		.timer = TIM2,
+		.timer_chan = TIM_Channel_2,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin = GPIO_Pin_3,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+				.GPIO_Mode  = GPIO_Mode_AF,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd  = GPIO_PuPd_UP
+			},
+			.pin_source = GPIO_PinSource3,
+		},
+		.remap = GPIO_AF_TIM2,
+	},
+	// PB4 - TIM3 CH1 LED2
+	{
+		.timer = TIM3,
+		.timer_chan = TIM_Channel_1,
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin = GPIO_Pin_4,
+				.GPIO_Speed = GPIO_Speed_2MHz,
+				.GPIO_Mode  = GPIO_Mode_AF,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd  = GPIO_PuPd_UP
+			},
+			.pin_source = GPIO_PinSource4,
 		},
 		.remap = GPIO_AF_TIM3,
 	},
@@ -1748,10 +1810,13 @@ static const struct pios_ppm_cfg pios_ppm_cfg = {
 
 #endif //PPM
 
+#if defined(PIOS_INCLUDE_GCSRCVR)
+#include "pios_gcsrcvr_priv.h"
+#endif	/* PIOS_INCLUDE_GCSRCVR */
+
 #if defined(PIOS_INCLUDE_RCVR)
 #include "pios_rcvr_priv.h"
-
-#endif
+#endif /* PIOS_INCLUDE_RCVR */
 
 #if defined(PIOS_INCLUDE_USB)
 #include "pios_usb_priv.h"

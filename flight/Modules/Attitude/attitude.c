@@ -387,13 +387,13 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	if (GyrosReadOnly() || AccelsReadOnly())
 		return 0;
 
-	gyros[0] = -mpu6000_data.gyro_y * PIOS_MPU6000_GetScale();
-	gyros[1] = -mpu6000_data.gyro_x * PIOS_MPU6000_GetScale();
-	gyros[2] = -mpu6000_data.gyro_z * PIOS_MPU6000_GetScale();
+	gyros[0] = mpu6000_data.gyro_x * PIOS_MPU6000_GetScale();
+	gyros[1] = mpu6000_data.gyro_y * PIOS_MPU6000_GetScale();
+	gyros[2] = mpu6000_data.gyro_z * PIOS_MPU6000_GetScale();
 	
-	accels[0] = -mpu6000_data.accel_y * PIOS_MPU6000_GetAccelScale();
-	accels[1] = -mpu6000_data.accel_x * PIOS_MPU6000_GetAccelScale();
-	accels[2] = -mpu6000_data.accel_z * PIOS_MPU6000_GetAccelScale();
+	accels[0] = mpu6000_data.accel_x * PIOS_MPU6000_GetAccelScale();
+	accels[1] = mpu6000_data.accel_y * PIOS_MPU6000_GetAccelScale();
+	accels[2] = mpu6000_data.accel_z * PIOS_MPU6000_GetAccelScale();
 
 	gyrosData->temperature = 35.0f + ((float) mpu6000_data.temperature + 512.0f) / 340.0f;
 	accelsData->temperature = 35.0f + ((float) mpu6000_data.temperature + 512.0f) / 340.0f;

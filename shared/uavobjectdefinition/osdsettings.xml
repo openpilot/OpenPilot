@@ -1,0 +1,22 @@
+<xml>
+    <object name="OsdSettings" singleinstance="true" settings="true">
+        <description>OSD settings used by the OSDgen module</description>
+        <field name="Attitude" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
+        <field name="AttitudeSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="168,135"/>
+        <field name="Time" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
+        <field name="TimeSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="10,250"/>
+        <field name="Battery" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
+        <field name="BatterySetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="316,210"/>
+        <field name="Speed" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
+        <field name="SpeedSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="2,145"/>
+        <field name="Altitude" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
+        <field name="AltitudeSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="2,145"/>
+        <field name="Heading" units="" type="enum" elements="1" options="Disabled,Enabled" defaultvalue="Enabled"/>
+        <field name="HeadingSetup" units="" type="int16" elements="2" elementnames="X,Y" defaultvalue="168,240"/>
+		<field name="Screen" units=""  type="uint8"  elements="1" defaultvalue="0"/>
+	<access gcs="readwrite" flight="readwrite"/>
+	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
+	<telemetryflight acked="true" updatemode="onchange" period="0"/>
+	<logging updatemode="manual" period="0"/>
+    </object>
+</xml>

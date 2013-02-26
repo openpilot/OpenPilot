@@ -53,6 +53,9 @@ FLASH_TOOL = OPENOCD
 
 # List of modules to include
 MODULES = ManualControl Stabilization GPS
+MODULES += PathPlanner
+MODULES += FixedWingPathFollower
+MODULES += VtolPathFollower
 MODULES += CameraStab
 MODULES += Telemetry
 #MODULES += OveroSync
@@ -133,6 +136,7 @@ SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/insgps13state.c
 SRC += $(FLIGHTLIB)/taskmonitor.c
+SRC += $(FLIGHTLIB)/paths.c
 
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
@@ -225,7 +229,7 @@ EXTRAINCDIRS += ${foreach MOD, ${MODULES} ${PYMODULES}, $(OPMODULEDIR)/${MOD}/in
 # Also add directories where the linker should search for
 # includes from linker-script to the list
 #     Each directory must be seperated by a space.
-EXTRA_LIBDIRS =
+#EXTRA_LIBDIRS +=
 
 # Extra Libraries
 #    Each library-name must be seperated by a space.
@@ -233,7 +237,7 @@ EXTRA_LIBDIRS =
 #    EXTRA_LIBS = xyz abc efsl
 # for newlib-lpc (file: libnewlibc-lpc.a):
 #    EXTRA_LIBS = newlib-lpc
-EXTRA_LIBS =
+#EXTRA_LIBS +=
 
 # Path to Linker-Scripts
 #LINKERSCRIPTPATH = $(PIOSSTM32F4XX)
@@ -362,7 +366,7 @@ LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
 
 # Define programs and commands.
 REMOVE  = $(REMOVE_CMD) -f
-PYHON   = python
+PYTHON  = python
 
 # List of all source files.
 ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
@@ -396,7 +400,7 @@ endif
 
 
 # Link: create ELF output file from object files.
-$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))
+$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ), $(ALLLIB)))
 
 # Assemble: create object files from assembler source files.
 $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))

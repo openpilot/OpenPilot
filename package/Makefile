@@ -32,11 +32,12 @@ CLEAN_FLIGHT := YES
 endif
 
 # Set up targets
-ALL_BOARDS        := coptercontrol pipxtreme
+ALL_BOARDS        := coptercontrol pipxtreme revolution revomini osd
+ALL_BOARDS_BU     := coptercontrol pipxtreme
 FW_TARGETS        := $(addprefix fw_, $(ALL_BOARDS))
 FW_TARGETS_TOOLS  := $(addprefix fw_, $(ALL_BOARDS))
 BL_TARGETS        := $(addprefix bl_, $(ALL_BOARDS))
-BU_TARGETS        := $(addprefix bu_, $(ALL_BOARDS))
+BU_TARGETS        := $(addprefix bu_, $(ALL_BOARDS_BU))
 
 help:
 	@echo

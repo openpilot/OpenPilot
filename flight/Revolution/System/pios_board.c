@@ -27,18 +27,61 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <pios.h>
+/* Pull in the board-specific static HW definitions.
+ * Including .c files is a bit ugly but this allows all of
+ * the HW definitions to be const and static to limit their
+ * scope.  
+ *
+ * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
+ */
+#include "board_hw_defs.c"
 
+#include <pios.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 #include "hwsettings.h"
 #include "manualcontrolsettings.h"
 
-#include "board_hw_defs.c"
-
 /**
  * Sensor configurations 
  */
+
+#if defined(PIOS_INCLUDE_ADC)
+#include "pios_adc_priv.h"
+void PIOS_ADC_DMC_irq_handler(void);
+void DMA2_Stream4_IRQHandler(void) __attribute__((alias("PIOS_ADC_DMC_irq_handler")));
+struct pios_adc_cfg pios_adc_cfg = {
+	.adc_dev = ADC1,
+	.dma = {
+		.irq = {
+			.flags   = (DMA_FLAG_TCIF4 | DMA_FLAG_TEIF4 | DMA_FLAG_HTIF4),
+			.init    = {
+				.NVIC_IRQChannel                   = DMA2_Stream4_IRQn,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+				.NVIC_IRQChannelSubPriority        = 0,
+				.NVIC_IRQChannelCmd                = ENABLE,
+			},
+		},
+		.rx = {
+			.channel = DMA2_Stream4,
+			.init    = {
+				.DMA_Channel                    = DMA_Channel_0,
+				.DMA_PeripheralBaseAddr = (uint32_t) & ADC1->DR
+			},
+		}
+	},
+	.half_flag = DMA_IT_HTIF4,
+	.full_flag = DMA_IT_TCIF4,
+
+};
+void PIOS_ADC_DMC_irq_handler(void)
+{
+	/* Call into the generic code to handle the IRQ for this specific device */
+	PIOS_ADC_DMA_Handler();
+}
+
+#endif
+
 #if defined(PIOS_INCLUDE_HMC5883)
 #include "pios_hmc5883.h"
 static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
@@ -88,7 +131,7 @@ static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 #if defined(PIOS_INCLUDE_MS5611)
 #include "pios_ms5611.h"
 static const struct pios_ms5611_cfg pios_ms5611_cfg = {
-	.oversampling = 1,
+	.oversampling = MS5611_OSR_512,
 };
 #endif /* PIOS_INCLUDE_MS5611 */
 
@@ -174,14 +217,15 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 	.exti_cfg = &pios_exti_mpu6000_cfg,
 	.Fifo_store = PIOS_MPU6000_FIFO_TEMP_OUT | PIOS_MPU6000_FIFO_GYRO_X_OUT | PIOS_MPU6000_FIFO_GYRO_Y_OUT | PIOS_MPU6000_FIFO_GYRO_Z_OUT,
 	// Clock at 8 khz, downsampled by 8 for 1khz
-	.Smpl_rate_div = 7,
+	.Smpl_rate_div = 11,
 	.interrupt_cfg = PIOS_MPU6000_INT_CLR_ANYRD,
 	.interrupt_en = PIOS_MPU6000_INTEN_DATA_RDY,
-	.User_ctl = PIOS_MPU6000_USERCTL_FIFO_EN,
+	.User_ctl = PIOS_MPU6000_USERCTL_FIFO_EN | PIOS_MPU6000_USERCTL_DIS_I2C,
 	.Pwr_mgmt_clk = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
 	.accel_range = PIOS_MPU6000_ACCEL_8G,
 	.gyro_range = PIOS_MPU6000_SCALE_500_DEG,
-	.filter = PIOS_MPU6000_LOWPASS_256_HZ
+	.filter = PIOS_MPU6000_LOWPASS_256_HZ,
+	.orientation = PIOS_MPU6000_TOP_0DEG
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
 
@@ -267,6 +311,7 @@ uint32_t pios_com_gps_id = 0;
 uint32_t pios_com_telem_usb_id = 0;
 uint32_t pios_com_telem_rf_id = 0;
 uint32_t pios_com_bridge_id = 0;
+uint32_t pios_com_overo_id = 0;
 
 /* 
  * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
@@ -358,13 +403,6 @@ void PIOS_Board_Init(void) {
 	PIOS_Flash_Jedec_Init(pios_spi_accel_id, 1, &flash_m25p_cfg);
 #endif
 	PIOS_FLASHFS_Init(&flashfs_m25p_cfg);
-	
-#if defined(PIOS_OVERO_SPI)
-	/* Set up the SPI interface to the gyro */
-	if (PIOS_SPI_Init(&pios_spi_overo_id, &pios_spi_overo_cfg)) {
-		PIOS_DEBUG_Assert(0);
-	}
-#endif
 
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
@@ -384,6 +422,7 @@ void PIOS_Board_Init(void) {
 
 	/* Set up pulse timers */
 	PIOS_TIM_InitClock(&tim_1_cfg);
+	PIOS_TIM_InitClock(&tim_2_cfg);
 	PIOS_TIM_InitClock(&tim_3_cfg);
 	PIOS_TIM_InitClock(&tim_4_cfg);
 	PIOS_TIM_InitClock(&tim_5_cfg);
@@ -414,28 +453,18 @@ void PIOS_Board_Init(void) {
 	bool usb_hid_present = false;
 	bool usb_cdc_present = false;
 
-	uint8_t hwsettings_usb_devicetype;
-	HwSettingsUSB_DeviceTypeGet(&hwsettings_usb_devicetype);
-
-	switch (hwsettings_usb_devicetype) {
-	case HWSETTINGS_USB_DEVICETYPE_HIDONLY:
-		if (PIOS_USB_DESC_HID_ONLY_Init()) {
-			PIOS_Assert(0);
-		}
-		usb_hid_present = true;
-		break;
-	case HWSETTINGS_USB_DEVICETYPE_HIDVCP:
-		if (PIOS_USB_DESC_HID_CDC_Init()) {
-			PIOS_Assert(0);
-		}
-		usb_hid_present = true;
-		usb_cdc_present = true;
-		break;
-	case HWSETTINGS_USB_DEVICETYPE_VCPONLY:
-		break;
-	default:
+#if defined(PIOS_INCLUDE_USB_CDC)
+	if (PIOS_USB_DESC_HID_CDC_Init()) {
 		PIOS_Assert(0);
 	}
+	usb_hid_present = true;
+	usb_cdc_present = true;
+#else
+	if (PIOS_USB_DESC_HID_ONLY_Init()) {
+		PIOS_Assert(0);
+	}
+	usb_hid_present = true;
+#endif
 
 	uint32_t pios_usb_id;
 	PIOS_USB_Init(&pios_usb_id, &pios_usb_main_cfg);
@@ -670,15 +699,12 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_RV_FLEXIPORT_DISABLED:
 			break;
 		case HWSETTINGS_RV_FLEXIPORT_I2C:
-//TODO: Enable I2C
 #if defined(PIOS_INCLUDE_I2C)
-/*		
 		{
-			if (PIOS_I2C_Init(&pios_i2c_flexi_adapter_id, &pios_i2c_flexi_adapter_cfg)) {
+			if (PIOS_I2C_Init(&pios_i2c_flexiport_adapter_id, &pios_i2c_flexiport_adapter_cfg)) {
 				PIOS_Assert(0);
 			}
 		}
-*/
 #endif	/* PIOS_INCLUDE_I2C */
 			break;
 			
@@ -756,6 +782,30 @@ void PIOS_Board_Init(void) {
 			break;
 	}
 
+#if defined(PIOS_OVERO_SPI)
+	/* Set up the SPI based PIOS_COM interface to the overo */
+	{
+		HwSettingsData hwSettings;
+		HwSettingsGet(&hwSettings);
+		if(hwSettings.OptionalModules[HWSETTINGS_OPTIONALMODULES_OVERO] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+			if (PIOS_OVERO_Init(&pios_overo_id, &pios_overo_cfg)) {
+				PIOS_DEBUG_Assert(0);
+			}
+			const uint32_t PACKET_SIZE = 1024;
+			uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PACKET_SIZE);
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PACKET_SIZE);
+			PIOS_Assert(rx_buffer);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_overo_id, &pios_overo_com_driver, pios_overo_id,
+							  rx_buffer, PACKET_SIZE,
+							  tx_buffer, PACKET_SIZE)) {
+				PIOS_Assert(0);
+			}
+		}
+	}
+
+#endif
+
 #if defined(PIOS_INCLUDE_GCSRCVR)
 	GCSReceiverInitialize();
 	uint32_t pios_gcsrcvr_id;
@@ -795,6 +845,10 @@ void PIOS_Board_Init(void) {
 	}
 	
 	PIOS_DELAY_WaitmS(50);
+
+#if defined(PIOS_INCLUDE_ADC)
+	PIOS_ADC_Init(&pios_adc_cfg);
+#endif
 
 #if defined(PIOS_INCLUDE_HMC5883)
 	PIOS_HMC5883_Init(&pios_hmc5883_cfg);

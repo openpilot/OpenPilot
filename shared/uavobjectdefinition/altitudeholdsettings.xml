@@ -1,12 +1,12 @@
 <xml>
     <object name="AltitudeHoldSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref AltitudeHold module</description>
-	<field name="Kp" units="throttle/m" type="float" elements="1" defaultvalue="0.025"/>
-	<field name="Ki" units="throttle/m" type="float" elements="1" defaultvalue="0.025"/>
-	<field name="Kd" units="throttle/m" type="float" elements="1" defaultvalue="0.25"/>
-	<field name="Ka" units="throttle/(m/s^2)" type="float" elements="1" defaultvalue="0"/>
-	<field name="PressureNoise" units="m" type="float" elements="1" defaultvalue="0.01"/>
-	<field name="AccelNoise" units="m/s^2" type="float" elements="1" defaultvalue="10"/>
+	<field name="Kp" units="throttle/m" type="float" elements="1" defaultvalue="0.03"/>
+	<field name="Ki" units="throttle/m" type="float" elements="1" defaultvalue="0.00"/>
+	<field name="Kd" units="throttle/m" type="float" elements="1" defaultvalue="0.03"/>
+	<field name="Ka" units="throttle/(m/s^2)" type="float" elements="1" defaultvalue="0.005"/>
+	<field name="PressureNoise" units="m" type="float" elements="1" defaultvalue="0.4"/>
+	<field name="AccelNoise" units="m/s^2" type="float" elements="1" defaultvalue="5"/>
 	<field name="AccelDrift" units="m/s^2" type="float" elements="1" defaultvalue="0.001"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>

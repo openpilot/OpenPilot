@@ -312,11 +312,10 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 {
     double Be[3];
 
-    Q_ASSERT (Utils::HomeLocationUtil().getDetails(LLA, Be) >= 0);
+    int result = Utils::HomeLocationUtil().getDetails(LLA, Be);
+    Q_ASSERT(result == 0);
 
-    // ******************
     // save the new settings
-
     HomeLocation *homeLocation = HomeLocation::GetInstance(obm);
     Q_ASSERT(homeLocation != NULL);
 

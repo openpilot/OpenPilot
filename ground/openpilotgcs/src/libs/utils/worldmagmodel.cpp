@@ -154,6 +154,15 @@ namespace Utils {
         Initialize();
     }
 
+    /**
+     * @brief
+     * @param[in] LLA The longitude-latitude-altitude coordinate to compute the magnetic field at
+     * @param[in] Month
+     * @param[in] Day
+     * @param[in] Year
+     * @param[out] Be The resulting magnetic field at that location and time in [mGau](?)
+     * @returns 0 if successful, negative otherwise.
+     */
     int WorldMagModel::GetMagVector(double LLA[3], int Month, int Day, int Year, double Be[3])
     {
         double Lat = LLA[0];

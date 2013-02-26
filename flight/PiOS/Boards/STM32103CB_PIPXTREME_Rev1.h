@@ -71,13 +71,10 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //------------------------
 #define PIOS_WATCHDOG_TIMEOUT    500
 #define PIOS_WDG_REGISTER        BKP_DR4
-#define PIOS_WDG_COMUAVTALK      0x0001
-#define PIOS_WDG_RADIORECEIVE    0x0002
-#define PIOS_WDG_SENDPACKET      0x0004
-#define PIOS_WDG_SENDDATA        0x0008
-#define PIOS_WDG_TRANSCOMM       0x0010
-#define PIOS_WDG_PPMINPUT        0x0020
-#define PIOS_WDG_COMGCS          0x0040
+#define PIOS_WDG_TELEMETRY       0x0001
+#define PIOS_WDG_RADIORX         0x0002
+#define PIOS_WDG_RADIOTX         0x0004
+#define PIOS_WDG_RFM22B          0x0008
 
 //------------------------
 // TELEMETRY
@@ -91,6 +88,12 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define PIOS_LED_LINK	1
 #define PIOS_LED_RX	2
 #define PIOS_LED_TX	3
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
+#define PIOS_LED_D1     4
+#define PIOS_LED_D2     5
+#define PIOS_LED_D3     6
+#define PIOS_LED_D4     7
+#endif
 
 #define PIOS_LED_HEARTBEAT PIOS_LED_USB
 #define PIOS_LED_ALARM PIOS_LED_TX
@@ -110,6 +113,24 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define TX_LED_ON					PIOS_LED_On(PIOS_LED_TX)
 #define TX_LED_OFF					PIOS_LED_Off(PIOS_LED_TX)
 #define TX_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_TX)
+
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
+#define D1_LED_ON					PIOS_LED_On(PIOS_LED_D1)
+#define D1_LED_OFF					PIOS_LED_Off(PIOS_LED_D1)
+#define D1_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_D1)
+
+#define D2_LED_ON					PIOS_LED_On(PIOS_LED_D2)
+#define D2_LED_OFF					PIOS_LED_Off(PIOS_LED_D2)
+#define D2_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_D2)
+
+#define D3_LED_ON					PIOS_LED_On(PIOS_LED_D3)
+#define D3_LED_OFF					PIOS_LED_Off(PIOS_LED_D3)
+#define D3_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_D3)
+
+#define D4_LED_ON					PIOS_LED_On(PIOS_LED_D4)
+#define D4_LED_OFF					PIOS_LED_Off(PIOS_LED_D4)
+#define D4_LED_TOGGLE					PIOS_LED_Toggle(PIOS_LED_D4)
+#endif
 
 //-------------------------
 // System Settings
@@ -138,8 +159,6 @@ extern uint32_t pios_i2c_flexi_adapter_id;
 // See also pios_board.c
 //------------------------
 #define PIOS_SPI_MAX_DEVS               1
-extern uint32_t pios_spi_port_id;
-#define PIOS_SPI_PORT                   (pios_spi_port_id)
 
 //-------------------------
 // PIOS_USART
@@ -154,29 +173,26 @@ extern uint32_t pios_spi_port_id;
 #define PIOS_COM_MAX_DEVS			5
 
 extern uint32_t pios_com_telem_usb_id;
+extern uint32_t pios_com_telem_vcp_id;
+extern uint32_t pios_com_telem_uart_telem_id;
+extern uint32_t pios_com_telem_uart_flexi_id;
 extern uint32_t pios_com_telemetry_id;
-extern uint32_t pios_com_flexi_id;
-extern uint32_t pios_com_vcp_id;
-extern uint32_t pios_com_uavtalk_com_id;
-extern uint32_t pios_com_gcs_com_id;
-extern uint32_t pios_com_trans_com_id;
-extern uint32_t pios_com_debug_id;
 extern uint32_t pios_com_rfm22b_id;
+extern uint32_t pios_com_radio_id;
 extern uint32_t pios_ppm_rcvr_id;
-#define PIOS_COM_USB_HID           (pios_com_telem_usb_id)
+extern uint32_t pios_ppm_out_id;
+#define PIOS_COM_TELEM_USB         (pios_com_telem_usb_id)
+#define PIOS_COM_TELEM_VCP         (pios_com_telem_vcp_id)
+#define PIOS_COM_TELEM_UART_FLEXI  (pios_com_telem_uart_flexi_id)
+#define PIOS_COM_TELEM_UART_TELEM  (pios_com_telem_uart_telem_id)
 #define PIOS_COM_TELEMETRY         (pios_com_telemetry_id)
-#define PIOS_COM_FLEXI             (pios_com_flexi_id)
-#define PIOS_COM_VCP               (pios_com_vcp_id)
-#define PIOS_COM_UAVTALK           (pios_com_uavtalk_com_id)
-#define PIOS_COM_GCS               (pios_com_gcs_com_id)
-#define PIOS_COM_TRANS_COM         (pios_com_trans_com_id)
-#define PIOS_COM_DEBUG             (pios_com_debug_id)
-#define PIOS_COM_RADIO             (pios_com_rfm22b_id)
-#define PIOS_COM_TELEM_USB         PIOS_COM_USB_HID
+#define PIOS_COM_RFM22B            (pios_com_rfm22b_id)
+#define PIOS_COM_RADIO             (pios_com_radio_id)
 #define PIOS_PPM_RECEIVER          (pios_ppm_rcvr_id)
+#define PIOS_PPM_OUTPUT            (pios_ppm_out_id)
 
 #define DEBUG_LEVEL 2
-#if DEBUG_LEVEL > 0
+#if DEBUG_LEVEL > 1000
 #define DEBUG_PRINTF(level, ...) {if(level <= DEBUG_LEVEL && PIOS_COM_DEBUG > 0) { PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__); }}
 #else
 #define DEBUG_PRINTF(...)
@@ -233,8 +249,7 @@ extern uint32_t pios_ppm_rcvr_id;
 // Receiver PPM input
 //-------------------------
 #define PIOS_PPM_MAX_DEVS     1
-#define PIOS_PPM_NUM_INPUTS   12
-#define PIOS_PPM_PACKET_UPDATE_PERIOD_MS 25
+#define PIOS_PPM_NUM_INPUTS   8
 
 //-------------------------
 // Servo outputs
@@ -270,30 +285,35 @@ extern uint32_t pios_ppm_rcvr_id;
 // RFM22
 //-------------------------
 
+#if defined(PIOS_INCLUDE_RFM22B)
+extern uint32_t pios_spi_rfm22b_id;
+#define PIOS_RFM22_SPI_PORT             (pios_spi_rfm22b_id)
 extern uint32_t pios_rfm22b_id;
-#define RFM22_EXT_INT_USE
-#define RFM22_PIOS_SPI	PIOS_SPI_PORT	// SPIx
+#endif /* PIOS_INCLUDE_RFM22B */
 
-#if defined(RFM22_EXT_INT_USE)
-#define PIOS_RFM22_EXTI_GPIO_PORT               GPIOA
-#define PIOS_RFM22_EXTI_GPIO_PIN                GPIO_Pin_2
-#define PIOS_RFM22_EXTI_PORT_SOURCE             GPIO_PortSourceGPIOA
-#define PIOS_RFM22_EXTI_PIN_SOURCE              GPIO_PinSource2
-#define PIOS_RFM22_EXTI_CLK                     RCC_APB2Periph_GPIOA
-#define PIOS_RFM22_EXTI_LINE                    EXTI_Line2
-#define PIOS_RFM22_EXTI_IRQn                    EXTI2_IRQn
-#define PIOS_RFM22_EXTI_PRIO                    PIOS_IRQ_PRIO_LOW
-#endif
+//-------------------------
+// Packet Handler
+//-------------------------
+#if defined(PIOS_INCLUDE_PACKET_HANDLER)
+extern uint32_t pios_packet_handler;
+#define PIOS_PACKET_HANDLER (pios_packet_handler)
+#define PIOS_PH_MAX_PACKET 255
+#define PIOS_PH_WIN_SIZE 3
+#define PIOS_PH_MAX_CONNECTIONS 1
+#define RS_ECC_NPARITY 4
+#endif /* PIOS_INCLUDE_PACKET_HANDLER */
 
 //-------------------------
 // Packet Handler
 //-------------------------
 
+#if defined(PIOS_INCLUDE_PACKET_HANDLER)
 uint32_t pios_packet_handler;
-#define PIOS_INCLUDE_PACKET_HANDLER
+#define PIOS_PACKET_HANDLER (pios_packet_handler)
 #define PIOS_PH_MAX_PACKET 255
 #define PIOS_PH_WIN_SIZE 3
 #define PIOS_PH_MAX_CONNECTIONS 1
+#endif /* PIOS_INCLUDE_PACKET_HANDLER */
 
 //-------------------------
 // Reed-Solomon ECC

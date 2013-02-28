@@ -45,10 +45,18 @@ public:
     ~ConfigRevoHWWidget();
 
 private:
+    enum {USB_HID, USB_VCP};
     Ui_RevoHWWidget *m_ui;
+    void setupCustomCombos();
+
+protected slots:
+    void refreshWidgetsValues(UAVObject * obj = NULL);
 
 private slots:
     virtual void refreshValues();
+    void usbTypeChanged(int index);
+    void flexiPortChanged(int index);
+    void mainPortChanged(int index);
 
 };
 

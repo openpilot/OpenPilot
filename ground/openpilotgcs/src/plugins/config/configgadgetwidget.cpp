@@ -232,7 +232,7 @@ void ConfigGadgetWidget::onAutopilotConnect() {
 
             icon = new QIcon();
             icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
-            icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Normal, QIcon::On);
+            icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Selected, QIcon::Off);
             qwd = new ConfigRevoHWWidget(this);
             ftw->removeTab(ConfigGadgetWidget::hardware);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));

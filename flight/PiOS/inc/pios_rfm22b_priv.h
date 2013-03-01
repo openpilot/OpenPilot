@@ -777,6 +777,8 @@ struct pios_rfm22b_dev {
 	float frequency_step_size;
 	// current frequency hop channel
 	uint8_t	frequency_hop_channel;
+	// previous frequency hop channel
+	uint8_t	prev_frequency_hop_channel;
 	// the frequency hop step size
 	uint8_t frequency_hop_step_size_reg;
 	// afc correction reading (in Hz)

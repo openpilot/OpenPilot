@@ -593,6 +593,8 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->stats.timeouts = 0;
 	rfm22b_dev->stats.link_quality = 0;
 	rfm22b_dev->stats.rssi = 0;
+	rfm22b_dev->stats.tx_seq = 0;
+	rfm22b_dev->stats.rx_seq = 0;
 
 	// initialize the frequency hopping step size (specified in 10khz increments).
 	uint32_t freq_hop_step_size = RFM22B_FREQUENCY_HOP_STEP_SIZE / 10000;
@@ -901,16 +903,16 @@ static void PIOS_RFM22B_Task(void *parameters)
 		}
 
 		portTickType curTicks = xTaskGetTickCount();
+		uint32_t last_rec_ms = (rfm22b_dev->rx_complete_ticks == 0) ? 0 : timeDifferenceMs(rfm22b_dev->rx_complete_ticks, curTicks);
 		// Have we been sending this packet too long?
-		if ((rfm22b_dev->packet_start_ticks > 0) && (timeDifferenceMs(rfm22b_dev->packet_start_ticks, curTicks) > (rfm22b_dev->max_packet_time * 3)))
+		if ((rfm22b_dev->packet_start_ticks > 0) && (timeDifferenceMs(rfm22b_dev->packet_start_ticks, curTicks) > (rfm22b_dev->max_packet_time * 3))) {
 			rfm22_process_event(rfm22b_dev, RFM22B_EVENT_TIMEOUT);
 
 		// Has it been too long since we received a packet
-		else if ((rfm22b_dev->rx_complete_ticks > 0) && (timeDifferenceMs(rfm22b_dev->rx_complete_ticks, curTicks) > DISCONNECT_TIMEOUT_MS))
+		} else if (last_rec_ms > DISCONNECT_TIMEOUT_MS) {
 			rfm22_process_event(rfm22b_dev, RFM22B_EVENT_ERROR);
 
-		else
-		{
+		} else {
 				
 			// Are we waiting for an ACK?
 			if (rfm22b_dev->prev_tx_packet)
@@ -934,7 +936,7 @@ static void PIOS_RFM22B_Task(void *parameters)
 				}
 
 				// Queue up a status packet if it's time.
-				if (timeDifferenceMs(lastStatusTicks, curTicks) > RADIOSTATS_UPDATE_PERIOD_MS)
+				if ((timeDifferenceMs(lastStatusTicks, curTicks) > RADIOSTATS_UPDATE_PERIOD_MS) || (last_rec_ms > rfm22b_dev->max_packet_time * 4))
 				{
 					rfm22_sendStatus(rfm22b_dev);
 					lastStatusTicks = curTicks;
@@ -977,7 +979,7 @@ static void rfm22_setDatarate(struct pios_rfm22b_dev * rfm22b_dev, enum rfm22b_d
 	{
 		// Generate a pseudo-random number from 0-8 to add to the delay
 		uint8_t random = PIOS_CRC_updateByte(0, (uint8_t)(xTaskGetTickCount() & 0xff)) & 0x03;
-		rfm22b_dev->max_ack_delay = (uint16_t)((float)(sizeof(PHPacketHeader) * 8 * 1000) / (float)(datarate_bps) + 0.5) * 4 + random;
+		rfm22b_dev->max_ack_delay = (uint16_t)((float)(sizeof(PHPacketHeader) * 8 * 1000) / (float)(datarate_bps) + 0.5) * 6 + random;
 	}
 	else
 		rfm22b_dev->max_ack_delay = CONNECT_ATTEMPT_PERIOD_MS;
@@ -1462,16 +1464,14 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 
 static void rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 {
-	// Don't send status if we're the coordinator.
-	if (rfm22b_dev->coordinator)
-		return;
-
 	// Update the link quality metric.
 	rfm22_calculateLinkQuality(rfm22b_dev);
 
 	// Queue the status message
 	if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED)
 		rfm22b_dev->status_packet.header.destination_id = rfm22b_dev->destination_id;
+	else if (rfm22b_dev->coordinator)
+		return;
 	else
 		rfm22b_dev->status_packet.header.destination_id = 0xffffffff; // Broadcast
 	rfm22b_dev->status_packet.header.type = PACKET_TYPE_STATUS;
@@ -2022,10 +2022,24 @@ static enum pios_rfm22b_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_d
 		cph->vcp_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].vcp_port;
 		cph->com_speed = rfm22b_dev->bindings[rfm22b_dev->cur_binding].com_speed;
 	} else {
-		// Switch to the fallback channel if we have resent too many packets.
-		if (rfm22b_dev->cur_resent_count++ > 2) {
+		// First resend on the current channel, then resend on the next channel in case the receive has changed channels, then fallback.
+		rfm22b_dev->cur_resent_count++;
+		switch (rfm22b_dev->cur_resent_count) {
+		case 1:
+		case 2:
+			rfm22b_dev->prev_frequency_hop_channel = rfm22b_dev->frequency_hop_channel;
+		case 5:
+			rfm22_setFreqHopChannel(rfm22b_dev, rfm22b_dev->prev_frequency_hop_channel);
+			break;
+		case 3:
+		case 4:
+		case 6:
+			rfm22_setFreqHopChannel(rfm22b_dev, PIOS_CRC16_updateByte(rfm22b_dev->tx_packet->header.seq_num, 0) & 0x7f);
+			break;
+		default:
 			rfm22b_dev->cur_resent_count = 0;
 			rfm22_setFreqHopChannel(rfm22b_dev, RFM22B_DEFAULT_CHANNEL);
+			break;
 		}
 	}
 
@@ -2192,8 +2206,6 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22b_dev->rx_packet_len = 0;
 	rfm22b_dev->tx_packet = NULL;
 	rfm22b_dev->prev_tx_packet = NULL;
-	rfm22b_dev->stats.tx_seq = 0;
-	rfm22b_dev->stats.rx_seq = 0;
 	rfm22b_dev->data_packet.header.data_size = 0;
 	rfm22b_dev->in_rx_mode = false;
 
@@ -2202,6 +2214,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22b_dev->rx_buffer_wr = 0;
 	rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
 	rfm22b_dev->frequency_hop_channel = 0;
+	rfm22b_dev->prev_frequency_hop_channel = 0;
 	rfm22b_dev->afc_correction_Hz = 0;
 	rfm22b_dev->packet_start_ticks = 0;
 	rfm22b_dev->tx_complete_ticks = 0;
@@ -2210,18 +2223,16 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	// software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
 	rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);
 
-	// wait 26ms
-	PIOS_DELAY_WaitmS(26);
-
 	for (int i = 50; i > 0; i--)
 	{
-		// wait 1ms
-		PIOS_DELAY_WaitmS(1);
-
 		// read the status registers
 		rfm22b_dev->int_status1 = rfm22_read(rfm22b_dev, RFM22_interrupt_status1);
 		rfm22b_dev->int_status2 = rfm22_read(rfm22b_dev, RFM22_interrupt_status2);
 		if (rfm22b_dev->int_status2 & RFM22_is2_ichiprdy) break;
+
+		// wait 1ms
+		PIOS_DELAY_WaitmS(1);
+
 	}
 
 	// ****************

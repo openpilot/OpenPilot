@@ -2,7 +2,7 @@ TEMPLATE = lib
 TARGET = Core
 DEFINES += CORE_LIBRARY
 QT += declarative \
-	xml \
+    xml \
     network \
     script \
     svg \

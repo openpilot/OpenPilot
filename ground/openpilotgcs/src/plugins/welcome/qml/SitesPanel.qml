@@ -32,10 +32,9 @@ Item {
     ListView {
         id: view
         width: parent.width
-        anchors { top: header.bottom; topMargin: 14; bottom: parent.bottom }
+        anchors { top: header.bottom; topMargin: 14; leftMargin: 32; bottom: parent.bottom }
         model: sitesModel
         spacing: 8
-        clip: true
 
         delegate: Text {
             text: title

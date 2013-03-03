@@ -91,6 +91,7 @@ using namespace Core;
 using namespace Core::Internal;
 
 static const char *uriListMimeFormatC = "text/uri-list";
+static const char *DEFAULT_CONFIG_FILENAME = "OpenPilotGCS.xml";
 
 enum { debugMainWindow = 0 };
 
@@ -289,23 +290,28 @@ void MainWindow::extensionsInitialized()
         directory.cd("default_configurations");
 
         qDebug() << "Looking for default config files in: " + directory.absolutePath();
-        bool showDialog = true;
+
         QString filename;
         if(!commandLine.isEmpty()) {
             if(QFile::exists(directory.absolutePath() + QDir::separator()+commandLine)) {
                 filename = directory.absolutePath() + QDir::separator()+commandLine;
                 qDebug() << "Load configuration from command line";
                 settings = new QSettings(filename, XmlConfig::XmlSettingsFormat);
-                showDialog = false;
             }
-        }
-        if(showDialog) {
+        }        
+        if(!QFile::exists(directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME)) {
+            qDebug() << "Default config file " << directory.absolutePath() << QDir::separator() << DEFAULT_CONFIG_FILENAME << " was not found.";
             importSettings *dialog = new importSettings(this);
             dialog->loadFiles(directory.absolutePath());
             dialog->exec();
             filename = dialog->choosenConfig();
             settings = new QSettings(filename, XmlConfig::XmlSettingsFormat);
             delete dialog;
+        }
+        else {
+            qDebug() << "Default config file " << directory.absolutePath() << QDir::separator() << DEFAULT_CONFIG_FILENAME << " was not loaded.";
+            settings = new QSettings(directory.absolutePath() + QDir::separator() +
+                                     DEFAULT_CONFIG_FILENAME, XmlConfig::XmlSettingsFormat);
         }
         qs = settings;
         qDebug() << "Load default config from resource " << filename;

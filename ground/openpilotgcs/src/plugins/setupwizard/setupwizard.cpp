@@ -83,7 +83,7 @@ int SetupWizard::nextId() const
                 case CONTROLLER_CC3D:
                     return PAGE_INPUT;
                 case CONTROLLER_REVO:
-                case CONTROLLER_PIPX:
+                case CONTROLLER_OPLINK:
                 default:
                     return PAGE_NOTYETIMPLEMENTED;
             }
@@ -147,7 +147,7 @@ QString SetupWizard::getSummaryText()
         case CONTROLLER_REVO:
             summary.append(tr("OpenPilot Revolution"));
             break;
-        case CONTROLLER_PIPX:
+        case CONTROLLER_OPLINK:
             summary.append(tr("OpenPilot OPLink Radio Modem"));
             break;
         default:

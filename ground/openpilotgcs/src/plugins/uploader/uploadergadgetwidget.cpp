@@ -552,11 +552,15 @@ bool UploaderGadgetWidget::autoUpdate()
     emit autoUpdateSignal(LOADING_FW,QVariant());
     switch (dfu->devices[0].ID)
     {
-    case 0x401:
-        filename="fw_coptercontrol";
+    case 0x0301:
+        filename="fw_pipxtreme";
         break;
+    case 0x401:
     case 0x402:
         filename="fw_coptercontrol";
+        break;
+    case 0x903:
+        filename="fw_revomini";
         break;
     default:
         emit autoUpdateSignal(FAILURE,QVariant());

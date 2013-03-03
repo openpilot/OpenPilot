@@ -51,12 +51,14 @@ private:
 
 protected slots:
     void refreshWidgetsValues(UAVObject * obj = NULL);
+    void updateObjectsFromWidgets();
 
 private slots:
-    virtual void refreshValues();
     void usbTypeChanged(int index);
     void flexiPortChanged(int index);
     void mainPortChanged(int index);
+    void modemPortChanged(int index);
+    void openHelp();
 
 };
 

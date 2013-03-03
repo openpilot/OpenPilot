@@ -30,6 +30,8 @@
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
 #include "hwsettings.h"
+#include <QDesktopServices>
+#include <QUrl>
 
 
 ConfigRevoHWWidget::ConfigRevoHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
@@ -45,6 +47,7 @@ ConfigRevoHWWidget::ConfigRevoHWWidget(QWidget *parent) : ConfigTaskWidget(paren
     }
 
     addApplySaveButtons(m_ui->saveTelemetryToRAM, m_ui->saveTelemetryToSD);
+
     addUAVObjectToWidgetRelation("HwSettings","RM_FlexiPort",m_ui->cbFlexi);
     addUAVObjectToWidgetRelation("HwSettings","RM_MainPort",m_ui->cbMain);
     addUAVObjectToWidgetRelation("HwSettings","RM_RcvrPort",m_ui->cbRcvr);
@@ -62,6 +65,9 @@ ConfigRevoHWWidget::ConfigRevoHWWidget(QWidget *parent) : ConfigTaskWidget(paren
     addUAVObjectToWidgetRelation("HwSettings","ComUsbBridgeSpeed",m_ui->cbMainComSpeed);
 
     addUAVObjectToWidgetRelation("HwSettings","RadioPort",m_ui->cbModem);
+
+    connect(m_ui->cchwHelp,SIGNAL(clicked()),this,SLOT(openHelp()));
+
     setupCustomCombos();
     enableControls(true);
     populateWidgets();
@@ -86,6 +92,7 @@ void ConfigRevoHWWidget::setupCustomCombos()
 
     connect(m_ui->cbFlexi, SIGNAL(currentIndexChanged(int)), this, SLOT(flexiPortChanged(int)));
     connect(m_ui->cbMain, SIGNAL(currentIndexChanged(int)), this, SLOT(mainPortChanged(int)));
+    connect(m_ui->cbModem, SIGNAL(currentIndexChanged(int)), this, SLOT(modemPortChanged(int)));
 
 }
 
@@ -105,6 +112,39 @@ void ConfigRevoHWWidget::refreshWidgetsValues(UAVObject *obj)
     flexiPortChanged(0);
 }
 
+void ConfigRevoHWWidget::updateObjectsFromWidgets()
+{
+    ConfigTaskWidget::updateObjectsFromWidgets();
+
+    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
+    HwSettings::DataFields data = hwSettings->getData();
+
+    // If any port is configured to be GPS port, enable GPS module if it is not enabled.
+    // Otherwise disable GPS module.
+    if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_GPS || m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_GPS) {
+        if(data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] != HwSettings::OPTIONALMODULES_ENABLED) {
+            data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = HwSettings::OPTIONALMODULES_ENABLED;
+        }
+    }
+    else if(data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] != HwSettings::OPTIONALMODULES_DISABLED) {
+        data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = HwSettings::OPTIONALMODULES_DISABLED;
+    }
+
+    // If any port is configured to be ComBridge port, enable UsbComBridge module if it is not enabled.
+    // Otherwise disable UsbComBridge module.
+    if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_COMBRIDGE || m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_COMBRIDGE ||
+            m_ui->cbUSBVCPFunction->currentIndex() == HwSettings::USB_VCPPORT_COMBRIDGE) {
+        if(data.OptionalModules[HwSettings::OPTIONALMODULES_COMUSBBRIDGE] != HwSettings::OPTIONALMODULES_ENABLED) {
+            data.OptionalModules[HwSettings::OPTIONALMODULES_COMUSBBRIDGE] = HwSettings::OPTIONALMODULES_ENABLED;
+        }
+    }
+    else if(data.OptionalModules[HwSettings::OPTIONALMODULES_COMUSBBRIDGE] != HwSettings::OPTIONALMODULES_DISABLED) {
+        data.OptionalModules[HwSettings::OPTIONALMODULES_COMUSBBRIDGE] = HwSettings::OPTIONALMODULES_DISABLED;
+    }
+
+    hwSettings->setData(data);
+}
+
 void ConfigRevoHWWidget::usbTypeChanged(int index)
 {
     Q_UNUSED(index);
@@ -115,7 +155,29 @@ void ConfigRevoHWWidget::usbTypeChanged(int index)
 
     m_ui->lblUSBVCPSpeed->setVisible(!hid);
     m_ui->cbUSBVCPSpeed->setVisible(!hid);
+
+    if(hid){
+        m_ui->cbUSBVCPFunction->setCurrentIndex(HwSettings::USB_VCPPORT_DISABLED);
+        m_ui->cbUSBHIDFunction->setCurrentIndex(HwSettings::USB_HIDPORT_USBTELEMETRY);
+    }
+    else {
+        m_ui->cbUSBHIDFunction->setCurrentIndex(HwSettings::USB_HIDPORT_DISABLED);
+        m_ui->cbUSBVCPFunction->setCurrentIndex(HwSettings::USB_VCPPORT_USBTELEMETRY);
+    }
+
+    if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_COMBRIDGE) {
+        m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
+    }
+    m_ui->cbFlexi->model()->setData(m_ui->cbFlexi->model()->index(HwSettings::RM_FLEXIPORT_COMBRIDGE, 0),
+                                    hid ? QVariant(0) : QVariant(1|32), Qt::UserRole - 1);
+
+    if(m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_COMBRIDGE) {
+        m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
+    }
+    m_ui->cbMain->model()->setData(m_ui->cbMain->model()->index(HwSettings::RM_MAINPORT_COMBRIDGE, 0),
+                                   hid ? QVariant(0) : QVariant(1|32), Qt::UserRole - 1);
 }
+
 
 void ConfigRevoHWWidget::flexiPortChanged(int index)
 {
@@ -126,17 +188,28 @@ void ConfigRevoHWWidget::flexiPortChanged(int index)
     m_ui->cbFlexiComSpeed->setVisible(false);
     m_ui->lblFlexiSpeed->setVisible(true);
 
-    int value = m_ui->cbFlexi->currentIndex();
-    switch(value)
+    switch(m_ui->cbFlexi->currentIndex())
     {
         case HwSettings::RM_FLEXIPORT_TELEMETRY:
             m_ui->cbFlexiTelemSpeed->setVisible(true);
+            if(m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_TELEMETRY) {
+                m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
+            }
+            if(m_ui->cbModem->currentIndex() == HwSettings::RADIOPORT_TELEMETRY) {
+                m_ui->cbModem->setCurrentIndex(HwSettings::RADIOPORT_DISABLED);
+            }
             break;
         case HwSettings::RM_FLEXIPORT_GPS:
             m_ui->cbFlexiGPSSpeed->setVisible(true);
+            if(m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_GPS) {
+                m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
+            }
             break;
         case HwSettings::RM_FLEXIPORT_COMBRIDGE:
             m_ui->cbFlexiComSpeed->setVisible(true);
+            if(m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_COMBRIDGE) {
+                m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
+            }
             break;
         default:
             m_ui->lblFlexiSpeed->setVisible(false);
@@ -153,17 +226,28 @@ void ConfigRevoHWWidget::mainPortChanged(int index)
     m_ui->cbMainComSpeed->setVisible(false);
     m_ui->lblMainSpeed->setVisible(true);
 
-    int value = m_ui->cbMain->currentIndex();
-    switch(value)
+    switch(m_ui->cbMain->currentIndex())
     {
-        case HwSettings::RM_FLEXIPORT_TELEMETRY:
+        case HwSettings::RM_MAINPORT_TELEMETRY:
             m_ui->cbMainTelemSpeed->setVisible(true);
+            if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_TELEMETRY) {
+                m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
+            }
+            if(m_ui->cbModem->currentIndex() == HwSettings::RADIOPORT_TELEMETRY) {
+                m_ui->cbModem->setCurrentIndex(HwSettings::RADIOPORT_DISABLED);
+            }
             break;
-        case HwSettings::RM_FLEXIPORT_GPS:
+        case HwSettings::RM_MAINPORT_GPS:
             m_ui->cbMainGPSSpeed->setVisible(true);
+            if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_GPS) {
+                m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
+            }
             break;
-        case HwSettings::RM_FLEXIPORT_COMBRIDGE:
+        case HwSettings::RM_MAINPORT_COMBRIDGE:
             m_ui->cbMainComSpeed->setVisible(true);
+            if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_COMBRIDGE) {
+                m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
+            }
             break;
         default:
             m_ui->lblMainSpeed->setVisible(false);
@@ -171,9 +255,21 @@ void ConfigRevoHWWidget::mainPortChanged(int index)
     }
 }
 
-/**
-  Request telemetry settings from the board
-  */
-void ConfigRevoHWWidget::refreshValues()
+void ConfigRevoHWWidget::modemPortChanged(int index)
 {
+    Q_UNUSED(index);
+
+    if(m_ui->cbModem->currentIndex()== HwSettings::RADIOPORT_TELEMETRY) {
+        if(m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_TELEMETRY) {
+            m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
+        }
+        if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_TELEMETRY) {
+            m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
+        }
+    }
+}
+
+void ConfigRevoHWWidget::openHelp()
+{
+    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/GgDBAQ", QUrl::StrictMode) );
 }

@@ -8,7 +8,7 @@
  *
  * @file       PIOS_MPU6000.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      MPU6000 3-axis gyor function headers
+ * @brief      MPU6000 3-axis gyro function headers
  * @see        The GNU Public License (GPL) Version 3
  *
  ******************************************************************************

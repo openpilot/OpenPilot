@@ -8,7 +8,7 @@
  *
  * @file       PIOS_MPU6000_CONFIG.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
- * @brief      MPU6000 3-axis gyor function headers
+ * @brief      MPU6000 UAVO-based configuration functions
  * @see        The GNU Public License (GPL) Version 3
  *
  ******************************************************************************

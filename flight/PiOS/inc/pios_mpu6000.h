@@ -102,7 +102,6 @@
 #define PIOS_MPU6000_PWRMGMT_STOP_CLK     0X07
 
 enum pios_mpu6000_range {
-        PIOS_MPU6000_SCALE_FROM_SETTINGS = 0xFF,
 	PIOS_MPU6000_SCALE_250_DEG  = 0x00,
 	PIOS_MPU6000_SCALE_500_DEG  = 0x08,
 	PIOS_MPU6000_SCALE_1000_DEG = 0x10,
@@ -110,7 +109,6 @@ enum pios_mpu6000_range {
 };
 
 enum pios_mpu6000_filter {
-        PIOS_MPU6000_LOWPASS_FROM_SETTINGS = 0xFF,
 	PIOS_MPU6000_LOWPASS_256_HZ = 0x00,
 	PIOS_MPU6000_LOWPASS_188_HZ = 0x01,
 	PIOS_MPU6000_LOWPASS_98_HZ  = 0x02,
@@ -121,7 +119,6 @@ enum pios_mpu6000_filter {
 };
 
 enum pios_mpu6000_accel_range {
-        PIOS_MPU6000_ACCEL_FROM_SETTINGS = 0xFF,
 	PIOS_MPU6000_ACCEL_2G = 0x00,
 	PIOS_MPU6000_ACCEL_4G = 0x08,
 	PIOS_MPU6000_ACCEL_8G = 0x10,
@@ -167,6 +164,7 @@ struct pios_mpu6000_cfg {
 
 /* Public Functions */
 extern int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_mpu6000_cfg * new_cfg);
+extern int32_t PIOS_MPU6000_ConfigureRanges(enum pios_mpu6000_range gyroRange, enum pios_mpu6000_accel_range accelRange,enum pios_mpu6000_filter filterSetting);
 extern xQueueHandle PIOS_MPU6000_GetQueue();
 extern int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * buffer);
 extern int32_t PIOS_MPU6000_ReadID();

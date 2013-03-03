@@ -182,6 +182,7 @@ static const struct pios_bma180_cfg pios_bma180_cfg = {
  */
 #if defined(PIOS_INCLUDE_MPU6000)
 #include "pios_mpu6000.h"
+#include "pios_mpu6000_config.h"
 static const struct pios_exti_cfg pios_exti_mpu6000_cfg __exti_config = {
 	.vector = PIOS_MPU6000_IRQHandler,
 	.line = EXTI_Line8,
@@ -224,9 +225,9 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 	.interrupt_en = PIOS_MPU6000_INTEN_DATA_RDY,
 	.User_ctl = PIOS_MPU6000_USERCTL_FIFO_EN | PIOS_MPU6000_USERCTL_DIS_I2C,
 	.Pwr_mgmt_clk = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
-	.accel_range = PIOS_MPU6000_ACCEL_FROM_SETTINGS,
-	.gyro_range = PIOS_MPU6000_SCALE_FROM_SETTINGS,
-	.filter = PIOS_MPU6000_LOWPASS_FROM_SETTINGS,
+	.accel_range = PIOS_MPU6000_ACCEL_8G,
+	.gyro_range = PIOS_MPU6000_SCALE_2000_DEG,
+	.filter = PIOS_MPU6000_LOWPASS_256_HZ,
 	.orientation = PIOS_MPU6000_TOP_0DEG
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
@@ -874,6 +875,7 @@ void PIOS_Board_Init(void) {
 		case 0x02:
 #if defined(PIOS_INCLUDE_MPU6000)
 			PIOS_MPU6000_Init(pios_spi_gyro_id,0, &pios_mpu6000_cfg);
+			PIOS_MPU6000_CONFIG_Configure();
 #endif
 			break;
 		default:

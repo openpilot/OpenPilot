@@ -122,11 +122,9 @@ void ConfigRevoHWWidget::updateObjectsFromWidgets()
     // If any port is configured to be GPS port, enable GPS module if it is not enabled.
     // Otherwise disable GPS module.
     if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_GPS || m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_GPS) {
-        if(data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] != HwSettings::OPTIONALMODULES_ENABLED) {
-            data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = HwSettings::OPTIONALMODULES_ENABLED;
-        }
+        data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = HwSettings::OPTIONALMODULES_ENABLED;
     }
-    else if(data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] != HwSettings::OPTIONALMODULES_DISABLED) {
+    else {
         data.OptionalModules[HwSettings::OPTIONALMODULES_GPS] = HwSettings::OPTIONALMODULES_DISABLED;
     }
 
@@ -134,11 +132,9 @@ void ConfigRevoHWWidget::updateObjectsFromWidgets()
     // Otherwise disable UsbComBridge module.
     if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_COMBRIDGE || m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_COMBRIDGE ||
             m_ui->cbUSBVCPFunction->currentIndex() == HwSettings::USB_VCPPORT_COMBRIDGE) {
-        if(data.OptionalModules[HwSettings::OPTIONALMODULES_COMUSBBRIDGE] != HwSettings::OPTIONALMODULES_ENABLED) {
-            data.OptionalModules[HwSettings::OPTIONALMODULES_COMUSBBRIDGE] = HwSettings::OPTIONALMODULES_ENABLED;
-        }
+        data.OptionalModules[HwSettings::OPTIONALMODULES_COMUSBBRIDGE] = HwSettings::OPTIONALMODULES_ENABLED;
     }
-    else if(data.OptionalModules[HwSettings::OPTIONALMODULES_COMUSBBRIDGE] != HwSettings::OPTIONALMODULES_DISABLED) {
+    else {
         data.OptionalModules[HwSettings::OPTIONALMODULES_COMUSBBRIDGE] = HwSettings::OPTIONALMODULES_DISABLED;
     }
 

@@ -268,7 +268,6 @@ void MainWindow::modeChanged(Core::IMode */*mode*/)
 void MainWindow::extensionsInitialized()
 {
     QSettings *qs = m_settings;
-    QSettings *settings;
     QString commandLine;
     if ( ! qs->allKeys().count() ) {
         foreach(QString str, qApp->arguments()) {
@@ -289,33 +288,31 @@ void MainWindow::extensionsInitialized()
 #endif
         directory.cd("default_configurations");
 
-        qDebug() << "Looking for default config files in: " + directory.absolutePath();
+        qDebug() << "Looking for configuration files in: " << directory.absolutePath();
 
         QString filename;
-        if(!commandLine.isEmpty()) {
-            if(QFile::exists(directory.absolutePath() + QDir::separator()+commandLine)) {
-                filename = directory.absolutePath() + QDir::separator()+commandLine;
-                qDebug() << "Load configuration from command line";
-                settings = new QSettings(filename, XmlConfig::XmlSettingsFormat);
-            }
-        }        
-        if(!QFile::exists(directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME)) {
-            qDebug() << "Default config file " << directory.absolutePath() << QDir::separator() << DEFAULT_CONFIG_FILENAME << " was not found.";
+        if(!commandLine.isEmpty() && QFile::exists(directory.absolutePath() + QDir::separator() + commandLine)) {
+            filename = directory.absolutePath() + QDir::separator() + commandLine;
+            qDebug() << "Configuration file " << filename << " specified on command line will be loaded.";
+        }
+        else if(QFile::exists(directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME)) {
+            filename = directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME;
+            qDebug() << "Default configuration file " << filename << " will be loaded.";
+        }
+        else {
+            qDebug() << "Default configuration file " << directory.absolutePath() << QDir::separator() << DEFAULT_CONFIG_FILENAME << " was not found.";
             importSettings *dialog = new importSettings(this);
             dialog->loadFiles(directory.absolutePath());
             dialog->exec();
             filename = dialog->choosenConfig();
-            settings = new QSettings(filename, XmlConfig::XmlSettingsFormat);
             delete dialog;
+            qDebug() << "Configuration file " << filename << " was selected and will be loaded.";
         }
-        else {
-            qDebug() << "Default config file " << directory.absolutePath() << QDir::separator() << DEFAULT_CONFIG_FILENAME << " was not loaded.";
-            settings = new QSettings(directory.absolutePath() + QDir::separator() +
-                                     DEFAULT_CONFIG_FILENAME, XmlConfig::XmlSettingsFormat);
-        }
-        qs = settings;
-        qDebug() << "Load default config from resource " << filename;
+
+        qs = new QSettings(filename, XmlConfig::XmlSettingsFormat);
+        qDebug() << "Configuration file " << filename << " was loaded.";
     }
+
     qs->beginGroup("General");
     m_config_description=qs->value("Description", "none").toString();
     m_config_details=qs->value("Details", "none").toString();

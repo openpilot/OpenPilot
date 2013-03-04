@@ -288,29 +288,29 @@ void MainWindow::extensionsInitialized()
 #endif
         directory.cd("default_configurations");
 
-        qDebug() << "Looking for configuration files in: " << directory.absolutePath();
+        qDebug() << "Looking for configuration files in:" << directory.absolutePath();
 
         QString filename;
         if(!commandLine.isEmpty() && QFile::exists(directory.absolutePath() + QDir::separator() + commandLine)) {
             filename = directory.absolutePath() + QDir::separator() + commandLine;
-            qDebug() << "Configuration file " << filename << " specified on command line will be loaded.";
+            qDebug() << "Configuration file" << filename << "specified on command line will be loaded.";
         }
         else if(QFile::exists(directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME)) {
             filename = directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME;
-            qDebug() << "Default configuration file " << filename << " will be loaded.";
+            qDebug() << "Default configuration file" << filename << "will be loaded.";
         }
         else {
-            qDebug() << "Default configuration file " << directory.absolutePath() << QDir::separator() << DEFAULT_CONFIG_FILENAME << " was not found.";
+            qDebug() << "Default configuration file " << directory.absolutePath() << QDir::separator() << DEFAULT_CONFIG_FILENAME << "was not found.";
             importSettings *dialog = new importSettings(this);
             dialog->loadFiles(directory.absolutePath());
             dialog->exec();
             filename = dialog->choosenConfig();
             delete dialog;
-            qDebug() << "Configuration file " << filename << " was selected and will be loaded.";
+            qDebug() << "Configuration file" << filename << "was selected and will be loaded.";
         }
 
         qs = new QSettings(filename, XmlConfig::XmlSettingsFormat);
-        qDebug() << "Configuration file " << filename << " was loaded.";
+        qDebug() << "Configuration file" << filename << "was loaded.";
     }
 
     qs->beginGroup("General");

@@ -205,10 +205,15 @@ static void rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22b_add_rx_status(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_rx_packet_status status);
 static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHandle p, uint16_t rx_len);
 static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev, uint32_t frequency_hz, uint8_t channel);
-static void rfm22_setFreqHopChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t channel);
+static bool rfm22_setFreqHopChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t channel);
 static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev);
 static bool rfm22_ready_to_send(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev);
+#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
+static uint16_t rfm22_coordinatorTime(struct pios_rfm22b_dev *rfm22b_dev, portTickType ticks);
+static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev);
+static bool rfm22_changeChannel(struct pios_rfm22b_dev *rfm22b_dev);
+#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 static void rfm22_clearLEDs();
 
 // SPI read/write functions
@@ -955,6 +960,10 @@ static void PIOS_RFM22B_Task(void *parameters)
 #endif
 		if (rfm22b_dev->time_to_send)
 			rfm22_process_event(rfm22b_dev, RFM22B_EVENT_TX_START);
+#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
+		else if(rfm22b_dev->state == RFM22B_STATE_RX_MODE)
+			rfm22_process_event(rfm22b_dev, RFM22B_EVENT_RX_MODE);
+#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	}
 }
 
@@ -1206,11 +1215,14 @@ static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev,
 	rfm22_write(rfm22b_dev, RFM22_nominal_carrier_frequency0, fc & 0xff);
 }
 
-static void rfm22_setFreqHopChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t channel)
+static bool rfm22_setFreqHopChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t channel)
 {
 	// set the frequency hopping channel
+	if (rfm22b_dev->frequency_hop_channel == channel)
+		return false;
 	rfm22b_dev->frequency_hop_channel = channel;
 	rfm22_write(rfm22b_dev, RFM22_frequency_hopping_channel_select, channel);
+	return true;
 }
 
 static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev)
@@ -1255,14 +1267,19 @@ static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev)
 static enum pios_rfm22b_event rfm22_setRxMode(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	// Are we already in Rx mode?
+#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
+	if (rfm22b_dev->in_rx_mode && !rfm22_changeChannel(rfm22b_dev))
+ 		return RFM22B_EVENT_NUM_EVENTS;
+#else // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	if (rfm22b_dev->in_rx_mode)
-		return RFM22B_EVENT_NUM_EVENTS;
+ 		return RFM22B_EVENT_NUM_EVENTS;
+#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 	rfm22b_dev->packet_start_ticks = 0;
 #ifdef PIOS_RFM22B_DEBUG_ON_TELEM
 	D2_LED_ON;
 	D3_LED_TOGGLE;
-#endif
+#endif // PIOS_RFM22B_DEBUG_ON_TELEM
 
 	// disable interrupts
 	rfm22_write(rfm22b_dev, RFM22_interrupt_enable1, 0x00);
@@ -1392,6 +1409,13 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 	D2_LED_OFF;
 	D3_LED_TOGGLE;
 #endif
+
+#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
+	// Change the channel if necessary.
+	if (((p->header.type != PACKET_TYPE_ACK) && (p->header.type != PACKET_TYPE_ACK_RTS)) ||
+	    (rfm22b_dev->rx_packet.header.type != PACKET_TYPE_CON_REQUEST))
+		rfm22_changeChannel(rfm22b_dev);
+#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 	// Add the error correcting code.
 	encode_data((unsigned char*)p, PHPacketSize(p), (unsigned char*)p);
@@ -1871,6 +1895,7 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 	// Packet has been sent
 	else if (rfm22b_dev->int_status1 & RFM22_is1_ipksent)
 	{
+		portTickType curTicks = xTaskGetTickCount();
 		rfm22b_dev->stats.tx_byte_count += PH_PACKET_SIZE(rfm22b_dev->tx_packet);
 
 		// Is this an ACK?
@@ -1884,7 +1909,14 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 				rfm22_setConnectionParameters(rfm22b_dev);
 
 			// Change the channel
+#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
+			// On the coordinator side, we initialize the time delta when we receive the ACK for the connection request message.
+			if (!rfm22b_dev->coordinator && (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_CON_REQUEST)) {
+				rfm22b_dev->time_delta = 0xffff - (curTicks & 0xffff);
+			}
+#else // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 			rfm22_setFreqHopChannel(rfm22b_dev, PIOS_CRC16_updateByte(rfm22b_dev->rx_packet.header.seq_num, 0) & 0x7f);
+#endif // !PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 		}
 		else if (rfm22b_dev->tx_packet->header.type != PACKET_TYPE_NACK)
 		{
@@ -1893,7 +1925,6 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 			rfm22b_dev->tx_complete_ticks = xTaskGetTickCount();
 		}
 		// Set the Tx period
-		portTickType curTicks = xTaskGetTickCount();
 		if (rfm22b_dev->tx_packet->header.type == PACKET_TYPE_ACK)
 			rfm22b_dev->time_to_send_offset = curTicks + 0x4;
 		else if (rfm22b_dev->tx_packet->header.type == PACKET_TYPE_ACK_RTS)
@@ -1930,6 +1961,9 @@ static enum pios_rfm22b_event rfm22_sendAck(struct pios_rfm22b_dev *rfm22b_dev)
 	aph->header.type = rfm22_ready_to_send(rfm22b_dev) ? PACKET_TYPE_ACK_RTS : PACKET_TYPE_ACK;
 	aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
 	aph->header.seq_num = rfm22b_dev->rx_packet.header.seq_num;
+#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
+	aph->packet_recv_time = rfm22_coordinatorTime(rfm22b_dev, rfm22b_dev->rx_complete_ticks);
+#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	rfm22b_dev->tx_packet = (PHPacketHandle)aph;
 	rfm22b_dev->time_to_send = true;
 	return RFM22B_EVENT_TX_START;
@@ -1964,8 +1998,7 @@ static enum pios_rfm22b_event rfm22_receiveAck(struct pios_rfm22b_dev *rfm22b_de
 	rfm22b_dev->prev_tx_packet = NULL;
 
 	// Was this a connection request?
-	switch (prev->header.type)
-	{
+	switch (prev->header.type) {
 	case PACKET_TYPE_CON_REQUEST:
 		rfm22_setConnectionParameters(rfm22b_dev);
 		break;
@@ -1974,21 +2007,33 @@ static enum pios_rfm22b_event rfm22_receiveAck(struct pios_rfm22b_dev *rfm22b_de
 		break;
 	}
 
+#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
+	// On the coordinator side, we initialize the time delta when we receive the ACK for the connection request message.
+	if (prev->header.type == PACKET_TYPE_CON_REQUEST) {
+		rfm22b_dev->time_delta = 0xffff - (rfm22b_dev->rx_complete_ticks & 0xffff);
+	} else if (!rfm22b_dev->coordinator) {
+		PHAckNackPacketHandle aph = (PHAckNackPacketHandle)(&(rfm22b_dev->rx_packet));
+		uint16_t local_tx_time = rfm22_coordinatorTime(rfm22b_dev, rfm22b_dev->tx_complete_ticks);
+		uint16_t remote_rx_time = aph->packet_recv_time;
+		// Adjust the time delta based on the difference between our estimated time offset and the coordinator offset.
+		// This is not working yet
+		if (0)
+			rfm22b_dev->time_delta += remote_rx_time - local_tx_time;
+	}
+#else // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
+	// Change the channel
+	rfm22_setFreqHopChannel(rfm22b_dev, PIOS_CRC16_updateByte(prev->header.seq_num, 0) & 0x7f);
+#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
+
 	// Reset the resend count
 	rfm22b_dev->cur_resent_count = 0;
 
-	// Change the channel
-	rfm22_setFreqHopChannel(rfm22b_dev, PIOS_CRC16_updateByte(prev->header.seq_num, 0) & 0x7f);
-
 	// Should we try to start another TX?
-	if (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_ACK)
-	{
+	if (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_ACK) {
 		rfm22b_dev->time_to_send_offset = curTicks;
 		rfm22b_dev->time_to_send = true;
 		return RFM22B_EVENT_TX_START;
-	}
-	else
-	{
+	} else {
 		rfm22b_dev->time_to_send_offset = curTicks + 0x4;
 		return RFM22B_EVENT_RX_MODE;
 	}
@@ -2022,12 +2067,13 @@ static enum pios_rfm22b_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_d
 		cph->vcp_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].vcp_port;
 		cph->com_speed = rfm22b_dev->bindings[rfm22b_dev->cur_binding].com_speed;
 	} else {
+#ifndef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 		// First resend on the current channel, then resend on the next channel in case the receive has changed channels, then fallback.
 		rfm22b_dev->cur_resent_count++;
 		switch (rfm22b_dev->cur_resent_count) {
 		case 1:
-		case 2:
 			rfm22b_dev->prev_frequency_hop_channel = rfm22b_dev->frequency_hop_channel;
+		case 2:
 		case 5:
 			rfm22_setFreqHopChannel(rfm22b_dev, rfm22b_dev->prev_frequency_hop_channel);
 			break;
@@ -2037,10 +2083,10 @@ static enum pios_rfm22b_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_d
 			rfm22_setFreqHopChannel(rfm22b_dev, PIOS_CRC16_updateByte(rfm22b_dev->tx_packet->header.seq_num, 0) & 0x7f);
 			break;
 		default:
-			rfm22b_dev->cur_resent_count = 0;
 			rfm22_setFreqHopChannel(rfm22b_dev, RFM22B_DEFAULT_CHANNEL);
 			break;
 		}
+#endif //PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	}
 
 	// Increment the reset packet counter if we're connected.
@@ -2148,6 +2194,30 @@ static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22_setDatarate(rfm22b_dev, rfm22b_dev->datarate, true);
  	PIOS_RFM22B_SetTxPower((uint32_t)rfm22b_dev, cph->max_tx_power);
 }
+
+#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
+static uint16_t rfm22_coordinatorTime(struct pios_rfm22b_dev *rfm22b_dev, portTickType ticks)
+{
+	return (ticks & 0xffff) + rfm22b_dev->time_delta;
+}
+
+static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev)
+{
+	uint16_t time = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
+	// We change channels every 128 ms.
+	time = time >> 7;
+	// The channel is calculated using the 16 bit CRC as the pseudo random number generator, and there are 128 channels.
+	return (uint8_t)(time & 0x7f);
+	//return (uint8_t)(PIOS_CRC16_updateByte((time && 0xffff), 0) & 0x7f);
+}
+
+static bool rfm22_changeChannel(struct pios_rfm22b_dev *rfm22b_dev)
+{
+	if (rfm22b_dev->stats.link_state != OPLINKSTATUS_LINKSTATE_CONNECTED)
+		return false;
+	return rfm22_setFreqHopChannel(rfm22b_dev, rfm22_calcChannel(rfm22b_dev));
+}
+#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm22b_dev)
 {

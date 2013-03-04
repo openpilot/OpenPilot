@@ -788,6 +788,9 @@ struct pios_rfm22b_dev {
 	portTickType packet_start_ticks;
 	portTickType tx_complete_ticks;
 	portTickType rx_complete_ticks;
+#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
+	uint16_t time_delta;
+#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 	// The maximum time (ms) that it should take to transmit / receive a packet.
 	uint32_t max_packet_time;

@@ -101,9 +101,9 @@
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="youdont">
+               <widget class="QCheckBox" name="confirmCheckBox">
                 <property name="text">
-                 <string>I know what I'm doing</string>
+                 <string>I know what I'm doing!</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>

@@ -35,12 +35,12 @@ deviceWidget::deviceWidget(QWidget *parent) :
     // Initialization of the Device icon display
     myDevice->verticalGroupBox_loaded->setVisible(false);
     myDevice->groupCustom->setVisible(false);
-    myDevice->youdont->setVisible(false);
+    myDevice->confirmCheckBox->setVisible(false);
     myDevice->gVDevice->setScene(new QGraphicsScene(this));
     connect(myDevice->retrieveButton, SIGNAL(clicked()), this, SLOT(downloadFirmware()));
     connect(myDevice->updateButton, SIGNAL(clicked()), this, SLOT(uploadFirmware()));
     connect(myDevice->pbLoad, SIGNAL(clicked()), this, SLOT(loadFirmware()));
-    connect(myDevice->youdont, SIGNAL(stateChanged(int)), this, SLOT(confirmCB(int)));
+    connect(myDevice->confirmCheckBox, SIGNAL(stateChanged(int)), this, SLOT(confirmCB(int)));
     QPixmap pix = QPixmap(QString(":uploader/images/view-refresh.svg"));
     myDevice->statusIcon->setPixmap(pix);
 
@@ -151,17 +151,17 @@ void deviceWidget::updateButtons(bool enabled)
     if (!enabled) {
         myDevice->description->setEnabled(false);
         myDevice->pbLoad->setEnabled(false);
-        myDevice->youdont->setEnabled(false);
+        myDevice->confirmCheckBox->setEnabled(false);
         myDevice->updateButton->setEnabled(false);
         myDevice->retrieveButton->setEnabled(false);
     }
     else {
         myDevice->description->setEnabled(true);
-        // Load button (i.e. chose file) is always enabled
+        // Load button (i.e. choose file) is always enabled
         myDevice->pbLoad->setEnabled(true);
-        myDevice->youdont->setEnabled(true);
-        // Update/Upload button is enabled if a file has be selected and the "You know what your doing" check box is checked
-        myDevice->updateButton->setEnabled(myDevice->youdont->isVisible() && myDevice->youdont->checkState() == Qt::Checked);
+        myDevice->confirmCheckBox->setEnabled(true);
+        // Update/Upload button is enabled if the "I know what I'm doing!" check box is checked
+        myDevice->updateButton->setEnabled(myDevice->confirmCheckBox->checkState() == Qt::Checked);
         // Retreive/Download button is always enabled
         myDevice->retrieveButton->setEnabled(true);
     }
@@ -275,6 +275,9 @@ void deviceWidget::loadFirmware()
 
     filename = setOpenFileName();
 
+    myDevice->confirmCheckBox->setVisible(false);
+    myDevice->confirmCheckBox->setChecked(false);
+
     if (filename.isEmpty()) {
         status("Empty filename", STATUSICON_FAIL);
         return;
@@ -287,52 +290,42 @@ void deviceWidget::loadFirmware()
     }
 
     loadedFW = file.readAll();
-    myDevice->youdont->setVisible(false);
-    myDevice->youdont->setChecked(false);
+
     QByteArray desc = loadedFW.right(100);
     QPixmap px;
-    if(loadedFW.length()>m_dfu->devices[deviceID].SizeOfCode)
+    if (loadedFW.length()>m_dfu->devices[deviceID].SizeOfCode) {
         myDevice->lblCRCL->setText(tr("Can't calculate, file too big for device"));
-    else
+    }
+    else {
         myDevice->lblCRCL->setText( QString::number(DFUObject::CRCFromQBArray(loadedFW,m_dfu->devices[deviceID].SizeOfCode)));
+    }
     //myDevice->lblFirmwareSizeL->setText(QString("Firmware size: ")+QVariant(loadedFW.length()).toString()+ QString(" bytes"));
     if (populateLoadedStructuredDescription(desc))
     {
-        myDevice->youdont->setChecked(true);
+        myDevice->confirmCheckBox->setChecked(true);
         myDevice->verticalGroupBox_loaded->setVisible(true);
         myDevice->groupCustom->setVisible(false);
-        if(myDevice->lblCRC->text()==myDevice->lblCRCL->text())
-        {
-            myDevice->statusLabel->setText(tr("The board has the same firmware as loaded. No need to update"));
+        if (myDevice->lblCRC->text() == myDevice->lblCRCL->text()) {
+            myDevice->statusLabel->setText(tr("The board has the same firmware as loaded. No need to update."));
             px.load(QString(":/uploader/images/warning.svg"));
-        }
-        else if(myDevice->lblDevName->text()!=myDevice->lblBrdNameL->text())
-        {
+        } else if (myDevice->lblDevName->text() != myDevice->lblBrdNameL->text()) {
             myDevice->statusLabel->setText(tr("WARNING: the loaded firmware is for different hardware. Do not update!"));
             px.load(QString(":/uploader/images/error.svg"));
-        }
-        else if(QDateTime::fromString(onBoardDescription.gitDate)>QDateTime::fromString(LoadedDescription.gitDate))
-        {
+        } else if (QDateTime::fromString(onBoardDescription.gitDate) > QDateTime::fromString(LoadedDescription.gitDate)) {
             myDevice->statusLabel->setText(tr("The board has newer firmware than loaded. Are you sure you want to update?"));
             px.load(QString(":/uploader/images/warning.svg"));
-        }
-        else if(!LoadedDescription.gitTag.startsWith("RELEASE",Qt::CaseSensitive))
-        {
-            myDevice->statusLabel->setText(tr("The loaded firmware is untagged or custom build. Update only if it was received from a trusted source (official website or your own build)"));
+        } else if (!LoadedDescription.gitTag.startsWith("RELEASE", Qt::CaseSensitive)) {
+            myDevice->statusLabel->setText(tr("The loaded firmware is untagged or custom build. Update only if it was received from a trusted source (official website or your own build)."));
             px.load(QString(":/uploader/images/warning.svg"));
-        }
-        else
-        {
-            myDevice->statusLabel->setText(tr("This is the tagged officially released OpenPilot firmware"));
+        } else {
+            myDevice->statusLabel->setText(tr("This is the tagged officially released OpenPilot firmware."));
             px.load(QString(":/uploader/images/gtk-info.svg"));
         }
-    }
-    else
-    {
-        myDevice->statusLabel->setText(tr("WARNING: the loaded firmware was not packaged with the OpenPilot format. Do not update unless you know what you are doing"));
+    } else {
+        myDevice->statusLabel->setText(tr("WARNING: the loaded firmware was not packaged with the OpenPilot format. Do not update unless you know what you are doing."));
         px.load(QString(":/uploader/images/error.svg"));
-        myDevice->youdont->setChecked(false);
-        myDevice->youdont->setVisible(true);
+        myDevice->confirmCheckBox->setChecked(false);
+        myDevice->confirmCheckBox->setVisible(true);
         myDevice->verticalGroupBox_loaded->setVisible(false);
         myDevice->groupCustom->setVisible(true);
     }

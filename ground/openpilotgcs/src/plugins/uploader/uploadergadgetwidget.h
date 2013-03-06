@@ -115,7 +115,8 @@ private slots:
     void cancel();
     void uploadStarted();
     void uploadEnded(bool succeed);
-
+    void downloadStarted();
+    void downloadEnded(bool succeed);
 };
 
 #endif // UPLOADERGADGETWIDGET_H

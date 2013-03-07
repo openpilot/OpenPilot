@@ -79,6 +79,7 @@ uint32_t pios_usb_rctx_id;
  */
 #if defined(PIOS_INCLUDE_MPU6000)
 #include "pios_mpu6000.h"
+#include "pios_mpu6000_config.h"
 static const struct pios_exti_cfg pios_exti_mpu6000_cfg __exti_config = {
 	.vector = PIOS_MPU6000_IRQHandler,
 	.line = EXTI_Line3,
@@ -112,13 +113,15 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 	.exti_cfg = &pios_exti_mpu6000_cfg,
 	.Fifo_store = PIOS_MPU6000_FIFO_TEMP_OUT | PIOS_MPU6000_FIFO_GYRO_X_OUT | PIOS_MPU6000_FIFO_GYRO_Y_OUT | PIOS_MPU6000_FIFO_GYRO_Z_OUT,
 	// Clock at 8 khz, downsampled by 16 for 500 Hz
-	.Smpl_rate_div = 15,
+	.Smpl_rate_div_no_dlp = 15,
+	// Clock at 1 khz, downsampled by 2 for 500 Hz
+	.Smpl_rate_div_dlp = 1,
 	.interrupt_cfg = PIOS_MPU6000_INT_CLR_ANYRD,
 	.interrupt_en = PIOS_MPU6000_INTEN_DATA_RDY,
 	.User_ctl = PIOS_MPU6000_USERCTL_FIFO_EN | PIOS_MPU6000_USERCTL_DIS_I2C,
 	.Pwr_mgmt_clk = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
 	.accel_range = PIOS_MPU6000_ACCEL_8G,
-	.gyro_range = PIOS_MPU6000_SCALE_500_DEG,
+	.gyro_range = PIOS_MPU6000_SCALE_2000_DEG,
 	.filter = PIOS_MPU6000_LOWPASS_256_HZ,
 	.orientation = PIOS_MPU6000_TOP_180DEG
 };
@@ -817,6 +820,7 @@ void PIOS_Board_Init(void) {
 				PIOS_Assert(0);
 			}
 			PIOS_MPU6000_Init(pios_spi_gyro_id,0,&pios_mpu6000_cfg);
+			PIOS_MPU6000_CONFIG_Configure();
 			init_test = PIOS_MPU6000_Test();
 #endif /* PIOS_INCLUDE_MPU6000 */
 

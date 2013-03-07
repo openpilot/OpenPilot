@@ -45,8 +45,6 @@ UAVGadgetDecorator::UAVGadgetDecorator(IUAVGadget *gadget, QList<IUAVGadgetConfi
     foreach (IUAVGadgetConfiguration *config, *m_configurations)
         m_toolbar->addItem(config->name());
     connect(m_toolbar, SIGNAL(activated(int)), this, SLOT(loadConfiguration(int)));
-    if (m_configurations->count() > 0)
-        loadConfiguration(0);
     updateToolbar();
 }
 
@@ -57,7 +55,7 @@ UAVGadgetDecorator::~UAVGadgetDecorator()
 }
 
 void UAVGadgetDecorator::loadConfiguration(int index) {
-    IUAVGadgetConfiguration* config = m_configurations->at(index);
+    IUAVGadgetConfiguration *config = m_configurations->at(index);
     loadConfiguration(config);
 }
 
@@ -70,13 +68,13 @@ void UAVGadgetDecorator::loadConfiguration(IUAVGadgetConfiguration *config)
 
 }
 
-void UAVGadgetDecorator::configurationChanged(IUAVGadgetConfiguration* config)
+void UAVGadgetDecorator::configurationChanged(IUAVGadgetConfiguration *config)
 {
     if (config == m_activeConfiguration)
         loadConfiguration(config);
 }
 
-void UAVGadgetDecorator::configurationAdded(IUAVGadgetConfiguration* config)
+void UAVGadgetDecorator::configurationAdded(IUAVGadgetConfiguration *config)
 {
     if (config->classId() != classId())
         return;
@@ -85,7 +83,7 @@ void UAVGadgetDecorator::configurationAdded(IUAVGadgetConfiguration* config)
     updateToolbar();
 }
 
-void UAVGadgetDecorator::configurationToBeDeleted(IUAVGadgetConfiguration* config)
+void UAVGadgetDecorator::configurationToBeDeleted(IUAVGadgetConfiguration *config)
 {
     if (config->classId() != classId())
         return;
@@ -97,7 +95,7 @@ void UAVGadgetDecorator::configurationToBeDeleted(IUAVGadgetConfiguration* confi
     updateToolbar();
 }
 
-void UAVGadgetDecorator::configurationNameChanged(IUAVGadgetConfiguration* config, QString oldName, QString newName)
+void UAVGadgetDecorator::configurationNameChanged(IUAVGadgetConfiguration *config, QString oldName, QString newName)
 {
     if (config->classId() != classId())
         return;
@@ -112,20 +110,21 @@ void UAVGadgetDecorator::updateToolbar()
     m_toolbar->setEnabled(m_toolbar->count() > 1);
 }
 
-void UAVGadgetDecorator::saveState(QSettings* qSettings)
+void UAVGadgetDecorator::saveState(QSettings *qSettings)
 {
     if (m_activeConfiguration) {
-        qSettings->setValue("activeConfiguration",m_activeConfiguration->name());
+        qSettings->setValue("activeConfiguration", m_activeConfiguration->name());
     }
 }
 
-void UAVGadgetDecorator::restoreState(QSettings* qSetting)
+void UAVGadgetDecorator::restoreState(QSettings *qSettings)
 {
-    QString configName = qSetting->value("activeConfiguration").toString();
+    QString configName = qSettings->value("activeConfiguration").toString();
     foreach (IUAVGadgetConfiguration *config, *m_configurations) {
         if (config->name() == configName) {
             m_activeConfiguration = config;
             loadConfiguration(config);
+            break;
         }
     }
 }

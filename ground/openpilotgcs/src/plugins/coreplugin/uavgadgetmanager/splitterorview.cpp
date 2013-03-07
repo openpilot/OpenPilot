@@ -347,11 +347,7 @@ void SplitterOrView::saveState(QSettings* qSettings) const {
         static_cast<SplitterOrView*>(m_splitter->widget(1))->saveState(qSettings);
         qSettings->endGroup();
     } else if (gadget()) {
-        qSettings->setValue("type", "uavGadget");
-        qSettings->setValue("classId", gadget()->classId());
-        qSettings->beginGroup("gadget");
-        gadget()->saveState(qSettings);
-        qSettings->endGroup();
+        m_view->saveState(qSettings);
     }
 }
 
@@ -374,13 +370,6 @@ void SplitterOrView::restoreState(QSettings* qSettings)
         static_cast<SplitterOrView*>(m_splitter->widget(1))->restoreState(qSettings);
         qSettings->endGroup();
     } else if (mode == "uavGadget") {
-        QString classId = qSettings->value("classId").toString();
-        int index = m_view->indexOfClassId(classId);
-        m_view->listSelectionActivated(index);
-        if(qSettings->childGroups().contains("gadget")) {
-            qSettings->beginGroup("gadget");
-            gadget()->restoreState(qSettings);
-            qSettings->endGroup();
-        }
+        m_view->restoreState(qSettings);
     }
 }

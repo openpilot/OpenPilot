@@ -120,6 +120,8 @@ void UploaderGadgetWidget::connectSignalSlot(QWidget *widget)
 {
     connect(qobject_cast<deviceWidget *>(widget),SIGNAL(uploadStarted()),this,SLOT(uploadStarted()));
     connect(qobject_cast<deviceWidget *>(widget),SIGNAL(uploadEnded(bool)),this,SLOT(uploadEnded(bool)));
+    connect(qobject_cast<deviceWidget *>(widget),SIGNAL(downloadStarted()),this,SLOT(downloadStarted()));
+    connect(qobject_cast<deviceWidget *>(widget),SIGNAL(downloadEnded(bool)),this,SLOT(downloadEnded(bool)));
 }
 
 FlightStatus *UploaderGadgetWidget::getFlightStatus()
@@ -398,7 +400,7 @@ void UploaderGadgetWidget::systemReset()
             delete dfu;
             dfu = NULL;
         }
-        m_config->textBrowser->clear();
+        clearLog();
         log("Board Reset initiated.");
         goToBootloader();
     }
@@ -470,8 +472,15 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
         // Freeze the tabs, they are not useful anymore and their buttons
         // will cause segfaults or weird stuff if we use them.
         for (int i=0; i< m_config->systemElements->count(); i++) {
-             deviceWidget *qw = (deviceWidget*)m_config->systemElements->widget(i);
-             qw->freeze();
+            // OP-682 arriving here too "early" (before the devices are refreshed) was leading to a crash
+            // OP-682 the crash was due to an unchecked cast in the line below that would cast a RunningDeviceGadget to a DeviceGadget
+            deviceWidget *qw = dynamic_cast<deviceWidget*>(m_config->systemElements->widget(i));
+            if (qw) {
+                // OP-682 fixed a second crash by disabling *all* buttons in the device widget
+                // disabling the buttons is only half of the solution as even if the buttons are enabled
+                // the app should not crash
+                qw->freeze();
+            }
         }
     }
     currentStep = IAP_STATE_READY;
@@ -479,6 +488,7 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
     delete dfu; // Frees up the USB/Serial port too
     dfu = NULL;
 }
+
 bool UploaderGadgetWidget::autoUpdateCapable()
 {
     return QDir(":/build").exists();
@@ -750,15 +760,44 @@ void UploaderGadgetWidget::cancel()
 
 void UploaderGadgetWidget::uploadStarted()
 {
+    m_config->haltButton->setEnabled(false);
     m_config->bootButton->setEnabled(false);
     m_config->safeBootButton->setEnabled(false);
+    m_config->resetButton->setEnabled(false);
+    m_config->rescueButton->setEnabled(false);
 }
 
 void UploaderGadgetWidget::uploadEnded(bool succeed)
 {
     Q_UNUSED(succeed);
+    // device is halted so no halt
+    m_config->haltButton->setEnabled(false);
     m_config->bootButton->setEnabled(true);
     m_config->safeBootButton->setEnabled(true);
+    // device is halted so no reset
+    m_config->resetButton->setEnabled(false);
+    m_config->rescueButton->setEnabled(true);
+}
+
+void UploaderGadgetWidget::downloadStarted()
+{
+    m_config->haltButton->setEnabled(false);
+    m_config->bootButton->setEnabled(false);
+    m_config->safeBootButton->setEnabled(false);
+    m_config->resetButton->setEnabled(false);
+    m_config->rescueButton->setEnabled(false);
+}
+
+void UploaderGadgetWidget::downloadEnded(bool succeed)
+{
+    Q_UNUSED(succeed);
+    // device is halted so no halt
+    m_config->haltButton->setEnabled(false);
+    m_config->bootButton->setEnabled(true);
+    m_config->safeBootButton->setEnabled(true);
+    // device is halted so no reset
+    m_config->resetButton->setEnabled(false);
+    m_config->rescueButton->setEnabled(true);
 }
 
 /**
@@ -766,9 +805,9 @@ void UploaderGadgetWidget::uploadEnded(bool succeed)
   */
 void UploaderGadgetWidget::log(QString str)
 {
+   qDebug() << str;
    m_config->textBrowser->append(str);
    m_config->textBrowser->repaint();
-
 }
 
 void UploaderGadgetWidget::clearLog()
@@ -815,6 +854,7 @@ void UploaderGadgetWidget::error(QString errorString, int errorNumber)
     msgBox.exec();
     m_config->boardStatus->setText(errorString);
 }
+
 /**
 Shows a message box with an information string.
 

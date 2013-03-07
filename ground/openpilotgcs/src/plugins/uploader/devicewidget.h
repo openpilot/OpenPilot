@@ -49,7 +49,7 @@ class UPLOADER_EXPORT deviceWidget : public QWidget
 {
     Q_OBJECT
 public:
-    deviceWidget( QWidget *parent = 0);
+    deviceWidget(QWidget *parent = 0);
     void setDeviceID(int devID);
     void setDfu(DFUObject* dfu);
     void populate();
@@ -57,6 +57,7 @@ public:
     typedef enum { STATUSICON_OK, STATUSICON_RUNNING, STATUSICON_FAIL, STATUSICON_INFO} StatusIcon;
     QString setOpenFileName();
     QString setSaveFileName();
+
 private:
     deviceDescriptorStruct onBoardDescription;
     deviceDescriptorStruct LoadedDescription;
@@ -71,10 +72,14 @@ private:
     void status(QString str, StatusIcon ic);
     bool populateBoardStructuredDescription(QByteArray arr);
     bool populateLoadedStructuredDescription(QByteArray arr);
+    void updateButtons(bool enabled);
 
 signals:
     void uploadStarted();
     void uploadEnded(bool success);
+    void downloadStarted();
+    void downloadEnded(bool success);
+
 public slots:
     void uploadFirmware();
     void loadFirmware();

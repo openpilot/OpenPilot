@@ -795,15 +795,13 @@ void MainWindow::registerDefaultActions()
 
     // About GCS Action
 #ifdef Q_WS_MAC
-    // tmpaction = new QAction(QIcon(Constants::ICON_OPENPILOT), tr("About &OpenPilot GCS"), this); // it's convention not to add dots to the about menu
+
 #else
-    // tmpaction = new QAction(QIcon(Constants::ICON_OPENPILOT), tr("About &OpenPilot GCS..."), this);
+
 #endif
-    // cmd = am->registerAction(tmpaction, Constants::ABOUT_OPENPILOTGCS, m_globalContext);
-    // mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
-    // tmpaction->setEnabled(true);
+
 #ifdef Q_WS_MAC
-    // cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
+
 #endif
     connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutOpenPilotGCS()));
 

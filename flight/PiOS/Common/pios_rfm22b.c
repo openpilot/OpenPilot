@@ -392,6 +392,7 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 		.entry_fn = rfm22_txData,
 		.next_state = {
 			[RFM22B_EVENT_INT_RECEIVED] = RFM22B_STATE_TX_DATA,
+			[RFM22B_EVENT_REQUEST_CONNECTION] = RFM22B_STATE_INITIATING_CONNECTION,
 			[RFM22B_EVENT_RX_MODE] = RFM22B_STATE_RX_MODE,
 			[RFM22B_EVENT_FAILURE] = RFM22B_STATE_TX_FAILURE,
 			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
@@ -1908,8 +1909,12 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 
 			// If this is an ACK for a connection request message we need to
 			// configure this modem from the connection request message.
-			if (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_CON_REQUEST)
+			if (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_CON_REQUEST) {
 				rfm22_setConnectionParameters(rfm22b_dev);
+			} else if (!rfm22_isConnected(rfm22b_dev)) {
+				// Request a connection if we're not yet connected.
+				ret_event = RFM22B_EVENT_REQUEST_CONNECTION;
+			}
 
 			// Change the channel
 #ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP

@@ -363,7 +363,7 @@ static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
     uint32_t outputPort = PIOS_COM_RADIO;
     // Don't send any data unless the radio port is available.
     if(outputPort && PIOS_COM_Available(outputPort)) {
-        return PIOS_COM_SendBuffer(outputPort, buf, length);
+        return PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
     } else {
         // For some reason, if this function returns failure, it prevents saving settings.
         return length;

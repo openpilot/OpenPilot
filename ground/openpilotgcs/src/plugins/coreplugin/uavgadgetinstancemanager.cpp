@@ -262,13 +262,17 @@ void UAVGadgetInstanceManager::createOptionsPages()
 }
 
 
-IUAVGadget *UAVGadgetInstanceManager::createGadget(QString classId, QWidget *parent)
+IUAVGadget *UAVGadgetInstanceManager::createGadget(QString classId, QWidget *parent, bool loadDefaultConfiguration)
 {
     IUAVGadgetFactory *f = factory(classId);
     if (f) {
         QList<IUAVGadgetConfiguration*> *configs = configurations(classId);
         IUAVGadget *g = f->createGadget(parent);
-        IUAVGadget *gadget = new UAVGadgetDecorator(g, configs);
+        UAVGadgetDecorator *gadget = new UAVGadgetDecorator(g, configs);
+        if ((loadDefaultConfiguration && configs && configs->count()) > 0) {
+            gadget->loadConfiguration(configs->at(0));
+        }
+
         m_gadgetInstances.append(gadget);
         connect(this, SIGNAL(configurationAdded(IUAVGadgetConfiguration*)), gadget, SLOT(configurationAdded(IUAVGadgetConfiguration*)));
         connect(this, SIGNAL(configurationChanged(IUAVGadgetConfiguration*)), gadget, SLOT(configurationChanged(IUAVGadgetConfiguration*)));

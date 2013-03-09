@@ -1331,13 +1331,13 @@ static const struct pios_tim_channel pios_tim_servoport_all_pins[] = {
 		.pin = {
 			.gpio = GPIOA,
 			.init = {
-				.GPIO_Pin = GPIO_Pin_1,
+				.GPIO_Pin = GPIO_Pin_0,
 				.GPIO_Speed = GPIO_Speed_2MHz,
 				.GPIO_Mode  = GPIO_Mode_AF,
 				.GPIO_OType = GPIO_OType_PP,
 				.GPIO_PuPd  = GPIO_PuPd_UP
 			},
-			.pin_source = GPIO_PinSource1,
+			.pin_source = GPIO_PinSource0,
 		},
 		.remap = GPIO_AF_TIM5,
 	},

@@ -1810,10 +1810,17 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 					break;
 				case PACKET_TYPE_PPM:
 				{
-#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER) || (defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT))
+#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER) || (defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT)) || defined(PIOS_INCLUDE_RFM22B_RCVR)
 					PHPpmPacketHandle ppmp = (PHPpmPacketHandle)&(rfm22b_dev->rx_packet);
+#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER) || (defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT))
 					bool ppm_output = false;
 #endif
+#endif
+#if defined(PIOS_INCLUDE_RFM22B_RCVR)
+					for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i) {
+						rfm22b_dev->ppm_channel[i] = ppmp->channels[i];
+					}
+#endif					
 #if defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT)
 					if (PIOS_PPM_OUTPUT) {
 						ppm_output = true;

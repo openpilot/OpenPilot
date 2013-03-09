@@ -120,6 +120,9 @@
 
 #define REVOLUTION
 
+/* Turn on debugging signals on the receiver input port */
+//#define PIOS_RFM22B_DEBUG_ON_RCVR
+
 #endif /* PIOS_CONFIG_H */
 /**
  * @}

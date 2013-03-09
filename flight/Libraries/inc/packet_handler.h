@@ -70,7 +70,7 @@ typedef struct {
 typedef struct {
 	PHPacketHeader header;
 #ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
-	uint8_t packet_recv_time;
+	portTickType packet_recv_time;
 #endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHAckNackPacket, *PHAckNackPacketHandle;

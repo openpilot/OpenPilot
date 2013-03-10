@@ -82,9 +82,8 @@ ConfigRevoHWWidget::~ConfigRevoHWWidget()
 
 void ConfigRevoHWWidget::setupCustomCombos()
 {
-    m_ui->cbUSBType->addItem(tr("HID"), USB_HID);
-    m_ui->cbUSBType->addItem(tr("VCP"), USB_VCP);
-    connect(m_ui->cbUSBType, SIGNAL(currentIndexChanged(int)), this, SLOT(usbTypeChanged(int)));
+    connect(m_ui->cbUSBHIDFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(usbHIDPortChanged(int)));
+    connect(m_ui->cbUSBVCPFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(usbVCPPortChanged(int)));
 
     m_ui->cbSonar->addItem(tr("Disabled"));
     m_ui->cbSonar->setCurrentIndex(0);
@@ -99,15 +98,7 @@ void ConfigRevoHWWidget::setupCustomCombos()
 void ConfigRevoHWWidget::refreshWidgetsValues(UAVObject *obj)
 {
     ConfigTaskWidget::refreshWidgetsValues(obj);
-    HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
-    HwSettings::DataFields data = hwSettings->getData();
-    if(data.USB_HIDPort != HwSettings::USB_HIDPORT_DISABLED){
-        m_ui->cbUSBType->setCurrentIndex(m_ui->cbUSBType->findData(USB_HID));
-    }
-    else {
-        m_ui->cbUSBType->setCurrentIndex(m_ui->cbUSBType->findData(USB_VCP));
-    }
-    usbTypeChanged(m_ui->cbUSBType->currentIndex());
+    usbVCPPortChanged(0);
     mainPortChanged(0);
     flexiPortChanged(0);
 }
@@ -141,39 +132,56 @@ void ConfigRevoHWWidget::updateObjectsFromWidgets()
     hwSettings->setData(data);
 }
 
-void ConfigRevoHWWidget::usbTypeChanged(int index)
+void ConfigRevoHWWidget::usbVCPPortChanged(int index)
 {
     Q_UNUSED(index);
 
-    bool hid = m_ui->cbUSBType->itemData(m_ui->cbUSBType->currentIndex()) == USB_HID;
-    m_ui->cbUSBHIDFunction->setVisible(hid);
-    m_ui->cbUSBVCPFunction->setVisible(!hid);
+    bool vcpComBridgeEnabled = m_ui->cbUSBVCPFunction->currentIndex() == HwSettings::USB_VCPPORT_COMBRIDGE;
 
-    m_ui->lblUSBVCPSpeed->setVisible(!hid);
-    m_ui->cbUSBVCPSpeed->setVisible(!hid);
+    m_ui->lblUSBVCPSpeed->setVisible(vcpComBridgeEnabled);
+    m_ui->cbUSBVCPSpeed->setVisible(vcpComBridgeEnabled);
 
-    if(hid){
-        m_ui->cbUSBVCPFunction->setCurrentIndex(HwSettings::USB_VCPPORT_DISABLED);
-        m_ui->cbUSBHIDFunction->setCurrentIndex(HwSettings::USB_HIDPORT_USBTELEMETRY);
-    }
-    else {
-        m_ui->cbUSBHIDFunction->setCurrentIndex(HwSettings::USB_HIDPORT_DISABLED);
-        m_ui->cbUSBVCPFunction->setCurrentIndex(HwSettings::USB_VCPPORT_USBTELEMETRY);
-    }
-
-    if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_COMBRIDGE) {
+    if(!vcpComBridgeEnabled && m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_COMBRIDGE) {
         m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
     }
     m_ui->cbFlexi->model()->setData(m_ui->cbFlexi->model()->index(HwSettings::RM_FLEXIPORT_COMBRIDGE, 0),
-                                    hid ? QVariant(0) : QVariant(1|32), Qt::UserRole - 1);
+                                    !vcpComBridgeEnabled ? QVariant(0) : QVariant(1|32), Qt::UserRole - 1);
 
-    if(m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_COMBRIDGE) {
+    if(!vcpComBridgeEnabled && m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_COMBRIDGE) {
         m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
     }
     m_ui->cbMain->model()->setData(m_ui->cbMain->model()->index(HwSettings::RM_MAINPORT_COMBRIDGE, 0),
-                                   hid ? QVariant(0) : QVariant(1|32), Qt::UserRole - 1);
+                                   !vcpComBridgeEnabled ? QVariant(0) : QVariant(1|32), Qt::UserRole - 1);
+
+    //_DEBUGCONSOLE modes are mutual exclusive
+    if(m_ui->cbUSBVCPFunction->currentIndex() == HwSettings::USB_VCPPORT_DEBUGCONSOLE) {
+        if(m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_DEBUGCONSOLE) {
+            m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
+        }
+        if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_DEBUGCONSOLE) {
+            m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
+        }
+    }
+
+    //_USBTELEMETRY modes are mutual exclusive
+    if(m_ui->cbUSBVCPFunction->currentIndex() == HwSettings::USB_VCPPORT_USBTELEMETRY) {
+        if(m_ui->cbUSBHIDFunction->currentIndex() == HwSettings::USB_HIDPORT_USBTELEMETRY) {
+            m_ui->cbUSBHIDFunction->setCurrentIndex(HwSettings::USB_HIDPORT_DISABLED);
+        }
+    }
 }
 
+void ConfigRevoHWWidget::usbHIDPortChanged(int index)
+{
+    Q_UNUSED(index);
+
+    //_USBTELEMETRY modes are mutual exclusive
+    if(m_ui->cbUSBHIDFunction->currentIndex() == HwSettings::USB_HIDPORT_USBTELEMETRY) {
+        if(m_ui->cbUSBVCPFunction->currentIndex() == HwSettings::USB_VCPPORT_USBTELEMETRY) {
+            m_ui->cbUSBVCPFunction->setCurrentIndex(HwSettings::USB_VCPPORT_DISABLED);
+        }
+    }
+}
 
 void ConfigRevoHWWidget::flexiPortChanged(int index)
 {
@@ -207,10 +215,19 @@ void ConfigRevoHWWidget::flexiPortChanged(int index)
                 m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
             }
             break;
+        case HwSettings::RM_FLEXIPORT_DEBUGCONSOLE:
+            m_ui->cbFlexiComSpeed->setVisible(true);
+            if(m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_DEBUGCONSOLE) {
+                m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
+            }
+            if(m_ui->cbUSBVCPFunction->currentIndex() == HwSettings::USB_VCPPORT_DEBUGCONSOLE) {
+                m_ui->cbUSBVCPFunction->setCurrentIndex(HwSettings::USB_VCPPORT_DISABLED);
+            }
+            break;
         default:
             m_ui->lblFlexiSpeed->setVisible(false);
             break;
-    }
+        }
 }
 
 void ConfigRevoHWWidget::mainPortChanged(int index)
@@ -243,6 +260,15 @@ void ConfigRevoHWWidget::mainPortChanged(int index)
             m_ui->cbMainComSpeed->setVisible(true);
             if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_COMBRIDGE) {
                 m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
+            }
+            break;
+        case HwSettings::RM_MAINPORT_DEBUGCONSOLE:
+            m_ui->cbMainComSpeed->setVisible(true);
+            if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_DEBUGCONSOLE) {
+                m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
+            }
+            if(m_ui->cbUSBVCPFunction->currentIndex() == HwSettings::USB_VCPPORT_DEBUGCONSOLE) {
+                m_ui->cbUSBVCPFunction->setCurrentIndex(HwSettings::USB_VCPPORT_DISABLED);
             }
             break;
         default:

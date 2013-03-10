@@ -45,7 +45,6 @@ public:
     ~ConfigRevoHWWidget();
 
 private:
-    enum {USB_HID, USB_VCP};
     Ui_RevoHWWidget *m_ui;
     void setupCustomCombos();
 
@@ -54,7 +53,8 @@ protected slots:
     void updateObjectsFromWidgets();
 
 private slots:
-    void usbTypeChanged(int index);
+    void usbVCPPortChanged(int index);
+    void usbHIDPortChanged(int index);
     void flexiPortChanged(int index);
     void mainPortChanged(int index);
     void modemPortChanged(int index);

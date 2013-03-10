@@ -47,7 +47,8 @@ const uint32_t * embedded_image_start = (uint32_t *) &(_binary_start);
 const uint32_t * embedded_image_end   = (uint32_t *) &(_binary_end);
 const uint32_t   embedded_image_size  = (uint32_t)   &(_binary_size);
 
-int main() {
+int main()
+{
 
 	PIOS_SYS_Init();
 	PIOS_Board_Init();
@@ -70,7 +71,7 @@ int main() {
 	 */
 
 	/* Calculate how far the board_info_blob is from the beginning of the bootloader */
-	uint32_t board_info_blob_offset = (uint32_t)&pios_board_info_blob - (uint32_t)0x08000000;
+	uint32_t board_info_blob_offset = (uint32_t) &pios_board_info_blob - (uint32_t)0x08000000;
 
 	/* Use the same offset into our embedded bootloader image */
 	struct pios_board_info * new_board_info_blob = (struct pios_board_info *)
@@ -114,13 +115,13 @@ int main() {
 	///
 
 	/// Bootloader programing
-	for (uint32_t offset = 0; offset < embedded_image_size/sizeof(uint32_t); ++offset) {
+	for (uint32_t offset = 0; offset < embedded_image_size / sizeof(uint32_t); ++offset) {
 		bool result = false;
 		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 		for (uint8_t retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
 			if (result == false) {
 				result = (FLASH_ProgramWord(0x08000000 + (offset * 4), embedded_image_start[offset])
-						== FLASH_COMPLETE) ? true : false;
+					== FLASH_COMPLETE) ? true : false;
 			}
 		}
 		if (result == false)
@@ -128,10 +129,10 @@ int main() {
 	}
 	///
 	for (uint8_t x = 0; x < 3; ++x) {
-			PIOS_LED_On(PIOS_LED_HEARTBEAT);
-			PIOS_DELAY_WaitmS(1000);
-			PIOS_LED_Off(PIOS_LED_HEARTBEAT);
-			PIOS_DELAY_WaitmS(1000);
+		PIOS_LED_On(PIOS_LED_HEARTBEAT);
+		PIOS_DELAY_WaitmS(1000);
+		PIOS_LED_Off(PIOS_LED_HEARTBEAT);
+		PIOS_DELAY_WaitmS(1000);
 	}
 
 	/// Invalidate the bootloader updater so we won't run
@@ -145,20 +146,18 @@ int main() {
 
 }
 
-void error(int led, int code) {
-	for(;;)
-	{
+void error(int led, int code)
+{
+	for (;;) {
 		PIOS_DELAY_WaitmS(1000);
-		for (int x=0; x<code; x++)
-		{
+		for (int x = 0; x < code; x++) {
 			PIOS_LED_On(led);
 			PIOS_DELAY_WaitmS(200);
 			PIOS_LED_Off(led);
 			PIOS_DELAY_WaitmS(1000);
 		}
 		PIOS_DELAY_WaitmS(1000);
-		for (int x=0; x<10; x++)
-		{
+		for (int x = 0; x < 10; x++) {
 			PIOS_LED_On(led);
 			PIOS_DELAY_WaitmS(200);
 			PIOS_LED_Off(led);

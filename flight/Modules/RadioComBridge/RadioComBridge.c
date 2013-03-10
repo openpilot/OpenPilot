@@ -162,6 +162,9 @@ static int32_t RadioComBridgeStart(void)
             case OPLINKSETTINGS_MAXRFPOWER_100:
                 PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_7);
                 break;
+	    default:
+	        // do nothing
+		break;
             }
 
             // Reinitilize the modem.

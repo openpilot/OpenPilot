@@ -612,8 +612,9 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->frequency_hop_step_size_reg = (uint8_t)freq_hop_step_size;
 
 	// Initialize the bindings.
-	for (uint32_t i = 0; i < OPLINKSETTINGS_BINDINGS_NUMELEM; ++i)
+	for (uint32_t i = 0; i < OPLINKSETTINGS_BINDINGS_NUMELEM; ++i) {
 		rfm22b_dev->bindings[i].pairID = 0;
+	}
 	rfm22b_dev->coordinator = false;
 
 	// Create the event queue
@@ -729,8 +730,9 @@ uint32_t PIOS_RFM22B_DeviceID(uint32_t rfm22b_id)
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if (PIOS_RFM22B_validate(rfm22b_dev)) {
                 return rfm22b_dev->deviceID;
-	} else
+	} else {
 		return 0;
+	}
 }
 
 /**
@@ -741,10 +743,11 @@ uint32_t PIOS_RFM22B_DeviceID(uint32_t rfm22b_id)
 bool PIOS_RFM22B_IsCoordinator(uint32_t rfm22b_id)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if (PIOS_RFM22B_validate(rfm22b_dev))
+	if (PIOS_RFM22B_validate(rfm22b_dev)) {
 		return rfm22b_dev->coordinator;
-	else
+	} else {
 		return false;
+	}
 }
 
 /**
@@ -755,8 +758,9 @@ bool PIOS_RFM22B_IsCoordinator(uint32_t rfm22b_id)
 void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if (!PIOS_RFM22B_validate(rfm22b_dev))
+	if (!PIOS_RFM22B_validate(rfm22b_dev)) {
 		return;
+	}
 	rfm22b_dev->tx_power = tx_pwr;
 }
 
@@ -768,8 +772,9 @@ void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr)
 void PIOS_RFM22B_SetComConfigCallback(uint32_t rfm22b_id, PIOS_RFM22B_ComConfigCallback cb)
 {
  	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-	if(!PIOS_RFM22B_validate(rfm22b_dev))
+	if(!PIOS_RFM22B_validate(rfm22b_dev)) {
 		return;
+	}
 	rfm22b_dev->com_config_cb = cb;
 }
 
@@ -858,6 +863,40 @@ bool PIOS_RFM22B_LinkStatus(uint32_t rfm22b_id)
 	if(!PIOS_RFM22B_validate(rfm22b_dev))
 		return false;
 	return (rfm22_isConnected(rfm22b_dev) && (rfm22b_dev->stats.link_quality > RFM22B_LINK_QUALITY_THRESHOLD));
+}
+
+/**
+ * Send a PPM packet with the given channel values.
+ * \param[in] rfm22b_id  The rfm22b device.
+ * \param[in] channels  The channel values.
+ * \param[in] nchannels  The number of channels.
+ * Returns true if there is a valid connection to paired radio, false otherwise.
+ */
+void PIOS_RFM22B_SendPPM(uint32_t rfm22b_id, const uint16_t *channels, uint8_t nchannels)
+{
+#ifdef PIOS_PPM_RECEIVER
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+ 	if (!PIOS_RFM22B_validate(rfm22b_dev)) {
+ 		return;
+	}
+
+	// Only send PPM if we're connected
+	if (!rfm22_isConnected(rfm22b_dev)) {
+		return;
+	}
+
+	// See if we have any valid channels.
+	uint8_t nchan = (nchannels <= PIOS_PPM_NUM_INPUTS) ? nchannels : PIOS_PPM_NUM_INPUTS;
+	for (uint8_t i = 0; i < nchan; ++i) {
+		rfm22b_dev->ppm_packet.channels[i] = channels[i];
+	}
+
+	// Send the PPM packet.
+	rfm22b_dev->ppm_packet.header.destination_id = rfm22b_dev->destination_id;
+	rfm22b_dev->ppm_packet.header.type = PACKET_TYPE_PPM;
+	rfm22b_dev->ppm_packet.header.data_size = PH_PPM_DATA_SIZE(&(rfm22b_dev->ppm_packet));
+	rfm22b_dev->send_ppm = true;
+#endif
 }
 
 /**
@@ -1496,6 +1535,10 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 
 static void rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 {
+	// The coordinator doesn't send status.
+	if (rfm22b_dev->coordinator)
+		return;
+
 	// Update the link quality metric.
 	rfm22_calculateLinkQuality(rfm22b_dev);
 

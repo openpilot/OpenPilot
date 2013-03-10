@@ -91,7 +91,7 @@
 #define MAX_RADIOSTATS_MISS_COUNT 3
 
 // The time between PPM updates
-#define PPM_UPDATE_PERIOD_MS 40
+#define PPM_UPDATE_PERIOD_MS 20
 
 // this is too adjust the RF module so that it is on frequency
 #define OSC_LOAD_CAP				0x7F	// cap = 12.5pf .. default

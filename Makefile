@@ -1,11 +1,36 @@
+#
+# Top level Makefile for the OpenPilot project build system.
+# Copyright (c) 2010-2013, The OpenPilot Team, http://www.openpilot.org
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
+
 # Set up a default goal
 .DEFAULT_GOAL := help
 
 # Set up some macros for common directories within the tree
-ROOT_DIR=$(CURDIR)
-TOOLS_DIR=$(ROOT_DIR)/tools
-BUILD_DIR=$(ROOT_DIR)/build
-DL_DIR=$(ROOT_DIR)/downloads
+ROOT_DIR  := $(CURDIR)
+TOOLS_DIR := $(ROOT_DIR)/tools
+BUILD_DIR := $(ROOT_DIR)/build
+DL_DIR    := $(ROOT_DIR)/downloads
+
+# Set up default build configurations (debug | release)
+UAVOGEN_BUILD_CONF	?= debug
+GCS_BUILD_CONF 		?= debug
+ANDROIDGCS_BUILD_CONF	?= debug
+GOOGLE_API_VERSION	?= 14
 
 # Function for converting an absolute path to one relative
 # to the top of the source tree.
@@ -15,10 +40,10 @@ toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
 # to remove the chance that they will cause problems with our build
 define SANITIZE_VAR
 $(if $(filter-out undefined,$(origin $(1))),
-  $(info *NOTE*      Sanitized $(2) variable '$(1)' from $(origin $(1)))
-  MAKEOVERRIDES = $(filter-out $(1)=%,$(MAKEOVERRIDES))
-  override $(1) :=
-  unexport $(1)
+    $(info *NOTE*      Sanitized $(2) variable '$(1)' from $(origin $(1)))
+    MAKEOVERRIDES = $(filter-out $(1)=%,$(MAKEOVERRIDES))
+    override $(1) :=
+    unexport $(1)
 )
 endef
 
@@ -31,144 +56,107 @@ $(foreach var, $(SANITIZE_GCC_VARS), $(eval $(call SANITIZE_VAR,$(var),disallowe
 SANITIZE_DEPRECATED_VARS := USE_BOOTLOADER
 $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),deprecated)))
 
-# Deal with unreasonable requests
-# See: http://xkcd.com/149/
-ifeq ($(MAKECMDGOALS),me a sandwich)
- ifeq ($(shell whoami),root)
- $(error Okay)
- else
- $(error What? Make it yourself)
- endif
-endif
-
 # Make sure this isn't being run as root
-ifeq ($(shell whoami),root)
-$(error You should not be running this as root)
+ifeq ($(shell whoami 2>/dev/null),root)
+    $(error You should not be running this as root)
 endif
 
 # Decide on a verbosity level based on the V= parameter
 export AT := @
-
 ifndef V
-export V0    :=
-export V1    := $(AT)
+    export V0    :=
+    export V1    := $(AT)
 else ifeq ($(V), 0)
-export V0    := $(AT)
-export V1    := $(AT)
+    export V0    := $(AT)
+    export V1    := $(AT)
 else ifeq ($(V), 1)
 endif
 
-# Make sure we know a few things about the architecture before including
+# Set up misc host tools, maybe useful on Windows
+ECHO	:= echo
+MKDIR	:= mkdir
+RM	:= rm
+LN	:= ln
+SED	:= sed
+TAR	:= tar
+ANT	:= ant
+JAVAC	:= javac
+JAR	:= jar
+GIT	:= git
+PYTHON	:= python
+INSTALL	:= install
+
+# Make sure we know few things about the architecture before including
 # the tools.mk to ensure that we download/install the right tools.
 UNAME := $(shell uname)
-ARCH := $(shell uname -m)
+ARCH  := $(shell uname -m)
+# Here and everywhere if not Linux or OSX then assume Windows
+ifeq ($(filter Linux Darwin, $(UNAME)), )
+    UNAME := Windows
+endif
 
+# The tools.mk uses wget to fetch tarballs or packages
+ifeq ($(shell [ -x "$(TOOLS_DIR)/bin/wget" ] && $(ECHO) "exists"), exists)
+    WGET := $(TOOLS_DIR)/bin/wget
+else
+    # not installed, hope it's in the path...
+    WGET ?= wget
+endif
+
+# Include tools installers
 include $(ROOT_DIR)/make/tools.mk
 
+# Set up paths to tools
+ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+    QMAKE := $(QT_SDK_QMAKE_PATH)
+else
+    # not installed, hope it's in the path...
+    QMAKE ?= qmake
+endif
+
+ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+    ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-none-eabi-
+else
+    # not installed, hope it's in the path...
+    ARM_SDK_PREFIX ?= arm-none-eabi-
+endif
+
+ifeq ($(shell [ -d "$(OPENOCD_DIR)" ] && $(ECHO) "exists"), exists)
+    OPENOCD := $(OPENOCD_DIR)/bin/openocd
+else
+    # not installed, hope it's in the path...
+    OPENOCD ?= openocd
+endif
+
+ifeq ($(shell [ -d "$(ANDROID_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+    ANDROID    := $(ANDROID_SDK_DIR)/tools/android
+    ANDROID_DX := $(ANDROID_SDK_DIR)/platform-tools/dx
+else
+    # not installed, hope it's in the path...
+    ANDROID    ?= android
+    ANDROID_DX ?= dx
+endif
+
 # We almost need to consider autoconf/automake instead of this
-# I don't know if windows supports uname :-(
-QT_SPEC=win32-g++
-UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/debug/uavobjgenerator.exe"
 ifeq ($(UNAME), Linux)
-  QT_SPEC=linux-g++
-  UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
+    QT_SPEC = linux-g++
+    UAVOBJGENERATOR = "$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
+else ifeq ($(UNAME), Darwin)
+    QT_SPEC = macx-g++
+    UAVOBJGENERATOR = "$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
+else
+    QT_SPEC = win32-g++
+    UAVOBJGENERATOR = "$(BUILD_DIR)/ground/uavobjgenerator/$(UAVOGEN_BUILD_CONF)/uavobjgenerator.exe"
 endif
-ifeq ($(UNAME), Darwin)
-  QT_SPEC=macx-g++
-  UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
-endif
 
-# OpenPilot GCS build configuration (debug | release)
-GCS_BUILD_CONF ?= debug
+# version-info cmd to extract some repository data
+VERSION_INFO := $(PYTHON) $(ROOT_DIR)/make/scripts/version-info.py --path="$(ROOT_DIR)"
 
-# Set up misc host tools
-RM=rm
-
-.PHONY: help
-help:
-	@echo
-	@echo "   This Makefile is known to work on Linux and Mac in a standard shell environment."
-	@echo "   It also works on Windows by following the instructions in make/winx86/README.txt."
-	@echo
-	@echo "   Here is a summary of the available targets:"
-	@echo
-	@echo "   [Tool Installers]"
-	@echo "     qt_sdk_install       - Install the QT v4.7.3 tools"
-	@echo "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
-	@echo "     openocd_install      - Install the OpenOCD JTAG daemon"
-	@echo "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
-	@echo "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
-	@echo "     android_sdk_install  - Install the Android SDK tools"
-	@echo
-	@echo "   [Big Hammer]"
-	@echo "     all                  - Generate UAVObjects, build openpilot firmware and gcs"
-	@echo "     all_flight           - Build all firmware, bootloaders and bootloader updaters"
-	@echo "     all_fw               - Build only firmware for all boards"
-	@echo "     all_bl               - Build only bootloaders for all boards"
-	@echo "     all_bu               - Build only bootloader updaters for all boards"
-	@echo
-	@echo "     all_clean            - Remove your build directory ($(BUILD_DIR))"
-	@echo "     all_flight_clean     - Remove all firmware, bootloaders and bootloader updaters"
-	@echo "     all_fw_clean         - Remove firmware for all boards"
-	@echo "     all_bl_clean         - Remove bootlaoders for all boards"
-	@echo "     all_bu_clean         - Remove bootloader updaters for all boards"
-	@echo
-	@echo "     all_<board>          - Build all available images for <board>"
-	@echo "     all_<board>_clean    - Remove all available images for <board>"
-	@echo
-	@echo "     all_ut               - Build all unit tests"
-	@echo "     all_ut_tap           - Run all unit tests and capture all TAP output to files"
-	@echo "     all_ut_run           - Run all unit tests and dump TAP output to console"
-	@echo
-	@echo "   [Firmware]"
-	@echo "     <board>              - Build firmware for <board>"
-	@echo "                            supported boards are ($(ALL_BOARDS))"
-	@echo "     fw_<board>           - Build firmware for <board>"
-	@echo "                            supported boards are ($(FW_BOARDS))"
-	@echo "     fw_<board>_clean     - Remove firmware for <board>"
-	@echo "     fw_<board>_program   - Use OpenOCD + JTAG to write firmware to <board>"
-	@echo
-	@echo "   [Bootloader]"
-	@echo "     bl_<board>           - Build bootloader for <board>"
-	@echo "                            supported boards are ($(BL_BOARDS))"
-	@echo "     bl_<board>_clean     - Remove bootloader for <board>"
-	@echo "     bl_<board>_program   - Use OpenOCD + JTAG to write bootloader to <board>"
-	@echo
-	@echo "   [Bootloader Updater]"
-	@echo "     bu_<board>           - Build bootloader updater for <board>"
-	@echo "                            supported boards are ($(BU_BOARDS))"
-	@echo "     bu_<board>_clean     - Remove bootloader updater for <board>"
-	@echo
-	@echo "   [Unbrick a board]"
-	@echo "     unbrick_<board>      - Use the STM32's built in boot ROM to write a bootloader to <board>"
-	@echo "                            supported boards are ($(BL_BOARDS))"
-	@echo "   [Unittests]"
-	@echo "     ut_<test>            - Build unit test <test>"
-	@echo "     ut_<test>_tap        - Run test and capture TAP output into a file"
-	@echo "     ut_<test>_run        - Run test and dump TAP output to console"
-	@echo
-	@echo "   [Simulation]"
-	@echo "     sim_osx              - Build OpenPilot simulation firmware for OSX"
-	@echo "     sim_osx_clean        - Delete all build output for the osx simulation"
-	@echo "     sim_win32            - Build OpenPilot simulation firmware for"
-	@echo "                            Windows using mingw and msys"
-	@echo "     sim_win32_clean      - Delete all build output for the win32 simulation"
-	@echo
-	@echo "   [GCS]"
-	@echo "     gcs                  - Build the Ground Control System (GCS) application"
-	@echo "     gcs_clean            - Remove the Ground Control System (GCS) application"
-	@echo
-	@echo "   [UAVObjects]"
-	@echo "     uavobjects           - Generate source files from the UAVObject definition XML files"
-	@echo "     uavobjects_test      - parse xml-files - check for valid, duplicate ObjId's, ... "
-	@echo "     uavobjects_<group>   - Generate source files from a subset of the UAVObject definition XML files"
-	@echo "                            supported groups are ($(UAVOBJ_TARGETS))"
-	@echo
-	@echo "   Hint: Add V=1 to your command line to see verbose build output."
-	@echo
-	@echo "   Note: All tools will be installed into $(TOOLS_DIR)"
-	@echo "         All build output will be placed in $(BUILD_DIR)"
-	@echo
+##############################
+#
+# All targets
+#
+##############################
 
 .PHONY: all
 all: uavobjects all_ground all_flight
@@ -178,49 +166,56 @@ all_clean:
 	[ ! -d "$(BUILD_DIR)" ] || $(RM) -rf "$(BUILD_DIR)"
 
 $(DL_DIR):
-	mkdir -p $@
+	$(MKDIR) -p $@
 
 $(TOOLS_DIR):
-	mkdir -p $@
+	$(MKDIR) -p $@
 
 $(BUILD_DIR):
-	mkdir -p $@
+	$(MKDIR) -p $@
 
 ##############################
 #
-# Set up paths to tools
+# UAVObjects
 #
 ##############################
 
-ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && echo "exists"), exists)
-  QMAKE = $(QT_SDK_QMAKE_PATH)
+ifeq ($(V), 1)
+    UAVOGEN_SILENT :=
 else
-  # not installed, hope it's in the path...
-  QMAKE = qmake
+    UAVOGEN_SILENT := silent
 endif
 
-ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && echo "exists"), exists)
-  ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-none-eabi-
-else
-  # not installed, hope it's in the path...
-  ARM_SDK_PREFIX ?= arm-none-eabi-
-endif
+.PHONY: uavobjgenerator
+uavobjgenerator:
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/ground/$@
+	$(V1) ( cd $(BUILD_DIR)/ground/$@ && \
+	    $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+="$(UAVOGEN_BUILD_CONF) $(UAVOGEN_SILENT)" && \
+	    $(MAKE) --no-print-directory -w ; \
+	)
 
-ifeq ($(shell [ -d "$(OPENOCD_DIR)" ] && echo "exists"), exists)
-  OPENOCD := $(OPENOCD_DIR)/bin/openocd
-else
-  # not installed, hope it's in the path...
-  OPENOCD ?= openocd
-endif
+UAVOBJ_TARGETS := gcs flight python matlab java wireshark
 
-ifeq ($(shell [ -d "$(ANDROID_SDK_DIR)" ] && echo "exists"), exists)
-  ANDROID := $(ANDROID_SDK_DIR)/tools/android
-  ANDROID_DX := $(ANDROID_SDK_DIR)/platform-tools/dx
-else
-  # not installed, hope it's in the path...
-  ANDROID ?= android
-  ANDROID_DX ?= dx
-endif
+.PHONY: uavobjects
+uavobjects:  $(addprefix uavobjects_, $(UAVOBJ_TARGETS))
+
+UAVOBJ_XML_DIR := $(ROOT_DIR)/shared/uavobjectdefinition
+UAVOBJ_OUT_DIR := $(BUILD_DIR)/uavobject-synthetics
+
+$(UAVOBJ_OUT_DIR):
+	$(V1) $(MKDIR) -p $@
+
+uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
+	$(V1) ( cd $(UAVOBJ_OUT_DIR) && \
+	    $(UAVOBJGENERATOR) -$* $(UAVOBJ_XML_DIR) $(ROOT_DIR) ; \
+	)
+
+uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
+	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
+
+uavobjects_clean:
+	$(V0) @$(ECHO) " CLEAN      $@"
+	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
 
 ##############################
 #
@@ -237,59 +232,23 @@ gcs: openpilotgcs
 gcs_clean: openpilotgcs_clean
 
 ifeq ($(V), 1)
-GCS_SILENT := 
+    GCS_SILENT :=
 else
-GCS_SILENT := silent
+    GCS_SILENT := silent
 endif
 
 .PHONY: openpilotgcs
-openpilotgcs:  uavobjects_gcs
-	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
+openpilotgcs: uavobjects_gcs
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/ground/$@
 	$(V1) ( cd $(BUILD_DIR)/ground/$@ && \
-	  $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) && \
-	  $(MAKE) -w ; \
+	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) && \
+	    $(MAKE) -w ; \
 	)
 
 .PHONY: openpilotgcs_clean
 openpilotgcs_clean:
-	$(V0) @echo " CLEAN      $@"
+	$(V0) @$(ECHO) " CLEAN      $@"
 	$(V1) [ ! -d "$(BUILD_DIR)/ground/openpilotgcs" ] || $(RM) -r "$(BUILD_DIR)/ground/openpilotgcs"
-
-ifeq ($(V), 1)
-UAVOGEN_SILENT := 
-else
-UAVOGEN_SILENT := silent
-endif
-
-.PHONY: uavobjgenerator
-uavobjgenerator:
-	$(V1) mkdir -p $(BUILD_DIR)/ground/$@
-	$(V1) ( cd $(BUILD_DIR)/ground/$@ && \
-	  $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+="debug $(UAVOGEN_SILENT)" && \
-	  $(MAKE) --no-print-directory -w ; \
-	)
-
-UAVOBJ_TARGETS := gcs flight python matlab java wireshark
-.PHONY:uavobjects
-uavobjects:  $(addprefix uavobjects_, $(UAVOBJ_TARGETS))
-
-UAVOBJ_XML_DIR := $(ROOT_DIR)/shared/uavobjectdefinition
-UAVOBJ_OUT_DIR := $(BUILD_DIR)/uavobject-synthetics
-
-$(UAVOBJ_OUT_DIR):
-	$(V1) mkdir -p $@
-
-uavobjects_%: $(UAVOBJ_OUT_DIR) uavobjgenerator
-	$(V1) ( cd $(UAVOBJ_OUT_DIR) && \
-	  $(UAVOBJGENERATOR) -$* $(UAVOBJ_XML_DIR) $(ROOT_DIR) ; \
-	)
-
-uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
-	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
-
-uavobjects_clean:
-	$(V0) @echo " CLEAN      $@"
-	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
 
 ################################
 #
@@ -297,31 +256,33 @@ uavobjects_clean:
 #
 ################################
 
-ANDROIDGCS_BUILD_CONF ?= debug
-
 # Build the output directory for the Android GCS build
 ANDROIDGCS_OUT_DIR := $(BUILD_DIR)/androidgcs
 $(ANDROIDGCS_OUT_DIR):
-	$(V1) mkdir -p $@
+	$(V1) $(MKDIR) -p $@
 
 # Build the asset directory for the android assets
 ANDROIDGCS_ASSETS_DIR := $(ANDROIDGCS_OUT_DIR)/assets
 $(ANDROIDGCS_ASSETS_DIR)/uavos:
-	$(V1) mkdir -p $@
+	$(V1) $(MKDIR) -p $@
 
 ifeq ($(V), 1)
-ANT_QUIET :=
-ANDROID_SILENT := 
+    ANT_QUIET      :=
+    ANDROID_SILENT :=
 else
-ANT_QUIET := -q
-ANDROID_SILENT := -s
+    ANT_QUIET      := -q
+    ANDROID_SILENT := -s
 endif
+
 .PHONY: androidgcs
 androidgcs: uavo-collections_java
-	$(V0) @echo " ANDROID   $(call toprel, $(ANDROIDGCS_OUT_DIR))"
-	$(V1) mkdir -p $(ANDROIDGCS_OUT_DIR)
-	$(V1) $(ANDROID) $(ANDROID_SILENT) update project --target 'Google Inc.:Google APIs:14' --name androidgcs --path ./androidgcs
-	$(V1) ant -f ./androidgcs/build.xml \
+	$(V0) @$(ECHO) " ANDROID   $(call toprel, $(ANDROIDGCS_OUT_DIR))"
+	$(V1) $(MKDIR) -p $(ANDROIDGCS_OUT_DIR)
+	$(V1) $(ANDROID) $(ANDROID_SILENT) update project \
+		--target "Google Inc.:Google APIs:$(GOOGLE_API_VERSION)" \
+		--name androidgcs \
+		--path ./androidgcs
+	$(V1) $(ANT) -f ./androidgcs/build.xml \
 		$(ANT_QUIET) \
 		-Dout.dir="../$(call toprel, $(ANDROIDGCS_OUT_DIR)/bin)" \
 		-Dgen.absolute.dir="$(ANDROIDGCS_OUT_DIR)/gen" \
@@ -329,18 +290,21 @@ androidgcs: uavo-collections_java
 
 .PHONY: androidgcs_clean
 androidgcs_clean:
-	$(V0) @echo " CLEAN      $@"
+	$(V0) @$(ECHO) " CLEAN      $@"
 	$(V1) [ ! -d "$(ANDROIDGCS_OUT_DIR)" ] || $(RM) -r "$(ANDROIDGCS_OUT_DIR)"
 
 # We want to take snapshots of the UAVOs at each point that they change
 # to allow the GCS to be compatible with as many versions as possible.
-#
+# We always include a pseudo collection called "srctree" which represents
+# the UAVOs in the source tree. So not necessary to add current tree UAVO
+# hash here, it is always included.
+
 # Find the git hashes of each commit that changes uavobjects with:
 #   git log --format=%h -- shared/uavobjectdefinition/ | head -n 2
+# List only UAVO hashes of past releases, do not list current hash.
 UAVO_GIT_VERSIONS := 5e14f53
 
-# All versions includes a pseudo collection called "working" which represents
-# the UAVOs in the source tree
+# All versions includes also the current source tree UAVO hash
 UAVO_ALL_VERSIONS := $(UAVO_GIT_VERSIONS) srctree
 
 # This is where the UAVO collections are stored
@@ -352,29 +316,29 @@ define UAVO_COLLECTION_GIT_TEMPLATE
 # Make the output directory that will contain all of the synthetics for the
 # uavo collection referenced by the git hash $(1)
 $$(UAVO_COLLECTION_DIR)/$(1):
-	$$(V1) mkdir -p $$(UAVO_COLLECTION_DIR)/$(1)
+	$$(V1) $(MKDIR) -p $$(UAVO_COLLECTION_DIR)/$(1)
 
 # Extract the snapshot of shared/uavobjectdefinition from git hash $(1)
 $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml.tar: | $$(UAVO_COLLECTION_DIR)/$(1)
 $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml.tar:
-	$$(V0) @echo " UAVOTAR   $(1)"
-	$$(V1) git archive $(1) -o $$@ -- shared/uavobjectdefinition/
+	$$(V0) @$(ECHO) " UAVOTAR   $(1)"
+	$$(V1) $(GIT) archive $(1) -o $$@ -- shared/uavobjectdefinition/
 
 # Extract the uavo xml files from our snapshot
 $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml: $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml.tar
-	$$(V0) @echo " UAVOUNTAR $(1)"
-	$$(V1) rm -rf $$@
-	$$(V1) mkdir -p $$@
-	$$(V1) tar -C $$(call toprel, $$@) -xf $$(call toprel, $$<) || rm -rf $$@
+	$$(V0) @$(ECHO) " UAVOUNTAR $(1)"
+	$$(V1) $(RM) -rf $$@
+	$$(V1) $(MKDIR) -p $$@
+	$$(V1) $(TAR) -C $$(call toprel, $$@) -xf $$(call toprel, $$<) || $(RM) -rf $$@
 endef
 
 # Map the current working directory into the set of UAVO collections
 $(UAVO_COLLECTION_DIR)/srctree:
-	$(V1) mkdir -p $@
+	$(V1) $(MKDIR) -p $@
 
 $(UAVO_COLLECTION_DIR)/srctree/uavo-xml: | $(UAVO_COLLECTION_DIR)/srctree
 $(UAVO_COLLECTION_DIR)/srctree/uavo-xml: $(UAVOBJ_XML_DIR)
-	$(V1) ln -sf $(ROOT_DIR) $(UAVO_COLLECTION_DIR)/srctree/uavo-xml
+	$(V1) $(LN) -sf $(ROOT_DIR) $(UAVO_COLLECTION_DIR)/srctree/uavo-xml
 
 # $(1) git hash (or symbolic name) of a UAVO snapshot
 define UAVO_COLLECTION_BUILD_TEMPLATE
@@ -383,18 +347,17 @@ define UAVO_COLLECTION_BUILD_TEMPLATE
 $$(UAVO_COLLECTION_DIR)/$(1)/uavohash: $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml
         # Compute the sha1 hash for this UAVO collection
         # The sed bit truncates the UAVO hash to 16 hex digits
-	$$(V1) python $$(ROOT_DIR)/make/scripts/version-info.py \
-			--path=$$(ROOT_DIR) \
+	$$(V1) $$(VERSION_INFO) \
 			--uavodir=$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition \
 			--format='$$$${UAVOSHA1TXT}' | \
-		sed -e 's|\(................\).*|\1|' > $$@
+		$(SED) -e 's|\(................\).*|\1|' > $$@
 
-	$$(V0) @echo " UAVOHASH  $(1) ->" $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
+	$$(V0) @$(ECHO) " UAVOHASH  $(1) ->" $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
 
 # Generate the java uavobjects for this UAVO collection
 $$(UAVO_COLLECTION_DIR)/$(1)/java-build/java: $$(UAVO_COLLECTION_DIR)/$(1)/uavohash
-	$$(V0) @echo " UAVOJAVA  $(1)   " $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
-	$$(V1) mkdir -p $$@
+	$$(V0) @$(ECHO) " UAVOJAVA  $(1)   " $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
+	$$(V1) $(MKDIR) -p $$@
 	$$(V1) ( \
 		cd $$(UAVO_COLLECTION_DIR)/$(1)/java-build && \
 		$$(UAVOBJGENERATOR) -java $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition $$(ROOT_DIR) ; \
@@ -403,22 +366,22 @@ $$(UAVO_COLLECTION_DIR)/$(1)/java-build/java: $$(UAVO_COLLECTION_DIR)/$(1)/uavoh
 # Build a jar file for this UAVO collection
 $$(UAVO_COLLECTION_DIR)/$(1)/java-build/uavobjects.jar: | $$(ANDROIDGCS_ASSETS_DIR)/uavos
 $$(UAVO_COLLECTION_DIR)/$(1)/java-build/uavobjects.jar: $$(UAVO_COLLECTION_DIR)/$(1)/java-build/java
-	$$(V0) @echo " UAVOJAR   $(1)   " $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
+	$$(V0) @$(ECHO) " UAVOJAR   $(1)   " $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
 	$$(V1) ( \
 		HASH=$$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash) && \
 		cd $$(UAVO_COLLECTION_DIR)/$(1)/java-build && \
-		javac java/*.java \
-		   $$(ROOT_DIR)/androidgcs/src/org/openpilot/uavtalk/UAVDataObject.java \
-		   $$(ROOT_DIR)/androidgcs/src/org/openpilot/uavtalk/UAVObject*.java \
-		   $$(ROOT_DIR)/androidgcs/src/org/openpilot/uavtalk/UAVMetaObject.java \
-		   -d . && \
+		$(JAVAC) java/*.java \
+			$$(ROOT_DIR)/androidgcs/src/org/openpilot/uavtalk/UAVDataObject.java \
+			$$(ROOT_DIR)/androidgcs/src/org/openpilot/uavtalk/UAVObject*.java \
+			$$(ROOT_DIR)/androidgcs/src/org/openpilot/uavtalk/UAVMetaObject.java \
+			-d . && \
 		find ./org/openpilot/uavtalk/uavobjects -type f -name '*.class' > classlist.txt && \
-		jar cf tmp_uavobjects.jar @classlist.txt && \
+		$(JAR) cf tmp_uavobjects.jar @classlist.txt && \
 		$$(ANDROID_DX) \
 			--dex \
 			--output $$(ANDROIDGCS_ASSETS_DIR)/uavos/$$$${HASH}.jar \
 			tmp_uavobjects.jar && \
-		ln -sf $$(ANDROIDGCS_ASSETS_DIR)/uavos/$$$${HASH}.jar uavobjects.jar \
+		$(LN) -sf $$(ANDROIDGCS_ASSETS_DIR)/uavos/$$$${HASH}.jar uavobjects.jar \
 	)
 
 endef
@@ -437,7 +400,7 @@ uavo-collections: uavo-collections_java
 
 .PHONY: uavo-collections_clean
 uavo-collections_clean:
-	$(V0) @echo " CLEAN  $(UAVO_COLLECTION_DIR)"
+	$(V0) @$(ECHO) " CLEAN  $(UAVO_COLLECTION_DIR)"
 	$(V1) [ ! -d "$(UAVO_COLLECTION_DIR)" ] || $(RM) -r $(UAVO_COLLECTION_DIR)
 
 ##############################
@@ -466,7 +429,7 @@ $(1): fw_$(1)_opfw
 fw_$(1): fw_$(1)_opfw
 
 fw_$(1)_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/fw_$(1)/dep
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/fw_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/targets/$(2) && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
@@ -492,7 +455,7 @@ fw_$(1)_%: uavobjects_flight
 .PHONY: $(1)_clean
 $(1)_clean: fw_$(1)_clean
 fw_$(1)_clean:
-	$(V0) @echo " CLEAN      $$@"
+	$(V0) @$(ECHO) " CLEAN      $$@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/fw_$(1)
 endef
 
@@ -504,7 +467,7 @@ bl_$(1): bl_$(1)_bin
 bl_$(1)_bino: bl_$(1)_bin
 
 bl_$(1)_%:
-	$(V1) mkdir -p $(BUILD_DIR)/bl_$(1)/dep
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/bl_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/$(2) && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
@@ -530,20 +493,20 @@ bl_$(1)_%:
 .PHONY: unbrick_$(1)
 unbrick_$(1): bl_$(1)_hex
 $(if $(filter-out undefined,$(origin UNBRICK_TTY)),
-	$(V0) @echo " UNBRICK    $(1) via $$(UNBRICK_TTY)"
+	$(V0) @$(ECHO) " UNBRICK    $(1) via $$(UNBRICK_TTY)"
 	$(V1) $(STM32FLASH_DIR)/stm32flash \
 		-w $(BUILD_DIR)/bl_$(1)/bl_$(1).hex \
 		-g 0x0 \
 		$$(UNBRICK_TTY)
 ,
-	$(V0) @echo
-	$(V0) @echo "ERROR: You must specify UNBRICK_TTY=<serial-device> to use for unbricking."
-	$(V0) @echo "       eg. $$(MAKE) $$@ UNBRICK_TTY=/dev/ttyUSB0"
+	$(V0) @$(ECHO)
+	$(V0) @$(ECHO) "ERROR: You must specify UNBRICK_TTY=<serial-device> to use for unbricking."
+	$(V0) @$(ECHO) "       eg. $$(MAKE) $$@ UNBRICK_TTY=/dev/ttyUSB0"
 )
 
 .PHONY: bl_$(1)_clean
 bl_$(1)_clean:
-	$(V0) @echo " CLEAN      $$@"
+	$(V0) @$(ECHO) " CLEAN      $$@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_$(1)
 endef
 
@@ -553,7 +516,7 @@ define BU_TEMPLATE
 bu_$(1): bu_$(1)_opfw
 
 bu_$(1)_%: bl_$(1)_bino
-	$(V1) mkdir -p $(BUILD_DIR)/bu_$(1)/dep
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/bu_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/BootloaderUpdater && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
@@ -578,7 +541,7 @@ bu_$(1)_%: bl_$(1)_bino
 
 .PHONY: bu_$(1)_clean
 bu_$(1)_clean:
-	$(V0) @echo " CLEAN      $$@"
+	$(V0) @$(ECHO) " CLEAN      $$@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bu_$(1)
 endef
 
@@ -588,7 +551,7 @@ define EF_TEMPLATE
 ef_$(1): ef_$(1)_bin
 
 ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
-	$(V1) mkdir -p $(BUILD_DIR)/ef_$(1)/dep
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/ef_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/targets/EntireFlash && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
@@ -604,7 +567,7 @@ ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 
 .PHONY: ef_$(1)_clean
 ef_$(1)_clean:
-	$(V0) @echo " CLEAN      $$@"
+	$(V0) @$(ECHO) " CLEAN      $$@"
 	$(V1) $(RM) -fr $(BUILD_DIR)/ef_$(1)
 endef
 
@@ -612,13 +575,13 @@ endef
 # additional details on each line of output to describe which build and target
 # that each line applies to.
 ifneq ($(strip $(filter all_%,$(MAKECMDGOALS))),)
-export ENABLE_MSG_EXTRA := yes
+    export ENABLE_MSG_EXTRA := yes
 endif
 
 # When building more than one goal in a single make invocation, also
 # enable the extra context for each output line
 ifneq ($(word 2,$(MAKECMDGOALS)),)
-export ENABLE_MSG_EXTRA := yes
+    export ENABLE_MSG_EXTRA := yes
 endif
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
@@ -636,14 +599,14 @@ all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
 all_$(1)_clean: $$(addsuffix _clean, $$(filter ef_$(1), $$(EF_TARGETS)))
 endef
 
-ALL_BOARDS := coptercontrol pipxtreme revolution revomini simposix osd
+ALL_BOARDS    := coptercontrol pipxtreme simposix revolution revomini osd
 ALL_BOARDS_BU := coptercontrol pipxtreme simposix
 
 # SimPosix only builds on Linux so drop it from the list for
 # all other platforms.
 ifneq ($(UNAME), Linux)
-ALL_BOARDS  := $(filter-out simposix, $(ALL_BOARDS))
-ALL_BOARDS_BU  := $(filter-out simposix, $(ALL_BOARDS_BU))
+    ALL_BOARDS    := $(filter-out simposix, $(ALL_BOARDS))
+    ALL_BOARDS_BU := $(filter-out simposix, $(ALL_BOARDS_BU))
 endif
 
 # Friendly names of each board (used to find source tree)
@@ -667,10 +630,6 @@ FW_BOARDS  := $(ALL_BOARDS)
 BL_BOARDS  := $(ALL_BOARDS)
 BU_BOARDS  := $(ALL_BOARDS_BU)
 EF_BOARDS  := $(ALL_BOARDS)
-
-# FIXME: The BU image doesn't work for F4 boards so we need to
-#        filter them out to prevent errors.
-BU_BOARDS  := $(filter-out revolution osd, $(BU_BOARDS))
 
 # SimPosix doesn't have a BL, BU or EF target so we need to
 # filter them out to prevent errors on the all_flight target.
@@ -723,7 +682,7 @@ $(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_fr
 sim_win32: sim_win32_exe
 
 sim_win32_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/sitl_win32
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/sitl_win32
 	$(V1) $(MAKE) --no-print-directory \
 		-C $(ROOT_DIR)/flight/targets/OpenPilot --file=$(ROOT_DIR)/flight/targets/OpenPilot/Makefile.win32 $*
 
@@ -731,10 +690,9 @@ sim_win32_%: uavobjects_flight
 sim_osx: sim_osx_elf
 
 sim_osx_%: uavobjects_flight
-	$(V1) mkdir -p $(BUILD_DIR)/sim_osx
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/sim_osx
 	$(V1) $(MAKE) --no-print-directory \
 		-C $(ROOT_DIR)/flight/targets/Revolution --file=$(ROOT_DIR)/flight/targets/Revolution/Makefile.osx $*
-
 
 ##############################
 #
@@ -744,10 +702,10 @@ sim_osx_%: uavobjects_flight
 
 ALL_UNITTESTS := logfs
 
+# Build the directory for the unit tests
 UT_OUT_DIR := $(BUILD_DIR)/unit_tests
-
 $(UT_OUT_DIR):
-	$(V1) mkdir -p $@
+	$(V1) $(MKDIR) -p $@
 
 .PHONY: all_ut
 all_ut: $(addsuffix _elf, $(addprefix ut_, $(ALL_UNITTESTS)))
@@ -760,7 +718,7 @@ all_ut_run: $(addsuffix _run, $(addprefix ut_, $(ALL_UNITTESTS)))
 
 .PHONY: all_ut_clean
 all_ut_clean:
-	$(V0) @echo " CLEAN      $@"
+	$(V0) @$(ECHO) " CLEAN      $@"
 	$(V1) [ ! -d "$(UT_OUT_DIR)" ] || $(RM) -r "$(UT_OUT_DIR)"
 
 # $(1) = Unit test name
@@ -769,7 +727,7 @@ define UT_TEMPLATE
 ut_$(1): ut_$(1)_run
 
 ut_$(1)_%: $$(UT_OUT_DIR)
-	$(V1) mkdir -p $(UT_OUT_DIR)/$(1)
+	$(V1) $(MKDIR) -p $(UT_OUT_DIR)/$(1)
 	$(V1) cd $(ROOT_DIR)/flight/tests/$(1) && \
 		$$(MAKE) -r --no-print-directory \
 		BUILD_TYPE=ut \
@@ -791,9 +749,8 @@ ut_$(1)_%: $$(UT_OUT_DIR)
 
 .PHONY: ut_$(1)_clean
 ut_$(1)_clean:
-	$(V0) @echo " CLEAN      $(1)"
+	$(V0) @$(ECHO) " CLEAN      $(1)"
 	$(V1) [ ! -d "$(UT_OUT_DIR)/$(1)" ] || $(RM) -r "$(UT_OUT_DIR)/$(1)"
-
 endef
 
 # Expand the unittest rules
@@ -803,7 +760,7 @@ $(foreach ut, $(ALL_UNITTESTS), $(eval $(call UT_TEMPLATE,$(ut))))
 # output is interleaved with the rest of the make output.
 ifneq ($(strip $(filter all_ut_run,$(MAKECMDGOALS))),)
 .NOTPARALLEL:
-$(info *NOTE*     Parallel make disabled by all_ut_run target so we have sane console output)
+    $(info *NOTE*     Parallel make disabled by all_ut_run target so we have sane console output)
 endif
 
 ##############################
@@ -820,11 +777,108 @@ package:
 package_resources:
 	$(V1) cd package && $(MAKE) --no-print-directory opfw_resource
 
+##############################
+#
+# Build info
+#
+##############################
+
 .PHONY: build-info
 build-info:
-	$(V1) mkdir -p $(BUILD_DIR)
-	$(V1) python $(ROOT_DIR)/make/scripts/version-info.py \
-		--path=$(ROOT_DIR) \
+	$(V1) $(MKDIR) -p $(BUILD_DIR)
+	$(V1) $(VERSION_INFO) \
 		--uavodir=$(ROOT_DIR)/shared/uavobjectdefinition \
 		--template="make/templates/$@.txt" \
 		--outfile="$(BUILD_DIR)/$@.txt"
+
+##############################
+#
+# Help message, the default Makefile goal
+#
+##############################
+
+.PHONY: help
+help:
+	@$(ECHO)
+	@$(ECHO) "   This Makefile is known to work on Linux and Mac in a standard shell environment."
+	@$(ECHO) "   It also works on Windows by following the instructions in make/winx86/README.txt."
+	@$(ECHO)
+	@$(ECHO) "   Here is a summary of the available targets:"
+	@$(ECHO)
+	@$(ECHO) "   [Tool Installers]"
+	@$(ECHO) "     qt_sdk_install       - Install the QT v4.7.3 tools"
+	@$(ECHO) "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
+	@$(ECHO) "     openocd_install      - Install the OpenOCD JTAG daemon"
+	@$(ECHO) "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
+	@$(ECHO) "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
+	@$(ECHO) "     android_sdk_install  - Install the Android SDK tools"
+	@$(ECHO)
+	@$(ECHO) "   [Big Hammer]"
+	@$(ECHO) "     all                  - Generate UAVObjects, build openpilot firmware and gcs"
+	@$(ECHO) "     all_flight           - Build all firmware, bootloaders and bootloader updaters"
+	@$(ECHO) "     all_fw               - Build only firmware for all boards"
+	@$(ECHO) "     all_bl               - Build only bootloaders for all boards"
+	@$(ECHO) "     all_bu               - Build only bootloader updaters for all boards"
+	@$(ECHO)
+	@$(ECHO) "     all_clean            - Remove your build directory ($(BUILD_DIR))"
+	@$(ECHO) "     all_flight_clean     - Remove all firmware, bootloaders and bootloader updaters"
+	@$(ECHO) "     all_fw_clean         - Remove firmware for all boards"
+	@$(ECHO) "     all_bl_clean         - Remove bootlaoders for all boards"
+	@$(ECHO) "     all_bu_clean         - Remove bootloader updaters for all boards"
+	@$(ECHO)
+	@$(ECHO) "     all_<board>          - Build all available images for <board>"
+	@$(ECHO) "     all_<board>_clean    - Remove all available images for <board>"
+	@$(ECHO)
+	@$(ECHO) "     all_ut               - Build all unit tests"
+	@$(ECHO) "     all_ut_tap           - Run all unit tests and capture all TAP output to files"
+	@$(ECHO) "     all_ut_run           - Run all unit tests and dump TAP output to console"
+	@$(ECHO)
+	@$(ECHO) "   [Firmware]"
+	@$(ECHO) "     <board>              - Build firmware for <board>"
+	@$(ECHO) "                            supported boards are ($(ALL_BOARDS))"
+	@$(ECHO) "     fw_<board>           - Build firmware for <board>"
+	@$(ECHO) "                            supported boards are ($(FW_BOARDS))"
+	@$(ECHO) "     fw_<board>_clean     - Remove firmware for <board>"
+	@$(ECHO) "     fw_<board>_program   - Use OpenOCD + JTAG to write firmware to <board>"
+	@$(ECHO)
+	@$(ECHO) "   [Bootloader]"
+	@$(ECHO) "     bl_<board>           - Build bootloader for <board>"
+	@$(ECHO) "                            supported boards are ($(BL_BOARDS))"
+	@$(ECHO) "     bl_<board>_clean     - Remove bootloader for <board>"
+	@$(ECHO) "     bl_<board>_program   - Use OpenOCD + JTAG to write bootloader to <board>"
+	@$(ECHO)
+	@$(ECHO) "   [Bootloader Updater]"
+	@$(ECHO) "     bu_<board>           - Build bootloader updater for <board>"
+	@$(ECHO) "                            supported boards are ($(BU_BOARDS))"
+	@$(ECHO) "     bu_<board>_clean     - Remove bootloader updater for <board>"
+	@$(ECHO)
+	@$(ECHO) "   [Unbrick a board]"
+	@$(ECHO) "     unbrick_<board>      - Use the STM32's built in boot ROM to write a bootloader to <board>"
+	@$(ECHO) "                            supported boards are ($(BL_BOARDS))"
+	@$(ECHO) "   [Unittests]"
+	@$(ECHO) "     ut_<test>            - Build unit test <test>"
+	@$(ECHO) "     ut_<test>_tap        - Run test and capture TAP output into a file"
+	@$(ECHO) "     ut_<test>_run        - Run test and dump TAP output to console"
+	@$(ECHO)
+	@$(ECHO) "   [Simulation]"
+	@$(ECHO) "     sim_osx              - Build OpenPilot simulation firmware for OSX"
+	@$(ECHO) "     sim_osx_clean        - Delete all build output for the osx simulation"
+	@$(ECHO) "     sim_win32            - Build OpenPilot simulation firmware for"
+	@$(ECHO) "                            Windows using mingw and msys"
+	@$(ECHO) "     sim_win32_clean      - Delete all build output for the win32 simulation"
+	@$(ECHO)
+	@$(ECHO) "   [GCS]"
+	@$(ECHO) "     gcs                  - Build the Ground Control System (GCS) application"
+	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application"
+	@$(ECHO)
+	@$(ECHO) "   [UAVObjects]"
+	@$(ECHO) "     uavobjects           - Generate source files from the UAVObject definition XML files"
+	@$(ECHO) "     uavobjects_test      - parse xml-files - check for valid, duplicate ObjId's, ... "
+	@$(ECHO) "     uavobjects_<group>   - Generate source files from a subset of the UAVObject definition XML files"
+	@$(ECHO) "                            supported groups are ($(UAVOBJ_TARGETS))"
+	@$(ECHO)
+	@$(ECHO) "   Hint: Add V=1 to your command line to see verbose build output."
+	@$(ECHO)
+	@$(ECHO) "   Note: All tools will be installed into $(TOOLS_DIR)"
+	@$(ECHO) "         All build output will be placed in $(BUILD_DIR)"
+	@$(ECHO)

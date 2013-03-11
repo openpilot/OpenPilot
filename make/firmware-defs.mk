@@ -64,7 +64,7 @@ toprel = $(subst $(realpath $(TOP))/,,$(abspath $(1)))
 
 # Display compiler version information.
 .PHONY: gccversion
-gccversion :
+gccversion:
 	@$(CC) --version
 
 # Create final output file (.hex) from ELF output file.

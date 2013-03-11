@@ -27,7 +27,7 @@ endif
 qt_sdk_install : | $(DL_DIR) $(TOOLS_DIR)
 qt_sdk_install: qt_sdk_clean
         # download the source only if it's newer than what we already have
-	$(V1) wget -N --content-disposition -P "$(DL_DIR)" "$(QT_SDK_URL)"
+	$(V1) $(WGET) -N --content-disposition -P "$(DL_DIR)" "$(QT_SDK_URL)"
         # tell the user exactly which path they should select in the GUI
 	$(V1) echo "*** NOTE NOTE NOTE ***"
 	$(V1) echo "*"
@@ -54,7 +54,7 @@ arm_sdk_install: ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
 arm_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
 arm_sdk_install: arm_sdk_clean
         # download the source only if it's newer than what we already have
-	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ARM_SDK_URL)"
+	$(V1) $(WGET) --no-check-certificate -N -P "$(DL_DIR)" "$(ARM_SDK_URL)"
 
         # binary only release so just extract it
 	$(V1) tar -C $(TOOLS_DIR) -xjf "$(DL_DIR)/$(ARM_SDK_FILE)"
@@ -74,7 +74,7 @@ openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/o
 openocd_install: OPENOCD_FILE := openocd-0.6.1.tar.bz2
 openocd_install: openocd_clean
         # download the source only if it's newer than what we already have
-	$(V1) wget -N -P "$(DL_DIR)" --trust-server-name "$(OPENOCD_URL)"
+	$(V1) $(WGET) -N -P "$(DL_DIR)" --trust-server-name "$(OPENOCD_URL)"
 
         # extract the source
 	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -r "$(OPENOCD_BUILD_DIR)"
@@ -111,7 +111,7 @@ ftd2xx_install: FTD2XX_FILE := CDM20817.zip
 ftd2xx_install: ftd2xx_clean
         # download the file only if it's newer than what we already have
 	$(V0) @echo " DOWNLOAD     $(FTD2XX_URL)"
-	$(V1) wget -q -N -P "$(DL_DIR)" "$(FTD2XX_URL)"
+	$(V1) $(WGET) -q -N -P "$(DL_DIR)" "$(FTD2XX_URL)"
 
         # extract the source
 	$(V0) @echo " EXTRACT      $(FTD2XX_FILE) -> $(FTD2XX_DIR)"
@@ -133,7 +133,7 @@ libusb_win_install: LIBUSB_WIN_FILE := libusb-win32-bin-1.2.6.0.zip
 libusb_win_install: libusb_win_clean
         # download the file only if it's newer than what we already have
 	$(V0) @echo " DOWNLOAD     $(LIBUSB_WIN_URL)"
-	$(V1) wget -q -N -P "$(DL_DIR)" --trust-server-name "$(LIBUSB_WIN_URL)"
+	$(V1) $(WGET) -q -N -P "$(DL_DIR)" --trust-server-name "$(LIBUSB_WIN_URL)"
 
         # extract the source
 	$(V0) @echo " EXTRACT      $(LIBUSB_WIN_FILE) -> $(LIBUSB_WIN_DIR)"
@@ -269,7 +269,7 @@ dfuutil_install: | $(DL_DIR) $(TOOLS_DIR)
 dfuutil_install: dfuutil_clean
         # download the source
 	$(V0) @echo " DOWNLOAD     $(DFUUTIL_URL)"
-	$(V1) wget -N -P "$(DL_DIR)" "$(DFUUTIL_URL)"
+	$(V1) $(WGET) -N -P "$(DL_DIR)" "$(DFUUTIL_URL)"
 
         # extract the source
 	$(V0) @echo " EXTRACT      $(DFUUTIL_FILE)"
@@ -302,7 +302,7 @@ android_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
 android_sdk_install: android_sdk_clean
         # download the source only if it's newer than what we already have
 	$(V0) @echo " DOWNLOAD     $(ANDROID_SDK_URL)"
-	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ANDROID_SDK_URL)"
+	$(V1) $(WGET) --no-check-certificate -N -P "$(DL_DIR)" "$(ANDROID_SDK_URL)"
 
         # binary only release so just extract it
 	$(V0) @echo " EXTRACT      $(ANDROID_SDK_FILE)"
@@ -329,7 +329,7 @@ gtest_install: gtest_clean
         # download the file unconditionally since google code gives back 404
         # for HTTP HEAD requests which are used when using the wget -N option
 	$(V1) [ ! -f "$(DL_DIR)/$(GTEST_FILE)" ] || $(RM) -f "$(DL_DIR)/$(GTEST_FILE)"
-	$(V1) wget -P "$(DL_DIR)" --trust-server-name "$(GTEST_URL)"
+	$(V1) $(WGET) -P "$(DL_DIR)" --trust-server-name "$(GTEST_URL)"
 
         # extract the source
 	$(V1) [ ! -d "$(GTEST_DIR)" ] || $(RM) -rf "$(GTEST_DIR)"

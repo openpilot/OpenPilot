@@ -244,13 +244,12 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject * obj)
     Q_ASSERT(actuatorSettings);
     ActuatorSettings::DataFields actuatorSettingsData = actuatorSettings->getData();
 
-    // get channel descriptions
+    // Get channel descriptions
     QStringList ChannelDesc = ConfigVehicleTypeWidget::getChannelDescriptions();
 
     // Initialize output forms
     QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
-    foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
-    {
+    foreach(OutputChannelForm *outputChannelForm, outputChannelForms) {
         outputChannelForm->setAssignment(ChannelDesc[outputChannelForm->index()]);
 
         // init min,max,neutral
@@ -265,25 +264,57 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject * obj)
     // Get the SpinWhileArmed setting
     m_config->spinningArmed->setChecked(actuatorSettingsData.MotorsSpinWhileArmed == ActuatorSettings::MOTORSSPINWHILEARMED_TRUE);
 
-    // Get Output rates for both banks
-    if(m_config->cb_outputRate1->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[0]))==-1)
-    {
+    // Setup output rates for all banks
+    if(m_config->cb_outputRate1->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[0])) == -1) {
         m_config->cb_outputRate1->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[0]));
     }
-    if(m_config->cb_outputRate2->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[1]))==-1)
-    {
+    if(m_config->cb_outputRate2->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[1])) == -1) {
         m_config->cb_outputRate2->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[1]));
+    }
+    if(m_config->cb_outputRate3->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[2]) )== -1) {
+        m_config->cb_outputRate3->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[2]));
+    }
+    if(m_config->cb_outputRate4->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[3])) == -1) {
+        m_config->cb_outputRate4->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[3]));
+    }
+    if(m_config->cb_outputRate5->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[4])) == -1) {
+        m_config->cb_outputRate5->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[4]));
+    }
+    if(m_config->cb_outputRate6->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[5])) == -1) {
+        m_config->cb_outputRate6->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[5]));
     }
     m_config->cb_outputRate1->setCurrentIndex(m_config->cb_outputRate1->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[0])));
     m_config->cb_outputRate2->setCurrentIndex(m_config->cb_outputRate2->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[1])));
+    m_config->cb_outputRate3->setCurrentIndex(m_config->cb_outputRate3->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[2])));
+    m_config->cb_outputRate4->setCurrentIndex(m_config->cb_outputRate4->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[3])));
+    m_config->cb_outputRate3->setCurrentIndex(m_config->cb_outputRate5->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[4])));
+    m_config->cb_outputRate4->setCurrentIndex(m_config->cb_outputRate6->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[5])));
 
+    // Reset to all disabled
+    m_config->chBank1->setText("-");
+    m_config->chBank2->setText("-");
+    m_config->chBank3->setText("-");
+    m_config->chBank4->setText("-");
+    m_config->chBank5->setText("-");
+    m_config->chBank6->setText("-");
+    m_config->cb_outputRate1->setEnabled(false);
+    m_config->cb_outputRate2->setEnabled(false);
+    m_config->cb_outputRate3->setEnabled(false);
+    m_config->cb_outputRate4->setEnabled(false);
+    m_config->cb_outputRate5->setEnabled(false);
+    m_config->cb_outputRate6->setEnabled(false);
+
+    // Get connected board model
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pm);
-    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
-    if (utilMngr) {
+    UAVObjectUtilManager *utilMngr = pm->getObject<UAVObjectUtilManager>();
+    Q_ASSERT(utilMngr);
+
+    if(utilMngr) {
         int board = utilMngr->getBoardModel();
-        if ((board & 0xff00) == 1024) {
-            // CopterControl family
+        // Setup labels and combos for banks according to board type
+        if ((board & 0xff00) == 0x0400) {
+            // Coptercontrol family of boards 4 timer banks
             m_config->chBank1->setText("1-3");
             m_config->chBank2->setText("4");
             m_config->chBank3->setText("5,7-8");
@@ -292,37 +323,27 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject * obj)
             m_config->cb_outputRate2->setEnabled(true);
             m_config->cb_outputRate3->setEnabled(true);
             m_config->cb_outputRate4->setEnabled(true);
-            if(m_config->cb_outputRate3->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[2]))==-1)
-            {
-                m_config->cb_outputRate3->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[2]));
-            }
-            if(m_config->cb_outputRate4->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[3]))==-1)
-            {
-                m_config->cb_outputRate4->addItem(QString::number(actuatorSettingsData.ChannelUpdateFreq[3]));
-            }
-            m_config->cb_outputRate3->setCurrentIndex(m_config->cb_outputRate3->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[2])));
-            m_config->cb_outputRate4->setCurrentIndex(m_config->cb_outputRate4->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[3])));
-        } else if ((board & 0xff00) == 256 ) {
-            // Mainboard family
+        }
+        else if((board & 0xff00) == 0x0900) {
+            // Revolution family of boards 6 timer banks
+            m_config->chBank1->setText("1-2");
+            m_config->chBank2->setText("3");
+            m_config->chBank3->setText("4");
+            m_config->chBank4->setText("5-6");
+            m_config->chBank5->setText("7-8");
+            m_config->chBank6->setText("9-10");
             m_config->cb_outputRate1->setEnabled(true);
             m_config->cb_outputRate2->setEnabled(true);
-            m_config->cb_outputRate3->setEnabled(false);
-            m_config->cb_outputRate4->setEnabled(false);
-            m_config->chBank1->setText("1-4");
-            m_config->chBank2->setText("5-8");
-            m_config->chBank3->setText("-");
-            m_config->chBank4->setText("-");
-            m_config->cb_outputRate3->addItem("0");
-            m_config->cb_outputRate3->setCurrentIndex(m_config->cb_outputRate3->findText("0"));
-            m_config->cb_outputRate4->addItem("0");
-            m_config->cb_outputRate4->setCurrentIndex(m_config->cb_outputRate4->findText("0"));
+            m_config->cb_outputRate3->setEnabled(true);
+            m_config->cb_outputRate4->setEnabled(true);
+            m_config->cb_outputRate5->setEnabled(true);
+            m_config->cb_outputRate6->setEnabled(true);
         }
     }
 
     // Get Channel ranges:
-    foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
-    {
-        int minValue = actuatorSettingsData.ChannelMin[outputChannelForm->index()];
+    foreach(OutputChannelForm *outputChannelForm, outputChannelForms) {
+        int minValue = actuatorSettingsData.ChannelMin[outputChannelForm->index()];        
         int maxValue = actuatorSettingsData.ChannelMax[outputChannelForm->index()];
         outputChannelForm->minmax(minValue, maxValue);
 
@@ -345,8 +366,7 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
 
         // Set channel ranges
         QList<OutputChannelForm*> outputChannelForms = findChildren<OutputChannelForm*>();
-        foreach(OutputChannelForm *outputChannelForm, outputChannelForms)
-        {
+        foreach(OutputChannelForm *outputChannelForm, outputChannelForms) {
             actuatorSettingsData.ChannelMax[outputChannelForm->index()] = outputChannelForm->max();
             actuatorSettingsData.ChannelMin[outputChannelForm->index()] = outputChannelForm->min();
             actuatorSettingsData.ChannelNeutral[outputChannelForm->index()] = outputChannelForm->neutral();
@@ -357,11 +377,12 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
         actuatorSettingsData.ChannelUpdateFreq[1] = m_config->cb_outputRate2->currentText().toUInt();
         actuatorSettingsData.ChannelUpdateFreq[2] = m_config->cb_outputRate3->currentText().toUInt();
         actuatorSettingsData.ChannelUpdateFreq[3] = m_config->cb_outputRate4->currentText().toUInt();
+        actuatorSettingsData.ChannelUpdateFreq[4] = m_config->cb_outputRate5->currentText().toUInt();
+        actuatorSettingsData.ChannelUpdateFreq[5] = m_config->cb_outputRate6->currentText().toUInt();
 
-        if(m_config->spinningArmed->isChecked() == true)
-            actuatorSettingsData.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_TRUE;
-        else
-            actuatorSettingsData.MotorsSpinWhileArmed = ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
+        actuatorSettingsData.MotorsSpinWhileArmed = m_config->spinningArmed->isChecked() ?
+                                                         ActuatorSettings::MOTORSSPINWHILEARMED_TRUE :
+                                                         ActuatorSettings::MOTORSSPINWHILEARMED_FALSE;
 
         // Apply settings
         actuatorSettings->setData(actuatorSettingsData);
@@ -370,7 +391,6 @@ void ConfigOutputWidget::updateObjectsFromWidgets()
 
 void ConfigOutputWidget::openHelp()
 {
-
     QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/WIGf", QUrl::StrictMode) );
 }
 
@@ -381,11 +401,12 @@ void ConfigOutputWidget::stopTests()
 
 void ConfigOutputWidget::disableIfNotMe(UAVObject* obj)
 {
-    if(UAVObject::GetGcsTelemetryUpdateMode(obj->getMetadata()) == UAVObject::UPDATEMODE_ONCHANGE)
-    {
-        if(!wasItMe)
+    if(UAVObject::GetGcsTelemetryUpdateMode(obj->getMetadata()) == UAVObject::UPDATEMODE_ONCHANGE) {
+        if(!wasItMe) {
             this->setEnabled(false);
+        }
     }
-    else
+    else {
         this->setEnabled(true);
+    }
 }

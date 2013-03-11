@@ -17,14 +17,21 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
+# This top level Makefile passes down some variables to sub-makes through
+# the environment. They are explicitly exported using the export keyword.
+# Lower level makefiles assume that these variables are defined. To ensure
+# that a special magic variable is exported here. It must be checked for
+# existance by each sub-make.
+export OPENPILOT_IS_COOL := Fuck Yeah!
+
 # Set up a default goal
 .DEFAULT_GOAL := help
 
 # Set up some macros for common directories within the tree
-ROOT_DIR  := $(CURDIR)
-TOOLS_DIR := $(ROOT_DIR)/tools
-BUILD_DIR := $(ROOT_DIR)/build
-DL_DIR    := $(ROOT_DIR)/downloads
+export ROOT_DIR  := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+export TOOLS_DIR := $(ROOT_DIR)/tools
+export BUILD_DIR := $(ROOT_DIR)/build
+export DL_DIR    := $(ROOT_DIR)/downloads
 
 # Set up default build configurations (debug | release)
 UAVOGEN_BUILD_CONF	?= debug
@@ -56,7 +63,7 @@ $(foreach var, $(SANITIZE_GCC_VARS), $(eval $(call SANITIZE_VAR,$(var),disallowe
 SANITIZE_DEPRECATED_VARS := USE_BOOTLOADER
 $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),deprecated)))
 
-# Make sure this isn't being run as root
+# Make sure this isn't being run as root (no whoami on Windows, but that is ok here)
 ifeq ($(shell whoami 2>/dev/null),root)
     $(error You should not be running this as root)
 endif
@@ -72,20 +79,6 @@ else ifeq ($(V), 0)
 else ifeq ($(V), 1)
 endif
 
-# Set up misc host tools, maybe useful on Windows
-ECHO	:= echo
-MKDIR	:= mkdir
-RM	:= rm
-LN	:= ln
-SED	:= sed
-TAR	:= tar
-ANT	:= ant
-JAVAC	:= javac
-JAR	:= jar
-GIT	:= git
-PYTHON	:= python
-INSTALL	:= install
-
 # Make sure we know few things about the architecture before including
 # the tools.mk to ensure that we download/install the right tools.
 UNAME := $(shell uname)
@@ -93,6 +86,32 @@ ARCH  := $(shell uname -m)
 # Here and everywhere if not Linux or OSX then assume Windows
 ifeq ($(filter Linux Darwin, $(UNAME)), )
     UNAME := Windows
+endif
+
+# Set up misc host tools
+export ECHO	:= echo
+export MKDIR	:= mkdir
+export RM	:= rm
+export LN	:= ln
+export CAT	:= cat
+export SED	:= sed
+export TAR	:= tar
+export ANT	:= ant
+export JAVAC	:= javac
+export JAR	:= jar
+export GIT	:= git
+export PYTHON	:= python
+export INSTALL	:= install
+
+# version-info cmd to extract some repository data
+export VERSION_INFO := $(PYTHON) "$(ROOT_DIR)/make/scripts/version-info.py" --path="$(ROOT_DIR)"
+
+# Test if quotes are needed for the echo-command
+ifeq (${shell $(ECHO) "test"}, test)
+	export QUOTE := '
+# This line is just to clear out the single quote above '
+else
+	export QUOTE :=
 endif
 
 # The tools.mk uses wget to fetch tarballs or packages
@@ -115,17 +134,17 @@ else
 endif
 
 ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-none-eabi-
+    export ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-none-eabi-
 else
     # not installed, hope it's in the path...
-    ARM_SDK_PREFIX ?= arm-none-eabi-
+    export ARM_SDK_PREFIX ?= arm-none-eabi-
 endif
 
 ifeq ($(shell [ -d "$(OPENOCD_DIR)" ] && $(ECHO) "exists"), exists)
-    OPENOCD := $(OPENOCD_DIR)/bin/openocd
+    export OPENOCD := $(OPENOCD_DIR)/bin/openocd
 else
     # not installed, hope it's in the path...
-    OPENOCD ?= openocd
+    export OPENOCD ?= openocd
 endif
 
 ifeq ($(shell [ -d "$(ANDROID_SDK_DIR)" ] && $(ECHO) "exists"), exists)
@@ -148,9 +167,6 @@ else
     QT_SPEC = win32-g++
     UAVOBJGENERATOR = "$(BUILD_DIR)/ground/uavobjgenerator/$(UAVOGEN_BUILD_CONF)/uavobjgenerator.exe"
 endif
-
-# version-info cmd to extract some repository data
-VERSION_INFO := $(PYTHON) $(ROOT_DIR)/make/scripts/version-info.py --path="$(ROOT_DIR)"
 
 ##############################
 #
@@ -411,14 +427,14 @@ uavo-collections_clean:
 
 # Define some pointers to the various important pieces of the flight code
 # to prevent these being repeated in every sub makefile
-PIOS          := $(ROOT_DIR)/flight/PiOS
-FLIGHTLIB     := $(ROOT_DIR)/flight/Libraries
-OPMODULEDIR   := $(ROOT_DIR)/flight/Modules
-OPUAVOBJ      := $(ROOT_DIR)/flight/targets/UAVObjects
-OPUAVTALK     := $(ROOT_DIR)/flight/targets/UAVTalk
-HWDEFS        := $(ROOT_DIR)/flight/targets/board_hw_defs
-DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
-OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
+export PIOS          := $(ROOT_DIR)/flight/PiOS
+export FLIGHTLIB     := $(ROOT_DIR)/flight/Libraries
+export OPMODULEDIR   := $(ROOT_DIR)/flight/Modules
+export OPUAVOBJ      := $(ROOT_DIR)/flight/targets/UAVObjects
+export OPUAVTALK     := $(ROOT_DIR)/flight/targets/UAVTalk
+export HWDEFS        := $(ROOT_DIR)/flight/targets/board_hw_defs
+export DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
+export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
 # $(2) = Name of board used in source tree (e.g. CopterControl)

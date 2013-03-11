@@ -483,14 +483,6 @@ endif
 #create compile-time module auto-initialisation
 MODNAMES = ${notdir $(subst /revolution,,$(MODULES))}
 
-# Test if quotes are needed for the echo-command
-result = ${shell echo "test"}
-ifeq (${result}, test)
-	quote = '
-else
-	quote =
-endif
-
 # Generate intermediate code
 gencode: ${OUTDIR}/InitMods.c ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
 

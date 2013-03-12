@@ -105,8 +105,8 @@ void OTG_FS_IRQHandler(void)
 }
 
 struct usb_if_entry {
-  struct pios_usb_ifops *ifops;
-  uint32_t context;
+	struct pios_usb_ifops *ifops;
+	uint32_t context;
 };
 static struct usb_if_entry usb_if_table[3];
 void PIOS_USBHOOK_RegisterIfOps(uint8_t ifnum, struct pios_usb_ifops * ifops, uint32_t context)
@@ -154,17 +154,17 @@ extern void PIOS_USBHOOK_DeRegisterEpInCallback(uint8_t epnum)
 static struct usb_ep_entry usb_epout_table[6];
 void PIOS_USBHOOK_RegisterEpOutCallback(uint8_t epnum, uint16_t max_len, pios_usbhook_epcb cb, uint32_t context)
 {
-  PIOS_Assert(epnum < NELEMENTS(usb_epout_table));
-  PIOS_Assert(cb);
+	PIOS_Assert(epnum < NELEMENTS(usb_epout_table));
+	PIOS_Assert(cb);
 
-  usb_epout_table[epnum].cb      = cb;
-  usb_epout_table[epnum].context = context;
-  usb_epout_table[epnum].max_len = max_len;
+	usb_epout_table[epnum].cb      = cb;
+	usb_epout_table[epnum].context = context;
+	usb_epout_table[epnum].max_len = max_len;
 
-  DCD_EP_Open(&pios_usb_otg_core_handle,
-	      epnum,
-	      max_len,
-	      USB_OTG_EP_INT);
+	DCD_EP_Open(&pios_usb_otg_core_handle,
+		epnum,
+		max_len,
+		USB_OTG_EP_INT);
 	/*
 	 * FIXME do not hardcode endpoint type
 	 */
@@ -308,26 +308,26 @@ static USBD_Usr_cb_TypeDef user_callbacks = {
 
 static uint8_t PIOS_USBHOOK_CLASS_Init(__attribute__((unused)) void *pdev, __attribute__((unused)) uint8_t cfgidx)
 {
-  /* Call all of the registered init callbacks */
-  for (uint8_t i = 0; i < NELEMENTS(usb_if_table); i++) {
-    struct usb_if_entry * usb_if = &(usb_if_table[i]);
-    if (usb_if->ifops && usb_if->ifops->init) {
-      usb_if->ifops->init(usb_if->context);
-    }
-  }
-  return USBD_OK;
+	/* Call all of the registered init callbacks */
+	for (uint8_t i = 0; i < NELEMENTS(usb_if_table); i++) {
+		struct usb_if_entry * usb_if = &(usb_if_table[i]);
+		if (usb_if->ifops && usb_if->ifops->init) {
+			usb_if->ifops->init(usb_if->context);
+		}
+	}
+	return USBD_OK;
 }
 
 static uint8_t PIOS_USBHOOK_CLASS_DeInit(__attribute__((unused)) void *pdev, __attribute__((unused)) uint8_t cfgidx)
 {
-  /* Call all of the registered deinit callbacks */
-  for (uint8_t i = 0; i < NELEMENTS(usb_if_table); i++) {
-    struct usb_if_entry * usb_if = &(usb_if_table[i]);
-    if (usb_if->ifops && usb_if->ifops->deinit) {
-      usb_if->ifops->deinit(usb_if->context);
-    }
-  }
-  return USBD_OK;
+	/* Call all of the registered deinit callbacks */
+	for (uint8_t i = 0; i < NELEMENTS(usb_if_table); i++) {
+		struct usb_if_entry * usb_if = &(usb_if_table[i]);
+		if (usb_if->ifops && usb_if->ifops->deinit) {
+			usb_if->ifops->deinit(usb_if->context);
+		}
+	}
+	return USBD_OK;
 }
 
 static struct usb_setup_request usb_ep0_active_req;

@@ -310,11 +310,37 @@ void MainWindow::extensionsInitialized()
         qs = settings;
         qDebug() << "Load default config from resource " << filename;
     }
+
     qs->beginGroup("General");
-    m_config_description=qs->value("Description", "none").toString();
-    m_config_details=qs->value("Details", "none").toString();
-    m_config_stylesheet=qs->value("StyleSheet", "none").toString();
-    loadStyleSheet(m_config_stylesheet);
+    m_config_description = qs->value("Description", "none").toString();
+    m_config_details = qs->value("Details", "none").toString();
+    m_config_stylesheet = qs->value("StyleSheet", "none").toString();
+
+    qDebug() << "Configured style sheet:" << m_config_stylesheet;
+    if (m_config_stylesheet == "wide") {
+        // OP-869 just in case some user configuration still references the now obsolete "wide" style sheet
+        m_config_stylesheet = "default";
+    }
+
+    // Load common style sheet
+    QString style = loadStyleSheet(m_config_stylesheet + ".qss");
+
+    // Load and concatenate platform specific style sheet
+    QString fileName = m_config_stylesheet;
+#ifdef Q_OS_MAC
+    fileName += "_macos.qss";
+#elif defined(Q_OS_LINUX)
+    fileName += "_linux.qss";
+#else
+    fileName += "_windows.qss";
+#endif
+    style += loadStyleSheet(fileName);
+
+    // We'll use qApp macro to get the QApplication pointer
+    // and set the style sheet application wide.
+    qDebug() << "Setting application style sheet to:" << style;
+    qApp->setStyleSheet(style);
+
     qs->endGroup();
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
     m_uavGadgetInstanceManager->readSettings(qs);
@@ -329,40 +355,33 @@ void MainWindow::extensionsInitialized()
     emit m_coreImpl->coreOpened();
 }
 
-void MainWindow::loadStyleSheet(QString name) {
-    /* Let's use QFile and point to a resource... */
-    QDir directory(QCoreApplication::applicationDirPath());
+QString MainWindow::loadStyleSheet(QString fileName) {
+    // Let's use QFile and point to a resource...
+    QDir dir(QCoreApplication::applicationDirPath());
 #ifdef Q_OS_MAC
-    directory.cdUp();
-    directory.cd("Resources");
+    dir.cdUp();
+    dir.cd("Resources");
 #else
-    directory.cdUp();
-    directory.cd("share");
-    directory.cd("openpilotgcs");
+    dir.cdUp();
+    dir.cd("share");
+    dir.cd("openpilotgcs");
 #endif
-    directory.cd("stylesheets");
-#ifdef Q_OS_MAC
-    QFile data(directory.absolutePath()+QDir::separator()+name+"_macos.qss");
-#elif defined(Q_OS_LINUX)
-    QFile data(directory.absolutePath()+QDir::separator()+name+"_linux.qss");
-#else
-    QFile data(directory.absolutePath()+QDir::separator()+name+"_windows.qss");
-#endif
+    dir.cd("stylesheets");
     QString style;
-    /* ...to open the file */
-    if(data.open(QFile::ReadOnly)) {
-        /* QTextStream... */
-        QTextStream styleIn(&data);
-        /* ...read file to a string. */
-        style = styleIn.readAll();
-        data.close();
-        /* We'll use qApp macro to get the QApplication pointer
-         * and set the style sheet application wide. */
-        qApp->setStyleSheet(style);
-        qDebug()<<"Loaded stylesheet:"<<style;
+    // ...to open the file
+    QFile file(dir.absolutePath() + QDir::separator() + fileName);
+    qDebug() << "Loading style sheet file" << file.fileName();
+    if (file.open(QFile::ReadOnly)) {
+        // QTextStream...
+        QTextStream textStream(&file);
+        // ...read file to a string.
+        style = textStream.readAll();
+        file.close();
     }
-    else
-        qDebug()<<"Failed to openstylesheet file"<<directory.absolutePath()<<name;
+    else {
+        qDebug() << "Failed to open style sheet file" << file.fileName();
+    }
+    return style;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

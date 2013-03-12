@@ -11,7 +11,7 @@
     <UDPMirror>false</UDPMirror>
     <Description>Wide configuration</Description>
     <Details>Default configuration built for wide screens (17"up)</Details>
-    <StyleSheet>wide</StyleSheet>
+    <StyleSheet>default</StyleSheet>
   </General>
   <KeyBindings>
     <size>0</size>

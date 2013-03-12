@@ -1,13 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       configtelemetrytwidget.h
+ * @file       configrevohwwidget.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
  * @addtogroup ConfigPlugin Config Plugin
  * @{
- * @brief Telemetry configuration panel
+ * @brief Revolution hardware configuration panel
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,10 +24,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGPROHWWIDGET_H
-#define CONFIGPROHWWIDGET_H
+#ifndef CONFIGREVOHWWIDGET_H
+#define CONFIGREVOHWWIDGET_H
 
-#include "ui_pro_hw_settings.h"
+#include "ui_configrevohwwidget.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -36,20 +36,30 @@
 #include <QList>
 
 
-class ConfigProHWWidget: public ConfigTaskWidget
+class ConfigRevoHWWidget: public ConfigTaskWidget
 {
     Q_OBJECT
 
 public:
-    ConfigProHWWidget(QWidget *parent = 0);
-    ~ConfigProHWWidget();
+    ConfigRevoHWWidget(QWidget *parent = 0);
+    ~ConfigRevoHWWidget();
 
 private:
-    Ui_PRO_HW_Widget *m_telemetry;
+    Ui_RevoHWWidget *m_ui;
+    void setupCustomCombos();
+
+protected slots:
+    void refreshWidgetsValues(UAVObject * obj = NULL);
+    void updateObjectsFromWidgets();
 
 private slots:
-    virtual void refreshValues();
+    void usbVCPPortChanged(int index);
+    void usbHIDPortChanged(int index);
+    void flexiPortChanged(int index);
+    void mainPortChanged(int index);
+    void modemPortChanged(int index);
+    void openHelp();
 
 };
 
-#endif // CONFIGPROHWWIDGET_H
+#endif // CONFIGREVOHWWIDGET_H

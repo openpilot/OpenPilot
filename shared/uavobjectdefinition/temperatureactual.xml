@@ -1,0 +1,11 @@
+<xml>
+    <object name="TemperatureActual" singleinstance="true" settings="false">
+        <description>The updated Temperature estimation from thermocouple.</description>
+        <field name="Temperature" units="degrees" type="float" elements="1"/>
+		<field name="Relay" units="raw" type="float" elements="1"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="100"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

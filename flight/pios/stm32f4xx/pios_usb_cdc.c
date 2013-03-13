@@ -42,13 +42,14 @@ static void PIOS_USB_CDC_RegisterTxCallback(uint32_t usbcdc_id, pios_com_callbac
 static void PIOS_USB_CDC_RegisterRxCallback(uint32_t usbcdc_id, pios_com_callback rx_in_cb, uint32_t context);
 static void PIOS_USB_CDC_TxStart(uint32_t usbcdc_id, uint16_t tx_bytes_avail);
 static void PIOS_USB_CDC_RxStart(uint32_t usbcdc_id, uint16_t rx_bytes_avail);
+static bool PIOS_USB_CDC_Available (uint32_t usbcdc_id);
 
 const struct pios_com_driver pios_usb_cdc_com_driver = {
 	.tx_start    = PIOS_USB_CDC_TxStart,
 	.rx_start    = PIOS_USB_CDC_RxStart,
 	.bind_tx_cb  = PIOS_USB_CDC_RegisterTxCallback,
 	.bind_rx_cb  = PIOS_USB_CDC_RegisterRxCallback,
-	.available   = PIOS_USB_CheckAvailable,	
+	.available   = PIOS_USB_CDC_Available,
 };
 
 enum pios_usb_cdc_dev_magic {
@@ -397,6 +398,17 @@ static bool PIOS_USB_CDC_CTRL_IF_Setup(uint32_t usb_cdc_id, struct usb_setup_req
 	}
 
 	return true;
+}
+
+static bool PIOS_USB_CDC_Available (uint32_t usbcdc_id)
+{
+	struct pios_usb_cdc_dev * usb_cdc_dev = (struct pios_usb_cdc_dev *)usbcdc_id;
+
+	bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
+	PIOS_Assert(valid);
+
+	return (PIOS_USB_CheckAvailable(usb_cdc_dev->lower_id) &&
+		(control_line_state & USB_CDC_CONTROL_LINE_STATE_DTE_PRESENT));
 }
 
 /**

@@ -30,5 +30,6 @@
         <file>images/camstab_normal.png</file>
         <file>images/pipx-selected.png</file>
         <file>images/pipx-normal.png</file>
+        <file>images/revolution_top.png</file>
     </qresource>
 </RCC>

@@ -34,7 +34,7 @@
 #include "configstabilizationwidget.h"
 #include "configcamerastabilizationwidget.h"
 #include "configtxpidwidget.h"
-#include "config_pro_hw_widget.h"
+#include "configrevohwwidget.h"
 #include "config_cc_hw_widget.h"
 #include "configpipxtremewidget.h"
 #include "configrevowidget.h"
@@ -129,7 +129,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     }
 
     help = 0;
-    connect(ftw,SIGNAL(currentAboutToShow(int,bool*)),this,SLOT(tabAboutToChange(int,bool*)));//,Qt::BlockingQueuedConnection);
+    connect(ftw,SIGNAL(currentAboutToShow(int,bool*)), this, SLOT(tabAboutToChange(int,bool*)));
 
     // Connect to the PipXStatus object updates
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -166,20 +166,21 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 
 void ConfigGadgetWidget::onAutopilotDisconnect() {
     ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-    ftw->removeTab(ConfigGadgetWidget::sensors);
 
     QIcon *icon = new QIcon();
     icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     QWidget *qwd = new DefaultAttitudeWidget(this);
+    ftw->removeTab(ConfigGadgetWidget::sensors);
     ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("INS"));
-    ftw->removeTab(ConfigGadgetWidget::hardware);
 
     icon = new QIcon();
     icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd = new DefaultHwSettingsWidget(this);
+    ftw->removeTab(ConfigGadgetWidget::hardware);
     ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
+
     ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
 
     emit autopilotDisconnected();
@@ -196,40 +197,39 @@ void ConfigGadgetWidget::onAutopilotConnect() {
         int board = utilMngr->getBoardModel();
         if ((board & 0xff00) == 1024) {
             // CopterControl family
-            // Delete the INS panel, replace with CC Panel:
-            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-            ftw->removeTab(ConfigGadgetWidget::sensors);
 
             QIcon *icon = new QIcon();
             icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
             icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
             QWidget *qwd = new ConfigCCAttitudeWidget(this);
-            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("INS"));
-            ftw->removeTab(ConfigGadgetWidget::hardware);
+            ftw->removeTab(ConfigGadgetWidget::sensors);
+            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("CopterControl"));
 
             icon = new QIcon();
             icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
             icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Selected, QIcon::Off);
             qwd = new ConfigCCHWWidget(this);
+            ftw->removeTab(ConfigGadgetWidget::hardware);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
+
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         } else if ((board & 0xff00) == 0x0900) {
-            // Revolution sensor calibration
-            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
-            ftw->removeTab(ConfigGadgetWidget::sensors);
+            // Revolution family
 
             QIcon *icon = new QIcon();
             icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
             icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
             QWidget *qwd = new ConfigRevoWidget(this);
-            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("Revo"));
-            ftw->removeTab(ConfigGadgetWidget::hardware);
+            ftw->removeTab(ConfigGadgetWidget::sensors);
+            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("Revolution"));
 
             icon = new QIcon();
             icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
-            icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Normal, QIcon::On);
-            qwd = new ConfigProHWWidget(this);
+            icon->addFile(":/configgadget/images/hardware_selected.png", QSize(), QIcon::Selected, QIcon::Off);
+            qwd = new ConfigRevoHWWidget(this);
+            ftw->removeTab(ConfigGadgetWidget::hardware);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
+
             ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         } else {
             //Unknown board

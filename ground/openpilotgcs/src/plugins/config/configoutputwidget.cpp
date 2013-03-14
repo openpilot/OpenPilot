@@ -329,7 +329,7 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject * obj)
             m_config->chBank3->setText("4");
             m_config->chBank4->setText("5-6");
             m_config->chBank5->setText("7-8");
-            m_config->chBank6->setText("9-10");
+            m_config->chBank6->setText("9-12");
             m_config->cb_outputRate1->setEnabled(true);
             m_config->cb_outputRate2->setEnabled(true);
             m_config->cb_outputRate3->setEnabled(true);

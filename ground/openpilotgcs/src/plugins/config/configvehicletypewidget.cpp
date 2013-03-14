@@ -648,8 +648,8 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
         m_aircraft->customThrottle2Curve->initLinearCurve(curveValues.count(), 1.0, m_aircraft->customThrottle2Curve->getMin());
     }
 
-    // Update the mixer table:
-    for (int channel=0; channel<(int)(VehicleConfig::CHANNEL_NUMELEM); channel++) {
+	// Update the mixer table:
+	for (int channel=0; channel < m_aircraft->customMixerTable->columnCount(); channel++) {
         UAVObjectField* field = mixer->getField(mixerTypes.at(channel));
         if (field)
         {

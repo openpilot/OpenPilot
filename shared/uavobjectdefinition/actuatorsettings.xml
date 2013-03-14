@@ -2,11 +2,11 @@
     <object name="ActuatorSettings" singleinstance="true" settings="true">
         <description>Settings for the @ref ActuatorModule that controls the channel assignments for the mixer based on AircraftType</description>
         <field name="ChannelUpdateFreq" units="Hz" type="uint16" elements="6" defaultvalue="50"/>
-        <field name="ChannelMax" units="us" type="int16" elements="10" defaultvalue="1000"/>
-        <field name="ChannelNeutral" units="us" type="int16" elements="10" defaultvalue="1000"/>
-        <field name="ChannelMin" units="us" type="int16" elements="10" defaultvalue="1000"/>
-        <field name="ChannelType" units="" type="enum" elements="10" options="PWM,MK,ASTEC4,PWM Alarm Buzzer,Arming led,Info led" defaultvalue="PWM"/>
-        <field name="ChannelAddr" units="" type="uint8" elements="10" defaultvalue="0,1,2,3,4,5,6,7,8,9"/>
+        <field name="ChannelMax" units="us" type="int16" elements="12" defaultvalue="1000"/>
+        <field name="ChannelNeutral" units="us" type="int16" elements="12" defaultvalue="1000"/>
+        <field name="ChannelMin" units="us" type="int16" elements="12" defaultvalue="1000"/>
+        <field name="ChannelType" units="" type="enum" elements="12" options="PWM,MK,ASTEC4,PWM Alarm Buzzer,Arming led,Info led" defaultvalue="PWM"/>
+        <field name="ChannelAddr" units="" type="uint8" elements="12" defaultvalue="0,1,2,3,4,5,6,7,8,9,10,11"/>
         <field name="MotorsSpinWhileArmed" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>

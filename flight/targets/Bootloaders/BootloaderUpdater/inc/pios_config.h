@@ -35,7 +35,6 @@
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_SYS
 #define PIOS_INCLUDE_GPIO
-#define PIOS_NO_GPS
 //#define DEBUG_SSP
 #define PIOS_INCLUDE_IRQ
 

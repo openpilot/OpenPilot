@@ -71,19 +71,29 @@
 /* PIOS common functions */
 #include <pios_crc.h>
 
-/* PIOS system functions */
+/* PIOS bootloader helper */
+#ifdef PIOS_INCLUDE_BL_HELPER
+/* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
+#include <pios_bl_helper.h>
+#endif
+
+/* PIOS FreeRTOS support */
 #ifdef PIOS_INCLUDE_FREERTOS
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
 #endif
+
+/* PIOS system functions */
 #ifdef PIOS_INCLUDE_DELAY
 #include <pios_delay.h>
 #endif
+
 #ifdef PIOS_INCLUDE_INITCALL
 #include "pios_initcall.h"
 #endif
+
 #ifdef PIOS_INCLUDE_SYS
 #include <pios_sys.h>
 #endif
@@ -92,30 +102,39 @@
 #ifdef PIOS_INCLUDE_IRQ
 #include <pios_irq.h>
 #endif
+
 #ifdef PIOS_INCLUDE_RTC
 #include <pios_rtc.h>
 #endif
+
 #ifdef PIOS_INCLUDE_TIM
 #include <pios_tim.h>
 #endif
+
 #ifdef PIOS_INCLUDE_USART
 #include <pios_usart.h>
 #endif
+
 #ifdef PIOS_INCLUDE_ADC
 #include <pios_adc.h>
 #endif
+
 #ifdef PIOS_INCLUDE_I2C
 #include <pios_i2c.h>
 #endif
+
 #ifdef PIOS_INCLUDE_SPI
 #include <pios_spi.h>
 #endif
+
 #ifdef PIOS_INCLUDE_GPIO
 #include <pios_gpio.h>
 #endif
+
 #ifdef PIOS_INCLUDE_EXTI
 #include <pios_exti.h>
 #endif
+
 #ifdef PIOS_INCLUDE_WDG
 #include <pios_wdg.h>
 #endif
@@ -139,44 +158,54 @@
 /* ADXL345 3-Axis Accelerometer */
 #include <pios_adxl345.h>
 #endif
+
 #ifdef PIOS_INCLUDE_BMA180
 /* BMA180 3-Axis Accelerometer */
 #include <pios_bma180.h>
 #endif
+
 #ifdef PIOS_INCLUDE_L3GD20
 /* L3GD20 3-Axis Gyro */
 #include <pios_l3gd20.h>
 #endif
+
 #ifdef PIOS_INCLUDE_MPU6000
 /* MPU6000 3-Axis Gyro/Accelerometer */
 /* #define PIOS_MPU6000_ACCEL */
 #include <pios_mpu6000.h>
 #endif
+
 #ifdef PIOS_INCLUDE_HMC5843
 /* HMC5843 3-Axis Digital Compass */
 #include <pios_hmc5843.h>
 #endif
+
 #ifdef PIOS_INCLUDE_HMC5883
 /* HMC5883 3-Axis Digital Compass */
 /* #define PIOS_HMC5883_HAS_GPIOS */
 #include <pios_hmc5883.h>
 #endif
+
 #ifdef PIOS_INCLUDE_BMP085
 /* BMP085 Barometric Pressure Sensor */
 #include <pios_bmp085.h>
 #endif
+
 #ifdef PIOS_INCLUDE_MS5611
 /* MS5611 Barometric Pressure Sensor */
 #include <pios_ms5611.h>
 #endif
+
 #ifdef PIOS_INCLUDE_MPXV
 /* MPXV5004, MPXV7002 based Airspeed Sensor */
 #include <pios_mpxv.h>
 #endif
+
 #ifdef PIOS_INCLUDE_ETASV3
 /* Eagle Tree Systems Airspeed MicroSensor V3 */
 #include <pios_etasv3.h>
 #endif
+
 #ifdef PIOS_INCLUDE_HCSR04
 /* HC-SR04 Ultrasonic Sensor */
 #include <pios_hcsr04.h>
@@ -186,15 +215,19 @@
 #ifdef PIOS_INCLUDE_PWM
 #include <pios_pwm.h>
 #endif
+
 #ifdef PIOS_INCLUDE_PPM
 #include <pios_ppm.h>
 #endif
+
 #ifdef PIOS_INCLUDE_DSM
 #include <pios_dsm.h>
 #endif
+
 #ifdef PIOS_INCLUDE_SBUS
 #include <pios_sbus.h>
 #endif
+
 #ifdef PIOS_INCLUDE_GCSRCVR
 /* only priv header */
 #endif
@@ -203,50 +236,65 @@
 #ifdef PIOS_INCLUDE_LED
 #include <pios_led.h>
 #endif
+
 #ifdef PIOS_INCLUDE_IAP
 #include <pios_iap.h>
 #endif
+
 #ifdef PIOS_INCLUDE_SERVO
 #include <pios_servo.h>
 #endif
+
 #ifdef PIOS_INCLUDE_I2C_ESC
 #include <pios_i2c_esc.h>
 #endif
+
 #ifdef PIOS_INCLUDE_OVERO
 /* #define PIOS_OVERO_SPI */
 #include <pios_overo.h>
 #endif
+
 #ifdef PIOS_INCLUDE_SDCARD
 /* #define LOG_FILENAME "startup.log" */
 #include <dosfs.h>
 #include <pios_sdcard.h>
 #endif
+
 #ifdef PIOS_INCLUDE_FLASH
 /* #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS */
 /* #define FLASH_FREERTOS */
 #include <pios_flash.h>
 #include <pios_flashfs.h>
 #endif
+
 #ifdef PIOS_INCLUDE_FLASH_EEPROM
 #include <pios_eeprom.h>
 #endif
+
+/* PIOS Radio modules */
 #ifdef PIOS_INCLUDE_RFM22B
 /* #define PIOS_INCLUDE_PACKET_HANDLER */
+#include <pios_rfm22b.h>
+
 #ifdef PIOS_INCLUDE_RFM22B_COM
 #include <pios_rfm22b_com.h>
 #endif
+
 #ifdef PIOS_INCLUDE_RFM22B_RCVR
 #include <pios_rfm22b_rcvr.h>
 #endif
 
-#include <pios_rfm22b.h>
-#endif
+#endif /* PIOS_INCLUDE_RFM22B */
+
+/* PIOS misc peripherals */
 #ifdef PIOS_INCLUDE_VIDEO
 #include <pios_video.h>
 #endif
+
 #ifdef PIOS_INCLUDE_WAVE
 #include <pios_wavplay.h>
 #endif
+
 #ifdef PIOS_INCLUDE_UDP
 #include <pios_udp.h>
 #endif
@@ -272,15 +320,8 @@
 #include <pios_com.h>
 #endif
 
-/* PIOS bootloader helper */
-#ifdef PIOS_INCLUDE_BL_HELPER
-/* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
-#include <pios_bl_helper.h>
-#endif
-
 /* Performance counters */
 /* #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998 */
-
 
 #endif /* USE_SIM_POSIX */
 #endif /* PIOS_H */

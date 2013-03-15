@@ -88,6 +88,7 @@ static struct pios_usb_cdc_dev * PIOS_USB_CDC_alloc(void)
 	usb_cdc_dev = (struct pios_usb_cdc_dev *)pvPortMalloc(sizeof(*usb_cdc_dev));
 	if (!usb_cdc_dev) return(NULL);
 
+	memset(usb_cdc_dev, 0, sizeof(*usb_cdc_dev));
 	usb_cdc_dev->magic = PIOS_USB_CDC_DEV_MAGIC;
 	return(usb_cdc_dev);
 }
@@ -103,6 +104,8 @@ static struct pios_usb_cdc_dev * PIOS_USB_CDC_alloc(void)
 	}
 
 	usb_cdc_dev = &pios_usb_cdc_devs[pios_usb_cdc_num_devs++];
+
+	memset(usb_cdc_dev, 0, sizeof(*usb_cdc_dev));
 	usb_cdc_dev->magic = PIOS_USB_CDC_DEV_MAGIC;
 
 	return (usb_cdc_dev);

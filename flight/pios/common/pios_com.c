@@ -73,6 +73,7 @@ static struct pios_com_dev * PIOS_COM_alloc(void)
 	com_dev = (struct pios_com_dev *)pvPortMalloc(sizeof(*com_dev));
 	if (!com_dev) return (NULL);
 
+	memset(com_dev, 0, sizeof(*com_dev));
 	com_dev->magic = PIOS_COM_DEV_MAGIC;
 	return(com_dev);
 }
@@ -88,6 +89,8 @@ static struct pios_com_dev * PIOS_COM_alloc(void)
 	}
 
 	com_dev = &pios_com_devs[pios_com_num_devs++];
+
+	memset(com_dev, 0, sizeof(*com_dev));
 	com_dev->magic = PIOS_COM_DEV_MAGIC;
 
 	return (com_dev);

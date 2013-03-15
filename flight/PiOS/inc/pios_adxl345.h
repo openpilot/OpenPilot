@@ -75,7 +75,7 @@ uint8_t PIOS_ADXL345_Read(struct pios_adxl345_data * data);
 int32_t PIOS_ADXL345_FifoElements();
 int32_t PIOS_ADXL345_Test();
 
-#endif
+#endif /* PIOS_ADXL345_H */
 
 /** 
  * @}

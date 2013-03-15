@@ -28,8 +28,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_BL_HELPER_H_
-#define PIOS_BL_HELPER_H_
+#ifndef PIOS_BL_HELPER_H
+#define PIOS_BL_HELPER_H
 
 extern uint8_t *PIOS_BL_HELPER_FLASH_If_Read(uint32_t SectorAddress);
 
@@ -43,4 +43,4 @@ extern uint8_t PIOS_BL_HELPER_FLASH_Start();
 
 extern void PIOS_BL_HELPER_CRC_Ini();
 
-#endif /* PIOS_BL_HELPER_H_ */
+#endif /* PIOS_BL_HELPER_H */

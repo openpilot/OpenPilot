@@ -32,11 +32,6 @@
 #ifndef PIOS_VIDEO_H
 #define PIOS_VIDEO_H
 
-#include <pios.h>
-
-// *****************************************************************************
-#if defined(PIOS_INCLUDE_VIDEO)
-
 #include <pios_stm32.h>
 #include <pios_spi_priv.h>
 
@@ -107,5 +102,4 @@ extern bool PIOS_Vsync_ISR();
 // Macro to swap buffers given a temporary pointer.
 #define SWAP_BUFFS(tmp, a, b) { tmp = a; a = b; b = tmp; }
 
-#endif
 #endif /* PIOS_VIDEO_H */

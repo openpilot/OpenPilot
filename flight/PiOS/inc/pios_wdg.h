@@ -28,8 +28,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_WDG
-#define PIOS_WDG
+#ifndef PIOS_WDG_H
+#define PIOS_WDG_H
 
 uint16_t PIOS_WDG_Init();
 bool PIOS_WDG_RegisterFlag(uint16_t flag_requested);
@@ -38,4 +38,4 @@ uint16_t PIOS_WDG_GetBootupFlags();
 uint16_t PIOS_WDG_GetActiveFlags();
 void PIOS_WDG_Clear(void);
 
-#endif
+#endif /* PIOS_WDG_H */

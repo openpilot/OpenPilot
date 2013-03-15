@@ -40,5 +40,4 @@ typedef enum {FALSE = 0, TRUE = !FALSE} bool;
 //#define PIOS_SERVO_NUM_OUTPUTS 8
 //#define PIOS_SERVO_NUM_TIMERS PIOS_SERVO_NUM_OUTPUTS
 
-#endif
-
+#endif /* PIOS_POSIX_H */

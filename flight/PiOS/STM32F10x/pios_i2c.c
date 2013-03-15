@@ -28,10 +28,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_I2C)
+#ifdef PIOS_INCLUDE_I2C
 
 #if defined(PIOS_INCLUDE_FREERTOS)
 #define USE_FREERTOS
@@ -1146,7 +1145,7 @@ void PIOS_I2C_ER_IRQ_Handler(uint32_t i2c_id)
 	}	
 }
 
-#endif
+#endif /* PIOS_INCLUDE_I2C */
 
 /**
   * @}

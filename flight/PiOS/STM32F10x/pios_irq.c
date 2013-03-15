@@ -29,10 +29,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_IRQ)
+#ifdef PIOS_INCLUDE_IRQ
 
 /* Private Function Prototypes */
 
@@ -90,7 +89,7 @@ int32_t PIOS_IRQ_Enable(void)
 	return 0;
 }
 
-#endif
+#endif /* PIOS_INCLUDE_IRQ */
 
 /**
   * @}

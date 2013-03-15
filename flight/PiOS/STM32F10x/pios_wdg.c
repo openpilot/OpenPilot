@@ -33,6 +33,9 @@
  */
 
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_WDG
+
 #include "stm32f10x_iwdg.h"
 #include "stm32f10x_dbgmcu.h"
 
@@ -173,3 +176,5 @@ void PIOS_WDG_Clear(void)
 	IWDG_ReloadCounter();
 #endif
 }
+
+#endif /* PIOS_INCLUDE_WDG */

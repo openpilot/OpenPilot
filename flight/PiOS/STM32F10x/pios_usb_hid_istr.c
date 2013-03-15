@@ -14,8 +14,8 @@
 *******************************************************************************/
 
 /* Includes ------------------------------------------------------------------*/
-#include "usb_lib.h"
 #include "pios.h"
+#include "usb_lib.h"
 #include "pios_usb_hid_pwr.h"
 #include "pios_usb_hid_istr.h"
 #include "pios_usb_hid.h"

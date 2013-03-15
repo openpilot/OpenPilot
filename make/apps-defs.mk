@@ -27,19 +27,44 @@ DEBUG ?= NO
 # Set to YES to use the Servo output pins for debugging via scope or logic analyser
 ENABLE_DEBUG_PINS ?= NO
 
-# Set to YES to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
-ENABLE_AUX_UART ?= NO
+# Include objects that are just nice information to show
+STACK_DIAGNOSTICS		?= NO
+MIXERSTATUS_DIAGNOSTICS		?= NO
+RATEDESIRED_DIAGNOSTICS		?= NO
+I2C_WDG_STATS_DIAGNOSTICS	?= NO
+DIAG_TASKS			?= NO
+
+# Or just turn on all the above diagnostics. WARNING: this consumes massive amounts of memory.
+ALL_DIGNOSTICS			?= NO
 
 # Paths
 TOPDIR		= .
-OPSYSTEM	= $(TOPDIR)
+OPSYSTEM	= $(TOPDIR)/System
 OPSYSTEMINC	= $(OPSYSTEM)/inc
 PIOSINC		= $(PIOS)/inc
 PIOSCOMMON	= $(PIOS)/Common
 PIOSBOARDS	= $(PIOS)/Boards
 FLIGHTLIBINC	= $(FLIGHTLIB)/inc
+MATHLIB		= $(FLIGHTLIB)/math
+MATHLIBINC	= $(FLIGHTLIB)/math
 STMSPDSRCDIR	= $(STMSPDDIR)/src
 STMSPDINCDIR	= $(STMSPDDIR)/inc
+OPUAVTALKINC	= $(OPUAVTALK)/inc
+OPUAVOBJINC	= $(OPUAVOBJ)/inc
+DOXYGENDIR	= $(TOPDIR)/../Doc/Doxygen
+OPTESTS		= $(TOPDIR)/Tests
+
+PYMITE		= $(FLIGHTLIB)/PyMite
+PYMITELIB	= $(PYMITE)/lib
+PYMITEPLAT	= $(PYMITE)/platform/openpilot
+PYMITETOOLS	= $(PYMITE)/tools
+PYMITEVM	= $(PYMITE)/vm
+PYMITEINC	= $(PYMITEVM)
+PYMITEINC	+= $(PYMITEPLAT)
+PYMITEINC	+= $(OUTDIR)
+
+FLIGHTPLANLIB	= $(OPMODULEDIR)/FlightPlan/lib
+FLIGHTPLANS	= $(OPMODULEDIR)/FlightPlan/flightplans
 
 ifeq ($(MCU),cortex-m3)
     PIOSSTM32F10X = $(PIOS)/STM32F10x
@@ -52,27 +77,18 @@ ifeq ($(MCU),cortex-m3)
     CMSISDIR      = $(STMLIBDIR)/CMSIS/Core/CM3
     DOSFSDIR      = $(APPLIBDIR)/dosfs
     MSDDIR        = $(APPLIBDIR)/msd
-    RTOSDIR       = $(APPLIBDIR)/FreeRTOS
+    RTOSDIR       = $(PIOSCOMMON)/Libraries/FreeRTOS
     RTOSSRCDIR    = $(RTOSDIR)/Source
     RTOSINCDIR    = $(RTOSSRCDIR)/include
+    RTOSPORTDIR   = $(APPLIBDIR)/FreeRTOS/Source
 else ifeq ($(MCU),cortex-m4)
-    PIOSSTM32F4XX = $(PIOS)/STM32F4xx
-    APPLIBDIR     = $(PIOSSTM32F4XX)/Libraries
-    STMLIBDIR     = $(APPLIBDIR)
-    STMSPDDIR     = $(STMLIBDIR)/STM32F4xx_StdPeriph_Driver
-    PIOSCOMMONLIB = $(PIOSCOMMON)/Libraries
+
 else
     $(error Unsupported MCU: $(MCU))
 endif
 
 # List C source files here (C dependencies are automatically generated).
 # Use file-extension c for "c-only"-files
-
-## Bootloader Core
-SRC += $(OPSYSTEM)/main.c
-SRC += $(OPSYSTEM)/pios_board.c
-SRC += $(OPSYSTEM)/pios_usb_board_data.c
-SRC += $(OPSYSTEM)/op_dfu.c
 
 ## PIOS Hardware
 ifeq ($(MCU),cortex-m3)
@@ -82,35 +98,78 @@ ifeq ($(MCU),cortex-m3)
     SRC += $(PIOSSTM32F10X)/pios_delay.c
     SRC += $(PIOSSTM32F10X)/pios_usart.c
     SRC += $(PIOSSTM32F10X)/pios_irq.c
+    SRC += $(PIOSSTM32F10X)/pios_adc.c
+    SRC += $(PIOSSTM32F10X)/pios_servo.c
+    SRC += $(PIOSSTM32F10X)/pios_i2c.c
+    SRC += $(PIOSSTM32F10X)/pios_spi.c
+    SRC += $(PIOSSTM32F10X)/pios_ppm.c
+    SRC += $(PIOSSTM32F10X)/pios_pwm.c
+    SRC += $(PIOSSTM32F10X)/pios_dsm.c
     SRC += $(PIOSSTM32F10X)/pios_debug.c
     SRC += $(PIOSSTM32F10X)/pios_gpio.c
+    SRC += $(PIOSSTM32F10X)/pios_exti.c
+    SRC += $(PIOSSTM32F10X)/pios_rtc.c
+    SRC += $(PIOSSTM32F10X)/pios_wdg.c
     SRC += $(PIOSSTM32F10X)/pios_iap.c
+    SRC += $(PIOSSTM32F10X)/pios_tim.c
     SRC += $(PIOSSTM32F10X)/pios_bl_helper.c
+
+    # PIOS USB related files
+    SRC += $(OPSYSTEM)/pios_usb_board_data.c
     SRC += $(PIOSSTM32F10X)/pios_usb.c
     SRC += $(PIOSSTM32F10X)/pios_usbhook.c
     SRC += $(PIOSSTM32F10X)/pios_usb_hid.c
+    SRC += $(PIOSSTM32F10X)/pios_usb_rctx.c
+    SRC += $(PIOSSTM32F10X)/pios_usb_cdc.c
     SRC += $(PIOSSTM32F10X)/pios_usb_hid_istr.c
     SRC += $(PIOSSTM32F10X)/pios_usb_hid_pwr.c
+    SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
+    SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
+    SRC += $(PIOSCOMMON)/pios_usb_util.c
+
+    ## PIOS Hardware (Common)
+    SRC += $(PIOSCOMMON)/pios_crc.c
+    SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
+    SRC += $(PIOSCOMMON)/pios_flash_jedec.c
+    SRC += $(PIOSCOMMON)/pios_adxl345.c
+    SRC += $(PIOSCOMMON)/pios_mpu6000.c
+    SRC += $(PIOSCOMMON)/pios_com.c
+    SRC += $(PIOSCOMMON)/pios_sbus.c
+    SRC += $(PIOSCOMMON)/pios_rcvr.c
+    SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
+    SRC += $(PIOSCOMMON)/printf-stdarg.c
+#   SRC += $(PIOSCOMMON)/pios_i2c_esc.c
+#   SRC += $(PIOSCOMMON)/pios_bmp085.c
 
     ## Libraries for flight calculations
     SRC += $(FLIGHTLIB)/fifo_buffer.c
+    SRC += $(FLIGHTLIB)/CoordinateConversions.c
+    SRC += $(FLIGHTLIB)/taskmonitor.c
+    SRC += $(FLIGHTLIB)/sanitycheck.c
+    SRC += $(MATHLIB)/sin_lookup.c
+    SRC += $(MATHLIB)/pid.c
 
     ## CMSIS for STM32
     SRC += $(CMSISDIR)/core_cm3.c
     SRC += $(CMSISDIR)/system_stm32f10x.c
 
     ## Used parts of the STM-Library
+    SRC += $(STMSPDSRCDIR)/stm32f10x_adc.c
     SRC += $(STMSPDSRCDIR)/stm32f10x_bkp.c
     SRC += $(STMSPDSRCDIR)/stm32f10x_crc.c
+    SRC += $(STMSPDSRCDIR)/stm32f10x_dac.c
     SRC += $(STMSPDSRCDIR)/stm32f10x_dma.c
     SRC += $(STMSPDSRCDIR)/stm32f10x_exti.c
     SRC += $(STMSPDSRCDIR)/stm32f10x_flash.c
     SRC += $(STMSPDSRCDIR)/stm32f10x_gpio.c
+    SRC += $(STMSPDSRCDIR)/stm32f10x_i2c.c
     SRC += $(STMSPDSRCDIR)/stm32f10x_pwr.c
     SRC += $(STMSPDSRCDIR)/stm32f10x_rcc.c
     SRC += $(STMSPDSRCDIR)/stm32f10x_rtc.c
     SRC += $(STMSPDSRCDIR)/stm32f10x_spi.c
+    SRC += $(STMSPDSRCDIR)/stm32f10x_tim.c
     SRC += $(STMSPDSRCDIR)/stm32f10x_usart.c
+    SRC += $(STMSPDSRCDIR)/stm32f10x_iwdg.c
     SRC += $(STMSPDSRCDIR)/stm32f10x_dbgmcu.c
     SRC += $(STMSPDSRCDIR)/misc.c
 
@@ -121,17 +180,19 @@ ifeq ($(MCU),cortex-m3)
     SRC += $(STMUSBSRCDIR)/usb_mem.c
     SRC += $(STMUSBSRCDIR)/usb_regs.c
     SRC += $(STMUSBSRCDIR)/usb_sil.c
+
+    ## RTOS
+    SRC += $(RTOSSRCDIR)/list.c
+    SRC += $(RTOSSRCDIR)/queue.c
+    SRC += $(RTOSSRCDIR)/tasks.c
+
+    ## RTOS Portable
+    SRC += $(RTOSPORTDIR)/portable/GCC/ARM_CM3/port.c
+    SRC += $(RTOSPORTDIR)/portable/MemMang/heap_1.c
 else ifeq ($(MCU),cortex-m4)
     ## PIOS Hardware (STM32F4xx)
     include $(PIOS)/STM32F4xx/library.mk
 endif
-
-## PIOS Hardware (Common)
-SRC += $(PIOSCOMMON)/pios_board_info.c
-SRC += $(PIOSCOMMON)/pios_com_msg.c
-SRC += $(PIOSCOMMON)/printf-stdarg.c
-SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
-SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # Use file-extension c for "c-only"-files
@@ -172,6 +233,9 @@ EXTRAINCDIRS += $(STMSPDINCDIR)
 EXTRAINCDIRS += $(CMSISDIR)
 EXTRAINCDIRS += $(HWDEFSINC)
 EXTRAINCDIRS += $(OPSYSTEMINC)
+EXTRAINCDIRS += $(OPUAVSYNTHDIR)
+EXTRAINCDIRS += $(MATHLIBINC)
+EXTRAINCDIRS += $(PYMITEINC)
 
 ifeq ($(MCU),cortex-m3)
     EXTRAINCDIRS += $(PIOSSTM32F10X)
@@ -184,10 +248,13 @@ ifeq ($(MCU),cortex-m3)
     EXTRAINCDIRS += $(RTOSINCDIR)
     EXTRAINCDIRS += $(STMUSBINCDIR)
     EXTRAINCDIRS += $(APPLIBDIR)
-    EXTRAINCDIRS += $(RTOSSRCDIR)/portable/GCC/ARM_CM3
+    EXTRAINCDIRS += $(RTOSPORTDIR)/portable/GCC/ARM_CM3
 else ifeq ($(MCU),cortex-m4)
     EXTRAINCDIRS += $(PIOSSTM34FXX)
 endif
+
+# Modules
+EXTRAINCDIRS += $(foreach mod, $(OPTMODULES) $(MODULES), $(OPMODULEDIR)/$(mod)/inc) $(OPMODULEDIR)/System/inc
 
 # List any extra directories to look for library files here.
 # Also add directories where the linker should search for
@@ -214,7 +281,7 @@ endif
 # 0 = turn off optimization. s = optimize for size.
 # Note: 3 is not always the best optimization level.
 ifeq ($(DEBUG), YES)
-    OPT = 0
+    OPT = 1
 else
     OPT = s
 endif
@@ -244,18 +311,9 @@ CDEFS += -DUSE_STDPERIPH_DRIVER
 ifeq ($(ENABLE_DEBUG_PINS), YES)
     CDEFS += -DPIOS_ENABLE_DEBUG_PINS
 endif
-ifeq ($(ENABLE_AUX_UART), YES)
-    CDEFS += -DPIOS_ENABLE_AUX_UART
-endif
 
-# Provide (only) the bootloader with board-specific defines
-BLONLY_CDEFS += -DBOARD_TYPE=$(BOARD_TYPE)
-BLONLY_CDEFS += -DBOARD_REVISION=$(BOARD_REVISION)
-BLONLY_CDEFS += -DHW_TYPE=$(HW_TYPE)
-BLONLY_CDEFS += -DBOOTLOADER_VERSION=$(BOOTLOADER_VERSION)
-BLONLY_CDEFS += -DFW_BANK_BASE=$(FW_BANK_BASE)
-BLONLY_CDEFS += -DFW_BANK_SIZE=$(FW_BANK_SIZE)
-BLONLY_CDEFS += -DFW_DESC_SIZE=$(FW_DESC_SIZE)
+# Declare all non-optional modules as built-in to force inclusion
+CDEFS += $(foreach mod, $(MODULES), -DMODULE_$(mod)_BUILTIN)
 
 # Place project-specific -D and/or -U options for Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
@@ -285,9 +343,30 @@ ifeq ($(MCU),cortex-m4)
     CFLAGS += -DMEM_SIZE=1024000000
 endif
 
+# The following Makefile command, ifneq (,$(filter) $(A), $(B) $(C))
+#    is equivalent to the pseudocode `if (A == B || A == C)`
+ifneq (,$(filter YES,$(STACK_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
+    CFLAGS += -DSTACK_DIAGNOSTICS
+endif
+
+ifneq (,$(filter YES,$(MIXERSTATUS_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
+    CFLAGS += -DMIXERSTATUS_DIAGNOSTICS
+endif
+
+ifneq (,$(filter YES,$(RATEDESIRED_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
+    CFLAGS += -DRATEDESIRED_DIAGNOSTICS
+endif
+
+ifneq (,$(filter YES,$(I2C_WDG_STATS_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
+    CFLAGS += -DI2C_WDG_STATS_DIAGNOSTICS
+endif
+
+ifneq (,$(filter YES,$(DIAG_TASKS) $(ALL_DIGNOSTICS)))
+    CFLAGS += -DDIAG_TASKS
+endif
+
 CFLAGS += -mcpu=$(MCU)
 CFLAGS += $(CDEFS)
-CFLAGS += $(BLONLY_CDEFS)
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 CFLAGS += -mapcs-frame
 CFLAGS += -fomit-frame-pointer
@@ -340,9 +419,9 @@ endif
 # Set linker-script name depending on selected submodel name
 ifeq ($(MCU),cortex-m3)
     LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_memory.ld
-    LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_BL_sections.ld
+    LDFLAGS += -T$(LINKERSCRIPTPATH)/link_$(BOARD)_sections.ld
 else ifeq ($(MCU),cortex-m4)
-    LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_BL))
+    LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
 endif
 
 # List of all source files.
@@ -370,6 +449,13 @@ build: elf hex bin sym
 else
     $(error "$(MSG_FORMATERROR) $(FORMAT)")
 endif
+
+# Generate code for PyMite
+# $(OUTDIR)/pmlib_img.c $(OUTDIR)/pmlib_nat.c $(OUTDIR)/pmlibusr_img.c $(OUTDIR)/pmlibusr_nat.c $(OUTDIR)/pmfeatures.h: $(wildcard $(PYMITELIB)/*.py) $(wildcard $(PYMITEPLAT)/*.py) $(wildcard $(FLIGHTPLANLIB)/*.py) $(wildcard $(FLIGHTPLANS)/*.py)
+#	@echo $(MSG_PYMITEINIT) $(call toprel, $@)
+#	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -s --memspace=flash -o $(OUTDIR)/pmlib_img.c --native-file=$(OUTDIR)/pmlib_nat.c $(PYMITELIB)/list.py $(PYMITELIB)/dict.py $(PYMITELIB)/__bi.py $(PYMITELIB)/sys.py $(PYMITELIB)/string.py $(wildcard $(FLIGHTPLANLIB)/*.py)
+#	@$(PYTHON) $(PYMITETOOLS)/pmGenPmFeatures.py $(PYMITEPLAT)/pmfeatures.py > $(OUTDIR)/pmfeatures.h
+#	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
 
 # Link: create ELF output file from object files.
 $(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ), $(ALLLIB)))
@@ -400,16 +486,20 @@ $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
 $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 
+# Add opfw target
+$(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
+
 # Add jtag targets (program and wipe)
 $(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BL_BANK_BASE),$(BL_BANK_SIZE),$(OPENOCD_JTAG_CONFIG),$(OPENOCD_CONFIG)))
 
-.PHONY: elf lss sym hex bin bino
+.PHONY: elf lss sym hex bin bino opfw
 elf: $(OUTDIR)/$(TARGET).elf
 lss: $(OUTDIR)/$(TARGET).lss
 sym: $(OUTDIR)/$(TARGET).sym
 hex: $(OUTDIR)/$(TARGET).hex
 bin: $(OUTDIR)/$(TARGET).bin
 bino: $(OUTDIR)/$(TARGET).bin.o
+opfw: $(OUTDIR)/$(TARGET).opfw
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
@@ -419,11 +509,11 @@ docs:
 	doxygen  $(DOXYGENDIR)/doxygen.cfg
 
 # Install: install binary file with prefix/suffix into install directory
-install: $(OUTDIR)/$(TARGET).bin
+install: $(OUTDIR)/$(TARGET).opfw
 ifneq ($(INSTALL_DIR),)
 	@$(ECHO) $(MSG_INSTALLING) $(call toprel, $<)
 	$(V1) $(MKDIR) -p $(INSTALL_DIR)
-	$(V1) $(INSTALL) $< $(INSTALL_DIR)/$(INSTALL_PFX)$(TARGET)$(INSTALL_SFX).bin
+	$(V1) $(INSTALL) $< $(INSTALL_DIR)/$(INSTALL_PFX)$(TARGET)$(INSTALL_SFX).opfw
 else
 	$(error INSTALL_DIR must be specified for $@)
 endif
@@ -440,6 +530,9 @@ clean_list :
 	$(V1) $(RM) -f $(OUTDIR)/$(TARGET).sym
 	$(V1) $(RM) -f $(OUTDIR)/$(TARGET).lss
 	$(V1) $(RM) -f $(OUTDIR)/$(TARGET).bin.o
+	$(V1) $(RM) -f $(OUTDIR)/$(TARGET).opfw
+	$(V1) $(RM) -f $(wildcard $(OUTDIR)/*.c)
+	$(V1) $(RM) -f $(wildcard $(OUTDIR)/*.h)
 	$(V1) $(RM) -f $(ALLOBJ)
 	$(V1) $(RM) -f $(LSTFILES)
 	$(V1) $(RM) -f $(DEPFILES)

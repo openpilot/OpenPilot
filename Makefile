@@ -451,21 +451,9 @@ fw_$(1)_%: uavobjects_flight
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(3) \
 		BUILD_TYPE=fw \
-		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
-		\
-		TARGET=fw_$(1) \
-		OUTDIR=$(BUILD_DIR)/fw_$(1) \
-		\
-		PIOS=$(PIOS) \
-		FLIGHTLIB=$(FLIGHTLIB) \
-		OPMODULEDIR=$(OPMODULEDIR) \
-		OPUAVOBJ=$(OPUAVOBJ) \
-		OPUAVTALK=$(OPUAVTALK) \
 		HWDEFSINC=$(HWDEFS)/$(1) \
-		DOXYGENDIR=$(DOXYGENDIR) \
-		OPUAVSYNTHDIR=$(OPUAVSYNTHDIR) \
-		\
+		OUTDIR=$(BUILD_DIR)/fw_$(1) \
+		TARGET=fw_$(1) \
 		$$*
 
 .PHONY: $(1)_clean

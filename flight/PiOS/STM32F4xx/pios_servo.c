@@ -28,8 +28,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_SERVO
+
 #include "pios_servo_priv.h"
 #include "pios_tim_priv.h"
 
@@ -153,3 +155,5 @@ void PIOS_Servo_Set(uint8_t servo, uint16_t position)
 			break;
 	}
 }
+
+#endif /* PIOS_INCLUDE_SERVO */

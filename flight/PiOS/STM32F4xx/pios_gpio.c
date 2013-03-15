@@ -28,10 +28,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_GPIO)
+#ifdef PIOS_INCLUDE_GPIO
 
 /* Private Function Prototypes */
 
@@ -92,7 +91,7 @@ void PIOS_GPIO_Toggle(uint8_t Pin)
 	GPIO_ToggleBits(GPIO_PORT[Pin], GPIO_PIN[Pin]);
 }
 
-#endif
+#endif /* PIOS_INCLUDE_GPIO */
 
 /**
   * @}

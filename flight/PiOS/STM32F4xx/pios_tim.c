@@ -31,7 +31,8 @@
 
 #include "pios.h"
 
-#include "pios_tim.h"
+#ifdef PIOS_INCLUDE_TIM
+
 #include "pios_tim_priv.h"
 
 enum pios_tim_dev_magic {
@@ -464,6 +465,8 @@ static void PIOS_TIM8_TRG_COM_TIM14_IRQHandler (void)
 		PIOS_TIM_generic_irq_handler (TIM14);
 	}
 }
+
+#endif /* PIOS_INCLUDE_TIM */
 
 /**
  * @}

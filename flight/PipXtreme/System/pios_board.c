@@ -260,17 +260,12 @@ void PIOS_InitPPMMainPort(bool input)
 	if (input)
 	{
 		uint32_t pios_ppm_id;
-		PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+		PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_main_cfg);
 
 		if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id))
 			PIOS_Assert(0);
 	}
-#if defined(PIOS_INCLUDE_PPM_OUT)
-	else
-	{
-		PIOS_PPM_Out_Init(&pios_ppm_out_id, &pios_ppm_out_cfg);
-	}
-#endif	/* PIOS_INCLUDE_PPM_OUT */
+	// For some reason, PPM output on the main port doesn't work.
 #endif	/* PIOS_INCLUDE_PPM */
 }
 
@@ -281,7 +276,7 @@ void PIOS_InitPPMFlexiPort(bool input)
 	if (input)
 	{
 		uint32_t pios_ppm_id;
-		PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
+		PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_flexi_cfg);
 
 		if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id))
 			PIOS_Assert(0);

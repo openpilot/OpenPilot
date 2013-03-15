@@ -28,10 +28,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_COM_MSG)
+#ifdef PIOS_INCLUDE_COM_MSG
 
 #include "pios_com.h"
 

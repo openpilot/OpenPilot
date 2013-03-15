@@ -28,15 +28,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_BMP085)
-#if !defined(PIOS_INCLUDE_EXTI)
-#error PIOS_EXTI Must be included in the project!
-#endif /* PIOS_INCLUDE_EXTI */
+#ifdef PIOS_INCLUDE_BMP085
 
-#include <pios_exti.h>
+#ifndef PIOS_INCLUDE_EXTI
+#error PIOS_EXTI must be included in the project
+#endif /* PIOS_INCLUDE_EXTI */
 
 /* Glocal Variables */
 ConversionTypeTypeDef CurrentRead;

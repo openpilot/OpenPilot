@@ -414,6 +414,8 @@ LDFLAGS += -nostartfiles -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
 LDFLAGS += -lc -lgcc $(MATH_LIB)
+LDFLAGS += -Wl,--warn-common
+LDFLAGS += -Wl,--fatal-warnings
 
 ifneq ($(DEBUG), YES)
     LDFLAGS += -Wl,-static

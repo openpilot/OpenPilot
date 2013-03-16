@@ -342,7 +342,7 @@ static uint8_t PIOS_USBHOOK_CLASS_Setup(__attribute__((unused)) void *pdev, USB_
 		    (usb_if_table[ifnum].ifops && usb_if_table[ifnum].ifops->setup)) {
 			usb_if_table[ifnum].ifops->setup(usb_if_table[ifnum].context, 
 							 (struct usb_setup_request *)req);
-			if (req->bmRequest & 0x80 && req->wLength > 0) {
+			if (!(req->bmRequest & 0x80) && req->wLength > 0) {
 				/* Request is a host-to-device data setup packet, keep track of the request details for the EP0_RxReady call */
 				usb_ep0_active_req.bmRequestType = req->bmRequest;
 				usb_ep0_active_req.bRequest      = req->bRequest;

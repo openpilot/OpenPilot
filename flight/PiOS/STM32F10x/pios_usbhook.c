@@ -29,6 +29,9 @@
  */
 
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_USB
+
 #include "pios_usb.h"		/* PIOS_USB_* */
 #include "pios_usbhook.h"
 #include "pios_usb_defs.h"	/* struct usb_* */
@@ -548,5 +551,7 @@ static const uint8_t *PIOS_USBHOOK_GetProtocolValue(uint16_t Length)
 		return (uint8_t *) (&ProtocolValue);
 	}
 }
+
+#endif /* PIOS_INCLUDE_USB */
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/

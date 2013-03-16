@@ -516,21 +516,10 @@ bu_$(1)_%: bl_$(1)_bino
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(3) \
 		BUILD_TYPE=bu \
-		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		REMOVE_CMD="$(RM)" OOCD_EXE="$(OPENOCD)" \
-		\
-		TARGET=bu_$(1) \
-		OUTDIR=$(BUILD_DIR)/bu_$(1) \
-		\
-		PIOS=$(PIOS) \
-		FLIGHTLIB=$(FLIGHTLIB) \
-		OPMODULEDIR=$(OPMODULEDIR) \
-		OPUAVOBJ=$(OPUAVOBJ) \
-		OPUAVTALK=$(OPUAVTALK) \
 		HWDEFSINC=$(HWDEFS)/$(1) \
-		OPUAVSYNTHDIR=$(OPUAVSYNTHDIR) \
-		DOXYGENDIR=$(DOXYGENDIR) \
-		\
+		TOPDIR=$(ROOT_DIR)/flight/targets/Bootloaders/BootloaderUpdater \
+		OUTDIR=$(BUILD_DIR)/bu_$(1) \
+		TARGET=bu_$(1) \
 		$$*
 
 .PHONY: bu_$(1)_clean

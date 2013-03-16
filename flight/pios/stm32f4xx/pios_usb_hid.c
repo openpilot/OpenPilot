@@ -407,7 +407,7 @@ static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request 
 			break;
 		case USB_HID_REQ_GET_REPORT:
 			/* Give back a dummy input report */
-			dummy_report[0] = req->wValue >> 8; /* Report ID */
+			dummy_report[0] = req->wValue & 0xFF; /* Report ID */
 			dummy_report[1] = 0x00;	/* dummy value */
 			PIOS_USBHOOK_CtrlTx(dummy_report,
 					MIN(sizeof(dummy_report), req->wLength));

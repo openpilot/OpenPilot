@@ -350,6 +350,7 @@ static void PIOS_USB_HID_IF_DeInit(uint32_t usb_hid_id)
 
 static uint8_t hid_protocol;
 static uint8_t hid_altset;
+static uint8_t dummy_report[2];
 
 static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request *req)
 {
@@ -405,15 +406,12 @@ static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request 
 			PIOS_USBHOOK_CtrlTx(&hid_protocol, 1);
 			break;
 		case USB_HID_REQ_GET_REPORT:
-		{
 			/* Give back a dummy input report */
-			uint8_t dummy_report[2] = {
-				[0]     = req->wValue >> 8, /* Report ID */
-				[1]     = 0x00,
-			};
-			PIOS_USBHOOK_CtrlTx(dummy_report, sizeof(dummy_report));
-		}
-		break;
+			dummy_report[0] = req->wValue >> 8; /* Report ID */
+			dummy_report[1] = 0x00;	/* dummy value */
+			PIOS_USBHOOK_CtrlTx(dummy_report,
+					MIN(sizeof(dummy_report), req->wLength));
+			break;
 		default:
 			/* Unhandled class request */
 			return false;

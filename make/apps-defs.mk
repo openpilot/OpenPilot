@@ -314,7 +314,7 @@ ifeq ($(ENABLE_DEBUG_PINS), YES)
 endif
 
 # Declare all non-optional modules as built-in to force inclusion
-CDEFS += $(foreach mod, $(MODULES), -DMODULE_$(mod)_BUILTIN)
+CDEFS += $(foreach mod, $(notdir $(MODULES)), -DMODULE_$(mod)_BUILTIN)
 
 # Place project-specific -D and/or -U options for Assembler with preprocessor here.
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER

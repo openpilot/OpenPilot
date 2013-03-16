@@ -75,8 +75,8 @@ ifeq ($(MCU),cortex-m3)
     STMUSBSRCDIR  = $(STMUSBDIR)/src
     STMUSBINCDIR  = $(STMUSBDIR)/inc
     CMSISDIR      = $(STMLIBDIR)/CMSIS/Core/CM3
-    DOSFSDIR      = $(APPLIBDIR)/dosfs
     MSDDIR        = $(APPLIBDIR)/msd
+    DOSFSDIR      = $(PIOSCOMMON)/Libraries/dosfs
     RTOSDIR       = $(PIOSCOMMON)/Libraries/FreeRTOS
     RTOSSRCDIR    = $(RTOSDIR)/Source
     RTOSINCDIR    = $(RTOSSRCDIR)/include

@@ -144,6 +144,7 @@ ifeq ($(MCU),cortex-m3)
     ## Libraries for flight calculations
     SRC += $(FLIGHTLIB)/fifo_buffer.c
     SRC += $(FLIGHTLIB)/CoordinateConversions.c
+    SRC += $(FLIGHTLIB)/packet_handler.c
     SRC += $(FLIGHTLIB)/taskmonitor.c
     SRC += $(FLIGHTLIB)/sanitycheck.c
     SRC += $(MATHLIB)/sin_lookup.c

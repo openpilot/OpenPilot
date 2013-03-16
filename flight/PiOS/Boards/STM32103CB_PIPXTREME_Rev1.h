@@ -304,18 +304,6 @@ extern uint32_t pios_packet_handler;
 #endif /* PIOS_INCLUDE_PACKET_HANDLER */
 
 //-------------------------
-// Packet Handler
-//-------------------------
-
-#if defined(PIOS_INCLUDE_PACKET_HANDLER)
-uint32_t pios_packet_handler;
-#define PIOS_PACKET_HANDLER (pios_packet_handler)
-#define PIOS_PH_MAX_PACKET 255
-#define PIOS_PH_WIN_SIZE 3
-#define PIOS_PH_MAX_CONNECTIONS 1
-#endif /* PIOS_INCLUDE_PACKET_HANDLER */
-
-//-------------------------
 // Reed-Solomon ECC
 //-------------------------
 

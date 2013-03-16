@@ -452,6 +452,7 @@ fw_$(1)_%: uavobjects_flight
 		BOARD_SHORT_NAME=$(3) \
 		BUILD_TYPE=fw \
 		HWDEFSINC=$(HWDEFS)/$(1) \
+		TOPDIR=$(ROOT_DIR)/flight/targets/$(2) \
 		OUTDIR=$(BUILD_DIR)/fw_$(1) \
 		TARGET=fw_$(1) \
 		$$*
@@ -478,6 +479,7 @@ bl_$(1)_%:
 		BOARD_SHORT_NAME=$(3) \
 		BUILD_TYPE=bl \
 		HWDEFSINC=$(HWDEFS)/$(1) \
+		TOPDIR=$(ROOT_DIR)/flight/targets/Bootloaders/$(2) \
 		OUTDIR=$(BUILD_DIR)/bl_$(1) \
 		TARGET=bl_$(1) \
 		$$*

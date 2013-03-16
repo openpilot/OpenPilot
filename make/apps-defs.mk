@@ -82,7 +82,7 @@ ifeq ($(MCU),cortex-m3)
     RTOSINCDIR    = $(RTOSSRCDIR)/include
     RTOSPORTDIR   = $(APPLIBDIR)/FreeRTOS/Source
 else ifeq ($(MCU),cortex-m4)
-
+    $(error This makefile is not yet converted for F4, work in progress)
 else
     $(error Unsupported MCU: $(MCU))
 endif
@@ -113,6 +113,8 @@ ifeq ($(MCU),cortex-m3)
     SRC += $(PIOSSTM32F10X)/pios_iap.c
     SRC += $(PIOSSTM32F10X)/pios_tim.c
     SRC += $(PIOSSTM32F10X)/pios_bl_helper.c
+    SRC += $(PIOSSTM32F10X)/pios_eeprom.c
+    SRC += $(PIOSSTM32F10X)/pios_ppm_out.c
 
     # PIOS USB related files
     SRC += $(OPSYSTEM)/pios_usb_board_data.c
@@ -137,14 +139,14 @@ ifeq ($(MCU),cortex-m3)
     SRC += $(PIOSCOMMON)/pios_sbus.c
     SRC += $(PIOSCOMMON)/pios_rcvr.c
     SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
+    SRC += $(PIOSCOMMON)/pios_rfm22b.c
+    SRC += $(PIOSCOMMON)/pios_rfm22b_com.c
     SRC += $(PIOSCOMMON)/printf-stdarg.c
-#   SRC += $(PIOSCOMMON)/pios_i2c_esc.c
-#   SRC += $(PIOSCOMMON)/pios_bmp085.c
+    SRC += $(PIOSCOMMON)/pios_i2c_esc.c
 
     ## Libraries for flight calculations
     SRC += $(FLIGHTLIB)/fifo_buffer.c
     SRC += $(FLIGHTLIB)/CoordinateConversions.c
-    SRC += $(FLIGHTLIB)/packet_handler.c
     SRC += $(FLIGHTLIB)/taskmonitor.c
     SRC += $(FLIGHTLIB)/sanitycheck.c
     SRC += $(MATHLIB)/sin_lookup.c

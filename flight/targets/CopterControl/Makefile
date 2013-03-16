@@ -28,21 +28,21 @@ include $(ROOT_DIR)/make/firmware-defs.mk
 USE_DSP_LIB      ?= NO
 
 # Optional module and driver defaults
-USE_CAMERASTAB   ?= YES
+USE_CAMERASTAB	 ?= YES
 USE_COMUSBBRIDGE ?= YES
-USE_GPS          ?= YES
-USE_TXPID        ?= YES
-USE_ALTITUDE     ?= NO
-USE_AUTOTUNE     ?= NO
-TEST_FAULTS      ?= NO
+USE_GPS		 ?= YES
+USE_TXPID	 ?= YES
+USE_ALTITUDE	 ?= NO
+USE_AUTOTUNE	 ?= NO
+TEST_FAULTS	 ?= NO
 
 # Camera gimbal options
-USE_INPUT_LPF   ?= YES
-USE_GIMBAL_LPF  ?= YES
-USE_GIMBAL_FF   ?= YES
+USE_INPUT_LPF	 ?= YES
+USE_GIMBAL_LPF	 ?= YES
+USE_GIMBAL_FF	 ?= YES
 
 # Set to YES to build a FW version that will erase data flash memory
-ERASE_FLASH     ?= NO
+ERASE_FLASH	 ?= NO
 
 # List of mandatory modules to include
 MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
@@ -75,9 +75,6 @@ ifeq ($(TEST_FAULTS), YES)
 endif
 
 # Misc defines
-ifeq ($(ERASE_FLASH), YES)
-    CDEFS += -DERASE_FLASH
-endif
 ifeq ($(USE_INPUT_LPF), YES)
     CDEFS += -DUSE_INPUT_LPF
 endif
@@ -87,13 +84,16 @@ endif
 ifeq ($(USE_GIMBAL_FF), YES)
     CDEFS += -DUSE_GIMBAL_FF
 endif
+ifeq ($(ERASE_FLASH), YES)
+    CDEFS += -DERASE_FLASH
+endif
 
 # List C source files here (C dependencies are automatically generated).
 # Use file-extension c for "c-only"-files
 ifndef TESTAPP
     ## Modules
-    SRC += ${foreach MOD, ${OPTMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
     SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
+    SRC += ${foreach MOD, ${OPTMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 
     ## Application Core
     SRC += ${OPMODULEDIR}/System/systemmod.c
@@ -154,3 +154,4 @@ ifndef TESTAPP
 endif
 
 include $(ROOT_DIR)/make/apps-defs.mk
+include $(ROOT_DIR)/make/common-defs.mk

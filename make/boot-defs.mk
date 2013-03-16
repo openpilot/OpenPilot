@@ -95,7 +95,6 @@ EXTRAINCDIRS += $(PIOSINC)
 EXTRAINCDIRS += $(FLIGHTLIBINC)
 EXTRAINCDIRS += $(PIOSCOMMON)
 EXTRAINCDIRS += $(PIOSBOARDS)
-EXTRAINCDIRS += $(STMSPDINCDIR)
 EXTRAINCDIRS += $(HWDEFSINC)
 EXTRAINCDIRS += $(OPSYSTEMINC)
 
@@ -103,7 +102,7 @@ EXTRAINCDIRS += $(OPSYSTEMINC)
 # Also add directories where the linker should search for
 # includes from linker-script to the list
 #     Each directory must be seperated by a space.
-EXTRA_LIBDIRS =
+EXTRA_LIBDIRS +=
 
 # Extra Libraries
 #    Each library-name must be seperated by a space.
@@ -111,7 +110,7 @@ EXTRA_LIBDIRS =
 #    EXTRA_LIBS = xyz abc efsl
 # for newlib-lpc (file: libnewlibc-lpc.a):
 #    EXTRA_LIBS = newlib-lpc
-EXTRA_LIBS =
+EXTRA_LIBS +=
 
 # Provide (only) the bootloader with board-specific defines
 BLONLY_CDEFS += -DBOARD_TYPE=$(BOARD_TYPE)

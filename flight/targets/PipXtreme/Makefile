@@ -61,3 +61,4 @@ endif
 include $(FLIGHTLIB)/rscode/library.mk
 
 include $(ROOT_DIR)/make/apps-defs.mk
+include $(ROOT_DIR)/make/common-defs.mk

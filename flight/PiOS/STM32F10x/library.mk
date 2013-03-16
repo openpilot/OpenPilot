@@ -46,5 +46,6 @@ EXTRAINCDIRS		+= $(USBDEVLIB)/inc
 ifneq ($(FREERTOS_DIR),)
     FREERTOS_PORTDIR	:= $(PIOS_DEVLIB)/Libraries/FreeRTOS/Source
     SRC			+= $(wildcard $(FREERTOS_PORTDIR)/portable/GCC/ARM_CM3/*.c)
+    SRC			+= $(wildcard $(FREERTOS_PORTDIR)/portable/MemMang/heap_1.c)
     EXTRAINCDIRS	+= $(FREERTOS_PORTDIR)/portable/GCC/ARM_CM3
 endif

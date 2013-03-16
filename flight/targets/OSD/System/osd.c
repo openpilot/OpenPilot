@@ -117,8 +117,8 @@ void processReset(void)
     if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET)
     {	// Independant Watchdog Reset
 
-        #if defined(PIOS_COM_DEBUG)
-            DEBUG_PRINTF("\r\nINDEPENDANT WATCHDOG CAUSED A RESET\r\n");
+        #if defined(PIOS_COM_DEBUG_CONSOLE)
+            DEBUG_PRINTF(0, "\r\nINDEPENDANT WATCHDOG CAUSED A RESET\r\n");
         #endif
 
         // all led's ON
@@ -136,7 +136,7 @@ void processReset(void)
 	if (RCC_GetFlagStatus(RCC_FLAG_WWDGRST) != RESET)
 	{	// Window Watchdog Reset
 
-		DEBUG_PRINTF("\r\nWINDOW WATCHDOG CAUSED A REBOOT\r\n");
+		DEBUG_PRINTF(0, "\r\nWINDOW WATCHDOG CAUSED A REBOOT\r\n");
 
 		// all led's ON
 		USB_LED_ON;
@@ -156,28 +156,28 @@ void processReset(void)
     if (RCC_GetFlagStatus(RCC_FLAG_PORRST) != RESET)
     {	// Power-On Reset
         #if defined(PIOS_COM_DEBUG)
-            DEBUG_PRINTF("\r\nPOWER-ON-RESET\r\n");
+            DEBUG_PRINTF(0, "\r\nPOWER-ON-RESET\r\n");
         #endif
     }
 
     if (RCC_GetFlagStatus(RCC_FLAG_SFTRST) != RESET)
     {	// Software Reset
         #if defined(PIOS_COM_DEBUG)
-            DEBUG_PRINTF("\r\nSOFTWARE RESET\r\n");
+            DEBUG_PRINTF(0, "\r\nSOFTWARE RESET\r\n");
         #endif
     }
 
     if (RCC_GetFlagStatus(RCC_FLAG_LPWRRST) != RESET)
     {	// Low-Power Reset
         #if defined(PIOS_COM_DEBUG)
-            DEBUG_PRINTF("\r\nLOW POWER RESET\r\n");
+            DEBUG_PRINTF(0, "\r\nLOW POWER RESET\r\n");
         #endif
     }
 
     if (RCC_GetFlagStatus(RCC_FLAG_PINRST) != RESET)
     {	// Pin Reset
         #if defined(PIOS_COM_DEBUG)
-            DEBUG_PRINTF("\r\nPIN RESET\r\n");
+            DEBUG_PRINTF("0, \r\nPIN RESET\r\n");
         #endif
     }
 

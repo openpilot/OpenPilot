@@ -60,7 +60,7 @@ extern uint32_t pios_com_spectrum_id;
 
 #ifdef PIOS_ENABLE_AUX_UART
 #define PIOS_COM_AUX                            (pios_com_aux_id)
-#define PIOS_COM_DEBUG                          (PIOS_COM_AUX
+#define PIOS_COM_DEBUG                          (PIOS_COM_AUX)
 #endif
 
 #define PIOS_GCSRCVR_TIMEOUT_MS 200

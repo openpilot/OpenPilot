@@ -36,6 +36,9 @@
  * details.
  */
 
+/* #define PIOS_INCLUDE_DEBUG_CONSOLE */
+/* #define DEBUG_LEVEL 0 */
+
 #define PIOS_INCLUDE_FREERTOS
 #define PIOS_INCLUDE_DELAY
 #define PIOS_INCLUDE_INITCALL

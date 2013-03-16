@@ -13,6 +13,7 @@ LINKER_SCRIPTS_BL	=  $(PIOS_DEVLIB)/link_STM32F4xx_BL_memory.ld \
 
 # Compiler options implied by the F4xx
 CDEFS			+= -DSTM32F4XX
+CDEFS			+= -DSYSCLK_FREQ=$(SYSCLK_FREQ)
 CDEFS			+= -DHSE_VALUE=$(OSCILLATOR_FREQ)
 CDEFS 			+= -DUSE_STDPERIPH_DRIVER
 ARCHFLAGS		+= -mcpu=cortex-m4 -march=armv7e-m -mfpu=fpv4-sp-d16 -mfloat-abi=hard
@@ -22,7 +23,7 @@ SRC			+= $(wildcard $(PIOS_DEVLIB)*.c)
 EXTRAINCDIRS		+= $(PIOS_DEVLIB)/inc
 
 # CMSIS for the F4
-include $(PIOSCOMMONLIB)/CMSIS2/library.mk
+include $(PIOSCOMMON)/Libraries/CMSIS2/library.mk
 CMSIS2_DEVICEDIR	:= $(PIOS_DEVLIB)/Libraries/CMSIS2/Device/ST/STM32F4xx
 SRC			+= $(wildcard $(CMSIS2_DEVICEDIR)/Source/$(BOARD_NAME)/*.c)
 EXTRAINCDIRS		+= $(CMSIS2_DEVICEDIR)/Include

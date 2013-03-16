@@ -23,6 +23,7 @@ endif
 include $(ROOT_DIR)/make/boards/$(BOARD_NAME)/board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk
 include $(ROOT_DIR)/make/boot-defs.mk
+include $(ROOT_DIR)/make/common-defs.mk
 
 BLONLY_CDEFS += -DEE_BANK_BASE=$(EE_BANK_BASE)
 BLONLY_CDEFS += -DEE_BANK_SIZE=$(EE_BANK_SIZE)

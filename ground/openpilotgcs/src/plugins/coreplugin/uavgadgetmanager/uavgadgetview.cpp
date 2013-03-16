@@ -230,14 +230,17 @@ void UAVGadgetView::updateToolBar()
 
 void UAVGadgetView::listSelectionActivated(int index)
 {
-    if (index < 0) // this could happen when called from SplitterOrView::restoreState()
+    if (index < 0 || index >= m_uavGadgetList->count())
         index = m_defaultIndex;
+
     QString classId = m_uavGadgetList->itemData(index).toString();
     if (m_uavGadget && (m_uavGadget->classId() == classId))
         return;
+
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
-    IUAVGadget *gadgetToRemove = m_uavGadget;
     IUAVGadget *gadget = im->createGadget(classId, this);
+
+    IUAVGadget *gadgetToRemove = m_uavGadget;
     setGadget(gadget);
     m_uavGadgetManager->setCurrentGadget(gadget);
     im->removeGadget(gadgetToRemove);
@@ -251,4 +254,40 @@ int UAVGadgetView::indexOfClassId(QString classId)
 void UAVGadgetView::currentGadgetChanged(IUAVGadget *gadget)
 {
     m_activeLabel->setVisible(m_uavGadget == gadget);
+}
+
+void UAVGadgetView::saveState(QSettings* qSettings)
+{
+    qSettings->setValue("type", "uavGadget");
+    qSettings->setValue("classId", gadget()->classId());
+    qSettings->beginGroup("gadget");
+    gadget()->saveState(qSettings);
+    qSettings->endGroup();
+}
+
+void UAVGadgetView::restoreState(QSettings* qSettings)
+{
+    QString classId = qSettings->value("classId").toString();
+    int index = indexOfClassId(classId);
+    if (index < 0) {
+        index = m_defaultIndex;
+    }
+    classId = m_uavGadgetList->itemData(index).toString();
+
+    IUAVGadget *newGadget;
+    UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
+    if(qSettings->childGroups().contains("gadget")) {
+        newGadget = im->createGadget(classId, this, false);
+        qSettings->beginGroup("gadget");
+        newGadget->restoreState(qSettings);
+        qSettings->endGroup();
+    }
+    else {
+        newGadget = im->createGadget(classId, this);
+    }
+
+    IUAVGadget *gadgetToRemove = m_uavGadget;
+    setGadget(newGadget);
+    m_uavGadgetManager->setCurrentGadget(newGadget);
+    im->removeGadget(gadgetToRemove);
 }

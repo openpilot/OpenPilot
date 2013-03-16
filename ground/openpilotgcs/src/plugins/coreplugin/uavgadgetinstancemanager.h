@@ -61,7 +61,7 @@ public:
     ~UAVGadgetInstanceManager();
     void readSettings(QSettings *qs);
     void saveSettings(QSettings *qs);
-    IUAVGadget *createGadget(QString classId, QWidget *parent);
+    IUAVGadget *createGadget(QString classId, QWidget *parent, bool loadDefaultConfiguration = true);
     void removeGadget(IUAVGadget *gadget);
     void removeAllGadgets();
     bool canDeleteConfiguration(IUAVGadgetConfiguration *config);

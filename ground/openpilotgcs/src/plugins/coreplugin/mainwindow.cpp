@@ -91,6 +91,7 @@ using namespace Core;
 using namespace Core::Internal;
 
 static const char *uriListMimeFormatC = "text/uri-list";
+static const char *DEFAULT_CONFIG_FILENAME = "OpenPilotGCS.xml";
 
 enum { debugMainWindow = 0 };
 
@@ -267,7 +268,6 @@ void MainWindow::modeChanged(Core::IMode */*mode*/)
 void MainWindow::extensionsInitialized()
 {
     QSettings *qs = m_settings;
-    QSettings *settings;
     QString commandLine;
     if ( ! qs->allKeys().count() ) {
         foreach(QString str, qApp->arguments()) {
@@ -288,28 +288,31 @@ void MainWindow::extensionsInitialized()
 #endif
         directory.cd("default_configurations");
 
-        qDebug() << "Looking for default config files in: " + directory.absolutePath();
-        bool showDialog = true;
+        qDebug() << "Looking for configuration files in:" << directory.absolutePath();
+
         QString filename;
-        if(!commandLine.isEmpty()) {
-            if(QFile::exists(directory.absolutePath() + QDir::separator()+commandLine)) {
-                filename = directory.absolutePath() + QDir::separator()+commandLine;
-                qDebug() << "Load configuration from command line";
-                settings = new QSettings(filename, XmlConfig::XmlSettingsFormat);
-                showDialog = false;
-            }
+        if(!commandLine.isEmpty() && QFile::exists(directory.absolutePath() + QDir::separator() + commandLine)) {
+            filename = directory.absolutePath() + QDir::separator() + commandLine;
+            qDebug() << "Configuration file" << filename << "specified on command line will be loaded.";
         }
-        if(showDialog) {
+        else if(QFile::exists(directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME)) {
+            filename = directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME;
+            qDebug() << "Default configuration file" << filename << "will be loaded.";
+        }
+        else {
+            qDebug() << "Default configuration file " << directory.absolutePath() << QDir::separator() << DEFAULT_CONFIG_FILENAME << "was not found.";
             importSettings *dialog = new importSettings(this);
             dialog->loadFiles(directory.absolutePath());
             dialog->exec();
             filename = dialog->choosenConfig();
-            settings = new QSettings(filename, XmlConfig::XmlSettingsFormat);
             delete dialog;
+            qDebug() << "Configuration file" << filename << "was selected and will be loaded.";
         }
-        qs = settings;
-        qDebug() << "Load default config from resource " << filename;
+
+        qs = new QSettings(filename, XmlConfig::XmlSettingsFormat);
+        qDebug() << "Configuration file" << filename << "was loaded.";
     }
+
     qs->beginGroup("General");
     m_config_description=qs->value("Description", "none").toString();
     m_config_details=qs->value("Details", "none").toString();
@@ -795,15 +798,13 @@ void MainWindow::registerDefaultActions()
 
     // About GCS Action
 #ifdef Q_WS_MAC
-    tmpaction = new QAction(QIcon(Constants::ICON_OPENPILOT), tr("About &OpenPilot GCS"), this); // it's convention not to add dots to the about menu
+
 #else
-    tmpaction = new QAction(QIcon(Constants::ICON_OPENPILOT), tr("About &OpenPilot GCS..."), this);
+
 #endif
-    cmd = am->registerAction(tmpaction, Constants::ABOUT_OPENPILOTGCS, m_globalContext);
-    mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
-    tmpaction->setEnabled(true);
+
 #ifdef Q_WS_MAC
-    cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
+
 #endif
     connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutOpenPilotGCS()));
 
@@ -818,7 +819,7 @@ void MainWindow::registerDefaultActions()
     connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutPlugins()));
 
     //Credits Action
-    tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &Authors..."), this);
+    tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &OpenPilot..."), this);
     cmd = am->registerAction(tmpaction, Constants::ABOUT_AUTHORS, m_globalContext);
     mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
     tmpaction->setEnabled(true);

@@ -1,0 +1,38 @@
+<xml>
+    <object name="Mpu6000Settings" singleinstance="true" settings="true" category="Sensors">
+        <description>Settings for the @ref MPU6000 sensor used on CC3D and Revolution. Reboot the board for this to takes effect</description>
+        <field name="GyroScale" units="deg/s" type="enum" elements="1" defaultvalue="Scale_2000">
+            <options>
+                <option>Scale_250</option>
+                <option>Scale_500</option>
+                <option>Scale_1000</option>
+                <option>Scale_2000</option>
+            </options>
+        </field>
+        <field name="AccelScale" units="g" type="enum" elements="1" defaultvalue="Scale_8g">
+            <options>
+                <option>Scale_2g</option>
+                <option>Scale_4g</option>
+                <option>Scale_8g</option>
+                <option>Scale_16g</option>
+            </options>
+        </field>
+
+        <field name="FilterSetting" units="Hz" type="enum" elements="1" defaultvalue="Lowpass_256_Hz">
+            <options>
+                <option>Lowpass_256_Hz</option>
+                <option>Lowpass_188_Hz</option>
+                <option>Lowpass_98_Hz</option>
+                <option>Lowpass_42_Hz</option>
+                <option>Lowpass_20_Hz</option>
+                <option>Lowpass_10_Hz</option>
+                <option>Lowpass_5_Hz</option>
+            </options>
+        </field>
+                           
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

@@ -45,7 +45,6 @@ FLASH_TOOL = OPENOCD
 # Optional module and driver defaults
 USE_COMUSBBRIDGE ?= NO
 USE_TXPID ?= NO
-USE_I2C ?= NO
 USE_ALTITUDE ?= NO
 TEST_FAULTS ?= NO
 USE_MAGBARO ?= NO
@@ -62,11 +61,7 @@ ifeq ($(TEST_FAULTS), YES)
 OPTMODULES += Fault
 endif
 ifeq ($(USE_MAGBARO), YES)
-ifeq ($(USE_I2C), YES)
 OPTMODULES += Extensions/MagBaro
-else
-$(error "MagBaro module (USE_MAGBARO=YES) requires i2c (USE_I2C=YES)")
-endif
 endif
 
 # List of modules to include

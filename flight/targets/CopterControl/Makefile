@@ -32,7 +32,6 @@ USE_CAMERASTAB   ?= YES
 USE_COMUSBBRIDGE ?= YES
 USE_GPS          ?= YES
 USE_TXPID        ?= YES
-USE_I2C          ?= NO
 USE_ALTITUDE     ?= NO
 USE_AUTOTUNE     ?= NO
 TEST_FAULTS      ?= NO
@@ -61,18 +60,12 @@ ifeq ($(USE_COMUSBBRIDGE), YES)
 endif
 ifeq ($(USE_GPS), YES)
     OPTMODULES += GPS
-    CDEFS += -DUSE_GPS
 endif
 ifeq ($(USE_TXPID), YES)
     OPTMODULES += TxPID
 endif
 ifeq ($(USE_ALTITUDE), YES)
-    ifeq ($(USE_I2C), YES)
-        OPTMODULES += Altitude
-        CDEFS += -DUSE_I2C
-    else
-        $(error Altitude module (USE_ALTITUDE=YES) requires i2c (USE_I2C=YES))
-    endif
+    OPTMODULES += Altitude
 endif
 ifeq ($(USE_AUTOTUNE), YES)
     OPTMODULES += Autotune

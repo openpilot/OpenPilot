@@ -47,7 +47,6 @@ USE_CAMERASTAB ?= NO
 USE_COMUSBBRIDGE ?= NO
 USE_GPS ?= NO
 USE_TXPID ?= NO
-USE_I2C ?= NO
 USE_ALTITUDE ?= NO
 TEST_FAULTS ?= NO
 USE_MAGBARO ?= NO
@@ -67,21 +66,13 @@ ifeq ($(USE_TXPID), YES)
 OPTMODULES += TxPID
 endif
 ifeq ($(USE_ALTITUDE), YES)
-ifeq ($(USE_I2C), YES)
 OPTMODULES += Altitude
-else
-$(error "Altitude module (USE_ALTITUDE=YES) requires i2c (USE_I2C=YES)")
-endif
 endif
 ifeq ($(TEST_FAULTS), YES)
 OPTMODULES += Fault
 endif
 ifeq ($(USE_MAGBARO), YES)
-ifeq ($(USE_I2C), YES)
 OPTMODULES += Extensions/MagBaro
-else
-$(error "MagBaro module (USE_MAGBARO=YES) requires i2c (USE_I2C=YES)")
-endif
 endif
 
 # List of mandatory modules to include

@@ -93,6 +93,7 @@
 /* #define PIOS_INCLUDE_OVERO */
 /* #define PIOS_OVERO_SPI */
 /* #define PIOS_INCLUDE_SDCARD */
+/* #define LOG_FILENAME "startup.log" */
 #define PIOS_INCLUDE_FLASH
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
 #define FLASH_FREERTOS

@@ -56,8 +56,7 @@ MATHLIBINC	= $(FLIGHTLIB)/math
 
 ## FreeRTOS support
 FREERTOS_DIR	 = $(PIOSCOMMON)/Libraries/FreeRTOS
-FREERTOS_SRC_DIR = $(FREERTOS_DIR)/Source
-FREERTOS_INC_DIR = $(FREERTOS_SRC_DIR)/include
+include $(FREERTOS_DIR)/library.mk
 
 ## Misc
 DOXYGENDIR	= $(ROOT_DIR)/flight/Doc/Doxygen
@@ -75,24 +74,37 @@ endif
 # List C source files here (C dependencies are automatically generated).
 # Use file-extension c for "c-only"-files
 
+## PIOS Hardware (Common Peripherals)
+SRC += $(PIOSCOMMON)/pios_adxl345.c
+SRC += $(PIOSCOMMON)/pios_bma180.c
+SRC += $(PIOSCOMMON)/pios_bmp085.c
+SRC += $(PIOSCOMMON)/pios_etasv3.c
+SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
+SRC += $(PIOSCOMMON)/pios_hcsr04.c
+SRC += $(PIOSCOMMON)/pios_hmc5843.c
+SRC += $(PIOSCOMMON)/pios_hmc5883.c
+SRC += $(PIOSCOMMON)/pios_i2c_esc.c
+SRC += $(PIOSCOMMON)/pios_l3gd20.c
+SRC += $(PIOSCOMMON)/pios_mpu6000.c
+SRC += $(PIOSCOMMON)/pios_mpxv.c
+SRC += $(PIOSCOMMON)/pios_ms5611.c
+SRC += $(PIOSCOMMON)/pios_video.c
+SRC += $(PIOSCOMMON)/pios_wavplay.c
+
 ## PIOS Hardware (Common)
+SRC += $(PIOSCOMMON)/pios_com.c
+SRC += $(PIOSCOMMON)/pios_com_msg.c
 SRC += $(PIOSCOMMON)/pios_crc.c
 SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
-SRC += $(PIOSCOMMON)/pios_adxl345.c
-SRC += $(PIOSCOMMON)/pios_mpu6000.c
-SRC += $(PIOSCOMMON)/pios_com.c
-SRC += $(PIOSCOMMON)/pios_sbus.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
-SRC += $(PIOSCOMMON)/pios_gcsrcvr.c
 SRC += $(PIOSCOMMON)/pios_rfm22b.c
 SRC += $(PIOSCOMMON)/pios_rfm22b_com.c
+SRC += $(PIOSCOMMON)/pios_sbus.c
+SRC += $(PIOSCOMMON)/pios_sdcard.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
-SRC += $(PIOSCOMMON)/pios_i2c_esc.c
-SRC += $(PIOSSTM32F10X)/pios_ppm_out.c
 
 # PIOS USB related files
-SRC += $(OPSYSTEM)/pios_usb_board_data.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 SRC += $(PIOSCOMMON)/pios_usb_util.c
@@ -106,10 +118,9 @@ SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 
-## Common FreeRTOS files
-SRC += $(FREERTOS_SRC_DIR)/list.c
-SRC += $(FREERTOS_SRC_DIR)/queue.c
-SRC += $(FREERTOS_SRC_DIR)/tasks.c
+## Modules
+SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
+SRC += ${foreach MOD, ${OPTMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # Use file-extension c for "c-only"-files
@@ -148,7 +159,6 @@ EXTRAINCDIRS += $(MATHLIBINC)
 EXTRAINCDIRS += $(OPUAVOBJINC)
 EXTRAINCDIRS += $(OPUAVTALKINC)
 EXTRAINCDIRS += $(OPUAVSYNTHDIR)
-EXTRAINCDIRS += $(FREERTOS_INC_DIR)
 
 # Modules
 EXTRAINCDIRS += $(foreach mod, $(OPTMODULES) $(MODULES), $(OPMODULEDIR)/$(mod)/inc) $(OPMODULEDIR)/System/inc

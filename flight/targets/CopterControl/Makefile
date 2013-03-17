@@ -91,14 +91,11 @@ endif
 # List C source files here (C dependencies are automatically generated).
 # Use file-extension c for "c-only"-files
 ifndef TESTAPP
-    ## Modules
-    SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
-    SRC += ${foreach MOD, ${OPTMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
-
     ## Application Core
     SRC += ${OPMODULEDIR}/System/systemmod.c
     SRC += $(OPSYSTEM)/coptercontrol.c
     SRC += $(OPSYSTEM)/pios_board.c
+    SRC += $(OPSYSTEM)/pios_usb_board_data.c
     SRC += $(OPSYSTEM)/alarms.c
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c

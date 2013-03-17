@@ -24,7 +24,7 @@ include $(ROOT_DIR)/make/boards/$(BOARD_NAME)/board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk
 
 # List of mandatory modules to include
-MODULES = RadioComBridge
+MODULES += RadioComBridge
 
 # List of optional modules to include
 OPTMODULES =
@@ -32,14 +32,11 @@ OPTMODULES =
 # List C source files here (C dependencies are automatically generated).
 # Use file-extension c for "c-only"-files
 ifndef TESTAPP
-    ## Modules
-    SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
-    SRC += ${foreach MOD, ${OPTMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
-
     ## Application Core
     SRC += ${OPMODULEDIR}/PipXtreme/pipxtrememod.c
     SRC += $(OPSYSTEM)/pipxtreme.c
     SRC += $(OPSYSTEM)/pios_board.c
+    SRC += $(OPSYSTEM)/pios_usb_board_data.c
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c

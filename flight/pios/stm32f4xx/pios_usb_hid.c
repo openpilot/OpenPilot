@@ -350,6 +350,12 @@ static void PIOS_USB_HID_IF_DeInit(uint32_t usb_hid_id)
 
 static uint8_t hid_protocol;
 static uint8_t hid_altset;
+
+struct hid_idle_msg {
+	uint8_t idle_period;
+	uint8_t report_id;
+};
+static struct hid_idle_msg hid_idle;
 static uint8_t dummy_report[2];
 
 static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request *req)
@@ -401,6 +407,11 @@ static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request 
 		switch (req->bRequest) {
 		case USB_HID_REQ_SET_PROTOCOL:
 			hid_protocol = (uint8_t)(req->wValue);
+			break;
+		case USB_HID_REQ_SET_IDLE:
+			/* Idle rates are currently ignored but decoded for debugging */
+			hid_idle.idle_period = req->wValue & 0xFF00 >> 8;
+			hid_idle.report_id   = req->wValue & 0x00FF;
 			break;
 		case USB_HID_REQ_GET_PROTOCOL:
 			PIOS_USBHOOK_CtrlTx(&hid_protocol, 1);

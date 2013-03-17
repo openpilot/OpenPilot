@@ -60,9 +60,11 @@ SRC += $(OPSYSTEM)/op_dfu.c
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_board_info.c
 SRC += $(PIOSCOMMON)/pios_com_msg.c
-SRC += $(PIOSCOMMON)/printf-stdarg.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 SRC += $(PIOSCOMMON)/pios_usb_util.c
+
+## Misc library functions
+SRC += $(FLIGHTLIB)/printf-stdarg.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # Use file-extension c for "c-only"-files

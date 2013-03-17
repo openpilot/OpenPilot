@@ -95,7 +95,7 @@ HWDEFSINC = ../../board_hw_defs/$(BOARD_NAME)
 ## COPTERCONTROL_BL CORE:
 SRC += $(OPSYSTEM)/main.c
 SRC += $(OPSYSTEM)/pios_board.c
-SRC += $(OPSYSTEM)/op_dfu.c
+SRC += $(FLIGHTLIB)/op_dfu.c
 
 ## PIOS Hardware (STM32F10x)
 include $(PIOS)/STM32F10x/library.mk

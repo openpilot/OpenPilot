@@ -1,11 +1,32 @@
-/*!
- * 	@File iap.c
- *	@Brief	
+/**
+ ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_IAP IAP Functions
+ * @brief STM32F4xx Hardware dependent I2C functionality
+ * @{
  *
- *  Created on: Sep 6, 2010
- *      Author: joe
+ * @file       pios_iap.c  
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      In application programming functions
+ * @see        The GNU Public License (GPL) Version 3
+ * 
+ *****************************************************************************/
+/* 
+ * This program is free software; you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by 
+ * the Free Software Foundation; either version 3 of the License, or 
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ * for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along 
+ * with this program; if not, write to the Free Software Foundation, Inc., 
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 
 /****************************************************************************************
  *  Header files
@@ -32,7 +53,12 @@
 /****************************************************************************************
  *  Private (static) Data
  ****************************************************************************************/
-
+const uint16_t pios_iap_cmd_list[] = 
+        { 
+                IAP_CMD1, 
+                IAP_CMD2, 
+                IAP_CMD3 
+        };
 /****************************************************************************************
  *  Public/Global Data
  ****************************************************************************************/
@@ -119,4 +145,38 @@ uint16_t PIOS_IAP_ReadBootCount(void)
 void PIOS_IAP_WriteBootCount (uint16_t boot_count)
 {
 	BKP_WriteBackupRegister ( IAP_BOOTCOUNT, boot_count );
+}
+
+/**
+  * @brief  Return one of the IAP command values passed from bootloader.
+  * @param  number: the index of the command value (0..2).
+  * @retval the selected command value.
+  */
+uint32_t PIOS_IAP_ReadBootCmd(uint8_t number)
+{
+	if(PIOS_IAP_CMD_COUNT < number)
+	{
+		PIOS_Assert(0);
+	}
+	else
+	{
+		return BKP_ReadBackupRegister(pios_iap_cmd_list[number]);
+	}	
+}
+
+/**
+  * @brief  Write one of the IAP command values to be passed to firmware from bootloader.
+  * @param  number: the index of the command value (0..2).
+  * @param  value: value to be written.
+  */
+void PIOS_IAP_WriteBootCmd(uint8_t number, uint32_t value)
+{
+	if(PIOS_IAP_CMD_COUNT < number)
+	{
+		PIOS_Assert(0);
+	}
+	else
+	{
+		BKP_WriteBackupRegister(pios_iap_cmd_list[number], value);
+	}	
 }

@@ -71,7 +71,7 @@ HWDEFSINC = ../../board_hw_defs/$(BOARD_NAME)
 SRC += main.c
 SRC += pios_board.c
 SRC += pios_usb_board_data.c
-SRC += op_dfu.c
+SRC += $(FLIGHTLIB)/op_dfu.c
 
 ## PIOS Hardware (STM32F4xx)
 include $(PIOS)/STM32F4xx/library.mk

@@ -53,7 +53,12 @@
 /****************************************************************************************
  *  Private (static) Data
  ****************************************************************************************/
-
+const uint16_t pios_iap_cmd_list[] = 
+        { 
+                IAP_CMD1, 
+                IAP_CMD2, 
+                IAP_CMD3 
+        };
 /****************************************************************************************
  *  Public/Global Data
  ****************************************************************************************/
@@ -139,4 +144,37 @@ uint16_t PIOS_IAP_ReadBootCount(void)
 void PIOS_IAP_WriteBootCount (uint16_t boot_count)
 {
 	RTC_WriteBackupRegister ( IAP_BOOTCOUNT, boot_count );
+}
+/**
+  * @brief  Return one of the IAP command values passed from bootloader.
+  * @param  number: the index of the command value (0..2).
+  * @retval the selected command value.
+  */
+uint32_t PIOS_IAP_ReadBootCmd(uint8_t number)
+{
+	if(PIOS_IAP_CMD_COUNT < number)
+	{
+		PIOS_Assert(0);
+	}
+	else
+	{
+		return RTC_ReadBackupRegister(pios_iap_cmd_list[number]);
+	}	
+}
+
+/**
+  * @brief  Write one of the IAP command values to be passed to firmware from bootloader.
+  * @param  number: the index of the command value (0..2).
+  * @param  value: value to be written.
+  */
+void PIOS_IAP_WriteBootCmd(uint8_t number, uint32_t value)
+{
+	if(PIOS_IAP_CMD_COUNT < number)
+	{
+		PIOS_Assert(0);
+	}
+	else
+	{
+		RTC_WriteBackupRegister(pios_iap_cmd_list[number], value);
+	}	
 }

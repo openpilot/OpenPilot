@@ -73,12 +73,12 @@ CSTANDARD = -std=gnu99
 # Common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)
 CFLAGS += $(CDEFS)
-CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
-CFLAGS += -mapcs-frame
-CFLAGS += -fomit-frame-pointer
 CFLAGS += -O$(OPT)
 CFLAGS += -g$(DEBUGF)
+CFLAGS += -mapcs-frame
+CFLAGS += -fomit-frame-pointer
 CFLAGS += -Wall
+CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 
 # FIXME: STM32F4xx library raises strict aliasing and const qualifier warnings
@@ -104,18 +104,19 @@ CONLYFLAGS += $(CSTANDARD)
 #  -ahlns:     create listing
 ASFLAGS =  -mcpu=$(MCU) -I. -x assembler-with-cpp
 ASFLAGS += $(ADEFS)
-ASFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 ASFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
+ASFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 
 # Linker flags.
 #  -Wl,...:     tell GCC to pass this to linker.
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
-LDFLAGS += -nostartfiles -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref,--gc-sections
+LDFLAGS += -nostartfiles
+LDFLAGS += -Wl,--warn-common,--fatal-warnings,--gc-sections
+LDFLAGS += -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
-LDFLAGS += -lc -lgcc $(patsubst %,-l%,$(EXTRA_LIBS))
-LDFLAGS += -Wl,--warn-common
-LDFLAGS += -Wl,--fatal-warnings
+LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
+LDFLAGS += -lc -lgcc
 
 ifneq ($(DEBUG), YES)
     LDFLAGS += -Wl,-static

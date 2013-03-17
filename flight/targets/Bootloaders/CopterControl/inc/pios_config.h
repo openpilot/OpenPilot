@@ -30,22 +30,23 @@
 
 #ifndef PIOS_CONFIG_H
 #define PIOS_CONFIG_H
-#define PIOS_INCLUDE_BL_HELPER
-#define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT
-/* Enable/Disable PiOS Modules */
+
+/* Enable/Disable PiOS modules */
 #define PIOS_INCLUDE_DELAY
-#define PIOS_INCLUDE_IRQ
-#define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_SYS
+#define PIOS_INCLUDE_IRQ
+#define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_USB
 #define PIOS_INCLUDE_USB_HID
+#define PIOS_INCLUDE_LED
+#define PIOS_INCLUDE_IAP
 #define PIOS_INCLUDE_COM
 #define PIOS_INCLUDE_COM_MSG
-#define PIOS_INCLUDE_GPIO
-#define PIOS_INCLUDE_IAP
-#define PIOS_NO_GPS
+#define PIOS_INCLUDE_BL_HELPER
+#define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT
 
 #endif /* PIOS_CONFIG_H */
+
 /**
  * @}
  * @}

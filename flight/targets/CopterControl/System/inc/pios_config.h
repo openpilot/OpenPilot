@@ -39,11 +39,13 @@
 /* #define PIOS_INCLUDE_DEBUG_CONSOLE */
 /* #define DEBUG_LEVEL 0 */
 
+/* PIOS system functions */
 #define PIOS_INCLUDE_FREERTOS
 #define PIOS_INCLUDE_DELAY
 #define PIOS_INCLUDE_INITCALL
 #define PIOS_INCLUDE_SYS
 
+/* PIOS hardware peripherals */
 #define PIOS_INCLUDE_IRQ
 #define PIOS_INCLUDE_RTC
 #define PIOS_INCLUDE_TIM
@@ -54,11 +56,14 @@
 #define PIOS_INCLUDE_GPIO
 #define PIOS_INCLUDE_EXTI
 #define PIOS_INCLUDE_WDG
+
+/* PIOS USB functions */
 #define PIOS_INCLUDE_USB
 #define PIOS_INCLUDE_USB_HID
 #define PIOS_INCLUDE_USB_CDC
 #define PIOS_INCLUDE_USB_RCTX
 
+/* PIOS sensor interfaces */
 #define PIOS_INCLUDE_ADXL345
 /* #define PIOS_INCLUDE_BMA180 */
 /* #define PIOS_INCLUDE_L3GD20 */
@@ -73,12 +78,14 @@
 /* #define PIOS_INCLUDE_ETASV3 */
 /* #define PIOS_INCLUDE_HCSR04 */
 
+/* PIOS receiver drivers */
 #define PIOS_INCLUDE_PWM
 #define PIOS_INCLUDE_PPM
 #define PIOS_INCLUDE_DSM
 #define PIOS_INCLUDE_SBUS
 #define PIOS_INCLUDE_GCSRCVR
 
+/* PIOS common peripherals */
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
 #define PIOS_INCLUDE_SERVO
@@ -93,11 +100,12 @@
 /* #define PIOS_INCLUDE_PACKET_HANDLER */
 /* #define PIOS_INCLUDE_VIDEO */
 /* #define PIOS_INCLUDE_WAVE */
-#define PIOS_INCLUDE_BL_HELPER
-/* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
 /* #define PIOS_INCLUDE_UDP */
 
+/* PIOS abstract receiver interface */
 #define PIOS_INCLUDE_RCVR
+
+/* PIOS abstract comms interface with options */
 #define PIOS_INCLUDE_COM
 /* #define PIOS_INCLUDE_COM_MSG */
 #define PIOS_INCLUDE_TELEMETRY_RF
@@ -109,6 +117,10 @@
 #define PIOS_INCLUDE_GPS_NMEA_PARSER
 #define PIOS_INCLUDE_GPS_UBX_PARSER
 /* #define PIOS_GPS_SETS_HOMELOCATION */
+
+/* PIOS bootloader helper */
+#define PIOS_INCLUDE_BL_HELPER
+/* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
 
 /* Performance counters */
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD	1995998

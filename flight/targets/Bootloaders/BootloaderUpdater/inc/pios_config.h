@@ -27,18 +27,19 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 #ifndef PIOS_CONFIG_H
 #define PIOS_CONFIG_H
-#define PIOS_INCLUDE_BL_HELPER
+
+/* Enable/Disable PiOS modules */
 #define PIOS_INCLUDE_DELAY
-#define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_SYS
-#define PIOS_INCLUDE_GPIO
-//#define DEBUG_SSP
 #define PIOS_INCLUDE_IRQ
+#define PIOS_INCLUDE_GPIO
+#define PIOS_INCLUDE_LED
+#define PIOS_INCLUDE_BL_HELPER
 
 #endif /* PIOS_CONFIG_H */
+
 /**
  * @}
  * @}

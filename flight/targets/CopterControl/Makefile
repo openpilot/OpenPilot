@@ -25,65 +25,31 @@ include $(ROOT_DIR)/make/boards/$(BOARD_NAME)/board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk
 
 # ARM DSP library
-USE_DSP_LIB      ?= NO
-
-# Optional module and driver defaults
-USE_CAMERASTAB	 ?= YES
-USE_COMUSBBRIDGE ?= YES
-USE_GPS		 ?= YES
-USE_TXPID	 ?= YES
-USE_ALTITUDE	 ?= NO
-USE_AUTOTUNE	 ?= NO
-TEST_FAULTS	 ?= NO
-
-# Camera gimbal options
-USE_INPUT_LPF	 ?= YES
-USE_GIMBAL_LPF	 ?= YES
-USE_GIMBAL_FF	 ?= YES
+USE_DSP_LIB ?= NO
 
 # Set to YES to build a FW version that will erase data flash memory
-ERASE_FLASH	 ?= NO
+ERASE_FLASH ?= NO
 
 # List of mandatory modules to include
-MODULES = Attitude Stabilization Actuator ManualControl FirmwareIAP
-
-# Telemetry must be last to grab the optional modules (why?)
+MODULES += Attitude
+MODULES += Stabilization
+MODULES += Actuator
+MODULES += ManualControl
+MODULES += FirmwareIAP
 MODULES += Telemetry
 
 # List of optional modules to include
-OPTMODULES =
-ifeq ($(USE_CAMERASTAB), YES)
-    OPTMODULES += CameraStab
-endif
-ifeq ($(USE_COMUSBBRIDGE), YES)
-    OPTMODULES += ComUsbBridge
-endif
-ifeq ($(USE_GPS), YES)
-    OPTMODULES += GPS
-endif
-ifeq ($(USE_TXPID), YES)
-    OPTMODULES += TxPID
-endif
-ifeq ($(USE_ALTITUDE), YES)
-    OPTMODULES += Altitude
-endif
-ifeq ($(USE_AUTOTUNE), YES)
-    OPTMODULES += Autotune
-endif
-ifeq ($(TEST_FAULTS), YES)
-    OPTMODULES += Fault
-endif
+OPTMODULES += CameraStab
+OPTMODULES += ComUsbBridge
+OPTMODULES += GPS
+OPTMODULES += TxPID
+#OPTMODULES += Altitude
+#OPTMODULES += Fault
 
-# Misc defines
-ifeq ($(USE_INPUT_LPF), YES)
-    CDEFS += -DUSE_INPUT_LPF
-endif
-ifeq ($(USE_GIMBAL_LPF), YES)
-    CDEFS += -DUSE_GIMBAL_LPF
-endif
-ifeq ($(USE_GIMBAL_FF), YES)
-    CDEFS += -DUSE_GIMBAL_FF
-endif
+# Include all camera options
+CDEFS += -DUSE_INPUT_LPF -DUSE_GIMBAL_LPF -DUSE_GIMBAL_FF
+
+# Erase flash firmware should be buildable from command line
 ifeq ($(ERASE_FLASH), YES)
     CDEFS += -DERASE_FLASH
 endif

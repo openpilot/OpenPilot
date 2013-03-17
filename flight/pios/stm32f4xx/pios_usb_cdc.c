@@ -73,7 +73,12 @@ struct pios_usb_cdc_dev {
 	uint8_t rx_packet_buffer[PIOS_USB_BOARD_CDC_DATA_LENGTH] __attribute__ ((aligned(4)));
 	volatile bool rx_active;
 
-	uint8_t tx_packet_buffer[PIOS_USB_BOARD_CDC_DATA_LENGTH] __attribute__ ((aligned(4)));
+	/*
+	 * NOTE: This is -1 as somewhat of a hack.  It ensures that we always send packets
+	 * that are strictly < maxPacketSize for this interface which means we never have
+	 * to bother with zero length packets (ZLP).
+	 */
+	uint8_t tx_packet_buffer[PIOS_USB_BOARD_CDC_DATA_LENGTH - 1] __attribute__ ((aligned(4)));
 	volatile bool tx_active;
 
 	uint8_t ctrl_tx_packet_buffer[PIOS_USB_BOARD_CDC_MGMT_LENGTH] __attribute__ ((aligned(4)));

@@ -235,6 +235,268 @@ uavobjects_clean:
 
 ##############################
 #
+# Flight related components
+#
+##############################
+
+# Define some pointers to the various important pieces of the flight code
+# to prevent these being repeated in every sub makefile
+export PIOS          := $(ROOT_DIR)/flight/PiOS
+export FLIGHTLIB     := $(ROOT_DIR)/flight/Libraries
+export OPMODULEDIR   := $(ROOT_DIR)/flight/Modules
+export OPUAVOBJ      := $(ROOT_DIR)/flight/targets/UAVObjects
+export OPUAVTALK     := $(ROOT_DIR)/flight/targets/UAVTalk
+export HWDEFS        := $(ROOT_DIR)/flight/targets/board_hw_defs
+export DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
+export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
+
+# Define supported board lists
+ALL_BOARDS    := coptercontrol pipxtreme revolution revomini simposix osd
+ALL_BOARDS_BU := coptercontrol pipxtreme simposix
+
+# Friendly names of each board (used to find source tree)
+coptercontrol_friendly := CopterControl
+pipxtreme_friendly     := PipXtreme
+revolution_friendly    := Revolution
+revomini_friendly      := RevoMini
+simposix_friendly      := SimPosix
+osd_friendly           := OSD
+
+# Short names of each board (used to display board name in parallel builds)
+coptercontrol_short    := 'cc  '
+pipxtreme_short        := 'pipx'
+revolution_short       := 'revo'
+revomini_short         := 'rm  '
+simposix_short         := 'posx'
+osd_short              := 'osd '
+
+# SimPosix only builds on Linux so drop it from the list for
+# all other platforms.
+ifneq ($(UNAME), Linux)
+    ALL_BOARDS    := $(filter-out simposix, $(ALL_BOARDS))
+    ALL_BOARDS_BU := $(filter-out simposix, $(ALL_BOARDS_BU))
+endif
+
+# Start out assuming that we'll build fw, bl and bu for all boards
+FW_BOARDS  := $(ALL_BOARDS)
+BL_BOARDS  := $(ALL_BOARDS)
+BU_BOARDS  := $(ALL_BOARDS_BU)
+EF_BOARDS  := $(ALL_BOARDS)
+
+# SimPosix doesn't have a BL, BU or EF target so we need to
+# filter them out to prevent errors on the all_flight target.
+BL_BOARDS  := $(filter-out simposix, $(BL_BOARDS))
+BU_BOARDS  := $(filter-out simposix, $(BU_BOARDS))
+EF_BOARDS  := $(filter-out simposix, $(EF_BOARDS))
+
+# Generate the targets for whatever boards are left in each list
+FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))
+BL_TARGETS := $(addprefix bl_, $(BL_BOARDS))
+BU_TARGETS := $(addprefix bu_, $(BU_BOARDS))
+EF_TARGETS := $(addprefix ef_, $(EF_BOARDS))
+
+# When building any of the "all_*" targets, tell all sub makefiles to display
+# additional details on each line of output to describe which build and target
+# that each line applies to.
+ifneq ($(strip $(filter all_%,$(MAKECMDGOALS))),)
+    export ENABLE_MSG_EXTRA := yes
+endif
+
+# When building more than one goal in a single make invocation, also
+# enable the extra context for each output line
+ifneq ($(word 2,$(MAKECMDGOALS)),)
+    export ENABLE_MSG_EXTRA := yes
+endif
+
+# TEMPLATES (used to generate build rules)
+
+# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+# $(2) = Name of board used in source tree (e.g. CopterControl)
+# $(3) = Short name for board (e.g CC)
+define FW_TEMPLATE
+.PHONY: $(1) fw_$(1)
+$(1): fw_$(1)_opfw
+fw_$(1): fw_$(1)_opfw
+
+fw_$(1)_%: uavobjects_flight
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/fw_$(1)/dep
+	$(V1) cd $(ROOT_DIR)/flight/targets/$(2) && \
+		$$(MAKE) -r --no-print-directory \
+		BOARD_NAME=$(1) \
+		BOARD_SHORT_NAME=$(3) \
+		BUILD_TYPE=fw \
+		HWDEFSINC=$(HWDEFS)/$(1) \
+		TOPDIR=$(ROOT_DIR)/flight/targets/$(2) \
+		OUTDIR=$(BUILD_DIR)/fw_$(1) \
+		TARGET=fw_$(1) \
+		$$*
+
+.PHONY: $(1)_clean
+$(1)_clean: fw_$(1)_clean
+fw_$(1)_clean:
+	$(V0) @$(ECHO) " CLEAN      $$@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/fw_$(1)
+endef
+
+# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+# $(2) = Name of board used in source tree (e.g. CopterControl)
+define BL_TEMPLATE
+.PHONY: bl_$(1)
+bl_$(1): bl_$(1)_bin
+bl_$(1)_bino: bl_$(1)_bin
+
+bl_$(1)_%:
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/bl_$(1)/dep
+	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/$(2) && \
+		$$(MAKE) -r --no-print-directory \
+		BOARD_NAME=$(1) \
+		BOARD_SHORT_NAME=$(3) \
+		BUILD_TYPE=bl \
+		HWDEFSINC=$(HWDEFS)/$(1) \
+		TOPDIR=$(ROOT_DIR)/flight/targets/Bootloaders/$(2) \
+		OUTDIR=$(BUILD_DIR)/bl_$(1) \
+		TARGET=bl_$(1) \
+		$$*
+
+.PHONY: unbrick_$(1)
+unbrick_$(1): bl_$(1)_hex
+$(if $(filter-out undefined,$(origin UNBRICK_TTY)),
+	$(V0) @$(ECHO) " UNBRICK    $(1) via $$(UNBRICK_TTY)"
+	$(V1) $(STM32FLASH_DIR)/stm32flash \
+		-w $(BUILD_DIR)/bl_$(1)/bl_$(1).hex \
+		-g 0x0 \
+		$$(UNBRICK_TTY)
+,
+	$(V0) @$(ECHO)
+	$(V0) @$(ECHO) "ERROR: You must specify UNBRICK_TTY=<serial-device> to use for unbricking."
+	$(V0) @$(ECHO) "       eg. $$(MAKE) $$@ UNBRICK_TTY=/dev/ttyUSB0"
+)
+
+.PHONY: bl_$(1)_clean
+bl_$(1)_clean:
+	$(V0) @$(ECHO) " CLEAN      $$@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/bl_$(1)
+endef
+
+# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+define BU_TEMPLATE
+.PHONY: bu_$(1)
+bu_$(1): bu_$(1)_opfw
+
+bu_$(1)_%: bl_$(1)_bino
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/bu_$(1)/dep
+	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/BootloaderUpdater && \
+		$$(MAKE) -r --no-print-directory \
+		BOARD_NAME=$(1) \
+		BOARD_SHORT_NAME=$(3) \
+		BUILD_TYPE=bu \
+		HWDEFSINC=$(HWDEFS)/$(1) \
+		TOPDIR=$(ROOT_DIR)/flight/targets/Bootloaders/BootloaderUpdater \
+		OUTDIR=$(BUILD_DIR)/bu_$(1) \
+		TARGET=bu_$(1) \
+		$$*
+
+.PHONY: bu_$(1)_clean
+bu_$(1)_clean:
+	$(V0) @$(ECHO) " CLEAN      $$@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/bu_$(1)
+endef
+
+# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+define EF_TEMPLATE
+.PHONY: ef_$(1)
+ef_$(1): ef_$(1)_bin
+
+ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/ef_$(1)/dep
+	$(V1) cd $(ROOT_DIR)/flight/targets/EntireFlash && \
+		$$(MAKE) -r --no-print-directory \
+		BOARD_NAME=$(1) \
+		BOARD_SHORT_NAME=$(3) \
+		BUILD_TYPE=ef \
+		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
+		DFU_CMD="$(DFUUTIL_DIR)/bin/dfu-util" \
+		\
+		TARGET=ef_$(1) \
+		OUTDIR=$(BUILD_DIR)/ef_$(1) \
+		\
+		$$*
+
+.PHONY: ef_$(1)_clean
+ef_$(1)_clean:
+	$(V0) @$(ECHO) " CLEAN      $$@"
+	$(V1) $(RM) -fr $(BUILD_DIR)/ef_$(1)
+endef
+
+# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+define BOARD_PHONY_TEMPLATE
+.PHONY: all_$(1)
+all_$(1): $$(filter fw_$(1), $$(FW_TARGETS))
+all_$(1): $$(filter bl_$(1), $$(BL_TARGETS))
+all_$(1): $$(filter bu_$(1), $$(BU_TARGETS))
+all_$(1): $$(filter ef_$(1), $$(EF_TARGETS))
+
+.PHONY: all_$(1)_clean
+all_$(1)_clean: $$(addsuffix _clean, $$(filter fw_$(1), $$(FW_TARGETS)))
+all_$(1)_clean: $$(addsuffix _clean, $$(filter bl_$(1), $$(BL_TARGETS)))
+all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
+all_$(1)_clean: $$(addsuffix _clean, $$(filter ef_$(1), $$(EF_TARGETS)))
+endef
+
+# Generate flight build rules
+.PHONY: all_fw all_fw_clean
+all_fw:        $(addsuffix _opfw,  $(FW_TARGETS))
+all_fw_clean:  $(addsuffix _clean, $(FW_TARGETS))
+
+.PHONY: all_bl all_bl_clean
+all_bl:        $(addsuffix _bin,   $(BL_TARGETS))
+all_bl_clean:  $(addsuffix _clean, $(BL_TARGETS))
+
+.PHONY: all_bu all_bu_clean
+all_bu:        $(addsuffix _opfw,  $(BU_TARGETS))
+all_bu_clean:  $(addsuffix _clean, $(BU_TARGETS))
+
+.PHONY: all_ef all_ef_clean
+all_ef:        $(EF_TARGETS)
+all_ef_clean:  $(addsuffix _clean, $(EF_TARGETS))
+
+.PHONY: all_flight all_flight_clean
+all_flight:       all_fw all_bl all_bu all_ef
+all_flight_clean: all_fw_clean all_bl_clean all_bu_clean all_ef_clean
+
+# Expand the groups of targets for each board
+$(foreach board, $(ALL_BOARDS), $(eval $(call BOARD_PHONY_TEMPLATE,$(board))))
+
+# Expand the firmware rules
+$(foreach board, $(ALL_BOARDS), $(eval $(call FW_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
+
+# Expand the bootloader rules
+$(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
+
+# Expand the bootloader updater rules
+$(foreach board, $(ALL_BOARDS), $(eval $(call BU_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
+
+# Expand the entire-flash rules
+$(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
+
+.PHONY: sim_win32
+sim_win32: sim_win32_exe
+
+sim_win32_%: uavobjects_flight
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/sitl_win32
+	$(V1) $(MAKE) --no-print-directory \
+		-C $(ROOT_DIR)/flight/targets/OpenPilot --file=$(ROOT_DIR)/flight/targets/OpenPilot/Makefile.win32 $*
+
+.PHONY: sim_osx
+sim_osx: sim_osx_elf
+
+sim_osx_%: uavobjects_flight
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/sim_osx
+	$(V1) $(MAKE) --no-print-directory \
+		-C $(ROOT_DIR)/flight/targets/Revolution --file=$(ROOT_DIR)/flight/targets/Revolution/Makefile.osx $*
+
+##############################
+#
 # GCS related components
 #
 ##############################
@@ -418,264 +680,6 @@ uavo-collections: uavo-collections_java
 uavo-collections_clean:
 	$(V0) @$(ECHO) " CLEAN  $(UAVO_COLLECTION_DIR)"
 	$(V1) [ ! -d "$(UAVO_COLLECTION_DIR)" ] || $(RM) -r $(UAVO_COLLECTION_DIR)
-
-##############################
-#
-# Flight related components
-#
-##############################
-
-# Define some pointers to the various important pieces of the flight code
-# to prevent these being repeated in every sub makefile
-export PIOS          := $(ROOT_DIR)/flight/PiOS
-export FLIGHTLIB     := $(ROOT_DIR)/flight/Libraries
-export OPMODULEDIR   := $(ROOT_DIR)/flight/Modules
-export OPUAVOBJ      := $(ROOT_DIR)/flight/targets/UAVObjects
-export OPUAVTALK     := $(ROOT_DIR)/flight/targets/UAVTalk
-export HWDEFS        := $(ROOT_DIR)/flight/targets/board_hw_defs
-export DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
-export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
-
-# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
-# $(2) = Name of board used in source tree (e.g. CopterControl)
-# $(3) = Short name for board (e.g CC)
-define FW_TEMPLATE
-.PHONY: $(1) fw_$(1)
-$(1): fw_$(1)_opfw
-fw_$(1): fw_$(1)_opfw
-
-fw_$(1)_%: uavobjects_flight
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/fw_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/$(2) && \
-		$$(MAKE) -r --no-print-directory \
-		BOARD_NAME=$(1) \
-		BOARD_SHORT_NAME=$(3) \
-		BUILD_TYPE=fw \
-		HWDEFSINC=$(HWDEFS)/$(1) \
-		TOPDIR=$(ROOT_DIR)/flight/targets/$(2) \
-		OUTDIR=$(BUILD_DIR)/fw_$(1) \
-		TARGET=fw_$(1) \
-		$$*
-
-.PHONY: $(1)_clean
-$(1)_clean: fw_$(1)_clean
-fw_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $$@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/fw_$(1)
-endef
-
-# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
-# $(2) = Name of board used in source tree (e.g. CopterControl)
-define BL_TEMPLATE
-.PHONY: bl_$(1)
-bl_$(1): bl_$(1)_bin
-bl_$(1)_bino: bl_$(1)_bin
-
-bl_$(1)_%:
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/bl_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/$(2) && \
-		$$(MAKE) -r --no-print-directory \
-		BOARD_NAME=$(1) \
-		BOARD_SHORT_NAME=$(3) \
-		BUILD_TYPE=bl \
-		HWDEFSINC=$(HWDEFS)/$(1) \
-		TOPDIR=$(ROOT_DIR)/flight/targets/Bootloaders/$(2) \
-		OUTDIR=$(BUILD_DIR)/bl_$(1) \
-		TARGET=bl_$(1) \
-		$$*
-
-.PHONY: unbrick_$(1)
-unbrick_$(1): bl_$(1)_hex
-$(if $(filter-out undefined,$(origin UNBRICK_TTY)),
-	$(V0) @$(ECHO) " UNBRICK    $(1) via $$(UNBRICK_TTY)"
-	$(V1) $(STM32FLASH_DIR)/stm32flash \
-		-w $(BUILD_DIR)/bl_$(1)/bl_$(1).hex \
-		-g 0x0 \
-		$$(UNBRICK_TTY)
-,
-	$(V0) @$(ECHO)
-	$(V0) @$(ECHO) "ERROR: You must specify UNBRICK_TTY=<serial-device> to use for unbricking."
-	$(V0) @$(ECHO) "       eg. $$(MAKE) $$@ UNBRICK_TTY=/dev/ttyUSB0"
-)
-
-.PHONY: bl_$(1)_clean
-bl_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $$@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/bl_$(1)
-endef
-
-# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
-define BU_TEMPLATE
-.PHONY: bu_$(1)
-bu_$(1): bu_$(1)_opfw
-
-bu_$(1)_%: bl_$(1)_bino
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/bu_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/BootloaderUpdater && \
-		$$(MAKE) -r --no-print-directory \
-		BOARD_NAME=$(1) \
-		BOARD_SHORT_NAME=$(3) \
-		BUILD_TYPE=bu \
-		HWDEFSINC=$(HWDEFS)/$(1) \
-		TOPDIR=$(ROOT_DIR)/flight/targets/Bootloaders/BootloaderUpdater \
-		OUTDIR=$(BUILD_DIR)/bu_$(1) \
-		TARGET=bu_$(1) \
-		$$*
-
-.PHONY: bu_$(1)_clean
-bu_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $$@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/bu_$(1)
-endef
-
-# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
-define EF_TEMPLATE
-.PHONY: ef_$(1)
-ef_$(1): ef_$(1)_bin
-
-ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/ef_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/EntireFlash && \
-		$$(MAKE) -r --no-print-directory \
-		BOARD_NAME=$(1) \
-		BOARD_SHORT_NAME=$(3) \
-		BUILD_TYPE=ef \
-		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
-		DFU_CMD="$(DFUUTIL_DIR)/bin/dfu-util" \
-		\
-		TARGET=ef_$(1) \
-		OUTDIR=$(BUILD_DIR)/ef_$(1) \
-		\
-		$$*
-
-.PHONY: ef_$(1)_clean
-ef_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $$@"
-	$(V1) $(RM) -fr $(BUILD_DIR)/ef_$(1)
-endef
-
-# When building any of the "all_*" targets, tell all sub makefiles to display
-# additional details on each line of output to describe which build and target
-# that each line applies to.
-ifneq ($(strip $(filter all_%,$(MAKECMDGOALS))),)
-    export ENABLE_MSG_EXTRA := yes
-endif
-
-# When building more than one goal in a single make invocation, also
-# enable the extra context for each output line
-ifneq ($(word 2,$(MAKECMDGOALS)),)
-    export ENABLE_MSG_EXTRA := yes
-endif
-
-# $(1) = Canonical board name all in lower case (e.g. coptercontrol)
-define BOARD_PHONY_TEMPLATE
-.PHONY: all_$(1)
-all_$(1): $$(filter fw_$(1), $$(FW_TARGETS))
-all_$(1): $$(filter bl_$(1), $$(BL_TARGETS))
-all_$(1): $$(filter bu_$(1), $$(BU_TARGETS))
-all_$(1): $$(filter ef_$(1), $$(EF_TARGETS))
-
-.PHONY: all_$(1)_clean
-all_$(1)_clean: $$(addsuffix _clean, $$(filter fw_$(1), $$(FW_TARGETS)))
-all_$(1)_clean: $$(addsuffix _clean, $$(filter bl_$(1), $$(BL_TARGETS)))
-all_$(1)_clean: $$(addsuffix _clean, $$(filter bu_$(1), $$(BU_TARGETS)))
-all_$(1)_clean: $$(addsuffix _clean, $$(filter ef_$(1), $$(EF_TARGETS)))
-endef
-
-ALL_BOARDS    := coptercontrol pipxtreme simposix revolution revomini osd
-ALL_BOARDS_BU := coptercontrol pipxtreme simposix
-
-# SimPosix only builds on Linux so drop it from the list for
-# all other platforms.
-ifneq ($(UNAME), Linux)
-    ALL_BOARDS    := $(filter-out simposix, $(ALL_BOARDS))
-    ALL_BOARDS_BU := $(filter-out simposix, $(ALL_BOARDS_BU))
-endif
-
-# Friendly names of each board (used to find source tree)
-coptercontrol_friendly := CopterControl
-pipxtreme_friendly     := PipXtreme
-revolution_friendly    := Revolution
-revomini_friendly      := RevoMini
-simposix_friendly      := SimPosix
-osd_friendly           := OSD
-
-# Short names of each board (used to display board name in parallel builds)
-coptercontrol_short    := 'cc  '
-pipxtreme_short        := 'pipx'
-revolution_short       := 'revo'
-revomini_short         := 'rm  '
-simposix_short         := 'posx'
-osd_short              := 'osd '
-
-# Start out assuming that we'll build fw, bl and bu for all boards
-FW_BOARDS  := $(ALL_BOARDS)
-BL_BOARDS  := $(ALL_BOARDS)
-BU_BOARDS  := $(ALL_BOARDS_BU)
-EF_BOARDS  := $(ALL_BOARDS)
-
-# SimPosix doesn't have a BL, BU or EF target so we need to
-# filter them out to prevent errors on the all_flight target.
-BL_BOARDS  := $(filter-out simposix, $(BL_BOARDS))
-BU_BOARDS  := $(filter-out simposix, $(BU_BOARDS))
-EF_BOARDS  := $(filter-out simposix, $(EF_BOARDS))
-
-# Generate the targets for whatever boards are left in each list
-FW_TARGETS := $(addprefix fw_, $(FW_BOARDS))
-BL_TARGETS := $(addprefix bl_, $(BL_BOARDS))
-BU_TARGETS := $(addprefix bu_, $(BU_BOARDS))
-EF_TARGETS := $(addprefix ef_, $(EF_BOARDS))
-
-.PHONY: all_fw all_fw_clean
-all_fw:        $(addsuffix _opfw,  $(FW_TARGETS))
-all_fw_clean:  $(addsuffix _clean, $(FW_TARGETS))
-
-.PHONY: all_bl all_bl_clean
-all_bl:        $(addsuffix _bin,   $(BL_TARGETS))
-all_bl_clean:  $(addsuffix _clean, $(BL_TARGETS))
-
-.PHONY: all_bu all_bu_clean
-all_bu:        $(addsuffix _opfw,  $(BU_TARGETS))
-all_bu_clean:  $(addsuffix _clean, $(BU_TARGETS))
-
-.PHONY: all_ef all_ef_clean
-all_ef:        $(EF_TARGETS)
-all_ef_clean:  $(addsuffix _clean, $(EF_TARGETS))
-
-.PHONY: all_flight all_flight_clean
-all_flight:       all_fw all_bl all_bu all_ef
-all_flight_clean: all_fw_clean all_bl_clean all_bu_clean all_ef_clean
-
-# Expand the groups of targets for each board
-$(foreach board, $(ALL_BOARDS), $(eval $(call BOARD_PHONY_TEMPLATE,$(board))))
-
-# Expand the bootloader updater rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call BU_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
-
-# Expand the firmware rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call FW_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
-
-# Expand the bootloader rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
-
-# Expand the entire-flash rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
-
-.PHONY: sim_win32
-sim_win32: sim_win32_exe
-
-sim_win32_%: uavobjects_flight
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/sitl_win32
-	$(V1) $(MAKE) --no-print-directory \
-		-C $(ROOT_DIR)/flight/targets/OpenPilot --file=$(ROOT_DIR)/flight/targets/OpenPilot/Makefile.win32 $*
-
-.PHONY: sim_osx
-sim_osx: sim_osx_elf
-
-sim_osx_%: uavobjects_flight
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/sim_osx
-	$(V1) $(MAKE) --no-print-directory \
-		-C $(ROOT_DIR)/flight/targets/Revolution --file=$(ROOT_DIR)/flight/targets/Revolution/Makefile.osx $*
 
 ##############################
 #

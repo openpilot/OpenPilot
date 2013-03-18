@@ -67,10 +67,11 @@ enum rfm22b_datarate {
 	RFM22_datarate_19200 = 7,
 	RFM22_datarate_24000 = 8,
 	RFM22_datarate_32000 = 9,
-	RFM22_datarate_64000 = 10,
-	RFM22_datarate_128000 = 11,
-	RFM22_datarate_192000 = 12,
-	RFM22_datarate_256000 = 13,
+	RFM22_datarate_56000 = 10,
+	RFM22_datarate_64000 = 11,
+	RFM22_datarate_128000 = 12,
+	RFM22_datarate_192000 = 13,
+	RFM22_datarate_256000 = 14,
 };
 
 struct rfm22b_stats {

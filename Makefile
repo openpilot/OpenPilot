@@ -814,10 +814,10 @@ help:
 	@$(ECHO) "   Here is a summary of the available targets:"
 	@$(ECHO)
 	@$(ECHO) "   [Tool Installers]"
-	@$(ECHO) "     qt_sdk_install       - Install the QT v4.7.3 tools"
+	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
 	@$(ECHO) "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
 	@$(ECHO) "     openocd_install      - Install the OpenOCD JTAG daemon"
-	@$(ECHO) "     stm32flash_install   - Install the stm32flash tool for unbricking boards"
+	@$(ECHO) "     stm32flash_install   - Install the stm32flash tool for unbricking F1-based boards"
 	@$(ECHO) "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
 	@$(ECHO) "     android_sdk_install  - Install the Android SDK tools"
 	@$(ECHO)
@@ -855,6 +855,12 @@ help:
 	@$(ECHO) "     bl_<board>_clean     - Remove bootloader for <board>"
 	@$(ECHO) "     bl_<board>_program   - Use OpenOCD + JTAG to write bootloader to <board>"
 	@$(ECHO)
+	@$(ECHO) "   [Entire Flash]"
+	@$(ECHO) "     ef_<board>           - Build entire flash image for <board>"
+	@$(ECHO) "                            supported boards are ($(EF_BOARDS))"
+	@$(ECHO) "     ef_<board>_clean     - Remove entire flash image for <board>"
+	@$(ECHO) "     ef_<board>_program   - Use OpenOCD + JTAG to write entire flash image to <board>"
+	@$(ECHO)
 	@$(ECHO) "   [Bootloader Updater]"
 	@$(ECHO) "     bu_<board>           - Build bootloader updater for <board>"
 	@$(ECHO) "                            supported boards are ($(BU_BOARDS))"
@@ -865,8 +871,8 @@ help:
 	@$(ECHO) "                            supported boards are ($(BL_BOARDS))"
 	@$(ECHO) "   [Unittests]"
 	@$(ECHO) "     ut_<test>            - Build unit test <test>"
-	@$(ECHO) "     ut_<test>_tap        - Run test and capture TAP output into a file"
-	@$(ECHO) "     ut_<test>_run        - Run test and dump TAP output to console"
+	@$(ECHO) "     ut_<test>_xml        - Run test and capture XML output into a file"
+	@$(ECHO) "     ut_<test>_run        - Run test and dump output to console"
 	@$(ECHO)
 	@$(ECHO) "   [Simulation]"
 	@$(ECHO) "     sim_osx              - Build OpenPilot simulation firmware for OSX"
@@ -877,7 +883,14 @@ help:
 	@$(ECHO)
 	@$(ECHO) "   [GCS]"
 	@$(ECHO) "     gcs                  - Build the Ground Control System (GCS) application"
+	@$(ECHO) "                            with optional GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
 	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application"
+	@$(ECHO)
+	@$(ECHO) "   [AndroidGCS]"
+	@$(ECHO) "     androidgcs           - Build the Android Ground Control System (GCS) application"
+	@$(ECHO) "     androidgcs_install   - Use ADB to install the Android GCS application"
+	@$(ECHO) "     androidgcs_run       - Run the Android GCS application"
+	@$(ECHO) "     androidgcs_clean     - Remove the Android GCS application"
 	@$(ECHO)
 	@$(ECHO) "   [UAVObjects]"
 	@$(ECHO) "     uavobjects           - Generate source files from the UAVObject definition XML files"
@@ -885,8 +898,13 @@ help:
 	@$(ECHO) "     uavobjects_<group>   - Generate source files from a subset of the UAVObject definition XML files"
 	@$(ECHO) "                            supported groups are ($(UAVOBJ_TARGETS))"
 	@$(ECHO)
+	@$(ECHO) "   [Packaging]"
+	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package"
+	@$(ECHO) "                            with optional CLEAN_BUILD=YES|NO (default is YES)"
+	@$(ECHO)
 	@$(ECHO) "   Hint: Add V=1 to your command line to see verbose build output."
 	@$(ECHO)
 	@$(ECHO) "   Note: All tools will be installed into $(TOOLS_DIR)"
 	@$(ECHO) "         All build output will be placed in $(BUILD_DIR)"
+	@$(ECHO) "         Package will be placed into $(BUILD_DIR)"
 	@$(ECHO)

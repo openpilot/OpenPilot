@@ -40,23 +40,7 @@ BL_TARGETS        := $(addprefix bl_, $(ALL_BOARDS))
 BU_TARGETS        := $(addprefix bu_, $(ALL_BOARDS_BU))
 
 help:
-	@echo
-	@echo "   This Makefile is known to work on Linux and Mac in a standard shell environment."
-	@echo "   It also works on Windows by following the instructions in ../make/winx86/README.txt."
-	@echo
-	@echo "   Here is a summary of the available targets:"
-	@echo
-	@echo "   [Packaging]"
-	@echo "     package        - Build and package the OpenPilot distributable"
-	@echo "     package_flight - Build and package the OpenPilot flight firmware only"
-	@echo
-	@echo "   Notes:"
-	@echo "     - package will be placed in $(PACKAGE_DIR)"
-	@echo
-	@echo "     - the build directory will be removed first on every run unless"
-	@echo "       CLEAN_BUILD=NO is defined. It means no clean before build."
-	@echo "       This usually is safe."
-	@echo
+	$(V1) $(MAKE) -C $(ROOT_DIR) $@
 
 # Clean and build uavobjects since all parts depend on them
 uavobjects: all_clean

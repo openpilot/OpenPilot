@@ -34,10 +34,10 @@ export BUILD_DIR := $(ROOT_DIR)/build
 export DL_DIR    := $(ROOT_DIR)/downloads
 
 # Set up default build configurations (debug | release)
-UAVOGEN_BUILD_CONF	?= debug
-GCS_BUILD_CONF 		?= debug
-ANDROIDGCS_BUILD_CONF	?= debug
-GOOGLE_API_VERSION	?= 14
+GCS_BUILD_CONF		:= release
+UAVOGEN_BUILD_CONF	:= debug
+ANDROIDGCS_BUILD_CONF	:= debug
+GOOGLE_API_VERSION	:= 14
 
 # Function for converting an absolute path to one relative
 # to the top of the source tree.
@@ -505,9 +505,10 @@ sim_osx_%: uavobjects_flight
 all_ground: openpilotgcs
 
 # Convenience target for the GCS
-.PHONY: gcs gcs_clean
+.PHONY: gcs gcs_clean gcs_all_clean
 gcs: openpilotgcs
 gcs_clean: openpilotgcs_clean
+gcs_all_clean: openpilotgcs_all_clean
 
 ifeq ($(V), 1)
     GCS_SILENT :=
@@ -517,14 +518,19 @@ endif
 
 .PHONY: openpilotgcs
 openpilotgcs: uavobjects_gcs
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/ground/$@
-	$(V1) ( cd $(BUILD_DIR)/ground/$@ && \
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/ground/$@/$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/ground/$@/$(GCS_BUILD_CONF) && \
 	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) && \
 	    $(MAKE) -w ; \
 	)
 
 .PHONY: openpilotgcs_clean
 openpilotgcs_clean:
+	$(V0) @$(ECHO) " CLEAN      $@"
+	$(V1) [ ! -d "$(BUILD_DIR)/ground/openpilotgcs/$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/ground/openpilotgcs/$(GCS_BUILD_CONF)"
+
+.PHONY: openpilotgcs_all_clean
+openpilotgcs_all_clean:
 	$(V0) @$(ECHO) " CLEAN      $@"
 	$(V1) [ ! -d "$(BUILD_DIR)/ground/openpilotgcs" ] || $(RM) -r "$(BUILD_DIR)/ground/openpilotgcs"
 
@@ -882,9 +888,10 @@ help:
 	@$(ECHO) "     sim_win32_clean      - Delete all build output for the win32 simulation"
 	@$(ECHO)
 	@$(ECHO) "   [GCS]"
-	@$(ECHO) "     gcs                  - Build the Ground Control System (GCS) application"
-	@$(ECHO) "                            with optional GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
-	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application"
+	@$(ECHO) "     gcs                  - Build the Ground Control System (GCS) application (debug|release)"
+	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application (debug|release)"
+	@$(ECHO) "                            supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
+	@$(ECHO) "     gcs_all_clean        - Remove the Ground Control System (GCS) application (all build confgurations)"
 	@$(ECHO)
 	@$(ECHO) "   [AndroidGCS]"
 	@$(ECHO) "     androidgcs           - Build the Android Ground Control System (GCS) application"

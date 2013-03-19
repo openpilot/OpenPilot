@@ -8,7 +8,7 @@
 # Since debug_and_release option is set, we need this
 !debug_and_release|build_pass {
     ROOT_DIR              = $$GCS_SOURCE_TREE/../..
-    VERSION_INFO_HEADER   = $$GCS_BUILD_TREE/gcsversioninfo.h
+    VERSION_INFO_HEADER   = $$GCS_BUILD_TREE/../gcsversioninfo.h
     VERSION_INFO_SCRIPT   = $$ROOT_DIR/make/scripts/version-info.py
     VERSION_INFO_TEMPLATE = $$ROOT_DIR/make/templates/gcsversioninfotemplate.h
     VERSION_INFO_COMMAND  = python \"$$VERSION_INFO_SCRIPT\"

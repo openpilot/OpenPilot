@@ -297,8 +297,9 @@ EF_TARGETS := $(addprefix ef_, $(EF_BOARDS))
 
 # When building any of the "all_*" targets, tell all sub makefiles to display
 # additional details on each line of output to describe which build and target
-# that each line applies to. The same applies also to opfw_resource target.
-ifneq ($(strip $(filter all_% opfw_resource,$(MAKECMDGOALS))),)
+# that each line applies to. The same applies also to opfw_resource and all
+# targets
+ifneq ($(strip $(filter all_% all opfw_resource,$(MAKECMDGOALS))),)
     export ENABLE_MSG_EXTRA := yes
 endif
 

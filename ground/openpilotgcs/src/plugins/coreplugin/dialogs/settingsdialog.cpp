@@ -77,12 +77,8 @@ static inline QList<Core::IOptionsPage*> sortedOptionsPages()
     return rc;
 }
 
-SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
-                               const QString &pageId)
-    : QDialog(parent),
-    m_applied(false),
-    m_windowWidth(0),
-    m_windowHeight(0)
+SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const QString &pageId)
+    : QDialog(parent), m_applied(false)
 {
     setupUi(this);
 #ifdef Q_OS_MAC
@@ -90,19 +86,28 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId,
 #else
     setWindowTitle(tr("Options"));
 #endif
+
+    QSettings *settings = ICore::instance()->settings();
+    settings->beginGroup("General");
+
+    // restore last displayed category and page
+    // this is done only if no category or page was provided through the constructor
     QString initialCategory = categoryId;
     QString initialPage = pageId;
-    qDebug() << "SettingsDialog constructor initial category: " << initialCategory << ", initial page: " << initialPage;
+    qDebug() << "SettingsDialog constructor initial category:" << initialCategory << ", initial page:" << initialPage;
     if (initialCategory.isEmpty() && initialPage.isEmpty()) {
-        QSettings *settings = ICore::instance()->settings();
-        initialCategory = settings->value("General/LastPreferenceCategory", QVariant(QString())).toString();
-        initialPage = settings->value("General/LastPreferencePage", QVariant(QString())).toString();
-        qDebug() << "SettingsDialog settings initial category: " << initialCategory << ", initial page: " << initialPage;
-        m_windowWidth = settings->value("General/SettingsWindowWidth", 0).toInt();
-        m_windowHeight = settings->value("General/SettingsWindowHeight", 0).toInt();
+        initialCategory = settings->value("LastPreferenceCategory", QVariant(QString())).toString();
+        initialPage = settings->value("LastPreferencePage", QVariant(QString())).toString();
+        qDebug() << "SettingsDialog settings initial category:" << initialCategory << ", initial page: " << initialPage;
     }
-    if (m_windowWidth > 0 && m_windowHeight > 0)
-        resize(m_windowWidth, m_windowHeight);
+    // restore window size
+    int windowWidth = settings->value("SettingsWindowWidth", 0).toInt();
+    int windowHeight = settings->value("SettingsWindowHeight", 0).toInt();
+    qDebug() << "SettingsDialog window width :" << windowWidth << ", height:" << windowHeight;
+    if (windowWidth > 0 && windowHeight > 0) {
+        resize(windowWidth, windowHeight);
+    }
+    settings->endGroup();
 
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 

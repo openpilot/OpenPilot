@@ -31,6 +31,7 @@ export OPENPILOT_IS_COOL := Fuck Yeah!
 export ROOT_DIR  := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 export TOOLS_DIR := $(ROOT_DIR)/tools
 export BUILD_DIR := $(ROOT_DIR)/build
+export PKG_DIR   := $(ROOT_DIR)/build/package
 export DL_DIR    := $(ROOT_DIR)/downloads
 
 # Set up default build configurations (debug | release)
@@ -914,5 +915,5 @@ help:
 	@$(ECHO)
 	@$(ECHO) "   Note: All tools will be installed into $(TOOLS_DIR)"
 	@$(ECHO) "         All build output will be placed in $(BUILD_DIR)"
-	@$(ECHO) "         Package will be placed into $(BUILD_DIR)"
+	@$(ECHO) "         Package will be placed into $(PKG_DIR)"
 	@$(ECHO)

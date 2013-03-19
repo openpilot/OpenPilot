@@ -269,9 +269,10 @@ void MainWindow::extensionsInitialized()
 {
     QSettings *qs = m_settings;
     QString commandLine;
-    if ( ! qs->allKeys().count() ) {
+    if (!qs->allKeys().count()) {
+        // no user settings, so try to load some default ones
         foreach(QString str, qApp->arguments()) {
-            if(str.contains("configfile")) {
+            if (str.contains("configfile")) {
                 qDebug() << "ass";
                 commandLine = str.split("=").at(1);
                 qDebug() << commandLine;
@@ -279,28 +280,30 @@ void MainWindow::extensionsInitialized()
         }
         QDir directory(QCoreApplication::applicationDirPath());
 #ifdef Q_OS_MAC
-            directory.cdUp();
-            directory.cd("Resources");
+        directory.cdUp();
+        directory.cd("Resources");
 #else
-            directory.cdUp();
-            directory.cd("share");
-            directory.cd("openpilotgcs");
+        directory.cdUp();
+        directory.cd("share");
+        directory.cd("openpilotgcs");
 #endif
         directory.cd("default_configurations");
 
         qDebug() << "Looking for configuration files in:" << directory.absolutePath();
 
         QString filename;
-        if(!commandLine.isEmpty() && QFile::exists(directory.absolutePath() + QDir::separator() + commandLine)) {
+        if (!commandLine.isEmpty() && QFile::exists(directory.absolutePath() + QDir::separator() + commandLine)) {
+            // use file name specified on command line
             filename = directory.absolutePath() + QDir::separator() + commandLine;
             qDebug() << "Configuration file" << filename << "specified on command line will be loaded.";
-        }
-        else if(QFile::exists(directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME)) {
+        } else if (QFile::exists(directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME)) {
+            // use default file name
             filename = directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME;
             qDebug() << "Default configuration file" << filename << "will be loaded.";
-        }
-        else {
-            qDebug() << "Default configuration file " << directory.absolutePath() << QDir::separator() << DEFAULT_CONFIG_FILENAME << "was not found.";
+        } else {
+            // prompt user for default file name
+            qDebug() << "Default configuration file" << directory.absolutePath() << QDir::separator()
+                    << DEFAULT_CONFIG_FILENAME << "was not found.";
             importSettings *dialog = new importSettings(this);
             dialog->loadFiles(directory.absolutePath());
             dialog->exec();
@@ -309,7 +312,13 @@ void MainWindow::extensionsInitialized()
             qDebug() << "Configuration file" << filename << "was selected and will be loaded.";
         }
 
+        // create settings from file
         qs = new QSettings(filename, XmlConfig::XmlSettingsFormat);
+
+        // replace empty settings with new ones
+        delete m_settings;
+        m_settings = qs;
+
         qDebug() << "Configuration file" << filename << "was loaded.";
     }
 
@@ -900,13 +909,12 @@ void MainWindow::setFocusToEditor()
 
 }
 
-bool MainWindow::showOptionsDialog(const QString &category,
-                                   const QString &page,
-                                   QWidget *parent)
+bool MainWindow::showOptionsDialog(const QString &category, const QString &page, QWidget *parent)
 {
     emit m_coreImpl->optionsDialogRequested();
-    if (!parent)
+    if (!parent) {
         parent = this;
+    }
     SettingsDialog dlg(parent, category, page);
     return dlg.execDialog();
 }

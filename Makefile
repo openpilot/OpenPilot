@@ -297,8 +297,8 @@ EF_TARGETS := $(addprefix ef_, $(EF_BOARDS))
 
 # When building any of the "all_*" targets, tell all sub makefiles to display
 # additional details on each line of output to describe which build and target
-# that each line applies to.
-ifneq ($(strip $(filter all_%,$(MAKECMDGOALS))),)
+# that each line applies to. The same applies also to opfw_resource target.
+ifneq ($(strip $(filter all_% opfw_resource,$(MAKECMDGOALS))),)
     export ENABLE_MSG_EXTRA := yes
 endif
 
@@ -755,6 +755,27 @@ endif
 # Packaging components
 #
 ##############################
+
+# Rules to generate GCS resources used to embed firmware binaries into the GCS.
+# They are used later by the vehicle setup wizard to update board firmware.
+# To open a firmware image use ":/firmware/fw_coptercontrol.opfw"
+OPFW_RESOURCE := $(BUILD_DIR)/ground/opfw_resource/opfw_resource.qrc
+OPFW_RESOURCE_PREFIX := ../../../
+OPFW_FILES := $(foreach fw_targ, $(FW_TARGETS), $(call toprel, $(BUILD_DIR)/$(fw_targ)/$(fw_targ).opfw))
+OPFW_CONTENTS := \
+<!DOCTYPE RCC><RCC version="1.0"> \
+    <qresource prefix="/firmware"> \
+        $(foreach fw_file, $(OPFW_FILES), <file alias="$(notdir $(fw_file))">$(OPFW_RESOURCE_PREFIX)$(fw_file)</file>) \
+    </qresource> \
+</RCC>
+
+.PHONY: opfw_resource
+opfw_resource: $(OPFW_RESOURCE)
+
+$(OPFW_RESOURCE): $(FW_TARGETS)
+	@$(ECHO) Generating OPFW resource file $(call toprel, $@)
+	$(V1) $(MKDIR) -p $(dir $@)
+	$(V1) $(ECHO) $(QUOTE)$(OPFW_CONTENTS)$(QUOTE) > $@
 
 .PHONY: package
 package:

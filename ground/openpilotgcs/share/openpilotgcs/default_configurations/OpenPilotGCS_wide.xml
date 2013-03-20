@@ -2,16 +2,16 @@
   <General>
     <AutoConnect>true</AutoConnect>
     <AutoSelect>true</AutoSelect>
-    <ExpertMode>false</ExpertMode>
-    <LastPreferenceCategory>Notify Plugin</LastPreferenceCategory>
-    <LastPreferencePage>settings</LastPreferencePage>
-    <SaveSettingsOnExit>true</SaveSettingsOnExit>
-    <SettingsWindowHeight>700</SettingsWindowHeight>
-    <SettingsWindowWidth>800</SettingsWindowWidth>
-    <UDPMirror>false</UDPMirror>
     <Description>Wide configuration</Description>
-    <Details>Default configuration built for wide screens (17"up)</Details>
+    <Details>Default configuration built for wide screens (17" and up)</Details>
+    <ExpertMode>false</ExpertMode>
+    <LastPreferenceCategory></LastPreferenceCategory>
+    <LastPreferencePage></LastPreferencePage>
+    <SaveSettingsOnExit>true</SaveSettingsOnExit>
+    <SettingsWindowHeight>554</SettingsWindowHeight>
+    <SettingsWindowWidth>776</SettingsWindowWidth>
     <StyleSheet>default</StyleSheet>
+    <UDPMirror>false</UDPMirror>
   </General>
   <KeyBindings>
     <size>0</size>

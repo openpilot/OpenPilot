@@ -2,13 +2,14 @@
   <General>
     <AutoConnect>true</AutoConnect>
     <AutoSelect>true</AutoSelect>
-    <UDPMirror>false</UDPMirror>
     <Description>Default configuration</Description>
     <Details>Default configuration built to work on all screen sizes</Details>
     <ExpertMode>false</ExpertMode>
+    <LastPreferenceCategory></LastPreferenceCategory>
+    <LastPreferencePage></LastPreferencePage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
-    <SettingsWindowHeight>700</SettingsWindowHeight>
-    <SettingsWindowWidth>800</SettingsWindowWidth>
+    <SettingsWindowHeight>554</SettingsWindowHeight>
+    <SettingsWindowWidth>776</SettingsWindowWidth>
     <StyleSheet>default</StyleSheet>
     <UDPMirror>false</UDPMirror>
   </General>

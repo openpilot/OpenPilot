@@ -1,6 +1,13 @@
 #
-# Windows-specific packaging
+# Windows-specific packaging script
 #
+
+ifndef OPENPILOT_IS_COOL
+    $(error Top level Makefile must be used to build this target)
+endif
+
+VERSION_CMD   := $(VERSION_INFO)
+FW_DIR        := $(PACKAGE_DIR)/firmware
 
 NSIS_CMD      := makensis.exe
 NSIS_OPTS     := /V3
@@ -9,7 +16,8 @@ NSIS_SCRIPT   := $(NSIS_DIR)/openpilotgcs.nsi
 NSIS_TEMPLATE := $(NSIS_DIR)/openpilotgcs.tpl
 NSIS_HEADER   := $(BUILD_DIR)/ground/openpilotgcs/openpilotgcs.nsh
 
-win_package: gcs package_flight
+.PHONY: package
+package:
 	$(V1) mkdir -p "$(dir $(NSIS_HEADER))"
 	$(VERSION_CMD) \
 		--template="$(NSIS_TEMPLATE)" \
@@ -21,10 +29,3 @@ win_package: gcs package_flight
 	$(V1) echo "If you have a script error in line 1 - use Unicode NSIS 2.46+"
 	$(V1) echo "  http://www.scratchpaper.com"
 	$(NSIS_CMD) $(NSIS_OPTS) $(NSIS_SCRIPT)
-
-gcs: uavobjects
-	$(V1) $(MAKE) -C $(ROOT_DIR) GCS_BUILD_CONF=release $@
-
-ground_package: | win_package
-
-.PHONY: gcs ground_package win_package

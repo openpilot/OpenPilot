@@ -36,9 +36,9 @@
   ; Tree root locations (relative to this script location)
   !define PROJECT_ROOT   "..\.."
   !define NSIS_DATA_TREE "."
-  !define GCS_BUILD_TREE "..\..\build\ground\openpilotgcs"
+  !define GCS_BUILD_TREE "..\..\build\ground\openpilotgcs\release"
   !define UAVO_SYNTH_TREE "..\..\build\uavobject-synthetics"
-  !define AEROSIMRC_TREE "..\..\build\ground\AeroSIM-RC"
+  !define AEROSIMRC_TREE "${GCS_BUILD_TREE}\misc\AeroSIM-RC"
 
   ; Default installation folder
   InstallDir "$PROGRAMFILES\OpenPilot"
@@ -61,7 +61,7 @@
 ; !define PRODUCT_VERSION "0.0.0.0"
 ; !define FILE_VERSION "${TAG_OR_BRANCH}:${HASH8} ${DATETIME}"
 ; !define BUILD_DESCRIPTION "${TAG_OR_BRANCH}:${HASH8} built from ${ORIGIN}, committed ${DATETIME} as ${HASH}"
-  !include "${GCS_BUILD_TREE}\openpilotgcs.nsh"
+  !include "${GCS_BUILD_TREE}\..\openpilotgcs.nsh"
 
   Name "${PRODUCT_NAME}"
   OutFile "${PACKAGE_DIR}\..\${OUT_FILE}"
@@ -203,12 +203,8 @@ SectionEnd
 
 ; Copy firmware files
 Section "Firmware" InSecFirmware
-; SetOutPath "$INSTDIR\firmware\${FIRMWARE_DIR}"
-; File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
   SetOutPath "$INSTDIR\firmware"
-  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_coptercontrol-${PACKAGE_LBL}.opfw"
-  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_pipxtreme-${PACKAGE_LBL}.opfw"
-  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_revomini-${PACKAGE_LBL}.opfw"
+  File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
 SectionEnd
 
 ; Copy utility files

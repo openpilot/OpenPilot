@@ -28,11 +28,11 @@ export OPENPILOT_IS_COOL := Fuck Yeah!
 .DEFAULT_GOAL := help
 
 # Set up some macros for common directories within the tree
-export ROOT_DIR  := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-export TOOLS_DIR := $(ROOT_DIR)/tools
-export BUILD_DIR := $(ROOT_DIR)/build
-export DL_DIR    := $(ROOT_DIR)/downloads
-export PKG_DIR   := $(ROOT_DIR)/build/package
+export ROOT_DIR    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
+export TOOLS_DIR   := $(ROOT_DIR)/tools
+export BUILD_DIR   := $(ROOT_DIR)/build
+export DL_DIR      := $(ROOT_DIR)/downloads
+export PACKAGE_DIR := $(ROOT_DIR)/build/package
 
 # Set up default build configurations (debug | release)
 GCS_BUILD_CONF		:= release
@@ -784,61 +784,61 @@ $(OPFW_RESOURCE): $(FW_TARGETS)
 	$(V1) $(MKDIR) -p $(dir $@)
 	$(V1) $(ECHO) $(QUOTE)$(OPFW_CONTENTS)$(QUOTE) > $@
 
+# If opfw_resource is requested, GCS should depend on it
+ifneq ($(strip $(filter opfw_resource,$(MAKECMDGOALS))),)
+    $(eval openpilotgcs: | opfw_resource)
+endif
+
 # Packaging targets: package, clean_package
 #  - removes build directory (clean_package only)
 #  - builds all firmware, opfw_resource, gcs
 #  - copies firmware into a package directory
 #  - calls paltform-specific packaging script
 
-export PKG_LABEL := $(shell $(VERSION_INFO) --format=\$${LABEL})
-export PKG_NAME  := OpenPilot
-export PKG_SEP   := -
+# Do some checks and define some values if package is requested
+ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
+    # Define some variables
+    export PACKAGE_LBL  := $(shell $(VERSION_INFO) --format=\$${LABEL})
+    export PACKAGE_NAME := OpenPilot
+    export PACKAGE_SEP  := -
 
-# Clean the build directory if clean_package is requested
-ifneq ($(strip $(filter clean_package,$(MAKECMDGOALS))),)
-    $(info Cleaning build directory before packaging...)
-    ifneq ($(shell $(MAKE) all_clean >/dev/null 2>&1 && $(ECHO) "clean"), clean)
-        $(error Cannot clean build directory)
+    # We can only package release builds
+    ifneq ($(GCS_BUILD_CONF),release)
+        $(error Packaging is currently supported for release builds only)
     endif
 
-.PHONY: clean_package
-clean_package: package
-endif
+    # Packaged GCS should depend on opfw_resource
+    ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
+        $(eval openpilotgcs: | opfw_resource)
+    endif
 
-# Make sure we package release build of GCS
-ifneq ($(GCS_BUILD_CONF),release)
-    $(error Packaging is currently supported for release builds only)
-endif
+    # Clean the build directory if clean_package is requested
+    ifneq ($(strip $(filter clean_package,$(MAKECMDGOALS))),)
+        $(info Cleaning build directory before packaging...)
+        ifneq ($(shell $(MAKE) all_clean >/dev/null 2>&1 && $(ECHO) "clean"), clean)
+            $(error Cannot clean build directory)
+        endif
 
-# Build GCS with embedded firmware if package or opfw_resource is requested
-ifneq ($(strip $(filter package clean_package opfw_resource,$(MAKECMDGOALS))),)
-    $(eval openpilotgcs: | opfw_resource)
+        .PHONY: clean_package
+        clean_package: package
+    endif
 endif
 
 # Copy file template. Empty line before the endef is required, do not remove
 define COPY_FW_FILES
-	$(V1) $(CP) "$(BUILD_DIR)/$(1)/$(1).opfw" "$(PKG_DIR)/firmware/$(1)$(PKG_SEP)$(PKG_LABEL).opfw"
+	$(V1) $(CP) "$(BUILD_DIR)/$(1)/$(1).opfw" "$(PACKAGE_DIR)/firmware/$(1)$(PACKAGE_SEP)$(PACKAGE_LBL).opfw"
 
 endef
 
 # Build and copy package files into the package directory
+# and call platform-specific packaging script
 .PHONY: package
-package: all_fw all_ground
-	$(V1) $(ECHO) "Packaging for $(UNAME) $(ARCH) into $(call toprel, $(PKG_DIR)) directory"
-	$(V1) [ ! -d "$(PKG_DIR)" ] || $(RM) -rf "$(PKG_DIR)"
-	$(V1) $(MKDIR) -p "$(PKG_DIR)/firmware"
+package: all_fw all_ground uavobjects_matlab
+	$(V1) $(ECHO) "Packaging for $(UNAME) $(ARCH) into $(call toprel, $(PACKAGE_DIR)) directory"
+	$(V1) [ ! -d "$(PACKAGE_DIR)" ] || $(RM) -rf "$(PACKAGE_DIR)"
+	$(V1) $(MKDIR) -p "$(PACKAGE_DIR)/firmware"
 	$(foreach fw_targ, $(FW_TARGETS), $(call COPY_FW_FILES,$(fw_targ)))
-
-# Call platform-specific packaging script
-
-
-
-
-
-
-
-
-
+	$(MAKE) --no-print-directory -C $(ROOT_DIR)/package --file=$(UNAME).mk $@
 
 ##############################
 #

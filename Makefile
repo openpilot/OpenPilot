@@ -410,18 +410,16 @@ define EF_TEMPLATE
 ef_$(1): ef_$(1)_bin
 
 ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/ef_$(1)/dep
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/ef_$(1)
 	$(V1) cd $(ROOT_DIR)/flight/targets/EntireFlash && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(3) \
 		BUILD_TYPE=ef \
-		TCHAIN_PREFIX="$(ARM_SDK_PREFIX)" \
 		DFU_CMD="$(DFUUTIL_DIR)/bin/dfu-util" \
-		\
-		TARGET=ef_$(1) \
+		TOPDIR=$(ROOT_DIR)/flight/targets/EntireFlash \
 		OUTDIR=$(BUILD_DIR)/ef_$(1) \
-		\
+		TARGET=ef_$(1) \
 		$$*
 
 .PHONY: ef_$(1)_clean

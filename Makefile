@@ -31,8 +31,8 @@ export OPENPILOT_IS_COOL := Fuck Yeah!
 export ROOT_DIR  := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 export TOOLS_DIR := $(ROOT_DIR)/tools
 export BUILD_DIR := $(ROOT_DIR)/build
-export PKG_DIR   := $(ROOT_DIR)/build/package
 export DL_DIR    := $(ROOT_DIR)/downloads
+export PKG_DIR   := $(ROOT_DIR)/build/package
 
 # Set up default build configurations (debug | release)
 GCS_BUILD_CONF		:= release
@@ -92,6 +92,7 @@ endif
 # Set up misc host tools
 export ECHO	:= echo
 export MKDIR	:= mkdir
+export CP	:= cp
 export RM	:= rm
 export LN	:= ln
 export CAT	:= cat
@@ -298,9 +299,9 @@ EF_TARGETS := $(addprefix ef_, $(EF_BOARDS))
 
 # When building any of the "all_*" targets, tell all sub makefiles to display
 # additional details on each line of output to describe which build and target
-# that each line applies to. The same applies also to opfw_resource and all
-# targets
-ifneq ($(strip $(filter all_% all opfw_resource,$(MAKECMDGOALS))),)
+# that each line applies to. The same applies also to all, opfw_resource,
+# package and clean_package targets
+ifneq ($(strip $(filter all_% all opfw_resource package clean_package,$(MAKECMDGOALS))),)
     export ENABLE_MSG_EXTRA := yes
 endif
 
@@ -783,13 +784,61 @@ $(OPFW_RESOURCE): $(FW_TARGETS)
 	$(V1) $(MKDIR) -p $(dir $@)
 	$(V1) $(ECHO) $(QUOTE)$(OPFW_CONTENTS)$(QUOTE) > $@
 
-.PHONY: package
-package:
-	$(V1) cd $@ && $(MAKE) --no-print-directory $@
+# Packaging targets: package, clean_package
+#  - removes build directory (clean_package only)
+#  - builds all firmware, opfw_resource, gcs
+#  - copies firmware into a package directory
+#  - calls paltform-specific packaging script
 
-.PHONY: package_resources
-package_resources:
-	$(V1) cd package && $(MAKE) --no-print-directory opfw_resource
+export PKG_LABEL := $(shell $(VERSION_INFO) --format=\$${LABEL})
+export PKG_NAME  := OpenPilot
+export PKG_SEP   := -
+
+# Clean the build directory if clean_package is requested
+ifneq ($(strip $(filter clean_package,$(MAKECMDGOALS))),)
+    $(info Cleaning build directory before packaging...)
+    ifneq ($(shell $(MAKE) all_clean >/dev/null 2>&1 && $(ECHO) "clean"), clean)
+        $(error Cannot clean build directory)
+    endif
+
+.PHONY: clean_package
+clean_package: package
+endif
+
+# Make sure we package release build of GCS
+ifneq ($(GCS_BUILD_CONF),release)
+    $(error Packaging is currently supported for release builds only)
+endif
+
+# Build GCS with embedded firmware if package or opfw_resource is requested
+ifneq ($(strip $(filter package clean_package opfw_resource,$(MAKECMDGOALS))),)
+    $(eval openpilotgcs: | opfw_resource)
+endif
+
+# Copy file template. Empty line before the endef is required, do not remove
+define COPY_FW_FILES
+	$(V1) $(CP) "$(BUILD_DIR)/$(1)/$(1).opfw" "$(PKG_DIR)/firmware/$(1)$(PKG_SEP)$(PKG_LABEL).opfw"
+
+endef
+
+# Build and copy package files into the package directory
+.PHONY: package
+package: all_fw all_ground
+	$(V1) $(ECHO) "Packaging for $(UNAME) $(ARCH) into $(call toprel, $(PKG_DIR)) directory"
+	$(V1) [ ! -d "$(PKG_DIR)" ] || $(RM) -rf "$(PKG_DIR)"
+	$(V1) $(MKDIR) -p "$(PKG_DIR)/firmware"
+	$(foreach fw_targ, $(FW_TARGETS), $(call COPY_FW_FILES,$(fw_targ)))
+
+# Call platform-specific packaging script
+
+
+
+
+
+
+
+
+
 
 ##############################
 #
@@ -906,8 +955,9 @@ help:
 	@$(ECHO) "                            supported groups are ($(UAVOBJ_TARGETS))"
 	@$(ECHO)
 	@$(ECHO) "   [Packaging]"
+	@$(ECHO) "     opfw_resource        - Generate resources to embed firmware binaries into the GCS"
+	@$(ECHO) "     clean_package        - Clean, build and package the OpenPilot platform-dependent package"
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package"
-	@$(ECHO) "                            with optional CLEAN_BUILD=YES|NO (default is YES)"
 	@$(ECHO)
 	@$(ECHO) "   Hint: Add V=1 to your command line to see verbose build output."
 	@$(ECHO)

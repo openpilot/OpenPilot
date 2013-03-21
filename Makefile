@@ -387,13 +387,13 @@ bu_$(1): bu_$(1)_opfw
 
 bu_$(1)_%: bl_$(1)_bino
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/bu_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/BootloaderUpdater && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/BootloaderUpdater && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(3) \
 		BUILD_TYPE=bu \
 		HWDEFSINC=$(HWDEFS)/$(1) \
-		TOPDIR=$(ROOT_DIR)/flight/targets/Bootloaders/BootloaderUpdater \
+		TOPDIR=$(ROOT_DIR)/flight/targets/BootloaderUpdater \
 		OUTDIR=$(BUILD_DIR)/bu_$(1) \
 		TARGET=bu_$(1) \
 		$$*

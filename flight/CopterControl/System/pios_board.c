@@ -222,6 +222,9 @@ void PIOS_Board_Init(void) {
 	   PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2)
 	{
 		 PIOS_FLASHFS_Format();
+		 PIOS_IAP_WriteBootCmd(0,0);
+		 PIOS_IAP_WriteBootCmd(1,0);
+		 PIOS_IAP_WriteBootCmd(2,0);
 	}
 	
 	HwSettingsInitialize();

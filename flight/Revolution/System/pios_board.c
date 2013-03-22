@@ -404,18 +404,31 @@ void PIOS_Board_Init(void) {
 	PIOS_Flash_Jedec_Init(pios_spi_flash_id, 0, &flash_m25p_cfg);
 #else
 	PIOS_Flash_Jedec_Init(pios_spi_accel_id, 1, &flash_m25p_cfg);
-#endif
 	PIOS_FLASHFS_Init(&flashfs_m25p_cfg);
+#endif
 
+		
+#if defined(PIOS_INCLUDE_RTC)
+	PIOS_RTC_Init(&pios_rtc_main_cfg);
+#endif
+	/* IAP System Setup */
+	PIOS_IAP_Init();
+	// check for safe mode commands from gcs
+	if(PIOS_IAP_ReadBootCmd(0) == PIOS_IAP_CLEAR_FLASH_CMD_0 &&
+	   PIOS_IAP_ReadBootCmd(1) == PIOS_IAP_CLEAR_FLASH_CMD_1 &&
+	   PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2)
+	{
+		 PIOS_FLASHFS_Format();
+		 PIOS_IAP_WriteBootCmd(0,0);
+		 PIOS_IAP_WriteBootCmd(1,0);
+		 PIOS_IAP_WriteBootCmd(2,0);
+	}
+	
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
 	
 	HwSettingsInitialize();
-	
-#if defined(PIOS_INCLUDE_RTC)
-	PIOS_RTC_Init(&pios_rtc_main_cfg);
-#endif
 
 	/* Initialize the alarms library */
 	AlarmsInitialize();
@@ -433,8 +446,6 @@ void PIOS_Board_Init(void) {
 	PIOS_TIM_InitClock(&tim_10_cfg);
 	PIOS_TIM_InitClock(&tim_11_cfg);
 
-	/* IAP System Setup */
-	PIOS_IAP_Init();
 	uint16_t boot_count = PIOS_IAP_ReadBootCount();
 	if (boot_count < 3) {
 		PIOS_IAP_WriteBootCount(++boot_count);

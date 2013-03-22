@@ -36,7 +36,15 @@
 /****************************************************************************************
  *  Private Definitions/Macros
  ****************************************************************************************/
-
+#if defined(STM32F4XX)
+#define ReadBackupRegister RTC_ReadBackupRegister
+#define WriteBackupRegister RTC_WriteBackupRegister
+#elif defined(STM32F10X_MD) || defined(STM32F10X_HD)
+#define ReadBackupRegister BKP_ReadBackupRegister
+#define WriteBackupRegister BKP_WriteBackupRegister
+#else
+#error non supported architecture for pios_IAP
+#endif
 /* these definitions reside here for protection and privacy. */
 #define IAP_MAGIC_WORD_1	0x1122
 #define IAP_MAGIC_WORD_2	0xAA55
@@ -73,17 +81,34 @@ const uint16_t pios_iap_cmd_list[] =
  */
 void PIOS_IAP_Init( void )
 {
+
+#if  defined(STM32F10X_MD) || defined(STM32F10X_HD)
 	/* Enable CRC clock */
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
 
 	/* Enable PWR and BKP clock */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_AHB1Periph_BKPSRAM, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
+
+	/* Enable write access to Backup domain */
+	PWR_BackupAccessCmd(ENABLE);
+
+	/* Clear Tamper pin Event(TE) pending flag */
+	BKP_ClearFlag();
+#elif defined (STM32F4XX)
+	/* Enable CRC clock */
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC | RCC_AHB1Periph_BKPSRAM, ENABLE);
+
+	/* Enable PWR and BKP clock */
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
 
 	/* Enable write access to Backup domain */
 	PWR_BackupAccessCmd(ENABLE);
 
 	/* Clear Tamper pin Event(TE) pending flag */
 	RTC_ClearFlag(RTC_FLAG_TAMP1F);
+#else
+#error non supported architecture for pios_IAP
+#endif
 }
 
 /*!
@@ -100,8 +125,8 @@ uint32_t	PIOS_IAP_CheckRequest( void )
 	uint16_t	reg1;
 	uint16_t	reg2;
 
-	reg1 = RTC_ReadBackupRegister( MAGIC_REG_1 );
-	reg2 = RTC_ReadBackupRegister( MAGIC_REG_2 );
+	reg1 = ReadBackupRegister( MAGIC_REG_1 );
+	reg2 = ReadBackupRegister( MAGIC_REG_2 );
 
 	if( reg1 == IAP_MAGIC_WORD_1 && reg2 == IAP_MAGIC_WORD_2 ) {
 		// We have a match.
@@ -122,29 +147,30 @@ uint32_t	PIOS_IAP_CheckRequest( void )
  */
 void	PIOS_IAP_SetRequest1(void)
 {
-	RTC_WriteBackupRegister( MAGIC_REG_1, IAP_MAGIC_WORD_1);
+	WriteBackupRegister( MAGIC_REG_1, IAP_MAGIC_WORD_1);
 }
 
 void	PIOS_IAP_SetRequest2(void)
 {
-	RTC_WriteBackupRegister( MAGIC_REG_2, IAP_MAGIC_WORD_2);
+	WriteBackupRegister( MAGIC_REG_2, IAP_MAGIC_WORD_2);
 }
 
 void	PIOS_IAP_ClearRequest(void)
 {
-	RTC_WriteBackupRegister( MAGIC_REG_1, 0);
-	RTC_WriteBackupRegister( MAGIC_REG_2, 0);
+	WriteBackupRegister( MAGIC_REG_1, 0);
+	WriteBackupRegister( MAGIC_REG_2, 0);
 }
 
 uint16_t PIOS_IAP_ReadBootCount(void)
 {
-	return RTC_ReadBackupRegister ( IAP_BOOTCOUNT );
+	return ReadBackupRegister ( IAP_BOOTCOUNT );
 }
 
 void PIOS_IAP_WriteBootCount (uint16_t boot_count)
 {
-	RTC_WriteBackupRegister ( IAP_BOOTCOUNT, boot_count );
+	WriteBackupRegister ( IAP_BOOTCOUNT, boot_count );
 }
+
 /**
   * @brief  Return one of the IAP command values passed from bootloader.
   * @param  number: the index of the command value (0..2).
@@ -158,7 +184,7 @@ uint32_t PIOS_IAP_ReadBootCmd(uint8_t number)
 	}
 	else
 	{
-		return RTC_ReadBackupRegister(pios_iap_cmd_list[number]);
+		return ReadBackupRegister(pios_iap_cmd_list[number]);
 	}	
 }
 
@@ -175,6 +201,6 @@ void PIOS_IAP_WriteBootCmd(uint8_t number, uint32_t value)
 	}
 	else
 	{
-		RTC_WriteBackupRegister(pios_iap_cmd_list[number], value);
+		WriteBackupRegister(pios_iap_cmd_list[number], value);
 	}	
 }

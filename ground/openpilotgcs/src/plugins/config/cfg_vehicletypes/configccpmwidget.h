@@ -27,12 +27,13 @@
 #ifndef CONFIGccpmWIDGET_H
 #define CONFIGccpmWIDGET_H
 
+#include "cfg_vehicletypes/vehicleconfig.h"
 #include "ui_ccpm.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
-#include "cfg_vehicletypes/vehicleconfig.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
 #include <QGraphicsEllipseItem>
@@ -63,66 +64,67 @@ public:
     friend class ConfigVehicleTypeWidget;
 
 private:
-        Ui_ccpmWidget *m_ccpm;
-        QGraphicsSvgItem *SwashplateImg;
-        QGraphicsSvgItem *CurveImg;
-        QGraphicsSvgItem *Servos[CCPM_MAX_SWASH_SERVOS];
-        QGraphicsTextItem *ServosText[CCPM_MAX_SWASH_SERVOS];
-        QGraphicsLineItem *ServoLines[CCPM_MAX_SWASH_SERVOS];
-        QGraphicsEllipseItem *ServosTextCircles[CCPM_MAX_SWASH_SERVOS];
-        QSpinBox *SwashLvlSpinBoxes[CCPM_MAX_SWASH_SERVOS];
+    Ui_ccpmWidget *m_ccpm;
+    QGraphicsSvgItem *SwashplateImg;
+    QGraphicsSvgItem *CurveImg;
+    QGraphicsSvgItem *Servos[CCPM_MAX_SWASH_SERVOS];
+    QGraphicsTextItem *ServosText[CCPM_MAX_SWASH_SERVOS];
+    QGraphicsLineItem *ServoLines[CCPM_MAX_SWASH_SERVOS];
+    QGraphicsEllipseItem *ServosTextCircles[CCPM_MAX_SWASH_SERVOS];
+    QSpinBox *SwashLvlSpinBoxes[CCPM_MAX_SWASH_SERVOS];
 
-        QString TypeText;
+    QString TypeText;
 
-        bool SwashLvlConfigurationInProgress;
-        UAVObject::Metadata SwashLvlaccInitialData;
-        int SwashLvlState;
-        int SwashLvlServoInterlock;
+    bool SwashLvlConfigurationInProgress;
+    UAVObject::Metadata SwashLvlaccInitialData;
+    int SwashLvlState;
+    int SwashLvlServoInterlock;
 
-        SwashplateServoSettingsStruct oldSwashLvlConfiguration;
-        SwashplateServoSettingsStruct newSwashLvlConfiguration;
+    SwashplateServoSettingsStruct oldSwashLvlConfiguration;
+    SwashplateServoSettingsStruct newSwashLvlConfiguration;
 
-        int MixerChannelData[6];
-        int ShowDisclaimer(int messageID);
-        virtual void enableControls(bool enable) { Q_UNUSED(enable)}; // Not used by this widget
+    int MixerChannelData[6];
+    int ShowDisclaimer(int messageID);
+    virtual void enableControls(bool enable) { Q_UNUSED(enable)}; // Not used by this widget
 
-        bool updatingFromHardware;
-        bool updatingToHardware;
+    bool updatingFromHardware;
+    bool updatingToHardware;
 
-        virtual void ResetActuators(GUIConfigDataUnion* configData);
-        static QStringList getChannelDescriptions();
+    virtual void ResetActuators(GUIConfigDataUnion* configData);
+    static QStringList getChannelDescriptions();
 
-        QString updateConfigObjects();
-    private slots:
-        virtual void setupUI(QString airframeType);
-        virtual void refreshWidgetsValues(QString frameType);
-        virtual QString updateConfigObjectsFromWidgets();
-        virtual bool throwConfigError(QString airframeType);
+    QString updateConfigObjects();
 
-        void ccpmSwashplateUpdate();
-        void ccpmSwashplateRedraw();
-        void UpdateMixer();
-        void UpdateType();
+private slots:
+    virtual void setupUI(QString airframeType);
+    virtual void refreshWidgetsValues(QString frameType);
+    virtual QString updateConfigObjectsFromWidgets();
+    virtual bool throwConfigError(QString airframeType);
 
-        void SwashLvlStartButtonPressed();
-        void SwashLvlNextButtonPressed();
-        void SwashLvlCancelButtonPressed();
-        void SwashLvlFinishButtonPressed();
+    void ccpmSwashplateUpdate();
+    void ccpmSwashplateRedraw();
+    void UpdateMixer();
+    void UpdateType();
 
-        //void UpdateCCPMOptionsFromUI();
-        //void UpdateCCPMUIFromOptions();
+    void SwashLvlStartButtonPressed();
+    void SwashLvlNextButtonPressed();
+    void SwashLvlCancelButtonPressed();
+    void SwashLvlFinishButtonPressed();
 
-        void SetUIComponentVisibilities();
+    //void UpdateCCPMOptionsFromUI();
+    //void UpdateCCPMUIFromOptions();
 
-        void enableSwashplateLevellingControl(bool state);
-        void setSwashplateLevel(int percent);
-        void SwashLvlSpinBoxChanged(int value);
-        virtual void refreshValues() {}; // Not used
+    void SetUIComponentVisibilities();
 
-    public slots:
-        void getMixer();
-        void setMixer();
-        void saveccpmUpdate();
+    void enableSwashplateLevellingControl(bool state);
+    void setSwashplateLevel(int percent);
+    void SwashLvlSpinBoxChanged(int value);
+    virtual void refreshValues() {}; // Not used
+
+public slots:
+    void getMixer();
+    void setMixer();
+    void saveccpmUpdate();
 
 protected:
     void showEvent(QShowEvent *event);

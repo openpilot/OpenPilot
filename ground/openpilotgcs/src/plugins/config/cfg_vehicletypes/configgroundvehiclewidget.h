@@ -27,12 +27,14 @@
 #ifndef CONFIGGROUNDVEHICLEWIDGET_H
 #define CONFIGGROUNDVEHICLEWIDGET_H
 
-#include "ui_airframe.h"
+#include "cfg_vehicletypes/vehicleconfig.h"
+#include "ui_airframe_ground.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavtalk/telemetrymanager.h"
+
 #include <QtGui/QWidget>
 #include <QList>
 #include <QItemDelegate>
@@ -44,13 +46,13 @@ class ConfigGroundVehicleWidget: public VehicleConfig
     Q_OBJECT
 
 public:
-    ConfigGroundVehicleWidget(Ui_AircraftWidget *aircraft = 0, QWidget *parent = 0);
+    ConfigGroundVehicleWidget(Ui_GroundConfigWidget *aircraft = 0, QWidget *parent = 0);
     ~ConfigGroundVehicleWidget();
 
     friend class ConfigVehicleTypeWidget;
 
 private:
-    Ui_AircraftWidget *m_aircraft;
+    Ui_GroundConfigWidget *m_aircraft;
 
     bool setupGroundVehicleCar(QString airframeType);
     bool setupGroundVehicleDifferential(QString airframeType);
@@ -64,7 +66,6 @@ private slots:
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
     virtual bool throwConfigError(QString airframeType);
-
 
 protected:
 

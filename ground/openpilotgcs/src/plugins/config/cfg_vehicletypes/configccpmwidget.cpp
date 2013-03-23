@@ -25,6 +25,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configccpmwidget.h"
+#include "mixersettings.h"
+#include "systemsettings.h"
+#include "actuatorcommand.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -35,10 +38,6 @@
 #include <QBrush>
 #include <math.h>
 #include <QMessageBox>
-
-#include "mixersettings.h"
-#include "systemsettings.h"
-#include "actuatorcommand.h"
 
 #define  Pi 3.14159265358979323846
 

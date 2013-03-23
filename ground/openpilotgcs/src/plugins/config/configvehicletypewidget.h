@@ -34,11 +34,17 @@
 #include "uavobject.h"
 #include "uavtalk/telemetrymanager.h"
 
+#include "cfg_vehicletypes/vehicleconfig.h"
 #include "cfg_vehicletypes/configccpmwidget.h"
 #include "cfg_vehicletypes/configfixedwingwidget.h"
-#include "cfg_vehicletypes/configmultirotorwidget.h"
 #include "cfg_vehicletypes/configgroundvehiclewidget.h"
-#include "cfg_vehicletypes/vehicleconfig.h"
+#include "cfg_vehicletypes/configmultirotorwidget.h"
+
+#include "ui_airframe_ccpm.h"
+#include "ui_airframe_fixedwing.h"
+#include "ui_airframe_ground.h"
+#include "ui_airframe_multirotor.h"
+#include "ui_airframe_custom.h"
 
 #include <QtGui/QWidget>
 #include <QList>
@@ -59,6 +65,12 @@ public:
 private:
     Ui_AircraftWidget *m_aircraft;
 
+    Ui_CcpmConfigWidget *m_ccpmUi;
+    Ui_FixedWingConfigWidget *m_fixedwingUi;
+    Ui_MultiRotorConfigWidget *m_multirotorUi;
+    Ui_GroundConfigWidget *m_groundUi;
+    Ui_CustomConfigWidget *m_customUi;
+
     ConfigCcpmWidget *m_heli;
     ConfigFixedWingWidget *m_fixedwing;
     ConfigMultiRotorWidget *m_multirotor;
@@ -66,7 +78,7 @@ private:
 
     void updateCustomAirframeUI();
     void addToDirtyMonitor();
-    void resetField(UAVObjectField * field);
+    void resetField(UAVObjectField *field);
 
     //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
 
@@ -81,10 +93,10 @@ private:
 
 private slots:
 
-    virtual void refreshWidgetsValues(UAVObject * o=NULL);
+    virtual void refreshWidgetsValues(UAVObject *o = NULL);
     virtual void updateObjectsFromWidgets();
 
-    void setComboCurrentIndex(QComboBox* box, int index);
+    void setComboCurrentIndex(QComboBox *box, int index);
 
     void setupAirframeUI(QString type);
 	
@@ -102,6 +114,7 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 
+
 };
 
 class SpinBoxDelegate : public QItemDelegate
@@ -111,15 +124,12 @@ class SpinBoxDelegate : public QItemDelegate
 public:
     SpinBoxDelegate(QObject *parent = 0);
 
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-                          const QModelIndex &index) const;
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model,
-                      const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 
-    void updateEditorGeometry(QWidget *editor,
-        const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
 #endif // CONFIGVEHICLETYPEWIDGET_H

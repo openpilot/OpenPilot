@@ -25,8 +25,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configfixedwingwidget.h"
-#include "configvehicletypewidget.h"
+//#include "configvehicletypewidget.h"
 #include "mixersettings.h"
+#include "systemsettings.h"
+#include "actuatorsettings.h"
+#include "actuatorcommand.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -38,16 +41,10 @@
 #include <math.h>
 #include <QMessageBox>
 
-#include "mixersettings.h"
-#include "systemsettings.h"
-#include "actuatorsettings.h"
-#include "actuatorcommand.h"
-
-
 /**
  Constructor
  */
-ConfigFixedWingWidget::ConfigFixedWingWidget(Ui_AircraftWidget *aircraft, QWidget *parent) : VehicleConfig(parent)
+ConfigFixedWingWidget::ConfigFixedWingWidget(Ui_FixedWingConfigWidget *aircraft, QWidget *parent) : VehicleConfig(parent)
 {
     m_aircraft = aircraft;    
 }
@@ -60,7 +57,6 @@ ConfigFixedWingWidget::~ConfigFixedWingWidget()
    // Do nothing
 }
 
-
 /**
  Virtual function to setup the UI
  */
@@ -70,7 +66,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
 
 	if (frameType == "FixedWing" || frameType == "Elevator aileron rudder") {
         // Setup the UI
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
+        //setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(true);
         m_aircraft->fwRudder1Label->setEnabled(true);
@@ -92,7 +88,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonMixBox->setHidden(true);
 		
     } else if (frameType == "FixedWingElevon" || frameType == "Elevon") {
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
+        //setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevon"));
         m_aircraft->fwAileron1Label->setText("Elevon 1");
         m_aircraft->fwAileron2Label->setText("Elevon 2");
@@ -111,7 +107,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonLabel2->setText("Pitch");
 		
 	} else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
+        //setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Vtail"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(false);
         m_aircraft->fwRudder1Label->setEnabled(false);

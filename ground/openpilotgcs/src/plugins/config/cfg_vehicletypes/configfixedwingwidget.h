@@ -27,12 +27,14 @@
 #ifndef CONFIGFIXEDWINGWIDGET_H
 #define CONFIGFIXEDWINGWIDGET_H
 
-#include "ui_airframe.h"
+#include "cfg_vehicletypes/vehicleconfig.h"
+#include "ui_airframe_fixedwing.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavtalk/telemetrymanager.h"
+
 #include <QtGui/QWidget>
 #include <QList>
 #include <QItemDelegate>
@@ -44,13 +46,13 @@ class ConfigFixedWingWidget: public VehicleConfig
     Q_OBJECT
 
 public:
-    ConfigFixedWingWidget(Ui_AircraftWidget *aircraft = 0, QWidget *parent = 0);
+    ConfigFixedWingWidget(Ui_FixedWingConfigWidget *aircraft = 0, QWidget *parent = 0);
     ~ConfigFixedWingWidget();
 
     friend class ConfigVehicleTypeWidget;
 
 private:
-    Ui_AircraftWidget *m_aircraft;
+    Ui_FixedWingConfigWidget *m_aircraft;
 
     bool setupFrameFixedWing(QString airframeType);
     bool setupFrameElevon(QString airframeType);

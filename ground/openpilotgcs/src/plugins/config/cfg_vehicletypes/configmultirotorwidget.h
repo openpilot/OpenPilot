@@ -27,14 +27,14 @@
 #ifndef CONFIGMULTIROTORWIDGET_H
 #define CONFIGMULTIROTORWIDGET_H
 
-#include "ui_airframe.h"
-#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "cfg_vehicletypes/vehicleconfig.h"
-
+#include "ui_airframe_multirotor.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavtalk/telemetrymanager.h"
+
 #include <QtGui/QWidget>
 #include <QList>
 #include <QItemDelegate>
@@ -46,13 +46,13 @@ class ConfigMultiRotorWidget: public VehicleConfig
     Q_OBJECT
 
 public:
-    ConfigMultiRotorWidget(Ui_AircraftWidget *aircraft = 0, QWidget *parent = 0);
+    ConfigMultiRotorWidget(Ui_MultiRotorConfigWidget *aircraft = 0, QWidget *parent = 0);
     ~ConfigMultiRotorWidget();
 
     friend class ConfigVehicleTypeWidget;
 
 private:
-    Ui_AircraftWidget *m_aircraft;
+    Ui_MultiRotorConfigWidget *m_aircraft;
 
     QWidget *uiowner;
     QGraphicsSvgItem *quad;

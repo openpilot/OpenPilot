@@ -25,8 +25,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configgroundvehiclewidget.h"
-#include "configvehicletypewidget.h"
+//#include "configvehicletypewidget.h"
 #include "mixersettings.h"
+#include "systemsettings.h"
+#include "actuatorsettings.h"
+#include "actuatorcommand.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -38,23 +41,11 @@
 #include <math.h>
 #include <QMessageBox>
 
-#include "mixersettings.h"
-#include "systemsettings.h"
-#include "actuatorsettings.h"
-#include "actuatorcommand.h"
-
-
-/**
- Constructor
- */
-ConfigGroundVehicleWidget::ConfigGroundVehicleWidget(Ui_AircraftWidget *aircraft, QWidget *parent) : VehicleConfig(parent)
+ConfigGroundVehicleWidget::ConfigGroundVehicleWidget(Ui_GroundConfigWidget *aircraft, QWidget *parent) : VehicleConfig(parent)
 {
     m_aircraft = aircraft;
 }
 
-/**
- Destructor
- */
 ConfigGroundVehicleWidget::~ConfigGroundVehicleWidget()
 {
    // Do nothing
@@ -68,7 +59,7 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
 	m_aircraft->differentialSteeringMixBox->setHidden(true);			
 	//STILL NEEDS WORK
 	// Setup the UI
-    setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Ground"));
+    //setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Ground"));
 	
 	m_aircraft->gvEngineChannelBox->setEnabled(false);
 	m_aircraft->gvEngineLabel->setEnabled(false);

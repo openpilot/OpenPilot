@@ -553,6 +553,23 @@ int DFUObject::JumpToApp(bool safeboot, bool erase)
 		buf[20] = 0x00;
 		buf[21] = 0x00;
 	}
+	else
+	{
+		buf[10] = 0x00;
+		buf[11] = 0x00;
+		buf[12] = 0x00;
+		buf[13] = 0x00;
+
+		buf[14] = 0x00;
+		buf[15] = 0x00;
+		buf[16] = 0x00;
+		buf[17] = 0x00;
+
+		buf[18] = 0x00;
+		buf[19] = 0x00;
+		buf[20] = 0x00;
+		buf[21] = 0x00;
+	}
 
     return sendData(buf, BUF_LEN);
 }

@@ -3,6 +3,7 @@
  *
  * @file       pios.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     PhoenixPilot, http://github.com/PhoenixPilot, Copyright (C) 2012
  * @brief      Main PiOS header. 
  *                 - Central header for the project.
  * @see        The GNU Public License (GPL) Version 3
@@ -156,8 +157,8 @@
 #endif
 
 #if defined(PIOS_INCLUDE_FLASH)
-#include <pios_flash_jedec.h>
-#include <pios_flashfs_objlist.h>
+#include <pios_flash.h>
+#include <pios_flashfs.h>
 #endif
 
 #if defined(PIOS_INCLUDE_BL_HELPER)

@@ -31,6 +31,21 @@ $(foreach var, $(SANITIZE_GCC_VARS), $(eval $(call SANITIZE_VAR,$(var),disallowe
 SANITIZE_DEPRECATED_VARS := USE_BOOTLOADER
 $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),deprecated)))
 
+# Deal with unreasonable requests
+# See: http://xkcd.com/149/
+ifeq ($(MAKECMDGOALS),me a sandwich)
+ ifeq ($(shell whoami),root)
+ $(error Okay)
+ else
+ $(error What? Make it yourself)
+ endif
+endif
+
+# Make sure this isn't being run as root
+ifeq ($(shell whoami),root)
+$(error You should not be running this as root)
+endif
+
 # Decide on a verbosity level based on the V= parameter
 export AT := @
 
@@ -43,14 +58,17 @@ export V1    := $(AT)
 else ifeq ($(V), 1)
 endif
 
+# Make sure we know a few things about the architecture before including
+# the tools.mk to ensure that we download/install the right tools.
+UNAME := $(shell uname)
+ARCH := $(shell uname -m)
+
 include $(ROOT_DIR)/make/tools.mk
 
 # We almost need to consider autoconf/automake instead of this
 # I don't know if windows supports uname :-(
 QT_SPEC=win32-g++
 UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/debug/uavobjgenerator.exe"
-UNAME := $(shell uname)
-ARCH := $(shell uname -m)
 ifeq ($(UNAME), Linux)
   QT_SPEC=linux-g++
   UAVOBJGENERATOR="$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
@@ -98,6 +116,10 @@ help:
 	@echo "     all_<board>          - Build all available images for <board>"
 	@echo "     all_<board>_clean    - Remove all available images for <board>"
 	@echo
+	@echo "     all_ut               - Build all unit tests"
+	@echo "     all_ut_tap           - Run all unit tests and capture all TAP output to files"
+	@echo "     all_ut_run           - Run all unit tests and dump TAP output to console"
+	@echo
 	@echo "   [Firmware]"
 	@echo "     <board>              - Build firmware for <board>"
 	@echo "                            supported boards are ($(ALL_BOARDS))"
@@ -120,6 +142,10 @@ help:
 	@echo "   [Unbrick a board]"
 	@echo "     unbrick_<board>      - Use the STM32's built in boot ROM to write a bootloader to <board>"
 	@echo "                            supported boards are ($(BL_BOARDS))"
+	@echo "   [Unittests]"
+	@echo "     ut_<test>            - Build unit test <test>"
+	@echo "     ut_<test>_tap        - Run test and capture TAP output into a file"
+	@echo "     ut_<test>_run        - Run test and dump TAP output to console"
 	@echo
 	@echo "   [Simulation]"
 	@echo "     sim_osx              - Build OpenPilot simulation firmware for OSX"
@@ -167,10 +193,10 @@ $(BUILD_DIR):
 ##############################
 
 ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && echo "exists"), exists)
-  QMAKE=$(QT_SDK_DIR)/Desktop/Qt/4.8.1/gcc/bin/qmake
+  QMAKE = $(QT_SDK_QMAKE_PATH)
 else
   # not installed, hope it's in the path...
-  QMAKE=qmake
+  QMAKE = qmake
 endif
 
 ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && echo "exists"), exists)
@@ -708,6 +734,78 @@ sim_osx_%: uavobjects_flight
 	$(V1) mkdir -p $(BUILD_DIR)/sim_osx
 	$(V1) $(MAKE) --no-print-directory \
 		-C $(ROOT_DIR)/flight/targets/Revolution --file=$(ROOT_DIR)/flight/targets/Revolution/Makefile.osx $*
+
+
+##############################
+#
+# Unit Tests
+#
+##############################
+
+ALL_UNITTESTS := logfs
+
+UT_OUT_DIR := $(BUILD_DIR)/unit_tests
+
+$(UT_OUT_DIR):
+	$(V1) mkdir -p $@
+
+.PHONY: all_ut
+all_ut: $(addsuffix _elf, $(addprefix ut_, $(ALL_UNITTESTS)))
+
+.PHONY: all_ut_xml
+all_ut_xml: $(addsuffix _xml, $(addprefix ut_, $(ALL_UNITTESTS)))
+
+.PHONY: all_ut_run
+all_ut_run: $(addsuffix _run, $(addprefix ut_, $(ALL_UNITTESTS)))
+
+.PHONY: all_ut_clean
+all_ut_clean:
+	$(V0) @echo " CLEAN      $@"
+	$(V1) [ ! -d "$(UT_OUT_DIR)" ] || $(RM) -r "$(UT_OUT_DIR)"
+
+# $(1) = Unit test name
+define UT_TEMPLATE
+.PHONY: ut_$(1)
+ut_$(1): ut_$(1)_run
+
+ut_$(1)_%: $$(UT_OUT_DIR)
+	$(V1) mkdir -p $(UT_OUT_DIR)/$(1)
+	$(V1) cd $(ROOT_DIR)/flight/tests/$(1) && \
+		$$(MAKE) -r --no-print-directory \
+		BUILD_TYPE=ut \
+		BOARD_SHORT_NAME=$(1) \
+		TCHAIN_PREFIX="" \
+		REMOVE_CMD="$(RM)" \
+		\
+		TARGET=$(1) \
+		OUTDIR="$(UT_OUT_DIR)/$(1)" \
+		\
+		PIOS=$(PIOS) \
+		OPUAVOBJ=$(OPUAVOBJ) \
+		OPUAVTALK=$(OPUAVTALK) \
+		FLIGHTLIB=$(FLIGHTLIB) \
+		\
+		GTEST_DIR=$(GTEST_DIR) \
+		\
+		$$*
+
+.PHONY: ut_$(1)_clean
+ut_$(1)_clean:
+	$(V0) @echo " CLEAN      $(1)"
+	$(V1) [ ! -d "$(UT_OUT_DIR)/$(1)" ] || $(RM) -r "$(UT_OUT_DIR)/$(1)"
+
+endef
+
+# Expand the unittest rules
+$(foreach ut, $(ALL_UNITTESTS), $(eval $(call UT_TEMPLATE,$(ut))))
+
+# Disable parallel make when the all_ut_run target is requested otherwise the TAP
+# output is interleaved with the rest of the make output.
+ifneq ($(strip $(filter all_ut_run,$(MAKECMDGOALS))),)
+.NOTPARALLEL:
+$(info *NOTE*     Parallel make disabled by all_ut_run target so we have sane console output)
+endif
+
 ##############################
 #
 # Packaging components

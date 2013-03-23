@@ -1,15 +1,13 @@
 /**
  ******************************************************************************
+ * @file       board_hw_defs.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @author     PhoenixPilot, http://github.com/PhoenixPilot, Copyright (C) 2012
  * @addtogroup OpenPilotSystem OpenPilot System
  * @{
  * @addtogroup OpenPilotCore OpenPilot Core
  * @{
- *
- * @file       board_hw_defs.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      Defines board specific static initializers for hardware for the OpenPilot board.
- * @see        The GNU Public License (GPL) Version 3
- *
+ * @brief Defines board specific static initializers for hardware for the CopterControl board.
  *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
@@ -400,6 +398,52 @@ void PIOS_SPI_flash_accel_irq_handler(void)
 }
 
 #endif	/* PIOS_INCLUDE_SPI */
+
+#if defined(PIOS_INCLUDE_FLASH)
+#include "pios_flashfs_logfs_priv.h"
+#include "pios_flash_jedec_priv.h"
+
+static const struct flashfs_logfs_cfg flashfs_w25x_cfg = {
+	.fs_magic      = 0x99abcdef,
+	.total_fs_size = 0x00080000, /* 512K bytes (128 sectors = entire chip) */
+	.arena_size    = 0x00010000, /* 256 * slot size */
+	.slot_size     = 0x00000100, /* 256 bytes */
+
+	.start_offset  = 0,	     /* start at the beginning of the chip */
+	.sector_size   = 0x00001000, /* 4K bytes */
+	.page_size     = 0x00000100, /* 256 bytes */
+};
+
+static const struct pios_flash_jedec_cfg flash_w25x_cfg = {
+	.expect_manufacturer = JEDEC_MANUFACTURER_WINBOND,
+	.expect_memorytype   = 0x30,
+	.expect_capacity     = 0x13,
+	.sector_erase        = 0x20,
+	.chip_erase          = 0x60
+};
+
+static const struct flashfs_logfs_cfg flashfs_m25p_cfg = {
+	.fs_magic      = 0x99abceef,
+	.total_fs_size = 0x00200000, /* 2M bytes (32 sectors = entire chip) */
+	.arena_size    = 0x00010000, /* 256 * slot size */
+	.slot_size     = 0x00000100, /* 256 bytes */
+
+	.start_offset  = 0,	     /* start at the beginning of the chip */
+	.sector_size   = 0x00010000, /* 64K bytes */
+	.page_size     = 0x00000100, /* 256 bytes */
+};
+
+static const struct pios_flash_jedec_cfg flash_m25p_cfg = {
+	.expect_manufacturer = JEDEC_MANUFACTURER_ST,
+	.expect_memorytype   = 0x20,
+	.expect_capacity     = 0x15,
+	.sector_erase        = 0xD8,
+	.chip_erase          = 0xC7,
+};
+
+#include "pios_flash.h"
+
+#endif	/* PIOS_INCLUDE_FLASH */
 
 /*
  * ADC system

@@ -14,10 +14,12 @@ QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-v1.2.1
 # Choose the appropriate installer based on host architecture
 ifneq (,$(filter $(ARCH), x86_64 amd64))
 # 64-bit
+QT_SDK_QMAKE_PATH := $(QT_SDK_DIR)/Desktop/Qt/4.8.1/gcc/bin/qmake
 qt_sdk_install: QT_SDK_FILE := QtSdk-offline-linux-x86_64-v1.2.1.run
 qt_sdk_install: QT_SDK_URL := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/14b2039c-0e1f-4774-a4f2-9aa60b6d5313/Qt_SDK_Lin64_offline
 else
 # 32-bit
+QT_SDK_QMAKE_PATH := $(QT_SDK_DIR)/Desktop/Qt/4.8.1/gcc/bin/qmake
 qt_sdk_install: QT_SDK_URL  := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/8ea74da4-fec1-4277-8b26-c58cc82e204b/Qt_SDK_Lin32_offline
 qt_sdk_install: QT_SDK_FILE := QtSdk-offline-linux-x86-v1.2.1.run
 endif
@@ -315,4 +317,27 @@ android_sdk_clean:
 android_sdk_update:
 	$(V0) @echo " UPDATE       $(ANDROID_SDK_DIR)"
 	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-16,addon-google_apis-google-16
+
+# Set up Google Test (gtest) tools
+GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
+
+.PHONY: gtest_install
+gtest_install: | $(DL_DIR) $(TOOLS_DIR)
+gtest_install: GTEST_URL  := http://googletest.googlecode.com/files/gtest-1.6.0.zip
+gtest_install: GTEST_FILE := $(notdir $(GTEST_URL))
+gtest_install: gtest_clean
+        # download the file unconditionally since google code gives back 404
+        # for HTTP HEAD requests which are used when using the wget -N option
+	$(V1) [ ! -f "$(DL_DIR)/$(GTEST_FILE)" ] || $(RM) -f "$(DL_DIR)/$(GTEST_FILE)"
+	$(V1) wget -P "$(DL_DIR)" --trust-server-name "$(GTEST_URL)"
+
+        # extract the source
+	$(V1) [ ! -d "$(GTEST_DIR)" ] || $(RM) -rf "$(GTEST_DIR)"
+	$(V1) mkdir -p "$(GTEST_DIR)"
+	$(V1) unzip -q -d "$(TOOLS_DIR)" "$(DL_DIR)/$(GTEST_FILE)"
+
+.PHONY: gtest_clean
+gtest_clean:
+	$(V0) @echo " CLEAN        $(GTEST_DIR)"
+	$(V1) [ ! -d "$(GTEST_DIR)" ] || $(RM) -rf "$(GTEST_DIR)"
 

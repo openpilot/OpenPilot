@@ -1,15 +1,13 @@
 /**
- ******************************************************************************
+ *****************************************************************************
+ * @file       pios_board.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     PhoenixPilot, http://github.com/PhoenixPilot, Copyright (C) 2012
  * @addtogroup OpenPilotSystem OpenPilot System
  * @{
  * @addtogroup OpenPilotCore OpenPilot Core
  * @{
- *
- * @file       pios_board.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Defines board specific static initializers for hardware for the OpenPilot board.
- * @see        The GNU Public License (GPL) Version 3
- *
+ * @brief Defines board specific static initializers for hardware for the CopterControl board.
  *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 
@@ -34,14 +32,14 @@
  *
  * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
  */
-#include "board_hw_defs.c"
 
-#include <pios.h>
 #include <openpilot.h>
 #include <uavobjectsinit.h>
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
+
+#include "board_hw_defs.c"
 
 
 /* One slot per selectable receiver group.
@@ -127,33 +125,6 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
 
-static const struct flashfs_cfg flashfs_w25x_cfg = {
-	.table_magic = 0x85FB3C35,
-	.obj_magic = 0x3015AE71,
-	.obj_table_start = 0x00000010,
-	.obj_table_end = 0x00001000,
-	.sector_size = 0x00001000,
-	.chip_size = 0x00080000,
-};
-
-static const struct pios_flash_jedec_cfg flash_w25x_cfg = {
-	.sector_erase = 0x20,
-	.chip_erase = 0x60
-};
-
-static const struct flashfs_cfg flashfs_m25p_cfg = {
-	.table_magic = 0x85FB3D35,
-	.obj_magic = 0x3015A371,
-	.obj_table_start = 0x00000010,
-	.obj_table_end = 0x00010000,
-	.sector_size = 0x00010000,
-	.chip_size = 0x00200000,
-};
-
-static const struct pios_flash_jedec_cfg flash_m25p_cfg = {
-	.sector_erase = 0xD8,
-	.chip_erase = 0xC7
-};
 #include <pios_board_info.h>
 /**
  * PIOS_Board_Init()
@@ -194,14 +165,16 @@ void PIOS_Board_Init(void) {
 
 #endif
 
+	uintptr_t flash_id;
+	uintptr_t fs_id;
 	switch(bdinfo->board_rev) {
 		case BOARD_REVISION_CC:
-			PIOS_Flash_Jedec_Init(pios_spi_flash_accel_id, 1, &flash_w25x_cfg);	
-			PIOS_FLASHFS_Init(&flashfs_w25x_cfg);
+			PIOS_Flash_Jedec_Init(&flash_id, pios_spi_flash_accel_id, 1, &flash_w25x_cfg);
+			PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_w25x_cfg, &pios_jedec_flash_driver, flash_id);
 			break;
 		case BOARD_REVISION_CC3D:
-			PIOS_Flash_Jedec_Init(pios_spi_flash_accel_id, 0, &flash_m25p_cfg);	
-			PIOS_FLASHFS_Init(&flashfs_m25p_cfg);
+			PIOS_Flash_Jedec_Init(&flash_id, pios_spi_flash_accel_id, 0, &flash_m25p_cfg);
+			PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_m25p_cfg, &pios_jedec_flash_driver, flash_id);
 			break;
 		default:
 			PIOS_DEBUG_Assert(0);

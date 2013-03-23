@@ -148,7 +148,7 @@ SRC += $(PIOSCOMMON)/pios_rfm22b_rcvr.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_sbus.c
 SRC += $(PIOSCOMMON)/pios_flash_jedec.c
-SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
+SRC += $(PIOSCOMMON)/pios_flashfs_logfs.c
 SRC += $(PIOSCOMMON)/printf-stdarg.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
@@ -244,6 +244,7 @@ CFLAGS += -DSTACK_DIAGNOSTICS
 CFLAGS += -DMIXERSTATUS_DIAGNOSTICS
 CFLAGS += -DRATEDESIRED_DIAGNOSTICS
 CFLAGS += -DI2C_WDG_STATS_DIAGNOSTICS
+CFLAGS += -DDIAGNOSTICS
 CFLAGS += -DDIAG_TASKS
 
 # This is not the best place for these.  Really should abstract out

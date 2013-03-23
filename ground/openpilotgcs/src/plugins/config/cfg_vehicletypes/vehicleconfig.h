@@ -31,6 +31,7 @@
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
+#include "actuatorcommand.h"
 
 
 typedef struct {
@@ -144,7 +145,7 @@ class VehicleConfig: public ConfigTaskWidget
         QStringList mixerVectors;
         QStringList mixerTypeDescriptions;
 
-        static const quint32 CHANNEL_NUMELEM = 10;
+        static const quint32 CHANNEL_NUMELEM = ActuatorCommand::CHANNEL_NUMELEM;
 
     private:
 

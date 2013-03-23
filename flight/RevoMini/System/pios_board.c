@@ -299,6 +299,31 @@ static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm
 	pios_rcvr_group_map[channelgroup] = pios_dsm_rcvr_id;
 }
 
+static void PIOS_Board_configure_pwm(const struct pios_pwm_cfg *pios_pwm_cfg)
+{
+	/* Set up the receiver port.  Later this should be optional */
+	uint32_t pios_pwm_id;
+	PIOS_PWM_Init(&pios_pwm_id, pios_pwm_cfg);
+
+	uint32_t pios_pwm_rcvr_id;
+	if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
+		PIOS_Assert(0);
+	}
+	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
+}
+
+static void PIOS_Board_configure_ppm(const struct pios_ppm_cfg *pios_ppm_cfg)
+{
+	uint32_t pios_ppm_id;
+	PIOS_PPM_Init(&pios_ppm_id, pios_ppm_cfg);
+
+	uint32_t pios_ppm_rcvr_id;
+	if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
+		PIOS_Assert(0);
+	}
+	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM] = pios_ppm_rcvr_id;
+}
+
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
@@ -651,6 +676,13 @@ void PIOS_Board_Init(void) {
 	}
 #endif /* PIOS_INCLUDE_RFM22B */
 
+#if defined(PIOS_INCLUDE_PWM) ||  defined(PIOS_INCLUDE_PWM)
+	
+	const struct pios_servo_cfg *pios_servo_cfg;
+	// default to servo outputs only
+	pios_servo_cfg = &pios_servo_cfg_out;
+#endif
+	
 	/* Configure the receiver port*/
 	uint8_t hwsettings_rcvrport;
 	HwSettingsRM_RcvrPortGet(&hwsettings_rcvrport);
@@ -660,35 +692,33 @@ void PIOS_Board_Init(void) {
 			break;
 		case HWSETTINGS_RM_RCVRPORT_PWM:
 #if defined(PIOS_INCLUDE_PWM)
-		{
 			/* Set up the receiver port.  Later this should be optional */
-			uint32_t pios_pwm_id;
-			PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
-			
-			uint32_t pios_pwm_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
-				PIOS_Assert(0);
-			}
-			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
-		}
+			PIOS_Board_configure_pwm(&pios_pwm_cfg);
 #endif	/* PIOS_INCLUDE_PWM */
 			break;
 		case HWSETTINGS_RM_RCVRPORT_PPM:
 		case HWSETTINGS_RM_RCVRPORT_PPMOUTPUTS:
+		case HWSETTINGS_RM_RCVRPORT_PPMPWM:
 #if defined(PIOS_INCLUDE_PPM)
-		{
-			uint32_t pios_ppm_id;
-			PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_cfg);
-			
-			uint32_t pios_ppm_rcvr_id;
-			if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
-				PIOS_Assert(0);
+			if(hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_PPMOUTPUTS)
+			{
+				// configure servo outputs and the remaining 5 inputs as outputs
+				pios_servo_cfg = &pios_servo_cfg_out_in_ppm;
 			}
-			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM] = pios_ppm_rcvr_id;
-		}
+
+			PIOS_Board_configure_ppm(&pios_ppm_cfg);
+
+			// enable pwm on the remaining channels
+			if(hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_PPMPWM)
+			{
+				PIOS_Board_configure_pwm(&pios_pwm_ppm_cfg);
+			}
+
+			break;
 #endif	/* PIOS_INCLUDE_PPM */
 		case HWSETTINGS_RM_RCVRPORT_OUTPUTS:
-		
+			// configure only the servo outputs
+			pios_servo_cfg = &pios_servo_cfg_out_in;
 			break;
 	}
 
@@ -705,20 +735,8 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_GCSRCVR */
 
 #ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
-	switch (hwsettings_rcvrport) {
-		case HWSETTINGS_RM_RCVRPORT_DISABLED:
-		case HWSETTINGS_RM_RCVRPORT_PWM:
-		case HWSETTINGS_RM_RCVRPORT_PPM:
-			/* Set up the servo outputs */
-			PIOS_Servo_Init(&pios_servo_cfg);
-			break;
-		case HWSETTINGS_RM_RCVRPORT_PPMOUTPUTS:
-		case HWSETTINGS_RM_RCVRPORT_OUTPUTS:
-			//PIOS_Servo_Init(&pios_servo_rcvr_cfg);
-			//TODO: Prepare the configurations on board_hw_defs and handle here:
-			PIOS_Servo_Init(&pios_servo_cfg);
-			break;
-	}
+	// pios_servo_cfg points to the correct configuration based on input port settings
+	PIOS_Servo_Init(pios_servo_cfg);
 #else
 	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
 #endif

@@ -95,7 +95,7 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define PIOS_LED_D4     7
 #endif
 
-#define PIOS_LED_HEARTBEAT PIOS_LED_USB
+#define PIOS_LED_HEARTBEAT PIOS_LED_LINK
 #define PIOS_LED_ALARM PIOS_LED_TX
 
 #define USB_LED_ON					PIOS_LED_On(PIOS_LED_USB)

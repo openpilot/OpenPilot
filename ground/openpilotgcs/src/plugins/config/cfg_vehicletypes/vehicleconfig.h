@@ -145,7 +145,7 @@ class VehicleConfig: public ConfigTaskWidget
         QStringList mixerVectors;
         QStringList mixerTypeDescriptions;
 
-		static const quint32 CHANNEL_NUMELEM = ActuatorCommand::CHANNEL_NUMELEM;
+        static const quint32 CHANNEL_NUMELEM = ActuatorCommand::CHANNEL_NUMELEM;
 
     private:
 

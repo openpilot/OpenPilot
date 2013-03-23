@@ -763,12 +763,16 @@ endif
 #
 ##############################
 
+# Firmware files to package
+PACKAGE_FW_TARGETS  := $(filter-out fw_simposix, $(FW_TARGETS))
+PACKAGE_ELF_TARGETS := $(filter     fw_simposix, $(FW_TARGETS))
+
 # Rules to generate GCS resources used to embed firmware binaries into the GCS.
 # They are used later by the vehicle setup wizard to update board firmware.
 # To open a firmware image use ":/firmware/fw_coptercontrol.opfw"
 OPFW_RESOURCE := $(BUILD_DIR)/ground/opfw_resource/opfw_resource.qrc
 OPFW_RESOURCE_PREFIX := ../../../
-OPFW_FILES := $(foreach fw_targ, $(FW_TARGETS), $(call toprel, $(BUILD_DIR)/$(fw_targ)/$(fw_targ).opfw))
+OPFW_FILES := $(foreach fw_targ, $(PACKAGE_FW_TARGETS), $(call toprel, $(BUILD_DIR)/$(fw_targ)/$(fw_targ).opfw))
 OPFW_CONTENTS := \
 <!DOCTYPE RCC><RCC version="1.0"> \
     <qresource prefix="/firmware"> \
@@ -825,8 +829,11 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
 endif
 
 # Copy file template. Empty line before the endef is required, do not remove
+# $(1) = copy file name without extension
+# $(2) = source file extension
+# $(3) = destination file extension
 define COPY_FW_FILES
-	$(V1) $(CP) "$(BUILD_DIR)/$(1)/$(1).opfw" "$(PACKAGE_DIR)/firmware/$(1)$(PACKAGE_SEP)$(PACKAGE_LBL).opfw"
+	$(V1) $(CP) "$(BUILD_DIR)/$(1)/$(1)$(2)" "$(PACKAGE_DIR)/firmware/$(1)$(PACKAGE_SEP)$(PACKAGE_LBL)$(3)"
 
 endef
 
@@ -837,7 +844,8 @@ package: all_fw all_ground uavobjects_matlab
 	$(V1) $(ECHO) "Packaging for $(UNAME) $(ARCH) into $(call toprel, $(PACKAGE_DIR)) directory"
 	$(V1) [ ! -d "$(PACKAGE_DIR)" ] || $(RM) -rf "$(PACKAGE_DIR)"
 	$(V1) $(MKDIR) -p "$(PACKAGE_DIR)/firmware"
-	$(foreach fw_targ, $(FW_TARGETS), $(call COPY_FW_FILES,$(fw_targ)))
+	$(foreach fw_targ, $(PACKAGE_FW_TARGETS), $(call COPY_FW_FILES,$(fw_targ),.opfw,.opfw))
+	$(foreach fw_targ, $(PACKAGE_ELF_TARGETS), $(call COPY_FW_FILES,$(fw_targ),.elf,))
 	$(MAKE) --no-print-directory -C $(ROOT_DIR)/package --file=$(UNAME).mk $@
 
 ##############################

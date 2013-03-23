@@ -51,6 +51,26 @@ typedef struct {
 /* Init module section */
 extern initmodule_t __module_initcall_start[], __module_initcall_end[];
 
+#ifdef USE_SIM_POSIX
+
+extern void InitModules();
+extern void StartModules();
+
+#define MODULE_INITCALL(ifn, sfn)
+
+#define MODULE_TASKCREATE_ALL { \
+	/* Start all module threads */ \
+	StartModules(); \
+	}
+
+#define MODULE_INITIALISE_ALL { \
+	/* Initialize modules */ \
+	InitModules(); \
+	/* Initialize the system thread */ \
+	SystemModInitialize();}
+
+#else
+
 /* initcalls are now grouped by functionality into separate 
  * subsections. Ordering inside the subsections is determined
  * by link order.
@@ -77,6 +97,7 @@ extern initmodule_t __module_initcall_start[], __module_initcall_end[];
 									if (fn->fn_tinit) \
 									   (fn->fn_tinit)(); }
 
+#endif /* USE_SIM_POSIX */
 #endif	/* PIOS_INITCALL_H */
 
 /**

@@ -362,17 +362,14 @@ LDFLAGS += -L$(OUTDIR)
 
 
 # Define programs and commands.
-CC      = $(TCHAIN_PREFIX)gcc
-CPP     = $(TCHAIN_PREFIX)g++
-AR      = $(TCHAIN_PREFIX)ar
-OBJCOPY = $(TCHAIN_PREFIX)objcopy
-OBJDUMP = $(TCHAIN_PREFIX)objdump
-SIZE    = $(TCHAIN_PREFIX)size
-NM      = $(TCHAIN_PREFIX)nm
-REMOVE  = $(REMOVE_CMD) -f
-PYTHON  = python
-###SHELL   = sh
-###COPY    = cp
+CC      = $(ARM_SDK_PREFIX)gcc
+CPP     = $(ARM_SDK_PREFIX)g++
+AR      = $(ARM_SDK_PREFIX)ar
+OBJCOPY = $(ARM_SDK_PREFIX)objcopy
+OBJDUMP = $(ARM_SDK_PREFIX)objdump
+SIZE    = $(ARM_SDK_PREFIX)size
+NM      = $(ARM_SDK_PREFIX)nm
+REMOVE  = $(RM) -f
 
 
 

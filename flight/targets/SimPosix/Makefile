@@ -1,8 +1,6 @@
 #####
-# Project: OpenPilot INS
 #
-#
-# Makefile for OpenPilot INS project
+# TODO: This file should be reworked. It will be done as a part of sim target refactoring.
 #
 # The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2009.
 #
@@ -22,34 +20,15 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #####
 
-WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
-TOP      := $(realpath $(WHEREAMI)/../../../)
-
-override TCHAIN_PREFIX :=
+override ARM_SDK_PREFIX :=
 override THUMB :=
-include $(TOP)/make/firmware-defs.mk
-include $(TOP)/make/boards/$(BOARD_NAME)/board-info.mk
 
-# Target file name (without extension).
-TARGET := fw_$(BOARD_NAME)
-
-# Directory for output files (lst, obj, dep, elf, sym, map, hex, bin etc.)
-OUTDIR := $(TOP)/build/$(TARGET)
+include $(ROOT_DIR)/make/firmware-defs.mk
+include $(ROOT_DIR)/make/boards/$(BOARD_NAME)/board-info.mk
 
 # Set developer code and compile options
 # Set to YES for debugging
 DEBUG ?= YES
-
-# Set to YES when using Code Sourcery toolchain
-CODE_SOURCERY ?= NO
-
-ifeq ($(CODE_SOURCERY), YES)
-REMOVE_CMD = cs-rm
-else
-REMOVE_CMD = rm
-endif
-
-FLASH_TOOL = OPENOCD
 
 # List of modules to include
 MODULES = ManualControl Stabilization GPS
@@ -66,11 +45,10 @@ PYMODULES =
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = ../../UAVTalk
+OPUAVTALK = ../UAVTalk
 OPUAVTALKINC = $(OPUAVTALK)/inc
-OPUAVOBJ = ../../UAVObjects
+OPUAVOBJ = ../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
-PIOS = ../../PiOS.posix
 PIOSINC = $(PIOS)/inc
 OPMODULEDIR = ../../Modules
 FLIGHTLIB = ../../Libraries
@@ -80,28 +58,39 @@ MATHLIBINC = $(FLIGHTLIB)/math
 PIOSPOSIX = $(PIOS)/posix
 PIOSCOMMON = $(PIOS)/posix
 PIOSBOARDS = $(PIOS)/Boards
-PIOSCOMMONLIB = $(PIOSCOMMON)/Libraries
-#APPLIBDIR = $(PIOSSTM32F4XX)/Libraries
-OPUAVOBJ = ../../UAVObjects
+PIOSCOMMONLIB = $(PIOS)/Common/Libraries
+OPUAVOBJ = ../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 BOOT = 
 BOOTINC = 
+PYMITE = $(FLIGHTLIB)/PyMite
+PYMITELIB = $(PYMITE)/lib
+PYMITEPLAT = $(PYMITE)/platform/openpilot
+PYMITETOOLS = $(PYMITE)/tools
+PYMITEVM = $(PYMITE)/vm
+PYMITEINC = $(PYMITEVM)
+PYMITEINC += $(PYMITEPLAT)
+PYMITEINC += $(OUTDIR)
 FLIGHTPLANLIB = $(OPMODULEDIR)/FlightPlan/lib
 FLIGHTPLANS = $(OPMODULEDIR)/FlightPlan/flightplans
 HWDEFSINC = ../board_hw_defs/$(BOARD_NAME)
 UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
-SRC = 
 # optional component libraries
-include $(PIOSCOMMONLIB)/FreeRTOS/library.mk
-#include $(PIOSCOMMONLIB)/dosfs/library.mk
-#include $(PIOSCOMMONLIB)/msheap/library.mk
-
-## PYMite support
-#include $(FLIGHTLIB)/PyMite/pymite.mk
+include $(PIOS)/Common/Libraries/FreeRTOS/library.mk
 
 # List C source files here. (C dependencies are automatically generated.)
 # use file-extension c for "c-only"-files
+
+## PyMite files and modules
+SRC += $(OUTDIR)/pmlib_img.c
+SRC += $(OUTDIR)/pmlib_nat.c
+SRC += $(OUTDIR)/pmlibusr_img.c
+SRC += $(OUTDIR)/pmlibusr_nat.c
+PYSRC += $(wildcard ${PYMITEVM}/*.c)
+PYSRC += $(wildcard ${PYMITEPLAT}/*.c)
+PYSRC += ${foreach MOD, ${PYMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
+SRC += $(PYSRC)
 
 ## MODULES
 SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
@@ -127,52 +116,11 @@ SRC += $(FLIGHTLIB)/sanitycheck.c
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 
-## PIOS Hardware (STM32F4xx)
+## PIOS Hardware
 include $(PIOS)/posix/library.mk
-
-## PIOS Hardware (Common)
-#SRC += $(PIOSCOMMON)/pios_mpu6000.c
-#SRC += $(PIOSCOMMON)/pios_bma180.c
-#SRC += $(PIOSCOMMON)/pios_l3gd20.c
-#SRC += $(PIOSCOMMON)/pios_hmc5883.c
-#SRC += $(PIOSCOMMON)/pios_ms5611.c
-#SRC += $(PIOSCOMMON)/pios_crc.c
-#SRC += $(PIOSCOMMON)/pios_com.c
-#SRC += $(PIOSCOMMON)/pios_rcvr.c
-#SRC += $(PIOSCOMMON)/pios_flash_jedec.c
-#SRC += $(PIOSCOMMON)/pios_flashfs_objlist.c
-#SRC += $(PIOSCOMMON)/printf-stdarg.c
-#SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
-#SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 
 include ./UAVObjects.inc
 SRC += $(UAVOBJSRC)
-
-# List C source files here which must be compiled in ARM-Mode (no -mthumb).
-# use file-extension c for "c-only"-files
-## just for testing, timer.c could be compiled in thumb-mode too
-SRCARM =
-
-# List C++ source files here.
-# use file-extension .cpp for C++-files (not .C)
-CPPSRC =
-
-# List C++ source files here which must be compiled in ARM-Mode.
-# use file-extension .cpp for C++-files (not .C)
-#CPPSRCARM = $(TARGET).cpp
-CPPSRCARM =
-
-# List Assembler source files here.
-# Make them always end in a capital .S. Files ending in a lowercase .s
-# will not be considered source files but generated files (assembler
-# output from the compiler), and will be deleted upon "make clean"!
-# Even though the DOS/Win* filesystem matches both .s and .S the same,
-# it will preserve the spelling of the filenames, and gcc itself does
-# care about how the name is spelled on its command-line.
-
-
-# List Assembler source files here which must be assembled in ARM-Mode..
-ASRCARM =
 
 # List any extra directories to look for include files here.
 #    Each directory must be seperated by a space.
@@ -186,38 +134,26 @@ EXTRAINCDIRS  += $(OPUAVOBJINC)
 EXTRAINCDIRS  += $(UAVOBJSYNTHDIR)
 EXTRAINCDIRS  += $(FLIGHTLIBINC)
 EXTRAINCDIRS  += $(MATHLIBINC)
-#EXTRAINCDIRS  += $(PIOSSTM32F4XX)
 EXTRAINCDIRS  += $(PIOSCOMMON)
 EXTRAINCDIRS  += $(PIOSBOARDS)
-#EXTRAINCDIRS  += $(STMSPDINCDIR)
 EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(BOOTINC)
+EXTRAINCDIRS  += $(PYMITEINC)
 EXTRAINCDIRS  += $(HWDEFSINC)
 
+# Generate intermediate code
+gencode: ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h 
+
+$(PYSRC): gencode
+
+# Generate code for PyMite
+${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTDIR}/pmlibusr_img.c ${OUTDIR}/pmlibusr_nat.c ${OUTDIR}/pmfeatures.h: $(wildcard ${PYMITELIB}/*.py) $(wildcard ${PYMITEPLAT}/*.py) $(wildcard ${FLIGHTPLANLIB}/*.py) $(wildcard ${FLIGHTPLANS}/*.py) 
+	@$(ECHO) $(MSG_PYMITEINIT) $(call toprel, $@)
+	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -s --memspace=flash -o $(OUTDIR)/pmlib_img.c --native-file=$(OUTDIR)/pmlib_nat.c $(PYMITELIB)/list.py $(PYMITELIB)/dict.py $(PYMITELIB)/__bi.py $(PYMITELIB)/sys.py $(PYMITELIB)/string.py $(wildcard $(FLIGHTPLANLIB)/*.py)
+	@$(PYTHON) $(PYMITETOOLS)/pmGenPmFeatures.py $(PYMITEPLAT)/pmfeatures.py > $(OUTDIR)/pmfeatures.h
+	@$(PYTHON) $(PYMITETOOLS)/pmImgCreator.py -f $(PYMITEPLAT)/pmfeatures.py -c -u -o $(OUTDIR)/pmlibusr_img.c --native-file=$(OUTDIR)/pmlibusr_nat.c $(FLIGHTPLANS)/test.py
 EXTRAINCDIRS += ${foreach MOD, ${MODULES} ${PYMODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
-
-# List any extra directories to look for library files here.
-# Also add directories where the linker should search for
-# includes from linker-script to the list
-#     Each directory must be seperated by a space.
-#EXTRA_LIBDIRS +=
-
-# Extra Libraries
-#    Each library-name must be seperated by a space.
-#    i.e. to link with libxyz.a, libabc.a and libefsl.a:
-#    EXTRA_LIBS = xyz abc efsl
-# for newlib-lpc (file: libnewlibc-lpc.a):
-#    EXTRA_LIBS = newlib-lpc
-#EXTRA_LIBS +=
-
-# Path to Linker-Scripts
-#LINKERSCRIPTPATH = $(PIOSSTM32F4XX)
-
-# Optimization level, can be [0, 1, 2, 3, s].
-# 0 = turn off optimization. s = optimize for size.
-# (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
-
 
 BLONLY_CDEFS += -DBOARD_TYPE=$(BOARD_TYPE)
 BLONLY_CDEFS += -DBOARD_REVISION=$(BOARD_REVISION)
@@ -238,19 +174,19 @@ CFLAGS += -finstrument-functions -ffixed-r10
 else
 CFLAGS += -Os
 endif
-
-
    
 # common architecture-specific flags from the device-specific library makefile
 CFLAGS += $(ARCHFLAGS)
 
 CFLAGS += $(UAVOBJDEFINE)
 
-CFLAGS += -DSTACK_DIAGNOSTICS
-CFLAGS += -DMIXERSTATUS_DIAGNOSTICS
-CFLAGS += -DRATEDESIRED_DIAGNOSTICS
-CFLAGS += -DI2C_WDG_STATS_DIAGNOSTICS
+CFLAGS += -DDIAG_STACK
+CFLAGS += -DDIA_MIXERSTATUS
+CFLAGS += -DDIAG_RATEDESIRED
+CFLAGS += -DDIAG_I2C_WDG_STATS
 CFLAGS += -DDIAG_TASKS
+# Or all of above:
+#CFLAGS += -DDIAG_ALL
 
 # This is not the best place for these.  Really should abstract out
 # to the board file or something
@@ -350,7 +286,7 @@ LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
 
 
 # Define programs and commands.
-REMOVE  = $(REMOVE_CMD) -f
+REMOVE  = $(RM) -f
 
 # List of all source files.
 ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
@@ -384,7 +320,7 @@ endif
 
 
 # Link: create ELF output file from object files.
-$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ), $(ALLLIB)))
+$(eval $(call LINK_TEMPLATE, $(OUTDIR)/$(TARGET).elf, $(ALLOBJ)))
 
 # Assemble: create object files from assembler source files.
 $(foreach src, $(ASRC), $(eval $(call ASSEMBLE_TEMPLATE, $(src))))
@@ -488,16 +424,16 @@ gencode: ${OUTDIR}/InitMods.c ${OUTDIR}/pmlib_img.c ${OUTDIR}/pmlib_nat.c ${OUTD
 
 # Generate code for module initialization
 ${OUTDIR}/InitMods.c: Makefile
-	@echo ${MSG_MODINIT}
-	@echo ${quote}// Autogenerated file${quote} > ${OUTDIR}/InitMods.c
-	@echo ${quote}${foreach MOD, ${MODNAMES}, extern unsigned int ${MOD}Initialize(void);}${quote}  >> ${OUTDIR}/InitMods.c
-	@echo ${quote}${foreach MOD, ${MODNAMES}, extern unsigned int ${MOD}Start(void);}${quote}  >> ${OUTDIR}/InitMods.c
-	@echo ${quote}void InitModules() {${quote} >> ${OUTDIR}/InitMods.c
-	@echo ${quote}${foreach MOD, ${MODNAMES}, ${MOD}Initialize();}${quote}  >> ${OUTDIR}/InitMods.c
-	@echo ${quote}}${quote} >> ${OUTDIR}/InitMods.c
-	@echo ${quote}void StartModules() {${quote} >> ${OUTDIR}/InitMods.c
-	@echo ${quote}${foreach MOD, ${MODNAMES}, ${MOD}Start();}${quote}  >> ${OUTDIR}/InitMods.c
-	@echo ${quote}}${quote} >> ${OUTDIR}/InitMods.c
+	$(V1) $(ECHO) $(MSG_MODINIT $(call toprel, $@))
+	$(V1) $(ECHO) $(QUOTE)// Autogenerated file$(QUOTE) > ${OUTDIR}/InitMods.c
+	$(V1) $(ECHO) $(QUOTE)${foreach MOD, ${MODNAMES}, extern unsigned int ${MOD}Initialize(void);}$(QUOTE)  >> ${OUTDIR}/InitMods.c
+	$(V1) $(ECHO) $(QUOTE)${foreach MOD, ${MODNAMES}, extern unsigned int ${MOD}Start(void);}$(QUOTE)  >> ${OUTDIR}/InitMods.c
+	$(V1) $(ECHO) $(QUOTE)void InitModules() {$(QUOTE) >> ${OUTDIR}/InitMods.c
+	$(V1) $(ECHO) $(QUOTE)${foreach MOD, ${MODNAMES}, ${MOD}Initialize();}$(QUOTE)  >> ${OUTDIR}/InitMods.c
+	$(V1) $(ECHO) $(QUOTE)}$(QUOTE) >> ${OUTDIR}/InitMods.c
+	$(V1) $(ECHO) $(QUOTE)void StartModules() {$(QUOTE) >> ${OUTDIR}/InitMods.c
+	$(V1) $(ECHO) $(QUOTE)${foreach MOD, ${MODNAMES}, ${MOD}Start();}$(QUOTE)  >> ${OUTDIR}/InitMods.c
+	$(V1) $(ECHO) $(QUOTE)}$(QUOTE) >> ${OUTDIR}/InitMods.c
 
 # Listing of phony targets.
 .PHONY : all build clean clean_list install

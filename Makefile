@@ -971,5 +971,5 @@ help:
 	@$(ECHO)
 	@$(ECHO) "   Note: All tools will be installed into $(TOOLS_DIR)"
 	@$(ECHO) "         All build output will be placed in $(BUILD_DIR)"
-	@$(ECHO) "         Package will be placed into $(PKG_DIR)"
+	@$(ECHO) "         Package will be placed into $(PACKAGE_DIR)"
 	@$(ECHO)

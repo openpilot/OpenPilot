@@ -535,7 +535,7 @@ int DFUObject::JumpToApp(bool safeboot, bool erase)
         buf[8] = 0;
         buf[9] = 0;
     }
-	if(erase)
+    if(erase)
 	{
 	// force data flash clear
 		buf[10] = 0x00;
@@ -552,9 +552,7 @@ int DFUObject::JumpToApp(bool safeboot, bool erase)
 		buf[19] = 0x00;
 		buf[20] = 0x00;
 		buf[21] = 0x00;
-	}
-	else
-	{
+	} else {
 		buf[10] = 0x00;
 		buf[11] = 0x00;
 		buf[12] = 0x00;

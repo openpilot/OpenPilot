@@ -54,7 +54,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
     connect(m_config->bootButton, SIGNAL(clicked()), this, SLOT(systemBoot()));
     connect(m_config->safeBootButton, SIGNAL(clicked()), this, SLOT(systemSafeBoot()));
-    connect(m_config->eraseBootButton, SIGNAL(clicked()), this,SLOT(systemEraseBoot()));
+    connect(m_config->eraseBootButton, SIGNAL(clicked()), this, SLOT(systemEraseBoot()));
     connect(m_config->rescueButton, SIGNAL(clicked()), this, SLOT(systemRescue()));
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     connect(cm,SIGNAL(deviceConnected(QIODevice*)),this,SLOT(onPhisicalHWConnect()));

@@ -3,7 +3,7 @@ TCHAIN_PREFIX ?= arm-none-eabi-
 
 # Define toolchain component names.
 CC      = $(TCHAIN_PREFIX)gcc
-CPP     = $(TCHAIN_PREFIX)g++
+CXX     = $(TCHAIN_PREFIX)g++
 AR      = $(TCHAIN_PREFIX)ar
 OBJCOPY = $(TCHAIN_PREFIX)objcopy
 OBJDUMP = $(TCHAIN_PREFIX)objdump
@@ -44,8 +44,8 @@ MSG_ARCHIVING        = ${quote} AR        $(MSG_EXTRA) ${quote}
 MSG_LINKING          = ${quote} LD        $(MSG_EXTRA) ${quote}
 MSG_COMPILING        = ${quote} CC        ${MSG_EXTRA} ${quote}
 MSG_COMPILING_ARM    = ${quote} CC-ARM    $(MSG_EXTRA) ${quote}
-MSG_COMPILINGCPP     = ${quote} CXX       $(MSG_EXTRA) ${quote}
-MSG_COMPILINGCPP_ARM = ${quote} CXX-ARM   $(MSG_EXTRA) ${quote}
+MSG_COMPILINGCXX     = ${quote} CXX       $(MSG_EXTRA) ${quote}
+MSG_COMPILINGCXX_ARM = ${quote} CXX-ARM   $(MSG_EXTRA) ${quote}
 MSG_ASSEMBLING       = ${quote} AS        $(MSG_EXTRA) ${quote}
 MSG_ASSEMBLING_ARM   = ${quote} AS-ARM    $(MSG_EXTRA) ${quote}
 MSG_CLEANING         = ${quote} CLEAN     $(MSG_EXTRA) ${quote}
@@ -171,17 +171,17 @@ $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
 endef
 
 # Compile: create object files from C++ source files.
-define COMPILE_CPP_TEMPLATE
+define COMPILE_CXX_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-	@echo $(MSG_COMPILINGCPP) $$(call toprel, $$<)
-	$(V1) $(CC) -c $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
+	@echo $(MSG_COMPILINGCXX) $$(call toprel, $$<)
+	$(V1) $(CXX) -c $(THUMB) $$(CFLAGS) $$(CPPFLAGS) $$(CXXFLAGS) $$< -o $$@
 endef
 
 # Compile: create object files from C++ source files. ARM-only
-define COMPILE_CPP_ARM_TEMPLATE
+define COMPILE_CXX_ARM_TEMPLATE
 $(OUTDIR)/$(notdir $(basename $(1))).o : $(1)
-	@echo $(MSG_COMPILINGCPP_ARM) $$(call toprel, $$<)
-	$(V1) $(CC) -c $$(CFLAGS) $$(CPPFLAGS) $$< -o $$@
+	@echo $(MSG_COMPILINGCXX_ARM) $$(call toprel, $$<)
+	$(V1) $(CPP) -c $$(CFLAGS) $$(CPPFLAGS) $$(CXXFLAGS) $$< -o $$@
 endef
 
 # Archive: create ar library file from object files.
@@ -217,6 +217,17 @@ define LINK_TEMPLATE
 $(1):  $(2) $(3)
 	@echo $(MSG_LINKING) $$(call toprel, $$@)
 	$(V1) $(CC) $(THUMB) $$(CFLAGS) $(2) $(3) --output $$@ $$(LDFLAGS)
+endef
+
+# Link: create ELF output file from object files.
+#   $1 = elf file to produce
+#   $2 = list of object files that make up the elf file
+define LINK_CXX_TEMPLATE
+.SECONDARY : $(1)
+.PRECIOUS : $(2)
+$(1):  $(2)
+	@echo $(MSG_LINKING) $$(call toprel, $$@)
+	$(V1) $(CXX) $(THUMB) $$(CFLAGS) $(2) --output $$@ $$(LDFLAGS)
 endef
 
 # Compile: create assembler files from C source files. ARM/Thumb

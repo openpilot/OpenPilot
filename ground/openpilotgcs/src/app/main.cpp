@@ -50,6 +50,8 @@
 #include <QtGui/QSplashScreen>
 #include <QtGui/QPainter>
 
+#include <QElapsedTimer>
+
 enum { OptionIndent = 4, DescriptionIndent = 24 };
 
 static const char *appNameC = "OpenPilot GCS";
@@ -234,6 +236,9 @@ static void overrideSettings(QSettings &settings, int argc, char **argv){
 
 int main(int argc, char **argv)
 {
+    QElapsedTimer timer;
+    timer.start();
+
 #ifdef Q_OS_MAC
     // increase the number of file that can be opened in OpenPilot GCS
     struct rlimit rl;
@@ -391,5 +396,11 @@ int main(int argc, char **argv)
     splash.showProgressMessage(QObject::tr("Application started."));
     QTimer::singleShot(1500, &splash, SLOT(close()));
 
-    return app.exec();
+    qDebug() << "main() took" << timer.elapsed() << "ms";
+
+    int ret = app.exec();
+
+    qDebug() << "GCS ran for" << timer.elapsed() << "ms";
+
+    return ret;
 }

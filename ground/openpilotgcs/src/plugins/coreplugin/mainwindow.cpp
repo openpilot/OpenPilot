@@ -84,6 +84,7 @@
 #include <QtGui/QToolButton>
 #include <QtGui/QMessageBox>
 #include <QDesktopServices>
+#include <QElapsedTimer>
 #include "dialogs/importsettings.h"
 #include <QDir>
 
@@ -268,16 +269,8 @@ void MainWindow::modeChanged(Core::IMode */*mode*/)
 void MainWindow::extensionsInitialized()
 {
     QSettings *qs = m_settings;
-    QString commandLine;
     if (!qs->allKeys().count()) {
         // no user settings, so try to load some default ones
-        foreach(QString str, qApp->arguments()) {
-            if (str.contains("configfile")) {
-                qDebug() << "ass";
-                commandLine = str.split("=").at(1);
-                qDebug() << commandLine;
-            }
-        }
         QDir directory(QCoreApplication::applicationDirPath());
 #ifdef Q_OS_MAC
         directory.cdUp();
@@ -292,6 +285,13 @@ void MainWindow::extensionsInitialized()
         qDebug() << "Looking for configuration files in:" << directory.absolutePath();
 
         QString filename;
+        // check if command line contains a config file name
+        QString commandLine;
+        foreach(QString str, qApp->arguments()) {
+            if (str.contains("configfile")) {
+                commandLine = str.split("=").at(1);
+            }
+        }
         if (!commandLine.isEmpty() && QFile::exists(directory.absolutePath() + QDir::separator() + commandLine)) {
             // use file name specified on command line
             filename = directory.absolutePath() + QDir::separator() + commandLine;
@@ -315,9 +315,15 @@ void MainWindow::extensionsInitialized()
         // create settings from file
         qs = new QSettings(filename, XmlConfig::XmlSettingsFormat);
 
-        // replace empty settings with new ones
-        delete m_settings;
-        m_settings = qs;
+        // transfer loaded settings to application settings
+        QStringList keys = qs->allKeys();
+        foreach(QString key, keys) {
+            m_settings->setValue(key, qs->value(key));
+        }
+
+        // and delete loaded settings
+        delete qs;
+        qs = m_settings;
 
         qDebug() << "Configuration file" << filename << "was loaded.";
     }
@@ -353,6 +359,7 @@ void MainWindow::extensionsInitialized()
     qApp->setStyleSheet(style);
 
     qs->endGroup();
+
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
     m_uavGadgetInstanceManager->readSettings(qs);
 
@@ -397,15 +404,14 @@ QString MainWindow::loadStyleSheet(QString fileName) {
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if ( !m_generalSettings->saveSettingsOnExit() ){
+    if (!m_generalSettings->saveSettingsOnExit()) {
         m_dontSaveSettings = true;
     }
-    if ( !m_dontSaveSettings ){
+    if (!m_dontSaveSettings) {
         emit m_coreImpl->saveSettingsRequested();
     }
 
-    const QList<ICoreListener *> listeners =
-        ExtensionSystem::PluginManager::instance()->getObjects<ICoreListener>();
+    const QList<ICoreListener *> listeners = ExtensionSystem::PluginManager::instance()->getObjects<ICoreListener>();
     foreach (ICoreListener *listener, listeners) {
         if (!listener->coreAboutToClose()) {
             event->ignore();
@@ -415,7 +421,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     emit m_coreImpl->coreAboutToClose();
 
-    if ( !m_dontSaveSettings ){
+    if (!m_dontSaveSettings) {
         saveSettings(m_settings);
         m_uavGadgetInstanceManager->saveSettings(m_settings);
     }
@@ -423,7 +429,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
 }
 
 // Check for desktop file manager file drop events
-
 static bool isDesktopFileManagerDrop(const QMimeData *d, QStringList *files = 0)
 {
     if (files)
@@ -545,9 +550,7 @@ void MainWindow::registerDefaultContainers()
     ac->appendGroup(Constants::G_HELP_ABOUT);
 }
 
-static Command *createSeparator(ActionManager *am, QObject *parent,
-                                const QString &name,
-                                const QList<int> &context)
+static Command *createSeparator(ActionManager *am, QObject *parent, const QString &name, const QList<int> &context)
 {
     QAction *tmpaction = new QAction(parent);
     tmpaction->setSeparator(true);
@@ -1183,13 +1186,18 @@ void MainWindow::createWorkspaces(QSettings* qs, bool diffOnly) {
     } else {
         m_uavGadgetManagers.clear();
     }
-    for (int i = start; i < newWorkspacesNo; ++i) {
 
-        const QString name     = m_workspaceSettings->name(i);
+    QElapsedTimer totalTimer;
+    totalTimer.start();
+    for (int i = start; i < newWorkspacesNo; ++i) {
+        QElapsedTimer timer;
+        timer.start();
+
+        const QString name = m_workspaceSettings->name(i);
         const QString iconName = m_workspaceSettings->iconName(i);
         const QString modeName = m_workspaceSettings->modeName(i);
-        uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), name,
-                                                      QIcon(iconName), 90-i+1, modeName, this);
+        uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), name, QIcon(iconName), 90 - i + 1, modeName,
+                this);
 
         connect(uavGadgetManager, SIGNAL(showUavGadgetMenus(bool, bool)), this, SLOT(showUavGadgetMenus(bool, bool)));
 
@@ -1203,7 +1211,9 @@ void MainWindow::createWorkspaces(QSettings* qs, bool diffOnly) {
         pm->addObject(uavGadgetManager);
         m_uavGadgetManagers.append(uavGadgetManager);
         uavGadgetManager->readSettings(qs);
+        qDebug() << "MainWindow::createWorkspaces - creating workspace" << name << "took" << timer.elapsed() << "ms";
     }
+    qDebug() << "MainWindow::createWorkspaces - creating workspaces took" << totalTimer.elapsed() << "ms";
 }
 
 static const char *settingsGroup = "MainWindow";
@@ -1215,7 +1225,7 @@ static const char *modePriorities = "ModePriorities";
 
 void MainWindow::readSettings(QSettings* qs, bool workspaceDiffOnly)
 {
-    if ( !qs ){
+    if (!qs) {
         qs = m_settings;
     }
 
@@ -1237,8 +1247,9 @@ void MainWindow::readSettings(QSettings* qs, bool workspaceDiffOnly)
     } else {
         resize(750, 400);
     }
-    if (qs->value(QLatin1String(maxKey), false).toBool())
+    if (qs->value(QLatin1String(maxKey), false).toBool()) {
         setWindowState(Qt::WindowMaximized);
+    }
     setFullScreen(qs->value(QLatin1String(fullScreenKey), false).toBool());
 
     qs->endGroup();
@@ -1263,9 +1274,11 @@ void MainWindow::readSettings(QSettings* qs, bool workspaceDiffOnly)
 
 void MainWindow::saveSettings(QSettings* qs)
 {
-    if ( m_dontSaveSettings ) return;
+    if (m_dontSaveSettings) {
+        return;
+    }
 
-    if ( !qs ){
+    if (!qs) {
         qs = m_settings;
     }
 
@@ -1309,7 +1322,7 @@ void MainWindow::saveSettings(QSettings* qs)
 
 void MainWindow::readSettings(IConfigurablePlugin* plugin, QSettings* qs)
 {
-    if ( !qs ){
+    if (!qs) {
         qs = m_settings;
     }
 
@@ -1332,8 +1345,11 @@ void MainWindow::readSettings(IConfigurablePlugin* plugin, QSettings* qs)
 
 void MainWindow::saveSettings(IConfigurablePlugin* plugin, QSettings* qs)
 {
-    if ( m_dontSaveSettings ) return;
-    if ( !qs ){
+    if (m_dontSaveSettings) {
+        return;
+    }
+
+    if (!qs) {
         qs = m_settings;
     }
 

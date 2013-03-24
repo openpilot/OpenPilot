@@ -1,0 +1,1 @@
+#define PIOS_INCLUDE_FLASH

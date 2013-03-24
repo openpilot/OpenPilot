@@ -31,6 +31,8 @@
 /* Project Includes */
 #include "pios.h"
 
+#include "uavobjectmanager.h"
+
 #if defined(PIOS_INCLUDE_GCSRCVR)
 
 #include "pios_gcsrcvr_priv.h"

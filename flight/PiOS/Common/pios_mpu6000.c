@@ -141,7 +141,7 @@ static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 
 	// Reset chip
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_PWR_MGMT_REG, PIOS_MPU6000_PWRMGMT_IMU_RST) != 0);
-	PIOS_DELAY_WaitmS(300);
+	PIOS_DELAY_WaitmS(100);
 
 	// Reset chip and fifo
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_USER_CTRL_REG,

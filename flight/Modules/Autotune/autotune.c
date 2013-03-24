@@ -48,7 +48,8 @@
  *
  */
 
-#include "pios.h"
+#include "openpilot.h"
+
 #include "flightstatus.h"
 #include "hwsettings.h"
 #include "manualcontrolcommand.h"

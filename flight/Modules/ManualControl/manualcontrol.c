@@ -40,6 +40,7 @@
 #include "baroaltitude.h"
 #include "flighttelemetrystats.h"
 #include "flightstatus.h"
+#include "sanitycheck.h"
 #include "manualcontrol.h"
 #include "manualcontrolsettings.h"
 #include "manualcontrolcommand.h"
@@ -48,6 +49,7 @@
 #include "stabilizationsettings.h"
 #include "stabilizationdesired.h"
 #include "receiveractivity.h"
+#include "systemsettings.h"
 
 #if defined(PIOS_INCLUDE_USB_RCTX)
 #include "pios_usb_rctx.h"
@@ -96,6 +98,7 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed, bool
 static void processFlightMode(ManualControlSettingsData * settings, float flightMode);
 static void processArm(ManualControlCommandData * cmd, ManualControlSettingsData * settings);
 static void setArmedIfChanged(uint8_t val);
+static void configurationUpdatedCb(UAVObjEvent * ev);
 
 static void manualControlTask(void *parameters);
 static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutral);
@@ -173,6 +176,15 @@ static void manualControlTask(void *parameters)
 	// this includes not even registering it if not used
 	AccessoryDesiredCreateInstance();
 	AccessoryDesiredCreateInstance();
+
+	// Run this initially to make sure the configuration is checked
+	configuration_check();
+	
+	// Whenever the configuration changes, make sure it is safe to fly
+	SystemSettingsConnectCallback(configurationUpdatedCb);
+	ManualControlSettingsConnectCallback(configurationUpdatedCb);
+	
+	// Whenever the configuration changes, make sure it is safe to fly
 
 	// Make sure unarmed on power up
 	ManualControlCommandGet(&cmd);
@@ -1075,6 +1087,16 @@ static void applyLPF(float *value, ManualControlSettingsResponseTimeElem channel
 	}
 }
 #endif // USE_INPUT_LPF
+
+/**
+ * Called whenever a critical configuration component changes
+ */
+static void configurationUpdatedCb(UAVObjEvent * ev)
+{
+	configuration_check();
+}
+
+
 
 /**
   * @}

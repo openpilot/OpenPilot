@@ -21,16 +21,28 @@
 #define MAGIC_REG_1     RTC_BKP_DR1
 #define MAGIC_REG_2     RTC_BKP_DR2
 #define IAP_BOOTCOUNT   RTC_BKP_DR3
-#define IAP_CMD1        RTC_BKP_DR4
-#define IAP_CMD2        RTC_BKP_DR5
-#define IAP_CMD3        RTC_BKP_DR6
+#define IAP_RESVD1		RTC_BKP_DR4
+#define IAP_RESVD2		RTC_BKP_DR5
+#define IAP_RESVD3		RTC_BKP_DR6
+#define IAP_RESVD4		RTC_BKP_DR7
+#define IAP_RESVD5		RTC_BKP_DR8
+#define IAP_RESVD6		RTC_BKP_DR9
+#define IAP_CMD1        RTC_BKP_DR10
+#define IAP_CMD2        RTC_BKP_DR11
+#define IAP_CMD3        RTC_BKP_DR12
 #else
 #define MAGIC_REG_1     BKP_DR1
 #define MAGIC_REG_2     BKP_DR2
 #define IAP_BOOTCOUNT   BKP_DR3
-#define IAP_CMD1        BKP_DR4
-#define IAP_CMD2        BKP_DR5
-#define IAP_CMD3        BKP_DR6
+#define IAP_RESVD1		BKP_DR4
+#define IAP_RESVD2		BKP_DR5
+#define IAP_RESVD3		BKP_DR6
+#define IAP_RESVD4		BKP_DR7
+#define IAP_RESVD5		BKP_DR8
+#define IAP_RESVD6		BKP_DR9
+#define IAP_CMD1        BKP_DR10
+#define IAP_CMD2        BKP_DR11
+#define IAP_CMD3        BKP_DR12
 #endif
 
 #define PIOS_IAP_CLEAR_FLASH_CMD_0 0xFA5F

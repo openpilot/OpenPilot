@@ -704,7 +704,7 @@ void ConfigVehicleTypeWidget::updateCustomAirframeUI()
     }
 
 	// Update the mixer table:
-	for (int channel=0; channel < m_aircraft->customMixerTable->columnCount(); channel++) {
+	for (int channel=0; channel < m_customUi->customMixerTable->columnCount(); channel++) {
         UAVObjectField* field = mixer->getField(mixerTypes.at(channel));
         if (field)
         {

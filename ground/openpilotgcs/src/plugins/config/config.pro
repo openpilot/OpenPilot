@@ -71,11 +71,11 @@ SOURCES += configplugin.cpp \
     configrevohwwidget.cpp
 
 FORMS += airframe.ui \
-    cfg_vehicletypes/airframe_ccpm.ui \
-    cfg_vehicletypes/airframe_fixedwing.ui \
-    cfg_vehicletypes/airframe_ground.ui \
-    cfg_vehicletypes/airframe_multirotor.ui \
-    cfg_vehicletypes/airframe_custom.ui \
+    airframe_ccpm.ui \
+    airframe_fixedwing.ui \
+    airframe_ground.ui \
+    airframe_multirotor.ui \
+    airframe_custom.ui \
     cc_hw_settings.ui \
     ccpm.ui \
     stabilization.ui \

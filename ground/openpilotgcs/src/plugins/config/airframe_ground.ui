@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FixedWingConfigWidget</class>
- <widget class="QWidget" name="FixedWingConfigWidget">
+ <class>GroundConfigWidget</class>
+ <widget class="QWidget" name="GroundConfigWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -15,12 +15,12 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_10">
    <property name="margin">
-    <number>9</number>
+    <number>12</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <layout class="QHBoxLayout" name="horizontalLayout_31">
      <item>
-      <widget class="QLabel" name="label_5">
+      <widget class="QLabel" name="label_51">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -34,15 +34,15 @@
         </font>
        </property>
        <property name="text">
-        <string>Airplane type:</string>
+        <string>Vehicle type:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="fixedWingType"/>
+      <widget class="QComboBox" name="groundVehicleType"/>
      </item>
      <item>
-      <spacer name="horizontalSpacer_3">
+      <spacer name="horizontalSpacer_31">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -57,9 +57,39 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <layout class="QHBoxLayout" name="horizontalLayout_33">
      <item>
-      <widget class="QGroupBox" name="groupBox_2">
+      <widget class="QLabel" name="label_7">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Channel Assignment</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_15">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_41">
+     <item>
+      <widget class="QGroupBox" name="groupBox_7">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -68,30 +98,39 @@
        </property>
        <property name="minimumSize">
         <size>
-         <width>230</width>
+         <width>0</width>
          <height>100</height>
         </size>
        </property>
        <property name="title">
-        <string>Output Channel Assignments</string>
+        <string>Output channel assignments</string>
        </property>
-       <layout class="QFormLayout" name="formLayout_3">
-        <item row="1" column="0">
-         <widget class="QLabel" name="fwEngineLabel">
+       <layout class="QFormLayout" name="formLayout_5">
+        <item row="0" column="0">
+         <widget class="QLabel" name="gvEngineLabel">
+          <property name="minimumSize">
+           <size>
+            <width>77</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="text">
            <string>Engine</string>
           </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QComboBox" name="fwEngineChannelBox">
+        <item row="0" column="1">
+         <widget class="QComboBox" name="gvEngineChannelBox">
           <property name="toolTip">
            <string>Select output channel for the engine</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="fwAileron1Label">
+        <item row="1" column="0">
+         <widget class="QLabel" name="gvAileron1Label">
           <property name="minimumSize">
            <size>
             <width>60</width>
@@ -103,15 +142,15 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
-         <widget class="QComboBox" name="fwAileron1ChannelBox">
+        <item row="1" column="1">
+         <widget class="QComboBox" name="gvAileron1ChannelBox">
           <property name="toolTip">
            <string>Select output channel for the first aileron (or elevon)</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="fwAileron2Label">
+        <item row="2" column="0">
+         <widget class="QLabel" name="gvAileron2Label">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -126,8 +165,8 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QComboBox" name="fwAileron2ChannelBox">
+        <item row="2" column="1">
+         <widget class="QComboBox" name="gvAileron2ChannelBox">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -136,98 +175,91 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="fwElevator1Label">
+        <item row="3" column="0">
+         <widget class="QLabel" name="gvMotor1Label">
           <property name="minimumSize">
            <size>
-            <width>67</width>
+            <width>0</width>
             <height>0</height>
            </size>
           </property>
           <property name="text">
-           <string>Elevator 1</string>
+           <string>Motor</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QComboBox" name="gvMotor1ChannelBox">
+          <property name="toolTip">
+           <string>Select output channel for the first motor</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="gvMotor2Label">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>47</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Motor 2</string>
           </property>
          </widget>
         </item>
         <item row="4" column="1">
-         <widget class="QComboBox" name="fwElevator1ChannelBox">
+         <widget class="QComboBox" name="gvMotor2ChannelBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="toolTip">
-           <string>Select output channel for the first elevator</string>
+           <string>Select output channel for a second motor</string>
           </property>
          </widget>
         </item>
         <item row="5" column="0">
-         <widget class="QLabel" name="fwElevator2Label">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>67</width>
-            <height>0</height>
-           </size>
-          </property>
+         <widget class="QLabel" name="gvSteering1Label">
           <property name="text">
-           <string>Elevator 2</string>
+           <string>Front Steering</string>
           </property>
          </widget>
         </item>
         <item row="5" column="1">
-         <widget class="QComboBox" name="fwElevator2ChannelBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
+         <widget class="QComboBox" name="gvSteering1ChannelBox">
           <property name="toolTip">
-           <string>Select output channel for a secondary elevator</string>
+           <string>Select output channel for the first steering actuator</string>
           </property>
          </widget>
         </item>
         <item row="6" column="0">
-         <widget class="QLabel" name="fwRudder1Label">
+         <widget class="QLabel" name="gvSteering2Label">
           <property name="text">
-           <string>Rudder 1</string>
+           <string>Rear Steering</string>
           </property>
          </widget>
         </item>
         <item row="6" column="1">
-         <widget class="QComboBox" name="fwRudder1ChannelBox">
+         <widget class="QComboBox" name="gvSteering2ChannelBox">
           <property name="toolTip">
-           <string>Select output channel for the first rudder</string>
+           <string>Select output channel for a second steering actuator</string>
           </property>
          </widget>
-        </item>
-        <item row="7" column="0">
-         <widget class="QLabel" name="fwRudder2Label">
-          <property name="text">
-           <string>Rudder 2</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1">
-         <widget class="QComboBox" name="fwRudder2ChannelBox">
-          <property name="toolTip">
-           <string>Select output channel for a secondary rudder</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </widget>
      </item>
      <item>
-      <widget class="QGroupBox" name="elevonMixBox">
+      <widget class="QGroupBox" name="differentialSteeringMixBox">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -235,60 +267,28 @@
         </sizepolicy>
        </property>
        <property name="title">
-        <string>Elevon Mix</string>
+        <string>Differential Steering Mix</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_13">
+       <layout class="QVBoxLayout" name="verticalLayout_33">
         <item>
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <layout class="QHBoxLayout" name="horizontalLayout_30">
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_14">
+           <layout class="QVBoxLayout" name="verticalLayout_34">
             <item>
-             <widget class="QLabel" name="elevonLabel1">
+             <widget class="QLabel" name="differentialSteeringLabel1">
               <property name="minimumSize">
                <size>
                 <width>65</width>
                 <height>0</height>
                </size>
               </property>
-              <property name="styleSheet">
-               <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-              </property>
               <property name="text">
-               <string>Rudder %</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <string>Left %</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSlider" name="elevonSlider1">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+             <widget class="QSlider" name="differentialSteeringSlider1">
               <property name="maximum">
                <number>100</number>
               </property>
@@ -301,50 +301,31 @@ margin:1px;</string>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="elevonSliderLabel1">
+             <widget class="QLabel" name="gvDiffSteering1Label">
               <property name="text">
                <string>50</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
            </layout>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_15">
+           <layout class="QVBoxLayout" name="verticalLayout_35">
             <item>
-             <widget class="QLabel" name="elevonLabel2">
+             <widget class="QLabel" name="differentialSteeringLabel2">
               <property name="minimumSize">
                <size>
                 <width>50</width>
                 <height>0</height>
                </size>
               </property>
-              <property name="styleSheet">
-               <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-              </property>
               <property name="text">
-               <string>Pitch %</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
+               <string>Right %</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QSlider" name="elevonSlider2">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+             <widget class="QSlider" name="differentialSteeringSlider2">
               <property name="maximum">
                <number>100</number>
               </property>
@@ -357,12 +338,9 @@ margin:1px;</string>
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="elevonSliderLabel2">
+             <widget class="QLabel" name="gvDiffSteering2Label">
               <property name="text">
                <string>50</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
               </property>
              </widget>
             </item>
@@ -374,20 +352,7 @@ margin:1px;</string>
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="groupBox_3">
+      <widget class="QGroupBox" name="gvThrottleCurve1GroupBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -395,15 +360,64 @@ margin:1px;</string>
         </sizepolicy>
        </property>
        <property name="title">
-        <string>Throttle Curve</string>
+        <string>Front throttle curve</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_16">
+       <layout class="QVBoxLayout" name="verticalLayout_36">
         <item>
-         <widget class="MixerCurve" name="fixedWingThrottle" native="true">
+         <widget class="MixerCurve" name="groundVehicleThrottle1" native="true">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>1</horstretch>
-            <verstretch>1</verstretch>
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>500</width>
+            <height>500</height>
+           </size>
+          </property>
+          <property name="sizeIncrement">
+           <size>
+            <width>10</width>
+            <height>10</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>300</width>
+            <height>350</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QGroupBox" name="gvThrottleCurve2GroupBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>Rear throttle curve</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_37">
+        <item>
+         <widget class="MixerCurve" name="groundVehicleThrottle2" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
@@ -438,7 +452,7 @@ margin:1px;</string>
     </layout>
    </item>
    <item>
-    <spacer name="verticalSpacer">
+    <spacer name="verticalSpacer_1">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -451,9 +465,9 @@ margin:1px;</string>
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_13">
+    <layout class="QHBoxLayout" name="horizontalLayout_28">
      <item>
-      <spacer name="horizontalSpacer_11">
+      <spacer name="horizontalSpacer_21">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -466,7 +480,7 @@ margin:1px;</string>
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="fwStatusLabel">
+      <widget class="QLabel" name="gvStatusLabel">
        <property name="font">
         <font>
          <weight>75</weight>
@@ -495,9 +509,9 @@ margin:1px;</string>
  </resources>
  <connections>
   <connection>
-   <sender>elevonSlider1</sender>
+   <sender>differentialSteeringSlider1</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>elevonSliderLabel1</receiver>
+   <receiver>gvDiffSteering1Label</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -505,24 +519,24 @@ margin:1px;</string>
      <y>126</y>
     </hint>
     <hint type="destinationlabel">
-     <x>124</x>
-     <y>126</y>
+     <x>315</x>
+     <y>391</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>elevonSlider2</sender>
+   <sender>differentialSteeringSlider2</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>elevonSliderLabel2</receiver>
+   <receiver>gvDiffSteering2Label</receiver>
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>362</x>
-     <y>299</y>
-    </hint>
-    <hint type="destinationlabel">
      <x>124</x>
      <y>126</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>390</x>
+     <y>391</y>
     </hint>
    </hints>
   </connection>

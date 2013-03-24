@@ -66,14 +66,8 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
-else
-    ## Test Code
-    SRC += $(OPTESTS)/test_common.c
-    SRC += $(OPTESTS)/$(TESTAPP).c
-endif
 
-## UAVObjects
-ifndef TESTAPP
+    ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/accessorydesired.c
     SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
     SRC += $(OPUAVSYNTHDIR)/gcstelemetrystats.c
@@ -114,6 +108,10 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/txpidsettings.c
     SRC += $(OPUAVSYNTHDIR)/airspeedactual.c
     SRC += $(OPUAVSYNTHDIR)/mpu6000settings.c
+else
+    ## Test Code
+    SRC += $(OPTESTS)/test_common.c
+    SRC += $(OPTESTS)/$(TESTAPP).c
 endif
 
 include $(ROOT_DIR)/make/apps-defs.mk

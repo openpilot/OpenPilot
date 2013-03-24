@@ -1,5 +1,5 @@
 #
-# Rules to (help) build the F1xx device support.
+# Rules to (help) build the F10x device support.
 #
 
 # Directory containing this makefile
@@ -12,7 +12,6 @@ LINKER_SCRIPTS_PATH	=  $(PIOS_DEVLIB)
 CDEFS			+= -DSTM32F10X -DSTM32F10X_$(MODEL)
 CDEFS 			+= -DUSE_STDPERIPH_DRIVER
 CDEFS			+= -DARM_MATH_CM3
-
 ARCHFLAGS		+= -mcpu=cortex-m3
 
 # Board-specific startup files
@@ -22,6 +21,7 @@ ASRC			+= $(PIOS_DEVLIB)startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
 SRC			+= $(wildcard $(PIOS_DEVLIB)*.c)
 
 # CMSIS for the F1
+include $(PIOS)/Common/Libraries/CMSIS2/library.mk
 CMSIS_DIR		= $(PIOS_DEVLIB)Libraries/CMSIS/Core/CM3
 SRC			+= $(CMSIS_DIR)/core_cm3.c
 SRC			+= $(CMSIS_DIR)/system_stm32f10x.c

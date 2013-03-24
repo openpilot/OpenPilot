@@ -340,4 +340,3 @@ gtest_install: gtest_clean
 gtest_clean:
 	$(V0) @echo " CLEAN        $(GTEST_DIR)"
 	$(V1) [ ! -d "$(GTEST_DIR)" ] || $(RM) -rf "$(GTEST_DIR)"
-

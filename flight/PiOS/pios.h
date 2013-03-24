@@ -71,18 +71,18 @@
 /* PIOS common functions */
 #include <pios_crc.h>
 
-/* PIOS bootloader helper */
-#ifdef PIOS_INCLUDE_BL_HELPER
-/* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
-#include <pios_bl_helper.h>
-#endif
-
 /* PIOS FreeRTOS support */
 #ifdef PIOS_INCLUDE_FREERTOS
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
+#endif
+
+/* PIOS bootloader helper */
+#ifdef PIOS_INCLUDE_BL_HELPER
+/* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
+#include <pios_bl_helper.h>
 #endif
 
 /* PIOS system functions */
@@ -220,6 +220,10 @@
 #include <pios_ppm.h>
 #endif
 
+#ifdef PIOS_INCLUDE_PPM_FLEXI
+/* PPM on CC flexi port */
+#endif
+
 #ifdef PIOS_INCLUDE_DSM
 #include <pios_dsm.h>
 #endif
@@ -230,6 +234,11 @@
 
 #ifdef PIOS_INCLUDE_GCSRCVR
 /* only priv header */
+#endif
+
+/* PIOS abstract receiver interface */
+#ifdef PIOS_INCLUDE_RCVR
+#include <pios_rcvr.h>
 #endif
 
 /* PIOS common peripherals */
@@ -271,19 +280,17 @@
 #include <pios_eeprom.h>
 #endif
 
-/* PIOS Radio modules */
+/* PIOS radio modules */
 #ifdef PIOS_INCLUDE_RFM22B
-/* #define PIOS_INCLUDE_PACKET_HANDLER */
+/* #define PIOS_INCLUDE_PPM_OUT */
+/* #define PIOS_RFM22B_DEBUG_ON_TELEM */
 #include <pios_rfm22b.h>
-
 #ifdef PIOS_INCLUDE_RFM22B_COM
 #include <pios_rfm22b_com.h>
 #endif
-
 #ifdef PIOS_INCLUDE_RFM22B_RCVR
 #include <pios_rfm22b_rcvr.h>
 #endif
-
 #endif /* PIOS_INCLUDE_RFM22B */
 
 /* PIOS misc peripherals */
@@ -297,11 +304,6 @@
 
 #ifdef PIOS_INCLUDE_UDP
 #include <pios_udp.h>
-#endif
-
-/* PIOS abstract receiver interface */
-#ifdef PIOS_INCLUDE_RCVR
-#include <pios_rcvr.h>
 #endif
 
 /* PIOS abstract comms interface with options */
@@ -319,6 +321,9 @@
 /* #define PIOS_GPS_SETS_HOMELOCATION */
 #include <pios_com.h>
 #endif
+
+/* Stabilization options */
+/* #define PIOS_QUATERNION_STABILIZATION */
 
 /* Performance counters */
 /* #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998 */

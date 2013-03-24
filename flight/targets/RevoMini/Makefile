@@ -24,6 +24,9 @@ endif
 include $(ROOT_DIR)/make/boards/$(BOARD_NAME)/board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk
 
+# ARM DSP library
+USE_DSP_LIB ?= NO
+
 # List of mandatory modules to include
 MODULES += Sensors
 MODULES += Attitude/revolution
@@ -41,16 +44,16 @@ MODULES += FirmwareIAP
 MODULES += Radio
 MODULES += PathPlanner
 MODULES += FixedWingPathFollower
-#MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
 MODULES += Telemetry
+#MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
 
 OPTMODULES =
 
 # Include all camera options
 CDEFS += -DUSE_INPUT_LPF -DUSE_GIMBAL_LPF -DUSE_GIMBAL_FF
 
-# All diagnostics
-CDEFS += -DDIAGNOSTICS -DDIAG_TASKS
+# Some diagnostics
+CDEFS += -DDIAG_TASKS
 
 # Misc options
 CFLAGS += -ffast-math
@@ -73,19 +76,18 @@ ifndef TESTAPP
     SRC += $(OPSYSTEM)/cm3_fault_handlers.c
     #endif
 
+    ## Misc library functions
     SRC += $(FLIGHTLIB)/paths.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
     SRC += $(FLIGHTLIB)/insgps13state.c
+
+    ## UAVObjects
+    include ./UAVObjects.inc
+    SRC += $(UAVOBJSRC)
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c
     SRC += $(OPTESTS)/$(TESTAPP).c
-endif
-
-## UAVObjects
-ifndef TESTAPP
-    include ./UAVObjects.inc
-    SRC += $(UAVOBJSRC)
 endif
 
 # Optional component libraries

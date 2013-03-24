@@ -20,6 +20,25 @@ ifndef OPENPILOT_IS_COOL
     $(error Top level Makefile must be used to build this target)
 endif
 
+# Set to YES to compile for debugging
+DEBUG ?= NO
+
+# Set to YES to use the Servo output pins for debugging via scope or logic analyser
+ENABLE_DEBUG_PINS	?= NO
+
+# Set to YES to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
+ENABLE_AUX_UART		?= NO
+
+# Include objects that are just nice information to show
+DIAG_STACK		?= NO
+DIAG_MIXERSTATUS	?= NO
+DIAG_RATEDESIRED	?= NO
+DIAG_I2C_WDG_STATS	?= NO
+DIAG_TASKS		?= NO
+
+# Or just turn on all the above diagnostics. WARNING: this consumes massive amounts of memory.
+DIAG_ALL		?= NO
+
 # Optimization level, can be [0, 1, 2, 3, s].
 # 0 = turn off optimization. s = optimize for size.
 # Note: 3 is not always the best optimization level.
@@ -48,6 +67,28 @@ endif
 
 ifeq ($(ENABLE_AUX_UART), YES)
     CDEFS += -DPIOS_ENABLE_AUX_UART
+endif
+
+# The following Makefile command, ifneq (,$(filter) $(A), $(B) $(C))
+#    is equivalent to the pseudocode `if (A == B || A == C)`
+ifneq (,$(filter YES,$(DIAG_STACK) $(DIAG_ALL)))
+    CFLAGS += -DDIAG_STACK
+endif
+
+ifneq (,$(filter YES,$(DIAG_MIXERSTATUS) $(DIAG_ALL)))
+    CFLAGS += -DDIAG_MIXERSTATUS
+endif
+
+ifneq (,$(filter YES,$(DIAG_RATEDESIRED) $(DIAG_ALL)))
+    CFLAGS += -DDIAG_RATEDESIRED
+endif
+
+ifneq (,$(filter YES,$(DIAG_I2C_WDG_STATS) $(DIAG_ALL)))
+    CFLAGS += -DDIAG_I2C_WDG_STATS
+endif
+
+ifneq (,$(filter YES,$(DIAG_TASKS) $(DIAG_ALL)))
+    CFLAGS += -DDIAG_TASKS
 endif
 
 # Place project-specific -D and/or -U options for Assembler with preprocessor here.
@@ -235,4 +276,4 @@ $(shell $(MKDIR) -p $(OUTDIR) 2>/dev/null)
 -include $(shell $(MKDIR) -p $(OUTDIR)/dep 2>/dev/null) $(wildcard $(OUTDIR)/dep/*)
 
 # Listing of phony targets.
-.PHONY : all build clean install
+.PHONY: all build clean install

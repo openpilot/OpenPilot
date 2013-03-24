@@ -23,6 +23,9 @@ endif
 include $(ROOT_DIR)/make/boards/$(BOARD_NAME)/board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk
 
+# ARM DSP library
+override USE_DSP_LIB := NO
+
 # List of mandatory modules to include
 MODULES += RadioComBridge
 
@@ -40,18 +43,16 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
-else
-    ## Test Code
-    SRC += $(OPTESTS)/test_common.c
-    SRC += $(OPTESTS)/$(TESTAPP).c
-endif
 
-## UAVObjects
-ifndef TESTAPP
+    ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
     SRC += $(OPUAVSYNTHDIR)/oplinkstatus.c
     SRC += $(OPUAVSYNTHDIR)/oplinksettings.c
     SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
+else
+    ## Test Code
+    SRC += $(OPTESTS)/test_common.c
+    SRC += $(OPTESTS)/$(TESTAPP).c
 endif
 
 # Optional component libraries

@@ -39,8 +39,14 @@
 /* #define PIOS_INCLUDE_DEBUG_CONSOLE */
 /* #define DEBUG_LEVEL 0 */
 
-/* PIOS system functions */
+/* PIOS FreeRTOS support */
 #define PIOS_INCLUDE_FREERTOS
+
+/* PIOS bootloader helper */
+#define PIOS_INCLUDE_BL_HELPER
+/* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
+
+/* PIOS system functions */
 #define PIOS_INCLUDE_DELAY
 #define PIOS_INCLUDE_INITCALL
 #define PIOS_INCLUDE_SYS
@@ -81,9 +87,13 @@
 /* PIOS receiver drivers */
 #define PIOS_INCLUDE_PWM
 #define PIOS_INCLUDE_PPM
+#define PIOS_INCLUDE_PPM_FLEXI
 #define PIOS_INCLUDE_DSM
 #define PIOS_INCLUDE_SBUS
 #define PIOS_INCLUDE_GCSRCVR
+
+/* PIOS abstract receiver interface */
+#define PIOS_INCLUDE_RCVR
 
 /* PIOS common peripherals */
 #define PIOS_INCLUDE_LED
@@ -98,14 +108,18 @@
 #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
 /* #define FLASH_FREERTOS */
 /* #define PIOS_INCLUDE_FLASH_EEPROM */
+
+/* PIOS radio modules */
 /* #define PIOS_INCLUDE_RFM22B */
-/* #define PIOS_INCLUDE_PACKET_HANDLER */
+/* #define PIOS_INCLUDE_RFM22B_COM */
+/* #define PIOS_INCLUDE_RFM22B_RCVR */
+/* #define PIOS_INCLUDE_PPM_OUT */
+/* #define PIOS_RFM22B_DEBUG_ON_TELEM */
+
+/* PIOS misc peripherals */
 /* #define PIOS_INCLUDE_VIDEO */
 /* #define PIOS_INCLUDE_WAVE */
 /* #define PIOS_INCLUDE_UDP */
-
-/* PIOS abstract receiver interface */
-#define PIOS_INCLUDE_RCVR
 
 /* PIOS abstract comms interface with options */
 #define PIOS_INCLUDE_COM
@@ -121,9 +135,8 @@
 #define PIOS_INCLUDE_GPS_UBX_PARSER
 /* #define PIOS_GPS_SETS_HOMELOCATION */
 
-/* PIOS bootloader helper */
-#define PIOS_INCLUDE_BL_HELPER
-/* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
+/* Stabilization options */
+/* #define PIOS_QUATERNION_STABILIZATION */
 
 /* Performance counters */
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD	1995998
@@ -144,11 +157,11 @@
 #define PIOS_TELEM_STACK_SIZE		500
 #define PIOS_EVENTDISPATCHER_STACK_SIZE	130
 
-/* Stabilization options */
-/* #define PIOS_QUATERNION_STABILIZATION */
-
 /* This can't be too high to stop eventdispatcher thread overflowing */
 #define PIOS_EVENTDISAPTCHER_QUEUE	10
+
+/* Revolution series */
+/* #define REVOLUTION */
 
 #endif /* PIOS_CONFIG_H */
 /**

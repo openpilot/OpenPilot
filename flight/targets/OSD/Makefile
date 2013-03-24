@@ -23,6 +23,9 @@ endif
 include $(ROOT_DIR)/make/boards/$(BOARD_NAME)/board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk
 
+# ARM DSP library
+override USE_DSP_LIB := NO
+
 # List of mandatory modules to include
 MODULES += Osd/osdgen
 MODULES += Osd/osdinput
@@ -60,16 +63,11 @@ ifndef TESTAPP
     SRC += $(OPSYSTEM)/cm3_fault_handlers.c
     #endif
 
+    ## Misc library functions
     SRC += $(FLIGHTLIB)/printf2.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
-else
-    ## Test Code
-    SRC += $(OPTESTS)/test_common.c
-    SRC += $(OPTESTS)/$(TESTAPP).c
-endif
 
-## UAVObjects
-ifndef TESTAPP
+    ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
     SRC += $(OPUAVSYNTHDIR)/gcstelemetrystats.c
     SRC += $(OPUAVSYNTHDIR)/flighttelemetrystats.c
@@ -92,7 +90,12 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/osdsettings.c
     SRC += $(OPUAVSYNTHDIR)/baroaltitude.c
     SRC += $(OPUAVSYNTHDIR)/magnetometer.c
+else
+    ## Test Code
+    SRC += $(OPTESTS)/test_common.c
+    SRC += $(OPTESTS)/$(TESTAPP).c
 endif
+
 	
 # Optional component libraries
 include $(PIOS)/Common/Libraries/dosfs/library.mk

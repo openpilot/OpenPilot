@@ -172,7 +172,7 @@ By default a lot of diagnostic objects that were enabled by default are now
 disabled in the build.  This include TaskInfo (and all the FreeRTOS options
 that provide that debugging information).  Also MixerStatus, I2CStatus,
 WatchdogStatus and RateDesired.  These can be reenabled for debugging with
--DDIAGNOSTICS.
+-DDIAG_ALL.
 
 2011-08-04
 Fixed packaging aesthetic issues.  Also avoid runtime issues on OSX Lion by

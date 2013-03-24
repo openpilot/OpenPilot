@@ -44,7 +44,7 @@ install:
 	cp -arp package/linux/openpilot_menu.menu debian/openpilot/etc/xdg/menus/applications-merged
 	cp -arp package/linux/openpilot_menu.directory debian/openpilot/usr/share/desktop-directories
 ifdef PACKAGE_DIR
-	cp -a $(PACKAGE_DIR)/*.opfw debian/openpilot/usr/local/OpenPilot/firmware/
+	cp -a $(PACKAGE_DIR)/* debian/openpilot/usr/local/OpenPilot/firmware/
 else
 	$(error PACKAGE_DIR not defined! $(PACKAGE_DIR))
 endif

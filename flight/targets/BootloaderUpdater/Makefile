@@ -23,6 +23,9 @@ endif
 include $(ROOT_DIR)/make/boards/$(BOARD_NAME)/board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk
 
+# ARM DSP library
+override USE_DSP_LIB := NO
+
 # Paths
 TOPDIR		= .
 OPSYSTEM	= $(TOPDIR)

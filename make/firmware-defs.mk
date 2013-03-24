@@ -40,34 +40,33 @@ else
 endif
 
 # Define Messages
-# English
-MSG_FORMATERROR      = ${QUOTE} Can not handle output-format${QUOTE}
-MSG_MODINIT          = ${QUOTE} MODINIT   $(MSG_EXTRA) ${QUOTE}
-MSG_SIZE             = ${QUOTE} SIZE      $(MSG_EXTRA) ${QUOTE}
-MSG_LOAD_FILE        = ${QUOTE} BIN/HEX   $(MSG_EXTRA) ${QUOTE}
-MSG_BIN_OBJ          = ${QUOTE} BINO      $(MSG_EXTRA) ${QUOTE}
-MSG_STRIP_FILE       = ${QUOTE} STRIP     $(MSG_EXTRA) ${QUOTE}
-MSG_EXTENDED_LISTING = ${QUOTE} LIS       $(MSG_EXTRA) ${QUOTE}
-MSG_SYMBOL_TABLE     = ${QUOTE} NM        $(MSG_EXTRA) ${QUOTE}
-MSG_ARCHIVING        = ${QUOTE} AR        $(MSG_EXTRA) ${QUOTE}
-MSG_LINKING          = ${QUOTE} LD        $(MSG_EXTRA) ${QUOTE}
-MSG_COMPILING        = ${QUOTE} CC        $(MSG_EXTRA) ${QUOTE}
-MSG_COMPILING_ARM    = ${QUOTE} CC-ARM    $(MSG_EXTRA) ${QUOTE}
-MSG_COMPILINGCXX     = ${QUOTE} CXX       $(MSG_EXTRA) ${QUOTE}
-MSG_COMPILINGCXX_ARM = ${QUOTE} CXX-ARM   $(MSG_EXTRA) ${QUOTE}
-MSG_ASSEMBLING       = ${QUOTE} AS        $(MSG_EXTRA) ${QUOTE}
-MSG_ASSEMBLING_ARM   = ${QUOTE} AS-ARM    $(MSG_EXTRA) ${QUOTE}
-MSG_CLEANING         = ${QUOTE} CLEAN     $(MSG_EXTRA) ${QUOTE}
-MSG_ASMFROMC         = ${QUOTE} AS(C)     $(MSG_EXTRA) ${QUOTE}
-MSG_ASMFROMC_ARM     = ${QUOTE} AS(C)-ARM $(MSG_EXTRA) ${QUOTE}
-MSG_PYMITEINIT       = ${QUOTE} PY        $(MSG_EXTRA) ${QUOTE}
-MSG_INSTALLING       = ${QUOTE} INSTALL   $(MSG_EXTRA) ${QUOTE}
-MSG_OPFIRMWARE       = ${QUOTE} OPFW      $(MSG_EXTRA) ${QUOTE}
-MSG_FWINFO           = ${QUOTE} FWINFO    $(MSG_EXTRA) ${QUOTE}
-MSG_JTAG_PROGRAM     = ${QUOTE} JTAG-PGM  $(MSG_EXTRA) ${QUOTE}
-MSG_JTAG_WIPE        = ${QUOTE} JTAG-WIPE $(MSG_EXTRA) ${QUOTE}
-MSG_PADDING          = ${QUOTE} PADDING   $(MSG_EXTRA) ${QUOTE}
-MSG_FLASH_IMG        = ${QUOTE} FLASH_IMG $(MSG_EXTRA) ${QUOTE}
+MSG_FORMATERROR      = $(QUOTE) Can not handle output-format$(QUOTE)
+MSG_MODINIT          = $(QUOTE) MODINIT   $(MSG_EXTRA) $(QUOTE)
+MSG_SIZE             = $(QUOTE) SIZE      $(MSG_EXTRA) $(QUOTE)
+MSG_LOAD_FILE        = $(QUOTE) BIN/HEX   $(MSG_EXTRA) $(QUOTE)
+MSG_BIN_OBJ          = $(QUOTE) BINO      $(MSG_EXTRA) $(QUOTE)
+MSG_STRIP_FILE       = $(QUOTE) STRIP     $(MSG_EXTRA) $(QUOTE)
+MSG_EXTENDED_LISTING = $(QUOTE) LIS       $(MSG_EXTRA) $(QUOTE)
+MSG_SYMBOL_TABLE     = $(QUOTE) NM        $(MSG_EXTRA) $(QUOTE)
+MSG_ARCHIVING        = $(QUOTE) AR        $(MSG_EXTRA) $(QUOTE)
+MSG_LINKING          = $(QUOTE) LD        $(MSG_EXTRA) $(QUOTE)
+MSG_COMPILING        = $(QUOTE) CC        $(MSG_EXTRA) $(QUOTE)
+MSG_COMPILING_ARM    = $(QUOTE) CC-ARM    $(MSG_EXTRA) $(QUOTE)
+MSG_COMPILINGCXX     = $(QUOTE) CXX       $(MSG_EXTRA) $(QUOTE)
+MSG_COMPILINGCXX_ARM = $(QUOTE) CXX-ARM   $(MSG_EXTRA) $(QUOTE)
+MSG_ASSEMBLING       = $(QUOTE) AS        $(MSG_EXTRA) $(QUOTE)
+MSG_ASSEMBLING_ARM   = $(QUOTE) AS-ARM    $(MSG_EXTRA) $(QUOTE)
+MSG_CLEANING         = $(QUOTE) CLEAN     $(MSG_EXTRA) $(QUOTE)
+MSG_ASMFROMC         = $(QUOTE) AS(C)     $(MSG_EXTRA) $(QUOTE)
+MSG_ASMFROMC_ARM     = $(QUOTE) AS(C)-ARM $(MSG_EXTRA) $(QUOTE)
+MSG_PYMITEINIT       = $(QUOTE) PY        $(MSG_EXTRA) $(QUOTE)
+MSG_INSTALLING       = $(QUOTE) INSTALL   $(MSG_EXTRA) $(QUOTE)
+MSG_OPFIRMWARE       = $(QUOTE) OPFW      $(MSG_EXTRA) $(QUOTE)
+MSG_FWINFO           = $(QUOTE) FWINFO    $(MSG_EXTRA) $(QUOTE)
+MSG_JTAG_PROGRAM     = $(QUOTE) JTAG-PGM  $(MSG_EXTRA) $(QUOTE)
+MSG_JTAG_WIPE        = $(QUOTE) JTAG-WIPE $(MSG_EXTRA) $(QUOTE)
+MSG_PADDING          = $(QUOTE) PADDING   $(MSG_EXTRA) $(QUOTE)
+MSG_FLASH_IMG        = $(QUOTE) FLASH_IMG $(MSG_EXTRA) $(QUOTE)
 
 # Function for converting an absolute path to one relative
 # to the top of the source tree.
@@ -210,9 +209,10 @@ else
 #	limitation. It is assumed that if the object files directory
 #	is given, all object files are in that directory.
 	$(V1) ( \
-		pushd $(3) >/dev/null && \
+		pwd=`pwd` && \
+		cd $(3) && \
 		$(AR) rcs $$@ $(notdir $(2)) && \
-		popd >/dev/null \
+		cd $$$${pwd} >/dev/null \
 	      )
 endif
 endef

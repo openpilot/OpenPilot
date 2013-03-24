@@ -8,7 +8,7 @@ EXTRAINCDIRS	+= $(CMSIS2_DIR)Include
 # Rules to build the ARM DSP library
 ifeq ($(USE_DSP_LIB), YES)
     DSPLIB_NAME		:= dsp
-    CMSIS_DSPLIB	:= $(CMSIS2_DIR)/DSP_Lib/Source
+    CMSIS_DSPLIB	:= $(CMSIS2_DIR)DSP_Lib/Source
 
     # Compile all files into output directory
     DSPLIB_SRC		:= $(wildcard $(CMSIS_DSPLIB)/*/*.c)

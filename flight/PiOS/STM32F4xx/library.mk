@@ -16,6 +16,7 @@ CDEFS			+= -DSTM32F4XX
 CDEFS			+= -DSYSCLK_FREQ=$(SYSCLK_FREQ)
 CDEFS			+= -DHSE_VALUE=$(OSCILLATOR_FREQ)
 CDEFS 			+= -DUSE_STDPERIPH_DRIVER
+CDEFS			+= -DARM_MATH_CM4 -D__FPU_PRESENT=1
 ARCHFLAGS		+= -mcpu=cortex-m4 -march=armv7e-m -mfpu=fpv4-sp-d16 -mfloat-abi=hard
 
 # PIOS device library source and includes

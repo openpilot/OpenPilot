@@ -20,16 +20,6 @@ ifndef OPENPILOT_IS_COOL
     $(error Top level Makefile must be used to build this target)
 endif
 
-# Set developer code and compile options.
-# Set to YES to compile for debugging
-DEBUG ?= NO
-
-# Set to YES to use the Servo output pins for debugging via scope or logic analyser
-ENABLE_DEBUG_PINS ?= NO
-
-# Set to YES to enable the AUX UART which is mapped on the S1 (Tx) and S2 (Rx) servo outputs
-ENABLE_AUX_UART ?= NO
-
 # Paths
 TOPDIR		= .
 OPSYSTEM	= $(TOPDIR)
@@ -38,6 +28,9 @@ PIOSINC		= $(PIOS)/inc
 PIOSCOMMON	= $(PIOS)/Common
 PIOSBOARDS	= $(PIOS)/Boards
 FLIGHTLIBINC	= $(FLIGHTLIB)/inc
+
+# ARM DSP library
+override USE_DSP_LIB := NO
 
 ## PIOS Hardware
 ifeq ($(MCU),cortex-m3)
@@ -124,7 +117,7 @@ BLONLY_CDEFS += -DFW_BANK_SIZE=$(FW_BANK_SIZE)
 BLONLY_CDEFS += -DFW_DESC_SIZE=$(FW_DESC_SIZE)
 
 # Compiler flags
-CFLAGS += $(BLONLY_CDEFS)
+CDEFS += $(BLONLY_CDEFS)
 
 # Set linker-script name depending on selected submodel name
 ifeq ($(MCU),cortex-m3)

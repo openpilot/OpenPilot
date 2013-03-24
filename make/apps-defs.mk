@@ -20,23 +20,6 @@ ifndef OPENPILOT_IS_COOL
     $(error Top level Makefile must be used to build this target)
 endif
 
-# Set developer code and compile options.
-# Set to YES to compile for debugging
-DEBUG ?= NO
-
-# Set to YES to use the Servo output pins for debugging via scope or logic analyser
-ENABLE_DEBUG_PINS ?= NO
-
-# Include objects that are just nice information to show
-STACK_DIAGNOSTICS		?= NO
-MIXERSTATUS_DIAGNOSTICS		?= NO
-RATEDESIRED_DIAGNOSTICS		?= NO
-I2C_WDG_STATS_DIAGNOSTICS	?= NO
-DIAG_TASKS			?= NO
-
-# Or just turn on all the above diagnostics. WARNING: this consumes massive amounts of memory.
-ALL_DIGNOSTICS			?= NO
-
 # Paths
 TOPDIR		= .
 OPSYSTEM	= $(TOPDIR)/System
@@ -100,26 +83,26 @@ SRC += $(PIOSCOMMON)/pios_flash_jedec.c
 SRC += $(PIOSCOMMON)/pios_rcvr.c
 SRC += $(PIOSCOMMON)/pios_rfm22b.c
 SRC += $(PIOSCOMMON)/pios_rfm22b_com.c
+SRC += $(PIOSCOMMON)/pios_rfm22b_rcvr.c
 SRC += $(PIOSCOMMON)/pios_sbus.c
 SRC += $(PIOSCOMMON)/pios_sdcard.c
 
-# PIOS USB related files
+## PIOS USB related files
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 SRC += $(PIOSCOMMON)/pios_usb_util.c
 
-## Libraries for flight calculations
+## Misc library functions
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/taskmonitor.c
-SRC += $(FLIGHTLIB)/packet_handler.c
 SRC += $(FLIGHTLIB)/sanitycheck.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 
 ## Modules
-SRC += ${foreach MOD, ${MODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
-SRC += ${foreach MOD, ${OPTMODULES}, ${wildcard ${OPMODULEDIR}/${MOD}/*.c}}
+SRC += $(foreach mod, $(MODULES), $(wildcard $(OPMODULEDIR)/$(mod)/*.c))
+SRC += $(foreach mod, $(OPTMODULES), $(wildcard $(OPMODULEDIR)/$(mod)/*.c))
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # Use file-extension c for "c-only"-files
@@ -181,28 +164,6 @@ CFLAGS +=
 
 # Declare all non-optional modules as built-in to force inclusion
 CDEFS += $(foreach mod, $(notdir $(MODULES)), -DMODULE_$(mod)_BUILTIN)
-
-# The following Makefile command, ifneq (,$(filter) $(A), $(B) $(C))
-#    is equivalent to the pseudocode `if (A == B || A == C)`
-ifneq (,$(filter YES,$(STACK_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
-    CFLAGS += -DSTACK_DIAGNOSTICS
-endif
-
-ifneq (,$(filter YES,$(MIXERSTATUS_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
-    CFLAGS += -DMIXERSTATUS_DIAGNOSTICS
-endif
-
-ifneq (,$(filter YES,$(RATEDESIRED_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
-    CFLAGS += -DRATEDESIRED_DIAGNOSTICS
-endif
-
-ifneq (,$(filter YES,$(I2C_WDG_STATS_DIAGNOSTICS) $(ALL_DIGNOSTICS)))
-    CFLAGS += -DI2C_WDG_STATS_DIAGNOSTICS
-endif
-
-ifneq (,$(filter YES,$(DIAG_TASKS) $(ALL_DIGNOSTICS)))
-    CFLAGS += -DDIAG_TASKS
-endif
 
 # Set linker-script name depending on selected submodel name
 ifeq ($(MCU),cortex-m3)

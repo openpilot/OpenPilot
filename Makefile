@@ -105,7 +105,7 @@ export GIT	:= git
 export PYTHON	:= python
 export INSTALL	:= install
 
-# version-info cmd to extract some repository data
+# Command to extract version info data from the repository and source tree
 export VERSION_INFO := $(PYTHON) "$(ROOT_DIR)/make/scripts/version-info.py" --path="$(ROOT_DIR)"
 
 # Test if quotes are needed for the echo-command
@@ -253,7 +253,7 @@ export DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
 export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 
 # Define supported board lists
-ALL_BOARDS    := coptercontrol pipxtreme revolution revomini simposix osd
+ALL_BOARDS    := coptercontrol pipxtreme revolution revomini osd simposix
 ALL_BOARDS_BU := coptercontrol pipxtreme simposix
 
 # Friendly names of each board (used to find source tree)
@@ -261,16 +261,16 @@ coptercontrol_friendly := CopterControl
 pipxtreme_friendly     := PipXtreme
 revolution_friendly    := Revolution
 revomini_friendly      := RevoMini
-simposix_friendly      := SimPosix
 osd_friendly           := OSD
+simposix_friendly      := SimPosix
 
 # Short names of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '
 pipxtreme_short        := 'pipx'
 revolution_short       := 'revo'
 revomini_short         := 'rm  '
-simposix_short         := 'posx'
 osd_short              := 'osd '
+simposix_short         := 'posx'
 
 # SimPosix only builds on Linux so drop it from the list for
 # all other platforms.
@@ -841,7 +841,7 @@ endef
 # and call platform-specific packaging script
 .PHONY: package
 package: all_fw all_ground uavobjects_matlab
-	$(V1) $(ECHO) "Packaging for $(UNAME) $(ARCH) into $(call toprel, $(PACKAGE_DIR)) directory"
+	@$(ECHO) "Packaging for $(UNAME) $(ARCH) into $(call toprel, $(PACKAGE_DIR)) directory"
 	$(V1) [ ! -d "$(PACKAGE_DIR)" ] || $(RM) -rf "$(PACKAGE_DIR)"
 	$(V1) $(MKDIR) -p "$(PACKAGE_DIR)/firmware"
 	$(foreach fw_targ, $(PACKAGE_FW_TARGETS), $(call COPY_FW_FILES,$(fw_targ),.opfw,.opfw))

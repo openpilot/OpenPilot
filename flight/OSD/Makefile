@@ -211,6 +211,7 @@ SRC += $(PIOSCOMMON)/pios_hmc5883.c
 #SRC += $(PIOSCOMMON)/printf-stdarg.c
 SRC += $(PIOSCOMMON)/printf2.c
 SRC += $(PIOSCOMMON)/pios_crc.c
+SRC += $(PIOSCOMMON)/pios_iap.c
 SRC += $(PIOSCOMMON)/pios_video.c
 SRC += $(PIOSCOMMON)/pios_wavplay.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c

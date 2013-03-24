@@ -18,7 +18,7 @@ def append(verbose, text, data):
     offset += len(data)
 
 def create_entire_flash(args):
-    """Generates entire flash image and prints it to stdout"""
+    """Generates entire flash image, prints image info and writes image to a file"""
     global image, offset
 
     assert args.bl_bank_base is not None

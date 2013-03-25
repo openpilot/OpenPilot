@@ -90,5 +90,8 @@ else
     SRC += $(OPTESTS)/$(TESTAPP).c
 endif
 
+# Optional component libraries
+#include $(FLIGHTLIB)/PyMite/pymite.mk
+
 include $(ROOT_DIR)/make/apps-defs.mk
 include $(ROOT_DIR)/make/common-defs.mk

@@ -94,7 +94,7 @@ int32_t CameraStabInitialize(void)
 {
 	bool cameraStabEnabled;
 
-#ifdef MODULE_CameraStab_BUILTIN
+#ifdef MODULE_CAMERASTAB_BUILTIN
 	cameraStabEnabled = true;
 #else
 	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];

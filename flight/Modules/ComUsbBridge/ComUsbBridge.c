@@ -94,7 +94,7 @@ static int32_t comUsbBridgeInitialize(void)
 	usart_port = PIOS_COM_BRIDGE;
 	vcp_port = PIOS_COM_VCP;
 
-#ifdef MODULE_ComUsbBridge_BUILTIN
+#ifdef MODULE_COMUSBBRIDGE_BUILTIN
 	bridge_enabled = true;
 #else
 	HwSettingsInitialize();

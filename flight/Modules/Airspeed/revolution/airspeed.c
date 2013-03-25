@@ -89,7 +89,7 @@ int32_t AirspeedStart()
  */
 int32_t AirspeedInitialize()
 {
-#ifdef MODULE_Airspeed_BUILTIN
+#ifdef MODULE_AIRSPEED_BUILTIN
 	airspeedEnabled = true;
 #else
 	

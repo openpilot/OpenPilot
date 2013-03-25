@@ -104,6 +104,11 @@ SRC += $(MATHLIB)/pid.c
 SRC += $(foreach mod, $(MODULES), $(wildcard $(OPMODULEDIR)/$(mod)/*.c))
 SRC += $(foreach mod, $(OPTMODULES), $(wildcard $(OPMODULEDIR)/$(mod)/*.c))
 
+# Declare all non-optional modules as built-in to force inclusion.
+# Built-in modules are always enabled and cannot be disabled.
+MODULES_BUILTIN := $(foreach mod, $(notdir $(MODULES)), -DMODULE_$(shell $(ECHO) $(mod) | tr '[:lower:]' '[:upper:]')_BUILTIN)
+CDEFS += $(MODULES_BUILTIN)
+
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
 # Use file-extension c for "c-only"-files
 SRCARM +=
@@ -161,9 +166,6 @@ EXTRA_LIBS += m
 
 # Compiler flags
 CFLAGS +=
-
-# Declare all non-optional modules as built-in to force inclusion
-CDEFS += $(foreach mod, $(notdir $(MODULES)), -DMODULE_$(mod)_BUILTIN)
 
 # Set linker-script name depending on selected submodel name
 ifeq ($(MCU),cortex-m3)

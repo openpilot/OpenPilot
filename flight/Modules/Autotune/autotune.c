@@ -82,7 +82,7 @@ static void update_stabilization_settings();
 int32_t AutotuneInitialize(void)
 {
 	// Create a queue, connect to manual control command and flightstatus
-#ifdef MODULE_Autotune_BUILTIN
+#ifdef MODULE_AUTOTUNE_BUILTIN
 	autotuneEnabled = true;
 #else
 	HwSettingsInitialize();

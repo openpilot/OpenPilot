@@ -106,7 +106,8 @@ SRC += $(foreach mod, $(OPTMODULES), $(wildcard $(OPMODULEDIR)/$(mod)/*.c))
 
 # Declare all non-optional modules as built-in to force inclusion.
 # Built-in modules are always enabled and cannot be disabled.
-MODULES_BUILTIN := $(foreach mod, $(notdir $(MODULES)), -DMODULE_$(shell $(ECHO) $(mod) | tr '[:lower:]' '[:upper:]')_BUILTIN)
+MODNAMES := $(notdir $(subst /revolution,,$(MODULES)))
+MODULES_BUILTIN := $(foreach mod, $(MODNAMES), -DMODULE_$(shell $(ECHO) $(mod) | tr '[:lower:]' '[:upper:]')_BUILTIN)
 CDEFS += $(MODULES_BUILTIN)
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).

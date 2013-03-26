@@ -3,6 +3,9 @@
 # -------------------------------------------------
 QT += xml
 QT -= gui
+macx {
+    QMAKE_CXXFLAGS  += -fpermissive
+}
 TARGET = uavobjgenerator
 CONFIG += console
 CONFIG -= app_bundle

@@ -30,6 +30,7 @@
  */
 #include "pios.h"
 #include "pios_flash_jedec_priv.h"
+#include "pios_flash_jedec_catalog.h"
 
 #define JEDEC_WRITE_ENABLE           0x06
 #define JEDEC_WRITE_DISABLE          0x04
@@ -115,7 +116,7 @@ static int32_t PIOS_Flash_Jedec_Validate(struct jedec_flash_dev * flash_dev) {
 /**
  * @brief Initialize the flash device and enable write access
  */
-int32_t PIOS_Flash_Jedec_Init(uintptr_t * flash_id, uint32_t spi_id, uint32_t slave_num, const struct pios_flash_jedec_cfg * cfg)
+int32_t PIOS_Flash_Jedec_Init(uintptr_t * flash_id, uint32_t spi_id, uint32_t slave_num)
 {
 	struct jedec_flash_dev * flash_dev = PIOS_Flash_Jedec_alloc();
 	if (flash_dev == NULL)
@@ -123,15 +124,25 @@ int32_t PIOS_Flash_Jedec_Init(uintptr_t * flash_id, uint32_t spi_id, uint32_t sl
 
 	flash_dev->spi_id = spi_id;
 	flash_dev->slave_num = slave_num;
-	flash_dev->cfg = cfg;
+	flash_dev->cfg = 0;
 
 	(void) PIOS_Flash_Jedec_ReadID(flash_dev);
-	if ((flash_dev->manufacturer != flash_dev->cfg->expect_manufacturer) ||
-		(flash_dev->memorytype != flash_dev->cfg->expect_memorytype) ||
-		(flash_dev->capacity != flash_dev->cfg->expect_capacity)) {
-		/* Mismatched device has been discovered */
-		return -1;
+	uint32_t i = 0;
+	while(i < pios_flash_jedec_catalog_size)
+	{
+		const struct pios_flash_jedec_cfg flash_jedec_entry = pios_flash_jedec_catalog[i];
+
+		if ((flash_dev->manufacturer == flash_jedec_entry.expect_manufacturer) &&
+			(flash_dev->memorytype == flash_jedec_entry.expect_memorytype) &&
+			(flash_dev->capacity == flash_jedec_entry.expect_capacity))
+		{
+			flash_dev->cfg = &pios_flash_jedec_catalog[i];
+		}
+		i++;
 	}
+
+	if(flash_dev->cfg == 0)
+		return -1;
 
 	/* Give back a handle to this flash device */
 	*flash_id = (uintptr_t) flash_dev;

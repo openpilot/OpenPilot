@@ -47,6 +47,6 @@ struct pios_flash_jedec_cfg {
 	uint32_t chip_erase;
 };
 
-int32_t PIOS_Flash_Jedec_Init(uintptr_t * flash_id, uint32_t spi_id, uint32_t slave_num, const struct pios_flash_jedec_cfg * cfg);
+int32_t PIOS_Flash_Jedec_Init(uintptr_t * flash_id, uint32_t spi_id, uint32_t slave_num);
 
 #endif	/* PIOS_FLASH_JEDEC_H_ */

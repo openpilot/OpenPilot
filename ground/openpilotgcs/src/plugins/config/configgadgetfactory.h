@@ -31,7 +31,6 @@
 #include "configgadgetwidget.h"
 #include "config_global.h"
 
-
 namespace Core {
 class IUAVGadget;
 class IUAVGadgetFactory;
@@ -43,19 +42,16 @@ class CONFIG_EXPORT ConfigGadgetFactory:  public Core::IUAVGadgetFactory
 {
    Q_OBJECT
 public:
-
     ConfigGadgetFactory(QObject *parent = 0);
     ~ConfigGadgetFactory();
 
     IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
-    IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 
 public slots:
     void startInputWizard();
 
 private:
-    ConfigGadgetWidget* gadgetWidget;
+    ConfigGadgetWidget *gadgetWidget;
 };
 
 #endif // CONFIGGADGETFACTORY_H

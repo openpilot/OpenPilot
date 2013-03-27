@@ -219,6 +219,11 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     connect(m_ui->sixPointsStart, SIGNAL(clicked()), this, SLOT(doStartSixPointCalibration()));
     connect(m_ui->sixPointsSave, SIGNAL(clicked()), this, SLOT(savePositionData()));
     connect(m_ui->noiseMeasurementStart, SIGNAL(clicked()), this, SLOT(doStartNoiseMeasurement()));
+
+    addUAVObjectToWidgetRelation("RevoSettings", "FusionAlgorithm", m_ui->FusionAlgorithm);
+
+    populateWidgets();
+    refreshWidgetsValues();
 }
 
 ConfigRevoWidget::~ConfigRevoWidget()
@@ -1028,8 +1033,10 @@ void ConfigRevoWidget::drawVariancesGraph()
   * Called by the ConfigTaskWidget parent when RevoCalibration is updated
   * to update the UI
   */
-void ConfigRevoWidget::refreshWidgetsValues(UAVObject *)
+void ConfigRevoWidget::refreshWidgetsValues(UAVObject *object)
 {
+    ConfigTaskWidget::refreshWidgetsValues(object);
+
     drawVariancesGraph();
 
     m_ui->noiseMeasurementStart->setEnabled(true);

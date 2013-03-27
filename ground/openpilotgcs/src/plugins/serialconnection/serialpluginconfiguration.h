@@ -40,16 +40,19 @@ class SerialPluginConfiguration : public IUAVGadgetConfiguration
 {
 Q_OBJECT
 public:
-    explicit SerialPluginConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
-    QString speed() {return m_speed;}
-    void saveConfig(QSettings* settings) const;
+    explicit SerialPluginConfiguration(QString classId, QSettings *qSettings = 0, QObject *parent = 0);
+    virtual ~SerialPluginConfiguration();
+
+    QString speed() { return m_speed; }
+    void saveConfig(QSettings *settings) const;
     IUAVGadgetConfiguration *clone();
     void savesettings() const;
     void restoresettings();
-    virtual ~SerialPluginConfiguration();
+
 private:
     QString m_speed;
-    QSettings* settings;
+    QSettings *settings;
+
 public slots:
     void setSpeed(QString speed) { m_speed = speed; }
 

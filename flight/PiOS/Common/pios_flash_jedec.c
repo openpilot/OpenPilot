@@ -124,11 +124,11 @@ int32_t PIOS_Flash_Jedec_Init(uintptr_t * flash_id, uint32_t spi_id, uint32_t sl
 
 	flash_dev->spi_id = spi_id;
 	flash_dev->slave_num = slave_num;
-	flash_dev->cfg = 0;
+	flash_dev->cfg = NULL;
 
 	(void) PIOS_Flash_Jedec_ReadID(flash_dev);
 	uint32_t i = 0;
-	while(i < pios_flash_jedec_catalog_size)
+	while ((i < pios_flash_jedec_catalog_size) && !flash_dev->cfg)
 	{
 		const struct pios_flash_jedec_cfg flash_jedec_entry = pios_flash_jedec_catalog[i];
 
@@ -141,8 +141,10 @@ int32_t PIOS_Flash_Jedec_Init(uintptr_t * flash_id, uint32_t spi_id, uint32_t sl
 		i++;
 	}
 
-	if(flash_dev->cfg == 0)
+	if(!flash_dev->cfg)
+	{
 		return -1;
+	}
 
 	/* Give back a handle to this flash device */
 	*flash_id = (uintptr_t) flash_dev;

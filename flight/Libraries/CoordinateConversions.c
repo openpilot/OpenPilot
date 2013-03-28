@@ -148,9 +148,9 @@ void RPY2Quaternion(const float rpy[3], float q[4])
 	float phi, theta, psi;
 	float cphi, sphi, ctheta, stheta, cpsi, spsi;
 
-	phi = DEG2RAD * rpy[0] / 2;
-	theta = DEG2RAD * rpy[1] / 2;
-	psi = DEG2RAD * rpy[2] / 2;
+	phi = DEG2RAD * rpy[0] / 2.0f;
+	theta = DEG2RAD * rpy[1] / 2.0f;
+	psi = DEG2RAD * rpy[2] / 2.0f;
 	cphi = cosf(phi);
 	sphi = sinf(phi);
 	ctheta = cosf(theta);

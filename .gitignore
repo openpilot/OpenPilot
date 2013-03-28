@@ -52,3 +52,4 @@ openpilotgcs-build-desktop
 /androidgcs/gen/
 /.cproject
 /.project
+/.metadata

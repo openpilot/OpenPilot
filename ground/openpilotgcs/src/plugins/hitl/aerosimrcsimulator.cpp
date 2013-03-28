@@ -71,13 +71,48 @@ void AeroSimRCSimulator::transmitUpdate()
         channels[i] = out;
     }
 
+    ActuatorDesired::DataFields actData;
+    FlightStatus::DataFields flightStatusData = flightStatus->getData();
+    ManualControlCommand::DataFields manCtrlData = manCtrlCommand->getData();
+    float roll = -1;
+    float pitch = -1;
+    float yaw = -1;
+    float throttle = -1;
+
+    if(flightStatusData.FlightMode == FlightStatus::FLIGHTMODE_MANUAL)
+    {
+        // Read joystick input
+        if(flightStatusData.Armed == FlightStatus::ARMED_ARMED)
+        {
+            // Note: Pitch sign is reversed in FG ?
+            roll = manCtrlData.Roll;
+            pitch = -manCtrlData.Pitch;
+            yaw = manCtrlData.Yaw;
+            throttle = manCtrlData.Throttle;
+        }
+    }
+    else
+    {
+        // Read ActuatorDesired from autopilot
+        actData = actDesired->getData();
+
+        roll = actData.Roll;
+        pitch = -actData.Pitch;
+        yaw = actData.Yaw;
+        throttle = (actData.Throttle*2.0)-1.0;
+    }
+    channels[0]=roll;
+    channels[1]=pitch;
+    if(throttle<-1)
+        throttle=-1;
+    channels[2]=throttle;
+    channels[3]=yaw;
+
     // read flight status
-    FlightStatus::DataFields flightData;
-    flightData = flightStatus->getData();
     quint8 armed;
     quint8 mode;
-    armed = flightData.Armed;
-    mode = flightData.FlightMode;
+    armed = flightStatusData.Armed;
+    mode = flightStatusData.FlightMode;
 
     QByteArray data;
     // 50 - current size of values, 4(quint32) + 10*4(float) + 2(quint8) + 4(quint32)
@@ -132,8 +167,9 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
             posX, posY, posZ,   // world
             velX, velY, velZ,   // world
             angX, angY, angZ,   // model
-            accX, accY, accZ,   // model
-            lat, lon, agl,      // world
+            accX, accY, accZ;   // model
+    qreal  lat, lon;
+    float   agl,      // world
             yaw, pitch, roll,   // model
             volt, curr,
             rx, ry, rz, fx, fy, fz, ux, uy, uz, // matrix
@@ -209,13 +245,13 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     out.groundspeed = qSqrt(velX * velX + velY * velY);
 
     /**********************************************************************************************/
-    out.dstN = posY * 100;
-    out.dstE = posX * 100;
-    out.dstD = posZ * -100;
+    out.dstN = posY * 1;
+    out.dstE = posX * 1;
+    out.dstD = posZ * -1;
 
-    out.velDown = velY * 100;
-    out.velEast = velX * 100;
-    out.velDown = velZ * 100; //WHY ISN'T THIS `-velZ`???
+    out.velNorth = velY * 1;
+    out.velEast = velX * 1;
+    out.velDown = velZ * -1;
 
     updateUAVOs(out);
 

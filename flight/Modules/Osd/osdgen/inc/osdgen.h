@@ -9,6 +9,7 @@
 #define OSDGEN_H_
 
 #include "openpilot.h"
+#include "pios.h"
 
 int32_t osdgenInitialize(void);
 

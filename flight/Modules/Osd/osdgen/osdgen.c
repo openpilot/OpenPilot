@@ -173,7 +173,7 @@ void drawCircle(uint16_t x0, uint16_t y0, uint16_t radius) {
 	  write_pixel_lm(x0, y0 - radius,1,1);
 	  write_pixel_lm(x0 + radius, y0,1,1);
 	  write_pixel_lm(x0 - radius, y0,1,1);
-
+
 	  while(x < y)
 	  {
 	    // ddF_x == 2 * x + 1;
@@ -2198,6 +2198,9 @@ void updateGraphics() {
 	HomeLocationGet(&home);
 	BaroAltitudeData baro;
 	BaroAltitudeGet(&baro);
+
+	PIOS_Servo_Set(0,OsdSettings.White);
+	PIOS_Servo_Set(1,OsdSettings.Black);
 	
 	switch (OsdSettings.Screen) {
 		case 0: // Dave simple
@@ -2294,11 +2297,11 @@ void updateGraphics() {
 				/* Print ADC voltage */
 				//sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
 				//write_string(temp, (GRAPHICS_WIDTH_REAL - 2),15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-				sprintf(temp,"Rssi:%4.2fV",(PIOS_ADC_PinGet(4)*3.0f/4096.0f));
+				sprintf(temp,"Rssi:%4.2fV",(PIOS_ADC_PinGet(5)*3.0f/4096.0f));
 				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)),APPLY_VDEADBAND(15), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 				
 				/* Print CPU temperature */
-				sprintf(temp,"Temp:%4.2fC",(PIOS_ADC_PinGet(6)*0.29296875f-264));
+				sprintf(temp,"Temp:%4.2fC",(PIOS_ADC_PinGet(3)*0.29296875f-264));
 				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)),APPLY_VDEADBAND(25), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 				
 				/* Print ADC voltage FLIGHT*/
@@ -2306,7 +2309,7 @@ void updateGraphics() {
 				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)),APPLY_VDEADBAND(35), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 				
 				/* Print ADC voltage VIDEO*/
-				sprintf(temp,"VidV:%4.2fV",(PIOS_ADC_PinGet(3)*3.0f*6.1f/4096.0f));
+				sprintf(temp,"VidV:%4.2fV",(PIOS_ADC_PinGet(4)*3.0f*6.1f/4096.0f));
 				write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)),APPLY_VDEADBAND(45), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 				
 				/* Print ADC voltage RSSI */
@@ -2371,7 +2374,7 @@ void updateGraphics() {
 			draw_artificial_horizon(-attitude.Roll,attitude.Pitch,APPLY_HDEADBAND(x),APPLY_VDEADBAND(y),size);
 			hud_draw_vertical_scale((int)gpsData.Groundspeed, 20, +1, APPLY_HDEADBAND(GRAPHICS_RIGHT-(x-1)),
 					APPLY_VDEADBAND(y+(size/2)), size, 5, 10, 4, 7, 10, 100, HUD_VSCALE_FLAG_NO_NEGATIVE);
-			if(1)
+			if(OsdSettings.AltitudeSource == OSDSETTINGS_ALTITUDESOURCE_BARO)
 			{
 				hud_draw_vertical_scale((int)baro.Altitude, 50, -1, APPLY_HDEADBAND((x+size+1)),
 					APPLY_VDEADBAND(y+(size/2)), size, 10, 20, 4, 7, 10, 500, 0);
@@ -2387,6 +2390,17 @@ void updateGraphics() {
 		case 3:
 		{
 			lamas();
+		}
+		break;
+		case 4:
+		case 5:
+		case 6:
+		{
+			int image=OsdSettings.Screen-4;
+			struct splashEntry splash_info;
+			splash_info = splash[image];
+
+			copyimage(APPLY_HDEADBAND(GRAPHICS_RIGHT/2-(splash_info.width)/2), APPLY_VDEADBAND(GRAPHICS_BOTTOM/2-(splash_info.height)/2),image);
 		}
 		break;
 	default:
@@ -2420,7 +2434,7 @@ int32_t osdgenStart(void)
 	// Start gps task
 	vSemaphoreCreateBinary( osdSemaphore);
 	xTaskCreate(osdgenTask, (signed char *)"OSDGEN", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &osdgenTaskHandle);
-	//TaskMonitorAdd(TASKINFO_RUNNING_GPS, osdgenTaskHandle);
+	TaskMonitorAdd(TASKINFO_RUNNING_OSDGEN, osdgenTaskHandle);
 
 	return 0;
 }
@@ -2460,6 +2474,11 @@ static void osdgenTask(void *parameters)
 	//portTickType lastSysTime;
 	// Loop forever
 	//lastSysTime = xTaskGetTickCount();
+	OsdSettingsData OsdSettings;
+	OsdSettingsGet (&OsdSettings);
+
+	PIOS_Servo_Set(0,OsdSettings.White);
+	PIOS_Servo_Set(1,OsdSettings.Black);
 
 	// intro
 	for(int i=0; i<63; i++)

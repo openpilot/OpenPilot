@@ -44,8 +44,9 @@ MODULES += FirmwareIAP
 MODULES += Radio
 MODULES += PathPlanner
 MODULES += FixedWingPathFollower
+MODULES += Osd/OsdHk
 MODULES += Telemetry
-#MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
+MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
 
 OPTMODULES =
 

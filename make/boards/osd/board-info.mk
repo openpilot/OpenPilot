@@ -20,9 +20,9 @@ BL_BANK_SIZE        := 0x00008000  # Should include BD_INFO region
 # Leave the remaining 16KB and 64KB sectors for other uses
 
 FW_BANK_BASE        := 0x08020000  # Start of firmware flash
-FW_BANK_SIZE        := 0x00040000  # Should include FW_DESC_SIZE
+FW_BANK_SIZE        := 0x00060000  # Should include FW_DESC_SIZE
 
 FW_DESC_SIZE        := 0x00000064
 
 OSCILLATOR_FREQ     := 8000000
-SYSCLK_FREQ         := 108000000
+SYSCLK_FREQ         := 168000000

@@ -42,12 +42,10 @@ struct pios_video_cfg {
 	const struct pios_exti_cfg * hsync;
 	const struct pios_exti_cfg * vsync;
 
-	/*struct stm32_exti hsync;
-	struct stm32_exti vsync;
-	struct stm32_gpio hsync_io;
-	struct stm32_gpio vsync_io;
-	struct stm32_irq hsync_irq;
-	struct stm32_irq vsync_irq;*/
+	struct pios_tim_channel pixel_timer;
+	struct pios_tim_channel hsync_capture;
+
+	TIM_OCInitTypeDef tim_oc_init;
 };
 
 // Time vars
@@ -65,20 +63,21 @@ extern bool PIOS_Hsync_ISR();
 extern bool PIOS_Vsync_ISR();
 
 // First OSD line
-#define GRAPHICS_LINE 32
+#define GRAPHICS_LINE 25
 
 //top/left deadband
-#define GRAPHICS_HDEADBAND 32
+#define GRAPHICS_HDEADBAND 80
 #define GRAPHICS_VDEADBAND 0
 
 #define PAL
 
 // Real OSD size
 #ifdef PAL
- #define GRAPHICS_WIDTH_REAL (336+GRAPHICS_HDEADBAND)
+//#define GRAPHICS_WIDTH_REAL (352+GRAPHICS_HDEADBAND)
+#define GRAPHICS_WIDTH_REAL 416
  #define GRAPHICS_HEIGHT_REAL (270+GRAPHICS_VDEADBAND)
 #else
- #define GRAPHICS_WIDTH_REAL (320+GRAPHICS_HDEADBAND)
+ #define GRAPHICS_WIDTH_REAL (312+GRAPHICS_HDEADBAND)
  #define GRAPHICS_HEIGHT_REAL (225+GRAPHICS_VDEADBAND)
 #endif
 

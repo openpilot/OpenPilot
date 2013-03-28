@@ -292,12 +292,17 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #define PIOS_COM_AUX_RX_BUF_LEN 512
 #define PIOS_COM_AUX_TX_BUF_LEN 512
 
+#define PIOS_COM_HKOSD_RX_BUF_LEN 22
+#define PIOS_COM_HKOSD_TX_BUF_LEN 22
+
+
 uint32_t pios_com_aux_id = 0;
 uint32_t pios_com_gps_id = 0;
 uint32_t pios_com_telem_usb_id = 0;
 uint32_t pios_com_telem_rf_id = 0;
 uint32_t pios_com_bridge_id = 0;
 uint32_t pios_com_overo_id = 0;
+uint32_t pios_com_hkosd_id = 0;
 
 /* 
  * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
@@ -617,6 +622,10 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_RV_AUXPORT_COMBRIDGE:
 			PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
 			break;
+		case HWSETTINGS_RV_AUXPORT_OSDHK:
+			PIOS_Board_configure_com(&pios_usart_hkosd_aux_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
+			break;
+
 	} /* hwsettings_rv_auxport */
 	/* Configure AUXSbusPort */
 	//TODO: ensure that the serial invertion pin is setted correctly
@@ -678,6 +687,9 @@ void PIOS_Board_Init(void) {
 			break;
 		case HWSETTINGS_RV_AUXSBUSPORT_COMBRIDGE:
 			PIOS_Board_configure_com(&pios_usart_auxsbus_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
+			break;
+		case HWSETTINGS_RV_AUXSBUSPORT_OSDHK:
+			PIOS_Board_configure_com(&pios_usart_hkosd_auxsbus_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
 			break;
 	} /* hwsettings_rv_auxport */
 	
@@ -796,6 +808,15 @@ void PIOS_Board_Init(void) {
 	}
 
 #endif
+
+#if defined(PIOS_INCLUDE_HCSR04)
+		{
+			PIOS_TIM_InitClock(&tim_8_cfg);
+			uint32_t pios_hcsr04_id;
+			PIOS_HCSR04_Init(&pios_hcsr04_id, &pios_hcsr04_cfg);
+		}
+#endif
+
 
 #if defined(PIOS_INCLUDE_GCSRCVR)
 	GCSReceiverInitialize();

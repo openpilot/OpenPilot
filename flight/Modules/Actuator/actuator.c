@@ -128,7 +128,7 @@ int32_t ActuatorInitialize()
 	// Primary output of this module
 	ActuatorCommandInitialize();
 
-#if defined(MIXERSTATUS_DIAGNOSTICS)
+#ifdef DIAG_MIXERSTATUS
 	// UAVO only used for inspecting the internal status of the mixer during debug
 	MixerStatusInitialize();
 #endif
@@ -218,7 +218,7 @@ static void actuatorTask(void* parameters)
 		ActuatorDesiredGet(&desired);
 		ActuatorCommandGet(&command);
 
-#if defined(MIXERSTATUS_DIAGNOSTICS)
+#ifdef DIAG_MIXERSTATUS
 		MixerStatusGet(&mixerStatus);
 #endif
 		int nMixers = 0;
@@ -379,7 +379,7 @@ static void actuatorTask(void* parameters)
 		// Update in case read only (eg. during servo configuration)
 		ActuatorCommandGet(&command);
 
-#if defined(MIXERSTATUS_DIAGNOSTICS)
+#ifdef DIAG_MIXERSTATUS
 		MixerStatusSet(&mixerStatus);
 #endif
 		

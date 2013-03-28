@@ -28,8 +28,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_FLASH_JEDEC_H_
-#define PIOS_FLASH_JEDEC_H_
+#ifndef PIOS_FLASH_JEDEC_H
+#define PIOS_FLASH_JEDEC_H
 
 #include "pios_flash.h"		/* API definition for flash drivers */
 
@@ -49,4 +49,4 @@ struct pios_flash_jedec_cfg {
 
 int32_t PIOS_Flash_Jedec_Init(uintptr_t * flash_id, uint32_t spi_id, uint32_t slave_num, const struct pios_flash_jedec_cfg * cfg);
 
-#endif	/* PIOS_FLASH_JEDEC_H_ */
+#endif	/* PIOS_FLASH_JEDEC_H */

@@ -28,11 +28,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
-#include "pios_ppm_out_priv.h"
 
-#if defined(PIOS_INCLUDE_PPM_OUT)
+#ifdef PIOS_INCLUDE_PPM_OUT
+
+#include "pios_ppm_out_priv.h"
 
 #define PIOS_PPM_OUT_MAX_DEVS               1
 #define PIOS_PPM_OUT_MAX_CHANNELS           8
@@ -228,4 +228,4 @@ static void PIOS_PPM_OUT_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t
 	return;
 }
 
-#endif // PIOS_PPM_OUT
+#endif /* PIOS_INCLUDE_PPM_OUT */

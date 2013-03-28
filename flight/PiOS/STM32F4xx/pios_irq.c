@@ -32,10 +32,9 @@
  * @todo This should be shared with the F1xx code.
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_IRQ)
+#ifdef PIOS_INCLUDE_IRQ
 
 /* Private Function Prototypes */
 
@@ -93,7 +92,7 @@ int32_t PIOS_IRQ_Enable(void)
 	return 0;
 }
 
-#endif
+#endif /* PIOS_INCLUDE_IRQ */
 
 /**
   * @}

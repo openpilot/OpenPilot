@@ -29,12 +29,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_I2C_ESC)
+#ifdef PIOS_INCLUDE_I2C_ESC
 
-/* HMC5843 Addresses */
+/* Known i2c ESC addresses */
 #define MK_I2C_ADDR			        0x29
 #define ASTEC4_I2C_ADDR                         0x02
 
@@ -164,7 +163,7 @@ bool PIOS_SetAstec4Speed(uint8_t motornum, uint8_t speed) {
 	return PIOS_I2C_Transfer(PIOS_I2C_ESC_ADAPTER, txn_list, NELEMENTS(txn_list));	
 }
 
-#endif
+#endif /* PIOS_INCLUDE_I2C_ESC */
 
 /**
  * @}

@@ -29,10 +29,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_SDCARD)
+#ifdef PIOS_INCLUDE_SDCARD
 
 /* Global Variables */
 VOLINFO PIOS_SDCARD_VolInfo;
@@ -1000,7 +999,7 @@ int32_t PIOS_SDCARD_FileDelete(char *Filename)
 	return 0;
 }
 
-#endif
+#endif /* PIOS_INCLUDE_SDCARD */
 
 /**
   * @}

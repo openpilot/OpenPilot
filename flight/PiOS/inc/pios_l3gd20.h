@@ -32,8 +32,6 @@
 #ifndef PIOS_L3GD20_H
 #define PIOS_L3GD20_H
 
-#include "pios.h"
-
 /* L3GD20 Addresses */
 #define PIOS_L3GD20_WHOAMI               0x0F
 #define PIOS_L3GD20_CTRL_REG1            0X20

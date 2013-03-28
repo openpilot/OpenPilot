@@ -66,6 +66,9 @@ float P[NUMX][NUMX], X[NUMX];	// covariance matrix and state vector
 float Q[NUMW], R[NUMV];		// input noise and measurement noise variances
 float K[NUMX][NUMV];		// feedback gain matrix
 
+// Global variables
+struct NavStruct Nav;
+
 //  *************  Exposed Functions ****************
 //  *************************************************
 

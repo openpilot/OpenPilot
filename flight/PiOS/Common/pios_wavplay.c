@@ -30,7 +30,8 @@
  */
 
 #include "pios.h"
-#if defined(PIOS_INCLUDE_WAVE)
+
+#ifdef PIOS_INCLUDE_WAVE
 
 static const struct pios_dac_cfg * dev_cfg;
 
@@ -606,7 +607,4 @@ void DAC_DMA_Handler(void)
 	}
 }
 
-
-#endif
-
-
+#endif /* PIOS_INCLUDE_WAVE */

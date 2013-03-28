@@ -28,13 +28,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
+#include "pios.h"
+
+#ifdef PIOS_INCLUDE_MS5611
+
+
 // TODO: Clean this up.  Getting around old constant.
 #define PIOS_MS5611_OVERSAMPLING oversampling
 
-#include "pios.h"
-
-#if defined(PIOS_INCLUDE_MS5611)
 
 /* Glocal Variables */
 ConversionTypeTypeDef CurrentRead;
@@ -261,7 +262,7 @@ int32_t PIOS_MS5611_Test()
 	return 0;
 }
 
-#endif
+#endif /* PIOS_INCLUDE_MS5611 */
 
 /**
  * @}

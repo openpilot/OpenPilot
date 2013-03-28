@@ -12,6 +12,8 @@
  ****************************************************************************************/
 #include <pios.h>
 
+#ifdef PIOS_INCLUDE_IAP
+
 /****************************************************************************************
  *  Private Definitions/Macros
  ****************************************************************************************/
@@ -120,3 +122,5 @@ void PIOS_IAP_WriteBootCount (uint16_t boot_count)
 {
 	BKP_WriteBackupRegister ( IAP_BOOTCOUNT, boot_count );
 }
+
+#endif /* PIOS_INCLUDE_IAP */

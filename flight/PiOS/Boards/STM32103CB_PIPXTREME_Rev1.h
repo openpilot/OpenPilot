@@ -191,12 +191,6 @@ extern uint32_t pios_ppm_out_id;
 #define PIOS_PPM_RECEIVER          (pios_ppm_rcvr_id)
 #define PIOS_PPM_OUTPUT            (pios_ppm_out_id)
 
-#define DEBUG_LEVEL 2
-#if DEBUG_LEVEL > 1000
-#define DEBUG_PRINTF(level, ...) {if(level <= DEBUG_LEVEL && PIOS_COM_DEBUG > 0) { PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__); }}
-#else
-#define DEBUG_PRINTF(...)
-#endif
 #define RFM22_DEBUG 1
 
 //-------------------------
@@ -294,26 +288,12 @@ extern uint32_t pios_rfm22b_id;
 //-------------------------
 // Packet Handler
 //-------------------------
-#if defined(PIOS_INCLUDE_PACKET_HANDLER)
 extern uint32_t pios_packet_handler;
 #define PIOS_PACKET_HANDLER (pios_packet_handler)
 #define PIOS_PH_MAX_PACKET 255
 #define PIOS_PH_WIN_SIZE 3
 #define PIOS_PH_MAX_CONNECTIONS 1
 #define RS_ECC_NPARITY 4
-#endif /* PIOS_INCLUDE_PACKET_HANDLER */
-
-//-------------------------
-// Packet Handler
-//-------------------------
-
-#if defined(PIOS_INCLUDE_PACKET_HANDLER)
-uint32_t pios_packet_handler;
-#define PIOS_PACKET_HANDLER (pios_packet_handler)
-#define PIOS_PH_MAX_PACKET 255
-#define PIOS_PH_WIN_SIZE 3
-#define PIOS_PH_MAX_CONNECTIONS 1
-#endif /* PIOS_INCLUDE_PACKET_HANDLER */
 
 //-------------------------
 // Reed-Solomon ECC

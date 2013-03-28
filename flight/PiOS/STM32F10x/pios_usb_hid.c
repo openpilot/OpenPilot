@@ -29,12 +29,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_USB_HID)
+#ifdef PIOS_INCLUDE_USB_HID
 
-#include "pios_usb.h"
 #include "pios_usb_hid_priv.h"
 #include "pios_usb_board_data.h" /* PIOS_BOARD_*_DATA_LENGTH */
 
@@ -81,7 +79,7 @@ static bool PIOS_USB_HID_validate(struct pios_usb_hid_dev * usb_hid_dev)
 	return (usb_hid_dev->magic == PIOS_USB_HID_DEV_MAGIC);
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS)
+#ifdef PIOS_INCLUDE_FREERTOS
 static struct pios_usb_hid_dev * PIOS_USB_HID_alloc(void)
 {
 	struct pios_usb_hid_dev * usb_hid_dev;
@@ -193,7 +191,7 @@ static void PIOS_USB_HID_SendReport(struct pios_usb_hid_dev * usb_hid_dev)
 	SetEPTxCount(usb_hid_dev->cfg->data_tx_ep, sizeof(usb_hid_dev->tx_packet_buffer));
 	SetEPTxValid(usb_hid_dev->cfg->data_tx_ep);
 
-#if defined(PIOS_INCLUDE_FREERTOS)
+#ifdef PIOS_INCLUDE_FREERTOS
 	if (need_yield) {
 		vPortYieldFromISR();
 	}
@@ -354,7 +352,7 @@ static void PIOS_USB_HID_EP_OUT_Callback(void)
 		SetEPRxStatus(usb_hid_dev->cfg->data_rx_ep, EP_RX_NAK);
 	}
 
-#if defined(PIOS_INCLUDE_FREERTOS)
+#ifdef PIOS_INCLUDE_FREERTOS
 	if (need_yield) {
 		vPortYieldFromISR();
 	}

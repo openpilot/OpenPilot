@@ -28,15 +28,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_COM)
+#ifdef PIOS_INCLUDE_COM
 
 #include "fifo_buffer.h"
 #include <pios_com_priv.h>
 
-#if !defined(PIOS_INCLUDE_FREERTOS)
+#ifndef PIOS_INCLUDE_FREERTOS
 #include "pios_delay.h"		/* PIOS_DELAY_WaitmS */
 #endif
 
@@ -524,7 +523,7 @@ bool PIOS_COM_Available(uint32_t com_id)
 	return (com_dev->driver->available)(com_dev->lower_id);
 }
 
-#endif
+#endif /* PIOS_INCLUDE_COM */
 
 /**
  * @}

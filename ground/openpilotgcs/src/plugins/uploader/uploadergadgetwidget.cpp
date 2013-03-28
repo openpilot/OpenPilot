@@ -491,7 +491,7 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
 
 bool UploaderGadgetWidget::autoUpdateCapable()
 {
-    return QDir(":/build").exists();
+    return QDir(":/firmware").exists();
 }
 
 bool UploaderGadgetWidget::autoUpdate()
@@ -560,20 +560,29 @@ bool UploaderGadgetWidget::autoUpdate()
     }
     QString filename;
     emit autoUpdateSignal(LOADING_FW,QVariant());
-    switch (dfu->devices[0].ID)
-    {
-    case 0x401:
-        filename="fw_coptercontrol";
+    switch (dfu->devices[0].ID) {
+    case 0x301:
+        filename = "fw_pipxtreme";
         break;
+    case 0x401:
     case 0x402:
-        filename="fw_coptercontrol";
+        filename = "fw_coptercontrol";
+        break;
+    case 0x501:
+        filename = "fw_osd";
+        break;
+    case 0x902:
+        filename = "fw_revolution";
+        break;
+    case 0x903:
+        filename = "fw_revomini";
         break;
     default:
         emit autoUpdateSignal(FAILURE,QVariant());
         return false;
         break;
     }
-    filename=":/build/"+filename+"/"+filename+".opfw";
+    filename = ":/firmware/" + filename + ".opfw";
     QByteArray firmware;
     if(!QFile::exists(filename))
     {

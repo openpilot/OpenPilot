@@ -28,8 +28,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include <pios.h>
+
+#ifdef PIOS_INCLUDE_RFM22B_COM
 
 #include <pios_rfm22b_priv.h>
 
@@ -128,3 +129,5 @@ static bool PIOS_RFM22B_COM_Available(uint32_t rfm22b_id)
 {
 	return PIOS_RFM22B_LinkStatus(rfm22b_id);
 }
+
+#endif /* PIOS_INCLUDE_RFM22B_COM */

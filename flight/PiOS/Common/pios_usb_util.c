@@ -28,6 +28,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "pios.h"
+
+#ifdef PIOS_INCLUDE_USB
+
 #include "pios_usb_util.h"
 
 uint8_t * PIOS_USB_UTIL_AsciiToUtf8(uint8_t * dst, uint8_t * src, uint16_t srclen)
@@ -40,3 +44,5 @@ uint8_t * PIOS_USB_UTIL_AsciiToUtf8(uint8_t * dst, uint8_t * src, uint16_t srcle
 
 	return dst;
 }
+
+#endif /* PIOS_INCLUDE_USB */

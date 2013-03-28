@@ -92,7 +92,7 @@ int32_t AltitudeStart()
  */
 int32_t AltitudeInitialize()
 {
-#ifdef MODULE_Altitude_BUILTIN
+#ifdef MODULE_ALTITUDE_BUILTIN
 	altitudeEnabled = 1;
 #else
 	HwSettingsInitialize();

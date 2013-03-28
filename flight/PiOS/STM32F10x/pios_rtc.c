@@ -28,10 +28,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_RTC)
+#ifdef PIOS_INCLUDE_RTC
+
 #include <pios_rtc_priv.h>
 
 #ifndef PIOS_RTC_PRESCALER
@@ -121,7 +121,8 @@ void PIOS_RTC_irq_handler (void)
 		RTC_ClearITPendingBit(RTC_IT_SEC);
 	}
 }
-#endif
+
+#endif /* PIOS_INCLUDE_RTC */
 
 /** 
  * @}

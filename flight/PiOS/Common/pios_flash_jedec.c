@@ -28,7 +28,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_FLASH
+
 #include "pios_flash_jedec_priv.h"
 
 #define JEDEC_WRITE_ENABLE           0x06
@@ -562,3 +566,4 @@ const struct pios_flash_driver pios_jedec_flash_driver = {
 	.read_data         = PIOS_Flash_Jedec_ReadData,
 };
 
+#endif /* PIOS_INCLUDE_FLASH */

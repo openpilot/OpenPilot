@@ -28,11 +28,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_PPM
+
 #include "pios_ppm_priv.h"
 
-#if defined(PIOS_INCLUDE_PPM)
 
 /* Provide a RCVR driver */
 static int32_t PIOS_PPM_Get(uint32_t rcvr_id, uint8_t channel);
@@ -349,7 +350,7 @@ static void PIOS_PPM_Supervisor(uint32_t ppm_id) {
 	ppm_dev->Fresh = FALSE;
 }
 
-#endif
+#endif /* PIOS_INCLUDE_PPM */
 
 /**
   * @}

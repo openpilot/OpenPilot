@@ -28,11 +28,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
-#include "pios_pwm_priv.h"
 
-#if defined(PIOS_INCLUDE_PWM)
+#ifdef PIOS_INCLUDE_PWM
+
+#include "pios_pwm_priv.h"
 
 /* Provide a RCVR driver */
 static int32_t PIOS_PWM_Get(uint32_t rcvr_id, uint8_t channel);
@@ -274,7 +274,7 @@ static void PIOS_PWM_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t cha
 	
 }
 
-#endif
+#endif /* PIOS_INCLUDE_PWM */
 
 /** 
   * @}

@@ -76,7 +76,7 @@ NVIC value of 255. */
 #endif
 
 /* Enable run time stats collection */
-#if defined(DIAG_TASKS)
+#ifdef DIAG_TASKS
 #define configCHECK_FOR_STACK_OVERFLOW	2
 
 #define configGENERATE_RUN_TIME_STATS 1

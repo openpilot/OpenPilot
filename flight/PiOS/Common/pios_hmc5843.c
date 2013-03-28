@@ -29,10 +29,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_HMC5843)
+#ifdef PIOS_INCLUDE_HMC5843
 
 #include <pios_exti.h>
 
@@ -376,7 +375,7 @@ static bool PIOS_HMC5843_Write(uint8_t address, uint8_t buffer)
 	return PIOS_I2C_Transfer(PIOS_I2C_MAIN_ADAPTER, txn_list, NELEMENTS(txn_list));
 }
 
-#endif
+#endif /* PIOS_INCLUDE_HMC5843 */
 
 /**
  * @}

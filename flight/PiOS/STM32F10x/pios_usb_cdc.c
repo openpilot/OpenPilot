@@ -29,12 +29,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_USB_CDC)
+#ifdef PIOS_INCLUDE_USB_CDC
 
-#include "pios_usb.h"
 #include "pios_usb_cdc_priv.h"
 #include "pios_usb_board_data.h" /* PIOS_BOARD_*_DATA_LENGTH */
 
@@ -417,4 +415,4 @@ static void PIOS_USB_CDC_CTRL_EP_IN_Callback(void)
 	SetEPTxValid(usb_cdc_dev->cfg->data_tx_ep);
 }
 
-#endif	/* PIOS_INCLUDE_USB_CDC */
+#endif /* PIOS_INCLUDE_USB_CDC */

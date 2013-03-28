@@ -32,10 +32,9 @@
  * @todo This is virtually identical to the F1xx driver and should be merged.
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_USART)
+#ifdef PIOS_INCLUDE_USART
 
 #include <pios_usart_priv.h>
 
@@ -350,7 +349,7 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
 #endif	/* PIOS_INCLUDE_FREERTOS */
 }
 
-#endif
+#endif /* PIOS_INCLUDE_USART */
 
 /**
   * @}

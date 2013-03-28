@@ -24,6 +24,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+
+#include "pios.h"
+
+#ifdef PIOS_INCLUDE_FLASH
+
 #include "openpilot.h"
 
 #include "pios_flashfs_logfs_priv.h"
@@ -1019,6 +1024,8 @@ out_end_trans:
 out_exit:
 	return rc;
 }
+
+#endif /* PIOS_INCLUDE_FLASH */
 
 /**
  * @}

@@ -75,7 +75,7 @@ struct overosync *overosync;
 int32_t OveroSyncInitialize(void)
 {
 
-#ifdef MODULE_OVERO_BUILTIN
+#ifdef MODULE_OVEROSYNC_BUILTIN
 	overoEnabled = true;
 #else
 	

@@ -87,7 +87,7 @@ int32_t MagBaroStart()
  */
 int32_t MagBaroInitialize()
 {
-#ifdef MODULE_MagBaro_BUILTIN
+#ifdef MODULE_MAGBARO_BUILTIN
 	magbaroEnabled = 1;
 #else
 	HwSettingsInitialize();

@@ -29,6 +29,9 @@
  */
 
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_USB
+
 #include "pios_usb.h"		/* PIOS_USB_* */
 #include "pios_usbhook.h"
 #include "pios_usb_defs.h"	/* struct usb_* */
@@ -470,3 +473,4 @@ static USBD_Class_cb_TypeDef class_callbacks = {
 #endif	/* USB_SUPPORT_USER_STRING_DESC */
 };
 
+#endif /* PIOS_INCLUDE_USB */

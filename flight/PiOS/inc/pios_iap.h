@@ -1,15 +1,38 @@
-/*!
- * 	@File iap.h
- *	@Brief	Header file for the In-Application-Programming Module
+/**
+ ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup PIOS_IAP In-Application-Programming Module
+ * @brief In-Application-Programming Module
+ * @{
  *
- *  Created on: Sep 6, 2010
- *      Author: joe
+ * @file       pios_iap.c  
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
+ * @brief      IAP functions
+ * @see        The GNU Public License (GPL) Version 3
+ * 
+ *****************************************************************************/
+/* 
+ * This program is free software; you can redistribute it and/or modify 
+ * it under the terms of the GNU General Public License as published by 
+ * the Free Software Foundation; either version 3 of the License, or 
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful, but 
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ * for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along 
+ * with this program; if not, write to the Free Software Foundation, Inc., 
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/* Project Includes */
 #ifndef PIOS_IAP_H_
 #define PIOS_IAP_H_
 
-
+#include <pios_bkp.h>
 /****************************************************************************************
  *  Header files
  ****************************************************************************************/
@@ -17,33 +40,12 @@
 /*****************************************************************************************
  *	Public Definitions/Macros
  ****************************************************************************************/
-#if defined(STM32F4XX)
-#define MAGIC_REG_1     RTC_BKP_DR1
-#define MAGIC_REG_2     RTC_BKP_DR2
-#define IAP_BOOTCOUNT   RTC_BKP_DR3
-#define IAP_RESVD1		RTC_BKP_DR4
-#define IAP_RESVD2		RTC_BKP_DR5
-#define IAP_RESVD3		RTC_BKP_DR6
-#define IAP_RESVD4		RTC_BKP_DR7
-#define IAP_RESVD5		RTC_BKP_DR8
-#define IAP_RESVD6		RTC_BKP_DR9
-#define IAP_CMD1        RTC_BKP_DR10
-#define IAP_CMD2        RTC_BKP_DR11
-#define IAP_CMD3        RTC_BKP_DR12
-#else
-#define MAGIC_REG_1     BKP_DR1
-#define MAGIC_REG_2     BKP_DR2
-#define IAP_BOOTCOUNT   BKP_DR3
-#define IAP_RESVD1		BKP_DR4
-#define IAP_RESVD2		BKP_DR5
-#define IAP_RESVD3		BKP_DR6
-#define IAP_RESVD4		BKP_DR7
-#define IAP_RESVD5		BKP_DR8
-#define IAP_RESVD6		BKP_DR9
-#define IAP_CMD1        BKP_DR10
-#define IAP_CMD2        BKP_DR11
-#define IAP_CMD3        BKP_DR12
-#endif
+#define MAGIC_REG_1     PIOS_BKP_RESERVED_1
+#define MAGIC_REG_2     PIOS_BKP_RESERVED_2
+#define IAP_BOOTCOUNT   PIOS_BKP_RESERVED_3
+#define IAP_CMD1        PIOS_BKP_RESERVED_5
+#define IAP_CMD2        PIOS_BKP_RESERVED_6
+#define IAP_CMD3        PIOS_BKP_RESERVED_7
 
 #define PIOS_IAP_CLEAR_FLASH_CMD_0 0xFA5F
 #define PIOS_IAP_CLEAR_FLASH_CMD_1 0x0001

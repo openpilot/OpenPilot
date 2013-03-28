@@ -3,7 +3,7 @@
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
  * @addtogroup   PIOS_IAP IAP Functions
- * @brief STM32F4xx Hardware dependent I2C functionality
+ * @brief Common IAP functionality
  * @{
  *
  * @file       pios_iap.c  
@@ -32,19 +32,12 @@
  *  Header files
  ****************************************************************************************/
 #include <pios.h>
+#include <pios_bkp.h>
 
 /****************************************************************************************
  *  Private Definitions/Macros
  ****************************************************************************************/
-#if defined(STM32F4XX)
-#define ReadBackupRegister RTC_ReadBackupRegister
-#define WriteBackupRegister RTC_WriteBackupRegister
-#elif defined(STM32F10X_MD) || defined(STM32F10X_HD)
-#define ReadBackupRegister BKP_ReadBackupRegister
-#define WriteBackupRegister BKP_WriteBackupRegister
-#else
-#error non supported architecture for pios_IAP
-#endif
+
 /* these definitions reside here for protection and privacy. */
 #define IAP_MAGIC_WORD_1	0x1122
 #define IAP_MAGIC_WORD_2	0xAA55
@@ -62,11 +55,11 @@
  *  Private (static) Data
  ****************************************************************************************/
 const uint16_t pios_iap_cmd_list[] = 
-        { 
-                IAP_CMD1, 
-                IAP_CMD2, 
-                IAP_CMD3 
-        };
+	{ 
+		IAP_CMD1, 
+		IAP_CMD2, 
+		IAP_CMD3
+	};
 /****************************************************************************************
  *  Public/Global Data
  ****************************************************************************************/
@@ -81,34 +74,8 @@ const uint16_t pios_iap_cmd_list[] =
  */
 void PIOS_IAP_Init( void )
 {
-
-#if  defined(STM32F10X_MD) || defined(STM32F10X_HD)
-	/* Enable CRC clock */
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
-
-	/* Enable PWR and BKP clock */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
-
-	/* Enable write access to Backup domain */
-	PWR_BackupAccessCmd(ENABLE);
-
-	/* Clear Tamper pin Event(TE) pending flag */
-	BKP_ClearFlag();
-#elif defined (STM32F4XX)
-	/* Enable CRC clock */
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC | RCC_AHB1Periph_BKPSRAM, ENABLE);
-
-	/* Enable PWR and BKP clock */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
-
-	/* Enable write access to Backup domain */
-	PWR_BackupAccessCmd(ENABLE);
-
-	/* Clear Tamper pin Event(TE) pending flag */
-	RTC_ClearFlag(RTC_FLAG_TAMP1F);
-#else
-#error non supported architecture for pios_IAP
-#endif
+	PIOS_BKP_Init();
+	PIOS_BKP_EnableWrite();
 }
 
 /*!
@@ -121,12 +88,12 @@ void PIOS_IAP_Init( void )
  */
 uint32_t	PIOS_IAP_CheckRequest( void )
 {
-	uint32_t	retval = false;
-	uint16_t	reg1;
-	uint16_t	reg2;
+	uint32_t retval = false;
+	uint16_t reg1;
+	uint16_t reg2;
 
-	reg1 = ReadBackupRegister( MAGIC_REG_1 );
-	reg2 = ReadBackupRegister( MAGIC_REG_2 );
+	reg1 = PIOS_BKP_ReadRegister(MAGIC_REG_1);
+	reg2 = PIOS_BKP_ReadRegister(MAGIC_REG_2);
 
 	if( reg1 == IAP_MAGIC_WORD_1 && reg2 == IAP_MAGIC_WORD_2 ) {
 		// We have a match.
@@ -145,30 +112,30 @@ uint32_t	PIOS_IAP_CheckRequest( void )
  * \return  n/a
  * \retval
  */
-void	PIOS_IAP_SetRequest1(void)
+void PIOS_IAP_SetRequest1(void)
 {
-	WriteBackupRegister( MAGIC_REG_1, IAP_MAGIC_WORD_1);
+	PIOS_BKP_WriteRegister(MAGIC_REG_1, IAP_MAGIC_WORD_1);
 }
 
-void	PIOS_IAP_SetRequest2(void)
+void PIOS_IAP_SetRequest2(void)
 {
-	WriteBackupRegister( MAGIC_REG_2, IAP_MAGIC_WORD_2);
+	PIOS_BKP_WriteRegister(MAGIC_REG_2, IAP_MAGIC_WORD_2);
 }
 
-void	PIOS_IAP_ClearRequest(void)
+void PIOS_IAP_ClearRequest(void)
 {
-	WriteBackupRegister( MAGIC_REG_1, 0);
-	WriteBackupRegister( MAGIC_REG_2, 0);
+	PIOS_BKP_WriteRegister(MAGIC_REG_1, 0);
+	PIOS_BKP_WriteRegister(MAGIC_REG_2, 0);
 }
 
 uint16_t PIOS_IAP_ReadBootCount(void)
 {
-	return ReadBackupRegister ( IAP_BOOTCOUNT );
+	return PIOS_BKP_ReadRegister(IAP_BOOTCOUNT);
 }
 
 void PIOS_IAP_WriteBootCount (uint16_t boot_count)
 {
-	WriteBackupRegister ( IAP_BOOTCOUNT, boot_count );
+	PIOS_BKP_WriteRegister(IAP_BOOTCOUNT, boot_count);
 }
 
 /**
@@ -184,7 +151,7 @@ uint32_t PIOS_IAP_ReadBootCmd(uint8_t number)
 	}
 	else
 	{
-		return ReadBackupRegister(pios_iap_cmd_list[number]);
+		return PIOS_BKP_ReadRegister(pios_iap_cmd_list[number]);
 	}	
 }
 
@@ -201,6 +168,6 @@ void PIOS_IAP_WriteBootCmd(uint8_t number, uint32_t value)
 	}
 	else
 	{
-		WriteBackupRegister(pios_iap_cmd_list[number], value);
+		PIOS_BKP_WriteRegister(pios_iap_cmd_list[number], value);
 	}	
 }

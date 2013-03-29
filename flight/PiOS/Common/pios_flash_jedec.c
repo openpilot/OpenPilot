@@ -119,30 +119,28 @@ static int32_t PIOS_Flash_Jedec_Validate(struct jedec_flash_dev * flash_dev) {
 int32_t PIOS_Flash_Jedec_Init(uintptr_t * flash_id, uint32_t spi_id, uint32_t slave_num)
 {
 	struct jedec_flash_dev * flash_dev = PIOS_Flash_Jedec_alloc();
-	if (flash_dev == NULL)
+	if (!flash_dev) {
 		return -1;
+	}
 
 	flash_dev->spi_id = spi_id;
 	flash_dev->slave_num = slave_num;
 	flash_dev->cfg = NULL;
 
 	(void) PIOS_Flash_Jedec_ReadID(flash_dev);
-	uint32_t i = 0;
-	while ((i < pios_flash_jedec_catalog_size) && !flash_dev->cfg)
-	{
+
+	for (uint32_t i = 0; i < pios_flash_jedec_catalog_size; ++i) {
 		const struct pios_flash_jedec_cfg flash_jedec_entry = pios_flash_jedec_catalog[i];
 
-		if ((flash_dev->manufacturer == flash_jedec_entry.expect_manufacturer) &&
-			(flash_dev->memorytype == flash_jedec_entry.expect_memorytype) &&
-			(flash_dev->capacity == flash_jedec_entry.expect_capacity))
-		{
+		if ((flash_dev->manufacturer == flash_jedec_entry.expect_manufacturer)
+				&& (flash_dev->memorytype == flash_jedec_entry.expect_memorytype)
+				&& (flash_dev->capacity == flash_jedec_entry.expect_capacity)) {
 			flash_dev->cfg = &pios_flash_jedec_catalog[i];
+			break;
 		}
-		i++;
 	}
 
-	if(!flash_dev->cfg)
-	{
+	if (!flash_dev->cfg) {
 		return -1;
 	}
 

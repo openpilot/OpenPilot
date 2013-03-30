@@ -8,10 +8,8 @@ INCLUDEPATH += ../../libs/eigen
 OTHER_FILES += Config.pluginspec
 
 HEADERS += configplugin.h \
-    configgadgetconfiguration.h \
     configgadgetwidget.h \
     configgadgetfactory.h \
-    configgadgetoptionspage.h \
     configgadget.h \
     fancytabwidget.h \
     configinputwidget.h \
@@ -39,11 +37,10 @@ HEADERS += configplugin.h \
     mixercurve.h \
     dblspindelegate.h \
     configrevohwwidget.h
+
 SOURCES += configplugin.cpp \
-    configgadgetconfiguration.cpp \
     configgadgetwidget.cpp \
     configgadgetfactory.cpp \
-    configgadgetoptionspage.cpp \
     configgadget.cpp \
     fancytabwidget.cpp \
     configinputwidget.cpp \
@@ -72,6 +69,7 @@ SOURCES += configplugin.cpp \
     mixercurve.cpp \
     dblspindelegate.cpp \
     configrevohwwidget.cpp
+
 FORMS += airframe.ui \
     cc_hw_settings.ui \
     ccpm.ui \
@@ -89,11 +87,5 @@ FORMS += airframe.ui \
     pipxtreme.ui \
     mixercurve.ui \
     configrevohwwidget.ui
+
 RESOURCES += configgadget.qrc
-
-
-
-
-
-
-

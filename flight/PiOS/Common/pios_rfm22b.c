@@ -46,10 +46,9 @@
 //
 // *****************************************************************
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_RFM22B)
+#ifdef PIOS_INCLUDE_RFM22B
 
 #include <pios_spi_priv.h>
 #include <packet_handler.h>
@@ -2615,7 +2614,7 @@ static enum pios_rfm22b_event rfm22_fatal_error(struct pios_rfm22b_dev *rfm22b_d
 
 // ************************************
 
-#endif
+#endif /* PIOS_INCLUDE_RFM22B */
 
 /**
  * @}

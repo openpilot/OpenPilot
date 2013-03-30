@@ -41,8 +41,8 @@ class Repo:
     def _exec(self, cmd):
         """Execute git using cmd as arguments"""
         self._git = 'git'
-        git = Popen(self._git + " " + cmd, cwd=self._path,
-                    shell=True, stdout=PIPE, stderr=PIPE)
+        git = Popen(self._git + " " + cmd, cwd = self._path,
+                    shell = True, stdout = PIPE, stderr = PIPE)
         self._out, self._err = git.communicate()
         self._rc = git.poll()
 
@@ -262,15 +262,15 @@ def xtrim(string, suffix, length):
     if len(string) + len(suffix) <= length:
         return ''.join([string, suffix])
     else:
-        n = length-1-len(suffix)
+        n = length - 1 - len(suffix)
         assert n > 0, "length of truncated string+suffix exceeds maximum length"
         return ''.join([string[:n], '+', suffix])
 
-def GetHashofDirs(directory, verbose=0, raw=0):
+def get_hash_of_dirs(directory, verbose = 0, raw = 0):
     """Return hash of XML files from UAVObject definition directory"""
     import hashlib, os
     SHAhash = hashlib.sha1()
-    if not os.path.exists (directory):
+    if not os.path.exists(directory):
         return -1
 
     try:
@@ -288,7 +288,6 @@ def GetHashofDirs(directory, verbose=0, raw=0):
                     f1 = open(filepath, 'rU')
                 except:
                     # You can't open the file for some reason
-                    f1.close()
                     continue
 
                 # Compute file hash. Same as running "sha1sum <file>".
@@ -296,7 +295,8 @@ def GetHashofDirs(directory, verbose=0, raw=0):
                 while 1:
                     # Read file in as little chunks
                     buf = f1.read(4096)
-                    if not buf : break
+                    if not buf:
+                        break
                     f1hash.update(buf)
                 f1.close()
 
@@ -412,8 +412,8 @@ string given.
         BOARD_TYPE = args.type,
         BOARD_REVISION = args.revision,
         SHA1 = sha1(args.image),
-        UAVOSHA1TXT = GetHashofDirs(args.uavodir, verbose=0, raw=1),
-        UAVOSHA1 = GetHashofDirs(args.uavodir, verbose=0, raw=0),
+        UAVOSHA1TXT = get_hash_of_dirs(args.uavodir, verbose = 0, raw = 1),
+        UAVOSHA1 = get_hash_of_dirs(args.uavodir, verbose = 0, raw = 0),
     )
 
     # Process positional arguments in the form of:

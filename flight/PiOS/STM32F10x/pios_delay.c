@@ -30,10 +30,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include <pios.h>
 
-#if defined(PIOS_INCLUDE_DELAY)
+#ifdef PIOS_INCLUDE_DELAY
 
 /* these should be defined by CMSIS, but they aren't */
 #define DWT_CTRL	(*(volatile uint32_t *)0xe0001000)
@@ -167,7 +166,7 @@ uint32_t PIOS_DELAY_DiffuS(uint32_t raw)
 	return diff / us_ticks;
 }
 
-#endif
+#endif /* PIOS_INCLUDE_DELAY */
 
 /**
   * @}

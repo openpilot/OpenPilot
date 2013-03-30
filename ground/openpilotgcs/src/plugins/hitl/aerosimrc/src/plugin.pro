@@ -11,7 +11,7 @@ TEMPLATE = lib
 TARGET = plugin_AeroSIMRC
 
 RES_DIR    = $${PWD}/resources
-SIM_DIR    = $$GCS_BUILD_TREE/../AeroSIM-RC
+SIM_DIR    = $$GCS_BUILD_TREE/misc/AeroSIM-RC
 PLUGIN_DIR = $$SIM_DIR/Plugin/CopterControl
 DLLDESTDIR = $$PLUGIN_DIR
 

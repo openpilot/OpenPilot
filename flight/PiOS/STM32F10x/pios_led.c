@@ -28,10 +28,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_LED)
+#ifdef PIOS_INCLUDE_LED
 
 #include <pios_led_priv.h>
 
@@ -148,7 +147,7 @@ void PIOS_LED_Toggle(uint32_t led_id)
 	}
 }
 
-#endif
+#endif /* PIOS_INCLUDE_LED */
 
 /**
   * @}

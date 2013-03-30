@@ -31,18 +31,16 @@
 #ifndef PIOS_MS5611_H
 #define PIOS_MS5611_H
 
-#include <pios.h>
-
 /* BMP085 Addresses */
 #define MS5611_I2C_ADDR	        0x77
 #define MS5611_RESET            0x1E
-#define MS5611_CALIB_ADDR		0xA2  /* First sample is factory stuff */
-#define MS5611_CALIB_LEN		16
-#define MS5611_ADC_READ		    0x00
-#define MS5611_PRES_ADDR		0x40
-#define MS5611_TEMP_ADDR		0x50
-#define MS5611_ADC_MSB			0xF6
-#define MS5611_P0			    101.3250f
+#define MS5611_CALIB_ADDR	0xA2  /* First sample is factory stuff */
+#define MS5611_CALIB_LEN	16
+#define MS5611_ADC_READ		0x00
+#define MS5611_PRES_ADDR	0x40
+#define MS5611_TEMP_ADDR	0x50
+#define MS5611_ADC_MSB		0xF6
+#define MS5611_P0		101.3250f
 
 /* Local Types */
 typedef struct {

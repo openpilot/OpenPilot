@@ -60,6 +60,7 @@ struct pios_spi_dev {
 };
 
 extern int32_t PIOS_SPI_Init(uint32_t * spi_id, const struct pios_spi_cfg * cfg);
+
 #endif /* PIOS_SPI_PRIV_H */
 
 /**

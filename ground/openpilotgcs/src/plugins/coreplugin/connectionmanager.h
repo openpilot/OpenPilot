@@ -125,6 +125,7 @@ private slots:
     void aboutToRemoveObject(QObject *obj);
 
     void onConnectClicked();
+    void onDeviceSelectionChanged(int index);
     void devChanged(IConnection *connection);
 
     void onConnectionDestroyed(QObject *obj);

@@ -28,8 +28,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_MPXV_H__
-#define PIOS_MPXV_H__
+#ifndef PIOS_MPXV_H
+#define PIOS_MPXV_H
 
 typedef enum{ PIOS_MPXV_UNKNOWN,PIOS_MPXV_5004,PIOS_MPXV_7002 } PIOS_MPXV_sensortype;
 typedef struct{
@@ -63,4 +63,4 @@ uint16_t PIOS_MPXV_Measure(PIOS_MPXV_descriptor *desc);
 uint16_t PIOS_MPXV_Calibrate(PIOS_MPXV_descriptor *desc, uint16_t measurement);
 float PIOS_MPXV_CalcAirspeed (PIOS_MPXV_descriptor *desc,uint16_t measurement);
 
-#endif // PIOS_MPXV_H__
+#endif /* PIOS_MPXV_H */

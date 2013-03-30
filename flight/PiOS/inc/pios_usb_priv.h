@@ -47,4 +47,3 @@ extern int32_t PIOS_USB_Init(uint32_t * usb_id, const struct pios_usb_cfg * cfg)
   * @}
   * @}
   */
-

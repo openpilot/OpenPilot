@@ -29,10 +29,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_EXTI)
+#ifdef PIOS_INCLUDE_EXTI
 
 /* Map EXTI line to full config */
 #define EXTI_MAX_LINES 16

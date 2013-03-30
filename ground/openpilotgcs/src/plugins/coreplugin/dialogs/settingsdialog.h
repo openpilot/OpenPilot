@@ -46,15 +46,12 @@ class SettingsDialog : public QDialog, public ::Ui::SettingsDialog
     Q_OBJECT
 
 public:
-    SettingsDialog(QWidget *parent,
-                   const QString &initialCategory = QString(),
-                   const QString &initialPage = QString());
+    SettingsDialog(QWidget *parent, const QString &initialCategory = QString(), const QString &initialPage = QString());
     ~SettingsDialog();
 
-    // Run the dialog and return true if 'Ok' was choosen or 'Apply' was invoked
-    // at least once
+    // Run the dialog and return true if 'Ok' was choosen or 'Apply' was invoked at least once
     bool execDialog();
-    void insertPage(IOptionsPage* page);
+    void insertPage(IOptionsPage *page);
     void deletePage();
     void updateText(QString text);
     void disableApplyOk(bool disable);
@@ -74,17 +71,13 @@ private slots:
     void apply();
     void categoryItemSelectedShowChildInstead();
 
-
 private:
-
     QList<Core::IOptionsPage*> m_pages;
     QMap<QString, QList<QTreeWidgetItem *> *> m_categoryItemsMap;
     UAVGadgetInstanceManager *m_instanceManager;
     bool m_applied;
     QString m_currentCategory;
     QString m_currentPage;
-    int m_windowWidth;
-    int m_windowHeight;
 };
 
 } // namespace Internal

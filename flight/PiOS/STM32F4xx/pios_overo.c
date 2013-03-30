@@ -31,6 +31,8 @@
 
 #include <pios.h>
 
+#ifdef PIOS_INCLUDE_OVERO
+
 /**
  * Configures the SPI device to use a double buffered DMA for transferring
  * data.  At the end of each transfer (NSS goes high) it makes sure to reset
@@ -38,7 +40,7 @@
  * buffer
  */
 
-#if defined(PIOS_INCLUDE_SPI)
+#ifdef PIOS_INCLUDE_SPI
 
 #include <pios_overo_priv.h>
 
@@ -368,7 +370,9 @@ static void PIOS_OVERO_RxStart(uint32_t overo_id, uint16_t rx_bytes_avail) {};
 
 #endif /* PIOS_INCLUDE_FREERTOS */
 
-#endif
+#endif /* PIOS_INCLUDE_SPI */
+
+#endif /* PIOS_INCLUDE_OVERO */
 
 /**
   * @}

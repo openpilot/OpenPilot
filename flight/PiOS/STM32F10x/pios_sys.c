@@ -29,10 +29,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_SYS)
+#ifdef PIOS_INCLUDE_SYS
 
 /* Private Function Prototypes */
 void NVIC_Configuration(void);
@@ -212,7 +211,7 @@ void assert_failed(uint8_t * file, uint32_t line)
 }
 #endif
 
-#endif
+#endif /* PIOS_INCLUDE_SYS */
 
 /**
   * @}

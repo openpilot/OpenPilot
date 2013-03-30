@@ -28,6 +28,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "pios.h"
+
+#ifdef PIOS_INCLUDE_USB
+
 #include "pios_usb_desc_hid_cdc_priv.h" /* exported API */
 #include "pios_usb_defs.h"		/* struct usb_*, USB_* */
 #include "pios_usb_board_data.h"	/* PIOS_USB_BOARD_* */
@@ -324,3 +328,5 @@ int32_t PIOS_USB_DESC_HID_CDC_Init(void)
 
 	return 0;
 }
+
+#endif /* PIOS_INCLUDE_USB */

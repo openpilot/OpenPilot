@@ -1,7 +1,7 @@
 ﻿#
 # Project: OpenPilot
 # NSIS configuration file for OpenPilot GCS
-# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2012.
+# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2013.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,9 +36,9 @@
   ; Tree root locations (relative to this script location)
   !define PROJECT_ROOT   "..\.."
   !define NSIS_DATA_TREE "."
-  !define GCS_BUILD_TREE "..\..\build\ground\openpilotgcs"
+  !define GCS_BUILD_TREE "..\..\build\ground\openpilotgcs\release"
   !define UAVO_SYNTH_TREE "..\..\build\uavobject-synthetics"
-  !define AEROSIMRC_TREE "..\..\build\ground\AeroSIM-RC"
+  !define AEROSIMRC_TREE "${GCS_BUILD_TREE}\misc\AeroSIM-RC"
 
   ; Default installation folder
   InstallDir "$PROGRAMFILES\OpenPilot"
@@ -61,7 +61,7 @@
 ; !define PRODUCT_VERSION "0.0.0.0"
 ; !define FILE_VERSION "${TAG_OR_BRANCH}:${HASH8} ${DATETIME}"
 ; !define BUILD_DESCRIPTION "${TAG_OR_BRANCH}:${HASH8} built from ${ORIGIN}, committed ${DATETIME} as ${HASH}"
-  !include "${GCS_BUILD_TREE}\openpilotgcs.nsh"
+  !include "${GCS_BUILD_TREE}\..\openpilotgcs.nsh"
 
   Name "${PRODUCT_NAME}"
   OutFile "${PACKAGE_DIR}\..\${OUT_FILE}"
@@ -72,7 +72,7 @@
   VIAddVersionKey "Comments" "${INSTALLER_NAME}. ${BUILD_DESCRIPTION}"
   VIAddVersionKey "CompanyName" "The OpenPilot Team, http://www.openpilot.org"
   VIAddVersionKey "LegalTrademarks" "${PRODUCT_NAME} is a trademark of The OpenPilot Team"
-  VIAddVersionKey "LegalCopyright" "© 2010-2012 The OpenPilot Team"
+  VIAddVersionKey "LegalCopyright" "© 2010-2013 The OpenPilot Team"
   VIAddVersionKey "FileDescription" "${INSTALLER_NAME}"
 
 ;--------------------------------
@@ -93,7 +93,7 @@
 ;--------------------------------
 ; Branding
 
-  BrandingText "© 2010-2012 The OpenPilot Team, http://www.openpilot.org"
+  BrandingText "© 2010-2013 The OpenPilot Team, http://www.openpilot.org"
 
   !define MUI_ICON "${NSIS_DATA_TREE}\resources\openpilot.ico"
   !define MUI_HEADERIMAGE
@@ -203,12 +203,8 @@ SectionEnd
 
 ; Copy firmware files
 Section "Firmware" InSecFirmware
-; SetOutPath "$INSTDIR\firmware\${FIRMWARE_DIR}"
-; File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
   SetOutPath "$INSTDIR\firmware"
-  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_coptercontrol-${PACKAGE_LBL}.opfw"
-  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_pipxtreme-${PACKAGE_LBL}.opfw"
-  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_revomini-${PACKAGE_LBL}.opfw"
+  File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
 SectionEnd
 
 ; Copy utility files

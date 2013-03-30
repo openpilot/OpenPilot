@@ -6,8 +6,8 @@
  *      Author: joe
  */
 
-#ifndef PIOS_IAP_H_
-#define PIOS_IAP_H_
+#ifndef PIOS_IAP_H
+#define PIOS_IAP_H
 
 
 /****************************************************************************************
@@ -42,4 +42,4 @@ void		PIOS_IAP_WriteBootCount(uint16_t);
  *  Public Data
  ****************************************************************************************/
 
-#endif /* PIOS_IAP_H_ */
+#endif /* PIOS_IAP_H */

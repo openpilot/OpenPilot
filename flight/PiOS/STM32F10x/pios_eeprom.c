@@ -28,13 +28,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include <pios.h>
-#include <pios_crc.h>
+
+#ifdef PIOS_INCLUDE_FLASH_EEPROM
+
 #include <stm32f10x_flash.h>
 #include <pios_board_info.h>
-
-#include <pios_eeprom.h>
 
 static struct pios_eeprom_cfg config;
 
@@ -153,3 +152,5 @@ int32_t PIOS_EEPROM_Load(uint8_t *data, uint32_t len)
 
 	return 0;
 }
+
+#endif /* PIOS_INCLUDE_FLASH_EEPROM */

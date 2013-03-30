@@ -1,14 +1,13 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotSystem OpenPilot System
+ * @addtogroup OpenPilotBL OpenPilot BootLoader
  * @{
- * @addtogroup OpenPilotCore OpenPilot Core
- * @{
- *
- * @file       op_config.h  
+ * @file       pios_config.h  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      OpenPilot configuration header. 
- *             Compile time config for OpenPilot Application
+ * @brief      PiOS configuration header. 
+ *             Central compile time config for the project.
+ *             In particular, pios_config.h is where you define which PiOS libraries
+ *             and features are included in the firmware.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,11 +27,19 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef PIOS_CONFIG_H
+#define PIOS_CONFIG_H
 
-#ifndef OP_CONFIG_H
-#define OP_CONFIG_H
+/* Enable/Disable PiOS modules */
+#define PIOS_INCLUDE_DELAY
+#define PIOS_INCLUDE_SYS
+#define PIOS_INCLUDE_IRQ
+#define PIOS_INCLUDE_GPIO
+#define PIOS_INCLUDE_LED
+#define PIOS_INCLUDE_BL_HELPER
 
-#endif /* OP_CONFIG_H */
+#endif /* PIOS_CONFIG_H */
+
 /**
  * @}
  * @}

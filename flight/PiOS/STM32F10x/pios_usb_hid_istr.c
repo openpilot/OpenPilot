@@ -14,8 +14,11 @@
 *******************************************************************************/
 
 /* Includes ------------------------------------------------------------------*/
-#include "usb_lib.h"
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_USB
+
+#include "usb_lib.h"
 #include "pios_usb_hid_pwr.h"
 #include "pios_usb_hid_istr.h"
 #include "pios_usb_hid.h"
@@ -330,3 +333,5 @@ u32 STM32_PCD_OTG_ISR_Handler(void)
 #endif /* STM32F10X_CL */
 
 /******************* (C) COPYRIGHT 2010 STMicroelectronics *****END OF FILE****/
+
+#endif /* PIOS_INCLUDE_USB */

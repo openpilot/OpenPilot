@@ -29,10 +29,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_L3GD20)
+#ifdef PIOS_INCLUDE_L3GD20
 
 #include "fifo_buffer.h"
 
@@ -381,7 +380,7 @@ bool PIOS_L3GD20_IRQHandler(void)
 	return xHigherPriorityTaskWoken == pdTRUE;
 }
 
-#endif /* L3GD20 */
+#endif /* PIOS_INCLUDE_L3GD20 */
 
 /**
  * @}

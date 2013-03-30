@@ -28,12 +28,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_HCSR04)
+#ifdef PIOS_INCLUDE_HCSR04
+
 #if !(defined(PIOS_INCLUDE_DSM) || defined(PIOS_INCLUDE_SBUS))
-#error Only supported with Spektrum/JR DSM or S.Bus interface!
+#error Only supported with Spektrum/JR DSM or S.Bus interface
 #endif
 
 /* Local Variables */
@@ -206,5 +206,5 @@ void TIM3_IRQHandler(void)
 	}
 }
 
+#endif /* PIOS_INCLUDE_HCSR04 */
 
-#endif

@@ -28,7 +28,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef PIOS_ETASV3_H
+#define PIOS_ETASV3_H
+
 #define ETASV3_I2C_ADDR			0x75
 
-
 int16_t PIOS_ETASV3_ReadAirspeed (void);
+
+#endif /* PIOS_ETASV3_H */

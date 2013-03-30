@@ -28,9 +28,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
-#if defined(PIOS_INCLUDE_BL_HELPER)
+
+#ifdef PIOS_INCLUDE_BL_HELPER
+
 #include <pios_board_info.h>
 #include "stm32f10x_flash.h"
 
@@ -99,4 +100,5 @@ void PIOS_BL_HELPER_CRC_Ini()
 {
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
 }
-#endif
+
+#endif /* PIOS_INCLUDE_BL_HELPER */

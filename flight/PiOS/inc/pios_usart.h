@@ -31,8 +31,6 @@
 #ifndef PIOS_USART_H
 #define PIOS_USART_H
 
-#include <pios_stm32.h>
-
 /* Global Types */
 /* Public Functions */
 

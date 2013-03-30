@@ -75,6 +75,4 @@
 #include <pios_bl_helper.h>
 #endif
 
-#define NELEMENTS(x) (sizeof(x) / sizeof(*(x)))
-
 #endif /* PIOS_POSIX_H */

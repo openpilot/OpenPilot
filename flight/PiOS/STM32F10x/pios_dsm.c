@@ -28,11 +28,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_DSM
+
 #include "pios_dsm_priv.h"
 
-#if defined(PIOS_INCLUDE_DSM)
 
 /* Forward Declarations */
 static int32_t PIOS_DSM_Get(uint32_t rcvr_id, uint8_t channel);
@@ -399,7 +400,7 @@ static void PIOS_DSM_Supervisor(uint32_t dsm_id)
 	}
 }
 
-#endif	/* PIOS_INCLUDE_DSM */
+#endif /* PIOS_INCLUDE_DSM */
 
 /** 
  * @}

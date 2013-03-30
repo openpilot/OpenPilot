@@ -29,10 +29,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "fifo_buffer.h"
-
 #ifndef PIOS_BMA180_H
 #define PIOS_BMA180_H
+
+#include "fifo_buffer.h"
 
 #include <pios.h>
 

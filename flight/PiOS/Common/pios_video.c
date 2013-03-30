@@ -30,7 +30,8 @@
  */
 
 #include "pios.h"
-#if defined(PIOS_INCLUDE_VIDEO)
+
+#ifdef PIOS_INCLUDE_VIDEO
 
 extern xSemaphoreHandle osdSemaphore;
 
@@ -277,7 +278,4 @@ void PIOS_VIDEO_DMA_Handler(void)
 
 }
 
-
-#endif
-
-
+#endif /* PIOS_INCLUDE_VIDEO */

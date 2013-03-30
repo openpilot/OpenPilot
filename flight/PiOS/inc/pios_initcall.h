@@ -98,6 +98,7 @@ extern void StartModules();
 									   (fn->fn_tinit)(); }
 
 #endif /* USE_SIM_POSIX */
+
 #endif	/* PIOS_INITCALL_H */
 
 /**

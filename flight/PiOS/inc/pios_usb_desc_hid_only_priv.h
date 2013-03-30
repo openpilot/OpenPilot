@@ -34,7 +34,7 @@
 
 extern int32_t PIOS_USB_DESC_HID_ONLY_Init(void);
 
-#endif	/* PIOS_USB_DESC_HID_ONLY_PRIV_H */
+#endif /* PIOS_USB_DESC_HID_ONLY_PRIV_H */
 
 /**
   * @}

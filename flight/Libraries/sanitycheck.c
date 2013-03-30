@@ -114,7 +114,7 @@ int32_t configuration_check()
 				if (coptercontrol)
 					status = SYSTEMALARMS_ALARM_ERROR;
 				else {
-					// Revo supports altitude hold
+					// Revo supports VelocityControl
 					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER))
 						status = SYSTEMALARMS_ALARM_ERROR;
 				}
@@ -123,7 +123,43 @@ int32_t configuration_check()
 				if (coptercontrol)
 					status = SYSTEMALARMS_ALARM_ERROR;
 				else {
-					// Revo supports altitude hold
+					// Revo supports Position Hold
+					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER))
+						status = SYSTEMALARMS_ALARM_ERROR;
+				}
+				break;
+			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_LAND:
+				if (coptercontrol)
+					status = SYSTEMALARMS_ALARM_ERROR;
+				else {
+					// Revo supports AutoLand Mode
+					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER))
+						status = SYSTEMALARMS_ALARM_ERROR;
+				}
+				break;
+			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POI:
+				if (coptercontrol)
+					status = SYSTEMALARMS_ALARM_ERROR;
+				else {
+					// Revo supports POI Mode
+					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER))
+						status = SYSTEMALARMS_ALARM_ERROR;
+				}
+				break;
+			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
+				if (coptercontrol)
+					status = SYSTEMALARMS_ALARM_ERROR;
+				else {
+					// Revo supports PathPlanner
+					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER))
+						status = SYSTEMALARMS_ALARM_ERROR;
+				}
+				break;
+			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
+				if (coptercontrol)
+					status = SYSTEMALARMS_ALARM_ERROR;
+				else {
+					// Revo supports ReturnToBase
 					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER))
 						status = SYSTEMALARMS_ALARM_ERROR;
 				}

@@ -34,6 +34,7 @@ MODULES += Altitude/revolution
 MODULES += Airspeed/revolution
 MODULES += AltitudeHold
 MODULES += Stabilization
+MODULES += VtolPathFollower
 MODULES += ManualControl
 MODULES += Actuator
 MODULES += GPS
@@ -46,7 +47,6 @@ MODULES += PathPlanner
 MODULES += FixedWingPathFollower
 MODULES += Osd/OsdHk
 MODULES += Telemetry
-MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
 
 OPTMODULES =
 

@@ -95,6 +95,15 @@ endif
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
 ADEFS = -D__ASSEMBLY__
 
+# Provide board-specific defines
+CDEFS += -DFW_BANK_BASE=$(FW_BANK_BASE)
+CDEFS += -DFW_BANK_SIZE=$(FW_BANK_SIZE)
+CDEFS += -DFW_DESC_SIZE=$(FW_DESC_SIZE)
+
+CDEFS += -DEE_BANK_BASE=$(EE_BANK_BASE)
+CDEFS += -DEE_BANK_SIZE=$(EE_BANK_SIZE)
+
+
 # Compiler flag to set the C Standard level.
 # c89   - "ANSI" C
 # gnu89 - c89 plus GCC extensions
@@ -121,6 +130,7 @@ CFLAGS += -fomit-frame-pointer
 CFLAGS += -Wall
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
+
 
 # FIXME: STM32F4xx library raises strict aliasing and const qualifier warnings
 ifneq ($(MCU),cortex-m4)

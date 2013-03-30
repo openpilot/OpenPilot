@@ -4,6 +4,9 @@ DEFINES += UPLOADER_LIBRARY
 QT += svg
 include(uploader_dependencies.pri)
 INCLUDEPATH += ../../libs/qextserialport/src
+macx {
+    QMAKE_CXXFLAGS  += -fpermissive
+}
 
 HEADERS += uploadergadget.h \
     uploadergadgetconfiguration.h \

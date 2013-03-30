@@ -21,7 +21,8 @@ equals(copydata, 1) {
                   QtXml4.dll \
                   QtDeclarative4.dll \
                   QtXmlPatterns4.dll \
-                  QtScript4.dll
+                  QtScript4.dll \
+                  QtWebKit4.dll
         for(dll, QT_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_BINS]/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }

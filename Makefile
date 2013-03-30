@@ -161,13 +161,13 @@ endif
 # We almost need to consider autoconf/automake instead of this
 ifeq ($(UNAME), Linux)
     QT_SPEC = linux-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
+    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
 else ifeq ($(UNAME), Darwin)
     QT_SPEC = macx-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
+    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
 else
     QT_SPEC = win32-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/ground/uavobjgenerator/$(UAVOGEN_BUILD_CONF)/uavobjgenerator.exe"
+    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/$(UAVOGEN_BUILD_CONF)/uavobjgenerator.exe"
 endif
 
 ##############################
@@ -206,8 +206,8 @@ endif
 
 .PHONY: uavobjgenerator
 uavobjgenerator:
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/ground/$@
-	$(V1) ( cd $(BUILD_DIR)/ground/$@ && \
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/$@
+	$(V1) ( cd $(BUILD_DIR)/$@ && \
 	    $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+="$(UAVOGEN_BUILD_CONF) $(UAVOGEN_SILENT)" && \
 	    $(MAKE) --no-print-directory -w ; \
 	)
@@ -251,6 +251,7 @@ export OPUAVTALK     := $(ROOT_DIR)/flight/targets/UAVTalk
 export HWDEFS        := $(ROOT_DIR)/flight/targets/board_hw_defs
 export DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
 export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
+export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 
 # Define supported board lists
 ALL_BOARDS    := coptercontrol pipxtreme revolution revomini osd simposix
@@ -509,7 +510,6 @@ all_ground: openpilotgcs
 .PHONY: gcs gcs_clean gcs_all_clean
 gcs: openpilotgcs
 gcs_clean: openpilotgcs_clean
-gcs_all_clean: openpilotgcs_all_clean
 
 ifeq ($(V), 1)
     GCS_SILENT :=
@@ -519,8 +519,8 @@ endif
 
 .PHONY: openpilotgcs
 openpilotgcs: uavobjects_gcs
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/ground/$@/$(GCS_BUILD_CONF)
-	$(V1) ( cd $(BUILD_DIR)/ground/$@/$(GCS_BUILD_CONF) && \
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/$@_$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/$@_$(GCS_BUILD_CONF) && \
 	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) && \
 	    $(MAKE) -w ; \
 	)
@@ -528,12 +528,7 @@ openpilotgcs: uavobjects_gcs
 .PHONY: openpilotgcs_clean
 openpilotgcs_clean:
 	$(V0) @$(ECHO) " CLEAN      $@"
-	$(V1) [ ! -d "$(BUILD_DIR)/ground/openpilotgcs/$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/ground/openpilotgcs/$(GCS_BUILD_CONF)"
-
-.PHONY: openpilotgcs_all_clean
-openpilotgcs_all_clean:
-	$(V0) @$(ECHO) " CLEAN      $@"
-	$(V1) [ ! -d "$(BUILD_DIR)/ground/openpilotgcs" ] || $(RM) -r "$(BUILD_DIR)/ground/openpilotgcs"
+	$(V1) [ ! -d "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)"
 
 ################################
 #
@@ -771,8 +766,8 @@ PACKAGE_ELF_TARGETS := $(filter     fw_simposix, $(FW_TARGETS))
 # Rules to generate GCS resources used to embed firmware binaries into the GCS.
 # They are used later by the vehicle setup wizard to update board firmware.
 # To open a firmware image use ":/firmware/fw_coptercontrol.opfw"
-OPFW_RESOURCE := $(BUILD_DIR)/ground/opfw_resource/opfw_resource.qrc
-OPFW_RESOURCE_PREFIX := ../../../
+OPFW_RESOURCE := $(OPGCSSYNTHDIR)/opfw_resource.qrc
+OPFW_RESOURCE_PREFIX := ../../
 OPFW_FILES := $(foreach fw_targ, $(PACKAGE_FW_TARGETS), $(call toprel, $(BUILD_DIR)/$(fw_targ)/$(fw_targ).opfw))
 OPFW_CONTENTS := \
 <!DOCTYPE RCC><RCC version="1.0"> \
@@ -789,8 +784,8 @@ $(OPFW_RESOURCE): $(FW_TARGETS)
 	$(V1) $(MKDIR) -p $(dir $@)
 	$(V1) $(ECHO) $(QUOTE)$(OPFW_CONTENTS)$(QUOTE) > $@
 
-# If opfw_resource is requested, GCS should depend on it
-ifneq ($(strip $(filter opfw_resource,$(MAKECMDGOALS))),)
+# If opfw_resource or all are requested, GCS should depend on the resource
+ifneq ($(strip $(filter opfw_resource all,$(MAKECMDGOALS))),)
     $(eval openpilotgcs: | opfw_resource)
 endif
 

@@ -49,8 +49,9 @@ static int32_t check_stabilization_settings(int index, bool multirotor);
  */
 int32_t configuration_check()
 {
-	int32_t status = SYSTEMALARMS_ALARM_OK;
-
+	int32_t severity = SYSTEMALARMS_ALARM_OK;
+	uint8_t alarmstatus = SANITYCHECK_STATUS_ERROR_NONE;
+	uint8_t alarmsubstatus = 0;
 	// Get board type
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;	
 	bool coptercontrol = bdinfo->board_type == 0x04;
@@ -85,58 +86,61 @@ int32_t configuration_check()
 	for(uint32_t i = 0; i < num_modes; i++) {
 		switch(modes[i]) {
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_MANUAL:
-				if (multirotor)
-					status = SYSTEMALARMS_ALARM_ERROR;
+				if (multirotor) {
+					severity = SYSTEMALARMS_ALARM_ERROR;
+				}
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED1:
-				status = (status == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(1, multirotor) : status;
+				severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(1, multirotor) : severity;
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED2:
-				status = (status == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(2, multirotor) : status;
+				severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(2, multirotor) : severity;
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_STABILIZED3:
-				status = (status == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(3, multirotor) : status;
+				severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(3, multirotor) : severity;
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
-				if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_AUTOTUNE))
-					status = SYSTEMALARMS_ALARM_ERROR;
+				if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_AUTOTUNE)) {
+					severity = SYSTEMALARMS_ALARM_ERROR;
+				}
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEHOLD:
-				if (coptercontrol)
-					status = SYSTEMALARMS_ALARM_ERROR;
-				else {
-					// Revo supports altitude hold
-				if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_ALTITUDEHOLD))
-						status = SYSTEMALARMS_ALARM_ERROR;
+				if (coptercontrol) {
+					severity = SYSTEMALARMS_ALARM_ERROR;
+				} else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_ALTITUDEHOLD)) { // Revo supports altitude hold
+						severity = SYSTEMALARMS_ALARM_ERROR;
 				}
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL:
-				if (coptercontrol)
-					status = SYSTEMALARMS_ALARM_ERROR;
-				else {
-					// Revo supports altitude hold
-					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER))
-						status = SYSTEMALARMS_ALARM_ERROR;
+				if (coptercontrol) {
+					severity = SYSTEMALARMS_ALARM_ERROR;
+				} else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER)) { // Revo supports altitude hold
+						severity = SYSTEMALARMS_ALARM_ERROR;
 				}
 				break;
 			case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
-				if (coptercontrol)
-					status = SYSTEMALARMS_ALARM_ERROR;
-				else {
-					// Revo supports altitude hold
-					if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER))
-						status = SYSTEMALARMS_ALARM_ERROR;
+				if (coptercontrol){
+					severity = SYSTEMALARMS_ALARM_ERROR;
+				} else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER)) { // Revo supports altitude hold
+					severity = SYSTEMALARMS_ALARM_ERROR;
 				}
 				break;
 			default:
 				// Uncovered modes are automatically an error
-				status = SYSTEMALARMS_ALARM_ERROR;
+				severity = SYSTEMALARMS_ALARM_ERROR;
 		}
+		// mark the first encountered erroneous setting in status and substatus
+		if(severity != SYSTEMALARMS_ALARM_OK && alarmstatus == SANITYCHECK_STATUS_ERROR_NONE)
+		{
+		    alarmstatus = SANITYCHECK_STATUS_ERROR_FLIGHTMODE;
+		    alarmsubstatus = i;
+		}
+
 	}
 
 	// TODO: Check on a multirotor no axis supports "None"
-	if(status != SYSTEMALARMS_ALARM_OK)
-		AlarmsSet(SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION, status);
+	if(severity != SYSTEMALARMS_ALARM_OK)
+		ExtendedAlarmsSet(SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION, severity, alarmstatus, alarmsubstatus);
 	else
 		AlarmsClear(SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION);
 

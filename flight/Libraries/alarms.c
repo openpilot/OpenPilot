@@ -88,6 +88,42 @@ int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity
 }
 
 /**
+ * Set an Extended Alarm
+ * @param alarm The system alarm to be modified
+ * @param severity The alarm severity
+ * @param status: the Extended alarm status field
+ * @param subStatus: the Extended alarm substatus field
+ * @return 0 if success, -1 if an error
+ */
+int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity, uint8_t status, uint8_t subStatus)
+{
+    SystemAlarmsData alarms;
+
+        // Check that this is a valid alarm
+        if (alarm >= SYSTEMALARMS_EXTENDEDALARMSTATUS_NUMELEM)
+        {
+            return -1;
+        }
+
+        // Lock
+        xSemaphoreTakeRecursive(lock, portMAX_DELAY);
+
+        // Read alarm and update its severity only if it was changed
+        SystemAlarmsGet(&alarms);
+        if ( alarms.Alarm[alarm] != severity )
+        {
+            alarms.ExtendedAlarmStatus[alarm] = status;
+            alarms.ExtendedAlarmSubStatus[alarm] = subStatus;
+            alarms.Alarm[alarm] = severity;
+            SystemAlarmsSet(&alarms);
+        }
+
+        // Release lock
+        xSemaphoreGiveRecursive(lock);
+        return 0;
+}
+
+/**
  * Get an alarm
  * @param alarm The system alarm to be read
  * @return Alarm severity
@@ -136,7 +172,11 @@ void AlarmsDefaultAll()
  */
 int32_t AlarmsClear(SystemAlarmsAlarmElem alarm)
 {
-	return AlarmsSet(alarm, SYSTEMALARMS_ALARM_OK);
+    if (alarm < SYSTEMALARMS_EXTENDEDALARMSTATUS_NUMELEM){
+        return ExtendedAlarmsSet(alarm, SYSTEMALARMS_ALARM_OK, 0, 0);
+    } else {
+        return AlarmsSet(alarm, SYSTEMALARMS_ALARM_OK);
+    }
 }
 
 /**

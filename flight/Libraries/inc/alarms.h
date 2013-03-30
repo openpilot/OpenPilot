@@ -33,6 +33,7 @@
 
 int32_t AlarmsInitialize(void);
 int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity);
+int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity, uint8_t status, uint8_t subStatus);
 SystemAlarmsAlarmOptions AlarmsGet(SystemAlarmsAlarmElem alarm);
 int32_t AlarmsDefault(SystemAlarmsAlarmElem alarm);
 void AlarmsDefaultAll();

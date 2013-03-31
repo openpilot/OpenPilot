@@ -106,14 +106,11 @@ void PIOS_Board_Init(void) {
 	// check for safe mode commands from gcs
 	if(PIOS_IAP_ReadBootCmd(0) == PIOS_IAP_CLEAR_FLASH_CMD_0 &&
 	   PIOS_IAP_ReadBootCmd(1) == PIOS_IAP_CLEAR_FLASH_CMD_1 &&
-	   PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2)
-	{
-		
+	   PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2) {
 		OPLinkSettingsGet(&oplinkSettings);
 		OPLinkSettingsSetDefaults(&oplinkSettings,0);
 		PIOS_EEPROM_Save((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData));
-		for(uint32_t i=0; i < 10; i++)
-		{
+		for (uint32_t i = 0; i < 10; i++) {
 			PIOS_DELAY_WaitmS(100);
 			PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 		}	

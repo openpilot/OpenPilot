@@ -48,7 +48,7 @@ toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
 # to remove the chance that they will cause problems with our build
 define SANITIZE_VAR
 $(if $(filter-out undefined,$(origin $(1))),
-    $(info *NOTE*      Sanitized $(2) variable '$(1)' from $(origin $(1)))
+    $(info $(EMPTY) NOTE        Sanitized $(2) variable '$(1)' from $(origin $(1)))
     MAKEOVERRIDES = $(filter-out $(1)=%,$(MAKEOVERRIDES))
     override $(1) :=
     unexport $(1)
@@ -102,6 +102,7 @@ export ANT	:= ant
 export JAVAC	:= javac
 export JAR	:= jar
 export GIT	:= git
+export CURL	:= curl
 export PYTHON	:= python
 export INSTALL	:= install
 
@@ -116,47 +117,8 @@ else
 	export QUOTE :=
 endif
 
-# The tools.mk uses wget to fetch tarballs or packages
-ifeq ($(shell [ -x "$(TOOLS_DIR)/bin/wget" ] && $(ECHO) "exists"), exists)
-    WGET := $(TOOLS_DIR)/bin/wget
-else
-    # not installed, hope it's in the path...
-    WGET ?= wget
-endif
-
 # Include tools installers
 include $(ROOT_DIR)/make/tools.mk
-
-# Set up paths to tools
-ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    QMAKE := $(QT_SDK_QMAKE_PATH)
-else
-    # not installed, hope it's in the path...
-    QMAKE ?= qmake
-endif
-
-ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    export ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-none-eabi-
-else
-    # not installed, hope it's in the path...
-    export ARM_SDK_PREFIX ?= arm-none-eabi-
-endif
-
-ifeq ($(shell [ -d "$(OPENOCD_DIR)" ] && $(ECHO) "exists"), exists)
-    export OPENOCD := $(OPENOCD_DIR)/bin/openocd
-else
-    # not installed, hope it's in the path...
-    export OPENOCD ?= openocd
-endif
-
-ifeq ($(shell [ -d "$(ANDROID_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    ANDROID    := $(ANDROID_SDK_DIR)/tools/android
-    ANDROID_DX := $(ANDROID_SDK_DIR)/platform-tools/dx
-else
-    # not installed, hope it's in the path...
-    ANDROID    ?= android
-    ANDROID_DX ?= dx
-endif
 
 # We almost need to consider autoconf/automake instead of this
 ifeq ($(UNAME), Linux)
@@ -755,7 +717,7 @@ $(foreach ut, $(ALL_UNITTESTS), $(eval $(call UT_TEMPLATE,$(ut))))
 # output is interleaved with the rest of the make output.
 ifneq ($(strip $(filter all_ut_run,$(MAKECMDGOALS))),)
 .NOTPARALLEL:
-    $(info *NOTE*     Parallel make disabled by all_ut_run target so we have sane console output)
+    $(info $(EMPTY) NOTE        Parallel make disabled by all_ut_run target so we have sane console output)
 endif
 
 ##############################

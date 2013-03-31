@@ -120,7 +120,7 @@ arm_sdk_install: arm_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 
         # binary only release so just extract it
 	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(ARM_SDK_DIR))
-	$(V1) tar -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(ARM_SDK_FILE))
+	$(V1) $(TAR) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(ARM_SDK_FILE))
 
 .PHONY: arm_sdk_clean
 arm_sdk_clean:
@@ -141,36 +141,6 @@ ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && $(ECHO) "exists"), exists)
 else
     # not installed, hope it's in the path...
     export ARM_SDK_PREFIX ?= arm-none-eabi-
-endif
-
-##############################
-#
-# TODO: these defines will go to tool install sections
-#
-##############################
-
-# Set up paths to tools
-ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    QMAKE := $(QT_SDK_QMAKE_PATH)
-else
-    # not installed, hope it's in the path...
-    QMAKE ?= qmake
-endif
-
-ifeq ($(shell [ -d "$(OPENOCD_DIR)" ] && $(ECHO) "exists"), exists)
-    export OPENOCD := $(OPENOCD_DIR)/bin/openocd
-else
-    # not installed, hope it's in the path...
-    export OPENOCD ?= openocd
-endif
-
-ifeq ($(shell [ -d "$(ANDROID_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    ANDROID    := $(ANDROID_SDK_DIR)/tools/android
-    ANDROID_DX := $(ANDROID_SDK_DIR)/platform-tools/dx
-else
-    # not installed, hope it's in the path...
-    ANDROID    ?= android
-    ANDROID_DX ?= dx
 endif
 
 ##############################
@@ -494,3 +464,33 @@ gtest_install: gtest_clean
 gtest_clean:
 	$(V0) @echo " CLEAN        $(GTEST_DIR)"
 	$(V1) [ ! -d "$(GTEST_DIR)" ] || $(RM) -rf "$(GTEST_DIR)"
+
+##############################
+#
+# TODO: these defines will go to tool install sections
+#
+##############################
+
+# Set up paths to tools
+ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+    QMAKE := $(QT_SDK_QMAKE_PATH)
+else
+    # not installed, hope it's in the path...
+    QMAKE ?= qmake
+endif
+
+ifeq ($(shell [ -d "$(OPENOCD_DIR)" ] && $(ECHO) "exists"), exists)
+    export OPENOCD := $(OPENOCD_DIR)/bin/openocd
+else
+    # not installed, hope it's in the path...
+    export OPENOCD ?= openocd
+endif
+
+ifeq ($(shell [ -d "$(ANDROID_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+    ANDROID    := $(ANDROID_SDK_DIR)/tools/android
+    ANDROID_DX := $(ANDROID_SDK_DIR)/platform-tools/dx
+else
+    # not installed, hope it's in the path...
+    ANDROID    ?= android
+    ANDROID_DX ?= dx
+endif

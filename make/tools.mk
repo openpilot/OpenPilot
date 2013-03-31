@@ -52,14 +52,14 @@ endif
 ##############################
 
 ifeq ($(UNAME), Linux)
-    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2012q4-20121208-linux.tar.bz2
+    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux.tar.bz2
 else ifeq ($(UNAME), Darwin)
-    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2012q4-20121208-mac.tar.bz2
+    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-mac.tar.bz2
 else ifeq ($(UNAME), Windows)
-    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2012q4-20121208-windows.tar.bz2
+    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
 endif
 
-ARM_SDK_DIR := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2012q4
+ARM_SDK_DIR := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
 
 ##############################
 #
@@ -140,6 +140,7 @@ ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && $(ECHO) "exists"), exists)
     export ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-none-eabi-
 else
     # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(ARM_SDK_DIR)) not found (make arm_sdk_install), using system PATH)
     export ARM_SDK_PREFIX ?= arm-none-eabi-
 endif
 

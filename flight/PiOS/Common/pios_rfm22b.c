@@ -52,7 +52,7 @@
 
 #include <pios_spi_priv.h>
 #include <packet_handler.h>
-#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER)
+#if defined(PIOS_INCLUDE_GCSRCVR)
 #include <gcsreceiver.h>
 #endif
 #include <pios_rfm22b_priv.h>
@@ -631,7 +631,7 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->deviceID = crcs[0] | crcs[1] << 8 | crcs[2] << 16 | crcs[3] << 24;
 	DEBUG_PRINTF(2, "RF device ID: %x\n\r", rfm22b_dev->deviceID);
 
-#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER)
+#if defined(PIOS_INCLUDE_GCSRCVR)
         // Initialize the GCSReceive object
 	GCSReceiverInitialize();
 #endif
@@ -1846,9 +1846,9 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 					break;
 				case PACKET_TYPE_PPM:
 				{
-#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER) || (defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT)) || defined(PIOS_INCLUDE_RFM22B_RCVR)
+#if defined(PIOS_INCLUDE_GCSRCVR) || (defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT)) || defined(PIOS_INCLUDE_RFM22B_RCVR)
 					PHPpmPacketHandle ppmp = (PHPpmPacketHandle)&(rfm22b_dev->rx_packet);
-#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER) || (defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT))
+#if defined(PIOS_INCLUDE_GCSRCVR) || (defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT))
 					bool ppm_output = false;
 #endif
 #endif
@@ -1865,7 +1865,7 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 						}
 					}
 #endif
-#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER)
+#if defined(PIOS_INCLUDE_GCSRCVR)
 					if (!ppm_output) {
 						GCSReceiverData gcsRcvr;
 						for (uint8_t i = 0; (i < PIOS_RFM22B_RCVR_MAX_CHANNELS) && (i < GCSRECEIVER_CHANNEL_NUMELEM); ++i) {

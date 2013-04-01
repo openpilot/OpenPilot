@@ -818,7 +818,7 @@ margin:1px;</string>
        </widget>
       </item>
       <item row="3" column="4">
-       <widget class="QCheckBox" name="MultirotorRevMixercheckBox">
+       <widget class="QCheckBox" name="MultirotorRevMixerCheckBox">
         <property name="text">
          <string>Reverse all motors</string>
         </property>

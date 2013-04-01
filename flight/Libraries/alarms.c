@@ -28,7 +28,7 @@
  */
 
 #include "openpilot.h"
-#include "alarms.h"
+#include "inc/alarms.h"
 
 // Private constants
 
@@ -71,7 +71,10 @@ int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity
 	}
 
 	// Lock
-    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
+    if(xSemaphoreTakeRecursive(lock, portMAX_DELAY) != 0){
+        return -1;
+    }
+
 
     // Read alarm and update its severity only if it was changed
     SystemAlarmsGet(&alarms);
@@ -99,28 +102,30 @@ int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions 
 {
     SystemAlarmsData alarms;
 
-        // Check that this is a valid alarm
-        if (alarm >= SYSTEMALARMS_EXTENDEDALARMSTATUS_NUMELEM)
-        {
-            return -1;
-        }
+    // Check that this is a valid alarm
+    if (alarm >= SYSTEMALARMS_EXTENDEDALARMSTATUS_NUMELEM)
+    {
+        return -1;
+    }
 
-        // Lock
-        xSemaphoreTakeRecursive(lock, portMAX_DELAY);
+    // Lock
+    if(xSemaphoreTakeRecursive(lock, portMAX_DELAY) != 0){
+        return -1;
+    }
 
-        // Read alarm and update its severity only if it was changed
-        SystemAlarmsGet(&alarms);
-        if ( alarms.Alarm[alarm] != severity )
-        {
-            alarms.ExtendedAlarmStatus[alarm] = status;
-            alarms.ExtendedAlarmSubStatus[alarm] = subStatus;
-            alarms.Alarm[alarm] = severity;
-            SystemAlarmsSet(&alarms);
-        }
+    // Read alarm and update its severity only if it was changed
+    SystemAlarmsGet(&alarms);
+    if (alarms.Alarm[alarm] != severity)
+    {
+        alarms.ExtendedAlarmStatus[alarm] = status;
+        alarms.ExtendedAlarmSubStatus[alarm] = subStatus;
+        alarms.Alarm[alarm] = severity;
+        SystemAlarmsSet(&alarms);
+    }
 
-        // Release lock
-        xSemaphoreGiveRecursive(lock);
-        return 0;
+    // Release lock
+    xSemaphoreGiveRecursive(lock);
+    return 0;
 }
 
 /**

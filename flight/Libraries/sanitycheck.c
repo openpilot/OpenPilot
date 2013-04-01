@@ -26,13 +26,17 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "openpilot.h"
-#include "taskmonitor.h"
+#include <openpilot.h>
 #include <pios_board_info.h>
-#include "sanitycheck.h"
-#include "manualcontrolsettings.h"
-#include "systemalarms.h"
-#include "systemsettings.h"
+
+// Private includes
+#include "inc/taskmonitor.h"
+#include "inc/sanitycheck.h"
+
+// UAVOs
+#include <manualcontrolsettings.h>
+#include <systemalarms.h>
+#include <systemsettings.h>
 
 /****************************
  * Current checks:

@@ -38,17 +38,20 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "openpilot.h"
-#include "systemmod.h"
-#include "objectpersistence.h"
-#include "flightstatus.h"
-#include "systemstats.h"
-#include "systemsettings.h"
-#include "i2cstats.h"
-#include "taskinfo.h"
-#include "watchdogstatus.h"
-#include "taskmonitor.h"
-#include "hwsettings.h"
+#include <openpilot.h>
+// private includes
+#include "inc/systemmod.h"
+// UAVOs
+#include <objectpersistence.h>
+#include <flightstatus.h>
+#include <systemstats.h>
+#include <systemsettings.h>
+#include <i2cstats.h>
+#include <taskinfo.h>
+#include <watchdogstatus.h>
+#include <taskmonitor.h>
+#include <hwsettings.h>
+// Flight Libraries
 #include <sanitycheck.h>
 
 
@@ -337,11 +340,9 @@ static void hwSettingsUpdatedCb(UAVObjEvent * ev)
     HwSettingsData currentHwSettings;
     HwSettingsGet(&currentHwSettings);
     // check whether the Hw Configuration has changed from the one used at boot time
-    if(!memcmp(&bootHwSettings,&currentHwSettings,sizeof(HwSettingsData))){
-        return;
+    if(memcmp(&bootHwSettings, &currentHwSettings, sizeof(HwSettingsData)) != 0){
+        ExtendedAlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT,SYSTEMALARMS_ALARM_ERROR,BOOTFAULT_STATUS_ERROR_REQUIRE_REBOOT, 0);
     }
-
-	ExtendedAlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT,SYSTEMALARMS_ALARM_ERROR,BOOTFAULT_STATUS_ERROR_REQUIRE_REBOOT, 0);
 }
 
 /**

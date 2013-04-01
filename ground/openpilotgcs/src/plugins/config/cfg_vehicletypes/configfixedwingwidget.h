@@ -46,7 +46,7 @@ class ConfigFixedWingWidget: public VehicleConfig
     Q_OBJECT
 
 public:
-    ConfigFixedWingWidget(Ui_FixedWingConfigWidget *aircraft = 0, QWidget *parent = 0);
+    ConfigFixedWingWidget(QWidget *parent = 0);
     ~ConfigFixedWingWidget();
 
     friend class ConfigVehicleTypeWidget;
@@ -67,10 +67,8 @@ private slots:
     virtual QString updateConfigObjectsFromWidgets();
     virtual bool throwConfigError(QString airframeType);
 
-
 protected:
 
 };
-
 
 #endif // CONFIGFIXEDWINGWIDGET_H

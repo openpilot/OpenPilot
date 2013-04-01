@@ -28,7 +28,7 @@
 #define CONFIGccpmWIDGET_H
 
 #include "cfg_vehicletypes/vehicleconfig.h"
-#include "ui_ccpm.h"
+#include "ui_airframe_ccpm.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -52,7 +52,6 @@ typedef struct {
     int Min[CCPM_MAX_SWASH_SERVOS];
 } SwashplateServoSettingsStruct;
 
-
 class ConfigCcpmWidget: public VehicleConfig
 {
     Q_OBJECT
@@ -64,7 +63,9 @@ public:
     friend class ConfigVehicleTypeWidget;
 
 private:
-    Ui_ccpmWidget *m_ccpm;
+    //Ui_ccpmWidget *m_ccpm;
+    Ui_CcpmConfigWidget *m_aircraft;
+
     QGraphicsSvgItem *SwashplateImg;
     QGraphicsSvgItem *CurveImg;
     QGraphicsSvgItem *Servos[CCPM_MAX_SWASH_SERVOS];
@@ -90,7 +91,7 @@ private:
     bool updatingFromHardware;
     bool updatingToHardware;
 
-    virtual void ResetActuators(GUIConfigDataUnion* configData);
+    virtual void ResetActuators(GUIConfigDataUnion *configData);
     static QStringList getChannelDescriptions();
 
     QString updateConfigObjects();

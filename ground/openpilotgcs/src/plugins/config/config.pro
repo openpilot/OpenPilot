@@ -32,6 +32,7 @@ HEADERS += configplugin.h \
     cfg_vehicletypes/configmultirotorwidget.h \
     cfg_vehicletypes/configfixedwingwidget.h \
     cfg_vehicletypes/configgroundvehiclewidget.h \
+    cfg_vehicletypes/configcustomwidget.h \
     configrevowidget.h \
     config_global.h \
     mixercurve.h \
@@ -65,6 +66,7 @@ SOURCES += configplugin.cpp \
     cfg_vehicletypes/configmultirotorwidget.cpp \
     cfg_vehicletypes/configfixedwingwidget.cpp \
     cfg_vehicletypes/configgroundvehiclewidget.cpp \
+    cfg_vehicletypes/configcustomwidget.cpp \
     outputchannelform.cpp \
     mixercurve.cpp \
     dblspindelegate.cpp \
@@ -77,7 +79,6 @@ FORMS += airframe.ui \
     airframe_multirotor.ui \
     airframe_custom.ui \
     cc_hw_settings.ui \
-    ccpm.ui \
     stabilization.ui \
     input.ui \
     output.ui \

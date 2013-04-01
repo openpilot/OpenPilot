@@ -28,29 +28,14 @@
 #define CONFIGVEHICLETYPEWIDGET_H
 
 #include "ui_airframe.h"
-#include "../uavobjectwidgetutils/configtaskwidget.h"
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-#include "uavtalk/telemetrymanager.h"
-
 #include "cfg_vehicletypes/vehicleconfig.h"
-#include "cfg_vehicletypes/configccpmwidget.h"
-#include "cfg_vehicletypes/configfixedwingwidget.h"
-#include "cfg_vehicletypes/configgroundvehiclewidget.h"
-#include "cfg_vehicletypes/configmultirotorwidget.h"
+#include "uavobject.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 
-#include "ui_airframe_ccpm.h"
-#include "ui_airframe_fixedwing.h"
-#include "ui_airframe_ground.h"
-#include "ui_airframe_multirotor.h"
-#include "ui_airframe_custom.h"
-
-#include <QtGui/QWidget>
-#include <QList>
-#include <QItemDelegate>
-
-class Ui_Widget;
+#include <QComboBox>
+#include <QString>
+#include <QStringList>
+#include <QWidget>
 
 class ConfigVehicleTypeWidget: public ConfigTaskWidget
 {
@@ -65,16 +50,11 @@ public:
 private:
     Ui_AircraftWidget *m_aircraft;
 
-    Ui_CcpmConfigWidget *m_ccpmUi;
-    Ui_FixedWingConfigWidget *m_fixedwingUi;
-    Ui_MultiRotorConfigWidget *m_multirotorUi;
-    Ui_GroundConfigWidget *m_groundUi;
-    Ui_CustomConfigWidget *m_customUi;
-
-    ConfigCcpmWidget *m_heli;
-    ConfigFixedWingWidget *m_fixedwing;
-    ConfigMultiRotorWidget *m_multirotor;
-    ConfigGroundVehicleWidget *m_groundvehicle;
+    VehicleConfig *m_heli;
+    VehicleConfig *m_fixedwing;
+    VehicleConfig *m_multirotor;
+    VehicleConfig *m_groundvehicle;
+    VehicleConfig *m_custom;
 
     void updateCustomAirframeUI();
     void addToDirtyMonitor();
@@ -86,7 +66,6 @@ private:
     QStringList mixerTypes;
     QStringList mixerVectors;
 
-    QGraphicsSvgItem *quad;
     bool ffTuningInProgress;
     bool ffTuningPhase;
     UAVObject::Metadata accInitialData;
@@ -100,36 +79,14 @@ private slots:
 
     void setupAirframeUI(QString type);
 	
-    void toggleAileron2(int index);
-    void toggleElevator2(int index);
-    void toggleRudder2(int index);
+//    void toggleAileron2(int index);
+//    void toggleElevator2(int index);
+//    void toggleRudder2(int index);
     void switchAirframeType(int index);
 
     void enableFFTest();
     void openHelp();
-    void reverseMultirotorMotor();
 
-protected:
-    void showEvent(QShowEvent *event);
-    void resizeEvent(QResizeEvent *event);
-
-
-
-};
-
-class SpinBoxDelegate : public QItemDelegate
-{
-    Q_OBJECT
-
-public:
-    SpinBoxDelegate(QObject *parent = 0);
-
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
-
-    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
 #endif // CONFIGVEHICLETYPEWIDGET_H

@@ -24,11 +24,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGMULTIROTORWIDGET_H
-#define CONFIGMULTIROTORWIDGET_H
+#ifndef CONFIGCUSTOMWIDGET_H
+#define CONFIGCUSTOMWIDGET_H
 
 #include "cfg_vehicletypes/vehicleconfig.h"
-#include "ui_airframe_multirotor.h"
+#include "ui_airframe_custom.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -41,45 +41,28 @@
 
 class Ui_Widget;
 
-class ConfigMultiRotorWidget: public VehicleConfig
+class ConfigCustomWidget: public VehicleConfig
 {
     Q_OBJECT
 
 public:
-    ConfigMultiRotorWidget(QWidget *parent = 0);
-    ~ConfigMultiRotorWidget();
+    ConfigCustomWidget(QWidget *parent = 0);
+    ~ConfigCustomWidget();
 
     friend class ConfigVehicleTypeWidget;
 
 private:
-    Ui_MultiRotorConfigWidget *m_aircraft;
+    Ui_CustomConfigWidget *m_aircraft;
 
-    QWidget *uiowner;
-    QGraphicsSvgItem *quad;
-
-    bool setupQuad(bool pLayout);
-    bool setupHexa(bool pLayout);
-    bool setupOcto();
-    bool setupMultiRotorMixer(double mixerFactors[8][3]);
-    void setupMotors(QList<QString> motorList);
-    void setupQuadMotor(int channel, double roll, double pitch, double yaw);
-
-    float invertMotors;
-
-    virtual void ResetActuators(GUIConfigDataUnion *configData);
+    //virtual void ResetActuators(GUIConfigDataUnion *configData);
     static QStringList getChannelDescriptions();
-    static const QString CHANNELBOXNAME;
-    void setYawMixLevel(int);
-
-    void drawAirframe(QString multiRotorType);
+//    static const QString CHANNELBOXNAME;
 
 private slots:
     virtual void setupUI(QString airframeType);
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
     virtual bool throwConfigError(int numMotors);
-
-    void reverseMultirotorMotor();
 
 protected:
     void showEvent(QShowEvent *event);
@@ -90,4 +73,19 @@ signals:
 
 };
 
-#endif // CONFIGMULTIROTORWIDGET_H
+class SpinBoxDelegate : public QItemDelegate
+{
+    Q_OBJECT
+
+public:
+    SpinBoxDelegate(QObject *parent = 0);
+
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+};
+
+#endif // CONFIGCUSTOMWIDGET_H

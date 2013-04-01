@@ -104,7 +104,22 @@ void VehicleConfig::SetConfigData(GUIConfigDataUnion configData) {
         guiConfig->setValue(configData.UAVObject[i], i);
 }
 
-void VehicleConfig::ResetActuators(GUIConfigDataUnion* configData)
+
+void VehicleConfig::setupUI(QString frameType)
+{
+
+}
+
+QString VehicleConfig::updateConfigObjectsFromWidgets()
+{
+    return QString();
+}
+
+void VehicleConfig::refreshWidgetsValues(QString frameType)
+{
+}
+
+void VehicleConfig::ResetActuators(GUIConfigDataUnion *configData)
 {
 }
 
@@ -113,27 +128,30 @@ void VehicleConfig::ResetActuators(GUIConfigDataUnion* configData)
   Sets the current index on supplied combobox to index
   if it is within bounds 0 <= index < combobox.count()
  */
-void VehicleConfig::setComboCurrentIndex(QComboBox* box, int index)
+void VehicleConfig::setComboCurrentIndex(QComboBox *box, int index)
 {
     Q_ASSERT(box);
 
-    if (index >= 0 && index < box->count())
+    if (index >= 0 && index < box->count()) {
         box->setCurrentIndex(index);
+    }
 }
 
 /**
   Helper function:
   enables/disables the named comboboxes within supplied uiowner
  */
-void VehicleConfig::enableComboBoxes(QWidget* owner, QString boxName, int boxCount, bool enable)
+void VehicleConfig::enableComboBoxes(QWidget *owner, QString boxName, int boxCount, bool enable)
 {
     for (int i = 1; i <= boxCount; i++) {
         QComboBox* box = qFindChild<QComboBox*>(owner, QString("%0%1").arg(boxName).arg(i));
-        if (box)
+        if (box) {
             box->setEnabled(enable);
+        }
     }
 }
-QString VehicleConfig::getMixerType(UAVDataObject* mixer, int channel)
+
+QString VehicleConfig::getMixerType(UAVDataObject *mixer, int channel)
 {
     Q_ASSERT(mixer);
 
@@ -246,28 +264,22 @@ void VehicleConfig::setMixerValue(UAVDataObject* mixer, QString elementName, dou
     }
 }
 
-
-void VehicleConfig::setThrottleCurve(UAVDataObject* mixer, MixerThrottleCurveElem curveType, QList<double> curve)
+void VehicleConfig::setThrottleCurve(UAVDataObject *mixer, MixerThrottleCurveElem curveType, QList<double> curve)
 {
     QPointer<UAVObjectField> field;
 
-    switch (curveType)
-    {
-        case MIXER_THROTTLECURVE1:
-        {
-            field = mixer->getField("ThrottleCurve1");
-            break;
-        }
-        case MIXER_THROTTLECURVE2:
-        {
-            field = mixer->getField("ThrottleCurve2");
-            break;
-        }
+    switch (curveType) {
+    case MIXER_THROTTLECURVE1:
+        field = mixer->getField("ThrottleCurve1");
+        break;
+    case MIXER_THROTTLECURVE2:
+        field = mixer->getField("ThrottleCurve2");
+        break;
     }
 
     if (field && field->getNumElements() == curve.length()) {
-        for (int i=0;i<curve.length();i++) {
-           field->setValue(curve.at(i),i);
+        for (int i = 0; i < curve.length(); i++) {
+            field->setValue(curve.at(i), i);
         }
     }
 }
@@ -279,23 +291,18 @@ void VehicleConfig::getThrottleCurve(UAVDataObject* mixer, MixerThrottleCurveEle
 
     QPointer<UAVObjectField> field;
 
-    switch (curveType)
-    {
-        case MIXER_THROTTLECURVE1:
-        {
-            field = mixer->getField("ThrottleCurve1");
-            break;
-        }
-        case MIXER_THROTTLECURVE2:
-        {
-            field = mixer->getField("ThrottleCurve2");
-            break;
-        }
+    switch (curveType) {
+    case MIXER_THROTTLECURVE1:
+        field = mixer->getField("ThrottleCurve1");
+        break;
+    case MIXER_THROTTLECURVE2:
+        field = mixer->getField("ThrottleCurve2");
+        break;
     }
 
     if (field) {
         curve->clear();
-        for (unsigned int i=0; i < field->getNumElements(); i++) {
+        for (unsigned int i = 0; i < field->getNumElements(); i++) {
             curve->append(field->getValue(i).toDouble());
         }
     }
@@ -306,7 +313,7 @@ bool VehicleConfig::isValidThrottleCurve(QList<double>* curve)
     Q_ASSERT(curve);
 
     if (curve) {
-        for (int i=0; i < curve->count(); i++) {
+        for (int i = 0; i < curve->count(); i++) {
             if (curve->at(i) != 0)
                 return true;
         }
@@ -314,21 +321,21 @@ bool VehicleConfig::isValidThrottleCurve(QList<double>* curve)
     return false;
 }
 
-double VehicleConfig::getCurveMin(QList<double>* curve)
+double VehicleConfig::getCurveMin(QList<double> *curve)
 {
     double min = 0;
-    for (int i=0; i<curve->count(); i++)
+    for (int i = 0; i < curve->count(); i++) {
         min = std::min(min, curve->at(i));
-
+    }
     return min;
 }
 
-double VehicleConfig::getCurveMax(QList<double>* curve)
+double VehicleConfig::getCurveMax(QList<double> *curve)
 {
     double max = 0;
-    for (int i=0; i<curve->count(); i++)
+    for (int i = 0; i < curve->count(); i++) {
         max = std::max(max, curve->at(i));
-
+    }
     return max;
 }
 /**
@@ -336,8 +343,8 @@ double VehicleConfig::getCurveMax(QList<double>* curve)
   */
 void VehicleConfig::resetField(UAVObjectField * field)
 {
-    for (unsigned int i=0;i<field->getNumElements();i++) {
-        field->setValue(0,i);
+    for (unsigned int i = 0; i < field->getNumElements(); i++) {
+        field->setValue(0, i);
     }
 }
 

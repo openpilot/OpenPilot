@@ -41,20 +41,24 @@
 #include <math.h>
 #include <QMessageBox>
 
-/**
- Constructor
- */
-ConfigFixedWingWidget::ConfigFixedWingWidget(Ui_FixedWingConfigWidget *aircraft, QWidget *parent) : VehicleConfig(parent)
+ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
+        VehicleConfig(parent), m_aircraft(new Ui_FixedWingConfigWidget())
 {
-    m_aircraft = aircraft;    
+    m_aircraft->setupUi(this);
+
+    QStringList fixedWingTypes;
+    fixedWingTypes << "Elevator aileron rudder" << "Elevon" << "Vtail";
+    m_aircraft->fixedWingType->addItems(fixedWingTypes);
+
+    // Set default model to "Elevator aileron rudder"
+    m_aircraft->fixedWingType->setCurrentIndex(0);
+
+    connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
 }
 
-/**
- Destructor
- */
 ConfigFixedWingWidget::~ConfigFixedWingWidget()
 {
-   // Do nothing
+    delete m_aircraft;
 }
 
 /**
@@ -65,7 +69,6 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
     Q_ASSERT(m_aircraft);
 
 	if (frameType == "FixedWing" || frameType == "Elevator aileron rudder") {
-        // Setup the UI
         //setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(true);
@@ -210,6 +213,30 @@ void ConfigFixedWingWidget::refreshWidgetsValues(QString frameType)
 {
     Q_ASSERT(m_aircraft);
 
+    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    QList<double> curveValues;
+    getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, &curveValues);
+
+    // is at least one of the curve values != 0?
+    if (isValidThrottleCurve(&curveValues)) {
+        // yes, use the curve we just read from mixersettings
+        m_aircraft->fixedWingThrottle->initCurve(&curveValues);
+    }
+    else {
+        // no, init a straight curve
+        m_aircraft->fixedWingThrottle->initLinearCurve(curveValues.count(), 1.0);
+    }
+
+
+
+
+
+
+
+
+
     GUIConfigDataUnion config = GetConfigData();
     fixedGUISettingsStruct fixed = config.fixedwing;
 
@@ -222,26 +249,32 @@ void ConfigFixedWingWidget::refreshWidgetsValues(QString frameType)
     setComboCurrentIndex(m_aircraft->fwRudder1ChannelBox, fixed.FixedWingYaw1);
     setComboCurrentIndex(m_aircraft->fwRudder2ChannelBox, fixed.FixedWingYaw2);
 
-    UAVDataObject* mixer= dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    Q_ASSERT(mixer);
+    //UAVDataObject* mixer= dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    //Q_ASSERT(mixer);
 
     int channel;
-	if (frameType == "FixedWingElevon") {
+    if (frameType == "FixedWingElevon") {
         // If the airframe is elevon, restore the slider setting
         // Find the channel number for Elevon1 (FixedWingRoll1)
-        channel = m_aircraft->fwAileron1ChannelBox->currentIndex()-1;
-        if (channel > -1) { // If for some reason the actuators were incoherent, we might fail here, hence the check.
-            m_aircraft->elevonSlider1->setValue(getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_ROLL)*100);
-            m_aircraft->elevonSlider2->setValue(getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_PITCH)*100);
-		}
-	}
-    if (frameType == "FixedWingVtail") {
-        channel = m_aircraft->fwElevator1ChannelBox->currentIndex()-1;
-        if (channel > -1) { // If for some reason the actuators were incoherent, we might fail here, hence the check.
-            m_aircraft->elevonSlider1->setValue(getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_YAW)*100);
-            m_aircraft->elevonSlider2->setValue(getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_PITCH)*100);
+        channel = m_aircraft->fwAileron1ChannelBox->currentIndex() - 1;
+        if (channel > -1) {
+            // If for some reason the actuators were incoherent, we might fail here, hence the check.
+            m_aircraft->elevonSlider1->setValue(
+                    getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL) * 100);
+            m_aircraft->elevonSlider2->setValue(
+                    getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH) * 100);
         }
-	}	
+    }
+    else if (frameType == "FixedWingVtail") {
+        channel = m_aircraft->fwElevator1ChannelBox->currentIndex() - 1;
+        if (channel > -1) {
+            // If for some reason the actuators were incoherent, we might fail here, hence the check.
+            m_aircraft->elevonSlider1->setValue(
+                    getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW) * 100);
+            m_aircraft->elevonSlider2->setValue(
+                    getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH) * 100);
+        }
+    }
 }
 
 

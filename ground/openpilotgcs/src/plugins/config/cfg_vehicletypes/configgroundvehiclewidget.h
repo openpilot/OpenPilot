@@ -46,7 +46,7 @@ class ConfigGroundVehicleWidget: public VehicleConfig
     Q_OBJECT
 
 public:
-    ConfigGroundVehicleWidget(Ui_GroundConfigWidget *aircraft = 0, QWidget *parent = 0);
+    ConfigGroundVehicleWidget(QWidget *parent = 0);
     ~ConfigGroundVehicleWidget();
 
     friend class ConfigVehicleTypeWidget;
@@ -70,6 +70,5 @@ private slots:
 protected:
 
 };
-
 
 #endif // CONFIGGROUNDVEHICLEWIDGET_H

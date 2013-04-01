@@ -140,25 +140,33 @@ public:
         MIXERVECTOR_YAW = 4
     } MixerVectorElem;
 
+    // TODO remove 1st capital
     static GUIConfigDataUnion GetConfigData();
     static void SetConfigData(GUIConfigDataUnion configData);
-    static void resetField(UAVObjectField * field);
-    static void setComboCurrentIndex(QComboBox* box, int index);
-    static void enableComboBoxes(QWidget* owner, QString boxName, int boxCount, bool enable);
-    double  getMixerVectorValue(UAVDataObject* mixer, int channel, MixerVectorElem elementName);
-    void    setMixerVectorValue(UAVDataObject* mixer, int channel, MixerVectorElem elementName, double value);
-    void    resetMixerVector(UAVDataObject* mixer, int channel);
-    void    resetMotorAndServoMixers(UAVDataObject* mixer);
-    QString getMixerType(UAVDataObject* mixer, int channel);
-    void    setMixerType(UAVDataObject* mixer, int channel, MixerTypeElem mixerType);
-    double  getMixerValue(UAVDataObject* mixer, QString elementName);
-    void    setMixerValue(UAVDataObject* mixer, QString elementName, double value);
-    void    setThrottleCurve(UAVDataObject* mixer, MixerThrottleCurveElem curveType, QList<double> curve);
-    void    getThrottleCurve(UAVDataObject* mixer, MixerThrottleCurveElem curveType, QList<double>* curve);
-    bool    isValidThrottleCurve(QList<double>* curve);
-    double  getCurveMin(QList<double>* curve);
-    double  getCurveMax(QList<double>* curve);
-    virtual void ResetActuators(GUIConfigDataUnion* configData);
+
+    static void resetField(UAVObjectField *field);
+    static void setComboCurrentIndex(QComboBox *box, int index);
+    static void enableComboBoxes(QWidget *owner, QString boxName, int boxCount, bool enable);
+
+    virtual void setupUI(QString airframeType);
+    virtual QString updateConfigObjectsFromWidgets();
+    virtual void refreshWidgetsValues(QString frameType);
+
+    virtual void ResetActuators(GUIConfigDataUnion *configData);
+
+    double  getMixerVectorValue(UAVDataObject *mixer, int channel, MixerVectorElem elementName);
+    void    setMixerVectorValue(UAVDataObject *mixer, int channel, MixerVectorElem elementName, double value);
+    void    resetMixerVector(UAVDataObject *mixer, int channel);
+    void    resetMotorAndServoMixers(UAVDataObject *mixer);
+    QString getMixerType(UAVDataObject *mixer, int channel);
+    void    setMixerType(UAVDataObject *mixer, int channel, MixerTypeElem mixerType);
+    double  getMixerValue(UAVDataObject *mixer, QString elementName);
+    void    setMixerValue(UAVDataObject *mixer, QString elementName, double value);
+    void    setThrottleCurve(UAVDataObject *mixer, MixerThrottleCurveElem curveType, QList<double> curve);
+    void    getThrottleCurve(UAVDataObject *mixer, MixerThrottleCurveElem curveType, QList<double>* curve);
+    bool    isValidThrottleCurve(QList<double> *curve);
+    double  getCurveMin(QList<double> *curve);
+    double  getCurveMax(QList<double> *curve);
 
     QStringList channelNames;
     QStringList mixerTypes;
@@ -168,7 +176,7 @@ public:
     static const quint32 CHANNEL_NUMELEM = ActuatorCommand::CHANNEL_NUMELEM;;
 
 private:
-    static UAVObjectManager* getUAVObjectManager();
+    static UAVObjectManager *getUAVObjectManager();
 
 private slots:
 

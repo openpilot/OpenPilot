@@ -143,7 +143,7 @@ void AeroSimRCSimulator::transmitUpdate()
 void AeroSimRCSimulator::processUpdate(const QByteArray &data)
 {
     // check size
-    if (data.size() > 188) {
+    if (data.size() > 192) {
         qDebug() << "!!! big datagram: " << data.size();
         return;
     }
@@ -171,7 +171,7 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     qreal  lat, lon;
     float   agl,      // world
             yaw, pitch, roll,   // model
-            volt, curr,
+            volt, curr, cons,
             rx, ry, rz, fx, fy, fz, ux, uy, uz, // matrix
             ch[AEROSIM_RCCHANNEL_NUMELEM];
 
@@ -184,7 +184,7 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     stream >> accX >> accY >> accZ;
     stream >> lat >> lon >> agl;
     stream >> yaw >> pitch >> roll;
-    stream >> volt >> curr;
+    stream >> volt >> curr >> cons;
     stream >> rx >> ry >> rz >> fx >> fy >> fz >> ux >> uy >> uz;
     stream >> ch[0] >> ch[1] >> ch[2] >> ch[3] >> ch[4] >> ch[5] >> ch[6] >> ch[7];
     stream >> udpCounterASrecv;
@@ -252,6 +252,11 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     out.velNorth = velY * 1;
     out.velEast = velX * 1;
     out.velDown = velZ * -1;
+
+    out.voltage = volt;
+    out.current = curr;
+    out.consumption = cons*1000.0;
+
 
     updateUAVOs(out);
 

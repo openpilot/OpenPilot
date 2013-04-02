@@ -69,6 +69,7 @@ Simulator::Simulator(const SimulatorSettings& params) :
     gcsRcvrTime = currentTime;
     attRawTime = currentTime;
     baroAltTime = currentTime;
+    battTime = currentTime;
     airspeedActualTime=currentTime;
 
     //Define standard atmospheric constants
@@ -153,6 +154,7 @@ void Simulator::onStart()
     velActual = VelocityActual::GetInstance(objManager);
     posActual = PositionActual::GetInstance(objManager);
     baroAlt = BaroAltitude::GetInstance(objManager);
+    flightBatt = FlightBatteryState::GetInstance(objManager);
     airspeedActual = AirspeedActual::GetInstance(objManager);
     attActual = AttitudeActual::GetInstance(objManager);
     attSettings = AttitudeSettings::GetInstance(objManager);
@@ -284,7 +286,10 @@ void Simulator::setupObjects()
         setupOutputObject(airspeedActual, settings.airspeedActualRate);
 
     if(settings.baroAltitudeEnabled)
+    {
         setupOutputObject(baroAlt, settings.baroAltRate);
+        setupOutputObject(flightBatt, settings.baroAltRate);
+    }
 
 }
 
@@ -723,6 +728,21 @@ void Simulator::updateUAVOs(Output2Hardware out){
         baroAlt->setData(baroAltData);
 
         baroAltTime=baroAltTime.addMSecs(settings.baroAltRate);
+        }
+    }
+
+    /*******************************/
+    // Update FlightBatteryState object
+    if (settings.baroAltitudeEnabled){
+        if (battTime.msecsTo(currentTime) >= settings.baroAltRate) {
+        FlightBatteryState::DataFields batteryData;
+        memset(&batteryData, 0, sizeof(FlightBatteryState::DataFields));
+        batteryData.Voltage = out.voltage;
+        batteryData.Current = out.current;
+        batteryData.ConsumedEnergy = out.consumption;
+        flightBatt->setData(batteryData);
+
+        battTime=battTime.addMSecs(settings.baroAltRate);
         }
     }
 

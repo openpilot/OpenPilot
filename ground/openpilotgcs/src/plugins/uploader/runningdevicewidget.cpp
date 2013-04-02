@@ -59,7 +59,6 @@ void runningDeviceWidget::resizeEvent(QResizeEvent* event)
   */
 void runningDeviceWidget::populate()
 {
-
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
     int id = utilMngr->getBoardModel();
@@ -81,7 +80,7 @@ void runningDeviceWidget::populate()
         devicePic.load("");//TODO
         break;
     case 0x0301:
-        devicePic.load(":/uploader/images/pipx.png");
+        devicePic.load(":/uploader/images/gcs-board-oplink.png");
         break;
     case 0x0401:
         devicePic.load(":/uploader/images/gcs-board-cc.png");
@@ -89,7 +88,11 @@ void runningDeviceWidget::populate()
     case 0x0402:
         devicePic.load(":/uploader/images/gcs-board-cc3d.png");
         break;
+    case 0x0903:
+        devicePic.load(":/uploader/images/gcs-board-revo.png");
+        break;
     default:
+        devicePic.load(""); //Clear
         break;
     }
     myDevice->devicePicture->scene()->addPixmap(devicePic);
@@ -97,65 +100,33 @@ void runningDeviceWidget::populate()
     myDevice->devicePicture->fitInView(devicePic.rect(),Qt::KeepAspectRatio);
 
     QString serial = utilMngr->getBoardCPUSerial().toHex();
-     myDevice->CPUSerial->setText(serial);
+    myDevice->CPUSerial->setText(serial);
 
     QByteArray description = utilMngr->getBoardDescription();
     deviceDescriptorStruct devDesc;
-    if(UAVObjectUtilManager::descriptionToStructure(description,devDesc))
-    {
-        if(devDesc.gitTag.startsWith("RELEASE",Qt::CaseSensitive))
-        {
-            myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.gitTag);
+    if(UAVObjectUtilManager::descriptionToStructure(description, devDesc)) {
+        if(devDesc.gitTag.startsWith("RELEASE",Qt::CaseSensitive)) {
+            myDevice->lblFWTag->setText(QString("Firmware tag: ") + devDesc.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Tagged officially released firmware build"));
 
-        }
-        else
-        {
-            myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.gitTag);
+        } else {
+            myDevice->lblFWTag->setText(QString("Firmware tag: ") + devDesc.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Untagged or custom firmware build"));
         }
-        myDevice->lblGitCommitTag->setText("Git commit hash: "+devDesc.gitHash);
+        myDevice->lblGitCommitTag->setText("Git commit hash: " + devDesc.gitHash);
         myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.gitDate.insert(4,"-").insert(7,"-"));
     }
     else
     {
-
-        myDevice->lblFWTag->setText(QString("Firmware tag: ")+QString(description).left(QString(description).indexOf(QChar(255))));
+        myDevice->lblFWTag->setText(QString("Firmware tag: ") + QString(description).left(QString(description).indexOf(QChar(255))));
         myDevice->lblGitCommitTag->setText("Git commit tag: Unknown");
         myDevice->lblFWDate->setText(QString("Firmware date: Unknown"));
         QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
         myDevice->lblCertified->setPixmap(pix);
         myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
     }
-    //status("Ready...", STATUSICON_INFO);
 }
-
-
-/**
-  Updates status message
-  */
-/*
-void runningDeviceWidget::status(QString str, StatusIcon ic)
-{
-    QPixmap px;
-    myDevice->statusLabel->setText(str);
-    switch (ic) {
-    case STATUSICON_RUNNING:
-        px.load(QString(":/uploader/images/system-run.svg"));
-        break;
-    case STATUSICON_OK:
-        px.load(QString(":/uploader/images/dialog-apply.svg"));
-        break;
-    case STATUSICON_FAIL:
-        px.load(QString(":/uploader/images/process-stop.svg"));
-        break;
-    default:
-        px.load(QString(":/uploader/images/gtk-info.svg"));
-    }
-    myDevice->statusIcon->setPixmap(px);
-}
-*/

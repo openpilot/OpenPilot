@@ -147,7 +147,7 @@ void UploaderGadgetWidget::onPhisicalHWConnect()
   Enables widget buttons if autopilot connected
   */
 void UploaderGadgetWidget::onAutopilotConnect(){
-    QTimer::singleShot(1000,this,SLOT(populate()));
+    QTimer::singleShot(1000, this, SLOT(populate()));
 }
 
 void UploaderGadgetWidget::populate()
@@ -175,6 +175,7 @@ void UploaderGadgetWidget::populate()
   Enables widget buttons if autopilot disconnected
   */
 void UploaderGadgetWidget::onAutopilotDisconnect(){
+
     m_config->haltButton->setEnabled(false);
     m_config->resetButton->setEnabled(false);
     m_config->bootButton->setEnabled(true);
@@ -187,7 +188,6 @@ void UploaderGadgetWidget::onAutopilotDisconnect(){
         m_config->telemetryLink->setEnabled(true);
     }
 }
-
 
 /**
   Tell the mainboard to go to bootloader:

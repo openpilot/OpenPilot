@@ -95,7 +95,7 @@ void deviceWidget::populate()
         devicePic.load("");//TODO
         break;
     case 0x0301:
-        devicePic.load(":/uploader/images/pipx.png");
+        devicePic.load(":/uploader/images/gcs-board-oplink.png");
         break;
     case 0x0401:
         devicePic.load(":/uploader/images/gcs-board-cc.png");
@@ -103,7 +103,11 @@ void deviceWidget::populate()
     case 0x0402:
         devicePic.load(":/uploader/images/gcs-board-cc3d.png");
         break;
+    case 0x0903:
+        devicePic.load(":/uploader/images/gcs-board-revo.png");
+        break;
     default:
+        devicePic.load(""); //Clear
         break;
     }
     myDevice->gVDevice->scene()->addPixmap(devicePic);

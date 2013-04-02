@@ -46,25 +46,25 @@ class ConfigGroundVehicleWidget: public VehicleConfig
     Q_OBJECT
 
 public:
+    static QStringList getChannelDescriptions();
+
     ConfigGroundVehicleWidget(QWidget *parent = 0);
     ~ConfigGroundVehicleWidget();
 
-    friend class ConfigVehicleTypeWidget;
+    virtual void setupUI(QString airframeType);
+    virtual void refreshWidgetsValues(QString frameType);
+    virtual QString updateConfigObjectsFromWidgets();
 
 private:
+    virtual void resetActuators(GUIConfigDataUnion *configData);
+
     Ui_GroundConfigWidget *m_aircraft;
 
     bool setupGroundVehicleCar(QString airframeType);
     bool setupGroundVehicleDifferential(QString airframeType);
     bool setupGroundVehicleMotorcycle(QString airframeType);
 
-    virtual void ResetActuators(GUIConfigDataUnion* configData);
-    static QStringList getChannelDescriptions();
-
 private slots:
-    virtual void setupUI(QString airframeType);
-    virtual void refreshWidgetsValues(QString frameType);
-    virtual QString updateConfigObjectsFromWidgets();
     virtual bool throwConfigError(QString airframeType);
 
 protected:

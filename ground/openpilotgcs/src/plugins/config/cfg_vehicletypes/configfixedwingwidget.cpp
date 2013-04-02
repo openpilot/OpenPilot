@@ -130,7 +130,7 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
 	}
 }
 
-void ConfigFixedWingWidget::ResetActuators(GUIConfigDataUnion* configData)
+void ConfigFixedWingWidget::resetActuators(GUIConfigDataUnion *configData)
 {
     configData->fixedwing.FixedWingPitch1 = 0;
     configData->fixedwing.FixedWingPitch2 = 0;
@@ -297,7 +297,7 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
     // Now setup the channels:
 	
     GUIConfigDataUnion config = GetConfigData();
-    ResetActuators(&config);
+    resetActuators(&config);
 
     config.fixedwing.FixedWingPitch1 = m_aircraft->fwElevator1ChannelBox->currentIndex();
     config.fixedwing.FixedWingPitch2 = m_aircraft->fwElevator2ChannelBox->currentIndex();
@@ -369,7 +369,7 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
     }
 	
     GUIConfigDataUnion config = GetConfigData();
-    ResetActuators(&config);
+    resetActuators(&config);
 
     config.fixedwing.FixedWingRoll1 = m_aircraft->fwAileron1ChannelBox->currentIndex();
     config.fixedwing.FixedWingRoll2 = m_aircraft->fwAileron2ChannelBox->currentIndex();
@@ -441,7 +441,7 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
     }
 	
     GUIConfigDataUnion config = GetConfigData();
-    ResetActuators(&config);
+    resetActuators(&config);
 
     config.fixedwing.FixedWingPitch1 = m_aircraft->fwElevator1ChannelBox->currentIndex();
     config.fixedwing.FixedWingPitch2 = m_aircraft->fwElevator2ChannelBox->currentIndex();

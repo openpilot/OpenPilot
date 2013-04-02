@@ -46,25 +46,26 @@ class ConfigFixedWingWidget: public VehicleConfig
     Q_OBJECT
 
 public:
+
+    static QStringList getChannelDescriptions();
+
     ConfigFixedWingWidget(QWidget *parent = 0);
     ~ConfigFixedWingWidget();
 
-    friend class ConfigVehicleTypeWidget;
+    virtual void setupUI(QString airframeType);
+    virtual void refreshWidgetsValues(QString frameType);
+    virtual QString updateConfigObjectsFromWidgets();
 
 private:
+    virtual void resetActuators(GUIConfigDataUnion *configData);
+
     Ui_FixedWingConfigWidget *m_aircraft;
 
     bool setupFrameFixedWing(QString airframeType);
     bool setupFrameElevon(QString airframeType);
     bool setupFrameVtail(QString airframeType);
 
-    virtual void ResetActuators(GUIConfigDataUnion* configData);
-    static QStringList getChannelDescriptions();
-
 private slots:
-    virtual void setupUI(QString airframeType);
-    virtual void refreshWidgetsValues(QString frameType);
-    virtual QString updateConfigObjectsFromWidgets();
     virtual bool throwConfigError(QString airframeType);
 
 protected:

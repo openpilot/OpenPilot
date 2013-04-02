@@ -94,6 +94,11 @@ QStringList ConfigCustomWidget::getChannelDescriptions()
     return channelDesc;
 }
 
+void ConfigCustomWidget::resetActuators(GUIConfigDataUnion *configData)
+{
+
+}
+
 /**
  Helper function to update the UI widget objects
  */

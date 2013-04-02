@@ -107,8 +107,6 @@ class VehicleConfig: public ConfigTaskWidget
 Q_OBJECT
 
 public:
-    VehicleConfig(QWidget *parent = 0);
-    ~VehicleConfig();
 
     /* Enumeration options for ThrottleCurves */
     typedef enum {
@@ -140,6 +138,8 @@ public:
         MIXERVECTOR_YAW = 4
     } MixerVectorElem;
 
+    static const quint32 CHANNEL_NUMELEM = ActuatorCommand::CHANNEL_NUMELEM;;
+
     // TODO remove 1st capital
     static GUIConfigDataUnion GetConfigData();
     static void SetConfigData(GUIConfigDataUnion configData);
@@ -148,12 +148,15 @@ public:
     static void setComboCurrentIndex(QComboBox *box, int index);
     static void enableComboBoxes(QWidget *owner, QString boxName, int boxCount, bool enable);
 
+    // VehicleConfig class
+    VehicleConfig(QWidget *parent = 0);
+    ~VehicleConfig();
+
     virtual void setupUI(QString airframeType);
     virtual QString updateConfigObjectsFromWidgets();
     virtual void refreshWidgetsValues(QString frameType);
 
-    virtual void ResetActuators(GUIConfigDataUnion *configData);
-
+    // TODO move to separate class
     double  getMixerVectorValue(UAVDataObject *mixer, int channel, MixerVectorElem elementName);
     void    setMixerVectorValue(UAVDataObject *mixer, int channel, MixerVectorElem elementName, double value);
     void    resetMixerVector(UAVDataObject *mixer, int channel);
@@ -168,15 +171,16 @@ public:
     double  getCurveMin(QList<double> *curve);
     double  getCurveMax(QList<double> *curve);
 
+protected:
     QStringList channelNames;
     QStringList mixerTypes;
     QStringList mixerVectors;
     QStringList mixerTypeDescriptions;
 
-    static const quint32 CHANNEL_NUMELEM = ActuatorCommand::CHANNEL_NUMELEM;;
-
 private:
     static UAVObjectManager *getUAVObjectManager();
+
+    virtual void resetActuators(GUIConfigDataUnion *configData);
 
 private slots:
 

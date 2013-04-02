@@ -46,12 +46,24 @@ class ConfigMultiRotorWidget: public VehicleConfig
     Q_OBJECT
 
 public:
+
+    static QStringList getChannelDescriptions();
+    static const QString CHANNELBOXNAME;
+
     ConfigMultiRotorWidget(QWidget *parent = 0);
     ~ConfigMultiRotorWidget();
 
-    friend class ConfigVehicleTypeWidget;
+    virtual void setupUI(QString airframeType);
+    virtual void refreshWidgetsValues(QString frameType);
+    virtual QString updateConfigObjectsFromWidgets();
+
+protected:
+    void showEvent(QShowEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
 private:
+    virtual void resetActuators(GUIConfigDataUnion *configData);
+
     Ui_MultiRotorConfigWidget *m_aircraft;
 
     QWidget *uiowner;
@@ -66,28 +78,14 @@ private:
 
     float invertMotors;
 
-    virtual void ResetActuators(GUIConfigDataUnion *configData);
-    static QStringList getChannelDescriptions();
-    static const QString CHANNELBOXNAME;
     void setYawMixLevel(int);
 
     void drawAirframe(QString multiRotorType);
 
 private slots:
-    virtual void setupUI(QString airframeType);
-    virtual void refreshWidgetsValues(QString frameType);
-    virtual QString updateConfigObjectsFromWidgets();
     virtual bool throwConfigError(int numMotors);
 
     void reverseMultirotorMotor();
-
-protected:
-    void showEvent(QShowEvent *event);
-    void resizeEvent(QResizeEvent *event);
-
-signals:
-    void configurationChanged();
-
 };
 
 #endif // CONFIGMULTIROTORWIDGET_H

@@ -57,13 +57,28 @@ class ConfigCcpmWidget: public VehicleConfig
     Q_OBJECT
 
 public:
+
+    static QStringList getChannelDescriptions();
+
     ConfigCcpmWidget(QWidget *parent = 0);
     ~ConfigCcpmWidget();
 
-    friend class ConfigVehicleTypeWidget;
+    virtual void setupUI(QString airframeType);
+    virtual void refreshWidgetsValues(QString frameType);
+    virtual QString updateConfigObjectsFromWidgets();
+
+public slots:
+    void getMixer();
+    void setMixer();
+    void saveccpmUpdate();
+
+protected:
+    void showEvent(QShowEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
 private:
-    //Ui_ccpmWidget *m_ccpm;
+    virtual void resetActuators(GUIConfigDataUnion *configData);
+
     Ui_CcpmConfigWidget *m_aircraft;
 
     QGraphicsSvgItem *SwashplateImg;
@@ -86,20 +101,16 @@ private:
 
     int MixerChannelData[6];
     int ShowDisclaimer(int messageID);
-    virtual void enableControls(bool enable) { Q_UNUSED(enable)}; // Not used by this widget
+    virtual void enableControls(bool enable) { Q_UNUSED(enable) }; // Not used by this widget
 
     bool updatingFromHardware;
     bool updatingToHardware;
 
-    virtual void ResetActuators(GUIConfigDataUnion *configData);
-    static QStringList getChannelDescriptions();
-
+    // TODO ?
     QString updateConfigObjects();
 
 private slots:
-    virtual void setupUI(QString airframeType);
-    virtual void refreshWidgetsValues(QString frameType);
-    virtual QString updateConfigObjectsFromWidgets();
+    // TODO ?
     virtual bool throwConfigError(QString airframeType);
 
     void ccpmSwashplateUpdate();
@@ -120,17 +131,8 @@ private slots:
     void enableSwashplateLevellingControl(bool state);
     void setSwashplateLevel(int percent);
     void SwashLvlSpinBoxChanged(int value);
+    // TODO ?
     virtual void refreshValues() {}; // Not used
-
-public slots:
-    void getMixer();
-    void setMixer();
-    void saveccpmUpdate();
-
-protected:
-    void showEvent(QShowEvent *event);
-    void resizeEvent(QResizeEvent *event);
-
 };
 
 #endif // CONFIGccpmWIDGET_H

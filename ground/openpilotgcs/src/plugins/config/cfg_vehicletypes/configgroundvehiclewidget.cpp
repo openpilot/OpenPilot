@@ -161,7 +161,7 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
 	}
 }
 
-void ConfigGroundVehicleWidget::ResetActuators(GUIConfigDataUnion* configData)
+void ConfigGroundVehicleWidget::resetActuators(GUIConfigDataUnion *configData)
 {
     configData->ground.GroundVehicleSteering1 = 0;
     configData->ground.GroundVehicleSteering2 = 0;
@@ -330,7 +330,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleMotorcycle(QString airframeTyp
 
 	// Now setup the channels:
     GUIConfigDataUnion config = GetConfigData();
-    ResetActuators(&config);
+    resetActuators(&config);
 
     config.ground.GroundVehicleThrottle1 = m_aircraft->gvMotor1ChannelBox->currentIndex();
     config.ground.GroundVehicleThrottle2 = m_aircraft->gvMotor2ChannelBox->currentIndex();
@@ -379,14 +379,14 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleDifferential(QString airframeT
 
     // Now setup the channels:
     GUIConfigDataUnion config = GetConfigData();
-    ResetActuators(&config);
+    resetActuators(&config);
 	
     config.ground.GroundVehicleThrottle1 = m_aircraft->gvMotor1ChannelBox->currentIndex();
     config.ground.GroundVehicleThrottle2 = m_aircraft->gvMotor2ChannelBox->currentIndex();
 
     SetConfigData((config));
 	
-    UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    UAVDataObject *mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
     resetMotorAndServoMixers(mixer);
 
@@ -423,7 +423,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleCar(QString airframeType)
 
     // Now setup the channels:
     GUIConfigDataUnion config = GetConfigData();
-    ResetActuators(&config);
+    resetActuators(&config);
 	
     config.ground.GroundVehicleThrottle1 = m_aircraft->gvMotor1ChannelBox->currentIndex();
     config.ground.GroundVehicleThrottle2 = m_aircraft->gvMotor2ChannelBox->currentIndex();

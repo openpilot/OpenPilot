@@ -296,7 +296,7 @@ void ConfigMultiRotorWidget::drawAirframe(QString frameType)
     m_aircraft->quadShape->fitInView(quad, Qt::KeepAspectRatio);
 }
 
-void ConfigMultiRotorWidget::ResetActuators(GUIConfigDataUnion* configData)
+void ConfigMultiRotorWidget::resetActuators(GUIConfigDataUnion *configData)
 {
     configData->multi.VTOLMotorN = 0;
     configData->multi.VTOLMotorNE = 0;
@@ -893,7 +893,7 @@ void ConfigMultiRotorWidget::setupMotors(QList<QString> motorList)
            << m_aircraft->multiMotorChannelBox7 << m_aircraft->multiMotorChannelBox8;
 
     GUIConfigDataUnion configData = GetConfigData();
-    ResetActuators(&configData);
+    resetActuators(&configData);
 
     int index;
     foreach (QString motor, motorList) {

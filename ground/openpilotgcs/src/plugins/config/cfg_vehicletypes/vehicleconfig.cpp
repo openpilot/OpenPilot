@@ -35,7 +35,7 @@
 
 VehicleConfig::VehicleConfig(QWidget *parent) : ConfigTaskWidget(parent)
 {
-    //Generate lists of mixerTypeNames, mixerVectorNames, channelNames
+    // Generate lists of mixerTypeNames, mixerVectorNames, channelNames
     channelNames << "None";
     for (int i = 0; i < (int)(VehicleConfig::CHANNEL_NUMELEM); i++) {
         mixerTypes << QString("Mixer%1Type").arg(i+1);
@@ -50,7 +50,7 @@ VehicleConfig::VehicleConfig(QWidget *parent) : ConfigTaskWidget(parent)
     // This is needed because new style tries to compact things as much as possible in grid
     // and on OSX the widget sizes of PushButtons is reported incorrectly:
     // https://bugreports.qt-project.org/browse/QTBUG-14591
-    foreach( QPushButton * btn, findChildren<QPushButton*>() ) {
+    foreach(QPushButton *btn, findChildren<QPushButton*>()) {
         btn->setAttribute(Qt::WA_LayoutUsesWidgetRect);
     }
 }
@@ -107,7 +107,6 @@ void VehicleConfig::SetConfigData(GUIConfigDataUnion configData) {
 
 void VehicleConfig::setupUI(QString frameType)
 {
-
 }
 
 QString VehicleConfig::updateConfigObjectsFromWidgets()
@@ -119,7 +118,7 @@ void VehicleConfig::refreshWidgetsValues(QString frameType)
 {
 }
 
-void VehicleConfig::ResetActuators(GUIConfigDataUnion *configData)
+void VehicleConfig::resetActuators(GUIConfigDataUnion *configData)
 {
 }
 
@@ -277,7 +276,7 @@ void VehicleConfig::setThrottleCurve(UAVDataObject *mixer, MixerThrottleCurveEle
         break;
     }
 
-    if (field && field->getNumElements() == curve.length()) {
+    if (field && (field->getNumElements() == (unsigned int) curve.length())) {
         for (int i = 0; i < curve.length(); i++) {
             field->setValue(curve.at(i), i);
         }
@@ -338,6 +337,7 @@ double VehicleConfig::getCurveMax(QList<double> *curve)
     }
     return max;
 }
+
 /**
   Reset the contents of a field
   */
@@ -348,12 +348,11 @@ void VehicleConfig::resetField(UAVObjectField * field)
     }
 }
 
-
 /**
  * Util function to get a pointer to the object manager
  * @return pointer to the UAVObjectManager
  */
-UAVObjectManager* VehicleConfig::getUAVObjectManager() {
+UAVObjectManager *VehicleConfig::getUAVObjectManager() {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager * objMngr = pm->getObject<UAVObjectManager>();
     Q_ASSERT(objMngr);

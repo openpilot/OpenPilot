@@ -52,9 +52,11 @@ public:
     ConfigCustomWidget(QWidget *parent = 0);
     ~ConfigCustomWidget();
 
-    virtual void setupUI(QString airframeType);
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
+
+public slots:
+    virtual void setupUI(QString airframeType);
 
 protected:
     void showEvent(QShowEvent *event);

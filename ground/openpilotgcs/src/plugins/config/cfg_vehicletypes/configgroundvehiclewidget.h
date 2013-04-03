@@ -51,9 +51,11 @@ public:
     ConfigGroundVehicleWidget(QWidget *parent = 0);
     ~ConfigGroundVehicleWidget();
 
-    virtual void setupUI(QString airframeType);
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
+
+public slots:
+    virtual void setupUI(QString airframeType);
 
 private:
     virtual void resetActuators(GUIConfigDataUnion *configData);
@@ -66,8 +68,6 @@ private:
 
 private slots:
     virtual bool throwConfigError(QString airframeType);
-
-protected:
 
 };
 

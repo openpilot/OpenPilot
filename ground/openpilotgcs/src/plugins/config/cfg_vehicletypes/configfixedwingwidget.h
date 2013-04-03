@@ -52,9 +52,11 @@ public:
     ConfigFixedWingWidget(QWidget *parent = 0);
     ~ConfigFixedWingWidget();
 
-    virtual void setupUI(QString airframeType);
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
+
+public slots:
+    virtual void setupUI(QString airframeType);
 
 private:
     virtual void resetActuators(GUIConfigDataUnion *configData);

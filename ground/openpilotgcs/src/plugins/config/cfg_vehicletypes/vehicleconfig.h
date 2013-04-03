@@ -152,7 +152,6 @@ public:
     VehicleConfig(QWidget *parent = 0);
     ~VehicleConfig();
 
-    virtual void setupUI(QString airframeType);
     virtual QString updateConfigObjectsFromWidgets();
     virtual void refreshWidgetsValues(QString frameType);
 
@@ -170,6 +169,9 @@ public:
     bool    isValidThrottleCurve(QList<double> *curve);
     double  getCurveMin(QList<double> *curve);
     double  getCurveMax(QList<double> *curve);
+
+public slots:
+    virtual void setupUI(QString airframeType);
 
 protected:
     QStringList channelNames;

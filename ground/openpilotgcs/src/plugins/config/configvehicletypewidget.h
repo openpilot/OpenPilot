@@ -42,10 +42,10 @@ class ConfigVehicleTypeWidget: public ConfigTaskWidget
     Q_OBJECT
 
 public:
+    static QStringList getChannelDescriptions();
+
     ConfigVehicleTypeWidget(QWidget *parent = 0);
     ~ConfigVehicleTypeWidget();
-
-    static QStringList getChannelDescriptions();
 
 private:
     Ui_AircraftWidget *m_aircraft;
@@ -56,11 +56,11 @@ private:
     VehicleConfig *m_groundvehicle;
     VehicleConfig *m_custom;
 
-    void updateCustomAirframeUI();
-    void addToDirtyMonitor();
+    void updateFeedForwardUI();
     void resetField(UAVObjectField *field);
 
-    //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
+    QString frameCategory1(QString frameType);
+    QString frameCategory2(QString frameType);
 
     QStringList channelNames;
     QStringList mixerTypes;

@@ -63,11 +63,11 @@ public:
     ConfigCcpmWidget(QWidget *parent = 0);
     ~ConfigCcpmWidget();
 
-    virtual void setupUI(QString airframeType);
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
 
 public slots:
+    virtual void setupUI(QString airframeType);
     void getMixer();
     void setMixer();
     void saveccpmUpdate();

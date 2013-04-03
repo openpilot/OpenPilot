@@ -75,7 +75,7 @@ static void PIOS_RFM22B_COM_ChangeBaud(uint32_t rfm22b_id, uint32_t baud)
 	else if (baud <= 19200)
 		datarate = RFM22_datarate_32000;
 	else if (baud <= 38400)
-		datarate = RFM22_datarate_56000;
+		datarate = RFM22_datarate_57600;
 	else if (baud <= 57600)
 		datarate = RFM22_datarate_128000;
 	else if (baud <= 115200)

@@ -9,18 +9,31 @@ QT_EXTRA="accessible/libqtaccessiblewidgets.dylib bearer/libqgenericbearer.dylib
 
 OSG_EXTRA="libosgViewer.90.dylib"
 
+if [ -z "${QT_DIR}" ]
+then
+	# QT_DIR is empty, then we have (presumably):
+	QT_FRAMEWORKS="/Library/Frameworks"
+	QT_PLUGINS="/Developer/Applications/Qt/plugins"
+else
+	# Typical Nokia SDK paths
+	QT_FRAMEWORKS="${QT_DIR}"
+	QT_PLUGINS="${QT_DIR}/../plugins"
+	QT_DIR="${QT_DIR}/"
+fi
+
 echo "Qt library directory is \"${QT_DIR}\""
 
 echo "Running macdeployqt"
 macdeployqt "${APP}"
 
-echo "Processing Qt libraries in $1"
+echo "Processing Qt libraries in ${APP}"
 for f in "${PLUGINS}/"*.dylib "${OP_PLUGINS}/"*.dylib
 do
-    for g in $QT_LIBS
-    do
+	# Only process plain files
+	[ ! -L "${f}" ] && for g in $QT_LIBS
+	do
 	install_name_tool -change \
-	    "${QT_DIR}/${g}.framework/Versions/4/${g}" \
+	    "${QT_DIR}${g}.framework/Versions/4/${g}" \
 	    @executable_path/../Frameworks/${g}.framework/Versions/4/${g} \
 	    "${f}"
     done
@@ -31,7 +44,7 @@ echo "Copying other libraries that were missed"
 for f in ${QT_LIBS}
 do
     echo "Copying ${f}"
-    cp -r "${QT_DIR}/${f}.framework" "${APP}/Contents/Frameworks/"
+    cp -a "${QT_FRAMEWORKS}/${f}.framework" "${APP}/Contents/Frameworks/"
 
     echo "Changing package identification of ${f}"
     install_name_tool -id \
@@ -44,7 +57,7 @@ do
     for g in $QT_LIBS
     do
 	install_name_tool -change \
-	    "${QT_DIR}/${g}.framework/Versions/4/${g}" \
+	    "${QT_DIR}${g}.framework/Versions/4/${g}" \
 	    @executable_path/../Frameworks/${g}.framework/Versions/4/${g} \
 	    "${APP}/Contents/Frameworks/${f}.framework/Versions/4/${f}"
     done
@@ -53,7 +66,9 @@ done
 for f in ${QT_EXTRA}
 do
 	echo "Copying package ${f}"
-	cp "${QT_DIR}/../plugins/${f}" "${APP}/Contents/Plugins/${f}"
+	d=$(dirname ${f})
+    [ ! -d "${APP}/Contents/Plugins/${d}" ] && mkdir "${APP}/Contents/Plugins/${d}"
+	cp "${QT_PLUGINS}/${f}" "${APP}/Contents/Plugins/${f}"
 	echo "Changing package identification of ${f}"
 	install_name_tool -id \
 		@executable_path/../Plugins/${f} \
@@ -63,14 +78,14 @@ do
 	for g in $QT_LIBS
 	do
 		install_name_tool -change \
-			"${QT_DIR}/${g}.framework/Versions/4/${g}" \
+			"${QT_DIR}${g}.framework/Versions/4/${g}" \
 			@executable_path/../Frameworks/${g}.framework/Versions/4/${g} \
 			"${APP}/Contents/Plugins/${f}"
 	done
 done
 
 echo "Copying SDL"
-cp -r "/Library/Frameworks/SDL.framework" "${APP}/Contents/Frameworks/"
+cp -a "/Library/Frameworks/SDL.framework" "${APP}/Contents/Frameworks/"
 
 echo "Changing package identification of SDL"
 install_name_tool -id \
@@ -81,20 +96,19 @@ install_name_tool -change \
 	"@executable_path/../Frameworks/SDL.framework/SDL" \
 	"${APP}/Contents/Plugins/libsdlgamepad.1.dylib"
 
+# echo "Copying OSG libraries"
+# for f in ${OSG_EXTRA}
+# do
+#	echo "Copying library ${f}"
+#	cp /usr/local/lib/{$f} "${APP}/Contents/Plugins/${f}"
+#	echo "Changing package identification of ${f}
+#	install_name_tool -id \
+#		@executable_path/../Frameworks/SDL.framework/Versions/A/SDL \
+#		"${APP}/Contents/Frameworks/SDL.framework/Versions/A/SDL"
+#done
+
 # deleting unnecessary files
-
-echo "Copying OSG libraries"
-for f in ${OSG_EXTRA}
-do
-	echo "Copying library ${f}
-	cp /usr/local/lib/{$f} "${APP}/Contents/Plugins/${f}"
-	echo "Changing package identification of ${f}
-	install_name_tool -id \
-		@executable_path/../Frameworks/SDL.framework/Versions/A/SDL \
-		"${APP}/Contents/Frameworks/SDL.framework/Versions/A/SDL"
-done
-
 echo "Deleting unnecessary files"
-find "${APP}/Contents/Frameworks" -iname "current" -exec rm -rf \{\} \;
-find "${APP}/Contents/Frameworks" -iname "4.0" -exec rm -rf \{\} \;
+# find "${APP}/Contents/Frameworks" -iname "current" -exec rm -rf \{\} \;
+# find "${APP}/Contents/Frameworks" -iname "4.0" -exec rm -rf \{\} \;
 find "${APP}/Contents/Frameworks" -iname "*_debug" -exec rm -rf \{\} \;

@@ -184,14 +184,6 @@ private:
 
     virtual void resetActuators(GUIConfigDataUnion *configData);
 
-private slots:
-
-public slots:
-
-signals:
-
-protected:
-
 };
 
 #endif // GUIVEHICLECONFIG_H

@@ -1572,6 +1572,17 @@
           <enableVbo>false</enableVbo>
         </data>
       </Revolution>
+      <Zagi>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/planes/zagi/zagi.3ds</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Zagi>
       <Easyquad__PCT__20X>
         <configInfo>
           <locked>false</locked>

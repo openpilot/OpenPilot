@@ -42,6 +42,9 @@
           <property name="frameShape">
            <enum>QFrame::NoFrame</enum>
           </property>
+          <property name="renderHints">
+           <set>QPainter::HighQualityAntialiasing</set>
+          </property>
          </widget>
         </item>
         <item>

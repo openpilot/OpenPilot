@@ -35,8 +35,8 @@ public:
            case 0x0901://Revolution
                return QString("Revolution");
                break;
-           case 0x0903://Revomini
-               return QString("Revomini");
+           case 0x0903://Revo Mini
+               return QString("Revolution");
                break;
            default:
                return QString("");

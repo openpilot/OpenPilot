@@ -116,9 +116,10 @@ ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
 .PHONY: arm_sdk_install
 arm_sdk_install: arm_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	@$(ECHO) $(MSG_DOWNLOADING) $(call toprel, $(DL_DIR)/$(ARM_SDK_FILE))
-	$(V1) $(CURL) $(CURL_OPTIONS) -z "$(DL_DIR)/$(ARM_SDK_FILE)" -o "$(DL_DIR)/$(ARM_SDK_FILE)" "$(ARM_SDK_URL)"
-
-        # binary only release so just extract it
+	$(V1) $(CURL) $(CURL_OPTIONS) \
+		$(if $(shell [ -f "$(DL_DIR)/$(ARM_SDK_FILE)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(ARM_SDK_FILE)",) \
+		-o "$(DL_DIR)/$(ARM_SDK_FILE)" \
+		"$(ARM_SDK_URL)"
 	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(ARM_SDK_DIR))
 	$(V1) $(TAR) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(ARM_SDK_FILE))
 

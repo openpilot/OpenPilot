@@ -24,24 +24,26 @@
 # existance by each sub-make.
 export OPENPILOT_IS_COOL := Fuck Yeah!
 
-# Set up a default goal
-.DEFAULT_GOAL := help
-
 # It is possible to set OPENPILOT_DL_DIR and/or OPENPILOT_TOOLS_DIR environment
 # variables to override local tools download and installation directorys. So the
 # same toolchains can be used for all working copies. Particularly useful for CI
 # server build agents, but also for local installations.
 #
-# NOTE: paths should use forward (unix-style) slashes.
-#
 # If no OPENPILOT_* variables found, makefile internal DL_DIR and TOOLS_DIR paths
 # will be used. They still can be overriden by the make command line parameters:
 # make DL_DIR=/path/to/download/directory TOOLS_DIR=/path/to/tools/directory targets...
 
+# Function for converting Windows style slashes into Unix style
+slashfix = $(subst \,/,$(1))
+
+# Function for converting an absolute path to one relative
+# to the top of the source tree
+toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
+
 # Set up some macros for common directories within the tree
 export ROOT_DIR    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-export DL_DIR      := $(if $(OPENPILOT_DL_DIR),$(OPENPILOT_DL_DIR),$(ROOT_DIR)/downloads)
-export TOOLS_DIR   := $(if $(OPENPILOT_TOOLS_DIR),$(OPENPILOT_TOOLS_DIR),$(ROOT_DIR)/tools)
+export DL_DIR      := $(if $(OPENPILOT_DL_DIR),$(call slashfix,$(OPENPILOT_DL_DIR)),$(ROOT_DIR)/downloads)
+export TOOLS_DIR   := $(if $(OPENPILOT_TOOLS_DIR),$(call slashfix,$(OPENPILOT_TOOLS_DIR)),$(ROOT_DIR)/tools)
 export BUILD_DIR   := $(ROOT_DIR)/build
 export PACKAGE_DIR := $(ROOT_DIR)/build/package
 
@@ -50,10 +52,6 @@ GCS_BUILD_CONF		:= release
 UAVOGEN_BUILD_CONF	:= release
 ANDROIDGCS_BUILD_CONF	:= debug
 GOOGLE_API_VERSION	:= 14
-
-# Function for converting an absolute path to one relative
-# to the top of the source tree.
-toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
 
 # Clean out undesirable variables from the environment and command-line
 # to remove the chance that they will cause problems with our build
@@ -841,6 +839,8 @@ build-info:
 # Help message, the default Makefile goal
 #
 ##############################
+
+.DEFAULT_GOAL := help
 
 .PHONY: help
 help:

@@ -205,7 +205,7 @@ int32_t AlarmsHasErrors()
 {
     return hasSeverity(SYSTEMALARMS_ALARM_ERROR);
 }
-;
+
 
 /**
  * Check if there are any alarms with critical or higher severity
@@ -215,7 +215,7 @@ int32_t AlarmsHasCritical()
 {
     return hasSeverity(SYSTEMALARMS_ALARM_CRITICAL);
 }
-;
+
 
 /**
  * Check if there are any alarms with the given or higher severity

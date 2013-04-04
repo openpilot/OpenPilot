@@ -340,8 +340,8 @@ static void hwSettingsUpdatedCb(UAVObjEvent * ev)
     HwSettingsData currentHwSettings;
     HwSettingsGet(&currentHwSettings);
     // check whether the Hw Configuration has changed from the one used at boot time
-    if(memcmp(&bootHwSettings, &currentHwSettings, sizeof(HwSettingsData)) != 0){
-        ExtendedAlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT,SYSTEMALARMS_ALARM_ERROR,BOOTFAULT_STATUS_ERROR_REQUIRE_REBOOT, 0);
+    if (memcmp(&bootHwSettings, &currentHwSettings, sizeof(HwSettingsData)) != 0) {
+        ExtendedAlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_ERROR, BOOTFAULT_STATUS_ERROR_REQUIRE_REBOOT, 0);
     }
 }
 

@@ -846,6 +846,12 @@ help:
 	@$(ECHO) "     stm32flash_install   - Install the stm32flash tool for unbricking F1-based boards"
 	@$(ECHO) "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
 	@$(ECHO) "     android_sdk_install  - Install the Android SDK tools"
+	@$(ECHO) "     all_sdk_install      - Install all of above (platform-dependent)"
+	@$(ECHO)
+	@$(ECHO) "   Other tool options are:"
+	@$(ECHO) "     <tool>_version       - Display <tool> version"
+	@$(ECHO) "     <tool>_clean         - Remove installed <tool>"
+	@$(ECHO) "     <tool>_distclean     - Remove downloaded <tool> distribution file(s)"
 	@$(ECHO)
 	@$(ECHO) "   [Big Hammer]"
 	@$(ECHO) "     all                  - Generate UAVObjects, build openpilot firmware and gcs"
@@ -857,7 +863,7 @@ help:
 	@$(ECHO) "     all_clean            - Remove your build directory ($(BUILD_DIR))"
 	@$(ECHO) "     all_flight_clean     - Remove all firmware, bootloaders and bootloader updaters"
 	@$(ECHO) "     all_fw_clean         - Remove firmware for all boards"
-	@$(ECHO) "     all_bl_clean         - Remove bootlaoders for all boards"
+	@$(ECHO) "     all_bl_clean         - Remove bootloaders for all boards"
 	@$(ECHO) "     all_bu_clean         - Remove bootloader updaters for all boards"
 	@$(ECHO)
 	@$(ECHO) "     all_<board>          - Build all available images for <board>"
@@ -932,7 +938,7 @@ help:
 	@$(ECHO)
 	@$(ECHO) "   Hint: Add V=1 to your command line to see verbose build output."
 	@$(ECHO)
-	@$(ECHO) "   Note: All tools will be installed into $(TOOLS_DIR)"
-	@$(ECHO) "         All build output will be placed in $(BUILD_DIR)"
-	@$(ECHO) "         Package will be placed into $(PACKAGE_DIR)"
+	@$(ECHO) "   Notes: All tool distribution files will be downloaded into $(DL_DIR)"
+	@$(ECHO) "          All tools will be installed into $(TOOLS_DIR)"
+	@$(ECHO) "          All build output will be placed in $(BUILD_DIR)"
 	@$(ECHO)

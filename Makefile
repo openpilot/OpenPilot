@@ -29,9 +29,9 @@ export OPENPILOT_IS_COOL := Fuck Yeah!
 
 # Set up some macros for common directories within the tree
 export ROOT_DIR    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-export TOOLS_DIR   := $(ROOT_DIR)/tools
+export DL_DIR      := $(if $(OPENPILOT_DL_DIR),$(OPENPILOT_DL_DIR),$(ROOT_DIR)/downloads)
+export TOOLS_DIR   := $(if $(OPENPILOT_TOOLS_DIR),$(OPENPILOT_TOOLS_DIR),$(ROOT_DIR)/tools)
 export BUILD_DIR   := $(ROOT_DIR)/build
-export DL_DIR      := $(ROOT_DIR)/downloads
 export PACKAGE_DIR := $(ROOT_DIR)/build/package
 
 # Set up default build configurations (debug | release)

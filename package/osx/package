@@ -14,9 +14,9 @@ rm -f "${TEMP_FILE}"
 rm -f "${OUT_FILE}"
 
 hdiutil convert "${ROOT_DIR}/package/osx/OpenPilot.dmg" \
-	-format UDRW -o "${TEMP_FILE}"
-device=$(hdiutil attach  "${TEMP_FILE}" | \
-         egrep '^/dev/' | sed 1q | awk '{print $1}')
+    -format UDRW -o "${TEMP_FILE}"
+device=$(hdiutil attach "${TEMP_FILE}" | \
+    egrep '^/dev/' | sed 1q | awk '{print $1}')
 
 # packaging goes here
 cp -a "${APP_PATH}" "/Volumes/${VOL_NAME}"
@@ -25,7 +25,7 @@ cp "${BUILD_DIR}/uavobject-synthetics/matlab/OPLogConvert.m" "/Volumes/${VOL_NAM
 cp "${ROOT_DIR}/HISTORY.txt" "/Volumes/${VOL_NAME}"
 
 "${ROOT_DIR}/package/osx/libraries" \
-	"/Volumes/${VOL_NAME}/OpenPilot GCS.app" || exit 1
+    "/Volumes/${VOL_NAME}/OpenPilot GCS.app" || exit 1
 
 hdiutil detach ${device}
 

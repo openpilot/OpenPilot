@@ -15,6 +15,10 @@ rem Based on the msys.bat file from the MSYS package
 rem   http://www.mingw.org/wiki/msys
 rem
 
+rem Shared directories for toolchains
+rem set OPENPILOT_DL_DIR=C:/OpenPilot/downloads
+rem set OPENPILOT_TOOLS_DIR=C:/OpenPilot/tools
+
 rem this should let run MSYS shell on x64
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
   SET COMSPEC=%WINDIR%\SysWOW64\cmd.exe
@@ -53,13 +57,13 @@ rem --------------------------------------------------------------------------
 set NOT_FOUND=
 set PATH_DIRS=
 
-call :which MSYSGIT       "%ProgramFiles%\Git\bin"       git.exe
-call :which QTMINGW       "C:\QtSDK\mingw\bin"                  mingw32-make.exe
-call :which QTSDK         "C:\QtSDK\Desktop\Qt\4.8.1\mingw\bin" qmake.exe
-call :which CODESOURCERY  "%ProgramFiles%\CodeSourcery\Sourcery G++ Lite\bin" cs-make.exe
-call :which PYTHON        "C:\Python27"                  python.exe
-call :which UNSIS         "%ProgramFiles%\NSIS\Unicode"  makensis.exe
-call :which OPENOCDBIN    "C:\OpenOCD\0.4.0\bin"         openocd.exe
+rem Replace %ProgramFiles% by %ProgramFiles(x86)% for 64bit system
+call :which MSYSGIT       "%ProgramFiles%\Git\bin"                              git.exe
+call :which QTMINGW       "C:\QtSDK\mingw\bin"                                  mingw32-make.exe
+call :which QTSDK         "C:\QtSDK\Desktop\Qt\4.8.1\mingw\bin"                 qmake.exe
+call :which ARMGCC        "C:\OpenPilot\gcc-arm-none-eabi-4_6-2012q4\bin"       arm-none-eabi-gcc.exe
+call :which PYTHON        "C:\Python27"                                         python.exe
+call :which UNSIS         "%ProgramFiles%\NSIS\Unicode"                         makensis.exe
 
 if "%NOT_FOUND%" == "" goto set_path
 

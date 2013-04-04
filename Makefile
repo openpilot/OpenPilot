@@ -27,6 +27,17 @@ export OPENPILOT_IS_COOL := Fuck Yeah!
 # Set up a default goal
 .DEFAULT_GOAL := help
 
+# It is possible to set OPENPILOT_DL_DIR and/or OPENPILOT_TOOLS_DIR environment
+# variables to override local tools download and installation directorys. So the
+# same toolchains can be used for all working copies. Particularly useful for CI
+# server build agents, but also for local installations.
+#
+# NOTE: paths should use forward (unix-style) slashes.
+#
+# If no OPENPILOT_* variables found, makefile internal DL_DIR and TOOLS_DIR paths
+# will be used. They still can be overriden by the make command line parameters:
+# make DL_DIR=/path/to/download/directory TOOLS_DIR=/path/to/tools/directory targets...
+
 # Set up some macros for common directories within the tree
 export ROOT_DIR    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 export DL_DIR      := $(if $(OPENPILOT_DL_DIR),$(OPENPILOT_DL_DIR),$(ROOT_DIR)/downloads)
@@ -111,10 +122,10 @@ export VERSION_INFO := $(PYTHON) "$(ROOT_DIR)/make/scripts/version-info.py" --pa
 
 # Test if quotes are needed for the echo-command
 ifeq (${shell $(ECHO) "test"}, test)
-	export QUOTE := '
+    export QUOTE := '
 # This line is just to clear out the single quote above '
 else
-	export QUOTE :=
+    export QUOTE :=
 endif
 
 # Include tools installers

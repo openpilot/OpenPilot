@@ -95,6 +95,13 @@ else
 #   CURL_OPTIONS := --silent
 endif
 
+# MSYS tar workaround
+ifeq ($(UNAME), Windows)
+    TAR_OPTIONS := --force-local
+else
+    TAR_OPTIONS :=
+endif
+
 # Disable parallel make for sdk install targets to ensure ordered dependences
 # like 'arm_sdk_clean | $(DL_DIR) $(TOOLS_DIR)'. They may fail otherwise being
 # run in parallel
@@ -121,7 +128,7 @@ arm_sdk_install: arm_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 		-o "$(DL_DIR)/$(ARM_SDK_FILE)" \
 		"$(ARM_SDK_URL)"
 	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(ARM_SDK_DIR))
-	$(V1) $(TAR) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(ARM_SDK_FILE))
+	$(V1) $(TAR) $(TAR_OPTIONS) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(ARM_SDK_FILE))
 
 .PHONY: arm_sdk_clean
 arm_sdk_clean:

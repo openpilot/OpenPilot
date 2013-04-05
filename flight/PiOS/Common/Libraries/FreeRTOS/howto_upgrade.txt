@@ -1,0 +1,92 @@
+General guidelines for updating FreeRTOS
+
+This file will list the necessary modifications to FreeRTOS package to be used inside PiOS
+
+- include/task.h
+add the following declaration: 
+
+	/**
+	 * task.h
+	 * <PRE>unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask );</PRE>
+	 *
+	 * Returns the run time of selected task
+	 *
+	 * @param xTask Handle of the task associated with the stack to be checked.
+	 * Set xTask to NULL to check the stack of the calling task.
+	 *
+	 * @return The run time of selected task
+	 */
+	unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask );
+
+it usually is added after the declaration of vTaskGetRunTimeStats.
+
+- task.c
+add the following function: 
+
+	#if ( INCLUDE_uxTaskGetRunTime == 1 )
+	
+	    unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask )
+	    {
+	        unsigned long runTime;
+	
+	        tskTCB *pxTCB;
+	        pxTCB = prvGetTCBFromHandle( xTask );
+	        runTime = pxTCB->ulRunTimeCounter;
+	        pxTCB->ulRunTimeCounter = 0;
+	        return runTime;
+	    }
+	
+	#endif
+	/*----------------------------------------------------------*/
+
+it usually is added after the declaration of vTaskGetRunTimeStats.
+
+- portable/MemMang/heap_1.c
+following there is the modification done in this revision against the base heap_1.c
+The modifications add a currentTOTAL_HEAP_SIZE variable that hold the current heap size,
+used instead of the configTOTAL_HEAP_SIZE macro that can be changed by the added
+xPortIncreaseHeapSize function.
+
+
+--- ../op_evo/FreeRTOSV7.4.0/FreeRTOS/Source/portable/MemMang/heap_1.c	2013-04-06 15:04:22.760048534 +0200
++++ ./flight/PiOS/Common/Libraries/FreeRTOS/Source/portable/MemMang/heap_1.c	2013-04-06 14:53:31.828030608 +0200
+@@ -92,13 +92,16 @@
+ 
+ #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+ 
+-/* A few bytes might be lost to byte aligning the heap start address. */
+-#define configADJUSTED_HEAP_SIZE	( configTOTAL_HEAP_SIZE - portBYTE_ALIGNMENT )
+ 
+ /* Allocate the memory for the heap. */
+-static unsigned char ucHeap[ configTOTAL_HEAP_SIZE ];
++static unsigned char ucHeap[ configTOTAL_HEAP_SIZE ]  __attribute__ ((section (".heap")));
+ static size_t xNextFreeByte = ( size_t ) 0;
+ 
++static size_t currentTOTAL_HEAP_SIZE = configTOTAL_HEAP_SIZE;
++
++/* A few bytes might be lost to byte aligning the heap start address. */
++#define configADJUSTED_HEAP_SIZE    (currentTOTAL_HEAP_SIZE - portBYTE_ALIGNMENT)
++
+ /*-----------------------------------------------------------*/
+ 
+ void *pvPortMalloc( size_t xWantedSize )
+@@ -172,6 +175,12 @@
+ {
+ 	return ( configADJUSTED_HEAP_SIZE - xNextFreeByte );
+ }
++/*-----------------------------------------------------------*/
+ 
+-
+-
++void xPortIncreaseHeapSize( size_t bytes )
++{
++    vTaskSuspendAll();
++    currentTOTAL_HEAP_SIZE = configTOTAL_HEAP_SIZE + bytes;
++    xTaskResumeAll();
++}
++/*-----------------------------------------------------------*/
+
+
+
+
+	

@@ -103,6 +103,7 @@ void ConfigRevoHWWidget::refreshWidgetsValues(UAVObject *obj)
     usbVCPPortChanged(0);
     mainPortChanged(0);
     flexiPortChanged(0);
+    modemPortChanged(0);
 }
 
 void ConfigRevoHWWidget::updateObjectsFromWidgets()

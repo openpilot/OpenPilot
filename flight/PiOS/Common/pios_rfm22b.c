@@ -1859,6 +1859,7 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
 #endif
 #endif
 #if defined(PIOS_INCLUDE_RFM22B_RCVR)
+					ppm_output = true;
 					for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i) {
 						rfm22b_dev->ppm_channel[i] = ppmp->channels[i];
 					}

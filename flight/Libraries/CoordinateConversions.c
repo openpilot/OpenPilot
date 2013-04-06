@@ -31,7 +31,7 @@
 #include <stdint.h>
 #include "CoordinateConversions.h"
 
-#define F_PI 3.14159265358979323846f
+#define F_PI ((float)M_PI)
 #define RAD2DEG (180.0f/ F_PI)
 #define DEG2RAD (F_PI /180.0f)
 

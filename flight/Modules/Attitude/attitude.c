@@ -67,6 +67,8 @@
 #define UPDATE_RATE  25.0f
 #define GYRO_NEUTRAL 1665
 
+#define F_PI ((float)M_PI)
+
 #define PI_MOD(x) (fmod(x + M_PI, M_PI * 2) - M_PI)
 // Private types
 
@@ -513,10 +515,10 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 		// Work out time derivative from INSAlgo writeup
 		// Also accounts for the fact that gyros are in deg/s
 		float qdot[4];
-		qdot[0] = (-q[1] * gyros[0] - q[2] * gyros[1] - q[3] * gyros[2]) * dT * (((float)M_PI) / 180 / 2);
-		qdot[1] = (q[0] * gyros[0] - q[3] * gyros[1] + q[2] * gyros[2]) * dT * (((float)M_PI) / 180 / 2);
-		qdot[2] = (q[3] * gyros[0] + q[0] * gyros[1] - q[1] * gyros[2]) * dT * (((float)M_PI) / 180 / 2);
-		qdot[3] = (-q[2] * gyros[0] + q[1] * gyros[1] + q[0] * gyros[2]) * dT * (((float)M_PI) / 180 / 2);
+		qdot[0] = (-q[1] * gyros[0] - q[2] * gyros[1] - q[3] * gyros[2]) * dT * (F_PI / 180.0f / 2.0f);
+		qdot[1] = (q[0] * gyros[0] - q[3] * gyros[1] + q[2] * gyros[2]) * dT * (F_PI / 180.0f / 2.0f);
+		qdot[2] = (q[3] * gyros[0] + q[0] * gyros[1] - q[1] * gyros[2]) * dT * (F_PI / 180.0f / 2.0f);
+		qdot[3] = (-q[2] * gyros[0] + q[1] * gyros[1] + q[0] * gyros[2]) * dT * (F_PI / 180.0f / 2.0f);
 		
 		// Take a time step
 		q[0] = q[0] + qdot[0];

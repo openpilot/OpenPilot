@@ -33,6 +33,7 @@
 #include "stdbool.h"
 #include "stdint.h"
 
+#define F_PI ((float)M_PI)
 #define FLASH_TABLE
 #ifdef FLASH_TABLE
  /** Version of the code which precomputes the lookup table in flash **/
@@ -81,7 +82,7 @@ int sin_lookup_initalize()
 		return -1;
 
 	for(uint32_t i = 0; i < 180; i++)
-		sin_table[i] = sinf((float)i * 2 * ((float)M_PI) / 360.0f);
+		sin_table[i] = sinf((float)i * 2 * F_PI / 360.0f);
 
 	return 0;
 }
@@ -126,7 +127,7 @@ float cos_lookup_deg(float angle)
  */
 float sin_lookup_rad(float angle)
 {
-	int degrees = angle * 180.0f / ((float)M_PI);
+	int degrees = angle * 180.0f / F_PI;
 	return sin_lookup_deg(degrees);
 }
 
@@ -137,6 +138,6 @@ float sin_lookup_rad(float angle)
  */
 float cos_lookup_rad(float angle)
 {
-	int degrees = angle * 180.0f / ((float)M_PI);
+	int degrees = angle * 180.0f / F_PI;
 	return cos_lookup_deg(degrees);
 }

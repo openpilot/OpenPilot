@@ -631,6 +631,10 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_RFM22B)
 	uint8_t hwsettings_radioport;
 	HwSettingsRadioPortGet(&hwsettings_radioport);
+	uint8_t hwsettings_maxrfpower;
+	HwSettingsMaxRFPowerGet(&hwsettings_maxrfpower);
+	uint32_t hwsettings_deffreq;
+	HwSettingsDefaultFrequencyGet(&hwsettings_deffreq);
 	switch (hwsettings_radioport) {
 		case HWSETTINGS_RADIOPORT_DISABLED:
 			break;
@@ -642,6 +646,12 @@ void PIOS_Board_Init(void) {
 			if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg->slave_num, pios_rfm22b_cfg)) {
 				PIOS_Assert(0);
 			}
+
+			// Set the modem parameters and reinitilize the modem.
+			PIOS_RFM22B_SetInitialFrequency(pios_rfm22b_id, hwsettings_deffreq);
+			PIOS_RFM22B_SetTxPower(pios_rfm22b_id, hwsettings_maxrfpower);
+			PIOS_RFM22B_Reinit(pios_rfm22b_id);
+
 #ifdef PIOS_INCLUDE_RFM22B_COM
 			uint8_t *rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
 			uint8_t *tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);

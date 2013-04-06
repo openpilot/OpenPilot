@@ -64,7 +64,9 @@ ConfigRevoHWWidget::ConfigRevoHWWidget(QWidget *parent) : ConfigTaskWidget(paren
     addUAVObjectToWidgetRelation("HwSettings","GPSSpeed",m_ui->cbMainGPSSpeed);
     addUAVObjectToWidgetRelation("HwSettings","ComUsbBridgeSpeed",m_ui->cbMainComSpeed);
 
-    addUAVObjectToWidgetRelation("HwSettings","RadioPort",m_ui->cbModem);
+    addUAVObjectToWidgetRelation("HwSettings", "RadioPort", m_ui->cbModem);
+    addUAVObjectToWidgetRelation("HwSettings", "MaxRFPower", m_ui->cbTxPower);
+    addUAVObjectToWidgetRelation("HwSettings", "DefaultFrequency", m_ui->leInitFreq);
 
     connect(m_ui->cchwHelp,SIGNAL(clicked()),this,SLOT(openHelp()));
 
@@ -288,6 +290,15 @@ void ConfigRevoHWWidget::modemPortChanged(int index)
         if(m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_TELEMETRY) {
             m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
         }
+        m_ui->lblTxPower->setVisible(true);
+        m_ui->cbTxPower->setVisible(true);
+        m_ui->lblInitFreq->setVisible(true);
+        m_ui->leInitFreq->setVisible(true);
+    } else {
+        m_ui->lblTxPower->setVisible(false);
+        m_ui->cbTxPower->setVisible(false);
+        m_ui->lblInitFreq->setVisible(false);
+        m_ui->leInitFreq->setVisible(false);
     }
 }
 

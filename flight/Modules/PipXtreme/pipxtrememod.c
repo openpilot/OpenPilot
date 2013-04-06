@@ -47,7 +47,6 @@
 
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
-#define LED_BLINK_RATE_HZ 5
 
 #if defined(PIOS_SYSTEM_STACK_SIZE)
 #define STACK_SIZE_BYTES PIOS_SYSTEM_STACK_SIZE

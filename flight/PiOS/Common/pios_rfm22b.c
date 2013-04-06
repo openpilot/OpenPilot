@@ -559,8 +559,8 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->stats.rx_seq = 0;
 
 	// Initialize the frequencies.
-	PIOS_RFM22B_SetFrequencyRange(*rfm22b_id, RFM22B_NOMINAL_CARRIER_FREQUENCY, RFM22B_NOMINAL_CARRIER_FREQUENCY, RFM22B_FREQUENCY_HOP_STEP_SIZE);
 	PIOS_RFM22B_SetInitialFrequency(*rfm22b_id, RFM22B_DEFAULT_FREQUENCY);
+	PIOS_RFM22B_SetFrequencyRange(*rfm22b_id, RFM22B_DEFAULT_FREQUENCY, RFM22B_DEFAULT_FREQUENCY, RFM22B_FREQUENCY_HOP_STEP_SIZE);
 
 	// Initialize the bindings.
 	for (uint32_t i = 0; i < OPLINKSETTINGS_BINDINGS_NUMELEM; ++i) {
@@ -1359,6 +1359,10 @@ static bool rfm22_ready_to_send(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	// Is there a status of PPM packet ready to send?
 	if (rfm22b_dev->prev_tx_packet || rfm22b_dev->send_ppm || rfm22b_dev->send_status)
+		return true;
+
+	// Are we not connected yet?
+	if (!rfm22_isConnected(rfm22b_dev))
 		return true;
 
 	// Is there some data ready to sent?
@@ -2519,7 +2523,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22_write(rfm22b_dev, RFM22_xtal_osc_load_cap, rfm22b_dev->cfg.RFXtalCap);
 
 	// Initialize the frequency and datarate to te default.
-	rfm22_setNominalCarrierFrequency(rfm22b_dev, RFM22B_DEFAULT_FREQUENCY, RFM22B_DEFAULT_FREQUENCY, RFM22B_FREQUENCY_HOP_STEP_SIZE);
+	rfm22_setNominalCarrierFrequency(rfm22b_dev, rfm22b_dev->init_frequency, rfm22b_dev->init_frequency, RFM22B_FREQUENCY_HOP_STEP_SIZE);
 	rfm22_setDatarate(rfm22b_dev, RFM22B_DEFAULT_RX_DATARATE, true);
 
 	return RFM22B_EVENT_INITIALIZED;

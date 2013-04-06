@@ -386,7 +386,7 @@ void PIOS_Board_Init(void) {
 	}
 
 
-	//PIOS_IAP_Init();
+	PIOS_WDG_Init();
 
 #if defined(PIOS_INCLUDE_USB)
 	/* Initialize board specific USB data */

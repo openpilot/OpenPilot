@@ -107,7 +107,8 @@ static int32_t RadioSendHandler(uint8_t *buf, int32_t length);
 static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte);
 static void queueEvent(xQueueHandle queue, void *obj, uint16_t instId, UAVObjEventType type);
 static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
-				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed);
+				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed,
+				 uint32_t min_frequency, uint32_t max_frequency, uint32_t channel_spacing);
 static void updateSettings();
 
 // ****************
@@ -127,13 +128,13 @@ static int32_t RadioComBridgeStart(void)
         // Configure the com port configuration callback
         PIOS_RFM22B_SetComConfigCallback(pios_rfm22b_id, &configureComCallback);
 
+	// Get the settings.
+	OPLinkSettingsData oplinkSettings;
+	OPLinkSettingsGet(&oplinkSettings);
+
         // Set the baudrates, etc.
         bool is_coordinator = PIOS_RFM22B_IsCoordinator(pios_rfm22b_id);
         if (is_coordinator) {
-
-            // Get the settings.
-            OPLinkSettingsData oplinkSettings;
-            OPLinkSettingsGet(&oplinkSettings);
 
             // Set the maximum radio RF power.
             switch (oplinkSettings.MaxRFPower)
@@ -167,9 +168,15 @@ static int32_t RadioComBridgeStart(void)
 		break;
             }
 
+	    // Set the frequency range.
+	    PIOS_RFM22B_SetFrequencyRange(pios_rfm22b_id, oplinkSettings.MinFrequency, oplinkSettings.MaxFrequency, oplinkSettings.ChannelSpacing);
+	    
             // Reinitilize the modem.
             PIOS_RFM22B_Reinit(pios_rfm22b_id);
         }
+
+	// Set the initial frequency.
+	PIOS_RFM22B_SetInitialFrequency(pios_rfm22b_id, oplinkSettings.InitFrequency);
 
         // Start the primary tasks for receiving/sending UAVTalk packets from the GCS.
         xTaskCreate(telemetryTxTask, (signed char *)"telemTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
@@ -505,7 +512,8 @@ static void queueEvent(xQueueHandle queue, void *obj, uint16_t instId, UAVObjEve
  * \param[in] com_speed  The com port speed
  */
 static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
-				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed)
+				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed,
+				 uint32_t min_frequency, uint32_t max_frequency, uint32_t channel_spacing)
 {
 
     // Update the com baud rate
@@ -552,6 +560,9 @@ static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, 
             break;
 	}
 
+	// Set the frequency range.
+	PIOS_RFM22B_SetFrequencyRange(pios_rfm22b_id, min_frequency, max_frequency, channel_spacing);
+
         // Update the OPLinkSettings object.
         OPLinkSettingsSet(&oplinkSettings);
     }
@@ -561,7 +572,7 @@ static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, 
 }
 
 /**
- * Update the oplink settings, called on startup.
+ * Update the oplink settings.
  */
 static void updateSettings()
 {

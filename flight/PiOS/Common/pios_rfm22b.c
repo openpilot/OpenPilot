@@ -65,13 +65,12 @@
 #define ISR_TIMEOUT 2 // ms
 #define EVENT_QUEUE_SIZE 5
 #define RFM22B_DEFAULT_RX_DATARATE RFM22_datarate_9600
-#define RFM22B_DEFAULT_FREQUENCY 430000000
-#define RFM22B_NOMINAL_CARRIER_FREQUENCY 430000000
-#define RFM22B_FREQUENCY_HOP_STEP_SIZE 75000
-#define RFM22B_NUM_CHANNELS 128
-#define RFM22B_DEFAULT_CHANNEL 28
 #define RFM22B_DEFAULT_TX_POWER RFM22_tx_pwr_txpow_7
 #define RFM22B_LINK_QUALITY_THRESHOLD 20
+#define RFM22B_NOMINAL_CARRIER_FREQUENCY 430000000
+#define RFM22B_MAXIMUM_FREQUENCY 440000000
+#define RFM22B_DEFAULT_FREQUENCY 433000000
+#define RFM22B_FREQUENCY_HOP_STEP_SIZE 75000
 //#define RFM22B_TEST_DROPPED_PACKETS 1
 
 // The maximum amount of time since the last message received to consider the connection broken.
@@ -203,7 +202,7 @@ static void rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22b_add_rx_status(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_rx_packet_status status);
 static bool rfm22_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHandle p, uint16_t rx_len);
-static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev, uint32_t frequency_hz, uint8_t channel);
+static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev, uint32_t min_frequency, uint32_t max_frequency, uint32_t step_size);
 static bool rfm22_setFreqHopChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t channel);
 static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev);
 static bool rfm22_ready_to_send(struct pios_rfm22b_dev *rfm22b_dev);
@@ -485,31 +484,6 @@ static const uint8_t                reg_71[] = {  0x23,  0x23,  0x23,  0x23,  0x
 
 static const uint8_t                reg_72[] = {  0x06,  0x06,  0x06,  0x06,  0x06,  0x08,  0x0D,  0x0F,  0x13,   0x1A,   0x2E,   0x33,   0x66,   0x9A,   0xCD}; // rfm22_frequency_deviation
 
-// ************************************
-// Scan Spectrum settings
-// GFSK modulation
-// no manchester encoding
-// data whitening
-// FIFO mode
-//  5-nibble rx preamble length detection
-// 10-nibble tx preamble length
-#define SS_LOOKUP_SIZE	 2
-
-static const uint8_t ss_reg_1C[] = {  0x51, 0x32}; // rfm22_if_filter_bandwidth
-static const uint8_t ss_reg_1D[] = {  0x00, 0x00}; // rfm22_afc_loop_gearshift_override
-
-static const uint8_t ss_reg_20[] = {  0xE8, 0x38}; // rfm22_clk_recovery_oversampling_ratio
-static const uint8_t ss_reg_21[] = {  0x60, 0x02}; // rfm22_clk_recovery_offset2
-static const uint8_t ss_reg_22[] = {  0x20, 0x4D}; // rfm22_clk_recovery_offset1
-static const uint8_t ss_reg_23[] = {  0xC5, 0xD3}; // rfm22_clk_recovery_offset0
-static const uint8_t ss_reg_24[] = {  0x00, 0x07}; // rfm22_clk_recovery_timing_loop_gain1
-static const uint8_t ss_reg_25[] = {  0x0F, 0xFF}; // rfm22_clk_recovery_timing_loop_gain0
-
-static const uint8_t ss_reg_2A[] = {  0xFF, 0xFF}; // rfm22_afc_limiter .. AFC_pull_in_range = �AFCLimiter[7:0] x (hbsel+1) x 625 Hz
-
-static const uint8_t ss_reg_70[] = {  0x24, 0x2D}; // rfm22_modulation_mode_control1
-static const uint8_t ss_reg_71[] = {  0x2B, 0x23}; // rfm22_modulation_mode_control2
-
 
 static inline uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
 {
@@ -599,12 +573,9 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->stats.tx_seq = 0;
 	rfm22b_dev->stats.rx_seq = 0;
 
-	// initialize the frequency hopping step size (specified in 10khz increments).
-	uint32_t freq_hop_step_size = RFM22B_FREQUENCY_HOP_STEP_SIZE / 10000;
-	if (freq_hop_step_size > 255) {
-		freq_hop_step_size = 255;
-        }
-	rfm22b_dev->frequency_hop_step_size_reg = (uint8_t)freq_hop_step_size;
+	// Initialize the frequencies.
+	PIOS_RFM22B_SetFrequencyRange(*rfm22b_id, RFM22B_NOMINAL_CARRIER_FREQUENCY, RFM22B_NOMINAL_CARRIER_FREQUENCY, RFM22B_FREQUENCY_HOP_STEP_SIZE);
+	PIOS_RFM22B_SetInitialFrequency(*rfm22b_id, RFM22B_DEFAULT_FREQUENCY);
 
 	// Initialize the bindings.
 	for (uint32_t i = 0; i < OPLINKSETTINGS_BINDINGS_NUMELEM; ++i) {
@@ -757,6 +728,38 @@ void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr)
 		return;
 	}
 	rfm22b_dev->tx_power = tx_pwr;
+}
+
+/**
+ * Sets the radio frequency range and initial frequency
+ * \param[in] rfm22b_id  The RFM22B device index.
+ * \param[in] min_freq  The minimum frequency
+ * \param[in] max_freq  The maximum frequency
+ * \param[in] step_size  The channel step size
+ */
+void PIOS_RFM22B_SetFrequencyRange(uint32_t rfm22b_id, uint32_t min_freq, uint32_t max_freq, uint32_t step_size)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if (!PIOS_RFM22B_validate(rfm22b_dev)) {
+		return;
+	}
+	rfm22b_dev->con_packet.min_frequency = min_freq;
+	rfm22b_dev->con_packet.max_frequency = max_freq;
+	rfm22b_dev->con_packet.channel_spacing = step_size;
+}
+
+/**
+ * Sets the initial radio frequency range
+ * \param[in] rfm22b_id  The RFM22B device index.
+ * \param[in] init_freq  The initial frequency
+ */
+void PIOS_RFM22B_SetInitialFrequency(uint32_t rfm22b_id, uint32_t init_freq)
+{
+	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+	if (!PIOS_RFM22B_validate(rfm22b_dev)) {
+		return;
+	}
+	rfm22b_dev->init_frequency = init_freq;
 }
 
 /**
@@ -1225,8 +1228,10 @@ static void rfm22_process_event(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rf
 
 // ************************************
 
-static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev, uint32_t frequency_hz, uint8_t channel)
+static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev, uint32_t min_frequency, uint32_t max_frequency, uint32_t step_size)
 {
+	uint32_t frequency_hz = min_frequency;
+
 	// holds the hbsel (1 or 2)
 	uint8_t	hbsel;
 	if (frequency_hz < 480000000)
@@ -1241,17 +1246,25 @@ static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev,
 	uint8_t fch = (fc >> 8) & 0xff;
 	uint8_t fcl = fc & 0xff;
 
+	// Calculate the number of frequency hopping channels.
+	rfm22b_dev->num_channels = (step_size == 0) ? 1 : (uint16_t)((max_frequency - min_frequency) / step_size);
+
+	// initialize the frequency hopping step size (specified in 10khz increments).
+	uint32_t freq_hop_step_size = step_size / 10000;
+	if (freq_hop_step_size > 255) {
+		freq_hop_step_size = 255;
+        }
+	rfm22_write(rfm22b_dev, RFM22_frequency_hopping_step_size, (uint8_t)freq_hop_step_size);
 
 	// frequency hopping channel (0-255)
 	rfm22b_dev->frequency_step_size = 156.25f * hbsel;
 
 	// frequency hopping channel (0-255)
-	rfm22b_dev->frequency_hop_channel = channel;
-	rfm22_write(rfm22b_dev, RFM22_frequency_hopping_channel_select, channel);
+	rfm22b_dev->frequency_hop_channel = 0;
+	rfm22_write(rfm22b_dev, RFM22_frequency_hopping_channel_select, 0);
 
 	// no frequency offset
 	rfm22_write(rfm22b_dev, RFM22_frequency_offset1, 0);
-	// no frequency offset
 	rfm22_write(rfm22b_dev, RFM22_frequency_offset2, 0);
 
 	// set the carrier frequency
@@ -2243,9 +2256,11 @@ static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev)
 
 	// Call the com port configuration function
 	if (rfm22b_dev->com_config_cb)
-		rfm22b_dev->com_config_cb(cph->main_port, cph->flexi_port, cph->vcp_port, cph->com_speed);
+		rfm22b_dev->com_config_cb(cph->main_port, cph->flexi_port, cph->vcp_port, cph->com_speed,
+					  cph->min_frequency, cph->max_frequency, cph->channel_spacing);
  
  	// Configure this modem from the connection request message.
+	rfm22_setNominalCarrierFrequency(rfm22b_dev, cph->min_frequency, cph->max_frequency, cph->channel_spacing);
 	rfm22_setDatarate(rfm22b_dev, rfm22b_dev->datarate, true);
  	PIOS_RFM22B_SetTxPower((uint32_t)rfm22b_dev, cph->max_tx_power);
 }
@@ -2267,10 +2282,11 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	portTickType time = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
 	// We change channels every 128 ms.
-	time = time >> 7;
-	// The channel is calculated using the 16 bit CRC as the pseudo random number generator, and there are 128 channels.
-	return (uint8_t)(time & 0x7f);
-	//return (uint8_t)(PIOS_CRC16_updateByte((time && 0xffff), 0) & 0x7f);
+	uint16_t n = (time >> 7) & 0xffff;
+	// The channel is calculated using the 16 bit CRC as the pseudo random number generator.
+	n = PIOS_CRC16_updateByte(n, 0);
+	float num_channels = rfm22b_dev->num_channels;
+	return (uint8_t)(num_channels * (float)n / (float)0xffff);
 }
 
 static bool rfm22_changeChannel(struct pios_rfm22b_dev *rfm22b_dev)
@@ -2515,9 +2531,6 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22_write(rfm22b_dev, RFM22_sync_word1, SYNC_BYTE_3);
 	rfm22_write(rfm22b_dev, RFM22_sync_word0, SYNC_BYTE_4);
 
-	// set frequency hopping channel step size (multiples of 10kHz)
-	rfm22_write(rfm22b_dev, RFM22_frequency_hopping_step_size, rfm22b_dev->frequency_hop_step_size_reg);
-
 	// set the tx power
 	rfm22_write(rfm22b_dev, RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | rfm22b_dev->tx_power);
 
@@ -2534,7 +2547,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22_write(rfm22b_dev, RFM22_xtal_osc_load_cap, rfm22b_dev->cfg.RFXtalCap);
 
 	// Initialize the frequency and datarate to te default.
-	rfm22_setNominalCarrierFrequency(rfm22b_dev, RFM22B_NOMINAL_CARRIER_FREQUENCY, RFM22B_DEFAULT_CHANNEL);
+	rfm22_setNominalCarrierFrequency(rfm22b_dev, RFM22B_DEFAULT_FREQUENCY, RFM22B_DEFAULT_FREQUENCY, RFM22B_FREQUENCY_HOP_STEP_SIZE);
 	rfm22_setDatarate(rfm22b_dev, RFM22B_DEFAULT_RX_DATARATE, true);
 
 	return RFM22B_EVENT_INITIALIZED;

@@ -34,6 +34,7 @@
 #include <packet_handler.h>
 #include <oplinksettings.h>
 
+/* Constant definitions */
 enum gpio_direction {GPIO0_TX_GPIO1_RX, GPIO0_RX_GPIO1_TX};
 
 /* Global Types */
@@ -98,12 +99,15 @@ struct rfm22b_stats {
 
 /* Callback function prototypes */
 typedef void (*PIOS_RFM22B_ComConfigCallback)(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
-					      OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed);
+					      OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed,
+					      uint32_t min_frequency, uint32_t max_frequency, uint32_t channel_spacing);
 
 /* Public Functions */
 extern int32_t PIOS_RFM22B_Init(uint32_t *rfb22b_id, uint32_t spi_id, uint32_t slave_num, const struct pios_rfm22b_cfg *cfg);
 extern void PIOS_RFM22B_Reinit(uint32_t rfb22b_id);
 extern void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr);
+extern void PIOS_RFM22B_SetFrequencyRange(uint32_t rfm22b_id, uint32_t min_freq, uint32_t max_freq, uint32_t step_size);
+extern void PIOS_RFM22B_SetInitialFrequency(uint32_t rfm22b_id, uint32_t init_freq);
 extern void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id);
 extern void PIOS_RFM22B_SetComConfigCallback(uint32_t rfm22b_id, PIOS_RFM22B_ComConfigCallback cb);
 extern void PIOS_RFM22B_SetBindings(uint32_t rfm22b_id, const uint32_t bindingPairIDs[], const uint8_t mainPortSettings[],

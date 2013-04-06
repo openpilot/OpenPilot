@@ -95,6 +95,9 @@ typedef struct {
 typedef struct {
 	PHPacketHeader header;
         uint32_t source_id;
+	uint32_t min_frequency;
+	uint32_t max_frequency;
+	uint32_t channel_spacing;
 	OPLinkSettingsMainPortOptions main_port;
 	OPLinkSettingsFlexiPortOptions flexi_port;
 	OPLinkSettingsVCPPortOptions vcp_port;

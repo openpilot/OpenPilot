@@ -773,6 +773,11 @@ struct pios_rfm22b_dev {
 	// The number of times that the current packet has been resent.
 	uint8_t cur_resent_count;
 
+	// The initial frequency
+	uint32_t init_frequency;
+	// The number of frequency hopping channels.
+	uint16_t num_channels;
+
 	// The frequency hopping step size
 	float frequency_step_size;
 	// current frequency hop channel

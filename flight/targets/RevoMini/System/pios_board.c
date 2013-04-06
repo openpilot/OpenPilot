@@ -43,7 +43,8 @@
 #if defined(PIOS_INCLUDE_RFM22B)
 // Forward declarations
 static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
-				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed);
+				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed,
+				 uint32_t min_frequency, uint32_t max_frequency, uint32_t channel_spacing);
 #endif
 
 /**
@@ -767,7 +768,8 @@ void PIOS_Board_Init(void) {
  * \param[in] com_speed  The com port speed
  */
 static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
-				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed)
+				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed,
+				 uint32_t min_frequency, uint32_t max_frequency, uint32_t channel_spacing)
 {
     uint32_t comBaud = 9600;
     switch (com_speed) {
@@ -796,6 +798,9 @@ static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, 
     if (PIOS_COM_TELEM_RF) {
         PIOS_COM_ChangeBaud(PIOS_COM_TELEM_RF, comBaud);
     }
+
+    // Set the frequency range.
+    PIOS_RFM22B_SetFrequencyRange(pios_rfm22b_id, min_frequency, max_frequency, channel_spacing);
 }
 
 #endif

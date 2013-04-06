@@ -188,7 +188,6 @@ static enum pios_rfm22b_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_d
 static enum pios_rfm22b_event rfm22_sendAck(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_sendNack(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_requestConnection(struct pios_rfm22b_dev *rfm22b_dev);
-static enum pios_rfm22b_event rfm22_initConnection(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev);
@@ -239,18 +238,7 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 	[RFM22B_STATE_INITIALIZING] = {
 		.entry_fn = rfm22_init,
 		.next_state = {
-			[RFM22B_EVENT_INITIALIZED] = RFM22B_STATE_INITIATING_CONNECTION,
-			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
-			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
-			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
-		},
-	},
-	[RFM22B_STATE_INITIATING_CONNECTION] = {
-		.entry_fn = rfm22_initConnection,
-		.next_state = {
-			[RFM22B_EVENT_REQUEST_CONNECTION] = RFM22B_STATE_REQUESTING_CONNECTION,
-			[RFM22B_EVENT_WAIT_FOR_CONNECTION] = RFM22B_STATE_RX_MODE,
-			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
+			[RFM22B_EVENT_INITIALIZED] = RFM22B_STATE_RX_MODE,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
@@ -263,7 +251,7 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
-			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
+			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR
 		},
 	},
 	[RFM22B_STATE_ACCEPTING_CONNECTION] = {
@@ -390,7 +378,7 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 		.entry_fn = rfm22_txData,
 		.next_state = {
 			[RFM22B_EVENT_INT_RECEIVED] = RFM22B_STATE_TX_DATA,
-			[RFM22B_EVENT_REQUEST_CONNECTION] = RFM22B_STATE_INITIATING_CONNECTION,
+			[RFM22B_EVENT_REQUEST_CONNECTION] = RFM22B_STATE_REQUESTING_CONNECTION,
 			[RFM22B_EVENT_RX_MODE] = RFM22B_STATE_RX_MODE,
 			[RFM22B_EVENT_FAILURE] = RFM22B_STATE_TX_FAILURE,
 			[RFM22B_EVENT_TIMEOUT] = RFM22B_STATE_TIMEOUT,
@@ -413,7 +401,6 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 		.entry_fn = rfm22_sendAck,
 		.next_state = {
 			[RFM22B_EVENT_TX_START] = RFM22B_STATE_TX_START,
-			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
@@ -423,7 +410,6 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 		.entry_fn = rfm22_sendNack,
 		.next_state = {
 			[RFM22B_EVENT_TX_START] = RFM22B_STATE_TX_START,
-			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
@@ -441,7 +427,6 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 	[RFM22B_STATE_ERROR] = {
 		.entry_fn = rfm22_error,
 		.next_state = {
-			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
 			[RFM22B_EVENT_ERROR] = RFM22B_STATE_ERROR,
 			[RFM22B_EVENT_INITIALIZE] = RFM22B_STATE_INITIALIZING,
 			[RFM22B_EVENT_FATAL_ERROR] = RFM22B_STATE_FATAL_ERROR,
@@ -1970,10 +1955,21 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 			// If this is an ACK for a connection request message we need to
 			// configure this modem from the connection request message.
 			if (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_CON_REQUEST) {
+
 				rfm22_setConnectionParameters(rfm22b_dev);
-			} else if (!rfm22_isConnected(rfm22b_dev)) {
-				// Request a connection if we're not yet connected.
-				ret_event = RFM22B_EVENT_REQUEST_CONNECTION;
+
+			} else if (!rfm22_isConnected(rfm22b_dev) && (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_STATUS)) {
+
+				// Send a connection request message if we're not connected, and this is a status message from a modem that we're bound to.
+				PHStatusPacketHandle status = (PHStatusPacketHandle)&(rfm22b_dev->rx_packet);
+				uint32_t source_id = status->source_id;
+				for (uint8_t i = 0; OPLINKSETTINGS_BINDINGS_NUMELEM; ++i) {
+					if (rfm22b_dev->bindings[i].pairID == source_id) {
+						rfm22b_dev->cur_binding = i;
+						ret_event = RFM22B_EVENT_REQUEST_CONNECTION;
+						break;
+					}
+				}
 			}
 
 			// Change the channel
@@ -2116,25 +2112,8 @@ static enum pios_rfm22b_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_d
 	rfm22b_dev->tx_packet = rfm22b_dev->prev_tx_packet;
 	rfm22b_dev->prev_tx_packet = NULL;
 
-	// Go to the next binding, if the previous tx packet was a connection request
-	if (rfm22b_dev->tx_packet->header.type == PACKET_TYPE_CON_REQUEST)
-	{
-		PHConnectionPacketHandle cph = &(rfm22b_dev->con_packet);
-		// Increment the current binding index to the next non-zero binding.
-                for (uint8_t i = 0; OPLINKSETTINGS_BINDINGS_NUMELEM; ++i) {
-			if (++(rfm22b_dev->cur_binding) >= OPLINKSETTINGS_BINDINGS_NUMELEM)
-				rfm22b_dev->cur_binding = 0;
-			if (rfm22b_dev->bindings[rfm22b_dev->cur_binding].pairID != 0)
-				break;
-                }
-		rfm22b_dev->destination_id = rfm22b_dev->bindings[rfm22b_dev->cur_binding].pairID;
-		cph->header.destination_id = rfm22b_dev->destination_id;
-		cph->main_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].main_port;
-		cph->flexi_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].flexi_port;
-		cph->vcp_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].vcp_port;
-		cph->com_speed = rfm22b_dev->bindings[rfm22b_dev->cur_binding].com_speed;
-	} else {
 #ifndef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
+	if (rfm22b_dev->tx_packet->header.type != PACKET_TYPE_CON_REQUEST) {
 		// First resend on the current channel, then resend on the next channel in case the receive has changed channels, then fallback.
 		rfm22b_dev->cur_resent_count++;
 		switch (rfm22b_dev->cur_resent_count) {
@@ -2153,8 +2132,8 @@ static enum pios_rfm22b_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_d
 			rfm22_setFreqHopChannel(rfm22b_dev, RFM22B_DEFAULT_CHANNEL);
 			break;
 		}
-#endif //PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	}
+#endif //PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 	// Increment the reset packet counter if we're connected.
 	if (rfm22_isConnected(rfm22b_dev)) {
@@ -2215,14 +2194,6 @@ static enum pios_rfm22b_event rfm22_receiveStatus(struct pios_rfm22b_dev *rfm22b
 	return RFM22B_EVENT_RX_COMPLETE;
 }
 
-static enum pios_rfm22b_event rfm22_initConnection(struct pios_rfm22b_dev *rfm22b_dev)
-{
-	if (rfm22b_dev->coordinator)
-		return RFM22B_EVENT_REQUEST_CONNECTION;
-	else
-		return RFM22B_EVENT_WAIT_FOR_CONNECTION;
-}
-
 static enum pios_rfm22b_event rfm22_requestConnection(struct pios_rfm22b_dev *rfm22b_dev)
 {
 	PHConnectionPacketHandle cph = &(rfm22b_dev->con_packet);
@@ -2243,6 +2214,7 @@ static enum pios_rfm22b_event rfm22_requestConnection(struct pios_rfm22b_dev *rf
 	cph->max_tx_power = rfm22b_dev->tx_power;
 	rfm22b_dev->time_to_send = true;
 	rfm22b_dev->send_connection_request = true;
+	rfm22b_dev->prev_tx_packet = NULL;
 
 	return RFM22B_EVENT_TX_START;
 }

@@ -1962,7 +1962,7 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 
 				rfm22_setConnectionParameters(rfm22b_dev);
 
-			} else if (!rfm22_isConnected(rfm22b_dev) && (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_STATUS)) {
+			} else if (rfm22b_dev->coordinator && !rfm22_isConnected(rfm22b_dev) && (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_STATUS)) {
 
 				// Send a connection request message if we're not connected, and this is a status message from a modem that we're bound to.
 				PHStatusPacketHandle status = (PHStatusPacketHandle)&(rfm22b_dev->rx_packet);

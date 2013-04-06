@@ -67,7 +67,7 @@
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 #define SENSOR_PERIOD 2
 
-#define F_PI 3.14159265358979323846f
+#define F_PI ((float)M_PI)
 #define PI_MOD(x) (fmodf(x + F_PI, F_PI * 2) - F_PI)
 // Private types
 
@@ -498,8 +498,8 @@ static void magOffsetEstimation(MagnetometerData *mag)
 	B_e[1] = R[0][1] * mag->x + R[1][1] * mag->y + R[2][1] * mag->z;
 	B_e[2] = R[0][2] * mag->x + R[1][2] * mag->y + R[2][2] * mag->z;
 	
-	float cy = cosf(attitude.Yaw * M_PI / 180.0f);
-	float sy = sinf(attitude.Yaw * M_PI / 180.0f);
+	float cy = cosf(attitude.Yaw * F_PI / 180.0f);
+	float sy = sinf(attitude.Yaw * F_PI / 180.0f);
 	
 	xy[0] =  cy * B_e[0] + sy * B_e[1];
 	xy[1] = -sy * B_e[0] + cy * B_e[1];

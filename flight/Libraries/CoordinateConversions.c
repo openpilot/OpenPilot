@@ -73,7 +73,7 @@ uint16_t ECEF2LLA(float ECEF[3], float LLA[3])
 	float Lat, N, NplusH, delta, esLat;
 	uint16_t iter;
 #define MAX_ITER 10		// should not take more than 5 for valid coordinates
-#define ACCURACY 1.0e-11	// used to be e-14, but we don't need sub micrometer exact calculations
+#define ACCURACY 1.0e-11f	// used to be e-14, but we don't need sub micrometer exact calculations
 
 	LLA[1] = RAD2DEG * atan2f(y, x);
 	Lat = DEG2RAD * LLA[0];
@@ -294,13 +294,13 @@ uint8_t RotFrom2Vectors(const float v1b[3], const float v1e[3], const float v2b[
 
 	// The first rows of rot matrices chosen in direction of v1
 	mag = VectorMagnitude(v1b);
-	if (fabs(mag) < 1e-30)
+	if (fabsf(mag) < 1e-30f)
 		return (-1);
 	for (i=0;i<3;i++)
 		Rib[0][i]=v1b[i]/mag;
 
 	mag = VectorMagnitude(v1e);
-	if (fabs(mag) < 1e-30)
+	if (fabsf(mag) < 1e-30f)
 		return (-1);
 	for (i=0;i<3;i++)
 		Rie[0][i]=v1e[i]/mag;
@@ -308,14 +308,14 @@ uint8_t RotFrom2Vectors(const float v1b[3], const float v1e[3], const float v2b[
 	// The second rows of rot matrices chosen in direction of v1xv2
 	CrossProduct(v1b,v2b,&Rib[1][0]);
 	mag = VectorMagnitude(&Rib[1][0]);
-	if (fabs(mag) < 1e-30)
+	if (fabsf(mag) < 1e-30f)
 		return (-1);
 	for (i=0;i<3;i++)
 		Rib[1][i]=Rib[1][i]/mag;
 
 	CrossProduct(v1e,v2e,&Rie[1][0]);
 	mag = VectorMagnitude(&Rie[1][0]);
-	if (fabs(mag) < 1e-30)
+	if (fabsf(mag) < 1e-30f)
 		return (-1);
 	for (i=0;i<3;i++)
 		Rie[1][i]=Rie[1][i]/mag;

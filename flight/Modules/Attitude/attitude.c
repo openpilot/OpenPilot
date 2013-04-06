@@ -513,10 +513,10 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 		// Work out time derivative from INSAlgo writeup
 		// Also accounts for the fact that gyros are in deg/s
 		float qdot[4];
-		qdot[0] = (-q[1] * gyros[0] - q[2] * gyros[1] - q[3] * gyros[2]) * dT * M_PI / 180 / 2;
-		qdot[1] = (q[0] * gyros[0] - q[3] * gyros[1] + q[2] * gyros[2]) * dT * M_PI / 180 / 2;
-		qdot[2] = (q[3] * gyros[0] + q[0] * gyros[1] - q[1] * gyros[2]) * dT * M_PI / 180 / 2;
-		qdot[3] = (-q[2] * gyros[0] + q[1] * gyros[1] + q[0] * gyros[2]) * dT * M_PI / 180 / 2;
+		qdot[0] = (-q[1] * gyros[0] - q[2] * gyros[1] - q[3] * gyros[2]) * dT * (((float)M_PI) / 180 / 2);
+		qdot[1] = (q[0] * gyros[0] - q[3] * gyros[1] + q[2] * gyros[2]) * dT * (((float)M_PI) / 180 / 2);
+		qdot[2] = (q[3] * gyros[0] + q[0] * gyros[1] - q[1] * gyros[2]) * dT * (((float)M_PI) / 180 / 2);
+		qdot[3] = (-q[2] * gyros[0] + q[1] * gyros[1] + q[0] * gyros[2]) * dT * (((float)M_PI) / 180 / 2);
 		
 		// Take a time step
 		q[0] = q[0] + qdot[0];
@@ -541,7 +541,7 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	
 	// If quaternion has become inappropriately short or is nan reinit.
 	// THIS SHOULD NEVER ACTUALLY HAPPEN
-	if((fabs(qmag) < 1e-3) || (qmag != qmag)) {
+	if((fabsf(qmag) < 1e-3f) || (qmag != qmag)) {
 		q[0] = 1;
 		q[1] = 0;
 		q[2] = 0;
@@ -571,7 +571,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 
 	// Calculate accel filter alpha, in the same way as for gyro data in stabilization module.
 	const float fakeDt = 0.0025;
-	if (attitudeSettings.AccelTau < 0.0001) {
+	if (attitudeSettings.AccelTau < 0.0001f) {
 		accel_alpha = 0;   // not trusting this to resolve to 0
 		accel_filter_enabled = false;
 	} else {

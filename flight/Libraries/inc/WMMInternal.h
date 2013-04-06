@@ -35,8 +35,9 @@
 #define	NUMTERMS 91		// ((WMM_MAX_MODEL_DEGREES+1)*(WMM_MAX_MODEL_DEGREES+2)/2);
 #define NUMPCUP 92		// NUMTERMS +1
 #define NUMPCUPS 13		// WMM_MAX_MODEL_DEGREES +1
-#define RAD2DEG(rad)    ((rad)*(180.0L/M_PI))
-#define DEG2RAD(deg)    ((deg)*(M_PI/180.0L))
+#define M_PI_F ((float)M_PI)
+#define RAD2DEG(rad)    ((rad)*(180.0f/M_PI_F))
+#define DEG2RAD(deg)    ((deg)*(M_PI_F/180.0f))
 
 	// internal structure definitions
 typedef struct {

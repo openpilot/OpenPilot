@@ -242,7 +242,7 @@ int WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, u
     {
         CoordGeodetic->lambda = Lon;
         CoordGeodetic->phi = Lat;
-        CoordGeodetic->HeightAboveEllipsoid = AltEllipsoid/1000.0; // convert to km
+        CoordGeodetic->HeightAboveEllipsoid = AltEllipsoid/1000.0f; // convert to km
 
         // Convert from geodeitic to Spherical Equations: 17-18, WMM Technical report
         if (WMM_GeodeticToSpherical(CoordGeodetic, CoordSpherical) < 0)
@@ -293,9 +293,9 @@ int WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, u
         Ellip = NULL;
     }
 
-	B[0] = GeoMagneticElements->X * 1e-2;
-	B[1] = GeoMagneticElements->Y * 1e-2;
-	B[2] = GeoMagneticElements->Z * 1e-2;
+	B[0] = GeoMagneticElements->X * 1e-2f;
+	B[1] = GeoMagneticElements->Y * 1e-2f;
+	B[2] = GeoMagneticElements->Z * 1e-2f;
 
     return returned;
 }
@@ -433,8 +433,8 @@ int WMM_ComputeSphericalHarmonicVariables(WMMtype_CoordSpherical *CoordSpherical
 	float cos_lambda, sin_lambda;
 	uint16_t m, n;
 
-	cos_lambda = cos(DEG2RAD(CoordSpherical->lambda));
-	sin_lambda = sin(DEG2RAD(CoordSpherical->lambda));
+	cos_lambda = cosf(DEG2RAD(CoordSpherical->lambda));
+	sin_lambda = sinf(DEG2RAD(CoordSpherical->lambda));
 
 	/* for n = 0 ... model_order, compute (Radius of Earth / Spherica radius r)^(n+2)
 	   for n  1..nMax-1 (this is much faster than calling pow MAX_N+1 times).      */
@@ -444,12 +444,12 @@ int WMM_ComputeSphericalHarmonicVariables(WMMtype_CoordSpherical *CoordSpherical
 		SphVariables->RelativeRadiusPower[n] = SphVariables->RelativeRadiusPower[n - 1] * (Ellip->re / CoordSpherical->r);
 
 	/*
-	   Compute cos(m*lambda), sin(m*lambda) for m = 0 ... nMax
-	   cos(a + b) = cos(a)*cos(b) - sin(a)*sin(b)
-	   sin(a + b) = cos(a)*sin(b) + sin(a)*cos(b)
+	   Compute cosf(m*lambda), sinf(m*lambda) for m = 0 ... nMax
+	   cosf(a + b) = cosf(a)*cosf(b) - sinf(a)*sinf(b)
+	   sinf(a + b) = cosf(a)*sinf(b) + sinf(a)*cosf(b)
 	 */
-	SphVariables->cos_mlambda[0] = 1.0;
-	SphVariables->sin_mlambda[0] = 0.0;
+	SphVariables->cos_mlambda[0] = 1.0f;
+	SphVariables->sin_mlambda[0] = 0.0f;
 
 	SphVariables->cos_mlambda[1] = cos_lambda;
 	SphVariables->sin_mlambda[1] = sin_lambda;
@@ -480,9 +480,9 @@ int WMM_AssociatedLegendreFunction(WMMtype_CoordSpherical * CoordSpherical, uint
 
 	 */
 {
-	float sin_phi = sin(DEG2RAD(CoordSpherical->phig));	/* sin  (geocentric latitude) */
+	float sin_phi = sinf(DEG2RAD(CoordSpherical->phig));	/* sinf  (geocentric latitude) */
 
-	if (nMax <= 16 || (1 - fabs(sin_phi)) < 1.0e-10)	/* If nMax is less tha 16 or at the poles */
+	if (nMax <= 16 || (1 - fabsf(sin_phi)) < 1.0e-10f)	/* If nMax is less tha 16 or at the poles */
 	{
 		if (WMM_PcupLow(LegendreFunction->Pcup, LegendreFunction->dPcup, sin_phi, nMax) < 0)
 		    return -1;  // error
@@ -508,7 +508,7 @@ int WMM_Summation(WMMtype_LegendreFunction * LegendreFunction,
 
 	   dV ^     1 dV ^        1     dV ^
 	   grad V = -- r  +  - -- t  +  -------- -- p
-	   dr       r dt       r sin(t) dp
+	   dr       r dt       r sinf(t) dp
 
 	   INPUT :  LegendreFunction
 	   MagneticModel
@@ -535,7 +535,7 @@ int WMM_Summation(WMMtype_LegendreFunction * LegendreFunction,
 			index = (n * (n + 1) / 2 + m);
 
 /*		    nMax  	(n+2) 	  n     m            m           m
-	Bz =   -SUM (a/r)   (n+1) SUM  [g cos(m p) + h sin(m p)] P (sin(phi))
+	Bz =   -SUM (a/r)   (n+1) SUM  [g cosf(m p) + h sinf(m p)] P (sinf(phi))
 			n=1      	      m=0   n            n           n  */
 /* Equation 12 in the WMM Technical report.  Derivative with respect to radius.*/
 			MagneticResults->Bz -=
@@ -545,7 +545,7 @@ int WMM_Summation(WMMtype_LegendreFunction * LegendreFunction,
 			    * (float)(n + 1) * LegendreFunction->Pcup[index];
 
 /*		  1 nMax  (n+2)    n     m            m           m
-	By =    SUM (a/r) (m)  SUM  [g cos(m p) + h sin(m p)] dP (sin(phi))
+	By =    SUM (a/r) (m)  SUM  [g cosf(m p) + h sinf(m p)] dP (sinf(phi))
 		   n=1             m=0   n            n           n  */
 /* Equation 11 in the WMM Technical report. Derivative with respect to longitude, divided by radius. */
 			MagneticResults->By +=
@@ -554,7 +554,7 @@ int WMM_Summation(WMMtype_LegendreFunction * LegendreFunction,
 			     SphVariables->sin_mlambda[m] - WMM_get_main_field_coeff_h(index) * SphVariables->cos_mlambda[m])
 			    * (float)(m) * LegendreFunction->Pcup[index];
 /*		   nMax  (n+2) n     m            m           m
-	Bx = - SUM (a/r)   SUM  [g cos(m p) + h sin(m p)] dP (sin(phi))
+	Bx = - SUM (a/r)   SUM  [g cosf(m p) + h sinf(m p)] dP (sinf(phi))
 		   n=1         m=0   n            n           n  */
 /* Equation 10  in the WMM Technical report. Derivative with respect to latitude, divided by radius. */
 
@@ -567,8 +567,8 @@ int WMM_Summation(WMMtype_LegendreFunction * LegendreFunction,
 		}
 	}
 
-	cos_phi = cos(DEG2RAD(CoordSpherical->phig));
-	if (fabs(cos_phi) > 1.0e-10)
+	cos_phi = cosf(DEG2RAD(CoordSpherical->phig));
+	if (fabsf(cos_phi) > 1.0e-10f)
 	{
 		MagneticResults->By = MagneticResults->By / cos_phi;
 	}
@@ -617,7 +617,7 @@ int WMM_SecVarSummation(WMMtype_LegendreFunction * LegendreFunction,
 			index = (n * (n + 1) / 2 + m);
 
 /*		    nMax  	(n+2) 	  n     m            m           m
-	Bz =   -SUM (a/r)   (n+1) SUM  [g cos(m p) + h sin(m p)] P (sin(phi))
+	Bz =   -SUM (a/r)   (n+1) SUM  [g cosf(m p) + h sinf(m p)] P (sinf(phi))
 			n=1      	      m=0   n            n           n  */
 /*  Derivative with respect to radius.*/
 			MagneticResults->Bz -=
@@ -627,7 +627,7 @@ int WMM_SecVarSummation(WMMtype_LegendreFunction * LegendreFunction,
 			    * (float)(n + 1) * LegendreFunction->Pcup[index];
 
 /*		  1 nMax  (n+2)    n     m            m           m
-	By =    SUM (a/r) (m)  SUM  [g cos(m p) + h sin(m p)] dP (sin(phi))
+	By =    SUM (a/r) (m)  SUM  [g cosf(m p) + h sinf(m p)] dP (sinf(phi))
 		   n=1             m=0   n            n           n  */
 /* Derivative with respect to longitude, divided by radius. */
 			MagneticResults->By +=
@@ -636,7 +636,7 @@ int WMM_SecVarSummation(WMMtype_LegendreFunction * LegendreFunction,
 			     SphVariables->sin_mlambda[m] - WMM_get_secular_var_coeff_h(index) * SphVariables->cos_mlambda[m])
 			    * (float)(m) * LegendreFunction->Pcup[index];
 /*		   nMax  (n+2) n     m            m           m
-	Bx = - SUM (a/r)   SUM  [g cos(m p) + h sin(m p)] dP (sin(phi))
+	Bx = - SUM (a/r)   SUM  [g cosf(m p) + h sinf(m p)] dP (sinf(phi))
 		   n=1         m=0   n            n           n  */
 /* Derivative with respect to latitude, divided by radius. */
 
@@ -647,8 +647,8 @@ int WMM_SecVarSummation(WMMtype_LegendreFunction * LegendreFunction,
 			    * LegendreFunction->dPcup[index];
 		}
 	}
-	cos_phi = cos(DEG2RAD(CoordSpherical->phig));
-	if (fabs(cos_phi) > 1.0e-10)
+	cos_phi = cosf(DEG2RAD(CoordSpherical->phig));
+	if (fabsf(cos_phi) > 1.0e-10f)
 	{
 		MagneticResults->By = MagneticResults->By / cos_phi;
 	}
@@ -695,11 +695,11 @@ int WMM_RotateMagneticVector(WMMtype_CoordSpherical * CoordSpherical,
 	 */
 {
 	/* Difference between the spherical and Geodetic latitudes */
-	float Psi = (M_PI / 180) * (CoordSpherical->phig - CoordGeodetic->phi);
+	float Psi = (M_PI_F / 180) * (CoordSpherical->phig - CoordGeodetic->phi);
 
 	/* Rotate spherical field components to the Geodeitic system */
-	MagneticResultsGeo->Bz = MagneticResultsSph->Bx * sin(Psi) + MagneticResultsSph->Bz * cos(Psi);
-	MagneticResultsGeo->Bx = MagneticResultsSph->Bx * cos(Psi) - MagneticResultsSph->Bz * sin(Psi);
+	MagneticResultsGeo->Bz = MagneticResultsSph->Bx * sinf(Psi) + MagneticResultsSph->Bz * cosf(Psi);
+	MagneticResultsGeo->Bx = MagneticResultsSph->Bx * cosf(Psi) - MagneticResultsSph->Bz * sinf(Psi);
 	MagneticResultsGeo->By = MagneticResultsSph->By;
 
     return 0;
@@ -727,10 +727,10 @@ int WMM_CalculateGeoMagneticElements(WMMtype_MagneticResults * MagneticResultsGe
 	GeoMagneticElements->Y = MagneticResultsGeo->By;
 	GeoMagneticElements->Z = MagneticResultsGeo->Bz;
 
-	GeoMagneticElements->H = sqrt(MagneticResultsGeo->Bx * MagneticResultsGeo->Bx + MagneticResultsGeo->By * MagneticResultsGeo->By);
-	GeoMagneticElements->F = sqrt(GeoMagneticElements->H * GeoMagneticElements->H + MagneticResultsGeo->Bz * MagneticResultsGeo->Bz);
-	GeoMagneticElements->Decl = RAD2DEG(atan2(GeoMagneticElements->Y, GeoMagneticElements->X));
-	GeoMagneticElements->Incl = RAD2DEG(atan2(GeoMagneticElements->Z, GeoMagneticElements->H));
+	GeoMagneticElements->H = sqrtf(MagneticResultsGeo->Bx * MagneticResultsGeo->Bx + MagneticResultsGeo->By * MagneticResultsGeo->By);
+	GeoMagneticElements->F = sqrtf(GeoMagneticElements->H * GeoMagneticElements->H + MagneticResultsGeo->Bz * MagneticResultsGeo->Bz);
+	GeoMagneticElements->Decl = RAD2DEG(atan2f(GeoMagneticElements->Y, GeoMagneticElements->X));
+	GeoMagneticElements->Incl = RAD2DEG(atan2f(GeoMagneticElements->Z, GeoMagneticElements->H));
 
     return 0;   // OK
 }
@@ -762,10 +762,10 @@ int WMM_CalculateSecularVariation(WMMtype_MagneticResults * MagneticVariation, W
 	    (MagneticElements->X * MagneticElements->Xdot +
 	     MagneticElements->Y * MagneticElements->Ydot + MagneticElements->Z * MagneticElements->Zdot) / MagneticElements->F;
 	MagneticElements->Decldot =
-	    180.0 / M_PI * (MagneticElements->X * MagneticElements->Ydot -
+	    180.0f / M_PI_F * (MagneticElements->X * MagneticElements->Ydot -
 			    MagneticElements->Y * MagneticElements->Xdot) / (MagneticElements->H * MagneticElements->H);
 	MagneticElements->Incldot =
-	    180.0 / M_PI * (MagneticElements->H * MagneticElements->Zdot -
+	    180.0f / M_PI_F * (MagneticElements->H * MagneticElements->Zdot -
 			    MagneticElements->Z * MagneticElements->Hdot) / (MagneticElements->F * MagneticElements->F);
 	MagneticElements->GVdot = MagneticElements->Decldot;
 
@@ -776,7 +776,7 @@ int WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
 
 /*	This function evaluates all of the Schmidt-semi normalized associated Legendre
 	functions up to degree nMax. The functions are initially scaled by
-	10^280 sin^m in order to minimize the effects of underflow at large m
+	10^280 sinf^m in order to minimize the effects of underflow at large m
 	near the poles (see Holmes and Featherstone 2002, J. Geodesy, 76, 279-299).
 	Note that this function performs the same operation as WMM_PcupLow.
 	However this function also can be used for high degree (large nMax) models.
@@ -784,7 +784,7 @@ int WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
 	Calling Parameters:
 		INPUT
 			nMax:	 Maximum spherical harmonic degree to compute.
-			x:		cos(colatitude) or sin(latitude).
+			x:		cosf(colatitude) or sinf(latitude).
 
 		OUTPUT
 			Pcup:	A vector of all associated Legendgre polynomials evaluated at
@@ -800,9 +800,9 @@ int WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
 
   Change from the previous version
   The prevous version computes the derivatives as
-  dP(n,m)(x)/dx, where x = sin(latitude) (or cos(colatitude) ).
+  dP(n,m)(x)/dx, where x = sinf(latitude) (or cosf(colatitude) ).
   However, the WMM Geomagnetic routines requires dP(n,m)(x)/dlatitude.
-  Hence the derivatives are multiplied by sin(latitude).
+  Hence the derivatives are multiplied by sinf(latitude).
   Removed the options for CS phase and normalizations.
 
   Note: In geomagnetism, the derivatives of ALF are usually found with
@@ -842,7 +842,7 @@ int WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
 	scalef = 1.0e-280;
 
 	for (n = 0; n <= 2 * nMax + 1; ++n)
-		PreSqr[n] = sqrt((float)(n));
+		PreSqr[n] = sqrtf((float)(n));
 
 	k = 2;
 
@@ -860,10 +860,10 @@ int WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
 		k = k + 2;
 	}
 
-	/*z = sin (geocentric latitude) */
-	z = sqrt((1.0 - x) * (1.0 + x));
+	/*z = sinf (geocentric latitude) */
+	z = sqrtf((1.0f - x) * (1.0f + x));
 	pm2 = 1.0;
-	Pcup[0] = 1.0;
+	Pcup[0] = 1.0f;
 	dPcup[0] = 0.0;
 	if (nMax == 0)
     {
@@ -945,7 +945,7 @@ int WMM_PcupLow(float *Pcup, float *dPcup, float x, uint16_t nMax)
 	Calling Parameters:
 		INPUT
 			nMax:	 Maximum spherical harmonic degree to compute.
-			x:		cos(colatitude) or sin(latitude).
+			x:		cosf(colatitude) or sinf(latitude).
 
 		OUTPUT
 			Pcup:	A vector of all associated Legendgre polynomials evaluated at
@@ -975,8 +975,8 @@ int WMM_PcupLow(float *Pcup, float *dPcup, float x, uint16_t nMax)
 	Pcup[0] = 1.0;
 	dPcup[0] = 0.0;
 
-	/*sin (geocentric latitude) - sin_phi */
-	z = sqrt((1.0 - x) * (1.0 + x));
+	/*sinf (geocentric latitude) - sin_phi */
+	z = sqrtf((1.0f - x) * (1.0f + x));
 
 	/*       First, Compute the Gauss-normalized associated Legendre  functions */
 	for (n = 1; n <= nMax; n++)
@@ -1033,7 +1033,7 @@ int WMM_PcupLow(float *Pcup, float *dPcup, float x, uint16_t nMax)
 		{
 			index = (n * (n + 1) / 2 + m);
 			index1 = (n * (n + 1) / 2 + m - 1);
-			schmidtQuasiNorm[index] = schmidtQuasiNorm[index1] * sqrt((float)((n - m + 1) * (m == 1 ? 2 : 1)) / (float)(n + m));
+			schmidtQuasiNorm[index] = schmidtQuasiNorm[index1] * sqrtf((float)((n - m + 1) * (m == 1 ? 2 : 1)) / (float)(n + m));
 		}
 
 	}
@@ -1086,7 +1086,7 @@ int WMM_SummationSpecial(WMMtype_SphericalHarmonicVariables *
 	schmidtQuasiNorm1 = 1.0;
 
 	MagneticResults->By = 0.0;
-	sin_phi = sin(DEG2RAD(CoordSpherical->phig));
+	sin_phi = sinf(DEG2RAD(CoordSpherical->phig));
 
 	for (n = 1; n <= MagneticModel->nMax; n++)
 	{
@@ -1097,7 +1097,7 @@ int WMM_SummationSpecial(WMMtype_SphericalHarmonicVariables *
 
 		index = (n * (n + 1) / 2 + 1);
 		schmidtQuasiNorm2 = schmidtQuasiNorm1 * (float)(2 * n - 1) / (float)n;
-		schmidtQuasiNorm3 = schmidtQuasiNorm2 * sqrt((float)(n * 2) / (float)(n + 1));
+		schmidtQuasiNorm3 = schmidtQuasiNorm2 * sqrtf((float)(n * 2) / (float)(n + 1));
 		schmidtQuasiNorm1 = schmidtQuasiNorm2;
 		if (n == 1)
 		{
@@ -1110,7 +1110,7 @@ int WMM_SummationSpecial(WMMtype_SphericalHarmonicVariables *
 		}
 
 /*		  1 nMax  (n+2)    n     m            m           m
-	By =    SUM (a/r) (m)  SUM  [g cos(m p) + h sin(m p)] dP (sin(phi))
+	By =    SUM (a/r) (m)  SUM  [g cosf(m p) + h sinf(m p)] dP (sinf(phi))
 		   n=1             m=0   n            n           n  */
 /* Equation 11 in the WMM Technical report. Derivative with respect to longitude, divided by radius. */
 
@@ -1152,13 +1152,13 @@ int WMM_SecVarSummationSpecial(WMMtype_SphericalHarmonicVariables *
 	schmidtQuasiNorm1 = 1.0;
 
 	MagneticResults->By = 0.0;
-	sin_phi = sin(DEG2RAD(CoordSpherical->phig));
+	sin_phi = sinf(DEG2RAD(CoordSpherical->phig));
 
 	for (n = 1; n <= MagneticModel->nMaxSecVar; n++)
 	{
 		index = (n * (n + 1) / 2 + 1);
 		schmidtQuasiNorm2 = schmidtQuasiNorm1 * (float)(2 * n - 1) / (float)n;
-		schmidtQuasiNorm3 = schmidtQuasiNorm2 * sqrt((float)(n * 2) / (float)(n + 1));
+		schmidtQuasiNorm3 = schmidtQuasiNorm2 * sqrtf((float)(n * 2) / (float)(n + 1));
 		schmidtQuasiNorm1 = schmidtQuasiNorm2;
 		if (n == 1)
 		{
@@ -1171,7 +1171,7 @@ int WMM_SecVarSummationSpecial(WMMtype_SphericalHarmonicVariables *
 		}
 
 /*		  1 nMax  (n+2)    n     m            m           m
-	By =    SUM (a/r) (m)  SUM  [g cos(m p) + h sin(m p)] dP (sin(phi))
+	By =    SUM (a/r) (m)  SUM  [g cosf(m p) + h sinf(m p)] dP (sinf(phi))
 		   n=1             m=0   n            n           n  */
 /* Derivative with respect to longitude, divided by radius. */
 
@@ -1291,7 +1291,7 @@ int WMM_DateToYear(uint16_t month, uint16_t day, uint16_t year)
 		temp += MonthDays[i - 1];
 	temp += day;
 	
-	decimal_date = year + (temp - 1) / (365.0 + ExtraDay);
+	decimal_date = year + (temp - 1) / (365.0f + ExtraDay);
 
 	return 0;   // OK
 }
@@ -1304,21 +1304,21 @@ int WMM_GeodeticToSpherical(WMMtype_CoordGeodetic * CoordGeodetic, WMMtype_Coord
 {
 	float CosLat, SinLat, rc, xp, zp;	// all local variables
 
-	CosLat = cos(DEG2RAD(CoordGeodetic->phi));
-	SinLat = sin(DEG2RAD(CoordGeodetic->phi));
+	CosLat = cosf(DEG2RAD(CoordGeodetic->phi));
+	SinLat = sinf(DEG2RAD(CoordGeodetic->phi));
 
 	// compute the local radius of curvature on the WGS-84 reference ellipsoid
-	rc = Ellip->a / sqrt(1.0 - Ellip->epssq * SinLat * SinLat);
+	rc = Ellip->a / sqrtf(1.0f - Ellip->epssq * SinLat * SinLat);
 
 	// compute ECEF Cartesian coordinates of specified point (for longitude=0)
 
 	xp = (rc + CoordGeodetic->HeightAboveEllipsoid) * CosLat;
-	zp = (rc * (1.0 - Ellip->epssq) + CoordGeodetic->HeightAboveEllipsoid) * SinLat;
+	zp = (rc * (1.0f - Ellip->epssq) + CoordGeodetic->HeightAboveEllipsoid) * SinLat;
 
 	// compute spherical radius and angle lambda and phi of specified point
 
-	CoordSpherical->r = sqrt(xp * xp + zp * zp);
-	CoordSpherical->phig = RAD2DEG(asin(zp / CoordSpherical->r));	// geocentric latitude
+	CoordSpherical->r = sqrtf(xp * xp + zp * zp);
+	CoordSpherical->phig = RAD2DEG(asinf(zp / CoordSpherical->r));	// geocentric latitude
 	CoordSpherical->lambda = CoordGeodetic->lambda;	// longitude
 
 	return 0;   // OK

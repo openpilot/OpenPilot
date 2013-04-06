@@ -8,15 +8,17 @@
 # Since debug_and_release option is set, we need this
 !debug_and_release|build_pass {
     ROOT_DIR              = $$GCS_SOURCE_TREE/../..
-    VERSION_INFO_HEADER   = $$GCS_BUILD_TREE/../gcsversioninfo.h
+    VERSION_INFO_DIR      = $$GCS_BUILD_TREE/../openpilotgcs-synthetics
+    VERSION_INFO_HEADER   = $$VERSION_INFO_DIR/gcs_version_info.h
     VERSION_INFO_SCRIPT   = $$ROOT_DIR/make/scripts/version-info.py
-    VERSION_INFO_TEMPLATE = $$ROOT_DIR/make/templates/gcsversioninfotemplate.h
+    VERSION_INFO_TEMPLATE = $$ROOT_DIR/make/templates/gcs_version_info_template.h
     VERSION_INFO_COMMAND  = python \"$$VERSION_INFO_SCRIPT\"
     UAVO_DEF_PATH         = $$ROOT_DIR/shared/uavobjectdefinition
 
     # Create custom version_info target which generates a header
     version_info.target   = $$VERSION_INFO_HEADER
-    version_info.commands = $$VERSION_INFO_COMMAND \
+    version_info.commands = -$(MKDIR) $$targetPath($$VERSION_INFO_DIR) $$addNewline()
+    version_info.commands += $$VERSION_INFO_COMMAND \
                                     --path=\"$$GCS_SOURCE_TREE\" \
                                     --template=\"$$VERSION_INFO_TEMPLATE\" \
                                     --uavodir=\"$$UAVO_DEF_PATH\" \

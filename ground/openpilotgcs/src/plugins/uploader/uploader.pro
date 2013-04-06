@@ -46,6 +46,8 @@ FORMS += \
 
 RESOURCES += \
     uploader.qrc
-exists( ../../../../../build/ground/opfw_resource/opfw_resource.qrc ) {
-RESOURCES += ../../../../build/ground/opfw_resource/opfw_resource.qrc
+exists( ../../../../../build/openpilotgcs-synthetics/opfw_resource.qrc ) {
+    RESOURCES += ../../../../../build/openpilotgcs-synthetics/opfw_resource.qrc
+} else {
+    message("opfw_resource.qrc is not available, automatic firmware upgrades are disabled")
 }

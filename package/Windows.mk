@@ -14,7 +14,7 @@ NSIS_OPTS     := /V3
 NSIS_DIR      := $(ROOT_DIR)/package/winx86
 NSIS_SCRIPT   := $(NSIS_DIR)/openpilotgcs.nsi
 NSIS_TEMPLATE := $(NSIS_DIR)/openpilotgcs.tpl
-NSIS_HEADER   := $(BUILD_DIR)/ground/openpilotgcs/openpilotgcs.nsh
+NSIS_HEADER   := $(OPGCSSYNTHDIR)/openpilotgcs.nsh
 
 .PHONY: package
 package:

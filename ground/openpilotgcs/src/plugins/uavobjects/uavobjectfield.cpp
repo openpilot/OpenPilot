@@ -1015,8 +1015,9 @@ void UAVObjectField::setValue(const QVariant& value, quint32 index)
         {
             qint8 tmpenum = options.indexOf( value.toString() );
             // Default to 0 on invalid values.
-            if(tmpenum < 0)
+            if(tmpenum < 0) {
                 tmpenum = 0;
+            }
             memcpy(&data[offset + numBytesPerElement*index], &tmpenum, numBytesPerElement);
             break;
         }

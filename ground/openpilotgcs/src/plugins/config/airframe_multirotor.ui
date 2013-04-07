@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="margin">
-    <number>12</number>
+    <number>0</number>
    </property>
    <item row="2" column="0">
     <widget class="QGroupBox" name="groupBox_10">
@@ -32,90 +32,16 @@
       </size>
      </property>
      <property name="title">
-      <string>Frame Type</string>
+      <string>Frame</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_8" stretch="0,0,1,0">
+     <layout class="QVBoxLayout" name="verticalLayout_8" stretch="1">
       <property name="margin">
-       <number>12</number>
+       <number>9</number>
       </property>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_7">
-        <property name="sizeConstraint">
-         <enum>QLayout::SetFixedSize</enum>
-        </property>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>10</width>
-            <height>13</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QComboBox" name="multirotorFrameType">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>25</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>25</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Select the Multirotor frame type here.</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_5">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>10</width>
-            <height>13</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <spacer name="verticalSpacer_6">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>8</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item>
        <widget class="QGraphicsView" name="quadShape">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -136,22 +62,6 @@
          <enum>QFrame::Plain</enum>
         </property>
        </widget>
-      </item>
-      <item>
-       <spacer name="verticalSpacer_7">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>8</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </widget>
@@ -181,7 +91,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_9">
       <property name="margin">
-       <number>12</number>
+       <number>9</number>
       </property>
       <item>
        <widget class="MixerCurve" name="multiThrottleCurve" native="true">
@@ -233,7 +143,7 @@
        <number>0</number>
       </property>
       <property name="margin">
-       <number>12</number>
+       <number>9</number>
       </property>
       <item row="0" column="0">
        <layout class="QGridLayout" name="gridLayout_3" columnstretch="0">
@@ -241,7 +151,7 @@
          <widget class="QLabel" name="mrRollMixValue">
           <property name="minimumSize">
            <size>
-            <width>30</width>
+            <width>40</width>
             <height>0</height>
            </size>
           </property>
@@ -257,7 +167,7 @@
          <widget class="QSlider" name="mrRollMixLevel">
           <property name="minimumSize">
            <size>
-            <width>35</width>
+            <width>40</width>
             <height>0</height>
            </size>
           </property>
@@ -286,13 +196,13 @@ Typical values are 100% for + configuration and 50% for X configuration on quads
           </property>
           <property name="minimumSize">
            <size>
-            <width>30</width>
+            <width>40</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>30</width>
+            <width>16777215</width>
             <height>16777215</height>
            </size>
           </property>
@@ -319,7 +229,7 @@ margin:1px;</string>
          <widget class="QLabel" name="mrPitchMixValue">
           <property name="minimumSize">
            <size>
-            <width>0</width>
+            <width>40</width>
             <height>0</height>
            </size>
           </property>
@@ -335,7 +245,7 @@ margin:1px;</string>
          <widget class="QSlider" name="mrPitchMixLevel">
           <property name="minimumSize">
            <size>
-            <width>35</width>
+            <width>40</width>
             <height>0</height>
            </size>
           </property>
@@ -356,6 +266,12 @@ Typical values are 100% for + configuration and 50% for X configuration on quads
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_40">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -379,7 +295,7 @@ margin:1px;</string>
          <widget class="QLabel" name="mrYawMixValue">
           <property name="minimumSize">
            <size>
-            <width>0</width>
+            <width>40</width>
             <height>0</height>
            </size>
           </property>
@@ -419,6 +335,12 @@ Typical value is 50% for + or X configuration on quads.</string>
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_6">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="autoFillBackground">
            <bool>false</bool>
           </property>
@@ -439,63 +361,108 @@ margin:1px;</string>
         </item>
        </layout>
       </item>
-      <item row="1" column="0" colspan="3">
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <item>
-         <spacer name="horizontalSpacer_6">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>10</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="mrStatusLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="text">
-           <string>Mixer OK</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_9">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>10</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
      </layout>
     </widget>
    </item>
+   <item row="0" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetFixedSize</enum>
+     </property>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Frame Type:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="multirotorFrameType">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>25</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>25</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Select the Multirotor frame type here.</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>10</width>
+         <height>13</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="4" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <spacer name="horizontalSpacer_6">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>10</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="mrStatusLabel">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Mixer OK</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item row="3" column="0" colspan="3">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="groupBox_2">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -511,12 +478,12 @@ margin:1px;</string>
      <property name="title">
       <string>Motor output channels</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_6" columnstretch="1,1,0,0,1">
+     <layout class="QGridLayout" name="gridLayout_7" columnstretch="1,1,0,0,1">
       <property name="margin">
-       <number>12</number>
+       <number>9</number>
       </property>
       <item row="0" column="0" rowspan="5">
-       <layout class="QFormLayout" name="formLayout_2">
+       <layout class="QFormLayout" name="formLayout_3">
         <property name="sizeConstraint">
          <enum>QLayout::SetMaximumSize</enum>
         </property>
@@ -527,7 +494,7 @@ margin:1px;</string>
          <number>6</number>
         </property>
         <item row="0" column="0">
-         <widget class="QLabel" name="MotorOutputLabel1">
+         <widget class="QLabel" name="MotorOutputLabel1_2">
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -548,7 +515,7 @@ margin:1px;</string>
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="label_8">
+         <widget class="QLabel" name="label_13">
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -569,7 +536,7 @@ margin:1px;</string>
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QLabel" name="label_9">
+         <widget class="QLabel" name="label_14">
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -590,7 +557,7 @@ margin:1px;</string>
          </widget>
         </item>
         <item row="3" column="0">
-         <widget class="QLabel" name="label_10">
+         <widget class="QLabel" name="label_15">
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -613,7 +580,7 @@ margin:1px;</string>
        </layout>
       </item>
       <item row="0" column="1" rowspan="5">
-       <layout class="QFormLayout" name="formLayout_4">
+       <layout class="QFormLayout" name="formLayout_5">
         <property name="sizeConstraint">
          <enum>QLayout::SetMaximumSize</enum>
         </property>
@@ -624,7 +591,7 @@ margin:1px;</string>
          <number>6</number>
         </property>
         <item row="0" column="0">
-         <widget class="QLabel" name="label_11">
+         <widget class="QLabel" name="label_18">
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -640,7 +607,7 @@ margin:1px;</string>
         <item row="0" column="1">
          <widget class="QComboBox" name="multiMotorChannelBox5">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -654,7 +621,7 @@ margin:1px;</string>
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QLabel" name="label_12">
+         <widget class="QLabel" name="label_19">
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -670,7 +637,7 @@ margin:1px;</string>
         <item row="1" column="1">
          <widget class="QComboBox" name="multiMotorChannelBox6">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="toolTip">
            <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
@@ -678,7 +645,7 @@ margin:1px;</string>
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QLabel" name="label_16">
+         <widget class="QLabel" name="label_20">
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -694,7 +661,7 @@ margin:1px;</string>
         <item row="2" column="1">
          <widget class="QComboBox" name="multiMotorChannelBox7">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="toolTip">
            <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
@@ -702,7 +669,7 @@ margin:1px;</string>
          </widget>
         </item>
         <item row="3" column="0">
-         <widget class="QLabel" name="label_17">
+         <widget class="QLabel" name="label_21">
           <property name="styleSheet">
            <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -718,7 +685,7 @@ margin:1px;</string>
         <item row="3" column="1">
          <widget class="QComboBox" name="multiMotorChannelBox8">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="toolTip">
            <string>Assign your motor output channels using the drawing above as a reference. Respect propeller rotation.</string>
@@ -728,7 +695,7 @@ margin:1px;</string>
        </layout>
       </item>
       <item row="0" column="2" rowspan="5" colspan="2">
-       <widget class="Line" name="line">
+       <widget class="Line" name="line_2">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -741,7 +708,7 @@ margin:1px;</string>
        </widget>
       </item>
       <item row="2" column="4">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="label_4">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -772,7 +739,7 @@ margin:1px;</string>
       <item row="1" column="4">
        <widget class="QComboBox" name="triYawChannelBox">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -789,7 +756,7 @@ margin:1px;</string>
        </widget>
       </item>
       <item row="0" column="4">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="label_5">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>

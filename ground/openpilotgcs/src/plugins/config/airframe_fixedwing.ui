@@ -15,10 +15,10 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_10">
    <property name="margin">
-    <number>12</number>
+    <number>0</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QLabel" name="label_5">
        <property name="sizePolicy">
@@ -58,8 +58,11 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
      <item>
-      <widget class="QGroupBox" name="groupBox_2">
+      <widget class="QGroupBox" name="channelBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -76,21 +79,24 @@
         <string>Output Channel Assignments</string>
        </property>
        <layout class="QFormLayout" name="formLayout_3">
-        <item row="1" column="0">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        </property>
+        <item row="0" column="0">
          <widget class="QLabel" name="fwEngineLabel">
           <property name="text">
            <string>Engine</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="0" column="1">
          <widget class="QComboBox" name="fwEngineChannelBox">
           <property name="toolTip">
            <string>Select output channel for the engine</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="1" column="0">
          <widget class="QLabel" name="fwAileron1Label">
           <property name="minimumSize">
            <size>
@@ -103,17 +109,17 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="1" column="1">
          <widget class="QComboBox" name="fwAileron1ChannelBox">
           <property name="toolTip">
            <string>Select output channel for the first aileron (or elevon)</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="2" column="0">
          <widget class="QLabel" name="fwAileron2Label">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="minimumSize">
            <size>
@@ -126,17 +132,17 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="2" column="1">
          <widget class="QComboBox" name="fwAileron2ChannelBox">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="toolTip">
            <string>Select output channel for the second aileron (or elevon)</string>
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="fwElevator1Label">
           <property name="minimumSize">
            <size>
@@ -149,17 +155,17 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="1">
+        <item row="3" column="1">
          <widget class="QComboBox" name="fwElevator1ChannelBox">
           <property name="toolTip">
            <string>Select output channel for the first elevator</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="fwElevator2Label">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="minimumSize">
            <size>
@@ -172,56 +178,43 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
+        <item row="4" column="1">
          <widget class="QComboBox" name="fwElevator2ChannelBox">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="toolTip">
            <string>Select output channel for a secondary elevator</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
+        <item row="5" column="0">
          <widget class="QLabel" name="fwRudder1Label">
           <property name="text">
            <string>Rudder 1</string>
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
+        <item row="5" column="1">
          <widget class="QComboBox" name="fwRudder1ChannelBox">
           <property name="toolTip">
            <string>Select output channel for the first rudder</string>
           </property>
          </widget>
         </item>
-        <item row="7" column="0">
+        <item row="6" column="0">
          <widget class="QLabel" name="fwRudder2Label">
           <property name="text">
            <string>Rudder 2</string>
           </property>
          </widget>
         </item>
-        <item row="7" column="1">
+        <item row="6" column="1">
          <widget class="QComboBox" name="fwRudder2ChannelBox">
           <property name="toolTip">
            <string>Select output channel for a secondary rudder</string>
           </property>
          </widget>
-        </item>
-        <item row="0" column="1">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </widget>
@@ -238,22 +231,6 @@
         <string>Elevon Mix</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_13">
-        <item>
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
           <item>
@@ -284,7 +261,7 @@ margin:1px;</string>
             <item>
              <widget class="QSlider" name="elevonSlider1">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -318,7 +295,7 @@ margin:1px;</string>
              <widget class="QLabel" name="elevonLabel2">
               <property name="minimumSize">
                <size>
-                <width>50</width>
+                <width>65</width>
                 <height>0</height>
                </size>
               </property>
@@ -340,7 +317,7 @@ margin:1px;</string>
             <item>
              <widget class="QSlider" name="elevonSlider2">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -374,20 +351,7 @@ margin:1px;</string>
       </widget>
      </item>
      <item>
-      <spacer name="horizontalSpacer_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="groupBox_3">
+      <widget class="QGroupBox" name="throttleCurveBox">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -435,6 +399,19 @@ margin:1px;</string>
        </layout>
       </widget>
      </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
    </item>
    <item>
@@ -451,7 +428,7 @@ margin:1px;</string>
     </spacer>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_13">
+    <layout class="QHBoxLayout" name="bottomLayout">
      <item>
       <spacer name="horizontalSpacer_11">
        <property name="orientation">

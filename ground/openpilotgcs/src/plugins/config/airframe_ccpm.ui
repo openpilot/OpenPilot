@@ -29,29 +29,48 @@
    <bool>false</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout_17">
+   <property name="margin">
+    <number>0</number>
+   </property>
    <item row="0" column="0">
     <layout class="QGridLayout" name="gridLayout_13">
      <item row="0" column="0">
-      <layout class="QFormLayout" name="formLayout_6">
-       <property name="fieldGrowthPolicy">
-        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-       </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
        <property name="topMargin">
         <number>0</number>
        </property>
-       <item row="0" column="0">
+       <item>
         <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
           <string>Swashplate config:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item>
         <widget class="QComboBox" name="ccpmType">
          <property name="toolTip">
           <string>Select aircraft type here</string>
          </property>
         </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
@@ -86,28 +105,25 @@ QGroupBox::title {
 	top: 5px;
  }</string>
        </property>
+       <property name="tabShape">
+        <enum>QTabWidget::Rounded</enum>
+       </property>
        <property name="currentIndex">
         <number>0</number>
+       </property>
+       <property name="documentMode">
+        <bool>false</bool>
        </property>
        <widget class="QWidget" name="BasicTab">
         <attribute name="title">
          <string>Basic settings</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_6">
-         <property name="leftMargin">
-          <number>3</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>3</number>
-         </property>
-         <property name="bottomMargin">
-          <number>3</number>
+         <property name="margin">
+          <number>9</number>
          </property>
          <property name="spacing">
-          <number>3</number>
+          <number>6</number>
          </property>
          <item row="0" column="0">
           <layout class="QVBoxLayout" name="ccpmSettingsBox" stretch="0,1,1,0,0">
@@ -1232,22 +1248,6 @@ margin:1px;
                <number>3</number>
               </property>
               <item>
-               <spacer name="verticalSpacer_10">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Minimum</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>7</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
                <widget class="QLabel" name="label_14">
                 <property name="enabled">
                  <bool>false</bool>
@@ -1268,25 +1268,12 @@ margin:1px;
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_2">
                 <item>
-                 <spacer name="horizontalSpacer_5">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>5</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
                  <widget class="QSlider" name="ccpmRevoSlider">
                   <property name="enabled">
                    <bool>true</bool>
                   </property>
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -1307,19 +1294,6 @@ margin:1px;
                    <enum>Qt::Vertical</enum>
                   </property>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_4">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>5</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                </layout>
               </item>
@@ -1399,22 +1373,6 @@ margin:1px;
                <number>3</number>
               </property>
               <item>
-               <spacer name="verticalSpacer_11">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Minimum</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>7</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
                <widget class="QLabel" name="label_15">
                 <property name="enabled">
                  <bool>true</bool>
@@ -1438,25 +1396,12 @@ margin:1px;
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout">
                 <item>
-                 <spacer name="horizontalSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>5</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
                  <widget class="QSlider" name="ccpmCollectiveSlider">
                   <property name="enabled">
                    <bool>true</bool>
                   </property>
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -1480,19 +1425,6 @@ margin:1px;
                    <enum>Qt::Vertical</enum>
                   </property>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>5</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                </layout>
               </item>
@@ -1582,43 +1514,14 @@ margin:1px;
                <number>3</number>
               </property>
               <item>
-               <spacer name="verticalSpacer_12">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Minimum</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>7</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
                <layout class="QHBoxLayout" name="horizontalLayout_11">
-                <item>
-                 <spacer name="horizontalSpacer_15">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>5</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                 <item>
                  <widget class="QSlider" name="ccpmCollectiveScale">
                   <property name="enabled">
                    <bool>true</bool>
                   </property>
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -1642,19 +1545,6 @@ margin:1px;
                    <enum>Qt::Vertical</enum>
                   </property>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_16">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>5</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                </layout>
               </item>
@@ -1729,43 +1619,14 @@ margin:1px;
                <number>3</number>
               </property>
               <item>
-               <spacer name="verticalSpacer_13">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Minimum</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>7</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
                <layout class="QHBoxLayout" name="horizontalLayout_7">
-                <item>
-                 <spacer name="horizontalSpacer_9">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>5</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                 <item>
                  <widget class="QSlider" name="ccpmCyclicScale">
                   <property name="enabled">
                    <bool>true</bool>
                   </property>
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -1789,19 +1650,6 @@ margin:1px;
                    <enum>Qt::Vertical</enum>
                   </property>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_10">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>5</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                </layout>
               </item>
@@ -1873,43 +1721,14 @@ margin:1px;
                <number>3</number>
               </property>
               <item>
-               <spacer name="verticalSpacer_14">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Minimum</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>7</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
                <layout class="QHBoxLayout" name="horizontalLayout_12">
-                <item>
-                 <spacer name="horizontalSpacer_17">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>5</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                 <item>
                  <widget class="QSlider" name="ccpmPitchScale">
                   <property name="enabled">
                    <bool>true</bool>
                   </property>
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -1933,19 +1752,6 @@ margin:1px;
                    <enum>Qt::Vertical</enum>
                   </property>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_18">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>5</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                </layout>
               </item>
@@ -2017,43 +1823,14 @@ margin:1px;
                <number>3</number>
               </property>
               <item>
-               <spacer name="verticalSpacer_15">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Minimum</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>7</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
                <layout class="QHBoxLayout" name="horizontalLayout_8">
-                <item>
-                 <spacer name="horizontalSpacer_11">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>5</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
                 <item>
                  <widget class="QSlider" name="ccpmRollScale">
                   <property name="enabled">
                    <bool>true</bool>
                   </property>
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -2077,19 +1854,6 @@ margin:1px;
                    <enum>Qt::Vertical</enum>
                   </property>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_12">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>5</width>
-                    <height>25</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                </layout>
               </item>
@@ -2119,10 +1883,10 @@ margin:1px;
         </attribute>
         <layout class="QGridLayout" name="gridLayout_8">
          <property name="margin">
-          <number>3</number>
+          <number>9</number>
          </property>
          <property name="spacing">
-          <number>3</number>
+          <number>6</number>
          </property>
          <item row="0" column="0">
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -2503,25 +2267,12 @@ margin:1px;</string>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
-               <spacer name="horizontalSpacer_7">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>5</width>
-                  <height>25</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
                <widget class="QSlider" name="SwashLvlPositionSlider">
                 <property name="enabled">
                  <bool>true</bool>
                 </property>
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -2545,19 +2296,6 @@ margin:1px;</string>
                  <enum>Qt::Vertical</enum>
                 </property>
                </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_8">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>5</width>
-                  <height>25</height>
-                 </size>
-                </property>
-               </spacer>
               </item>
              </layout>
             </item>
@@ -2764,10 +2502,10 @@ margin:1px;</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_7">
          <property name="margin">
-          <number>3</number>
+          <number>9</number>
          </property>
          <property name="spacing">
-          <number>3</number>
+          <number>6</number>
          </property>
          <item row="0" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_6"/>
@@ -2958,10 +2696,10 @@ margin:1px;</string>
         </attribute>
         <layout class="QGridLayout" name="gridLayout_4">
          <property name="margin">
-          <number>3</number>
+          <number>9</number>
          </property>
          <property name="spacing">
-          <number>3</number>
+          <number>6</number>
          </property>
          <item row="0" column="0">
           <widget class="QTableWidget" name="ccpmAdvancedSettingsTable">
@@ -3554,38 +3292,6 @@ margin:1px;</string>
    </hints>
   </connection>
   <connection>
-   <sender>ccpmCyclicScale</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>ccpmCyclicScaleBox</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>358</x>
-     <y>306</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>355</x>
-     <y>538</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ccpmCyclicScaleBox</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>ccpmCyclicScale</receiver>
-   <slot>setValue(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>341</x>
-     <y>538</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>351</x>
-     <y>376</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>ccpmPitchScale</sender>
    <signal>valueChanged(int)</signal>
    <receiver>ccpmPitchScaleBox</receiver>
@@ -3646,6 +3352,38 @@ margin:1px;</string>
     <hint type="destinationlabel">
      <x>474</x>
      <y>533</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmCyclicScale</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ccpmCyclicScaleBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>358</x>
+     <y>306</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>355</x>
+     <y>538</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ccpmCyclicScaleBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ccpmCyclicScale</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>341</x>
+     <y>538</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>351</x>
+     <y>376</y>
     </hint>
    </hints>
   </connection>

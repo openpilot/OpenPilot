@@ -773,10 +773,6 @@ struct pios_rfm22b_dev {
 	float frequency_step_size;
 	// current frequency hop channel
 	uint8_t	frequency_hop_channel;
-#ifndef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
-	// previous frequency hop channel
-	uint8_t	prev_frequency_hop_channel;
-#endif // !PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	// the frequency hop step size
 	uint8_t frequency_hop_step_size_reg;
 	// afc correction reading (in Hz)
@@ -786,9 +782,7 @@ struct pios_rfm22b_dev {
 	portTickType packet_start_ticks;
 	portTickType tx_complete_ticks;
 	portTickType rx_complete_ticks;
-#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	portTickType time_delta;
-#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 	// The maximum time (ms) that it should take to transmit / receive a packet.
 	uint32_t max_packet_time;

@@ -69,9 +69,7 @@ typedef struct {
 #define PH_ACK_NACK_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
 typedef struct {
 	PHPacketHeader header;
-#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	portTickType packet_recv_time;
-#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHAckNackPacket, *PHAckNackPacketHandle;
 

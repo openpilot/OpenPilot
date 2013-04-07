@@ -137,7 +137,6 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //-------------------------
 #define PIOS_MASTER_CLOCK			72000000
 #define PIOS_PERIPHERAL_CLOCK			(PIOS_MASTER_CLOCK / 2)
-#define PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 //-------------------------
 // Interrupt Priorities

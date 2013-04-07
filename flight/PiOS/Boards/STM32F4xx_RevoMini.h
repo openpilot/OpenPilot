@@ -212,7 +212,6 @@ extern uint32_t pios_packet_handler;
 // Default APB2 Prescaler = 2
 //
 #define PIOS_PERIPHERAL_APB2_CLOCK					PIOS_SYSCLK
-#define PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 //-------------------------
 // Interrupt Priorities

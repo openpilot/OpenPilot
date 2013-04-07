@@ -207,12 +207,10 @@ static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev);
 static bool rfm22_ready_to_send(struct pios_rfm22b_dev *rfm22b_dev);
 static bool rfm22_isConnected(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev);
-#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 static portTickType rfm22_coordinatorTime(struct pios_rfm22b_dev *rfm22b_dev, portTickType ticks);
 static bool rfm22_inChannelBuffer(struct pios_rfm22b_dev *rfm22b_dev);
 static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev);
 static bool rfm22_changeChannel(struct pios_rfm22b_dev *rfm22b_dev);
-#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 static void rfm22_clearLEDs();
 
 // SPI read/write functions
@@ -1388,13 +1386,8 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 	PHPacketHandle p = NULL;
 
 	// Don't send if it's not our turn.
-#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	if (!rfm22b_dev->time_to_send || (rfm22_inChannelBuffer(rfm22b_dev) && rfm22_isConnected(rfm22b_dev)))
 		return RFM22B_EVENT_RX_MODE;
-#else // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
-	if (!rfm22b_dev->time_to_send)
-		return RFM22B_EVENT_RX_MODE;
-#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 	// See if there's a packet ready to send.
 	if (rfm22b_dev->tx_packet)
@@ -1456,12 +1449,10 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 	D2_LED_OFF;
 #endif
 
-#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	// Change the channel if necessary.
 	if (((p->header.type != PACKET_TYPE_ACK) && (p->header.type != PACKET_TYPE_ACK_RTS)) ||
 	    (rfm22b_dev->rx_packet.header.type != PACKET_TYPE_CON_REQUEST))
 		rfm22_changeChannel(rfm22b_dev);
-#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 	// Add the error correcting code.
 	encode_data((unsigned char*)p, PHPacketSize(p), (unsigned char*)p);
@@ -1974,14 +1965,10 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
 			}
 
 			// Change the channel
-#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 			// On the remote side, we initialize the time delta when we finish sending the ACK for the connection request message.
 			if (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_CON_REQUEST) {
 				rfm22b_dev->time_delta = portMAX_DELAY - curTicks;
 			}
-#else // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
-			rfm22_setFreqHopChannel(rfm22b_dev, PIOS_CRC16_updateByte(rfm22b_dev->rx_packet.header.seq_num, 0) & 0x7f);
-#endif // !PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 		} else if (rfm22b_dev->tx_packet->header.type != PACKET_TYPE_NACK) {
 
@@ -2025,9 +2012,7 @@ static enum pios_rfm22b_event rfm22_sendAck(struct pios_rfm22b_dev *rfm22b_dev)
 	aph->header.type = rfm22_ready_to_send(rfm22b_dev) ? PACKET_TYPE_ACK_RTS : PACKET_TYPE_ACK;
 	aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
 	aph->header.seq_num = rfm22b_dev->rx_packet.header.seq_num;
-#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	aph->packet_recv_time = rfm22_coordinatorTime(rfm22b_dev, rfm22b_dev->rx_complete_ticks);
-#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	rfm22b_dev->tx_packet = (PHPacketHandle)aph;
 	rfm22b_dev->time_to_send = true;
 	return RFM22B_EVENT_TX_START;
@@ -2071,7 +2056,6 @@ static enum pios_rfm22b_event rfm22_receiveAck(struct pios_rfm22b_dev *rfm22b_de
 		break;
 	}
 
-#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	// On the coordinator side, we initialize the time delta when we receive the ACK for the connection request message.
 	if (prev->header.type == PACKET_TYPE_CON_REQUEST) {
 		rfm22b_dev->time_delta = portMAX_DELAY - rfm22b_dev->rx_complete_ticks;
@@ -2083,10 +2067,6 @@ static enum pios_rfm22b_event rfm22_receiveAck(struct pios_rfm22b_dev *rfm22b_de
 		// This is not working yet
 		rfm22b_dev->time_delta += remote_rx_time - local_tx_time;
 	}
-#else // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
-	// Change the channel
-	rfm22_setFreqHopChannel(rfm22b_dev, PIOS_CRC16_updateByte(prev->header.seq_num, 0) & 0x7f);
-#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 	// Reset the resend count
 	rfm22b_dev->cur_resent_count = 0;
@@ -2112,29 +2092,6 @@ static enum pios_rfm22b_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_d
 	// Resend the previous TX packet.
 	rfm22b_dev->tx_packet = rfm22b_dev->prev_tx_packet;
 	rfm22b_dev->prev_tx_packet = NULL;
-
-#ifndef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
-	if (rfm22b_dev->tx_packet->header.type != PACKET_TYPE_CON_REQUEST) {
-		// First resend on the current channel, then resend on the next channel in case the receive has changed channels, then fallback.
-		rfm22b_dev->cur_resent_count++;
-		switch (rfm22b_dev->cur_resent_count) {
-		case 1:
-			rfm22b_dev->prev_frequency_hop_channel = rfm22b_dev->frequency_hop_channel;
-		case 2:
-		case 5:
-			rfm22_setFreqHopChannel(rfm22b_dev, rfm22b_dev->prev_frequency_hop_channel);
-			break;
-		case 3:
-		case 4:
-		case 6:
-			rfm22_setFreqHopChannel(rfm22b_dev, PIOS_CRC16_updateByte(rfm22b_dev->tx_packet->header.seq_num, 0) & 0x7f);
-			break;
-		default:
-			rfm22_setFreqHopChannel(rfm22b_dev, RFM22B_DEFAULT_CHANNEL);
-			break;
-		}
-	}
-#endif //PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 	// Increment the reset packet counter if we're connected.
 	if (rfm22_isConnected(rfm22b_dev)) {
@@ -2236,7 +2193,6 @@ static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22_setDatarate(rfm22b_dev, rfm22b_dev->datarate, true);
 }
 
-#ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 static portTickType rfm22_coordinatorTime(struct pios_rfm22b_dev *rfm22b_dev, portTickType ticks)
 {
 	return ticks + rfm22b_dev->time_delta;
@@ -2267,7 +2223,6 @@ static bool rfm22_changeChannel(struct pios_rfm22b_dev *rfm22b_dev)
 	}
 	return false;
 }
-#endif // PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 
 static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm22b_dev)
 {
@@ -2301,8 +2256,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22_clearLEDs();
 
 	// Initialize the detected device statistics.
-	for (uint8_t i = 0; i < OPLINKSTATUS_PAIRIDS_NUMELEM; ++i)
-	{
+	for (uint8_t i = 0; i < OPLINKSTATUS_PAIRIDS_NUMELEM; ++i) {
 		rfm22b_dev->pair_stats[i].pairID = 0;
 		rfm22b_dev->pair_stats[i].rssi = -127;
 		rfm22b_dev->pair_stats[i].afc_correction = 0;
@@ -2334,9 +2288,6 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22b_dev->rx_buffer_wr = 0;
 	rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
 	rfm22b_dev->frequency_hop_channel = 0;
-#ifndef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
-	rfm22b_dev->prev_frequency_hop_channel = 0;
-#endif // !PIOS_RFM22B_PERIODIC_CHANNEL_HOP
 	rfm22b_dev->afc_correction_Hz = 0;
 	rfm22b_dev->packet_start_ticks = 0;
 	rfm22b_dev->tx_complete_ticks = 0;
@@ -2345,8 +2296,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	// software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
 	rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);
 
-	for (int i = 50; i > 0; i--)
-	{
+	for (int i = 50; i > 0; i--) {
 		// read the status registers
 		rfm22b_dev->int_status1 = rfm22_read(rfm22b_dev, RFM22_interrupt_status1);
 		rfm22b_dev->int_status2 = rfm22_read(rfm22b_dev, RFM22_interrupt_status2);
@@ -2354,7 +2304,6 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 
 		// wait 1ms
 		PIOS_DELAY_WaitmS(1);
-
 	}
 
 	// ****************

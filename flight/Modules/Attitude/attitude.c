@@ -394,7 +394,8 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	accels[0] = mpu6000_data.accel_x * PIOS_MPU6000_GetAccelScale();
 	accels[1] = mpu6000_data.accel_y * PIOS_MPU6000_GetAccelScale();
 	accels[2] = mpu6000_data.accel_z * PIOS_MPU6000_GetAccelScale();
-
+	uint32_t sensor_dt_us = PIOS_DELAY_DiffuS(mpu6000_data.timestamp);
+    gyrosData->sampledelay = sensor_dt_us;
 	gyrosData->temperature = 35.0f + ((float) mpu6000_data.temperature + 512.0f) / 340.0f;
 	accelsData->temperature = 35.0f + ((float) mpu6000_data.temperature + 512.0f) / 340.0f;
 #endif

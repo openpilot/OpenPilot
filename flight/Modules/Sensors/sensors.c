@@ -184,6 +184,7 @@ static void SensorsTask(void *parameters)
 #endif
 			break;
 		case 0x02:
+		case 0x03: //RM
 #if defined(PIOS_INCLUDE_MPU6000)
 			gyro_test = PIOS_MPU6000_Test();
 			accel_test = gyro_test;
@@ -213,8 +214,7 @@ static void SensorsTask(void *parameters)
 	uint32_t mag_update_time = PIOS_DELAY_GetRaw();
 	while (1) {
 		// TODO: add timeouts to the sensor reads and set an error if the fail
-		sensor_dt_us = PIOS_DELAY_DiffuS(timeval);
-		timeval = PIOS_DELAY_GetRaw();
+				timeval = PIOS_DELAY_GetRaw();
 
 		if (error) {
 			PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
@@ -313,6 +313,8 @@ static void SensorsTask(void *parameters)
 					accel_accum[1] += mpu6000_data.accel_y;
 					accel_accum[2] += mpu6000_data.accel_z;
 
+                    sensor_dt_us = PIOS_DELAY_DiffuS(mpu6000_data.timestamp);
+
 					gyro_samples ++;
 					accel_samples ++;
 				}
@@ -327,6 +329,7 @@ static void SensorsTask(void *parameters)
 				accel_scaling = PIOS_MPU6000_GetAccelScale();
 
 				gyrosData.temperature = 35.0f + ((float) mpu6000_data.temperature + 512.0f) / 340.0f;
+				gyrosData.sampledelay = sensor_dt_us;
 				accelsData.temperature = 35.0f + ((float) mpu6000_data.temperature + 512.0f) / 340.0f;
 			}
 #endif /* PIOS_INCLUDE_MPU6000 */

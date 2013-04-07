@@ -140,6 +140,7 @@ struct pios_mpu6000_data {
 	int16_t accel_z;
 #endif /* PIOS_MPU6000_ACCEL */
 	int16_t temperature;
+	uint32_t timestamp;
 };
 
 struct pios_mpu6000_cfg {

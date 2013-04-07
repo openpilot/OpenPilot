@@ -504,10 +504,6 @@
 
 #define RFM22_tx_power						0x6D	// R/W
 #define RFM22_tx_pwr_lna_sw					0x08		// LNA Switch Controller. If set, lna_sw control from the digital will go high during TX modes, and low during other times. If reset, the digital control signal is low at all times.
-#define RFM22_tx_pwr_papeaklvl_0				0x10		//      "                   "
-#define RFM22_tx_pwr_papeaklvl_1				0x20		// PA Peak Detect Level (direct from register). 00 = 6.5, 01 = 7, 10 = 7.5, 11 = 8, 00 = default
-#define RFM22_tx_pwr_papeaken					0x40		// PA Peak Detector Enable.
-#define RFM22_tx_pwr_papeakval					0x80		// PA Peak Detector Value Read Register. Reading a 1 in this register when the papeaken=1 then the PA drain voltage is too high and the match network needs adjusting for optimal efficiency.
 
 #define RFM22_tx_data_rate1					0x6E	// R/W
 #define RFM22_tx_data_rate0					0x6F	// R/W

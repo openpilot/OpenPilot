@@ -65,7 +65,7 @@
 #define ISR_TIMEOUT 2 // ms
 #define EVENT_QUEUE_SIZE 5
 #define RFM22B_DEFAULT_RX_DATARATE RFM22_datarate_9600
-#define RFM22B_DEFAULT_TX_POWER RFM22_tx_pwr_txpow_7
+#define RFM22B_DEFAULT_TX_POWER RFM22_tx_pwr_txpow_0
 #define RFM22B_LINK_QUALITY_THRESHOLD 20
 #define RFM22B_NOMINAL_CARRIER_FREQUENCY 430000000
 #define RFM22B_MAXIMUM_FREQUENCY 440000000
@@ -1496,10 +1496,6 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22_write(rfm22b_dev, RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_fifo |
 		    RFM22_mmc2_modtyp_gfsk);
 
-	// set the tx power
-	rfm22_write(rfm22b_dev, RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_1 |
-		    RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | RFM22B_DEFAULT_TX_POWER);
-
 	// clear FIFOs
 	rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl2, RFM22_opfc2_ffclrrx | RFM22_opfc2_ffclrtx);
 	rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl2, 0x00);
@@ -2216,7 +2212,6 @@ static enum pios_rfm22b_event rfm22_requestConnection(struct pios_rfm22b_dev *rf
 	cph->flexi_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].flexi_port;
 	cph->vcp_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].vcp_port;
 	cph->com_speed = rfm22b_dev->bindings[rfm22b_dev->cur_binding].com_speed;
-	cph->max_tx_power = rfm22b_dev->tx_power;
 	rfm22b_dev->time_to_send = true;
 	rfm22b_dev->send_connection_request = true;
 	rfm22b_dev->prev_tx_packet = NULL;
@@ -2239,7 +2234,6 @@ static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev)
  	// Configure this modem from the connection request message.
 	rfm22_setNominalCarrierFrequency(rfm22b_dev, cph->min_frequency, cph->max_frequency, cph->channel_spacing);
 	rfm22_setDatarate(rfm22b_dev, rfm22b_dev->datarate, true);
- 	PIOS_RFM22B_SetTxPower((uint32_t)rfm22b_dev, cph->max_tx_power);
 }
 
 #ifdef PIOS_RFM22B_PERIODIC_CHANNEL_HOP
@@ -2509,7 +2503,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 	rfm22_write(rfm22b_dev, RFM22_sync_word0, SYNC_BYTE_4);
 
 	// set the tx power
-	rfm22_write(rfm22b_dev, RFM22_tx_power, RFM22_tx_pwr_papeaken | RFM22_tx_pwr_papeaklvl_0 | RFM22_tx_pwr_lna_sw | rfm22b_dev->tx_power);
+	rfm22_write(rfm22b_dev, RFM22_tx_power, RFM22_tx_pwr_lna_sw | rfm22b_dev->tx_power);
 
 	// TX FIFO Almost Full Threshold (0 - 63)
 	rfm22_write(rfm22b_dev, RFM22_tx_fifo_control1, TX_FIFO_HI_WATERMARK);

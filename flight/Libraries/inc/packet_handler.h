@@ -102,7 +102,6 @@ typedef struct {
 	OPLinkSettingsFlexiPortOptions flexi_port;
 	OPLinkSettingsVCPPortOptions vcp_port;
 	OPLinkSettingsComSpeedOptions com_speed;
-	uint8_t max_tx_power;
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHConnectionPacket, *PHConnectionPacketHandle;
 

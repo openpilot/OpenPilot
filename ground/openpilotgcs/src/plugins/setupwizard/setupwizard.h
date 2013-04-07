@@ -58,6 +58,12 @@ public:
     void setESCType(SetupWizard::ESC_TYPE type) { m_escType = type; }
     SetupWizard::ESC_TYPE getESCType() const { return m_escType; }
 
+    void setGPSSetting(SetupWizard::GPS_SETTING setting) { m_gpsSetting = setting; }
+    SetupWizard::GPS_SETTING getGPSSetting() const {return m_gpsSetting;}
+
+    void setRadioSetting(SetupWizard::RADIO_SETTING setting) { m_radioSetting = setting; }
+    SetupWizard::RADIO_SETTING getRadioSetting() const {return m_radioSetting;}
+
     void setLevellingBias(accelGyroBias bias) { m_levellingBias = bias; m_levellingPerformed = true; }
     bool isLevellingPerformed() const { return m_levellingPerformed; }
     accelGyroBias getLevellingBias() const { return m_levellingBias; }
@@ -95,6 +101,9 @@ private:
     VEHICLE_SUB_TYPE m_vehicleSubType;
     INPUT_TYPE m_inputType;
     ESC_TYPE m_escType;
+
+    GPS_SETTING m_gpsSetting;
+    RADIO_SETTING m_radioSetting;
 
     bool m_levellingPerformed;
     accelGyroBias m_levellingBias;

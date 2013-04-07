@@ -35,7 +35,7 @@ through serial or USB)</string>
      <item>
       <widget class="QPushButton" name="bootButton">
        <property name="enabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="toolTip">
         <string>Boots the system.
@@ -53,7 +53,7 @@ menu on the right.</string>
      <item>
       <widget class="QPushButton" name="safeBootButton">
        <property name="enabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="toolTip">
         <string>Boots the system into safe mode (ie. default HwSettings).
@@ -71,15 +71,10 @@ menu on the right.</string>
      <item>
       <widget class="QPushButton" name="eraseBootButton">
        <property name="enabled">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="toolTip">
-        <string>Reboot the board and clear its settings memory.
-        Useful if the board cannot boot properly.
-        Blue led starts blinking quick for 20-30 seconds than the board will start normally
-
-If telemetry is not running, select the link using the dropdown
-menu on the right.</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and earlier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>Erase settings</string>

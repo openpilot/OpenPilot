@@ -140,8 +140,13 @@ void UploaderGadgetWidget::bootButtonsSetEnable(bool enabled)
 {
     m_config->bootButton->setEnabled(enabled);
     m_config->safeBootButton->setEnabled(enabled);
-    m_config->eraseBootButton->setEnabled(enabled);
-}
+
+
+		m_config->eraseBootButton->setEnabled(
+					enabled &&
+					// this feature is supported only on BL revision >= 4
+					((dfu != NULL) && (dfu->devices[0].BL_Version >= 4)));
+	}
 
 void UploaderGadgetWidget::onPhisicalHWConnect()
 {

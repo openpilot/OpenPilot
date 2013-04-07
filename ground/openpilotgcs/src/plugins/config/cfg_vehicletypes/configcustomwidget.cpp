@@ -26,9 +26,6 @@
  */
 #include "configcustomwidget.h"
 #include "mixersettings.h"
-//#include "systemsettings.h"
-//#include "actuatorsettings.h"
-//#include "actuatorcommand.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -41,7 +38,14 @@
 #include <math.h>
 #include <QMessageBox>
 
-//const QString ConfigCustomWidget::CHANNELBOXNAME = QString("multiMotorChannelBox");
+QStringList ConfigCustomWidget::getChannelDescriptions()
+{
+    QStringList channelDesc;
+    for (int i = 0; i < (int) (VehicleConfig::CHANNEL_NUMELEM); i++) {
+        channelDesc.append(QString("-"));
+    }
+    return channelDesc;
+}
 
 ConfigCustomWidget::ConfigCustomWidget(QWidget *parent) :
         VehicleConfig(parent), m_aircraft(new Ui_CustomConfigWidget())
@@ -74,83 +78,10 @@ ConfigCustomWidget::~ConfigCustomWidget()
 void ConfigCustomWidget::setupUI(QString frameType)
 {
     Q_ASSERT(m_aircraft);
-
-    m_aircraft->customMixerTable->resizeColumnsToContents();
-
-    for (int i = 0; i < (int) (VehicleConfig::CHANNEL_NUMELEM); i++) {
-        m_aircraft->customMixerTable->setColumnWidth(i,
-                (m_aircraft->customMixerTable->width() - m_aircraft->customMixerTable->verticalHeader()->width()) / 10);
-    }
-}
-
-QStringList ConfigCustomWidget::getChannelDescriptions()
-{
-    QStringList channelDesc;
-
-    for (int i = 0; i < (int) (VehicleConfig::CHANNEL_NUMELEM); i++) {
-        channelDesc.append(QString("-"));
-    }
-
-    return channelDesc;
 }
 
 void ConfigCustomWidget::resetActuators(GUIConfigDataUnion *configData)
 {
-
-}
-
-/**
- Helper function to update the UI widget objects
- */
-QString ConfigCustomWidget::updateConfigObjectsFromWidgets()
-{
-    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
-    Q_ASSERT(mixer);
-
-    setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->customThrottle1Curve->getCurve());
-    setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, m_aircraft->customThrottle2Curve->getCurve());
-
-    // Update the table:
-    for (int channel = 0; channel < (int) (VehicleConfig::CHANNEL_NUMELEM); channel++) {
-        QComboBox* q = (QComboBox*) m_aircraft->customMixerTable->cellWidget(0, channel);
-        if (q->currentText() == "Disabled") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_DISABLED);
-        } else if (q->currentText() == "Motor") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_MOTOR);
-        } else if (q->currentText() == "Servo") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
-        } else if (q->currentText() == "CameraRoll") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_CAMERAROLL);
-        } else if (q->currentText() == "CameraPitch") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_CAMERAPITCH);
-        } else if (q->currentText() == "CameraYaw") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_CAMERAYAW);
-        } else if (q->currentText() == "Accessory0") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY0);
-        } else if (q->currentText() == "Accessory1") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY1);
-        } else if (q->currentText() == "Accessory2") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY2);
-        } else if (q->currentText() == "Accessory3") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY3);
-        } else if (q->currentText() == "Accessory4") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY4);
-        } else if (q->currentText() == "Accessory5") {
-            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY5);
-        }
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1,
-                m_aircraft->customMixerTable->item(1, channel)->text().toDouble());
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2,
-                m_aircraft->customMixerTable->item(2, channel)->text().toDouble());
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL,
-                m_aircraft->customMixerTable->item(3, channel)->text().toDouble());
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH,
-                m_aircraft->customMixerTable->item(4, channel)->text().toDouble());
-        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW,
-                m_aircraft->customMixerTable->item(5, channel)->text().toDouble());
-    }
-
-    return "Custom";
 }
 
 /**
@@ -159,6 +90,8 @@ QString ConfigCustomWidget::updateConfigObjectsFromWidgets()
 void ConfigCustomWidget::refreshWidgetsValues(QString frameType)
 {
     Q_ASSERT(m_aircraft);
+
+    setupUI(frameType);
 
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
@@ -220,6 +153,60 @@ void ConfigCustomWidget::refreshWidgetsValues(QString frameType)
 }
 
 /**
+ Helper function to
+ */
+QString ConfigCustomWidget::updateConfigObjectsFromWidgets()
+{
+    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->customThrottle1Curve->getCurve());
+    setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, m_aircraft->customThrottle2Curve->getCurve());
+
+    // Update the table:
+    for (int channel = 0; channel < (int) (VehicleConfig::CHANNEL_NUMELEM); channel++) {
+        QComboBox* q = (QComboBox*) m_aircraft->customMixerTable->cellWidget(0, channel);
+        if (q->currentText() == "Disabled") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_DISABLED);
+        } else if (q->currentText() == "Motor") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_MOTOR);
+        } else if (q->currentText() == "Servo") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+        } else if (q->currentText() == "CameraRoll") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_CAMERAROLL);
+        } else if (q->currentText() == "CameraPitch") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_CAMERAPITCH);
+        } else if (q->currentText() == "CameraYaw") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_CAMERAYAW);
+        } else if (q->currentText() == "Accessory0") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY0);
+        } else if (q->currentText() == "Accessory1") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY1);
+        } else if (q->currentText() == "Accessory2") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY2);
+        } else if (q->currentText() == "Accessory3") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY3);
+        } else if (q->currentText() == "Accessory4") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY4);
+        } else if (q->currentText() == "Accessory5") {
+            setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_ACCESSORY5);
+        }
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1,
+                m_aircraft->customMixerTable->item(1, channel)->text().toDouble());
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE2,
+                m_aircraft->customMixerTable->item(2, channel)->text().toDouble());
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL,
+                m_aircraft->customMixerTable->item(3, channel)->text().toDouble());
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH,
+                m_aircraft->customMixerTable->item(4, channel)->text().toDouble());
+        setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW,
+                m_aircraft->customMixerTable->item(5, channel)->text().toDouble());
+    }
+
+    return "Custom";
+}
+
+/**
  This function displays text and color formatting in order to help the user understand what channels have not yet been configured.
  */
 bool ConfigCustomWidget::throwConfigError(int numMotors)
@@ -238,7 +225,8 @@ void ConfigCustomWidget::showEvent(QShowEvent *event)
     int channelCount = (int) VehicleConfig::CHANNEL_NUMELEM;
     for (int i = 0; i < channelCount; i++) {
         m_aircraft->customMixerTable->setColumnWidth(i,
-                (m_aircraft->customMixerTable->width() - m_aircraft->customMixerTable->verticalHeader()->width()) / channelCount);
+                (m_aircraft->customMixerTable->width() - m_aircraft->customMixerTable->verticalHeader()->width())
+                        / channelCount);
     }
 }
 
@@ -253,7 +241,8 @@ void ConfigCustomWidget::resizeEvent(QResizeEvent *event)
     int channelCount = (int) VehicleConfig::CHANNEL_NUMELEM;
     for (int i = 0; i < channelCount; i++) {
         m_aircraft->customMixerTable->setColumnWidth(i,
-                (m_aircraft->customMixerTable->width() - m_aircraft->customMixerTable->verticalHeader()->width()) / channelCount);
+                (m_aircraft->customMixerTable->width() - m_aircraft->customMixerTable->verticalHeader()->width())
+                        / channelCount);
     }
 }
 

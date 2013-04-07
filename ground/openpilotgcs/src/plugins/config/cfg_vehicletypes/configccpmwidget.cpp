@@ -285,6 +285,61 @@ void ConfigCcpmWidget::resetActuators(GUIConfigDataUnion *configData)
     configData->heli.ServoIndexZ = 0;
 }
 
+void ConfigCcpmWidget::refreshWidgetsValues(QString frameType)
+{
+    Q_UNUSED(frameType);
+
+    setupUI(frameType);
+
+    GUIConfigDataUnion config = GetConfigData();
+
+    //swashplate config
+    setComboCurrentIndex( m_aircraft->ccpmType, m_aircraft->ccpmType->count() - (config.heli.SwashplateType +1));
+    setComboCurrentIndex(m_aircraft->ccpmSingleServo, config.heli.FirstServoIndex);
+
+    //ccpm mixing options
+    m_aircraft->ccpmCollectivePassthrough->setChecked(config.heli.ccpmCollectivePassthroughState);
+    m_aircraft->ccpmLinkCyclic->setChecked(config.heli.ccpmLinkCyclicState);
+    m_aircraft->ccpmLinkRoll->setChecked(config.heli.ccpmLinkRollState);
+
+    //correction angle
+    m_aircraft->ccpmCorrectionAngle->setValue(config.heli.CorrectionAngle);
+
+    //update sliders
+    m_aircraft->ccpmCollectiveScale->setValue(config.heli.SliderValue0);
+    m_aircraft->ccpmCollectiveScaleBox->setValue(config.heli.SliderValue0);
+    m_aircraft->ccpmCyclicScale->setValue(config.heli.SliderValue1);
+    m_aircraft->ccpmCyclicScaleBox->setValue(config.heli.SliderValue1);
+    m_aircraft->ccpmPitchScale->setValue(config.heli.SliderValue1);
+    m_aircraft->ccpmPitchScaleBox->setValue(config.heli.SliderValue1);
+    m_aircraft->ccpmRollScale->setValue(config.heli.SliderValue2);
+    m_aircraft->ccpmRollScaleBox->setValue(config.heli.SliderValue2);
+    m_aircraft->ccpmCollectiveSlider->setValue(config.heli.SliderValue0);
+    m_aircraft->ccpmCollectivespinBox->setValue(config.heli.SliderValue0);
+
+    //servo assignments
+    setComboCurrentIndex(m_aircraft->ccpmServoWChannel, config.heli.ServoIndexW);
+    setComboCurrentIndex( m_aircraft->ccpmServoXChannel,config.heli.ServoIndexX);
+    setComboCurrentIndex( m_aircraft->ccpmServoYChannel,config.heli.ServoIndexY);
+    setComboCurrentIndex( m_aircraft->ccpmServoZChannel,config.heli.ServoIndexZ);
+
+    //throttle
+    setComboCurrentIndex( m_aircraft->ccpmEngineChannel, config.heli.Throttle);
+    //tail
+    setComboCurrentIndex( m_aircraft->ccpmTailChannel, config.heli.Tail);
+
+    getMixer();
+}
+
+QString ConfigCcpmWidget::updateConfigObjectsFromWidgets()
+{
+    QString airframeType = updateConfigObjects();
+
+    setMixer();
+
+    return airframeType;
+}
+
 void ConfigCcpmWidget::UpdateType()
 {
     int TypeInt, SingleServoIndex, NumServosDefined;
@@ -754,59 +809,6 @@ QString ConfigCcpmWidget::updateConfigObjects()
 
     updatingFromHardware = FALSE;
     return airframeType;
-}
-
-QString ConfigCcpmWidget::updateConfigObjectsFromWidgets()
-{
-    QString airframeType = updateConfigObjects();
-
-    setMixer();
-
-    return airframeType;
-}
-
-void ConfigCcpmWidget::refreshWidgetsValues(QString frameType)
-{
-    Q_UNUSED(frameType);
-
-    GUIConfigDataUnion config = GetConfigData();
-
-    //swashplate config
-    setComboCurrentIndex( m_aircraft->ccpmType, m_aircraft->ccpmType->count() - (config.heli.SwashplateType +1));
-    setComboCurrentIndex(m_aircraft->ccpmSingleServo, config.heli.FirstServoIndex);
-    
-    //ccpm mixing options
-    m_aircraft->ccpmCollectivePassthrough->setChecked(config.heli.ccpmCollectivePassthroughState);
-    m_aircraft->ccpmLinkCyclic->setChecked(config.heli.ccpmLinkCyclicState);
-    m_aircraft->ccpmLinkRoll->setChecked(config.heli.ccpmLinkRollState);
-    
-    //correction angle
-    m_aircraft->ccpmCorrectionAngle->setValue(config.heli.CorrectionAngle);
-        
-    //update sliders
-    m_aircraft->ccpmCollectiveScale->setValue(config.heli.SliderValue0);
-    m_aircraft->ccpmCollectiveScaleBox->setValue(config.heli.SliderValue0);
-    m_aircraft->ccpmCyclicScale->setValue(config.heli.SliderValue1);
-    m_aircraft->ccpmCyclicScaleBox->setValue(config.heli.SliderValue1);
-    m_aircraft->ccpmPitchScale->setValue(config.heli.SliderValue1);
-    m_aircraft->ccpmPitchScaleBox->setValue(config.heli.SliderValue1);
-    m_aircraft->ccpmRollScale->setValue(config.heli.SliderValue2);
-    m_aircraft->ccpmRollScaleBox->setValue(config.heli.SliderValue2);
-    m_aircraft->ccpmCollectiveSlider->setValue(config.heli.SliderValue0);
-    m_aircraft->ccpmCollectivespinBox->setValue(config.heli.SliderValue0);
-    
-    //servo assignments
-    setComboCurrentIndex(m_aircraft->ccpmServoWChannel, config.heli.ServoIndexW);
-    setComboCurrentIndex( m_aircraft->ccpmServoXChannel,config.heli.ServoIndexX);
-    setComboCurrentIndex( m_aircraft->ccpmServoYChannel,config.heli.ServoIndexY);
-    setComboCurrentIndex( m_aircraft->ccpmServoZChannel,config.heli.ServoIndexZ);
-
-    //throttle
-    setComboCurrentIndex( m_aircraft->ccpmEngineChannel, config.heli.Throttle);
-    //tail
-    setComboCurrentIndex( m_aircraft->ccpmTailChannel, config.heli.Tail);
-
-    getMixer();
 }
 
 void ConfigCcpmWidget::SetUIComponentVisibilities()

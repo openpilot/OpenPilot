@@ -54,19 +54,17 @@ public:
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
 
-public slots:
-    virtual void setupUI(QString airframeType);
-
 private:
-    virtual void resetActuators(GUIConfigDataUnion *configData);
-
     Ui_GroundConfigWidget *m_aircraft;
+
+    virtual void resetActuators(GUIConfigDataUnion *configData);
 
     bool setupGroundVehicleCar(QString airframeType);
     bool setupGroundVehicleDifferential(QString airframeType);
     bool setupGroundVehicleMotorcycle(QString airframeType);
 
 private slots:
+    virtual void setupUI(QString airframeType);
     virtual bool throwConfigError(QString airframeType);
 
 };

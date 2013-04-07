@@ -138,7 +138,7 @@ void VehicleConfig::setComboCurrentIndex(QComboBox *box, int index)
 
 /**
   Helper function:
-  enables/disables the named comboboxes within supplied uiowner
+  enables/disables the named comboboxes within supplied owner
  */
 void VehicleConfig::enableComboBoxes(QWidget *owner, QString boxName, int boxCount, bool enable)
 {

@@ -46,7 +46,6 @@ class ConfigCustomWidget: public VehicleConfig
     Q_OBJECT
 
 public:
-
     static QStringList getChannelDescriptions();
 
     ConfigCustomWidget(QWidget *parent = 0);
@@ -55,23 +54,18 @@ public:
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
 
-public slots:
-    virtual void setupUI(QString airframeType);
-
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
 
 private:
-    virtual void resetActuators(GUIConfigDataUnion *configData);
-
     Ui_CustomConfigWidget *m_aircraft;
 
-private slots:
-    virtual bool throwConfigError(int numMotors);
+    virtual void resetActuators(GUIConfigDataUnion *configData);
 
-//signals:
-//    void configurationChanged();
+private slots:
+    virtual void setupUI(QString airframeType);
+    virtual bool throwConfigError(int numMotors);
 
 };
 

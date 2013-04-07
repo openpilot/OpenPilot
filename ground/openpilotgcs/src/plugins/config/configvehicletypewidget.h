@@ -43,9 +43,14 @@ class ConfigVehicleTypeWidget: public ConfigTaskWidget
 
 public:
     static QStringList getChannelDescriptions();
+    static void setComboCurrentIndex(QComboBox *box, int index);
 
     ConfigVehicleTypeWidget(QWidget *parent = 0);
     ~ConfigVehicleTypeWidget();
+
+public slots:
+    virtual void refreshWidgetsValues(UAVObject *o = NULL);
+    virtual void updateObjectsFromWidgets();
 
 private:
     Ui_AircraftWidget *m_aircraft;
@@ -57,10 +62,8 @@ private:
     VehicleConfig *m_custom;
 
     void updateFeedForwardUI();
-    void resetField(UAVObjectField *field);
 
-    QString frameCategory1(QString frameType);
-    QString frameCategory2(QString frameType);
+    QString frameCategory(QString frameType);
 
     QStringList channelNames;
     QStringList mixerTypes;
@@ -71,16 +74,6 @@ private:
     UAVObject::Metadata accInitialData;
 
 private slots:
-
-    virtual void refreshWidgetsValues(UAVObject *o = NULL);
-    virtual void updateObjectsFromWidgets();
-
-    void setComboCurrentIndex(QComboBox *box, int index);
-
-    void setupAirframeUI(QString type);
-    // TODO ?
-    void switchAirframeType(int index);
-
     void enableFFTest();
     void openHelp();
 

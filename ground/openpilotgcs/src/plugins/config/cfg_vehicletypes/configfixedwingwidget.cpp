@@ -25,7 +25,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configfixedwingwidget.h"
-//#include "configvehicletypewidget.h"
 #include "mixersettings.h"
 #include "systemsettings.h"
 #include "actuatorsettings.h"
@@ -41,6 +40,41 @@
 #include <math.h>
 #include <QMessageBox>
 
+QStringList ConfigFixedWingWidget::getChannelDescriptions()
+{
+    // init a channel_numelem list of channel desc defaults
+    QStringList channelDesc;
+    for (int i = 0; i < (int) (ConfigFixedWingWidget::CHANNEL_NUMELEM); i++) {
+        channelDesc.append(QString("-"));
+    }
+
+    // get the gui config data
+    GUIConfigDataUnion configData = GetConfigData();
+
+    if (configData.fixedwing.FixedWingPitch1 > 0) {
+        channelDesc[configData.fixedwing.FixedWingPitch1 - 1] = QString("FixedWingPitch1");
+    }
+    if (configData.fixedwing.FixedWingPitch2 > 0) {
+        channelDesc[configData.fixedwing.FixedWingPitch2 - 1] = QString("FixedWingPitch2");
+    }
+    if (configData.fixedwing.FixedWingRoll1 > 0) {
+        channelDesc[configData.fixedwing.FixedWingRoll1 - 1] = QString("FixedWingRoll1");
+    }
+    if (configData.fixedwing.FixedWingRoll2 > 0) {
+        channelDesc[configData.fixedwing.FixedWingRoll2 - 1] = QString("FixedWingRoll2");
+    }
+    if (configData.fixedwing.FixedWingYaw1 > 0) {
+        channelDesc[configData.fixedwing.FixedWingYaw1 - 1] = QString("FixedWingYaw1");
+    }
+    if (configData.fixedwing.FixedWingYaw2 > 0) {
+        channelDesc[configData.fixedwing.FixedWingYaw2 - 1] = QString("FixedWingYaw2");
+    }
+    if (configData.fixedwing.FixedWingThrottle > 0) {
+        channelDesc[configData.fixedwing.FixedWingThrottle - 1] = QString("FixedWingThrottle");
+    }
+    return channelDesc;
+}
+
 ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
         VehicleConfig(parent), m_aircraft(new Ui_FixedWingConfigWidget())
 {
@@ -51,7 +85,9 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
     m_aircraft->fixedWingType->addItems(fixedWingTypes);
 
     // Set default model to "Elevator aileron rudder"
-    m_aircraft->fixedWingType->setCurrentIndex(0);
+    m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
+
+    setupUI(m_aircraft->fixedWingType->currentText());
 
     connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
 }
@@ -141,38 +177,6 @@ void ConfigFixedWingWidget::resetActuators(GUIConfigDataUnion *configData)
     configData->fixedwing.FixedWingThrottle = 0;
 }
 
-QStringList ConfigFixedWingWidget::getChannelDescriptions()
-{
-    int i;
-    QStringList channelDesc;
-
-    // init a channel_numelem list of channel desc defaults
-    for (i=0; i < (int)(ConfigFixedWingWidget::CHANNEL_NUMELEM); i++)
-    {
-        channelDesc.append(QString("-"));
-    }
-
-    // get the gui config data
-    GUIConfigDataUnion configData = GetConfigData();
-
-    if (configData.fixedwing.FixedWingPitch1 > 0)
-        channelDesc[configData.fixedwing.FixedWingPitch1-1] = QString("FixedWingPitch1");
-    if (configData.fixedwing.FixedWingPitch2 > 0)
-        channelDesc[configData.fixedwing.FixedWingPitch2-1] = QString("FixedWingPitch2");
-    if (configData.fixedwing.FixedWingRoll1 > 0)
-        channelDesc[configData.fixedwing.FixedWingRoll1-1] = QString("FixedWingRoll1");
-    if (configData.fixedwing.FixedWingRoll2 > 0)
-        channelDesc[configData.fixedwing.FixedWingRoll2-1] = QString("FixedWingRoll2");
-    if (configData.fixedwing.FixedWingYaw1 > 0)
-        channelDesc[configData.fixedwing.FixedWingYaw1-1] = QString("FixedWingYaw1");
-    if (configData.fixedwing.FixedWingYaw2 > 0)
-        channelDesc[configData.fixedwing.FixedWingYaw2-1] = QString("FixedWingYaw2");
-    if (configData.fixedwing.FixedWingThrottle > 0)
-        channelDesc[configData.fixedwing.FixedWingThrottle-1] = QString("FixedWingThrottle");
-
-    return channelDesc;
-}
-
 /**
  Virtual function to update the UI widget objects
  */
@@ -205,13 +209,14 @@ QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
 	return airframeType;
 }
 
-
 /**
  Virtual function to refresh the UI widget values
  */
 void ConfigFixedWingWidget::refreshWidgetsValues(QString frameType)
 {
     Q_ASSERT(m_aircraft);
+
+    setupUI(frameType);
 
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);

@@ -57,7 +57,6 @@ class ConfigCcpmWidget: public VehicleConfig
     Q_OBJECT
 
 public:
-
     static QStringList getChannelDescriptions();
 
     ConfigCcpmWidget(QWidget *parent = 0);
@@ -67,7 +66,6 @@ public:
     virtual QString updateConfigObjectsFromWidgets();
 
 public slots:
-    virtual void setupUI(QString airframeType);
     void getMixer();
     void setMixer();
     void saveccpmUpdate();
@@ -77,8 +75,6 @@ protected:
     void resizeEvent(QResizeEvent *event);
 
 private:
-    virtual void resetActuators(GUIConfigDataUnion *configData);
-
     Ui_CcpmConfigWidget *m_aircraft;
 
     QGraphicsSvgItem *SwashplateImg;
@@ -100,17 +96,19 @@ private:
     SwashplateServoSettingsStruct newSwashLvlConfiguration;
 
     int MixerChannelData[6];
+
+    virtual void resetActuators(GUIConfigDataUnion *configData);
+
     int ShowDisclaimer(int messageID);
     virtual void enableControls(bool enable) { Q_UNUSED(enable) }; // Not used by this widget
 
     bool updatingFromHardware;
     bool updatingToHardware;
 
-    // TODO ?
     QString updateConfigObjects();
 
 private slots:
-    // TODO ?
+    virtual void setupUI(QString airframeType);
     virtual bool throwConfigError(QString airframeType);
 
     void ccpmSwashplateUpdate();
@@ -131,7 +129,6 @@ private slots:
     void enableSwashplateLevellingControl(bool state);
     void setSwashplateLevel(int percent);
     void SwashLvlSpinBoxChanged(int value);
-    // TODO ?
     virtual void refreshValues() {}; // Not used
 };
 

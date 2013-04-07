@@ -41,11 +41,11 @@ typedef struct {
     uint VTOLMotorNW:4;
     uint VTOLMotorNE:4;
     uint VTOLMotorSW:4;
-    uint VTOLMotorSE:4;         //32bits
+    uint VTOLMotorSE:4; // 32 bits
     uint TRIYaw:4;
-    quint32 padding:28;         //64bits
+    quint32 padding:28; // 64 bits
     quint32 padding1;
-    quint32 padding2;       //128bits
+    quint32 padding2; // 128 bits
 } __attribute__((packed))  multiGUISettingsStruct;
 
 typedef struct {
@@ -57,15 +57,15 @@ typedef struct {
     uint ccpmLinkRollState:1;
     uint SliderValue0:7;
     uint SliderValue1:7;
-    uint SliderValue2:7;//41bits
+    uint SliderValue2:7; // 41 bits
     uint ServoIndexW:4;
     uint ServoIndexX:4;
     uint ServoIndexY:4;
-    uint ServoIndexZ:4;//57bits
+    uint ServoIndexZ:4; // 57 bits
     uint Throttle:4;
-    uint Tail:4;       //65bits
-    quint32 padding:31;  //96bits
-    quint32 padding1;  //128bits
+    uint Tail:4; // 65bits
+    quint32 padding:31; // 96 bits
+    quint32 padding1; // 128 bits
 } __attribute__((packed))  heliGUISettingsStruct;
 
 typedef struct {
@@ -76,10 +76,10 @@ typedef struct {
     uint FixedWingPitch2:4;
     uint FixedWingYaw1:4;
     uint FixedWingYaw2:4;
-    uint padding:4;         //32bits
+    uint padding:4; // 32 bits
     quint32 padding1;
     quint32 padding2;
-    quint32 padding3;       //128bits
+    quint32 padding3; // 128 bits
 } __attribute__((packed))  fixedGUISettingsStruct;
 
 typedef struct {
@@ -87,16 +87,16 @@ typedef struct {
     uint GroundVehicleThrottle2:4;
     uint GroundVehicleSteering1:4;
     uint GroundVehicleSteering2:4;
-    uint padding:16;         //32bits
+    uint padding:16; // 32 bits
     quint32 padding1;
     quint32 padding2;
-    quint32 padding3;       //128bits
+    quint32 padding3; // 128 bits
 } __attribute__((packed))  groundGUISettingsStruct;
 
 typedef union
 {
-    uint                    UAVObject[4];   //32bits * 4
-    heliGUISettingsStruct   heli;           //128bits
+    uint                    UAVObject[4]; // 32 bits * 4
+    heliGUISettingsStruct   heli; // 128 bits
     fixedGUISettingsStruct  fixedwing;
     multiGUISettingsStruct  multi;
     groundGUISettingsStruct ground;
@@ -145,6 +145,7 @@ public:
     static void SetConfigData(GUIConfigDataUnion configData);
 
     static void resetField(UAVObjectField *field);
+
     static void setComboCurrentIndex(QComboBox *box, int index);
     static void enableComboBoxes(QWidget *owner, QString boxName, int boxCount, bool enable);
 
@@ -170,9 +171,6 @@ public:
     double  getCurveMin(QList<double> *curve);
     double  getCurveMax(QList<double> *curve);
 
-public slots:
-    virtual void setupUI(QString airframeType);
-
 protected:
     QStringList channelNames;
     QStringList mixerTypes;
@@ -183,6 +181,9 @@ private:
     static UAVObjectManager *getUAVObjectManager();
 
     virtual void resetActuators(GUIConfigDataUnion *configData);
+
+private slots:
+    virtual void setupUI(QString airframeType);
 
 };
 

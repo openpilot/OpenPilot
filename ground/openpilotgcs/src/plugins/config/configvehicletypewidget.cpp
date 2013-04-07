@@ -44,6 +44,62 @@
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
 
+/**
+  Static function to get currently assigned channelDescriptions
+  for all known vehicle types;  instantiates the appropriate object
+  then asks it to supply channel descs
+  */
+QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectManager *objMngr = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(objMngr);
+
+    // get an instance of systemsettings
+    SystemSettings *systemSettings = SystemSettings::GetInstance(objMngr);
+    Q_ASSERT(systemSettings);
+    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
+
+    QStringList channelDesc;
+    switch (systemSettingsData.AirframeType) {
+    case SystemSettings::AIRFRAMETYPE_FIXEDWING:
+    case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
+    case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
+        // fixed wing
+        channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
+        break;
+    case SystemSettings::AIRFRAMETYPE_HELICP:
+        // helicp
+        channelDesc = ConfigCcpmWidget::getChannelDescriptions();
+        break;
+    case SystemSettings::AIRFRAMETYPE_VTOL:
+    case SystemSettings::AIRFRAMETYPE_TRI:
+    case SystemSettings::AIRFRAMETYPE_QUADX:
+    case SystemSettings::AIRFRAMETYPE_QUADP:
+    case SystemSettings::AIRFRAMETYPE_OCTOV:
+    case SystemSettings::AIRFRAMETYPE_OCTOCOAXX:
+    case SystemSettings::AIRFRAMETYPE_OCTOCOAXP:
+    case SystemSettings::AIRFRAMETYPE_OCTO:
+    case SystemSettings::AIRFRAMETYPE_HEXAX:
+    case SystemSettings::AIRFRAMETYPE_HEXACOAX:
+    case SystemSettings::AIRFRAMETYPE_HEXA:
+        // multirotor
+        channelDesc = ConfigMultiRotorWidget::getChannelDescriptions();
+        break;
+    case SystemSettings::AIRFRAMETYPE_GROUNDVEHICLECAR:
+    case SystemSettings::AIRFRAMETYPE_GROUNDVEHICLEDIFFERENTIAL:
+    case SystemSettings::AIRFRAMETYPE_GROUNDVEHICLEMOTORCYCLE:
+        // ground
+        channelDesc = ConfigGroundVehicleWidget::getChannelDescriptions();
+        break;
+    default:
+        channelDesc = ConfigCustomWidget::getChannelDescriptions();
+        break;
+    }
+
+    return channelDesc;
+}
+
 ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_aircraft = new Ui_AircraftWidget();
@@ -115,7 +171,7 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     }
 
 	// Connect aircraft type selection dropbox to callback function
-    connect(m_aircraft->aircraftType, SIGNAL(currentIndexChanged(int)), this, SLOT(switchAirframeType(int)));
+    connect(m_aircraft->aircraftType, SIGNAL(currentIndexChanged(int)), m_aircraft->airframesWidget, SLOT(setCurrentIndex(int)));
 	
     // Connect the three feed forward test checkboxes
     connect(m_aircraft->ffTestBox1, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
@@ -132,7 +188,6 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     disableMouseWheelEvents();
 }
 
-
 /**
  Destructor
  */
@@ -142,75 +197,206 @@ ConfigVehicleTypeWidget::~ConfigVehicleTypeWidget()
 }
 
 /**
-  Static function to get currently assigned channelDescriptions
-  for all known vehicle types;  instantiates the appropriate object
-  then asks it to supply channel descs
-  */
-QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
-{    
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectManager *objMngr = pm->getObject<UAVObjectManager>();
-    Q_ASSERT(objMngr);
-
-    // get an instance of systemsettings
-    SystemSettings *systemSettings = SystemSettings::GetInstance(objMngr);
-    Q_ASSERT(systemSettings);
-    SystemSettings::DataFields systemSettingsData = systemSettings->getData();
-
-    QStringList channelDesc;
-    switch (systemSettingsData.AirframeType) {
-    case SystemSettings::AIRFRAMETYPE_FIXEDWING:
-    case SystemSettings::AIRFRAMETYPE_FIXEDWINGELEVON:
-    case SystemSettings::AIRFRAMETYPE_FIXEDWINGVTAIL:
-        // fixed wing
-        channelDesc = ConfigFixedWingWidget::getChannelDescriptions();
-        break;
-    case SystemSettings::AIRFRAMETYPE_HELICP:
-        // helicp
-        channelDesc = ConfigCcpmWidget::getChannelDescriptions();
-        break;
-    case SystemSettings::AIRFRAMETYPE_VTOL:
-    case SystemSettings::AIRFRAMETYPE_TRI:
-    case SystemSettings::AIRFRAMETYPE_QUADX:
-    case SystemSettings::AIRFRAMETYPE_QUADP:
-    case SystemSettings::AIRFRAMETYPE_OCTOV:
-    case SystemSettings::AIRFRAMETYPE_OCTOCOAXX:
-    case SystemSettings::AIRFRAMETYPE_OCTOCOAXP:
-    case SystemSettings::AIRFRAMETYPE_OCTO:
-    case SystemSettings::AIRFRAMETYPE_HEXAX:
-    case SystemSettings::AIRFRAMETYPE_HEXACOAX:
-    case SystemSettings::AIRFRAMETYPE_HEXA:
-        // multirotor
-        channelDesc = ConfigMultiRotorWidget::getChannelDescriptions();
-        break;
-    case SystemSettings::AIRFRAMETYPE_GROUNDVEHICLECAR:
-    case SystemSettings::AIRFRAMETYPE_GROUNDVEHICLEDIFFERENTIAL:
-    case SystemSettings::AIRFRAMETYPE_GROUNDVEHICLEMOTORCYCLE:
-        // ground
-        channelDesc = ConfigGroundVehicleWidget::getChannelDescriptions();
-        break;
-    default:
-        channelDesc = ConfigCustomWidget::getChannelDescriptions();
-        break;
-    }
-
-    return channelDesc;
-}
-
-
-/**
   Slot for switching the airframe type. We do it explicitely
   rather than a signal in the UI, because we want to force a fitInView of the quad shapes.
   This is because this method (fitinview) only works when the widget is shown.
   */
-void ConfigVehicleTypeWidget::switchAirframeType(int index)
+//void ConfigVehicleTypeWidget::switchAirframeType(int index)
+//{
+//    m_aircraft->airframesWidget->setCurrentIndex(index);
+//}
+
+/**
+  \brief Sets up the mixer depending on Airframe type. Accepts either system settings or
+  combo box entry from airframe type, as those do not overlap.
+  */
+//void ConfigVehicleTypeWidget::setupAirframeUI(QString frameType)
+//{
+//    qDebug() << "ConfigVehicleTypeWidget::setupAirframeUI - begin";
+//    qDebug() << "ConfigVehicleTypeWidget::setupAirframeUI - frame type" << frameType;
+//
+//    bool dirty = isDirty();
+//
+//    QString category = frameCategory2(frameType);
+//    if (category == "FixedWing") {
+//        m_fixedwing->setupUI(frameType);
+//    } else if (category == "Multirotor") {
+//        m_multirotor->setupUI(frameType);
+//    } else if (category == "Helicopter") {
+//        m_heli->setupUI(frameType);
+//    } else if (category == "Ground") {
+//        m_groundvehicle->setupUI(frameType);
+//    } else if (category == "Custom") {
+//        m_custom->setupUI(frameType);
+//    }
+//
+//    setDirty(dirty);
+//
+//    qDebug() << "ConfigVehicleTypeWidget::setupAirframeUI - end";
+//}
+
+/**
+  Refreshes the current value of the SystemSettings which holds the aircraft type
+  */
+void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
 {
-    m_aircraft->airframesWidget->setCurrentIndex(index);
+    Q_UNUSED(o);
+
+    qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - begin";
+
+    if (!allObjectsUpdated()) {
+        return;
+    }
+	
+    bool dirty = isDirty();
+    qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - isDirty:" << dirty;
+	
+    // Get the Airframe type from the system settings:
+    UAVDataObject *system = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
+    Q_ASSERT(system);
+
+    UAVObjectField *field = system->getField(QString("AirframeType"));
+    Q_ASSERT(field);
+
+    // At this stage, we will need to have some hardcoded settings in this code, this
+    // is not ideal, but there you go.
+    QString frameType = field->getValue().toString();
+    qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - frame type:" << frameType;
+    //setupAirframeUI(frameType);
+
+    QString category = "FixedWing";//frameCategory(frameType);
+    if (category == "FixedWing") {
+        // Retrieve fixed wing settings
+        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
+        m_fixedwing->refreshWidgetsValues(frameType);
+    } else if (category == "Multirotor") {
+        // Retrieve multirotor settings
+        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Multirotor"));
+        m_multirotor->refreshWidgetsValues(frameType);
+    } else if (category == "Helicopter") {
+        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Helicopter"));
+        m_heli->refreshWidgetsValues(frameType);
+    } else if (category == "Ground") {
+        // Retrieve ground vehicle settings
+        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Ground"));
+        m_groundvehicle->refreshWidgetsValues(frameType);
+    } else if (category == "Custom") {
+        // Retrieve custom settings
+        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Custom"));
+        m_custom->refreshWidgetsValues(frameType);
+	}	
+	
+    updateFeedForwardUI();
+
+    setDirty(dirty);
+
+    qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - end";
 }
 
-/////////////////////////////////////////////////////////
-/// Feed Forward Testing
-/////////////////////////////////////////////////////////
+//QString ConfigVehicleTypeWidget::frameCategory1(QString frameType)
+//{
+//    QString category;
+//    if (frameType.startsWith("FixedWing")) {
+//        category = "FixedWing";
+//    } else if (frameType == "Tri" || frameType == "QuadX" || frameType == "QuadP" || frameType == "Hexa"
+//            || frameType == "HexaCoax" || frameType == "HexaX" || frameType == "Octo" || frameType == "OctoV"
+//            || frameType == "OctoCoaxP" || frameType == "OctoCoaxX") {
+//        category = "Multirotor";
+//    } else if (frameType == "HeliCP") {
+//        category = "Helicopter";
+//    } else if (frameType.startsWith("GroundVehicle")) {
+//        category = "Ground";
+//    } else {
+//        category = "Custom";
+//    }
+//    return category;
+//}
+
+
+QString ConfigVehicleTypeWidget::frameCategory(QString frameType)
+{
+    QString category;
+    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder" || frameType == "FixedWingElevon"
+            || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
+        category = "FixedWing";
+    } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
+            || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"
+            || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
+            || frameType == "Hexacopter Y6" || frameType == "Octo" || frameType == "Octocopter" || frameType == "OctoV"
+            || frameType == "Octocopter V" || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
+            || frameType == "OctoCoaxX" || frameType == "Octo Coax X") {
+        category = "Multirotor";
+    } else if (frameType == "HeliCP") {
+        category = "Helicopter";
+    } else if (frameType == "GroundVehicleCar" || frameType == "Turnable (car)"
+            || frameType == "GroundVehicleDifferential" || frameType == "Differential (tank)"
+            || frameType == "GroundVehicleMotorcyle" || frameType == "Motorcycle") {
+        category = "Ground";
+    } else {
+        category = "Custom";
+    }
+    return category;
+}
+
+/**
+  Sends the config to the board (airframe type)
+
+  We do all the tasks common to all airframes, or family of airframes, and
+  we call additional methods for specific frames, so that we do not have a code
+  that is too heavy.
+*/
+void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
+{
+    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    QPointer<VehicleConfig> vconfig = new VehicleConfig();
+
+    // Update feed forward settings
+    vconfig->setMixerValue(mixer, "FeedForward", m_aircraft->feedForwardSlider->value() / 100.0);
+    vconfig->setMixerValue(mixer, "AccelTime", m_aircraft->accelTime->value());
+    vconfig->setMixerValue(mixer, "DecelTime", m_aircraft->decelTime->value());
+    vconfig->setMixerValue(mixer, "MaxAccel", m_aircraft->maxAccelSlider->value());
+
+    // Sets airframe type default to "Custom"
+    QString airframeType = "Custom";
+    if (m_aircraft->aircraftType->currentText() == "Fixed Wing") {
+        airframeType = m_fixedwing->updateConfigObjectsFromWidgets();
+    }
+    else if (m_aircraft->aircraftType->currentText() == "Multirotor") {
+         airframeType = m_multirotor->updateConfigObjectsFromWidgets();
+    }
+    else if (m_aircraft->aircraftType->currentText() == "Helicopter") {
+         airframeType = m_heli->updateConfigObjectsFromWidgets();
+    }
+    else if (m_aircraft->aircraftType->currentText() == "Ground") {
+         airframeType = m_groundvehicle->updateConfigObjectsFromWidgets();
+    }
+    else {
+        airframeType = m_custom->updateConfigObjectsFromWidgets();
+    }
+
+    // set the airframe type
+    UAVDataObject *system = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("SystemSettings")));
+    Q_ASSERT(system);
+
+    QPointer<UAVObjectField> field = system->getField(QString("AirframeType"));
+    if (field) {
+        field->setValue(airframeType);
+    }
+
+    updateFeedForwardUI();
+}
+
+/**
+  Reset the contents of a field
+  */
+//void ConfigVehicleTypeWidget::resetField(UAVObjectField *field)
+//{
+//    for (unsigned int i = 0; i < field->getNumElements(); i++) {
+//        field->setValue(0, i);
+//    }
+//}
 
 /**
   Enables and runs feed forward testing
@@ -271,150 +457,6 @@ void ConfigVehicleTypeWidget::enableFFTest()
     }
 }
 
-/**************************
-  * Aircraft settings
-  **************************/
-
-/**
-  Refreshes the current value of the SystemSettings which holds the aircraft type
-  */
-void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
-{
-    Q_UNUSED(o);
-
-    qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - begin";
-
-    if (!allObjectsUpdated()) {
-        return;
-    }
-	
-    bool dirty = isDirty();
-    qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - isDirty:" << dirty;
-	
-    // Get the Airframe type from the system settings:
-    UAVDataObject *system = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
-    Q_ASSERT(system);
-
-    UAVObjectField *field = system->getField(QString("AirframeType"));
-    Q_ASSERT(field);
-
-    // At this stage, we will need to have some hardcoded settings in this code, this
-    // is not ideal, but there you go.
-    QString frameType = field->getValue().toString();
-    qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - frame type:" << frameType;
-    setupAirframeUI(frameType);
-
-    QString category = frameCategory1(frameType);
-    if (category == "FixedWing") {
-        // Retrieve fixed wing settings
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
-        m_fixedwing->refreshWidgetsValues(frameType);
-    } else if (category == "Multirotor") {
-        // Retrieve multirotor settings
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Multirotor"));
-        m_multirotor->refreshWidgetsValues(frameType);
-    } else if (category == "Helicopter") {
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Helicopter"));
-        m_heli->refreshWidgetsValues(frameType);
-    } else if (category == "Ground") {
-        // Retrieve ground vehicle settings
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Ground"));
-        m_groundvehicle->refreshWidgetsValues(frameType);
-    } else if (category == "Custom") {
-        // Retrieve custom settings
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Custom"));
-        m_custom->refreshWidgetsValues(frameType);
-	}	
-	
-    updateFeedForwardUI();
-    setDirty(dirty);
-
-    qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - end";
-}
-
-/**
-  \brief Sets up the mixer depending on Airframe type. Accepts either system settings or
-  combo box entry from airframe type, as those do not overlap.
-  */
-void ConfigVehicleTypeWidget::setupAirframeUI(QString frameType)
-{
-    qDebug() << "ConfigVehicleTypeWidget::setupAirframeUI - begin";
-    qDebug() << "ConfigVehicleTypeWidget::setupAirframeUI - frame type" << frameType;
-    bool dirty = isDirty();
-
-    QString category = frameCategory2(frameType);
-    if (category == "FixedWing") {
-        m_fixedwing->setupUI(frameType);
-    } else if (category == "Multirotor") {
-        m_multirotor->setupUI(frameType);
-    } else if (category == "Helicopter") {
-        m_heli->setupUI(frameType);
-    } else if (category == "Ground") {
-        m_groundvehicle->setupUI(frameType);
-    } else if (category == "Custom") {
-        m_custom->setupUI(frameType);
-    }
-
-    setDirty(dirty);
-    qDebug() << "ConfigVehicleTypeWidget::setupAirframeUI - end";
-}
-
-QString ConfigVehicleTypeWidget::frameCategory1(QString frameType)
-{
-    QString category;
-    if (frameType.startsWith("FixedWing")) {
-        category = "FixedWing";
-    } else if (frameType == "Tri" || frameType == "QuadX" || frameType == "QuadP" || frameType == "Hexa"
-            || frameType == "HexaCoax" || frameType == "HexaX" || frameType == "Octo" || frameType == "OctoV"
-            || frameType == "OctoCoaxP" || frameType == "OctoCoaxX") {
-        category = "Multirotor";
-    } else if (frameType == "HeliCP") {
-        category = "Helicopter";
-    } else if (frameType.startsWith("GroundVehicle")) {
-        category = "Ground";
-    } else {
-        category = "Custom";
-    }
-    return category;
-}
-
-
-QString ConfigVehicleTypeWidget::frameCategory2(QString frameType)
-{
-    QString category;
-    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder" || frameType == "FixedWingElevon"
-            || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
-        category = "FixedWing";
-    } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
-            || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"
-            || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
-            || frameType == "Hexacopter Y6" || frameType == "Octo" || frameType == "Octocopter" || frameType == "OctoV"
-            || frameType == "Octocopter V" || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
-            || frameType == "OctoCoaxX" || frameType == "Octo Coax X") {
-        category = "Multirotor";
-    } else if (frameType == "HeliCP") {
-        category = "Helicopter";
-    } else if (frameType == "GroundVehicleCar" || frameType == "Turnable (car)"
-            || frameType == "GroundVehicleDifferential" || frameType == "Differential (tank)"
-            || frameType == "GroundVehicleMotorcyle" || frameType == "Motorcycle") {
-        category = "Ground";
-    } else {
-        category = "Custom";
-    }
-    return category;
-}
-
-
-/**
-  Reset the contents of a field
-  */
-void ConfigVehicleTypeWidget::resetField(UAVObjectField * field)
-{
-    for (unsigned int i = 0; i < field->getNumElements(); i++) {
-        field->setValue(0, i);
-    }
-}
-
 /**
   Updates the custom airframe settings based on the current airframe.
 
@@ -422,7 +464,7 @@ void ConfigVehicleTypeWidget::resetField(UAVObjectField * field)
   */
 // TODO rename to FF
 void ConfigVehicleTypeWidget::updateFeedForwardUI()
-{    
+{
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
 
@@ -433,56 +475,6 @@ void ConfigVehicleTypeWidget::updateFeedForwardUI()
     m_aircraft->accelTime->setValue(vconfig->getMixerValue(mixer,"AccelTime"));
     m_aircraft->decelTime->setValue(vconfig->getMixerValue(mixer,"DecelTime"));
     m_aircraft->maxAccelSlider->setValue(vconfig->getMixerValue(mixer,"MaxAccel"));
-}
-
-/**
-  Sends the config to the board (airframe type)
-
-  We do all the tasks common to all airframes, or family of airframes, and
-  we call additional methods for specific frames, so that we do not have a code
-  that is too heavy.
-*/
-void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
-{
-    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
-    Q_ASSERT(mixer);
-
-    QPointer<VehicleConfig> vconfig = new VehicleConfig();
-
-    // Update feed forward settings
-    vconfig->setMixerValue(mixer, "FeedForward", m_aircraft->feedForwardSlider->value() / 100.0);
-    vconfig->setMixerValue(mixer, "AccelTime", m_aircraft->accelTime->value());
-    vconfig->setMixerValue(mixer, "DecelTime", m_aircraft->decelTime->value());
-    vconfig->setMixerValue(mixer, "MaxAccel", m_aircraft->maxAccelSlider->value());
-
-    // Sets airframe type default to "Custom"
-    QString airframeType = "Custom";
-    if (m_aircraft->aircraftType->currentText() == "Fixed Wing") {
-        airframeType = m_fixedwing->updateConfigObjectsFromWidgets();
-    }
-    else if (m_aircraft->aircraftType->currentText() == "Multirotor") {
-         airframeType = m_multirotor->updateConfigObjectsFromWidgets();
-    }
-    else if (m_aircraft->aircraftType->currentText() == "Helicopter") {
-         airframeType = m_heli->updateConfigObjectsFromWidgets();
-    }
-    else if (m_aircraft->aircraftType->currentText() == "Ground") {
-         airframeType = m_groundvehicle->updateConfigObjectsFromWidgets();
-    }
-    else {
-        airframeType = m_custom->updateConfigObjectsFromWidgets();
-    }
-
-    // set the airframe type
-    UAVDataObject *system = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("SystemSettings")));
-    Q_ASSERT(system);
-
-    QPointer<UAVObjectField> field = system->getField(QString("AirframeType"));
-    if (field) {
-        field->setValue(airframeType);
-    }
-
-    updateFeedForwardUI();
 }
 
 /**

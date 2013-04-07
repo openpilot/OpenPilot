@@ -173,7 +173,7 @@ void drawCircle(uint16_t x0, uint16_t y0, uint16_t radius) {
 	  write_pixel_lm(x0, y0 - radius,1,1);
 	  write_pixel_lm(x0 + radius, y0,1,1);
 	  write_pixel_lm(x0 - radius, y0,1,1);
-
+
 	  while(x < y)
 	  {
 	    // ddF_x == 2 * x + 1;

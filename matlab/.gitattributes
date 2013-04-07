@@ -1,0 +1,6 @@
+#
+# Matlab files have LF line endings
+#
+
+*.m		text eol=lf
+*.mdl		text eol=lf

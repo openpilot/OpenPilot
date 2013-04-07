@@ -1,0 +1,5 @@
+#
+# Only Makefiles will have LF line endings
+#
+
+/*.mk		text eol=lf

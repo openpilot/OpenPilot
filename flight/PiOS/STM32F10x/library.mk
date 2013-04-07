@@ -12,7 +12,7 @@ LINKER_SCRIPTS_PATH	=  $(PIOS_DEVLIB)
 CDEFS			+= -DSTM32F10X -DSTM32F10X_$(MODEL)
 CDEFS 			+= -DUSE_STDPERIPH_DRIVER
 CDEFS			+= -DARM_MATH_CM3
-ARCHFLAGS		+= -mcpu=cortex-m3
+ARCHFLAGS		+= -mcpu=cortex-m3 --specs=nano.specs
 
 # Board-specific startup files
 ASRC			+= $(PIOS_DEVLIB)startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S

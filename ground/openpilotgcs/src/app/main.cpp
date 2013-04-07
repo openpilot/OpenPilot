@@ -78,6 +78,8 @@ static const char *EXIT_AFTER_CONFIG_OPTION = "-exit-after-config";
 
 typedef QList<ExtensionSystem::PluginSpec *> PluginSpecSet;
 
+static const char *DEFAULT_CONFIG_FILENAME = "OpenPilotGCS.xml";
+
 // Helpers for displaying messages. Note that there is no console on Windows.
 #ifdef Q_OS_WIN
 // Format as <pre> HTML
@@ -204,35 +206,87 @@ static inline QStringList getPluginPaths()
     return rc;
 }
 
+static void loadFactorySettings(QSettings &settings)
+{
+    QDir directory(QCoreApplication::applicationDirPath());
 #ifdef Q_OS_MAC
-#  define SHARE_PATH "/../Resources"
+    directory.cdUp();
+    directory.cd("Resources");
 #else
-#  define SHARE_PATH "/../share/openpilotgcs"
+    directory.cdUp();
+    directory.cd("share");
+    directory.cd("openpilotgcs");
 #endif
+    directory.cd("default_configurations");
 
-static void overrideSettings(QSettings &settings, int argc, char **argv){
+    qDebug() << "Looking for configuration files in:" << directory.absolutePath();
 
-    QMap<QString, QString> settingOptions;
+    QString filename;
+    // check if command line contains a config file name
+    QString commandLine;
+    foreach(QString str, qApp->arguments()) {
+        if (str.contains("configfile")) {
+            commandLine = str.split("=").at(1);
+        }
+    }
+    if (!commandLine.isEmpty() && QFile::exists(directory.absolutePath() + QDir::separator() + commandLine)) {
+        // use file name specified on command line
+        filename = directory.absolutePath() + QDir::separator() + commandLine;
+        qDebug() << "Configuration file" << filename << "specified on command line will be loaded.";
+    } else if (QFile::exists(directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME)) {
+        // use default file name
+        filename = directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME;
+        qDebug() << "Default configuration file" << filename << "will be loaded.";
+    } else {
+        // TODO should we exit violently?
+        qWarning() << "No default configuration file found!";
+        return;
+    }
+
+    // create settings from file
+    QSettings *qs = new QSettings(filename, XmlConfig::XmlSettingsFormat);
+
+    // transfer loaded settings to application settings
+    QStringList keys = qs->allKeys();
+    foreach(QString key, keys) {
+        settings.setValue(key, qs->value(key));
+    }
+
+    // and delete loaded settings
+    delete qs;
+
+    qDebug() << "Configuration file" << filename << "was loaded.";
+}
+
+static void overrideSettings(QSettings &settings, int argc, char **argv)
+{
     // Options like -DMy/setting=test
     QRegExp rx("([^=]+)=(.*)");
 
-    for(int i = 0; i < argc; ++i ){
-        if ( QString(CONFIG_OPTION).compare(QString(argv[i])) == 0 ){
-            if ( rx.indexIn(argv[++i]) > -1 ){
+    QMap<QString, QString> settingOptions;
+    for (int i = 0; i < argc; ++i) {
+        if (QString(CONFIG_OPTION).compare(QString(argv[i])) == 0) {
+            if (rx.indexIn(argv[++i]) > -1) {
                 settingOptions.insert(rx.cap(1), rx.cap(2));
             }
         }
-        if ( QString(CLEAN_CONFIG_OPTION).compare(QString(argv[i])) == 0 ){
+        if (QString(CLEAN_CONFIG_OPTION).compare(QString(argv[i])) == 0) {
             settings.clear();
         }
     }
 
     QList<QString> keys = settingOptions.keys();
-    foreach ( QString key, keys ){
+    foreach (QString key, keys) {
         settings.setValue(key, settingOptions.value(key));
     }
     settings.sync();
 }
+
+#ifdef Q_OS_MAC
+#  define SHARE_PATH "/../Resources"
+#else
+#  define SHARE_PATH "/../share/openpilotgcs"
+#endif
 
 int main(int argc, char **argv)
 {
@@ -250,42 +304,52 @@ int main(int argc, char **argv)
     QApplication::setAttribute(Qt::AA_X11InitThreads, true);
 #endif
 
-    //Set the default locale to EN, if this is not set the system locale will be used
-    //and as of now we dont want that behaviour.
+    // Set the default locale to EN, if this is not set the system locale will be used
+    // and as of now we dont want that behaviour.
     QLocale::setDefault(QLocale::English);
 
     SharedTools::QtSingleApplication app((QLatin1String(appNameC)), argc, argv);
 
-    //Open Splashscreen
+    // Open splash screen
     GCSSplashScreen splash;
     splash.show();
 
-    QString locale = QLocale::system().name();
-
     // Must be done before any QSettings class is created
     QSettings::setPath(XmlConfig::XmlSettingsFormat, QSettings::SystemScope,
-            QCoreApplication::applicationDirPath()+QLatin1String(SHARE_PATH));
+            QCoreApplication::applicationDirPath() + QLatin1String(SHARE_PATH));
     // keep this in sync with the MainWindow ctor in coreplugin/mainwindow.cpp
-    QSettings settings(XmlConfig::XmlSettingsFormat, QSettings::UserScope,
-                                 QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS_config"));
+    QSettings settings(XmlConfig::XmlSettingsFormat, QSettings::UserScope, QLatin1String("OpenPilot"),
+            QLatin1String("OpenPilotGCS_config"));
 
+    if (!settings.allKeys().count()) {
+        qDebug() << "No user setting, loading factory defaults.";
+        // no user settings, so try to load some default ones
+        loadFactorySettings(settings);
+    }
+
+    // override setting with command line provided settings
     overrideSettings(settings, argc, argv);
-    locale = settings.value("General/OverrideLanguage", locale).toString();
+
+    QString locale = QLocale::system().name();
+    qDebug() << "main - system locale:" << locale;
+
+    QString language = QLocale::system().name();
+    language = settings.value("General/OverrideLanguage", language).toString();
+    qDebug() << "main - language:" << language;
 
     QTranslator translator;
-    QTranslator qtTranslator;
-
-    const QString &creatorTrPath = QCoreApplication::applicationDirPath()
-                                   + QLatin1String(SHARE_PATH "/translations");
-    if (translator.load(QLatin1String("openpilotgcs_") + locale, creatorTrPath)) {
+    const QString &creatorTrPath = QCoreApplication::applicationDirPath() + QLatin1String(SHARE_PATH "/translations");
+    if (translator.load(QLatin1String("openpilotgcs_") + language, creatorTrPath)) {
         const QString &qtTrPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
-        const QString &qtTrFile = QLatin1String("qt_") + locale;
+        const QString &qtTrFile = QLatin1String("qt_") + language;
         // Binary installer puts Qt tr files into creatorTrPath
+        QTranslator qtTranslator;
         if (qtTranslator.load(qtTrFile, qtTrPath) || qtTranslator.load(qtTrFile, creatorTrPath)) {
             QCoreApplication::installTranslator(&translator);
             QCoreApplication::installTranslator(&qtTranslator);
         } else {
-            translator.load(QString()); // unload()
+            // unload()
+            translator.load(QString());
         }
     }
     app.setProperty("qtc_locale", locale); // Do we need this?
@@ -313,10 +377,7 @@ int main(int argc, char **argv)
         appOptions.insert(QLatin1String(CLEAN_CONFIG_OPTION), false);
         appOptions.insert(QLatin1String(EXIT_AFTER_CONFIG_OPTION), false);
         QString errorMessage;
-        if (!pluginManager.parseOptions(arguments,
-                                        appOptions,
-                                        &foundAppOptions,
-                                        &errorMessage)) {
+        if (!pluginManager.parseOptions(arguments, appOptions, &foundAppOptions, &errorMessage)) {
             displayError(errorMessage);
             printHelp(QFileInfo(app.applicationFilePath()).baseName(), pluginManager);
             return -1;
@@ -331,9 +392,10 @@ int main(int argc, char **argv)
             break;
         }
     }
-    if(!coreplugin){
+    if (!coreplugin) {
         QString nativePaths = QDir::toNativeSeparators(pluginPaths.join(QLatin1String(",")));
-        const QString reason = QCoreApplication::translate("Application", "Could not find 'Core.pluginspec' in %1").arg(nativePaths);
+        const QString reason = QCoreApplication::translate("Application", "Could not find 'Core.pluginspec' in %1").arg(
+                nativePaths);
         displayError(msgCoreLoadFailure(reason));
         return 1;
     }
@@ -356,8 +418,9 @@ int main(int argc, char **argv)
         return 0;
     }
     const bool isFirstInstance = !app.isRunning();
-    if (!isFirstInstance && foundAppOptions.contains(QLatin1String(CLIENT_OPTION)))
+    if (!isFirstInstance && foundAppOptions.contains(QLatin1String(CLIENT_OPTION))) {
         return sendArguments(app, pluginManager.arguments()) ? 0 : -1;
+    }
 
     QObject::connect(&pluginManager, SIGNAL(pluginAboutToBeLoaded(ExtensionSystem::PluginSpec*)),
                      &splash, SLOT(showPluginLoadingProgress(ExtensionSystem::PluginSpec*)));
@@ -396,11 +459,11 @@ int main(int argc, char **argv)
     splash.showProgressMessage(QObject::tr("Application started."));
     QTimer::singleShot(1500, &splash, SLOT(close()));
 
-    qDebug() << "main() took" << timer.elapsed() << "ms";
+    qDebug() << "main - main took" << timer.elapsed() << "ms";
 
     int ret = app.exec();
 
-    qDebug() << "GCS ran for" << timer.elapsed() << "ms";
+    qDebug() << "main - GCS ran for" << timer.elapsed() << "ms";
 
     return ret;
 }

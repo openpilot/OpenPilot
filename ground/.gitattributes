@@ -1,0 +1,17 @@
+#
+# Ground source code files should always have CRLF line endings by agreement
+# http://wiki.openpilot.org/display/Doc/Coding+Style
+#
+
+*.c		text eol=crlf
+*.cpp		text eol=crlf
+*.h		text eol=crlf
+*.hpp		text eol=crlf
+
+*.ui		text eol=crlf
+*.qrc		text eol=crlf
+*.qml		text eol=crlf
+*.pluginspec	text eol=crlf
+
+*.pri		text eol=crlf
+*.pro		text eol=crlf

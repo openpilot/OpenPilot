@@ -1,0 +1,31 @@
+#
+# Line endings normalization: http://wiki.openpilot.org/display/Doc/Coding+Style
+# You need at least git 1.7.2 for this to work (previous versions ignore text and eol attributes).
+#
+# Make sure you have committed all local changes first. Then use the following bash commands
+# to normalize your local repository to be able to merge it with a mainline:
+#
+# Minimal normalization:
+#   git rm --cached -r .
+#   git reset --hard
+#   git add .
+#   git commit -m "Normalize line endings"
+#
+# Or full normalization (don't do that on Windows, it breaks file modes):
+#   git rm --cached -r .
+#   git diff --cached --name-only -z | xargs -0 git add
+#   git commit -m "Normalize line endings"
+#   git ls-files -z | xargs -0 rm
+#   git checkout .
+#
+
+# Set default behaviour (do not convert line endings regardless of local git core settings)
+*		-text
+
+# All *.txt files in the root should be Windows-readable (CRLF)
+/*.txt		text eol=crlf
+
+# Root Makefile has LF line endings
+/Makefile	text eol=lf
+
+# More attributes are defined in per-directory .gitattributes which override this file

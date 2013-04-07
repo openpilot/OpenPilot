@@ -40,7 +40,7 @@ static uint8_t active_fault;
 
 static int32_t fault_initialize(void)
 {
-#ifdef MODULE_Fault_BUILTIN
+#ifdef MODULE_FAULT_BUILTIN
 	module_enabled = true;
 #else
 	HwSettingsInitialize();

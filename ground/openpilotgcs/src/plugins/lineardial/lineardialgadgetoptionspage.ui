@@ -48,6 +48,188 @@
         <number>0</number>
        </property>
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMaximumSize</enum>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Dial SVG: </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Utils::PathChooser" name="svgSourceFile" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_14">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Dial font:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="fontPicker">
+           <property name="text">
+            <string>Select...</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_15">
+           <property name="text">
+            <string>Decimal places:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="decPlaces">
+           <property name="maximum">
+            <number>99</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_16">
+           <property name="text">
+            <string>Factor:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="factor">
+           <property name="decimals">
+            <number>6</number>
+           </property>
+           <property name="minimum">
+            <double>-10000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>100000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QLabel" name="label_17">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Input:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_18">
+           <property name="text">
+            <string>ObjectName</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="objectName">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_19">
+           <property name="text">
+            <string>ObjectField</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="objectField">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
           <widget class="QLabel" name="label_8">
@@ -255,138 +437,6 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="label_14">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Dial font:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="fontPicker">
-           <property name="text">
-            <string>Select...</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_15">
-           <property name="text">
-            <string>Decimal places:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="decPlaces">
-           <property name="maximum">
-            <number>99</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_16">
-           <property name="text">
-            <string>Factor:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDoubleSpinBox" name="factor">
-           <property name="decimals">
-            <number>6</number>
-           </property>
-           <property name="minimum">
-            <double>-10000.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>100000.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
-         <item>
-          <widget class="QLabel" name="label_17">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Input:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_18">
-           <property name="text">
-            <string>ObjectName</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="objectName">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_19">
-           <property name="text">
-            <string>ObjectField</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="objectField">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QLabel" name="label_2">
@@ -456,6 +506,13 @@
         </layout>
        </item>
        <item>
+        <widget class="Line" name="line_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
           <widget class="QCheckBox" name="useOpenGL">
@@ -467,42 +524,18 @@
            </property>
           </widget>
          </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="Line" name="line_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
-         <property name="spacing">
-          <number>10</number>
-         </property>
-         <property name="sizeConstraint">
-          <enum>QLayout::SetMaximumSize</enum>
-         </property>
-         <property name="bottomMargin">
-          <number>10</number>
-         </property>
          <item>
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Dial SVG: </string>
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="Utils::PathChooser" name="svgSourceFile" native="true">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
            </property>
-          </widget>
+          </spacer>
          </item>
         </layout>
        </item>

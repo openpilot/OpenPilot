@@ -35,7 +35,6 @@
 #include <pios.h>
 
 /* OpenPilot Libraries */
-#include "op_config.h"
 #include "utlist.h"
 #include "uavobjectmanager.h"
 #include "eventdispatcher.h"

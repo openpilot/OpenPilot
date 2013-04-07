@@ -432,9 +432,9 @@ void ScopeGadgetWidget::addCurvePlot(QString uavObject, QString uavFieldSubField
 
     QString curveNameScaled;
     if(scaleOrderFactor == 0)
-        curveNameScaled = curveName + "(" + units + ")";
+        curveNameScaled = curveName + " (" + units + ")";
     else
-        curveNameScaled = curveName + "(x10^" + QString::number(scaleOrderFactor) + " " + units + ")";
+        curveNameScaled = curveName + " (x10^" + QString::number(scaleOrderFactor) + " " + units + ")";
 
     QwtPlotCurve* plotCurve = new QwtPlotCurve(curveNameScaled);
     plotCurve->setPen(pen);

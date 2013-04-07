@@ -386,14 +386,20 @@ void PIOS_Board_Init(void) {
 	}
 	/* Connect flash to the appropriate interface and configure it */
 	uintptr_t flash_id;
-	PIOS_Flash_Jedec_Init(&flash_id, pios_spi_flash_id, 0, &flash_m25p_cfg);
+	if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_flash_id, 0)) {
+		PIOS_DEBUG_Assert(0);
+	}
 #else
 	/* Connect flash to the appropriate interface and configure it */
 	uintptr_t flash_id;
-	PIOS_Flash_Jedec_Init(&flash_id, pios_spi_accel_id, 1, &flash_m25p_cfg);
+	if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_accel_id, 1)) {
+		PIOS_DEBUG_Assert(0);
+	}
 #endif
 	uintptr_t fs_id;
-	PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_m25p_cfg, &pios_jedec_flash_driver, flash_id);
+	if (PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_m25p_cfg, &pios_jedec_flash_driver, flash_id)) {
+		PIOS_DEBUG_Assert(0);
+	}
 
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();

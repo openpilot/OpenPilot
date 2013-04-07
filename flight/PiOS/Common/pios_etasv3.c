@@ -28,12 +28,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_ETASV3)
-
-#include "pios_etasv3.h"
+#ifdef PIOS_INCLUDE_ETASV3
 
 static bool PIOS_ETASV3_Read(uint8_t * buffer, uint8_t len)
 {

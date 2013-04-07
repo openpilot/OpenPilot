@@ -1,12 +1,14 @@
 /**
  ******************************************************************************
- *
+ * @addtogroup OpenPilotSystem OpenPilot System
+ * @{
+ * @addtogroup OpenPilotCore OpenPilot Core
+ * @{
  * @file       pios_config.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      PiOS configuration header.
- *                 - Central compile time config for the project.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010-2013.
+ * @brief      PiOS configuration header, the compile time config file for the PIOS.
+ *             Defines which PiOS libraries and features are included in the firmware.
  * @see        The GNU Public License (GPL) Version 3
- *
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -24,62 +26,119 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 #ifndef PIOS_CONFIG_H
 #define PIOS_CONFIG_H
 
-/* Major features */
-#define PIOS_INCLUDE_FREERTOS
-#define PIOS_INCLUDE_BL_HELPER
+/*
+ * Below is a complete list of PIOS configurable options.
+ * Please do not remove or rearrange them. Only comment out
+ * unused options in the list. See main pios.h header for more
+ * details.
+ */
 
-/* Enable/Disable PiOS Modules */
-#define PIOS_INCLUDE_ADC
+/* #define PIOS_INCLUDE_DEBUG_CONSOLE */
+/* #define DEBUG_LEVEL 0 */
+
+/* PIOS FreeRTOS support */
+#define PIOS_INCLUDE_FREERTOS
+
+/* PIOS bootloader helper */
+#define PIOS_INCLUDE_BL_HELPER
+/* #define PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT */
+
+/* PIOS system functions */
 #define PIOS_INCLUDE_DELAY
-#define PIOS_INCLUDE_I2C
-#define PIOS_INCLUDE_IRQ
-#define PIOS_INCLUDE_LED
-#define PIOS_INCLUDE_IAP
-//#define PIOS_INCLUDE_SERVO
-#define PIOS_INCLUDE_SPI
+#define PIOS_INCLUDE_INITCALL
 #define PIOS_INCLUDE_SYS
+
+/* PIOS hardware peripherals */
+#define PIOS_INCLUDE_IRQ
+#define PIOS_INCLUDE_RTC
+#define PIOS_INCLUDE_TIM
 #define PIOS_INCLUDE_USART
-//#define PIOS_INCLUDE_GPIO
+#define PIOS_INCLUDE_ADC
+#define PIOS_INCLUDE_I2C
+#define PIOS_INCLUDE_SPI
+/* #define PIOS_INCLUDE_GPIO */
+#define PIOS_INCLUDE_EXTI
+#define PIOS_INCLUDE_WDG
+
+/* PIOS USB functions */
 #define PIOS_INCLUDE_USB
 #define PIOS_INCLUDE_USB_HID
-#define PIOS_INCLUDE_EXTI
-#define PIOS_INCLUDE_RTC
-#define PIOS_INCLUDE_WDG
-#define PIOS_INCLUDE_VIDEO
+/* #define PIOS_INCLUDE_USB_CDC */
+/* #define PIOS_INCLUDE_USB_RCTX */
 
-/* Com systems to include */
-#define PIOS_INCLUDE_COM
-#define PIOS_INCLUDE_COM_TELEM
-#define PIOS_INCLUDE_COM_AUX
-#define PIOS_INCLUDE_GPS
-//#define PIOS_OVERO_SPI
-#define PIOS_INCLUDE_BMP085
+/* PIOS sensor interfaces */
+/* #define PIOS_INCLUDE_ADXL345 */
+/* #define PIOS_INCLUDE_BMA180 */
+/* #define PIOS_INCLUDE_L3GD20 */
+/* #define PIOS_INCLUDE_MPU6000 */
+/* #define PIOS_MPU6000_ACCEL */
+/* #define PIOS_INCLUDE_HMC5843 */
 #define PIOS_INCLUDE_HMC5883
+/* #define PIOS_HMC5883_HAS_GPIOS */
+#define PIOS_INCLUDE_BMP085
+/* #define PIOS_INCLUDE_MS5611 */
+/* #define PIOS_INCLUDE_MPXV */
+/* #define PIOS_INCLUDE_ETASV3 */
+/* #define PIOS_INCLUDE_HCSR04 */
+
+/* PIOS receiver drivers */
+/* #define PIOS_INCLUDE_PWM */
+/* #define PIOS_INCLUDE_PPM */
+/* #define PIOS_INCLUDE_PPM_FLEXI */
+/* #define PIOS_INCLUDE_DSM */
+/* #define PIOS_INCLUDE_SBUS */
+/* #define PIOS_INCLUDE_GCSRCVR */
+
+/* PIOS abstract receiver interface */
+/* #define PIOS_INCLUDE_RCVR */
+
+/* PIOS common peripherals */
+#define PIOS_INCLUDE_LED
+#define PIOS_INCLUDE_IAP
+/* #define PIOS_INCLUDE_SERVO */
+/* #define PIOS_INCLUDE_I2C_ESC */
+/* #define PIOS_INCLUDE_OVERO */
+/* #define PIOS_OVERO_SPI */
 #define PIOS_INCLUDE_SDCARD
-//#define PIOS_INCLUDE_WAVE
-/* Supported receiver interfaces */
-//#define PIOS_INCLUDE_RCVR
-//#define PIOS_INCLUDE_DSM
-//#define PIOS_INCLUDE_SBUS
-//#define PIOS_INCLUDE_PPM
-//#define PIOS_INCLUDE_PWM
-//#define PIOS_INCLUDE_GCSRCVR
+#define LOG_FILENAME "startup.log"
+/* #define PIOS_INCLUDE_FLASH */
+/* #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS */
+/* #define FLASH_FREERTOS */
+/* #define PIOS_INCLUDE_FLASH_EEPROM */
 
-//#define PIOS_INCLUDE_SETTINGS
-//#define PIOS_INCLUDE_FLASH
-/* A really shitty setting saving implementation */
-//#define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
+/* PIOS radio modules */
+/* #define PIOS_INCLUDE_RFM22B */
+/* #define PIOS_INCLUDE_RFM22B_COM */
+/* #define PIOS_INCLUDE_RFM22B_RCVR */
+/* #define PIOS_INCLUDE_PPM_OUT */
+/* #define PIOS_RFM22B_DEBUG_ON_TELEM */
 
-#define PIOS_INCLUDE_INITCALL           /* Include init call structures */
-#define PIOS_TELEM_PRIORITY_QUEUE       /* Enable a priority queue in telemetry */
-#define PIOS_QUATERNION_STABILIZATION   /* Stabilization options */
-#define PIOS_GPS_SETS_HOMELOCATION      /* GPS options */
-#define PIOS_INCLUDE_GPS_NMEA_PARSER /* Include the NMEA protocol parser */
-#define PIOS_INCLUDE_GPS_UBX_PARSER  /* Include the UBX protocol parser */
+#define PIOS_INCLUDE_VIDEO
+/* #define PIOS_INCLUDE_WAVE */
+/* #define PIOS_INCLUDE_UDP */
+
+/* PIOS abstract comms interface with options */
+#define PIOS_INCLUDE_COM
+/* #define PIOS_INCLUDE_COM_MSG */
+/* #define PIOS_INCLUDE_TELEMETRY_RF */
+#define PIOS_INCLUDE_COM_TELEM
+/* #define PIOS_INCLUDE_COM_FLEXI */
+#define PIOS_INCLUDE_COM_AUX
+#define PIOS_TELEM_PRIORITY_QUEUE
+#define PIOS_INCLUDE_GPS
+/* #define PIOS_GPS_MINIMAL */
+#define PIOS_INCLUDE_GPS_NMEA_PARSER
+#define PIOS_INCLUDE_GPS_UBX_PARSER
+#define PIOS_GPS_SETS_HOMELOCATION
+
+/* Stabilization options */
+#define PIOS_QUATERNION_STABILIZATION
+
+/* Performance counters */
+#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD	8379692
 
 /* Alarm Thresholds */
 #define HEAP_LIMIT_WARNING		4000
@@ -89,8 +148,23 @@
 #define CPULOAD_LIMIT_WARNING		80
 #define CPULOAD_LIMIT_CRITICAL		95
 
-// This actually needs calibrating
-#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD (8379692)
-#define LOG_FILENAME 			"PIOS.LOG"
+/* Task stack sizes */
+/* #define PIOS_ACTUATOR_STACK_SIZE	1020 */
+/* #define PIOS_MANUAL_STACK_SIZE		800 */
+/* #define PIOS_SYSTEM_STACK_SIZE		660 */
+/* #define PIOS_STABILIZATION_STACK_SIZE	524 */
+/* #define PIOS_TELEM_STACK_SIZE		500 */
+/* #define PIOS_EVENTDISPATCHER_STACK_SIZE	130 */
+
+/* This can't be too high to stop eventdispatcher thread overflowing */
+/* #define PIOS_EVENTDISAPTCHER_QUEUE	10 */
+
+/* Revolution series */
+/* #define REVOLUTION */
 
 #endif /* PIOS_CONFIG_H */
+
+/**
+ * @}
+ * @}
+ */

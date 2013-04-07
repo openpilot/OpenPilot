@@ -1,8 +1,15 @@
 #
-# MacOSX-specific packaging
+# MacOSX-specific packaging script
 #
 
-osx_package: gcs package_flight
+ifndef OPENPILOT_IS_COOL
+    $(error Top level Makefile must be used to build this target)
+endif
+
+FW_DIR := $(PACKAGE_DIR)/firmware
+
+.PHONY: package
+package:
 	( \
 	  ROOT_DIR="$(ROOT_DIR)" \
 	  BUILD_DIR="$(BUILD_DIR)" \
@@ -13,10 +20,3 @@ osx_package: gcs package_flight
 	  FW_DIR="$(FW_DIR)" \
 	  "$(ROOT_DIR)/package/osx/package" \
 	)
-
-gcs: uavobjects
-	$(V1) $(MAKE) -C $(ROOT_DIR) GCS_BUILD_CONF=release $@
-
-ground_package: | osx_package
-
-.PHONY: gcs ground_package osx_package

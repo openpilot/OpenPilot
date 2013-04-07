@@ -41,7 +41,6 @@
 
 namespace Core {
 
-
 ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidget *modeStack) :
     QWidget(mainWindow),
     m_availableDevList(0),
@@ -50,36 +49,41 @@ ConnectionManager::ConnectionManager(Internal::MainWindow *mainWindow, QTabWidge
     polling(true),
     m_mainWindow(mainWindow)
 {
-    QHBoxLayout *layout = new QHBoxLayout;
-    layout->setSpacing(5);
-    layout->setContentsMargins(5,2,5,2);
-
+    // monitor widget
     m_monitorWidget = new TelemetryMonitorWidget(this);
-    layout->addWidget(m_monitorWidget, Qt::AlignHCenter);
 
-    layout->addWidget(new QLabel(tr("Connections:")));
-
+    // device list
     m_availableDevList = new QComboBox;
-    m_availableDevList->setMinimumWidth(100);
-    m_availableDevList->setMaximumWidth(150);
+    m_availableDevList->setMinimumWidth(120);
+    m_availableDevList->setMaximumWidth(180);
     m_availableDevList->setContextMenuPolicy(Qt::CustomContextMenu);
-    layout->addWidget(m_availableDevList);
 
+    // connect button
     m_connectBtn = new QPushButton(tr("Connect"));
     m_connectBtn->setEnabled(false);
-    layout->addWidget(m_connectBtn);
+
+    // put everything together
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->setSpacing(5);
+    layout->setContentsMargins(5, 2, 5, 2);
+
+    layout->addWidget(m_monitorWidget, 0, Qt::AlignVCenter);
+    layout->addWidget(new QLabel(tr("Connections:")), 0, Qt::AlignVCenter);
+    layout->addWidget(m_availableDevList, 0, Qt::AlignVCenter);
+    layout->addWidget(m_connectBtn, 0, Qt::AlignVCenter);
 
     setLayout(layout);
 
     modeStack->setCornerWidget(this, Qt::TopRightCorner);
 
     QObject::connect(m_connectBtn, SIGNAL(clicked()), this, SLOT(onConnectClicked()));
+    QObject::connect(m_availableDevList, SIGNAL(currentIndexChanged(int)), this, SLOT(onDeviceSelectionChanged(int)));
 
     // setup our reconnect timers
     reconnect = new QTimer(this);
     reconnectCheck = new QTimer(this);
-    connect(reconnect,SIGNAL(timeout()),this,SLOT(reconnectSlot()));
-    connect(reconnectCheck,SIGNAL(timeout()),this,SLOT(reconnectCheckSlot()));
+    connect(reconnect, SIGNAL(timeout()), this, SLOT(reconnectSlot()));
+    connect(reconnectCheck, SIGNAL(timeout()), this, SLOT(reconnectCheckSlot()));
 }
 
 ConnectionManager::~ConnectionManager()
@@ -103,7 +107,8 @@ void ConnectionManager::init()
 */
 bool ConnectionManager::connectDevice(DevListItem device)
 {
-    DevListItem connection_device = findDevice(m_availableDevList->itemData(m_availableDevList->currentIndex(),Qt::ToolTipRole).toString());
+    QString deviceName = m_availableDevList->itemData(m_availableDevList->currentIndex(), Qt::ToolTipRole).toString();
+    DevListItem connection_device = findDevice(deviceName);
     if (!connection_device.connection)
         return false;
 
@@ -225,20 +230,32 @@ void ConnectionManager::onConnectionDestroyed(QObject *obj)
 }
 
 /**
+*   Slot called when the user selects a device from the combo box
+*/
+void ConnectionManager::onDeviceSelectionChanged(int index)
+{
+    if (index >= 0) {
+        QString deviceName = m_availableDevList->itemData(index, Qt::ToolTipRole).toString();
+        m_availableDevList->setToolTip(deviceName);
+    }
+}
+
+/**
 *   Slot called when the user clicks the connect/disconnect button
 */
 void ConnectionManager::onConnectClicked()
 {
     // Check if we have a ioDev already created:
-    if (!m_ioDev)
-    {
+    if (!m_ioDev) {
         // connecting to currently selected device
-        DevListItem device = findDevice(m_availableDevList->itemData(m_availableDevList->currentIndex(), Qt::ToolTipRole).toString());
-        if (device.connection)
+        QString deviceName = m_availableDevList->itemData(m_availableDevList->currentIndex(), Qt::ToolTipRole).toString();
+        DevListItem device = findDevice(deviceName);
+        if (device.connection) {
             connectDevice(device);
+        }
     }
-    else
-    {	// disconnecting
+    else {
+        // disconnecting
         disconnectDevice();
     }
 }
@@ -444,32 +461,32 @@ void ConnectionManager::devChanged(IConnection *connection)
 
 void ConnectionManager::updateConnectionDropdown()
 {
-    //add all the list again to the combobox
-    foreach (DevListItem d, m_devList)
-    {
+    // add all the list again to the combobox
+    foreach (DevListItem d, m_devList) {
         m_availableDevList->addItem(d.getConName());
-        m_availableDevList->setItemData(m_availableDevList->count()-1, d.getConName(), Qt::ToolTipRole);
-        if(!m_ioDev && d.getConName().startsWith("USB"))
-        {
-            if(m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect())
+        m_availableDevList->setItemData(m_availableDevList->count() - 1, d.getConName(), Qt::ToolTipRole);
+        if (!m_ioDev && d.getConName().startsWith("USB")) {
+            if (m_mainWindow->generalSettings()->autoConnect() || m_mainWindow->generalSettings()->autoSelect()) {
                 m_availableDevList->setCurrentIndex(m_availableDevList->count() - 1);
-
-            if(m_mainWindow->generalSettings()->autoConnect() && polling)
-            {
+            }
+            if (m_mainWindow->generalSettings()->autoConnect() && polling) {
                 qDebug() << "Automatically opening device";
                 connectDevice(d);
-                qDebug()<<"ConnectionManager::devChanged autoconnected USB device";
+                qDebug() << "ConnectionManager::updateConnectionDropdown autoconnected USB device";
             }
         }
     }
-    if(m_ioDev)//if a device is connected make it the one selected on the dropbox
-    {
-        for(int x=0;x<m_availableDevList->count();++x)
-        {
-            if(m_connectionDevice.getConName()==m_availableDevList->itemData(x,Qt::ToolTipRole).toString())
-                m_availableDevList->setCurrentIndex(x);
+    if (m_ioDev) {
+        // if a device is connected make it the one selected on the dropbox
+        for (int i = 0; i < m_availableDevList->count(); i++) {
+            QString deviceName = m_availableDevList->itemData(i, Qt::ToolTipRole).toString();
+            if (m_connectionDevice.getConName() == deviceName) {
+                m_availableDevList->setCurrentIndex(i);
+            }
         }
     }
+    // update combo box tooltip
+    onDeviceSelectionChanged(m_availableDevList->currentIndex());
 }
 
 void Core::ConnectionManager::connectionsCallBack()

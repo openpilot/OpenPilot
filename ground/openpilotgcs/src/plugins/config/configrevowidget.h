@@ -103,7 +103,7 @@ private:
 
 private slots:
     //! Overriden method from the configTaskWidget to update UI
-    virtual void refreshWidgetsValues(UAVObject * obj=NULL);
+    virtual void refreshWidgetsValues(UAVObject *object=NULL);
 
     // Slots for calibrating the mags
     void doStartSixPointCalibration();

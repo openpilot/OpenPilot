@@ -28,6 +28,9 @@
  */
 
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_ADC
+
 #include <pios_adc_priv.h>
 
 // Private types
@@ -360,6 +363,8 @@ void PIOS_ADC_DMA_Handler(void)
 		DMA_ClearFlag(pios_adc_dev->cfg->dma.irq.flags /*DMA1_FLAG_GL1*/);
 	}
 }
+
+#endif /* PIOS_INCLUDE_ADC */
 
 /** 
  * @}

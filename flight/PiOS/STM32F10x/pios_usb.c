@@ -28,16 +28,17 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_USB
+
 #include "usb_lib.h"
 #include "pios_usb_board_data.h"
 #include "stm32f10x.h"
 
-#include "pios_usb.h"
 #include "pios_usb_priv.h"
 
-#if defined(PIOS_INCLUDE_USB_HID)
+#ifdef PIOS_INCLUDE_USB_HID
 
 /* Rx/Tx status */
 static bool transfer_possible = false;
@@ -66,7 +67,7 @@ static int32_t PIOS_USB_validate(struct pios_usb_dev * usb_dev)
 	return 0;
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS)
+#ifdef PIOS_INCLUDE_FREERTOS
 static struct pios_usb_dev * PIOS_USB_alloc(void)
 {
 	struct pios_usb_dev * usb_dev;
@@ -156,14 +157,14 @@ int32_t PIOS_USB_ChangeConnectionState(bool Connected)
 
 		//TODO: Check SetEPRxValid(ENDP1);
 
-#if defined(USB_LED_ON)
+#ifdef USB_LED_ON
 		USB_LED_ON;	// turn the USB led on
 #endif
 	} else {
 		// Cable disconnected: disable transfers
 		transfer_possible = false;
 
-#if defined(USB_LED_OFF)
+#ifdef USB_LED_OFF
 		USB_LED_OFF;	// turn the USB led off
 #endif
 	}
@@ -233,7 +234,9 @@ bool PIOS_USB_CheckAvailable(uint32_t id)
 	return PIOS_USB_CableConnected(id) && transfer_possible;
 }
 
-#endif
+#endif /* PIOS_INCLUDE_USB_HID */
+
+#endif /* PIOS_INCLUDE_USB */
 
 /**
  * @}

@@ -27,6 +27,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifndef PIOS_CRC_H
+#define PIOS_CRC_H
+
 uint8_t PIOS_CRC_updateByte(uint8_t crc, const uint8_t data);
 uint8_t PIOS_CRC_updateCRC(uint8_t crc, const uint8_t* data, int32_t length);
 
@@ -35,3 +38,5 @@ uint16_t PIOS_CRC16_updateCRC(uint16_t crc, const uint8_t* data, int32_t length)
 
 uint32_t PIOS_CRC32_updateByte(uint32_t crc, const uint8_t data);
 uint32_t PIOS_CRC32_updateCRC(uint32_t crc, const uint8_t* data, int32_t length);
+
+#endif /* PIOS_CRC_H */

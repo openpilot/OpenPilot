@@ -31,15 +31,29 @@
 #ifndef PIOS_DEBUG_H
 #define PIOS_DEBUG_H
 
+#ifdef PIOS_INCLUDE_DEBUG_CONSOLE
+#ifndef DEBUG_LEVEL
+#define DEBUG_LEVEL	0
+#endif
+#define DEBUG_PRINTF(level, ...) \
+    { \
+        if ((level <= DEBUG_LEVEL) && (PIOS_COM_DEBUG > 0)) { \
+            PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__); \
+        } \
+    }
+#else
+#define DEBUG_PRINTF(level, ...)
+#endif	/* PIOS_INCLUDE_DEBUG_CONSOLE */
+
 extern const char *PIOS_DEBUG_AssertMsg;
 
 #ifdef USE_SIM_POSIX
 void PIOS_DEBUG_Init(void);
 #else
 #include <pios_tim_priv.h>
-
 void PIOS_DEBUG_Init(const struct pios_tim_channel * channels, uint8_t num_channels);
 #endif
+
 void PIOS_DEBUG_PinHigh(uint8_t pin);
 void PIOS_DEBUG_PinLow(uint8_t pin);
 void PIOS_DEBUG_PinValue8Bit(uint8_t value);

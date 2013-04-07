@@ -32,8 +32,6 @@
 #ifndef PIOS_MPU6000_H
 #define PIOS_MPU6000_H
 
-#include "pios.h"
-
 /* MPU6000 Addresses */
 #define PIOS_MPU6000_SMPLRT_DIV_REG       0X19
 #define PIOS_MPU6000_DLPF_CFG_REG         0X1A

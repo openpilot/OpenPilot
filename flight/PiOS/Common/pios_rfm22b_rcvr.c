@@ -28,10 +28,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_RFM22B_RCVR)
+#ifdef PIOS_INCLUDE_RFM22B_RCVR
 
 #include "pios_rfm22b_priv.h"
 
@@ -91,7 +90,7 @@ static void PIOS_RFM22B_RCVR_Supervisor(uint32_t rcvr_id) {
 	rfm22b_dev->ppm_fresh = false;
 }
 
-#endif	/* PIOS_INCLUDE_GCSRCVR */
+#endif	/* PIOS_INCLUDE_RFM22B_RCVR */
 
 /** 
   * @}

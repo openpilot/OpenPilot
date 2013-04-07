@@ -28,11 +28,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
-#include "pios_sbus_priv.h"
 
-#if defined(PIOS_INCLUDE_SBUS)
+#ifdef PIOS_INCLUDE_SBUS
+
+#include "pios_sbus_priv.h"
 
 /* Forward Declarations */
 static int32_t PIOS_SBus_Get(uint32_t rcvr_id, uint8_t channel);
@@ -332,7 +332,7 @@ static void PIOS_SBus_Supervisor(uint32_t sbus_id)
 	}
 }
 
-#endif	/* PIOS_INCLUDE_SBUS */
+#endif /* PIOS_INCLUDE_SBUS */
 
 /** 
  * @}

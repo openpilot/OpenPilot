@@ -1,7 +1,6 @@
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_RCVR)
+#ifdef PIOS_INCLUDE_RCVR
 
 #include <pios_rcvr_priv.h>
 
@@ -108,7 +107,7 @@ int32_t PIOS_RCVR_Read(uint32_t rcvr_id, uint8_t channel)
   return rcvr_dev->driver->read(rcvr_dev->lower_id, channel);
 }
 
-#endif
+#endif /* PIOS_INCLUDE_RCVR */
 
 /**
  * @}

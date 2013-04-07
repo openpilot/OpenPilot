@@ -24,8 +24,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_FLASH_H_
-#define PIOS_FLASH_H_
+#ifndef PIOS_FLASH_H
+#define PIOS_FLASH_H
 
 #include <stdint.h>
 
@@ -44,4 +44,4 @@ struct pios_flash_driver {
 	int32_t (*read_data)(uintptr_t flash_id, uint32_t addr, uint8_t * data, uint16_t len);
 };
 
-#endif	/* PIOS_FLASH_H_ */
+#endif	/* PIOS_FLASH_H */

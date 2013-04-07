@@ -43,9 +43,11 @@
  */
 
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_ADC
+
 #include <pios_adc_priv.h>
 
-#if defined(PIOS_INCLUDE_ADC)
 
 #if !defined(PIOS_ADC_MAX_SAMPLES)
 #define PIOS_ADC_MAX_SAMPLES 0

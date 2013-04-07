@@ -28,12 +28,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_USB_RCTX)
+#ifdef PIOS_INCLUDE_USB_RCTX
 
-#include "pios_usb.h"
 #include "pios_usb_rctx_priv.h"
 
 /* STM32 USB Library Definitions */
@@ -62,7 +60,7 @@ static bool PIOS_USB_RCTX_validate(struct pios_usb_rctx_dev * usb_rctx_dev)
 	return (usb_rctx_dev->magic == PIOS_USB_RCTX_DEV_MAGIC);
 }
 
-#if defined(PIOS_INCLUDE_FREERTOS)
+#ifdef PIOS_INCLUDE_FREERTOS
 static struct pios_usb_rctx_dev * PIOS_USB_RCTX_alloc(void)
 {
 	struct pios_usb_rctx_dev * usb_rctx_dev;
@@ -126,7 +124,7 @@ out_fail:
 
 static void PIOS_USB_RCTX_SendReport(struct pios_usb_rctx_dev * usb_rctx_dev)
 {
-#if defined(PIOS_INCLUDE_FREERTOS)
+#ifdef PIOS_INCLUDE_FREERTOS
 	bool need_yield = false;
 #endif	/* PIOS_INCLUDE_FREERTOS */
 
@@ -139,7 +137,7 @@ static void PIOS_USB_RCTX_SendReport(struct pios_usb_rctx_dev * usb_rctx_dev)
 	SetEPTxCount(usb_rctx_dev->cfg->data_tx_ep, sizeof(usb_rctx_dev->report));
 	SetEPTxValid(usb_rctx_dev->cfg->data_tx_ep);
 
-#if defined(PIOS_INCLUDE_FREERTOS)
+#ifdef PIOS_INCLUDE_FREERTOS
 	if (need_yield) {
 		vPortYieldFromISR();
 	}
@@ -208,4 +206,4 @@ void PIOS_USB_RCTX_Update(uint32_t usbrctx_id, const uint16_t channel[], const i
 	PIOS_USB_RCTX_SendReport(usb_rctx_dev);
 }
 
-#endif	/* PIOS_INCLUDE_USB_RCTX */
+#endif /* PIOS_INCLUDE_USB_RCTX */

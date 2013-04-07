@@ -1,8 +1,13 @@
-# -------------------------------------------------
-# Project created by QtCreator 2010-03-21T20:44:17
-# -------------------------------------------------
+#
+# Qmake project for UAVObjGenerator.
+# Copyright (c) 2010-2013, The OpenPilot Team, http://www.openpilot.org
+#
+
 QT += xml
 QT -= gui
+macx {
+    QMAKE_CXXFLAGS  += -fpermissive
+}
 TARGET = uavobjgenerator
 CONFIG += console
 CONFIG -= app_bundle

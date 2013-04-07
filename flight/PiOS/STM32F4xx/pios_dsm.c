@@ -28,13 +28,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_DSM
+
 #include "pios_dsm_priv.h"
 
-#if defined(PIOS_INCLUDE_DSM)
-
-#if !defined(PIOS_INCLUDE_RTC)
+#ifndef PIOS_INCLUDE_RTC
 #error PIOS_INCLUDE_RTC must be used to use DSM
 #endif
 
@@ -401,7 +401,7 @@ static void PIOS_DSM_Supervisor(uint32_t dsm_id)
 	}
 }
 
-#endif	/* PIOS_INCLUDE_DSM */
+#endif /* PIOS_INCLUDE_DSM */
 
 /** 
  * @}

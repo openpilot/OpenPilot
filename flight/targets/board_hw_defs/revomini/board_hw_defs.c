@@ -567,14 +567,6 @@ static const struct flashfs_logfs_cfg flashfs_m25p_cfg = {
 	.page_size     = 0x00000100, /* 256 bytes */
 };
 
-static const struct pios_flash_jedec_cfg flash_m25p_cfg = {
-	.expect_manufacturer = JEDEC_MANUFACTURER_ST,
-	.expect_memorytype   = 0x20,
-	.expect_capacity     = 0x15,
-	.sector_erase        = 0xD8,
-	.chip_erase          = 0xC7,
-};
-
 #endif	/* PIOS_INCLUDE_FLASH */
 
 #include <pios_usart_priv.h>

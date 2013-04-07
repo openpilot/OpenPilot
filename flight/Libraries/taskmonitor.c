@@ -47,7 +47,7 @@ int32_t TaskMonitorInitialize(void)
 	lock = xSemaphoreCreateRecursiveMutex();
 	memset(handles, 0, sizeof(xTaskHandle)*TASKINFO_RUNNING_NUMELEM);
 	lastMonitorTime = 0;
-#if defined(DIAG_TASKS)
+#ifdef DIAG_TASKS
 	lastMonitorTime = portGET_RUN_TIME_COUNTER_VALUE();
 #endif
 	return 0;
@@ -104,7 +104,7 @@ bool TaskMonitorQueryRunning(TaskInfoRunningElem task)
  */
 void TaskMonitorUpdateAll(void)
 {
-#if defined(DIAG_TASKS)
+#ifdef DIAG_TASKS
 	TaskInfoData data;
 	int n;
 

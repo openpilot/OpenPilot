@@ -24,8 +24,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_FLASHFS_LOGFS_PRIV_H_
-#define PIOS_FLASHFS_LOGFS_PRIV_H_
+#ifndef PIOS_FLASHFS_LOGFS_PRIV_H
+#define PIOS_FLASHFS_LOGFS_PRIV_H
 
 #include <stdint.h>
 #include "pios_flash.h"		/* struct pios_flash_driver */
@@ -43,4 +43,4 @@ struct flashfs_logfs_cfg {
 
 int32_t PIOS_FLASHFS_Logfs_Init(uintptr_t * fs_id, const struct flashfs_logfs_cfg * cfg, const struct pios_flash_driver * driver, uintptr_t flash_id);
 
-#endif	/* PIOS_FLASHFS_LOGFS_PRIV_H_ */
+#endif	/* PIOS_FLASHFS_LOGFS_PRIV_H */

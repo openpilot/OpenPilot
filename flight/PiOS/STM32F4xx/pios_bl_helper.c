@@ -28,9 +28,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
-#if defined(PIOS_INCLUDE_BL_HELPER)
+
+#ifdef PIOS_INCLUDE_BL_HELPER
+
 #include <pios_board_info.h>
 #include "stm32f4xx_flash.h"
 #include <stdbool.h>
@@ -192,4 +193,5 @@ void PIOS_BL_HELPER_FLASH_Read_Description(uint8_t * array, uint8_t size)
 void PIOS_BL_HELPER_CRC_Ini()
 {
 }
-#endif
+
+#endif /* PIOS_INCLUDE_BL_HELPER */

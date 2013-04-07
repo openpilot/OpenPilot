@@ -30,6 +30,8 @@
 
 #include "pios.h"
 
+#ifdef PIOS_INCLUDE_ADXL345
+
 enum pios_adxl345_dev_magic {
 	PIOS_ADXL345_DEV_MAGIC = 0xcb55aa55,
 };
@@ -306,3 +308,5 @@ uint8_t PIOS_ADXL345_Read(struct pios_adxl345_data * data)
 	
 	return rec[8] & 0x7F; // return number of remaining entries
 }
+
+#endif /* PIOS_INCLUDE_ADXL345 */

@@ -30,10 +30,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_MPXV)
+#ifdef PIOS_INCLUDE_MPXV
 
 #define A0 340.27f        //speed of sound at standard sea level in [m/s]
 #define P0 101.325f       //static air pressure at standard sea level in kPa

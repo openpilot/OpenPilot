@@ -15,8 +15,8 @@
 !define PACKAGE_LBL "${PACKAGE_LBL}"
 !define PACKAGE_NAME "${PACKAGE_NAME}"
 !define PACKAGE_SEP "${PACKAGE_SEP}"
-!define PACKAGE_DIR "..\..\build\package-$${PACKAGE_LBL}"
-!define FIRMWARE_DIR "firmware-$${PACKAGE_LBL}"
+!define PACKAGE_DIR "..\..\build\package"
+!define FIRMWARE_DIR "firmware"
 !define OUT_FILE "$${PACKAGE_NAME}$${PACKAGE_SEP}$${PACKAGE_LBL}$${PACKAGE_SEP}win32.exe"
 
 ; Installer version info

@@ -1,11 +1,162 @@
-###############################################################
 #
-# Installers for tools required by the ground and flight builds
+# Installers for tools required by the OpenPilot build system.
+# Copyright (c) 2010-2013, The OpenPilot Team, http://www.openpilot.org
 #
-# NOTE: These are not tied to the default goals
-#       and must be invoked manually
+# NOTE: install targets are not tied to the default goals and must
+# be invoked manually. But tool paths set by this file are used
+# across the build system.
 #
-###############################################################
+# Ready to use:
+#    arm_sdk_install
+#
+# TODO:
+#    wget_win_install
+#    make_win_install
+#    qt_sdk_install
+#    openocd_install
+#    ftd2xx_install
+#    libusb_win_install
+#    openocd_git_win_install
+#    openocd_git_install
+#    stm32flash_install
+#    dfuutil_install
+#    android_sdk_install
+#    gtest_install
+#
+# TODO:
+#    help in the top Makefile
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+#
+
+ifndef OPENPILOT_IS_COOL
+    $(error $(notdir $(lastword $(MAKEFILE_LIST))) should be included by the top level Makefile)
+endif
+
+##############################
+#
+# Toolchain URLs and directories
+#
+##############################
+
+ifeq ($(UNAME), Linux)
+    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux.tar.bz2
+else ifeq ($(UNAME), Darwin)
+    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-mac.tar.bz2
+else ifeq ($(UNAME), Windows)
+    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
+endif
+
+ARM_SDK_DIR := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
+
+##############################
+#
+# All toolchains available for the platform
+#
+##############################
+
+ALL_SDK_TARGETS := arm_sdk
+
+.PHONY: all_sdk_install all_sdk_clean all_sdk_distclean all_sdk_version
+all_sdk_install:   $(addsuffix _install,$(ALL_SDK_TARGETS))
+all_sdk_clean:     $(addsuffix _clean,$(ALL_SDK_TARGETS))
+all_sdk_distclean: $(addsuffix _distclean,$(ALL_SDK_TARGETS))
+all_sdk_version:   $(addsuffix _version,$(ALL_SDK_TARGETS))
+
+##############################
+#
+# Misc settings
+#
+##############################
+
+# Define messages
+MSG_DOWNLOADING      = $(QUOTE) DOWNLOAD   $(QUOTE)
+MSG_EXTRACTING       = $(QUOTE) EXTRACT    $(QUOTE)
+MSG_INSTALLING       = $(QUOTE) INSTALL    $(QUOTE)
+MSG_CLEANING         = $(QUOTE) CLEAN      $(QUOTE)
+MSG_DISTCLEANING     = $(QUOTE) DISTCLEAN  $(QUOTE)
+
+# Verbosity level
+ifeq ($(V), 1)
+    CURL_OPTIONS :=
+else
+#   CURL_OPTIONS := --silent
+endif
+
+# MSYS tar workaround
+ifeq ($(UNAME), Windows)
+    TAR_OPTIONS := --force-local
+else
+    TAR_OPTIONS :=
+endif
+
+# Disable parallel make for sdk install targets to ensure ordered dependences
+# like 'arm_sdk_clean | $(DL_DIR) $(TOOLS_DIR)'. They may fail otherwise being
+# run in parallel
+ifneq ($(strip $(filter $(addsuffix _install,all_sdk $(ALL_SDK_TARGETS)),$(MAKECMDGOALS))),)
+.NOTPARALLEL:
+    $(info $(EMPTY) NOTE        Parallel make disabled by some of sdk install targets)
+    $(info $(EMPTY) NOTE        If some of install/extract targets failed, try 'make *_distclean' first)
+    $(info $(EMPTY) NOTE        Use all_sdk_version to check toolchain versions)
+endif
+
+##############################
+#
+# ARM SDK
+#
+##############################
+
+ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
+
+.PHONY: arm_sdk_install
+arm_sdk_install: arm_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
+	@$(ECHO) $(MSG_DOWNLOADING) $(call toprel, $(DL_DIR)/$(ARM_SDK_FILE))
+	$(V1) $(CURL) $(CURL_OPTIONS) \
+		$(if $(shell [ -f "$(DL_DIR)/$(ARM_SDK_FILE)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(ARM_SDK_FILE)",) \
+		-o "$(DL_DIR)/$(ARM_SDK_FILE)" \
+		"$(ARM_SDK_URL)"
+	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(ARM_SDK_DIR))
+	$(V1) $(TAR) $(TAR_OPTIONS) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(ARM_SDK_FILE))
+
+.PHONY: arm_sdk_clean
+arm_sdk_clean:
+	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(ARM_SDK_DIR))
+	$(V1) [ ! -d "$(ARM_SDK_DIR)" ] || $(RM) -r "$(ARM_SDK_DIR)"
+
+.PHONY: arm_sdk_distclean
+arm_sdk_distclean:
+	@$(ECHO) $(MSG_DISTCLEANING) $(call toprel, $@)
+	$(V1) [ ! -f "$(DL_DIR)/$(ARM_SDK_FILE)" ] || $(RM) "$(DL_DIR)/$(ARM_SDK_FILE)"
+
+.PHONY: arm_sdk_version
+arm_sdk_version:
+	$(V1) $(ARM_SDK_PREFIX)gcc --version | head -n1
+
+ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+    export ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-none-eabi-
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(ARM_SDK_DIR)) not found (make arm_sdk_install), using system PATH)
+    export ARM_SDK_PREFIX ?= arm-none-eabi-
+endif
+
+##############################
+#
+# TODO: code below is not revised yet
+#
+##############################
 
 # Set up QT toolchain
 QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-v1.2.1
@@ -27,7 +178,7 @@ endif
 qt_sdk_install : | $(DL_DIR) $(TOOLS_DIR)
 qt_sdk_install: qt_sdk_clean
         # download the source only if it's newer than what we already have
-	$(V1) wget -N --content-disposition -P "$(DL_DIR)" "$(QT_SDK_URL)"
+	$(V1) $(WGET) -N --content-disposition -P "$(DL_DIR)" "$(QT_SDK_URL)"
         # tell the user exactly which path they should select in the GUI
 	$(V1) echo "*** NOTE NOTE NOTE ***"
 	$(V1) echo "*"
@@ -44,24 +195,6 @@ qt_sdk_install: qt_sdk_clean
 qt_sdk_clean:
 	$(V1) [ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf $(QT_SDK_DIR)
 
-# Set up ARM (STM32) SDK
-ARM_SDK_DIR := $(TOOLS_DIR)/gcc-arm-none-eabi-4_6-2012q4
-
-.PHONY: arm_sdk_install
-arm_sdk_install: ARM_SDK_URL  := https://launchpad.net/gcc-arm-embedded/4.6/4.6-2012-q4-update/+download/gcc-arm-none-eabi-4_6-2012q4-20121016.tar.bz2
-arm_sdk_install: ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
-# order-only prereq on directory existance:
-arm_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
-arm_sdk_install: arm_sdk_clean
-        # download the source only if it's newer than what we already have
-	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ARM_SDK_URL)"
-
-        # binary only release so just extract it
-	$(V1) tar -C $(TOOLS_DIR) -xjf "$(DL_DIR)/$(ARM_SDK_FILE)"
-
-.PHONY: arm_sdk_clean
-arm_sdk_clean:
-	$(V1) [ ! -d "$(ARM_SDK_DIR)" ] || $(RM) -r $(ARM_SDK_DIR)
 
 # Set up openocd tools
 OPENOCD_DIR       := $(TOOLS_DIR)/openocd
@@ -74,7 +207,7 @@ openocd_install: OPENOCD_URL  := http://sourceforge.net/projects/openocd/files/o
 openocd_install: OPENOCD_FILE := openocd-0.6.1.tar.bz2
 openocd_install: openocd_clean
         # download the source only if it's newer than what we already have
-	$(V1) wget -N -P "$(DL_DIR)" --trust-server-name "$(OPENOCD_URL)"
+	$(V1) $(WGET) -N -P "$(DL_DIR)" --trust-server-name "$(OPENOCD_URL)"
 
         # extract the source
 	$(V1) [ ! -d "$(OPENOCD_BUILD_DIR)" ] || $(RM) -r "$(OPENOCD_BUILD_DIR)"
@@ -111,7 +244,7 @@ ftd2xx_install: FTD2XX_FILE := CDM20817.zip
 ftd2xx_install: ftd2xx_clean
         # download the file only if it's newer than what we already have
 	$(V0) @echo " DOWNLOAD     $(FTD2XX_URL)"
-	$(V1) wget -q -N -P "$(DL_DIR)" "$(FTD2XX_URL)"
+	$(V1) $(WGET) -q -N -P "$(DL_DIR)" "$(FTD2XX_URL)"
 
         # extract the source
 	$(V0) @echo " EXTRACT      $(FTD2XX_FILE) -> $(FTD2XX_DIR)"
@@ -133,7 +266,7 @@ libusb_win_install: LIBUSB_WIN_FILE := libusb-win32-bin-1.2.6.0.zip
 libusb_win_install: libusb_win_clean
         # download the file only if it's newer than what we already have
 	$(V0) @echo " DOWNLOAD     $(LIBUSB_WIN_URL)"
-	$(V1) wget -q -N -P "$(DL_DIR)" --trust-server-name "$(LIBUSB_WIN_URL)"
+	$(V1) $(WGET) -q -N -P "$(DL_DIR)" --trust-server-name "$(LIBUSB_WIN_URL)"
 
         # extract the source
 	$(V0) @echo " EXTRACT      $(LIBUSB_WIN_FILE) -> $(LIBUSB_WIN_DIR)"
@@ -269,7 +402,7 @@ dfuutil_install: | $(DL_DIR) $(TOOLS_DIR)
 dfuutil_install: dfuutil_clean
         # download the source
 	$(V0) @echo " DOWNLOAD     $(DFUUTIL_URL)"
-	$(V1) wget -N -P "$(DL_DIR)" "$(DFUUTIL_URL)"
+	$(V1) $(WGET) -N -P "$(DL_DIR)" "$(DFUUTIL_URL)"
 
         # extract the source
 	$(V0) @echo " EXTRACT      $(DFUUTIL_FILE)"
@@ -302,7 +435,7 @@ android_sdk_install: | $(DL_DIR) $(TOOLS_DIR)
 android_sdk_install: android_sdk_clean
         # download the source only if it's newer than what we already have
 	$(V0) @echo " DOWNLOAD     $(ANDROID_SDK_URL)"
-	$(V1) wget --no-check-certificate -N -P "$(DL_DIR)" "$(ANDROID_SDK_URL)"
+	$(V1) $(WGET) --no-check-certificate -N -P "$(DL_DIR)" "$(ANDROID_SDK_URL)"
 
         # binary only release so just extract it
 	$(V0) @echo " EXTRACT      $(ANDROID_SDK_FILE)"
@@ -329,7 +462,7 @@ gtest_install: gtest_clean
         # download the file unconditionally since google code gives back 404
         # for HTTP HEAD requests which are used when using the wget -N option
 	$(V1) [ ! -f "$(DL_DIR)/$(GTEST_FILE)" ] || $(RM) -f "$(DL_DIR)/$(GTEST_FILE)"
-	$(V1) wget -P "$(DL_DIR)" --trust-server-name "$(GTEST_URL)"
+	$(V1) $(WGET) -P "$(DL_DIR)" --trust-server-name "$(GTEST_URL)"
 
         # extract the source
 	$(V1) [ ! -d "$(GTEST_DIR)" ] || $(RM) -rf "$(GTEST_DIR)"
@@ -341,3 +474,32 @@ gtest_clean:
 	$(V0) @echo " CLEAN        $(GTEST_DIR)"
 	$(V1) [ ! -d "$(GTEST_DIR)" ] || $(RM) -rf "$(GTEST_DIR)"
 
+##############################
+#
+# TODO: these defines will go to tool install sections
+#
+##############################
+
+# Set up paths to tools
+ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+    QMAKE := $(QT_SDK_QMAKE_PATH)
+else
+    # not installed, hope it's in the path...
+    QMAKE ?= qmake
+endif
+
+ifeq ($(shell [ -d "$(OPENOCD_DIR)" ] && $(ECHO) "exists"), exists)
+    export OPENOCD := $(OPENOCD_DIR)/bin/openocd
+else
+    # not installed, hope it's in the path...
+    export OPENOCD ?= openocd
+endif
+
+ifeq ($(shell [ -d "$(ANDROID_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+    ANDROID    := $(ANDROID_SDK_DIR)/tools/android
+    ANDROID_DX := $(ANDROID_SDK_DIR)/platform-tools/dx
+else
+    # not installed, hope it's in the path...
+    ANDROID    ?= android
+    ANDROID_DX ?= dx
+endif

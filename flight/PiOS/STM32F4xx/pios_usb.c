@@ -28,14 +28,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
+
+#ifdef PIOS_INCLUDE_USB
+
 #include "usb_core.h"
 #include "pios_usb_board_data.h"
-#include "pios_usb.h"
 #include "pios_usb_priv.h"
 
-#if defined(PIOS_INCLUDE_USB)
 
 /* Rx/Tx status */
 static uint8_t transfer_possible = 0;
@@ -261,7 +261,7 @@ void USB_OTG_BSP_TimerIRQ (void)
 
 }
 
-#endif	/* PIOS_INCLUDE_USB */
+#endif /* PIOS_INCLUDE_USB */
 
 /**
  * @}

@@ -32,12 +32,8 @@
 #ifndef PIOS_WAVPLAY_H
 #define PIOS_WAVPLAY_H
 
-#include <pios.h>
-
-// *****************************************************************************
-#if defined(PIOS_INCLUDE_WAVE)
-
 #include <pios_stm32.h>
+
 #define BUFFERSIZE	512	//Defines the buffer size to hold data from the SD card.
 
 struct pios_dac_cfg {
@@ -53,5 +49,4 @@ struct pios_dac_cfg {
 extern void PIOS_WavPlay_Init(const struct pios_dac_cfg * cfg);
 extern uint8_t WavePlayer_Start(void);
 
-#endif
-#endif /* PIOS_VIDEO_H */
+#endif /* PIOS_WAVPLAY_H */

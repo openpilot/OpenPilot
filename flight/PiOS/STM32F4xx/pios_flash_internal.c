@@ -26,7 +26,7 @@
 
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_FLASH_INTERNAL)
+#ifdef PIOS_INCLUDE_FLASH_INTERNAL
 
 #include "stm32f4xx_flash.h"
 #include "pios_flash_internal_priv.h"
@@ -334,4 +334,4 @@ const struct pios_flash_driver pios_internal_flash_driver = {
 	.read_data         = PIOS_Flash_Internal_ReadData,
 };
 
-#endif	/* defined(PIOS_INCLUDE_FLASH_INTERNAL) */
+#endif /* PIOS_INCLUDE_FLASH_INTERNAL */

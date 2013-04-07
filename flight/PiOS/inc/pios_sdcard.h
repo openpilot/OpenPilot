@@ -31,8 +31,6 @@
 #ifndef PIOS_SDCARD_H
 #define PIOS_SDCARD_H
 
-#if defined(PIOS_INCLUDE_SDCARD)
-
 /* Public Functions */
 typedef struct {
 	uint8_t CSDStruct;	/* CSD structure */
@@ -112,7 +110,5 @@ extern int32_t PIOS_SDCARD_ReadLine(PFILEINFO fileinfo, uint8_t * buffer, uint32
 #endif
 extern int32_t PIOS_SDCARD_FileCopy(char *Source, char *Destination);
 extern int32_t PIOS_SDCARD_FileDelete(char *Filename);
-
-#endif
 
 #endif /* PIOS_SDCARD_H */

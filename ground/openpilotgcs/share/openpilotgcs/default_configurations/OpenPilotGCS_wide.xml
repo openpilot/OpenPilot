@@ -2,16 +2,16 @@
   <General>
     <AutoConnect>true</AutoConnect>
     <AutoSelect>true</AutoSelect>
-    <ExpertMode>false</ExpertMode>
-    <LastPreferenceCategory>Notify Plugin</LastPreferenceCategory>
-    <LastPreferencePage>settings</LastPreferencePage>
-    <SaveSettingsOnExit>true</SaveSettingsOnExit>
-    <SettingsWindowHeight>700</SettingsWindowHeight>
-    <SettingsWindowWidth>800</SettingsWindowWidth>
-    <UDPMirror>false</UDPMirror>
     <Description>Wide configuration</Description>
-    <Details>Default configuration built for wide screens (17"up)</Details>
-    <StyleSheet>wide</StyleSheet>
+    <Details>Default configuration built for wide screens (17" and up)</Details>
+    <ExpertMode>false</ExpertMode>
+    <LastPreferenceCategory></LastPreferenceCategory>
+    <LastPreferencePage></LastPreferencePage>
+    <SaveSettingsOnExit>true</SaveSettingsOnExit>
+    <SettingsWindowHeight>600</SettingsWindowHeight>
+    <SettingsWindowWidth>800</SettingsWindowWidth>
+    <StyleSheet>default</StyleSheet>
+    <UDPMirror>false</UDPMirror>
   </General>
   <KeyBindings>
     <size>0</size>
@@ -2464,14 +2464,7 @@
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve0>
-          <plotCurve1>
-            <color>0</color>
-            <yMaximum>0</yMaximum>
-            <yMeanSamples>1</yMeanSamples>
-            <yMinimum>0</yMinimum>
-            <yScalePower>0</yScalePower>
-          </plotCurve1>
-          <plotCurveCount>2</plotCurveCount>
+          <plotCurveCount>1</plotCurveCount>
           <plotType>1</plotType>
           <refreshInterval>800</refreshInterval>
         </data>

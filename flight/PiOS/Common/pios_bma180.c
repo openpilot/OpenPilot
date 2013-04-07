@@ -31,7 +31,7 @@
 
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_BMA180)
+#ifdef PIOS_INCLUDE_BMA180
 
 #include "fifo_buffer.h"
 
@@ -475,6 +475,7 @@ bool PIOS_BMA180_IRQHandler(void)
 }
 
 #endif /* PIOS_INCLUDE_BMA180 */
+
 /**
  * @}
  * @}

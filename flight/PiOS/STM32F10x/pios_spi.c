@@ -35,7 +35,7 @@
 
 #include <pios.h>
 
-#if defined(PIOS_INCLUDE_SPI)
+#ifdef PIOS_INCLUDE_SPI
 
 #include <pios_spi_priv.h>
 
@@ -577,7 +577,7 @@ void PIOS_SPI_IRQ_Handler(uint32_t spi_id)
 	}
 }
 
-#endif
+#endif /* PIOS_INCLUDE_SPI */
 
 /**
   * @}

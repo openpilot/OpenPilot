@@ -1,6 +1,5 @@
 #include <pios.h>
 #include <pios_board.h>
-
 #include "pios_board_info.h"
 
 const struct pios_board_info __attribute__((__used__)) __attribute__((__section__(".boardinfo"))) pios_board_info_blob = {

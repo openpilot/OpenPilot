@@ -186,7 +186,7 @@ extern uint32_t pios_com_telem_usb_id;
 #define PIOS_COM_GPS                    (pios_com_gps_id)
 #define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
 #define PIOS_COM_TELEM_RF               (pios_com_telem_rf_id)
-#define PIOS_COM_DEBUG                  PIOS_COM_AUX
+#define PIOS_COM_DEBUG                  (PIOS_COM_AUX)
 #define PIOS_COM_OSD                 	(pios_com_aux_id)
 
 //extern uint32_t pios_com_serial_id;
@@ -200,13 +200,6 @@ extern uint32_t pios_com_telem_usb_id;
 #if defined(PIOS_INCLUDE_USB_HID)
 extern uint32_t pios_com_telem_usb_id;
 #define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
-#endif
-
-#if defined(PIOS_COM_DEBUG)
-//  #define DEBUG_PRINTF(...) PIOS_COM_SendFormattedString(PIOS_COM_DEBUG, __VA_ARGS__)
-  #define DEBUG_PRINTF(...) PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__)
-#else
-  #define DEBUG_PRINTF(...)
 #endif
 
 // *****************************************************************

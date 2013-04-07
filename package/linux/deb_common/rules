@@ -33,18 +33,17 @@ install:
 	dh_installdirs
 	dh_installudev --priority=45
 	# Add here commands to install the package into debian/<packagename>
-	cp -arp build/ground/openpilotgcs/bin   debian/openpilot/usr/local/OpenPilot
-	cp -arp build/ground/openpilotgcs/lib   debian/openpilot/usr/local/OpenPilot
-	cp -arp build/ground/openpilotgcs/share debian/openpilot/usr/local/OpenPilot
-	cp -arp build/ground/openpilotgcs/.obj  debian/openpilot/usr/local/OpenPilot
-	cp -arp build/ground/openpilotgcs/gcsversioninfo.h debian/openpilot/usr/local/OpenPilot
+	cp -arp build/openpilotgcs_release/bin   debian/openpilot/usr/local/OpenPilot
+	cp -arp build/openpilotgcs_release/lib   debian/openpilot/usr/local/OpenPilot
+	cp -arp build/openpilotgcs_release/share debian/openpilot/usr/local/OpenPilot
+	cp -arp build/openpilotgcs_release/.obj  debian/openpilot/usr/local/OpenPilot
 	cp -arp package/linux/openpilot.desktop debian/openpilot/usr/share/applications
 	cp -arp package/linux/openpilot.png     debian/openpilot/usr/share/pixmaps
 	cp -arp package/linux/openpilot_menu.png  debian/openpilot/usr/share/pixmaps
 	cp -arp package/linux/openpilot_menu.menu debian/openpilot/etc/xdg/menus/applications-merged
 	cp -arp package/linux/openpilot_menu.directory debian/openpilot/usr/share/desktop-directories
 ifdef PACKAGE_DIR
-	cp -a $(PACKAGE_DIR)/*.opfw debian/openpilot/usr/local/OpenPilot/firmware/
+	cp -a $(PACKAGE_DIR)/* debian/openpilot/usr/local/OpenPilot/firmware/
 else
 	$(error PACKAGE_DIR not defined! $(PACKAGE_DIR))
 endif

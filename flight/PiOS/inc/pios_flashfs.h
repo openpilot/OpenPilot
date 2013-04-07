@@ -24,8 +24,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_FLASHFS_H_
-#define PIOS_FLASHFS_H_
+#ifndef PIOS_FLASHFS_H
+#define PIOS_FLASHFS_H
 
 #include <stdint.h>
 
@@ -34,4 +34,4 @@ int32_t PIOS_FLASHFS_ObjSave(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_
 int32_t PIOS_FLASHFS_ObjLoad(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size);
 int32_t PIOS_FLASHFS_ObjDelete(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id);
 
-#endif	/* PIOS_FLASHFS_H_ */
+#endif	/* PIOS_FLASHFS_H */

@@ -510,11 +510,10 @@ int DFUObject::AbortOperation(void)
 
     return sendData(buf, BUF_LEN);
 }
-
 /**
   Starts the firmware (leaves bootloader and boots the main software)
   */
-int DFUObject::JumpToApp(bool safeboot)
+int DFUObject::JumpToApp(bool safeboot, bool erase)
 {
     char buf[BUF_LEN];
     buf[0] =0x02;//reportID
@@ -536,6 +535,39 @@ int DFUObject::JumpToApp(bool safeboot)
         buf[8] = 0;
         buf[9] = 0;
     }
+    if(erase)
+	{
+	// force data flash clear
+		buf[10] = 0x00;
+		buf[11] = 0x00;
+		buf[12] = 0xFA;
+		buf[13] = 0x5F;
+
+		buf[14] = 0x00;
+		buf[15] = 0x00;
+		buf[16] = 0x00;
+		buf[17] = 0x01;
+
+		buf[18] = 0x00;
+		buf[19] = 0x00;
+		buf[20] = 0x00;
+		buf[21] = 0x00;
+	} else {
+		buf[10] = 0x00;
+		buf[11] = 0x00;
+		buf[12] = 0x00;
+		buf[13] = 0x00;
+
+		buf[14] = 0x00;
+		buf[15] = 0x00;
+		buf[16] = 0x00;
+		buf[17] = 0x00;
+
+		buf[18] = 0x00;
+		buf[19] = 0x00;
+		buf[20] = 0x00;
+		buf[21] = 0x00;
+	}
 
     return sendData(buf, BUF_LEN);
 }

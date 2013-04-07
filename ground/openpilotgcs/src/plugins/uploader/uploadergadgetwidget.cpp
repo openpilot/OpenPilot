@@ -54,6 +54,7 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(m_config->resetButton, SIGNAL(clicked()), this, SLOT(systemReset()));
     connect(m_config->bootButton, SIGNAL(clicked()), this, SLOT(systemBoot()));
     connect(m_config->safeBootButton, SIGNAL(clicked()), this, SLOT(systemSafeBoot()));
+    connect(m_config->eraseBootButton, SIGNAL(clicked()), this, SLOT(systemEraseBoot()));
     connect(m_config->rescueButton, SIGNAL(clicked()), this, SLOT(systemRescue()));
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
     connect(cm,SIGNAL(deviceConnected(QIODevice*)),this,SLOT(onPhisicalHWConnect()));
@@ -135,10 +136,16 @@ FlightStatus *UploaderGadgetWidget::getFlightStatus()
     return status;
 }
 
+void UploaderGadgetWidget::bootButtonsSetEnable(bool enabled)
+{
+    m_config->bootButton->setEnabled(enabled);
+    m_config->safeBootButton->setEnabled(enabled);
+    m_config->eraseBootButton->setEnabled(enabled);
+}
+
 void UploaderGadgetWidget::onPhisicalHWConnect()
 {
-    m_config->bootButton->setEnabled(false);
-    m_config->safeBootButton->setEnabled(false);
+    bootButtonsSetEnable(false);
     m_config->rescueButton->setEnabled(false);
     m_config->telemetryLink->setEnabled(false);
 }
@@ -154,8 +161,7 @@ void UploaderGadgetWidget::populate()
 {
     m_config->haltButton->setEnabled(true);
     m_config->resetButton->setEnabled(true);
-    m_config->safeBootButton->setEnabled(false);
-    m_config->bootButton->setEnabled(false);
+    bootButtonsSetEnable(false);
     m_config->rescueButton->setEnabled(false);
     m_config->telemetryLink->setEnabled(false);
 
@@ -177,8 +183,7 @@ void UploaderGadgetWidget::populate()
 void UploaderGadgetWidget::onAutopilotDisconnect(){
     m_config->haltButton->setEnabled(false);
     m_config->resetButton->setEnabled(false);
-    m_config->bootButton->setEnabled(true);
-    m_config->safeBootButton->setEnabled(true);
+    bootButtonsSetEnable(true);
     if (currentStep == IAP_STATE_BOOTLOADER) {
         m_config->rescueButton->setEnabled(false);
         m_config->telemetryLink->setEnabled(false);
@@ -344,8 +349,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
         m_config->resetButton->setEnabled(false);
         */
         // Need to re-enable in case we were not connected
-        m_config->bootButton->setEnabled(true);
-        m_config->safeBootButton->setEnabled(true);
+        bootButtonsSetEnable(true);
         /*
         m_config->telemetryLink->setEnabled(false);
         m_config->rescueButton->setEnabled(false);
@@ -420,23 +424,38 @@ void UploaderGadgetWidget::systemReset()
 
 void UploaderGadgetWidget::systemBoot()
 {
-  commonSystemBoot(false);
+  commonSystemBoot(false, false);
 }
 
 void UploaderGadgetWidget::systemSafeBoot()
 {
-  commonSystemBoot(true);
+  commonSystemBoot(true, false);
+}
+
+void UploaderGadgetWidget::systemEraseBoot()
+{
+	QMessageBox msgBox;
+	int result;
+	msgBox.setWindowTitle(tr("Erase Settings"));
+	msgBox.setInformativeText(tr("Do you want to erase all settings from the board?\nSettings cannot be recovered after this operation.\nThe board will be restarted and all the setting erased"));
+	msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel | QMessageBox::Help);
+	result = msgBox.exec();
+	if(result == QMessageBox::Ok)
+	{
+		commonSystemBoot(true, true);
+	} else if(result == QMessageBox::Help) {
+		QDesktopServices::openUrl( QUrl(tr("http://wiki.openpilot.org/display/Doc/Erase+board+settings"), QUrl::StrictMode) );
+	}
 }
 
 /**
   * Tells the system to boot (from Bootloader state)
   * @param[in] safeboot Indicates whether the firmware should use the stock HWSettings
   */
-void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
+void UploaderGadgetWidget::commonSystemBoot(bool safeboot, bool erase)
 {
     clearLog();
-    m_config->bootButton->setEnabled(false);
-    m_config->safeBootButton->setEnabled(false);
+    bootButtonsSetEnable(false);
 
     // Suspend telemety & polling in case it is not done yet
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
@@ -459,13 +478,12 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
         log("Could not enter DFU mode.");
         delete dfu;
         dfu = NULL;
-        m_config->bootButton->setEnabled(true);
-        m_config->safeBootButton->setEnabled(true);
+        bootButtonsSetEnable(true);
         m_config->rescueButton->setEnabled(true); // Boot not possible, maybe Rescue OK?
         return;
     }
     log("Booting system...");
-    dfu->JumpToApp(safeboot);
+    dfu->JumpToApp(safeboot, erase);
     // Restart the polling thread
     cm->resumePolling();
     m_config->rescueButton->setEnabled(true);
@@ -738,8 +756,7 @@ void UploaderGadgetWidget::systemRescue()
     }
     m_config->haltButton->setEnabled(false);
     m_config->resetButton->setEnabled(false);
-    m_config->bootButton->setEnabled(true);
-    m_config->safeBootButton->setEnabled(true);
+    bootButtonsSetEnable(true);
     m_config->rescueButton->setEnabled(false);
     currentStep = IAP_STATE_BOOTLOADER; // So that we can boot from the GUI afterwards.
 }
@@ -773,8 +790,7 @@ void UploaderGadgetWidget::cancel()
 void UploaderGadgetWidget::uploadStarted()
 {
     m_config->haltButton->setEnabled(false);
-    m_config->bootButton->setEnabled(false);
-    m_config->safeBootButton->setEnabled(false);
+    bootButtonsSetEnable(false);
     m_config->resetButton->setEnabled(false);
     m_config->rescueButton->setEnabled(false);
 }
@@ -784,8 +800,7 @@ void UploaderGadgetWidget::uploadEnded(bool succeed)
     Q_UNUSED(succeed);
     // device is halted so no halt
     m_config->haltButton->setEnabled(false);
-    m_config->bootButton->setEnabled(true);
-    m_config->safeBootButton->setEnabled(true);
+    bootButtonsSetEnable(true);
     // device is halted so no reset
     m_config->resetButton->setEnabled(false);
     m_config->rescueButton->setEnabled(true);
@@ -794,8 +809,7 @@ void UploaderGadgetWidget::uploadEnded(bool succeed)
 void UploaderGadgetWidget::downloadStarted()
 {
     m_config->haltButton->setEnabled(false);
-    m_config->bootButton->setEnabled(false);
-    m_config->safeBootButton->setEnabled(false);
+    bootButtonsSetEnable(false);
     m_config->resetButton->setEnabled(false);
     m_config->rescueButton->setEnabled(false);
 }
@@ -805,8 +819,7 @@ void UploaderGadgetWidget::downloadEnded(bool succeed)
     Q_UNUSED(succeed);
     // device is halted so no halt
     m_config->haltButton->setEnabled(false);
-    m_config->bootButton->setEnabled(true);
-    m_config->safeBootButton->setEnabled(true);
+    bootButtonsSetEnable(true);
     // device is halted so no reset
     m_config->resetButton->setEnabled(false);
     m_config->rescueButton->setEnabled(true);

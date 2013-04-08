@@ -77,7 +77,7 @@ float PIOS_MPXV_CalcAirspeed(PIOS_MPXV_descriptor *desc,uint16_t measurement)
 	}
 	
 	//Compute calibrated airspeed, as per http://en.wikipedia.org/wiki/Calibrated_airspeed
-	float calibratedAirspeed = A0*sqrt(5.0f*(pow(Qc/P0+1.0f,POWER)-1.0f));
+	float calibratedAirspeed = A0*sqrtf(5.0f*(powf(Qc/P0+1.0f,POWER)-1.0f));
 	
 	//Upper bound airspeed. No need to lower bound it, that comes from Qc
 	if (calibratedAirspeed > desc->maxSpeed) { //in [m/s]

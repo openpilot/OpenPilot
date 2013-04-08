@@ -34,8 +34,7 @@
 #ifndef PIOS_H
 #define PIOS_H
 
-/* Used in pios_*.* files macro */
-#define NELEMENTS(x) (sizeof(x) / sizeof((x)[0]))
+#include <pios_helpers.h>
 
 #ifdef USE_SIM_POSIX
 /* SimPosix version of this file. This will probably be removed later */

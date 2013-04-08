@@ -35,7 +35,7 @@
 #include "gpsvelocity.h"
 #include "attitudeactual.h"
 #include "CoordinateConversions.h"
-
+#include <pios_math.h>
 
 
 // Private constants
@@ -43,9 +43,6 @@
 #define GPS_AIRSPEED_BIAS_KI           0.1f   //Needs to be settable in a UAVO
 #define SAMPLING_DELAY_MS_GPS          100    //Needs to be settable in a UAVO
 #define GPS_AIRSPEED_TIME_CONSTANT_MS  500.0f //Needs to be settable in a UAVO
-
-#define F_PI 3.141526535897932f
-#define DEG2RAD (F_PI/180.0f)
 
 // Private types
 struct GPSGlobals {
@@ -117,7 +114,7 @@ void gps_airspeedGet(float *v_air_GPS)
 	float cosDiff=(Rbe[0][0]*gps->RbeCol1_old[0]) + (Rbe[0][1]*gps->RbeCol1_old[1]) + (Rbe[0][2]*gps->RbeCol1_old[2]);
 	
 	//If there's more than a 5 degree difference between two fuselage measurements, then we have sufficient delta to continue.
-	if (fabs(cosDiff) < cos(5.0f*DEG2RAD)) {
+	if (fabsf(cosDiff) < cosf(DEG2RAD(5.0f))) {
 		GPSVelocityData gpsVelData;
 		GPSVelocityGet(&gpsVelData);
 		

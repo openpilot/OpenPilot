@@ -964,12 +964,12 @@ static void PIOS_RFM22B_Task(void *parameters)
 static void rfm22_setDatarate(struct pios_rfm22b_dev * rfm22b_dev, enum rfm22b_datarate datarate, bool data_whitening)
 {
 	uint32_t datarate_bps = data_rate[datarate];
-	rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(datarate_bps) + 0.5);
+	rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(datarate_bps) + 0.5f);
 	if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED)
 	{
 		// Generate a pseudo-random number from 0-8 to add to the delay
 		uint8_t random = PIOS_CRC_updateByte(0, (uint8_t)(xTaskGetTickCount() & 0xff)) & 0x03;
-		rfm22b_dev->max_ack_delay = (uint16_t)((float)(sizeof(PHPacketHeader) * 8 * 1000) / (float)(datarate_bps) + 0.5) * 4 + random;
+		rfm22b_dev->max_ack_delay = (uint16_t)((float)(sizeof(PHPacketHeader) * 8 * 1000) / (float)(datarate_bps) + 0.5f) * 4 + random;
 	}
 	else
 		rfm22b_dev->max_ack_delay = CONNECT_ATTEMPT_PERIOD_MS;

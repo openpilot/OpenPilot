@@ -524,19 +524,15 @@ int DFUObject::JumpToApp(bool safeboot, bool erase)
     buf[5] = 0;
     buf[6] = 0;
     buf[7] = 0;
-    if (safeboot)
-    {
+    if (safeboot) {
         /* force system to safe boot mode (hwsettings == defaults) */
         buf[8] = 0x5A;
         buf[9] = 0xFE;
-    }
-    else
-    {
+    } else {
         buf[8] = 0;
         buf[9] = 0;
     }
-    if(erase)
-	{
+    if (erase) {
 	// force data flash clear
 		buf[10] = 0x00;
 		buf[11] = 0x00;

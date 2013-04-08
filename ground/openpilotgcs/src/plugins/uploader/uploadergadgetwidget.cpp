@@ -64,6 +64,8 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     rbi.addFile(QString(":uploader/images/view-refresh.svg"));
     m_config->refreshPorts->setIcon(rbi);
 
+    bootButtonsSetEnable(false);
+
     connect(m_config->refreshPorts, SIGNAL(clicked()), this, SLOT(getSerialPorts()));
 
     connect(m_config->pbHelp,SIGNAL(clicked()),this,SLOT(openHelp()));

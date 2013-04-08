@@ -91,6 +91,8 @@ do {\
 #define configCHECK_FOR_STACK_OVERFLOW	1
 #endif
 
+void *pvPortMallocGeneric( size_t xWantedSize, size_t alignment);
+#define pvPortMallocAligned( x, puxStackBuffer ) ( ( ( puxStackBuffer ) == NULL ) ? ( pvPortMallocGeneric( ( x ) , portBYTE_ALIGNMENT) ) : ( puxStackBuffer ) )
 
 /**
   * @}

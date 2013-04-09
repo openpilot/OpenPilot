@@ -1,6 +1,7 @@
 #
 # Top level Makefile for the OpenPilot project build system.
 # Copyright (c) 2010-2013, The OpenPilot Team, http://www.openpilot.org
+# Use 'make help' for instructions.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -93,37 +94,9 @@ endif
 # the tools.mk to ensure that we download/install the right tools.
 UNAME := $(shell uname)
 ARCH  := $(shell uname -m)
-# Here and everywhere if not Linux or OSX then assume Windows
+# Here and everywhere if not Linux or Mac then assume Windows
 ifeq ($(filter Linux Darwin, $(UNAME)), )
     UNAME := Windows
-endif
-
-# Set up misc host tools
-export ECHO	:= echo
-export MKDIR	:= mkdir
-export CP	:= cp
-export RM	:= rm
-export LN	:= ln
-export CAT	:= cat
-export SED	:= sed
-export TAR	:= tar
-export ANT	:= ant
-export JAVAC	:= javac
-export JAR	:= jar
-export GIT	:= git
-export CURL	:= curl
-export PYTHON	:= python
-export INSTALL	:= install
-
-# Command to extract version info data from the repository and source tree
-export VERSION_INFO := $(PYTHON) "$(ROOT_DIR)/make/scripts/version-info.py" --path="$(ROOT_DIR)"
-
-# Test if quotes are needed for the echo-command
-ifeq (${shell $(ECHO) "test"}, test)
-    export QUOTE := '
-# This line is just to clear out the single quote above '
-else
-    export QUOTE :=
 endif
 
 # Include tools installers
@@ -136,7 +109,7 @@ ifeq ($(UNAME), Linux)
 else ifeq ($(UNAME), Darwin)
     QT_SPEC = macx-g++
     UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
-else
+else ifeq ($(UNAME), Windows)
     QT_SPEC = win32-g++
     UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/$(UAVOGEN_BUILD_CONF)/uavobjgenerator.exe"
 endif
@@ -846,8 +819,9 @@ help:
 	@$(ECHO) "   Here is a summary of the available targets:"
 	@$(ECHO)
 	@$(ECHO) "   [Tool Installers]"
-	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
 	@$(ECHO) "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
+	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
+	@$(ECHO) "     mingw_install        - Install the MinGW toolchain (Windows only)"
 	@$(ECHO) "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@$(ECHO) "     stm32flash_install   - Install the stm32flash tool for unbricking F1-based boards"
 	@$(ECHO) "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"

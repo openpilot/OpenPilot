@@ -8,11 +8,12 @@
 #
 # Ready to use:
 #    arm_sdk_install
+#    qt_sdk_install
+#    mingw_install
 #
 # TODO:
 #    wget_win_install
 #    make_win_install
-#    qt_sdk_install
 #    openocd_install
 #    ftd2xx_install
 #    libusb_win_install
@@ -53,13 +54,19 @@ endif
 
 ifeq ($(UNAME), Linux)
     ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux.tar.bz2
+    QT_SDK_URL  := TODO/qt-4.8.4-linux.tar.bz2
 else ifeq ($(UNAME), Darwin)
     ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-mac.tar.bz2
+    QT_SDK_URL  := TODO/qt-4.8.4-mac.tar.bz2
 else ifeq ($(UNAME), Windows)
     ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
+    QT_SDK_URL  := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-windows.tar.bz2
+    MINGW_URL   := http://wiki.openpilot.org/download/attachments/18612236/mingw-4.4.0.tar.bz2
 endif
 
-ARM_SDK_DIR := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
+ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
+QT_SDK_DIR      := $(TOOLS_DIR)/qt-4.8.4
+MINGW_DIR       := $(TOOLS_DIR)/mingw-4.4.0
 
 ##############################
 #
@@ -67,7 +74,10 @@ ARM_SDK_DIR := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
 #
 ##############################
 
-ALL_SDK_TARGETS := arm_sdk
+ALL_SDK_TARGETS := arm_sdk qt_sdk
+ifeq ($(UNAME), Windows)
+    ALL_SDK_TARGETS += mingw
+endif
 
 .PHONY: all_sdk_install all_sdk_clean all_sdk_distclean all_sdk_version
 all_sdk_install:   $(addsuffix _install,$(ALL_SDK_TARGETS))
@@ -85,6 +95,7 @@ all_sdk_version:   $(addsuffix _version,$(ALL_SDK_TARGETS))
 MSG_DOWNLOADING      = $(QUOTE) DOWNLOAD   $(QUOTE)
 MSG_EXTRACTING       = $(QUOTE) EXTRACT    $(QUOTE)
 MSG_INSTALLING       = $(QUOTE) INSTALL    $(QUOTE)
+MSG_CONFIGURING      = $(QUOTE) CONFIGURE  $(QUOTE)
 MSG_CLEANING         = $(QUOTE) CLEAN      $(QUOTE)
 MSG_DISTCLEANING     = $(QUOTE) DISTCLEAN  $(QUOTE)
 
@@ -107,10 +118,50 @@ endif
 # run in parallel
 ifneq ($(strip $(filter $(addsuffix _install,all_sdk $(ALL_SDK_TARGETS)),$(MAKECMDGOALS))),)
 .NOTPARALLEL:
-    $(info $(EMPTY) NOTE        Parallel make disabled by some of sdk install targets)
+    $(info $(EMPTY) NOTE        Parallel make disabled by some of tool/sdk install targets)
     $(info $(EMPTY) NOTE        If some of install/extract targets failed, try 'make *_distclean' first)
     $(info $(EMPTY) NOTE        Use all_sdk_version to check toolchain versions)
 endif
+
+##############################
+#
+# Misc host tools
+#
+##############################
+
+export MKDIR	:= mkdir
+export CP	:= cp
+export RM	:= rm
+export LN	:= ln
+export CAT	:= cat
+export SED	:= sed
+export TAR	:= tar
+export ANT	:= ant
+export JAVAC	:= javac
+export JAR	:= jar
+export GIT	:= git
+export CURL	:= curl
+export PYTHON	:= python
+export INSTALL	:= install
+
+# Echo in recipes is a bit tricky in a Windows Git Bash window in some cases.
+# It does not work if make started under msysGit installed into a path with spaces.
+ifneq ($(UNAME), Windows)
+    export ECHO	:= echo
+else
+    export ECHO	:= $(PYTHON) -c "import sys; print(' '.join(sys.argv[1:]))"
+endif
+
+# Test if quotes are needed for the echo command
+ifeq ($(shell $(ECHO) "test"), test)
+    export QUOTE := '
+# This line is just to clear out the single quote above '
+else
+    export QUOTE :=
+endif
+
+# Command to extract version info data from the repository and source tree
+export VERSION_INFO := $(PYTHON) "$(ROOT_DIR)/make/scripts/version-info.py" --path="$(ROOT_DIR)"
 
 ##############################
 #
@@ -127,13 +178,14 @@ arm_sdk_install: arm_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 		$(if $(shell [ -f "$(DL_DIR)/$(ARM_SDK_FILE)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(ARM_SDK_FILE)",) \
 		-o "$(DL_DIR)/$(ARM_SDK_FILE)" \
 		"$(ARM_SDK_URL)"
+
 	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(ARM_SDK_DIR))
 	$(V1) $(TAR) $(TAR_OPTIONS) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(ARM_SDK_FILE))
 
 .PHONY: arm_sdk_clean
 arm_sdk_clean:
 	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(ARM_SDK_DIR))
-	$(V1) [ ! -d "$(ARM_SDK_DIR)" ] || $(RM) -r "$(ARM_SDK_DIR)"
+	$(V1) [ ! -d "$(ARM_SDK_DIR)" ] || $(RM) -rf "$(ARM_SDK_DIR)"
 
 .PHONY: arm_sdk_distclean
 arm_sdk_distclean:
@@ -154,47 +206,125 @@ endif
 
 ##############################
 #
-# TODO: code below is not revised yet
+# MinGW (Windows only)
 #
 ##############################
 
-# Set up QT toolchain
-QT_SDK_DIR := $(TOOLS_DIR)/qtsdk-v1.2.1
+ifeq ($(UNAME), Windows)
+
+MINGW_FILE := $(notdir $(MINGW_URL))
+
+.PHONY: mingw_install
+mingw_install: mingw_clean | $(DL_DIR) $(TOOLS_DIR)
+	@$(ECHO) $(MSG_DOWNLOADING) $(call toprel, $(DL_DIR)/$(MINGW_FILE))
+	$(V1) $(CURL) $(CURL_OPTIONS) \
+		$(if $(shell [ -f "$(DL_DIR)/$(MINGW_FILE)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(MINGW_FILE)",) \
+		-o "$(DL_DIR)/$(MINGW_FILE)" \
+		"$(MINGW_URL)"
+
+	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(MINGW_DIR))
+	$(V1) $(TAR) $(TAR_OPTIONS) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(MINGW_FILE))
+
+.PHONY: mingw_clean
+mingw_clean:
+	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(MINGW_DIR))
+	$(V1) [ ! -d "$(MINGW_DIR)" ] || $(RM) -rf "$(MINGW_DIR)"
+
+.PHONY: mingw_distclean
+mingw_distclean:
+	@$(ECHO) $(MSG_DISTCLEANING) $(call toprel, $@)
+	$(V1) [ ! -f "$(DL_DIR)/$(MINGW_FILE)" ] || $(RM) "$(DL_DIR)/$(MINGW_FILE)"
+
+.PHONY: mingw_version
+mingw_version:
+	$(V1) gcc --version | head -n1
+
+.PHONY: gcc_version
+gcc_version: mingw_version
+
+ifeq ($(shell [ -d "$(MINGW_DIR)" ] && $(ECHO) "exists"), exists)
+    # set MinGW binary and library paths (QTMINGW is used by qmake, do not rename)
+    export QTMINGW := $(MINGW_DIR)/bin
+    export PATH    := $(QTMINGW):$(PATH)
+else
+    # not installed, use host gcc compiler
+    # $(info $(EMPTY) WARNING     $(call toprel, $(MINGW_DIR)) not found (make mingw_install), using system PATH)
+endif
+
+else # Linux or Mac
+
+all_sdk_version: gcc_version
+
+.PHONY: gcc_version
+gcc_version:
+	$(V1) gcc --version | head -n1
+
+endif
+
+##############################
+#
+# Qt SDK
+#
+##############################
+
+QT_SDK_FILE := $(notdir $(QT_SDK_URL))
 
 .PHONY: qt_sdk_install
-# Choose the appropriate installer based on host architecture
-ifneq (,$(filter $(ARCH), x86_64 amd64))
-# 64-bit
-QT_SDK_QMAKE_PATH := $(QT_SDK_DIR)/Desktop/Qt/4.8.1/gcc/bin/qmake
-qt_sdk_install: QT_SDK_FILE := QtSdk-offline-linux-x86_64-v1.2.1.run
-qt_sdk_install: QT_SDK_URL := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/14b2039c-0e1f-4774-a4f2-9aa60b6d5313/Qt_SDK_Lin64_offline
-else
-# 32-bit
-QT_SDK_QMAKE_PATH := $(QT_SDK_DIR)/Desktop/Qt/4.8.1/gcc/bin/qmake
-qt_sdk_install: QT_SDK_URL  := http://www.developer.nokia.com/dp?uri=http://sw.nokia.com/id/8ea74da4-fec1-4277-8b26-c58cc82e204b/Qt_SDK_Lin32_offline
-qt_sdk_install: QT_SDK_FILE := QtSdk-offline-linux-x86-v1.2.1.run
-endif
-# order-only prereq on directory existance:
-qt_sdk_install : | $(DL_DIR) $(TOOLS_DIR)
-qt_sdk_install: qt_sdk_clean
-        # download the source only if it's newer than what we already have
-	$(V1) $(WGET) -N --content-disposition -P "$(DL_DIR)" "$(QT_SDK_URL)"
-        # tell the user exactly which path they should select in the GUI
-	$(V1) echo "*** NOTE NOTE NOTE ***"
-	$(V1) echo "*"
-	$(V1) echo "*  In the GUI, please use exactly this path as the installation path:"
-	$(V1) echo "*        $(QT_SDK_DIR)"
-	$(V1) echo "*"
-	$(V1) echo "*** NOTE NOTE NOTE ***"
+qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
+	@$(ECHO) $(MSG_DOWNLOADING) $(call toprel, $(DL_DIR)/$(QT_SDK_FILE))
+	$(V1) $(CURL) $(CURL_OPTIONS) \
+		$(if $(shell [ -f "$(DL_DIR)/$(QT_SDK_FILE)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(QT_SDK_FILE)",) \
+		-o "$(DL_DIR)/$(QT_SDK_FILE)" \
+		"$(QT_SDK_URL)"
 
-        #installer is an executable, make it executable and run it
-	$(V1) chmod u+x "$(DL_DIR)/$(QT_SDK_FILE)"
-	$(V1) "$(DL_DIR)/$(QT_SDK_FILE)" -style cleanlooks
+	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(QT_SDK_DIR))
+	$(V1) $(TAR) $(TAR_OPTIONS) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(QT_SDK_FILE))
+
+	@$(ECHO) $(MSG_CONFIGURING) $(call toprel, $(QT_SDK_DIR))
+	@$(ECHO) $(QUOTE)[Paths]$(QUOTE)		> $(QT_SDK_DIR)/bin/qt.conf
+	@$(ECHO) $(QUOTE)Prefix = $(QT_SDK_DIR)$(QUOTE)	>> $(QT_SDK_DIR)/bin/qt.conf
 
 .PHONY: qt_sdk_clean
 qt_sdk_clean:
-	$(V1) [ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf $(QT_SDK_DIR)
+	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(QT_SDK_DIR))
+	$(V1) [ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf "$(QT_SDK_DIR)"
 
+.PHONY: qt_sdk_distclean
+qt_sdk_distclean:
+	@$(ECHO) $(MSG_DISTCLEANING) $(call toprel, $@)
+	$(V1) [ ! -f "$(DL_DIR)/$(QT_SDK_FILE)" ] || $(RM) "$(DL_DIR)/$(QT_SDK_FILE)"
+
+.PHONY: qt_sdk_version
+qt_sdk_version:
+	$(V1) $(QMAKE) --version | tail -1
+
+ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+    export QMAKE := $(QT_SDK_DIR)/bin/qmake
+
+    # set Qt library search path
+    ifeq ($(UNAME), Windows)
+        export PATH := $(QT_SDK_DIR)/bin:$(PATH)
+    else
+        export LD_LIBRARY_PATH := $(QT_SDK_DIR)/lib:$(LD_LIBRARY_PATH)
+    endif
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(QT_SDK_DIR)) not found (make qt_sdk_install), using system PATH)
+    QMAKE ?= qmake
+endif
+
+
+
+
+
+
+
+
+##############################
+#
+# TODO: code below is not revised yet
+#
+##############################
 
 # Set up openocd tools
 OPENOCD_DIR       := $(TOOLS_DIR)/openocd
@@ -479,14 +609,6 @@ gtest_clean:
 # TODO: these defines will go to tool install sections
 #
 ##############################
-
-# Set up paths to tools
-ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    QMAKE := $(QT_SDK_QMAKE_PATH)
-else
-    # not installed, hope it's in the path...
-    QMAKE ?= qmake
-endif
 
 ifeq ($(shell [ -d "$(OPENOCD_DIR)" ] && $(ECHO) "exists"), exists)
     export OPENOCD := $(OPENOCD_DIR)/bin/openocd

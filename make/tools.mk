@@ -166,36 +166,48 @@ export VERSION_INFO = $(PYTHON) $(ROOT_DIR)/make/scripts/version-info.py --path=
 
 ##############################
 #
+# Common tool install template
+#  $(1) = tool name
+#  $(2) = tool install directory
+#  $(3) = tool distribution URL
+#  $(4) = tool distribution file
+#  $(5) = optional configure template
+#
+##############################
+
+define TOOL_INSTALL_TEMPLATE
+
+.PHONY: $(addprefix $(1)_, install clean distclean)
+
+$(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
+	@$(ECHO) $(MSG_DOWNLOADING) $$(call toprel, $(DL_DIR)/$(4))
+	$(V1)echo $(CURL) $(CURL_OPTIONS) \
+		$(if $(shell [ -f "$(DL_DIR)/$(4)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(4)",) \
+		-o "$(DL_DIR)/$(4)" \
+		"$(3)"
+
+	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
+	$(V1)echo $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(TOOLS_DIR)) -xjf $$(call toprel, $(DL_DIR)/$(4))
+
+	$(5)
+
+$(1)_clean:
+	@$(ECHO) $(MSG_CLEANING) $$(call toprel, $(2))
+	$(V1)echo [ ! -d "$(2)" ] || $(RM) -rf "$(2)"
+
+$(1)_distclean:
+	@$(ECHO) $(MSG_DISTCLEANING) $$(call toprel, $$@)
+	$(V1) [ ! -f "$(DL_DIR)/$(4)" ] || $(RM) "$(DL_DIR)/$(4)"
+
+endef
+
+##############################
+#
 # ARM SDK
 #
 ##############################
 
-ARM_SDK_FILE := $(notdir $(ARM_SDK_URL))
-
-.PHONY: arm_sdk_install
-arm_sdk_install: arm_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
-	@$(ECHO) $(MSG_DOWNLOADING) $(call toprel, $(DL_DIR)/$(ARM_SDK_FILE))
-	$(V1) $(CURL) $(CURL_OPTIONS) \
-		$(if $(shell [ -f "$(DL_DIR)/$(ARM_SDK_FILE)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(ARM_SDK_FILE)",) \
-		-o "$(DL_DIR)/$(ARM_SDK_FILE)" \
-		"$(ARM_SDK_URL)"
-
-	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(ARM_SDK_DIR))
-	$(V1) $(TAR) $(TAR_OPTIONS) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(ARM_SDK_FILE))
-
-.PHONY: arm_sdk_clean
-arm_sdk_clean:
-	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(ARM_SDK_DIR))
-	$(V1) [ ! -d "$(ARM_SDK_DIR)" ] || $(RM) -rf "$(ARM_SDK_DIR)"
-
-.PHONY: arm_sdk_distclean
-arm_sdk_distclean:
-	@$(ECHO) $(MSG_DISTCLEANING) $(call toprel, $@)
-	$(V1) [ ! -f "$(DL_DIR)/$(ARM_SDK_FILE)" ] || $(RM) "$(DL_DIR)/$(ARM_SDK_FILE)"
-
-.PHONY: arm_sdk_version
-arm_sdk_version:
-	$(V1) $(ARM_SDK_PREFIX)gcc --version | head -n1
+$(eval $(call TOOL_INSTALL_TEMPLATE,arm_sdk,$(ARM_SDK_DIR),$(ARM_SDK_URL),$(notdir $(ARM_SDK_URL))))
 
 ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && $(ECHO) "exists"), exists)
     export ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-none-eabi-
@@ -205,42 +217,23 @@ else
     export ARM_SDK_PREFIX ?= arm-none-eabi-
 endif
 
+.PHONY: arm_sdk_version
+arm_sdk_version:
+	$(V1) $(ARM_SDK_PREFIX)gcc --version | head -n1
+
 ##############################
 #
 # Qt SDK
 #
 ##############################
 
-QT_SDK_FILE := $(notdir $(QT_SDK_URL))
-
-.PHONY: qt_sdk_install
-qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
-	@$(ECHO) $(MSG_DOWNLOADING) $(call toprel, $(DL_DIR)/$(QT_SDK_FILE))
-	$(V1) $(CURL) $(CURL_OPTIONS) \
-		$(if $(shell [ -f "$(DL_DIR)/$(QT_SDK_FILE)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(QT_SDK_FILE)",) \
-		-o "$(DL_DIR)/$(QT_SDK_FILE)" \
-		"$(QT_SDK_URL)"
-
-	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(QT_SDK_DIR))
-	$(V1) $(TAR) $(TAR_OPTIONS) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(QT_SDK_FILE))
-
+define QT_SDK_CONFIGURE_TEMPLATE
 	@$(ECHO) $(MSG_CONFIGURING) $(call toprel, $(QT_SDK_DIR))
-	@$(ECHO) $(QUOTE)[Paths]$(QUOTE)		> $(QT_SDK_DIR)/bin/qt.conf
-	@$(ECHO) $(QUOTE)Prefix = $(QT_SDK_DIR)$(QUOTE)	>> $(QT_SDK_DIR)/bin/qt.conf
+	$(V1) $(ECHO) $(QUOTE)[Paths]$(QUOTE) > $(QT_SDK_DIR)/bin/qt.conf
+	$(V1) $(ECHO) $(QUOTE)Prefix = $(QT_SDK_DIR)$(QUOTE) >> $(QT_SDK_DIR)/bin/qt.conf
+endef
 
-.PHONY: qt_sdk_clean
-qt_sdk_clean:
-	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(QT_SDK_DIR))
-	$(V1) [ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf "$(QT_SDK_DIR)"
-
-.PHONY: qt_sdk_distclean
-qt_sdk_distclean:
-	@$(ECHO) $(MSG_DISTCLEANING) $(call toprel, $@)
-	$(V1) [ ! -f "$(DL_DIR)/$(QT_SDK_FILE)" ] || $(RM) "$(DL_DIR)/$(QT_SDK_FILE)"
-
-.PHONY: qt_sdk_version
-qt_sdk_version:
-	$(V1) $(QMAKE) --version | tail -1
+$(eval $(call TOOL_INSTALL_TEMPLATE,qt_sdk,$(QT_SDK_DIR),$(QT_SDK_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_CONFIGURE_TEMPLATE)))
 
 ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
     export QMAKE := $(QT_SDK_DIR)/bin/qmake
@@ -257,43 +250,19 @@ else
     QMAKE ?= qmake
 endif
 
+.PHONY: qt_sdk_version
+qt_sdk_version:
+	$(V1) $(QMAKE) --version | tail -1
+
 ##############################
 #
-# MinGW (Windows only)
+# MinGW
 #
 ##############################
 
 ifeq ($(UNAME), Windows)
 
-MINGW_FILE := $(notdir $(MINGW_URL))
-
-.PHONY: mingw_install
-mingw_install: mingw_clean | $(DL_DIR) $(TOOLS_DIR)
-	@$(ECHO) $(MSG_DOWNLOADING) $(call toprel, $(DL_DIR)/$(MINGW_FILE))
-	$(V1) $(CURL) $(CURL_OPTIONS) \
-		$(if $(shell [ -f "$(DL_DIR)/$(MINGW_FILE)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(MINGW_FILE)",) \
-		-o "$(DL_DIR)/$(MINGW_FILE)" \
-		"$(MINGW_URL)"
-
-	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(MINGW_DIR))
-	$(V1) $(TAR) $(TAR_OPTIONS) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(MINGW_FILE))
-
-.PHONY: mingw_clean
-mingw_clean:
-	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(MINGW_DIR))
-	$(V1) [ ! -d "$(MINGW_DIR)" ] || $(RM) -rf "$(MINGW_DIR)"
-
-.PHONY: mingw_distclean
-mingw_distclean:
-	@$(ECHO) $(MSG_DISTCLEANING) $(call toprel, $@)
-	$(V1) [ ! -f "$(DL_DIR)/$(MINGW_FILE)" ] || $(RM) "$(DL_DIR)/$(MINGW_FILE)"
-
-.PHONY: mingw_version
-mingw_version:
-	$(V1) gcc --version | head -n1
-
-.PHONY: gcc_version
-gcc_version: mingw_version
+$(eval $(call TOOL_INSTALL_TEMPLATE,mingw,$(MINGW_DIR),$(MINGW_URL),$(notdir $(MINGW_URL))))
 
 ifeq ($(shell [ -d "$(MINGW_DIR)" ] && $(ECHO) "exists"), exists)
     # set MinGW binary and library paths (QTMINGW is used by qmake, do not rename)
@@ -303,6 +272,13 @@ else
     # not installed, use host gcc compiler
     # $(info $(EMPTY) WARNING     $(call toprel, $(MINGW_DIR)) not found (make mingw_install), using system PATH)
 endif
+
+.PHONY: mingw_version
+mingw_version:
+	$(V1) gcc --version | head -n1
+
+.PHONY: gcc_version
+gcc_version: mingw_version
 
 else # Linux or Mac
 
@@ -316,46 +292,17 @@ endif
 
 ##############################
 #
-# Python (Windows only)
+# Python
 #
 ##############################
 
 ifeq ($(UNAME), Windows)
 
-PYTHON_FILE := $(notdir $(PYTHON_URL))
-
-.PHONY: python_install
-python_install: python_clean | $(DL_DIR) $(TOOLS_DIR)
-	@$(ECHO) $(MSG_DOWNLOADING) $(call toprel, $(DL_DIR)/$(PYTHON_FILE))
-	$(V1) $(CURL) $(CURL_OPTIONS) \
-		$(if $(shell [ -f "$(DL_DIR)/$(PYTHON_FILE)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(PYTHON_FILE)",) \
-		-o "$(DL_DIR)/$(PYTHON_FILE)" \
-		"$(PYTHON_URL)"
-
-	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(PYTHON_DIR))
-	$(V1) $(TAR) $(TAR_OPTIONS) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(PYTHON_FILE))
-
-.PHONY: python_clean
-python_clean:
-	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(PYTHON_DIR))
-	$(V1) [ ! -d "$(PYTHON_DIR)" ] || $(RM) -rf "$(PYTHON_DIR)"
-
-.PHONY: python_distclean
-python_distclean:
-	@$(ECHO) $(MSG_DISTCLEANING) $(call toprel, $@)
-	$(V1) [ ! -f "$(DL_DIR)/$(PYTHON_FILE)" ] || $(RM) "$(DL_DIR)/$(PYTHON_FILE)"
-
-.PHONY: python_version
-python_version:
-	$(V1) $(PYTHON) --version
+$(eval $(call TOOL_INSTALL_TEMPLATE,python,$(PYTHON_DIR),$(PYTHON_URL),$(notdir $(PYTHON_URL))))
 
 else # Linux or Mac
 
 all_sdk_version: python_version
-
-.PHONY: python_version
-python_version:
-	$(V1) $(PYTHON) --version
 
 endif
 
@@ -367,6 +314,13 @@ else
     # $(info $(EMPTY) WARNING     $(call toprel, $(PYTHON_DIR)) not found (make python_install), using system PATH)
     export PYTHON := python
 endif
+
+.PHONY: python_version
+python_version:
+	$(V1) $(PYTHON) --version
+
+
+
 
 
 

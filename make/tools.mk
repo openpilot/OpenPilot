@@ -9,11 +9,10 @@
 # Ready to use:
 #    arm_sdk_install
 #    qt_sdk_install
-#    mingw_install
+#    mingw_install (Windows only)
+#    python_install (Windows only)
 #
 # TODO:
-#    wget_win_install
-#    make_win_install
 #    openocd_install
 #    ftd2xx_install
 #    libusb_win_install
@@ -62,11 +61,13 @@ else ifeq ($(UNAME), Windows)
     ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
     QT_SDK_URL  := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-windows.tar.bz2
     MINGW_URL   := http://wiki.openpilot.org/download/attachments/18612236/mingw-4.4.0.tar.bz2
+    PYTHON_URL  := http://wiki.openpilot.org/download/attachments/18612236/python-2.7.4-windows.tar.bz2
 endif
 
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-4.8.4
 MINGW_DIR       := $(TOOLS_DIR)/mingw-4.4.0
+PYTHON_DIR      := $(TOOLS_DIR)/python-2.7.4
 
 ##############################
 #
@@ -76,7 +77,7 @@ MINGW_DIR       := $(TOOLS_DIR)/mingw-4.4.0
 
 ALL_SDK_TARGETS := arm_sdk qt_sdk
 ifeq ($(UNAME), Windows)
-    ALL_SDK_TARGETS += mingw
+    ALL_SDK_TARGETS += mingw python
 endif
 
 .PHONY: all_sdk_install all_sdk_clean all_sdk_distclean all_sdk_version
@@ -141,7 +142,6 @@ export JAVAC	:= javac
 export JAR	:= jar
 export GIT	:= git
 export CURL	:= curl
-export PYTHON	:= python
 export INSTALL	:= install
 
 # Echo in recipes is a bit tricky in a Windows Git Bash window in some cases.
@@ -149,7 +149,8 @@ export INSTALL	:= install
 ifneq ($(UNAME), Windows)
     export ECHO	:= echo
 else
-    export ECHO	:= $(PYTHON) -c "import sys; print(' '.join(sys.argv[1:]))"
+#   export ECHO := $(PYTHON) -c "import sys; print(' '.join(sys.argv[1:]))"
+    export ECHO	:= echo
 endif
 
 # Test if quotes are needed for the echo command
@@ -161,7 +162,7 @@ else
 endif
 
 # Command to extract version info data from the repository and source tree
-export VERSION_INFO := $(PYTHON) "$(ROOT_DIR)/make/scripts/version-info.py" --path="$(ROOT_DIR)"
+export VERSION_INFO = $(PYTHON) $(ROOT_DIR)/make/scripts/version-info.py --path=$(ROOT_DIR)
 
 ##############################
 #
@@ -202,6 +203,58 @@ else
     # not installed, hope it's in the path...
     # $(info $(EMPTY) WARNING     $(call toprel, $(ARM_SDK_DIR)) not found (make arm_sdk_install), using system PATH)
     export ARM_SDK_PREFIX ?= arm-none-eabi-
+endif
+
+##############################
+#
+# Qt SDK
+#
+##############################
+
+QT_SDK_FILE := $(notdir $(QT_SDK_URL))
+
+.PHONY: qt_sdk_install
+qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
+	@$(ECHO) $(MSG_DOWNLOADING) $(call toprel, $(DL_DIR)/$(QT_SDK_FILE))
+	$(V1) $(CURL) $(CURL_OPTIONS) \
+		$(if $(shell [ -f "$(DL_DIR)/$(QT_SDK_FILE)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(QT_SDK_FILE)",) \
+		-o "$(DL_DIR)/$(QT_SDK_FILE)" \
+		"$(QT_SDK_URL)"
+
+	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(QT_SDK_DIR))
+	$(V1) $(TAR) $(TAR_OPTIONS) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(QT_SDK_FILE))
+
+	@$(ECHO) $(MSG_CONFIGURING) $(call toprel, $(QT_SDK_DIR))
+	@$(ECHO) $(QUOTE)[Paths]$(QUOTE)		> $(QT_SDK_DIR)/bin/qt.conf
+	@$(ECHO) $(QUOTE)Prefix = $(QT_SDK_DIR)$(QUOTE)	>> $(QT_SDK_DIR)/bin/qt.conf
+
+.PHONY: qt_sdk_clean
+qt_sdk_clean:
+	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(QT_SDK_DIR))
+	$(V1) [ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf "$(QT_SDK_DIR)"
+
+.PHONY: qt_sdk_distclean
+qt_sdk_distclean:
+	@$(ECHO) $(MSG_DISTCLEANING) $(call toprel, $@)
+	$(V1) [ ! -f "$(DL_DIR)/$(QT_SDK_FILE)" ] || $(RM) "$(DL_DIR)/$(QT_SDK_FILE)"
+
+.PHONY: qt_sdk_version
+qt_sdk_version:
+	$(V1) $(QMAKE) --version | tail -1
+
+ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+    export QMAKE := $(QT_SDK_DIR)/bin/qmake
+
+    # set Qt library search path
+    ifeq ($(UNAME), Windows)
+        export PATH := $(QT_SDK_DIR)/bin:$(PATH)
+    else
+        export LD_LIBRARY_PATH := $(QT_SDK_DIR)/lib:$(LD_LIBRARY_PATH)
+    endif
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(QT_SDK_DIR)) not found (make qt_sdk_install), using system PATH)
+    QMAKE ?= qmake
 endif
 
 ##############################
@@ -263,59 +316,57 @@ endif
 
 ##############################
 #
-# Qt SDK
+# Python (Windows only)
 #
 ##############################
 
-QT_SDK_FILE := $(notdir $(QT_SDK_URL))
+ifeq ($(UNAME), Windows)
 
-.PHONY: qt_sdk_install
-qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
-	@$(ECHO) $(MSG_DOWNLOADING) $(call toprel, $(DL_DIR)/$(QT_SDK_FILE))
+PYTHON_FILE := $(notdir $(PYTHON_URL))
+
+.PHONY: python_install
+python_install: python_clean | $(DL_DIR) $(TOOLS_DIR)
+	@$(ECHO) $(MSG_DOWNLOADING) $(call toprel, $(DL_DIR)/$(PYTHON_FILE))
 	$(V1) $(CURL) $(CURL_OPTIONS) \
-		$(if $(shell [ -f "$(DL_DIR)/$(QT_SDK_FILE)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(QT_SDK_FILE)",) \
-		-o "$(DL_DIR)/$(QT_SDK_FILE)" \
-		"$(QT_SDK_URL)"
+		$(if $(shell [ -f "$(DL_DIR)/$(PYTHON_FILE)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(PYTHON_FILE)",) \
+		-o "$(DL_DIR)/$(PYTHON_FILE)" \
+		"$(PYTHON_URL)"
 
-	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(QT_SDK_DIR))
-	$(V1) $(TAR) $(TAR_OPTIONS) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(QT_SDK_FILE))
+	@$(ECHO) $(MSG_EXTRACTING) $(call toprel, $(PYTHON_DIR))
+	$(V1) $(TAR) $(TAR_OPTIONS) -C $(call toprel, $(TOOLS_DIR)) -xjf $(call toprel, $(DL_DIR)/$(PYTHON_FILE))
 
-	@$(ECHO) $(MSG_CONFIGURING) $(call toprel, $(QT_SDK_DIR))
-	@$(ECHO) $(QUOTE)[Paths]$(QUOTE)		> $(QT_SDK_DIR)/bin/qt.conf
-	@$(ECHO) $(QUOTE)Prefix = $(QT_SDK_DIR)$(QUOTE)	>> $(QT_SDK_DIR)/bin/qt.conf
+.PHONY: python_clean
+python_clean:
+	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(PYTHON_DIR))
+	$(V1) [ ! -d "$(PYTHON_DIR)" ] || $(RM) -rf "$(PYTHON_DIR)"
 
-.PHONY: qt_sdk_clean
-qt_sdk_clean:
-	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(QT_SDK_DIR))
-	$(V1) [ ! -d "$(QT_SDK_DIR)" ] || $(RM) -rf "$(QT_SDK_DIR)"
-
-.PHONY: qt_sdk_distclean
-qt_sdk_distclean:
+.PHONY: python_distclean
+python_distclean:
 	@$(ECHO) $(MSG_DISTCLEANING) $(call toprel, $@)
-	$(V1) [ ! -f "$(DL_DIR)/$(QT_SDK_FILE)" ] || $(RM) "$(DL_DIR)/$(QT_SDK_FILE)"
+	$(V1) [ ! -f "$(DL_DIR)/$(PYTHON_FILE)" ] || $(RM) "$(DL_DIR)/$(PYTHON_FILE)"
 
-.PHONY: qt_sdk_version
-qt_sdk_version:
-	$(V1) $(QMAKE) --version | tail -1
+.PHONY: python_version
+python_version:
+	$(V1) $(PYTHON) --version
 
-ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    export QMAKE := $(QT_SDK_DIR)/bin/qmake
+else # Linux or Mac
 
-    # set Qt library search path
-    ifeq ($(UNAME), Windows)
-        export PATH := $(QT_SDK_DIR)/bin:$(PATH)
-    else
-        export LD_LIBRARY_PATH := $(QT_SDK_DIR)/lib:$(LD_LIBRARY_PATH)
-    endif
-else
-    # not installed, hope it's in the path...
-    # $(info $(EMPTY) WARNING     $(call toprel, $(QT_SDK_DIR)) not found (make qt_sdk_install), using system PATH)
-    QMAKE ?= qmake
+all_sdk_version: python_version
+
+.PHONY: python_version
+python_version:
+	$(V1) $(PYTHON) --version
+
 endif
 
-
-
-
+ifeq ($(shell [ -d "$(PYTHON_DIR)" ] && $(ECHO) "exists"), exists)
+    export PYTHON := $(PYTHON_DIR)/python
+    export PATH   := $(PYTHON_DIR):$(PATH)
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(PYTHON_DIR)) not found (make python_install), using system PATH)
+    export PYTHON := python
+endif
 
 
 

@@ -822,6 +822,7 @@ help:
 	@$(ECHO) "     arm_sdk_install      - Install the GNU ARM gcc toolchain"
 	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
 	@$(ECHO) "     mingw_install        - Install the MinGW toolchain (Windows only)"
+	@$(ECHO) "     python_install       - Install the Python interpreter (Windows only)"
 	@$(ECHO) "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@$(ECHO) "     stm32flash_install   - Install the stm32flash tool for unbricking F1-based boards"
 	@$(ECHO) "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"

@@ -71,9 +71,8 @@ public:
         QString getUnits() const {
             if (field) {
                 return field->getUnits();
-            } else {
-                return QString("");
             }
+	    return QString("");
         }
     };
 

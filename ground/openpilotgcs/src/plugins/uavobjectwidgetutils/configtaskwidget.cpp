@@ -1132,19 +1132,21 @@ bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, dou
     }
     else if(QLineEdit * cb=qobject_cast<QLineEdit *>(widget))
     {
-	if((scale== 0) || (scale == 1)) {
+	if ((scale== 0) || (scale == 1)) {
             if(units == "hex") {
                 cb->setText(QString::number(value.toUInt(), 16).toUpper());
             } else {
                 cb->setText(value.toString());
             }
-        } else
+        } else {
             cb->setText(QString::number((value.toDouble()/scale)));
+        }
         return true;
     }
     else
         return false;
 }
+
 /**
  * Sets a widget from a variant
  * @param widget pointer for the widget to set
@@ -1156,6 +1158,7 @@ bool ConfigTaskWidget::setWidgetFromVariant(QWidget *widget, QVariant value, dou
 {
     return setWidgetFromVariant(widget, value, scale, QString(""));
 }
+
 /**
  * Sets a widget from a UAVObject field
  * @param widget pointer to the widget to set

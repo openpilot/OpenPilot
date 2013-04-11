@@ -93,7 +93,9 @@ all_sdk_version:   $(addsuffix _version,$(ALL_SDK_TARGETS))
 ##############################
 
 # Define messages
+MSG_VERIFYING        = $(QUOTE) VERIFY     $(QUOTE)
 MSG_DOWNLOADING      = $(QUOTE) DOWNLOAD   $(QUOTE)
+MSG_CHECKSUMMING     = $(QUOTE) MD5        $(QUOTE)
 MSG_EXTRACTING       = $(QUOTE) EXTRACT    $(QUOTE)
 MSG_INSTALLING       = $(QUOTE) INSTALL    $(QUOTE)
 MSG_CONFIGURING      = $(QUOTE) CONFIGURE  $(QUOTE)
@@ -104,7 +106,7 @@ MSG_DISTCLEANING     = $(QUOTE) DISTCLEAN  $(QUOTE)
 ifeq ($(V), 1)
     CURL_OPTIONS :=
 else
-#   CURL_OPTIONS := --silent
+    CURL_OPTIONS := --silent
 endif
 
 # MSYS tar workaround
@@ -114,14 +116,16 @@ else
     TAR_OPTIONS :=
 endif
 
+# Print some useful notes for *_install targets
+ifneq ($(strip $(filter $(addsuffix _install,all_sdk $(ALL_SDK_TARGETS)),$(MAKECMDGOALS))),)
 # Disable parallel make for sdk install targets to ensure ordered dependences
 # like 'arm_sdk_clean | $(DL_DIR) $(TOOLS_DIR)'. They may fail otherwise being
 # run in parallel
-ifneq ($(strip $(filter $(addsuffix _install,all_sdk $(ALL_SDK_TARGETS)),$(MAKECMDGOALS))),)
-.NOTPARALLEL:
-    $(info $(EMPTY) NOTE        Parallel make disabled by some of tool/sdk install targets)
-    $(info $(EMPTY) NOTE        If some of install/extract targets failed, try 'make *_distclean' first)
-    $(info $(EMPTY) NOTE        Use all_sdk_version to check toolchain versions)
+#.NOTPARALLEL:
+#   $(info $(EMPTY) NOTE        Parallel make disabled by some of install targets)
+    $(info $(EMPTY) NOTE        Use 'make all_sdk_distclean' to remove installation files)
+    $(info $(EMPTY) NOTE        Use 'make all_sdk_version' to check toolchain versions)
+    $(info $(EMPTY) NOTE        Add 'V=1' to make command line to diagnose make problems)
 endif
 
 ##############################
@@ -143,6 +147,7 @@ export JAR	:= jar
 export GIT	:= git
 export CURL	:= curl
 export INSTALL	:= install
+export MD5SUM	:= md5sum
 
 # Echo in recipes is a bit tricky in a Windows Git Bash window in some cases.
 # It does not work if make started under msysGit installed into a path with spaces.
@@ -180,24 +185,31 @@ define TOOL_INSTALL_TEMPLATE
 .PHONY: $(addprefix $(1)_, install clean distclean)
 
 $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
-	@$(ECHO) $(MSG_DOWNLOADING) $$(call toprel, $(DL_DIR)/$(4))
-	$(V1)echo $(CURL) $(CURL_OPTIONS) \
-		$(if $(shell [ -f "$(DL_DIR)/$(4)" ] && $(ECHO) "exists"),-z "$(DL_DIR)/$(4)",) \
-		-o "$(DL_DIR)/$(4)" \
-		"$(3)"
+	@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(4))
+	$(V1) ( \
+		cd "$(DL_DIR)" && \
+		$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4).md5" "$(3).md5" && \
+		if ! $(MD5SUM) -c --status "$(DL_DIR)/$(4).md5" 2>/dev/null; then \
+			$(ECHO) $(MSG_DOWNLOADING) $(3) && \
+			$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4)" "$(3)" && \
+			$(ECHO) $(MSG_CHECKSUMMING) $$(call toprel, $(DL_DIR)/$(4)) && \
+			$(MD5SUM) -c --status "$(DL_DIR)/$(4).md5" 2>/dev/null; \
+		fi; \
+	)
 
 	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
-	$(V1)echo $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(TOOLS_DIR)) -xjf $$(call toprel, $(DL_DIR)/$(4))
+	$(V1) $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(TOOLS_DIR)) -xjf $$(call toprel, $(DL_DIR)/$(4))
 
 	$(5)
 
 $(1)_clean:
 	@$(ECHO) $(MSG_CLEANING) $$(call toprel, $(2))
-	$(V1)echo [ ! -d "$(2)" ] || $(RM) -rf "$(2)"
+	$(V1) [ ! -d "$(2)" ] || $(RM) -rf "$(2)"
 
 $(1)_distclean:
 	@$(ECHO) $(MSG_DISTCLEANING) $$(call toprel, $$@)
-	$(V1) [ ! -f "$(DL_DIR)/$(4)" ] || $(RM) "$(DL_DIR)/$(4)"
+	$(V1) [ ! -f "$(DL_DIR)/$(4)" ]     || $(RM) "$(DL_DIR)/$(4)"
+	$(V1) [ ! -f "$(DL_DIR)/$(4).md5" ] || $(RM) "$(DL_DIR)/$(4).md5"
 
 endef
 

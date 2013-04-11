@@ -81,8 +81,8 @@ int SetupWizard::nextId() const
             {
                 case CONTROLLER_CC:
                 case CONTROLLER_CC3D:
-                    return PAGE_INPUT;
                 case CONTROLLER_REVO:
+                    return PAGE_INPUT;
                 case CONTROLLER_OPLINK:
                 default:
                     return PAGE_NOTYETIMPLEMENTED;

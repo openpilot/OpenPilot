@@ -74,18 +74,42 @@ bool InputPage::restartNeeded(VehicleConfigurationSource::INPUT_TYPE selectedTyp
     Q_ASSERT(uavoManager);
     HwSettings* hwSettings = HwSettings::GetInstance(uavoManager);
     HwSettings::DataFields data = hwSettings->getData();
-    switch(selectedType)
-    {
-        case VehicleConfigurationSource::INPUT_PWM:
-            return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PWM;
-        case VehicleConfigurationSource::INPUT_PPM:
-            return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PPM;
-        case VehicleConfigurationSource::INPUT_SBUS:
-            return data.CC_MainPort != HwSettings::CC_MAINPORT_SBUS;
-        case VehicleConfigurationSource::INPUT_DSM2:
-            // TODO: Handle all of the DSM types ?? Which is most common?
-            return data.CC_MainPort != HwSettings::CC_MAINPORT_DSM2;
-        default:
-            return true;
+    switch(getWizard()->getControllerType()) {
+        case SetupWizard::CONTROLLER_CC:
+        case SetupWizard::CONTROLLER_CC3D:
+        {
+            switch(selectedType)
+            {
+                case VehicleConfigurationSource::INPUT_PWM:
+                    return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PWM;
+                case VehicleConfigurationSource::INPUT_PPM:
+                    return data.CC_RcvrPort != HwSettings::CC_RCVRPORT_PPM;
+                case VehicleConfigurationSource::INPUT_SBUS:
+                    return data.CC_MainPort != HwSettings::CC_MAINPORT_SBUS;
+                case VehicleConfigurationSource::INPUT_DSM2:
+                    // TODO: Handle all of the DSM types ?? Which is most common?
+                    return data.CC_MainPort != HwSettings::CC_MAINPORT_DSM2;
+                default: return true;
+            }
+            break;
+        }
+        case SetupWizard::CONTROLLER_REVO:
+        {
+            switch(selectedType)
+            {
+                case VehicleConfigurationSource::INPUT_PWM:
+                    return data.RM_RcvrPort != HwSettings::CC_RCVRPORT_PWM;
+                case VehicleConfigurationSource::INPUT_PPM:
+                    return data.RM_RcvrPort != HwSettings::CC_RCVRPORT_PPM;
+                case VehicleConfigurationSource::INPUT_SBUS:
+                    return data.RM_MainPort != HwSettings::CC_MAINPORT_SBUS;
+                case VehicleConfigurationSource::INPUT_DSM2:
+                    // TODO: Handle all of the DSM types ?? Which is most common?
+                    return data.RM_MainPort != HwSettings::CC_MAINPORT_DSM2;
+                default: return true;
+            }
+            break;
+        }
+        default: return true;
     }
 }

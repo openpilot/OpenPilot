@@ -260,11 +260,17 @@ void VehicleConfigurationHelper::applyActuatorConfiguration()
             switch(m_configSource->getVehicleSubType()) {
                 case VehicleConfigurationSource::MULTI_ROTOR_TRI_Y:
                     data.ChannelUpdateFreq[0] = updateFrequence;
+                    if(m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+                        data.ChannelUpdateFreq[1] = updateFrequence;
+                    }
                     break;
                 case VehicleConfigurationSource::MULTI_ROTOR_QUAD_X:
                 case VehicleConfigurationSource::MULTI_ROTOR_QUAD_PLUS:
                     data.ChannelUpdateFreq[0] = updateFrequence;
                     data.ChannelUpdateFreq[1] = updateFrequence;
+                    if(m_configSource->getControllerType() == VehicleConfigurationSource::CONTROLLER_REVO) {
+                        data.ChannelUpdateFreq[2] = updateFrequence;
+                    }
                     break;
                 case VehicleConfigurationSource::MULTI_ROTOR_HEXA:
                 case VehicleConfigurationSource::MULTI_ROTOR_HEXA_COAX_Y:

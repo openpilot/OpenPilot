@@ -575,7 +575,7 @@ bool UploaderGadgetWidget::autoUpdate()
         filename = "fw_osd";
         break;
     case 0x902:
-        filename = "fw_revolution";
+        filename = "fw_sensortest";
         break;
     case 0x903:
         filename = "fw_revomini";

@@ -10,7 +10,7 @@
 #elif USE_STM32F4xx_OSD
 #include "STM32F4xx_OSD.h"
 #elif USE_STM32F4xx_OP
-#include "STM32F4xx_Revolution.h"
+#include "STM32F4xx_SensorTest.h"
 #elif USE_SIM_POSIX
 #include "sim_posix.h"
 #else

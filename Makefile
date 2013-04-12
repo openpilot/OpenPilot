@@ -198,13 +198,13 @@ export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 
 # Define supported board lists
-ALL_BOARDS    := coptercontrol oplinkmini revolution revomini osd simposix
+ALL_BOARDS    := coptercontrol oplinkmini sensortest revomini osd simposix
 ALL_BOARDS_BU := coptercontrol oplinkmini simposix
 
 # Friendly names of each board (used to find source tree)
 coptercontrol_friendly := CopterControl
 oplinkmini_friendly    := OPLinkMini
-revolution_friendly    := Revolution
+sensortest_friendly    := SensorTest
 revomini_friendly      := RevoMini
 osd_friendly           := OSD
 simposix_friendly      := SimPosix
@@ -212,7 +212,7 @@ simposix_friendly      := SimPosix
 # Short names of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '
 oplinkmini_short       := 'oplm'
-revolution_short       := 'revo'
+sensortest_short       := 'stst'
 revomini_short         := 'rm  '
 osd_short              := 'osd '
 simposix_short         := 'posx'
@@ -441,7 +441,7 @@ sim_osx: sim_osx_elf
 sim_osx_%: uavobjects_flight
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/sim_osx
 	$(V1) $(MAKE) --no-print-directory \
-		-C $(ROOT_DIR)/flight/targets/Revolution --file=$(ROOT_DIR)/flight/targets/Revolution/Makefile.osx $*
+		-C $(ROOT_DIR)/flight/targets/SensorTest --file=$(ROOT_DIR)/flight/targets/SensorTest/Makefile.osx $*
 
 ##############################
 #

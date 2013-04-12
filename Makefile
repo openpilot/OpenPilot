@@ -755,8 +755,8 @@ $(OPFW_RESOURCE): $(FW_TARGETS)
 	$(V1) $(MKDIR) -p $(dir $@)
 	$(V1) $(ECHO) $(QUOTE)$(OPFW_CONTENTS)$(QUOTE) > $@
 
-# If opfw_resource or all are requested, GCS should depend on the resource
-ifneq ($(strip $(filter opfw_resource all,$(MAKECMDGOALS))),)
+# If opfw_resource or all firmware are requested, GCS should depend on the resource
+ifneq ($(strip $(filter opfw_resource all all_fw all_flight,$(MAKECMDGOALS))),)
     $(eval openpilotgcs: | opfw_resource)
 endif
 

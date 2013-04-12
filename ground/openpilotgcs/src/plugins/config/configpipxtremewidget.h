@@ -27,6 +27,8 @@
 #ifndef CONFIGPIPXTREMEWIDGET_H
 #define CONFIGPIPXTREMEWIDGET_H
 
+#include <oplinksettings.h>
+
 #include "ui_pipxtreme.h"
 #include "configtaskwidget.h"
 
@@ -46,24 +48,22 @@ private:
 	Ui_PipXtremeWidget *m_oplink;
 
 	// The OPLink status UAVObject
-	UAVDataObject* oplinkStatusObj;
+	UAVDataObject *oplinkStatusObj;
 
 	// The OPLink ssettins UAVObject
-	UAVDataObject* oplinkSettingsObj;
+	OPLinkSettings* oplinkSettingsObj;
 
+	// Are the settings current?
 	bool settingsUpdated;
 
+	// Signal mappers to add arguments to signals.
+	QSignalMapper *signalMapperAddBinding;
+	QSignalMapper *signalMapperRemBinding;
+
 private slots:
-	void refreshValues();
-	void applySettings();
-	void saveSettings();
 	void disconnected();
-	void pairIDToggled(bool checked, quint8 idx);
-	void pair1Toggled(bool checked);
-	void pair2Toggled(bool checked);
-	void pair3Toggled(bool checked);
-	void pair4Toggled(bool checked);
-	void pairBToggled(bool checked);
+	void addBinding(QWidget *w);
+	void removeBinding(QWidget *w);
 };
 
 #endif // CONFIGTXPIDWIDGET_H

@@ -36,7 +36,7 @@ OPTMODULES =
 # Use file-extension c for "c-only"-files
 ifndef TESTAPP
     ## Application Core
-    SRC += ${OPMODULEDIR}/PipXtreme/pipxtrememod.c
+    SRC += $(OPMODULEDIR)/PipXtreme/pipxtrememod.c
     SRC += $(OPSYSTEM)/pipxtreme.c
     SRC += $(OPSYSTEM)/pios_board.c
     SRC += $(OPSYSTEM)/pios_usb_board_data.c

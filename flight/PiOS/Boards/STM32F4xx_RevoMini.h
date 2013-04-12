@@ -77,6 +77,28 @@ TIM8  |           |           |           |
 //------------------------
 #define PIOS_LED_HEARTBEAT	0
 #define PIOS_LED_ALARM		1
+#ifdef PIOS_RFM22B_DEBUG_ON_SERVO
+#define PIOS_LED_D1		2
+#define PIOS_LED_D2		3
+#define PIOS_LED_D3		4
+#define PIOS_LED_D4		5
+
+#define D1_LED_ON	PIOS_LED_On(PIOS_LED_D1)
+#define D1_LED_OFF	PIOS_LED_Off(PIOS_LED_D1)
+#define D1_LED_TOGGLE	PIOS_LED_Toggle(PIOS_LED_D1)
+
+#define D2_LED_ON	PIOS_LED_On(PIOS_LED_D2)
+#define D2_LED_OFF	PIOS_LED_Off(PIOS_LED_D2)
+#define D2_LED_TOGGLE	PIOS_LED_Toggle(PIOS_LED_D2)
+
+#define D3_LED_ON	PIOS_LED_On(PIOS_LED_D3)
+#define D3_LED_OFF	PIOS_LED_Off(PIOS_LED_D3)
+#define D3_LED_TOGGLE	PIOS_LED_Toggle(PIOS_LED_D3)
+
+#define D4_LED_ON	PIOS_LED_On(PIOS_LED_D4)
+#define D4_LED_OFF	PIOS_LED_Off(PIOS_LED_D4)
+#define D4_LED_TOGGLE	PIOS_LED_Toggle(PIOS_LED_D4)
+#endif
 
 //------------------------
 // PIOS_SPI
@@ -191,7 +213,6 @@ extern uint32_t pios_packet_handler;
 //
 #define PIOS_PERIPHERAL_APB2_CLOCK					PIOS_SYSCLK
 
-
 //-------------------------
 // Interrupt Priorities
 //-------------------------
@@ -207,7 +228,7 @@ extern uint32_t pios_packet_handler;
 #define PIOS_RCVR_MAX_DEVS           3
 #define PIOS_RCVR_MAX_CHANNELS       12
 #define PIOS_GCSRCVR_TIMEOUT_MS      100
-#define PIOS_RFM22B_RCVR_TIMEOUT_MS  100
+#define PIOS_RFM22B_RCVR_TIMEOUT_MS  200
 
 //-------------------------
 // Receiver PPM input

@@ -261,7 +261,7 @@ static const struct pios_exti_cfg pios_exti_rfm22b_cfg __exti_config = {
 
 #include <pios_rfm22b_priv.h>
 
-struct pios_rfm22b_cfg pios_rfm22b_pipx_cfg = {
+struct pios_rfm22b_cfg pios_rfm22b_cfg = {
 	.spi_cfg = &pios_spi_rfm22b_cfg,
 	.exti_cfg = &pios_exti_rfm22b_cfg,
 	.RFXtalCap = 0x7f,
@@ -272,7 +272,7 @@ struct pios_rfm22b_cfg pios_rfm22b_pipx_cfg = {
 //! Compatibility layer for various hardware revisions
 const struct pios_rfm22b_cfg * PIOS_BOARD_HW_DEFS_GetRfm22Cfg (uint32_t board_revision)
 {
-	return &pios_rfm22b_pipx_cfg;
+	return &pios_rfm22b_cfg;
 }
 
 #endif /* PIOS_INCLUDE_RFM22B */

@@ -2,20 +2,20 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @brief The OpenPilot Modules do the majority of the control in OpenPilot.  The
- * @ref PipXtremeModule The PipXtreme Module is the equivalanet of the System
- * Module for the PipXtreme modem.  it starts all the other modules.
+ * @ref OPLinkModule The OPLink Module is the equivalanet of the System
+ * Module for the OPLink modem.  it starts all the other modules.
  #  This is done through the @ref PIOS "PIOS Hardware abstraction layer",
  # which then contains hardware specific implementations
  * (currently only STM32 supported)
  *
  * @{ 
- * @addtogroup PipXtremeModule PipXtreme Module
+ * @addtogroup OPLinkModule OPLink Module
  * @brief Initializes PIOS and other modules runs monitoring
  * After initializing all the modules runs basic monitoring and
  * alarms.
  * @{ 
  *
- * @file       pipxtrememod.c
+ * @file       oplinkmod.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @brief      System module
  *
@@ -72,13 +72,13 @@ static void systemTask(void *parameters);
  * Create the module task.
  * \returns 0 on success or -1 if initialization failed
  */
-int32_t PipXtremeModStart(void)
+int32_t OPLinkModStart(void)
 {
 	// Initialize vars
 	stackOverflow = false;
 	mallocFailed = false;
-	// Create pipxtreme system task
-	xTaskCreate(systemTask, (signed char *)"PipXtreme", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &systemTaskHandle);
+	// Create oplink system task
+	xTaskCreate(systemTask, (signed char *)"OPLink", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &systemTaskHandle);
 	// Register task
 	TaskMonitorAdd(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
 
@@ -89,7 +89,7 @@ int32_t PipXtremeModStart(void)
  * Initialize the module, called on startup.
  * \returns 0 on success or -1 if initialization failed
  */
-int32_t PipXtremeModInitialize(void)
+int32_t OPLinkModInitialize(void)
 {
 
 	// Must registers objects here for system thread because ObjectManager started in OpenPilotInit
@@ -111,12 +111,12 @@ int32_t PipXtremeModInitialize(void)
 	OPLinkStatusSet(&oplinkStatus);
 
 	// Call the module start function.
-	PipXtremeModStart();
+	OPLinkModStart();
 
 	return 0;
 }
 
-MODULE_INITCALL(PipXtremeModInitialize, 0)
+MODULE_INITCALL(OPLinkModInitialize, 0)
 
 /**
  * System task, periodically executes every SYSTEM_UPDATE_PERIOD_MS
@@ -152,7 +152,7 @@ static void systemTask(void *parameters)
 		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 #endif	/* PIOS_LED_HEARTBEAT */
 
-		// Update the PipXstatus UAVO
+		// Update the OPLinkStatus UAVO
 		OPLinkStatusData oplinkStatus;
 		OPLinkStatusGet(&oplinkStatus);
 

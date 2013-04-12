@@ -1,7 +1,7 @@
 define connect
 	target remote localhost:3333
 	monitor cortex_m3 vector_catch all
-	file ./Build/PipXtreme.elf
+	file ./Build/OPLink.elf
 end
 #monitor reset halt
 

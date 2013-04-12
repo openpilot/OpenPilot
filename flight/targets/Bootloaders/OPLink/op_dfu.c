@@ -236,7 +236,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 						}
 						break;
 					case Remote_flash_via_spi:
-						result = FALSE; // No support for this for the PipX
+						result = FALSE; // No support for this for the OPLink
 						break;
 					default:
 						result = 0;
@@ -453,7 +453,7 @@ void sendData(uint8_t * buf, uint16_t size) {
 bool flash_read(uint8_t * buffer, uint32_t adr, DFUProgType type) {
 	switch (type) {
 	case Remote_flash_via_spi:
-		return FALSE; // We should not get this for the PipX
+		return FALSE; // We should not get this for the OPLink
 		break;
 	case Self_flash:
 		for (uint8_t x = 0; x < 4; ++x) {

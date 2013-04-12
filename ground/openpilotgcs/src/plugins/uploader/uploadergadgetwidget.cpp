@@ -565,7 +565,7 @@ bool UploaderGadgetWidget::autoUpdate()
     emit autoUpdateSignal(LOADING_FW,QVariant());
     switch (dfu->devices[0].ID) {
     case 0x301:
-        filename = "fw_pipxtreme";
+        filename = "fw_oplinkmini";
         break;
     case 0x401:
     case 0x402:

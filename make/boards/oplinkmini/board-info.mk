@@ -5,7 +5,7 @@ HW_TYPE             := 0x01
 
 MCU                 := cortex-m3
 CHIP                := STM32F103CBT
-BOARD               := STM32103CB_OPLINK
+BOARD               := STM32103CB_OPLINKMINI
 MODEL               := MD
 MODEL_SUFFIX        := _PX
 

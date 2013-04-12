@@ -4,7 +4,7 @@
 #ifdef USE_STM3210E_OP
 #include "STM3210E_OP.h"
 #elif USE_STM32103CB_OPLINK
-#include "STM32103CB_OPLINK_Rev1.h"
+#include "STM32103CB_OPLink_Rev1.h"
 #elif USE_STM32103CB_CC_Rev1
 #include "STM32103CB_CC_Rev1.h"
 #elif USE_STM32F2xx_INS

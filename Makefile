@@ -757,7 +757,7 @@ $(OPFW_RESOURCE): $(FW_TARGETS)
 
 # If opfw_resource or all firmware are requested, GCS should depend on the resource
 ifneq ($(strip $(filter opfw_resource all all_fw all_flight,$(MAKECMDGOALS))),)
-    $(eval openpilotgcs: | opfw_resource)
+    $(eval openpilotgcs: $(OPFW_RESOURCE))
 endif
 
 # Packaging targets: package, clean_package
@@ -780,7 +780,7 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
 
     # Packaged GCS should depend on opfw_resource
     ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
-        $(eval openpilotgcs: | opfw_resource)
+        $(eval openpilotgcs: $(OPFW_RESOURCE))
     endif
 
     # Clean the build directory if clean_package is requested

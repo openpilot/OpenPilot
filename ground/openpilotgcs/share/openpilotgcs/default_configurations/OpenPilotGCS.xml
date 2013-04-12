@@ -13,6 +13,15 @@
     <StyleSheet>default</StyleSheet>
     <UDPMirror>false</UDPMirror>
   </General>
+  <IPconnection>
+    <Current>
+      <arr_1>
+        <Port>9000</Port>
+        <UseTCP>0</UseTCP>
+      </arr_1>
+      <size>1</size>
+    </Current>
+  </IPconnection>
   <KeyBindings>
     <size>0</size>
   </KeyBindings>

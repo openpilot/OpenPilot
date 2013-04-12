@@ -36,7 +36,7 @@ OPTMODULES =
 # Use file-extension c for "c-only"-files
 ifndef TESTAPP
     ## Application Core
-    SRC += ${OPMODULEDIR}/OPLink/oplinkmod.c
+    SRC += $(OPMODULEDIR)/OPLink/oplinkmod.c
     SRC += $(OPSYSTEM)/oplink.c
     SRC += $(OPSYSTEM)/pios_board.c
     SRC += $(OPSYSTEM)/pios_usb_board_data.c

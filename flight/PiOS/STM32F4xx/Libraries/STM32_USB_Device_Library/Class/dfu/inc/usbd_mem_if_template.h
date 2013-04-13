@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    usbd_conf_template.h
+  * @file    usbd_mem_if_template.h
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    19-March-2012
-  * @brief   usb device configuration template file
+  * @brief   Header for usbd_mem_if_template.c file.
   ******************************************************************************
   * @attention
   *
@@ -26,58 +26,26 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USBD_CONF__H__
-#define __USBD_CONF__H__
+#ifndef __MEM_IF_MAL_H
+#define __MEM_IF_MAL_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx.h"
 #include "usb_conf.h"
 
-/** @defgroup USB_CONF_Exported_Defines
-  * @{
-  */ 
-//#define USE_USB_OTG_HS
+#include "usbd_dfu_mal.h"
 
-#define USBD_CFG_MAX_NUM           1
-#define USB_MAX_STR_DESC_SIZ       64 
-#define USBD_EP0_MAX_PACKET_SIZE   64
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+#define MEM_START_ADD                 0x00000000 /* Dummy start address */
+#define MEM_END_ADD                   (uint32_t)(MEM_START_ADD + (5 * 1024)) /* Dummy Size = 5KB */
 
-/**
-  * @}
-  */ 
+#define MEM_IF_STRING                 "@Dummy Memory   /0x00000000/01*002Kg,03*001Kg"
 
+extern DFU_MAL_Prop_TypeDef DFU_Mem_cb;
 
-/** @defgroup USB_CONF_Exported_Types
-  * @{
-  */ 
-/**
-  * @}
-  */ 
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
 
+#endif /* __MEM_IF_MAL_H */
 
-/** @defgroup USB_CONF_Exported_Macros
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USB_CONF_Exported_Variables
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USB_CONF_Exported_FunctionsPrototype
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-
-#endif //__USBD_CONF__H__
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
-
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

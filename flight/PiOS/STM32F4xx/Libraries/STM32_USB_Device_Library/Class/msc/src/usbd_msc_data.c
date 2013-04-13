@@ -1,12 +1,12 @@
 /**
   ******************************************************************************
-  * @file    usbd_req.h
+  * @file    usbd_msc_data.c
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    19-March-2012
-  * @brief   header file for the usbd_req.c file
+  * @brief   This file provides all the vital inquiry pages and sense data.
   ******************************************************************************
-  * @attention 
+  * @attention
   *
   * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
   *
@@ -25,27 +25,87 @@
   ******************************************************************************
   */ 
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-
-#ifndef __USB_REQUEST_H_
-#define __USB_REQUEST_H_
-
 /* Includes ------------------------------------------------------------------*/
-#include  "usbd_def.h"
-#include  "usbd_core.h"
-#include  "usbd_conf.h"
+#include "usbd_msc_data.h"
 
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
   * @{
   */
-  
-/** @defgroup USBD_REQ
-  * @brief header file for the usbd_ioreq.c file
+
+
+/** @defgroup MSC_DATA 
+  * @brief Mass storage info/data module
   * @{
   */ 
 
-/** @defgroup USBD_REQ_Exported_Defines
+/** @defgroup MSC_DATA_Private_TypesDefinitions
+  * @{
+  */ 
+/**
+  * @}
+  */ 
+
+
+/** @defgroup MSC_DATA_Private_Defines
+  * @{
+  */ 
+/**
+  * @}
+  */ 
+
+
+/** @defgroup MSC_DATA_Private_Macros
+  * @{
+  */ 
+/**
+  * @}
+  */ 
+
+
+/** @defgroup MSC_DATA_Private_Variables
+  * @{
+  */ 
+
+
+/* USB Mass storage Page 0 Inquiry Data */
+const uint8_t  MSC_Page00_Inquiry_Data[] = {//7						
+	0x00,		
+	0x00, 
+	0x00, 
+	(LENGTH_INQUIRY_PAGE00 - 4),
+	0x00, 
+	0x80, 
+	0x83 
+};  
+/* USB Mass storage sense 6  Data */
+const uint8_t  MSC_Mode_Sense6_data[] = {
+	0x00,
+	0x00,
+	0x00,
+	0x00,
+	0x00,
+	0x00, 
+	0x00,
+	0x00
+};	
+/* USB Mass storage sense 10  Data */
+const uint8_t  MSC_Mode_Sense10_data[] = {
+	0x00,
+	0x06, 
+	0x00, 
+	0x00, 
+	0x00, 
+	0x00, 
+	0x00, 
+	0x00
+};
+/**
+  * @}
+  */ 
+
+
+/** @defgroup MSC_DATA_Private_FunctionPrototypes
   * @{
   */ 
 /**
@@ -53,56 +113,22 @@
   */ 
 
 
-/** @defgroup USBD_REQ_Exported_Types
-  * @{
-  */
-/**
-  * @}
-  */ 
-
-
-
-/** @defgroup USBD_REQ_Exported_Macros
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USBD_REQ_Exported_Variables
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USBD_REQ_Exported_FunctionsPrototype
+/** @defgroup MSC_DATA_Private_Functions
   * @{
   */ 
 
-USBD_Status  USBD_StdDevReq (USB_OTG_CORE_HANDLE  *pdev, USB_SETUP_REQ  *req);
-USBD_Status  USBD_StdItfReq (USB_OTG_CORE_HANDLE  *pdev, USB_SETUP_REQ  *req);
-USBD_Status  USBD_StdEPReq (USB_OTG_CORE_HANDLE  *pdev, USB_SETUP_REQ  *req);
-void USBD_ParseSetupRequest( USB_OTG_CORE_HANDLE  *pdev,
-                                    USB_SETUP_REQ *req);
-
-void USBD_CtlError( USB_OTG_CORE_HANDLE  *pdev,
-                            USB_SETUP_REQ *req);
-
-void USBD_GetString(uint8_t *desc, uint8_t *unicode, uint16_t *len);
 /**
   * @}
   */ 
 
-#endif /* __USB_REQUEST_H_ */
 
 /**
   * @}
   */ 
 
+
 /**
-* @}
-*/ 
+  * @}
+  */ 
 
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

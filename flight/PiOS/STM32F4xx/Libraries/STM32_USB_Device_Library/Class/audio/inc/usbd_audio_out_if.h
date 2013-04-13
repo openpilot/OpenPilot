@@ -1,12 +1,12 @@
 /**
   ******************************************************************************
-  * @file    usbd_core.h
+  * @file    usbd_audio_out_if.h
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    19-March-2012
-  * @brief   Header file for usbd_core.c
+  * @brief   header file for the usbd_audio_out_if.c file.
   ******************************************************************************
-  * @attention  
+  * @attention
   *
   * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
   *
@@ -25,34 +25,56 @@
   ******************************************************************************
   */ 
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USBD_CORE_H
-#define __USBD_CORE_H
-
 /* Includes ------------------------------------------------------------------*/
-#include "usb_dcd.h"
-#include "usbd_def.h"
-#include "usbd_conf.h"
+
+#ifndef __USB_AUDIO_OUT_IF_H_
+#define __USB_AUDIO_OUT_IF_H_
+
+#ifdef STM32F2XX
+ #include "stm322xg_usb_audio_codec.h"
+#elif defined(STM32F4XX)
+ #include "stm324xg_usb_audio_codec.h"
+#elif defined(STM32F10X_CL)
+ #include "stm3210c_usb_audio_codec.h"
+#endif /* STM32F2XX */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
   * @{
   */
   
-/** @defgroup USBD_CORE
-  * @brief This file is the Header file for usbd_core.c file
+/** @defgroup usbd_audio
+  * @brief This file is the Header file for USBD_audio.c
   * @{
   */ 
 
 
-/** @defgroup USBD_CORE_Exported_Defines
+/** @defgroup usbd_audio_Exported_Defines
   * @{
   */ 
+/* Audio Commands enmueration */
+typedef enum
+{
+  AUDIO_CMD_PLAY = 1,
+  AUDIO_CMD_PAUSE,
+  AUDIO_CMD_STOP,
+}AUDIO_CMD_TypeDef;
 
-typedef enum {
-  USBD_OK   = 0,
-  USBD_BUSY,
-  USBD_FAIL,
-}USBD_Status;
+/* Mute commands */
+#define AUDIO_MUTE                      0x01
+#define AUDIO_UNMUTE                    0x00
+
+/* Functions return value */
+#define AUDIO_OK                        0x00
+#define AUDIO_FAIL                      0xFF
+
+/* Audio Machine States */
+#define AUDIO_STATE_INACTIVE            0x00
+#define AUDIO_STATE_ACTIVE              0x01
+#define AUDIO_STATE_PLAYING             0x02
+#define AUDIO_STATE_PAUSED              0x03
+#define AUDIO_STATE_STOPPED             0x04
+#define AUDIO_STATE_ERROR               0x05
+
 /**
   * @}
   */ 
@@ -61,8 +83,6 @@ typedef enum {
 /** @defgroup USBD_CORE_Exported_TypesDefinitions
   * @{
   */
- 
-
 /**
   * @}
   */ 
@@ -72,7 +92,6 @@ typedef enum {
 /** @defgroup USBD_CORE_Exported_Macros
   * @{
   */ 
-
 /**
   * @}
   */ 
@@ -81,40 +100,26 @@ typedef enum {
   * @{
   */ 
 
+extern AUDIO_FOPS_TypeDef  AUDIO_OUT_fops;
+
 /**
   * @}
   */ 
 
-/** @defgroup USBD_CORE_Exported_FunctionsPrototype
+/** @defgroup USB_CORE_Exported_Functions
   * @{
-  */ 
-void USBD_Init(USB_OTG_CORE_HANDLE *pdev,
-               USB_OTG_CORE_ID_TypeDef coreID, 
-               USBD_DEVICE *pDevice,                  
-               USBD_Class_cb_TypeDef *class_cb, 
-               USBD_Usr_cb_TypeDef *usr_cb);
-
-USBD_Status USBD_DeInit(USB_OTG_CORE_HANDLE *pdev);
-
-USBD_Status USBD_ClrCfg(USB_OTG_CORE_HANDLE  *pdev, uint8_t cfgidx);
-
-USBD_Status USBD_SetCfg(USB_OTG_CORE_HANDLE  *pdev, uint8_t cfgidx);
-
+  */
 /**
   * @}
   */ 
 
-#endif /* __USBD_CORE_H */
-
+#endif  /* __USB_AUDIO_OUT_IF_H_ */
 /**
   * @}
   */ 
 
 /**
-* @}
-*/ 
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
-
-
-
+  * @}
+  */ 
+  
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

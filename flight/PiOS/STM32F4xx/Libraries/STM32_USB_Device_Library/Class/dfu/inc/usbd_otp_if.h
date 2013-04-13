@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    usbd_conf_template.h
+  * @file    usbd_otp_if.h
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    19-March-2012
-  * @brief   usb device configuration template file
+  * @brief   Header for usbd_otp_if.c file.
   ******************************************************************************
   * @attention
   *
@@ -26,58 +26,24 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USBD_CONF__H__
-#define __USBD_CONF__H__
+#ifndef __OTP_IF_MAL_H
+#define __OTP_IF_MAL_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx.h"
-#include "usb_conf.h"
+#include "usbd_dfu_mal.h"
 
-/** @defgroup USB_CONF_Exported_Defines
-  * @{
-  */ 
-//#define USE_USB_OTG_HS
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+#define OTP_START_ADD                  0x1FFF7800             
+#define OTP_END_ADD                    (uint32_t)(OTP_START_ADD + 528) 
 
-#define USBD_CFG_MAX_NUM           1
-#define USB_MAX_STR_DESC_SIZ       64 
-#define USBD_EP0_MAX_PACKET_SIZE   64
+#define OTP_IF_STRING                  "@OTP Area   /0x1FFF7800/01*512 g,01*016 g"
 
-/**
-  * @}
-  */ 
+extern DFU_MAL_Prop_TypeDef DFU_Otp_cb;
 
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
 
-/** @defgroup USB_CONF_Exported_Types
-  * @{
-  */ 
-/**
-  * @}
-  */ 
+#endif /* __OTP_IF_MAL_H */
 
-
-/** @defgroup USB_CONF_Exported_Macros
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USB_CONF_Exported_Variables
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USB_CONF_Exported_FunctionsPrototype
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-
-#endif //__USBD_CONF__H__
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
-
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

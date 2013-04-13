@@ -1,10 +1,10 @@
 /**
   ******************************************************************************
-  * @file    usbd_conf_template.h
+  * @file    usbd_cdc_if_template.h
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    19-March-2012
-  * @brief   usb device configuration template file
+  * @brief   Header for dfu_mal.c file.
   ******************************************************************************
   * @attention
   *
@@ -26,58 +26,21 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __USBD_CONF__H__
-#define __USBD_CONF__H__
+#ifndef __USBD_CDC_IF_TEMPLATE_H
+#define __USBD_CDC_IF_TEMPLATE_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "stm32f4xx.h"
 #include "usb_conf.h"
+#include "usbd_conf.h"
+#include "usbd_cdc_core.h"
 
-/** @defgroup USB_CONF_Exported_Defines
-  * @{
-  */ 
-//#define USE_USB_OTG_HS
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
 
-#define USBD_CFG_MAX_NUM           1
-#define USB_MAX_STR_DESC_SIZ       64 
-#define USBD_EP0_MAX_PACKET_SIZE   64
+extern CDC_IF_Prop_TypeDef  TEMPLATE_fops;
 
-/**
-  * @}
-  */ 
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
+#endif /* __USBD_CDC_IF_TEMPLATE_H */
 
-
-/** @defgroup USB_CONF_Exported_Types
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-
-/** @defgroup USB_CONF_Exported_Macros
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USB_CONF_Exported_Variables
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USB_CONF_Exported_FunctionsPrototype
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-
-#endif //__USBD_CONF__H__
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
-
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

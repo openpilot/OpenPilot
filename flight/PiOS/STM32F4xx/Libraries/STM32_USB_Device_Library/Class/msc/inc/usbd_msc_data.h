@@ -1,12 +1,12 @@
 /**
   ******************************************************************************
-  * @file    usbd_req.h
+  * @file    usbd_msc_data.h
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    19-March-2012
-  * @brief   header file for the usbd_req.c file
+  * @brief   header for the usbd_msc_data.c file
   ******************************************************************************
-  * @attention 
+  * @attention
   *
   * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
   *
@@ -27,33 +27,35 @@
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 
-#ifndef __USB_REQUEST_H_
-#define __USB_REQUEST_H_
+#ifndef _USBD_MSC_DATA_H_
+#define _USBD_MSC_DATA_H_
 
 /* Includes ------------------------------------------------------------------*/
-#include  "usbd_def.h"
-#include  "usbd_core.h"
-#include  "usbd_conf.h"
-
+#include "usbd_conf.h"
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
   * @{
   */
   
-/** @defgroup USBD_REQ
-  * @brief header file for the usbd_ioreq.c file
+/** @defgroup USB_INFO
+  * @brief general defines for the usb device library file
   * @{
   */ 
 
-/** @defgroup USBD_REQ_Exported_Defines
+/** @defgroup USB_INFO_Exported_Defines
   * @{
   */ 
+#define MODE_SENSE6_LEN			 8
+#define MODE_SENSE10_LEN		 8
+#define LENGTH_INQUIRY_PAGE00		 7
+#define LENGTH_FORMAT_CAPACITIES    	20
+
 /**
   * @}
   */ 
 
 
-/** @defgroup USBD_REQ_Exported_Types
+/** @defgroup USBD_INFO_Exported_TypesDefinitions
   * @{
   */
 /**
@@ -62,39 +64,34 @@
 
 
 
-/** @defgroup USBD_REQ_Exported_Macros
+/** @defgroup USBD_INFO_Exported_Macros
   * @{
   */ 
+
 /**
   * @}
   */ 
 
-/** @defgroup USBD_REQ_Exported_Variables
+/** @defgroup USBD_INFO_Exported_Variables
   * @{
   */ 
+extern const uint8_t MSC_Page00_Inquiry_Data[];  
+extern const uint8_t MSC_Mode_Sense6_data[];
+extern const uint8_t MSC_Mode_Sense10_data[] ;
+
 /**
   * @}
   */ 
 
-/** @defgroup USBD_REQ_Exported_FunctionsPrototype
+/** @defgroup USBD_INFO_Exported_FunctionsPrototype
   * @{
   */ 
 
-USBD_Status  USBD_StdDevReq (USB_OTG_CORE_HANDLE  *pdev, USB_SETUP_REQ  *req);
-USBD_Status  USBD_StdItfReq (USB_OTG_CORE_HANDLE  *pdev, USB_SETUP_REQ  *req);
-USBD_Status  USBD_StdEPReq (USB_OTG_CORE_HANDLE  *pdev, USB_SETUP_REQ  *req);
-void USBD_ParseSetupRequest( USB_OTG_CORE_HANDLE  *pdev,
-                                    USB_SETUP_REQ *req);
-
-void USBD_CtlError( USB_OTG_CORE_HANDLE  *pdev,
-                            USB_SETUP_REQ *req);
-
-void USBD_GetString(uint8_t *desc, uint8_t *unicode, uint16_t *len);
 /**
   * @}
   */ 
 
-#endif /* __USB_REQUEST_H_ */
+#endif /* _USBD_MSC_DATA_H_ */
 
 /**
   * @}
@@ -104,5 +101,4 @@ void USBD_GetString(uint8_t *desc, uint8_t *unicode, uint16_t *len);
 * @}
 */ 
 
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

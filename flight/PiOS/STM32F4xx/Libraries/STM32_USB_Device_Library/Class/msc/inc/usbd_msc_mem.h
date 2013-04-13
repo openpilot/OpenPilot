@@ -1,12 +1,12 @@
 /**
   ******************************************************************************
-  * @file    usbd_req.h
+  * @file    usbd_msc_mem.h
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    19-March-2012
-  * @brief   header file for the usbd_req.c file
+  * @brief   header for the STORAGE DISK file file
   ******************************************************************************
-  * @attention 
+  * @attention
   *
   * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
   *
@@ -27,74 +27,80 @@
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 
-#ifndef __USB_REQUEST_H_
-#define __USB_REQUEST_H_
-
+#ifndef __USBD_MEM_H
+#define __USBD_MEM_H
 /* Includes ------------------------------------------------------------------*/
-#include  "usbd_def.h"
-#include  "usbd_core.h"
-#include  "usbd_conf.h"
+#include "usbd_def.h"
 
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
   * @{
   */
   
-/** @defgroup USBD_REQ
-  * @brief header file for the usbd_ioreq.c file
+/** @defgroup USBD_MEM
+  * @brief header file for the storage disk file
   * @{
   */ 
 
-/** @defgroup USBD_REQ_Exported_Defines
+/** @defgroup USBD_MEM_Exported_Defines
   * @{
   */ 
+#define USBD_STD_INQUIRY_LENGTH		36
 /**
   * @}
   */ 
 
 
-/** @defgroup USBD_REQ_Exported_Types
+/** @defgroup USBD_MEM_Exported_TypesDefinitions
   * @{
   */
+
+typedef struct _USBD_STORAGE
+{
+  int8_t (* Init) (uint8_t lun);
+  int8_t (* GetCapacity) (uint8_t lun, uint32_t *block_num, uint32_t *block_size);
+  int8_t (* IsReady) (uint8_t lun);
+  int8_t (* IsWriteProtected) (uint8_t lun);
+  int8_t (* Read) (uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len);
+  int8_t (* Write)(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len);
+  int8_t (* GetMaxLun)(void);
+  int8_t *pInquiry;
+  
+}USBD_STORAGE_cb_TypeDef;
 /**
   * @}
   */ 
 
 
 
-/** @defgroup USBD_REQ_Exported_Macros
+/** @defgroup USBD_MEM_Exported_Macros
   * @{
   */ 
+
 /**
   * @}
   */ 
 
-/** @defgroup USBD_REQ_Exported_Variables
-  * @{
-  */ 
-/**
-  * @}
-  */ 
-
-/** @defgroup USBD_REQ_Exported_FunctionsPrototype
+/** @defgroup USBD_MEM_Exported_Variables
   * @{
   */ 
 
-USBD_Status  USBD_StdDevReq (USB_OTG_CORE_HANDLE  *pdev, USB_SETUP_REQ  *req);
-USBD_Status  USBD_StdItfReq (USB_OTG_CORE_HANDLE  *pdev, USB_SETUP_REQ  *req);
-USBD_Status  USBD_StdEPReq (USB_OTG_CORE_HANDLE  *pdev, USB_SETUP_REQ  *req);
-void USBD_ParseSetupRequest( USB_OTG_CORE_HANDLE  *pdev,
-                                    USB_SETUP_REQ *req);
-
-void USBD_CtlError( USB_OTG_CORE_HANDLE  *pdev,
-                            USB_SETUP_REQ *req);
-
-void USBD_GetString(uint8_t *desc, uint8_t *unicode, uint16_t *len);
 /**
   * @}
   */ 
 
-#endif /* __USB_REQUEST_H_ */
+/** @defgroup USBD_MEM_Exported_FunctionsPrototype
+  * @{
+  */ 
+extern USBD_STORAGE_cb_TypeDef *USBD_STORAGE_fops;
+/**
+  * @}
+  */ 
+
+#endif /* __USBD_MEM_H */
+/**
+  * @}
+  */ 
 
 /**
   * @}
@@ -103,6 +109,4 @@ void USBD_GetString(uint8_t *desc, uint8_t *unicode, uint16_t *len);
 /**
 * @}
 */ 
-
-
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

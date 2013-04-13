@@ -26,7 +26,6 @@
 #ifndef PIOS_BOARD_H
 #define PIOS_BOARD_H
 
-
 #include <stdbool.h>
 
 // *****************************************************************
@@ -291,6 +290,5 @@ extern uint32_t pios_i2c_flexiport_adapter_id;
 #define PIOS_FCLOSE(file)               DFS_Close(&file)
 
 #define PIOS_FUNLINK(filename)          DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, PIOS_SDCARD_Sector)
-
 
 #endif /* PIOS_BOARD_H */

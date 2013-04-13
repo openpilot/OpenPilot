@@ -26,9 +26,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-#ifndef STM3210E_INS_H_
-#define STM3210E_INS_H_
+#ifndef PIOS_BOARD_H
+#define PIOS_BOARD_H
 
 #include <stdbool.h>
 
@@ -263,7 +262,8 @@ extern uint32_t pios_com_vcp_id;
 #define PIOS_USB_ENABLED                        1 /* Should remove all references to this */
 #define PIOS_USB_HID_MAX_DEVS                   1
 
-#endif /* STM3210E_INS_H_ */
+#endif /* PIOS_BOARD_H */
+
 /**
  * @}
  * @}

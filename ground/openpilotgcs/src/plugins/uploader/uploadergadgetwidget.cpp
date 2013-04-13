@@ -578,7 +578,7 @@ bool UploaderGadgetWidget::autoUpdate()
         filename = "fw_sensortest";
         break;
     case 0x903:
-        filename = "fw_revomini";
+        filename = "fw_revolution";
         break;
     default:
         emit autoUpdateSignal(FAILURE,QVariant());

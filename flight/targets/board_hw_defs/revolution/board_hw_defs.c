@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OpenPilotCore OpenPilot Core
  * @{
- * @brief Defines board specific static initializers for hardware for the RevoMini board.
+ * @brief Defines board specific static initializers for hardware for the Revolution board.
  *****************************************************************************/
 /* 
  * This program is free software; you can redistribute it and/or modify 

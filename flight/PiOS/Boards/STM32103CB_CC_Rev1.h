@@ -23,9 +23,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-#ifndef STM32103CB_CC_H_
-#define STM32103CB_CC_H_
+#ifndef PIOS_BOARD_H
+#define PIOS_BOARD_H
 
 //------------------------
 // Timers and Channels Used
@@ -275,4 +274,5 @@ extern uint32_t pios_com_debug_id;
 #define PIOS_USB_DETECT_GPIO_PORT               GPIOC
 #define PIOS_USB_MAX_DEVS                       1
 #define PIOS_USB_DETECT_GPIO_PIN                GPIO_Pin_15
-#endif /* STM32103CB_CC_H_ */
+
+#endif /* PIOS_BOARD_H */

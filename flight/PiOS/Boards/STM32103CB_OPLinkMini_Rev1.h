@@ -23,8 +23,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef STM32103CB_OPLINKMINI_H
-#define STM32103CB_OPLINKMINI_H
+#ifndef PIOS_BOARD_H
+#define PIOS_BOARD_H
 
 #define ADD_ONE_ADC
 
@@ -312,4 +312,4 @@ extern uint32_t pios_packet_handler;
 #define PIOS_FLASH_EEPROM_ADDR (PIOS_FLASH_EEPROM_START_ADDR + PIOS_FLASH_SIZE - PIOS_FLASH_PAGE_SIZE)
 #define PIOS_FLASH_EEPROM_LEN PIOS_FLASH_PAGE_SIZE
 
-#endif /* STM32103CB_OPLINKMINI_H */
+#endif /* PIOS_BOARD_H */

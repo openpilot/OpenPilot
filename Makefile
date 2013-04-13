@@ -70,7 +70,7 @@ SANITIZE_GCC_VARS += CFLAGS CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE
 $(foreach var, $(SANITIZE_GCC_VARS), $(eval $(call SANITIZE_VAR,$(var),disallowed)))
 
 # These specific variables used to be valid but now they make no sense
-SANITIZE_DEPRECATED_VARS := USE_BOOTLOADER
+SANITIZE_DEPRECATED_VARS := USE_BOOTLOADER CLEAN_BUILD
 $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),deprecated)))
 
 # Make sure this isn't being run as root (no whoami on Windows, but that is ok here)
@@ -757,7 +757,7 @@ $(OPFW_RESOURCE): $(FW_TARGETS)
 
 # If opfw_resource or all firmware are requested, GCS should depend on the resource
 ifneq ($(strip $(filter opfw_resource all all_fw all_flight,$(MAKECMDGOALS))),)
-    $(eval openpilotgcs: | opfw_resource)
+    $(eval openpilotgcs: $(OPFW_RESOURCE))
 endif
 
 # Packaging targets: package, clean_package
@@ -780,7 +780,7 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
 
     # Packaged GCS should depend on opfw_resource
     ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
-        $(eval openpilotgcs: | opfw_resource)
+        $(eval openpilotgcs: $(OPFW_RESOURCE))
     endif
 
     # Clean the build directory if clean_package is requested

@@ -80,6 +80,16 @@ typedef struct {
 	uint32_t comTxRetries;
 	uint32_t UAVTalkErrors;
 	uint32_t droppedPackets;
+	
+	/*
+	uint8_t Selected_Buffer;
+	uint8_t buffer1[512];//first buffer to write to the SD
+	bool buffer1_Full;
+	uint16_t Pos_In_Buffer1;
+	uint8_t buffer2[512];//second buffer to write to the SD
+	bool buffer2_Full;
+	uint16_t Pos_In_Buffer2;*///check the stcak size
+	
 
 } LoggerComBridgeData;
 
@@ -93,7 +103,7 @@ static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length);
 static int32_t LoggerSendHandler(uint8_t *buf, int32_t length);
 static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte);
 static void queueEvent(xQueueHandle queue, void *obj, uint16_t instId, UAVObjEventType type);
-static void configureComCallback(OPLogSettingsOutputConnectionOptions com_port, OPLogSettingsComSpeedOptions com_speed);
+//static void configureComCallback(OPLogSettingsOutputConnectionOptions com_port, OPLogSettingsComSpeedOptions com_speed);
 static void updateSettings();
 
 // ****************
@@ -124,8 +134,8 @@ static int32_t LoggerComBridgeStart(void)
 		// Register the watchdog timers.
 #ifdef PIOS_INCLUDE_WDG
 		PIOS_WDG_RegisterFlag(PIOS_WDG_TELEMETRY);
-		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIORX);
-		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIOTX);
+		//PIOS_WDG_RegisterFlag(PIOS_WDG_RADIORX);
+		//PIOS_WDG_RegisterFlag(PIOS_WDG_RADIOTX);
 #endif
 
 		return 0;
@@ -234,7 +244,7 @@ static void loggerRxTask(void *parameters)
 	// Task loop
 	while (1) {
 #ifdef PIOS_INCLUDE_WDG
-		PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORX);
+		//PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORX);
 #endif
 		uint8_t serial_data[1];
 		uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
@@ -254,7 +264,7 @@ static void loggerTxTask(void *parameters)
 	while (1) {
 		uint32_t inputPort = PIOS_COM_TELEMETRY;
 #ifdef PIOS_INCLUDE_WDG
-		PIOS_WDG_UpdateFlag(PIOS_WDG_RADIOTX);
+		//PIOS_WDG_UpdateFlag(PIOS_WDG_RADIOTX);
 #endif
 #if defined(PIOS_INCLUDE_USB)
 		// Determine output port (USB takes priority over telemetry port)
@@ -442,7 +452,7 @@ static void queueEvent(xQueueHandle queue, void *obj, uint16_t instId, UAVObjEve
  * \param[in] com_port  The com port to configure
  * \param[in] com_speed  The com port speed
  */
-static void configureComCallback(OPLogSettingsOutputConnectionOptions com_port, OPLogSettingsComSpeedOptions com_speed)
+/*static void configureComCallback(OPLogSettingsOutputConnectionOptions com_port, OPLogSettingsComSpeedOptions com_speed)
 {
 
 	// Get the settings.
@@ -482,7 +492,7 @@ static void configureComCallback(OPLogSettingsOutputConnectionOptions com_port, 
 	// Perform the update.
 	updateSettings();
 }
-
+*/
 /**
  * Update the oplog settings, called on startup.
  */
@@ -520,7 +530,7 @@ static void updateSettings()
 		PIOS_COM_RADIO = PIOS_COM_TELEM_UART_TELEM;
 		break;
 	default:
-		PIOS_COM_RADIO = NULL;
+		PIOS_COM_RADIO = 0;
 		break;
 	}
 

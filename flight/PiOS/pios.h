@@ -269,6 +269,13 @@
 #include <pios_sdcard.h>
 #endif
 
+#ifdef PIOS_INCLUDE_SDCARD2
+/* #define LOG_FILENAME "startup.log" */
+#include <dosfs.h>
+#include <pios_sdcard.h>
+#endif
+
+
 #ifdef PIOS_INCLUDE_FLASH
 /* #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS */
 /* #define FLASH_FREERTOS */

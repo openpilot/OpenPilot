@@ -31,7 +31,7 @@
 
 #include "pios.h"
 
-#ifdef PIOS_INCLUDE_SDCARD
+#if defined(PIOS_INCLUDE_SDCARD) || defined(PIOS_INCLUDE_SDCARD2)
 
 /* Global Variables */
 VOLINFO PIOS_SDCARD_VolInfo;

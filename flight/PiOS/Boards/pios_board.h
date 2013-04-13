@@ -5,6 +5,8 @@
 #include "STM3210E_OP.h"
 #elif USE_STM32103CB_PIPXTREME
 #include "STM32103CB_PIPXTREME_Rev1.h"
+#elif USE_STM32103CB_OL
+#include "STM32103CB_OL_Rev1.h"
 #elif USE_STM32103CB_CC_Rev1
 #include "STM32103CB_CC_Rev1.h"
 #elif USE_STM32F2xx_INS

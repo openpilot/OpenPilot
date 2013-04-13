@@ -29,131 +29,119 @@ const struct pios_led_cfg * PIOS_BOARD_HW_DEFS_GetLedCfg (uint32_t board_revisio
 
 #endif	/* PIOS_INCLUDE_LED */
 
+#if defined(PIOS_INCLUDE_SDCARD2)
 #if defined(PIOS_INCLUDE_SPI)
 
 #include <pios_spi_priv.h>
 
-/* OP Interface
+/* MicroSD Interface
  *
  * NOTE: Leave this declared as const data so that it ends up in the
  * .rodata section (ie. Flash) rather than in the .bss section (RAM).
  */
-void PIOS_SPI_port_irq_handler(void);
-void DMA1_Channel5_IRQHandler() __attribute__ ((alias ("PIOS_SPI_port_irq_handler")));
-void DMA1_Channel4_IRQHandler() __attribute__ ((alias ("PIOS_SPI_port_irq_handler")));
-
-static const struct pios_spi_cfg pios_spi_rfm22b_cfg =
-{
-	.regs = SPI1,
-
-	.init =
-	{
-		.SPI_Mode = SPI_Mode_Master,
-		.SPI_Direction = SPI_Direction_2Lines_FullDuplex,
-		.SPI_DataSize = SPI_DataSize_8b,
-		.SPI_NSS = SPI_NSS_Soft,
-		.SPI_FirstBit = SPI_FirstBit_MSB,
-		.SPI_CRCPolynomial = 0,
-		.SPI_CPOL = SPI_CPOL_Low,
-		.SPI_CPHA = SPI_CPHA_1Edge,
-		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16,		// slowest SCLK
+void PIOS_SPI_sdcard_irq_handler(void);
+void DMA1_Channel5_IRQHandler() __attribute__ ((alias ("PIOS_SPI_sdcard_irq_handler")));
+void DMA1_Channel4_IRQHandler() __attribute__ ((alias ("PIOS_SPI_sdcard_irq_handler")));
+static const struct pios_spi_cfg pios_spi_sdcard_cfg = {
+	.regs   = SPI2,
+	.init   = {
+		.SPI_Mode              = SPI_Mode_Master,
+		.SPI_Direction         = SPI_Direction_2Lines_FullDuplex,
+		.SPI_DataSize          = SPI_DataSize_8b,
+		.SPI_NSS               = SPI_NSS_Soft,
+		.SPI_FirstBit          = SPI_FirstBit_MSB,
+		.SPI_CRCPolynomial     = 7,
+		.SPI_CPOL              = SPI_CPOL_High,
+		.SPI_CPHA              = SPI_CPHA_2Edge,
+		.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8, 
 	},
-	.use_crc = FALSE,
-
-	.dma =
-	{
-		.ahb_clk = RCC_AHBPeriph_DMA1,
-		.irq =
-		{
-		      .flags   = (DMA1_FLAG_TC2 | DMA1_FLAG_TE2 | DMA1_FLAG_HT2 | DMA1_FLAG_GL2),
-		      .init    = {
-			.NVIC_IRQChannel                   = DMA1_Channel2_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
-			.NVIC_IRQChannelSubPriority        = 0,
-			.NVIC_IRQChannelCmd                = ENABLE,
-		      },
-		    },
-
-		    .rx = {
-		      .channel = DMA1_Channel2,
-		      .init    = {
-			.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
-			.DMA_DIR                = DMA_DIR_PeripheralSRC,
-			.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-			.DMA_MemoryInc          = DMA_MemoryInc_Enable,
-			.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-			.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
-			.DMA_Mode               = DMA_Mode_Normal,
-			.DMA_Priority           = DMA_Priority_Medium,
-			.DMA_M2M                = DMA_M2M_Disable,
-		      },
-		    },
-		    .tx = {
-		      .channel = DMA1_Channel3,
-		      .init    = {
-			.DMA_PeripheralBaseAddr = (uint32_t)&(SPI1->DR),
-			.DMA_DIR                = DMA_DIR_PeripheralDST,
-			.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
-			.DMA_MemoryInc          = DMA_MemoryInc_Enable,
-			.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
-			.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
-			.DMA_Mode               = DMA_Mode_Normal,
-			.DMA_Priority           = DMA_Priority_Medium,
-			.DMA_M2M                = DMA_M2M_Disable,
-		      },
-		    },
-	},
-	.slave_count = 1,
-	.ssel =
-	{{
-		.gpio = GPIOA,
-		.init =
-		{
-			.GPIO_Pin = GPIO_Pin_4,
-			.GPIO_Speed = GPIO_Speed_10MHz,
-			.GPIO_Mode = GPIO_Mode_Out_PP,
+	.use_crc = false,
+	.dma = {
+		.ahb_clk  = RCC_AHBPeriph_DMA1,
+		
+		.irq = {
+			.flags   = (DMA1_FLAG_TC4 | DMA1_FLAG_TE4 | DMA1_FLAG_HT4 | DMA1_FLAG_GL4),
+			.init    = {
+				.NVIC_IRQChannel                   = DMA1_Channel4_IRQn,
+				.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+				.NVIC_IRQChannelSubPriority        = 0,
+				.NVIC_IRQChannelCmd                = ENABLE,
+			},
 		},
-	}},
-	.sclk =
-	{
-		.gpio = GPIOA,
-		.init =
-		{
-			.GPIO_Pin = GPIO_Pin_5,
-			.GPIO_Speed = GPIO_Speed_10MHz,
-			.GPIO_Mode = GPIO_Mode_AF_PP,
+		
+		.rx = {
+			.channel = DMA1_Channel4,
+			.init    = {
+				.DMA_PeripheralBaseAddr = (uint32_t)&(SPI2->DR),
+				.DMA_DIR                = DMA_DIR_PeripheralSRC,
+				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Priority           = DMA_Priority_High,
+				.DMA_M2M                = DMA_M2M_Disable,
+			},
+		},
+		.tx = {
+			.channel = DMA1_Channel5,
+			.init    = {
+				.DMA_PeripheralBaseAddr = (uint32_t)&(SPI2->DR),
+				.DMA_DIR                = DMA_DIR_PeripheralDST,
+				.DMA_PeripheralInc      = DMA_PeripheralInc_Disable,
+				.DMA_MemoryInc          = DMA_MemoryInc_Enable,
+				.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte,
+				.DMA_MemoryDataSize     = DMA_MemoryDataSize_Byte,
+				.DMA_Mode               = DMA_Mode_Normal,
+				.DMA_Priority           = DMA_Priority_High,
+				.DMA_M2M                = DMA_M2M_Disable,
+			},
 		},
 	},
-	.miso =
-	{
-		.gpio = GPIOA,
-		.init =
-		{
-			.GPIO_Pin = GPIO_Pin_6,
+	.sclk = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_13,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode  = GPIO_Mode_AF_PP,
+		},
+	},
+	.miso = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_14,
 			.GPIO_Speed = GPIO_Speed_10MHz,
 			.GPIO_Mode  = GPIO_Mode_IN_FLOATING,
 		},
 	},
-	.mosi =
-	{
-		.gpio = GPIOA,
-		.init =
-		{
-			.GPIO_Pin = GPIO_Pin_7,
+	.mosi = {
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_15,
 			.GPIO_Speed = GPIO_Speed_10MHz,
-			.GPIO_Mode = GPIO_Mode_AF_PP,
+			.GPIO_Mode  = GPIO_Mode_AF_PP,
 		},
 	},
+	.slave_count = 1,
+	.ssel = {{
+		.gpio = GPIOC,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_13,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode = GPIO_Mode_Out_PP,
+		},
+	}},
 };
 
-uint32_t pios_spi_rfm22b_id;
-void PIOS_SPI_port_irq_handler(void)
+static uint32_t pios_spi_sdcard_id;
+void PIOS_SPI_sdcard_irq_handler(void)
 {
-	/* Call into the generic code to handle the IRQ for this specific device */
-	PIOS_SPI_IRQ_Handler(pios_spi_rfm22b_id);
+  /* Call into the generic code to handle the IRQ for this specific device */
+	PIOS_SPI_IRQ_Handler(pios_spi_sdcard_id);
 }
 
-#endif /* PIOS_INCLUDE_SPI */
+#endif
+#endif
 
 #if defined(PIOS_INCLUDE_ADC)
 

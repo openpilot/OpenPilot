@@ -2,20 +2,26 @@
   ******************************************************************************
   * @file    usb_hcd_int.c
   * @author  MCD Application Team
-  * @version V2.0.0
-  * @date    22-July-2011
+  * @version V2.1.0
+  * @date    19-March-2012
   * @brief   Host driver interrupt subroutines
   ******************************************************************************
   * @attention
   *
-  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
-  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
-  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
-  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
-  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
   *
-  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
+  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  * You may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at:
+  *
+  *        http://www.st.com/software_license_agreement_liberty_v2
+  *
+  * Unless required by applicable law or agreed to in writing, software 
+  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  *
   ******************************************************************************
   */
 
@@ -25,8 +31,6 @@
 #include "usb_hcd_int.h"
 
 #if defined   (__CC_ARM) /*!< ARM Compiler */
-    #pragma O0
-#elif defined ( __ICCARM__ ) /*!< IAR Compiler */
     #pragma O0
 #elif defined (__GNUC__) /*!< GNU Compiler */
     #pragma GCC optimize ("O0")
@@ -220,9 +224,10 @@ static uint32_t USB_OTG_USBH_handle_hc_ISR (USB_OTG_CORE_HANDLE *pdev)
 static uint32_t USB_OTG_USBH_handle_sof_ISR (USB_OTG_CORE_HANDLE *pdev)
 {
   USB_OTG_GINTSTS_TypeDef      gintsts;
-  
-  
   gintsts.d32 = 0;
+  
+  USBH_HCD_INT_fops->SOF(pdev);
+  
   /* Clear interrupt */
   gintsts.b.sofintr = 1;
   USB_OTG_WRITE_REG32(&pdev->regs.GREGS->GINTSTS, gintsts.d32);
@@ -240,10 +245,9 @@ static uint32_t USB_OTG_USBH_handle_Disconnect_ISR (USB_OTG_CORE_HANDLE *pdev)
 {
   USB_OTG_GINTSTS_TypeDef      gintsts;
   
-  pdev->host.ConnSts = 0;
   gintsts.d32 = 0;
   
-  pdev->host.port_cb->Disconnect(pdev);
+  USBH_HCD_INT_fops->DevDisconnected(pdev);
   
   /* Clear interrupt */
   gintsts.b.disconnect = 1;
@@ -251,7 +255,9 @@ static uint32_t USB_OTG_USBH_handle_Disconnect_ISR (USB_OTG_CORE_HANDLE *pdev)
   
   return 1;
 }
-
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
+#pragma optimize = none
+#endif /* __CC_ARM */
 /**
   * @brief  USB_OTG_USBH_handle_nptxfempty_ISR 
   *         Handles non periodic tx fifo empty.
@@ -266,38 +272,40 @@ static uint32_t USB_OTG_USBH_handle_nptxfempty_ISR (USB_OTG_CORE_HANDLE *pdev)
   
   hnptxsts.d32 = USB_OTG_READ_REG32(&pdev->regs.GREGS->HNPTXSTS);
   
-  len_words = (pdev->host.hc[hnptxsts.b.chnum].xfer_len + 3) / 4;
+  len_words = (pdev->host.hc[hnptxsts.b.nptxqtop.chnum].xfer_len + 3) / 4;
   
   while ((hnptxsts.b.nptxfspcavail > len_words)&&
-      (pdev->host.hc[hnptxsts.b.chnum].xfer_len != 0))
+         (pdev->host.hc[hnptxsts.b.nptxqtop.chnum].xfer_len != 0))
   {
     
     len = hnptxsts.b.nptxfspcavail * 4;
     
-    if (len > pdev->host.hc[hnptxsts.b.chnum].xfer_len)
+    if (len > pdev->host.hc[hnptxsts.b.nptxqtop.chnum].xfer_len)
     {
       /* Last packet */
-      len = pdev->host.hc[hnptxsts.b.chnum].xfer_len;
+      len = pdev->host.hc[hnptxsts.b.nptxqtop.chnum].xfer_len;
       
       intmsk.d32 = 0;
       intmsk.b.nptxfempty = 1;
       USB_OTG_MODIFY_REG32( &pdev->regs.GREGS->GINTMSK, intmsk.d32, 0);       
     }
     
-    len_words = (pdev->host.hc[hnptxsts.b.chnum].xfer_len + 3) / 4;
+    len_words = (pdev->host.hc[hnptxsts.b.nptxqtop.chnum].xfer_len + 3) / 4;
     
-    USB_OTG_WritePacket (pdev , pdev->host.hc[hnptxsts.b.chnum].xfer_buff, hnptxsts.b.chnum, len);
+    USB_OTG_WritePacket (pdev , pdev->host.hc[hnptxsts.b.nptxqtop.chnum].xfer_buff, hnptxsts.b.nptxqtop.chnum, len);
     
-    pdev->host.hc[hnptxsts.b.chnum].xfer_buff  += len;
-    pdev->host.hc[hnptxsts.b.chnum].xfer_len   -= len;
-    pdev->host.hc[hnptxsts.b.chnum].xfer_count  += len; 
+    pdev->host.hc[hnptxsts.b.nptxqtop.chnum].xfer_buff  += len;
+    pdev->host.hc[hnptxsts.b.nptxqtop.chnum].xfer_len   -= len;
+    pdev->host.hc[hnptxsts.b.nptxqtop.chnum].xfer_count  += len; 
         
     hnptxsts.d32 = USB_OTG_READ_REG32(&pdev->regs.GREGS->HNPTXSTS);
   }  
 
   return 1;
 }
-
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
+#pragma optimize = none
+#endif /* __CC_ARM */
 /**
   * @brief  USB_OTG_USBH_handle_ptxfempty_ISR 
   *         Handles periodic tx fifo empty
@@ -312,30 +320,30 @@ static uint32_t USB_OTG_USBH_handle_ptxfempty_ISR (USB_OTG_CORE_HANDLE *pdev)
   
   hptxsts.d32 = USB_OTG_READ_REG32(&pdev->regs.HREGS->HPTXSTS);
   
-  len_words = (pdev->host.hc[hptxsts.b.chnum].xfer_len + 3) / 4;
+  len_words = (pdev->host.hc[hptxsts.b.ptxqtop.chnum].xfer_len + 3) / 4;
   
   while ((hptxsts.b.ptxfspcavail > len_words)&&
-      (pdev->host.hc[hptxsts.b.chnum].xfer_len != 0))    
+         (pdev->host.hc[hptxsts.b.ptxqtop.chnum].xfer_len != 0))    
   {
     
     len = hptxsts.b.ptxfspcavail * 4;
     
-    if (len > pdev->host.hc[hptxsts.b.chnum].xfer_len)
+    if (len > pdev->host.hc[hptxsts.b.ptxqtop.chnum].xfer_len)
     {
-      len = pdev->host.hc[hptxsts.b.chnum].xfer_len;
+      len = pdev->host.hc[hptxsts.b.ptxqtop.chnum].xfer_len;
       /* Last packet */
       intmsk.d32 = 0;
       intmsk.b.ptxfempty = 1;
       USB_OTG_MODIFY_REG32( &pdev->regs.GREGS->GINTMSK, intmsk.d32, 0); 
     }
     
-    len_words = (pdev->host.hc[hptxsts.b.chnum].xfer_len + 3) / 4;
+    len_words = (pdev->host.hc[hptxsts.b.ptxqtop.chnum].xfer_len + 3) / 4;
     
-    USB_OTG_WritePacket (pdev , pdev->host.hc[hptxsts.b.chnum].xfer_buff, hptxsts.b.chnum, len);
+    USB_OTG_WritePacket (pdev , pdev->host.hc[hptxsts.b.ptxqtop.chnum].xfer_buff, hptxsts.b.ptxqtop.chnum, len);
     
-    pdev->host.hc[hptxsts.b.chnum].xfer_buff  += len;
-    pdev->host.hc[hptxsts.b.chnum].xfer_len   -= len;
-    pdev->host.hc[hptxsts.b.chnum].xfer_count  += len; 
+    pdev->host.hc[hptxsts.b.ptxqtop.chnum].xfer_buff  += len;
+    pdev->host.hc[hptxsts.b.ptxqtop.chnum].xfer_len   -= len;
+    pdev->host.hc[hptxsts.b.ptxqtop.chnum].xfer_count  += len; 
      
     hptxsts.d32 = USB_OTG_READ_REG32(&pdev->regs.HREGS->HPTXSTS);
   }  
@@ -349,6 +357,9 @@ static uint32_t USB_OTG_USBH_handle_ptxfempty_ISR (USB_OTG_CORE_HANDLE *pdev)
   * @param  pdev: Selected device
   * @retval status 
   */
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
+#pragma optimize = none
+#endif /* __CC_ARM */
 static uint32_t USB_OTG_USBH_handle_port_ISR (USB_OTG_CORE_HANDLE *pdev)
 {
   USB_OTG_HPRT0_TypeDef  hprt0;
@@ -374,9 +385,9 @@ static uint32_t USB_OTG_USBH_handle_port_ISR (USB_OTG_CORE_HANDLE *pdev)
   /* Port Connect Detected */
   if (hprt0.b.prtconndet)
   {
-    pdev->host.port_cb->Connect(pdev);
+
     hprt0_dup.b.prtconndet = 1;
-    do_reset = 1;
+    USBH_HCD_INT_fops->DevConnected(pdev);
     retval |= 1;
   }
   
@@ -384,9 +395,11 @@ static uint32_t USB_OTG_USBH_handle_port_ISR (USB_OTG_CORE_HANDLE *pdev)
   if (hprt0.b.prtenchng)
   {
     hprt0_dup.b.prtenchng = 1;
+    
     if (hprt0.b.prtena == 1)
     {
-      pdev->host.ConnSts = 1;
+      
+      USBH_HCD_INT_fops->DevConnected(pdev);
       
       if ((hprt0.b.prtspd == HPRT0_PRTSPD_LOW_SPEED) ||
           (hprt0.b.prtspd == HPRT0_PRTSPD_FULL_SPEED))
@@ -399,7 +412,7 @@ static uint32_t USB_OTG_USBH_handle_port_ISR (USB_OTG_CORE_HANDLE *pdev)
           USB_OTG_WRITE_REG32(&pdev->regs.HREGS->HFIR, 6000 );
           if (hcfg.b.fslspclksel != HCFG_6_MHZ)
           {
-            if(pdev->cfg.coreID == USB_OTG_FS_CORE_ID)
+            if(pdev->cfg.phy_itface  == USB_OTG_EMBEDDED_PHY)
             {          
               USB_OTG_InitFSLSPClkSel(pdev ,HCFG_6_MHZ );
             }          
@@ -432,14 +445,15 @@ static uint32_t USB_OTG_USBH_handle_port_ISR (USB_OTG_CORE_HANDLE *pdev)
   if (do_reset)
   {
     USB_OTG_ResetPort(pdev);
-    
   }
   /* Clear Port Interrupts */
   USB_OTG_WRITE_REG32(pdev->regs.HPRT0, hprt0_dup.d32);
   
   return retval;
 }
-
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
+#pragma optimize = none
+#endif /* __CC_ARM */
 /**
   * @brief  USB_OTG_USBH_handle_hc_n_Out_ISR 
   *         Handles interrupt for a specific Host Channel
@@ -451,13 +465,13 @@ uint32_t USB_OTG_USBH_handle_hc_n_Out_ISR (USB_OTG_CORE_HANDLE *pdev , uint32_t 
 {
   
   USB_OTG_HCINTn_TypeDef     hcint;
-  USB_OTG_HCGINTMSK_TypeDef  hcintmsk;
+  USB_OTG_HCINTMSK_TypeDef  hcintmsk;
   USB_OTG_HC_REGS *hcreg;
   USB_OTG_HCCHAR_TypeDef     hcchar; 
   
   hcreg = pdev->regs.HC_REGS[num];
   hcint.d32 = USB_OTG_READ_REG32(&hcreg->HCINT);
-  hcintmsk.d32 = USB_OTG_READ_REG32(&hcreg->HCGINTMSK);
+  hcintmsk.d32 = USB_OTG_READ_REG32(&hcreg->HCINTMSK);
   hcint.d32 = hcint.d32 & hcintmsk.d32;
   
   hcchar.d32 = USB_OTG_READ_REG32(&pdev->regs.HC_REGS[num]->HCCHAR);
@@ -471,7 +485,12 @@ uint32_t USB_OTG_USBH_handle_hc_n_Out_ISR (USB_OTG_CORE_HANDLE *pdev , uint32_t 
   {
     CLEAR_HC_INT(hcreg , ack);
   }
-  
+  else if (hcint.b.frmovrun)
+  {
+    UNMASK_HOST_INT_CHH (num);
+    USB_OTG_HC_Halt(pdev, num);
+    CLEAR_HC_INT(hcreg ,frmovrun);
+  }
   else if (hcint.b.xfercompl)
   {
     pdev->host.ErrCnt[num] = 0;
@@ -567,7 +586,9 @@ uint32_t USB_OTG_USBH_handle_hc_n_Out_ISR (USB_OTG_CORE_HANDLE *pdev , uint32_t 
 
   return 1;
 }
-
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
+#pragma optimize = none
+#endif /* __CC_ARM */
 /**
   * @brief  USB_OTG_USBH_handle_hc_n_In_ISR 
   *         Handles interrupt for a specific Host Channel
@@ -578,7 +599,7 @@ uint32_t USB_OTG_USBH_handle_hc_n_Out_ISR (USB_OTG_CORE_HANDLE *pdev , uint32_t 
 uint32_t USB_OTG_USBH_handle_hc_n_In_ISR (USB_OTG_CORE_HANDLE *pdev , uint32_t num)
 {
   USB_OTG_HCINTn_TypeDef     hcint;
-  USB_OTG_HCGINTMSK_TypeDef  hcintmsk;
+  USB_OTG_HCINTMSK_TypeDef  hcintmsk;
   USB_OTG_HCCHAR_TypeDef     hcchar; 
   USB_OTG_HCTSIZn_TypeDef  hctsiz;
   USB_OTG_HC_REGS *hcreg;
@@ -586,7 +607,7 @@ uint32_t USB_OTG_USBH_handle_hc_n_In_ISR (USB_OTG_CORE_HANDLE *pdev , uint32_t n
   
   hcreg = pdev->regs.HC_REGS[num];
   hcint.d32 = USB_OTG_READ_REG32(&hcreg->HCINT);
-  hcintmsk.d32 = USB_OTG_READ_REG32(&hcreg->HCGINTMSK);
+  hcintmsk.d32 = USB_OTG_READ_REG32(&hcreg->HCINTMSK);
   hcint.d32 = hcint.d32 & hcintmsk.d32;
   hcchar.d32 = USB_OTG_READ_REG32(&pdev->regs.HC_REGS[num]->HCCHAR);
   hcintmsk.d32 = 0;
@@ -704,7 +725,6 @@ uint32_t USB_OTG_USBH_handle_hc_n_In_ISR (USB_OTG_CORE_HANDLE *pdev , uint32_t n
     {
       UNMASK_HOST_INT_CHH (num);
       USB_OTG_HC_Halt(pdev, num);
-      CLEAR_HC_INT(hcreg , nak);   
     }
      else if  ((hcchar.b.eptype == EP_TYPE_CTRL)||
              (hcchar.b.eptype == EP_TYPE_BULK))
@@ -715,6 +735,7 @@ uint32_t USB_OTG_USBH_handle_hc_n_In_ISR (USB_OTG_CORE_HANDLE *pdev , uint32_t n
       USB_OTG_WRITE_REG32(&pdev->regs.HC_REGS[num]->HCCHAR, hcchar.d32); 
     }
     pdev->host.HC_Status[num] = HC_NAK;
+    CLEAR_HC_INT(hcreg , nak);   
   }
 
   
@@ -728,7 +749,9 @@ uint32_t USB_OTG_USBH_handle_hc_n_In_ISR (USB_OTG_CORE_HANDLE *pdev , uint32_t n
   * @param  pdev: Selected device
   * @retval status 
   */
-
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
+#pragma optimize = none
+#endif /* __CC_ARM */
 static uint32_t USB_OTG_USBH_handle_rx_qlvl_ISR (USB_OTG_CORE_HANDLE *pdev)
 {
   USB_OTG_GRXFSTS_TypeDef       grxsts;
@@ -794,6 +817,9 @@ static uint32_t USB_OTG_USBH_handle_rx_qlvl_ISR (USB_OTG_CORE_HANDLE *pdev)
   * @param  pdev: Selected device
   * @retval status 
   */
+#if defined ( __ICCARM__ ) /*!< IAR Compiler */
+#pragma optimize = none
+#endif /* __CC_ARM */
 static uint32_t USB_OTG_USBH_handle_IncompletePeriodicXfer_ISR (USB_OTG_CORE_HANDLE *pdev)
 {
   

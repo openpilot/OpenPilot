@@ -443,36 +443,10 @@
 #define RFM22_received_packet_length				0x4B	// R
 
 #define RFM22_adc8_control							0x4F	// R/W
-/*
-  #define RFM22_analog_test_bus						0x50	// R/W
-  #define RFM22_digital_test_bus						0x51	// R/W
-  #define RFM22_tx_ramp_control						0x52	// R/W
-  #define RFM22_pll_tune_time							0x53	// R/W
 
-  #define RFM22_calibration_control					0x55	// R/W
-
-  #define RFM22_modem_test							0x56	// R/W
-
-  #define RFM22_chargepump_test						0x57	// R/W
-  #define RFM22_chargepump_current_trimming_override	0x58	// R/W
-
-  #define RFM22_divider_current_trimming				0x59	// R/W
-
-  #define RFM22_vco_current_trimming					0x5A	// R/W
-  #define RFM22_vco_calibration_override				0x5B	// R/W
-
-  #define RFM22_synthersizer_test						0x5C	// R/W
-
-  #define RFM22_block_enable_override1				0x5D	// R/W
-  #define RFM22_block_enable_override2				0x5E	// R/W
-  #define RFM22_block_enable_override3				0x5F	// R/W
-*/
 #define RFM22_channel_filter_coeff_addr				0x60	// R/W
 #define RFM22_ch_fil_coeff_ad_inv_pre_th_mask	0xF0		//
 #define RFM22_ch_fil_coeff_ad_chfiladd_mask		0x0F		// Channel Filter Coefficient Look-up Table Address. The address for channel filter coefficients used in the RX path.
-
-
-//#define RFM22_channel_filter_coeff_value			0x61	// R/W
 
 #define RFM22_xtal_osc_por_ctrl						0x62	// R/W
 #define RFM22_xtal_osc_por_ctrl_pwst_mask		0xE0		// Internal Power States of the Chip.
@@ -481,26 +455,12 @@
 #define RFM22_xtal_osc_por_ctrl_enamp2x			0x04		// 2 Times Higher Amplification Enable.
 #define RFM22_xtal_osc_por_ctrl_bufovr			0x02		// Output Buffer Enable Override.
 #define RFM22_xtal_osc_por_ctrl_enbuf			0x01		// Output Buffer Enable.
-/*
-  #define RFM22_rc_osc_coarse_calbration_override		0x63	// R/W
-  #define RFM22_rc_osc_fine_calbration_override		0x64	// R/W
 
-  #define RFM22_ldo_control_override					0x65	// R/W
-  #define RFM22_ldo_level_setting						0x66	// R/W
-
-  #define RFM22_deltasigma_adc_tuning1				0x67	// R/W
-  #define RFM22_deltasigma_adc_tuning2				0x68	// R/W
-*/
 #define RFM22_agc_override1					0x69	// R/W
 #define RFM22_agc_ovr1_sgi					0x40		// AGC Loop, Set Gain Increase. If set to 0 then gain increasing will not be allowed. If set to 1 then gain increasing is allowed, default is 0.
 #define RFM22_agc_ovr1_agcen					0x20		// Automatic Gain Control Enable. When this bit is set then the result of the control can be read out from bits [4:0], otherwise the gain can be controlled manually by writing into bits [4:0].
 #define RFM22_agc_ovr1_lnagain					0x10		// LNA Gain Select. 0 = min gain = 5dB, 1 = max gain = 25 dB.
 #define RFM22_agc_ovr1_pga_mask					0x0F		// PGA Gain Override Value.
-
-//#define RFM22_agc_override2						0x6A	// R/W
-
-//#define RFM22_gfsk_fir_coeff_addr					0x6B	// R/W
-//#define RFM22_gfsk_fir_coeff_value				0x6C	// R/W
 
 #define RFM22_tx_power						0x6D	// R/W
 #define RFM22_tx_pwr_lna_sw					0x08		// LNA Switch Controller. If set, lna_sw control from the digital will go high during TX modes, and low during other times. If reset, the digital control signal is low at all times.
@@ -761,8 +721,6 @@ struct pios_rfm22b_dev {
 
 	// The offset between our clock and the global send clock
 	uint8_t time_to_send_offset;
-	// The number of times that the current packet has been resent.
-	uint8_t cur_resent_count;
 
 	// The initial frequency
 	uint32_t init_frequency;
@@ -773,8 +731,6 @@ struct pios_rfm22b_dev {
 	float frequency_step_size;
 	// current frequency hop channel
 	uint8_t	frequency_hop_channel;
-	// the frequency hop step size
-	uint8_t frequency_hop_step_size_reg;
 	// afc correction reading (in Hz)
 	int8_t afc_correction_Hz;
 

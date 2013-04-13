@@ -79,9 +79,6 @@
 // The maximum amount of time without activity before initiating a reset.
 #define PIOS_RFM22B_SUPERVISOR_TIMEOUT 100  // ms
 
-// The time between connection attempts when not connected
-#define CONNECT_ATTEMPT_PERIOD_MS 250 // ms
-
 // The time between updates for sending stats the radio link.
 #define RADIOSTATS_UPDATE_PERIOD_MS 250
 
@@ -93,10 +90,6 @@
 
 // this is too adjust the RF module so that it is on frequency
 #define OSC_LOAD_CAP				0x7F	// cap = 12.5pf .. default
-#define OSC_LOAD_CAP_1				0x7D	// board 1
-#define OSC_LOAD_CAP_2				0x7B	// board 2
-#define OSC_LOAD_CAP_3				0x7E	// board 3
-#define OSC_LOAD_CAP_4				0x7F	// board 4
 
 // ************************************
 
@@ -176,6 +169,7 @@ static const uint8_t OUT_FF[64] = {
 static void PIOS_RFM22B_Task(void *parameters);
 static bool rfm22_readStatus(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22_setDatarate(struct pios_rfm22b_dev * rfm22b_dev, enum rfm22b_datarate datarate, bool data_whitening);
+static void pios_rfm22_inject_event(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event, bool inISR);
 static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_setRxMode(struct pios_rfm22b_dev *rfm22b_dev);
 static enum pios_rfm22b_event rfm22_detectPreamble(struct pios_rfm22b_dev *rfm22b_dev);
@@ -222,7 +216,7 @@ static void rfm22_write(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr, uint8_
 static uint8_t rfm22_read(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr);
 static uint8_t rfm22_read_noclaim(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr);
 
-/* Te state transition table */
+/* The state transition table */
 const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_STATES] = {
 
 	// Initialization thread
@@ -438,7 +432,6 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_S
 };
 
 // xtal 10 ppm, 434MHz
-#define LOOKUP_SIZE	 15
 static const uint32_t            data_rate[] = {   500,  1000,  2000,  4000,  8000,  9600, 16000, 19200, 24000,  32000,  57600, 64000, 128000, 192000, 256000};
 static const uint8_t      modulation_index[] = {    16,     8,     4,     2,     1,     1,     1,     1,     1,      1,      1,     1,      1,      1,      1};
 
@@ -607,7 +600,7 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
 	rfm22b_dev->state = RFM22B_STATE_UNINITIALIZED;
 
 	// Initialize the radio device.
-	PIOS_RFM22B_InjectEvent(rfm22b_dev, RFM22B_EVENT_INITIALIZE, false);
+	pios_rfm22_inject_event(rfm22b_dev, RFM22B_EVENT_INITIALIZE, false);
 
 	// Start the driver task.  This task controls the radio state machine and removed all of the IO from the IRQ handler.
 	xTaskCreate(PIOS_RFM22B_Task, (signed char *)"PIOS_RFM22B_Task", STACK_SIZE_BYTES, (void*)rfm22b_dev, TASK_PRIORITY, &(rfm22b_dev->taskHandle));
@@ -622,7 +615,7 @@ void PIOS_RFM22B_Reinit(uint32_t rfm22b_id)
 {
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if (PIOS_RFM22B_validate(rfm22b_dev))
-		PIOS_RFM22B_InjectEvent(rfm22b_dev, RFM22B_EVENT_INITIALIZE, false);
+		pios_rfm22_inject_event(rfm22b_dev, RFM22B_EVENT_INITIALIZE, false);
 }
 
 /**
@@ -634,39 +627,8 @@ bool PIOS_RFM22_EXT_Int(void)
 		return false;
 
 	// Inject an interrupt event into the state machine.
-	PIOS_RFM22B_InjectEvent(g_rfm22b_dev, RFM22B_EVENT_INT_RECEIVED, true);
+	pios_rfm22_inject_event(g_rfm22b_dev, RFM22B_EVENT_INT_RECEIVED, true);
         return false;
-}
-
-/**
- * Inject an event into the RFM22B state machine.
- * \param[in] rfm22b_dev The device structure
- * \param[in] event The event to inject
- * \param[in] inISR Is this being called from an interrrup service routine?
- */
-void PIOS_RFM22B_InjectEvent(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event, bool inISR)
-{
-
-	// Store the event.
-	if (xQueueSend(rfm22b_dev->eventQueue, &event, portMAX_DELAY) != pdTRUE)
-		return;
-
-	// Signal the semaphore to wake up the handler thread.
-	if (inISR) {
-		portBASE_TYPE pxHigherPriorityTaskWoken;
-		if (xSemaphoreGiveFromISR(rfm22b_dev->isrPending, &pxHigherPriorityTaskWoken) != pdTRUE) {
-			// Something went fairly seriously wrong
-			rfm22b_dev->errors++;
-		}
-		portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
-	}
-	else
-	{
-		if (xSemaphoreGive(rfm22b_dev->isrPending) != pdTRUE) {
-			// Something went fairly seriously wrong
-			rfm22b_dev->errors++;
-		}
-	}
 }
 
 /**
@@ -847,40 +809,6 @@ bool PIOS_RFM22B_LinkStatus(uint32_t rfm22b_id)
 }
 
 /**
- * Send a PPM packet with the given channel values.
- * \param[in] rfm22b_id  The rfm22b device.
- * \param[in] channels  The channel values.
- * \param[in] nchannels  The number of channels.
- * Returns true if there is a valid connection to paired radio, false otherwise.
- */
-void PIOS_RFM22B_SendPPM(uint32_t rfm22b_id, const uint16_t *channels, uint8_t nchannels)
-{
-#ifdef PIOS_PPM_RECEIVER
-	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
- 	if (!PIOS_RFM22B_validate(rfm22b_dev)) {
- 		return;
-	}
-
-	// Only send PPM if we're connected
-	if (!rfm22_isConnected(rfm22b_dev)) {
-		return;
-	}
-
-	// See if we have any valid channels.
-	uint8_t nchan = (nchannels <= PIOS_PPM_NUM_INPUTS) ? nchannels : PIOS_PPM_NUM_INPUTS;
-	for (uint8_t i = 0; i < nchan; ++i) {
-		rfm22b_dev->ppm_packet.channels[i] = channels[i];
-	}
-
-	// Send the PPM packet.
-	rfm22b_dev->ppm_packet.header.destination_id = rfm22b_dev->destination_id;
-	rfm22b_dev->ppm_packet.header.type = PACKET_TYPE_PPM;
-	rfm22b_dev->ppm_packet.header.data_size = PH_PPM_DATA_SIZE(&(rfm22b_dev->ppm_packet));
-	rfm22b_dev->send_ppm = true;
-#endif
-}
-
-/**
  * The task that controls the radio state machine.
  */
 static void PIOS_RFM22B_Task(void *parameters)
@@ -996,31 +924,284 @@ static void PIOS_RFM22B_Task(void *parameters)
 	}
 }
 
-// ************************************
-// radio datarate about 19200 Baud
-// radio frequency deviation 45kHz
-// radio receiver bandwidth 67kHz.
-//
-// Carson's rule:
-//  The signal bandwidth is about 2(Delta-f + fm) ..
-//
-// Delta-f = frequency deviation
-// fm = maximum frequency of the signal
-//
-// This gives 2(45 + 9.6) = 109.2kHz.
-
-static void rfm22_setDatarate(struct pios_rfm22b_dev * rfm22b_dev, enum rfm22b_datarate datarate, bool data_whitening)
+/**
+ * Initialize (or re-initialize) the RFM22B radio device.
+ *
+ * \param[in] rfm22b_dev The device structure
+ */
+static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 {
-	uint32_t datarate_bps = data_rate[datarate];
-	rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(datarate_bps) + 0.5f);
-	if (rfm22_isConnected(rfm22b_dev))
+
+	// Initialize the register values.
+	rfm22b_dev->device_status = 0;
+	rfm22b_dev->int_status1 = 0;
+	rfm22b_dev->int_status2 = 0;
+	rfm22b_dev->ezmac_status = 0;
+
+	// Clean the LEDs
+	rfm22_clearLEDs();
+
+	// Initialize the detected device statistics.
+	for (uint8_t i = 0; i < OPLINKSTATUS_PAIRIDS_NUMELEM; ++i) {
+		rfm22b_dev->pair_stats[i].pairID = 0;
+		rfm22b_dev->pair_stats[i].rssi = -127;
+		rfm22b_dev->pair_stats[i].afc_correction = 0;
+		rfm22b_dev->pair_stats[i].lastContact = 0;
+	}
+
+	// Initlize the link stats.
+	for (uint8_t i = 0; i < RFM22B_RX_PACKET_STATS_LEN; ++i)
+		rfm22b_dev->rx_packet_stats[i] = 0;
+
+	// Initialize the state
+	rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
+	rfm22b_dev->destination_id = 0xffffffff;
+	rfm22b_dev->time_to_send = false;
+	rfm22b_dev->time_to_send_offset = 0;
+	rfm22b_dev->send_status = false;
+	rfm22b_dev->send_connection_request = false;
+
+	// Initialize the packets.
+	rfm22b_dev->rx_packet_len = 0;
+	rfm22b_dev->tx_packet = NULL;
+	rfm22b_dev->prev_tx_packet = NULL;
+	rfm22b_dev->data_packet.header.data_size = 0;
+	rfm22b_dev->in_rx_mode = false;
+
+	// Initialize the devide state
+	rfm22b_dev->device_status = rfm22b_dev->int_status1 = rfm22b_dev->int_status2 = rfm22b_dev->ezmac_status = 0;
+	rfm22b_dev->rx_buffer_wr = 0;
+	rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
+	rfm22b_dev->frequency_hop_channel = 0;
+	rfm22b_dev->afc_correction_Hz = 0;
+	rfm22b_dev->packet_start_ticks = 0;
+	rfm22b_dev->tx_complete_ticks = 0;
+	rfm22b_dev->rx_complete_ticks = 0;
+
+	// software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
+	rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);
+
+	for (int i = 50; i > 0; i--) {
+		// read the status registers
+		rfm22b_dev->int_status1 = rfm22_read(rfm22b_dev, RFM22_interrupt_status1);
+		rfm22b_dev->int_status2 = rfm22_read(rfm22b_dev, RFM22_interrupt_status2);
+		if (rfm22b_dev->int_status2 & RFM22_is2_ichiprdy) break;
+
+		// wait 1ms
+		PIOS_DELAY_WaitmS(1);
+	}
+
+	// ****************
+
+	// read status - clears interrupt
+	rfm22b_dev->device_status = rfm22_read(rfm22b_dev, RFM22_device_status);
+	rfm22b_dev->int_status1 = rfm22_read(rfm22b_dev, RFM22_interrupt_status1);
+	rfm22b_dev->int_status2 = rfm22_read(rfm22b_dev, RFM22_interrupt_status2);
+	rfm22b_dev->ezmac_status = rfm22_read(rfm22b_dev, RFM22_ezmac_status);
+
+	// disable all interrupts
+	rfm22_write(rfm22b_dev, RFM22_interrupt_enable1, 0x00);
+	rfm22_write(rfm22b_dev, RFM22_interrupt_enable2, 0x00);
+
+	// read the RF chip ID bytes
+
+	// read the device type
+	uint8_t device_type = rfm22_read(rfm22b_dev, RFM22_DEVICE_TYPE) & RFM22_DT_MASK;
+	// read the device version
+	uint8_t device_version = rfm22_read(rfm22b_dev, RFM22_DEVICE_VERSION) & RFM22_DV_MASK;
+
+#if defined(RFM22_DEBUG)
+	DEBUG_PRINTF(2, "rf device type: %d\n\r", device_type);
+	DEBUG_PRINTF(2, "rf device version: %d\n\r", device_version);
+#endif
+
+	if (device_type != 0x08)
 	{
-		// Generate a pseudo-random number from 0-8 to add to the delay
-		uint8_t random = PIOS_CRC_updateByte(0, (uint8_t)(xTaskGetTickCount() & 0xff)) & 0x03;
-		rfm22b_dev->max_ack_delay = (uint16_t)((float)((sizeof(PHAckNackPacket) * 8 + TX_PREAMBLE_NIBBLES * 4) * 1000) / (float)(datarate_bps) + 0.5f) * 4 + 4 + random;
+#if defined(RFM22_DEBUG)
+		DEBUG_PRINTF(2, "rf device type: INCORRECT - should be 0x08\n\r");
+#endif
+		// incorrect RF module type
+		return RFM22B_EVENT_FATAL_ERROR;
+	}
+	if (device_version != RFM22_DEVICE_VERSION_B1)
+	{
+#if defined(RFM22_DEBUG)
+		DEBUG_PRINTF(2, "rf device version: INCORRECT\n\r");
+#endif
+		// incorrect RF module version
+		return RFM22B_EVENT_FATAL_ERROR;
+	}
+
+	// calibrate our RF module to be exactly on frequency .. different for every module
+	rfm22_write(rfm22b_dev, RFM22_xtal_osc_load_cap, OSC_LOAD_CAP);
+
+	// disable Low Duty Cycle Mode
+	rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl2, 0x00);
+
+	// 1MHz clock output
+	rfm22_write(rfm22b_dev, RFM22_cpu_output_clk, RFM22_coc_1MHz);
+
+	// READY mode
+	rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_xton);
+
+	// choose the 3 GPIO pin functions
+	// GPIO port use default value
+	rfm22_write(rfm22b_dev, RFM22_io_port_config, RFM22_io_port_default);
+	if (rfm22b_dev->cfg.gpio_direction == GPIO0_TX_GPIO1_RX) {
+		// GPIO0 = TX State (to control RF Switch)
+		rfm22_write(rfm22b_dev, RFM22_gpio0_config, RFM22_gpio0_config_drv3 | RFM22_gpio0_config_txstate);
+		// GPIO1 = RX State (to control RF Switch)
+		rfm22_write(rfm22b_dev, RFM22_gpio1_config, RFM22_gpio1_config_drv3 | RFM22_gpio1_config_rxstate);
+	} else {
+		// GPIO0 = TX State (to control RF Switch)
+		rfm22_write(rfm22b_dev, RFM22_gpio0_config, RFM22_gpio0_config_drv3 | RFM22_gpio0_config_rxstate);
+		// GPIO1 = RX State (to control RF Switch)		
+		rfm22_write(rfm22b_dev, RFM22_gpio1_config, RFM22_gpio1_config_drv3 | RFM22_gpio1_config_txstate);
+	}
+	// GPIO2 = Clear Channel Assessment
+	rfm22_write(rfm22b_dev, RFM22_gpio2_config, RFM22_gpio2_config_drv3 | RFM22_gpio2_config_cca);
+
+	// FIFO mode, GFSK modulation
+	uint8_t fd_bit = rfm22_read(rfm22b_dev, RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
+	rfm22_write(rfm22b_dev, RFM22_modulation_mode_control2, RFM22_mmc2_trclk_clk_none | RFM22_mmc2_dtmod_fifo | fd_bit | RFM22_mmc2_modtyp_gfsk);
+
+	// setup to read the internal temperature sensor
+
+	// ADC used to sample the temperature sensor
+	uint8_t adc_config = RFM22_ac_adcsel_temp_sensor | RFM22_ac_adcref_bg;
+	rfm22_write(rfm22b_dev, RFM22_adc_config, adc_config);
+
+	// adc offset
+	rfm22_write(rfm22b_dev, RFM22_adc_sensor_amp_offset, 0);
+
+	// temp sensor calibration .. �40C to +64C 0.5C resolution
+	rfm22_write(rfm22b_dev, RFM22_temp_sensor_calib, RFM22_tsc_tsrange0 | RFM22_tsc_entsoffs);
+
+	// temp sensor offset
+	rfm22_write(rfm22b_dev, RFM22_temp_value_offset, 0);
+
+	// start an ADC conversion
+	rfm22_write(rfm22b_dev, RFM22_adc_config, adc_config | RFM22_ac_adcstartbusy);
+
+	// set the RSSI threshold interrupt to about -90dBm
+	rfm22_write(rfm22b_dev, RFM22_rssi_threshold_clear_chan_indicator, (-90 + 122) * 2);
+
+	// enable the internal Tx & Rx packet handlers (without CRC)
+	rfm22_write(rfm22b_dev, RFM22_data_access_control, RFM22_dac_enpacrx | RFM22_dac_enpactx);
+
+	// x-nibbles tx preamble
+	rfm22_write(rfm22b_dev, RFM22_preamble_length, TX_PREAMBLE_NIBBLES);
+	// x-nibbles rx preamble detection
+	rfm22_write(rfm22b_dev, RFM22_preamble_detection_ctrl1, RX_PREAMBLE_NIBBLES << 3);
+
+	// header control - using a 4 by header with broadcast of 0xffffffff
+	rfm22_write(rfm22b_dev, RFM22_header_control1,
+		    RFM22_header_cntl1_bcen_0 |
+		    RFM22_header_cntl1_bcen_1 |
+		    RFM22_header_cntl1_bcen_2 |
+		    RFM22_header_cntl1_bcen_3 |
+		    RFM22_header_cntl1_hdch_0 |
+		    RFM22_header_cntl1_hdch_1 |
+		    RFM22_header_cntl1_hdch_2 |
+		    RFM22_header_cntl1_hdch_3);
+	// Check all bit of all bytes of the header
+	rfm22_write(rfm22b_dev, RFM22_header_enable0, 0xff);
+	rfm22_write(rfm22b_dev, RFM22_header_enable1, 0xff);
+	rfm22_write(rfm22b_dev, RFM22_header_enable2, 0xff);
+	rfm22_write(rfm22b_dev, RFM22_header_enable3, 0xff);
+	// Set the ID to be checked
+	uint32_t id = rfm22b_dev->deviceID;
+	rfm22_write(rfm22b_dev, RFM22_check_header0, id & 0xff);
+	rfm22_write(rfm22b_dev, RFM22_check_header1, (id >> 8) & 0xff);
+	rfm22_write(rfm22b_dev, RFM22_check_header2, (id >> 16) & 0xff);
+	rfm22_write(rfm22b_dev, RFM22_check_header3, (id >> 24) & 0xff);
+	// 4 header bytes, synchronization word length 3, 2, 1 & 0 used, packet length included in header.
+	rfm22_write(rfm22b_dev, RFM22_header_control2,
+		    RFM22_header_cntl2_hdlen_3210 |
+		    RFM22_header_cntl2_synclen_3210 |
+		    ((TX_PREAMBLE_NIBBLES >> 8) & 0x01));
+
+	// sync word
+	rfm22_write(rfm22b_dev, RFM22_sync_word3, SYNC_BYTE_1);
+	rfm22_write(rfm22b_dev, RFM22_sync_word2, SYNC_BYTE_2);
+	rfm22_write(rfm22b_dev, RFM22_sync_word1, SYNC_BYTE_3);
+	rfm22_write(rfm22b_dev, RFM22_sync_word0, SYNC_BYTE_4);
+
+	// set the tx power
+	rfm22_write(rfm22b_dev, RFM22_tx_power, RFM22_tx_pwr_lna_sw | rfm22b_dev->tx_power);
+
+	// TX FIFO Almost Full Threshold (0 - 63)
+	rfm22_write(rfm22b_dev, RFM22_tx_fifo_control1, TX_FIFO_HI_WATERMARK);
+
+	// TX FIFO Almost Empty Threshold (0 - 63)
+	rfm22_write(rfm22b_dev, RFM22_tx_fifo_control2, TX_FIFO_LO_WATERMARK);
+
+	// RX FIFO Almost Full Threshold (0 - 63)
+	rfm22_write(rfm22b_dev, RFM22_rx_fifo_control, RX_FIFO_HI_WATERMARK);
+
+	// Set the frequency calibration
+	rfm22_write(rfm22b_dev, RFM22_xtal_osc_load_cap, rfm22b_dev->cfg.RFXtalCap);
+
+	// Initialize the frequency and datarate to te default.
+	rfm22_setNominalCarrierFrequency(rfm22b_dev, rfm22b_dev->init_frequency, rfm22b_dev->init_frequency, RFM22B_FREQUENCY_HOP_STEP_SIZE);
+	rfm22_setDatarate(rfm22b_dev, RFM22B_DEFAULT_RX_DATARATE, true);
+
+	return RFM22B_EVENT_INITIALIZED;
+}
+
+/**
+ * Inject an event into the RFM22B state machine.
+ *
+ * \param[in] rfm22b_dev The device structure
+ * \param[in] event The event to inject
+ * \param[in] inISR Is this being called from an interrrup service routine?
+ */
+static void pios_rfm22_inject_event(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event, bool inISR)
+{
+
+	// Store the event.
+	if (xQueueSend(rfm22b_dev->eventQueue, &event, portMAX_DELAY) != pdTRUE)
+		return;
+
+	// Signal the semaphore to wake up the handler thread.
+	if (inISR) {
+		portBASE_TYPE pxHigherPriorityTaskWoken;
+		if (xSemaphoreGiveFromISR(rfm22b_dev->isrPending, &pxHigherPriorityTaskWoken) != pdTRUE) {
+			// Something went fairly seriously wrong
+			rfm22b_dev->errors++;
+		}
+		portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken);
 	}
 	else
-		rfm22b_dev->max_ack_delay = CONNECT_ATTEMPT_PERIOD_MS;
+	{
+		if (xSemaphoreGive(rfm22b_dev->isrPending) != pdTRUE) {
+			// Something went fairly seriously wrong
+			rfm22b_dev->errors++;
+		}
+	}
+}
+
+/**
+ * Set the air datarate for the RFM22B device.
+ *
+ * Carson's rule:
+ *  The signal bandwidth is about 2(Delta-f + fm) ..
+ *
+ * Delta-f = frequency deviation
+ * fm = maximum frequency of the signal
+ *
+ * \param[in] rfm33b_dev  The device structure pointer.
+ * \param[in] datarate  The air datarate.
+ * \param[in] data_whitening  Is data whitening desired?
+ */
+static void rfm22_setDatarate(struct pios_rfm22b_dev *rfm22b_dev, enum rfm22b_datarate datarate, bool data_whitening)
+{
+	uint32_t datarate_bps = data_rate[datarate];
+	rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(datarate_bps) + 0.5);
+
+	// Generate a pseudo-random number from 0-8 to add to the delay
+	uint8_t random = PIOS_CRC_updateByte(0, (uint8_t)(xTaskGetTickCount() & 0xff)) & 0x03;
+	rfm22b_dev->max_ack_delay = (uint16_t)((float)((sizeof(PHAckNackPacket) * 8 + TX_PREAMBLE_NIBBLES * 4) * 1000) / (float)(datarate_bps) + 0.5) * 4 + 4 + random;
 
 	// rfm22_if_filter_bandwidth
 	rfm22_write(rfm22b_dev, 0x1C, reg_1C[datarate]);
@@ -1121,20 +1302,6 @@ static void rfm22_write(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr, uint8_
 	rfm22_deassertCs(rfm22b_dev);
 	rfm22_releaseBus(rfm22b_dev);
 }
-
-/**
- * Write a byte to a register without claiming the bus.  Also
- * toggle the NSS line
- * @param[in] addr The address of the RFM22b register to write
- * @param[in] data The data to write to that register
- static void rfm22_write_noclaim(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr, uint8_t data)
- {
-	 uint8_t buf[2] = {addr | 0x80, data};
-	 rfm22_assertCs(rfm22b_dev);
-	 PIOS_SPI_TransferBlock(rfm22b_dev->spi_id, buf, NULL, sizeof(buf), NULL);
-	 rfm22_deassertCs(rfm22b_dev);
- }
-*/
 
 /**
 
@@ -2068,9 +2235,6 @@ static enum pios_rfm22b_event rfm22_receiveAck(struct pios_rfm22b_dev *rfm22b_de
 		rfm22b_dev->time_delta += remote_rx_time - local_tx_time;
 	}
 
-	// Reset the resend count
-	rfm22b_dev->cur_resent_count = 0;
-
 	// Should we try to start another TX?
 	if (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_ACK) {
 		rfm22b_dev->time_to_send_offset = curTicks;
@@ -2238,239 +2402,6 @@ static enum pios_rfm22b_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm
 	rfm22b_dev->destination_id = cph->source_id;
 
 	return RFM22B_EVENT_DEFAULT;
-}
-
-// ************************************
-// Initialise this hardware layer module and the rf module
-
-static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
-{
-
-	// Initialize the register values.
-	rfm22b_dev->device_status = 0;
-	rfm22b_dev->int_status1 = 0;
-	rfm22b_dev->int_status2 = 0;
-	rfm22b_dev->ezmac_status = 0;
-
-	// Clean the LEDs
-	rfm22_clearLEDs();
-
-	// Initialize the detected device statistics.
-	for (uint8_t i = 0; i < OPLINKSTATUS_PAIRIDS_NUMELEM; ++i) {
-		rfm22b_dev->pair_stats[i].pairID = 0;
-		rfm22b_dev->pair_stats[i].rssi = -127;
-		rfm22b_dev->pair_stats[i].afc_correction = 0;
-		rfm22b_dev->pair_stats[i].lastContact = 0;
-	}
-
-	// Initlize the link stats.
-	for (uint8_t i = 0; i < RFM22B_RX_PACKET_STATS_LEN; ++i)
-		rfm22b_dev->rx_packet_stats[i] = 0;
-
-	// Initialize the state
-	rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
-	rfm22b_dev->destination_id = 0xffffffff;
-	rfm22b_dev->time_to_send = false;
-	rfm22b_dev->time_to_send_offset = 0;
-	rfm22b_dev->send_status = false;
-	rfm22b_dev->send_connection_request = false;
-	rfm22b_dev->cur_resent_count = 0;
-
-	// Initialize the packets.
-	rfm22b_dev->rx_packet_len = 0;
-	rfm22b_dev->tx_packet = NULL;
-	rfm22b_dev->prev_tx_packet = NULL;
-	rfm22b_dev->data_packet.header.data_size = 0;
-	rfm22b_dev->in_rx_mode = false;
-
-	// Initialize the devide state
-	rfm22b_dev->device_status = rfm22b_dev->int_status1 = rfm22b_dev->int_status2 = rfm22b_dev->ezmac_status = 0;
-	rfm22b_dev->rx_buffer_wr = 0;
-	rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
-	rfm22b_dev->frequency_hop_channel = 0;
-	rfm22b_dev->afc_correction_Hz = 0;
-	rfm22b_dev->packet_start_ticks = 0;
-	rfm22b_dev->tx_complete_ticks = 0;
-	rfm22b_dev->rx_complete_ticks = 0;
-
-	// software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
-	rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);
-
-	for (int i = 50; i > 0; i--) {
-		// read the status registers
-		rfm22b_dev->int_status1 = rfm22_read(rfm22b_dev, RFM22_interrupt_status1);
-		rfm22b_dev->int_status2 = rfm22_read(rfm22b_dev, RFM22_interrupt_status2);
-		if (rfm22b_dev->int_status2 & RFM22_is2_ichiprdy) break;
-
-		// wait 1ms
-		PIOS_DELAY_WaitmS(1);
-	}
-
-	// ****************
-
-	// read status - clears interrupt
-	rfm22b_dev->device_status = rfm22_read(rfm22b_dev, RFM22_device_status);
-	rfm22b_dev->int_status1 = rfm22_read(rfm22b_dev, RFM22_interrupt_status1);
-	rfm22b_dev->int_status2 = rfm22_read(rfm22b_dev, RFM22_interrupt_status2);
-	rfm22b_dev->ezmac_status = rfm22_read(rfm22b_dev, RFM22_ezmac_status);
-
-	// disable all interrupts
-	rfm22_write(rfm22b_dev, RFM22_interrupt_enable1, 0x00);
-	rfm22_write(rfm22b_dev, RFM22_interrupt_enable2, 0x00);
-
-	// read the RF chip ID bytes
-
-	// read the device type
-	uint8_t device_type = rfm22_read(rfm22b_dev, RFM22_DEVICE_TYPE) & RFM22_DT_MASK;
-	// read the device version
-	uint8_t device_version = rfm22_read(rfm22b_dev, RFM22_DEVICE_VERSION) & RFM22_DV_MASK;
-
-#if defined(RFM22_DEBUG)
-	DEBUG_PRINTF(2, "rf device type: %d\n\r", device_type);
-	DEBUG_PRINTF(2, "rf device version: %d\n\r", device_version);
-#endif
-
-	if (device_type != 0x08)
-	{
-#if defined(RFM22_DEBUG)
-		DEBUG_PRINTF(2, "rf device type: INCORRECT - should be 0x08\n\r");
-#endif
-		// incorrect RF module type
-		return RFM22B_EVENT_FATAL_ERROR;
-	}
-	if (device_version != RFM22_DEVICE_VERSION_B1)
-	{
-#if defined(RFM22_DEBUG)
-		DEBUG_PRINTF(2, "rf device version: INCORRECT\n\r");
-#endif
-		// incorrect RF module version
-		return RFM22B_EVENT_FATAL_ERROR;
-	}
-
-	// calibrate our RF module to be exactly on frequency .. different for every module
-	rfm22_write(rfm22b_dev, RFM22_xtal_osc_load_cap, OSC_LOAD_CAP);
-
-	// disable Low Duty Cycle Mode
-	rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl2, 0x00);
-
-	// 1MHz clock output
-	rfm22_write(rfm22b_dev, RFM22_cpu_output_clk, RFM22_coc_1MHz);
-
-	// READY mode
-	rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_xton);
-
-	// choose the 3 GPIO pin functions
-	// GPIO port use default value
-	rfm22_write(rfm22b_dev, RFM22_io_port_config, RFM22_io_port_default);
-	if (rfm22b_dev->cfg.gpio_direction == GPIO0_TX_GPIO1_RX) {
-		// GPIO0 = TX State (to control RF Switch)
-		rfm22_write(rfm22b_dev, RFM22_gpio0_config, RFM22_gpio0_config_drv3 | RFM22_gpio0_config_txstate);
-		// GPIO1 = RX State (to control RF Switch)
-		rfm22_write(rfm22b_dev, RFM22_gpio1_config, RFM22_gpio1_config_drv3 | RFM22_gpio1_config_rxstate);
-	} else {
-		// GPIO0 = TX State (to control RF Switch)
-		rfm22_write(rfm22b_dev, RFM22_gpio0_config, RFM22_gpio0_config_drv3 | RFM22_gpio0_config_rxstate);
-		// GPIO1 = RX State (to control RF Switch)		
-		rfm22_write(rfm22b_dev, RFM22_gpio1_config, RFM22_gpio1_config_drv3 | RFM22_gpio1_config_txstate);
-	}
-	// GPIO2 = Clear Channel Assessment
-	rfm22_write(rfm22b_dev, RFM22_gpio2_config, RFM22_gpio2_config_drv3 | RFM22_gpio2_config_cca);
-
-	// FIFO mode, GFSK modulation
-	uint8_t fd_bit = rfm22_read(rfm22b_dev, RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
-	rfm22_write(rfm22b_dev, RFM22_modulation_mode_control2, RFM22_mmc2_trclk_clk_none | RFM22_mmc2_dtmod_fifo | fd_bit | RFM22_mmc2_modtyp_gfsk);
-
-	// setup to read the internal temperature sensor
-
-	// ADC used to sample the temperature sensor
-	uint8_t adc_config = RFM22_ac_adcsel_temp_sensor | RFM22_ac_adcref_bg;
-	rfm22_write(rfm22b_dev, RFM22_adc_config, adc_config);
-
-	// adc offset
-	rfm22_write(rfm22b_dev, RFM22_adc_sensor_amp_offset, 0);
-
-	// temp sensor calibration .. �40C to +64C 0.5C resolution
-	rfm22_write(rfm22b_dev, RFM22_temp_sensor_calib, RFM22_tsc_tsrange0 | RFM22_tsc_entsoffs);
-
-	// temp sensor offset
-	rfm22_write(rfm22b_dev, RFM22_temp_value_offset, 0);
-
-	// start an ADC conversion
-	rfm22_write(rfm22b_dev, RFM22_adc_config, adc_config | RFM22_ac_adcstartbusy);
-
-	// set the RSSI threshold interrupt to about -90dBm
-	rfm22_write(rfm22b_dev, RFM22_rssi_threshold_clear_chan_indicator, (-90 + 122) * 2);
-
-	// enable the internal Tx & Rx packet handlers (without CRC)
-	rfm22_write(rfm22b_dev, RFM22_data_access_control, RFM22_dac_enpacrx | RFM22_dac_enpactx);
-
-	// x-nibbles tx preamble
-	rfm22_write(rfm22b_dev, RFM22_preamble_length, TX_PREAMBLE_NIBBLES);
-	// x-nibbles rx preamble detection
-	rfm22_write(rfm22b_dev, RFM22_preamble_detection_ctrl1, RX_PREAMBLE_NIBBLES << 3);
-
-#ifdef PIOS_RFM22_NO_HEADER
-	// header control - we are not using the header
-	rfm22_write(rfm22b_dev, RFM22_header_control1, RFM22_header_cntl1_bcen_none | RFM22_header_cntl1_hdch_none);
-
-	// no header bytes, synchronization word length 3, 2, 1 & 0 used, packet length included in header.
-	rfm22_write(rfm22b_dev, RFM22_header_control2, RFM22_header_cntl2_hdlen_none |
-		    RFM22_header_cntl2_synclen_3210 | ((TX_PREAMBLE_NIBBLES >> 8) & 0x01));
-#else
-	// header control - using a 4 by header with broadcast of 0xffffffff
-	rfm22_write(rfm22b_dev, RFM22_header_control1,
-		    RFM22_header_cntl1_bcen_0 |
-		    RFM22_header_cntl1_bcen_1 |
-		    RFM22_header_cntl1_bcen_2 |
-		    RFM22_header_cntl1_bcen_3 |
-		    RFM22_header_cntl1_hdch_0 |
-		    RFM22_header_cntl1_hdch_1 |
-		    RFM22_header_cntl1_hdch_2 |
-		    RFM22_header_cntl1_hdch_3);
-	// Check all bit of all bytes of the header
-	rfm22_write(rfm22b_dev, RFM22_header_enable0, 0xff);
-	rfm22_write(rfm22b_dev, RFM22_header_enable1, 0xff);
-	rfm22_write(rfm22b_dev, RFM22_header_enable2, 0xff);
-	rfm22_write(rfm22b_dev, RFM22_header_enable3, 0xff);
-	// Set the ID to be checked
-	uint32_t id = rfm22b_dev->deviceID;
-	rfm22_write(rfm22b_dev, RFM22_check_header0, id & 0xff);
-	rfm22_write(rfm22b_dev, RFM22_check_header1, (id >> 8) & 0xff);
-	rfm22_write(rfm22b_dev, RFM22_check_header2, (id >> 16) & 0xff);
-	rfm22_write(rfm22b_dev, RFM22_check_header3, (id >> 24) & 0xff);
-	// 4 header bytes, synchronization word length 3, 2, 1 & 0 used, packet length included in header.
-	rfm22_write(rfm22b_dev, RFM22_header_control2,
-		    RFM22_header_cntl2_hdlen_3210 |
-		    RFM22_header_cntl2_synclen_3210 |
-		    ((TX_PREAMBLE_NIBBLES >> 8) & 0x01));
-#endif
-
-	// sync word
-	rfm22_write(rfm22b_dev, RFM22_sync_word3, SYNC_BYTE_1);
-	rfm22_write(rfm22b_dev, RFM22_sync_word2, SYNC_BYTE_2);
-	rfm22_write(rfm22b_dev, RFM22_sync_word1, SYNC_BYTE_3);
-	rfm22_write(rfm22b_dev, RFM22_sync_word0, SYNC_BYTE_4);
-
-	// set the tx power
-	rfm22_write(rfm22b_dev, RFM22_tx_power, RFM22_tx_pwr_lna_sw | rfm22b_dev->tx_power);
-
-	// TX FIFO Almost Full Threshold (0 - 63)
-	rfm22_write(rfm22b_dev, RFM22_tx_fifo_control1, TX_FIFO_HI_WATERMARK);
-
-	// TX FIFO Almost Empty Threshold (0 - 63)
-	rfm22_write(rfm22b_dev, RFM22_tx_fifo_control2, TX_FIFO_LO_WATERMARK);
-
-	// RX FIFO Almost Full Threshold (0 - 63)
-	rfm22_write(rfm22b_dev, RFM22_rx_fifo_control, RX_FIFO_HI_WATERMARK);
-
-	// Set the frequency calibration
-	rfm22_write(rfm22b_dev, RFM22_xtal_osc_load_cap, rfm22b_dev->cfg.RFXtalCap);
-
-	// Initialize the frequency and datarate to te default.
-	rfm22_setNominalCarrierFrequency(rfm22b_dev, rfm22b_dev->init_frequency, rfm22b_dev->init_frequency, RFM22B_FREQUENCY_HOP_STEP_SIZE);
-	rfm22_setDatarate(rfm22b_dev, RFM22B_DEFAULT_RX_DATARATE, true);
-
-	return RFM22B_EVENT_INITIALIZED;
 }
 
 static void rfm22_clearLEDs() {

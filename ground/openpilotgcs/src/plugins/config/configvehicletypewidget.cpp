@@ -207,35 +207,6 @@ ConfigVehicleTypeWidget::~ConfigVehicleTypeWidget()
 //}
 
 /**
-  \brief Sets up the mixer depending on Airframe type. Accepts either system settings or
-  combo box entry from airframe type, as those do not overlap.
-  */
-//void ConfigVehicleTypeWidget::setupAirframeUI(QString frameType)
-//{
-//    qDebug() << "ConfigVehicleTypeWidget::setupAirframeUI - begin";
-//    qDebug() << "ConfigVehicleTypeWidget::setupAirframeUI - frame type" << frameType;
-//
-//    bool dirty = isDirty();
-//
-//    QString category = frameCategory2(frameType);
-//    if (category == "FixedWing") {
-//        m_fixedwing->setupUI(frameType);
-//    } else if (category == "Multirotor") {
-//        m_multirotor->setupUI(frameType);
-//    } else if (category == "Helicopter") {
-//        m_heli->setupUI(frameType);
-//    } else if (category == "Ground") {
-//        m_groundvehicle->setupUI(frameType);
-//    } else if (category == "Custom") {
-//        m_custom->setupUI(frameType);
-//    }
-//
-//    setDirty(dirty);
-//
-//    qDebug() << "ConfigVehicleTypeWidget::setupAirframeUI - end";
-//}
-
-/**
   Refreshes the current value of the SystemSettings which holds the aircraft type
   */
 void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
@@ -462,7 +433,6 @@ void ConfigVehicleTypeWidget::enableFFTest()
 
   Note: does NOT ask for an object refresh itself!
   */
-// TODO rename to FF
 void ConfigVehicleTypeWidget::updateFeedForwardUI()
 {
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
@@ -471,10 +441,10 @@ void ConfigVehicleTypeWidget::updateFeedForwardUI()
     QPointer<VehicleConfig> vconfig = new VehicleConfig();
 
     // Update feed forward settings
-    m_aircraft->feedForwardSlider->setValue(vconfig->getMixerValue(mixer,"FeedForward") * 100);
-    m_aircraft->accelTime->setValue(vconfig->getMixerValue(mixer,"AccelTime"));
-    m_aircraft->decelTime->setValue(vconfig->getMixerValue(mixer,"DecelTime"));
-    m_aircraft->maxAccelSlider->setValue(vconfig->getMixerValue(mixer,"MaxAccel"));
+    m_aircraft->feedForwardSlider->setValue(vconfig->getMixerValue(mixer, "FeedForward") * 100);
+    m_aircraft->accelTime->setValue(vconfig->getMixerValue(mixer, "AccelTime"));
+    m_aircraft->decelTime->setValue(vconfig->getMixerValue(mixer, "DecelTime"));
+    m_aircraft->maxAccelSlider->setValue(vconfig->getMixerValue(mixer, "MaxAccel"));
 }
 
 /**

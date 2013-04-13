@@ -44,12 +44,9 @@
 
 QStringList ConfigCcpmWidget::getChannelDescriptions()
 {
-    int i;
-    QStringList channelDesc;
-
     // init a channel_numelem list of channel desc defaults
-    for (i=0; i < (int)(ConfigCcpmWidget::CHANNEL_NUMELEM); i++)
-    {
+    QStringList channelDesc;
+    for (int i = 0; i < (int) ConfigCcpmWidget::CHANNEL_NUMELEM; i++) {
         channelDesc.append(QString("-"));
     }
 
@@ -57,62 +54,73 @@ QStringList ConfigCcpmWidget::getChannelDescriptions()
     GUIConfigDataUnion configData = GetConfigData();
     heliGUISettingsStruct heli = configData.heli;
 
-    if (heli.Throttle > 0)
+    if (heli.Throttle > 0) {
         channelDesc[heli.Throttle - 1] = QString("Throttle");
-    if (heli.Tail > 0)
-        channelDesc[heli.Tail - 1] = QString("Tail");
-
-    switch(heli.FirstServoIndex)
-    {
-        case 0:  //front
-            if (heli.ServoIndexW > 0)
-                channelDesc[heli.ServoIndexW - 1] = QString("Elevator");
-            if (heli.ServoIndexX > 0)
-                channelDesc[heli.ServoIndexX - 1] = QString("Roll1");
-            if (heli.ServoIndexY > 0)
-                channelDesc[heli.ServoIndexY - 1] = QString("Roll2");
-        break;
-
-        case 1:  //right
-            if (heli.ServoIndexW > 0)
-                channelDesc[heli.ServoIndexW - 1] = QString("ServoW");
-            if (heli.ServoIndexX > 0)
-                channelDesc[heli.ServoIndexX - 1] = QString("ServoX");
-            if (heli.ServoIndexY > 0)
-                channelDesc[heli.ServoIndexY - 1] = QString("ServoY");
-        break;
-
-        case 2:  //rear
-            if (heli.ServoIndexW > 0)
-                channelDesc[heli.ServoIndexW - 1] = QString("Elevator");
-            if (heli.ServoIndexX > 0)
-                channelDesc[heli.ServoIndexX - 1] = QString("Roll1");
-            if (heli.ServoIndexY > 0)
-                channelDesc[heli.ServoIndexY - 1] = QString("Roll2");
-        break;
-
-        case 3:  //left
-            if (heli.ServoIndexW > 0)
-                channelDesc[heli.ServoIndexW - 1] = QString("ServoW");
-            if (heli.ServoIndexX > 0)
-                channelDesc[heli.ServoIndexX - 1] = QString("ServoX");
-            if (heli.ServoIndexY > 0)
-                channelDesc[heli.ServoIndexY - 1] = QString("ServoY");
-        break;
-
     }
-    if (heli.ServoIndexZ > 0)
-        channelDesc[heli.ServoIndexZ - 1] = QString("ServoZ");
+    if (heli.Tail > 0) {
+        channelDesc[heli.Tail - 1] = QString("Tail");
+    }
 
+    switch (heli.FirstServoIndex) {
+    case 0:
+        // front
+        if (heli.ServoIndexW > 0) {
+            channelDesc[heli.ServoIndexW - 1] = QString("Elevator");
+        }
+        if (heli.ServoIndexX > 0) {
+            channelDesc[heli.ServoIndexX - 1] = QString("Roll1");
+        }
+        if (heli.ServoIndexY > 0) {
+            channelDesc[heli.ServoIndexY - 1] = QString("Roll2");
+        }
+        break;
+    case 1:
+        // right
+        if (heli.ServoIndexW > 0) {
+            channelDesc[heli.ServoIndexW - 1] = QString("ServoW");
+        }
+        if (heli.ServoIndexX > 0) {
+            channelDesc[heli.ServoIndexX - 1] = QString("ServoX");
+        }
+        if (heli.ServoIndexY > 0) {
+            channelDesc[heli.ServoIndexY - 1] = QString("ServoY");
+        }
+        break;
+    case 2:
+        // rear
+        if (heli.ServoIndexW > 0) {
+            channelDesc[heli.ServoIndexW - 1] = QString("Elevator");
+        }
+        if (heli.ServoIndexX > 0) {
+            channelDesc[heli.ServoIndexX - 1] = QString("Roll1");
+        }
+        if (heli.ServoIndexY > 0) {
+            channelDesc[heli.ServoIndexY - 1] = QString("Roll2");
+        }
+        break;
+    case 3:
+        // left
+        if (heli.ServoIndexW > 0) {
+            channelDesc[heli.ServoIndexW - 1] = QString("ServoW");
+        }
+        if (heli.ServoIndexX > 0) {
+            channelDesc[heli.ServoIndexX - 1] = QString("ServoX");
+        }
+        if (heli.ServoIndexY > 0) {
+            channelDesc[heli.ServoIndexY - 1] = QString("ServoY");
+        }
+        break;
+    }
+    if (heli.ServoIndexZ > 0) {
+        channelDesc[heli.ServoIndexZ - 1] = QString("ServoZ");
+    }
     return channelDesc;
 }
 
 ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
-    VehicleConfig(parent), m_aircraft(new Ui_CcpmConfigWidget())
+        VehicleConfig(parent), m_aircraft(new Ui_CcpmConfigWidget())
 {
     m_aircraft->setupUi(this);
-
-    //Ui_CcpmConfigWidget *m_aircraft = m_aircraft;
 
     SwashLvlConfigurationInProgress = 0;
     SwashLvlState = 0;
@@ -120,23 +128,19 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
     updatingFromHardware = FALSE;
     updatingToHardware = FALSE;
 
-    //m_aircraft = new Ui_ccpmWidget();
-    //m_aircraft->setupUi(this);
-
     // Initialization of the swashplaye widget
     m_aircraft->SwashplateImage->setScene(new QGraphicsScene(this));
 
     m_aircraft->SwashLvlSwashplateImage->setScene(m_aircraft->SwashplateImage->scene());
-    m_aircraft->SwashLvlSwashplateImage->setSceneRect(-50,-50,500,500);
+    m_aircraft->SwashLvlSwashplateImage->setSceneRect(-50, -50, 500, 500);
     //m_aircraft->SwashLvlSwashplateImage->scale(.85,.85);
 
     //m_aircraft->SwashplateImage->setSceneRect(SwashplateImg->boundingRect());
-    m_aircraft->SwashplateImage->setSceneRect(-50,-30,500,500);
+    m_aircraft->SwashplateImage->setSceneRect(-50, -30, 500, 500);
     //m_aircraft->SwashplateImage->scale(.85,.85);
 
     QSvgRenderer *renderer = new QSvgRenderer();
     renderer->load(QString(":/configgadget/images/ccpm_setup.svg"));
-
 
     SwashplateImg = new QGraphicsSvgItem();
     SwashplateImg->setSharedRenderer(renderer);
@@ -146,7 +150,8 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
     m_aircraft->SwashplateImage->scene()->addItem(SwashplateImg);
 
     QFont serifFont("Times", 24, QFont::Bold);
-    QPen pen;  // creates a default pen
+    // creates a default pen
+    QPen pen;
 
     pen.setStyle(Qt::DotLine);
     pen.setWidth(2);
@@ -154,24 +159,23 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
     pen.setCapStyle(Qt::RoundCap);
     pen.setJoinStyle(Qt::RoundJoin);
 
-    
     QBrush brush(Qt::darkBlue);
-    QPen pen2;  // creates a default pen
-    
+    // creates a default pen
+    QPen pen2;
+
     //pen2.setStyle(Qt::DotLine);
     pen2.setWidth(1);
     pen2.setBrush(Qt::blue);
     //pen2.setCapStyle(Qt::RoundCap);
     //pen2.setJoinStyle(Qt::RoundJoin);
-    
-    
-   //brush.setStyle(Qt::RadialGradientPattern);
-    
+
+    //brush.setStyle(Qt::RadialGradientPattern);
+
     QList<QString> ServoNames;
-    ServoNames << "ServoW" << "ServoX" << "ServoY" << "ServoZ" ;
+    ServoNames << "ServoW" << "ServoX" << "ServoY" << "ServoZ";
 
     for (int i = 0; i < CCPM_MAX_SWASH_SERVOS; i++) {
-        ServoLines[i] = m_aircraft->SwashLvlSwashplateImage->scene()->addLine(0,0,100*i,i*i*100,pen);
+        ServoLines[i] = m_aircraft->SwashLvlSwashplateImage->scene()->addLine(0, 0, 100 * i, i * i * 100, pen);
 
         Servos[i] = new QGraphicsSvgItem();
         Servos[i]->setSharedRenderer(renderer);
@@ -182,14 +186,12 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
         ServosText[i]->setDefaultTextColor(Qt::yellow);
         ServosText[i]->setPlainText(QString("-"));
         ServosText[i]->setFont(serifFont);
-        
-        ServosTextCircles[i] = new QGraphicsEllipseItem(1,1,30,30);
+
+        ServosTextCircles[i] = new QGraphicsEllipseItem(1, 1, 30, 30);
         ServosTextCircles[i]->setBrush(brush);
         ServosTextCircles[i]->setPen(pen2);
         m_aircraft->SwashplateImage->scene()->addItem(ServosTextCircles[i]);
         m_aircraft->SwashplateImage->scene()->addItem(ServosText[i]);
-        
-
 
         SwashLvlSpinBoxes[i] = new QSpinBox(m_aircraft->SwashLvlSwashplateImage);       // use QGraphicsView
         m_aircraft->SwashLvlSwashplateImage->scene()->addWidget(SwashLvlSpinBoxes[i]);
@@ -199,7 +201,7 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
 
     }
 
-    //initialize our two mixer curves
+    // initialize our two mixer curves
     // mixercurve defaults to mixercurve_throttle
     m_aircraft->ThrottleCurve->initLinearCurve(5, 1.0, 0.0);
 
@@ -207,7 +209,7 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
     m_aircraft->PitchCurve->setMixerType(MixerCurve::MIXERCURVE_PITCH);
     m_aircraft->PitchCurve->initLinearCurve(5, 1.0, -1.0);
 
-    //initialize channel names
+    // initialize channel names
     m_aircraft->ccpmEngineChannel->addItems(channelNames);
     m_aircraft->ccpmEngineChannel->setCurrentIndex(0);
     m_aircraft->ccpmTailChannel->addItems(channelNames);
@@ -222,11 +224,11 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
     m_aircraft->ccpmServoZChannel->setCurrentIndex(0);
 
     QStringList Types;
-    Types << QString::fromUtf8("CCPM 2 Servo 90º") << QString::fromUtf8("CCPM 3 Servo 90º") << QString::fromUtf8("CCPM 4 Servo 90º") <<
-             QString::fromUtf8("CCPM 3 Servo 120º") << QString::fromUtf8("CCPM 3 Servo 140º") <<
-             QString::fromUtf8("FP 2 Servo 90º")  <<
-             QString::fromUtf8("Coax 2 Servo 90º")  <<
-             QString::fromUtf8("Custom - User Angles") << QString::fromUtf8("Custom - Advanced Settings");
+    Types << QString::fromUtf8("CCPM 2 Servo 90º") << QString::fromUtf8("CCPM 3 Servo 90º")
+            << QString::fromUtf8("CCPM 4 Servo 90º") << QString::fromUtf8("CCPM 3 Servo 120º")
+            << QString::fromUtf8("CCPM 3 Servo 140º") << QString::fromUtf8("FP 2 Servo 90º")
+            << QString::fromUtf8("Coax 2 Servo 90º") << QString::fromUtf8("Custom - User Angles")
+            << QString::fromUtf8("Custom - Advanced Settings");
     m_aircraft->ccpmType->addItems(Types);
     m_aircraft->ccpmType->setCurrentIndex(m_aircraft->ccpmType->count() - 1);
 
@@ -258,10 +260,10 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
     connect(m_aircraft->SwashLvlCancelButton, SIGNAL(clicked()), this, SLOT(SwashLvlCancelButtonPressed()));
     connect(m_aircraft->SwashLvlFinishButton, SIGNAL(clicked()), this, SLOT(SwashLvlFinishButtonPressed()));
 
-    connect(m_aircraft->ccpmCollectivePassthrough, SIGNAL(clicked()),this, SLOT(SetUIComponentVisibilities()));
+    connect(m_aircraft->ccpmCollectivePassthrough, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
     connect(m_aircraft->ccpmLinkCyclic, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
     connect(m_aircraft->ccpmLinkRoll, SIGNAL(clicked()), this, SLOT(SetUIComponentVisibilities()));
-    
+
     ccpmSwashplateRedraw();
 }
 
@@ -293,19 +295,19 @@ void ConfigCcpmWidget::refreshWidgetsValues(QString frameType)
 
     GUIConfigDataUnion config = GetConfigData();
 
-    //swashplate config
+    // swashplate config
     setComboCurrentIndex( m_aircraft->ccpmType, m_aircraft->ccpmType->count() - (config.heli.SwashplateType +1));
     setComboCurrentIndex(m_aircraft->ccpmSingleServo, config.heli.FirstServoIndex);
 
-    //ccpm mixing options
+    // ccpm mixing options
     m_aircraft->ccpmCollectivePassthrough->setChecked(config.heli.ccpmCollectivePassthroughState);
     m_aircraft->ccpmLinkCyclic->setChecked(config.heli.ccpmLinkCyclicState);
     m_aircraft->ccpmLinkRoll->setChecked(config.heli.ccpmLinkRollState);
 
-    //correction angle
+    // correction angle
     m_aircraft->ccpmCorrectionAngle->setValue(config.heli.CorrectionAngle);
 
-    //update sliders
+    // update sliders
     m_aircraft->ccpmCollectiveScale->setValue(config.heli.SliderValue0);
     m_aircraft->ccpmCollectiveScaleBox->setValue(config.heli.SliderValue0);
     m_aircraft->ccpmCyclicScale->setValue(config.heli.SliderValue1);
@@ -317,15 +319,15 @@ void ConfigCcpmWidget::refreshWidgetsValues(QString frameType)
     m_aircraft->ccpmCollectiveSlider->setValue(config.heli.SliderValue0);
     m_aircraft->ccpmCollectivespinBox->setValue(config.heli.SliderValue0);
 
-    //servo assignments
+    // servo assignments
     setComboCurrentIndex(m_aircraft->ccpmServoWChannel, config.heli.ServoIndexW);
     setComboCurrentIndex( m_aircraft->ccpmServoXChannel,config.heli.ServoIndexX);
     setComboCurrentIndex( m_aircraft->ccpmServoYChannel,config.heli.ServoIndexY);
     setComboCurrentIndex( m_aircraft->ccpmServoZChannel,config.heli.ServoIndexZ);
 
-    //throttle
+    // throttle
     setComboCurrentIndex( m_aircraft->ccpmEngineChannel, config.heli.Throttle);
-    //tail
+    // tail
     setComboCurrentIndex( m_aircraft->ccpmTailChannel, config.heli.Tail);
 
     getMixer();

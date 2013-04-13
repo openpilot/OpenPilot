@@ -41,7 +41,7 @@
 QStringList ConfigCustomWidget::getChannelDescriptions()
 {
     QStringList channelDesc;
-    for (int i = 0; i < (int) (VehicleConfig::CHANNEL_NUMELEM); i++) {
+    for (int i = 0; i < (int) VehicleConfig::CHANNEL_NUMELEM; i++) {
         channelDesc.append(QString("-"));
     }
     return channelDesc;
@@ -58,14 +58,14 @@ ConfigCustomWidget::ConfigCustomWidget(QWidget *parent) :
 
     UAVObjectField* field = mixer->getField(QString("Mixer1Type"));
     QStringList list = field->getOptions();
-    for (int i = 0; i < (int) (VehicleConfig::CHANNEL_NUMELEM); i++) {
+    for (int i = 0; i < (int) VehicleConfig::CHANNEL_NUMELEM; i++) {
         QComboBox* qb = new QComboBox(m_aircraft->customMixerTable);
         qb->addItems(list);
         m_aircraft->customMixerTable->setCellWidget(0, i, qb);
     }
 
     SpinBoxDelegate *sbd = new SpinBoxDelegate();
-    for (int i = 1; i < (int) (VehicleConfig::CHANNEL_NUMELEM); i++) {
+    for (int i = 1; i < (int) VehicleConfig::CHANNEL_NUMELEM; i++) {
         m_aircraft->customMixerTable->setItemDelegateForRow(i, sbd);
     }
 }
@@ -164,7 +164,7 @@ QString ConfigCustomWidget::updateConfigObjectsFromWidgets()
     setThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, m_aircraft->customThrottle2Curve->getCurve());
 
     // Update the table:
-    for (int channel = 0; channel < (int) (VehicleConfig::CHANNEL_NUMELEM); channel++) {
+    for (int channel = 0; channel < (int) VehicleConfig::CHANNEL_NUMELEM; channel++) {
         QComboBox* q = (QComboBox*) m_aircraft->customMixerTable->cellWidget(0, channel);
         if (q->currentText() == "Disabled") {
             setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_DISABLED);

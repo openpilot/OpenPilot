@@ -79,307 +79,305 @@
 
 namespace {
 
-typedef QList<ExtensionSystem::PluginSpec *> PluginSpecSet;
-typedef QMap<QString, bool> AppOptions;
-typedef QMap<QString, QString> FoundAppOptions;
+    typedef QList<ExtensionSystem::PluginSpec *> PluginSpecSet;
+    typedef QMap<QString, bool> AppOptions;
+    typedef QMap<QString, QString> FoundAppOptions;
 
-enum {
-    OptionIndent = 4, DescriptionIndent = 24
-};
+    enum {
+        OptionIndent = 4, DescriptionIndent = 24
+    };
 
-static const char *appNameC = "OpenPilot GCS";
+    const char *appNameC = "OpenPilot GCS";
 
-static const char *corePluginNameC = "Core";
+    const char *corePluginNameC = "Core";
 
 #ifdef Q_OS_MAC
-static const char *SHARE_PATH = "/../Resources";
+    const char *SHARE_PATH = "/../Resources";
 #else
-static const char *SHARE_PATH = "/../share/openpilotgcs";
+    const char *SHARE_PATH = "/../share/openpilotgcs";
 #endif
 
-static const char *DEFAULT_CONFIG_FILENAME = "OpenPilotGCS.xml";
+    const char *DEFAULT_CONFIG_FILENAME = "OpenPilotGCS.xml";
 
-static const char *fixedOptionsC =
-" [OPTION]... [FILE]...\n"
-"Options:\n"
-"    -help               Display this help\n"
-"    -version            Display program version\n"
-"    -client             Attempt to connect to already running instance\n"
-"    -clean-config       Delete all existing configuration settings\n"
-"    -exit-after-config  Exit GCS after manipulating configuration settings\n"
-"    -D key=value        Override configuration settings e.g: -D General/OverrideLanguage=de\n"
-"    -reset              Reset user settings to factory defaults.\n";
+    const char *fixedOptionsC =
+        " [OPTION]... [FILE]...\n"
+        "Options:\n"
+        "    -help               Display this help\n"
+        "    -version            Display program version\n"
+        "    -no-splash          Don't display splash screen\n"
+        "    -client             Attempt to connect to already running instance\n"
+        "    -clean-config       Delete all existing configuration settings\n"
+        "    -exit-after-config  Exit GCS after manipulating configuration settings\n"
+        "    -D key=value        Override configuration settings e.g: -D General/OverrideLanguage=de\n"
+        "    -reset              Reset user settings to factory defaults.\n";
 
-static QLatin1String HELP_OPTION1("-h");
-static QLatin1String HELP_OPTION2("-help");
-static QLatin1String HELP_OPTION3("/h");
-static QLatin1String HELP_OPTION4("--help");
-static QLatin1String VERSION_OPTION("-version");
-static QLatin1String CLIENT_OPTION("-client");
-static QLatin1String CONFIG_OPTION("-D");
-static QLatin1String CLEAN_CONFIG_OPTION("-clean-config");
-static QLatin1String EXIT_AFTER_CONFIG_OPTION("-exit-after-config");
-static QLatin1String RESET("-reset");
-static QLatin1String NO_SPLASH("-no-splash");
+    const QLatin1String HELP_OPTION1("-h");
+    const QLatin1String HELP_OPTION2("-help");
+    const QLatin1String HELP_OPTION3("/h");
+    const QLatin1String HELP_OPTION4("--help");
+    const QLatin1String VERSION_OPTION("-version");
+    const QLatin1String CLIENT_OPTION("-client");
+    const QLatin1String CONFIG_OPTION("-D");
+    const QLatin1String CLEAN_CONFIG_OPTION("-clean-config");
+    const QLatin1String EXIT_AFTER_CONFIG_OPTION("-exit-after-config");
+    const QLatin1String RESET("-reset");
+    const QLatin1String NO_SPLASH("-no-splash");
 
-// Helpers for displaying messages. Note that there is no console on Windows.
+    // Helpers for displaying messages. Note that there is no console on Windows.
 #ifdef Q_OS_WIN
-// Format as <pre> HTML
-inline void toHtml(QString &t)
-{
-    t.replace(QLatin1Char('&'), QLatin1String("&amp;"));
-    t.replace(QLatin1Char('<'), QLatin1String("&lt;"));
-    t.replace(QLatin1Char('>'), QLatin1String("&gt;"));
-    t.insert(0, QLatin1String("<html><pre>"));
-    t.append(QLatin1String("</pre></html>"));
-}
 
-void displayHelpText(QString t) // No console on Windows.
-{
-    toHtml(t);
-    QMessageBox::information(0, QLatin1String(appNameC), t);
-}
+    // Format as <pre> HTML
+    inline void toHtml(QString &t)
+    {
+        t.replace(QLatin1Char('&'), QLatin1String("&amp;"));
+        t.replace(QLatin1Char('<'), QLatin1String("&lt;"));
+        t.replace(QLatin1Char('>'), QLatin1String("&gt;"));
+        t.insert(0, QLatin1String("<html><pre>"));
+        t.append(QLatin1String("</pre></html>"));
+    }
 
-void displayError(const QString &t) // No console on Windows.
-{
-    QMessageBox::critical(0, QLatin1String(appNameC), t);
-}
+    void displayHelpText(QString t) // No console on Windows.
+    {
+        toHtml(t);
+        QMessageBox::information(0, QLatin1String(appNameC), t);
+    }
+
+    void displayError(const QString &t) // No console on Windows.
+    {
+        QMessageBox::critical(0, QLatin1String(appNameC), t);
+    }
 
 #else
 
-void displayHelpText(const QString &t)
-{
-    qWarning("%s", qPrintable(t));
-}
+    void displayHelpText(const QString &t)
+    {
+        qWarning("%s", qPrintable(t));
+    }
 
-void displayError(const QString &t)
-{
-    qCritical("%s", qPrintable(t));
-}
+    void displayError(const QString &t)
+    {
+        qCritical("%s", qPrintable(t));
+    }
 
 #endif
 
-void printVersion(const ExtensionSystem::PluginSpec *coreplugin, const ExtensionSystem::PluginManager &pm)
-{
-    QString version;
-    QTextStream str(&version);
-    str << '\n' << appNameC << ' ' << coreplugin->version() << " based on Qt " << qVersion() << "\n\n";
-    pm.formatPluginVersions(str);
-    str << '\n' << coreplugin->copyright() << '\n';
-    displayHelpText(version);
-}
+    void printVersion(const ExtensionSystem::PluginSpec *coreplugin, const ExtensionSystem::PluginManager &pm)
+    {
+        QString version;
+        QTextStream str(&version);
+        str << '\n' << appNameC << ' ' << coreplugin->version() << " based on Qt " << qVersion() << "\n\n";
+        pm.formatPluginVersions(str);
+        str << '\n' << coreplugin->copyright() << '\n';
+        displayHelpText(version);
+    }
 
-void printHelp(const QString &a0, const ExtensionSystem::PluginManager &pm)
-{
-    QString help;
-    QTextStream str(&help);
-    str << "Usage: " << a0 << fixedOptionsC;
-    ExtensionSystem::PluginManager::formatOptions(str, OptionIndent, DescriptionIndent);
-    pm.formatPluginOptions(str, OptionIndent, DescriptionIndent);
-    displayHelpText(help);
-}
+    void printHelp(const QString &a0, const ExtensionSystem::PluginManager &pm)
+    {
+        QString help;
+        QTextStream str(&help);
+        str << "Usage: " << a0 << fixedOptionsC;
+        ExtensionSystem::PluginManager::formatOptions(str, OptionIndent, DescriptionIndent);
+        pm.formatPluginOptions(str, OptionIndent, DescriptionIndent);
+        displayHelpText(help);
+    }
 
-inline QString msgCoreLoadFailure(const QString &why)
-{
-    return QCoreApplication::translate("Application", "Failed to load core: %1").arg(why);
-}
+    inline QString msgCoreLoadFailure(const QString &why)
+    {
+        return QCoreApplication::translate("Application", "Failed to load core: %1").arg(why);
+    }
 
-inline QString msgSendArgumentFailed()
-{
-    return QCoreApplication::translate("Application", "Unable to send command line arguments to the already running instance. It appears to be not responding.");
-}
+    inline QString msgSendArgumentFailed()
+    {
+        return QCoreApplication::translate("Application", "Unable to send command line arguments to the already running instance. It appears to be not responding.");
+    }
 
-// Prepare a remote argument: If it is a relative file, add the current directory
-// since the the central instance might be running in a different directory.
+    // Prepare a remote argument: If it is a relative file, add the current directory
+    // since the the central instance might be running in a different directory.
 
-inline QString prepareRemoteArgument(const QString &a)
-{
-    QFileInfo fi(a);
-    if (!fi.exists()) {
+    inline QString prepareRemoteArgument(const QString &a)
+    {
+        QFileInfo fi(a);
+        if (!fi.exists()) {
+            return a;
+        }
+        if (fi.isRelative()) {
+            return fi.absoluteFilePath();
+        }
         return a;
     }
-    if (fi.isRelative()) {
-        return fi.absoluteFilePath();
-    }
-    return a;
-}
 
-// Send the arguments to an already running instance of OpenPilot GCS
-bool sendArguments(SharedTools::QtSingleApplication &app, const QStringList &arguments)
-{
-    if (!arguments.empty()) {
-        // Send off arguments
-        const QStringList::const_iterator acend = arguments.constEnd();
-        for (QStringList::const_iterator it = arguments.constBegin(); it != acend; ++it) {
-            if (!app.sendMessage(prepareRemoteArgument(*it))) {
-                displayError(msgSendArgumentFailed());
-                return false;
+    // Send the arguments to an already running instance of OpenPilot GCS
+    bool sendArguments(SharedTools::QtSingleApplication &app, const QStringList &arguments)
+    {
+        if (!arguments.empty()) {
+            // Send off arguments
+            const QStringList::const_iterator acend = arguments.constEnd();
+            for (QStringList::const_iterator it = arguments.constBegin(); it != acend; ++it) {
+                if (!app.sendMessage(prepareRemoteArgument(*it))) {
+                    displayError(msgSendArgumentFailed());
+                    return false;
+                }
             }
         }
+        // Special empty argument means: Show and raise (the slot just needs to be triggered)
+        if (!app.sendMessage(QString())) {
+            displayError(msgSendArgumentFailed());
+            return false;
+        }
+        return true;
     }
-    // Special empty argument means: Show and raise (the slot just needs to be triggered)
-    if (!app.sendMessage(QString())) {
-        displayError(msgSendArgumentFailed());
-        return false;
-    }
-    return true;
-}
 
-void systemInit()
-{
+    void systemInit()
+    {
 #ifdef Q_OS_MAC
-    // increase the number of file that can be opened in OpenPilot GCS
-    struct rlimit rl;
-    getrlimit(RLIMIT_NOFILE, &rl);
-    rl.rlim_cur = rl.rlim_max;
-    setrlimit(RLIMIT_NOFILE, &rl);
+        // increase the number of file that can be opened in OpenPilot GCS
+        struct rlimit rl;
+        getrlimit(RLIMIT_NOFILE, &rl);
+        rl.rlim_cur = rl.rlim_max;
+        setrlimit(RLIMIT_NOFILE, &rl);
 #endif
 #ifdef Q_OS_LINUX
-    QApplication::setAttribute(Qt::AA_X11InitThreads, true);
+        QApplication::setAttribute(Qt::AA_X11InitThreads, true);
 #endif
-}
-
-inline QStringList getPluginPaths()
-{
-    QStringList rc;
-    // Figure out root:  Up one from 'bin'
-    QDir rootDir = QApplication::applicationDirPath();
-    rootDir.cdUp();
-    const QString rootDirPath = rootDir.canonicalPath();
-    // 1) "plugins" (Win/Linux)
-    QString pluginPath = rootDirPath;
-    pluginPath += QLatin1Char('/');
-    pluginPath += QLatin1String(GCS_LIBRARY_BASENAME);
-    pluginPath += QLatin1Char('/');
-    pluginPath += QLatin1String("openpilotgcs");
-    pluginPath += QLatin1Char('/');
-    pluginPath += QLatin1String("plugins");
-    rc.push_back(pluginPath);
-    // 2) "PlugIns" (OS X)
-    pluginPath = rootDirPath;
-    pluginPath += QLatin1Char('/');
-    pluginPath += QLatin1String("Plugins");
-    rc.push_back(pluginPath);
-    return rc;
-}
-
-AppOptions options()
-{
-    AppOptions appOptions;
-    appOptions.insert(HELP_OPTION1, false);
-    appOptions.insert(HELP_OPTION2, false);
-    appOptions.insert(HELP_OPTION3, false);
-    appOptions.insert(HELP_OPTION4, false);
-    appOptions.insert(VERSION_OPTION, false);
-    appOptions.insert(CLIENT_OPTION, false);
-    appOptions.insert(CONFIG_OPTION, true);
-    appOptions.insert(CLEAN_CONFIG_OPTION, false);
-    appOptions.insert(EXIT_AFTER_CONFIG_OPTION, false);
-    appOptions.insert(RESET, false);
-    appOptions.insert(NO_SPLASH, false);
-    return appOptions;
-}
-
-FoundAppOptions parseCommandLine(SharedTools::QtSingleApplication &app, ExtensionSystem::PluginManager &pluginManager, QString &errorMessage)
-{
-    FoundAppOptions foundAppOptions;
-    const QStringList arguments = app.arguments();
-    if (arguments.size() > 1) {
-        AppOptions appOptions = options();
-        if (!pluginManager.parseOptions(arguments, appOptions, &foundAppOptions, &errorMessage)) {
-//            displayError(errorMessage);
-//            printHelp(QFileInfo(app.applicationFilePath()).baseName(), pluginManager);
-        }
-    }
-    return foundAppOptions;
-}
-
-void loadFactoryDefaults(QSettings &settings)
-{
-    QDir directory(QCoreApplication::applicationDirPath() + QString(SHARE_PATH) + QString("/default_configurations"));
-
-    qDebug() << "Looking for configuration files in:" << directory.absolutePath();
-
-    // check if command line contains a config file name
-    QString commandLine;
-    foreach(QString str, qApp->arguments()) {
-        if (str.contains("configfile")) {
-            commandLine = str.split("=").at(1);
-        }
-    }
-    QString filename;
-    if (!commandLine.isEmpty() && QFile::exists(directory.absolutePath() + QDir::separator() + commandLine)) {
-        // use file name specified on command line
-        filename = directory.absolutePath() + QDir::separator() + commandLine;
-        qDebug() << "Configuration file" << filename << "specified on command line will be loaded.";
-    } else if (QFile::exists(directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME)) {
-        // use default file name
-        filename = directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME;
-        qDebug() << "Default configuration file" << filename << "will be loaded.";
-    } else {
-        // TODO should we exit violently?
-        qWarning() << "No default configuration file found!";
-        return;
     }
 
-    // create settings from file
-    QSettings qs(filename, XmlConfig::XmlSettingsFormat);
-
-    // transfer loaded settings to application settings
-    QStringList keys = qs.allKeys();
-    foreach(QString key, keys) {
-        settings.setValue(key, qs.value(key));
+    inline QStringList getPluginPaths()
+    {
+        QStringList rc;
+        // Figure out root:  Up one from 'bin'
+        QDir rootDir = QApplication::applicationDirPath();
+        rootDir.cdUp();
+        const QString rootDirPath = rootDir.canonicalPath();
+        // 1) "plugins" (Win/Linux)
+        QString pluginPath = rootDirPath;
+        pluginPath += QLatin1Char('/');
+        pluginPath += QLatin1String(GCS_LIBRARY_BASENAME);
+        pluginPath += QLatin1Char('/');
+        pluginPath += QLatin1String("openpilotgcs");
+        pluginPath += QLatin1Char('/');
+        pluginPath += QLatin1String("plugins");
+        rc.push_back(pluginPath);
+        // 2) "PlugIns" (OS X)
+        pluginPath = rootDirPath;
+        pluginPath += QLatin1Char('/');
+        pluginPath += QLatin1String("Plugins");
+        rc.push_back(pluginPath);
+        return rc;
     }
 
-    qDebug() << "Configuration file" << filename << "was loaded.";
-}
+    AppOptions options()
+    {
+        AppOptions appOptions;
+        appOptions.insert(HELP_OPTION1, false);
+        appOptions.insert(HELP_OPTION2, false);
+        appOptions.insert(HELP_OPTION3, false);
+        appOptions.insert(HELP_OPTION4, false);
+        appOptions.insert(VERSION_OPTION, false);
+        appOptions.insert(CLIENT_OPTION, false);
+        appOptions.insert(CONFIG_OPTION, true);
+        appOptions.insert(CLEAN_CONFIG_OPTION, false);
+        appOptions.insert(EXIT_AFTER_CONFIG_OPTION, false);
+        appOptions.insert(RESET, false);
+        appOptions.insert(NO_SPLASH, false);
+        return appOptions;
+    }
 
-void overrideSettings(QSettings &settings, int argc, char **argv)
-{
-    // Options like -DMy/setting=test
-    QRegExp rx("([^=]+)=(.*)");
-
-    QMap<QString, QString> settingOptions;
-    for (int i = 0; i < argc; ++i) {
-        if (QString(CONFIG_OPTION).compare(QString(argv[i])) == 0) {
-            if (rx.indexIn(argv[++i]) > -1) {
-                settingOptions.insert(rx.cap(1), rx.cap(2));
+    FoundAppOptions parseCommandLine(SharedTools::QtSingleApplication &app, ExtensionSystem::PluginManager &pluginManager, QString &errorMessage)
+    {
+        FoundAppOptions foundAppOptions;
+        const QStringList arguments = app.arguments();
+        if (arguments.size() > 1) {
+            AppOptions appOptions = options();
+            if (!pluginManager.parseOptions(arguments, appOptions, &foundAppOptions, &errorMessage)) {
+    //            displayError(errorMessage);
+    //            printHelp(QFileInfo(app.applicationFilePath()).baseName(), pluginManager);
             }
         }
-        if (QString(CLEAN_CONFIG_OPTION).compare(QString(argv[i])) == 0) {
-            settings.clear();
+        return foundAppOptions;
+    }
+
+    void loadFactoryDefaults(QSettings &settings)
+    {
+        QDir directory(QCoreApplication::applicationDirPath() + QString(SHARE_PATH) + QString("/default_configurations"));
+
+        qDebug() << "Looking for configuration files in:" << directory.absolutePath();
+
+        // check if command line contains a config file name
+        QString commandLine;
+        foreach(QString str, qApp->arguments()) {
+            if (str.contains("configfile")) {
+                commandLine = str.split("=").at(1);
+            }
         }
-    }
-
-    QList<QString> keys = settingOptions.keys();
-    foreach (QString key, keys) {
-        qDebug() << "Overriding user setting:" << key << "with value" << settingOptions.value(key);
-        settings.setValue(key, settingOptions.value(key));
-    }
-
-    settings.sync();
-}
-
-void loadTranslators(QString language)
-{
-    // TODO static!?!
-    static QTranslator translator;
-    static QTranslator qtTranslator;
-
-    const QString &creatorTrPath = QCoreApplication::applicationDirPath() + QLatin1String(SHARE_PATH) + QLatin1String("/translations");
-    if (translator.load(QLatin1String("openpilotgcs_") + language, creatorTrPath)) {
-        const QString &qtTrPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
-        const QString &qtTrFile = QLatin1String("qt_") + language;
-        // Binary installer puts Qt tr files into creatorTrPath
-        if (qtTranslator.load(qtTrFile, qtTrPath) || qtTranslator.load(qtTrFile, creatorTrPath)) {
-            QCoreApplication::installTranslator(&translator);
-            QCoreApplication::installTranslator(&qtTranslator);
+        QString filename;
+        if (!commandLine.isEmpty() && QFile::exists(directory.absolutePath() + QDir::separator() + commandLine)) {
+            // use file name specified on command line
+            filename = directory.absolutePath() + QDir::separator() + commandLine;
+            qDebug() << "Configuration file" << filename << "specified on command line will be loaded.";
+        } else if (QFile::exists(directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME)) {
+            // use default file name
+            filename = directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME;
+            qDebug() << "Default configuration file" << filename << "will be loaded.";
         } else {
-            // unload()
-            translator.load(QString());
+            // TODO should we exit violently?
+            qWarning() << "No default configuration file found!";
+            return;
+        }
+
+        // create settings from file
+        QSettings qs(filename, XmlConfig::XmlSettingsFormat);
+
+        // transfer loaded settings to application settings
+        QStringList keys = qs.allKeys();
+        foreach(QString key, keys) {
+            settings.setValue(key, qs.value(key));
+        }
+
+        qDebug() << "Configuration file" << filename << "was loaded.";
+    }
+
+    void overrideSettings(QSettings &settings, int argc, char **argv)
+    {
+        // Options like -DMy/setting=test
+        QRegExp rx("([^=]+)=(.*)");
+
+        QMap<QString, QString> settingOptions;
+        for (int i = 0; i < argc; ++i) {
+            if (QString(CONFIG_OPTION).compare(QString(argv[i])) == 0) {
+                if (rx.indexIn(argv[++i]) > -1) {
+                    settingOptions.insert(rx.cap(1), rx.cap(2));
+                }
+            }
+            if (QString(CLEAN_CONFIG_OPTION).compare(QString(argv[i])) == 0) {
+                settings.clear();
+            }
+        }
+
+        QList<QString> keys = settingOptions.keys();
+        foreach (QString key, keys) {
+            qDebug() << "Overriding user setting:" << key << "with value" << settingOptions.value(key);
+            settings.setValue(key, settingOptions.value(key));
+        }
+
+        settings.sync();
+    }
+
+    void loadTranslators(QString language, QTranslator &translator, QTranslator &qtTranslator)
+    {
+        const QString &creatorTrPath = QCoreApplication::applicationDirPath() + QLatin1String(SHARE_PATH) + QLatin1String("/translations");
+        if (translator.load(QLatin1String("openpilotgcs_") + language, creatorTrPath)) {
+            const QString &qtTrPath = QLibraryInfo::location(QLibraryInfo::TranslationsPath);
+            const QString &qtTrFile = QLatin1String("qt_") + language;
+            // Binary installer puts Qt tr files into creatorTrPath
+            if (qtTranslator.load(qtTrFile, qtTrPath) || qtTranslator.load(qtTrFile, creatorTrPath)) {
+                QCoreApplication::installTranslator(&translator);
+                QCoreApplication::installTranslator(&qtTranslator);
+            } else {
+                // unload()
+                translator.load(QString());
+            }
         }
     }
-}
 
 } //  namespace anonymous
 
@@ -404,6 +402,8 @@ int main(int argc, char **argv)
     QString errorMessage;
     FoundAppOptions foundAppOptions = parseCommandLine(app, pluginManager, errorMessage);
     if (!errorMessage.isEmpty()) {
+        // this will display two popups : one error popup + one usage string popup
+        // TODO merge two popups into one.
         displayError(errorMessage);
         printHelp(QFileInfo(app.applicationFilePath()).baseName(), pluginManager);
         return -1;
@@ -454,7 +454,9 @@ int main(int argc, char **argv)
     // if the translation file for the given language is not found, GCS will default to built in English.
     QString language = settings.value("General/OverrideLanguage", localeName).toString();
     qDebug() << "main - translation language:" << language;
-    loadTranslators(language);
+    QTranslator translator;
+    QTranslator qtTranslator;
+    loadTranslators(language, translator, qtTranslator);
 
     app.setProperty("qtc_locale", localeName); // Do we need this?
 
@@ -544,10 +546,9 @@ int main(int argc, char **argv)
     QTimer::singleShot(100, &pluginManager, SLOT(startTests()));
 
     if (splash) {
-        // Update message and postpone closing of splashscreen 3 seconds
-        splash->showProgressMessage(QObject::tr("Application started."));
-        QTimer::singleShot(1500, splash, SLOT(close()));
-        // TODO delete splash
+        // close and delete splash
+        splash->close();
+        delete splash;
     }
 
     qDebug() << "main - main took" << timer.elapsed() << "ms";

@@ -1824,8 +1824,8 @@ static const struct pios_usb_cfg pios_usb_main_rm1_cfg = {
 	.irq = {
 		.init    = {
 			.NVIC_IRQChannel                   = OTG_FS_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-			.NVIC_IRQChannelSubPriority        = 3,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority        = 0, //PriorityGroup=4
 			.NVIC_IRQChannelCmd                = ENABLE,
 		},
 	},
@@ -1844,8 +1844,8 @@ static const struct pios_usb_cfg pios_usb_main_rm2_cfg = {
 	.irq = {
 		.init    = {
 			.NVIC_IRQChannel                   = OTG_FS_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-			.NVIC_IRQChannelSubPriority        = 3,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority        = 0, //PriorityGroup=4
 			.NVIC_IRQChannelCmd                = ENABLE,
 		},
 	},

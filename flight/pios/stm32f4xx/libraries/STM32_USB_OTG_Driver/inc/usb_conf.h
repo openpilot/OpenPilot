@@ -2,20 +2,26 @@
   ******************************************************************************
   * @file    usb_conf.h
   * @author  MCD Application Team
-  * @version V2.0.0
-  * @date    22-July-2011
-  * @brief   general low level driver configuration
+  * @version V2.1.0
+  * @date    19-March-2012
+  * @brief   General low level driver configuration
   ******************************************************************************
   * @attention
   *
-  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
-  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
-  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
-  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
-  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
   *
-  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
+  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  * You may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at:
+  *
+  *        http://www.st.com/software_license_agreement_liberty_v2
+  *
+  * Unless required by applicable law or agreed to in writing, software 
+  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  *
   ******************************************************************************
   */
 
@@ -26,6 +32,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
 
+#include "usb_conf.h"
 
 /** @addtogroup USB_OTG_DRIVER
   * @{
@@ -45,10 +52,37 @@
         configuration, you can declare the needed define in your toolchain
         compiler preprocessor.
    */
+/****************** USB OTG FS PHY CONFIGURATION *******************************
+*  The USB OTG FS Core supports one on-chip Full Speed PHY.
+*  
+*  The USE_EMBEDDED_PHY symbol is defined in the project compiler preprocessor 
+*  when FS core is used.
+*******************************************************************************/
 #ifndef USE_USB_OTG_FS
- #define USE_USB_OTG_FS
+#define USE_USB_OTG_FS
 #endif /* USE_USB_OTG_FS */
 
+#ifdef USE_USB_OTG_FS 
+#define USB_OTG_FS_CORE
+#endif
+
+/****************** USB OTG HS PHY CONFIGURATION *******************************
+*  The USB OTG HS Core supports two PHY interfaces:
+*   (i)  An ULPI interface for the external High Speed PHY: the USB HS Core will 
+*        operate in High speed mode
+*   (ii) An on-chip Full Speed PHY: the USB HS Core will operate in Full speed mode
+*
+*  You can select the PHY to be used using one of these two defines:
+*   (i)  USE_ULPI_PHY: if the USB OTG HS Core is to be used in High speed mode 
+*   (ii) USE_EMBEDDED_PHY: if the USB OTG HS Core is to be used in Full speed mode
+*
+*  Notes: 
+*   - The USE_ULPI_PHY symbol is defined in the project compiler preprocessor as 
+*     default PHY when HS core is used.
+*   - On STM322xG-EVAL and STM324xG-EVAL boards, only configuration(i) is available.
+*     Configuration (ii) need a different hardware, for more details refer to your
+*     STM32 device datasheet.
+*******************************************************************************/
 #ifndef USE_USB_OTG_HS
  //#define USE_USB_OTG_HS
 #endif /* USE_USB_OTG_HS */
@@ -151,9 +185,6 @@
  #ifdef USE_EMBEDDED_PHY
    #define USB_OTG_EMBEDDED_PHY_ENABLED
  #endif
- #ifdef USE_I2C_PHY
-  #define USB_OTG_I2C_PHY_ENABLED
- #endif
  #define USB_OTG_HS_INTERNAL_DMA_ENABLED
  #define USB_OTG_HS_DEDICATED_EP1_ENABLED
 #endif
@@ -171,19 +202,20 @@
  //#define USB_OTG_FS_LOW_PWR_MGMT_SUPPORT
  //#define USB_OTG_FS_SOF_OUTPUT_ENABLED
 #endif
+//#define VBUS_SENSING_ENABLED
+/****************** USB OTG MODE CONFIGURATION ********************************/
+//#define USE_HOST_MODE
 
 /****************** USB OTG MODE CONFIGURATION ********************************/
 //#define USE_HOST_MODE
 #define USE_DEVICE_MODE
 //#define USE_OTG_MODE
 
-
 #ifndef USB_OTG_FS_CORE
  #ifndef USB_OTG_HS_CORE
     #error  "USB_OTG_HS_CORE or USB_OTG_FS_CORE should be defined"
  #endif
 #endif
-
 
 #ifndef USE_DEVICE_MODE
  #ifndef USE_HOST_MODE
@@ -198,9 +230,7 @@
 #else //USE_USB_OTG_HS
  #ifndef USE_ULPI_PHY
   #ifndef USE_EMBEDDED_PHY
-   #ifndef USE_I2C_PHY
-     #error  "USE_ULPI_PHY or USE_EMBEDDED_PHY or USE_I2C_PHY should be defined"
-   #endif
+     #error  "USE_ULPI_PHY or USE_EMBEDDED_PHY should be defined"
   #endif
  #endif
 #endif

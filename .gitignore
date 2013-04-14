@@ -50,6 +50,16 @@ openpilotgcs-build-desktop
 # Ignore build output from Eclipse android builds
 /androidgcs/bin/
 /androidgcs/gen/
+
+# Ignore Eclipse Projects and Metadata
 /.cproject
 /.project
 /.metadata
+
+# Ignore Eclipse temp folder, git plugin based?
+RemoteSystemsTempFiles
+
+# Ignore patch-related files
+*.rej
+*.orig
+*.diff~

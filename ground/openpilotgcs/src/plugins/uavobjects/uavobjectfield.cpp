@@ -886,10 +886,9 @@ QVariant UAVObjectField::getValue(quint32 index)
     {
         quint8 tmpenum;
         memcpy(&tmpenum, &data[offset + numBytesPerElement*index], numBytesPerElement);
-        //            Q_ASSERT((tmpenum < options.length()) && (tmpenum >= 0)); // catch bad enum settings
         if(tmpenum >= options.length()) {
             qDebug() << "Invalid value for" << name;
-            return QVariant( QString("Bad Value") );
+            tmpenum = 0;
         }
         return QVariant( options[tmpenum] );
         break;
@@ -1015,7 +1014,10 @@ void UAVObjectField::setValue(const QVariant& value, quint32 index)
         case ENUM:
         {
             qint8 tmpenum = options.indexOf( value.toString() );
-            Q_ASSERT(tmpenum >= 0); // To catch any programming errors where we set invalid values
+            // Default to 0 on invalid values.
+            if(tmpenum < 0) {
+                tmpenum = 0;
+            }
             memcpy(&data[offset + numBytesPerElement*index], &tmpenum, numBytesPerElement);
             break;
         }

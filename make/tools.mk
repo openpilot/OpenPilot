@@ -146,6 +146,7 @@ MSG_INSTALLING       = $(QUOTE) INSTALL    $(QUOTE)
 MSG_CONFIGURING      = $(QUOTE) CONFIGURE  $(QUOTE)
 MSG_CLEANING         = $(QUOTE) CLEAN      $(QUOTE)
 MSG_DISTCLEANING     = $(QUOTE) DISTCLEAN  $(QUOTE)
+MSG_NOTICE           = $(QUOTE) NOTE       $(QUOTE)
 
 # Verbosity level
 ifeq ($(V), 1)
@@ -242,6 +243,10 @@ arm_sdk_version:
 #
 # Qt SDK
 #
+# Windows:  native binary package has been provided
+# Linux:    user should install native Qt SDK package
+# Mac OS X: user should install native Qt SDK package
+#
 ##############################
 
 define QT_SDK_CONFIGURE_TEMPLATE
@@ -250,7 +255,25 @@ define QT_SDK_CONFIGURE_TEMPLATE
 	$(V1) $(ECHO) $(QUOTE)Prefix = $(QT_SDK_DIR)$(QUOTE) >> $(QT_SDK_DIR)/bin/qt.conf
 endef
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,qt_sdk,$(QT_SDK_DIR),$(QT_SDK_URL),$(notdir $(QT_SDK_URL)),,$(QT_SDK_CONFIGURE_TEMPLATE)))
+ifeq ($(UNAME), Windows)
+
+    $(eval $(call TOOL_INSTALL_TEMPLATE,qt_sdk,$(QT_SDK_DIR),$(QT_SDK_URL),$(notdir $(QT_SDK_URL)),,$(QT_SDK_CONFIGURE_TEMPLATE)))
+
+else
+
+.PHONY: qt_sdk_install
+qt_sdk_install:
+	@$(ECHO) $(MSG_NOTICE) --------------------------------------------------------
+	@$(ECHO) $(MSG_NOTICE) Please install native Qt 4.8.x SDK using package manager
+	@$(ECHO) $(MSG_NOTICE) --------------------------------------------------------
+
+.PHONY: qt_sdk_clean
+qt_sdk_clean:
+
+.PHONY: qt_sdk_distclean
+qt_sdk_distclean:
+
+endif
 
 ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
     export QMAKE := $(QT_SDK_DIR)/bin/qmake

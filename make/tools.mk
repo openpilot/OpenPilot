@@ -92,48 +92,6 @@ all_sdk_version:   $(addsuffix _version,$(ALL_SDK_TARGETS))
 
 ##############################
 #
-# Misc settings
-#
-##############################
-
-# Define messages
-MSG_VERIFYING        = $(QUOTE) VERIFY     $(QUOTE)
-MSG_DOWNLOADING      = $(QUOTE) DOWNLOAD   $(QUOTE)
-MSG_CHECKSUMMING     = $(QUOTE) MD5        $(QUOTE)
-MSG_EXTRACTING       = $(QUOTE) EXTRACT    $(QUOTE)
-MSG_INSTALLING       = $(QUOTE) INSTALL    $(QUOTE)
-MSG_CONFIGURING      = $(QUOTE) CONFIGURE  $(QUOTE)
-MSG_CLEANING         = $(QUOTE) CLEAN      $(QUOTE)
-MSG_DISTCLEANING     = $(QUOTE) DISTCLEAN  $(QUOTE)
-
-# Verbosity level
-ifeq ($(V), 1)
-    CURL_OPTIONS :=
-else
-    CURL_OPTIONS := --silent
-endif
-
-# MSYS tar workaround
-ifeq ($(UNAME), Windows)
-    TAR_OPTIONS := --force-local
-else
-    TAR_OPTIONS :=
-endif
-
-# Print some useful notes for *_install targets
-ifneq ($(strip $(filter $(addsuffix _install,all_sdk $(ALL_SDK_TARGETS)),$(MAKECMDGOALS))),)
-# Disable parallel make for sdk install targets to ensure ordered dependences
-# like 'arm_sdk_clean | $(DL_DIR) $(TOOLS_DIR)'. They may fail otherwise being
-# run in parallel
-#.NOTPARALLEL:
-#   $(info $(EMPTY) NOTE        Parallel make disabled by some of install targets)
-    $(info $(EMPTY) NOTE        Use 'make all_sdk_distclean' to remove installation files)
-    $(info $(EMPTY) NOTE        Use 'make all_sdk_version' to check toolchain versions)
-    $(info $(EMPTY) NOTE        Add 'V=1' to make command line to diagnose make problems)
-endif
-
-##############################
-#
 # Misc host tools
 #
 ##############################
@@ -172,6 +130,46 @@ endif
 
 # Command to extract version info data from the repository and source tree
 export VERSION_INFO = $(PYTHON) $(ROOT_DIR)/make/scripts/version-info.py --path=$(ROOT_DIR)
+
+##############################
+#
+# Misc settings
+#
+##############################
+
+# Define messages
+MSG_VERIFYING        = $(QUOTE) VERIFY     $(QUOTE)
+MSG_DOWNLOADING      = $(QUOTE) DOWNLOAD   $(QUOTE)
+MSG_CHECKSUMMING     = $(QUOTE) MD5        $(QUOTE)
+MSG_EXTRACTING       = $(QUOTE) EXTRACT    $(QUOTE)
+MSG_INSTALLING       = $(QUOTE) INSTALL    $(QUOTE)
+MSG_CONFIGURING      = $(QUOTE) CONFIGURE  $(QUOTE)
+MSG_CLEANING         = $(QUOTE) CLEAN      $(QUOTE)
+MSG_DISTCLEANING     = $(QUOTE) DISTCLEAN  $(QUOTE)
+
+# Verbosity level
+ifeq ($(V), 1)
+    CURL_OPTIONS :=
+else
+    CURL_OPTIONS := --silent
+endif
+
+# MSYS tar workaround
+ifeq ($(UNAME), Windows)
+    TAR_OPTIONS := --force-local
+else
+    TAR_OPTIONS :=
+endif
+
+# Print some useful notes for *_install targets
+ifneq ($(strip $(filter $(addsuffix _install,all_sdk $(ALL_SDK_TARGETS)),$(MAKECMDGOALS))),)
+    ifneq ($(shell $(CURL) --version >/dev/null 2>&1 && $(ECHO) "found"), found)
+        $(error Please install curl first ('apt-get install curl' or similar))
+    endif
+    $(info $(EMPTY) NOTE        Use 'make all_sdk_distclean' to remove installation files)
+    $(info $(EMPTY) NOTE        Use 'make all_sdk_version' to check toolchain versions)
+    $(info $(EMPTY) NOTE        Add 'V=1' to make command line to diagnose make problems)
+endif
 
 ##############################
 #

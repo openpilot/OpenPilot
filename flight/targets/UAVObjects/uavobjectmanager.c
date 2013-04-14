@@ -60,10 +60,10 @@ for (struct UAVOData ** _uavo_slot = __start__uavo_handles; \
 typedef void* InstanceHandle; 
 
 struct ObjectEventEntry {
+	struct ObjectEventEntry * next;
 	xQueueHandle              queue;
 	UAVObjEventCallback       cb;
 	uint8_t                   eventMask;
-	struct ObjectEventEntry * next;
 };
 
 /*
@@ -91,7 +91,6 @@ struct UAVOBase {
 		bool isSingle      : 1;
 		bool isSettings    : 1;
 	} flags;
-
 } __attribute__((packed));
 
 /* Augmented type for Meta UAVO */
@@ -110,7 +109,7 @@ struct UAVOData {
 	 */
 	struct UAVOMeta   metaObj;
 	uint16_t          instance_size;
-} __attribute__((packed));
+} __attribute__((packed, aligned(4)));
 
 /* Augmented type for Single Instance Data UAVO */
 struct UAVOSingle {
@@ -136,9 +135,8 @@ struct UAVOMultiInst {
 /* Augmented type for Multi Instance Data UAVO */
 struct UAVOMulti {
 	struct UAVOData        uavo;
-
 	uint16_t               num_instances;
-	struct UAVOMultiInst   instance0;
+	struct UAVOMultiInst   instance0 __attribute__((aligned(4)));
 	/*
 	 * Additional space will be malloc'd here to hold the
 	 * the data for instance 0.
@@ -296,8 +294,8 @@ static struct UAVOData * UAVObjAllocMulti(uint32_t num_bytes)
 	/* Set up the type-specific part of the UAVO */
 	uavo_multi->num_instances = 1;
 
-	/* Clear the instance data carried in the UAVO */
-	memset (&(uavo_multi->instance0), 0, num_bytes);
+	/* Clear the multi instance data carried in the UAVO */
+	memset (&(uavo_multi->instance0), 0, sizeof(struct UAVOMultiInst) + num_bytes);
 
 	/* Give back the generic UAVO part */
 	return (&(uavo_multi->uavo));
@@ -1864,10 +1862,11 @@ static InstanceHandle createInstance(struct UAVOData * obj, uint16_t instId)
 	}
 
 	/* Create the actual instance */
-	instEntry = (struct UAVOMultiInst *) pvPortMalloc(sizeof(struct UAVOMultiInst)+obj->instance_size);
+	uint32_t size = sizeof(struct UAVOMultiInst) + obj->instance_size;
+	instEntry = (struct UAVOMultiInst *) pvPortMalloc(size);
 	if (!instEntry)
 		return NULL;
-	memset(InstanceDataOffset(instEntry), 0, obj->instance_size);
+	memset(instEntry, 0, size);
 	LL_APPEND(( (struct UAVOMulti*)obj )->instance0.next, instEntry);
 
 	( (struct UAVOMulti*)obj )->num_instances++;

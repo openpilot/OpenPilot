@@ -26,7 +26,7 @@
  */
 #include "devicewidget.h"
 
-deviceWidget::deviceWidget(QWidget *parent) :
+DeviceWidget::DeviceWidget(QWidget *parent) :
     QWidget(parent)
 {
     myDevice = new Ui_deviceWidget();
@@ -47,8 +47,7 @@ deviceWidget::deviceWidget(QWidget *parent) :
     myDevice->lblCertified->setText("");
 }
 
-
-void deviceWidget::showEvent(QShowEvent *event)
+void DeviceWidget::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event)
     // Thit fitInView method should only be called now, once the
@@ -57,18 +56,18 @@ void deviceWidget::showEvent(QShowEvent *event)
     myDevice->gVDevice->fitInView(devicePic.rect(),Qt::KeepAspectRatio);
 }
 
-void deviceWidget::resizeEvent(QResizeEvent* event)
+void DeviceWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
     myDevice->gVDevice->fitInView(devicePic.rect(), Qt::KeepAspectRatio);
 }
 
-
-void deviceWidget::setDeviceID(int devID){
+void DeviceWidget::setDeviceID(int devID)
+{
     deviceID = devID;
 }
 
-void deviceWidget::setDfu(DFUObject *dfu)
+void DeviceWidget::setDfu(DFUObject *dfu)
 {
     m_dfu = dfu;
 }
@@ -76,9 +75,8 @@ void deviceWidget::setDfu(DFUObject *dfu)
 /**
   Fills the various fields for the device
   */
-void deviceWidget::populate()
+void DeviceWidget::populate()
 {
-
     int id = m_dfu->devices[deviceID].ID;
     myDevice->lbldevID->setText(QString("Device ID: ") + QString::number(id, 16));
     // DeviceID tells us what sort of HW we have detected:
@@ -89,10 +87,8 @@ void deviceWidget::populate()
 
     switch (id) {
     case 0x0101:
-        devicePic.load("");//TODO
-        break;
     case 0x0201:
-        devicePic.load("");//TODO
+        devicePic.load("");
         break;
     case 0x0301:
         devicePic.load(":/uploader/images/gcs-board-oplink.png");
@@ -107,7 +103,8 @@ void deviceWidget::populate()
         devicePic.load(":/uploader/images/gcs-board-revo.png");
         break;
     default:
-        devicePic.load(""); //Clear
+        // Clear
+        devicePic.load("");
         break;
     }
     myDevice->gVDevice->scene()->addPixmap(devicePic);
@@ -145,12 +142,12 @@ void deviceWidget::populate()
   Freezes the contents of the widget so that a user cannot
   try to modify the contents
   */
-void deviceWidget::freeze()
+void DeviceWidget::freeze()
 {
     updateButtons(false);
 }
 
-void deviceWidget::updateButtons(bool enabled)
+void DeviceWidget::updateButtons(bool enabled)
 {
     if (!enabled) {
         myDevice->description->setEnabled(false);
@@ -175,22 +172,19 @@ void deviceWidget::updateButtons(bool enabled)
   Populates the widget field with the description in case
   it is structured properly
   */
-bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
+bool DeviceWidget::populateBoardStructuredDescription(QByteArray desc)
 {
-    if(UAVObjectUtilManager::descriptionToStructure(desc,onBoardDescription))
-    {
+    if(UAVObjectUtilManager::descriptionToStructure(desc,onBoardDescription)) {
         myDevice->lblGitTag->setText(onBoardDescription.gitHash);
         myDevice->lblBuildDate->setText(onBoardDescription.gitDate.insert(4,"-").insert(7,"-"));
-        if(onBoardDescription.gitTag.startsWith("RELEASE",Qt::CaseSensitive))
-        {
+        if(onBoardDescription.gitTag.startsWith("RELEASE",Qt::CaseSensitive)) {
             myDevice->lblDescription->setText(onBoardDescription.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Tagged officially released firmware build"));
 
         }
-        else
-        {
+        else {
             myDevice->lblDescription->setText(onBoardDescription.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
             myDevice->lblCertified->setPixmap(pix);
@@ -203,24 +197,20 @@ bool deviceWidget::populateBoardStructuredDescription(QByteArray desc)
     }
 
     return false;
-
 }
-bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
+
+bool DeviceWidget::populateLoadedStructuredDescription(QByteArray desc)
 {
-    if(UAVObjectUtilManager::descriptionToStructure(desc,LoadedDescription))
-    {
+    if(UAVObjectUtilManager::descriptionToStructure(desc,LoadedDescription)) {
         myDevice->lblGitTagL->setText(LoadedDescription.gitHash);
-        myDevice->lblBuildDateL->setText( LoadedDescription.gitDate.insert(4,"-").insert(7,"-"));
-        if(LoadedDescription.gitTag.startsWith("RELEASE",Qt::CaseSensitive))
-        {
+        myDevice->lblBuildDateL->setText( LoadedDescription.gitDate.insert(4, "-").insert(7, "-"));
+        if(LoadedDescription.gitTag.startsWith("RELEASE",Qt::CaseSensitive)) {
             myDevice->lblDescritpionL->setText(LoadedDescription.gitTag);
             myDevice->description->setText(LoadedDescription.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertifiedL->setPixmap(pix);
             myDevice->lblCertifiedL->setToolTip(tr("Tagged officially released firmware build"));
-        }
-        else
-        {
+        } else {
             myDevice->lblDescritpionL->setText(LoadedDescription.gitTag);
             myDevice->description->setText(LoadedDescription.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
@@ -231,19 +221,18 @@ bool deviceWidget::populateLoadedStructuredDescription(QByteArray desc)
 
         return true;
     }
-
     return false;
-
 }
+
 /**
   Updates status message for messages coming from DFU
   */
-void deviceWidget::dfuStatus(QString str)
+void DeviceWidget::dfuStatus(QString str)
 {
     status(str, STATUSICON_RUNNING);
 }
 
-void deviceWidget::confirmCB(int value)
+void DeviceWidget::confirmCB(int value)
 {
     updateButtons(true);
 }
@@ -251,7 +240,7 @@ void deviceWidget::confirmCB(int value)
 /**
   Updates status message
   */
-void deviceWidget::status(QString str, StatusIcon ic)
+void DeviceWidget::status(QString str, StatusIcon ic)
 {
     QPixmap px;
     myDevice->statusLabel->setText(str);
@@ -271,8 +260,7 @@ void deviceWidget::status(QString str, StatusIcon ic)
     myDevice->statusIcon->setPixmap(px);
 }
 
-
-void deviceWidget::loadFirmware()
+void DeviceWidget::loadFirmware()
 {
     myDevice->verticalGroupBox_loaded->setVisible(false);
     myDevice->groupCustom->setVisible(false);
@@ -299,13 +287,12 @@ void deviceWidget::loadFirmware()
     QPixmap px;
     if (loadedFW.length()>m_dfu->devices[deviceID].SizeOfCode) {
         myDevice->lblCRCL->setText(tr("Can't calculate, file too big for device"));
-    }
-    else {
+    } else {
         myDevice->lblCRCL->setText( QString::number(DFUObject::CRCFromQBArray(loadedFW,m_dfu->devices[deviceID].SizeOfCode)));
     }
+
     //myDevice->lblFirmwareSizeL->setText(QString("Firmware size: ")+QVariant(loadedFW.length()).toString()+ QString(" bytes"));
-    if (populateLoadedStructuredDescription(desc))
-    {
+    if (populateLoadedStructuredDescription(desc)) {
         myDevice->confirmCheckBox->setChecked(true);
         myDevice->verticalGroupBox_loaded->setVisible(true);
         myDevice->groupCustom->setVisible(false);
@@ -339,7 +326,7 @@ void deviceWidget::loadFirmware()
 /**
   Sends a firmware to the device
   */
-void deviceWidget::uploadFirmware()
+void DeviceWidget::uploadFirmware()
 {
     // clear progress bar now
     // this avoids displaying an error message and the progress at 100% at the same time
@@ -422,7 +409,7 @@ void deviceWidget::uploadFirmware()
 /**
   Retrieves the firmware from the device
   */
-void deviceWidget::downloadFirmware()
+void DeviceWidget::downloadFirmware()
 {
     // clear progress bar now
     // this avoids displaying an error message and the progress at 100% at the same time
@@ -466,7 +453,7 @@ void deviceWidget::downloadFirmware()
 /**
   Callback for the firmware download result
   */
-void deviceWidget::downloadFinished()
+void DeviceWidget::downloadFinished()
 {
     disconnect(m_dfu, SIGNAL(downloadFinished()), this, SLOT(downloadFinished()));
     disconnect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
@@ -482,7 +469,7 @@ void deviceWidget::downloadFinished()
 /**
   Callback for the firmware upload result
   */
-void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
+void DeviceWidget::uploadFinished(OP_DFU::Status retstatus)
 {
     disconnect(m_dfu, SIGNAL(uploadFinished(OP_DFU::Status)), this, SLOT(uploadFinished(OP_DFU::Status)));
     disconnect(m_dfu, SIGNAL(progressUpdated(int)), this, SLOT(setProgress(int)));
@@ -529,7 +516,7 @@ void deviceWidget::uploadFinished(OP_DFU::Status retstatus)
 /**
   Slot to update the progress bar
   */
-void deviceWidget::setProgress(int percent)
+void DeviceWidget::setProgress(int percent)
 {
     myDevice->progressBar->setValue(percent);
 }
@@ -537,7 +524,7 @@ void deviceWidget::setProgress(int percent)
 /**
  *Opens an open file dialog.
  */
-QString deviceWidget::setOpenFileName()
+QString DeviceWidget::setOpenFileName()
 {
     QFileDialog::Options options;
     QString selectedFilter;
@@ -576,7 +563,7 @@ QString deviceWidget::setOpenFileName()
 /**
  *Set the save file name
  */
-QString deviceWidget::setSaveFileName()
+QString DeviceWidget::setSaveFileName()
 {
     QFileDialog::Options options;
     QString selectedFilter;

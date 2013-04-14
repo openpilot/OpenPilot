@@ -27,7 +27,8 @@
 #include "runningdevicewidget.h"
 #include "devicedescriptorstruct.h"
 #include "uploadergadgetwidget.h"
-runningDeviceWidget::runningDeviceWidget(QWidget *parent) :
+
+RunningDeviceWidget::RunningDeviceWidget(QWidget *parent) :
     QWidget(parent)
 {
     myDevice = new Ui_runningDeviceWidget();
@@ -35,11 +36,9 @@ runningDeviceWidget::runningDeviceWidget(QWidget *parent) :
 
     // Initialization of the Device icon display
     myDevice->devicePicture->setScene(new QGraphicsScene(this));
-
 }
 
-
-void runningDeviceWidget::showEvent(QShowEvent *event)
+void RunningDeviceWidget::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event)
     // Thit fitInView method should only be called now, once the
@@ -48,7 +47,7 @@ void runningDeviceWidget::showEvent(QShowEvent *event)
     myDevice->devicePicture->fitInView(devicePic.rect(),Qt::KeepAspectRatio);
 }
 
-void runningDeviceWidget::resizeEvent(QResizeEvent* event)
+void RunningDeviceWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
     myDevice->devicePicture->fitInView(devicePic.rect(), Qt::KeepAspectRatio);
@@ -57,7 +56,7 @@ void runningDeviceWidget::resizeEvent(QResizeEvent* event)
 /**
   Fills the various fields for the device
   */
-void runningDeviceWidget::populate()
+void RunningDeviceWidget::populate()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
@@ -65,19 +64,17 @@ void runningDeviceWidget::populate()
 
     myDevice->lblDeviceID->setText(QString("Device ID: ") + QString::number(id, 16));
     myDevice->lblBoardName->setText(deviceDescriptorStruct::idToBoardName(id));
-    myDevice->lblHWRev->setText(QString(tr("HW Revision: "))+QString::number(id & 0x00FF, 16));
-    qDebug()<<"CRC"<<utilMngr->getFirmwareCRC();
-    myDevice->lblCRC->setText(QString(tr("Firmware CRC: "))+QVariant(utilMngr->getFirmwareCRC()).toString());
+    myDevice->lblHWRev->setText(QString(tr("HW Revision: ")) + QString::number(id & 0x00FF, 16));
+    qDebug() << "CRC" << utilMngr->getFirmwareCRC();
+    myDevice->lblCRC->setText(QString(tr("Firmware CRC: ")) + QVariant(utilMngr->getFirmwareCRC()).toString());
     // DeviceID tells us what sort of HW we have detected:
     // display a nice icon:
     myDevice->devicePicture->scene()->clear();
 
     switch (id) {
     case 0x0101:
-        devicePic.load("");//TODO
-        break;
     case 0x0201:
-        devicePic.load("");//TODO
+        devicePic.load("");
         break;
     case 0x0301:
         devicePic.load(":/uploader/images/gcs-board-oplink.png");
@@ -92,7 +89,8 @@ void runningDeviceWidget::populate()
         devicePic.load(":/uploader/images/gcs-board-revo.png");
         break;
     default:
-        devicePic.load(""); //Clear
+        // Clear
+        devicePic.load("");
         break;
     }
     myDevice->devicePicture->scene()->addPixmap(devicePic);
@@ -119,9 +117,7 @@ void runningDeviceWidget::populate()
         }
         myDevice->lblGitCommitTag->setText("Git commit hash: " + devDesc.gitHash);
         myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.gitDate.insert(4,"-").insert(7,"-"));
-    }
-    else
-    {
+    } else {
         myDevice->lblFWTag->setText(QString("Firmware tag: ") + QString(description).left(QString(description).indexOf(QChar(255))));
         myDevice->lblGitCommitTag->setText("Git commit tag: Unknown");
         myDevice->lblFWDate->setText(QString("Firmware date: Unknown"));

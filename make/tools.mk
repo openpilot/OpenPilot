@@ -178,7 +178,8 @@ endif
 #  $(2) = tool install directory
 #  $(3) = tool distribution URL
 #  $(4) = tool distribution file
-#  $(5) = optional configure template
+#  $(5) = optional pre-fetch template
+#  $(6) = optional post-extract template
 #
 ##############################
 
@@ -187,6 +188,8 @@ define TOOL_INSTALL_TEMPLATE
 .PHONY: $(addprefix $(1)_, install clean distclean)
 
 $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
+	$(5)
+
 	@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(4))
 	$(V1) ( \
 		cd "$(DL_DIR)" && \
@@ -202,7 +205,7 @@ $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
 	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
 	$(V1) $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(TOOLS_DIR)) -xjf $$(call toprel, $(DL_DIR)/$(4))
 
-	$(5)
+	$(6)
 
 $(1)_clean:
 	@$(ECHO) $(MSG_CLEANING) $$(call toprel, $(2))
@@ -247,7 +250,7 @@ define QT_SDK_CONFIGURE_TEMPLATE
 	$(V1) $(ECHO) $(QUOTE)Prefix = $(QT_SDK_DIR)$(QUOTE) >> $(QT_SDK_DIR)/bin/qt.conf
 endef
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,qt_sdk,$(QT_SDK_DIR),$(QT_SDK_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_CONFIGURE_TEMPLATE)))
+$(eval $(call TOOL_INSTALL_TEMPLATE,qt_sdk,$(QT_SDK_DIR),$(QT_SDK_URL),$(notdir $(QT_SDK_URL)),,$(QT_SDK_CONFIGURE_TEMPLATE)))
 
 ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
     export QMAKE := $(QT_SDK_DIR)/bin/qmake

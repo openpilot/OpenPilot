@@ -177,6 +177,11 @@ PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_internal_cfg, &pios_internal_flash_driv
 
 	HwSettingsInitialize();
 
+#ifdef PIOS_INCLUDE_WDG
+	/* Initialize watchdog as early as possible to catch faults during init */
+	PIOS_WDG_Init();
+#endif /* PIOS_INCLUDE_WDG */
+
 	/* Initialize the alarms library */
 	AlarmsInitialize();
 

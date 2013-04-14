@@ -37,6 +37,9 @@ MODULES += Telemetry
 
 OPTMODULES =
 
+# Some diagnostics
+CDEFS += -DDIAG_TASKS
+
 # Misc options
 CFLAGS += -ffast-math
 

@@ -2322,7 +2322,9 @@ int32_t osdgenStart(void)
     vSemaphoreCreateBinary(osdSemaphore);
     xTaskCreate(osdgenTask, (signed char *) "OSDGEN", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &osdgenTaskHandle);
     TaskMonitorAdd(TASKINFO_RUNNING_OSDGEN, osdgenTaskHandle);
-
+#ifdef PIOS_INCLUDE_WDG
+    PIOS_WDG_RegisterFlag(PIOS_WDG_OSDGEN);
+#endif
     return 0;
 }
 
@@ -2370,12 +2372,18 @@ static void osdgenTask(void *parameters)
     // intro
     for (int i = 0; i < 63; i++) {
         if (xSemaphoreTake(osdSemaphore, LONG_TIME) == pdTRUE) {
+#ifdef PIOS_INCLUDE_WDG
+            PIOS_WDG_UpdateFlag(PIOS_WDG_OSDGEN);
+#endif
             clearGraphics();
             introGraphics();
         }
     }
     for (int i = 0; i < 63; i++) {
         if (xSemaphoreTake(osdSemaphore, LONG_TIME) == pdTRUE) {
+#ifdef PIOS_INCLUDE_WDG
+            PIOS_WDG_UpdateFlag(PIOS_WDG_OSDGEN);
+#endif
             clearGraphics();
             introGraphics();
             introText();
@@ -2384,6 +2392,9 @@ static void osdgenTask(void *parameters)
 
     while (1) {
         if (xSemaphoreTake(osdSemaphore, LONG_TIME) == pdTRUE) {
+#ifdef PIOS_INCLUDE_WDG
+            PIOS_WDG_UpdateFlag(PIOS_WDG_OSDGEN);
+#endif
             updateOnceEveryFrame();
         }
         //xSemaphoreTake(osdSemaphore, portMAX_DELAY);

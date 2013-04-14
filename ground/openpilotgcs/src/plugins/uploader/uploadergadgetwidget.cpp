@@ -313,6 +313,9 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             return;
         }
         //dfu.StatusRequest();
+
+		QTimer::singleShot(500, &m_eventloop, SLOT(quit()));
+		m_eventloop.exec();
         dfu->findDevices();
         log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
         if (dfu->numberOfDevices < 0 || dfu->numberOfDevices > 3) {

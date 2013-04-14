@@ -1,17 +1,17 @@
 /**
- ******************************************************************************
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup   PIOS_RFM22B Radio Functions
- * @brief PIOS interface for RFM22B Radio
- * @{
- *
- * @file       pios_rfm22b_priv.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      RFM22B private definitions.
- * @see        The GNU Public License (GPL) Version 3
- *
- *****************************************************************************/
+******************************************************************************
+* @addtogroup PIOS PIOS Core hardware abstraction layer
+* @{
+* @addtogroup   PIOS_RFM22B Radio Functions
+* @brief PIOS interface for RFM22B Radio
+* @{
+*
+* @file       pios_rfm22b_priv.h
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+* @brief      RFM22B private definitions.
+* @see        The GNU Public License (GPL) Version 3
+*
+*****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -444,28 +444,28 @@
 
 #define RFM22_adc8_control							0x4F	// R/W
 /*
-#define RFM22_analog_test_bus						0x50	// R/W
-#define RFM22_digital_test_bus						0x51	// R/W
-#define RFM22_tx_ramp_control						0x52	// R/W
-#define RFM22_pll_tune_time							0x53	// R/W
+  #define RFM22_analog_test_bus						0x50	// R/W
+  #define RFM22_digital_test_bus						0x51	// R/W
+  #define RFM22_tx_ramp_control						0x52	// R/W
+  #define RFM22_pll_tune_time							0x53	// R/W
 
-#define RFM22_calibration_control					0x55	// R/W
+  #define RFM22_calibration_control					0x55	// R/W
 
-#define RFM22_modem_test							0x56	// R/W
+  #define RFM22_modem_test							0x56	// R/W
 
-#define RFM22_chargepump_test						0x57	// R/W
-#define RFM22_chargepump_current_trimming_override	0x58	// R/W
+  #define RFM22_chargepump_test						0x57	// R/W
+  #define RFM22_chargepump_current_trimming_override	0x58	// R/W
 
-#define RFM22_divider_current_trimming				0x59	// R/W
+  #define RFM22_divider_current_trimming				0x59	// R/W
 
-#define RFM22_vco_current_trimming					0x5A	// R/W
-#define RFM22_vco_calibration_override				0x5B	// R/W
+  #define RFM22_vco_current_trimming					0x5A	// R/W
+  #define RFM22_vco_calibration_override				0x5B	// R/W
 
-#define RFM22_synthersizer_test						0x5C	// R/W
+  #define RFM22_synthersizer_test						0x5C	// R/W
 
-#define RFM22_block_enable_override1				0x5D	// R/W
-#define RFM22_block_enable_override2				0x5E	// R/W
-#define RFM22_block_enable_override3				0x5F	// R/W
+  #define RFM22_block_enable_override1				0x5D	// R/W
+  #define RFM22_block_enable_override2				0x5E	// R/W
+  #define RFM22_block_enable_override3				0x5F	// R/W
 */
 #define RFM22_channel_filter_coeff_addr				0x60	// R/W
 #define RFM22_ch_fil_coeff_ad_inv_pre_th_mask	0xF0		//
@@ -482,14 +482,14 @@
 #define RFM22_xtal_osc_por_ctrl_bufovr			0x02		// Output Buffer Enable Override.
 #define RFM22_xtal_osc_por_ctrl_enbuf			0x01		// Output Buffer Enable.
 /*
-#define RFM22_rc_osc_coarse_calbration_override		0x63	// R/W
-#define RFM22_rc_osc_fine_calbration_override		0x64	// R/W
+  #define RFM22_rc_osc_coarse_calbration_override		0x63	// R/W
+  #define RFM22_rc_osc_fine_calbration_override		0x64	// R/W
 
-#define RFM22_ldo_control_override					0x65	// R/W
-#define RFM22_ldo_level_setting						0x66	// R/W
+  #define RFM22_ldo_control_override					0x65	// R/W
+  #define RFM22_ldo_level_setting						0x66	// R/W
 
-#define RFM22_deltasigma_adc_tuning1				0x67	// R/W
-#define RFM22_deltasigma_adc_tuning2				0x68	// R/W
+  #define RFM22_deltasigma_adc_tuning1				0x67	// R/W
+  #define RFM22_deltasigma_adc_tuning2				0x68	// R/W
 */
 #define RFM22_agc_override1					0x69	// R/W
 #define RFM22_agc_ovr1_sgi					0x40		// AGC Loop, Set Gain Increase. If set to 0 then gain increasing will not be allowed. If set to 1 then gain increasing is allowed, default is 0.
@@ -504,10 +504,6 @@
 
 #define RFM22_tx_power						0x6D	// R/W
 #define RFM22_tx_pwr_lna_sw					0x08		// LNA Switch Controller. If set, lna_sw control from the digital will go high during TX modes, and low during other times. If reset, the digital control signal is low at all times.
-#define RFM22_tx_pwr_papeaklvl_0				0x10		//      "                   "
-#define RFM22_tx_pwr_papeaklvl_1				0x20		// PA Peak Detect Level (direct from register). 00 = 6.5, 01 = 7, 10 = 7.5, 11 = 8, 00 = default
-#define RFM22_tx_pwr_papeaken					0x40		// PA Peak Detector Enable.
-#define RFM22_tx_pwr_papeakval					0x80		// PA Peak Detector Value Read Register. Reading a 1 in this register when the papeaken=1 then the PA drain voltage is too high and the match network needs adjusting for optimal efficiency.
 
 #define RFM22_tx_data_rate1					0x6E	// R/W
 #define RFM22_tx_data_rate0					0x6F	// R/W
@@ -578,12 +574,8 @@ enum pios_rfm22b_dev_magic {
 enum pios_rfm22b_state {
 	RFM22B_STATE_UNINITIALIZED,
 	RFM22B_STATE_INITIALIZING,
-	RFM22B_STATE_INITIALIZED,
-	RFM22B_STATE_INITIATING_CONNECTION,
-	RFM22B_STATE_WAIT_FOR_CONNECTION,
 	RFM22B_STATE_REQUESTING_CONNECTION,
 	RFM22B_STATE_ACCEPTING_CONNECTION,
-	RFM22B_STATE_CONNECTION_ACCEPTED,
 	RFM22B_STATE_RX_MODE,
 	RFM22B_STATE_WAIT_PREAMBLE,
 	RFM22B_STATE_WAIT_SYNC,
@@ -605,13 +597,12 @@ enum pios_rfm22b_state {
 };
 
 enum pios_rfm22b_event {
+	RFM22B_EVENT_DEFAULT,
 	RFM22B_EVENT_INT_RECEIVED,
 	RFM22B_EVENT_INITIALIZE,
 	RFM22B_EVENT_INITIALIZED,
 	RFM22B_EVENT_REQUEST_CONNECTION,
-	RFM22B_EVENT_WAIT_FOR_CONNECTION,
 	RFM22B_EVENT_CONNECTION_REQUESTED,
-	RFM22B_EVENT_CONNECTION_ACCEPTED,
 	RFM22B_EVENT_PACKET_ACKED,
 	RFM22B_EVENT_PACKET_NACKED,
 	RFM22B_EVENT_ACK_TIMEOUT,
@@ -645,6 +636,14 @@ typedef struct {
 	uint8_t lastContact;
 } rfm22b_pair_stats;
 
+typedef struct {
+	uint32_t pairID;
+	OPLinkSettingsRemoteMainPortOptions main_port;
+	OPLinkSettingsRemoteFlexiPortOptions flexi_port;
+	OPLinkSettingsRemoteVCPPortOptions vcp_port;
+	OPLinkSettingsComSpeedOptions com_speed;
+} rfm22b_binding;
+
 struct pios_rfm22b_dev {
 	enum pios_rfm22b_dev_magic magic;
 	struct pios_rfm22b_cfg cfg;
@@ -658,6 +657,10 @@ struct pios_rfm22b_dev {
 
 	// The destination ID
 	uint32_t destination_id;
+
+	// The list of bound radios.
+	rfm22b_binding bindings[OPLINKSETTINGS_BINDINGS_NUMELEM];
+	uint8_t cur_binding;
 
 	// Is this device a coordinator?
 	bool coordinator;
@@ -714,9 +717,6 @@ struct pios_rfm22b_dev {
 	// RSSI in dBm
 	int8_t rssi_dBm;
 
-	// The packet queue handle
-	xQueueHandle packetQueue;
-
 	// The tx data packet
 	PHPacket data_packet;
 	// The current tx packet
@@ -758,14 +758,17 @@ struct pios_rfm22b_dev {
 	bool send_ppm;
 	bool send_connection_request;
 	bool time_to_send;
-	uint8_t time_to_send_offset;
 
-	// The minimum frequency
-	uint32_t min_frequency;
-	// The maximum frequency
-	uint32_t max_frequency;
-	// The current nominal frequency
-	uint32_t frequency_hz;
+	// The offset between our clock and the global send clock
+	uint8_t time_to_send_offset;
+	// The number of times that the current packet has been resent.
+	uint8_t cur_resent_count;
+
+	// The initial frequency
+	uint32_t init_frequency;
+	// The number of frequency hopping channels.
+	uint16_t num_channels;
+
 	// The frequency hopping step size
 	float frequency_step_size;
 	// current frequency hop channel
@@ -775,17 +778,24 @@ struct pios_rfm22b_dev {
 	// afc correction reading (in Hz)
 	int8_t afc_correction_Hz;
 
-	// The maximum time (ms) that it should take to transmit / receive a packet.
-	uint32_t max_packet_time;
+	// The packet timers.
 	portTickType packet_start_ticks;
 	portTickType tx_complete_ticks;
 	portTickType rx_complete_ticks;
+	portTickType time_delta;
+
+	// The maximum time (ms) that it should take to transmit / receive a packet.
+	uint32_t max_packet_time;
+
+	// The maximum time to wait for an ACK.
 	uint8_t max_ack_delay;
 
+#ifdef PIOS_INCLUDE_RFM22B_RCVR
 	// The PPM channel values
 	uint16_t ppm_channel[PIOS_RFM22B_RCVR_MAX_CHANNELS];
 	uint8_t ppm_supv_timer;
 	bool ppm_fresh;
+#endif
 };
 
 
@@ -803,6 +813,6 @@ extern const struct pios_com_driver pios_rfm22b_com_driver;
 #endif /* PIOS_RFM22B_PRIV_H */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

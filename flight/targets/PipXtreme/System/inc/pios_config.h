@@ -90,7 +90,7 @@
 /* #define PIOS_INCLUDE_PPM_FLEXI */
 /* #define PIOS_INCLUDE_DSM */
 /* #define PIOS_INCLUDE_SBUS */
-/* #define PIOS_INCLUDE_GCSRCVR */
+#define PIOS_INCLUDE_GCSRCVR
 
 /* PIOS abstract receiver interface */
 #define PIOS_INCLUDE_RCVR

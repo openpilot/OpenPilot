@@ -1,0 +1,17 @@
+#
+# Flight source code files should always have LF line endings by agreement
+# http://wiki.openpilot.org/display/Doc/Coding+Style
+#
+
+*.c		text eol=lf
+*.h		text eol=lf
+*.py		text eol=lf
+
+*.s		text eol=lf
+*.S		text eol=lf
+*.ld		text eol=lf
+*.inc		text eol=lf
+
+Makefile	text eol=lf
+Makefile.*	text eol=lf
+*.mk		text eol=lf

@@ -39,6 +39,7 @@ typedef struct DelayedCallbackInfoStruct DelayedCallbackInfo;
 int32_t CallbackSchedulerInitialize();
 int32_t CallbackSchedulerStart();
 int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo);
-DelayedCallbackInfo* DelayedCallbackCreate(DelayedCallback cb, DelayedCallbackPriority priority, uint32_t stacksize);
+int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken);
+DelayedCallbackInfo* DelayedCallbackCreate(DelayedCallback cb, DelayedCallbackPriority priority, long taskPriority, uint32_t stacksize);
 
 #endif // CALLBACKSCHEDULER_H

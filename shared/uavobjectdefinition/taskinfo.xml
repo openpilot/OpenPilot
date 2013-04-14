@@ -27,7 +27,10 @@
 			<elementname>ModemStat</elementname>
 			<elementname>Autotune</elementname>
 			<elementname>EventDispatcher</elementname>
-			<elementname>CallbackScheduler</elementname>
+			<elementname>CallbackScheduler0</elementname>
+			<elementname>CallbackScheduler1</elementname>
+			<elementname>CallbackScheduler2</elementname>
+			<elementname>CallbackScheduler3</elementname>
 		</elementnames>
 	</field> 
 	<field name="Running" units="bool" type="enum">
@@ -56,7 +59,10 @@
 			<elementname>ModemStat</elementname>
 			<elementname>Autotune</elementname>
 			<elementname>EventDispatcher</elementname>
-			<elementname>CallbackScheduler</elementname>
+			<elementname>CallbackScheduler0</elementname>
+			<elementname>CallbackScheduler1</elementname>
+			<elementname>CallbackScheduler2</elementname>
+			<elementname>CallbackScheduler3</elementname>
 		</elementnames>
 		<options>
 			<option>False</option>
@@ -89,7 +95,10 @@
 			<elementname>ModemStat</elementname>
 			<elementname>Autotune</elementname>
 			<elementname>EventDispatcher</elementname>
-			<elementname>CallbackScheduler</elementname>
+			<elementname>CallbackScheduler0</elementname>
+			<elementname>CallbackScheduler1</elementname>
+			<elementname>CallbackScheduler2</elementname>
+			<elementname>CallbackScheduler3</elementname>
 		</elementnames>
 	</field> 
         <access gcs="readwrite" flight="readwrite"/>

@@ -65,15 +65,12 @@ private:
 
     QString frameCategory(QString frameType);
 
-    QStringList channelNames;
-    QStringList mixerTypes;
-    QStringList mixerVectors;
-
     bool ffTuningInProgress;
     bool ffTuningPhase;
     UAVObject::Metadata accInitialData;
 
 private slots:
+    void switchAirframeType(int index);
     void enableFFTest();
     void openHelp();
 

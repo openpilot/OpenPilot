@@ -50,7 +50,7 @@ QStringList ConfigGroundVehicleWidget::getChannelDescriptions()
     }
 
     // get the gui config data
-    GUIConfigDataUnion configData = GetConfigData();
+    GUIConfigDataUnion configData = getConfigData();
 
     if (configData.ground.GroundVehicleSteering1 > 0) {
         channelDesc[configData.ground.GroundVehicleSteering1 - 1] = QString("GroundSteering1");
@@ -71,6 +71,8 @@ ConfigGroundVehicleWidget::ConfigGroundVehicleWidget(QWidget *parent) :
         VehicleConfig(parent), m_aircraft(new Ui_GroundConfigWidget())
 {
     m_aircraft->setupUi(this);
+
+    populateChannelComboBoxes();
 
     QStringList groundVehicleTypes;
     groundVehicleTypes << "Turnable (car)" << "Differential (tank)" << "Motorcycle";
@@ -224,7 +226,7 @@ void ConfigGroundVehicleWidget::refreshWidgetsValues(QString frameType)
     } else {
         m_aircraft->groundVehicleThrottle2->initLinearCurve(curveValues.count(), 1.0);
     }
-    GUIConfigDataUnion config = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
 
     // THIS SECTION STILL NEEDS WORK. FOR THE MOMENT, USE THE FIXED-WING ONBOARD SETTING IN ORDER TO MINIMIZE CHANCES OF BOLLOXING REAL CODE
     // Retrieve channel setup values
@@ -310,13 +312,13 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleMotorcycle(QString airframeTyp
     }
 
     // Now setup the channels:
-    GUIConfigDataUnion config = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
     resetActuators(&config);
 
     config.ground.GroundVehicleThrottle1 = m_aircraft->gvMotor1ChannelBox->currentIndex();
     config.ground.GroundVehicleThrottle2 = m_aircraft->gvMotor2ChannelBox->currentIndex();
 
-    SetConfigData(config);
+    setConfigData(config);
 
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
@@ -360,13 +362,13 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleDifferential(QString airframeT
     }
 
     // Now setup the channels:
-    GUIConfigDataUnion config = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
     resetActuators(&config);
 
     config.ground.GroundVehicleThrottle1 = m_aircraft->gvMotor1ChannelBox->currentIndex();
     config.ground.GroundVehicleThrottle2 = m_aircraft->gvMotor2ChannelBox->currentIndex();
 
-    SetConfigData((config));
+    setConfigData(config);
 
     UAVDataObject *mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
@@ -404,7 +406,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleCar(QString airframeType)
     }
 
     // Now setup the channels:
-    GUIConfigDataUnion config = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
     resetActuators(&config);
 
     config.ground.GroundVehicleThrottle1 = m_aircraft->gvMotor1ChannelBox->currentIndex();
@@ -412,7 +414,7 @@ bool ConfigGroundVehicleWidget::setupGroundVehicleCar(QString airframeType)
     config.ground.GroundVehicleSteering1 = m_aircraft->gvSteering1ChannelBox->currentIndex();
     config.ground.GroundVehicleSteering2 = m_aircraft->gvSteering2ChannelBox->currentIndex();
 
-    SetConfigData(config);
+    setConfigData(config);
 
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);

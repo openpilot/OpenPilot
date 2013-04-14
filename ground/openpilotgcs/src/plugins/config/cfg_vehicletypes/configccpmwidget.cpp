@@ -51,7 +51,7 @@ QStringList ConfigCcpmWidget::getChannelDescriptions()
     }
 
     // get the gui config data
-    GUIConfigDataUnion configData = GetConfigData();
+    GUIConfigDataUnion configData = getConfigData();
     heliGUISettingsStruct heli = configData.heli;
 
     if (heli.Throttle > 0) {
@@ -293,7 +293,7 @@ void ConfigCcpmWidget::refreshWidgetsValues(QString frameType)
 
     setupUI(frameType);
 
-    GUIConfigDataUnion config = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
 
     // swashplate config
     setComboCurrentIndex( m_aircraft->ccpmType, m_aircraft->ccpmType->count() - (config.heli.SwashplateType +1));
@@ -626,7 +626,7 @@ void ConfigCcpmWidget::UpdateMixer()
     if (throwConfigError(QString("HeliCP")))
         return;
 
-    GUIConfigDataUnion config = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
 
     useCCPM = !(config.heli.ccpmCollectivePassthroughState || !config.heli.ccpmLinkCyclicState);
     useCyclic = config.heli.ccpmLinkRollState;
@@ -767,7 +767,7 @@ QString ConfigCcpmWidget::updateConfigObjects()
     updatingFromHardware = TRUE;
 
     //get the user options
-    GUIConfigDataUnion config = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
 
     //swashplate config
     config.heli.SwashplateType = m_aircraft->ccpmType->count() - m_aircraft->ccpmType->currentIndex() - 1;
@@ -807,7 +807,7 @@ QString ConfigCcpmWidget::updateConfigObjects()
     //tail
     config.heli.Tail = m_aircraft->ccpmTailChannel->currentIndex();
 
-    SetConfigData(config);
+    setConfigData(config);
 
     updatingFromHardware = FALSE;
     return airframeType;
@@ -849,28 +849,25 @@ void ConfigCcpmWidget::getMixer()
     if (SwashLvlConfigurationInProgress)return;
     if (updatingToHardware)return;
 
-    updatingFromHardware=TRUE;
+    updatingFromHardware = TRUE;
     
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
 
-    QPointer<VehicleConfig> vconfig = new VehicleConfig();
-
     QList<double> curveValues;
-    vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, &curveValues);
+    getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, &curveValues);
 
     // is at least one of the curve values != 0?
-    if (vconfig->isValidThrottleCurve(&curveValues)) {
+    if (isValidThrottleCurve(&curveValues)) {
         m_aircraft->ThrottleCurve->setCurve(&curveValues);
     }
     else {
         m_aircraft->ThrottleCurve->ResetCurve();
     }
 
-
-    vconfig->getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, &curveValues);
+    getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE2, &curveValues);
     // is at least one of the curve values != 0?
-    if (vconfig->isValidThrottleCurve(&curveValues)) {
+    if (isValidThrottleCurve(&curveValues)) {
         m_aircraft->PitchCurve->setCurve(&curveValues);
     }
     else {

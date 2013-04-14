@@ -38,14 +38,13 @@ VehicleConfig::VehicleConfig(QWidget *parent) : ConfigTaskWidget(parent)
     // Generate lists of mixerTypeNames, mixerVectorNames, channelNames
     channelNames << "None";
     for (int i = 0; i < (int) VehicleConfig::CHANNEL_NUMELEM; i++) {
-        mixerTypes << QString("Mixer%1Type").arg(i+1);
-        mixerVectors << QString("Mixer%1Vector").arg(i+1);
-        channelNames << QString("Channel%1").arg(i+1);
+        mixerTypes << QString("Mixer%1Type").arg(i + 1);
+        mixerVectors << QString("Mixer%1Vector").arg(i + 1);
+        channelNames << QString("Channel%1").arg(i + 1);
     }
 
-    mixerTypeDescriptions << "Disabled" << "Motor" << "Servo" << "CameraRoll" << "CameraPitch"
-                          << "CameraYaw" << "Accessory0" << "Accessory1" << "Accessory2"
-                          << "Accessory3" << "Accessory4" << "Accessory5";
+    mixerTypeDescriptions << "Disabled" << "Motor" << "Servo" << "CameraRoll" << "CameraPitch" << "CameraYaw"
+            << "Accessory0" << "Accessory1" << "Accessory2" << "Accessory3" << "Accessory4" << "Accessory5";
 
     // This is needed because new style tries to compact things as much as possible in grid
     // and on OSX the widget sizes of PushButtons is reported incorrectly:
@@ -60,45 +59,43 @@ VehicleConfig::~VehicleConfig()
    // Do nothing
 }
 
-GUIConfigDataUnion VehicleConfig::GetConfigData()
+GUIConfigDataUnion VehicleConfig::getConfigData()
 {
-    int i;
-    GUIConfigDataUnion configData;
-
     // get an instance of systemsettings
-    SystemSettings * systemSettings = SystemSettings::GetInstance(getUAVObjectManager());
+    SystemSettings *systemSettings = SystemSettings::GetInstance(getUAVObjectManager());
     Q_ASSERT(systemSettings);
     SystemSettings::DataFields systemSettingsData = systemSettings->getData();
 
     // copy systemsettings -> local configData
-    for(i = 0; i < (int)(SystemSettings::GUICONFIGDATA_NUMELEM); i++)
-        configData.UAVObject[i]=systemSettingsData.GUIConfigData[i];
+    GUIConfigDataUnion configData;
+    for (int i = 0; i < (int) SystemSettings::GUICONFIGDATA_NUMELEM; i++) {
+        configData.UAVObject[i] = systemSettingsData.GUIConfigData[i];
+    }
 
     // sanity check
-    Q_ASSERT(SystemSettings::GUICONFIGDATA_NUMELEM ==
-             (sizeof(configData.UAVObject) / sizeof(configData.UAVObject[0])));
+    Q_ASSERT(SystemSettings::GUICONFIGDATA_NUMELEM == (sizeof(configData.UAVObject) / sizeof(configData.UAVObject[0])));
 
     return configData;
 }
 
-void VehicleConfig::SetConfigData(GUIConfigDataUnion configData)
+void VehicleConfig::setConfigData(GUIConfigDataUnion configData)
 {
     // sanity check
     Q_ASSERT(SystemSettings::GUICONFIGDATA_NUMELEM == (sizeof(configData.UAVObject) / sizeof(configData.UAVObject[0])));
 
     // get an instance of systemsettings
-    SystemSettings * systemSettings = SystemSettings::GetInstance(getUAVObjectManager());
+    SystemSettings *systemSettings = SystemSettings::GetInstance(getUAVObjectManager());
     Q_ASSERT(systemSettings);
     SystemSettings::DataFields systemSettingsData = systemSettings->getData();
 
-    UAVObjectField* guiConfig = systemSettings->getField("GUIConfigData");
+    UAVObjectField *guiConfig = systemSettings->getField("GUIConfigData");
     Q_ASSERT(guiConfig);
     if (!guiConfig) {
         return;
     }
 
     // copy parameter configData -> systemsettings
-    for (int i = 0; i < (int) (SystemSettings::GUICONFIGDATA_NUMELEM); i++) {
+    for (int i = 0; i < (int) SystemSettings::GUICONFIGDATA_NUMELEM; i++) {
         guiConfig->setValue(configData.UAVObject[i], i);
     }
 }
@@ -118,6 +115,17 @@ void VehicleConfig::refreshWidgetsValues(QString frameType)
 
 void VehicleConfig::resetActuators(GUIConfigDataUnion *configData)
 {
+}
+
+// NEW STYLE: Loop through the widgets looking for all widgets that have "ChannelBox" in their name
+// The upshot of this is that ALL new ComboBox widgets for selecting the output channel must have "ChannelBox" in their name
+// FOR WHATEVER REASON, THIS DOES NOT WORK WITH ChannelBox. ChannelBo is sufficiently accurate
+void VehicleConfig::populateChannelComboBoxes()
+{
+    QList<QComboBox *> l = findChildren<QComboBox*>(QRegExp("\\S+ChannelBo\\S+"));
+    foreach(QComboBox *combobox, l) {
+        combobox->addItems(channelNames);
+    }
 }
 
 /**

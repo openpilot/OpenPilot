@@ -52,7 +52,7 @@ QStringList ConfigMultiRotorWidget::getChannelDescriptions()
     }
 
     // get the gui config data
-    GUIConfigDataUnion configData = GetConfigData();
+    GUIConfigDataUnion configData = getConfigData();
     multiGUISettingsStruct multi = configData.multi;
 
     if (multi.VTOLMotorN > 0 && multi.VTOLMotorN <= ConfigMultiRotorWidget::CHANNEL_NUMELEM) {
@@ -90,9 +90,12 @@ ConfigMultiRotorWidget::ConfigMultiRotorWidget(QWidget *parent) :
 {
     m_aircraft->setupUi(this);
 
+    populateChannelComboBoxes();
+
     // Setup the Multirotor picture in the Quad settings interface
     m_aircraft->quadShape->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_aircraft->quadShape->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
     QSvgRenderer *renderer = new QSvgRenderer();
     renderer->load(QString(":/configgadget/images/multirotor-shapes.svg"));
 
@@ -284,7 +287,7 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         m_aircraft->multiThrottleCurve->initLinearCurve(curveValues.count(), 0.9);
     }
 
-    GUIConfigDataUnion config = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
     multiGUISettingsStruct multi = config.multi;
 
     if (frameType == "QuadP") {
@@ -670,9 +673,9 @@ QString ConfigMultiRotorWidget::updateConfigObjectsFromWidgets()
         motorList << "VTOLMotorNW" << "VTOLMotorNE" << "VTOLMotorS";
         setupMotors(motorList);
 
-        GUIConfigDataUnion config = GetConfigData();
+        GUIConfigDataUnion config = getConfigData();
         config.multi.TRIYaw = m_aircraft->triYawChannelBox->currentIndex();
-        SetConfigData(config);
+        setConfigData(config);
 
         // Motor 1 to 6, Y6 Layout:
         //     pitch   roll    yaw
@@ -787,11 +790,10 @@ void ConfigMultiRotorWidget::setupMotors(QList<QString> motorList)
             << m_aircraft->multiMotorChannelBox5 << m_aircraft->multiMotorChannelBox6
             << m_aircraft->multiMotorChannelBox7 << m_aircraft->multiMotorChannelBox8;
 
-    GUIConfigDataUnion configData = GetConfigData();
+    GUIConfigDataUnion configData = getConfigData();
     resetActuators(&configData);
 
-    foreach (QString motor, motorList)
-    {
+    foreach (QString motor, motorList) {
         int index = mmList.takeFirst()->currentIndex();
         if (motor == QString("VTOLMotorN")) {
             configData.multi.VTOLMotorN = index;
@@ -811,7 +813,7 @@ void ConfigMultiRotorWidget::setupMotors(QList<QString> motorList)
             configData.multi.VTOLMotorNW = index;
         }
     }
-    SetConfigData(configData);
+    setConfigData(configData);
 }
 
 /**

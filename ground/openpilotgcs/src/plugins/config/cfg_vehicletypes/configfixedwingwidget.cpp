@@ -49,7 +49,7 @@ QStringList ConfigFixedWingWidget::getChannelDescriptions()
     }
 
     // get the gui config data
-    GUIConfigDataUnion configData = GetConfigData();
+    GUIConfigDataUnion configData = getConfigData();
 
     if (configData.fixedwing.FixedWingPitch1 > 0) {
         channelDesc[configData.fixedwing.FixedWingPitch1 - 1] = QString("FixedWingPitch1");
@@ -79,6 +79,8 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
         VehicleConfig(parent), m_aircraft(new Ui_FixedWingConfigWidget())
 {
     m_aircraft->setupUi(this);
+
+    populateChannelComboBoxes();
 
     QStringList fixedWingTypes;
     fixedWingTypes << "Elevator aileron rudder" << "Elevon" << "Vtail";
@@ -199,7 +201,7 @@ void ConfigFixedWingWidget::refreshWidgetsValues(QString frameType)
         m_aircraft->fixedWingThrottle->initLinearCurve(curveValues.count(), 1.0);
     }
 
-    GUIConfigDataUnion config = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
     fixedGUISettingsStruct fixed = config.fixedwing;
 
     // Then retrieve how channels are setup
@@ -283,7 +285,7 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
     }
 
     // Now setup the channels:
-    GUIConfigDataUnion config = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
     resetActuators(&config);
 
     config.fixedwing.FixedWingPitch1 = m_aircraft->fwElevator1ChannelBox->currentIndex();
@@ -293,7 +295,7 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
     config.fixedwing.FixedWingYaw1 = m_aircraft->fwRudder1ChannelBox->currentIndex();
     config.fixedwing.FixedWingThrottle = m_aircraft->fwEngineChannelBox->currentIndex();
 
-    SetConfigData(config);
+    setConfigData(config);
 
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
@@ -353,7 +355,7 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
         return false;
     }
 
-    GUIConfigDataUnion config = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
     resetActuators(&config);
 
     config.fixedwing.FixedWingRoll1 = m_aircraft->fwAileron1ChannelBox->currentIndex();
@@ -362,7 +364,7 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
     config.fixedwing.FixedWingYaw2 = m_aircraft->fwRudder2ChannelBox->currentIndex();
     config.fixedwing.FixedWingThrottle = m_aircraft->fwEngineChannelBox->currentIndex();
 
-    SetConfigData(config);
+    setConfigData(config);
 
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
@@ -423,7 +425,7 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
         return false;
     }
 	
-    GUIConfigDataUnion config = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
     resetActuators(&config);
 
     config.fixedwing.FixedWingPitch1 = m_aircraft->fwElevator1ChannelBox->currentIndex();
@@ -432,7 +434,7 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
     config.fixedwing.FixedWingRoll2 = m_aircraft->fwAileron2ChannelBox->currentIndex();
     config.fixedwing.FixedWingThrottle = m_aircraft->fwEngineChannelBox->currentIndex();
 
-    SetConfigData(config);
+    setConfigData(config);
 	    
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);

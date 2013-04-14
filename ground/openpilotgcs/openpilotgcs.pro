@@ -1,3 +1,8 @@
+#
+# Qmake project for the OpenPilot GCS.
+# Copyright (c) 2009-2013, The OpenPilot Team, http://www.openpilot.org
+#
+
 #version check qt
 contains(QT_VERSION, ^4\\.[0-5]\\..*) {
     message("Cannot build OpenPilot GCS with Qt version $${QT_VERSION}.")

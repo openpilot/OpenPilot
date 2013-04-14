@@ -40,6 +40,13 @@
 #include "hwsettings.h"
 #include "manualcontrolsettings.h"
 
+#if defined(PIOS_INCLUDE_RFM22B)
+// Forward declarations
+static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
+				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed,
+				 uint32_t min_frequency, uint32_t max_frequency, uint32_t channel_spacing);
+#endif
+
 /**
  * Sensor configurations 
  */
@@ -340,9 +347,15 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_FLASH)
 	/* Connect flash to the appropriate interface and configure it */
 	uintptr_t flash_id;
-	PIOS_Flash_Jedec_Init(&flash_id, pios_spi_telem_flash_id, 1, &flash_m25p_cfg);
+	if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_telem_flash_id, 1)) {
+		PIOS_DEBUG_Assert(0);
+	}
+
 	uintptr_t fs_id;
-	PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_m25p_cfg, &pios_jedec_flash_driver, flash_id);
+	if (PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_m25p_cfg, &pios_jedec_flash_driver, flash_id)) {
+		PIOS_DEBUG_Assert(0);
+	}
+
 #endif
 
 	/* Initialize UAVObject libraries */
@@ -628,6 +641,10 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_RFM22B)
 	uint8_t hwsettings_radioport;
 	HwSettingsRadioPortGet(&hwsettings_radioport);
+	uint8_t hwsettings_maxrfpower;
+	HwSettingsMaxRFPowerGet(&hwsettings_maxrfpower);
+	uint32_t hwsettings_deffreq;
+	HwSettingsDefaultFrequencyGet(&hwsettings_deffreq);
 	switch (hwsettings_radioport) {
 		case HWSETTINGS_RADIOPORT_DISABLED:
 			break;
@@ -639,6 +656,41 @@ void PIOS_Board_Init(void) {
 			if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg->slave_num, pios_rfm22b_cfg)) {
 				PIOS_Assert(0);
 			}
+
+			// Set the modem parameters and reinitilize the modem.
+			PIOS_RFM22B_SetInitialFrequency(pios_rfm22b_id, hwsettings_deffreq);
+			switch (hwsettings_maxrfpower)
+			{
+			case OPLINKSETTINGS_MAXRFPOWER_125:
+				PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_0);
+				break;
+			case OPLINKSETTINGS_MAXRFPOWER_16:
+				PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_1);
+				break;
+			case OPLINKSETTINGS_MAXRFPOWER_316:
+				PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_2);
+				break;
+			case OPLINKSETTINGS_MAXRFPOWER_63:
+				PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_3);
+				break;
+			case OPLINKSETTINGS_MAXRFPOWER_126:
+				PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_4);
+				break;
+			case OPLINKSETTINGS_MAXRFPOWER_25:
+				PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_5);
+				break;
+			case OPLINKSETTINGS_MAXRFPOWER_50:
+				PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_6);
+				break;
+			case OPLINKSETTINGS_MAXRFPOWER_100:
+				PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_7);
+				break;
+			default:
+				// do nothing
+				break;
+			}
+			PIOS_RFM22B_Reinit(pios_rfm22b_id);
+
 #ifdef PIOS_INCLUDE_RFM22B_COM
 			uint8_t *rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
 			uint8_t *tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
@@ -657,6 +709,10 @@ void PIOS_Board_Init(void) {
 				PIOS_Assert(0);
 			pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_OPLINK] = pios_rfm22b_rcvr_id;
 #endif
+
+                        // Set the com port configuration callback.
+                        PIOS_RFM22B_SetComConfigCallback(pios_rfm22b_id, &configureComCallback);
+
 			break;
 		}
 	}
@@ -751,6 +807,52 @@ void PIOS_Board_Init(void) {
 #endif
 
 }
+
+#if defined(PIOS_INCLUDE_RFM22B)
+/**
+ * Configure the radio com port based on a configuration event from the remote coordinator.
+ * \param[in] main_port  The main com port options
+ * \param[in] flexi_port The flexi com port options
+ * \param[in] vcp_port   The USB virtual com port options
+ * \param[in] com_speed  The com port speed
+ */
+static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
+				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed,
+				 uint32_t min_frequency, uint32_t max_frequency, uint32_t channel_spacing)
+{
+    uint32_t comBaud = 9600;
+    switch (com_speed) {
+    case OPLINKSETTINGS_COMSPEED_2400:
+        comBaud = 2400;
+        break;
+    case OPLINKSETTINGS_COMSPEED_4800:
+        comBaud = 4800;
+        break;
+    case OPLINKSETTINGS_COMSPEED_9600:
+        comBaud = 9600;
+        break;
+    case OPLINKSETTINGS_COMSPEED_19200:
+        comBaud = 19200;
+        break;
+    case OPLINKSETTINGS_COMSPEED_38400:
+        comBaud = 38400;
+        break;
+    case OPLINKSETTINGS_COMSPEED_57600:
+        comBaud = 57600;
+        break;
+    case OPLINKSETTINGS_COMSPEED_115200:
+        comBaud = 115200;
+        break;
+    }
+    if (PIOS_COM_TELEM_RF) {
+        PIOS_COM_ChangeBaud(PIOS_COM_TELEM_RF, comBaud);
+    }
+
+    // Set the frequency range.
+    PIOS_RFM22B_SetFrequencyRange(pios_rfm22b_id, min_frequency, max_frequency, channel_spacing);
+}
+
+#endif
 
 /**
  * @}

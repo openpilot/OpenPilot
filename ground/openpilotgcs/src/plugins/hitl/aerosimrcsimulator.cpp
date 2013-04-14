@@ -49,10 +49,11 @@ bool AeroSimRCSimulator::setupProcess()
 void AeroSimRCSimulator::setupUdpPorts(const QString &host, int inPort, int outPort)
 {
     Q_UNUSED(outPort)
-    if (inSocket->bind(QHostAddress(host), inPort))
+    if (inSocket->bind(QHostAddress(host), inPort)) {
         emit processOutput("Successfully bound to address " + host + ", port " + QString::number(inPort) + "\n");
-    else
+    } else {
         emit processOutput("Cannot bind to address " + host + ", port " + QString::number(inPort) + "\n");
+    }
 }
 
 void AeroSimRCSimulator::transmitUpdate()
@@ -79,20 +80,16 @@ void AeroSimRCSimulator::transmitUpdate()
     float yaw = -1;
     float throttle = -1;
 
-    if(flightStatusData.FlightMode == FlightStatus::FLIGHTMODE_MANUAL)
-    {
+    if (flightStatusData.FlightMode == FlightStatus::FLIGHTMODE_MANUAL) {
         // Read joystick input
-        if(flightStatusData.Armed == FlightStatus::ARMED_ARMED)
-        {
+        if (flightStatusData.Armed == FlightStatus::ARMED_ARMED) {
             // Note: Pitch sign is reversed in FG ?
             roll = manCtrlData.Roll;
             pitch = -manCtrlData.Pitch;
             yaw = manCtrlData.Yaw;
             throttle = manCtrlData.Throttle;
         }
-    }
-    else
-    {
+    } else {
         // Read ActuatorDesired from autopilot
         actData = actDesired->getData();
 
@@ -101,12 +98,13 @@ void AeroSimRCSimulator::transmitUpdate()
         yaw = actData.Yaw;
         throttle = (actData.Throttle*2.0)-1.0;
     }
-    channels[0]=roll;
-    channels[1]=pitch;
-    if(throttle<-1)
-        throttle=-1;
-    channels[2]=throttle;
-    channels[3]=yaw;
+    channels[0] = roll;
+    channels[1] = pitch;
+    if(throttle < -1) {
+        throttle = -1;
+    }
+    channels[2] = throttle;
+    channels[3] = yaw;
 
     // read flight status
     quint8 armed;
@@ -120,8 +118,9 @@ void AeroSimRCSimulator::transmitUpdate()
     QDataStream stream(&data, QIODevice::WriteOnly);
     stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
     stream << quint32(0x52434D44);      // magic header, "RCMD"
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 10; ++i) {
         stream << channels[i];          // channels
+    }
     stream << armed << mode;            // flight status
     stream << udpCounterASrecv;         // packet counter
 
@@ -143,7 +142,7 @@ void AeroSimRCSimulator::transmitUpdate()
 void AeroSimRCSimulator::processUpdate(const QByteArray &data)
 {
     // check size
-    if (data.size() > 188) {
+    if (data.size() > 192) {
         qDebug() << "!!! big datagram: " << data.size();
         return;
     }
@@ -171,7 +170,7 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     qreal  lat, lon;
     float   agl,      // world
             yaw, pitch, roll,   // model
-            volt, curr,
+            volt, curr, cons,
             rx, ry, rz, fx, fy, fz, ux, uy, uz, // matrix
             ch[AEROSIM_RCCHANNEL_NUMELEM];
 
@@ -184,7 +183,7 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     stream >> accX >> accY >> accZ;
     stream >> lat >> lon >> agl;
     stream >> yaw >> pitch >> roll;
-    stream >> volt >> curr;
+    stream >> volt >> curr >> cons;
     stream >> rx >> ry >> rz >> fx >> fy >> fz >> ux >> uy >> uz;
     stream >> ch[0] >> ch[1] >> ch[2] >> ch[3] >> ch[4] >> ch[5] >> ch[6] >> ch[7];
     stream >> udpCounterASrecv;
@@ -193,10 +192,10 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     memset(&out, 0, sizeof(Output2Hardware));
 
 
-    out.delT=delT;
+    out.delT = delT;
 
     /*************************************************************************************/
-    for (int i=0; i< AEROSIM_RCCHANNEL_NUMELEM; i++){
+    for (int i=0; i< AEROSIM_RCCHANNEL_NUMELEM; i++) {
         out.rc_channel[i]=ch[i]; //Elements in rc_channel are between -1 and 1
     }
 
@@ -245,16 +244,19 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     out.groundspeed = qSqrt(velX * velX + velY * velY);
 
     /**********************************************************************************************/
-    out.dstN = posY * 1;
-    out.dstE = posX * 1;
-    out.dstD = posZ * -1;
+    out.dstN = posY;
+    out.dstE = posX;
+    out.dstD = -posZ;
 
-    out.velNorth = velY * 1;
-    out.velEast = velX * 1;
-    out.velDown = velZ * -1;
+    out.velNorth = velY;
+    out.velEast = velX;
+    out.velDown = -velZ;
+
+    out.voltage = volt;
+    out.current = curr;
+    out.consumption = cons * 1000.0;
 
     updateUAVOs(out);
-
 
 #ifdef DBG_TIMERS
     static int cntRX = 0;

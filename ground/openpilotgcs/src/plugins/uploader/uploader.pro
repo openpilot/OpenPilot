@@ -4,6 +4,9 @@ DEFINES += UPLOADER_LIBRARY
 QT += svg
 include(uploader_dependencies.pri)
 INCLUDEPATH += ../../libs/qextserialport/src
+macx {
+    QMAKE_CXXFLAGS  += -fpermissive
+}
 
 HEADERS += uploadergadget.h \
     uploadergadgetconfiguration.h \
@@ -43,6 +46,8 @@ FORMS += \
 
 RESOURCES += \
     uploader.qrc
-exists( ../../../../../build/ground/opfw_resource/opfw_resource.qrc ) {
-RESOURCES += ../../../../build/ground/opfw_resource/opfw_resource.qrc
+exists( ../../../../../build/openpilotgcs-synthetics/opfw_resource.qrc ) {
+    RESOURCES += ../../../../../build/openpilotgcs-synthetics/opfw_resource.qrc
+} else {
+    message("opfw_resource.qrc is not available, automatic firmware upgrades are disabled")
 }

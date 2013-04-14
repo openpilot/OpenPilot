@@ -285,8 +285,8 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject * obj)
     m_config->cb_outputRate2->setCurrentIndex(m_config->cb_outputRate2->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[1])));
     m_config->cb_outputRate3->setCurrentIndex(m_config->cb_outputRate3->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[2])));
     m_config->cb_outputRate4->setCurrentIndex(m_config->cb_outputRate4->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[3])));
-    m_config->cb_outputRate3->setCurrentIndex(m_config->cb_outputRate5->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[4])));
-    m_config->cb_outputRate4->setCurrentIndex(m_config->cb_outputRate6->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[5])));
+    m_config->cb_outputRate5->setCurrentIndex(m_config->cb_outputRate5->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[4])));
+    m_config->cb_outputRate6->setCurrentIndex(m_config->cb_outputRate6->findText(QString::number(actuatorSettingsData.ChannelUpdateFreq[5])));
 
     // Reset to all disabled
     m_config->chBank1->setText("-");

@@ -1,7 +1,7 @@
 Here is a list of some known unresolved issues. If an issue has JIRA ID [OP-XXX], you may track it using the
 following URL: http://bugs.openpilot.org/browse/OP-XXX
 
-+ Missing Translations, use English.
++ Only French translation is updated, use English for other locales or help with translations.
 + Radio Wizard confused by a reversed throttle, fix it on your transmitter before starting wizard.
 + Radio Wizard Throttle display does not show full range properly.
 + [Windows 8] USB Driver is broken.
@@ -17,6 +17,4 @@ following URL: http://bugs.openpilot.org/browse/OP-XXX
 + [OP-725] GCS camera stab config error message disappears too fast (but config error is cleared as it should)
 + [OP-767] GCS does not send AttitudeActual packets over serial port when GPS is connected and system is armed
 + [OP-768] GCS does not show UAV position on the map (master or next CC branches, but works in Revo branches)
-+ [OP-682] GCS crashes on firmware page. Noted on Windows and OSX platforms, difficult to reproduce.
-           Workaround: use Vehicle setup wizard to update the firmware.
 + [OP-769] Can't enter "12,45" on German system. Workaround: change GCS language (in fact, locale) to German.

@@ -24,14 +24,27 @@
 # existance by each sub-make.
 export OPENPILOT_IS_COOL := Fuck Yeah!
 
-# Set up a default goal
-.DEFAULT_GOAL := help
+# It is possible to set OPENPILOT_DL_DIR and/or OPENPILOT_TOOLS_DIR environment
+# variables to override local tools download and installation directorys. So the
+# same toolchains can be used for all working copies. Particularly useful for CI
+# server build agents, but also for local installations.
+#
+# If no OPENPILOT_* variables found, makefile internal DL_DIR and TOOLS_DIR paths
+# will be used. They still can be overriden by the make command line parameters:
+# make DL_DIR=/path/to/download/directory TOOLS_DIR=/path/to/tools/directory targets...
+
+# Function for converting Windows style slashes into Unix style
+slashfix = $(subst \,/,$(1))
+
+# Function for converting an absolute path to one relative
+# to the top of the source tree
+toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
 
 # Set up some macros for common directories within the tree
 export ROOT_DIR    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-export TOOLS_DIR   := $(ROOT_DIR)/tools
+export DL_DIR      := $(if $(OPENPILOT_DL_DIR),$(call slashfix,$(OPENPILOT_DL_DIR)),$(ROOT_DIR)/downloads)
+export TOOLS_DIR   := $(if $(OPENPILOT_TOOLS_DIR),$(call slashfix,$(OPENPILOT_TOOLS_DIR)),$(ROOT_DIR)/tools)
 export BUILD_DIR   := $(ROOT_DIR)/build
-export DL_DIR      := $(ROOT_DIR)/downloads
 export PACKAGE_DIR := $(ROOT_DIR)/build/package
 
 # Set up default build configurations (debug | release)
@@ -40,15 +53,11 @@ UAVOGEN_BUILD_CONF	:= release
 ANDROIDGCS_BUILD_CONF	:= debug
 GOOGLE_API_VERSION	:= 14
 
-# Function for converting an absolute path to one relative
-# to the top of the source tree.
-toprel = $(subst $(realpath $(ROOT_DIR))/,,$(abspath $(1)))
-
 # Clean out undesirable variables from the environment and command-line
 # to remove the chance that they will cause problems with our build
 define SANITIZE_VAR
 $(if $(filter-out undefined,$(origin $(1))),
-    $(info *NOTE*      Sanitized $(2) variable '$(1)' from $(origin $(1)))
+    $(info $(EMPTY) NOTE        Sanitized $(2) variable '$(1)' from $(origin $(1)))
     MAKEOVERRIDES = $(filter-out $(1)=%,$(MAKEOVERRIDES))
     override $(1) :=
     unexport $(1)
@@ -61,7 +70,7 @@ SANITIZE_GCC_VARS += CFLAGS CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH OBJC_INCLUDE
 $(foreach var, $(SANITIZE_GCC_VARS), $(eval $(call SANITIZE_VAR,$(var),disallowed)))
 
 # These specific variables used to be valid but now they make no sense
-SANITIZE_DEPRECATED_VARS := USE_BOOTLOADER
+SANITIZE_DEPRECATED_VARS := USE_BOOTLOADER CLEAN_BUILD
 $(foreach var, $(SANITIZE_DEPRECATED_VARS), $(eval $(call SANITIZE_VAR,$(var),deprecated)))
 
 # Make sure this isn't being run as root (no whoami on Windows, but that is ok here)
@@ -102,6 +111,7 @@ export ANT	:= ant
 export JAVAC	:= javac
 export JAR	:= jar
 export GIT	:= git
+export CURL	:= curl
 export PYTHON	:= python
 export INSTALL	:= install
 
@@ -110,64 +120,25 @@ export VERSION_INFO := $(PYTHON) "$(ROOT_DIR)/make/scripts/version-info.py" --pa
 
 # Test if quotes are needed for the echo-command
 ifeq (${shell $(ECHO) "test"}, test)
-	export QUOTE := '
+    export QUOTE := '
 # This line is just to clear out the single quote above '
 else
-	export QUOTE :=
-endif
-
-# The tools.mk uses wget to fetch tarballs or packages
-ifeq ($(shell [ -x "$(TOOLS_DIR)/bin/wget" ] && $(ECHO) "exists"), exists)
-    WGET := $(TOOLS_DIR)/bin/wget
-else
-    # not installed, hope it's in the path...
-    WGET ?= wget
+    export QUOTE :=
 endif
 
 # Include tools installers
 include $(ROOT_DIR)/make/tools.mk
 
-# Set up paths to tools
-ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    QMAKE := $(QT_SDK_QMAKE_PATH)
-else
-    # not installed, hope it's in the path...
-    QMAKE ?= qmake
-endif
-
-ifeq ($(shell [ -d "$(ARM_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    export ARM_SDK_PREFIX := $(ARM_SDK_DIR)/bin/arm-none-eabi-
-else
-    # not installed, hope it's in the path...
-    export ARM_SDK_PREFIX ?= arm-none-eabi-
-endif
-
-ifeq ($(shell [ -d "$(OPENOCD_DIR)" ] && $(ECHO) "exists"), exists)
-    export OPENOCD := $(OPENOCD_DIR)/bin/openocd
-else
-    # not installed, hope it's in the path...
-    export OPENOCD ?= openocd
-endif
-
-ifeq ($(shell [ -d "$(ANDROID_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    ANDROID    := $(ANDROID_SDK_DIR)/tools/android
-    ANDROID_DX := $(ANDROID_SDK_DIR)/platform-tools/dx
-else
-    # not installed, hope it's in the path...
-    ANDROID    ?= android
-    ANDROID_DX ?= dx
-endif
-
 # We almost need to consider autoconf/automake instead of this
 ifeq ($(UNAME), Linux)
     QT_SPEC = linux-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
+    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
 else ifeq ($(UNAME), Darwin)
     QT_SPEC = macx-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/ground/uavobjgenerator/uavobjgenerator"
+    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/uavobjgenerator"
 else
     QT_SPEC = win32-g++
-    UAVOBJGENERATOR = "$(BUILD_DIR)/ground/uavobjgenerator/$(UAVOGEN_BUILD_CONF)/uavobjgenerator.exe"
+    UAVOBJGENERATOR = "$(BUILD_DIR)/uavobjgenerator/$(UAVOGEN_BUILD_CONF)/uavobjgenerator.exe"
 endif
 
 ##############################
@@ -206,8 +177,8 @@ endif
 
 .PHONY: uavobjgenerator
 uavobjgenerator:
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/ground/$@
-	$(V1) ( cd $(BUILD_DIR)/ground/$@ && \
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/$@
+	$(V1) ( cd $(BUILD_DIR)/$@ && \
 	    $(QMAKE) $(ROOT_DIR)/ground/uavobjgenerator/uavobjgenerator.pro -spec $(QT_SPEC) -r CONFIG+="$(UAVOGEN_BUILD_CONF) $(UAVOGEN_SILENT)" && \
 	    $(MAKE) --no-print-directory -w ; \
 	)
@@ -251,6 +222,7 @@ export OPUAVTALK     := $(ROOT_DIR)/flight/targets/UAVTalk
 export HWDEFS        := $(ROOT_DIR)/flight/targets/board_hw_defs
 export DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
 export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
+export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 
 # Define supported board lists
 ALL_BOARDS    := coptercontrol pipxtreme revolution revomini osd simposix
@@ -509,7 +481,6 @@ all_ground: openpilotgcs
 .PHONY: gcs gcs_clean gcs_all_clean
 gcs: openpilotgcs
 gcs_clean: openpilotgcs_clean
-gcs_all_clean: openpilotgcs_all_clean
 
 ifeq ($(V), 1)
     GCS_SILENT :=
@@ -519,8 +490,8 @@ endif
 
 .PHONY: openpilotgcs
 openpilotgcs: uavobjects_gcs
-	$(V1) $(MKDIR) -p $(BUILD_DIR)/ground/$@/$(GCS_BUILD_CONF)
-	$(V1) ( cd $(BUILD_DIR)/ground/$@/$(GCS_BUILD_CONF) && \
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/$@_$(GCS_BUILD_CONF)
+	$(V1) ( cd $(BUILD_DIR)/$@_$(GCS_BUILD_CONF) && \
 	    $(QMAKE) $(ROOT_DIR)/ground/openpilotgcs/openpilotgcs.pro -spec $(QT_SPEC) -r CONFIG+="$(GCS_BUILD_CONF) $(GCS_SILENT)" $(GCS_QMAKE_OPTS) && \
 	    $(MAKE) -w ; \
 	)
@@ -528,12 +499,7 @@ openpilotgcs: uavobjects_gcs
 .PHONY: openpilotgcs_clean
 openpilotgcs_clean:
 	$(V0) @$(ECHO) " CLEAN      $@"
-	$(V1) [ ! -d "$(BUILD_DIR)/ground/openpilotgcs/$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/ground/openpilotgcs/$(GCS_BUILD_CONF)"
-
-.PHONY: openpilotgcs_all_clean
-openpilotgcs_all_clean:
-	$(V0) @$(ECHO) " CLEAN      $@"
-	$(V1) [ ! -d "$(BUILD_DIR)/ground/openpilotgcs" ] || $(RM) -r "$(BUILD_DIR)/ground/openpilotgcs"
+	$(V1) [ ! -d "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)"
 
 ################################
 #
@@ -755,7 +721,7 @@ $(foreach ut, $(ALL_UNITTESTS), $(eval $(call UT_TEMPLATE,$(ut))))
 # output is interleaved with the rest of the make output.
 ifneq ($(strip $(filter all_ut_run,$(MAKECMDGOALS))),)
 .NOTPARALLEL:
-    $(info *NOTE*     Parallel make disabled by all_ut_run target so we have sane console output)
+    $(info $(EMPTY) NOTE        Parallel make disabled by all_ut_run target so we have sane console output)
 endif
 
 ##############################
@@ -771,8 +737,8 @@ PACKAGE_ELF_TARGETS := $(filter     fw_simposix, $(FW_TARGETS))
 # Rules to generate GCS resources used to embed firmware binaries into the GCS.
 # They are used later by the vehicle setup wizard to update board firmware.
 # To open a firmware image use ":/firmware/fw_coptercontrol.opfw"
-OPFW_RESOURCE := $(BUILD_DIR)/ground/opfw_resource/opfw_resource.qrc
-OPFW_RESOURCE_PREFIX := ../../../
+OPFW_RESOURCE := $(OPGCSSYNTHDIR)/opfw_resource.qrc
+OPFW_RESOURCE_PREFIX := ../../
 OPFW_FILES := $(foreach fw_targ, $(PACKAGE_FW_TARGETS), $(call toprel, $(BUILD_DIR)/$(fw_targ)/$(fw_targ).opfw))
 OPFW_CONTENTS := \
 <!DOCTYPE RCC><RCC version="1.0"> \
@@ -789,9 +755,9 @@ $(OPFW_RESOURCE): $(FW_TARGETS)
 	$(V1) $(MKDIR) -p $(dir $@)
 	$(V1) $(ECHO) $(QUOTE)$(OPFW_CONTENTS)$(QUOTE) > $@
 
-# If opfw_resource is requested, GCS should depend on it
-ifneq ($(strip $(filter opfw_resource,$(MAKECMDGOALS))),)
-    $(eval openpilotgcs: | opfw_resource)
+# If opfw_resource or all firmware are requested, GCS should depend on the resource
+ifneq ($(strip $(filter opfw_resource all all_fw all_flight,$(MAKECMDGOALS))),)
+    $(eval openpilotgcs: $(OPFW_RESOURCE))
 endif
 
 # Packaging targets: package, clean_package
@@ -814,7 +780,7 @@ ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
 
     # Packaged GCS should depend on opfw_resource
     ifneq ($(strip $(filter package clean_package,$(MAKECMDGOALS))),)
-        $(eval openpilotgcs: | opfw_resource)
+        $(eval openpilotgcs: $(OPFW_RESOURCE))
     endif
 
     # Clean the build directory if clean_package is requested
@@ -869,6 +835,8 @@ build-info:
 #
 ##############################
 
+.DEFAULT_GOAL := help
+
 .PHONY: help
 help:
 	@$(ECHO)
@@ -884,6 +852,12 @@ help:
 	@$(ECHO) "     stm32flash_install   - Install the stm32flash tool for unbricking F1-based boards"
 	@$(ECHO) "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
 	@$(ECHO) "     android_sdk_install  - Install the Android SDK tools"
+	@$(ECHO) "     all_sdk_install      - Install all of above (platform-dependent)"
+	@$(ECHO)
+	@$(ECHO) "   Other tool options are:"
+	@$(ECHO) "     <tool>_version       - Display <tool> version"
+	@$(ECHO) "     <tool>_clean         - Remove installed <tool>"
+	@$(ECHO) "     <tool>_distclean     - Remove downloaded <tool> distribution file(s)"
 	@$(ECHO)
 	@$(ECHO) "   [Big Hammer]"
 	@$(ECHO) "     all                  - Generate UAVObjects, build openpilot firmware and gcs"
@@ -895,7 +869,7 @@ help:
 	@$(ECHO) "     all_clean            - Remove your build directory ($(BUILD_DIR))"
 	@$(ECHO) "     all_flight_clean     - Remove all firmware, bootloaders and bootloader updaters"
 	@$(ECHO) "     all_fw_clean         - Remove firmware for all boards"
-	@$(ECHO) "     all_bl_clean         - Remove bootlaoders for all boards"
+	@$(ECHO) "     all_bl_clean         - Remove bootloaders for all boards"
 	@$(ECHO) "     all_bu_clean         - Remove bootloader updaters for all boards"
 	@$(ECHO)
 	@$(ECHO) "     all_<board>          - Build all available images for <board>"
@@ -970,7 +944,7 @@ help:
 	@$(ECHO)
 	@$(ECHO) "   Hint: Add V=1 to your command line to see verbose build output."
 	@$(ECHO)
-	@$(ECHO) "   Note: All tools will be installed into $(TOOLS_DIR)"
-	@$(ECHO) "         All build output will be placed in $(BUILD_DIR)"
-	@$(ECHO) "         Package will be placed into $(PACKAGE_DIR)"
+	@$(ECHO) "   Notes: All tool distribution files will be downloaded into $(DL_DIR)"
+	@$(ECHO) "          All tools will be installed into $(TOOLS_DIR)"
+	@$(ECHO) "          All build output will be placed in $(BUILD_DIR)"
 	@$(ECHO)

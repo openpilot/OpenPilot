@@ -46,6 +46,12 @@
 
 #include <stdbool.h>
 
+// External functions
+void PIOS_InitUartMainPort();
+void PIOS_InitUartFlexiPort();
+void PIOS_InitPPMMainPort(bool input);
+void PIOS_InitPPMFlexiPort(bool input);
+
 // ****************
 // Private constants
 
@@ -82,6 +88,12 @@ typedef struct {
 	uint32_t UAVTalkErrors;
 	uint32_t droppedPackets;
 
+	// Should we parse UAVTalk?
+	bool parseUAVTalk;
+
+	// The current configured uart speed
+	OPLinkSettingsComSpeedOptions comSpeed;
+
 } RadioComBridgeData;
 
 // ****************
@@ -94,7 +106,9 @@ static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length);
 static int32_t RadioSendHandler(uint8_t *buf, int32_t length);
 static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte);
 static void queueEvent(xQueueHandle queue, void *obj, uint16_t instId, UAVObjEventType type);
-static void configureComCallback(OPLinkSettingsOutputConnectionOptions com_port, OPLinkSettingsComSpeedOptions com_speed);
+static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
+				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed,
+				 uint32_t min_frequency, uint32_t max_frequency, uint32_t channel_spacing);
 static void updateSettings();
 
 // ****************
@@ -109,30 +123,77 @@ static RadioComBridgeData *data;
  */
 static int32_t RadioComBridgeStart(void)
 {
-	if(data) {
+    if(data) {
 
-		// Configure the com port configuration callback
-		PIOS_RFM22B_SetComConfigCallback(pios_rfm22b_id, &configureComCallback);
+        // Configure the com port configuration callback
+        PIOS_RFM22B_SetComConfigCallback(pios_rfm22b_id, &configureComCallback);
 
-		// Set the baudrates, etc.
-		updateSettings();
+	// Get the settings.
+	OPLinkSettingsData oplinkSettings;
+	OPLinkSettingsGet(&oplinkSettings);
 
-		// Start the primary tasks for receiving/sending UAVTalk packets from the GCS.
-		xTaskCreate(telemetryTxTask, (signed char *)"telemTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
-		xTaskCreate(radioRxTask, (signed char *)"radioRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioRxTaskHandle));
-		xTaskCreate(radioTxTask, (signed char *)"radioTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioTxTaskHandle));
+        // Set the baudrates, etc.
+        bool is_coordinator = PIOS_RFM22B_IsCoordinator(pios_rfm22b_id);
+        if (is_coordinator) {
 
-		// Register the watchdog timers.
+            // Set the maximum radio RF power.
+            switch (oplinkSettings.MaxRFPower)
+            {
+            case OPLINKSETTINGS_MAXRFPOWER_125:
+                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_0);
+                break;
+            case OPLINKSETTINGS_MAXRFPOWER_16:
+                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_1);
+                break;
+            case OPLINKSETTINGS_MAXRFPOWER_316:
+                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_2);
+                break;
+            case OPLINKSETTINGS_MAXRFPOWER_63:
+                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_3);
+                break;
+            case OPLINKSETTINGS_MAXRFPOWER_126:
+                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_4);
+                break;
+            case OPLINKSETTINGS_MAXRFPOWER_25:
+                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_5);
+                break;
+            case OPLINKSETTINGS_MAXRFPOWER_50:
+                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_6);
+                break;
+            case OPLINKSETTINGS_MAXRFPOWER_100:
+                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_7);
+                break;
+	    default:
+	        // do nothing
+		break;
+            }
+
+	    // Set the frequency range.
+	    PIOS_RFM22B_SetFrequencyRange(pios_rfm22b_id, oplinkSettings.MinFrequency, oplinkSettings.MaxFrequency, oplinkSettings.ChannelSpacing);
+	    
+            // Reinitilize the modem.
+            PIOS_RFM22B_Reinit(pios_rfm22b_id);
+        }
+
+	// Set the initial frequency.
+	PIOS_RFM22B_SetInitialFrequency(pios_rfm22b_id, oplinkSettings.InitFrequency);
+
+        // Start the primary tasks for receiving/sending UAVTalk packets from the GCS.
+        xTaskCreate(telemetryTxTask, (signed char *)"telemTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
+        xTaskCreate(radioRxTask, (signed char *)"radioRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioRxTaskHandle));
+        xTaskCreate(radioTxTask, (signed char *)"radioTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioTxTaskHandle));
+
+        // Register the watchdog timers.
 #ifdef PIOS_INCLUDE_WDG
-		PIOS_WDG_RegisterFlag(PIOS_WDG_TELEMETRY);
-		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIORX);
-		PIOS_WDG_RegisterFlag(PIOS_WDG_RADIOTX);
+        PIOS_WDG_RegisterFlag(PIOS_WDG_TELEMETRY);
+        PIOS_WDG_RegisterFlag(PIOS_WDG_RADIORX);
+        PIOS_WDG_RegisterFlag(PIOS_WDG_RADIOTX);
 #endif
 
-		return 0;
-	}
+        return 0;
+    }
 
-	return -1;
+    return -1;
 }
 
 /**
@@ -149,7 +210,6 @@ static int32_t RadioComBridgeInitialize(void)
 		return -1;
 
 	// Initialize the UAVObjects that we use
-	GCSReceiverInitialize();
 	OPLinkStatusInitialize();
 	ObjectPersistenceInitialize();
 
@@ -163,11 +223,17 @@ static int32_t RadioComBridgeInitialize(void)
 	// Configure our UAVObjects for updates.
 	UAVObjConnectQueue(UAVObjGetByID(OPLINKSTATUS_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
 	UAVObjConnectQueue(UAVObjGetByID(OBJECTPERSISTENCE_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL);
+#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER)
+	UAVObjConnectQueue(UAVObjGetByID(GCSRECEIVER_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
+#endif
 
 	// Initialize the statistics.
 	data->comTxErrors = 0;
 	data->comTxRetries = 0;
 	data->UAVTalkErrors = 0;
+	data->parseUAVTalk = false;
+        data->comSpeed = OPLINKSETTINGS_COMSPEED_9600;
+        PIOS_COM_RADIO = PIOS_COM_RFM22B;
 
 	return 0;
 }
@@ -235,7 +301,7 @@ static void radioRxTask(void *parameters)
 	// Task loop
 	while (1) {
 #ifdef PIOS_INCLUDE_WDG
-		PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORX);
+                PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORX);
 #endif
 		uint8_t serial_data[1];
 		uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
@@ -259,17 +325,18 @@ static void radioTxTask(void *parameters)
 #endif
 #if defined(PIOS_INCLUDE_USB)
 		// Determine output port (USB takes priority over telemetry port)
-		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB)
-			inputPort = PIOS_COM_TELEM_USB;
+		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB_HID)
+			inputPort = PIOS_COM_TELEM_USB_HID;
 #endif /* PIOS_INCLUDE_USB */
-		if(inputPort)
-		{
+		if(inputPort) {
 			uint8_t serial_data[1];
 			uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
-			if (bytes_to_process > 0)
-				for (uint8_t i = 0; i < bytes_to_process; i++)
-					ProcessInputStream(data->inUAVTalkCon, serial_data[i]);
-		}
+			if (bytes_to_process > 0) {
+                            for (uint8_t i = 0; i < bytes_to_process; i++)
+                                ProcessInputStream(data->inUAVTalkCon, serial_data[i]);
+                        }
+		} else
+			vTaskDelay(5);
 	}
 }
 
@@ -285,8 +352,8 @@ static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length)
 	uint32_t outputPort = PIOS_COM_TELEMETRY;
 #if defined(PIOS_INCLUDE_USB)
 	// Determine output port (USB takes priority over telemetry port)
-	if (PIOS_COM_TELEM_USB && PIOS_COM_Available(PIOS_COM_TELEM_USB))
-		outputPort = PIOS_COM_TELEM_USB;
+	if (PIOS_COM_TELEM_USB_HID && PIOS_COM_Available(PIOS_COM_TELEM_USB_HID))
+		outputPort = PIOS_COM_TELEM_USB_HID;
 #endif /* PIOS_INCLUDE_USB */
 	if(outputPort)
 		return PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
@@ -303,13 +370,14 @@ static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length)
  */
 static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
 {
-	uint32_t outputPort = PIOS_COM_RADIO;
-	// Don't send any data unless the radio port is available.
-	if(outputPort && PIOS_COM_Available(outputPort))
-		return PIOS_COM_SendBuffer(outputPort, buf, length);
-	else
-		// For some reason, if this function returns failure, it prevents saving settings.
-		return length;
+    uint32_t outputPort = PIOS_COM_RADIO;
+    // Don't send any data unless the radio port is available.
+    if(outputPort && PIOS_COM_Available(outputPort)) {
+        return PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
+    } else {
+        // For some reason, if this function returns failure, it prevents saving settings.
+        return length;
+    }
 }
 
 static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte)
@@ -443,161 +511,149 @@ static void queueEvent(xQueueHandle queue, void *obj, uint16_t instId, UAVObjEve
  * \param[in] com_port  The com port to configure
  * \param[in] com_speed  The com port speed
  */
-static void configureComCallback(OPLinkSettingsOutputConnectionOptions com_port, OPLinkSettingsComSpeedOptions com_speed)
+static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
+				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed,
+				 uint32_t min_frequency, uint32_t max_frequency, uint32_t channel_spacing)
 {
 
-	// Get the settings.
-	OPLinkSettingsData oplinkSettings;
-	OPLinkSettingsGet(&oplinkSettings);
+    // Update the com baud rate
+    data->comSpeed = com_speed;
 
-	// Set the output telemetry port and speed.
-	switch (com_port)
-	{
-	case OPLINKSETTINGS_OUTPUTCONNECTION_REMOTEHID:
-		oplinkSettings.InputConnection = OPLINKSETTINGS_INPUTCONNECTION_HID;
-		break;
-	case OPLINKSETTINGS_OUTPUTCONNECTION_REMOTEVCP:
-		oplinkSettings.InputConnection = OPLINKSETTINGS_INPUTCONNECTION_VCP;
-		break;
-	case OPLINKSETTINGS_OUTPUTCONNECTION_REMOTETELEMETRY:
-		oplinkSettings.InputConnection = OPLINKSETTINGS_INPUTCONNECTION_TELEMETRY;
-		break;
-	case OPLINKSETTINGS_OUTPUTCONNECTION_REMOTEFLEXI:
-		oplinkSettings.InputConnection = OPLINKSETTINGS_INPUTCONNECTION_FLEXI;
-		break;
-	case OPLINKSETTINGS_OUTPUTCONNECTION_TELEMETRY:
-		oplinkSettings.InputConnection = OPLINKSETTINGS_INPUTCONNECTION_HID;
-		break;
-	case OPLINKSETTINGS_OUTPUTCONNECTION_FLEXI:
-		oplinkSettings.InputConnection = OPLINKSETTINGS_INPUTCONNECTION_HID;
-		break;
+    // Set the output main/flexi/vcp port and speed.
+    bool is_coordinator = PIOS_RFM22B_IsCoordinator(pios_rfm22b_id);
+    if (!is_coordinator) {
+
+        // Get the settings.
+        OPLinkSettingsData oplinkSettings;
+        OPLinkSettingsGet(&oplinkSettings);
+
+	switch (main_port) {
+	case OPLINKSETTINGS_REMOTEMAINPORT_DISABLED:
+            oplinkSettings.MainPort = OPLINKSETTINGS_MAINPORT_DISABLED;
+            break;
+	case OPLINKSETTINGS_REMOTEMAINPORT_SERIAL:
+            oplinkSettings.MainPort = OPLINKSETTINGS_MAINPORT_SERIAL;
+            break;
+	case OPLINKSETTINGS_REMOTEMAINPORT_PPM:
+            oplinkSettings.MainPort = OPLINKSETTINGS_MAINPORT_PPM;
+            break;
 	}
-	oplinkSettings.ComSpeed = com_speed;
 
-	// A non-coordinator modem should not set a remote telemetry connection.
-	oplinkSettings.OutputConnection = OPLINKSETTINGS_OUTPUTCONNECTION_REMOTEHID;
+	switch (flexi_port) {
+	case OPLINKSETTINGS_REMOTEFLEXIPORT_DISABLED:
+            oplinkSettings.FlexiPort = OPLINKSETTINGS_FLEXIPORT_DISABLED;
+            break;
+	case OPLINKSETTINGS_REMOTEFLEXIPORT_SERIAL:
+            oplinkSettings.FlexiPort = OPLINKSETTINGS_FLEXIPORT_SERIAL;
+            break;
+	case OPLINKSETTINGS_REMOTEFLEXIPORT_PPM:
+            oplinkSettings.FlexiPort = OPLINKSETTINGS_FLEXIPORT_PPM;
+            break;
+	}
 
-	// Update the OPLinkSettings object.
-	OPLinkSettingsSet(&oplinkSettings);
+	switch (vcp_port) {
+	case OPLINKSETTINGS_REMOTEVCPPORT_DISABLED:
+            oplinkSettings.VCPPort = OPLINKSETTINGS_VCPPORT_DISABLED;
+            break;
+	case OPLINKSETTINGS_REMOTEVCPPORT_SERIAL:
+            oplinkSettings.VCPPort = OPLINKSETTINGS_VCPPORT_SERIAL;
+            break;
+	}
 
-	// Perform the update.
-	updateSettings();
+	// Set the frequency range.
+	PIOS_RFM22B_SetFrequencyRange(pios_rfm22b_id, min_frequency, max_frequency, channel_spacing);
+
+        // Update the OPLinkSettings object.
+        OPLinkSettingsSet(&oplinkSettings);
+    }
+
+    // Perform the update.
+    updateSettings();
 }
 
 /**
- * Update the oplink settings, called on startup.
+ * Update the oplink settings.
  */
 static void updateSettings()
 {
+    // Get the settings.
+    OPLinkSettingsData oplinkSettings;
+    OPLinkSettingsGet(&oplinkSettings);
 
-	// Get the settings.
-	OPLinkSettingsData oplinkSettings;
-	OPLinkSettingsGet(&oplinkSettings);
+    // Configure the main port
+    bool is_coordinator = PIOS_RFM22B_IsCoordinator(pios_rfm22b_id);
+    switch (oplinkSettings.MainPort)
+    {
+    case OPLINKSETTINGS_MAINPORT_TELEMETRY:
+        data->parseUAVTalk = true;
+    case OPLINKSETTINGS_MAINPORT_SERIAL:
+        /* Configure the main port for uart serial */
+        PIOS_InitUartMainPort();
+        PIOS_COM_TELEMETRY = PIOS_COM_TELEM_UART_MAIN;
+        break;
+    case OPLINKSETTINGS_MAINPORT_PPM:
+        PIOS_InitPPMMainPort(is_coordinator);
+        break;
+    case OPLINKSETTINGS_MAINPORT_DISABLED:
+        break;
+    }
 
-	bool is_coordinator = (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
-	if (is_coordinator)
-	{
-		// Set the remote com configuration parameters
-		PIOS_RFM22B_SetRemoteComConfig(pios_rfm22b_id, oplinkSettings.OutputConnection, oplinkSettings.ComSpeed);
+    // Configure the flexi port
+    switch (oplinkSettings.FlexiPort)
+    {
+    case OPLINKSETTINGS_FLEXIPORT_TELEMETRY:
+        data->parseUAVTalk = true;
+    case OPLINKSETTINGS_FLEXIPORT_SERIAL:
+        /* Configure the flexi port as uart serial */
+        PIOS_InitUartFlexiPort();
+        PIOS_COM_TELEMETRY = PIOS_COM_TELEM_UART_FLEXI;
+        break;
+    case OPLINKSETTINGS_FLEXIPORT_PPM:
+        PIOS_InitPPMFlexiPort(is_coordinator);
+        break;
+    case OPLINKSETTINGS_FLEXIPORT_DISABLED:
+        break;
+    }
 
-		// Configure the RFM22B device as coordinator or not
-		PIOS_RFM22B_SetCoordinator(pios_rfm22b_id, true);
+    // Configure the USB VCP port
+    switch (oplinkSettings.VCPPort)
+    {
+    case OPLINKSETTINGS_VCPPORT_SERIAL:
+        PIOS_COM_TELEMETRY = PIOS_COM_TELEM_USB_VCP;
+        break;
+    case OPLINKSETTINGS_VCPPORT_DISABLED:
+        break;
+    }
 
-		// Set the frequencies.
-		PIOS_RFM22B_SetFrequencyRange(pios_rfm22b_id, oplinkSettings.MinFrequency, oplinkSettings.MaxFrequency);
-
-		// Set the maximum radio RF power.
-		switch (oplinkSettings.MaxRFPower)
-		{
-		case OPLINKSETTINGS_MAXRFPOWER_125:
-			PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_0);
-			break;
-		case OPLINKSETTINGS_MAXRFPOWER_16:
-			PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_1);
-			break;
-		case OPLINKSETTINGS_MAXRFPOWER_316:
-			PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_2);
-			break;
-		case OPLINKSETTINGS_MAXRFPOWER_63:
-			PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_3);
-			break;
-		case OPLINKSETTINGS_MAXRFPOWER_126:
-			PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_4);
-			break;
-		case OPLINKSETTINGS_MAXRFPOWER_25:
-			PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_5);
-			break;
-		case OPLINKSETTINGS_MAXRFPOWER_50:
-			PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_6);
-			break;
-		case OPLINKSETTINGS_MAXRFPOWER_100:
-			PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_7);
-			break;
-		}
-
-		// Set the radio destination ID.
-		PIOS_RFM22B_SetDestinationId(pios_rfm22b_id, oplinkSettings.PairID);
-	}
-
-	// Determine what com ports we're using.
-	switch (oplinkSettings.InputConnection)
-	{
-	case OPLINKSETTINGS_INPUTCONNECTION_VCP:
-		PIOS_COM_TELEMETRY = PIOS_COM_TELEM_VCP;
-		break;
-	case OPLINKSETTINGS_INPUTCONNECTION_TELEMETRY:
-		PIOS_COM_TELEMETRY = PIOS_COM_TELEM_UART_TELEM;
-		break;
-	case OPLINKSETTINGS_INPUTCONNECTION_FLEXI:
-		PIOS_COM_TELEMETRY = PIOS_COM_TELEM_UART_FLEXI;
-		break;
-	default:
-		PIOS_COM_TELEMETRY = 0;
-		break;
-	}
-
-	switch (oplinkSettings.OutputConnection)
-	{
-	case OPLINKSETTINGS_OUTPUTCONNECTION_FLEXI:
-		PIOS_COM_RADIO = PIOS_COM_TELEM_UART_FLEXI;
-		break;
-	case OPLINKSETTINGS_OUTPUTCONNECTION_TELEMETRY:
-		PIOS_COM_RADIO = PIOS_COM_TELEM_UART_TELEM;
-		break;
-	default:
-		PIOS_COM_RADIO = PIOS_COM_RFM22B;
-		break;
-	}
-
-	// Configure the com port speeds.
-	switch (oplinkSettings.ComSpeed) {
-	case OPLINKSETTINGS_COMSPEED_2400:
-		if (is_coordinator && PIOS_COM_RADIO)  PIOS_COM_ChangeBaud(PIOS_COM_RADIO, 2400);
-		if (PIOS_COM_TELEMETRY)  PIOS_COM_ChangeBaud(PIOS_COM_TELEMETRY, 2400);
-		break;
-	case OPLINKSETTINGS_COMSPEED_4800:
-		if (is_coordinator && PIOS_COM_RADIO)  PIOS_COM_ChangeBaud(PIOS_COM_RADIO, 4800);
-		if (PIOS_COM_TELEMETRY)  PIOS_COM_ChangeBaud(PIOS_COM_TELEMETRY, 4800);
-		break;
-	case OPLINKSETTINGS_COMSPEED_9600:
-		if (is_coordinator && PIOS_COM_RADIO)  PIOS_COM_ChangeBaud(PIOS_COM_RADIO, 9600);
-		if (PIOS_COM_TELEMETRY)  PIOS_COM_ChangeBaud(PIOS_COM_TELEMETRY, 9600);
-		break;
-	case OPLINKSETTINGS_COMSPEED_19200:
-		if (is_coordinator && PIOS_COM_RADIO)  PIOS_COM_ChangeBaud(PIOS_COM_RADIO, 19200);
-		if (PIOS_COM_TELEMETRY)  PIOS_COM_ChangeBaud(PIOS_COM_TELEMETRY, 19200);
-		break;
-	case OPLINKSETTINGS_COMSPEED_38400:
-		if (is_coordinator && PIOS_COM_RADIO)  PIOS_COM_ChangeBaud(PIOS_COM_RADIO, 38400);
-		if (PIOS_COM_TELEMETRY)  PIOS_COM_ChangeBaud(PIOS_COM_TELEMETRY, 38400);
-		break;
-	case OPLINKSETTINGS_COMSPEED_57600:
-		if (is_coordinator && PIOS_COM_RADIO)  PIOS_COM_ChangeBaud(PIOS_COM_RADIO, 57600);
-		if (PIOS_COM_TELEMETRY)  PIOS_COM_ChangeBaud(PIOS_COM_TELEMETRY, 57600);
-		break;
-	case OPLINKSETTINGS_COMSPEED_115200:
-		if (is_coordinator && PIOS_COM_RADIO)  PIOS_COM_ChangeBaud(PIOS_COM_RADIO, 115200);
-		if (PIOS_COM_TELEMETRY)  PIOS_COM_ChangeBaud(PIOS_COM_TELEMETRY, 115200);
-		break;
-	}
+    // Update the com baud rate.
+    uint32_t comBaud = 9600;
+    switch (data->comSpeed) {
+    case OPLINKSETTINGS_COMSPEED_2400:
+        comBaud = 2400;
+        break;
+    case OPLINKSETTINGS_COMSPEED_4800:
+        comBaud = 4800;
+        break;
+    case OPLINKSETTINGS_COMSPEED_9600:
+        comBaud = 9600;
+        break;
+    case OPLINKSETTINGS_COMSPEED_19200:
+        comBaud = 19200;
+        break;
+    case OPLINKSETTINGS_COMSPEED_38400:
+        comBaud = 38400;
+        break;
+    case OPLINKSETTINGS_COMSPEED_57600:
+        comBaud = 57600;
+        break;
+    case OPLINKSETTINGS_COMSPEED_115200:
+        comBaud = 115200;
+        break;
+    }
+    if (PIOS_COM_RADIO) {
+        PIOS_COM_ChangeBaud(PIOS_COM_RADIO, comBaud);
+    }
+    if (PIOS_COM_TELEMETRY) {
+        PIOS_COM_ChangeBaud(PIOS_COM_TELEMETRY, comBaud);
+    }
 }

@@ -1955,7 +1955,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 
     //sides
     write_line_outlined(l_x, l_y, l_x, l_y + size, 0, 0, 0, 1);
-    write_line_outlined(l_x + size, l_y, l_x + size, l_y +s ize, 0, 0, 0, 1);
+    write_line_outlined(l_x + size, l_y, l_x + size, l_y + size, 0, 0, 0, 1);
     //plane
     write_line_outlined(refx - 5, refy, refx + 6, refy, 0, 0, 0, 1);
     write_line_outlined(refx, refy, refx, refy - 3, 0, 0, 0, 1);

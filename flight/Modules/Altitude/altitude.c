@@ -131,8 +131,8 @@ static void altitudeTask(void *parameters)
 	
 #if defined(PIOS_INCLUDE_HCSR04)
 	SonarAltitudeData sonardata;
-	int32_t value=0,timeout=5;
-	float coeff=0.25,height_out=0,height_in=0;
+	int32_t value = 0, timeout = 5;
+	float coeff = 0.25, height_out = 0, height_in = 0;
 	if(hwsettings_rcvrport==HWSETTINGS_CC_RCVRPORT_DISABLED) {
 		PIOS_HCSR04_Trigger();
 	}
@@ -149,25 +149,23 @@ static void altitudeTask(void *parameters)
 #if defined(PIOS_INCLUDE_HCSR04)
 		// Compute the current altitude
 		if(hwsettings_rcvrport==HWSETTINGS_CC_RCVRPORT_DISABLED) {
-			if(PIOS_HCSR04_Completed())
-			{
+			if(PIOS_HCSR04_Completed()) {
 				value = PIOS_HCSR04_Get();
-				if((value>100) && (value < 15000)) //from 3.4cm to 5.1m
-				{
-					height_in = value*0.00034f/2.0f;
+				//from 3.4cm to 5.1m
+				if((value > 100) && (value < 15000)) {
+					height_in = value * 0.00034f / 2.0f;
 					height_out = (height_out * (1 - coeff)) + (height_in * coeff);
 					sonardata.Altitude = height_out; // m/us
 				}
 
 				// Update the AltitudeActual UAVObject
 				SonarAltitudeSet(&sonardata);
-				timeout=5;
+				timeout = 5;
 				PIOS_HCSR04_Trigger();
 			}
-			if(!(timeout--))
-			{
+			if(!(timeout--)) {
 				//retrigger
-				timeout=5;
+				timeout = 5;
 				PIOS_HCSR04_Trigger();
 			}
 		}

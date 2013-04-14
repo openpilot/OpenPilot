@@ -130,7 +130,7 @@ endif
 ifeq ($(DEBUG), YES)
     CFLAGS += -DDEBUG
 else
-    CFLAGS += -fdata-sections -ffunction-sections
+    CFLAGS += -ffunction-sections #-fdata-sections 
 endif
 
 # Compiler flags to generate dependency files

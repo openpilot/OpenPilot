@@ -84,6 +84,8 @@
 /* #define PIOS_INCLUDE_ETASV3 */
 /* #define PIOS_INCLUDE_HCSR04 */
 //#define PIOS_INCLUDE_SSD1308
+#define PIOS_INCLUDE_MPU6050
+#define PIOS_MPU6050_ACCEL
 
 /* PIOS receiver drivers */
 /* #define PIOS_INCLUDE_PWM */

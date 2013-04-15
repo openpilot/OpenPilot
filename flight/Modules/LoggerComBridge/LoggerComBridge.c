@@ -57,6 +57,9 @@
 #define EV_SEND_ACK 0x20
 #define EV_SEND_NACK 0x30
 
+#define SENSOR_PERIOD 4
+#define LOG_NAME "mpu6050.log"
+
 // ****************
 // Private types
 
@@ -66,6 +69,7 @@ typedef struct {
 	xTaskHandle telemetryTxTaskHandle;
 	xTaskHandle loggerRxTaskHandle;
 	xTaskHandle loggerTxTaskHandle;
+	xTaskHandle loggerMpuTaskHandle;
 
 	// The UAVTalk connection on the com side.
 	UAVTalkConnection outUAVTalkCon;
@@ -93,23 +97,88 @@ typedef struct {
 
 } LoggerComBridgeData;
 
+/**
+ * Configuration for the MPU6050 chip
+ */
+#if defined(PIOS_INCLUDE_MPU6050)
+#include "pios_mpu6050.h"
+static const struct pios_exti_cfg pios_exti_mpu6050_cfg __exti_config = {
+	.vector = PIOS_MPU6050_IRQHandler,
+	.line = EXTI_Line4,
+	.pin = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_4,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode  = GPIO_Mode_IN_FLOATING,
+		},
+	},
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel = EXTI4_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+	.exti = {
+		.init = {
+			.EXTI_Line = EXTI_Line4, // matches above GPIO pin
+			.EXTI_Mode = EXTI_Mode_Interrupt,
+			.EXTI_Trigger = EXTI_Trigger_Rising,
+			.EXTI_LineCmd = ENABLE,
+		},
+	},
+};
+
+static const struct pios_mpu6050_cfg pios_mpu6050_cfg = {
+	.exti_cfg = &pios_exti_mpu6050_cfg,
+	.Fifo_store = PIOS_MPU6050_FIFO_TEMP_OUT | PIOS_MPU6050_FIFO_GYRO_X_OUT | PIOS_MPU6050_FIFO_GYRO_Y_OUT | PIOS_MPU6050_FIFO_GYRO_Z_OUT,
+	// Clock at 8 khz, downsampled by 8 for 1khz
+	.Smpl_rate_div = 11,
+	.interrupt_cfg = PIOS_MPU6050_INT_CLR_ANYRD,
+	.interrupt_en = PIOS_MPU6050_INTEN_DATA_RDY,
+	.User_ctl = PIOS_MPU6050_USERCTL_FIFO_EN ,
+	.Pwr_mgmt_clk = PIOS_MPU6050_PWRMGMT_PLL_X_CLK,
+	.accel_range = PIOS_MPU6050_ACCEL_8G,
+	.gyro_range = PIOS_MPU6050_SCALE_500_DEG,
+	.filter = PIOS_MPU6050_LOWPASS_256_HZ,
+	.orientation = PIOS_MPU6050_TOP_180DEG
+};
+#endif /* PIOS_INCLUDE_MPU6050 */
+
+#if defined(PIOS_INCLUDE_MPU6050)
+float accels[3], gyros[3];
+float temperature;
+#endif
+
 // ****************
 // Private functions
 
 static void telemetryTxTask(void *parameters);
 static void loggerRxTask(void *parameters);
 static void loggerTxTask(void *parameters);
+static void loggerMpuTask(void *parameters);
 static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length);
 static int32_t LoggerSendHandler(uint8_t *buf, int32_t length);
 static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte);
 static void queueEvent(xQueueHandle queue, void *obj, uint16_t instId, UAVObjEventType type);
 //static void configureComCallback(OPLogSettingsOutputConnectionOptions com_port, OPLogSettingsComSpeedOptions com_speed);
 static void updateSettings();
+static int32_t updateSensors(void);
+void printFloat(float v, uint8_t decimalDigits);
 
 // ****************
 // Private variables
 
 static LoggerComBridgeData *data;
+
+int16_t intPart, fractPart;
+uint8_t sensPart;
+
+FILEINFO File;
+char Buffer[1024];
+uint32_t Cache;
 
 /**
  * Start the module
@@ -130,6 +199,9 @@ static int32_t LoggerComBridgeStart(void)
 		xTaskCreate(telemetryTxTask, (signed char *)"telemTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
 		xTaskCreate(loggerRxTask, (signed char *)"loggerRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerRxTaskHandle));
 		xTaskCreate(loggerTxTask, (signed char *)"loggerTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerTxTaskHandle));
+#if defined(PIOS_INCLUDE_MPU6050)
+		xTaskCreate(loggerMpuTask, (signed char *)"loggerMpuTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerMpuTaskHandle));
+#endif
 
 		// Register the watchdog timers.
 #ifdef PIOS_INCLUDE_WDG
@@ -137,8 +209,7 @@ static int32_t LoggerComBridgeStart(void)
 		//PIOS_WDG_RegisterFlag(PIOS_WDG_RADIORX);
 		//PIOS_WDG_RegisterFlag(PIOS_WDG_RADIOTX);
 #endif
-
-		return 0;
+	return 0;
 	}
 
 	return -1;
@@ -177,6 +248,19 @@ static int32_t LoggerComBridgeInitialize(void)
 	data->comTxErrors = 0;
 	data->comTxRetries = 0;
 	data->UAVTalkErrors = 0;
+	
+		/* Delete the file if it exists - ignore errors */
+	DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_NAME, PIOS_SDCARD_Sector);
+	if (DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_NAME, DFS_WRITE, PIOS_SDCARD_Sector, &File)) {
+		/* Error opening file */
+		return -2;
+	}
+	
+	sprintf(Buffer, "PiOS Log\r\n\r\nLog file creation completed.\r\n");
+	if (DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer))) {
+		/* Error writing to file */
+		return -3;
+	}
 
 	return 0;
 }
@@ -247,11 +331,11 @@ static void loggerRxTask(void *parameters)
 		//PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORX);
 #endif
 		uint8_t serial_data[1];
-		uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
+		uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_UART_TELEM, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
 		if (bytes_to_process > 0)
 			for (uint8_t i = 0; i < bytes_to_process; i++)
-				if (UAVTalkRelayInputStream(data->outUAVTalkCon, serial_data[i]) == UAVTALK_STATE_ERROR)
-					data->UAVTalkErrors++;
+			sprintf((char *)Buffer,"R:%u\r\n",serial_data[i]);
+			DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
 	}
 }
 
@@ -279,6 +363,32 @@ static void loggerTxTask(void *parameters)
 				for (uint8_t i = 0; i < bytes_to_process; i++)
 					ProcessInputStream(data->inUAVTalkCon, serial_data[i]);
 		}
+	}
+}
+
+/**
+ * Logger rx task.  Receive data packets from the logger and pass them on.
+ */
+static void loggerMpuTask(void *parameters)
+{
+	
+#if defined(PIOS_INCLUDE_MPU6050)
+	PIOS_MPU6050_Init(pios_i2c_flexi_adapter_id, &pios_mpu6050_cfg);
+#endif
+	
+	// Task loop
+	while (1) {
+		updateSensors();
+		printFloat(accels[0], 2);
+		sprintf((char *)Buffer,"Ax:%c%d.%d\r\n",sensPart,(int)(intPart),(int)(fractPart));
+		DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
+		printFloat(accels[1], 2);
+		sprintf((char *)Buffer,"Ay:%c%d.%d\r\n",sensPart,(int)(intPart),(int)(fractPart));
+		DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
+		printFloat(accels[2], 2);
+		sprintf((char *)Buffer,"Az:%c%d.%d\r\n",sensPart,(int)(intPart),(int)(fractPart));
+		DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
+
 	}
 }
 
@@ -448,6 +558,40 @@ static void queueEvent(xQueueHandle queue, void *obj, uint16_t instId, UAVObjEve
 }
 
 /**
+ * Get an update from the sensors
+ * @param[in] attitudeRaw Populate the UAVO instead of saving right here
+ * @return 0 if successfull, -1 if not
+ */
+ #if defined(PIOS_INCLUDE_MPU6050)
+struct pios_mpu6050_data mpu6050_data;
+#endif
+
+static int32_t updateSensors(void)
+{
+	
+#if defined(PIOS_INCLUDE_MPU6050)
+	
+	xQueueHandle queue = PIOS_MPU6050_GetQueue();
+	
+	if(xQueueReceive(queue, (void *) &mpu6050_data, SENSOR_PERIOD) == errQUEUE_EMPTY)
+		return -1;	// Error, no data
+
+
+	gyros[0] = mpu6050_data.gyro_x * PIOS_MPU6050_GetScale();
+	gyros[1] = mpu6050_data.gyro_y * PIOS_MPU6050_GetScale();
+	gyros[2] = mpu6050_data.gyro_z * PIOS_MPU6050_GetScale();
+	
+	accels[0] = mpu6050_data.accel_x * PIOS_MPU6050_GetAccelScale();
+	accels[1] = mpu6050_data.accel_y * PIOS_MPU6050_GetAccelScale();
+	accels[2] = mpu6050_data.accel_z * PIOS_MPU6050_GetAccelScale();
+
+	temperature = 35.0f + ((float) mpu6050_data.temperature + 512.0f) / 340.0f;
+#endif
+
+	return 0;
+}
+
+/**
  * Configure the output port based on a configuration event from the remote coordinator.
  * \param[in] com_port  The com port to configure
  * \param[in] com_speed  The com port speed
@@ -564,5 +708,23 @@ static void updateSettings()
 		if (is_coordinator && PIOS_COM_RADIO)  PIOS_COM_ChangeBaud(PIOS_COM_RADIO, 115200);
 		if (PIOS_COM_TELEMETRY)  PIOS_COM_ChangeBaud(PIOS_COM_TELEMETRY, 115200);
 		break;
+	}
+}
+
+void printFloat(float v, uint8_t decimalDigits)
+{
+	uint8_t i = 1;
+	for (;decimalDigits!=0; i*=10, decimalDigits--);
+	intPart = (int16_t)v;
+	fractPart = (int16_t)((v-(float)(int16_t)v)*i);
+	if(intPart<0 || fractPart<0)
+	{
+		intPart=-intPart;
+		fractPart=-fractPart;
+		sensPart='-';
+	}
+	else
+	{
+		sensPart='+';
 	}
 }

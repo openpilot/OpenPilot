@@ -175,6 +175,12 @@
 #include <pios_mpu6000.h>
 #endif
 
+#ifdef PIOS_INCLUDE_MPU6050
+/* MPU6050 3-Axis Gyro/Accelerometer */
+/* #define PIOS_MPU6050_ACCEL */
+#include <pios_mpu6050.h>
+#endif
+
 #ifdef PIOS_INCLUDE_HMC5843
 /* HMC5843 3-Axis Digital Compass */
 #include <pios_hmc5843.h>

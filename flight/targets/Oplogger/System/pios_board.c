@@ -190,6 +190,25 @@ void PIOS_Board_Init(void) {
 	}
 #endif
 
+/* Configure the telemetry serial port */
+#ifndef PIOS_RFM22B_DEBUG_ON_TELEM
+	{
+		uint32_t pios_usart1_id;
+		if (PIOS_USART_Init(&pios_usart1_id, &pios_usart_serial_cfg)) {
+			PIOS_Assert(0);
+		}
+		uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
+		uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
+		PIOS_Assert(rx_buffer);
+		PIOS_Assert(tx_buffer);
+		if (PIOS_COM_Init(&pios_com_telem_uart_telem_id, &pios_usart_com_driver, pios_usart1_id,
+											rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
+											tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
+			PIOS_Assert(0);
+		}
+	}
+#endif
+
 	/* Configure PPM input */
 	switch (oplogSettings.PPM)	{
 #if defined(PIOS_INCLUDE_PPM)
@@ -217,6 +236,13 @@ void PIOS_Board_Init(void) {
 
 	default:
 	{
+#if defined(PIOS_INCLUDE_I2C) && defined(PIOS_INCLUDE_MPU6050)
+		{
+			if (PIOS_I2C_Init(&pios_i2c_flexi_adapter_id, &pios_i2c_flexi_adapter_cfg)) {
+				PIOS_Assert(0);
+			}
+		}
+#else	
 		/* Configure the flexi serial port if PPM not selected */
 		uint32_t pios_usart3_id;
 		if (PIOS_USART_Init(&pios_usart3_id, &pios_usart_telem_flexi_cfg)) {
@@ -231,6 +257,7 @@ void PIOS_Board_Init(void) {
 											tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
+#endif
 	}
 	}
 

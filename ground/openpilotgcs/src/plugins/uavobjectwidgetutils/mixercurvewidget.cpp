@@ -64,7 +64,7 @@ MixerCurveWidget::MixerCurveWidget(QWidget *parent) : QGraphicsView(parent)
     QGraphicsScene *scene = new QGraphicsScene(this);
     QSvgRenderer *renderer = new QSvgRenderer();
     plot = new QGraphicsSvgItem();
-    renderer->load(QString(":/configgadget/images/curve-bg.svg"));
+    renderer->load(QString(":/uavobjectwidgetutils/images/curve-bg.svg"));
     plot->setSharedRenderer(renderer);
     //plot->setElementId("map");
     scene->addItem(plot);

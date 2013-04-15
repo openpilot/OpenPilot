@@ -335,13 +335,13 @@ bu_$(1): bu_$(1)_opfw
 
 bu_$(1)_%: bl_$(1)_bino
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/bu_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/common/BootloaderUpdater && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/common/bootloader_updater && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(3) \
 		BUILD_TYPE=bu \
 		HWDEFSINC=$(HWDEFS)/$(1) \
-		TOPDIR=$(ROOT_DIR)/flight/targets/common/BootloaderUpdater \
+		TOPDIR=$(ROOT_DIR)/flight/targets/common/bootloader_updater \
 		OUTDIR=$(BUILD_DIR)/bu_$(1) \
 		TARGET=bu_$(1) \
 		$$*
@@ -359,13 +359,13 @@ ef_$(1): ef_$(1)_bin
 
 ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/ef_$(1)
-	$(V1) cd $(ROOT_DIR)/flight/targets/common/EntireFlash && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/common/entire_flash && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(3) \
 		BUILD_TYPE=ef \
 		DFU_CMD="$(DFUUTIL_DIR)/bin/dfu-util" \
-		TOPDIR=$(ROOT_DIR)/flight/targets/common/EntireFlash \
+		TOPDIR=$(ROOT_DIR)/flight/targets/common/entire_flash \
 		OUTDIR=$(BUILD_DIR)/ef_$(1) \
 		TARGET=ef_$(1) \
 		$$*

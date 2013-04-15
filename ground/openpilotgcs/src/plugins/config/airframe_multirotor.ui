@@ -128,7 +128,7 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QGroupBox" name="groupBox_9">
+    <widget class="QGroupBox" name="mixLevelGroupBox">
      <property name="maximumSize">
       <size>
        <width>16777215</width>
@@ -146,47 +146,8 @@
        <number>9</number>
       </property>
       <item row="0" column="0">
-       <layout class="QGridLayout" name="gridLayout_3" columnstretch="0">
-        <item row="0" column="0">
-         <widget class="QLabel" name="mrRollMixValue">
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>100</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QSlider" name="mrRollMixLevel">
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="toolTip">
-           <string>Weight of Roll mixing in percent.
-Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
-          </property>
-          <property name="maximum">
-           <number>100</number>
-          </property>
-          <property name="value">
-           <number>100</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
          <widget class="QLabel" name="label_42">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -221,28 +182,8 @@ margin:1px;</string>
           </property>
          </widget>
         </item>
-       </layout>
-      </item>
-      <item row="0" column="1">
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0">
-         <widget class="QLabel" name="mrPitchMixValue">
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>100</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QSlider" name="mrPitchMixLevel">
+        <item>
+         <widget class="QSlider" name="mrRollMixLevel">
           <property name="minimumSize">
            <size>
             <width>40</width>
@@ -250,21 +191,41 @@ margin:1px;</string>
            </size>
           </property>
           <property name="toolTip">
-           <string>Weight of Pitch mixing in percent.
+           <string>Weight of Roll mixing in percent.
 Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
           </property>
           <property name="maximum">
            <number>100</number>
           </property>
           <property name="value">
-           <number>100</number>
+           <number>50</number>
           </property>
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item>
+         <widget class="QLabel" name="mrRollMixValue">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>50</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="1">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
          <widget class="QLabel" name="label_40">
           <property name="minimumSize">
            <size>
@@ -287,12 +248,31 @@ margin:1px;</string>
           </property>
          </widget>
         </item>
-       </layout>
-      </item>
-      <item row="0" column="2">
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="0" column="0">
-         <widget class="QLabel" name="mrYawMixValue">
+        <item>
+         <widget class="QSlider" name="mrPitchMixLevel">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="toolTip">
+           <string>Weight of Pitch mixing in percent.
+Typical values are 100% for + configuration and 50% for X configuration on quads.</string>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="value">
+           <number>50</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="mrPitchMixValue">
           <property name="minimumSize">
            <size>
             <width>40</width>
@@ -307,7 +287,37 @@ margin:1px;</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+       </layout>
+      </item>
+      <item row="0" column="2">
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+          </property>
+          <property name="text">
+           <string>Yaw</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QSlider" name="mrYawMixLevel">
           <property name="minimumSize">
            <size>
@@ -333,26 +343,16 @@ Typical value is 50% for + or X configuration on quads.</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_6">
+        <item>
+         <widget class="QLabel" name="mrYawMixValue">
           <property name="minimumSize">
            <size>
             <width>40</width>
             <height>0</height>
            </size>
           </property>
-          <property name="autoFillBackground">
-           <bool>false</bool>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-          </property>
           <property name="text">
-           <string>Yaw</string>
+           <string>50</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>

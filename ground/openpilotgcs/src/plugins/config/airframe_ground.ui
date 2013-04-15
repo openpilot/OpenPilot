@@ -252,7 +252,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_30">
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_34">
+           <layout class="QVBoxLayout" name="diffSteering1Layout">
             <item>
              <widget class="QLabel" name="differentialSteeringLabel1">
               <property name="minimumSize">
@@ -263,9 +263,18 @@
               </property>
               <property name="font">
                <font>
-                <weight>50</weight>
-                <bold>false</bold>
+                <pointsize>-1</pointsize>
+                <weight>75</weight>
+                <italic>false</italic>
+                <bold>true</bold>
                </font>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
               </property>
               <property name="text">
                <string>Left %</string>
@@ -307,7 +316,7 @@
            </layout>
           </item>
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_35">
+           <layout class="QVBoxLayout" name="diffSteering2Layout">
             <item>
              <widget class="QLabel" name="differentialSteeringLabel2">
               <property name="minimumSize">
@@ -315,6 +324,13 @@
                 <width>65</width>
                 <height>0</height>
                </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
               </property>
               <property name="text">
                <string>Right %</string>

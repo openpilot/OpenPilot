@@ -201,14 +201,6 @@ export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 ALL_BOARDS    := coptercontrol oplinkmini sensortest revolution osd simposix
 ALL_BOARDS_BU := coptercontrol oplinkmini simposix
 
-# Friendly names of each board (used to find source tree)
-coptercontrol_friendly := CopterControl
-oplinkmini_friendly    := OPLinkMini
-sensortest_friendly    := SensorTest
-revolution_friendly    := Revolution
-osd_friendly           := OSD
-simposix_friendly      := SimPosix
-
 # Short names of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '
 oplinkmini_short       := 'oplm'
@@ -259,8 +251,7 @@ endif
 # TEMPLATES (used to generate build rules)
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
-# $(2) = Name of board used in source tree (e.g. CopterControl)
-# $(3) = Short name for board (e.g CC)
+# $(2) = Short name for board (e.g cc)
 define FW_TEMPLATE
 .PHONY: $(1) fw_$(1)
 $(1): fw_$(1)_opfw
@@ -269,13 +260,13 @@ fw_$(1): fw_$(1)_opfw
 fw_$(1)_%: uavobjects_flight
 	$(V1) $$(ARM_GCC_VERSION_CHECK_TEMPLATE)
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/fw_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/boards/$(2) && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/boards/$(1) && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
-		BOARD_SHORT_NAME=$(3) \
+		BOARD_SHORT_NAME=$(2) \
 		BUILD_TYPE=fw \
 		HWDEFSINC=$(HWDEFS)/$(1) \
-		TOPDIR=$(ROOT_DIR)/flight/targets/boards/$(2) \
+		TOPDIR=$(ROOT_DIR)/flight/targets/boards/$(1) \
 		OUTDIR=$(BUILD_DIR)/fw_$(1) \
 		TARGET=fw_$(1) \
 		$$*
@@ -288,7 +279,7 @@ fw_$(1)_clean:
 endef
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
-# $(2) = Name of board used in source tree (e.g. CopterControl)
+# $(2) = Short name for board (e.g cc)
 define BL_TEMPLATE
 .PHONY: bl_$(1)
 bl_$(1): bl_$(1)_bin
@@ -297,13 +288,13 @@ bl_$(1)_bino: bl_$(1)_bin
 bl_$(1)_%:
 	$(V1) $$(ARM_GCC_VERSION_CHECK_TEMPLATE)
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/bl_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/$(2) && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/$(1) && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
-		BOARD_SHORT_NAME=$(3) \
+		BOARD_SHORT_NAME=$(2) \
 		BUILD_TYPE=bl \
 		HWDEFSINC=$(HWDEFS)/$(1) \
-		TOPDIR=$(ROOT_DIR)/flight/targets/Bootloaders/$(2) \
+		TOPDIR=$(ROOT_DIR)/flight/targets/Bootloaders/$(1) \
 		OUTDIR=$(BUILD_DIR)/bl_$(1) \
 		TARGET=bl_$(1) \
 		$$*
@@ -329,6 +320,7 @@ bl_$(1)_clean:
 endef
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+# $(2) = Short name for board (e.g cc)
 define BU_TEMPLATE
 .PHONY: bu_$(1)
 bu_$(1): bu_$(1)_opfw
@@ -338,7 +330,7 @@ bu_$(1)_%: bl_$(1)_bino
 	$(V1) cd $(ROOT_DIR)/flight/targets/common/bootloader_updater && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
-		BOARD_SHORT_NAME=$(3) \
+		BOARD_SHORT_NAME=$(2) \
 		BUILD_TYPE=bu \
 		HWDEFSINC=$(HWDEFS)/$(1) \
 		TOPDIR=$(ROOT_DIR)/flight/targets/common/bootloader_updater \
@@ -353,6 +345,7 @@ bu_$(1)_clean:
 endef
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+# $(2) = Short name for board (e.g cc)
 define EF_TEMPLATE
 .PHONY: ef_$(1)
 ef_$(1): ef_$(1)_bin
@@ -362,7 +355,7 @@ ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 	$(V1) cd $(ROOT_DIR)/flight/targets/common/entire_flash && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
-		BOARD_SHORT_NAME=$(3) \
+		BOARD_SHORT_NAME=$(2) \
 		BUILD_TYPE=ef \
 		DFU_CMD="$(DFUUTIL_DIR)/bin/dfu-util" \
 		TOPDIR=$(ROOT_DIR)/flight/targets/common/entire_flash \
@@ -416,16 +409,16 @@ all_flight_clean: all_fw_clean all_bl_clean all_bu_clean all_ef_clean
 $(foreach board, $(ALL_BOARDS), $(eval $(call BOARD_PHONY_TEMPLATE,$(board))))
 
 # Expand the firmware rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call FW_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
+$(foreach board, $(ALL_BOARDS), $(eval $(call FW_TEMPLATE,$(board),$($(board)_short))))
 
 # Expand the bootloader rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
+$(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_short))))
 
 # Expand the bootloader updater rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call BU_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
+$(foreach board, $(ALL_BOARDS), $(eval $(call BU_TEMPLATE,$(board),$($(board)_short))))
 
 # Expand the entire-flash rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
+$(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_short))))
 
 .PHONY: sim_win32
 sim_win32: sim_win32_exe

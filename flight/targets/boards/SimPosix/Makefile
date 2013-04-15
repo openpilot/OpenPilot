@@ -43,13 +43,13 @@ MODULES += FirmwareIAP
 # Paths
 OPSYSTEM = ./System
 OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = ../UAVTalk
+OPUAVTALK = ../../UAVTalk
 OPUAVTALKINC = $(OPUAVTALK)/inc
-OPUAVOBJ = ../UAVObjects
+OPUAVOBJ = ../../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 PIOSINC = $(PIOS)/inc
-OPMODULEDIR = ../../Modules
-FLIGHTLIB = ../../Libraries
+OPMODULEDIR = ../../../Modules
+FLIGHTLIB = ../../../Libraries
 FLIGHTLIBINC = $(FLIGHTLIB)/inc
 MATHLIB = $(FLIGHTLIB)/math
 MATHLIBINC = $(FLIGHTLIB)/math
@@ -57,11 +57,9 @@ PIOSPOSIX = $(PIOS)/posix
 PIOSCOMMON = $(PIOS)/posix
 PIOSBOARDS = $(PIOS)/Boards
 PIOSCOMMONLIB = $(PIOS)/Common/Libraries
-OPUAVOBJ = ../UAVObjects
-OPUAVOBJINC = $(OPUAVOBJ)/inc
 BOOT = 
 BOOTINC = 
-HWDEFSINC = ../board_hw_defs/$(BOARD_NAME)
+HWDEFSINC = ../../board_hw_defs/$(BOARD_NAME)
 UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # optional component libraries
@@ -248,7 +246,7 @@ LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))
 LDFLAGS += $(MATH_LIB)
 LDFLAGS += -lc -lgcc -lpthread -lrt
 
-#Linker scripts                                                                                                                                                                                                              
+#Linker scripts
 LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
 
 

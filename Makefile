@@ -269,13 +269,13 @@ fw_$(1): fw_$(1)_opfw
 fw_$(1)_%: uavobjects_flight
 	$(V1) $$(ARM_GCC_VERSION_CHECK_TEMPLATE)
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/fw_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/$(2) && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/boards/$(2) && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(3) \
 		BUILD_TYPE=fw \
 		HWDEFSINC=$(HWDEFS)/$(1) \
-		TOPDIR=$(ROOT_DIR)/flight/targets/$(2) \
+		TOPDIR=$(ROOT_DIR)/flight/targets/boards/$(2) \
 		OUTDIR=$(BUILD_DIR)/fw_$(1) \
 		TARGET=fw_$(1) \
 		$$*

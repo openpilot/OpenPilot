@@ -22,7 +22,7 @@ endif
 
 # Paths
 TOPDIR		= .
-OPSYSTEM	= $(TOPDIR)/System
+OPSYSTEM	= $(TOPDIR)
 OPSYSTEMINC	= $(OPSYSTEM)/inc
 PIOSINC		= $(PIOS)/inc
 PIOSCOMMON	= $(PIOS)/Common

@@ -41,15 +41,15 @@ MODULES += FirmwareIAP
 #MODULES += OveroSync
 
 # Paths
-OPSYSTEM = ./System
+OPSYSTEM = .
 OPSYSTEMINC = $(OPSYSTEM)/inc
-OPUAVTALK = ../../UAVTalk
+OPUAVTALK = ../../../UAVTalk
 OPUAVTALKINC = $(OPUAVTALK)/inc
-OPUAVOBJ = ../../UAVObjects
+OPUAVOBJ = ../../../UAVObjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 PIOSINC = $(PIOS)/inc
-OPMODULEDIR = ../../../Modules
-FLIGHTLIB = ../../../Libraries
+OPMODULEDIR = ../../../../Modules
+FLIGHTLIB = ../../../../Libraries
 FLIGHTLIBINC = $(FLIGHTLIB)/inc
 MATHLIB = $(FLIGHTLIB)/math
 MATHLIBINC = $(FLIGHTLIB)/math
@@ -59,7 +59,7 @@ PIOSBOARDS = $(PIOS)/Boards
 PIOSCOMMONLIB = $(PIOS)/Common/Libraries
 BOOT = 
 BOOTINC = 
-HWDEFSINC = ../../board_hw_defs/$(BOARD_NAME)
+HWDEFSINC = ../../../board_hw_defs/$(BOARD_NAME)
 UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # optional component libraries

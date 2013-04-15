@@ -249,17 +249,23 @@ static int32_t LoggerComBridgeInitialize(void)
 	data->comTxRetries = 0;
 	data->UAVTalkErrors = 0;
 	
-		/* Delete the file if it exists - ignore errors */
+		// Delete the file if it exists - ignore errors 
 	DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_NAME, PIOS_SDCARD_Sector);
 	if (DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_NAME, DFS_WRITE, PIOS_SDCARD_Sector, &File)) {
-		/* Error opening file */
-		return -2;
+		// Error opening file 
+		//return -1;
 	}
 	
 	sprintf(Buffer, "PiOS Log\r\n\r\nLog file creation completed.\r\n");
 	if (DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer))) {
+		// Error writing to file 
+		//return -1;
+	}
+	
+	sprintf(Buffer, "------------------------------\r\nSD Card Information\r\n------------------------------\r\n");
+	if (DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer))) {
 		/* Error writing to file */
-		return -3;
+		//return -2;
 	}
 
 	return 0;
@@ -334,8 +340,10 @@ static void loggerRxTask(void *parameters)
 		uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_UART_TELEM, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
 		if (bytes_to_process > 0)
 			for (uint8_t i = 0; i < bytes_to_process; i++)
-			sprintf((char *)Buffer,"R:%u\r\n",serial_data[i]);
-			DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
+			{
+			//sprintf((char *)Buffer,"R:%u\r\n",serial_data[i]);
+			//DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
+			}
 	}
 }
 
@@ -371,6 +379,10 @@ static void loggerTxTask(void *parameters)
  */
 static void loggerMpuTask(void *parameters)
 {
+portTickType lastSysTime;
+int16_t inpart[6];
+int16_t frpart[6];
+uint8_t spart[6];
 	
 #if defined(PIOS_INCLUDE_MPU6050)
 	PIOS_MPU6050_Init(pios_i2c_flexi_adapter_id, &pios_mpu6050_cfg);
@@ -378,7 +390,39 @@ static void loggerMpuTask(void *parameters)
 	
 	// Task loop
 	while (1) {
-		updateSensors();
+		if(updateSensors()==0)
+		{
+			lastSysTime = xTaskGetTickCount();
+			printFloat(accels[0], 2);
+			inpart[0]=intPart;
+			frpart[0]=fractPart;
+			spart[0]=sensPart;
+			printFloat(accels[1], 2);
+			inpart[1]=intPart;
+			frpart[1]=fractPart;
+			spart[1]=sensPart;
+			printFloat(accels[2], 2);
+			inpart[2]=intPart;
+			frpart[2]=fractPart;
+			spart[2]=sensPart;
+			printFloat(gyros[0], 2);
+			inpart[3]=intPart;
+			frpart[3]=fractPart;
+			spart[3]=sensPart;
+			printFloat(gyros[1], 2);
+			inpart[4]=intPart;
+			frpart[4]=fractPart;
+			spart[4]=sensPart;
+			printFloat(gyros[2], 2);
+			inpart[5]=intPart;
+			frpart[5]=fractPart;
+			spart[5]=sensPart;
+			
+			sprintf((char *)Buffer,"%d : Ax:%c%d.%d, Ay:%c%d.%d, Az:%c%d.%d, Gx:%c%d.%d, Gz:%c%d.%d, Gz:%c%d.%d\r\n",(int)lastSysTime,spart[0],(int)(inpart[0]),(int)(frpart[0]),spart[1],(int)(inpart[1]),(int)(frpart[1]),spart[2],(int)(inpart[2]),(int)(frpart[2]),spart[3],(int)(inpart[3]),(int)(frpart[3]),spart[4],(int)(inpart[4]),(int)(frpart[4]),spart[5],(int)(inpart[5]),(int)(frpart[5]));
+			DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
+			//vTaskDelay(5 / portTICK_RATE_MS);
+		}
+		/*
 		printFloat(accels[0], 2);
 		sprintf((char *)Buffer,"Ax:%c%d.%d\r\n",sensPart,(int)(intPart),(int)(fractPart));
 		DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
@@ -387,7 +431,7 @@ static void loggerMpuTask(void *parameters)
 		DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
 		printFloat(accels[2], 2);
 		sprintf((char *)Buffer,"Az:%c%d.%d\r\n",sensPart,(int)(intPart),(int)(fractPart));
-		DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
+		DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));*/
 
 	}
 }

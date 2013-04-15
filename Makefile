@@ -288,13 +288,13 @@ bl_$(1)_bino: bl_$(1)_bin
 bl_$(1)_%:
 	$(V1) $$(ARM_GCC_VERSION_CHECK_TEMPLATE)
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/bl_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/$(1) && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/boards/$(1)/bootloader && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(2) \
 		BUILD_TYPE=bl \
 		HWDEFSINC=$(HWDEFS)/$(1) \
-		TOPDIR=$(ROOT_DIR)/flight/targets/Bootloaders/$(1) \
+		TOPDIR=$(ROOT_DIR)/flight/targets/boards/$(1)/bootloader \
 		OUTDIR=$(BUILD_DIR)/bl_$(1) \
 		TARGET=bl_$(1) \
 		$$*

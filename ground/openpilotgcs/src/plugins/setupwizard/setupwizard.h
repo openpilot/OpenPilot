@@ -64,9 +64,9 @@ public:
     void setRadioSetting(SetupWizard::RADIO_SETTING setting) { m_radioSetting = setting; }
     SetupWizard::RADIO_SETTING getRadioSetting() const {return m_radioSetting;}
 
-    void setLevellingBias(accelGyroBias bias) { m_levellingBias = bias; m_levellingPerformed = true; }
-    bool isCalibrationPerformed() const { return m_levellingPerformed; }
-    accelGyroBias getCalibrationBias() const { return m_levellingBias; }
+    void setLevellingBias(accelGyroBias bias) { m_calibrationBias = bias; m_calibrationPerformed = true; }
+    bool isCalibrationPerformed() const { return m_calibrationPerformed; }
+    accelGyroBias getCalibrationBias() const { return m_calibrationBias; }
 
     void setActuatorSettings(QList<actuatorChannelSettings> actuatorSettings) { m_actuatorSettings = actuatorSettings; }
     bool isMotorCalibrationPerformed() const { return m_motorCalibrationPerformed; }
@@ -90,8 +90,9 @@ private slots:
     void pageChanged(int currId);
 private:
     enum {PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
-          PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_CC_CALIBRATION, PAGE_OUTPUT_CALIBRATION,
-          PAGE_SAVE, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_REBOOT, PAGE_END, PAGE_UPDATE};
+          PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_CC_CALIBRATION,
+          PAGE_REVO_CALIBRATION, PAGE_OUTPUT_CALIBRATION, PAGE_SAVE, PAGE_SUMMARY,
+          PAGE_NOTYETIMPLEMENTED, PAGE_REBOOT, PAGE_END, PAGE_UPDATE};
     void createPages();
     bool saveHardwareSettings() const;
     bool canAutoUpdate() const;
@@ -105,8 +106,8 @@ private:
     GPS_SETTING m_gpsSetting;
     RADIO_SETTING m_radioSetting;
 
-    bool m_levellingPerformed;
-    accelGyroBias m_levellingBias;
+    bool m_calibrationPerformed;
+    accelGyroBias m_calibrationBias;
 
     bool m_motorCalibrationPerformed;
     QList<actuatorChannelSettings> m_actuatorSettings;

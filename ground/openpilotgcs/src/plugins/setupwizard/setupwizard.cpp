@@ -42,6 +42,7 @@
 #include "pages/notyetimplementedpage.h"
 #include "pages/rebootpage.h"
 #include "pages/outputcalibrationpage.h"
+#include "pages/revocalibrationpage.h"
 #include "extensionsystem/pluginmanager.h"
 #include "vehicleconfigurationhelper.h"
 #include "actuatorsettings.h"
@@ -51,7 +52,7 @@
 SetupWizard::SetupWizard(QWidget *parent) : QWizard(parent), VehicleConfigurationSource(),
     m_controllerType(CONTROLLER_UNKNOWN),
     m_vehicleType(VEHICLE_UNKNOWN), m_inputType(INPUT_UNKNOWN), m_escType(ESC_UNKNOWN),
-    m_levellingPerformed(false), m_restartNeeded(false), m_connectionManager(0)
+    m_calibrationPerformed(false), m_restartNeeded(false), m_connectionManager(0)
 {
     setWindowTitle(tr("OpenPilot Setup Wizard"));
     setOption(QWizard::IndependentPages, false);
@@ -119,10 +120,23 @@ int SetupWizard::nextId() const
             return PAGE_SUMMARY;
         case PAGE_CC_CALIBRATION:
             return PAGE_OUTPUT_CALIBRATION;
+        case PAGE_REVO_CALIBRATION:
+            return PAGE_OUTPUT_CALIBRATION;
         case PAGE_OUTPUT_CALIBRATION:
             return PAGE_SAVE;
         case PAGE_SUMMARY:
-            return PAGE_CC_CALIBRATION;
+        {
+            switch(getControllerType())
+            {
+                case CONTROLLER_CC:
+                case CONTROLLER_CC3D:
+                    return PAGE_CC_CALIBRATION;
+                case CONTROLLER_REVO:
+                    return PAGE_REVO_CALIBRATION;
+                default:
+                    return PAGE_NOTYETIMPLEMENTED;
+            }
+        }
         case PAGE_SAVE:
             return PAGE_END;
         case PAGE_NOTYETIMPLEMENTED:
@@ -276,6 +290,7 @@ void SetupWizard::createPages()
     setPage(PAGE_INPUT, new InputPage(this));
     setPage(PAGE_OUTPUT, new OutputPage(this));
     setPage(PAGE_CC_CALIBRATION, new CCCalibrationPage(this));
+    setPage(PAGE_REVO_CALIBRATION, new RevoCalibrationPage(this));
     setPage(PAGE_OUTPUT_CALIBRATION, new OutputCalibrationPage(this));
     setPage(PAGE_SUMMARY, new SummaryPage(this));
     setPage(PAGE_SAVE, new SavePage(this));

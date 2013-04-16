@@ -23,8 +23,8 @@
 override ARM_SDK_PREFIX :=
 override THUMB :=
 
+include ../board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk
-include $(ROOT_DIR)/make/boards/$(BOARD_NAME)/board-info.mk
 
 # Set developer code and compile options
 # Set to YES for debugging

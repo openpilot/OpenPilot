@@ -21,7 +21,7 @@ ifndef OPENPILOT_IS_COOL
     $(error Top level Makefile must be used to build this target)
 endif
 
-include $(ROOT_DIR)/make/boards/$(BOARD_NAME)/board-info.mk
+include ../board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk
 
 # ARM DSP library

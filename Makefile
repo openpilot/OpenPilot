@@ -190,8 +190,8 @@ uavobjects_clean:
 export PIOS          := $(ROOT_DIR)/flight/PiOS
 export FLIGHTLIB     := $(ROOT_DIR)/flight/Libraries
 export OPMODULEDIR   := $(ROOT_DIR)/flight/Modules
-export OPUAVOBJ      := $(ROOT_DIR)/flight/targets/UAVObjects
-export OPUAVTALK     := $(ROOT_DIR)/flight/targets/UAVTalk
+export OPUAVOBJ      := $(ROOT_DIR)/flight/uavobjects
+export OPUAVTALK     := $(ROOT_DIR)/flight/uavtalk
 export DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
 export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics

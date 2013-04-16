@@ -239,6 +239,15 @@ endif
 arm_sdk_version:
 	$(V1) $(ARM_SDK_PREFIX)gcc --version | head -n1
 
+# Template to check ARM toolchain version before building targets
+define ARM_GCC_VERSION_CHECK_TEMPLATE
+	if ! $(ARM_SDK_PREFIX)gcc --version --specs=nano.specs >/dev/null 2>&1; then \
+		$(ECHO) $(MSG_NOTICE) Please install ARM toolchain 4.7+ using \'make arm_sdk_install\' && \
+		$(ECHO) $(MSG_NOTICE) Older ARM SDKs do not support new \'--specs=nano.specs\' option && \
+		exit 1; \
+	fi
+endef
+
 ##############################
 #
 # Qt SDK

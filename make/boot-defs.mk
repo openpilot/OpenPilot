@@ -23,10 +23,10 @@ endif
 # Paths
 TOPDIR		= .
 OPSYSTEM	= $(TOPDIR)
+BOARDINC	= $(TOPDIR)/..
 OPSYSTEMINC	= $(OPSYSTEM)/inc
 PIOSINC		= $(PIOS)/inc
 PIOSCOMMON	= $(PIOS)/Common
-PIOSBOARDS	= $(PIOS)/Boards
 FLIGHTLIBINC	= $(FLIGHTLIB)/inc
 
 # ARM DSP library
@@ -87,9 +87,9 @@ ASRCARM +=
 #    Each directory must be seperated by a space.
 EXTRAINCDIRS += $(PIOS)
 EXTRAINCDIRS += $(PIOSINC)
+EXTRAINCDIRS += $(BOARDINC)
 EXTRAINCDIRS += $(FLIGHTLIBINC)
 EXTRAINCDIRS += $(PIOSCOMMON)
-EXTRAINCDIRS += $(PIOSBOARDS)
 EXTRAINCDIRS += $(OPSYSTEMINC)
 
 # List any extra directories to look for library files here.

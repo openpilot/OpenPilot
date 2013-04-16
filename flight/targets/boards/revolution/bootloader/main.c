@@ -25,15 +25,16 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-/* Bootloader Includes */
+
 #include <pios.h>
 #include <pios_board_info.h>
+#include "inc/op_dfu.h"
+#include <pios_iap.h>
+#include <fifo_buffer.h>
+#include <pios_com_msg.h>
+#include <pios_usbhook.h>	/* PIOS_USBHOOK_* */
 #include <stdbool.h>
-#include "op_dfu.h"
-#include "pios_iap.h"
-#include "fifo_buffer.h"
-#include "pios_com_msg.h"
-#include "pios_usbhook.h"	/* PIOS_USBHOOK_* */
+
 /* Prototype of PIOS_Board_Init() function */
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();

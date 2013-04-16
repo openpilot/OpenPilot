@@ -27,10 +27,19 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <pios.h>
-#include <openpilot.h>
+#include "inc/openpilot.h"
+#include <pios_board_info.h>
 #include <oplinksettings.h>
-#include <board_hw_defs.c>
+
+/*
+ * Pull in the board-specific static HW definitions.
+ * Including .c files is a bit ugly but this allows all of
+ * the HW definitions to be const and static to limit their
+ * scope.
+ *
+ * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
+ */
+#include "../board_hw_defs.c"
 
 #define PIOS_COM_TELEM_USB_RX_BUF_LEN 256
 #define PIOS_COM_TELEM_USB_TX_BUF_LEN 256

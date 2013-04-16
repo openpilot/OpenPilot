@@ -22,7 +22,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#include "dcc_stdio.h"
+#include "inc/dcc_stdio.h"
 
 #define TARGET_REQ_TRACEMSG					0x00
 #define TARGET_REQ_DEBUGMSG_ASCII			0x01

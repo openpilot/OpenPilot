@@ -35,7 +35,7 @@
 
 #define PIOS_USB_BOARD_EP_NUM 2
 
-#include "pios_usb_defs.h" 	/* struct usb_* */
+#include <pios_usb_defs.h> 	/* struct usb_* */
 
 #define PIOS_USB_BOARD_PRODUCT_ID USB_PRODUCT_ID_OPLINK
 #define PIOS_USB_BOARD_DEVICE_VER USB_OP_DEVICE_VER(USB_OP_BOARD_ID_OPLINK, USB_OP_BOARD_MODE_BL)

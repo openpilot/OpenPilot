@@ -23,10 +23,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <pios.h>
+#include "inc/openpilot.h"
 #include <pios_udp_priv.h>
 #include <pios_com_priv.h>
-#include <openpilot.h>
 #include <uavobjectsinit.h>
 
 /**

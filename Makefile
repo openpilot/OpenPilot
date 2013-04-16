@@ -192,7 +192,6 @@ export FLIGHTLIB     := $(ROOT_DIR)/flight/Libraries
 export OPMODULEDIR   := $(ROOT_DIR)/flight/Modules
 export OPUAVOBJ      := $(ROOT_DIR)/flight/targets/UAVObjects
 export OPUAVTALK     := $(ROOT_DIR)/flight/targets/UAVTalk
-export HWDEFS        := $(ROOT_DIR)/flight/targets/board_hw_defs
 export DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
 export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
@@ -265,7 +264,6 @@ fw_$(1)_%: uavobjects_flight
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(2) \
 		BUILD_TYPE=fw \
-		HWDEFSINC=$(HWDEFS)/$(1) \
 		TOPDIR=$(ROOT_DIR)/flight/targets/boards/$(1)/firmware \
 		OUTDIR=$(BUILD_DIR)/fw_$(1) \
 		TARGET=fw_$(1) \
@@ -293,7 +291,6 @@ bl_$(1)_%:
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(2) \
 		BUILD_TYPE=bl \
-		HWDEFSINC=$(HWDEFS)/$(1) \
 		TOPDIR=$(ROOT_DIR)/flight/targets/boards/$(1)/bootloader \
 		OUTDIR=$(BUILD_DIR)/bl_$(1) \
 		TARGET=bl_$(1) \
@@ -332,7 +329,6 @@ bu_$(1)_%: bl_$(1)_bino
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(2) \
 		BUILD_TYPE=bu \
-		HWDEFSINC=$(HWDEFS)/$(1) \
 		TOPDIR=$(ROOT_DIR)/flight/targets/common/bootloader_updater \
 		OUTDIR=$(BUILD_DIR)/bu_$(1) \
 		TARGET=bu_$(1) \

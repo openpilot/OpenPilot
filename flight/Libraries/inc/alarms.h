@@ -28,7 +28,7 @@
 #ifndef ALARMS_H
 #define ALARMS_H
 
-#include "systemalarms.h"
+#include <systemalarms.h>
 #define SYSTEMALARMS_ALARM_DEFAULT SYSTEMALARMS_ALARM_UNINITIALISED
 
 int32_t AlarmsInitialize(void);

@@ -25,10 +25,10 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-/* Bootloader Includes */
+
 #include <pios.h>
+#include <pios_board_info.h>
 #include <stdbool.h>
-#include "pios_board_info.h"
 
 #define MAX_WRI_RETRYS 3
 /* Prototype of PIOS_Board_Init() function */

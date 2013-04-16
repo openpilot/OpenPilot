@@ -30,17 +30,17 @@
 #ifndef OPENPILOT_H
 #define OPENPILOT_H
 
-
 /* PIOS Includes */
 #include <pios.h>
 
 /* OpenPilot Libraries */
-#include "utlist.h"
-#include "uavobjectmanager.h"
-#include "eventdispatcher.h"
+#include <utlist.h>
+#include <uavobjectmanager.h>
+#include <eventdispatcher.h>
+#include <taskmonitor.h>
+#include <uavtalk.h>
+
 #include "alarms.h"
-#include "taskmonitor.h"
-#include "uavtalk.h"
 
 /* Global Functions */
 void OpenPilotInit(void);

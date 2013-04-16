@@ -23,17 +23,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Pull in the board-specific static HW definitions.
+#include <pios.h>
+#include <pios_board_info.h>
+
+/*
+ * Pull in the board-specific static HW definitions.
  * Including .c files is a bit ugly but this allows all of
  * the HW definitions to be const and static to limit their
  * scope.
  *
  * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
  */
-#include "board_hw_defs.c"
-
-#include <pios_board_info.h>
-#include <pios.h>
+#include "../board_hw_defs.c"
 
 uint32_t pios_com_telem_usb_id;
 

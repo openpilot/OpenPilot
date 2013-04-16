@@ -59,7 +59,6 @@ PIOSBOARDS = $(PIOS)/Boards
 PIOSCOMMONLIB = $(PIOS)/Common/Libraries
 BOOT = 
 BOOTINC = 
-HWDEFSINC = ../../../board_hw_defs/$(BOARD_NAME)
 UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # optional component libraries
@@ -116,7 +115,6 @@ EXTRAINCDIRS  += $(PIOSBOARDS)
 EXTRAINCDIRS  += $(CMSISDIR)
 EXTRAINCDIRS  += $(OPUAVSYNTHDIR)
 EXTRAINCDIRS  += $(BOOTINC)
-EXTRAINCDIRS  += $(HWDEFSINC)
 
 EXTRAINCDIRS += ${foreach MOD, ${MODULES}, $(OPMODULEDIR)/${MOD}/inc} ${OPMODULEDIR}/System/inc
 

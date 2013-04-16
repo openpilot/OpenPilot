@@ -24,8 +24,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include <pios_config.h>
-#include <pios_board_info.h>
 
 #define BOARD_REVISION_CC   1
 #define BOARD_REVISION_CC3D 2

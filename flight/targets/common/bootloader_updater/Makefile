@@ -20,7 +20,7 @@ ifndef OPENPILOT_IS_COOL
     $(error Top level Makefile must be used to build this target)
 endif
 
-include $(ROOT_DIR)/make/boards/$(BOARD_NAME)/board-info.mk
+include ../../boards/$(BOARD_NAME)/board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk
 
 # ARM DSP library
@@ -34,6 +34,7 @@ PIOSINC		= $(PIOS)/inc
 PIOSCOMMON	= $(PIOS)/Common
 PIOSBOARDS	= $(PIOS)/Boards
 FLIGHTLIBINC	= $(FLIGHTLIB)/inc
+HWDEFSINC	= ../../boards/$(BOARD_NAME)
 
 # List C source files here (C dependencies are automatically generated).
 # Use file-extension c for "c-only"-files
@@ -55,10 +56,10 @@ endif
 #    Each directory must be seperated by a space.
 EXTRAINCDIRS += $(PIOS)
 EXTRAINCDIRS += $(PIOSINC)
+EXTRAINCDIRS += $(HWDEFSINC)
 EXTRAINCDIRS += $(FLIGHTLIBINC)
 EXTRAINCDIRS += $(PIOSCOMMON)
 EXTRAINCDIRS += $(PIOSBOARDS)
-EXTRAINCDIRS += $(HWDEFSINC)
 EXTRAINCDIRS += $(OPSYSTEMINC)
 
 # Link: create ELF output file from object files.

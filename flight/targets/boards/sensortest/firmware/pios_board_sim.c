@@ -23,23 +23,21 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <pios.h>
+#include "inc/openpilot.h"
 #include <pios_com_priv.h>
 #include <pios_tcp_priv.h>
 #include <pios_udp_priv.h>
-#include <openpilot.h>
+#include <pios_rcvr_priv.h>
+#include <pios_gcsrcvr_priv.h>
 #include <uavobjectsinit.h>
 
-#include "accels.h"
-#include "baroaltitude.h"
-#include "gpsposition.h"
-#include "gyros.h"
-#include "gyrosbias.h"
-#include "magnetometer.h"
-#include "manualcontrolsettings.h"
-
-#include "pios_rcvr_priv.h"
-#include "pios_gcsrcvr_priv.h"
+#include <accels.h>
+#include <baroaltitude.h>
+#include <gpsposition.h>
+#include <gyros.h>
+#include <gyrosbias.h>
+#include <magnetometer.h>
+#include <manualcontrolsettings.h>
 
 void Stack_Change() {
 }

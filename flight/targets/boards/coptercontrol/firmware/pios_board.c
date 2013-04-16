@@ -25,22 +25,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Pull in the board-specific static HW definitions.
- * Including .c files is a bit ugly but this allows all of
- * the HW definitions to be const and static to limit their
- * scope.  
- *
- * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
- */
-
-#include <openpilot.h>
+#include "inc/openpilot.h"
+#include <pios_board_info.h>
 #include <uavobjectsinit.h>
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
 
-#include "board_hw_defs.c"
-
+/*
+ * Pull in the board-specific static HW definitions.
+ * Including .c files is a bit ugly but this allows all of
+ * the HW definitions to be const and static to limit their
+ * scope.
+ *
+ * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
+ */
+#include "../board_hw_defs.c"
 
 /* One slot per selectable receiver group.
  *  eg. PWM, PPM, GCS, DSMMAINPORT, DSMFLEXIPORT, SBUS
@@ -125,7 +125,6 @@ static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
 };
 #endif /* PIOS_INCLUDE_MPU6000 */
 
-#include <pios_board_info.h>
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware

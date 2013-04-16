@@ -1,5 +1,3 @@
-#include <pios_config.h>
-#include <pios_board_info.h>
 
 #if defined(PIOS_INCLUDE_LED)
 

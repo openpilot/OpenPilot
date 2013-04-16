@@ -23,22 +23,22 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Pull in the board-specific static HW definitions.
- * Including .c files is a bit ugly but this allows all of
- * the HW definitions to be const and static to limit their
- * scope.  
- *
- * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
- */
-#include "board_hw_defs.c"
-
-#include <pios.h>
-#include <fifo_buffer.h>
-#include <openpilot.h>
+#include "inc/openpilot.h"
+#include <pios_board_info.h>
 #include <uavobjectsinit.h>
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
+
+/*
+ * Pull in the board-specific static HW definitions.
+ * Including .c files is a bit ugly but this allows all of
+ * the HW definitions to be const and static to limit their
+ * scope.
+ *
+ * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
+ */
+#include "../board_hw_defs.c"
 
 /* Private macro -------------------------------------------------------------*/
 #define countof(a)   (sizeof(a) / sizeof(*(a)))
@@ -46,7 +46,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 #if defined(PIOS_INCLUDE_ADC)
-#include "pios_adc_priv.h"
+#include <pios_adc_priv.h>
 void PIOS_ADC_DMC_irq_handler(void);
 void DMA2_Stream4_IRQHandler(void) __attribute__((alias("PIOS_ADC_DMC_irq_handler")));
 struct pios_adc_cfg pios_adc_cfg = {

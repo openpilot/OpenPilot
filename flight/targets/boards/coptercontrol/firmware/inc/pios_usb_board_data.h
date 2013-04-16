@@ -37,7 +37,7 @@
 
 #define PIOS_USB_BOARD_EP_NUM 4
 
-#include "pios_usb_defs.h" 	/* USB_* macros */
+#include <pios_usb_defs.h> 	/* USB_* macros */
 
 #define PIOS_USB_BOARD_PRODUCT_ID USB_PRODUCT_ID_COPTERCONTROL
 #define PIOS_USB_BOARD_DEVICE_VER USB_OP_DEVICE_VER(USB_OP_BOARD_ID_COPTERCONTROL, USB_OP_BOARD_MODE_FW)

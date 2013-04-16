@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "fonts.h"
+#include "inc/fonts.h"
 
 // Font table. Add new fonts here. The table must end with a -1 for the id.
 struct FontEntry fonts[NUM_FONTS + 1] = {

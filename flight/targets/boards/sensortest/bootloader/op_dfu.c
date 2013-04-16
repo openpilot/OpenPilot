@@ -26,13 +26,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Includes ------------------------------------------------------------------*/
-#include "pios.h"
-#include <stdbool.h>
-#include "op_dfu.h"
-#include "pios_bl_helper.h"
-#include "pios_com_msg.h"
+#include <pios.h>
 #include <pios_board_info.h>
+#include "inc/op_dfu.h"
+#include <pios_bl_helper.h>
+#include <pios_com_msg.h>
+#include <stdbool.h>
+
 //programmable devices
 Device devicesTable[10];
 uint8_t numberOfDevices = 0;

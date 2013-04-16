@@ -31,12 +31,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
-/* OpenPilot Includes */
-#include "openpilot.h"
-#include "uavobjectsinit.h"
-#include "hwsettings.h"
-#include "systemmod.h"
+#include "inc/openpilot.h"
+#include <uavobjectsinit.h>
+#include <hwsettings.h>
+#include <systemmod.h>
 
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)

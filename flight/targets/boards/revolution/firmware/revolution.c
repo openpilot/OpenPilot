@@ -32,10 +32,9 @@
  */
 
 
-/* OpenPilot Includes */
-#include "openpilot.h"
-#include "uavobjectsinit.h"
-#include "systemmod.h"
+#include "inc/openpilot.h"
+#include <systemmod.h>
+#include <uavobjectsinit.h>
 
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)

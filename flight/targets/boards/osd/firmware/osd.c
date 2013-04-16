@@ -30,12 +30,10 @@
 //#define USE_WATCHDOG                    // comment this out if you don't want to use the watchdog
 
 // *****************************************************************************
-// OpenPilot Includes
 
+#include "inc/openpilot.h"
+#include <systemmod.h>
 #include <string.h>
-
-#include "openpilot.h"
-#include "systemmod.h"
 
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)

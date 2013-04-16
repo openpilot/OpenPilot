@@ -28,10 +28,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "pios_usb_board_data.h" /* struct usb_*, USB_* */
-#include "pios_sys.h"		 /* PIOS_SYS_SerialNumberGet */
-#include "pios_usbhook.h"	 /* PIOS_USBHOOK_* */
-#include "pios_usb_util.h"	 /* PIOS_USB_UTIL_AsciiToUtf8 */
+#include "inc/pios_usb_board_data.h"	/* struct usb_*, USB_* */
+#include <pios_sys.h>			/* PIOS_SYS_SerialNumberGet */
+#include <pios_usbhook.h>		/* PIOS_USBHOOK_* */
+#include <pios_usb_util.h>		/* PIOS_USB_UTIL_AsciiToUtf8 */
 
 static const uint8_t usb_product_id[28] = {
 	sizeof(usb_product_id),

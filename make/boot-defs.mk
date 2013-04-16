@@ -45,9 +45,9 @@ endif
 # Use file-extension c for "c-only"-files
 
 ## Bootloader Core
+SRC += ../pios_usb_board_data.c
 SRC += $(OPSYSTEM)/main.c
 SRC += $(OPSYSTEM)/pios_board.c
-SRC += $(OPSYSTEM)/pios_usb_board_data.c
 SRC += $(OPSYSTEM)/op_dfu.c
 
 ## PIOS Hardware (Common)

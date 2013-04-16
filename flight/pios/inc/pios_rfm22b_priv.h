@@ -758,17 +758,7 @@ struct pios_rfm22b_dev {
 // External function definitions
 
 bool PIOS_RFM22_EXT_Int(void);
-void PIOS_RFM22B_InjectEvent(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event, bool inISR);
-
-/**
- * Validate that the device structure is valid.
- *
- * @param[in] rfm22b_dev  The RFM22B device structure pointer.
- */
-inline bool PIOS_RFM22B_Validate(struct pios_rfm22b_dev *rfm22b_dev)
-{
-    return (rfm22b_dev != NULL && rfm22b_dev->magic == PIOS_RFM22B_DEV_MAGIC);
-}
+bool PIOS_RFM22B_Validate(struct pios_rfm22b_dev *rfm22b_dev);
 
 // Global variable definitions
 

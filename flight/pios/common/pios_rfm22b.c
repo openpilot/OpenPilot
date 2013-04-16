@@ -790,6 +790,16 @@ bool PIOS_RFM22B_LinkStatus(uint32_t rfm22b_id)
     return (rfm22_isConnected(rfm22b_dev) && (rfm22b_dev->stats.link_quality > RFM22B_LINK_QUALITY_THRESHOLD));
 }
 
+/**
+ * Validate that the device structure is valid.
+ *
+ * @param[in] rfm22b_dev  The RFM22B device structure pointer.
+ */
+inline bool PIOS_RFM22B_Validate(struct pios_rfm22b_dev *rfm22b_dev)
+{
+    return (rfm22b_dev != NULL && rfm22b_dev->magic == PIOS_RFM22B_DEV_MAGIC);
+}
+
 
 /*****************************************************************************
  * The Device Control Thread

@@ -77,8 +77,8 @@ public:
     virtual VehicleConfigurationSource::GPS_SETTING getGPSSetting() const = 0;
     virtual VehicleConfigurationSource::RADIO_SETTING getRadioSetting() const = 0;
 
-    virtual bool isLevellingPerformed() const = 0;
-    virtual accelGyroBias getLevellingBias() const = 0;
+    virtual bool isCalibrationPerformed() const = 0;
+    virtual accelGyroBias getCalibrationBias() const = 0;
 
     virtual bool isMotorCalibrationPerformed() const = 0;
     virtual QList<actuatorChannelSettings> getActuatorSettings() const = 0;

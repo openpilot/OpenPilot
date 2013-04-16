@@ -29,7 +29,7 @@
 #define SETUPWIZARD_H
 
 #include <QWizard>
-#include "levellingutil.h"
+#include "cccalibrationutil.h"
 #include <coreplugin/icore.h>
 #include <coreplugin/connectionmanager.h>
 #include "vehicleconfigurationsource.h"
@@ -65,8 +65,8 @@ public:
     SetupWizard::RADIO_SETTING getRadioSetting() const {return m_radioSetting;}
 
     void setLevellingBias(accelGyroBias bias) { m_levellingBias = bias; m_levellingPerformed = true; }
-    bool isLevellingPerformed() const { return m_levellingPerformed; }
-    accelGyroBias getLevellingBias() const { return m_levellingBias; }
+    bool isCalibrationPerformed() const { return m_levellingPerformed; }
+    accelGyroBias getCalibrationBias() const { return m_levellingBias; }
 
     void setActuatorSettings(QList<actuatorChannelSettings> actuatorSettings) { m_actuatorSettings = actuatorSettings; }
     bool isMotorCalibrationPerformed() const { return m_motorCalibrationPerformed; }
@@ -90,7 +90,7 @@ private slots:
     void pageChanged(int currId);
 private:
     enum {PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
-          PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_LEVELLING, PAGE_CALIBRATION,
+          PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_CC_CALIBRATION, PAGE_OUTPUT_CALIBRATION,
           PAGE_SAVE, PAGE_SUMMARY, PAGE_NOTYETIMPLEMENTED, PAGE_REBOOT, PAGE_END, PAGE_UPDATE};
     void createPages();
     bool saveHardwareSettings() const;

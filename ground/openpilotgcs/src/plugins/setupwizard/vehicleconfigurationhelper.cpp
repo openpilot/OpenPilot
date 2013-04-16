@@ -332,9 +332,9 @@ void VehicleConfigurationHelper::applyLevellingConfiguration()
     AttitudeSettings* attitudeSettings = AttitudeSettings::GetInstance(m_uavoManager);
     Q_ASSERT(attitudeSettings);
     AttitudeSettings::DataFields data = attitudeSettings->getData();
-    if(m_configSource->isLevellingPerformed())
+    if(m_configSource->isCalibrationPerformed())
     {
-        accelGyroBias bias = m_configSource->getLevellingBias();
+        accelGyroBias bias = m_configSource->getCalibrationBias();
 
         data.AccelBias[0] += bias.m_accelerometerXBias;
         data.AccelBias[1] += bias.m_accelerometerYBias;

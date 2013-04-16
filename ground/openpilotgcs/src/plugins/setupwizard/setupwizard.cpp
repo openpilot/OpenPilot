@@ -36,7 +36,7 @@
 #include "pages/surfacepage.h"
 #include "pages/inputpage.h"
 #include "pages/outputpage.h"
-#include "pages/levellingpage.h"
+#include "pages/cccalibrationpage.h"
 #include "pages/summarypage.h"
 #include "pages/savepage.h"
 #include "pages/notyetimplementedpage.h"
@@ -117,12 +117,12 @@ int SetupWizard::nextId() const
             return PAGE_VEHICLES;
         case PAGE_OUTPUT:
             return PAGE_SUMMARY;
-        case PAGE_LEVELLING:
-            return PAGE_CALIBRATION;
-        case PAGE_CALIBRATION:
+        case PAGE_CC_CALIBRATION:
+            return PAGE_OUTPUT_CALIBRATION;
+        case PAGE_OUTPUT_CALIBRATION:
             return PAGE_SAVE;
         case PAGE_SUMMARY:
-            return PAGE_LEVELLING;
+            return PAGE_CC_CALIBRATION;
         case PAGE_SAVE:
             return PAGE_END;
         case PAGE_NOTYETIMPLEMENTED:
@@ -275,8 +275,8 @@ void SetupWizard::createPages()
     setPage(PAGE_SURFACE, new SurfacePage(this));
     setPage(PAGE_INPUT, new InputPage(this));
     setPage(PAGE_OUTPUT, new OutputPage(this));
-    setPage(PAGE_LEVELLING, new LevellingPage(this));
-    setPage(PAGE_CALIBRATION, new OutputCalibrationPage(this));
+    setPage(PAGE_CC_CALIBRATION, new CCCalibrationPage(this));
+    setPage(PAGE_OUTPUT_CALIBRATION, new OutputCalibrationPage(this));
     setPage(PAGE_SUMMARY, new SummaryPage(this));
     setPage(PAGE_SAVE, new SavePage(this));
     setPage(PAGE_REBOOT, new RebootPage(this));
@@ -295,7 +295,7 @@ void SetupWizard::createPages()
 
 void SetupWizard::customBackClicked()
 {
-    if(currentId() == PAGE_CALIBRATION) {
+    if(currentId() == PAGE_OUTPUT_CALIBRATION) {
         static_cast<OutputCalibrationPage*>(currentPage())->customBackClicked();
     }
     else {

@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       levellingpage.h
+ * @file       cccalibrationpage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup LevellingPage
+ * @addtogroup CCCalibrationPage
  * @{
  * @brief
  *****************************************************************************/
@@ -25,41 +25,41 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef LEVELLINGPAGE_H
-#define LEVELLINGPAGE_H
+#ifndef CCCALIBRATIONPAGE_H
+#define CCCALIBRATIONPAGE_H
 
 #include "abstractwizardpage.h"
-#include "levellingutil.h"
+#include "cccalibrationutil.h"
 
 namespace Ui {
-class LevellingPage;
+class CCCalibrationPage;
 }
 
-class LevellingPage : public AbstractWizardPage
+class CCCalibrationPage : public AbstractWizardPage
 {
     Q_OBJECT
 
 public:
-    explicit LevellingPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~LevellingPage();
+    explicit CCCalibrationPage(SetupWizard *wizard, QWidget *parent = 0);
+    ~CCCalibrationPage();
     bool validatePage();
     bool isComplete() const;
 
 private slots:
-    void performLevelling();
-    void levellingProgress(long current, long total);
-    void levellingDone(accelGyroBias bias);
-    void levellingTimeout(QString message);
+    void performCalibration();
+    void calibrationProgress(long current, long total);
+    void calibrationDone(accelGyroBias bias);
+    void calibrationTimeout(QString message);
 
 private:
     static const int BIAS_CYCLES = 200;
     static const int BIAS_RATE = 30;
 
-    Ui::LevellingPage *ui;
-    LevellingUtil *m_levellingUtil;
+    Ui::CCCalibrationPage *ui;
+    CCCalibrationUtil *m_calibrationUtil;
 
-    void stopLevelling();
+    void stopCalibration();
     void enableButtons(bool enable);
 };
 
-#endif // LEVELLINGPAGE_H
+#endif // CCCALIBRATIONPAGE_H

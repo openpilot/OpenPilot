@@ -68,6 +68,7 @@ else ifeq ($(UNAME), Windows)
     PYTHON_URL  := http://wiki.openpilot.org/download/attachments/18612236/python-2.7.4-windows.tar.bz2
 endif
 
+# Changing PYTHON_DIR, also update it in ground\openpilotgcs\src\app\gcsversioninfo.pri
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-4.8.4
 MINGW_DIR       := $(TOOLS_DIR)/mingw-4.4.0

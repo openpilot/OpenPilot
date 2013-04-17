@@ -276,8 +276,9 @@ int32_t PIOS_SPI_ClaimBusISR(uint32_t spi_id)
 	bool valid = PIOS_SPI_validate(spi_dev);
 	PIOS_Assert(valid)
 	
-	if (xQueueGenericReceive(( xQueueHandle ) spi_dev->busy, NULL, 0x0000 , pdFALSE ) != pdTRUE)
+	if (xSemaphoreTakeFromISR(( xQueueHandle ) spi_dev->busy, NULL) != pdTRUE){
 		return -1;
+	}
 #endif
 	return 0;
 }

@@ -26,7 +26,6 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-
 #ifndef STM3210E_INS_H_
 
 #include <stdbool.h>
@@ -35,18 +34,18 @@
 // Timers and Channels Used
 //------------------------
 /*
-Timer | Channel 1 | Channel 2 | Channel 3 | Channel 4
-------+-----------+-----------+-----------+----------
-TIM1  |           |           |           |
-TIM2  | --------------- PIOS_DELAY -----------------
-TIM3  |           |           |           |
-TIM4  |           |           |           |
-TIM5  |           |           |           |
-TIM6  |           |           |           |
-TIM7  |           |           |           |
-TIM8  |           |           |           |
-------+-----------+-----------+-----------+----------
-*/
+ Timer | Channel 1 | Channel 2 | Channel 3 | Channel 4
+ ------+-----------+-----------+-----------+----------
+ TIM1  |           |           |           |
+ TIM2  | --------------- PIOS_DELAY -----------------
+ TIM3  |           |           |           |
+ TIM4  |           |           |           |
+ TIM5  |           |           |           |
+ TIM6  |           |           |           |
+ TIM7  |           |           |           |
+ TIM8  |           |           |           |
+ ------+-----------+-----------+-----------+----------
+ */
 
 //------------------------
 // DMA Channels Used
@@ -70,7 +69,6 @@ TIM8  |           |           |           |
 #define BOARD_READABLE	true
 #define BOARD_WRITABLE	true
 #define MAX_DEL_RETRYS	3
-
 
 //------------------------
 // PIOS_LED
@@ -222,7 +220,6 @@ extern uint32_t pios_packet_handler;
 #define PIOS_IRQ_PRIO_MID                       8               // higher than RTOS
 #define PIOS_IRQ_PRIO_HIGH                      5               // for SPI, ADC, I2C etc...
 #define PIOS_IRQ_PRIO_HIGHEST                   4               // for USART etc...
-
 //------------------------
 // PIOS_RCVR
 // See also pios_board.c
@@ -295,6 +292,7 @@ extern uint32_t pios_packet_handler;
 #define PIOS_ADC_MAX_OVERSAMPLING       2
 #define PIOS_ADC_USE_ADC2               0
 #define PIOS_ADC_VOLTAGE_SCALE 3.30/4096.0
+#define PIOS_ADC_USE_TEMP_SENSOR        1
 
 //-------------------------
 // USB

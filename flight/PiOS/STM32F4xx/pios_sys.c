@@ -220,7 +220,7 @@ int32_t PIOS_SYS_Reset(void)
  */
 uint32_t PIOS_SYS_getCPUFlashSize(void)
 {
-    return ((uint32_t) MEM16(0x1fff7a22) * 1000);	// it might be possible to locate in the OTP area, but haven't looked and not documented
+    return ((uint32_t) MEM16(0x1fff7a22) * 1024);	// it might be possible to locate in the OTP area, but haven't looked and not documented
 }
 
 /**

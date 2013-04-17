@@ -34,6 +34,7 @@
 #include "pios_flashfs_logfs_priv.h"
 
 #include <stdbool.h>
+#include <stddef.h>		/* NULL */
 
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
 
@@ -41,7 +42,12 @@
  * Filesystem state data tracked in RAM
  */
 
+enum pios_flashfs_logfs_dev_magic {
+	PIOS_FLASHFS_LOGFS_DEV_MAGIC = 0x94938201,
+};
+
 struct logfs_state {
+	enum pios_flashfs_logfs_dev_magic magic;
 	const struct flashfs_logfs_cfg * cfg;
 	bool mounted;
 	uint8_t active_arena_id;
@@ -58,8 +64,6 @@ struct logfs_state {
 	uintptr_t flash_id;
 };
 
-static struct logfs_state logfs;
-
 /*
  * Internal Utility functions
  */
@@ -68,14 +72,14 @@ static struct logfs_state logfs;
  * @brief Return the offset in flash of a particular slot within an arena
  * @return address of the requested slot
  */
-static uintptr_t logfs_get_addr(uint8_t arena_id, uint16_t slot_id)
+static uintptr_t logfs_get_addr(const struct logfs_state * logfs, uint8_t arena_id, uint16_t slot_id)
 {
-	PIOS_Assert(arena_id < (logfs.cfg->total_fs_size / logfs.cfg->arena_size));
-	PIOS_Assert(slot_id < (logfs.cfg->arena_size / logfs.cfg->slot_size));
+	PIOS_Assert(arena_id < (logfs->cfg->total_fs_size / logfs->cfg->arena_size));
+	PIOS_Assert(slot_id < (logfs->cfg->arena_size / logfs->cfg->slot_size));
 
-	return (logfs.cfg->start_offset +
-		(arena_id * logfs.cfg->arena_size) +
-		(slot_id  * logfs.cfg->slot_size));
+	return (logfs->cfg->start_offset +
+		(arena_id * logfs->cfg->arena_size) +
+		(slot_id  * logfs->cfg->slot_size));
 }
 
 /*
@@ -114,27 +118,27 @@ struct arena_header {
  * @return 0 if success, < 0 on failure
  * @note Must be called while holding the flash transaction lock
  */
-static int32_t logfs_erase_arena(uint8_t arena_id)
+static int32_t logfs_erase_arena(const struct logfs_state * logfs, uint8_t arena_id)
 {
-	uintptr_t arena_addr = logfs_get_addr (arena_id, 0);
+	uintptr_t arena_addr = logfs_get_addr (logfs, arena_id, 0);
 
 	/* Erase all of the sectors in the arena */
 	for (uint8_t sector_id = 0;
-	     sector_id < (logfs.cfg->arena_size / logfs.cfg->sector_size);
+	     sector_id < (logfs->cfg->arena_size / logfs->cfg->sector_size);
 	     sector_id++) {
-		if (logfs.driver->erase_sector(logfs.flash_id,
-						arena_addr + (sector_id * logfs.cfg->sector_size))) {
+		if (logfs->driver->erase_sector(logfs->flash_id,
+						arena_addr + (sector_id * logfs->cfg->sector_size))) {
 			return -1;
 		}
 	}
 
 	/* Mark this arena as fully erased */
 	struct arena_header arena_hdr = {
-		.magic = logfs.cfg->fs_magic,
+		.magic = logfs->cfg->fs_magic,
 		.state = ARENA_STATE_ERASED,
 	};
 
-	if (logfs.driver->write_data(logfs.flash_id,
+	if (logfs->driver->write_data(logfs->flash_id,
 					arena_addr,
 					(uint8_t *)&arena_hdr,
 					sizeof(arena_hdr)) != 0) {
@@ -151,13 +155,13 @@ static int32_t logfs_erase_arena(uint8_t arena_id)
  * @note Arena must have been previously erased before calling this
  * @note Must be called while holding the flash transaction lock
  */
-static int32_t logfs_reserve_arena (uint8_t arena_id)
+static int32_t logfs_reserve_arena (const struct logfs_state * logfs, uint8_t arena_id)
 {
-	uintptr_t arena_addr = logfs_get_addr (arena_id, 0);
+	uintptr_t arena_addr = logfs_get_addr (logfs, arena_id, 0);
 
 	/* Read in the current arena header */
 	struct arena_header arena_hdr;
-	if (logfs.driver->read_data(logfs.flash_id,
+	if (logfs->driver->read_data(logfs->flash_id,
 					arena_addr,
 					(uint8_t *)&arena_hdr,
 					sizeof(arena_hdr)) != 0) {
@@ -172,7 +176,7 @@ static int32_t logfs_reserve_arena (uint8_t arena_id)
 	arena_hdr.state = ARENA_STATE_RESERVED;
 
 	/* Write the arena header back to flash */
-	if (logfs.driver->write_data(logfs.flash_id,
+	if (logfs->driver->write_data(logfs->flash_id,
 					arena_addr,
 					(uint8_t *)&arena_hdr,
 					sizeof(arena_hdr)) != 0) {
@@ -188,15 +192,15 @@ static int32_t logfs_reserve_arena (uint8_t arena_id)
  * @return 0 if success, < 0 on failure
  * @note Must be called while holding the flash transaction lock
  */
-static int32_t logfs_erase_all_arenas()
+static int32_t logfs_erase_all_arenas(const struct logfs_state * logfs)
 {
-	uint16_t num_arenas = logfs.cfg->total_fs_size / logfs.cfg->arena_size;
+	uint16_t num_arenas = logfs->cfg->total_fs_size / logfs->cfg->arena_size;
 
 	for (uint16_t arena = 0; arena < num_arenas; arena++) {
 #ifdef PIOS_LED_HEARTBEAT
 		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 #endif
-		if (logfs_erase_arena(arena) != 0)
+		if (logfs_erase_arena(logfs, arena) != 0)
 			return -1;
 	}
 
@@ -209,13 +213,13 @@ static int32_t logfs_erase_all_arenas()
  * @note Arena must have been previously erased or reserved before calling this
  * @note Must be called while holding the flash transaction lock
  */
-static int32_t logfs_activate_arena(uint8_t arena_id)
+static int32_t logfs_activate_arena(const struct logfs_state * logfs, uint8_t arena_id)
 {
-	uintptr_t arena_addr = logfs_get_addr(arena_id, 0);
+	uintptr_t arena_addr = logfs_get_addr(logfs, arena_id, 0);
 
 	/* Make sure this arena has been previously erased */
 	struct arena_header arena_hdr;
-	if (logfs.driver->read_data(logfs.flash_id,
+	if (logfs->driver->read_data(logfs->flash_id,
 					arena_addr,
 					(uint8_t *)&arena_hdr,
 					sizeof (arena_hdr)) != 0) {
@@ -230,7 +234,7 @@ static int32_t logfs_activate_arena(uint8_t arena_id)
 
 	/* Mark this arena as active */
 	arena_hdr.state = ARENA_STATE_ACTIVE;
-	if (logfs.driver->write_data(logfs.flash_id,
+	if (logfs->driver->write_data(logfs->flash_id,
 					arena_addr,
 					(uint8_t *)&arena_hdr,
 					sizeof(arena_hdr)) != 0) {
@@ -247,16 +251,16 @@ static int32_t logfs_activate_arena(uint8_t arena_id)
  * @note Arena must have been previously active before calling this
  * @note Must be called while holding the flash transaction lock
  */
-static int32_t logfs_obsolete_arena(uint8_t arena_id)
+static int32_t logfs_obsolete_arena(const struct logfs_state * logfs, uint8_t arena_id)
 {
-	uintptr_t arena_addr = logfs_get_addr (arena_id, 0);
+	uintptr_t arena_addr = logfs_get_addr (logfs, arena_id, 0);
 
 	/* We shouldn't be retiring the currently active arena */
-	PIOS_Assert(!logfs.mounted);
+	PIOS_Assert(!logfs->mounted);
 
 	/* Make sure this arena was previously active */
 	struct arena_header arena_hdr;
-	if (logfs.driver->read_data(logfs.flash_id,
+	if (logfs->driver->read_data(logfs->flash_id,
 					arena_addr,
 					(uint8_t *)&arena_hdr,
 					sizeof (arena_hdr)) != 0) {
@@ -271,7 +275,7 @@ static int32_t logfs_obsolete_arena(uint8_t arena_id)
 
 	/* Mark this arena as obsolete */
 	arena_hdr.state = ARENA_STATE_OBSOLETE;
-	if (logfs.driver->write_data(logfs.flash_id,
+	if (logfs->driver->write_data(logfs->flash_id,
 					arena_addr,
 					(uint8_t *)&arena_hdr,
 					sizeof(arena_hdr)) != 0) {
@@ -289,23 +293,23 @@ static int32_t logfs_obsolete_arena(uint8_t arena_id)
  * @return -2 if failed to read arena header
  * @note Must be called while holding the flash transaction lock
  */
-static int32_t logfs_find_active_arena()
+static int32_t logfs_find_active_arena(const struct logfs_state * logfs)
 {
 	/* Search for the lowest numbered active arena */
 	for (uint8_t arena_id = 0;
-	     arena_id < logfs.cfg->total_fs_size / logfs.cfg->arena_size;
+	     arena_id < logfs->cfg->total_fs_size / logfs->cfg->arena_size;
 	     arena_id++) {
-		uintptr_t arena_addr = logfs_get_addr (arena_id, 0);
+		uintptr_t arena_addr = logfs_get_addr (logfs, arena_id, 0);
 		/* Load the arena header */
 		struct arena_header arena_hdr;
-		if (logfs.driver->read_data(logfs.flash_id,
+		if (logfs->driver->read_data(logfs->flash_id,
 						arena_addr,
 						(uint8_t *)&arena_hdr,
 						sizeof (arena_hdr)) != 0) {
 			return -2;
 		}
 		if ((arena_hdr.state == ARENA_STATE_ACTIVE) &&
-			(arena_hdr.magic == logfs.cfg->fs_magic)) {
+			(arena_hdr.magic == logfs->cfg->fs_magic)) {
 			/* This is the first active arena */
 			return arena_id;
 		}
@@ -344,7 +348,7 @@ struct slot_header {
 } __attribute__((packed));
 
 /* NOTE: Must be called while holding the flash transaction lock */
-static int32_t logfs_raw_copy_bytes (uintptr_t src_addr, uint16_t src_size, uintptr_t dst_addr)
+static int32_t logfs_raw_copy_bytes (const struct logfs_state * logfs, uintptr_t src_addr, uint16_t src_size, uintptr_t dst_addr)
 {
 #define RAW_COPY_BLOCK_SIZE 16
 	uint8_t data_block[RAW_COPY_BLOCK_SIZE];
@@ -360,7 +364,7 @@ static int32_t logfs_raw_copy_bytes (uintptr_t src_addr, uint16_t src_size, uint
 		}
 
 		/* Read a block of data from source */
-		if (logfs.driver->read_data(logfs.flash_id,
+		if (logfs->driver->read_data(logfs->flash_id,
 						src_addr,
 						data_block,
 						blk_size) != 0) {
@@ -369,7 +373,7 @@ static int32_t logfs_raw_copy_bytes (uintptr_t src_addr, uint16_t src_size, uint
 		}
 
 		/* Write a block of data to destination */
-		if (logfs.driver->write_data(logfs.flash_id,
+		if (logfs->driver->write_data(logfs->flash_id,
 						dst_addr,
 						data_block,
 						blk_size) != 0) {
@@ -391,9 +395,9 @@ static int32_t logfs_raw_copy_bytes (uintptr_t src_addr, uint16_t src_size, uint
  * true = all slots in the arena are in the ACTIVE state (ie. garbage collection won't free anything)
  * false = some slots in the arena are either currently free or could be free'd by garbage collection
  */
-static bool logfs_fs_is_full(void)
+static bool logfs_fs_is_full(const struct logfs_state * logfs)
 {
-	return (logfs.num_active_slots == (logfs.cfg->arena_size / logfs.cfg->slot_size) - 1);
+	return (logfs->num_active_slots == (logfs->cfg->arena_size / logfs->cfg->slot_size) - 1);
 }
 
 /*
@@ -401,37 +405,37 @@ static bool logfs_fs_is_full(void)
  * true = there are no unwritten slots left in the log (garbage collection may or may not help)
  * false = there are still some entirely unused slots left in the log
  */
-static bool logfs_log_is_full(void)
+static bool logfs_log_is_full(const struct logfs_state * logfs)
 {
-	return (logfs.num_free_slots == 0);
+	return (logfs->num_free_slots == 0);
 }
 
-static int32_t logfs_unmount_log(void)
+static int32_t logfs_unmount_log(struct logfs_state * logfs)
 {
-	PIOS_Assert (logfs.mounted);
+	PIOS_Assert (logfs->mounted);
 
-	logfs.num_active_slots = 0;
-	logfs.num_free_slots   = 0;
-	logfs.mounted          = false;
+	logfs->num_active_slots = 0;
+	logfs->num_free_slots   = 0;
+	logfs->mounted          = false;
 
 	return 0;
 }
 
-static int32_t logfs_mount_log(uint8_t arena_id)
+static int32_t logfs_mount_log(struct logfs_state * logfs, uint8_t arena_id)
 {
-	PIOS_Assert (!logfs.mounted);
+	PIOS_Assert (!logfs->mounted);
 
-	logfs.num_active_slots = 0;
-	logfs.num_free_slots   = 0;
-	logfs.active_arena_id  = arena_id;
+	logfs->num_active_slots = 0;
+	logfs->num_free_slots   = 0;
+	logfs->active_arena_id  = arena_id;
 
 	/* Scan the log to find out how full it is */
 	for (uint16_t slot_id = 1;
-	     slot_id < (logfs.cfg->arena_size / logfs.cfg->slot_size);
+	     slot_id < (logfs->cfg->arena_size / logfs->cfg->slot_size);
 	     slot_id++) {
 		struct slot_header slot_hdr;
-		uintptr_t slot_addr = logfs_get_addr (logfs.active_arena_id, slot_id);
-		if (logfs.driver->read_data(logfs.flash_id,
+		uintptr_t slot_addr = logfs_get_addr (logfs, logfs->active_arena_id, slot_id);
+		if (logfs->driver->read_data(logfs->flash_id,
 						slot_addr,
 						(uint8_t *)&slot_hdr,
 						sizeof (slot_hdr)) != 0) {
@@ -443,14 +447,14 @@ static int32_t logfs_mount_log(uint8_t arena_id)
 		 * end of the arena.
 		 */
 		PIOS_Assert (slot_hdr.state == SLOT_STATE_EMPTY ||
-			logfs.num_free_slots == 0);
+			logfs->num_free_slots == 0);
 
 		switch (slot_hdr.state) {
 		case SLOT_STATE_EMPTY:
-			logfs.num_free_slots++;
+			logfs->num_free_slots++;
 			break;
 		case SLOT_STATE_ACTIVE:
-			logfs.num_active_slots++;
+			logfs->num_active_slots++;
 			break;
 		case SLOT_STATE_RESERVED:
 		case SLOT_STATE_OBSOLETE:
@@ -459,11 +463,58 @@ static int32_t logfs_mount_log(uint8_t arena_id)
 	}
 
 	/* Scan is complete, mark the arena mounted */
-	logfs.active_arena_id = arena_id;
-	logfs.mounted = true;
+	logfs->active_arena_id = arena_id;
+	logfs->mounted = true;
 
 	return 0;
 }
+
+static bool PIOS_FLASHFS_Logfs_validate(const struct logfs_state * logfs)
+{
+	return (logfs && (logfs->magic == PIOS_FLASHFS_LOGFS_DEV_MAGIC));
+}
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+static struct logfs_state * PIOS_FLASHFS_Logfs_alloc(void)
+{
+	struct logfs_state * logfs;
+
+	logfs = (struct logfs_state *)pvPortMalloc(sizeof(*logfs));
+	if (!logfs) return (NULL);
+
+	logfs->magic = PIOS_FLASHFS_LOGFS_DEV_MAGIC;
+	return(logfs);
+}
+static void PIOS_FLASHFS_Logfs_free(struct logfs_state * logfs)
+{
+	/* Invalidate the magic */
+	logfs->magic = ~PIOS_FLASHFS_LOGFS_DEV_MAGIC;
+	vPortFree(logfs);
+}
+#else
+static struct logfs_state pios_flashfs_logfs_devs[PIOS_FLASHFS_LOGFS_MAX_DEVS];
+static uint8_t pios_flashfs_logfs_num_devs;
+static struct logfs_state * PIOS_FLASHFS_Logfs_alloc(void)
+{
+	struct logfs_state * logfs;
+
+	if (pios_flashfs_logfs_num_devs >= PIOS_FLASHFS_LOGFS_MAX_DEVS) {
+		return (NULL);
+	}
+
+	logfs = &pios_flashfs_logfs_devs[pios_flashfs_logfs_num_devs++];
+	logfs->magic = PIOS_FLASHFS_LOGFS_DEV_MAGIC;
+
+	return (logfs);
+}
+static void PIOS_FLASHFS_Logfs_free(struct logfs_state * logfs)
+{
+	/* Invalidate the magic */
+	logfs->magic = ~PIOS_FLASHFS_LOGFS_DEV_MAGIC;
+
+	/* Can't free the resources with this simple allocator */
+}
+#endif
 
 /**
  * @brief Initialize the flash object setting FS
@@ -485,15 +536,23 @@ int32_t PIOS_FLASHFS_Logfs_Init(uintptr_t * fs_id, const struct flashfs_logfs_cf
 	PIOS_Assert(driver->write_data);
 	PIOS_Assert(driver->read_data);
 
-	/* Bind configuration parameters to this filesystem instance */
-	logfs.cfg      = cfg;	/* filesystem configuration */
-	logfs.driver   = driver; /* lower-level flash driver */
-	logfs.flash_id = flash_id; /* lower-level flash device id */
-	logfs.mounted  = false;
-
 	int8_t rc;
 
-	if (logfs.driver->start_transaction(logfs.flash_id) != 0) {
+	struct logfs_state * logfs;
+
+	logfs = (struct logfs_state *) PIOS_FLASHFS_Logfs_alloc();
+	if (!logfs) {
+		rc = -1;
+		goto out_exit;
+	}
+
+	/* Bind configuration parameters to this filesystem instance */
+	logfs->cfg      = cfg;	/* filesystem configuration */
+	logfs->driver   = driver; /* lower-level flash driver */
+	logfs->flash_id = flash_id; /* lower-level flash device id */
+	logfs->mounted  = false;
+
+	if (logfs->driver->start_transaction(logfs->flash_id) != 0) {
 		rc = -1;
 		goto out_exit;
 	}
@@ -502,16 +561,16 @@ int32_t PIOS_FLASHFS_Logfs_Init(uintptr_t * fs_id, const struct flashfs_logfs_cf
 	int32_t arena_id;
 	for (uint8_t try = 0; !found && try < 2; try++) {
 		/* Find the active arena */
-		arena_id = logfs_find_active_arena();
+		arena_id = logfs_find_active_arena(logfs);
 		if (arena_id >= 0) {
 			/* Found the active arena */
 			found = true;
 			break;
 		} else {
 			/* No active arena found, erase and activate arena 0 */
-			if (logfs_erase_arena(0) != 0)
+			if (logfs_erase_arena(logfs, 0) != 0)
 				break;
-			if (logfs_activate_arena(0) != 0)
+			if (logfs_activate_arena(logfs, 0) != 0)
 				break;
 		}
 	}
@@ -523,7 +582,7 @@ int32_t PIOS_FLASHFS_Logfs_Init(uintptr_t * fs_id, const struct flashfs_logfs_cf
 	}
 
 	/* We've found an active arena, mount it */
-	if (logfs_mount_log(arena_id) != 0) {
+	if (logfs_mount_log(logfs, arena_id) != 0) {
 		/* Failed to mount the log, something is broken */
 		rc = -3;
 		goto out_end_trans;
@@ -532,32 +591,50 @@ int32_t PIOS_FLASHFS_Logfs_Init(uintptr_t * fs_id, const struct flashfs_logfs_cf
 	/* Log has been mounted */
 	rc = 0;
 
-	*fs_id = (uintptr_t) &logfs;
+	*fs_id = (uintptr_t) logfs;
 
 out_end_trans:
-	logfs.driver->end_transaction(logfs.flash_id);
+	logfs->driver->end_transaction(logfs->flash_id);
+
+out_exit:
+	return rc;
+}
+
+int32_t PIOS_FLASHFS_Logfs_Destroy(uintptr_t fs_id)
+{
+	int32_t rc;
+
+	struct logfs_state * logfs = (struct logfs_state *)fs_id;
+
+	if (!PIOS_FLASHFS_Logfs_validate(logfs)) {
+		rc = -1;
+		goto out_exit;
+	}
+
+	PIOS_FLASHFS_Logfs_free(logfs);
+	rc = 0;
 
 out_exit:
 	return rc;
 }
 
 /* NOTE: Must be called while holding the flash transaction lock */
-static int32_t logfs_garbage_collect (void) {
-	PIOS_Assert (logfs.mounted);
+static int32_t logfs_garbage_collect (struct logfs_state * logfs) {
+	PIOS_Assert (logfs->mounted);
 
 	/* Source arena is the active arena */
-	uint8_t src_arena_id = logfs.active_arena_id;
+	uint8_t src_arena_id = logfs->active_arena_id;
 
 	/* Compute destination arena */
-	uint8_t dst_arena_id = (logfs.active_arena_id + 1) % (logfs.cfg->total_fs_size / logfs.cfg->arena_size);
+	uint8_t dst_arena_id = (logfs->active_arena_id + 1) % (logfs->cfg->total_fs_size / logfs->cfg->arena_size);
 
 	/* Erase destination arena */
-	if (logfs_erase_arena (dst_arena_id) != 0) {
+	if (logfs_erase_arena (logfs, dst_arena_id) != 0) {
 		return -1;
 	}
 
 	/* Reserve the destination arena so we can start filling it */
-	if (logfs_reserve_arena (dst_arena_id) != 0) {
+	if (logfs_reserve_arena (logfs, dst_arena_id) != 0) {
 		/* Unable to reserve the arena */
 		return -2;
 	}
@@ -565,11 +642,11 @@ static int32_t logfs_garbage_collect (void) {
 	/* Copy active slots from active arena to destination arena */
 	uint16_t dst_slot_id = 1;
 	for (uint16_t src_slot_id = 1;
-	     src_slot_id < (logfs.cfg->arena_size / logfs.cfg->slot_size);
+	     src_slot_id < (logfs->cfg->arena_size / logfs->cfg->slot_size);
 	     src_slot_id++) {
 		struct slot_header slot_hdr;
-		uintptr_t src_addr = logfs_get_addr (src_arena_id, src_slot_id);
-		if (logfs.driver->read_data(logfs.flash_id,
+		uintptr_t src_addr = logfs_get_addr (logfs, src_arena_id, src_slot_id);
+		if (logfs->driver->read_data(logfs->flash_id,
 						src_addr,
 						(uint8_t *)&slot_hdr,
 						sizeof (slot_hdr)) != 0) {
@@ -577,8 +654,9 @@ static int32_t logfs_garbage_collect (void) {
 		}
 
 		if (slot_hdr.state == SLOT_STATE_ACTIVE) {
-			uintptr_t dst_addr = logfs_get_addr (dst_arena_id, dst_slot_id);
-			if (logfs_raw_copy_bytes(src_addr,
+			uintptr_t dst_addr = logfs_get_addr (logfs, dst_arena_id, dst_slot_id);
+			if (logfs_raw_copy_bytes(logfs,
+							src_addr,
 							sizeof(slot_hdr) + slot_hdr.obj_size,
 							dst_addr) != 0) {
 				/* Failed to copy all bytes */
@@ -589,22 +667,22 @@ static int32_t logfs_garbage_collect (void) {
 	}
 
 	/* Activate the destination arena */
-	if (logfs_activate_arena (dst_arena_id) != 0) {
+	if (logfs_activate_arena (logfs, dst_arena_id) != 0) {
 		return -5;
 	}
 
 	/* Unmount the source arena */
-	if (logfs_unmount_log () != 0) {
+	if (logfs_unmount_log (logfs) != 0) {
 		return -6;
 	}
 
 	/* Obsolete the source arena */
-	if (logfs_obsolete_arena (src_arena_id) != 0) {
+	if (logfs_obsolete_arena (logfs, src_arena_id) != 0) {
 		return -7;
 	}
 
 	/* Mount the new arena */
-	if (logfs_mount_log (dst_arena_id) != 0) {
+	if (logfs_mount_log (logfs, dst_arena_id) != 0) {
 		return -8;
 	}
 
@@ -612,7 +690,7 @@ static int32_t logfs_garbage_collect (void) {
 }
 
 /* NOTE: Must be called while holding the flash transaction lock */
-static int16_t logfs_object_find_next (struct slot_header * slot_hdr, uint16_t * curr_slot, uint32_t obj_id, uint16_t obj_inst_id)
+static int16_t logfs_object_find_next (const struct logfs_state * logfs, struct slot_header * slot_hdr, uint16_t * curr_slot, uint32_t obj_id, uint16_t obj_inst_id)
 {
 	PIOS_Assert(slot_hdr);
 	PIOS_Assert(curr_slot);
@@ -621,11 +699,11 @@ static int16_t logfs_object_find_next (struct slot_header * slot_hdr, uint16_t *
 	if (*curr_slot == 0) *curr_slot = 1;
 
 	for (uint16_t slot_id = *curr_slot;
-	     slot_id < (logfs.cfg->arena_size / logfs.cfg->slot_size);
+	     slot_id < (logfs->cfg->arena_size / logfs->cfg->slot_size);
 	     slot_id++) {
-		uintptr_t slot_addr = logfs_get_addr (logfs.active_arena_id, slot_id);
+		uintptr_t slot_addr = logfs_get_addr (logfs, logfs->active_arena_id, slot_id);
 
-		if (logfs.driver->read_data(logfs.flash_id,
+		if (logfs->driver->read_data(logfs->flash_id,
 						slot_addr,
 						(uint8_t *)slot_hdr,
 						sizeof (*slot_hdr)) != 0) {
@@ -650,7 +728,7 @@ static int16_t logfs_object_find_next (struct slot_header * slot_hdr, uint16_t *
 
 /* NOTE: Must be called while holding the flash transaction lock */
 /* OPTIMIZE: could trust that there is at most one active version of every object and terminate the search when we find one */
-static int8_t logfs_delete_object (uint32_t obj_id, uint16_t obj_inst_id)
+static int8_t logfs_delete_object (struct logfs_state * logfs, uint32_t obj_id, uint16_t obj_inst_id)
 {
 	int8_t rc;
 
@@ -658,13 +736,13 @@ static int8_t logfs_delete_object (uint32_t obj_id, uint16_t obj_inst_id)
 	uint16_t curr_slot_id = 0;
 	do {
 		struct slot_header slot_hdr;
-		switch (logfs_object_find_next (&slot_hdr, &curr_slot_id, obj_id, obj_inst_id)) {
+		switch (logfs_object_find_next (logfs, &slot_hdr, &curr_slot_id, obj_id, obj_inst_id)) {
 		case 0:
 			/* Found a matching slot.  Obsolete it. */
 			slot_hdr.state = SLOT_STATE_OBSOLETE;
-			uintptr_t slot_addr = logfs_get_addr (logfs.active_arena_id, curr_slot_id);
+			uintptr_t slot_addr = logfs_get_addr (logfs, logfs->active_arena_id, curr_slot_id);
 
-			if (logfs.driver->write_data(logfs.flash_id,
+			if (logfs->driver->write_data(logfs->flash_id,
 							slot_addr,
 							(uint8_t *)&slot_hdr,
 							sizeof(slot_hdr)) != 0) {
@@ -672,7 +750,7 @@ static int8_t logfs_delete_object (uint32_t obj_id, uint16_t obj_inst_id)
 				goto out_exit;
 			}
 			/* Object has been successfully obsoleted and is no longer active */
-			logfs.num_active_slots--;
+			logfs->num_active_slots--;
 			break;
 		case -1:
 			/* Search completed, object not found */
@@ -691,27 +769,27 @@ out_exit:
 }
 
 /* NOTE: Must be called while holding the flash transaction lock */
-static int8_t logfs_reserve_free_slot (uint16_t * slot_id, struct slot_header * slot_hdr, uint32_t obj_id, uint16_t obj_inst_id, uint16_t obj_size)
+static int8_t logfs_reserve_free_slot (struct logfs_state * logfs, uint16_t * slot_id, struct slot_header * slot_hdr, uint32_t obj_id, uint16_t obj_inst_id, uint16_t obj_size)
 {
 	PIOS_Assert(slot_id);
 	PIOS_Assert(slot_hdr);
 
-	if (logfs.num_free_slots < 1) {
+	if (logfs->num_free_slots < 1) {
 		/* No free slots to allocate */
 		return -1;
 	}
 
-	if (obj_size > (logfs.cfg->slot_size - sizeof (slot_hdr))) {
+	if (obj_size > (logfs->cfg->slot_size - sizeof (slot_hdr))) {
 		/* This object is too big for the slot */
 		return -2;
 	}
 
-	uint16_t candidate_slot_id = (logfs.cfg->arena_size / logfs.cfg->slot_size) - logfs.num_free_slots;
+	uint16_t candidate_slot_id = (logfs->cfg->arena_size / logfs->cfg->slot_size) - logfs->num_free_slots;
 	PIOS_Assert(candidate_slot_id > 0);
 
-	uintptr_t slot_addr = logfs_get_addr (logfs.active_arena_id, candidate_slot_id);
+	uintptr_t slot_addr = logfs_get_addr (logfs, logfs->active_arena_id, candidate_slot_id);
 
-	if (logfs.driver->read_data(logfs.flash_id,
+	if (logfs->driver->read_data(logfs->flash_id,
 					slot_addr,
 					(uint8_t *)slot_hdr,
 					sizeof (*slot_hdr)) != 0) {
@@ -731,7 +809,7 @@ static int8_t logfs_reserve_free_slot (uint16_t * slot_id, struct slot_header * 
 	slot_hdr->obj_inst_id = obj_inst_id;
 	slot_hdr->obj_size    = obj_size;
 
-	if (logfs.driver->write_data(logfs.flash_id,
+	if (logfs->driver->write_data(logfs->flash_id,
 					slot_addr,
 					(uint8_t *)slot_hdr,
 					sizeof(*slot_hdr)) != 0) {
@@ -740,33 +818,33 @@ static int8_t logfs_reserve_free_slot (uint16_t * slot_id, struct slot_header * 
 	}
 
 	/* FIXME: If the header write (above) failed, may have partially written data, thus corrupting that slot but we would have missed decrementing this counter */
-	logfs.num_free_slots--;
+	logfs->num_free_slots--;
 
 	*slot_id = candidate_slot_id;
 	return 0;
 }
 
 /* NOTE: Must be called while holding the flash transaction lock */
-static int8_t logfs_append_to_log (uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
+static int8_t logfs_append_to_log (struct logfs_state * logfs, uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
 {
 	/* Reserve a free slot for our new object */
 	uint16_t free_slot_id;
 	struct slot_header slot_hdr;
-	if (logfs_reserve_free_slot (&free_slot_id, &slot_hdr, obj_id, obj_inst_id, obj_size) != 0) {
+	if (logfs_reserve_free_slot (logfs, &free_slot_id, &slot_hdr, obj_id, obj_inst_id, obj_size) != 0) {
 		/* Failed to reserve a free slot */
 		return -1;
 	}
 
 	/* Compute slot address */
-	uintptr_t slot_addr = logfs_get_addr (logfs.active_arena_id, free_slot_id);
+	uintptr_t slot_addr = logfs_get_addr (logfs, logfs->active_arena_id, free_slot_id);
 
 	/* Write the data into the reserved slot, starting after the slot header */
 	uintptr_t slot_offset = sizeof(slot_hdr);
 	while (obj_size > 0) {
 		/* Individual writes must fit entirely within a single page buffer. */
-		uint16_t page_remaining = logfs.cfg->page_size - (slot_offset % logfs.cfg->page_size);
+		uint16_t page_remaining = logfs->cfg->page_size - (slot_offset % logfs->cfg->page_size);
 		uint16_t write_size = MIN(obj_size, page_remaining);
-		if (logfs.driver->write_data (logfs.flash_id,
+		if (logfs->driver->write_data (logfs->flash_id,
 						slot_addr + slot_offset,
 						obj_data,
 						write_size) != 0) {
@@ -782,7 +860,7 @@ static int8_t logfs_append_to_log (uint32_t obj_id, uint16_t obj_inst_id, uint8_
 
 	/* Mark this slot active in one atomic step */
 	slot_hdr.state = SLOT_STATE_ACTIVE;
-	if (logfs.driver->write_data (logfs.flash_id,
+	if (logfs->driver->write_data (logfs->flash_id,
 					slot_addr,
 					(uint8_t *)&slot_hdr,
 					sizeof(slot_hdr)) != 0) {
@@ -791,7 +869,7 @@ static int8_t logfs_append_to_log (uint32_t obj_id, uint16_t obj_inst_id, uint8_
 	}
 
 	/* Object has been successfully written to the slot */
-	logfs.num_active_slots++;
+	logfs->num_active_slots++;
 	return 0;
 }
 
@@ -811,26 +889,34 @@ static int8_t logfs_append_to_log (uint32_t obj_id, uint16_t obj_inst_id, uint8_
  * @param[in] obj_data Contents of the object being saved
  * @param[in] obj_size Size of the object being saved
  * @return 0 if success or error code
- * @retval -1 if failed to start transaction
- * @retval -2 if failure to delete any previous versions of the object
- * @retval -3 if filesystem is entirely full and garbage collection won't help
- * @retval -4 if garbage collection failed
- * @retval -5 if filesystem is full even after garbage collection should have freed space
- * @retval -6 if writing the new object to the filesystem failed
+ * @retval -1 if fs_id is not a valid filesystem instance
+ * @retval -2 if failed to start transaction
+ * @retval -3 if failure to delete any previous versions of the object
+ * @retval -4 if filesystem is entirely full and garbage collection won't help
+ * @retval -5 if garbage collection failed
+ * @retval -6 if filesystem is full even after garbage collection should have freed space
+ * @retval -7 if writing the new object to the filesystem failed
  */
-int32_t PIOS_FLASHFS_ObjSave(__attribute__((unused)) uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
+int32_t PIOS_FLASHFS_ObjSave(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
 {
 	int8_t rc;
 
-	PIOS_Assert(obj_size <= (logfs.cfg->slot_size - sizeof(struct slot_header)));
+	struct logfs_state * logfs = (struct logfs_state *)fs_id;
 
-	if (logfs.driver->start_transaction(logfs.flash_id) != 0) {
+	if (!PIOS_FLASHFS_Logfs_validate(logfs)) {
 		rc = -1;
 		goto out_exit;
 	}
 
-	if (logfs_delete_object (obj_id, obj_inst_id) != 0) {
+	PIOS_Assert(obj_size <= (logfs->cfg->slot_size - sizeof(struct slot_header)));
+
+	if (logfs->driver->start_transaction(logfs->flash_id) != 0) {
 		rc = -2;
+		goto out_exit;
+	}
+
+	if (logfs_delete_object (logfs, obj_id, obj_inst_id) != 0) {
+		rc = -3;
 		goto out_end_trans;
 	}
 
@@ -840,36 +926,36 @@ int32_t PIOS_FLASHFS_ObjSave(__attribute__((unused)) uint32_t fs_id, uint32_t ob
 	 */
 
 	/* Check if the arena is entirely full. */
-	if (logfs_fs_is_full()) {
+	if (logfs_fs_is_full(logfs)) {
 		/* Note: Filesystem Full means we're full of *active* records so gc won't help at all. */
-		rc = -3;
+		rc = -4;
 		goto out_end_trans;
 	}
 
 	/* Is garbage collection required? */
-	if (logfs_log_is_full()) {
+	if (logfs_log_is_full(logfs)) {
 		/* Note: Log Full means the log is full but may contain obsolete slots so gc may free some space */
-		if (logfs_garbage_collect() != 0) {
-			rc = -4;
+		if (logfs_garbage_collect(logfs) != 0) {
+			rc = -5;
 			goto out_end_trans;
 		}
 		/* Check one more time just to be sure we actually free'd some space */
-		if (logfs_log_is_full()) {
+		if (logfs_log_is_full(logfs)) {
 			/*
 			 * Log is still full even after gc!
 			 * NOTE: This should not happen since the filesystem wasn't full
 			 *       when we checked above so gc should have helped.
 			 */
 			PIOS_DEBUG_Assert(0);
-			rc = -5;
+			rc = -6;
 			goto out_end_trans;
 		}
 	}
 
 	/* We have room for our new object.  Append it to the log. */
-	if (logfs_append_to_log(obj_id, obj_inst_id, obj_data, obj_size) != 0) {
+	if (logfs_append_to_log(logfs, obj_id, obj_inst_id, obj_data, obj_size) != 0) {
 		/* Error during append */
-		rc = -6;
+		rc = -7;
 		goto out_end_trans;
 	}
 
@@ -877,7 +963,7 @@ int32_t PIOS_FLASHFS_ObjSave(__attribute__((unused)) uint32_t fs_id, uint32_t ob
 	rc = 0;
 
 out_end_trans:
-	logfs.driver->end_transaction(logfs.flash_id);
+	logfs->driver->end_transaction(logfs->flash_id);
 
 out_exit:
 	return rc;
@@ -891,47 +977,55 @@ out_exit:
  * @param[in] obj_data Buffer to hold the contents of the loaded object
  * @param[in] obj_size Size of the object to be loaded
  * @return 0 if success or error code
- * @retval -1 if failed to start transaction
- * @retval -2 if object not found in filesystem
- * @retval -3 if object size in filesystem does not exactly match buffer size
- * @retval -4 if reading the object data from flash fails
+ * @retval -1 if fs_id is not a valid filesystem instance
+ * @retval -2 if failed to start transaction
+ * @retval -3 if object not found in filesystem
+ * @retval -4 if object size in filesystem does not exactly match buffer size
+ * @retval -5 if reading the object data from flash fails
  */
-int32_t PIOS_FLASHFS_ObjLoad(__attribute__((unused)) uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
+int32_t PIOS_FLASHFS_ObjLoad(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
 {
 	int8_t rc;
 
-	PIOS_Assert(obj_size <= (logfs.cfg->slot_size - sizeof(struct slot_header)));
+	struct logfs_state * logfs = (struct logfs_state *)fs_id;
 
-	if (logfs.driver->start_transaction(logfs.flash_id) != 0) {
+	if (!PIOS_FLASHFS_Logfs_validate(logfs)) {
 		rc = -1;
+		goto out_exit;
+	}
+
+	PIOS_Assert(obj_size <= (logfs->cfg->slot_size - sizeof(struct slot_header)));
+
+	if (logfs->driver->start_transaction(logfs->flash_id) != 0) {
+		rc = -2;
 		goto out_exit;
 	}
 
 	/* Find the object in the log */
 	uint16_t slot_id = 0;
 	struct slot_header slot_hdr;
-	if (logfs_object_find_next (&slot_hdr, &slot_id, obj_id, obj_inst_id) != 0) {
+	if (logfs_object_find_next (logfs, &slot_hdr, &slot_id, obj_id, obj_inst_id) != 0) {
 		/* Object does not exist in fs */
-		rc = -2;
+		rc = -3;
 		goto out_end_trans;
 	}
 
 	/* Sanity check what we've found */
 	if (slot_hdr.obj_size != obj_size) {
 		/* Object sizes don't match.  Not safe to copy contents. */
-		rc = -3;
+		rc = -4;
 		goto out_end_trans;
 	}
 
 	/* Read the contents of the object from the log */
 	if (obj_size > 0) {
-		uintptr_t slot_addr = logfs_get_addr (logfs.active_arena_id, slot_id);
-		if (logfs.driver->read_data(logfs.flash_id,
+		uintptr_t slot_addr = logfs_get_addr (logfs, logfs->active_arena_id, slot_id);
+		if (logfs->driver->read_data(logfs->flash_id,
 						slot_addr + sizeof(slot_hdr),
 						(uint8_t *)obj_data,
 						obj_size) != 0) {
 			/* Failed to read object data from the log */
-			rc = -4;
+			rc = -5;
 			goto out_end_trans;
 		}
 	}
@@ -940,7 +1034,7 @@ int32_t PIOS_FLASHFS_ObjLoad(__attribute__((unused)) uint32_t fs_id, uint32_t ob
 	rc = 0;
 
 out_end_trans:
-	logfs.driver->end_transaction(logfs.flash_id);
+	logfs->driver->end_transaction(logfs->flash_id);
 
 out_exit:
 	return rc;
@@ -952,20 +1046,28 @@ out_exit:
  * @param[in] obj UAVObject ID of the object to delete
  * @param[in] obj_inst_id The instance of the object to delete
  * @return 0 if success or error code
- * @retval -1 if failed to start transaction
- * @retval -2 if failed to delete the object from the filesystem
+ * @retval -1 if fs_id is not a valid filesystem instance
+ * @retval -2 if failed to start transaction
+ * @retval -3 if failed to delete the object from the filesystem
  */
-int32_t PIOS_FLASHFS_ObjDelete(__attribute__((unused)) uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id)
+int32_t PIOS_FLASHFS_ObjDelete(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id)
 {
 	int8_t rc;
 
-	if (logfs.driver->start_transaction(logfs.flash_id) != 0) {
+	struct logfs_state * logfs = (struct logfs_state *)fs_id;
+
+	if (!PIOS_FLASHFS_Logfs_validate(logfs)) {
 		rc = -1;
 		goto out_exit;
 	}
 
-	if (logfs_delete_object (obj_id, obj_inst_id) != 0) {
+	if (logfs->driver->start_transaction(logfs->flash_id) != 0) {
 		rc = -2;
+		goto out_exit;
+	}
+
+	if (logfs_delete_object (logfs, obj_id, obj_inst_id) != 0) {
+		rc = -3;
 		goto out_end_trans;
 	}
 
@@ -973,7 +1075,7 @@ int32_t PIOS_FLASHFS_ObjDelete(__attribute__((unused)) uint32_t fs_id, uint32_t 
 	rc = 0;
 
 out_end_trans:
-	logfs.driver->end_transaction(logfs.flash_id);
+	logfs->driver->end_transaction(logfs->flash_id);
 
 out_exit:
 	return rc;
@@ -983,38 +1085,46 @@ out_exit:
  * @brief Erases all filesystem arenas and activate the first arena
  * @param[in] fs_id The filesystem to use for this action
  * @return 0 if success or error code
- * @retval -1 if failed to start transaction
- * @retval -2 if failed to erase all arenas
- * @retval -3 if failed to activate arena 0
- * @retval -4 if failed to mount arena 0
+ * @retval -1 if fs_id is not a valid filesystem instance
+ * @retval -2 if failed to start transaction
+ * @retval -3 if failed to erase all arenas
+ * @retval -4 if failed to activate arena 0
+ * @retval -5 if failed to mount arena 0
  */
-int32_t PIOS_FLASHFS_Format(__attribute__((unused)) uint32_t fs_id)
+int32_t PIOS_FLASHFS_Format(uint32_t fs_id)
 {
 	int32_t rc;
 
-	if (logfs.mounted) {
-		logfs_unmount_log();
-	}
+	struct logfs_state * logfs = (struct logfs_state *)fs_id;
 
-	if (logfs.driver->start_transaction(logfs.flash_id) != 0) {
+	if (!PIOS_FLASHFS_Logfs_validate(logfs)) {
 		rc = -1;
 		goto out_exit;
 	}
 
-	if (logfs_erase_all_arenas() != 0) {
-		rc = -2;
-		goto out_end_trans;
+	if (logfs->mounted) {
+		logfs_unmount_log(logfs);
 	}
 
-	/* Reinitialize arena 0 */
-	if (logfs_activate_arena(0) != 0) {
+	if (logfs->driver->start_transaction(logfs->flash_id) != 0) {
+		rc = -2;
+		goto out_exit;
+	}
+
+	if (logfs_erase_all_arenas(logfs) != 0) {
 		rc = -3;
 		goto out_end_trans;
 	}
 
-	/* Mount arena 0 */
-	if (logfs_mount_log(0) != 0) {
+	/* Reinitialize arena 0 */
+	if (logfs_activate_arena(logfs, 0) != 0) {
 		rc = -4;
+		goto out_end_trans;
+	}
+
+	/* Mount arena 0 */
+	if (logfs_mount_log(logfs, 0) != 0) {
+		rc = -5;
 		goto out_end_trans;
 	}
 
@@ -1022,7 +1132,7 @@ int32_t PIOS_FLASHFS_Format(__attribute__((unused)) uint32_t fs_id)
 	rc = 0;
 
 out_end_trans:
-	logfs.driver->end_transaction(logfs.flash_id);
+	logfs->driver->end_transaction(logfs->flash_id);
 
 out_exit:
 	return rc;

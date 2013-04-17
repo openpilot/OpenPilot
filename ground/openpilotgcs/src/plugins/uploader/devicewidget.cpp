@@ -122,11 +122,11 @@ void DeviceWidget::populate()
     m_dfu->enterDFU(deviceID);
     QByteArray desc = m_dfu->DownloadDescriptionAsBA(size);
 
-    if (! populateBoardStructuredDescription(desc)) {
+    if (!populateBoardStructuredDescription(desc)) {
         //TODO
         // desc was not a structured description
         QString str = m_dfu->DownloadDescription(size);
-        myDevice->lblDescription->setText(QString("Firmware custom description: ")+str.left(str.indexOf(QChar(255))));
+        myDevice->lblDescription->setText(QString("Firmware custom description: ") + str.left(str.indexOf(QChar(255))));
         QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
         myDevice->lblCertified->setPixmap(pix);
         myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
@@ -388,7 +388,7 @@ void DeviceWidget::uploadFirmware()
         updateButtons(true);
         return;
     }
-    OP_DFU::Status ret=m_dfu->StatusRequest();
+    OP_DFU::Status ret = m_dfu->StatusRequest();
     qDebug() << m_dfu->StatusToString(ret);
     m_dfu->AbortOperation(); // Necessary, otherwise I get random failures.
 
@@ -437,7 +437,7 @@ void DeviceWidget::downloadFirmware()
     connect(m_dfu, SIGNAL(downloadFinished()), this, SLOT(downloadFinished()));
 
     downloadedFirmware.clear(); // Empty the byte array
-    bool ret = m_dfu->DownloadFirmware(&downloadedFirmware,deviceID);
+    bool ret = m_dfu->DownloadFirmware(&downloadedFirmware, deviceID);
 
     if (!ret) {
         emit downloadEnded(false);
@@ -480,31 +480,29 @@ void DeviceWidget::uploadFinished(OP_DFU::Status retstatus)
         status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
         updateButtons(true);
         return;
-    } else
-        if (!descriptionArray.isEmpty()) {
-            // We have a structured array to save
-            status(QString("Updating description"), STATUSICON_RUNNING);
-            repaint(); // Make sure the text above shows right away
-            retstatus = m_dfu->UploadDescription(descriptionArray);
-            if (retstatus != OP_DFU::Last_operation_Success) {
-                emit uploadEnded(false);
-                status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
-                updateButtons(true);
-                return;
-            }
-
-        } else if (!myDevice->description->text().isEmpty()) {
-            // Fallback: we save the description field:
-            status(QString("Updating description"), STATUSICON_RUNNING);
-            repaint(); // Make sure the text above shows right away
-            retstatus = m_dfu->UploadDescription(myDevice->description->text());
-            if (retstatus != OP_DFU::Last_operation_Success) {
-                emit uploadEnded(false);
-                status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
-                updateButtons(true);
-                return;
-            }
+    } else if (!descriptionArray.isEmpty()) {
+        // We have a structured array to save
+        status(QString("Updating description"), STATUSICON_RUNNING);
+        repaint(); // Make sure the text above shows right away
+        retstatus = m_dfu->UploadDescription(descriptionArray);
+        if (retstatus != OP_DFU::Last_operation_Success) {
+            emit uploadEnded(false);
+            status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
+            updateButtons(true);
+            return;
         }
+    } else if (!myDevice->description->text().isEmpty()) {
+        // Fallback: we save the description field:
+        status(QString("Updating description"), STATUSICON_RUNNING);
+        repaint(); // Make sure the text above shows right away
+        retstatus = m_dfu->UploadDescription(myDevice->description->text());
+        if (retstatus != OP_DFU::Last_operation_Success) {
+            emit uploadEnded(false);
+            status(QString("Upload failed with code: ") + m_dfu->StatusToString(retstatus).toLatin1().data(), STATUSICON_FAIL);
+            updateButtons(true);
+            return;
+        }
+    }
 
     populate();
 

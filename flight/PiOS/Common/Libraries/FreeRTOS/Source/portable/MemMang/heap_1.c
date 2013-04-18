@@ -105,54 +105,49 @@ void *pvPortMallocGeneric( size_t xWantedSize, size_t alignment);
 
 /*-----------------------------------------------------------*/
 
-void *pvPortMallocGeneric( size_t xWantedSize, size_t alignment)
-{
-void *pvReturn = NULL;
-static unsigned char *pucAlignedHeap = NULL;
-size_t mask = alignment-1;
-	/* Ensure that blocks are always aligned to the required number of bytes. */
-	#if portBYTE_ALIGNMENT != 1
-		if( xWantedSize & mask )
-		{
-		    			/* Byte alignment required. */
-			xWantedSize += ( alignment - ( xWantedSize & mask ) );
-		}
-	#endif
+void *pvPortMallocGeneric(size_t xWantedSize, size_t alignment) {
+    void *pvReturn = NULL;
+    static unsigned char *pucAlignedHeap = NULL;
+    size_t mask = alignment - 1;
+    /* Ensure that blocks are always aligned to the required number of bytes. */
+#if portBYTE_ALIGNMENT != 1
+    if (xWantedSize & mask) {
+        /* Byte alignment required. */
+        xWantedSize += (alignment - (xWantedSize & mask));
+    }
+#endif
 
-	vTaskSuspendAll();
-	{
-		if( pucAlignedHeap == NULL )
-		{
-			/* Ensure the heap starts on a correctly aligned boundary. */
-			pucAlignedHeap = ( unsigned char * ) ( ( ( portPOINTER_SIZE_TYPE ) &ucHeap[ alignment ] ) & ( ( portPOINTER_SIZE_TYPE ) ~ mask ) );
-		}
+    vTaskSuspendAll();
+    {
+        if (pucAlignedHeap == NULL ) {
+            /* Ensure the heap starts on a correctly aligned boundary. */
+            pucAlignedHeap = (unsigned char *) (((portPOINTER_SIZE_TYPE ) &ucHeap[alignment]) & ((portPOINTER_SIZE_TYPE ) ~mask));
+        }
 
-		/* Check there is enough room left for the allocation. */
-		if( ( ( xNextFreeByte + xWantedSize ) < configADJUSTED_HEAP_SIZE ) &&
-			( ( xNextFreeByte + xWantedSize ) > xNextFreeByte )	)/* Check for overflow. */
-		{
-			/* Return the next free byte then increment the index past this
-			block. */
-			pvReturn = pucAlignedHeap + xNextFreeByte;
-			xNextFreeByte += xWantedSize;
-		}
-	}
-	xTaskResumeAll();
+        /* Check there is enough room left for the allocation. */
+        if (((xNextFreeByte + xWantedSize) < configADJUSTED_HEAP_SIZE)&&
+        ( ( xNextFreeByte + xWantedSize ) > xNextFreeByte ) ){
+        /* Check for overflow. */
+        /* Return the next free byte then increment the index past this block. */
+        pvReturn = pucAlignedHeap + xNextFreeByte;
+        xNextFreeByte += xWantedSize;
+        }
+    }
+    xTaskResumeAll();
 
-	#if( configUSE_MALLOC_FAILED_HOOK == 1 )
-	{
-		if( pvReturn == NULL )
-		{
-			extern void vApplicationMallocFailedHook( void );
-			vApplicationMallocFailedHook();
-		}
-	}
-	#endif
+#if( configUSE_MALLOC_FAILED_HOOK == 1 )
+    {
+        if( pvReturn == NULL ) {
+            extern void vApplicationMallocFailedHook( void );
+            vApplicationMallocFailedHook();
+        }
+    }
+#endif
 
-	return pvReturn;
+    return pvReturn;
 }
 
-void *pvPortMalloc( size_t xWantedSize){
+void *pvPortMalloc(size_t xWantedSize) {
     return pvPortMallocGeneric(xWantedSize, portBYTE_HEAP_ALIGNMENT);
 }
 

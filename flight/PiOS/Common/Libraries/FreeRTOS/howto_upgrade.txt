@@ -8,6 +8,7 @@ Brief list of modifications:
 *Allow heap_1.c for modification of max heap size at runtime;
 *use section ".heap" for heap.
 
+Memory manager now handles two different kind of alignments for F1, portBYTE_ALIGNMENT for standard mallocs, and portBYTE_HEAP_ALIGNMENT for stack(aligned) allocs
 
 
 

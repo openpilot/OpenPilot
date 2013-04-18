@@ -115,6 +115,8 @@ extern "C" {
 #define portBYTE_HEAP_ALIGNMENT     4 // this value is used to allocate heap
 /*-----------------------------------------------------------*/
 
+extern void *pvPortMallocGeneric( size_t xWantedSize, size_t alignment);
+#define pvPortMallocAligned( x, puxStackBuffer ) ( ( ( puxStackBuffer ) == NULL ) ? ( pvPortMallocGeneric( ( x ) , portBYTE_ALIGNMENT) ) : ( puxStackBuffer ) )
 
 /* Scheduler utilities. */
 extern void vPortYieldFromISR( void );

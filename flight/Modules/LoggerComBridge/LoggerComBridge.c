@@ -49,7 +49,7 @@
 // Private constants
 
 #define STACK_SIZE_BYTES 150
-#define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
+#define TASK_PRIORITY (tskIDLE_PRIORITY)
 #define MAX_RETRIES 2
 #define RETRY_TIMEOUT_MS 20
 #define EVENT_QUEUE_SIZE 10
@@ -221,7 +221,7 @@ static int32_t LoggerComBridgeStart(void)
 		updateSettings();
 
 		// Start the primary tasks for receiving/sending UAVTalk packets from the GCS.
-		//xTaskCreate(telemetryTxTask, (signed char *)"telemTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
+		xTaskCreate(telemetryTxTask, (signed char *)"telemTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
 		xTaskCreate(loggerRxTask, (signed char *)"loggerRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerRxTaskHandle));
 		//xTaskCreate(loggerTxTask, (signed char *)"loggerTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerTxTaskHandle));
 #if defined(PIOS_INCLUDE_MPU6050)
@@ -601,6 +601,7 @@ static void loggerAdcTask(void *parameters)
 		Pos++;
 		while(data->Buffers_InUse)//wait for other task to finish writing on buffer
 		{
+			vTaskDelay(1 / portTICK_RATE_MS);
 		}
 		data->Buffers_InUse=1;
 		if(data->Current_buffer==1)
@@ -634,7 +635,7 @@ static void loggerAdcTask(void *parameters)
 			}
 		}
 		data->Buffers_InUse=0;
-		vTaskDelay(10 / portTICK_RATE_MS);//sleep for 10ms (scan at 100hz)
+		vTaskDelayUntil(&lastSysTime, 10 / portTICK_RATE_MS);//sleep for 10ms (scan at 100hz)
 	
 		/*Pos=0;
 		Adc_Buffer[Pos]='A';
@@ -687,6 +688,7 @@ float AdcValue;
 	while (1) {
 		if(updateSensors()==0)
 		{
+			lastSysTime = xTaskGetTickCount();
 			Pos=0;
 			Mpu6050Form_Buff[Pos]='M';
 			Pos++;
@@ -722,6 +724,7 @@ float AdcValue;
 			Pos++;
 			while(data->Buffers_InUse)//wait for other task to finish writing on buffer
 			{
+				vTaskDelay(1 / portTICK_RATE_MS);
 			}
 			data->Buffers_InUse=1;
 			if(data->Current_buffer==1)
@@ -755,7 +758,7 @@ float AdcValue;
 				}
 			}
 			data->Buffers_InUse=0;
-			vTaskDelay(5 / portTICK_RATE_MS);//sleep a while
+			vTaskDelayUntil(&lastSysTime, 10 / portTICK_RATE_MS);//sleep a while
 		}
 		/*
 		if(updateSensors()==0)

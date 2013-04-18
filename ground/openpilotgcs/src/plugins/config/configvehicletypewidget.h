@@ -33,6 +33,7 @@
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 
 #include <QComboBox>
+#include <QMap>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
@@ -55,15 +56,16 @@ public slots:
 private:
     Ui_AircraftWidget *m_aircraft;
 
-    VehicleConfig *m_heli;
-    VehicleConfig *m_fixedwing;
-    VehicleConfig *m_multirotor;
-    VehicleConfig *m_groundvehicle;
-    VehicleConfig *m_custom;
-
-    void updateFeedForwardUI();
+    // Maps a frame category to its index in the m_aircraft->airframesWidget QStackedWidget
+    QMap<QString, int> vehicleIndexMap;
 
     QString frameCategory(QString frameType);
+
+    VehicleConfig *getVehicleConfigWidget(QString frameCategory);
+    VehicleConfig *createVehicleConfigWidget(QString frameCategory);
+
+    // Feed Forward
+    void updateFeedForwardUI();
 
     bool ffTuningInProgress;
     bool ffTuningPhase;
@@ -71,8 +73,8 @@ private:
 
 private slots:
     void switchAirframeType(int index);
-    void enableFFTest();
     void openHelp();
+    void enableFFTest();
 
 };
 

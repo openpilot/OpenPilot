@@ -124,35 +124,8 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     airframeTypes << "Fixed Wing" << "Multirotor" << "Helicopter" << "Ground" << "Custom";
     m_aircraft->aircraftType->addItems(airframeTypes);
 
-    // *****************************************************************************************************************
-
-    // create and setup a FixedWing config widget
-    qDebug() << "create fixedwing ui";
-    m_fixedwing = new ConfigFixedWingWidget();
-    m_aircraft->airframesWidget->addWidget(m_fixedwing);
-
-    // create and setup a MultiRotor config widget
-    m_multirotor = new ConfigMultiRotorWidget();
-    m_aircraft->airframesWidget->addWidget(m_multirotor);
-
-    // create and setup a Helicopter config widget
-    m_heli = new ConfigCcpmWidget();
-    m_aircraft->airframesWidget->addWidget(m_heli);
-
-    // create and setup a GroundVehicle config widget
-    m_groundvehicle = new ConfigGroundVehicleWidget();
-    m_aircraft->airframesWidget->addWidget(m_groundvehicle);
-
-    // create and setup a custom config widget
-    m_custom = new ConfigCustomWidget();
-    m_aircraft->airframesWidget->addWidget(m_custom);
-
-    // *****************************************************************************************************************
-
     // Set default vehicle to MultiRotor
-    m_aircraft->aircraftType->setCurrentIndex(1);
-    // Force the tab index to match
-    m_aircraft->airframesWidget->setCurrentIndex(1);
+    //m_aircraft->aircraftType->setCurrentIndex(3);
 
 	// Connect aircraft type selection dropbox to callback function
     connect(m_aircraft->aircraftType, SIGNAL(currentIndexChanged(int)), this, SLOT(switchAirframeType(int)));
@@ -182,7 +155,9 @@ ConfigVehicleTypeWidget::~ConfigVehicleTypeWidget()
 
 void ConfigVehicleTypeWidget::switchAirframeType(int index)
 {
-    m_aircraft->airframesWidget->setCurrentIndex(index);
+    // TODO not safe w/r to translation!!!
+    QString frameCategory = m_aircraft->aircraftType->currentText();
+    m_aircraft->airframesWidget->setCurrentWidget(getVehicleConfigWidget(frameCategory));
 }
 
 /**
@@ -214,77 +189,16 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
     qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - frame type:" << frameType;
 
     QString category = frameCategory(frameType);
-    if (category == "FixedWing") {
-        // Retrieve fixed wing settings
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
-        m_fixedwing->refreshWidgetsValues(frameType);
-    } else if (category == "Multirotor") {
-        // Retrieve multirotor settings
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Multirotor"));
-        m_multirotor->refreshWidgetsValues(frameType);
-    } else if (category == "Helicopter") {
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Helicopter"));
-        m_heli->refreshWidgetsValues(frameType);
-    } else if (category == "Ground") {
-        // Retrieve ground vehicle settings
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Ground"));
-        m_groundvehicle->refreshWidgetsValues(frameType);
-    } else if (category == "Custom") {
-        // Retrieve custom settings
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Custom"));
-        m_custom->refreshWidgetsValues(frameType);
-	}	
+    setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText(category));
+
+    VehicleConfig *vehicleConfig = getVehicleConfigWidget(category);
+    vehicleConfig->refreshWidgetsValues(frameType);
 	
     updateFeedForwardUI();
 
     setDirty(dirty);
 
     qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - end";
-}
-
-//QString ConfigVehicleTypeWidget::frameCategory1(QString frameType)
-//{
-//    QString category;
-//    if (frameType.startsWith("FixedWing")) {
-//        category = "FixedWing";
-//    } else if (frameType == "Tri" || frameType == "QuadX" || frameType == "QuadP" || frameType == "Hexa"
-//            || frameType == "HexaCoax" || frameType == "HexaX" || frameType == "Octo" || frameType == "OctoV"
-//            || frameType == "OctoCoaxP" || frameType == "OctoCoaxX") {
-//        category = "Multirotor";
-//    } else if (frameType == "HeliCP") {
-//        category = "Helicopter";
-//    } else if (frameType.startsWith("GroundVehicle")) {
-//        category = "Ground";
-//    } else {
-//        category = "Custom";
-//    }
-//    return category;
-//}
-
-
-QString ConfigVehicleTypeWidget::frameCategory(QString frameType)
-{
-    QString category;
-    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder" || frameType == "FixedWingElevon"
-            || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
-        category = "FixedWing";
-    } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
-            || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"
-            || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
-            || frameType == "Hexacopter Y6" || frameType == "Octo" || frameType == "Octocopter" || frameType == "OctoV"
-            || frameType == "Octocopter V" || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
-            || frameType == "OctoCoaxX" || frameType == "Octo Coax X") {
-        category = "Multirotor";
-    } else if (frameType == "HeliCP") {
-        category = "Helicopter";
-    } else if (frameType == "GroundVehicleCar" || frameType == "Turnable (car)"
-            || frameType == "GroundVehicleDifferential" || frameType == "Differential (tank)"
-            || frameType == "GroundVehicleMotorcyle" || frameType == "Motorcycle") {
-        category = "Ground";
-    } else {
-        category = "Custom";
-    }
-    return category;
 }
 
 /**
@@ -309,21 +223,9 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
 
     // Sets airframe type default to "Custom"
     QString airframeType = "Custom";
-    if (m_aircraft->aircraftType->currentText() == "Fixed Wing") {
-        airframeType = m_fixedwing->updateConfigObjectsFromWidgets();
-    }
-    else if (m_aircraft->aircraftType->currentText() == "Multirotor") {
-         airframeType = m_multirotor->updateConfigObjectsFromWidgets();
-    }
-    else if (m_aircraft->aircraftType->currentText() == "Helicopter") {
-         airframeType = m_heli->updateConfigObjectsFromWidgets();
-    }
-    else if (m_aircraft->aircraftType->currentText() == "Ground") {
-         airframeType = m_groundvehicle->updateConfigObjectsFromWidgets();
-    }
-    else {
-        airframeType = m_custom->updateConfigObjectsFromWidgets();
-    }
+
+    VehicleConfig *vehicleConfig = (VehicleConfig *) m_aircraft->airframesWidget->currentWidget();
+    airframeType = vehicleConfig->updateConfigObjectsFromWidgets();
 
     // set the airframe type
     UAVDataObject *system = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("SystemSettings")));
@@ -346,6 +248,62 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
 //        field->setValue(0, i);
 //    }
 //}
+
+QString ConfigVehicleTypeWidget::frameCategory(QString frameType)
+{
+    QString category;
+    if (frameType == "FixedWing" || frameType == "Elevator aileron rudder" || frameType == "FixedWingElevon"
+            || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
+        category = "Fixed Wing";
+    } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
+            || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"
+            || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
+            || frameType == "Hexacopter Y6" || frameType == "Octo" || frameType == "Octocopter" || frameType == "OctoV"
+            || frameType == "Octocopter V" || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
+            || frameType == "OctoCoaxX" || frameType == "Octo Coax X") {
+        category = "Multirotor";
+    } else if (frameType == "HeliCP") {
+        category = "Helicopter";
+    } else if (frameType == "GroundVehicleCar" || frameType == "Turnable (car)"
+            || frameType == "GroundVehicleDifferential" || frameType == "Differential (tank)"
+            || frameType == "GroundVehicleMotorcyle" || frameType == "Motorcycle") {
+        category = "Ground";
+    } else {
+        category = "Custom";
+    }
+    return category;
+}
+
+VehicleConfig *ConfigVehicleTypeWidget::getVehicleConfigWidget(QString frameCategory)
+{
+    VehicleConfig *vehiculeConfig;
+    if (vehicleIndexMap.contains(frameCategory)) {
+        int index = vehicleIndexMap.value(frameCategory);
+        vehiculeConfig = (VehicleConfig *) m_aircraft->airframesWidget->widget(index);
+    } else {
+        vehiculeConfig = createVehicleConfigWidget(frameCategory);
+        int index = m_aircraft->airframesWidget->insertWidget(m_aircraft->airframesWidget->count(), vehiculeConfig);
+        vehicleIndexMap[frameCategory] = index;
+    }
+    return vehiculeConfig;
+}
+
+VehicleConfig *ConfigVehicleTypeWidget::createVehicleConfigWidget(QString frameCategory)
+{
+    qDebug() << "creating" << frameCategory;
+    if (frameCategory == "Fixed Wing") {
+        return new ConfigFixedWingWidget();
+    } else if (frameCategory == "Multirotor") {
+        return new ConfigMultiRotorWidget();
+    } else if (frameCategory == "Helicopter") {
+        return new ConfigCcpmWidget();
+    } else if (frameCategory == "Ground") {
+        return new ConfigGroundVehicleWidget();
+    } else if (frameCategory == "Custom") {
+        return new ConfigCustomWidget();
+    }
+    return NULL;
+}
 
 /**
   Enables and runs feed forward testing

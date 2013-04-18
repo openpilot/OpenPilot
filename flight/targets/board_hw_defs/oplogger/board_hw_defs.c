@@ -220,11 +220,11 @@ void PIOS_I2C_flexi_adapter_er_irq_handler(void)
 #endif /* PIOS_INCLUDE_I2C */
 
 
-#if defined(PIOS_INCLUDE_ADC)
 
 /*
  * ADC system
  */
+#if defined(PIOS_INCLUDE_ADC)
 #include "pios_adc_priv.h"
 extern void PIOS_ADC_handler(void);
 void DMA1_Channel1_IRQHandler() __attribute__ ((alias("PIOS_ADC_handler")));
@@ -260,20 +260,10 @@ static const struct pios_adc_cfg pios_adc_cfg = {
 	.full_flag = DMA1_IT_TC1,
 };
 
-struct pios_adc_dev pios_adc_devs[] = {
-	{
-		.cfg = &pios_adc_cfg,
-		.callback_function = NULL,
-	},
-};
-
-uint8_t pios_adc_num_devices = NELEMENTS(pios_adc_devs);
-
 void PIOS_ADC_handler() {
 	PIOS_ADC_DMA_Handler();
 }
-
-#endif	/* PIOS_INCLUDE_ADC */
+#endif
 
 #if defined(PIOS_INCLUDE_TIM)
 

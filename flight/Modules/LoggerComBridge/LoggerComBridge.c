@@ -57,8 +57,12 @@
 #define EV_SEND_ACK 0x20
 #define EV_SEND_NACK 0x30
 
+#define MAX_BUFFER_LENGTH 512
+
 #define SENSOR_PERIOD 4
 #define LOG_NAME "mpu6050.log"
+#define LOG_SERIAL_NAME "serial.log"
+#define LOG_ADC_NAME "adc.log"
 
 // ****************
 // Private types
@@ -70,6 +74,8 @@ typedef struct {
 	xTaskHandle loggerRxTaskHandle;
 	xTaskHandle loggerTxTaskHandle;
 	xTaskHandle loggerMpuTaskHandle;
+	xTaskHandle loggerWriteSDTaskHandle;
+	xTaskHandle loggerAdcTaskHandle;
 
 	// The UAVTalk connection on the com side.
 	UAVTalkConnection outUAVTalkCon;
@@ -85,14 +91,17 @@ typedef struct {
 	uint32_t UAVTalkErrors;
 	uint32_t droppedPackets;
 	
-	/*
-	uint8_t Selected_Buffer;
-	uint8_t buffer1[512];//first buffer to write to the SD
-	bool buffer1_Full;
-	uint16_t Pos_In_Buffer1;
-	uint8_t buffer2[512];//second buffer to write to the SD
-	bool buffer2_Full;
-	uint16_t Pos_In_Buffer2;*///check the stcak size
+	char Log_Buffer_1[MAX_BUFFER_LENGTH];
+	char Log_Buffer_2[MAX_BUFFER_LENGTH];
+	
+	uint16_t Pos_Buffer_1;
+	uint16_t Pos_Buffer_2;
+	uint8_t Current_buffer;
+	
+	uint8_t Ready2Record_1;
+	uint8_t Ready2Record_2;
+	
+	uint8_t Buffers_InUse;
 	
 
 } LoggerComBridgeData;
@@ -152,6 +161,9 @@ float accels[3], gyros[3];
 float temperature;
 #endif
 
+bool NewMpu6050BufferReady;
+bool NewSerialBufferReady;
+
 // ****************
 // Private functions
 
@@ -159,6 +171,8 @@ static void telemetryTxTask(void *parameters);
 static void loggerRxTask(void *parameters);
 static void loggerTxTask(void *parameters);
 static void loggerMpuTask(void *parameters);
+static void loggerWriteSDTask(void *parameters);
+static void loggerAdcTask(void *parameters);
 static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length);
 static int32_t LoggerSendHandler(uint8_t *buf, int32_t length);
 static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte);
@@ -176,9 +190,20 @@ static LoggerComBridgeData *data;
 int16_t intPart, fractPart;
 uint8_t sensPart;
 
-FILEINFO File;
-char Buffer[1024];
+FILEINFO Mpu6050_File;
+char Mpu6050_Buffer[512];
 uint32_t Cache;
+bool LogAscii;
+
+FILEINFO Serial_File;
+char Serial_Buffer[512];
+uint32_t Serial_Cache;
+uint16_t PosInSerialBuf;
+
+FILEINFO Adc_File;
+char Adc_Buffer[512];
+uint32_t Adc_Cache;
+uint16_t PosInAdcBuf;
 
 /**
  * Start the module
@@ -196,12 +221,18 @@ static int32_t LoggerComBridgeStart(void)
 		updateSettings();
 
 		// Start the primary tasks for receiving/sending UAVTalk packets from the GCS.
-		xTaskCreate(telemetryTxTask, (signed char *)"telemTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
+		//xTaskCreate(telemetryTxTask, (signed char *)"telemTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
 		xTaskCreate(loggerRxTask, (signed char *)"loggerRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerRxTaskHandle));
-		xTaskCreate(loggerTxTask, (signed char *)"loggerTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerTxTaskHandle));
+		//xTaskCreate(loggerTxTask, (signed char *)"loggerTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerTxTaskHandle));
 #if defined(PIOS_INCLUDE_MPU6050)
 		xTaskCreate(loggerMpuTask, (signed char *)"loggerMpuTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerMpuTaskHandle));
 #endif
+
+#if defined(PIOS_INCLUDE_ADC)
+		xTaskCreate(loggerAdcTask, (signed char *)"loggerAdcTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerAdcTaskHandle));
+#endif
+
+		xTaskCreate(loggerWriteSDTask, (signed char *)"loggerWriteSDTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerWriteSDTaskHandle));
 
 		// Register the watchdog timers.
 #ifdef PIOS_INCLUDE_WDG
@@ -251,22 +282,71 @@ static int32_t LoggerComBridgeInitialize(void)
 	
 		// Delete the file if it exists - ignore errors 
 	DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_NAME, PIOS_SDCARD_Sector);
-	if (DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_NAME, DFS_WRITE, PIOS_SDCARD_Sector, &File)) {
+	if (DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_NAME, DFS_WRITE, PIOS_SDCARD_Sector, &Mpu6050_File)) {
 		// Error opening file 
 		//return -1;
 	}
 	
-	sprintf(Buffer, "PiOS Log\r\n\r\nLog file creation completed.\r\n");
-	if (DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer))) {
+	sprintf(Mpu6050_Buffer, "PiOS Log\r\n\r\nLog file creation completed.\r\n");
+	if (DFS_WriteFile(&Mpu6050_File, PIOS_SDCARD_Sector, (uint8_t *) Mpu6050_Buffer, &Cache, strlen(Mpu6050_Buffer))) {
 		// Error writing to file 
 		//return -1;
 	}
 	
-	sprintf(Buffer, "------------------------------\r\nSD Card Information\r\n------------------------------\r\n");
-	if (DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer))) {
+	sprintf(Mpu6050_Buffer, "------------------------------\r\nMpu6050 i2C Log\r\n------------------------------\r\n");
+	if (DFS_WriteFile(&Mpu6050_File, PIOS_SDCARD_Sector, (uint8_t *) Mpu6050_Buffer, &Cache, strlen(Mpu6050_Buffer))) {
 		/* Error writing to file */
 		//return -2;
 	}
+	
+	DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_SERIAL_NAME, PIOS_SDCARD_Sector);
+	if (DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_SERIAL_NAME, DFS_WRITE, PIOS_SDCARD_Sector, &Serial_File)) {
+		// Error opening file 
+		//return -1;
+	}
+	
+	sprintf(Serial_Buffer, "PiOS Log\r\n\r\nLog file creation completed.\r\n");
+	if (DFS_WriteFile(&Serial_File, PIOS_SDCARD_Sector, (uint8_t *) Serial_Buffer, &Serial_Cache, strlen(Serial_Buffer))) {
+		// Error writing to file 
+		//return -1;
+	}
+	
+	sprintf(Serial_Buffer, "------------------------------\r\nSerial Log\r\n------------------------------\r\n");
+	if (DFS_WriteFile(&Serial_File, PIOS_SDCARD_Sector, (uint8_t *) Serial_Buffer, &Serial_Cache, strlen(Serial_Buffer))) {
+		/* Error writing to file */
+		//return -2;
+	}
+	
+	DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_ADC_NAME, PIOS_SDCARD_Sector);
+	if (DFS_OpenFile(&PIOS_SDCARD_VolInfo, (uint8_t *) LOG_ADC_NAME, DFS_WRITE, PIOS_SDCARD_Sector, &Adc_File)) {
+		// Error opening file 
+		//return -1;
+	}
+	
+	sprintf(Adc_Buffer, "PiOS Log\r\n\r\nLog file creation completed.\r\n");
+	if (DFS_WriteFile(&Adc_File, PIOS_SDCARD_Sector, (uint8_t *) Adc_Buffer, &Adc_Cache, strlen(Adc_Buffer))) {
+		// Error writing to file 
+		//return -1;
+	}
+	
+	sprintf(Adc_Buffer, "------------------------------\r\nAdc Log\r\n------------------------------\r\n");
+	if (DFS_WriteFile(&Adc_File, PIOS_SDCARD_Sector, (uint8_t *) Adc_Buffer, &Adc_Cache, strlen(Adc_Buffer))) {
+		/* Error writing to file */
+		//return -2;
+	}
+	
+	data->Pos_Buffer_1=0;
+	data->Pos_Buffer_2=0;
+	data->Current_buffer=1;
+	data->Ready2Record_1=0;
+	data->Ready2Record_2=0;
+	data->Buffers_InUse=0;
+	
+	PosInSerialBuf=0;
+	PosInAdcBuf=0;
+	NewMpu6050BufferReady=FALSE;
+	NewSerialBufferReady=FALSE;
+	LogAscii=FALSE;
 
 	return 0;
 }
@@ -331,19 +411,89 @@ static void telemetryTxTask(void *parameters)
  */
 static void loggerRxTask(void *parameters)
 {
+portTickType lastSysTime;
+uint8_t Pos;
+uint8_t FloatIEEE[4];
+char Serial_FormBuffer[64];
 	// Task loop
 	while (1) {
 #ifdef PIOS_INCLUDE_WDG
 		//PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORX);
 #endif
+		lastSysTime = xTaskGetTickCount();
+		//it takes 0.00015625Sec to stream the 9bits of a byte @ 57600bds, should have 6.4character/ms, 1ms seems to be the period the rx is polled
 		uint8_t serial_data[1];
 		uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_UART_TELEM, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
 		if (bytes_to_process > 0)
+		{
+			Pos=0;
+			Serial_FormBuffer[Pos]='R';
+			Pos++;
+			Serial_FormBuffer[Pos]='3';
+			Pos++;
+			memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
+			copybuf((char*)&Serial_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+			Pos+=sizeof(FloatIEEE);
 			for (uint8_t i = 0; i < bytes_to_process; i++)
 			{
-			//sprintf((char *)Buffer,"R:%u\r\n",serial_data[i]);
-			//DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
+				Serial_FormBuffer[Pos]=serial_data[i];
+				Pos++;
 			}
+			Serial_FormBuffer[Pos]=0x0d;
+			Pos++;
+			Serial_FormBuffer[Pos]=0x0a;
+			Pos++;
+			while(data->Buffers_InUse)//wait for other task to finish writing on buffer
+			{
+			}
+			data->Buffers_InUse=1;
+			if(data->Current_buffer==1)
+			{
+				if(data->Pos_Buffer_1+Pos>=MAX_BUFFER_LENGTH)
+				{
+					data->Current_buffer=2;
+					data->Ready2Record_1=1;
+					copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
+					data->Pos_Buffer_2=Pos;
+				}
+				else
+				{
+					copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
+					data->Pos_Buffer_1+=Pos;
+				}
+			}
+			else
+			{
+				if(data->Pos_Buffer_2+Pos>=MAX_BUFFER_LENGTH)
+				{
+					data->Current_buffer=1;
+					data->Ready2Record_2=1;
+					copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
+					data->Pos_Buffer_1=Pos;
+				}
+				else
+				{
+					copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
+					data->Pos_Buffer_2+=Pos;
+				}
+			}
+			data->Buffers_InUse=0;
+			/*sprintf((char *)Serial_Buffer,"%d :R3:",(int)(lastSysTime/portTICK_RATE_MS));
+			PosInSerialBuf=strlen(Serial_Buffer);
+			for (uint8_t i = 0; i < bytes_to_process; i++)
+			{
+				Serial_Buffer[PosInSerialBuf]=serial_data[i];
+				PosInSerialBuf++;
+			}
+			Serial_Buffer[PosInSerialBuf]=0x0d;
+			PosInSerialBuf++;
+			Serial_Buffer[PosInSerialBuf]=0x0a;
+			PosInSerialBuf++;
+			//sprintf((char *)Serial_Buffer,"%d :R:%u\r\n",(int)(lastSysTime/portTICK_RATE_MS),serial_data[0]);
+			DFS_WriteFile(&Serial_File, PIOS_SDCARD_Sector, (uint8_t *) Serial_Buffer, &Serial_Cache, PosInSerialBuf);
+			NewSerialBufferReady=TRUE;*/
+			//vTaskDelay(2 / portTICK_RATE_MS);
+		}
 	}
 }
 
@@ -374,15 +524,160 @@ static void loggerTxTask(void *parameters)
 	}
 }
 
+static void loggerWriteSDTask(void *parameters)
+{
+	//portTickType lastSysTime;
+	while (1) {
+		if(data->Ready2Record_1==1)
+		{
+			DFS_WriteFile(&Serial_File, PIOS_SDCARD_Sector, (uint8_t *) data->Log_Buffer_1, &Serial_Cache, data->Pos_Buffer_1);
+			data->Pos_Buffer_1=0;
+			data->Ready2Record_1=0;
+		}
+		if(data->Ready2Record_2==1)
+		{
+			DFS_WriteFile(&Serial_File, PIOS_SDCARD_Sector, (uint8_t *) data->Log_Buffer_2, &Serial_Cache, data->Pos_Buffer_2);
+			data->Pos_Buffer_2=0;
+			data->Ready2Record_2=0;
+		}
+		/*
+		if(NewSerialBufferReady)
+		{
+			DFS_WriteFile(&Serial_File, PIOS_SDCARD_Sector, (uint8_t *) Serial_Buffer, &Serial_Cache, strlen(Serial_Buffer));
+			NewSerialBufferReady=FALSE;
+		}
+		else if(NewMpu6050BufferReady)
+		{
+			//DFS_WriteFile(&Mpu6050_File, PIOS_SDCARD_Sector, (uint8_t *) Mpu6050_Buffer, &Cache, strlen(Mpu6050_Buffer));
+			NewMpu6050BufferReady=FALSE;
+		}*/
+		//vTaskDelay(2 / portTICK_RATE_MS);
+	}
+}
+
+void copybuf(char * bufDest,char * bufSource,uint16_t pos, uint16_t lenght)
+{
+	uint16_t index;
+	for(index=0;index<lenght;index++)
+	{
+		bufDest[pos+index]=bufSource[index];
+	}
+}
+
+static void loggerAdcTask(void *parameters)
+{
+	portTickType lastSysTime;
+	uint8_t FloatIEEE[4];
+	uint8_t Pos=0;
+	int32_t AdcValue;
+	char Adc_FormBuffer[24];
+	// Task loop
+	while (1) 
+	{
+		lastSysTime = xTaskGetTickCount();
+		Pos=0;
+		Adc_FormBuffer[Pos]='A';
+		Pos++;
+		Adc_FormBuffer[Pos]='d';
+		Pos++;
+		memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
+		copybuf((char*)&Adc_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		Pos+=sizeof(FloatIEEE);
+		AdcValue=PIOS_ADC_PinGet(0);
+		memcpy(&FloatIEEE,&AdcValue, sizeof(AdcValue));//turn the float value to an array of 4bytes
+		copybuf((char*)&Adc_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		Pos+=sizeof(FloatIEEE);
+		AdcValue=PIOS_ADC_PinGet(1);
+		memcpy(&FloatIEEE,&AdcValue, sizeof(AdcValue));//turn the float value to an array of 4bytes
+		copybuf((char*)&Adc_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		Pos+=sizeof(FloatIEEE);
+		AdcValue=PIOS_ADC_PinGet(2);
+		memcpy(&FloatIEEE,&AdcValue, sizeof(AdcValue));//turn the float value to an array of 4bytes
+		copybuf((char*)&Adc_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		Pos+=sizeof(FloatIEEE);
+		Adc_FormBuffer[Pos]=0x0d;
+		Pos++;
+		Adc_FormBuffer[Pos]=0x0a;
+		Pos++;
+		while(data->Buffers_InUse)//wait for other task to finish writing on buffer
+		{
+		}
+		data->Buffers_InUse=1;
+		if(data->Current_buffer==1)
+		{
+			if(data->Pos_Buffer_1+Pos>=MAX_BUFFER_LENGTH)
+			{
+				data->Current_buffer=2;
+				data->Ready2Record_1=1;
+				copybuf((char*)&data->Log_Buffer_2,(char*)&Adc_FormBuffer,0,(uint16_t)Pos);
+				data->Pos_Buffer_2=Pos;
+			}
+			else
+			{
+				copybuf((char*)&data->Log_Buffer_1,(char*)&Adc_FormBuffer,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
+				data->Pos_Buffer_1+=Pos;
+			}
+		}
+		else
+		{
+			if(data->Pos_Buffer_2+Pos>=MAX_BUFFER_LENGTH)
+			{
+				data->Current_buffer=1;
+				data->Ready2Record_2=1;
+				copybuf((char*)&data->Log_Buffer_1,(char*)&Adc_FormBuffer,0,(uint16_t)Pos);
+				data->Pos_Buffer_1=Pos;
+			}
+			else
+			{
+				copybuf((char*)&data->Log_Buffer_2,(char*)&Adc_FormBuffer,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
+				data->Pos_Buffer_2+=Pos;
+			}
+		}
+		data->Buffers_InUse=0;
+		vTaskDelay(10 / portTICK_RATE_MS);//sleep for 10ms (scan at 100hz)
+	
+		/*Pos=0;
+		Adc_Buffer[Pos]='A';
+		Pos++;
+		Adc_Buffer[Pos]='d';
+		Pos++;
+		memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
+		copybuf((char*)&Adc_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		Pos+=sizeof(FloatIEEE);
+		AdcValue=PIOS_ADC_PinGet(0);
+		memcpy(&FloatIEEE,&AdcValue, sizeof(AdcValue));//turn the float value to an array of 4bytes
+		copybuf((char*)&Adc_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		Pos+=sizeof(FloatIEEE);
+		AdcValue=PIOS_ADC_PinGet(1);
+		memcpy(&FloatIEEE,&AdcValue, sizeof(AdcValue));//turn the float value to an array of 4bytes
+		copybuf((char*)&Adc_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		Pos+=sizeof(FloatIEEE);
+		AdcValue=PIOS_ADC_PinGet(2);
+		memcpy(&FloatIEEE,&AdcValue, sizeof(AdcValue));//turn the float value to an array of 4bytes
+		copybuf((char*)&Adc_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		Pos+=sizeof(FloatIEEE);
+		Adc_Buffer[Pos]=0x0d;
+		Pos++;
+		Adc_Buffer[Pos]=0x0a;
+		Pos++;
+		DFS_WriteFile(&Adc_File, PIOS_SDCARD_Sector, (uint8_t *) Adc_Buffer, &Adc_Cache, Pos);
+		vTaskDelay(10 / portTICK_RATE_MS);*/
+	}
+}
 /**
  * Logger rx task.  Receive data packets from the logger and pass them on.
  */
 static void loggerMpuTask(void *parameters)
 {
 portTickType lastSysTime;
-int16_t inpart[6];
-int16_t frpart[6];
-uint8_t spart[6];
+int16_t inpart[7];
+int16_t frpart[7];
+uint8_t spart[7];
+char Mpu6050Form_Buff[64];
+char Mpu6050Hex_Buff[16];
+uint8_t Pos=0;
+uint8_t FloatIEEE[4];
+float AdcValue;
 	
 #if defined(PIOS_INCLUDE_MPU6050)
 	PIOS_MPU6050_Init(pios_i2c_flexi_adapter_id, &pios_mpu6050_cfg);
@@ -392,47 +687,180 @@ uint8_t spart[6];
 	while (1) {
 		if(updateSensors()==0)
 		{
-			lastSysTime = xTaskGetTickCount();
-			printFloat(accels[0], 2);
-			inpart[0]=intPart;
-			frpart[0]=fractPart;
-			spart[0]=sensPart;
-			printFloat(accels[1], 2);
-			inpart[1]=intPart;
-			frpart[1]=fractPart;
-			spart[1]=sensPart;
-			printFloat(accels[2], 2);
-			inpart[2]=intPart;
-			frpart[2]=fractPart;
-			spart[2]=sensPart;
-			printFloat(gyros[0], 2);
-			inpart[3]=intPart;
-			frpart[3]=fractPart;
-			spart[3]=sensPart;
-			printFloat(gyros[1], 2);
-			inpart[4]=intPart;
-			frpart[4]=fractPart;
-			spart[4]=sensPart;
-			printFloat(gyros[2], 2);
-			inpart[5]=intPart;
-			frpart[5]=fractPart;
-			spart[5]=sensPart;
-			
-			sprintf((char *)Buffer,"%d : Ax:%c%d.%d, Ay:%c%d.%d, Az:%c%d.%d, Gx:%c%d.%d, Gz:%c%d.%d, Gz:%c%d.%d\r\n",(int)lastSysTime,spart[0],(int)(inpart[0]),(int)(frpart[0]),spart[1],(int)(inpart[1]),(int)(frpart[1]),spart[2],(int)(inpart[2]),(int)(frpart[2]),spart[3],(int)(inpart[3]),(int)(frpart[3]),spart[4],(int)(inpart[4]),(int)(frpart[4]),spart[5],(int)(inpart[5]),(int)(frpart[5]));
-			DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
-			//vTaskDelay(5 / portTICK_RATE_MS);
+			Pos=0;
+			Mpu6050Form_Buff[Pos]='M';
+			Pos++;
+			Mpu6050Form_Buff[Pos]='p';
+			Pos++;
+			memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+			Pos+=sizeof(FloatIEEE);
+			memcpy(&FloatIEEE,&accels[0], sizeof(accels[0]));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			Pos+=sizeof(FloatIEEE);
+			memcpy(&FloatIEEE,&accels[1], sizeof(accels[1]));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			Pos+=sizeof(FloatIEEE);
+			memcpy(&FloatIEEE,&accels[2], sizeof(accels[2]));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			Pos+=sizeof(FloatIEEE);
+			memcpy(&FloatIEEE,&gyros[0], sizeof(gyros[0]));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			Pos+=sizeof(FloatIEEE);
+			memcpy(&FloatIEEE,&gyros[1], sizeof(gyros[1]));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			Pos+=sizeof(FloatIEEE);
+			memcpy(&FloatIEEE,&gyros[2], sizeof(gyros[2]));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			Pos+=sizeof(FloatIEEE);
+			memcpy(&FloatIEEE,&temperature, sizeof(temperature));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			Pos+=sizeof(FloatIEEE);
+			Mpu6050Form_Buff[Pos]=0x0d;
+			Pos++;
+			Mpu6050Form_Buff[Pos]=0x0a;
+			Pos++;
+			while(data->Buffers_InUse)//wait for other task to finish writing on buffer
+			{
+			}
+			data->Buffers_InUse=1;
+			if(data->Current_buffer==1)
+			{
+				if(data->Pos_Buffer_1+Pos>=MAX_BUFFER_LENGTH)
+				{
+					data->Current_buffer=2;
+					data->Ready2Record_1=1;
+					copybuf((char*)&data->Log_Buffer_2,(char*)&Mpu6050Form_Buff,0,(uint16_t)Pos);
+					data->Pos_Buffer_2=Pos;
+				}
+				else
+				{
+					copybuf((char*)&data->Log_Buffer_1,(char*)&Mpu6050Form_Buff,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
+					data->Pos_Buffer_1+=Pos;
+				}
+			}
+			else
+			{
+				if(data->Pos_Buffer_2+Pos>=MAX_BUFFER_LENGTH)
+				{
+					data->Current_buffer=1;
+					data->Ready2Record_2=1;
+					copybuf((char*)&data->Log_Buffer_1,(char*)&Mpu6050Form_Buff,0,(uint16_t)Pos);
+					data->Pos_Buffer_1=Pos;
+				}
+				else
+				{
+					copybuf((char*)&data->Log_Buffer_2,(char*)&Mpu6050Form_Buff,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
+					data->Pos_Buffer_2+=Pos;
+				}
+			}
+			data->Buffers_InUse=0;
+			vTaskDelay(5 / portTICK_RATE_MS);//sleep a while
 		}
 		/*
-		printFloat(accels[0], 2);
-		sprintf((char *)Buffer,"Ax:%c%d.%d\r\n",sensPart,(int)(intPart),(int)(fractPart));
-		DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
-		printFloat(accels[1], 2);
-		sprintf((char *)Buffer,"Ay:%c%d.%d\r\n",sensPart,(int)(intPart),(int)(fractPart));
-		DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));
-		printFloat(accels[2], 2);
-		sprintf((char *)Buffer,"Az:%c%d.%d\r\n",sensPart,(int)(intPart),(int)(fractPart));
-		DFS_WriteFile(&File, PIOS_SDCARD_Sector, (uint8_t *) Buffer, &Cache, strlen(Buffer));*/
-
+		if(updateSensors()==0)
+		{
+			lastSysTime = xTaskGetTickCount();
+			if(LogAscii)
+			{
+				printFloat(accels[0], 2);
+				inpart[0]=intPart;
+				frpart[0]=fractPart;
+				spart[0]=sensPart;
+				printFloat(accels[1], 2);
+				inpart[1]=intPart;
+				frpart[1]=fractPart;
+				spart[1]=sensPart;
+				printFloat(accels[2], 2);
+				inpart[2]=intPart;
+				frpart[2]=fractPart;
+				spart[2]=sensPart;
+				printFloat(gyros[0], 2);
+				inpart[3]=intPart;
+				frpart[3]=fractPart;
+				spart[3]=sensPart;
+				printFloat(gyros[1], 2);
+				inpart[4]=intPart;
+				frpart[4]=fractPart;
+				spart[4]=sensPart;
+				printFloat(gyros[2], 2);
+				inpart[5]=intPart;
+				frpart[5]=fractPart;
+				spart[5]=sensPart;
+				printFloat(temperature, 2);
+				inpart[6]=intPart;
+				frpart[6]=fractPart;
+				spart[6]=sensPart;
+				sprintf((char *)Mpu6050_Buffer,"%d : Ax:%c%d.%02d, Ay:%c%d.%02d, Az:%c%d.%02d, Gx:%c%d.%02d, Gy:%c%d.%02d, Gz:%c%d.%02d, T:%c%d.%02d\r\n",(int)(lastSysTime/portTICK_RATE_MS),spart[0],(int)(inpart[0]),(int)(frpart[0]),spart[1],(int)(inpart[1]),(int)(frpart[1]),spart[2],(int)(inpart[2]),(int)(frpart[2]),spart[3],(int)(inpart[3]),(int)(frpart[3]),spart[4],(int)(inpart[4]),(int)(frpart[4]),spart[5],(int)(inpart[5]),(int)(frpart[5]),spart[6],(int)(inpart[6]),(int)(frpart[6]));
+				DFS_WriteFile(&Mpu6050_File, PIOS_SDCARD_Sector, (uint8_t *) Mpu6050_Buffer, &Cache, strlen(Mpu6050_Buffer));
+			}
+			else
+			{
+				Pos=0;
+				Mpu6050_Buffer[Pos]='M';
+				Pos++;
+				Mpu6050_Buffer[Pos]='p';
+				Pos++;
+				memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
+				copybuf((char*)&Mpu6050_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+				Pos+=sizeof(FloatIEEE);
+				memcpy(&FloatIEEE,&accels[0], sizeof(accels[0]));
+				copybuf((char*)&Mpu6050_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));
+				Pos+=sizeof(FloatIEEE);
+				memcpy(&FloatIEEE,&accels[1], sizeof(accels[1]));
+				copybuf((char*)&Mpu6050_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));
+				Pos+=sizeof(FloatIEEE);
+				memcpy(&FloatIEEE,&accels[2], sizeof(accels[2]));
+				copybuf((char*)&Mpu6050_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));
+				Pos+=sizeof(FloatIEEE);
+				memcpy(&FloatIEEE,&gyros[0], sizeof(gyros[0]));
+				copybuf((char*)&Mpu6050_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));
+				Pos+=sizeof(FloatIEEE);
+				memcpy(&FloatIEEE,&gyros[1], sizeof(gyros[1]));
+				copybuf((char*)&Mpu6050_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));
+				Pos+=sizeof(FloatIEEE);
+				memcpy(&FloatIEEE,&gyros[2], sizeof(gyros[2]));
+				copybuf((char*)&Mpu6050_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));
+				Pos+=sizeof(FloatIEEE);
+				memcpy(&FloatIEEE,&temperature, sizeof(temperature));
+				copybuf((char*)&Mpu6050_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));
+				Pos+=sizeof(FloatIEEE);
+				Mpu6050_Buffer[Pos]=0x0d;
+				Pos++;
+				Mpu6050_Buffer[Pos]=0x0a;
+				Pos++;
+				DFS_WriteFile(&Mpu6050_File, PIOS_SDCARD_Sector, (uint8_t *) Mpu6050_Buffer, &Cache, Pos);
+			}
+			NewMpu6050BufferReady=TRUE;
+		}
+		//--------------------start ADC log -------------------------------------
+		Pos=0;
+		Adc_Buffer[Pos]='A';
+		Pos++;
+		Adc_Buffer[Pos]='d';
+		Pos++;
+		memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
+		copybuf((char*)&Adc_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		Pos+=sizeof(FloatIEEE);
+		AdcValue=PIOS_ADC_PinGet(0);
+		memcpy(&FloatIEEE,&AdcValue, sizeof(AdcValue));//turn the float value to an array of 4bytes
+		copybuf((char*)&Adc_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		Pos+=sizeof(FloatIEEE);
+		AdcValue=PIOS_ADC_PinGet(1);
+		memcpy(&FloatIEEE,&AdcValue, sizeof(AdcValue));//turn the float value to an array of 4bytes
+		copybuf((char*)&Adc_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		Pos+=sizeof(FloatIEEE);
+		AdcValue=PIOS_ADC_PinGet(2);
+		memcpy(&FloatIEEE,&AdcValue, sizeof(AdcValue));//turn the float value to an array of 4bytes
+		copybuf((char*)&Adc_Buffer,(char*)&FloatIEEE,(uint8_t)Pos,(uint8_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		Pos+=sizeof(FloatIEEE);
+		Adc_Buffer[Pos]=0x0d;
+		Pos++;
+		Adc_Buffer[Pos]=0x0a;
+		Pos++;
+		DFS_WriteFile(&Adc_File, PIOS_SDCARD_Sector, (uint8_t *) Adc_Buffer, &Adc_Cache, Pos);
+		//------------------------------------------------------------------------
+		*/
 	}
 }
 

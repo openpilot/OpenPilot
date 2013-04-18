@@ -67,12 +67,11 @@
 #include "velocityactual.h"
 #include "CoordinateConversions.h"
 #include <pios_math.h>
+#include <pios_constants.h>
 // Private constants
 #define MAX_QUEUE_SIZE 4
 #define STACK_SIZE_BYTES 1548
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
-#define GEE 9.81f
-// Private types
 
 // Private variables
 static bool followerEnabled = false;

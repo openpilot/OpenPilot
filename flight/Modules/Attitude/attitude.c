@@ -58,6 +58,8 @@
 #include "manualcontrolcommand.h"
 #include "CoordinateConversions.h"
 #include <pios_board_info.h>
+#include <pios_math.h>
+
  
 // Private constants
 #define STACK_SIZE_BYTES 540
@@ -67,9 +69,6 @@
 #define UPDATE_RATE  25.0f
 #define GYRO_NEUTRAL 1665
 
-#define F_PI ((float)M_PI)
-
-#define PI_MOD(x) (fmod(x + M_PI, M_PI * 2) - M_PI)
 // Private types
 
 // Private variables
@@ -336,7 +335,7 @@ static int32_t updateSensors(AccelsData * accels, GyrosData * gyros)
 			float throttle;
 			FlightStatusArmedGet(&armed);
 			ManualControlCommandThrottleGet(&throttle);  // Until flight status indicates airborne
-			if ((armed == FLIGHTSTATUS_ARMED_ARMED) && (throttle > 0)) {
+			if ((armed == FLIGHTSTATUS_ARMED_ARMED) && (throttle > 0.0f)) {
 				trim_samples++;
 				// Store the digitally scaled version since that is what we use for bias
 				trim_accels[0] += accels->x;
@@ -515,10 +514,10 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 		// Work out time derivative from INSAlgo writeup
 		// Also accounts for the fact that gyros are in deg/s
 		float qdot[4];
-		qdot[0] = (-q[1] * gyros[0] - q[2] * gyros[1] - q[3] * gyros[2]) * dT * (F_PI / 180.0f / 2.0f);
-		qdot[1] = (q[0] * gyros[0] - q[3] * gyros[1] + q[2] * gyros[2]) * dT * (F_PI / 180.0f / 2.0f);
-		qdot[2] = (q[3] * gyros[0] + q[0] * gyros[1] - q[1] * gyros[2]) * dT * (F_PI / 180.0f / 2.0f);
-		qdot[3] = (-q[2] * gyros[0] + q[1] * gyros[1] + q[0] * gyros[2]) * dT * (F_PI / 180.0f / 2.0f);
+		qdot[0] = (-q[1] * gyros[0] - q[2] * gyros[1] - q[3] * gyros[2]) * dT * (M_PI_F / 180.0f / 2.0f);
+		qdot[1] = (q[0] * gyros[0] - q[3] * gyros[1] + q[2] * gyros[2]) * dT * (M_PI_F / 180.0f / 2.0f);
+		qdot[2] = (q[3] * gyros[0] + q[0] * gyros[1] - q[1] * gyros[2]) * dT * (M_PI_F / 180.0f / 2.0f);
+		qdot[3] = (-q[2] * gyros[0] + q[1] * gyros[1] + q[0] * gyros[2]) * dT * (M_PI_F / 180.0f / 2.0f);
 		
 		// Take a time step
 		q[0] = q[0] + qdot[0];

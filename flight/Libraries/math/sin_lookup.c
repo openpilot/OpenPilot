@@ -82,7 +82,7 @@ int sin_lookup_initalize()
 		return -1;
 
 	for(uint32_t i = 0; i < 180; i++)
-		sin_table[i] = sinf((float)i * 2 * M_PI_F / 360.0f);
+		sin_table[i] = sinf(DEG2RAD((float)i));
 
 	return 0;
 }

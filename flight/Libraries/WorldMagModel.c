@@ -57,7 +57,8 @@
 //#define MALLOC(x) malloc(x)
 //#define FREE(x) free(x)
 
-// const should hopefully keep them in the flash region
+// http://reviews.openpilot.org/cru/OPReview-436#c6476 :
+// first column not used but it will be optimized out by compiler
 static const float CoeffFile[91][6] = { {0, 0, 0, 0, 0, 0},
 	{1, 0, -29496.6, 0.0, 11.6, 0.0},
 	{1, 1, -1586.3, 4944.4, 16.5, -25.9},
@@ -204,11 +205,11 @@ int WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, u
     // ***********
     // range check supplied params
 
-    if (Lat <  -90) return -1;  // error
-    if (Lat >   90) return -2;  // error
+    if (Lat <  -90.0f) return -1;  // error
+    if (Lat >   90.0f) return -2;  // error
 
-    if (Lon < -180) return -3;  // error
-    if (Lon >  180) return -4;  // error
+    if (Lon < -180.0f) return -3;  // error
+    if (Lon >  180.0f) return -4;  // error
 
     // ***********
     // allocated required memory

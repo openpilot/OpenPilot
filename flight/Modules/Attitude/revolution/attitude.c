@@ -76,8 +76,6 @@
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 #define FAILSAFE_TIMEOUT_MS 10
 
-#define PI_MOD(x) (fmodf(x + M_PI_F, M_PI_F * 2) - M_PI_F)
-
 // low pass filter configuration to calculate offset
 // of barometric altitude sensor
 // reasoning: updates at: 10 Hz, tau= 300 s settle time

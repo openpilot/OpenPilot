@@ -24,8 +24,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_HELPERS_H_
-#define PIOS_HELPERS_H_
+#ifndef PIOS_HELPERS_H
+#define PIOS_HELPERS_H
 
 
 /**
@@ -37,4 +37,4 @@
 #define NELEMENTS(x) (sizeof(x) / sizeof((x)[0]))
 
 
-#endif // PIOS_HELPERS_H_
+#endif // PIOS_HELPERS_H

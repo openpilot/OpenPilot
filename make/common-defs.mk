@@ -223,6 +223,9 @@ $(eval $(call PARTIAL_COMPILE_TEMPLATE, SRC))
 # Compile: create assembler files from C source files. ARM only
 $(eval $(call PARTIAL_COMPILE_ARM_TEMPLATE, SRCARM))
 
+# Add opfw target
+$(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
+
 $(OUTDIR)/$(TARGET).bin.o: $(OUTDIR)/$(TARGET).bin
 
 .PHONY: elf lss sym hex bin bino opfw

@@ -176,8 +176,5 @@ else ifeq ($(MCU),cortex-m4)
     LDFLAGS += $(addprefix -T,$(LINKER_SCRIPTS_APP))
 endif
 
-# Add opfw target
-$(eval $(call OPFW_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(BOARD_TYPE),$(BOARD_REVISION)))
-
 # Add jtag targets (program and wipe)
 $(eval $(call JTAG_TEMPLATE,$(OUTDIR)/$(TARGET).bin,$(FW_BANK_BASE),$(FW_BANK_SIZE),$(OPENOCD_JTAG_CONFIG),$(OPENOCD_CONFIG)))

@@ -52,15 +52,16 @@ endif
 ##############################
 
 ifeq ($(UNAME), Linux)
-    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux.tar.bz2
     ifeq ($(ARCH), x86_64)
-        QT_SDK_URL  := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-linux-x64.tar.bz2
+        ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-amd64.tar.bz2
+        QT_SDK_URL  := "Plese use native Qt 4.8.x package"
     else
-        QT_SDK_URL  := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-linux.tar.bz2
+        ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-i686.tar.bz2
+        QT_SDK_URL  := "Plese use native Qt 4.8.x package"
     endif
 else ifeq ($(UNAME), Darwin)
     ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-mac.tar.bz2
-    QT_SDK_URL  := TODO/qt-4.8.4-mac.tar.bz2
+    QT_SDK_URL  := "Plese use native Qt 4.8.x package"
 else ifeq ($(UNAME), Windows)
     ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
     QT_SDK_URL  := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-windows.tar.bz2

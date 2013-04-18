@@ -342,7 +342,7 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
 			next = current->next;
 			xSemaphoreTakeRecursive(mutex, portMAX_DELAY); // access to scheduletime should be mutex protected
 			if (current->scheduletime) {
-				diff = next->scheduletime - xTaskGetTickCount();
+				diff = current->scheduletime - xTaskGetTickCount();
 				if (diff<=0) {
 					current->waiting = true;
 				} else if (diff<result) {

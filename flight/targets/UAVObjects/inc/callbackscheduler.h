@@ -28,6 +28,7 @@
 
 // Public types
 typedef enum{CALLBACK_PRIORITY_CRITICAL=0,CALLBACK_PRIORITY_REGULAR=1,CALLBACK_PRIORITY_LOW=2} DelayedCallbackPriority;
+typedef enum{CALLBACK_UPDATEMODE_NONE=0,CALLBACK_UPDATEMODE_SOONER=1,CALLBACK_UPDATEMODE_LATER=2,CALLBACK_UPDATEMODE_OVERRIDE=3} DelayedCallbackUpdateMode;
 
 typedef void (*DelayedCallback)(void);
 
@@ -38,6 +39,7 @@ typedef struct DelayedCallbackInfoStruct DelayedCallbackInfo;
 //
 int32_t CallbackSchedulerInitialize();
 int32_t CallbackSchedulerStart();
+int32_t DelayedCallbackSchedule(DelayedCallbackInfo *cbinfo, int32_t milliseconds, DelayedCallbackUpdateMode updatemode);
 int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo);
 int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken);
 DelayedCallbackInfo* DelayedCallbackCreate(DelayedCallback cb, DelayedCallbackPriority priority, long taskPriority, uint32_t stacksize);

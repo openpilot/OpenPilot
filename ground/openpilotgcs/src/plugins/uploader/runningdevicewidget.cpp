@@ -27,7 +27,8 @@
 #include "runningdevicewidget.h"
 #include "devicedescriptorstruct.h"
 #include "uploadergadgetwidget.h"
-runningDeviceWidget::runningDeviceWidget(QWidget *parent) :
+
+RunningDeviceWidget::RunningDeviceWidget(QWidget *parent) :
     QWidget(parent)
 {
     myDevice = new Ui_runningDeviceWidget();
@@ -35,11 +36,9 @@ runningDeviceWidget::runningDeviceWidget(QWidget *parent) :
 
     // Initialization of the Device icon display
     myDevice->devicePicture->setScene(new QGraphicsScene(this));
-
 }
 
-
-void runningDeviceWidget::showEvent(QShowEvent *event)
+void RunningDeviceWidget::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event)
     // Thit fitInView method should only be called now, once the
@@ -48,7 +47,7 @@ void runningDeviceWidget::showEvent(QShowEvent *event)
     myDevice->devicePicture->fitInView(devicePic.rect(),Qt::KeepAspectRatio);
 }
 
-void runningDeviceWidget::resizeEvent(QResizeEvent* event)
+void RunningDeviceWidget::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
     myDevice->devicePicture->fitInView(devicePic.rect(), Qt::KeepAspectRatio);
@@ -57,31 +56,28 @@ void runningDeviceWidget::resizeEvent(QResizeEvent* event)
 /**
   Fills the various fields for the device
   */
-void runningDeviceWidget::populate()
+void RunningDeviceWidget::populate()
 {
-
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
     int id = utilMngr->getBoardModel();
 
     myDevice->lblDeviceID->setText(QString("Device ID: ") + QString::number(id, 16));
     myDevice->lblBoardName->setText(deviceDescriptorStruct::idToBoardName(id));
-    myDevice->lblHWRev->setText(QString(tr("HW Revision: "))+QString::number(id & 0x00FF, 16));
-    qDebug()<<"CRC"<<utilMngr->getFirmwareCRC();
-    myDevice->lblCRC->setText(QString(tr("Firmware CRC: "))+QVariant(utilMngr->getFirmwareCRC()).toString());
+    myDevice->lblHWRev->setText(QString(tr("HW Revision: ")) + QString::number(id & 0x00FF, 16));
+    qDebug() << "CRC" << utilMngr->getFirmwareCRC();
+    myDevice->lblCRC->setText(QString(tr("Firmware CRC: ")) + QVariant(utilMngr->getFirmwareCRC()).toString());
     // DeviceID tells us what sort of HW we have detected:
     // display a nice icon:
     myDevice->devicePicture->scene()->clear();
 
     switch (id) {
     case 0x0101:
-        devicePic.load("");//TODO
-        break;
     case 0x0201:
-        devicePic.load("");//TODO
+        devicePic.load("");
         break;
     case 0x0301:
-        devicePic.load(":/uploader/images/pipx.png");
+        devicePic.load(":/uploader/images/gcs-board-oplink.png");
         break;
     case 0x0401:
         devicePic.load(":/uploader/images/gcs-board-cc.png");
@@ -89,7 +85,12 @@ void runningDeviceWidget::populate()
     case 0x0402:
         devicePic.load(":/uploader/images/gcs-board-cc3d.png");
         break;
+    case 0x0903:
+        devicePic.load(":/uploader/images/gcs-board-revo.png");
+        break;
     default:
+        // Clear
+        devicePic.load("");
         break;
     }
     myDevice->devicePicture->scene()->addPixmap(devicePic);
@@ -97,65 +98,31 @@ void runningDeviceWidget::populate()
     myDevice->devicePicture->fitInView(devicePic.rect(),Qt::KeepAspectRatio);
 
     QString serial = utilMngr->getBoardCPUSerial().toHex();
-     myDevice->CPUSerial->setText(serial);
+    myDevice->CPUSerial->setText(serial);
 
     QByteArray description = utilMngr->getBoardDescription();
     deviceDescriptorStruct devDesc;
-    if(UAVObjectUtilManager::descriptionToStructure(description,devDesc))
-    {
-        if(devDesc.gitTag.startsWith("RELEASE",Qt::CaseSensitive))
-        {
-            myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.gitTag);
+    if(UAVObjectUtilManager::descriptionToStructure(description, devDesc)) {
+        if(devDesc.gitTag.startsWith("RELEASE",Qt::CaseSensitive)) {
+            myDevice->lblFWTag->setText(QString("Firmware tag: ") + devDesc.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Tagged officially released firmware build"));
 
-        }
-        else
-        {
-            myDevice->lblFWTag->setText(QString("Firmware tag: ")+devDesc.gitTag);
+        } else {
+            myDevice->lblFWTag->setText(QString("Firmware tag: ") + devDesc.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Untagged or custom firmware build"));
         }
-        myDevice->lblGitCommitTag->setText("Git commit hash: "+devDesc.gitHash);
+        myDevice->lblGitCommitTag->setText("Git commit hash: " + devDesc.gitHash);
         myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.gitDate.insert(4,"-").insert(7,"-"));
-    }
-    else
-    {
-
-        myDevice->lblFWTag->setText(QString("Firmware tag: ")+QString(description).left(QString(description).indexOf(QChar(255))));
+    } else {
+        myDevice->lblFWTag->setText(QString("Firmware tag: ") + QString(description).left(QString(description).indexOf(QChar(255))));
         myDevice->lblGitCommitTag->setText("Git commit tag: Unknown");
         myDevice->lblFWDate->setText(QString("Firmware date: Unknown"));
         QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
         myDevice->lblCertified->setPixmap(pix);
         myDevice->lblCertified->setToolTip(tr("Custom Firmware Build"));
     }
-    //status("Ready...", STATUSICON_INFO);
 }
-
-
-/**
-  Updates status message
-  */
-/*
-void runningDeviceWidget::status(QString str, StatusIcon ic)
-{
-    QPixmap px;
-    myDevice->statusLabel->setText(str);
-    switch (ic) {
-    case STATUSICON_RUNNING:
-        px.load(QString(":/uploader/images/system-run.svg"));
-        break;
-    case STATUSICON_OK:
-        px.load(QString(":/uploader/images/dialog-apply.svg"));
-        break;
-    case STATUSICON_FAIL:
-        px.load(QString(":/uploader/images/process-stop.svg"));
-        break;
-    default:
-        px.load(QString(":/uploader/images/gtk-info.svg"));
-    }
-    myDevice->statusIcon->setPixmap(px);
-}
-*/

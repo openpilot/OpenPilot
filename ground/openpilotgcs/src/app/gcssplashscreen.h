@@ -33,7 +33,7 @@
 #include <QPainter>
 #include <extensionsystem/pluginspec.h>
 
-#include "../../../../build/ground/openpilotgcs/gcsversioninfo.h"
+#include "../gcs_version_info.h"
 
 class GCSSplashScreen : public QSplashScreen
 {

@@ -62,9 +62,6 @@ static void PIOS_RFM22B_COM_ChangeBaud(uint32_t rfm22b_id, uint32_t baud)
 	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 	if (!PIOS_RFM22B_validate(rfm22b_dev))
 		return;
-	// This is only allowed for coordinators.
-	if (!rfm22b_dev->coordinator)
-		return;
 	// Set the RF data rate on the modem to ~2X the selected buad rate because the modem is half duplex.
 	enum rfm22b_datarate datarate = RFM22_datarate_64000;
 	if (baud <= 1024)
@@ -78,12 +75,12 @@ static void PIOS_RFM22B_COM_ChangeBaud(uint32_t rfm22b_id, uint32_t baud)
 	else if (baud <= 19200)
 		datarate = RFM22_datarate_32000;
 	else if (baud <= 38400)
-		datarate = RFM22_datarate_64000;
+		datarate = RFM22_datarate_57600;
 	else if (baud <= 57600)
 		datarate = RFM22_datarate_128000;
 	else if (baud <= 115200)
 		datarate = RFM22_datarate_192000;
-	PIOS_RFM22B_SetDatarate(rfm22b_id, datarate, true);
+	rfm22b_dev->datarate = datarate;
 }
 
 static void PIOS_RFM22B_COM_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail)

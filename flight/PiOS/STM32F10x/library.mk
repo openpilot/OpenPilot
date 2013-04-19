@@ -12,13 +12,13 @@ LINKER_SCRIPTS_PATH	=  $(PIOS_DEVLIB)
 CDEFS			+= -DSTM32F10X -DSTM32F10X_$(MODEL)
 CDEFS 			+= -DUSE_STDPERIPH_DRIVER
 CDEFS			+= -DARM_MATH_CM3
-ARCHFLAGS		+= -mcpu=cortex-m3
+ARCHFLAGS		+= -mcpu=cortex-m3 --specs=nano.specs
 
 # Board-specific startup files
 ASRC			+= $(PIOS_DEVLIB)startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
 
 # PIOS device library source and includes
-SRC			+= $(wildcard $(PIOS_DEVLIB)*.c)
+SRC			+= $(sort $(wildcard $(PIOS_DEVLIB)*.c))
 
 # CMSIS for the F1
 include $(PIOS)/Common/Libraries/CMSIS2/library.mk
@@ -29,12 +29,12 @@ EXTRAINCDIRS		+= $(CMSIS_DIR)
 
 # ST Peripheral library
 PERIPHLIB		=  $(PIOS_DEVLIB)Libraries/STM32F10x_StdPeriph_Driver
-SRC			+= $(wildcard $(PERIPHLIB)/src/*.c)
+SRC			+= $(sort $(wildcard $(PERIPHLIB)/src/*.c))
 EXTRAINCDIRS		+= $(PERIPHLIB)/inc
 
 # ST USB Device library
 USBDEVLIB		=  $(PIOS_DEVLIB)Libraries/STM32_USB-FS-Device_Driver
-SRC			+= $(wildcard $(USBDEVLIB)/src/*.c)
+SRC			+= $(sort $(wildcard $(USBDEVLIB)/src/*.c))
 EXTRAINCDIRS		+= $(USBDEVLIB)/inc
 
 #
@@ -45,7 +45,7 @@ EXTRAINCDIRS		+= $(USBDEVLIB)/inc
 #
 ifneq ($(FREERTOS_DIR),)
     FREERTOS_PORTDIR	:= $(PIOS_DEVLIB)Libraries/FreeRTOS/Source
-    SRC			+= $(wildcard $(FREERTOS_PORTDIR)/portable/GCC/ARM_CM3/*.c)
-    SRC			+= $(wildcard $(FREERTOS_PORTDIR)/portable/MemMang/heap_1.c)
+    SRC			+= $(sort $(wildcard $(FREERTOS_PORTDIR)/portable/GCC/ARM_CM3/*.c))
+    SRC			+= $(sort $(wildcard $(FREERTOS_PORTDIR)/portable/MemMang/heap_1.c))
     EXTRAINCDIRS	+= $(FREERTOS_PORTDIR)/portable/GCC/ARM_CM3
 endif

@@ -6,5 +6,5 @@
 #
 
 FREERTOS_DIR	:=	$(dir $(lastword $(MAKEFILE_LIST)))/Source
-SRC		+=	$(wildcard $(FREERTOS_DIR)/*.c)
+SRC		+=	$(sort $(wildcard $(FREERTOS_DIR)/*.c))
 EXTRAINCDIRS	+=	$(FREERTOS_DIR)/include

@@ -41,11 +41,11 @@
 #include "uavobjectutilmanager.h"
 #include "uploader_global.h"
 
-class UPLOADER_EXPORT runningDeviceWidget : public QWidget
+class UPLOADER_EXPORT RunningDeviceWidget : public QWidget
 {
     Q_OBJECT
 public:
-    runningDeviceWidget( QWidget *parent = 0);
+    RunningDeviceWidget( QWidget *parent = 0);
     void populate();
     void freeze();
     QString setOpenFileName();
@@ -57,7 +57,6 @@ private:
     int deviceID;
     QPixmap devicePic;
     //void status(QString str, StatusIcon ic);
-
 
 signals:
 

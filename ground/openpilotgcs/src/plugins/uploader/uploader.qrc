@@ -16,5 +16,7 @@
         <file>images/gcs-board-cc.png</file>
         <file>images/gcs-board-cc3d.png</file>
         <file>images/pipx.png</file>
+        <file>images/gcs-board-oplink.png</file>
+        <file>images/gcs-board-revo.png</file>
     </qresource>
 </RCC>

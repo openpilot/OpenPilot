@@ -44,7 +44,7 @@ CFLAGS += -ffast-math
 # Use file-extension c for "c-only"-files
 ifndef TESTAPP
     ## Application Core
-    SRC += ${OPMODULEDIR}/System/systemmod.c
+    SRC += $(OPMODULEDIR)/System/systemmod.c
     SRC += $(OPSYSTEM)/osd.c
     SRC += $(OPSYSTEM)/pios_board.c
     SRC += $(OPSYSTEM)/pios_usb_board_data.c

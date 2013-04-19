@@ -34,6 +34,7 @@
 #include <packet_handler.h>
 #include <oplinksettings.h>
 
+/* Constant definitions */
 enum gpio_direction {GPIO0_TX_GPIO1_RX, GPIO0_RX_GPIO1_TX};
 
 /* Global Types */
@@ -67,10 +68,11 @@ enum rfm22b_datarate {
 	RFM22_datarate_19200 = 7,
 	RFM22_datarate_24000 = 8,
 	RFM22_datarate_32000 = 9,
-	RFM22_datarate_64000 = 10,
-	RFM22_datarate_128000 = 11,
-	RFM22_datarate_192000 = 12,
-	RFM22_datarate_256000 = 13,
+	RFM22_datarate_57600 = 10,
+	RFM22_datarate_64000 = 11,
+	RFM22_datarate_128000 = 12,
+	RFM22_datarate_192000 = 13,
+	RFM22_datarate_256000 = 14,
 };
 
 struct rfm22b_stats {
@@ -96,18 +98,22 @@ struct rfm22b_stats {
 };
 
 /* Callback function prototypes */
-typedef void (*PIOS_RFM22B_ComConfigCallback)(OPLinkSettingsOutputConnectionOptions com_port, OPLinkSettingsComSpeedOptions com_speed);
+typedef void (*PIOS_RFM22B_ComConfigCallback)(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
+					      OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed,
+					      uint32_t min_frequency, uint32_t max_frequency, uint32_t channel_spacing);
 
 /* Public Functions */
 extern int32_t PIOS_RFM22B_Init(uint32_t *rfb22b_id, uint32_t spi_id, uint32_t slave_num, const struct pios_rfm22b_cfg *cfg);
-extern void PIOS_RFM22B_SetFrequencyRange(uint32_t rfm22b_id, uint32_t min_frequency, uint32_t max_frequency);
+extern void PIOS_RFM22B_Reinit(uint32_t rfb22b_id);
 extern void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr);
-extern void PIOS_RFM22B_SetDatarate(uint32_t rfm22b_id, enum rfm22b_datarate datarate, bool data_whitening);
+extern void PIOS_RFM22B_SetFrequencyRange(uint32_t rfm22b_id, uint32_t min_freq, uint32_t max_freq, uint32_t step_size);
+extern void PIOS_RFM22B_SetInitialFrequency(uint32_t rfm22b_id, uint32_t init_freq);
 extern void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id);
-extern void PIOS_RFM22B_SetCoordinator(uint32_t rfm22b_id, bool coordinator);
-extern void PIOS_RFM22B_SetRemoteComConfig(uint32_t rfm22b_id, OPLinkSettingsOutputConnectionOptions com_port, OPLinkSettingsComSpeedOptions com_speed);
 extern void PIOS_RFM22B_SetComConfigCallback(uint32_t rfm22b_id, PIOS_RFM22B_ComConfigCallback cb);
+extern void PIOS_RFM22B_SetBindings(uint32_t rfm22b_id, const uint32_t bindingPairIDs[], const uint8_t mainPortSettings[],
+				    const uint8_t flexiPortSettings[], const uint8_t vcpPortSettings[], const uint8_t comSpeeds[]);
 extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
+extern bool PIOS_RFM22B_IsCoordinator(uint32_t rfb22b_id);
 extern void PIOS_RFM22B_GetStats(uint32_t rfm22b_id, struct rfm22b_stats *stats);
 extern uint8_t PIOS_RFM2B_GetPairStats(uint32_t rfm22b_id, uint32_t *device_ids, int8_t *RSSIs, uint8_t max_pairs);
 extern bool PIOS_RFM22B_LinkStatus(uint32_t rfm22b_id);

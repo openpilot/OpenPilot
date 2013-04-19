@@ -13,6 +13,15 @@
     <StyleSheet>default</StyleSheet>
     <UDPMirror>false</UDPMirror>
   </General>
+  <IPconnection>
+    <Current>
+      <arr_1>
+        <Port>9000</Port>
+        <UseTCP>0</UseTCP>
+      </arr_1>
+      <size>1</size>
+    </Current>
+  </IPconnection>
   <KeyBindings>
     <size>0</size>
   </KeyBindings>
@@ -1561,6 +1570,28 @@
           <enableVbo>false</enableVbo>
         </data>
       </CC3D>
+      <Revolution>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/boards/Revolution/revolution.3ds</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Revolution>
+      <Zagi>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <acFilename>%%DATAPATH%%models/planes/zagi/zagi.3ds</acFilename>
+          <bgFilename>%%DATAPATH%%models/backgrounds/default_background.png</bgFilename>
+          <enableVbo>false</enableVbo>
+        </data>
+      </Zagi>
       <Easyquad__PCT__20X>
         <configInfo>
           <locked>false</locked>

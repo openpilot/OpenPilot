@@ -1,7 +1,6 @@
 #
 # Qmake project for UAVObjects generation.
-#
-# TODO: provide some dependencies (now it builds every time)
+# Copyright (c) 2009-2013, The OpenPilot Team, http://www.openpilot.org
 #
 
 TEMPLATE  = subdirs
@@ -39,31 +38,30 @@ win32 {
     # Windows sometimes remembers working directory changed from Makefile, sometimes not.
     # That's why pushd/popd is used here - to make sure that we know current directory.
 
-    uavobjects.commands += -$(MKDIR) $$targetPath(../../uavobject-synthetics) $$addNewline()
-
-    uavobjects.commands += pushd $$targetPath(../../uavobject-synthetics) &&
-    uavobjects.commands += $$targetPath(../ground/uavobjgenerator/$${BUILD_CONFIG}/uavobjgenerator)
-    uavobjects.commands +=   -gcs -flight -python -matlab
+    uavobjects.commands += -$(MKDIR) $$targetPath(../uavobject-synthetics) $$addNewline()
+    uavobjects.commands += pushd $$targetPath(../uavobject-synthetics) &&
+    uavobjects.commands += $$targetPath(../uavobjgenerator/$${BUILD_CONFIG}/uavobjgenerator)
     uavobjects.commands +=   $$targetPath(../../shared/uavobjectdefinition)
     uavobjects.commands +=   $$targetPath(../..) &&
     uavobjects.commands += popd $$addNewline()
 
-    uavobjects.commands += pushd $$targetPath(../../ground/openpilotgcs) &&
+    uavobjects.commands += -$(MKDIR) $$targetPath(../openpilotgcs) $$addNewline()
+    uavobjects.commands += pushd $$targetPath(../openpilotgcs) &&
     uavobjects.commands += $(QMAKE) -spec $$SPEC CONFIG+=$${BUILD_CONFIG} -r
-    uavobjects.commands +=   $$targetPath(../../../ground/openpilotgcs/)openpilotgcs.pro &&
+    uavobjects.commands +=   $$targetPath(../../ground/openpilotgcs/)openpilotgcs.pro &&
     uavobjects.commands += popd $$addNewline()
 }
 
 !win32 {
-    uavobjects.commands += $(MKDIR) -p ../../uavobject-synthetics $$addNewline()
+    uavobjects.commands += $(MKDIR) -p ../uavobject-synthetics $$addNewline()
+    uavobjects.commands += cd ../uavobject-synthetics &&
+    uavobjects.commands += ../uavobjgenerator/uavobjgenerator
+    uavobjects.commands +=   ../../shared/uavobjectdefinition ../.. &&
 
-    uavobjects.commands += cd ../../uavobject-synthetics &&
-    uavobjects.commands += ../ground/uavobjgenerator/uavobjgenerator
-    uavobjects.commands += -gcs -flight -python -matlab ../../shared/uavobjectdefinition ../.. &&
-
-    uavobjects.commands += cd ../ground/openpilotgcs &&
-    uavobjects.commands += $(QMAKE) ../../../ground/openpilotgcs/openpilotgcs.pro
-    uavobjects.commands += -spec $$SPEC CONFIG+=$${BUILD_CONFIG} -r $$addNewline()
+    uavobjects.commands += $(MKDIR) -p ../openpilotgcs $$addNewline()
+    uavobjects.commands += cd ../openpilotgcs &&
+    uavobjects.commands += $(QMAKE) ../../ground/openpilotgcs/openpilotgcs.pro
+    uavobjects.commands +=   -spec $$SPEC CONFIG+=$${BUILD_CONFIG} -r $$addNewline()
 }
 
 uavobjects.target = FORCE

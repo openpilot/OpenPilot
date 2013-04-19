@@ -25,7 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uploadergadgetwidget.h"
-#include "../../../../../build/ground/openpilotgcs/gcsversioninfo.h"
+#include "../../gcs_version_info.h"
 #include <coreplugin/coreconstants.h>
 #include <QDebug>
 #include "flightstatus.h"
@@ -118,10 +118,10 @@ QString UploaderGadgetWidget::getPortDevice(const QString &friendName)
 
 void UploaderGadgetWidget::connectSignalSlot(QWidget *widget)
 {
-    connect(qobject_cast<deviceWidget *>(widget),SIGNAL(uploadStarted()),this,SLOT(uploadStarted()));
-    connect(qobject_cast<deviceWidget *>(widget),SIGNAL(uploadEnded(bool)),this,SLOT(uploadEnded(bool)));
-    connect(qobject_cast<deviceWidget *>(widget),SIGNAL(downloadStarted()),this,SLOT(downloadStarted()));
-    connect(qobject_cast<deviceWidget *>(widget),SIGNAL(downloadEnded(bool)),this,SLOT(downloadEnded(bool)));
+    connect(qobject_cast<DeviceWidget *>(widget),SIGNAL(uploadStarted()),this,SLOT(uploadStarted()));
+    connect(qobject_cast<DeviceWidget *>(widget),SIGNAL(uploadEnded(bool)),this,SLOT(uploadEnded(bool)));
+    connect(qobject_cast<DeviceWidget *>(widget),SIGNAL(downloadStarted()),this,SLOT(downloadStarted()));
+    connect(qobject_cast<DeviceWidget *>(widget),SIGNAL(downloadEnded(bool)),this,SLOT(downloadEnded(bool)));
 }
 
 FlightStatus *UploaderGadgetWidget::getFlightStatus()
@@ -147,7 +147,7 @@ void UploaderGadgetWidget::onPhisicalHWConnect()
   Enables widget buttons if autopilot connected
   */
 void UploaderGadgetWidget::onAutopilotConnect(){
-    QTimer::singleShot(1000,this,SLOT(populate()));
+    QTimer::singleShot(1000, this, SLOT(populate()));
 }
 
 void UploaderGadgetWidget::populate()
@@ -166,7 +166,7 @@ void UploaderGadgetWidget::populate()
          m_config->systemElements->removeTab(0);
          delete qw;
     }
-    runningDeviceWidget* dw = new runningDeviceWidget(this);
+    RunningDeviceWidget* dw = new RunningDeviceWidget(this);
     dw->populate();
     m_config->systemElements->addTab(dw, QString("Connected Device"));
 }
@@ -175,6 +175,7 @@ void UploaderGadgetWidget::populate()
   Enables widget buttons if autopilot disconnected
   */
 void UploaderGadgetWidget::onAutopilotDisconnect(){
+
     m_config->haltButton->setEnabled(false);
     m_config->resetButton->setEnabled(false);
     m_config->bootButton->setEnabled(true);
@@ -187,7 +188,6 @@ void UploaderGadgetWidget::onAutopilotDisconnect(){
         m_config->telemetryLink->setEnabled(true);
     }
 }
-
 
 /**
   Tell the mainboard to go to bootloader:
@@ -313,6 +313,9 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
             return;
         }
         //dfu.StatusRequest();
+
+		QTimer::singleShot(500, &m_eventloop, SLOT(quit()));
+		m_eventloop.exec();
         dfu->findDevices();
         log(QString("Found ") + QString::number(dfu->numberOfDevices) + QString(" device(s)."));
         if (dfu->numberOfDevices < 0 || dfu->numberOfDevices > 3) {
@@ -329,7 +332,7 @@ void UploaderGadgetWidget::goToBootloader(UAVObject* callerObj, bool success)
              delete qw;
         }
         for(int i=0;i<dfu->numberOfDevices;i++) {
-            deviceWidget* dw = new deviceWidget(this);
+            DeviceWidget* dw = new DeviceWidget(this);
             connectSignalSlot(dw);
             dw->setDeviceID(i);
             dw->setDfu(dfu);
@@ -474,7 +477,7 @@ void UploaderGadgetWidget::commonSystemBoot(bool safeboot)
         for (int i=0; i< m_config->systemElements->count(); i++) {
             // OP-682 arriving here too "early" (before the devices are refreshed) was leading to a crash
             // OP-682 the crash was due to an unchecked cast in the line below that would cast a RunningDeviceGadget to a DeviceGadget
-            deviceWidget *qw = dynamic_cast<deviceWidget*>(m_config->systemElements->widget(i));
+            DeviceWidget *qw = dynamic_cast<DeviceWidget*>(m_config->systemElements->widget(i));
             if (qw) {
                 // OP-682 fixed a second crash by disabling *all* buttons in the device widget
                 // disabling the buttons is only half of the solution as even if the buttons are enabled
@@ -726,7 +729,7 @@ void UploaderGadgetWidget::systemRescue()
         return;
     }
     for(int i=0;i<dfu->numberOfDevices;i++) {
-        deviceWidget* dw = new deviceWidget(this);
+        DeviceWidget* dw = new DeviceWidget(this);
         connectSignalSlot(dw);
         dw->setDeviceID(i);
         dw->setDfu(dfu);

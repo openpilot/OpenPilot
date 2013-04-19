@@ -4,7 +4,7 @@
 : ${ROOT_DIR?} ${BUILD_DIR?} ${PACKAGE_LBL?} ${PACKAGE_DIR?} ${FW_DIR?} ${PACKAGE_NAME?} ${PACKAGE_SEP?}
 
 # more variables
-APP_PATH="${BUILD_DIR}/ground/openpilotgcs/release/bin/OpenPilot GCS.app"
+APP_PATH="${BUILD_DIR}/openpilotgcs_release/bin/OpenPilot GCS.app"
 TEMP_FILE="${PACKAGE_DIR}/OpenPilot-temp.dmg"
 OUT_FILE="${PACKAGE_DIR}/../${PACKAGE_NAME}${PACKAGE_SEP}${PACKAGE_LBL}${PACKAGE_SEP}osx.dmg"
 VOL_NAME="OpenPilot"
@@ -14,18 +14,18 @@ rm -f "${TEMP_FILE}"
 rm -f "${OUT_FILE}"
 
 hdiutil convert "${ROOT_DIR}/package/osx/OpenPilot.dmg" \
-	-format UDRW -o "${TEMP_FILE}"
-device=$(hdiutil attach  "${TEMP_FILE}" | \
-         egrep '^/dev/' | sed 1q | awk '{print $1}')
+    -format UDRW -o "${TEMP_FILE}"
+device=$(hdiutil attach "${TEMP_FILE}" | \
+    egrep '^/dev/' | sed 1q | awk '{print $1}')
 
 # packaging goes here
-cp -r "${APP_PATH}" "/Volumes/${VOL_NAME}"
+cp -a "${APP_PATH}" "/Volumes/${VOL_NAME}"
 ls "${FW_DIR}" | xargs -n 1 -I {} cp "${FW_DIR}/{}" "/Volumes/${VOL_NAME}/Firmware"
 cp "${BUILD_DIR}/uavobject-synthetics/matlab/OPLogConvert.m" "/Volumes/${VOL_NAME}/Utilities"
 cp "${ROOT_DIR}/HISTORY.txt" "/Volumes/${VOL_NAME}"
 
 "${ROOT_DIR}/package/osx/libraries" \
-	"/Volumes/${VOL_NAME}/OpenPilot GCS.app" || exit 1
+    "/Volumes/${VOL_NAME}/OpenPilot GCS.app" || exit 1
 
 hdiutil detach ${device}
 

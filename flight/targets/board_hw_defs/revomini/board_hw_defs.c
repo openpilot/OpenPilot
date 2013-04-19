@@ -75,6 +75,56 @@ static const struct pios_led pios_leds_v2[] = {
 			},
 		},
 	},
+#ifdef PIOS_RFM22B_DEBUG_ON_SERVO
+	[PIOS_LED_D1] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_13,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+				.GPIO_Mode  = GPIO_Mode_OUT,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd = GPIO_PuPd_UP
+			},
+		},
+	},
+	[PIOS_LED_D2] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_14,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+				.GPIO_Mode  = GPIO_Mode_OUT,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd = GPIO_PuPd_UP
+			},
+		},
+	},
+	[PIOS_LED_D3] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_15,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+				.GPIO_Mode  = GPIO_Mode_OUT,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd = GPIO_PuPd_UP
+			},
+		},
+	},
+	[PIOS_LED_D4] = {
+		.pin = {
+			.gpio = GPIOC,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_6,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+				.GPIO_Mode  = GPIO_Mode_OUT,
+				.GPIO_OType = GPIO_OType_PP,
+				.GPIO_PuPd = GPIO_PuPd_UP
+			},
+		},
+	},
+#endif
 };
 
 static const struct pios_led_cfg pios_led_v2_cfg = {
@@ -565,14 +615,6 @@ static const struct flashfs_logfs_cfg flashfs_m25p_cfg = {
 	.start_offset  = 0,	     /* start at the beginning of the chip */
 	.sector_size   = 0x00010000, /* 64K bytes */
 	.page_size     = 0x00000100, /* 256 bytes */
-};
-
-static const struct pios_flash_jedec_cfg flash_m25p_cfg = {
-	.expect_manufacturer = JEDEC_MANUFACTURER_ST,
-	.expect_memorytype   = 0x20,
-	.expect_capacity     = 0x15,
-	.sector_erase        = 0xD8,
-	.chip_erase          = 0xC7,
 };
 
 #endif	/* PIOS_INCLUDE_FLASH */

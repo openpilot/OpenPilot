@@ -36,7 +36,7 @@
   ; Tree root locations (relative to this script location)
   !define PROJECT_ROOT   "..\.."
   !define NSIS_DATA_TREE "."
-  !define GCS_BUILD_TREE "..\..\build\ground\openpilotgcs\release"
+  !define GCS_BUILD_TREE "..\..\build\openpilotgcs_release"
   !define UAVO_SYNTH_TREE "..\..\build\uavobject-synthetics"
   !define AEROSIMRC_TREE "${GCS_BUILD_TREE}\misc\AeroSIM-RC"
 
@@ -61,7 +61,7 @@
 ; !define PRODUCT_VERSION "0.0.0.0"
 ; !define FILE_VERSION "${TAG_OR_BRANCH}:${HASH8} ${DATETIME}"
 ; !define BUILD_DESCRIPTION "${TAG_OR_BRANCH}:${HASH8} built from ${ORIGIN}, committed ${DATETIME} as ${HASH}"
-  !include "${GCS_BUILD_TREE}\..\openpilotgcs.nsh"
+  !include "${GCS_BUILD_TREE}\..\openpilotgcs-synthetics\openpilotgcs.nsh"
 
   Name "${PRODUCT_NAME}"
   OutFile "${PACKAGE_DIR}\..\${OUT_FILE}"

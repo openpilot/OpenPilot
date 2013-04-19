@@ -410,6 +410,19 @@ static const struct pios_tim_channel pios_tim_ppm_flexi_port = {
 	.remap = GPIO_PartialRemap2_TIM2,
 };
 
+static const struct pios_tim_channel pios_tim_ppm_main_port = {
+	.timer = TIM1,
+	.timer_chan = TIM_Channel_2,
+	.pin = {
+		.gpio = GPIOA,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_9,
+			.GPIO_Mode  = GPIO_Mode_IPD,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+		},
+	},
+};
+
 #endif	/* PIOS_INCLUDE_TIM */
 
 #if defined(PIOS_INCLUDE_USART)
@@ -541,7 +554,7 @@ void PIOS_RTC_IRQ_Handler (void)
 #if defined(PIOS_INCLUDE_PPM)
 #include <pios_ppm_priv.h>
 
-const struct pios_ppm_cfg pios_ppm_cfg = {
+const struct pios_ppm_cfg pios_ppm_flexi_cfg = {
 	.tim_ic_init = {
 		.TIM_ICPolarity = TIM_ICPolarity_Rising,
 		.TIM_ICSelection = TIM_ICSelection_DirectTI,
@@ -549,6 +562,17 @@ const struct pios_ppm_cfg pios_ppm_cfg = {
 		.TIM_ICFilter = 0x0,
 	},
 	.channels = &pios_tim_ppm_flexi_port,
+	.num_channels = 1,
+};
+
+const struct pios_ppm_cfg pios_ppm_main_cfg = {
+	.tim_ic_init = {
+		.TIM_ICPolarity = TIM_ICPolarity_Rising,
+		.TIM_ICSelection = TIM_ICSelection_DirectTI,
+		.TIM_ICPrescaler = TIM_ICPSC_DIV1,
+		.TIM_ICFilter = 0x0,
+	},
+	.channels = &pios_tim_ppm_main_port,
 	.num_channels = 1,
 };
 

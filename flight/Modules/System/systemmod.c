@@ -39,8 +39,10 @@
  */
 
 #include <openpilot.h>
+
 // private includes
 #include "inc/systemmod.h"
+
 // UAVOs
 #include <objectpersistence.h>
 #include <flightstatus.h>
@@ -51,6 +53,7 @@
 #include <watchdogstatus.h>
 #include <taskmonitor.h>
 #include <hwsettings.h>
+
 // Flight Libraries
 #include <sanitycheck.h>
 
@@ -69,8 +72,8 @@
 
 #ifndef IDLE_COUNTS_PER_SEC_AT_NO_LOAD
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998	// calibrated by running tests/test_cpuload.c
-											  // must be updated if the FreeRTOS or compiler
-											  // optimisation options are changed.
+						// must be updated if the FreeRTOS or compiler
+						// optimisation options are changed.
 #endif
 
 #if defined(PIOS_SYSTEM_STACK_SIZE)
@@ -177,8 +180,8 @@ static void systemTask(void *parameters)
 	// Listen for SettingPersistance object updates, connect a callback function
 	ObjectPersistenceConnectQueue(objectPersistenceQueue);
 
-    // Load a copy of HwSetting active at boot time
-    HwSettingsGet(&bootHwSettings);
+	// Load a copy of HwSetting active at boot time
+	HwSettingsGet(&bootHwSettings);
 	// Whenever the configuration changes, make sure it is safe to fly
 	HwSettingsConnectCallback(hwSettingsUpdatedCb);
 
@@ -314,7 +317,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 #if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
 			retval = PIOS_FLASHFS_Format(0);
 #else
-            retval = -1;
+			retval = -1;
 #endif
 		}
 		switch(retval) {

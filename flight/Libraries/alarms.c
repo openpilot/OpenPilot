@@ -157,8 +157,7 @@ int32_t AlarmsDefault(SystemAlarmsAlarmElem alarm)
  */
 void AlarmsDefaultAll()
 {
-    uint32_t n;
-    for (n = 0; n < SYSTEMALARMS_ALARM_NUMELEM; ++n) {
+    for (uint32_t n = 0; n < SYSTEMALARMS_ALARM_NUMELEM; ++n) {
         AlarmsDefault(n);
     }
 }
@@ -182,8 +181,7 @@ int32_t AlarmsClear(SystemAlarmsAlarmElem alarm)
  */
 void AlarmsClearAll()
 {
-    uint32_t n;
-    for (n = 0; n < SYSTEMALARMS_ALARM_NUMELEM; ++n) {
+    for (uint32_t n = 0; n < SYSTEMALARMS_ALARM_NUMELEM; ++n) {
         AlarmsClear(n);
     }
 }
@@ -224,7 +222,6 @@ int32_t AlarmsHasCritical()
 static int32_t hasSeverity(SystemAlarmsAlarmOptions severity)
 {
     SystemAlarmsData alarms;
-    uint32_t n;
 
     // Lock
     xSemaphoreTakeRecursive(lock, portMAX_DELAY);
@@ -233,7 +230,7 @@ static int32_t hasSeverity(SystemAlarmsAlarmOptions severity)
     SystemAlarmsGet(&alarms);
 
     // Go through alarms and check if any are of the given severity or higher
-    for (n = 0; n < SYSTEMALARMS_ALARM_NUMELEM; ++n) {
+    for (uint32_t n = 0; n < SYSTEMALARMS_ALARM_NUMELEM; ++n) {
         if (alarms.Alarm[n] >= severity) {
             xSemaphoreGiveRecursive(lock);
             return 1;
@@ -244,8 +241,8 @@ static int32_t hasSeverity(SystemAlarmsAlarmOptions severity)
     xSemaphoreGiveRecursive(lock);
     return 0;
 }
+
 /**
  * @}
  * @}
  */
-

@@ -91,11 +91,14 @@ int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity
  * Set an Extended Alarm
  * @param alarm The system alarm to be modified
  * @param severity The alarm severity
- * @param status: the Extended alarm status field
- * @param subStatus: the Extended alarm substatus field
+ * @param status The Extended alarm status field
+ * @param subStatus The Extended alarm substatus field
  * @return 0 if success, -1 if an error
  */
-int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity, uint8_t status, uint8_t subStatus)
+int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm,
+			  SystemAlarmsAlarmOptions severity,
+			  SystemAlarmsExtendedAlarmStatusOptions status,
+			  uint8_t subStatus)
 {
     SystemAlarmsData alarms;
 
@@ -170,7 +173,7 @@ void AlarmsDefaultAll()
 int32_t AlarmsClear(SystemAlarmsAlarmElem alarm)
 {
     if (alarm < SYSTEMALARMS_EXTENDEDALARMSTATUS_NUMELEM) {
-        return ExtendedAlarmsSet(alarm, SYSTEMALARMS_ALARM_OK, 0, 0);
+        return ExtendedAlarmsSet(alarm, SYSTEMALARMS_ALARM_OK, SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE, 0);
     } else {
         return AlarmsSet(alarm, SYSTEMALARMS_ALARM_OK);
     }

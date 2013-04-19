@@ -54,7 +54,7 @@ static int32_t check_stabilization_settings(int index, bool multirotor);
 int32_t configuration_check()
 {
     int32_t severity = SYSTEMALARMS_ALARM_OK;
-    uint8_t alarmstatus = SANITYCHECK_STATUS_ERROR_NONE;
+    SystemAlarmsExtendedAlarmStatusOptions alarmstatus = SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE;
     uint8_t alarmsubstatus = 0;
     // Get board type
     const struct pios_board_info * bdinfo = &pios_board_info_blob;
@@ -134,9 +134,8 @@ int32_t configuration_check()
                 severity = SYSTEMALARMS_ALARM_ERROR;
         }
         // mark the first encountered erroneous setting in status and substatus
-        if(severity != SYSTEMALARMS_ALARM_OK && alarmstatus == SANITYCHECK_STATUS_ERROR_NONE)
-        {
-            alarmstatus = SANITYCHECK_STATUS_ERROR_FLIGHTMODE;
+        if ((severity != SYSTEMALARMS_ALARM_OK) && (alarmstatus == SYSTEMALARMS_EXTENDEDALARMSTATUS_NONE)) {
+            alarmstatus = SYSTEMALARMS_EXTENDEDALARMSTATUS_FLIGHTMODE;
             alarmsubstatus = i;
         }
 

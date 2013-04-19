@@ -29,15 +29,9 @@
 #ifndef SANITYCHECK_H
 #define SANITYCHECK_H
 
-#define SANITYCHECK_STATUS_ERROR_NONE 0
-#define SANITYCHECK_STATUS_ERROR_FLIGHTMODE 1
-
-#define BOOTFAULT_STATUS_ERROR_NONE 0
-#define BOOTFAULT_STATUS_ERROR_REQUIRE_REBOOT 1
-
 #if (SYSTEMALARMS_EXTENDEDALARMSTATUS_NUMELEM != SYSTEMALARMS_EXTENDEDALARMSUBSTATUS_NUMELEM) || \
     (SYSTEMALARMS_EXTENDEDALARMSUBSTATUS_NUMELEM > SYSTEMALARMS_ALARM_NUMELEM)
-#error incongruent SystemAlarms. Please revise the UAVO definition in SystemAlarm.xml
+#error Incongruent SystemAlarms. Please revise the UAVO definition in systemalarms.xml
 #endif
 
 extern int32_t configuration_check();

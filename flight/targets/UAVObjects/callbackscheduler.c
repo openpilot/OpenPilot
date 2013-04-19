@@ -40,7 +40,7 @@ struct DelayedCallbackTaskStruct {
 	xTaskHandle callbackSchedulerTaskHandle;
 	signed char name[3];
 	uint32_t stackSize;
-	long taskPriority;
+	DelayedCallbackPriorityTask priorityTask;
 	xSemaphoreHandle signal;
 	struct DelayedCallbackTaskStruct *next;
 };
@@ -114,7 +114,7 @@ int32_t CallbackSchedulerStart()
 			cursor->name,
 			cursor->stackSize/4,
 			cursor,
-			cursor->taskPriority,
+			cursor->priorityTask,
 			&cursor->callbackSchedulerTaskHandle
 			);
 		if (TASKINFO_RUNNING_CALLBACKSCHEDULER0+t <= TASKINFO_RUNNING_CALLBACKSCHEDULER3) {
@@ -227,33 +227,35 @@ int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigh
 }
 
 /**
- * Register a new callback to be called by a delayed callback scheduler task
+ * Register a new callback to be called by a delayed callback scheduler task.
+ * If a scheduler task with the specified task priority does not exist yet, it
+ * will be created.
  * \param[in] cb The callback to be invoked
- * \param[in] priority Priority of the callback compared to other callbacks called by the same delayed callback scheduler task.
- * \param[in] taskPriority Priority of the entire scheduler task. One scheduler task will be spawned for each distinct task priority in use, further callbacks with the same task priority will be handled by the same delayed callback scheduler task, according to their callback priority.
+ * \param[in] priority Priority of the callback compared to other callbacks scheduled by the same delayed callback scheduler task.
+ * \param[in] priorityTask Task priority of the scheduler task. One scheduler task will be spawned for each distinct value specified, further callbacks created  with the same priorityTask will all be handled by the same delayed callback scheduler task and scheduled according to their individual callback priorities
  * \param[in] stacksize The stack requirements of the callback when called by the scheduler.
  * \return CallbackInfo Pointer on success, NULL if failed.
  */
 DelayedCallbackInfo *DelayedCallbackCreate(
 	DelayedCallback cb,
 	DelayedCallbackPriority priority,
-	long taskPriority,
+	DelayedCallbackPriorityTask priorityTask,
 	uint32_t stacksize
 	)
 {
 
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// find appropriate scheduler task matching taskPriority
+	// find appropriate scheduler task matching priorityTask
 	struct DelayedCallbackTaskStruct *task = NULL;
 	int t = 0;
 	LL_FOREACH(schedulerTasks, task) {
-		if (task->taskPriority == taskPriority) {
+		if (task->priorityTask == priorityTask) {
 			break; // found
 		}
 		t++;
 	}
-	// if scheduler task for given taskPriority does not exist, create it
+	// if given priorityTask does not exist, create it
 	if (!task) {
 		// allocate memory if possible
 		task = (struct DelayedCallbackTaskStruct*)pvPortMalloc(sizeof(struct DelayedCallbackTaskStruct));
@@ -271,7 +273,7 @@ DelayedCallbackInfo *DelayedCallbackCreate(
 		task->name[1]      = 'a'+t;
 		task->name[2]      = 0;
 		task->stackSize    = ((STACK_SIZE>stacksize)?STACK_SIZE:stacksize);
-		task->taskPriority = taskPriority;
+		task->priorityTask = priorityTask;
 		task->next         = NULL;
 
 		// create the signaling semaphore
@@ -292,7 +294,7 @@ DelayedCallbackInfo *DelayedCallbackCreate(
 				task->name,
 				task->stackSize/4,
 				task,
-				task->taskPriority,
+				task->priorityTask,
 				&task->callbackSchedulerTaskHandle
 				);
 			if (TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t <= TASKINFO_RUNNING_CALLBACKSCHEDULER3) {

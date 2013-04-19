@@ -37,7 +37,7 @@
 // Private constants
 #define STACK_SIZE configMINIMAL_STACK_SIZE
 #define CALLBACK_PRIORITY CALLBACK_PRIORITY_LOW
-#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
+#define TASK_PRIORITY CALLBACK_TASKPRIORITY_AUXILIARY
 // Private types
 
 //#define DEBUGPRINT(...) fprintf (stderr, __VA_ARGS__)

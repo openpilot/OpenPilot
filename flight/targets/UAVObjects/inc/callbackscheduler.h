@@ -32,6 +32,51 @@ typedef enum{
 	CALLBACK_PRIORITY_REGULAR  = 1,
 	CALLBACK_PRIORITY_LOW      = 2
 	} DelayedCallbackPriority;
+// Use the CallbackPriority to define how frequent a callback needs to be
+// called in relation to others in the same callback scheduling task.
+// The scheduler will call callbacks waiting for execution with the same
+// priority in a round robin way. However one slot in this queue is reserved
+// for a chosen member of the next lower priority. This member will also be
+// chosen in a round robin way.
+// Example:
+// Assume you have 6 callbacks in the same PriorityTask, all constantly wanting
+// to be executed.
+// A and B are priority CRITICAL,
+// c and d are priority REGULAR,
+// x and y are priority LOW.
+// Then the execution schedule will look as follows:
+// ...ABcABdABxABcABdAByABcABdABxABcABdABy...
+// However if only the 3 callbacks, A, c and x want to execute, you will get:
+// ...AcAxAcAxAcAxAcAxAcAxAcAxAcAxAcAxAcAx...
+// And if onlz A and y need execution it will be:
+// ...AyAyAyAyAyAyAyAyAyAyAyAyAyAyAyAyAyAy...
+// despite their different priority they would get treated equally in this case.
+//
+// WARNING: Callbacks ALWAYS should return as quickly as possible.  Otherwise
+// a low priority callback can block a critical one from being executed.
+// Callbacks MUST NOT block execution!
+
+typedef enum{
+	CALLBACK_TASK_AUXILIARY     = (tskIDLE_PRIORITY + 1),
+	CALLBACK_TASK_NAVIGATION    = (tskIDLE_PRIORITY + 2),
+	CALLBACK_TASK_FLIGHTCONTROL = (tskIDLE_PRIORITY + 3),
+	CALLBACK_TASK_DEVICEDRIVER  = (tskIDLE_PRIORITY + 4),
+	} DelayedCallbackPriorityTask;
+// Use the PriorityTask to define the global importance of callback execution
+// compared to other processes in the system.
+// Callbacks dispatched in a higher PriorityTasks will halt the execution of
+// any lower priority processes, including callbacks and even callback
+// scheduling tasks until they are done!
+// Assume you have two callbacks:
+// A in priorityTask DEVICEDRIVER,
+// b and c in priorityTask AUXILIARY,
+// Then the execution schedule can look as follows: (| marks a task switch)
+// <b ... /b><c ... |<A ... /A>| ... /c><b ...
+// be aware that if A gets constantly dispatched this would look like this:
+// <b ... |<A><A><A><A><A><A><A><A><A><A><A><A><A><A><A><A><A><A><A>...
+//
+// WARNING: Any higher priority task can prevent lower priority code from being
+// executed! (This does not only apply to callbacks but to all FreeRTOS tasks!)
 
 typedef enum{
 	CALLBACK_UPDATEMODE_NONE     = 0,
@@ -39,11 +84,26 @@ typedef enum{
 	CALLBACK_UPDATEMODE_LATER    = 2,
 	CALLBACK_UPDATEMODE_OVERRIDE = 3
 	} DelayedCallbackUpdateMode;
+// When scheduling a callback for execution at a time in the future, use the
+// update mode to define what should happen if the callback is already
+// scheduled.
+// With NONE, the schedule will not be updated and the callback will be
+// executed at the original time.
+// With SOONER, the closer of the two schedules will take precedence
+// With LATER, the schedule more distant in the future will be used.
+// With OVERRIDE, the original schedule will be discarded.
 
 typedef void (*DelayedCallback)(void);
+// Use this type for the callback function.
 
 struct DelayedCallbackInfoStruct;
 typedef struct DelayedCallbackInfoStruct DelayedCallbackInfo;
+// Use a pointer to DelayedCallbackInfo as a handle to identify registered callbacks.
+// be aware that the same callback function can be registered as a callback
+// several times, even with different callback priorities and even
+// priorityTasks, using different handles and as such different dispatch calls.
+// Be aware that using different priorityTasks for the same callback function
+// might cause your callback to be executed recursively in different task contexts!
 
 // Public functions
 //
@@ -69,18 +129,18 @@ int32_t CallbackSchedulerStart();
 
 /**
  * Register a new callback to be called by a delayed callback scheduler task.
- * If a scheduler task with the specified taskPriority does not exist yet, it
+ * If a scheduler task with the specified task priority does not exist yet, it
  * will be created.
  * \param[in] cb The callback to be invoked
- * \param[in] priority Priority of the callback compared to other callbacks called by the same delayed callback scheduler task.
- * \param[in] taskPriority Priority of the entire scheduler task. One scheduler task will be spawned for each distinct task priority in use, further callbacks with the same task priority will be handled by the same delayed callback scheduler task, according to their callback priority.
+ * \param[in] priority Priority of the callback compared to other callbacks scheduled by the same delayed callback scheduler task.
+ * \param[in] priorityTask Task priority of the scheduler task. One scheduler task will be spawned for each distinct value specified, further callbacks created  with the same priorityTask will all be handled by the same delayed callback scheduler task and scheduled according to their individual callback priorities
  * \param[in] stacksize The stack requirements of the callback when called by the scheduler.
  * \return CallbackInfo Pointer on success, NULL if failed.
  */
 DelayedCallbackInfo *DelayedCallbackCreate(
 	DelayedCallback cb,
 	DelayedCallbackPriority priority,
-	long taskPriority,
+	DelayedCallbackPriorityTask priorityTask,
 	uint32_t stacksize
 	);
 

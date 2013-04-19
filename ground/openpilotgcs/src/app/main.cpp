@@ -39,7 +39,7 @@
 
  The -reset switch will clear all the user settings and will trigger a reload of the factory defaults.
 
- You can combine it with the -configfile=<file> command line argument to quickly switch between multiple settings files.
+ You can combine it with the -config-file=<file> command line argument to quickly switch between multiple settings files.
 
  [code]
  openpilotgcs -reset -config-file ./MyOpenPilotGCS.xml
@@ -55,7 +55,7 @@
  Quickly switch configurations
 
  [code]
- -reset -config-file <relative or absolute path>
+ openpilotgcs -reset -config-file <relative or absolute path>
  [/code]
 
  Configuring GCS from installer
@@ -65,14 +65,14 @@
  If the user chooses to start GCS at the end of the installer:
 
  [code]
- -D General/OverrideLanguage=de
+ openpilotgcs -D General/OverrideLanguage=de
  [/code]
 
  If the user chooses not to start GCS at the end of the installer, you still need to configure GCS.
  In that case you can use -exit-after-config
 
  [code]
- -D General/OverrideLanguage=de -exit-after-config
+ openpilotgcs -D General/OverrideLanguage=de -exit-after-config
  [/code]
 
  */
@@ -127,7 +127,7 @@ namespace {
 
     const char *DEFAULT_CONFIG_FILENAME = "OpenPilotGCS.xml";
 
-    const char *fixedOptionsC = " [OPTION]... [FILE]...\n"
+    const char *fixedOptionsC = " [OPTION]...\n"
             "Options:\n"
             "    -help               Display this help\n"
             "    -version            Display application version\n"
@@ -151,66 +151,56 @@ namespace {
     const QLatin1String EXIT_AFTER_CONFIG_OPTION("-exit-after-config");
 
     // Helpers for displaying messages. Note that there is no console on Windows.
-#ifdef Q_OS_WIN
-
-    // Format as <pre> HTML
-    inline void toHtml(QString &t)
+    void displayHelpText(QString t)
     {
+#ifdef Q_OS_WIN
+        // No console on Windows. (???)
+        // TODO there is a console on windows and popups are not always desired
         t.replace(QLatin1Char('&'), QLatin1String("&amp;"));
         t.replace(QLatin1Char('<'), QLatin1String("&lt;"));
         t.replace(QLatin1Char('>'), QLatin1String("&gt;"));
         t.insert(0, QLatin1String("<html><pre>"));
         t.append(QLatin1String("</pre></html>"));
-    }
-
-    void displayHelpText(QString t) // No console on Windows.
-    {
-        toHtml(t);
         QMessageBox::information(0, APP_NAME, t);
-    }
-
-    void displayError(const QString &t) // No console on Windows.
-    {
-        QMessageBox::critical(0, APP_NAME, t);
-    }
-
 #else
-
-    void displayHelpText(const QString &t)
-    {
         qWarning("%s", qPrintable(t));
+#endif
     }
 
     void displayError(const QString &t)
     {
+#ifdef Q_OS_WIN
+        // No console on Windows. (???)
+        // TODO there is a console on windows and popups are not always desired
+        QMessageBox::critical(0, APP_NAME, t);
+#else
         qCritical("%s", qPrintable(t));
+#endif
     }
 
-#endif
-
-    void printVersion(const ExtensionSystem::PluginSpec *coreplugin, const ExtensionSystem::PluginManager &pm)
+    void printVersion(const ExtensionSystem::PluginSpec *corePlugin, const ExtensionSystem::PluginManager &pm)
     {
         QString version;
         QTextStream str(&version);
-        str << '\n' << APP_NAME << ' ' << coreplugin->version() << " based on Qt " << qVersion() << "\n\n";
+        str << '\n' << APP_NAME << ' ' << corePlugin->version() << " based on Qt " << qVersion() << "\n\n";
         pm.formatPluginVersions(str);
-        str << '\n' << coreplugin->copyright() << '\n';
+        str << '\n' << corePlugin->copyright() << '\n';
         displayHelpText(version);
     }
 
-    void printHelp(const QString &a0, const ExtensionSystem::PluginManager &pm)
+    void printHelp(const QString &appExecName, const ExtensionSystem::PluginManager &pm)
     {
         QString help;
         QTextStream str(&help);
-        str << "Usage: " << a0 << fixedOptionsC;
+        str << "Usage: " << appExecName << fixedOptionsC;
         ExtensionSystem::PluginManager::formatOptions(str, OptionIndent, DescriptionIndent);
         pm.formatPluginOptions(str, OptionIndent, DescriptionIndent);
         displayHelpText(help);
     }
 
-    inline QString msgCoreLoadFailure(const QString &why)
+    inline QString msgCoreLoadFailure(const QString &reason)
     {
-        return QCoreApplication::translate("Application", "Failed to load core: %1").arg(why);
+        return QCoreApplication::translate("Application", "Failed to load core plug-in, reason is: %1").arg(reason);
     }
 
     inline QString msgSendArgumentFailed()
@@ -366,8 +356,7 @@ namespace {
 
         // transfer loaded settings to application settings
         QStringList keys = qs.allKeys();
-        foreach(QString key, keys)
-        {
+        foreach(QString key, keys) {
             settings.setValue(key, qs.value(key));
         }
 
@@ -469,7 +458,7 @@ int main(int argc, char **argv)
     overrideSettings(settings, argc, argv);
 
     // initialize GCS locale
-    // use the value defined by the General/Locale setting or default to system locale.
+    // use the value defined by the General/Locale setting or default to system Locale.
     // the General/Locale setting is not available in the Options dialog, it is a hidden setting but can still be changed:
     // - through the command line
     // - editing the factory defaults XML file before 1st launch
@@ -477,7 +466,7 @@ int main(int argc, char **argv)
     QString localeName = settings.value("General/Locale", QLocale::system().name()).toString();
     QLocale::setDefault(localeName);
 
-    // some debuging
+    // some debugging
     qDebug() << "main - system locale:" << QLocale::system().name();
     qDebug() << "main - GCS locale:" << QLocale().name();
 
@@ -512,8 +501,7 @@ int main(int argc, char **argv)
     // find and load core plugin
     const PluginSpecSet plugins = pluginManager.plugins();
     ExtensionSystem::PluginSpec *coreplugin = 0;
-    foreach (ExtensionSystem::PluginSpec *spec, plugins)
-    {
+    foreach (ExtensionSystem::PluginSpec *spec, plugins) {
         if (spec->name() == CORE_PLUGIN_NAME) {
             coreplugin = spec;
             break;

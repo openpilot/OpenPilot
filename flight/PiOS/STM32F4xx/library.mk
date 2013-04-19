@@ -20,18 +20,18 @@ CDEFS			+= -DARM_MATH_CM4 -D__FPU_PRESENT=1
 ARCHFLAGS		+= -mcpu=cortex-m4 -march=armv7e-m -mfpu=fpv4-sp-d16 -mfloat-abi=hard
 
 # PIOS device library source and includes
-SRC			+= $(wildcard $(PIOS_DEVLIB)*.c)
+SRC			+= $(sort $(wildcard $(PIOS_DEVLIB)*.c))
 EXTRAINCDIRS		+= $(PIOS_DEVLIB)inc
 
 # CMSIS for the F4
 include $(PIOSCOMMON)/Libraries/CMSIS2/library.mk
 CMSIS2_DEVICEDIR	:= $(PIOS_DEVLIB)Libraries/CMSIS2/Device/ST/STM32F4xx
-SRC			+= $(wildcard $(CMSIS2_DEVICEDIR)/Source/$(BOARD_NAME)/*.c)
+SRC			+= $(sort $(wildcard $(CMSIS2_DEVICEDIR)/Source/$(BOARD_NAME)/*.c))
 EXTRAINCDIRS		+= $(CMSIS2_DEVICEDIR)/Include
 
 # ST Peripheral library
 PERIPHLIB		=  $(PIOS_DEVLIB)Libraries/STM32F4xx_StdPeriph_Driver
-SRC			+= $(wildcard $(PERIPHLIB)/src/*.c)
+SRC			+= $(sort $(wildcard $(PERIPHLIB)/src/*.c))
 EXTRAINCDIRS		+= $(PERIPHLIB)/inc
 
 # ST USB OTG library
@@ -42,7 +42,7 @@ EXTRAINCDIRS		+= $(USBOTGLIB)/inc
 
 # ST USB Device library
 USBDEVLIB		=  $(PIOS_DEVLIB)Libraries/STM32_USB_Device_Library
-SRC			+= $(wildcard $(USBDEVLIB)/Core/src/*.c)
+SRC			+= $(sort $(wildcard $(USBDEVLIB)/Core/src/*.c))
 EXTRAINCDIRS		+= $(USBDEVLIB)/Core/inc
 
 #
@@ -53,7 +53,7 @@ EXTRAINCDIRS		+= $(USBDEVLIB)/Core/inc
 #
 ifneq ($(FREERTOS_DIR),)
     FREERTOS_PORTDIR	:= $(PIOS_DEVLIB)Libraries/FreeRTOS/Source
-    SRC			+= $(wildcard $(FREERTOS_PORTDIR)/portable/GCC/ARM_CM4F/*.c)
+    SRC			+= $(sort $(wildcard $(FREERTOS_PORTDIR)/portable/GCC/ARM_CM4F/*.c))
     EXTRAINCDIRS	+= $(FREERTOS_PORTDIR)/portable/GCC/ARM_CM4F
     include $(PIOSCOMMON)/Libraries/msheap/library.mk
 endif

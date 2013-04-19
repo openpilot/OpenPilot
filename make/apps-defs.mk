@@ -101,8 +101,8 @@ SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
 
 ## Modules
-SRC += $(foreach mod, $(MODULES), $(wildcard $(OPMODULEDIR)/$(mod)/*.c))
-SRC += $(foreach mod, $(OPTMODULES), $(wildcard $(OPMODULEDIR)/$(mod)/*.c))
+SRC += $(foreach mod, $(MODULES), $(sort $(wildcard $(OPMODULEDIR)/$(mod)/*.c)))
+SRC += $(foreach mod, $(OPTMODULES), $(sort $(wildcard $(OPMODULEDIR)/$(mod)/*.c)))
 
 # Declare all non-optional modules as built-in to force inclusion.
 # Built-in modules are always enabled and cannot be disabled.

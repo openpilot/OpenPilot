@@ -17,16 +17,17 @@ PYTHON_DIR = python-2.7.4
     # Search the python using environment override first
     OPENPILOT_TOOLS_DIR = $$(OPENPILOT_TOOLS_DIR)
     !isEmpty(OPENPILOT_TOOLS_DIR):exists($$OPENPILOT_TOOLS_DIR/$$PYTHON_DIR/python*) {
-        PYTHON = $$OPENPILOT_TOOLS_DIR/$$PYTHON_DIR/python
+        PYTHON = \"$$OPENPILOT_TOOLS_DIR/$$PYTHON_DIR/python\"
     } else {
         # If not found, search the predefined tools path
         exists($$ROOT_DIR/tools/$$PYTHON_DIR/python*) {
-            PYTHON = $$ROOT_DIR/tools/$$PYTHON_DIR/python
+            PYTHON = \"$$ROOT_DIR/tools/$$PYTHON_DIR/python\"
         } else {
             # not found, hope it's in the path...
-            PYTHON = python
+            PYTHON = \"python\"
         }
     }
+    PYTHON = $$replace(PYTHON, \\\\, /)
     message(Using python interpreter: $$PYTHON)
 
     # Define other variables

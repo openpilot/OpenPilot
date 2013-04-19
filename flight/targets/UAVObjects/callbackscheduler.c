@@ -35,8 +35,8 @@
  * task information
  */
 struct DelayedCallbackTaskStruct {
-        DelayedCallbackInfo *callbackQueue[CALLBACK_PRIORITY_LOW+1];
-        DelayedCallbackInfo *queueCursor[CALLBACK_PRIORITY_LOW+1];
+        DelayedCallbackInfo *callbackQueue[CALLBACK_PRIORITY_LOW + 1];
+        DelayedCallbackInfo *queueCursor[CALLBACK_PRIORITY_LOW + 1];
 	xTaskHandle callbackSchedulerTaskHandle;
 	signed char name[3];
 	uint32_t stackSize;
@@ -69,7 +69,7 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
 
 /**
  * Initialize the scheduler
- * must be called before any othyer functions are called
+ * must be called before any other functions are called
  * \return Success (0), failure (-1)
  */
 int32_t CallbackSchedulerInitialize()
@@ -89,7 +89,13 @@ int32_t CallbackSchedulerInitialize()
 }
 
 /**
- * Start the scheduler
+ * Start all scheduler tasks
+ * Will instantiate all scheduler tasks registered so far.  Although new
+ * callbacks CAN be registered beyond that point, any further scheduling tasks
+ * will be started the moment of instantiation.  It is not possible to increase
+ * the STACK requirements of a scheduler task after this function has been
+ * run.  No callbacks will be run before this function is called, although
+ * they can be marked for later execution by executing the dispatch function.
  * \return Success (0), failure (-1)
  */
 int32_t CallbackSchedulerStart()
@@ -97,13 +103,20 @@ int32_t CallbackSchedulerStart()
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	// only call once
-	PIOS_Assert(schedulerStarted==false);
+	PIOS_Assert(schedulerStarted == false);
 
 	// start tasks
-	struct DelayedCallbackTaskStruct *cursor;
-	int t=0;
-	LL_FOREACH(schedulerTasks,cursor) {
-		xTaskCreate( CallbackSchedulerTask, cursor->name, cursor->stackSize/4, cursor, cursor->taskPriority, &cursor->callbackSchedulerTaskHandle );
+	struct DelayedCallbackTaskStruct *cursor = NULL;
+	int t = 0;
+	LL_FOREACH(schedulerTasks, cursor) {
+		xTaskCreate(
+			CallbackSchedulerTask,
+			cursor->name,
+			cursor->stackSize/4,
+			cursor,
+			cursor->taskPriority,
+			&cursor->callbackSchedulerTaskHandle
+			);
 		if (TASKINFO_RUNNING_CALLBACKSCHEDULER0+t <= TASKINFO_RUNNING_CALLBACKSCHEDULER3) {
 			TaskMonitorAdd(TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t, cursor->callbackSchedulerTaskHandle);
 		}
@@ -119,7 +132,7 @@ int32_t CallbackSchedulerStart()
 
 /**
  * Schedule dispatching a callback at some point in the future. The function returns immediately.
- * \param[in] cbinfo the callback handle
+ * \param[in] *cbinfo the callback handle
  * \param[in] milliseconds How far in the future to dispatch the callback
  * \param[in] updatemode What to do if the callback is already scheduled but not dispatched yet.
  * The options are:
@@ -129,14 +142,18 @@ int32_t CallbackSchedulerStart()
  * UPDATEMODE_OVERRIDE: The callback will be rescheduled in any case, effectively overriding any previous schedule. (sooner+later=override)
  * \return 0: not scheduled, previous schedule takes precedence, 1: new schedule, 2: previous schedule overridden
  */
-int32_t DelayedCallbackSchedule(DelayedCallbackInfo *cbinfo, int32_t milliseconds, DelayedCallbackUpdateMode updatemode)
+int32_t DelayedCallbackSchedule(
+	DelayedCallbackInfo *cbinfo,
+	int32_t milliseconds,
+	DelayedCallbackUpdateMode updatemode
+	)
 {
-	int32_t result=0;
+	int32_t result = 0;
 
 	PIOS_Assert(cbinfo);
 
-	if (milliseconds<=0) {
-		milliseconds=0; // we can and will not schedule in the past since that ruins the wraparound of uint32_t
+	if (milliseconds <= 0) {
+		milliseconds = 0; // we can and will not schedule in the past since that ruins the wraparound of uint32_t
 	}
 
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
@@ -148,15 +165,15 @@ int32_t DelayedCallbackSchedule(DelayedCallbackInfo *cbinfo, int32_t millisecond
 
 	int32_t diff = new - cbinfo->scheduletime;
 	if ( (!cbinfo->scheduletime)
-	   || ((updatemode & CALLBACK_UPDATEMODE_SOONER) && diff<0)
-	   || ((updatemode & CALLBACK_UPDATEMODE_LATER) && diff>0)
+	   || ((updatemode & CALLBACK_UPDATEMODE_SOONER) && diff < 0)
+	   || ((updatemode & CALLBACK_UPDATEMODE_LATER ) && diff > 0)
 	   ) {
 
 		// the scheduletime may be updated
 		if (!cbinfo->scheduletime) {
-			result=1;
+			result = 1;
 		} else {
-			result=2;
+			result = 2;
 		}
 		cbinfo->scheduletime = new;
 
@@ -180,7 +197,7 @@ int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo)
 	PIOS_Assert(cbinfo);
 
 	// no semaphore needed for the callback
-	cbinfo->waiting=true;
+	cbinfo->waiting = true;
 	// but the scheduler as a whole needs to be notified
 	return xSemaphoreGive(cbinfo->task->signal);
 }
@@ -204,7 +221,7 @@ int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigh
 	PIOS_Assert(cbinfo);
 
 	// no semaphore needed for the callback
-	cbinfo->waiting=true;
+	cbinfo->waiting = true;
 	// but the scheduler as a whole needs to be notified
 	return xSemaphoreGiveFromISR(cbinfo->task->signal, pxHigherPriorityTaskWoken);
 }
@@ -213,18 +230,23 @@ int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigh
  * Register a new callback to be called by a delayed callback scheduler task
  * \param[in] cb The callback to be invoked
  * \param[in] priority Priority of the callback compared to other callbacks called by the same delayed callback scheduler task.
- * \param[in] taskPriority Priority of the scheduler task. One scheduler task will be spawned for each distinct task priority in use, further callbacks with the same task priority will be handled by the same delayed callback scheduler task, according to their callback priority.
+ * \param[in] taskPriority Priority of the entire scheduler task. One scheduler task will be spawned for each distinct task priority in use, further callbacks with the same task priority will be handled by the same delayed callback scheduler task, according to their callback priority.
  * \param[in] stacksize The stack requirements of the callback when called by the scheduler.
- * \return Success (0), failure (-1)
+ * \return CallbackInfo Pointer on success, NULL if failed.
  */
-DelayedCallbackInfo* DelayedCallbackCreate(DelayedCallback cb, DelayedCallbackPriority priority, long taskPriority, uint32_t stacksize)
+DelayedCallbackInfo *DelayedCallbackCreate(
+	DelayedCallback cb,
+	DelayedCallbackPriority priority,
+	long taskPriority,
+	uint32_t stacksize
+	)
 {
 
 	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
 	// find appropriate scheduler task matching taskPriority
-	struct DelayedCallbackTaskStruct *task=NULL;
-	int t=0;
+	struct DelayedCallbackTaskStruct *task = NULL;
+	int t = 0;
 	LL_FOREACH(schedulerTasks, task) {
 		if (task->taskPriority == taskPriority) {
 			break; // found
@@ -241,14 +263,14 @@ DelayedCallbackInfo* DelayedCallbackCreate(DelayedCallback cb, DelayedCallbackPr
 		}
 
 		// initialize structure
-		for (DelayedCallbackPriority p=0; p<=CALLBACK_PRIORITY_LOW; p++) {
+		for (DelayedCallbackPriority p = 0; p <= CALLBACK_PRIORITY_LOW; p++) {
 			task->callbackQueue[p] = NULL;
-			task->queueCursor[p] = NULL;
+			task->queueCursor[p]   = NULL;
 		}
 		task->name[0]      = 'C';
 		task->name[1]      = 'a'+t;
 		task->name[2]      = 0;
-		task->stackSize   = ((STACK_SIZE>stacksize)?STACK_SIZE:stacksize);
+		task->stackSize    = ((STACK_SIZE>stacksize)?STACK_SIZE:stacksize);
 		task->taskPriority = taskPriority;
 		task->next         = NULL;
 
@@ -265,7 +287,14 @@ DelayedCallbackInfo* DelayedCallbackCreate(DelayedCallback cb, DelayedCallbackPr
 		// Previously registered tasks are spawned when CallbackSchedulerStart() is called.
 		// Tasks registered afterwards need to spawn upon creation.
 		if (schedulerStarted) {
-			xTaskCreate( CallbackSchedulerTask, task->name, task->stackSize/4, task, task->taskPriority, &task->callbackSchedulerTaskHandle );
+			xTaskCreate( 
+				CallbackSchedulerTask,
+				task->name,
+				task->stackSize/4,
+				task,
+				task->taskPriority,
+				&task->callbackSchedulerTaskHandle
+				);
 			if (TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t <= TASKINFO_RUNNING_CALLBACKSCHEDULER3) {
 				TaskMonitorAdd(TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t, task->callbackSchedulerTaskHandle);
 			}
@@ -295,7 +324,7 @@ DelayedCallbackInfo* DelayedCallbackCreate(DelayedCallback cb, DelayedCallbackPr
 	info->cb           = cb;
 
 	// add to scheduling queue
-	LL_APPEND(task->callbackQueue[priority],info);
+	LL_APPEND(task->callbackQueue[priority], info);
 
 	xSemaphoreGiveRecursive(mutex);
 
@@ -308,10 +337,11 @@ DelayedCallbackInfo* DelayedCallbackCreate(DelayedCallback cb, DelayedCallbackPr
  * \param[in] priority The scheduling priority of the callback to search for
  * \return wait time until next scheduled callback is due - 0 if a callback has just been executed
  */
-static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCallbackPriority priority) {
+static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCallbackPriority priority)
+{
 
 	int32_t result = MAX_SLEEP;
-	int32_t diff;
+	int32_t diff   = 0;
 
 	// no such queue
 	if (priority > CALLBACK_PRIORITY_LOW) {
@@ -326,8 +356,8 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
 	DelayedCallbackInfo *current = task->queueCursor[priority];
 	DelayedCallbackInfo *next;
 	do {
-		if (current==NULL) {
-			next=task->callbackQueue[priority]; // loop around the end of the list
+		if (current == NULL) {
+			next = task->callbackQueue[priority]; // loop around the end of the list
 			// also attempt to run a callback that has lower priority
 			// every time the queue is completely traversed
 			diff = runNextCallback(task, priority + 1);
@@ -335,7 +365,7 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
 				task->queueCursor[priority] = next; // the recursive call has executed a callback
 				return 0;
 			}
-			if (diff<result) {
+			if (diff < result) {
 				result = diff; // adjust sleep time
 			}
 		} else {
@@ -343,9 +373,9 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
 			xSemaphoreTakeRecursive(mutex, portMAX_DELAY); // access to scheduletime should be mutex protected
 			if (current->scheduletime) {
 				diff = current->scheduletime - xTaskGetTickCount();
-				if (diff<=0) {
+				if (diff <= 0) {
 					current->waiting = true;
-				} else if (diff<result) {
+				} else if (diff < result) {
 					result = diff; // adjust sleep time
 				}
 			}
@@ -371,16 +401,15 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
  */
 static void CallbackSchedulerTask(void *task)
 {
-	uint32_t delay;
+	uint32_t delay = 0;
+
 	while (1) {
 
-		delay = runNextCallback((struct DelayedCallbackTaskStruct*) task, CALLBACK_PRIORITY_CRITICAL);
+		delay = runNextCallback((struct DelayedCallbackTaskStruct*)task, CALLBACK_PRIORITY_CRITICAL);
 		if (delay) {
 			// nothing to do but sleep
-			xSemaphoreTake( ((struct DelayedCallbackTaskStruct*)task)->signal, delay);
+			xSemaphoreTake(((struct DelayedCallbackTaskStruct*)task)->signal, delay);
 		}
 	}
 }
-
-
 

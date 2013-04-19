@@ -102,6 +102,7 @@ typedef struct {
 	uint8_t Ready2Record_2;
 	
 	uint8_t Buffers_InUse;
+	xSemaphoreHandle buffer_lock;
 	
 
 } LoggerComBridgeData;
@@ -342,6 +343,10 @@ static int32_t LoggerComBridgeInitialize(void)
 	data->Ready2Record_2=0;
 	data->Buffers_InUse=0;
 	
+	data->buffer_lock = xSemaphoreCreateMutex();
+	if(data->buffer_lock == NULL)
+		return -1;
+	
 	PosInSerialBuf=0;
 	PosInAdcBuf=0;
 	NewMpu6050BufferReady=FALSE;
@@ -442,11 +447,13 @@ uint8_t NbCLogged=0;
 					Serial_FormBuffer[Pos]=0x0a;
 					Pos++;
 					InSentence=FALSE;
-					while(data->Buffers_InUse)//wait for other task to finish writing on buffer
+					// Get the lock for manipulating the buffer
+					xSemaphoreTake(data->buffer_lock, portMAX_DELAY);
+					/*while(data->Buffers_InUse)//wait for other task to finish writing on buffer
 					{
 						vTaskDelay(1 / portTICK_RATE_MS);
 					}
-					data->Buffers_InUse=1;
+					data->Buffers_InUse=1;*/
 					if(data->Current_buffer==1)
 					{
 						if(data->Pos_Buffer_1+Pos>=MAX_BUFFER_LENGTH)
@@ -477,7 +484,8 @@ uint8_t NbCLogged=0;
 							data->Pos_Buffer_2+=Pos;
 						}
 					}
-					data->Buffers_InUse=0;
+					xSemaphoreGive(data->buffer_lock);
+					//data->Buffers_InUse=0;
 				}
 				
 				{
@@ -618,11 +626,12 @@ static void loggerAdcTask(void *parameters)
 		Pos++;
 		Adc_FormBuffer[Pos]=0x0a;
 		Pos++;
-		while(data->Buffers_InUse)//wait for other task to finish writing on buffer
+		xSemaphoreTake(data->buffer_lock, portMAX_DELAY);
+		/*while(data->Buffers_InUse)//wait for other task to finish writing on buffer
 		{
 			vTaskDelay(1 / portTICK_RATE_MS);
 		}
-		data->Buffers_InUse=1;
+		data->Buffers_InUse=1;*/
 		if(data->Current_buffer==1)
 		{
 			if(data->Pos_Buffer_1+Pos>=MAX_BUFFER_LENGTH)
@@ -653,7 +662,8 @@ static void loggerAdcTask(void *parameters)
 				data->Pos_Buffer_2+=Pos;
 			}
 		}
-		data->Buffers_InUse=0;
+		xSemaphoreGive(data->buffer_lock);
+		//data->Buffers_InUse=0;
 		vTaskDelayUntil(&lastSysTime, 10 / portTICK_RATE_MS);//sleep for 10ms (scan at 100hz)
 	}
 }
@@ -714,11 +724,12 @@ float AdcValue;
 			Pos++;
 			Mpu6050Form_Buff[Pos]=0x0a;
 			Pos++;
-			while(data->Buffers_InUse)//wait for other task to finish writing on buffer
+			xSemaphoreTake(data->buffer_lock, portMAX_DELAY);
+			/*while(data->Buffers_InUse)//wait for other task to finish writing on buffer
 			{
 				vTaskDelay(1 / portTICK_RATE_MS);
 			}
-			data->Buffers_InUse=1;
+			data->Buffers_InUse=1;*/
 			if(data->Current_buffer==1)
 			{
 				if(data->Pos_Buffer_1+Pos>=MAX_BUFFER_LENGTH)
@@ -749,7 +760,8 @@ float AdcValue;
 					data->Pos_Buffer_2+=Pos;
 				}
 			}
-			data->Buffers_InUse=0;
+			xSemaphoreGive(data->buffer_lock);
+			//data->Buffers_InUse=0;
 			vTaskDelayUntil(&lastSysTime, 10 / portTICK_RATE_MS);//sleep a while
 		}
 	}

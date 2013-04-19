@@ -797,7 +797,7 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t ins
 		if (instId != 0)
 			return -1;
 
-		if (PIOS_FLASHFS_ObjSave(0, UAVObjGetID(obj_handle), instId, (uint8_t*) MetaDataPtr((struct UAVOMeta *)obj_handle), UAVObjGetNumBytes(obj_handle)) != 0)
+		if (PIOS_FLASHFS_ObjSave(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, (uint8_t*) MetaDataPtr((struct UAVOMeta *)obj_handle), UAVObjGetNumBytes(obj_handle)) != 0)
 			return -1;
 	} else {
 		InstanceHandle instEntry = getInstance( (struct UAVOData *)obj_handle, instId);
@@ -808,7 +808,7 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t ins
 		if (InstanceData(instEntry) == NULL)
 			return -1;
 
-		if (PIOS_FLASHFS_ObjSave(0, UAVObjGetID(obj_handle), instId, InstanceData(instEntry), UAVObjGetNumBytes(obj_handle)) != 0)
+		if (PIOS_FLASHFS_ObjSave(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, InstanceData(instEntry), UAVObjGetNumBytes(obj_handle)) != 0)
 			return -1;
 	}
 #endif
@@ -952,7 +952,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t ins
 			return -1;
 
 		// Fire event on success
-		if (PIOS_FLASHFS_ObjLoad(0, UAVObjGetID(obj_handle), instId, (uint8_t*) MetaDataPtr((struct UAVOMeta *)obj_handle), UAVObjGetNumBytes(obj_handle)) == 0)
+		if (PIOS_FLASHFS_ObjLoad(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, (uint8_t*) MetaDataPtr((struct UAVOMeta *)obj_handle), UAVObjGetNumBytes(obj_handle)) == 0)
 			sendEvent((struct UAVOBase*)obj_handle, instId, EV_UNPACKED);
 		else
 			return -1;
@@ -1022,7 +1022,7 @@ int32_t UAVObjDelete(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t i
 {
 	PIOS_Assert(obj_handle);
 #if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
-	PIOS_FLASHFS_ObjDelete(0, UAVObjGetID(obj_handle), instId);
+	PIOS_FLASHFS_ObjDelete(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId);
 #endif
 #if defined(PIOS_USE_SETTINGS_ON_SDCARD)
 	uint8_t filename[14];

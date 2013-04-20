@@ -35,7 +35,6 @@
 
 // UAVOs
 #include <manualcontrolsettings.h>
-#include <systemalarms.h>
 #include <systemsettings.h>
 
 /****************************

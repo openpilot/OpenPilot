@@ -23,11 +23,16 @@
 			<elementname>Power</elementname>
 		</elementnames>
 	</field>
-	<field name="ExtendedAlarmStatus" units="" type="uint8" defaultvalue="0">
+	<field name="ExtendedAlarmStatus" units="" type="enum" defaultvalue="None">
 		<elementnames>
 			<elementname>SystemConfiguration</elementname>
 			<elementname>BootFault</elementname>
 		</elementnames>
+		<options>
+   			<option>None</option>
+   			<option>RebootRequired</option>
+   			<option>FlightMode</option>
+  		</options>
 	</field>
 	<field name="ExtendedAlarmSubStatus" units="" type="uint8" defaultvalue="0">
 		<elementnames>

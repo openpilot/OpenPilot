@@ -45,7 +45,7 @@ MODULES += FirmwareIAP
 MODULES += Radio
 MODULES += PathPlanner
 MODULES += FixedWingPathFollower
-MODULES += Osd/OsdHk
+MODULES += Osd/osdoutout
 MODULES += Telemetry
 
 OPTMODULES =

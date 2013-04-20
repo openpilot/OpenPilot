@@ -1,4 +1,4 @@
- /**
+/**
  ******************************************************************************
  *
  * @file       pios_board.h
@@ -26,21 +26,20 @@
 #ifndef PIOS_BOARD_H
 #define PIOS_BOARD_H
 
-
 #include <stdbool.h>
 
 // *****************************************************************
 // Timers and Channels Used
 
 /*
-Timer | Channel 1  | Channel 2  | Channel 3  | Channel 4
-------+------------+------------+------------+------------
-TIM1  |                       DELAY                      |
-TIM2  |                         | PPM Output | PPM Input |
-TIM3  |                  TIMER INTERRUPT                 |
-TIM4  |                     STOPWATCH                    |
-------+------------+------------+------------+------------
-*/
+ Timer | Channel 1  | Channel 2  | Channel 3  | Channel 4
+ ------+------------+------------+------------+------------
+ TIM1  |                       DELAY                      |
+ TIM2  |                         | PPM Output | PPM Input |
+ TIM3  |                  TIMER INTERRUPT                 |
+ TIM4  |                     STOPWATCH                    |
+ ------+------------+------------+------------+------------
+ */
 
 //------------------------
 // DMA Channels Used
@@ -99,7 +98,6 @@ TIM4  |                     STOPWATCH                    |
 //
 #define PIOS_PERIPHERAL_APB2_CLOCK					PIOS_SYSCLK
 
-
 //------------------------
 // TELEMETRY
 //------------------------
@@ -114,7 +112,6 @@ TIM4  |                     STOPWATCH                    |
 #define PIOS_IRQ_PRIO_HIGH			5		// for SPI, ADC, I2C etc...
 #define PIOS_IRQ_PRIO_HIGHEST		4 		// for USART etc...
 
-
 //------------------------
 // WATCHDOG_SETTINGS
 //------------------------
@@ -125,7 +122,6 @@ TIM4  |                     STOPWATCH                    |
 #define PIOS_WDG_ATTITUDE        0x0004
 #define PIOS_WDG_MANUAL          0x0008
 #define PIOS_WDG_OSDGEN          0x0010
-
 
 // *****************************************************************
 // PIOS_LED
@@ -144,13 +140,13 @@ TIM4  |                     STOPWATCH                    |
 // Timer interrupt
 
 /*#define TIMER_INT_TIMER					TIM3
-#define TIMER_INT_FUNC					TIM3_IRQHandler
-#define TIMER_INT_PRIORITY				2
+ #define TIMER_INT_FUNC					TIM3_IRQHandler
+ #define TIMER_INT_PRIORITY				2
 
-// *****************************************************************
-// Stop watch timer
+ // *****************************************************************
+ // Stop watch timer
 
-#define STOPWATCH_TIMER					TIM4*/
+ #define STOPWATCH_TIMER					TIM4*/
 
 //------------------------
 // PIOS_SPI
@@ -190,7 +186,6 @@ extern uint32_t pios_com_telem_usb_id;
 
 //extern uint32_t pios_com_gps_id;
 //#define PIOS_COM_GPS                    (pios_com_gps_id)
-
 
 #if defined(PIOS_INCLUDE_USB_HID)
 extern uint32_t pios_com_telem_usb_id;
@@ -234,15 +229,14 @@ extern uint32_t pios_com_telem_usb_id;
 // USB
 
 #if defined(PIOS_INCLUDE_USB_HID)
-	#define PIOS_USB_ENABLED				1
-	#define PIOS_USB_DETECT_GPIO_PORT		GPIO_IN_2_PORT
-	#define PIOS_USB_DETECT_GPIO_PIN		GPIO_IN_2_PIN
-	#define PIOS_USB_DETECT_EXTI_LINE		EXTI_Line4
-	#define PIOS_IRQ_USB_PRIORITY			8
-        #define PIOS_USB_RX_BUFFER_SIZE                 512
-        #define PIOS_USB_TX_BUFFER_SIZE                 512
+#define PIOS_USB_ENABLED				1
+#define PIOS_USB_DETECT_GPIO_PORT		GPIO_IN_2_PORT
+#define PIOS_USB_DETECT_GPIO_PIN		GPIO_IN_2_PIN
+#define PIOS_USB_DETECT_EXTI_LINE		EXTI_Line4
+#define PIOS_IRQ_USB_PRIORITY			8
+#define PIOS_USB_RX_BUFFER_SIZE                 512
+#define PIOS_USB_TX_BUFFER_SIZE                 512
 #endif
-
 
 // *****************************************************************
 //--------------------------
@@ -272,7 +266,6 @@ extern uint32_t pios_i2c_flexiport_adapter_id;
 //------------------------
 #define PIOS_BMP085_OVERSAMPLING                3
 
-
 /**
  * glue macros for file IO
  * STM32 uses DOSFS for file IO
@@ -288,6 +281,5 @@ extern uint32_t pios_i2c_flexiport_adapter_id;
 #define PIOS_FCLOSE(file)               DFS_Close(&file)
 
 #define PIOS_FUNLINK(filename)          DFS_UnlinkFile(&PIOS_SDCARD_VolInfo, (uint8_t *)filename, PIOS_SDCARD_Sector)
-
 
 #endif /* PIOS_BOARD_H */

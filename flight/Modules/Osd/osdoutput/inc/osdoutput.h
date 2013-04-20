@@ -1,15 +1,14 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- * @addtogroup HKOSDModule HK OSD Module
- * @brief On screen display support
- * @{ 
+ * @{
+ * @addtogroup osdoutputModule osdoutput Module
+ * @brief Process osdoutput information
+ * @{
  *
- * @file       OsdHk.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Interfacing with HobbyKing OSD module
- *
+ * @file       osdoutput.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      osdoutput module, handles osdoutput stream
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,12 +27,12 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef OSDHK_H
-#define OSDHK_H
+#ifndef OSDOUTPUT_H
+#define OSDOUTPUT_H
 
-int32_t OsdHkInitialize(void);
+int32_t osdoutputInitialize(void);
 
-#endif	/* OSDHK_H */
+#endif	/* OSDOUTPUT_H */
 
 /**
  * @}

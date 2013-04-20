@@ -2,7 +2,7 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup OSDGENModule osdgen Module
+ * @addtogroup OSDgenModule osdgen Module
  * @brief Process OSD information
  * @{
  *
@@ -38,6 +38,7 @@
 #include "gpssatellites.h"
 #include "osdsettings.h"
 #include "baroaltitude.h"
+#include "flightstatus.h"
 
 #include "fonts.h"
 #include "font12x18.h"
@@ -2096,6 +2097,8 @@ void updateGraphics()
     HomeLocationGet(&home);
     BaroAltitudeData baro;
     BaroAltitudeGet(&baro);
+    FlightStatusData status;
+    FlightStatusGet(&status);
 
     PIOS_Servo_Set(0, OsdSettings.White);
     PIOS_Servo_Set(1, OsdSettings.Black);
@@ -2234,7 +2237,6 @@ void updateGraphics()
              }*/
 
             //drawAltitude(200,50,m_alt,dir);
-
             //drawArrow(96,GRAPHICS_HEIGHT_REAL/2,angleB,32);
             // Draw airspeed (left side.)
             if (OsdSettings.Speed == OSDSETTINGS_SPEED_ENABLED) {
@@ -2272,6 +2274,36 @@ void updateGraphics()
                         0);
             }
 
+            char temp[50] =
+            { 0 };
+            memset(temp, ' ', 50);
+            switch (status.FlightMode) {
+                case FLIGHTSTATUS_FLIGHTMODE_MANUAL:
+                    sprintf(temp, "Man");
+                    break;
+                case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
+                    sprintf(temp, "Stab1");
+                    break;
+                case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
+                    sprintf(temp, "Stab2");
+                    break;
+                case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
+                    sprintf(temp, "Stab3");
+                    break;
+                case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
+                    sprintf(temp, "PH");
+                    break;
+                case FLIGHTSTATUS_FLIGHTMODE_RETURNTOBASE:
+                    sprintf(temp, "RTB");
+                    break;
+                case FLIGHTSTATUS_FLIGHTMODE_PATHPLANNER:
+                    sprintf(temp, "PATH");
+                    break;
+                default:
+                    sprintf(temp, "Mode: %d", status.FlightMode);
+                    break;
+            }
+            write_string(temp, APPLY_HDEADBAND(5), APPLY_VDEADBAND(5), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
         }
             break;
         case 3:
@@ -2348,6 +2380,7 @@ int32_t osdgenInitialize(void)
 #endif
     OsdSettingsInitialize();
     BaroAltitudeInitialize();
+    FlightStatusInitialize();
 
     return 0;
 }

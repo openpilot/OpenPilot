@@ -36,30 +36,30 @@
 #include <pios_spi_priv.h>
 
 struct pios_video_cfg {
-	const struct pios_spi_cfg mask;
-	const struct pios_spi_cfg level;
+        const struct pios_spi_cfg mask;
+        const struct pios_spi_cfg level;
 
-	const struct pios_exti_cfg * hsync;
-	const struct pios_exti_cfg * vsync;
+        const struct pios_exti_cfg *hsync;
+        const struct pios_exti_cfg *vsync;
 
-	/*struct stm32_exti hsync;
-	struct stm32_exti vsync;
-	struct stm32_gpio hsync_io;
-	struct stm32_gpio vsync_io;
-	struct stm32_irq hsync_irq;
-	struct stm32_irq vsync_irq;*/
+        /*struct stm32_exti hsync;
+           struct stm32_exti vsync;
+           struct stm32_gpio hsync_io;
+           struct stm32_gpio vsync_io;
+           struct stm32_irq hsync_irq;
+           struct stm32_irq vsync_irq;*/
 };
 
 // Time vars
 typedef struct {
-  uint8_t sec;
-  uint8_t min;
-  uint8_t hour;
+        uint8_t sec;
+        uint8_t min;
+        uint8_t hour;
 } TTime;
 
 extern TTime timex;
 
-extern void PIOS_Video_Init(const struct pios_video_cfg * cfg);
+extern void PIOS_Video_Init(const struct pios_video_cfg *cfg);
 uint16_t PIOS_Video_GetOSDLines(void);
 extern bool PIOS_Hsync_ISR();
 extern bool PIOS_Vsync_ISR();
@@ -75,21 +75,21 @@ extern bool PIOS_Vsync_ISR();
 
 // Real OSD size
 #ifdef PAL
- #define GRAPHICS_WIDTH_REAL (336+GRAPHICS_HDEADBAND)
- #define GRAPHICS_HEIGHT_REAL (270+GRAPHICS_VDEADBAND)
+ #define GRAPHICS_WIDTH_REAL (336 + GRAPHICS_HDEADBAND)
+ #define GRAPHICS_HEIGHT_REAL (270 + GRAPHICS_VDEADBAND)
 #else
- #define GRAPHICS_WIDTH_REAL (320+GRAPHICS_HDEADBAND)
- #define GRAPHICS_HEIGHT_REAL (225+GRAPHICS_VDEADBAND)
+ #define GRAPHICS_WIDTH_REAL (320 + GRAPHICS_HDEADBAND)
+ #define GRAPHICS_HEIGHT_REAL (225 + GRAPHICS_VDEADBAND)
 #endif
 
 //draw area
 #define GRAPHICS_TOP 0
 #define GRAPHICS_LEFT 0
-#define GRAPHICS_BOTTOM (GRAPHICS_HEIGHT_REAL-GRAPHICS_VDEADBAND-1)
-#define GRAPHICS_RIGHT (GRAPHICS_WIDTH_REAL-GRAPHICS_HDEADBAND-1)
+#define GRAPHICS_BOTTOM (GRAPHICS_HEIGHT_REAL - GRAPHICS_VDEADBAND - 1)
+#define GRAPHICS_RIGHT (GRAPHICS_WIDTH_REAL - GRAPHICS_HDEADBAND - 1)
 
 
-#define GRAPHICS_WIDTH (GRAPHICS_WIDTH_REAL/8)
+#define GRAPHICS_WIDTH (GRAPHICS_WIDTH_REAL / 8)
 #define GRAPHICS_HEIGHT GRAPHICS_HEIGHT_REAL
 
 // dma lenght

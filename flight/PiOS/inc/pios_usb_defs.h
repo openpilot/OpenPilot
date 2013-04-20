@@ -31,50 +31,50 @@
 #ifndef PIOS_USB_DEFS_H
 #define PIOS_USB_DEFS_H
 
-#include <stdint.h>		/* uint*_t */
+#include <stdint.h>             /* uint*_t */
 
 enum usb_desc_types {
-	USB_DESC_TYPE_DEVICE         = 0x01,
-	USB_DESC_TYPE_CONFIGURATION  = 0x02,
-	USB_DESC_TYPE_STRING         = 0x03,
-	USB_DESC_TYPE_INTERFACE      = 0x04,
-	USB_DESC_TYPE_ENDPOINT       = 0x05,
-	USB_DESC_TYPE_IAD            = 0x0B,
-	USB_DESC_TYPE_HID            = 0x21,
-	USB_DESC_TYPE_REPORT         = 0x22,
-	USB_DESC_TYPE_CLASS_SPECIFIC = 0x24,
+        USB_DESC_TYPE_DEVICE         = 0x01,
+        USB_DESC_TYPE_CONFIGURATION  = 0x02,
+        USB_DESC_TYPE_STRING         = 0x03,
+        USB_DESC_TYPE_INTERFACE      = 0x04,
+        USB_DESC_TYPE_ENDPOINT       = 0x05,
+        USB_DESC_TYPE_IAD            = 0x0B,
+        USB_DESC_TYPE_HID            = 0x21,
+        USB_DESC_TYPE_REPORT         = 0x22,
+        USB_DESC_TYPE_CLASS_SPECIFIC = 0x24,
 } __attribute__((packed));
 
 enum usb_interface_class {
-	USB_INTERFACE_CLASS_CDC  = 0x02,
-	USB_INTERFACE_CLASS_HID  = 0x03,
-	USB_INTERFACE_CLASS_DATA = 0x0A,
+        USB_INTERFACE_CLASS_CDC  = 0x02,
+        USB_INTERFACE_CLASS_HID  = 0x03,
+        USB_INTERFACE_CLASS_DATA = 0x0A,
 } __attribute__((packed));
 
 enum usb_cdc_desc_subtypes {
-	USB_CDC_DESC_SUBTYPE_HEADER        = 0x00,
-	USB_CDC_DESC_SUBTYPE_CALLMGMT      = 0x01,
-	USB_CDC_DESC_SUBTYPE_ABSTRACT_CTRL = 0x02,
-	USB_CDC_DESC_SUBTYPE_UNION         = 0x06,
+        USB_CDC_DESC_SUBTYPE_HEADER        = 0x00,
+        USB_CDC_DESC_SUBTYPE_CALLMGMT      = 0x01,
+        USB_CDC_DESC_SUBTYPE_ABSTRACT_CTRL = 0x02,
+        USB_CDC_DESC_SUBTYPE_UNION         = 0x06,
 } __attribute__((packed));
 
 enum usb_ep_attr {
-	USB_EP_ATTR_TT_CONTROL     = 0x00,
-	USB_EP_ATTR_TT_ISOCHRONOUS = 0x01,
-	USB_EP_ATTR_TT_BULK        = 0x02,
-	USB_EP_ATTR_TT_INTERRUPT   = 0x03,
+        USB_EP_ATTR_TT_CONTROL     = 0x00,
+        USB_EP_ATTR_TT_ISOCHRONOUS = 0x01,
+        USB_EP_ATTR_TT_BULK        = 0x02,
+        USB_EP_ATTR_TT_INTERRUPT   = 0x03,
 } __attribute__((packed));
 
 /* Standard macros to convert from host endian to USB endian (ie. little endian) */
 #if __BIG_ENDIAN__
-#define htousbs(v) ((uint16_t)(\
-				((((v) >> 0) & 0xFF) << 8) |	\
-				((((v) >> 8) & 0xFF) << 0)))
-#define htousbl(v) ((uint32_t)(\
-		((((v) >>  0) & 0xFF) << 24) |	\
-		((((v) >>  8) & 0xFF) << 16) |	\
-		((((v) >> 16) & 0xFF) <<  8) |	\
-		((((v) >> 24) & 0xFF) <<  0)))
+#define htousbs(v) ((uint16_t)( \
+                            ((((v) >> 0) & 0xFF) << 8) |    \
+                            ((((v) >> 8) & 0xFF) << 0)))
+#define htousbl(v) ((uint32_t)( \
+                            ((((v) >> 0) & 0xFF) << 24) |  \
+                            ((((v) >> 8) & 0xFF) << 16) |  \
+                            ((((v) >> 16) & 0xFF) << 8) |  \
+                            ((((v) >> 24) & 0xFF) << 0)))
 #else
 #define htousbs(v) (v)
 #define htousbl(v) (v)
@@ -124,12 +124,12 @@ enum usb_ep_attr {
 #define HID_ITEM_SIZE_0 0
 #define HID_ITEM_SIZE_1 1
 #define HID_ITEM_SIZE_2 2
-#define HID_ITEM_SIZE_4 3	/* Yes, 4 bytes is represented with a size field = 3 */
+#define HID_ITEM_SIZE_4 3       /* Yes, 4 bytes is represented with a size field = 3 */
 
-#define HID_SHORT_ITEM(tag,type,size) (\
-	(((tag)  & 0xF) << 4) |	       \
-	(((type) & 0x3) << 2) |	       \
-	(((size) & 0x3) << 0))
+#define HID_SHORT_ITEM(tag,type,size) ( \
+                (((tag) & 0xF) << 4) |        \
+                (((type) & 0x3) << 2) |        \
+                (((size) & 0x3) << 0))
 
 /* Long items have a fixed prefix */
 #define HID_LONG_ITEM HID_SHORT_ITEM(HID_TAG_RSVD, HID_ITEM_TYPE_RSVD, HID_ITEM_SIZE_2)
@@ -150,81 +150,81 @@ enum usb_ep_attr {
 #define HID_LOCAL_ITEM_4(tag) HID_SHORT_ITEM((tag), HID_ITEM_TYPE_LOCAL, HID_ITEM_SIZE_4)
 
 struct usb_device_desc {
-	uint8_t  bLength;
-	uint8_t  bDescriptorType;
-	uint16_t bcdUSB;
-	uint8_t  bDeviceClass;
-	uint8_t  bDeviceSubClass;
-	uint8_t  bDeviceProtocol;
-	uint8_t  bMaxPacketSize0;
-	uint16_t idVendor;
-	uint16_t idProduct;
-	uint16_t bcdDevice;
-	uint8_t  iManufacturer;
-	uint8_t  iProduct;
-	uint8_t  iSerialNumber;
-	uint8_t  bNumConfigurations;
+        uint8_t bLength;
+        uint8_t bDescriptorType;
+        uint16_t bcdUSB;
+        uint8_t bDeviceClass;
+        uint8_t bDeviceSubClass;
+        uint8_t bDeviceProtocol;
+        uint8_t bMaxPacketSize0;
+        uint16_t idVendor;
+        uint16_t idProduct;
+        uint16_t bcdDevice;
+        uint8_t iManufacturer;
+        uint8_t iProduct;
+        uint8_t iSerialNumber;
+        uint8_t bNumConfigurations;
 } __attribute__((packed));
 
 struct usb_configuration_desc {
-	uint8_t  bLength;
-	uint8_t  bDescriptorType;
-	uint16_t wTotalLength;
-	uint8_t  bNumInterfaces;
-	uint8_t  bConfigurationValue;
-	uint8_t  iConfiguration;
-	uint8_t  bmAttributes;
-	uint8_t  bMaxPower;
+        uint8_t bLength;
+        uint8_t bDescriptorType;
+        uint16_t wTotalLength;
+        uint8_t bNumInterfaces;
+        uint8_t bConfigurationValue;
+        uint8_t iConfiguration;
+        uint8_t bmAttributes;
+        uint8_t bMaxPower;
 } __attribute__((packed));
 
 struct usb_interface_association_desc {
-	uint8_t  bLength;
-	uint8_t  bDescriptorType;
-	uint8_t  bFirstInterface;
-	uint8_t  bInterfaceCount;
-	uint8_t  bFunctionClass;
-	uint8_t  bFunctionSubClass;
-	uint8_t  bFunctionProtocol;
-	uint8_t  iInterface;
+        uint8_t bLength;
+        uint8_t bDescriptorType;
+        uint8_t bFirstInterface;
+        uint8_t bInterfaceCount;
+        uint8_t bFunctionClass;
+        uint8_t bFunctionSubClass;
+        uint8_t bFunctionProtocol;
+        uint8_t iInterface;
 } __attribute__((packed));
 
 struct usb_interface_desc {
-	uint8_t  bLength;
-	uint8_t  bDescriptorType;
-	uint8_t  bInterfaceNumber;
-	uint8_t  bAlternateSetting;
-	uint8_t  bNumEndpoints;
-	uint8_t  bInterfaceClass;
-	uint8_t  bInterfaceSubClass;
-	uint8_t  nInterfaceProtocol;
-	uint8_t  iInterface;
+        uint8_t bLength;
+        uint8_t bDescriptorType;
+        uint8_t bInterfaceNumber;
+        uint8_t bAlternateSetting;
+        uint8_t bNumEndpoints;
+        uint8_t bInterfaceClass;
+        uint8_t bInterfaceSubClass;
+        uint8_t nInterfaceProtocol;
+        uint8_t iInterface;
 } __attribute__((packed));
 
 struct usb_hid_desc {
-	uint8_t  bLength;
-	uint8_t  bDescriptorType;
-	uint16_t bcdHID;
-	uint8_t  bCountryCode;
-	uint8_t  bNumDescriptors;
-	uint8_t  bClassDescriptorType;
-	uint16_t wItemLength;
+        uint8_t bLength;
+        uint8_t bDescriptorType;
+        uint16_t bcdHID;
+        uint8_t bCountryCode;
+        uint8_t bNumDescriptors;
+        uint8_t bClassDescriptorType;
+        uint16_t wItemLength;
 } __attribute__((packed));
 
 struct usb_endpoint_desc {
-	uint8_t  bLength;
-	uint8_t  bDescriptorType;
-	uint8_t  bEndpointAddress;
-	uint8_t  bmAttributes;
-	uint16_t wMaxPacketSize;
-	uint8_t  bInterval;
+        uint8_t bLength;
+        uint8_t bDescriptorType;
+        uint8_t bEndpointAddress;
+        uint8_t bmAttributes;
+        uint16_t wMaxPacketSize;
+        uint8_t bInterval;
 } __attribute__((packed));
 
 struct usb_setup_request {
-	uint8_t  bmRequestType;
-	uint8_t  bRequest;
-	uint16_t wValue;
-	uint16_t wIndex;
-	uint16_t wLength;
+        uint8_t bmRequestType;
+        uint8_t bRequest;
+        uint16_t wValue;
+        uint16_t wIndex;
+        uint16_t wLength;
 } __attribute__((packed));
 
 #define USB_REQ_TYPE_STANDARD                          0x00
@@ -238,108 +238,108 @@ struct usb_setup_request {
 #define USB_REQ_RECIPIENT_MASK                         0x03
 
 enum usb_standard_requests {
-	USB_REQ_GET_STATUS         = 0x00,
-	USB_REQ_CLEAR_FEATURE      = 0x01,
-	/* what is 0x02? */
-	USB_REQ_SET_FEATURE        = 0x03,
-	/* what is 0x04? */
-	USB_REQ_SET_ADDRESS        = 0x05,
-	USB_REQ_GET_DESCRIPTOR     = 0x06,
-	USB_REQ_SET_DESCRIPTOR     = 0x07,
-	USB_REQ_GET_CONFIGURATION  = 0x08,
-	USB_REQ_SET_CONFIGURATION  = 0x09,
-	USB_REQ_GET_INTERFACE      = 0x0A,
-	USB_REQ_SET_INTERFACE      = 0x0B,
-	USB_REQ_SYNCH_FRAME        = 0x0C,
+        USB_REQ_GET_STATUS         = 0x00,
+        USB_REQ_CLEAR_FEATURE      = 0x01,
+        /* what is 0x02? */
+        USB_REQ_SET_FEATURE        = 0x03,
+        /* what is 0x04? */
+        USB_REQ_SET_ADDRESS        = 0x05,
+        USB_REQ_GET_DESCRIPTOR     = 0x06,
+        USB_REQ_SET_DESCRIPTOR     = 0x07,
+        USB_REQ_GET_CONFIGURATION  = 0x08,
+        USB_REQ_SET_CONFIGURATION  = 0x09,
+        USB_REQ_GET_INTERFACE      = 0x0A,
+        USB_REQ_SET_INTERFACE      = 0x0B,
+        USB_REQ_SYNCH_FRAME        = 0x0C,
 };
 
 enum usb_hid_requests {
-	USB_HID_REQ_GET_REPORT     = 0x01,
-	USB_HID_REQ_GET_IDLE       = 0x02,
-	USB_HID_REQ_GET_PROTOCOL   = 0x03,
-	/* 0x04-0x08 Reserved */
-	USB_HID_REQ_SET_REPORT     = 0x09,
-	USB_HID_REQ_SET_IDLE       = 0x0A,
-	USB_HID_REQ_SET_PROTOCOL   = 0x0B,
+        USB_HID_REQ_GET_REPORT     = 0x01,
+        USB_HID_REQ_GET_IDLE       = 0x02,
+        USB_HID_REQ_GET_PROTOCOL   = 0x03,
+        /* 0x04-0x08 Reserved */
+        USB_HID_REQ_SET_REPORT     = 0x09,
+        USB_HID_REQ_SET_IDLE       = 0x0A,
+        USB_HID_REQ_SET_PROTOCOL   = 0x0B,
 };
 
 enum usb_cdc_requests {
-	USB_CDC_REQ_SET_LINE_CODING        = 0x20,
-	USB_CDC_REQ_GET_LINE_CODING        = 0x21,
+        USB_CDC_REQ_SET_LINE_CODING        = 0x20,
+        USB_CDC_REQ_GET_LINE_CODING        = 0x21,
 
-	USB_CDC_REQ_SET_CONTROL_LINE_STATE = 0x22,
+        USB_CDC_REQ_SET_CONTROL_LINE_STATE = 0x22,
 };
 
 struct usb_cdc_header_func_desc {
-	uint8_t  bLength;
-	uint8_t  bDescriptorType;
-	uint8_t  bDescriptorSubType;
-	uint16_t bcdCDC;
+        uint8_t bLength;
+        uint8_t bDescriptorType;
+        uint8_t bDescriptorSubType;
+        uint16_t bcdCDC;
 } __attribute__((packed));
 
 struct usb_cdc_callmgmt_func_desc {
-	uint8_t  bLength;
-	uint8_t  bDescriptorType;
-	uint8_t  bDescriptorSubType;
-	uint8_t  bmCapabilities;
-	uint8_t  bDataInterface;
+        uint8_t bLength;
+        uint8_t bDescriptorType;
+        uint8_t bDescriptorSubType;
+        uint8_t bmCapabilities;
+        uint8_t bDataInterface;
 } __attribute__((packed));
 
 struct usb_cdc_acm_func_desc {
-	uint8_t  bLength;
-	uint8_t  bDescriptorType;
-	uint8_t  bDescriptorSubType;
-	uint8_t  bmCapabilities;
+        uint8_t bLength;
+        uint8_t bDescriptorType;
+        uint8_t bDescriptorSubType;
+        uint8_t bmCapabilities;
 } __attribute__((packed));
 
 struct usb_cdc_union_func_desc {
-	uint8_t  bLength;
-	uint8_t  bDescriptorType;
-	uint8_t  bDescriptorSubType;
-	uint8_t  bMasterInterface;
-	uint8_t  bSlaveInterface;
+        uint8_t bLength;
+        uint8_t bDescriptorType;
+        uint8_t bDescriptorSubType;
+        uint8_t bMasterInterface;
+        uint8_t bSlaveInterface;
 } __attribute__((packed));
 
 #define USB_LANGID_ENGLISH_US 0x0409
 
 struct usb_string_langid {
-	uint8_t  bLength;
-	uint8_t  bDescriptorType;
-	uint16_t bLangID;
+        uint8_t bLength;
+        uint8_t bDescriptorType;
+        uint16_t bLangID;
 } __attribute__((packed));
 
 struct usb_cdc_line_coding {
-	uint32_t dwDTERate;
-	uint8_t  bCharFormat;
-	uint8_t  bParityType;
-	uint8_t  bDataBits;
+        uint32_t dwDTERate;
+        uint8_t bCharFormat;
+        uint8_t bParityType;
+        uint8_t bDataBits;
 } __attribute__((packed));
 
 enum usb_cdc_line_coding_stop {
-	USB_CDC_LINE_CODING_STOP_1   = 0,
-	USB_CDC_LINE_CODING_STOP_1_5 = 1,
-	USB_CDC_LINE_CODING_STOP_2   = 2,
+        USB_CDC_LINE_CODING_STOP_1   = 0,
+        USB_CDC_LINE_CODING_STOP_1_5 = 1,
+        USB_CDC_LINE_CODING_STOP_2   = 2,
 } __attribute__((packed));
 
 enum usb_cdc_line_coding_parity {
-	USB_CDC_LINE_CODING_PARITY_NONE  = 0,
-	USB_CDC_LINE_CODING_PARITY_ODD   = 1,
-	USB_CDC_LINE_CODING_PARITY_EVEN  = 2,
-	USB_CDC_LINE_CODING_PARITY_MARK  = 3,
-	USB_CDC_LINE_CODING_PARITY_SPACE = 4,
+        USB_CDC_LINE_CODING_PARITY_NONE  = 0,
+        USB_CDC_LINE_CODING_PARITY_ODD   = 1,
+        USB_CDC_LINE_CODING_PARITY_EVEN  = 2,
+        USB_CDC_LINE_CODING_PARITY_MARK  = 3,
+        USB_CDC_LINE_CODING_PARITY_SPACE = 4,
 } __attribute__((packed));
 
 struct usb_cdc_serial_state_report {
-	uint8_t  bmRequestType;
-	uint8_t  bNotification;
-	uint16_t wValue;
-	uint16_t wIndex;
-	uint16_t wLength;
-	uint16_t bmUartState;
+        uint8_t bmRequestType;
+        uint8_t bNotification;
+        uint16_t wValue;
+        uint16_t wIndex;
+        uint16_t wLength;
+        uint16_t bmUartState;
 } __attribute__((packed));
 
 enum usb_cdc_notification {
-	USB_CDC_NOTIFICATION_SERIAL_STATE = 0x20,
+        USB_CDC_NOTIFICATION_SERIAL_STATE = 0x20,
 } __attribute__((packed));
 
 /*
@@ -349,31 +349,31 @@ enum usb_cdc_notification {
 #define USB_VENDOR_ID_OPENPILOT 0x20A0
 
 enum usb_product_ids {
-	USB_PRODUCT_ID_OPENPILOT_MAIN = 0x415A,
-	USB_PRODUCT_ID_COPTERCONTROL  = 0x415B,
-	USB_PRODUCT_ID_PIPXTREME      = 0x415C,
-	USB_PRODUCT_ID_CC3D           = 0x415D,
-	USB_PRODUCT_ID_REVOLUTION     = 0x415E,
-	USB_PRODUCT_ID_OSD            = 0x4194,
-	USB_PRODUCT_ID_SPARE          = 0x4195,
+        USB_PRODUCT_ID_OPENPILOT_MAIN = 0x415A,
+        USB_PRODUCT_ID_COPTERCONTROL  = 0x415B,
+        USB_PRODUCT_ID_PIPXTREME      = 0x415C,
+        USB_PRODUCT_ID_CC3D           = 0x415D,
+        USB_PRODUCT_ID_REVOLUTION     = 0x415E,
+        USB_PRODUCT_ID_OSD            = 0x4194,
+        USB_PRODUCT_ID_SPARE          = 0x4195,
 } __attribute__((packed));
 
 enum usb_op_board_ids {
-	USB_OP_BOARD_ID_OPENPILOT_MAIN = 1,
-	/* Board ID 2 may be unused or AHRS */
-	USB_OP_BOARD_ID_PIPXTREME      = 3,
-	USB_OP_BOARD_ID_COPTERCONTROL  = 4,
-	USB_OP_BOARD_ID_REVOLUTION     = 5,
-	USB_OP_BOARD_ID_OSD     	   = 6,
+        USB_OP_BOARD_ID_OPENPILOT_MAIN = 1,
+        /* Board ID 2 may be unused or AHRS */
+        USB_OP_BOARD_ID_PIPXTREME      = 3,
+        USB_OP_BOARD_ID_COPTERCONTROL  = 4,
+        USB_OP_BOARD_ID_REVOLUTION     = 5,
+        USB_OP_BOARD_ID_OSD                = 6,
 } __attribute__((packed));
 
 enum usb_op_board_modes {
-	USB_OP_BOARD_MODE_BL = 1,
-	USB_OP_BOARD_MODE_FW = 2,
+        USB_OP_BOARD_MODE_BL = 1,
+        USB_OP_BOARD_MODE_FW = 2,
 } __attribute__((packed));
 
-#define USB_OP_DEVICE_VER(board_id, board_mode) (\
-		((board_id   & 0xFF) << 8) |	 \
-		((board_mode & 0xFF) << 0))
+#define USB_OP_DEVICE_VER(board_id, board_mode) ( \
+                ((board_id & 0xFF) << 8) |     \
+                ((board_mode & 0xFF) << 0))
 
 #endif /* PIOS_USB_DEFS_H */

@@ -34,7 +34,7 @@
 extern uint8_t *PIOS_BL_HELPER_FLASH_If_Read(uint32_t SectorAddress);
 extern uint8_t PIOS_BL_HELPER_FLASH_Ini();
 extern uint32_t PIOS_BL_HELPER_CRC_Memory_Calc();
-extern void PIOS_BL_HELPER_FLASH_Read_Description(uint8_t * array, uint8_t size);
+extern void PIOS_BL_HELPER_FLASH_Read_Description(uint8_t *array, uint8_t size);
 extern uint8_t PIOS_BL_HELPER_FLASH_Start();
 extern void PIOS_BL_HELPER_CRC_Ini();
 

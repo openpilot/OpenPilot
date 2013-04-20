@@ -34,15 +34,15 @@
 #include "pios_usb_rctx.h"
 
 struct pios_usb_rctx_cfg {
-	uint8_t data_if;
-	uint8_t data_tx_ep;
+        uint8_t data_if;
+        uint8_t data_tx_ep;
 };
 
-extern int32_t PIOS_USB_RCTX_Init(uint32_t * usbrctx_id, const struct pios_usb_rctx_cfg * cfg, uint32_t lower_id);
+extern int32_t PIOS_USB_RCTX_Init(uint32_t *usbrctx_id, const struct pios_usb_rctx_cfg *cfg, uint32_t lower_id);
 
 #endif /* PIOS_USB_RCTX_PRIV_H */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

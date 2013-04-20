@@ -34,11 +34,11 @@
 #include <pios.h>
 
 struct pios_ppm_out_cfg {
-	TIM_OCInitTypeDef tim_oc_init;
-	const struct pios_tim_channel * channel;
+        TIM_OCInitTypeDef tim_oc_init;
+        const struct pios_tim_channel *channel;
 };
 
-extern int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg * cfg);
+extern int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg *cfg);
 extern void PIOS_PPM_OUT_Set(uint32_t ppm_out_id, uint8_t servo, uint16_t position);
 
 #endif /* PIOS_PPM_PRIV_H */

@@ -11,8 +11,8 @@
 #ifndef PIOS_STRUCT_HELPER_H
 #define PIOS_STRUCT_HELPER_H
 
-#define container_of(ptr, type, member) ({			\
-	const typeof( ((type *)0)->member ) *__mptr = (ptr);	\
-	(type *)( (char *)__mptr - offsetof(type,member) );})
+#define container_of(ptr, type, member) ({                      \
+                                                 const typeof( ((type*)0)->member ) * __mptr = (ptr);    \
+                                                 (type*)( (char*)__mptr - offsetof(type,member) ); })
 
 #endif /* PIOS_STRUCT_HELPER_H */

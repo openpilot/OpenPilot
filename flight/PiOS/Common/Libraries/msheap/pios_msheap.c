@@ -38,8 +38,8 @@
 /*
  * Symbols exported by the linker script telling us where the heap is.
  */
-extern char	_sheap;
-extern char	_eheap;
+extern char _sheap;
+extern char _eheap;
 
 #if defined(PIOS_INCLUDE_FREERTOS)
 /*
@@ -57,78 +57,77 @@ extern char	_eheap;
  */
 extern void vApplicationMallocFailedHook(void) __attribute__((weak));
 
-void *
+void*
 pvPortMalloc(size_t s)
 {
-	void *p;
+        void *p;
 
-	vPortEnterCritical();
-	p = msheap_alloc(s);
-	vPortExitCritical();
+        vPortEnterCritical();
+        p = msheap_alloc(s);
+        vPortExitCritical();
 
-	if (p == NULL && &vApplicationMallocFailedHook != NULL)
-		vApplicationMallocFailedHook();
-
-	return p;
+        if (p == NULL && &vApplicationMallocFailedHook != NULL) {
+                vApplicationMallocFailedHook();
+        }
+        return p;
 }
 
 void
 vPortFree(void *p)
 {
-	vPortEnterCritical();
-	msheap_free(p);
-	vPortExitCritical();
+        vPortEnterCritical();
+        msheap_free(p);
+        vPortExitCritical();
 }
 
 size_t
 xPortGetFreeHeapSize(void)
 {
-	return msheap_free_space();
+        return msheap_free_space();
 }
 
 void
 vPortInitialiseBlocks(void)
 {
-	msheap_init(&_sheap, &_eheap);
+        msheap_init(&_sheap, &_eheap);
 }
 
 void
 xPortIncreaseHeapSize(size_t bytes)
 {
-	msheap_extend(bytes);
+        msheap_extend(bytes);
 }
 
-void *
+void*
 malloc(size_t size)
 {
-	return pvPortMalloc(size);
+        return pvPortMalloc(size);
 }
 
 void
 free(void *p)
 {
-	return vPortFree(p);
+        return vPortFree(p);
 }
 
 #else /* !PIOS_INCLUDE_FREERTOS */
 int heap_init_done;
-void *
+void*
 malloc(size_t size)
 {
-//	static 
+//	static
 
-	if (!heap_init_done) {
-		msheap_init(&_sheap, &_eheap);
-		heap_init_done = 1;
-	}
-
-	return msheap_alloc(size);
+        if (!heap_init_done) {
+                msheap_init(&_sheap, &_eheap);
+                heap_init_done = 1;
+        }
+        return msheap_alloc(size);
 }
 
 void
 free(void *p)
 {
-	return msheap_free(p);
+        return msheap_free(p);
 }
 
 #endif /* PIOS_INCLUDE_FREERTOS */
@@ -136,5 +135,5 @@ free(void *p)
 void
 msheap_panic(const char *reason)
 {
-	//PIOS_DEBUG_Panic(reason);
+        //PIOS_DEBUG_Panic(reason);
 }

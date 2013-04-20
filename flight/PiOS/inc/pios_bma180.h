@@ -54,54 +54,53 @@
 #define BMA_RESET_CODE    0x6B
 
 /* Accel range  */
-#define BMA_RANGE_MASK    0x0E          
+#define BMA_RANGE_MASK    0x0E
 #define BMA_RANGE_SHIFT   1
 enum bma180_range { BMA_RANGE_1G = 0x00,
-	BMA_RANGE_1_5G = 0x01,
-	BMA_RANGE_2G = 0x02,
-	BMA_RANGE_3G = 0x03,
-	BMA_RANGE_4G = 0x04,
-	BMA_RANGE_8G = 0x05,
-	BMA_RANGE_16G = 0x06
-};
+                    BMA_RANGE_1_5G = 0x01,
+                    BMA_RANGE_2G = 0x02,
+                    BMA_RANGE_3G = 0x03,
+                    BMA_RANGE_4G = 0x04,
+                    BMA_RANGE_8G = 0x05,
+                    BMA_RANGE_16G = 0x06};
 
 /* Measurement bandwidth */
 #define BMA_BW_MASK       0xF0
 #define BMA_BW_SHIFT      4
 enum bma180_bandwidth { BMA_BW_10HZ = 0x00,
-	BMA_BW_20HZ = 0x01,
-	BMA_BW_40HZ = 0x02,
-	BMA_BW_75HZ = 0x03,
-	BMA_BW_150HZ = 0x04,
-	BMA_BW_300HZ = 0x05,
-	BMA_BW_600HZ = 0x06,
-	BMA_BW_1200HZ =0x07,
-	BMA_BW_HP1HZ = 0x08,    // High-pass, 1 Hz
-	BMA_BW_BP0_300HZ = 0x09 // Band-pass, 0.3Hz-300Hz
+                        BMA_BW_20HZ = 0x01,
+                        BMA_BW_40HZ = 0x02,
+                        BMA_BW_75HZ = 0x03,
+                        BMA_BW_150HZ = 0x04,
+                        BMA_BW_300HZ = 0x05,
+                        BMA_BW_600HZ = 0x06,
+                        BMA_BW_1200HZ =0x07,
+                        BMA_BW_HP1HZ = 0x08, // High-pass, 1 Hz
+                        BMA_BW_BP0_300HZ = 0x09 // Band-pass, 0.3Hz-300Hz
 };
 
 #define BMA_NEW_DAT_INT   0x02
 
 struct pios_bma180_data {
-	int16_t x;
-	int16_t y;
-	int16_t z;
-	int8_t temperature;
+        int16_t x;
+        int16_t y;
+        int16_t z;
+        int8_t temperature;
 };
 
 
 struct pios_bma180_cfg {
-	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
-	enum bma180_bandwidth bandwidth;
-	enum bma180_range range;
+        const struct pios_exti_cfg *exti_cfg;  /* Pointer to the EXTI configuration */
+        enum bma180_bandwidth bandwidth;
+        enum bma180_range range;
 };
 
 /* Public Functions */
-extern int32_t PIOS_BMA180_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_bma180_cfg * cfg);
+extern int32_t PIOS_BMA180_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_bma180_cfg *cfg);
 extern void PIOS_BMA180_Attach(uint32_t spi_id);
 extern float PIOS_BMA180_GetScale();
-extern int32_t PIOS_BMA180_ReadFifo(struct pios_bma180_data * buffer);
-extern int32_t PIOS_BMA180_ReadAccels(struct pios_bma180_data * data);
+extern int32_t PIOS_BMA180_ReadFifo(struct pios_bma180_data *buffer);
+extern int32_t PIOS_BMA180_ReadAccels(struct pios_bma180_data *data);
 extern int32_t PIOS_BMA180_Test();
 extern bool PIOS_BMA180_IRQHandler();
 

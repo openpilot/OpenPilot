@@ -1,4 +1,4 @@
- /**
+/**
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
@@ -35,15 +35,15 @@
 #include <pios_stm32.h>
 
 struct pios_usb_cfg {
-	struct stm32_irq irq;
-	struct stm32_gpio vsense;
+        struct stm32_irq irq;
+        struct stm32_gpio vsense;
 };
 
-extern int32_t PIOS_USB_Init(uint32_t * usb_id, const struct pios_usb_cfg * cfg);
+extern int32_t PIOS_USB_Init(uint32_t *usb_id, const struct pios_usb_cfg *cfg);
 
 #endif /* PIOS_USB_PRIV_H */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

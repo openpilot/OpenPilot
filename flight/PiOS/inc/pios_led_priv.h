@@ -35,21 +35,21 @@
 #include <pios_stm32.h>
 
 struct pios_led {
-	struct stm32_gpio pin;
-	uint32_t remap;
-	bool active_high;
+        struct stm32_gpio pin;
+        uint32_t remap;
+        bool active_high;
 };
 
 struct pios_led_cfg {
-	const struct pios_led * leds;
-	uint8_t num_leds;
+        const struct pios_led *leds;
+        uint8_t num_leds;
 };
 
-extern int32_t PIOS_LED_Init(const struct pios_led_cfg * cfg);
+extern int32_t PIOS_LED_Init(const struct pios_led_cfg *cfg);
 
 #endif /* PIOS_LED_PRIV_H */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

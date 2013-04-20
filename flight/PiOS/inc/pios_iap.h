@@ -1,5 +1,5 @@
 /*!
- * 	@File iap.h
+ *      @File iap.h
  *	@Brief	Header file for the In-Application-Programming Module
  *
  *  Created on: Sep 6, 2010
@@ -11,8 +11,8 @@
 
 
 /****************************************************************************************
- *  Header files
- ****************************************************************************************/
+*  Header files
+****************************************************************************************/
 
 /*****************************************************************************************
  *	Public Definitions/Macros
@@ -28,18 +28,18 @@
 #endif
 
 /****************************************************************************************
- *  Public Functions
- ****************************************************************************************/
-void		PIOS_IAP_Init(void);
-uint32_t	PIOS_IAP_CheckRequest( void );
-void		PIOS_IAP_SetRequest1(void);
-void		PIOS_IAP_SetRequest2(void);
-void		PIOS_IAP_ClearRequest(void);
-uint16_t	PIOS_IAP_ReadBootCount(void);
-void		PIOS_IAP_WriteBootCount(uint16_t);
+*  Public Functions
+****************************************************************************************/
+void            PIOS_IAP_Init(void);
+uint32_t        PIOS_IAP_CheckRequest( void );
+void            PIOS_IAP_SetRequest1(void);
+void            PIOS_IAP_SetRequest2(void);
+void            PIOS_IAP_ClearRequest(void);
+uint16_t        PIOS_IAP_ReadBootCount(void);
+void PIOS_IAP_WriteBootCount(uint16_t);
 
 /****************************************************************************************
- *  Public Data
- ****************************************************************************************/
+*  Public Data
+****************************************************************************************/
 
 #endif /* PIOS_IAP_H */

@@ -70,9 +70,7 @@ int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity
     }
 
     // Lock
-    if (xSemaphoreTakeRecursive(lock, portMAX_DELAY) == pdFALSE) {
-        return -1;
-    }
+    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
 
     // Read alarm and update its severity only if it was changed
     SystemAlarmsGet(&alarms);
@@ -105,9 +103,7 @@ int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions 
     }
 
     // Lock
-    if (xSemaphoreTakeRecursive(lock, portMAX_DELAY) == pdFALSE) {
-        return -1;
-    }
+    xSemaphoreTakeRecursive(lock, portMAX_DELAY);
 
     // Read alarm and update its severity only if it was changed
     SystemAlarmsGet(&alarms);

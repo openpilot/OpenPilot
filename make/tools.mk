@@ -52,15 +52,16 @@ endif
 ##############################
 
 ifeq ($(UNAME), Linux)
-    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux.tar.bz2
     ifeq ($(ARCH), x86_64)
-        QT_SDK_URL  := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-linux-x64.tar.bz2
+        ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-amd64.tar.bz2
+        QT_SDK_URL  := "Please install native Qt 4.8.x SDK using package manager"
     else
-        QT_SDK_URL  := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-linux.tar.bz2
+        ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-i686.tar.bz2
+        QT_SDK_URL  := "Please install native Qt 4.8.x SDK using package manager"
     endif
 else ifeq ($(UNAME), Darwin)
     ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-mac.tar.bz2
-    QT_SDK_URL  := TODO/qt-4.8.4-mac.tar.bz2
+    QT_SDK_URL  := "Please install native Qt 4.8.x SDK using package manager"
 else ifeq ($(UNAME), Windows)
     ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
     QT_SDK_URL  := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-windows.tar.bz2
@@ -68,6 +69,7 @@ else ifeq ($(UNAME), Windows)
     PYTHON_URL  := http://wiki.openpilot.org/download/attachments/18612236/python-2.7.4-windows.tar.bz2
 endif
 
+# Changing PYTHON_DIR, also update it in ground\openpilotgcs\src\app\gcsversioninfo.pri
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-4.8.4
 MINGW_DIR       := $(TOOLS_DIR)/mingw-4.4.0
@@ -238,6 +240,15 @@ endif
 .PHONY: arm_sdk_version
 arm_sdk_version:
 	$(V1) $(ARM_SDK_PREFIX)gcc --version | head -n1
+
+# Template to check ARM toolchain version before building targets
+define ARM_GCC_VERSION_CHECK_TEMPLATE
+	if ! $(ARM_SDK_PREFIX)gcc --version --specs=nano.specs >/dev/null 2>&1; then \
+		$(ECHO) $(MSG_NOTICE) Please install ARM toolchain 4.7+ using \'make arm_sdk_install\' && \
+		$(ECHO) $(MSG_NOTICE) Older ARM SDKs do not support new \'--specs=nano.specs\' option && \
+		exit 1; \
+	fi
+endef
 
 ##############################
 #

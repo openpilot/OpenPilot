@@ -267,6 +267,7 @@ $(1): fw_$(1)_opfw
 fw_$(1): fw_$(1)_opfw
 
 fw_$(1)_%: uavobjects_flight
+	$(V1) $$(ARM_GCC_VERSION_CHECK_TEMPLATE)
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/fw_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/targets/$(2) && \
 		$$(MAKE) -r --no-print-directory \
@@ -294,6 +295,7 @@ bl_$(1): bl_$(1)_bin
 bl_$(1)_bino: bl_$(1)_bin
 
 bl_$(1)_%:
+	$(V1) $$(ARM_GCC_VERSION_CHECK_TEMPLATE)
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/bl_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/$(2) && \
 		$$(MAKE) -r --no-print-directory \

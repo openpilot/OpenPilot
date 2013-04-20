@@ -27,7 +27,7 @@ ARCHFLAGS			+= -DARCH_POSIX
 #
 # PIOS device library source and includes
 #
-SRC					+=	$(wildcard $(PIOS_DEVLIB)*.c)
+SRC					+=	$(sort $(wildcard $(PIOS_DEVLIB)*.c))
 EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/inc
 
 #
@@ -68,8 +68,8 @@ EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/inc
 #
 ifneq ($(FREERTOS_DIR),)
 FREERTOS_PORTDIR	:=	$(PIOS_DEVLIB)/Libraries/FreeRTOS/Source
-SRC					+=	$(wildcard $(FREERTOS_PORTDIR)/portable/GCC/Posix/*.c)
-SRC					+=	$(wildcard $(FREERTOS_PORTDIR)/portable/MemMang/*.c)
+SRC					+=	$(sort $(wildcard $(FREERTOS_PORTDIR)/portable/GCC/Posix/*.c))
+SRC					+=	$(sort $(wildcard $(FREERTOS_PORTDIR)/portable/MemMang/*.c))
 
 EXTRAINCDIRS		+=	$(FREERTOS_PORTDIR)/portable/GCC/Posix
 endif

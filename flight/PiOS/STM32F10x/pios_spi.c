@@ -276,7 +276,7 @@ int32_t PIOS_SPI_ClaimBusISR(uint32_t spi_id)
 	bool valid = PIOS_SPI_validate(spi_dev);
 	PIOS_Assert(valid)
 	
-	if (xSemaphoreTakeFromISR(spi_dev->busy, NULL) != pdTRUE){
+	if (xSemaphoreTakeFromISR(spi_dev->busy, NULL) != pdTRUE) {
 		return -1;
 	}
 #endif

@@ -101,8 +101,12 @@ void GCSControlGadget::manualControlCommandUpdated(UAVObject * obj) {
     double yaw = obj->getField("Yaw")->getDouble();
     double throttle = obj->getField("Throttle")->getDouble();
 
-    if (throttle >= -1.0 && throttle <= 1.0) // necessary against incorect values from not configured joysticks 
-        throttle = -1.0 + (throttle * 2.0); // convert ManualControlCommand.Throttle range (0..1) to the widget's throttle stick range (-1..+1)
+    // necessary against incorect values from not configured joysticks 
+    if (throttle >= -1.0 && throttle <= 1.0)
+    {
+        // convert ManualControlCommand.Throttle range (0..1) to the widget's throttle stick range (-1..+1)
+        throttle = -1.0 + (throttle * 2.0);
+    }
 
     // Remap RPYT to left X/Y and right X/Y depending on mode
     switch (controlsMode) {
@@ -190,7 +194,11 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
         return;
 
     if (newThrottle != oldThrottle)
-        newThrottle = (newThrottle+1.0)/2.0; // convert widget's throttle stick range (-1..+1) to ManualControlCommand.Throttle range (0..1)
+    {
+        // convert widget's throttle stick range (-1..+1) to ManualControlCommand.Throttle range (0..1)
+        newThrottle = (newThrottle + 1.0) / 2.0;
+    }
+     
 
     if((newThrottle != oldThrottle) || (newPitch != oldPitch) || (newYaw != oldYaw) || (newRoll != oldRoll)) {
         if (buttonRollControl==0)obj->getField("Roll")->setDouble(newRoll);

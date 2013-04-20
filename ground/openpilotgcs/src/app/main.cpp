@@ -100,7 +100,6 @@
 #include <QtGui/QApplication>
 #include <QtGui/QMainWindow>
 #include <QtGui/QSplashScreen>
-#include <QtGui/QPainter>
 
 namespace {
 
@@ -108,9 +107,8 @@ namespace {
     typedef QMap<QString, bool> AppOptions;
     typedef QMap<QString, QString> AppOptionValues;
 
-    enum {
-        OptionIndent = 4, DescriptionIndent = 24
-    };
+    const int OptionIndent = 4;
+    const int DescriptionIndent = 24;
 
     const QLatin1String APP_NAME("OpenPilot GCS");
 
@@ -127,7 +125,7 @@ namespace {
 
     const char *DEFAULT_CONFIG_FILENAME = "OpenPilotGCS.xml";
 
-    const char *fixedOptionsC = " [OPTION]...\n"
+    const char *fixedOptionsC = " [OPTION]... [FILE]...\n"
             "Options:\n"
             "    -help               Display this help\n"
             "    -version            Display application version\n"
@@ -211,16 +209,16 @@ namespace {
 
     // Prepare a remote argument: If it is a relative file, add the current directory
     // since the the central instance might be running in a different directory.
-    inline QString prepareRemoteArgument(const QString &a)
+    inline QString prepareRemoteArgument(const QString &arg)
     {
-        QFileInfo fi(a);
+        QFileInfo fi(arg);
         if (!fi.exists()) {
-            return a;
+            return arg;
         }
         if (fi.isRelative()) {
             return fi.absoluteFilePath();
         }
-        return a;
+        return arg;
     }
 
     // Send the arguments to an already running instance of application
@@ -321,12 +319,12 @@ namespace {
         // check if command line option -config-file contains a file name
         QString commandLine = appOptionValues.value(CONFIG_FILE_OPTION);
         if (!commandLine.isEmpty()) {
-            if (QFile::exists(directory.absolutePath() + QDir::separator() + commandLine)) {
+            QFileInfo fi(commandLine);
+            if (fi.isRelative()) {
                 // file name specified on command line has a relative path
-                fileName = directory.absolutePath() + QDir::separator() + commandLine;
-                qDebug() << "Configuration file" << fileName << "specified on command line will be loaded.";
-            } else if (QFile::exists(commandLine)) {
-                // file name specified on command line has an absolutee path
+                commandLine = directory.absolutePath() + QDir::separator() + commandLine;
+            }
+            if (QFile::exists(commandLine)) {
                 fileName = commandLine;
                 qDebug() << "Configuration file" << fileName << "specified on command line will be loaded.";
             } else {
@@ -543,8 +541,7 @@ int main(int argc, char **argv)
 
     {
         QStringList errors;
-        foreach (ExtensionSystem::PluginSpec *p, pluginManager.plugins())
-        {
+        foreach (ExtensionSystem::PluginSpec *p, pluginManager.plugins()) {
             if (p->hasError()) {
                 errors.append(p->errorString());
             }

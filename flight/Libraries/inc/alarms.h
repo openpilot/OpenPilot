@@ -5,7 +5,7 @@
  * @addtogroup OpenPilotLibraries OpenPilot System Libraries
  * @{
  * @file       alarms.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @brief      Include file of the alarm library
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -28,7 +28,8 @@
 #ifndef ALARMS_H
 #define ALARMS_H
 
-#include "systemalarms.h"
+#include <systemalarms.h>
+
 #define SYSTEMALARMS_ALARM_DEFAULT SYSTEMALARMS_ALARM_UNINITIALISED
 
 int32_t AlarmsInitialize(void);

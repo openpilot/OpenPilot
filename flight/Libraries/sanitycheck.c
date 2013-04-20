@@ -5,7 +5,7 @@
  * @addtogroup OpenPilot Libraries OpenPilot System Libraries
  * @{
  * @file       sanitycheck.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @brief      Utilities to validate a flight configuration
  * @see        The GNU Public License (GPL) Version 3
  *

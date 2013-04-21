@@ -31,36 +31,36 @@
 #ifndef PIOS_MPXV_H
 #define PIOS_MPXV_H
 
-typedef enum { PIOS_MPXV_UNKNOWN,PIOS_MPXV_5004,PIOS_MPXV_7002 } PIOS_MPXV_sensortype;
+typedef enum { PIOS_MPXV_UNKNOWN, PIOS_MPXV_5004, PIOS_MPXV_7002 } PIOS_MPXV_sensortype;
 typedef struct {
-        PIOS_MPXV_sensortype type;
-        uint8_t airspeedADCPin;
-        uint16_t calibrationCount;
-        uint32_t calibrationSum;
-        uint16_t zeroPoint;
-        float maxSpeed;
+    PIOS_MPXV_sensortype type;
+    uint8_t airspeedADCPin;
+    uint16_t calibrationCount;
+    uint32_t calibrationSum;
+    uint16_t zeroPoint;
+    float maxSpeed;
 } PIOS_MPXV_descriptor;
 
 #define PIOS_MPXV_5004_DESC(pin) \
-        (PIOS_MPXV_descriptor) { \
-                .type = PIOS_MPXV_5004, \
-                .airspeedADCPin = pin, \
-                .maxSpeed = 80.0f, \
-                .calibrationCount = 0, \
-                .calibrationSum = 0, \
-        }
+    (PIOS_MPXV_descriptor) { \
+        .type = PIOS_MPXV_5004, \
+        .airspeedADCPin = pin, \
+        .maxSpeed = 80.0f, \
+        .calibrationCount = 0, \
+        .calibrationSum = 0, \
+    }
 #define PIOS_MPXV_7002_DESC(pin) \
-        (PIOS_MPXV_descriptor) { \
-                .type = PIOS_MPXV_7002, \
-                .airspeedADCPin = pin, \
-                .maxSpeed = 56.0f, \
-                .calibrationCount = 0, \
-                .calibrationSum = 0, \
-        }
+    (PIOS_MPXV_descriptor) { \
+        .type = PIOS_MPXV_7002, \
+        .airspeedADCPin = pin, \
+        .maxSpeed = 56.0f, \
+        .calibrationCount = 0, \
+        .calibrationSum = 0, \
+    }
 
 
 uint16_t PIOS_MPXV_Measure(PIOS_MPXV_descriptor *desc);
 uint16_t PIOS_MPXV_Calibrate(PIOS_MPXV_descriptor *desc, uint16_t measurement);
-float PIOS_MPXV_CalcAirspeed (PIOS_MPXV_descriptor *desc,uint16_t measurement);
+float PIOS_MPXV_CalcAirspeed(PIOS_MPXV_descriptor *desc, uint16_t measurement);
 
 #endif /* PIOS_MPXV_H */

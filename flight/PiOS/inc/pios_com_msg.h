@@ -31,7 +31,7 @@
 #ifndef PIOS_COM_MSG_H
 #define PIOS_COM_MSG_H
 
-#include <stdint.h>             /* uint*_t */
+#include <stdint.h> /* uint*_t */
 
 /* Public Functions */
 extern int32_t PIOS_COM_MSG_Send(uint32_t com_id, const uint8_t *msg, uint16_t msg_len);

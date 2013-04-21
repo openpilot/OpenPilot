@@ -36,13 +36,12 @@
 
 uint8_t *PIOS_USB_UTIL_AsciiToUtf8(uint8_t *dst, uint8_t *src, uint16_t srclen)
 {
-        for (uint8_t i = 0; i < srclen; i++)
-        {
-                *dst = *src;
-                dst += 2;
-                src += 1;
-        }
-        return dst;
+    for (uint8_t i = 0; i < srclen; i++) {
+        *dst = *src;
+        dst += 2;
+        src += 1;
+    }
+    return dst;
 }
 
 #endif /* PIOS_INCLUDE_USB */

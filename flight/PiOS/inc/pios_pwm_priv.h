@@ -37,9 +37,9 @@
 #include <pios_tim_priv.h>
 
 struct pios_pwm_cfg {
-        TIM_ICInitTypeDef tim_ic_init;
-        const struct pios_tim_channel *channels;
-        uint8_t num_channels;
+    TIM_ICInitTypeDef tim_ic_init;
+    const struct pios_tim_channel *channels;
+    uint8_t num_channels;
 };
 
 extern const struct pios_rcvr_driver pios_pwm_rcvr_driver;

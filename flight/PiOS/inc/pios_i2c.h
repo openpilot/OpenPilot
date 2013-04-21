@@ -36,31 +36,31 @@
 
 /* Global Types */
 enum pios_i2c_txn_direction {
-        PIOS_I2C_TXN_READ,
-        PIOS_I2C_TXN_WRITE
+    PIOS_I2C_TXN_READ,
+    PIOS_I2C_TXN_WRITE
 };
 
 struct pios_i2c_txn {
-        const char *info;
-        uint16_t addr;
-        enum pios_i2c_txn_direction rw;
-        uint32_t len;
-        uint8_t *buf;
+    const char *info;
+    uint16_t addr;
+    enum pios_i2c_txn_direction rw;
+    uint32_t len;
+    uint8_t *buf;
 };
 
 #define I2C_LOG_DEPTH 20
 enum pios_i2c_error_type {
-        PIOS_I2C_ERROR_EVENT,
-        PIOS_I2C_ERROR_FSM,
-        PIOS_I2C_ERROR_INTERRUPT
+    PIOS_I2C_ERROR_EVENT,
+    PIOS_I2C_ERROR_FSM,
+    PIOS_I2C_ERROR_INTERRUPT
 };
 
 struct pios_i2c_fault_history {
-        enum pios_i2c_error_type type;
-        uint32_t evirq[I2C_LOG_DEPTH];
-        uint32_t erirq[I2C_LOG_DEPTH];
-        uint8_t event[I2C_LOG_DEPTH];
-        uint8_t state[I2C_LOG_DEPTH];
+    enum pios_i2c_error_type type;
+    uint32_t evirq[I2C_LOG_DEPTH];
+    uint32_t erirq[I2C_LOG_DEPTH];
+    uint8_t event[I2C_LOG_DEPTH];
+    uint8_t state[I2C_LOG_DEPTH];
 };
 
 /* Public Functions */

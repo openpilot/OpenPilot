@@ -36,25 +36,25 @@
 #include <pios_spi_priv.h>
 
 struct pios_video_cfg {
-        const struct pios_spi_cfg mask;
-        const struct pios_spi_cfg level;
+    const struct pios_spi_cfg mask;
+    const struct pios_spi_cfg level;
 
-        const struct pios_exti_cfg *hsync;
-        const struct pios_exti_cfg *vsync;
+    const struct pios_exti_cfg *hsync;
+    const struct pios_exti_cfg *vsync;
 
-        /*struct stm32_exti hsync;
-           struct stm32_exti vsync;
-           struct stm32_gpio hsync_io;
-           struct stm32_gpio vsync_io;
-           struct stm32_irq hsync_irq;
-           struct stm32_irq vsync_irq;*/
+    /*struct stm32_exti hsync;
+       struct stm32_exti vsync;
+       struct stm32_gpio hsync_io;
+       struct stm32_gpio vsync_io;
+       struct stm32_irq hsync_irq;
+       struct stm32_irq vsync_irq;*/
 };
 
 // Time vars
 typedef struct {
-        uint8_t sec;
-        uint8_t min;
-        uint8_t hour;
+    uint8_t sec;
+    uint8_t min;
+    uint8_t hour;
 } TTime;
 
 extern TTime timex;
@@ -65,39 +65,39 @@ extern bool PIOS_Hsync_ISR();
 extern bool PIOS_Vsync_ISR();
 
 // First OSD line
-#define GRAPHICS_LINE 32
+#define GRAPHICS_LINE         32
 
-//top/left deadband
-#define GRAPHICS_HDEADBAND 32
-#define GRAPHICS_VDEADBAND 0
+// top/left deadband
+#define GRAPHICS_HDEADBAND    32
+#define GRAPHICS_VDEADBAND    0
 
 #define PAL
 
 // Real OSD size
 #ifdef PAL
- #define GRAPHICS_WIDTH_REAL (336 + GRAPHICS_HDEADBAND)
+ #define GRAPHICS_WIDTH_REAL  (336 + GRAPHICS_HDEADBAND)
  #define GRAPHICS_HEIGHT_REAL (270 + GRAPHICS_VDEADBAND)
 #else
- #define GRAPHICS_WIDTH_REAL (320 + GRAPHICS_HDEADBAND)
+ #define GRAPHICS_WIDTH_REAL  (320 + GRAPHICS_HDEADBAND)
  #define GRAPHICS_HEIGHT_REAL (225 + GRAPHICS_VDEADBAND)
 #endif
 
-//draw area
-#define GRAPHICS_TOP 0
-#define GRAPHICS_LEFT 0
-#define GRAPHICS_BOTTOM (GRAPHICS_HEIGHT_REAL - GRAPHICS_VDEADBAND - 1)
-#define GRAPHICS_RIGHT (GRAPHICS_WIDTH_REAL - GRAPHICS_HDEADBAND - 1)
+// draw area
+#define GRAPHICS_TOP          0
+#define GRAPHICS_LEFT         0
+#define GRAPHICS_BOTTOM       (GRAPHICS_HEIGHT_REAL - GRAPHICS_VDEADBAND - 1)
+#define GRAPHICS_RIGHT        (GRAPHICS_WIDTH_REAL - GRAPHICS_HDEADBAND - 1)
 
 
-#define GRAPHICS_WIDTH (GRAPHICS_WIDTH_REAL / 8)
-#define GRAPHICS_HEIGHT GRAPHICS_HEIGHT_REAL
+#define GRAPHICS_WIDTH        (GRAPHICS_WIDTH_REAL / 8)
+#define GRAPHICS_HEIGHT       GRAPHICS_HEIGHT_REAL
 
 // dma lenght
-#define BUFFER_LINE_LENGTH         (GRAPHICS_WIDTH)  //Yes, in bytes.
+#define BUFFER_LINE_LENGTH    (GRAPHICS_WIDTH)       // Yes, in bytes.
 
 // line types
-#define LINE_TYPE_UNKNOWN 0
-#define LINE_TYPE_GRAPHICS 2
+#define LINE_TYPE_UNKNOWN     0
+#define LINE_TYPE_GRAPHICS    2
 
 // Macro to swap buffers given a temporary pointer.
 #define SWAP_BUFFS(tmp, a, b) { tmp = a; a = b; b = tmp; }

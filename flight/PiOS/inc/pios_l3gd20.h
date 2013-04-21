@@ -103,32 +103,32 @@
 #define PIOS_L3GD20_PWRMGMT_STOP_CLK     0X07
 
 enum pios_l3gd20_range {
-        PIOS_L3GD20_SCALE_250_DEG  = 0x00,
-        PIOS_L3GD20_SCALE_500_DEG  = 0x10,
-        PIOS_L3GD20_SCALE_2000_DEG = 0x3
+    PIOS_L3GD20_SCALE_250_DEG = 0x00,
+    PIOS_L3GD20_SCALE_500_DEG = 0x10,
+    PIOS_L3GD20_SCALE_2000_DEG = 0x3
 };
 
 enum pios_l3gd20_filter {
-        PIOS_L3GD20_LOWPASS_256_HZ = 0x00,
-        PIOS_L3GD20_LOWPASS_188_HZ = 0x01,
-        PIOS_L3GD20_LOWPASS_98_HZ  = 0x02,
-        PIOS_L3GD20_LOWPASS_42_HZ  = 0x03,
-        PIOS_L3GD20_LOWPASS_20_HZ  = 0x04,
-        PIOS_L3GD20_LOWPASS_10_HZ  = 0x05,
-        PIOS_L3GD20_LOWPASS_5_HZ   = 0x06
+    PIOS_L3GD20_LOWPASS_256_HZ = 0x00,
+    PIOS_L3GD20_LOWPASS_188_HZ = 0x01,
+    PIOS_L3GD20_LOWPASS_98_HZ = 0x02,
+    PIOS_L3GD20_LOWPASS_42_HZ = 0x03,
+    PIOS_L3GD20_LOWPASS_20_HZ = 0x04,
+    PIOS_L3GD20_LOWPASS_10_HZ = 0x05,
+    PIOS_L3GD20_LOWPASS_5_HZ = 0x06
 };
 
 struct pios_l3gd20_data {
-        int16_t gyro_x;
-        int16_t gyro_y;
-        int16_t gyro_z;
-        int16_t temperature;
+    int16_t gyro_x;
+    int16_t gyro_y;
+    int16_t gyro_z;
+    int16_t temperature;
 };
 
 struct pios_l3gd20_cfg {
-        const struct pios_exti_cfg *exti_cfg;  /* Pointer to the EXTI configuration */
+    const struct pios_exti_cfg *exti_cfg;      /* Pointer to the EXTI configuration */
 
-        enum pios_l3gd20_range range;
+    enum pios_l3gd20_range range;
 };
 
 /* Public Functions */

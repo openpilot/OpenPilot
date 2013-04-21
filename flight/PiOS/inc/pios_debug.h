@@ -33,17 +33,17 @@
 
 #ifdef PIOS_INCLUDE_DEBUG_CONSOLE
 #ifndef DEBUG_LEVEL
-#define DEBUG_LEVEL     0
+#define DEBUG_LEVEL 0
 #endif
 #define DEBUG_PRINTF(level, ...) \
-        { \
-                if ((level <= DEBUG_LEVEL) && (PIOS_COM_DEBUG > 0)) { \
-                        PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__); \
-                } \
-        }
+    { \
+        if ((level <= DEBUG_LEVEL) && (PIOS_COM_DEBUG > 0)) { \
+            PIOS_COM_SendFormattedStringNonBlocking(PIOS_COM_DEBUG, __VA_ARGS__); \
+        } \
+    }
 #else
 #define DEBUG_PRINTF(level, ...)
-#endif  /* PIOS_INCLUDE_DEBUG_CONSOLE */
+#endif /* PIOS_INCLUDE_DEBUG_CONSOLE */
 
 extern const char *PIOS_DEBUG_AssertMsg;
 
@@ -61,11 +61,13 @@ void PIOS_DEBUG_PinValue4BitL(uint8_t value);
 void PIOS_DEBUG_Panic(const char *msg);
 
 #ifdef DEBUG
-#define PIOS_DEBUG_Assert(test) if (!(test)) {PIOS_DEBUG_Panic(PIOS_DEBUG_AssertMsg); }
-#define PIOS_Assert(test) PIOS_DEBUG_Assert(test)
+#define PIOS_DEBUG_Assert(test) if (!(test)) { PIOS_DEBUG_Panic(PIOS_DEBUG_AssertMsg); }
+#define PIOS_Assert(test)       PIOS_DEBUG_Assert(test)
 #else
 #define PIOS_DEBUG_Assert(test)
-#define PIOS_Assert(test) if (!(test)) {while (1) {; }}
+#define PIOS_Assert(test) \
+    if (!(test)) { while (1) {; } \
+    }
 #endif
 
 #endif /* PIOS_DEBUG_H */

@@ -35,66 +35,66 @@
 #include <oplinksettings.h>
 
 /* Constant definitions */
-enum gpio_direction {GPIO0_TX_GPIO1_RX, GPIO0_RX_GPIO1_TX};
+enum gpio_direction { GPIO0_TX_GPIO1_RX, GPIO0_RX_GPIO1_TX };
 
 /* Global Types */
 struct pios_rfm22b_cfg {
-        const struct pios_spi_cfg *spi_cfg;  /* Pointer to SPI interface configuration */
-        const struct pios_exti_cfg *exti_cfg;  /* Pointer to the EXTI configuration */
-        uint8_t RFXtalCap;
-        uint8_t slave_num;
-        enum gpio_direction gpio_direction;
+    const struct pios_spi_cfg *spi_cfg;      /* Pointer to SPI interface configuration */
+    const struct pios_exti_cfg *exti_cfg;      /* Pointer to the EXTI configuration */
+    uint8_t RFXtalCap;
+    uint8_t slave_num;
+    enum gpio_direction gpio_direction;
 };
 
 enum rfm22b_tx_power {
-        RFM22_tx_pwr_txpow_0 = 0x00,  //  +1dBm .. 1.25mW
-        RFM22_tx_pwr_txpow_1 = 0x01,  //  +2dBm .. 1.6mW
-        RFM22_tx_pwr_txpow_2 = 0x02,  //  +5dBm .. 3.16mW
-        RFM22_tx_pwr_txpow_3 = 0x03,  //  +8dBm .. 6.3mW
-        RFM22_tx_pwr_txpow_4 = 0x04,  // +11dBm .. 12.6mW
-        RFM22_tx_pwr_txpow_5 = 0x05,  // +14dBm .. 25mW
-        RFM22_tx_pwr_txpow_6 = 0x06,  // +17dBm .. 50mW
-        RFM22_tx_pwr_txpow_7 = 0x07   // +20dBm .. 100mW
+    RFM22_tx_pwr_txpow_0 = 0x00,      // +1dBm .. 1.25mW
+    RFM22_tx_pwr_txpow_1 = 0x01,      // +2dBm .. 1.6mW
+    RFM22_tx_pwr_txpow_2 = 0x02,      // +5dBm .. 3.16mW
+    RFM22_tx_pwr_txpow_3 = 0x03,      // +8dBm .. 6.3mW
+    RFM22_tx_pwr_txpow_4 = 0x04,      // +11dBm .. 12.6mW
+    RFM22_tx_pwr_txpow_5 = 0x05,      // +14dBm .. 25mW
+    RFM22_tx_pwr_txpow_6 = 0x06,      // +17dBm .. 50mW
+    RFM22_tx_pwr_txpow_7 = 0x07       // +20dBm .. 100mW
 };
 
 enum rfm22b_datarate {
-        RFM22_datarate_500 = 0,
-        RFM22_datarate_1000 = 1,
-        RFM22_datarate_2000 = 2,
-        RFM22_datarate_4000 = 3,
-        RFM22_datarate_8000 = 4,
-        RFM22_datarate_9600 = 5,
-        RFM22_datarate_16000 = 6,
-        RFM22_datarate_19200 = 7,
-        RFM22_datarate_24000 = 8,
-        RFM22_datarate_32000 = 9,
-        RFM22_datarate_57600 = 10,
-        RFM22_datarate_64000 = 11,
-        RFM22_datarate_128000 = 12,
-        RFM22_datarate_192000 = 13,
-        RFM22_datarate_256000 = 14,
+    RFM22_datarate_500 = 0,
+    RFM22_datarate_1000 = 1,
+    RFM22_datarate_2000 = 2,
+    RFM22_datarate_4000 = 3,
+    RFM22_datarate_8000 = 4,
+    RFM22_datarate_9600 = 5,
+    RFM22_datarate_16000 = 6,
+    RFM22_datarate_19200 = 7,
+    RFM22_datarate_24000 = 8,
+    RFM22_datarate_32000 = 9,
+    RFM22_datarate_57600 = 10,
+    RFM22_datarate_64000 = 11,
+    RFM22_datarate_128000 = 12,
+    RFM22_datarate_192000 = 13,
+    RFM22_datarate_256000 = 14,
 };
 
 struct rfm22b_stats {
-        uint16_t packets_per_sec;
-        uint16_t tx_byte_count;
-        uint16_t rx_byte_count;
-        uint16_t tx_seq;
-        uint16_t rx_seq;
-        uint8_t rx_good;
-        uint8_t rx_corrected;
-        uint8_t rx_error;
-        uint8_t rx_missed;
-        uint8_t rx_failure;
-        uint8_t tx_dropped;
-        uint8_t tx_resent;
-        uint8_t tx_failure;
-        uint8_t resets;
-        uint8_t timeouts;
-        uint8_t link_quality;
-        int8_t rssi;
-        int8_t afc_correction;
-        uint8_t link_state;
+    uint16_t packets_per_sec;
+    uint16_t tx_byte_count;
+    uint16_t rx_byte_count;
+    uint16_t tx_seq;
+    uint16_t rx_seq;
+    uint8_t rx_good;
+    uint8_t rx_corrected;
+    uint8_t rx_error;
+    uint8_t rx_missed;
+    uint8_t rx_failure;
+    uint8_t tx_dropped;
+    uint8_t tx_resent;
+    uint8_t tx_failure;
+    uint8_t resets;
+    uint8_t timeouts;
+    uint8_t link_quality;
+    int8_t rssi;
+    int8_t afc_correction;
+    uint8_t link_state;
 };
 
 /* Callback function prototypes */

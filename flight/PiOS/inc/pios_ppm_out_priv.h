@@ -34,8 +34,8 @@
 #include <pios.h>
 
 struct pios_ppm_out_cfg {
-        TIM_OCInitTypeDef tim_oc_init;
-        const struct pios_tim_channel *channel;
+    TIM_OCInitTypeDef tim_oc_init;
+    const struct pios_tim_channel *channel;
 };
 
 extern int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg *cfg);

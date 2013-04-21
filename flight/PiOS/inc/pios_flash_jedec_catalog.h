@@ -34,38 +34,38 @@
 #include <pios_flash_jedec_priv.h>
 
 // this structure contains the catalog of all "known" flash chip used
-const struct pios_flash_jedec_cfg pios_flash_jedec_catalog [] =
+const struct pios_flash_jedec_cfg pios_flash_jedec_catalog[] =
 {
-        {         // m25p16
-                .expect_manufacturer = JEDEC_MANUFACTURER_ST,
-                .expect_memorytype = 0x20,
-                .expect_capacity = 0x15,
-                .sector_erase = 0xD8,
-                .chip_erase = 0xC7,
-        },
-        {         // m25px16
-                .expect_manufacturer = JEDEC_MANUFACTURER_ST,
-                .expect_memorytype = 0x71,
-                .expect_capacity = 0x15,
-                .sector_erase = 0xD8,
-                .chip_erase = 0xC7,
-        },
-        {         //w25x
-                .expect_manufacturer = JEDEC_MANUFACTURER_WINBOND,
-                .expect_memorytype = 0x30,
-                .expect_capacity = 0x13,
-                .sector_erase = 0x20,
-                .chip_erase = 0x60
-        },
-        {         //25q16
-                .expect_manufacturer = JEDEC_MANUFACTURER_WINBOND,
-                .expect_memorytype = 0x40,
-                .expect_capacity = 0x15,
-                .sector_erase = 0x20,
-                .chip_erase = 0x60
-        }
+    {             // m25p16
+        .expect_manufacturer = JEDEC_MANUFACTURER_ST,
+        .expect_memorytype = 0x20,
+        .expect_capacity = 0x15,
+        .sector_erase = 0xD8,
+        .chip_erase = 0xC7,
+    },
+    {             // m25px16
+        .expect_manufacturer = JEDEC_MANUFACTURER_ST,
+        .expect_memorytype = 0x71,
+        .expect_capacity = 0x15,
+        .sector_erase = 0xD8,
+        .chip_erase = 0xC7,
+    },
+    {             // w25x
+        .expect_manufacturer = JEDEC_MANUFACTURER_WINBOND,
+        .expect_memorytype = 0x30,
+        .expect_capacity = 0x13,
+        .sector_erase = 0x20,
+        .chip_erase = 0x60
+    },
+    {             // 25q16
+        .expect_manufacturer = JEDEC_MANUFACTURER_WINBOND,
+        .expect_memorytype = 0x40,
+        .expect_capacity = 0x15,
+        .sector_erase = 0x20,
+        .chip_erase = 0x60
+    }
 };
-const uint32_t pios_flash_jedec_catalog_size = NELEMENTS(pios_flash_jedec_catalog);
+const uint32_t                    pios_flash_jedec_catalog_size = NELEMENTS(pios_flash_jedec_catalog);
 
 
 #endif /* PIOS_FLASH_JEDEC_CATALOG_H_ */

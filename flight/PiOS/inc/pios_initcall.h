@@ -44,8 +44,8 @@
 
 typedef int32_t (*initcall_t)(void);
 typedef struct {
-        initcall_t fn_minit;
-        initcall_t fn_tinit;
+    initcall_t fn_minit;
+    initcall_t fn_tinit;
 } initmodule_t;
 
 /* Init module section */
@@ -58,16 +58,18 @@ extern void StartModules();
 
 #define MODULE_INITCALL(ifn, sfn)
 
-#define MODULE_TASKCREATE_ALL { \
-                /* Start all module threads */ \
-                StartModules(); \
-}
+#define MODULE_TASKCREATE_ALL \
+    { \
+        /* Start all module threads */ \
+        StartModules(); \
+    }
 
-#define MODULE_INITIALISE_ALL { \
-                /* Initialize modules */ \
-                InitModules(); \
-                /* Initialize the system thread */ \
-                SystemModInitialize(); }
+#define MODULE_INITIALISE_ALL \
+    { \
+        /* Initialize modules */ \
+        InitModules(); \
+        /* Initialize the system thread */ \
+        SystemModInitialize(); }
 
 #else
 
@@ -79,27 +81,33 @@ extern void StartModules();
  * can point at the same handler without causing duplicate-symbol build errors.
  */
 
-#define __define_initcall(level,fn,id) \
-        static initcall_t __initcall_ ## fn ## id __attribute__((__used__)) \
-        __attribute__((__section__(".initcall" level ".init"))) = fn
+#define __define_initcall(level, fn, id) \
+    static initcall_t __initcall_ ## fn ## id __attribute__((__used__)) \
+    __attribute__((__section__(".initcall" level ".init"))) = fn
 
 #define __define_module_initcall(level, ifn, sfn) \
-        static initmodule_t __initcall_ ## fn __attribute__((__used__)) \
-        __attribute__((__section__(".initcall" level ".init"))) = { .fn_minit = ifn, .fn_tinit = sfn };
+    static initmodule_t __initcall_ ## fn __attribute__((__used__)) \
+    __attribute__((__section__(".initcall" level ".init"))) = { .fn_minit = ifn, .fn_tinit = sfn };
 
-#define MODULE_INITCALL(ifn, sfn)               __define_module_initcall("module", ifn, sfn)
+#define MODULE_INITCALL(ifn, sfn) __define_module_initcall("module", ifn, sfn)
 
-#define MODULE_INITIALISE_ALL  { for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) { \
-                                         if (fn->fn_minit) { \
-                                                 (fn->fn_minit)(); }} }
+#define MODULE_INITIALISE_ALL \
+    { for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) { \
+          if (fn->fn_minit) { \
+              (fn->fn_minit)(); } \
+      } \
+    }
 
-#define MODULE_TASKCREATE_ALL  { for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) { \
-                                         if (fn->fn_tinit) { \
-                                                 (fn->fn_tinit)(); }} }
+#define MODULE_TASKCREATE_ALL \
+    { for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) { \
+          if (fn->fn_tinit) { \
+              (fn->fn_tinit)(); } \
+      } \
+    }
 
 #endif /* USE_SIM_POSIX */
 
-#endif  /* PIOS_INITCALL_H */
+#endif /* PIOS_INITCALL_H */
 
 /**
  * @}

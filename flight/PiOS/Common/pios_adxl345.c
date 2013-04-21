@@ -33,19 +33,19 @@
 #ifdef PIOS_INCLUDE_ADXL345
 
 enum pios_adxl345_dev_magic {
-        PIOS_ADXL345_DEV_MAGIC = 0xcb55aa55,
+    PIOS_ADXL345_DEV_MAGIC = 0xcb55aa55,
 };
 
 struct adxl345_dev {
-        uint32_t spi_id;
-        uint32_t slave_num;
-        enum pios_adxl345_dev_magic magic;
+    uint32_t spi_id;
+    uint32_t slave_num;
+    enum pios_adxl345_dev_magic magic;
 };
 
-//! Global structure for this device device
+// ! Global structure for this device device
 static struct adxl345_dev *dev;
 
-//! Private functions
+// ! Private functions
 static struct adxl345_dev *PIOS_ADXL345_alloc(void);
 static int32_t PIOS_ADXL345_Validate(struct adxl345_dev *dev);
 static int32_t PIOS_ADXL345_ClaimBus();
@@ -57,14 +57,14 @@ static int32_t PIOS_ADXL345_FifoDepth(uint8_t depth);
  */
 static struct adxl345_dev *PIOS_ADXL345_alloc(void)
 {
-        struct adxl345_dev *adxl345_dev;
+    struct adxl345_dev *adxl345_dev;
 
-        adxl345_dev = (struct adxl345_dev*)pvPortMalloc(sizeof(*adxl345_dev));
-        if (!adxl345_dev) {
-                return (NULL);
-        }
-        adxl345_dev->magic = PIOS_ADXL345_DEV_MAGIC;
-        return(adxl345_dev);
+    adxl345_dev = (struct adxl345_dev *)pvPortMalloc(sizeof(*adxl345_dev));
+    if (!adxl345_dev) {
+        return NULL;
+    }
+    adxl345_dev->magic = PIOS_ADXL345_DEV_MAGIC;
+    return adxl345_dev;
 }
 
 /**
@@ -73,16 +73,16 @@ static struct adxl345_dev *PIOS_ADXL345_alloc(void)
  */
 static int32_t PIOS_ADXL345_Validate(struct adxl345_dev *dev)
 {
-        if (dev == NULL) {
-                return -1;
-        }
-        if (dev->magic != PIOS_ADXL345_DEV_MAGIC) {
-                return -2;
-        }
-        if (dev->spi_id == 0) {
-                return -3;
-        }
-        return 0;
+    if (dev == NULL) {
+        return -1;
+    }
+    if (dev->magic != PIOS_ADXL345_DEV_MAGIC) {
+        return -2;
+    }
+    if (dev->spi_id == 0) {
+        return -3;
+    }
+    return 0;
 }
 
 /**
@@ -91,15 +91,15 @@ static int32_t PIOS_ADXL345_Validate(struct adxl345_dev *dev)
  */
 static int32_t PIOS_ADXL345_ClaimBus()
 {
-        if (PIOS_ADXL345_Validate(dev) != 0) {
-                return -1;
-        }
-        if (PIOS_SPI_ClaimBus(dev->spi_id) != 0) {
-                return -2;
-        }
-        PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
+    if (PIOS_ADXL345_Validate(dev) != 0) {
+        return -1;
+    }
+    if (PIOS_SPI_ClaimBus(dev->spi_id) != 0) {
+        return -2;
+    }
+    PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
 
-        return 0;
+    return 0;
 }
 
 /**
@@ -108,15 +108,15 @@ static int32_t PIOS_ADXL345_ClaimBus()
  */
 static int32_t PIOS_ADXL345_ReleaseBus()
 {
-        if (PIOS_ADXL345_Validate(dev) != 0) {
-                return -1;
-        }
-        PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
+    if (PIOS_ADXL345_Validate(dev) != 0) {
+        return -1;
+    }
+    PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
 
-        if (PIOS_SPI_ReleaseBus(dev->spi_id) != 0) {
-                return -2;
-        }
-        return 0;
+    if (PIOS_SPI_ReleaseBus(dev->spi_id) != 0) {
+        return -2;
+    }
+    return 0;
 }
 
 /**
@@ -126,20 +126,20 @@ static int32_t PIOS_ADXL345_ReleaseBus()
  */
 int32_t PIOS_ADXL345_SelectRate(uint8_t rate)
 {
-        if (PIOS_ADXL345_Validate(dev) != 0) {
-                return -1;
-        }
-        if (PIOS_ADXL345_ClaimBus() != 0) {
-                return -2;
-        }
-        uint8_t out[2] = {ADXL_RATE_ADDR, rate & 0x0F};
-        if (PIOS_SPI_TransferBlock(dev->spi_id,out,NULL,sizeof(out),NULL) < 0) {
-                PIOS_ADXL345_ReleaseBus();
-                return -3;
-        }
+    if (PIOS_ADXL345_Validate(dev) != 0) {
+        return -1;
+    }
+    if (PIOS_ADXL345_ClaimBus() != 0) {
+        return -2;
+    }
+    uint8_t out[2] = { ADXL_RATE_ADDR, rate & 0x0F };
+    if (PIOS_SPI_TransferBlock(dev->spi_id, out, NULL, sizeof(out), NULL) < 0) {
         PIOS_ADXL345_ReleaseBus();
+        return -3;
+    }
+    PIOS_ADXL345_ReleaseBus();
 
-        return 0;
+    return 0;
 }
 
 /**
@@ -148,20 +148,20 @@ int32_t PIOS_ADXL345_SelectRate(uint8_t rate)
  */
 int32_t PIOS_ADXL345_SetRange(uint8_t range)
 {
-        if (PIOS_ADXL345_Validate(dev) != 0) {
-                return -1;
-        }
-        if (PIOS_ADXL345_ClaimBus() != 0) {
-                return -2;
-        }
-        uint8_t out[2] = {ADXL_FORMAT_ADDR, (range & 0x03) | ADXL_FULL_RES | ADXL_4WIRE};
-        if (PIOS_SPI_TransferBlock(dev->spi_id,out,NULL,sizeof(out),NULL) < 0) {
-                PIOS_ADXL345_ReleaseBus();
-                return -3;
-        }
+    if (PIOS_ADXL345_Validate(dev) != 0) {
+        return -1;
+    }
+    if (PIOS_ADXL345_ClaimBus() != 0) {
+        return -2;
+    }
+    uint8_t out[2] = { ADXL_FORMAT_ADDR, (range & 0x03) | ADXL_FULL_RES | ADXL_4WIRE };
+    if (PIOS_SPI_TransferBlock(dev->spi_id, out, NULL, sizeof(out), NULL) < 0) {
         PIOS_ADXL345_ReleaseBus();
+        return -3;
+    }
+    PIOS_ADXL345_ReleaseBus();
 
-        return 0;
+    return 0;
 }
 
 /**
@@ -169,20 +169,20 @@ int32_t PIOS_ADXL345_SetRange(uint8_t range)
  */
 static int32_t PIOS_ADXL345_FifoDepth(uint8_t depth)
 {
-        if (PIOS_ADXL345_Validate(dev) != 0) {
-                return -1;
-        }
-        if (PIOS_ADXL345_ClaimBus() != 0) {
-                return -2;
-        }
-        uint8_t out[2] = {ADXL_FIFO_ADDR, (depth & 0x1f) | ADXL_FIFO_STREAM};
-        if (PIOS_SPI_TransferBlock(dev->spi_id,out,NULL,sizeof(out),NULL) < 0) {
-                PIOS_ADXL345_ReleaseBus();
-                return -3;
-        }
+    if (PIOS_ADXL345_Validate(dev) != 0) {
+        return -1;
+    }
+    if (PIOS_ADXL345_ClaimBus() != 0) {
+        return -2;
+    }
+    uint8_t out[2] = { ADXL_FIFO_ADDR, (depth & 0x1f) | ADXL_FIFO_STREAM };
+    if (PIOS_SPI_TransferBlock(dev->spi_id, out, NULL, sizeof(out), NULL) < 0) {
         PIOS_ADXL345_ReleaseBus();
+        return -3;
+    }
+    PIOS_ADXL345_ReleaseBus();
 
-        return 0;
+    return 0;
 }
 
 /**
@@ -190,20 +190,20 @@ static int32_t PIOS_ADXL345_FifoDepth(uint8_t depth)
  */
 static int32_t PIOS_ADXL345_SetMeasure(uint8_t enable)
 {
-        if (PIOS_ADXL345_Validate(dev) != 0) {
-                return -1;
-        }
-        if (PIOS_ADXL345_ClaimBus() != 0) {
-                return -2;
-        }
-        uint8_t out[2] = {ADXL_POWER_ADDR, ADXL_MEAURE};
-        if (PIOS_SPI_TransferBlock(dev->spi_id,out,NULL,sizeof(out),NULL) < 0) {
-                PIOS_ADXL345_ReleaseBus();
-                return -3;
-        }
+    if (PIOS_ADXL345_Validate(dev) != 0) {
+        return -1;
+    }
+    if (PIOS_ADXL345_ClaimBus() != 0) {
+        return -2;
+    }
+    uint8_t out[2] = { ADXL_POWER_ADDR, ADXL_MEAURE };
+    if (PIOS_SPI_TransferBlock(dev->spi_id, out, NULL, sizeof(out), NULL) < 0) {
         PIOS_ADXL345_ReleaseBus();
+        return -3;
+    }
+    PIOS_ADXL345_ReleaseBus();
 
-        return 0;
+    return 0;
 }
 
 /**
@@ -211,20 +211,20 @@ static int32_t PIOS_ADXL345_SetMeasure(uint8_t enable)
  */
 int32_t PIOS_ADXL345_Init(uint32_t spi_id, uint32_t slave_num)
 {
-        dev = PIOS_ADXL345_alloc();
-        if (dev == NULL) {
-                return -1;
-        }
-        dev->spi_id = spi_id;
-        dev->slave_num = slave_num;
+    dev = PIOS_ADXL345_alloc();
+    if (dev == NULL) {
+        return -1;
+    }
+    dev->spi_id = spi_id;
+    dev->slave_num = slave_num;
 
-        PIOS_ADXL345_ReleaseBus();
-        PIOS_ADXL345_SelectRate(ADXL_RATE_3200);
-        PIOS_ADXL345_SetRange(ADXL_RANGE_8G);
-        PIOS_ADXL345_FifoDepth(16);
-        PIOS_ADXL345_SetMeasure(1);
+    PIOS_ADXL345_ReleaseBus();
+    PIOS_ADXL345_SelectRate(ADXL_RATE_3200);
+    PIOS_ADXL345_SetRange(ADXL_RANGE_8G);
+    PIOS_ADXL345_FifoDepth(16);
+    PIOS_ADXL345_SetMeasure(1);
 
-        return 0;
+    return 0;
 }
 
 /**
@@ -232,23 +232,23 @@ int32_t PIOS_ADXL345_Init(uint32_t spi_id, uint32_t slave_num)
  */
 int32_t PIOS_ADXL345_Test()
 {
-        if (PIOS_ADXL345_Validate(dev) != 0) {
-                return -1;
-        }
-        if (PIOS_ADXL345_ClaimBus() != 0) {
-                return -2;
-        }
-        uint8_t buf[2] = {0,0};
-        uint8_t rec[2] = {0,0};
-        buf[0] = ADXL_WHOAMI | ADXL_READ_BIT;
+    if (PIOS_ADXL345_Validate(dev) != 0) {
+        return -1;
+    }
+    if (PIOS_ADXL345_ClaimBus() != 0) {
+        return -2;
+    }
+    uint8_t buf[2] = { 0, 0 };
+    uint8_t rec[2] = { 0, 0 };
+    buf[0] = ADXL_WHOAMI | ADXL_READ_BIT;
 
-        if (PIOS_SPI_TransferBlock(dev->spi_id,&buf[0],&rec[0],sizeof(buf),NULL) < 0) {
-                PIOS_ADXL345_ReleaseBus();
-                return -3;
-        }
+    if (PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
         PIOS_ADXL345_ReleaseBus();
+        return -3;
+    }
+    PIOS_ADXL345_ReleaseBus();
 
-        return (rec[1] == ADXL_DEVICE_ID) ? 0 : -4;
+    return (rec[1] == ADXL_DEVICE_ID) ? 0 : -4;
 }
 
 /**
@@ -256,23 +256,23 @@ int32_t PIOS_ADXL345_Test()
  */
 int32_t PIOS_ADXL345_FifoElements()
 {
-        if (PIOS_ADXL345_Validate(dev) != 0) {
-                return -1;
-        }
-        if (PIOS_ADXL345_ClaimBus() != 0) {
-                return -2;
-        }
-        uint8_t buf[2] = {0,0};
-        uint8_t rec[2] = {0,0};
-        buf[0] = ADXL_FIFOSTATUS_ADDR | ADXL_READ_BIT;  // Read fifo status
+    if (PIOS_ADXL345_Validate(dev) != 0) {
+        return -1;
+    }
+    if (PIOS_ADXL345_ClaimBus() != 0) {
+        return -2;
+    }
+    uint8_t buf[2] = { 0, 0 };
+    uint8_t rec[2] = { 0, 0 };
+    buf[0] = ADXL_FIFOSTATUS_ADDR | ADXL_READ_BIT;      // Read fifo status
 
-        if (PIOS_SPI_TransferBlock(dev->spi_id,&buf[0],&rec[0],sizeof(buf),NULL) < 0) {
-                PIOS_ADXL345_ReleaseBus();
-                return -3;
-        }
+    if (PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
         PIOS_ADXL345_ReleaseBus();
+        return -3;
+    }
+    PIOS_ADXL345_ReleaseBus();
 
-        return rec[1] & 0x3f;
+    return rec[1] & 0x3f;
 }
 
 /**
@@ -281,29 +281,29 @@ int32_t PIOS_ADXL345_FifoElements()
  */
 uint8_t PIOS_ADXL345_Read(struct pios_adxl345_data *data)
 {
-        if (PIOS_ADXL345_Validate(dev) != 0) {
-                return -1;
-        }
-        if (PIOS_ADXL345_ClaimBus() != 0) {
-                return -2;
-        }
-        // To save memory use same buffer for in and out but offset by
-        // a byte
-        uint8_t buf[9] = {0,0,0,0,0,0,0,0};
-        uint8_t rec[9] = {0,0,0,0,0,0,0,0};
-        buf[0] = ADXL_X0_ADDR | ADXL_MULTI_BIT | ADXL_READ_BIT;  // Multibyte read starting at X0
+    if (PIOS_ADXL345_Validate(dev) != 0) {
+        return -1;
+    }
+    if (PIOS_ADXL345_ClaimBus() != 0) {
+        return -2;
+    }
+    // To save memory use same buffer for in and out but offset by
+    // a byte
+    uint8_t buf[9] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    uint8_t rec[9] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+    buf[0] = ADXL_X0_ADDR | ADXL_MULTI_BIT | ADXL_READ_BIT;      // Multibyte read starting at X0
 
-        if (PIOS_SPI_TransferBlock(dev->spi_id,&buf[0],&rec[0],9,NULL) < 0) {
-                PIOS_ADXL345_ReleaseBus();
-                return -3;
-        }
+    if (PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], 9, NULL) < 0) {
         PIOS_ADXL345_ReleaseBus();
+        return -3;
+    }
+    PIOS_ADXL345_ReleaseBus();
 
-        data->x = rec[1] + (rec[2] << 8);
-        data->y = rec[3] + (rec[4] << 8);
-        data->z = rec[5] + (rec[6] << 8);
+    data->x = rec[1] + (rec[2] << 8);
+    data->y = rec[3] + (rec[4] << 8);
+    data->z = rec[5] + (rec[6] << 8);
 
-        return rec[8] & 0x7F; // return number of remaining entries
+    return rec[8] & 0x7F;     // return number of remaining entries
 }
 
 #endif /* PIOS_INCLUDE_ADXL345 */

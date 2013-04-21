@@ -33,8 +33,8 @@
 
 /* Public Structures */
 struct pios_eeprom_cfg {
-        uint32_t base_address;
-        uint32_t max_size;
+    uint32_t base_address;
+    uint32_t max_size;
 };
 
 /* Public Functions */

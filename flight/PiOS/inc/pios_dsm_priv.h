@@ -98,27 +98,27 @@
  * master.
  */
 
-#define DSM_CHANNELS_PER_FRAME          7
-#define DSM_FRAME_LENGTH                (1 + 1 + DSM_CHANNELS_PER_FRAME * 2)
-#define DSM_DSM2_RES_MASK               0x0010
-#define DSM_2ND_FRAME_MASK              0x8000
+#define DSM_CHANNELS_PER_FRAME 7
+#define DSM_FRAME_LENGTH       (1 + 1 + DSM_CHANNELS_PER_FRAME * 2)
+#define DSM_DSM2_RES_MASK      0x0010
+#define DSM_2ND_FRAME_MASK     0x8000
 
 /*
  * Include lost frame counter and provide it as a last channel value
  * for debugging. Currently is not used by the receiver layer.
  */
-//#define DSM_LOST_FRAME_COUNTER
+// #define DSM_LOST_FRAME_COUNTER
 
 /* DSM protocol variations */
 enum pios_dsm_proto {
-        PIOS_DSM_PROTO_DSM2,
-        PIOS_DSM_PROTO_DSMX10BIT,
-        PIOS_DSM_PROTO_DSMX11BIT,
+    PIOS_DSM_PROTO_DSM2,
+    PIOS_DSM_PROTO_DSMX10BIT,
+    PIOS_DSM_PROTO_DSMX11BIT,
 };
 
 /* DSM receiver instance configuration */
 struct pios_dsm_cfg {
-        struct stm32_gpio bind;
+    struct stm32_gpio bind;
 };
 
 extern const struct pios_rcvr_driver pios_dsm_rcvr_driver;

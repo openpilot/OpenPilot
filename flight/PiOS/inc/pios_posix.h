@@ -28,16 +28,16 @@
 
 #include <stdint.h>
 
-typedef enum {FALSE = 0, TRUE = !FALSE} bool;
+typedef enum { FALSE = 0, TRUE = !FALSE } bool;
 
 #ifndef false
         #define false FALSE
-        #define true TRUE
+        #define true  TRUE
 #endif
 
-//#define FILEINFO FILE*
+// #define FILEINFO FILE*
 
-//#define PIOS_SERVO_NUM_OUTPUTS 8
-//#define PIOS_SERVO_NUM_TIMERS PIOS_SERVO_NUM_OUTPUTS
+// #define PIOS_SERVO_NUM_OUTPUTS 8
+// #define PIOS_SERVO_NUM_TIMERS PIOS_SERVO_NUM_OUTPUTS
 
 #endif /* PIOS_POSIX_H */

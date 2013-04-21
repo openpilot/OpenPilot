@@ -32,9 +32,9 @@
 #define PIOS_USB_HID_PRIV_H
 
 struct pios_usb_hid_cfg {
-        uint8_t data_if;
-        uint8_t data_rx_ep;
-        uint8_t data_tx_ep;
+    uint8_t data_if;
+    uint8_t data_rx_ep;
+    uint8_t data_tx_ep;
 };
 
 extern const struct pios_com_driver pios_usb_hid_com_driver;

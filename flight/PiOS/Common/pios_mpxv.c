@@ -34,8 +34,8 @@
 
 #ifdef PIOS_INCLUDE_MPXV
 
-#define A0 340.27f        //speed of sound at standard sea level in [m/s]
-#define P0 101.325f       //static air pressure at standard sea level in kPa
+#define A0    340.27f     // speed of sound at standard sea level in [m/s]
+#define P0    101.325f    // static air pressure at standard sea level in kPa
 #define POWER (2.0f / 7.0f)
 
 #include "pios_mpxv.h"
@@ -45,20 +45,21 @@
  */
 uint16_t PIOS_MPXV_Measure(PIOS_MPXV_descriptor *desc)
 {
-        if (desc) {
-                return PIOS_ADC_PinGet(desc->airspeedADCPin);
-        }
-        return 0;
+    if (desc) {
+        return PIOS_ADC_PinGet(desc->airspeedADCPin);
+    }
+    return 0;
 }
 
 /*
-   *Returns zeroPoint so that the user can inspect the calibration vs. the sensor value
+ * Returns zeroPoint so that the user can inspect the calibration vs. the sensor value
  */
-uint16_t PIOS_MPXV_Calibrate(PIOS_MPXV_descriptor *desc,uint16_t measurement) {
-        desc->calibrationSum += measurement;
-        desc->calibrationCount++;
-        desc->zeroPoint = (uint16_t)(((float)desc->calibrationSum) / desc->calibrationCount);
-        return desc->zeroPoint;
+uint16_t PIOS_MPXV_Calibrate(PIOS_MPXV_descriptor *desc, uint16_t measurement)
+{
+    desc->calibrationSum += measurement;
+    desc->calibrationCount++;
+    desc->zeroPoint = (uint16_t)(((float)desc->calibrationSum) / desc->calibrationCount);
+    return desc->zeroPoint;
 }
 
 
@@ -66,24 +67,24 @@ uint16_t PIOS_MPXV_Calibrate(PIOS_MPXV_descriptor *desc,uint16_t measurement) {
  * Reads the airspeed and returns CAS (calibrated airspeed) in the case of success.
  * In the case of a failed read, returns -1.
  */
-float PIOS_MPXV_CalcAirspeed(PIOS_MPXV_descriptor *desc,uint16_t measurement)
+float PIOS_MPXV_CalcAirspeed(PIOS_MPXV_descriptor *desc, uint16_t measurement)
 {
-        //Calculate dynamic pressure, as per docs
-        float Qc = 3.3f / 4096.0f * (float)(measurement - desc->zeroPoint);
+    // Calculate dynamic pressure, as per docs
+    float Qc = 3.3f / 4096.0f * (float)(measurement - desc->zeroPoint);
 
-        //Saturate Qc on the lower bound, in order to make sure we don't have negative airspeeds. No need
-        // to saturate on the upper bound, we'll handle that later with calibratedAirspeed.
-        if (Qc < 0) {
-                Qc = 0;
-        }
-        //Compute calibrated airspeed, as per http://en.wikipedia.org/wiki/Calibrated_airspeed
-        float calibratedAirspeed = A0 * sqrt(5.0f * (pow(Qc / P0 + 1.0f,POWER) - 1.0f));
+    // Saturate Qc on the lower bound, in order to make sure we don't have negative airspeeds. No need
+    // to saturate on the upper bound, we'll handle that later with calibratedAirspeed.
+    if (Qc < 0) {
+        Qc = 0;
+    }
+    // Compute calibrated airspeed, as per http://en.wikipedia.org/wiki/Calibrated_airspeed
+    float calibratedAirspeed = A0 * sqrt(5.0f * (pow(Qc / P0 + 1.0f, POWER) - 1.0f));
 
-        //Upper bound airspeed. No need to lower bound it, that comes from Qc
-        if (calibratedAirspeed > desc->maxSpeed) { //in [m/s]
-                calibratedAirspeed = desc->maxSpeed;
-        }
-        return calibratedAirspeed;
+    // Upper bound airspeed. No need to lower bound it, that comes from Qc
+    if (calibratedAirspeed > desc->maxSpeed) {     // in [m/s]
+        calibratedAirspeed = desc->maxSpeed;
+    }
+    return calibratedAirspeed;
 }
 
 #endif /* PIOS_INCLUDE_MPXV */

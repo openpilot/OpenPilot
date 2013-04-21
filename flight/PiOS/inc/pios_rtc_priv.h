@@ -35,9 +35,9 @@
 #include <pios_stm32.h>
 
 struct pios_rtc_cfg {
-        uint32_t clksrc;
-        uint32_t prescaler;
-        struct stm32_irq irq;
+    uint32_t clksrc;
+    uint32_t prescaler;
+    struct stm32_irq irq;
 };
 
 extern void PIOS_RTC_Init(const struct pios_rtc_cfg *cfg);

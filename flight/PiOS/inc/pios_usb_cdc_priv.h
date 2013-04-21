@@ -32,12 +32,12 @@
 #define PIOS_USB_CDC_PRIV_H
 
 struct pios_usb_cdc_cfg {
-        uint8_t ctrl_if;
-        uint8_t ctrl_tx_ep;
+    uint8_t ctrl_if;
+    uint8_t ctrl_tx_ep;
 
-        uint8_t data_if;
-        uint8_t data_rx_ep;
-        uint8_t data_tx_ep;
+    uint8_t data_if;
+    uint8_t data_rx_ep;
+    uint8_t data_tx_ep;
 };
 
 extern const struct pios_com_driver pios_usb_cdc_com_driver;

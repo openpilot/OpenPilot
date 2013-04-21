@@ -26,25 +26,25 @@
 /* Includes ------------------------------------------------------------------*/
 /* Uncomment the line below to enable peripheral header file inclusion */
 #include "stm32f4xx_adc.h"
-//#include "stm32f4xx_can.h"
+// #include "stm32f4xx_can.h"
 #include "stm32f4xx_crc.h"
-//#include "stm32f2xx_cryp.h"
+// #include "stm32f2xx_cryp.h"
 #include "stm32f4xx_dac.h"
-//#include "stm32f4xx_dbgmcu.h"
-//#include "stm32f4xx_dcmi.h"
+// #include "stm32f4xx_dbgmcu.h"
+// #include "stm32f4xx_dcmi.h"
 #include "stm32f4xx_dma.h"
 #include "stm32f4xx_exti.h"
 #include "stm32f4xx_flash.h"
-//#include "stm32f4xx_fsmc.h"
-//#include "stm32f4xx_hash.h"
+// #include "stm32f4xx_fsmc.h"
+// #include "stm32f4xx_hash.h"
 #include "stm32f4xx_gpio.h"
 #include "stm32f4xx_i2c.h"
-//#include "stm32f4xx_iwdg.h"
+// #include "stm32f4xx_iwdg.h"
 #include "stm32f4xx_pwr.h"
 #include "stm32f4xx_rcc.h"
-//#include "stm32f4xx_rng.h"
+// #include "stm32f4xx_rng.h"
 #include "stm32f4xx_rtc.h"
-//#include "stm32f4xx_sdio.h"
+// #include "stm32f4xx_sdio.h"
 #include "stm32f4xx_spi.h"
 #include "stm32f4xx_syscfg.h"
 #include "stm32f4xx_tim.h"
@@ -76,7 +76,7 @@
  *   If expr is true, it returns no value.
  * @retval None
  */
-  #define assert_param(expr) ((expr) ? (void)0 : assert_failed((uint8_t*)__FILE__, __LINE__))
+  #define assert_param(expr) ((expr) ? (void)0 : assert_failed((uint8_t *)__FILE__, __LINE__))
 /* Exported functions ------------------------------------------------------- */
 void assert_failed(uint8_t *file, uint32_t line);
 #else

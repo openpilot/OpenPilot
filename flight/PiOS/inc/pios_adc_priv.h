@@ -37,11 +37,11 @@
 #include <fifo_buffer.h>
 
 struct pios_adc_cfg {
-        ADC_TypeDef *adc_dev;
-        struct stm32_dma dma;
-        uint32_t half_flag;
-        uint32_t full_flag;
-        uint16_t max_downsample;
+    ADC_TypeDef *adc_dev;
+    struct stm32_dma dma;
+    uint32_t half_flag;
+    uint32_t full_flag;
+    uint16_t max_downsample;
 };
 
 int32_t PIOS_ADC_Init(const struct pios_adc_cfg *cfg);

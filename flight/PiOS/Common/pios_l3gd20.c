@@ -37,24 +37,24 @@
 
 /* Global Variables */
 enum pios_l3gd20_dev_magic {
-        PIOS_L3GD20_DEV_MAGIC = 0x9d39bced,
+    PIOS_L3GD20_DEV_MAGIC = 0x9d39bced,
 };
 
 #define PIOS_L3GD20_MAX_DOWNSAMPLE 2
 struct l3gd20_dev {
-        uint32_t spi_id;
-        uint32_t slave_num;
-        xQueueHandle queue;
-        const struct pios_l3gd20_cfg *cfg;
-        enum pios_l3gd20_filter bandwidth;
-        enum pios_l3gd20_range range;
-        enum pios_l3gd20_dev_magic magic;
+    uint32_t spi_id;
+    uint32_t slave_num;
+    xQueueHandle queue;
+    const struct pios_l3gd20_cfg *cfg;
+    enum pios_l3gd20_filter bandwidth;
+    enum pios_l3gd20_range range;
+    enum pios_l3gd20_dev_magic magic;
 };
 
-//! Global structure for this device device
+// ! Global structure for this device device
 static struct l3gd20_dev *dev;
 
-//! Private functions
+// ! Private functions
 static struct l3gd20_dev *PIOS_L3GD20_alloc(void);
 static int32_t PIOS_L3GD20_Validate(struct l3gd20_dev *dev);
 static void PIOS_L3GD20_Config(struct pios_l3gd20_cfg const *cfg);
@@ -64,7 +64,7 @@ static int32_t PIOS_L3GD20_ClaimBus();
 static int32_t PIOS_L3GD20_ClaimBusIsr();
 static int32_t PIOS_L3GD20_ReleaseBus();
 
-volatile bool l3gd20_configured = false;
+volatile bool            l3gd20_configured = false;
 
 /* Local Variables */
 #define DEG_TO_RAD (M_PI / 180.0)
@@ -74,20 +74,20 @@ volatile bool l3gd20_configured = false;
  */
 static struct l3gd20_dev *PIOS_L3GD20_alloc(void)
 {
-        struct l3gd20_dev *l3gd20_dev;
+    struct l3gd20_dev *l3gd20_dev;
 
-        l3gd20_dev = (struct l3gd20_dev*)pvPortMalloc(sizeof(*l3gd20_dev));
-        if (!l3gd20_dev) {
-                return (NULL);
-        }
-        l3gd20_dev->magic = PIOS_L3GD20_DEV_MAGIC;
+    l3gd20_dev = (struct l3gd20_dev *)pvPortMalloc(sizeof(*l3gd20_dev));
+    if (!l3gd20_dev) {
+        return NULL;
+    }
+    l3gd20_dev->magic = PIOS_L3GD20_DEV_MAGIC;
 
-        l3gd20_dev->queue = xQueueCreate(PIOS_L3GD20_MAX_DOWNSAMPLE, sizeof(struct pios_l3gd20_data));
-        if (l3gd20_dev->queue == NULL) {
-                vPortFree(l3gd20_dev);
-                return NULL;
-        }
-        return(l3gd20_dev);
+    l3gd20_dev->queue = xQueueCreate(PIOS_L3GD20_MAX_DOWNSAMPLE, sizeof(struct pios_l3gd20_data));
+    if (l3gd20_dev->queue == NULL) {
+        vPortFree(l3gd20_dev);
+        return NULL;
+    }
+    return l3gd20_dev;
 }
 
 /**
@@ -96,16 +96,16 @@ static struct l3gd20_dev *PIOS_L3GD20_alloc(void)
  */
 static int32_t PIOS_L3GD20_Validate(struct l3gd20_dev *dev)
 {
-        if (dev == NULL) {
-                return -1;
-        }
-        if (dev->magic != PIOS_L3GD20_DEV_MAGIC) {
-                return -2;
-        }
-        if (dev->spi_id == 0) {
-                return -3;
-        }
-        return 0;
+    if (dev == NULL) {
+        return -1;
+    }
+    if (dev->magic != PIOS_L3GD20_DEV_MAGIC) {
+        return -2;
+    }
+    if (dev->spi_id == 0) {
+        return -3;
+    }
+    return 0;
 }
 
 /**
@@ -115,25 +115,25 @@ static int32_t PIOS_L3GD20_Validate(struct l3gd20_dev *dev)
 #include <pios_board_info.h>
 int32_t PIOS_L3GD20_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_l3gd20_cfg *cfg)
 {
-        dev = PIOS_L3GD20_alloc();
-        if (dev == NULL) {
-                return -1;
-        }
-        dev->spi_id = spi_id;
-        dev->slave_num = slave_num;
-        dev->cfg = cfg;
+    dev = PIOS_L3GD20_alloc();
+    if (dev == NULL) {
+        return -1;
+    }
+    dev->spi_id = spi_id;
+    dev->slave_num = slave_num;
+    dev->cfg = cfg;
 
-        /* Configure the MPU6050 Sensor */
-        PIOS_L3GD20_Config(cfg);
+    /* Configure the MPU6050 Sensor */
+    PIOS_L3GD20_Config(cfg);
 
-        /* Set up EXTI */
-        PIOS_EXTI_Init(cfg->exti_cfg);
+    /* Set up EXTI */
+    PIOS_EXTI_Init(cfg->exti_cfg);
 
-        // An initial read is needed to get it running
-        struct pios_l3gd20_data data;
-        PIOS_L3GD20_ReadGyros(&data);
+    // An initial read is needed to get it running
+    struct pios_l3gd20_data data;
+    PIOS_L3GD20_ReadGyros(&data);
 
-        return 0;
+    return 0;
 }
 
 /**
@@ -144,21 +144,27 @@ int32_t PIOS_L3GD20_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_
  */
 static void PIOS_L3GD20_Config(struct pios_l3gd20_cfg const *cfg)
 {
-        // This register enables the channels and sets the bandwidth
-        while (PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG1, PIOS_L3GD20_CTRL1_FASTEST |
-                                  PIOS_L3GD20_CTRL1_PD | PIOS_L3GD20_CTRL1_ZEN |
-                                  PIOS_L3GD20_CTRL1_YEN | PIOS_L3GD20_CTRL1_XEN) != 0) {; }
+    // This register enables the channels and sets the bandwidth
+    while (PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG1, PIOS_L3GD20_CTRL1_FASTEST |
+                              PIOS_L3GD20_CTRL1_PD | PIOS_L3GD20_CTRL1_ZEN |
+                              PIOS_L3GD20_CTRL1_YEN | PIOS_L3GD20_CTRL1_XEN) != 0) {
+    }
 
-        // Disable the high pass filters
-        while (PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG2, 0) != 0) {; }
-        // Set int2 to go high on data ready
-        while (PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG3, 0x08) != 0) {; }
-        // Select SPI interface, 500 deg/s, endianness?
-        while (PIOS_L3GD20_SetRange(cfg->range) != 0) {; }
-        // Enable FIFO, disable HPF
-        while (PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG5, 0x40) != 0) {; }
-        // Fifo stream mode
-        while (PIOS_L3GD20_SetReg(PIOS_L3GD20_FIFO_CTRL_REG, 0x40) != 0) {; }
+    // Disable the high pass filters
+    while (PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG2, 0) != 0) {
+    }
+    // Set int2 to go high on data ready
+    while (PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG3, 0x08) != 0) {
+    }
+    // Select SPI interface, 500 deg/s, endianness?
+    while (PIOS_L3GD20_SetRange(cfg->range) != 0) {
+    }
+    // Enable FIFO, disable HPF
+    while (PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG5, 0x40) != 0) {
+    }
+    // Fifo stream mode
+    while (PIOS_L3GD20_SetReg(PIOS_L3GD20_FIFO_CTRL_REG, 0x40) != 0) {
+    }
 }
 
 /**
@@ -167,14 +173,14 @@ static void PIOS_L3GD20_Config(struct pios_l3gd20_cfg const *cfg)
  */
 int32_t PIOS_L3GD20_SetRange(enum pios_l3gd20_range range)
 {
-        if (PIOS_L3GD20_Validate(dev) != 0) {
-                return -1;
-        }
-        dev->range = range;
-        if (PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG4, dev->range) != 0) {
-                return -2;
-        }
-        return 0;
+    if (PIOS_L3GD20_Validate(dev) != 0) {
+        return -1;
+    }
+    dev->range = range;
+    if (PIOS_L3GD20_SetReg(PIOS_L3GD20_CTRL_REG4, dev->range) != 0) {
+        return -2;
+    }
+    return 0;
 }
 
 /**
@@ -183,14 +189,14 @@ int32_t PIOS_L3GD20_SetRange(enum pios_l3gd20_range range)
  */
 static int32_t PIOS_L3GD20_ClaimBus()
 {
-        if (PIOS_L3GD20_Validate(dev) != 0) {
-                return -1;
-        }
-        if (PIOS_SPI_ClaimBus(dev->spi_id) != 0) {
-                return -2;
-        }
-        PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,0);
-        return 0;
+    if (PIOS_L3GD20_Validate(dev) != 0) {
+        return -1;
+    }
+    if (PIOS_SPI_ClaimBus(dev->spi_id) != 0) {
+        return -2;
+    }
+    PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
+    return 0;
 }
 
 /**
@@ -199,14 +205,14 @@ static int32_t PIOS_L3GD20_ClaimBus()
  */
 static int32_t PIOS_L3GD20_ClaimBusIsr()
 {
-        if (PIOS_L3GD20_Validate(dev) != 0) {
-                return -1;
-        }
-        if (PIOS_SPI_ClaimBusISR(dev->spi_id) != 0) {
-                return -2;
-        }
-        PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,0);
-        return 0;
+    if (PIOS_L3GD20_Validate(dev) != 0) {
+        return -1;
+    }
+    if (PIOS_SPI_ClaimBusISR(dev->spi_id) != 0) {
+        return -2;
+    }
+    PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
+    return 0;
 }
 
 /**
@@ -215,12 +221,12 @@ static int32_t PIOS_L3GD20_ClaimBusIsr()
  */
 int32_t PIOS_L3GD20_ReleaseBus()
 {
-        if (PIOS_L3GD20_Validate(dev) != 0) {
-                return -1;
-        }
-        PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,1);
+    if (PIOS_L3GD20_Validate(dev) != 0) {
+        return -1;
+    }
+    PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
 
-        return PIOS_SPI_ReleaseBus(dev->spi_id);
+    return PIOS_SPI_ReleaseBus(dev->spi_id);
 }
 
 /**
@@ -230,16 +236,16 @@ int32_t PIOS_L3GD20_ReleaseBus()
  */
 static int32_t PIOS_L3GD20_GetReg(uint8_t reg)
 {
-        uint8_t data;
+    uint8_t data;
 
-        if (PIOS_L3GD20_ClaimBus() != 0) {
-                return -1;
-        }
-        PIOS_SPI_TransferByte(dev->spi_id,(0x80 | reg) ); // request byte
-        data = PIOS_SPI_TransferByte(dev->spi_id,0 );     // receive response
+    if (PIOS_L3GD20_ClaimBus() != 0) {
+        return -1;
+    }
+    PIOS_SPI_TransferByte(dev->spi_id, (0x80 | reg));     // request byte
+    data = PIOS_SPI_TransferByte(dev->spi_id, 0);         // receive response
 
-        PIOS_L3GD20_ReleaseBus();
-        return data;
+    PIOS_L3GD20_ReleaseBus();
+    return data;
 }
 
 /**
@@ -252,15 +258,15 @@ static int32_t PIOS_L3GD20_GetReg(uint8_t reg)
  */
 static int32_t PIOS_L3GD20_SetReg(uint8_t reg, uint8_t data)
 {
-        if (PIOS_L3GD20_ClaimBus() != 0) {
-                return -1;
-        }
-        PIOS_SPI_TransferByte(dev->spi_id, 0x7f & reg);
-        PIOS_SPI_TransferByte(dev->spi_id, data);
+    if (PIOS_L3GD20_ClaimBus() != 0) {
+        return -1;
+    }
+    PIOS_SPI_TransferByte(dev->spi_id, 0x7f & reg);
+    PIOS_SPI_TransferByte(dev->spi_id, data);
 
-        PIOS_L3GD20_ReleaseBus();
+    PIOS_L3GD20_ReleaseBus();
 
-        return 0;
+    return 0;
 }
 
 /**
@@ -271,26 +277,26 @@ static int32_t PIOS_L3GD20_SetReg(uint8_t reg, uint8_t data)
 uint32_t l3gd20_irq = 0;
 int32_t PIOS_L3GD20_ReadGyros(struct pios_l3gd20_data *data)
 {
-        uint8_t buf[7] = {PIOS_L3GD20_GYRO_X_OUT_LSB | 0x80 | 0x40, 0, 0, 0, 0, 0, 0};
-        uint8_t rec[7];
+    uint8_t buf[7] = { PIOS_L3GD20_GYRO_X_OUT_LSB | 0x80 | 0x40, 0, 0, 0, 0, 0, 0 };
+    uint8_t rec[7];
 
-        if (PIOS_L3GD20_ClaimBus() != 0) {
-                return -1;
-        }
-        if (PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
-                PIOS_L3GD20_ReleaseBus();
-                data->gyro_x = 0;
-                data->gyro_y = 0;
-                data->gyro_z = 0;
-                data->temperature = 0;
-                return -2;
-        }
+    if (PIOS_L3GD20_ClaimBus() != 0) {
+        return -1;
+    }
+    if (PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
         PIOS_L3GD20_ReleaseBus();
+        data->gyro_x = 0;
+        data->gyro_y = 0;
+        data->gyro_z = 0;
+        data->temperature = 0;
+        return -2;
+    }
+    PIOS_L3GD20_ReleaseBus();
 
-        memcpy((uint8_t*) &(data->gyro_x), &rec[1], 6);
-        data->temperature = PIOS_L3GD20_GetReg(PIOS_L3GD20_OUT_TEMP);
+    memcpy((uint8_t *)&(data->gyro_x), &rec[1], 6);
+    data->temperature = PIOS_L3GD20_GetReg(PIOS_L3GD20_OUT_TEMP);
 
-        return 0;
+    return 0;
 }
 
 /**
@@ -299,11 +305,12 @@ int32_t PIOS_L3GD20_ReadGyros(struct pios_l3gd20_data *data)
  */
 int32_t PIOS_L3GD20_ReadID()
 {
-        int32_t l3gd20_id = PIOS_L3GD20_GetReg(PIOS_L3GD20_WHOAMI);
-        if (l3gd20_id < 0) {
-                return -1;
-        }
-        return l3gd20_id;
+    int32_t l3gd20_id = PIOS_L3GD20_GetReg(PIOS_L3GD20_WHOAMI);
+
+    if (l3gd20_id < 0) {
+        return -1;
+    }
+    return l3gd20_id;
 }
 
 /**
@@ -312,26 +319,28 @@ int32_t PIOS_L3GD20_ReadID()
  */
 xQueueHandle PIOS_L3GD20_GetQueue()
 {
-        if (PIOS_L3GD20_Validate(dev) != 0) {
-                return (xQueueHandle) NULL;
-        }
-        return dev->queue;
+    if (PIOS_L3GD20_Validate(dev) != 0) {
+        return (xQueueHandle)NULL;
+    }
+    return dev->queue;
 }
 
 float PIOS_L3GD20_GetScale()
 {
-        if (PIOS_L3GD20_Validate(dev) != 0) {
-                return -1;
-        }
-        switch (dev->range) {
-        case PIOS_L3GD20_SCALE_250_DEG:
-                return 0.00875f;
-        case PIOS_L3GD20_SCALE_500_DEG:
-                return 0.01750f;
-        case PIOS_L3GD20_SCALE_2000_DEG:
-                return 0.070f;
-        }
-        return 0;
+    if (PIOS_L3GD20_Validate(dev) != 0) {
+        return -1;
+    }
+    switch (dev->range) {
+    case PIOS_L3GD20_SCALE_250_DEG:
+        return 0.00875f;
+
+    case PIOS_L3GD20_SCALE_500_DEG:
+        return 0.01750f;
+
+    case PIOS_L3GD20_SCALE_2000_DEG:
+        return 0.070f;
+    }
+    return 0;
 }
 
 /**
@@ -341,15 +350,16 @@ float PIOS_L3GD20_GetScale()
  */
 uint8_t PIOS_L3GD20_Test(void)
 {
-        int32_t l3gd20_id = PIOS_L3GD20_ReadID();
-        if (l3gd20_id < 0) {
-                return -1;
-        }
-        uint8_t id = l3gd20_id;
-        if (id == 0xD4) {
-                return 0;
-        }
-        return -2;
+    int32_t l3gd20_id = PIOS_L3GD20_ReadID();
+
+    if (l3gd20_id < 0) {
+        return -1;
+    }
+    uint8_t id = l3gd20_id;
+    if (id == 0xD4) {
+        return 0;
+    }
+    return -2;
 }
 
 /**
@@ -357,29 +367,29 @@ uint8_t PIOS_L3GD20_Test(void)
  */
 bool PIOS_L3GD20_IRQHandler(void)
 {
-        l3gd20_irq++;
+    l3gd20_irq++;
 
-        struct pios_l3gd20_data data;
-        uint8_t buf[7] = {PIOS_L3GD20_GYRO_X_OUT_LSB | 0x80 | 0x40, 0, 0, 0, 0, 0, 0};
-        uint8_t rec[7];
+    struct pios_l3gd20_data data;
+    uint8_t                 buf[7] = { PIOS_L3GD20_GYRO_X_OUT_LSB | 0x80 | 0x40, 0, 0, 0, 0, 0, 0 };
+    uint8_t                 rec[7];
 
-        /* This code duplicates ReadGyros above but uses ClaimBusIsr */
-        if (PIOS_L3GD20_ClaimBusIsr() != 0) {
-                return false;
-        }
-        if (PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
-                PIOS_L3GD20_ReleaseBus();
-                return false;
-        }
+    /* This code duplicates ReadGyros above but uses ClaimBusIsr */
+    if (PIOS_L3GD20_ClaimBusIsr() != 0) {
+        return false;
+    }
+    if (PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
         PIOS_L3GD20_ReleaseBus();
+        return false;
+    }
+    PIOS_L3GD20_ReleaseBus();
 
-        memcpy((uint8_t*) &(data.gyro_x), &rec[1], 6);
-        data.temperature = PIOS_L3GD20_GetReg(PIOS_L3GD20_OUT_TEMP);
+    memcpy((uint8_t *)&(data.gyro_x), &rec[1], 6);
+    data.temperature = PIOS_L3GD20_GetReg(PIOS_L3GD20_OUT_TEMP);
 
-        portBASE_TYPE xHigherPriorityTaskWoken;
-        xQueueSendToBackFromISR(dev->queue, (void*) &data, &xHigherPriorityTaskWoken);
+    portBASE_TYPE xHigherPriorityTaskWoken;
+    xQueueSendToBackFromISR(dev->queue, (void *)&data, &xHigherPriorityTaskWoken);
 
-        return xHigherPriorityTaskWoken == pdTRUE;
+    return xHigherPriorityTaskWoken == pdTRUE;
 }
 
 #endif /* PIOS_INCLUDE_L3GD20 */

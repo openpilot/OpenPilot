@@ -39,64 +39,66 @@ static int32_t PIOS_RFM22B_RCVR_Get(uint32_t rcvr_id, uint8_t channel);
 static void PIOS_RFM22B_RCVR_Supervisor(uint32_t rcvr_id);
 
 const struct pios_rcvr_driver pios_rfm22b_rcvr_driver = {
-        .read = PIOS_RFM22B_RCVR_Get,
+    .read = PIOS_RFM22B_RCVR_Get,
 };
 
 int32_t PIOS_RFM22B_RCVR_Init(uint32_t rcvr_id)
 {
-        struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev*)rcvr_id;
-        if (!PIOS_RFM22B_validate(rfm22b_dev)) {
-                return -1;
-        }
-        // Initialize
-        for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i)
-        {
-                rfm22b_dev->ppm_channel[i] = PIOS_RCVR_TIMEOUT;
-        }
-        rfm22b_dev->ppm_supv_timer = 0;
+    struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rcvr_id;
 
-        // Register the failsafe timer callback.
-        if (!PIOS_RTC_RegisterTickCallback(PIOS_RFM22B_RCVR_Supervisor, rcvr_id)) {
-                PIOS_DEBUG_Assert(0);
-        }
-        return 0;
+    if (!PIOS_RFM22B_validate(rfm22b_dev)) {
+        return -1;
+    }
+    // Initialize
+    for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i) {
+        rfm22b_dev->ppm_channel[i] = PIOS_RCVR_TIMEOUT;
+    }
+    rfm22b_dev->ppm_supv_timer = 0;
+
+    // Register the failsafe timer callback.
+    if (!PIOS_RTC_RegisterTickCallback(PIOS_RFM22B_RCVR_Supervisor, rcvr_id)) {
+        PIOS_DEBUG_Assert(0);
+    }
+    return 0;
 }
 
 static int32_t PIOS_RFM22B_RCVR_Get(uint32_t rcvr_id, uint8_t channel)
 {
-        struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev*)rcvr_id;
-        if (!PIOS_RFM22B_validate(rfm22b_dev)) {
-                return -1;
-        }
-        if (channel >= GCSRECEIVER_CHANNEL_NUMELEM) {
-                /* channel is out of range */
-                return -1;
-        }
-        return rfm22b_dev->ppm_channel[channel];
+    struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rcvr_id;
+
+    if (!PIOS_RFM22B_validate(rfm22b_dev)) {
+        return -1;
+    }
+    if (channel >= GCSRECEIVER_CHANNEL_NUMELEM) {
+        /* channel is out of range */
+        return -1;
+    }
+    return rfm22b_dev->ppm_channel[channel];
 }
 
-static void PIOS_RFM22B_RCVR_Supervisor(uint32_t rcvr_id) {
-        struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev*)rcvr_id;
-        if (!PIOS_RFM22B_validate(rfm22b_dev)) {
-                return;
-        }
-        // RTC runs at 625Hz.
-        if (++(rfm22b_dev->ppm_supv_timer) < (PIOS_RFM22B_RCVR_TIMEOUT_MS * 1000 / 625)) {
-                return;
-        }
-        rfm22b_dev->ppm_supv_timer = 0;
+static void PIOS_RFM22B_RCVR_Supervisor(uint32_t rcvr_id)
+{
+    struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rcvr_id;
 
-        // Have we received fresh values since the last update?
-        if (!rfm22b_dev->ppm_fresh) {
-                for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i)
-                {
-                        rfm22b_dev->ppm_channel[i] = 0;
-                }
+    if (!PIOS_RFM22B_validate(rfm22b_dev)) {
+        return;
+    }
+    // RTC runs at 625Hz.
+    if (++(rfm22b_dev->ppm_supv_timer) < (PIOS_RFM22B_RCVR_TIMEOUT_MS * 1000 / 625)) {
+        return;
+    }
+    rfm22b_dev->ppm_supv_timer = 0;
+
+    // Have we received fresh values since the last update?
+    if (!rfm22b_dev->ppm_fresh) {
+        for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i) {
+            rfm22b_dev->ppm_channel[i] = 0;
         }
-        rfm22b_dev->ppm_fresh = false;
+    }
+    rfm22b_dev->ppm_fresh = false;
 }
 
-#endif  /* PIOS_INCLUDE_RFM22B_RCVR */
+#endif /* PIOS_INCLUDE_RFM22B_RCVR */
 
 /**
  * @}

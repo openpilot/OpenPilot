@@ -30,27 +30,27 @@
 /*-------------------------------------------------------------*/
 /* buffer table base address */
 /* buffer table base address */
-#define BTABLE_ADDRESS      (0x00)
+#define BTABLE_ADDRESS                 (0x00)
 
 /* EP0  */
 /* rx/tx buffer base address */
-#define ENDP0_RXADDR        (0x20)
-#define ENDP0_TXADDR        (0x40)
+#define ENDP0_RXADDR                   (0x20)
+#define ENDP0_TXADDR                   (0x40)
 
 /* EP1  */
 /* rx/tx buffer base address */
-#define ENDP1_TXADDR        (0x60)
-#define ENDP1_RXADDR        (0x80)
+#define ENDP1_TXADDR                   (0x60)
+#define ENDP1_RXADDR                   (0x80)
 
 /* EP2 */
 /* rx/tx buffer base address */
-#define ENDP2_TXADDR        (0x100)
-#define ENDP2_RXADDR        (0x140)
+#define ENDP2_TXADDR                   (0x100)
+#define ENDP2_RXADDR                   (0x140)
 
 /* EP3 */
 /* rx/tx buffer base address */
-#define ENDP3_TXADDR        (0x180)
-#define ENDP3_RXADDR        (0x1C0)
+#define ENDP3_TXADDR                   (0x180)
+#define ENDP3_RXADDR                   (0x1C0)
 
 /*-------------------------------------------------------------*/
 /* -------------------   ISTR events  -------------------------*/
@@ -58,8 +58,9 @@
 /* IMR_MSK */
 /* mask defining which events has to be handled */
 /* by the device application software */
-#define IMR_MSK (CNTR_CTRM | CNTR_WKUPM | CNTR_SUSPM | CNTR_ERRM | CNTR_SOFM \
-                 | CNTR_ESOFM | CNTR_RESETM )
+#define IMR_MSK \
+    (CNTR_CTRM | CNTR_WKUPM | CNTR_SUSPM | CNTR_ERRM | CNTR_SOFM \
+     | CNTR_ESOFM | CNTR_RESETM)
 #endif /* STM32F10X_CL */
 
 #ifdef STM32F10X_CL
@@ -105,84 +106,84 @@
 *       of the FIFO.Ex: use EP1 and EP2 as IN instead of EP1 and EP3 as IN ones.
 *******************************************************************************/
 
-#define RX_FIFO_SIZE                          128
-#define TX0_FIFO_SIZE                          64
-#define TX1_FIFO_SIZE                          64
-#define TX2_FIFO_SIZE                          16
-#define TX3_FIFO_SIZE                          16
+#define RX_FIFO_SIZE                   128
+#define TX0_FIFO_SIZE                  64
+#define TX1_FIFO_SIZE                  64
+#define TX2_FIFO_SIZE                  16
+#define TX3_FIFO_SIZE                  16
 
 /* OTGD-FS-DEVICE IP interrupts Enable definitions */
 /* Uncomment the define to enable the selected interrupt */
-//#define INTR_MODEMISMATCH
+// #define INTR_MODEMISMATCH
 #define INTR_SOFINTR
-#define INTR_RXSTSQLVL          /* Mandatory */
-//#define INTR_NPTXFEMPTY
-//#define INTR_GINNAKEFF
-//#define INTR_GOUTNAKEFF
-//#define INTR_ERLYSUSPEND
-#define INTR_USBSUSPEND         /* Mandatory */
-#define INTR_USBRESET           /* Mandatory */
-#define INTR_ENUMDONE           /* Mandatory */
-//#define INTR_ISOOUTDROP
-//#define INTR_EOPFRAME
-//#define INTR_EPMISMATCH
-#define INTR_INEPINTR           /* Mandatory */
-#define INTR_OUTEPINTR          /* Mandatory */
-//#define INTR_INCOMPLISOIN
-//#define INTR_INCOMPLISOOUT
-#define INTR_WKUPINTR           /* Mandatory */
+#define INTR_RXSTSQLVL                 /* Mandatory */
+// #define INTR_NPTXFEMPTY
+// #define INTR_GINNAKEFF
+// #define INTR_GOUTNAKEFF
+// #define INTR_ERLYSUSPEND
+#define INTR_USBSUSPEND                /* Mandatory */
+#define INTR_USBRESET                  /* Mandatory */
+#define INTR_ENUMDONE                  /* Mandatory */
+// #define INTR_ISOOUTDROP
+// #define INTR_EOPFRAME
+// #define INTR_EPMISMATCH
+#define INTR_INEPINTR                  /* Mandatory */
+#define INTR_OUTEPINTR                 /* Mandatory */
+// #define INTR_INCOMPLISOIN
+// #define INTR_INCOMPLISOOUT
+#define INTR_WKUPINTR                  /* Mandatory */
 
 /* OTGD-FS-DEVICE IP interrupts subroutines */
 /* Comment the define to enable the selected interrupt subroutine and replace it
    by user code */
-#define  INTR_MODEMISMATCH_Callback      NOP_Process
-#define  INTR_SOFINTR_Callback           NOP_Process
-#define  INTR_RXSTSQLVL_Callback         NOP_Process
-#define  INTR_NPTXFEMPTY_Callback        NOP_Process
-#define  INTR_NPTXFEMPTY_Callback        NOP_Process
-#define  INTR_GINNAKEFF_Callback         NOP_Process
-#define  INTR_GOUTNAKEFF_Callback        NOP_Process
-#define  INTR_ERLYSUSPEND_Callback       NOP_Process
-#define  INTR_USBSUSPEND_Callback        NOP_Process
-#define  INTR_USBRESET_Callback          NOP_Process
-#define  INTR_ENUMDONE_Callback          NOP_Process
-#define  INTR_ISOOUTDROP_Callback        NOP_Process
-#define  INTR_EOPFRAME_Callback          NOP_Process
-#define  INTR_EPMISMATCH_Callback        NOP_Process
-#define  INTR_INEPINTR_Callback          NOP_Process
-#define  INTR_OUTEPINTR_Callback         NOP_Process
-#define  INTR_INCOMPLISOIN_Callback      NOP_Process
-#define  INTR_INCOMPLISOOUT_Callback     NOP_Process
-#define  INTR_WKUPINTR_Callback          NOP_Process
+#define  INTR_MODEMISMATCH_Callback    NOP_Process
+#define  INTR_SOFINTR_Callback         NOP_Process
+#define  INTR_RXSTSQLVL_Callback       NOP_Process
+#define  INTR_NPTXFEMPTY_Callback      NOP_Process
+#define  INTR_NPTXFEMPTY_Callback      NOP_Process
+#define  INTR_GINNAKEFF_Callback       NOP_Process
+#define  INTR_GOUTNAKEFF_Callback      NOP_Process
+#define  INTR_ERLYSUSPEND_Callback     NOP_Process
+#define  INTR_USBSUSPEND_Callback      NOP_Process
+#define  INTR_USBRESET_Callback        NOP_Process
+#define  INTR_ENUMDONE_Callback        NOP_Process
+#define  INTR_ISOOUTDROP_Callback      NOP_Process
+#define  INTR_EOPFRAME_Callback        NOP_Process
+#define  INTR_EPMISMATCH_Callback      NOP_Process
+#define  INTR_INEPINTR_Callback        NOP_Process
+#define  INTR_OUTEPINTR_Callback       NOP_Process
+#define  INTR_INCOMPLISOIN_Callback    NOP_Process
+#define  INTR_INCOMPLISOOUT_Callback   NOP_Process
+#define  INTR_WKUPINTR_Callback        NOP_Process
 
 /* Isochronous data update */
-#define  INTR_RXSTSQLVL_ISODU_Callback   NOP_Process
+#define  INTR_RXSTSQLVL_ISODU_Callback NOP_Process
 
 /* Isochronous transfer parameters */
 /* Size of a single Isochronous buffer (size of a single transfer) */
-#define ISOC_BUFFER_SZE                  1
+#define ISOC_BUFFER_SZE                1
 /* Number of sub-buffers (number of single buffers/transfers), should be even */
-#define NUM_SUB_BUFFERS                  2
+#define NUM_SUB_BUFFERS                2
 
 #endif /* STM32F10X_CL */
 
 /* CTR service routines */
 /* associated to defined endpoints */
-#define  EP1_IN_Callback   NOP_Process
-#define  EP2_IN_Callback   NOP_Process
-#define  EP3_IN_Callback   NOP_Process
-#define  EP4_IN_Callback   NOP_Process
-#define  EP5_IN_Callback   NOP_Process
-#define  EP6_IN_Callback   NOP_Process
-#define  EP7_IN_Callback   NOP_Process
+#define  EP1_IN_Callback               NOP_Process
+#define  EP2_IN_Callback               NOP_Process
+#define  EP3_IN_Callback               NOP_Process
+#define  EP4_IN_Callback               NOP_Process
+#define  EP5_IN_Callback               NOP_Process
+#define  EP6_IN_Callback               NOP_Process
+#define  EP7_IN_Callback               NOP_Process
 
-#define  EP1_OUT_Callback   NOP_Process
-#define  EP2_OUT_Callback   NOP_Process
-#define  EP3_OUT_Callback   NOP_Process
-#define  EP4_OUT_Callback   NOP_Process
-#define  EP5_OUT_Callback   NOP_Process
-#define  EP6_OUT_Callback   NOP_Process
-#define  EP7_OUT_Callback   NOP_Process
+#define  EP1_OUT_Callback              NOP_Process
+#define  EP2_OUT_Callback              NOP_Process
+#define  EP3_OUT_Callback              NOP_Process
+#define  EP4_OUT_Callback              NOP_Process
+#define  EP5_OUT_Callback              NOP_Process
+#define  EP6_OUT_Callback              NOP_Process
+#define  EP7_OUT_Callback              NOP_Process
 
 #endif /*__USB_CONF_H*/
 

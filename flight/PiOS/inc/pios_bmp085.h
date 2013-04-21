@@ -32,41 +32,41 @@
 #define PIOS_BMP085_H
 
 /* BMP085 Addresses */
-#define BMP085_I2C_ADDR                 0x77
-#define BMP085_CALIB_ADDR               0xAA
-#define BMP085_CALIB_LEN                22
-#define BMP085_CTRL_ADDR                0xF4
-#define BMP085_OVERSAMPLING             PIOS_BMP085_OVERSAMPLING
-#define BMP085_PRES_ADDR                (0x34 + (BMP085_OVERSAMPLING << 6))
-#define BMP085_TEMP_ADDR                0x2E
-#define BMP085_ADC_MSB                  0xF6
-#define BMP085_P0                       101325
+#define BMP085_I2C_ADDR     0x77
+#define BMP085_CALIB_ADDR   0xAA
+#define BMP085_CALIB_LEN    22
+#define BMP085_CTRL_ADDR    0xF4
+#define BMP085_OVERSAMPLING PIOS_BMP085_OVERSAMPLING
+#define BMP085_PRES_ADDR    (0x34 + (BMP085_OVERSAMPLING << 6))
+#define BMP085_TEMP_ADDR    0x2E
+#define BMP085_ADC_MSB      0xF6
+#define BMP085_P0           101325
 
 /* Local Types */
 typedef struct {
-        int16_t AC1;
-        int16_t AC2;
-        int16_t AC3;
-        uint16_t AC4;
-        uint16_t AC5;
-        uint16_t AC6;
-        int16_t B1;
-        int16_t B2;
-        int16_t MB;
-        int16_t MC;
-        int16_t MD;
+    int16_t AC1;
+    int16_t AC2;
+    int16_t AC3;
+    uint16_t AC4;
+    uint16_t AC5;
+    uint16_t AC6;
+    int16_t B1;
+    int16_t B2;
+    int16_t MB;
+    int16_t MC;
+    int16_t MD;
 } BMP085CalibDataTypeDef;
 
 typedef enum {
-        PressureConv,
-        TemperatureConv
+    PressureConv,
+    TemperatureConv
 } ConversionTypeTypeDef;
 
 /* Global Variables */
 #if defined(PIOS_INCLUDE_FREERTOS)
 extern xSemaphoreHandle PIOS_BMP085_EOC;
 #else
-extern int32_t PIOS_BMP085_EOC;
+extern int32_t          PIOS_BMP085_EOC;
 #endif
 
 /* Public Functions */

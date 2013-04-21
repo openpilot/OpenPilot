@@ -4,6 +4,40 @@
 #if defined(PIOS_INCLUDE_LED)
 
 #include <pios_led_priv.h>
+#if defined(PIOS_BRIAN_LOGGER)
+static const struct pios_led pios_leds[] = {
+	[PIOS_LED_LINK] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_4,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_RX1] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_5,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+	[PIOS_LED_RX2] = {
+		.pin = {
+			.gpio = GPIOB,
+			.init = {
+				.GPIO_Pin   = GPIO_Pin_6,
+				.GPIO_Mode  = GPIO_Mode_Out_PP,
+				.GPIO_Speed = GPIO_Speed_50MHz,
+			},
+		},
+	},
+};
+#else
 static const struct pios_led pios_leds[] = {
 	[PIOS_LED_LINK] = {
 		.pin = {
@@ -16,6 +50,7 @@ static const struct pios_led pios_leds[] = {
 		},
 	},
 };
+#endif
 
 static const struct pios_led_cfg pios_led_cfg = {
 	.leds     = pios_leds,
@@ -123,6 +158,16 @@ static const struct pios_spi_cfg pios_spi_sdcard_cfg = {
 		},
 	},
 	.slave_count = 1,
+#if defined(PIOS_BRIAN_LOGGER)
+	.ssel = {{
+		.gpio = GPIOB,
+		.init = {
+			.GPIO_Pin   = GPIO_Pin_12,
+			.GPIO_Speed = GPIO_Speed_10MHz,
+			.GPIO_Mode = GPIO_Mode_Out_PP,
+		},
+	}},
+#else
 	.ssel = {{
 		.gpio = GPIOC,
 		.init = {
@@ -131,6 +176,7 @@ static const struct pios_spi_cfg pios_spi_sdcard_cfg = {
 			.GPIO_Mode = GPIO_Mode_Out_PP,
 		},
 	}},
+#endif
 };
 
 static uint32_t pios_spi_sdcard_id;
@@ -390,6 +436,50 @@ static const struct pios_usart_cfg pios_usart_serial_cfg =
 		.init =
 		{
 			.GPIO_Pin = GPIO_Pin_9,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode = GPIO_Mode_AF_PP,
+		},
+	},
+};
+
+static const struct pios_usart_cfg pios_usart_aux_cfg =
+{
+	.regs = USART2,
+	.init =
+	{
+		.USART_BaudRate = 57600,
+		.USART_WordLength = USART_WordLength_8b,
+		.USART_Parity = USART_Parity_No,
+		.USART_StopBits = USART_StopBits_1,
+		.USART_HardwareFlowControl = USART_HardwareFlowControl_None,
+		.USART_Mode = USART_Mode_Rx | USART_Mode_Tx,
+	},
+	.irq =
+	{
+		.init =
+		{
+			.NVIC_IRQChannel = USART2_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
+			.NVIC_IRQChannelSubPriority = 0,
+			.NVIC_IRQChannelCmd = ENABLE,
+		},
+	},
+	.rx =
+	{
+		.gpio = GPIOA,
+		.init =
+		{
+			.GPIO_Pin = GPIO_Pin_3,
+			.GPIO_Speed = GPIO_Speed_2MHz,
+			.GPIO_Mode = GPIO_Mode_IPU,
+		},
+	},
+	.tx =
+	{
+		.gpio = GPIOA,
+		.init =
+		{
+			.GPIO_Pin = GPIO_Pin_2,
 			.GPIO_Speed = GPIO_Speed_2MHz,
 			.GPIO_Mode = GPIO_Mode_AF_PP,
 		},

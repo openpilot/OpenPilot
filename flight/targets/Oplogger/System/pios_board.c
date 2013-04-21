@@ -47,6 +47,7 @@ uint32_t pios_com_telem_usb_id = 0;
 uint32_t pios_com_telem_vcp_id = 0;
 uint32_t pios_com_telem_uart_telem_id = 0;
 uint32_t pios_com_telem_uart_flexi_id = 0;
+uint32_t pios_com_telem_uart_aux_id = 0;
 uint32_t pios_com_telemetry_id = 0;
 uint32_t pios_i2c_flexi_adapter_id=0;
 uint32_t pios_com_radio_id = 0;
@@ -197,13 +198,27 @@ void PIOS_Board_Init(void) {
 		if (PIOS_USART_Init(&pios_usart1_id, &pios_usart_serial_cfg)) {
 			PIOS_Assert(0);
 		}
-		uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
-		uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
+		uint8_t *rx1_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
+		uint8_t *tx1_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
+		PIOS_Assert(rx1_buffer);
+		PIOS_Assert(tx1_buffer);
 		if (PIOS_COM_Init(&pios_com_telem_uart_telem_id, &pios_usart_com_driver, pios_usart1_id,
-											rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
-											tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
+											rx1_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
+											tx1_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
+			PIOS_Assert(0);
+		}
+		
+		uint32_t pios_usart2_id;
+		if (PIOS_USART_Init(&pios_usart2_id, &pios_usart_aux_cfg)) {
+			PIOS_Assert(0);
+		}
+		uint8_t *rx2_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
+		uint8_t *tx2_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
+		PIOS_Assert(rx2_buffer);
+		PIOS_Assert(tx2_buffer);
+		if (PIOS_COM_Init(&pios_com_telem_uart_aux_id, &pios_usart_com_driver, pios_usart2_id,
+											rx2_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
+											tx2_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
 	}

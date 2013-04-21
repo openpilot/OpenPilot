@@ -63,6 +63,8 @@
 #define PIOS_INCLUDE_EXTI
 #define PIOS_INCLUDE_WDG
 
+//#define PIOS_BRIAN_LOGGER
+
 /* PIOS USB functions */
 #define PIOS_INCLUDE_USB
 #define PIOS_INCLUDE_USB_HID

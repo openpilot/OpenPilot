@@ -71,7 +71,9 @@ typedef struct {
 
 	// The task handles.
 	xTaskHandle telemetryTxTaskHandle;
-	xTaskHandle loggerRxTaskHandle;
+	xTaskHandle loggerRx1TaskHandle;
+	xTaskHandle loggerRx2TaskHandle;
+	xTaskHandle loggerRx3TaskHandle;
 	xTaskHandle loggerTxTaskHandle;
 	xTaskHandle loggerMpuTaskHandle;
 	xTaskHandle loggerWriteSDTaskHandle;
@@ -169,7 +171,9 @@ bool NewSerialBufferReady;
 // Private functions
 
 static void telemetryTxTask(void *parameters);
-static void loggerRxTask(void *parameters);
+static void loggerRx1Task(void *parameters);
+static void loggerRx2Task(void *parameters);
+static void loggerRx3Task(void *parameters);
 static void loggerTxTask(void *parameters);
 static void loggerMpuTask(void *parameters);
 static void loggerWriteSDTask(void *parameters);
@@ -223,7 +227,9 @@ static int32_t LoggerComBridgeStart(void)
 
 		// Start the primary tasks for receiving/sending UAVTalk packets from the GCS.
 		xTaskCreate(telemetryTxTask, (signed char *)"telemTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
-		xTaskCreate(loggerRxTask, (signed char *)"loggerRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerRxTaskHandle));
+		xTaskCreate(loggerRx1Task, (signed char *)"loggerRx1Task", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerRx1TaskHandle));
+		xTaskCreate(loggerRx2Task, (signed char *)"loggerRx2Task", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerRx2TaskHandle));
+		//xTaskCreate(loggerRx3Task, (signed char *)"loggerRx3Task", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerRx3TaskHandle));
 		//xTaskCreate(loggerTxTask, (signed char *)"loggerTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerTxTaskHandle));
 #if defined(PIOS_INCLUDE_MPU6050)
 		xTaskCreate(loggerMpuTask, (signed char *)"loggerMpuTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->loggerMpuTaskHandle));
@@ -414,7 +420,7 @@ static void telemetryTxTask(void *parameters)
 /**
  * Logger rx task.  Receive data packets from the logger and pass them on.
  */
-static void loggerRxTask(void *parameters)
+static void loggerRx1Task(void *parameters)
 {
 portTickType lastSysTime;
 portTickType oldSysTime;
@@ -449,11 +455,6 @@ uint8_t NbCLogged=0;
 					InSentence=FALSE;
 					// Get the lock for manipulating the buffer
 					xSemaphoreTake(data->buffer_lock, portMAX_DELAY);
-					/*while(data->Buffers_InUse)//wait for other task to finish writing on buffer
-					{
-						vTaskDelay(1 / portTICK_RATE_MS);
-					}
-					data->Buffers_InUse=1;*/
 					if(data->Current_buffer==1)
 					{
 						if(data->Pos_Buffer_1+Pos>=MAX_BUFFER_LENGTH)
@@ -517,21 +518,204 @@ uint8_t NbCLogged=0;
 					NbCLogged++;
 				}
 			}
-			/*sprintf((char *)Serial_Buffer,"%d :R3:",(int)(lastSysTime/portTICK_RATE_MS));
-			PosInSerialBuf=strlen(Serial_Buffer);
-			for (uint8_t i = 0; i < bytes_to_process; i++)
+		}
+	}
+}
+
+static void loggerRx2Task(void *parameters)
+{
+portTickType lastSysTime;
+portTickType oldSysTime;
+uint8_t Pos;
+uint8_t FloatIEEE[4];
+char Serial_FormBuffer[64];
+oldSysTime = xTaskGetTickCount();
+bool InSentence=FALSE;
+uint8_t NbCLogged=0;
+	// Task loop
+	while (1) {
+		//it takes 0.00015625Sec to stream the 9bits of a byte @ 57600bds, should have 6.4character/ms, 1ms seems to be the period the rx is polled
+		uint8_t serial_data[1];
+		uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_UART_AUX, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
+		if (bytes_to_process > 0)
+		{
+			PIOS_LED_Toggle(PIOS_LED_LINK);
+			lastSysTime = xTaskGetTickCount();
+			if(lastSysTime!=oldSysTime)
 			{
-				Serial_Buffer[PosInSerialBuf]=serial_data[i];
-				PosInSerialBuf++;
+				if(InSentence)//close the transaction and write it to the sd
+				{
+					Serial_FormBuffer[Pos]=NbCLogged;
+					Pos++;
+					Serial_FormBuffer[Pos]=0x0d;
+					Pos++;
+					Serial_FormBuffer[Pos]=0x0a;
+					Pos++;
+					InSentence=FALSE;
+					// Get the lock for manipulating the buffer
+					xSemaphoreTake(data->buffer_lock, portMAX_DELAY);
+					if(data->Current_buffer==1)
+					{
+						if(data->Pos_Buffer_1+Pos>=MAX_BUFFER_LENGTH)
+						{
+							data->Current_buffer=2;
+							data->Ready2Record_1=1;
+							copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
+							data->Pos_Buffer_2=Pos;
+						}
+						else
+						{
+							copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
+							data->Pos_Buffer_1+=Pos;
+						}
+					}
+					else
+					{
+						if(data->Pos_Buffer_2+Pos>=MAX_BUFFER_LENGTH)
+						{
+							data->Current_buffer=1;
+							data->Ready2Record_2=1;
+							copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
+							data->Pos_Buffer_1=Pos;
+						}
+						else
+						{
+							copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
+							data->Pos_Buffer_2+=Pos;
+						}
+					}
+					xSemaphoreGive(data->buffer_lock);
+					//data->Buffers_InUse=0;
+				}
+				
+				{
+					NbCLogged=0;
+					Pos=0;
+					Serial_FormBuffer[Pos]='R';
+					Pos++;
+					Serial_FormBuffer[Pos]='2';
+					Pos++;
+					memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
+					copybuf((char*)&Serial_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+					Pos+=sizeof(FloatIEEE);
+					oldSysTime=lastSysTime;
+					InSentence=TRUE;
+					for (uint8_t i = 0; i < bytes_to_process; i++)
+					{
+						Serial_FormBuffer[Pos]=serial_data[i];
+						Pos++;
+						NbCLogged++;
+					}
+				}
 			}
-			Serial_Buffer[PosInSerialBuf]=0x0d;
-			PosInSerialBuf++;
-			Serial_Buffer[PosInSerialBuf]=0x0a;
-			PosInSerialBuf++;
-			//sprintf((char *)Serial_Buffer,"%d :R:%u\r\n",(int)(lastSysTime/portTICK_RATE_MS),serial_data[0]);
-			DFS_WriteFile(&Serial_File, PIOS_SDCARD_Sector, (uint8_t *) Serial_Buffer, &Serial_Cache, PosInSerialBuf);
-			NewSerialBufferReady=TRUE;*/
-			//vTaskDelay(2 / portTICK_RATE_MS);
+			else
+			{
+				for (uint8_t i = 0; i < bytes_to_process; i++)
+				{
+					Serial_FormBuffer[Pos]=serial_data[i];
+					Pos++;
+					NbCLogged++;
+				}
+			}
+		}
+	}
+}
+
+static void loggerRx3Task(void *parameters)
+{
+portTickType lastSysTime;
+portTickType oldSysTime;
+uint8_t Pos;
+uint8_t FloatIEEE[4];
+char Serial_FormBuffer[64];
+oldSysTime = xTaskGetTickCount();
+bool InSentence=FALSE;
+uint8_t NbCLogged=0;
+	// Task loop
+	while (1) {
+		//it takes 0.00015625Sec to stream the 9bits of a byte @ 57600bds, should have 6.4character/ms, 1ms seems to be the period the rx is polled
+		uint8_t serial_data[1];
+		uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEM_UART_AUX, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
+		if (bytes_to_process > 0)
+		{
+			PIOS_LED_Toggle(PIOS_LED_LINK);
+			lastSysTime = xTaskGetTickCount();
+			if(lastSysTime!=oldSysTime)
+			{
+				if(InSentence)//close the transaction and write it to the sd
+				{
+					Serial_FormBuffer[Pos]=NbCLogged;
+					Pos++;
+					Serial_FormBuffer[Pos]=0x0d;
+					Pos++;
+					Serial_FormBuffer[Pos]=0x0a;
+					Pos++;
+					InSentence=FALSE;
+					// Get the lock for manipulating the buffer
+					xSemaphoreTake(data->buffer_lock, portMAX_DELAY);
+					if(data->Current_buffer==1)
+					{
+						if(data->Pos_Buffer_1+Pos>=MAX_BUFFER_LENGTH)
+						{
+							data->Current_buffer=2;
+							data->Ready2Record_1=1;
+							copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
+							data->Pos_Buffer_2=Pos;
+						}
+						else
+						{
+							copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
+							data->Pos_Buffer_1+=Pos;
+						}
+					}
+					else
+					{
+						if(data->Pos_Buffer_2+Pos>=MAX_BUFFER_LENGTH)
+						{
+							data->Current_buffer=1;
+							data->Ready2Record_2=1;
+							copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
+							data->Pos_Buffer_1=Pos;
+						}
+						else
+						{
+							copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
+							data->Pos_Buffer_2+=Pos;
+						}
+					}
+					xSemaphoreGive(data->buffer_lock);
+					//data->Buffers_InUse=0;
+				}
+				
+				{
+					NbCLogged=0;
+					Pos=0;
+					Serial_FormBuffer[Pos]='R';
+					Pos++;
+					Serial_FormBuffer[Pos]='3';
+					Pos++;
+					memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
+					copybuf((char*)&Serial_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+					Pos+=sizeof(FloatIEEE);
+					oldSysTime=lastSysTime;
+					InSentence=TRUE;
+					for (uint8_t i = 0; i < bytes_to_process; i++)
+					{
+						Serial_FormBuffer[Pos]=serial_data[i];
+						Pos++;
+						NbCLogged++;
+					}
+				}
+			}
+			else
+			{
+				for (uint8_t i = 0; i < bytes_to_process; i++)
+				{
+					Serial_FormBuffer[Pos]=serial_data[i];
+					Pos++;
+					NbCLogged++;
+				}
+			}
 		}
 	}
 }

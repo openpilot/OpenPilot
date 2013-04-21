@@ -1,7 +1,7 @@
 /* -*- Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*- */
 /*-
  * MSHEAP
- * 
+ *
  * A compact, low-overhead heap implementation with configurable
  * integrity checking.
  *
@@ -71,10 +71,10 @@ extern int  msheap_check(void);
  *
  * @param   callback    Called for each allocation in the heap.
  *                      The ptr argument gives the allocated address or
- *                      the free region address, size is the region size 
+ *                      the free region address, size is the region size
  *                      in bytes and free is nonzero if the region is free.
  */
-extern void msheap_walk(void (* callback)(void *ptr, uint32_t size, int free));
+extern void msheap_walk(void (*callback)(void *ptr, uint32_t size, int free));
 
 /**
  * Return the amount of free space in the heap.

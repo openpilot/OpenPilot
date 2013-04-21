@@ -206,9 +206,9 @@ static void rfm22_assertCs(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22_deassertCs(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22_claimBus(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22_releaseBus(struct pios_rfm22b_dev *rfm22b_dev);
+static void rfm22_write_claim(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr, uint8_t data);
 static void rfm22_write(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr, uint8_t data);
 static uint8_t rfm22_read(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr);
-static uint8_t rfm22_read_noclaim(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr);
 
 
 /* The state transition table */
@@ -1065,7 +1065,7 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22b_dev->rx_complete_ticks = 0;
 
     // software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
-    rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);
+    rfm22_write_claim(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);
 
     for (uint8_t i = 0; i < 50; ++i) {
 
@@ -1084,6 +1084,9 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 
     // read status - clears interrupt
     rfm22_readStatus(rfm22b_dev);
+
+    // Claim the SPI bus.
+    rfm22_claimBus(rfm22b_dev);
 
     // disable all interrupts
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable1, 0x00);
@@ -1181,14 +1184,14 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 
     // header control - using a 4 by header with broadcast of 0xffffffff
     rfm22_write(rfm22b_dev, RFM22_header_control1,
-                RFM22_header_cntl1_bcen_0 |
-                RFM22_header_cntl1_bcen_1 |
-                RFM22_header_cntl1_bcen_2 |
-                RFM22_header_cntl1_bcen_3 |
-                RFM22_header_cntl1_hdch_0 |
-                RFM22_header_cntl1_hdch_1 |
-                RFM22_header_cntl1_hdch_2 |
-                RFM22_header_cntl1_hdch_3);
+                        RFM22_header_cntl1_bcen_0 |
+                        RFM22_header_cntl1_bcen_1 |
+                        RFM22_header_cntl1_bcen_2 |
+                        RFM22_header_cntl1_bcen_3 |
+                        RFM22_header_cntl1_hdch_0 |
+                        RFM22_header_cntl1_hdch_1 |
+                        RFM22_header_cntl1_hdch_2 |
+                        RFM22_header_cntl1_hdch_3);
     // Check all bit of all bytes of the header
     rfm22_write(rfm22b_dev, RFM22_header_enable0, 0xff);
     rfm22_write(rfm22b_dev, RFM22_header_enable1, 0xff);
@@ -1202,9 +1205,9 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22_write(rfm22b_dev, RFM22_check_header3, (id >> 24) & 0xff);
     // 4 header bytes, synchronization word length 3, 2, 1 & 0 used, packet length included in header.
     rfm22_write(rfm22b_dev, RFM22_header_control2,
-                RFM22_header_cntl2_hdlen_3210 |
-                RFM22_header_cntl2_synclen_3210 |
-                ((TX_PREAMBLE_NIBBLES >> 8) & 0x01));
+                        RFM22_header_cntl2_hdlen_3210 |
+                        RFM22_header_cntl2_synclen_3210 |
+                        ((TX_PREAMBLE_NIBBLES >> 8) & 0x01));
 
     // sync word
     rfm22_write(rfm22b_dev, RFM22_sync_word3, SYNC_BYTE_1);
@@ -1226,6 +1229,9 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 
     // Set the frequency calibration
     rfm22_write(rfm22b_dev, RFM22_xtal_osc_load_cap, rfm22b_dev->cfg.RFXtalCap);
+
+    // Release the bus
+    rfm22_releaseBus(rfm22b_dev);
 
     // Initialize the frequency and datarate to te default.
     rfm22_setNominalCarrierFrequency(rfm22b_dev, rfm22b_dev->init_frequency, rfm22b_dev->init_frequency, RFM22B_FREQUENCY_HOP_STEP_SIZE);
@@ -1255,6 +1261,9 @@ static void rfm22_setDatarate(struct pios_rfm22b_dev *rfm22b_dev, enum rfm22b_da
     // Generate a pseudo-random number from 0-8 to add to the delay
     uint8_t random = PIOS_CRC_updateByte(0, (uint8_t)(xTaskGetTickCount() & 0xff)) & 0x03;
     rfm22b_dev->max_ack_delay = (uint16_t)((float)((sizeof(PHAckNackPacket) * 8 + TX_PREAMBLE_NIBBLES * 4) * 1000) / (float)(datarate_bps) + 0.5) * 4 + 4 + random;
+
+    // Claim the SPI bus.
+    rfm22_claimBus(rfm22b_dev);
 
     // rfm22_if_filter_bandwidth
     rfm22_write(rfm22b_dev, 0x1C, reg_1C[datarate]);
@@ -1308,6 +1317,9 @@ static void rfm22_setDatarate(struct pios_rfm22b_dev *rfm22b_dev, enum rfm22b_da
 
     rfm22_write(rfm22b_dev, RFM22_ook_counter_value1, 0x00);
     rfm22_write(rfm22b_dev, RFM22_ook_counter_value2, 0x00);
+
+    // Release the bus
+    rfm22_releaseBus(rfm22b_dev);
 }
 
 /**
@@ -1337,6 +1349,9 @@ static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev,
     uint8_t fch = (fc >> 8) & 0xff;
     uint8_t fcl = fc & 0xff;
 
+    // Claim the SPI bus.
+    rfm22_claimBus(rfm22b_dev);
+
     // Calculate the number of frequency hopping channels.
     rfm22b_dev->num_channels = (step_size == 0) ? 1 : (uint16_t)((max_frequency - min_frequency) / step_size);
 
@@ -1362,6 +1377,9 @@ static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev,
     rfm22_write(rfm22b_dev, RFM22_frequency_band_select, fb & 0xff);
     rfm22_write(rfm22b_dev, RFM22_nominal_carrier_frequency1, fch);
     rfm22_write(rfm22b_dev, RFM22_nominal_carrier_frequency0, fcl);
+
+    // Release the bus
+    rfm22_releaseBus(rfm22b_dev);
 }
 
 
@@ -1377,7 +1395,7 @@ static bool rfm22_setFreqHopChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t 
         return false;
     }
     rfm22b_dev->frequency_hop_channel = channel;
-    rfm22_write(rfm22b_dev, RFM22_frequency_hopping_channel_select, channel);
+    rfm22_write_claim(rfm22b_dev, RFM22_frequency_hopping_channel_select, channel);
     return true;
 }
 
@@ -1405,10 +1423,10 @@ static bool rfm22_readStatus(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22b_dev->status_regs.int_status_2.raw = read_buf[2];
 
     // Device status
-    rfm22b_dev->status_regs.device_status.raw = rfm22_read_noclaim(rfm22b_dev, RFM22_device_status);
+    rfm22b_dev->status_regs.device_status.raw = rfm22_read(rfm22b_dev, RFM22_device_status);
 
     // EzMAC status
-    rfm22b_dev->status_regs.ezmac_status.raw = rfm22_read_noclaim(rfm22b_dev, RFM22_ezmac_status);
+    rfm22b_dev->status_regs.ezmac_status.raw = rfm22_read(rfm22b_dev, RFM22_ezmac_status);
 
     // Release the bus
     rfm22_releaseBus(rfm22b_dev);
@@ -1438,6 +1456,9 @@ static enum pios_rfm22b_event rfm22_setRxMode(struct pios_rfm22b_dev *rfm22b_dev
     D2_LED_ON;
 #endif // PIOS_RFM22B_DEBUG_ON_TELEM
 
+    // Claim the SPI bus.
+    rfm22_claimBus(rfm22b_dev);
+
     // disable interrupts
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable1, 0x00);
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable2, 0x00);
@@ -1460,12 +1481,15 @@ static enum pios_rfm22b_event rfm22_setRxMode(struct pios_rfm22b_dev *rfm22b_dev
 
     // enable RX interrupts
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable1, RFM22_ie1_encrcerror | RFM22_ie1_enpkvalid |
-                RFM22_ie1_enrxffafull | RFM22_ie1_enfferr);
+                        RFM22_ie1_enrxffafull | RFM22_ie1_enfferr);
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable2, RFM22_ie2_enpreainval | RFM22_ie2_enpreaval |
-                RFM22_ie2_enswdet);
+                        RFM22_ie2_enswdet);
 
     // enable the receiver
     rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_rxon);
+
+    // Release the SPI bus.
+    rfm22_releaseBus(rfm22b_dev);
 
     // Indicate that we're in RX mode.
     rfm22b_dev->in_rx_mode = true;
@@ -1515,6 +1539,9 @@ static enum pios_rfm22b_event rfm22_detectSync(struct pios_rfm22b_dev *rfm22b_de
     if (rfm22b_dev->status_regs.int_status_2.sync_word_detected) {
         RX_LED_ON;
 
+        // Claim the SPI bus.
+        rfm22_claimBus(rfm22b_dev);
+
         // read the 10-bit signed afc correction value
         // bits 9 to 2
         uint16_t afc_correction = (uint16_t)rfm22_read(rfm22b_dev, RFM22_afc_correction_read) << 8;
@@ -1529,6 +1556,9 @@ static enum pios_rfm22b_event rfm22_detectSync(struct pios_rfm22b_dev *rfm22b_de
         uint8_t rssi = rfm22_read(rfm22b_dev, RFM22_rssi);
         // convert to dBm
         rfm22b_dev->rssi_dBm = (int8_t)(rssi >> 1) - 122;
+
+        // Release the SPI bus.
+        rfm22_releaseBus(rfm22b_dev);
 
         return RFM22B_EVENT_SYNC_DETECTED;
 
@@ -1561,7 +1591,11 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
     // RX FIFO almost full, it needs emptying
     if (rfm22b_dev->status_regs.int_status_1.rx_fifo_almost_full) {
         // read data from the rf chips FIFO buffer
-        // read the total length of the packet data
+
+        // Claim the SPI bus.
+        rfm22_claimBus(rfm22b_dev);
+
+        // Read the total length of the packet data
         uint16_t len = rfm22_read(rfm22b_dev, RFM22_received_packet_length);
 
         // The received packet is going to be larger than the specified length
@@ -1575,16 +1609,20 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
         }
 
         // Fetch the data from the RX FIFO
-        rfm22_claimBus(rfm22b_dev);
         rfm22_assertCs(rfm22b_dev);
         PIOS_SPI_TransferByte(rfm22b_dev->spi_id,RFM22_fifo_access & 0x7F);
         rfm22b_dev->rx_buffer_wr += (PIOS_SPI_TransferBlock(rfm22b_dev->spi_id ,OUT_FF, (uint8_t *)&rx_buffer[rfm22b_dev->rx_buffer_wr], RX_FIFO_HI_WATERMARK, NULL) == 0) ? RX_FIFO_HI_WATERMARK : 0;
         rfm22_deassertCs(rfm22b_dev);
+
+        // Release the SPI bus.
         rfm22_releaseBus(rfm22b_dev);
     }
 
     // Valid packet received
     if (rfm22b_dev->status_regs.int_status_1.valid_packet_received) {
+
+        // Claim the SPI bus.
+        rfm22_claimBus(rfm22b_dev);
 
         // read the total length of the packet data
         uint32_t len = rfm22_read(rfm22b_dev, RFM22_received_packet_length);
@@ -1593,14 +1631,15 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
         if (rfm22b_dev->rx_buffer_wr < len) {
             int32_t bytes_to_read = len - rfm22b_dev->rx_buffer_wr;
             // Fetch the data from the RX FIFO
-            rfm22_claimBus(rfm22b_dev);
             rfm22_assertCs(rfm22b_dev);
             PIOS_SPI_TransferByte(rfm22b_dev->spi_id,RFM22_fifo_access & 0x7F);
             rfm22b_dev->rx_buffer_wr += (PIOS_SPI_TransferBlock(rfm22b_dev->spi_id,OUT_FF, (uint8_t *)&rx_buffer[rfm22b_dev->rx_buffer_wr], bytes_to_read, NULL) == 0) ? bytes_to_read : 0;
             rfm22_deassertCs(rfm22b_dev);
-            rfm22_releaseBus(rfm22b_dev);
         }
 	
+        // Release the SPI bus.
+        rfm22_releaseBus(rfm22b_dev);
+
         if (rfm22b_dev->rx_buffer_wr != len) {
             return RFM22B_EVENT_FAILURE;
         }
@@ -1858,7 +1897,10 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
         rfm22b_dev->packet_start_ticks = 1;
     }
 
-    // disable interrupts
+    // Claim the SPI bus.
+    rfm22_claimBus(rfm22b_dev);
+
+    // Disable interrupts
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable1, 0x00);
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable2, 0x00);
 
@@ -1880,21 +1922,18 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
 
     // FIFO mode, GFSK modulation
     uint8_t fd_bit = rfm22_read(rfm22b_dev, RFM22_modulation_mode_control2) & RFM22_mmc2_fd;
-    rfm22_write(rfm22b_dev, RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_fifo |
-                RFM22_mmc2_modtyp_gfsk);
+    rfm22_write(rfm22b_dev, RFM22_modulation_mode_control2, fd_bit | RFM22_mmc2_dtmod_fifo | RFM22_mmc2_modtyp_gfsk);
 
-    // clear FIFOs
+    // Clear the FIFOs.
     rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl2, RFM22_opfc2_ffclrrx | RFM22_opfc2_ffclrtx);
     rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl2, 0x00);
 
-    // *******************
     // add some data to the chips TX FIFO before enabling the transmitter
 
-    // set the total number of data bytes we are going to transmit
+    // Set the total number of data bytes we are going to transmit.
     rfm22_write(rfm22b_dev, RFM22_transmit_packet_length, rfm22b_dev->tx_data_wr);
 
-    // add some data
-    rfm22_claimBus(rfm22b_dev);
+    // Add some data.
     rfm22_assertCs(rfm22b_dev);
     PIOS_SPI_TransferByte(rfm22b_dev->spi_id, RFM22_fifo_access | 0x80);
     int bytes_to_write = (rfm22b_dev->tx_data_wr - rfm22b_dev->tx_data_rd);
@@ -1902,13 +1941,15 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
     PIOS_SPI_TransferBlock(rfm22b_dev->spi_id, &tx_buffer[rfm22b_dev->tx_data_rd], NULL, bytes_to_write, NULL);
     rfm22b_dev->tx_data_rd += bytes_to_write;
     rfm22_deassertCs(rfm22b_dev);
-    rfm22_releaseBus(rfm22b_dev);
 
-    // enable TX interrupts
+    // Enable TX interrupts.
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable1, RFM22_ie1_enpksent | RFM22_ie1_entxffaem);
 
-    // enable the transmitter
+    // Enable the transmitter.
     rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon | RFM22_opfc1_txon);
+
+    // Release the SPI bus.
+    rfm22_releaseBus(rfm22b_dev);
 
     TX_LED_ON;
 
@@ -2720,7 +2761,7 @@ static void rfm22_releaseBus(struct pios_rfm22b_dev *rfm22b_dev)
  * @param[in] addr The address to write to
  * @param[in] data The datat to write to that address
  */
-static void rfm22_write(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr, uint8_t data)
+static void rfm22_write_claim(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr, uint8_t data)
 {
     rfm22_claimBus(rfm22b_dev);
     rfm22_assertCs(rfm22b_dev);
@@ -2731,22 +2772,18 @@ static void rfm22_write(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr, uint8_
 }
 
 /**
- * Read a byte from an RFM22b register
+ * Write a byte to a register without claiming the semaphore
  *
- * @param[in] rfm22b_dev  The RFM22B device structure pointer.
- * @param[in] addr The address to read from
- * @return Returns the result of the register read
+ * @param[in] rfm22b_dev  The RFM22B device.
+ * @param[in] addr The address to write to
+ * @param[in] data The datat to write to that address
  */
-static uint8_t rfm22_read(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr)
+static void rfm22_write(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr, uint8_t data)
 {
-    uint8_t in[2];	
-    uint8_t out[2] = {addr & 0x7f, 0xFF};
-    rfm22_claimBus(rfm22b_dev);
     rfm22_assertCs(rfm22b_dev);
-    PIOS_SPI_TransferBlock(rfm22b_dev->spi_id, out, in, sizeof(out), NULL);
+    uint8_t buf[2] = {addr | 0x80, data};
+    PIOS_SPI_TransferBlock(rfm22b_dev->spi_id, buf, NULL, sizeof(buf), NULL);
     rfm22_deassertCs(rfm22b_dev);
-    rfm22_releaseBus(rfm22b_dev);
-    return in[1];
 }
 
 /**
@@ -2756,7 +2793,7 @@ static uint8_t rfm22_read(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr)
  * @param[in] addr The address to read from
  * @return Returns the result of the register read
  */
-static uint8_t rfm22_read_noclaim(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr)
+static uint8_t rfm22_read(struct pios_rfm22b_dev *rfm22b_dev, uint8_t addr)
 {
     uint8_t out[2] = {addr & 0x7F, 0xFF};
     uint8_t in[2];

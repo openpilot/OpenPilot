@@ -717,7 +717,7 @@ struct pios_rfm22b_dev {
     uint32_t tx_out_context;
 
     // the transmit power to use for data transmissions
-    uint8_t	tx_power;
+    uint8_t tx_power;
 
     // The RF datarate lookup index.
     uint8_t datarate;

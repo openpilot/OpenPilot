@@ -604,6 +604,79 @@ typedef struct {
     OPLinkSettingsComSpeedOptions com_speed;
 } rfm22b_binding;
 
+enum pios_rfm22b_chip_power_state {
+    RFM22B_IDLE_STATE = 0x00,
+    RFM22B_RX_STATE = 0x01,
+    RFM22B_TX_STATE = 0x10,
+    RFM22B_INVALID_STATE = 0x11
+};
+
+// Device Status
+typedef union {
+    struct {
+        uint8_t state : 2;
+        bool frequency_error : 1;
+        bool header_error : 1;
+        bool rx_fifo_empty : 1;
+        bool fifo_underflow : 1;
+        bool fifo_overflow : 1;
+    };
+    uint8_t raw;
+} rfm22b_device_status_reg;
+
+// EzMAC Status
+typedef union {
+    struct {
+        bool packet_sent : 1;
+        bool packet_transmitting : 1;
+        bool crc_error : 1;
+        bool valid_packet_received : 1;
+        bool packet_receiving : 1;
+        bool packet_searching : 1;
+        bool crc_is_all_ones : 1;
+        bool reserved;
+    };
+    uint8_t raw;
+} rfm22b_ezmac_status_reg;
+
+// Interrrupt Status Register 1
+typedef union {
+    struct {
+        bool crc_error : 1;
+        bool valid_packet_received : 1;
+        bool packet_sent_interrupt : 1;
+        bool external_interrupt : 1;
+        bool rx_fifo_almost_full : 1;
+        bool tx_fifo_almost_empty : 1;
+        bool tx_fifo_almost_full : 1;
+        bool fifo_underoverflow_error : 1;
+    };
+    uint8_t raw;
+} rfm22b_int_status_1;
+
+// Interrupt Status Register 2
+typedef union {
+    struct {
+        bool poweron_reset : 1;
+        bool chip_ready : 1;
+        bool low_battery_detect : 1;
+        bool wakeup_timer : 1;
+        bool rssi_above_threshold : 1;
+        bool invalid_preamble_detected : 1;
+        bool valid_preamble_detected : 1;
+        bool sync_word_detected : 1;
+    };
+    uint8_t raw;
+} rfm22b_int_status_2;
+
+typedef struct {
+    rfm22b_device_status_reg device_status;
+    rfm22b_device_status_reg ezmac_status;
+    rfm22b_int_status_1 int_status_1;
+    rfm22b_int_status_2 int_status_2;
+} rfm22b_device_status;
+
+
 struct pios_rfm22b_dev {
     enum pios_rfm22b_dev_magic magic;
     struct pios_rfm22b_cfg cfg;
@@ -655,14 +728,8 @@ struct pios_rfm22b_dev {
     // The event queue handle
     xQueueHandle eventQueue;
 
-    // device status register
-    uint8_t device_status;
-    // interrupt status register 1
-    uint8_t int_status1;
-    // interrupt status register 2
-    uint8_t int_status2;
-    // ezmac status register
-    uint8_t ezmac_status;
+    // The device status registers.
+    rfm22b_device_status status_regs;
 
     // The error statistics counters
     uint16_t prev_rx_seq_num;

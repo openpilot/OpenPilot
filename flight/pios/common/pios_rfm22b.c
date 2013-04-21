@@ -1019,10 +1019,10 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 {
 
     // Initialize the register values.
-    rfm22b_dev->device_status = 0;
-    rfm22b_dev->int_status1 = 0;
-    rfm22b_dev->int_status2 = 0;
-    rfm22b_dev->ezmac_status = 0;
+    rfm22b_dev->status_regs.int_status_1.raw = 0;
+    rfm22b_dev->status_regs.int_status_2.raw = 0;
+    rfm22b_dev->status_regs.device_status.raw = 0;
+    rfm22b_dev->status_regs.ezmac_status.raw = 0;
 
     // Clean the LEDs
     rfm22_clearLEDs();
@@ -1056,7 +1056,6 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22b_dev->in_rx_mode = false;
 
     // Initialize the devide state
-    rfm22b_dev->device_status = rfm22b_dev->int_status1 = rfm22b_dev->int_status2 = rfm22b_dev->ezmac_status = 0;
     rfm22b_dev->rx_buffer_wr = 0;
     rfm22b_dev->tx_data_rd = rfm22b_dev->tx_data_wr = 0;
     rfm22b_dev->frequency_hop_channel = 0;
@@ -1068,23 +1067,23 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     // software reset the RF chip .. following procedure according to Si4x3x Errata (rev. B)
     rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_swres);
 
-    for (int i = 50; i > 0; i--) {
-        // read the status registers
-        rfm22b_dev->int_status1 = rfm22_read(rfm22b_dev, RFM22_interrupt_status1);
-        rfm22b_dev->int_status2 = rfm22_read(rfm22b_dev, RFM22_interrupt_status2);
-        if (rfm22b_dev->int_status2 & RFM22_is2_ichiprdy) break;
+    for (uint8_t i = 0; i < 50; ++i) {
 
-        // wait 1ms
+        // read the status registers
+        rfm22_readStatus(rfm22b_dev);
+
+        // Is the chip ready?
+        if (rfm22b_dev->status_regs.int_status_2.chip_ready)
+            break;
+
+        // Wait 1ms if not.
         PIOS_DELAY_WaitmS(1);
     }
 
     // ****************
 
     // read status - clears interrupt
-    rfm22b_dev->device_status = rfm22_read(rfm22b_dev, RFM22_device_status);
-    rfm22b_dev->int_status1 = rfm22_read(rfm22b_dev, RFM22_interrupt_status1);
-    rfm22b_dev->int_status2 = rfm22_read(rfm22b_dev, RFM22_interrupt_status2);
-    rfm22b_dev->ezmac_status = rfm22_read(rfm22b_dev, RFM22_ezmac_status);
+    rfm22_readStatus(rfm22b_dev);
 
     // disable all interrupts
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable1, 0x00);
@@ -1402,20 +1401,20 @@ static bool rfm22_readStatus(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22_assertCs(rfm22b_dev);
     PIOS_SPI_TransferBlock(rfm22b_dev->spi_id, write_buf, read_buf, sizeof(write_buf), NULL);
     rfm22_deassertCs(rfm22b_dev);
-    rfm22b_dev->int_status1 = read_buf[1];
-    rfm22b_dev->int_status2 = read_buf[2];
-	
+    rfm22b_dev->status_regs.int_status_1.raw = read_buf[1];
+    rfm22b_dev->status_regs.int_status_2.raw = read_buf[2];
+
     // Device status
-    rfm22b_dev->device_status = rfm22_read_noclaim(rfm22b_dev, RFM22_device_status);
+    rfm22b_dev->status_regs.device_status.raw = rfm22_read_noclaim(rfm22b_dev, RFM22_device_status);
 
     // EzMAC status
-    rfm22b_dev->ezmac_status = rfm22_read_noclaim(rfm22b_dev, RFM22_ezmac_status);
+    rfm22b_dev->status_regs.ezmac_status.raw = rfm22_read_noclaim(rfm22b_dev, RFM22_ezmac_status);
 
     // Release the bus
     rfm22_releaseBus(rfm22b_dev);
 
     // the RF module has gone and done a reset - we need to re-initialize the rf module
-    if (rfm22b_dev->int_status2 & RFM22_is2_ipor) {
+    if (rfm22b_dev->status_regs.int_status_2.poweron_reset) {
         return false;
     }
 
@@ -1488,7 +1487,7 @@ static enum pios_rfm22b_event rfm22_detectPreamble(struct pios_rfm22b_dev *rfm22
         return RFM22B_EVENT_FAILURE;
 
     // Valid preamble detected
-    if (rfm22b_dev->int_status2 & RFM22_is2_ipreaval) {
+    if (rfm22b_dev->status_regs.int_status_2.valid_preamble_detected) {
         rfm22b_dev->packet_start_ticks = xTaskGetTickCount();
         if (rfm22b_dev->packet_start_ticks == 0)
             rfm22b_dev->packet_start_ticks = 1;
@@ -1513,7 +1512,7 @@ static enum pios_rfm22b_event rfm22_detectSync(struct pios_rfm22b_dev *rfm22b_de
         return RFM22B_EVENT_FAILURE;
 
     // Sync word detected
-    if (rfm22b_dev->int_status2 & RFM22_is2_iswdet) {
+    if (rfm22b_dev->status_regs.int_status_2.sync_word_detected) {
         RX_LED_ON;
 
         // read the 10-bit signed afc correction value
@@ -1532,9 +1531,7 @@ static enum pios_rfm22b_event rfm22_detectSync(struct pios_rfm22b_dev *rfm22b_de
         rfm22b_dev->rssi_dBm = (int8_t)(rssi >> 1) - 122;
 
         return RFM22B_EVENT_SYNC_DETECTED;
-    } else if (rfm22b_dev->int_status2 & !RFM22_is2_ipreaval) {
-        // Waiting for sync timed out.
-        return RFM22B_EVENT_FAILURE;
+
     }
 
     return RFM22B_EVENT_NUM_EVENTS;
@@ -1557,12 +1554,12 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
     }
 
     // FIFO under/over flow error.  Restart RX mode.
-    if (rfm22b_dev->int_status1 & RFM22_is1_ifferr) {
+    if (rfm22b_dev->status_regs.int_status_1.fifo_underoverflow_error) {
         return RFM22B_EVENT_FAILURE;
     }
 
     // RX FIFO almost full, it needs emptying
-    if (rfm22b_dev->int_status1 & RFM22_is1_irxffafull) {
+    if (rfm22b_dev->status_regs.int_status_1.rx_fifo_almost_full) {
         // read data from the rf chips FIFO buffer
         // read the total length of the packet data
         uint16_t len = rfm22_read(rfm22b_dev, RFM22_received_packet_length);
@@ -1573,7 +1570,7 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
         }
 
         // Another packet length error.
-        if (((rfm22b_dev->rx_buffer_wr + RX_FIFO_HI_WATERMARK) >= len) && !(rfm22b_dev->int_status1 & RFM22_is1_ipkvalid)) {
+        if (((rfm22b_dev->rx_buffer_wr + RX_FIFO_HI_WATERMARK) >= len) && !(rfm22b_dev->status_regs.int_status_1.valid_packet_received)) {
             return RFM22B_EVENT_FAILURE;
         }
 
@@ -1586,13 +1583,8 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
         rfm22_releaseBus(rfm22b_dev);
     }
 
-    // CRC error .. discard the received data
-    if (rfm22b_dev->int_status1 & RFM22_is1_icrerror) {
-        return RFM22B_EVENT_FAILURE;
-    }
-
     // Valid packet received
-    if (rfm22b_dev->int_status1 & RFM22_is1_ipkvalid) {
+    if (rfm22b_dev->status_regs.int_status_1.valid_packet_received) {
 
         // read the total length of the packet data
         uint32_t len = rfm22_read(rfm22b_dev, RFM22_received_packet_length);
@@ -1939,7 +1931,7 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
     }
 
     // TX FIFO almost empty, it needs filling up
-    if (rfm22b_dev->int_status1 & RFM22_is1_ixtffaem) {
+    if (rfm22b_dev->status_regs.int_status_1.tx_fifo_almost_empty) {
         // top-up the rf chips TX FIFO buffer
         uint8_t *tx_buffer = (uint8_t*)(rfm22b_dev->tx_packet);
         uint16_t max_bytes = FIFO_SIZE - TX_FIFO_LO_WATERMARK - 1;
@@ -1954,7 +1946,7 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
         rfm22_releaseBus(rfm22b_dev);
 
     // Packet has been sent
-    } else if (rfm22b_dev->int_status1 & RFM22_is1_ipksent) {
+    } else if (rfm22b_dev->status_regs.int_status_1.packet_sent_interrupt) {
         portTickType curTicks = xTaskGetTickCount();
         rfm22b_dev->stats.tx_byte_count += PH_PACKET_SIZE(rfm22b_dev->tx_packet);
 

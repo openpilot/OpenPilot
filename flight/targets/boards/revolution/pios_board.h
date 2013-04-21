@@ -77,7 +77,7 @@ TIM8  |           |           |           |
 //------------------------
 #define PIOS_LED_HEARTBEAT	0
 #define PIOS_LED_ALARM		1
-#ifdef PIOS_RFM22B_DEBUG_ON_SERVO
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
 #define PIOS_LED_D1		2
 #define PIOS_LED_D2		3
 #define PIOS_LED_D3		4
@@ -98,7 +98,7 @@ TIM8  |           |           |           |
 #define D4_LED_ON	PIOS_LED_On(PIOS_LED_D4)
 #define D4_LED_OFF	PIOS_LED_Off(PIOS_LED_D4)
 #define D4_LED_TOGGLE	PIOS_LED_Toggle(PIOS_LED_D4)
-#endif
+#endif /* PIOS_RFM22B_DEBUG_ON_TELEM */
 
 //------------------------
 // PIOS_SPI

@@ -898,7 +898,7 @@ static void pios_rfm22_task(void *parameters)
 
         // Send a packet if it's our time slice
         rfm22b_dev->time_to_send = (((curTicks - rfm22b_dev->time_to_send_offset) & 0x6) == 0);
-#if defined(PIOS_RFM22B_DEBUG_ON_TELEM) || defined(PIOS_RFM22B_DEBUG_ON_RCVR)
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
         if (rfm22b_dev->time_to_send) {
             D4_LED_ON;
         } else {
@@ -1435,7 +1435,7 @@ static enum pios_rfm22b_event rfm22_setRxMode(struct pios_rfm22b_dev *rfm22b_dev
         return RFM22B_EVENT_NUM_EVENTS;
     }
     rfm22b_dev->packet_start_ticks = 0;
-#if defined(PIOS_RFM22B_DEBUG_ON_TELEM) || defined(PIOS_RFM22B_DEBUG_ON_RCVR)
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
     D2_LED_ON;
 #endif // PIOS_RFM22B_DEBUG_ON_TELEM
 
@@ -1698,7 +1698,7 @@ static enum pios_rfm22b_event rfm22_rxData(struct pios_rfm22b_dev *rfm22b_dev)
             rfm22b_dev->rx_complete_ticks = xTaskGetTickCount();
             if (rfm22b_dev->rx_complete_ticks == 0)
                 rfm22b_dev->rx_complete_ticks = 1;
-#if defined(PIOS_RFM22B_DEBUG_ON_TELEM) || defined(PIOS_RFM22B_DEBUG_ON_RCVR)
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
             D2_LED_OFF;
 #endif
         }
@@ -1846,7 +1846,7 @@ static enum pios_rfm22b_event rfm22_txStart(struct pios_rfm22b_dev *rfm22b_dev)
     // We're transitioning out of Rx mode.
     rfm22b_dev->in_rx_mode = false;
 
-#if defined(PIOS_RFM22B_DEBUG_ON_TELEM) || defined(PIOS_RFM22B_DEBUG_ON_RCVR)
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
     D1_LED_ON;
     D2_LED_OFF;
 #endif
@@ -2006,7 +2006,7 @@ static enum pios_rfm22b_event rfm22_txData(struct pios_rfm22b_dev *rfm22b_dev)
         // Start a new transaction
         rfm22b_dev->packet_start_ticks = 0;
 
-#if defined(PIOS_RFM22B_DEBUG_ON_TELEM) || defined(PIOS_RFM22B_DEBUG_ON_RCVR)
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
         D1_LED_OFF;
 #endif
     }
@@ -2540,7 +2540,7 @@ static enum pios_rfm22b_event rfm22_timeout(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22b_dev->rx_buffer_wr = 0;
     TX_LED_OFF;
     RX_LED_OFF;
-#if defined(PIOS_RFM22B_DEBUG_ON_TELEM) || defined(PIOS_RFM22B_DEBUG_ON_RCVR)
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
     D1_LED_OFF;
     D2_LED_OFF;
     D3_LED_OFF;
@@ -2659,7 +2659,7 @@ static void rfm22_clearLEDs(void) {
     LINK_LED_OFF;
     RX_LED_OFF;
     TX_LED_OFF;
-#if defined(PIOS_RFM22B_DEBUG_ON_TELEM) || defined(PIOS_RFM22B_DEBUG_ON_RCVR)
+#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
     D1_LED_OFF;
     D2_LED_OFF;
     D3_LED_OFF;

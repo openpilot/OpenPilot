@@ -20,13 +20,55 @@
         <field name="Arming" units="" type="enum" elements="1" options="Always Disarmed,Always Armed,Roll Left,Roll Right,Pitch Forward,Pitch Aft,Yaw Left,Yaw Right" defaultvalue="Always Disarmed"/>
 
 	<!-- Note these options should be identical to those in StabilizationDesired.StabilizationMode -->
-        <field name="Stabilization1Settings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,RelayRate,RelayAttitude" defaultvalue="Attitude,Attitude,Rate"/>
-        <field name="Stabilization2Settings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,RelayRate,RelayAttitude" defaultvalue="Attitude,Attitude,Rate"/>
-        <field name="Stabilization3Settings" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,RelayRate,RelayAttitude" defaultvalue="Attitude,Attitude,Rate"/>
+        <field name="Stabilization1Settings" units="" type="enum"
+		elementnames="Roll,Pitch,Yaw"
+		options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,RelayRate,RelayAttitude"
+		defaultvalue="Attitude,Attitude,Rate"
+		limits="%NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude;"/>
+        <field name="Stabilization2Settings" units="" type="enum"
+		elementnames="Roll,Pitch,Yaw"
+		options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,RelayRate,RelayAttitude"
+		defaultvalue="Attitude,Attitude,Rate"
+		limits="%NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude;"/>
+        <field name="Stabilization3Settings" units="" type="enum"
+		elementnames="Roll,Pitch,Yaw"
+		options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,RelayRate,RelayAttitude"
+		defaultvalue="Attitude,Attitude,Rate"
+		limits="%NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude;"/>
 
 	<!-- Note these options values should be identical to those defined in FlightMode -->
         <field name="FlightModeNumber" units="" type="uint8" elements="1" defaultvalue="3"/>
-        <field name="FlightModePosition" units="" type="enum" elements="6" options="Manual,Stabilized1,Stabilized2,Stabilized3,Autotune,AltitudeHold,VelocityControl,PositionHold,ReturnToBase,Land,PathPlanner" defaultvalue="Manual,Stabilized1,Stabilized2,Stabilized3,AltitudeHold,PositionHold" limits="%0401NE:AltitudeHold:VelocityControl:PositionHold:Autotune;%0402NE:AltitudeHold:VelocityControl:PositionHold:Autotune,%0401NE:AltitudeHold:VelocityControl:PositionHold:Autotune;%0402NE:AltitudeHold:VelocityControl:PositionHold:Autotune,%0401NE:AltitudeHold:VelocityControl:PositionHold:Autotune;%0402NE:AltitudeHold:VelocityControl:PositionHold:Autotune,%0401NE:AltitudeHold:VelocityControl:PositionHold:Autotune;%0402NE:AltitudeHold:VelocityControl:PositionHold:Autotune,%0401NE:AltitudeHold:VelocityControl:PositionHold:Autotune;%0402NE:AltitudeHold:VelocityControl:PositionHold:Autotune,%0401NE:AltitudeHold:VelocityControl:PositionHold:Autotune;%0402NE:AltitudeHold:VelocityControl:PositionHold:Autotune"/>
+        <!-- Currently only some modes are enabled for UI using limits attribute per board. Update when more modes will be operational -->
+        <field name="FlightModePosition"
+               units=""
+               type="enum"
+               elements="6"
+               options="Manual,Stabilized1,Stabilized2,Stabilized3,Autotune,AltitudeHold,VelocityControl,PositionHold,ReturnToBase,Land,PathPlanner"
+               defaultvalue="Manual,Stabilized1,Stabilized2,Stabilized3,AltitudeHold,PositionHold"
+               limits="\
+                       %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner,\
+                       %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner,\
+                       %0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner;\
+                       \
+                       %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner,\
+                       %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner,\
+                       %0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner;\
+                       \
+                       %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner,\
+                       %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner,\
+                       %0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner;\
+                       \
+                       %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner,\
+                       %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner,\
+                       %0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner;\
+                       \
+                       %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner,\
+                       %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner,\
+                       %0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner;\
+                       \
+                       %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner,\
+                       %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner,\
+                       %0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner"/>
 
         <field name="ArmedTimeout" units="ms" type="uint16" elements="1" defaultvalue="30000"/>
         <field name="FailsafeBehavior" units="" type="enum" elements="1" options="None" defaultvalue="None"/>

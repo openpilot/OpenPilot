@@ -38,17 +38,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "openpilot.h"
-#include "systemmod.h"
-#include "objectpersistence.h"
-#include "flightstatus.h"
-#include "systemstats.h"
-#include "systemsettings.h"
-#include "i2cstats.h"
-#include "taskinfo.h"
-#include "watchdogstatus.h"
-#include "taskmonitor.h"
-#include "hwsettings.h"
+#include <openpilot.h>
+
+// private includes
+#include "inc/systemmod.h"
+
+// UAVOs
+#include <objectpersistence.h>
+#include <flightstatus.h>
+#include <systemstats.h>
+#include <systemsettings.h>
+#include <i2cstats.h>
+#include <taskinfo.h>
+#include <watchdogstatus.h>
+#include <taskmonitor.h>
+#include <hwsettings.h>
+
+// Flight Libraries
+#include <sanitycheck.h>
+
 
 //#define DEBUG_THIS_FILE
 
@@ -64,8 +72,8 @@
 
 #ifndef IDLE_COUNTS_PER_SEC_AT_NO_LOAD
 #define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998	// calibrated by running tests/test_cpuload.c
-											  // must be updated if the FreeRTOS or compiler
-											  // optimisation options are changed.
+						// must be updated if the FreeRTOS or compiler
+						// optimisation options are changed.
 #endif
 
 #if defined(PIOS_SYSTEM_STACK_SIZE)
@@ -85,6 +93,7 @@ static xTaskHandle systemTaskHandle;
 static xQueueHandle objectPersistenceQueue;
 static bool stackOverflow;
 static bool mallocFailed;
+static HwSettingsData bootHwSettings;
 
 // Private functions
 static void objectUpdatedCb(UAVObjEvent * ev);
@@ -171,6 +180,8 @@ static void systemTask(void *parameters)
 	// Listen for SettingPersistance object updates, connect a callback function
 	ObjectPersistenceConnectQueue(objectPersistenceQueue);
 
+	// Load a copy of HwSetting active at boot time
+	HwSettingsGet(&bootHwSettings);
 	// Whenever the configuration changes, make sure it is safe to fly
 	HwSettingsConnectCallback(hwSettingsUpdatedCb);
 
@@ -303,9 +314,10 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 				retval = UAVObjDeleteMetaobjects();
 			}
 		} else if (objper.Operation == OBJECTPERSISTENCE_OPERATION_FULLERASE) {
-			retval = -1;
 #if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
 			retval = PIOS_FLASHFS_Format(0);
+#else
+			retval = -1;
 #endif
 		}
 		switch(retval) {
@@ -328,7 +340,12 @@ static void objectUpdatedCb(UAVObjEvent * ev)
  */
 static void hwSettingsUpdatedCb(UAVObjEvent * ev)
 {
-	AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT,SYSTEMALARMS_ALARM_ERROR);
+    HwSettingsData currentHwSettings;
+    HwSettingsGet(&currentHwSettings);
+    // check whether the Hw Configuration has changed from the one used at boot time
+    if (memcmp(&bootHwSettings, &currentHwSettings, sizeof(HwSettingsData)) != 0) {
+        ExtendedAlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_ERROR, SYSTEMALARMS_EXTENDEDALARMSTATUS_REBOOTREQUIRED, 0);
+    }
 }
 
 /**

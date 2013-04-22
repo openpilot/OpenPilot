@@ -85,6 +85,7 @@ private:
     QList<QTextCodec *> m_codecs;
 
 };
+
 } // namespace Internal
 } // namespace Core
 

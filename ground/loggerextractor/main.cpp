@@ -162,7 +162,15 @@ int main(int argc, char *argv[])
 		 if(line[0]=='A')
 		 {
 			if(line[1]=='d')
-			{
+			{	
+				while(line.length()<2)
+				{
+					line += file.readLine();
+				}
+				while((line[line.length()-2]!='\r')&&(line.length()<20))
+				{
+					line += file.readLine();
+				}
 				if(line.length()==20)
 				{
 					FloatIEEE[0]=line[2];
@@ -267,6 +275,10 @@ int main(int argc, char *argv[])
 		 {
 			if(line[1]=='1')
 			{
+				while((line[line.length()-2]!='\r'))
+				{
+					line += file.readLine();
+				}
 				Len=(line[line.length()-3]+9);
 				if(Len==line.length())
 				{
@@ -280,11 +292,15 @@ int main(int argc, char *argv[])
 				}
 				else
 				{
-					QByteArray line2 = file.readLine();
+					//QByteArray line2 = file.readLine();
 				}
 			}
 			else if(line[1]=='2')
 			{
+				while((line[line.length()-2]!='\r'))
+				{
+					line += file.readLine();
+				}
 				Len2=(line[line.length()-3]+9);
 				if(Len2==line.length())
 				{
@@ -298,7 +314,7 @@ int main(int argc, char *argv[])
 				}
 				else
 				{
-					QByteArray line2 = file.readLine();
+					//QByteArray line2 = file.readLine();
 				}
 			}
 			else if(line[1]=='3')

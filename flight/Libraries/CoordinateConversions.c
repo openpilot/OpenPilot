@@ -29,11 +29,10 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <pios_math.h>
 #include "CoordinateConversions.h"
 
-#define F_PI 3.14159265358979323846f
-#define RAD2DEG (180.0f/ F_PI)
-#define DEG2RAD (F_PI /180.0f)
+#define MIN_ALLOWABLE_MAGNITUDE 1e-30f
 
 // ****** convert Lat,Lon,Alt to ECEF  ************
 void LLA2ECEF(float LLA[3], float ECEF[3])
@@ -43,10 +42,10 @@ void LLA2ECEF(float LLA[3], float ECEF[3])
 	float sinLat, sinLon, cosLat, cosLon;
 	float N;
 
-	sinLat = sinf(DEG2RAD * LLA[0]);
-	sinLon = sinf(DEG2RAD * LLA[1]);
-	cosLat = cosf(DEG2RAD * LLA[0]);
-	cosLon = cosf(DEG2RAD * LLA[1]);
+	sinLat = sinf(DEG2RAD(LLA[0]));
+	sinLon = sinf(DEG2RAD(LLA[1]));
+	cosLat = cosf(DEG2RAD(LLA[0]));
+	cosLon = cosf(DEG2RAD(LLA[1]));
 
 	N = a / sqrtf(1.0f - e * e * sinLat * sinLat);	//prime vertical radius of curvature
 
@@ -73,10 +72,10 @@ uint16_t ECEF2LLA(float ECEF[3], float LLA[3])
 	float Lat, N, NplusH, delta, esLat;
 	uint16_t iter;
 #define MAX_ITER 10		// should not take more than 5 for valid coordinates
-#define ACCURACY 1.0e-11	// used to be e-14, but we don't need sub micrometer exact calculations
+#define ACCURACY 1.0e-11f	// used to be e-14, but we don't need sub micrometer exact calculations
 
-	LLA[1] = RAD2DEG * atan2f(y, x);
-	Lat = DEG2RAD * LLA[0];
+	LLA[1] = RAD2DEG(atan2f(y, x));
+	Lat = DEG2RAD(LLA[0]);
 	esLat = e * sinf(Lat);
 	N = a / sqrtf(1 - esLat * esLat);
 	NplusH = N + LLA[2];
@@ -93,7 +92,7 @@ uint16_t ECEF2LLA(float ECEF[3], float LLA[3])
 		iter += 1;
 	}
 
-	LLA[0] = RAD2DEG * Lat;
+	LLA[0] = RAD2DEG(Lat);
 	LLA[2] = NplusH - N;
 
 	return (iter < MAX_ITER);
@@ -104,10 +103,10 @@ void RneFromLLA(float LLA[3], float Rne[3][3])
 {
 	float sinLat, sinLon, cosLat, cosLon;
 
-	sinLat = (float)sinf(DEG2RAD * LLA[0]);
-	sinLon = (float)sinf(DEG2RAD * LLA[1]);
-	cosLat = (float)cosf(DEG2RAD * LLA[0]);
-	cosLon = (float)cosf(DEG2RAD * LLA[1]);
+	sinLat = (float)sinf(DEG2RAD(LLA[0]));
+	sinLon = (float)sinf(DEG2RAD(LLA[1]));
+	cosLat = (float)cosf(DEG2RAD(LLA[0]));
+	cosLon = (float)cosf(DEG2RAD(LLA[1]));
 
 	Rne[0][0] = -sinLat * cosLon;
 	Rne[0][1] = -sinLat * sinLon;
@@ -135,9 +134,9 @@ void Quaternion2RPY(const float q[4], float rpy[3])
 	R23 = 2.0f * (q[2] * q[3] + q[0] * q[1]);
 	R33 = q0s - q1s - q2s + q3s;
 
-	rpy[1] = RAD2DEG * asinf(-R13);	// pitch always between -pi/2 to pi/2
-	rpy[2] = RAD2DEG * atan2f(R12, R11);
-	rpy[0] = RAD2DEG * atan2f(R23, R33);
+	rpy[1] = RAD2DEG(asinf(-R13));	// pitch always between -pi/2 to pi/2
+	rpy[2] = RAD2DEG(atan2f(R12, R11));
+	rpy[0] = RAD2DEG(atan2f(R23, R33));
 
 	//TODO: consider the cases where |R13| ~= 1, |pitch| ~= pi/2
 }
@@ -148,9 +147,9 @@ void RPY2Quaternion(const float rpy[3], float q[4])
 	float phi, theta, psi;
 	float cphi, sphi, ctheta, stheta, cpsi, spsi;
 
-	phi = DEG2RAD * rpy[0] / 2;
-	theta = DEG2RAD * rpy[1] / 2;
-	psi = DEG2RAD * rpy[2] / 2;
+	phi = DEG2RAD(rpy[0] / 2);
+	theta = DEG2RAD(rpy[1] / 2);
+	psi = DEG2RAD(rpy[2] / 2);
 	cphi = cosf(phi);
 	sphi = sinf(phi);
 	ctheta = cosf(theta);
@@ -294,13 +293,13 @@ uint8_t RotFrom2Vectors(const float v1b[3], const float v1e[3], const float v2b[
 
 	// The first rows of rot matrices chosen in direction of v1
 	mag = VectorMagnitude(v1b);
-	if (fabs(mag) < 1e-30)
+	if (fabsf(mag) < MIN_ALLOWABLE_MAGNITUDE)
 		return (-1);
 	for (i=0;i<3;i++)
 		Rib[0][i]=v1b[i]/mag;
 
 	mag = VectorMagnitude(v1e);
-	if (fabs(mag) < 1e-30)
+	if (fabsf(mag) < MIN_ALLOWABLE_MAGNITUDE)
 		return (-1);
 	for (i=0;i<3;i++)
 		Rie[0][i]=v1e[i]/mag;
@@ -308,14 +307,14 @@ uint8_t RotFrom2Vectors(const float v1b[3], const float v1e[3], const float v2b[
 	// The second rows of rot matrices chosen in direction of v1xv2
 	CrossProduct(v1b,v2b,&Rib[1][0]);
 	mag = VectorMagnitude(&Rib[1][0]);
-	if (fabs(mag) < 1e-30)
+	if (fabsf(mag) < MIN_ALLOWABLE_MAGNITUDE)
 		return (-1);
 	for (i=0;i<3;i++)
 		Rib[1][i]=Rib[1][i]/mag;
 
 	CrossProduct(v1e,v2e,&Rie[1][0]);
 	mag = VectorMagnitude(&Rie[1][0]);
-	if (fabs(mag) < 1e-30)
+	if (fabsf(mag) < MIN_ALLOWABLE_MAGNITUDE)
 		return (-1);
 	for (i=0;i<3;i++)
 		Rie[1][i]=Rie[1][i]/mag;

@@ -329,7 +329,7 @@ static uint8_t conditionTimeOut() {
 		toWaypoint = waypointActive.Index;
 		toStarttime = PIOS_DELAY_GetRaw();
 	}
-	if (PIOS_DELAY_DiffuS(toStarttime) >= 1e6 * pathAction.ConditionParameters[0]) {
+	if (PIOS_DELAY_DiffuS(toStarttime) >= 1e6f * pathAction.ConditionParameters[0]) {
 		// make sure we reinitialize even if the same waypoint comes twice
 		toWaypoint = 0xFFFF;
 		return true;

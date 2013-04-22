@@ -46,20 +46,21 @@
  *
  */
 
-#include "openpilot.h"
+#include <openpilot.h>
 
-#include "homelocation.h"
-#include "magnetometer.h"
-#include "magbias.h"
-#include "accels.h"
-#include "gyros.h"
-#include "gyrosbias.h"
-#include "attitudeactual.h"
-#include "attitudesettings.h"
-#include "revocalibration.h"
-#include "flightstatus.h"
-#include "CoordinateConversions.h"
+#include <homelocation.h>
+#include <magnetometer.h>
+#include <magbias.h>
+#include <accels.h>
+#include <gyros.h>
+#include <gyrosbias.h>
+#include <attitudeactual.h>
+#include <attitudesettings.h>
+#include <revocalibration.h>
+#include <flightstatus.h>
+#include <CoordinateConversions.h>
 
+#include <pios_math.h>
 #include <pios_board_info.h>
 
 // Private constants
@@ -67,8 +68,6 @@
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 #define SENSOR_PERIOD 2
 
-#define F_PI 3.14159265358979323846f
-#define PI_MOD(x) (fmodf(x + F_PI, F_PI * 2) - F_PI)
 // Private types
 
 
@@ -302,7 +301,7 @@ static void SensorsTask(void *parameters)
 			{
 				struct pios_mpu6000_data mpu6000_data;
 				xQueueHandle queue = PIOS_MPU6000_GetQueue();
-				
+
 				while(xQueueReceive(queue, (void *) &mpu6000_data, gyro_samples == 0 ? 10 : 0) != errQUEUE_EMPTY)
 				{
 					gyro_accum[0] += mpu6000_data.gyro_x;
@@ -316,7 +315,7 @@ static void SensorsTask(void *parameters)
 					gyro_samples ++;
 					accel_samples ++;
 				}
-				
+
 				if (gyro_samples == 0) {
 					PIOS_MPU6000_ReadGyros(&mpu6000_data);
 					error = true;
@@ -498,8 +497,8 @@ static void magOffsetEstimation(MagnetometerData *mag)
 	B_e[1] = R[0][1] * mag->x + R[1][1] * mag->y + R[2][1] * mag->z;
 	B_e[2] = R[0][2] * mag->x + R[1][2] * mag->y + R[2][2] * mag->z;
 	
-	float cy = cosf(attitude.Yaw * M_PI / 180.0f);
-	float sy = sinf(attitude.Yaw * M_PI / 180.0f);
+	float cy = cosf(DEG2RAD(attitude.Yaw));
+	float sy = sinf(DEG2RAD(attitude.Yaw));
 	
 	xy[0] =  cy * B_e[0] + sy * B_e[1];
 	xy[1] = -sy * B_e[0] + cy * B_e[1];

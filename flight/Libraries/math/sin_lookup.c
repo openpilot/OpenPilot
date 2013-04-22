@@ -32,6 +32,7 @@
 #include "math.h"
 #include "stdbool.h"
 #include "stdint.h"
+#include <pios_math.h>
 
 #define FLASH_TABLE
 #ifdef FLASH_TABLE
@@ -81,7 +82,7 @@ int sin_lookup_initalize()
 		return -1;
 
 	for(uint32_t i = 0; i < 180; i++)
-		sin_table[i] = sinf((float)i * 2 * M_PI / 360.0f);
+		sin_table[i] = sinf(DEG2RAD((float)i));
 
 	return 0;
 }
@@ -126,7 +127,7 @@ float cos_lookup_deg(float angle)
  */
 float sin_lookup_rad(float angle)
 {
-	int degrees = angle * 180.0f / M_PI;
+	int degrees = angle * 180.0f / M_PI_F;
 	return sin_lookup_deg(degrees);
 }
 
@@ -137,6 +138,6 @@ float sin_lookup_rad(float angle)
  */
 float cos_lookup_rad(float angle)
 {
-	int degrees = angle * 180.0f / M_PI;
+	int degrees = angle * 180.0f / M_PI_F;
 	return cos_lookup_deg(degrees);
 }

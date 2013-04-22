@@ -39,72 +39,74 @@
  ****************************************************************************/
 
  import QtQuick 1.1
- import QtWebKit 1.0 
+ 
  
  // This is a tabbed pane element. Add a nested Rectangle to add a tab.
  TabWidget {
-	 	id: tabs
-		width: 640; height: 480
-		// This  tab is for the GCS version information
-		Rectangle {
-			property string title: "OpenPilot GCS"
-			anchors.fill: parent
-			color: "#e3e3e3"
-			
-			Rectangle {
-				anchors.fill: parent; anchors.margins: 20
-				color: "#e3e3e3"
-				Image {
-					source: "../images/openpilot_logo_128.png"
-					x: 0; y: 0; z: 100
-					fillMode: Image.PreserveAspectFit
-				}
-                Flickable  {
-					anchors.fill: parent
-					anchors.centerIn: parent
-                   Text {
-					   id: versionLabel
-					   x: 156; y: 0
-					   width: 430; height: 379
-					   horizontalAlignment: Qt.AlignLeft
-					   font.pixelSize: 12
-					   wrapMode: Text.WordWrap
-					// @var version exposed in authorsdialog.cpp
-					   text: version
-                   }
-                }
+    // Define AuthorsModel as type
+    property AuthorsModel authors: AuthorsModel {}
+
+    id: tabs
+    width: 640; height: 480
+    // This  tab is for the GCS version information
+    Rectangle {
+        property string title: "OpenPilot GCS"
+        anchors.fill: parent
+        color: "#e3e3e3"
+
+        Rectangle {
+            anchors.fill: parent; anchors.margins: 20
+            color: "#e3e3e3"
+            Image {
+                source: "../images/openpilot_logo_128.png"
+                x: 0; y: 0; z: 100
+                fillMode: Image.PreserveAspectFit
+            }
+            Flickable  {
+                anchors.fill: parent
+                anchors.centerIn: parent
+               Text {
+                   id: versionLabel
+                   x: 156; y: 0
+                   width: 430; height: 379
+                   horizontalAlignment: Qt.AlignLeft
+                   font.pixelSize: 12
+                   wrapMode: Text.WordWrap
+                // @var version exposed in authorsdialog.cpp
+                   text: version
+               }
             }
         }
-		// This is a stub for the Plugins.
-        // Rectangle {
-        //      property string title: "Plugins"
-        //      anchors.fill: parent
-        //      color: "#e3e3e3"
-        //  
-        //      Rectangle {
-        //          anchors.fill: parent; anchors.margins: 20
-        //          color: "#7fff7f"
-        //          Text {
-        //              width: parent.width - 20
-        //              anchors.centerIn: parent; horizontalAlignment: Qt.AlignHCenter
-        //              font.pixelSize: 20
-        //              wrapMode: Text.WordWrap
-        //          }
-        //      }
-        //  }
-  //  This tab is for the authors/contributors/credits
+    }
+
+    //  This tab is for the authors/contributors/credits
+    Rectangle {
+        property string title: "Authors"
+        anchors.fill: parent; color: "#e3e3e3"
         Rectangle {
-			property string title: "Authors"
-			anchors.fill: parent; color: "#e3e3e3"
-			 Rectangle {
-				anchors.fill: parent; anchors.margins: 20
-				color: "#e3e3e3"
-				 FlickableWebView {
-					  id: webView
-					  z: 0
-					  url: "../CREDITS.html"
-					  anchors { top: parent.top; left: parent.left; right: parent.right; bottom: parent.bottom }
-				 }
-			 }
-		 }
- }
+            anchors.fill: parent; anchors.margins: 20
+            color: "#e3e3e3"
+            Text {
+                id: description
+                text: "<h4>These people have been key contributors to the OpenPilot project. Without the work of the people in this list, OpenPilot would not be what it is today.</h4><p>This list is sorted alphabetically by name</p>"
+                width: 600
+                wrapMode: Text.WordWrap
+
+            }
+            ListView {
+                id: authorsView
+                y: description.y + description.height + 20
+                width: parent.width; height: parent.height - description.height - 20
+                spacing: 3
+                model: authors
+                delegate: Text {
+                    text: name
+                }
+                clip: true
+            }
+            ScrollDecorator {
+                flickableItem: authorsView
+            }
+        }
+    }
+}

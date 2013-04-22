@@ -62,7 +62,7 @@ ifndef TESTAPP
     SRC += $(OPSYSTEM)/coptercontrol.c
     SRC += $(OPSYSTEM)/pios_board.c
     SRC += $(OPSYSTEM)/pios_usb_board_data.c
-    SRC += $(OPSYSTEM)/alarms.c
+    SRC += $(FLIGHTLIB)/alarms.c
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c

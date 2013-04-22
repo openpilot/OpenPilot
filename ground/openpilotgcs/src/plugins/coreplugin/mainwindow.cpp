@@ -85,14 +85,12 @@
 #include <QtGui/QMessageBox>
 #include <QDesktopServices>
 #include <QElapsedTimer>
-#include "dialogs/importsettings.h"
 #include <QDir>
 
 using namespace Core;
 using namespace Core::Internal;
 
 static const char *uriListMimeFormatC = "text/uri-list";
-static const char *DEFAULT_CONFIG_FILENAME = "OpenPilotGCS.xml";
 
 enum { debugMainWindow = 0 };
 
@@ -269,66 +267,9 @@ void MainWindow::modeChanged(Core::IMode */*mode*/)
 void MainWindow::extensionsInitialized()
 {
     QSettings *qs = m_settings;
-    if (!qs->allKeys().count()) {
-        // no user settings, so try to load some default ones
-        QDir directory(QCoreApplication::applicationDirPath());
-#ifdef Q_OS_MAC
-        directory.cdUp();
-        directory.cd("Resources");
-#else
-        directory.cdUp();
-        directory.cd("share");
-        directory.cd("openpilotgcs");
-#endif
-        directory.cd("default_configurations");
-
-        qDebug() << "Looking for configuration files in:" << directory.absolutePath();
-
-        QString filename;
-        // check if command line contains a config file name
-        QString commandLine;
-        foreach(QString str, qApp->arguments()) {
-            if (str.contains("configfile")) {
-                commandLine = str.split("=").at(1);
-            }
-        }
-        if (!commandLine.isEmpty() && QFile::exists(directory.absolutePath() + QDir::separator() + commandLine)) {
-            // use file name specified on command line
-            filename = directory.absolutePath() + QDir::separator() + commandLine;
-            qDebug() << "Configuration file" << filename << "specified on command line will be loaded.";
-        } else if (QFile::exists(directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME)) {
-            // use default file name
-            filename = directory.absolutePath() + QDir::separator() + DEFAULT_CONFIG_FILENAME;
-            qDebug() << "Default configuration file" << filename << "will be loaded.";
-        } else {
-            // prompt user for default file name
-            qDebug() << "Default configuration file" << directory.absolutePath() << QDir::separator()
-                    << DEFAULT_CONFIG_FILENAME << "was not found.";
-            importSettings *dialog = new importSettings(this);
-            dialog->loadFiles(directory.absolutePath());
-            dialog->exec();
-            filename = dialog->choosenConfig();
-            delete dialog;
-            qDebug() << "Configuration file" << filename << "was selected and will be loaded.";
-        }
-
-        // create settings from file
-        qs = new QSettings(filename, XmlConfig::XmlSettingsFormat);
-
-        // transfer loaded settings to application settings
-        QStringList keys = qs->allKeys();
-        foreach(QString key, keys) {
-            m_settings->setValue(key, qs->value(key));
-        }
-
-        // and delete loaded settings
-        delete qs;
-        qs = m_settings;
-
-        qDebug() << "Configuration file" << filename << "was loaded.";
-    }
 
     qs->beginGroup("General");
+
     m_config_description = qs->value("Description", "none").toString();
     m_config_details = qs->value("Details", "none").toString();
     m_config_stylesheet = qs->value("StyleSheet", "none").toString();

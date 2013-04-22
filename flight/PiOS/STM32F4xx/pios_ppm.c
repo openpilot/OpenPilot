@@ -145,8 +145,8 @@ extern int32_t PIOS_PPM_Init(uint32_t * ppm_id, const struct pios_ppm_cfg * cfg)
 
 	for (uint8_t i = 0; i < PIOS_PPM_IN_MAX_NUM_CHANNELS; i++) {
 		/* Flush counter variables */
-		ppm_dev->CaptureValue[i] = 0;
-		ppm_dev->CaptureValueNewFrame[i] = 0;
+		ppm_dev->CaptureValue[i] = PIOS_RCVR_TIMEOUT;
+		ppm_dev->CaptureValueNewFrame[i] = PIOS_RCVR_TIMEOUT;
 
 	}
 
@@ -200,11 +200,12 @@ out_fail:
 }
 
 /**
-* Get the value of an input channel
-* \param[in] Channel Number of the channel desired
-* \output -1 Channel not available
-* \output >0 Channel value
-*/
+ * Get the value of an input channel
+ * \param[in] channel Number of the channel desired (zero based)
+ * \output PIOS_RCVR_INVALID channel not available
+ * \output PIOS_RCVR_TIMEOUT failsafe condition or missing receiver
+ * \output >=0 channel value
+ */
 static int32_t PIOS_PPM_Get(uint32_t rcvr_id, uint8_t channel)
 {
 	struct pios_ppm_dev * ppm_dev = (struct pios_ppm_dev *)rcvr_id;

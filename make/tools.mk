@@ -103,19 +103,23 @@ all_sdk_version:   $(addsuffix _version,$(ALL_SDK_TARGETS))
 #
 ##############################
 
+# Used by other makefiles
 export MKDIR	:= mkdir
 export CP	:= cp
 export RM	:= rm
 export LN	:= ln
 export CAT	:= cat
+export CUT	:= cut
 export SED	:= sed
-export TAR	:= tar
-export ANT	:= ant
-export JAVAC	:= javac
-export JAR	:= jar
-export GIT	:= git
-export CURL	:= curl
-export MD5SUM	:= md5sum
+
+# Used only by this Makefile
+TAR		:= tar
+ANT		:= ant
+JAVAC		:= javac
+JAR		:= jar
+GIT		:= git
+CURL		:= curl
+MD5		:= openssl dgst -md5
 
 # Echo in recipes is a bit tricky in a Windows Git Bash window in some cases.
 # It does not work if make started under msysGit installed into a path with spaces.
@@ -200,13 +204,13 @@ $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) ( \
 		cd "$(DL_DIR)" && \
 		$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4).md5" "$(3).md5" && \
-		if ! $(MD5SUM) -c --status "$(DL_DIR)/$(4).md5" 2>/dev/null; then \
+		if [ x`$(MD5) < "$(DL_DIR)/$(4)"` != x`$(CUT) -f1 -d' ' < "$(DL_DIR)/$(4).md5"` ]; then \
 			$(ECHO) $(MSG_DOWNLOADING) $(3) && \
 			$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4)" "$(3)" && \
 			$(ECHO) $(MSG_CHECKSUMMING) $$(call toprel, $(DL_DIR)/$(4)) && \
-			$(MD5SUM) -c --status "$(DL_DIR)/$(4).md5" 2>/dev/null; \
+			[ x`$(MD5) < "$(DL_DIR)/$(4)"` = x`$(CUT) -f1 -d' ' < "$(DL_DIR)/$(4).md5"` ]; \
 		fi; \
-	)
+	) 2>/dev/null
 
 	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))

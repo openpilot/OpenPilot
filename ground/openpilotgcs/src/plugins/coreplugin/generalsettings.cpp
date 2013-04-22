@@ -45,11 +45,11 @@ using namespace Core::Internal;
 
 GeneralSettings::GeneralSettings():
     m_saveSettingsOnExit(true),
-    m_dialog(0),
     m_autoConnect(true),
     m_autoSelect(true),
     m_useUDPMirror(false),
-    m_useExpertMode(false)
+    m_useExpertMode(false),
+    m_dialog(0)
 {
 }
 
@@ -88,23 +88,23 @@ void GeneralSettings::fillLanguageBox() const
     m_page->languageBox->addItem(tr("<System Language>"), QString());
     // need to add this explicitly, since there is no qm file for English
     m_page->languageBox->addItem(QLatin1String("English"), QLatin1String("C"));
-    if (currentLocale == QLatin1String("C"))
+    if (currentLocale == QLatin1String("C")) {
         m_page->languageBox->setCurrentIndex(m_page->languageBox->count() - 1);
+    }
 
-    const QString creatorTrPath =
-            Core::ICore::instance()->resourcePath() + QLatin1String("/translations");
+    const QString creatorTrPath = Core::ICore::instance()->resourcePath() + QLatin1String("/translations");
     const QStringList languageFiles = QDir(creatorTrPath).entryList(QStringList(QLatin1String("openpilotgcs*.qm")));
 
-    Q_FOREACH(const QString &languageFile, languageFiles)
-    {
-        int start = languageFile.indexOf(QLatin1Char('_'))+1;
+    foreach(QString languageFile, languageFiles) {
+        int start = languageFile.indexOf(QLatin1Char('_')) + 1;
         int end = languageFile.lastIndexOf(QLatin1Char('.'));
-        const QString locale = languageFile.mid(start, end-start);
+        const QString locale = languageFile.mid(start, end - start);
         // no need to show a language that creator will not load anyway
         if (hasQmFilesForLocale(locale, creatorTrPath)) {
             m_page->languageBox->addItem(QLocale::languageToString(QLocale(locale).language()), locale);
-            if (locale == currentLocale)
+            if (locale == currentLocale) {
                 m_page->languageBox->setCurrentIndex(m_page->languageBox->count() - 1);
+            }
         }
     }
 }
@@ -114,8 +114,11 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
     m_page = new Ui::GeneralSettings();
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
+
     fillLanguageBox();
-    connect(m_page->checkAutoConnect,SIGNAL(stateChanged(int)),this,SLOT(slotAutoConnect(int)));
+
+    connect(m_page->checkAutoConnect, SIGNAL(stateChanged(int)), this, SLOT(slotAutoConnect(int)));
+
     m_page->checkBoxSaveOnExit->setChecked(m_saveSettingsOnExit);
     m_page->checkAutoConnect->setChecked(m_autoConnect);
     m_page->checkAutoSelect->setChecked(m_autoSelect);
@@ -123,8 +126,7 @@ QWidget *GeneralSettings::createPage(QWidget *parent)
     m_page->cbExpertMode->setChecked(m_useExpertMode);
     m_page->colorButton->setColor(StyleHelper::baseColor());
 
-    connect(m_page->resetButton, SIGNAL(clicked()),
-            this, SLOT(resetInterfaceColor()));
+    connect(m_page->resetButton, SIGNAL(clicked()), this, SLOT(resetInterfaceColor()));
 
     return w;
 }
@@ -148,26 +150,28 @@ void GeneralSettings::finish()
     delete m_page;
 }
 
-void GeneralSettings::readSettings(QSettings* qs)
+void GeneralSettings::readSettings(QSettings *qs)
 {
     qs->beginGroup(QLatin1String("General"));
-    m_language = qs->value(QLatin1String("OverrideLanguage"),QLocale::system().name()).toString();
-    m_saveSettingsOnExit = qs->value(QLatin1String("SaveSettingsOnExit"),m_saveSettingsOnExit).toBool();
-    m_autoConnect = qs->value(QLatin1String("AutoConnect"),m_autoConnect).toBool();
-    m_autoSelect = qs->value(QLatin1String("AutoSelect"),m_autoSelect).toBool();
-    m_useUDPMirror = qs->value(QLatin1String("UDPMirror"),m_useUDPMirror).toBool();
-    m_useExpertMode = qs->value(QLatin1String("ExpertMode"),m_useExpertMode).toBool();
+    m_language = qs->value(QLatin1String("OverrideLanguage"), QLocale::system().name()).toString();
+    m_saveSettingsOnExit = qs->value(QLatin1String("SaveSettingsOnExit"), m_saveSettingsOnExit).toBool();
+    m_autoConnect = qs->value(QLatin1String("AutoConnect"), m_autoConnect).toBool();
+    m_autoSelect = qs->value(QLatin1String("AutoSelect"), m_autoSelect).toBool();
+    m_useUDPMirror = qs->value(QLatin1String("UDPMirror"), m_useUDPMirror).toBool();
+    m_useExpertMode = qs->value(QLatin1String("ExpertMode"), m_useExpertMode).toBool();
     qs->endGroup();
 }
 
-void GeneralSettings::saveSettings(QSettings* qs)
+void GeneralSettings::saveSettings(QSettings *qs)
 {
     qs->beginGroup(QLatin1String("General"));
 
-    if (m_language.isEmpty())
+    if (m_language.isEmpty()) {
         qs->remove(QLatin1String("OverrideLanguage"));
-    else
+    }
+    else {
         qs->setValue(QLatin1String("OverrideLanguage"), m_language);
+    }
 
     qs->setValue(QLatin1String("SaveSettingsOnExit"), m_saveSettingsOnExit);
     qs->setValue(QLatin1String("AutoConnect"), m_autoConnect);
@@ -217,8 +221,8 @@ void GeneralSettings::setLanguage(const QString &locale)
 {
     if (m_language != locale) {
         if (!locale.isEmpty()) {
-        QMessageBox::information((QWidget*)Core::ICore::instance()->mainWindow(), tr("Restart required"),
-                                 tr("The language change will take effect after a restart of the OpenPilot GCS."));
+            QMessageBox::information((QWidget*) Core::ICore::instance()->mainWindow(), tr("Restart required"),
+                    tr("The language change will take effect after a restart of the OpenPilot GCS."));
         }
         m_language = locale;
     }
@@ -251,8 +255,10 @@ bool GeneralSettings::useExpertMode() const
 
 void GeneralSettings::slotAutoConnect(int value)
 {
-    if (value==Qt::Checked)
+    if (value==Qt::Checked) {
         m_page->checkAutoSelect->setEnabled(false);
-    else
+    }
+    else {
         m_page->checkAutoSelect->setEnabled(true);
+    }
 }

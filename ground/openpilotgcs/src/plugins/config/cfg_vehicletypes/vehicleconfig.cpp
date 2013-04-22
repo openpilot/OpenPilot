@@ -102,6 +102,7 @@ void VehicleConfig::setConfigData(GUIConfigDataUnion configData)
 
 void VehicleConfig::setupUI(QString frameType)
 {
+    Q_UNUSED(frameType);
 }
 
 QString VehicleConfig::updateConfigObjectsFromWidgets()
@@ -111,10 +112,12 @@ QString VehicleConfig::updateConfigObjectsFromWidgets()
 
 void VehicleConfig::refreshWidgetsValues(QString frameType)
 {
+    Q_UNUSED(frameType);
 }
 
 void VehicleConfig::resetActuators(GUIConfigDataUnion *configData)
 {
+    Q_UNUSED(configData);
 }
 
 // NEW STYLE: Loop through the widgets looking for all widgets that have "ChannelBox" in their name
@@ -122,7 +125,7 @@ void VehicleConfig::resetActuators(GUIConfigDataUnion *configData)
 // FOR WHATEVER REASON, THIS DOES NOT WORK WITH ChannelBox. ChannelBo is sufficiently accurate
 void VehicleConfig::populateChannelComboBoxes()
 {
-    QList<QComboBox *> l = findChildren<QComboBox*>(QRegExp("\\S+ChannelBo\\S+"));
+    QList<QComboBox *> l = findChildren<QComboBox *>(QRegExp("\\S+ChannelBo\\S+"));
     foreach(QComboBox *combobox, l) {
         combobox->addItems(channelNames);
     }
@@ -136,7 +139,6 @@ void VehicleConfig::populateChannelComboBoxes()
 void VehicleConfig::setComboCurrentIndex(QComboBox *box, int index)
 {
     Q_ASSERT(box);
-
     if (index >= 0 && index < box->count()) {
         box->setCurrentIndex(index);
     }

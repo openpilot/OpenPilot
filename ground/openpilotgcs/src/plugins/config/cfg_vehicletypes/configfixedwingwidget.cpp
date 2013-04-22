@@ -89,7 +89,7 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
     // Set default model to "Elevator aileron rudder"
     m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
 
-    setupUI(m_aircraft->fixedWingType->currentText());
+    //setupUI(m_aircraft->fixedWingType->currentText());
 
     connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
 }

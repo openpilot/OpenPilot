@@ -232,7 +232,7 @@ ConfigCcpmWidget::ConfigCcpmWidget(QWidget *parent) :
     m_aircraft->ccpmType->addItems(Types);
     m_aircraft->ccpmType->setCurrentIndex(m_aircraft->ccpmType->count() - 1);
 
-    refreshWidgetsValues(QString("HeliCP"));
+    //refreshWidgetsValues(QString("HeliCP"));
 
     UpdateType();
 
@@ -296,7 +296,7 @@ void ConfigCcpmWidget::refreshWidgetsValues(QString frameType)
     GUIConfigDataUnion config = getConfigData();
 
     // swashplate config
-    setComboCurrentIndex( m_aircraft->ccpmType, m_aircraft->ccpmType->count() - (config.heli.SwashplateType +1));
+    setComboCurrentIndex(m_aircraft->ccpmType, m_aircraft->ccpmType->count() - (config.heli.SwashplateType + 1));
     setComboCurrentIndex(m_aircraft->ccpmSingleServo, config.heli.FirstServoIndex);
 
     // ccpm mixing options

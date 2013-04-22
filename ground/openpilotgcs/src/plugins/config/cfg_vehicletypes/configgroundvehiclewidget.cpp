@@ -81,7 +81,7 @@ ConfigGroundVehicleWidget::ConfigGroundVehicleWidget(QWidget *parent) :
     // Set default model to "Turnable (car)"
     m_aircraft->groundVehicleType->setCurrentIndex(m_aircraft->groundVehicleType->findText("Turnable (car)"));
 
-    setupUI(m_aircraft->groundVehicleType->currentText());
+    //setupUI(m_aircraft->groundVehicleType->currentText());
 
     connect(m_aircraft->groundVehicleType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
 }
@@ -199,8 +199,6 @@ void ConfigGroundVehicleWidget::resetActuators(GUIConfigDataUnion *configData)
  */
 void ConfigGroundVehicleWidget::refreshWidgetsValues(QString frameType)
 {
-    qDebug() << "ConfigGroundVehicleWidget::refreshWidgetsValues - frame type:" << frameType;
-
     setupUI(frameType);
 
     UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));

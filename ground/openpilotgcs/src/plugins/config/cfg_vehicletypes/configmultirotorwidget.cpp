@@ -86,7 +86,7 @@ QStringList ConfigMultiRotorWidget::getChannelDescriptions()
 }
 
 ConfigMultiRotorWidget::ConfigMultiRotorWidget(QWidget *parent) :
-        VehicleConfig(parent), m_aircraft(new Ui_MultiRotorConfigWidget()), invertMotors(1)
+        VehicleConfig(parent), m_aircraft(new Ui_MultiRotorConfigWidget()), invertMotors(false)
 {
     m_aircraft->setupUi(this);
 
@@ -116,7 +116,7 @@ ConfigMultiRotorWidget::ConfigMultiRotorWidget(QWidget *parent) :
     // Set default model to "Quad X"
     m_aircraft->multirotorFrameType->setCurrentIndex(m_aircraft->multirotorFrameType->findText("Quad X"));
 
-    setupUI(m_aircraft->multirotorFrameType->currentText());
+    //setupUI(m_aircraft->multirotorFrameType->currentText());
 
     connect(m_aircraft->multirotorFrameType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
 
@@ -133,8 +133,6 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
 {
     Q_ASSERT(m_aircraft);
     Q_ASSERT(quad);
-
-    qDebug() << "ConfigMultiRotorWidget::setupUI - frame type" << frameType;
 
     // disable triyaw channel
     m_aircraft->triYawChannelBox->setEnabled(false);
@@ -246,8 +244,9 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
         m_aircraft->mrPitchMixLevel->setValue(50);
         setYawMixLevel(50);
     }
+
     // Draw the appropriate airframe
-    //drawAirframe(frameType);
+    updateAirframe(frameType);
 }
 
 void ConfigMultiRotorWidget::resetActuators(GUIConfigDataUnion *configData)
@@ -503,7 +502,7 @@ void ConfigMultiRotorWidget::refreshWidgetsValues(QString frameType)
         }
     }
 
-    drawAirframe(frameType);
+    updateAirframe(frameType);
 }
 
 /**
@@ -720,12 +719,12 @@ void ConfigMultiRotorWidget::setYawMixLevel(int value)
 
 void ConfigMultiRotorWidget::reverseMultirotorMotor(){
     QString frameType = m_aircraft->multirotorFrameType->currentText();
-    drawAirframe(frameType);
+    updateAirframe(frameType);
 }
 
-void ConfigMultiRotorWidget::drawAirframe(QString frameType)
+void ConfigMultiRotorWidget::updateAirframe(QString frameType)
 {
-    qDebug() << "ConfigMultiRotorWidget::drawAirframe - frame type" << frameType;
+    qDebug() << "ConfigMultiRotorWidget::updateAirframe - frame type" << frameType;
 
     QString elementId;
     if (frameType == "Tri" || frameType == "Tricopter Y") {
@@ -750,8 +749,8 @@ void ConfigMultiRotorWidget::drawAirframe(QString frameType)
         elementId = "octo-coax-X";
     }
 
-    invertMotors = m_aircraft->MultirotorRevMixerCheckBox->isChecked() ? -1 : 1;
-    if (invertMotors <= 0) {
+    invertMotors = m_aircraft->MultirotorRevMixerCheckBox->isChecked();
+    if (invertMotors) {
         elementId += "_reverse";
     }
 
@@ -953,27 +952,28 @@ bool ConfigMultiRotorWidget::setupHexa(bool pLayout)
  */
 bool ConfigMultiRotorWidget::setupMultiRotorMixer(double mixerFactors[8][3])
 {
-    QList<QComboBox*> mmList;
-    mmList << m_aircraft->multiMotorChannelBox1 << m_aircraft->multiMotorChannelBox2
-            << m_aircraft->multiMotorChannelBox3 << m_aircraft->multiMotorChannelBox4
-            << m_aircraft->multiMotorChannelBox5 << m_aircraft->multiMotorChannelBox6
-            << m_aircraft->multiMotorChannelBox7 << m_aircraft->multiMotorChannelBox8;
-
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
     resetMotorAndServoMixers(mixer);
 
     // and enable only the relevant channels:
-    double pFactor = (double) m_aircraft->mrPitchMixLevel->value() / 100;
-    double rFactor = (double) m_aircraft->mrRollMixLevel->value() / 100;
-    invertMotors = m_aircraft->MultirotorRevMixerCheckBox->isChecked() ? -1 : 1;
-    double yFactor = invertMotors * (double) m_aircraft->mrYawMixLevel->value() / 100;
+    double pFactor = (double) m_aircraft->mrPitchMixLevel->value() / 100.0;
+    double rFactor = (double) m_aircraft->mrRollMixLevel->value() / 100.0;
+    invertMotors = m_aircraft->MultirotorRevMixerCheckBox->isChecked();
+    double yFactor = (invertMotors ? -1.0 : 1.0) * (double) m_aircraft->mrYawMixLevel->value() / 100.0;
+
+    QList<QComboBox*> mmList;
+    mmList << m_aircraft->multiMotorChannelBox1 << m_aircraft->multiMotorChannelBox2
+            << m_aircraft->multiMotorChannelBox3 << m_aircraft->multiMotorChannelBox4
+            << m_aircraft->multiMotorChannelBox5 << m_aircraft->multiMotorChannelBox6
+            << m_aircraft->multiMotorChannelBox7 << m_aircraft->multiMotorChannelBox8;
     for (int i = 0; i < 8; i++) {
         if (mmList.at(i)->isEnabled()) {
             int channel = mmList.at(i)->currentIndex() - 1;
-            if (channel > -1)
+            if (channel > -1) {
                 setupQuadMotor(channel, mixerFactors[i][0] * pFactor, rFactor * mixerFactors[i][1],
                         yFactor * mixerFactors[i][2]);
+            }
         }
     }
     return true;

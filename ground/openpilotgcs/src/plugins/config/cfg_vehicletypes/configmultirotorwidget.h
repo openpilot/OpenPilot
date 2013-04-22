@@ -35,9 +35,9 @@
 #include "uavobject.h"
 #include "uavtalk/telemetrymanager.h"
 
+#include <QtCore/QList>
 #include <QtGui/QWidget>
-#include <QList>
-#include <QItemDelegate>
+#include <QtGui/QItemDelegate>
 
 class Ui_Widget;
 
@@ -62,7 +62,7 @@ protected:
 private:
     Ui_MultiRotorConfigWidget *m_aircraft;
     QGraphicsSvgItem *quad;
-    float invertMotors;
+    bool invertMotors;
 
     virtual void resetActuators(GUIConfigDataUnion *configData);
 
@@ -75,7 +75,7 @@ private:
 
     void setYawMixLevel(int);
 
-    void drawAirframe(QString multiRotorType);
+    void updateAirframe(QString multiRotorType);
 
 private slots:
     virtual void setupUI(QString airframeType);

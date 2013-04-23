@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
     QString outputpath;
     QStringList arguments_stringlist;
     QStringList objects_stringlist;
-	QByteArray Out;
-	QByteArray Out2;
+	//QByteArray Out;
+	//QByteArray Out2;
 	int Len;
 	int Len2;
 	int Pos=0;
@@ -156,6 +156,10 @@ int main(int argc, char *argv[])
 		float Adc;
 		char FloatIEEE[4];
 		QString qStr; 
+		int AdError=0;
+		int MpError=0;
+		int R1Error=0;
+		int R2Error=0;
 		
 		while (!file.atEnd()) {
          QByteArray line = file.readLine();
@@ -163,15 +167,30 @@ int main(int argc, char *argv[])
 		 {
 			if(line[1]=='d')
 			{	
-				while(line.length()<2)
+				int len1=line.length();
+				while(line.length()<20)
 				{
-					line += file.readLine();
+					QByteArray line2 = file.readLine();
+					//qRealloc(len1, len1*sizeof(QByteArray));
+					line.resize(len1+line2.length());
+					for(int i=0;i<line2.length();i++)
+					{
+						line[len1+i]= line2[i];
+					}
+					len1+=line2.length();
 				}
-				while((line[line.length()-2]!='\r')&&(line.length()<20))
+				while((line[len1-2]!='\r')&&(len1<20))
 				{
-					line += file.readLine();
+					QByteArray line2 = file.readLine();
+					//qRealloc(len1, len1*sizeof(QByteArray));
+					line.resize(len1+line2.length());
+					for(int i=0;i<line2.length();i++)
+					{
+						line[len1+i]= line2[i];
+					}
+					len1+=line2.length();
 				}
-				if(line.length()==20)
+				if(len1==20)
 				{
 					FloatIEEE[0]=line[2];
 					FloatIEEE[1]=line[3];
@@ -201,7 +220,12 @@ int main(int argc, char *argv[])
 					memcpy(&Adc,&FloatIEEE, 4);
 					qStr = QString::number(Adc);
 					file4.write( qStr.toAscii()+QString("\r").toAscii());
-					 //cout << "Ad : " <<line.length() ;
+					 cout << "Ad : " <<line.length()<<"\r\n" ;
+				}
+				else
+				{
+					cout << "OverlenghtAd " <<line.length() <<"\r\n";
+					AdError++;
 				}
 			}
 		 }
@@ -209,7 +233,30 @@ int main(int argc, char *argv[])
 		 {
 			if(line[1]=='p')
 			{
-				if(line.length()==36)
+				int len1=line.length();
+				while(line.length()<36)
+				{
+					QByteArray line2 = file.readLine();
+					//qRealloc(len1, len1*sizeof(QByteArray));
+					line.resize(len1+line2.length());
+					for(int i=0;i<line2.length();i++)
+					{
+						line[len1+i]= line2[i];
+					}
+					len1+=line2.length();
+				}
+				while((line[len1-2]!='\r')&&(len1<36))
+				{
+					QByteArray line2 = file.readLine();
+					//qRealloc(len1, len1*sizeof(QByteArray));
+					line.resize(len1+line2.length());
+					for(int i=0;i<line2.length();i++)
+					{
+						line[len1+i]= line2[i];
+					}
+					len1+=line2.length();
+				}
+				if(len1==36)
 				{
 					FloatIEEE[0]=line[2];
 					FloatIEEE[1]=line[3];
@@ -267,7 +314,14 @@ int main(int argc, char *argv[])
 					memcpy(&Adc,&FloatIEEE, 4);
 					qStr = QString::number(Adc);
 					file5.write( qStr.toAscii()+QString("\r").toAscii());
-					 //cout << "Mp : " <<line.length() ;
+					 cout << "Mp : " <<line.length()<< "\r\n";
+				}
+				else
+				{
+					//file5.write("Error "+line+"\r\n");
+					cout << "OverlenghtMp " <<line.length()<< "\r\n";
+					//cout << line.Data();
+					MpError++;
 				}
 			}
 		 }
@@ -275,47 +329,111 @@ int main(int argc, char *argv[])
 		 {
 			if(line[1]=='1')
 			{
-				while((line[line.length()-2]!='\r'))
+				QByteArray Out;
+				Pos=0;
+				int len1=line.length();
+				while(len1<10)
 				{
-					line += file.readLine();
+					QByteArray line2 = file.readLine();
+					//qRealloc(len1, len1*sizeof(QByteArray));
+					line.resize(len1+line2.length());
+					for(int i=0;i<line2.length();i++)
+					{
+						line[len1+i]= line2[i];
+					}
+					len1+=line2.length();
+					//line += file.readLine();
 				}
-				Len=(line[line.length()-3]+9);
-				if(Len==line.length())
+				Len2=(line[len1-3]+9);
+				cout << "R1 : ("<< Len2 <<")" <<"["<<len1<<"] \r\n";
+				while((line[len1-2]!='\r')&&(Len2!=len1))
+				{
+					QByteArray line4 = file.readLine();
+					line.resize(len1+line4.length());
+					//len1=line.length();
+					for(int i=0;i<line4.length();i++)
+					{
+						line[len1+i]= line4[i];
+					}
+					//line += file.readLine();
+					len1+=line4.length();
+					Len2=(line[len1-3]+9);
+					//cout << Len2;
+				}
+				//if(line.length()<20)
 				{
 					for(int i=0;i<line[line.length()-3];i++)
 					{
+						//Out[Pos]=line[6+i];
+						//Pos++;
 						Out[Pos]=line[6+i];
 						Pos++;
 					}
-					Pos+=line[line.length()-3];
-					cout << "R1 : " <<line.length() ;
+					//Pos+=line[line.length()-3];
+					//Pos2+=line[line.length()-3];
+					//cout << "R1 : " <<line.length() ;
+					file2.write(Out);
 				}
-				else
+				/*else
 				{
+					cout << "R1 Overlenght "<<line.length()<< "\r\n";
 					//QByteArray line2 = file.readLine();
-				}
+				}*/
 			}
 			else if(line[1]=='2')
 			{
-				while((line[line.length()-2]!='\r'))
+				QByteArray Out2;
+				Pos2=0;
+				int len1=line.length();
+				while(len1<10)
 				{
-					line += file.readLine();
+					QByteArray line2 = file.readLine();
+					//qRealloc(len1, len1*sizeof(QByteArray));
+					line.resize(len1+line2.length());
+					for(int i=0;i<line2.length();i++)
+					{
+						line[len1+i]= line2[i];
+					}
+					len1+=line2.length();
+					//line += file.readLine();
 				}
-				Len2=(line[line.length()-3]+9);
-				if(Len2==line.length())
+				Len2=(line[len1-3]+9);
+				cout << "R2 : ("<< Len2 <<")" <<"["<<len1<<"] \r\n";
+				while((line[len1-2]!='\r')&&(Len2!=len1))
+				{
+					QByteArray line4 = file.readLine();
+					line.resize(len1+line4.length());
+					//len1=line.length();
+					for(int i=0;i<line4.length();i++)
+					{
+						line[len1+i]= line4[i];
+					}
+					//line += file.readLine();
+					len1+=line4.length();
+					Len2=(line[len1-3]+9);
+					//cout << Len2;
+				}
+				//if(line.length()<30)
 				{
 					for(int i=0;i<line[line.length()-3];i++)
 					{
-						Out2[Pos]=line[6+i];
+						//Out[Pos]=line[6+i];
+						//Pos++;
+						Out2[Pos2]=line[6+i];
 						Pos2++;
 					}
-					Pos2+=line[line.length()-3];
-					cout << "R2 : " <<line.length() ;
+					//Pos+=line[line.length()-3];
+					//Pos2+=line[line.length()-3];
+					//cout << "R2 : " <<line.length() ;
+					file3.write(Out2);
 				}
-				else
+				/*else
 				{
+					cout << "R2 Overlenght "<<line.length()<< "\r\n";
+					file3.close();
+					exit(0);
 					//QByteArray line2 = file.readLine();
-				}
+				}*/
 			}
 			else if(line[1]=='3')
 			{
@@ -324,13 +442,14 @@ int main(int argc, char *argv[])
 		 }
 		 else
 		 {
-			cout << "Error";
+			cout << "Error" <<line.length() << "\r\n";
+			R1Error++;
 		 }
      }
 	 
-	 file2.write(Out);
+	 cout << "Error R:" <<R1Error << " Ad:"<<AdError<<" Mp:"<<MpError<<"\r\n";
+	 
 	 file2.close();
-	 file3.write(Out2);
 	 file3.close();
 	 file4.close();
 	 file5.close();

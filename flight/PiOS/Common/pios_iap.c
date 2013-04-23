@@ -3,7 +3,7 @@
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
  * @addtogroup   PIOS_IAP IAP Functions
- * @brief STM32F4xx Hardware dependent I2C functionality
+ * @brief Common IAP functionality
  * @{
  *
  * @file       pios_iap.c  
@@ -32,6 +32,7 @@
  *  Header files
  ****************************************************************************************/
 #include <pios.h>
+#include <pios_bkp.h>
 
 #ifdef PIOS_INCLUDE_IAP
 
@@ -55,7 +56,12 @@
 /****************************************************************************************
  *  Private (static) Data
  ****************************************************************************************/
-
+const uint16_t pios_iap_cmd_list[] = 
+	{ 
+		IAP_CMD1, 
+		IAP_CMD2, 
+		IAP_CMD3
+	};
 /****************************************************************************************
  *  Public/Global Data
  ****************************************************************************************/
@@ -70,17 +76,8 @@
  */
 void PIOS_IAP_Init( void )
 {
-	/* Enable CRC clock */
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
-
-	/* Enable PWR and BKP clock */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_AHB1Periph_BKPSRAM, ENABLE);
-
-	/* Enable write access to Backup domain */
-	PWR_BackupAccessCmd(ENABLE);
-
-	/* Clear Tamper pin Event(TE) pending flag */
-	RTC_ClearFlag(RTC_FLAG_TAMP1F);
+	PIOS_BKP_Init();
+	PIOS_BKP_EnableWrite();
 }
 
 /*!
@@ -97,8 +94,8 @@ uint32_t	PIOS_IAP_CheckRequest( void )
 	uint16_t	reg1;
 	uint16_t	reg2;
 
-	reg1 = RTC_ReadBackupRegister( MAGIC_REG_1 );
-	reg2 = RTC_ReadBackupRegister( MAGIC_REG_2 );
+	reg1 = PIOS_BKP_ReadRegister(MAGIC_REG_1);
+	reg2 = PIOS_BKP_ReadRegister(MAGIC_REG_2);
 
 	if( reg1 == IAP_MAGIC_WORD_1 && reg2 == IAP_MAGIC_WORD_2 ) {
 		// We have a match.
@@ -119,28 +116,62 @@ uint32_t	PIOS_IAP_CheckRequest( void )
  */
 void	PIOS_IAP_SetRequest1(void)
 {
-	RTC_WriteBackupRegister( MAGIC_REG_1, IAP_MAGIC_WORD_1);
+	PIOS_BKP_WriteRegister(MAGIC_REG_1, IAP_MAGIC_WORD_1);
 }
 
 void	PIOS_IAP_SetRequest2(void)
 {
-	RTC_WriteBackupRegister( MAGIC_REG_2, IAP_MAGIC_WORD_2);
+	PIOS_BKP_WriteRegister(MAGIC_REG_2, IAP_MAGIC_WORD_2);
 }
 
 void	PIOS_IAP_ClearRequest(void)
 {
-	RTC_WriteBackupRegister( MAGIC_REG_1, 0);
-	RTC_WriteBackupRegister( MAGIC_REG_2, 0);
+	PIOS_BKP_WriteRegister(MAGIC_REG_1, 0);
+	PIOS_BKP_WriteRegister(MAGIC_REG_2, 0);
 }
 
 uint16_t PIOS_IAP_ReadBootCount(void)
 {
-	return RTC_ReadBackupRegister ( IAP_BOOTCOUNT );
+	return PIOS_BKP_ReadRegister(IAP_BOOTCOUNT);
 }
 
 void PIOS_IAP_WriteBootCount (uint16_t boot_count)
 {
-	RTC_WriteBackupRegister ( IAP_BOOTCOUNT, boot_count );
+	PIOS_BKP_WriteRegister(IAP_BOOTCOUNT, boot_count);
+}
+
+/**
+  * @brief  Return one of the IAP command values passed from bootloader.
+  * @param  number: the index of the command value (0..2).
+  * @retval the selected command value.
+  */
+uint32_t PIOS_IAP_ReadBootCmd(uint8_t number)
+{
+	if(PIOS_IAP_CMD_COUNT < number)
+	{
+		PIOS_Assert(0);
+	}
+	else
+	{
+		return PIOS_BKP_ReadRegister(pios_iap_cmd_list[number]);
+	}	
+}
+
+/**
+  * @brief  Write one of the IAP command values to be passed to firmware from bootloader.
+  * @param  number: the index of the command value (0..2).
+  * @param  value: value to be written.
+  */
+void PIOS_IAP_WriteBootCmd(uint8_t number, uint32_t value)
+{
+	if(PIOS_IAP_CMD_COUNT < number)
+	{
+		PIOS_Assert(0);
+	}
+	else
+	{
+		PIOS_BKP_WriteRegister(pios_iap_cmd_list[number], value);
+	}	
 }
 
 #endif /* PIOS_INCLUDE_IAP */

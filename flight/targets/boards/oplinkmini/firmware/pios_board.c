@@ -111,6 +111,23 @@ void PIOS_Board_Init(void) {
 #if defined(PIOS_INCLUDE_FLASH_EEPROM)
  	PIOS_EEPROM_Init(&pios_eeprom_cfg);
 
+	/* IAP System Setup */
+	PIOS_IAP_Init();
+	// check for safe mode commands from gcs
+	if(PIOS_IAP_ReadBootCmd(0) == PIOS_IAP_CLEAR_FLASH_CMD_0 &&
+	   PIOS_IAP_ReadBootCmd(1) == PIOS_IAP_CLEAR_FLASH_CMD_1 &&
+	   PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2) {
+		OPLinkSettingsGet(&oplinkSettings);
+		OPLinkSettingsSetDefaults(&oplinkSettings,0);
+		PIOS_EEPROM_Save((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData));
+		for (uint32_t i = 0; i < 10; i++) {
+			PIOS_DELAY_WaitmS(100);
+			PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+		}	
+		PIOS_IAP_WriteBootCmd(0,0);
+		PIOS_IAP_WriteBootCmd(1,0);
+		PIOS_IAP_WriteBootCmd(2,0);
+	}
 	/* Read the settings from flash. */
 	/* NOTE: We probably need to save/restore the objID here incase the object changed but the size doesn't */
 	if (PIOS_EEPROM_Load((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData)) == 0)
@@ -135,10 +152,11 @@ void PIOS_Board_Init(void) {
 	/* Initialize board specific USB data */
 	PIOS_USB_BOARD_DATA_Init();
 
+
+#if defined(PIOS_INCLUDE_USB_CDC)
 	/* Flags to determine if various USB interfaces are advertised */
 	bool usb_cdc_present = false;
 
-#if defined(PIOS_INCLUDE_USB_CDC)
 	if (PIOS_USB_DESC_HID_CDC_Init()) {
 		PIOS_Assert(0);
 	}

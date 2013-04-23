@@ -48,15 +48,16 @@ endif
 SRC += ../pios_usb_board_data.c
 SRC += $(OPSYSTEM)/main.c
 SRC += $(OPSYSTEM)/pios_board.c
-SRC += $(OPSYSTEM)/op_dfu.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_board_info.c
 SRC += $(PIOSCOMMON)/pios_com_msg.c
+SRC += $(PIOSCOMMON)/pios_iap.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 ## Misc library functions
+SRC += $(FLIGHTLIB)/op_dfu.c
 SRC += $(FLIGHTLIB)/printf-stdarg.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).

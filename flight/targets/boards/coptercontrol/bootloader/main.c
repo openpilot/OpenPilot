@@ -28,7 +28,7 @@
 
 #include <pios.h>
 #include <pios_board_info.h>
-#include "inc/op_dfu.h"
+#include <op_dfu.h>
 #include <usb_lib.h>
 #include <pios_iap.h>
 #include <fifo_buffer.h>

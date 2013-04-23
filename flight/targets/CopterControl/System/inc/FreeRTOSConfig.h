@@ -91,7 +91,6 @@ do {\
 #define configCHECK_FOR_STACK_OVERFLOW	1
 #endif
 
-
 /**
   * @}
   */

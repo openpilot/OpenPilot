@@ -1,54 +1,75 @@
 /*
-    FreeRTOS V6.0.4 - Copyright (C) 2010 Real Time Engineers Ltd.
+    FreeRTOS V7.4.0 - Copyright (C) 2013 Real Time Engineers Ltd.
+
+    FEATURES AND PORTS ARE ADDED TO FREERTOS ALL THE TIME.  PLEASE VISIT
+    http://www.FreeRTOS.org TO ENSURE YOU ARE USING THE LATEST VERSION.
 
     ***************************************************************************
-    *                                                                         *
-    * If you are:                                                             *
-    *                                                                         *
-    *    + New to FreeRTOS,                                                   *
-    *    + Wanting to learn FreeRTOS or multitasking in general quickly       *
-    *    + Looking for basic training,                                        *
-    *    + Wanting to improve your FreeRTOS skills and productivity           *
-    *                                                                         *
-    * then take a look at the FreeRTOS eBook                                  *
-    *                                                                         *
-    *        "Using the FreeRTOS Real Time Kernel - a Practical Guide"        *
-    *                  http://www.FreeRTOS.org/Documentation                  *
-    *                                                                         *
-    * A pdf reference manual is also available.  Both are usually delivered   *
-    * to your inbox within 20 minutes to two hours when purchased between 8am *
-    * and 8pm GMT (although please allow up to 24 hours in case of            *
-    * exceptional circumstances).  Thank you for your support!                *
-    *                                                                         *
+     *                                                                       *
+     *    FreeRTOS tutorial books are available in pdf and paperback.        *
+     *    Complete, revised, and edited pdf reference manuals are also       *
+     *    available.                                                         *
+     *                                                                       *
+     *    Purchasing FreeRTOS documentation will not only help you, by       *
+     *    ensuring you get running as quickly as possible and with an        *
+     *    in-depth knowledge of how to use FreeRTOS, it will also help       *
+     *    the FreeRTOS project to continue with its mission of providing     *
+     *    professional grade, cross platform, de facto standard solutions    *
+     *    for microcontrollers - completely free of charge!                  *
+     *                                                                       *
+     *    >>> See http://www.FreeRTOS.org/Documentation for details. <<<     *
+     *                                                                       *
+     *    Thank you for using FreeRTOS, and thank you for your support!      *
+     *                                                                       *
     ***************************************************************************
+
 
     This file is part of the FreeRTOS distribution.
 
     FreeRTOS is free software; you can redistribute it and/or modify it under
     the terms of the GNU General Public License (version 2) as published by the
     Free Software Foundation AND MODIFIED BY the FreeRTOS exception.
-    ***NOTE*** The exception to the GPL is included to allow you to distribute
-    a combined work that includes FreeRTOS without being obliged to provide the
-    source code for proprietary components outside of the FreeRTOS kernel.
-    FreeRTOS is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-    more details. You should have received a copy of the GNU General Public 
-    License and the FreeRTOS license exception along with FreeRTOS; if not it 
-    can be viewed here: http://www.freertos.org/a00114.html and also obtained 
-    by writing to Richard Barry, contact details for whom are available on the
-    FreeRTOS WEB site.
+
+    >>>>>>NOTE<<<<<< The modification to the GPL is included to allow you to
+    distribute a combined work that includes FreeRTOS without being obliged to
+    provide the source code for proprietary components outside of the FreeRTOS
+    kernel.
+
+    FreeRTOS is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+    details. You should have received a copy of the GNU General Public License
+    and the FreeRTOS license exception along with FreeRTOS; if not itcan be
+    viewed here: http://www.freertos.org/a00114.html and also obtained by
+    writing to Real Time Engineers Ltd., contact details for whom are available
+    on the FreeRTOS WEB site.
 
     1 tab == 4 spaces!
 
-    http://www.FreeRTOS.org - Documentation, latest information, license and
-    contact details.
+    ***************************************************************************
+     *                                                                       *
+     *    Having a problem?  Start by reading the FAQ "My application does   *
+     *    not run, what could be wrong?"                                     *
+     *                                                                       *
+     *    http://www.FreeRTOS.org/FAQHelp.html                               *
+     *                                                                       *
+    ***************************************************************************
 
-    http://www.SafeRTOS.com - A version that is certified for use in safety
-    critical systems.
 
-    http://www.OpenRTOS.com - Commercial support, development, porting,
-    licensing and training services.
+    http://www.FreeRTOS.org - Documentation, books, training, latest versions,
+    license and Real Time Engineers Ltd. contact details.
+
+    http://www.FreeRTOS.org/plus - A selection of FreeRTOS ecosystem products,
+    including FreeRTOS+Trace - an indispensable productivity tool, and our new
+    fully thread aware and reentrant UDP/IP stack.
+
+    http://www.OpenRTOS.com - Real Time Engineers ltd license FreeRTOS to High
+    Integrity Systems, who sell the code with commercial support,
+    indemnification and middleware, under the OpenRTOS brand.
+
+    http://www.SafeRTOS.com - High Integrity Systems also provide a safety
+    engineered and independently SIL3 certified version for use in safety and
+    mission critical applications that require provable dependability.
 */
 
 #include "FreeRTOS.h"
@@ -70,7 +91,7 @@ static xList xDelayedCoRoutineList1;									/*< Delayed co-routines. */
 static xList xDelayedCoRoutineList2;									/*< Delayed co-routines (two lists are used - one for delays that have overflowed the current tick count. */
 static xList * pxDelayedCoRoutineList;									/*< Points to the delayed co-routine list currently being used. */
 static xList * pxOverflowDelayedCoRoutineList;							/*< Points to the delayed co-routine list currently being used to hold co-routines that have overflowed the current tick count. */
-static xList xPendingReadyCoRoutineList;											/*< Holds co-routines that have been readied by an external event.  They cannot be added directly to the ready lists as the ready lists cannot be accessed by interrupts. */
+static xList xPendingReadyCoRoutineList;								/*< Holds co-routines that have been readied by an external event.  They cannot be added directly to the ready lists as the ready lists cannot be accessed by interrupts. */
 
 /* Other file private variables. --------------------------------*/
 corCRCB * pxCurrentCoRoutine = NULL;
@@ -94,7 +115,7 @@ static portTickType xCoRoutineTickCount = 0, xLastTickCount = 0, xPassedTicks = 
 		uxTopCoRoutineReadyPriority = pxCRCB->uxPriority;															\
 	}																												\
 	vListInsertEnd( ( xList * ) &( pxReadyCoRoutineLists[ pxCRCB->uxPriority ] ), &( pxCRCB->xGenericListItem ) );	\
-}	
+}
 
 /*
  * Utility to ready all the lists used by the scheduler.  This is called
@@ -160,10 +181,10 @@ corCRCB *pxCoRoutine;
 		in a list. */
 		listSET_LIST_ITEM_OWNER( &( pxCoRoutine->xGenericListItem ), pxCoRoutine );
 		listSET_LIST_ITEM_OWNER( &( pxCoRoutine->xEventListItem ), pxCoRoutine );
-	
+
 		/* Event lists are always in priority order. */
 		listSET_LIST_ITEM_VALUE( &( pxCoRoutine->xEventListItem ), configMAX_PRIORITIES - ( portTickType ) uxPriority );
-		
+
 		/* Now the co-routine has been initialised it can be added to the ready
 		list at the correct priority. */
 		prvAddCoRoutineToReadyQueue( pxCoRoutine );
@@ -171,11 +192,11 @@ corCRCB *pxCoRoutine;
 		xReturn = pdPASS;
 	}
 	else
-	{		
+	{
 		xReturn = errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY;
 	}
-	
-	return xReturn;	
+
+	return xReturn;
 }
 /*-----------------------------------------------------------*/
 
@@ -190,7 +211,7 @@ portTickType xTimeToWake;
 	/* We must remove ourselves from the ready list before adding
 	ourselves to the blocked list as the same list item is used for
 	both lists. */
-	vListRemove( ( xListItem * ) &( pxCurrentCoRoutine->xGenericListItem ) );
+	uxListRemove( ( xListItem * ) &( pxCurrentCoRoutine->xGenericListItem ) );
 
 	/* The list item will be inserted in wake time order. */
 	listSET_LIST_ITEM_VALUE( &( pxCurrentCoRoutine->xGenericListItem ), xTimeToWake );
@@ -222,20 +243,20 @@ static void prvCheckPendingReadyList( void )
 	/* Are there any co-routines waiting to get moved to the ready list?  These
 	are co-routines that have been readied by an ISR.  The ISR cannot access
 	the	ready lists itself. */
-	while( !listLIST_IS_EMPTY( &xPendingReadyCoRoutineList ) )
+	while( listLIST_IS_EMPTY( &xPendingReadyCoRoutineList ) == pdFALSE )
 	{
 		corCRCB *pxUnblockedCRCB;
 
 		/* The pending ready list can be accessed by an ISR. */
 		portDISABLE_INTERRUPTS();
-		{	
-			pxUnblockedCRCB = ( corCRCB * ) listGET_OWNER_OF_HEAD_ENTRY( (&xPendingReadyCoRoutineList) );			
-			vListRemove( &( pxUnblockedCRCB->xEventListItem ) );
+		{
+			pxUnblockedCRCB = ( corCRCB * ) listGET_OWNER_OF_HEAD_ENTRY( (&xPendingReadyCoRoutineList) );
+			uxListRemove( &( pxUnblockedCRCB->xEventListItem ) );
 		}
 		portENABLE_INTERRUPTS();
 
-		vListRemove( &( pxUnblockedCRCB->xGenericListItem ) );
-		prvAddCoRoutineToReadyQueue( pxUnblockedCRCB );	
+		uxListRemove( &( pxUnblockedCRCB->xGenericListItem ) );
+		prvAddCoRoutineToReadyQueue( pxUnblockedCRCB );
 	}
 }
 /*-----------------------------------------------------------*/
@@ -263,13 +284,15 @@ corCRCB *pxCRCB;
 		}
 
 		/* See if this tick has made a timeout expire. */
-		while( ( pxCRCB = ( corCRCB * ) listGET_OWNER_OF_HEAD_ENTRY( pxDelayedCoRoutineList ) ) != NULL )
-		{	
-			if( xCoRoutineTickCount < listGET_LIST_ITEM_VALUE( &( pxCRCB->xGenericListItem ) ) )				
-			{			
-				/* Timeout not yet expired. */																			
-				break;																				
-			}																						
+		while( listLIST_IS_EMPTY( pxDelayedCoRoutineList ) == pdFALSE )
+		{
+			pxCRCB = ( corCRCB * ) listGET_OWNER_OF_HEAD_ENTRY( pxDelayedCoRoutineList );
+
+			if( xCoRoutineTickCount < listGET_LIST_ITEM_VALUE( &( pxCRCB->xGenericListItem ) ) )
+			{
+				/* Timeout not yet expired. */
+				break;
+			}
 
 			portDISABLE_INTERRUPTS();
 			{
@@ -278,18 +301,18 @@ corCRCB *pxCRCB;
 				have been moved to the pending ready list and the following
 				line is still valid.  Also the pvContainer parameter will have
 				been set to NULL so the following lines are also valid. */
-				vListRemove( &( pxCRCB->xGenericListItem ) );											
+				uxListRemove( &( pxCRCB->xGenericListItem ) );
 
-				/* Is the co-routine waiting on an event also? */												
-				if( pxCRCB->xEventListItem.pvContainer )													
-				{															
-					vListRemove( &( pxCRCB->xEventListItem ) );											
+				/* Is the co-routine waiting on an event also? */
+				if( pxCRCB->xEventListItem.pvContainer )
+				{
+					uxListRemove( &( pxCRCB->xEventListItem ) );
 				}
 			}
 			portENABLE_INTERRUPTS();
 
-			prvAddCoRoutineToReadyQueue( pxCRCB );													
-		}																									
+			prvAddCoRoutineToReadyQueue( pxCRCB );
+		}
 	}
 
 	xLastTickCount = xCoRoutineTickCount;
@@ -352,9 +375,10 @@ corCRCB *pxUnblockedCRCB;
 signed portBASE_TYPE xReturn;
 
 	/* This function is called from within an interrupt.  It can only access
-	event lists and the pending ready list. */
+	event lists and the pending ready list.  This function assumes that a
+	check has already been made to ensure pxEventList is not empty. */
 	pxUnblockedCRCB = ( corCRCB * ) listGET_OWNER_OF_HEAD_ENTRY( pxEventList );
-	vListRemove( &( pxUnblockedCRCB->xEventListItem ) );
+	uxListRemove( &( pxUnblockedCRCB->xEventListItem ) );
 	vListInsertEnd( ( xList * ) &( xPendingReadyCoRoutineList ), &( pxUnblockedCRCB->xEventListItem ) );
 
 	if( pxUnblockedCRCB->uxPriority >= pxCurrentCoRoutine->uxPriority )

@@ -1,0 +1,153 @@
+General guidelines for updating FreeRTOS
+
+This file will list the necessary modifications to FreeRTOS package to be used inside PiOS
+
+Brief list of modifications: 
+*Add function to get task run time;
+*Modified heap_1.c to allow for different alignment for stack and generic malloc;
+*Allow heap_1.c for modification of max heap size at runtime;
+*use section ".heap" for heap.
+
+Memory manager now handles two different kind of alignments for F1, portBYTE_ALIGNMENT for standard mallocs, and portBYTE_HEAP_ALIGNMENT for stack(aligned) allocs
+
+
+
+
+- include/task.h
+add the following declaration: 
+
+	/**
+	 * task.h
+	 * <PRE>unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask );</PRE>
+	 *
+	 * Returns the run time of selected task
+	 *
+	 * @param xTask Handle of the task associated with the stack to be checked.
+	 * Set xTask to NULL to check the stack of the calling task.
+	 *
+	 * @return The run time of selected task
+	 */
+	unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask );
+
+it usually is added after the declaration of vTaskGetRunTimeStats.
+
+- task.c
+add the following function: 
+
+	#if ( INCLUDE_uxTaskGetRunTime == 1 )
+	
+	    unsigned portBASE_TYPE uxTaskGetRunTime( xTaskHandle xTask )
+	    {
+	        unsigned long runTime;
+	
+	        tskTCB *pxTCB;
+	        pxTCB = prvGetTCBFromHandle( xTask );
+	        runTime = pxTCB->ulRunTimeCounter;
+	        pxTCB->ulRunTimeCounter = 0;
+	        return runTime;
+	    }
+	
+	#endif
+	/*----------------------------------------------------------*/
+
+it usually is added after the declaration of vTaskGetRunTimeStats.
+
+- STM32F1XX/Libraries/FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h
+add the following define for 
+
+#define portBYTE_HEAP_ALIGNMENT     4 // this value is used to allocate heap
+
+
+
+
+- portable/MemMang/heap_1.c
+following there is the modification done in this revision against the base heap_1.c
+The modifications add a currentTOTAL_HEAP_SIZE variable that hold the current heap size,
+used instead of the configTOTAL_HEAP_SIZE macro that can be changed by the added
+xPortIncreaseHeapSize function.
+Also it allows for configurable aligments for Heap and Stack allocations.
+
+--- ../op_evo/FreeRTOSV7.4.0/FreeRTOS/Source/portable/MemMang/heap_1.c	2013-04-06 15:04:22.760048534 +0200
++++ ./flight/PiOS/Common/Libraries/FreeRTOS/Source/portable/MemMang/heap_1.c	2013-04-08 02:23:01.649194752 +0200
+@@ -92,26 +92,30 @@
+ 
+ #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE
+ 
+-/* A few bytes might be lost to byte aligning the heap start address. */
+-#define configADJUSTED_HEAP_SIZE	( configTOTAL_HEAP_SIZE - portBYTE_ALIGNMENT )
+ 
+ /* Allocate the memory for the heap. */
+-static unsigned char ucHeap[ configTOTAL_HEAP_SIZE ];
++static unsigned char ucHeap[ configTOTAL_HEAP_SIZE ]  __attribute__ ((section (".heap")));
+ static size_t xNextFreeByte = ( size_t ) 0;
+ 
++static size_t currentTOTAL_HEAP_SIZE = configTOTAL_HEAP_SIZE;
++void *pvPortMallocGeneric( size_t xWantedSize, size_t alignment);
++
++/* A few bytes might be lost to byte aligning the heap start address. */
++#define configADJUSTED_HEAP_SIZE    (currentTOTAL_HEAP_SIZE - portBYTE_ALIGNMENT)
++
+ /*-----------------------------------------------------------*/
+ 
+-void *pvPortMalloc( size_t xWantedSize )
++void *pvPortMallocGeneric( size_t xWantedSize, size_t alignment)
+ {
+ void *pvReturn = NULL;
+ static unsigned char *pucAlignedHeap = NULL;
+-
++size_t mask = alignment-1;
+ 	/* Ensure that blocks are always aligned to the required number of bytes. */
+ 	#if portBYTE_ALIGNMENT != 1
+-		if( xWantedSize & portBYTE_ALIGNMENT_MASK )
++		if( xWantedSize & mask )
+ 		{
+-			/* Byte alignment required. */
+-			xWantedSize += ( portBYTE_ALIGNMENT - ( xWantedSize & portBYTE_ALIGNMENT_MASK ) );
++		    			/* Byte alignment required. */
++			xWantedSize += ( alignment - ( xWantedSize & mask ) );
+ 		}
+ 	#endif
+ 
+@@ -120,7 +124,7 @@
+ 		if( pucAlignedHeap == NULL )
+ 		{
+ 			/* Ensure the heap starts on a correctly aligned boundary. */
+-			pucAlignedHeap = ( unsigned char * ) ( ( ( portPOINTER_SIZE_TYPE ) &ucHeap[ portBYTE_ALIGNMENT ] ) & ( ( portPOINTER_SIZE_TYPE ) ~portBYTE_ALIGNMENT_MASK ) );
++			pucAlignedHeap = ( unsigned char * ) ( ( ( portPOINTER_SIZE_TYPE ) &ucHeap[ alignment ] ) & ( ( portPOINTER_SIZE_TYPE ) ~ mask ) );
+ 		}
+ 
+ 		/* Check there is enough room left for the allocation. */
+@@ -147,6 +151,11 @@
+ 
+ 	return pvReturn;
+ }
++
++void *pvPortMalloc( size_t xWantedSize){
++    return pvPortMallocGeneric(xWantedSize, portBYTE_HEAP_ALIGNMENT);
++}
++
+ /*-----------------------------------------------------------*/
+ 
+ void vPortFree( void *pv )
+@@ -172,6 +181,12 @@
+ {
+ 	return ( configADJUSTED_HEAP_SIZE - xNextFreeByte );
+ }
++/*-----------------------------------------------------------*/
+ 
+-
+-
++void xPortIncreaseHeapSize( size_t bytes )
++{
++    vTaskSuspendAll();
++    currentTOTAL_HEAP_SIZE = configTOTAL_HEAP_SIZE + bytes;
++    xTaskResumeAll();
++}
++/*-----------------------------------------------------------*/
+
+
+
+
+
+
+	

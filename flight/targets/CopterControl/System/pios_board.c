@@ -196,7 +196,18 @@ void PIOS_Board_Init(void) {
 	/* Initialize the real-time clock and its associated tick */
 	PIOS_RTC_Init(&pios_rtc_main_cfg);
 #endif
-
+	PIOS_IAP_Init();
+	// check for safe mode commands from gcs
+	if(PIOS_IAP_ReadBootCmd(0) == PIOS_IAP_CLEAR_FLASH_CMD_0 &&
+	   PIOS_IAP_ReadBootCmd(1) == PIOS_IAP_CLEAR_FLASH_CMD_1 &&
+	   PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2)
+	{
+	    PIOS_FLASHFS_Format(fs_id);
+		 PIOS_IAP_WriteBootCmd(0,0);
+		 PIOS_IAP_WriteBootCmd(1,0);
+		 PIOS_IAP_WriteBootCmd(2,0);
+	}
+	
 	HwSettingsInitialize();
 
 #ifndef ERASE_FLASH
@@ -208,7 +219,6 @@ void PIOS_Board_Init(void) {
 	AlarmsInitialize();
 
 	/* Check for repeated boot failures */
-	PIOS_IAP_Init();
 	uint16_t boot_count = PIOS_IAP_ReadBootCount();
 	if (boot_count < 3) {
 		PIOS_IAP_WriteBootCount(++boot_count);
@@ -792,7 +802,7 @@ void PIOS_Board_Init(void) {
 #endif
 			break;
 		case BOARD_REVISION_CC3D:
-			// Revision 2 with L3GD20 gyros, start a SPI interface and connect to it
+			// Revision 2 with MPU6000 gyros, start a SPI interface and connect to it
 			GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
 
 #if defined(PIOS_INCLUDE_MPU6000)

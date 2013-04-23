@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotBL OpenPilot BootLoader
- * @brief These files contain the code to the OpenPilot MB Bootloader.
+ * @addtogroup CopterControlBL CopterControl BootLoader
+ * @brief These files contain the code to the CopterControl Bootloader.
  *
  * @{
  * @file       op_dfu.c
@@ -28,6 +28,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "pios.h"
+#include <stdbool.h>
 #include "op_dfu.h"
 #include "pios_bl_helper.h"
 #include "pios_com_msg.h"
@@ -60,6 +61,8 @@ uint8_t Data0;
 uint8_t Data1;
 uint8_t Data2;
 uint8_t Data3;
+uint32_t Opt[3];
+
 uint8_t offset = 0;
 uint32_t aux;
 //Download vars
@@ -132,17 +135,25 @@ void processComand(uint8_t *xReceive_Buffer) {
 	Data1 = xReceive_Buffer[DATA + 1];
 	Data2 = xReceive_Buffer[DATA + 2];
 	Data3 = xReceive_Buffer[DATA + 3];
+	for( uint32_t i=0; i < 3; i++ )
+	{
+		Opt[i] = xReceive_Buffer[DATA + 4 * (i+1) ] << 24 |
+			 xReceive_Buffer[DATA + 4 * (i+1) + 1] << 16 |
+			 xReceive_Buffer[DATA + 4 * (i+1) + 2] << 8 |
+			 xReceive_Buffer[DATA + 4 * (i+1) + 3];	
+	}
+	
 	Command = Command & 0b00011111;
 
 	if (EchoReqFlag == 1) {
-		memcpy(echoBuffer, Buffer, 64);
+		memcpy(echoBuffer, xReceive_Buffer, 64);
 	}
 	switch (Command) {
 	case EnterDFU:
 		if (((DeviceState == BLidle) && (Data0 < numberOfDevices))
 				|| (DeviceState == DFUidle)) {
 			if (Data0 > 0)
-				OPDfuIni(TRUE);
+				OPDfuIni(true);
 			DeviceState = DFUidle;
 			currentProgrammingDestination = devicesTable[Data0].programmingType;
 			currentDeviceCanRead = devicesTable[Data0].readWriteFlags & 0x01;
@@ -155,7 +166,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 				result = PIOS_BL_HELPER_FLASH_Ini();
 				break;
 			case Remote_flash_via_spi:
-				result = TRUE;
+				result = true;
 				break;
 			default:
 				DeviceState = Last_operation_failed;
@@ -180,7 +191,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 				SizeOfLastPacket = Data1;
 
 				if (isBiggerThanAvailable(TransferType, (SizeOfTransfer - 1)
-						* 14 * 4 + SizeOfLastPacket * 4) == TRUE) {
+						* 14 * 4 + SizeOfLastPacket * 4) == true) {
 					DeviceState = outsideDevCapabilities;
 					Aditionals = (uint32_t) Command;
 				} else {
@@ -191,7 +202,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 							result = PIOS_BL_HELPER_FLASH_Start();
 							break;
 						case Remote_flash_via_spi:
-							result = FALSE;
+							result = false;
 							break;
 						default:
 							break;
@@ -236,7 +247,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 						}
 						break;
 					case Remote_flash_via_spi:
-						result = FALSE; // No support for this for the PipX
+						result = false; // No support for this for the PipX
 						break;
 					default:
 						result = 0;
@@ -259,7 +270,7 @@ void processComand(uint8_t *xReceive_Buffer) {
 		}
 		break;
 	case Req_Capabilities:
-		OPDfuIni(TRUE);
+		OPDfuIni(true);
 		Buffer[0] = 0x01;
 		Buffer[1] = Rep_Capabilities;
 		if (Data0 == 0) {
@@ -295,10 +306,16 @@ void processComand(uint8_t *xReceive_Buffer) {
 		sendData(Buffer + 1, 63);
 		break;
 	case JumpFW:
-		if (Data == 0x5AFE) {
+		if (Data == 0x5AFE) 
+		{
 			/* Force board into safe mode */
 			PIOS_IAP_WriteBootCount(0xFFFF);
 		}
+		// pass any Opt value to the firmware
+		PIOS_IAP_WriteBootCmd(0, Opt[0]);
+		PIOS_IAP_WriteBootCmd(1, Opt[1]);
+		PIOS_IAP_WriteBootCmd(2, Opt[2]);
+
 		FLASH_Lock();
 		JumpToApp = 1;
 		break;
@@ -428,7 +445,7 @@ uint8_t isBiggerThanAvailable(DFUTransfer type, uint32_t size) {
 		return (size > currentDevice.sizeOfDescription) ? 1 : 0;
 		break;
 	default:
-		return TRUE;
+		return true;
 	}
 }
 
@@ -453,15 +470,15 @@ void sendData(uint8_t * buf, uint16_t size) {
 bool flash_read(uint8_t * buffer, uint32_t adr, DFUProgType type) {
 	switch (type) {
 	case Remote_flash_via_spi:
-		return FALSE; // We should not get this for the PipX
+		return false; // We should not get this for the PipX
 		break;
 	case Self_flash:
 		for (uint8_t x = 0; x < 4; ++x) {
 			buffer[x] = *PIOS_BL_HELPER_FLASH_If_Read(adr + x);
 		}
-		return TRUE;
+		return true;
 		break;
 	default:
-		return FALSE;
+		return false;
 	}
 }

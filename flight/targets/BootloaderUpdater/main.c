@@ -113,7 +113,6 @@ int main()
 
 
 	///
-
 	/// Bootloader programing
 	for (uint32_t offset = 0; offset < embedded_image_size / sizeof(uint32_t); ++offset) {
 		bool result = false;
@@ -156,12 +155,6 @@ void error(int led, int code)
 			PIOS_LED_Off(led);
 			PIOS_DELAY_WaitmS(1000);
 		}
-		PIOS_DELAY_WaitmS(1000);
-		for (int x = 0; x < 10; x++) {
-			PIOS_LED_On(led);
-			PIOS_DELAY_WaitmS(200);
-			PIOS_LED_Off(led);
-			PIOS_DELAY_WaitmS(200);
+		PIOS_DELAY_WaitmS(3000);
 		}
-	}
 }

@@ -2,11 +2,11 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup PIOS_IAP In-Application-Programming Module
- * @brief In-Application-Programming Module
+ * @addtogroup PIOS_BKP Backup SRAM functions
+ * @brief Hardware abstraction layer for backup sram
  * @{
  *
- * @file       pios_iap.c  
+ * @file       pios_bkp.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @brief      IAP functions
  * @see        The GNU Public License (GPL) Version 3
@@ -29,58 +29,90 @@
  */
 
 /* Project Includes */
-#ifndef PIOS_IAP_H
-#define PIOS_IAP_H
-
+#ifndef PIOS_BKP_H_
+#define PIOS_BKP_H_
 
 
 /****************************************************************************************
  *  Header files
  ****************************************************************************************/
-#include <pios_bkp.h>
 
 /*****************************************************************************************
  *	Public Definitions/Macros
  ****************************************************************************************/
-#define MAGIC_REG_1     PIOS_BKP_RESERVED_1
-#define MAGIC_REG_2     PIOS_BKP_RESERVED_2
-#define IAP_BOOTCOUNT   PIOS_BKP_RESERVED_3
-#define IAP_CMD1        PIOS_BKP_RESERVED_5
-#define IAP_CMD2        PIOS_BKP_RESERVED_6
-#define IAP_CMD3        PIOS_BKP_RESERVED_7
-
-#define PIOS_IAP_CLEAR_FLASH_CMD_0 0xFA5F
-#define PIOS_IAP_CLEAR_FLASH_CMD_1 0x0001
-#define PIOS_IAP_CLEAR_FLASH_CMD_2 0x0000
-
-#define PIOS_IAP_CMD_COUNT 3
+// Backup registers definitions
+// registers reserved for PIOS usage
+#define PIOS_BKP_RESERVED_1   0  // IAP_MAGIC_REG_1
+#define PIOS_BKP_RESERVED_2   1  // IAP_MAGIC_REG_2
+#define PIOS_BKP_RESERVED_3   2  // IAP_BOOTCOUNT
+#define PIOS_BKP_RESERVED_4   3  // PIOS_WDG_REGISTER
+#define PIOS_BKP_RESERVED_5   4  // IAP_CMD1
+#define PIOS_BKP_RESERVED_6   5  // IAP_CMD2
+#define PIOS_BKP_RESERVED_7   6  // IAP_CMD3
+#define PIOS_BKP_RESERVED_8   7
+#define PIOS_BKP_RESERVED_9   8
+#define PIOS_BKP_RESERVED_10  9
+// registers reserved for BOARD specific usage
+#define PIOS_BKP_BOARD_RESERVED_1 10
+#define PIOS_BKP_BOARD_RESERVED_2 11
+#define PIOS_BKP_BOARD_RESERVED_3 12
+// registers reserved for APP usage
+#define PIOS_BKP_APP_RESERVED_1 13
+#define PIOS_BKP_APP_RESERVED_2 14
+#define PIOS_BKP_APP_RESERVED_3 15
+#define PIOS_BKP_APP_RESERVED_4 16
 
 /****************************************************************************************
  *  Public Functions
  ****************************************************************************************/
-void		PIOS_IAP_Init(void);
-uint32_t	PIOS_IAP_CheckRequest( void );
-void		PIOS_IAP_SetRequest1(void);
-void		PIOS_IAP_SetRequest2(void);
-void		PIOS_IAP_ClearRequest(void);
-uint16_t	PIOS_IAP_ReadBootCount(void);
-void		PIOS_IAP_WriteBootCount(uint16_t);
+/** @defgroup PIOS_BKP_Public_Functions
+  * @{
+  */
 
 /**
-  * @brief  Return one of the IAP command values passed from bootloader.
-  * @param  number: the index of the command value (0..2).
-  * @retval the selected command value.
+  * @brief  Initialize the Backup Register hardware
+  * @param  None
+  * @retval None
   */
-uint32_t PIOS_IAP_ReadBootCmd(uint8_t number);
+void		PIOS_BKP_Init(void);
 
 /**
-  * @brief  Write one of the IAP command values to be passed to firmware from bootloader.
-  * @param  number: the index of the command value (0..2).
-  * @param  value: value to be written.
+  * @brief  Reads data from the specified Backup Register.
+  * @param  regnumber: specifies the Backup Register.
+  * @retval The content of the specified Data Backup Register
   */
-void PIOS_IAP_WriteBootCmd(uint8_t number, uint32_t value);
+uint16_t	PIOS_BKP_ReadRegister(uint32_t regnumber);
+
+/**
+  * @brief  Writes user data to the specified Backup Register.
+  * @param  regnumber: specifies the Data Backup Register.
+  * @param  data: data to write
+  * @retval None
+  */
+void		PIOS_BKP_WriteRegister(uint32_t regnumber,uint16_t data);
+
+/**
+  * @brief  Enable Backup registers write access
+  * @param  None
+  * @retval None
+  */
+void		PIOS_BKP_EnableWrite(void);
+
+/**
+  * @brief  Disable Backup registers write access
+  * @param  None
+  * @retval None
+  */
+void		PIOS_BKP_DisableWrite(void);
+
+/**
+  * @}
+  */
+
+
+
 /****************************************************************************************
  *  Public Data
  ****************************************************************************************/
 
-#endif /* PIOS_IAP_H */
+#endif /* PIOS_BKP_H_ */

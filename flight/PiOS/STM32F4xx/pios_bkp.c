@@ -2,11 +2,11 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup PIOS_IAP In-Application-Programming Module
- * @brief In-Application-Programming Module
+ * @addtogroup PIOS_BKP Backup SRAM functions
+ * @brief Hardware abstraction layer for backup sram
  * @{
  *
- * @file       pios_iap.c  
+ * @file       pios_bkp.c  
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @brief      IAP functions
  * @see        The GNU Public License (GPL) Version 3
@@ -28,59 +28,92 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
-#ifndef PIOS_IAP_H
-#define PIOS_IAP_H
-
-
+#include <pios.h>
+#include <pios_bkp.h>
+#include <stm32f4xx_rtc.h>
 
 /****************************************************************************************
  *  Header files
  ****************************************************************************************/
-#include <pios_bkp.h>
 
 /*****************************************************************************************
  *	Public Definitions/Macros
  ****************************************************************************************/
-#define MAGIC_REG_1     PIOS_BKP_RESERVED_1
-#define MAGIC_REG_2     PIOS_BKP_RESERVED_2
-#define IAP_BOOTCOUNT   PIOS_BKP_RESERVED_3
-#define IAP_CMD1        PIOS_BKP_RESERVED_5
-#define IAP_CMD2        PIOS_BKP_RESERVED_6
-#define IAP_CMD3        PIOS_BKP_RESERVED_7
-
-#define PIOS_IAP_CLEAR_FLASH_CMD_0 0xFA5F
-#define PIOS_IAP_CLEAR_FLASH_CMD_1 0x0001
-#define PIOS_IAP_CLEAR_FLASH_CMD_2 0x0000
-
-#define PIOS_IAP_CMD_COUNT 3
 
 /****************************************************************************************
  *  Public Functions
  ****************************************************************************************/
-void		PIOS_IAP_Init(void);
-uint32_t	PIOS_IAP_CheckRequest( void );
-void		PIOS_IAP_SetRequest1(void);
-void		PIOS_IAP_SetRequest2(void);
-void		PIOS_IAP_ClearRequest(void);
-uint16_t	PIOS_IAP_ReadBootCount(void);
-void		PIOS_IAP_WriteBootCount(uint16_t);
+const uint32_t pios_bkp_registers_map[] =
+	{
+		RTC_BKP_DR0,
+		RTC_BKP_DR1,
+		RTC_BKP_DR2,
+		RTC_BKP_DR3,
+		RTC_BKP_DR4,
+		RTC_BKP_DR5,
+		RTC_BKP_DR6,
+		RTC_BKP_DR7,
+		RTC_BKP_DR8,
+		RTC_BKP_DR9,
+		RTC_BKP_DR10,
+		RTC_BKP_DR11,
+		RTC_BKP_DR12,
+		RTC_BKP_DR13,
+		RTC_BKP_DR14,
+		RTC_BKP_DR15,
+		RTC_BKP_DR16,
+		RTC_BKP_DR17,
+		RTC_BKP_DR18,
+		RTC_BKP_DR19
+	};
+#define PIOS_BKP_REGISTERS_COUNT NELEMENTS(pios_bkp_registers_map)
 
-/**
-  * @brief  Return one of the IAP command values passed from bootloader.
-  * @param  number: the index of the command value (0..2).
-  * @retval the selected command value.
-  */
-uint32_t PIOS_IAP_ReadBootCmd(uint8_t number);
+void PIOS_BKP_Init(void)
+{
+	/* Enable CRC clock */
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC | RCC_AHB1Periph_BKPSRAM, ENABLE);
 
-/**
-  * @brief  Write one of the IAP command values to be passed to firmware from bootloader.
-  * @param  number: the index of the command value (0..2).
-  * @param  value: value to be written.
-  */
-void PIOS_IAP_WriteBootCmd(uint8_t number, uint32_t value);
+	/* Enable PWR and BKP clock */
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR, ENABLE);
+
+	/* Clear Tamper pin Event(TE) pending flag */
+	RTC_ClearFlag(RTC_FLAG_TAMP1F);
+}
+
+uint16_t PIOS_BKP_ReadRegister(uint32_t regnumber)
+{
+	if(PIOS_BKP_REGISTERS_COUNT < regnumber)
+	{
+		PIOS_Assert(0);
+	} else {
+		return (uint16_t) RTC_ReadBackupRegister(pios_bkp_registers_map[regnumber]);
+	}
+}
+
+void PIOS_BKP_WriteRegister(uint32_t regnumber,uint16_t data)
+{
+	if(PIOS_BKP_REGISTERS_COUNT < regnumber)
+	{
+		PIOS_Assert(0);
+	} else {
+		RTC_WriteBackupRegister(pios_bkp_registers_map[regnumber],(uint32_t)data);
+	}
+}
+
+void PIOS_BKP_EnableWrite(void)
+{
+	/* Enable write access to Backup domain */
+	PWR_BackupAccessCmd(ENABLE);
+}
+
+void PIOS_BKP_DisableWrite(void)
+{
+	/* Enable write access to Backup domain */
+	PWR_BackupAccessCmd(DISABLE);
+}
+
+
+
 /****************************************************************************************
  *  Public Data
  ****************************************************************************************/
-
-#endif /* PIOS_IAP_H */

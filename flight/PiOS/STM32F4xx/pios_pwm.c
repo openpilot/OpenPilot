@@ -170,11 +170,12 @@ out_fail:
 }
 
 /**
-* Get the value of an input channel
-* \param[in] Channel Number of the channel desired
-* \output -1 Channel not available
-* \output >0 Channel value
-*/
+ * Get the value of an input channel
+ * \param[in] channel Number of the channel desired (zero based)
+ * \output PIOS_RCVR_INVALID channel not available
+ * \output PIOS_RCVR_TIMEOUT failsafe condition or missing receiver
+ * \output >=0 channel value
+ */
 static int32_t PIOS_PWM_Get(uint32_t rcvr_id, uint8_t channel)
 {
 	struct pios_pwm_dev * pwm_dev = (struct pios_pwm_dev *)rcvr_id;

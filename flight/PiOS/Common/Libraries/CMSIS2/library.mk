@@ -11,7 +11,7 @@ ifeq ($(USE_DSP_LIB), YES)
     CMSIS_DSPLIB	:= $(CMSIS2_DIR)DSP_Lib/Source
 
     # Compile all files into output directory
-    DSPLIB_SRC		:= $(wildcard $(CMSIS_DSPLIB)/*/*.c)
+    DSPLIB_SRC		:= $(sort $(wildcard $(CMSIS_DSPLIB)/*/*.c))
     DSPLIB_SRCBASE	:= $(notdir $(basename $(DSPLIB_SRC)))
     $(foreach src, $(DSPLIB_SRC), $(eval $(call COMPILE_C_TEMPLATE, $(src))))
 

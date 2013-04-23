@@ -697,11 +697,8 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
 static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool home)
 {
 	static portTickType lastSysTime;
-	portTickType thisSysTime;
-	float dT;
-
-	thisSysTime = xTaskGetTickCount();
-	dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
+	portTickType thisSysTime = xTaskGetTickCount();
+	/* float dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f; */
 	lastSysTime = thisSysTime;
 
 	if (home && changed) {
@@ -738,16 +735,15 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool 
 		pathDesired.EndingVelocity=0;
 		pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
 		PathDesiredSet(&pathDesired);
+	/* Disable this section, until such time as proper discussion can be had about how to implement it for all types of crafts.
 	} else {
-		
-/*Disable this section, until such time as proper discussion can be had about how to implement it for all types of crafts.		
 		PathDesiredData pathDesired;
 		PathDesiredGet(&pathDesired);
 		pathDesired.End[PATHDESIRED_END_NORTH] += dT * -cmd->Pitch;
 		pathDesired.End[PATHDESIRED_END_EAST] += dT * cmd->Roll;
 		pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
 		PathDesiredSet(&pathDesired);
-*/ 
+	*/
 	}
 }
 

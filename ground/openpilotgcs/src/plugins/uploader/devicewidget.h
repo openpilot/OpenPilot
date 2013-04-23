@@ -45,11 +45,11 @@
 #include "uploader_global.h"
 
 using namespace OP_DFU;
-class UPLOADER_EXPORT deviceWidget : public QWidget
+class UPLOADER_EXPORT DeviceWidget : public QWidget
 {
     Q_OBJECT
 public:
-    deviceWidget(QWidget *parent = 0);
+    DeviceWidget(QWidget *parent = 0);
     void setDeviceID(int devID);
     void setDfu(DFUObject* dfu);
     void populate();

@@ -165,6 +165,21 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
 	}
 }
 
+void ConfigFixedWingWidget::registerWidgets(ConfigTaskWidget &parent) {
+    parent.addWidget(m_aircraft->fixedWingThrottle->getCurveWidget());
+    parent.addWidget(m_aircraft->fixedWingType);
+
+    parent.addWidget(m_aircraft->fwEngineChannelBox);
+    parent.addWidget(m_aircraft->fwAileron1ChannelBox);
+    parent.addWidget(m_aircraft->fwAileron2ChannelBox);
+    parent.addWidget(m_aircraft->fwElevator1ChannelBox);
+    parent.addWidget(m_aircraft->fwElevator2ChannelBox);
+    parent.addWidget(m_aircraft->fwRudder1ChannelBox);
+    parent.addWidget(m_aircraft->fwRudder2ChannelBox);
+    parent.addWidget(m_aircraft->elevonSlider1);
+    parent.addWidget(m_aircraft->elevonSlider2);
+}
+
 void ConfigFixedWingWidget::resetActuators(GUIConfigDataUnion *configData)
 {
     configData->fixedwing.FixedWingPitch1 = 0;

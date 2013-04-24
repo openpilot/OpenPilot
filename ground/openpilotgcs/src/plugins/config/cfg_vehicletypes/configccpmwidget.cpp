@@ -277,6 +277,41 @@ void ConfigCcpmWidget::setupUI(QString frameType)
     Q_UNUSED(frameType);
 }
 
+void ConfigCcpmWidget::registerWidgets(ConfigTaskWidget &parent) {
+    parent.addWidget(m_aircraft->ccpmType);
+    parent.addWidget(m_aircraft->ccpmTailChannel);
+    parent.addWidget(m_aircraft->ccpmEngineChannel);
+    parent.addWidget(m_aircraft->ccpmServoWChannel);
+    parent.addWidget(m_aircraft->ccpmServoXChannel);
+    parent.addWidget(m_aircraft->ccpmServoYChannel);
+    parent.addWidget(m_aircraft->ccpmSingleServo);
+    parent.addWidget(m_aircraft->ccpmServoZChannel);
+    parent.addWidget(m_aircraft->ccpmAngleW);
+    parent.addWidget(m_aircraft->ccpmAngleX);
+    parent.addWidget(m_aircraft->ccpmCorrectionAngle);
+    parent.addWidget(m_aircraft->ccpmAngleZ);
+    parent.addWidget(m_aircraft->ccpmAngleY);
+    parent.addWidget(m_aircraft->ccpmCollectivePassthrough);
+    parent.addWidget(m_aircraft->ccpmLinkRoll);
+    parent.addWidget(m_aircraft->ccpmLinkCyclic);
+    parent.addWidget(m_aircraft->ccpmRevoSlider);
+    parent.addWidget(m_aircraft->ccpmREVOspinBox);
+    parent.addWidget(m_aircraft->ccpmCollectiveSlider);
+    parent.addWidget(m_aircraft->ccpmCollectivespinBox);
+    parent.addWidget(m_aircraft->ccpmCollectiveScale);
+    parent.addWidget(m_aircraft->ccpmCollectiveScaleBox);
+    parent.addWidget(m_aircraft->ccpmCyclicScale);
+    parent.addWidget(m_aircraft->ccpmPitchScale);
+    parent.addWidget(m_aircraft->ccpmPitchScaleBox);
+    parent.addWidget(m_aircraft->ccpmRollScale);
+    parent.addWidget(m_aircraft->ccpmRollScaleBox);
+    parent.addWidget(m_aircraft->SwashLvlPositionSlider);
+    parent.addWidget(m_aircraft->SwashLvlPositionSpinBox);
+    parent.addWidget(m_aircraft->ThrottleCurve->getCurveWidget());
+    parent.addWidget(m_aircraft->PitchCurve->getCurveWidget());
+    parent.addWidget(m_aircraft->ccpmAdvancedSettingsTable);
+}
+
 void ConfigCcpmWidget::resetActuators(GUIConfigDataUnion *configData)
 {
     configData->heli.Throttle = 0;

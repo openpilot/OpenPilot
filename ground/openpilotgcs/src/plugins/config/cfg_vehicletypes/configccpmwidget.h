@@ -97,6 +97,7 @@ private:
 
     int MixerChannelData[6];
 
+    virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);
 
     int ShowDisclaimer(int messageID);

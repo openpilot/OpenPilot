@@ -64,6 +64,7 @@ private:
     QGraphicsSvgItem *quad;
     bool invertMotors;
 
+    virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);
 
     bool setupQuad(bool pLayout);

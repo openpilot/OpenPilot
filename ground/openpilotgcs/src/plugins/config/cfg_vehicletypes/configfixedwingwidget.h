@@ -57,6 +57,7 @@ public:
 private:
     Ui_FixedWingConfigWidget *m_aircraft;
 
+    virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);
 
     bool setupFrameFixedWing(QString airframeType);

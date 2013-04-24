@@ -102,6 +102,14 @@ typedef union
     groundGUISettingsStruct ground;
 } GUIConfigDataUnion;
 
+class ConfigTaskWidget;
+
+/*
+ * This class handles vehicle specific configuration UI and associated logic.
+ *
+ * This class derives from ConfigTaskWidget and overrides its the default "binding" mechanism.
+ * It does not use the "dirty" state management directlyand registers its relevant widgets with ConfigTaskWidget to do so.
+ */
 class VehicleConfig: public ConfigTaskWidget
 {
 Q_OBJECT
@@ -152,6 +160,8 @@ public:
     VehicleConfig(QWidget *parent = 0);
     ~VehicleConfig();
 
+    virtual void registerWidgets(ConfigTaskWidget &parent);
+
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
 
@@ -177,6 +187,10 @@ protected:
     bool    isValidThrottleCurve(QList<double> *curve);
     double  getCurveMin(QList<double> *curve);
     double  getCurveMax(QList<double> *curve);
+
+//protected slots:
+//    virtual void refreshWidgetsValues(UAVObject *o = NULL);
+//    virtual void updateObjectsFromWidgets();
 
 private:
     static UAVObjectManager *getUAVObjectManager();

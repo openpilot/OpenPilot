@@ -68,6 +68,7 @@ ConfigCustomWidget::ConfigCustomWidget(QWidget *parent) :
     for (int i = 1; i < (int) VehicleConfig::CHANNEL_NUMELEM; i++) {
         m_aircraft->customMixerTable->setItemDelegateForRow(i, sbd);
     }
+
 }
 
 ConfigCustomWidget::~ConfigCustomWidget()
@@ -78,6 +79,12 @@ ConfigCustomWidget::~ConfigCustomWidget()
 void ConfigCustomWidget::setupUI(QString frameType)
 {
     Q_ASSERT(m_aircraft);
+}
+
+void ConfigCustomWidget::registerWidgets(ConfigTaskWidget &parent) {
+    parent.addWidget(m_aircraft->customMixerTable);
+    parent.addWidget(m_aircraft->customThrottle1Curve->getCurveWidget());
+    parent.addWidget(m_aircraft->customThrottle2Curve->getCurveWidget());
 }
 
 void ConfigCustomWidget::resetActuators(GUIConfigDataUnion *configData)

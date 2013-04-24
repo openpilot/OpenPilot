@@ -105,19 +105,27 @@ void VehicleConfig::setupUI(QString frameType)
     Q_UNUSED(frameType);
 }
 
-QString VehicleConfig::updateConfigObjectsFromWidgets()
-{
-    return QString();
-}
+//void VehicleConfig::refreshWidgetsValues(UAVObject *o = NULL)
+//void VehicleConfig::updateObjectsFromWidgets()
 
 void VehicleConfig::refreshWidgetsValues(QString frameType)
 {
     Q_UNUSED(frameType);
 }
 
+QString VehicleConfig::updateConfigObjectsFromWidgets()
+{
+    return QString();
+}
+
 void VehicleConfig::resetActuators(GUIConfigDataUnion *configData)
 {
     Q_UNUSED(configData);
+}
+
+
+void VehicleConfig::registerWidgets(ConfigTaskWidget &parent) {
+    Q_UNUSED(parent);
 }
 
 // NEW STYLE: Loop through the widgets looking for all widgets that have "ChannelBox" in their name

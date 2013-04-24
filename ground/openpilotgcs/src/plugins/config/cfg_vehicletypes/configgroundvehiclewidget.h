@@ -57,6 +57,7 @@ public:
 private:
     Ui_GroundConfigWidget *m_aircraft;
 
+    virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);
 
     bool setupGroundVehicleCar(QString airframeType);

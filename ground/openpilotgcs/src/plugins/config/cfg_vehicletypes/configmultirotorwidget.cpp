@@ -249,6 +249,23 @@ void ConfigMultiRotorWidget::setupUI(QString frameType)
     updateAirframe(frameType);
 }
 
+void ConfigMultiRotorWidget::registerWidgets(ConfigTaskWidget &parent) {
+    parent.addWidget(m_aircraft->multiThrottleCurve->getCurveWidget());
+    parent.addWidget(m_aircraft->multirotorFrameType);
+    parent.addWidget(m_aircraft->multiMotorChannelBox1);
+    parent.addWidget(m_aircraft->multiMotorChannelBox2);
+    parent.addWidget(m_aircraft->multiMotorChannelBox3);
+    parent.addWidget(m_aircraft->multiMotorChannelBox4);
+    parent.addWidget(m_aircraft->multiMotorChannelBox5);
+    parent.addWidget(m_aircraft->multiMotorChannelBox6);
+    parent.addWidget(m_aircraft->multiMotorChannelBox7);
+    parent.addWidget(m_aircraft->multiMotorChannelBox8);
+    parent.addWidget(m_aircraft->mrPitchMixLevel);
+    parent.addWidget(m_aircraft->mrRollMixLevel);
+    parent.addWidget(m_aircraft->mrYawMixLevel);
+    parent.addWidget(m_aircraft->triYawChannelBox);
+}
+
 void ConfigMultiRotorWidget::resetActuators(GUIConfigDataUnion *configData)
 {
     configData->multi.VTOLMotorN = 0;

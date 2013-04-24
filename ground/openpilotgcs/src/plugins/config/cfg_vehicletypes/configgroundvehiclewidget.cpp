@@ -186,6 +186,12 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
     }
 }
 
+void ConfigGroundVehicleWidget::registerWidgets(ConfigTaskWidget &parent) {
+    parent.addWidget(m_aircraft->groundVehicleThrottle1->getCurveWidget());
+    parent.addWidget(m_aircraft->groundVehicleThrottle2->getCurveWidget());
+    parent.addWidget(m_aircraft->groundVehicleType);
+}
+
 void ConfigGroundVehicleWidget::resetActuators(GUIConfigDataUnion *configData)
 {
     configData->ground.GroundVehicleSteering1 = 0;

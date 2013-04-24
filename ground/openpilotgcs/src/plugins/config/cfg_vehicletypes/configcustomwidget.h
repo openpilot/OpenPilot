@@ -61,6 +61,7 @@ protected:
 private:
     Ui_CustomConfigWidget *m_aircraft;
 
+    virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);
 
 private slots:

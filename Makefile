@@ -188,8 +188,8 @@ uavobjects_clean:
 # Define some pointers to the various important pieces of the flight code
 # to prevent these being repeated in every sub makefile
 export PIOS          := $(ROOT_DIR)/flight/PiOS
-export FLIGHTLIB     := $(ROOT_DIR)/flight/Libraries
-export OPMODULEDIR   := $(ROOT_DIR)/flight/Modules
+export FLIGHTLIB     := $(ROOT_DIR)/flight/libraries
+export OPMODULEDIR   := $(ROOT_DIR)/flight/modules
 export OPUAVOBJ      := $(ROOT_DIR)/flight/uavobjects
 export OPUAVTALK     := $(ROOT_DIR)/flight/uavtalk
 export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight

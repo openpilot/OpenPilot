@@ -38,7 +38,7 @@ MATHLIB		= $(FLIGHTLIB)/math
 MATHLIBINC	= $(FLIGHTLIB)/math
 
 ## FreeRTOS support
-FREERTOS_DIR	 = $(PIOSCOMMON)/Libraries/FreeRTOS
+FREERTOS_DIR	 = $(PIOSCOMMON)/libraries/FreeRTOS
 include $(FREERTOS_DIR)/library.mk
 
 ## Misc

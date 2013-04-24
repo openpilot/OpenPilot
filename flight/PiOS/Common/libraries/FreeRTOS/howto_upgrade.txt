@@ -52,7 +52,7 @@ add the following function:
 
 it usually is added after the declaration of vTaskGetRunTimeStats.
 
-- STM32F1XX/Libraries/FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h
+- STM32F1XX/libraries/FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h
 add the following define for 
 
 #define portBYTE_HEAP_ALIGNMENT     4 // this value is used to allocate heap
@@ -68,7 +68,7 @@ xPortIncreaseHeapSize function.
 Also it allows for configurable aligments for Heap and Stack allocations.
 
 --- ../op_evo/FreeRTOSV7.4.0/FreeRTOS/Source/portable/MemMang/heap_1.c	2013-04-06 15:04:22.760048534 +0200
-+++ ./flight/PiOS/Common/Libraries/FreeRTOS/Source/portable/MemMang/heap_1.c	2013-04-08 02:23:01.649194752 +0200
++++ ./flight/PiOS/Common/libraries/FreeRTOS/Source/portable/MemMang/heap_1.c	2013-04-08 02:23:01.649194752 +0200
 @@ -92,26 +92,30 @@
  
  #undef MPU_WRAPPERS_INCLUDED_FROM_API_FILE

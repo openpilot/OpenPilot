@@ -49,20 +49,20 @@ OPUAVTALKINC = $(OPUAVTALK)/inc
 OPUAVOBJ = ../../../../uavobjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 PIOSINC = $(PIOS)/inc
-OPMODULEDIR = ../../../../Modules
-FLIGHTLIB = ../../../../Libraries
+OPMODULEDIR = ../../../../modules
+FLIGHTLIB = ../../../../libraries
 FLIGHTLIBINC = $(FLIGHTLIB)/inc
 MATHLIB = $(FLIGHTLIB)/math
 MATHLIBINC = $(FLIGHTLIB)/math
 PIOSPOSIX = $(PIOS)/posix
 PIOSCOMMON = $(PIOS)/posix
-PIOSCOMMONLIB = $(PIOS)/Common/Libraries
+PIOSCOMMONLIB = $(PIOS)/Common/libraries
 BOOT = 
 BOOTINC = 
 UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # optional component libraries
-include $(PIOS)/Common/Libraries/FreeRTOS/library.mk
+include $(PIOS)/Common/libraries/FreeRTOS/library.mk
 include $(FLIGHTLIB)/PyMite/pymite.mk
 
 # List C source files here. (C dependencies are automatically generated.)

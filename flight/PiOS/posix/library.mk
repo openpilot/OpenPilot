@@ -34,21 +34,21 @@ EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/inc
 # CMSIS for the F4
 #
 #include $(PIOSCOMMONLIB)/CMSIS2/library.mk
-#CMSIS2_DEVICEDIR	:=	$(PIOS_DEVLIB)/Libraries/CMSIS2/Device/ST/STM32F4xx
+#CMSIS2_DEVICEDIR	:=	$(PIOS_DEVLIB)/libraries/CMSIS2/Device/ST/STM32F4xx
 #SRC					+=	$(wildcard $(CMSIS2_DEVICEDIR)/Source/*.c)
 #EXTRAINCDIRS		+=	$(CMSIS2_DEVICEDIR)/Include
 
 #
 # ST Peripheral library
 #
-#PERIPHLIB			 =	$(PIOS_DEVLIB)/Libraries/STM32F4xx_StdPeriph_Driver
+#PERIPHLIB			 =	$(PIOS_DEVLIB)/libraries/STM32F4xx_StdPeriph_Driver
 #SRC					+=	$(wildcard $(PERIPHLIB)/src/*.c)
 #EXTRAINCDIRS		+=	$(PERIPHLIB)/inc
 
 #
 # ST USB OTG library
 #
-#USBOTGLIB			=	$(PIOS_DEVLIB)/Libraries/STM32_USB_OTG_Driver
+#USBOTGLIB			=	$(PIOS_DEVLIB)/libraries/STM32_USB_OTG_Driver
 #USBOTGLIB_SRC			=	usb_core.c usb_dcd.c usb_dcd_int.c
 #SRC				+=	$(addprefix $(USBOTGLIB)/src/,$(USBOTGLIB_SRC))
 #EXTRAINCDIRS			+=	$(USBOTGLIB)/inc
@@ -56,7 +56,7 @@ EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/inc
 #
 # ST USB Device library
 #
-#USBDEVLIB			=	$(PIOS_DEVLIB)/Libraries/STM32_USB_Device_Library
+#USBDEVLIB			=	$(PIOS_DEVLIB)/libraries/STM32_USB_Device_Library
 #SRC				+=	$(wildcard $(USBDEVLIB)/Core/src/*.c)
 #EXTRAINCDIRS			+=	$(USBDEVLIB)/Core/inc
 
@@ -67,7 +67,7 @@ EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/inc
 # the device-specific pieces of the code.
 #
 ifneq ($(FREERTOS_DIR),)
-FREERTOS_PORTDIR	:=	$(PIOS_DEVLIB)/Libraries/FreeRTOS/Source
+FREERTOS_PORTDIR	:=	$(PIOS_DEVLIB)/libraries/FreeRTOS/Source
 SRC					+=	$(sort $(wildcard $(FREERTOS_PORTDIR)/portable/GCC/Posix/*.c))
 SRC					+=	$(sort $(wildcard $(FREERTOS_PORTDIR)/portable/MemMang/*.c))
 

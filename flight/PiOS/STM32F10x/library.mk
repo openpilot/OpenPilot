@@ -21,7 +21,7 @@ ASRC			+= $(PIOS_DEVLIB)startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
 SRC			+= $(sort $(wildcard $(PIOS_DEVLIB)*.c))
 
 # CMSIS for the F1
-include $(PIOS)/Common/libraries/CMSIS2/library.mk
+include $(PIOS)/common/libraries/CMSIS2/library.mk
 CMSIS_DIR		= $(PIOS_DEVLIB)libraries/CMSIS/Core/CM3
 SRC			+= $(CMSIS_DIR)/core_cm3.c
 SRC			+= $(CMSIS_DIR)/system_stm32f10x.c

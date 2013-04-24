@@ -33,7 +33,6 @@
 
 
 #include "inc/openpilot.h"
-#include <systemmod.h>
 #include <uavobjectsinit.h>
 
 /* Task Priorities */

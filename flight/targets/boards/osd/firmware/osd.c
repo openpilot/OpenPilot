@@ -32,7 +32,6 @@
 // *****************************************************************************
 
 #include "inc/openpilot.h"
-#include <systemmod.h>
 #include <string.h>
 
 /* Task Priorities */

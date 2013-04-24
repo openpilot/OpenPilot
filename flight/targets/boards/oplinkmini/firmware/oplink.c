@@ -34,7 +34,6 @@
 #include "inc/openpilot.h"
 #include <uavobjectsinit.h>
 #include <hwsettings.h>
-#include <systemmod.h>
 
 /* Task Priorities */
 #define PRIORITY_TASK_HOOKS             (tskIDLE_PRIORITY + 3)

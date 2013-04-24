@@ -46,9 +46,9 @@ OPTESTS		= $(TOPDIR)/Tests
 
 ## PIOS Hardware
 ifeq ($(MCU),cortex-m3)
-    include $(PIOS)/STM32F10x/library.mk
+    include $(PIOS)/stm32f10x/library.mk
 else ifeq ($(MCU),cortex-m4)
-    include $(PIOS)/STM32F4xx/library.mk
+    include $(PIOS)/stm32f4xx/library.mk
 else
     $(error Unsupported MCU: $(MCU))
 endif

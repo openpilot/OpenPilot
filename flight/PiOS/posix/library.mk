@@ -10,11 +10,11 @@ PIOS_DEVLIB			:=	$(dir $(lastword $(MAKEFILE_LIST)))
 #
 # Hardcoded linker script names for now
 #
-#LINKER_SCRIPTS_APP	 =	$(PIOS_DEVLIB)/link_STM32F4xx_OP_memory.ld \
-						$(PIOS_DEVLIB)/link_STM32F4xx_sections.ld
+#LINKER_SCRIPTS_APP	 =	$(PIOS_DEVLIB)/link_stm32f4xx_OP_memory.ld \
+						$(PIOS_DEVLIB)/link_stm32f4xx_sections.ld
 
-#LINKER_SCRIPTS_BL	 =	$(PIOS_DEVLIB)/link_STM32F4xx_BL_memory.ld \
-						$(PIOS_DEVLIB)/link_STM32F4xx_sections.ld
+#LINKER_SCRIPTS_BL	 =	$(PIOS_DEVLIB)/link_stm32f4xx_BL_memory.ld \
+						$(PIOS_DEVLIB)/link_stm32f4xx_sections.ld
 
 #
 # Compiler options implied by the F4xx
@@ -41,7 +41,7 @@ EXTRAINCDIRS		+=	$(PIOS_DEVLIB)/inc
 #
 # ST Peripheral library
 #
-#PERIPHLIB			 =	$(PIOS_DEVLIB)/libraries/STM32F4xx_StdPeriph_Driver
+#PERIPHLIB			 =	$(PIOS_DEVLIB)/libraries/stm32f4xx_StdPeriph_Driver
 #SRC					+=	$(wildcard $(PERIPHLIB)/src/*.c)
 #EXTRAINCDIRS		+=	$(PERIPHLIB)/inc
 

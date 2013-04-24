@@ -105,9 +105,6 @@ void VehicleConfig::setupUI(QString frameType)
     Q_UNUSED(frameType);
 }
 
-//void VehicleConfig::refreshWidgetsValues(UAVObject *o = NULL)
-//void VehicleConfig::updateObjectsFromWidgets()
-
 void VehicleConfig::refreshWidgetsValues(QString frameType)
 {
     Q_UNUSED(frameType);
@@ -115,7 +112,17 @@ void VehicleConfig::refreshWidgetsValues(QString frameType)
 
 QString VehicleConfig::updateConfigObjectsFromWidgets()
 {
-    return QString();
+    return NULL;
+}
+
+void VehicleConfig::refreshWidgetsValues(UAVObject *o)
+{
+    Q_UNUSED(o);
+}
+
+void VehicleConfig::updateObjectsFromWidgets()
+{
+
 }
 
 void VehicleConfig::resetActuators(GUIConfigDataUnion *configData)

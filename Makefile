@@ -781,6 +781,28 @@ package: all_fw all_ground uavobjects_matlab
 
 ##############################
 #
+# Source code formatting
+#
+##############################
+
+# $(1) = Uncrustify target (e.g flight or ground)
+# $(2) = Target root directory
+define UNCRUSTIFY_TEMPLATE
+
+.PHONY: uncrustify_$(1)
+uncrustify_$(1):
+	@$(ECHO) "Auto-formatting $(1) source code"
+	$(V1) UNCRUSTIFY_CONFIG="make/templates/uncrustify.cfg" $(SHELL) make/scripts/uncrustify.sh $(call toprel, $(2))
+endef
+
+$(eval $(call UNCRUSTIFY_TEMPLATE,flight,$(ROOT_DIR)/flight))
+$(eval $(call UNCRUSTIFY_TEMPLATE,ground,$(ROOT_DIR)/ground))
+
+.PHONY: uncrustify_all
+uncrustify_all: $(addprefix uncrustify_,flight ground)
+
+##############################
+#
 # Build info
 #
 ##############################
@@ -814,6 +836,7 @@ help:
 	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
 	@$(ECHO) "     mingw_install        - Install the MinGW toolchain (Windows only)"
 	@$(ECHO) "     python_install       - Install the Python interpreter (Windows only)"
+	@$(ECHO) "     uncrustify_install   - Install the Uncrustify source code beautifier"
 	@$(ECHO) "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@$(ECHO) "     stm32flash_install   - Install the stm32flash tool for unbricking F1-based boards"
 	@$(ECHO) "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
@@ -907,6 +930,10 @@ help:
 	@$(ECHO) "     opfw_resource        - Generate resources to embed firmware binaries into the GCS"
 	@$(ECHO) "     clean_package        - Clean, build and package the OpenPilot platform-dependent package"
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package"
+	@$(ECHO)
+	@$(ECHO) "   [Code Formatting]"
+	@$(ECHO) "     uncrustify_<source>  - Reformat <source> code. <source> can be flight or ground"
+	@$(ECHO) "     uncrustify_all       - Reformat all source code"
 	@$(ECHO)
 	@$(ECHO) "   Hint: Add V=1 to your command line to see verbose build output."
 	@$(ECHO)

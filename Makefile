@@ -192,7 +192,6 @@ export FLIGHTLIB     := $(ROOT_DIR)/flight/Libraries
 export OPMODULEDIR   := $(ROOT_DIR)/flight/Modules
 export OPUAVOBJ      := $(ROOT_DIR)/flight/uavobjects
 export OPUAVTALK     := $(ROOT_DIR)/flight/uavtalk
-export DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
 export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 
@@ -814,6 +813,18 @@ build-info:
 		--uavodir=$(ROOT_DIR)/shared/uavobjectdefinition \
 		--template="make/templates/$@.txt" \
 		--outfile="$(BUILD_DIR)/$@.txt"
+
+##############################
+#
+# Doxygen documentation
+# FIXME: currently is not not used and should be updated
+#
+##############################
+
+# Generate Doxygen documentation
+.PHONY: docs
+docs:
+	$(DOXYGEN) $(ROOT_DIR)/make/doxygen/doxygen.cfg
 
 ##############################
 #

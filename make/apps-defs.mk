@@ -42,7 +42,6 @@ FREERTOS_DIR	 = $(PIOSCOMMON)/Libraries/FreeRTOS
 include $(FREERTOS_DIR)/library.mk
 
 ## Misc
-DOXYGENDIR	= $(ROOT_DIR)/flight/Doc/Doxygen
 OPTESTS		= $(TOPDIR)/Tests
 
 ## PIOS Hardware

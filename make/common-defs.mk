@@ -240,10 +240,6 @@ opfw: $(OUTDIR)/$(TARGET).opfw
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
 
-# Generate Doxygen documents
-docs:
-	doxygen  $(DOXYGENDIR)/doxygen.cfg
-
 # Target: clean project
 clean:
 	@echo $(MSG_CLEANING)

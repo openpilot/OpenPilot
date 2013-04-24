@@ -791,7 +791,7 @@ define UNCRUSTIFY_TEMPLATE
 .PHONY: uncrustify_$(1)
 uncrustify_$(1):
 	@$(ECHO) "Auto-formatting $(1) source code"
-	$(V1) UNCRUSTIFY_CONFIG="make/templates/uncrustify.cfg" $(SHELL) make/scripts/uncrustify.sh $(call toprel, $(2))
+	$(V1) UNCRUSTIFY_CONFIG="$(ROOT_DIR)/make/uncrustify/uncrustify.cfg" $(SHELL) make/scripts/uncrustify.sh $(call toprel, $(2))
 endef
 
 $(eval $(call UNCRUSTIFY_TEMPLATE,flight,$(ROOT_DIR)/flight))

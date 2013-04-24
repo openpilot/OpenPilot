@@ -119,7 +119,7 @@ JAVAC		:= javac
 JAR		:= jar
 GIT		:= git
 CURL		:= curl
-MD5		:= openssl dgst -md5
+OPENSSL		:= openssl
 
 # Echo in recipes is a bit tricky in a Windows Git Bash window in some cases.
 # It does not work if make started under msysGit installed into a path with spaces.
@@ -185,6 +185,17 @@ endif
 
 ##############################
 #
+# Cross-platform MD5 check template
+#  $(1) = file name without quotes
+#  $(2) = string compare operator, e.g. = or !=
+#
+##############################
+define MD5_CHECK_TEMPLATE
+"`test -f \"$(1)\" && $(OPENSSL) dgst -md5 \"$(1)\" | $(CUT) -f2 -d' '`" $(2) "`$(CUT) -f1 -d' ' < \"$(1).md5\"`"
+endef
+
+##############################
+#
 # Common tool install template
 #  $(1) = tool name
 #  $(2) = tool extract/build directory
@@ -204,13 +215,13 @@ $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) ( \
 		cd "$(DL_DIR)" && \
 		$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4).md5" "$(3).md5" && \
-		if [ x`$(MD5) < "$(DL_DIR)/$(4)"` != x`$(CUT) -f1 -d' ' < "$(DL_DIR)/$(4).md5"` ]; then \
+		if [ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(4),!=) ]; then \
 			$(ECHO) $(MSG_DOWNLOADING) $(3) && \
 			$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4)" "$(3)" && \
 			$(ECHO) $(MSG_CHECKSUMMING) $$(call toprel, $(DL_DIR)/$(4)) && \
-			[ x`$(MD5) < "$(DL_DIR)/$(4)"` = x`$(CUT) -f1 -d' ' < "$(DL_DIR)/$(4).md5"` ]; \
+			[ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(4),=) ]; \
 		fi; \
-	) 2>/dev/null
+	)
 
 	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))

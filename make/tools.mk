@@ -587,8 +587,8 @@ openocd_win_clean:
 .PHONY: openocd_git_install
 
 openocd_git_install: | $(DL_DIR) $(TOOLS_DIR)
-openocd_git_install: OPENOCD_URL  := git://openocd.git.sourceforge.net/gitroot/openocd/openocd
-openocd_git_install: OPENOCD_REV  := f1c0133321c8fcadadd10bba5537c0a634eb183b
+openocd_git_install: OPENOCD_URL  := git://git.code.sf.net/p/openocd/code
+openocd_git_install: OPENOCD_REV  := 4a590e0b56ee1e2aa2a80711696abb2d3160afb7
 openocd_git_install: openocd_clean
         # download the source
 	$(V0) @echo " DOWNLOAD     $(OPENOCD_URL) @ $(OPENOCD_REV)"
@@ -599,13 +599,11 @@ openocd_git_install: openocd_clean
 	  cd $(OPENOCD_BUILD_DIR) ; \
 	  git checkout -q $(OPENOCD_REV) ; \
 	)
-
         # apply patches
 	$(V0) @echo " PATCH        $(OPENOCD_DIR)"
 	$(V1) ( \
 	  cd $(OPENOCD_BUILD_DIR) ; \
-	  git apply < $(ROOT_DIR)/flight/Project/OpenOCD/0001-armv7m-remove-dummy-FP-regs-for-new-gdb.patch ; \
-	  git apply < $(ROOT_DIR)/flight/Project/OpenOCD/0002-rtos-add-stm32_stlink-to-FreeRTOS-targets.patch ; \
+	  git apply < $(ROOT_DIR)/flight/Project/OpenOCD/0003-rtos-for-stm32_stlink-targets.patch ; \
 	)
 
         # build and install
@@ -614,7 +612,7 @@ openocd_git_install: openocd_clean
 	$(V1) ( \
 	  cd $(OPENOCD_BUILD_DIR) ; \
 	  ./bootstrap ; \
-	  ./configure --enable-maintainer-mode --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-buspirate --enable-stlink ; \
+	  ./configure --enable-maintainer-mode --prefix="$(OPENOCD_DIR)" --enable-ft2232_libftdi --enable-stlink ; \
 	  $(MAKE) ; \
 	  $(MAKE) install ; \
 	)

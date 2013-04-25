@@ -23,10 +23,10 @@ endif
 # Paths
 TOPDIR		= .
 OPSYSTEM	= $(TOPDIR)
+BOARDINC	= $(TOPDIR)/..
 OPSYSTEMINC	= $(OPSYSTEM)/inc
 PIOSINC		= $(PIOS)/inc
 PIOSCOMMON	= $(PIOS)/Common
-PIOSBOARDS	= $(PIOS)/Boards
 FLIGHTLIBINC	= $(FLIGHTLIB)/inc
 
 # ARM DSP library
@@ -45,18 +45,19 @@ endif
 # Use file-extension c for "c-only"-files
 
 ## Bootloader Core
+SRC += ../pios_usb_board_data.c
 SRC += $(OPSYSTEM)/main.c
 SRC += $(OPSYSTEM)/pios_board.c
-SRC += $(OPSYSTEM)/pios_usb_board_data.c
-SRC += $(OPSYSTEM)/op_dfu.c
 
 ## PIOS Hardware (Common)
 SRC += $(PIOSCOMMON)/pios_board_info.c
 SRC += $(PIOSCOMMON)/pios_com_msg.c
+SRC += $(PIOSCOMMON)/pios_iap.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 SRC += $(PIOSCOMMON)/pios_usb_util.c
 
 ## Misc library functions
+SRC += $(FLIGHTLIB)/op_dfu.c
 SRC += $(FLIGHTLIB)/printf-stdarg.c
 
 # List C source files here which must be compiled in ARM-Mode (no -mthumb).
@@ -87,10 +88,9 @@ ASRCARM +=
 #    Each directory must be seperated by a space.
 EXTRAINCDIRS += $(PIOS)
 EXTRAINCDIRS += $(PIOSINC)
+EXTRAINCDIRS += $(BOARDINC)
 EXTRAINCDIRS += $(FLIGHTLIBINC)
 EXTRAINCDIRS += $(PIOSCOMMON)
-EXTRAINCDIRS += $(PIOSBOARDS)
-EXTRAINCDIRS += $(HWDEFSINC)
 EXTRAINCDIRS += $(OPSYSTEMINC)
 
 # List any extra directories to look for library files here.

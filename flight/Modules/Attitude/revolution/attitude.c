@@ -70,14 +70,11 @@
 #include "revosettings.h"
 #include "velocityactual.h"
 #include "CoordinateConversions.h"
-
+#include <pios_math.h>
 // Private constants
 #define STACK_SIZE_BYTES 2048
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
 #define FAILSAFE_TIMEOUT_MS 10
-
-#define F_PI 3.14159265358979323846f
-#define PI_MOD(x) (fmodf(x + F_PI, F_PI * 2) - F_PI)
 
 // low pass filter configuration to calculate offset
 // of barometric altitude sensor
@@ -303,9 +300,9 @@ static int32_t updateAttitudeComplementary(bool first_run)
 		AttitudeActualData attitudeActual;
 		AttitudeActualGet(&attitudeActual);
 		init = 0;
-		attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
-		attitudeActual.Pitch = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
-		attitudeActual.Yaw = atan2f(-magData.y, magData.x) * 180.0f / F_PI;
+		attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z) * 180.0f / M_PI_F;
+		attitudeActual.Pitch = atan2f(accelsData.x, -accelsData.z) * 180.0f / M_PI_F;
+		attitudeActual.Yaw = atan2f(-magData.y, magData.x) * 180.0f / M_PI_F;
 
 		RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
 		AttitudeActualSet(&attitudeActual);
@@ -415,10 +412,10 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	// Work out time derivative from INSAlgo writeup
 	// Also accounts for the fact that gyros are in deg/s
 	float qdot[4];
-	qdot[0] = (-q[1] * gyrosData.x - q[2] * gyrosData.y - q[3] * gyrosData.z) * dT * F_PI / 180 / 2;
-	qdot[1] = (q[0] * gyrosData.x - q[3] * gyrosData.y + q[2] * gyrosData.z) * dT * F_PI / 180 / 2;
-	qdot[2] = (q[3] * gyrosData.x + q[0] * gyrosData.y - q[1] * gyrosData.z) * dT * F_PI / 180 / 2;
-	qdot[3] = (-q[2] * gyrosData.x + q[1] * gyrosData.y + q[0] * gyrosData.z) * dT * F_PI / 180 / 2;
+	qdot[0] = (-q[1] * gyrosData.x - q[2] * gyrosData.y - q[3] * gyrosData.z) * dT * M_PI_F / 180 / 2;
+	qdot[1] = (q[0] * gyrosData.x - q[3] * gyrosData.y + q[2] * gyrosData.z) * dT * M_PI_F / 180 / 2;
+	qdot[2] = (q[3] * gyrosData.x + q[0] * gyrosData.y - q[1] * gyrosData.z) * dT * M_PI_F / 180 / 2;
+	qdot[3] = (-q[2] * gyrosData.x + q[1] * gyrosData.y + q[0] * gyrosData.z) * dT * M_PI_F / 180 / 2;
 
 	// Take a time step
 	q[0] = q[0] + qdot[0];
@@ -641,7 +638,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			INSSetBaroVar(revoCalibration.baro_var);
 
 			// Initialize the gyro bias from the settings
-			float gyro_bias[3] = {gyrosBias.x * F_PI / 180.0f, gyrosBias.y * F_PI / 180.0f, gyrosBias.z * F_PI / 180.0f};
+			float gyro_bias[3] = {gyrosBias.x * M_PI_F / 180.0f, gyrosBias.y * M_PI_F / 180.0f, gyrosBias.z * M_PI_F / 180.0f};
 			INSSetGyroBias(gyro_bias);
 
 			xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
@@ -649,9 +646,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 			// Set initial attitude
 			AttitudeActualData attitudeActual;
-			attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
-			attitudeActual.Pitch = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
-			attitudeActual.Yaw = atan2f(-magData.y, magData.x) * 180.0f / F_PI;
+			attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z) * 180.0f / M_PI_F;
+			attitudeActual.Pitch = atan2f(accelsData.x, -accelsData.z) * 180.0f / M_PI_F;
+			attitudeActual.Yaw = atan2f(-magData.y, magData.x) * 180.0f / M_PI_F;
 			RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
 			AttitudeActualSet(&attitudeActual);
 
@@ -676,7 +673,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			INSSetMagNorth(homeLocation.Be);
 
 			// Initialize the gyro bias from the settings
-			float gyro_bias[3] = {gyrosBias.x * F_PI / 180.0f, gyrosBias.y * F_PI / 180.0f, gyrosBias.z * F_PI / 180.0f};
+			float gyro_bias[3] = {gyrosBias.x * M_PI_F / 180.0f, gyrosBias.y * M_PI_F / 180.0f, gyrosBias.z * M_PI_F / 180.0f};
 			INSSetGyroBias(gyro_bias);
 
 			GPSPositionData gpsPosition;
@@ -693,9 +690,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 			// Set initial attitude
 			AttitudeActualData attitudeActual;
-			attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z) * 180.0f / F_PI;
-			attitudeActual.Pitch = atan2f(accelsData.x, -accelsData.z) * 180.0f / F_PI;
-			attitudeActual.Yaw = atan2f(-magData.y, magData.x) * 180.0f / F_PI;
+			attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z) * 180.0f / M_PI_F;
+			attitudeActual.Pitch = atan2f(accelsData.x, -accelsData.z) * 180.0f / M_PI_F;
+			attitudeActual.Yaw = atan2f(-magData.y, magData.x) * 180.0f / M_PI_F;
 			RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
 			AttitudeActualSet(&attitudeActual);
 
@@ -711,9 +708,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			dT = PIOS_DELAY_DiffuS(ins_last_time) / 1.0e6f;
 
 			GyrosBiasGet(&gyrosBias);
-			float gyros[3] = {(gyrosData.x + gyrosBias.x) * F_PI / 180.0f, 
-				(gyrosData.y + gyrosBias.y) * F_PI / 180.0f, 
-				(gyrosData.z + gyrosBias.z) * F_PI / 180.0f};
+			float gyros[3] = {(gyrosData.x + gyrosBias.x) * M_PI_F / 180.0f,
+				(gyrosData.y + gyrosBias.y) * M_PI_F / 180.0f,
+				(gyrosData.z + gyrosBias.z) * M_PI_F / 180.0f};
 			INSStatePrediction(gyros, &accelsData.x, dT);
 			
 			AttitudeActualData attitude;
@@ -750,18 +747,18 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	// If the gyro bias setting was updated we should reset
 	// the state estimate of the EKF
 	if(gyroBiasSettingsUpdated) {
-		float gyro_bias[3] = {gyrosBias.x * F_PI / 180.0f, gyrosBias.y * F_PI / 180.0f, gyrosBias.z * F_PI / 180.0f};
+		float gyro_bias[3] = {gyrosBias.x * M_PI_F / 180.0f, gyrosBias.y * M_PI_F / 180.0f, gyrosBias.z * M_PI_F / 180.0f};
 		INSSetGyroBias(gyro_bias);
 		gyroBiasSettingsUpdated = false;
 	}
 
 	// Because the sensor module remove the bias we need to add it
 	// back in here so that the INS algorithm can track it correctly
-	float gyros[3] = {gyrosData.x * F_PI / 180.0f, gyrosData.y * F_PI / 180.0f, gyrosData.z * F_PI / 180.0f};
+	float gyros[3] = {gyrosData.x * M_PI_F / 180.0f, gyrosData.y * M_PI_F / 180.0f, gyrosData.z * M_PI_F / 180.0f};
 	if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
-		gyros[0] += gyrosBias.x * F_PI / 180.0f;
-		gyros[1] += gyrosBias.y * F_PI / 180.0f;
-		gyros[2] += gyrosBias.z * F_PI / 180.0f;
+		gyros[0] += gyrosBias.x * M_PI_F / 180.0f;
+		gyros[1] += gyrosBias.y * M_PI_F / 180.0f;
+		gyros[2] += gyrosBias.z * M_PI_F / 180.0f;
 	}
 
 	// Advance the state estimate
@@ -795,8 +792,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 		if (0) { // Old code to take horizontal velocity from GPS Position update
 			sensors |= HORIZ_SENSORS;
-			vel[0] = gpsData.Groundspeed * cosf(gpsData.Heading * F_PI / 180.0f);
-			vel[1] = gpsData.Groundspeed * sinf(gpsData.Heading * F_PI / 180.0f);
+			vel[0] = gpsData.Groundspeed * cosf(gpsData.Heading * M_PI_F / 180.0f);
+			vel[1] = gpsData.Groundspeed * sinf(gpsData.Heading * M_PI_F / 180.0f);
 			vel[2] = 0;
 		}
 		// Transform the GPS position into NED coordinates
@@ -870,9 +867,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		// Copy the gyro bias into the UAVO except when it was updated
 		// from the settings during the calculation, then consume it
 		// next cycle
-		gyrosBias.x = Nav.gyro_bias[0] * 180.0f / F_PI;
-		gyrosBias.y = Nav.gyro_bias[1] * 180.0f / F_PI;
-		gyrosBias.z = Nav.gyro_bias[2] * 180.0f / F_PI;
+		gyrosBias.x = Nav.gyro_bias[0] * 180.0f / M_PI_F;
+		gyrosBias.y = Nav.gyro_bias[1] * 180.0f / M_PI_F;
+		gyrosBias.z = Nav.gyro_bias[2] * 180.0f / M_PI_F;
 		GyrosBiasSet(&gyrosBias);
 	}
 

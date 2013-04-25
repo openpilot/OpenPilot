@@ -55,7 +55,7 @@ int stabilization_virtual_flybar(float gyro, float command, float *output, float
 
 	// Command signal can indicate how much to disregard the gyro feedback (fast flips)
 	if (settings->VbarGyroSuppress > 0) {
-		gyro_gain = (1.0f - fabs(command) * settings->VbarGyroSuppress / 100.0f);
+		gyro_gain = (1.0f - fabsf(command) * settings->VbarGyroSuppress / 100.0f);
 		gyro_gain = (gyro_gain < 0) ? 0 : gyro_gain;
 	}
 

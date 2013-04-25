@@ -63,7 +63,7 @@
 				65904F1E14632C1700FD9482 /* esc */,
 				65904F1F14632C1700FD9482 /* ins */,
 				65904F2014632C1700FD9482 /* openpilot */,
-				65904F2114632C1700FD9482 /* pipxtreme */,
+				65904F2114632C1700FD9482 /* oplink */,
 			);
 			path = boards;
 			sourceTree = "<group>";
@@ -136,12 +136,12 @@
 			path = openpilot;
 			sourceTree = "<group>";
 		};
-		65904F2114632C1700FD9482 /* pipxtreme */ = {
+		65904F2114632C1700FD9482 /* oplink */ = {
 			isa = PBXGroup;
 			children = (
 				65904F2714632C1700FD9482 /* board-info.mk */,
 			);
-			path = pipxtreme;
+			path = oplink;
 			sourceTree = "<group>";
 		};
 		65904F2B14632C1700FD9482 /* bin */ = {

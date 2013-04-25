@@ -94,7 +94,7 @@ static void path_endpoint(float * start_point, float * end_point, float * cur_po
     dist_diff = sqrtf(diff_north * diff_north + diff_east * diff_east);
     dist_path = sqrtf(path_north * path_north + path_east * path_east);
 
-    if (dist_diff < 1e-6) {
+	if (dist_diff < 1e-6f ) {
         status->fractional_progress = 1;
         status->error = 0;
         status->path_direction[0] = status->path_direction[1] = 0;
@@ -135,7 +135,7 @@ static void path_vector(float * start_point, float * end_point, float * cur_poin
     dot = path_north * diff_north + path_east * diff_east;
     dist_path = sqrtf(path_north * path_north + path_east * path_east);
 
-    if (dist_path < 1e-6) {
+	if (dist_path < 1e-6f){
         // if the path is too short, we cannot determine vector direction.
         // Fly towards the endpoint to prevent flying away,
         // but assume progress=1 either way.
@@ -190,7 +190,7 @@ static void path_circle(float * start_point, float * end_point, float * cur_poin
     radius = sqrtf(powf(radius_north, 2) + powf(radius_east, 2));
     cradius = sqrtf(powf(diff_north, 2) + powf(diff_east, 2));
 
-    if (cradius < 1e-6) {
+	if (cradius < 1e-6f) {
         // cradius is zero, just fly somewhere and make sure correction is still a normal
         status->fractional_progress = 1;
         status->error = radius;

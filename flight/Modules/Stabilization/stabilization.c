@@ -305,7 +305,7 @@ static void stabilizationTask(void* parameters)
 					if (reinit)
 						pids[PID_RATE_ROLL + i].iAccumulator = 0;
 
-					if(fabs(attitudeDesiredAxis[i]) > max_axislock_rate) {
+					if(fabsf(attitudeDesiredAxis[i]) > max_axislock_rate) {
 						// While getting strong commands act like rate mode
 						rateDesiredAxis[i] = attitudeDesiredAxis[i];
 						axis_lock_accum[i] = 0;
@@ -494,7 +494,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	// update rates on OP (~300 Hz) and CC (~475 Hz) is negligible for this
 	// calculation
 	const float fakeDt = 0.0025;
-	if(settings.GyroTau < 0.0001)
+	if(settings.GyroTau < 0.0001f)
 		gyro_alpha = 0;   // not trusting this to resolve to 0
 	else
 		gyro_alpha = expf(-fakeDt  / settings.GyroTau);

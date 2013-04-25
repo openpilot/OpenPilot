@@ -295,7 +295,7 @@ void applyFeedForward(uint8_t index, float dT_millis, float *attitude, CameraSta
 		if (index == CAMERASTABSETTINGS_INPUT_ROLL) {
 			float pitch;
 			AttitudeActualPitchGet(&pitch);
-			gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH] - fabs(pitch))
+			gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH] - fabsf(pitch))
 							/ cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH];
 		}
 		break;
@@ -303,7 +303,7 @@ void applyFeedForward(uint8_t index, float dT_millis, float *attitude, CameraSta
 		if (index == CAMERASTABSETTINGS_INPUT_PITCH) {
 			float roll;
 			AttitudeActualRollGet(&roll);
-			gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL] - fabs(roll))
+			gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL] - fabsf(roll))
 							/ cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL];
 		}
 		break;

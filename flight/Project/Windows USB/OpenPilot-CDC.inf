@@ -10,11 +10,11 @@ DriverVer=10/15/2009,1.0.0.0
 
 [DeviceList.NTx86]
 %CopterControl%= DriverInstall,USB\VID_20A0&PID_415b&MI_00
-%PipXtreme%= DriverInstall,USB\VID_20A0&PID_415c&MI_00
+%OPLink%= DriverInstall,USB\VID_20A0&PID_415c&MI_00
 
 [DeviceList.NTamd64]
 %CopterControl%= DriverInstall,USB\VID_20A0&PID_415b&MI_00
-%PipXtreme%= DriverInstall,USB\VID_20A0&PID_415c&MI_00
+%OPLink%= DriverInstall,USB\VID_20A0&PID_415c&MI_00
 
 [DriverInstall]
 include=mdmcpq.inf
@@ -32,4 +32,4 @@ HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
 [Strings]
 ProviderName = "CDC Driver"
 CopterControl = "OpenPilot CDC Driver"
-PipXtreme = "OpenPilot CDC Driver"
+OPLink = "OpenPilot CDC Driver"

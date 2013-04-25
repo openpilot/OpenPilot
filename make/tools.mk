@@ -11,6 +11,7 @@
 #    qt_sdk_install
 #    mingw_install (Windows only)
 #    python_install (Windows only)
+#    uncrustify_install
 #
 # TODO:
 #    openocd_install
@@ -59,14 +60,17 @@ ifeq ($(UNAME), Linux)
         ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-i686.tar.bz2
         QT_SDK_URL  := "Please install native Qt 4.8.x SDK using package manager"
     endif
+    UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
 else ifeq ($(UNAME), Darwin)
-    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-mac.tar.bz2
-    QT_SDK_URL  := "Please install native Qt 4.8.x SDK using package manager"
+    ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-mac.tar.bz2
+    QT_SDK_URL     := "Please install native Qt 4.8.x SDK using package manager"
+    UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
 else ifeq ($(UNAME), Windows)
-    ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
-    QT_SDK_URL  := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-windows.tar.bz2
-    MINGW_URL   := http://wiki.openpilot.org/download/attachments/18612236/mingw-4.4.0.tar.bz2
-    PYTHON_URL  := http://wiki.openpilot.org/download/attachments/18612236/python-2.7.4-windows.tar.bz2
+    ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
+    QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-windows.tar.bz2
+    MINGW_URL      := http://wiki.openpilot.org/download/attachments/18612236/mingw-4.4.0.tar.bz2
+    PYTHON_URL     := http://wiki.openpilot.org/download/attachments/18612236/python-2.7.4-windows.tar.bz2
+    UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
 endif
 
 # Changing PYTHON_DIR, also update it in ground\openpilotgcs\src\app\gcsversioninfo.pri
@@ -74,6 +78,7 @@ ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-4.8.4
 MINGW_DIR       := $(TOOLS_DIR)/mingw-4.4.0
 PYTHON_DIR      := $(TOOLS_DIR)/python-2.7.4
+UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 
 ##############################
 #
@@ -81,7 +86,7 @@ PYTHON_DIR      := $(TOOLS_DIR)/python-2.7.4
 #
 ##############################
 
-ALL_SDK_TARGETS := arm_sdk qt_sdk
+ALL_SDK_TARGETS := arm_sdk qt_sdk uncrustify
 ifeq ($(UNAME), Windows)
     ALL_SDK_TARGETS += mingw python
 endif
@@ -98,20 +103,23 @@ all_sdk_version:   $(addsuffix _version,$(ALL_SDK_TARGETS))
 #
 ##############################
 
+# Used by other makefiles
 export MKDIR	:= mkdir
 export CP	:= cp
 export RM	:= rm
 export LN	:= ln
 export CAT	:= cat
+export CUT	:= cut
 export SED	:= sed
-export TAR	:= tar
-export ANT	:= ant
-export JAVAC	:= javac
-export JAR	:= jar
-export GIT	:= git
-export CURL	:= curl
-export INSTALL	:= install
-export MD5SUM	:= md5sum
+
+# Used only by this Makefile
+TAR		:= tar
+ANT		:= ant
+JAVAC		:= javac
+JAR		:= jar
+GIT		:= git
+CURL		:= curl
+OPENSSL		:= openssl
 
 # Echo in recipes is a bit tricky in a Windows Git Bash window in some cases.
 # It does not work if make started under msysGit installed into a path with spaces.
@@ -144,8 +152,9 @@ MSG_VERIFYING        = $(QUOTE) VERIFY     $(QUOTE)
 MSG_DOWNLOADING      = $(QUOTE) DOWNLOAD   $(QUOTE)
 MSG_CHECKSUMMING     = $(QUOTE) MD5        $(QUOTE)
 MSG_EXTRACTING       = $(QUOTE) EXTRACT    $(QUOTE)
-MSG_INSTALLING       = $(QUOTE) INSTALL    $(QUOTE)
 MSG_CONFIGURING      = $(QUOTE) CONFIGURE  $(QUOTE)
+MSG_BUILDING         = $(QUOTE) BUILD      $(QUOTE)
+MSG_INSTALLING       = $(QUOTE) INSTALL    $(QUOTE)
 MSG_CLEANING         = $(QUOTE) CLEAN      $(QUOTE)
 MSG_DISTCLEANING     = $(QUOTE) DISTCLEAN  $(QUOTE)
 MSG_NOTICE           = $(QUOTE) NOTE       $(QUOTE)
@@ -176,13 +185,24 @@ endif
 
 ##############################
 #
+# Cross-platform MD5 check template
+#  $(1) = file name without quotes
+#  $(2) = string compare operator, e.g. = or !=
+#
+##############################
+define MD5_CHECK_TEMPLATE
+"`test -f \"$(1)\" && $(OPENSSL) dgst -md5 \"$(1)\" | $(CUT) -f2 -d' '`" $(2) "`$(CUT) -f1 -d' ' < \"$(1).md5\"`"
+endef
+
+##############################
+#
 # Common tool install template
 #  $(1) = tool name
-#  $(2) = tool install directory
+#  $(2) = tool extract/build directory
 #  $(3) = tool distribution URL
 #  $(4) = tool distribution file
-#  $(5) = optional pre-fetch template
-#  $(6) = optional post-extract template
+#  $(5) = optional extra build recipes template
+#  $(6) = optional extra clean recipes template
 #
 ##############################
 
@@ -191,31 +211,32 @@ define TOOL_INSTALL_TEMPLATE
 .PHONY: $(addprefix $(1)_, install clean distclean)
 
 $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
-	$(5)
-
 	@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(4))
 	$(V1) ( \
 		cd "$(DL_DIR)" && \
 		$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4).md5" "$(3).md5" && \
-		if ! $(MD5SUM) -c --status "$(DL_DIR)/$(4).md5" 2>/dev/null; then \
+		if [ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(4),!=) ]; then \
 			$(ECHO) $(MSG_DOWNLOADING) $(3) && \
 			$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4)" "$(3)" && \
 			$(ECHO) $(MSG_CHECKSUMMING) $$(call toprel, $(DL_DIR)/$(4)) && \
-			$(MD5SUM) -c --status "$(DL_DIR)/$(4).md5" 2>/dev/null; \
+			[ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(4),=) ]; \
 		fi; \
 	)
 
 	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
-	$(V1) $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(TOOLS_DIR)) -xjf $$(call toprel, $(DL_DIR)/$(4))
+	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
+	$(V1) $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(dir $(2))) -xf $$(call toprel, $(DL_DIR)/$(4))
 
-	$(6)
+	$(5)
 
 $(1)_clean:
 	@$(ECHO) $(MSG_CLEANING) $$(call toprel, $(2))
 	$(V1) [ ! -d "$(2)" ] || $(RM) -rf "$(2)"
 
+	$(6)
+
 $(1)_distclean:
-	@$(ECHO) $(MSG_DISTCLEANING) $$(call toprel, $$@)
+	@$(ECHO) $(MSG_DISTCLEANING) $$(call toprel, $(DL_DIR)/$(4))
 	$(V1) [ ! -f "$(DL_DIR)/$(4)" ]     || $(RM) "$(DL_DIR)/$(4)"
 	$(V1) [ ! -f "$(DL_DIR)/$(4).md5" ] || $(RM) "$(DL_DIR)/$(4).md5"
 
@@ -239,7 +260,7 @@ endif
 
 .PHONY: arm_sdk_version
 arm_sdk_version:
-	$(V1) $(ARM_SDK_PREFIX)gcc --version | head -n1
+	-$(V1) $(ARM_SDK_PREFIX)gcc --version | head -n1
 
 # Template to check ARM toolchain version before building targets
 define ARM_GCC_VERSION_CHECK_TEMPLATE
@@ -260,15 +281,15 @@ endef
 #
 ##############################
 
+ifeq ($(UNAME), Windows)
+
 define QT_SDK_CONFIGURE_TEMPLATE
 	@$(ECHO) $(MSG_CONFIGURING) $(call toprel, $(QT_SDK_DIR))
 	$(V1) $(ECHO) $(QUOTE)[Paths]$(QUOTE) > $(QT_SDK_DIR)/bin/qt.conf
 	$(V1) $(ECHO) $(QUOTE)Prefix = $(QT_SDK_DIR)$(QUOTE) >> $(QT_SDK_DIR)/bin/qt.conf
 endef
 
-ifeq ($(UNAME), Windows)
-
-    $(eval $(call TOOL_INSTALL_TEMPLATE,qt_sdk,$(QT_SDK_DIR),$(QT_SDK_URL),$(notdir $(QT_SDK_URL)),,$(QT_SDK_CONFIGURE_TEMPLATE)))
+    $(eval $(call TOOL_INSTALL_TEMPLATE,qt_sdk,$(QT_SDK_DIR),$(QT_SDK_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_CONFIGURE_TEMPLATE)))
 
 else
 
@@ -303,7 +324,7 @@ endif
 
 .PHONY: qt_sdk_version
 qt_sdk_version:
-	$(V1) $(QMAKE) --version | tail -1
+	-$(V1) $(QMAKE) --version | tail -1
 
 ##############################
 #
@@ -326,7 +347,7 @@ endif
 
 .PHONY: mingw_version
 mingw_version:
-	$(V1) gcc --version | head -n1
+	-$(V1) gcc --version | head -n1
 
 .PHONY: gcc_version
 gcc_version: mingw_version
@@ -337,7 +358,7 @@ all_sdk_version: gcc_version
 
 .PHONY: gcc_version
 gcc_version:
-	$(V1) gcc --version | head -n1
+	-$(V1) gcc --version | head -n1
 
 endif
 
@@ -368,9 +389,55 @@ endif
 
 .PHONY: python_version
 python_version:
-	$(V1) $(PYTHON) --version
+	-$(V1) $(PYTHON) --version
 
+##############################
+#
+# Uncrustify
+#
+##############################
 
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,uncrustify,$(UNCRUSTIFY_DIR),$(UNCRUSTIFY_URL),$(notdir $(UNCRUSTIFY_URL))))
+
+else # Linux or Mac
+
+UNCRUSTIFY_BUILD_DIR := $(BUILD_DIR)/$(notdir $(UNCRUSTIFY_DIR))
+
+define UNCRUSTIFY_BUILD_TEMPLATE
+	$(V1) ( \
+		$(ECHO) $(MSG_CONFIGURING) $(call toprel, $(UNCRUSTIFY_BUILD_DIR)) && \
+		cd $(UNCRUSTIFY_BUILD_DIR) && \
+		./configure --prefix="$(UNCRUSTIFY_DIR)" && \
+		$(ECHO) $(MSG_BUILDING) $(call toprel, $(UNCRUSTIFY_BUILD_DIR)) && \
+		$(MAKE) --silent && \
+		$(ECHO) $(MSG_INSTALLING) $(call toprel, $(UNCRUSTIFY_DIR)) && \
+		$(MAKE) --silent install-strip \
+	)
+	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(UNCRUSTIFY_BUILD_DIR))
+	-$(V1) [ ! -d "$(UNCRUSTIFY_BUILD_DIR)" ] || $(RM) -rf "$(UNCRUSTIFY_BUILD_DIR)"
+endef
+
+define UNCRUSTIFY_CLEAN_TEMPLATE
+	-$(V1) [ ! -d "$(UNCRUSTIFY_DIR)" ] || $(RM) -rf "$(UNCRUSTIFY_DIR)"
+endef
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,uncrustify,$(UNCRUSTIFY_BUILD_DIR),$(UNCRUSTIFY_URL),$(notdir $(UNCRUSTIFY_URL)),$(UNCRUSTIFY_BUILD_TEMPLATE),$(UNCRUSTIFY_CLEAN_TEMPLATE)))
+
+endif
+
+ifeq ($(shell [ -d "$(UNCRUSTIFY_DIR)" ] && $(ECHO) "exists"), exists)
+    export UNCRUSTIFY := $(UNCRUSTIFY_DIR)/bin/uncrustify
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(UNCRUSTIFY_DIR)) not found (make uncrustify_install), using system PATH)
+    export UNCRUSTIFY := uncrustify
+endif
+
+.PHONY: uncrustify_version
+uncrustify_version:
+	-$(V1) $(UNCRUSTIFY) --version
 
 
 

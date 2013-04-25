@@ -22,11 +22,11 @@ endif
 
 # Paths
 TOPDIR		= .
-OPSYSTEM	= $(TOPDIR)/System
+OPSYSTEM	= $(TOPDIR)
+BOARDINC	= $(TOPDIR)/..
 OPSYSTEMINC	= $(OPSYSTEM)/inc
 PIOSINC		= $(PIOS)/inc
 PIOSCOMMON	= $(PIOS)/Common
-PIOSBOARDS	= $(PIOS)/Boards
 FLIGHTLIBINC	= $(FLIGHTLIB)/inc
 
 ## UAVTalk and UAVObject manager
@@ -75,6 +75,7 @@ SRC += $(PIOSCOMMON)/pios_video.c
 SRC += $(PIOSCOMMON)/pios_wavplay.c
 
 ## PIOS Hardware (Common)
+SRC += $(PIOSCOMMON)/pios_iap.c
 SRC += $(PIOSCOMMON)/pios_com.c
 SRC += $(PIOSCOMMON)/pios_com_msg.c
 SRC += $(PIOSCOMMON)/pios_crc.c
@@ -138,10 +139,9 @@ ASRCARM +=
 #    Each directory must be seperated by a space.
 EXTRAINCDIRS += $(PIOS)
 EXTRAINCDIRS += $(PIOSINC)
+EXTRAINCDIRS += $(BOARDINC)
 EXTRAINCDIRS += $(FLIGHTLIBINC)
 EXTRAINCDIRS += $(PIOSCOMMON)
-EXTRAINCDIRS += $(PIOSBOARDS)
-EXTRAINCDIRS += $(HWDEFSINC)
 EXTRAINCDIRS += $(OPSYSTEMINC)
 EXTRAINCDIRS += $(MATHLIBINC)
 EXTRAINCDIRS += $(OPUAVOBJINC)

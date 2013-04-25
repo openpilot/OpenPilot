@@ -66,16 +66,12 @@
 #include "velocitydesired.h"
 #include "velocityactual.h"
 #include "CoordinateConversions.h"
-
+#include <pios_math.h>
+#include <pios_constants.h>
 // Private constants
 #define MAX_QUEUE_SIZE 4
 #define STACK_SIZE_BYTES 1548
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
-#define F_PI 3.14159265358979323846f
-#define RAD2DEG (180.0f/F_PI)
-#define DEG2RAD (F_PI/180.0f)
-#define GEE 9.81f
-// Private types
 
 // Private variables
 static bool followerEnabled = false;
@@ -293,7 +289,7 @@ static void updatePathVelocity()
 			break;
 	}
 	// make sure groundspeed is not zero
-	if (groundspeed<1e-2) groundspeed=1e-2;
+	if (groundspeed<1e-2f) groundspeed=1e-2f;
 	
 	// calculate velocity - can be zero if waypoints are too close
 	VelocityDesiredData velocityDesired;
@@ -313,8 +309,8 @@ static void updatePathVelocity()
 	// difference between correction_direction and velocityactual >90 degrees and
 	// difference between path_direction and velocityactual >90 degrees  ( 4th sector, facing away from eerything )
 	// fix: ignore correction, steer in path direction until the situation has become better (condition doesn't apply anymore)
-	float angle1=RAD2DEG * ( atan2f(progress.path_direction[1],progress.path_direction[0]) - atan2f(velocityActual.East,velocityActual.North));
-	float angle2=RAD2DEG * ( atan2f(progress.correction_direction[1],progress.correction_direction[0]) - atan2f(velocityActual.East,velocityActual.North));
+	float angle1=RAD2DEG( atan2f(progress.path_direction[1],progress.path_direction[0]) - atan2f(velocityActual.East,velocityActual.North));
+	float angle2=RAD2DEG( atan2f(progress.correction_direction[1],progress.correction_direction[0]) - atan2f(velocityActual.East,velocityActual.North));
 	if (angle1<-180.0f) angle1+=360.0f;
 	if (angle1>180.0f) angle1-=360.0f;
 	if (angle2<-180.0f) angle2+=360.0f;
@@ -470,7 +466,7 @@ static uint8_t updateFixedDesiredAttitude()
 		result = 0;
 	}
 	
-	if (indicatedAirspeedActual<1e-6) {
+	if (indicatedAirspeedActual<1e-6f) {
 		// prevent division by zero, abort without controlling anything. This guidance mode is not suited for takeoff or touchdown, or handling stationary planes
 		// also we cannot handle planes flying backwards, lets just wait until the nose drops
 		fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWSPEED] = 1;
@@ -583,8 +579,8 @@ static uint8_t updateFixedDesiredAttitude()
 	/**
 	 * Compute desired roll command
 	 */
-	if (groundspeedDesired> 1e-6) {
-		bearingError = RAD2DEG * (atan2f(velocityDesired.East,velocityDesired.North) - atan2f(velocityActual.East,velocityActual.North));
+	if (groundspeedDesired> 1e-6f) {
+		bearingError = RAD2DEG(atan2f(velocityDesired.East,velocityDesired.North) - atan2f(velocityActual.East,velocityActual.North));
 	} else {
 		// if we are not supposed to move, run in a circle
 		bearingError = -90.0f;

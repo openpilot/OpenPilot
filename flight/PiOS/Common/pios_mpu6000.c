@@ -141,7 +141,7 @@ static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 
 	// Reset chip
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_PWR_MGMT_REG, PIOS_MPU6000_PWRMGMT_IMU_RST) != 0);
-	PIOS_DELAY_WaitmS(100);
+	PIOS_DELAY_WaitmS(50);
 
 	// Reset chip and fifo
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_USER_CTRL_REG,
@@ -154,7 +154,7 @@ static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg)
 		(PIOS_MPU6000_USERCTL_GYRO_RST |
 		PIOS_MPU6000_USERCTL_SIG_COND |
 		PIOS_MPU6000_USERCTL_FIFO_RST));
-
+	PIOS_DELAY_WaitmS(10);
 	//Power management configuration
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_PWR_MGMT_REG, cfg->Pwr_mgmt_clk) != 0);
 
@@ -227,15 +227,19 @@ int32_t PIOS_MPU6000_ConfigureRanges(
 /**
  * @brief Claim the SPI bus for the accel communications and select this chip
  * @return 0 if successful, -1 for invalid device, -2 if unable to claim bus
+ * @param fromIsr[in] Tells if the function is being called from a ISR or not
  */
-int32_t PIOS_MPU6000_ClaimBus()
+static int32_t PIOS_MPU6000_ClaimBus(bool fromIsr)
 {
 	if(PIOS_MPU6000_Validate(dev) != 0)
 		return -1;
-	
-	if(PIOS_SPI_ClaimBus(dev->spi_id) != 0)
-		return -2;
-	
+	if(fromIsr){
+        if(PIOS_SPI_ClaimBusISR(dev->spi_id) != 0)
+            return -2;
+	} else {
+        if(PIOS_SPI_ClaimBus(dev->spi_id) != 0)
+            return -2;
+	}
 	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,0);
 	return 0;
 }
@@ -243,15 +247,19 @@ int32_t PIOS_MPU6000_ClaimBus()
 /**
  * @brief Release the SPI bus for the accel communications and end the transaction
  * @return 0 if successful
+ * @param fromIsr[in] Tells if the function is being called from a ISR or not
  */
-int32_t PIOS_MPU6000_ReleaseBus()
+int32_t PIOS_MPU6000_ReleaseBus(bool fromIsr)
 {
 	if(PIOS_MPU6000_Validate(dev) != 0)
 		return -1;
 	
 	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,1);
-	
-	return PIOS_SPI_ReleaseBus(dev->spi_id);
+	if(fromIsr){
+	    return PIOS_SPI_ReleaseBusISR(dev->spi_id);
+	} else {
+	    return PIOS_SPI_ReleaseBus(dev->spi_id);
+	}
 }
 
 /**
@@ -263,13 +271,13 @@ static int32_t PIOS_MPU6000_GetReg(uint8_t reg)
 {
 	uint8_t data;
 	
-	if(PIOS_MPU6000_ClaimBus() != 0)
+	if(PIOS_MPU6000_ClaimBus(false) != 0)
 		return -1;	
 	
 	PIOS_SPI_TransferByte(dev->spi_id,(0x80 | reg) ); // request byte
 	data = PIOS_SPI_TransferByte(dev->spi_id,0 );     // receive response
 	
-	PIOS_MPU6000_ReleaseBus();
+	PIOS_MPU6000_ReleaseBus(false);
 	return data;
 }
 
@@ -283,20 +291,20 @@ static int32_t PIOS_MPU6000_GetReg(uint8_t reg)
  */
 static int32_t PIOS_MPU6000_SetReg(uint8_t reg, uint8_t data)
 {
-	if(PIOS_MPU6000_ClaimBus() != 0)
+	if(PIOS_MPU6000_ClaimBus(false) != 0)
 		return -1;
 	
 	if(PIOS_SPI_TransferByte(dev->spi_id, 0x7f & reg) != 0) {
-		PIOS_MPU6000_ReleaseBus();
+		PIOS_MPU6000_ReleaseBus(false);
 		return -2;
 	}
 	
 	if(PIOS_SPI_TransferByte(dev->spi_id, data) != 0) {
-		PIOS_MPU6000_ReleaseBus();
+		PIOS_MPU6000_ReleaseBus(false);
 		return -3;
 	}
 	
-	PIOS_MPU6000_ReleaseBus();
+	PIOS_MPU6000_ReleaseBus(false);
 	
 	return 0;
 }
@@ -312,13 +320,13 @@ int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * data)
 	uint8_t buf[7] = {PIOS_MPU6000_GYRO_X_OUT_MSB | 0x80, 0, 0, 0, 0, 0, 0};
 	uint8_t rec[7];
 	
-	if(PIOS_MPU6000_ClaimBus() != 0)
+	if(PIOS_MPU6000_ClaimBus(false) != 0)
 		return -1;
 
 	if(PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0)
 		return -2;
 		
-	PIOS_MPU6000_ReleaseBus();
+	PIOS_MPU6000_ReleaseBus(false);
 	
 	data->gyro_x = rec[1] << 8 | rec[2];
 	data->gyro_y = rec[3] << 8 | rec[4];
@@ -404,21 +412,22 @@ int32_t PIOS_MPU6000_Test(void)
  * @brief Run self-test operation.
  * \return 0 if test succeeded
  * \return non-zero value if test succeeded
+ * @param fromIsr[in] Tells if the function is being called from a ISR or not
  */
-static int32_t PIOS_MPU6000_FifoDepth(void)
+static int32_t PIOS_MPU6000_FifoDepth(bool fromIsr)
 {
 	uint8_t mpu6000_send_buf[3] = {PIOS_MPU6000_FIFO_CNT_MSB | 0x80, 0, 0};
 	uint8_t mpu6000_rec_buf[3];
 
-	if(PIOS_MPU6000_ClaimBus() != 0)
+	if(PIOS_MPU6000_ClaimBus(fromIsr) != 0)
 		return -1;
 
 	if(PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
-		PIOS_MPU6000_ReleaseBus();
+		PIOS_MPU6000_ReleaseBus(fromIsr);
 		return -1;
 	}
 
-	PIOS_MPU6000_ReleaseBus();
+	PIOS_MPU6000_ReleaseBus(fromIsr);
 	
 	return (mpu6000_rec_buf[1] << 8) | mpu6000_rec_buf[2];
 }
@@ -446,39 +455,39 @@ bool PIOS_MPU6000_IRQHandler(void)
 	if (!mpu6000_configured)
 		return false;
 
-	mpu6000_count = PIOS_MPU6000_FifoDepth();
+	mpu6000_count = PIOS_MPU6000_FifoDepth(true);
 	if (mpu6000_count < sizeof(struct pios_mpu6000_data))
 		return false;
 
-	if (PIOS_MPU6000_ClaimBus() != 0)
+	if (PIOS_MPU6000_ClaimBus(true) != 0)
 		return false;
 
-	uint8_t mpu6000_send_buf[1 + sizeof(struct pios_mpu6000_data) ] = {PIOS_MPU6000_FIFO_REG | 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
-	uint8_t mpu6000_rec_buf[1 + sizeof(struct pios_mpu6000_data) ];
+	static uint8_t mpu6000_send_buf[1 + sizeof(struct pios_mpu6000_data) ] = {PIOS_MPU6000_FIFO_REG | 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
+	static uint8_t mpu6000_rec_buf[1 + sizeof(struct pios_mpu6000_data) ];
 
 	if (PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
-		PIOS_MPU6000_ReleaseBus();
+		PIOS_MPU6000_ReleaseBus(true);
 		mpu6000_fails++;
 		return false;
 	}
 
-	PIOS_MPU6000_ReleaseBus();
+	PIOS_MPU6000_ReleaseBus(true);
 
-	struct pios_mpu6000_data data;
+	static struct pios_mpu6000_data data;
 
 	// In the case where extras samples backed up grabbed an extra
 	if (mpu6000_count >= (sizeof(data) * 2)) {
 		mpu6000_fifo_backup++;
-		if (PIOS_MPU6000_ClaimBus() != 0)
+		if (PIOS_MPU6000_ClaimBus(true) != 0)
 			return false;
 
 		if (PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
-			PIOS_MPU6000_ReleaseBus();
+			PIOS_MPU6000_ReleaseBus(true);
 			mpu6000_fails++;
 			return false;
 		}
 
-		PIOS_MPU6000_ReleaseBus();
+		PIOS_MPU6000_ReleaseBus(true);
 	}
 
 	// Rotate the sensor to OP convention.  The datasheet defines X as towards the right

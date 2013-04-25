@@ -190,31 +190,22 @@ uavobjects_clean:
 export PIOS          := $(ROOT_DIR)/flight/PiOS
 export FLIGHTLIB     := $(ROOT_DIR)/flight/Libraries
 export OPMODULEDIR   := $(ROOT_DIR)/flight/Modules
-export OPUAVOBJ      := $(ROOT_DIR)/flight/targets/UAVObjects
-export OPUAVTALK     := $(ROOT_DIR)/flight/targets/UAVTalk
-export HWDEFS        := $(ROOT_DIR)/flight/targets/board_hw_defs
+export OPUAVOBJ      := $(ROOT_DIR)/flight/uavobjects
+export OPUAVTALK     := $(ROOT_DIR)/flight/uavtalk
 export DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
 export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 
 # Define supported board lists
-ALL_BOARDS    := coptercontrol pipxtreme revolution revomini osd simposix
-ALL_BOARDS_BU := coptercontrol pipxtreme simposix
-
-# Friendly names of each board (used to find source tree)
-coptercontrol_friendly := CopterControl
-pipxtreme_friendly     := PipXtreme
-revolution_friendly    := Revolution
-revomini_friendly      := RevoMini
-osd_friendly           := OSD
-simposix_friendly      := SimPosix
+ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix
+ALL_BOARDS_BU := coptercontrol oplinkmini
 
 # Short names of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '
-pipxtreme_short        := 'pipx'
+oplinkmini_short       := 'oplm'
 revolution_short       := 'revo'
-revomini_short         := 'rm  '
 osd_short              := 'osd '
+revoproto_short        := 'revp'
 simposix_short         := 'posx'
 
 # SimPosix only builds on Linux so drop it from the list for
@@ -259,8 +250,7 @@ endif
 # TEMPLATES (used to generate build rules)
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
-# $(2) = Name of board used in source tree (e.g. CopterControl)
-# $(3) = Short name for board (e.g CC)
+# $(2) = Short name for board (e.g cc)
 define FW_TEMPLATE
 .PHONY: $(1) fw_$(1)
 $(1): fw_$(1)_opfw
@@ -269,13 +259,12 @@ fw_$(1): fw_$(1)_opfw
 fw_$(1)_%: uavobjects_flight
 	$(V1) $$(ARM_GCC_VERSION_CHECK_TEMPLATE)
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/fw_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/$(2) && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/boards/$(1)/firmware && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
-		BOARD_SHORT_NAME=$(3) \
+		BOARD_SHORT_NAME=$(2) \
 		BUILD_TYPE=fw \
-		HWDEFSINC=$(HWDEFS)/$(1) \
-		TOPDIR=$(ROOT_DIR)/flight/targets/$(2) \
+		TOPDIR=$(ROOT_DIR)/flight/targets/boards/$(1)/firmware \
 		OUTDIR=$(BUILD_DIR)/fw_$(1) \
 		TARGET=fw_$(1) \
 		$$*
@@ -288,7 +277,7 @@ fw_$(1)_clean:
 endef
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
-# $(2) = Name of board used in source tree (e.g. CopterControl)
+# $(2) = Short name for board (e.g cc)
 define BL_TEMPLATE
 .PHONY: bl_$(1)
 bl_$(1): bl_$(1)_bin
@@ -297,13 +286,12 @@ bl_$(1)_bino: bl_$(1)_bin
 bl_$(1)_%:
 	$(V1) $$(ARM_GCC_VERSION_CHECK_TEMPLATE)
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/bl_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/Bootloaders/$(2) && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/boards/$(1)/bootloader && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
-		BOARD_SHORT_NAME=$(3) \
+		BOARD_SHORT_NAME=$(2) \
 		BUILD_TYPE=bl \
-		HWDEFSINC=$(HWDEFS)/$(1) \
-		TOPDIR=$(ROOT_DIR)/flight/targets/Bootloaders/$(2) \
+		TOPDIR=$(ROOT_DIR)/flight/targets/boards/$(1)/bootloader \
 		OUTDIR=$(BUILD_DIR)/bl_$(1) \
 		TARGET=bl_$(1) \
 		$$*
@@ -329,19 +317,19 @@ bl_$(1)_clean:
 endef
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+# $(2) = Short name for board (e.g cc)
 define BU_TEMPLATE
 .PHONY: bu_$(1)
 bu_$(1): bu_$(1)_opfw
 
 bu_$(1)_%: bl_$(1)_bino
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/bu_$(1)/dep
-	$(V1) cd $(ROOT_DIR)/flight/targets/BootloaderUpdater && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/common/bootloader_updater && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
-		BOARD_SHORT_NAME=$(3) \
+		BOARD_SHORT_NAME=$(2) \
 		BUILD_TYPE=bu \
-		HWDEFSINC=$(HWDEFS)/$(1) \
-		TOPDIR=$(ROOT_DIR)/flight/targets/BootloaderUpdater \
+		TOPDIR=$(ROOT_DIR)/flight/targets/common/bootloader_updater \
 		OUTDIR=$(BUILD_DIR)/bu_$(1) \
 		TARGET=bu_$(1) \
 		$$*
@@ -353,19 +341,20 @@ bu_$(1)_clean:
 endef
 
 # $(1) = Canonical board name all in lower case (e.g. coptercontrol)
+# $(2) = Short name for board (e.g cc)
 define EF_TEMPLATE
 .PHONY: ef_$(1)
 ef_$(1): ef_$(1)_bin
 
 ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/ef_$(1)
-	$(V1) cd $(ROOT_DIR)/flight/targets/EntireFlash && \
+	$(V1) cd $(ROOT_DIR)/flight/targets/common/entire_flash && \
 		$$(MAKE) -r --no-print-directory \
 		BOARD_NAME=$(1) \
-		BOARD_SHORT_NAME=$(3) \
+		BOARD_SHORT_NAME=$(2) \
 		BUILD_TYPE=ef \
 		DFU_CMD="$(DFUUTIL_DIR)/bin/dfu-util" \
-		TOPDIR=$(ROOT_DIR)/flight/targets/EntireFlash \
+		TOPDIR=$(ROOT_DIR)/flight/targets/common/entire_flash \
 		OUTDIR=$(BUILD_DIR)/ef_$(1) \
 		TARGET=ef_$(1) \
 		$$*
@@ -416,16 +405,16 @@ all_flight_clean: all_fw_clean all_bl_clean all_bu_clean all_ef_clean
 $(foreach board, $(ALL_BOARDS), $(eval $(call BOARD_PHONY_TEMPLATE,$(board))))
 
 # Expand the firmware rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call FW_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
+$(foreach board, $(ALL_BOARDS), $(eval $(call FW_TEMPLATE,$(board),$($(board)_short))))
 
 # Expand the bootloader rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
+$(foreach board, $(ALL_BOARDS), $(eval $(call BL_TEMPLATE,$(board),$($(board)_short))))
 
 # Expand the bootloader updater rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call BU_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
+$(foreach board, $(ALL_BOARDS), $(eval $(call BU_TEMPLATE,$(board),$($(board)_short))))
 
 # Expand the entire-flash rules
-$(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_friendly),$($(board)_short))))
+$(foreach board, $(ALL_BOARDS), $(eval $(call EF_TEMPLATE,$(board),$($(board)_short))))
 
 .PHONY: sim_win32
 sim_win32: sim_win32_exe
@@ -441,7 +430,7 @@ sim_osx: sim_osx_elf
 sim_osx_%: uavobjects_flight
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/sim_osx
 	$(V1) $(MAKE) --no-print-directory \
-		-C $(ROOT_DIR)/flight/targets/Revolution --file=$(ROOT_DIR)/flight/targets/Revolution/Makefile.osx $*
+		-C $(ROOT_DIR)/flight/targets/SensorTest --file=$(ROOT_DIR)/flight/targets/SensorTest/Makefile.osx $*
 
 ##############################
 #
@@ -792,6 +781,28 @@ package: all_fw all_ground uavobjects_matlab
 
 ##############################
 #
+# Source code formatting
+#
+##############################
+
+# $(1) = Uncrustify target (e.g flight or ground)
+# $(2) = Target root directory
+define UNCRUSTIFY_TEMPLATE
+
+.PHONY: uncrustify_$(1)
+uncrustify_$(1):
+	@$(ECHO) "Auto-formatting $(1) source code"
+	$(V1) UNCRUSTIFY_CONFIG="make/templates/uncrustify.cfg" $(SHELL) make/scripts/uncrustify.sh $(call toprel, $(2))
+endef
+
+$(eval $(call UNCRUSTIFY_TEMPLATE,flight,$(ROOT_DIR)/flight))
+$(eval $(call UNCRUSTIFY_TEMPLATE,ground,$(ROOT_DIR)/ground))
+
+.PHONY: uncrustify_all
+uncrustify_all: $(addprefix uncrustify_,flight ground)
+
+##############################
+#
 # Build info
 #
 ##############################
@@ -825,6 +836,7 @@ help:
 	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
 	@$(ECHO) "     mingw_install        - Install the MinGW toolchain (Windows only)"
 	@$(ECHO) "     python_install       - Install the Python interpreter (Windows only)"
+	@$(ECHO) "     uncrustify_install   - Install the Uncrustify source code beautifier"
 	@$(ECHO) "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@$(ECHO) "     stm32flash_install   - Install the stm32flash tool for unbricking F1-based boards"
 	@$(ECHO) "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
@@ -918,6 +930,10 @@ help:
 	@$(ECHO) "     opfw_resource        - Generate resources to embed firmware binaries into the GCS"
 	@$(ECHO) "     clean_package        - Clean, build and package the OpenPilot platform-dependent package"
 	@$(ECHO) "     package              - Build and package the OpenPilot platform-dependent package"
+	@$(ECHO)
+	@$(ECHO) "   [Code Formatting]"
+	@$(ECHO) "     uncrustify_<source>  - Reformat <source> code. <source> can be flight or ground"
+	@$(ECHO) "     uncrustify_all       - Reformat all source code"
 	@$(ECHO)
 	@$(ECHO) "   Hint: Add V=1 to your command line to see verbose build output."
 	@$(ECHO)

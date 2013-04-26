@@ -537,8 +537,6 @@ enum pios_radio_state {
     RADIO_STATE_REQUESTING_CONNECTION,
     RADIO_STATE_ACCEPTING_CONNECTION,
     RADIO_STATE_RX_MODE,
-    RADIO_STATE_WAIT_PREAMBLE,
-    RADIO_STATE_WAIT_SYNC,
     RADIO_STATE_RX_DATA,
     RADIO_STATE_RX_FAILURE,
     RADIO_STATE_RECEIVING_STATUS,
@@ -567,8 +565,6 @@ enum pios_radio_event {
     RADIO_EVENT_PACKET_NACKED,
     RADIO_EVENT_ACK_TIMEOUT,
     RADIO_EVENT_RX_MODE,
-    RADIO_EVENT_PREAMBLE_DETECTED,
-    RADIO_EVENT_SYNC_DETECTED,
     RADIO_EVENT_RX_COMPLETE,
     RADIO_EVENT_RX_ERROR,
     RADIO_EVENT_STATUS_RECEIVED,
@@ -584,7 +580,8 @@ enum pios_radio_event {
 enum pios_rfm22b_state {
     RFM22B_STATE_INITIALIZING,
     RFM22B_STATE_TRANSITION,
-    RFM22B_STATE_RECEIVE_WAIT,
+    RFM22B_STATE_RX_WAIT,
+    RFM22B_STATE_RX_WAIT_SYNC,
     RFM22B_STATE_RX_MODE,
     RFM22B_STATE_TX_MODE,
     RFM22B_STATE_TRANSMITTING,
@@ -773,6 +770,8 @@ struct pios_rfm22b_dev {
 
     // The rx data packet
     PHPacket rx_packet;
+    // The rx data packet
+    PHPacketHandle rx_packet_handle;
     // The receive buffer write index
     uint16_t rx_buffer_wr;
     // The receive buffer write index

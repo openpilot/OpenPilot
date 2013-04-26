@@ -7,7 +7,7 @@
  * @{
  *
  * @file       pios_debug.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @brief      Debugging Functions
  * @see        The GNU Public License (GPL) Version 3
  * 
@@ -60,13 +60,13 @@ void PIOS_DEBUG_Init(const struct pios_tim_channel * channels, uint8_t num_chann
 		GPIO_StructInit(&GPIO_InitStructure);
 		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-		GPIO_InitStructure.GPIO_Pin = chan->init->GPIO_Pin;
+		GPIO_InitStructure.GPIO_Pin = chan->pin.init.GPIO_Pin;
 
 		/* Initialize the GPIO */
-		GPIO_Init(chan->init->port, &GPIO_InitStructure);
+		GPIO_Init(chan->pin.gpio, &GPIO_InitStructure);
 
 		/* Set the pin low */
-		GPIO_WriteBit(chan->init->port, chan->init->GPIO_Pin, Bit_RESET);
+		GPIO_WriteBit(chan->pin.gpio, chan->pin.init.GPIO_Pin, Bit_RESET);
 	}
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
@@ -84,7 +84,7 @@ void PIOS_DEBUG_PinHigh(uint8_t pin)
 
 	const struct pios_tim_channel * chan = &debug_channels[pin];
 
-	GPIO_WriteBit(chan->init->port, chan->init->GPIO_Pin, Bit_Set);
+	GPIO_WriteBit(chan->pin.gpio, chan->pin.init.GPIO_Pin, Bit_SET);
 
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
@@ -102,7 +102,7 @@ void PIOS_DEBUG_PinLow(uint8_t pin)
 
 	const struct pios_tim_channel * chan = &debug_channels[pin];
 
-	GPIO_WriteBit(chan->init->port, chan->init->GPIO_Pin, Bit_RESET);
+	GPIO_WriteBit(chan->pin.gpio, chan->pin.init.GPIO_Pin, Bit_RESET);
 
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
@@ -124,8 +124,8 @@ void PIOS_DEBUG_PinValue8Bit(uint8_t value)
 	 * This is sketchy since it assumes a particular ordering
 	 * and bitwise layout of the channels provided to the debug code.
 	 */
-	debug_channels[0].init.port->BSRR = bsrr_l;
-	debug_channels[4].init.port->BSRR = bsrr_h;
+	debug_channels[0].pin.gpio->BSRR = bsrr_l;
+	debug_channels[4].pin.gpio->BSRR = bsrr_h;
 
 	PIOS_IRQ_Enable();
 #endif // PIOS_ENABLE_DEBUG_PINS
@@ -143,7 +143,7 @@ void PIOS_DEBUG_PinValue4BitL(uint8_t value)
 	 * and bitwise layout of the channels provided to the debug code.
 	 */
 	uint32_t bsrr_l = ((~(value & 0x0F)<<(16+6))) | ((value & 0x0F)<<6);
-	debug_channels[0].init.port->BSRR = bsrr_l;
+	debug_channels[0].pin.gpio->BSRR = bsrr_l;
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 

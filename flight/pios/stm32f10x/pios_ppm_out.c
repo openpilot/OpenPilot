@@ -59,6 +59,8 @@ struct pios_ppm_out_dev {
 	bool Fresh;
 };
 
+static void PIOS_PPM_Out_Supervisor(uint32_t ppm_id);
+
 static bool PIOS_PPM_Out_validate(struct pios_ppm_out_dev *ppm_dev)
 {
 	return (ppm_dev->magic == PIOS_PPM_OUT_DEV_MAGIC);
@@ -188,6 +190,15 @@ int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg * 
 		TIM_SetCompare4(chan->timer, ppm_dev->triggering_period);
 		break;
 	}
+
+        // Configure the supervisor
+	ppm_dev->supv_timer = 0;
+	ppm_dev->Fresh = FALSE;
+	ppm_dev->Tracking = FALSE;
+	if (!PIOS_RTC_RegisterTickCallback(PIOS_PPM_Out_Supervisor, (uint32_t)ppm_dev)) {
+		PIOS_DEBUG_Assert(0);
+	}
+
 	return 0;
 }
 
@@ -202,6 +213,10 @@ void PIOS_PPM_OUT_Set(uint32_t ppm_out_id, uint8_t servo, uint16_t position)
 		position = PIOS_PPM_OUT_MIN_CHANNEL_PULSE_US;
 	if (position > PIOS_PPM_OUT_MAX_CHANNEL_PULSE_US)
 		position = PIOS_PPM_OUT_MAX_CHANNEL_PULSE_US;
+
+        // Update the supervisor tracking variables.
+	ppm_dev->Fresh = TRUE;
+	ppm_dev->Tracking = TRUE;
 	
 	// Update the position
 	ppm_dev->ChannelValue[servo] = position;
@@ -226,6 +241,30 @@ static void PIOS_PPM_OUT_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t
 	TIM_SetAutoreload(ppm_dev->cfg->channel->timer, pulse_width - 1);
 
 	return;
+}
+
+static void PIOS_PPM_Out_Supervisor(uint32_t ppm_out_id) {
+	struct pios_ppm_out_dev *ppm_dev = (struct pios_ppm_out_dev *)ppm_out_id;
+	if (!PIOS_PPM_Out_validate(ppm_dev))
+		return;
+
+	/* 
+	 * RTC runs at 625Hz so divide down the base rate so that this loop runs at 25Hz.
+	 */
+	if(++(ppm_dev->supv_timer) < 25) {
+		return;
+	}
+	ppm_dev->supv_timer = 0;
+
+	if (!ppm_dev->Fresh) {
+		ppm_dev->Tracking = FALSE;
+
+                // Flush counter variables
+                for (uint8_t i = 0; i < PIOS_PPM_OUT_MAX_CHANNELS; i++)
+                        ppm_dev->ChannelValue[i] = 1000;
+	}
+
+	ppm_dev->Fresh = FALSE;
 }
 
 #endif /* PIOS_INCLUDE_PPM_OUT */

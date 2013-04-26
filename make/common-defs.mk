@@ -122,6 +122,21 @@ CFLAGS += -Wall
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 
+# Provides board-specific defines
+BOARD_CDEFS += -DBOARD_TYPE=$(BOARD_TYPE)
+BOARD_CDEFS += -DBOARD_REVISION=$(BOARD_REVISION)
+BOARD_CDEFS += -DHW_TYPE=$(HW_TYPE)
+BOARD_CDEFS += -DBOOTLOADER_VERSION=$(BOOTLOADER_VERSION)
+BOARD_CDEFS += -DFW_BANK_BASE=$(FW_BANK_BASE)
+BOARD_CDEFS += -DFW_BANK_SIZE=$(FW_BANK_SIZE)
+BOARD_CDEFS += -DFW_DESC_SIZE=$(FW_DESC_SIZE)
+
+BOARD_CDEFS += -DBL_BANK_BASE=$(BL_BANK_BASE)
+BOARD_CDEFS += -DBL_BANK_SIZE=$(BL_BANK_SIZE)
+BOARD_CDEFS += -DBL_DESC_SIZE=$(BL_DESC_SIZE)
+
+CDEFS += $(BOARD_CDEFS)
+
 # FIXME: stm32f4xx library raises strict aliasing and const qualifier warnings
 ifneq ($(MCU),cortex-m4)
     CFLAGS += -Werror

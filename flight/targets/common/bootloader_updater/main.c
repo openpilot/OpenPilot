@@ -35,7 +35,9 @@
 extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
 void error(int, int);
-
+#ifdef STM32F4XX
+#define FLASH_ErasePage(x) FLASH_EraseSector((x) > 0x08000000 ? FLASH_Sector_1 : FLASH_Sector_0, VoltageRange_3)
+#endif
 /* The ADDRESSES of the _binary_* symbols are the important
  * data.  This is non-intuitive for _binary_size where you
  * might expect its value to hold the size but you'd be wrong.
@@ -58,7 +60,7 @@ int main()
 
 	/// Self overwrite check
 	uint32_t base_address = SCB->VTOR;
-	if ((0x08000000 + embedded_image_size) > base_address)
+	if ((BL_BANK_BASE + embedded_image_size) > base_address)
 		error(PIOS_LED_HEARTBEAT, 1);
 	///
 
@@ -71,7 +73,7 @@ int main()
 	 */
 
 	/* Calculate how far the board_info_blob is from the beginning of the bootloader */
-	uint32_t board_info_blob_offset = (uint32_t) &pios_board_info_blob - (uint32_t)0x08000000;
+	uint32_t board_info_blob_offset = (uint32_t) &pios_board_info_blob - (uint32_t)BL_BANK_BASE;
 
 	/* Use the same offset into our embedded bootloader image */
 	struct pios_board_info * new_board_info_blob = (struct pios_board_info *)
@@ -90,9 +92,9 @@ int main()
 
 	/// Bootloader memory space erase
 	uint32_t pageAddress;
-	pageAddress = 0x08000000;
+	pageAddress = BL_BANK_BASE;
 	bool fail = false;
-	while ((pageAddress < base_address) && (fail == false)) {
+	while ((pageAddress < BL_BANK_BASE + BL_BANK_SIZE) && (fail == false)) {
 		for (int retry = 0; retry < MAX_DEL_RETRYS; ++retry) {
 			if (FLASH_ErasePage(pageAddress) == FLASH_COMPLETE) {
 				fail = false;
@@ -105,6 +107,8 @@ int main()
 		pageAddress += 2048;
 #elif defined (STM32F10X_MD)
 		pageAddress += 1024;
+#elif defined (STM32F4XX)
+        pageAddress += 0x4000;
 #endif
 	}
 

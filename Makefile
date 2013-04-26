@@ -197,7 +197,7 @@ export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 
 # Define supported board lists
 ALL_BOARDS    := coptercontrol oplinkmini revolution osd revoproto simposix
-ALL_BOARDS_BU := coptercontrol oplinkmini
+ALL_BOARDS_BU := coptercontrol oplinkmini revolution osd revoproto
 
 # Short names of each board (used to display board name in parallel builds)
 coptercontrol_short    := 'cc  '

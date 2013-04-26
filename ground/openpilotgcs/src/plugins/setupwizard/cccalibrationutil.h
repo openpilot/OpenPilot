@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       levellingutil.h
+ * @file       cccalibrationutil.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup LevellingUtil
+ * @addtogroup CCCalibrationUtil
  * @{
  * @brief
  *****************************************************************************/
@@ -25,8 +25,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef LEVELLINGUTIL_H
-#define LEVELLINGUTIL_H
+#ifndef CCCALIBRATIONUTIL_H
+#define CCCALIBRATIONUTIL_H
 
 #include <QObject>
 #include <QTimer>
@@ -35,12 +35,12 @@
 #include "uavobject.h"
 #include "vehicleconfigurationsource.h"
 
-class LevellingUtil : public QObject
+class CCCalibrationUtil : public QObject
 {
     Q_OBJECT
 public:
-    explicit LevellingUtil(long measurementCount, long measurementRate);
-    explicit LevellingUtil(long accelMeasurementCount, long accelMeasurementRate,
+    explicit CCCalibrationUtil(long measurementCount, long measurementRate);
+    explicit CCCalibrationUtil(long accelMeasurementCount, long accelMeasurementRate,
                            long gyroMeasurementCount, long gyroMeasurementRate);
 
 signals:
@@ -89,4 +89,4 @@ private:
     accelGyroBias calculateLevellingData();
 };
 
-#endif // LEVELLINGUTIL_H
+#endif // CCCALIBRATIONUTIL_H

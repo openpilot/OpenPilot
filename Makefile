@@ -187,12 +187,11 @@ uavobjects_clean:
 
 # Define some pointers to the various important pieces of the flight code
 # to prevent these being repeated in every sub makefile
-export PIOS          := $(ROOT_DIR)/flight/PiOS
-export FLIGHTLIB     := $(ROOT_DIR)/flight/Libraries
-export OPMODULEDIR   := $(ROOT_DIR)/flight/Modules
+export PIOS          := $(ROOT_DIR)/flight/pios
+export FLIGHTLIB     := $(ROOT_DIR)/flight/libraries
+export OPMODULEDIR   := $(ROOT_DIR)/flight/modules
 export OPUAVOBJ      := $(ROOT_DIR)/flight/uavobjects
 export OPUAVTALK     := $(ROOT_DIR)/flight/uavtalk
-export DOXYGENDIR    := $(ROOT_DIR)/flight/Doc/Doxygen
 export OPUAVSYNTHDIR := $(BUILD_DIR)/uavobject-synthetics/flight
 export OPGCSSYNTHDIR := $(BUILD_DIR)/openpilotgcs-synthetics
 
@@ -792,7 +791,7 @@ define UNCRUSTIFY_TEMPLATE
 .PHONY: uncrustify_$(1)
 uncrustify_$(1):
 	@$(ECHO) "Auto-formatting $(1) source code"
-	$(V1) UNCRUSTIFY_CONFIG="make/templates/uncrustify.cfg" $(SHELL) make/scripts/uncrustify.sh $(call toprel, $(2))
+	$(V1) UNCRUSTIFY_CONFIG="$(ROOT_DIR)/make/uncrustify/uncrustify.cfg" $(SHELL) make/scripts/uncrustify.sh $(call toprel, $(2))
 endef
 
 $(eval $(call UNCRUSTIFY_TEMPLATE,flight,$(ROOT_DIR)/flight))
@@ -814,6 +813,18 @@ build-info:
 		--uavodir=$(ROOT_DIR)/shared/uavobjectdefinition \
 		--template="make/templates/$@.txt" \
 		--outfile="$(BUILD_DIR)/$@.txt"
+
+##############################
+#
+# Doxygen documentation
+# FIXME: currently is not not used and should be updated
+#
+##############################
+
+# Generate Doxygen documentation
+.PHONY: docs
+docs:
+	$(DOXYGEN) $(ROOT_DIR)/make/doxygen/doxygen.cfg
 
 ##############################
 #

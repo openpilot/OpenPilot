@@ -15,9 +15,9 @@ AutoUpdatePage::AutoUpdatePage(SetupWizard *wizard, QWidget *parent) :
     Q_ASSERT(pm);
     UploaderGadgetFactory *uploader = pm->getObject<UploaderGadgetFactory>();
     Q_ASSERT(uploader);
-    connect(ui->startUpdate,SIGNAL(clicked()), this, SLOT(disableButtons()));
-    connect(ui->startUpdate,SIGNAL(clicked()),uploader,SIGNAL(autoUpdate()));
-    connect(uploader,SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep,QVariant)),this,SLOT(updateStatus(uploader::AutoUpdateStep,QVariant)));
+    connect(ui->startUpdate, SIGNAL(clicked()), this, SLOT(disableButtons()));
+    connect(ui->startUpdate, SIGNAL(clicked()), uploader, SIGNAL(autoUpdate()));
+    connect(uploader, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep,QVariant)), this, SLOT(updateStatus(uploader::AutoUpdateStep, QVariant)));
 }
 
 AutoUpdatePage::~AutoUpdatePage()

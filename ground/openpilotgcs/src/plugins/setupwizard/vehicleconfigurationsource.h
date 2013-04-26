@@ -56,7 +56,7 @@ class VehicleConfigurationSource
 public:
     VehicleConfigurationSource();
 
-    enum CONTROLLER_TYPE {CONTROLLER_UNKNOWN, CONTROLLER_CC, CONTROLLER_CC3D, CONTROLLER_REVO, CONTROLLER_PIPX};
+    enum CONTROLLER_TYPE {CONTROLLER_UNKNOWN, CONTROLLER_CC, CONTROLLER_CC3D, CONTROLLER_REVO, CONTROLLER_OPLINK};
     enum VEHICLE_TYPE {VEHICLE_UNKNOWN, VEHICLE_MULTI, VEHICLE_FIXEDWING, VEHICLE_HELI, VEHICLE_SURFACE};
     enum VEHICLE_SUB_TYPE {MULTI_ROTOR_UNKNOWN, MULTI_ROTOR_TRI_Y, MULTI_ROTOR_QUAD_X, MULTI_ROTOR_QUAD_PLUS,
                                MULTI_ROTOR_HEXA, MULTI_ROTOR_HEXA_H, MULTI_ROTOR_HEXA_COAX_Y, MULTI_ROTOR_OCTO,
@@ -65,14 +65,20 @@ public:
     enum ESC_TYPE {ESC_RAPID, ESC_LEGACY, ESC_UNKNOWN};
     enum INPUT_TYPE {INPUT_PWM, INPUT_PPM, INPUT_SBUS, INPUT_DSMX10, INPUT_DSMX11, INPUT_DSM2, INPUT_UNKNOWN};
 
+    enum GPS_SETTING {GPS_UBX, GPS_NMEA, GPS_DISABLED};
+    enum RADIO_SETTING {RADIO_TELEMETRY, RADIO_DISABLED};
+
     virtual VehicleConfigurationSource::CONTROLLER_TYPE getControllerType() const = 0;
     virtual VehicleConfigurationSource::VEHICLE_TYPE getVehicleType() const = 0;
     virtual VehicleConfigurationSource::VEHICLE_SUB_TYPE getVehicleSubType() const = 0;
     virtual VehicleConfigurationSource::INPUT_TYPE getInputType() const = 0;
     virtual VehicleConfigurationSource::ESC_TYPE getESCType() const = 0;
 
-    virtual bool isLevellingPerformed() const = 0;
-    virtual accelGyroBias getLevellingBias() const = 0;
+    virtual VehicleConfigurationSource::GPS_SETTING getGPSSetting() const = 0;
+    virtual VehicleConfigurationSource::RADIO_SETTING getRadioSetting() const = 0;
+
+    virtual bool isCalibrationPerformed() const = 0;
+    virtual accelGyroBias getCalibrationBias() const = 0;
 
     virtual bool isMotorCalibrationPerformed() const = 0;
     virtual QList<actuatorChannelSettings> getActuatorSettings() const = 0;

@@ -1,4 +1,4 @@
-﻿Short summary of changes.  For a complete list see the git log.
+Short summary of changes.  For a complete list see the git log.
 
 2012-11-17
 Advanced camera stabilization features.

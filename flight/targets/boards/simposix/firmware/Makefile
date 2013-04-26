@@ -49,20 +49,20 @@ OPUAVTALKINC = $(OPUAVTALK)/inc
 OPUAVOBJ = ../../../../uavobjects
 OPUAVOBJINC = $(OPUAVOBJ)/inc
 PIOSINC = $(PIOS)/inc
-OPMODULEDIR = ../../../../Modules
-FLIGHTLIB = ../../../../Libraries
+OPMODULEDIR = ../../../../modules
+FLIGHTLIB = ../../../../libraries
 FLIGHTLIBINC = $(FLIGHTLIB)/inc
 MATHLIB = $(FLIGHTLIB)/math
 MATHLIBINC = $(FLIGHTLIB)/math
 PIOSPOSIX = $(PIOS)/posix
 PIOSCOMMON = $(PIOS)/posix
-PIOSCOMMONLIB = $(PIOS)/Common/Libraries
+PIOSCOMMONLIB = $(PIOS)/common/libraries
 BOOT = 
 BOOTINC = 
 UAVOBJSYNTHDIR = $(OUTDIR)/../uavobject-synthetics/flight
 
 # optional component libraries
-include $(PIOS)/Common/Libraries/FreeRTOS/library.mk
+include $(PIOS)/common/libraries/FreeRTOS/library.mk
 include $(FLIGHTLIB)/PyMite/pymite.mk
 
 # List C source files here. (C dependencies are automatically generated.)
@@ -329,10 +329,6 @@ opfw: $(OUTDIR)/$(TARGET).opfw
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
-
-# Generate Doxygen documents
-docs:
-	doxygen  $(DOXYGENDIR)/doxygen.cfg
 
 # Install: install binary file with prefix/suffix into install directory
 install: $(OUTDIR)/$(TARGET).opfw

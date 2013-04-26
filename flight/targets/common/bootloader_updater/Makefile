@@ -31,7 +31,7 @@ TOPDIR		= .
 OPSYSTEM	= $(TOPDIR)
 OPSYSTEMINC	= $(OPSYSTEM)/inc
 PIOSINC		= $(PIOS)/inc
-PIOSCOMMON	= $(PIOS)/Common
+PIOSCOMMON	= $(PIOS)/common
 FLIGHTLIBINC	= $(FLIGHTLIB)/inc
 HWDEFSINC	= ../../boards/$(BOARD_NAME)
 
@@ -42,7 +42,7 @@ SRC += $(OPSYSTEM)/pios_board.c
 
 ## PIOS Hardware
 ifeq ($(MCU),cortex-m3)
-    include $(PIOS)/STM32F10x/library.mk
+    include $(PIOS)/stm32f10x/library.mk
 
     # Set linker-script name depending on selected submodel name
     LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_memory.ld

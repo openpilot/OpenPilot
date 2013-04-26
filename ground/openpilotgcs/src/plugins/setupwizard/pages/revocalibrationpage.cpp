@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       levellingpage.h
+ * @file       revocalibrationpage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup LevellingPage
+ * @addtogroup RevoCalibrationPage
  * @{
  * @brief
  *****************************************************************************/
@@ -25,41 +25,18 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef LEVELLINGPAGE_H
-#define LEVELLINGPAGE_H
+#include "revocalibrationpage.h"
+#include "ui_revocalibrationpage.h"
 
-#include "abstractwizardpage.h"
-#include "levellingutil.h"
-
-namespace Ui {
-class LevellingPage;
+RevoCalibrationPage::RevoCalibrationPage(SetupWizard *wizard, QWidget *parent) :
+    AbstractWizardPage(wizard, parent),
+    ui(new Ui::RevoCalibrationPage)
+{
+    ui->setupUi(this);
+    setFinalPage(true);
 }
 
-class LevellingPage : public AbstractWizardPage
+RevoCalibrationPage::~RevoCalibrationPage()
 {
-    Q_OBJECT
-
-public:
-    explicit LevellingPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~LevellingPage();
-    bool validatePage();
-    bool isComplete() const;
-
-private slots:
-    void performLevelling();
-    void levellingProgress(long current, long total);
-    void levellingDone(accelGyroBias bias);
-    void levellingTimeout(QString message);
-
-private:
-    static const int BIAS_CYCLES = 200;
-    static const int BIAS_RATE = 30;
-
-    Ui::LevellingPage *ui;
-    LevellingUtil *m_levellingUtil;
-
-    void stopLevelling();
-    void enableButtons(bool enable);
-};
-
-#endif // LEVELLINGPAGE_H
+    delete ui;
+}

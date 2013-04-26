@@ -127,8 +127,7 @@ CFLAGS += -Wall
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))
 
-
-# FIXME: STM32F4xx library raises strict aliasing and const qualifier warnings
+# FIXME: stm32f4xx library raises strict aliasing and const qualifier warnings
 ifneq ($(MCU),cortex-m4)
     CFLAGS += -Werror
 endif
@@ -245,10 +244,6 @@ opfw: $(OUTDIR)/$(TARGET).opfw
 
 # Display sizes of sections.
 $(eval $(call SIZE_TEMPLATE, $(OUTDIR)/$(TARGET).elf))
-
-# Generate Doxygen documents
-docs:
-	doxygen  $(DOXYGENDIR)/doxygen.cfg
 
 # Target: clean project
 clean:

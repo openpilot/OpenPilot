@@ -58,7 +58,9 @@ void PIOS_DEBUG_Init(const struct pios_tim_channel * channels, uint8_t num_chann
 		// Initialise pins as standard output pins
 		GPIO_InitTypeDef GPIO_InitStructure;
 		GPIO_StructInit(&GPIO_InitStructure);
-		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+		GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+		GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
 		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 		GPIO_InitStructure.GPIO_Pin = chan->pin.init.GPIO_Pin;
 
@@ -115,6 +117,9 @@ void PIOS_DEBUG_PinValue8Bit(uint8_t value)
 		return;
 	}
 
+#pragma message("This code is not portable and should be revised")
+	PIOS_Assert(0);
+
 	uint32_t bsrr_l = ( ((~value)&0x0F)<<(16+6)   ) | ((value & 0x0F)<<6);
 	uint32_t bsrr_h = ( ((~value)&0xF0)<<(16+6-4) ) | ((value & 0xF0)<<(6-4));
 
@@ -124,8 +129,8 @@ void PIOS_DEBUG_PinValue8Bit(uint8_t value)
 	 * This is sketchy since it assumes a particular ordering
 	 * and bitwise layout of the channels provided to the debug code.
 	 */
-	debug_channels[0].pin.gpio->BSRR = bsrr_l;
-	debug_channels[4].pin.gpio->BSRR = bsrr_h;
+	//debug_channels[0].pin.gpio->BSRR = bsrr_l;
+	//debug_channels[4].pin.gpio->BSRR = bsrr_h;
 
 	PIOS_IRQ_Enable();
 #endif // PIOS_ENABLE_DEBUG_PINS
@@ -138,12 +143,15 @@ void PIOS_DEBUG_PinValue4BitL(uint8_t value)
 		return;
 	}
 
+#pragma message("This code is not portable and should be revised")
+	PIOS_Assert(0);
+
 	/* 
 	 * This is sketchy since it assumes a particular ordering
 	 * and bitwise layout of the channels provided to the debug code.
 	 */
 	uint32_t bsrr_l = ((~(value & 0x0F)<<(16+6))) | ((value & 0x0F)<<6);
-	debug_channels[0].pin.gpio->BSRR = bsrr_l;
+	//debug_channels[0].pin.gpio->BSRR = bsrr_l;
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 

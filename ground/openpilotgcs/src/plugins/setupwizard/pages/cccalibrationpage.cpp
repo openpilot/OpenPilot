@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       levellingpage.cpp
+ * @file       cccalibrationpage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup LevellingPage
+ * @addtogroup CCCalibrationPage
  * @{
  * @brief
  *****************************************************************************/
@@ -27,38 +27,37 @@
 
 #include <QMessageBox>
 #include <QDebug>
-#include "levellingpage.h"
-#include "ui_levellingpage.h"
+#include "cccalibrationpage.h"
+#include "ui_cccalibrationpage.h"
 #include "setupwizard.h"
 
-LevellingPage::LevellingPage(SetupWizard *wizard, QWidget *parent) :
+CCCalibrationPage::CCCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
-    ui(new Ui::LevellingPage),  m_levellingUtil(0)
+    ui(new Ui::CCCalibrationPage),  m_calibrationUtil(0)
 {
     ui->setupUi(this);
-    connect(ui->levelButton, SIGNAL(clicked()), this, SLOT(performLevelling()));
+    connect(ui->levelButton, SIGNAL(clicked()), this, SLOT(performCalibration()));
 }
 
-LevellingPage::~LevellingPage()
+CCCalibrationPage::~CCCalibrationPage()
 {
-    if(m_levellingUtil) {
-        delete m_levellingUtil;
+    if(m_calibrationUtil) {
+        delete m_calibrationUtil;
     }
     delete ui;
 }
 
-bool LevellingPage::validatePage()
+bool CCCalibrationPage::validatePage()
 {
     return true;
 }
 
-bool LevellingPage::isComplete() const
+bool CCCalibrationPage::isComplete() const
 {
-    //const_cast<LevellingPage *>(this)->getWizard()->isLevellingPerformed() &&
     return ui->levelButton->isEnabled();
 }
 
-void LevellingPage::enableButtons(bool enable)
+void CCCalibrationPage::enableButtons(bool enable)
 {
     ui->levelButton->setEnabled(enable);
     getWizard()->button(QWizard::NextButton)->setEnabled(enable);
@@ -68,7 +67,7 @@ void LevellingPage::enableButtons(bool enable)
     QApplication::processEvents();
 }
 
-void LevellingPage::performLevelling()
+void CCCalibrationPage::performCalibration()
 {
     if(!getWizard()->getConnectionManager()->isConnected()) {
         QMessageBox msgBox;
@@ -84,19 +83,19 @@ void LevellingPage::performLevelling()
     ui->progressLabel->setText(QString(tr("Retrieving data...")));
 
 
-    if(!m_levellingUtil)
+    if(!m_calibrationUtil)
     {
-        m_levellingUtil = new LevellingUtil(BIAS_CYCLES, BIAS_RATE);
+        m_calibrationUtil = new CCCalibrationUtil(BIAS_CYCLES, BIAS_RATE);
     }
 
-    connect(m_levellingUtil, SIGNAL(progress(long,long)), this, SLOT(levellingProgress(long,long)));
-    connect(m_levellingUtil, SIGNAL(done(accelGyroBias)), this, SLOT(levellingDone(accelGyroBias)));
-    connect(m_levellingUtil, SIGNAL(timeout(QString)), this, SLOT(levellingTimeout(QString)));
+    connect(m_calibrationUtil, SIGNAL(progress(long,long)), this, SLOT(calibrationProgress(long,long)));
+    connect(m_calibrationUtil, SIGNAL(done(accelGyroBias)), this, SLOT(calibrationDone(accelGyroBias)));
+    connect(m_calibrationUtil, SIGNAL(timeout(QString)), this, SLOT(calibrationTimeout(QString)));
 
-    m_levellingUtil->start();
+    m_calibrationUtil->start();
 }
 
-void LevellingPage::levellingProgress(long current, long total)
+void CCCalibrationPage::calibrationProgress(long current, long total)
 {
     if(ui->levellinProgressBar->maximum() != (int)total) {
         ui->levellinProgressBar->setMaximum((int)total);
@@ -106,16 +105,16 @@ void LevellingPage::levellingProgress(long current, long total)
     }
 }
 
-void LevellingPage::levellingDone(accelGyroBias bias)
+void CCCalibrationPage::calibrationDone(accelGyroBias bias)
 {
-    stopLevelling();
+    stopCalibration();
     getWizard()->setLevellingBias(bias);
     emit completeChanged();
 }
 
-void LevellingPage::levellingTimeout(QString message)
+void CCCalibrationPage::calibrationTimeout(QString message)
 {
-    stopLevelling();
+    stopCalibration();
 
     QMessageBox msgBox;
     msgBox.setText(message);
@@ -124,13 +123,13 @@ void LevellingPage::levellingTimeout(QString message)
     msgBox.exec();
 }
 
-void LevellingPage::stopLevelling()
+void CCCalibrationPage::stopCalibration()
 {
-    if(m_levellingUtil)
+    if(m_calibrationUtil)
     {
-        disconnect(m_levellingUtil, SIGNAL(progress(long,long)), this, SLOT(levellingProgress(long,long)));
-        disconnect(m_levellingUtil, SIGNAL(done(accelGyroBias)), this, SLOT(levellingDone(accelGyroBias)));
-        disconnect(m_levellingUtil, SIGNAL(timeout(QString)), this, SLOT(levellingTimeout(QString)));
+        disconnect(m_calibrationUtil, SIGNAL(progress(long,long)), this, SLOT(calibrationProgress(long,long)));
+        disconnect(m_calibrationUtil, SIGNAL(done(accelGyroBias)), this, SLOT(calibrationDone(accelGyroBias)));
+        disconnect(m_calibrationUtil, SIGNAL(timeout(QString)), this, SLOT(calibrationTimeout(QString)));
         ui->progressLabel->setText(QString(tr("<font color='green'>Done!</font>")));
         enableButtons(true);
     }

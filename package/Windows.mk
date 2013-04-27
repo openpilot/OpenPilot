@@ -20,11 +20,11 @@ NSIS_HEADER   := $(OPGCSSYNTHDIR)/openpilotgcs.nsh
 package:
 	$(V1) mkdir -p "$(dir $(NSIS_HEADER))"
 	$(VERSION_CMD) \
-		--template="$(NSIS_TEMPLATE)" \
-		--outfile="$(NSIS_HEADER)" \
-		PACKAGE_LBL="$(PACKAGE_LBL)" \
-		PACKAGE_NAME="$(PACKAGE_NAME)" \
-		PACKAGE_SEP="$(PACKAGE_SEP)"
+		--template='$(NSIS_TEMPLATE)' \
+		--outfile='$(NSIS_HEADER)' \
+		PACKAGE_LBL='$(PACKAGE_LBL)' \
+		PACKAGE_NAME='$(PACKAGE_NAME)' \
+		PACKAGE_SEP='$(PACKAGE_SEP)'
 	$(V1) echo "Building Windows installer, please wait..."
 	$(V1) echo "If you have a script error in line 1 - use Unicode NSIS 2.46+"
 	$(V1) echo "  http://www.scratchpaper.com"

@@ -82,7 +82,7 @@ void ConnectionDiagram::setupGraphicsScene()
             case VehicleConfigurationSource::CONTROLLER_CC:
             case VehicleConfigurationSource::CONTROLLER_CC3D:
             case VehicleConfigurationSource::CONTROLLER_REVO:
-            case VehicleConfigurationSource::CONTROLLER_PIPX:
+            case VehicleConfigurationSource::CONTROLLER_OPLINK:
             default:
                 elementsToShow << "controller";
                 break;

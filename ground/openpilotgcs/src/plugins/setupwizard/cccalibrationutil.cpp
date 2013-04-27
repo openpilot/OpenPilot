@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       levellingutil.cpp
+ * @file       cccalibrationutil.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup LevellingUtil
+ * @addtogroup CCCalibrationUtil
  * @{
  * @brief
  *****************************************************************************/
@@ -25,7 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "levellingutil.h"
+#include "cccalibrationutil.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "attitudesettings.h"
@@ -33,20 +33,20 @@
 #include "gyros.h"
 
 
-LevellingUtil::LevellingUtil(long measurementCount, long measurementRate) : QObject(),
+CCCalibrationUtil::CCCalibrationUtil(long measurementCount, long measurementRate) : QObject(),
     m_isMeasuring(false), m_accelMeasurementCount(measurementCount), m_gyroMeasurementCount(measurementCount),
     m_accelMeasurementRate(measurementRate), m_gyroMeasurementRate(measurementRate)
 {
 }
 
-LevellingUtil::LevellingUtil(long accelMeasurementCount, long accelMeasurementRate,
+CCCalibrationUtil::CCCalibrationUtil(long accelMeasurementCount, long accelMeasurementRate,
                              long gyroMeasurementCount, long gyroMeasurementRate) : QObject(),
     m_isMeasuring(false), m_accelMeasurementCount(accelMeasurementCount), m_gyroMeasurementCount(gyroMeasurementCount),
     m_accelMeasurementRate(accelMeasurementRate), m_gyroMeasurementRate(gyroMeasurementRate)
 {
 }
 
-void LevellingUtil::start()
+void CCCalibrationUtil::start()
 {
     if(!m_isMeasuring) {
         startMeasurement();
@@ -58,15 +58,16 @@ void LevellingUtil::start()
     }
 }
 
-void LevellingUtil::abort()
+void CCCalibrationUtil::abort()
 {
     if(m_isMeasuring) {
         stopMeasurement();
     }
 }
 
-void LevellingUtil::gyroMeasurementsUpdated(UAVObject *obj)
+void CCCalibrationUtil::gyroMeasurementsUpdated(UAVObject *obj)
 {
+    Q_UNUSED(obj);
     QMutexLocker locker(&m_measurementMutex);
 
     if(m_receivedGyroUpdates < m_gyroMeasurementCount) {
@@ -91,8 +92,9 @@ void LevellingUtil::gyroMeasurementsUpdated(UAVObject *obj)
     }
 }
 
-void LevellingUtil::accelMeasurementsUpdated(UAVObject *obj)
+void CCCalibrationUtil::accelMeasurementsUpdated(UAVObject *obj)
 {
+    Q_UNUSED(obj);
     QMutexLocker locker(&m_measurementMutex);
 
     if(m_receivedAccelUpdates < m_accelMeasurementCount) {
@@ -117,7 +119,7 @@ void LevellingUtil::accelMeasurementsUpdated(UAVObject *obj)
     }
 }
 
-void LevellingUtil::timeout()
+void CCCalibrationUtil::timeout()
 {
     QMutexLocker locker(&m_measurementMutex);
 
@@ -125,7 +127,7 @@ void LevellingUtil::timeout()
     emit timeout(tr("Calibration timed out before receiving required updates."));
 }
 
-void LevellingUtil::startMeasurement()
+void CCCalibrationUtil::startMeasurement()
 {
     QMutexLocker locker(&m_measurementMutex);
 
@@ -174,7 +176,7 @@ void LevellingUtil::startMeasurement()
     uavObject->setMetadata(newMetaData);
 }
 
-void LevellingUtil::stopMeasurement()
+void CCCalibrationUtil::stopMeasurement()
 {
     m_isMeasuring = false;
 
@@ -202,7 +204,7 @@ void LevellingUtil::stopMeasurement()
     AttitudeSettings::GetInstance(uavObjectManager)->setData(attitudeSettingsData);
 }
 
-accelGyroBias LevellingUtil::calculateLevellingData()
+accelGyroBias CCCalibrationUtil::calculateLevellingData()
 {
     accelGyroBias bias;
     bias.m_accelerometerXBias = m_accelerometerX / (double)m_receivedAccelUpdates / ACCELERATION_SCALE;

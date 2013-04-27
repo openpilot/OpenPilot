@@ -34,6 +34,10 @@
 #include "openpilot.h"
 #include "pios_struct_helper.h"
 
+#if (defined(__MACH__) && defined(__APPLE__))
+#include <mach-o/getsect.h>
+#endif
+
 // Constants
 
 // Private types
@@ -41,9 +45,21 @@
 // Macros
 #define SET_BITS(var, shift, value, mask) var = (var & ~(mask << shift)) | (value << shift);
 
-/* Table of UAVO handles registered at compile time */
+// Mach-o: dummy segment to calculate ASLR offset in sim_osx
+#if (defined(__MACH__) && defined(__APPLE__))
+static long _aslr_offset __attribute__((section("__DATA,_aslr")));
+#endif
+
+/* Table of UAVO handles */
+#if (defined(__MACH__) && defined(__APPLE__))
+/* Mach-o format */
+static struct UAVOData ** __start__uavo_handles;
+static struct UAVOData ** __stop__uavo_handles;
+#else
+/* ELF format: automagically defined at compile time */
 extern struct UAVOData * __start__uavo_handles[] __attribute__((weak));
 extern struct UAVOData * __stop__uavo_handles[] __attribute__((weak));
+#endif
 
 #define UAVO_LIST_ITERATE(_item) \
 for (struct UAVOData ** _uavo_slot = __start__uavo_handles; \
@@ -198,6 +214,13 @@ int32_t UAVObjInitialize()
 {
 	// Initialize variables
 	memset(&stats, 0, sizeof(UAVObjStats));
+
+	/* Initialize _uavo_handles start/stop pointers */
+	#if (defined(__MACH__) && defined(__APPLE__))
+	uint64_t aslr_offset = (uint64_t) & _aslr_offset - getsectbyname("__DATA","_aslr")->addr;
+	__start__uavo_handles = (struct UAVOData **) (getsectbyname("__DATA","_uavo_handles")->addr + aslr_offset);
+	__stop__uavo_handles = (struct UAVOData **) ((uint64_t)__start__uavo_handles + getsectbyname("__DATA","_uavo_handles")->size);
+	#endif
 
 	// Initialize the uavo handle table
 	memset(__start__uavo_handles, 0,

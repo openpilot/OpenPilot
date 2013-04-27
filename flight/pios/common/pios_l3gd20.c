@@ -67,7 +67,6 @@ static int32_t PIOS_L3GD20_ReleaseBus();
 volatile bool l3gd20_configured = false;
 
 /* Local Variables */
-#define DEG_TO_RAD (M_PI / 180.0)
 
 /**
  * @brief Allocate a new device

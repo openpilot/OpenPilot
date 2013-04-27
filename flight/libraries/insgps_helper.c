@@ -5,9 +5,6 @@
 #include "insgps.h"
 #include "CoordinateConversions.h"
 
-#define DEG_TO_RAD         (M_PI / 180.0)
-#define RAD_TO_DEG         (180.0 / M_PI)
-
 #define INSGPS_GPS_TIMEOUT 2   /* 2 seconds triggers reinit of position */
 #define INSGPS_GPS_MINSAT  6   /* 2 seconds triggers reinit of position */
 #define INSGPS_GPS_MINPDOP 3.5 /* minimum PDOP for postition updates    */

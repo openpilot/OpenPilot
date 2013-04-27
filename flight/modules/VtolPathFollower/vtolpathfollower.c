@@ -47,6 +47,7 @@
  */
 
 #include "openpilot.h"
+#include <pios_math.h>
 #include "paths.h"
 
 #include "vtolpathfollower.h"
@@ -79,9 +80,6 @@
 #define MAX_QUEUE_SIZE 4
 #define STACK_SIZE_BYTES 1548
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
-#define F_PI 3.14159265358979323846f
-#define DEG2RAD (F_PI/180.0f)
-#define RAD2DEG(rad) ((rad)*(180.0f/F_PI))
 
 // Private types
 
@@ -338,8 +336,8 @@ static void updatePOIBearing()
     // don't try to move any closer
     if (poiRadius >= 3.0f || changeRadius > 0) {
         if (pathAngle != 0 || changeRadius != 0) {
-            pathDesired.End[PATHDESIRED_END_NORTH] = poi.North + (poiRadius * cosf((pathAngle + yaw - 180.0f) * DEG2RAD));
-            pathDesired.End[PATHDESIRED_END_EAST] = poi.East + (poiRadius * sinf((pathAngle + yaw - 180.0f) * DEG2RAD));
+            pathDesired.End[PATHDESIRED_END_NORTH] = poi.North + (poiRadius * cosf(DEG2RAD(pathAngle + yaw - 180.0f)));
+            pathDesired.End[PATHDESIRED_END_EAST] = poi.East + (poiRadius * sinf(DEG2RAD(pathAngle + yaw - 180.0f)));
             pathDesired.StartingVelocity = 1;
             pathDesired.EndingVelocity = 0;
             pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
@@ -481,13 +479,13 @@ void updateEndpointVelocity()
             GPSPositionGet(&gpsPosition);
             HomeLocationData homeLocation;
             HomeLocationGet(&homeLocation);
-            float lat = homeLocation.Latitude / 10.0e6f * DEG2RAD;
+            float lat = DEG2RAD(homeLocation.Latitude / 10.0e6f);
             float alt = homeLocation.Altitude;
             float T[3] =
             { alt + 6.378137E6f, cosf(lat) * (alt + 6.378137E6f), -1.0f };
             float NED[3] =
-            { T[0] * ((gpsPosition.Latitude - homeLocation.Latitude) / 10.0e6f * DEG2RAD), T[1]
-                    * ((gpsPosition.Longitude - homeLocation.Longitude) / 10.0e6f * DEG2RAD), T[2]
+            { T[0] * (DEG2RAD((gpsPosition.Latitude - homeLocation.Latitude) / 10.0e6f)), T[1]
+                    * (DEG2RAD((gpsPosition.Longitude - homeLocation.Longitude) / 10.0e6f)), T[2]
                     * ((gpsPosition.Altitude + gpsPosition.GeoidSeparation - homeLocation.Altitude)) };
 
             northPos = NED[0];
@@ -610,8 +608,8 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
         {
             GPSPositionData gpsPosition;
             GPSPositionGet(&gpsPosition);
-            northVel = gpsPosition.Groundspeed * cosf(gpsPosition.Heading * F_PI / 180.0f);
-            eastVel = gpsPosition.Groundspeed * sinf(gpsPosition.Heading * F_PI / 180.0f);
+            northVel = gpsPosition.Groundspeed * cosf(DEG2RAD(gpsPosition.Heading));
+            eastVel = gpsPosition.Groundspeed * sinf(DEG2RAD(gpsPosition.Heading));
             downVel = velocityActual.Down;
         }
             break;
@@ -656,9 +654,9 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
 
     // Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
     // craft should move similarly for 5 deg roll versus 5 deg pitch
-    stabDesired.Pitch = bound(-northCommand * cosf(attitudeActual.Yaw * M_PI / 180) + -eastCommand * sinf(attitudeActual.Yaw * M_PI / 180),
+    stabDesired.Pitch = bound(-northCommand * cosf(DEG2RAD(attitudeActual.Yaw)) + -eastCommand * sinf(DEG2RAD(attitudeActual.Yaw)),
             -vtolpathfollowerSettings.MaxRollPitch, vtolpathfollowerSettings.MaxRollPitch);
-    stabDesired.Roll = bound(-northCommand * sinf(attitudeActual.Yaw * M_PI / 180) + eastCommand * cosf(attitudeActual.Yaw * M_PI / 180),
+    stabDesired.Roll = bound(-northCommand * sinf(DEG2RAD(attitudeActual.Yaw)) + eastCommand * cosf(DEG2RAD(attitudeActual.Yaw)),
             -vtolpathfollowerSettings.MaxRollPitch, vtolpathfollowerSettings.MaxRollPitch);
 
     if (vtolpathfollowerSettings.ThrottleControl == VTOLPATHFOLLOWERSETTINGS_THROTTLECONTROL_FALSE) {

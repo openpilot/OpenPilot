@@ -38,6 +38,6 @@ CFLAGS += "-DFLASH_IMAGE_FILE=\"$(OUTDIR)/theflash.bin\""
 
 CONLYFLAGS += -std=gnu99
 
-SRC := $(PIOS)/Common/pios_flashfs_logfs.c
+SRC := $(PIOS)/common/pios_flashfs_logfs.c
 
 include $(TOP)/make/unittest.mk

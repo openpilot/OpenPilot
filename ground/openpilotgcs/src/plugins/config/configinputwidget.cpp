@@ -125,23 +125,23 @@ ConfigInputWidget::ConfigInputWidget(QWidget *parent) :
     connect(m_config->wzBack,SIGNAL(clicked()),this,SLOT(wzBack()));
 
     m_config->stackedWidget->setCurrentIndex(0);
-    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos1,0,1,true);
-    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos2,1,1,true);
-    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos3,2,1,true);
-    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos4,3,1,true);
-    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos5,4,1,true);
-    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModePosition",m_config->fmsModePos6,5,1,true);
-    addUAVObjectToWidgetRelation("ManualControlSettings","FlightModeNumber",m_config->fmsPosNum);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "FlightModePosition", m_config->fmsModePos1, 0, 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "FlightModePosition", m_config->fmsModePos2, 1, 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "FlightModePosition", m_config->fmsModePos3, 2, 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "FlightModePosition", m_config->fmsModePos4, 3, 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "FlightModePosition", m_config->fmsModePos5, 4, 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "FlightModePosition", m_config->fmsModePos6, 5, 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "FlightModeNumber", m_config->fmsPosNum);
 
-    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization1Settings",m_config->fmsSsPos1Roll,"Roll");
-    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization2Settings",m_config->fmsSsPos2Roll,"Roll");
-    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization3Settings",m_config->fmsSsPos3Roll,"Roll");
-    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization1Settings",m_config->fmsSsPos1Pitch,"Pitch");
-    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization2Settings",m_config->fmsSsPos2Pitch,"Pitch");
-    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization3Settings",m_config->fmsSsPos3Pitch,"Pitch");
-    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization1Settings",m_config->fmsSsPos1Yaw,"Yaw");
-    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization2Settings",m_config->fmsSsPos2Yaw,"Yaw");
-    addUAVObjectToWidgetRelation("ManualControlSettings","Stabilization3Settings",m_config->fmsSsPos3Yaw,"Yaw");
+    addUAVObjectToWidgetRelation("ManualControlSettings", "Stabilization1Settings", m_config->fmsSsPos1Roll, "Roll", 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "Stabilization2Settings", m_config->fmsSsPos2Roll, "Roll", 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "Stabilization3Settings", m_config->fmsSsPos3Roll, "Roll", 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "Stabilization1Settings", m_config->fmsSsPos1Pitch, "Pitch", 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "Stabilization2Settings", m_config->fmsSsPos2Pitch, "Pitch", 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "Stabilization3Settings", m_config->fmsSsPos3Pitch, "Pitch", 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "Stabilization1Settings", m_config->fmsSsPos1Yaw, "Yaw", 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "Stabilization2Settings", m_config->fmsSsPos2Yaw, "Yaw", 1, true);
+    addUAVObjectToWidgetRelation("ManualControlSettings", "Stabilization3Settings", m_config->fmsSsPos3Yaw, "Yaw", 1, true);
 
     addUAVObjectToWidgetRelation("ManualControlSettings","Arming",m_config->armControl);
     addUAVObjectToWidgetRelation("ManualControlSettings","ArmedTimeout",m_config->armTimeout,0,1000);

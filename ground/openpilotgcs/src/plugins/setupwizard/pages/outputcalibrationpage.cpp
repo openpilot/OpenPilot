@@ -330,6 +330,7 @@ void OutputCalibrationPage::debugLogChannelValues()
 
 void OutputCalibrationPage::on_motorNeutralSlider_valueChanged(int value)
 {
+    Q_UNUSED(value);
     if(ui->motorNeutralButton->isChecked()) {
         quint16 value = ui->motorNeutralSlider->value();
         m_calibrationUtil->setChannelOutputValue(value);
@@ -348,6 +349,7 @@ void OutputCalibrationPage::on_servoCenterButton_toggled(bool checked)
 
 void OutputCalibrationPage::on_servoCenterSlider_valueChanged(int position)
 {
+    Q_UNUSED(position);
     if(ui->servoCenterButton->isChecked()) {
         quint16 value = ui->servoCenterSlider->value();
         m_calibrationUtil->setChannelOutputValue(value);
@@ -375,6 +377,7 @@ void OutputCalibrationPage::on_servoMinAngleButton_toggled(bool checked)
 
 void OutputCalibrationPage::on_servoMinAngleSlider_valueChanged(int position)
 {
+    Q_UNUSED(position);
     if(ui->servoMinAngleButton->isChecked()) {
         quint16 value = ui->servoMinAngleSlider->value();
         m_calibrationUtil->setChannelOutputValue(value);
@@ -393,6 +396,7 @@ void OutputCalibrationPage::on_servoMaxAngleButton_toggled(bool checked)
 
 void OutputCalibrationPage::on_servoMaxAngleSlider_valueChanged(int position)
 {
+    Q_UNUSED(position);
     if(ui->servoMaxAngleButton->isChecked()) {
         quint16 value = ui->servoMaxAngleSlider->value();
         m_calibrationUtil->setChannelOutputValue(value);

@@ -64,7 +64,8 @@
 		<file>images/tx-rx.svg</file>
 		<file>qml/images/tab.png</file>
 		<file>qml/AboutDialog.qml</file>
-		<file>qml/FlickableWebView.qml</file>
+		<file>qml/AuthorsModel.qml</file>
+		<file>qml/ScrollDecorator.qml</file>
 		<file>qml/TabWidget.qml</file>
     </qresource>
 </RCC>

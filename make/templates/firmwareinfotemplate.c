@@ -55,7 +55,11 @@ struct __attribute__((packed)) fw_version_info {
 	uint8_t pad[20];
 };
 
+#if (defined(__MACH__) && defined(__APPLE__))
+const struct fw_version_info fw_version_blob __attribute__((used)) __attribute__((__section__("__TEXT,.fw_version_blob"))) = {
+#else
 const struct fw_version_info fw_version_blob __attribute__((used)) __attribute__((__section__(".fw_version_blob"))) = {
+#endif
 	.magic = { 'O','p','F','w' },
 	.commit_hash_prefix = 0x${HASH8},
 	.timestamp = ${UNIXTIME},

@@ -101,18 +101,27 @@ void UAVObjectField::constructorInitialize(const QString& name, const QString& u
 
 void UAVObjectField::limitsInitialize(const QString &limits)
 {
-    /// format
-    /// (TY)->type (EQ-equal;NE-not equal;BE-between;BI-bigger;SM-smaller)
-    /// (VALX)->value
-    /// %TY:VAL1:VAL2:VAL3,%TY,VAL1,VAL2,VAL3
-    /// example: first element bigger than 3 and second element inside [2.3,5]
-    /// "%BI:3,%BE:2.3:5"
+    // Limit string format:
+    //     %        - start char
+    //     XXXX     - optional BOARD_TYPE and BOARD_REVISION (4 hex digits)
+    //     TY       - rule type (EQ-equal, NE-not equal, BE-between, BI-bigger, SM-smaller)
+    //     VAL      - values for TY separated by colon
+    //     ,        - rule separator (may have leading or trailing spaces)
+    //     ;        - element separator (may have leading or trailing spaces)
+    //
+    // Examples:
+    //     Disable few flight modes for Revo (00903):
+    //         "%0903NE:Autotune:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner"
+    //     Original CC board (rev 1), first element bigger than 3 and second element inside [2.3-5.0]:
+    //         "%0401BI:3; %BE:2.3:5"
+    //     Set applicable range [0-500] for 3 elements of array for all boards:
+    //         "%BE:0:500; %BE:0:500; %BE:0:500"
     if(limits.isEmpty())
         return;
-    QStringList stringPerElement=limits.split(",");
+    QStringList stringPerElement = limits.split(";");
     quint32 index=0;
     foreach (QString str, stringPerElement) {
-        QStringList ruleList=str.split(";");
+        QStringList ruleList = str.split(",");
         QList<LimitStruct> limitList;
         foreach(QString rule,ruleList)
         {

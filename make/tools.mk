@@ -120,6 +120,7 @@ JAR		:= jar
 GIT		:= git
 CURL		:= curl
 OPENSSL		:= openssl
+DOXYGEN		:= doxygen
 
 # Echo in recipes is a bit tricky in a Windows Git Bash window in some cases.
 # It does not work if make started under msysGit installed into a path with spaces.

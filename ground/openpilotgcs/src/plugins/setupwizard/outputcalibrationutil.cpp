@@ -46,7 +46,7 @@ OutputCalibrationUtil::~OutputCalibrationUtil()
 
 void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValue)
 {
-    if(m_outputChannel < 0 && channel >= 0 && channel < ActuatorCommand::CHANNEL_NUMELEM)
+    if(m_outputChannel < 0 && channel < ActuatorCommand::CHANNEL_NUMELEM)
     {
         //Start output...
         m_outputChannel = channel;

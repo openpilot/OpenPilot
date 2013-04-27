@@ -6,7 +6,8 @@
 *.py		text eol=lf
 *.sh		text eol=lf
 
+/doxygen/*.cfg				text eol=lf
 /templates/firmwareinfotemplate.c 	text eol=lf
 /templates/gcs_version_info_template.h	text eol=crlf
 /templates/*.txt			text eol=crlf
-/templates/uncrustify.cfg		text eol=lf
+/uncrustify/*.cfg			text eol=lf

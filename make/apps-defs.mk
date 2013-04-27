@@ -26,7 +26,7 @@ OPSYSTEM	= $(TOPDIR)
 BOARDINC	= $(TOPDIR)/..
 OPSYSTEMINC	= $(OPSYSTEM)/inc
 PIOSINC		= $(PIOS)/inc
-PIOSCOMMON	= $(PIOS)/Common
+PIOSCOMMON	= $(PIOS)/common
 FLIGHTLIBINC	= $(FLIGHTLIB)/inc
 
 ## UAVTalk and UAVObject manager
@@ -38,18 +38,17 @@ MATHLIB		= $(FLIGHTLIB)/math
 MATHLIBINC	= $(FLIGHTLIB)/math
 
 ## FreeRTOS support
-FREERTOS_DIR	 = $(PIOSCOMMON)/Libraries/FreeRTOS
+FREERTOS_DIR	 = $(PIOSCOMMON)/libraries/FreeRTOS
 include $(FREERTOS_DIR)/library.mk
 
 ## Misc
-DOXYGENDIR	= $(ROOT_DIR)/flight/Doc/Doxygen
 OPTESTS		= $(TOPDIR)/Tests
 
 ## PIOS Hardware
 ifeq ($(MCU),cortex-m3)
-    include $(PIOS)/STM32F10x/library.mk
+    include $(PIOS)/stm32f10x/library.mk
 else ifeq ($(MCU),cortex-m4)
-    include $(PIOS)/STM32F4xx/library.mk
+    include $(PIOS)/stm32f4xx/library.mk
 else
     $(error Unsupported MCU: $(MCU))
 endif

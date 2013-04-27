@@ -98,7 +98,7 @@ endif
 
 	
 # Optional component libraries
-include $(PIOS)/Common/Libraries/dosfs/library.mk
+include $(PIOS)/common/libraries/dosfs/library.mk
 
 include $(ROOT_DIR)/make/apps-defs.mk
 include $(ROOT_DIR)/make/common-defs.mk

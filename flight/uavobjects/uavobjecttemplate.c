@@ -40,7 +40,11 @@
 #include "$(NAMELC).h"
 
 // Private variables
+#if (defined(__MACH__) && defined(__APPLE__))
+static UAVObjHandle handle __attribute__((section("__DATA,_uavo_handles")));
+#else
 static UAVObjHandle handle __attribute__((section("_uavo_handles")));
+#endif
 
 /**
  * Initialize object.

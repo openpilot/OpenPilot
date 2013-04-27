@@ -135,7 +135,7 @@ endif
 ifeq ($(DEBUG), YES)
     CFLAGS += -DDEBUG
 else
-    CFLAGS += -ffunction-sections #-fdata-sections 
+    CFLAGS += -fdata-sections -ffunction-sections
 endif
 
 # Compiler flags to generate dependency files
@@ -158,7 +158,7 @@ ASFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(base
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
 LDFLAGS += -nostartfiles
-LDFLAGS += -Wl,--warn-common,--fatal-warnings,--gc-sections
+LDFLAGS += -Wl,--warn-common,--fatal-warnings,--sort-common,--sort-section=alignment,--gc-sections
 LDFLAGS += -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))

@@ -194,6 +194,7 @@ void PIOS_PPM_OUT_Set(uint32_t ppm_out_id, uint8_t servo, uint16_t position)
         // Reenable the TIM if it's been turned off.
         if (!ppm_dev->Tracking) {
                 PIOS_PPM_Out_Enable_Disable(ppm_dev, true);
+                ppm_dev->Tracking = TRUE;
         }
 	
 	// Update the position

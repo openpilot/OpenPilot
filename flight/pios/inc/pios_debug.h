@@ -68,6 +68,12 @@ void PIOS_DEBUG_Panic(const char *msg);
 #define PIOS_Assert(test) if (!(test)) while (1);
 #endif
 
+/* Static (compile-time) assertion for use in a function.
+   If test evaluates to 0 (ie fails) at compile time then compilation will
+   fail with the error: "size of unnamed array is negative" */
+#define PIOS_STATIC_ASSERT(test) ((void)sizeof(int[1 - 2*!(test)]))
+
+
 #endif /* PIOS_DEBUG_H */
 
 /**

@@ -75,7 +75,7 @@ typedef enum {
  *    6-7    gcsTelemetryUpdateMode   Update mode used by the GCS (UAVObjUpdateMode)
  */
 typedef struct {
-	uint8_t flags; /** Defines flags for update and logging modes and whether an update should be ACK'd (bits defined above) */
+	uint8_t  flags; /** Defines flags for update and logging modes and whether an update should be ACK'd (bits defined above) */
 	uint16_t telemetryUpdatePeriod; /** Update period used by the telemetry module (only if telemetry mode is PERIODIC) */
 	uint16_t gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
 	uint16_t loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */

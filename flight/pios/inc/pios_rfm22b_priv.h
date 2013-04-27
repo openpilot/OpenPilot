@@ -443,36 +443,10 @@
 #define RFM22_received_packet_length				0x4B	// R
 
 #define RFM22_adc8_control							0x4F	// R/W
-/*
-  #define RFM22_analog_test_bus						0x50	// R/W
-  #define RFM22_digital_test_bus						0x51	// R/W
-  #define RFM22_tx_ramp_control						0x52	// R/W
-  #define RFM22_pll_tune_time							0x53	// R/W
 
-  #define RFM22_calibration_control					0x55	// R/W
-
-  #define RFM22_modem_test							0x56	// R/W
-
-  #define RFM22_chargepump_test						0x57	// R/W
-  #define RFM22_chargepump_current_trimming_override	0x58	// R/W
-
-  #define RFM22_divider_current_trimming				0x59	// R/W
-
-  #define RFM22_vco_current_trimming					0x5A	// R/W
-  #define RFM22_vco_calibration_override				0x5B	// R/W
-
-  #define RFM22_synthersizer_test						0x5C	// R/W
-
-  #define RFM22_block_enable_override1				0x5D	// R/W
-  #define RFM22_block_enable_override2				0x5E	// R/W
-  #define RFM22_block_enable_override3				0x5F	// R/W
-*/
 #define RFM22_channel_filter_coeff_addr				0x60	// R/W
 #define RFM22_ch_fil_coeff_ad_inv_pre_th_mask	0xF0		//
 #define RFM22_ch_fil_coeff_ad_chfiladd_mask		0x0F		// Channel Filter Coefficient Look-up Table Address. The address for channel filter coefficients used in the RX path.
-
-
-//#define RFM22_channel_filter_coeff_value			0x61	// R/W
 
 #define RFM22_xtal_osc_por_ctrl						0x62	// R/W
 #define RFM22_xtal_osc_por_ctrl_pwst_mask		0xE0		// Internal Power States of the Chip.
@@ -481,26 +455,12 @@
 #define RFM22_xtal_osc_por_ctrl_enamp2x			0x04		// 2 Times Higher Amplification Enable.
 #define RFM22_xtal_osc_por_ctrl_bufovr			0x02		// Output Buffer Enable Override.
 #define RFM22_xtal_osc_por_ctrl_enbuf			0x01		// Output Buffer Enable.
-/*
-  #define RFM22_rc_osc_coarse_calbration_override		0x63	// R/W
-  #define RFM22_rc_osc_fine_calbration_override		0x64	// R/W
 
-  #define RFM22_ldo_control_override					0x65	// R/W
-  #define RFM22_ldo_level_setting						0x66	// R/W
-
-  #define RFM22_deltasigma_adc_tuning1				0x67	// R/W
-  #define RFM22_deltasigma_adc_tuning2				0x68	// R/W
-*/
 #define RFM22_agc_override1					0x69	// R/W
 #define RFM22_agc_ovr1_sgi					0x40		// AGC Loop, Set Gain Increase. If set to 0 then gain increasing will not be allowed. If set to 1 then gain increasing is allowed, default is 0.
 #define RFM22_agc_ovr1_agcen					0x20		// Automatic Gain Control Enable. When this bit is set then the result of the control can be read out from bits [4:0], otherwise the gain can be controlled manually by writing into bits [4:0].
 #define RFM22_agc_ovr1_lnagain					0x10		// LNA Gain Select. 0 = min gain = 5dB, 1 = max gain = 25 dB.
 #define RFM22_agc_ovr1_pga_mask					0x0F		// PGA Gain Override Value.
-
-//#define RFM22_agc_override2						0x6A	// R/W
-
-//#define RFM22_gfsk_fir_coeff_addr					0x6B	// R/W
-//#define RFM22_gfsk_fir_coeff_value				0x6C	// R/W
 
 #define RFM22_tx_power						0x6D	// R/W
 #define RFM22_tx_pwr_lna_sw					0x08		// LNA Switch Controller. If set, lna_sw control from the digital will go high during TX modes, and low during other times. If reset, the digital control signal is low at all times.
@@ -568,233 +528,229 @@
 typedef int16_t (*t_rfm22_TxDataByteCallback) (void);
 typedef bool (*t_rfm22_RxDataCallback) (void *data, uint8_t len);
 enum pios_rfm22b_dev_magic {
-	PIOS_RFM22B_DEV_MAGIC = 0x68e971b6,
+    PIOS_RFM22B_DEV_MAGIC = 0x68e971b6,
 };
 
 enum pios_rfm22b_state {
-	RFM22B_STATE_UNINITIALIZED,
-	RFM22B_STATE_INITIALIZING,
-	RFM22B_STATE_REQUESTING_CONNECTION,
-	RFM22B_STATE_ACCEPTING_CONNECTION,
-	RFM22B_STATE_RX_MODE,
-	RFM22B_STATE_WAIT_PREAMBLE,
-	RFM22B_STATE_WAIT_SYNC,
-	RFM22B_STATE_RX_DATA,
-	RFM22B_STATE_RX_FAILURE,
-	RFM22B_STATE_RECEIVING_STATUS,
-	RFM22B_STATE_TX_START,
-	RFM22B_STATE_TX_DATA,
-	RFM22B_STATE_TX_FAILURE,
-	RFM22B_STATE_SENDING_ACK,
-	RFM22B_STATE_SENDING_NACK,
-	RFM22B_STATE_RECEIVING_ACK,
-	RFM22B_STATE_RECEIVING_NACK,
-	RFM22B_STATE_TIMEOUT,
-	RFM22B_STATE_ERROR,
-	RFM22B_STATE_FATAL_ERROR,
+    RFM22B_STATE_UNINITIALIZED,
+    RFM22B_STATE_INITIALIZING,
+    RFM22B_STATE_REQUESTING_CONNECTION,
+    RFM22B_STATE_ACCEPTING_CONNECTION,
+    RFM22B_STATE_RX_MODE,
+    RFM22B_STATE_WAIT_PREAMBLE,
+    RFM22B_STATE_WAIT_SYNC,
+    RFM22B_STATE_RX_DATA,
+    RFM22B_STATE_RX_FAILURE,
+    RFM22B_STATE_RECEIVING_STATUS,
+    RFM22B_STATE_TX_START,
+    RFM22B_STATE_TX_DATA,
+    RFM22B_STATE_TX_FAILURE,
+    RFM22B_STATE_SENDING_ACK,
+    RFM22B_STATE_SENDING_NACK,
+    RFM22B_STATE_RECEIVING_ACK,
+    RFM22B_STATE_RECEIVING_NACK,
+    RFM22B_STATE_TIMEOUT,
+    RFM22B_STATE_ERROR,
+    RFM22B_STATE_FATAL_ERROR,
 
-	RFM22B_STATE_NUM_STATES // Must be last
+    RFM22B_STATE_NUM_STATES // Must be last
 };
 
 enum pios_rfm22b_event {
-	RFM22B_EVENT_DEFAULT,
-	RFM22B_EVENT_INT_RECEIVED,
-	RFM22B_EVENT_INITIALIZE,
-	RFM22B_EVENT_INITIALIZED,
-	RFM22B_EVENT_REQUEST_CONNECTION,
-	RFM22B_EVENT_CONNECTION_REQUESTED,
-	RFM22B_EVENT_PACKET_ACKED,
-	RFM22B_EVENT_PACKET_NACKED,
-	RFM22B_EVENT_ACK_TIMEOUT,
-	RFM22B_EVENT_RX_MODE,
-	RFM22B_EVENT_PREAMBLE_DETECTED,
-	RFM22B_EVENT_SYNC_DETECTED,
-	RFM22B_EVENT_RX_COMPLETE,
-	RFM22B_EVENT_RX_ERROR,
-	RFM22B_EVENT_STATUS_RECEIVED,
-	RFM22B_EVENT_TX_START,
-	RFM22B_EVENT_FAILURE,
-	RFM22B_EVENT_TIMEOUT,
-	RFM22B_EVENT_ERROR,
-	RFM22B_EVENT_FATAL_ERROR,
+    RFM22B_EVENT_DEFAULT,
+    RFM22B_EVENT_INT_RECEIVED,
+    RFM22B_EVENT_INITIALIZE,
+    RFM22B_EVENT_INITIALIZED,
+    RFM22B_EVENT_REQUEST_CONNECTION,
+    RFM22B_EVENT_CONNECTION_REQUESTED,
+    RFM22B_EVENT_PACKET_ACKED,
+    RFM22B_EVENT_PACKET_NACKED,
+    RFM22B_EVENT_ACK_TIMEOUT,
+    RFM22B_EVENT_RX_MODE,
+    RFM22B_EVENT_PREAMBLE_DETECTED,
+    RFM22B_EVENT_SYNC_DETECTED,
+    RFM22B_EVENT_RX_COMPLETE,
+    RFM22B_EVENT_RX_ERROR,
+    RFM22B_EVENT_STATUS_RECEIVED,
+    RFM22B_EVENT_TX_START,
+    RFM22B_EVENT_FAILURE,
+    RFM22B_EVENT_TIMEOUT,
+    RFM22B_EVENT_ERROR,
+    RFM22B_EVENT_FATAL_ERROR,
 
-	RFM22B_EVENT_NUM_EVENTS  // Must be last
+    RFM22B_EVENT_NUM_EVENTS  // Must be last
 };
 
 #define RFM22B_RX_PACKET_STATS_LEN 4
 enum pios_rfm22b_rx_packet_status {
-	RFM22B_GOOD_RX_PACKET = 0x00,
-	RFM22B_CORRECTED_RX_PACKET = 0x01,
-	RFM22B_ERROR_RX_PACKET = 0x2,
-	RFM22B_RESENT_TX_PACKET = 0x3
+    RFM22B_GOOD_RX_PACKET = 0x00,
+    RFM22B_CORRECTED_RX_PACKET = 0x01,
+    RFM22B_ERROR_RX_PACKET = 0x2,
+    RFM22B_RESENT_TX_PACKET = 0x3
 };
 
 typedef struct {
-	uint32_t pairID;
-	int8_t rssi;
-	int8_t afc_correction;
-	uint8_t lastContact;
+    uint32_t pairID;
+    int8_t rssi;
+    int8_t afc_correction;
+    uint8_t lastContact;
 } rfm22b_pair_stats;
 
 typedef struct {
-	uint32_t pairID;
-	OPLinkSettingsRemoteMainPortOptions main_port;
-	OPLinkSettingsRemoteFlexiPortOptions flexi_port;
-	OPLinkSettingsRemoteVCPPortOptions vcp_port;
-	OPLinkSettingsComSpeedOptions com_speed;
+    uint32_t pairID;
+    OPLinkSettingsRemoteMainPortOptions main_port;
+    OPLinkSettingsRemoteFlexiPortOptions flexi_port;
+    OPLinkSettingsRemoteVCPPortOptions vcp_port;
+    OPLinkSettingsComSpeedOptions com_speed;
 } rfm22b_binding;
 
 struct pios_rfm22b_dev {
-	enum pios_rfm22b_dev_magic magic;
-	struct pios_rfm22b_cfg cfg;
+    enum pios_rfm22b_dev_magic magic;
+    struct pios_rfm22b_cfg cfg;
 
-	// The SPI bus information
-	uint32_t spi_id;
-	uint32_t slave_num;
+    // The SPI bus information
+    uint32_t spi_id;
+    uint32_t slave_num;
 
-	// The device ID
-	uint32_t deviceID;
+    // The device ID
+    uint32_t deviceID;
 
-	// The destination ID
-	uint32_t destination_id;
+    // The destination ID
+    uint32_t destination_id;
 
-	// The list of bound radios.
-	rfm22b_binding bindings[OPLINKSETTINGS_BINDINGS_NUMELEM];
-	uint8_t cur_binding;
+    // The list of bound radios.
+    rfm22b_binding bindings[OPLINKSETTINGS_BINDINGS_NUMELEM];
+    uint8_t cur_binding;
 
-	// Is this device a coordinator?
-	bool coordinator;
+    // Is this device a coordinator?
+    bool coordinator;
 
-	// The task handle
-	xTaskHandle taskHandle;
+    // The task handle
+    xTaskHandle taskHandle;
 
-	// The potential paired statistics
-	rfm22b_pair_stats pair_stats[OPLINKSTATUS_PAIRIDS_NUMELEM];
+    // The potential paired statistics
+    rfm22b_pair_stats pair_stats[OPLINKSTATUS_PAIRIDS_NUMELEM];
 
-	// ISR pending semaphore
-	xSemaphoreHandle isrPending;
+    // ISR pending semaphore
+    xSemaphoreHandle isrPending;
 
-	// The com configuration callback
-	PIOS_RFM22B_ComConfigCallback com_config_cb;
+    // The com configuration callback
+    PIOS_RFM22B_ComConfigCallback com_config_cb;
 
-	// The COM callback functions.
-	pios_com_callback rx_in_cb;
-	uint32_t rx_in_context;
-	pios_com_callback tx_out_cb;
-	uint32_t tx_out_context;
+    // The COM callback functions.
+    pios_com_callback rx_in_cb;
+    uint32_t rx_in_context;
+    pios_com_callback tx_out_cb;
+    uint32_t tx_out_context;
 
-	// the transmit power to use for data transmissions
-	uint8_t	tx_power;
+    // the transmit power to use for data transmissions
+    uint8_t	tx_power;
 
-	// The RF datarate lookup index.
-	uint8_t datarate;
+    // The RF datarate lookup index.
+    uint8_t datarate;
 
-	// The state machine state and the current event
-	enum pios_rfm22b_state state;
+    // The state machine state and the current event
+    enum pios_rfm22b_state state;
 
-	// The event queue handle
-	xQueueHandle eventQueue;
+    // The event queue handle
+    xQueueHandle eventQueue;
 
-	// device status register
-	uint8_t device_status;
-	// interrupt status register 1
-	uint8_t int_status1;
-	// interrupt status register 2
-	uint8_t int_status2;
-	// ezmac status register
-	uint8_t ezmac_status;
+    // device status register
+    uint8_t device_status;
+    // interrupt status register 1
+    uint8_t int_status1;
+    // interrupt status register 2
+    uint8_t int_status2;
+    // ezmac status register
+    uint8_t ezmac_status;
 
-	// The error statistics counters
-	uint16_t prev_rx_seq_num;
-	uint32_t rx_packet_stats[RFM22B_RX_PACKET_STATS_LEN];
+    // The error statistics counters
+    uint16_t prev_rx_seq_num;
+    uint32_t rx_packet_stats[RFM22B_RX_PACKET_STATS_LEN];
 
-	// The packet statistics
-	struct rfm22b_stats stats;
+    // The packet statistics
+    struct rfm22b_stats stats;
 
-	// Stats
-	uint16_t errors;
+    // Stats
+    uint16_t errors;
 
-	// RSSI in dBm
-	int8_t rssi_dBm;
+    // RSSI in dBm
+    int8_t rssi_dBm;
 
-	// The tx data packet
-	PHPacket data_packet;
-	// The current tx packet
-	PHPacketHandle tx_packet;
-	// The previous tx packet (waiting for an ACK)
-	PHPacketHandle prev_tx_packet;
-	// The tx data read index
-	uint16_t tx_data_rd;
-	// The tx data write index
-	uint16_t tx_data_wr;
-	// The tx packet sequence number
-	uint16_t tx_seq;
+    // The tx data packet
+    PHPacket data_packet;
+    // The current tx packet
+    PHPacketHandle tx_packet;
+    // The previous tx packet (waiting for an ACK)
+    PHPacketHandle prev_tx_packet;
+    // The tx data read index
+    uint16_t tx_data_rd;
+    // The tx data write index
+    uint16_t tx_data_wr;
+    // The tx packet sequence number
+    uint16_t tx_seq;
 
-	// The rx data packet
-	PHPacket rx_packet;
-	// The receive buffer write index
-	uint16_t rx_buffer_wr;
-	// The receive buffer write index
-	uint16_t rx_packet_len;
-	// Is the modem currently in Rx mode?
-	bool in_rx_mode;
+    // The rx data packet
+    PHPacket rx_packet;
+    // The receive buffer write index
+    uint16_t rx_buffer_wr;
+    // The receive buffer write index
+    uint16_t rx_packet_len;
+    // Is the modem currently in Rx mode?
+    bool in_rx_mode;
 
-	// The status packet
-	PHStatusPacket status_packet;
+    // The status packet
+    PHStatusPacket status_packet;
 
-	// The ACK/NACK packet
-	PHAckNackPacket ack_nack_packet;
+    // The ACK/NACK packet
+    PHAckNackPacket ack_nack_packet;
 
 #ifdef PIOS_PPM_RECEIVER
-	// The PPM packet
-	PHPpmPacket ppm_packet;
+    // The PPM packet
+    PHPpmPacket ppm_packet;
 #endif
 
-	// The connection packet.
-	PHConnectionPacket con_packet;
+    // The connection packet.
+    PHConnectionPacket con_packet;
 
-	// Send flags
-	bool send_status;
-	bool send_ppm;
-	bool send_connection_request;
-	bool time_to_send;
+    // Send flags
+    bool send_status;
+    bool send_ppm;
+    bool send_connection_request;
+    bool time_to_send;
 
-	// The offset between our clock and the global send clock
-	uint8_t time_to_send_offset;
-	// The number of times that the current packet has been resent.
-	uint8_t cur_resent_count;
+    // The offset between our clock and the global send clock
+    uint8_t time_to_send_offset;
 
-	// The initial frequency
-	uint32_t init_frequency;
-	// The number of frequency hopping channels.
-	uint16_t num_channels;
+    // The initial frequency
+    uint32_t init_frequency;
+    // The number of frequency hopping channels.
+    uint16_t num_channels;
 
-	// The frequency hopping step size
-	float frequency_step_size;
-	// current frequency hop channel
-	uint8_t	frequency_hop_channel;
-	// the frequency hop step size
-	uint8_t frequency_hop_step_size_reg;
-	// afc correction reading (in Hz)
-	int8_t afc_correction_Hz;
+    // The frequency hopping step size
+    float frequency_step_size;
+    // current frequency hop channel
+    uint8_t	frequency_hop_channel;
+    // afc correction reading (in Hz)
+    int8_t afc_correction_Hz;
 
-	// The packet timers.
-	portTickType packet_start_ticks;
-	portTickType tx_complete_ticks;
-	portTickType rx_complete_ticks;
-	portTickType time_delta;
+    // The packet timers.
+    portTickType packet_start_ticks;
+    portTickType tx_complete_ticks;
+    portTickType rx_complete_ticks;
+    portTickType time_delta;
 
-	// The maximum time (ms) that it should take to transmit / receive a packet.
-	uint32_t max_packet_time;
+    // The maximum time (ms) that it should take to transmit / receive a packet.
+    uint32_t max_packet_time;
 
-	// The maximum time to wait for an ACK.
-	uint8_t max_ack_delay;
+    // The maximum time to wait for an ACK.
+    uint8_t max_ack_delay;
 
 #ifdef PIOS_INCLUDE_RFM22B_RCVR
-	// The PPM channel values
-	uint16_t ppm_channel[PIOS_RFM22B_RCVR_MAX_CHANNELS];
-	uint8_t ppm_supv_timer;
-	bool ppm_fresh;
+    // The PPM channel values
+    uint16_t ppm_channel[PIOS_RFM22B_RCVR_MAX_CHANNELS];
+    uint8_t ppm_supv_timer;
+    bool ppm_fresh;
 #endif
 };
 
@@ -802,9 +758,7 @@ struct pios_rfm22b_dev {
 // External function definitions
 
 bool PIOS_RFM22_EXT_Int(void);
-bool PIOS_RFM22B_validate(struct pios_rfm22b_dev * rfm22b_dev);
-void PIOS_RFM22B_InjectEvent(struct pios_rfm22b_dev *rfm22b_dev, enum pios_rfm22b_event event, bool inISR);
-
+bool PIOS_RFM22B_Validate(struct pios_rfm22b_dev *rfm22b_dev);
 
 // Global variable definitions
 

@@ -51,11 +51,19 @@ int32_t $(NAME)Initialize();
 UAVObjHandle $(NAME)Handle();
 void $(NAME)SetDefaults(UAVObjHandle obj, uint16_t instId);
 
-// Object data
+// Packed Object data (unaligned).
+// Should only be used where 4 byte alignment can be guaranteed
+// (eg a single instance on the heap)
 typedef struct {
 $(DATAFIELDS)
-} __attribute__((packed)) $(NAME)Data;
+} __attribute__((packed)) $(NAME)DataPacked;
 
+// Packed Object data.
+// Alignment is forced to 4 bytes so as to avoid the potential for CPU usage faults 
+// on Cortex M4F during load/store of float UAVO fields
+typedef $(NAME)DataPacked __attribute__((aligned(4))) $(NAME)Data;
+
+    
 // Typesafe Object access functions
 /**
  * @function $(NAME)Get(dataOut)

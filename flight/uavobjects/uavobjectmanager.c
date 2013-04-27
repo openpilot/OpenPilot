@@ -34,6 +34,10 @@
 #include "openpilot.h"
 #include "pios_struct_helper.h"
 
+#if (defined(__MACH__) && defined(__APPLE__))
+#include <mach-o/getsect.h>
+#endif
+
 // Constants
 
 // Private types
@@ -41,9 +45,21 @@
 // Macros
 #define SET_BITS(var, shift, value, mask) var = (var & ~(mask << shift)) | (value << shift);
 
-/* Table of UAVO handles registered at compile time */
+// Mach-o: dummy segment to calculate ASLR offset in sim_osx
+#if (defined(__MACH__) && defined(__APPLE__))
+static long _aslr_offset __attribute__((section("__DATA,_aslr")));
+#endif
+
+/* Table of UAVO handles */
+#if (defined(__MACH__) && defined(__APPLE__))
+/* Mach-o format */
+static struct UAVOData ** __start__uavo_handles;
+static struct UAVOData ** __stop__uavo_handles;
+#else
+/* ELF format: automagically defined at compile time */
 extern struct UAVOData * __start__uavo_handles[] __attribute__((weak));
 extern struct UAVOData * __stop__uavo_handles[] __attribute__((weak));
+#endif
 
 #define UAVO_LIST_ITERATE(_item) \
 for (struct UAVOData ** _uavo_slot = __start__uavo_handles; \
@@ -60,10 +76,10 @@ for (struct UAVOData ** _uavo_slot = __start__uavo_handles; \
 typedef void* InstanceHandle; 
 
 struct ObjectEventEntry {
+	struct ObjectEventEntry * next;
 	xQueueHandle              queue;
 	UAVObjEventCallback       cb;
 	uint8_t                   eventMask;
-	struct ObjectEventEntry * next;
 };
 
 /*
@@ -91,7 +107,6 @@ struct UAVOBase {
 		bool isSingle      : 1;
 		bool isSettings    : 1;
 	} flags;
-
 } __attribute__((packed));
 
 /* Augmented type for Meta UAVO */
@@ -110,7 +125,7 @@ struct UAVOData {
 	 */
 	struct UAVOMeta   metaObj;
 	uint16_t          instance_size;
-} __attribute__((packed));
+} __attribute__((packed, aligned(4)));
 
 /* Augmented type for Single Instance Data UAVO */
 struct UAVOSingle {
@@ -136,9 +151,8 @@ struct UAVOMultiInst {
 /* Augmented type for Multi Instance Data UAVO */
 struct UAVOMulti {
 	struct UAVOData        uavo;
-
 	uint16_t               num_instances;
-	struct UAVOMultiInst   instance0;
+	struct UAVOMultiInst   instance0 __attribute__((aligned(4)));
 	/*
 	 * Additional space will be malloc'd here to hold the
 	 * the data for instance 0.
@@ -198,6 +212,13 @@ int32_t UAVObjInitialize()
 {
 	// Initialize variables
 	memset(&stats, 0, sizeof(UAVObjStats));
+
+	/* Initialize _uavo_handles start/stop pointers */
+	#if (defined(__MACH__) && defined(__APPLE__))
+	uint64_t aslr_offset = (uint64_t) & _aslr_offset - getsectbyname("__DATA","_aslr")->addr;
+	__start__uavo_handles = (struct UAVOData **) (getsectbyname("__DATA","_uavo_handles")->addr + aslr_offset);
+	__stop__uavo_handles = (struct UAVOData **) ((uint64_t)__start__uavo_handles + getsectbyname("__DATA","_uavo_handles")->size);
+	#endif
 
 	// Initialize the uavo handle table
 	memset(__start__uavo_handles, 0,
@@ -296,8 +317,8 @@ static struct UAVOData * UAVObjAllocMulti(uint32_t num_bytes)
 	/* Set up the type-specific part of the UAVO */
 	uavo_multi->num_instances = 1;
 
-	/* Clear the instance data carried in the UAVO */
-	memset (&(uavo_multi->instance0), 0, num_bytes);
+	/* Clear the multi instance data carried in the UAVO */
+	memset (&(uavo_multi->instance0), 0, sizeof(struct UAVOMultiInst) + num_bytes);
 
 	/* Give back the generic UAVO part */
 	return (&(uavo_multi->uavo));
@@ -1864,10 +1885,11 @@ static InstanceHandle createInstance(struct UAVOData * obj, uint16_t instId)
 	}
 
 	/* Create the actual instance */
-	instEntry = (struct UAVOMultiInst *) pvPortMalloc(sizeof(struct UAVOMultiInst)+obj->instance_size);
+	uint32_t size = sizeof(struct UAVOMultiInst) + obj->instance_size;
+	instEntry = (struct UAVOMultiInst *) pvPortMalloc(size);
 	if (!instEntry)
 		return NULL;
-	memset(InstanceDataOffset(instEntry), 0, obj->instance_size);
+	memset(instEntry, 0, size);
 	LL_APPEND(( (struct UAVOMulti*)obj )->instance0.next, instEntry);
 
 	( (struct UAVOMulti*)obj )->num_instances++;

@@ -1,17 +1,17 @@
 /**
- ******************************************************************************
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup   PIOS_RFM22B_RCVR RFM22B Receiver Input Functions
- * @brief	 Code to output the PPM signal from the RFM22B
- * @{
- *
- * @file       pios_rfm22b_rcvr.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      Implements a receiver interface to the RFM22B device
- * @see        The GNU Public License (GPL) Version 3
- *
- *****************************************************************************/
+******************************************************************************
+* @addtogroup PIOS PIOS Core hardware abstraction layer
+* @{
+* @addtogroup   PIOS_RFM22B_RCVR RFM22B Receiver Input Functions
+* @brief	 Code to output the PPM signal from the RFM22B
+* @{
+*
+* @file       pios_rfm22b_rcvr.c
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+* @brief      Implements a receiver interface to the RFM22B device
+* @see        The GNU Public License (GPL) Version 3
+*
+*****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,60 +39,86 @@ static int32_t PIOS_RFM22B_RCVR_Get(uint32_t rcvr_id, uint8_t channel);
 static void PIOS_RFM22B_RCVR_Supervisor(uint32_t rcvr_id);
 
 const struct pios_rcvr_driver pios_rfm22b_rcvr_driver = {
-	.read = PIOS_RFM22B_RCVR_Get,
+    .read = PIOS_RFM22B_RCVR_Get,
 };
 
+/**
+ * Initialize the receiver.
+ *
+ * @param[in] rfm22b_dev  The receiver ID.
+ * @return < 0 on failure.
+ */
 int32_t PIOS_RFM22B_RCVR_Init(uint32_t rcvr_id)
 {
-	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rcvr_id;
-	if (!PIOS_RFM22B_validate(rfm22b_dev))
-		return -1;
+    struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rcvr_id;
+    if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
+        return -1;
+    }
 
-	// Initialize
-	for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i)
-		rfm22b_dev->ppm_channel[i] = PIOS_RCVR_TIMEOUT;
-	rfm22b_dev->ppm_supv_timer = 0;
+    // Initialize
+    for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i) {
+        rfm22b_dev->ppm_channel[i] = PIOS_RCVR_TIMEOUT;
+    }
+    rfm22b_dev->ppm_supv_timer = 0;
 
-	// Register the failsafe timer callback.
-	if (!PIOS_RTC_RegisterTickCallback(PIOS_RFM22B_RCVR_Supervisor, rcvr_id))
-		PIOS_DEBUG_Assert(0);
+    // Register the failsafe timer callback.
+    if (!PIOS_RTC_RegisterTickCallback(PIOS_RFM22B_RCVR_Supervisor, rcvr_id)) {
+        PIOS_DEBUG_Assert(0);
+    }
 
-	return 0;
+    return 0;
 }
 
+/**
+ * Get a channel from the receiver.
+ *
+ * @param[in] rcvr_id  The receiver ID.
+ * @return The channel value, or -1 on failure.
+ */
 static int32_t PIOS_RFM22B_RCVR_Get(uint32_t rcvr_id, uint8_t channel)
 {
-	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rcvr_id;
-	if (!PIOS_RFM22B_validate(rfm22b_dev))
-		return -1;
+    struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rcvr_id;
+    if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
+        return -1;
+    }
 
-	if (channel >= GCSRECEIVER_CHANNEL_NUMELEM)
-		/* channel is out of range */
-		return -1;
+    if (channel >= GCSRECEIVER_CHANNEL_NUMELEM) {
+        /* channel is out of range */
+        return -1;
+    }
 
-	return rfm22b_dev->ppm_channel[channel];
+    return rfm22b_dev->ppm_channel[channel];
 }
 
+/**
+ * The supervisor function that ensures that the data is current.
+ *
+ * @param[in] rcvr_id  The receiver ID.
+ */
 static void PIOS_RFM22B_RCVR_Supervisor(uint32_t rcvr_id) {
-	struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rcvr_id;
-	if (!PIOS_RFM22B_validate(rfm22b_dev))
-		return;
+    struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rcvr_id;
+    if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
+        return;
+    }
 
-	// RTC runs at 625Hz.
-	if (++(rfm22b_dev->ppm_supv_timer) < (PIOS_RFM22B_RCVR_TIMEOUT_MS * 1000 / 625))
-		return;
-	rfm22b_dev->ppm_supv_timer = 0;
+    // RTC runs at 625Hz.
+    if (++(rfm22b_dev->ppm_supv_timer) < (PIOS_RFM22B_RCVR_TIMEOUT_MS * 1000 / 625)) {
+        return;
+    }
+    rfm22b_dev->ppm_supv_timer = 0;
 
-	// Have we received fresh values since the last update?
-	if (!rfm22b_dev->ppm_fresh)
-		for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i)
-			rfm22b_dev->ppm_channel[i] = 0;
-	rfm22b_dev->ppm_fresh = false;
+    // Have we received fresh values since the last update?
+    if (!rfm22b_dev->ppm_fresh) {
+        for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i) {
+            rfm22b_dev->ppm_channel[i] = 0;
+        }
+    }
+    rfm22b_dev->ppm_fresh = false;
 }
 
 #endif	/* PIOS_INCLUDE_RFM22B_RCVR */
 
 /** 
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

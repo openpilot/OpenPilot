@@ -35,44 +35,66 @@
 #include <pios_board_info.h>
 #include "stm32f10x_flash.h"
 
+
 uint8_t *PIOS_BL_HELPER_FLASH_If_Read(uint32_t SectorAddress)
 {
 	return (uint8_t *) (SectorAddress);
 }
 
 #if defined(PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT)
+
+static bool erase_flash(uint32_t startAddress, uint32_t endAddress);
+
 uint8_t PIOS_BL_HELPER_FLASH_Ini()
 {
-	FLASH_Unlock();
-	return 1;
+    FLASH_Unlock();
+    return 1;
 }
 
 uint8_t PIOS_BL_HELPER_FLASH_Start()
 {
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
-	uint32_t pageAdress = bdinfo->fw_base;
-	uint8_t fail = FALSE;
-	while ((pageAdress < (bdinfo->fw_base + bdinfo->fw_size + bdinfo->desc_size))
-	       || (fail == TRUE)) {
-		for (int retry = 0; retry < MAX_DEL_RETRYS; ++retry) {
-			if (FLASH_ErasePage(pageAdress) == FLASH_COMPLETE) {
-				fail = FALSE;
-				break;
-			} else {
-				fail = TRUE;
-			}
+    const struct pios_board_info * bdinfo = &pios_board_info_blob;
+    uint32_t startAddress = bdinfo->fw_base;
+    uint32_t endAddress = bdinfo->fw_base + bdinfo->fw_size + bdinfo->desc_size;
 
-		}
+    bool success = erase_flash(startAddress, endAddress);
+
+    return (success) ? 1 : 0;
+}
+
+uint8_t PIOS_BL_HELPER_FLASH_ERASE_BOOTLOADER() {
+/// Bootloader memory space erase
+    uint32_t startAddress = BL_BANK_BASE;
+    uint32_t endAddress = BL_BANK_BASE + BL_BANK_SIZE;
+
+    bool success = erase_flash(startAddress, endAddress);
+
+    return (success) ? 1 : 0;
+}
+
+static bool erase_flash(uint32_t startAddress, uint32_t endAddress) {
+    uint32_t pageAdress = startAddress;
+    uint8_t fail = FALSE;
+    while ((pageAdress < endAddress)
+            || (fail == TRUE)) {
+        for (int retry = 0; retry < MAX_DEL_RETRYS; ++retry) {
+            if (FLASH_ErasePage(pageAdress) == FLASH_COMPLETE) {
+                fail = FALSE;
+                break;
+            } else {
+                fail = TRUE;
+            }
+        }
 
 #ifdef STM32F10X_HD
-		pageAdress += 2048;
+        pageAdress += 2048;
 #elif defined (STM32F10X_MD)
-		pageAdress += 1024;
+        pageAdress += 1024;
 #endif
-	}
-
-	return (fail == TRUE) ? 0 : 1;
+    }
+    return !fail;
 }
+
 #endif
 
 uint32_t PIOS_BL_HELPER_CRC_Memory_Calc()

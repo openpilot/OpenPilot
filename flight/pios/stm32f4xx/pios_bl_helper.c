@@ -36,12 +36,16 @@
 #include "stm32f4xx_flash.h"
 #include <stdbool.h>
 
+
 uint8_t *PIOS_BL_HELPER_FLASH_If_Read(uint32_t SectorAddress)
 {
 	return (uint8_t *) (SectorAddress);
 }
 
 #if defined(PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT)
+
+static bool erase_flash(uint32_t startAddress, uint32_t endAddress);
+
 uint8_t PIOS_BL_HELPER_FLASH_Ini()
 {
 	FLASH_Unlock();
@@ -138,35 +142,55 @@ static bool PIOS_BL_HELPER_FLASH_GetSectorInfo(uint32_t address, uint8_t * secto
 uint8_t PIOS_BL_HELPER_FLASH_Start()
 {
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
-	uint32_t pageAddress = bdinfo->fw_base;
-	bool fail = false;
-	while ((pageAddress < (bdinfo->fw_base + bdinfo->fw_size + bdinfo->desc_size))
-	       && (fail == false)) {
-		uint8_t sector_number;
-		uint32_t sector_start;
-		uint32_t sector_size;
-		if (!PIOS_BL_HELPER_FLASH_GetSectorInfo(pageAddress, 
-								&sector_number,
-								&sector_start,
-								&sector_size)) {
-			/* We're asking for an invalid flash address */
-			PIOS_Assert(0);
-		}
-		for (int retry = 0; retry < MAX_DEL_RETRYS; ++retry) {
-			if (FLASH_EraseSector(sector_number, VoltageRange_3) == FLASH_COMPLETE) {
-				fail = false;
-				break;
-			} else {
-				fail = true;
-			}
+	uint32_t startAddress = bdinfo->fw_base;
+	uint32_t endAddress = bdinfo->fw_base + bdinfo->fw_size + bdinfo->desc_size;
 
-		}
-		/* Move to the next sector */
-		pageAddress += sector_size;
-	}
+	bool success = erase_flash(startAddress, endAddress);
 
-	return (fail == true) ? 0 : 1;
+    return (success) ? 1 : 0;
 }
+
+
+uint8_t PIOS_BL_HELPER_FLASH_ERASE_BOOTLOADER() {
+/// Bootloader memory space erase
+    uint32_t startAddress = BL_BANK_BASE;
+    uint32_t endAddress = BL_BANK_BASE + BL_BANK_SIZE;
+
+    bool success = erase_flash(startAddress, endAddress);
+
+    return (success) ? 1 : 0;
+}
+
+static bool erase_flash(uint32_t startAddress, uint32_t endAddress)
+{
+    uint32_t pageAddress = startAddress;
+    bool fail = false;
+    while ((pageAddress < endAddress)
+            && (fail == false)) {
+        uint8_t sector_number;
+        uint32_t sector_start;
+        uint32_t sector_size;
+        if (!PIOS_BL_HELPER_FLASH_GetSectorInfo(pageAddress,
+                        &sector_number,
+                        &sector_start,
+                        &sector_size)) {
+            /* We're asking for an invalid flash address */
+            PIOS_Assert(0);
+        }
+        for (int retry = 0; retry < MAX_DEL_RETRYS; ++retry) {
+            if (FLASH_EraseSector(sector_number, VoltageRange_3) == FLASH_COMPLETE) {
+                fail = false;
+                break;
+            } else {
+                fail = true;
+            }
+        }
+        /* Move to the next sector */
+        pageAddress += sector_size;
+    }
+    return !fail;
+}
+
 #endif
 
 uint32_t PIOS_BL_HELPER_CRC_Memory_Calc()

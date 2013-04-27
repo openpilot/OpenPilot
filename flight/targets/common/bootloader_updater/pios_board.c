@@ -36,21 +36,11 @@
 #include <board_hw_defs.c>
 #ifdef STM32F4XX
 #define FLASH_ErasePage(x) FLASH_EraseSector(x,VoltageRange_3)
-#define FLASH_PrefetchBuffer_Enable ENABLE
 #endif
 
 
 void PIOS_Board_Init(void) {
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
-
-	/* Enable Prefetch Buffer */
-	FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
-
-	/* Flash 2 wait state */
-	//FLASH_SetLatency(FLASH_Latency_5);
-
-	/* Delay system */
-	PIOS_DELAY_Init();
 
 	/* LEDs */
 #if defined(PIOS_INCLUDE_LED)

@@ -43,13 +43,19 @@
 #include <pios_eeprom.h>
 #endif
 
+#if defined(PIOS_LOG_FFT)
+#include "../../PiOS/STM32F10x/Libraries/STM32F10x_DSP_Lib/inc/stm32_dsp.h"
+#include "../../PiOS/STM32F10x/Libraries/STM32F10x_DSP_Lib/inc/table_fft.h"
+
+#endif
+
 #include <stdbool.h>
 
 // ****************
 // Private constants
 
 #define STACK_SIZE_BYTES 150
-#define TASK_PRIORITY (tskIDLE_PRIORITY)
+#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 #define MAX_RETRIES 2
 #define RETRY_TIMEOUT_MS 20
 #define EVENT_QUEUE_SIZE 10
@@ -64,6 +70,7 @@
 #define LOG_SERIAL_NAME "serial.log"
 #define LOG_ADC_NAME "adc.log"
 
+#define NPT 64            // NPT = No of FFT point
 // ****************
 // Private types
 
@@ -166,6 +173,17 @@ float temperature;
 
 bool NewMpu6050BufferReady;
 bool NewSerialBufferReady;
+
+#if defined(PIOS_LOG_FFT)
+uint8_t BufferPos;
+
+extern uint16_t TableFFT[];
+long lBUFIN[NPT];         //Complex input vector 
+long lBUFOUT[NPT];        // Complex output vector 
+long lBUFMAG[NPT + NPT/2];// Magnitude vector 
+
+void powerMag(long nfill);
+#endif
 
 // ****************
 // Private functions
@@ -461,14 +479,14 @@ uint8_t NbCLogged=0;
 						{
 							data->Current_buffer=2;
 							data->Ready2Record_1=1;
-							memcpy((char*)data->Log_Buffer_2,(char*)Serial_FormBuffer, Pos);
-							//copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
+							//memcpy((char*)data->Log_Buffer_2,(char*)Serial_FormBuffer, Pos);
+							copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
 							data->Pos_Buffer_2=Pos;
 						}
 						else
 						{
-							memcpy((char*)data->Log_Buffer_1+data->Pos_Buffer_1,(char*)Serial_FormBuffer, Pos);
-							//copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
+							//memcpy((char*)data->Log_Buffer_1+data->Pos_Buffer_1,(char*)Serial_FormBuffer, Pos);
+							copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
 							data->Pos_Buffer_1+=Pos;
 						}
 					}
@@ -478,14 +496,14 @@ uint8_t NbCLogged=0;
 						{
 							data->Current_buffer=1;
 							data->Ready2Record_2=1;
-							memcpy((char*)data->Log_Buffer_1,(char*)Serial_FormBuffer, Pos);
-							//copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
+							//memcpy((char*)data->Log_Buffer_1,(char*)Serial_FormBuffer, Pos);
+							copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
 							data->Pos_Buffer_1=Pos;
 						}
 						else
 						{
-							memcpy((char*)data->Log_Buffer_2+data->Pos_Buffer_2,(char*)Serial_FormBuffer, Pos);
-							//copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
+							//memcpy((char*)data->Log_Buffer_2+data->Pos_Buffer_2,(char*)Serial_FormBuffer, Pos);
+							copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
 							data->Pos_Buffer_2+=Pos;
 						}
 					}
@@ -501,8 +519,8 @@ uint8_t NbCLogged=0;
 					Serial_FormBuffer[Pos]='1';
 					Pos++;
 					memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
-					memcpy((char*)Serial_FormBuffer,(char*)FloatIEEE+Pos, sizeof(FloatIEEE));
-					//copybuf((char*)&Serial_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+					//memcpy((char*)Serial_FormBuffer,(char*)FloatIEEE+Pos, sizeof(FloatIEEE));
+					copybuf((char*)&Serial_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
 					Pos+=sizeof(FloatIEEE);
 					oldSysTime=lastSysTime;
 					InSentence=TRUE;
@@ -565,14 +583,14 @@ uint8_t NbCLogged=0;
 						{
 							data->Current_buffer=2;
 							data->Ready2Record_1=1;
-							memcpy((char*)data->Log_Buffer_2,(char*)Serial_FormBuffer, Pos);
-							//copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
+							//memcpy((char*)data->Log_Buffer_2,(char*)Serial_FormBuffer, Pos);
+							copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
 							data->Pos_Buffer_2=Pos;
 						}
 						else
 						{
-							memcpy((char*)data->Log_Buffer_1+data->Pos_Buffer_1,(char*)Serial_FormBuffer, Pos);
-							//copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
+							//memcpy((char*)data->Log_Buffer_1+data->Pos_Buffer_1,(char*)Serial_FormBuffer, Pos);
+							copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
 							data->Pos_Buffer_1+=Pos;
 						}
 					}
@@ -582,14 +600,14 @@ uint8_t NbCLogged=0;
 						{
 							data->Current_buffer=1;
 							data->Ready2Record_2=1;
-							memcpy((char*)data->Log_Buffer_1,(char*)Serial_FormBuffer, Pos);
-							//copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
+							//memcpy((char*)data->Log_Buffer_1,(char*)Serial_FormBuffer, Pos);
+							copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
 							data->Pos_Buffer_1=Pos;
 						}
 						else
 						{
-							memcpy((char*)data->Log_Buffer_2+data->Pos_Buffer_2,(char*)Serial_FormBuffer, Pos);
-							//copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
+							//memcpy((char*)data->Log_Buffer_2+data->Pos_Buffer_2,(char*)Serial_FormBuffer, Pos);
+							copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
 							data->Pos_Buffer_2+=Pos;
 						}
 					}
@@ -605,8 +623,8 @@ uint8_t NbCLogged=0;
 					Serial_FormBuffer[Pos]='2';
 					Pos++;
 					memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
-					memcpy((char*)Serial_FormBuffer+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-					//copybuf((char*)&Serial_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+					//memcpy((char*)Serial_FormBuffer+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+					copybuf((char*)&Serial_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
 					Pos+=sizeof(FloatIEEE);
 					oldSysTime=lastSysTime;
 					InSentence=TRUE;
@@ -669,14 +687,14 @@ uint8_t NbCLogged=0;
 						{
 							data->Current_buffer=2;
 							data->Ready2Record_1=1;
-							memcpy((char*)data->Log_Buffer_2,(char*)Serial_FormBuffer, Pos);
-							//copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
+							//memcpy((char*)data->Log_Buffer_2,(char*)Serial_FormBuffer, Pos);
+							copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
 							data->Pos_Buffer_2=Pos;
 						}
 						else
 						{
-							memcpy((char*)data->Log_Buffer_1+data->Pos_Buffer_1,(char*)Serial_FormBuffer, Pos);
-							//copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
+							//memcpy((char*)data->Log_Buffer_1+data->Pos_Buffer_1,(char*)Serial_FormBuffer, Pos);
+							copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
 							data->Pos_Buffer_1+=Pos;
 						}
 					}
@@ -686,14 +704,14 @@ uint8_t NbCLogged=0;
 						{
 							data->Current_buffer=1;
 							data->Ready2Record_2=1;
-							memcpy((char*)data->Log_Buffer_1,(char*)Serial_FormBuffer, Pos);
-							//copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
+							//memcpy((char*)data->Log_Buffer_1,(char*)Serial_FormBuffer, Pos);
+							copybuf((char*)&data->Log_Buffer_1,(char*)&Serial_FormBuffer,0,(uint16_t)Pos);
 							data->Pos_Buffer_1=Pos;
 						}
 						else
 						{
-							memcpy((char*)data->Log_Buffer_2+data->Pos_Buffer_2,(char*)Serial_FormBuffer, Pos);
-							//copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
+							//memcpy((char*)data->Log_Buffer_2+data->Pos_Buffer_2,(char*)Serial_FormBuffer, Pos);
+							copybuf((char*)&data->Log_Buffer_2,(char*)&Serial_FormBuffer,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
 							data->Pos_Buffer_2+=Pos;
 						}
 					}
@@ -709,8 +727,8 @@ uint8_t NbCLogged=0;
 					Serial_FormBuffer[Pos]='3';
 					Pos++;
 					memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
-					memcpy((char*)Serial_FormBuffer+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-					//copybuf((char*)&Serial_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+					//memcpy((char*)Serial_FormBuffer+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+					copybuf((char*)&Serial_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
 					Pos+=sizeof(FloatIEEE);
 					oldSysTime=lastSysTime;
 					InSentence=TRUE;
@@ -807,23 +825,23 @@ static void loggerAdcTask(void *parameters)
 		Adc_FormBuffer[Pos]='d';
 		Pos++;
 		memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
-		memcpy((char*)Adc_FormBuffer+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-		//copybuf((char*)&Adc_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		//memcpy((char*)Adc_FormBuffer+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+		copybuf((char*)&Adc_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
 		Pos+=sizeof(FloatIEEE);
 		AdcValue=PIOS_ADC_PinGet(0);
 		memcpy(&FloatIEEE,&AdcValue, sizeof(AdcValue));//turn the float value to an array of 4bytes
-		memcpy((char*)Adc_FormBuffer+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-		//copybuf((char*)&Adc_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		//memcpy((char*)Adc_FormBuffer+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+		copybuf((char*)&Adc_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
 		Pos+=sizeof(FloatIEEE);
 		AdcValue=PIOS_ADC_PinGet(1);
 		memcpy(&FloatIEEE,&AdcValue, sizeof(AdcValue));//turn the float value to an array of 4bytes
-		memcpy((char*)Adc_FormBuffer+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-		//copybuf((char*)&Adc_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		//memcpy((char*)Adc_FormBuffer+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+		copybuf((char*)&Adc_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
 		Pos+=sizeof(FloatIEEE);
 		AdcValue=PIOS_ADC_PinGet(2);
 		memcpy(&FloatIEEE,&AdcValue, sizeof(AdcValue));//turn the float value to an array of 4bytes
-		memcpy((char*)Adc_FormBuffer+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-		//copybuf((char*)&Adc_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+		//memcpy((char*)Adc_FormBuffer+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+		copybuf((char*)&Adc_FormBuffer,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
 		Pos+=sizeof(FloatIEEE);
 		Adc_FormBuffer[Pos]=0x0d;
 		Pos++;
@@ -841,14 +859,14 @@ static void loggerAdcTask(void *parameters)
 			{
 				data->Current_buffer=2;
 				data->Ready2Record_1=1;
-				memcpy((char*)data->Log_Buffer_2,(char*)Adc_FormBuffer, Pos);
-				//copybuf((char*)&data->Log_Buffer_2,(char*)&Adc_FormBuffer,0,(uint16_t)Pos);
+				//memcpy((char*)data->Log_Buffer_2,(char*)Adc_FormBuffer, Pos);
+				copybuf((char*)&data->Log_Buffer_2,(char*)&Adc_FormBuffer,0,(uint16_t)Pos);
 				data->Pos_Buffer_2=Pos;
 			}
 			else
 			{
-				memcpy((char*)data->Log_Buffer_1+data->Pos_Buffer_1,(char*)Adc_FormBuffer, Pos);
-				//copybuf((char*)&data->Log_Buffer_1,(char*)&Adc_FormBuffer,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
+				//memcpy((char*)data->Log_Buffer_1+data->Pos_Buffer_1,(char*)Adc_FormBuffer, Pos);
+				copybuf((char*)&data->Log_Buffer_1,(char*)&Adc_FormBuffer,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
 				data->Pos_Buffer_1+=Pos;
 			}
 		}
@@ -858,14 +876,14 @@ static void loggerAdcTask(void *parameters)
 			{
 				data->Current_buffer=1;
 				data->Ready2Record_2=1;
-				memcpy((char*)data->Log_Buffer_1,(char*)Adc_FormBuffer, Pos);
-				//copybuf((char*)&data->Log_Buffer_1,(char*)&Adc_FormBuffer,0,(uint16_t)Pos);
+				//memcpy((char*)data->Log_Buffer_1,(char*)Adc_FormBuffer, Pos);
+				copybuf((char*)&data->Log_Buffer_1,(char*)&Adc_FormBuffer,0,(uint16_t)Pos);
 				data->Pos_Buffer_1=Pos;
 			}
 			else
 			{
-				memcpy((char*)data->Log_Buffer_2+data->Pos_Buffer_2,(char*)Adc_FormBuffer, Pos);
-				//copybuf((char*)&data->Log_Buffer_2,(char*)&Adc_FormBuffer,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
+				//memcpy((char*)data->Log_Buffer_2+data->Pos_Buffer_2,(char*)Adc_FormBuffer, Pos);
+				copybuf((char*)&data->Log_Buffer_2,(char*)&Adc_FormBuffer,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
 				data->Pos_Buffer_2+=Pos;
 			}
 		}
@@ -883,11 +901,17 @@ portTickType lastSysTime;
 int16_t inpart[7];
 int16_t frpart[7];
 uint8_t spart[7];
-char Mpu6050Form_Buff[64];
+//char Mpu6050Form_Buff[64];
 char Mpu6050Hex_Buff[16];
-uint8_t Pos=0;
+uint16_t Pos=0;
 uint8_t FloatIEEE[4];
 float AdcValue;
+#if defined(PIOS_LOG_FFT)
+char Mpu6050Form_Buff[300];
+BufferPos=0;
+#else
+char Mpu6050Form_Buff[64];
+#endif
 	
 #if defined(PIOS_INCLUDE_MPU6050)
 	PIOS_MPU6050_Init(pios_i2c_flexi_adapter_id, &pios_mpu6050_cfg);
@@ -904,41 +928,70 @@ float AdcValue;
 			Mpu6050Form_Buff[Pos]='p';
 			Pos++;
 			memcpy(&FloatIEEE,&lastSysTime, sizeof(lastSysTime));//turn the float value to an array of 4bytes
-			memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-			//copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
+			//memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));//copy the 4 bytes at the end of the buffer
 			Pos+=sizeof(FloatIEEE);
 			memcpy(&FloatIEEE,&accels[0], sizeof(accels[0]));
-			memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-			//copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			//memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
 			Pos+=sizeof(FloatIEEE);
 			memcpy(&FloatIEEE,&accels[1], sizeof(accels[1]));
-			memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-			//copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			//memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
 			Pos+=sizeof(FloatIEEE);
 			memcpy(&FloatIEEE,&accels[2], sizeof(accels[2]));
-			memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-			//copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			//memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
 			Pos+=sizeof(FloatIEEE);
 			memcpy(&FloatIEEE,&gyros[0], sizeof(gyros[0]));
-			memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-			//copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			//memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
 			Pos+=sizeof(FloatIEEE);
 			memcpy(&FloatIEEE,&gyros[1], sizeof(gyros[1]));
-			memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-			//copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			//memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
 			Pos+=sizeof(FloatIEEE);
 			memcpy(&FloatIEEE,&gyros[2], sizeof(gyros[2]));
-			memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-			//copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			//memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
 			Pos+=sizeof(FloatIEEE);
 			memcpy(&FloatIEEE,&temperature, sizeof(temperature));
-			memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
-			//copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+			//memcpy((char*)Mpu6050Form_Buff+Pos,(char*)FloatIEEE, sizeof(FloatIEEE));
+			copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
 			Pos+=sizeof(FloatIEEE);
 			Mpu6050Form_Buff[Pos]=0x0d;
 			Pos++;
 			Mpu6050Form_Buff[Pos]=0x0a;
 			Pos++;
+			//---------------------------------------------------------check for new fft sample every 64 sample, if so send them------------------
+#if defined(PIOS_LOG_FFT)
+			lBUFIN[BufferPos]=(short)((accels[2]*1)) << 16 ;
+			if(BufferPos>=63)
+			{
+				cr4_fft_64_stm32(lBUFOUT, lBUFIN, NPT);
+				powerMag(NPT);
+				Mpu6050Form_Buff[Pos]='F';
+				Pos++;
+				Mpu6050Form_Buff[Pos]='f';
+				Pos++;
+				for(uint8_t j=0;j<64;j++)
+				{
+					memcpy(&FloatIEEE,&lBUFOUT[j], sizeof(lBUFOUT[j]));
+					copybuf((char*)&Mpu6050Form_Buff,(char*)&FloatIEEE,(uint16_t)Pos,(uint16_t)sizeof(FloatIEEE));
+					Pos+=sizeof(FloatIEEE);
+				}
+				Mpu6050Form_Buff[Pos]=0x0d;
+				Pos++;
+				Mpu6050Form_Buff[Pos]=0x0a;
+				Pos++;
+				BufferPos=0;
+			}
+			else
+			{
+				BufferPos++;
+			}
+#endif
+//-------------------------------------------------------------------------------------------------------------
 			xSemaphoreTake(data->buffer_lock, portMAX_DELAY);
 			/*while(data->Buffers_InUse)//wait for other task to finish writing on buffer
 			{
@@ -951,14 +1004,14 @@ float AdcValue;
 				{
 					data->Current_buffer=2;
 					data->Ready2Record_1=1;
-					memcpy((char*)data->Log_Buffer_2,(char*)Mpu6050Form_Buff, Pos);
-					//copybuf((char*)&data->Log_Buffer_2,(char*)&Mpu6050Form_Buff,0,(uint16_t)Pos);
+					//memcpy((char*)data->Log_Buffer_2,(char*)Mpu6050Form_Buff, Pos);
+					copybuf((char*)&data->Log_Buffer_2,(char*)&Mpu6050Form_Buff,0,(uint16_t)Pos);
 					data->Pos_Buffer_2=Pos;
 				}
 				else
 				{
-					memcpy((char*)data->Log_Buffer_1+data->Pos_Buffer_1,(char*)Mpu6050Form_Buff, Pos);
-					//copybuf((char*)&data->Log_Buffer_1,(char*)&Mpu6050Form_Buff,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
+					//memcpy((char*)data->Log_Buffer_1+data->Pos_Buffer_1,(char*)Mpu6050Form_Buff, Pos);
+					copybuf((char*)&data->Log_Buffer_1,(char*)&Mpu6050Form_Buff,(uint16_t)data->Pos_Buffer_1,(uint16_t)Pos);
 					data->Pos_Buffer_1+=Pos;
 				}
 			}
@@ -968,20 +1021,20 @@ float AdcValue;
 				{
 					data->Current_buffer=1;
 					data->Ready2Record_2=1;
-					memcpy((char*)data->Log_Buffer_1,(char*)Mpu6050Form_Buff, Pos);
-					//copybuf((char*)&data->Log_Buffer_1,(char*)&Mpu6050Form_Buff,0,(uint16_t)Pos);
+					//memcpy((char*)data->Log_Buffer_1,(char*)Mpu6050Form_Buff, Pos);
+					copybuf((char*)&data->Log_Buffer_1,(char*)&Mpu6050Form_Buff,0,(uint16_t)Pos);
 					data->Pos_Buffer_1=Pos;
 				}
 				else
 				{
-					memcpy((char*)data->Log_Buffer_2+data->Pos_Buffer_2,(char*)Mpu6050Form_Buff, Pos);
-					//copybuf((char*)&data->Log_Buffer_2,(char*)&Mpu6050Form_Buff,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
+					//memcpy((char*)data->Log_Buffer_2+data->Pos_Buffer_2,(char*)Mpu6050Form_Buff, Pos);
+					copybuf((char*)&data->Log_Buffer_2,(char*)&Mpu6050Form_Buff,(uint16_t)data->Pos_Buffer_2,(uint16_t)Pos);
 					data->Pos_Buffer_2+=Pos;
 				}
 			}
 			xSemaphoreGive(data->buffer_lock);
 			//data->Buffers_InUse=0;
-			vTaskDelayUntil(&lastSysTime, 10 / portTICK_RATE_MS);//sleep a while
+			vTaskDelayUntil(&lastSysTime, 5 / portTICK_RATE_MS);//sleep a while
 		}
 	}
 }
@@ -1322,3 +1375,30 @@ void printFloat(float v, uint8_t decimalDigits)
 		sensPart='+';
 	}
 }
+
+#if defined(PIOS_LOG_FFT)
+
+/**
+  * @brief  Compute power magnitude of the FFT transform
+  * @param ill: length of the array holding power mag
+  *   : strPara: if set to "1SIDED", removes aliases part of spectrum (not tested)
+  * @retval : None
+  */
+void powerMag(long nfill)
+{
+  int32_t lX,lY;
+  uint32_t i;
+
+  for (i=0; i < nfill; i++)
+  {
+    lX= (lBUFOUT[i]<<16)>>16; /* sine_cosine --> cos */
+    lY= (lBUFOUT[i] >> 16);   /* sine_cosine --> sin */
+    {
+      float X=  64*((float)lX)/32768;
+      float Y = 64*((float)lY)/32768;
+      float Mag = sqrt(X*X+ Y*Y)/nfill;
+      lBUFMAG[i] = (uint32_t)(Mag*65536);
+    }
+  }
+}
+#endif

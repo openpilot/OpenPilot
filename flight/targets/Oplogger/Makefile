@@ -72,3 +72,5 @@ include $(PIOS)/Common/Libraries/dosfs/library.mk
 
 include $(ROOT_DIR)/make/apps-defs.mk
 include $(ROOT_DIR)/make/common-defs.mk
+
+ASRC += $(PIOSSTM32F10X)/Libraries/STM32F10x_DSP_Lib/src/asm/gcc/cr4_fft_64_stm32.S

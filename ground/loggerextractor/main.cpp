@@ -145,15 +145,18 @@ int main(int argc, char *argv[])
 		QFile file3("R2.opl");
 		QFile file4("Adc.csv");
 		QFile file5("mpu.csv");
+		QFile file6("ff.csv");
 		
 		file.open(QIODevice::ReadOnly);
 		file2.open(QIODevice::WriteOnly);
 		file3.open(QIODevice::WriteOnly);
 		file4.open(QIODevice::WriteOnly| QIODevice::Text);
 		file5.open(QIODevice::WriteOnly| QIODevice::Text);
+		file6.open(QIODevice::WriteOnly| QIODevice::Text);
 		
 		int lastSysTime;
 		float Adc;
+		int AdcInt;
 		char FloatIEEE[4];
 		QString qStr; 
 		int AdError=0;
@@ -203,21 +206,24 @@ int main(int argc, char *argv[])
 					FloatIEEE[1]=line[7];
 					FloatIEEE[2]=line[8];
 					FloatIEEE[3]=line[9];
-					memcpy(&Adc,&FloatIEEE, 4);
+					memcpy(&AdcInt,&FloatIEEE, 4);
+					Adc=3.3f*((float)AdcInt/4096.0f);
 					qStr = QString::number(Adc);
 					file4.write( qStr.toAscii()+QString(";").toAscii());
 					FloatIEEE[0]=line[10];
 					FloatIEEE[1]=line[11];
 					FloatIEEE[2]=line[12];
 					FloatIEEE[3]=line[13];
-					memcpy(&Adc,&FloatIEEE, 4);
+					memcpy(&AdcInt,&FloatIEEE, 4);
+					Adc=3.3f*((float)AdcInt/4096.0f);
 					qStr = QString::number(Adc);
 					file4.write( qStr.toAscii()+QString(";").toAscii());
 					FloatIEEE[0]=line[14];
 					FloatIEEE[1]=line[15];
 					FloatIEEE[2]=line[16];
 					FloatIEEE[3]=line[17];
-					memcpy(&Adc,&FloatIEEE, 4);
+					memcpy(&AdcInt,&FloatIEEE, 4);
+					Adc=3.3f*((float)AdcInt/4096.0f);
 					qStr = QString::number(Adc);
 					file4.write( qStr.toAscii()+QString("\r").toAscii());
 					 cout << "Ad : " <<line.length()<<"\r\n" ;
@@ -229,6 +235,38 @@ int main(int argc, char *argv[])
 				}
 			}
 		 }
+		 else if(line[0]=='F')
+		 {
+			if(line[1]=='f')
+			{	
+				int len1=line.length();
+				while(line.length()<260)
+				{
+					QByteArray line2 = file.readLine();
+					//qRealloc(len1, len1*sizeof(QByteArray));
+					line.resize(len1+line2.length());
+					for(int i=0;i<line2.length();i++)
+					{
+						line[len1+i]= line2[i];
+					}
+					len1+=line2.length();
+				}
+				while((line[len1-2]!='\r')&&(len1<20))
+				{
+					QByteArray line2 = file.readLine();
+					//qRealloc(len1, len1*sizeof(QByteArray));
+					line.resize(len1+line2.length());
+					for(int i=0;i<line2.length();i++)
+					{
+						line[len1+i]= line2[i];
+					}
+					len1+=line2.length();
+				}
+				if(len1==260)
+				{
+				}
+			}
+		}
 		 else if(line[0]=='M')
 		 {
 			if(line[1]=='p')

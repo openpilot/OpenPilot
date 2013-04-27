@@ -16,6 +16,7 @@ ARCHFLAGS		+= -mcpu=cortex-m3 --specs=nano.specs
 
 # Board-specific startup files
 ASRC			+= $(PIOS_DEVLIB)startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
+ASRC 			+= $(PIOS_DEVLIB)/Libraries/STM32F10x_DSP_Lib/src/asm/gcc/cr4_fft_64_stm32.S
 
 # PIOS device library source and includes
 SRC			+= $(wildcard $(PIOS_DEVLIB)*.c)

@@ -10,7 +10,7 @@
         <field name="gyro_bias" units="deg/s" type="float" elementnames="X,Y,Z" defaultvalue="0,0,0"/>
         <field name="gyro_scale" units="gain" type="float" elementnames="X,Y,Z" defaultvalue="1,1,1"/>
         <field name="gyro_var" units="(deg/s)^2" type="float" elementnames="X,Y,Z" defaultvalue="0.1,0.1,0.1"/>
-	<field name="gyro_tempcoeff" units="(deg/s)/deg" type="float" elementnames="X,Y,Z" defaultvalue="1"/>
+        <field name="gyro_bias_var" units="(deg/s)^2" type="float" elementnames="X,Y,Z" defaultvalue="0.00000001,0.00000001,0.00000001"/>
         <field name="mag_bias" units="mGau" type="float" elementnames="X,Y,Z" defaultvalue="0,0,0"/>
         <field name="mag_scale" units="gain" type="float" elementnames="X,Y,Z" defaultvalue="1"/>
         <field name="mag_var" units="mGau^2" type="float" elementnames="X,Y,Z" defaultvalue="1,1,1"/>

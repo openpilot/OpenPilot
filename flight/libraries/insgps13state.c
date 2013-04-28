@@ -210,6 +210,13 @@ void INSSetGyroVar(float gyro_var[3])
 	Q[2] = gyro_var[2];
 }
 
+void INSSetGyroBiasVar(float gyro_bias_var[3])
+{
+	Q[6] = gyro_bias_var[0];
+	Q[7] = gyro_bias_var[1];
+	Q[8] = gyro_bias_var[2];
+}
+
 void INSSetMagVar(float scaled_mag_var[3])
 {
 	R[6] = scaled_mag_var[0];

@@ -46,8 +46,7 @@ ifeq ($(MCU),cortex-m3)
     # Set linker-script name depending on selected submodel name
     LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_memory.ld
     LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_sections.ld
-else
-ifeq  ($(MCU),cortex-m4)
+else ifeq  ($(MCU),cortex-m4)
 	include $(PIOS)/stm32f4xx/library.mk
     # Set linker-script name depending on selected submodel name
     LDFLAGS += -T$(PIOS_DEVLIB)/link_stm32f4xx_fw_memory.ld
@@ -57,7 +56,6 @@ ifeq  ($(MCU),cortex-m4)
 
 else
     $(error Unsupported MCU for BootloaderUpdater: $(MCU))
-endif
 endif
 
 # List any extra directories to look for include files here.

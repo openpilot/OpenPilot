@@ -33,18 +33,19 @@
 
 #include "ui_workspacesettings.h"
 
-
 using namespace Core;
 using namespace Core::Internal;
 
 const int WorkspaceSettings::MAX_WORKSPACES = 10;
 
 WorkspaceSettings::WorkspaceSettings(QObject *parent) :
-    IOptionsPage(parent)
-{}
+        IOptionsPage(parent)
+{
+}
 
 WorkspaceSettings::~WorkspaceSettings()
-{}
+{
+}
 
 // IOptionsPage
 
@@ -97,6 +98,7 @@ QWidget *WorkspaceSettings::createPage(QWidget *parent)
         m_page->comboBoxTabBarPlacement->setCurrentIndex(m_tabBarPlacementIndex);
     }
     m_page->checkBoxAllowTabMovement->setChecked(m_allowTabBarMovement);
+    m_page->checkBoxRestoreSelectedOnStartup->setChecked(m_restoreSelectedOnStartup);
 
     return w;
 }
@@ -122,7 +124,10 @@ void WorkspaceSettings::readSettings(QSettings *qs)
     }
     m_tabBarPlacementIndex = qs->value(QLatin1String("TabBarPlacementIndex"), 1).toInt(); // 1 == "Bottom"
     m_allowTabBarMovement  = qs->value(QLatin1String("AllowTabBarMovement"), false).toBool();
+    m_restoreSelectedOnStartup = qs->value(QLatin1String("RestoreSelectedOnStartup"), false).toBool();
+
     qs->endGroup();
+
     QTabWidget::TabPosition pos = m_tabBarPlacementIndex == 0 ? QTabWidget::North : QTabWidget::South;
     emit tabBarSettingsApplied(pos, m_allowTabBarMovement);
 }
@@ -142,6 +147,7 @@ void WorkspaceSettings::saveSettings(QSettings *qs)
     }
     qs->setValue(QLatin1String("TabBarPlacementIndex"), m_tabBarPlacementIndex);
     qs->setValue(QLatin1String("AllowTabBarMovement"), m_allowTabBarMovement);
+    qs->setValue(QLatin1String("RestoreSelectedOnStartup"), m_restoreSelectedOnStartup);
     qs->endGroup();
 }
 

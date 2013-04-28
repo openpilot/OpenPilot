@@ -27,7 +27,6 @@
 
 #include "telemetrymonitor.h"
 #include "qxtlogger.h"
-#include "coreplugin/connectionmanager.h"
 #include "coreplugin/icore.h"
 
 /**
@@ -54,11 +53,6 @@ TelemetryMonitor::TelemetryMonitor(UAVObjectManager *objMngr, Telemetry *tel)
     statsTimer = new QTimer(this);
     connect(statsTimer, SIGNAL(timeout()), this, SLOT(processStatsUpdates()));
     statsTimer->start(STATS_CONNECT_PERIOD_MS);
-
-    Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    connect(this, SIGNAL(connected()), cm, SLOT(telemetryConnected()));
-    connect(this, SIGNAL(disconnected()), cm, SLOT(telemetryDisconnected()));
-    connect(this, SIGNAL(telemetryUpdated(double, double)), cm, SLOT(telemetryUpdated(double, double)));
 }
 
 TelemetryMonitor::~TelemetryMonitor()
@@ -218,7 +212,7 @@ void TelemetryMonitor::processStatsUpdates()
         }
     }
 
-    emit telemetryUpdated((double)gcsStats.TxDataRate, (double)gcsStats.RxDataRate);
+    emit telemetryUpdated((double) gcsStats.TxDataRate, (double) gcsStats.RxDataRate);
 
     // Set data
     gcsStatsObj->setData(gcsStats);

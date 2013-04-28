@@ -98,6 +98,7 @@ private:
     int m_numberOfWorkspaces;
     int m_tabBarPlacementIndex;
     bool m_allowTabBarMovement;
+    bool m_restoreSelectedOnStartup;
     static const int MAX_WORKSPACES;
 };
 } // namespace Internal

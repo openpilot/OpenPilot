@@ -49,6 +49,12 @@ plugin_uavtalk.subdir = uavtalk
 plugin_uavtalk.depends = plugin_uavobjects
 plugin_uavtalk.depends += plugin_coreplugin
 
+# Telemetry plugin
+SUBDIRS += plugin_telemetry
+plugin_telemetry.subdir = telemetry
+plugin_telemetry.depends += plugin_uavtalk
+plugin_telemetry.depends += plugin_coreplugin
+
 # OPMap UAVGadget
 plugin_opmap.subdir = opmap
 plugin_opmap.depends = plugin_coreplugin

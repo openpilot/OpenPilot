@@ -47,13 +47,13 @@ ifeq ($(MCU),cortex-m3)
     LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_memory.ld
     LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_sections.ld
 else ifeq  ($(MCU),cortex-m4)
-	include $(PIOS)/stm32f4xx/library.mk
+    include $(PIOS)/stm32f4xx/library.mk
+
     # Set linker-script name depending on selected submodel name
     LDFLAGS += -T$(PIOS_DEVLIB)/link_stm32f4xx_fw_memory.ld
     LDFLAGS += -T$(PIOS_DEVLIB)/link_stm32f4xx_sections.ld
     SRC += $(HWDEFSINC)/firmware/cm3_fault_handlers.c
     SRC += $(HWDEFSINC)/firmware/dcc_stdio.c
-
 else
     $(error Unsupported MCU for BootloaderUpdater: $(MCU))
 endif

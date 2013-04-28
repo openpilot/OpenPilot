@@ -209,7 +209,7 @@ simposix_short         := 'posx'
 # SimPosix only builds on Linux so drop it from the list for
 # all other platforms.
 ifneq ($(UNAME), Linux)
-    ALL_BOARDS    := $(filter-out simposix, $(ALL_BOARDS))
+    ALL_BOARDS := $(filter-out simposix, $(ALL_BOARDS))
 endif
 
 # Start out assuming that we'll build fw, bl and bu for all boards

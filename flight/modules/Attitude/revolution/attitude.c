@@ -299,9 +299,29 @@ static int32_t updateAttitudeComplementary(bool first_run)
 		AttitudeActualData attitudeActual;
 		AttitudeActualGet(&attitudeActual);
 		init = 0;
-		attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z) * 180.0f / M_PI_F;
-		attitudeActual.Pitch = atan2f(accelsData.x, -accelsData.z) * 180.0f / M_PI_F;
-		attitudeActual.Yaw = atan2f(-magData.y, magData.x) * 180.0f / M_PI_F;
+
+		// Set initial attitude. Use accels to determine roll and pitch, rotate magnetic measurement accordingly,
+		// so pseudo "north" vector can be estimated even if the board is not level
+		attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z);
+		float zn = cos(attitudeActual.Roll) * magData.z + sin(attitudeActual.Roll) * magData.y;
+		float yn = cos(attitudeActual.Roll) * magData.y - sin(attitudeActual.Roll) * magData.z;
+
+		// rotate accels z vector according to roll
+		float azn = cos(attitudeActual.Roll) * accelsData.z + sin(attitudeActual.Roll) * accelsData.y;
+		attitudeActual.Pitch = atan2f(accelsData.x, -azn);
+
+		float xn = cos(attitudeActual.Pitch) * magData.x + sin(attitudeActual.Pitch) * zn;
+
+		attitudeActual.Yaw = atan2f(-yn, xn);
+		// TODO: This is still a hack
+		// Put this in a proper generic function in CoordinateConversion.c
+		// should take 4 vectors: g (0,0,-9.81), accels, Be (or 1,0,0 if no home loc) and magnetometers (or 1,0,0 if no mags)
+		// should calculate the rotation in 3d space using proper cross product math
+		// SUBTODO: formulate the math required
+
+		attitudeActual.Roll *= 180.0f / M_PI_F;
+		attitudeActual.Pitch *= 180.0f / M_PI_F;
+		attitudeActual.Yaw *= 180.0f / M_PI_F;
 
 		RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
 		AttitudeActualSet(&attitudeActual);
@@ -681,11 +701,32 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
 			MagnetometerGet(&magData);
 
-			// Set initial attitude
 			AttitudeActualData attitudeActual;
-			attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z) * 180.0f / M_PI_F;
-			attitudeActual.Pitch = atan2f(accelsData.x, -accelsData.z) * 180.0f / M_PI_F;
-			attitudeActual.Yaw = atan2f(-magData.y, magData.x) * 180.0f / M_PI_F;
+			AttitudeActualGet (&attitudeActual);
+
+			// Set initial attitude. Use accels to determine roll and pitch, rotate magnetic measurement accordingly,
+			// so pseudo "north" vector can be estimated even if the board is not level
+			attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z);
+			float zn = cos(attitudeActual.Roll) * magData.z + sin(attitudeActual.Roll) * magData.y;
+			float yn = cos(attitudeActual.Roll) * magData.y - sin(attitudeActual.Roll) * magData.z;
+
+			// rotate accels z vector according to roll
+			float azn = cos(attitudeActual.Roll) * accelsData.z + sin(attitudeActual.Roll) * accelsData.y;
+			attitudeActual.Pitch = atan2f(accelsData.x, -azn);
+
+			float xn = cos(attitudeActual.Pitch) * magData.x + sin(attitudeActual.Pitch) * zn;
+
+			attitudeActual.Yaw = atan2f(-yn, xn);
+			// TODO: This is still a hack
+			// Put this in a proper generic function in CoordinateConversion.c
+			// should take 4 vectors: g (0,0,-9.81), accels, Be (or 1,0,0 if no home loc) and magnetometers (or 1,0,0 if no mags)
+			// should calculate the rotation in 3d space using proper cross product math
+			// SUBTODO: formulate the math required
+
+			attitudeActual.Roll *= 180.0f / M_PI_F;
+			attitudeActual.Pitch *= 180.0f / M_PI_F;
+			attitudeActual.Yaw *= 180.0f / M_PI_F;
+
 			RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
 			AttitudeActualSet(&attitudeActual);
 

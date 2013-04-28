@@ -662,9 +662,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		if (init_stage == 0) {
 			float Pdiag[13]={
 				25.0f, 25.0f, 25.0f,        // initial position variance    - 5 meters mean uncertainty (5²=25)
-				 4.0f,  4.0f,  4.0f,        // initial velocity variance    - 2 m/s mean uncertainty
-				2e-6f, 2e-6f, 2e-6f, 2e-6f, // initial orientation variance - 5 deg (sin((5*(pi/180)))² ~ 2e-6)
-				8e-3f, 8e-3f, 8e-3f,        // initial gyro drift variance  - 5 deg/s ((5*(pi/180))² ~ 0.008 )
+				 5.0f,  5.0f,  5.0f,        // initial velocity variance    - 2.2 m/s mean uncertainty
+				7e-3f, 7e-3f, 7e-3f, 7e-3f, // initial orientation variance - 5 deg (sin(5°)² ~ 7e-3)
+				1e-4f, 1e-4f, 1e-4f,        // initial gyro drift variance  - 0.6 deg/s (sin(0.6°)² ~ 1e-4)
 			};
 			float q[4];
 			float pos[3] = {0.0f, 0.0f, 0.0f};

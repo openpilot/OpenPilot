@@ -91,6 +91,9 @@ typedef struct {
     // Should we parse UAVTalk?
     bool parseUAVTalk;
 
+    // We can only configure the hardware once.
+    bool configured;
+
     // The current configured uart speed
     OPLinkSettingsComSpeedOptions comSpeed;
 
@@ -232,6 +235,7 @@ static int32_t RadioComBridgeInitialize(void)
     data->comTxRetries = 0;
     data->UAVTalkErrors = 0;
     data->parseUAVTalk = false;
+    data->configured = false;
     data->comSpeed = OPLINKSETTINGS_COMSPEED_9600;
     PIOS_COM_RADIO = PIOS_COM_RFM22B;
 
@@ -589,6 +593,12 @@ static void updateSettings()
     // Get the settings.
     OPLinkSettingsData oplinkSettings;
     OPLinkSettingsGet(&oplinkSettings);
+
+    // We can only configure the hardware once.
+    if (data->configured) {
+        return;
+    }
+    data->configured = true;
 
     // Configure the main port
     bool is_coordinator = PIOS_RFM22B_IsCoordinator(pios_rfm22b_id);

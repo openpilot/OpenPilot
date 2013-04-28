@@ -66,6 +66,7 @@
 #include "homelocation.h"
 #include "magnetometer.h"
 #include "positionactual.h"
+#include "ekfstatevariance.h"
 #include "revocalibration.h"
 #include "revosettings.h"
 #include "velocityactual.h"
@@ -137,6 +138,7 @@ int32_t AttitudeInitialize(void)
 	VelocityActualInitialize();
 	RevoSettingsInitialize();
 	RevoCalibrationInitialize();
+	EKFStateVarianceInitialize();
 	
 	// Initialize this here while we aren't setting the homelocation in GPS
 	HomeLocationInitialize();
@@ -884,6 +886,11 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	gyrosBias.y = Nav.gyro_bias[1] * 180.0f / M_PI_F;
 	gyrosBias.z = Nav.gyro_bias[2] * 180.0f / M_PI_F;
 	GyrosBiasSet(&gyrosBias);
+
+	EKFStateVarianceData vardata;
+	EKFStateVarianceGet(&vardata);
+	INSGetP(vardata.P);
+	EKFStateVarianceSet(&vardata);
 
 	return 0;
 }

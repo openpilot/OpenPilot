@@ -141,6 +141,18 @@ void INSResetP(float PDiag[NUMX])
 	}
 }
 
+void INSGetP(float PDiag[NUMX])
+{
+	uint8_t i;
+
+	// retrieve diagonal elements (aka state variance)
+	for (i=0;i<NUMX;i++){
+		if (PDiag != 0){
+			PDiag[i] = P[i][i];
+		}
+	}
+}
+
 void INSSetState(float pos[3], float vel[3], float q[4], float gyro_bias[3], float accel_bias[3])
 {
 	/* Note: accel_bias not used in 13 state INS */

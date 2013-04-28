@@ -2751,17 +2751,6 @@
           </gadget>
           <type>uavGadget</type>
         </side0>
-          <side1>
-            <classId>HITLv2</classId>
-            <gadget>
-              <activeConfiguration>default</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side1>
-          <splitterOrientation>1</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-          <type>splitter</type>
-        </side0>
         <side1>
           <side0>
             <side0>

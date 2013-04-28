@@ -64,8 +64,6 @@ static void PIOS_MPU6000_Config(struct pios_mpu6000_cfg const * cfg);
 static int32_t PIOS_MPU6000_SetReg(uint8_t address, uint8_t buffer);
 static int32_t PIOS_MPU6000_GetReg(uint8_t address);
 
-#define DEG_TO_RAD (M_PI / 180.0)
-
 #define GRAV 9.81f
 
 /**

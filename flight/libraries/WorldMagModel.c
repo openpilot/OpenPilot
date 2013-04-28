@@ -696,7 +696,7 @@ int WMM_RotateMagneticVector(WMMtype_CoordSpherical * CoordSpherical,
 	 */
 {
 	/* Difference between the spherical and Geodetic latitudes */
-	float Psi = (M_PI_F / 180) * (CoordSpherical->phig - CoordGeodetic->phi);
+	float Psi = DEG2RAD(CoordSpherical->phig - CoordGeodetic->phi);
 
 	/* Rotate spherical field components to the Geodeitic system */
 	MagneticResultsGeo->Bz = MagneticResultsSph->Bx * sinf(Psi) + MagneticResultsSph->Bz * cosf(Psi);

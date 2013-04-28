@@ -53,6 +53,11 @@ static UAVObjHandle handle __attribute__((section("_uavo_handles")));
  */
 int32_t $(NAME)Initialize(void)
 {
+	// Compile time assertion that the $(NAME)DataPacked and $(NAME)Data structs
+	// have the same size (though instances of $(NAME)Data
+	// should be placed in memory by the linker/compiler on a 4 byte alignment).
+	PIOS_STATIC_ASSERT(sizeof($(NAME)DataPacked) == sizeof($(NAME)Data));
+    
 	// Don't set the handle to null if already registered
 	if(UAVObjGetByID($(NAMEUC)_OBJID) != NULL)
 		return -2;

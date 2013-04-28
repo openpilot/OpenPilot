@@ -2745,13 +2745,12 @@
       <showToolbars>false</showToolbars>
       <splitter>
         <side0>
-          <side0>
-            <classId>HITL</classId>
-            <gadget>
-              <activeConfiguration>XPlane HITL</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side0>
+          <classId>HITL</classId>
+          <gadget>
+            <activeConfiguration>XPlane HITL</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
+        </side0>
           <side1>
             <classId>HITLv2</classId>
             <gadget>

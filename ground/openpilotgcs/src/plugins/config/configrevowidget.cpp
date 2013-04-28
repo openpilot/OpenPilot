@@ -367,9 +367,9 @@ void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
         revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] += listMean(accel_accum_x);
         revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] += listMean(accel_accum_y);
         revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] += ( listMean(accel_accum_z) + GRAVITY );
-        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_X] = listMean(gyro_accum_x);
-        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Y] = listMean(gyro_accum_y);
-        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Z] = listMean(gyro_accum_z);
+        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_X] += listMean(gyro_accum_x);
+        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Y] += listMean(gyro_accum_y);
+        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Z] += listMean(gyro_accum_z);
 
         revoCalibration->setData(revoCalibrationData);
         revoCalibration->updated();

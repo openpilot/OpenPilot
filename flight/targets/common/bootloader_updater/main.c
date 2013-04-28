@@ -37,9 +37,6 @@ extern void PIOS_Board_Init(void);
 extern void FLASH_Download();
 void error(int, int);
 
-#ifdef STM32F4XX
-#define FLASH_ErasePage(x) FLASH_EraseSector((x) > 0x08000000 ? FLASH_Sector_1 : FLASH_Sector_0, VoltageRange_3)
-#endif
 /* The ADDRESSES of the _binary_* symbols are the important
  * data.  This is non-intuitive for _binary_size where you
  * might expect its value to hold the size but you'd be wrong.
@@ -93,7 +90,7 @@ int main()
 
     bool fail;
 
-    fail = (PIOS_BL_HELPER_FLASH_ERASE_BOOTLOADER() != 1);
+    fail = (PIOS_BL_HELPER_FLASH_Erase_Bootloader() != 1);
 
     if (fail == true){
         error(PIOS_LED_HEARTBEAT, 3);
@@ -105,7 +102,7 @@ int main()
         PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
         for (uint8_t retry = 0; retry < MAX_WRI_RETRYS; ++retry) {
             if (result == false) {
-                result = (FLASH_ProgramWord(0x08000000 + (offset * 4), embedded_image_start[offset]) == FLASH_COMPLETE);
+                result = (FLASH_ProgramWord(BL_BANK_BASE + (offset * 4), embedded_image_start[offset]) == FLASH_COMPLETE);
             }
         }
         if (result == false) {

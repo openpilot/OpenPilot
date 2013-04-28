@@ -34,10 +34,6 @@
  * NOTE: THIS IS THE ONLY PLACE THAT SHOULD EVER INCLUDE THIS FILE
  */
 #include <board_hw_defs.c>
-#ifdef STM32F4XX
-#define FLASH_ErasePage(x) FLASH_EraseSector(x,VoltageRange_3)
-#endif
-
 
 void PIOS_Board_Init(void) {
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;

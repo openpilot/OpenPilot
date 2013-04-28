@@ -28,13 +28,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "pios.h"
+#include <pios.h>
 
 #ifdef PIOS_INCLUDE_BL_HELPER
 
 #include <pios_board_info.h>
-#include "stm32f10x_flash.h"
-
+#include <stm32f10x_flash.h>
+#include <stdbool.h>
 
 uint8_t *PIOS_BL_HELPER_FLASH_If_Read(uint32_t SectorAddress)
 {
@@ -62,7 +62,7 @@ uint8_t PIOS_BL_HELPER_FLASH_Start()
     return (success) ? 1 : 0;
 }
 
-uint8_t PIOS_BL_HELPER_FLASH_ERASE_BOOTLOADER() {
+uint8_t PIOS_BL_HELPER_FLASH_Erase_Bootloader() {
 /// Bootloader memory space erase
     uint32_t startAddress = BL_BANK_BASE;
     uint32_t endAddress = BL_BANK_BASE + BL_BANK_SIZE;
@@ -73,23 +73,22 @@ uint8_t PIOS_BL_HELPER_FLASH_ERASE_BOOTLOADER() {
 }
 
 static bool erase_flash(uint32_t startAddress, uint32_t endAddress) {
-    uint32_t pageAdress = startAddress;
-    uint8_t fail = FALSE;
-    while ((pageAdress < endAddress)
-            || (fail == TRUE)) {
+    uint32_t pageAddress = startAddress;
+    uint8_t fail = false;
+    while ((pageAddress < endAddress) && (fail == false)) {
         for (int retry = 0; retry < MAX_DEL_RETRYS; ++retry) {
-            if (FLASH_ErasePage(pageAdress) == FLASH_COMPLETE) {
-                fail = FALSE;
+            if (FLASH_ErasePage(pageAddress) == FLASH_COMPLETE) {
+                fail = false;
                 break;
             } else {
-                fail = TRUE;
+                fail = true;
             }
         }
 
 #ifdef STM32F10X_HD
-        pageAdress += 2048;
+        pageAddress += 2048;
 #elif defined (STM32F10X_MD)
-        pageAdress += 1024;
+        pageAddress += 1024;
 #endif
     }
     return !fail;

@@ -28,14 +28,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "pios.h"
+#include <pios.h>
 
 #ifdef PIOS_INCLUDE_BL_HELPER
 
 #include <pios_board_info.h>
-#include "stm32f4xx_flash.h"
+#include <stm32f4xx_flash.h>
 #include <stdbool.h>
-
 
 uint8_t *PIOS_BL_HELPER_FLASH_If_Read(uint32_t SectorAddress)
 {
@@ -151,7 +150,7 @@ uint8_t PIOS_BL_HELPER_FLASH_Start()
 }
 
 
-uint8_t PIOS_BL_HELPER_FLASH_ERASE_BOOTLOADER() {
+uint8_t PIOS_BL_HELPER_FLASH_Erase_Bootloader() {
 /// Bootloader memory space erase
     uint32_t startAddress = BL_BANK_BASE;
     uint32_t endAddress = BL_BANK_BASE + BL_BANK_SIZE;
@@ -165,8 +164,7 @@ static bool erase_flash(uint32_t startAddress, uint32_t endAddress)
 {
     uint32_t pageAddress = startAddress;
     bool fail = false;
-    while ((pageAddress < endAddress)
-            && (fail == false)) {
+    while ((pageAddress < endAddress) && (fail == false)) {
         uint8_t sector_number;
         uint32_t sector_start;
         uint32_t sector_size;

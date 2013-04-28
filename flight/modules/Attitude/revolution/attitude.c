@@ -103,7 +103,6 @@ static AttitudeSettingsData attitudeSettings;
 static HomeLocationData homeLocation;
 static RevoCalibrationData revoCalibration;
 static RevoSettingsData revoSettings;
-static bool gyroBiasSettingsUpdated = false;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
 
 // Private functions
@@ -404,6 +403,13 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	gyrosBias.z -= mag_err[2] * magKi;
 	GyrosBiasSet(&gyrosBias);
 
+	if (revoCalibration.BiasCorrectedRaw != REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
+		// if the raw values are not adjusted, we need to adjust here.
+		gyrosData.x -= gyrosBias.x;
+		gyrosData.y -= gyrosBias.y;
+		gyrosData.z -= gyrosBias.z;
+	}
+
 	// Correct rates based on error, integral component dealt with in updateSensors
 	gyrosData.x += accel_err[0] * attitudeSettings.AccelKp / dT;
 	gyrosData.y += accel_err[1] * attitudeSettings.AccelKp / dT;
@@ -637,8 +643,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			INSSetGyroVar(revoCalibration.gyro_var);
 			INSSetBaroVar(revoCalibration.baro_var);
 
-			// Initialize the gyro bias from the settings
-			float gyro_bias[3] = {gyrosBias.x * M_PI_F / 180.0f, gyrosBias.y * M_PI_F / 180.0f, gyrosBias.z * M_PI_F / 180.0f};
+			// Initialize the gyro bias
+			float gyro_bias[3] = {0,0,0};
 			INSSetGyroBias(gyro_bias);
 
 			xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
@@ -673,7 +679,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			INSSetMagNorth(homeLocation.Be);
 
 			// Initialize the gyro bias from the settings
-			float gyro_bias[3] = {gyrosBias.x * M_PI_F / 180.0f, gyrosBias.y * M_PI_F / 180.0f, gyrosBias.z * M_PI_F / 180.0f};
+			float gyro_bias[3] = {0,0,0};
 			INSSetGyroBias(gyro_bias);
 
 			GPSPositionData gpsPosition;
@@ -707,10 +713,14 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			// Run prediction a bit before any corrections
 			dT = PIOS_DELAY_DiffuS(ins_last_time) / 1.0e6f;
 
-			GyrosBiasGet(&gyrosBias);
-			float gyros[3] = {(gyrosData.x + gyrosBias.x) * M_PI_F / 180.0f,
-				(gyrosData.y + gyrosBias.y) * M_PI_F / 180.0f,
-				(gyrosData.z + gyrosBias.z) * M_PI_F / 180.0f};
+			// Because the sensor module remove the bias we need to add it
+			// back in here so that the INS algorithm can track it correctly
+			float gyros[3] = {gyrosData.x * M_PI_F / 180.0f, gyrosData.y * M_PI_F / 180.0f, gyrosData.z * M_PI_F / 180.0f};
+			if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
+				gyros[0] += gyrosBias.x * M_PI_F / 180.0f;
+				gyros[1] += gyrosBias.y * M_PI_F / 180.0f;
+				gyros[2] += gyrosBias.z * M_PI_F / 180.0f;
+			}
 			INSStatePrediction(gyros, &accelsData.x, dT);
 			
 			AttitudeActualData attitude;
@@ -743,14 +753,6 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		dT = 0.01f;
 	else if(dT <= 0.001f)
 		dT = 0.001f;
-
-	// If the gyro bias setting was updated we should reset
-	// the state estimate of the EKF
-	if(gyroBiasSettingsUpdated) {
-		float gyro_bias[3] = {gyrosBias.x * M_PI_F / 180.0f, gyrosBias.y * M_PI_F / 180.0f, gyrosBias.z * M_PI_F / 180.0f};
-		INSSetGyroBias(gyro_bias);
-		gyroBiasSettingsUpdated = false;
-	}
 
 	// Because the sensor module remove the bias we need to add it
 	// back in here so that the INS algorithm can track it correctly
@@ -863,15 +865,10 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	velocityActual.Down = Nav.Vel[2];
 	VelocityActualSet(&velocityActual);
 
-	if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE && !gyroBiasSettingsUpdated) {
-		// Copy the gyro bias into the UAVO except when it was updated
-		// from the settings during the calculation, then consume it
-		// next cycle
-		gyrosBias.x = Nav.gyro_bias[0] * 180.0f / M_PI_F;
-		gyrosBias.y = Nav.gyro_bias[1] * 180.0f / M_PI_F;
-		gyrosBias.z = Nav.gyro_bias[2] * 180.0f / M_PI_F;
-		GyrosBiasSet(&gyrosBias);
-	}
+	gyrosBias.x = Nav.gyro_bias[0] * 180.0f / M_PI_F;
+	gyrosBias.y = Nav.gyro_bias[1] * 180.0f / M_PI_F;
+	gyrosBias.z = Nav.gyro_bias[2] * 180.0f / M_PI_F;
+	GyrosBiasSet(&gyrosBias);
 
 	return 0;
 }
@@ -905,16 +902,6 @@ static void settingsUpdatedCb(UAVObjEvent * ev)
 	if (ev == NULL || ev->obj == RevoCalibrationHandle()) {
 		RevoCalibrationGet(&revoCalibration);
 		
-		/* When the revo calibration is updated, update the GyroBias object */
-		GyrosBiasData gyrosBias;
-		GyrosBiasGet(&gyrosBias);
-		gyrosBias.x = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_X];
-		gyrosBias.y = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_Y];
-		gyrosBias.z = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_Z];
-		GyrosBiasSet(&gyrosBias);
-
-		gyroBiasSettingsUpdated = true;
-
 		// In case INS currently running
 		INSSetMagVar(revoCalibration.mag_var);
 		INSSetAccelVar(revoCalibration.accel_var);

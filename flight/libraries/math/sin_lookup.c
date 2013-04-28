@@ -127,7 +127,7 @@ float cos_lookup_deg(float angle)
  */
 float sin_lookup_rad(float angle)
 {
-	int degrees = angle * 180.0f / M_PI_F;
+	int degrees = RAD2DEG(angle);
 	return sin_lookup_deg(degrees);
 }
 
@@ -138,6 +138,6 @@ float sin_lookup_rad(float angle)
  */
 float cos_lookup_rad(float angle)
 {
-	int degrees = angle * 180.0f / M_PI_F;
+	int degrees = RAD2DEG(angle);
 	return cos_lookup_deg(degrees);
 }

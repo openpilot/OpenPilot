@@ -106,6 +106,8 @@ static RevoCalibrationData revoCalibration;
 static RevoSettingsData revoSettings;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
 
+static bool volatile variance_error = true;
+
 // Private functions
 static void AttitudeTask(void *parameters);
 
@@ -114,6 +116,25 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 
 static int32_t getNED(GPSPositionData * gpsPosition, float * NED);
+
+// check for invalid values
+static inline bool invalid(float data) {
+	if ( isnan(data) || isinf(data) ){
+		return true;
+	}
+	return false;
+}
+
+// check for invalid variance values
+static inline bool invalid_var(float data) {
+	if ( invalid(data) ) {
+		return true;
+	}
+	if ( fabsf(data) < 1e-15f ) {
+		return true;
+	}
+	return false;
+}
 
 /**
  * API for sensor fusion algorithms:
@@ -565,6 +586,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	static bool gps_updated;
 	static bool gps_vel_updated;
 
+	static bool value_error = false;
+
 	static float baroOffset = 0;
 
 	static uint32_t ins_last_time = 0;
@@ -628,24 +651,95 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	GPSVelocityGet(&gpsVelData);
 	GyrosBiasGet(&gyrosBias);
 
-	// Discard mag if it has NAN (normally from bad calibration)
-	mag_updated &= (magData.x == magData.x && magData.y == magData.y && magData.z == magData.z);
+	value_error = false;
+	// safety checks
+	if ( invalid(gyrosData.x) ||
+	     invalid(gyrosData.y) ||
+	     invalid(gyrosData.z) ||
+	     invalid(accelsData.x) ||
+	     invalid(accelsData.y) ||
+	     invalid(accelsData.z) ) {
+		// cannot run process update, raise error!
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);
+		return -1;
+	}
+	if ( invalid(gyrosBias.x) ||
+	     invalid(gyrosBias.y) ||
+	     invalid(gyrosBias.z) ) {
+		gyrosBias.x = 0;
+		gyrosBias.y = 0;
+		gyrosBias.z = 0;
+	}
+
+	if ( invalid(magData.x) ||
+	     invalid(magData.y) ||
+	     invalid(magData.z) ) {
+
+		// magnetometers can be ignored for a while
+		mag_updated = false;
+		value_error = true;
+	}
+
 	// Don't require HomeLocation.Set to be true but at least require a mag configuration (allows easily
 	// switching between indoor and outdoor mode with Set = false)
-	mag_updated &= (homeLocation.Be[0] != 0 || homeLocation.Be[1] != 0 || homeLocation.Be[2]);
+	if ( homeLocation.Be[0]==0 && homeLocation.Be[1]==0 && homeLocation.Be[2]==0 ) {
+		mag_updated = false;
+		value_error = true;
+	}
+
+	if ( invalid(baroData.Altitude) ) {
+		baro_updated = false;
+		value_error = true;
+	}
+
+	if ( invalid(airspeedData.CalibratedAirspeed) ) {
+		airspeed_updated = false;
+		value_error = true;
+	}
+
+	if ( invalid(gpsData.Altitude) ) {
+		gps_updated = false;
+		value_error = true;
+	}
+
+	if ( invalid_var(revoCalibration.gps_var[REVOCALIBRATION_GPS_VAR_POS]) ||
+	     invalid_var(revoCalibration.gps_var[REVOCALIBRATION_GPS_VAR_VEL]) ) {
+		gps_updated = false;
+		value_error = true;
+	}
+
+	if ( invalid(gpsVelData.North) ||
+	     invalid(gpsVelData.East) ||
+	     invalid(gpsVelData.Down) ) {
+		gps_vel_updated = false;
+		value_error = true;
+	}
 
 	// Discard airspeed if sensor not connected
-	airspeed_updated &= ( airspeedData.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE );
+	if ( airspeedData.SensorConnected != AIRSPEEDSENSOR_SENSORCONNECTED_TRUE ) {
+		airspeed_updated = false;
+	}
 
 	// Have a minimum requirement for gps usage
-	gps_updated &= (gpsData.Satellites >= 7) && (gpsData.PDOP <= 4.0f) && (homeLocation.Set == HOMELOCATION_SET_TRUE);
+	if ( ( gpsData.Satellites < 7 ) ||
+	     ( gpsData.PDOP > 4.0f ) ||
+	     ( gpsData.Latitude==0 && gpsData.Longitude==0 ) ||
+	     ( homeLocation.Set != HOMELOCATION_SET_TRUE ) ) {
+		gps_updated = false;
+		gps_vel_updated = false;
+	}
 
-	if (!inited)
+	if ( !inited ) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);
-	else if (outdoor_mode && gpsData.Satellites < 7)
+	} else if ( value_error ) {
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_CRITICAL);
+	} else if ( variance_error ) {
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_CRITICAL);
+	} else if (outdoor_mode && gpsData.Satellites < 7) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);
-	else
+	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+	}
 			
 	dT = PIOS_DELAY_DiffuS(ins_last_time) / 1.0e6f;
 	ins_last_time = PIOS_DELAY_GetRaw();
@@ -657,7 +751,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		dT = 0.001f;
 	}
 
-	if (!inited && mag_updated && baro_updated && (gps_updated || !outdoor_mode)) {
+	if (!inited && mag_updated && baro_updated && (gps_updated || !outdoor_mode) && !variance_error) {
+
 		// Don't initialize until all sensors are read
 		if (init_stage == 0) {
 			float Pdiag[13]={
@@ -922,14 +1017,36 @@ static int32_t getNED(GPSPositionData * gpsPosition, float * NED)
 static void settingsUpdatedCb(UAVObjEvent * ev) 
 {
 	if (ev == NULL || ev->obj == RevoCalibrationHandle()) {
+		bool error = false;
 		RevoCalibrationGet(&revoCalibration);
-		
-		// In case INS currently running
-		INSSetMagVar(revoCalibration.mag_var);
-		INSSetAccelVar(revoCalibration.accel_var);
-		INSSetGyroVar(revoCalibration.gyro_var);
-		INSSetGyroBiasVar(revoCalibration.gyro_bias_var);
-		INSSetBaroVar(revoCalibration.baro_var);
+
+		if ( invalid_var( revoCalibration.mag_var[0] ) ||
+		     invalid_var( revoCalibration.mag_var[1] ) ||
+		     invalid_var( revoCalibration.mag_var[2] ) ||
+		     invalid_var( revoCalibration.accel_var[0] ) ||
+		     invalid_var( revoCalibration.accel_var[1] ) ||
+		     invalid_var( revoCalibration.accel_var[2] ) ||
+		     invalid_var( revoCalibration.gyro_var[0] ) ||
+		     invalid_var( revoCalibration.gyro_var[1] ) ||
+		     invalid_var( revoCalibration.gyro_var[2] ) ||
+		     invalid_var( revoCalibration.gyro_bias_var[0] ) ||
+		     invalid_var( revoCalibration.gyro_bias_var[1] ) ||
+		     invalid_var( revoCalibration.gyro_bias_var[2] ) ||
+		     invalid_var( revoCalibration.baro_var ) ) {
+			error = true;
+		}
+
+		if (error) {
+			variance_error = true;
+		} else {
+			// In case INS currently running
+			INSSetMagVar(revoCalibration.mag_var);
+			INSSetAccelVar(revoCalibration.accel_var);
+			INSSetGyroVar(revoCalibration.gyro_var);
+			INSSetGyroBiasVar(revoCalibration.gyro_bias_var);
+			INSSetBaroVar(revoCalibration.baro_var);
+			variance_error = false;
+		}
 	}
 	if(ev == NULL || ev->obj == HomeLocationHandle()) {
 		HomeLocationGet(&homeLocation);

@@ -125,7 +125,8 @@ all: uavobjects all_ground all_flight
 
 .PHONY: all_clean
 all_clean:
-	[ ! -d "$(BUILD_DIR)" ] || $(RM) -rf "$(BUILD_DIR)"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR))"
+	$(V1) [ ! -d "$(BUILD_DIR)" ] || $(RM) -rf "$(BUILD_DIR)"
 
 $(DL_DIR):
 	$(MKDIR) -p $@
@@ -176,7 +177,7 @@ uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
 	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
 uavobjects_clean:
-	$(V0) @$(ECHO) " CLEAN      $@"
+	@$(ECHO) " CLEAN      $(call toprel, $(UAVOBJ_OUT_DIR))"
 	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
 
 ##############################
@@ -271,7 +272,7 @@ fw_$(1)_%: uavobjects_flight
 .PHONY: $(1)_clean
 $(1)_clean: fw_$(1)_clean
 fw_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $$@"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/fw_$(1))"
 	$(V1) $(RM) -fr $(BUILD_DIR)/fw_$(1)
 endef
 
@@ -311,7 +312,7 @@ $(if $(filter-out undefined,$(origin UNBRICK_TTY)),
 
 .PHONY: bl_$(1)_clean
 bl_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $$@"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/bl_$(1))"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_$(1)
 endef
 
@@ -335,7 +336,7 @@ bu_$(1)_%: bl_$(1)_bino
 
 .PHONY: bu_$(1)_clean
 bu_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $$@"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/bu_$(1))"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bu_$(1)
 endef
 
@@ -360,7 +361,7 @@ ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 
 .PHONY: ef_$(1)_clean
 ef_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $$@"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/ef_$(1))"
 	$(V1) $(RM) -fr $(BUILD_DIR)/ef_$(1)
 endef
 
@@ -461,7 +462,7 @@ openpilotgcs: uavobjects_gcs
 
 .PHONY: openpilotgcs_clean
 openpilotgcs_clean:
-	$(V0) @$(ECHO) " CLEAN      $@"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF))"
 	$(V1) [ ! -d "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)"
 
 ################################
@@ -504,7 +505,7 @@ androidgcs: uavo-collections_java
 
 .PHONY: androidgcs_clean
 androidgcs_clean:
-	$(V0) @$(ECHO) " CLEAN      $@"
+	@$(ECHO) " CLEAN      $(call toprel, $(ANDROIDGCS_OUT_DIR))"
 	$(V1) [ ! -d "$(ANDROIDGCS_OUT_DIR)" ] || $(RM) -r "$(ANDROIDGCS_OUT_DIR)"
 
 # We want to take snapshots of the UAVOs at each point that they change
@@ -615,7 +616,7 @@ uavo-collections: uavo-collections_java
 
 .PHONY: uavo-collections_clean
 uavo-collections_clean:
-	$(V0) @$(ECHO) " CLEAN  $(UAVO_COLLECTION_DIR)"
+	@$(ECHO) " CLEAN      $(call toprel, $(UAVO_COLLECTION_DIR))"
 	$(V1) [ ! -d "$(UAVO_COLLECTION_DIR)" ] || $(RM) -r $(UAVO_COLLECTION_DIR)
 
 ##############################
@@ -642,7 +643,7 @@ all_ut_run: $(addsuffix _run, $(addprefix ut_, $(ALL_UNITTESTS)))
 
 .PHONY: all_ut_clean
 all_ut_clean:
-	$(V0) @$(ECHO) " CLEAN      $@"
+	@$(ECHO) " CLEAN      $(call toprel, $(UT_OUT_DIR))"
 	$(V1) [ ! -d "$(UT_OUT_DIR)" ] || $(RM) -r "$(UT_OUT_DIR)"
 
 # $(1) = Unit test name
@@ -673,7 +674,7 @@ ut_$(1)_%: $$(UT_OUT_DIR)
 
 .PHONY: ut_$(1)_clean
 ut_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $(1)"
+	@$(ECHO) " CLEAN      $(call toprel, $(UT_OUT_DIR)/$(1))"
 	$(V1) [ ! -d "$(UT_OUT_DIR)/$(1)" ] || $(RM) -r "$(UT_OUT_DIR)/$(1)"
 endef
 
@@ -835,7 +836,8 @@ docs_all: $(addprefix docs_,$(DOCS_TARGETS))
 
 .PHONY: docs_all_clean
 docs_all_clean:
-	[ ! -d "$(BUILD_DIR)/docs" ] || $(RM) -rf "$(BUILD_DIR)/docs"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/docs)"
+	$(V1) [ ! -d "$(BUILD_DIR)/docs" ] || $(RM) -rf "$(BUILD_DIR)/docs"
 
 ##############################
 #

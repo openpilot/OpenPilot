@@ -784,6 +784,8 @@ package: all_fw all_ground uavobjects_matlab
 #
 ##############################
 
+UNCRUSTIFY_TARGETS := flight ground
+
 # $(1) = Uncrustify target (e.g flight or ground)
 # $(2) = Target root directory
 define UNCRUSTIFY_TEMPLATE
@@ -794,11 +796,10 @@ uncrustify_$(1):
 	$(V1) UNCRUSTIFY_CONFIG="$(ROOT_DIR)/make/uncrustify/uncrustify.cfg" $(SHELL) make/scripts/uncrustify.sh $(call toprel, $(2))
 endef
 
-$(eval $(call UNCRUSTIFY_TEMPLATE,flight,$(ROOT_DIR)/flight))
-$(eval $(call UNCRUSTIFY_TEMPLATE,ground,$(ROOT_DIR)/ground))
+$(foreach uncrustify_targ, $(UNCRUSTIFY_TARGETS), $(eval $(call UNCRUSTIFY_TEMPLATE,$(uncrustify_targ),$(ROOT_DIR)/$(uncrustify_targ))))
 
 .PHONY: uncrustify_all
-uncrustify_all: $(addprefix uncrustify_,flight ground)
+uncrustify_all: $(addprefix uncrustify_,$(UNCRUSTIFY_TARGETS))
 
 ##############################
 #
@@ -808,6 +809,8 @@ uncrustify_all: $(addprefix uncrustify_,flight ground)
 # proper source directory (e.g. $(target)) and appropriate other doxygen options.
 #
 ##############################
+
+DOCS_TARGETS := flight ground uavobjects
 
 # $(1) = Doxygen target (e.g flight or ground)
 define DOXYGEN_TEMPLATE
@@ -825,15 +828,14 @@ docs_$(1)_clean:
 
 endef
 
-$(eval $(call DOXYGEN_TEMPLATE,flight))
-$(eval $(call DOXYGEN_TEMPLATE,ground))
-$(eval $(call DOXYGEN_TEMPLATE,uavobjects))
+$(foreach docs_targ, $(DOCS_TARGETS), $(eval $(call DOXYGEN_TEMPLATE,$(docs_targ))))
 
 .PHONY: docs_all
-docs_all: $(addprefix docs_,flight ground uavobjects)
+docs_all: $(addprefix docs_,$(DOCS_TARGETS))
 
 .PHONY: docs_all_clean
-docs_all_clean: $(addsuffix _clean,$(addprefix docs_,flight ground uavobjects))
+docs_all_clean:
+	[ ! -d "$(BUILD_DIR)/docs" ] || $(RM) -rf "$(BUILD_DIR)/docs"
 
 ##############################
 #

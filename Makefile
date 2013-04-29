@@ -802,6 +802,41 @@ uncrustify_all: $(addprefix uncrustify_,flight ground)
 
 ##############################
 #
+# Doxygen documentation
+#
+# Each target should have own Doxyfile.$(target) with build directory build/docs/$(target),
+# proper source directory (e.g. $(target)) and appropriate other doxygen options.
+#
+##############################
+
+# $(1) = Doxygen target (e.g flight or ground)
+define DOXYGEN_TEMPLATE
+
+.PHONY: docs_$(1)
+docs_$(1): docs_$(1)_clean
+	@$(ECHO) "Generating $(1) documentation"
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/docs/$(1)
+	$(V1) $(DOXYGEN) $(ROOT_DIR)/make/doxygen/Doxyfile.$(1)
+
+.PHONY: docs_$(1)_clean
+docs_$(1)_clean:
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/docs/$(1))"
+	$(V1) [ ! -d "$(BUILD_DIR)/docs/$(1)" ] || $(RM) -r "$(BUILD_DIR)/docs/$(1)"
+
+endef
+
+$(eval $(call DOXYGEN_TEMPLATE,flight))
+$(eval $(call DOXYGEN_TEMPLATE,ground))
+$(eval $(call DOXYGEN_TEMPLATE,uavobjects))
+
+.PHONY: docs_all
+docs_all: $(addprefix docs_,flight ground uavobjects)
+
+.PHONY: docs_all_clean
+docs_all_clean: $(addsuffix _clean,$(addprefix docs_,flight ground uavobjects))
+
+##############################
+#
 # Build info
 #
 ##############################
@@ -813,18 +848,6 @@ build-info:
 		--uavodir=$(ROOT_DIR)/shared/uavobjectdefinition \
 		--template="make/templates/$@.txt" \
 		--outfile="$(BUILD_DIR)/$@.txt"
-
-##############################
-#
-# Doxygen documentation
-# FIXME: currently is not not used and should be updated
-#
-##############################
-
-# Generate Doxygen documentation
-.PHONY: docs
-docs:
-	$(DOXYGEN) $(ROOT_DIR)/make/doxygen/doxygen.cfg
 
 ##############################
 #

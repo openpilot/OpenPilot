@@ -12,6 +12,7 @@
 #    mingw_install (Windows only)
 #    python_install (Windows only)
 #    uncrustify_install
+#    doxygen_install
 #
 # TODO:
 #    openocd_install
@@ -61,16 +62,19 @@ ifeq ($(UNAME), Linux)
         QT_SDK_URL  := "Please install native Qt 4.8.x SDK using package manager"
     endif
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
+    DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Darwin)
     ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-mac.tar.bz2
     QT_SDK_URL     := "Please install native Qt 4.8.x SDK using package manager"
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
+    DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Windows)
     ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
     QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-windows.tar.bz2
     MINGW_URL      := http://wiki.openpilot.org/download/attachments/18612236/mingw-4.4.0.tar.bz2
     PYTHON_URL     := http://wiki.openpilot.org/download/attachments/18612236/python-2.7.4-windows.tar.bz2
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
+    DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
 endif
 
 # Changing PYTHON_DIR, also update it in ground\openpilotgcs\src\app\gcsversioninfo.pri
@@ -79,6 +83,7 @@ QT_SDK_DIR      := $(TOOLS_DIR)/qt-4.8.4
 MINGW_DIR       := $(TOOLS_DIR)/mingw-4.4.0
 PYTHON_DIR      := $(TOOLS_DIR)/python-2.7.4
 UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
+DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
 
 ##############################
 #
@@ -86,10 +91,11 @@ UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 #
 ##############################
 
-ALL_SDK_TARGETS := arm_sdk qt_sdk uncrustify
+ALL_SDK_TARGETS := arm_sdk qt_sdk
 ifeq ($(UNAME), Windows)
     ALL_SDK_TARGETS += mingw python
 endif
+ALL_SDK_TARGETS += uncrustify doxygen
 
 .PHONY: all_sdk_install all_sdk_clean all_sdk_distclean all_sdk_version
 all_sdk_install:   $(addsuffix _install,$(ALL_SDK_TARGETS))
@@ -163,8 +169,10 @@ MSG_NOTICE           = $(QUOTE) NOTE       $(QUOTE)
 # Verbosity level
 ifeq ($(V), 1)
     CURL_OPTIONS :=
+    MAKE_SILENT  :=
 else
     CURL_OPTIONS := --silent
+    MAKE_SILENT  := --silent
 endif
 
 # MSYS tar workaround
@@ -412,9 +420,9 @@ define UNCRUSTIFY_BUILD_TEMPLATE
 		cd $(UNCRUSTIFY_BUILD_DIR) && \
 		./configure --prefix="$(UNCRUSTIFY_DIR)" && \
 		$(ECHO) $(MSG_BUILDING) $(call toprel, $(UNCRUSTIFY_BUILD_DIR)) && \
-		$(MAKE) --silent && \
+		$(MAKE) $(MAKE_SILENT) && \
 		$(ECHO) $(MSG_INSTALLING) $(call toprel, $(UNCRUSTIFY_DIR)) && \
-		$(MAKE) --silent install-strip \
+		$(MAKE) $(MAKE_SILENT) install-strip \
 	)
 	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(UNCRUSTIFY_BUILD_DIR))
 	-$(V1) [ ! -d "$(UNCRUSTIFY_BUILD_DIR)" ] || $(RM) -rf "$(UNCRUSTIFY_BUILD_DIR)"
@@ -439,6 +447,56 @@ endif
 .PHONY: uncrustify_version
 uncrustify_version:
 	-$(V1) $(UNCRUSTIFY) --version
+
+##############################
+#
+# Doxygen
+#
+##############################
+
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,doxygen,$(DOXYGEN_DIR),$(DOXYGEN_URL),$(notdir $(DOXYGEN_URL))))
+
+else # Linux or Mac
+
+DOXYGEN_BUILD_DIR := $(BUILD_DIR)/$(notdir $(DOXYGEN_DIR))
+
+define DOXYGEN_BUILD_TEMPLATE
+	$(V1) ( \
+		$(ECHO) $(MSG_CONFIGURING) $(call toprel, $(DOXYGEN_BUILD_DIR)) && \
+		cd $(DOXYGEN_BUILD_DIR) && \
+		./configure --prefix "$(DOXYGEN_DIR)" --english-only && \
+		$(ECHO) $(MSG_BUILDING) $(call toprel, $(DOXYGEN_BUILD_DIR)) && \
+		$(MAKE) $(MAKE_SILENT) && \
+		$(ECHO) $(MSG_INSTALLING) $(call toprel, $(DOXYGEN_DIR)) && \
+		$(MAKE) $(MAKE_SILENT) install \
+	)
+	@$(ECHO) $(MSG_CLEANING) $(call toprel, $(DOXYGEN_BUILD_DIR))
+	-$(V1) [ ! -d "$(DOXYGEN_BUILD_DIR)" ] || $(RM) -rf "$(DOXYGEN_BUILD_DIR)"
+endef
+
+define DOXYGEN_CLEAN_TEMPLATE
+	-$(V1) [ ! -d "$(DOXYGEN_DIR)" ] || $(RM) -rf "$(DOXYGEN_DIR)"
+endef
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,doxygen,$(DOXYGEN_BUILD_DIR),$(DOXYGEN_URL),$(notdir $(DOXYGEN_URL)),$(DOXYGEN_BUILD_TEMPLATE),$(DOXYGEN_CLEAN_TEMPLATE)))
+
+endif
+
+ifeq ($(shell [ -d "$(DOXYGEN_DIR)" ] && $(ECHO) "exists"), exists)
+    export DOXYGEN := $(DOXYGEN_DIR)/bin/doxygen
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(DOXYGEN_DIR)) not found (make doxygen_install), using system PATH)
+    export DOXYGEN := doxygen
+endif
+
+.PHONY: doxygen_version
+doxygen_version:
+	-$(V1) $(ECHO) "Doxygen `$(DOXYGEN) --version`"
+
+
 
 
 

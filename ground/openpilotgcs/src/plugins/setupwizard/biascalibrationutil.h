@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       cccalibrationutil.h
+ * @file       biascalibrationutil.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup CCCalibrationUtil
+ * @addtogroup BiasCalibrationUtil
  * @{
  * @brief
  *****************************************************************************/
@@ -25,22 +25,21 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef CCCALIBRATIONUTIL_H
-#define CCCALIBRATIONUTIL_H
+#ifndef BIASCALIBRATIONUTIL_H
+#define BIASCALIBRATIONUTIL_H
 
 #include <QObject>
 #include <QTimer>
-#include <QMutex>
 
 #include "uavobject.h"
 #include "vehicleconfigurationsource.h"
 
-class CCCalibrationUtil : public QObject
+class BiasCalibrationUtil : public QObject
 {
     Q_OBJECT
 public:
-    explicit CCCalibrationUtil(long measurementCount, long measurementRate);
-    explicit CCCalibrationUtil(long accelMeasurementCount, long accelMeasurementRate,
+    explicit BiasCalibrationUtil(long measurementCount, long measurementRate);
+    explicit BiasCalibrationUtil(long accelMeasurementCount, long accelMeasurementRate,
                            long gyroMeasurementCount, long gyroMeasurementRate);
 
 signals:
@@ -58,10 +57,6 @@ private slots:
     void timeout();
 
 private:
-    static const float G = 9.81f;
-    static const float ACCELERATION_SCALE = 0.004f * 9.81f;
-
-    QMutex m_measurementMutex;
     QTimer m_timeoutTimer;
 
     bool m_isMeasuring;
@@ -86,7 +81,6 @@ private:
     void stop();
     void startMeasurement();
     void stopMeasurement();
-    accelGyroBias calculateLevellingData();
 };
 
-#endif // CCCALIBRATIONUTIL_H
+#endif // BIASCALIBRATIONUTIL_H

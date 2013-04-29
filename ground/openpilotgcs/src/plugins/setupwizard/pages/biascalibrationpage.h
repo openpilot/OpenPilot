@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       cccalibrationpage.h
+ * @file       biascalibrationpage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup CCCalibrationPage
+ * @addtogroup BiasCalibrationPage
  * @{
  * @brief
  *****************************************************************************/
@@ -25,23 +25,23 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef CCCALIBRATIONPAGE_H
-#define CCCALIBRATIONPAGE_H
+#ifndef BIASCALIBRATIONPAGE_H
+#define BIASCALIBRATIONPAGE_H
 
 #include "abstractwizardpage.h"
-#include "cccalibrationutil.h"
+#include "biascalibrationutil.h"
 
 namespace Ui {
-class CCCalibrationPage;
+class BiasCalibrationPage;
 }
 
-class CCCalibrationPage : public AbstractWizardPage
+class BiasCalibrationPage : public AbstractWizardPage
 {
     Q_OBJECT
 
 public:
-    explicit CCCalibrationPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~CCCalibrationPage();
+    explicit BiasCalibrationPage(SetupWizard *wizard, QWidget *parent = 0);
+    ~BiasCalibrationPage();
     bool validatePage();
     bool isComplete() const;
 
@@ -53,13 +53,13 @@ private slots:
 
 private:
     static const int BIAS_CYCLES = 200;
-    static const int BIAS_RATE = 30;
+    static const int BIAS_RATE = 50;
 
-    Ui::CCCalibrationPage *ui;
-    CCCalibrationUtil *m_calibrationUtil;
+    Ui::BiasCalibrationPage *ui;
+    BiasCalibrationUtil *m_calibrationUtil;
 
     void stopCalibration();
     void enableButtons(bool enable);
 };
 
-#endif // CCCALIBRATIONPAGE_H
+#endif // BIASCALIBRATIONPAGE_H

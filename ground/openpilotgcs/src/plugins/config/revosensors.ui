@@ -51,7 +51,7 @@
                    </font>
                   </property>
                   <property name="text">
-                   <string>#1: Magnetometer calibrtion</string>
+                   <string>#1: Magnetometer calibration</string>
                   </property>
                  </widget>
                 </item>

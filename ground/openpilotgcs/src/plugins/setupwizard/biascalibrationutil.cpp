@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       cccalibrationutil.cpp
+ * @file       biascalibrationutil.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup CCCalibrationUtil
+ * @addtogroup BiasCalibrationUtil
  * @{
  * @brief
  *****************************************************************************/
@@ -25,28 +25,29 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "cccalibrationutil.h"
+#include "biascalibrationutil.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "attitudesettings.h"
 #include "accels.h"
 #include "gyros.h"
+#include "qdebug.h"
 
 
-CCCalibrationUtil::CCCalibrationUtil(long measurementCount, long measurementRate) : QObject(),
+BiasCalibrationUtil::BiasCalibrationUtil(long measurementCount, long measurementRate) : QObject(),
     m_isMeasuring(false), m_accelMeasurementCount(measurementCount), m_gyroMeasurementCount(measurementCount),
     m_accelMeasurementRate(measurementRate), m_gyroMeasurementRate(measurementRate)
 {
 }
 
-CCCalibrationUtil::CCCalibrationUtil(long accelMeasurementCount, long accelMeasurementRate,
+BiasCalibrationUtil::BiasCalibrationUtil(long accelMeasurementCount, long accelMeasurementRate,
                              long gyroMeasurementCount, long gyroMeasurementRate) : QObject(),
     m_isMeasuring(false), m_accelMeasurementCount(accelMeasurementCount), m_gyroMeasurementCount(gyroMeasurementCount),
     m_accelMeasurementRate(accelMeasurementRate), m_gyroMeasurementRate(gyroMeasurementRate)
 {
 }
 
-void CCCalibrationUtil::start()
+void BiasCalibrationUtil::start()
 {
     if(!m_isMeasuring) {
         startMeasurement();
@@ -58,17 +59,16 @@ void CCCalibrationUtil::start()
     }
 }
 
-void CCCalibrationUtil::abort()
+void BiasCalibrationUtil::abort()
 {
     if(m_isMeasuring) {
         stopMeasurement();
     }
 }
 
-void CCCalibrationUtil::gyroMeasurementsUpdated(UAVObject *obj)
+void BiasCalibrationUtil::gyroMeasurementsUpdated(UAVObject *obj)
 {
     Q_UNUSED(obj);
-    QMutexLocker locker(&m_measurementMutex);
 
     if(m_receivedGyroUpdates < m_gyroMeasurementCount) {
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -88,14 +88,12 @@ void CCCalibrationUtil::gyroMeasurementsUpdated(UAVObject *obj)
     else if (m_receivedAccelUpdates >= m_accelMeasurementCount &&
              m_receivedGyroUpdates >= m_gyroMeasurementCount && m_isMeasuring) {
         stopMeasurement();
-        emit done(calculateLevellingData());
     }
 }
 
-void CCCalibrationUtil::accelMeasurementsUpdated(UAVObject *obj)
+void BiasCalibrationUtil::accelMeasurementsUpdated(UAVObject *obj)
 {
     Q_UNUSED(obj);
-    QMutexLocker locker(&m_measurementMutex);
 
     if(m_receivedAccelUpdates < m_accelMeasurementCount) {
         ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
@@ -115,22 +113,17 @@ void CCCalibrationUtil::accelMeasurementsUpdated(UAVObject *obj)
     else if (m_receivedAccelUpdates >= m_accelMeasurementCount &&
              m_receivedGyroUpdates >= m_gyroMeasurementCount && m_isMeasuring) {
         stopMeasurement();
-        emit done(calculateLevellingData());
     }
 }
 
-void CCCalibrationUtil::timeout()
+void BiasCalibrationUtil::timeout()
 {
-    QMutexLocker locker(&m_measurementMutex);
-
     stopMeasurement();
     emit timeout(tr("Calibration timed out before receiving required updates."));
 }
 
-void CCCalibrationUtil::startMeasurement()
+void BiasCalibrationUtil::startMeasurement()
 {
-    QMutexLocker locker(&m_measurementMutex);
-
     m_isMeasuring = true;
 
     // Reset variables
@@ -176,8 +169,10 @@ void CCCalibrationUtil::startMeasurement()
     uavObject->setMetadata(newMetaData);
 }
 
-void CCCalibrationUtil::stopMeasurement()
+void BiasCalibrationUtil::stopMeasurement()
 {
+    qDebug() << "Sampling done, G =" << m_receivedGyroUpdates << "A =" << m_receivedAccelUpdates;
+
     m_isMeasuring = false;
 
     //Stop timeout timer
@@ -202,18 +197,16 @@ void CCCalibrationUtil::stopMeasurement()
     AttitudeSettings::DataFields attitudeSettingsData = AttitudeSettings::GetInstance(uavObjectManager)->getData();
     attitudeSettingsData.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
     AttitudeSettings::GetInstance(uavObjectManager)->setData(attitudeSettingsData);
-}
 
-accelGyroBias CCCalibrationUtil::calculateLevellingData()
-{
     accelGyroBias bias;
-    bias.m_accelerometerXBias = m_accelerometerX / (double)m_receivedAccelUpdates / ACCELERATION_SCALE;
-    bias.m_accelerometerYBias = m_accelerometerY / (double)m_receivedAccelUpdates / ACCELERATION_SCALE;
-    bias.m_accelerometerZBias = (m_accelerometerZ / (double)m_receivedAccelUpdates + G) / ACCELERATION_SCALE;
+    bias.m_accelerometerXBias = m_accelerometerX / (double)m_receivedAccelUpdates;
+    bias.m_accelerometerYBias = m_accelerometerY / (double)m_receivedAccelUpdates;
+    bias.m_accelerometerZBias = m_accelerometerZ / (double)m_receivedAccelUpdates;
 
-    bias.m_gyroXBias = m_gyroX / (double)m_receivedGyroUpdates * 100.0;
-    bias.m_gyroYBias = m_gyroY / (double)m_receivedGyroUpdates * 100.0;
-    bias.m_gyroZBias = m_gyroZ / (double)m_receivedGyroUpdates * 100.0;
-    return bias;
+    bias.m_gyroXBias = m_gyroX / (double)m_receivedGyroUpdates;
+    bias.m_gyroYBias = m_gyroY / (double)m_receivedGyroUpdates;
+    bias.m_gyroZBias = m_gyroZ / (double)m_receivedGyroUpdates;
+
+    qDebug() << "Bias calculations finished";
+    emit done(bias);
 }
-

@@ -165,7 +165,7 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 }
 
 void ConfigGadgetWidget::onAutopilotDisconnect() {
-    ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+    int selectedIndex = ftw->currentIndex();
 
     QIcon *icon = new QIcon();
     icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
@@ -181,7 +181,7 @@ void ConfigGadgetWidget::onAutopilotDisconnect() {
     ftw->removeTab(ConfigGadgetWidget::hardware);
     ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
 
-    ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
+    ftw->setCurrentIndex(selectedIndex);
 
     emit autopilotDisconnected();
 }
@@ -194,6 +194,7 @@ void ConfigGadgetWidget::onAutopilotConnect() {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
     if (utilMngr) {
+        int selectedIndex = ftw->currentIndex();
         int board = utilMngr->getBoardModel();
         if ((board & 0xff00) == 1024) {
             // CopterControl family
@@ -212,7 +213,6 @@ void ConfigGadgetWidget::onAutopilotConnect() {
             ftw->removeTab(ConfigGadgetWidget::hardware);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
 
-            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         } else if ((board & 0xff00) == 0x0900) {
             // Revolution family
 
@@ -230,11 +230,11 @@ void ConfigGadgetWidget::onAutopilotConnect() {
             ftw->removeTab(ConfigGadgetWidget::hardware);
             ftw->insertTab(ConfigGadgetWidget::hardware, qwd, *icon, QString("Hardware"));
 
-            ftw->setCurrentIndex(ConfigGadgetWidget::hardware);
         } else {
             //Unknown board
             qDebug() << "Unknown board " << board;
         }
+        ftw->setCurrentIndex(selectedIndex);
     }
     emit autopilotConnected();
 }

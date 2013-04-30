@@ -1,11 +1,11 @@
 /**
  ******************************************************************************
  *
- * @file       cccalibrationpage.cpp
+ * @file       biascalibrationpage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
- * @addtogroup CCCalibrationPage
+ * @addtogroup BiasCalibrationPage
  * @{
  * @brief
  *****************************************************************************/
@@ -27,19 +27,19 @@
 
 #include <QMessageBox>
 #include <QDebug>
-#include "cccalibrationpage.h"
-#include "ui_cccalibrationpage.h"
+#include "biascalibrationpage.h"
+#include "ui_biascalibrationpage.h"
 #include "setupwizard.h"
 
-CCCalibrationPage::CCCalibrationPage(SetupWizard *wizard, QWidget *parent) :
+BiasCalibrationPage::BiasCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
-    ui(new Ui::CCCalibrationPage),  m_calibrationUtil(0)
+    ui(new Ui::BiasCalibrationPage),  m_calibrationUtil(0)
 {
     ui->setupUi(this);
     connect(ui->levelButton, SIGNAL(clicked()), this, SLOT(performCalibration()));
 }
 
-CCCalibrationPage::~CCCalibrationPage()
+BiasCalibrationPage::~BiasCalibrationPage()
 {
     if(m_calibrationUtil) {
         delete m_calibrationUtil;
@@ -47,17 +47,17 @@ CCCalibrationPage::~CCCalibrationPage()
     delete ui;
 }
 
-bool CCCalibrationPage::validatePage()
+bool BiasCalibrationPage::validatePage()
 {
     return true;
 }
 
-bool CCCalibrationPage::isComplete() const
+bool BiasCalibrationPage::isComplete() const
 {
     return ui->levelButton->isEnabled();
 }
 
-void CCCalibrationPage::enableButtons(bool enable)
+void BiasCalibrationPage::enableButtons(bool enable)
 {
     ui->levelButton->setEnabled(enable);
     getWizard()->button(QWizard::NextButton)->setEnabled(enable);
@@ -67,7 +67,7 @@ void CCCalibrationPage::enableButtons(bool enable)
     QApplication::processEvents();
 }
 
-void CCCalibrationPage::performCalibration()
+void BiasCalibrationPage::performCalibration()
 {
     if(!getWizard()->getConnectionManager()->isConnected()) {
         QMessageBox msgBox;
@@ -85,7 +85,7 @@ void CCCalibrationPage::performCalibration()
 
     if(!m_calibrationUtil)
     {
-        m_calibrationUtil = new CCCalibrationUtil(BIAS_CYCLES, BIAS_RATE);
+        m_calibrationUtil = new BiasCalibrationUtil(BIAS_CYCLES, BIAS_RATE);
     }
 
     connect(m_calibrationUtil, SIGNAL(progress(long,long)), this, SLOT(calibrationProgress(long,long)));
@@ -95,7 +95,7 @@ void CCCalibrationPage::performCalibration()
     m_calibrationUtil->start();
 }
 
-void CCCalibrationPage::calibrationProgress(long current, long total)
+void BiasCalibrationPage::calibrationProgress(long current, long total)
 {
     if(ui->levellinProgressBar->maximum() != (int)total) {
         ui->levellinProgressBar->setMaximum((int)total);
@@ -105,14 +105,14 @@ void CCCalibrationPage::calibrationProgress(long current, long total)
     }
 }
 
-void CCCalibrationPage::calibrationDone(accelGyroBias bias)
+void BiasCalibrationPage::calibrationDone(accelGyroBias bias)
 {
     stopCalibration();
     getWizard()->setLevellingBias(bias);
     emit completeChanged();
 }
 
-void CCCalibrationPage::calibrationTimeout(QString message)
+void BiasCalibrationPage::calibrationTimeout(QString message)
 {
     stopCalibration();
 
@@ -123,7 +123,7 @@ void CCCalibrationPage::calibrationTimeout(QString message)
     msgBox.exec();
 }
 
-void CCCalibrationPage::stopCalibration()
+void BiasCalibrationPage::stopCalibration()
 {
     if(m_calibrationUtil)
     {

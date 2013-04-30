@@ -5,7 +5,7 @@
 	<field name="PitchMax" units="degrees" type="uint8" elements="1" defaultvalue="40" limits="%BE:0:180"/>
 	<field name="YawMax" units="degrees" type="uint8" elements="1" defaultvalue="40" limits="%BE:0:180"/>
 	<field name="ManualRate" units="degrees/sec" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="150,150,175" limits="%BE:0:500; %BE:0:500; %BE:0:500"/>
-	<field name="MaximumRate" units="degrees/sec" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="300,300,50" limits="%BE:0:500; %BE:0:500; %BE:0:500"/>
+	<field name="MaximumRate" units="degrees/sec" type="float" elementnames="Roll,Pitch,Yaw" defaultvalue="300,300,300" limits="%BE:0:500; %BE:0:500; %BE:0:500"/>
 
 	<field name="RollRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.003,0.003,0.00002,0.3" limits="%BE:0:0.01; %BE:0:0.01; ; "/>
 	<field name="PitchRatePID" units="" type="float" elementnames="Kp,Ki,Kd,ILimit" defaultvalue="0.003,0.003,0.00002,0.3" limits="%BE:0:0.01; %BE:0:0.01; ; "/>

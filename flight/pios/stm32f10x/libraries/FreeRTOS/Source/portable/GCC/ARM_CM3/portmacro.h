@@ -116,6 +116,7 @@ extern "C" {
 /*-----------------------------------------------------------*/
 
 extern void *pvPortMallocGeneric( size_t xWantedSize, size_t alignment);
+#undef pvPortMallocAligned
 #define pvPortMallocAligned( x, puxStackBuffer ) ( ( ( puxStackBuffer ) == NULL ) ? ( pvPortMallocGeneric( ( x ) , portBYTE_ALIGNMENT) ) : ( puxStackBuffer ) )
 
 /* Scheduler utilities. */

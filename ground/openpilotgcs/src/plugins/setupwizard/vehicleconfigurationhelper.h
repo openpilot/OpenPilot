@@ -81,7 +81,7 @@ private:
     void applyVehicleConfiguration();
     void applyActuatorConfiguration();
     void applyFlighModeConfiguration();
-    void applyLevellingConfiguration();
+    void applySensorBiasConfiguration();
     void applyStabilizationConfiguration();
     void applyManualControlDefaults();
 

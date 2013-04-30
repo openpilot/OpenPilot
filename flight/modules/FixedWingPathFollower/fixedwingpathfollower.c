@@ -508,25 +508,19 @@ static uint8_t updateFixedDesiredAttitude()
 
 	// Error condition: plane cannot hold altitude at current speed.
 	fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWPOWER] = 0;
-	if (
-		powerCommand == fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MAX] // throttle at maximum
-		&& velocityActual.Down > 0 // we ARE going down
-		&& descentspeedDesired < 0 // we WANT to go up
-		&& airspeedError > 0 // we are too slow already
-		) 
-	{
+	if (powerCommand >= fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MAX] && // throttle at maximum
+		velocityActual.Down > 0 && // we ARE going down
+		descentspeedDesired < 0 && // we WANT to go up
+		airspeedError > 0) {       // we are too slow already
 		fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWPOWER] = 1;
 		result = 0;
 	}
 	// Error condition: plane keeps climbing despite minimum throttle (opposite of above)
 	fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHPOWER] = 0;
-	if (
-		powerCommand == fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MIN] // throttle at minimum
-		&& velocityActual.Down < 0 // we ARE going up
-		&& descentspeedDesired > 0 // we WANT to go down
-		&& airspeedError < 0 // we are too fast already
-		) 
-	{
+	if (powerCommand >= fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MIN] && // throttle at minimum
+		velocityActual.Down < 0 && // we ARE going up
+		descentspeedDesired > 0 && // we WANT to go down
+		airspeedError < 0 ) {      // we are too fast already
 		fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHPOWER] = 1;
 		result = 0;
 	}
@@ -558,23 +552,19 @@ static uint8_t updateFixedDesiredAttitude()
 	fixedwingpathfollowerStatus.ErrorInt[FIXEDWINGPATHFOLLOWERSTATUS_ERRORINT_SPEED] = airspeedErrorInt;
 	fixedwingpathfollowerStatus.Command[FIXEDWINGPATHFOLLOWERSTATUS_COMMAND_SPEED] = pitchCommand;
 
-	stabDesired.Pitch = bound(fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_NEUTRAL] +
-		pitchCommand,
-		fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_MIN],
-		fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_MAX]);
+	stabDesired.Pitch = bound(fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_NEUTRAL] + pitchCommand,
+							  fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_MIN],
+							  fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_MAX]);
 
 	// Error condition: high speed dive
 	fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_PITCHCONTROL] = 0;
-	if (
-		pitchCommand == fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_MAX] // pitch demand is full up
-		&& velocityActual.Down > 0 // we ARE going down
-		&& descentspeedDesired < 0 // we WANT to go up
-		&& airspeedError < 0 // we are too fast already
-		) {
+	if (pitchCommand >= fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_MAX] && // pitch demand is full up
+		velocityActual.Down > 0 && // we ARE going down
+		descentspeedDesired < 0 && // we WANT to go up
+		airspeedError < 0 ) {      // we are too fast already
 		fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_PITCHCONTROL] = 1;
 		result = 0;
 	}
-
 
 	/**
 	 * Compute desired roll command

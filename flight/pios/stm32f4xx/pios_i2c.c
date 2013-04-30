@@ -668,7 +668,7 @@ static bool i2c_adapter_wait_for_stopped(struct pios_i2c_adapter *i2c_adapter)
 	 * failures at this transition which previously resulted
 	 * in spinning on this bit in the ISR forever.
 	 */
-	for (guard = 1e6;	/* FIXME: should use the configured bus timeout */
+	for (guard = 1000000;	/* FIXME: should use the configured bus timeout */
 	     guard && (i2c_adapter->cfg->regs->CR1 & I2C_CR1_STOP); guard--)
 		continue;
 	if (!guard) {

@@ -80,7 +80,7 @@ uint32_t PIOS_RTC_Counter()
  */
 float PIOS_RTC_Rate()
 {
-	return (float) (8e6 / 128) / (1 + PIOS_RTC_PRESCALER);
+	return (float) (8e6f / 128.0f) / (1 + PIOS_RTC_PRESCALER);
 }
 
 float PIOS_RTC_MsPerTick() 

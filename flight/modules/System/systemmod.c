@@ -461,9 +461,9 @@ static void updateStats()
 	
 #if defined(PIOS_INCLUDE_ADC) && defined(PIOS_ADC_USE_TEMP_SENSOR)
 	float temp_voltage = 3.3f * PIOS_ADC_PinGet(0) / ((float)((1 << 12) - 1));
-	const float STM32_TEMP_V25 = 1.43; /* V */
-	const float STM32_TEMP_AVG_SLOPE = 4.3; /* mV/C */
-	stats.CPUTemp = (temp_voltage-STM32_TEMP_V25) * 1000 / STM32_TEMP_AVG_SLOPE + 25;
+	const float STM32_TEMP_V25 = 1.43f; /* V */
+	const float STM32_TEMP_AVG_SLOPE = 4.3f; /* mV/C */
+	stats.CPUTemp = (temp_voltage-STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
 #endif
 	SystemStatsSet(&stats);
 }

@@ -353,7 +353,7 @@ static void manualControlTask(void *parameters)
 				flightMode         = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE];
 
 				// Apply deadband for Roll/Pitch/Yaw stick inputs
-				if (settings.Deadband) {
+				if (settings.Deadband > 0.0f) {
 					applyDeadband(&cmd.Roll, settings.Deadband);
 					applyDeadband(&cmd.Pitch, settings.Deadband);
 					applyDeadband(&cmd.Yaw, settings.Deadband);
@@ -696,11 +696,6 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
  */
 static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool home)
 {
-	static portTickType lastSysTime;
-	portTickType thisSysTime = xTaskGetTickCount();
-	/* float dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f; */
-	lastSysTime = thisSysTime;
-
 	if (home && changed) {
 		// Simple Return To Base mode - keep altitude the same, fly to home position
 		PositionActualData positionActual;
@@ -754,8 +749,8 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool 
  */
 static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
 {
-	const float DEADBAND_HIGH = 0.55;
-	const float DEADBAND_LOW = 0.45;
+	const float DEADBAND_HIGH = 0.55f;
+	const float DEADBAND_LOW = 0.45f;
 	
 	static portTickType lastSysTime;
 	static bool zeroed = false;
@@ -768,7 +763,7 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
 	StabilizationSettingsGet(&stabSettings);
 
 	thisSysTime = xTaskGetTickCount();
-	dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
+	dT = ((thisSysTime == lastSysTime)? 0.001f : (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f);
 	lastSysTime = thisSysTime;
 
 	altitudeHoldDesired.Roll = cmd->Roll * stabSettings.RollMax;
@@ -829,9 +824,11 @@ static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutr
 	}
 
 	// Bound
-	if (valueScaled >  1.0) valueScaled =  1.0;
-	else
-	if (valueScaled < -1.0) valueScaled = -1.0;
+	if (valueScaled >  1.0f) {
+		valueScaled =  1.0f;
+	} else if (valueScaled < -1.0f) {
+		valueScaled = -1.0f;
+	}
 
 	return valueScaled;
 }

@@ -90,7 +90,9 @@ static char* gps_rx_buffer;
 static uint32_t timeOfLastCommandMs;
 static uint32_t timeOfLastUpdateMs;
 
+#if defined(PIOS_INCLUDE_GPS_NMEA_PARSER) || defined(PIOS_INCLUDE_GPS_UBX_PARSER)
 static struct GPS_RX_STATS gpsRxStats;
+#endif
 
 // ****************
 /**
@@ -250,7 +252,7 @@ static void gpsTask(void *parameters)
 			// we appear to be receiving GPS sentences OK, we've had an update
 			//criteria for GPS-OK taken from this post...
 			//http://forums.openpilot.org/topic/1523-professors-insgps-in-svn/page__view__findpost__p__5220
-			if ((gpsposition.PDOP < 3.5) && (gpsposition.Satellites >= 7) &&
+			if ((gpsposition.PDOP < 3.5f) && (gpsposition.Satellites >= 7) &&
 					(gpsposition.Status == GPSPOSITION_STATUS_FIX3D)) {
 				AlarmsClear(SYSTEMALARMS_ALARM_GPS);
 #ifdef PIOS_GPS_SETS_HOMELOCATION
@@ -275,14 +277,14 @@ static void gpsTask(void *parameters)
  */
 static float GravityAccel(float latitude, float longitude, float altitude)
 {
-	// WGS84 gravity model.  The effect of gravity over latitude is strong
-	// enough to change the estimated accelerometer bias in those apps.
-	double sinsq = sin((double)latitude);
+	/* WGS84 gravity model.  The effect of gravity over latitude is strong
+	 * enough to change the estimated accelerometer bias in those apps. */
+	float sinsq = sinf(latitude);
 	sinsq *= sinsq;
-	// Likewise, over the altitude range of a high-altitude balloon, the effect
-	// due to change in altitude can also affect the model.
-	return (float)(9.7803267714 * (1 + 0.00193185138639*sinsq) / sqrt(1 - 0.00669437999013*sinsq)
-		- 3.086e-6*altitude);
+	/* Likewise, over the altitude range of a high-altitude balloon, the effect
+	 * due to change in altitude can also affect the model. */
+	return (9.7803267714f * (1.0f + 0.00193185138639f*sinsq) / sqrtf(1.0f - 0.00669437999013f*sinsq)
+			- 3.086e-6f*altitude);
 }
 
 // ****************
@@ -296,21 +298,23 @@ static void setHomeLocation(GPSPositionData * gpsData)
 
 	if (gps.Year >= 2000)
 	{
-		// Store LLA
+		/* Store LLA */
 		home.Latitude = gpsData->Latitude;
 		home.Longitude = gpsData->Longitude;
 		home.Altitude = gpsData->Altitude + gpsData->GeoidSeparation;
 
-		// Compute home ECEF coordinates and the rotation matrix into NED
-		double LLA[3] = { ((double)home.Latitude) / 10e6, ((double)home.Longitude) / 10e6, ((double)home.Altitude) };
+		/* Compute home ECEF coordinates and the rotation matrix into NED
+		 * Note that floats are used here - they should give enough precision
+		 * for this application.*/
 
-		// Compute magnetic flux direction at home location
-		if (WMM_GetMagVector(LLA[0], LLA[1], LLA[2], gps.Month, gps.Day, gps.Year, &home.Be[0]) >= 0)
-		{   // calculations appeared to go OK
+		float LLA[3] = { (home.Latitude)/10e6f, (home.Longitude)/10e6f, (home.Altitude) };
 
-			// Compute local acceleration due to gravity.  Vehicles that span a very large
-			// range of altitude (say, weather balloons) may need to update this during the
-			// flight.
+		/* Compute magnetic flux direction at home location */
+		if (WMM_GetMagVector(LLA[0], LLA[1], LLA[2], gps.Month, gps.Day, gps.Year, &home.Be[0]) == 0) {
+
+			/*Compute local acceleration due to gravity.  Vehicles that span a very large
+			 * range of altitude (say, weather balloons) may need to update this during the
+			 * flight. */
 			home.g_e = GravityAccel(LLA[0], LLA[1], LLA[2]);
 			home.Set = HOMELOCATION_SET_TRUE;
 			HomeLocationSet(&home);

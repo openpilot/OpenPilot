@@ -58,6 +58,12 @@
 #include <pios_sys.h>
 #include <pios_delay.h>
 #include <pios_led.h>
+/* FIXME: simposix needs its own custom include directory into
+ * which a custom pios_led.h can be put that includes the following
+ * declaration. */
+#ifdef PIOS_INCLUDE_LED
+extern void PIOS_LED_Init(void);
+#endif
 #include <pios_irq.h>
 #include <pios_sdcard.h>
 #include <pios_udp.h>

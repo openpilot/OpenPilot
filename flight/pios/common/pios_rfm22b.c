@@ -1251,11 +1251,11 @@ static enum pios_rfm22b_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 static void rfm22_setDatarate(struct pios_rfm22b_dev *rfm22b_dev, enum rfm22b_datarate datarate, bool data_whitening)
 {
     uint32_t datarate_bps = data_rate[datarate];
-    rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(datarate_bps) + 0.5);
+    rfm22b_dev->max_packet_time = (uint16_t)((float)(PIOS_PH_MAX_PACKET * 8 * 1000) / (float)(datarate_bps) + 0.5f);
 
     // Generate a pseudo-random number from 0-8 to add to the delay
     uint8_t random = PIOS_CRC_updateByte(0, (uint8_t)(xTaskGetTickCount() & 0xff)) & 0x03;
-    rfm22b_dev->max_ack_delay = (uint16_t)((float)((sizeof(PHAckNackPacket) * 8 + TX_PREAMBLE_NIBBLES * 4) * 1000) / (float)(datarate_bps) + 0.5) * 4 + 4 + random;
+    rfm22b_dev->max_ack_delay = (uint16_t)((float)((sizeof(PHAckNackPacket) * 8 + TX_PREAMBLE_NIBBLES * 4) * 1000) / (float)(datarate_bps) + 0.5f) * 4 + 4 + random;
 
     // rfm22_if_filter_bandwidth
     rfm22_write(rfm22b_dev, 0x1C, reg_1C[datarate]);
@@ -1330,11 +1330,11 @@ static void rfm22_setNominalCarrierFrequency(struct pios_rfm22b_dev *rfm22b_dev,
     } else {
         hbsel = 1;
     }
-    float freq_mhz = (float)(frequency_hz) / 1000000.0;
-    float xtal_freq_khz = 30000;
-    float sfreq = freq_mhz / (10.0 * (xtal_freq_khz / 30000.0) * (1 + hbsel));
+    float freq_mhz = (float)(frequency_hz) / 1000000.0f;
+    float xtal_freq_khz = 30000.0f;
+    float sfreq = freq_mhz / (10.0f * (xtal_freq_khz / 30000.0f) * (1 + hbsel));
     uint32_t fb = (uint32_t)sfreq - 24 + (64 + 32 * hbsel);
-    uint32_t fc = (uint32_t)((sfreq - (uint32_t)sfreq) * 64000.0);
+    uint32_t fc = (uint32_t)((sfreq - (uint32_t)sfreq) * 64000.0f);
     uint8_t fch = (fc >> 8) & 0xff;
     uint8_t fcl = fc & 0xff;
 

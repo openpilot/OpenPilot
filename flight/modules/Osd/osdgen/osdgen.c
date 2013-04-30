@@ -292,7 +292,7 @@ void ellipse(int centerX, int centerY, int horizontalRadius, int verticalRadius)
           plotFourQuadrants(centerX, centerY, x, y);
     }
 
-    error = (int64_t)(doubleVerticalRadius * (x + 1 / 2.0) * (x + 1 / 2.0) + doubleHorizontalRadius * (y - 1) * (y - 1) - doubleHorizontalRadius * doubleVerticalRadius);
+    error = (int64_t)(doubleVerticalRadius * (x + 1 / 2.0f) * (x + 1 / 2.0f) + doubleHorizontalRadius * (y - 1) * (y - 1) - doubleHorizontalRadius * doubleVerticalRadius);
 
     while (y>=0)
     {
@@ -1908,13 +1908,13 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 	int16_t x0 = (size/2)-dx;
 	int16_t y0 = (size/2)+dy;
 	// calculate the line function
-	if((angle != 90) && (angle != -90))
+	if((angle < 90.0f) && (angle > -90.0f))
 	{
-		k = tanf(alpha);
 		vertical = 0;
-		if(k==0)
-		{
-			horizontal=1;
+		if(fabsf(angle) < 1e-5f) {
+			horizontal = 1;
+		} else {
+			k = tanf(alpha);
 		}
 	}
 	else
@@ -1960,7 +1960,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 		// horizon line
 		write_line_outlined(x1+l_x,y1+l_y,x2+l_x,y2+l_y,0,0,0,1);
 		//fill
-		if(angle<=0 && angle>-90)
+		if(angle <= 0.0f && angle > -90.0f)
 		{
 			//write_string("1", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
 			for(int i=y2;i<size;i++)
@@ -1973,7 +1973,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 				write_hline_lm(x2+l_x,size+l_x,i+l_y,1,1);
 			}
 		}
-		else if(angle<-90)
+		else if(angle < -90.0f)
 		{
 			//write_string("2", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
 			for(int i=0;i<y2;i++)
@@ -1986,7 +1986,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 				write_hline_lm(size+l_x,x2+l_x,i+l_y,1,1);
 			}
 		}
-		else if(angle>0 && angle<90)
+		else if(angle > 0.0f && angle < 90.0f)
 		{
 			//write_string("3", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
 			for(int i=y1;i<size;i++)
@@ -1999,7 +1999,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 				write_hline_lm(0+l_x,x2+l_x,i+l_y,1,1);
 			}
 		}
-		else if(angle>90)
+		else if(angle > 90.0f)
 		{
 			//write_string("4", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
 			for(int i=0;i<y1;i++)
@@ -2017,7 +2017,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
 	{
 		// horizon line
 		write_line_outlined(x0+l_x,0+l_y,x0+l_x,size+l_y,0,0,0,1);
-		if(angle==90)
+		if(angle >= 90.0f)
 		{
 			//write_string("5", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
 			for(int i=0;i<size;i++)
@@ -2143,7 +2143,7 @@ void calcHomeArrow(int16_t m_yaw)
     d = 6371 * 1000 * c;
 
     // Elevation  v depends servo direction
-    if(d!=0)
+    if(d > 0.0f)
         elevation = 90-RAD2DEG(atanf(dAlt/d));
     else
         elevation = 0;

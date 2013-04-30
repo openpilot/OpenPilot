@@ -80,7 +80,6 @@ MODULE_INITCALL(WavPlayerInitialize, WavPlayerStart)
 
 static void WavPlayerTask(void *parameters)
 {
-	portTickType xDelay = 100 / portTICK_RATE_MS;
 	portTickType lastSysTime;
 	// Loop forever
 	lastSysTime = xTaskGetTickCount();	//portTickType xDelay = 100 / portTICK_RATE_MS;

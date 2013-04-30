@@ -431,7 +431,7 @@ float ProcessMixer(const int index, const float curve1, const float curve2,
 		accumulator += (result - lastResult[index]) * mixerSettings->FeedForward;
 		lastResult[index] = result;
 		result += accumulator;
-		if(period !=0)
+		if(period > 0.0f)
 		{
 			if(accumulator > 0.0f)
 			{

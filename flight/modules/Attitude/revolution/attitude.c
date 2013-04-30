@@ -315,14 +315,14 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
 	if((init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
 		// For first 7 seconds use accels to get gyro bias
-		attitudeSettings.AccelKp = 1;
-		attitudeSettings.AccelKi = 0.9;
-		attitudeSettings.YawBiasRate = 0.23;
+		attitudeSettings.AccelKp = 1.0f;
+		attitudeSettings.AccelKi = 0.9f;
+		attitudeSettings.YawBiasRate = 0.23f;
 		magKp = 1;
 	} else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
-		attitudeSettings.AccelKp = 1;
-		attitudeSettings.AccelKi = 0.9;
-		attitudeSettings.YawBiasRate = 0.23;
+		attitudeSettings.AccelKp = 1.0f;
+		attitudeSettings.AccelKi = 0.9f;
+		attitudeSettings.YawBiasRate = 0.23f;
 		magKp = 1;
 		init = 0;
 	} else if (init == 0) {
@@ -373,7 +373,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
 		MagnetometerGet(&mag);
 
 		// If the mag is producing bad data don't use it (normally bad calibration)
-		if  (mag.x == mag.x && mag.y == mag.y && mag.z == mag.z) {
+		if  (!isnan(mag.x) && !isinf(mag.x) && !isnan(mag.y) && !isinf(mag.y) && !isnan(mag.z) && !isinf(mag.z)) {
 			rot_mult(Rbe, homeLocation.Be, brot);
 
 			float mag_len = sqrtf(mag.x * mag.x + mag.y * mag.y + mag.z * mag.z);
@@ -439,7 +439,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
 	// If quaternion has become inappropriately short or is nan reinit.
 	// THIS SHOULD NEVER ACTUALLY HAPPEN
-	if((fabs(qmag) < 1.0e-3f) || (qmag != qmag)) {
+	if((fabs(qmag) < 1.0e-3f) || isnan(qmag)) {
 		q[0] = 1;
 		q[1] = 0;
 		q[2] = 0;
@@ -601,10 +601,10 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	GyrosBiasGet(&gyrosBias);
 
 	// Discard mag if it has NAN (normally from bad calibration)
-	mag_updated &= (magData.x == magData.x && magData.y == magData.y && magData.z == magData.z);
+	mag_updated &= (!isnan(magData.x) && !isinf(magData.x) && !isnan(magData.y) && !isinf(magData.y) && !isnan(magData.z) && !isinf(magData.z));
 	// Don't require HomeLocation.Set to be true but at least require a mag configuration (allows easily
 	// switching between indoor and outdoor mode with Set = false)
-	mag_updated &= (homeLocation.Be[0] != 0 || homeLocation.Be[1] != 0 || homeLocation.Be[2]);
+	mag_updated &= (homeLocation.Be[0] > 0.0f || homeLocation.Be[1] > 0.0f || homeLocation.Be[2] > 0.0f);
 
 	// Discard airspeed if sensor not connected
 	airspeed_updated &= ( airspeedData.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE );

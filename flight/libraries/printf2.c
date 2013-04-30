@@ -178,7 +178,7 @@ int _read(int file, char *ptr, int len)
 
 /*==============================================================================
  * Write to a file. libc subroutines will use this system routine for output to
- * all files, including stdout—so if you need to generate any output, for
+ * all files, including stdoutï¿½so if you need to generate any output, for
  * example to a serial port for debugging, you should make your minimal write
  * capable of doing this.
  */
@@ -287,14 +287,14 @@ static uint my_strlen(char *str)
 //  It is more useful when implementing a walking-string function.
 //****************************************************************************
 static const double round_nums[8] = {
-   0.5,
-   0.05,
-   0.005,
-   0.0005,
-   0.00005,
-   0.000005,
-   0.0000005,
-   0.00000005
+   0.5L,
+   0.05L,
+   0.005L,
+   0.0005L,
+   0.00005L,
+   0.000005L,
+   0.0000005L,
+   0.00000005L
 } ;
 
 static unsigned dbl2stri(char *outbfr, double dbl, unsigned dec_digits)
@@ -305,9 +305,9 @@ static unsigned dbl2stri(char *outbfr, double dbl, unsigned dec_digits)
    //*******************************************
    //  extract negative info
    //*******************************************
-   if (dbl < 0.0) {
+   if (dbl < 0.0L) {
       *output++ = '-' ;
-      dbl *= -1.0 ;
+      dbl *= -1.0L ;
    } else {
       if (use_leading_plus) {
          *output++ = '+' ;

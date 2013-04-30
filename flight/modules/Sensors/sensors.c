@@ -509,7 +509,9 @@ static void magOffsetEstimation(MagnetometerData *mag)
 	delta[1] = -rate * (xy[1] / xy_norm * Rxy - xy[1]);
 	delta[2] = -rate * (Rz - B_e[2]);
 	
-	if (delta[0] == delta[0] && delta[1] == delta[1] && delta[2] == delta[2]) {		
+	if (!isnan(delta[0]) && !isinf(delta[0]) &&
+		!isnan(delta[1]) && !isinf(delta[1]) &&
+		!isnan(delta[2]) && !isinf(delta[2])) {
 		magBias.x += delta[0];
 		magBias.y += delta[1];
 		magBias.z += delta[2];

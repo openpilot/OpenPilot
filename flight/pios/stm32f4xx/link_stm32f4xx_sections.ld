@@ -83,7 +83,7 @@ SECTIONS
     	_irq_stack_end = . ;
     	*(.irqstack)
     	_irq_stack_top = . ;
-	} > SRAM
+	} > CCSRAM
 	
 
 	/*

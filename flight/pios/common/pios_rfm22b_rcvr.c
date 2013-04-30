@@ -110,7 +110,7 @@ static void PIOS_RFM22B_RCVR_Supervisor(uint32_t rcvr_id) {
     // Have we received fresh values since the last update?
     if (!rfm22b_dev->ppm_fresh) {
         for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i) {
-            rfm22b_dev->ppm_channel[i] = 0;
+            rfm22b_dev->ppm_channel[i] = PIOS_RCVR_TIMEOUT;
         }
     }
     rfm22b_dev->ppm_fresh = false;

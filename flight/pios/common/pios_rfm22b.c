@@ -2072,9 +2072,9 @@ static void rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev)
 
     // See if we have any valid channels.
     bool valid_input_detected = false;
-    for (uint8_t i = 1; i <= PIOS_PPM_NUM_INPUTS; ++i) {
-        rfm22b_dev->ppm_packet.channels[i - 1] = PIOS_RCVR_Read(PIOS_PPM_RECEIVER, i);
-        if(rfm22b_dev->ppm_packet.channels[i - 1] != PIOS_RCVR_TIMEOUT)
+    for (uint8_t i = 0; i < PIOS_PPM_NUM_INPUTS; ++i) {
+        rfm22b_dev->ppm_packet.channels[i] = PIOS_RCVR_Read(PIOS_PPM_RECEIVER, i + 1);
+        if((rfm22b_dev->ppm_packet.channels[i] != PIOS_RCVR_INVALID) && (rfm22b_dev->ppm_packet.channels[i] != PIOS_RCVR_TIMEOUT))
             valid_input_detected = true;
     }
 

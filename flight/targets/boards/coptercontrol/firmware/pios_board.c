@@ -773,7 +773,7 @@ void PIOS_Board_Init(void) {
 	/* Remap AFIO pin for PB4 (Servo 5 Out)*/
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
 
-#ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
+#ifndef PIOS_ENABLE_DEBUG_PINS
 	switch (hwsettings_rcvrport) {
 		case HWSETTINGS_CC_RCVRPORT_DISABLED:
 		case HWSETTINGS_CC_RCVRPORT_PWM:
@@ -787,8 +787,8 @@ void PIOS_Board_Init(void) {
 			break;
 	}
 #else
-	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
-#endif	/* PIOS_DEBUG_ENABLE_DEBUG_PINS */
+	PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
+#endif	/* PIOS_ENABLE_DEBUG_PINS */
 
 	switch(bdinfo->board_rev) {
 		case BOARD_REVISION_CC:

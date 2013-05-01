@@ -24,11 +24,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef CONFIGGROUNDVEHICLEWIDGET_H
-#define CONFIGGROUNDVEHICLEWIDGET_H
+#ifndef CONFIGCUSTOMWIDGET_H
+#define CONFIGCUSTOMWIDGET_H
 
 #include "cfg_vehicletypes/vehicleconfig.h"
-#include "ui_airframe_ground.h"
+#include "ui_airframe_custom.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
@@ -41,33 +41,48 @@
 
 class Ui_Widget;
 
-class ConfigGroundVehicleWidget: public VehicleConfig
+class ConfigCustomWidget: public VehicleConfig
 {
     Q_OBJECT
 
 public:
     static QStringList getChannelDescriptions();
 
-    ConfigGroundVehicleWidget(QWidget *parent = 0);
-    ~ConfigGroundVehicleWidget();
+    ConfigCustomWidget(QWidget *parent = 0);
+    ~ConfigCustomWidget();
 
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
 
+protected:
+    void showEvent(QShowEvent *event);
+    void resizeEvent(QResizeEvent *event);
+
 private:
-    Ui_GroundConfigWidget *m_aircraft;
+    Ui_CustomConfigWidget *m_aircraft;
 
     virtual void registerWidgets(ConfigTaskWidget &parent);
     virtual void resetActuators(GUIConfigDataUnion *configData);
 
-    bool setupGroundVehicleCar(QString airframeType);
-    bool setupGroundVehicleDifferential(QString airframeType);
-    bool setupGroundVehicleMotorcycle(QString airframeType);
-
 private slots:
     virtual void setupUI(QString airframeType);
-    virtual bool throwConfigError(QString airframeType);
+    virtual bool throwConfigError(int numMotors);
 
 };
 
-#endif // CONFIGGROUNDVEHICLEWIDGET_H
+class SpinBoxDelegate : public QItemDelegate
+{
+    Q_OBJECT
+
+public:
+    SpinBoxDelegate(QObject *parent = 0);
+
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+};
+
+#endif // CONFIGCUSTOMWIDGET_H

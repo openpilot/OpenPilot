@@ -25,8 +25,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "configfixedwingwidget.h"
-#include "configvehicletypewidget.h"
 #include "mixersettings.h"
+#include "systemsettings.h"
+#include "actuatorsettings.h"
+#include "actuatorcommand.h"
 
 #include <QDebug>
 #include <QStringList>
@@ -38,28 +40,64 @@
 #include <math.h>
 #include <QMessageBox>
 
-#include "mixersettings.h"
-#include "systemsettings.h"
-#include "actuatorsettings.h"
-#include "actuatorcommand.h"
-
-
-/**
- Constructor
- */
-ConfigFixedWingWidget::ConfigFixedWingWidget(Ui_AircraftWidget *aircraft, QWidget *parent) : VehicleConfig(parent)
+QStringList ConfigFixedWingWidget::getChannelDescriptions()
 {
-    m_aircraft = aircraft;    
+    // init a channel_numelem list of channel desc defaults
+    QStringList channelDesc;
+    for (int i = 0; i < (int) ConfigFixedWingWidget::CHANNEL_NUMELEM; i++) {
+        channelDesc.append(QString("-"));
+    }
+
+    // get the gui config data
+    GUIConfigDataUnion configData = getConfigData();
+
+    if (configData.fixedwing.FixedWingPitch1 > 0) {
+        channelDesc[configData.fixedwing.FixedWingPitch1 - 1] = QString("FixedWingPitch1");
+    }
+    if (configData.fixedwing.FixedWingPitch2 > 0) {
+        channelDesc[configData.fixedwing.FixedWingPitch2 - 1] = QString("FixedWingPitch2");
+    }
+    if (configData.fixedwing.FixedWingRoll1 > 0) {
+        channelDesc[configData.fixedwing.FixedWingRoll1 - 1] = QString("FixedWingRoll1");
+    }
+    if (configData.fixedwing.FixedWingRoll2 > 0) {
+        channelDesc[configData.fixedwing.FixedWingRoll2 - 1] = QString("FixedWingRoll2");
+    }
+    if (configData.fixedwing.FixedWingYaw1 > 0) {
+        channelDesc[configData.fixedwing.FixedWingYaw1 - 1] = QString("FixedWingYaw1");
+    }
+    if (configData.fixedwing.FixedWingYaw2 > 0) {
+        channelDesc[configData.fixedwing.FixedWingYaw2 - 1] = QString("FixedWingYaw2");
+    }
+    if (configData.fixedwing.FixedWingThrottle > 0) {
+        channelDesc[configData.fixedwing.FixedWingThrottle - 1] = QString("FixedWingThrottle");
+    }
+    return channelDesc;
 }
 
-/**
- Destructor
- */
+ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
+        VehicleConfig(parent), m_aircraft(new Ui_FixedWingConfigWidget())
+{
+    m_aircraft->setupUi(this);
+
+    populateChannelComboBoxes();
+
+    QStringList fixedWingTypes;
+    fixedWingTypes << "Elevator aileron rudder" << "Elevon" << "Vtail";
+    m_aircraft->fixedWingType->addItems(fixedWingTypes);
+
+    // Set default model to "Elevator aileron rudder"
+    m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
+
+    //setupUI(m_aircraft->fixedWingType->currentText());
+
+    connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
+}
+
 ConfigFixedWingWidget::~ConfigFixedWingWidget()
 {
-   // Do nothing
+    delete m_aircraft;
 }
-
 
 /**
  Virtual function to setup the UI
@@ -69,8 +107,6 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
     Q_ASSERT(m_aircraft);
 
 	if (frameType == "FixedWing" || frameType == "Elevator aileron rudder") {
-        // Setup the UI
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(true);
         m_aircraft->fwRudder1Label->setEnabled(true);
@@ -92,7 +128,6 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonMixBox->setHidden(true);
 		
     } else if (frameType == "FixedWingElevon" || frameType == "Elevon") {
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevon"));
         m_aircraft->fwAileron1Label->setText("Elevon 1");
         m_aircraft->fwAileron2Label->setText("Elevon 2");
@@ -111,7 +146,6 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
         m_aircraft->elevonLabel2->setText("Pitch");
 		
 	} else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
-        setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText("Fixed Wing"));
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Vtail"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(false);
         m_aircraft->fwRudder1Label->setEnabled(false);
@@ -131,7 +165,22 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
 	}
 }
 
-void ConfigFixedWingWidget::ResetActuators(GUIConfigDataUnion* configData)
+void ConfigFixedWingWidget::registerWidgets(ConfigTaskWidget &parent) {
+    parent.addWidget(m_aircraft->fixedWingThrottle->getCurveWidget());
+    parent.addWidget(m_aircraft->fixedWingType);
+
+    parent.addWidget(m_aircraft->fwEngineChannelBox);
+    parent.addWidget(m_aircraft->fwAileron1ChannelBox);
+    parent.addWidget(m_aircraft->fwAileron2ChannelBox);
+    parent.addWidget(m_aircraft->fwElevator1ChannelBox);
+    parent.addWidget(m_aircraft->fwElevator2ChannelBox);
+    parent.addWidget(m_aircraft->fwRudder1ChannelBox);
+    parent.addWidget(m_aircraft->fwRudder2ChannelBox);
+    parent.addWidget(m_aircraft->elevonSlider1);
+    parent.addWidget(m_aircraft->elevonSlider2);
+}
+
+void ConfigFixedWingWidget::resetActuators(GUIConfigDataUnion *configData)
 {
     configData->fixedwing.FixedWingPitch1 = 0;
     configData->fixedwing.FixedWingPitch2 = 0;
@@ -142,36 +191,65 @@ void ConfigFixedWingWidget::ResetActuators(GUIConfigDataUnion* configData)
     configData->fixedwing.FixedWingThrottle = 0;
 }
 
-QStringList ConfigFixedWingWidget::getChannelDescriptions()
+/**
+ Virtual function to refresh the UI widget values
+ */
+void ConfigFixedWingWidget::refreshWidgetsValues(QString frameType)
 {
-    int i;
-    QStringList channelDesc;
+    Q_ASSERT(m_aircraft);
 
-    // init a channel_numelem list of channel desc defaults
-    for (i=0; i < (int)(ConfigFixedWingWidget::CHANNEL_NUMELEM); i++)
-    {
-        channelDesc.append(QString("-"));
+    setupUI(frameType);
+
+    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+    Q_ASSERT(mixer);
+
+    QList<double> curveValues;
+    getThrottleCurve(mixer, VehicleConfig::MIXER_THROTTLECURVE1, &curveValues);
+
+    // is at least one of the curve values != 0?
+    if (isValidThrottleCurve(&curveValues)) {
+        // yes, use the curve we just read from mixersettings
+        m_aircraft->fixedWingThrottle->initCurve(&curveValues);
+    }
+    else {
+        // no, init a straight curve
+        m_aircraft->fixedWingThrottle->initLinearCurve(curveValues.count(), 1.0);
     }
 
-    // get the gui config data
-    GUIConfigDataUnion configData = GetConfigData();
+    GUIConfigDataUnion config = getConfigData();
+    fixedGUISettingsStruct fixed = config.fixedwing;
 
-    if (configData.fixedwing.FixedWingPitch1 > 0)
-        channelDesc[configData.fixedwing.FixedWingPitch1-1] = QString("FixedWingPitch1");
-    if (configData.fixedwing.FixedWingPitch2 > 0)
-        channelDesc[configData.fixedwing.FixedWingPitch2-1] = QString("FixedWingPitch2");
-    if (configData.fixedwing.FixedWingRoll1 > 0)
-        channelDesc[configData.fixedwing.FixedWingRoll1-1] = QString("FixedWingRoll1");
-    if (configData.fixedwing.FixedWingRoll2 > 0)
-        channelDesc[configData.fixedwing.FixedWingRoll2-1] = QString("FixedWingRoll2");
-    if (configData.fixedwing.FixedWingYaw1 > 0)
-        channelDesc[configData.fixedwing.FixedWingYaw1-1] = QString("FixedWingYaw1");
-    if (configData.fixedwing.FixedWingYaw2 > 0)
-        channelDesc[configData.fixedwing.FixedWingYaw2-1] = QString("FixedWingYaw2");
-    if (configData.fixedwing.FixedWingThrottle > 0)
-        channelDesc[configData.fixedwing.FixedWingThrottle-1] = QString("FixedWingThrottle");
+    // Then retrieve how channels are setup
+    setComboCurrentIndex(m_aircraft->fwEngineChannelBox, fixed.FixedWingThrottle);
+    setComboCurrentIndex(m_aircraft->fwAileron1ChannelBox, fixed.FixedWingRoll1);
+    setComboCurrentIndex(m_aircraft->fwAileron2ChannelBox, fixed.FixedWingRoll2);
+    setComboCurrentIndex(m_aircraft->fwElevator1ChannelBox, fixed.FixedWingPitch1);
+    setComboCurrentIndex(m_aircraft->fwElevator2ChannelBox, fixed.FixedWingPitch2);
+    setComboCurrentIndex(m_aircraft->fwRudder1ChannelBox, fixed.FixedWingYaw1);
+    setComboCurrentIndex(m_aircraft->fwRudder2ChannelBox, fixed.FixedWingYaw2);
 
-    return channelDesc;
+    if (frameType == "FixedWingElevon") {
+        // If the airframe is elevon, restore the slider setting
+        // Find the channel number for Elevon1 (FixedWingRoll1)
+        int channel = m_aircraft->fwAileron1ChannelBox->currentIndex() - 1;
+        if (channel > -1) {
+            // If for some reason the actuators were incoherent, we might fail here, hence the check.
+            m_aircraft->elevonSlider1->setValue(
+                    getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL) * 100);
+            m_aircraft->elevonSlider2->setValue(
+                    getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH) * 100);
+        }
+    }
+    else if (frameType == "FixedWingVtail") {
+        int channel = m_aircraft->fwElevator1ChannelBox->currentIndex() - 1;
+        if (channel > -1) {
+            // If for some reason the actuators were incoherent, we might fail here, hence the check.
+            m_aircraft->elevonSlider1->setValue(
+                    getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW) * 100);
+            m_aircraft->elevonSlider2->setValue(
+                    getMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH) * 100);
+        }
+    }
 }
 
 /**
@@ -180,18 +258,18 @@ QStringList ConfigFixedWingWidget::getChannelDescriptions()
 QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
 {
 	QString airframeType = "FixedWing";
-	
+
 	// Save the curve (common to all Fixed wing frames)
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
 
 	// Remove Feed Forward, it is pointless on a plane:
     setMixerValue(mixer, "FeedForward", 0.0);
-	
+
     // Set the throttle curve
     setThrottleCurve(mixer,VehicleConfig::MIXER_THROTTLECURVE1, m_aircraft->fixedWingThrottle->getCurve());
 
-	//All airframe types must start with "FixedWing"
+	// All airframe types must start with "FixedWing"
 	if (m_aircraft->fixedWingType->currentText() == "Elevator aileron rudder" ) {
 		airframeType = "FixedWing";
         setupFrameFixedWing( airframeType );
@@ -206,50 +284,6 @@ QString ConfigFixedWingWidget::updateConfigObjectsFromWidgets()
 	return airframeType;
 }
 
-
-/**
- Virtual function to refresh the UI widget values
- */
-void ConfigFixedWingWidget::refreshWidgetsValues(QString frameType)
-{
-    Q_ASSERT(m_aircraft);
-
-    GUIConfigDataUnion config = GetConfigData();
-    fixedGUISettingsStruct fixed = config.fixedwing;
-
-    // Then retrieve how channels are setup
-    setComboCurrentIndex(m_aircraft->fwEngineChannelBox, fixed.FixedWingThrottle);
-    setComboCurrentIndex(m_aircraft->fwAileron1ChannelBox, fixed.FixedWingRoll1);
-    setComboCurrentIndex(m_aircraft->fwAileron2ChannelBox, fixed.FixedWingRoll2);
-    setComboCurrentIndex(m_aircraft->fwElevator1ChannelBox, fixed.FixedWingPitch1);
-    setComboCurrentIndex(m_aircraft->fwElevator2ChannelBox, fixed.FixedWingPitch2);
-    setComboCurrentIndex(m_aircraft->fwRudder1ChannelBox, fixed.FixedWingYaw1);
-    setComboCurrentIndex(m_aircraft->fwRudder2ChannelBox, fixed.FixedWingYaw2);
-
-    UAVDataObject* mixer= dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
-    Q_ASSERT(mixer);
-
-    int channel;
-	if (frameType == "FixedWingElevon") {
-        // If the airframe is elevon, restore the slider setting
-        // Find the channel number for Elevon1 (FixedWingRoll1)
-        channel = m_aircraft->fwAileron1ChannelBox->currentIndex()-1;
-        if (channel > -1) { // If for some reason the actuators were incoherent, we might fail here, hence the check.
-            m_aircraft->elevonSlider1->setValue(getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_ROLL)*100);
-            m_aircraft->elevonSlider2->setValue(getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_PITCH)*100);
-		}
-	}
-    if (frameType == "FixedWingVtail") {
-        channel = m_aircraft->fwElevator1ChannelBox->currentIndex()-1;
-        if (channel > -1) { // If for some reason the actuators were incoherent, we might fail here, hence the check.
-            m_aircraft->elevonSlider1->setValue(getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_YAW)*100);
-            m_aircraft->elevonSlider2->setValue(getMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_PITCH)*100);
-        }
-	}	
-}
-
-
-
 /**
  Setup Elevator/Aileron/Rudder airframe.
  
@@ -260,15 +294,14 @@ void ConfigFixedWingWidget::refreshWidgetsValues(QString frameType)
 bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
 {
     // Check coherence:
-	//Show any config errors in GUI
+    // Show any config errors in GUI
     if (throwConfigError(airframeType)) {
-			return false;
-		}
+        return false;
+    }
 
     // Now setup the channels:
-	
-    GUIConfigDataUnion config = GetConfigData();
-    ResetActuators(&config);
+    GUIConfigDataUnion config = getConfigData();
+    resetActuators(&config);
 
     config.fixedwing.FixedWingPitch1 = m_aircraft->fwElevator1ChannelBox->currentIndex();
     config.fixedwing.FixedWingPitch2 = m_aircraft->fwElevator2ChannelBox->currentIndex();
@@ -277,8 +310,8 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
     config.fixedwing.FixedWingYaw1 = m_aircraft->fwRudder1ChannelBox->currentIndex();
     config.fixedwing.FixedWingThrottle = m_aircraft->fwEngineChannelBox->currentIndex();
 
-    SetConfigData(config);
-	
+    setConfigData(config);
+
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
     resetMotorAndServoMixers(mixer);
@@ -289,44 +322,42 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
 
     // 1. Assign the servo/motor/none for each channel
 
-    //motor
-    int channel = m_aircraft->fwEngineChannelBox->currentIndex()-1;
-    setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_MOTOR);
-    setMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
+    // motor
+    int channel = m_aircraft->fwEngineChannelBox->currentIndex() - 1;
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_MOTOR);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
 
-    //rudder
-    channel = m_aircraft->fwRudder1ChannelBox->currentIndex()-1;
-    setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
+    // rudder
+    channel = m_aircraft->fwRudder1ChannelBox->currentIndex() - 1;
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
 
-    //ailerons
-    channel = m_aircraft->fwAileron1ChannelBox->currentIndex()-1;
+    // ailerons
+    channel = m_aircraft->fwAileron1ChannelBox->currentIndex() - 1;
     if (channel > -1) {
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
+        setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, 127);
 
-        channel = m_aircraft->fwAileron2ChannelBox->currentIndex()-1;
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
+        channel = m_aircraft->fwAileron2ChannelBox->currentIndex() - 1;
+        setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, 127);
     }
 
-    //elevators
-    channel = m_aircraft->fwElevator1ChannelBox->currentIndex()-1;
+    // elevators
+    channel = m_aircraft->fwElevator1ChannelBox->currentIndex() - 1;
     if (channel > -1) {
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
+        setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, 127);
 
-        channel = m_aircraft->fwElevator2ChannelBox->currentIndex()-1;
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
+        channel = m_aircraft->fwElevator2ChannelBox->currentIndex() - 1;
+        setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, 127);
     }
 
     m_aircraft->fwStatusLabel->setText("Mixer generated");
-	
+
     return true;
 }
-
-
 
 /**
  Setup Elevon
@@ -334,13 +365,13 @@ bool ConfigFixedWingWidget::setupFrameFixedWing(QString airframeType)
 bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
 {
     // Check coherence:
-	//Show any config errors in GUI
+    // Show any config errors in GUI
     if (throwConfigError(airframeType)) {
         return false;
     }
-	
-    GUIConfigDataUnion config = GetConfigData();
-    ResetActuators(&config);
+
+    GUIConfigDataUnion config = getConfigData();
+    resetActuators(&config);
 
     config.fixedwing.FixedWingRoll1 = m_aircraft->fwAileron1ChannelBox->currentIndex();
     config.fixedwing.FixedWingRoll2 = m_aircraft->fwAileron2ChannelBox->currentIndex();
@@ -348,8 +379,8 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
     config.fixedwing.FixedWingYaw2 = m_aircraft->fwRudder2ChannelBox->currentIndex();
     config.fixedwing.FixedWingThrottle = m_aircraft->fwEngineChannelBox->currentIndex();
 
-    SetConfigData(config);
-	    
+    setConfigData(config);
+
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
     resetMotorAndServoMixers(mixer);
@@ -363,34 +394,34 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
 
     double value;
 
-    //motor
-    int channel = m_aircraft->fwEngineChannelBox->currentIndex()-1;
-    setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_MOTOR);
-    setMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
+    // motor
+    int channel = m_aircraft->fwEngineChannelBox->currentIndex() - 1;
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_MOTOR);
+    setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
 
-    //rudders
-    channel = m_aircraft->fwRudder1ChannelBox->currentIndex()-1;
-    setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
+    // rudders
+    channel = m_aircraft->fwRudder1ChannelBox->currentIndex() - 1;
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
 
-    channel = m_aircraft->fwRudder2ChannelBox->currentIndex()-1;
-    setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
+    channel = m_aircraft->fwRudder2ChannelBox->currentIndex() - 1;
+    setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, -127);
 
-    //ailerons
-    channel = m_aircraft->fwAileron1ChannelBox->currentIndex()-1;
+    // ailerons
+    channel = m_aircraft->fwAileron1ChannelBox->currentIndex() - 1;
     if (channel > -1) {
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
-        value = (double)(m_aircraft->elevonSlider2->value()*1.27);
+        setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+        value = (double) (m_aircraft->elevonSlider2->value() * 1.27);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, value);
-        value = (double)(m_aircraft->elevonSlider1->value()*1.27);
+        value = (double) (m_aircraft->elevonSlider1->value() * 1.27);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, value);
 
-        channel = m_aircraft->fwAileron2ChannelBox->currentIndex()-1;
-        setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
-        value = (double)(m_aircraft->elevonSlider2->value()*1.27);
+        channel = m_aircraft->fwAileron2ChannelBox->currentIndex() - 1;
+        setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_SERVO);
+        value = (double) (m_aircraft->elevonSlider2->value() * 1.27);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, value);
-        value = (double)(m_aircraft->elevonSlider1->value()*1.27);
+        value = (double) (m_aircraft->elevonSlider1->value() * 1.27);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, -value);
     }
 
@@ -398,21 +429,19 @@ bool ConfigFixedWingWidget::setupFrameElevon(QString airframeType)
     return true;
 }
 
-
-
 /**
  Setup VTail
  */
 bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
 {
     // Check coherence:
-	//Show any config errors in GUI
+	// Show any config errors in GUI
     if (throwConfigError(airframeType)) {
         return false;
     }
 	
-    GUIConfigDataUnion config = GetConfigData();
-    ResetActuators(&config);
+    GUIConfigDataUnion config = getConfigData();
+    resetActuators(&config);
 
     config.fixedwing.FixedWingPitch1 = m_aircraft->fwElevator1ChannelBox->currentIndex();
     config.fixedwing.FixedWingPitch2 = m_aircraft->fwElevator2ChannelBox->currentIndex();
@@ -420,7 +449,7 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
     config.fixedwing.FixedWingRoll2 = m_aircraft->fwAileron2ChannelBox->currentIndex();
     config.fixedwing.FixedWingThrottle = m_aircraft->fwEngineChannelBox->currentIndex();
 
-    SetConfigData(config);
+    setConfigData(config);
 	    
     UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
     Q_ASSERT(mixer);
@@ -433,14 +462,12 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
 
     // 1. Assign the servo/motor/none for each channel
 
-    double value;
-
-    //motor
+    // motor
     int channel = m_aircraft->fwEngineChannelBox->currentIndex()-1;
     setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_MOTOR);
     setMixerVectorValue(mixer,channel,VehicleConfig::MIXERVECTOR_THROTTLECURVE1, 127);
 
-    //rudders
+    // rudders
     channel = m_aircraft->fwRudder1ChannelBox->currentIndex()-1;
     setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, 127);
@@ -449,7 +476,7 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
     setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
     setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, -127);
 
-    //ailerons
+    // ailerons
     channel = m_aircraft->fwAileron1ChannelBox->currentIndex()-1;
     if (channel > -1) {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
@@ -460,11 +487,11 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_ROLL, -127);
     }
 
-    //vtail
+    // vtail
     channel = m_aircraft->fwElevator1ChannelBox->currentIndex()-1;
     if (channel > -1) {
         setMixerType(mixer,channel,VehicleConfig::MIXERTYPE_SERVO);
-        value = (double)(m_aircraft->elevonSlider2->value()*1.27);
+        double value = (double)(m_aircraft->elevonSlider2->value()*1.27);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_PITCH, value);
         value = (double)(m_aircraft->elevonSlider1->value()*1.27);
         setMixerVectorValue(mixer, channel, VehicleConfig::MIXERVECTOR_YAW, value);
@@ -486,96 +513,88 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
  */
 bool ConfigFixedWingWidget::throwConfigError(QString airframeType)
 {
-	//Initialize configuration error flag
-	bool error=false;
-	
-	//Create a red block. All combo boxes are the same size, so any one should do as a model
-	int size = m_aircraft->fwEngineChannelBox->style()->pixelMetric(QStyle::PM_SmallIconSize);
-	QPixmap pixmap(size,size);
-	pixmap.fill(QColor("red"));
-	
-	if (airframeType == "FixedWing" ) {
-		if (m_aircraft->fwEngineChannelBox->currentText() == "None"){
-			m_aircraft->fwEngineChannelBox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes 
-			error=true;
-		}
-		else{
-			m_aircraft->fwEngineChannelBox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes 
-		}
-		
-		if (m_aircraft->fwElevator1ChannelBox->currentText() == "None"){
-			m_aircraft->fwElevator1ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes 
-			error=true;
-		}
-		else{
-			m_aircraft->fwElevator1ChannelBox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes 
-		}	
-	
-		if	((m_aircraft->fwAileron1ChannelBox->currentText() == "None") &&	 (m_aircraft->fwRudder1ChannelBox->currentText() == "None")) {
-			pixmap.fill(QColor("green"));
-			m_aircraft->fwAileron1ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes 
-			m_aircraft->fwRudder1ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes 
-			error=true;
-		}
-		else{
-			m_aircraft->fwAileron1ChannelBox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes 
-			m_aircraft->fwRudder1ChannelBox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes 
-		}	
-	} else if (airframeType == "FixedWingElevon"){
-		if (m_aircraft->fwEngineChannelBox->currentText() == "None"){
-			m_aircraft->fwEngineChannelBox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes 
-			error=true;
-		}
-		else{
-			m_aircraft->fwEngineChannelBox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes 
-		}	
-		
-		if(m_aircraft->fwAileron1ChannelBox->currentText() == "None"){
-			m_aircraft->fwAileron1ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes 
-			error=true;
-		}
-		else{
-			m_aircraft->fwAileron1ChannelBox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes 
-		}	
-		
-		if (m_aircraft->fwAileron2ChannelBox->currentText() == "None"){
-			m_aircraft->fwAileron2ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes 
-			error=true;
-		}
-		else{
-			m_aircraft->fwAileron2ChannelBox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes 
-		}	
-			
-	} else if ( airframeType == "FixedWingVtail"){
-		if (m_aircraft->fwEngineChannelBox->currentText() == "None"){
-			m_aircraft->fwEngineChannelBox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes 
-			error=true;
-		}
-		else{
-			m_aircraft->fwEngineChannelBox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes 
-		}	
-		
-		if(m_aircraft->fwElevator1ChannelBox->currentText() == "None"){
-			m_aircraft->fwElevator1ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes 
-			error=true;
-		}
-		else{
-			m_aircraft->fwElevator1ChannelBox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes 
-		}	
-		
-		if(m_aircraft->fwElevator2ChannelBox->currentText() == "None"){
-			m_aircraft->fwElevator2ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);//Set color palettes 
-			error=true;
-		}		
-		else{
-			m_aircraft->fwElevator2ChannelBox->setItemData(0, 0, Qt::DecorationRole);//Reset color palettes 
-		}	
-		
-	}
-	
-	if (error){
-		m_aircraft->fwStatusLabel->setText(QString("<font color='red'>ERROR: Assign all necessary channels</font>"));
-	}
+    // Initialize configuration error flag
+    bool error = false;
+
+    // Create a red block. All combo boxes are the same size, so any one should do as a model
+    int size = m_aircraft->fwEngineChannelBox->style()->pixelMetric(QStyle::PM_SmallIconSize);
+    QPixmap pixmap(size, size);
+    pixmap.fill(QColor("red"));
+
+    if (airframeType == "FixedWing") {
+        if (m_aircraft->fwEngineChannelBox->currentText() == "None") {
+            m_aircraft->fwEngineChannelBox->setItemData(0, pixmap, Qt::DecorationRole);    //Set color palettes
+            error = true;
+        } else {
+            m_aircraft->fwEngineChannelBox->setItemData(0, 0, Qt::DecorationRole);    //Reset color palettes
+        }
+
+        if (m_aircraft->fwElevator1ChannelBox->currentText() == "None") {
+            m_aircraft->fwElevator1ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);    //Set color palettes
+            error = true;
+        } else {
+            m_aircraft->fwElevator1ChannelBox->setItemData(0, 0, Qt::DecorationRole);    //Reset color palettes
+        }
+
+        if ((m_aircraft->fwAileron1ChannelBox->currentText() == "None")
+                && (m_aircraft->fwRudder1ChannelBox->currentText() == "None")) {
+            pixmap.fill(QColor("green"));
+            m_aircraft->fwAileron1ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);    //Set color palettes
+            m_aircraft->fwRudder1ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);    //Set color palettes
+            error = true;
+        } else {
+            m_aircraft->fwAileron1ChannelBox->setItemData(0, 0, Qt::DecorationRole);    //Reset color palettes
+            m_aircraft->fwRudder1ChannelBox->setItemData(0, 0, Qt::DecorationRole);    //Reset color palettes
+        }
+    } else if (airframeType == "FixedWingElevon") {
+        if (m_aircraft->fwEngineChannelBox->currentText() == "None") {
+            m_aircraft->fwEngineChannelBox->setItemData(0, pixmap, Qt::DecorationRole);    //Set color palettes
+            error = true;
+        } else {
+            m_aircraft->fwEngineChannelBox->setItemData(0, 0, Qt::DecorationRole);    //Reset color palettes
+        }
+
+        if (m_aircraft->fwAileron1ChannelBox->currentText() == "None") {
+            m_aircraft->fwAileron1ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);    //Set color palettes
+            error = true;
+        } else {
+            m_aircraft->fwAileron1ChannelBox->setItemData(0, 0, Qt::DecorationRole);    //Reset color palettes
+        }
+
+        if (m_aircraft->fwAileron2ChannelBox->currentText() == "None") {
+            m_aircraft->fwAileron2ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);    //Set color palettes
+            error = true;
+        } else {
+            m_aircraft->fwAileron2ChannelBox->setItemData(0, 0, Qt::DecorationRole);    //Reset color palettes
+        }
+
+    } else if (airframeType == "FixedWingVtail") {
+        if (m_aircraft->fwEngineChannelBox->currentText() == "None") {
+            m_aircraft->fwEngineChannelBox->setItemData(0, pixmap, Qt::DecorationRole);    //Set color palettes
+            error = true;
+        } else {
+            m_aircraft->fwEngineChannelBox->setItemData(0, 0, Qt::DecorationRole);    //Reset color palettes
+        }
+
+        if (m_aircraft->fwElevator1ChannelBox->currentText() == "None") {
+            m_aircraft->fwElevator1ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);    //Set color palettes
+            error = true;
+        } else {
+            m_aircraft->fwElevator1ChannelBox->setItemData(0, 0, Qt::DecorationRole);    //Reset color palettes
+        }
+
+        if (m_aircraft->fwElevator2ChannelBox->currentText() == "None") {
+            m_aircraft->fwElevator2ChannelBox->setItemData(0, pixmap, Qt::DecorationRole);    //Set color palettes
+            error = true;
+        } else {
+            m_aircraft->fwElevator2ChannelBox->setItemData(0, 0, Qt::DecorationRole);    //Reset color palettes
+        }
+
+    }
+
+    if (error) {
+        m_aircraft->fwStatusLabel->setText(QString("<font color='red'>ERROR: Assign all necessary channels</font>"));
+    }
 
     return error;
 }

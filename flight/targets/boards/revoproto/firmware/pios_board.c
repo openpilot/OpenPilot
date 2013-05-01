@@ -826,7 +826,7 @@ void PIOS_Board_Init(void) {
 	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
 #endif	/* PIOS_INCLUDE_GCSRCVR */
 	
-#ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
+#ifndef PIOS_ENABLE_DEBUG_PINS
 	switch (hwsettings_rcvrport) {
 		case HWSETTINGS_RV_RCVRPORT_DISABLED:
 		case HWSETTINGS_RV_RCVRPORT_PWM:
@@ -842,7 +842,7 @@ void PIOS_Board_Init(void) {
 			break;
 	}
 #else
-	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
+	PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
 #endif
 	
 	if (PIOS_I2C_Init(&pios_i2c_mag_adapter_id, &pios_i2c_mag_adapter_cfg)) {

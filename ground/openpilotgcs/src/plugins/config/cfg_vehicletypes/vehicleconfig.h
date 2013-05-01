@@ -24,15 +24,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef GUIVEHICLECONFIG_H
-#define GUIVEHICLECONFIG_H
+#ifndef VEHICLECONFIG_H
+#define VEHICLECONFIG_H
 
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "actuatorcommand.h"
-
 
 typedef struct {
     uint VTOLMotorN:4;
@@ -42,11 +41,11 @@ typedef struct {
     uint VTOLMotorNW:4;
     uint VTOLMotorNE:4;
     uint VTOLMotorSW:4;
-    uint VTOLMotorSE:4;         //32bits
+    uint VTOLMotorSE:4; // 32 bits
     uint TRIYaw:4;
-    quint32 padding:28;         //64bits
+    quint32 padding:28; // 64 bits
     quint32 padding1;
-    quint32 padding2;       //128bits
+    quint32 padding2; // 128 bits
 } __attribute__((packed))  multiGUISettingsStruct;
 
 typedef struct {
@@ -58,15 +57,15 @@ typedef struct {
     uint ccpmLinkRollState:1;
     uint SliderValue0:7;
     uint SliderValue1:7;
-    uint SliderValue2:7;//41bits
+    uint SliderValue2:7; // 41 bits
     uint ServoIndexW:4;
     uint ServoIndexX:4;
     uint ServoIndexY:4;
-    uint ServoIndexZ:4;//57bits
+    uint ServoIndexZ:4; // 57 bits
     uint Throttle:4;
-    uint Tail:4;       //65bits
-    quint32 padding:31;  //96bits
-    quint32 padding1;  //128bits
+    uint Tail:4; // 65bits
+    quint32 padding:31; // 96 bits
+    quint32 padding1; // 128 bits
 } __attribute__((packed))  heliGUISettingsStruct;
 
 typedef struct {
@@ -77,10 +76,10 @@ typedef struct {
     uint FixedWingPitch2:4;
     uint FixedWingYaw1:4;
     uint FixedWingYaw2:4;
-    uint padding:4;         //32bits
+    uint padding:4; // 32 bits
     quint32 padding1;
     quint32 padding2;
-    quint32 padding3;       //128bits
+    quint32 padding3; // 128 bits
 } __attribute__((packed))  fixedGUISettingsStruct;
 
 typedef struct {
@@ -88,78 +87,119 @@ typedef struct {
     uint GroundVehicleThrottle2:4;
     uint GroundVehicleSteering1:4;
     uint GroundVehicleSteering2:4;
-    uint padding:16;         //32bits
+    uint padding:16; // 32 bits
     quint32 padding1;
     quint32 padding2;
-    quint32 padding3;       //128bits
+    quint32 padding3; // 128 bits
 } __attribute__((packed))  groundGUISettingsStruct;
 
 typedef union
 {
-    uint                    UAVObject[4];   //32bits * 4
-    heliGUISettingsStruct   heli;           //128bits
-    fixedGUISettingsStruct  fixedwing;
-    multiGUISettingsStruct  multi;
+    uint UAVObject[4]; // 32 bits * 4
+    heliGUISettingsStruct heli; // 128 bits
+    fixedGUISettingsStruct fixedwing;
+    multiGUISettingsStruct multi;
     groundGUISettingsStruct ground;
 } GUIConfigDataUnion;
 
+class ConfigTaskWidget;
 
+/*
+ * This class handles vehicle specific configuration UI and associated logic.
+ *
+ * This class derives from ConfigTaskWidget and overrides its the default "binding" mechanism.
+ * It does not use the "dirty" state management directlyand registers its relevant widgets with ConfigTaskWidget to do so.
+ */
 class VehicleConfig: public ConfigTaskWidget
 {
-    Q_OBJECT
+Q_OBJECT
 
-    public:
-        VehicleConfig(QWidget *parent = 0);
-        ~VehicleConfig();
+public:
 
-        /* Enumeration options for ThrottleCurves */
-        typedef enum { MIXER_THROTTLECURVE1=0, MIXER_THROTTLECURVE2=1 } MixerThrottleCurveElem;
+    /* Enumeration options for ThrottleCurves */
+    typedef enum {
+        MIXER_THROTTLECURVE1 = 0, MIXER_THROTTLECURVE2 = 1
+    } MixerThrottleCurveElem;
 
-        /* Enumeration options for field MixerType */
-        typedef enum { MIXERTYPE_DISABLED=0, MIXERTYPE_MOTOR=1, MIXERTYPE_SERVO=2, MIXERTYPE_CAMERAROLL=3, MIXERTYPE_CAMERAPITCH=4, MIXERTYPE_CAMERAYAW=5, MIXERTYPE_ACCESSORY0=6, MIXERTYPE_ACCESSORY1=7, MIXERTYPE_ACCESSORY2=8, MIXERTYPE_ACCESSORY3=9, MIXERTYPE_ACCESSORY4=10, MIXERTYPE_ACCESSORY5=11 } MixerTypeElem;
-        /* Array element names for field MixerVector */
-        typedef enum { MIXERVECTOR_THROTTLECURVE1=0, MIXERVECTOR_THROTTLECURVE2=1, MIXERVECTOR_ROLL=2, MIXERVECTOR_PITCH=3, MIXERVECTOR_YAW=4 } MixerVectorElem;
+    /* Enumeration options for field MixerType */
+    typedef enum {
+        MIXERTYPE_DISABLED = 0,
+        MIXERTYPE_MOTOR = 1,
+        MIXERTYPE_SERVO = 2,
+        MIXERTYPE_CAMERAROLL = 3,
+        MIXERTYPE_CAMERAPITCH = 4,
+        MIXERTYPE_CAMERAYAW = 5,
+        MIXERTYPE_ACCESSORY0 = 6,
+        MIXERTYPE_ACCESSORY1 = 7,
+        MIXERTYPE_ACCESSORY2 = 8,
+        MIXERTYPE_ACCESSORY3 = 9,
+        MIXERTYPE_ACCESSORY4 = 10,
+        MIXERTYPE_ACCESSORY5 = 11
+    } MixerTypeElem;
 
-        static GUIConfigDataUnion GetConfigData();
-        static void SetConfigData(GUIConfigDataUnion configData);
-        static void resetField(UAVObjectField * field);
-        static void setComboCurrentIndex(QComboBox* box, int index);
-        static void enableComboBoxes(QWidget* owner, QString boxName, int boxCount, bool enable);
-        double  getMixerVectorValue(UAVDataObject* mixer, int channel, MixerVectorElem elementName);
-        void    setMixerVectorValue(UAVDataObject* mixer, int channel, MixerVectorElem elementName, double value);
-        void    resetMixerVector(UAVDataObject* mixer, int channel);
-        void    resetMotorAndServoMixers(UAVDataObject* mixer);
-        QString getMixerType(UAVDataObject* mixer, int channel);
-        void    setMixerType(UAVDataObject* mixer, int channel, MixerTypeElem mixerType);
-        double  getMixerValue(UAVDataObject* mixer, QString elementName);
-        void    setMixerValue(UAVDataObject* mixer, QString elementName, double value);
-        void    setThrottleCurve(UAVDataObject* mixer, MixerThrottleCurveElem curveType, QList<double> curve);
-        void    getThrottleCurve(UAVDataObject* mixer, MixerThrottleCurveElem curveType, QList<double>* curve);
-        bool    isValidThrottleCurve(QList<double>* curve);
-        double  getCurveMin(QList<double>* curve);
-        double  getCurveMax(QList<double>* curve);
-        virtual void ResetActuators(GUIConfigDataUnion* configData);
+    /* Array element names for field MixerVector */
+    typedef enum {
+        MIXERVECTOR_THROTTLECURVE1 = 0,
+        MIXERVECTOR_THROTTLECURVE2 = 1,
+        MIXERVECTOR_ROLL = 2,
+        MIXERVECTOR_PITCH = 3,
+        MIXERVECTOR_YAW = 4
+    } MixerVectorElem;
 
-        QStringList channelNames;
-        QStringList mixerTypes;
-        QStringList mixerVectors;
-        QStringList mixerTypeDescriptions;
+    static const quint32 CHANNEL_NUMELEM = ActuatorCommand::CHANNEL_NUMELEM;;
 
-        static const quint32 CHANNEL_NUMELEM = ActuatorCommand::CHANNEL_NUMELEM;
+    static GUIConfigDataUnion getConfigData();
+    static void setConfigData(GUIConfigDataUnion configData);
 
-    private:
+    static void resetField(UAVObjectField *field);
 
-        static UAVObjectManager* getUAVObjectManager();
+    static void setComboCurrentIndex(QComboBox *box, int index);
+    static void enableComboBoxes(QWidget *owner, QString boxName, int boxCount, bool enable);
 
-    private slots:
+    // VehicleConfig class
+    VehicleConfig(QWidget *parent = 0);
+    ~VehicleConfig();
 
-    public slots:
+    virtual void registerWidgets(ConfigTaskWidget &parent);
 
-    signals:
-        //void ConfigurationChanged();
+    virtual void refreshWidgetsValues(QString frameType);
+    virtual QString updateConfigObjectsFromWidgets();
+
+    double getMixerValue(UAVDataObject *mixer, QString elementName);
+    void setMixerValue(UAVDataObject *mixer, QString elementName, double value);
 
 protected:
+    QStringList channelNames;
+    QStringList mixerTypes;
+    QStringList mixerVectors;
+    QStringList mixerTypeDescriptions;
+
+    void populateChannelComboBoxes();
+
+    double  getMixerVectorValue(UAVDataObject *mixer, int channel, MixerVectorElem elementName);
+    void    setMixerVectorValue(UAVDataObject *mixer, int channel, MixerVectorElem elementName, double value);
+    void    resetMixerVector(UAVDataObject *mixer, int channel);
+    void    resetMotorAndServoMixers(UAVDataObject *mixer);
+    QString getMixerType(UAVDataObject *mixer, int channel);
+    void    setMixerType(UAVDataObject *mixer, int channel, MixerTypeElem mixerType);
+    void    setThrottleCurve(UAVDataObject *mixer, MixerThrottleCurveElem curveType, QList<double> curve);
+    void    getThrottleCurve(UAVDataObject *mixer, MixerThrottleCurveElem curveType, QList<double>* curve);
+    bool    isValidThrottleCurve(QList<double> *curve);
+    double  getCurveMin(QList<double> *curve);
+    double  getCurveMax(QList<double> *curve);
+
+protected slots:
+    virtual void refreshWidgetsValues(UAVObject *o = NULL);
+    virtual void updateObjectsFromWidgets();
+
+private:
+    static UAVObjectManager *getUAVObjectManager();
+
+    virtual void resetActuators(GUIConfigDataUnion *configData);
+
+private slots:
+    virtual void setupUI(QString airframeType);
 
 };
 
-#endif // GUIVEHICLECONFIG_H
+#endif // VEHICLECONFIG_H

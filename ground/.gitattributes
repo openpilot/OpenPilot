@@ -15,3 +15,7 @@
 
 *.pri		text eol=crlf
 *.pro		text eol=crlf
+
+*.h.template	text eol=crlf
+*.c.template	text eol=crlf
+*.cpp.template	text eol=crlf

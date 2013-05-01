@@ -48,6 +48,9 @@ void PIOS_Board_Init(void) {
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();
 
+	/* Initialize the delayed callback library */
+	CallbackSchedulerInitialize();
+
 	/* Initialize the PiOS library */
 	PIOS_COM_Init();
 

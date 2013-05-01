@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       configstabilizationwidget.h
+ * @file       configstabilizationwidget.cpp
  * @author     E. Lafargue & The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -36,10 +36,8 @@
 #include <QUrl>
 #include <QList>
 
-
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
-
 
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
@@ -47,30 +45,32 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     m_stabilization->setupUi(this);
 
 
-    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
-    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
-    if(!settings->useExpertMode())
+    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings* settings = pm->getObject<Core::Internal::GeneralSettings>();
+    if(!settings->useExpertMode()) {
         m_stabilization->saveStabilizationToRAM_6->setVisible(false);
-
-    
+    }
 
     autoLoadWidgets();
-    realtimeUpdates=new QTimer(this);
-    connect(m_stabilization->realTimeUpdates_6,SIGNAL(stateChanged(int)),this,SLOT(realtimeUpdatesSlot(int)));
-    connect(realtimeUpdates,SIGNAL(timeout()),this,SLOT(apply()));
+    realtimeUpdates = new QTimer(this);
 
-    connect(m_stabilization->checkBox_7,SIGNAL(stateChanged(int)),this,SLOT(linkCheckBoxes(int)));
-    connect(m_stabilization->checkBox_2,SIGNAL(stateChanged(int)),this,SLOT(linkCheckBoxes(int)));
-    connect(m_stabilization->checkBox_8,SIGNAL(stateChanged(int)),this,SLOT(linkCheckBoxes(int)));
-    connect(m_stabilization->checkBox_3,SIGNAL(stateChanged(int)),this,SLOT(linkCheckBoxes(int)));
+    connect(m_stabilization->realTimeUpdates_6, SIGNAL(stateChanged(int)), this, SLOT(realtimeUpdatesSlot(int)));
+    connect(m_stabilization->realTimeUpdates_8, SIGNAL(stateChanged(int)), this, SLOT(realtimeUpdatesSlot(int)));
+    connect(realtimeUpdates, SIGNAL(timeout()), this, SLOT(apply()));
 
-    connect(this,SIGNAL(widgetContentsChanged(QWidget*)),this,SLOT(processLinkedWidgets(QWidget*)));
+    connect(m_stabilization->checkBox_7, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+    connect(m_stabilization->checkBox_2, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+    connect(m_stabilization->checkBox_8, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+    connect(m_stabilization->checkBox_3, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+
+    connect(this, SIGNAL(widgetContentsChanged(QWidget*)), this, SLOT(processLinkedWidgets(QWidget*)));
+
+    // Link by default
+    m_stabilization->checkBox_7->setChecked(true);
+    m_stabilization->checkBox_8->setChecked(true);
 
     disableMouseWheelEvents();
-
-
 }
-
 
 ConfigStabilizationWidget::~ConfigStabilizationWidget()
 {
@@ -80,22 +80,30 @@ ConfigStabilizationWidget::~ConfigStabilizationWidget()
 void ConfigStabilizationWidget::realtimeUpdatesSlot(int value)
 {
     m_stabilization->realTimeUpdates_6->setCheckState((Qt::CheckState)value);
-    if(value==Qt::Checked && !realtimeUpdates->isActive())
+    m_stabilization->realTimeUpdates_8->setCheckState((Qt::CheckState)value);
+
+    if(value == Qt::Checked && !realtimeUpdates->isActive()) {
         realtimeUpdates->start(300);
-    else if(value==Qt::Unchecked)
+    }
+    else if(value == Qt::Unchecked) {
         realtimeUpdates->stop();
+    }
 }
 
 void ConfigStabilizationWidget::linkCheckBoxes(int value)
 {
-    if(sender()== m_stabilization->checkBox_7)
+    if(sender() == m_stabilization->checkBox_7) {
         m_stabilization->checkBox_3->setCheckState((Qt::CheckState)value);
-    else if(sender()== m_stabilization->checkBox_3)
+    }
+    else if(sender() == m_stabilization->checkBox_3) {
         m_stabilization->checkBox_7->setCheckState((Qt::CheckState)value);
-    else if(sender()== m_stabilization->checkBox_8)
+    }
+    else if(sender( )== m_stabilization->checkBox_8) {
         m_stabilization->checkBox_2->setCheckState((Qt::CheckState)value);
-    else if(sender()== m_stabilization->checkBox_2)
+    }
+    else if(sender() == m_stabilization->checkBox_2) {
         m_stabilization->checkBox_8->setCheckState((Qt::CheckState)value);
+    }
 }
 
 void ConfigStabilizationWidget::processLinkedWidgets(QWidget * widget)

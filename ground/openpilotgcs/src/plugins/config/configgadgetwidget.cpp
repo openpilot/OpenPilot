@@ -49,8 +49,6 @@
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QPushButton>
 
-
-
 ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -144,6 +142,8 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     oplinkTimeout = new QTimer(this);
     connect(oplinkTimeout, SIGNAL(timeout()), this, SLOT(onOPLinkDisconnect()));
     oplinkConnected = false;
+
+    ftw->setWidgetsEnabled(false);
 }
 
 ConfigGadgetWidget::~ConfigGadgetWidget()
@@ -165,6 +165,8 @@ void ConfigGadgetWidget::resizeEvent(QResizeEvent *event)
 }
 
 void ConfigGadgetWidget::onAutopilotDisconnect() {
+    ftw->setWidgetsEnabled(false);
+
     int selectedIndex = ftw->currentIndex();
 
     QIcon *icon = new QIcon();
@@ -234,8 +236,9 @@ void ConfigGadgetWidget::onAutopilotConnect() {
             //Unknown board
             qDebug() << "Unknown board " << board;
         }
-        ftw->setCurrentIndex(selectedIndex);
+        ftw->setCurrentIndex(selectedIndex);        
     }
+    ftw->setWidgetsEnabled(true);
     emit autopilotConnected();
 }
 

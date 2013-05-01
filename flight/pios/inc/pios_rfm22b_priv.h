@@ -796,10 +796,6 @@ struct pios_rfm22b_dev {
     bool send_status;
     bool send_ppm;
     bool send_connection_request;
-    bool time_to_send;
-
-    // The offset between our clock and the global send clock
-    uint8_t time_to_send_offset;
 
     // The initial frequency
     uint32_t init_frequency;

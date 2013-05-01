@@ -188,6 +188,7 @@ static void rfm22_calculateLinkQuality(struct pios_rfm22b_dev *rfm22b_dev);
 static bool rfm22_ready_to_send(struct pios_rfm22b_dev *rfm22b_dev);
 static bool rfm22_isConnected(struct pios_rfm22b_dev *rfm22b_dev);
 static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev);
+static bool rfm22_timeToSend(struct pios_rfm22b_dev *rfm22b_dev);
 static portTickType rfm22_coordinatorTime(struct pios_rfm22b_dev *rfm22b_dev, portTickType ticks);
 static bool rfm22_inChannelBuffer(struct pios_rfm22b_dev *rfm22b_dev);
 static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev);
@@ -1221,9 +1222,9 @@ static void pios_rfm22_task(void *parameters)
         }
 
         // Send a packet if it's our time slice
-        rfm22b_dev->time_to_send = (((curTicks - rfm22b_dev->time_to_send_offset) & 0x6) == 0);
+        bool time_to_send = rfm22_timeToSend(rfm22b_dev);
 #ifdef PIOS_RFM22B_DEBUG_ON_TELEM
-        if (rfm22b_dev->time_to_send) {
+        if (time_to_send) {
             D4_LED_ON;
         } else {
             D4_LED_OFF;
@@ -1234,7 +1235,7 @@ static void pios_rfm22_task(void *parameters)
             D3_LED_OFF;
         }
 #endif
-        if (rfm22b_dev->time_to_send && PIOS_RFM22B_InRxWait((uint32_t)rfm22b_dev)) {
+        if (time_to_send && PIOS_RFM22B_InRxWait((uint32_t)rfm22b_dev)) {
             rfm22_process_event(rfm22b_dev, RADIO_EVENT_TX_START);
         }
     }
@@ -1370,8 +1371,6 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     // Initialize the state
     rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
     rfm22b_dev->destination_id = 0xffffffff;
-    rfm22b_dev->time_to_send = false;
-    rfm22b_dev->time_to_send_offset = 0;
     rfm22b_dev->send_status = false;
     rfm22b_dev->send_connection_request = false;
 
@@ -1795,7 +1794,7 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
     PHPacketHandle p = NULL;
 
     // Don't send if it's not our turn.
-    if (!radio_dev->time_to_send || (rfm22_inChannelBuffer(radio_dev) && rfm22_isConnected(radio_dev)) || !PIOS_RFM22B_InRxWait((uint32_t)radio_dev)) {
+    if (!rfm22_timeToSend(radio_dev) || (rfm22_inChannelBuffer(radio_dev) && rfm22_isConnected(radio_dev)) || !PIOS_RFM22B_InRxWait((uint32_t)radio_dev)) {
         return RADIO_EVENT_RX_MODE;
     }
 
@@ -1928,12 +1927,6 @@ static enum pios_radio_event radio_txData(struct pios_rfm22b_dev *radio_dev)
             // We need to wait for an ACK if this packet it not an ACK or NACK.
             radio_dev->prev_tx_packet = radio_dev->tx_packet;
             radio_dev->tx_complete_ticks = xTaskGetTickCount();
-        }
-        // Set the Tx period
-        if (radio_dev->tx_packet->header.type == PACKET_TYPE_ACK) {
-            radio_dev->time_to_send_offset = curTicks + 0x4;
-        } else if (radio_dev->tx_packet->header.type == PACKET_TYPE_ACK_RTS) {
-            radio_dev->time_to_send_offset = curTicks;
         }
         radio_dev->tx_packet = 0;
         radio_dev->tx_data_wr = radio_dev->tx_data_rd = 0;
@@ -2219,7 +2212,6 @@ static enum pios_radio_event rfm22_sendAck(struct pios_rfm22b_dev *rfm22b_dev)
     aph->header.seq_num = rfm22b_dev->rx_packet.header.seq_num;
     aph->packet_recv_time = rfm22_coordinatorTime(rfm22b_dev, rfm22b_dev->rx_complete_ticks);
     rfm22b_dev->tx_packet = (PHPacketHandle)aph;
-    rfm22b_dev->time_to_send = true;
     return RADIO_EVENT_TX_START;
 }
 
@@ -2237,7 +2229,6 @@ static enum pios_radio_event rfm22_sendNack(struct pios_rfm22b_dev *rfm22b_dev)
     aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
     aph->header.seq_num = rfm22b_dev->rx_packet.header.seq_num;
     rfm22b_dev->tx_packet = (PHPacketHandle)aph;
-    rfm22b_dev->time_to_send = true;
     return RADIO_EVENT_TX_START;
 }
 
@@ -2264,7 +2255,6 @@ static enum pios_radio_event rfm22_requestConnection(struct pios_rfm22b_dev *rfm
     cph->flexi_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].flexi_port;
     cph->vcp_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].vcp_port;
     cph->com_speed = rfm22b_dev->bindings[rfm22b_dev->cur_binding].com_speed;
-    rfm22b_dev->time_to_send = true;
     rfm22b_dev->send_connection_request = true;
     rfm22b_dev->prev_tx_packet = NULL;
 
@@ -2285,7 +2275,6 @@ static enum pios_radio_event rfm22_requestConnection(struct pios_rfm22b_dev *rfm
 static enum pios_radio_event rfm22_receiveAck(struct pios_rfm22b_dev *rfm22b_dev)
 {
     PHPacketHandle prev = rfm22b_dev->prev_tx_packet;
-    portTickType curTicks = xTaskGetTickCount();
 
     // Clear the previous TX packet.
     rfm22b_dev->prev_tx_packet = NULL;
@@ -2313,14 +2302,7 @@ static enum pios_radio_event rfm22_receiveAck(struct pios_rfm22b_dev *rfm22b_dev
     }
 
     // Should we try to start another TX?
-    if (rfm22b_dev->rx_packet.header.type == PACKET_TYPE_ACK) {
-        rfm22b_dev->time_to_send_offset = curTicks;
-        rfm22b_dev->time_to_send = true;
-        return RADIO_EVENT_TX_START;
-    } else {
-        rfm22b_dev->time_to_send_offset = curTicks + 0x4;
-        return RADIO_EVENT_RX_MODE;
-    }
+    return RADIO_EVENT_TX_START;
 }
 
 /**
@@ -2340,7 +2322,6 @@ static enum pios_radio_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_de
     if (rfm22_isConnected(rfm22b_dev)) {
         rfm22b_add_rx_status(rfm22b_dev, RADIO_RESENT_TX_PACKET);
     }
-    rfm22b_dev->time_to_send = true;
     return RADIO_EVENT_TX_START;
 }
 
@@ -2572,6 +2553,20 @@ static bool rfm22_inChannelBuffer(struct pios_rfm22b_dev *rfm22b_dev)
 static portTickType rfm22_coordinatorTime(struct pios_rfm22b_dev *rfm22b_dev, portTickType ticks)
 {
     return ticks + rfm22b_dev->time_delta;
+}
+
+/**
+ * Return true if this modem is in the send interval, which allows the modem to initiate a transmit.
+ *
+ * @param[in] rfm22b_dev  The device structure
+ */
+static bool rfm22_timeToSend(struct pios_rfm22b_dev *rfm22b_dev)
+{
+    portTickType time = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
+    if (rfm22b_dev->coordinator)
+        return (time & 0x06) == 0;
+    else
+        return ((time + 4) & 0x06) == 0;
 }
 
 /**

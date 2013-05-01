@@ -1,17 +1,17 @@
 /**
- ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
- * @addtogroup RadioComBridgeModule Com Port to Radio Bridge Module
- * @brief Bridge Com and Radio ports
- * @{ 
- *
- * @file       RadioComBridge.c
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      Bridges selected Com Port to the COM VCP emulated serial port
- * @see        The GNU Public License (GPL) Version 3
- *
- *****************************************************************************/
+******************************************************************************
+* @addtogroup OpenPilotModules OpenPilot Modules
+* @{ 
+* @addtogroup RadioComBridgeModule Com Port to Radio Bridge Module
+* @brief Bridge Com and Radio ports
+* @{ 
+*
+* @file       RadioComBridge.c
+* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+* @brief      Bridges selected Com Port to the COM VCP emulated serial port
+* @see        The GNU Public License (GPL) Version 3
+*
+*****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,30 +69,33 @@ void PIOS_InitPPMFlexiPort(bool input);
 
 typedef struct {
 
-	// The task handles.
-	xTaskHandle telemetryTxTaskHandle;
-	xTaskHandle radioRxTaskHandle;
-	xTaskHandle radioTxTaskHandle;
+    // The task handles.
+    xTaskHandle telemetryTxTaskHandle;
+    xTaskHandle radioRxTaskHandle;
+    xTaskHandle radioTxTaskHandle;
 
-	// The UAVTalk connection on the com side.
-	UAVTalkConnection outUAVTalkCon;
-	UAVTalkConnection inUAVTalkCon;
+    // The UAVTalk connection on the com side.
+    UAVTalkConnection outUAVTalkCon;
+    UAVTalkConnection inUAVTalkCon;
 
-	// Queue handles.
-	xQueueHandle gcsEventQueue;
-	xQueueHandle uavtalkEventQueue;
+    // Queue handles.
+    xQueueHandle gcsEventQueue;
+    xQueueHandle uavtalkEventQueue;
 
-	// Error statistics.
-	uint32_t comTxErrors;
-	uint32_t comTxRetries;
-	uint32_t UAVTalkErrors;
-	uint32_t droppedPackets;
+    // Error statistics.
+    uint32_t comTxErrors;
+    uint32_t comTxRetries;
+    uint32_t UAVTalkErrors;
+    uint32_t droppedPackets;
 
-	// Should we parse UAVTalk?
-	bool parseUAVTalk;
+    // Should we parse UAVTalk?
+    bool parseUAVTalk;
 
-	// The current configured uart speed
-	OPLinkSettingsComSpeedOptions comSpeed;
+    // We can only configure the hardware once.
+    bool configured;
+
+    // The current configured uart speed
+    OPLinkSettingsComSpeedOptions comSpeed;
 
 } RadioComBridgeData;
 
@@ -118,8 +121,8 @@ static RadioComBridgeData *data;
 
 /**
  * Start the module
- * \return -1 if initialisation failed
- * \return 0 on success
+ *
+ * @return -1 if initialisation failed, 0 on success
  */
 static int32_t RadioComBridgeStart(void)
 {
@@ -137,8 +140,7 @@ static int32_t RadioComBridgeStart(void)
         if (is_coordinator) {
 
             // Set the maximum radio RF power.
-            switch (oplinkSettings.MaxRFPower)
-            {
+            switch (oplinkSettings.MaxRFPower) {
             case OPLINKSETTINGS_MAXRFPOWER_125:
                 PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_0);
                 break;
@@ -198,175 +200,187 @@ static int32_t RadioComBridgeStart(void)
 
 /**
  * Initialise the module
- * \return -1 if initialisation failed
- * \return 0 on success
+ *
+ * @return -1 if initialisation failed on success
  */
 static int32_t RadioComBridgeInitialize(void)
 {
 
-	// allocate and initialize the static data storage only if module is enabled
-	data = (RadioComBridgeData *)pvPortMalloc(sizeof(RadioComBridgeData));
-	if (!data)
-		return -1;
+    // allocate and initialize the static data storage only if module is enabled
+    data = (RadioComBridgeData *)pvPortMalloc(sizeof(RadioComBridgeData));
+    if (!data) {
+        return -1;
+    }
 
-	// Initialize the UAVObjects that we use
-	OPLinkStatusInitialize();
-	ObjectPersistenceInitialize();
+    // Initialize the UAVObjects that we use
+    OPLinkStatusInitialize();
+    ObjectPersistenceInitialize();
 
-	// Initialise UAVTalk
-	data->outUAVTalkCon = UAVTalkInitialize(&UAVTalkSendHandler);
-	data->inUAVTalkCon = UAVTalkInitialize(&RadioSendHandler);
+    // Initialise UAVTalk
+    data->outUAVTalkCon = UAVTalkInitialize(&UAVTalkSendHandler);
+    data->inUAVTalkCon = UAVTalkInitialize(&RadioSendHandler);
 
-	// Initialize the queues.
-	data->uavtalkEventQueue = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(UAVObjEvent));
+    // Initialize the queues.
+    data->uavtalkEventQueue = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(UAVObjEvent));
 
-	// Configure our UAVObjects for updates.
-	UAVObjConnectQueue(UAVObjGetByID(OPLINKSTATUS_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
-	UAVObjConnectQueue(UAVObjGetByID(OBJECTPERSISTENCE_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL);
+    // Configure our UAVObjects for updates.
+    UAVObjConnectQueue(UAVObjGetByID(OPLINKSTATUS_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
+    UAVObjConnectQueue(UAVObjGetByID(OBJECTPERSISTENCE_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL);
 #if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER)
-	UAVObjConnectQueue(UAVObjGetByID(GCSRECEIVER_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
+    UAVObjConnectQueue(UAVObjGetByID(GCSRECEIVER_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
 #endif
 
-	// Initialize the statistics.
-	data->comTxErrors = 0;
-	data->comTxRetries = 0;
-	data->UAVTalkErrors = 0;
-	data->parseUAVTalk = false;
-        data->comSpeed = OPLINKSETTINGS_COMSPEED_9600;
-        PIOS_COM_RADIO = PIOS_COM_RFM22B;
+    // Initialize the statistics.
+    data->comTxErrors = 0;
+    data->comTxRetries = 0;
+    data->UAVTalkErrors = 0;
+    data->parseUAVTalk = false;
+    data->configured = false;
+    data->comSpeed = OPLINKSETTINGS_COMSPEED_9600;
+    PIOS_COM_RADIO = PIOS_COM_RFM22B;
 
-	return 0;
+    return 0;
 }
 MODULE_INITCALL(RadioComBridgeInitialize, RadioComBridgeStart)
 
 /**
  * Telemetry transmit task, regular priority
+ *
+ * @param[in] parameters  The task parameters
  */
 static void telemetryTxTask(void *parameters)
 {
-	UAVObjEvent ev;
+    UAVObjEvent ev;
 
-	// Loop forever
-	while (1) {
+    // Loop forever
+    while (1) {
 #ifdef PIOS_INCLUDE_WDG
-		PIOS_WDG_UpdateFlag(PIOS_WDG_TELEMETRY);
+        PIOS_WDG_UpdateFlag(PIOS_WDG_TELEMETRY);
 #endif
-		// Wait for queue message
-		if (xQueueReceive(data->uavtalkEventQueue, &ev, MAX_PORT_DELAY) == pdTRUE) {
-			if ((ev.event == EV_UPDATED) || (ev.event == EV_UPDATE_REQ))
-			{
-				// Send update (with retries)
-				uint32_t retries = 0;
-				int32_t success = -1;
-				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendObject(data->outUAVTalkCon, ev.obj, 0, 0, RETRY_TIMEOUT_MS) == 0;
-					if (!success)
-						++retries;
-				}
-				data->comTxRetries += retries;
-			}
-			else if(ev.event == EV_SEND_ACK)
-			{
-				// Send the ACK
-				uint32_t retries = 0;
-				int32_t success = -1;
-				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendAck(data->outUAVTalkCon, ev.obj, ev.instId) == 0;
-					if (!success)
-						++retries;
-				}
-				data->comTxRetries += retries;
-			}
-			else if(ev.event == EV_SEND_NACK)
-			{
-				// Send the NACK
-				uint32_t retries = 0;
-				int32_t success = -1;
-				while (retries < MAX_RETRIES && success == -1) {
-					success = UAVTalkSendNack(data->outUAVTalkCon, UAVObjGetID(ev.obj)) == 0;
-					if (!success)
-						++retries;
-				}
-				data->comTxRetries += retries;
-			}
-		}
-	}
+        // Wait for queue message
+        if (xQueueReceive(data->uavtalkEventQueue, &ev, MAX_PORT_DELAY) == pdTRUE) {
+            if ((ev.event == EV_UPDATED) || (ev.event == EV_UPDATE_REQ)) {
+                // Send update (with retries)
+                uint32_t retries = 0;
+                int32_t success = -1;
+                while (retries < MAX_RETRIES && success == -1) {
+                    success = UAVTalkSendObject(data->outUAVTalkCon, ev.obj, 0, 0, RETRY_TIMEOUT_MS) == 0;
+                    if (!success)
+                        ++retries;
+                }
+                data->comTxRetries += retries;
+            } else if(ev.event == EV_SEND_ACK) {
+                // Send the ACK
+                uint32_t retries = 0;
+                int32_t success = -1;
+                while (retries < MAX_RETRIES && success == -1) {
+                    success = UAVTalkSendAck(data->outUAVTalkCon, ev.obj, ev.instId) == 0;
+                    if (!success)
+                        ++retries;
+                }
+                data->comTxRetries += retries;
+            } else if(ev.event == EV_SEND_NACK) {
+                // Send the NACK
+                uint32_t retries = 0;
+                int32_t success = -1;
+                while (retries < MAX_RETRIES && success == -1) {
+                    success = UAVTalkSendNack(data->outUAVTalkCon, UAVObjGetID(ev.obj)) == 0;
+                    if (!success)
+                        ++retries;
+                }
+                data->comTxRetries += retries;
+            }
+        }
+    }
 }
 
 /**
  * Radio rx task.  Receive data packets from the radio and pass them on.
+ *
+ * @param[in] parameters  The task parameters
  */
 static void radioRxTask(void *parameters)
 {
-	// Task loop
-	while (1) {
+    // Task loop
+    while (1) {
 #ifdef PIOS_INCLUDE_WDG
-                PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORX);
+        PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORX);
 #endif
-		uint8_t serial_data[1];
-		uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
-		if (bytes_to_process > 0)
-			for (uint8_t i = 0; i < bytes_to_process; i++)
-				if (UAVTalkRelayInputStream(data->outUAVTalkCon, serial_data[i]) == UAVTALK_STATE_ERROR)
-					data->UAVTalkErrors++;
-	}
+        uint8_t serial_data[1];
+        uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
+        if (bytes_to_process > 0) {
+            for (uint8_t i = 0; i < bytes_to_process; i++) {
+                if (UAVTalkRelayInputStream(data->outUAVTalkCon, serial_data[i]) == UAVTALK_STATE_ERROR) {
+                    data->UAVTalkErrors++;
+                }
+            }
+        }
+    }
 }
 
 /**
  * Radio rx task.  Receive data from a com port and pass it on to the radio.
+ *
+ * @param[in] parameters  The task parameters
  */
 static void radioTxTask(void *parameters)
 {
-	// Task loop
-	while (1) {
-		uint32_t inputPort = PIOS_COM_TELEMETRY;
+    // Task loop
+    while (1) {
+        uint32_t inputPort = PIOS_COM_TELEMETRY;
 #ifdef PIOS_INCLUDE_WDG
-		PIOS_WDG_UpdateFlag(PIOS_WDG_RADIOTX);
+        PIOS_WDG_UpdateFlag(PIOS_WDG_RADIOTX);
 #endif
 #if defined(PIOS_INCLUDE_USB)
-		// Determine output port (USB takes priority over telemetry port)
-		if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB_HID)
-			inputPort = PIOS_COM_TELEM_USB_HID;
+        // Determine output port (USB takes priority over telemetry port)
+        if (PIOS_USB_CheckAvailable(0) && PIOS_COM_TELEM_USB_HID) {
+            inputPort = PIOS_COM_TELEM_USB_HID;
+        }
 #endif /* PIOS_INCLUDE_USB */
-		if(inputPort) {
-			uint8_t serial_data[1];
-			uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
-			if (bytes_to_process > 0) {
-                            for (uint8_t i = 0; i < bytes_to_process; i++)
-                                ProcessInputStream(data->inUAVTalkCon, serial_data[i]);
-                        }
-		} else
-			vTaskDelay(5);
-	}
+        if(inputPort) {
+            uint8_t serial_data[1];
+            uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
+            if (bytes_to_process > 0) {
+                for (uint8_t i = 0; i < bytes_to_process; i++)
+                    ProcessInputStream(data->inUAVTalkCon, serial_data[i]);
+            }
+        } else {
+            vTaskDelay(5);
+        }
+    }
 }
 
 /**
  * Transmit data buffer to the com port.
- * \param[in] buf Data buffer to send
- * \param[in] length Length of buffer
- * \return -1 on failure
- * \return number of bytes transmitted on success
+ *
+ * @param[in] buf Data buffer to send
+ * @param[in] length Length of buffer
+ * @return -1 on failure
+ * @return number of bytes transmitted on success
  */
 static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length)
 {
-	uint32_t outputPort = PIOS_COM_TELEMETRY;
+    uint32_t outputPort = PIOS_COM_TELEMETRY;
 #if defined(PIOS_INCLUDE_USB)
-	// Determine output port (USB takes priority over telemetry port)
-	if (PIOS_COM_TELEM_USB_HID && PIOS_COM_Available(PIOS_COM_TELEM_USB_HID))
-		outputPort = PIOS_COM_TELEM_USB_HID;
+    // Determine output port (USB takes priority over telemetry port)
+    if (PIOS_COM_TELEM_USB_HID && PIOS_COM_Available(PIOS_COM_TELEM_USB_HID)) {
+        outputPort = PIOS_COM_TELEM_USB_HID;
+    }
 #endif /* PIOS_INCLUDE_USB */
-	if(outputPort)
-		return PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
-	else
-		return -1;
+    if(outputPort) {
+        return PIOS_COM_SendBufferNonBlocking(outputPort, buf, length);
+    } else {
+        return -1;
+    }
 }
 
 /**
  * Transmit data buffer to the com port.
- * \param[in] buf Data buffer to send
- * \param[in] length Length of buffer
- * \return -1 on failure
- * \return number of bytes transmitted on success
+ *
+ * @param[in] buf Data buffer to send
+ * @param[in] length Length of buffer
+ * @return -1 on failure
+ * @return number of bytes transmitted on success
  */
 static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
 {
@@ -380,136 +394,136 @@ static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
     }
 }
 
+/**
+ * Process a byte of data received
+ *
+ * @param[in] connectionHandle  The UAVTalk connection handle
+ * @param[in] rxbyte  The received byte.
+ */
 static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte)
 {
-	// Keep reading until we receive a completed packet.
-	UAVTalkRxState state = UAVTalkRelayInputStream(connectionHandle, rxbyte);
-	UAVTalkConnectionData *connection = (UAVTalkConnectionData*)(connectionHandle);
-	UAVTalkInputProcessor *iproc = &(connection->iproc);
+    // Keep reading until we receive a completed packet.
+    UAVTalkRxState state = UAVTalkRelayInputStream(connectionHandle, rxbyte);
+    UAVTalkConnectionData *connection = (UAVTalkConnectionData*)(connectionHandle);
+    UAVTalkInputProcessor *iproc = &(connection->iproc);
 
-	if (state == UAVTALK_STATE_COMPLETE)
- 	{
-		// Is this a local UAVObject?
-		// We only generate GcsReceiver ojects, we don't consume them.
-		if ((iproc->obj != NULL) && (iproc->objId != GCSRECEIVER_OBJID))
-		{
-			// We treat the ObjectPersistence object differently
-			if(iproc->objId == OBJECTPERSISTENCE_OBJID)
-			{
-				// Unpack object, if the instance does not exist it will be created!
-				UAVObjUnpack(iproc->obj, iproc->instId, connection->rxBuffer);
+    if (state == UAVTALK_STATE_COMPLETE) {
+        // Is this a local UAVObject?
+        // We only generate GcsReceiver ojects, we don't consume them.
+        if ((iproc->obj != NULL) && (iproc->objId != GCSRECEIVER_OBJID)) {
+            // We treat the ObjectPersistence object differently
+            if(iproc->objId == OBJECTPERSISTENCE_OBJID) {
+                // Unpack object, if the instance does not exist it will be created!
+                UAVObjUnpack(iproc->obj, iproc->instId, connection->rxBuffer);
 
-				// Get the ObjectPersistence object.
-				ObjectPersistenceData obj_per;
-				ObjectPersistenceGet(&obj_per);
+                // Get the ObjectPersistence object.
+                ObjectPersistenceData obj_per;
+                ObjectPersistenceGet(&obj_per);
 
-				// Is this concerning or setting object?
-				if (obj_per.ObjectID == OPLINKSETTINGS_OBJID)
-				{
-					// Queue up the ACK.
-					queueEvent(data->uavtalkEventQueue, (void*)iproc->obj, iproc->instId, EV_SEND_ACK);
+                // Is this concerning or setting object?
+                if (obj_per.ObjectID == OPLINKSETTINGS_OBJID) {
+                    // Queue up the ACK.
+                    queueEvent(data->uavtalkEventQueue, (void*)iproc->obj, iproc->instId, EV_SEND_ACK);
 
-					// Is this a save, load, or delete?
-					bool success = true;
-					switch (obj_per.Operation)
-					{
-					case OBJECTPERSISTENCE_OPERATION_LOAD:
-					{
+                    // Is this a save, load, or delete?
+                    bool success = true;
+                    switch (obj_per.Operation) {
+                    case OBJECTPERSISTENCE_OPERATION_LOAD:
+                    {
 #if defined(PIOS_INCLUDE_FLASH_EEPROM)
-						// Load the settings.
-						OPLinkSettingsData oplinkSettings;
-						if (PIOS_EEPROM_Load((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData)) == 0)
-							OPLinkSettingsSet(&oplinkSettings);
-						else
-							success = false;
+                        // Load the settings.
+                        OPLinkSettingsData oplinkSettings;
+                        if (PIOS_EEPROM_Load((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData)) == 0)
+                            OPLinkSettingsSet(&oplinkSettings);
+                        else
+                            success = false;
 #endif
-						break;
-					}
-					case OBJECTPERSISTENCE_OPERATION_SAVE:
-					{
+                        break;
+                    }
+                    case OBJECTPERSISTENCE_OPERATION_SAVE:
+                    {
 #if defined(PIOS_INCLUDE_FLASH_EEPROM)
-						// Save the settings.
-						OPLinkSettingsData oplinkSettings;
-						OPLinkSettingsGet(&oplinkSettings);
-						int32_t ret = PIOS_EEPROM_Save((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData));
-						if (ret != 0)
-							success = false;
+                        // Save the settings.
+                        OPLinkSettingsData oplinkSettings;
+                        OPLinkSettingsGet(&oplinkSettings);
+                        int32_t ret = PIOS_EEPROM_Save((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData));
+                        if (ret != 0)
+                            success = false;
 #endif
-						break;
-					}
-					case OBJECTPERSISTENCE_OPERATION_DELETE:
-					{
+                        break;
+                    }
+                    case OBJECTPERSISTENCE_OPERATION_DELETE:
+                    {
 #if defined(PIOS_INCLUDE_FLASH_EEPROM)
-						// Erase the settings.
-						OPLinkSettingsData oplinkSettings;
-						uint8_t *ptr = (uint8_t*)&oplinkSettings;
-						memset(ptr, 0, sizeof(OPLinkSettingsData));
-						int32_t ret = PIOS_EEPROM_Save(ptr, sizeof(OPLinkSettingsData));
-						if (ret != 0)
-							success = false;
+                        // Erase the settings.
+                        OPLinkSettingsData oplinkSettings;
+                        uint8_t *ptr = (uint8_t*)&oplinkSettings;
+                        memset(ptr, 0, sizeof(OPLinkSettingsData));
+                        int32_t ret = PIOS_EEPROM_Save(ptr, sizeof(OPLinkSettingsData));
+                        if (ret != 0)
+                            success = false;
 #endif
-						break;
-					}
-					default:
-						break;
-					}
-					if (success == true)
-					{
-						obj_per.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
-						ObjectPersistenceSet(&obj_per);
-					}
-				}
-			}
-			else
-			{
-				switch (iproc->type)
-				{
-				case UAVTALK_TYPE_OBJ:
-					// Unpack object, if the instance does not exist it will be created!
-					UAVObjUnpack(iproc->obj, iproc->instId, connection->rxBuffer);
-					break;
-				case UAVTALK_TYPE_OBJ_REQ:
-					// Queue up an object send request.
-					queueEvent(data->uavtalkEventQueue, (void*)iproc->obj, iproc->instId, EV_UPDATE_REQ);
-					break;
-				case UAVTALK_TYPE_OBJ_ACK:
-					if (UAVObjUnpack(iproc->obj, iproc->instId, connection->rxBuffer) == 0)
-						// Queue up an ACK
-						queueEvent(data->uavtalkEventQueue, (void*)iproc->obj, iproc->instId, EV_SEND_ACK);
-					break;
-				}
-			}
-		}
+                        break;
+                    }
+                    default:
+                        break;
+                    }
+                    if (success == true) {
+                        obj_per.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
+                        ObjectPersistenceSet(&obj_per);
+                    }
+                }
+            } else {
+                switch (iproc->type) {
+                case UAVTALK_TYPE_OBJ:
+                    // Unpack object, if the instance does not exist it will be created!
+                    UAVObjUnpack(iproc->obj, iproc->instId, connection->rxBuffer);
+                    break;
+                case UAVTALK_TYPE_OBJ_REQ:
+                    // Queue up an object send request.
+                    queueEvent(data->uavtalkEventQueue, (void*)iproc->obj, iproc->instId, EV_UPDATE_REQ);
+                    break;
+                case UAVTALK_TYPE_OBJ_ACK:
+                    if (UAVObjUnpack(iproc->obj, iproc->instId, connection->rxBuffer) == 0)
+                        // Queue up an ACK
+                        queueEvent(data->uavtalkEventQueue, (void*)iproc->obj, iproc->instId, EV_SEND_ACK);
+                    break;
+                }
+            }
+        }
 
-	} else if(state == UAVTALK_STATE_ERROR) {
-		data->UAVTalkErrors++;
+    } else if(state == UAVTALK_STATE_ERROR) {
+        data->UAVTalkErrors++;
 
-		// Send a NACK if required.
-		if((iproc->obj) && (iproc->type == UAVTALK_TYPE_OBJ_ACK))
-			// Queue up a NACK
-			queueEvent(data->uavtalkEventQueue, iproc->obj, iproc->instId, EV_SEND_NACK);
- 	}
+        // Send a NACK if required.
+        if((iproc->obj) && (iproc->type == UAVTALK_TYPE_OBJ_ACK)) {
+            // Queue up a NACK
+            queueEvent(data->uavtalkEventQueue, iproc->obj, iproc->instId, EV_SEND_NACK);
+        }
+    }
 }
 
 /**
  * Queue and event into an event queue.
- * \param[in] queue  The event queue
- * \param[in] obj  The data pointer
- * \param[in] type The event type
+ *
+ * @param[in] queue  The event queue
+ * @param[in] obj  The data pointer
+ * @param[in] type The event type
  */
 static void queueEvent(xQueueHandle queue, void *obj, uint16_t instId, UAVObjEventType type)
 {
-	UAVObjEvent ev;
-	ev.obj = (UAVObjHandle)obj;
-	ev.instId = instId;
-	ev.event = type;
-	xQueueSend(queue, &ev, portMAX_DELAY);
+    UAVObjEvent ev;
+    ev.obj = (UAVObjHandle)obj;
+    ev.instId = instId;
+    ev.event = type;
+    xQueueSend(queue, &ev, portMAX_DELAY);
 }
 
 /**
  * Configure the output port based on a configuration event from the remote coordinator.
- * \param[in] com_port  The com port to configure
- * \param[in] com_speed  The com port speed
+ *
+ * @param[in] com_port  The com port to configure
+ * @param[in] com_speed  The com port speed
  */
 static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
 				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed,
@@ -580,10 +594,15 @@ static void updateSettings()
     OPLinkSettingsData oplinkSettings;
     OPLinkSettingsGet(&oplinkSettings);
 
+    // We can only configure the hardware once.
+    if (data->configured) {
+        return;
+    }
+    data->configured = true;
+
     // Configure the main port
     bool is_coordinator = PIOS_RFM22B_IsCoordinator(pios_rfm22b_id);
-    switch (oplinkSettings.MainPort)
-    {
+    switch (oplinkSettings.MainPort) {
     case OPLINKSETTINGS_MAINPORT_TELEMETRY:
         data->parseUAVTalk = true;
     case OPLINKSETTINGS_MAINPORT_SERIAL:
@@ -599,8 +618,7 @@ static void updateSettings()
     }
 
     // Configure the flexi port
-    switch (oplinkSettings.FlexiPort)
-    {
+    switch (oplinkSettings.FlexiPort) {
     case OPLINKSETTINGS_FLEXIPORT_TELEMETRY:
         data->parseUAVTalk = true;
     case OPLINKSETTINGS_FLEXIPORT_SERIAL:
@@ -616,8 +634,7 @@ static void updateSettings()
     }
 
     // Configure the USB VCP port
-    switch (oplinkSettings.VCPPort)
-    {
+    switch (oplinkSettings.VCPPort) {
     case OPLINKSETTINGS_VCPPORT_SERIAL:
         PIOS_COM_TELEMETRY = PIOS_COM_TELEM_USB_VCP;
         break;

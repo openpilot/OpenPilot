@@ -1064,39 +1064,6 @@
           </data>
       </XPlane__PCT__20HITL>
     </HITL>
-    <HITLv2>
-      <default>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <attActCalc>false</attActCalc>
-          <attActHW>false</attActHW>
-          <attActSim>true</attActSim>
-          <attActual>true</attActual>
-          <attRaw>true</attRaw>
-          <attRawRate>20</attRawRate>
-          <gcsReciever>true</gcsReciever>
-          <gpsPosRate>200</gpsPosRate>
-          <gpsPosition>true</gpsPosition>
-          <homeLocRate>0</homeLocRate>
-          <homeLocation>true</homeLocation>
-          <hostAddress>127.0.0.1</hostAddress>
-          <inPort>40100</inPort>
-          <inputCommand>true</inputCommand>
-          <manualControl>false</manualControl>
-          <manualOutput>false</manualOutput>
-          <outPort>40200</outPort>
-          <outputRate>20</outputRate>
-          <remoteAddress>127.0.0.1</remoteAddress>
-          <simulatorId>ASimRC</simulatorId>
-          <sonarAltRate>50</sonarAltRate>
-          <sonarAltitude>false</sonarAltitude>
-          <sonarMaxAlt>@Variant(AAAAh0CgAAA=)</sonarMaxAlt>
-        </data>
-      </default>
-    </HITLv2>
     <LineardialGadget>
       <Accel__PCT__20Horizontal__PCT__20X>
         <configInfo>
@@ -2745,23 +2712,11 @@
       <showToolbars>false</showToolbars>
       <splitter>
         <side0>
-          <side0>
-            <classId>HITL</classId>
-            <gadget>
-              <activeConfiguration>XPlane HITL</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side0>
-          <side1>
-            <classId>HITLv2</classId>
-            <gadget>
-              <activeConfiguration>default</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
-          </side1>
-          <splitterOrientation>1</splitterOrientation>
-          <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
-          <type>splitter</type>
+          <classId>HITL</classId>
+          <gadget>
+            <activeConfiguration>XPlane HITL</activeConfiguration>
+          </gadget>
+          <type>uavGadget</type>
         </side0>
         <side1>
           <side0>

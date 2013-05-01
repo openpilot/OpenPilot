@@ -188,6 +188,7 @@ extern int32_t PIOS_PPM_Init(uint32_t * ppm_id, const struct pios_ppm_cfg * cfg)
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
 	TIM_ICInitStructure.TIM_ICFilter = 0x0;
 
+	ppm_dev->supv_timer = 0;
 	if (!PIOS_RTC_RegisterTickCallback(PIOS_PPM_Supervisor, (uint32_t)ppm_dev)) {
 		PIOS_DEBUG_Assert(0);
 	}

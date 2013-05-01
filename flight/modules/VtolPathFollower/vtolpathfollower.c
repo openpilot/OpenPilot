@@ -47,6 +47,7 @@
  */
 
 #include "openpilot.h"
+#include <pios_math.h>
 #include "paths.h"
 
 #include "vtolpathfollower.h"
@@ -74,8 +75,6 @@
 #define MAX_QUEUE_SIZE 4
 #define STACK_SIZE_BYTES 1548
 #define TASK_PRIORITY (tskIDLE_PRIORITY+2)
-#define F_PI 3.14159265358979323846f
-#define DEG2RAD (F_PI/180.0f)
 
 // Private types
 
@@ -355,13 +354,13 @@ void updateEndpointVelocity()
 			GPSPositionGet(&gpsPosition);
 			HomeLocationData homeLocation;
 			HomeLocationGet(&homeLocation);
-			float lat = homeLocation.Latitude / 10.0e6f * DEG2RAD;
+			float lat = DEG2RAD(homeLocation.Latitude / 10.0e6f);
 			float alt = homeLocation.Altitude;
 			float T[3] = { alt+6.378137E6f,
 				     cosf(lat)*(alt+6.378137E6f),
 				     -1.0f};
-			float NED[3] = {T[0] * ((gpsPosition.Latitude - homeLocation.Latitude) / 10.0e6f * DEG2RAD),
-				T[1] * ((gpsPosition.Longitude - homeLocation.Longitude) / 10.0e6f * DEG2RAD),
+			float NED[3] = {T[0] * (DEG2RAD((gpsPosition.Latitude - homeLocation.Latitude) / 10.0e6f)),
+				T[1] * (DEG2RAD((gpsPosition.Longitude - homeLocation.Longitude) / 10.0e6f)),
 				T[2] * ((gpsPosition.Altitude + gpsPosition.GeoidSeparation - homeLocation.Altitude))};
 
 			northPos = NED[0];
@@ -488,8 +487,8 @@ static void updateVtolDesiredAttitude()
 		{
 			GPSPositionData gpsPosition;
 			GPSPositionGet(&gpsPosition);
-			northVel = gpsPosition.Groundspeed * cosf(gpsPosition.Heading * F_PI / 180.0f);
-			eastVel = gpsPosition.Groundspeed * sinf(gpsPosition.Heading * F_PI / 180.0f);
+			northVel = gpsPosition.Groundspeed * cosf(DEG2RAD(gpsPosition.Heading));
+			eastVel = gpsPosition.Groundspeed * sinf(DEG2RAD(gpsPosition.Heading));
 			downVel = velocityActual.Down;
 		}
 			break;
@@ -538,11 +537,11 @@ static void updateVtolDesiredAttitude()
 	
 	// Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
 	// craft should move similarly for 5 deg roll versus 5 deg pitch
-	stabDesired.Pitch = bound(-northCommand * cosf(attitudeActual.Yaw * M_PI / 180) + 
-				      -eastCommand * sinf(attitudeActual.Yaw * M_PI / 180),
+	stabDesired.Pitch = bound(-northCommand * cosf(DEG2RAD(attitudeActual.Yaw)) +
+				      -eastCommand * sinf(DEG2RAD(attitudeActual.Yaw)),
 				      -vtolpathfollowerSettings.MaxRollPitch, vtolpathfollowerSettings.MaxRollPitch);
-	stabDesired.Roll = bound(-northCommand * sinf(attitudeActual.Yaw * M_PI / 180) + 
-				     eastCommand * cosf(attitudeActual.Yaw * M_PI / 180),
+	stabDesired.Roll = bound(-northCommand * sinf(DEG2RAD(attitudeActual.Yaw)) +
+				     eastCommand * cosf(DEG2RAD(attitudeActual.Yaw)),
 				     -vtolpathfollowerSettings.MaxRollPitch, vtolpathfollowerSettings.MaxRollPitch);
 	
 	if(vtolpathfollowerSettings.ThrottleControl == VTOLPATHFOLLOWERSETTINGS_THROTTLECONTROL_FALSE) {

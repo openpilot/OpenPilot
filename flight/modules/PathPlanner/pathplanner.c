@@ -30,6 +30,7 @@
  */
 
 #include "openpilot.h"
+#include <pios_math.h>
 #include "paths.h"
 
 #include "flightstatus.h"
@@ -46,8 +47,6 @@
 #define STACK_SIZE_BYTES 1024
 #define TASK_PRIORITY (tskIDLE_PRIORITY+1)
 #define MAX_QUEUE_SIZE 2
-#define F_PI 3.141526535897932f
-#define RAD2DEG (180.0f/F_PI)
 #define PATH_PLANNER_UPDATE_RATE_MS 20
 
 // Private types
@@ -472,7 +471,7 @@ static uint8_t conditionPointingTowardsNext() {
 	float angle2 = atan2f(velocity.North,velocity.East);
 
 	// calculate the absolute angular difference
-	angle1 = fabsf(RAD2DEG * (angle1 - angle2));
+	angle1 = fabsf(RAD2DEG(angle1 - angle2));
 	while (angle1>360) angle1-=360;
 
 	if (angle1 <= pathAction.ConditionParameters[0]) {

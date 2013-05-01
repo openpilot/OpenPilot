@@ -76,7 +76,7 @@ typedef struct {
 #define PH_PPM_DATA_SIZE(p) ((uint8_t*)((p)->ecc) - (uint8_t*)(((PHPacketHandle)(p))->data))
 typedef struct {
 	PHPacketHeader header;
-	uint16_t channels[PIOS_RFM22B_RCVR_MAX_CHANNELS];
+	int16_t channels[PIOS_RFM22B_RCVR_MAX_CHANNELS];
 	uint8_t ecc[RS_ECC_NPARITY];
 } PHPpmPacket, *PHPpmPacketHandle;
 

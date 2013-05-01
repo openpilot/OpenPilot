@@ -30,8 +30,7 @@
 
 #include "openpilot.h"
 #include "pid.h"
-
-#define F_PI ((float) M_PI)
+#include <pios_math.h>
 
 //! Private method
 static float bound(float val, float range);
@@ -121,7 +120,7 @@ void pid_zero(struct pid *pid)
  */
 void pid_configure_derivative(float cutoff, float g)
 {
-	deriv_tau = 1.0f / (2 * F_PI * cutoff);
+	deriv_tau = 1.0f / (2 * M_PI_F * cutoff);
 	deriv_gamma = g;
 }
 

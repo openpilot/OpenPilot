@@ -153,7 +153,7 @@ ASFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(base
 #    -Map:      create map file
 #    --cref:    add cross reference to  map file
 LDFLAGS += -nostartfiles
-LDFLAGS += -Wl,--warn-common,--fatal-warnings,--gc-sections
+LDFLAGS += -Wl,--warn-common,--fatal-warnings,--sort-common,--sort-section=alignment,--gc-sections
 LDFLAGS += -Wl,-Map=$(OUTDIR)/$(TARGET).map,--cref
 LDFLAGS += $(patsubst %,-L%,$(EXTRA_LIBDIRS))
 LDFLAGS += $(patsubst %,-l%,$(EXTRA_LIBS))

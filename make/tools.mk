@@ -11,6 +11,7 @@
 #    qt_sdk_install
 #    mingw_install (Windows only)
 #    python_install (Windows only)
+#    nsis_install (Windows only)
 #    uncrustify_install
 #    doxygen_install
 #
@@ -73,6 +74,7 @@ else ifeq ($(UNAME), Windows)
     QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-windows.tar.bz2
     MINGW_URL      := http://wiki.openpilot.org/download/attachments/18612236/mingw-4.4.0.tar.bz2
     PYTHON_URL     := http://wiki.openpilot.org/download/attachments/18612236/python-2.7.4-windows.tar.bz2
+    NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
 endif
@@ -82,6 +84,7 @@ ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-4.8.4
 MINGW_DIR       := $(TOOLS_DIR)/mingw-4.4.0
 PYTHON_DIR      := $(TOOLS_DIR)/python-2.7.4
+NSIS_DIR        := $(TOOLS_DIR)/nsis-2.46-unicode
 UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
 
@@ -93,7 +96,7 @@ DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
 
 ALL_SDK_TARGETS := arm_sdk qt_sdk
 ifeq ($(UNAME), Windows)
-    ALL_SDK_TARGETS += mingw python
+    ALL_SDK_TARGETS += mingw python nsis
 endif
 ALL_SDK_TARGETS += uncrustify doxygen
 
@@ -399,6 +402,30 @@ endif
 .PHONY: python_version
 python_version:
 	-$(V1) $(PYTHON) --version
+
+##############################
+#
+# NSIS Unicode
+#
+##############################
+
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,nsis,$(NSIS_DIR),$(NSIS_URL),$(notdir $(NSIS_URL))))
+
+ifeq ($(shell [ -d "$(NSIS_DIR)" ] && $(ECHO) "exists"), exists)
+    export NSIS := $(NSIS_DIR)/makensis
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(NSIS_DIR)) not found (make nsis_install), using system PATH)
+    export NSIS ?= makensis
+endif
+
+.PHONY: nsis_version
+nsis_version:
+	-$(V1) $(NSIS) | head -n1
+
+endif
 
 ##############################
 #

@@ -35,15 +35,15 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser* parser,QString template
 
     QString flightObjInit,objInc,objFileNames,objNames;
     qint32 sizeCalc;
-    flightCodePath = QDir( templatepath + QString("flight/uavobjects"));
+    flightCodePath = QDir( templatepath + QString(FLIGHT_CODE_DIR));
     flightOutputPath = QDir( outputpath + QString("flight") );
     flightOutputPath.mkpath(flightOutputPath.absolutePath());
 
-    flightCodeTemplate = readFile( flightCodePath.absoluteFilePath("uavobjecttemplate.c") );
-    flightIncludeTemplate = readFile( flightCodePath.absoluteFilePath("inc/uavobjecttemplate.h") );
-    flightInitTemplate = readFile( flightCodePath.absoluteFilePath("uavobjectsinittemplate.c") );
-    flightInitIncludeTemplate = readFile( flightCodePath.absoluteFilePath("inc/uavobjectsinittemplate.h") );
-    flightMakeTemplate = readFile( flightCodePath.absoluteFilePath("Makefiletemplate.inc") );
+    flightCodeTemplate = readFile( flightCodePath.absoluteFilePath("uavobject.c.template") );
+    flightIncludeTemplate = readFile( flightCodePath.absoluteFilePath("inc/uavobject.h.template") );
+    flightInitTemplate = readFile( flightCodePath.absoluteFilePath("uavobjectsinit.c.template") );
+    flightInitIncludeTemplate = readFile( flightCodePath.absoluteFilePath("inc/uavobjectsinit.h.template") );
+    flightMakeTemplate = readFile( flightCodePath.absoluteFilePath("Makefile.inc.template") );
 
     if ( flightCodeTemplate.isNull() || flightIncludeTemplate.isNull() || flightInitTemplate.isNull()) {
             cerr << "Error: Could not open flight template files." << endl;
@@ -54,10 +54,10 @@ bool UAVObjectGeneratorFlight::generate(UAVObjectParser* parser,QString template
     for (int objidx = 0; objidx < parser->getNumObjects(); ++objidx) {
         ObjectInfo* info=parser->getObjectByIndex(objidx);
         process_object(info);
-        flightObjInit.append("#ifdef UAVOBJ_INIT_" + info->namelc +"\r\n");
-        flightObjInit.append("    " + info->name + "Initialize();\r\n");
-        flightObjInit.append("#endif\r\n");
-        objInc.append("#include \"" + info->namelc + ".h\"\r\n");
+        flightObjInit.append("#ifdef UAVOBJ_INIT_" + info->namelc +"\n");
+        flightObjInit.append("    " + info->name + "Initialize();\n");
+        flightObjInit.append("#endif\n");
+        objInc.append("#include \"" + info->namelc + ".h\"\n");
 	objFileNames.append(" " + info->namelc);
 	objNames.append(" " + info->name);
 	if (parser->getNumBytes(objidx)>sizeCalc) {
@@ -124,12 +124,12 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
         // Append field
         if ( info->fields[n]->numElements > 1 )
         {
-            fields.append( QString("    %1 %2[%3];\r\n").arg(type)
+            fields.append( QString("    %1 %2[%3];\n").arg(type)
                            .arg(info->fields[n]->name).arg(info->fields[n]->numElements) );
         }
         else
         {
-            fields.append( QString("    %1 %2;\r\n").arg(type).arg(info->fields[n]->name) );
+            fields.append( QString("    %1 %2;\n").arg(type).arg(info->fields[n]->name) );
         }
     }
     outInclude.replace(QString("$(DATAFIELDS)"), fields);
@@ -138,16 +138,16 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
     QString enums;
     for (int n = 0; n < info->fields.length(); ++n)
     {
-        enums.append(QString("// Field %1 information\r\n").arg(info->fields[n]->name));
+        enums.append(QString("/* Field %1 information */\n").arg(info->fields[n]->name));
         // Only for enum types
         if (info->fields[n]->type == FIELDTYPE_ENUM)
         {
-            enums.append(QString("/* Enumeration options for field %1 */\r\n").arg(info->fields[n]->name));
-            enums.append("typedef enum { ");
+            enums.append(QString("\n// Enumeration options for field %1\n").arg(info->fields[n]->name));
+            enums.append("typedef enum {\n");
             // Go through each option
             QStringList options = info->fields[n]->options;
             for (int m = 0; m < options.length(); ++m) {
-                QString s = (m == (options.length()-1)) ? "%1_%2_%3=%4" : "%1_%2_%3=%4, ";
+                QString s = (m == (options.length()-1)) ? "    %1_%2_%3=%4\n" : "    %1_%2_%3=%4,\n";
                 enums.append( s
                                 .arg( info->name.toUpper() )
                                 .arg( info->fields[n]->name.toUpper() )
@@ -155,20 +155,20 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
                                 .arg(m) );
 
             }
-            enums.append( QString(" } %1%2Options;\r\n")
+            enums.append( QString("} %1%2Options;\n")
                           .arg( info->name )
                           .arg( info->fields[n]->name ) );
         }
         // Generate element names (only if field has more than one element)
         if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames)
         {
-            enums.append(QString("/* Array element names for field %1 */\r\n").arg(info->fields[n]->name));
-            enums.append("typedef enum { ");
+            enums.append(QString("\n// Array element names for field %1\n").arg(info->fields[n]->name));
+            enums.append("typedef enum {\n");
             // Go through the element names
             QStringList elemNames = info->fields[n]->elementNames;
             for (int m = 0; m < elemNames.length(); ++m)
             {
-                QString s = (m != (elemNames.length()-1)) ? "%1_%2_%3=%4, " : "%1_%2_%3=%4";
+                QString s = (m != (elemNames.length()-1)) ? "    %1_%2_%3=%4,\n" : "    %1_%2_%3=%4\n";
                 enums.append( s
                                 .arg( info->name.toUpper() )
                                 .arg( info->fields[n]->name.toUpper() )
@@ -176,19 +176,21 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
                                 .arg(m) );
 
             }
-            enums.append( QString(" } %1%2Elem;\r\n")
+            enums.append( QString("} %1%2Elem;\n")
                           .arg( info->name )
                           .arg( info->fields[n]->name ) );
         }
         // Generate array information
         if (info->fields[n]->numElements > 1)
         {
-            enums.append(QString("/* Number of elements for field %1 */\r\n").arg(info->fields[n]->name));
-            enums.append( QString("#define %1_%2_NUMELEM %3\r\n")
+            enums.append(QString("\n// Number of elements for field %1\n").arg(info->fields[n]->name));
+            enums.append( QString("#define %1_%2_NUMELEM %3\n")
                           .arg( info->name.toUpper() )
                           .arg( info->fields[n]->name.toUpper() )
                           .arg( info->fields[n]->numElements ) );
         }
+
+        enums.append(QString("\n"));
     }
     outInclude.replace(QString("$(DATAFIELDINFO)"), enums);
 
@@ -203,19 +205,19 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
             {
                 if ( info->fields[n]->type == FIELDTYPE_ENUM )
                 {
-                    initfields.append( QString("\tdata.%1 = %2;\r\n")
+                    initfields.append( QString("    data.%1 = %2;\n")
                                 .arg( info->fields[n]->name )
                                 .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValues[0] ) ) );
                 }
                 else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
                 {
-                    initfields.append( QString("\tdata.%1 = %2;\r\n")
+                    initfields.append( QString("    data.%1 = %2;\n")
                                 .arg( info->fields[n]->name )
                                 .arg( info->fields[n]->defaultValues[0].toFloat() ) );
                 }
                 else
                 {
-                    initfields.append( QString("\tdata.%1 = %2;\r\n")
+                    initfields.append( QString("    data.%1 = %2;\n")
                                 .arg( info->fields[n]->name )
                                 .arg( info->fields[n]->defaultValues[0].toInt() ) );
                 }
@@ -227,21 +229,21 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
                 {
                     if ( info->fields[n]->type == FIELDTYPE_ENUM )
                     {
-                        initfields.append( QString("\tdata.%1[%2] = %3;\r\n")
+                        initfields.append( QString("    data.%1[%2] = %3;\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
                                     .arg( info->fields[n]->options.indexOf( info->fields[n]->defaultValues[idx] ) ) );
                     }
                     else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
                     {
-                        initfields.append( QString("\tdata.%1[%2] = %3;\r\n")
+                        initfields.append( QString("    data.%1[%2] = %3;\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
                                     .arg( info->fields[n]->defaultValues[idx].toFloat() ) );
                     }
                     else
                     {
-                        initfields.append( QString("\tdata.%1[%2] = %3;\r\n")
+                        initfields.append( QString("    data.%1[%2] = %3;\n")
                                     .arg( info->fields[n]->name )
                                     .arg( idx )
                                     .arg( info->fields[n]->defaultValues[idx].toInt() ) );
@@ -263,58 +265,58 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
             {
 
             	/* Set */
-                setgetfields.append( QString("void %2%3Set( %1 *New%3 )\r\n")
+                setgetfields.append( QString("void %2%3Set(%1 *New%3)\n")
 							.arg( fieldTypeStrC[info->fields[n]->type] )
 							.arg( info->name )
 							.arg( info->fields[n]->name ) );
-				setgetfields.append( QString("{\r\n") );
-				setgetfields.append( QString("\tUAVObjSetDataField(%1Handle(), (void*)New%2, offsetof( %1Data, %2), sizeof(%3));\r\n")
+				setgetfields.append( QString("{\n") );
+				setgetfields.append( QString("    UAVObjSetDataField(%1Handle(), (void *)New%2, offsetof(%1Data, %2), sizeof(%3));\n")
 							.arg( info->name )
 							.arg( info->fields[n]->name )
 							.arg( fieldTypeStrC[info->fields[n]->type] ) );
-				setgetfields.append( QString("}\r\n") );
+				setgetfields.append( QString("}\n") );
 
 				/* GET */
-				setgetfields.append( QString("void %2%3Get( %1 *New%3 )\r\n")
+				setgetfields.append( QString("void %2%3Get(%1 *New%3)\n")
 							.arg( fieldTypeStrC[info->fields[n]->type] )
 							.arg( info->name )
 							.arg( info->fields[n]->name ));
-				setgetfields.append( QString("{\r\n") );
-				setgetfields.append( QString("\tUAVObjGetDataField(%1Handle(), (void*)New%2, offsetof( %1Data, %2), sizeof(%3));\r\n")
+				setgetfields.append( QString("{\n") );
+				setgetfields.append( QString("    UAVObjGetDataField(%1Handle(), (void *)New%2, offsetof(%1Data, %2), sizeof(%3));\n")
 							.arg( info->name )
 							.arg( info->fields[n]->name )
 							.arg( fieldTypeStrC[info->fields[n]->type] ) );
-				setgetfields.append( QString("}\r\n") );
+				setgetfields.append( QString("}\n") );
 
             }
             else
             {
 
             	/* SET */
-				setgetfields.append( QString("void %2%3Set( %1 *New%3 )\r\n")
+				setgetfields.append( QString("void %2%3Set( %1 *New%3 )\n")
 								.arg( fieldTypeStrC[info->fields[n]->type] )
 								.arg( info->name )
 								.arg( info->fields[n]->name ) );
-				setgetfields.append( QString("{\r\n") );
-				setgetfields.append( QString("\tUAVObjSetDataField(%1Handle(), (void*)New%2, offsetof( %1Data, %2), %3*sizeof(%4));\r\n")
+				setgetfields.append( QString("{\n") );
+				setgetfields.append( QString("    UAVObjSetDataField(%1Handle(), (void *)New%2, offsetof(%1Data, %2), %3*sizeof(%4));\n")
 								.arg( info->name )
 								.arg( info->fields[n]->name )
 								.arg( info->fields[n]->numElements )
 								.arg( fieldTypeStrC[info->fields[n]->type] ) );
-				setgetfields.append( QString("}\r\n") );
+				setgetfields.append( QString("}\n") );
 
 				/* GET */
-				setgetfields.append( QString("void %2%3Get( %1 *New%3 )\r\n")
+				setgetfields.append( QString("void %2%3Get( %1 *New%3 )\n")
 								.arg( fieldTypeStrC[info->fields[n]->type] )
 								.arg( info->name )
 								.arg( info->fields[n]->name ) );
-				setgetfields.append( QString("{\r\n") );
-				setgetfields.append( QString("\tUAVObjGetDataField(%1Handle(), (void*)New%2, offsetof( %1Data, %2), %3*sizeof(%4));\r\n")
+				setgetfields.append( QString("{\n") );
+				setgetfields.append( QString("    UAVObjGetDataField(%1Handle(), (void *)New%2, offsetof(%1Data, %2), %3*sizeof(%4));\n")
 								.arg( info->name )
 								.arg( info->fields[n]->name )
 								.arg( info->fields[n]->numElements )
 								.arg( fieldTypeStrC[info->fields[n]->type] ) );
-				setgetfields.append( QString("}\r\n") );
+				setgetfields.append( QString("}\n") );
             }
         }
     }
@@ -328,13 +330,13 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
          {
 
 			/* SET */
-			setgetfieldsextern.append( QString("extern void %2%3Set( %1 *New%3 );\r\n")
+			setgetfieldsextern.append( QString("extern void %2%3Set(%1 *New%3);\n")
 					.arg( fieldTypeStrC[info->fields[n]->type] )
 					.arg( info->name )
 					.arg( info->fields[n]->name ) );
 
 			/* GET */
-			setgetfieldsextern.append( QString("extern void %2%3Get( %1 *New%3 );\r\n")
+			setgetfieldsextern.append( QString("extern void %2%3Get(%1 *New%3);\n")
 					.arg( fieldTypeStrC[info->fields[n]->type] )
 					.arg( info->name )
 					.arg( info->fields[n]->name ) );
@@ -357,5 +359,3 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
 
     return true;
 }
-
-

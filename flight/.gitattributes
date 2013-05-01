@@ -15,3 +15,6 @@
 Makefile	text eol=lf
 Makefile.*	text eol=lf
 *.mk		text eol=lf
+
+*.h.template	text eol=lf
+*.c.template	text eol=lf

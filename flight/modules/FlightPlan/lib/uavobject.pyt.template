@@ -30,31 +30,21 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
-
 from uavobject import *
 
 $(DATAFIELDS)
 
 # Object $(NAME) definition
 class $(NAME)(UAVObject):
-	# Object constants
-	OBJID = $(UOBJID)
+    # Object constants
+    OBJID = $(UOBJID)
 
-	# Constructor
-	def __init__(self):
-		UAVObject.__init__(self, $(NAME).OBJID)
+    # Constructor
+    def __init__(self):
+        UAVObject.__init__(self, $(NAME).OBJID)
 
-		# Create object fields
+        # Create object fields
 $(DATAFIELDINIT)
-		# Read field data
-		self.read()
-		self.metadata.read()
-
-
-
-
-
-
-
-
-
+        # Read field data
+        self.read()
+        self.metadata.read()

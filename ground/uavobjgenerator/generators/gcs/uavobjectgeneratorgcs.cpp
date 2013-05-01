@@ -39,9 +39,9 @@ bool UAVObjectGeneratorGCS::generate(UAVObjectParser* parser,QString templatepat
     gcsOutputPath = QDir( outputpath + QString("gcs") );
     gcsOutputPath.mkpath(gcsOutputPath.absolutePath());
 
-    gcsCodeTemplate = readFile( gcsCodePath.absoluteFilePath("uavobjecttemplate.cpp") );
-    gcsIncludeTemplate = readFile( gcsCodePath.absoluteFilePath("uavobjecttemplate.h") );
-    QString gcsInitTemplate = readFile( gcsCodePath.absoluteFilePath("uavobjectsinittemplate.cpp") );
+    gcsCodeTemplate = readFile( gcsCodePath.absoluteFilePath("uavobject.cpp.template") );
+    gcsIncludeTemplate = readFile( gcsCodePath.absoluteFilePath("uavobject.h.template") );
+    QString gcsInitTemplate = readFile( gcsCodePath.absoluteFilePath("uavobjectsinit.cpp.template") );
 
     if (gcsCodeTemplate.isEmpty() || gcsIncludeTemplate.isEmpty() || gcsInitTemplate.isEmpty()) {
         std::cerr << "Problem reading gcs code templates" << endl;

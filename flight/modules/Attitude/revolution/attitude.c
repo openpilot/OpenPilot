@@ -461,10 +461,10 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	// Work out time derivative from INSAlgo writeup
 	// Also accounts for the fact that gyros are in deg/s
 	float qdot[4];
-	qdot[0] = (-q[1] * gyrosData.x - q[2] * gyrosData.y - q[3] * gyrosData.z) * dT * M_PI_F / 180 / 2;
-	qdot[1] = (q[0] * gyrosData.x - q[3] * gyrosData.y + q[2] * gyrosData.z) * dT * M_PI_F / 180 / 2;
-	qdot[2] = (q[3] * gyrosData.x + q[0] * gyrosData.y - q[1] * gyrosData.z) * dT * M_PI_F / 180 / 2;
-	qdot[3] = (-q[2] * gyrosData.x + q[1] * gyrosData.y + q[0] * gyrosData.z) * dT * M_PI_F / 180 / 2;
+	qdot[0] = DEG2RAD(-q[1] * gyrosData.x - q[2] * gyrosData.y - q[3] * gyrosData.z) * dT / 2;
+	qdot[1] = DEG2RAD(q[0] * gyrosData.x - q[3] * gyrosData.y + q[2] * gyrosData.z) * dT / 2;
+	qdot[2] = DEG2RAD(q[3] * gyrosData.x + q[0] * gyrosData.y - q[1] * gyrosData.z) * dT / 2;
+	qdot[3] = DEG2RAD(-q[2] * gyrosData.x + q[1] * gyrosData.y + q[0] * gyrosData.z) * dT / 2;
 
 	// Take a time step
 	q[0] = q[0] + qdot[0];
@@ -838,11 +838,11 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 			// Because the sensor module remove the bias we need to add it
 			// back in here so that the INS algorithm can track it correctly
-			float gyros[3] = {gyrosData.x * M_PI_F / 180.0f, gyrosData.y * M_PI_F / 180.0f, gyrosData.z * M_PI_F / 180.0f};
+			float gyros[3] = { DEG2RAD(gyrosData.x), DEG2RAD(gyrosData.y), DEG2RAD(gyrosData.z) };
 			if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
-				gyros[0] += gyrosBias.x * M_PI_F / 180.0f;
-				gyros[1] += gyrosBias.y * M_PI_F / 180.0f;
-				gyros[2] += gyrosBias.z * M_PI_F / 180.0f;
+				gyros[0] += DEG2RAD(gyrosBias.x);
+				gyros[1] += DEG2RAD(gyrosBias.y);
+				gyros[2] += DEG2RAD(gyrosBias.z);
 			}
 			INSStatePrediction(gyros, &accelsData.x, dT);
 
@@ -868,11 +868,11 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 	// Because the sensor module remove the bias we need to add it
 	// back in here so that the INS algorithm can track it correctly
-	float gyros[3] = {gyrosData.x * M_PI_F / 180.0f, gyrosData.y * M_PI_F / 180.0f, gyrosData.z * M_PI_F / 180.0f};
+	float gyros[3] = { DEG2RAD(gyrosData.x), DEG2RAD(gyrosData.y), DEG2RAD(gyrosData.z) };
 	if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
-		gyros[0] += gyrosBias.x * M_PI_F / 180.0f;
-		gyros[1] += gyrosBias.y * M_PI_F / 180.0f;
-		gyros[2] += gyrosBias.z * M_PI_F / 180.0f;
+		gyros[0] += DEG2RAD(gyrosBias.x);
+		gyros[1] += DEG2RAD(gyrosBias.y);
+		gyros[2] += DEG2RAD(gyrosBias.z);
 	}
 
 	// Advance the state estimate
@@ -977,9 +977,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	velocityActual.Down = Nav.Vel[2];
 	VelocityActualSet(&velocityActual);
 
-	gyrosBias.x = Nav.gyro_bias[0] * 180.0f / M_PI_F;
-	gyrosBias.y = Nav.gyro_bias[1] * 180.0f / M_PI_F;
-	gyrosBias.z = Nav.gyro_bias[2] * 180.0f / M_PI_F;
+	gyrosBias.x = RAD2DEG(Nav.gyro_bias[0]);
+	gyrosBias.y = RAD2DEG(Nav.gyro_bias[1]);
+	gyrosBias.z = RAD2DEG(Nav.gyro_bias[2]);
 	GyrosBiasSet(&gyrosBias);
 
 	EKFStateVarianceData vardata;

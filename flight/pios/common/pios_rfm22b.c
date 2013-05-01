@@ -1917,9 +1917,9 @@ static enum pios_radio_event radio_txData(struct pios_rfm22b_dev *radio_dev)
                 radio_dev->time_delta = portMAX_DELAY - curTicks;
             }
 
-        } else if (radio_dev->tx_packet->header.type != PACKET_TYPE_NACK) {
+        } else if ((radio_dev->tx_packet->header.type != PACKET_TYPE_NACK) && (radio_dev->tx_packet->header.type != PACKET_TYPE_PPM)) {
 
-            // We need to wait for an ACK if this packet it not an ACK or NACK.
+            // We need to wait for an ACK if this packet it not an ACK, NACK, or PPM.
             radio_dev->prev_tx_packet = radio_dev->tx_packet;
             radio_dev->tx_complete_ticks = xTaskGetTickCount();
         }
@@ -2199,13 +2199,16 @@ static void rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev)
  */
 static enum pios_radio_event rfm22_sendAck(struct pios_rfm22b_dev *rfm22b_dev)
 {
-    PHAckNackPacketHandle aph = (PHAckNackPacketHandle)(&(rfm22b_dev->ack_nack_packet));
-    aph->header.destination_id = rfm22b_dev->destination_id;
-    aph->header.type = PACKET_TYPE_ACK;
-    aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
-    aph->header.seq_num = rfm22b_dev->rx_packet.header.seq_num;
-    aph->packet_recv_time = rfm22_coordinatorTime(rfm22b_dev, rfm22b_dev->rx_complete_ticks);
-    rfm22b_dev->tx_packet = (PHPacketHandle)aph;
+    // We don't ACK PPM packets.
+    if (rfm22b_dev->rx_packet.header.type != PACKET_TYPE_PPM) {
+        PHAckNackPacketHandle aph = (PHAckNackPacketHandle)(&(rfm22b_dev->ack_nack_packet));
+        aph->header.destination_id = rfm22b_dev->destination_id;
+        aph->header.type = PACKET_TYPE_ACK;
+        aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
+        aph->header.seq_num = rfm22b_dev->rx_packet.header.seq_num;
+        aph->packet_recv_time = rfm22_coordinatorTime(rfm22b_dev, rfm22b_dev->rx_complete_ticks);
+        rfm22b_dev->tx_packet = (PHPacketHandle)aph;
+    }
     return RADIO_EVENT_TX_START;
 }
 

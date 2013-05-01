@@ -66,6 +66,7 @@
 #include "homelocation.h"
 #include "magnetometer.h"
 #include "positionactual.h"
+#include "ekfinitialvariance.h"
 #include "ekfstatevariance.h"
 #include "revocalibration.h"
 #include "revosettings.h"
@@ -159,6 +160,7 @@ int32_t AttitudeInitialize(void)
 	VelocityActualInitialize();
 	RevoSettingsInitialize();
 	RevoCalibrationInitialize();
+	EKFInitialVarianceInitialize();
 	EKFStateVarianceInitialize();
 	
 	// Initialize this here while we aren't setting the homelocation in GPS
@@ -755,14 +757,6 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 		// Don't initialize until all sensors are read
 		if (init_stage == 0) {
-			float Pdiag[13]={
-				25.0f, 25.0f, 25.0f,        // initial position variance    - 5 meters mean uncertainty (5²=25)
-				 5.0f,  5.0f,  5.0f,        // initial velocity variance    - 2.2 m/s mean uncertainty
-				7e-3f, 7e-3f, 7e-3f, 7e-3f, // initial orientation variance - 5 deg (sin(5°)² ~ 7e-3)
-				1e-4f, 1e-4f, 1e-4f,        // initial gyro drift variance  - 0.6 deg/s (sin(0.6°)² ~ 1e-4)
-			};
-			float q[4];
-			float pos[3] = {0.0f, 0.0f, 0.0f};
 
 			// Reset the INS algorithm
 			INSGPSInit();
@@ -775,6 +769,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			// Initialize the gyro bias
 			float gyro_bias[3] = {0,0,0};
 			INSSetGyroBias(gyro_bias);
+
+			float pos[3] = {0.0f, 0.0f, 0.0f};
 
 			if (outdoor_mode) {
 
@@ -827,12 +823,13 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
 			AttitudeActualSet(&attitudeActual);
 
-			q[0] = attitudeActual.q1;
-			q[1] = attitudeActual.q2;
-			q[2] = attitudeActual.q3;
-			q[3] = attitudeActual.q4;
+			float q[4] = { attitudeActual.q1, attitudeActual.q2, attitudeActual.q3, attitudeActual.q4 };
 			INSSetState(pos, zeros, q, zeros, zeros);
-			INSResetP(Pdiag);
+			
+			EKFInitialVarianceData vardata;
+			EKFInitialVarianceGet(&vardata);
+			INSResetP(vardata.P);
+
 		} else {
 			// Run prediction a bit before any corrections
 

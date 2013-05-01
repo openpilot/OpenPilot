@@ -1,7 +1,11 @@
 <xml>
-    <object name="EKFStateVariance" singleinstance="true" settings="false">
-        <description>Extended Kalman Filter state covariance</description>
-	<field name="P" units="1^2" type="float">
+    <object name="EKFInitialVariance" singleinstance="true" settings="true">
+        <description>Extended Kalman Filter covariance initialisation</description>
+	<field name="P" units="1^2" type="float" defaultvalue="
+		25.0, 25.0, 25.0,
+		5.0, 5.0, 5.0,
+		0.007, 0.007, 0.007, 0.007,
+		0.0001, 0.0001, 0.0001">
 		<elementnames>
 			<elementname>PositionNorth</elementname>
 			<elementname>PositionEast</elementname>
@@ -19,8 +23,8 @@
 		</elementnames>
 	</field>
         <access gcs="readwrite" flight="readwrite"/>
-        <telemetrygcs acked="false" updatemode="manual" period="0"/>
-        <telemetryflight acked="false" updatemode="periodic" period="10000"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
         <logging updatemode="manual" period="0"/>
     </object>
 </xml>

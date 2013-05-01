@@ -129,6 +129,9 @@ void PIOS_Board_Init(void) {
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();
 
+	/* Initialize the delayed callback library */
+	CallbackSchedulerInitialize();
+
 	/* Configure IO ports */
 	
 	/* Configure Telemetry port */

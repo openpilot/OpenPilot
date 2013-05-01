@@ -382,6 +382,9 @@ void PIOS_Board_Init(void) {
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();
 
+	/* Initialize the delayed callback library */
+	CallbackSchedulerInitialize();
+
 	/* Set up pulse timers */
 	PIOS_TIM_InitClock(&tim_1_cfg);
 	PIOS_TIM_InitClock(&tim_3_cfg);

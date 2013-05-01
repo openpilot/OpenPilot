@@ -331,14 +331,14 @@ static int32_t updateAttitudeComplementary(bool first_run)
 		// Set initial attitude. Use accels to determine roll and pitch, rotate magnetic measurement accordingly,
 		// so pseudo "north" vector can be estimated even if the board is not level
 		attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z);
-		float zn = cos(attitudeActual.Roll) * magData.z + sin(attitudeActual.Roll) * magData.y;
-		float yn = cos(attitudeActual.Roll) * magData.y - sin(attitudeActual.Roll) * magData.z;
+		float zn = cosf(attitudeActual.Roll) * magData.z + sinf(attitudeActual.Roll) * magData.y;
+		float yn = cosf(attitudeActual.Roll) * magData.y - sinf(attitudeActual.Roll) * magData.z;
 
 		// rotate accels z vector according to roll
-		float azn = cos(attitudeActual.Roll) * accelsData.z + sin(attitudeActual.Roll) * accelsData.y;
+		float azn = cosf(attitudeActual.Roll) * accelsData.z + sinf(attitudeActual.Roll) * accelsData.y;
 		attitudeActual.Pitch = atan2f(accelsData.x, -azn);
 
-		float xn = cos(attitudeActual.Pitch) * magData.x + sin(attitudeActual.Pitch) * zn;
+		float xn = cosf(attitudeActual.Pitch) * magData.x + sinf(attitudeActual.Pitch) * zn;
 
 		attitudeActual.Yaw = atan2f(-yn, xn);
 		// TODO: This is still a hack
@@ -808,14 +808,14 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			// Set initial attitude. Use accels to determine roll and pitch, rotate magnetic measurement accordingly,
 			// so pseudo "north" vector can be estimated even if the board is not level
 			attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z);
-			float zn = cos(attitudeActual.Roll) * magData.z + sin(attitudeActual.Roll) * magData.y;
-			float yn = cos(attitudeActual.Roll) * magData.y - sin(attitudeActual.Roll) * magData.z;
+			float zn = cosf(attitudeActual.Roll) * magData.z + sinf(attitudeActual.Roll) * magData.y;
+			float yn = cosf(attitudeActual.Roll) * magData.y - sinf(attitudeActual.Roll) * magData.z;
 
 			// rotate accels z vector according to roll
-			float azn = cos(attitudeActual.Roll) * accelsData.z + sin(attitudeActual.Roll) * accelsData.y;
+			float azn = cosf(attitudeActual.Roll) * accelsData.z + sinf(attitudeActual.Roll) * accelsData.y;
 			attitudeActual.Pitch = atan2f(accelsData.x, -azn);
 
-			float xn = cos(attitudeActual.Pitch) * magData.x + sin(attitudeActual.Pitch) * zn;
+			float xn = cosf(attitudeActual.Pitch) * magData.x + sinf(attitudeActual.Pitch) * zn;
 
 			attitudeActual.Yaw = atan2f(-yn, xn);
 			// TODO: This is still a hack

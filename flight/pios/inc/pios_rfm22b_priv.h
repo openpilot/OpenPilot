@@ -775,8 +775,6 @@ struct pios_rfm22b_dev {
     uint16_t rx_buffer_wr;
     // The receive buffer write index
     uint16_t rx_packet_len;
-    // Is the modem currently in Rx mode?
-    bool in_rx_mode;
 
     // The status packet
     PHStatusPacket status_packet;

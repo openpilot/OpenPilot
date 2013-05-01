@@ -48,7 +48,6 @@ typedef enum {
 	PACKET_TYPE_DUPLICATE_DATA,      // a duplicate data packet
 	PACKET_TYPE_PPM,                 // PPM relay values
 	PACKET_TYPE_ACK,                 // Acknowlege the receipt of a packet
-	PACKET_TYPE_ACK_RTS,             // Acknowlege the receipt of a packet and indicate that the receiving side has data to send (ready to send)
 	PACKET_TYPE_NACK,                // Acknowlege the receipt of an uncorrectable packet
 } PHPacketType;
 

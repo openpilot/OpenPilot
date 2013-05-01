@@ -101,11 +101,17 @@ void GCSControlGadget::manualControlCommandUpdated(UAVObject * obj) {
     double yaw = obj->getField("Yaw")->getDouble();
     double throttle = obj->getField("Throttle")->getDouble();
 
-    // necessary against incorect values from not configured joysticks 
-    if (throttle >= -1.0 && throttle <= 1.0)
-    {
+    // necessary against having the wrong joystick profile chosen, which shows weird values 
+    if (throttle > -1.0 && throttle <= 1.0) {
         // convert ManualControlCommand.Throttle range (0..1) to the widget's throttle stick range (-1..+1)
         throttle = -1.0 + (throttle * 2.0);
+    } else {
+        // with the safety value (line 206), this helps keep the sticks insde the margins
+        if (throttle <= -1.0) {
+            throttle = -1.0;
+        } else {
+            throttle = 1.0;
+        }
     }
 
     // Remap RPYT to left X/Y and right X/Y depending on mode
@@ -193,11 +199,15 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
     if (((GCSControlGadgetWidget *)m_widget)->getGCSControl()==false || ((GCSControlGadgetWidget *)m_widget)->getUDPControl())
         return;
 
-    if (newThrottle != oldThrottle)
-    {
+    //if (newThrottle != oldThrottle) {
         // convert widget's throttle stick range (-1..+1) to ManualControlCommand.Throttle range (0..1)
         newThrottle = (newThrottle + 1.0) / 2.0;
-    }
+        
+        //  safety value to stop the motors from spinning at 0% throttle
+        if (newThrottle <= 0.01 ) {
+            newThrottle = -1;
+        }
+    //}
      
 
     if((newThrottle != oldThrottle) || (newPitch != oldPitch) || (newYaw != oldYaw) || (newRoll != oldRoll)) {

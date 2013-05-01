@@ -104,10 +104,14 @@ static xQueueHandle gpsVelQueue;
 static AttitudeSettingsData attitudeSettings;
 static HomeLocationData homeLocation;
 static RevoCalibrationData revoCalibration;
+static EKFInitialVarianceData ekfInitialVariance;
 static RevoSettingsData revoSettings;
+static FlightStatusData flightStatus;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
 
 static bool volatile variance_error = true;
+static bool volatile initialization_required = true;
+static uint32_t volatile running_algorithm = 0xffffffff; // we start with no algorithm running
 
 // Private functions
 static void AttitudeTask(void *parameters);
@@ -162,6 +166,7 @@ int32_t AttitudeInitialize(void)
 	RevoCalibrationInitialize();
 	EKFInitialVarianceInitialize();
 	EKFStateVarianceInitialize();
+	FlightStatusInitialize();
 	
 	// Initialize this here while we aren't setting the homelocation in GPS
 	HomeLocationInitialize();
@@ -187,6 +192,8 @@ int32_t AttitudeInitialize(void)
 	RevoSettingsConnectCallback(&settingsUpdatedCb);
 	RevoCalibrationConnectCallback(&settingsUpdatedCb);
 	HomeLocationConnectCallback(&settingsUpdatedCb);
+	EKFInitialVarianceConnectCallback(&settingsUpdatedCb);
+	FlightStatusConnectCallback(&settingsUpdatedCb);
 
 	return 0;
 }
@@ -229,8 +236,7 @@ MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
  */
 static void AttitudeTask(void *parameters)
 {
-	bool first_run = true;
-	uint32_t last_algorithm;
+
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
 	// Force settings update to make sure rotation loaded
@@ -239,21 +245,19 @@ static void AttitudeTask(void *parameters)
 	// Wait for all the sensors be to read
 	vTaskDelay(100);
 
-	// Invalidate previous algorithm to trigger a first run
-	last_algorithm = 0xfffffff;
-
-	// Main task loop
+	// Main task loop - TODO: make it run as delayed callback
 	while (1) {
 
 		int32_t ret_val = -1;
 
-		if (last_algorithm != revoSettings.FusionAlgorithm) {
-			last_algorithm = revoSettings.FusionAlgorithm;
+		bool first_run = false;
+		if (initialization_required) {
+			initialization_required = false;
 			first_run = true;
 		}
 
 		// This  function blocks on data queue
-		switch (revoSettings.FusionAlgorithm ) {
+		switch (running_algorithm ) {
 			case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARY:
 				ret_val = updateAttitudeComplementary(first_run);
 				break;
@@ -268,8 +272,9 @@ static void AttitudeTask(void *parameters)
 				break;
 		}
 
-		if(ret_val == 0)
-			first_run = false;
+		if(ret_val != 0) {
+			initialization_required = true;
+		}
 
 		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 	}
@@ -306,8 +311,6 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	AccelsGet(&accelsData);
 
 	// During initialization and 
-	FlightStatusData flightStatus;
-	FlightStatusGet(&flightStatus);
 	if(first_run) {
 #if defined(PIOS_INCLUDE_HMC5883)
 		// To initialize we need a valid mag reading
@@ -554,7 +557,12 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	}
 
 
-	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+	if ( variance_error ) {
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_CRITICAL);
+	} else {
+		AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+	}
+
 
 	return 0;
 }
@@ -663,7 +671,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	     invalid(accelsData.z) ) {
 		// cannot run process update, raise error!
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);
-		return -1;
+		return 0;
 	}
 	if ( invalid(gyrosBias.x) ||
 	     invalid(gyrosBias.y) ||
@@ -826,9 +834,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			float q[4] = { attitudeActual.q1, attitudeActual.q2, attitudeActual.q3, attitudeActual.q4 };
 			INSSetState(pos, zeros, q, zeros, zeros);
 			
-			EKFInitialVarianceData vardata;
-			EKFInitialVarianceGet(&vardata);
-			INSResetP(vardata.P);
+			INSResetP(ekfInitialVariance.P);
 
 		} else {
 			// Run prediction a bit before any corrections
@@ -1012,7 +1018,18 @@ static int32_t getNED(GPSPositionData * gpsPosition, float * NED)
 
 static void settingsUpdatedCb(UAVObjEvent * ev) 
 {
-	if (ev == NULL || ev->obj == RevoCalibrationHandle()) {
+	if (ev == NULL || ev->obj == FlightStatusHandle()) {
+		FlightStatusGet(&flightStatus);
+	}
+	// change of these settings require reinitialization of the EKF
+	// when an error flag has been risen, we also listen to flightStatus updates,
+	// since we are waiting for the system to get disarmed so we can reinitialize safely.
+	if (ev == NULL || ev->obj == RevoCalibrationHandle() ||
+			ev->obj == EKFInitialVarianceHandle() ||
+			ev->obj == RevoSettingsHandle() ||
+			( variance_error==true && ev->obj == FlightStatusHandle() )
+			) {
+
 		bool error = false;
 		RevoCalibrationGet(&revoCalibration);
 
@@ -1031,17 +1048,31 @@ static void settingsUpdatedCb(UAVObjEvent * ev)
 		     invalid_var( revoCalibration.baro_var ) ) {
 			error = true;
 		}
+		
+		EKFInitialVarianceGet(&ekfInitialVariance);
+		int t;
+		for (t=0; t < EKFINITIALVARIANCE_P_NUMELEM; t++) {
+			if (invalid_var(ekfInitialVariance.P[t])) {
+				error = true;
+			}
+		}
+
+		RevoSettingsGet(&revoSettings);
+
+		// Reinitialization of the EKF is not desired during flight.
+		// It will be delayed until the board is disarmed by raising the error flag.
+		// We will not prevent the initial initialization though, since the board could be in always armed mode.
+		if (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED && !initialization_required ) {
+			error = true;
+		}
 
 		if (error) {
 			variance_error = true;
 		} else {
-			// In case INS currently running
-			INSSetMagVar(revoCalibration.mag_var);
-			INSSetAccelVar(revoCalibration.accel_var);
-			INSSetGyroVar(revoCalibration.gyro_var);
-			INSSetGyroBiasVar(revoCalibration.gyro_bias_var);
-			INSSetBaroVar(revoCalibration.baro_var);
+			// trigger reinitialization - possibly with new algorithm
+			running_algorithm = revoSettings.FusionAlgorithm;
 			variance_error = false;
+			initialization_required = true;
 		}
 	}
 	if(ev == NULL || ev->obj == HomeLocationHandle()) {
@@ -1054,11 +1085,12 @@ static void settingsUpdatedCb(UAVObjEvent * ev)
 		T[0] = alt+6.378137E6f;
 		T[1] = cosf(lat)*(alt+6.378137E6f);
 		T[2] = -1.0f;
+
+		// TODO: convert positionActual to new reference frame and gracefully update EKF state!
+		// needed for long range flights where the reference coordinate is adjusted in flight
 	}
 	if (ev == NULL || ev->obj == AttitudeSettingsHandle())
 		AttitudeSettingsGet(&attitudeSettings);
-	if (ev == NULL || ev->obj == RevoSettingsHandle())
-		RevoSettingsGet(&revoSettings);
 }
 /**
  * @}

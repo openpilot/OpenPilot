@@ -92,7 +92,7 @@ ConfigGadgetWidget::ConfigGadgetWidget(QWidget *parent) : QWidget(parent)
     icon->addFile(":/configgadget/images/ins_normal.png", QSize(), QIcon::Normal, QIcon::Off);
     icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     qwd = new DefaultAttitudeWidget(this);
-    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("INS"));
+    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("Attitude"));
 
     icon = new QIcon();
     icon->addFile(":/configgadget/images/stabilization_normal.png", QSize(), QIcon::Normal, QIcon::Off);
@@ -174,7 +174,7 @@ void ConfigGadgetWidget::onAutopilotDisconnect() {
     icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
     QWidget *qwd = new DefaultAttitudeWidget(this);
     ftw->removeTab(ConfigGadgetWidget::sensors);
-    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("INS"));
+    ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("Attitude"));
 
     icon = new QIcon();
     icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
@@ -206,7 +206,7 @@ void ConfigGadgetWidget::onAutopilotConnect() {
             icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
             QWidget *qwd = new ConfigCCAttitudeWidget(this);
             ftw->removeTab(ConfigGadgetWidget::sensors);
-            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("CopterControl"));
+            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("Attitude"));
 
             icon = new QIcon();
             icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);
@@ -223,7 +223,7 @@ void ConfigGadgetWidget::onAutopilotConnect() {
             icon->addFile(":/configgadget/images/ins_selected.png", QSize(), QIcon::Selected, QIcon::Off);
             QWidget *qwd = new ConfigRevoWidget(this);
             ftw->removeTab(ConfigGadgetWidget::sensors);
-            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("Revolution"));
+            ftw->insertTab(ConfigGadgetWidget::sensors, qwd, *icon, QString("Attitude"));
 
             icon = new QIcon();
             icon->addFile(":/configgadget/images/hardware_normal.png", QSize(), QIcon::Normal, QIcon::Off);

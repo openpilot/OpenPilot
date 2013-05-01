@@ -157,6 +157,9 @@ MODULE_INITCALL(SystemModInitialize, 0)
  */
 static void systemTask(void *parameters)
 {
+	/* start the delayed callback scheduler */
+	CallbackSchedulerStart();
+
 	/* create all modules thread */
 	MODULE_TASKCREATE_ALL;
 

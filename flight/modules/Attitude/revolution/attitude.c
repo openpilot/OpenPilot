@@ -342,9 +342,9 @@ static int32_t updateAttitudeComplementary(bool first_run)
 		// should calculate the rotation in 3d space using proper cross product math
 		// SUBTODO: formulate the math required
 
-		attitudeActual.Roll *= 180.0f / M_PI_F;
-		attitudeActual.Pitch *= 180.0f / M_PI_F;
-		attitudeActual.Yaw *= 180.0f / M_PI_F;
+		attitudeActual.Roll = RAD2DEG(attitudeActual.Roll);
+		attitudeActual.Pitch = RAD2DEG(attitudeActual.Pitch);
+		attitudeActual.Yaw = RAD2DEG(attitudeActual.Yaw);
 
 		RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
 		AttitudeActualSet(&attitudeActual);
@@ -820,9 +820,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			// should calculate the rotation in 3d space using proper cross product math
 			// SUBTODO: formulate the math required
 
-			attitudeActual.Roll *= 180.0f / M_PI_F;
-			attitudeActual.Pitch *= 180.0f / M_PI_F;
-			attitudeActual.Yaw *= 180.0f / M_PI_F;
+			attitudeActual.Roll = RAD2DEG(attitudeActual.Roll);
+			attitudeActual.Pitch = RAD2DEG(attitudeActual.Pitch);
+			attitudeActual.Yaw = RAD2DEG(attitudeActual.Yaw);
 
 			RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
 			AttitudeActualSet(&attitudeActual);
@@ -906,8 +906,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 		if (0) { // Old code to take horizontal velocity from GPS Position update
 			sensors |= HORIZ_SENSORS;
-			vel[0] = gpsData.Groundspeed * cosf(gpsData.Heading * M_PI_F / 180.0f);
-			vel[1] = gpsData.Groundspeed * sinf(gpsData.Heading * M_PI_F / 180.0f);
+			vel[0] = gpsData.Groundspeed * cosf(DEG2RAD(gpsData.Heading));
+			vel[1] = gpsData.Groundspeed * sinf(DEG2RAD(gpsData.Heading));
 			vel[2] = 0;
 		}
 		// Transform the GPS position into NED coordinates
@@ -1000,12 +1000,11 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
  * @returns 0 for success, -1 for failure
  */
 float T[3];
-const float DEG2RAD = 3.141592653589793f / 180.0f;
 static int32_t getNED(GPSPositionData * gpsPosition, float * NED)
 {
-	float dL[3] = {(gpsPosition->Latitude - homeLocation.Latitude) / 10.0e6f * DEG2RAD,
-		(gpsPosition->Longitude - homeLocation.Longitude) / 10.0e6f * DEG2RAD,
-		(gpsPosition->Altitude + gpsPosition->GeoidSeparation - homeLocation.Altitude)};
+	float dL[3] = { DEG2RAD((gpsPosition->Latitude - homeLocation.Latitude) / 10.0e6f),
+	    DEG2RAD((gpsPosition->Longitude - homeLocation.Longitude) / 10.0e6f),
+		(gpsPosition->Altitude + gpsPosition->GeoidSeparation - homeLocation.Altitude) };
 
 	NED[0] = T[0] * dL[0];
 	NED[1] = T[1] * dL[1];
@@ -1052,7 +1051,7 @@ static void settingsUpdatedCb(UAVObjEvent * ev)
 		HomeLocationGet(&homeLocation);
 		// Compute matrix to convert deltaLLA to NED
 		float lat, alt;
-		lat = homeLocation.Latitude / 10.0e6f * DEG2RAD;
+		lat = DEG2RAD(homeLocation.Latitude / 10.0e6f);
 		alt = homeLocation.Altitude;
 
 		T[0] = alt+6.378137E6f;

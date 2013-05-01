@@ -65,6 +65,7 @@
 /* PIOS debug interface */
 /* #define PIOS_INCLUDE_DEBUG_CONSOLE */
 /* #define DEBUG_LEVEL 0 */
+/* #define PIOS_ENABLE_DEBUG_PINS */
 #include <pios_debug.h>
 
 /* PIOS common functions */

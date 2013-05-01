@@ -28,98 +28,69 @@
 #define CONFIGVEHICLETYPEWIDGET_H
 
 #include "ui_airframe.h"
-#include "../uavobjectwidgetutils/configtaskwidget.h"
-#include "extensionsystem/pluginmanager.h"
-#include "uavobjectmanager.h"
-#include "uavobject.h"
-#include "uavtalk/telemetrymanager.h"
-
-#include "cfg_vehicletypes/configccpmwidget.h"
-#include "cfg_vehicletypes/configfixedwingwidget.h"
-#include "cfg_vehicletypes/configmultirotorwidget.h"
-#include "cfg_vehicletypes/configgroundvehiclewidget.h"
 #include "cfg_vehicletypes/vehicleconfig.h"
+#include "uavobject.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 
-#include <QtGui/QWidget>
-#include <QList>
-#include <QItemDelegate>
+#include <QComboBox>
+#include <QMap>
+#include <QString>
+#include <QStringList>
+#include <QWidget>
 
-class Ui_Widget;
-
+/*
+ * This class derives from ConfigTaskWidget and overrides its default "binding" mechanism.
+ * This widget bypasses automatic synchronization of UAVObjects and UI by providing its own implementations of
+ *     virtual void refreshWidgetsValues(UAVObject *obj = NULL);
+ *     virtual void updateObjectsFromWidgets();
+ *
+ * It does use the "dirty" state management and registers its relevant widgets with ConfigTaskWidget to do so.
+ *
+ * This class also manages child ConfigTaskWidget : see VehicleConfig class and its derived classes.
+ * Note: for "dirty" state management it is important to register the fields of child widgets with the parent
+ * ConfigVehicleTypeWidget class.
+ *
+ * TODO consider to call "super" to benefit from default logic...
+ * TODO improve handling of relationship with VehicleConfig derived classes (i.e. ConfigTaskWidget within ConfigTaskWidget)
+ */
 class ConfigVehicleTypeWidget: public ConfigTaskWidget
 {
     Q_OBJECT
 
 public:
+    static QStringList getChannelDescriptions();
+    static void setComboCurrentIndex(QComboBox *box, int index);
+
     ConfigVehicleTypeWidget(QWidget *parent = 0);
     ~ConfigVehicleTypeWidget();
 
-    static QStringList getChannelDescriptions();
+protected slots:
+    virtual void refreshWidgetsValues(UAVObject *o = NULL);
+    virtual void updateObjectsFromWidgets();
 
 private:
     Ui_AircraftWidget *m_aircraft;
 
-    ConfigCcpmWidget *m_heli;
-    ConfigFixedWingWidget *m_fixedwing;
-    ConfigMultiRotorWidget *m_multirotor;
-    ConfigGroundVehicleWidget *m_groundvehicle;
+    // Maps a frame category to its index in the m_aircraft->airframesWidget QStackedWidget
+    QMap<QString, int> vehicleIndexMap;
 
-    void updateCustomAirframeUI();
-    void addToDirtyMonitor();
-    void resetField(UAVObjectField * field);
+    QString frameCategory(QString frameType);
 
-    //void setMixerChannel(int channelNumber, bool channelIsMotor, QList<double> vector);
+    VehicleConfig *getVehicleConfigWidget(QString frameCategory);
+    VehicleConfig *createVehicleConfigWidget(QString frameCategory);
 
-    QStringList channelNames;
-    QStringList mixerTypes;
-    QStringList mixerVectors;
+    // Feed Forward
+    void updateFeedForwardUI();
 
-    QGraphicsSvgItem *quad;
     bool ffTuningInProgress;
     bool ffTuningPhase;
     UAVObject::Metadata accInitialData;
 
 private slots:
-
-    virtual void refreshWidgetsValues(UAVObject * o=NULL);
-    virtual void updateObjectsFromWidgets();
-
-    void setComboCurrentIndex(QComboBox* box, int index);
-
-    void setupAirframeUI(QString type);
-	
-    void toggleAileron2(int index);
-    void toggleElevator2(int index);
-    void toggleRudder2(int index);
     void switchAirframeType(int index);
-
-    void enableFFTest();
     void openHelp();
-    void reverseMultirotorMotor();
+    void enableFFTest();
 
-protected:
-    void showEvent(QShowEvent *event);
-    void resizeEvent(QResizeEvent *event);
-
-
-};
-
-class SpinBoxDelegate : public QItemDelegate
-{
-    Q_OBJECT
-
-public:
-    SpinBoxDelegate(QObject *parent = 0);
-
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
-                          const QModelIndex &index) const;
-
-    void setEditorData(QWidget *editor, const QModelIndex &index) const;
-    void setModelData(QWidget *editor, QAbstractItemModel *model,
-                      const QModelIndex &index) const;
-
-    void updateEditorGeometry(QWidget *editor,
-        const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
 #endif // CONFIGVEHICLETYPEWIDGET_H

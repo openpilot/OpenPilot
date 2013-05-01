@@ -34,7 +34,7 @@ PYTHON_DIR = python-2.7.4
     VERSION_INFO_DIR      = $$GCS_BUILD_TREE/../openpilotgcs-synthetics
     VERSION_INFO_HEADER   = $$VERSION_INFO_DIR/gcs_version_info.h
     VERSION_INFO_SCRIPT   = $$ROOT_DIR/make/scripts/version-info.py
-    VERSION_INFO_TEMPLATE = $$ROOT_DIR/make/templates/gcs_version_info_template.h
+    VERSION_INFO_TEMPLATE = $$ROOT_DIR/make/templates/gcs_version_info.h.template
     VERSION_INFO_COMMAND  = $$PYTHON \"$$VERSION_INFO_SCRIPT\"
     UAVO_DEF_PATH         = $$ROOT_DIR/shared/uavobjectdefinition
 

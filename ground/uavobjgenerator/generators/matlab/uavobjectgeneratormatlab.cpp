@@ -35,11 +35,11 @@ bool UAVObjectGeneratorMatlab::generate(UAVObjectParser* parser,QString template
     fieldSizeStrMatlab << "1" << "2" << "4"
         << "1" << "2" << "4" << "4" << "1";
 
-    QDir matlabTemplatePath = QDir( templatepath + QString("ground/openpilotgcs/src/plugins/uavobjects"));
+    QDir matlabTemplatePath = QDir( templatepath + QString(MATLAB_CODE_DIR));
     QDir matlabOutputPath = QDir( outputpath + QString("matlab") );
     matlabOutputPath.mkpath(matlabOutputPath.absolutePath());
 
-    QString matlabCodeTemplate = readFile( matlabTemplatePath.absoluteFilePath( "uavobjecttemplate.m") );
+    QString matlabCodeTemplate = readFile( matlabTemplatePath.absoluteFilePath( "uavobject.m.template") );
 
     if (matlabCodeTemplate.isEmpty() ) {
         std::cerr << "Problem reading matlab templates" << endl;

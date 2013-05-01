@@ -79,6 +79,7 @@ SRC += $(FLIGHTLIB)/alarms.c
 SRC += $(OPUAVTALK)/uavtalk.c
 SRC += $(OPUAVOBJ)/uavobjectmanager.c
 SRC += $(OPUAVOBJ)/eventdispatcher.c
+SRC += $(OPUAVOBJ)/callbackscheduler.c
 SRC += $(UAVOBJSYNTHDIR)/uavobjectsinit.c
 
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
@@ -257,7 +258,7 @@ ALLSRC     = $(ASRCARM) $(ASRC) $(SRCARM) $(SRC) $(CPPSRCARM) $(CPPSRC)
 ALLSRCBASE = $(notdir $(basename $(ALLSRC)))
 
 # Define all object files.
-ALLOBJ     = $(addprefix $(OUTDIR)/, $(addsuffix .o, $(ALLSRCBASE) uavobjectsinit.o.firmwareinfo ))
+ALLOBJ     = $(addprefix $(OUTDIR)/, $(addsuffix .o, $(ALLSRCBASE) uavobjectsinit.o.firmware_info ))
 
 # Define all listing files (used for make clean).
 LSTFILES   = $(addprefix $(OUTDIR)/, $(addsuffix .lst, $(ALLSRCBASE)))

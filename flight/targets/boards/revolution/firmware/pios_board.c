@@ -382,6 +382,9 @@ void PIOS_Board_Init(void) {
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();
 
+	/* Initialize the delayed callback library */
+	CallbackSchedulerInitialize();
+
 	/* Set up pulse timers */
 	PIOS_TIM_InitClock(&tim_1_cfg);
 	PIOS_TIM_InitClock(&tim_3_cfg);
@@ -777,11 +780,11 @@ void PIOS_Board_Init(void) {
 	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
 #endif	/* PIOS_INCLUDE_GCSRCVR */
 
-#ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
+#ifndef PIOS_ENABLE_DEBUG_PINS
 	// pios_servo_cfg points to the correct configuration based on input port settings
 	PIOS_Servo_Init(pios_servo_cfg);
 #else
-	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
+	PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
 #endif
 	
 	if (PIOS_I2C_Init(&pios_i2c_mag_pressure_adapter_id, &pios_i2c_mag_pressure_adapter_cfg)) {

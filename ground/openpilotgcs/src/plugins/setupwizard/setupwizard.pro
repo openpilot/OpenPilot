@@ -33,9 +33,9 @@ HEADERS += setupwizardplugin.h \
     pages/rebootpage.h \
     pages/savepage.h \
     pages/autoupdatepage.h \
-    pages/cccalibrationpage.h \
-    cccalibrationutil.h \
-    pages/revocalibrationpage.h
+    pages/revocalibrationpage.h \
+    biascalibrationutil.h \
+    pages/biascalibrationpage.h
 
 SOURCES += setupwizardplugin.cpp \
     setupwizard.cpp \
@@ -60,9 +60,9 @@ SOURCES += setupwizardplugin.cpp \
     pages/rebootpage.cpp \
     pages/savepage.cpp \
     pages/autoupdatepage.cpp \
-    pages/cccalibrationpage.cpp \
-    cccalibrationutil.cpp \
-    pages/revocalibrationpage.cpp
+    pages/revocalibrationpage.cpp \
+    biascalibrationutil.cpp \
+    pages/biascalibrationpage.cpp
 
 OTHER_FILES += SetupWizard.pluginspec
 
@@ -84,8 +84,8 @@ FORMS += \
     pages/rebootpage.ui \
     pages/savepage.ui \
     pages/autoupdatepage.ui \
-    pages/cccalibrationpage.ui \
-    pages/revocalibrationpage.ui
+    pages/revocalibrationpage.ui \
+    pages/biascalibrationpage.ui
 
 RESOURCES += \
     wizardResources.qrc

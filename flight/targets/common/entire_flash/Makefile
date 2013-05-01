@@ -38,7 +38,7 @@ bin: $(OUTDIR)/$(TARGET).bin
 
 BL_BIN = $(BUILD_DIR)/bl_$(BOARD_NAME)/bl_$(BOARD_NAME).bin
 FW_BIN = $(BUILD_DIR)/fw_$(BOARD_NAME)/fw_$(BOARD_NAME).bin
-FWINFO_BIN = $(FW_BIN).firmwareinfo.bin
+FWINFO_BIN = $(FW_BIN).firmware_info.bin
 
 $(OUTDIR)/$(TARGET).bin: $(BL_BIN) $(FW_BIN)
 	$(V0) @$(ECHO) $(MSG_FLASH_IMG) $@

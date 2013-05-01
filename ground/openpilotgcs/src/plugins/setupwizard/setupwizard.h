@@ -29,7 +29,7 @@
 #define SETUPWIZARD_H
 
 #include <QWizard>
-#include "cccalibrationutil.h"
+#include "biascalibrationutil.h"
 #include <coreplugin/icore.h>
 #include <coreplugin/connectionmanager.h>
 #include "vehicleconfigurationsource.h"
@@ -90,7 +90,7 @@ private slots:
     void pageChanged(int currId);
 private:
     enum {PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
-          PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_CC_CALIBRATION,
+          PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_BIAS_CALIBRATION,
           PAGE_REVO_CALIBRATION, PAGE_OUTPUT_CALIBRATION, PAGE_SAVE, PAGE_SUMMARY,
           PAGE_NOTYETIMPLEMENTED, PAGE_REBOOT, PAGE_END, PAGE_UPDATE};
     void createPages();

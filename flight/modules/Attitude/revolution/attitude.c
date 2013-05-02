@@ -135,7 +135,7 @@ static inline bool invalid_var(float data) {
 	if ( invalid(data) ) {
 		return true;
 	}
-	if ( fabsf(data) < 1e-15f ) {
+	if ( data < 1e-15f ) { // var should not be close to zero. And not negative either.
 		return true;
 	}
 	return false;

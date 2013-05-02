@@ -2192,7 +2192,6 @@ static enum pios_rfm22b_event rfm22_receiveAck(struct pios_rfm22b_dev *rfm22b_de
         portTickType local_tx_time = rfm22_coordinatorTime(rfm22b_dev, rfm22b_dev->tx_complete_ticks);
         portTickType remote_rx_time = aph->packet_recv_time;
         // Adjust the time delta based on the difference between our estimated time offset and the coordinator offset.
-        // This is not working yet
         rfm22b_dev->time_delta += remote_rx_time - local_tx_time;
     }
 

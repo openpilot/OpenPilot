@@ -51,7 +51,7 @@
 #include <i2cstats.h>
 #include <taskinfo.h>
 #include <watchdogstatus.h>
-#include <taskmonitor.h>
+#include <taskinfo.h>
 #include <hwsettings.h>
 
 // Flight Libraries
@@ -98,6 +98,9 @@ static HwSettingsData bootHwSettings;
 // Private functions
 static void objectUpdatedCb(UAVObjEvent * ev);
 static void hwSettingsUpdatedCb(UAVObjEvent * ev);
+#ifdef DIAG_TASKS
+static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_info *task_info, void *context);
+#endif
 static void updateStats();
 static void updateSystemAlarms();
 static void systemTask(void *parameters);
@@ -117,7 +120,7 @@ int32_t SystemModStart(void)
 	// Create system task
 	xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &systemTaskHandle);
 	// Register task
-	TaskMonitorAdd(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
 
 	return 0;
 }
@@ -185,6 +188,10 @@ static void systemTask(void *parameters)
 	// Whenever the configuration changes, make sure it is safe to fly
 	HwSettingsConnectCallback(hwSettingsUpdatedCb);
 
+#ifdef DIAG_TASKS
+	TaskInfoData taskInfoData;
+#endif
+
 	// Main system loop
 	while (1) {
 		// Update the system statistics
@@ -199,7 +206,8 @@ static void systemTask(void *parameters)
 
 #ifdef DIAG_TASKS
 		// Update the task status object
-		TaskMonitorUpdateAll();
+		PIOS_TASK_MONITOR_ForEachTask(taskMonitorForEachCallback, &taskInfoData);
+		TaskInfoSet(&taskInfoData);
 #endif
 
 		// Flash the heartbeat LED
@@ -347,6 +355,19 @@ static void hwSettingsUpdatedCb(UAVObjEvent * ev)
         ExtendedAlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_ERROR, SYSTEMALARMS_EXTENDEDALARMSTATUS_REBOOTREQUIRED, 0);
     }
 }
+
+#ifdef DIAG_TASKS
+static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_info *task_info, void *context)
+{
+	TaskInfoData *taskData = (TaskInfoData *)context;
+	// By convention, there is a direct mapping between task monitor task_id's and members
+	// of the TaskInfoXXXXElem enums
+	PIOS_DEBUG_Assert(task_id < TASKINFO_RUNNING_NUMELEM);
+	taskData->Running[task_id] = task_info->is_running? TASKINFO_RUNNING_TRUE: TASKINFO_RUNNING_FALSE;
+	taskData->StackRemaining[task_id] = task_info->stack_remaining;
+	taskData->RunningTime[task_id] = task_info->running_time_percentage;
+}
+#endif
 
 /**
  * Called periodically to update the I2C statistics 

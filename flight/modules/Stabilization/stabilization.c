@@ -31,7 +31,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "openpilot.h"
+#include <openpilot.h>
+
 #include "stabilization.h"
 #include "stabilizationsettings.h"
 #include "actuatordesired.h"
@@ -43,6 +44,7 @@
 #include "gyros.h"
 #include "flightstatus.h"
 #include "manualcontrol.h" // Just to get a macro
+#include "taskinfo.h"
 
 // Math libraries
 #include "CoordinateConversions.h"
@@ -107,7 +109,7 @@ int32_t StabilizationStart()
 	
 	// Start main task
 	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_STABILIZATION, taskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_STABILIZATION, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_STABILIZATION);
 	return 0;
 }

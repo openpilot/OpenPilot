@@ -186,7 +186,6 @@ SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/paths.c
 SRC += $(FLIGHTLIB)/insgps13state.c
-SRC += $(FLIGHTLIB)/taskmonitor.c
 
 ## RTOS and RTOS Portable 
 SRC += $(RTOSSRCDIR)/list.c

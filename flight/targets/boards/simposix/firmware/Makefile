@@ -56,6 +56,7 @@ MATHLIB = $(FLIGHTLIB)/math
 MATHLIBINC = $(FLIGHTLIB)/math
 PIOSPOSIX = $(PIOS)/posix
 PIOSCOMMON = $(PIOS)/posix
+PIOSCORECOMMON = $(PIOS)/common
 PIOSCOMMONLIB = $(PIOS)/common/libraries
 BOOT = 
 BOOTINC = 
@@ -85,12 +86,13 @@ SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/fifo_buffer.c
 SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/insgps13state.c
-SRC += $(FLIGHTLIB)/taskmonitor.c
 SRC += $(FLIGHTLIB)/paths.c
 SRC += $(FLIGHTLIB)/sanitycheck.c
 
 SRC += $(MATHLIB)/sin_lookup.c
 SRC += $(MATHLIB)/pid.c
+
+SRC += $(PIOSCORECOMMON)/pios_task_monitor.c
 
 ## PIOS Hardware
 include $(PIOS)/posix/library.mk

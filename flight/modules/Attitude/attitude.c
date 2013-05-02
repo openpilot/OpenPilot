@@ -48,7 +48,10 @@
  *
  */
 
-#include "pios.h"
+#include <openpilot.h>
+
+#include <pios_board_info.h>
+
 #include "attitude.h"
 #include "gyros.h"
 #include "accels.h"
@@ -56,11 +59,11 @@
 #include "attitudesettings.h"
 #include "flightstatus.h"
 #include "manualcontrolcommand.h"
-#include "CoordinateConversions.h"
-#include <pios_board_info.h>
-#include <pios_math.h>
+#include "taskinfo.h"
 
- 
+#include "CoordinateConversions.h"
+
+
 // Private constants
 #define STACK_SIZE_BYTES 540
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
@@ -119,7 +122,7 @@ int32_t AttitudeStart(void)
 	
 	// Start main task
 	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, taskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ATTITUDE, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
 	
 	return 0;

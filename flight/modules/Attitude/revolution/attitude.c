@@ -48,10 +48,9 @@
  *
  */
 
-#include "pios.h"
+#include <openpilot.h>
 
 #include "attitude.h"
-
 #include "accels.h"
 #include "airspeedsensor.h"
 #include "airspeedactual.h"
@@ -69,8 +68,10 @@
 #include "revocalibration.h"
 #include "revosettings.h"
 #include "velocityactual.h"
+#include "taskinfo.h"
+
 #include "CoordinateConversions.h"
-#include <pios_math.h>
+
 // Private constants
 #define STACK_SIZE_BYTES 2048
 #define TASK_PRIORITY (tskIDLE_PRIORITY+3)
@@ -184,7 +185,7 @@ int32_t AttitudeStart(void)
 
 	// Start main task
 	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &attitudeTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_ATTITUDE, attitudeTaskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ATTITUDE, attitudeTaskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
 	
 	GyrosConnectQueue(gyroQueue);

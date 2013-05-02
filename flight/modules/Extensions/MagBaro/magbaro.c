@@ -36,11 +36,13 @@
  *
  */
 
-#include "openpilot.h"
+#include <openpilot.h>
+
 #include "hwsettings.h"
 #include "magbaro.h"
 #include "baroaltitude.h"	// object that will be updated by the module
 #include "magnetometer.h"
+#include "taskinfo.h"
 
 // Private constants
 #define STACK_SIZE_BYTES 620
@@ -75,7 +77,7 @@ int32_t MagBaroStart()
 	if (magbaroEnabled) {
 		// Start main task
 		xTaskCreate(magbaroTask, (signed char *)"MagBaro", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-		//TaskMonitorAdd(TASKINFO_RUNNING_MAGBARO, taskHandle);
+		//PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_MAGBARO, taskHandle);
 		return 0;
 	}
 	return -1;

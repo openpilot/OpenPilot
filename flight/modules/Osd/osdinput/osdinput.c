@@ -30,9 +30,13 @@
 
 // ****************
 
-#include "openpilot.h"
+#include <openpilot.h>
+
 #include "osdinput.h"
+
 #include "attitudeactual.h"
+#include "taskinfo.h"
+
 #include "fifo_buffer.h"
 
 
@@ -85,7 +89,7 @@ int32_t OpOsdStart(void)
 {
 	// Start gps task
 	xTaskCreate(OpOsdTask, (signed char *)"OSD", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &OpOsdTaskHandle);
-	//TaskMonitorAdd(TASKINFO_RUNNING_GPS, OpOsdTaskHandle);
+	//PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_GPS, OpOsdTaskHandle);
 
 	return 0;
 }

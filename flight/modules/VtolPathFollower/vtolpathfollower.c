@@ -46,11 +46,10 @@
  *
  */
 
-#include "openpilot.h"
-#include <pios_math.h>
-#include "paths.h"
+#include <openpilot.h>
 
 #include "vtolpathfollower.h"
+
 #include "accels.h"
 #include "attitudeactual.h"
 #include "hwsettings.h"
@@ -69,6 +68,9 @@
 #include "systemsettings.h"
 #include "velocitydesired.h"
 #include "velocityactual.h"
+#include "taskinfo.h"
+
+#include "paths.h"
 #include "CoordinateConversions.h"
 
 // Private constants
@@ -103,7 +105,7 @@ int32_t VtolPathFollowerStart()
 	if (vtolpathfollower_enabled) {
 		// Start main task
 		xTaskCreate(vtolPathFollowerTask, (signed char *)"VtolPathFollower", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
-		TaskMonitorAdd(TASKINFO_RUNNING_PATHFOLLOWER, pathfollowerTaskHandle);
+		PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_PATHFOLLOWER, pathfollowerTaskHandle);
 	}
 
 	return 0;

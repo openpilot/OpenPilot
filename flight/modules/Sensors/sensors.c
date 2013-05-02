@@ -58,9 +58,10 @@
 #include <attitudesettings.h>
 #include <revocalibration.h>
 #include <flightstatus.h>
+#include <taskinfo.h>
+
 #include <CoordinateConversions.h>
 
-#include <pios_math.h>
 #include <pios_board_info.h>
 
 // Private constants
@@ -130,7 +131,7 @@ int32_t SensorsStart(void)
 {
 	// Start main task
 	xTaskCreate(SensorsTask, (signed char *)"Sensors", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &sensorsTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_SENSORS, sensorsTaskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SENSORS, sensorsTaskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_SENSORS);
 
 	return 0;

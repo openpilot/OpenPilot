@@ -48,7 +48,7 @@
  *
  */
 
-#include "openpilot.h"
+#include <openpilot.h>
 
 #include "flightstatus.h"
 #include "hwsettings.h"
@@ -58,7 +58,7 @@
 #include "relaytuningsettings.h"
 #include "stabilizationdesired.h"
 #include "stabilizationsettings.h"
-#include <pios_board_info.h>
+#include "taskinfo.h"
  
 // Private constants
 #define STACK_SIZE_BYTES 1024
@@ -109,7 +109,7 @@ int32_t AutotuneStart(void)
 	if(autotuneEnabled) {
 		xTaskCreate(AutotuneTask, (signed char *)"Autotune", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 
-		TaskMonitorAdd(TASKINFO_RUNNING_AUTOTUNE, taskHandle);
+		PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_AUTOTUNE, taskHandle);
 		PIOS_WDG_RegisterFlag(PIOS_WDG_AUTOTUNE);
 	}
 	return 0;

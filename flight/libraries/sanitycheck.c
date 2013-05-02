@@ -30,12 +30,12 @@
 #include <pios_board_info.h>
 
 // Private includes
-#include "inc/taskmonitor.h"
 #include "inc/sanitycheck.h"
 
 // UAVOs
 #include <manualcontrolsettings.h>
 #include <systemsettings.h>
+#include <taskinfo.h>
 
 /****************************
  * Current checks:
@@ -103,28 +103,28 @@ int32_t configuration_check()
                 severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(3, multirotor) : severity;
                 break;
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
-                if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_AUTOTUNE)) {
+                if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE)) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
                 break;
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEHOLD:
                 if (coptercontrol) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
-                } else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_ALTITUDEHOLD)) { // Revo supports altitude hold
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_ALTITUDEHOLD)) { // Revo supports altitude hold
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
                 break;
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL:
                 if (coptercontrol) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
-                } else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER)) { // Revo supports altitude hold
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) { // Revo supports altitude hold
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
                 break;
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
                 if (coptercontrol){
                     severity = SYSTEMALARMS_ALARM_ERROR;
-                } else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER)) { // Revo supports altitude hold
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) { // Revo supports altitude hold
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
                 break;

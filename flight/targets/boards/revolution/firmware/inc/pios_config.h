@@ -50,6 +50,7 @@
 #define PIOS_INCLUDE_DELAY
 #define PIOS_INCLUDE_INITCALL
 #define PIOS_INCLUDE_SYS
+#define PIOS_INCLUDE_TASK_MONITOR
 
 /* PIOS hardware peripherals */
 #define PIOS_INCLUDE_IRQ

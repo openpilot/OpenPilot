@@ -29,12 +29,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "openpilot.h"
-#include "pm.h"
+#include <openpilot.h>
+
 #include "flightplan.h"
 #include "flightplanstatus.h"
 #include "flightplancontrol.h"
 #include "flightplansettings.h"
+#include "taskinfo.h"
+
+#include "pm.h"
 
 // Private constants
 #define STACK_SIZE_BYTES 1500
@@ -63,7 +66,7 @@ int32_t FlightPlanStart()
 
 	// Start VM thread
 	xTaskCreate(flightPlanTask, (signed char *)"FlightPlan", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_FLIGHTPLAN, taskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_FLIGHTPLAN, taskHandle);
 
 	return 0;
 }
@@ -258,7 +261,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 			if ( taskHandle == NULL )
 			{
 				xTaskCreate(flightPlanTask, (signed char *)"FlightPlan", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-				TaskMonitorAdd(TASKINFO_RUNNING_FLIGHTPLAN, taskHandle);
+				PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_FLIGHTPLAN, taskHandle);
 			}
 		}
 		else if ( controlData.Command == FLIGHTPLANCONTROL_COMMAND_KILL )
@@ -268,7 +271,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 			if ( taskHandle != NULL )
 			{
 				// Kill VM
-				TaskMonitorRemove(TASKINFO_RUNNING_FLIGHTPLAN);
+				PIOS_TASK_MONITOR_UnregisterTask(TASKINFO_RUNNING_FLIGHTPLAN);
 				vTaskDelete(taskHandle);
 				taskHandle = NULL;
 				// Update status object

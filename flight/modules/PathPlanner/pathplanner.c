@@ -30,8 +30,6 @@
  */
 
 #include "openpilot.h"
-#include <pios_math.h>
-#include "paths.h"
 
 #include "flightstatus.h"
 #include "airspeedactual.h"
@@ -42,6 +40,9 @@
 #include "velocityactual.h"
 #include "waypoint.h"
 #include "waypointactive.h"
+#include "taskinfo.h"
+
+#include "paths.h"
 
 // Private constants
 #define STACK_SIZE_BYTES 1024
@@ -86,7 +87,7 @@ int32_t PathPlannerStart()
 
 	// Start VM thread
 	xTaskCreate(pathPlannerTask, (signed char *)"PathPlanner", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_PATHPLANNER, taskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_PATHPLANNER, taskHandle);
 
 	return 0;
 }

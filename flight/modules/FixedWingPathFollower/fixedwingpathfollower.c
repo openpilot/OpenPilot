@@ -43,8 +43,7 @@
  *
  */
 
-#include "openpilot.h"
-#include "paths.h"
+#include <openpilot.h>
 
 #include "accels.h"
 #include "hwsettings.h"
@@ -65,9 +64,11 @@
 #include "systemsettings.h"
 #include "velocitydesired.h"
 #include "velocityactual.h"
+#include "taskinfo.h"
+
+#include "paths.h"
 #include "CoordinateConversions.h"
-#include <pios_math.h>
-#include <pios_constants.h>
+
 // Private constants
 #define MAX_QUEUE_SIZE 4
 #define STACK_SIZE_BYTES 1548
@@ -98,7 +99,7 @@ int32_t FixedWingPathFollowerStart()
 	if (followerEnabled) {
 		// Start main task
 		xTaskCreate(pathfollowerTask, (signed char *)"PathFollower", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &pathfollowerTaskHandle);
-		TaskMonitorAdd(TASKINFO_RUNNING_PATHFOLLOWER, pathfollowerTaskHandle);
+		PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_PATHFOLLOWER, pathfollowerTaskHandle);
 	}
 
 	return 0;

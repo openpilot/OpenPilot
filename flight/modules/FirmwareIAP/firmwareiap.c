@@ -24,11 +24,11 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include <stdint.h>
 
-#include "pios.h"
+#include <openpilot.h>
+
 #include <pios_board_info.h>
-#include "openpilot.h"
+
 #include "firmwareiap.h"
 #include "firmwareiapobj.h"
 #include "flightstatus.h"

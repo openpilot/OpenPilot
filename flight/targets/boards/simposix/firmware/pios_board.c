@@ -32,6 +32,7 @@
 #include <uavobjectsinit.h>
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
+#include <taskinfo.h>
 
 /*
  * Pull in the board-specific static HW definitions.
@@ -126,8 +127,10 @@ void PIOS_Board_Init(void) {
 	/* Initialize the alarms library */
 	AlarmsInitialize();
 
-	/* Initialize the task monitor library */
-	TaskMonitorInitialize();
+	/* Initialize the task monitor */
+	if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
+		PIOS_Assert(0);
+	}
 
 	/* Configure IO ports */
 	

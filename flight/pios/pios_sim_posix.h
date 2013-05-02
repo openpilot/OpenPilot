@@ -40,6 +40,13 @@
 #include "semphr.h"
 #endif
 
+#ifdef PIOS_INCLUDE_TASK_MONITOR
+#ifndef PIOS_INCLUDE_FREERTOS
+#error PiOS Task Monitor requires PIOS_INCLUDE_FREERTOS to be defined
+#endif
+#include <pios_task_monitor.h>
+#endif
+
 /* C Lib Includes */
 #include <stdio.h>
 #include <stdlib.h>

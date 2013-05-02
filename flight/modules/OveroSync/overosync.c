@@ -30,11 +30,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "openpilot.h"
-#include "hwsettings.h"
+#include <openpilot.h>
+
 #include "overosync.h"
+
+#include "hwsettings.h"
 #include "overosyncstats.h"
 #include "systemstats.h"
+#include "taskinfo.h"
 
 // Private constants
 #define MAX_QUEUE_SIZE   200
@@ -128,7 +131,7 @@ int32_t OveroSyncStart(void)
 	// Start overosync tasks
 	xTaskCreate(overoSyncTask, (signed char *)"OveroSync", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &overoSyncTaskHandle);
 	
-	TaskMonitorAdd(TASKINFO_RUNNING_OVEROSYNC, overoSyncTaskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_OVEROSYNC, overoSyncTaskHandle);
 	
 	return 0;
 }

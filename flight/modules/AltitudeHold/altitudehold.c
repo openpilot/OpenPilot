@@ -43,19 +43,19 @@
  *
  */
 
-#include "openpilot.h"
+#include <openpilot.h>
 #include <math.h>
-#include "CoordinateConversions.h"
-#include "altholdsmoothed.h"
-#include "attitudeactual.h"
-#include "altitudeholdsettings.h"
-#include "altitudeholddesired.h"	// object that will be updated by the module
-#include "baroaltitude.h"
-#include "positionactual.h"
-#include "flightstatus.h"
-#include "stabilizationdesired.h"
-#include "accels.h"
-
+#include <CoordinateConversions.h>
+#include <altholdsmoothed.h>
+#include <attitudeactual.h>
+#include <altitudeholdsettings.h>
+#include <altitudeholddesired.h>	// object that will be updated by the module
+#include <baroaltitude.h>
+#include <positionactual.h>
+#include <flightstatus.h>
+#include <stabilizationdesired.h>
+#include <accels.h>
+#include <pios_constants.h>
 // Private constants
 #define MAX_QUEUE_SIZE 2
 #define STACK_SIZE_BYTES 1024
@@ -111,7 +111,6 @@ float decay;
 float velocity_decay;
 bool running = false;
 float error;
-float switchThrottle;
 float smoothed_altitude;
 float starting_altitude;
 
@@ -161,7 +160,6 @@ static void altitudeHoldTask(void *parameters)
 			if(flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD && !running) {
 				// Copy the current throttle as a starting point for integral
 				StabilizationDesiredThrottleGet(&throttleIntegral);
-				switchThrottle = throttleIntegral;
 				error = 0;
 				velocity = 0;
 				running = true;
@@ -336,7 +334,8 @@ static void altitudeHoldTask(void *parameters)
 			// Verify that we are  in altitude hold mode
 			FlightStatusData flightStatus;
 			FlightStatusGet(&flightStatus);
-			if(flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) {
+			if(flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ||
+			   flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED) {
 				running = false;
 			}
 
@@ -362,8 +361,7 @@ static void altitudeHoldTask(void *parameters)
 			if(stabilizationDesired.Throttle > 1) {
 				throttleIntegral -= (stabilizationDesired.Throttle - 1);
 				stabilizationDesired.Throttle = 1;
-			}
-			else if (stabilizationDesired.Throttle < 0) {
+			} else if (stabilizationDesired.Throttle < 0) {
 				throttleIntegral -= stabilizationDesired.Throttle;
 				stabilizationDesired.Throttle = 0;
 			}

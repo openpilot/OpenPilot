@@ -174,18 +174,18 @@ int32_t AttitudeInitialize(void)
 	// Initialize quaternion
 	AttitudeActualData attitude;
 	AttitudeActualGet(&attitude);
-	attitude.q1 = 1;
-	attitude.q2 = 0;
-	attitude.q3 = 0;
-	attitude.q4 = 0;
+	attitude.q1 = 1.0f;
+	attitude.q2 = 0.0f;
+	attitude.q3 = 0.0f;
+	attitude.q4 = 0.0f;
 	AttitudeActualSet(&attitude);
 	
 	// Cannot trust the values to init right above if BL runs
 	GyrosBiasData gyrosBias;
 	GyrosBiasGet(&gyrosBias);
-	gyrosBias.x = 0;
-	gyrosBias.y = 0;
-	gyrosBias.z = 0;
+	gyrosBias.x = 0.0f;
+	gyrosBias.y = 0.0f;
+	gyrosBias.z = 0.0f;
 	GyrosBiasSet(&gyrosBias);
 	
 	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
@@ -320,9 +320,9 @@ static int32_t updateAttitudeComplementary(bool first_run)
 		MagnetometerGet(&magData);
 #else
 		MagnetometerData magData;
-		magData.x = 100;
-		magData.y = 0;
-		magData.z = 0;
+		magData.x = 100.0f;
+		magData.y = 0.0f;
+		magData.z = 0.0f;
 #endif
 		AttitudeActualData attitudeActual;
 		AttitudeActualGet(&attitudeActual);
@@ -362,15 +362,15 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
 	if((init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
 		// For first 7 seconds use accels to get gyro bias
-		attitudeSettings.AccelKp = 1;
-		attitudeSettings.AccelKi = 0.9;
-		attitudeSettings.YawBiasRate = 0.23;
-		magKp = 1;
+		attitudeSettings.AccelKp = 1.0f;
+		attitudeSettings.AccelKi = 0.9f;
+		attitudeSettings.YawBiasRate = 0.23f;
+		magKp = 1.0f;
 	} else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
-		attitudeSettings.AccelKp = 1;
-		attitudeSettings.AccelKi = 0.9;
-		attitudeSettings.YawBiasRate = 0.23;
-		magKp = 1;
+		attitudeSettings.AccelKp = 1.0f;
+		attitudeSettings.AccelKi = 0.9f;
+		attitudeSettings.YawBiasRate = 0.23f;
+		magKp = 1.0f;
 		init = 0;
 	} else if (init == 0) {
 		// Reload settings (all the rates)
@@ -397,8 +397,8 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	quat_copy(&attitudeActual.q1, q);
 
 	// Rotate gravity to body frame and cross with accels
-	grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
-	grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
+	grot[0] = -(2.0f * (q[1] * q[3] - q[0] * q[2]));
+	grot[1] = -(2.0f * (q[2] * q[3] + q[0] * q[1]));
 	grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
 	CrossProduct((const float *) &accelsData.x, (const float *) grot, accel_err);
 
@@ -434,13 +434,13 @@ static int32_t updateAttitudeComplementary(bool first_run)
 			brot[2] /= bmag;
 
 			// Only compute if neither vector is null
-			if (bmag < 1 || mag_len < 1)
-				mag_err[0] = mag_err[1] = mag_err[2] = 0;
+			if (bmag < 1.0f || mag_len < 1.0f)
+				mag_err[0] = mag_err[1] = mag_err[2] = 0.0f;
 			else
 				CrossProduct((const float *) &mag.x, (const float *) brot, mag_err);
 		}
 	} else {
-		mag_err[0] = mag_err[1] = mag_err[2] = 0;
+		mag_err[0] = mag_err[1] = mag_err[2] = 0.0f;
 	}
 
 	// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
@@ -477,7 +477,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	q[2] = q[2] + qdot[2];
 	q[3] = q[3] + qdot[3];
 
-	if(q[0] < 0) {
+	if(q[0] < 0.0f) {
 		q[0] = -q[0];
 		q[1] = -q[1];
 		q[2] = -q[2];
@@ -494,10 +494,10 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	// If quaternion has become inappropriately short or is nan reinit.
 	// THIS SHOULD NEVER ACTUALLY HAPPEN
 	if((fabs(qmag) < 1.0e-3f) || (qmag != qmag)) {
-		q[0] = 1;
-		q[1] = 0;
-		q[2] = 0;
-		q[3] = 0;
+		q[0] = 1.0f;
+		q[1] = 0.0f;
+		q[2] = 0.0f;
+		q[3] = 0.0f;
 	}
 
 	quat_copy(q, &attitudeActual.q1);
@@ -598,7 +598,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 	static bool value_error = false;
 
-	static float baroOffset = 0;
+	static float baroOffset = 0.0f;
 
 	static uint32_t ins_last_time = 0;
 	static bool inited;
@@ -676,9 +676,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	if ( invalid(gyrosBias.x) ||
 	     invalid(gyrosBias.y) ||
 	     invalid(gyrosBias.z) ) {
-		gyrosBias.x = 0;
-		gyrosBias.y = 0;
-		gyrosBias.z = 0;
+		gyrosBias.x = 0.0f;
+		gyrosBias.y = 0.0f;
+		gyrosBias.z = 0.0f;
 	}
 
 	if ( invalid(magData.x) ||
@@ -692,7 +692,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 	// Don't require HomeLocation.Set to be true but at least require a mag configuration (allows easily
 	// switching between indoor and outdoor mode with Set = false)
-	if ( homeLocation.Be[0]==0 && homeLocation.Be[1]==0 && homeLocation.Be[2]==0 ) {
+	if ( fabsf(homeLocation.Be[0])<0.1f && fabsf(homeLocation.Be[1])<0.1f && fabsf(homeLocation.Be[2])<0.1f ) {
 		mag_updated = false;
 		value_error = true;
 	}
@@ -775,7 +775,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			INSSetBaroVar(revoCalibration.baro_var);
 
 			// Initialize the gyro bias
-			float gyro_bias[3] = {0,0,0};
+			float gyro_bias[3] = {0.0f, 0.0f, 0.0f};
 			INSSetGyroBias(gyro_bias);
 
 			float pos[3] = {0.0f, 0.0f, 0.0f};
@@ -911,7 +911,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			sensors |= HORIZ_SENSORS;
 			vel[0] = gpsData.Groundspeed * cosf(DEG2RAD(gpsData.Heading));
 			vel[1] = gpsData.Groundspeed * sinf(DEG2RAD(gpsData.Heading));
-			vel[2] = 0;
+			vel[2] = 0.0f;
 		}
 		// Transform the GPS position into NED coordinates
 		getNED(&gpsData, NED);
@@ -923,8 +923,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 	} else if (!outdoor_mode) {
 		INSSetPosVelVar(1e6f, 1e5f);
-		vel[0] = vel[1] = vel[2] = 0;
-		NED[0] = NED[1] = 0;
+		vel[0] = vel[1] = vel[2] = 0.0f;
+		NED[0] = NED[1] = 0.0f;
 		NED[2] = -(baroData.Altitude + baroOffset);
 		sensors |= HORIZ_SENSORS | HORIZ_POS_SENSORS;
 		sensors |= POS_SENSORS |VERT_SENSORS;
@@ -953,7 +953,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			// rotate airspeed vector into NED frame - airspeed is measured in X axis only
 			float R[3][3];
 			Quaternion2R(Nav.q,R);
-			float vtas[3] = {airspeed.TrueAirspeed,0,0};
+			float vtas[3] = {airspeed.TrueAirspeed,0.0f,0.0f};
 			rot_mult(R,vtas,vel);
 		}
 	}

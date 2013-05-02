@@ -93,10 +93,10 @@ public:
         QString fieldname;
         QString element;
         QString url;
-        double scale;
-        bool haslimits;
         buttonTypeEnum buttonType;
         QList<int> buttonGroup;
+        double scale;
+        bool haslimits;
     };
 
     ConfigTaskWidget(QWidget *parent = 0);

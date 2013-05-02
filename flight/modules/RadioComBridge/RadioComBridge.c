@@ -72,8 +72,8 @@ typedef struct {
     // The task handles.
     xTaskHandle telemetryTxTaskHandle;
     xTaskHandle telemetryRxTaskHandle;
-    xTaskHandle radioRxTaskHandle;
     xTaskHandle radioTxTaskHandle;
+    xTaskHandle radioRxTaskHandle;
 
     // The UAVTalk connection on the com side.
     UAVTalkConnection outUAVTalkCon;
@@ -105,8 +105,8 @@ typedef struct {
 
 static void telemetryTxTask(void *parameters);
 static void telemetryRxTask(void *parameters);
-static void radioRxTask(void *parameters);
 static void radioTxTask(void *parameters);
+static void radioRxTask(void *parameters);
 static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length);
 static int32_t RadioSendHandler(uint8_t *buf, int32_t length);
 static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyte);
@@ -190,22 +190,16 @@ static int32_t RadioComBridgeStart(void)
         // Start the primary tasks for receiving/sending UAVTalk packets from the GCS.
         xTaskCreate(telemetryTxTask, (signed char *)"telemetryTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
         xTaskCreate(telemetryRxTask, (signed char *)"telemetryRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryRxTaskHandle));
+        xTaskCreate(radioTxTask, (signed char *)"radioTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioTxTaskHandle));
         xTaskCreate(radioRxTask, (signed char *)"radioRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioRxTaskHandle));
 
         // Register the watchdog timers.
 #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_RegisterFlag(PIOS_WDG_TELEMETRYTX);
         PIOS_WDG_RegisterFlag(PIOS_WDG_TELEMETRYRX);
+        PIOS_WDG_RegisterFlag(PIOS_WDG_RADIOTX);
         PIOS_WDG_RegisterFlag(PIOS_WDG_RADIORX);
 #endif
-
-        // If we're doing raw comms, we need to have another thread that relays data from the com port to the radio.
-        if (!data->parseUAVTalk) {
-            xTaskCreate(radioTxTask, (signed char *)"radioTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioTxTaskHandle));
-#ifdef PIOS_INCLUDE_WDG
-            PIOS_WDG_RegisterFlag(PIOS_WDG_RADIOTX);
-#endif
-        }
         return 0;
     }
 
@@ -309,6 +303,34 @@ static void telemetryTxTask(void *parameters)
 }
 
 /**
+ * Radio tx task.  Receive data packets from the com port and send to the radio.
+ *
+ * @param[in] parameters  The task parameters
+ */
+static void radioTxTask(void *parameters)
+{
+    // Task loop
+    while (1) {
+#ifdef PIOS_INCLUDE_WDG
+        PIOS_WDG_UpdateFlag(PIOS_WDG_RADIOTX);
+#endif
+
+        // Wait until the com port is available.
+        if (data->parseUAVTalk || !PIOS_COM_TELEMETRY) {
+            vTaskDelay(5);
+            continue;
+        }
+
+        // Read from the com port.
+        uint8_t serial_data[1];
+        uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEMETRY, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
+        if (bytes_to_process > 0) {
+            PIOS_COM_SendBufferNonBlocking(PIOS_COM_RADIO, serial_data, bytes_to_process);
+        }
+    }
+}
+
+/**
  * Radio rx task.  Receive data packets from the radio and pass them on.
  *
  * @param[in] parameters  The task parameters
@@ -333,34 +355,6 @@ static void radioRxTask(void *parameters)
             } else if (PIOS_COM_TELEMETRY) {
                 PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, serial_data, bytes_to_process);
             }
-        }
-    }
-}
-
-/**
- * Radio tx task.  Receive data packets from the com port and send to the radio.
- *
- * @param[in] parameters  The task parameters
- */
-static void radioTxTask(void *parameters)
-{
-    // Task loop
-    while (1) {
-#ifdef PIOS_INCLUDE_WDG
-        PIOS_WDG_UpdateFlag(PIOS_WDG_RADIOTX);
-#endif
-
-        // Wait until the com port is available.
-        if (!PIOS_COM_TELEMETRY) {
-            vTaskDelay(5);
-            continue;
-        }
-
-        // Read from the com port.
-        uint8_t serial_data[1];
-        uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_TELEMETRY, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
-        if (bytes_to_process > 0) {
-            PIOS_COM_SendBufferNonBlocking(PIOS_COM_RADIO, serial_data, bytes_to_process);
         }
     }
 }
@@ -623,6 +617,11 @@ static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, 
 
 	// Set the frequency range.
 	PIOS_RFM22B_SetFrequencyRange(pios_rfm22b_id, min_frequency, max_frequency, channel_spacing);
+
+        // We will not parse/send UAVTalk if any ports are configured as Serial (except for over the USB HID port).
+        data->parseUAVTalk = ((oplinkSettings.MainPort != OPLINKSETTINGS_MAINPORT_SERIAL) &&
+                              (oplinkSettings.FlexiPort != OPLINKSETTINGS_FLEXIPORT_SERIAL) &&
+                              (oplinkSettings.VCPPort != OPLINKSETTINGS_VCPPORT_SERIAL));
 
         // Update the OPLinkSettings object.
         OPLinkSettingsSet(&oplinkSettings);

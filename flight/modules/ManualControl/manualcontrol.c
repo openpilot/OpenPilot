@@ -916,7 +916,18 @@ static bool okToArm(void)
         }
     }
 
-    return true;
+	uint8_t flightMode;
+	FlightStatusFlightModeGet(&flightMode);
+	switch(flightMode) {
+	    case FLIGHTSTATUS_FLIGHTMODE_MANUAL:
+	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
+	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
+	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
+	        return true;
+	    default:
+	        return false;
+
+	}
 }
 /**
  * @brief Determine if the aircraft is forced to disarm by an explicit alarm

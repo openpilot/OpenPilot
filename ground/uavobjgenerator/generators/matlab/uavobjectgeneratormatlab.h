@@ -27,6 +27,8 @@
 #ifndef UAVOBJECTGENERATORMATLAB_H
 #define UAVOBJECTGENERATORMATLAB_H
 
+#define MATLAB_CODE_DIR "ground/openpilotgcs/src/plugins/uavobjects"
+
 #include "../generator_common.h"
 
 class UAVObjectGeneratorMatlab

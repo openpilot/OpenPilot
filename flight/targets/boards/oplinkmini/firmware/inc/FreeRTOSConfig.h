@@ -76,7 +76,7 @@ NVIC value of 255. */
 #endif
 
 /* Enable run time stats collection */
-#if defined(DIAG_STACK)
+#ifdef DIAG_TASKS
 #define configCHECK_FOR_STACK_OVERFLOW	2
 
 #define configGENERATE_RUN_TIME_STATS 1
@@ -90,9 +90,6 @@ do {\
 #else
 #define configCHECK_FOR_STACK_OVERFLOW	1
 #endif
-
-void *pvPortMallocGeneric( size_t xWantedSize, size_t alignment);
-#define pvPortMallocAligned( x, puxStackBuffer ) ( ( ( puxStackBuffer ) == NULL ) ? ( pvPortMallocGeneric( ( x ) , portBYTE_ALIGNMENT) ) : ( puxStackBuffer ) )
 
 /**
   * @}

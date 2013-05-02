@@ -125,7 +125,8 @@ all: uavobjects all_ground all_flight
 
 .PHONY: all_clean
 all_clean:
-	[ ! -d "$(BUILD_DIR)" ] || $(RM) -rf "$(BUILD_DIR)"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR))"
+	$(V1) [ ! -d "$(BUILD_DIR)" ] || $(RM) -rf "$(BUILD_DIR)"
 
 $(DL_DIR):
 	$(MKDIR) -p $@
@@ -176,7 +177,7 @@ uavobjects_test: $(UAVOBJ_OUT_DIR) uavobjgenerator
 	$(V1) $(UAVOBJGENERATOR) -v -none $(UAVOBJ_XML_DIR) $(ROOT_DIR)
 
 uavobjects_clean:
-	$(V0) @$(ECHO) " CLEAN      $@"
+	@$(ECHO) " CLEAN      $(call toprel, $(UAVOBJ_OUT_DIR))"
 	$(V1) [ ! -d "$(UAVOBJ_OUT_DIR)" ] || $(RM) -r "$(UAVOBJ_OUT_DIR)"
 
 ##############################
@@ -271,7 +272,7 @@ fw_$(1)_%: uavobjects_flight
 .PHONY: $(1)_clean
 $(1)_clean: fw_$(1)_clean
 fw_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $$@"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/fw_$(1))"
 	$(V1) $(RM) -fr $(BUILD_DIR)/fw_$(1)
 endef
 
@@ -311,7 +312,7 @@ $(if $(filter-out undefined,$(origin UNBRICK_TTY)),
 
 .PHONY: bl_$(1)_clean
 bl_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $$@"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/bl_$(1))"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bl_$(1)
 endef
 
@@ -335,7 +336,7 @@ bu_$(1)_%: bl_$(1)_bino
 
 .PHONY: bu_$(1)_clean
 bu_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $$@"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/bu_$(1))"
 	$(V1) $(RM) -fr $(BUILD_DIR)/bu_$(1)
 endef
 
@@ -360,7 +361,7 @@ ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 
 .PHONY: ef_$(1)_clean
 ef_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $$@"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/ef_$(1))"
 	$(V1) $(RM) -fr $(BUILD_DIR)/ef_$(1)
 endef
 
@@ -461,7 +462,7 @@ openpilotgcs: uavobjects_gcs
 
 .PHONY: openpilotgcs_clean
 openpilotgcs_clean:
-	$(V0) @$(ECHO) " CLEAN      $@"
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF))"
 	$(V1) [ ! -d "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)" ] || $(RM) -r "$(BUILD_DIR)/openpilotgcs_$(GCS_BUILD_CONF)"
 
 ################################
@@ -504,7 +505,7 @@ androidgcs: uavo-collections_java
 
 .PHONY: androidgcs_clean
 androidgcs_clean:
-	$(V0) @$(ECHO) " CLEAN      $@"
+	@$(ECHO) " CLEAN      $(call toprel, $(ANDROIDGCS_OUT_DIR))"
 	$(V1) [ ! -d "$(ANDROIDGCS_OUT_DIR)" ] || $(RM) -r "$(ANDROIDGCS_OUT_DIR)"
 
 # We want to take snapshots of the UAVOs at each point that they change
@@ -615,7 +616,7 @@ uavo-collections: uavo-collections_java
 
 .PHONY: uavo-collections_clean
 uavo-collections_clean:
-	$(V0) @$(ECHO) " CLEAN  $(UAVO_COLLECTION_DIR)"
+	@$(ECHO) " CLEAN      $(call toprel, $(UAVO_COLLECTION_DIR))"
 	$(V1) [ ! -d "$(UAVO_COLLECTION_DIR)" ] || $(RM) -r $(UAVO_COLLECTION_DIR)
 
 ##############################
@@ -642,7 +643,7 @@ all_ut_run: $(addsuffix _run, $(addprefix ut_, $(ALL_UNITTESTS)))
 
 .PHONY: all_ut_clean
 all_ut_clean:
-	$(V0) @$(ECHO) " CLEAN      $@"
+	@$(ECHO) " CLEAN      $(call toprel, $(UT_OUT_DIR))"
 	$(V1) [ ! -d "$(UT_OUT_DIR)" ] || $(RM) -r "$(UT_OUT_DIR)"
 
 # $(1) = Unit test name
@@ -673,7 +674,7 @@ ut_$(1)_%: $$(UT_OUT_DIR)
 
 .PHONY: ut_$(1)_clean
 ut_$(1)_clean:
-	$(V0) @$(ECHO) " CLEAN      $(1)"
+	@$(ECHO) " CLEAN      $(call toprel, $(UT_OUT_DIR)/$(1))"
 	$(V1) [ ! -d "$(UT_OUT_DIR)/$(1)" ] || $(RM) -r "$(UT_OUT_DIR)/$(1)"
 endef
 
@@ -784,6 +785,8 @@ package: all_fw all_ground uavobjects_matlab
 #
 ##############################
 
+UNCRUSTIFY_TARGETS := flight ground
+
 # $(1) = Uncrustify target (e.g flight or ground)
 # $(2) = Target root directory
 define UNCRUSTIFY_TEMPLATE
@@ -794,11 +797,47 @@ uncrustify_$(1):
 	$(V1) UNCRUSTIFY_CONFIG="$(ROOT_DIR)/make/uncrustify/uncrustify.cfg" $(SHELL) make/scripts/uncrustify.sh $(call toprel, $(2))
 endef
 
-$(eval $(call UNCRUSTIFY_TEMPLATE,flight,$(ROOT_DIR)/flight))
-$(eval $(call UNCRUSTIFY_TEMPLATE,ground,$(ROOT_DIR)/ground))
+$(foreach uncrustify_targ, $(UNCRUSTIFY_TARGETS), $(eval $(call UNCRUSTIFY_TEMPLATE,$(uncrustify_targ),$(ROOT_DIR)/$(uncrustify_targ))))
 
 .PHONY: uncrustify_all
-uncrustify_all: $(addprefix uncrustify_,flight ground)
+uncrustify_all: $(addprefix uncrustify_,$(UNCRUSTIFY_TARGETS))
+
+##############################
+#
+# Doxygen documentation
+#
+# Each target should have own Doxyfile.$(target) with build directory build/docs/$(target),
+# proper source directory (e.g. $(target)) and appropriate other doxygen options.
+#
+##############################
+
+DOCS_TARGETS := flight ground uavobjects
+
+# $(1) = Doxygen target (e.g flight or ground)
+define DOXYGEN_TEMPLATE
+
+.PHONY: docs_$(1)
+docs_$(1): docs_$(1)_clean
+	@$(ECHO) "Generating $(1) documentation"
+	$(V1) $(MKDIR) -p $(BUILD_DIR)/docs/$(1)
+	$(V1) $(DOXYGEN) $(ROOT_DIR)/make/doxygen/Doxyfile.$(1)
+
+.PHONY: docs_$(1)_clean
+docs_$(1)_clean:
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/docs/$(1))"
+	$(V1) [ ! -d "$(BUILD_DIR)/docs/$(1)" ] || $(RM) -r "$(BUILD_DIR)/docs/$(1)"
+
+endef
+
+$(foreach docs_targ, $(DOCS_TARGETS), $(eval $(call DOXYGEN_TEMPLATE,$(docs_targ))))
+
+.PHONY: docs_all
+docs_all: $(addprefix docs_,$(DOCS_TARGETS))
+
+.PHONY: docs_all_clean
+docs_all_clean:
+	@$(ECHO) " CLEAN      $(call toprel, $(BUILD_DIR)/docs)"
+	$(V1) [ ! -d "$(BUILD_DIR)/docs" ] || $(RM) -rf "$(BUILD_DIR)/docs"
 
 ##############################
 #
@@ -808,23 +847,12 @@ uncrustify_all: $(addprefix uncrustify_,flight ground)
 
 .PHONY: build-info
 build-info:
+	@$(ECHO) " BUILD-INFO $(call toprel, $(BUILD_DIR)/$@.txt)"
 	$(V1) $(MKDIR) -p $(BUILD_DIR)
 	$(V1) $(VERSION_INFO) \
 		--uavodir=$(ROOT_DIR)/shared/uavobjectdefinition \
 		--template="make/templates/$@.txt" \
 		--outfile="$(BUILD_DIR)/$@.txt"
-
-##############################
-#
-# Doxygen documentation
-# FIXME: currently is not not used and should be updated
-#
-##############################
-
-# Generate Doxygen documentation
-.PHONY: docs
-docs:
-	$(DOXYGEN) $(ROOT_DIR)/make/doxygen/doxygen.cfg
 
 ##############################
 #
@@ -838,7 +866,8 @@ docs:
 help:
 	@$(ECHO)
 	@$(ECHO) "   This Makefile is known to work on Linux and Mac in a standard shell environment."
-	@$(ECHO) "   It also works on Windows by following the instructions in make/winx86/README.txt."
+	@$(ECHO) "   It also works on Windows by following the instructions given on this wiki page:"
+	@$(ECHO) "       http://wiki.openpilot.org/display/Doc/Windows%3A+Building+and+Packaging"
 	@$(ECHO)
 	@$(ECHO) "   Here is a summary of the available targets:"
 	@$(ECHO)
@@ -847,11 +876,15 @@ help:
 	@$(ECHO) "     qt_sdk_install       - Install the QT development tools"
 	@$(ECHO) "     mingw_install        - Install the MinGW toolchain (Windows only)"
 	@$(ECHO) "     python_install       - Install the Python interpreter (Windows only)"
+	@$(ECHO) "     nsis_install         - Install the NSIS Unicode (Windows only)"
 	@$(ECHO) "     uncrustify_install   - Install the Uncrustify source code beautifier"
+	@$(ECHO) "     doxygen_install      - Install the Doxygen documentation generator"
+	@$(ECHO) "   These targets are not updated yet and are probably broken:"
 	@$(ECHO) "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@$(ECHO) "     stm32flash_install   - Install the stm32flash tool for unbricking F1-based boards"
 	@$(ECHO) "     dfuutil_install      - Install the dfu-util tool for unbricking F4-based boards"
 	@$(ECHO) "     android_sdk_install  - Install the Android SDK tools"
+	@$(ECHO) "   Install all available tools:"
 	@$(ECHO) "     all_sdk_install      - Install all of above (platform-dependent)"
 	@$(ECHO)
 	@$(ECHO) "   Other tool options are:"

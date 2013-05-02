@@ -55,6 +55,7 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
+    SRC += $(OPUAVOBJ)/callbackscheduler.c
 
     ## OSD fonts
     SRC += $(OPSYSTEM)/fonts.c

@@ -187,6 +187,9 @@ PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_internal_cfg, &pios_internal_flash_driv
 
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();
+	
+	/* Initialize the delayed callback library */
+	CallbackSchedulerInitialize();
 
 	/* IAP System Setup */
 	PIOS_IAP_Init();

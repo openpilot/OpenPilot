@@ -7,7 +7,7 @@
 *.sh		text eol=lf
 
 /doxygen/*.cfg				text eol=lf
-/templates/firmwareinfotemplate.c 	text eol=lf
-/templates/gcs_version_info_template.h	text eol=crlf
+/templates/firmware_info.c.template 	text eol=lf
+/templates/gcs_version_info.h.template	text eol=crlf
 /templates/*.txt			text eol=crlf
 /uncrustify/*.cfg			text eol=lf

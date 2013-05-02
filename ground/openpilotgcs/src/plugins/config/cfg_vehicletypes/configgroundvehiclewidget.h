@@ -27,12 +27,14 @@
 #ifndef CONFIGGROUNDVEHICLEWIDGET_H
 #define CONFIGGROUNDVEHICLEWIDGET_H
 
-#include "ui_airframe.h"
+#include "cfg_vehicletypes/vehicleconfig.h"
+#include "ui_airframe_ground.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavtalk/telemetrymanager.h"
+
 #include <QtGui/QWidget>
 #include <QList>
 #include <QItemDelegate>
@@ -44,31 +46,28 @@ class ConfigGroundVehicleWidget: public VehicleConfig
     Q_OBJECT
 
 public:
-    ConfigGroundVehicleWidget(Ui_AircraftWidget *aircraft = 0, QWidget *parent = 0);
+    static QStringList getChannelDescriptions();
+
+    ConfigGroundVehicleWidget(QWidget *parent = 0);
     ~ConfigGroundVehicleWidget();
 
-    friend class ConfigVehicleTypeWidget;
+    virtual void refreshWidgetsValues(QString frameType);
+    virtual QString updateConfigObjectsFromWidgets();
 
 private:
-    Ui_AircraftWidget *m_aircraft;
+    Ui_GroundConfigWidget *m_aircraft;
+
+    virtual void registerWidgets(ConfigTaskWidget &parent);
+    virtual void resetActuators(GUIConfigDataUnion *configData);
 
     bool setupGroundVehicleCar(QString airframeType);
     bool setupGroundVehicleDifferential(QString airframeType);
     bool setupGroundVehicleMotorcycle(QString airframeType);
 
-    virtual void ResetActuators(GUIConfigDataUnion* configData);
-    static QStringList getChannelDescriptions();
-
 private slots:
     virtual void setupUI(QString airframeType);
-    virtual void refreshWidgetsValues(QString frameType);
-    virtual QString updateConfigObjectsFromWidgets();
     virtual bool throwConfigError(QString airframeType);
 
-
-protected:
-
 };
-
 
 #endif // CONFIGGROUNDVEHICLEWIDGET_H

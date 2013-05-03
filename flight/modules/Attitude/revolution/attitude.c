@@ -604,7 +604,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	mag_updated &= (!isnan(magData.x) && !isinf(magData.x) && !isnan(magData.y) && !isinf(magData.y) && !isnan(magData.z) && !isinf(magData.z));
 	// Don't require HomeLocation.Set to be true but at least require a mag configuration (allows easily
 	// switching between indoor and outdoor mode with Set = false)
-	mag_updated &= (homeLocation.Be[0] > 0.0f || homeLocation.Be[1] > 0.0f || homeLocation.Be[2] > 0.0f);
+	mag_updated &= (homeLocation.Be[0] * homeLocation.Be[0] + homeLocation.Be[1] * homeLocation.Be[1] + homeLocation.Be[2] * homeLocation.Be[2] > 1e-5f);
 
 	// Discard airspeed if sensor not connected
 	airspeed_updated &= ( airspeedData.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE );

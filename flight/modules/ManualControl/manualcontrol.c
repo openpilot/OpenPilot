@@ -763,7 +763,7 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
 	StabilizationSettingsGet(&stabSettings);
 
 	thisSysTime = xTaskGetTickCount();
-	dT = ((thisSysTime == lastSysTime)? 0.001f : (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f);
+	dT = ((thisSysTime == lastSysTime)? 0.001f : (thisSysTime - lastSysTime) * portTICK_RATE_MS * 0.001f);
 	lastSysTime = thisSysTime;
 
 	altitudeHoldDesired.Roll = cmd->Roll * stabSettings.RollMax;
@@ -834,9 +834,7 @@ static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutr
 }
 
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time) {
-	if(end_time > start_time)
-		return (end_time - start_time) * portTICK_RATE_MS;
-	return ((((portTICK_RATE_MS) -1) - start_time) + end_time) * portTICK_RATE_MS;
+	return (end_time - start_time) * portTICK_RATE_MS;
 }
 
 /**

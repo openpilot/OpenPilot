@@ -457,7 +457,7 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	portTickType thisSysTime = xTaskGetTickCount();
 	static portTickType lastSysTime = 0;
 	
-	dT = (thisSysTime == lastSysTime) ? 0.001f : (portMAX_DELAY & (thisSysTime - lastSysTime)) / portTICK_RATE_MS / 1000.0f;
+	dT = (thisSysTime == lastSysTime) ? 0.001f : (thisSysTime - lastSysTime) * portTICK_RATE_MS * 0.001f;
 	lastSysTime = thisSysTime;
 	
 	// Bad practice to assume structure order, but saves memory

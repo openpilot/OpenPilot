@@ -182,7 +182,11 @@ static int32_t connectObj(UAVObjHandle obj_handle, xQueueHandle queue,
 static int32_t disconnectObj(UAVObjHandle obj_handle, xQueueHandle queue,
 			UAVObjEventCallback cb);
 
-#if defined(PIOS_INCLUDE_SDCARD)
+#if defined(PIOS_USE_SETTINGS_ON_SDCARD) && defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
+#error Both PIOS_USE_SETTINGS_ON_SDCARD and PIOS_INCLUDE_FLASH_SECTOR_SETTINGS. Only one settings storage allowed.
+#endif
+
+#if defined(PIOS_USE_SETTINGS_ON_SDCARD)
 static void objectFilename(UAVObjHandle obj_handle, uint8_t * filename);
 static void customSPrintf(uint8_t * buffer, uint8_t * format, ...);
 #endif
@@ -697,7 +701,7 @@ unlock_exit:
 	return rc;
 }
 
-#if defined(PIOS_INCLUDE_SDCARD)
+#if defined(PIOS_USE_SETTINGS_ON_SDCARD)
 /**
  * Save the data of the specified object instance to the file system (SD card).
  * The object will be appended and the file will not be closed.
@@ -772,7 +776,7 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj_handle, uint16_t instId,
 	xSemaphoreGiveRecursive(mutex);
 	return 0;
 }
-#endif /* PIOS_INCLUDE_SDCARD */
+#endif /* PIOS_USE_SETTINGS_ON_SDCARD */
 
 /**
  * Save the data of the specified object to the file system (SD card).
@@ -808,7 +812,7 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
 			return -1;
 	}
 #endif
-#if defined(PIOS_INCLUDE_SDCARD)
+#if defined(PIOS_USE_SETTINGS_ON_SDCARD)
 	FILEINFO file;
 	uint8_t filename[14];
 
@@ -836,11 +840,11 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
 	// Done, close file and unlock
 	PIOS_FCLOSE(file);
 	xSemaphoreGiveRecursive(mutex);
-#endif /* PIOS_INCLUDE_SDCARD */
+#endif /* PIOS_USE_SETTINGS_ON_SDCARD */
 	return 0;
 }
 
-#if defined(PIOS_INCLUDE_SDCARD)
+#if defined(PIOS_USE_SETTINGS_ON_SDCARD)
 /**
  * Load an object from the file system (SD card).
  * @param[in] file File to read from
@@ -928,7 +932,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO * file)
 	xSemaphoreGiveRecursive(mutex);
 	return obj_handle;
 }
-#endif /* PIOS_INCLUDE_SDCARD */
+#endif /* PIOS_USE_SETTINGS_ON_SDCARD */
 
 /**
  * Load an object from the file system (SD card).
@@ -968,7 +972,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
 
 #endif
 
-#if defined(PIOS_INCLUDE_SDCARD)
+#if defined(PIOS_USE_SETTINGS_ON_SDCARD)
 	FILEINFO file;
 	UAVObjHandle loadedObj;
 	uint8_t filename[14];
@@ -1004,7 +1008,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
 	// Done, close file and unlock
 	PIOS_FCLOSE(file);
 	xSemaphoreGiveRecursive(mutex);
-#endif /* PIOS_INCLUDE_SDCARD */
+#endif /* PIOS_USE_SETTINGS_ON_SDCARD */
 	return 0;
 }
 
@@ -1020,7 +1024,7 @@ int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
 #if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
 	PIOS_FLASHFS_ObjDelete(0, UAVObjGetID(obj_handle), instId);
 #endif
-#if defined(PIOS_INCLUDE_SDCARD)
+#if defined(PIOS_USE_SETTINGS_ON_SDCARD)
 	uint8_t filename[14];
 
 	// Check for file system availability
@@ -1038,7 +1042,7 @@ int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
 
 	// Done
 	xSemaphoreGiveRecursive(mutex);
-#endif /* PIOS_INCLUDE_SDCARD */
+#endif /* PIOS_USE_SETTINGS_ON_SDCARD */
 	return 0;
 }
 
@@ -2012,7 +2016,7 @@ static int32_t disconnectObj(UAVObjHandle obj_handle, xQueueHandle queue,
 	return -1;
 }
 
-#if defined(PIOS_INCLUDE_SDCARD)
+#if defined(PIOS_USE_SETTINGS_ON_SDCARD)
 /**
  * Wrapper for the sprintf function
  */
@@ -2030,4 +2034,4 @@ static void objectFilename(UAVObjHandle obj_handle, uint8_t * filename)
 {
 	customSPrintf(filename, (uint8_t *) "%X.obj", UAVObjGetID(obj_handle));
 }
-#endif /* PIOS_INCLUDE_SDCARD */
+#endif /* PIOS_USE_SETTINGS_ON_SDCARD */

@@ -809,7 +809,7 @@
          <item>
           <widget class="QGroupBox" name="baroAltitudeCheckbox">
            <property name="enabled">
-            <bool>false</bool>
+            <bool>true</bool>
            </property>
            <property name="title">
             <string>BaroAltitude</string>

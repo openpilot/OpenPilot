@@ -1,17 +1,14 @@
 /**
  ******************************************************************************
- * @addtogroup OpenPilotModules OpenPilot Modules
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup StabilizationModule Stabilization Module
- * @brief Relay tuning controller
- * @note This object updates the @ref ActuatorDesired "Actuator Desired" based on the
- * PID loops on the @ref AttitudeDesired "Attitude Desired" and @ref AttitudeActual "Attitude Actual"
+ * @addtogroup   PIOS_SERVO Servo Functions
+ * @brief PIOS interface to read and write from servo PWM ports
  * @{
  *
- * @file       relay_tuning.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      Attitude stabilization module.
- *
+ * @file       pios_servo_priv.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @brief      Servo private structures.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -31,9 +28,28 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef RELAY_TUNING_H
-#define RELAY_TUNING_H
+#ifndef PIOS_HCSR04_PRIV_H
+#define PIOS_HCSR04_PRIV_H
 
-int stabilization_relay_rate(float err, float *output, int axis, bool reinit);
+#include <pios.h>
+#include <pios_stm32.h>
 
-#endif
+#include <pios_tim_priv.h>
+
+struct pios_hcsr04_cfg {
+	TIM_ICInitTypeDef tim_ic_init;
+	const struct pios_tim_channel * channels;
+	uint8_t num_channels;
+	struct stm32_gpio trigger;
+};
+
+extern const struct pios_rcvr_driver pios_pwm_rcvr_driver;
+
+extern int32_t PIOS_HCSR04_Init(uint32_t * pwm_id, const struct pios_hcsr04_cfg * cfg);
+
+#endif /* PIOS_HCSR04_PRIV_H */
+
+/**
+ * @}
+ * @}
+ */

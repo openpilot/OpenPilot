@@ -43,6 +43,7 @@ OPTMODULES += CameraStab
 OPTMODULES += ComUsbBridge
 OPTMODULES += GPS
 OPTMODULES += TxPID
+OPTMODULES += Osd/osdoutput
 #OPTMODULES += Altitude
 #OPTMODULES += Fault
 

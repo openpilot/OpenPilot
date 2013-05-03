@@ -87,7 +87,7 @@ void UdpSender::sendDatagram(const simToPlugin *stp)
     // attitude
     out << stp->heading     << stp->pitch       << stp->roll;
     // electric
-    out << stp->voltage     << stp->current;
+    out << stp->voltage     << stp->current     << stp->consumedCharge;
     // matrix
     out << stp->axisXx << stp->axisXy << stp->axisXz;
     out << stp->axisYx << stp->axisYy << stp->axisYz;

@@ -89,6 +89,8 @@ UAVOBJSRCFILENAMES += altitudeholdsettings
 UAVOBJSRCFILENAMES += altitudeholddesired
 UAVOBJSRCFILENAMES += waypoint
 UAVOBJSRCFILENAMES += waypointactive
+UAVOBJSRCFILENAMES += poilocation
+UAVOBJSRCFILENAMES += poilearnsettings
 UAVOBJSRCFILENAMES += mpu6000settings
 UAVOBJSRCFILENAMES += txpidsettings
 

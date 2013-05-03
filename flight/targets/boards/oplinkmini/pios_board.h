@@ -71,10 +71,11 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 //------------------------
 #define PIOS_WATCHDOG_TIMEOUT    500
 #define PIOS_WDG_REGISTER        BKP_DR4
-#define PIOS_WDG_TELEMETRY       0x0001
-#define PIOS_WDG_RADIORX         0x0002
+#define PIOS_WDG_TELEMETRYTX     0x0001
+#define PIOS_WDG_TELEMETRYRX     0x0002
 #define PIOS_WDG_RADIOTX         0x0004
-#define PIOS_WDG_RFM22B          0x0008
+#define PIOS_WDG_RADIORX         0x0008
+#define PIOS_WDG_RFM22B          0x0016
 
 //------------------------
 // TELEMETRY

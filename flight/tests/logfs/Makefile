@@ -1,6 +1,7 @@
 ###############################################################################
 # @file       Makefile
 # @author     PhoenixPilot, http://github.com/PhoenixPilot, Copyright (C) 2012
+#             Copyright (c) 2013, The OpenPilot Team, http://www.openpilot.org
 # @addtogroup 
 # @{
 # @addtogroup 
@@ -23,21 +24,17 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
-WHEREAMI := $(dir $(lastword $(MAKEFILE_LIST)))
-TOP      := $(realpath $(WHEREAMI)/../../../)
-include $(TOP)/make/firmware-defs.mk
+ifndef OPENPILOT_IS_COOL
+    $(error Top level Makefile must be used to build this target)
+endif
 
+include $(ROOT_DIR)/make/firmware-defs.mk
+
+EXTRAINCDIRS += $(TOPDIR)
 EXTRAINCDIRS += $(PIOS)/inc
 
-CFLAGS += -O0
-CFLAGS += -Wall -Werror
-CFLAGS += -g
-CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
+SRC += $(PIOS)/common/pios_flashfs_logfs.c
 
 CFLAGS += "-DFLASH_IMAGE_FILE=\"$(OUTDIR)/theflash.bin\""
 
-CONLYFLAGS += -std=gnu99
-
-SRC := $(PIOS)/common/pios_flashfs_logfs.c
-
-include $(TOP)/make/unittest.mk
+include $(ROOT_DIR)/make/unittest.mk

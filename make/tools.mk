@@ -544,6 +544,8 @@ doxygen_version:
 
 $(eval $(call TOOL_INSTALL_TEMPLATE,gtest,$(GTEST_DIR),$(GTEST_URL),$(notdir $(GTEST_URL))))
 
+export GTEST_DIR
+
 .PHONY: gtest_version
 gtest_version:
 	-$(V1) $(SED) -n "s/^PACKAGE_STRING='\(.*\)'/\1/p" < $(GTEST_DIR)/configure

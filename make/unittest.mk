@@ -1,6 +1,7 @@
 ###############################################################################
 # @file       unittest.mk
 # @author     PhoenixPilot, http://github.com/PhoenixPilot, Copyright (C) 2012
+#             Copyright (c) 2013, The OpenPilot Team, http://www.openpilot.org
 # @addtogroup 
 # @{
 # @addtogroup 
@@ -23,39 +24,41 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 
-# Flags passed to the preprocessor.
-CPPFLAGS += -I$(GTEST_DIR)/include
-
-# Flags passed to the C++ compiler.
-CXXFLAGS += -g -Wall -Wextra
-
-# Google Test needs the pthread library
-LDFLAGS += -lpthread
-
-#################################
-#
-# Template to build the user test
-#
-#################################
-
-# Need to disable THUMB mode for unit tests
+# Use native toolchain and disable THUMB mode for unit tests
+override ARM_SDK_PREFIX :=
 override THUMB :=
 
-EXTRAINCDIRS    += .
-ALLSRC          := $(SRC) $(wildcard ./*.c)
-ALLCPPSRC       := $(wildcard ./*.cpp) $(GTEST_DIR)/src/gtest_main.cc
-ALLSRCBASE      := $(notdir $(basename $(ALLSRC) $(ALLCPPSRC)))
-ALLOBJ          := $(addprefix $(OUTDIR)/, $(addsuffix .o, $(ALLSRCBASE)))
+# Unit test source files
+ALLSRC     := $(SRC) $(wildcard ./*.c)
+ALLCPPSRC  := $(wildcard ./*.cpp) $(GTEST_DIR)/src/gtest_main.cc
+ALLSRCBASE := $(notdir $(basename $(ALLSRC) $(ALLCPPSRC)))
+ALLOBJ     := $(addprefix $(OUTDIR)/, $(addsuffix .o, $(ALLSRCBASE)))
 
 $(foreach src,$(ALLSRC),$(eval $(call COMPILE_C_TEMPLATE,$(src))))
 $(foreach src,$(ALLCPPSRC),$(eval $(call COMPILE_CXX_TEMPLATE,$(src))))
 
-
 # Specific extensions to CPPFLAGS only for the google test library
-$(OUTDIR)/gtest-all.o : CPPFLAGS += -I$(GTEST_DIR)
-$(eval $(call COMPILE_CXX_TEMPLATE, $(GTEST_DIR)/src/gtest-all.cc))
+$(OUTDIR)/gtest-all.o: CPPFLAGS += -I$(GTEST_DIR)
 
+$(eval $(call COMPILE_CXX_TEMPLATE, $(GTEST_DIR)/src/gtest-all.cc))
 $(eval $(call LINK_CXX_TEMPLATE,$(OUTDIR)/$(TARGET).elf,$(ALLOBJ) $(OUTDIR)/gtest-all.o))
+
+# Flags passed to the preprocessor
+CPPFLAGS += -I$(GTEST_DIR)/include
+
+# Flags passed to the C++ compiler
+CXXFLAGS += -g -Wall -Wextra
+
+# Flags passed to the C compiler
+CONLYFLAGS += -std=gnu99
+
+# Common compiler flags
+CFLAGS += -O0 -g
+CFLAGS += -Wall -Werror
+CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS))
+
+# Google Test needs the pthread library
+LDFLAGS += -lpthread
 
 .PHONY: elf
 elf: $(OUTDIR)/$(TARGET).elf

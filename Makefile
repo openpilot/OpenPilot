@@ -261,9 +261,9 @@ fw_$(1)_%: uavobjects_flight
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/fw_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/targets/boards/$(1)/firmware && \
 		$$(MAKE) -r --no-print-directory \
+		BUILD_TYPE=fw \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(2) \
-		BUILD_TYPE=fw \
 		TOPDIR=$(ROOT_DIR)/flight/targets/boards/$(1)/firmware \
 		OUTDIR=$(BUILD_DIR)/fw_$(1) \
 		TARGET=fw_$(1) \
@@ -288,9 +288,9 @@ bl_$(1)_%:
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/bl_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/targets/boards/$(1)/bootloader && \
 		$$(MAKE) -r --no-print-directory \
+		BUILD_TYPE=bl \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(2) \
-		BUILD_TYPE=bl \
 		TOPDIR=$(ROOT_DIR)/flight/targets/boards/$(1)/bootloader \
 		OUTDIR=$(BUILD_DIR)/bl_$(1) \
 		TARGET=bl_$(1) \
@@ -326,9 +326,9 @@ bu_$(1)_%: bl_$(1)_bino
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/bu_$(1)/dep
 	$(V1) cd $(ROOT_DIR)/flight/targets/common/bootloader_updater && \
 		$$(MAKE) -r --no-print-directory \
+		BUILD_TYPE=bu \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(2) \
-		BUILD_TYPE=bu \
 		TOPDIR=$(ROOT_DIR)/flight/targets/common/bootloader_updater \
 		OUTDIR=$(BUILD_DIR)/bu_$(1) \
 		TARGET=bu_$(1) \
@@ -350,9 +350,9 @@ ef_$(1)_%: bl_$(1)_bin fw_$(1)_opfw
 	$(V1) $(MKDIR) -p $(BUILD_DIR)/ef_$(1)
 	$(V1) cd $(ROOT_DIR)/flight/targets/common/entire_flash && \
 		$$(MAKE) -r --no-print-directory \
+		BUILD_TYPE=ef \
 		BOARD_NAME=$(1) \
 		BOARD_SHORT_NAME=$(2) \
-		BUILD_TYPE=ef \
 		DFU_CMD="$(DFUUTIL_DIR)/bin/dfu-util" \
 		TOPDIR=$(ROOT_DIR)/flight/targets/common/entire_flash \
 		OUTDIR=$(BUILD_DIR)/ef_$(1) \
@@ -656,20 +656,9 @@ ut_$(1)_%: $$(UT_OUT_DIR)
 	$(V1) cd $(ROOT_DIR)/flight/tests/$(1) && \
 		$$(MAKE) -r --no-print-directory \
 		BUILD_TYPE=ut \
-		BOARD_SHORT_NAME=$(1) \
-		TCHAIN_PREFIX="" \
-		REMOVE_CMD="$(RM)" \
-		\
-		TARGET=$(1) \
+		TOPDIR=$(ROOT_DIR)/flight/tests/$(1) \
 		OUTDIR="$(UT_OUT_DIR)/$(1)" \
-		\
-		PIOS=$(PIOS) \
-		OPUAVOBJ=$(OPUAVOBJ) \
-		OPUAVTALK=$(OPUAVTALK) \
-		FLIGHTLIB=$(FLIGHTLIB) \
-		\
-		GTEST_DIR=$(GTEST_DIR) \
-		\
+		TARGET=$(1) \
 		$$*
 
 .PHONY: ut_$(1)_clean

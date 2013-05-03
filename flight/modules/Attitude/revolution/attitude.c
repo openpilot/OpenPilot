@@ -1031,7 +1031,7 @@ static void settingsUpdatedCb(UAVObjEvent * ev)
 	// change of these settings require reinitialization of the EKF
 	// when an error flag has been risen, we also listen to flightStatus updates,
 	// since we are waiting for the system to get disarmed so we can reinitialize safely.
-	if (ev == NULL || ev->obj == RevoCalibrationHandle() ||
+	if (ev == NULL ||
 			ev->obj == EKFConfigurationHandle() ||
 			ev->obj == RevoSettingsHandle() ||
 			( variance_error==true && ev->obj == FlightStatusHandle() )

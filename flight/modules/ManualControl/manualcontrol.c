@@ -791,7 +791,7 @@ static void updateLandDesired(ManualControlCommandData *cmd, bool changed)
  */
 static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
 {
-    const float DEADBAND      = .20f;
+    const float DEADBAND      = .10f;
     const float DEADBAND_HIGH = 1.0f / 2 + DEADBAND / 2;
     const float DEADBAND_LOW  = 1.0f / 2 - DEADBAND / 2;
 

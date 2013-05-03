@@ -879,6 +879,7 @@ help:
 	@$(ECHO) "     nsis_install         - Install the NSIS Unicode (Windows only)"
 	@$(ECHO) "     uncrustify_install   - Install the Uncrustify source code beautifier"
 	@$(ECHO) "     doxygen_install      - Install the Doxygen documentation generator"
+	@$(ECHO) "     gtest_install        - Install the GoogleTest framework"
 	@$(ECHO) "   These targets are not updated yet and are probably broken:"
 	@$(ECHO) "     openocd_install      - Install the OpenOCD JTAG daemon"
 	@$(ECHO) "     stm32flash_install   - Install the stm32flash tool for unbricking F1-based boards"
@@ -886,6 +887,7 @@ help:
 	@$(ECHO) "     android_sdk_install  - Install the Android SDK tools"
 	@$(ECHO) "   Install all available tools:"
 	@$(ECHO) "     all_sdk_install      - Install all of above (platform-dependent)"
+	@$(ECHO) "     build_sdk_install    - Install only essential for build tools (platform-dependent)"
 	@$(ECHO)
 	@$(ECHO) "   Other tool options are:"
 	@$(ECHO) "     <tool>_version       - Display <tool> version"

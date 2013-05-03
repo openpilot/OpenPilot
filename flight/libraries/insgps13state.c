@@ -191,14 +191,14 @@ void INSPosVelReset(float pos[3], float vel[3])
 	X[5] = vel[2];	
 }
 
-void INSSetPosVelVar(float PosVar, float VelVar)
+void INSSetPosVelVar(float PosVar[3], float VelVar[3])
 {
-	R[0] = PosVar;
-	R[1] = PosVar;
-	R[2] = PosVar;
-	R[3] = VelVar;
-	R[4] = VelVar;
-	R[5] = VelVar;
+	R[0] = PosVar[0];
+	R[1] = PosVar[1];
+	R[2] = PosVar[2];
+	R[3] = VelVar[0];
+	R[4] = VelVar[1];
+	R[5] = VelVar[2];
 }
 
 void INSSetGyroBias(float gyro_bias[3])

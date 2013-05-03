@@ -66,7 +66,7 @@
 #include "homelocation.h"
 #include "magnetometer.h"
 #include "positionactual.h"
-#include "ekfinitialvariance.h"
+#include "ekfconfiguration.h"
 #include "ekfstatevariance.h"
 #include "revocalibration.h"
 #include "revosettings.h"
@@ -104,7 +104,7 @@ static xQueueHandle gpsVelQueue;
 static AttitudeSettingsData attitudeSettings;
 static HomeLocationData homeLocation;
 static RevoCalibrationData revoCalibration;
-static EKFInitialVarianceData ekfInitialVariance;
+static EKFConfigurationData ekfConfiguration;
 static RevoSettingsData revoSettings;
 static FlightStatusData flightStatus;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
@@ -164,7 +164,7 @@ int32_t AttitudeInitialize(void)
 	VelocityActualInitialize();
 	RevoSettingsInitialize();
 	RevoCalibrationInitialize();
-	EKFInitialVarianceInitialize();
+	EKFConfigurationInitialize();
 	EKFStateVarianceInitialize();
 	FlightStatusInitialize();
 	
@@ -192,7 +192,7 @@ int32_t AttitudeInitialize(void)
 	RevoSettingsConnectCallback(&settingsUpdatedCb);
 	RevoCalibrationConnectCallback(&settingsUpdatedCb);
 	HomeLocationConnectCallback(&settingsUpdatedCb);
-	EKFInitialVarianceConnectCallback(&settingsUpdatedCb);
+	EKFConfigurationConnectCallback(&settingsUpdatedCb);
 	FlightStatusConnectCallback(&settingsUpdatedCb);
 
 	return 0;
@@ -712,8 +712,12 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		value_error = true;
 	}
 
-	if ( invalid_var(revoCalibration.gps_var[REVOCALIBRATION_GPS_VAR_POS]) ||
-	     invalid_var(revoCalibration.gps_var[REVOCALIBRATION_GPS_VAR_VEL]) ) {
+	if ( invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSNORTH]) ||
+	     invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSEAST]) ||
+	     invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSDOWN]) ||
+	     invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELNORTH]) ||
+	     invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELEAST]) ||
+	     invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELDOWN]) ) {
 		gps_updated = false;
 		value_error = true;
 	}
@@ -768,11 +772,11 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 			// Reset the INS algorithm
 			INSGPSInit();
-			INSSetMagVar(revoCalibration.mag_var);
-			INSSetAccelVar(revoCalibration.accel_var);
-			INSSetGyroVar(revoCalibration.gyro_var);
-			INSSetGyroBiasVar(revoCalibration.gyro_bias_var);
-			INSSetBaroVar(revoCalibration.baro_var);
+			INSSetMagVar(&ekfConfiguration.R[EKFCONFIGURATION_R_MAGX]);
+			INSSetAccelVar(&ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELX]);
+			INSSetGyroVar(&ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROX]);
+			INSSetGyroBiasVar(&ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTX]);
+			INSSetBaroVar(ekfConfiguration.R[EKFCONFIGURATION_R_BAROZ]);
 
 			// Initialize the gyro bias
 			float gyro_bias[3] = {0.0f, 0.0f, 0.0f};
@@ -834,7 +838,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 			float q[4] = { attitudeActual.q1, attitudeActual.q2, attitudeActual.q3, attitudeActual.q4 };
 			INSSetState(pos, zeros, q, zeros, zeros);
 			
-			INSResetP(ekfInitialVariance.P);
+			INSResetP(ekfConfiguration.P);
 
 		} else {
 			// Run prediction a bit before any corrections
@@ -904,7 +908,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	
 	if (gps_updated && outdoor_mode)
 	{
-		INSSetPosVelVar(revoCalibration.gps_var[REVOCALIBRATION_GPS_VAR_POS], revoCalibration.gps_var[REVOCALIBRATION_GPS_VAR_VEL]);
+		INSSetPosVelVar(&ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSNORTH], &ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELNORTH]);
 		sensors |= POS_SENSORS;
 
 		if (0) { // Old code to take horizontal velocity from GPS Position update
@@ -922,7 +926,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		    * ( -NED[2] - baroData.Altitude );
 
 	} else if (!outdoor_mode) {
-		INSSetPosVelVar(1e6f, 1e5f);
+		INSSetPosVelVar((float[3]){1e6f,1e6f,1e6f}, (float[3]){1e5f,1e5f,1e5f});
 		vel[0] = vel[1] = vel[2] = 0.0f;
 		NED[0] = NED[1] = 0.0f;
 		NED[2] = -(baroData.Altitude + baroOffset);
@@ -949,7 +953,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		if ( !gps_vel_updated && !gps_updated) {
 			// feed airspeed into EKF, treat wind as 1e2 variance
 			sensors |= HORIZ_SENSORS | VERT_SENSORS;
-			INSSetPosVelVar(1e6f, 1e2f);
+			INSSetPosVelVar((float[3]){1e6f,1e6f,1e6f}, (float[3]){1e2f,1e2f,1e2f});
 			// rotate airspeed vector into NED frame - airspeed is measured in X axis only
 			float R[3][3];
 			Quaternion2R(Nav.q,R);
@@ -1021,38 +1025,34 @@ static void settingsUpdatedCb(UAVObjEvent * ev)
 	if (ev == NULL || ev->obj == FlightStatusHandle()) {
 		FlightStatusGet(&flightStatus);
 	}
+	if (ev == NULL || ev->obj == RevoCalibrationHandle()) {
+		RevoCalibrationGet(&revoCalibration);
+	}
 	// change of these settings require reinitialization of the EKF
 	// when an error flag has been risen, we also listen to flightStatus updates,
 	// since we are waiting for the system to get disarmed so we can reinitialize safely.
 	if (ev == NULL || ev->obj == RevoCalibrationHandle() ||
-			ev->obj == EKFInitialVarianceHandle() ||
+			ev->obj == EKFConfigurationHandle() ||
 			ev->obj == RevoSettingsHandle() ||
 			( variance_error==true && ev->obj == FlightStatusHandle() )
 			) {
 
 		bool error = false;
-		RevoCalibrationGet(&revoCalibration);
 
-		if ( invalid_var( revoCalibration.mag_var[0] ) ||
-		     invalid_var( revoCalibration.mag_var[1] ) ||
-		     invalid_var( revoCalibration.mag_var[2] ) ||
-		     invalid_var( revoCalibration.accel_var[0] ) ||
-		     invalid_var( revoCalibration.accel_var[1] ) ||
-		     invalid_var( revoCalibration.accel_var[2] ) ||
-		     invalid_var( revoCalibration.gyro_var[0] ) ||
-		     invalid_var( revoCalibration.gyro_var[1] ) ||
-		     invalid_var( revoCalibration.gyro_var[2] ) ||
-		     invalid_var( revoCalibration.gyro_bias_var[0] ) ||
-		     invalid_var( revoCalibration.gyro_bias_var[1] ) ||
-		     invalid_var( revoCalibration.gyro_bias_var[2] ) ||
-		     invalid_var( revoCalibration.baro_var ) ) {
-			error = true;
-		}
-		
-		EKFInitialVarianceGet(&ekfInitialVariance);
+		EKFConfigurationGet(&ekfConfiguration);
 		int t;
-		for (t=0; t < EKFINITIALVARIANCE_P_NUMELEM; t++) {
-			if (invalid_var(ekfInitialVariance.P[t])) {
+		for (t=0; t < EKFCONFIGURATION_P_NUMELEM; t++) {
+			if (invalid_var(ekfConfiguration.P[t])) {
+				error = true;
+			}
+		}
+		for (t=0; t < EKFCONFIGURATION_Q_NUMELEM; t++) {
+			if (invalid_var(ekfConfiguration.Q[t])) {
+				error = true;
+			}
+		}
+		for (t=0; t < EKFCONFIGURATION_R_NUMELEM; t++) {
+			if (invalid_var(ekfConfiguration.R[t])) {
 				error = true;
 			}
 		}

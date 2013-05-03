@@ -1,0 +1,64 @@
+<xml>
+    <object name="EKFConfiguration" singleinstance="true" settings="true">
+        <description>Extended Kalman Filter initialisation</description>
+	<field name="P" units="1^2" type="float" defaultvalue="
+		25.0, 25.0, 25.0,
+		5.0, 5.0, 5.0,
+		0.007, 0.007, 0.007, 0.007,
+		0.0001, 0.0001, 0.0001">
+		<elementnames>
+			<elementname>PositionNorth</elementname>
+			<elementname>PositionEast</elementname>
+			<elementname>PositionDown</elementname>
+			<elementname>VelocityNorth</elementname>
+			<elementname>VelocityEast</elementname>
+			<elementname>VelocityDown</elementname>
+			<elementname>AttitudeQ1</elementname>
+			<elementname>AttitudeQ2</elementname>
+			<elementname>AttitudeQ3</elementname>
+			<elementname>AttitudeQ4</elementname>
+			<elementname>GyroDriftX</elementname>
+			<elementname>GyroDriftY</elementname>
+			<elementname>GyroDriftZ</elementname>
+		</elementnames>
+	</field>
+	<field name="Q" units="1^2" type="float" defaultvalue="
+		0.1, 0.1, 0.1,
+		10.0, 10.0, 10.0,
+		0.00000002, 0.00000002, 0.00000002">
+		<elementnames>
+			<elementname>GyroX</elementname>
+			<elementname>GyroY</elementname>
+			<elementname>GyroZ</elementname>
+			<elementname>AccelX</elementname>
+			<elementname>AccelY</elementname>
+			<elementname>AccelZ</elementname>
+			<elementname>GyroDriftX</elementname>
+			<elementname>GyroDriftY</elementname>
+			<elementname>GyroDriftZ</elementname>
+		</elementnames>
+	</field>
+	<field name="R" units="1^2" type="float" defaultvalue="
+		1.0, 1.0, 1.0,
+		0.1, 0.1, 0.1,
+		1.0, 1.0, 1.0,
+		0.1">
+		<elementnames>
+			<elementname>GPSPosNorth</elementname>
+			<elementname>GPSPosEast</elementname>
+			<elementname>GPSPosDown</elementname>
+			<elementname>GPSVelNorth</elementname>
+			<elementname>GPSVelEast</elementname>
+			<elementname>GPSVelDown</elementname>
+			<elementname>MagX</elementname>
+			<elementname>MagY</elementname>
+			<elementname>MagZ</elementname>
+			<elementname>BaroZ</elementname>
+		</elementnames>
+	</field>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

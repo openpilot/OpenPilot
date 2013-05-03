@@ -1,0 +1,10 @@
+<xml>
+    <object name="PoiLearnSettings" singleinstance="true" settings="true">
+        <description>Settings for the @ref Point of Interest feature</description>
+        <field name="Input" units="channel" type="enum" elements="1" options="Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5,None" defaultvalue="None"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="manual" period="0"/>
+	</object>
+</xml>

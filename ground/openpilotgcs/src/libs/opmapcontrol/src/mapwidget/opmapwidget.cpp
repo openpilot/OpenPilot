@@ -80,6 +80,7 @@ namespace mapcontrol
 
             if(GPS!=0)
             {
+                GPS->DeleteTrail();
                 delete GPS;
                 GPS=0;
             }
@@ -93,6 +94,7 @@ namespace mapcontrol
             {
                 GPS=new GPSItem(map,this);
                 GPS->setParentItem(map);
+                GPS->setOpacity(overlayOpacity);
                 setOverlayOpacity(overlayOpacity);
             }
         }

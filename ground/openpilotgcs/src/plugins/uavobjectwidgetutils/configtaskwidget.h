@@ -195,6 +195,7 @@ private:
     void loadWidgetLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, double sclale);
     QString outOfLimitsStyle;
     QTimer * timeOut;
+
 protected slots:
     virtual void disableObjUpdates();
     virtual void enableObjUpdates();
@@ -207,6 +208,8 @@ protected slots:
 protected:
     virtual void enableControls(bool enable);
     void checkWidgetsLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, QVariant value, double scale);
+    void updateEnableControls();
+
 };
 
 #endif // CONFIGTASKWIDGET_H

@@ -23,10 +23,24 @@ QSlider::add-page:horizontal {
     border-radius: 4px;
 }
 
+QSlider::add-page:horizontal:disabled {
+    background: #ccc;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
 QSlider::sub-page:horizontal {
-    background: rgb(249, 117, 76);
+    background: rgb(78, 147, 246);
     border: 1px solid #777;
     height: 1px;
+    border-radius: 4px;
+}
+
+QSlider::sub-page:horizontal:disabled {
+    background: #eee;
+    border: 1px solid #999;
+    width: 1px;
     border-radius: 4px;
 }
 
@@ -56,9 +70,23 @@ QSlider::sub-page:vertical {
     border-radius: 4px;
 }
 
+QSlider::sub-page:vertical:disabled {
+    background: #eee;
+    border: 1px solid #999;
+    width: 1px;
+    border-radius: 4px;
+}
+
 QSlider::add-page:vertical {
-    background: rgb(249, 117, 76);
+    background: rgb(78, 147, 246);
     border: 1px solid #777;
+    width: 1px;
+    border-radius: 4px;
+}
+
+QSlider::add-page:vertical:disabled {
+    background: #ccc;
+    border: 1px solid #999;
     width: 1px;
     border-radius: 4px;
 }

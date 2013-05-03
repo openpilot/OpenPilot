@@ -429,12 +429,9 @@ void ConfigTaskWidget::addApplySaveButtons(QPushButton *update, QPushButton *sav
             smartsave->addObject((UAVDataObject*)oTw->object);
         }
     }
-    TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
-    if(telMngr->isConnected())
-        enableControls(true);
-    else
-        enableControls(false);
+    updateEnableControls();
 }
+
 /**
  * SLOT function used the enable or disable the SAVE, UPLOAD and RELOAD buttons
  * @param enable set to true to enable the buttons or false to disable them
@@ -442,12 +439,24 @@ void ConfigTaskWidget::addApplySaveButtons(QPushButton *update, QPushButton *sav
  */
 void ConfigTaskWidget::enableControls(bool enable)
 {
-    if(smartsave)
+    if(smartsave) {
         smartsave->enableControls(enable);
-    foreach (QPushButton * button, reloadButtonList) {
+    }
+
+    foreach (QPushButton *button, reloadButtonList) {
         button->setEnabled(enable);
     }
+
+    foreach(objectToWidget *ow,objOfInterest) {
+        if(ow->widget) {
+            ow->widget->setEnabled(enable);
+            foreach (shadow *sh, ow->shadowsList) {
+                sh->widget->setEnabled(enable);
+            }
+        }
+    }
 }
+
 /**
  * SLOT function called when on of the widgets contents added to the framework changes
  */
@@ -1308,6 +1317,13 @@ void ConfigTaskWidget::loadWidgetLimits(QWidget * widget,UAVObjectField * field,
             cb->setMinimum((int)(field->getMinLimit(index,currentBoard).toDouble()/scale));
         }
     }
+}
+
+void ConfigTaskWidget::updateEnableControls()
+{
+    TelemetryManager* telMngr = pm->getObject<TelemetryManager>();
+    Q_ASSERT(telMngr);
+    enableControls(telMngr->isConnected());
 }
 
 void ConfigTaskWidget::disableMouseWheelEvents()

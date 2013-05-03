@@ -43,10 +43,6 @@ MixerCurve::MixerCurve(QWidget *parent) :
 
 
     m_mixerUI->SettingsGroup->hide();
-    m_curve->showCommands(false);
-    m_curve->showCommand("Reset", false);
-    m_curve->showCommand("Popup", false);
-    m_curve->showCommand("Commands", false);
 
     // create our spin delegate
     m_spinDelegate = new DoubleSpinDelegate();
@@ -54,27 +50,19 @@ MixerCurve::MixerCurve(QWidget *parent) :
     // set the default mixer type
     setMixerType(MixerCurve::MIXERCURVE_THROTTLE);
 
-    // setup and turn off advanced mode
-    CommandActivated();
-
     // paint the ui
     UpdateCurveUI();
 
     // wire up our signals
-
     connect(m_mixerUI->CurveType, SIGNAL(currentIndexChanged(int)), this, SLOT(CurveTypeChanged()));
     connect(m_mixerUI->ResetCurve, SIGNAL(clicked()), this, SLOT(ResetCurve()));
     connect(m_mixerUI->PopupCurve, SIGNAL(clicked()),this,SLOT(PopupCurve()));
     connect(m_mixerUI->GenerateCurve, SIGNAL(clicked()), this, SLOT(GenerateCurve()));
     connect(m_curve, SIGNAL(curveUpdated()), this, SLOT(UpdateSettingsTable()));
-    connect(m_curve, SIGNAL(commandActivated(MixerNode*)),this, SLOT(CommandActivated(MixerNode*)));
     connect(m_settings, SIGNAL(cellChanged(int,int)), this, SLOT(SettingsTableChanged()));
     connect(m_mixerUI->CurveMin, SIGNAL(valueChanged(double)), this, SLOT(CurveMinChanged(double)));
     connect(m_mixerUI->CurveMax, SIGNAL(valueChanged(double)), this, SLOT(CurveMaxChanged(double)));
     connect(m_mixerUI->CurveStep, SIGNAL(valueChanged(double)), this, SLOT(GenerateCurve()));
-
-
-
 }
 
 MixerCurve::~MixerCurve()
@@ -103,7 +91,6 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
         {
             m_mixerUI->SettingsGroup->setTitle("Pitch Curve");
             m_curve->setRange(-1.0, 1.0);            
-            m_curve->setPositiveColor("#0000aa", "#0000aa");
             m_mixerUI->CurveMin->setMinimum(-1.0);
             m_mixerUI->CurveMax->setMinimum(-1.0);
             break;
@@ -126,37 +113,26 @@ void MixerCurve::ResetCurve()
 
     initLinearCurve(MixerCurveWidget::NODE_NUMELEM, getCurveMax(), getCurveMin());
 
-    m_curve->activateCommand("Linear");
-
     UpdateSettingsTable();
 }
 
 void MixerCurve::PopupCurve()
 {
-    if (!m_curve->isCommandActive("Popup")) {
+    m_mixerUI->SettingsGroup->show();
+    m_mixerUI->PopupCurve->hide();
 
-        m_mixerUI->SettingsGroup->show();
-        m_mixerUI->PopupCurve->hide();
+    PopupWidget* popup = new PopupWidget();
+    popup->popUp(this);
 
-        PopupWidget* popup = new PopupWidget();
-        popup->popUp(this);
-
-        m_mixerUI->SettingsGroup->hide();
-        m_mixerUI->PopupCurve->show();
-        m_curve->showCommands(false);
-    }
+    m_mixerUI->SettingsGroup->hide();
+    m_mixerUI->PopupCurve->show();
 }
+
 void MixerCurve::UpdateCurveUI()
 {
     //get the user settings
     QString curveType = m_mixerUI->CurveType->currentText();
 
-    m_curve->activateCommand(curveType);
-    bool cmdsActive = m_curve->isCommandActive("Commands");
-
-    m_curve->showCommand("StepPlus", cmdsActive && curveType != "Linear");
-    m_curve->showCommand("StepMinus", cmdsActive && curveType != "Linear");
-    m_curve->showCommand("StepValue", cmdsActive && curveType != "Linear");
 
     m_mixerUI->CurveStep->setMinimum(0.0);
     m_mixerUI->CurveStep->setMaximum(100.0);
@@ -229,8 +205,6 @@ void MixerCurve::GenerateCurve()
    double value2 = getCurveMax();
    double value3 = getCurveStep();
 
-   m_curve->setCommandText("StepValue", QString("%0").arg(value3));
-
    QString CurveType = m_mixerUI->CurveType->currentText();
 
    QList<double> points;
@@ -282,10 +256,12 @@ void MixerCurve::initCurve (const QList<double>* points)
     m_curve->setCurve(points);
     UpdateSettingsTable();
 }
+
 QList<double> MixerCurve::getCurve()
 {
     return m_curve->getCurve();
 }
+
 void MixerCurve::initLinearCurve(int numPoints, double maxValue, double minValue)
 {
     setMin(minValue);
@@ -296,39 +272,45 @@ void MixerCurve::initLinearCurve(int numPoints, double maxValue, double minValue
     if (m_spinDelegate)
         m_spinDelegate->setRange(minValue, maxValue);
 }
+
 void MixerCurve::setCurve(const QList<double>* points)
 {
     m_curve->setCurve(points);
     UpdateSettingsTable();
 }
+
 void MixerCurve::setMin(double value)
 {
     //m_curve->setMin(value);
     m_mixerUI->CurveMin->setMinimum(value);
 }
+
 double MixerCurve::getMin()
 {
     return m_curve->getMin();
 }
+
 void MixerCurve::setMax(double value)
 {
     //m_curve->setMax(value);
     m_mixerUI->CurveMax->setMaximum(value);
 }
+
 double MixerCurve::getMax()
 {
     return m_curve->getMax();
 }
+
 double MixerCurve::setRange(double min, double max)
 {
     return m_curve->setRange(min, max);
 }
 
-
 double MixerCurve::getCurveMin()
 {
     return m_mixerUI->CurveMin->value();
 }
+
 double MixerCurve::getCurveMax()
 {
     return m_mixerUI->CurveMax->value();
@@ -368,59 +350,6 @@ void MixerCurve::SettingsTableChanged()
     m_mixerUI->CurveMax->setValue(points.last());
 
     m_curve->setCurve(&points);
-}
-
-void MixerCurve::CommandActivated(MixerNode* node)
-{
-    QString name = (node) ? node->getName() : "Reset";
-
-    if (name == "Reset") {        
-        ResetCurve();
-        m_curve->showCommands(false);
-    }
-    else if (name == "Commands") {
-
-    }
-    else if (name == "Popup" ) {
-        PopupCurve();
-    }
-    else if (name == "Linear") {
-        m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Linear"));
-    }
-    else if (name == "Log") {
-        m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Log"));
-    }
-    else if (name == "Exp") {
-        m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Exp"));
-    }
-    else if (name == "Flat") {
-        m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Flat"));
-    }
-    else if (name == "Step") {
-        m_mixerUI->CurveType->setCurrentIndex(m_mixerUI->CurveType->findText("Step"));
-    }
-    else if (name ==  "MinPlus") {
-        m_mixerUI->CurveMin->stepUp();
-    }
-    else if (name ==  "MinMinus") {
-        m_mixerUI->CurveMin->stepDown();
-    }
-    else if (name == "MaxPlus") {
-        m_mixerUI->CurveMax->stepUp();
-    }
-    else if (name == "MaxMinus"){
-        m_mixerUI->CurveMax->stepDown();
-    }
-    else if (name ==  "StepPlus") {
-        m_mixerUI->CurveStep->stepUp();
-        m_curve->setCommandText("StepValue", QString("%0").arg(getCurveStep()));
-    }
-    else if (name == "StepMinus") {
-        m_mixerUI->CurveStep->stepDown();
-        m_curve->setCommandText("StepValue", QString("%0").arg(getCurveStep()));
-    }
-
-    GenerateCurve();
 }
 
 void MixerCurve::CurveTypeChanged()

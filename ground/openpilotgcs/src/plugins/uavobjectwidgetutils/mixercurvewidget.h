@@ -58,54 +58,35 @@ public:
    double getMax();
    double setRange(double min, double max);
 
-
-   void cmdActivated(MixerNode* node);
-   void activateCommand(const QString& name);
-   bool isCommandActive(const QString& name);
-   void showCommand(const QString& name, bool show);
-   void showCommands(bool show);
-   MixerNode* getCmdNode(const QString& name);
-   void setCommandText(const QString& name, const QString& text);
-
    static const int NODE_NUMELEM = 5;
 
 signals:
    void curveUpdated();
    void curveMinChanged(double value);
    void curveMaxChanged(double value);
-   void commandActivated(MixerNode* node);
 
 private slots:
 
 private:
    QGraphicsSvgItem *plot;
 
-   QList<MixerNode*> nodePool;
-   QList<MixerNode*> cmdNodePool;
-   QList<Edge*> edgePool;
+   QList<Edge*> edgeList;
    QList<MixerNode*> nodeList;
 
    double curveMin;
    double curveMax;
    bool   curveUpdating;
 
-   QString posColor0;
-   QString posColor1;
-   QString negColor0;
-   QString negColor1;
-
    void  initNodes(int numPoints);
-   MixerNode* getNode(int index);
-   MixerNode* getCommandNode(int index);
-   Edge* getEdge(int index, MixerNode* sourceNode, MixerNode* destNode);
-   void setPositiveColor(QString color0 = "#00ff00", QString color1 = "#00ff00");
-   void setNegativeColor(QString color0 = "#ff0000", QString color1 = "#ff0000");
+   void setPositiveColor(QString color);
+   void setNegativeColor(QString color);
 
    void  resizeCommands();
 
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
+    void changeEvent(QEvent *event);
 
 
 };

@@ -216,15 +216,9 @@ void ConfigCCAttitudeWidget::setAccelFiltering(bool active)
 
 void ConfigCCAttitudeWidget::enableControls(bool enable)
 {
-    if(ui->zeroBias) {
-        ui->zeroBias->setEnabled(enable);
-    }
-    if(ui->zeroGyroBiasOnArming) {
-        ui->zeroGyroBiasOnArming->setEnabled(enable);
-    }
-    if(ui->accelTauSpinbox) {
-        ui->accelTauSpinbox->setEnabled(enable);
-    }
+    ui->zeroBias->setEnabled(enable);
+    ui->zeroGyroBiasOnArming->setEnabled(enable);
+    ui->accelTauSpinbox->setEnabled(enable);
     ConfigTaskWidget::enableControls(enable);
 }
 

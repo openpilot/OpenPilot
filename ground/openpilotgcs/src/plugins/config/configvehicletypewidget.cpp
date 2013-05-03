@@ -138,8 +138,6 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     // Connect the help pushbutton
     connect(m_aircraft->airframeHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 
-    enableControls(false);
-
     refreshWidgetsValues();
 
     // register widgets for dirty state management
@@ -150,8 +148,12 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     addWidget(m_aircraft->accelTime);
     addWidget(m_aircraft->decelTime);
     addWidget(m_aircraft->maxAccelSlider);
+    addWidget(m_aircraft->ffTestBox1);
+    addWidget(m_aircraft->ffTestBox2);
+    addWidget(m_aircraft->ffTestBox3);
 
     disableMouseWheelEvents();
+    updateEnableControls();
 }
 
 /**

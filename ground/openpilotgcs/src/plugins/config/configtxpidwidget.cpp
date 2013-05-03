@@ -109,8 +109,29 @@ void ConfigTxPIDWidget::saveSettings()
     saveObjectToSD(obj);
 }
 
+void ConfigTxPIDWidget::enableControls(bool enable)
+{
+    /*
+    m_txpid->PID1->setEnabled(enable);
+    m_txpid->PID2->setEnabled(enable);
+    m_txpid->PID3->setEnabled(enable);
 
-/**
-  @}
-  @}
-  */
+    m_txpid->Input1->setEnabled(enable);
+    m_txpid->Input2->setEnabled(enable);
+    m_txpid->Input3->setEnabled(enable);
+
+    m_txpid->MinPID1->setEnabled(enable);
+    m_txpid->MinPID2->setEnabled(enable);
+    m_txpid->MinPID3->setEnabled(enable);
+
+    m_txpid->MaxPID1->setEnabled(enable);
+    m_txpid->MaxPID2->setEnabled(enable);
+    m_txpid->MaxPID3->setEnabled(enable);
+
+    m_txpid->ThrottleMin->setEnabled(enable);
+    m_txpid->ThrottleMax->setEnabled(enable);
+
+    m_txpid->UpdateMode->setEnabled(enable);
+    */
+    ConfigTaskWidget::setEnabled(enable);
+}

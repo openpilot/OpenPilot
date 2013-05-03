@@ -41,35 +41,53 @@
 
 ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
-    m_stabilization = new Ui_StabilizationWidget();
-    m_stabilization->setupUi(this);
+    ui = new Ui_StabilizationWidget();
+    ui->setupUi(this);
 
 
     ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings* settings = pm->getObject<Core::Internal::GeneralSettings>();
     if(!settings->useExpertMode()) {
-        m_stabilization->saveStabilizationToRAM_6->setVisible(false);
+        ui->saveStabilizationToRAM_6->setVisible(false);
     }
 
     autoLoadWidgets();
-    realtimeUpdates = new QTimer(this);
 
-    connect(m_stabilization->realTimeUpdates_6, SIGNAL(stateChanged(int)), this, SLOT(realtimeUpdatesSlot(int)));
-    connect(m_stabilization->realTimeUpdates_8, SIGNAL(stateChanged(int)), this, SLOT(realtimeUpdatesSlot(int)));
+    realtimeUpdates = new QTimer(this);
     connect(realtimeUpdates, SIGNAL(timeout()), this, SLOT(apply()));
 
-    connect(m_stabilization->checkBox_7, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
-    connect(m_stabilization->checkBox_2, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
-    connect(m_stabilization->checkBox_8, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
-    connect(m_stabilization->checkBox_3, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+    connect(ui->realTimeUpdates_6, SIGNAL(stateChanged(int)), this, SLOT(realtimeUpdatesSlot(int)));
+    addWidget(ui->realTimeUpdates_6);
+    connect(ui->realTimeUpdates_8, SIGNAL(stateChanged(int)), this, SLOT(realtimeUpdatesSlot(int)));
+    addWidget(ui->realTimeUpdates_8);
+
+    connect(ui->checkBox_7, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+    addWidget(ui->checkBox_7);
+    connect(ui->checkBox_2, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+    addWidget(ui->checkBox_2);
+    connect(ui->checkBox_8, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+    addWidget(ui->checkBox_8);
+    connect(ui->checkBox_3, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+    addWidget(ui->checkBox_3);
+
+    addWidget(ui->pushButton_2);
+    addWidget(ui->pushButton_3);
+    addWidget(ui->pushButton_4);
+    addWidget(ui->pushButton_5);
+    addWidget(ui->pushButton_6);
+    addWidget(ui->pushButton_9);
+    addWidget(ui->pushButton_20);
+    addWidget(ui->pushButton_22);
+    addWidget(ui->pushButton_23);
 
     connect(this, SIGNAL(widgetContentsChanged(QWidget*)), this, SLOT(processLinkedWidgets(QWidget*)));
 
     // Link by default
-    m_stabilization->checkBox_7->setChecked(true);
-    m_stabilization->checkBox_8->setChecked(true);
+    ui->checkBox_7->setChecked(true);
+    ui->checkBox_8->setChecked(true);
 
     disableMouseWheelEvents();
+    updateEnableControls();
 }
 
 ConfigStabilizationWidget::~ConfigStabilizationWidget()
@@ -79,8 +97,8 @@ ConfigStabilizationWidget::~ConfigStabilizationWidget()
 
 void ConfigStabilizationWidget::realtimeUpdatesSlot(int value)
 {
-    m_stabilization->realTimeUpdates_6->setCheckState((Qt::CheckState)value);
-    m_stabilization->realTimeUpdates_8->setCheckState((Qt::CheckState)value);
+    ui->realTimeUpdates_6->setCheckState((Qt::CheckState)value);
+    ui->realTimeUpdates_8->setCheckState((Qt::CheckState)value);
 
     if(value == Qt::Checked && !realtimeUpdates->isActive()) {
         realtimeUpdates->start(300);
@@ -92,84 +110,85 @@ void ConfigStabilizationWidget::realtimeUpdatesSlot(int value)
 
 void ConfigStabilizationWidget::linkCheckBoxes(int value)
 {
-    if(sender() == m_stabilization->checkBox_7) {
-        m_stabilization->checkBox_3->setCheckState((Qt::CheckState)value);
+    if(sender() == ui->checkBox_7) {
+        ui->checkBox_3->setCheckState((Qt::CheckState)value);
     }
-    else if(sender() == m_stabilization->checkBox_3) {
-        m_stabilization->checkBox_7->setCheckState((Qt::CheckState)value);
+    else if(sender() == ui->checkBox_3) {
+        ui->checkBox_7->setCheckState((Qt::CheckState)value);
     }
-    else if(sender( )== m_stabilization->checkBox_8) {
-        m_stabilization->checkBox_2->setCheckState((Qt::CheckState)value);
+    else if(sender( )== ui->checkBox_8) {
+        ui->checkBox_2->setCheckState((Qt::CheckState)value);
     }
-    else if(sender() == m_stabilization->checkBox_2) {
-        m_stabilization->checkBox_8->setCheckState((Qt::CheckState)value);
+    else if(sender() == ui->checkBox_2) {
+        ui->checkBox_8->setCheckState((Qt::CheckState)value);
     }
 }
 
 void ConfigStabilizationWidget::processLinkedWidgets(QWidget * widget)
 {
-    if(m_stabilization->checkBox_7->checkState()==Qt::Checked)
+    if(ui->checkBox_7->checkState()==Qt::Checked)
     {
-        if(widget== m_stabilization->RateRollKp_2)
+        if(widget== ui->RateRollKp_2)
         {
-            m_stabilization->RatePitchKp->setValue(m_stabilization->RateRollKp_2->value());
+            ui->RatePitchKp->setValue(ui->RateRollKp_2->value());
         }
-        else if(widget== m_stabilization->RateRollKi_2)
+        else if(widget== ui->RateRollKi_2)
         {
-            m_stabilization->RatePitchKi->setValue(m_stabilization->RateRollKi_2->value());
+            ui->RatePitchKi->setValue(ui->RateRollKi_2->value());
         }
-        else if(widget== m_stabilization->RateRollILimit_2)
+        else if(widget== ui->RateRollILimit_2)
         {
-            m_stabilization->RatePitchILimit->setValue(m_stabilization->RateRollILimit_2->value());
+            ui->RatePitchILimit->setValue(ui->RateRollILimit_2->value());
         }
-        else if(widget== m_stabilization->RatePitchKp)
+        else if(widget== ui->RatePitchKp)
         {
-            m_stabilization->RateRollKp_2->setValue(m_stabilization->RatePitchKp->value());
+            ui->RateRollKp_2->setValue(ui->RatePitchKp->value());
         }
-        else if(widget== m_stabilization->RatePitchKi)
+        else if(widget== ui->RatePitchKi)
         {
-            m_stabilization->RateRollKi_2->setValue(m_stabilization->RatePitchKi->value());
+            ui->RateRollKi_2->setValue(ui->RatePitchKi->value());
         }
-        else if(widget== m_stabilization->RatePitchILimit)
+        else if(widget== ui->RatePitchILimit)
         {
-            m_stabilization->RateRollILimit_2->setValue(m_stabilization->RatePitchILimit->value());
+            ui->RateRollILimit_2->setValue(ui->RatePitchILimit->value());
         }
-        else if(widget== m_stabilization->RollRateKd)
+        else if(widget== ui->RollRateKd)
         {
-            m_stabilization->PitchRateKd->setValue(m_stabilization->RollRateKd->value());
+            ui->PitchRateKd->setValue(ui->RollRateKd->value());
         }
-        else if(widget== m_stabilization->PitchRateKd)
+        else if(widget== ui->PitchRateKd)
         {
-            m_stabilization->RollRateKd->setValue(m_stabilization->PitchRateKd->value());
+            ui->RollRateKd->setValue(ui->PitchRateKd->value());
         }
     }
-    if(m_stabilization->checkBox_8->checkState()==Qt::Checked)
+    if(ui->checkBox_8->checkState()==Qt::Checked)
     {
-        if(widget== m_stabilization->AttitudeRollKp)
+        if(widget== ui->AttitudeRollKp)
         {
-            m_stabilization->AttitudePitchKp_2->setValue(m_stabilization->AttitudeRollKp->value());
+            ui->AttitudePitchKp_2->setValue(ui->AttitudeRollKp->value());
         }
-        else if(widget== m_stabilization->AttitudeRollKi)
+        else if(widget== ui->AttitudeRollKi)
         {
-            m_stabilization->AttitudePitchKi_2->setValue(m_stabilization->AttitudeRollKi->value());
+            ui->AttitudePitchKi_2->setValue(ui->AttitudeRollKi->value());
         }
-        else if(widget== m_stabilization->AttitudeRollILimit)
+        else if(widget== ui->AttitudeRollILimit)
         {
-            m_stabilization->AttitudePitchILimit_2->setValue(m_stabilization->AttitudeRollILimit->value());
+            ui->AttitudePitchILimit_2->setValue(ui->AttitudeRollILimit->value());
         }
-        else if(widget== m_stabilization->AttitudePitchKp_2)
+        else if(widget== ui->AttitudePitchKp_2)
         {
-            m_stabilization->AttitudeRollKp->setValue(m_stabilization->AttitudePitchKp_2->value());
+            ui->AttitudeRollKp->setValue(ui->AttitudePitchKp_2->value());
         }
-        else if(widget== m_stabilization->AttitudePitchKi_2)
+        else if(widget== ui->AttitudePitchKi_2)
         {
-            m_stabilization->AttitudeRollKi->setValue(m_stabilization->AttitudePitchKi_2->value());
+            ui->AttitudeRollKi->setValue(ui->AttitudePitchKi_2->value());
         }
-        else if(widget== m_stabilization->AttitudePitchILimit_2)
+        else if(widget== ui->AttitudePitchILimit_2)
         {
-            m_stabilization->AttitudeRollILimit->setValue(m_stabilization->AttitudePitchILimit_2->value());
+            ui->AttitudeRollILimit->setValue(ui->AttitudePitchILimit_2->value());
         }
     }
 }
+
 
 

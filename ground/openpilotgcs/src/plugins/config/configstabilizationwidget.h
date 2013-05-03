@@ -46,7 +46,7 @@ public:
     ~ConfigStabilizationWidget();
 
 private:
-    Ui_StabilizationWidget *m_stabilization;
+    Ui_StabilizationWidget *ui;
     QTimer * realtimeUpdates;
 private slots:
     void realtimeUpdatesSlot(int);

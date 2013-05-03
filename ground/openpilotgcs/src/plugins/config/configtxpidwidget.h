@@ -44,6 +44,7 @@ private slots:
     void refreshValues();
     void applySettings();
     void saveSettings();
+    void enableControls(bool enable);
 };
 
 #endif // CONFIGTXPIDWIDGET_H

@@ -266,6 +266,7 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RADIO_STATE_NUM_ST
         .next_state = {
             [RADIO_EVENT_INT_RECEIVED] = RADIO_STATE_RX_DATA,
             [RADIO_EVENT_TX_START] = RADIO_STATE_TX_START,
+            [RADIO_EVENT_REQUEST_CONNECTION] = RADIO_STATE_REQUESTING_CONNECTION,
             [RADIO_EVENT_ACK_TIMEOUT] = RADIO_STATE_RECEIVING_NACK,
             [RADIO_EVENT_RX_COMPLETE] = RADIO_STATE_SENDING_ACK,
             [RADIO_EVENT_RX_MODE] = RADIO_STATE_RX_MODE,
@@ -304,7 +305,7 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RADIO_STATE_NUM_ST
     [RADIO_STATE_RECEIVING_STATUS] = {
         .entry_fn = rfm22_receiveStatus,
         .next_state = {
-            [RADIO_EVENT_RX_COMPLETE] = RADIO_STATE_SENDING_ACK,
+            [RADIO_EVENT_RX_COMPLETE] = RADIO_STATE_TX_START,
             [RADIO_EVENT_TIMEOUT] = RADIO_STATE_TIMEOUT,
             [RADIO_EVENT_ERROR] = RADIO_STATE_ERROR,
             [RADIO_EVENT_INITIALIZE] = RADIO_STATE_INITIALIZING,
@@ -326,7 +327,6 @@ const static struct pios_rfm22b_transition rfm22b_transitions[RADIO_STATE_NUM_ST
         .entry_fn = radio_txData,
         .next_state = {
             [RADIO_EVENT_INT_RECEIVED] = RADIO_STATE_TX_DATA,
-            [RADIO_EVENT_REQUEST_CONNECTION] = RADIO_STATE_REQUESTING_CONNECTION,
             [RADIO_EVENT_RX_MODE] = RADIO_STATE_RX_MODE,
             [RADIO_EVENT_FAILURE] = RADIO_STATE_TX_FAILURE,
             [RADIO_EVENT_TIMEOUT] = RADIO_STATE_TIMEOUT,
@@ -1843,10 +1843,6 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
                 p = NULL;
             }
         }
-
-        if (p) {
-            p->header.seq_num = radio_dev->stats.tx_seq++;
-        }
     }
     if (!p) {
         return RADIO_EVENT_RX_MODE;
@@ -1855,6 +1851,12 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
 #ifdef PIOS_RFM22B_DEBUG_ON_TELEM
     D1_LED_ON;
 #endif
+
+    // Add the packet sequence number.
+    p->header.seq_num = radio_dev->stats.tx_seq++;
+
+    // Pass the time of the previous transmitted packet to use for synchronizing the clocks.
+    p->header.prev_tx_time = radio_dev->tx_complete_ticks;
 
     // Change the channel if necessary, but not when ACKing the connection request message.
     if ((p->header.type != PACKET_TYPE_ACK) || (radio_dev->rx_packet.header.type != PACKET_TYPE_CON_REQUEST)) {
@@ -1883,8 +1885,8 @@ static enum pios_radio_event radio_txData(struct pios_rfm22b_dev *radio_dev)
 
     // Is the transmition complete
     if (res == PIOS_RFM22B_TX_COMPLETE) {
-        portTickType curTicks = xTaskGetTickCount();
         radio_dev->stats.tx_byte_count += PH_PACKET_SIZE(radio_dev->tx_packet);
+        radio_dev->tx_complete_ticks = xTaskGetTickCount();
 
         // Is this an ACK?
         bool is_ack = (radio_dev->tx_packet->header.type == PACKET_TYPE_ACK);
@@ -1894,34 +1896,15 @@ static enum pios_radio_event radio_txData(struct pios_rfm22b_dev *radio_dev)
             // If this is an ACK for a connection request message we need to
             // configure this modem from the connection request message.
             if (radio_dev->rx_packet.header.type == PACKET_TYPE_CON_REQUEST) {
-
                 rfm22_setConnectionParameters(radio_dev);
-
-            } else if (radio_dev->coordinator && !rfm22_isConnected(radio_dev) && (radio_dev->rx_packet.header.type == PACKET_TYPE_STATUS)) {
-
-                // Send a connection request message if we're not connected, and this is a status message from a modem that we're bound to.
-                PHStatusPacketHandle status = (PHStatusPacketHandle)&(radio_dev->rx_packet);
-                uint32_t source_id = status->source_id;
-                for (uint8_t i = 0; OPLINKSETTINGS_BINDINGS_NUMELEM; ++i) {
-                    if (radio_dev->bindings[i].pairID == source_id) {
-                        radio_dev->cur_binding = i;
-                        ret_event = RADIO_EVENT_REQUEST_CONNECTION;
-                        break;
-                    }
-                }
             }
 
-            // Change the channel
-            // On the remote side, we initialize the time delta when we finish sending the ACK for the connection request message.
-            if (radio_dev->rx_packet.header.type == PACKET_TYPE_CON_REQUEST) {
-                radio_dev->time_delta = portMAX_DELAY - curTicks;
-            }
-
-        } else if ((radio_dev->tx_packet->header.type != PACKET_TYPE_NACK) && (radio_dev->tx_packet->header.type != PACKET_TYPE_PPM)) {
+        } else if ((radio_dev->tx_packet->header.type != PACKET_TYPE_NACK) && (radio_dev->tx_packet->header.type != PACKET_TYPE_PPM) &&
+                   (radio_dev->tx_packet->header.type != PACKET_TYPE_STATUS) && (radio_dev->tx_packet->header.type != PACKET_TYPE_PPM)) {
 
             // We need to wait for an ACK if this packet it not an ACK, NACK, or PPM.
             radio_dev->prev_tx_packet = radio_dev->tx_packet;
-            radio_dev->tx_complete_ticks = xTaskGetTickCount();
+
         }
         radio_dev->tx_packet = 0;
         radio_dev->tx_data_wr = radio_dev->tx_data_rd = 0;
@@ -1956,13 +1939,14 @@ static enum pios_radio_event radio_setRxMode(struct pios_rfm22b_dev *rfm22b_dev)
 /**
  * Complete the receipt of a packet.
  *
- * @param[in] rfm22b_dev  The device structure
+ * @param[in] radio_dev  The device structure
  * @param[in] p  The packet handle of the received packet.
  * @param[in] rc_len  The number of bytes received.
  * @return enum pios_radio_event  The next event to inject
  */
-static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *rfm22b_dev, PHPacketHandle p, uint16_t rx_len)
+static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_dev, PHPacketHandle p, uint16_t rx_len)
 {
+    portTickType curTicks = xTaskGetTickCount();
 
     // Attempt to correct any errors in the packet.
     decode_data((unsigned char*)p, rx_len);
@@ -1975,36 +1959,15 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *rfm22b_
         corrected_packet = true;
     }
 
-    // Add any missed packets into the stats.
-    bool ack_nack_packet = ((p->header.type == PACKET_TYPE_ACK) || (p->header.type == PACKET_TYPE_NACK));
-    if (!ack_nack_packet && (good_packet || corrected_packet)) {
-        uint16_t seq_num = p->header.seq_num;
-        if (rfm22_isConnected(rfm22b_dev)) {
-            static bool first_time = true;
-            uint16_t missed_packets = 0;
-            if (first_time) {
-                first_time = false;
-            } else {
-                uint16_t prev_seq_num = rfm22b_dev->stats.rx_seq;
-                if (seq_num > prev_seq_num)
-                    missed_packets = seq_num - prev_seq_num - 1;
-                else if((seq_num == prev_seq_num) && (p->header.type == PACKET_TYPE_DATA))
-                    p->header.type = PACKET_TYPE_DUPLICATE_DATA;
-            }
-            rfm22b_dev->stats.rx_missed += missed_packets;
-        }
-        rfm22b_dev->stats.rx_seq = seq_num;
-    }
-
     // Set the packet status
     if (good_packet) {
-        rfm22b_add_rx_status(rfm22b_dev, RADIO_GOOD_RX_PACKET);
+        rfm22b_add_rx_status(radio_dev, RADIO_GOOD_RX_PACKET);
     } else if(corrected_packet) {
         // We corrected the error.
-        rfm22b_add_rx_status(rfm22b_dev, RADIO_CORRECTED_RX_PACKET);
+        rfm22b_add_rx_status(radio_dev, RADIO_CORRECTED_RX_PACKET);
     } else {
         // We couldn't correct the error, so drop the packet.
-        rfm22b_add_rx_status(rfm22b_dev, RADIO_ERROR_RX_PACKET);
+        rfm22b_add_rx_status(radio_dev, RADIO_ERROR_RX_PACKET);
     }
 
     enum pios_radio_event ret_event = RADIO_EVENT_RX_COMPLETE;
@@ -2012,7 +1975,21 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *rfm22b_
         switch (p->header.type) {
         case PACKET_TYPE_STATUS:
             ret_event = RADIO_EVENT_STATUS_RECEIVED;
+
+            // Send a connection request message if we're not connected, and this is a status message from a modem that we're bound to.
+            if (radio_dev->coordinator && !rfm22_isConnected(radio_dev)) {
+                PHStatusPacketHandle status = (PHStatusPacketHandle)&(radio_dev->rx_packet);
+                uint32_t source_id = status->source_id;
+                for (uint8_t i = 0; OPLINKSETTINGS_BINDINGS_NUMELEM; ++i) {
+                    if (radio_dev->bindings[i].pairID == source_id) {
+                        radio_dev->cur_binding = i;
+                        ret_event = RADIO_EVENT_REQUEST_CONNECTION;
+                        break;
+                    }
+                }
+            }
             break;
+
         case PACKET_TYPE_CON_REQUEST:
             ret_event = RADIO_EVENT_CONNECTION_REQUESTED;
             break;
@@ -2020,8 +1997,8 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *rfm22b_
         {
             // Send the data to the com port
             bool rx_need_yield;
-            if (rfm22b_dev->rx_in_cb)
-                (rfm22b_dev->rx_in_cb)(rfm22b_dev->rx_in_context, p->data, p->header.data_size, NULL, &rx_need_yield);
+            if (radio_dev->rx_in_cb)
+                (radio_dev->rx_in_cb)(radio_dev->rx_in_context, p->data, p->header.data_size, NULL, &rx_need_yield);
             break;
         }
         case PACKET_TYPE_DUPLICATE_DATA:
@@ -2043,7 +2020,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *rfm22b_
 #if defined(PIOS_INCLUDE_RFM22B_RCVR)
             ppm_output = true;
             for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i) {
-                rfm22b_dev->ppm_channel[i] = ppmp->channels[i];
+                radio_dev->ppm_channel[i] = ppmp->channels[i];
             }
 #endif					
 #if defined(PIOS_INCLUDE_PPM_OUT) && defined(PIOS_PPM_OUTPUT)
@@ -2069,9 +2046,38 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *rfm22b_
             break;
         }
 
+        uint16_t seq_num = radio_dev->rx_packet.header.seq_num;
+        if (rfm22_isConnected(radio_dev)) {
+
+            // Adjust the clock syncronization if this is the remote modem.
+            // The coordinator sends the time that the previous packet was finised transmitting,
+            // which should match the time that the last packet was received.
+            uint16_t prev_seq_num = radio_dev->stats.rx_seq;
+            if (seq_num == (prev_seq_num + 1)) {
+                portTickType local_rx_time = radio_dev->rx_complete_ticks;
+                portTickType remote_tx_time = radio_dev->rx_packet.header.prev_tx_time;
+                radio_dev->time_delta = remote_tx_time - local_rx_time;
+
+            } else if (seq_num > prev_seq_num) {
+
+                // Add any missed packets into the stats.
+                uint16_t missed_packets = seq_num - prev_seq_num - 1;
+                radio_dev->stats.rx_missed += missed_packets;
+            }
+
+        }
+
+        // Update the sequence number
+        radio_dev->stats.rx_seq = seq_num;
+
     } else {
         ret_event = RADIO_EVENT_RX_COMPLETE;
     }
+
+    // Log the time that the packet was received.
+    radio_dev->rx_complete_ticks = curTicks;
+    if (radio_dev->rx_complete_ticks == 0)
+        radio_dev->rx_complete_ticks = 1;
 
     return ret_event;
 }
@@ -2094,9 +2100,6 @@ static enum pios_radio_event radio_rxData(struct pios_rfm22b_dev *radio_dev)
         // Receive the packet.
         ret_event = radio_receivePacket(radio_dev, radio_dev->rx_packet_handle, radio_dev->rx_buffer_wr);
         radio_dev->rx_buffer_wr = 0;
-        radio_dev->rx_complete_ticks = xTaskGetTickCount();
-        if (radio_dev->rx_complete_ticks == 0)
-            radio_dev->rx_complete_ticks = 1;
 #ifdef PIOS_RFM22B_DEBUG_ON_TELEM
         D2_LED_OFF;
 #endif
@@ -2129,8 +2132,8 @@ static enum pios_radio_event radio_rxData(struct pios_rfm22b_dev *radio_dev)
  */
 static void rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 {
-    // Don't send if we're a coordinator, or if a status is already queued.
-    if (rfm22b_dev->coordinator || rfm22b_dev->send_status) {
+    // Don't send if a status is already queued.
+    if (rfm22b_dev->send_status) {
         return;
     }
 
@@ -2199,14 +2202,12 @@ static void rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev)
  */
 static enum pios_radio_event rfm22_sendAck(struct pios_rfm22b_dev *rfm22b_dev)
 {
-    // We don't ACK PPM packets.
-    if (rfm22b_dev->rx_packet.header.type != PACKET_TYPE_PPM) {
+    // We don't ACK PPM or status packets.
+    if ((rfm22b_dev->rx_packet.header.type != PACKET_TYPE_PPM) && (rfm22b_dev->rx_packet.header.type != PACKET_TYPE_STATUS)) {
         PHAckNackPacketHandle aph = (PHAckNackPacketHandle)(&(rfm22b_dev->ack_nack_packet));
         aph->header.destination_id = rfm22b_dev->destination_id;
         aph->header.type = PACKET_TYPE_ACK;
         aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
-        aph->header.seq_num = rfm22b_dev->rx_packet.header.seq_num;
-        aph->packet_recv_time = rfm22_coordinatorTime(rfm22b_dev, rfm22b_dev->rx_complete_ticks);
         rfm22b_dev->tx_packet = (PHPacketHandle)aph;
     }
     return RADIO_EVENT_TX_START;
@@ -2224,7 +2225,6 @@ static enum pios_radio_event rfm22_sendNack(struct pios_rfm22b_dev *rfm22b_dev)
     aph->header.destination_id = rfm22b_dev->destination_id;
     aph->header.type = PACKET_TYPE_NACK;
     aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
-    aph->header.seq_num = rfm22b_dev->rx_packet.header.seq_num;
     rfm22b_dev->tx_packet = (PHPacketHandle)aph;
     return RADIO_EVENT_TX_START;
 }
@@ -2248,6 +2248,7 @@ static enum pios_radio_event rfm22_requestConnection(struct pios_rfm22b_dev *rfm
     cph->header.type = PACKET_TYPE_CON_REQUEST;
     cph->header.data_size = PH_CONNECTION_DATA_SIZE(&(rfm22b_dev->con_packet));
     cph->source_id = rfm22b_dev->deviceID;
+    cph->status_rx_time = rfm22b_dev->rx_complete_ticks;
     cph->main_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].main_port;
     cph->flexi_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].flexi_port;
     cph->vcp_port = rfm22b_dev->bindings[rfm22b_dev->cur_binding].vcp_port;
@@ -2284,17 +2285,6 @@ static enum pios_radio_event rfm22_receiveAck(struct pios_rfm22b_dev *rfm22b_dev
     case PACKET_TYPE_DATA:
         rfm22b_dev->data_packet.header.data_size = 0;
         break;
-    }
-
-    // On the coordinator side, we initialize the time delta when we receive the ACK for the connection request message.
-    if (prev->header.type == PACKET_TYPE_CON_REQUEST) {
-        rfm22b_dev->time_delta = portMAX_DELAY - rfm22b_dev->rx_complete_ticks;
-    } else if (!rfm22b_dev->coordinator) {
-        PHAckNackPacketHandle aph = (PHAckNackPacketHandle)(&(rfm22b_dev->rx_packet));
-        portTickType local_tx_time = rfm22_coordinatorTime(rfm22b_dev, rfm22b_dev->tx_complete_ticks);
-        portTickType remote_rx_time = aph->packet_recv_time;
-        // Adjust the time delta based on the difference between our estimated time offset and the coordinator offset.
-        rfm22b_dev->time_delta += remote_rx_time - local_tx_time;
     }
 
     // Should we try to start another TX?
@@ -2485,6 +2475,12 @@ static enum pios_radio_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm2
     // Set the destination ID to the source of the connection request message.
     rfm22b_dev->destination_id = cph->source_id;
 
+    // The remote modem sets the time delta between the two modems using the differene between the clock
+    // on the local modem when it sent the status packet and the time on the coordinator modem when it was received.
+    portTickType local_tx_time = rfm22b_dev->tx_complete_ticks;
+    portTickType remote_rx_time = cph->status_rx_time;
+    rfm22b_dev->time_delta = remote_rx_time - local_tx_time;
+
     return RADIO_EVENT_DEFAULT;
 }
 
@@ -2501,6 +2497,9 @@ static enum pios_radio_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm2
  */
 static portTickType rfm22_coordinatorTime(struct pios_rfm22b_dev *rfm22b_dev, portTickType ticks)
 {
+    if (rfm22b_dev->coordinator) {
+        return ticks;
+    }
     return ticks + rfm22b_dev->time_delta;
 }
 

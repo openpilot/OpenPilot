@@ -50,6 +50,7 @@
 #include "stabilizationdesired.h"
 #include "receiveractivity.h"
 #include "systemsettings.h"
+#include <altitudeholdsettings.h>
 
 #if defined(PIOS_INCLUDE_USB_RCTX)
 #include "pios_usb_rctx.h"
@@ -796,14 +797,19 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     const float DEADBAND_LOW  = 1.0f / 2 - DEADBAND / 2;
 
     // this is the max speed in m/s at the extents of throttle
-    const float MAX_ALT_CHANGE_RATE = 5;
+    uint8_t throttleRate;
+    uint8_t throttleExp;
+
     static portTickType lastSysTime;
     static bool zeroed = false;
     portTickType thisSysTime;
     float dT;
-    AltitudeHoldDesiredData altitudeHoldDesired;
 
+    AltitudeHoldDesiredData altitudeHoldDesired;
     AltitudeHoldDesiredGet(&altitudeHoldDesired);
+
+    AltitudeHoldSettingsThrottleExpGet(&throttleExp);
+    AltitudeHoldSettingsThrottleRateGet(&throttleRate);
 
     StabilizationSettingsData stabSettings;
     StabilizationSettingsGet(&stabSettings);
@@ -824,10 +830,10 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
         zeroed = false;
     } else if (cmd->Throttle > DEADBAND_HIGH && zeroed) {
         // being the two band simmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
-        // then apply an "exp"
-        altitudeHoldDesired.Altitude += powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) * MAX_ALT_CHANGE_RATE * dT;
+        // then apply an "exp" f(x,k) = (k∙x∙x∙x + x∙(256−k)) / 256
+        altitudeHoldDesired.Altitude += (throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
     } else if (cmd->Throttle < DEADBAND_LOW && zeroed) {
-        altitudeHoldDesired.Altitude += powf(((cmd->Throttle < 0 ? 0 : cmd->Throttle) - DEADBAND_LOW) / (DEADBAND_LOW), 3) * MAX_ALT_CHANGE_RATE * dT;
+        altitudeHoldDesired.Altitude -=  (throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
     } else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH) {
         // Require the stick to enter the dead band before they can move height
         zeroed = true;

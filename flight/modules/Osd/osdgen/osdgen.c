@@ -2124,15 +2124,17 @@ void updateGraphics()
             char temp[50] =
             { 0 };
             memset(temp, ' ', 40);
-            sprintf(temp, "Lat:%11.7f", gpsData.Latitude / 10000000.0f);
+            // Note: cast to double required due to -Wdouble-promotion compiler option is
+            // being used, and there is no way in C to pass a float to a variadic function like sprintf()
+            sprintf(temp, "Lat:%11.7f", (double)(gpsData.Latitude / 10000000.0f));
             write_string(temp, APPLY_HDEADBAND(20), APPLY_VDEADBAND(GRAPHICS_BOTTOM-30), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
-            sprintf(temp, "Lon:%11.7f", gpsData.Longitude / 10000000.0f);
+            sprintf(temp, "Lon:%11.7f", (double)(gpsData.Longitude / 10000000.0f));
             write_string(temp, APPLY_HDEADBAND(20), APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
             sprintf(temp, "Sat:%d", (int) gpsData.Satellites);
             write_string(temp, APPLY_HDEADBAND(GRAPHICS_RIGHT-40), APPLY_VDEADBAND(30), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
             /* Print ADC voltage FLIGHT*/
-            sprintf(temp, "V:%5.2fV", (PIOS_ADC_PinGet(2) * 3 * 6.1f / 4096));
+            sprintf(temp, "V:%5.2fV", (double)(PIOS_ADC_PinGet(2) * 3 * 6.1f / 4096));
             write_string(temp, APPLY_HDEADBAND(20), APPLY_VDEADBAND(20), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
 
             if (gpsData.Heading > 180)
@@ -2183,9 +2185,9 @@ void updateGraphics()
             char temp[50] =
             { 0 };
             memset(temp, ' ', 40);
-            sprintf(temp, "Lat:%11.7f", gpsData.Latitude / 10000000.0f);
+            sprintf(temp, "Lat:%11.7f", (double)(gpsData.Latitude / 10000000.0f));
             write_string(temp, APPLY_HDEADBAND(5), APPLY_VDEADBAND(5), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
-            sprintf(temp, "Lon:%11.7f", gpsData.Longitude / 10000000.0f);
+            sprintf(temp, "Lon:%11.7f", (double)(gpsData.Longitude / 10000000.0f));
             write_string(temp, APPLY_HDEADBAND(5), APPLY_VDEADBAND(15), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
             sprintf(temp, "Fix:%d", (int) gpsData.Status);
             write_string(temp, APPLY_HDEADBAND(5), APPLY_VDEADBAND(25), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
@@ -2204,19 +2206,19 @@ void updateGraphics()
             /* Print ADC voltage */
             //sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
             //write_string(temp, (GRAPHICS_WIDTH_REAL - 2),15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-            sprintf(temp, "Rssi:%4.2fV", (PIOS_ADC_PinGet(5) * 3.0f / 4096.0f));
+            sprintf(temp, "Rssi:%4.2fV", (double)(PIOS_ADC_PinGet(5) * 3.0f / 4096.0f));
             write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(15), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
             /* Print CPU temperature */
-            sprintf(temp, "Temp:%4.2fC", (PIOS_ADC_PinGet(3) * 0.29296875f - 264));
+            sprintf(temp, "Temp:%4.2fC", (double)(PIOS_ADC_PinGet(3) * 0.29296875f - 264));
             write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(25), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
             /* Print ADC voltage FLIGHT*/
-            sprintf(temp, "FltV:%4.2fV", (PIOS_ADC_PinGet(2) * 3.0f * 6.1f / 4096.0f));
+            sprintf(temp, "FltV:%4.2fV", (double)(PIOS_ADC_PinGet(2) * 3.0f * 6.1f / 4096.0f));
             write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(35), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
             /* Print ADC voltage VIDEO*/
-            sprintf(temp, "VidV:%4.2fV", (PIOS_ADC_PinGet(4) * 3.0f * 6.1f / 4096.0f));
+            sprintf(temp, "VidV:%4.2fV", (double)(PIOS_ADC_PinGet(4) * 3.0f * 6.1f / 4096.0f));
             write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(45), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
             /* Print ADC voltage RSSI */

@@ -834,7 +834,7 @@ int WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
      * Note: OP code change to avoid floating point equality test.
      * Was: if (fabs(x) == 1.0)
      */
-	if (fabs(x) - 1.0f < 1e-9f)
+	if (fabsf(x) - 1.0f < 1e-9f)
 	{
 	    FREE(PreSqr);
 	    FREE(f2);

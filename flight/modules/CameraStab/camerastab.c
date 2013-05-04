@@ -180,7 +180,7 @@ static void attitudeUpdated(UAVObjEvent* ev)
 					break;
 				case CAMERASTABSETTINGS_STABILIZATIONMODE_AXISLOCK:
 					input_rate = accessory.AccessoryVal * cameraStab.InputRate[i];
-					if (fabs(input_rate) > cameraStab.MaxAxisLockRate)
+					if (fabsf(input_rate) > cameraStab.MaxAxisLockRate)
 						csd->inputs[i] = bound(csd->inputs[i] + input_rate * 0.001f * dT_millis, cameraStab.InputRange[i]);
 					break;
 				default:
@@ -328,7 +328,7 @@ void applyFeedForward(uint8_t index, float dT_millis, float *attitude, CameraSta
 	float delta = *attitude - csd->ffLastAttitudeFiltered[index];
 	float maxDelta = (float)cameraStab->MaxAccel * 0.001f * dT_millis;
 
-	if (fabs(delta) > maxDelta) {
+	if (fabsf(delta) > maxDelta) {
 		// we are accelerating too hard
 		*attitude = csd->ffLastAttitudeFiltered[index] + ((delta > 0.0f) ? maxDelta : -maxDelta);
 	}

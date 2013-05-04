@@ -439,7 +439,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
 	// If quaternion has become inappropriately short or is nan reinit.
 	// THIS SHOULD NEVER ACTUALLY HAPPEN
-	if((fabs(qmag) < 1.0e-3f) || isnan(qmag)) {
+	if((fabsf(qmag) < 1.0e-3f) || isnan(qmag)) {
 		q[0] = 1;
 		q[1] = 0;
 		q[2] = 0;

@@ -315,7 +315,7 @@ static void updatePathVelocity()
 	if (angle1>180.0f) angle1-=360.0f;
 	if (angle2<-180.0f) angle2+=360.0f;
 	if (angle2>180.0f) angle2-=360.0f;
-	if (fabs(angle1)>=90.0f && fabs(angle2)>=90.0f) {
+	if (fabsf(angle1)>=90.0f && fabsf(angle2)>=90.0f) {
 		error_speed=0;
 	}
 

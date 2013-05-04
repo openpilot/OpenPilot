@@ -1110,7 +1110,7 @@ bool validInputRange(int16_t min, int16_t max, uint16_t value)
  */
 static void applyDeadband(float *value, float deadband)
 {
-    if (fabs(*value) < deadband)
+    if (fabsf(*value) < deadband)
         *value = 0.0f;
     else if (*value > 0.0f)
         *value -= deadband;

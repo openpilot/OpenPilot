@@ -24,7 +24,7 @@ QSlider::add-page:horizontal {
 }
 
 QSlider::add-page:horizontal:disabled {
-    background: #ccc;
+    background: #eee;
     border: 1px solid #999;
     width: 1px;
     border-radius: 4px;
@@ -38,7 +38,7 @@ QSlider::sub-page:horizontal {
 }
 
 QSlider::sub-page:horizontal:disabled {
-    background: #eee;
+    background: #ccc;
     border: 1px solid #999;
     width: 1px;
     border-radius: 4px;

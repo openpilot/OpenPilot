@@ -858,6 +858,9 @@ bool PIOS_RFM22B_TransmitPacket(uint32_t rfm22b_id, PHPacketHandle p) {
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable1, 0x00);
     rfm22_write(rfm22b_dev, RFM22_interrupt_enable2, 0x00);
 
+    // set the tx power
+    rfm22_write(rfm22b_dev, RFM22_tx_power, RFM22_tx_pwr_lna_sw | rfm22b_dev->tx_power);
+
     // TUNE mode
     rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl1, RFM22_opfc1_pllon);
 
@@ -882,12 +885,10 @@ bool PIOS_RFM22B_TransmitPacket(uint32_t rfm22b_id, PHPacketHandle p) {
     rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl2, RFM22_opfc2_ffclrrx | RFM22_opfc2_ffclrtx);
     rfm22_write(rfm22b_dev, RFM22_op_and_func_ctrl2, 0x00);
 
-    // add some data to the chips TX FIFO before enabling the transmitter
-
     // Set the total number of data bytes we are going to transmit.
     rfm22_write(rfm22b_dev, RFM22_transmit_packet_length, rfm22b_dev->tx_data_wr);
 
-    // Add some data.
+    // Add some data to the chips TX FIFO before enabling the transmitter
     rfm22_assertCs(rfm22b_dev);
     PIOS_SPI_TransferByte(rfm22b_dev->spi_id, RFM22_fifo_access | 0x80);
     int bytes_to_write = (rfm22b_dev->tx_data_wr - rfm22b_dev->tx_data_rd);
@@ -1533,9 +1534,6 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22_write(rfm22b_dev, RFM22_sync_word2, SYNC_BYTE_2);
     rfm22_write(rfm22b_dev, RFM22_sync_word1, SYNC_BYTE_3);
     rfm22_write(rfm22b_dev, RFM22_sync_word0, SYNC_BYTE_4);
-
-    // set the tx power
-    rfm22_write(rfm22b_dev, RFM22_tx_power, RFM22_tx_pwr_lna_sw | rfm22b_dev->tx_power);
 
     // TX FIFO Almost Full Threshold (0 - 63)
     rfm22_write(rfm22b_dev, RFM22_tx_fifo_control1, TX_FIFO_HI_WATERMARK);

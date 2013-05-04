@@ -237,7 +237,7 @@ static void AttitudeTask(void *parameters)
 			AttitudeSettingsAccelKiGet(&accelKi);
 			AttitudeSettingsAccelKpGet(&accelKp);
 			AttitudeSettingsYawBiasRateGet(&yawBiasRate);
-			rollPitchBiasRate = 0.0f			
+			rollPitchBiasRate = 0.0f;
 			if (accel_alpha > 0.0f)
 				accel_filter_enabled = true;
 			init = 1;
@@ -437,8 +437,8 @@ static int32_t updateSensorsCC3D(AccelsData * accelsData, GyrosData * gyrosData)
 	}
 
 	// Force the roll & pitch gyro rates to average to zero during initialisation
-	gyro_correct_int[0] += - gyros->x * rollPitchBiasRate;
-	gyro_correct_int[1] += - gyros->y * rollPitchBiasRate;
+	gyro_correct_int[0] += - gyrosData->x * rollPitchBiasRate;
+	gyro_correct_int[1] += - gyrosData->y * rollPitchBiasRate;
 
 	// Because most crafts wont get enough information from gravity to zero yaw gyro, we try
 	// and make it average zero (weakly)

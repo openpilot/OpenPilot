@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       uavobjecttemplate.cpp
+ * @file       $(NAME).java
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      Template for an uavobject in java
  *             $(GENERATEDWARNING)

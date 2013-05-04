@@ -134,7 +134,7 @@ int32_t PIOS_TIM_InitChannels(uint32_t * tim_id, const struct pios_tim_channel *
 			RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
 			break;
 		case (uint32_t) GPIOC:
-			RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+			RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
 			break;
 		default:
 			PIOS_Assert(0);

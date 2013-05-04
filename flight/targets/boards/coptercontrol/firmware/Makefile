@@ -43,6 +43,7 @@ OPTMODULES += CameraStab
 OPTMODULES += ComUsbBridge
 OPTMODULES += GPS
 OPTMODULES += TxPID
+OPTMODULES += Osd/osdoutput
 #OPTMODULES += Altitude
 #OPTMODULES += Fault
 
@@ -66,6 +67,7 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
+    SRC += $(OPUAVOBJ)/callbackscheduler.c
 
     ## UAVObjects
     SRC += $(OPUAVSYNTHDIR)/accessorydesired.c

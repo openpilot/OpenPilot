@@ -121,7 +121,9 @@ void MapDataDelegate::loadComboBox(QComboBox *combo, flightDataModel::pathPlanDa
         combo->addItem("Timeout",ENDCONDITION_TIMEOUT);
         combo->addItem("Distance to tgt",ENDCONDITION_DISTANCETOTARGET);
         combo->addItem("Leg remaining",ENDCONDITION_LEGREMAINING);
+        combo->addItem("Below Error",ENDCONDITION_BELOWERROR);
         combo->addItem("Above Altitude",ENDCONDITION_ABOVEALTITUDE);
+        combo->addItem("Above Speed",ENDCONDITION_ABOVESPEED);
         combo->addItem("Pointing towards next",ENDCONDITION_POINTINGTOWARDSNEXT);
         combo->addItem("Python script",ENDCONDITION_PYTHONSCRIPT);
         combo->addItem("Immediate",ENDCONDITION_IMMEDIATE);

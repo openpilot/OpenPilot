@@ -40,8 +40,8 @@ bool UAVObjectGeneratorWireshark::generate(UAVObjectParser* parser,QString templ
     wiresharkOutputPath = QDir( outputpath + QString("wireshark") );
     wiresharkOutputPath.mkpath(wiresharkOutputPath.absolutePath());
 
-    wiresharkCodeTemplate = readFile( wiresharkCodePath.absoluteFilePath("op-uavobjects/packet-op-uavobjects-template.c") );
-    wiresharkMakeTemplate = readFile( wiresharkCodePath.absoluteFilePath("op-uavobjects/Makefile.common-template") );
+    wiresharkCodeTemplate = readFile( wiresharkCodePath.absoluteFilePath("op-uavobjects/packet-op-uavobjects.c.template") );
+    wiresharkMakeTemplate = readFile( wiresharkCodePath.absoluteFilePath("op-uavobjects/Makefile.common.template") );
 
     if ( wiresharkCodeTemplate.isNull() || wiresharkMakeTemplate.isNull()) {
       cerr << "Error: Could not open wireshark template files." << endl;

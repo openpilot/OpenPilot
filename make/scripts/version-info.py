@@ -160,17 +160,23 @@ class Repo:
 
     def label(self):
         """Return package label (tag if defined, or date-hash if no tag)"""
-        if self._tag == None:
-            return ''.join([self.time('%Y%m%d'), "-", self.hash(8, 'untagged'), self.dirty()])
-        else:
-            return ''.join([self.tag(''), self.dirty()])
+        try:
+            if self._tag == None:
+                return ''.join([self.time('%Y%m%d'), "-", self.hash(8, 'untagged'), self.dirty()])
+            else:
+                return ''.join([self.tag(''), self.dirty()])
+        except:
+            return None
 
     def revision(self):
         """Return full revison string (tag if defined, or branch:hash date time if no tag)"""
-        if self._tag == None:
-            return ''.join([self.branch('no-branch'), ":", self.hash(8, 'no-hash'), self.dirty(), self.time(' %Y%m%d %H:%M')])
-        else:
-            return ''.join([self.tag(''), self.dirty()])
+        try:
+            if self._tag == None:
+                return ''.join([self.branch('no-branch'), ":", self.hash(8, 'no-hash'), self.dirty(), self.time(' %Y%m%d %H:%M')])
+            else:
+                return ''.join([self.tag(''), self.dirty()])
+        except:
+            return None
 
     def info(self):
         """Print some repository info"""
@@ -258,7 +264,6 @@ def xtrim(string, suffix, length):
     up to length characters. If it does not fit then the string will be
     truncated and the '+' will be put between it and the suffix.
     """
-
     if len(string) + len(suffix) <= length:
         return ''.join([string, suffix])
     else:
@@ -270,6 +275,7 @@ def get_hash_of_dirs(directory, verbose = 0, raw = 0):
     """Return hash of XML files from UAVObject definition directory"""
     import hashlib, os
     SHAhash = hashlib.sha1()
+
     if not os.path.exists(directory):
         return -1
 

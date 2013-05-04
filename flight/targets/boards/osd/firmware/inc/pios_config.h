@@ -38,6 +38,7 @@
 
 /* #define PIOS_INCLUDE_DEBUG_CONSOLE */
 /* #define DEBUG_LEVEL 0 */
+/* #define PIOS_ENABLE_DEBUG_PINS */
 
 /* PIOS FreeRTOS support */
 #define PIOS_INCLUDE_FREERTOS
@@ -98,14 +99,16 @@
 /* PIOS common peripherals */
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
-/* #define PIOS_INCLUDE_SERVO */
+#define PIOS_INCLUDE_SERVO
 /* #define PIOS_INCLUDE_I2C_ESC */
 /* #define PIOS_INCLUDE_OVERO */
 /* #define PIOS_OVERO_SPI */
 #define PIOS_INCLUDE_SDCARD
+/* #define PIOS_USE_SETTINGS_ON_SDCARD */
 #define LOG_FILENAME "startup.log"
-/* #define PIOS_INCLUDE_FLASH */
-/* #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS */
+#define PIOS_INCLUDE_FLASH
+#define PIOS_INCLUDE_FLASH_INTERNAL
+#define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
 /* #define FLASH_FREERTOS */
 /* #define PIOS_INCLUDE_FLASH_EEPROM */
 

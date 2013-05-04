@@ -2,19 +2,19 @@
 	<object name="HwSettings" singleinstance="true" settings="true">
 		<description>Selection of optional hardware configurations.</description>
 		<field name="CC_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+PWM,PPM+Outputs,Outputs" defaultvalue="PWM"/>
-		<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),DebugConsole,ComBridge" defaultvalue="Telemetry"/>
-		<field name="CC_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,PPM,DSM2,DSMX (10bit),DSMX (11bit),DebugConsole,ComBridge" defaultvalue="Disabled"/>
+		<field name="CC_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),DebugConsole,ComBridge,OsdHk" defaultvalue="Telemetry"/>
+		<field name="CC_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,PPM,DSM2,DSMX (10bit),DSMX (11bit),DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
 
 		<field name="RV_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+Outputs,Outputs" defaultvalue="PWM"/>
-		<field name="RV_AuxPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge" defaultvalue="Disabled"/>
-		<field name="RV_AuxSBusPort" units="function" type="enum" elements="1" options="Disabled,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge" defaultvalue="Disabled"/>
+		<field name="RV_AuxPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge,OsdHk" defaultvalue="Disabled"/>
+		<field name="RV_AuxSBusPort" units="function" type="enum" elements="1" options="Disabled,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge,OsdHk" defaultvalue="Disabled"/>
 		<field name="RV_FlexiPort" units="function" type="enum" elements="1" options="Disabled,I2C,DSM2,DSMX (10bit),DSMX (11bit),ComAux,ComBridge" defaultvalue="Disabled"/>
 		<field name="RV_TelemetryPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,ComAux,ComBridge" defaultvalue="Telemetry"/>
 		<field name="RV_GPSPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,ComAux,ComBridge" defaultvalue="GPS"/>
 
 		<field name="RM_RcvrPort" units="function" type="enum" elements="1" options="Disabled,PWM,PPM,PPM+PWM,PPM+Outputs,Outputs" defaultvalue="PWM"/>
-		<field name="RM_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),DebugConsole,ComBridge" defaultvalue="Telemetry"/>
-		<field name="RM_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,DSM2,DSMX (10bit),DSMX (11bit),DebugConsole,ComBridge" defaultvalue="Disabled"/>
+		<field name="RM_MainPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,S.Bus,DSM2,DSMX (10bit),DSMX (11bit),DebugConsole,ComBridge,OsdHk" defaultvalue="Telemetry"/>
+		<field name="RM_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,DSM2,DSMX (10bit),DSMX (11bit),DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
 
 		<field name="RadioPort" units="function" type="enum" elements="1" options="Disabled,Telemetry" defaultvalue="Disabled"/>
 		<field name="MaxRFPower" units="mW" type="enum" elements="1" options="1.25,1.6,3.16,6.3,12.6,25,50,100" defaultvalue="100"/>
@@ -26,7 +26,7 @@
 		<field name="USB_HIDPort" units="function" type="enum" elements="1" options="USBTelemetry,RCTransmitter,Disabled" defaultvalue="USBTelemetry"/>
 		<field name="USB_VCPPort" units="function" type="enum" elements="1" options="USBTelemetry,ComBridge,DebugConsole,Disabled" defaultvalue="Disabled"/>
 
-		<field name="OptionalModules" units="" type="enum" elementnames="CameraStab,GPS,ComUsbBridge,Fault,Altitude,Airspeed,TxPID,Autotune,VtolPathFollower,FixedWingPathFollower,Battery,Overo" options="Disabled,Enabled" defaultvalue="Disabled"/>
+		<field name="OptionalModules" units="" type="enum" elementnames="CameraStab,GPS,ComUsbBridge,Fault,Altitude,Airspeed,TxPID,Autotune,VtolPathFollower,FixedWingPathFollower,Battery,Overo,MagBaro,OsdHk" options="Disabled,Enabled" defaultvalue="Disabled"/>
 		<field name="ADCRouting" units="" type="enum" elementnames="ADC0,ADC1,ADC2,ADC3" options="Disabled,BatteryVoltage,BatteryCurrent,AnalogAirspeed,Generic" defaultvalue="Disabled"/>
 		<field name="DSMxBind" units=""  type="uint8"  elements="1" defaultvalue="0"/>
 

@@ -27,6 +27,8 @@
 #ifndef UAVOBJECTGENERATORFLIGHT_H
 #define UAVOBJECTGENERATORFLIGHT_H
 
+#define FLIGHT_CODE_DIR "flight/uavobjects"
+
 #include "../generator_common.h"
 
 class UAVObjectGeneratorFlight

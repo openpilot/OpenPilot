@@ -34,6 +34,7 @@ MODULES += Altitude/revolution
 MODULES += Airspeed/revolution
 MODULES += AltitudeHold
 MODULES += Stabilization
+MODULES += VtolPathFollower
 MODULES += ManualControl
 MODULES += Actuator
 MODULES += GPS
@@ -44,8 +45,8 @@ MODULES += FirmwareIAP
 MODULES += Radio
 MODULES += PathPlanner
 MODULES += FixedWingPathFollower
+MODULES += Osd/osdoutout
 MODULES += Telemetry
-#MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
 
 OPTMODULES =
 
@@ -70,6 +71,7 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
+    SRC += $(OPUAVOBJ)/callbackscheduler.c
 
     #ifeq ($(DEBUG), YES)
     SRC += $(OPSYSTEM)/dcc_stdio.c

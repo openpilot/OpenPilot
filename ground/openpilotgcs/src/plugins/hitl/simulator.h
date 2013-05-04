@@ -45,6 +45,7 @@
 #include "attitudeactual.h"
 #include "attitudesettings.h"
 #include "baroaltitude.h"
+#include "flightbatterystate.h"
 #include "flightstatus.h"
 #include "gcsreceiver.h"
 #include "gcstelemetrystats.h"
@@ -194,6 +195,10 @@ struct Output2Hardware{
     float pitchDesired;
     float yawDesired;
     float throttleDesired;
+
+    float voltage;
+    float current;
+    float consumption;
 };
 
 //struct Output2Simulator{
@@ -285,6 +290,7 @@ protected:
     ActuatorDesired* actDesired;
     ManualControlCommand* manCtrlCommand;
     FlightStatus* flightStatus;
+    FlightBatteryState* flightBatt;
     BaroAltitude* baroAlt;
     AirspeedActual* airspeedActual;
     AttitudeActual* attActual;
@@ -323,6 +329,7 @@ private:
     QTime gpsPosTime;
     QTime groundTruthTime;
     QTime baroAltTime;
+    QTime battTime;
     QTime gcsRcvrTime;
     QTime airspeedActualTime;
 

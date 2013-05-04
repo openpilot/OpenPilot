@@ -217,6 +217,9 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #define PIOS_COM_RFM22B_RF_RX_BUF_LEN 512
 #define PIOS_COM_RFM22B_RF_TX_BUF_LEN 512
 
+#define PIOS_COM_HKOSD_RX_BUF_LEN 22
+#define PIOS_COM_HKOSD_TX_BUF_LEN 22
+
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
 #define PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN 40
 uint32_t pios_com_debug_id;
@@ -227,6 +230,7 @@ uint32_t pios_com_telem_usb_id = 0;
 uint32_t pios_com_telem_rf_id = 0;
 uint32_t pios_com_bridge_id = 0;
 uint32_t pios_com_overo_id = 0;
+uint32_t pios_com_hkosd_id = 0;
 #if defined(PIOS_INCLUDE_RFM22B)
 uint32_t pios_rfm22b_id = 0;
 #endif
@@ -381,6 +385,9 @@ void PIOS_Board_Init(void) {
 
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();
+
+	/* Initialize the delayed callback library */
+	CallbackSchedulerInitialize();
 
 	/* Set up pulse timers */
 	PIOS_TIM_InitClock(&tim_1_cfg);
@@ -573,7 +580,9 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_RM_MAINPORT_COMBRIDGE:
 			PIOS_Board_configure_com(&pios_usart_main_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
 			break;
-			
+		case HWSETTINGS_RM_MAINPORT_OSDHK:
+			PIOS_Board_configure_com(&pios_usart_hkosd_main_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
+			break;
 	} /* 	hwsettings_rm_mainport */
 
 	if (hwsettings_mainport != HWSETTINGS_RM_MAINPORT_SBUS) {
@@ -636,7 +645,11 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_RM_FLEXIPORT_COMBRIDGE:
 			PIOS_Board_configure_com(&pios_usart_flexi_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
 			break;
-	} /* hwsettings_rv_flexiport */
+		case HWSETTINGS_RM_FLEXIPORT_OSDHK:
+			PIOS_Board_configure_com(&pios_usart_hkosd_flexi_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
+			break;
+	} /* hwsettings_rm_flexiport */
+
 
 	/* Initalize the RFM22B radio COM device. */
 #if defined(PIOS_INCLUDE_RFM22B)
@@ -777,11 +790,11 @@ void PIOS_Board_Init(void) {
 	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
 #endif	/* PIOS_INCLUDE_GCSRCVR */
 
-#ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
+#ifndef PIOS_ENABLE_DEBUG_PINS
 	// pios_servo_cfg points to the correct configuration based on input port settings
 	PIOS_Servo_Init(pios_servo_cfg);
 #else
-	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
+	PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
 #endif
 	
 	if (PIOS_I2C_Init(&pios_i2c_mag_pressure_adapter_id, &pios_i2c_mag_pressure_adapter_cfg)) {

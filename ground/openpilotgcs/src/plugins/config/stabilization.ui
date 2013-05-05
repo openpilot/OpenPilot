@@ -652,13 +652,13 @@
                 <property name="text">
                  <string>Default</string>
                 </property>
-		<property name="objrelation" stdset="0">
-		 <stringlist>
-		  <string>objname:StabilizationSettings</string>
-		  <string>button:default</string>
-		  <string>buttongroup:6</string>
-		 </stringlist>
-		</property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:StabilizationSettings</string>
+                  <string>button:default</string>
+                  <string>buttongroup:6</string>
+                 </stringlist>
+                </property>
                </widget>
               </item>
               <item row="0" column="0" colspan="4">
@@ -9025,13 +9025,7 @@ border-radius: 5;</string>
           <property name="autoFillBackground">
            <bool>true</bool>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_16">
-           <property name="spacing">
-            <number>9</number>
-           </property>
-           <property name="margin">
-            <number>9</number>
-           </property>
+          <layout class="QVBoxLayout" name="verticalLayout_29">
            <item>
             <widget class="QGroupBox" name="RateStabilizationGroup_8">
              <property name="sizePolicy">
@@ -18831,6 +18825,52 @@ border-radius: 5;</string>
                   </spacer>
                  </item>
                 </layout>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="groupBox_24">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>60</height>
+              </size>
+             </property>
+             <property name="title">
+              <string>Instant Update</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_16">
+              <item>
+               <widget class="QCheckBox" name="realTimeUpdates_12">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>136</width>
+                  <height>20</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Enabling this feature mean that any changes made to the sliders will be instantly sent and used by the Flight Controller, useful for two person tuning where one normally flies and ones changes the GCS.</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Update flight controller in real time</string>
+                </property>
                </widget>
               </item>
              </layout>

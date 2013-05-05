@@ -61,6 +61,8 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     addWidget(ui->realTimeUpdates_6);
     connect(ui->realTimeUpdates_8, SIGNAL(toggled(bool)), this, SLOT(realtimeUpdatesSlot(bool)));
     addWidget(ui->realTimeUpdates_8);
+    connect(ui->realTimeUpdates_12, SIGNAL(toggled(bool)), this, SLOT(realtimeUpdatesSlot(bool)));
+    addWidget(ui->realTimeUpdates_12);
 
     connect(ui->checkBox_7, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
     addWidget(ui->checkBox_7);
@@ -114,6 +116,7 @@ void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)
 {
     ui->realTimeUpdates_6->setChecked(value);
     ui->realTimeUpdates_8->setChecked(value);
+    ui->realTimeUpdates_12->setChecked(value);
 
     if (value && !realtimeUpdates->isActive()) {
         realtimeUpdates->start(AUTOMATIC_UPDATE_RATE);

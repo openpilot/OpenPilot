@@ -49,6 +49,9 @@ private:
     Ui_StabilizationWidget *ui;
     QTimer * realtimeUpdates;
 
+    // Milliseconds between automatic 'Instant Updates'
+    static const int AUTOMATIC_UPDATE_RATE = 500;
+
 protected slots:
     void refreshWidgetsValues(UAVObject *o = NULL);
 

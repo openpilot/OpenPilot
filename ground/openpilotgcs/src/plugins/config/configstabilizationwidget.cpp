@@ -116,9 +116,11 @@ void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)
     ui->realTimeUpdates_8->setChecked(value);
 
     if (value && !realtimeUpdates->isActive()) {
-        realtimeUpdates->start(300);
-    } else {
+        realtimeUpdates->start(AUTOMATIC_UPDATE_RATE);
+        qDebug() << "Instant Update timer started.";
+    } else if (!value && realtimeUpdates->isActive()) {
         realtimeUpdates->stop();
+        qDebug() << "Instant Update timer stopped.";
     }
 }
 
@@ -134,7 +136,7 @@ void ConfigStabilizationWidget::linkCheckBoxes(bool value)
         ui->checkBox_8->setChecked(value);
     } else if (sender() == ui->basicResponsivenessGroupBox) {
         ui->advancedResponsivenessGroupBox->setChecked(!value);
-        if(value) {
+        if (value) {
             processLinkedWidgets(ui->AttitudeResponsivenessSlider);
             processLinkedWidgets(ui->RateResponsivenessSlider);
         }
@@ -181,7 +183,7 @@ void ConfigStabilizationWidget::processLinkedWidgets(QWidget *widget)
         }
     }
 
-    if(ui->basicResponsivenessGroupBox->isChecked()) {
+    if (ui->basicResponsivenessGroupBox->isChecked()) {
         if (widget == ui->AttitudeResponsivenessSlider) {
             ui->ratePitchKp_4->setValue(ui->AttitudeResponsivenessSlider->value());
         } else if (widget == ui->RateResponsivenessSlider) {

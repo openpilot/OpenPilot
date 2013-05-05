@@ -56,6 +56,16 @@
 			<elementname>BaroZ</elementname>
 		</elementnames>
 	</field>
+	<field name="FakeR" type="float" units="1^2" defaultvalue="
+		1000000,
+		100000,
+		100">
+		<elementnames>
+			<elementname>FakeGPSPosIndoor</elementname>
+			<elementname>FakeGPSVelIndoor</elementname>
+			<elementname>FakeGPSVelAirspeed</elementname>
+		</elementnames>
+	</field>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

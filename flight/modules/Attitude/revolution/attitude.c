@@ -783,10 +783,18 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
 			// Reset the INS algorithm
 			INSGPSInit();
-			INSSetMagVar(&ekfConfiguration.R[EKFCONFIGURATION_R_MAGX]);
-			INSSetAccelVar(&ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELX]);
-			INSSetGyroVar(&ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROX]);
-			INSSetGyroBiasVar(&ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTX]);
+			INSSetMagVar( (float[3]){ ekfConfiguration.R[EKFCONFIGURATION_R_MAGX],
+			                          ekfConfiguration.R[EKFCONFIGURATION_R_MAGY],
+			                          ekfConfiguration.R[EKFCONFIGURATION_R_MAGZ] } );
+			INSSetAccelVar( (float[3]){ ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELX],
+			                            ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELY],
+			                            ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELZ] } );
+			INSSetGyroVar( (float[3]){ ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROX],
+			                            ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROY],
+			                            ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROZ] } );
+			INSSetGyroBiasVar( (float[3]){ ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTX],
+			                               ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTY],
+			                               ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTZ] } );
 			INSSetBaroVar(ekfConfiguration.R[EKFCONFIGURATION_R_BAROZ]);
 
 			// Initialize the gyro bias
@@ -919,7 +927,12 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	
 	if (gps_updated && outdoor_mode)
 	{
-		INSSetPosVelVar(&ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSNORTH], &ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELNORTH]);
+		INSSetPosVelVar((float[3]){ ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSNORTH],
+		                            ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSEAST],
+		                            ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSDOWN] },
+		                (float[3]){ ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELNORTH],
+		                            ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELEAST],
+		                            ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELDOWN] });
 		sensors |= POS_SENSORS;
 
 		if (0) { // Old code to take horizontal velocity from GPS Position update
@@ -937,7 +950,12 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		    * ( -NED[2] - baroData.Altitude );
 
 	} else if (!outdoor_mode) {
-		INSSetPosVelVar((float[3]){1e6f,1e6f,1e6f}, (float[3]){1e5f,1e5f,1e5f});
+		INSSetPosVelVar((float[3]){ ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
+		                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
+		                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR] },
+		                (float[3]){ ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR],
+		                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR],
+		                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR] });
 		vel[0] = vel[1] = vel[2] = 0.0f;
 		NED[0] = NED[1] = 0.0f;
 		NED[2] = -(baroData.Altitude + baroOffset);
@@ -964,7 +982,12 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		if ( !gps_vel_updated && !gps_updated) {
 			// feed airspeed into EKF, treat wind as 1e2 variance
 			sensors |= HORIZ_SENSORS | VERT_SENSORS;
-			INSSetPosVelVar((float[3]){1e6f,1e6f,1e6f}, (float[3]){1e2f,1e2f,1e2f});
+			INSSetPosVelVar((float[3]){ ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
+			                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
+			                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR] },
+			                (float[3]){ ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED],
+			                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED],
+			                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED] });
 			// rotate airspeed vector into NED frame - airspeed is measured in X axis only
 			float R[3][3];
 			Quaternion2R(Nav.q,R);

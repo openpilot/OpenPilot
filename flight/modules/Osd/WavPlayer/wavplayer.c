@@ -76,7 +76,7 @@ MODULE_INITCALL( WavPlayerInitialize, WavPlayerStart)
  * Main WavPlayer task. It does not return.
  */
 
-static void WavPlayerTask(void *parameters)
+static void WavPlayerTask(__attribute__((unused)) void *parameters)
 {
     portTickType lastSysTime;
     // Loop forever

@@ -206,17 +206,17 @@ static void SetNbSats(uint8_t nb)
 	msg[OSDMSG_NB_SATS] = nb;
 }
 
-static void FlightBatteryStateUpdatedCb(UAVObjEvent * ev)
+static void FlightBatteryStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	newBattData = TRUE;
 }
 
-static void GPSPositionUpdatedCb(UAVObjEvent * ev)
+static void GPSPositionUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	newPosData = TRUE;
 }
 
-static void BaroAltitudeUpdatedCb(UAVObjEvent * ev)
+static void BaroAltitudeUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	newBaroData = TRUE;
 }

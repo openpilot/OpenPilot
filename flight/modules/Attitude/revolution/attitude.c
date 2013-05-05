@@ -203,7 +203,7 @@ MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
 /**
  * Module thread, should not return.
  */
-static void AttitudeTask(void *parameters)
+static void AttitudeTask(__attribute__((unused)) void *parameters)
 {
 	bool first_run = true;
 	uint32_t last_algorithm;

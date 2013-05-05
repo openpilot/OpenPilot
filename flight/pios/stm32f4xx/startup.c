@@ -48,7 +48,7 @@ extern char		_sidata, _sdata, _edata, _sfast, _efast;
 char			irq_stack[1024] __attribute__((section(".irqstack")));
 
 /** exception handler */
-typedef const void	(vector)(void);
+typedef void	(vector)(void);
 
 /** CortexM3 CPU vectors */
 struct cm3_vectors {

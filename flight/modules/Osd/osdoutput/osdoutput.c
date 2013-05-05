@@ -136,7 +136,7 @@ static uint32_t osd_hk_com_id;
 static uint8_t osd_hk_msg_dropped;
 static uint8_t osd_packet;
 
-static void send_update(UAVObjEvent * ev)
+static void send_update(__attribute__((unused)) UAVObjEvent * ev)
 {
     static enum osd_hk_sync sync = OSD_HK_SYNC_A;
 

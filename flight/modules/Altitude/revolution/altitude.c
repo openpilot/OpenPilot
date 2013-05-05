@@ -84,7 +84,7 @@ MODULE_INITCALL(AltitudeInitialize, AltitudeStart)
 /**
  * Module thread, should not return.
  */
-static void altitudeTask(void *parameters)
+static void altitudeTask(__attribute__((unused)) void *parameters)
 {
 	BaroAltitudeData data;
 	

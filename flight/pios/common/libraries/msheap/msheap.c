@@ -423,7 +423,7 @@ msheap_extend(uint32_t size)
  * @param   reason      The reason we are panicking.
  */
 void
-msheap_panic(const char *reason)
+msheap_panic(__attribute__((unused)) const char *reason)
 {
     for (;;)
         ;

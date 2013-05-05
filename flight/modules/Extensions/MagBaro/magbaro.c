@@ -140,7 +140,7 @@ static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 };
 #endif
 
-static void magbaroTask(void *parameters)
+static void magbaroTask(__attribute__((unused)) void *parameters)
 {
 	portTickType lastSysTime;
 	

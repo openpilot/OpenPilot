@@ -238,7 +238,7 @@ static uint32_t get_time(void)
 /**
  * Executed by event dispatcher callback to reset INS before resetting OP 
  */
-static void resetTask(UAVObjEvent * ev)
+static void resetTask(__attribute__((unused)) UAVObjEvent * ev)
 {
 #if defined (PIOS_LED_HEARTBEAT)
 	PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);

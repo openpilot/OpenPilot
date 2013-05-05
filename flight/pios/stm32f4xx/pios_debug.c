@@ -41,7 +41,7 @@ static uint8_t debug_num_channels;
 /**
 * Initialise Debug-features
 */
-void PIOS_DEBUG_Init(const struct pios_tim_channel * channels, uint8_t num_channels)
+void PIOS_DEBUG_Init(__attribute__((unused)) const struct pios_tim_channel * channels, __attribute__((unused)) uint8_t num_channels)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
 	PIOS_Assert(channels);
@@ -77,7 +77,7 @@ void PIOS_DEBUG_Init(const struct pios_tim_channel * channels, uint8_t num_chann
 * Set debug-pin high
 * \param pin 0 for S1 output
 */
-void PIOS_DEBUG_PinHigh(uint8_t pin)
+void PIOS_DEBUG_PinHigh(__attribute__((unused)) uint8_t pin)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
 	if (!debug_channels || pin >= debug_num_channels) {
@@ -95,7 +95,7 @@ void PIOS_DEBUG_PinHigh(uint8_t pin)
 * Set debug-pin low
 * \param pin 0 for S1 output
 */
-void PIOS_DEBUG_PinLow(uint8_t pin)
+void PIOS_DEBUG_PinLow(__attribute__((unused)) uint8_t pin)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
 	if (!debug_channels || pin >= debug_num_channels) {
@@ -110,7 +110,7 @@ void PIOS_DEBUG_PinLow(uint8_t pin)
 }
 
 
-void PIOS_DEBUG_PinValue8Bit(uint8_t value)
+void PIOS_DEBUG_PinValue8Bit(__attribute__((unused)) uint8_t value)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
 	if (!debug_channels) {
@@ -136,7 +136,7 @@ void PIOS_DEBUG_PinValue8Bit(uint8_t value)
 #endif // PIOS_ENABLE_DEBUG_PINS
 }
 
-void PIOS_DEBUG_PinValue4BitL(uint8_t value)
+void PIOS_DEBUG_PinValue4BitL(__attribute__((unused)) uint8_t value)
 {
 #ifdef PIOS_ENABLE_DEBUG_PINS
 	if (!debug_channels) {
@@ -159,7 +159,7 @@ void PIOS_DEBUG_PinValue4BitL(uint8_t value)
 /**
  * Report a serious error and halt
  */
-void PIOS_DEBUG_Panic(const char *msg)
+void PIOS_DEBUG_Panic(__attribute__((unused)) const char *msg)
 {
 #ifdef PIOS_INCLUDE_DEBUG_CONSOLE
 	register int *lr asm("lr");	// Link-register holds the PC of the caller

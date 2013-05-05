@@ -159,7 +159,7 @@ static float throttleOffset = 0;
 /**
  * Module thread, should not return.
  */
-static void vtolPathFollowerTask(void *parameters)
+static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
 {
     SystemSettingsData systemSettings;
     FlightStatusData flightStatus;
@@ -732,7 +732,7 @@ static float bound(float val, float min, float max)
     return val;
 }
 
-static void SettingsUpdatedCb(UAVObjEvent * ev)
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     VtolPathFollowerSettingsGet(&vtolpathfollowerSettings);
 }

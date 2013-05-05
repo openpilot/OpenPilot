@@ -143,7 +143,7 @@ static float indicatedAirspeedActualBias = 0;
 /**
  * Module thread, should not return.
  */
-static void pathfollowerTask(void *parameters)
+static void pathfollowerTask(__attribute__((unused)) void *parameters)
 {
 	SystemSettingsData systemSettings;
 	FlightStatusData flightStatus;
@@ -629,13 +629,13 @@ static float bound(float val, float min, float max)
 	return val;
 }
 
-static void SettingsUpdatedCb(UAVObjEvent * ev)
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	FixedWingPathFollowerSettingsGet(&fixedwingpathfollowerSettings);
 	PathDesiredGet(&pathDesired);
 }
 
-static void airspeedActualUpdatedCb(UAVObjEvent * ev)
+static void airspeedActualUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 
 	AirspeedActualData airspeedActual;

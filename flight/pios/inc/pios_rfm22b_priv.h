@@ -749,7 +749,7 @@ struct pios_rfm22b_dev {
 #ifdef PIOS_INCLUDE_RFM22B_RCVR
     // The PPM channel values
     uint16_t ppm_channel[PIOS_RFM22B_RCVR_MAX_CHANNELS];
-    uint8_t ppm_supv_timer;
+    uint32_t ppm_supv_timer;
     bool ppm_fresh;
 #endif
 };

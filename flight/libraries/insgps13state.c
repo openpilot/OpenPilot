@@ -141,7 +141,7 @@ void INSResetP(float PDiag[NUMX])
 	}
 }
 
-void INSSetState(float pos[3], float vel[3], float q[4], float gyro_bias[3], float accel_bias[3])
+void INSSetState(float pos[3], float vel[3], float q[4], float gyro_bias[3], __attribute__((unused)) float accel_bias[3])
 {
 	/* Note: accel_bias not used in 13 state INS */
 	X[0] = pos[0];

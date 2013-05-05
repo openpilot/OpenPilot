@@ -164,7 +164,7 @@ MODULE_INITCALL( ManualControlInitialize, ManualControlStart)
 /**
  * Module task
  */
-static void manualControlTask(void *parameters)
+static void manualControlTask(__attribute__((unused)) void *parameters)
 {
     ManualControlSettingsData settings;
     ManualControlCommandData cmd;
@@ -250,7 +250,7 @@ static void manualControlTask(void *parameters)
 
                 // If a channel has timed out this is not valid data and we shouldn't update anything
                 // until we decide to go to failsafe
-                if (cmd.Channel[n] == PIOS_RCVR_TIMEOUT)
+                if (cmd.Channel[n] == (uint16_t)PIOS_RCVR_TIMEOUT)
                     valid_input_detected = false;
                 else
                     scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n], settings.ChannelMin[n], settings.ChannelNeutral[n]);
@@ -700,7 +700,7 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
  * @brief Update the position desired to current location when
  * enabled and allow the waypoint to be moved by transmitter
  */
-static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool home)
+static void updatePathDesired(__attribute__((unused)) ManualControlCommandData * cmd, bool changed,bool home)
 {
     /*
     static portTickType lastSysTime;
@@ -755,7 +755,7 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool 
     }
 }
 
-static void updateLandDesired(ManualControlCommandData * cmd, bool changed)
+static void updateLandDesired(__attribute__((unused)) ManualControlCommandData * cmd, bool changed)
 {
     /*
     static portTickType lastSysTime;
@@ -838,17 +838,21 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
 // TODO: These functions should never be accessible on CC.  Any configuration that
 // could allow them to be called sholud already throw an error to prevent this happening
 // in flight
-static void updatePathDesired(ManualControlCommandData * cmd, bool changed, bool home)
+static void updatePathDesired(__attribute__((unused)) ManualControlCommandData * cmd,
+								  __attribute__((unused)) bool changed,
+								  __attribute__((unused)) bool home)
 {
     AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);
 }
 
-static void updateLandDesired(ManualControlCommandData * cmd, bool changed)
+static void updateLandDesired(__attribute__((unused)) ManualControlCommandData * cmd,
+								  __attribute__((unused)) bool changed)
 {
     AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);
 }
 
-static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
+static void altitudeHoldDesired(__attribute__((unused)) ManualControlCommandData * cmd,
+									__attribute__((unused)) bool changed)
 {
     AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);
 }
@@ -1134,7 +1138,7 @@ static void applyLPF(float *value, ManualControlSettingsResponseTimeElem channel
 /**
  * Called whenever a critical configuration component changes
  */
-static void configurationUpdatedCb(UAVObjEvent * ev)
+static void configurationUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     configuration_check();
 }

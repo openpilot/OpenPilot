@@ -187,7 +187,7 @@ static int32_t PIOS_ADXL345_FifoDepth(uint8_t depth)
 /**
  * @brief Enable measuring.  This also disables the activity sensors (tap or free fall)
  */
-static int32_t PIOS_ADXL345_SetMeasure(uint8_t enable)
+static int32_t PIOS_ADXL345_SetMeasure(__attribute__((unused)) uint8_t enable)
 {
 	if(PIOS_ADXL345_Validate(dev) != 0)
 		return -1;

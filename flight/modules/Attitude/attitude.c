@@ -174,7 +174,7 @@ MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
  
 int32_t accel_test;
 int32_t gyro_test;
-static void AttitudeTask(void *parameters)
+static void AttitudeTask(__attribute__((unused)) void *parameters)
 {
 	uint8_t init = 0;
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
@@ -573,7 +573,7 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	AttitudeActualSet(&attitudeActual);
 }
 
-static void settingsUpdatedCb(UAVObjEvent * objEv) {
+static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent * objEv) {
 	AttitudeSettingsData attitudeSettings;
 	AttitudeSettingsGet(&attitudeSettings);
 	

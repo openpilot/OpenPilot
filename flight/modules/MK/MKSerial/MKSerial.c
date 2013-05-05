@@ -501,7 +501,7 @@ static void DoConnectedToNC(void)
 	}
 }
 
-static void MkSerialTask(void *parameters)
+static void MkSerialTask(__attribute__((unused)) void *parameters)
 {
 	MkMsg_t msg;
 	uint32_t version;

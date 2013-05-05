@@ -78,7 +78,7 @@ extern uint8_t JumpToApp;
 void sendData(uint8_t * buf, uint16_t size);
 uint32_t CalcFirmCRC(void);
 
-void DataDownload(DownloadAction action) {
+void DataDownload(__attribute__((unused)) DownloadAction action) {
 	if ((DeviceState == downloading)) {
 
 		uint8_t packetSize;

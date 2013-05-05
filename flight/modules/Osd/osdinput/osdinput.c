@@ -110,7 +110,7 @@ MODULE_INITCALL( osdinputInitialize, osdinputStart)
  * Main osdinput task. It does not return.
  */
 
-static void osdinputTask(void *parameters)
+static void osdinputTask(__attribute__((unused)) void *parameters)
 {
     portTickType xDelay = 100 / portTICK_RATE_MS;
     portTickType lastSysTime;

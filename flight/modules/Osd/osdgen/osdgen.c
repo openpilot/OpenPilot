@@ -205,7 +205,7 @@ void swap(uint16_t* a, uint16_t* b)
     *b = temp;
 }
 
-const static int8_t sinData[91] =
+static const int8_t sinData[91] =
 { 0, 2, 3, 5, 7, 9, 10, 12, 14, 16, 17, 19, 21, 22, 24, 26, 28, 29, 31, 33, 34, 36, 37, 39, 41, 42, 44, 45, 47, 48, 50, 52, 53, 54, 56, 57, 59, 60, 62, 63, 64,
         66, 67, 68, 69, 71, 72, 73, 74, 75, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 87, 88, 89, 90, 91, 91, 92, 93, 93, 94, 95, 95, 96, 96, 97, 97, 97, 98,
         98, 98, 99, 99, 99, 99, 100, 100, 100, 100, 100, 100 };
@@ -485,10 +485,10 @@ void write_vline(uint8_t *buff, unsigned int x, unsigned int y0, unsigned int y1
     }
     /* This is an optimised algorithm for writing vertical lines.
      * We begin by finding the addresses of the x,y0 and x,y1 points. */
-    int addr0 = CALC_BUFF_ADDR(x, y0);
-    int addr1 = CALC_BUFF_ADDR(x, y1);
+    unsigned int addr0 = CALC_BUFF_ADDR(x, y0);
+    unsigned int addr1 = CALC_BUFF_ADDR(x, y1);
     /* Then we calculate the pixel data to be written. */
-    int bitnum = CALC_BIT_IN_WORD(x);
+    unsigned int bitnum = CALC_BIT_IN_WORD(x);
     uint16_t mask = 1 << (7 - bitnum);
     /* Run from addr0 to addr1 placing pixels. Increment by the number
      * of words n each graphics line. */
@@ -558,7 +558,7 @@ void write_vline_outlined(unsigned int x, unsigned int y0, unsigned int y1, int 
  */
 void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsigned int width, unsigned int height, int mode)
 {
-    int yy, addr0_old, addr1_old;
+    unsigned int yy, addr0_old, addr1_old;
     CHECK_COORDS(x, y);
     CHECK_COORD_X(x + width);
     CHECK_COORD_Y(y + height);
@@ -567,11 +567,11 @@ void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsig
     }
     // Calculate as if the rectangle was only a horizontal line. We then
     // step these addresses through each row until we iterate `height` times.
-    int addr0 = CALC_BUFF_ADDR(x, y);
-    int addr1 = CALC_BUFF_ADDR(x + width, y);
-    int addr0_bit = CALC_BIT_IN_WORD(x);
-    int addr1_bit = CALC_BIT_IN_WORD(x + width);
-    int mask, mask_l, mask_r, i;
+    unsigned int addr0 = CALC_BUFF_ADDR(x, y);
+    unsigned int addr1 = CALC_BUFF_ADDR(x + width, y);
+    unsigned int addr0_bit = CALC_BIT_IN_WORD(x);
+    unsigned int addr1_bit = CALC_BIT_IN_WORD(x + width);
+    unsigned int mask, mask_l, mask_r, i;
     // If the addresses are equal, we need to write one word vertically.
     if (addr0 == addr1) {
         mask = COMPUTE_HLINE_ISLAND_MASK(addr0_bit, addr1_bit);
@@ -794,7 +794,7 @@ void write_circle_filled(uint8_t *buff, unsigned int cx, unsigned int cy, unsign
 void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mode)
 {
     // Based on http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-    int steep = abs(y1 - y0) > abs(x1 - x0);
+	unsigned int steep = abs(y1 - y0) > abs(x1 - x0);
     if (steep) {
         SWAP(x0, y0);
         SWAP(x1, y1);
@@ -804,11 +804,11 @@ void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1
         SWAP(y0, y1);
     }
     int deltax = x1 - x0;
-    int deltay = abs(y1 - y0);
+    unsigned int deltay = abs(y1 - y0);
     int error = deltax / 2;
     int ystep;
-    int y = y0;
-    int x; //, lasty = y, stox = 0;
+    unsigned int y = y0;
+    unsigned int x; //, lasty = y, stox = 0;
     if (y0 < y1) {
         ystep = 1;
     } else {
@@ -857,7 +857,9 @@ void write_line_lm(unsigned int x0, unsigned int y0, unsigned int x1, unsigned i
  * @param       mode            0 = black outline, white body, 1 = white outline, black body
  * @param       mmode           0 = clear, 1 = set, 2 = toggle
  */
-void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int endcap0, int endcap1, int mode, int mmode)
+void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1,
+							__attribute__((unused)) int endcap0, __attribute__((unused)) int endcap1,
+							int mode, int mmode)
 {
     // Based on http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
     // This could be improved for speed.
@@ -879,11 +881,11 @@ void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsi
         SWAP(y0, y1);
     }
     int deltax = x1 - x0;
-    int deltay = abs(y1 - y0);
+    unsigned int deltay = abs(y1 - y0);
     int error = deltax / 2;
     int ystep;
-    int y = y0;
-    int x;
+    unsigned int y = y0;
+    unsigned int x;
     if (y0 < y1) {
         ystep = 1;
     } else {
@@ -939,8 +941,8 @@ void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsi
  */
 void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff, int mode)
 {
-    uint16_t firstmask = word >> xoff;
-    uint16_t lastmask = word << (16 - xoff);
+    int16_t firstmask = word >> xoff;
+    int16_t lastmask = word << (16 - xoff);
     WRITE_WORD_MODE(buff, addr+1, firstmask && 0x00ff, mode);
     WRITE_WORD_MODE(buff, addr, (firstmask & 0xff00) >> 8, mode);
     if (xoff > 0) {
@@ -1028,7 +1030,7 @@ void write_word_misaligned_lm(uint16_t wordl, uint16_t wordm, unsigned int addr,
 int fetch_font_info(uint8_t ch, int font, struct FontEntry *font_info, char *lookup)
 {
     // First locate the font struct.
-    if (font > SIZEOF_ARRAY(fonts)) {
+    if ((unsigned int)font > SIZEOF_ARRAY(fonts)) {
         return 0; // font does not exist, exit.
     }
     // Load the font info; IDs are always sequential.
@@ -1056,7 +1058,7 @@ int fetch_font_info(uint8_t ch, int font, struct FontEntry *font_info, char *loo
  */
 void write_char16(char ch, unsigned int x, unsigned int y, int font)
 {
-    int yy, addr_temp, row, row_temp, xshift;
+    unsigned int yy, addr_temp, row, row_temp, xshift;
     uint16_t and_mask, or_mask, level_bits;
     struct FontEntry font_info;
     //char lookup = 0;
@@ -1132,14 +1134,14 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
  */
 void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
 {
-    int yy, addr_temp, row, row_temp, xshift;
+    unsigned int yy, addr_temp, row, row_temp, xshift;
     uint16_t and_mask, or_mask, level_bits;
     struct FontEntry font_info;
     char lookup = 0;
     fetch_font_info(ch, font, &font_info, &lookup);
     // Compute starting address (for x,y) of character.
-    int addr = CALC_BUFF_ADDR(x, y);
-    int wbit = CALC_BIT_IN_WORD(x);
+    unsigned int addr = CALC_BUFF_ADDR(x, y);
+    unsigned int wbit = CALC_BIT_IN_WORD(x);
     // If font only supports lowercase or uppercase, make the letter
     // lowercase or uppercase.
     /*if(font_info.flags & FONT_LOWERCASE_ONLY)
@@ -1298,7 +1300,8 @@ void write_string(char *str, unsigned int x, unsigned int y, unsigned int xs, un
  * @param       ha              horizontal align
  * @param       flags   flags (passed to write_char)
  */
-void write_string_formatted(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys, int va, int ha, int flags)
+void write_string_formatted(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys,
+								__attribute__((unused)) int va, __attribute__((unused)) int ha, int flags)
 {
     int fcode = 0, fptr = 0, font = 0, fwidth = 0, fheight = 0, xx = x, yy = y, max_xx = 0, max_height = 0;
     struct FontEntry font_info;
@@ -1600,7 +1603,7 @@ void printTime(uint16_t x, uint16_t y)
  * @param       flags                   special flags (see hud.h.)
  */
 void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int height, int mintick_step, int majtick_step, int mintick_len, int majtick_len,
-        int boundtick_len, int max_val, int flags)
+        int boundtick_len, __attribute__((unused)) int max_val, int flags)
 {
     char temp[15];	//, temp2[15];
     struct FontEntry font_info;
@@ -1743,7 +1746,7 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
  * @param       majtick_len             major tick length
  * @param       flags                   special flags (see hud.h.)
  */
-void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mintick_step, int majtick_step, int mintick_len, int majtick_len, int flags)
+void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mintick_step, int majtick_step, int mintick_len, int majtick_len, __attribute__((unused)) int flags)
 {
     v %= 360; // wrap, just in case.
     struct FontEntry font_info;
@@ -2400,7 +2403,7 @@ MODULE_INITCALL( osdgenInitialize, osdgenStart)
  * Main osd task. It does not return.
  */
 
-static void osdgenTask(void *parameters)
+static void osdgenTask(__attribute__((unused)) void *parameters)
 {
     //portTickType lastSysTime;
     // Loop forever

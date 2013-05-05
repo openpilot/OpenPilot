@@ -155,7 +155,7 @@ int32_t mag_test;
  */
 
 uint32_t sensor_dt_us;
-static void SensorsTask(void *parameters)
+static void SensorsTask(__attribute__((unused)) void *parameters)
 {
 	portTickType lastSysTime;
 	uint32_t accel_samples = 0;
@@ -523,7 +523,7 @@ static void magOffsetEstimation(MagnetometerData *mag)
 /**
  * Locally cache some variables from the AtttitudeSettings object
  */
-static void settingsUpdatedCb(UAVObjEvent * objEv) {
+static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent * objEv) {
 	RevoCalibrationGet(&cal);
 	
 	mag_bias[0] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_X];

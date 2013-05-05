@@ -139,7 +139,7 @@ MODULE_INITCALL(StabilizationInitialize, StabilizationStart)
 /**
  * Module task
  */
-static void stabilizationTask(void* parameters)
+static void stabilizationTask(__attribute__((unused)) void* parameters)
 {
 	UAVObjEvent ev;
 	
@@ -432,7 +432,7 @@ static float bound(float val, float range)
 	return val;
 }
 
-static void SettingsUpdatedCb(UAVObjEvent * ev)
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent * ev)
 {
 	StabilizationSettingsGet(&settings);
 	

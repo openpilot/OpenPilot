@@ -248,7 +248,7 @@ static void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg
 	
 	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(rx_buf_len);
 	PIOS_Assert(rx_buffer);
-	if(tx_buf_len!= -1){ // this is the case for rx/tx ports
+	if(tx_buf_len!= (size_t)-1){ // this is the case for rx/tx ports
 		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(tx_buf_len);
 		PIOS_Assert(tx_buffer);
 		
@@ -830,9 +830,11 @@ void PIOS_Board_Init(void) {
  * \param[in] vcp_port   The USB virtual com port options
  * \param[in] com_speed  The com port speed
  */
-static void configureComCallback(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
-				 OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed,
-				 uint32_t min_frequency, uint32_t max_frequency, uint32_t channel_spacing)
+static void configureComCallback(__attribute__((unused)) OPLinkSettingsRemoteMainPortOptions main_port,
+								  __attribute__((unused)) OPLinkSettingsRemoteFlexiPortOptions flexi_port,
+								  __attribute__((unused)) OPLinkSettingsRemoteVCPPortOptions vcp_port,
+								  OPLinkSettingsComSpeedOptions com_speed,
+								  uint32_t min_frequency, uint32_t max_frequency, uint32_t channel_spacing)
 {
     uint32_t comBaud = 9600;
     switch (com_speed) {

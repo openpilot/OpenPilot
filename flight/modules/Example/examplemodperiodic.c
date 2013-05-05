@@ -76,7 +76,7 @@ int32_t ExampleModPeriodicInitialize()
 /**
  * Module thread, should not return.
  */
-static void exampleTask(void *parameters)
+static void exampleTask(__attribute__((unused)) void *parameters)
 {
 	ExampleSettingsData settings;
 	ExampleObject2Data data;

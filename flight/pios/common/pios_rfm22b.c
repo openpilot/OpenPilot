@@ -212,7 +212,7 @@ static uint8_t rfm22_read_noclaim(struct pios_rfm22b_dev *rfm22b_dev, uint8_t ad
 
 
 /* The state transition table */
-const static struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_STATES] = {
+static const struct pios_rfm22b_transition rfm22b_transitions[RFM22B_STATE_NUM_STATES] = {
 
     // Initialization thread
     [RFM22B_STATE_UNINITIALIZED] = {
@@ -2057,7 +2057,7 @@ static void rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
  *
  * @param[in] rfm22b_dev The device structure
  */
-static void rfm22_sendPPM(struct pios_rfm22b_dev *rfm22b_dev)
+static void rfm22_sendPPM(__attribute__((unused)) struct pios_rfm22b_dev *rfm22b_dev)
 {
 #ifdef PIOS_PPM_RECEIVER
     // Only send PPM if we're connected
@@ -2568,7 +2568,7 @@ static enum pios_rfm22b_event rfm22_error(struct pios_rfm22b_dev *rfm22b_dev)
  * @parem [in] rfm22b_dev  The device structure
  * @return enum pios_rfm22b_event  The next event to inject
  */
-static enum pios_rfm22b_event rfm22_fatal_error(struct pios_rfm22b_dev *rfm22b_dev)
+static enum pios_rfm22b_event rfm22_fatal_error(__attribute__((unused)) struct pios_rfm22b_dev *rfm22b_dev)
 {
     // RF module error .. flash the LED's
     rfm22_clearLEDs();

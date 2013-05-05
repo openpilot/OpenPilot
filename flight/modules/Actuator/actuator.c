@@ -150,7 +150,7 @@ MODULE_INITCALL(ActuatorInitialize, ActuatorStart)
  *
  * @return -1 if error, 0 if success
  */
-static void actuatorTask(void* parameters)
+static void actuatorTask(__attribute__((unused)) void* parameters)
 {
 	UAVObjEvent ev;
 	portTickType lastSysTime;
@@ -718,12 +718,12 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData * actuato
 	}
 }
 
-static void ActuatorSettingsUpdatedCb(UAVObjEvent * ev)
+static void ActuatorSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	actuator_settings_updated = true;
 }
 
-static void MixerSettingsUpdatedCb(UAVObjEvent * ev)
+static void MixerSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	mixer_settings_updated = true;
 }

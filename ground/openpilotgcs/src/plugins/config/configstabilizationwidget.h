@@ -48,9 +48,13 @@ public:
 private:
     Ui_StabilizationWidget *ui;
     QTimer * realtimeUpdates;
+
+protected slots:
+    void refreshWidgetsValues(UAVObject *o = NULL);
+
 private slots:
-    void realtimeUpdatesSlot(int);
-    void linkCheckBoxes(int value);
+    void realtimeUpdatesSlot(bool value);
+    void linkCheckBoxes(bool value);
     void processLinkedWidgets(QWidget*);
 };
 

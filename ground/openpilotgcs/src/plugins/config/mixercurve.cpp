@@ -38,7 +38,7 @@ MixerCurve::MixerCurve(QWidget *parent) :
     m_mixerUI->setupUi(this);
 
     // setup some convienence pointers
-    m_curve = m_mixerUI->CurveWidget;
+    m_curve    = m_mixerUI->CurveWidget;
     m_settings = m_mixerUI->CurveSettings;
 
 
@@ -56,10 +56,10 @@ MixerCurve::MixerCurve(QWidget *parent) :
     // wire up our signals
     connect(m_mixerUI->CurveType, SIGNAL(currentIndexChanged(int)), this, SLOT(CurveTypeChanged()));
     connect(m_mixerUI->ResetCurve, SIGNAL(clicked()), this, SLOT(ResetCurve()));
-    connect(m_mixerUI->PopupCurve, SIGNAL(clicked()),this,SLOT(PopupCurve()));
+    connect(m_mixerUI->PopupCurve, SIGNAL(clicked()), this, SLOT(PopupCurve()));
     connect(m_mixerUI->GenerateCurve, SIGNAL(clicked()), this, SLOT(GenerateCurve()));
     connect(m_curve, SIGNAL(curveUpdated()), this, SLOT(UpdateSettingsTable()));
-    connect(m_settings, SIGNAL(cellChanged(int,int)), this, SLOT(SettingsTableChanged()));
+    connect(m_settings, SIGNAL(cellChanged(int, int)), this, SLOT(SettingsTableChanged()));
     connect(m_mixerUI->CurveMin, SIGNAL(valueChanged(double)), this, SLOT(CurveMinChanged(double)));
     connect(m_mixerUI->CurveMax, SIGNAL(valueChanged(double)), this, SLOT(CurveMaxChanged(double)));
     connect(m_mixerUI->CurveStep, SIGNAL(valueChanged(double)), this, SLOT(GenerateCurve()));
@@ -79,26 +79,26 @@ void MixerCurve::setMixerType(MixerCurveType curveType)
     m_mixerUI->CurveMax->setMaximum(1.0);
 
     switch (m_curveType) {
-        case MixerCurve::MIXERCURVE_THROTTLE:
-        {
-            m_mixerUI->SettingsGroup->setTitle("Throttle Curve");
-            m_curve->setRange(0.0, 1.0);
-            m_mixerUI->CurveMin->setMinimum(0.0);
-            m_mixerUI->CurveMax->setMinimum(0.0);
-            break;
-        }
-        case MixerCurve::MIXERCURVE_PITCH:
-        {
-            m_mixerUI->SettingsGroup->setTitle("Pitch Curve");
-            m_curve->setRange(-1.0, 1.0);            
-            m_mixerUI->CurveMin->setMinimum(-1.0);
-            m_mixerUI->CurveMax->setMinimum(-1.0);
-            break;
-        }
+    case MixerCurve::MIXERCURVE_THROTTLE:
+    {
+        m_mixerUI->SettingsGroup->setTitle("Throttle Curve");
+        m_curve->setRange(0.0, 1.0);
+        m_mixerUI->CurveMin->setMinimum(0.0);
+        m_mixerUI->CurveMax->setMinimum(0.0);
+        break;
+    }
+    case MixerCurve::MIXERCURVE_PITCH:
+    {
+        m_mixerUI->SettingsGroup->setTitle("Pitch Curve");
+        m_curve->setRange(-1.0, 1.0);
+        m_mixerUI->CurveMin->setMinimum(-1.0);
+        m_mixerUI->CurveMax->setMinimum(-1.0);
+        break;
+    }
     }
 
     m_spinDelegate->setRange(m_mixerUI->CurveMin->minimum(), m_mixerUI->CurveMax->maximum());
-    for (int i=0; i<MixerCurveWidget::NODE_NUMELEM; i++) {
+    for (int i = 0; i < MixerCurveWidget::NODE_NUMELEM; i++) {
         m_settings->setItemDelegateForRow(i, m_spinDelegate);
     }
 
@@ -121,7 +121,7 @@ void MixerCurve::PopupCurve()
     m_mixerUI->SettingsGroup->show();
     m_mixerUI->PopupCurve->hide();
 
-    PopupWidget* popup = new PopupWidget();
+    PopupWidget *popup = new PopupWidget();
     popup->popUp(this);
 
     m_mixerUI->SettingsGroup->hide();
@@ -130,7 +130,7 @@ void MixerCurve::PopupCurve()
 
 void MixerCurve::UpdateCurveUI()
 {
-    //get the user settings
+    // get the user settings
     QString curveType = m_mixerUI->CurveType->currentText();
 
 
@@ -138,7 +138,7 @@ void MixerCurve::UpdateCurveUI()
     m_mixerUI->CurveStep->setMaximum(100.0);
     m_mixerUI->CurveStep->setSingleStep(1.00);
 
-    //set default visible
+    // set default visible
     m_mixerUI->minLabel->setVisible(true);
     m_mixerUI->CurveMin->setVisible(true);
     m_mixerUI->maxLabel->setVisible(false);
@@ -146,8 +146,7 @@ void MixerCurve::UpdateCurveUI()
     m_mixerUI->stepLabel->setVisible(false);
     m_mixerUI->CurveStep->setVisible(false);
 
-    if ( curveType.compare("Flat")==0)
-    {
+    if (curveType.compare("Flat") == 0) {
         m_mixerUI->minLabel->setVisible(false);
         m_mixerUI->CurveMin->setVisible(false);
         m_mixerUI->stepLabel->setVisible(true);
@@ -157,13 +156,11 @@ void MixerCurve::UpdateCurveUI()
         m_mixerUI->CurveStep->setSingleStep(0.01);
         m_mixerUI->CurveStep->setValue(m_mixerUI->CurveMax->value() / 2);
     }
-    if ( curveType.compare("Linear")==0)
-    {
+    if (curveType.compare("Linear") == 0) {
         m_mixerUI->maxLabel->setVisible(true);
         m_mixerUI->CurveMax->setVisible(true);
     }
-    if ( curveType.compare("Step")==0)
-    {
+    if (curveType.compare("Step") == 0) {
         m_mixerUI->maxLabel->setVisible(true);
         m_mixerUI->CurveMax->setVisible(true);
         m_mixerUI->stepLabel->setText("Step at");
@@ -172,8 +169,7 @@ void MixerCurve::UpdateCurveUI()
 
         m_mixerUI->CurveStep->setMinimum(1.0);
     }
-    if ( curveType.compare("Exp")==0)
-    {
+    if (curveType.compare("Exp") == 0) {
         m_mixerUI->maxLabel->setVisible(true);
         m_mixerUI->CurveMax->setVisible(true);
         m_mixerUI->stepLabel->setText("Power");
@@ -182,13 +178,12 @@ void MixerCurve::UpdateCurveUI()
 
         m_mixerUI->CurveStep->setMinimum(1.0);
     }
-    if ( curveType.compare("Log")==0)
-    {
+    if (curveType.compare("Log") == 0) {
         m_mixerUI->maxLabel->setVisible(true);
         m_mixerUI->CurveMax->setVisible(true);
         m_mixerUI->stepLabel->setText("Power");
         m_mixerUI->stepLabel->setVisible(true);
-        m_mixerUI->CurveStep->setVisible(true);        
+        m_mixerUI->CurveStep->setVisible(true);
         m_mixerUI->CurveStep->setMinimum(1.0);
     }
 
@@ -197,61 +192,52 @@ void MixerCurve::UpdateCurveUI()
 
 void MixerCurve::GenerateCurve()
 {
-   double scale;
-   double newValue;
+    double scale;
+    double newValue;
 
-   //get the user settings
-   double value1 = getCurveMin();
-   double value2 = getCurveMax();
-   double value3 = getCurveStep();
+    // get the user settings
+    double value1     = getCurveMin();
+    double value2     = getCurveMax();
+    double value3     = getCurveStep();
 
-   QString CurveType = m_mixerUI->CurveType->currentText();
+    QString CurveType = m_mixerUI->CurveType->currentText();
 
-   QList<double> points;
+    QList<double> points;
 
-   for (int i=0; i<MixerCurveWidget::NODE_NUMELEM; i++)
-   {
-       scale =((double)i/(double)(MixerCurveWidget::NODE_NUMELEM - 1));
+    for (int i = 0; i < MixerCurveWidget::NODE_NUMELEM; i++) {
+        scale = ((double)i / (double)(MixerCurveWidget::NODE_NUMELEM - 1));
 
-       if ( CurveType.compare("Flat")==0)
-       {
-           points.append(value3);
-       }
-       if ( CurveType.compare("Linear")==0)
-       {
-           newValue =value1 +(scale*(value2-value1));
-           points.append(newValue);
-       }
-       if ( CurveType.compare("Step")==0)
-       {
-           if (scale*100<value3)
-           {
-               points.append(value1);
-           }
-           else
-           {
-               points.append(value2);
-           }
-       }
-       if ( CurveType.compare("Exp")==0)
-       {
-           newValue =value1 +(((exp(scale*(value3/10))-1))/(exp((value3/10))-1)*(value2-value1));
-           points.append(newValue);
-       }
-       if ( CurveType.compare("Log")==0)
-       {
-           newValue = value1 +(((log(scale*(value3*2)+1))/(log(1+(value3*2))))*(value2-value1));
-           points.append(newValue);
-       }
-   }
+        if (CurveType.compare("Flat") == 0) {
+            points.append(value3);
+        }
+        if (CurveType.compare("Linear") == 0) {
+            newValue = value1 + (scale * (value2 - value1));
+            points.append(newValue);
+        }
+        if (CurveType.compare("Step") == 0) {
+            if (scale * 100 < value3) {
+                points.append(value1);
+            } else {
+                points.append(value2);
+            }
+        }
+        if (CurveType.compare("Exp") == 0) {
+            newValue = value1 + (((exp(scale * (value3 / 10)) - 1)) / (exp((value3 / 10)) - 1) * (value2 - value1));
+            points.append(newValue);
+        }
+        if (CurveType.compare("Log") == 0) {
+            newValue = value1 + (((log(scale * (value3 * 2) + 1)) / (log(1 + (value3 * 2)))) * (value2 - value1));
+            points.append(newValue);
+        }
+    }
 
-   setCurve(&points);
+    setCurve(&points);
 }
 
 /**
-  Wrappers for mixercurvewidget.
-  */
-void MixerCurve::initCurve (const QList<double>* points)
+   Wrappers for mixercurvewidget.
+ */
+void MixerCurve::initCurve(const QList<double> *points)
 {
     m_curve->setCurve(points);
     UpdateSettingsTable();
@@ -269,11 +255,12 @@ void MixerCurve::initLinearCurve(int numPoints, double maxValue, double minValue
 
     m_curve->initLinearCurve(numPoints, maxValue, minValue);
 
-    if (m_spinDelegate)
+    if (m_spinDelegate) {
         m_spinDelegate->setRange(minValue, maxValue);
+    }
 }
 
-void MixerCurve::setCurve(const QList<double>* points)
+void MixerCurve::setCurve(const QList<double> *points)
 {
     m_curve->setCurve(points);
     UpdateSettingsTable();
@@ -281,7 +268,7 @@ void MixerCurve::setCurve(const QList<double>* points)
 
 void MixerCurve::setMin(double value)
 {
-    //m_curve->setMin(value);
+    // m_curve->setMin(value);
     m_mixerUI->CurveMin->setMinimum(value);
 }
 
@@ -292,7 +279,7 @@ double MixerCurve::getMin()
 
 void MixerCurve::setMax(double value)
 {
-    //m_curve->setMax(value);
+    // m_curve->setMax(value);
     m_mixerUI->CurveMax->setMaximum(value);
 }
 
@@ -326,11 +313,11 @@ void MixerCurve::UpdateSettingsTable()
     QList<double> points = m_curve->getCurve();
     int ptCnt = points.count();
 
-    for (int i=0; i<ptCnt; i++)
-    {
-        QTableWidgetItem* item = m_settings->item(i, 0);
-        if (item)
-            item->setText(QString().sprintf("%.2f",points.at( (ptCnt - 1) - i )));
+    for (int i = 0; i < ptCnt; i++) {
+        QTableWidgetItem *item = m_settings->item(i, 0);
+        if (item) {
+            item->setText(QString().sprintf("%.2f", points.at((ptCnt - 1) - i)));
+        }
     }
 }
 
@@ -338,12 +325,12 @@ void MixerCurve::SettingsTableChanged()
 {
     QList<double> points;
 
-    for (int i=0; i < m_settings->rowCount(); i++)
-    {
-        QTableWidgetItem* item = m_settings->item(i, 0);
+    for (int i = 0; i < m_settings->rowCount(); i++) {
+        QTableWidgetItem *item = m_settings->item(i, 0);
 
-        if (item)
+        if (item) {
             points.push_front(item->text().toDouble());
+        }
     }
 
     m_mixerUI->CurveMin->setValue(points.first());
@@ -369,7 +356,7 @@ void MixerCurve::CurveMinChanged(double value)
 void MixerCurve::CurveMaxChanged(double value)
 {
     // the max changed so redraw the curve
-    //  mixercurvewidget::setCurve will trim any points above max
+    // mixercurvewidget::setCurve will trim any points above max
     QList<double> points = m_curve->getCurve();
     points.removeLast();
     points.append(value);
@@ -381,23 +368,25 @@ void MixerCurve::showEvent(QShowEvent *event)
     Q_UNUSED(event);
 
     m_settings->resizeColumnsToContents();
-    m_settings->setColumnWidth(0,(m_settings->width()-  m_settings->verticalHeader()->width()));
+    m_settings->setColumnWidth(0, (m_settings->width() - m_settings->verticalHeader()->width()));
 
-    int h = (m_settings->height() -  m_settings->horizontalHeader()->height()) / m_settings->rowCount();
-    for (int i=0; i<m_settings->rowCount(); i++)
+    int h = (m_settings->height() - m_settings->horizontalHeader()->height()) / m_settings->rowCount();
+    for (int i = 0; i < m_settings->rowCount(); i++) {
         m_settings->setRowHeight(i, h);
+    }
 
     m_curve->showEvent(event);
 }
 
-void MixerCurve::resizeEvent(QResizeEvent* event)
+void MixerCurve::resizeEvent(QResizeEvent *event)
 {
     m_settings->resizeColumnsToContents();
-    m_settings->setColumnWidth(0,(m_settings->width() -  m_settings->verticalHeader()->width()));
+    m_settings->setColumnWidth(0, (m_settings->width() - m_settings->verticalHeader()->width()));
 
-    int h = (m_settings->height() -  m_settings->horizontalHeader()->height()) / m_settings->rowCount();
-    for (int i=0; i<m_settings->rowCount(); i++)
+    int h = (m_settings->height() - m_settings->horizontalHeader()->height()) / m_settings->rowCount();
+    for (int i = 0; i < m_settings->rowCount(); i++) {
         m_settings->setRowHeight(i, h);
+    }
 
     m_curve->resizeEvent(event);
 }

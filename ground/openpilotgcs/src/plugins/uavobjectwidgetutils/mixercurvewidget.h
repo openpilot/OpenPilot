@@ -37,57 +37,54 @@
 #include "mixercurveline.h"
 #include "uavobjectwidgetutils_global.h"
 
-class UAVOBJECTWIDGETUTILS_EXPORT MixerCurveWidget : public QGraphicsView
-{
+class UAVOBJECTWIDGETUTILS_EXPORT MixerCurveWidget : public QGraphicsView {
     Q_OBJECT
 
 public:
     MixerCurveWidget(QWidget *parent = 0);
-   ~MixerCurveWidget();
+    ~MixerCurveWidget();
 
     friend class MixerCurve;
 
-   void itemMoved(double itemValue); // Callback when a point is moved, to be updated
-   void initCurve (const QList<double>* points);
-   QList<double> getCurve();
-   void initLinearCurve(int numPoints, double maxValue = 1, double minValue = 0);
-   void setCurve(const QList<double>* points);
-   void setMin(double value);
-   double getMin();
-   void setMax(double value);
-   double getMax();
-   double setRange(double min, double max);
+    void itemMoved(double itemValue); // Callback when a point is moved, to be updated
+    void initCurve(const QList<double> *points);
+    QList<double> getCurve();
+    void initLinearCurve(int numPoints, double maxValue = 1, double minValue = 0);
+    void setCurve(const QList<double> *points);
+    void setMin(double value);
+    double getMin();
+    void setMax(double value);
+    double getMax();
+    double setRange(double min, double max);
 
-   static const int NODE_NUMELEM = 5;
+    static const int NODE_NUMELEM = 5;
 
 signals:
-   void curveUpdated();
-   void curveMinChanged(double value);
-   void curveMaxChanged(double value);
+    void curveUpdated();
+    void curveMinChanged(double value);
+    void curveMaxChanged(double value);
 
 private slots:
 
 private:
-   QGraphicsSvgItem *plot;
+    QGraphicsSvgItem *plot;
 
-   QList<Edge*> edgeList;
-   QList<MixerNode*> nodeList;
+    QList<Edge *> edgeList;
+    QList<MixerNode *> nodeList;
 
-   double curveMin;
-   double curveMax;
-   bool   curveUpdating;
+    double curveMin;
+    double curveMax;
+    bool curveUpdating;
 
-   void  initNodes(int numPoints);
-   void setPositiveColor(QString color);
-   void setNegativeColor(QString color);
+    void  initNodes(int numPoints);
+    void setPositiveColor(QString color);
+    void setNegativeColor(QString color);
 
-   void  resizeCommands();
+    void  resizeCommands();
 
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
     void changeEvent(QEvent *event);
-
-
 };
 #endif /* MIXERCURVEWIDGET_H_ */

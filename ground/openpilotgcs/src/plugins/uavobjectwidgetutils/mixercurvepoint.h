@@ -39,8 +39,7 @@ QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
-class MixerNode : public QObject,public QGraphicsItem
-{
+class MixerNode : public QObject, public QGraphicsItem {
     Q_OBJECT
 public:
     MixerNode(MixerCurveWidget *graphWidget);
@@ -48,15 +47,37 @@ public:
     QList<Edge *> edges() const;
 
     enum { Type = UserType + 10 };
-    int type() const { return Type; }
+    int type() const
+    {
+        return Type;
+    }
 
     void verticalMove(bool flag);
 
-    void setPositiveColor(QColor color = "#609FF2") {positiveColor = color; }
-    void setNegativeColor(QColor color = "#EF5F5F") {negativeColor = color; }
-    void setImage(QImage img) { image = img; }
-    void setDrawNode(bool draw) { drawNode = draw; }
-    void setDrawText(bool draw) { drawText = draw; }
+    void setPositiveColor(QColor color = "#609FF2")
+    {
+        positiveColor = color;
+    }
+
+    void setNegativeColor(QColor color = "#EF5F5F")
+    {
+        negativeColor = color;
+    }
+
+    void setImage(QImage img)
+    {
+        image = img;
+    }
+
+    void setDrawNode(bool draw)
+    {
+        drawNode = draw;
+    }
+
+    void setDrawText(bool draw)
+    {
+        drawText = draw;
+    }
 
     QRectF boundingRect() const;
     QPainterPath shape() const;
@@ -69,25 +90,24 @@ protected:
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    
+
 private:
-    QList<Edge *>       edgeList;
-    QPointF             newPos;
-    MixerCurveWidget*   graph;
+    QList<Edge *> edgeList;
+    QPointF newPos;
+    MixerCurveWidget *graph;
 
-    QColor             positiveColor;
-    QColor             neutralColor;
-    QColor             negativeColor;
-    QColor             disabledColor;
-    QColor             disabledTextColor;
+    QColor positiveColor;
+    QColor neutralColor;
+    QColor negativeColor;
+    QColor disabledColor;
+    QColor disabledTextColor;
 
-    QImage              image;
+    QImage image;
 
-    bool    vertical;
-    bool    drawNode;
-    bool    drawText;
-    int     index;
-
+    bool vertical;
+    bool drawNode;
+    bool drawText;
+    int index;
 };
 
-#endif  // MIXERCURVEPOINT_H
+#endif // MIXERCURVEPOINT_H

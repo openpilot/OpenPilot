@@ -45,9 +45,10 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     ui->setupUi(this);
 
 
-    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
-    Core::Internal::GeneralSettings* settings = pm->getObject<Core::Internal::GeneralSettings>();
-    if(!settings->useExpertMode()) {
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
+
+    if (!settings->useExpertMode()) {
         ui->saveStabilizationToRAM_6->setVisible(false);
     }
 
@@ -56,18 +57,18 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     realtimeUpdates = new QTimer(this);
     connect(realtimeUpdates, SIGNAL(timeout()), this, SLOT(apply()));
 
-    connect(ui->realTimeUpdates_6, SIGNAL(stateChanged(int)), this, SLOT(realtimeUpdatesSlot(int)));
+    connect(ui->realTimeUpdates_6, SIGNAL(toggled(bool)), this, SLOT(realtimeUpdatesSlot(bool)));
     addWidget(ui->realTimeUpdates_6);
-    connect(ui->realTimeUpdates_8, SIGNAL(stateChanged(int)), this, SLOT(realtimeUpdatesSlot(int)));
+    connect(ui->realTimeUpdates_8, SIGNAL(toggled(bool)), this, SLOT(realtimeUpdatesSlot(bool)));
     addWidget(ui->realTimeUpdates_8);
 
-    connect(ui->checkBox_7, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+    connect(ui->checkBox_7, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
     addWidget(ui->checkBox_7);
-    connect(ui->checkBox_2, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+    connect(ui->checkBox_2, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
     addWidget(ui->checkBox_2);
-    connect(ui->checkBox_8, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+    connect(ui->checkBox_8, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
     addWidget(ui->checkBox_8);
-    connect(ui->checkBox_3, SIGNAL(stateChanged(int)), this, SLOT(linkCheckBoxes(int)));
+    connect(ui->checkBox_3, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
     addWidget(ui->checkBox_3);
 
     addWidget(ui->pushButton_2);
@@ -80,7 +81,12 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
     addWidget(ui->pushButton_22);
     addWidget(ui->pushButton_23);
 
-    connect(this, SIGNAL(widgetContentsChanged(QWidget*)), this, SLOT(processLinkedWidgets(QWidget*)));
+    addWidget(ui->basicResponsivenessGroupBox);
+    connect(ui->basicResponsivenessGroupBox, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
+    addWidget(ui->advancedResponsivenessGroupBox);
+    connect(ui->advancedResponsivenessGroupBox, SIGNAL(toggled(bool)), this, SLOT(linkCheckBoxes(bool)));
+
+    connect(this, SIGNAL(widgetContentsChanged(QWidget *)), this, SLOT(processLinkedWidgets(QWidget *)));
 
     // Link by default
     ui->checkBox_7->setChecked(true);
@@ -95,100 +101,91 @@ ConfigStabilizationWidget::~ConfigStabilizationWidget()
     // Do nothing
 }
 
-void ConfigStabilizationWidget::realtimeUpdatesSlot(int value)
-{
-    ui->realTimeUpdates_6->setCheckState((Qt::CheckState)value);
-    ui->realTimeUpdates_8->setCheckState((Qt::CheckState)value);
 
-    if(value == Qt::Checked && !realtimeUpdates->isActive()) {
+void ConfigStabilizationWidget::refreshWidgetsValues(UAVObject *o)
+{
+    ConfigTaskWidget::refreshWidgetsValues(o);
+
+    ui->basicResponsivenessGroupBox->setChecked(ui->rateRollKp_3->value() == ui->ratePitchKp_4->value() &&
+                                                ui->rateRollKi_3->value() == ui->ratePitchKi_4->value());
+}
+
+void ConfigStabilizationWidget::realtimeUpdatesSlot(bool value)
+{
+    ui->realTimeUpdates_6->setChecked(value);
+    ui->realTimeUpdates_8->setChecked(value);
+
+    if (value && !realtimeUpdates->isActive()) {
         realtimeUpdates->start(300);
-    }
-    else if(value == Qt::Unchecked) {
+    } else {
         realtimeUpdates->stop();
     }
 }
 
-void ConfigStabilizationWidget::linkCheckBoxes(int value)
+void ConfigStabilizationWidget::linkCheckBoxes(bool value)
 {
-    if(sender() == ui->checkBox_7) {
-        ui->checkBox_3->setCheckState((Qt::CheckState)value);
-    }
-    else if(sender() == ui->checkBox_3) {
-        ui->checkBox_7->setCheckState((Qt::CheckState)value);
-    }
-    else if(sender( )== ui->checkBox_8) {
-        ui->checkBox_2->setCheckState((Qt::CheckState)value);
-    }
-    else if(sender() == ui->checkBox_2) {
-        ui->checkBox_8->setCheckState((Qt::CheckState)value);
+    if (sender() == ui->checkBox_7) {
+        ui->checkBox_3->setChecked(value);
+    } else if (sender() == ui->checkBox_3) {
+        ui->checkBox_7->setChecked(value);
+    } else if (sender() == ui->checkBox_8) {
+        ui->checkBox_2->setChecked(value);
+    } else if (sender() == ui->checkBox_2) {
+        ui->checkBox_8->setChecked(value);
+    } else if (sender() == ui->basicResponsivenessGroupBox) {
+        ui->advancedResponsivenessGroupBox->setChecked(!value);
+        if(value) {
+            processLinkedWidgets(ui->AttitudeResponsivenessSlider);
+            processLinkedWidgets(ui->RateResponsivenessSlider);
+        }
+    } else if (sender() == ui->advancedResponsivenessGroupBox) {
+        ui->basicResponsivenessGroupBox->setChecked(!value);
     }
 }
 
-void ConfigStabilizationWidget::processLinkedWidgets(QWidget * widget)
+void ConfigStabilizationWidget::processLinkedWidgets(QWidget *widget)
 {
-    if(ui->checkBox_7->checkState()==Qt::Checked)
-    {
-        if(widget== ui->RateRollKp_2)
-        {
+    if (ui->checkBox_7->isChecked()) {
+        if (widget == ui->RateRollKp_2) {
             ui->RatePitchKp->setValue(ui->RateRollKp_2->value());
-        }
-        else if(widget== ui->RateRollKi_2)
-        {
+        } else if (widget == ui->RateRollKi_2) {
             ui->RatePitchKi->setValue(ui->RateRollKi_2->value());
-        }
-        else if(widget== ui->RateRollILimit_2)
-        {
+        } else if (widget == ui->RateRollILimit_2) {
             ui->RatePitchILimit->setValue(ui->RateRollILimit_2->value());
-        }
-        else if(widget== ui->RatePitchKp)
-        {
+        } else if (widget == ui->RatePitchKp) {
             ui->RateRollKp_2->setValue(ui->RatePitchKp->value());
-        }
-        else if(widget== ui->RatePitchKi)
-        {
+        } else if (widget == ui->RatePitchKi) {
             ui->RateRollKi_2->setValue(ui->RatePitchKi->value());
-        }
-        else if(widget== ui->RatePitchILimit)
-        {
+        } else if (widget == ui->RatePitchILimit) {
             ui->RateRollILimit_2->setValue(ui->RatePitchILimit->value());
-        }
-        else if(widget== ui->RollRateKd)
-        {
+        } else if (widget == ui->RollRateKd) {
             ui->PitchRateKd->setValue(ui->RollRateKd->value());
-        }
-        else if(widget== ui->PitchRateKd)
-        {
+        } else if (widget == ui->PitchRateKd) {
             ui->RollRateKd->setValue(ui->PitchRateKd->value());
         }
     }
-    if(ui->checkBox_8->checkState()==Qt::Checked)
-    {
-        if(widget== ui->AttitudeRollKp)
-        {
+
+    if (ui->checkBox_8->isChecked()) {
+        if (widget == ui->AttitudeRollKp) {
             ui->AttitudePitchKp_2->setValue(ui->AttitudeRollKp->value());
-        }
-        else if(widget== ui->AttitudeRollKi)
-        {
+        } else if (widget == ui->AttitudeRollKi) {
             ui->AttitudePitchKi_2->setValue(ui->AttitudeRollKi->value());
-        }
-        else if(widget== ui->AttitudeRollILimit)
-        {
+        } else if (widget == ui->AttitudeRollILimit) {
             ui->AttitudePitchILimit_2->setValue(ui->AttitudeRollILimit->value());
-        }
-        else if(widget== ui->AttitudePitchKp_2)
-        {
+        } else if (widget == ui->AttitudePitchKp_2) {
             ui->AttitudeRollKp->setValue(ui->AttitudePitchKp_2->value());
-        }
-        else if(widget== ui->AttitudePitchKi_2)
-        {
+        } else if (widget == ui->AttitudePitchKi_2) {
             ui->AttitudeRollKi->setValue(ui->AttitudePitchKi_2->value());
-        }
-        else if(widget== ui->AttitudePitchILimit_2)
-        {
+        } else if (widget == ui->AttitudePitchILimit_2) {
             ui->AttitudeRollILimit->setValue(ui->AttitudePitchILimit_2->value());
         }
     }
+
+    if(ui->basicResponsivenessGroupBox->isChecked()) {
+        if (widget == ui->AttitudeResponsivenessSlider) {
+            ui->ratePitchKp_4->setValue(ui->AttitudeResponsivenessSlider->value());
+        } else if (widget == ui->RateResponsivenessSlider) {
+            ui->ratePitchKi_4->setValue(ui->RateResponsivenessSlider->value());
+        }
+    }
 }
-
-
-

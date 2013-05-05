@@ -1,0 +1,26 @@
+<xml>
+    <object name="EKFStateVariance" singleinstance="true" settings="false">
+        <description>Extended Kalman Filter state covariance</description>
+	<field name="P" units="1^2" type="float">
+		<elementnames>
+			<elementname>PositionNorth</elementname>
+			<elementname>PositionEast</elementname>
+			<elementname>PositionDown</elementname>
+			<elementname>VelocityNorth</elementname>
+			<elementname>VelocityEast</elementname>
+			<elementname>VelocityDown</elementname>
+			<elementname>AttitudeQ1</elementname>
+			<elementname>AttitudeQ2</elementname>
+			<elementname>AttitudeQ3</elementname>
+			<elementname>AttitudeQ4</elementname>
+			<elementname>GyroDriftX</elementname>
+			<elementname>GyroDriftY</elementname>
+			<elementname>GyroDriftZ</elementname>
+		</elementnames>
+	</field>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="10000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

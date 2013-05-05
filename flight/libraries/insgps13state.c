@@ -141,6 +141,18 @@ void INSResetP(float PDiag[NUMX])
 	}
 }
 
+void INSGetP(float PDiag[NUMX])
+{
+	uint8_t i;
+
+	// retrieve diagonal elements (aka state variance)
+	for (i=0;i<NUMX;i++){
+		if (PDiag != 0){
+			PDiag[i] = P[i][i];
+		}
+	}
+}
+
 void INSSetState(float pos[3], float vel[3], float q[4], float gyro_bias[3], __attribute__((unused)) float accel_bias[3])
 {
 	/* Note: accel_bias not used in 13 state INS */
@@ -179,14 +191,14 @@ void INSPosVelReset(float pos[3], float vel[3])
 	X[5] = vel[2];	
 }
 
-void INSSetPosVelVar(float PosVar, float VelVar)
+void INSSetPosVelVar(float PosVar[3], float VelVar[3])
 {
-	R[0] = PosVar;
-	R[1] = PosVar;
-	R[2] = PosVar;
-	R[3] = VelVar;
-	R[4] = VelVar;
-	R[5] = VelVar;
+	R[0] = PosVar[0];
+	R[1] = PosVar[1];
+	R[2] = PosVar[2];
+	R[3] = VelVar[0];
+	R[4] = VelVar[1];
+	R[5] = VelVar[2];
 }
 
 void INSSetGyroBias(float gyro_bias[3])
@@ -208,6 +220,13 @@ void INSSetGyroVar(float gyro_var[3])
 	Q[0] = gyro_var[0];
 	Q[1] = gyro_var[1];
 	Q[2] = gyro_var[2];
+}
+
+void INSSetGyroBiasVar(float gyro_bias_var[3])
+{
+	Q[6] = gyro_bias_var[0];
+	Q[7] = gyro_bias_var[1];
+	Q[8] = gyro_bias_var[2];
 }
 
 void INSSetMagVar(float scaled_mag_var[3])

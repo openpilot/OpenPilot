@@ -82,6 +82,15 @@ void PIOS_Board_Init(void) {
 	/* Delay system */
 	PIOS_DELAY_Init();
 
+#ifdef PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
+    uintptr_t flash_id;
+    uintptr_t fs_id;
+    PIOS_Flash_Internal_Init(&flash_id, &flash_internal_cfg);
+    PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_internal_cfg, &pios_internal_flash_driver, flash_id);
+#elif !defined(PIOS_USE_SETTINGS_ON_SDCARD)
+#error No setting storage specified. (define PIOS_USE_SETTINGS_ON_SDCARD or INCLUDE_FLASH_SECTOR_SETTINGS)
+#endif
+
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();

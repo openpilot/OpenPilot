@@ -2,16 +2,13 @@
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
- * @addtogroup StabilizationModule Stabilization Module
- * @brief Relay tuning controller
- * @note This object updates the @ref ActuatorDesired "Actuator Desired" based on the
- * PID loops on the @ref AttitudeDesired "Attitude Desired" and @ref AttitudeActual "Attitude Actual"
+ * @addtogroup osdoutputModule osdoutput Module
+ * @brief Process osdoutput information
  * @{
  *
- * @file       relay_tuning.h
+ * @file       osdoutput.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      Attitude stabilization module.
- *
+ * @brief      osdoutput module, handles osdoutput stream
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -30,10 +27,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#ifndef OSDOUTPUT_H
+#define OSDOUTPUT_H
 
-#ifndef RELAY_TUNING_H
-#define RELAY_TUNING_H
+int32_t osdoutputInitialize(void);
 
-int stabilization_relay_rate(float err, float *output, int axis, bool reinit);
+#endif	/* OSDOUTPUT_H */
 
-#endif
+/**
+ * @}
+ * @}
+ */

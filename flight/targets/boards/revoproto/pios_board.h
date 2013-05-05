@@ -35,18 +35,18 @@
 // Timers and Channels Used
 //------------------------
 /*
-Timer | Channel 1 | Channel 2 | Channel 3 | Channel 4
-------+-----------+-----------+-----------+----------
-TIM1  |           |           |           |
-TIM2  | --------------- PIOS_DELAY -----------------
-TIM3  |           |           |           |
-TIM4  |           |           |           |
-TIM5  |           |           |           |
-TIM6  |           |           |           |
-TIM7  |           |           |           |
-TIM8  |           |           |           |
-------+-----------+-----------+-----------+----------
-*/
+ Timer | Channel 1 | Channel 2 | Channel 3 | Channel 4
+ ------+-----------+-----------+-----------+----------
+ TIM1  |           |           |           |
+ TIM2  | --------------- PIOS_DELAY -----------------
+ TIM3  |           |           |           |
+ TIM4  |           |           |           |
+ TIM5  |           |           |           |
+ TIM6  |           |           |           |
+ TIM7  |           |           |           |
+ TIM8  |           |           |           |
+ ------+-----------+-----------+-----------+----------
+ */
 
 //------------------------
 // DMA Channels Used
@@ -71,7 +71,6 @@ TIM8  |           |           |           |
 #define BOARD_WRITABLE	true
 #define MAX_DEL_RETRYS	3
 
-
 //------------------------
 // PIOS_LED
 //------------------------
@@ -94,6 +93,7 @@ TIM8  |           |           |           |
 #define PIOS_WDG_ATTITUDE        0x0004
 #define PIOS_WDG_MANUAL          0x0008
 #define PIOS_WDG_SENSORS         0x0010
+#define PIOS_WDG_AUTOTUNE        0x0020
 
 //------------------------
 // PIOS_I2C
@@ -125,6 +125,7 @@ extern uint32_t pios_com_aux_id;
 extern uint32_t pios_com_telem_usb_id;
 extern uint32_t pios_com_bridge_id;
 extern uint32_t pios_com_vcp_id;
+extern uint32_t pios_com_hkosd_id;
 #define PIOS_COM_AUX                    (pios_com_aux_id)
 #define PIOS_COM_GPS                    (pios_com_gps_id)
 #define PIOS_COM_TELEM_USB              (pios_com_telem_usb_id)
@@ -132,6 +133,7 @@ extern uint32_t pios_com_vcp_id;
 #define PIOS_COM_BRIDGE                 (pios_com_bridge_id)
 #define PIOS_COM_VCP                    (pios_com_vcp_id)
 #define PIOS_COM_DEBUG                  PIOS_COM_AUX
+#define PIOS_COM_OSDHK              (pios_com_hkosd_id)
 
 //------------------------
 // TELEMETRY 
@@ -173,7 +175,6 @@ extern uint32_t pios_com_vcp_id;
 //
 #define PIOS_PERIPHERAL_APB2_CLOCK					PIOS_SYSCLK
 
-
 //-------------------------
 // Interrupt Priorities
 //-------------------------
@@ -181,7 +182,6 @@ extern uint32_t pios_com_vcp_id;
 #define PIOS_IRQ_PRIO_MID                       8               // higher than RTOS
 #define PIOS_IRQ_PRIO_HIGH                      5               // for SPI, ADC, I2C etc...
 #define PIOS_IRQ_PRIO_HIGHEST                   4               // for USART etc...
-
 //------------------------
 // PIOS_RCVR
 // See also pios_board.c
@@ -235,8 +235,9 @@ extern uint32_t pios_com_vcp_id;
 // ADC
 // PIOS_ADC_PinGet(0) = Current sensor
 // PIOS_ADC_PinGet(1) = Voltage sensor
-// PIOS_ADC_PinGet(4) = VREF
-// PIOS_ADC_PinGet(5) = Temperature sensor
+// PIOS_ADC_PinGet(2) = VREF
+// PIOS_ADC_PinGet(3) = Temperature sensor
+// PIOS_ADC_PinGet(4) = Board Power
 //-------------------------
 #define PIOS_DMA_PIN_CONFIG                                                                         \
 {                                                                                                   \
@@ -253,7 +254,8 @@ extern uint32_t pios_com_vcp_id;
 #define PIOS_ADC_NUM_CHANNELS           4
 #define PIOS_ADC_MAX_OVERSAMPLING       2
 #define PIOS_ADC_USE_ADC2               0
-#define PIOS_ADC_VOLTAGE_SCALE 3.30/4096.0
+#define PIOS_ADC_VOLTAGE_SCALE 3.30f/4096.0f
+#define PIOS_ADC_USE_TEMP_SENSOR		1
 
 //-------------------------
 // USB

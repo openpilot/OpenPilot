@@ -27,6 +27,8 @@
 			<elementname>ModemStat</elementname>
 			<elementname>Autotune</elementname>
 			<elementname>EventDispatcher</elementname>
+			<elementname>MagBaro</elementname>
+			<elementname>OSDGen</elementname>
 			<elementname>CallbackScheduler0</elementname>
 			<elementname>CallbackScheduler1</elementname>
 			<elementname>CallbackScheduler2</elementname>
@@ -59,6 +61,8 @@
 			<elementname>ModemStat</elementname>
 			<elementname>Autotune</elementname>
 			<elementname>EventDispatcher</elementname>
+			<elementname>MagBaro</elementname>
+			<elementname>OSDGen</elementname>
 			<elementname>CallbackScheduler0</elementname>
 			<elementname>CallbackScheduler1</elementname>
 			<elementname>CallbackScheduler2</elementname>
@@ -95,6 +99,8 @@
 			<elementname>ModemStat</elementname>
 			<elementname>Autotune</elementname>
 			<elementname>EventDispatcher</elementname>
+			<elementname>MagBaro</elementname>
+			<elementname>OSDGen</elementname>
 			<elementname>CallbackScheduler0</elementname>
 			<elementname>CallbackScheduler1</elementname>
 			<elementname>CallbackScheduler2</elementname>

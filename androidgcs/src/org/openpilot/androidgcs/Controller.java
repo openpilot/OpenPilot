@@ -66,12 +66,14 @@ public class Controller extends ObjectManagerActivity {
 	private boolean leftJoystickHeld, rightJoystickHeld;
 
 	Timer sendTimer = new Timer();
-
+	TextView manualView;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.controller);
+		manualView = (TextView) findViewById(R.id.manualControlValues);
 	}
 
 	Observer settingsUpdated = new Observer() {

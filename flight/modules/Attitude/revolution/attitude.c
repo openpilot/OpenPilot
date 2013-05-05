@@ -648,8 +648,19 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	mag_updated |= (xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE);
 	baro_updated |= xQueueReceive(baroQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
 	airspeed_updated |= xQueueReceive(airspeedQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
-	gps_updated |= (xQueueReceive(gpsQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
-	gps_vel_updated |= (xQueueReceive(gpsVelQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
+
+	// Check if we are running simulation
+	if (!GPSPositionReadOnly()) {
+	    gps_updated |= (xQueueReceive(gpsQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
+	} else {
+	    gps_updated |= pdTRUE && outdoor_mode;
+	}
+
+    if (!GPSVelocityReadOnly()) {
+        gps_vel_updated |= (xQueueReceive(gpsVelQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
+    } else {
+        gps_vel_updated |= pdTRUE && outdoor_mode;
+    }
 
 	// Get most recent data
 	GyrosGet(&gyrosData);

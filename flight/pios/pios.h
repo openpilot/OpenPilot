@@ -49,11 +49,11 @@
 #include <math.h>
 
 /* STM32 Std Peripherals Lib */
-#ifdef STM32F4XX
+#if defined(STM32F10X)
+#include <stm32f10x.h>
+#elif defined(STM32F4XX)
 #include <stm32f4xx.h>
 #include <stm32f4xx_rcc.h>
-#else
-#include <stm32f10x.h>
 #endif
 
 /* PIOS board specific feature selection */

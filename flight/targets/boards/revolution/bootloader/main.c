@@ -161,8 +161,7 @@ int main() {
 
 		if (stopwatch > 50 * 1000 * 1000)
 			stopwatch = 0;
-		if ((stopwatch > 6 * 1000 * 1000) && (DeviceState
-				== BLidle))
+		if ((stopwatch > 6 * 1000 * 1000) && ((DeviceState == BLidle) || (DeviceState == DFUidle && !USB_connected)))
 			JumpToApp = true;
 
 		processRX();

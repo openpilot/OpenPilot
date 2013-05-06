@@ -211,9 +211,9 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
                 }
                 else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
                 {
-                    initfields.append( QString("    data.%1 = %2;\n")
-                                .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->defaultValues[0].toFloat() ) );
+                    initfields.append( QString("    data.%1 = %2f;\n")
+                                .arg(info->fields[n]->name)
+                                .arg(info->fields[n]->defaultValues[0].toFloat(), 0, 'e', 6));
                 }
                 else
                 {
@@ -236,10 +236,10 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo* info)
                     }
                     else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
                     {
-                        initfields.append( QString("    data.%1[%2] = %3;\n")
-                                    .arg( info->fields[n]->name )
-                                    .arg( idx )
-                                    .arg( info->fields[n]->defaultValues[idx].toFloat() ) );
+                        initfields.append( QString("    data.%1[%2] = %3f;\n")
+                                    .arg(info->fields[n]->name)
+                                    .arg(idx)
+                                    .arg(info->fields[n]->defaultValues[idx].toFloat(), 0, 'e', 6));
                     }
                     else
                     {

@@ -113,7 +113,7 @@ static void gcsreceiver_updated(UAVObjEvent * ev)
 	}
 }
 
-extern int32_t PIOS_GCSRCVR_Init(uint32_t *gcsrcvr_id)
+extern int32_t PIOS_GCSRCVR_Init(__attribute__((unused)) uint32_t *gcsrcvr_id)
 {
 	struct pios_gcsrcvr_dev *gcsrcvr_dev;
 
@@ -145,7 +145,7 @@ extern int32_t PIOS_GCSRCVR_Init(uint32_t *gcsrcvr_id)
  * \output PIOS_RCVR_TIMEOUT failsafe condition or missing receiver
  * \output >=0 channel value
  */
-static int32_t PIOS_GCSRCVR_Get(uint32_t rcvr_id, uint8_t channel)
+static int32_t PIOS_GCSRCVR_Get(__attribute__((unused)) uint32_t rcvr_id, uint8_t channel)
 {
 	if (channel >= GCSRECEIVER_CHANNEL_NUMELEM) {
 		/* channel is out of range */

@@ -141,37 +141,6 @@ static int32_t RadioComBridgeStart(void)
         bool is_coordinator = PIOS_RFM22B_IsCoordinator(pios_rfm22b_id);
         if (is_coordinator) {
 
-            // Set the maximum radio RF power.
-            switch (oplinkSettings.MaxRFPower) {
-            case OPLINKSETTINGS_MAXRFPOWER_125:
-                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_0);
-                break;
-            case OPLINKSETTINGS_MAXRFPOWER_16:
-                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_1);
-                break;
-            case OPLINKSETTINGS_MAXRFPOWER_316:
-                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_2);
-                break;
-            case OPLINKSETTINGS_MAXRFPOWER_63:
-                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_3);
-                break;
-            case OPLINKSETTINGS_MAXRFPOWER_126:
-                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_4);
-                break;
-            case OPLINKSETTINGS_MAXRFPOWER_25:
-                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_5);
-                break;
-            case OPLINKSETTINGS_MAXRFPOWER_50:
-                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_6);
-                break;
-            case OPLINKSETTINGS_MAXRFPOWER_100:
-                PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_7);
-                break;
-	    default:
-	        // do nothing
-		break;
-            }
-
 	    // Set the frequency range.
 	    PIOS_RFM22B_SetFrequencyRange(pios_rfm22b_id, oplinkSettings.MinFrequency, oplinkSettings.MaxFrequency, oplinkSettings.ChannelSpacing);
 
@@ -182,6 +151,37 @@ static int32_t RadioComBridgeStart(void)
             data->parseUAVTalk = ((oplinkSettings.MainPort != OPLINKSETTINGS_MAINPORT_SERIAL) &&
                                   (oplinkSettings.FlexiPort != OPLINKSETTINGS_FLEXIPORT_SERIAL) &&
                                   (oplinkSettings.VCPPort != OPLINKSETTINGS_VCPPORT_SERIAL));
+        }
+
+        // Set the maximum radio RF power.
+        switch (oplinkSettings.MaxRFPower) {
+        case OPLINKSETTINGS_MAXRFPOWER_125:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_0);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_16:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_1);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_316:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_2);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_63:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_3);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_126:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_4);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_25:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_5);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_50:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_6);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_100:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_7);
+            break;
+        default:
+            // do nothing
+            break;
         }
 
 	// Set the initial frequency.
@@ -256,7 +256,7 @@ MODULE_INITCALL(RadioComBridgeInitialize, RadioComBridgeStart)
  *
  * @param[in] parameters  The task parameters
  */
-static void telemetryTxTask(void *parameters)
+static void telemetryTxTask(__attribute__((unused)) void *parameters)
 {
     UAVObjEvent ev;
 
@@ -307,7 +307,7 @@ static void telemetryTxTask(void *parameters)
  *
  * @param[in] parameters  The task parameters
  */
-static void radioTxTask(void *parameters)
+static void radioTxTask(__attribute__((unused)) void *parameters)
 {
     // Task loop
     while (1) {
@@ -335,7 +335,7 @@ static void radioTxTask(void *parameters)
  *
  * @param[in] parameters  The task parameters
  */
-static void radioRxTask(void *parameters)
+static void radioRxTask(__attribute__((unused)) void *parameters)
 {
     // Task loop
     while (1) {
@@ -364,7 +364,7 @@ static void radioRxTask(void *parameters)
  *
  * @param[in] parameters  The task parameters
  */
-static void telemetryRxTask(void *parameters)
+static void telemetryRxTask(__attribute__((unused)) void *parameters)
 {
     // Task loop
     while (1) {

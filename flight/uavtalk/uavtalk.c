@@ -714,7 +714,12 @@ int32_t UAVTalkSendBuf(UAVTalkConnection connectionHandle, uint8_t *buf, uint16_
  * \return 0 Success
  * \return -1 Failure
  */
-static int32_t receiveObject(UAVTalkConnectionData *connection, uint8_t type, uint32_t objId, uint16_t instId, uint8_t* data, int32_t length)
+static int32_t receiveObject(UAVTalkConnectionData *connection,
+								uint8_t type,
+								uint32_t objId,
+								uint16_t instId,
+								uint8_t* data,
+								__attribute__((unused))int32_t length)
 {
 	UAVObjHandle obj;
 	int32_t ret = 0;

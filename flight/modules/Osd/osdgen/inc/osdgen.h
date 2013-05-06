@@ -129,14 +129,14 @@ struct FontDimensions
 #define APPLY_VDEADBAND(y) ((y)+GRAPHICS_VDEADBAND)
 #define APPLY_HDEADBAND(x) ((x)+GRAPHICS_HDEADBAND)
 
-// Check if coordinates are valid. If not, return.
-#define CHECK_COORDS(x, y) if(x < 0 || x >= GRAPHICS_WIDTH_REAL || y < 0 || y >= GRAPHICS_HEIGHT_REAL) return;
-#define CHECK_COORD_X(x) if(x < 0 || x >= GRAPHICS_WIDTH_REAL) return;
-#define CHECK_COORD_Y(y) if(y < 0 || y >= GRAPHICS_HEIGHT_REAL) return;
+// Check if coordinates are valid. If not, return. Assumes unsigned coordinate
+#define CHECK_COORDS(x, y) if(x >= GRAPHICS_WIDTH_REAL || y >= GRAPHICS_HEIGHT_REAL) return;
+#define CHECK_COORD_X(x) if(x >= GRAPHICS_WIDTH_REAL) return;
+#define CHECK_COORD_Y(y) if(y >= GRAPHICS_HEIGHT_REAL) return;
 
-// Clip coordinates out of range.
-#define CLIP_COORD_X(x) { x = MAX(0, MIN(x, GRAPHICS_WIDTH_REAL)); }
-#define CLIP_COORD_Y(y) { y = MAX(0, MIN(y, GRAPHICS_HEIGHT_REAL)); }
+// Clip coordinates out of range - assumes unsigned coordinate
+#define CLIP_COORD_X(x) { x = MIN(x, GRAPHICS_WIDTH_REAL); }
+#define CLIP_COORD_Y(y) { y = MIN(y, GRAPHICS_HEIGHT_REAL); }
 #define CLIP_COORDS(x, y) { CLIP_COORD_X(x); CLIP_COORD_Y(y); }
 
 // Macro to swap two variables using XOR swap.

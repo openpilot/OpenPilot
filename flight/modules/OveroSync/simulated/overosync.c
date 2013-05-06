@@ -158,7 +158,7 @@ static void registerObject(UAVObjHandle obj)
  * when done packing the buffer we should call PIOS_SPI_TransferBlock, change the active buffer
  * and then take the semaphrore
  */
-static void overoSyncTask(void *parameters)
+static void overoSyncTask(__attribute__((unused)) void *parameters)
 {
 	UAVObjEvent ev;
 

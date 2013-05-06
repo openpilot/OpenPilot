@@ -276,8 +276,8 @@ static int32_t eventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, xQue
  */
 static void eventTask()
 {
-	int32_t timeToNextUpdateMs;
-	int32_t delayMs;
+	uint32_t timeToNextUpdateMs;
+	uint32_t delayMs;
 	EventCallbackInfo evInfo;
 
 	/* Must do this in task context to ensure that TaskMonitor has already finished its init */
@@ -290,11 +290,7 @@ static void eventTask()
 	while (1)
 	{
 		// Calculate delay time
-		delayMs = timeToNextUpdateMs-(xTaskGetTickCount()*portTICK_RATE_MS);
-		if (delayMs < 0)
-		{
-			delayMs = 0;
-		}
+		delayMs = timeToNextUpdateMs - (xTaskGetTickCount() * portTICK_RATE_MS);
 
 		// Wait for queue message
 		if ( xQueueReceive(queue, &evInfo, delayMs/portTICK_RATE_MS) == pdTRUE )

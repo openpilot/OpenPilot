@@ -318,7 +318,7 @@ static void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg
 	
 	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(rx_buf_len);
 	PIOS_Assert(rx_buffer);
-	if(tx_buf_len!= -1){ // this is the case for rx/tx ports
+	if(tx_buf_len!= (size_t)-1){ // this is the case for rx/tx ports
 		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(tx_buf_len);
 		PIOS_Assert(tx_buffer);
 		

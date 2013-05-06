@@ -98,12 +98,19 @@ struct splashEntry
     const uint16_t *mask;
 };
 
-struct splashEntry splash[3] =
-{
-{ oplogo_width, oplogo_height, oplogo_bits, oplogo_mask_bits },
-{ level_width, level_height, level_bits, level_mask_bits },
-{ llama_width, llama_height, llama_bits, llama_mask_bits },
-
+struct splashEntry splash[3] = {
+	{	oplogo_width,
+		oplogo_height,
+		oplogo_bits,
+		oplogo_mask_bits },
+	{	level_width,
+		level_height,
+		level_bits,
+		level_mask_bits },
+	{	llama_width,
+		llama_height,
+		llama_bits,
+		llama_mask_bits }
 };
 
 uint16_t mirror(uint16_t source)
@@ -198,7 +205,7 @@ void swap(uint16_t* a, uint16_t* b)
     *b = temp;
 }
 
-const static int8_t sinData[91] =
+static const int8_t sinData[91] =
 { 0, 2, 3, 5, 7, 9, 10, 12, 14, 16, 17, 19, 21, 22, 24, 26, 28, 29, 31, 33, 34, 36, 37, 39, 41, 42, 44, 45, 47, 48, 50, 52, 53, 54, 56, 57, 59, 60, 62, 63, 64,
         66, 67, 68, 69, 71, 72, 73, 74, 75, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 87, 88, 89, 90, 91, 91, 92, 93, 93, 94, 95, 95, 96, 96, 97, 97, 97, 98,
         98, 98, 99, 99, 99, 99, 100, 100, 100, 100, 100, 100 };
@@ -282,8 +289,7 @@ void ellipse(int centerX, int centerY, int horizontalRadius, int verticalRadius)
         plotFourQuadrants(centerX, centerY, x, y);
     }
 
-    error = (int64_t)(
-            doubleVerticalRadius * (x + 1 / 2.0) * (x + 1 / 2.0) + doubleHorizontalRadius * (y - 1) * (y - 1) - doubleHorizontalRadius * doubleVerticalRadius);
+    error = (int64_t)(doubleVerticalRadius * (x + 1 / 2.0f) * (x + 1 / 2.0f) + doubleHorizontalRadius * (y - 1) * (y - 1) - doubleHorizontalRadius * doubleVerticalRadius);
 
     while (y >= 0) {
         error += doubleHorizontalRadius;
@@ -479,10 +485,10 @@ void write_vline(uint8_t *buff, unsigned int x, unsigned int y0, unsigned int y1
     }
     /* This is an optimised algorithm for writing vertical lines.
      * We begin by finding the addresses of the x,y0 and x,y1 points. */
-    int addr0 = CALC_BUFF_ADDR(x, y0);
-    int addr1 = CALC_BUFF_ADDR(x, y1);
+    unsigned int addr0 = CALC_BUFF_ADDR(x, y0);
+    unsigned int addr1 = CALC_BUFF_ADDR(x, y1);
     /* Then we calculate the pixel data to be written. */
-    int bitnum = CALC_BIT_IN_WORD(x);
+    unsigned int bitnum = CALC_BIT_IN_WORD(x);
     uint16_t mask = 1 << (7 - bitnum);
     /* Run from addr0 to addr1 placing pixels. Increment by the number
      * of words n each graphics line. */
@@ -552,7 +558,7 @@ void write_vline_outlined(unsigned int x, unsigned int y0, unsigned int y1, int 
  */
 void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsigned int width, unsigned int height, int mode)
 {
-    int yy, addr0_old, addr1_old;
+    unsigned int yy, addr0_old, addr1_old;
     CHECK_COORDS(x, y);
     CHECK_COORD_X(x + width);
     CHECK_COORD_Y(y + height);
@@ -561,11 +567,11 @@ void write_filled_rectangle(uint8_t *buff, unsigned int x, unsigned int y, unsig
     }
     // Calculate as if the rectangle was only a horizontal line. We then
     // step these addresses through each row until we iterate `height` times.
-    int addr0 = CALC_BUFF_ADDR(x, y);
-    int addr1 = CALC_BUFF_ADDR(x + width, y);
-    int addr0_bit = CALC_BIT_IN_WORD(x);
-    int addr1_bit = CALC_BIT_IN_WORD(x + width);
-    int mask, mask_l, mask_r, i;
+    unsigned int addr0 = CALC_BUFF_ADDR(x, y);
+    unsigned int addr1 = CALC_BUFF_ADDR(x + width, y);
+    unsigned int addr0_bit = CALC_BIT_IN_WORD(x);
+    unsigned int addr1_bit = CALC_BIT_IN_WORD(x + width);
+    unsigned int mask, mask_l, mask_r, i;
     // If the addresses are equal, we need to write one word vertically.
     if (addr0 == addr1) {
         mask = COMPUTE_HLINE_ISLAND_MASK(addr0_bit, addr1_bit);
@@ -788,7 +794,7 @@ void write_circle_filled(uint8_t *buff, unsigned int cx, unsigned int cy, unsign
 void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int mode)
 {
     // Based on http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-    int steep = abs(y1 - y0) > abs(x1 - x0);
+	unsigned int steep = abs(y1 - y0) > abs(x1 - x0);
     if (steep) {
         SWAP(x0, y0);
         SWAP(x1, y1);
@@ -798,11 +804,11 @@ void write_line(uint8_t *buff, unsigned int x0, unsigned int y0, unsigned int x1
         SWAP(y0, y1);
     }
     int deltax = x1 - x0;
-    int deltay = abs(y1 - y0);
+    unsigned int deltay = abs(y1 - y0);
     int error = deltax / 2;
     int ystep;
-    int y = y0;
-    int x; //, lasty = y, stox = 0;
+    unsigned int y = y0;
+    unsigned int x; //, lasty = y, stox = 0;
     if (y0 < y1) {
         ystep = 1;
     } else {
@@ -851,7 +857,9 @@ void write_line_lm(unsigned int x0, unsigned int y0, unsigned int x1, unsigned i
  * @param       mode            0 = black outline, white body, 1 = white outline, black body
  * @param       mmode           0 = clear, 1 = set, 2 = toggle
  */
-void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1, int endcap0, int endcap1, int mode, int mmode)
+void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsigned int y1,
+							__attribute__((unused)) int endcap0, __attribute__((unused)) int endcap1,
+							int mode, int mmode)
 {
     // Based on http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
     // This could be improved for speed.
@@ -873,11 +881,11 @@ void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsi
         SWAP(y0, y1);
     }
     int deltax = x1 - x0;
-    int deltay = abs(y1 - y0);
+    unsigned int deltay = abs(y1 - y0);
     int error = deltax / 2;
     int ystep;
-    int y = y0;
-    int x;
+    unsigned int y = y0;
+    unsigned int x;
     if (y0 < y1) {
         ystep = 1;
     } else {
@@ -933,8 +941,8 @@ void write_line_outlined(unsigned int x0, unsigned int y0, unsigned int x1, unsi
  */
 void write_word_misaligned(uint8_t *buff, uint16_t word, unsigned int addr, unsigned int xoff, int mode)
 {
-    uint16_t firstmask = word >> xoff;
-    uint16_t lastmask = word << (16 - xoff);
+    int16_t firstmask = word >> xoff;
+    int16_t lastmask = word << (16 - xoff);
     WRITE_WORD_MODE(buff, addr+1, firstmask && 0x00ff, mode);
     WRITE_WORD_MODE(buff, addr, (firstmask & 0xff00) >> 8, mode);
     if (xoff > 0) {
@@ -1022,7 +1030,7 @@ void write_word_misaligned_lm(uint16_t wordl, uint16_t wordm, unsigned int addr,
 int fetch_font_info(uint8_t ch, int font, struct FontEntry *font_info, char *lookup)
 {
     // First locate the font struct.
-    if (font > SIZEOF_ARRAY(fonts)) {
+    if ((unsigned int)font > SIZEOF_ARRAY(fonts)) {
         return 0; // font does not exist, exit.
     }
     // Load the font info; IDs are always sequential.
@@ -1050,7 +1058,7 @@ int fetch_font_info(uint8_t ch, int font, struct FontEntry *font_info, char *loo
  */
 void write_char16(char ch, unsigned int x, unsigned int y, int font)
 {
-    int yy, addr_temp, row, row_temp, xshift;
+    unsigned int yy, addr_temp, row, row_temp, xshift;
     uint16_t and_mask, or_mask, level_bits;
     struct FontEntry font_info;
     //char lookup = 0;
@@ -1126,14 +1134,14 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
  */
 void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
 {
-    int yy, addr_temp, row, row_temp, xshift;
+    unsigned int yy, addr_temp, row, row_temp, xshift;
     uint16_t and_mask, or_mask, level_bits;
     struct FontEntry font_info;
     char lookup = 0;
     fetch_font_info(ch, font, &font_info, &lookup);
     // Compute starting address (for x,y) of character.
-    int addr = CALC_BUFF_ADDR(x, y);
-    int wbit = CALC_BIT_IN_WORD(x);
+    unsigned int addr = CALC_BUFF_ADDR(x, y);
+    unsigned int wbit = CALC_BIT_IN_WORD(x);
     // If font only supports lowercase or uppercase, make the letter
     // lowercase or uppercase.
     /*if(font_info.flags & FONT_LOWERCASE_ONLY)
@@ -1292,7 +1300,8 @@ void write_string(char *str, unsigned int x, unsigned int y, unsigned int xs, un
  * @param       ha              horizontal align
  * @param       flags   flags (passed to write_char)
  */
-void write_string_formatted(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys, int va, int ha, int flags)
+void write_string_formatted(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys,
+								__attribute__((unused)) int va, __attribute__((unused)) int ha, int flags)
 {
     int fcode = 0, fptr = 0, font = 0, fwidth = 0, fheight = 0, xx = x, yy = y, max_xx = 0, max_height = 0;
     struct FontEntry font_info;
@@ -1594,7 +1603,7 @@ void printTime(uint16_t x, uint16_t y)
  * @param       flags                   special flags (see hud.h.)
  */
 void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int height, int mintick_step, int majtick_step, int mintick_len, int majtick_len,
-        int boundtick_len, int max_val, int flags)
+        int boundtick_len, __attribute__((unused)) int max_val, int flags)
 {
     char temp[15];	//, temp2[15];
     struct FontEntry font_info;
@@ -1737,7 +1746,7 @@ void hud_draw_vertical_scale(int v, int range, int halign, int x, int y, int hei
  * @param       majtick_len             major tick length
  * @param       flags                   special flags (see hud.h.)
  */
-void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mintick_step, int majtick_step, int mintick_len, int majtick_len, int flags)
+void hud_draw_linear_compass(int v, int range, int width, int x, int y, int mintick_step, int majtick_step, int mintick_len, int majtick_len, __attribute__((unused)) int flags)
 {
     v %= 360; // wrap, just in case.
     struct FontEntry font_info;
@@ -1832,12 +1841,13 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
     int16_t x0 = (size / 2) - dx;
     int16_t y0 = (size / 2) + dy;
     // calculate the line function
-    if ((angle != 90) && (angle != -90)) {
-        k = tanf(alpha);
-        vertical = 0;
-        if (k == 0) {
-            horizontal = 1;
-        }
+    if ((angle < 90.0f) && (angle > -90)) {
+		vertical = 0;
+		if(fabsf(angle) < 1e-5f) {
+			horizontal = 1;
+		} else {
+			k = tanf(alpha);
+		}
     } else {
         vertical = 1;
     }
@@ -1875,7 +1885,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
         // horizon line
         write_line_outlined(x1 + l_x, y1 + l_y, x2 + l_x, y2 + l_y, 0, 0, 0, 1);
         //fill
-        if (angle <= 0 && angle > -90) {
+        if (angle <= 0.0f && angle > -90.0f) {
             //write_string("1", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = y2; i < size; i++) {
                 x2 = ((i - y0) + k * x0) / k;
@@ -1887,7 +1897,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
                 }
                 write_hline_lm(x2 + l_x, size + l_x, i + l_y, 1, 1);
             }
-        } else if (angle < -90) {
+        } else if (angle < -90.0f) {
             //write_string("2", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = 0; i < y2; i++) {
                 x2 = ((i - y0) + k * x0) / k;
@@ -1899,7 +1909,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
                 }
                 write_hline_lm(size + l_x, x2 + l_x, i + l_y, 1, 1);
             }
-        } else if (angle > 0 && angle < 90) {
+        } else if (angle > 0.0f && angle < 90.0f) {
             //write_string("3", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = y1; i < size; i++) {
                 x2 = ((i - y0) + k * x0) / k;
@@ -1911,7 +1921,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
                 }
                 write_hline_lm(0 + l_x, x2 + l_x, i + l_y, 1, 1);
             }
-        } else if (angle > 90) {
+        } else if (angle > 90.0f) {
             //write_string("4", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = 0; i < y1; i++) {
                 x2 = ((i - y0) + k * x0) / k;
@@ -1927,7 +1937,7 @@ void draw_artificial_horizon(float angle, float pitch, int16_t l_x, int16_t l_y,
     } else if (vertical) {
         // horizon line
         write_line_outlined(x0 + l_x, 0 + l_y, x0 + l_x, size + l_y, 0, 0, 0, 1);
-        if (angle == 90) {
+        if (angle >= 90.0f) {
             //write_string("5", APPLY_HDEADBAND((GRAPHICS_RIGHT/2)),APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_CENTER, 0, 3);
             for (int i = 0; i < size; i++) {
                 write_hline_lm(0 + l_x, x0 + l_x, i + l_y, 1, 1);
@@ -2017,13 +2027,13 @@ void calcHomeArrow(int16_t m_yaw)
     x = cosf(lat1) * sinf(lat2) - sinf(lat1) * cosf(lat2) * cosf(lon2 - lon1);
     brng = RAD2DEG(atan2f(y,x));
     if (brng < 0) {
-        brng += 360;
+        brng += 360.0f;
     }
 
     // yaw corrected bearing, needs compass
-    u2g = brng - 180 - m_yaw;
+    u2g = brng - 180.0f - m_yaw;
     if (u2g < 0) {
-        u2g += 360;
+        u2g += 360.0f;
     }
 
     // Haversine formula for distance
@@ -2038,14 +2048,14 @@ void calcHomeArrow(int16_t m_yaw)
      var d = R * c;
      **/
     a = sinf((lat2 - lat1) / 2) * sinf((lat2 - lat1) / 2) + cosf(lat1) * cosf(lat2) * sinf((lon2 - lon1) / 2) * sinf((lon2 - lon1) / 2);
-    c = 2 * atan2f(sqrtf(a), sqrtf(1 - a));
-    d = 6371 * 1000 * c;
+    c = 2.0f * atan2f(sqrtf(a), sqrtf(1.0f - a));
+    d = 6371.0f * 1000.0f * c;
 
     // Elevation  v depends servo direction
-    if (d != 0)
-        elevation = 90 - RAD2DEG(atanf(dAlt/d));
+    if(d > 0.0f)
+        elevation = 90.0f - RAD2DEG(atanf(dAlt/d));
     else
-        elevation = 0;
+        elevation = 0.0f;
     //! TODO: sanity check
 
     char temp[50] =
@@ -2117,15 +2127,17 @@ void updateGraphics()
             char temp[50] =
             { 0 };
             memset(temp, ' ', 40);
-            sprintf(temp, "Lat:%11.7f", gpsData.Latitude / 10000000.0f);
+            // Note: cast to double required due to -Wdouble-promotion compiler option is
+            // being used, and there is no way in C to pass a float to a variadic function like sprintf()
+            sprintf(temp, "Lat:%11.7f", (double)(gpsData.Latitude / 10000000.0f));
             write_string(temp, APPLY_HDEADBAND(20), APPLY_VDEADBAND(GRAPHICS_BOTTOM-30), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
-            sprintf(temp, "Lon:%11.7f", gpsData.Longitude / 10000000.0f);
+            sprintf(temp, "Lon:%11.7f", (double)(gpsData.Longitude / 10000000.0f));
             write_string(temp, APPLY_HDEADBAND(20), APPLY_VDEADBAND(GRAPHICS_BOTTOM-10), 0, 0, TEXT_VA_BOTTOM, TEXT_HA_LEFT, 0, 3);
             sprintf(temp, "Sat:%d", (int) gpsData.Satellites);
             write_string(temp, APPLY_HDEADBAND(GRAPHICS_RIGHT-40), APPLY_VDEADBAND(30), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
             /* Print ADC voltage FLIGHT*/
-            sprintf(temp, "V:%5.2fV", (PIOS_ADC_PinGet(2) * 3 * 6.1f / 4096));
+            sprintf(temp, "V:%5.2fV", (double)(PIOS_ADC_PinGet(2) * 3 * 6.1f / 4096));
             write_string(temp, APPLY_HDEADBAND(20), APPLY_VDEADBAND(20), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 3);
 
             if (gpsData.Heading > 180)
@@ -2176,9 +2188,9 @@ void updateGraphics()
             char temp[50] =
             { 0 };
             memset(temp, ' ', 40);
-            sprintf(temp, "Lat:%11.7f", gpsData.Latitude / 10000000.0f);
+            sprintf(temp, "Lat:%11.7f", (double)(gpsData.Latitude / 10000000.0f));
             write_string(temp, APPLY_HDEADBAND(5), APPLY_VDEADBAND(5), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
-            sprintf(temp, "Lon:%11.7f", gpsData.Longitude / 10000000.0f);
+            sprintf(temp, "Lon:%11.7f", (double)(gpsData.Longitude / 10000000.0f));
             write_string(temp, APPLY_HDEADBAND(5), APPLY_VDEADBAND(15), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
             sprintf(temp, "Fix:%d", (int) gpsData.Status);
             write_string(temp, APPLY_HDEADBAND(5), APPLY_VDEADBAND(25), 0, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 2);
@@ -2197,19 +2209,19 @@ void updateGraphics()
             /* Print ADC voltage */
             //sprintf(temp,"Rssi:%4dV",(int)(PIOS_ADC_PinGet(4)*3000/4096));
             //write_string(temp, (GRAPHICS_WIDTH_REAL - 2),15, 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
-            sprintf(temp, "Rssi:%4.2fV", (PIOS_ADC_PinGet(5) * 3.0f / 4096.0f));
+            sprintf(temp, "Rssi:%4.2fV", (double)(PIOS_ADC_PinGet(5) * 3.0f / 4096.0f));
             write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(15), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
             /* Print CPU temperature */
-            sprintf(temp, "Temp:%4.2fC", (PIOS_ADC_PinGet(3) * 0.29296875f - 264));
+            sprintf(temp, "Temp:%4.2fC", (double)(PIOS_ADC_PinGet(3) * 0.29296875f - 264));
             write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(25), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
             /* Print ADC voltage FLIGHT*/
-            sprintf(temp, "FltV:%4.2fV", (PIOS_ADC_PinGet(2) * 3.0f * 6.1f / 4096.0f));
+            sprintf(temp, "FltV:%4.2fV", (double)(PIOS_ADC_PinGet(2) * 3.0f * 6.1f / 4096.0f));
             write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(35), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
             /* Print ADC voltage VIDEO*/
-            sprintf(temp, "VidV:%4.2fV", (PIOS_ADC_PinGet(4) * 3.0f * 6.1f / 4096.0f));
+            sprintf(temp, "VidV:%4.2fV", (double)(PIOS_ADC_PinGet(4) * 3.0f * 6.1f / 4096.0f));
             write_string(temp, APPLY_HDEADBAND((GRAPHICS_RIGHT - 8)), APPLY_VDEADBAND(45), 0, 0, TEXT_VA_TOP, TEXT_HA_RIGHT, 0, 2);
 
             /* Print ADC voltage RSSI */
@@ -2391,7 +2403,7 @@ MODULE_INITCALL( osdgenInitialize, osdgenStart)
  * Main osd task. It does not return.
  */
 
-static void osdgenTask(void *parameters)
+static void osdgenTask(__attribute__((unused)) void *parameters)
 {
     //portTickType lastSysTime;
     // Loop forever

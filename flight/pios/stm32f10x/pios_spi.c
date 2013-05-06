@@ -39,7 +39,7 @@
 
 #include <pios_spi_priv.h>
 
-static bool PIOS_SPI_validate(struct pios_spi_dev * com_dev)
+static bool PIOS_SPI_validate(__attribute__((unused)) struct pios_spi_dev * com_dev)
 {
 	/* Should check device magic here */
 	return(true);

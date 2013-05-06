@@ -39,7 +39,7 @@ static float bound(float val, float range);
 static float deriv_tau = 7.9577e-3f;
 
 //! Store the setpoint weight to apply for the derivative term
-static float deriv_gamma = 1.0;
+static float deriv_gamma = 1.0f;
 
 /**
  * Update the PID computation
@@ -58,7 +58,7 @@ float pid_apply(struct pid *pid, const float err, float dT)
 	float diff = (err - pid->lastErr);
 	float dterm = 0;
 	pid->lastErr = err;
-	if(pid->d && dT)
+	if(pid->d > 0.0f && dT > 0.0f)
 	{
 		dterm = pid->lastDer +  dT / ( dT + deriv_tau) * ((diff * pid->d / dT) - pid->lastDer);
 		pid->lastDer = dterm;            //   ^ set constant to 1/(2*pi*f_cutoff)
@@ -90,7 +90,7 @@ float pid_apply_setpoint(struct pid *pid, const float setpoint, const float meas
 	float dterm = 0;
 	float diff = ((deriv_gamma * setpoint - measured) - pid->lastErr);
 	pid->lastErr = (deriv_gamma * setpoint - measured);
-	if(pid->d && dT)
+	if(pid->d > 0.0f && dT > 0.0f)
 	{
 		dterm = pid->lastDer +  dT / ( dT + deriv_tau) * ((diff * pid->d / dT) - pid->lastDer);
 		pid->lastDer = dterm;            //   ^ set constant to 1/(2*pi*f_cutoff)

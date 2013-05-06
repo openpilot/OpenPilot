@@ -788,7 +788,7 @@ int32_t UAVObjSaveToFile(UAVObjHandle obj_handle, uint16_t instId,
  * @param[in] file File to append to
  * @return 0 if success or -1 if failure
  */
-int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
+int32_t UAVObjSave(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t instId)
 {
 	PIOS_Assert(obj_handle);
 
@@ -942,7 +942,7 @@ UAVObjHandle UAVObjLoadFromFile(FILEINFO * file)
  * @param[in] instId The object instance
  * @return 0 if success or -1 if failure
  */
-int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
+int32_t UAVObjLoad(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t instId)
 {
 	PIOS_Assert(obj_handle);
 
@@ -1018,7 +1018,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
  * @param[in] instId The object instance
  * @return 0 if success or -1 if failure
  */
-int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
+int32_t UAVObjDelete(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t instId)
 {
 	PIOS_Assert(obj_handle);
 #if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)

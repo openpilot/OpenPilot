@@ -56,8 +56,8 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 	static uint32_t accumulated = 0;
 
 	const uint16_t DEGLITCH_TIME = 20; // ms
-	const float AMPLITUDE_ALPHA = 0.95;
-	const float PERIOD_ALPHA = 0.95;
+	const float AMPLITUDE_ALPHA = 0.95f;
+	const float PERIOD_ALPHA = 0.95f;
 
 	portTickType thisTime = xTaskGetTickCount();
 

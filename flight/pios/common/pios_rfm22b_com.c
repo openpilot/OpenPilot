@@ -91,7 +91,8 @@ static void PIOS_RFM22B_COM_ChangeBaud(uint32_t rfm22b_id, uint32_t baud)
  * @param[in] rfm22b_dev  The device ID.
  * @param[in] rx_bytes_available  The number of bytes available to receive
  */
-static void PIOS_RFM22B_COM_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail)
+static void PIOS_RFM22B_COM_RxStart(__attribute__((unused)) uint32_t rfm22b_id,
+									 __attribute__((unused)) uint16_t rx_bytes_avail)
 {
 }
 
@@ -101,7 +102,7 @@ static void PIOS_RFM22B_COM_RxStart(uint32_t rfm22b_id, uint16_t rx_bytes_avail)
  * @param[in] rfm22b_dev  The device ID.
  * @param[in] tx_bytes_available  The number of bytes available to transmit
  */
-static void PIOS_RFM22B_COM_TxStart(uint32_t rfm22b_id, uint16_t tx_bytes_avail)
+static void PIOS_RFM22B_COM_TxStart(uint32_t rfm22b_id, __attribute__((unused)) uint16_t tx_bytes_avail)
 {
     struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
     if (!PIOS_RFM22B_Validate(rfm22b_dev)) {

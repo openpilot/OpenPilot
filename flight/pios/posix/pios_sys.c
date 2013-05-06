@@ -28,7 +28,7 @@
 
 
 /* Project Includes */
-#include "pios.h"
+#include <pios.h>
 
 #if defined(PIOS_INCLUDE_SYS)
 

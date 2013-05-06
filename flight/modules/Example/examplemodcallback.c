@@ -83,7 +83,7 @@ int32_t ExampleModCallbackInitialize()
  * event thread. Because of that the callback execution time must be kept to
  * a minimum.
  */
-static void ObjectUpdatedCb(UAVObjEvent * ev)
+static void ObjectUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	DelayedCallbackDispatch(cbinfo);
 }

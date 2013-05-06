@@ -311,8 +311,8 @@ bool PIOS_BMP085_Write(uint8_t address, uint8_t buffer)
 int32_t PIOS_BMP085_Test()
 {
 	// TODO: Is there a better way to test this than just checking that pressure/temperature has changed?
-	int32_t passed = 1;
-	int32_t cur_value = 0;
+	uint32_t passed = 1;
+	uint32_t cur_value = 0;
 
 	cur_value = Temperature;
 	PIOS_BMP085_StartADC(TemperatureConv);

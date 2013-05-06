@@ -155,7 +155,7 @@ int32_t PIOS_USB_ChangeConnectionState(bool connected)
  * \return 0: interface not available
  */
 uint32_t usb_found;
-bool PIOS_USB_CheckAvailable(uint32_t id)
+bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
 {
 	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_id;
 
@@ -175,7 +175,7 @@ bool PIOS_USB_CheckAvailable(uint32_t id)
 
 #include "usb_bsp.h"
 
-void USB_OTG_BSP_Init(USB_OTG_CORE_HANDLE *pdev)
+void USB_OTG_BSP_Init(__attribute__((unused)) USB_OTG_CORE_HANDLE *pdev)
 {
 	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_id;
 
@@ -210,7 +210,7 @@ void USB_OTG_BSP_Init(USB_OTG_CORE_HANDLE *pdev)
 	RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_OTG_FS, ENABLE);
 }
 
-void USB_OTG_BSP_EnableInterrupt(USB_OTG_CORE_HANDLE *pdev)
+void USB_OTG_BSP_EnableInterrupt(__attribute__((unused)) USB_OTG_CORE_HANDLE *pdev)
 {
 	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_id;
 

@@ -98,7 +98,7 @@ static struct pios_ppm_out_dev * PIOS_PPM_alloc(void)
 #endif
 
 static void PIOS_PPM_OUT_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count);
-const static struct pios_tim_callbacks tim_out_callbacks = {
+static const struct pios_tim_callbacks tim_out_callbacks = {
 	.overflow = NULL,
 	.edge     = PIOS_PPM_OUT_tim_edge_cb,
 };
@@ -203,7 +203,10 @@ void PIOS_PPM_OUT_Set(uint32_t ppm_out_id, uint8_t servo, uint16_t position)
 	ppm_dev->ChannelValue[servo] = position;
 }
 
-static void PIOS_PPM_OUT_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count)
+static void PIOS_PPM_OUT_tim_edge_cb (__attribute__((unused)) uint32_t tim_id,
+										uint32_t context,
+										__attribute__((unused)) uint8_t chan_idx,
+										__attribute__((unused)) uint16_t count)
 {
 	struct pios_ppm_out_dev *ppm_dev = (struct pios_ppm_out_dev *)context;
 	if (!PIOS_PPM_Out_validate(ppm_dev))

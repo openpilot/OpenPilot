@@ -120,7 +120,7 @@ MODULE_INITCALL(AutotuneInitialize, AutotuneStart)
 /**
  * Module thread, should not return.
  */
-static void AutotuneTask(void *parameters)
+static void AutotuneTask(__attribute__((unused)) void *parameters)
 {
 	//AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 	

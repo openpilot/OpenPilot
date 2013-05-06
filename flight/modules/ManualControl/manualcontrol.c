@@ -73,7 +73,11 @@
 // Private types
 typedef enum
 {
-    ARM_STATE_DISARMED, ARM_STATE_ARMING_MANUAL, ARM_STATE_ARMED, ARM_STATE_DISARMING_MANUAL, ARM_STATE_DISARMING_TIMEOUT
+	ARM_STATE_DISARMED,
+	ARM_STATE_ARMING_MANUAL,
+	ARM_STATE_ARMED,
+	ARM_STATE_DISARMING_MANUAL,
+	ARM_STATE_DISARMING_TIMEOUT
 } ArmState_t;
 
 // Private variables
@@ -160,7 +164,7 @@ MODULE_INITCALL( ManualControlInitialize, ManualControlStart)
 /**
  * Module task
  */
-static void manualControlTask(void *parameters)
+static void manualControlTask(__attribute__((unused)) void *parameters)
 {
     ManualControlSettingsData settings;
     ManualControlCommandData cmd;
@@ -246,7 +250,7 @@ static void manualControlTask(void *parameters)
 
                 // If a channel has timed out this is not valid data and we shouldn't update anything
                 // until we decide to go to failsafe
-                if (cmd.Channel[n] == PIOS_RCVR_TIMEOUT)
+                if (cmd.Channel[n] == (uint16_t)PIOS_RCVR_TIMEOUT)
                     valid_input_detected = false;
                 else
                     scaledChannel[n] = scaleChannel(cmd.Channel[n], settings.ChannelMax[n], settings.ChannelMin[n], settings.ChannelNeutral[n]);
@@ -351,7 +355,7 @@ static void manualControlTask(void *parameters)
                 flightMode = scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_FLIGHTMODE];
 
                 // Apply deadband for Roll/Pitch/Yaw stick inputs
-                if (settings.Deadband) {
+                if (settings.Deadband > 0.0f) {
                     applyDeadband(&cmd.Roll, settings.Deadband);
                     applyDeadband(&cmd.Pitch, settings.Deadband);
                     applyDeadband(&cmd.Yaw, settings.Deadband);
@@ -696,12 +700,14 @@ static void updateStabilizationDesired(ManualControlCommandData * cmd, ManualCon
  * @brief Update the position desired to current location when
  * enabled and allow the waypoint to be moved by transmitter
  */
-static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool home)
+static void updatePathDesired(__attribute__((unused)) ManualControlCommandData * cmd, bool changed,bool home)
 {
+    /*
     static portTickType lastSysTime;
     portTickType thisSysTime = xTaskGetTickCount();
-    /* float dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f; */
+    dT = ((thisSysTime == lastSysTime)? 0.001f : (thisSysTime - lastSysTime) * portTICK_RATE_MS * 0.001f);
     lastSysTime = thisSysTime;
+    */
 
     if (home && changed) {
         // Simple Return To Base mode - keep altitude the same, fly to home position
@@ -749,15 +755,17 @@ static void updatePathDesired(ManualControlCommandData * cmd, bool changed,bool 
     }
 }
 
-static void updateLandDesired(ManualControlCommandData * cmd, bool changed)
+static void updateLandDesired(__attribute__((unused)) ManualControlCommandData * cmd, bool changed)
 {
+    /*
     static portTickType lastSysTime;
     portTickType thisSysTime;
     float dT;
 
-    thisSysTime = xTaskGetTickCount();
-    dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
-    lastSysTime = thisSysTime;
+	thisSysTime = xTaskGetTickCount();
+	dT = ((thisSysTime == lastSysTime)? 0.001f : (thisSysTime - lastSysTime) * portTICK_RATE_MS * 0.001f);
+	lastSysTime = thisSysTime;
+	*/
 
     PositionActualData positionActual;
     PositionActualGet(&positionActual);
@@ -787,8 +795,8 @@ static void updateLandDesired(ManualControlCommandData * cmd, bool changed)
  */
 static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
 {
-    const float DEADBAND_HIGH = 0.55;
-    const float DEADBAND_LOW = 0.45;
+    const float DEADBAND_HIGH = 0.55f;
+    const float DEADBAND_LOW = 0.45f;
 
     static portTickType lastSysTime;
     static bool zeroed = false;
@@ -800,9 +808,9 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
     StabilizationSettingsData stabSettings;
     StabilizationSettingsGet(&stabSettings);
 
-    thisSysTime = xTaskGetTickCount();
-    dT = (thisSysTime - lastSysTime) / portTICK_RATE_MS / 1000.0f;
-    lastSysTime = thisSysTime;
+	thisSysTime = xTaskGetTickCount();
+	dT = ((thisSysTime == lastSysTime)? 0.001f : (thisSysTime - lastSysTime) * portTICK_RATE_MS * 0.001f);
+	lastSysTime = thisSysTime;
 
     altitudeHoldDesired.Roll = cmd->Roll * stabSettings.RollMax;
     altitudeHoldDesired.Pitch = cmd->Pitch * stabSettings.PitchMax;
@@ -830,17 +838,21 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
 // TODO: These functions should never be accessible on CC.  Any configuration that
 // could allow them to be called sholud already throw an error to prevent this happening
 // in flight
-static void updatePathDesired(ManualControlCommandData * cmd, bool changed, bool home)
+static void updatePathDesired(__attribute__((unused)) ManualControlCommandData * cmd,
+								  __attribute__((unused)) bool changed,
+								  __attribute__((unused)) bool home)
 {
     AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);
 }
 
-static void updateLandDesired(ManualControlCommandData * cmd, bool changed)
+static void updateLandDesired(__attribute__((unused)) ManualControlCommandData * cmd,
+								  __attribute__((unused)) bool changed)
 {
     AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);
 }
 
-static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
+static void altitudeHoldDesired(__attribute__((unused)) ManualControlCommandData * cmd,
+									__attribute__((unused)) bool changed)
 {
     AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_ERROR);
 }
@@ -868,21 +880,17 @@ static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutr
     }
 
     // Bound
-    if (valueScaled > 1.0) {
-        valueScaled = 1.0;
-    } else if (valueScaled < -1.0) {
-        valueScaled = -1.0;
+    if (valueScaled > 1.0f) {
+        valueScaled = 1.0f;
+    } else if (valueScaled < -1.0f) {
+        valueScaled = -1.0f;
     }
 
     return valueScaled;
 }
 
-static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
-{
-    if (end_time > start_time) {
-        return (end_time - start_time) * portTICK_RATE_MS;
-    }
-    return ((((portTICK_RATE_MS) - 1) - start_time) + end_time) * portTICK_RATE_MS;
+static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time) {
+	return (end_time - start_time) * portTICK_RATE_MS;
 }
 
 /**
@@ -898,9 +906,9 @@ static bool okToArm(void)
     // Check each alarm
     for (int i = 0; i < SYSTEMALARMS_ALARM_NUMELEM; i++) {
         if (alarms.Alarm[i] >= SYSTEMALARMS_ALARM_ERROR) {	// found an alarm thats set
-            if (i == SYSTEMALARMS_ALARM_GPS || i == SYSTEMALARMS_ALARM_TELEMETRY)
+            if (i == SYSTEMALARMS_ALARM_GPS || i == SYSTEMALARMS_ALARM_TELEMETRY) {
                 continue;
-
+			}
             return false;
         }
     }
@@ -1106,7 +1114,7 @@ bool validInputRange(int16_t min, int16_t max, uint16_t value)
  */
 static void applyDeadband(float *value, float deadband)
 {
-    if (fabs(*value) < deadband)
+    if (fabsf(*value) < deadband)
         *value = 0.0f;
     else if (*value > 0.0f)
         *value -= deadband;
@@ -1130,7 +1138,7 @@ static void applyLPF(float *value, ManualControlSettingsResponseTimeElem channel
 /**
  * Called whenever a critical configuration component changes
  */
-static void configurationUpdatedCb(UAVObjEvent * ev)
+static void configurationUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     configuration_check();
 }

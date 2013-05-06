@@ -118,7 +118,7 @@ float starting_altitude;
 /**
  * Module thread, should not return.
  */
-static void altitudeHoldTask(void *parameters)
+static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 {
 	AltitudeHoldDesiredData altitudeHoldDesired;
 	StabilizationDesiredData stabilizationDesired;
@@ -177,10 +177,13 @@ static void altitudeHoldTask(void *parameters)
 			static float z[4] = {0, 0, 0, 0};
 			float z_new[4];
 			float P[4][4], K[4][2], x[2];
-			float G[4] = {1.0e-15f, 1.0e-15f, 1.0e-3f, 1.0e-7};
-			static float V[4][4] = {{10.0f, 0, 0, 0}, {0, 100.0f, 0, 0}, {0, 0, 100.0f, 0}, {0, 0, 0, 1000.0f}};
+			float G[4] = {1.0e-15f, 1.0e-15f, 1.0e-3f, 1.0e-7f};
+			static float V[4][4] = {{10.0f, 0.0f, 0.0f, 0.0f},
+									  {0.0f, 100.0f, 0.0f, 0.0f},
+									  {0.0f, 0.0f, 100.0f, 0.0f},
+									  {0.0f, 0.0f, 0.0f, 1000.0f}};
 			static uint32_t accel_downsample_count = 0;
-			static float accels_accum[3] = {0,0,0};
+			static float accels_accum[3] = {0.0f, 0.0f, 0.0f};
 			float dT;
 			static float S[2] = {1.0f,10.0f};
 
@@ -383,7 +386,7 @@ static void altitudeHoldTask(void *parameters)
 	}
 }
 
-static void SettingsUpdatedCb(UAVObjEvent * ev)
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	AltitudeHoldSettingsGet(&altitudeHoldSettings);
 }

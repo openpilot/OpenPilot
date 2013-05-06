@@ -223,7 +223,7 @@ static void PIOS_USB_HID_RxStart(uint32_t usbhid_id, uint16_t rx_bytes_avail) {
 	PIOS_IRQ_Enable();
 }
 
-static void PIOS_USB_HID_TxStart(uint32_t usbhid_id, uint16_t tx_bytes_avail)
+static void PIOS_USB_HID_TxStart(uint32_t usbhid_id, __attribute__((unused)) uint16_t tx_bytes_avail)
 {
 	struct pios_usb_hid_dev * usb_hid_dev = (struct pios_usb_hid_dev *)usbhid_id;
 

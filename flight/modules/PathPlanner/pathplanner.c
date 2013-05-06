@@ -115,7 +115,7 @@ MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart)
 /**
  * Module task
  */
-static void pathPlannerTask(void *parameters)
+static void pathPlannerTask(__attribute__((unused)) void *parameters)
 {
 	// when the active waypoint changes, update pathDesired
 	WaypointConnectCallback(updatePathDesired);
@@ -207,7 +207,7 @@ static void pathPlannerTask(void *parameters)
 }
 
 // callback function when waypoints changed in any way, update pathDesired
-void updatePathDesired(UAVObjEvent * ev) {
+void updatePathDesired(__attribute__((unused)) UAVObjEvent * ev) {
 
 	// only ever touch pathDesired if pathplanner is enabled
 	if (!pathplanner_active) return;

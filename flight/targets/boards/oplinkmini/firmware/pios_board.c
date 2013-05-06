@@ -144,6 +144,9 @@ void PIOS_Board_Init(void) {
 		PIOS_Assert(0);
 	}
 
+	/* Initialize the delayed callback library */
+	CallbackSchedulerInitialize();
+
 #if defined(PIOS_INCLUDE_TIM)
 	/* Set up pulse timers */
 	PIOS_TIM_InitClock(&tim_1_cfg);

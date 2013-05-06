@@ -51,11 +51,11 @@
 #include <math.h>
 
 /* STM32 Std Peripherals Lib */
-#ifdef STM32F4XX
+#if defined(STM32F10X)
+#include <stm32f10x.h>
+#elif defined(STM32F4XX)
 #include <stm32f4xx.h>
 #include <stm32f4xx_rcc.h>
-#else
-#include <stm32f10x.h>
 #endif
 
 /* PIOS board specific feature selection */
@@ -67,6 +67,7 @@
 /* PIOS debug interface */
 /* #define PIOS_INCLUDE_DEBUG_CONSOLE */
 /* #define DEBUG_LEVEL 0 */
+/* #define PIOS_ENABLE_DEBUG_PINS */
 #include <pios_debug.h>
 
 /* PIOS common functions */

@@ -438,7 +438,7 @@ bool PIOS_BMA180_IRQHandler(void)
 {
 	bma180_irqs++;
 	
-	const static uint8_t pios_bma180_req_buf[7] = {BMA_X_LSB_ADDR | 0x80,0,0,0,0,0};
+	static const uint8_t pios_bma180_req_buf[7] = {BMA_X_LSB_ADDR | 0x80,0,0,0,0,0};
 	uint8_t pios_bma180_dmabuf[8];
 
 	// If we can't get the bus then just move on for efficiency

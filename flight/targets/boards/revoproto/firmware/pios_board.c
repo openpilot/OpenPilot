@@ -294,12 +294,17 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #define PIOS_COM_AUX_RX_BUF_LEN 512
 #define PIOS_COM_AUX_TX_BUF_LEN 512
 
+#define PIOS_COM_HKOSD_RX_BUF_LEN 22
+#define PIOS_COM_HKOSD_TX_BUF_LEN 22
+
+
 uint32_t pios_com_aux_id = 0;
 uint32_t pios_com_gps_id = 0;
 uint32_t pios_com_telem_usb_id = 0;
 uint32_t pios_com_telem_rf_id = 0;
 uint32_t pios_com_bridge_id = 0;
 uint32_t pios_com_overo_id = 0;
+uint32_t pios_com_hkosd_id = 0;
 
 /* 
  * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
@@ -314,7 +319,7 @@ static void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg
 	
 	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(rx_buf_len);
 	PIOS_Assert(rx_buffer);
-	if(tx_buf_len!= -1){ // this is the case for rx/tx ports
+	if(tx_buf_len!= (size_t)-1){ // this is the case for rx/tx ports
 		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(tx_buf_len);
 		PIOS_Assert(tx_buffer);
 		
@@ -433,6 +438,9 @@ void PIOS_Board_Init(void) {
 	if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
 		PIOS_Assert(0);
 	}
+
+	/* Initialize the delayed callback library */
+	CallbackSchedulerInitialize();
 
 	/* Set up pulse timers */
 	PIOS_TIM_InitClock(&tim_1_cfg);
@@ -638,6 +646,10 @@ void PIOS_Board_Init(void) {
 		case HWSETTINGS_RV_AUXPORT_COMBRIDGE:
 			PIOS_Board_configure_com(&pios_usart_aux_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
 			break;
+		case HWSETTINGS_RV_AUXPORT_OSDHK:
+			PIOS_Board_configure_com(&pios_usart_hkosd_aux_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
+			break;
+
 	} /* hwsettings_rv_auxport */
 	/* Configure AUXSbusPort */
 	//TODO: ensure that the serial invertion pin is setted correctly
@@ -699,6 +711,9 @@ void PIOS_Board_Init(void) {
 			break;
 		case HWSETTINGS_RV_AUXSBUSPORT_COMBRIDGE:
 			PIOS_Board_configure_com(&pios_usart_auxsbus_cfg, PIOS_COM_BRIDGE_RX_BUF_LEN, PIOS_COM_BRIDGE_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_bridge_id);
+			break;
+		case HWSETTINGS_RV_AUXSBUSPORT_OSDHK:
+			PIOS_Board_configure_com(&pios_usart_hkosd_auxsbus_cfg, PIOS_COM_HKOSD_RX_BUF_LEN, PIOS_COM_HKOSD_TX_BUF_LEN, &pios_usart_com_driver, &pios_com_hkosd_id);
 			break;
 	} /* hwsettings_rv_auxport */
 	
@@ -818,6 +833,15 @@ void PIOS_Board_Init(void) {
 
 #endif
 
+#if defined(PIOS_INCLUDE_HCSR04)
+		{
+			PIOS_TIM_InitClock(&tim_8_cfg);
+			uint32_t pios_hcsr04_id;
+			PIOS_HCSR04_Init(&pios_hcsr04_id, &pios_hcsr04_cfg);
+		}
+#endif
+
+
 #if defined(PIOS_INCLUDE_GCSRCVR)
 	GCSReceiverInitialize();
 	uint32_t pios_gcsrcvr_id;
@@ -829,7 +853,7 @@ void PIOS_Board_Init(void) {
 	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
 #endif	/* PIOS_INCLUDE_GCSRCVR */
 	
-#ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
+#ifndef PIOS_ENABLE_DEBUG_PINS
 	switch (hwsettings_rcvrport) {
 		case HWSETTINGS_RV_RCVRPORT_DISABLED:
 		case HWSETTINGS_RV_RCVRPORT_PWM:
@@ -845,7 +869,7 @@ void PIOS_Board_Init(void) {
 			break;
 	}
 #else
-	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
+	PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
 #endif
 	
 	if (PIOS_I2C_Init(&pios_i2c_mag_adapter_id, &pios_i2c_mag_adapter_cfg)) {

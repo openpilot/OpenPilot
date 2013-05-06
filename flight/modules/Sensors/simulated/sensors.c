@@ -145,7 +145,7 @@ MODULE_INITCALL(SensorsInitialize, SensorsStart)
  * Simulated sensor task.  Run a model of the airframe and produce sensor values
  */
 int sensors_count;
-static void SensorsTask(void *parameters)
+static void SensorsTask(__attribute__((unused)) void *parameters)
 {
 	portTickType lastSysTime;
 

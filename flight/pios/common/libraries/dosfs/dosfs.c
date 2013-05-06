@@ -1194,7 +1194,7 @@ uint32_t DFS_WriteFile(PFILEINFO fileinfo, uint8_t *scratch, uint8_t *buffer, ui
                         // this point, all passes through the read loop will be aligned on a
                         // sector boundary, which allows us to go through the optimal path
                         // 2A below.
-                        if (remain >= SECTOR_SIZE - tempsize) {
+                        if (remain >= (uint32_t)SECTOR_SIZE - tempsize) {
                                 memcpy(scratch + tempsize, buffer, SECTOR_SIZE - tempsize);
                                 if (!result)
                                         result = DFS_WriteSector(fileinfo->volinfo->unit, scratch, sector, 1);
@@ -1330,7 +1330,7 @@ uint32_t DFS_WriteFile(PFILEINFO fileinfo, uint8_t *scratch, uint8_t *buffer, ui
         No original function of DosFS driver
         It has no effect if writing to SD Card, it's only used by the DosFS wrapper in emulation
 */
-uint32_t DFS_Close(PFILEINFO fileinfo)
+uint32_t DFS_Close(__attribute__((unused)) PFILEINFO fileinfo)
 {
   return DFS_OK;
 }

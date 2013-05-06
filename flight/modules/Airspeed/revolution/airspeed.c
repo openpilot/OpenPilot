@@ -131,7 +131,7 @@ MODULE_INITCALL(AirspeedInitialize, AirspeedStart)
 /**
  * Module thread, should not return.
  */
-static void airspeedTask(void *parameters)
+static void airspeedTask(__attribute__((unused)) void *parameters)
 {
 	AirspeedSettingsUpdatedCb(AirspeedSettingsHandle());
 	
@@ -179,7 +179,7 @@ static void airspeedTask(void *parameters)
 	
 
 
-static void AirspeedSettingsUpdatedCb(UAVObjEvent * ev)
+static void AirspeedSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	AirspeedSettingsGet(&airspeedSettings);
 	

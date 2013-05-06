@@ -123,7 +123,7 @@ MODULE_INITCALL(OPLinkModInitialize, 0)
 /**
  * System task, periodically executes every SYSTEM_UPDATE_PERIOD_MS
  */
-static void systemTask(void *parameters)
+static void systemTask(__attribute__((unused)) void *parameters)
 {
 	portTickType lastSysTime;
 	uint16_t prev_tx_count = 0;
@@ -227,7 +227,8 @@ void vApplicationIdleHook(void)
  * Called by the RTOS when a stack overflow is detected.
  */
 #define DEBUG_STACK_OVERFLOW 0
-void vApplicationStackOverflowHook(xTaskHandle * pxTask, signed portCHAR * pcTaskName)
+void vApplicationStackOverflowHook(__attribute__((unused)) xTaskHandle * pxTask,
+								   __attribute__((unused)) signed portCHAR * pcTaskName)
 {
 	stackOverflow = true;
 #if DEBUG_STACK_OVERFLOW

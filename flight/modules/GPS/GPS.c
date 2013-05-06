@@ -196,7 +196,7 @@ MODULE_INITCALL(GPSInitialize, GPSStart)
  * Main gps task. It does not return.
  */
 
-static void gpsTask(void *parameters)
+static void gpsTask(__attribute__((unused)) void *parameters)
 {
 	portTickType xDelay = 100 / portTICK_RATE_MS;
 	uint32_t timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
@@ -277,7 +277,7 @@ static void gpsTask(void *parameters)
 /*
  * Estimate the acceleration due to gravity for a particular location in LLA
  */
-static float GravityAccel(float latitude, float longitude, float altitude)
+static float GravityAccel(float latitude, __attribute__((unused)) float longitude, float altitude)
 {
 	/* WGS84 gravity model.  The effect of gravity over latitude is strong
 	 * enough to change the estimated accelerometer bias in those apps. */

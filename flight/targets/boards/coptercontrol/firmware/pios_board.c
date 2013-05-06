@@ -60,6 +60,8 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
 #define PIOS_COM_BRIDGE_RX_BUF_LEN 65
 #define PIOS_COM_BRIDGE_TX_BUF_LEN 12
 
+#define PIOS_COM_HKOSD_TX_BUF_LEN 22
+
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE)
 #define PIOS_COM_DEBUGCONSOLE_TX_BUF_LEN 40
 uint32_t pios_com_debug_id;
@@ -70,6 +72,7 @@ uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_vcp_id;
 uint32_t pios_com_gps_id;
 uint32_t pios_com_bridge_id;
+uint32_t pios_com_hkosd_id;
 
 uint32_t pios_usb_rctx_id;
 
@@ -233,6 +236,9 @@ void PIOS_Board_Init(void) {
 	if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
 		PIOS_Assert(0);
 	}
+
+	/* Initialize the delayed callback library */
+	CallbackSchedulerInitialize();
 
 	/* Set up pulse timers */
 	PIOS_TIM_InitClock(&tim_1_cfg);
@@ -546,6 +552,22 @@ void PIOS_Board_Init(void) {
 			}
 		}
 		break;
+	case HWSETTINGS_CC_MAINPORT_OSDHK:
+		{
+			uint32_t pios_usart_hkosd_id;
+			if (PIOS_USART_Init(&pios_usart_hkosd_id, &pios_usart_hkosd_main_cfg)) {
+				PIOS_Assert(0);
+			}
+
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_HKOSD_TX_BUF_LEN);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_hkosd_id, &pios_usart_com_driver, pios_usart_hkosd_id,
+						NULL, 0,
+						tx_buffer, PIOS_COM_HKOSD_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+		}
+		break;
 	}
 
 	/* Configure the flexi port */
@@ -695,6 +717,22 @@ void PIOS_Board_Init(void) {
 		}
 #endif	/* PIOS_INCLUDE_I2C */
 		break;
+	case HWSETTINGS_CC_FLEXIPORT_OSDHK:
+		{
+			uint32_t pios_usart_hkosd_id;
+			if (PIOS_USART_Init(&pios_usart_hkosd_id, &pios_usart_hkosd_flexi_cfg)) {
+				PIOS_Assert(0);
+			}
+
+			uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_HKOSD_TX_BUF_LEN);
+			PIOS_Assert(tx_buffer);
+			if (PIOS_COM_Init(&pios_com_hkosd_id, &pios_usart_com_driver, pios_usart_hkosd_id,
+						NULL, 0,
+						tx_buffer, PIOS_COM_HKOSD_TX_BUF_LEN)) {
+				PIOS_Assert(0);
+			}
+		}
+		break;
 	}
 
 	/* Configure the rcvr port */
@@ -703,6 +741,12 @@ void PIOS_Board_Init(void) {
 
 	switch (hwsettings_rcvrport) {
 	case HWSETTINGS_CC_RCVRPORT_DISABLED:
+#if defined(PIOS_INCLUDE_HCSR04)
+		{
+			uint32_t pios_hcsr04_id;
+			PIOS_HCSR04_Init(&pios_hcsr04_id, &pios_hcsr04_cfg);
+		}
+#endif
 		break;
 	case HWSETTINGS_CC_RCVRPORT_PWM:
 #if defined(PIOS_INCLUDE_PWM)
@@ -776,7 +820,7 @@ void PIOS_Board_Init(void) {
 	/* Remap AFIO pin for PB4 (Servo 5 Out)*/
 	GPIO_PinRemapConfig( GPIO_Remap_SWJ_NoJTRST, ENABLE);
 
-#ifndef PIOS_DEBUG_ENABLE_DEBUG_PINS
+#ifndef PIOS_ENABLE_DEBUG_PINS
 	switch (hwsettings_rcvrport) {
 		case HWSETTINGS_CC_RCVRPORT_DISABLED:
 		case HWSETTINGS_CC_RCVRPORT_PWM:
@@ -790,8 +834,8 @@ void PIOS_Board_Init(void) {
 			break;
 	}
 #else
-	PIOS_DEBUG_Init(&pios_tim_servo_all_channels, NELEMENTS(pios_tim_servo_all_channels));
-#endif	/* PIOS_DEBUG_ENABLE_DEBUG_PINS */
+	PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
+#endif	/* PIOS_ENABLE_DEBUG_PINS */
 
 	switch(bdinfo->board_rev) {
 		case BOARD_REVISION_CC:

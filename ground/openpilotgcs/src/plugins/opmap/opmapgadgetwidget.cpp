@@ -24,6 +24,7 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#define USE_PATHPLANNER
 
 #include "opmapgadgetwidget.h"
 #include "ui_opmap_widget.h"
@@ -546,8 +547,8 @@ void OPMapGadgetWidget::closeEvent(QCloseEvent *event)
 */
 void OPMapGadgetWidget::updatePosition()
 {
-	double uav_latitude, uav_longitude, uav_altitude, uav_yaw;
-	double gps_latitude, gps_longitude, gps_altitude, gps_heading;
+    double uav_latitude, uav_longitude, uav_altitude, uav_yaw;
+    double gps_latitude, gps_longitude, gps_altitude, gps_heading;
 
 	internals::PointLatLng uav_pos;
 	internals::PointLatLng gps_pos;
@@ -581,7 +582,7 @@ void OPMapGadgetWidget::updatePosition()
     gps_longitude = gpsPositionData.Longitude;
     gps_altitude = gpsPositionData.Altitude;
 
-	gps_pos = internals::PointLatLng(gps_latitude, gps_longitude);
+    gps_pos = internals::PointLatLng(gps_latitude*1e-7, gps_longitude*1e-7);
 
     //**********************
     // get the current position and heading estimates
@@ -643,6 +644,7 @@ void OPMapGadgetWidget::updatePosition()
     {
         m_map->GPS->SetUAVPos(gps_pos, gps_altitude); // set the maps GPS position
         m_map->GPS->SetUAVHeading(gps_heading);       // set the maps GPS heading
+        m_map->GPS->update();
     }
     m_map->UAV->updateTextOverlay();
     m_map->UAV->update();

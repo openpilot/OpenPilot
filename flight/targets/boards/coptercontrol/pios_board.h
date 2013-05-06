@@ -1,4 +1,4 @@
- /**
+/**
  ******************************************************************************
  *
  * @file       pios_board.h
@@ -30,14 +30,14 @@
 // Timers and Channels Used
 //------------------------
 /*
-Timer | Channel 1 | Channel 2 | Channel 3 | Channel 4
-------+-----------+-----------+-----------+----------
-TIM1  |  Servo 4  |           |           |
-TIM2  |  RC In 5  |  RC In 6  |  Servo 6  |
-TIM3  |  Servo 5  |  RC In 2  |  RC In 3  |  RC In 4
-TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
-------+-----------+-----------+-----------+----------
-*/
+ Timer | Channel 1 | Channel 2 | Channel 3 | Channel 4
+ ------+-----------+-----------+-----------+----------
+ TIM1  |  Servo 4  |           |           |
+ TIM2  |  RC In 5  |  RC In 6  |  Servo 6  |
+ TIM3  |  Servo 5  |  RC In 2  |  RC In 3  |  RC In 4
+ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
+ ------+-----------+-----------+-----------+----------
+ */
 
 //------------------------
 // DMA Channels Used
@@ -55,14 +55,12 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 /* Channel 11 - 				*/
 /* Channel 12 - 				*/
 
-
 //------------------------
 // BOOTLOADER_SETTINGS
 //------------------------
 #define BOARD_READABLE	TRUE
 #define BOARD_WRITABLE	TRUE
 #define MAX_DEL_RETRYS	3
-
 
 //------------------------
 // WATCHDOG_SETTINGS
@@ -98,7 +96,6 @@ TIM4  |  RC In 1  |  Servo 3  |  Servo 2  |  Servo 1
 #define PIOS_IRQ_PRIO_MID			8		// higher than RTOS
 #define PIOS_IRQ_PRIO_HIGH			5		// for SPI, ADC, I2C etc...
 #define PIOS_IRQ_PRIO_HIGHEST			4 		// for USART etc...
-
 //------------------------
 // PIOS_I2C
 // See also pios_board.c
@@ -154,6 +151,9 @@ extern uint32_t pios_com_telem_usb_id;
 extern uint32_t pios_com_debug_id;
 #define PIOS_COM_DEBUG                  (pios_com_debug_id)
 #endif	/* PIOS_INCLUDE_DEBUG_CONSOLE */
+
+extern uint32_t pios_com_hkosd_id;
+#define PIOS_COM_OSDHK              (pios_com_hkosd_id)
 
 //-------------------------
 // ADC
@@ -263,7 +263,6 @@ extern uint32_t pios_com_debug_id;
 #define PIOS_GPIO_PINS				{  }
 #define PIOS_GPIO_CLKS				{  }
 #define PIOS_GPIO_NUM				0
-
 
 //-------------------------
 // USB

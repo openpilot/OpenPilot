@@ -95,6 +95,11 @@ endif
 #ADEFS = -DUSE_IRQ_ASM_WRAPPER
 ADEFS = -D__ASSEMBLY__
 
+# Provide board-specific defines
+CDEFS += -DFW_BANK_BASE=$(FW_BANK_BASE)
+CDEFS += -DFW_BANK_SIZE=$(FW_BANK_SIZE)
+CDEFS += -DFW_DESC_SIZE=$(FW_DESC_SIZE)
+
 # Compiler flag to set the C Standard level.
 # c89   - "ANSI" C
 # gnu89 - c89 plus GCC extensions
@@ -118,8 +123,8 @@ CFLAGS += -O$(OPT)
 CFLAGS += -g$(DEBUGF)
 CFLAGS += -mapcs-frame
 CFLAGS += -fomit-frame-pointer
-CFLAGS += -Wall
-CFLAGS += -Wfloat-equal -Wunsuffixed-float-constants
+CFLAGS += -Wall -Wextra
+CFLAGS += -Wfloat-equal -Wunsuffixed-float-constants -Wdouble-promotion
 CFLAGS += -Werror
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))

@@ -6,7 +6,7 @@
  * @brief Process WavPlayer information
  * @{
  *
- * @file       WavPlayer.c
+ * @file       wavplayer.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      WavPlayer module
  * @see        The GNU Public License (GPL) Version 3
@@ -29,9 +29,7 @@
  */
 
 // ****************
-
 #include "openpilot.h"
-
 
 // ****************
 // Private functions
@@ -56,10 +54,10 @@ static uint32_t timeOfLastUpdateMs;
 // ****************
 int32_t WavPlayerStart(void)
 {
-	// Start WavPlayer task
-	xTaskCreate(WavPlayerTask, (signed char *)"WavPlayer", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &WavPlayerTaskHandle);
+    // Start WavPlayer task
+    xTaskCreate(WavPlayerTask, (signed char *) "WavPlayer", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &WavPlayerTaskHandle);
 
-	return 0;
+    return 0;
 }
 /**
  * Initialise the WavPlayer module
@@ -69,54 +67,37 @@ int32_t WavPlayerStart(void)
 int32_t WavPlayerInitialize(void)
 {
 
-	return 0;
+    return 0;
 }
-MODULE_INITCALL(WavPlayerInitialize, WavPlayerStart)
+MODULE_INITCALL( WavPlayerInitialize, WavPlayerStart)
 
 // ****************
 /**
- * Main gps task. It does not return.
+ * Main WavPlayer task. It does not return.
  */
 
-static void WavPlayerTask(void *parameters)
+static void WavPlayerTask(__attribute__((unused)) void *parameters)
 {
-	portTickType lastSysTime;
-	// Loop forever
-	lastSysTime = xTaskGetTickCount();	//portTickType xDelay = 100 / portTICK_RATE_MS;
-	uint32_t timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;;
+    portTickType lastSysTime;
+    // Loop forever
+    lastSysTime = xTaskGetTickCount();
+    uint32_t timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
 
-
-	timeOfLastUpdateMs = timeNowMs;
-	timeOfLastCommandMs = timeNowMs;
+    timeOfLastUpdateMs = timeNowMs;
+    timeOfLastCommandMs = timeNowMs;
 #if defined(PIOS_INCLUDE_WAVE)
-	WavePlayer_Start();
+    WavePlayer_Start();
 #endif
-	// Loop forever
-	while (1)
-	{
-
-		vTaskDelayUntil(&lastSysTime, 50 / portTICK_RATE_MS);
-		// Check for GPS timeout
-		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
-		/*if ((timeNowMs - timeOfLastUpdateMs) >= GPS_TIMEOUT_MS)
-		{	// we have not received any valid GPS sentences for a while.
-			// either the GPS is not plugged in or a hardware problem or the GPS has locked up.
-
-
-		}
-		else
-		{	// we appear to be receiving GPS sentences OK, we've had an update
-
-
-		}*/
-
-	}
+    // Loop forever
+    while (1) {
+        vTaskDelayUntil(&lastSysTime, 50 / portTICK_RATE_MS);
+        timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
+    }
 }
-
 
 // ****************
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

@@ -40,7 +40,9 @@
 
 #include "hwsettings.h"
 #include "altitude.h"
+#if defined(PIOS_INCLUDE_BMP085)
 #include "baroaltitude.h"	// object that will be updated by the module
+#endif
 #if defined(PIOS_INCLUDE_HCSR04)
 #include "sonaraltitude.h"	// object that will be updated by the module
 #endif
@@ -57,12 +59,15 @@
 static xTaskHandle taskHandle;
 
 // down sampling variables
+#if defined(PIOS_INCLUDE_BMP085)
 #define alt_ds_size    4
 static int32_t alt_ds_temp = 0;
 static int32_t alt_ds_pres = 0;
 static int alt_ds_count = 0;
+#endif
 
 static bool altitudeEnabled;
+static uint8_t hwsettings_rcvrport;;
 
         // Private functions
 static void altitudeTask(void *parameters);
@@ -75,9 +80,11 @@ int32_t AltitudeStart()
 {
 
 	if (altitudeEnabled) {
+#if defined(PIOS_INCLUDE_BMP085)
 		BaroAltitudeInitialize();
+#endif
 #if defined(PIOS_INCLUDE_HCSR04)
-		SonarAltitudeInitialze();
+		SonarAltitudeInitialize();
 #endif
 
 		// Start main task
@@ -107,59 +114,65 @@ int32_t AltitudeInitialize()
 	}
 #endif
 
+#if defined(PIOS_INCLUDE_BMP085)
 	// init down-sampling data
 	alt_ds_temp = 0;
 	alt_ds_pres = 0;
 	alt_ds_count = 0;
-
+#endif
+	HwSettingsCC_RcvrPortGet(&hwsettings_rcvrport);
 	return 0;
 }
 MODULE_INITCALL(AltitudeInitialize, AltitudeStart)
 /**
  * Module thread, should not return.
  */
-static void altitudeTask(void *parameters)
+static void altitudeTask(__attribute__((unused)) void *parameters)
 {
-	BaroAltitudeData data;
 	portTickType lastSysTime;
 	
 #if defined(PIOS_INCLUDE_HCSR04)
 	SonarAltitudeData sonardata;
-	int32_t value=0,timeout=5;
-	float coeff=0.25,height_out=0,height_in=0;
-	PIOS_HCSR04_Init();
-	PIOS_HCSR04_Trigger();
+	int32_t value = 0, timeout = 5;
+	float coeff = 0.25, height_out = 0, height_in = 0;
+	if(hwsettings_rcvrport==HWSETTINGS_CC_RCVRPORT_DISABLED) {
+		PIOS_HCSR04_Trigger();
+	}
 #endif
+#if defined(PIOS_INCLUDE_BMP085)
+	BaroAltitudeData data;
 	PIOS_BMP085_Init();
+#endif
 	
 	// Main task loop
 	lastSysTime = xTaskGetTickCount();
 	while (1)
 	{
 #if defined(PIOS_INCLUDE_HCSR04)
-		// Compute the current altitude (all pressures in kPa)
-		if(PIOS_HCSR04_Completed())
-		{
-			value = PIOS_HCSR04_Get();
-			if((value>100) && (value < 15000)) //from 3.4cm to 5.1m
-			{
-				height_in = value*0.00034;
-				height_out = (height_out * (1 - coeff)) + (height_in * coeff);
-				sonardata.Altitude = height_out; // m/us
+		// Compute the current altitude
+		if(hwsettings_rcvrport==HWSETTINGS_CC_RCVRPORT_DISABLED) {
+			if(PIOS_HCSR04_Completed()) {
+				value = PIOS_HCSR04_Get();
+				//from 3.4cm to 5.1m
+				if((value > 100) && (value < 15000)) {
+					height_in = value * 0.00034f / 2.0f;
+					height_out = (height_out * (1 - coeff)) + (height_in * coeff);
+					sonardata.Altitude = height_out; // m/us
+				}
+
+				// Update the AltitudeActual UAVObject
+				SonarAltitudeSet(&sonardata);
+				timeout = 5;
+				PIOS_HCSR04_Trigger();
 			}
-			
-			// Update the AltitudeActual UAVObject
-			SonarAltitudeSet(&sonardata);
-			timeout=5;
-			PIOS_HCSR04_Trigger();
-		}
-		if(timeout--)
-		{
-			//retrigger
-			timeout=5;
-			PIOS_HCSR04_Trigger();
+			if(!(timeout--)) {
+				//retrigger
+				timeout = 5;
+				PIOS_HCSR04_Trigger();
+			}
 		}
 #endif
+#if defined(PIOS_INCLUDE_BMP085)
 		// Update the temperature data
 		PIOS_BMP085_StartADC(TemperatureConv);
 #ifdef PIOS_BMP085_HAS_GPIOS
@@ -198,6 +211,7 @@ static void altitudeTask(void *parameters)
 			// Update the AltitudeActual UAVObject
 			BaroAltitudeSet(&data);
 		}
+#endif
 
 		// Delay until it is time to read the next sample
 		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD / portTICK_RATE_MS);

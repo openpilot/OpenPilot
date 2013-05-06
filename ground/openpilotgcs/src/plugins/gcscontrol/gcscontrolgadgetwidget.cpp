@@ -70,9 +70,6 @@ GCSControlGadgetWidget::GCSControlGadgetWidget(QWidget *parent) : QLabel(parent)
     // Connect object updated event from UAVObject to also update check boxes and dropdown
     connect(obj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(mccChanged(UAVObject*)));
 
-
-
-
     leftX = 0;
     leftY = 0;
     rightX = 0;
@@ -129,7 +126,6 @@ void GCSControlGadgetWidget::toggleControl(int state)
         UAVObject::SetGcsTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_ONCHANGE);
         mdata.gcsTelemetryUpdatePeriod = 100;
         m_gcscontrol->checkBoxUDPControl->setEnabled(true);
-
     }
     else
     {

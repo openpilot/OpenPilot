@@ -29,10 +29,10 @@ using namespace std;
 
 bool UAVObjectGeneratorPython::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
     // Load template and setup output directory
-    pythonCodePath = QDir( templatepath + QString("flight/Modules/FlightPlan/lib"));
+    pythonCodePath = QDir( templatepath + QString("flight/modules/FlightPlan/lib"));
     pythonOutputPath = QDir( outputpath + QString("python") );
     pythonOutputPath.mkpath(pythonOutputPath.absolutePath());
-    pythonCodeTemplate = readFile( pythonCodePath.absoluteFilePath("uavobjecttemplate.pyt") );
+    pythonCodeTemplate = readFile( pythonCodePath.absoluteFilePath("uavobject.pyt.template") );
     if (pythonCodeTemplate.isEmpty()) {
         std::cerr << "Problem reading python templates" << endl;
         return false;
@@ -71,20 +71,20 @@ bool UAVObjectGeneratorPython::process_object(ObjectInfo* info)
         // Only for enum types
         if (info->fields[n]->type == FIELDTYPE_ENUM)
         {
-            datafields.append(QString("\t# Enumeration options\n"));
+            datafields.append(QString("    # Enumeration options\n"));
             // Go through each option
             QStringList options = info->fields[n]->options;
             for (int m = 0; m < options.length(); ++m) {
                 QString name = options[m].toUpper().replace(QRegExp(ENUM_SPECIAL_CHARS), "");
                 if (name[0].isDigit())
                     name = QString("N%1").arg(name);
-                datafields.append(QString("\t%1 = %2\n").arg(name).arg(m));
+                datafields.append(QString("    %1 = %2\n").arg(name).arg(m));
             }
         }
         // Generate element names (only if field has more than one element)
         if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames)
         {
-            datafields.append(QString("\t# Array element names\n"));
+            datafields.append(QString("    # Array element names\n"));
             // Go through the element names
             QStringList elemNames = info->fields[n]->elementNames;
             for (int m = 0; m < elemNames.length(); ++m)
@@ -92,12 +92,12 @@ bool UAVObjectGeneratorPython::process_object(ObjectInfo* info)
                 QString name = elemNames[m].toUpper().replace(QRegExp(ENUM_SPECIAL_CHARS), "");
                 if (name[0].isDigit())
                     name = QString("N%1").arg(name);
-                datafields.append(QString("\t%1 = %2\n").arg(name).arg(m));
+                datafields.append(QString("    %1 = %2\n").arg(name).arg(m));
             }
         }
         // Constructor
-        datafields.append(QString("\tdef __init__(self):\n"));
-        datafields.append(QString("\t\tUAVObjectField.__init__(self, %1, %2)\n\n").arg(info->fields[n]->type).arg(info->fields[n]->numElements));
+        datafields.append(QString("    def __init__(self):\n"));
+        datafields.append(QString("        UAVObjectField.__init__(self, %1, %2)\n\n").arg(info->fields[n]->type).arg(info->fields[n]->numElements));
     }
     outCode.replace(QString("$(DATAFIELDS)"), datafields);
 
@@ -105,8 +105,8 @@ bool UAVObjectGeneratorPython::process_object(ObjectInfo* info)
     QString fields;
     for (int n = 0; n < info->fields.length(); ++n)
     {
-        fields.append(QString("\t\tself.%1 = %1Field()\n").arg(info->fields[n]->name));
-        fields.append(QString("\t\tself.addField(self.%1)\n").arg(info->fields[n]->name));
+        fields.append(QString("        self.%1 = %1Field()\n").arg(info->fields[n]->name));
+        fields.append(QString("        self.addField(self.%1)\n").arg(info->fields[n]->name));
     }
     outCode.replace(QString("$(DATAFIELDINIT)"), fields);
 
@@ -119,4 +119,3 @@ bool UAVObjectGeneratorPython::process_object(ObjectInfo* info)
 
     return true;
 }
-

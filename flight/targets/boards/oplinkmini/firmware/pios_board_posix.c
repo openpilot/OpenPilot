@@ -50,6 +50,9 @@ void PIOS_Board_Init(void) {
 		PIOS_Assert(0);
 	}
 
+	/* Initialize the delayed callback library */
+	CallbackSchedulerInitialize();
+
 	/* Initialize the PiOS library */
 	PIOS_COM_Init();
 

@@ -11,8 +11,10 @@
 #    qt_sdk_install
 #    mingw_install (Windows only)
 #    python_install (Windows only)
+#    nsis_install (Windows only)
 #    uncrustify_install
 #    doxygen_install
+#    gtest_install
 #
 # TODO:
 #    openocd_install
@@ -23,7 +25,6 @@
 #    stm32flash_install
 #    dfuutil_install
 #    android_sdk_install
-#    gtest_install
 #
 # TODO:
 #    help in the top Makefile
@@ -73,35 +74,45 @@ else ifeq ($(UNAME), Windows)
     QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-windows.tar.bz2
     MINGW_URL      := http://wiki.openpilot.org/download/attachments/18612236/mingw-4.4.0.tar.bz2
     PYTHON_URL     := http://wiki.openpilot.org/download/attachments/18612236/python-2.7.4-windows.tar.bz2
+    NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
 endif
+
+GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
 
 # Changing PYTHON_DIR, also update it in ground\openpilotgcs\src\app\gcsversioninfo.pri
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-4.8.4
 MINGW_DIR       := $(TOOLS_DIR)/mingw-4.4.0
 PYTHON_DIR      := $(TOOLS_DIR)/python-2.7.4
+NSIS_DIR        := $(TOOLS_DIR)/nsis-2.46-unicode
 UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
+GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
 
 ##############################
 #
-# All toolchains available for the platform
+# Build only and all toolchains available for the platform
 #
 ##############################
 
-ALL_SDK_TARGETS := arm_sdk qt_sdk
+BUILD_SDK_TARGETS := arm_sdk qt_sdk
 ifeq ($(UNAME), Windows)
-    ALL_SDK_TARGETS += mingw python
+    BUILD_SDK_TARGETS += mingw python nsis
 endif
-ALL_SDK_TARGETS += uncrustify doxygen
+ALL_SDK_TARGETS := $(BUILD_SDK_TARGETS) gtest uncrustify doxygen
 
-.PHONY: all_sdk_install all_sdk_clean all_sdk_distclean all_sdk_version
-all_sdk_install:   $(addsuffix _install,$(ALL_SDK_TARGETS))
-all_sdk_clean:     $(addsuffix _clean,$(ALL_SDK_TARGETS))
-all_sdk_distclean: $(addsuffix _distclean,$(ALL_SDK_TARGETS))
-all_sdk_version:   $(addsuffix _version,$(ALL_SDK_TARGETS))
+define GROUP_SDK_TEMPLATE
+.PHONY: $(1)_install $(1)_clean $(1)_distclean $(1)_version
+$(1)_install:   $(addsuffix _install,$(2))
+$(1)_clean:     $(addsuffix _clean,$(2))
+$(1)_distclean: $(addsuffix _distclean,$(2))
+$(1)_version:   $(addsuffix _version,$(2))
+endef
+
+$(eval $(call GROUP_SDK_TEMPLATE,build_sdk,$(BUILD_SDK_TARGETS)))
+$(eval $(call GROUP_SDK_TEMPLATE,all_sdk,$(ALL_SDK_TARGETS)))
 
 ##############################
 #
@@ -119,14 +130,14 @@ export CUT	:= cut
 export SED	:= sed
 
 # Used only by this Makefile
+GIT		:= git
+CURL		:= curl
 TAR		:= tar
+UNZIP		:= unzip
+OPENSSL		:= openssl
 ANT		:= ant
 JAVAC		:= javac
 JAR		:= jar
-GIT		:= git
-CURL		:= curl
-OPENSSL		:= openssl
-DOXYGEN		:= doxygen
 
 # Echo in recipes is a bit tricky in a Windows Git Bash window in some cases.
 # It does not work if make started under msysGit installed into a path with spaces.
@@ -168,11 +179,13 @@ MSG_NOTICE           = $(QUOTE) NOTE       $(QUOTE)
 
 # Verbosity level
 ifeq ($(V), 1)
-    CURL_OPTIONS :=
-    MAKE_SILENT  :=
+    CURL_OPTIONS  :=
+    MAKE_SILENT   :=
+    UNZIP_SILENT  :=
 else
-    CURL_OPTIONS := --silent
-    MAKE_SILENT  := --silent
+    CURL_OPTIONS  := --silent
+    MAKE_SILENT   := --silent
+    UNZIP_SILENT  := -q
 endif
 
 # MSYS tar workaround
@@ -234,7 +247,10 @@ $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
 
 	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(2))
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
-	$(V1) $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(dir $(2))) -xf $$(call toprel, $(DL_DIR)/$(4))
+	$(if $(filter $(suffix $(4)), .zip),
+		$(V1) $(UNZIP) $(UNZIP_SILENT) -d $$(call toprel, $(dir $(2))) $$(call toprel, $(DL_DIR)/$(4)),
+		$(V1) $(TAR) $(TAR_OPTIONS) -C $$(call toprel, $(dir $(2))) -xf $$(call toprel, $(DL_DIR)/$(4))
+	)
 
 	$(5)
 
@@ -402,6 +418,30 @@ python_version:
 
 ##############################
 #
+# NSIS Unicode
+#
+##############################
+
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,nsis,$(NSIS_DIR),$(NSIS_URL),$(notdir $(NSIS_URL))))
+
+ifeq ($(shell [ -d "$(NSIS_DIR)" ] && $(ECHO) "exists"), exists)
+    export NSIS := $(NSIS_DIR)/makensis
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(NSIS_DIR)) not found (make nsis_install), using system PATH)
+    export NSIS ?= makensis
+endif
+
+.PHONY: nsis_version
+nsis_version:
+	-$(V1) $(NSIS) | head -n1
+
+endif
+
+##############################
+#
 # Uncrustify
 #
 ##############################
@@ -496,7 +536,19 @@ endif
 doxygen_version:
 	-$(V1) $(ECHO) "Doxygen `$(DOXYGEN) --version`"
 
+##############################
+#
+# GoogleTest
+#
+##############################
 
+$(eval $(call TOOL_INSTALL_TEMPLATE,gtest,$(GTEST_DIR),$(GTEST_URL),$(notdir $(GTEST_URL))))
+
+export GTEST_DIR
+
+.PHONY: gtest_version
+gtest_version:
+	-$(V1) $(SED) -n "s/^PACKAGE_STRING='\(.*\)'/\1/p" < $(GTEST_DIR)/configure
 
 
 
@@ -763,28 +815,6 @@ android_sdk_update:
 	$(V0) @echo " UPDATE       $(ANDROID_SDK_DIR)"
 	$(ANDROID_SDK_DIR)/tools/android update sdk --no-ui -t platform-tools,android-16,addon-google_apis-google-16
 
-# Set up Google Test (gtest) tools
-GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
-
-.PHONY: gtest_install
-gtest_install: | $(DL_DIR) $(TOOLS_DIR)
-gtest_install: GTEST_URL  := http://googletest.googlecode.com/files/gtest-1.6.0.zip
-gtest_install: GTEST_FILE := $(notdir $(GTEST_URL))
-gtest_install: gtest_clean
-        # download the file unconditionally since google code gives back 404
-        # for HTTP HEAD requests which are used when using the wget -N option
-	$(V1) [ ! -f "$(DL_DIR)/$(GTEST_FILE)" ] || $(RM) -f "$(DL_DIR)/$(GTEST_FILE)"
-	$(V1) $(WGET) -P "$(DL_DIR)" --trust-server-name "$(GTEST_URL)"
-
-        # extract the source
-	$(V1) [ ! -d "$(GTEST_DIR)" ] || $(RM) -rf "$(GTEST_DIR)"
-	$(V1) mkdir -p "$(GTEST_DIR)"
-	$(V1) unzip -q -d "$(TOOLS_DIR)" "$(DL_DIR)/$(GTEST_FILE)"
-
-.PHONY: gtest_clean
-gtest_clean:
-	$(V0) @echo " CLEAN        $(GTEST_DIR)"
-	$(V1) [ ! -d "$(GTEST_DIR)" ] || $(RM) -rf "$(GTEST_DIR)"
 
 ##############################
 #

@@ -531,62 +531,69 @@ enum pios_rfm22b_dev_magic {
     PIOS_RFM22B_DEV_MAGIC = 0x68e971b6,
 };
 
+enum pios_radio_state {
+    RADIO_STATE_UNINITIALIZED,
+    RADIO_STATE_INITIALIZING,
+    RADIO_STATE_REQUESTING_CONNECTION,
+    RADIO_STATE_ACCEPTING_CONNECTION,
+    RADIO_STATE_RX_MODE,
+    RADIO_STATE_RX_DATA,
+    RADIO_STATE_RX_FAILURE,
+    RADIO_STATE_RECEIVING_STATUS,
+    RADIO_STATE_TX_START,
+    RADIO_STATE_TX_DATA,
+    RADIO_STATE_TX_FAILURE,
+    RADIO_STATE_SENDING_ACK,
+    RADIO_STATE_SENDING_NACK,
+    RADIO_STATE_RECEIVING_ACK,
+    RADIO_STATE_RECEIVING_NACK,
+    RADIO_STATE_TIMEOUT,
+    RADIO_STATE_ERROR,
+    RADIO_STATE_FATAL_ERROR,
+
+    RADIO_STATE_NUM_STATES // Must be last
+};
+
+enum pios_radio_event {
+    RADIO_EVENT_DEFAULT,
+    RADIO_EVENT_INT_RECEIVED,
+    RADIO_EVENT_INITIALIZE,
+    RADIO_EVENT_INITIALIZED,
+    RADIO_EVENT_REQUEST_CONNECTION,
+    RADIO_EVENT_CONNECTION_REQUESTED,
+    RADIO_EVENT_PACKET_ACKED,
+    RADIO_EVENT_PACKET_NACKED,
+    RADIO_EVENT_ACK_TIMEOUT,
+    RADIO_EVENT_RX_MODE,
+    RADIO_EVENT_RX_COMPLETE,
+    RADIO_EVENT_STATUS_RECEIVED,
+    RADIO_EVENT_TX_START,
+    RADIO_EVENT_FAILURE,
+    RADIO_EVENT_TIMEOUT,
+    RADIO_EVENT_ERROR,
+    RADIO_EVENT_FATAL_ERROR,
+
+    RADIO_EVENT_NUM_EVENTS  // Must be last
+};
+
 enum pios_rfm22b_state {
-    RFM22B_STATE_UNINITIALIZED,
     RFM22B_STATE_INITIALIZING,
-    RFM22B_STATE_REQUESTING_CONNECTION,
-    RFM22B_STATE_ACCEPTING_CONNECTION,
+    RFM22B_STATE_TRANSITION,
+    RFM22B_STATE_RX_WAIT,
+    RFM22B_STATE_RX_WAIT_SYNC,
     RFM22B_STATE_RX_MODE,
-    RFM22B_STATE_WAIT_PREAMBLE,
-    RFM22B_STATE_WAIT_SYNC,
-    RFM22B_STATE_RX_DATA,
-    RFM22B_STATE_RX_FAILURE,
-    RFM22B_STATE_RECEIVING_STATUS,
-    RFM22B_STATE_TX_START,
-    RFM22B_STATE_TX_DATA,
-    RFM22B_STATE_TX_FAILURE,
-    RFM22B_STATE_SENDING_ACK,
-    RFM22B_STATE_SENDING_NACK,
-    RFM22B_STATE_RECEIVING_ACK,
-    RFM22B_STATE_RECEIVING_NACK,
-    RFM22B_STATE_TIMEOUT,
-    RFM22B_STATE_ERROR,
-    RFM22B_STATE_FATAL_ERROR,
+    RFM22B_STATE_TX_MODE,
+    RFM22B_STATE_TRANSMITTING,
 
     RFM22B_STATE_NUM_STATES // Must be last
 };
 
-enum pios_rfm22b_event {
-    RFM22B_EVENT_DEFAULT,
-    RFM22B_EVENT_INT_RECEIVED,
-    RFM22B_EVENT_INITIALIZE,
-    RFM22B_EVENT_INITIALIZED,
-    RFM22B_EVENT_REQUEST_CONNECTION,
-    RFM22B_EVENT_CONNECTION_REQUESTED,
-    RFM22B_EVENT_PACKET_ACKED,
-    RFM22B_EVENT_PACKET_NACKED,
-    RFM22B_EVENT_ACK_TIMEOUT,
-    RFM22B_EVENT_RX_MODE,
-    RFM22B_EVENT_PREAMBLE_DETECTED,
-    RFM22B_EVENT_SYNC_DETECTED,
-    RFM22B_EVENT_RX_COMPLETE,
-    RFM22B_EVENT_RX_ERROR,
-    RFM22B_EVENT_STATUS_RECEIVED,
-    RFM22B_EVENT_TX_START,
-    RFM22B_EVENT_FAILURE,
-    RFM22B_EVENT_TIMEOUT,
-    RFM22B_EVENT_ERROR,
-    RFM22B_EVENT_FATAL_ERROR,
-
-    RFM22B_EVENT_NUM_EVENTS  // Must be last
-};
-
 #define RFM22B_RX_PACKET_STATS_LEN 4
 enum pios_rfm22b_rx_packet_status {
-    RFM22B_GOOD_RX_PACKET = 0x00,
-    RFM22B_CORRECTED_RX_PACKET = 0x01,
-    RFM22B_ERROR_RX_PACKET = 0x2,
-    RFM22B_RESENT_TX_PACKET = 0x3
+    RADIO_GOOD_RX_PACKET = 0x00,
+    RADIO_CORRECTED_RX_PACKET = 0x01,
+    RADIO_ERROR_RX_PACKET = 0x2,
+    RADIO_RESENT_TX_PACKET = 0x3
 };
 
 typedef struct {
@@ -603,6 +610,79 @@ typedef struct {
     OPLinkSettingsRemoteVCPPortOptions vcp_port;
     OPLinkSettingsComSpeedOptions com_speed;
 } rfm22b_binding;
+
+enum pios_rfm22b_chip_power_state {
+    RFM22B_IDLE_STATE = 0x00,
+    RFM22B_RX_STATE = 0x01,
+    RFM22B_TX_STATE = 0x10,
+    RFM22B_INVALID_STATE = 0x11
+};
+
+// Device Status
+typedef union {
+    struct {
+        uint8_t state : 2;
+        bool frequency_error : 1;
+        bool header_error : 1;
+        bool rx_fifo_empty : 1;
+        bool fifo_underflow : 1;
+        bool fifo_overflow : 1;
+    };
+    uint8_t raw;
+} rfm22b_device_status_reg;
+
+// EzMAC Status
+typedef union {
+    struct {
+        bool packet_sent : 1;
+        bool packet_transmitting : 1;
+        bool crc_error : 1;
+        bool valid_packet_received : 1;
+        bool packet_receiving : 1;
+        bool packet_searching : 1;
+        bool crc_is_all_ones : 1;
+        bool reserved;
+    };
+    uint8_t raw;
+} rfm22b_ezmac_status_reg;
+
+// Interrrupt Status Register 1
+typedef union {
+    struct {
+        bool crc_error : 1;
+        bool valid_packet_received : 1;
+        bool packet_sent_interrupt : 1;
+        bool external_interrupt : 1;
+        bool rx_fifo_almost_full : 1;
+        bool tx_fifo_almost_empty : 1;
+        bool tx_fifo_almost_full : 1;
+        bool fifo_underoverflow_error : 1;
+    };
+    uint8_t raw;
+} rfm22b_int_status_1;
+
+// Interrupt Status Register 2
+typedef union {
+    struct {
+        bool poweron_reset : 1;
+        bool chip_ready : 1;
+        bool low_battery_detect : 1;
+        bool wakeup_timer : 1;
+        bool rssi_above_threshold : 1;
+        bool invalid_preamble_detected : 1;
+        bool valid_preamble_detected : 1;
+        bool sync_word_detected : 1;
+    };
+    uint8_t raw;
+} rfm22b_int_status_2;
+
+typedef struct {
+    rfm22b_device_status_reg device_status;
+    rfm22b_device_status_reg ezmac_status;
+    rfm22b_int_status_1 int_status_1;
+    rfm22b_int_status_2 int_status_2;
+} rfm22b_device_status;
+
 
 struct pios_rfm22b_dev {
     enum pios_rfm22b_dev_magic magic;
@@ -644,29 +724,26 @@ struct pios_rfm22b_dev {
     uint32_t tx_out_context;
 
     // the transmit power to use for data transmissions
-    uint8_t	tx_power;
+    uint8_t tx_power;
 
     // The RF datarate lookup index.
     uint8_t datarate;
 
-    // The state machine state and the current event
-    enum pios_rfm22b_state state;
+    // The radio state machine state
+    enum pios_radio_state state;
 
     // The event queue handle
     xQueueHandle eventQueue;
 
-    // device status register
-    uint8_t device_status;
-    // interrupt status register 1
-    uint8_t int_status1;
-    // interrupt status register 2
-    uint8_t int_status2;
-    // ezmac status register
-    uint8_t ezmac_status;
+    // The device status registers.
+    rfm22b_device_status status_regs;
 
     // The error statistics counters
     uint16_t prev_rx_seq_num;
     uint32_t rx_packet_stats[RFM22B_RX_PACKET_STATS_LEN];
+
+    // The RFM22B state machine state
+    enum pios_rfm22b_state rfm22b_state;
 
     // The packet statistics
     struct rfm22b_stats stats;
@@ -692,12 +769,12 @@ struct pios_rfm22b_dev {
 
     // The rx data packet
     PHPacket rx_packet;
+    // The rx data packet
+    PHPacketHandle rx_packet_handle;
     // The receive buffer write index
     uint16_t rx_buffer_wr;
     // The receive buffer write index
     uint16_t rx_packet_len;
-    // Is the modem currently in Rx mode?
-    bool in_rx_mode;
 
     // The status packet
     PHStatusPacket status_packet;
@@ -717,10 +794,6 @@ struct pios_rfm22b_dev {
     bool send_status;
     bool send_ppm;
     bool send_connection_request;
-    bool time_to_send;
-
-    // The offset between our clock and the global send clock
-    uint8_t time_to_send_offset;
 
     // The initial frequency
     uint32_t init_frequency;
@@ -730,7 +803,7 @@ struct pios_rfm22b_dev {
     // The frequency hopping step size
     float frequency_step_size;
     // current frequency hop channel
-    uint8_t	frequency_hop_channel;
+    uint8_t frequency_hop_channel;
     // afc correction reading (in Hz)
     int8_t afc_correction_Hz;
 
@@ -749,7 +822,7 @@ struct pios_rfm22b_dev {
 #ifdef PIOS_INCLUDE_RFM22B_RCVR
     // The PPM channel values
     uint16_t ppm_channel[PIOS_RFM22B_RCVR_MAX_CHANNELS];
-    uint8_t ppm_supv_timer;
+    uint32_t ppm_supv_timer;
     bool ppm_fresh;
 #endif
 };

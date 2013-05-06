@@ -1,12 +1,14 @@
 /**
  ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{
+ * @addtogroup osdoutputModule osdoutput Module
+ * @brief Process osdoutput information
+ * @{
  *
- *
- * @file       uavobjectsinittemplate.java
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      the template for the uavobjects init part
- *             $(GENERATEDWARNING)
- *
+ * @file       osdoutput.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      osdoutput module, handles osdoutput stream
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -25,18 +27,14 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#ifndef OSDOUTPUT_H
+#define OSDOUTPUT_H
 
-package org.openpilot.uavtalk.uavobjects;
+int32_t osdoutputInitialize(void);
 
-import org.openpilot.uavtalk.UAVObjectManager;
+#endif	/* OSDOUTPUT_H */
 
-public class UAVObjectsInitialize {
-	
-	public static void register(UAVObjectManager objMngr) {
-		try {
-$(OBJINIT)	
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-}
+/**
+ * @}
+ * @}
+ */

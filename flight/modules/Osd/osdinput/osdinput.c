@@ -36,261 +36,148 @@
 
 #include "attitudeactual.h"
 #include "taskinfo.h"
+#include "flightstatus.h"
 
 #include "fifo_buffer.h"
-
 
 // ****************
 // Private functions
 
-static void OpOsdTask(void *parameters);
+static void osdinputTask(void *parameters);
 
 // ****************
 // Private constants
 
-#define GPS_TIMEOUT_MS                  500
-#define NMEA_MAX_PACKET_LENGTH          33 // 82 max NMEA msg size plus 12 margin (because some vendors add custom crap) plus CR plus Linefeed
-// same as in COM buffer
-
-
-#ifdef PIOS_GPS_SETS_HOMELOCATION
-// Unfortunately need a good size stack for the WMM calculation
-	#define STACK_SIZE_BYTES            800
-#else
-	#define STACK_SIZE_BYTES            1024
-#endif
-
+#define STACK_SIZE_BYTES            1024
 #define TASK_PRIORITY                   (tskIDLE_PRIORITY + 4)
-
+#define MAX_PACKET_LENGTH 33
 // ****************
 // Private variables
 
 static uint32_t oposdPort;
 
-static xTaskHandle OpOsdTaskHandle;
+static xTaskHandle osdinputTaskHandle;
 
 static char* oposd_rx_buffer;
 t_fifo_buffer rx;
 
-static uint32_t timeOfLastCommandMs;
-static uint32_t timeOfLastUpdateMs;
-static uint32_t numUpdates;
-static uint32_t numChecksumErrors;
-static uint32_t numParsingErrors;
+enum osd_pkt_type
+{
+    OSD_PKT_TYPE_MISC = 0, OSD_PKT_TYPE_NAV = 1, OSD_PKT_TYPE_MAINT = 2, OSD_PKT_TYPE_ATT = 3, OSD_PKT_TYPE_MODE = 4,
+};
 
 // ****************
+/**
+ * Initialise the osdinput module
+ * \return -1 if initialisation failed
+ * \return 0 on success
+ */
+
+int32_t osdinputStart(void)
+{
+    // Start osdinput task
+    xTaskCreate(osdinputTask, (signed char *) "OSDINPUT", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &osdinputTaskHandle);
+
+    return 0;
+}
 /**
  * Initialise the gps module
  * \return -1 if initialisation failed
  * \return 0 on success
  */
-
-int32_t OpOsdStart(void)
+int32_t osdinputInitialize(void)
 {
-	// Start gps task
-	xTaskCreate(OpOsdTask, (signed char *)"OSD", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &OpOsdTaskHandle);
-	//PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_GPS, OpOsdTaskHandle);
+    AttitudeActualInitialize();
+    FlightStatusInitialize();
+    // Initialize quaternion
+    AttitudeActualData attitude;
+    AttitudeActualGet(&attitude);
+    attitude.q1 = 1;
+    attitude.q2 = 0;
+    attitude.q3 = 0;
+    attitude.q4 = 0;
+    attitude.Roll = 0;
+    attitude.Pitch = 0;
+    attitude.Yaw = 0;
+    AttitudeActualSet(&attitude);
 
-	return 0;
+    oposdPort = PIOS_COM_OSD;
+
+    oposd_rx_buffer = pvPortMalloc(MAX_PACKET_LENGTH);
+    PIOS_Assert(oposd_rx_buffer);
+
+    return 0;
 }
-/**
- * Initialise the gps module
- * \return -1 if initialisation failed
- * \return 0 on success
- */
-int32_t OpOsdInitialize(void)
-{
-	AttitudeActualInitialize();
-	// Initialize quaternion
-	AttitudeActualData attitude;
-	AttitudeActualGet(&attitude);
-	attitude.q1 = 1;
-	attitude.q2 = 0;
-	attitude.q3 = 0;
-	attitude.q4 = 0;
-	attitude.Roll = 0;
-	attitude.Pitch = 0;
-	attitude.Yaw = 0;
-	AttitudeActualSet(&attitude);
-
-
-	// TODO: Get gps settings object
-	oposdPort = PIOS_COM_OSD;
-
-	oposd_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
-	PIOS_Assert(oposd_rx_buffer);
-
-	return 0;
-}
-MODULE_INITCALL(OpOsdInitialize, OpOsdStart)
+MODULE_INITCALL( osdinputInitialize, osdinputStart)
 
 // ****************
 /**
- * Main gps task. It does not return.
+ * Main osdinput task. It does not return.
  */
 
-static void OpOsdTask(void *parameters)
+static void osdinputTask(__attribute__((unused)) void *parameters)
 {
-	portTickType xDelay = 100 / portTICK_RATE_MS;
-	portTickType lastSysTime;
-	// Loop forever
-	lastSysTime = xTaskGetTickCount();	//portTickType xDelay = 100 / portTICK_RATE_MS;
-	uint32_t timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;;
-	//GPSPositionData GpsData;
+    portTickType xDelay = 100 / portTICK_RATE_MS;
+    portTickType lastSysTime;
+    lastSysTime = xTaskGetTickCount();
 
-	//uint8_t rx_count = 0;
-	//bool start_flag = false;
-	//bool found_cr = false;
-	//int32_t gpsRxOverflow = 0;
+    uint8_t rx_count = 0;
+    bool start_flag = false;
+    int32_t osdRxOverflow = 0;
+    uint8_t c = 0xAA;
+    // Loop forever
+    while (1) {
+        // This blocks the task until there is something on the buffer
+        while (PIOS_COM_ReceiveBuffer(oposdPort, &c, 1, xDelay) > 0) {
 
-	numUpdates = 0;
-	numChecksumErrors = 0;
-	numParsingErrors = 0;
+            // detect start while acquiring stream
+            if (!start_flag && ((c == 0xCB) || (c == 0x34))) {
+                start_flag = true;
+                rx_count = 0;
+            } else if (!start_flag) {
+                continue;
+            }
 
-	timeOfLastUpdateMs = timeNowMs;
-	timeOfLastCommandMs = timeNowMs;
-	uint8_t rx_count = 0;
-	bool start_flag = false;
-	//bool found_cr = false;
-	int32_t gpsRxOverflow = 0;
-	uint8_t c=0xAA;
-	// Loop forever
-	while (1)
-	{
-		/*//DMA_Cmd(DMA1_Stream2, DISABLE);   //prohibit  channel3 for a little time
-		uint16_t cnt = DMA_GetCurrDataCounter(DMA1_Stream2);
-    	rx.wr = rx.buf_size-cnt;
-		if(rx.wr)
-		{
-			//PIOS_LED_Toggle(LED2);
-			while (	fifoBuf_getData(&rx, &c, 1) > 0)
-			{
-
-				// detect start while acquiring stream
-				if (!start_flag && ((c == 0xCB) || (c == 0x34)))
-				{
-					start_flag = true;
-					rx_count = 0;
-				}
-				else
-				if (!start_flag)
-					continue;
-
-				if (rx_count >= 11)
-				{
-					// The buffer is already full and we haven't found a valid NMEA sentence.
-					// Flush the buffer and note the overflow event.
-					gpsRxOverflow++;
-					start_flag = false;
-					rx_count = 0;
-				}
-				else
-				{
-					oposd_rx_buffer[rx_count] = c;
-					rx_count++;
-				}
-				if (start_flag && rx_count == 11)
-				{
-					//PIOS_LED_Toggle(LED3);
-					if(oposd_rx_buffer[1]==3)
-					{
-						AttitudeActualData attitude;
-						AttitudeActualGet(&attitude);
-						attitude.q1 = 1;
-						attitude.q2 = 0;
-						attitude.q3 = 0;
-						attitude.q4 = 0;
-						attitude.Roll = (int16_t)(oposd_rx_buffer[3] | oposd_rx_buffer[4]<<8);
-						attitude.Pitch = (int16_t)(oposd_rx_buffer[5] | oposd_rx_buffer[6]<<8);
-						attitude.Yaw = (int16_t)(oposd_rx_buffer[7] | oposd_rx_buffer[8]<<8);
-						AttitudeActualSet(&attitude);
-						//setAttitudeOsd((int16_t)(oposd_rx_buffer[5] | oposd_rx_buffer[6]<<8), //pitch
-						//		(int16_t)(oposd_rx_buffer[3] | oposd_rx_buffer[4]<<8), //roll
-						//		(int16_t)(oposd_rx_buffer[7] | oposd_rx_buffer[8]<<8)); //yaw
-
-					}
-					//frame completed
-					start_flag = false;
-					rx_count = 0;
-				}
-			}
-		}
-		//DMA_Cmd(DMA1_Stream2, ENABLE);
-
-		 */
-
-		//PIOS_COM_SendBufferNonBlocking(oposdPort, &c, 1);
-
-		// This blocks the task until there is something on the buffer
-		while (PIOS_COM_ReceiveBuffer(oposdPort, &c, 1, xDelay) > 0)
-		{
-
-			// detect start while acquiring stream
-			if (!start_flag && ((c == 0xCB) || (c == 0x34)))
-			{
-				start_flag = true;
-				rx_count = 0;
-			}
-			else
-			if (!start_flag)
-				continue;
-
-			if (rx_count >= 11)
-			{
-				// The buffer is already full and we haven't found a valid NMEA sentence.
-				// Flush the buffer and note the overflow event.
-				gpsRxOverflow++;
-				start_flag = false;
-				rx_count = 0;
-			}
-			else
-			{
-				oposd_rx_buffer[rx_count] = c;
-				rx_count++;
-			}
-			if (rx_count == 11)
-			{
-				if(oposd_rx_buffer[1]==3)
-				{
-					AttitudeActualData attitude;
-					AttitudeActualGet(&attitude);
-					attitude.q1 = 1;
-					attitude.q2 = 0;
-					attitude.q3 = 0;
-					attitude.q4 = 0;
-					attitude.Roll = (int16_t)(oposd_rx_buffer[3] | oposd_rx_buffer[4]<<8);
-					attitude.Pitch = (int16_t)(oposd_rx_buffer[5] | oposd_rx_buffer[6]<<8);
-					attitude.Yaw = (int16_t)(oposd_rx_buffer[7] | oposd_rx_buffer[8]<<8);
-					AttitudeActualSet(&attitude);
-				}
-				//frame completed
-				start_flag = false;
-				rx_count = 0;
-
-			}
-		}
-		vTaskDelayUntil(&lastSysTime, 50 / portTICK_RATE_MS);
-		// Check for GPS timeout
-		timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
-		if ((timeNowMs - timeOfLastUpdateMs) >= GPS_TIMEOUT_MS)
-		{	// we have not received any valid GPS sentences for a while.
-			// either the GPS is not plugged in or a hardware problem or the GPS has locked up.
-
-
-		}
-		else
-		{	// we appear to be receiving GPS sentences OK, we've had an update
-
-
-		}
-
-	}
+            if (rx_count >= 11) {
+                // Flush the buffer and note the overflow event.
+                osdRxOverflow++;
+                start_flag = false;
+                rx_count = 0;
+            } else {
+                oposd_rx_buffer[rx_count] = c;
+                rx_count++;
+            }
+            if (rx_count == 11) {
+                if (oposd_rx_buffer[1] == OSD_PKT_TYPE_ATT) {
+                    AttitudeActualData attitude;
+                    AttitudeActualGet(&attitude);
+                    attitude.q1 = 1;
+                    attitude.q2 = 0;
+                    attitude.q3 = 0;
+                    attitude.q4 = 0;
+                    attitude.Roll = (float) ((int16_t)(oposd_rx_buffer[3] | oposd_rx_buffer[4] << 8)) / 10.0f;
+                    attitude.Pitch = (float) ((int16_t)(oposd_rx_buffer[5] | oposd_rx_buffer[6] << 8)) / 10.0f;
+                    attitude.Yaw = (float) ((int16_t)(oposd_rx_buffer[7] | oposd_rx_buffer[8] << 8)) / 10.0f;
+                    AttitudeActualSet(&attitude);
+                } else if (oposd_rx_buffer[1] == OSD_PKT_TYPE_MODE) {
+                    FlightStatusData status;
+                    FlightStatusGet(&status);
+                    status.Armed = oposd_rx_buffer[8];
+                    status.FlightMode = oposd_rx_buffer[3];
+                    FlightStatusSet(&status);
+                }
+                //frame completed
+                start_flag = false;
+                rx_count = 0;
+            }
+        }
+        vTaskDelayUntil(&lastSysTime, 50 / portTICK_RATE_MS);
+    }
 }
-
 
 // ****************
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

@@ -307,7 +307,7 @@ static void processObjEvent(UAVObjEvent * ev)
 /**
  * Telemetry transmit task, regular priority
  */
-static void telemetryTxTask(void *parameters)
+static void telemetryTxTask(__attribute__((unused)) void *parameters)
 {
 	UAVObjEvent ev;
 
@@ -325,7 +325,7 @@ static void telemetryTxTask(void *parameters)
  * Telemetry transmit task, high priority
  */
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
-static void telemetryTxPriTask(void *parameters)
+static void telemetryTxPriTask(__attribute__((unused)) void *parameters)
 {
 	UAVObjEvent ev;
 
@@ -343,7 +343,7 @@ static void telemetryTxPriTask(void *parameters)
 /**
  * Telemetry transmit task. Processes queue events and periodic updates.
  */
-static void telemetryRxTask(void *parameters)
+static void telemetryRxTask(__attribute__((unused)) void *parameters)
 {
 
 	// Task loop

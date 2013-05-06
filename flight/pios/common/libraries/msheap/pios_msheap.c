@@ -134,7 +134,7 @@ free(void *p)
 #endif /* PIOS_INCLUDE_FREERTOS */
 
 void
-msheap_panic(const char *reason)
+msheap_panic(__attribute__((unused)) const char *reason)
 {
 	//PIOS_DEBUG_Panic(reason);
 }

@@ -74,7 +74,7 @@ char **environ = __env;
 /*==============================================================================
  * Close a file.
  */
-int _close(int file)
+int _close(__attribute__((unused)) int file)
 {
     return -1;
 }
@@ -82,7 +82,7 @@ int _close(int file)
 /*==============================================================================
  * Transfer control to a new process.
  */
-int _execve(char *name, char **argv, char **env)
+int _execve(__attribute__((unused)) char *name, __attribute__((unused)) char **argv, __attribute__((unused)) char **env)
 {
     errno = ENOMEM;
     return -1;
@@ -91,7 +91,7 @@ int _execve(char *name, char **argv, char **env)
 /*==============================================================================
  * Exit a program without cleaning up files.
  */
-void _exit( int code )
+void _exit( __attribute__((unused)) int code )
 {
 	/* Should we force a system reset? */
 	while( 1 )
@@ -112,7 +112,7 @@ int _fork(void)
 /*==============================================================================
  * Status of an open file.
  */
-int _fstat(int file, struct stat *st)
+int _fstat(__attribute__((unused)) int file, struct stat *st)
 {
     st->st_mode = S_IFCHR;
     return 0;
@@ -129,7 +129,7 @@ int _getpid(void)
 /*==============================================================================
  * Query whether output stream is a terminal.
  */
-int _isatty(int file)
+int _isatty(__attribute__((unused)) int file)
 {
     return 1;
 }
@@ -137,7 +137,7 @@ int _isatty(int file)
 /*==============================================================================
  * Send a signal.
  */
-int _kill(int pid, int sig)
+int _kill(__attribute__((unused)) int pid, __attribute__((unused)) int sig)
 {
     errno = EINVAL;
     return -1;
@@ -146,7 +146,7 @@ int _kill(int pid, int sig)
 /*==============================================================================
  * Establish a new name for an existing file.
  */
-int _link(char *old, char *new)
+int _link(__attribute__((unused)) char *old, __attribute__((unused)) char *new)
 {
     errno = EMLINK;
     return -1;
@@ -155,7 +155,7 @@ int _link(char *old, char *new)
 /*==============================================================================
  * Set position in a file.
  */
-int _lseek(int file, int ptr, int dir)
+int _lseek(__attribute__((unused)) int file, __attribute__((unused)) int ptr, __attribute__((unused)) int dir)
 {
     return 0;
 }
@@ -163,7 +163,7 @@ int _lseek(int file, int ptr, int dir)
 /*==============================================================================
  * Open a file.
  */
-int _open(const char *name, int flags, int mode)
+int _open(__attribute__((unused)) const char *name, __attribute__((unused)) int flags, __attribute__((unused)) int mode)
 {
     return -1;
 }
@@ -171,7 +171,7 @@ int _open(const char *name, int flags, int mode)
 /*==============================================================================
  * Read from a file.
  */
-int _read(int file, char *ptr, int len)
+int _read(__attribute__((unused)) int file, __attribute__((unused)) char *ptr, __attribute__((unused)) int len)
 {
     return 0;
 }
@@ -182,7 +182,7 @@ int _read(int file, char *ptr, int len)
  * example to a serial port for debugging, you should make your minimal write
  * capable of doing this.
  */
-int _write_r( void * reent, int file, char * ptr, int len )
+int _write_r( __attribute__((unused)) void * reent, __attribute__((unused)) int file, __attribute__((unused)) char * ptr, __attribute__((unused)) int len )
 {
     return 0;
 }
@@ -220,7 +220,7 @@ caddr_t _sbrk(int incr)
 /*==============================================================================
  * Status of a file (by name).
  */
-int _stat(char *file, struct stat *st)
+int _stat(__attribute__((unused)) char *file, struct stat *st)
 {
     st->st_mode = S_IFCHR;
     return 0;
@@ -229,7 +229,7 @@ int _stat(char *file, struct stat *st)
 /*==============================================================================
  * Timing information for current process.
  */
-int _times(struct tms *buf)
+int _times(__attribute__((unused)) struct tms *buf)
 {
     return -1;
 }
@@ -237,7 +237,7 @@ int _times(struct tms *buf)
 /*==============================================================================
  * Remove a file's directory entry.
  */
-int _unlink(char *name)
+int _unlink(__attribute__((unused)) char *name)
 {
     errno = ENOENT;
     return -1;
@@ -246,7 +246,7 @@ int _unlink(char *name)
 /*==============================================================================
  * Wait for a child process.
  */
-int _wait(int *status)
+int _wait(__attribute__((unused)) int *status)
 {
     errno = ECHILD;
     return -1;

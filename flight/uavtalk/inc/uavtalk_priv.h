@@ -67,7 +67,7 @@ typedef struct {
     uint8_t timestampLength;
     uint8_t cs;
 	uint16_t timestamp;
-    int32_t rxCount;
+    uint32_t rxCount;
     UAVTalkRxState state;
     uint16_t rxPacketLength;
 } UAVTalkInputProcessor;

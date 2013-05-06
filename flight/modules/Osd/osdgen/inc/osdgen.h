@@ -1,17 +1,40 @@
-/*
- * osdgen.h
+/**
+ ******************************************************************************
+ * @addtogroup OpenPilotModules OpenPilot Modules
+ * @{
+ * @addtogroup OSDgenModule osdgen Module
+ * @brief Process OSD information
+ * @{
  *
- *  Created on: 2.10.2011
- *      Author: Samba
+ * @file       osdgen.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      OSD gen module, handles OSD draw. Parts from CL-OSD and SUPEROSD projects
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
 #ifndef OSDGEN_H_
 #define OSDGEN_H_
 
 #include "openpilot.h"
+#include "pios.h"
 
 int32_t osdgenInitialize(void);
-
 
 // Size of an array (num items.)
 #define SIZEOF_ARRAY(x) (sizeof(x) / sizeof((x)[0]))
@@ -78,12 +101,9 @@ int32_t osdgenInitialize(void);
         write_pixel(buff, (cx) + (x), (cy) - (y), mode); \
         write_pixel(buff, (cx) - (x), (cy) - (y), mode);
 
-
-
 // Font flags.
 #define FONT_BOLD               1               // bold text (no outline)
 #define FONT_INVERT             2               // invert: border white, inside black
-
 // Text alignments.
 #define TEXT_VA_TOP     0
 #define TEXT_VA_MIDDLE  1
@@ -95,9 +115,8 @@ int32_t osdgenInitialize(void);
 // Text dimension structures.
 struct FontDimensions
 {
-        int width, height;
+    int width, height;
 };
-
 
 // Max/Min macros.
 #define MAX(a, b)               ((a) > (b) ? (a) : (b))
@@ -110,19 +129,18 @@ struct FontDimensions
 #define APPLY_VDEADBAND(y) ((y)+GRAPHICS_VDEADBAND)
 #define APPLY_HDEADBAND(x) ((x)+GRAPHICS_HDEADBAND)
 
-// Check if coordinates are valid. If not, return.
-#define CHECK_COORDS(x, y) if(x < 0 || x >= GRAPHICS_WIDTH_REAL || y < 0 || y >= GRAPHICS_HEIGHT_REAL) return;
-#define CHECK_COORD_X(x) if(x < 0 || x >= GRAPHICS_WIDTH_REAL) return;
-#define CHECK_COORD_Y(y) if(y < 0 || y >= GRAPHICS_HEIGHT_REAL) return;
+// Check if coordinates are valid. If not, return. Assumes unsigned coordinate
+#define CHECK_COORDS(x, y) if(x >= GRAPHICS_WIDTH_REAL || y >= GRAPHICS_HEIGHT_REAL) return;
+#define CHECK_COORD_X(x) if(x >= GRAPHICS_WIDTH_REAL) return;
+#define CHECK_COORD_Y(y) if(y >= GRAPHICS_HEIGHT_REAL) return;
 
-// Clip coordinates out of range.
-#define CLIP_COORD_X(x) { x = MAX(0, MIN(x, GRAPHICS_WIDTH_REAL)); }
-#define CLIP_COORD_Y(y) { y = MAX(0, MIN(y, GRAPHICS_HEIGHT_REAL)); }
+// Clip coordinates out of range - assumes unsigned coordinate
+#define CLIP_COORD_X(x) { x = MIN(x, GRAPHICS_WIDTH_REAL); }
+#define CLIP_COORD_Y(y) { y = MIN(y, GRAPHICS_HEIGHT_REAL); }
 #define CLIP_COORDS(x, y) { CLIP_COORD_X(x); CLIP_COORD_Y(y); }
 
 // Macro to swap two variables using XOR swap.
 #define SWAP(a, b) { a ^= b; b ^= a; a ^= b; }
-
 
 // Line triggering
 #define LAST_LINE 312 //625/2 //PAL
@@ -140,8 +158,6 @@ struct FontDimensions
 #define DELAY_8_NOP() asm("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
 #define DELAY_9_NOP() asm("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
 #define DELAY_10_NOP() asm("nop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\nnop\r\n")
-
-
 
 uint8_t getCharData(uint16_t charPos);
 void introText();
@@ -188,8 +204,5 @@ void write_string(char *str, unsigned int x, unsigned int y, unsigned int xs, un
 void write_string_formatted(char *str, unsigned int x, unsigned int y, unsigned int xs, unsigned int ys, int va, int ha, int flags);
 
 void updateOnceEveryFrame();
-
-
-
 
 #endif /* OSDGEN_H_ */

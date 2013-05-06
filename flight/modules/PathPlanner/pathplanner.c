@@ -116,7 +116,7 @@ MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart)
 /**
  * Module task
  */
-static void pathPlannerTask(void *parameters)
+static void pathPlannerTask(__attribute__((unused)) void *parameters)
 {
 	// when the active waypoint changes, update pathDesired
 	WaypointConnectCallback(updatePathDesired);
@@ -208,7 +208,7 @@ static void pathPlannerTask(void *parameters)
 }
 
 // callback function when waypoints changed in any way, update pathDesired
-void updatePathDesired(UAVObjEvent * ev) {
+void updatePathDesired(__attribute__((unused)) UAVObjEvent * ev) {
 
 	// only ever touch pathDesired if pathplanner is enabled
 	if (!pathplanner_active) return;
@@ -238,20 +238,25 @@ void updatePathDesired(UAVObjEvent * ev) {
 	pathDesired.UID = waypointActive.Index;
 
 	if(waypointActive.Index == 0) {
+		PositionActualData positionActual;
+		PositionActualGet(&positionActual);
 		// First waypoint has itself as start point (used to be home position but that proved dangerous when looping)
 
-		pathDesired.Start[PATHDESIRED_START_NORTH] =  waypoint.Position[WAYPOINT_POSITION_NORTH];
+		/*pathDesired.Start[PATHDESIRED_START_NORTH] =  waypoint.Position[WAYPOINT_POSITION_NORTH];
 		pathDesired.Start[PATHDESIRED_START_EAST] =  waypoint.Position[WAYPOINT_POSITION_EAST];
-		pathDesired.Start[PATHDESIRED_START_DOWN] =  waypoint.Position[WAYPOINT_POSITION_DOWN];
+		pathDesired.Start[PATHDESIRED_START_DOWN] =  waypoint.Position[WAYPOINT_POSITION_DOWN];*/
+		pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North;
+		pathDesired.Start[PATHDESIRED_START_EAST] = positionActual.East;
+		pathDesired.Start[PATHDESIRED_START_DOWN] = positionActual.Down;
 		pathDesired.StartingVelocity = pathDesired.EndingVelocity;
 	} else {
 		// Get previous waypoint as start point
 		WaypointData waypointPrev;
 		WaypointInstGet(waypointActive.Index - 1, &waypointPrev);
 
-		pathDesired.Start[PATHDESIRED_END_NORTH] = waypointPrev.Position[WAYPOINT_POSITION_NORTH];
-		pathDesired.Start[PATHDESIRED_END_EAST] = waypointPrev.Position[WAYPOINT_POSITION_EAST];
-		pathDesired.Start[PATHDESIRED_END_DOWN] = waypointPrev.Position[WAYPOINT_POSITION_DOWN];
+		pathDesired.Start[PATHDESIRED_START_NORTH] = waypointPrev.Position[WAYPOINT_POSITION_NORTH];
+		pathDesired.Start[PATHDESIRED_START_EAST] = waypointPrev.Position[WAYPOINT_POSITION_EAST];
+		pathDesired.Start[PATHDESIRED_START_DOWN] = waypointPrev.Position[WAYPOINT_POSITION_DOWN];
 		pathDesired.StartingVelocity = waypointPrev.Velocity;
 	}
 	PathDesiredSet(&pathDesired);

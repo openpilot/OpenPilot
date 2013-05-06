@@ -88,6 +88,8 @@ static float mag_bias[3] = {0,0,0};
 static float mag_scale[3] = {0,0,0};
 static float accel_bias[3] = {0,0,0};
 static float accel_scale[3] = {0,0,0};
+static float gyro_staticbias[3] = {0,0,0};
+static float gyro_scale[3] = {0,0,0};
 
 static float R[3][3] = {{0}};
 static int8_t rotate = 0;
@@ -156,7 +158,7 @@ int32_t mag_test;
  */
 
 uint32_t sensor_dt_us;
-static void SensorsTask(void *parameters)
+static void SensorsTask(__attribute__((unused)) void *parameters)
 {
 	portTickType lastSysTime;
 	uint32_t accel_samples = 0;
@@ -358,9 +360,9 @@ static void SensorsTask(void *parameters)
 		float gyros[3] = {(float) gyro_accum[0] / gyro_samples,
 		                  (float) gyro_accum[1] / gyro_samples,
 		                  (float) gyro_accum[2] / gyro_samples};
-		float gyros_out[3] = {gyros[0] * gyro_scaling,
-		                      gyros[1] * gyro_scaling,
-		                      gyros[2] * gyro_scaling};
+		float gyros_out[3] = {gyros[0] * gyro_scaling * gyro_scale[0] - gyro_staticbias[0],
+		                      gyros[1] * gyro_scaling * gyro_scale[1] - gyro_staticbias[1],
+		                      gyros[2] * gyro_scaling * gyro_scale[2] - gyro_staticbias[2]};
 		if (rotate) {
 			rot_mult(R, gyros_out, gyros);
 			gyrosData.x = gyros[0];
@@ -524,7 +526,7 @@ static void magOffsetEstimation(MagnetometerData *mag)
 /**
  * Locally cache some variables from the AtttitudeSettings object
  */
-static void settingsUpdatedCb(UAVObjEvent * objEv) {
+static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent * objEv) {
 	RevoCalibrationGet(&cal);
 	
 	mag_bias[0] = cal.mag_bias[REVOCALIBRATION_MAG_BIAS_X];
@@ -539,8 +541,12 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	accel_scale[0] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_X];
 	accel_scale[1] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Y];
 	accel_scale[2] = cal.accel_scale[REVOCALIBRATION_ACCEL_SCALE_Z];
-	// Do not store gyros_bias here as that comes from the state estimator and should be
-	// used from GyroBias directly
+	gyro_staticbias[0] = cal.gyro_bias[REVOCALIBRATION_GYRO_BIAS_X];
+	gyro_staticbias[1] = cal.gyro_bias[REVOCALIBRATION_GYRO_BIAS_Y];
+	gyro_staticbias[2] = cal.gyro_bias[REVOCALIBRATION_GYRO_BIAS_Z];
+	gyro_scale[0] = cal.gyro_scale[REVOCALIBRATION_GYRO_SCALE_X];
+	gyro_scale[1] = cal.gyro_scale[REVOCALIBRATION_GYRO_SCALE_Y];
+	gyro_scale[2] = cal.gyro_scale[REVOCALIBRATION_GYRO_SCALE_Z];
 	
 	// Zero out any adaptive tracking
 	MagBiasData magBias;

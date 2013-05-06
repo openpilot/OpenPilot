@@ -75,8 +75,6 @@ void GCSControlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
  //       control_sock->close();
     control_sock->bind(GCSControlConfig->getUDPControlHost(), GCSControlConfig->getUDPControlPort(),QUdpSocket::ShareAddress);
 
-
-
     controlsMode = GCSControlConfig->getControlsMode();
 
     int i;
@@ -102,6 +100,20 @@ void GCSControlGadget::manualControlCommandUpdated(UAVObject * obj) {
     double pitch = obj->getField("Pitch")->getDouble();
     double yaw = obj->getField("Yaw")->getDouble();
     double throttle = obj->getField("Throttle")->getDouble();
+
+    // necessary against having the wrong joystick profile chosen, which shows weird values 
+    if (throttle > -1.0 && throttle <= 1.0) {
+        // convert ManualControlCommand.Throttle range (0..1) to the widget's throttle stick range (-1..+1)
+        throttle = -1.0 + (throttle * 2.0);
+    } else {
+        // with the safety value (line 206), this helps keep the sticks insde the margins
+        if (throttle <= -1.0) {
+            throttle = -1.0;
+        } else {
+            throttle = 1.0;
+        }
+    }
+
     // Remap RPYT to left X/Y and right X/Y depending on mode
     switch (controlsMode) {
     case 1:
@@ -186,6 +198,17 @@ void GCSControlGadget::sticksChangedLocally(double leftX, double leftY, double r
     //if we are not in local gcs control mode, ignore the joystick input
     if (((GCSControlGadgetWidget *)m_widget)->getGCSControl()==false || ((GCSControlGadgetWidget *)m_widget)->getUDPControl())
         return;
+
+    //if (newThrottle != oldThrottle) {
+        // convert widget's throttle stick range (-1..+1) to ManualControlCommand.Throttle range (0..1)
+        newThrottle = (newThrottle + 1.0) / 2.0;
+        
+        //  safety value to stop the motors from spinning at 0% throttle
+        if (newThrottle <= 0.01 ) {
+            newThrottle = -1;
+        }
+    //}
+     
 
     if((newThrottle != oldThrottle) || (newPitch != oldPitch) || (newYaw != oldYaw) || (newRoll != oldRoll)) {
         if (buttonRollControl==0)obj->getField("Roll")->setDouble(newRoll);

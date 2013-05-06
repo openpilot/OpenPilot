@@ -75,6 +75,13 @@ enum rfm22b_datarate {
     RFM22_datarate_256000 = 14,
 };
 
+typedef enum {
+    PIOS_RFM22B_INT_FAILURE,
+    PIOS_RFM22B_INT_SUCCESS,
+    PIOS_RFM22B_TX_COMPLETE,
+    PIOS_RFM22B_RX_COMPLETE
+} pios_rfm22b_int_result;
+
 struct rfm22b_stats {
     uint16_t packets_per_sec;
     uint16_t tx_byte_count;
@@ -116,7 +123,12 @@ extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
 extern bool PIOS_RFM22B_IsCoordinator(uint32_t rfb22b_id);
 extern void PIOS_RFM22B_GetStats(uint32_t rfm22b_id, struct rfm22b_stats *stats);
 extern uint8_t PIOS_RFM2B_GetPairStats(uint32_t rfm22b_id, uint32_t *device_ids, int8_t *RSSIs, uint8_t max_pairs);
+extern bool PIOS_RFM22B_InRxWait(uint32_t rfb22b_id);
 extern bool PIOS_RFM22B_LinkStatus(uint32_t rfm22b_id);
+extern bool PIOS_RFM22B_ReceivePacket(uint32_t rfm22b_id, PHPacketHandle p);
+extern bool PIOS_RFM22B_TransmitPacket(uint32_t rfm22b_id, PHPacketHandle p);
+extern pios_rfm22b_int_result PIOS_RFM22B_ProcessTx(uint32_t rfm22b_id);
+extern pios_rfm22b_int_result PIOS_RFM22B_ProcessRx(uint32_t rfm22b_id);
 
 /* Global Variables */
 extern const struct pios_com_driver pios_rfm22b_com_driver;

@@ -114,7 +114,7 @@ static struct pios_ppm_dev * PIOS_PPM_alloc(void)
 
 static void PIOS_PPM_tim_overflow_cb (uint32_t id, uint32_t context, uint8_t channel, uint16_t count);
 static void PIOS_PPM_tim_edge_cb (uint32_t id, uint32_t context, uint8_t channel, uint16_t count);
-const static struct pios_tim_callbacks tim_callbacks = {
+static const struct pios_tim_callbacks tim_callbacks = {
 	.overflow = PIOS_PPM_tim_overflow_cb,
 	.edge     = PIOS_PPM_tim_edge_cb,
 };
@@ -188,6 +188,7 @@ extern int32_t PIOS_PPM_Init(uint32_t * ppm_id, const struct pios_ppm_cfg * cfg)
 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
 	TIM_ICInitStructure.TIM_ICFilter = 0x0;
 
+	ppm_dev->supv_timer = 0;
 	if (!PIOS_RTC_RegisterTickCallback(PIOS_PPM_Supervisor, (uint32_t)ppm_dev)) {
 		PIOS_DEBUG_Assert(0);
 	}
@@ -223,7 +224,10 @@ static int32_t PIOS_PPM_Get(uint32_t rcvr_id, uint8_t channel)
 	return ppm_dev->CaptureValue[channel];
 }
 
-static void PIOS_PPM_tim_overflow_cb (uint32_t tim_id, uint32_t context, uint8_t channel, uint16_t count)
+static void PIOS_PPM_tim_overflow_cb (__attribute__((unused)) uint32_t tim_id,
+									   uint32_t context,
+									   __attribute__((unused)) uint8_t channel,
+									   uint16_t count)
 {
 	struct pios_ppm_dev * ppm_dev = (struct pios_ppm_dev *)context;
 
@@ -238,7 +242,10 @@ static void PIOS_PPM_tim_overflow_cb (uint32_t tim_id, uint32_t context, uint8_t
 }
 
 
-static void PIOS_PPM_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count)
+static void PIOS_PPM_tim_edge_cb (__attribute__((unused)) uint32_t tim_id,
+								   uint32_t context,
+								   uint8_t chan_idx,
+								   uint16_t count)
 {
 	/* Recover our device context */
 	struct pios_ppm_dev * ppm_dev = (struct pios_ppm_dev *)context;
@@ -286,7 +293,7 @@ static void PIOS_PPM_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t cha
 		/* Check if the last frame was well formed */
 		if (ppm_dev->PulseIndex == ppm_dev->NumChannels && ppm_dev->Tracking) {
 			/* The last frame was well formed */
-			for (uint32_t i = 0; i < ppm_dev->NumChannels; i++) {
+			for (int32_t i = 0; i < ppm_dev->NumChannels; i++) {
 				ppm_dev->CaptureValue[i] = ppm_dev->CaptureValueNewFrame[i];
 			}
 			for (uint32_t i = ppm_dev->NumChannels;

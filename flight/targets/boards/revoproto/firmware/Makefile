@@ -41,7 +41,7 @@ MODULES += CameraStab
 MODULES += FirmwareIAP
 MODULES += PathPlanner
 MODULES += FixedWingPathFollower
-MODULES += OveroSync
+#MODULES += OveroSync ## OveroSync disabled until OP292 is fixed
 MODULES += Telemetry
 #MODULES += VtolPathFollower  ## OP-700: VtolPathFollower disabled because its currently unsafe - remove this line once Sambas code has been merged
 #MODULES += Battery
@@ -70,6 +70,7 @@ ifndef TESTAPP
     SRC += $(OPUAVTALK)/uavtalk.c
     SRC += $(OPUAVOBJ)/uavobjectmanager.c
     SRC += $(OPUAVOBJ)/eventdispatcher.c
+    SRC += $(OPUAVOBJ)/callbackscheduler.c
 
     #ifeq ($(DEBUG), YES)
     SRC += $(OPSYSTEM)/dcc_stdio.c

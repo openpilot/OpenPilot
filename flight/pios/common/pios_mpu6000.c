@@ -454,7 +454,7 @@ bool PIOS_MPU6000_IRQHandler(void)
 		return false;
 
 	mpu6000_count = PIOS_MPU6000_FifoDepth(true);
-	if (mpu6000_count < sizeof(struct pios_mpu6000_data))
+	if (mpu6000_count < (int32_t)sizeof(struct pios_mpu6000_data))
 		return false;
 
 	if (PIOS_MPU6000_ClaimBus(true) != 0)
@@ -474,7 +474,7 @@ bool PIOS_MPU6000_IRQHandler(void)
 	static struct pios_mpu6000_data data;
 
 	// In the case where extras samples backed up grabbed an extra
-	if (mpu6000_count >= (sizeof(data) * 2)) {
+	if (mpu6000_count >= (int32_t)(sizeof(data) * 2)) {
 		mpu6000_fifo_backup++;
 		if (PIOS_MPU6000_ClaimBus(true) != 0)
 			return false;

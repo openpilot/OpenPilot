@@ -132,6 +132,9 @@ void PIOS_Board_Init(void) {
 		PIOS_Assert(0);
 	}
 
+	/* Initialize the delayed callback library */
+	CallbackSchedulerInitialize();
+
 	/* Configure IO ports */
 	
 	/* Configure Telemetry port */

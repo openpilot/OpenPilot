@@ -32,6 +32,9 @@
 	<string name="alarms">Alarms</string>
 	<string name="txrate">TxRate: </string>
 	<string name="rxrate">RxRate: </string>
+	<string name="latitude">Latitude:</string>
+	<string name="longitude">Longitude:</string>
+	<string name="altitude">Altitude:</string>
 	<string name="tester">Tester</string>
 	<string name="_3dview">3DView</string>
 	<string name="tuning">Tuning</string>

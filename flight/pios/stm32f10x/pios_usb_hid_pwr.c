@@ -44,7 +44,7 @@ struct {
  * Output         : None.
  * Return         : None
  *******************************************************************************/
-void USB_Cable_Config(FunctionalState NewState)
+void USB_Cable_Config(__attribute__((unused)) FunctionalState NewState)
 {
 }
 

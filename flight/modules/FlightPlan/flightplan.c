@@ -97,7 +97,7 @@ MODULE_INITCALL(FlightPlanInitialize, FlightPlanStart)
 /**
  * Module task
  */
-static void flightPlanTask(void *parameters)
+static void flightPlanTask(__attribute__((unused)) void *parameters)
 {
 	UAVObjEvent ev;
 	PmReturn_t retval;

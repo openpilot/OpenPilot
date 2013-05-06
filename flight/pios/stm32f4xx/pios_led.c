@@ -34,7 +34,7 @@
 
 #include <pios_led_priv.h>
 
-const static struct pios_led_cfg * led_cfg;
+static const struct pios_led_cfg * led_cfg;
 
 /**
  * Initialises all the LED's

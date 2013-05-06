@@ -86,8 +86,8 @@ void PIOS_ADC_DMC_irq_handler(void)
 static void Clock(uint32_t spektrum_id);
 
 
-#define PIOS_COM_TELEM_RF_RX_BUF_LEN 512
-#define PIOS_COM_TELEM_RF_TX_BUF_LEN 512
+#define PIOS_COM_TELEM_RF_RX_BUF_LEN 128
+#define PIOS_COM_TELEM_RF_TX_BUF_LEN 128
 
 #define PIOS_COM_AUX_RX_BUF_LEN 512
 #define PIOS_COM_AUX_TX_BUF_LEN 512
@@ -105,7 +105,42 @@ uint32_t pios_com_gps_id;
 uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_telem_rf_id;
 
+/**
+ * TIM3 is triggered by the HSYNC signal into its ETR line and will divide the 
+ *  APB1_CLOCK to generate a pixel clock that is used by the SPI CLK lines.
+ * TIM4 will be synced to it and will divide by that times the pixel width to
+ *  fire an IRQ when the last pixel of the line has been output.  Then the timer will
+ *  be rearmed and wait for the next HSYNC signal.  
+ * The critical timing detail is that the task be _DISABLED_ at the end of the line
+ *  before an extra pixel is clocked out
+ *  or we will need to configure the DMA task per line
+ */
+#include "pios_tim_priv.h"
+#define NTSC_PX_CLOCK  6797088
+#define PAL_PX_CLOCK   6750130
+#define PX_PERIOD      ((PIOS_PERIPHERAL_APB1_CLOCK / NTSC_PX_CLOCK) + 1)
+#define LINE_PERIOD    PX_PERIOD * GRAPHICS_WIDTH
 
+static const TIM_TimeBaseInitTypeDef tim_4_time_base = {
+	.TIM_Prescaler = 0, //PIOS_PERIPHERAL_APB1_CLOCK,
+	.TIM_ClockDivision = TIM_CKD_DIV1,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+	.TIM_Period = LINE_PERIOD - 1,
+	.TIM_RepetitionCounter = 0x0000,
+};
+
+static const struct pios_tim_clock_cfg pios_tim4_cfg = {
+	.timer = TIM4,
+	.time_base_init = &tim_4_time_base,
+	.irq = {
+		.init = {
+			.NVIC_IRQChannel                   = TIM4_IRQn,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelSubPriority        = 0,
+			.NVIC_IRQChannelCmd                = ENABLE,
+		},
+	}
+};
 
 void PIOS_Board_Init(void) {
 
@@ -120,16 +155,33 @@ void PIOS_Board_Init(void) {
 		PIOS_Assert(0);
 	}
 
+#if defined(PIOS_INCLUDE_SDCARD)
 	/* Enable and mount the SDCard */
 	PIOS_SDCARD_Init(pios_spi_sdcard_id);
 	PIOS_SDCARD_MountFS(0);
+#endif
 #endif /* PIOS_INCLUDE_SPI */
+
+#ifdef PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
+uintptr_t flash_id;
+uintptr_t fs_id;
+PIOS_Flash_Internal_Init(&flash_id, &flash_internal_cfg);
+PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_internal_cfg, &pios_internal_flash_driver, flash_id);
+#elif !defined(PIOS_USE_SETTINGS_ON_SDCARD)
+#error No setting storage specified. (define PIOS_USE_SETTINGS_ON_SDCARD or INCLUDE_FLASH_SECTOR_SETTINGS)
+#endif
+
 
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
 	UAVObjInitialize();
 
 	HwSettingsInitialize();
+
+#ifdef PIOS_INCLUDE_WDG
+	/* Initialize watchdog as early as possible to catch faults during init */
+	PIOS_WDG_Init();
+#endif /* PIOS_INCLUDE_WDG */
 
 	/* Initialize the alarms library */
 	AlarmsInitialize();
@@ -138,6 +190,9 @@ void PIOS_Board_Init(void) {
 	if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
 		PIOS_Assert(0);
 	}
+
+	/* Initialize the delayed callback library */
+	CallbackSchedulerInitialize();
 
 	/* IAP System Setup */
 	PIOS_IAP_Init();
@@ -150,6 +205,7 @@ void PIOS_Board_Init(void) {
 		HwSettingsSetDefaults(HwSettingsHandle(), 0);
 		AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
 	}
+
 
 #if defined(PIOS_INCLUDE_RTC)
 	/* Initialize the real-time clock and its associated tick */
@@ -406,13 +462,17 @@ void PIOS_Board_Init(void) {
 #endif
 
 #if defined(PIOS_INCLUDE_VIDEO)
+	PIOS_TIM_InitClock(&tim_8_cfg);
+	PIOS_Servo_Init(&pios_servo_cfg);
+	// Start the pixel and line clock counter
+	//PIOS_TIM_InitClock(&pios_tim4_cfg);
 	PIOS_Video_Init(&pios_video_cfg);
 #endif
 }
 
 uint16_t supv_timer=0;
 
-static void Clock(uint32_t spektrum_id) {
+static void Clock(__attribute__((unused)) uint32_t spektrum_id) {
 	/* 125hz */
 	++supv_timer;
 	if(supv_timer >= 625) {

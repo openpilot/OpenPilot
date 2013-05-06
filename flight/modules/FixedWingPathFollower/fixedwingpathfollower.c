@@ -144,7 +144,7 @@ static float indicatedAirspeedActualBias = 0;
 /**
  * Module thread, should not return.
  */
-static void pathfollowerTask(void *parameters)
+static void pathfollowerTask(__attribute__((unused)) void *parameters)
 {
 	SystemSettingsData systemSettings;
 	FlightStatusData flightStatus;
@@ -316,7 +316,7 @@ static void updatePathVelocity()
 	if (angle1>180.0f) angle1-=360.0f;
 	if (angle2<-180.0f) angle2+=360.0f;
 	if (angle2>180.0f) angle2-=360.0f;
-	if (fabs(angle1)>=90.0f && fabs(angle2)>=90.0f) {
+	if (fabsf(angle1)>=90.0f && fabsf(angle2)>=90.0f) {
 		error_speed=0;
 	}
 
@@ -630,13 +630,13 @@ static float bound(float val, float min, float max)
 	return val;
 }
 
-static void SettingsUpdatedCb(UAVObjEvent * ev)
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	FixedWingPathFollowerSettingsGet(&fixedwingpathfollowerSettings);
 	PathDesiredGet(&pathDesired);
 }
 
-static void airspeedActualUpdatedCb(UAVObjEvent * ev)
+static void airspeedActualUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 
 	AirspeedActualData airspeedActual;

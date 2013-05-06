@@ -130,7 +130,7 @@ init_pins(void)
 	GPIO_InitStructure.GPIO_Speed	= GPIO_Speed_2MHz;
 	GPIO_InitStructure.GPIO_Mode	= GPIO_Mode_AIN;
 	
-	for (int32_t i = 0; i < PIOS_ADC_NUM_PINS; i++) {
+	for (uint32_t i = 0; i < PIOS_ADC_NUM_PINS; ++i) {
 		if (config[i].port == NULL)
 			continue;
 		GPIO_InitStructure.GPIO_Pin = config[i].pin;
@@ -210,7 +210,7 @@ init_adc(void)
 	ADC_DMACmd(pios_adc_dev->cfg->adc_dev, ENABLE);
 
 	/* Configure input scan */
-	for (int32_t i = 0; i < PIOS_ADC_NUM_PINS; i++) {
+	for (uint32_t i = 0; i < PIOS_ADC_NUM_PINS; i++) {
 		ADC_RegularChannelConfig(pios_adc_dev->cfg->adc_dev,
 				config[i].channel,
 				i+1,
@@ -284,7 +284,7 @@ int32_t PIOS_ADC_Init(const struct pios_adc_cfg * cfg)
  * @brief Configure the ADC to run at a fixed oversampling
  * @param[in] oversampling the amount of oversampling to run at
  */
-void PIOS_ADC_Config(uint32_t oversampling)
+void PIOS_ADC_Config(__attribute__((unused)) uint32_t oversampling)
 {
 	/* we ignore this */
 }
@@ -376,7 +376,7 @@ uint8_t PIOS_ADC_GetOverSampling(void)
  * filter coefficients
  * @note Not currently supported.
  */
-void PIOS_ADC_SetFIRCoefficients(float * new_filter)
+void PIOS_ADC_SetFIRCoefficients(__attribute__((unused)) float * new_filter)
 {
 	// not implemented
 }
@@ -393,14 +393,14 @@ void accumulate(uint16_t *buffer, uint32_t count)
 	 * Accumulate sampled values.
 	 */
 	while (count--) {
-		for (int i = 0; i < PIOS_ADC_NUM_PINS; i++) {
+		for (uint32_t i = 0; i < PIOS_ADC_NUM_PINS; ++i) {
 			accumulator[i].accumulator += *sp++;
 			accumulator[i].count++;
 			/*
 			 * If the accumulator reaches half-full, rescale in order to
 			 * make more space.
 			 */
-			if (accumulator[i].accumulator >= (1 << 31)) {
+			if (accumulator[i].accumulator >= (((uint32_t)1) << 31)) {
 				accumulator[i].accumulator /= 2;
 				accumulator[i].count /= 2;
 			}

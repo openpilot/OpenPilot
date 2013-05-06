@@ -69,7 +69,7 @@ void PIOS_USBHOOK_RegisterString(enum usb_string_desc string_id, const uint8_t *
 
 static struct pios_usbhook_descriptor Config_Descriptor;
 
-void PIOS_USBHOOK_RegisterConfig(uint8_t config_id, const uint8_t * desc, uint16_t desc_size)
+void PIOS_USBHOOK_RegisterConfig(__attribute__((unused)) uint8_t config_id, const uint8_t * desc, uint16_t desc_size)
 {
 	Config_Descriptor.descriptor = desc;
 	Config_Descriptor.length     = desc_size;
@@ -205,42 +205,42 @@ void PIOS_USBHOOK_EndpointRx(uint8_t epnum, uint8_t *buf, uint16_t len)
  * Device level hooks into STM USB library
  */
 
-static const uint8_t * PIOS_USBHOOK_DEV_GetDeviceDescriptor(uint8_t speed, uint16_t *length)
+static const uint8_t * PIOS_USBHOOK_DEV_GetDeviceDescriptor(__attribute__((unused)) uint8_t speed, uint16_t *length)
 {
 	*length = Device_Descriptor.length;
 	return Device_Descriptor.descriptor;
 }
 
-static const uint8_t * PIOS_USBHOOK_DEV_GetLangIDStrDescriptor(uint8_t speed, uint16_t *length)
+static const uint8_t * PIOS_USBHOOK_DEV_GetLangIDStrDescriptor(__attribute__((unused)) uint8_t speed, uint16_t *length)
 {
 	*length = String_Descriptor[USB_STRING_DESC_LANG].length;
 	return String_Descriptor[USB_STRING_DESC_LANG].descriptor;
 }
 
-static const uint8_t * PIOS_USBHOOK_DEV_GetManufacturerStrDescriptor(uint8_t speed, uint16_t *length)
+static const uint8_t * PIOS_USBHOOK_DEV_GetManufacturerStrDescriptor(__attribute__((unused)) uint8_t speed, uint16_t *length)
 {
 	*length = String_Descriptor[USB_STRING_DESC_VENDOR].length;
 	return String_Descriptor[USB_STRING_DESC_VENDOR].descriptor;
 }
 
-static const uint8_t * PIOS_USBHOOK_DEV_GetProductStrDescriptor(uint8_t speed, uint16_t *length)
+static const uint8_t * PIOS_USBHOOK_DEV_GetProductStrDescriptor(__attribute__((unused)) uint8_t speed, uint16_t *length)
 {
 	*length = String_Descriptor[USB_STRING_DESC_PRODUCT].length;
 	return String_Descriptor[USB_STRING_DESC_PRODUCT].descriptor;
 }
 
-static const uint8_t * PIOS_USBHOOK_DEV_GetSerialStrDescriptor(uint8_t speed, uint16_t *length)
+static const uint8_t * PIOS_USBHOOK_DEV_GetSerialStrDescriptor(__attribute__((unused)) uint8_t speed, uint16_t *length)
 {
 	*length = String_Descriptor[USB_STRING_DESC_SERIAL].length;
 	return String_Descriptor[USB_STRING_DESC_SERIAL].descriptor;
 }
 
-static const uint8_t * PIOS_USBHOOK_DEV_GetConfigurationStrDescriptor(uint8_t speed, uint16_t *length)
+static const uint8_t * PIOS_USBHOOK_DEV_GetConfigurationStrDescriptor(__attribute__((unused)) uint8_t speed, __attribute__((unused)) uint16_t *length)
 {
 	return NULL;
 }
 
-static const uint8_t * PIOS_USBHOOK_DEV_GetInterfaceStrDescriptor(uint8_t speed, uint16_t *length)
+static const uint8_t * PIOS_USBHOOK_DEV_GetInterfaceStrDescriptor(__attribute__((unused)) uint8_t speed, __attribute__((unused)) uint16_t *length)
 {
 	return NULL;
 }
@@ -266,7 +266,7 @@ static void PIOS_USBHOOK_USR_Init(void)
 #endif
 }
 
-static void PIOS_USBHOOK_USR_DeviceReset(uint8_t speed)
+static void PIOS_USBHOOK_USR_DeviceReset(__attribute__((unused)) uint8_t speed)
 {
 	PIOS_USB_ChangeConnectionState(false);
 }
@@ -306,7 +306,7 @@ static USBD_Usr_cb_TypeDef user_callbacks = {
 	.DeviceDisconnected = PIOS_USBHOOK_USR_DeviceDisconnected,
 };
 
-static uint8_t PIOS_USBHOOK_CLASS_Init(void *pdev, uint8_t cfgidx)
+static uint8_t PIOS_USBHOOK_CLASS_Init(__attribute__((unused)) void *pdev, __attribute__((unused)) uint8_t cfgidx)
 {
   /* Call all of the registered init callbacks */
   for (uint8_t i = 0; i < NELEMENTS(usb_if_table); i++) {
@@ -318,7 +318,7 @@ static uint8_t PIOS_USBHOOK_CLASS_Init(void *pdev, uint8_t cfgidx)
   return USBD_OK;
 }
 
-static uint8_t PIOS_USBHOOK_CLASS_DeInit(void *pdev, uint8_t cfgidx)
+static uint8_t PIOS_USBHOOK_CLASS_DeInit(__attribute__((unused)) void *pdev, __attribute__((unused)) uint8_t cfgidx)
 {
   /* Call all of the registered deinit callbacks */
   for (uint8_t i = 0; i < NELEMENTS(usb_if_table); i++) {
@@ -331,7 +331,7 @@ static uint8_t PIOS_USBHOOK_CLASS_DeInit(void *pdev, uint8_t cfgidx)
 }
 
 static struct usb_setup_request usb_ep0_active_req;
-static uint8_t PIOS_USBHOOK_CLASS_Setup(void *pdev, USB_SETUP_REQ *req)
+static uint8_t PIOS_USBHOOK_CLASS_Setup(__attribute__((unused)) void *pdev, USB_SETUP_REQ *req)
 {
 	switch (req->bmRequest & (USB_REQ_TYPE_MASK | USB_REQ_RECIPIENT_MASK)) {
 	case (USB_REQ_TYPE_STANDARD | USB_REQ_RECIPIENT_INTERFACE):
@@ -365,12 +365,12 @@ static uint8_t PIOS_USBHOOK_CLASS_Setup(void *pdev, USB_SETUP_REQ *req)
 	return USBD_OK;
 }
 
-static uint8_t PIOS_USBHOOK_CLASS_EP0_TxSent(void *pdev)
+static uint8_t PIOS_USBHOOK_CLASS_EP0_TxSent(__attribute__((unused)) void *pdev)
 {
 	return USBD_OK;
 }
 
-static uint8_t PIOS_USBHOOK_CLASS_EP0_RxReady(void *pdev)
+static uint8_t PIOS_USBHOOK_CLASS_EP0_RxReady(__attribute__((unused)) void *pdev)
 {
 	uint8_t ifnum = LOBYTE(usb_ep0_active_req.wIndex);
 
@@ -418,22 +418,22 @@ static uint8_t PIOS_USBHOOK_CLASS_DataOut(void *pdev, uint8_t epnum)
 	return USBD_OK;
 }
 
-static uint8_t PIOS_USBHOOK_CLASS_SOF(void *pdev)
+static uint8_t PIOS_USBHOOK_CLASS_SOF(__attribute__((unused)) void *pdev)
 {
 	return USBD_OK;
 }
 
-static uint8_t PIOS_USBHOOK_CLASS_IsoINIncomplete(void *pdev)
+static uint8_t PIOS_USBHOOK_CLASS_IsoINIncomplete(__attribute__((unused)) void *pdev)
 {
 	return USBD_OK;
 }
 
-static uint8_t PIOS_USBHOOK_CLASS_IsoOUTIncomplete(void *pdev)
+static uint8_t PIOS_USBHOOK_CLASS_IsoOUTIncomplete(__attribute__((unused)) void *pdev)
 {
 	return USBD_OK;
 }
 
-static const uint8_t * PIOS_USBHOOK_CLASS_GetConfigDescriptor(uint8_t speed, uint16_t *length)
+static const uint8_t * PIOS_USBHOOK_CLASS_GetConfigDescriptor(__attribute__((unused)) uint8_t speed, uint16_t *length)
 {
 	*length = Config_Descriptor.length;
 	return Config_Descriptor.descriptor;

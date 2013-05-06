@@ -84,7 +84,7 @@ int32_t ExampleModThreadInitialize()
 /**
  * Module thread, should not return.
  */
-static void exampleTask(void *parameters)
+static void exampleTask(__attribute__((unused)) void *parameters)
 {
 	UAVObjEvent ev;
 	ExampleSettingsData settings;

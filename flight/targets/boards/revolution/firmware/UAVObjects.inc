@@ -68,6 +68,8 @@ UAVOBJSRCFILENAMES += positionactual
 UAVOBJSRCFILENAMES += ratedesired
 UAVOBJSRCFILENAMES += relaytuning
 UAVOBJSRCFILENAMES += relaytuningsettings
+UAVOBJSRCFILENAMES += ekfconfiguration
+UAVOBJSRCFILENAMES += ekfstatevariance
 UAVOBJSRCFILENAMES += revocalibration
 UAVOBJSRCFILENAMES += revosettings
 UAVOBJSRCFILENAMES += sonaraltitude
@@ -89,6 +91,8 @@ UAVOBJSRCFILENAMES += altitudeholdsettings
 UAVOBJSRCFILENAMES += altitudeholddesired
 UAVOBJSRCFILENAMES += waypoint
 UAVOBJSRCFILENAMES += waypointactive
+UAVOBJSRCFILENAMES += poilocation
+UAVOBJSRCFILENAMES += poilearnsettings
 UAVOBJSRCFILENAMES += mpu6000settings
 UAVOBJSRCFILENAMES += txpidsettings
 

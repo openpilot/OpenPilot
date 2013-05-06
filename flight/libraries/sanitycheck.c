@@ -63,7 +63,7 @@ int32_t configuration_check()
     bool multirotor = true;
     uint8_t airframe_type;
     SystemSettingsAirframeTypeGet(&airframe_type);
-    switch(airframe_type) {
+    switch (airframe_type) {
         case SYSTEMSETTINGS_AIRFRAMETYPE_QUADX:
         case SYSTEMSETTINGS_AIRFRAMETYPE_QUADP:
         case SYSTEMSETTINGS_AIRFRAMETYPE_HEXA:
@@ -73,6 +73,7 @@ int32_t configuration_check()
         case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXP:
         case SYSTEMSETTINGS_AIRFRAMETYPE_HEXACOAX:
         case SYSTEMSETTINGS_AIRFRAMETYPE_TRI:
+        case SYSTEMSETTINGS_AIRFRAMETYPE_OCTOCOAXX:
             multirotor = true;
             break;
         default:
@@ -86,8 +87,8 @@ int32_t configuration_check()
     ManualControlSettingsFlightModeNumberGet(&num_modes);
     ManualControlSettingsFlightModePositionGet(modes);
 
-    for(uint32_t i = 0; i < num_modes; i++) {
-        switch(modes[i]) {
+    for (uint32_t i = 0; i < num_modes; i++) {
+        switch (modes[i]) {
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_MANUAL:
                 if (multirotor) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
@@ -122,9 +123,42 @@ int32_t configuration_check()
                 }
                 break;
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
-                if (coptercontrol){
+                if (coptercontrol) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
-                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) { // Revo supports altitude hold
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
+                    // Revo supports Position Hold
+                    severity = SYSTEMALARMS_ALARM_ERROR;
+                }
+                break;
+            case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_LAND:
+                if (coptercontrol) {
+                    severity = SYSTEMALARMS_ALARM_ERROR;
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
+                    // Revo supports AutoLand Mode
+                    severity = SYSTEMALARMS_ALARM_ERROR;
+                }
+                break;
+            case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POI:
+                if (coptercontrol) {
+                    severity = SYSTEMALARMS_ALARM_ERROR;
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
+                    // Revo supports POI Mode
+                    severity = SYSTEMALARMS_ALARM_ERROR;
+                }
+                break;
+            case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
+                if (coptercontrol) {
+                    severity = SYSTEMALARMS_ALARM_ERROR;
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
+                    // Revo supports PathPlanner
+                    severity = SYSTEMALARMS_ALARM_ERROR;
+                }
+                break;
+            case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
+                if (coptercontrol) {
+                    severity = SYSTEMALARMS_ALARM_ERROR;
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
+                    // Revo supports ReturnToBase
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
                 break;
@@ -141,7 +175,7 @@ int32_t configuration_check()
     }
 
     // TODO: Check on a multirotor no axis supports "None"
-    if(severity != SYSTEMALARMS_ALARM_OK)
+    if (severity != SYSTEMALARMS_ALARM_OK)
         ExtendedAlarmsSet(SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION, severity, alarmstatus, alarmsubstatus);
     else
         AlarmsClear(SYSTEMALARMS_ALARM_SYSTEMCONFIGURATION);
@@ -159,13 +193,13 @@ static int32_t check_stabilization_settings(int index, bool multirotor)
 {
     // Make sure the modes have identical sizes
     if (MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION2SETTINGS_NUMELEM ||
-            MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_NUMELEM)
+        MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_NUMELEM)
         return SYSTEMALARMS_ALARM_ERROR;
 
     uint8_t modes[MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM];
 
     // Get the different axis modes for this switch position
-    switch(index) {
+    switch (index) {
         case 1:
             ManualControlSettingsStabilization1SettingsGet(modes);
             break;
@@ -181,7 +215,7 @@ static int32_t check_stabilization_settings(int index, bool multirotor)
 
     // For multirotors verify that nothing is set to "none"
     if (multirotor) {
-        for(uint32_t i = 0; i < NELEMENTS(modes); i++) {
+        for (uint32_t i = 0; i < NELEMENTS(modes); i++) {
             if (modes[i] == MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NONE)
                 return SYSTEMALARMS_ALARM_ERROR;
         }

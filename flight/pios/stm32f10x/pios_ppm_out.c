@@ -49,15 +49,19 @@ struct pios_ppm_out_dev {
 	enum pios_ppm_out_dev_magic magic;
 	const struct pios_ppm_out_cfg * cfg;
 
-	uint32_t triggering_period;
+	uint32_t TriggeringPeriod;
 	uint32_t ChannelSum;
 	uint8_t NumChannelCounter;
 	uint16_t ChannelValue[PIOS_PPM_OUT_MAX_CHANNELS];
 
-	uint8_t supv_timer;
-	bool Tracking;
+	uint8_t SupvTimer;
 	bool Fresh;
+	bool Tracking;
+        bool Enabled;
 };
+
+static void PIOS_PPM_Out_Supervisor(uint32_t ppm_id);
+static void PIOS_PPM_Out_Enable_Disable(struct pios_ppm_out_dev *ppm_dev, bool enable);
 
 static bool PIOS_PPM_Out_validate(struct pios_ppm_out_dev *ppm_dev)
 {
@@ -94,7 +98,7 @@ static struct pios_ppm_out_dev * PIOS_PPM_alloc(void)
 #endif
 
 static void PIOS_PPM_OUT_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count);
-const static struct pios_tim_callbacks tim_out_callbacks = {
+static const struct pios_tim_callbacks tim_out_callbacks = {
 	.overflow = NULL,
 	.edge     = PIOS_PPM_OUT_tim_edge_cb,
 };
@@ -115,12 +119,12 @@ int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg * 
 	ppm_dev->cfg = cfg;
 
 	// Set up the state variables
-	ppm_dev->triggering_period = PIOS_PPM_OUT_HIGH_PULSE_US;
+	ppm_dev->TriggeringPeriod = PIOS_PPM_OUT_HIGH_PULSE_US;
 	ppm_dev->ChannelSum = 0;
 	ppm_dev->NumChannelCounter = 0;
 
 	// Flush counter variables
-	for (uint8_t i = 0; i < PIOS_PPM_OUT_MAX_CHANNELS; i++)
+	for (uint8_t i = 0; i < PIOS_PPM_OUT_MAX_CHANNELS; ++i)
 		ppm_dev->ChannelValue[i] = 1000;
 
 	uint32_t tim_id;
@@ -149,20 +153,6 @@ int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg * 
 		TIM_OC4PreloadConfig(chan->timer, TIM_OCPreload_Enable);
 		break;
 	}
-	switch (chan->timer_chan) {
-	case TIM_Channel_1:
-		TIM_ITConfig(chan->timer, TIM_IT_CC1 | TIM_IT_Update, ENABLE);
-		break;
-	case TIM_Channel_2:
-		TIM_ITConfig(chan->timer, TIM_IT_CC2 | TIM_IT_Update, ENABLE);
-		break;
-	case TIM_Channel_3:
-		TIM_ITConfig(chan->timer, TIM_IT_CC3 | TIM_IT_Update, ENABLE);
-		break;
-	case TIM_Channel_4:
-		TIM_ITConfig(chan->timer, TIM_IT_CC4 | TIM_IT_Update, ENABLE);
-		break;
-	}
 
 	TIM_ARRPreloadConfig(chan->timer, ENABLE);
 	TIM_CtrlPWMOutputs(chan->timer, ENABLE);
@@ -174,20 +164,17 @@ int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg * 
 	TIM_TimeBaseStructure.TIM_Prescaler = (PIOS_MASTER_CLOCK / 1000000) - 1;
 	TIM_TimeBaseStructure.TIM_Period = ((1000000 / 100) - 1);
 	TIM_TimeBaseInit(chan->timer, &TIM_TimeBaseStructure);
-	switch(chan->timer_chan) {
-	case TIM_Channel_1:
-		TIM_SetCompare1(chan->timer, ppm_dev->triggering_period);
-		break;
-	case TIM_Channel_2:
-		TIM_SetCompare2(chan->timer, ppm_dev->triggering_period);
-		break;
-	case TIM_Channel_3:
-		TIM_SetCompare3(chan->timer, ppm_dev->triggering_period);
-		break;
-	case TIM_Channel_4:
-		TIM_SetCompare4(chan->timer, ppm_dev->triggering_period);
-		break;
+        PIOS_PPM_Out_Enable_Disable(ppm_dev, false);
+
+        // Configure the supervisor
+	ppm_dev->SupvTimer = 0;
+	ppm_dev->Fresh = FALSE;
+	ppm_dev->Tracking = FALSE;
+        ppm_dev->Enabled = FALSE;
+	if (!PIOS_RTC_RegisterTickCallback(PIOS_PPM_Out_Supervisor, (uint32_t)ppm_dev)) {
+		PIOS_DEBUG_Assert(0);
 	}
+
 	return 0;
 }
 
@@ -202,16 +189,44 @@ void PIOS_PPM_OUT_Set(uint32_t ppm_out_id, uint8_t servo, uint16_t position)
 		position = PIOS_PPM_OUT_MIN_CHANNEL_PULSE_US;
 	if (position > PIOS_PPM_OUT_MAX_CHANNEL_PULSE_US)
 		position = PIOS_PPM_OUT_MAX_CHANNEL_PULSE_US;
+
+        // Update the supervisor tracking variables.
+	ppm_dev->Fresh = TRUE;
+
+        // Reenable the TIM if it's been turned off.
+        if (!ppm_dev->Tracking) {
+                ppm_dev->Tracking = TRUE;
+                PIOS_PPM_Out_Enable_Disable(ppm_dev, true);
+        }
 	
 	// Update the position
 	ppm_dev->ChannelValue[servo] = position;
 }
 
-static void PIOS_PPM_OUT_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count)
+static void PIOS_PPM_OUT_tim_edge_cb (__attribute__((unused)) uint32_t tim_id,
+										uint32_t context,
+										__attribute__((unused)) uint8_t chan_idx,
+										__attribute__((unused)) uint16_t count)
 {
 	struct pios_ppm_out_dev *ppm_dev = (struct pios_ppm_out_dev *)context;
 	if (!PIOS_PPM_Out_validate(ppm_dev))
 		return;
+
+        // Just return if the device is disabled.
+        if (!ppm_dev->Enabled) {
+                return;
+        }
+
+        // Turn off the PPM stream if we are no longer receiving update
+        // Note: This must happen between frames.
+        if ((ppm_dev->NumChannelCounter == 0) && !ppm_dev->Tracking) {
+                // Flush counter variables
+                for (uint8_t i = 0; i < PIOS_PPM_OUT_MAX_CHANNELS; ++i) {
+                        ppm_dev->ChannelValue[i] = 1000;
+                }
+                PIOS_PPM_Out_Enable_Disable(ppm_dev, false);
+                return;
+        }
 
 	// Finish out the frame if we reached the last channel.
 	uint32_t pulse_width;
@@ -219,13 +234,59 @@ static void PIOS_PPM_OUT_tim_edge_cb (uint32_t tim_id, uint32_t context, uint8_t
 		pulse_width = PIOS_PPM_OUT_FRAME_PERIOD_US - ppm_dev->ChannelSum;
 		ppm_dev->NumChannelCounter = 0;
 		ppm_dev->ChannelSum = 0;
-	} else
+        } else
 		ppm_dev->ChannelSum += (pulse_width = ppm_dev->ChannelValue[ppm_dev->NumChannelCounter++]);
 
 	// Initiate the pulse
 	TIM_SetAutoreload(ppm_dev->cfg->channel->timer, pulse_width - 1);
 
 	return;
+}
+
+static void PIOS_PPM_Out_Enable_Disable(struct pios_ppm_out_dev *ppm_dev, bool enable)
+{
+	const struct pios_tim_channel *chan = ppm_dev->cfg->channel;
+        uint32_t trig = enable ? ppm_dev->TriggeringPeriod : 0;
+        FunctionalState state = enable ? ENABLE : DISABLE;
+        ppm_dev->Enabled = enable;
+        switch (chan->timer_chan) {
+        case TIM_Channel_1:
+                TIM_ITConfig(chan->timer, TIM_IT_CC1 | TIM_IT_Update, state);
+                TIM_SetCompare1(chan->timer, trig);
+                break;
+        case TIM_Channel_2:
+                TIM_ITConfig(chan->timer, TIM_IT_CC2 | TIM_IT_Update, state);
+                TIM_SetCompare2(chan->timer, trig);
+                break;
+        case TIM_Channel_3:
+                TIM_ITConfig(chan->timer, TIM_IT_CC3 | TIM_IT_Update, state);
+                TIM_SetCompare3(chan->timer, trig);
+                break;
+        case TIM_Channel_4:
+                TIM_ITConfig(chan->timer, TIM_IT_CC4 | TIM_IT_Update, state);
+                TIM_SetCompare4(chan->timer, trig);
+                break;
+        }
+}
+
+static void PIOS_PPM_Out_Supervisor(uint32_t ppm_out_id) {
+	struct pios_ppm_out_dev *ppm_dev = (struct pios_ppm_out_dev *)ppm_out_id;
+	if (!PIOS_PPM_Out_validate(ppm_dev))
+		return;
+
+        // RTC runs at 625Hz so divide down the base rate so that this loop runs at 12.5Hz.
+	if(++(ppm_dev->SupvTimer) < 50) {
+		return;
+	}
+	ppm_dev->SupvTimer = 0;
+
+        // Go into failsafe the channel values haven't been refreshed since the last time through.
+	if (!ppm_dev->Fresh) {
+		ppm_dev->Tracking = FALSE;
+	}
+
+        // Set Fresh to false to test if channel values are being refreshed.
+	ppm_dev->Fresh = FALSE;
 }
 
 #endif /* PIOS_INCLUDE_PPM_OUT */

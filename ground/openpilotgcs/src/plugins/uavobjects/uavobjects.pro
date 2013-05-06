@@ -33,6 +33,8 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.h \
+    $$UAVOBJECT_SYNTHETICS/ekfconfiguration.h \
+    $$UAVOBJECT_SYNTHETICS/ekfstatevariance.h \
     $$UAVOBJECT_SYNTHETICS/revocalibration.h \
     $$UAVOBJECT_SYNTHETICS/revosettings.h \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.h \
@@ -95,6 +97,8 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/txpidsettings.h \
     $$UAVOBJECT_SYNTHETICS/cameradesired.h \
     $$UAVOBJECT_SYNTHETICS/faultsettings.h \
+    $$UAVOBJECT_SYNTHETICS/poilearnsettings.h \
+    $$UAVOBJECT_SYNTHETICS/poilocation.h \
     $$UAVOBJECT_SYNTHETICS/oplinksettings.h \
     $$UAVOBJECT_SYNTHETICS/oplinkstatus.h \
     $$UAVOBJECT_SYNTHETICS/osdsettings.h \
@@ -112,6 +116,8 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/ekfconfiguration.cpp \
+    $$UAVOBJECT_SYNTHETICS/ekfstatevariance.cpp \
     $$UAVOBJECT_SYNTHETICS/revocalibration.cpp \
     $$UAVOBJECT_SYNTHETICS/revosettings.cpp \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.cpp \
@@ -175,6 +181,8 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/txpidsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/cameradesired.cpp \
     $$UAVOBJECT_SYNTHETICS/faultsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/poilearnsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/poilocation.cpp \
     $$UAVOBJECT_SYNTHETICS/oplinksettings.cpp \
     $$UAVOBJECT_SYNTHETICS/oplinkstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/osdsettings.cpp \

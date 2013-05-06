@@ -41,7 +41,7 @@
 //
 #define DEBUG_PORT		PIOS_COM_GPS
 //#define ENABLE_DEBUG_MSG
-//#define USE_DEBUG_PINS
+//#define PIOS_ENABLE_DEBUG_PINS
 //#define DUMP_CONFIG           // Enable this do read and dump the OSD config
 
 //
@@ -78,7 +78,7 @@
 #define OSDMSG_GPS_STAT_FIX		0x2B
 #define OSDMSG_GPS_STAT_HB_FLAG	0x10
 
-#ifdef USE_DEBUG_PINS
+#ifdef PIOS_ENABLE_DEBUG_PINS
 	#define	DEBUG_PIN_RUNNING	0
 	#define	DEBUG_PIN_I2C		1
 	#define DebugPinHigh(x) PIOS_DEBUG_PinHigh(x)
@@ -206,17 +206,17 @@ static void SetNbSats(uint8_t nb)
 	msg[OSDMSG_NB_SATS] = nb;
 }
 
-static void FlightBatteryStateUpdatedCb(UAVObjEvent * ev)
+static void FlightBatteryStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	newBattData = TRUE;
 }
 
-static void GPSPositionUpdatedCb(UAVObjEvent * ev)
+static void GPSPositionUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	newPosData = TRUE;
 }
 
-static void BaroAltitudeUpdatedCb(UAVObjEvent * ev)
+static void BaroAltitudeUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	newBaroData = TRUE;
 }

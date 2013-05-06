@@ -61,7 +61,7 @@ void baro_airspeedGetETASV3(AirspeedSensorData *airspeedSensor, AirspeedSettings
 
 	//Check to see if airspeed sensor is returning airspeedSensor
 	airspeedSensor->SensorValue = PIOS_ETASV3_ReadAirspeed();
-	if (airspeedSensor->SensorValue==-1) {
+	if (airspeedSensor->SensorValue==(uint16_t)-1) {
 		airspeedSensor->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
 		airspeedSensor->CalibratedAirspeed = 0;
 		return;

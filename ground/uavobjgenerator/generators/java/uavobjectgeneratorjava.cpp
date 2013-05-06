@@ -39,8 +39,8 @@ bool UAVObjectGeneratorJava::generate(UAVObjectParser* parser,QString templatepa
     javaOutputPath = QDir( outputpath + QString("java") );
     javaOutputPath.mkpath(javaOutputPath.absolutePath());
 
-    javaCodeTemplate = readFile( javaCodePath.absoluteFilePath("uavobjecttemplate.java") );
-    QString javaInitTemplate = readFile( javaCodePath.absoluteFilePath("uavobjectsinittemplate.java") );
+    javaCodeTemplate = readFile( javaCodePath.absoluteFilePath("uavobject.java.template") );
+    QString javaInitTemplate = readFile( javaCodePath.absoluteFilePath("uavobjectsinit.java.template") );
 
     if (javaCodeTemplate.isEmpty() || javaInitTemplate.isEmpty()) {
         std::cerr << "Problem reading java code templates" << endl;

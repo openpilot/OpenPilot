@@ -152,12 +152,13 @@ MODULE_INITCALL(ActuatorInitialize, ActuatorStart)
  *
  * @return -1 if error, 0 if success
  */
-static void actuatorTask(void* parameters)
+static void actuatorTask(__attribute__((unused)) void* parameters)
 {
 	UAVObjEvent ev;
 	portTickType lastSysTime;
 	portTickType thisSysTime;
-	float dT = 0.0f;
+	float dTSeconds;
+	uint32_t dTMilliseconds;
 
 	ActuatorCommandData command;
 	ActuatorDesiredData desired;
@@ -208,13 +209,9 @@ static void actuatorTask(void* parameters)
 
 		// Check how long since last update
 		thisSysTime = xTaskGetTickCount();
-		// reuse dt in case of wraparound
-		// todo:
-		//  if dT actually matters...
-		//  fix it to know max value and subtract for currently correct dT on wrap
-		if(thisSysTime > lastSysTime)
-			dT = (thisSysTime - lastSysTime) * (portTICK_RATE_MS * 0.001f);
+		dTMilliseconds = (thisSysTime == lastSysTime)? 1: (thisSysTime - lastSysTime) * portTICK_RATE_MS;
 		lastSysTime = thisSysTime;
+		dTSeconds = dTMilliseconds * 0.001f;
 
 		FlightStatusGet(&flightStatus);
 		ActuatorDesiredGet(&desired);
@@ -298,7 +295,7 @@ static void actuatorTask(void* parameters)
 			}
 
 			if((mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_MOTOR) || (mixers[ct].type == MIXERSETTINGS_MIXER1TYPE_SERVO))
-				status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dT);
+				status[ct] = ProcessMixer(ct, curve1, curve2, &mixerSettings, &desired, dTSeconds);
 			else
 				status[ct] = -1;
 
@@ -372,7 +369,7 @@ static void actuatorTask(void* parameters)
 							   actuatorSettings.ChannelNeutral[i]);
 
 		// Store update time
-		command.UpdateTime = dT * 1000.0f;
+		command.UpdateTime = dTMilliseconds;
 		if (command.UpdateTime > command.MaxUpdateTime)
 			command.MaxUpdateTime = command.UpdateTime;
 		
@@ -723,12 +720,12 @@ static void actuator_update_rate_if_changed(const ActuatorSettingsData * actuato
 	}
 }
 
-static void ActuatorSettingsUpdatedCb(UAVObjEvent * ev)
+static void ActuatorSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	actuator_settings_updated = true;
 }
 
-static void MixerSettingsUpdatedCb(UAVObjEvent * ev)
+static void MixerSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	mixer_settings_updated = true;
 }

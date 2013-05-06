@@ -63,10 +63,6 @@ static void altitudeTask(void *parameters);
  */
 int32_t AltitudeStart()
 {	
-#if defined(PIOS_INCLUDE_HCSR04)
-	SonarAltitudeInitialze();
-#endif
-	
 	// Start main task
 	xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ALTITUDE, taskHandle);
@@ -81,22 +77,23 @@ int32_t AltitudeStart()
 int32_t AltitudeInitialize()
 {
 	BaroAltitudeInitialize();
-
+#if defined(PIOS_INCLUDE_HCSR04)
+	SonarAltitudeInitialize();
+#endif
 	return 0;
 }
 MODULE_INITCALL(AltitudeInitialize, AltitudeStart)
 /**
  * Module thread, should not return.
  */
-static void altitudeTask(void *parameters)
+static void altitudeTask(__attribute__((unused)) void *parameters)
 {
 	BaroAltitudeData data;
 	
 #if defined(PIOS_INCLUDE_HCSR04)
 	SonarAltitudeData sonardata;
-	int32_t value=0,timeout=5;
-	float coeff=0.25,height_out=0,height_in=0;
-	PIOS_HCSR04_Init();
+	int32_t value = 0, timeout = 10, sample_rate = 0;
+	float coeff = 0.25, height_out = 0, height_in = 0;
 	PIOS_HCSR04_Trigger();
 #endif
 
@@ -113,27 +110,29 @@ static void altitudeTask(void *parameters)
 	while (1)
 	{
 #if defined(PIOS_INCLUDE_HCSR04)
-		// Compute the current altitude (all pressures in kPa)
-		if(PIOS_HCSR04_Completed())
-		{
-			value = PIOS_HCSR04_Get();
-			if((value>100) && (value < 15000)) //from 3.4cm to 5.1m
-			{
-				height_in = value*0.00034;
-				height_out = (height_out * (1 - coeff)) + (height_in * coeff);
-				sonardata.Altitude = height_out; // m/us
+		// Compute the current altitude
+		// depends on baro samplerate
+		if(!(sample_rate--)) {
+			if(PIOS_HCSR04_Completed()) {
+				value = PIOS_HCSR04_Get();
+				//from 3.4cm to 5.1m
+				if((value > 100) && (value < 15000)) {
+					height_in = value * 0.00034f / 2.0f;
+					height_out = (height_out * (1 - coeff)) + (height_in * coeff);
+					sonardata.Altitude = height_out; // m/us
+				}
+
+				// Update the SonarAltitude UAVObject
+				SonarAltitudeSet(&sonardata);
+				timeout = 10;
+				PIOS_HCSR04_Trigger();
 			}
-			
-			// Update the AltitudeActual UAVObject
-			SonarAltitudeSet(&sonardata);
-			timeout=5;
-			PIOS_HCSR04_Trigger();
-		}
-		if(timeout--)
-		{
-			//retrigger
-			timeout=5;
-			PIOS_HCSR04_Trigger();
+			if(!(timeout--)) {
+				//retrigger
+				timeout = 10;
+				PIOS_HCSR04_Trigger();
+			}
+			sample_rate = 25;
 		}
 #endif
 		float temp, press;

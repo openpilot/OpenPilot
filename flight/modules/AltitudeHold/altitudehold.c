@@ -119,7 +119,7 @@ float starting_altitude;
 /**
  * Module thread, should not return.
  */
-static void altitudeHoldTask(void *parameters)
+static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 {
 	AltitudeHoldDesiredData altitudeHoldDesired;
 	StabilizationDesiredData stabilizationDesired;
@@ -387,7 +387,7 @@ static void altitudeHoldTask(void *parameters)
 	}
 }
 
-static void SettingsUpdatedCb(UAVObjEvent * ev)
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
 	AltitudeHoldSettingsGet(&altitudeHoldSettings);
 }

@@ -133,21 +133,21 @@ endef
 define OPFW_TEMPLATE
 FORCE:
 
-$(1).firmwareinfo.c: $(1) $(ROOT_DIR)/make/templates/firmwareinfotemplate.c FORCE
+$(1).firmware_info.c: $(1) $(ROOT_DIR)/make/templates/firmware_info.c.template FORCE
 	@$(ECHO) $(MSG_FWINFO) $$(call toprel, $$@)
 	$(V1) $(VERSION_INFO) \
-		--template=$(ROOT_DIR)/make/templates/firmwareinfotemplate.c \
+		--template=$(ROOT_DIR)/make/templates/firmware_info.c.template \
 		--outfile=$$@ \
 		--image=$(1) \
 		--type=$(2) \
 		--revision=$(3) \
 		--uavodir=$(ROOT_DIR)/shared/uavobjectdefinition
 
-$(eval $(call COMPILE_C_TEMPLATE, $(1).firmwareinfo.c))
+$(eval $(call COMPILE_C_TEMPLATE, $(1).firmware_info.c))
 
-$(OUTDIR)/$(notdir $(basename $(1))).opfw : $(1) $(1).firmwareinfo.bin
+$(OUTDIR)/$(notdir $(basename $(1))).opfw : $(1) $(1).firmware_info.bin
 	@$(ECHO) $(MSG_OPFIRMWARE) $$(call toprel, $$@)
-	$(V1) $(CAT) $(1) $(1).firmwareinfo.bin > $$@
+	$(V1) $(CAT) $(1) $(1).firmware_info.bin > $$@
 endef
 
 # Assemble: create object files from assembler source files.

@@ -227,7 +227,7 @@ out_fail:
 	return(-1);
 }
 
-static void PIOS_USART_RxStart(uint32_t usart_id, uint16_t rx_bytes_avail)
+static void PIOS_USART_RxStart(uint32_t usart_id, __attribute__((unused)) uint16_t rx_bytes_avail)
 {
 	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 	
@@ -236,7 +236,7 @@ static void PIOS_USART_RxStart(uint32_t usart_id, uint16_t rx_bytes_avail)
 	
 	USART_ITConfig(usart_dev->cfg->regs, USART_IT_RXNE, ENABLE);
 }
-static void PIOS_USART_TxStart(uint32_t usart_id, uint16_t tx_bytes_avail)
+static void PIOS_USART_TxStart(uint32_t usart_id, __attribute__((unused)) uint16_t tx_bytes_avail)
 {
 	struct pios_usart_dev * usart_dev = (struct pios_usart_dev *)usart_id;
 	

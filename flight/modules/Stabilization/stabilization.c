@@ -139,7 +139,7 @@ MODULE_INITCALL(StabilizationInitialize, StabilizationStart)
 /**
  * Module task
  */
-static void stabilizationTask(void* parameters)
+static void stabilizationTask(__attribute__((unused)) void* parameters)
 {
 	UAVObjEvent ev;
 	
@@ -255,7 +255,7 @@ static void stabilizationTask(void* parameters)
 
 					// Compute the inner loop
 					actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i],  gyro_filtered[i], dT);
-					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
+					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
 
 					break;
 
@@ -271,7 +271,7 @@ static void stabilizationTask(void* parameters)
 
 					// Compute the inner loop
 					actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i],  gyro_filtered[i], dT);
-					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
+					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
 
 					break;
 
@@ -296,7 +296,7 @@ static void stabilizationTask(void* parameters)
 					// Compute desired rate as input biased towards leveling
 					rateDesiredAxis[i] = attitudeDesiredAxis[i] + weak_leveling;
 					actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i],  gyro_filtered[i], dT);
-					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
+					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
 
 					break;
 				}
@@ -319,7 +319,7 @@ static void stabilizationTask(void* parameters)
 					rateDesiredAxis[i] = bound(rateDesiredAxis[i], settings.ManualRate[i]);
 
 					actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i],  rateDesiredAxis[i],  gyro_filtered[i], dT);
-					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0f);
+					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
 
 					break;
 
@@ -329,7 +329,7 @@ static void stabilizationTask(void* parameters)
 
 					// Run the relay controller which also estimates the oscillation parameters
 					stabilization_relay_rate(rateDesiredAxis[i] - gyro_filtered[i], &actuatorDesiredAxis[i], i, reinit);
-					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0);
+					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
 
 					break;
 
@@ -343,12 +343,12 @@ static void stabilizationTask(void* parameters)
 
 					// Run the relay controller which also estimates the oscillation parameters
 					stabilization_relay_rate(rateDesiredAxis[i] - gyro_filtered[i], &actuatorDesiredAxis[i], i, reinit);
-					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i],1.0);
+					actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
 
 					break;
 
 				case STABILIZATIONDESIRED_STABILIZATIONMODE_NONE:
-					actuatorDesiredAxis[i] = bound(attitudeDesiredAxis[i],1.0f);
+					actuatorDesiredAxis[i] = bound(attitudeDesiredAxis[i], 1.0f);
 					break;
 				default:
 					error = true;
@@ -432,7 +432,7 @@ static float bound(float val, float range)
 	return val;
 }
 
-static void SettingsUpdatedCb(UAVObjEvent * ev)
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent * ev)
 {
 	StabilizationSettingsGet(&settings);
 	
@@ -493,7 +493,7 @@ static void SettingsUpdatedCb(UAVObjEvent * ev)
 	// based on a time (in ms) rather than a fixed multiplier.  The error between
 	// update rates on OP (~300 Hz) and CC (~475 Hz) is negligible for this
 	// calculation
-	const float fakeDt = 0.0025;
+	const float fakeDt = 0.0025f;
 	if(settings.GyroTau < 0.0001f)
 		gyro_alpha = 0;   // not trusting this to resolve to 0
 	else

@@ -26,7 +26,7 @@
  */
 
 /** interrupt handler */
-typedef const void	(vector)(void);
+typedef void	(vector)(void);
 
 /** default interrupt handler */
 static void

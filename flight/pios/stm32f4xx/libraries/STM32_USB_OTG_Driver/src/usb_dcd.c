@@ -264,7 +264,7 @@ uint32_t  DCD_EP_Tx ( USB_OTG_CORE_HANDLE *pdev,
   /* Setup and start the Transfer */
   ep->is_in = 1;
   ep->num = ep_addr & 0x7F;  
-  ep->xfer_buff = pbuf;
+  ep->xfer_buff = (uint8_t*)pbuf;
   ep->dma_addr = (uint32_t)pbuf;  
   ep->xfer_count = 0;
   ep->xfer_len  = buf_len;

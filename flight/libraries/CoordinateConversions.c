@@ -37,8 +37,8 @@
 // ****** convert Lat,Lon,Alt to ECEF  ************
 void LLA2ECEF(float LLA[3], float ECEF[3])
 {
-	const float a = 6378137.0;	// Equatorial Radius
-	const float e = 8.1819190842622e-2;	// Eccentricity
+	const float a = 6378137.0f;	// Equatorial Radius
+	const float e = 8.1819190842622e-2f;	// Eccentricity
 	float sinLat, sinLon, cosLat, cosLon;
 	float N;
 
@@ -66,7 +66,7 @@ uint16_t ECEF2LLA(float ECEF[3], float LLA[3])
 	 * Suggestion: [0,0,0]
 	 **/
 
-	const float a = 6378137.0;	// Equatorial Radius
+	const float a = 6378137.0f;	// Equatorial Radius
 	const float e = 8.1819190842622e-2f;	// Eccentricity
 	float x = ECEF[0], y = ECEF[1], z = ECEF[2];
 	float Lat, N, NplusH, delta, esLat;

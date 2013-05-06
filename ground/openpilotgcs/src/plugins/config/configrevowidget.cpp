@@ -41,6 +41,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <attitudesettings.h>
+#include <ekfconfiguration.h>
 #include <revocalibration.h>
 #include <homelocation.h>
 #include <accels.h>
@@ -212,6 +213,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     // Must set up the UI (above) before setting up the UAVO mappings or refreshWidgetValues
     // will be dealing with some null pointers
     addUAVObject("RevoCalibration");
+    addUAVObject("EKFConfiguration");
     autoLoadWidgets();
 
     // Connect the signals
@@ -367,9 +369,9 @@ void ConfigRevoWidget::doGetAccelGyroBiasData(UAVObject *obj)
         revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_X] += listMean(accel_accum_x);
         revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Y] += listMean(accel_accum_y);
         revoCalibrationData.accel_bias[RevoCalibration::ACCEL_BIAS_Z] += ( listMean(accel_accum_z) + GRAVITY );
-        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_X] = listMean(gyro_accum_x);
-        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Y] = listMean(gyro_accum_y);
-        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Z] = listMean(gyro_accum_z);
+        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_X] += listMean(gyro_accum_x);
+        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Y] += listMean(gyro_accum_y);
+        revoCalibrationData.gyro_bias[RevoCalibration::GYRO_BIAS_Z] += listMean(gyro_accum_z);
 
         revoCalibration->setData(revoCalibrationData);
         revoCalibration->updated();
@@ -965,20 +967,20 @@ void ConfigRevoWidget::doGetNoiseSample(UAVObject * obj)
         disconnect(gyros, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
         disconnect(mags, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(doGetNoiseSample(UAVObject*)));
 
-        RevoCalibration *revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-        Q_ASSERT(revoCalibration);
-        if(revoCalibration) {
-            RevoCalibration::DataFields revoCalData = revoCalibration->getData();
-            revoCalData.accel_var[RevoCalibration::ACCEL_VAR_X] = listVar(accel_accum_x);
-            revoCalData.accel_var[RevoCalibration::ACCEL_VAR_Y] = listVar(accel_accum_y);
-            revoCalData.accel_var[RevoCalibration::ACCEL_VAR_Z] = listVar(accel_accum_z);
-            revoCalData.gyro_var[RevoCalibration::GYRO_VAR_X] = listVar(gyro_accum_x);
-            revoCalData.gyro_var[RevoCalibration::GYRO_VAR_Y] = listVar(gyro_accum_y);
-            revoCalData.gyro_var[RevoCalibration::GYRO_VAR_Z] = listVar(gyro_accum_z);
-            revoCalData.mag_var[RevoCalibration::MAG_VAR_X] = listVar(mag_accum_x);
-            revoCalData.mag_var[RevoCalibration::MAG_VAR_Y] = listVar(mag_accum_y);
-            revoCalData.mag_var[RevoCalibration::MAG_VAR_Z] = listVar(mag_accum_z);
-            revoCalibration->setData(revoCalData);
+        EKFConfiguration *ekfConfiguration = EKFConfiguration::GetInstance(getObjectManager());
+        Q_ASSERT(ekfConfiguration);
+        if(ekfConfiguration) {
+            EKFConfiguration::DataFields revoCalData = ekfConfiguration->getData();
+            revoCalData.Q[EKFConfiguration::Q_ACCELX] = listVar(accel_accum_x);
+            revoCalData.Q[EKFConfiguration::Q_ACCELY] = listVar(accel_accum_y);
+            revoCalData.Q[EKFConfiguration::Q_ACCELZ] = listVar(accel_accum_z);
+            revoCalData.Q[EKFConfiguration::Q_GYROX] = listVar(gyro_accum_x);
+            revoCalData.Q[EKFConfiguration::Q_GYROY] = listVar(gyro_accum_y);
+            revoCalData.Q[EKFConfiguration::Q_GYROZ] = listVar(gyro_accum_z);
+            revoCalData.R[EKFConfiguration::R_MAGX] = listVar(mag_accum_x);
+            revoCalData.R[EKFConfiguration::R_MAGY] = listVar(mag_accum_y);
+            revoCalData.R[EKFConfiguration::R_MAGZ] = listVar(mag_accum_z);
+            ekfConfiguration->setData(revoCalData);
         }
     }
 }
@@ -989,42 +991,42 @@ void ConfigRevoWidget::doGetNoiseSample(UAVObject * obj)
   */
 void ConfigRevoWidget::drawVariancesGraph()
 {
-    RevoCalibration * revoCalibration = RevoCalibration::GetInstance(getObjectManager());
-    Q_ASSERT(revoCalibration);
-    if(!revoCalibration)
+    EKFConfiguration * ekfConfiguration = EKFConfiguration::GetInstance(getObjectManager());
+    Q_ASSERT(ekfConfiguration);
+    if(!ekfConfiguration)
         return;
-    RevoCalibration::DataFields revoCalibrationData = revoCalibration->getData();
+    EKFConfiguration::DataFields ekfConfigurationData = ekfConfiguration->getData();
 
     // The expected range is from 1E-6 to 1E-1
     double steps = 6; // 6 bars on the graph
-    float accel_x_var = -1/steps*(1+steps+log10(revoCalibrationData.accel_var[RevoCalibration::ACCEL_VAR_X]));
+    float accel_x_var = -1/steps*(1+steps+log10(ekfConfigurationData.Q[EKFConfiguration::Q_ACCELX]));
     if(accel_x)
         accel_x->setTransform(QTransform::fromScale(1,accel_x_var),false);
-    float accel_y_var = -1/steps*(1+steps+log10(revoCalibrationData.accel_var[RevoCalibration::ACCEL_VAR_Y]));
+    float accel_y_var = -1/steps*(1+steps+log10(ekfConfigurationData.Q[EKFConfiguration::Q_ACCELY]));
     if(accel_y)
         accel_y->setTransform(QTransform::fromScale(1,accel_y_var),false);
-    float accel_z_var = -1/steps*(1+steps+log10(revoCalibrationData.accel_var[RevoCalibration::ACCEL_VAR_Z]));
+    float accel_z_var = -1/steps*(1+steps+log10(ekfConfigurationData.Q[EKFConfiguration::Q_ACCELZ]));
     if(accel_z)
         accel_z->setTransform(QTransform::fromScale(1,accel_z_var),false);
 
-    float gyro_x_var = -1/steps*(1+steps+log10(revoCalibrationData.gyro_var[RevoCalibration::GYRO_VAR_X]));
+    float gyro_x_var = -1/steps*(1+steps+log10(ekfConfigurationData.Q[EKFConfiguration::Q_GYROX]));
     if(gyro_x)
         gyro_x->setTransform(QTransform::fromScale(1,gyro_x_var),false);
-    float gyro_y_var = -1/steps*(1+steps+log10(revoCalibrationData.gyro_var[RevoCalibration::GYRO_VAR_Y]));
+    float gyro_y_var = -1/steps*(1+steps+log10(ekfConfigurationData.Q[EKFConfiguration::Q_GYROY]));
     if(gyro_y)
         gyro_y->setTransform(QTransform::fromScale(1,gyro_y_var),false);
-    float gyro_z_var = -1/steps*(1+steps+log10(revoCalibrationData.gyro_var[RevoCalibration::GYRO_VAR_Z]));
+    float gyro_z_var = -1/steps*(1+steps+log10(ekfConfigurationData.Q[EKFConfiguration::Q_GYROZ]));
     if(gyro_z)
         gyro_z->setTransform(QTransform::fromScale(1,gyro_z_var),false);
 
     // Scale by 1e-3 because mag vars are much higher.
-    float mag_x_var = -1/steps*(1+steps+log10(1e-3*revoCalibrationData.mag_var[RevoCalibration::MAG_VAR_X]));
+    float mag_x_var = -1/steps*(1+steps+log10(1e-3*ekfConfigurationData.R[EKFConfiguration::R_MAGX]));
     if(mag_x)
         mag_x->setTransform(QTransform::fromScale(1,mag_x_var),false);
-    float mag_y_var = -1/steps*(1+steps+log10(1e-3*revoCalibrationData.mag_var[RevoCalibration::MAG_VAR_Y]));
+    float mag_y_var = -1/steps*(1+steps+log10(1e-3*ekfConfigurationData.R[EKFConfiguration::R_MAGY]));
     if(mag_y)
         mag_y->setTransform(QTransform::fromScale(1,mag_y_var),false);
-    float mag_z_var = -1/steps*(1+steps+log10(1e-3*revoCalibrationData.mag_var[RevoCalibration::MAG_VAR_Z]));
+    float mag_z_var = -1/steps*(1+steps+log10(1e-3*ekfConfigurationData.R[EKFConfiguration::R_MAGZ]));
     if(mag_z)
         mag_z->setTransform(QTransform::fromScale(1,mag_z_var),false);
 }

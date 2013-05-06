@@ -78,7 +78,7 @@ static bool nmeaProcessGPGSA(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
 	static bool nmeaProcessGPGSV(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam);
 #endif //PIOS_GPS_MINIMAL
 
-const static struct nmea_parser nmea_parsers[] = {
+static const struct nmea_parser nmea_parsers[] = {
 	{
 		.prefix = "GPGGA",
 		.handler = nmeaProcessGPGGA,
@@ -189,7 +189,7 @@ int parse_nmea_stream (uint8_t c, char *gps_rx_buffer, GPSPositionData *GpsData,
 	return PARSER_INCOMPLETE;
 }
 
-const static struct nmea_parser *NMEA_find_parser_by_prefix(const char *prefix)
+static const struct nmea_parser *NMEA_find_parser_by_prefix(const char *prefix)
 {
 	if (!prefix) {
 		return (NULL);
@@ -601,7 +601,7 @@ static bool nmeaProcessGPVTG(GPSPositionData * GpsData, bool* gpsDataUpdated, ch
  * \param[in] A pointer to a GPSPosition UAVObject to be updated (unused).
  * \param[in] An NMEA sentence with a valid checksum
  */
-static bool nmeaProcessGPZDA(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam)
+static bool nmeaProcessGPZDA(__attribute__((unused)) GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam)
 {
 	if (nbParam != 7)
 		return false;
@@ -640,7 +640,7 @@ static uint8_t gsv_processed_mask;
 static uint16_t gsv_incomplete_error;
 static uint16_t gsv_duplicate_error;
 
-static bool nmeaProcessGPGSV(GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam)
+static bool nmeaProcessGPGSV(__attribute__((unused)) GPSPositionData * GpsData, bool* gpsDataUpdated, char* param[], uint8_t nbParam)
 {
 	if (nbParam < 4)
 		return false;

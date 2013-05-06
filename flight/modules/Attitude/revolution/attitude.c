@@ -66,6 +66,8 @@
 #include "homelocation.h"
 #include "magnetometer.h"
 #include "positionactual.h"
+#include "ekfconfiguration.h"
+#include "ekfstatevariance.h"
 #include "revocalibration.h"
 #include "revosettings.h"
 #include "velocityactual.h"
@@ -102,9 +104,14 @@ static xQueueHandle gpsVelQueue;
 static AttitudeSettingsData attitudeSettings;
 static HomeLocationData homeLocation;
 static RevoCalibrationData revoCalibration;
+static EKFConfigurationData ekfConfiguration;
 static RevoSettingsData revoSettings;
-static bool gyroBiasSettingsUpdated = false;
+static FlightStatusData flightStatus;
 const uint32_t SENSOR_QUEUE_SIZE = 10;
+
+static bool volatile variance_error = true;
+static bool volatile initialization_required = true;
+static uint32_t volatile running_algorithm = 0xffffffff; // we start with no algorithm running
 
 // Private functions
 static void AttitudeTask(void *parameters);
@@ -114,6 +121,25 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode);
 static void settingsUpdatedCb(UAVObjEvent * objEv);
 
 static int32_t getNED(GPSPositionData * gpsPosition, float * NED);
+
+// check for invalid values
+static inline bool invalid(float data) {
+	if ( isnan(data) || isinf(data) ){
+		return true;
+	}
+	return false;
+}
+
+// check for invalid variance values
+static inline bool invalid_var(float data) {
+	if ( invalid(data) ) {
+		return true;
+	}
+	if ( data < 1e-15f ) { // var should not be close to zero. And not negative either.
+		return true;
+	}
+	return false;
+}
 
 /**
  * API for sensor fusion algorithms:
@@ -138,6 +164,9 @@ int32_t AttitudeInitialize(void)
 	VelocityActualInitialize();
 	RevoSettingsInitialize();
 	RevoCalibrationInitialize();
+	EKFConfigurationInitialize();
+	EKFStateVarianceInitialize();
+	FlightStatusInitialize();
 	
 	// Initialize this here while we aren't setting the homelocation in GPS
 	HomeLocationInitialize();
@@ -145,24 +174,26 @@ int32_t AttitudeInitialize(void)
 	// Initialize quaternion
 	AttitudeActualData attitude;
 	AttitudeActualGet(&attitude);
-	attitude.q1 = 1;
-	attitude.q2 = 0;
-	attitude.q3 = 0;
-	attitude.q4 = 0;
+	attitude.q1 = 1.0f;
+	attitude.q2 = 0.0f;
+	attitude.q3 = 0.0f;
+	attitude.q4 = 0.0f;
 	AttitudeActualSet(&attitude);
 	
 	// Cannot trust the values to init right above if BL runs
 	GyrosBiasData gyrosBias;
 	GyrosBiasGet(&gyrosBias);
-	gyrosBias.x = 0;
-	gyrosBias.y = 0;
-	gyrosBias.z = 0;
+	gyrosBias.x = 0.0f;
+	gyrosBias.y = 0.0f;
+	gyrosBias.z = 0.0f;
 	GyrosBiasSet(&gyrosBias);
 	
 	AttitudeSettingsConnectCallback(&settingsUpdatedCb);
 	RevoSettingsConnectCallback(&settingsUpdatedCb);
 	RevoCalibrationConnectCallback(&settingsUpdatedCb);
 	HomeLocationConnectCallback(&settingsUpdatedCb);
+	EKFConfigurationConnectCallback(&settingsUpdatedCb);
+	FlightStatusConnectCallback(&settingsUpdatedCb);
 
 	return 0;
 }
@@ -203,10 +234,9 @@ MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
 /**
  * Module thread, should not return.
  */
-static void AttitudeTask(void *parameters)
+static void AttitudeTask(__attribute__((unused)) void *parameters)
 {
-	bool first_run = true;
-	uint32_t last_algorithm;
+
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
 
 	// Force settings update to make sure rotation loaded
@@ -215,21 +245,19 @@ static void AttitudeTask(void *parameters)
 	// Wait for all the sensors be to read
 	vTaskDelay(100);
 
-	// Invalidate previous algorithm to trigger a first run
-	last_algorithm = 0xfffffff;
-
-	// Main task loop
+	// Main task loop - TODO: make it run as delayed callback
 	while (1) {
 
 		int32_t ret_val = -1;
 
-		if (last_algorithm != revoSettings.FusionAlgorithm) {
-			last_algorithm = revoSettings.FusionAlgorithm;
+		bool first_run = false;
+		if (initialization_required) {
+			initialization_required = false;
 			first_run = true;
 		}
 
 		// This  function blocks on data queue
-		switch (revoSettings.FusionAlgorithm ) {
+		switch (running_algorithm ) {
 			case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARY:
 				ret_val = updateAttitudeComplementary(first_run);
 				break;
@@ -244,8 +272,9 @@ static void AttitudeTask(void *parameters)
 				break;
 		}
 
-		if(ret_val == 0)
-			first_run = false;
+		if(ret_val != 0) {
+			initialization_required = true;
+		}
 
 		PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 	}
@@ -282,8 +311,6 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	AccelsGet(&accelsData);
 
 	// During initialization and 
-	FlightStatusData flightStatus;
-	FlightStatusGet(&flightStatus);
 	if(first_run) {
 #if defined(PIOS_INCLUDE_HMC5883)
 		// To initialize we need a valid mag reading
@@ -293,16 +320,36 @@ static int32_t updateAttitudeComplementary(bool first_run)
 		MagnetometerGet(&magData);
 #else
 		MagnetometerData magData;
-		magData.x = 100;
-		magData.y = 0;
-		magData.z = 0;
+		magData.x = 100.0f;
+		magData.y = 0.0f;
+		magData.z = 0.0f;
 #endif
 		AttitudeActualData attitudeActual;
 		AttitudeActualGet(&attitudeActual);
 		init = 0;
-		attitudeActual.Roll = RAD2DEG(atan2f(-accelsData.y, -accelsData.z));
-		attitudeActual.Pitch = RAD2DEG(atan2f(accelsData.x, -accelsData.z));
-		attitudeActual.Yaw = RAD2DEG(atan2f(-magData.y, magData.x));
+
+		// Set initial attitude. Use accels to determine roll and pitch, rotate magnetic measurement accordingly,
+		// so pseudo "north" vector can be estimated even if the board is not level
+		attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z);
+		float zn = cosf(attitudeActual.Roll) * magData.z + sinf(attitudeActual.Roll) * magData.y;
+		float yn = cosf(attitudeActual.Roll) * magData.y - sinf(attitudeActual.Roll) * magData.z;
+
+		// rotate accels z vector according to roll
+		float azn = cosf(attitudeActual.Roll) * accelsData.z + sinf(attitudeActual.Roll) * accelsData.y;
+		attitudeActual.Pitch = atan2f(accelsData.x, -azn);
+
+		float xn = cosf(attitudeActual.Pitch) * magData.x + sinf(attitudeActual.Pitch) * zn;
+
+		attitudeActual.Yaw = atan2f(-yn, xn);
+		// TODO: This is still a hack
+		// Put this in a proper generic function in CoordinateConversion.c
+		// should take 4 vectors: g (0,0,-9.81), accels, Be (or 1,0,0 if no home loc) and magnetometers (or 1,0,0 if no mags)
+		// should calculate the rotation in 3d space using proper cross product math
+		// SUBTODO: formulate the math required
+
+		attitudeActual.Roll = RAD2DEG(attitudeActual.Roll);
+		attitudeActual.Pitch = RAD2DEG(attitudeActual.Pitch);
+		attitudeActual.Yaw = RAD2DEG(attitudeActual.Yaw);
 
 		RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
 		AttitudeActualSet(&attitudeActual);
@@ -315,15 +362,15 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
 	if((init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
 		// For first 7 seconds use accels to get gyro bias
-		attitudeSettings.AccelKp = 1;
-		attitudeSettings.AccelKi = 0.9;
-		attitudeSettings.YawBiasRate = 0.23;
-		magKp = 1;
+		attitudeSettings.AccelKp = 1.0f;
+		attitudeSettings.AccelKi = 0.9f;
+		attitudeSettings.YawBiasRate = 0.23f;
+		magKp = 1.0f;
 	} else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
-		attitudeSettings.AccelKp = 1;
-		attitudeSettings.AccelKi = 0.9;
-		attitudeSettings.YawBiasRate = 0.23;
-		magKp = 1;
+		attitudeSettings.AccelKp = 1.0f;
+		attitudeSettings.AccelKi = 0.9f;
+		attitudeSettings.YawBiasRate = 0.23f;
+		magKp = 1.0f;
 		init = 0;
 	} else if (init == 0) {
 		// Reload settings (all the rates)
@@ -350,8 +397,8 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	quat_copy(&attitudeActual.q1, q);
 
 	// Rotate gravity to body frame and cross with accels
-	grot[0] = -(2 * (q[1] * q[3] - q[0] * q[2]));
-	grot[1] = -(2 * (q[2] * q[3] + q[0] * q[1]));
+	grot[0] = -(2.0f * (q[1] * q[3] - q[0] * q[2]));
+	grot[1] = -(2.0f * (q[2] * q[3] + q[0] * q[1]));
 	grot[2] = -(q[0] * q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3]);
 	CrossProduct((const float *) &accelsData.x, (const float *) grot, accel_err);
 
@@ -373,7 +420,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
 		MagnetometerGet(&mag);
 
 		// If the mag is producing bad data don't use it (normally bad calibration)
-		if  (mag.x == mag.x && mag.y == mag.y && mag.z == mag.z) {
+		if  (!isnan(mag.x) && !isinf(mag.x) && !isnan(mag.y) && !isinf(mag.y) && !isnan(mag.z) && !isinf(mag.z)) {
 			rot_mult(Rbe, homeLocation.Be, brot);
 
 			float mag_len = sqrtf(mag.x * mag.x + mag.y * mag.y + mag.z * mag.z);
@@ -387,13 +434,13 @@ static int32_t updateAttitudeComplementary(bool first_run)
 			brot[2] /= bmag;
 
 			// Only compute if neither vector is null
-			if (bmag < 1 || mag_len < 1)
-				mag_err[0] = mag_err[1] = mag_err[2] = 0;
+			if (bmag < 1.0f || mag_len < 1.0f)
+				mag_err[0] = mag_err[1] = mag_err[2] = 0.0f;
 			else
 				CrossProduct((const float *) &mag.x, (const float *) brot, mag_err);
 		}
 	} else {
-		mag_err[0] = mag_err[1] = mag_err[2] = 0;
+		mag_err[0] = mag_err[1] = mag_err[2] = 0.0f;
 	}
 
 	// Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
@@ -404,6 +451,13 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	gyrosBias.z -= mag_err[2] * magKi;
 	GyrosBiasSet(&gyrosBias);
 
+	if (revoCalibration.BiasCorrectedRaw != REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
+		// if the raw values are not adjusted, we need to adjust here.
+		gyrosData.x -= gyrosBias.x;
+		gyrosData.y -= gyrosBias.y;
+		gyrosData.z -= gyrosBias.z;
+	}
+
 	// Correct rates based on error, integral component dealt with in updateSensors
 	gyrosData.x += accel_err[0] * attitudeSettings.AccelKp / dT;
 	gyrosData.y += accel_err[1] * attitudeSettings.AccelKp / dT;
@@ -412,10 +466,10 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	// Work out time derivative from INSAlgo writeup
 	// Also accounts for the fact that gyros are in deg/s
 	float qdot[4];
-	qdot[0] = (-q[1] * gyrosData.x - q[2] * gyrosData.y - q[3] * gyrosData.z) * dT * M_PI_F / 180 / 2;
-	qdot[1] = (q[0] * gyrosData.x - q[3] * gyrosData.y + q[2] * gyrosData.z) * dT * M_PI_F / 180 / 2;
-	qdot[2] = (q[3] * gyrosData.x + q[0] * gyrosData.y - q[1] * gyrosData.z) * dT * M_PI_F / 180 / 2;
-	qdot[3] = (-q[2] * gyrosData.x + q[1] * gyrosData.y + q[0] * gyrosData.z) * dT * M_PI_F / 180 / 2;
+	qdot[0] = DEG2RAD(-q[1] * gyrosData.x - q[2] * gyrosData.y - q[3] * gyrosData.z) * dT / 2;
+	qdot[1] = DEG2RAD(q[0] * gyrosData.x - q[3] * gyrosData.y + q[2] * gyrosData.z) * dT / 2;
+	qdot[2] = DEG2RAD(q[3] * gyrosData.x + q[0] * gyrosData.y - q[1] * gyrosData.z) * dT / 2;
+	qdot[3] = DEG2RAD(-q[2] * gyrosData.x + q[1] * gyrosData.y + q[0] * gyrosData.z) * dT / 2;
 
 	// Take a time step
 	q[0] = q[0] + qdot[0];
@@ -423,7 +477,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	q[2] = q[2] + qdot[2];
 	q[3] = q[3] + qdot[3];
 
-	if(q[0] < 0) {
+	if(q[0] < 0.0f) {
 		q[0] = -q[0];
 		q[1] = -q[1];
 		q[2] = -q[2];
@@ -439,11 +493,11 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
 	// If quaternion has become inappropriately short or is nan reinit.
 	// THIS SHOULD NEVER ACTUALLY HAPPEN
-	if((fabs(qmag) < 1.0e-3f) || (qmag != qmag)) {
-		q[0] = 1;
-		q[1] = 0;
-		q[2] = 0;
-		q[3] = 0;
+	if((fabsf(qmag) < 1.0e-3f) || isnan(qmag)) {
+		q[0] = 1.0f;
+		q[1] = 0.0f;
+		q[2] = 0.0f;
+		q[3] = 0.0f;
 	}
 
 	quat_copy(q, &attitudeActual.q1);
@@ -503,7 +557,12 @@ static int32_t updateAttitudeComplementary(bool first_run)
 	}
 
 
-	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+	if ( variance_error ) {
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_CRITICAL);
+	} else {
+		AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+	}
+
 
 	return 0;
 }
@@ -537,7 +596,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	static bool gps_updated;
 	static bool gps_vel_updated;
 
-	static float baroOffset = 0;
+	static bool value_error = false;
+
+	static float baroOffset = 0.0f;
 
 	static uint32_t ins_last_time = 0;
 	static bool inited;
@@ -611,119 +672,206 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	GPSVelocityGet(&gpsVelData);
 	GyrosBiasGet(&gyrosBias);
 
-	// Discard mag if it has NAN (normally from bad calibration)
-	mag_updated &= (magData.x == magData.x && magData.y == magData.y && magData.z == magData.z);
+	value_error = false;
+	// safety checks
+	if ( invalid(gyrosData.x) ||
+	     invalid(gyrosData.y) ||
+	     invalid(gyrosData.z) ||
+	     invalid(accelsData.x) ||
+	     invalid(accelsData.y) ||
+	     invalid(accelsData.z) ) {
+		// cannot run process update, raise error!
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);
+		return 0;
+	}
+	if ( invalid(gyrosBias.x) ||
+	     invalid(gyrosBias.y) ||
+	     invalid(gyrosBias.z) ) {
+		gyrosBias.x = 0.0f;
+		gyrosBias.y = 0.0f;
+		gyrosBias.z = 0.0f;
+	}
+
+	if ( invalid(magData.x) ||
+	     invalid(magData.y) ||
+	     invalid(magData.z) ) {
+
+		// magnetometers can be ignored for a while
+		mag_updated = false;
+		value_error = true;
+	}
+
 	// Don't require HomeLocation.Set to be true but at least require a mag configuration (allows easily
 	// switching between indoor and outdoor mode with Set = false)
-	mag_updated &= (homeLocation.Be[0] != 0 || homeLocation.Be[1] != 0 || homeLocation.Be[2]);
+	if ( (homeLocation.Be[0] * homeLocation.Be[0] + homeLocation.Be[1] * homeLocation.Be[1] + homeLocation.Be[2] * homeLocation.Be[2] < 1e-5f) ) {
+		mag_updated = false;
+		value_error = true;
+	}
+
+	if ( invalid(baroData.Altitude) ) {
+		baro_updated = false;
+		value_error = true;
+	}
+
+	if ( invalid(airspeedData.CalibratedAirspeed) ) {
+		airspeed_updated = false;
+		value_error = true;
+	}
+
+	if ( invalid(gpsData.Altitude) ) {
+		gps_updated = false;
+		value_error = true;
+	}
+
+	if ( invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSNORTH]) ||
+	     invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSEAST]) ||
+	     invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSDOWN]) ||
+	     invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELNORTH]) ||
+	     invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELEAST]) ||
+	     invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELDOWN]) ) {
+		gps_updated = false;
+		value_error = true;
+	}
+
+	if ( invalid(gpsVelData.North) ||
+	     invalid(gpsVelData.East) ||
+	     invalid(gpsVelData.Down) ) {
+		gps_vel_updated = false;
+		value_error = true;
+	}
 
 	// Discard airspeed if sensor not connected
-	airspeed_updated &= ( airspeedData.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE );
+	if ( airspeedData.SensorConnected != AIRSPEEDSENSOR_SENSORCONNECTED_TRUE ) {
+		airspeed_updated = false;
+	}
 
 	// Have a minimum requirement for gps usage
-	gps_updated &= (gpsData.Satellites >= 7) && (gpsData.PDOP <= 4.0f) && (homeLocation.Set == HOMELOCATION_SET_TRUE);
+	if ( ( gpsData.Satellites < 7 ) ||
+	     ( gpsData.PDOP > 4.0f ) ||
+	     ( gpsData.Latitude==0 && gpsData.Longitude==0 ) ||
+	     ( homeLocation.Set != HOMELOCATION_SET_TRUE ) ) {
+		gps_updated = false;
+		gps_vel_updated = false;
+	}
 
-	if (!inited)
+	if ( !inited ) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);
-	else if (outdoor_mode && gpsData.Satellites < 7)
+	} else if ( value_error ) {
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_CRITICAL);
+	} else if ( variance_error ) {
+		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_CRITICAL);
+	} else if (outdoor_mode && gpsData.Satellites < 7) {
 		AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE,SYSTEMALARMS_ALARM_ERROR);
-	else
+	} else {
 		AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+	}
 			
-	if (!inited && mag_updated && baro_updated && (gps_updated || !outdoor_mode)) {
+	dT = PIOS_DELAY_DiffuS(ins_last_time) / 1.0e6f;
+	ins_last_time = PIOS_DELAY_GetRaw();
+
+	// This should only happen at start up or at mode switches
+	if(dT > 0.01f) {
+		dT = 0.01f;
+	} else if(dT <= 0.001f) {
+		dT = 0.001f;
+	}
+
+	if (!inited && mag_updated && baro_updated && (gps_updated || !outdoor_mode) && !variance_error) {
+
 		// Don't initialize until all sensors are read
-		if (init_stage == 0 && !outdoor_mode) {
-			float Pdiag[16]={25.0f,25.0f,25.0f,5.0f,5.0f,5.0f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-4f,1e-4f,1e-4f};
-			float q[4];
+		if (init_stage == 0) {
+
+			// Reset the INS algorithm
+			INSGPSInit();
+			INSSetMagVar( (float[3]){ ekfConfiguration.R[EKFCONFIGURATION_R_MAGX],
+			                          ekfConfiguration.R[EKFCONFIGURATION_R_MAGY],
+			                          ekfConfiguration.R[EKFCONFIGURATION_R_MAGZ] } );
+			INSSetAccelVar( (float[3]){ ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELX],
+			                            ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELY],
+			                            ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELZ] } );
+			INSSetGyroVar( (float[3]){ ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROX],
+			                            ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROY],
+			                            ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROZ] } );
+			INSSetGyroBiasVar( (float[3]){ ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTX],
+			                               ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTY],
+			                               ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTZ] } );
+			INSSetBaroVar(ekfConfiguration.R[EKFCONFIGURATION_R_BAROZ]);
+
+			// Initialize the gyro bias
+			float gyro_bias[3] = {0.0f, 0.0f, 0.0f};
+			INSSetGyroBias(gyro_bias);
+
 			float pos[3] = {0.0f, 0.0f, 0.0f};
 
-			// Initialize barometric offset to homelocation altitude
-			baroOffset = -baroData.Altitude;
-			pos[2] = -(baroData.Altitude + baroOffset);
+			if (outdoor_mode) {
 
-			// Reset the INS algorithm
-			INSGPSInit();
-			INSSetMagVar(revoCalibration.mag_var);
-			INSSetAccelVar(revoCalibration.accel_var);
-			INSSetGyroVar(revoCalibration.gyro_var);
-			INSSetBaroVar(revoCalibration.baro_var);
+				GPSPositionData gpsPosition;
+				GPSPositionGet(&gpsPosition);
 
-			// Initialize the gyro bias from the settings
-			float gyro_bias[3] = {gyrosBias.x * M_PI_F / 180.0f, gyrosBias.y * M_PI_F / 180.0f, gyrosBias.z * M_PI_F / 180.0f};
-			INSSetGyroBias(gyro_bias);
+				// Transform the GPS position into NED coordinates
+				getNED(&gpsPosition, pos);
+
+				// Initialize barometric offset to current GPS NED coordinate
+				baroOffset = -pos[2] - baroData.Altitude;
+
+			} else {
+
+				// Initialize barometric offset to homelocation altitude
+				baroOffset = -baroData.Altitude;
+				pos[2] = -(baroData.Altitude + baroOffset);
+
+			}
 
 			xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
 			MagnetometerGet(&magData);
 
-			// Set initial attitude
 			AttitudeActualData attitudeActual;
-			attitudeActual.Roll = RAD2DEG(atan2f(-accelsData.y, -accelsData.z));
-			attitudeActual.Pitch = RAD2DEG(atan2f(accelsData.x, -accelsData.z));
-			attitudeActual.Yaw = RAD2DEG(atan2f(-magData.y, magData.x));
+			AttitudeActualGet (&attitudeActual);
+
+			// Set initial attitude. Use accels to determine roll and pitch, rotate magnetic measurement accordingly,
+			// so pseudo "north" vector can be estimated even if the board is not level
+			attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z);
+			float zn = cosf(attitudeActual.Roll) * magData.z + sinf(attitudeActual.Roll) * magData.y;
+			float yn = cosf(attitudeActual.Roll) * magData.y - sinf(attitudeActual.Roll) * magData.z;
+
+			// rotate accels z vector according to roll
+			float azn = cosf(attitudeActual.Roll) * accelsData.z + sinf(attitudeActual.Roll) * accelsData.y;
+			attitudeActual.Pitch = atan2f(accelsData.x, -azn);
+
+			float xn = cosf(attitudeActual.Pitch) * magData.x + sinf(attitudeActual.Pitch) * zn;
+
+			attitudeActual.Yaw = atan2f(-yn, xn);
+			// TODO: This is still a hack
+			// Put this in a proper generic function in CoordinateConversion.c
+			// should take 4 vectors: g (0,0,-9.81), accels, Be (or 1,0,0 if no home loc) and magnetometers (or 1,0,0 if no mags)
+			// should calculate the rotation in 3d space using proper cross product math
+			// SUBTODO: formulate the math required
+
+			attitudeActual.Roll = RAD2DEG(attitudeActual.Roll);
+			attitudeActual.Pitch = RAD2DEG(attitudeActual.Pitch);
+			attitudeActual.Yaw = RAD2DEG(attitudeActual.Yaw);
+
 			RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
 			AttitudeActualSet(&attitudeActual);
 
-			q[0] = attitudeActual.q1;
-			q[1] = attitudeActual.q2;
-			q[2] = attitudeActual.q3;
-			q[3] = attitudeActual.q4;
+			float q[4] = { attitudeActual.q1, attitudeActual.q2, attitudeActual.q3, attitudeActual.q4 };
 			INSSetState(pos, zeros, q, zeros, zeros);
-			INSResetP(Pdiag);
-		} else if (init_stage == 0 && outdoor_mode) {
-			float Pdiag[16]={25.0f,25.0f,25.0f,5.0f,5.0f,5.0f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-5f,1e-4f,1e-4f,1e-4f};
-			float q[4];
-			float NED[3];
-
-			// Reset the INS algorithm
-			INSGPSInit();
-			INSSetMagVar(revoCalibration.mag_var);
-			INSSetAccelVar(revoCalibration.accel_var);
-			INSSetGyroVar(revoCalibration.gyro_var);
-			INSSetBaroVar(revoCalibration.baro_var);
-
-			INSSetMagNorth(homeLocation.Be);
-
-			// Initialize the gyro bias from the settings
-			float gyro_bias[3] = {gyrosBias.x * M_PI_F / 180.0f, gyrosBias.y * M_PI_F / 180.0f, gyrosBias.z * M_PI_F / 180.0f};
-			INSSetGyroBias(gyro_bias);
-
-			GPSPositionData gpsPosition;
-			GPSPositionGet(&gpsPosition);
-
-			// Transform the GPS position into NED coordinates
-			getNED(&gpsPosition, NED);
 			
-			// Initialize barometric offset to cirrent GPS NED coordinate
-			baroOffset = -NED[2] - baroData.Altitude;
+			INSResetP(ekfConfiguration.P);
 
-			xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
-			MagnetometerGet(&magData);
-
-			// Set initial attitude
-			AttitudeActualData attitudeActual;
-			attitudeActual.Roll = RAD2DEG(atan2f(-accelsData.y, -accelsData.z));
-			attitudeActual.Pitch = RAD2DEG(atan2f(accelsData.x, -accelsData.z));
-			attitudeActual.Yaw = RAD2DEG(atan2f(-magData.y, magData.x));
-			RPY2Quaternion(&attitudeActual.Roll,&attitudeActual.q1);
-			AttitudeActualSet(&attitudeActual);
-
-			q[0] = attitudeActual.q1;
-			q[1] = attitudeActual.q2;
-			q[2] = attitudeActual.q3;
-			q[3] = attitudeActual.q4;
-
-			INSSetState(NED, zeros, q, zeros, zeros);
-			INSResetP(Pdiag);
-		} else if (init_stage > 0) {
+		} else {
 			// Run prediction a bit before any corrections
-			dT = PIOS_DELAY_DiffuS(ins_last_time) / 1.0e6f;
 
-			GyrosBiasGet(&gyrosBias);
-			float gyros[3] = {(gyrosData.x + gyrosBias.x) * M_PI_F / 180.0f,
-				(gyrosData.y + gyrosBias.y) * M_PI_F / 180.0f,
-				(gyrosData.z + gyrosBias.z) * M_PI_F / 180.0f};
+			// Because the sensor module remove the bias we need to add it
+			// back in here so that the INS algorithm can track it correctly
+			float gyros[3] = { DEG2RAD(gyrosData.x), DEG2RAD(gyrosData.y), DEG2RAD(gyrosData.z) };
+			if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
+				gyros[0] += DEG2RAD(gyrosBias.x);
+				gyros[1] += DEG2RAD(gyrosBias.y);
+				gyros[2] += DEG2RAD(gyrosBias.z);
+			}
 			INSStatePrediction(gyros, &accelsData.x, dT);
-			
+
 			AttitudeActualData attitude;
 			AttitudeActualGet(&attitude);
 			attitude.q1 = Nav.q[0];
@@ -738,38 +886,19 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		if(init_stage > 10)
 			inited = true;
 
-		ins_last_time = PIOS_DELAY_GetRaw();	
-
 		return 0;
 	}
 
 	if (!inited)
 		return 0;
 
-	dT = PIOS_DELAY_DiffuS(ins_last_time) / 1.0e6f;
-	ins_last_time = PIOS_DELAY_GetRaw();
-
-	// This should only happen at start up or at mode switches
-	if(dT > 0.01f)
-		dT = 0.01f;
-	else if(dT <= 0.001f)
-		dT = 0.001f;
-
-	// If the gyro bias setting was updated we should reset
-	// the state estimate of the EKF
-	if(gyroBiasSettingsUpdated) {
-		float gyro_bias[3] = {gyrosBias.x * M_PI_F / 180.0f, gyrosBias.y * M_PI_F / 180.0f, gyrosBias.z * M_PI_F / 180.0f};
-		INSSetGyroBias(gyro_bias);
-		gyroBiasSettingsUpdated = false;
-	}
-
 	// Because the sensor module remove the bias we need to add it
 	// back in here so that the INS algorithm can track it correctly
-	float gyros[3] = {gyrosData.x * M_PI_F / 180.0f, gyrosData.y * M_PI_F / 180.0f, gyrosData.z * M_PI_F / 180.0f};
+	float gyros[3] = { DEG2RAD(gyrosData.x), DEG2RAD(gyrosData.y), DEG2RAD(gyrosData.z) };
 	if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
-		gyros[0] += gyrosBias.x * M_PI_F / 180.0f;
-		gyros[1] += gyrosBias.y * M_PI_F / 180.0f;
-		gyros[2] += gyrosBias.z * M_PI_F / 180.0f;
+		gyros[0] += DEG2RAD(gyrosBias.x);
+		gyros[1] += DEG2RAD(gyrosBias.y);
+		gyros[2] += DEG2RAD(gyrosBias.z);
 	}
 
 	// Advance the state estimate
@@ -798,14 +927,19 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	
 	if (gps_updated && outdoor_mode)
 	{
-		INSSetPosVelVar(revoCalibration.gps_var[REVOCALIBRATION_GPS_VAR_POS], revoCalibration.gps_var[REVOCALIBRATION_GPS_VAR_VEL]);
+		INSSetPosVelVar((float[3]){ ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSNORTH],
+		                            ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSEAST],
+		                            ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSDOWN] },
+		                (float[3]){ ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELNORTH],
+		                            ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELEAST],
+		                            ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELDOWN] });
 		sensors |= POS_SENSORS;
 
 		if (0) { // Old code to take horizontal velocity from GPS Position update
 			sensors |= HORIZ_SENSORS;
 			vel[0] = gpsData.Groundspeed * cosf(DEG2RAD(gpsData.Heading));
 			vel[1] = gpsData.Groundspeed * sinf(DEG2RAD(gpsData.Heading));
-			vel[2] = 0;
+			vel[2] = 0.0f;
 		}
 		// Transform the GPS position into NED coordinates
 		getNED(&gpsData, NED);
@@ -816,9 +950,14 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		    * ( -NED[2] - baroData.Altitude );
 
 	} else if (!outdoor_mode) {
-		INSSetPosVelVar(1e6f, 1e5f);
-		vel[0] = vel[1] = vel[2] = 0;
-		NED[0] = NED[1] = 0;
+		INSSetPosVelVar((float[3]){ ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
+		                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
+		                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR] },
+		                (float[3]){ ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR],
+		                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR],
+		                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR] });
+		vel[0] = vel[1] = vel[2] = 0.0f;
+		NED[0] = NED[1] = 0.0f;
 		NED[2] = -(baroData.Altitude + baroOffset);
 		sensors |= HORIZ_SENSORS | HORIZ_POS_SENSORS;
 		sensors |= POS_SENSORS |VERT_SENSORS;
@@ -843,11 +982,16 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		if ( !gps_vel_updated && !gps_updated) {
 			// feed airspeed into EKF, treat wind as 1e2 variance
 			sensors |= HORIZ_SENSORS | VERT_SENSORS;
-			INSSetPosVelVar(1e6f, 1e2f);
+			INSSetPosVelVar((float[3]){ ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
+			                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
+			                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR] },
+			                (float[3]){ ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED],
+			                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED],
+			                            ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED] });
 			// rotate airspeed vector into NED frame - airspeed is measured in X axis only
 			float R[3][3];
 			Quaternion2R(Nav.q,R);
-			float vtas[3] = {airspeed.TrueAirspeed,0,0};
+			float vtas[3] = {airspeed.TrueAirspeed,0.0f,0.0f};
 			rot_mult(R,vtas,vel);
 		}
 	}
@@ -874,15 +1018,15 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	velocityActual.Down = Nav.Vel[2];
 	VelocityActualSet(&velocityActual);
 
-	if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE && !gyroBiasSettingsUpdated) {
-		// Copy the gyro bias into the UAVO except when it was updated
-		// from the settings during the calculation, then consume it
-		// next cycle
-		gyrosBias.x = Nav.gyro_bias[0] * 180.0f / M_PI_F;
-		gyrosBias.y = Nav.gyro_bias[1] * 180.0f / M_PI_F;
-		gyrosBias.z = Nav.gyro_bias[2] * 180.0f / M_PI_F;
-		GyrosBiasSet(&gyrosBias);
-	}
+	gyrosBias.x = RAD2DEG(Nav.gyro_bias[0]);
+	gyrosBias.y = RAD2DEG(Nav.gyro_bias[1]);
+	gyrosBias.z = RAD2DEG(Nav.gyro_bias[2]);
+	GyrosBiasSet(&gyrosBias);
+
+	EKFStateVarianceData vardata;
+	EKFStateVarianceGet(&vardata);
+	INSGetP(vardata.P);
+	EKFStateVarianceSet(&vardata);
 
 	return 0;
 }
@@ -912,24 +1056,58 @@ static int32_t getNED(GPSPositionData * gpsPosition, float * NED)
 
 static void settingsUpdatedCb(UAVObjEvent * ev) 
 {
+	if (ev == NULL || ev->obj == FlightStatusHandle()) {
+		FlightStatusGet(&flightStatus);
+	}
 	if (ev == NULL || ev->obj == RevoCalibrationHandle()) {
 		RevoCalibrationGet(&revoCalibration);
-		
-		/* When the revo calibration is updated, update the GyroBias object */
-		GyrosBiasData gyrosBias;
-		GyrosBiasGet(&gyrosBias);
-		gyrosBias.x = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_X];
-		gyrosBias.y = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_Y];
-		gyrosBias.z = revoCalibration.gyro_bias[REVOCALIBRATION_GYRO_BIAS_Z];
-		GyrosBiasSet(&gyrosBias);
+	}
+	// change of these settings require reinitialization of the EKF
+	// when an error flag has been risen, we also listen to flightStatus updates,
+	// since we are waiting for the system to get disarmed so we can reinitialize safely.
+	if (ev == NULL ||
+			ev->obj == EKFConfigurationHandle() ||
+			ev->obj == RevoSettingsHandle() ||
+			( variance_error==true && ev->obj == FlightStatusHandle() )
+			) {
 
-		gyroBiasSettingsUpdated = true;
+		bool error = false;
 
-		// In case INS currently running
-		INSSetMagVar(revoCalibration.mag_var);
-		INSSetAccelVar(revoCalibration.accel_var);
-		INSSetGyroVar(revoCalibration.gyro_var);
-		INSSetBaroVar(revoCalibration.baro_var);
+		EKFConfigurationGet(&ekfConfiguration);
+		int t;
+		for (t=0; t < EKFCONFIGURATION_P_NUMELEM; t++) {
+			if (invalid_var(ekfConfiguration.P[t])) {
+				error = true;
+			}
+		}
+		for (t=0; t < EKFCONFIGURATION_Q_NUMELEM; t++) {
+			if (invalid_var(ekfConfiguration.Q[t])) {
+				error = true;
+			}
+		}
+		for (t=0; t < EKFCONFIGURATION_R_NUMELEM; t++) {
+			if (invalid_var(ekfConfiguration.R[t])) {
+				error = true;
+			}
+		}
+
+		RevoSettingsGet(&revoSettings);
+
+		// Reinitialization of the EKF is not desired during flight.
+		// It will be delayed until the board is disarmed by raising the error flag.
+		// We will not prevent the initial initialization though, since the board could be in always armed mode.
+		if (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED && !initialization_required ) {
+			error = true;
+		}
+
+		if (error) {
+			variance_error = true;
+		} else {
+			// trigger reinitialization - possibly with new algorithm
+			running_algorithm = revoSettings.FusionAlgorithm;
+			variance_error = false;
+			initialization_required = true;
+		}
 	}
 	if(ev == NULL || ev->obj == HomeLocationHandle()) {
 		HomeLocationGet(&homeLocation);
@@ -941,11 +1119,12 @@ static void settingsUpdatedCb(UAVObjEvent * ev)
 		T[0] = alt+6.378137E6f;
 		T[1] = cosf(lat)*(alt+6.378137E6f);
 		T[2] = -1.0f;
+
+		// TODO: convert positionActual to new reference frame and gracefully update EKF state!
+		// needed for long range flights where the reference coordinate is adjusted in flight
 	}
 	if (ev == NULL || ev->obj == AttitudeSettingsHandle())
 		AttitudeSettingsGet(&attitudeSettings);
-	if (ev == NULL || ev->obj == RevoSettingsHandle())
-		RevoSettingsGet(&revoSettings);
 }
 /**
  * @}

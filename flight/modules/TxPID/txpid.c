@@ -178,7 +178,7 @@ static void updatePIDs(UAVObjEvent* ev)
 						inst.ThrottleRange[TXPIDSETTINGS_THROTTLERANGE_MAX],
 						inst.MinPID[i], inst.MaxPID[i]);
 			} else if (AccessoryDesiredInstGet(inst.Inputs[i] - TXPIDSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0) {
-				value = scale(accessory.AccessoryVal, -1.0, 1.0, inst.MinPID[i], inst.MaxPID[i]);
+				value = scale(accessory.AccessoryVal, -1.0f, 1.0f, inst.MinPID[i], inst.MaxPID[i]);
 			} else {
 				continue;
 			}
@@ -302,7 +302,7 @@ static float scale(float val, float inMin, float inMax, float outMin, float outM
 
 	// normalize input value to [0..1]
 	if (inMax <= inMin)
-		val = 0.0;
+		val = 0.0f;
 	else
 		val = (val - inMin) / (inMax - inMin);
 
@@ -311,7 +311,7 @@ static float scale(float val, float inMin, float inMax, float outMin, float outM
 		float t = outMin;
 		outMin = outMax;
 		outMax = t;
-		val = 1.0 - val;
+		val = 1.0f - val;
 	}
 
 	return (outMax - outMin) * val + outMin;
@@ -323,7 +323,12 @@ static float scale(float val, float inMin, float inMax, float outMin, float outM
  */
 static uint8_t update(float *var, float val)
 {
-	if (*var != val) {
+	/* FIXME: this is not an entirely correct way
+	 * to check if the two floating point
+	 * numbers are 'not equal'.
+	 * Epsilon of 1e-9 is probably okay for the range
+	 * of numbers we see here*/
+	if (fabsf(*var - val) > 1e-9f) {
 		*var = val;
 		return 1;
 	}

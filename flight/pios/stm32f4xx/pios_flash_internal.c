@@ -166,7 +166,7 @@ static struct pios_internal_flash_dev * PIOS_Flash_Internal_alloc(void)
 
 #endif /* defined(PIOS_INCLUDE_FREERTOS) */
 
-int32_t PIOS_Flash_Internal_Init(uintptr_t * flash_id, const struct pios_flash_internal_cfg * cfg)
+int32_t PIOS_Flash_Internal_Init(uintptr_t * flash_id, __attribute__((unused)) const struct pios_flash_internal_cfg * cfg)
 {
 	struct pios_internal_flash_dev * flash_dev;
 

@@ -261,7 +261,7 @@ static void PIOS_USB_HID_RxStart(uint32_t usbhid_id, uint16_t rx_bytes_avail) {
 	}
 }
 
-static void PIOS_USB_HID_TxStart(uint32_t usbhid_id, uint16_t tx_bytes_avail)
+static void PIOS_USB_HID_TxStart(uint32_t usbhid_id, __attribute__((unused)) uint16_t tx_bytes_avail)
 {
 	struct pios_usb_hid_dev * usb_hid_dev = (struct pios_usb_hid_dev *)usbhid_id;
 
@@ -428,7 +428,7 @@ static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request 
 	return true;
 }
 
-static void PIOS_USB_HID_IF_CtrlDataOut(uint32_t usb_hid_id, struct usb_setup_request *req)
+static void PIOS_USB_HID_IF_CtrlDataOut(__attribute__((unused)) uint32_t usb_hid_id, __attribute__((unused)) struct usb_setup_request *req)
 {
 	/* HID devices don't have any OUT data stages on the control endpoint */
 	PIOS_Assert(0);
@@ -438,7 +438,7 @@ static void PIOS_USB_HID_IF_CtrlDataOut(uint32_t usb_hid_id, struct usb_setup_re
  * @brief Callback used to indicate a transmission from device INto host completed
  * Checks if any data remains, pads it into HID packet and sends.
  */
-static bool PIOS_USB_HID_EP_IN_Callback(uint32_t usb_hid_id, uint8_t epnum, uint16_t len)
+static bool PIOS_USB_HID_EP_IN_Callback(uint32_t usb_hid_id, __attribute__((unused)) uint8_t epnum, __attribute__((unused)) uint16_t len)
 {
 	struct pios_usb_hid_dev * usb_hid_dev = (struct pios_usb_hid_dev *)usb_hid_id;
 
@@ -460,7 +460,7 @@ static bool PIOS_USB_HID_EP_IN_Callback(uint32_t usb_hid_id, uint8_t epnum, uint
 /**
  * EP1 OUT Callback Routine
  */
-static bool PIOS_USB_HID_EP_OUT_Callback(uint32_t usb_hid_id, uint8_t epnum, uint16_t len)
+static bool PIOS_USB_HID_EP_OUT_Callback(uint32_t usb_hid_id, __attribute__((unused)) uint8_t epnum, uint16_t len)
 {
 	struct pios_usb_hid_dev * usb_hid_dev = (struct pios_usb_hid_dev *)usb_hid_id;
 

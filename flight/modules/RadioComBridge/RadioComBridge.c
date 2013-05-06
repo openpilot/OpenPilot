@@ -256,7 +256,7 @@ MODULE_INITCALL(RadioComBridgeInitialize, RadioComBridgeStart)
  *
  * @param[in] parameters  The task parameters
  */
-static void telemetryTxTask(void *parameters)
+static void telemetryTxTask(__attribute__((unused)) void *parameters)
 {
     UAVObjEvent ev;
 
@@ -307,7 +307,7 @@ static void telemetryTxTask(void *parameters)
  *
  * @param[in] parameters  The task parameters
  */
-static void radioTxTask(void *parameters)
+static void radioTxTask(__attribute__((unused)) void *parameters)
 {
     // Task loop
     while (1) {
@@ -335,7 +335,7 @@ static void radioTxTask(void *parameters)
  *
  * @param[in] parameters  The task parameters
  */
-static void radioRxTask(void *parameters)
+static void radioRxTask(__attribute__((unused)) void *parameters)
 {
     // Task loop
     while (1) {
@@ -364,7 +364,7 @@ static void radioRxTask(void *parameters)
  *
  * @param[in] parameters  The task parameters
  */
-static void telemetryRxTask(void *parameters)
+static void telemetryRxTask(__attribute__((unused)) void *parameters)
 {
     // Task loop
     while (1) {

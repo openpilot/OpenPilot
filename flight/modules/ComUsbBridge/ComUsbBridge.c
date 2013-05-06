@@ -126,7 +126,7 @@ MODULE_INITCALL(comUsbBridgeInitialize, comUsbBridgeStart)
  * Main task. It does not return.
  */
 
-static void com2UsbBridgeTask(void *parameters)
+static void com2UsbBridgeTask(__attribute__((unused)) void *parameters)
 {
 	/* Handle usart -> vcp direction */
 	volatile uint32_t tx_errors = 0;
@@ -136,7 +136,7 @@ static void com2UsbBridgeTask(void *parameters)
 		rx_bytes = PIOS_COM_ReceiveBuffer(usart_port, com2usb_buf, BRIDGE_BUF_LEN, 500);
 		if (rx_bytes > 0) {
 			/* Bytes available to transfer */
-			if (PIOS_COM_SendBuffer(vcp_port, com2usb_buf, rx_bytes) != rx_bytes) {
+			if (PIOS_COM_SendBuffer(vcp_port, com2usb_buf, rx_bytes) != (int32_t)rx_bytes) {
 				/* Error on transmit */
 				tx_errors++;
 			}
@@ -144,7 +144,7 @@ static void com2UsbBridgeTask(void *parameters)
 	}
 }
 
-static void usb2ComBridgeTask(void * parameters)
+static void usb2ComBridgeTask(__attribute__((unused)) void * parameters)
 {
 	/* Handle vcp -> usart direction */
 	volatile uint32_t tx_errors = 0;
@@ -154,7 +154,7 @@ static void usb2ComBridgeTask(void * parameters)
 		rx_bytes = PIOS_COM_ReceiveBuffer(vcp_port, usb2com_buf, BRIDGE_BUF_LEN, 500);
 		if (rx_bytes > 0) {
 			/* Bytes available to transfer */
-			if (PIOS_COM_SendBuffer(usart_port, usb2com_buf, rx_bytes) != rx_bytes) {
+			if (PIOS_COM_SendBuffer(usart_port, usb2com_buf, rx_bytes) != (int32_t)rx_bytes) {
 				/* Error on transmit */
 				tx_errors++;
 			}

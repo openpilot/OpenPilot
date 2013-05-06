@@ -62,7 +62,7 @@ static const struct pios_led_cfg pios_led_cfg = {
 	.num_leds = NELEMENTS(pios_leds),
 };
 
-const struct pios_led_cfg * PIOS_BOARD_HW_DEFS_GetLedCfg (uint32_t board_revision)
+const struct pios_led_cfg * PIOS_BOARD_HW_DEFS_GetLedCfg (__attribute__((unused)) uint32_t board_revision)
 {
 	return &pios_led_cfg;
 }
@@ -712,7 +712,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 					.NVIC_IRQChannelCmd = ENABLE,
 				},
 			},
-			.rx = {},
+			/*.rx = {},*/
 			.tx = {
 				.channel = DMA1_Stream7,
 				.init = {
@@ -753,7 +753,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 				.GPIO_PuPd = GPIO_PuPd_NOPULL
 			},
 		},
-		.mosi = {},
+		/*.mosi = {},*/
 		.slave_count = 1,
 	},
 	.level = {
@@ -781,7 +781,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 						.NVIC_IRQChannelCmd                = ENABLE,
 					},
 				},
-				.rx = {},
+				/*.rx = {},*/
 				.tx = {
 					.channel = DMA2_Stream5,
 					.init    = {
@@ -822,7 +822,7 @@ static const struct pios_video_cfg pios_video_cfg = {
 					.GPIO_PuPd = GPIO_PuPd_UP
 				},
 			},
-			.mosi = {},
+			/*.mosi = {},*/
 			.slave_count = 1,
 
 	},

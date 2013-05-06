@@ -24,7 +24,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "pios.h"
+#include <pios.h>
+#include <pios_math.h>
+
 #include "paths.h"
 
 #include "uavobjectmanager.h" // <--.
@@ -216,18 +218,18 @@ static void path_circle(float * start_point, float * end_point, float * cur_poin
     a_radius = atan2f(radius_north, radius_east);
 
     if (a_diff < 0) {
-        a_diff += 2 * M_PI;
+        a_diff += 2.0f * M_PI_F;
     }
     if (a_radius < 0) {
-        a_radius += 2 * M_PI;
+        a_radius += 2.0f * M_PI_F;
     }
 
-    progress = (a_diff - a_radius + M_PI) / (2 * M_PI);
+    progress = (a_diff - a_radius + M_PI_F) / (2.0f * M_PI_F);
 
     if (progress < 0) {
-        progress += 1.0;
-    } else if (progress >= 1) {
-        progress -= 1.0;
+        progress += 1.0f;
+    } else if (progress >= 1.0f) {
+        progress -= 1.0f;
     }
 
     if (clockwise) {

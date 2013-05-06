@@ -159,7 +159,7 @@ static float throttleOffset = 0;
 /**
  * Module thread, should not return.
  */
-static void vtolPathFollowerTask(void *parameters)
+static void vtolPathFollowerTask(__attribute__((unused)) void *parameters)
 {
     SystemSettingsData systemSettings;
     FlightStatusData flightStatus;
@@ -279,8 +279,8 @@ static void vtolPathFollowerTask(void *parameters)
  */
 static void updatePOIBearing()
 {
-    const float DEADBAND_HIGH = 0.10;
-    const float DEADBAND_LOW = -0.10;
+    const float DEADBAND_HIGH = 0.10f;
+    const float DEADBAND_LOW = -0.10f;
     float dT = vtolpathfollowerSettings.UpdatePeriod / 1000.0f;
 
     PathDesiredData pathDesired;
@@ -296,20 +296,20 @@ static void updatePOIBearing()
 
     float dLoc[3];
     float yaw = 0;
-    float elevation = 0;
+    /*float elevation = 0;*/
 
     dLoc[0] = positionActual.North - poi.North;
     dLoc[1] = positionActual.East - poi.East;
     dLoc[2] = positionActual.Down - poi.Down;
 
     if (dLoc[1] < 0) {
-        yaw = RAD2DEG(atan2f(dLoc[1],dLoc[0])) + 180;
+        yaw = RAD2DEG(atan2f(dLoc[1],dLoc[0])) + 180.0f;
     } else {
-        yaw = RAD2DEG(atan2f(dLoc[1],dLoc[0])) - 180;
+        yaw = RAD2DEG(atan2f(dLoc[1],dLoc[0])) - 180.0f;
     }
 
     // distance
-    float distance = sqrtf(powf(dLoc[0], 2) + powf(dLoc[1], 2));
+    float distance = sqrtf(powf(dLoc[0], 2.0f) + powf(dLoc[1], 2.0f));
 
     ManualControlCommandData manualControlData;
     ManualControlCommandGet(&manualControlData);
@@ -335,11 +335,11 @@ static void updatePOIBearing()
 
     // don't try to move any closer
     if (poiRadius >= 3.0f || changeRadius > 0) {
-        if (pathAngle != 0 || changeRadius != 0) {
+        if (fabsf(pathAngle) > 0.0f || fabsf(changeRadius) > 0.0f) {
             pathDesired.End[PATHDESIRED_END_NORTH] = poi.North + (poiRadius * cosf(DEG2RAD(pathAngle + yaw - 180.0f)));
             pathDesired.End[PATHDESIRED_END_EAST] = poi.East + (poiRadius * sinf(DEG2RAD(pathAngle + yaw - 180.0f)));
-            pathDesired.StartingVelocity = 1;
-            pathDesired.EndingVelocity = 0;
+            pathDesired.StartingVelocity = 1.0f;
+            pathDesired.EndingVelocity = 0.0f;
             pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
             PathDesiredSet(&pathDesired);
         }
@@ -347,7 +347,7 @@ static void updatePOIBearing()
     //not above
     if (distance >= 3.0f) {
         //You can feed this into camerastabilization
-        elevation = RAD2DEG(atan2f(dLoc[2],distance));
+        /*elevation = RAD2DEG(atan2f(dLoc[2],distance));*/
 
         stabDesired.Yaw = yaw + (pathAngle / 2.0f);
         stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
@@ -732,7 +732,7 @@ static float bound(float val, float min, float max)
     return val;
 }
 
-static void SettingsUpdatedCb(UAVObjEvent * ev)
+static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     VtolPathFollowerSettingsGet(&vtolpathfollowerSettings);
 }

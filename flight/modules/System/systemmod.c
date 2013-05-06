@@ -155,7 +155,7 @@ MODULE_INITCALL(SystemModInitialize, 0)
 /**
  * System task, periodically executes every SYSTEM_UPDATE_PERIOD_MS
  */
-static void systemTask(void *parameters)
+static void systemTask(__attribute__((unused))void *parameters)
 {
 	/* start the delayed callback scheduler */
 	CallbackSchedulerStart();
@@ -334,7 +334,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 /**
  * Called whenever hardware settings changed
  */
-static void hwSettingsUpdatedCb(UAVObjEvent * ev)
+static void hwSettingsUpdatedCb(__attribute__((unused))UAVObjEvent * ev)
 {
     HwSettingsData currentHwSettings;
     HwSettingsGet(&currentHwSettings);
@@ -458,12 +458,12 @@ static void updateStats()
     float temp_voltage = 3.3f * PIOS_ADC_PinGet(3) / ((1 << 12) - 1);
     const float STM32_TEMP_V25 = 0.76f; /* V */
     const float STM32_TEMP_AVG_SLOPE = 2.5f; /* mV/C */
-    stats.CPUTemp = (temp_voltage-STM32_TEMP_V25) * 1000 / STM32_TEMP_AVG_SLOPE + 25;
+    stats.CPUTemp = (temp_voltage-STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
 #else
     float temp_voltage = 3.3f * PIOS_ADC_PinGet(0) / ((1 << 12) - 1);
     const float STM32_TEMP_V25 = 1.43f; /* V */
     const float STM32_TEMP_AVG_SLOPE = 4.3f; /* mV/C */
-    stats.CPUTemp = (temp_voltage-STM32_TEMP_V25) * 1000 / STM32_TEMP_AVG_SLOPE + 25;
+    stats.CPUTemp = (temp_voltage-STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
 #endif
 #endif
     SystemStatsSet(&stats);
@@ -552,7 +552,8 @@ void vApplicationIdleHook(void)
  * Called by the RTOS when a stack overflow is detected.
  */
 #define DEBUG_STACK_OVERFLOW 0
-void vApplicationStackOverflowHook(xTaskHandle * pxTask, signed portCHAR * pcTaskName)
+void vApplicationStackOverflowHook(__attribute__((unused))xTaskHandle * pxTask,
+		__attribute__((unused))signed portCHAR * pcTaskName)
 {
     stackOverflow = true;
 #if DEBUG_STACK_OVERFLOW

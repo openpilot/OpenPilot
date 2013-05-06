@@ -88,7 +88,7 @@ int32_t PIOS_EEPROM_Save(uint8_t *data, uint32_t len)
 	// write 4 bytes at a time into program flash area (emulated EEPROM area)
 	uint8_t *p1 = data;
 	uint32_t *p3 = (uint32_t *)config.base_address;
-	for (int32_t i = 0; i < size; p3++)
+	for (uint32_t i = 0; i < size; p3++)
 	{
 		uint32_t value = 0;
 

@@ -128,7 +128,7 @@ static const TIM_TimeBaseInitTypeDef tim_4_time_base = {
 	.TIM_RepetitionCounter = 0x0000,
 };
 
-const static struct pios_tim_clock_cfg pios_tim4_cfg = {
+static const struct pios_tim_clock_cfg pios_tim4_cfg = {
 	.timer = TIM4,
 	.time_base_init = &tim_4_time_base,
 	.irq = {
@@ -469,7 +469,7 @@ PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_internal_cfg, &pios_internal_flash_driv
 
 uint16_t supv_timer=0;
 
-static void Clock(uint32_t spektrum_id) {
+static void Clock(__attribute__((unused)) uint32_t spektrum_id) {
 	/* 125hz */
 	++supv_timer;
 	if(supv_timer >= 625) {

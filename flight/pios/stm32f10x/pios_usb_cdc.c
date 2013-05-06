@@ -229,7 +229,7 @@ static void PIOS_USB_CDC_SendData(struct pios_usb_cdc_dev * usb_cdc_dev)
 #endif	/* PIOS_INCLUDE_FREERTOS */
 }
 
-static void PIOS_USB_CDC_TxStart(uint32_t usbcdc_id, uint16_t tx_bytes_avail)
+static void PIOS_USB_CDC_TxStart(uint32_t usbcdc_id, __attribute__((unused)) uint16_t tx_bytes_avail)
 {
 	struct pios_usb_cdc_dev * usb_cdc_dev = (struct pios_usb_cdc_dev *)usbcdc_id;
 

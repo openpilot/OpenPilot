@@ -93,7 +93,7 @@ static float accels_filtered[3];
 static float grot_filtered[3];
 static float yawBiasRate = 0;
 static float rollPitchBiasRate = 0.0f;
-static float gyroGain = 0.42;
+static float gyroGain = 0.42f;
 static int16_t accelbias[3];
 static float q[4] = {1,0,0,0};
 static float R[3][3];
@@ -174,7 +174,7 @@ MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
  
 int32_t accel_test;
 int32_t gyro_test;
-static void AttitudeTask(void *parameters)
+static void AttitudeTask(__attribute__((unused)) void *parameters)
 {
 	uint8_t init = 0;
 	AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
@@ -218,17 +218,17 @@ static void AttitudeTask(void *parameters)
 		
 		if((xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
 			// Use accels to initialise attitude and calculate gyro bias
-			accelKp = 1;
+			accelKp = 1.0f;
 			accelKi = 0.0f;
-			yawBiasRate = 0.01;
+			yawBiasRate = 0.01f;
 			rollPitchBiasRate = 0.01f;
 			accel_filter_enabled = false;
 			init = 0;
 		}
 		else if (zero_during_arming && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
-			accelKp = 1;
+			accelKp = 1.0f;
 			accelKi = 0.0f;
-			yawBiasRate = 0.01;
+			yawBiasRate = 0.01f;
 			rollPitchBiasRate = 0.01f;
 			accel_filter_enabled = false;
 			init = 0;
@@ -469,7 +469,7 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	portTickType thisSysTime = xTaskGetTickCount();
 	static portTickType lastSysTime = 0;
 	
-	dT = (thisSysTime == lastSysTime) ? 0.001 : (portMAX_DELAY & (thisSysTime - lastSysTime)) / portTICK_RATE_MS / 1000.0f;
+	dT = (thisSysTime == lastSysTime) ? 0.001f : (thisSysTime - lastSysTime) * portTICK_RATE_MS * 0.001f;
 	lastSysTime = thisSysTime;
 	
 	// Bad practice to assume structure order, but saves memory
@@ -547,18 +547,19 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	
 	// Renomalize
 	float qmag = sqrtf(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]);
-	q[0] = q[0] / qmag;
-	q[1] = q[1] / qmag;
-	q[2] = q[2] / qmag;
-	q[3] = q[3] / qmag;
 	
 	// If quaternion has become inappropriately short or is nan reinit.
 	// THIS SHOULD NEVER ACTUALLY HAPPEN
-	if((fabsf(qmag) < 1e-3f) || (qmag != qmag)) {
+	if((fabsf(qmag) < 1e-3f) || isnan(qmag)) {
 		q[0] = 1;
 		q[1] = 0;
 		q[2] = 0;
 		q[3] = 0;
+	} else {
+		q[0] = q[0] / qmag;
+		q[1] = q[1] / qmag;
+		q[2] = q[2] / qmag;
+		q[3] = q[3] / qmag;
 	}
 	
 	AttitudeActualData attitudeActual;
@@ -572,7 +573,7 @@ static void updateAttitude(AccelsData * accelsData, GyrosData * gyrosData)
 	AttitudeActualSet(&attitudeActual);
 }
 
-static void settingsUpdatedCb(UAVObjEvent * objEv) {
+static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent * objEv) {
 	AttitudeSettingsData attitudeSettings;
 	AttitudeSettingsGet(&attitudeSettings);
 	
@@ -583,7 +584,7 @@ static void settingsUpdatedCb(UAVObjEvent * objEv) {
 	gyroGain = attitudeSettings.GyroGain;
 
 	// Calculate accel filter alpha, in the same way as for gyro data in stabilization module.
-	const float fakeDt = 0.0025;
+	const float fakeDt = 0.0025f;
 	if (attitudeSettings.AccelTau < 0.0001f) {
 		accel_alpha = 0;   // not trusting this to resolve to 0
 		accel_filter_enabled = false;

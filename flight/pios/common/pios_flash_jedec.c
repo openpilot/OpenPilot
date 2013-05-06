@@ -303,12 +303,12 @@ static int32_t PIOS_Flash_Jedec_EndTransaction(uintptr_t flash_id)
 
 #else  /* FLASH_USE_FREERTOS_LOCKS */
 
-static int32_t PIOS_Flash_Jedec_StartTransaction(uintptr_t flash_id)
+static int32_t PIOS_Flash_Jedec_StartTransaction(__attribute__((unused)) uintptr_t flash_id)
 {
 	return 0;
 }
 
-static int32_t PIOS_Flash_Jedec_EndTransaction(uintptr_t flash_id)
+static int32_t PIOS_Flash_Jedec_EndTransaction(__attribute__((unused)) uintptr_t flash_id)
 {
 	return 0;
 }

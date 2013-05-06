@@ -818,7 +818,7 @@ static int8_t logfs_append_to_log (uint32_t obj_id, uint16_t obj_inst_id, uint8_
  * @retval -5 if filesystem is full even after garbage collection should have freed space
  * @retval -6 if writing the new object to the filesystem failed
  */
-int32_t PIOS_FLASHFS_ObjSave(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
+int32_t PIOS_FLASHFS_ObjSave(__attribute__((unused)) uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
 {
 	int8_t rc;
 
@@ -896,7 +896,7 @@ out_exit:
  * @retval -3 if object size in filesystem does not exactly match buffer size
  * @retval -4 if reading the object data from flash fails
  */
-int32_t PIOS_FLASHFS_ObjLoad(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
+int32_t PIOS_FLASHFS_ObjLoad(__attribute__((unused)) uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id, uint8_t * obj_data, uint16_t obj_size)
 {
 	int8_t rc;
 
@@ -955,7 +955,7 @@ out_exit:
  * @retval -1 if failed to start transaction
  * @retval -2 if failed to delete the object from the filesystem
  */
-int32_t PIOS_FLASHFS_ObjDelete(uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id)
+int32_t PIOS_FLASHFS_ObjDelete(__attribute__((unused)) uint32_t fs_id, uint32_t obj_id, uint16_t obj_inst_id)
 {
 	int8_t rc;
 
@@ -988,7 +988,7 @@ out_exit:
  * @retval -3 if failed to activate arena 0
  * @retval -4 if failed to mount arena 0
  */
-int32_t PIOS_FLASHFS_Format(uint32_t fs_id)
+int32_t PIOS_FLASHFS_Format(__attribute__((unused)) uint32_t fs_id)
 {
 	int32_t rc;
 

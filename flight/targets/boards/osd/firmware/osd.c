@@ -222,7 +222,7 @@ int main()
  * Runs board and module initialisation, then terminates.
  */
 void
-initTask(void *parameters)
+initTask(__attribute__((unused)) void *parameters)
 {
 	/* board driver init */
 	PIOS_Board_Init();

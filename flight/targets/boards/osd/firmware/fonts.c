@@ -31,5 +31,5 @@ struct FontEntry fonts[NUM_FONTS + 1] = {
 			FONT_UPPERCASE_ONLY },
 	{ 2, 8, 10, "font8x10", 0, 0, 0 },
 	{ 3, 12, 18, "font12x18", 0, 0, 0 },
-	{ -1 } // ends font table
+	{ -1, -1, -1, "", 0, 0, 0 } // ends font table
 };

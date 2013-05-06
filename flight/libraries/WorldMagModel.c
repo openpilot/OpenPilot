@@ -59,97 +59,97 @@
 
 // http://reviews.openpilot.org/cru/OPReview-436#c6476 :
 // first column not used but it will be optimized out by compiler
-static const float CoeffFile[91][6] = { {0, 0, 0, 0, 0, 0},
-	{1, 0, -29496.6, 0.0, 11.6, 0.0},
-	{1, 1, -1586.3, 4944.4, 16.5, -25.9},
-	{2, 0, -2396.6, 0.0, -12.1, 0.0},
-	{2, 1, 3026.1, -2707.7, -4.4, -22.5},
-	{2, 2, 1668.6, -576.1, 1.9, -11.8},
-	{3, 0, 1340.1, 0.0, 0.4, 0.0},
-	{3, 1, -2326.2, -160.2, -4.1, 7.3},
-	{3, 2, 1231.9, 251.9, -2.9, -3.9},
-	{3, 3, 634.0, -536.6, -7.7, -2.6},
-	{4, 0, 912.6, 0.0, -1.8, 0.0},
-	{4, 1, 808.9, 286.4, 2.3, 1.1},
-	{4, 2, 166.7, -211.2, -8.7, 2.7},
-	{4, 3, -357.1, 164.3, 4.6, 3.9},
-	{4, 4, 89.4, -309.1, -2.1, -0.8},
-	{5, 0, -230.9, 0.0, -1.0, 0.0},
-	{5, 1, 357.2, 44.6, 0.6, 0.4},
-	{5, 2, 200.3, 188.9, -1.8, 1.8},
-	{5, 3, -141.1, -118.2, -1.0, 1.2},
-	{5, 4, -163.0, 0.0, 0.9, 4.0},
-	{5, 5, -7.8, 100.9, 1.0, -0.6},
-	{6, 0, 72.8, 0.0, -0.2, 0.0},
-	{6, 1, 68.6, -20.8, -0.2, -0.2},
-	{6, 2, 76.0, 44.1, -0.1, -2.1},
-	{6, 3, -141.4, 61.5, 2.0, -0.4},
-	{6, 4, -22.8, -66.3, -1.7, -0.6},
-	{6, 5, 13.2, 3.1, -0.3, 0.5},
-	{6, 6, -77.9, 55.0, 1.7, 0.9},
-	{7, 0, 80.5, 0.0, 0.1, 0.0},
-	{7, 1, -75.1, -57.9, -0.1, 0.7},
-	{7, 2, -4.7, -21.1, -0.6, 0.3},
-	{7, 3, 45.3, 6.5, 1.3, -0.1},
-	{7, 4, 13.9, 24.9, 0.4, -0.1},
-	{7, 5, 10.4, 7.0, 0.3, -0.8},
-	{7, 6, 1.7, -27.7, -0.7, -0.3},
-	{7, 7, 4.9, -3.3, 0.6, 0.3},
-	{8, 0, 24.4, 0.0, -0.1, 0.0},
-	{8, 1, 8.1, 11.0, 0.1, -0.1},
-	{8, 2, -14.5, -20.0, -0.6, 0.2},
-	{8, 3, -5.6, 11.9, 0.2, 0.4},
-	{8, 4, -19.3, -17.4, -0.2, 0.4},
-	{8, 5, 11.5, 16.7, 0.3, 0.1},
-	{8, 6, 10.9, 7.0, 0.3, -0.1},
-	{8, 7, -14.1, -10.8, -0.6, 0.4},
-	{8, 8, -3.7, 1.7, 0.2, 0.3},
-	{9, 0, 5.4, 0.0, 0.0, 0.0},
-	{9, 1, 9.4, -20.5, -0.1, 0.0},
-	{9, 2, 3.4, 11.5, 0.0, -0.2},
-	{9, 3, -5.2, 12.8, 0.3, 0.0},
-	{9, 4, 3.1, -7.2, -0.4, -0.1},
-	{9, 5, -12.4, -7.4, -0.3, 0.1},
-	{9, 6, -0.7, 8.0, 0.1, 0.0},
-	{9, 7, 8.4, 2.1, -0.1, -0.2},
-	{9, 8, -8.5, -6.1, -0.4, 0.3},
-	{9, 9, -10.1, 7.0, -0.2, 0.2},
-	{10, 0, -2.0, 0.0, 0.0, 0.0},
-	{10, 1, -6.3, 2.8, 0.0, 0.1},
-	{10, 2, 0.9, -0.1, -0.1, -0.1},
-	{10, 3, -1.1, 4.7, 0.2, 0.0},
-	{10, 4, -0.2, 4.4, 0.0, -0.1},
-	{10, 5, 2.5, -7.2, -0.1, -0.1},
-	{10, 6, -0.3, -1.0, -0.2, 0.0},
-	{10, 7, 2.2, -3.9, 0.0, -0.1},
-	{10, 8, 3.1, -2.0, -0.1, -0.2},
-	{10, 9, -1.0, -2.0, -0.2, 0.0},
-	{10, 10, -2.8, -8.3, -0.2, -0.1},
-	{11, 0, 3.0, 0.0, 0.0, 0.0},
-	{11, 1, -1.5, 0.2, 0.0, 0.0},
-	{11, 2, -2.1, 1.7, 0.0, 0.1},
-	{11, 3, 1.7, -0.6, 0.1, 0.0},
-	{11, 4, -0.5, -1.8, 0.0, 0.1},
-	{11, 5, 0.5, 0.9, 0.0, 0.0},
-	{11, 6, -0.8, -0.4, 0.0, 0.1},
-	{11, 7, 0.4, -2.5, 0.0, 0.0},
-	{11, 8, 1.8, -1.3, 0.0, -0.1},
-	{11, 9, 0.1, -2.1, 0.0, -0.1},
-	{11, 10, 0.7, -1.9, -0.1, 0.0},
-	{11, 11, 3.8, -1.8, 0.0, -0.1},
-	{12, 0, -2.2, 0.0, 0.0, 0.0},
-	{12, 1, -0.2, -0.9, 0.0, 0.0},
-	{12, 2, 0.3, 0.3, 0.1, 0.0},
-	{12, 3, 1.0, 2.1, 0.1, 0.0},
-	{12, 4, -0.6, -2.5, -0.1, 0.0},
-	{12, 5, 0.9, 0.5, 0.0, 0.0},
-	{12, 6, -0.1, 0.6, 0.0, 0.1},
-	{12, 7, 0.5, 0.0, 0.0, 0.0},
-	{12, 8, -0.4, 0.1, 0.0, 0.0},
-	{12, 9, -0.4, 0.3, 0.0, 0.0},
-	{12, 10, 0.2, -0.9, 0.0, 0.0},
-	{12, 11, -0.8, -0.2, -0.1, 0.0},
-	{12, 12, 0.0, 0.9, 0.1, 0.0}
+static const float CoeffFile[91][6] = { {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+	{1.0f, 0.0f, -29496.6f, 0.0f, 11.6f, 0.0f},
+	{1.0f, 1.0f, -1586.3f, 4944.4f, 16.5f, -25.9f},
+	{2.0f, 0.0f, -2396.6f, 0.0f, -12.1f, 0.0f},
+	{2.0f, 1.0f, 3026.1f, -2707.7f, -4.4f, -22.5f},
+	{2.0f, 2.0f, 1668.6f, -576.1f, 1.9f, -11.8f},
+	{3.0f, 0.0f, 1340.1f, 0.0f, 0.4f, 0.0f},
+	{3.0f, 1.0f, -2326.2f, -160.2f, -4.1f, 7.3f},
+	{3.0f, 2.0f, 1231.9f, 251.9f, -2.9f, -3.9f},
+	{3.0f, 3.0f, 634.0f, -536.6f, -7.7f, -2.6f},
+	{4.0f, 0.0f, 912.6f, 0.0f, -1.8f, 0.0f},
+	{4.0f, 1.0f, 808.9f, 286.4f, 2.3f, 1.1f},
+	{4.0f, 2.0f, 166.7f, -211.2f, -8.7f, 2.7f},
+	{4.0f, 3.0f, -357.1f, 164.3f, 4.6f, 3.9f},
+	{4.0f, 4.0f, 89.4f, -309.1f, -2.1f, -0.8f},
+	{5.0f, 0.0f, -230.9f, 0.0f, -1.0f, 0.0f},
+	{5.0f, 1.0f, 357.2f, 44.6f, 0.6f, 0.4f},
+	{5.0f, 2.0f, 200.3f, 188.9f, -1.8f, 1.8f},
+	{5.0f, 3.0f, -141.1f, -118.2f, -1.0f, 1.2f},
+	{5.0f, 4.0f, -163.0f, 0.0f, 0.9f, 4.0f},
+	{5.0f, 5.0f, -7.8f, 100.9f, 1.0f, -0.6f},
+	{6.0f, 0.0f, 72.8f, 0.0f, -0.2f, 0.0f},
+	{6.0f, 1.0f, 68.6f, -20.8f, -0.2f, -0.2f},
+	{6.0f, 2.0f, 76.0f, 44.1f, -0.1f, -2.1f},
+	{6.0f, 3.0f, -141.4f, 61.5f, 2.0f, -0.4f},
+	{6.0f, 4.0f, -22.8f, -66.3f, -1.7f, -0.6f},
+	{6.0f, 5.0f, 13.2f, 3.1f, -0.3f, 0.5f},
+	{6.0f, 6.0f, -77.9f, 55.0f, 1.7f, 0.9f},
+	{7.0f, 0.0f, 80.5f, 0.0f, 0.1f, 0.0f},
+	{7.0f, 1.0f, -75.1f, -57.9f, -0.1f, 0.7f},
+	{7.0f, 2.0f, -4.7f, -21.1f, -0.6f, 0.3f},
+	{7.0f, 3.0f, 45.3f, 6.5f, 1.3f, -0.1f},
+	{7.0f, 4.0f, 13.9f, 24.9f, 0.4f, -0.1f},
+	{7.0f, 5.0f, 10.4f, 7.0f, 0.3f, -0.8f},
+	{7.0f, 6.0f, 1.7f, -27.7f, -0.7f, -0.3f},
+	{7.0f, 7.0f, 4.9f, -3.3f, 0.6f, 0.3f},
+	{8.0f, 0.0f, 24.4f, 0.0f, -0.1f, 0.0f},
+	{8.0f, 1.0f, 8.1f, 11.0f, 0.1f, -0.1f},
+	{8.0f, 2.0f, -14.5f, -20.0f, -0.6f, 0.2f},
+	{8.0f, 3.0f, -5.6f, 11.9f, 0.2f, 0.4f},
+	{8.0f, 4.0f, -19.3f, -17.4f, -0.2f, 0.4f},
+	{8.0f, 5.0f, 11.5f, 16.7f, 0.3f, 0.1f},
+	{8.0f, 6.0f, 10.9f, 7.0f, 0.3f, -0.1f},
+	{8.0f, 7.0f, -14.1f, -10.8f, -0.6f, 0.4f},
+	{8.0f, 8.0f, -3.7f, 1.7f, 0.2f, 0.3f},
+	{9.0f, 0.0f, 5.4f, 0.0f, 0.0f, 0.0f},
+	{9.0f, 1.0f, 9.4f, -20.5f, -0.1f, 0.0f},
+	{9.0f, 2.0f, 3.4f, 11.5f, 0.0f, -0.2f},
+	{9.0f, 3.0f, -5.2f, 12.8f, 0.3f, 0.0f},
+	{9.0f, 4.0f, 3.1f, -7.2f, -0.4f, -0.1f},
+	{9.0f, 5.0f, -12.4f, -7.4f, -0.3f, 0.1f},
+	{9.0f, 6.0f, -0.7f, 8.0f, 0.1f, 0.0f},
+	{9.0f, 7.0f, 8.4f, 2.1f, -0.1f, -0.2f},
+	{9.0f, 8.0f, -8.5f, -6.1f, -0.4f, 0.3f},
+	{9.0f, 9.0f, -10.1f, 7.0f, -0.2f, 0.2f},
+	{10.0f, 0.0f, -2.0f, 0.0f, 0.0f, 0.0f},
+	{10.0f, 1.0f, -6.3f, 2.8f, 0.0f, 0.1f},
+	{10.0f, 2.0f, 0.9f, -0.1f, -0.1f, -0.1f},
+	{10.0f, 3.0f, -1.1f, 4.7f, 0.2f, 0.0f},
+	{10.0f, 4.0f, -0.2f, 4.4f, 0.0f, -0.1f},
+	{10.0f, 5.0f, 2.5f, -7.2f, -0.1f, -0.1f},
+	{10.0f, 6.0f, -0.3f, -1.0f, -0.2f, 0.0f},
+	{10.0f, 7.0f, 2.2f, -3.9f, 0.0f, -0.1f},
+	{10.0f, 8.0f, 3.1f, -2.0f, -0.1f, -0.2f},
+	{10.0f, 9.0f, -1.0f, -2.0f, -0.2f, 0.0f},
+	{10.0f, 10.0f, -2.8f, -8.3f, -0.2f, -0.1f},
+	{11.0f, 0.0f, 3.0f, 0.0f, 0.0f, 0.0f},
+	{11.0f, 1.0f, -1.5f, 0.2f, 0.0f, 0.0f},
+	{11.0f, 2.0f, -2.1f, 1.7f, 0.0f, 0.1f},
+	{11.0f, 3.0f, 1.7f, -0.6f, 0.1f, 0.0f},
+	{11.0f, 4.0f, -0.5f, -1.8f, 0.0f, 0.1f},
+	{11.0f, 5.0f, 0.5f, 0.9f, 0.0f, 0.0f},
+	{11.0f, 6.0f, -0.8f, -0.4f, 0.0f, 0.1f},
+	{11.0f, 7.0f, 0.4f, -2.5f, 0.0f, 0.0f},
+	{11.0f, 8.0f, 1.8f, -1.3f, 0.0f, -0.1f},
+	{11.0f, 9.0f, 0.1f, -2.1f, 0.0f, -0.1f},
+	{11.0f, 10.0f, 0.7f, -1.9f, -0.1f, 0.0f},
+	{11.0f, 11.0f, 3.8f, -1.8f, 0.0f, -0.1f},
+	{12.0f, 0.0f, -2.2f, 0.0f, 0.0f, 0.0f},
+	{12.0f, 1.0f, -0.2f, -0.9f, 0.0f, 0.0f},
+	{12.0f, 2.0f, 0.3f, 0.3f, 0.1f, 0.0f},
+	{12.0f, 3.0f, 1.0f, 2.1f, 0.1f, 0.0f},
+	{12.0f, 4.0f, -0.6f, -2.5f, -0.1f, 0.0f},
+	{12.0f, 5.0f, 0.9f, 0.5f, 0.0f, 0.0f},
+	{12.0f, 6.0f, -0.1f, 0.6f, 0.0f, 0.1f},
+	{12.0f, 7.0f, 0.5f, 0.0f, 0.0f, 0.0f},
+	{12.0f, 8.0f, -0.4f, 0.1f, 0.0f, 0.0f},
+	{12.0f, 9.0f, -0.4f, 0.3f, 0.0f, 0.0f},
+	{12.0f, 10.0f, 0.2f, -0.9f, 0.0f, 0.0f},
+	{12.0f, 11.0f, -0.8f, -0.2f, -0.1f, 0.0f},
+	{12.0f, 12.0f, 0.0f, 0.9f, 0.1f, 0.0f}
 };
 
 static WMMtype_Ellipsoid        *Ellip = NULL;
@@ -175,12 +175,12 @@ int WMM_Initialize()
 	if (!MagneticModel) return -2;  // invalid pointer
 	
 	// Sets WGS-84 parameters
-	Ellip->a = 6378.137;	// semi-major axis of the ellipsoid in km
-	Ellip->b = 6356.7523142;	// semi-minor axis of the ellipsoid in km
-	Ellip->fla = 1 / 298.257223563;	// flattening
+	Ellip->a = 6378.137f;	// semi-major axis of the ellipsoid in km
+	Ellip->b = 6356.7523142f;	// semi-minor axis of the ellipsoid in km
+	Ellip->fla = 1.0f / 298.257223563f;	// flattening
 	Ellip->eps = sqrt(1 - (Ellip->b * Ellip->b) / (Ellip->a * Ellip->a));	// first eccentricity
 	Ellip->epssq = (Ellip->eps * Ellip->eps);	// first eccentricity squared
-	Ellip->re = 6371.2;	// Earth's radius in km
+	Ellip->re = 6371.2f;	// Earth's radius in km
 
 	// Sets Magnetic Model parameters
 	MagneticModel->nMax = WMM_MAX_MODEL_DEGREES;
@@ -188,15 +188,15 @@ int WMM_Initialize()
 	MagneticModel->SecularVariationUsed = 0;
 
 	// Really, Really needs to be read from a file - out of date in 2015 at latest
-	MagneticModel->EditionDate = 5.7863328170559505e-307;
-	MagneticModel->epoch = 2010.0;
+	MagneticModel->EditionDate = 0.0f; /* OP change. Originally 5.7863328170559505e-307, truncates to 0.0f */
+	MagneticModel->epoch = 2010.0f;
 	sprintf(MagneticModel->ModelName, "WMM-2010");
 
 	return 0;                       // OK
 }
 
 int WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, uint16_t Day, uint16_t Year, float B[3])
-{	
+{
     // return '0' if all appears to be OK
     // return < 0 if error
 
@@ -245,7 +245,7 @@ int WMM_GetMagVector(float Lat, float Lon, float AltEllipsoid, uint16_t Month, u
         CoordGeodetic->phi = Lat;
         CoordGeodetic->HeightAboveEllipsoid = AltEllipsoid/1000.0f; // convert to km
 
-        // Convert from geodeitic to Spherical Equations: 17-18, WMM Technical report
+        // Convert from geodetic to Spherical Equations: 17-18, WMM Technical report
         if (WMM_GeodeticToSpherical(CoordGeodetic, CoordSpherical) < 0)
             returned = -7;  // error
     }
@@ -525,9 +525,9 @@ int WMM_Summation(WMMtype_LegendreFunction * LegendreFunction,
     uint16_t m, n, index;
 	float cos_phi;
 
-	MagneticResults->Bz = 0.0;
-	MagneticResults->By = 0.0;
-	MagneticResults->Bx = 0.0;
+	MagneticResults->Bz = 0.0f;
+	MagneticResults->By = 0.0f;
+	MagneticResults->Bx = 0.0f;
 
 	for (n = 1; n <= MagneticModel->nMax; n++)
 	{
@@ -607,9 +607,9 @@ int WMM_SecVarSummation(WMMtype_LegendreFunction * LegendreFunction,
 
 	MagneticModel->SecularVariationUsed = TRUE;
 
-	MagneticResults->Bz = 0.0;
-	MagneticResults->By = 0.0;
-	MagneticResults->Bx = 0.0;
+	MagneticResults->Bz = 0.0f;
+	MagneticResults->By = 0.0f;
+	MagneticResults->Bx = 0.0f;
 
 	for (n = 1; n <= MagneticModel->nMaxSecVar; n++)
 	{
@@ -830,7 +830,11 @@ int WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
         return -1;
     }
 
-	if (fabs(x) == 1.0)
+    /*
+     * Note: OP code change to avoid floating point equality test.
+     * Was: if (fabs(x) == 1.0)
+     */
+	if (fabsf(x) - 1.0f < 1e-9f)
 	{
 	    FREE(PreSqr);
 	    FREE(f2);
@@ -840,7 +844,9 @@ int WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
 		return -2;
 	}
 
-	scalef = 1.0e-280;
+	/* OP Change: 1.0e-280 is too small to store in a float - the compiler truncates
+	 * it to 0.0f, which is bad as the code below divides by scalef. */
+	scalef = 1.0e-20f;
 
 	for (n = 0; n <= 2 * nMax + 1; ++n)
 		PreSqr[n] = sqrtf((float)(n));
@@ -863,9 +869,9 @@ int WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
 
 	/*z = sinf (geocentric latitude) */
 	z = sqrtf((1.0f - x) * (1.0f + x));
-	pm2 = 1.0;
+	pm2 = 1.0f;
 	Pcup[0] = 1.0f;
-	dPcup[0] = 0.0;
+	dPcup[0] = 0.0f;
 	if (nMax == 0)
     {
         FREE(PreSqr);
@@ -889,7 +895,7 @@ int WMM_PcupHigh(float *Pcup, float *dPcup, float x, uint16_t nMax)
 	}
 
 	pmm = PreSqr[2] * scalef;
-	rescalem = 1.0 / scalef;
+	rescalem = 1.0f / scalef;
 	kstart = 0;
 
 	for (m = 1; m <= nMax - 1; ++m)
@@ -973,8 +979,8 @@ int WMM_PcupLow(float *Pcup, float *dPcup, float x, uint16_t nMax)
         return -1;
     }
 
-	Pcup[0] = 1.0;
-	dPcup[0] = 0.0;
+	Pcup[0] = 1.0f;
+	dPcup[0] = 0.0f;
 
 	/*sinf (geocentric latitude) - sin_phi */
 	z = sqrtf((1.0f - x) * (1.0f + x));
@@ -1022,7 +1028,7 @@ int WMM_PcupLow(float *Pcup, float *dPcup, float x, uint16_t nMax)
   functions and the Schmidt quasi-normalized version. This is equivalent to
   sqrt((m==0?1:2)*(n-m)!/(n+m!))*(2n-1)!!/(n-m)!  */
 
-	schmidtQuasiNorm[0] = 1.0;
+	schmidtQuasiNorm[0] = 1.0f;
 	for (n = 1; n <= nMax; n++)
 	{
 		index = (n * (n + 1) / 2);
@@ -1084,9 +1090,9 @@ int WMM_SummationSpecial(WMMtype_SphericalHarmonicVariables *
         return -1;  // memory allocation error
 
 	PcupS[0] = 1;
-	schmidtQuasiNorm1 = 1.0;
+	schmidtQuasiNorm1 = 1.0f;
 
-	MagneticResults->By = 0.0;
+	MagneticResults->By = 0.0f;
 	sin_phi = sinf(DEG2RAD(CoordSpherical->phig));
 
 	for (n = 1; n <= MagneticModel->nMax; n++)
@@ -1150,9 +1156,9 @@ int WMM_SecVarSummationSpecial(WMMtype_SphericalHarmonicVariables *
         return -1;  // memory allocation error
 
 	PcupS[0] = 1;
-	schmidtQuasiNorm1 = 1.0;
+	schmidtQuasiNorm1 = 1.0f;
 
-	MagneticResults->By = 0.0;
+	MagneticResults->By = 0.0f;
 	sin_phi = sinf(DEG2RAD(CoordSpherical->phig));
 
 	for (n = 1; n <= MagneticModel->nMaxSecVar; n++)

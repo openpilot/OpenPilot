@@ -304,7 +304,7 @@ static void processObjEvent(UAVObjEvent * ev)
 /**
  * Telemetry transmit task, regular priority
  */
-static void telemetryTxTask(void *parameters)
+static void telemetryTxTask(__attribute__((unused)) void *parameters)
 {
 	UAVObjEvent ev;
 
@@ -322,7 +322,7 @@ static void telemetryTxTask(void *parameters)
  * Telemetry transmit task, high priority
  */
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
-static void telemetryTxPriTask(void *parameters)
+static void telemetryTxPriTask(__attribute__((unused)) void *parameters)
 {
 	UAVObjEvent ev;
 
@@ -340,7 +340,7 @@ static void telemetryTxPriTask(void *parameters)
 /**
  * Telemetry transmit task. Processes queue events and periodic updates.
  */
-static void telemetryRxTask(void *parameters)
+static void telemetryRxTask(__attribute__((unused)) void *parameters)
 {
 
 	// Task loop
@@ -437,8 +437,8 @@ static void updateTelemetryStats()
 
 	// Update stats object
 	if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
-		flightStats.RxDataRate = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0);
-		flightStats.TxDataRate = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0);
+		flightStats.RxDataRate = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+		flightStats.TxDataRate = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
 		flightStats.RxFailures += utalkStats.rxErrors;
 		flightStats.TxFailures += txErrors;
 		flightStats.TxRetries += txRetries;

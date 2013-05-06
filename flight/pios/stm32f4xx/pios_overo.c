@@ -308,7 +308,7 @@ out_fail:
 	return(-1);
 }
 
-static void PIOS_OVERO_RxStart(uint32_t overo_id, uint16_t rx_bytes_avail)
+static void PIOS_OVERO_RxStart(uint32_t overo_id, __attribute__((unused)) uint16_t rx_bytes_avail)
 {
 	struct pios_overo_dev * overo_dev = (struct pios_overo_dev *)overo_id;
 	
@@ -318,7 +318,7 @@ static void PIOS_OVERO_RxStart(uint32_t overo_id, uint16_t rx_bytes_avail)
 	// DMA RX enable (enable IRQ) ?
 }
 
-static void PIOS_OVERO_TxStart(uint32_t overo_id, uint16_t tx_bytes_avail)
+static void PIOS_OVERO_TxStart(uint32_t overo_id, __attribute__((unused)) uint16_t tx_bytes_avail)
 {
 	struct pios_overo_dev * overo_dev = (struct pios_overo_dev *)overo_id;
 	

@@ -140,7 +140,7 @@ static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 };
 #endif
 
-static void magbaroTask(void *parameters)
+static void magbaroTask(__attribute__((unused)) void *parameters)
 {
 	portTickType lastSysTime;
 	
@@ -185,7 +185,7 @@ static void magbaroTask(void *parameters)
 			alt_ds_count = 0;
 
 			// Convert from 1/10ths of degC to degC
-			data.Temperature = alt_ds_temp / (10.0 * alt_ds_size);
+			data.Temperature = alt_ds_temp / (10.0f * alt_ds_size);
 			alt_ds_temp = 0;
 
 			// Convert from Pa to kPa
@@ -193,7 +193,7 @@ static void magbaroTask(void *parameters)
 			alt_ds_pres = 0;
 
 			// Compute the current altitude (all pressures in kPa)
-			data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / (BMP085_P0 / 1000.0)), (1.0 / 5.255)));
+			data.Altitude = 44330.0f * (1.0f - powf((data.Pressure / (BMP085_P0 / 1000.0f)), (1.0f / 5.255f)));
 
 			// Update the AltitudeActual UAVObject
 			BaroAltitudeSet(&data);

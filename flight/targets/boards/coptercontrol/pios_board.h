@@ -210,7 +210,7 @@ extern uint32_t pios_com_hkosd_id;
 // Currently analog acquistion hard coded at 480 Hz
 // PCKL2 = HCLK / 16
 // ADCCLK = PCLK2 / 2
-#define PIOS_ADC_RATE		(72.0e6 / 1.0 / 8.0 / 252.0 / (PIOS_ADC_NUM_CHANNELS >> PIOS_ADC_USE_ADC2))
+#define PIOS_ADC_RATE		(72.0e6f / 1.0f / 8.0f / 252.0f / (PIOS_ADC_NUM_CHANNELS >> PIOS_ADC_USE_ADC2))
 #define PIOS_ADC_MAX_OVERSAMPLING               36
 
 //------------------------

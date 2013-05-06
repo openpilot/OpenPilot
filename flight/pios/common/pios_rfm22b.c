@@ -2017,6 +2017,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
 #endif
 #if defined(PIOS_INCLUDE_RFM22B_RCVR)
             ppm_output = true;
+	    radio_dev->ppm_fresh = true;
             for (uint8_t i = 0; i < PIOS_RFM22B_RCVR_MAX_CHANNELS; ++i) {
                 radio_dev->ppm_channel[i] = ppmp->channels[i];
             }

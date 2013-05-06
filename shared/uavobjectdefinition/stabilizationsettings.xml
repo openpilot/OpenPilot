@@ -27,7 +27,7 @@
 	<field name="DerivativeCutoff" units="Hz" type="uint8" elements="1" defaultvalue="20"/>
 	<field name="DerivativeGamma" units="" type="float" elements="1" defaultvalue="1"/>
 
-	<field name="MaxAxisLock" units="deg" type="uint8" elements="1" defaultvalue="15"/>
+	<field name="MaxAxisLock" units="deg" type="uint8" elements="1" defaultvalue="30"/>
 	<field name="MaxAxisLockRate" units="deg/s" type="uint8" elements="1" defaultvalue="2"/>
 
 	<field name="WeakLevelingKp" units="(deg/s)/deg" type="float" elements="1" defaultvalue="0.1"/>

@@ -102,7 +102,7 @@ static void PIOS_RFM22B_RCVR_Supervisor(uint32_t rcvr_id) {
     }
 
     // RTC runs at 625Hz.
-    if (++(rfm22b_dev->ppm_supv_timer) < (PIOS_RFM22B_RCVR_TIMEOUT_MS * 1000 / 625)) {
+    if (++(rfm22b_dev->ppm_supv_timer) < (PIOS_RFM22B_RCVR_TIMEOUT_MS * 625 / 1000)) {
         return;
     }
     rfm22b_dev->ppm_supv_timer = 0;

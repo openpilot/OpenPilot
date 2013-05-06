@@ -117,8 +117,6 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_LED */
 
 	OPLinkSettingsData oplinkSettings;
-#if defined(PIOS_INCLUDE_FLASH_EEPROM)
- 	PIOS_EEPROM_Init(&pios_eeprom_cfg);
 
 	/* IAP System Setup */
 	PIOS_IAP_Init();
@@ -128,7 +126,8 @@ void PIOS_Board_Init(void) {
 	   PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2) {
 		OPLinkSettingsGet(&oplinkSettings);
 		OPLinkSettingsSetDefaults(&oplinkSettings,0);
-		PIOS_EEPROM_Save((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData));
+		OPLinkSettingsSet(&oplinkSettings);
+		//PIOS_EEPROM_Save((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData));
 		for (uint32_t i = 0; i < 10; i++) {
 			PIOS_DELAY_WaitmS(100);
 			PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
@@ -137,15 +136,10 @@ void PIOS_Board_Init(void) {
 		PIOS_IAP_WriteBootCmd(1,0);
 		PIOS_IAP_WriteBootCmd(2,0);
 	}
-	/* Read the settings from flash. */
-	/* NOTE: We probably need to save/restore the objID here incase the object changed but the size doesn't */
-	if (PIOS_EEPROM_Load((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData)) == 0)
-		OPLinkSettingsSet(&oplinkSettings);
-	else
-		OPLinkSettingsGet(&oplinkSettings);
-#else
 	OPLinkSettingsGet(&oplinkSettings);
-#endif /* PIOS_INCLUDE_FLASH_EEPROM */
+//#else
+//	OPLinkSettingsGet(&oplinkSettings);
+//#endif /* PIOS_INCLUDE_FLASH_EEPROM */
 
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();

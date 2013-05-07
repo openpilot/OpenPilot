@@ -1263,10 +1263,10 @@ border-radius: 5;</string>
                     <number>10</number>
                    </property>
                    <property name="maximum">
-                    <number>500</number>
+                    <number>255</number>
                    </property>
                    <property name="value">
-                    <number>150</number>
+                    <number>115</number>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -1288,7 +1288,7 @@ border-radius: 5;</string>
                     <number>800</number>
                    </property>
                    <property name="value">
-                    <number>450</number>
+                    <number>400</number>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -1345,7 +1345,7 @@ border-radius: 5;</string>
                     <number>800</number>
                    </property>
                    <property name="value">
-                    <number>300</number>
+                    <number>400</number>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -2510,13 +2510,13 @@ border-radius: 5;</string>
                     <number>10</number>
                    </property>
                    <property name="maximum">
-                    <number>500</number>
+                    <number>255</number>
                    </property>
                    <property name="singleStep">
                     <number>1</number>
                    </property>
                    <property name="value">
-                    <number>255</number>
+                    <number>115</number>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -2547,7 +2547,7 @@ border-radius: 5;</string>
                     <number>800</number>
                    </property>
                    <property name="value">
-                    <number>450</number>
+                    <number>400</number>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -2607,7 +2607,7 @@ border-radius: 5;</string>
                     <number>800</number>
                    </property>
                    <property name="value">
-                    <number>300</number>
+                    <number>400</number>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -16581,7 +16581,7 @@ border-radius: 5;</string>
                     <number>0</number>
                    </property>
                    <property name="maximum">
-                    <double>1000000.000000000000000</double>
+                    <double>255.000000000000000</double>
                    </property>
                    <property name="singleStep">
                     <double>1.000000000000000</double>
@@ -16786,7 +16786,7 @@ border-radius: 5;</string>
                     <number>0</number>
                    </property>
                    <property name="maximum">
-                    <double>1000000.000000000000000</double>
+                    <double>255.000000000000000</double>
                    </property>
                    <property name="singleStep">
                     <double>1.000000000000000</double>
@@ -18717,7 +18717,7 @@ border-radius: 5;</string>
                     <number>0</number>
                    </property>
                    <property name="maximum">
-                    <double>1000000.000000000000000</double>
+                    <double>255.000000000000000</double>
                    </property>
                    <property name="singleStep">
                     <double>1.000000000000000</double>

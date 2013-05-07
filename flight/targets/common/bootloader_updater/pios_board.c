@@ -38,15 +38,6 @@
 void PIOS_Board_Init(void) {
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 
-	/* Enable Prefetch Buffer */
-	FLASH_PrefetchBufferCmd(FLASH_PrefetchBuffer_Enable);
-
-	/* Flash 2 wait state */
-	FLASH_SetLatency(FLASH_Latency_2);
-
-	/* Delay system */
-	PIOS_DELAY_Init();
-
 	/* LEDs */
 #if defined(PIOS_INCLUDE_LED)
 	const struct pios_led_cfg * led_cfg = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
@@ -55,5 +46,8 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_LED */
 
 	/* Initialize the PiOS library */
+#if defined(PIOS_INCLUDE_GPIO)
 	PIOS_GPIO_Init();
+#endif  /* PIOS_INCLUDE_GPIO */
+
 }

@@ -107,14 +107,8 @@ EXTRA_LIBDIRS +=
 #    EXTRA_LIBS = newlib-lpc
 EXTRA_LIBS +=
 
-# Provide (only) the bootloader with board-specific defines
-BLONLY_CDEFS += -DBOARD_TYPE=$(BOARD_TYPE)
-BLONLY_CDEFS += -DBOARD_REVISION=$(BOARD_REVISION)
-BLONLY_CDEFS += -DHW_TYPE=$(HW_TYPE)
-BLONLY_CDEFS += -DBOOTLOADER_VERSION=$(BOOTLOADER_VERSION)
-
 # Compiler flags
-CDEFS += $(BLONLY_CDEFS)
+CDEFS += 
 
 # Set linker-script name depending on selected submodel name
 ifeq ($(MCU),cortex-m3)

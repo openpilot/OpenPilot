@@ -10,6 +10,9 @@ LINKER_SCRIPTS_APP	=  $(PIOS_DEVLIB)link_stm32f4xx_fw_memory.ld \
 			   $(PIOS_DEVLIB)link_stm32f4xx_sections.ld
 LINKER_SCRIPTS_BL	=  $(PIOS_DEVLIB)link_stm32f4xx_bl_memory.ld \
 			   $(PIOS_DEVLIB)link_stm32f4xx_sections.ld
+# _compat linker script are aimed at bootloader updater to guarantee to be compatible with earlier bootloaders.
+LINKER_SCRIPTS_COMPAT	=  $(PIOS_DEVLIB)link_stm32f4xx_fw_memory.ld \
+			   $(PIOS_DEVLIB)link_stm32f4xx_sections_compat.ld
 
 # Compiler options implied by the F4xx
 CDEFS			+= -DSTM32F4XX

@@ -50,6 +50,9 @@ void PIOS_SYS_Init(void)
 	/* Setup STM32 system (RCC, clock, PLL and Flash configuration) - CMSIS Function */
 	SystemInit();
 
+	/* Init the delay system */
+	PIOS_DELAY_Init();
+
 	/* Enable GPIOA, GPIOB, GPIOC, GPIOD, GPIOE and AFIO clocks */
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE |
 			       RCC_APB2Periph_AFIO, ENABLE);

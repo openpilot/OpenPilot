@@ -161,8 +161,7 @@ int main() {
 
 		if (stopwatch > 50 * 1000 * 1000)
 			stopwatch = 0;
-		if ((stopwatch > 6 * 1000 * 1000) && (DeviceState
-				== BLidle))
+        if ((stopwatch > 6 * 1000 * 1000) && ((DeviceState == BLidle) || (DeviceState == DFUidle && !USB_connected)))
 			JumpToApp = true;
 
 		processRX();
@@ -174,7 +173,11 @@ void jump_to_app() {
 	const struct pios_board_info * bdinfo = &pios_board_info_blob;
 
 	PIOS_LED_On(PIOS_LED_HEARTBEAT);
-	if (((*(__IO uint32_t*) bdinfo->fw_base) & 0x2FFE0000) == 0x20000000) { /* Jump to user application */
+    // Look at cm3_vectors struct in startup. In a fw image the first uint32_t contains the address of the top of irqstack
+    uint32_t fwIrqStackBase = (*(__IO uint32_t*) bdinfo->fw_base) & 0xFFFE0000;
+    // Check for the two possible irqstack locations (sram or core coupled sram)
+    if ( fwIrqStackBase == 0x20000000 || fwIrqStackBase == 0x10000000) {
+        /* Jump to user application */
 		FLASH_Lock();
 		RCC_APB2PeriphResetCmd(0xffffffff, ENABLE);
 		RCC_APB1PeriphResetCmd(0xffffffff, ENABLE);

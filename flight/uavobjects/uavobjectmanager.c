@@ -34,6 +34,8 @@
 #include "openpilot.h"
 #include "pios_struct_helper.h"
 
+extern uintptr_t pios_uavo_settings_fs_id;
+
 #if (defined(__MACH__) && defined(__APPLE__))
 #include <mach-o/getsect.h>
 #endif
@@ -964,7 +966,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t ins
 			return -1;
 
 		// Fire event on success
-		if (PIOS_FLASHFS_ObjLoad(0, UAVObjGetID(obj_handle), instId, InstanceData(instEntry), UAVObjGetNumBytes(obj_handle)) == 0)
+		if (PIOS_FLASHFS_ObjLoad(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId, InstanceData(instEntry), UAVObjGetNumBytes(obj_handle)) == 0)
 			sendEvent((struct UAVOBase*)obj_handle, instId, EV_UNPACKED);
 		else
 			return -1;

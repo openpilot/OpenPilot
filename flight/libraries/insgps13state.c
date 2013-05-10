@@ -432,7 +432,7 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 	float dT1 = 1.0f / dT; // multiplication is faster than division on fpu.
 	float dTsq = dT * dT;
 
-	static float Dummy[NUMX][NUMX];
+	float Dummy[NUMX][NUMX];
 	int8_t i;
 	for (i = 0; i < NUMX; i++) { // Calculate Dummy = (P/T +F*P)
 

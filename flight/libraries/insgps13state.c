@@ -32,15 +32,13 @@
 #include "insgps.h"
 #include <math.h>
 #include <stdint.h>
+#include <pios_math.h>
 
 // constants/macros/typdefs
 #define NUMX 13			// number of states, X is the state vector
 #define NUMW 9			// number of plant noise inputs, w is disturbance noise vector
 #define NUMV 10			// number of measurements, v is the measurement noise vector
 #define NUMU 6			// number of deterministic inputs, U is the input vector
-
-#define MIN(a,b) ((a)<(b)?(a):(b))
-#define MAX(a,b) ((a)>(b)?(a):(b))
 
 // Private functions
 void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
@@ -56,14 +54,14 @@ void MeasurementEq(float X[NUMX], float Be[3], float Y[NUMV]);
 void LinearizeH(float X[NUMX], float Be[3], float H[NUMV][NUMX]);
 
 // Private variables
-float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];	// linearized system matrices
+static float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];	// linearized system matrices
 // global to init to zero and maintain zero elements
 
 // speed optimizations, describe matrix sparsity
 // derived from state equations in
 // LinearizeFG() and LinearizeH():
 //
-// usage F:        usage G:   usage H: (TODO)
+// usage F:        usage G:   usage H:
 //  0123456789abc  012345678  0123456789abc
 // 0...X.........  .........  X............
 // 1....X........  .........  .X...........
@@ -79,19 +77,19 @@ float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];	// linearized system matrices
 // b.............  .......X.
 // c.............  ........X
 
-const int8_t FrowMin[NUMX] = {  3, 4, 5, 6, 6, 6, 7, 6, 6, 6,13,13,13 };
-const int8_t FrowMax[NUMX] = {  3, 4, 5, 9, 9, 9,12,12,12,12,-1,-1,-1 };
+static const int8_t FrowMin[NUMX] = {  3, 4, 5, 6, 6, 6, 7, 6, 6, 6,13,13,13 };
+static const int8_t FrowMax[NUMX] = {  3, 4, 5, 9, 9, 9,12,12,12,12,-1,-1,-1 };
 
-const int8_t GrowMin[NUMX] = {  9, 9, 9, 3, 3, 3, 0, 0, 0, 0, 6, 7, 8 };
-const int8_t GrowMax[NUMX] = { -1,-1,-1, 5, 5, 5, 2, 2, 2, 2, 6, 7, 8 };
+static const int8_t GrowMin[NUMX] = {  9, 9, 9, 3, 3, 3, 0, 0, 0, 0, 6, 7, 8 };
+static const int8_t GrowMax[NUMX] = { -1,-1,-1, 5, 5, 5, 2, 2, 2, 2, 6, 7, 8 };
 
-const int8_t HrowMin[NUMV] = {  0, 1, 2, 3, 4, 5, 6, 6, 6, 2 };
-const int8_t HrowMax[NUMV] = {  0, 1, 2, 3, 4, 5, 9, 9, 9, 2 };
+static const int8_t HrowMin[NUMV] = {  0, 1, 2, 3, 4, 5, 6, 6, 6, 2 };
+static const int8_t HrowMax[NUMV] = {  0, 1, 2, 3, 4, 5, 9, 9, 9, 2 };
 
-float Be[3];			// local magnetic unit vector in NED frame
-float P[NUMX][NUMX], X[NUMX];	// covariance matrix and state vector
-float Q[NUMW], R[NUMV];		// input noise and measurement noise variances
-float K[NUMX][NUMV];		// feedback gain matrix
+static float Be[3];			// local magnetic unit vector in NED frame
+static float P[NUMX][NUMX], X[NUMX];	// covariance matrix and state vector
+static float Q[NUMW], R[NUMV];		// input noise and measurement noise variances
+static float K[NUMX][NUMV];		// feedback gain matrix
 
 // Global variables
 struct NavStruct Nav;
@@ -434,7 +432,7 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 	float dT1 = 1.0f / dT; // multiplication is faster than division on fpu.
 	float dTsq = dT * dT;
 
-	float Dummy[NUMX][NUMX];
+	static float Dummy[NUMX][NUMX];
 	int8_t i;
 	for (i = 0; i < NUMX; i++) { // Calculate Dummy = (P/T +F*P)
 

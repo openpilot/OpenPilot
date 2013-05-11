@@ -235,6 +235,8 @@ uint32_t pios_com_hkosd_id = 0;
 uint32_t pios_rfm22b_id = 0;
 #endif
 
+uintptr_t pios_uavo_settings_fs_id;
+
 /* 
  * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
  */
@@ -352,8 +354,7 @@ void PIOS_Board_Init(void) {
 		PIOS_DEBUG_Assert(0);
 	}
 
-	uintptr_t fs_id;
-	if (PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_m25p_cfg, &pios_jedec_flash_driver, flash_id)) {
+	if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_m25p_cfg, &pios_jedec_flash_driver, flash_id)) {
 		PIOS_DEBUG_Assert(0);
 	}
 
@@ -369,7 +370,7 @@ void PIOS_Board_Init(void) {
 	   PIOS_IAP_ReadBootCmd(1) == PIOS_IAP_CLEAR_FLASH_CMD_1 &&
 	   PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2)
 	{
-		 PIOS_FLASHFS_Format(fs_id);
+		 PIOS_FLASHFS_Format(pios_uavo_settings_fs_id);
 		 PIOS_IAP_WriteBootCmd(0,0);
 		 PIOS_IAP_WriteBootCmd(1,0);
 		 PIOS_IAP_WriteBootCmd(2,0);

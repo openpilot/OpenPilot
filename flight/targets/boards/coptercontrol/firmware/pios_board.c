@@ -75,6 +75,8 @@ uint32_t pios_com_hkosd_id;
 
 uint32_t pios_usb_rctx_id;
 
+uintptr_t pios_uavo_settings_fs_id;
+
 /**
  * Configuration for MPU6000 chip
  */
@@ -168,13 +170,12 @@ void PIOS_Board_Init(void) {
 #endif
 
 	uintptr_t flash_id;
-	uintptr_t fs_id;
 	switch(bdinfo->board_rev) {
 		case BOARD_REVISION_CC:
 			if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_flash_accel_id, 1)) {
 				PIOS_DEBUG_Assert(0);
 			}
-			if (PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_w25x_cfg, &pios_jedec_flash_driver, flash_id)) {
+			if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_w25x_cfg, &pios_jedec_flash_driver, flash_id)) {
 				PIOS_DEBUG_Assert(0);
 			}
 			break;
@@ -182,7 +183,7 @@ void PIOS_Board_Init(void) {
 			if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_flash_accel_id, 0)) {
 				PIOS_DEBUG_Assert(0);
 			}
-			if (PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_m25p_cfg, &pios_jedec_flash_driver, flash_id)) {
+			if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_m25p_cfg, &pios_jedec_flash_driver, flash_id)) {
 				PIOS_DEBUG_Assert(0);
 			}
 			break;
@@ -204,7 +205,7 @@ void PIOS_Board_Init(void) {
 	   PIOS_IAP_ReadBootCmd(1) == PIOS_IAP_CLEAR_FLASH_CMD_1 &&
 	   PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2)
 	{
-	    PIOS_FLASHFS_Format(fs_id);
+	    PIOS_FLASHFS_Format(pios_uavo_settings_fs_id);
 		 PIOS_IAP_WriteBootCmd(0,0);
 		 PIOS_IAP_WriteBootCmd(1,0);
 		 PIOS_IAP_WriteBootCmd(2,0);

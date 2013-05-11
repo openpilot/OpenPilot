@@ -265,22 +265,33 @@ int32_t PIOS_SPI_ClaimBus(uint32_t spi_id)
 /**
  * Claim the SPI bus semaphore from an ISR.  Has no timeout.
  * \param[in] spi SPI number (0 or 1)
+ * \param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
+ *                      task has is now eligible to run, else unchanged
  * \return 0 if no error
  * \return -1 if timeout before claiming semaphore
  */
-int32_t PIOS_SPI_ClaimBusISR(uint32_t spi_id)
+int32_t PIOS_SPI_ClaimBusISR(uint32_t spi_id, bool *woken)
 {
 #if defined(PIOS_INCLUDE_FREERTOS)
-	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
-	
+ 	struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
+    signed portBASE_TYPE higherPriorityTaskWoken = pdFALSE;
+
 	bool valid = PIOS_SPI_validate(spi_dev);
 	PIOS_Assert(valid)
 	
-	if (xSemaphoreTakeFromISR(spi_dev->busy, NULL) != pdTRUE){
+	if (xSemaphoreTakeFromISR(spi_dev->busy, &higherPriorityTaskWoken) != pdTRUE){
 		return -1;
 	}
-#endif
+	if (woken) {
+		*woken = *woken || (higherPriorityTaskWoken == pdTRUE);
+	}
 	return 0;
+#else
+	if (woken) {
+		*woken = false;
+	}
+	return PIOS_SPI_ClaimBus(spi_id);
+#endif
 }
 
 /**
@@ -302,7 +313,6 @@ int32_t PIOS_SPI_ReleaseBus(uint32_t spi_id)
 	PIOS_IRQ_Disable();
 	spi_dev->busy = 0;
 	PIOS_IRQ_Enable();
-	
 #endif
 	return 0;
 }
@@ -310,25 +320,30 @@ int32_t PIOS_SPI_ReleaseBus(uint32_t spi_id)
 /**
  * Release the SPI bus semaphore from ISR.  Calling the SPI functions does not require this
  * \param[in] spi SPI number (0 or 1)
+ * \param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
+ *                      task has is now eligible to run, else unchanged
  * \return 0 if no error
  */
-int32_t PIOS_SPI_ReleaseBusISR(uint32_t spi_id)
+int32_t PIOS_SPI_ReleaseBusISR(uint32_t spi_id, bool *woken)
 {
 #if defined(PIOS_INCLUDE_FREERTOS)
     struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
+	signed portBASE_TYPE higherPriorityTaskWoken = pdFALSE;
 
     bool valid = PIOS_SPI_validate(spi_dev);
     PIOS_Assert(valid)
 
-    xSemaphoreGiveFromISR(spi_dev->busy, NULL);
+    xSemaphoreGiveFromISR(spi_dev->busy, &higherPriorityTaskWoken);
+    if (woken) {
+    	*woken = *woken || (higherPriorityTaskWoken == pdTRUE);
+    }
+	return 0;
 #else
-    struct pios_spi_dev * spi_dev = (struct pios_spi_dev *)spi_id;
-    PIOS_IRQ_Disable();
-    spi_dev->busy = 0;
-    PIOS_IRQ_Enable();
-
+	if (woken) {
+		*woken = false;
+	}
+	return PIOS_SPI_ReleaseBus(spi_id);
 #endif
-    return 0;
 }
 
 

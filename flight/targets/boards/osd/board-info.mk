@@ -24,7 +24,8 @@ OPENOCD_CONFIG      := stm32f4xx.stlink.cfg
 # 6			0x0804 0000		128k	FW
 # 7 		0x0806 0000		128k	FW
 # 8 		0x0808 0000		128k	Unused
-# ..								..
+# 9			0x080A 0000		128k	Unused
+# 10		0x080C 0000		128k	Unused						..
 # 11		0x080E 0000		128k   	Unused
 
 # Note: These must match the values in link_$(BOARD)_memory.ld

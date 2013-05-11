@@ -202,8 +202,10 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 
     // Main task loop
     lastSysTime = xTaskGetTickCount();
+
+    float scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM] = {0};
+
     while (1) {
-        static float scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM] = {0};
 
         // Wait until next update
         vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD_MS / portTICK_RATE_MS);

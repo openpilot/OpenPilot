@@ -121,8 +121,8 @@ void sensordebugging(int8_t sensornum,float curvalue) {
 		if (curvalue<s.minvalue[sensornum]) s.minvalue[sensornum] = curvalue;
 		if (curvalue>s.maxvalue[sensornum]) s.maxvalue[sensornum] = curvalue;
 		if (delta>s.maxdelta[sensornum]) s.maxdelta[sensornum] = delta;
-		s.average[sensornum] += curvalue * (1.0f/(float)s.numupdates[sensornum]);
-		s.avgdeviation[sensornum] += delta * (1.0f/(float)s.numupdates[sensornum]);
+		s.average[sensornum] *= (9999.f/10000.f) + curvalue * (1.0f/10000.f);
+		s.avgdeviation[sensornum] *= (9999.f/10000.f) + delta * (1.0f/10000.f);
 	}
 }
 

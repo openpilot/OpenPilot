@@ -262,7 +262,7 @@ static void PIOS_USB_CDC_RxStart(uint32_t usbcdc_id, uint16_t rx_bytes_avail) {
 	}
 }
 
-static void PIOS_USB_CDC_TxStart(uint32_t usbcdc_id, uint16_t tx_bytes_avail)
+static void PIOS_USB_CDC_TxStart(uint32_t usbcdc_id, __attribute__((unused)) uint16_t tx_bytes_avail)
 {
 	struct pios_usb_cdc_dev * usb_cdc_dev = (struct pios_usb_cdc_dev *)usbcdc_id;
 
@@ -480,7 +480,10 @@ static struct usb_cdc_serial_state_report uart_state = {
 	.bmUartState   = htousbs(0),
 };
 	
-static bool PIOS_USB_CDC_CTRL_EP_IN_Callback(uint32_t usb_cdc_id, uint8_t epnum, uint16_t len)
+static bool PIOS_USB_CDC_CTRL_EP_IN_Callback(
+        __attribute__((unused)) uint32_t usb_cdc_id,
+        __attribute__((unused)) uint8_t epnum,
+        __attribute__((unused)) uint16_t len)
 {
 	struct pios_usb_cdc_dev * usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
 
@@ -561,7 +564,9 @@ static void PIOS_USB_CDC_DATA_IF_DeInit(uint32_t usb_cdc_id)
 	PIOS_USBHOOK_DeRegisterEpOutCallback(usb_cdc_dev->cfg->data_rx_ep);
 }
 
-static bool PIOS_USB_CDC_DATA_IF_Setup(uint32_t usb_cdc_id, struct usb_setup_request *req)
+static bool PIOS_USB_CDC_DATA_IF_Setup(
+        __attribute__((unused)) uint32_t usb_cdc_id,
+        __attribute__((unused)) struct usb_setup_request *req)
 {
 	/* There are no valid EP0 transactions for CDC DATA interfaces */
 	PIOS_Assert(0);
@@ -573,7 +578,9 @@ static bool PIOS_USB_CDC_DATA_IF_Setup(uint32_t usb_cdc_id, struct usb_setup_req
  * Called *after* the data has been written to the buffer provided in the setup stage.  The
  * setup request is passed in here again so we know *which* EP0 data out has just completed.
  */
-static void PIOS_USB_CDC_DATA_IF_CtrlDataOut(uint32_t usb_cdc_id, const struct usb_setup_request *req)
+static void PIOS_USB_CDC_DATA_IF_CtrlDataOut(
+        __attribute__((unused)) uint32_t usb_cdc_id,
+        __attribute__((unused)) const struct usb_setup_request *req)
 {
 	/* CDC DATA interfaces don't have any OUT data stages on the control endpoint */
 	PIOS_Assert(0);
@@ -583,7 +590,10 @@ static void PIOS_USB_CDC_DATA_IF_CtrlDataOut(uint32_t usb_cdc_id, const struct u
  * @brief Callback used to indicate a transmission from device INto host completed
  * Checks if any data remains, pads it into HID packet and sends.
  */
-static bool PIOS_USB_CDC_DATA_EP_IN_Callback(uint32_t usb_cdc_id, uint8_t epnum, uint16_t len)
+static bool PIOS_USB_CDC_DATA_EP_IN_Callback(
+        __attribute__((unused)) uint32_t usb_cdc_id,
+        __attribute__((unused)) uint8_t epnum,
+        __attribute__((unused)) uint16_t len)
 {
 	struct pios_usb_cdc_dev * usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
 
@@ -599,7 +609,10 @@ static bool PIOS_USB_CDC_DATA_EP_IN_Callback(uint32_t usb_cdc_id, uint8_t epnum,
 	return rc;
 }
 
-static bool PIOS_USB_CDC_DATA_EP_OUT_Callback(uint32_t usb_cdc_id, uint8_t epnum, uint16_t len)
+static bool PIOS_USB_CDC_DATA_EP_OUT_Callback(
+        __attribute__((unused)) uint32_t usb_cdc_id,
+        __attribute__((unused)) uint8_t epnum,
+        uint16_t len)
 {
 	struct pios_usb_cdc_dev * usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
 

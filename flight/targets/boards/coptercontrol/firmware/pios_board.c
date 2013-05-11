@@ -31,6 +31,7 @@
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
+#include <taskinfo.h>
 
 /*
  * Pull in the board-specific static HW definitions.
@@ -231,8 +232,10 @@ void PIOS_Board_Init(void) {
 		AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
 	}
 
-	/* Initialize the task monitor library */
-	TaskMonitorInitialize();
+	/* Initialize the task monitor */
+	if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
+		PIOS_Assert(0);
+	}
 
 	/* Initialize the delayed callback library */
 	CallbackSchedulerInitialize();

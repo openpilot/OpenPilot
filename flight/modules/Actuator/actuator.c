@@ -31,7 +31,8 @@
  */
 
 
-#include "openpilot.h"
+#include <openpilot.h>
+
 #include "accessorydesired.h"
 #include "actuator.h"
 #include "actuatorsettings.h"
@@ -43,6 +44,7 @@
 #include "mixerstatus.h"
 #include "cameradesired.h"
 #include "manualcontrolcommand.h"
+#include "taskinfo.h"
 
 // Private constants
 #define MAX_QUEUE_SIZE 2
@@ -100,7 +102,7 @@ int32_t ActuatorStart()
 {
 	// Start main task
 	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_ACTUATOR, taskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ACTUATOR, taskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_ACTUATOR);
 
 	return 0;

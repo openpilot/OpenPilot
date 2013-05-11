@@ -36,12 +36,14 @@
  *
  */
 
-#include "openpilot.h"
+#include <openpilot.h>
+
 #include "hwsettings.h"
 #include "airspeedsettings.h"
 #include "airspeedsensor.h" // object that will be updated by the module
 #include "baro_airspeed_etasv3.h"
 #include "baro_airspeed_mpxv.h"
+#include "taskinfo.h"
 
 // Private constants
 
@@ -79,7 +81,7 @@ int32_t AirspeedStart()
 		
 	// Start main task
 	xTaskCreate(airspeedTask, (signed char *)"Airspeed", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_AIRSPEED, taskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_AIRSPEED, taskHandle);
 	return 0;
 }
 

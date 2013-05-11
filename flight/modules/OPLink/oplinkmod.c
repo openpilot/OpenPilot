@@ -39,10 +39,13 @@
  */
 
 #include <openpilot.h>
+
 #include <oplinkstatus.h>
+#include <oplinksettings.h>
+#include <taskinfo.h>
+
 #include <pios_rfm22b.h>
 #include <pios_board_info.h>
-#include <oplinksettings.h>
 
 // Private constants
 #define SYSTEM_UPDATE_PERIOD_MS 1000
@@ -79,7 +82,7 @@ int32_t OPLinkModStart(void)
 	// Create oplink system task
 	xTaskCreate(systemTask, (signed char *)"OPLink", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &systemTaskHandle);
 	// Register task
-	TaskMonitorAdd(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SYSTEM, systemTaskHandle);
 
 	return 0;
 }

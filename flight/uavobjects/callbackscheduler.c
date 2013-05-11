@@ -24,7 +24,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "openpilot.h"
+#include <openpilot.h>
+
+#include <taskinfo.h>
 
 // Private constants
 #define STACK_SIZE 128
@@ -118,7 +120,7 @@ int32_t CallbackSchedulerStart()
 			&cursor->callbackSchedulerTaskHandle
 			);
 		if (TASKINFO_RUNNING_CALLBACKSCHEDULER0+t <= TASKINFO_RUNNING_CALLBACKSCHEDULER3) {
-			TaskMonitorAdd(TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t, cursor->callbackSchedulerTaskHandle);
+			PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t, cursor->callbackSchedulerTaskHandle);
 		}
 		t++;
 	}
@@ -232,7 +234,9 @@ int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigh
  * will be created.
  * \param[in] cb The callback to be invoked
  * \param[in] priority Priority of the callback compared to other callbacks scheduled by the same delayed callback scheduler task.
- * \param[in] priorityTask Task priority of the scheduler task. One scheduler task will be spawned for each distinct value specified, further callbacks created  with the same priorityTask will all be handled by the same delayed callback scheduler task and scheduled according to their individual callback priorities
+ * \param[in] priorityTask Task priority of the scheduler task. One scheduler task will be spawned for each distinct value specified,
+ *            further callbacks created  with the same priorityTask will all be handled by the same delayed callback scheduler task
+ *            and scheduled according to their individual callback priorities
  * \param[in] stacksize The stack requirements of the callback when called by the scheduler.
  * \return CallbackInfo Pointer on success, NULL if failed.
  */
@@ -260,7 +264,7 @@ DelayedCallbackInfo *DelayedCallbackCreate(
 		// allocate memory if possible
 		task = (struct DelayedCallbackTaskStruct*)pvPortMalloc(sizeof(struct DelayedCallbackTaskStruct));
 		if (!task) {
-	                xSemaphoreGiveRecursive(mutex);
+			xSemaphoreGiveRecursive(mutex);
 			return NULL;
 		}
 
@@ -279,7 +283,7 @@ DelayedCallbackInfo *DelayedCallbackCreate(
 		// create the signaling semaphore
 		vSemaphoreCreateBinary( task->signal );
 		if (!task->signal) {
-	                xSemaphoreGiveRecursive(mutex);
+			xSemaphoreGiveRecursive(mutex);
 			return NULL;
 		}
 
@@ -298,7 +302,7 @@ DelayedCallbackInfo *DelayedCallbackCreate(
 				&task->callbackSchedulerTaskHandle
 				);
 			if (TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t <= TASKINFO_RUNNING_CALLBACKSCHEDULER3) {
-				TaskMonitorAdd(TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t, task->callbackSchedulerTaskHandle);
+				PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t, task->callbackSchedulerTaskHandle);
 			}
 		}
 	}

@@ -92,9 +92,11 @@ SRC += $(PIOSCOMMON)/pios_usb_desc_hid_cdc.c
 SRC += $(PIOSCOMMON)/pios_usb_desc_hid_only.c
 SRC += $(PIOSCOMMON)/pios_usb_util.c
 
+## PIOS system code
+SRC += $(PIOSCOMMON)/pios_task_monitor.c
+
 ## Misc library functions
 SRC += $(FLIGHTLIB)/fifo_buffer.c
-SRC += $(FLIGHTLIB)/taskmonitor.c
 SRC += $(FLIGHTLIB)/sanitycheck.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(MATHLIB)/sin_lookup.c

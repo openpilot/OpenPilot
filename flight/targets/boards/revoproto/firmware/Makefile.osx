@@ -185,7 +185,6 @@ SRC += $(FLIGHTLIB)/WorldMagModel.c
 SRC += $(FLIGHTLIB)/CoordinateConversions.c
 SRC += $(FLIGHTLIB)/paths.c
 SRC += $(FLIGHTLIB)/insgps13state.c
-SRC += $(FLIGHTLIB)/taskmonitor.c
 SRC += $(MATHLIB)/pid.c
 SRC += $(MATHLIB)/sin_lookup.c
 

@@ -30,11 +30,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "openpilot.h"
+#include <openpilot.h>
+
 #include "telemetry.h"
+
 #include "flighttelemetrystats.h"
 #include "gcstelemetrystats.h"
 #include "hwsettings.h"
+#include "taskinfo.h"
 
 // Private constants
 #define MAX_QUEUE_SIZE   TELEM_QUEUE_SIZE
@@ -96,13 +99,13 @@ int32_t TelemetryStart(void)
     
 	// Start telemetry tasks
 	xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTX, telemetryTxTaskHandle);
 	xTaskCreate(telemetryRxTask, (signed char *)"TelRx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_TELEMETRYTX, telemetryTxTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
 
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
 	xTaskCreate(telemetryTxPriTask, (signed char *)"TelPriTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TXPRI, &telemetryTxPriTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_TELEMETRYTXPRI, telemetryTxPriTaskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTXPRI, telemetryTxPriTaskHandle);
 #endif
 
 	return 0;

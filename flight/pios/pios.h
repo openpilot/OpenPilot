@@ -35,6 +35,8 @@
 #define PIOS_H
 
 #include <pios_helpers.h>
+#include <pios_math.h>
+#include <pios_constants.h>
 
 #ifdef USE_SIM_POSIX
 /* SimPosix version of this file. This will probably be removed later */
@@ -77,6 +79,13 @@
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
+#endif
+
+#ifdef PIOS_INCLUDE_TASK_MONITOR
+#ifndef PIOS_INCLUDE_FREERTOS
+#error PiOS Task Monitor requires PIOS_INCLUDE_FREERTOS to be defined
+#endif
+#include <pios_task_monitor.h>
 #endif
 
 /* PIOS bootloader helper */

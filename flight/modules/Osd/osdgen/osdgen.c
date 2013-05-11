@@ -29,8 +29,11 @@
  */
 
 // ****************
-#include "openpilot.h"
+
+#include <openpilot.h>
+
 #include "osdgen.h"
+
 #include "attitudeactual.h"
 #include "gpsposition.h"
 #include "homelocation.h"
@@ -38,6 +41,7 @@
 #include "gpssatellites.h"
 #include "osdsettings.h"
 #include "baroaltitude.h"
+#include "taskinfo.h"
 #include "flightstatus.h"
 
 #include "fonts.h"
@@ -2365,7 +2369,7 @@ int32_t osdgenStart(void)
     // Start gps task
     vSemaphoreCreateBinary(osdSemaphore);
     xTaskCreate(osdgenTask, (signed char *) "OSDGEN", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &osdgenTaskHandle);
-    TaskMonitorAdd(TASKINFO_RUNNING_OSDGEN, osdgenTaskHandle);
+    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_OSDGEN, osdgenTaskHandle);
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_OSDGEN);
 #endif

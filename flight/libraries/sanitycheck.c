@@ -30,12 +30,12 @@
 #include <pios_board_info.h>
 
 // Private includes
-#include "inc/taskmonitor.h"
 #include "inc/sanitycheck.h"
 
 // UAVOs
 #include <manualcontrolsettings.h>
 #include <systemsettings.h>
+#include <taskinfo.h>
 
 /****************************
  * Current checks:
@@ -104,30 +104,28 @@ int32_t configuration_check()
                 severity = (severity == SYSTEMALARMS_ALARM_OK) ? check_stabilization_settings(3, multirotor) : severity;
                 break;
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_AUTOTUNE:
-                if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_AUTOTUNE)) {
+                if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_AUTOTUNE)) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
                 break;
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_ALTITUDEHOLD:
                 if (coptercontrol) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
-                } else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_ALTITUDEHOLD)) {
-                    // Revo supports altitude hold
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_ALTITUDEHOLD)) { // Revo supports altitude hold
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
                 break;
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_VELOCITYCONTROL:
                 if (coptercontrol) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
-                } else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
-                    // Revo supports VelocityControl
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) { // Revo supports altitude hold
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
                 break;
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POSITIONHOLD:
                 if (coptercontrol) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
-                } else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                     // Revo supports Position Hold
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
@@ -135,7 +133,7 @@ int32_t configuration_check()
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_LAND:
                 if (coptercontrol) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
-                } else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                     // Revo supports AutoLand Mode
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
@@ -143,7 +141,7 @@ int32_t configuration_check()
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_POI:
                 if (coptercontrol) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
-                } else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                     // Revo supports POI Mode
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
@@ -151,7 +149,7 @@ int32_t configuration_check()
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_PATHPLANNER:
                 if (coptercontrol) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
-                } else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                     // Revo supports PathPlanner
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
@@ -159,7 +157,7 @@ int32_t configuration_check()
             case MANUALCONTROLSETTINGS_FLIGHTMODEPOSITION_RETURNTOBASE:
                 if (coptercontrol) {
                     severity = SYSTEMALARMS_ALARM_ERROR;
-                } else if (!TaskMonitorQueryRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
+                } else if (!PIOS_TASK_MONITOR_IsRunning(TASKINFO_RUNNING_PATHFOLLOWER)) {
                     // Revo supports ReturnToBase
                     severity = SYSTEMALARMS_ALARM_ERROR;
                 }
@@ -194,8 +192,8 @@ int32_t configuration_check()
 static int32_t check_stabilization_settings(int index, bool multirotor)
 {
     // Make sure the modes have identical sizes
-    if (MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION2SETTINGS_NUMELEM
-            || MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_NUMELEM)
+    if (MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION2SETTINGS_NUMELEM ||
+        MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM != MANUALCONTROLSETTINGS_STABILIZATION3SETTINGS_NUMELEM)
         return SYSTEMALARMS_ALARM_ERROR;
 
     uint8_t modes[MANUALCONTROLSETTINGS_STABILIZATION1SETTINGS_NUMELEM];

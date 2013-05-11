@@ -29,6 +29,7 @@
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
 #include <gcsreceiver.h>
+#include <taskinfo.h>
 
 /*
  * Pull in the board-specific static HW definitions.
@@ -185,9 +186,11 @@ PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_internal_cfg, &pios_internal_flash_driv
 	/* Initialize the alarms library */
 	AlarmsInitialize();
 
-	/* Initialize the task monitor library */
-	TaskMonitorInitialize();
-	
+	/* Initialize the task monitor */
+	if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
+		PIOS_Assert(0);
+	}
+
 	/* Initialize the delayed callback library */
 	CallbackSchedulerInitialize();
 

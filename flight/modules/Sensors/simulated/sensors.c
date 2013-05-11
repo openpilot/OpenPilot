@@ -46,9 +46,9 @@
  *
  */
 
-#include "pios.h"
-#include "attitude.h"
+#include <openpilot.h>
 
+#include "attitude.h"
 #include "accels.h"
 #include "actuatordesired.h"
 #include "attitudeactual.h"
@@ -67,6 +67,7 @@
 #include "ratedesired.h"
 #include "revocalibration.h"
 #include "systemsettings.h"
+#include "taskinfo.h"
 
 #include "CoordinateConversions.h"
 
@@ -132,7 +133,7 @@ int32_t SensorsStart(void)
 {
 	// Start main task
 	xTaskCreate(SensorsTask, (signed char *)"Sensors", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &sensorsTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_SENSORS, sensorsTaskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SENSORS, sensorsTaskHandle);
 	PIOS_WDG_RegisterFlag(PIOS_WDG_SENSORS);
 
 	return 0;

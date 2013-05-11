@@ -36,12 +36,14 @@
  *
  */
 
-#include "openpilot.h"
+#include <openpilot.h>
+
 #include "altitude.h"
 #include "baroaltitude.h"	// object that will be updated by the module
 #if defined(PIOS_INCLUDE_HCSR04)
 #include "sonaraltitude.h"	// object that will be updated by the module
 #endif
+#include "taskinfo.h"
 
 // Private constants
 #define STACK_SIZE_BYTES 500
@@ -63,7 +65,7 @@ int32_t AltitudeStart()
 {	
 	// Start main task
 	xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_ALTITUDE, taskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ALTITUDE, taskHandle);
 
 	return 0;
 }

@@ -24,7 +24,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "openpilot.h"
+#include <openpilot.h>
+
+#include <taskinfo.h>
 
 // Private constants
 #if defined(PIOS_EVENTDISAPTCHER_QUEUE)
@@ -281,7 +283,7 @@ static void eventTask()
 	EventCallbackInfo evInfo;
 
 	/* Must do this in task context to ensure that TaskMonitor has already finished its init */
-	TaskMonitorAdd(TASKINFO_RUNNING_EVENTDISPATCHER, eventTaskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_EVENTDISPATCHER, eventTaskHandle);
 
 	// Initialize time
 	timeToNextUpdateMs = xTaskGetTickCount()*portTICK_RATE_MS;

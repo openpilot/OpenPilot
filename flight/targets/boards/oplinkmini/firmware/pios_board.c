@@ -30,6 +30,7 @@
 #include "inc/openpilot.h"
 #include <pios_board_info.h>
 #include <oplinksettings.h>
+#include <taskinfo.h>
 
 /*
  * Pull in the board-specific static HW definitions.
@@ -138,8 +139,10 @@ void PIOS_Board_Init(void) {
 	OPLinkSettingsGet(&oplinkSettings);
 #endif /* PIOS_INCLUDE_FLASH_EEPROM */
 
-	/* Initialize the task monitor library */
-	TaskMonitorInitialize();
+	/* Initialize the task monitor */
+	if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
+		PIOS_Assert(0);
+	}
 
 	/* Initialize the delayed callback library */
 	CallbackSchedulerInitialize();

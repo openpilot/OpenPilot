@@ -30,8 +30,10 @@
 
 // ****************
 
-#include "openpilot.h"
+#include <openpilot.h>
+
 #include "hwsettings.h"
+#include "taskinfo.h"
 
 #include <stdbool.h>
 
@@ -75,9 +77,9 @@ static int32_t comUsbBridgeStart(void)
 	if (bridge_enabled) {
 		// Start tasks
 		xTaskCreate(com2UsbBridgeTask, (signed char *)"Com2UsbBridge", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &com2UsbBridgeTaskHandle);
-		TaskMonitorAdd(TASKINFO_RUNNING_COM2USBBRIDGE, com2UsbBridgeTaskHandle);
+		PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_COM2USBBRIDGE, com2UsbBridgeTaskHandle);
 		xTaskCreate(usb2ComBridgeTask, (signed char *)"Usb2ComBridge", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &usb2ComBridgeTaskHandle);
-		TaskMonitorAdd(TASKINFO_RUNNING_USB2COMBRIDGE, usb2ComBridgeTaskHandle);
+		PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_USB2COMBRIDGE, usb2ComBridgeTaskHandle);
 		return 0;
 	}
 

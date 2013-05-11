@@ -35,7 +35,6 @@
 
 #include <stdbool.h>
 
-#define MIN(x,y) ((x) < (y) ? (x) : (y))
 
 /*
  * Filesystem state data tracked in RAM

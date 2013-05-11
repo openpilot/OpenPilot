@@ -30,8 +30,7 @@
 
 // ****************
 
-#include "openpilot.h"
-#include "GPS.h"
+#include <openpilot.h>
 
 #include "gpsposition.h"
 #include "homelocation.h"
@@ -39,10 +38,13 @@
 #include "gpssatellites.h"
 #include "gpsvelocity.h"
 #include "systemsettings.h"
-#include "WorldMagModel.h"
-#include "CoordinateConversions.h"
+#include "taskinfo.h"
 #include "hwsettings.h"
 
+#include "WorldMagModel.h"
+#include "CoordinateConversions.h"
+
+#include "GPS.h"
 #include "NMEA.h"
 #include "UBX.h"
 
@@ -107,7 +109,7 @@ int32_t GPSStart(void)
 		if (gpsPort) {
 			// Start gps task
 			xTaskCreate(gpsTask, (signed char *)"GPS", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &gpsTaskHandle);
-			TaskMonitorAdd(TASKINFO_RUNNING_GPS, gpsTaskHandle);
+			PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_GPS, gpsTaskHandle);
 			return 0;
 		}
 

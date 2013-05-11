@@ -43,8 +43,8 @@
  *
  */
 
-#include "openpilot.h"
-#include <math.h>
+#include <openpilot.h>
+
 #include "CoordinateConversions.h"
 #include "altholdsmoothed.h"
 #include "attitudeactual.h"
@@ -55,6 +55,7 @@
 #include "flightstatus.h"
 #include "stabilizationdesired.h"
 #include "accels.h"
+#include "taskinfo.h"
 
 // Private constants
 #define MAX_QUEUE_SIZE 2
@@ -80,7 +81,7 @@ int32_t AltitudeHoldStart()
 {
 	// Start main task
 	xTaskCreate(altitudeHoldTask, (signed char *)"AltitudeHold", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &altitudeHoldTaskHandle);
-	TaskMonitorAdd(TASKINFO_RUNNING_ALTITUDEHOLD, altitudeHoldTaskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ALTITUDEHOLD, altitudeHoldTaskHandle);
 
 	return 0;
 }

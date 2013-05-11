@@ -29,10 +29,15 @@
  */
 
 // ****************
-#include "openpilot.h"
+
+#include <openpilot.h>
+
 #include "osdinput.h"
+
 #include "attitudeactual.h"
+#include "taskinfo.h"
 #include "flightstatus.h"
+
 #include "fifo_buffer.h"
 
 // ****************

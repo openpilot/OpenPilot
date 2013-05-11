@@ -1,0 +1,87 @@
+<xml>
+    <object name="Sensordebugging" singleinstance="true" settings="false">
+        <description>Debug information from Sensors</description>
+	<field name="minvalue" type="float" units="1">
+		<elementnames>
+			<elementname>GyroX</elementname>
+			<elementname>GyroY</elementname>
+			<elementname>GyroZ</elementname>
+			<elementname>AccelX</elementname>
+			<elementname>AccelY</elementname>
+			<elementname>AccelZ</elementname>
+			<elementname>MagX</elementname>
+			<elementname>MagY</elementname>
+			<elementname>MagZ</elementname>
+		</elementnames>
+	</field>
+	<field name="maxvalue" type="float" units="1">
+		<elementnames>
+			<elementname>GyroX</elementname>
+			<elementname>GyroY</elementname>
+			<elementname>GyroZ</elementname>
+			<elementname>AccelX</elementname>
+			<elementname>AccelY</elementname>
+			<elementname>AccelZ</elementname>
+			<elementname>MagX</elementname>
+			<elementname>MagY</elementname>
+			<elementname>MagZ</elementname>
+		</elementnames>
+	</field>
+	<field name="numupdates" type="uint32" units="1" >
+		<elementnames>
+			<elementname>GyroX</elementname>
+			<elementname>GyroY</elementname>
+			<elementname>GyroZ</elementname>
+			<elementname>AccelX</elementname>
+			<elementname>AccelY</elementname>
+			<elementname>AccelZ</elementname>
+			<elementname>MagX</elementname>
+			<elementname>MagY</elementname>
+			<elementname>MagZ</elementname>
+		</elementnames>
+	</field>
+	<field name="average" type="float" units="1" >
+		<elementnames>
+			<elementname>GyroX</elementname>
+			<elementname>GyroY</elementname>
+			<elementname>GyroZ</elementname>
+			<elementname>AccelX</elementname>
+			<elementname>AccelY</elementname>
+			<elementname>AccelZ</elementname>
+			<elementname>MagX</elementname>
+			<elementname>MagY</elementname>
+			<elementname>MagZ</elementname>
+		</elementnames>
+	</field>
+	<field name="maxdelta" type="float" units="1" >
+		<elementnames>
+			<elementname>GyroX</elementname>
+			<elementname>GyroY</elementname>
+			<elementname>GyroZ</elementname>
+			<elementname>AccelX</elementname>
+			<elementname>AccelY</elementname>
+			<elementname>AccelZ</elementname>
+			<elementname>MagX</elementname>
+			<elementname>MagY</elementname>
+			<elementname>MagZ</elementname>
+		</elementnames>
+	</field>
+	<field name="avgdeviation" type="float" units="1" >
+		<elementnames>
+			<elementname>GyroX</elementname>
+			<elementname>GyroY</elementname>
+			<elementname>GyroZ</elementname>
+			<elementname>AccelX</elementname>
+			<elementname>AccelY</elementname>
+			<elementname>AccelZ</elementname>
+			<elementname>MagX</elementname>
+			<elementname>MagY</elementname>
+			<elementname>MagZ</elementname>
+		</elementnames>
+	</field>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

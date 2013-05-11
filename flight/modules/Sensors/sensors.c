@@ -53,6 +53,7 @@
 #include <magbias.h>
 #include <accels.h>
 #include <gyros.h>
+#include <sensordebugging.h>
 #include <gyrosbias.h>
 #include <attitudeactual.h>
 #include <attitudesettings.h>
@@ -103,6 +104,29 @@ static int8_t rotate = 0;
  */
 
 
+static SensordebuggingData s;
+void sensordebugging(int8_t sensornum,float curvalue) {
+	static float lastvalue[SENSORDEBUGGING_MINVALUE_NUMELEM]={0.0f};
+
+	float delta = fabsf( lastvalue[sensornum]-curvalue );
+	lastvalue[sensornum] = curvalue;
+	s.numupdates[sensornum]++;
+	if (s.numupdates[sensornum]==1) {
+		s.minvalue[sensornum]=curvalue;
+		s.maxvalue[sensornum]=curvalue;
+		s.average[sensornum]=curvalue;
+		s.maxdelta[sensornum] = 0.0f;
+		s.avgdeviation[sensornum] = 0.0f;
+	} else {
+		if (curvalue<s.minvalue[sensornum]) s.minvalue[sensornum] = curvalue;
+		if (curvalue>s.maxvalue[sensornum]) s.maxvalue[sensornum] = curvalue;
+		if (delta>s.maxdelta[sensornum]) s.maxdelta[sensornum] = delta;
+		s.average[sensornum] += curvalue * (1.0f/(float)s.numupdates[sensornum]);
+		s.avgdeviation[sensornum] += delta * (1.0f/(float)s.numupdates[sensornum]);
+	}
+}
+
+
 /**
  * Initialise the module.  Called before the start function
  * \returns 0 on success or -1 if initialisation failed
@@ -116,6 +140,7 @@ int32_t SensorsInitialize(void)
 	MagBiasInitialize();
 	RevoCalibrationInitialize();
 	AttitudeSettingsInitialize();
+	SensordebuggingInitialize();
 
 	rotate = 0;
 
@@ -131,6 +156,7 @@ int32_t SensorsInitialize(void)
  */
 int32_t SensorsStart(void)
 {
+	SensordebuggingGet(&s);
 	// Start main task
 	xTaskCreate(SensorsTask, (signed char *)"Sensors", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &sensorsTaskHandle);
 	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SENSORS, sensorsTaskHandle);
@@ -214,6 +240,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 	bool error = false;
 	uint32_t mag_update_time = PIOS_DELAY_GetRaw();
 	while (1) {
+		SensordebuggingSet(&s);
 		// TODO: add timeouts to the sensor reads and set an error if the fail
 		sensor_dt_us = PIOS_DELAY_DiffuS(timeval);
 		timeval = PIOS_DELAY_GetRaw();
@@ -314,7 +341,12 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 					accel_accum[0] += mpu6000_data.accel_x;
 					accel_accum[1] += mpu6000_data.accel_y;
 					accel_accum[2] += mpu6000_data.accel_z;
-
+sensordebugging(SENSORDEBUGGING_MINVALUE_GYROX,mpu6000_data.gyro_x);
+sensordebugging(SENSORDEBUGGING_MINVALUE_GYROY,mpu6000_data.gyro_y);
+sensordebugging(SENSORDEBUGGING_MINVALUE_GYROZ,mpu6000_data.gyro_z);
+sensordebugging(SENSORDEBUGGING_MINVALUE_ACCELX,mpu6000_data.accel_x);
+sensordebugging(SENSORDEBUGGING_MINVALUE_ACCELY,mpu6000_data.accel_y);
+sensordebugging(SENSORDEBUGGING_MINVALUE_ACCELZ,mpu6000_data.accel_z);
 					gyro_samples ++;
 					accel_samples ++;
 				}
@@ -392,6 +424,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 		if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
 			int16_t values[3];
 			PIOS_HMC5883_ReadMag(values);
+sensordebugging(SENSORDEBUGGING_MINVALUE_MAGX,values[0]);
+sensordebugging(SENSORDEBUGGING_MINVALUE_MAGY,values[1]);
+sensordebugging(SENSORDEBUGGING_MINVALUE_MAGZ,values[2]);
 			float mags[3] = {(float) values[1] * mag_scale[0] - mag_bias[0],
 			                (float) values[0] * mag_scale[1] - mag_bias[1],
 			                -(float) values[2] * mag_scale[2] - mag_bias[2]};

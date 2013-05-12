@@ -1116,7 +1116,6 @@ void ConfigRevoWidget::refreshWidgetsValues(UAVObject *object)
     m_ui->noiseMeasurementStart->setEnabled(true);
     m_ui->sixPointsStart->setEnabled(true);
     m_ui->accelBiasStart->setEnabled(true);
-    m_ui->startDriftCalib->setEnabled(true);
     m_ui->calibInstructions->setText(QString("Press \"Start\" above to calibrate."));
 
     m_ui->isSetCheckBox->setEnabled(false);

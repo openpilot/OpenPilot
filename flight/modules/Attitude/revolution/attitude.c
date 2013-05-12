@@ -71,6 +71,7 @@
 #include "revosettings.h"
 #include "velocityactual.h"
 #include "taskinfo.h"
+#include "filterdebugging.h"
 
 #include "CoordinateConversions.h"
 
@@ -142,6 +143,34 @@ static inline bool invalid_var(float data) {
 	return false;
 }
 
+
+static FilterdebuggingData f;
+static void filterdebugging(int8_t sensornum,float curvalue) {
+	static float lastvalue[FILTERDEBUGGING_MINVALUE_NUMELEM]={0.0f};
+
+	float delta = fabsf( lastvalue[sensornum]-curvalue );
+	lastvalue[sensornum] = curvalue;
+	f.numupdates[sensornum]++;
+	if (f.numupdates[sensornum]<5) { // don't count initialization, it works fine...
+		f.minvalue[sensornum]=curvalue;
+		f.maxvalue[sensornum]=curvalue;
+		f.average[sensornum]=curvalue;
+		f.maxdelta[sensornum] = 0.0f;
+		f.avgdeviation[sensornum] = 0.0f;
+	} else {
+		if (curvalue<f.minvalue[sensornum]) f.minvalue[sensornum] = curvalue;
+		if (curvalue>f.maxvalue[sensornum]) f.maxvalue[sensornum] = curvalue;
+		if (delta>f.maxdelta[sensornum]) f.maxdelta[sensornum] = delta;
+		f.average[sensornum] = (f.average[sensornum]*999.0f + curvalue)/1000.0f;
+		f.avgdeviation[sensornum] = (f.avgdeviation[sensornum]*999.0f + delta)/1000.0f;
+	}
+}
+
+
+
+
+
+
 /**
  * API for sensor fusion algorithms:
  * Configure(xQueueHandle gyro, xQueueHandle accel, xQueueHandle mag, xQueueHandle baro)
@@ -168,6 +197,7 @@ int32_t AttitudeInitialize(void)
 	EKFConfigurationInitialize();
 	EKFStateVarianceInitialize();
 	FlightStatusInitialize();
+	FilterdebuggingInitialize();
 	
 	// Initialize this here while we aren't setting the homelocation in GPS
 	HomeLocationInitialize();
@@ -213,6 +243,8 @@ int32_t AttitudeStart(void)
 	baroQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 	gpsQueue = xQueueCreate(1, sizeof(UAVObjEvent));
 	gpsVelQueue = xQueueCreate(1, sizeof(UAVObjEvent));
+
+	FilterdebuggingGet(&f);
 
 	// Start main task
 	xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &attitudeTaskHandle);
@@ -901,6 +933,13 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 		gyros[1] += DEG2RAD(gyrosBias.y);
 		gyros[2] += DEG2RAD(gyrosBias.z);
 	}
+filterdebugging(FILTERDEBUGGING_MINVALUE_GYROX,gyros[0]);
+filterdebugging(FILTERDEBUGGING_MINVALUE_GYROY,gyros[1]);
+filterdebugging(FILTERDEBUGGING_MINVALUE_GYROZ,gyros[2]);
+filterdebugging(FILTERDEBUGGING_MINVALUE_ACCELX,accelsData.x);
+filterdebugging(FILTERDEBUGGING_MINVALUE_ACCELY,accelsData.y);
+filterdebugging(FILTERDEBUGGING_MINVALUE_ACCELZ,accelsData.z);
+filterdebugging(FILTERDEBUGGING_MINVALUE_DT,dT);
 
 	// Advance the state estimate
 	INSStatePrediction(gyros, &accelsData.x, dT);
@@ -918,11 +957,17 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	// Advance the covariance estimate
 	INSCovariancePrediction(dT);
 
-	if(mag_updated)
+	if(mag_updated) {
 		sensors |= MAG_SENSORS;
+filterdebugging(FILTERDEBUGGING_MINVALUE_MAGX,magData.x);
+filterdebugging(FILTERDEBUGGING_MINVALUE_MAGY,magData.y);
+filterdebugging(FILTERDEBUGGING_MINVALUE_MAGZ,magData.z);
+	}
 
-	if(baro_updated)
+	if(baro_updated) {
 		sensors |= BARO_SENSOR;
+filterdebugging(FILTERDEBUGGING_MINVALUE_BARO,( baroData.Altitude + baroOffset ));
+	}
 
 	INSSetMagNorth(homeLocation.Be);
 	
@@ -1029,6 +1074,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 	INSGetP(vardata.P);
 	EKFStateVarianceSet(&vardata);
 
+	FilterdebuggingSet(&f);
 	return 0;
 }
 

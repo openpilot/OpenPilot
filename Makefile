@@ -654,6 +654,7 @@ ut_$(1)_%: $$(UT_OUT_DIR)
 	$(V1) cd $(ROOT_DIR)/flight/tests/$(1) && \
 		$$(MAKE) -r --no-print-directory \
 		BUILD_TYPE=ut \
+		BOARD_SHORT_NAME=$(1) \
 		TOPDIR=$(ROOT_DIR)/flight/tests/$(1) \
 		OUTDIR="$(UT_OUT_DIR)/$(1)" \
 		TARGET=$(1) \

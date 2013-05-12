@@ -76,7 +76,7 @@
 			<elementname>dT</elementname>
 		</elementnames>
 	</field>
-	<field name="avgdeviation" type="float" units="1" >
+<!--	<field name="avgdeviation" type="float" units="1" >
 		<elementnames>
 			<elementname>GyroX</elementname>
 			<elementname>GyroY</elementname>
@@ -90,7 +90,7 @@
 			<elementname>Baro</elementname>
 			<elementname>dT</elementname>
 		</elementnames>
-	</field>
+	</field>-->
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="500"/>

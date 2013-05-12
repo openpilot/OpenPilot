@@ -156,13 +156,13 @@ static void filterdebugging(int8_t sensornum,float curvalue) {
 		f.maxvalue[sensornum]=curvalue;
 		f.average[sensornum]=curvalue;
 		f.maxdelta[sensornum] = 0.0f;
-		f.avgdeviation[sensornum] = 0.0f;
+//		f.avgdeviation[sensornum] = 0.0f;
 	} else {
 		if (curvalue<f.minvalue[sensornum]) f.minvalue[sensornum] = curvalue;
 		if (curvalue>f.maxvalue[sensornum]) f.maxvalue[sensornum] = curvalue;
 		if (delta>f.maxdelta[sensornum]) f.maxdelta[sensornum] = delta;
 		f.average[sensornum] = (f.average[sensornum]*999.0f + curvalue)/1000.0f;
-		f.avgdeviation[sensornum] = (f.avgdeviation[sensornum]*999.0f + delta)/1000.0f;
+//		f.avgdeviation[sensornum] = (f.avgdeviation[sensornum]*999.0f + delta)/1000.0f;
 	}
 }
 

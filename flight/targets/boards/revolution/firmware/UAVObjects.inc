@@ -20,6 +20,7 @@
 # (all architectures)
 UAVOBJSRCFILENAMES =
 UAVOBJSRCFILENAMES += sensordebugging
+UAVOBJSRCFILENAMES += filterdebugging
 UAVOBJSRCFILENAMES += accessorydesired
 UAVOBJSRCFILENAMES += actuatorcommand
 UAVOBJSRCFILENAMES += actuatordesired

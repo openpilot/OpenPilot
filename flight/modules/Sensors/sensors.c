@@ -105,7 +105,7 @@ static int8_t rotate = 0;
 
 
 static SensordebuggingData s;
-void sensordebugging(int8_t sensornum,float curvalue) {
+static void sensordebugging(int8_t sensornum,float curvalue) {
 	static float lastvalue[SENSORDEBUGGING_MINVALUE_NUMELEM]={0.0f};
 
 	float delta = fabsf( lastvalue[sensornum]-curvalue );

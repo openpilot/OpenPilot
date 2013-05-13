@@ -93,13 +93,13 @@ static struct l3gd20_dev * PIOS_L3GD20_alloc(void)
  * @brief Validate the handle to the spi device
  * @returns 0 for valid device or -1 otherwise
  */
-static int32_t PIOS_L3GD20_Validate(struct l3gd20_dev * dev)
+static int32_t PIOS_L3GD20_Validate(struct l3gd20_dev *vdev)
 {
-	if (dev == NULL) 
+	if (vdev == NULL)
 		return -1;
-	if (dev->magic != PIOS_L3GD20_DEV_MAGIC)
+	if (vdev->magic != PIOS_L3GD20_DEV_MAGIC)
 		return -2;
-	if (dev->spi_id == 0)
+	if (vdev->spi_id == 0)
 		return -3;
 	return 0;
 }

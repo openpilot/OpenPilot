@@ -91,13 +91,13 @@ static struct mpu6000_dev * PIOS_MPU6000_alloc(void)
  * @brief Validate the handle to the spi device
  * @returns 0 for valid device or -1 otherwise
  */
-static int32_t PIOS_MPU6000_Validate(struct mpu6000_dev * dev)
+static int32_t PIOS_MPU6000_Validate(struct mpu6000_dev *vdev)
 {
-	if (dev == NULL) 
+	if (vdev == NULL)
 		return -1;
-	if (dev->magic != PIOS_MPU6000_DEV_MAGIC)
+	if (vdev->magic != PIOS_MPU6000_DEV_MAGIC)
 		return -2;
-	if (dev->spi_id == 0)
+	if (vdev->spi_id == 0)
 		return -3;
 	return 0;
 }

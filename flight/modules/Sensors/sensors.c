@@ -487,7 +487,7 @@ static void magOffsetEstimation(MagnetometerData *mag)
 	const float Rz = homeLocation.Be[2];
 	
 	const float rate = cal.MagBiasNullingRate;
-	float R[3][3];
+	float Rot[3][3];
 	float B_e[3];
 	float xy[2];
 	float delta[3];
@@ -496,9 +496,9 @@ static void magOffsetEstimation(MagnetometerData *mag)
 	Quaternion2R(&attitude.q1, R);
 	
 	// Rotate the mag into the NED frame
-	B_e[0] = R[0][0] * mag->x + R[1][0] * mag->y + R[2][0] * mag->z;
-	B_e[1] = R[0][1] * mag->x + R[1][1] * mag->y + R[2][1] * mag->z;
-	B_e[2] = R[0][2] * mag->x + R[1][2] * mag->y + R[2][2] * mag->z;
+	B_e[0] = Rot[0][0] * mag->x + Rot[1][0] * mag->y + Rot[2][0] * mag->z;
+	B_e[1] = Rot[0][1] * mag->x + Rot[1][1] * mag->y + Rot[2][1] * mag->z;
+	B_e[2] = Rot[0][2] * mag->x + Rot[1][2] * mag->y + Rot[2][2] * mag->z;
 	
 	float cy = cosf(DEG2RAD(attitude.Yaw));
 	float sy = sinf(DEG2RAD(attitude.Yaw));

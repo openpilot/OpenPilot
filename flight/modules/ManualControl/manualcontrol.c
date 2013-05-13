@@ -800,45 +800,45 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
     const float DEADBAND_HIGH = 0.55f;
     const float DEADBAND_LOW = 0.45f;
 
-    static portTickType lastSysTime;
+    static portTickType lastSysTimeAH;
     static bool zeroed = false;
     portTickType thisSysTime;
     float dT;
-    AltitudeHoldDesiredData altitudeHoldDesired;
-    AltitudeHoldDesiredGet(&altitudeHoldDesired);
+    AltitudeHoldDesiredData altitudeHoldDesiredData;
+    AltitudeHoldDesiredGet(&altitudeHoldDesiredData);
 
     StabilizationSettingsData stabSettings;
     StabilizationSettingsGet(&stabSettings);
 
 	thisSysTime = xTaskGetTickCount();
-	dT = ((thisSysTime == lastSysTime)? 0.001f : (thisSysTime - lastSysTime) * portTICK_RATE_MS * 0.001f);
-	lastSysTime = thisSysTime;
+	dT = ((thisSysTime == lastSysTimeAH)? 0.001f : (thisSysTime - lastSysTimeAH) * portTICK_RATE_MS * 0.001f);
+	lastSysTimeAH = thisSysTime;
 
-    altitudeHoldDesired.Roll = cmd->Roll * stabSettings.RollMax;
-    altitudeHoldDesired.Pitch = cmd->Pitch * stabSettings.PitchMax;
-    altitudeHoldDesired.Yaw = cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
+    altitudeHoldDesiredData.Roll = cmd->Roll * stabSettings.RollMax;
+    altitudeHoldDesiredData.Pitch = cmd->Pitch * stabSettings.PitchMax;
+    altitudeHoldDesiredData.Yaw = cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
 
     float currentDown;
     PositionActualDownGet(&currentDown);
     if(changed) {
         // After not being in this mode for a while init at current height
-        altitudeHoldDesired.Altitude = 0;
+        altitudeHoldDesiredData.Altitude = 0;
         zeroed = false;
     } else if (cmd->Throttle > DEADBAND_HIGH && zeroed) {
-        altitudeHoldDesired.Altitude += (cmd->Throttle - DEADBAND_HIGH) * dT;
+        altitudeHoldDesiredData.Altitude += (cmd->Throttle - DEADBAND_HIGH) * dT;
     } else if (cmd->Throttle < DEADBAND_LOW && zeroed) {
-        altitudeHoldDesired.Altitude += (cmd->Throttle - DEADBAND_LOW) * dT;
+        altitudeHoldDesiredData.Altitude += (cmd->Throttle - DEADBAND_LOW) * dT;
     } else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH) {
         // Require the stick to enter the dead band before they can move height
         zeroed = true;
     }
 
-    AltitudeHoldDesiredSet(&altitudeHoldDesired);
+    AltitudeHoldDesiredSet(&altitudeHoldDesiredData);
 }
 #else
 
 // TODO: These functions should never be accessible on CC.  Any configuration that
-// could allow them to be called sholud already throw an error to prevent this happening
+// could allow them to be called should already throw an error to prevent this happening
 // in flight
 static void updatePathDesired(__attribute__((unused)) ManualControlCommandData * cmd,
 								  __attribute__((unused)) bool changed,

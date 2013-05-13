@@ -120,6 +120,7 @@ CFLAGS += -mapcs-frame
 CFLAGS += -fomit-frame-pointer
 CFLAGS += -Wall -Wextra
 CFLAGS += -Wfloat-equal -Wunsuffixed-float-constants -Wdouble-promotion
+CFLAGS += -Wshadow
 CFLAGS += -Werror
 CFLAGS += $(patsubst %,-I%,$(EXTRAINCDIRS)) -I.
 CFLAGS += -Wa,-adhlns=$(addprefix $(OUTDIR)/, $(notdir $(addsuffix .lst, $(basename $<))))

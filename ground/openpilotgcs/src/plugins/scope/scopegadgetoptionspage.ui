@@ -176,37 +176,17 @@
              </property>
             </widget>
            </item>
-           <item row="9" column="0">
-            <widget class="QLabel" name="label_3">
+           <item row="7" column="0">
+            <widget class="QLabel" name="mathFunctionLabel">
              <property name="text">
-              <string>Color:</string>
+              <string>Math function:</string>
              </property>
             </widget>
            </item>
-           <item row="9" column="1">
-            <widget class="QPushButton" name="btnColor">
+           <item row="7" column="1">
+            <widget class="QComboBox" name="mathFunctionComboBox">
              <property name="focusPolicy">
               <enum>Qt::StrongFocus</enum>
-             </property>
-             <property name="text">
-              <string>Choose</string>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="0">
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>Y-axis scale factor:</string>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="1">
-            <widget class="QComboBox" name="cmbScale">
-             <property name="focusPolicy">
-              <enum>Qt::StrongFocus</enum>
-             </property>
-             <property name="editable">
-              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -248,17 +228,50 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="mathFunctionLabel">
+           <item row="9" column="0">
+            <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Math function:</string>
+              <string>Color:</string>
              </property>
             </widget>
            </item>
-           <item row="7" column="1">
-            <widget class="QComboBox" name="mathFunctionComboBox">
+           <item row="9" column="1">
+            <widget class="QPushButton" name="btnColor">
              <property name="focusPolicy">
               <enum>Qt::StrongFocus</enum>
+             </property>
+             <property name="text">
+              <string>Choose</string>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Y-axis scale factor:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="1">
+            <widget class="QComboBox" name="cmbScale">
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
+             <property name="editable">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="1">
+            <widget class="QCheckBox" name="drawAntialiasedCheckBox">
+             <property name="toolTip">
+              <string>Check this to have the curve drawn antialiased.</string>
+             </property>
+             <property name="text">
+              <string>Draw Antialiased</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -277,7 +290,7 @@
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>100</height>
+               <height>40</height>
               </size>
              </property>
             </spacer>
@@ -288,8 +301,7 @@
               <string>Add a new curve to the scope, or update it if the UAVObject and UAVField is the same.</string>
              </property>
              <property name="text">
-              <string>Add
-Update</string>
+              <string>Add / Update</string>
              </property>
             </widget>
            </item>
@@ -299,8 +311,7 @@ Update</string>
               <string>Remove the curve from the scope.</string>
              </property>
              <property name="text">
-              <string>Remove
-</string>
+              <string>Remove</string>
              </property>
             </widget>
            </item>
@@ -310,12 +321,12 @@ Update</string>
               <enum>Qt::Vertical</enum>
              </property>
              <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
+              <enum>QSizePolicy::Expanding</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>15</height>
+               <height>40</height>
               </size>
              </property>
             </spacer>
@@ -331,8 +342,8 @@ Update</string>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>0</width>
-               <height>200</height>
+               <width>20</width>
+               <height>40</height>
               </size>
              </property>
             </spacer>
@@ -346,6 +357,19 @@ Update</string>
               <number>100</number>
              </property>
             </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </item>

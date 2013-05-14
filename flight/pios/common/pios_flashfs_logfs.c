@@ -32,7 +32,7 @@
 #include <stdbool.h>
 #include <openpilot.h>
 #include <pios_math.h>
-
+#include <pios_wdg.h>
 #include "pios_flashfs_logfs_priv.h"
 
 /*
@@ -194,6 +194,9 @@ static int32_t logfs_erase_all_arenas()
 #ifdef PIOS_LED_HEARTBEAT
 		PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
 #endif
+#ifdef PIOS_INCLUDE_WDG
+		PIOS_WDG_Clear();
+#endif
 		if (logfs_erase_arena(arena) != 0)
 			return -1;
 	}
@@ -307,6 +310,10 @@ static int32_t logfs_find_active_arena()
 			/* This is the first active arena */
 			return arena_id;
 		}
+#ifdef PIOS_INCLUDE_WDG
+        PIOS_WDG_Clear();
+#endif
+
 	}
 
 	/* Didn't find an active arena */
@@ -584,6 +591,9 @@ static int32_t logfs_garbage_collect (void) {
 			}
 			dst_slot_id++;
 		}
+#ifdef PIOS_INCLUDE_WDG
+        PIOS_WDG_Clear();
+#endif
 	}
 
 	/* Activate the destination arena */
@@ -640,6 +650,9 @@ static int16_t logfs_object_find_next (struct slot_header * slot_hdr, uint16_t *
 			*curr_slot = slot_id;
 			return 0;
 		}
+#ifdef PIOS_INCLUDE_WDG
+        PIOS_WDG_Clear();
+#endif
 	}
 
 	/* No matching entry was found */

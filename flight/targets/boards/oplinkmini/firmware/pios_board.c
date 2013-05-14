@@ -72,6 +72,8 @@ uint32_t pios_com_radio_id = 0;
 uint8_t *pios_uart_rx_buffer;
 uint8_t *pios_uart_tx_buffer;
 
+uintptr_t pios_uavo_settings_fs_id;
+
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
@@ -84,11 +86,8 @@ void PIOS_Board_Init(void) {
 
 #ifdef PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
     uintptr_t flash_id;
-    uintptr_t fs_id;
     PIOS_Flash_Internal_Init(&flash_id, &flash_internal_cfg);
-    PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_internal_cfg, &pios_internal_flash_driver, flash_id);
-#elif !defined(PIOS_USE_SETTINGS_ON_SDCARD)
-#error No setting storage specified. (define PIOS_USE_SETTINGS_ON_SDCARD or INCLUDE_FLASH_SECTOR_SETTINGS)
+    PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_internal_cfg, &pios_internal_flash_driver, flash_id);
 #endif
 
 	/* Initialize UAVObject libraries */
@@ -137,9 +136,7 @@ void PIOS_Board_Init(void) {
 		PIOS_IAP_WriteBootCmd(2,0);
 	}
 	OPLinkSettingsGet(&oplinkSettings);
-//#else
-//	OPLinkSettingsGet(&oplinkSettings);
-//#endif /* PIOS_INCLUDE_FLASH_EEPROM */
+
 
 	/* Initialize the task monitor library */
 	TaskMonitorInitialize();

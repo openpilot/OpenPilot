@@ -64,6 +64,9 @@ private:
     bool setupFrameElevon(QString airframeType);
     bool setupFrameVtail(QString airframeType);
 
+protected:
+    void enableControls(bool enable);
+
 private slots:
     virtual void setupUI(QString airframeType);
     virtual bool throwConfigError(QString airframeType);

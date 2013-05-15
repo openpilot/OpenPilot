@@ -27,75 +27,63 @@
 
 #include "scopegadgetconfiguration.h"
 
-ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
-        IUAVGadgetConfiguration(classId, parent),
-        m_plotType((int)ChronoPlot),
-        m_dataSize(60),
-        m_refreshInterval(1000),
-        m_mathFunctionType(0)
+ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, QSettings *qSettings, QObject *parent) :
+    IUAVGadgetConfiguration(classId, parent),
+    m_plotType((int)ChronoPlot),
+    m_dataSize(60),
+    m_refreshInterval(1000),
+    m_mathFunctionType(0)
 {
     uint currentStreamVersion = 0;
     int plotCurveCount = 0;
 
 
-    //if a saved configuration exists load it
-    if(qSettings != 0) {
+    // If a saved configuration exists load it
+    if (qSettings != 0) {
         currentStreamVersion = qSettings->value("configurationStreamVersion").toUInt();
 
-        if(currentStreamVersion != m_configurationStreamVersion)
+        if (currentStreamVersion != m_configurationStreamVersion) {
             return;
+        }
 
-        m_plotType = qSettings->value("plotType").toInt();
-        m_dataSize = qSettings->value("dataSize").toInt();
+        m_plotType        = qSettings->value("plotType").toInt();
+        m_dataSize        = qSettings->value("dataSize").toInt();
         m_refreshInterval = qSettings->value("refreshInterval").toInt();
-        plotCurveCount = qSettings->value("plotCurveCount").toInt();
+        plotCurveCount    = qSettings->value("plotCurveCount").toInt();
 
-        for(int plotDatasLoadIndex = 0; plotDatasLoadIndex < plotCurveCount; plotDatasLoadIndex++)
-        {
-            QString uavObject;
-            QString uavField;
-            QRgb color;
-
+        for (int plotDatasLoadIndex = 0; plotDatasLoadIndex < plotCurveCount; plotDatasLoadIndex++) {
             qSettings->beginGroup(QString("plotCurve") + QString().number(plotDatasLoadIndex));
 
-            PlotCurveConfiguration* plotCurveConf = new PlotCurveConfiguration();
-            uavObject = qSettings->value("uavObject").toString();
-            plotCurveConf->uavObject = uavObject;
-            uavField = qSettings->value("uavField").toString();
-            plotCurveConf->uavField = uavField;
-            color = qSettings->value("color").value<QRgb>();
-            plotCurveConf->color = color;
-            plotCurveConf->yScalePower = qSettings->value("yScalePower").toInt();
+            PlotCurveConfiguration *plotCurveConf = new PlotCurveConfiguration();
+            plotCurveConf->uavObject = qSettings->value("uavObject").toString();
+            plotCurveConf->uavField = qSettings->value("uavField").toString();
+            plotCurveConf->color = qSettings->value("color").value<QRgb>();
+            plotCurveConf->yScalePower  = qSettings->value("yScalePower").toInt();
             plotCurveConf->mathFunction = qSettings->value("mathFunction").toString();
-            plotCurveConf->yMeanSamples = qSettings->value("yMeanSamples").toInt();
-
-            if (!plotCurveConf->yMeanSamples) plotCurveConf->yMeanSamples = 1; // fallback for backward compatibility with earlier versions //IS THIS STILL NECESSARY?
-
+            plotCurveConf->yMeanSamples = qSettings->value("yMeanSamples", 1).toInt();
+            plotCurveConf->yMeanSamples = qSettings->value("yMeanSamples", 1).toInt();
+            plotCurveConf->drawAntialiased = qSettings->value("drawAntialiased", true).toBool();
             plotCurveConf->yMinimum = qSettings->value("yMinimum").toDouble();
             plotCurveConf->yMaximum = qSettings->value("yMaximum").toDouble();
-
-            m_PlotCurveConfigs.append(plotCurveConf);
+            m_plotCurveConfigs.append(plotCurveConf);
 
             qSettings->endGroup();
         }
 
-        m_LoggingEnabled = qSettings->value("LoggingEnabled").toBool();
-        m_LoggingNewFileOnConnect = qSettings->value("LoggingNewFileOnConnect").toBool();
-        m_LoggingPath = qSettings->value("LoggingPath").toString();
-
+        m_loggingEnabled = qSettings->value("LoggingEnabled").toBool();
+        m_loggingNewFileOnConnect = qSettings->value("LoggingNewFileOnConnect").toBool();
+        m_loggingPath = qSettings->value("LoggingPath").toString();
     }
 }
 
 void ScopeGadgetConfiguration::clearPlotData()
 {
-    PlotCurveConfiguration* poltCurveConfig;
+    PlotCurveConfiguration *plotCurveConfig;
 
-    while(m_PlotCurveConfigs.size() > 0)
-    {
-        poltCurveConfig = m_PlotCurveConfigs.first();
-        m_PlotCurveConfigs.pop_front();
-
-        delete poltCurveConfig;
+    while (m_plotCurveConfigs.size() > 0) {
+        plotCurveConfig = m_plotCurveConfigs.first();
+        m_plotCurveConfigs.pop_front();
+        delete plotCurveConfig;
     }
 }
 
@@ -105,40 +93,38 @@ void ScopeGadgetConfiguration::clearPlotData()
  */
 IUAVGadgetConfiguration *ScopeGadgetConfiguration::clone()
 {
-    int plotCurveCount = 0;
+    int plotCurveCount     = 0;
     int plotDatasLoadIndex = 0;
 
     ScopeGadgetConfiguration *m = new ScopeGadgetConfiguration(this->classId());
-    m->setPlotType( m_plotType);
-    m->setDataSize( m_dataSize);
-    m->setMathFunctionType( m_mathFunctionType);
-    m->setRefreashInterval( m_refreshInterval);
 
-    plotCurveCount = m_PlotCurveConfigs.size();
+    m->setPlotType(m_plotType);
+    m->setDataSize(m_dataSize);
+    m->setMathFunctionType(m_mathFunctionType);
+    m->setRefreashInterval(m_refreshInterval);
 
-    for(plotDatasLoadIndex = 0; plotDatasLoadIndex < plotCurveCount; plotDatasLoadIndex++)
-    {
-        PlotCurveConfiguration* currentPlotCurveConf = m_PlotCurveConfigs.at(plotDatasLoadIndex);
+    plotCurveCount = m_plotCurveConfigs.size();
 
-        PlotCurveConfiguration* newPlotCurveConf = new PlotCurveConfiguration();
-        newPlotCurveConf->uavObject = currentPlotCurveConf->uavObject;
-        newPlotCurveConf->uavField = currentPlotCurveConf->uavField;
-        newPlotCurveConf->color = currentPlotCurveConf->color;
-        newPlotCurveConf->yScalePower = currentPlotCurveConf->yScalePower;
+    for (plotDatasLoadIndex = 0; plotDatasLoadIndex < plotCurveCount; plotDatasLoadIndex++) {
+        PlotCurveConfiguration *currentPlotCurveConf = m_plotCurveConfigs.at(plotDatasLoadIndex);
+
+        PlotCurveConfiguration *newPlotCurveConf     = new PlotCurveConfiguration();
+        newPlotCurveConf->uavObject    = currentPlotCurveConf->uavObject;
+        newPlotCurveConf->uavField     = currentPlotCurveConf->uavField;
+        newPlotCurveConf->color        = currentPlotCurveConf->color;
+        newPlotCurveConf->yScalePower  = currentPlotCurveConf->yScalePower;
         newPlotCurveConf->yMeanSamples = currentPlotCurveConf->yMeanSamples;
         newPlotCurveConf->mathFunction = currentPlotCurveConf->mathFunction;
-
-        newPlotCurveConf->yMinimum = currentPlotCurveConf->yMinimum;
-        newPlotCurveConf->yMaximum = currentPlotCurveConf->yMaximum;
+        newPlotCurveConf->drawAntialiased = currentPlotCurveConf->drawAntialiased;
+        newPlotCurveConf->yMinimum     = currentPlotCurveConf->yMinimum;
+        newPlotCurveConf->yMaximum     = currentPlotCurveConf->yMaximum;
 
         m->addPlotCurveConfig(newPlotCurveConf);
     }
 
-    m->setLoggingEnabled(m_LoggingEnabled);
-    m->setLoggingNewFileOnConnect(m_LoggingNewFileOnConnect);
-    m->setLoggingPath(m_LoggingPath);
-
-
+    m->setLoggingEnabled(m_loggingEnabled);
+    m->setLoggingNewFileOnConnect(m_loggingNewFileOnConnect);
+    m->setLoggingPath(m_loggingPath);
 
     return m;
 }
@@ -148,9 +134,9 @@ IUAVGadgetConfiguration *ScopeGadgetConfiguration::clone()
  * Saves a configuration. //REDEFINES saveConfig CHILD BEHAVIOR?
  *
  */
-void ScopeGadgetConfiguration::saveConfig(QSettings* qSettings) const {
-
-    int plotCurveCount = m_PlotCurveConfigs.size();
+void ScopeGadgetConfiguration::saveConfig(QSettings *qSettings) const
+{
+    int plotCurveCount     = m_plotCurveConfigs.size();
     int plotDatasLoadIndex = 0;
 
     qSettings->setValue("configurationStreamVersion", m_configurationStreamVersion);
@@ -159,35 +145,33 @@ void ScopeGadgetConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("refreshInterval", m_refreshInterval);
     qSettings->setValue("plotCurveCount", plotCurveCount);
 
-    for(plotDatasLoadIndex = 0; plotDatasLoadIndex < plotCurveCount; plotDatasLoadIndex++)
-    {
+    for (plotDatasLoadIndex = 0; plotDatasLoadIndex < plotCurveCount; plotDatasLoadIndex++) {
         qSettings->beginGroup(QString("plotCurve") + QString().number(plotDatasLoadIndex));
 
-        PlotCurveConfiguration* plotCurveConf = m_PlotCurveConfigs.at(plotDatasLoadIndex);
-        qSettings->setValue("uavObject",  plotCurveConf->uavObject);
-        qSettings->setValue("uavField",  plotCurveConf->uavField);
-        qSettings->setValue("color",  plotCurveConf->color);
-        qSettings->setValue("mathFunction",  plotCurveConf->mathFunction);
-        qSettings->setValue("yScalePower",  plotCurveConf->yScalePower);
-        qSettings->setValue("yMeanSamples",  plotCurveConf->yMeanSamples);
-        qSettings->setValue("yMinimum",  plotCurveConf->yMinimum);
-        qSettings->setValue("yMaximum",  plotCurveConf->yMaximum);
+        PlotCurveConfiguration *plotCurveConf = m_plotCurveConfigs.at(plotDatasLoadIndex);
+        qSettings->setValue("uavObject", plotCurveConf->uavObject);
+        qSettings->setValue("uavField", plotCurveConf->uavField);
+        qSettings->setValue("color", plotCurveConf->color);
+        qSettings->setValue("mathFunction", plotCurveConf->mathFunction);
+        qSettings->setValue("yScalePower", plotCurveConf->yScalePower);
+        qSettings->setValue("yMeanSamples", plotCurveConf->yMeanSamples);
+        qSettings->setValue("yMinimum", plotCurveConf->yMinimum);
+        qSettings->setValue("yMaximum", plotCurveConf->yMaximum);
+        qSettings->setValue("drawAntialiased", plotCurveConf->drawAntialiased);
 
         qSettings->endGroup();
     }
 
-    qSettings->setValue("LoggingEnabled",  m_LoggingEnabled);
-    qSettings->setValue("LoggingNewFileOnConnect",  m_LoggingNewFileOnConnect);
-    qSettings->setValue("LoggingPath",  m_LoggingPath);
-
-
+    qSettings->setValue("LoggingEnabled", m_loggingEnabled);
+    qSettings->setValue("LoggingNewFileOnConnect", m_loggingNewFileOnConnect);
+    qSettings->setValue("LoggingPath", m_loggingPath);
 }
 
-void ScopeGadgetConfiguration::replacePlotCurveConfig(QList<PlotCurveConfiguration*> newPlotCurveConfigs)
+void ScopeGadgetConfiguration::replacePlotCurveConfig(QList<PlotCurveConfiguration *> newPlotCurveConfigs)
 {
     clearPlotData();
 
-    m_PlotCurveConfigs.append(newPlotCurveConfigs);
+    m_plotCurveConfigs.append(newPlotCurveConfigs);
 }
 
 ScopeGadgetConfiguration::~ScopeGadgetConfiguration()

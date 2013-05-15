@@ -38,9 +38,7 @@
  **
  ****************************************************************************/
 
- import QtQuick 1.1
- import QtWebKit 1.0 
- 
+ import QtQuick 1.1 
  
  // This is a tabbed pane element. Add a nested Rectangle to add a tab.
  TabWidget {

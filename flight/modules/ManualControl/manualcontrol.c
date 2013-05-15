@@ -51,7 +51,8 @@
 #include "stabilizationdesired.h"
 #include "receiveractivity.h"
 #include "systemsettings.h"
-#include "taskinfo.h"
+#include <altitudeholdsettings.h>
+#include <taskinfo.h>
 
 #if defined(PIOS_INCLUDE_USB_RCTX)
 #include "pios_usb_rctx.h"
@@ -202,8 +203,10 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 
     // Main task loop
     lastSysTime = xTaskGetTickCount();
+
+    float scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM] = {0};
+
     while (1) {
-        float scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM];
 
         // Wait until next update
         vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD_MS / portTICK_RATE_MS);
@@ -764,9 +767,9 @@ static void updateLandDesired(__attribute__((unused)) ManualControlCommandData *
     portTickType thisSysTime;
     float dT;
 
-	thisSysTime = xTaskGetTickCount();
+    thisSysTime = xTaskGetTickCount();
 	dT = ((thisSysTime == lastSysTime)? 0.001f : (thisSysTime - lastSysTime) * portTICK_RATE_MS * 0.001f);
-	lastSysTime = thisSysTime;
+    lastSysTime = thisSysTime;
 	*/
 
     PositionActualData positionActual;
@@ -797,20 +800,29 @@ static void updateLandDesired(__attribute__((unused)) ManualControlCommandData *
  */
 static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
 {
-    const float DEADBAND_HIGH = 0.55f;
-    const float DEADBAND_LOW = 0.45f;
+    const float DEADBAND      = 0.10f;
+    const float DEADBAND_HIGH = 1.0f / 2 + DEADBAND / 2;
+    const float DEADBAND_LOW  = 1.0f / 2 - DEADBAND / 2;
+
+    // this is the max speed in m/s at the extents of throttle
+    uint8_t throttleRate;
+    uint8_t throttleExp;
 
     static portTickType lastSysTimeAH;
     static bool zeroed = false;
     portTickType thisSysTime;
     float dT;
+
     AltitudeHoldDesiredData altitudeHoldDesiredData;
     AltitudeHoldDesiredGet(&altitudeHoldDesiredData);
+
+    AltitudeHoldSettingsThrottleExpGet(&throttleExp);
+    AltitudeHoldSettingsThrottleRateGet(&throttleRate);
 
     StabilizationSettingsData stabSettings;
     StabilizationSettingsGet(&stabSettings);
 
-	thisSysTime = xTaskGetTickCount();
+    thisSysTime = xTaskGetTickCount();
 	dT = ((thisSysTime == lastSysTimeAH)? 0.001f : (thisSysTime - lastSysTimeAH) * portTICK_RATE_MS * 0.001f);
 	lastSysTimeAH = thisSysTime;
 
@@ -825,9 +837,11 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
         altitudeHoldDesiredData.Altitude = 0;
         zeroed = false;
     } else if (cmd->Throttle > DEADBAND_HIGH && zeroed) {
-        altitudeHoldDesiredData.Altitude += (cmd->Throttle - DEADBAND_HIGH) * dT;
+        // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
+        // then apply an "exp" f(x,k) = (k∙x∙x∙x + x∙(256−k)) / 256
+        altitudeHoldDesiredData.Altitude += (throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
     } else if (cmd->Throttle < DEADBAND_LOW && zeroed) {
-        altitudeHoldDesiredData.Altitude += (cmd->Throttle - DEADBAND_LOW) * dT;
+        altitudeHoldDesiredData.Altitude -=  (throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
     } else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH) {
         // Require the stick to enter the dead band before they can move height
         zeroed = true;
@@ -892,7 +906,7 @@ static float scaleChannel(int16_t value, int16_t max, int16_t min, int16_t neutr
 }
 
 static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time) {
-	return (end_time - start_time) * portTICK_RATE_MS;
+   return (end_time - start_time) * portTICK_RATE_MS;
 }
 
 /**
@@ -903,6 +917,7 @@ static bool okToArm(void)
 {
     // read alarms
     SystemAlarmsData alarms;
+
     SystemAlarmsGet(&alarms);
 
     // Check each alarm
@@ -911,11 +926,23 @@ static bool okToArm(void)
             if (i == SYSTEMALARMS_ALARM_GPS || i == SYSTEMALARMS_ALARM_TELEMETRY) {
                 continue;
 			}
+
             return false;
         }
     }
 
+	uint8_t flightMode;
+	FlightStatusFlightModeGet(&flightMode);
+	switch(flightMode) {
+	    case FLIGHTSTATUS_FLIGHTMODE_MANUAL:
+	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED1:
+	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED2:
+	    case FLIGHTSTATUS_FLIGHTMODE_STABILIZED3:
     return true;
+	    default:
+	        return false;
+
+	}
 }
 /**
  * @brief Determine if the aircraft is forced to disarm by an explicit alarm

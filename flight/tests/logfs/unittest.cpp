@@ -87,7 +87,6 @@ protected:
 TEST_F(LogfsTestRaw, FlashInit) {
   uintptr_t flash_id;
   EXPECT_EQ(0, PIOS_Flash_UT_Init(&flash_id, &flash_config));
-
   PIOS_Flash_UT_Destroy(flash_id);
 }
 
@@ -97,10 +96,11 @@ TEST_F(LogfsTestRaw, LogfsInit) {
 
   uintptr_t fs_id;
   EXPECT_EQ(0, PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_config_partition_a, &pios_ut_flash_driver, flash_id));
-
   PIOS_FLASHFS_Logfs_Destroy(fs_id);
   PIOS_Flash_UT_Destroy(flash_id);
 }
+
+
 
 class LogfsTestCooked : public LogfsTestRaw {
 protected:
@@ -109,7 +109,6 @@ protected:
     LogfsTestRaw::SetUp();
 
     /* Init the flash and the flashfs so we don't need to repeat this in every test */
-    uintptr_t flash_id;
     EXPECT_EQ(0, PIOS_Flash_UT_Init(&flash_id, &flash_config));
     EXPECT_EQ(0, PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_config_partition_a, &pios_ut_flash_driver, flash_id));
   }

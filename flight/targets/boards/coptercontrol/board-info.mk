@@ -19,3 +19,5 @@ FW_BANK_BASE        := 0x08003000  # Start of firmware flash
 FW_BANK_SIZE        := 0x0001D000  # Should include FW_DESC_SIZE
 
 FW_DESC_SIZE        := 0x00000064
+
+OSCILLATOR_FREQ     :=   8000000

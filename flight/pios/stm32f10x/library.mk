@@ -12,6 +12,7 @@ LINKER_SCRIPTS_PATH	=  $(PIOS_DEVLIB)
 CDEFS			+= -DSTM32F10X -DSTM32F10X_$(MODEL)
 CDEFS 			+= -DUSE_STDPERIPH_DRIVER
 CDEFS			+= -DARM_MATH_CM3
+CDEFS			+= -DHSE_VALUE=$(OSCILLATOR_FREQ)
 ARCHFLAGS		+= -mcpu=cortex-m3 --specs=nano.specs
 
 # Board-specific startup files
@@ -24,7 +25,6 @@ SRC			+= $(sort $(wildcard $(PIOS_DEVLIB)*.c))
 include $(PIOS)/common/libraries/CMSIS2/library.mk
 CMSIS_DIR		= $(PIOS_DEVLIB)libraries/CMSIS/Core/CM3
 SRC			+= $(CMSIS_DIR)/core_cm3.c
-SRC			+= $(CMSIS_DIR)/system_stm32f10x.c
 EXTRAINCDIRS		+= $(CMSIS_DIR)
 
 # ST Peripheral library

@@ -184,8 +184,8 @@ static int32_t connectObj(UAVObjHandle obj_handle, xQueueHandle queue,
 static int32_t disconnectObj(UAVObjHandle obj_handle, xQueueHandle queue,
 			UAVObjEventCallback cb);
 
-#if defined(PIOS_USE_SETTINGS_ON_SDCARD) && defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
-#error Both PIOS_USE_SETTINGS_ON_SDCARD and PIOS_INCLUDE_FLASH_SECTOR_SETTINGS. Only one settings storage allowed.
+#if defined(PIOS_USE_SETTINGS_ON_SDCARD) && defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
+#error Both PIOS_USE_SETTINGS_ON_SDCARD and PIOS_INCLUDE_FLASH_LOGFS_SETTINGS. Only one settings storage allowed.
 #endif
 
 #if defined(PIOS_USE_SETTINGS_ON_SDCARD)
@@ -794,7 +794,7 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t ins
 {
 	PIOS_Assert(obj_handle);
 
-#if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
+#if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
 	if (UAVObjIsMetaobject(obj_handle)) {
 		if (instId != 0)
 			return -1;
@@ -948,7 +948,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t ins
 {
 	PIOS_Assert(obj_handle);
 
-#if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
+#if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
 	if (UAVObjIsMetaobject(obj_handle)) {
 		if (instId != 0)
 			return -1;
@@ -1023,7 +1023,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t ins
 int32_t UAVObjDelete(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t instId)
 {
 	PIOS_Assert(obj_handle);
-#if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
+#if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
 	PIOS_FLASHFS_ObjDelete(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId);
 #endif
 #if defined(PIOS_USE_SETTINGS_ON_SDCARD)

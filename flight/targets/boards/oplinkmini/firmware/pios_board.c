@@ -84,7 +84,7 @@ void PIOS_Board_Init(void) {
 	/* Delay system */
 	PIOS_DELAY_Init();
 
-#ifdef PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
+#ifdef PIOS_INCLUDE_FLASH_LOGFS_SETTINGS
     uintptr_t flash_id;
     PIOS_Flash_Internal_Init(&flash_id, &flash_internal_cfg);
     PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_internal_cfg, &pios_internal_flash_driver, flash_id);

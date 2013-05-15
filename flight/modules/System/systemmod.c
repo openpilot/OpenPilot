@@ -310,7 +310,7 @@ static void objectUpdatedCb(UAVObjEvent * ev)
                 retval = UAVObjDeleteMetaobjects();
             }
         } else if (objper.Operation == OBJECTPERSISTENCE_OPERATION_FULLERASE) {
-#if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
+#if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
             retval = PIOS_FLASHFS_Format(0);
 #else
 			retval = -1;

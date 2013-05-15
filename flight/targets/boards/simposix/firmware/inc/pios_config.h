@@ -90,7 +90,7 @@
 #define PIOS_INCLUDE_SETTINGS
 #define PIOS_INCLUDE_FLASH
 /* A really shitty setting saving implementation */
-//#define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
+//#define PIOS_INCLUDE_FLASH_LOGFS_SETTINGS
 
 /* Other Interfaces */
 //#define PIOS_INCLUDE_I2C_ESC

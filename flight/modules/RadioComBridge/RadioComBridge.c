@@ -471,7 +471,7 @@ static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyt
                     switch (obj_per.Operation) {
                     case OBJECTPERSISTENCE_OPERATION_LOAD:
                     {
-#if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
+#if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
                         // Load the settings.
                         void *obj = UAVObjGetByID(obj_per.ObjectID);
                         if (obj == 0) {
@@ -485,7 +485,7 @@ static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyt
                     }
                     case OBJECTPERSISTENCE_OPERATION_SAVE:
                     {
-#if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
+#if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
                         void *obj = UAVObjGetByID(obj_per.ObjectID);
                         if (obj == 0) {
                             success = false;
@@ -498,7 +498,7 @@ static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyt
                     }
                     case OBJECTPERSISTENCE_OPERATION_DELETE:
                     {
-#if defined(PIOS_INCLUDE_FLASH_SECTOR_SETTINGS)
+#if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
                         void *obj = UAVObjGetByID(obj_per.ObjectID);
                         if (obj == 0) {
                             success = false;

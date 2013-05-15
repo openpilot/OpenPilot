@@ -49,7 +49,6 @@ class TimeScaleDraw : public QwtScaleDraw
 {
 public:
     TimeScaleDraw() {
-        //baseTime = QDateTime::currentDateTime().toTime_t();
     }
     virtual QwtText label(double v) const {
         uint seconds = (uint)(v);
@@ -58,8 +57,6 @@ public:
         upTime.setTime(timePart);
         return upTime.toLocalTime().toString("hh:mm:ss");
     }
-private:
-//    double baseTime;
 };
 
 class ScopeGadgetWidget : public QwtPlot
@@ -81,15 +78,15 @@ public:
     int refreshInterval(){return m_refreshInterval;}
 
 
-    void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, int meanSamples = 1, QString mathFunction= "None", QPen pen = QPen(Qt::black));
-    //void removeCurvePlot(QString uavObject, QString uavField);
+    void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, int meanSamples = 1,
+                      QString mathFunction= "None", QPen pen = QPen(Qt::black), bool antialiased = true);
     void clearCurvePlots();
     int csvLoggingStart();
     int csvLoggingStop();
     void csvLoggingSetName(QString);
-    void setLoggingEnabled(bool value){m_csvLoggingEnabled=value;};
-    void setLoggingNewFileOnConnect(bool value){m_csvLoggingNewFileOnConnect=value;};
-    void setLoggingPath(QString value){m_csvLoggingPath=value;};
+    void setLoggingEnabled(bool value){m_csvLoggingEnabled=value;}
+    void setLoggingNewFileOnConnect(bool value){m_csvLoggingNewFileOnConnect=value;}
+    void setLoggingPath(QString value){m_csvLoggingPath=value;}
 
 protected:
 	void mousePressEvent(QMouseEvent *e);
@@ -97,6 +94,7 @@ protected:
 	void mouseDoubleClickEvent(QMouseEvent *e);
 	void mouseMoveEvent(QMouseEvent *e);
 	void wheelEvent(QWheelEvent *e);
+    void showEvent(QShowEvent *e);
 
 private slots:
     void uavObjectReceived(UAVObject*);

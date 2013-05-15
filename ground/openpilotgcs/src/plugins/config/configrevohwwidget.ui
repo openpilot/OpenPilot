@@ -20,6 +20,9 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
+      <property name="autoFillBackground">
+       <bool>true</bool>
+      </property>
       <attribute name="title">
        <string>HW settings</string>
       </attribute>
@@ -119,7 +122,7 @@
             <number>12</number>
            </property>
            <item row="2" column="2">
-            <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+            <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
              <item row="7" column="0">
               <widget class="QLabel" name="label_8">
                <property name="sizePolicy">
@@ -399,11 +402,11 @@
               </widget>
              </item>
              <item row="17" column="2">
-               <widget class="QLineEdit" name="leInitFreq">
-                 <property name="toolTip">
-                   <string extracomment="The initial connection frequency (Hz)"/>
-                 </property>
-               </widget>
+              <widget class="QLineEdit" name="leInitFreq">
+               <property name="toolTip">
+                <string extracomment="The initial connection frequency (Hz)"/>
+               </property>
+              </widget>
              </item>
              <item row="14" column="1">
               <widget class="QLabel" name="lblFlexiSpeed">

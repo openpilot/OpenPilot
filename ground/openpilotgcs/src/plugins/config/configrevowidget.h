@@ -43,19 +43,18 @@
 
 class Ui_Widget;
 
-class ConfigRevoWidget: public ConfigTaskWidget
-{
+class ConfigRevoWidget : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
     ConfigRevoWidget(QWidget *parent = 0);
     ~ConfigRevoWidget();
-    
+
 private:
     void drawVariancesGraph();
     void displayPlane(QString elementID);
 
-    //! Computes the scale and bias of the mag based on collected data
+    // ! Computes the scale and bias of the mag based on collected data
     void computeScaleBias();
 
     Ui_RevoSensorsWidget *m_ui;
@@ -101,27 +100,36 @@ private:
 
     static const int NOISE_SAMPLES = 100;
 
+    // Board rotation store/recall
+    qint16 storedBoardRotation[3];
+    bool isBoardRotationStored;
+    void storeAndClearBoardRotation();
+    void recallBoardRotation();
+
+
 private slots:
-    //! Overriden method from the configTaskWidget to update UI
-    virtual void refreshWidgetsValues(UAVObject *object=NULL);
+    // ! Overriden method from the configTaskWidget to update UI
+    virtual void refreshWidgetsValues(UAVObject *object = NULL);
 
     // Slots for calibrating the mags
     void doStartSixPointCalibration();
-    void doGetSixPointCalibrationMeasurement(UAVObject * obj);
+    void doGetSixPointCalibrationMeasurement(UAVObject *obj);
     void savePositionData();
 
     // Slots for calibrating the accel and gyro
     void doStartAccelGyroBiasCalibration();
-    void doGetAccelGyroBiasData(UAVObject*);
+    void doGetAccelGyroBiasData(UAVObject *);
 
     // Slots for measuring the sensor noise
     void doStartNoiseMeasurement();
     void doGetNoiseSample(UAVObject *);
 
+    // Slot for clearing home location
+    void clearHomeLocation();
+
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
-
 };
 
 #endif // ConfigRevoWidget_H

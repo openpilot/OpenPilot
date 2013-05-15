@@ -46,11 +46,18 @@ public:
     ~ConfigStabilizationWidget();
 
 private:
-    Ui_StabilizationWidget *m_stabilization;
+    Ui_StabilizationWidget *ui;
     QTimer * realtimeUpdates;
+
+    // Milliseconds between automatic 'Instant Updates'
+    static const int AUTOMATIC_UPDATE_RATE = 500;
+
+protected slots:
+    void refreshWidgetsValues(UAVObject *o = NULL);
+
 private slots:
-    void realtimeUpdatesSlot(int);
-    void linkCheckBoxes(int value);
+    void realtimeUpdatesSlot(bool value);
+    void linkCheckBoxes(bool value);
     void processLinkedWidgets(QWidget*);
 };
 

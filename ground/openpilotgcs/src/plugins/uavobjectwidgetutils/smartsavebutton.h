@@ -37,14 +37,15 @@
 #include "uavobjectutilmanager.h"
 #include <QObject>
 #include <QDebug>
-class smartSaveButton:public QObject
-{
-    enum buttonTypeEnum {save_button,apply_button};
+
+class smartSaveButton : public QObject {
+    enum buttonTypeEnum { save_button, apply_button };
 public:
     Q_OBJECT
+
 public:
     smartSaveButton();
-    void addButtons(QPushButton * save,QPushButton * apply);
+    void addButtons(QPushButton *save, QPushButton *apply);
     void setObjects(QList<UAVDataObject *>);
     void addObject(UAVDataObject *);
     void clearObjects();
@@ -53,32 +54,34 @@ public:
     void addApplyButton(QPushButton *apply);
     void addSaveButton(QPushButton *save);
     void resetIcons();
+
 signals:
     void preProcessOperations();
     void saveSuccessfull();
     void beginOp();
     void endOp();
+
 public slots:
     void apply();
     void save();
+
 private slots:
     void processClick();
     void processOperation(QPushButton *button, bool save);
-    void transaction_finished(UAVObject* obj, bool result);
-    void saving_finished(int,bool);
+    void transaction_finished(UAVObject *obj, bool result);
+    void saving_finished(int, bool);
 
 private:
     quint32 current_objectID;
-    UAVDataObject * current_object;
+    UAVDataObject *current_object;
     bool up_result;
     bool sv_result;
     QEventLoop loop;
     QList<UAVDataObject *> objects;
-    QMap<QPushButton *,buttonTypeEnum> buttonList;
-protected:
+    QMap<QPushButton *, buttonTypeEnum> buttonList;
+
 public slots:
     void enableControls(bool value);
-
 };
 
 

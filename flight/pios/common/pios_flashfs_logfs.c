@@ -29,12 +29,11 @@
 
 #ifdef PIOS_INCLUDE_FLASH
 
-#include "openpilot.h"
+#include <stdbool.h>
+#include <openpilot.h>
+#include <pios_math.h>
 
 #include "pios_flashfs_logfs_priv.h"
-
-#include <stdbool.h>
-
 
 /*
  * Filesystem state data tracked in RAM

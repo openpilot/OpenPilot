@@ -47,6 +47,8 @@ public:
     void removeTab(int index);
     void setIconSize(int size) { m_listWidget->setIconSize(QSize(size, size)); }
 
+    void setWidgetsEnabled(bool enabled);
+
     int currentIndex() const;
 
     void insertCornerWidget(int index, QWidget *widget);

@@ -87,11 +87,9 @@ ConfigFixedWingWidget::ConfigFixedWingWidget(QWidget *parent) :
     m_aircraft->fixedWingType->addItems(fixedWingTypes);
 
     // Set default model to "Elevator aileron rudder"
-    m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
-
-    //setupUI(m_aircraft->fixedWingType->currentText());
-
     connect(m_aircraft->fixedWingType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
+    m_aircraft->fixedWingType->setCurrentIndex(m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
+    setupUI(m_aircraft->fixedWingType->currentText());
 }
 
 ConfigFixedWingWidget::~ConfigFixedWingWidget()
@@ -109,64 +107,61 @@ void ConfigFixedWingWidget::setupUI(QString frameType)
 	if (frameType == "FixedWing" || frameType == "Elevator aileron rudder") {
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevator aileron rudder"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(true);
-        m_aircraft->fwRudder1Label->setEnabled(true);
         m_aircraft->fwRudder2ChannelBox->setEnabled(true);
-        m_aircraft->fwRudder2Label->setEnabled(true);
         m_aircraft->fwElevator1ChannelBox->setEnabled(true);
-        m_aircraft->fwElevator1Label->setEnabled(true);
         m_aircraft->fwElevator2ChannelBox->setEnabled(true);
-        m_aircraft->fwElevator2Label->setEnabled(true);
         m_aircraft->fwAileron1ChannelBox->setEnabled(true);
-        m_aircraft->fwAileron1Label->setEnabled(true);
         m_aircraft->fwAileron2ChannelBox->setEnabled(true);
-        m_aircraft->fwAileron2Label->setEnabled(true);
 		
         m_aircraft->fwAileron1Label->setText("Aileron 1");
         m_aircraft->fwAileron2Label->setText("Aileron 2");
         m_aircraft->fwElevator1Label->setText("Elevator 1");
         m_aircraft->fwElevator2Label->setText("Elevator 2");
-        m_aircraft->elevonMixBox->setHidden(true);
-		
+
+        m_aircraft->elevonSlider1->setEnabled(false);
+        m_aircraft->elevonSlider2->setEnabled(false);
+
     } else if (frameType == "FixedWingElevon" || frameType == "Elevon") {
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Elevon"));
         m_aircraft->fwAileron1Label->setText("Elevon 1");
         m_aircraft->fwAileron2Label->setText("Elevon 2");
         m_aircraft->fwElevator1ChannelBox->setEnabled(false);
-        m_aircraft->fwElevator1Label->setEnabled(false);
         m_aircraft->fwElevator2ChannelBox->setEnabled(false);
-        m_aircraft->fwElevator2Label->setEnabled(false);
         m_aircraft->fwRudder1ChannelBox->setEnabled(true);
-        m_aircraft->fwRudder1Label->setEnabled(true);
         m_aircraft->fwRudder2ChannelBox->setEnabled(true);
-        m_aircraft->fwRudder2Label->setEnabled(true);
+
         m_aircraft->fwElevator1Label->setText("Elevator 1");
         m_aircraft->fwElevator2Label->setText("Elevator 2");
-        m_aircraft->elevonMixBox->setHidden(false);
         m_aircraft->elevonLabel1->setText("Roll");
         m_aircraft->elevonLabel2->setText("Pitch");
-		
+
+        m_aircraft->elevonSlider1->setEnabled(true);
+        m_aircraft->elevonSlider2->setEnabled(true);
+
 	} else if (frameType == "FixedWingVtail" || frameType == "Vtail") {
         setComboCurrentIndex(m_aircraft->fixedWingType, m_aircraft->fixedWingType->findText("Vtail"));
         m_aircraft->fwRudder1ChannelBox->setEnabled(false);
-        m_aircraft->fwRudder1Label->setEnabled(false);
         m_aircraft->fwRudder2ChannelBox->setEnabled(false);
-        m_aircraft->fwRudder2Label->setEnabled(false);
-        m_aircraft->fwElevator1ChannelBox->setEnabled(true);
-        m_aircraft->fwElevator1Label->setEnabled(true);
+
         m_aircraft->fwElevator1Label->setText("Vtail 1");
+        m_aircraft->fwElevator1ChannelBox->setEnabled(true);
+
         m_aircraft->fwElevator2Label->setText("Vtail 2");
-        m_aircraft->elevonMixBox->setHidden(false);
         m_aircraft->fwElevator2ChannelBox->setEnabled(true);
-        m_aircraft->fwElevator2Label->setEnabled(true);
+
         m_aircraft->fwAileron1Label->setText("Aileron 1");
         m_aircraft->fwAileron2Label->setText("Aileron 2");
         m_aircraft->elevonLabel1->setText("Rudder");
         m_aircraft->elevonLabel2->setText("Pitch");
-	}
+
+        m_aircraft->elevonSlider1->setEnabled(true);
+        m_aircraft->elevonSlider2->setEnabled(true);
+    }
 }
 
 void ConfigFixedWingWidget::registerWidgets(ConfigTaskWidget &parent) {
     parent.addWidget(m_aircraft->fixedWingThrottle->getCurveWidget());
+    parent.addWidget(m_aircraft->fixedWingThrottle);
     parent.addWidget(m_aircraft->fixedWingType);
 
     parent.addWidget(m_aircraft->fwEngineChannelBox);
@@ -506,6 +501,14 @@ bool ConfigFixedWingWidget::setupFrameVtail(QString airframeType)
 
     m_aircraft->fwStatusLabel->setText("Mixer generated");
     return true;
+}
+
+void ConfigFixedWingWidget::enableControls(bool enable)
+{
+    ConfigTaskWidget::enableControls(enable);
+    if(enable) {
+        setupUI(m_aircraft->fixedWingType->currentText());
+    }
 }
 
 /**

@@ -138,7 +138,9 @@ int32_t ManualControlStart()
     // Start main task
     xTaskCreate(manualControlTask, (signed char *) "ManualControl", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_MANUALCONTROL, taskHandle);
+#ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_MANUAL);
+#endif
 
     return 0;
 }
@@ -208,7 +210,9 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 
         // Wait until next update
         vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD_MS / portTICK_RATE_MS);
+#ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_MANUAL);
+#endif
 
         // Read settings
         ManualControlSettingsGet(&settings);

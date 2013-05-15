@@ -640,7 +640,8 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
 			.GPIO_Speed = GPIO_Speed_10MHz,
 			.GPIO_Mode  = GPIO_Mode_AF_OD,
 		},
-	}
+        },
+        .vsense_active_low = false
 };
 
 #include "pios_usb_board_data_priv.h"

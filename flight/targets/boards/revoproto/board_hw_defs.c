@@ -2003,7 +2003,8 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
 			.GPIO_Mode  = GPIO_Mode_IN,
 			.GPIO_OType = GPIO_OType_OD,
 		},
-	}
+        },
+        .vsense_active_low = false
 };
 
 #include "pios_usb_board_data_priv.h"

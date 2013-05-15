@@ -56,9 +56,6 @@ else
     SRC += $(OPTESTS)/$(TESTAPP).c
 endif
 
-CDEFS += -DEE_BANK_BASE=$(EE_BANK_BASE)
-CDEFS += -DEE_BANK_SIZE=$(EE_BANK_SIZE)
-
 # Optional component libraries
 include $(FLIGHTLIB)/rscode/library.mk
 

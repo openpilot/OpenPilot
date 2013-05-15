@@ -99,8 +99,6 @@ else
     SRC += $(OPTESTS)/test_common.c
     SRC += $(OPTESTS)/$(TESTAPP).c
 endif
-
-
 	
 # Optional component libraries
 include $(PIOS)/common/libraries/dosfs/library.mk

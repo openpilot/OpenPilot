@@ -1063,7 +1063,7 @@ int fetch_font_info(uint8_t ch, int font, struct FontEntry *font_info, char *loo
 void write_char16(char ch, unsigned int x, unsigned int y, int font)
 {
     unsigned int yy, addr_temp, row, row_temp, xshift;
-    uint16_t and_mask, or_mask, level_bits;
+    uint16_t and_mask, or_mask, levels;
     struct FontEntry font_info;
     //char lookup = 0;
     fetch_font_info(0, font, &font_info, NULL);
@@ -1103,17 +1103,17 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
         addr = addr_temp;
         for (yy = y; yy < y + font_info.height; yy++) {
             if (font == 3) {
-                level_bits = font_frame12x18[row];
+                levels = font_frame12x18[row];
                 //if(!(flags & FONT_INVERT)) // data is normally inverted
-                level_bits = ~level_bits;
+                levels = ~levels;
                 or_mask = font_mask12x18[row] << xshift;
-                and_mask = (font_mask12x18[row] & level_bits) << xshift;
+                and_mask = (font_mask12x18[row] & levels) << xshift;
             } else {
-                level_bits = font_frame8x10[row];
+                levels = font_frame8x10[row];
                 //if(!(flags & FONT_INVERT)) // data is normally inverted
-                level_bits = ~level_bits;
+                levels = ~levels;
                 or_mask = font_mask8x10[row] << xshift;
-                and_mask = (font_mask8x10[row] & level_bits) << xshift;
+                and_mask = (font_mask8x10[row] & levels) << xshift;
             }
             write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
             // If we're not bold write the AND mask.
@@ -1139,7 +1139,7 @@ void write_char16(char ch, unsigned int x, unsigned int y, int font)
 void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
 {
     unsigned int yy, addr_temp, row, row_temp, xshift;
-    uint16_t and_mask, or_mask, level_bits;
+    uint16_t and_mask, or_mask, levels;
     struct FontEntry font_info;
     char lookup = 0;
     fetch_font_info(ch, font, &font_info, &lookup);
@@ -1178,13 +1178,13 @@ void write_char(char ch, unsigned int x, unsigned int y, int flags, int font)
         row = row_temp;
         addr = addr_temp;
         for (yy = y; yy < y + font_info.height; yy++) {
-            level_bits = font_info.data[row + font_info.height];
+            levels = font_info.data[row + font_info.height];
             if (!(flags & FONT_INVERT)) {
                 // data is normally inverted
-                level_bits = ~level_bits;
+                levels = ~levels;
             }
             or_mask = font_info.data[row] << xshift;
-            and_mask = (font_info.data[row] & level_bits) << xshift;
+            and_mask = (font_info.data[row] & levels) << xshift;
             write_word_misaligned_OR(draw_buffer_level, or_mask, addr, wbit);
             // If we're not bold write the AND mask.
             //if(!(flags & FONT_BOLD))

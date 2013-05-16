@@ -582,8 +582,6 @@ const struct pios_ppm_cfg pios_ppm_main_cfg = {
 #if defined(PIOS_INCLUDE_PPM_OUT)
 #include <pios_ppm_out_priv.h>
 
-uint32_t pios_ppm_id;
-
 static const struct pios_tim_channel pios_tim_ppmout[] = {
 	{
 		.timer = TIM2,

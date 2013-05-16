@@ -377,7 +377,6 @@ static uint8_t updateFixedDesiredAttitude()
 	StabilizationDesiredData stabDesired;
 	AttitudeActualData attitudeActual;
 	AccelsData accels;
-	FixedWingPathFollowerSettingsData fixedwingpathfollowerSettings;
 	StabilizationSettingsData stabSettings;
 	FixedWingPathFollowerStatusData fixedwingpathfollowerStatus;
 	AirspeedActualData airspeedActual;
@@ -396,8 +395,6 @@ static uint8_t updateFixedDesiredAttitude()
 
 	float bearingError;
 	float bearingCommand;
-
-	FixedWingPathFollowerSettingsGet(&fixedwingpathfollowerSettings);
 
 	FixedWingPathFollowerStatusGet(&fixedwingpathfollowerStatus);
 	

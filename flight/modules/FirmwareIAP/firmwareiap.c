@@ -191,9 +191,9 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 						/* Note: Cant just wait timeout value, because first time is randomized */
 						reset_count = 0;
 						lastResetSysTime = xTaskGetTickCount();
-						UAVObjEvent * ev = pvPortMalloc(sizeof(UAVObjEvent));
-						memset(ev,0,sizeof(UAVObjEvent));
-						EventPeriodicCallbackCreate(ev, resetTask, 100);
+						UAVObjEvent *event = pvPortMalloc(sizeof(UAVObjEvent));
+						memset(event, 0, sizeof(UAVObjEvent));
+						EventPeriodicCallbackCreate(event, resetTask, 100);
 						iap_state = IAP_STATE_RESETTING;
 					} else {
 						iap_state = IAP_STATE_READY;

@@ -427,7 +427,7 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 			  float Q[NUMW], float dT, float P[NUMX][NUMX])
 {
 
-	//  Pnew = (I+F*T)*P*(I+F*T)' + T²*G*Q*G' = T²[(P/T + F*P)*(I/T + F') + G*Q*G')]
+	//  Pnew = (I+F*T)*P*(I+F*T)' + (T^2)*G*Q*G' = (T^2)[(P/T + F*P)*(I/T + F') + G*Q*G')]
 
 	float dT1 = 1.0f / dT; // multiplication is faster than division on fpu.
 	float dTsq = dT * dT;
@@ -451,7 +451,7 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 			}
 		}
 	}
-	for (i = 0; i < NUMX; i++) { // Calculate Pnew = T² [Dummy/T + Dummy*F' + G*Qw*G']
+	for (i = 0; i < NUMX; i++) { // Calculate Pnew = (T^2) [Dummy/T + Dummy*F' + G*Qw*G']
 
 		float *Dirow = Dummy[i];
 		float *Girow = G[i];
@@ -483,7 +483,7 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 				}
 			}
 
-			P[j][i] = Pirow[j] = Ptmp * dTsq; // [] * T²
+			P[j][i] = Pirow[j] = Ptmp * dTsq; // [] * (T^2)
 		}
 	}
 }

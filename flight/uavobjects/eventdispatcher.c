@@ -68,11 +68,11 @@ struct PeriodicObjectListStruct {
 typedef struct PeriodicObjectListStruct PeriodicObjectList;
 
 // Private variables
-static PeriodicObjectList* objList;
-static xQueueHandle queue;
-static xTaskHandle eventTaskHandle;
-static xSemaphoreHandle mutex;
-static EventStats stats;
+static PeriodicObjectList* mObjList;
+static xQueueHandle mQueue;
+static xTaskHandle mEventTaskHandle;
+static xSemaphoreHandle mMutex;
+static EventStats mStats;
 
 // Private functions
 static int32_t processPeriodicUpdates();
@@ -89,19 +89,19 @@ static uint16_t randomizePeriod(uint16_t periodMs);
 int32_t EventDispatcherInitialize()
 {
 	// Initialize variables
-	objList = NULL;
-	memset(&stats, 0, sizeof(EventStats));
+	mObjList = NULL;
+	memset(&mStats, 0, sizeof(EventStats));
 
-	// Create mutex
-	mutex = xSemaphoreCreateRecursiveMutex();
-	if (mutex == NULL)
+	// Create mMutex
+	mMutex = xSemaphoreCreateRecursiveMutex();
+	if (mMutex == NULL)
 		return -1;
 
 	// Create event queue
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(EventCallbackInfo));
+	mQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(EventCallbackInfo));
 
 	// Create task
-	xTaskCreate( eventTask, (signed char*)"Event", STACK_SIZE, NULL, TASK_PRIORITY, &eventTaskHandle );
+	xTaskCreate(eventTask, (signed char*)"Event", STACK_SIZE, NULL, TASK_PRIORITY, &mEventTaskHandle);
 
 	// Done
 	return 0;
@@ -113,9 +113,9 @@ int32_t EventDispatcherInitialize()
  */
 void EventGetStats(EventStats* statsOut)
 {
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	memcpy(statsOut, &stats, sizeof(EventStats));
-	xSemaphoreGiveRecursive(mutex);
+	xSemaphoreTakeRecursive(mMutex, portMAX_DELAY);
+	memcpy(statsOut, &mStats, sizeof(EventStats));
+	xSemaphoreGiveRecursive(mMutex);
 }
 
 /**
@@ -123,9 +123,9 @@ void EventGetStats(EventStats* statsOut)
  */
 void EventClearStats()
 {
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
-	memset(&stats, 0, sizeof(EventStats));
-	xSemaphoreGiveRecursive(mutex);
+	xSemaphoreTakeRecursive(mMutex, portMAX_DELAY);
+	memset(&mStats, 0, sizeof(EventStats));
+	xSemaphoreGiveRecursive(mMutex);
 }
 
 /**
@@ -143,7 +143,7 @@ int32_t EventCallbackDispatch(UAVObjEvent* ev, UAVObjEventCallback cb)
 	evInfo.cb = cb;
 	evInfo.queue = 0;
 	// Push to queue
-	return xQueueSend(queue, &evInfo, 0); // will not block if queue is full
+	return xQueueSend(mQueue, &evInfo, 0); // will not block if queue is full
 }
 
 /**
@@ -204,26 +204,26 @@ int32_t EventPeriodicQueueUpdate(UAVObjEvent* ev, xQueueHandle queue, uint16_t p
  */
 static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQueueHandle queue, uint16_t periodMs)
 {
-	PeriodicObjectList* objEntry;
+	PeriodicObjectList *objEntry;
 	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	xSemaphoreTakeRecursive(mMutex, portMAX_DELAY);
 	// Check that the object is not already connected
-	LL_FOREACH(objList, objEntry)
-	{
+	LL_FOREACH(mObjList, objEntry) {
 		if (objEntry->evInfo.cb == cb &&
 			objEntry->evInfo.queue == queue &&
 			objEntry->evInfo.ev.obj == ev->obj &&
 			objEntry->evInfo.ev.instId == ev->instId &&
-			objEntry->evInfo.ev.event == ev->event)
-		{
+			objEntry->evInfo.ev.event == ev->event) {
 			// Already registered, do nothing
-			xSemaphoreGiveRecursive(mutex);
+			xSemaphoreGiveRecursive(mMutex);
 			return -1;
 		}
 	}
     // Create handle
 	objEntry = (PeriodicObjectList*)pvPortMalloc(sizeof(PeriodicObjectList));
-	if (objEntry == NULL) return -1;
+	if (objEntry == NULL) {
+		return -1;
+	}
 	objEntry->evInfo.ev.obj = ev->obj;
 	objEntry->evInfo.ev.instId = ev->instId;
 	objEntry->evInfo.ev.event = ev->event;
@@ -232,9 +232,9 @@ static int32_t eventPeriodicCreate(UAVObjEvent* ev, UAVObjEventCallback cb, xQue
     objEntry->updatePeriodMs = periodMs;
     objEntry->timeToNextUpdateMs = randomizePeriod(periodMs); // avoid bunching of updates
     // Add to list
-    LL_APPEND(objList, objEntry);
+    LL_APPEND(mObjList, objEntry);
 	// Release lock
-	xSemaphoreGiveRecursive(mutex);
+	xSemaphoreGiveRecursive(mMutex);
     return 0;
 }
 
@@ -250,26 +250,24 @@ static int32_t eventPeriodicUpdate(UAVObjEvent* ev, UAVObjEventCallback cb, xQue
 {
 	PeriodicObjectList* objEntry;
 	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	xSemaphoreTakeRecursive(mMutex, portMAX_DELAY);
 	// Find object
-	LL_FOREACH(objList, objEntry)
-	{
+	LL_FOREACH(mObjList, objEntry) {
 		if (objEntry->evInfo.cb == cb &&
 			objEntry->evInfo.queue == queue &&
 			objEntry->evInfo.ev.obj == ev->obj &&
 			objEntry->evInfo.ev.instId == ev->instId &&
-			objEntry->evInfo.ev.event == ev->event)
-		{
+			objEntry->evInfo.ev.event == ev->event) {
 			// Object found, update period
 			objEntry->updatePeriodMs = periodMs;
 			objEntry->timeToNextUpdateMs = randomizePeriod(periodMs); // avoid bunching of updates
 			// Release lock
-			xSemaphoreGiveRecursive(mutex);
+			xSemaphoreGiveRecursive(mMutex);
 			return 0;
 		}
 	}
     // If this point is reached the object was not found
-	xSemaphoreGiveRecursive(mutex);
+	xSemaphoreGiveRecursive(mMutex);
     return -1;
 }
 
@@ -283,7 +281,7 @@ static void eventTask()
 	EventCallbackInfo evInfo;
 
 	/* Must do this in task context to ensure that TaskMonitor has already finished its init */
-	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_EVENTDISPATCHER, eventTaskHandle);
+	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_EVENTDISPATCHER, mEventTaskHandle);
 
 	// Initialize time
 	timeToNextUpdateMs = xTaskGetTickCount()*portTICK_RATE_MS;
@@ -295,7 +293,7 @@ static void eventTask()
 		delayMs = timeToNextUpdateMs - (xTaskGetTickCount() * portTICK_RATE_MS);
 
 		// Wait for queue message
-		if ( xQueueReceive(queue, &evInfo, delayMs/portTICK_RATE_MS) == pdTRUE )
+		if ( xQueueReceive(mQueue, &evInfo, delayMs/portTICK_RATE_MS) == pdTRUE )
 		{
 			// Invoke callback, if one
 			if ( evInfo.cb != 0)
@@ -324,49 +322,43 @@ static int32_t processPeriodicUpdates()
     int32_t offset;
 
 	// Get lock
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+	xSemaphoreTakeRecursive(mMutex, portMAX_DELAY);
 
     // Iterate through each object and update its timer, if zero then transmit object.
     // Also calculate smallest delay to next update.
     timeToNextUpdate = xTaskGetTickCount()*portTICK_RATE_MS + MAX_UPDATE_PERIOD_MS;
-    LL_FOREACH(objList, objEntry)
-    {
+    LL_FOREACH(mObjList, objEntry) {
         // If object is configured for periodic updates
-        if (objEntry->updatePeriodMs > 0)
-        {
+        if (objEntry->updatePeriodMs > 0) {
             // Check if time for the next update
         	timeNow = xTaskGetTickCount()*portTICK_RATE_MS;
-            if (objEntry->timeToNextUpdateMs <= timeNow)
-            {
+            if (objEntry->timeToNextUpdateMs <= timeNow) {
                 // Reset timer
-            	offset = ( timeNow - objEntry->timeToNextUpdateMs ) % objEntry->updatePeriodMs;
+            	offset = (timeNow - objEntry->timeToNextUpdateMs) % objEntry->updatePeriodMs;
             	objEntry->timeToNextUpdateMs = timeNow + objEntry->updatePeriodMs - offset;
     			// Invoke callback, if one
-    			if ( objEntry->evInfo.cb != 0)
-    			{
+    			if (objEntry->evInfo.cb != 0) {
     				objEntry->evInfo.cb(&objEntry->evInfo.ev); // the function is expected to copy the event information
     			}
     			// Push event to queue, if one
-    			if ( objEntry->evInfo.queue != 0)
-    			{
-    				if ( xQueueSend(objEntry->evInfo.queue, &objEntry->evInfo.ev, 0) != pdTRUE ) // do not block if queue is full
-    				{
-						if (objEntry->evInfo.ev.obj != NULL)
-							stats.lastErrorID = UAVObjGetID(objEntry->evInfo.ev.obj);
-    					++stats.eventErrors;
+    			if (objEntry->evInfo.queue != 0) {
+    				if (xQueueSend(objEntry->evInfo.queue, &objEntry->evInfo.ev, 0) != pdTRUE ) { // do not block if queue is full
+						if (objEntry->evInfo.ev.obj != NULL) {
+							mStats.lastErrorID = UAVObjGetID(objEntry->evInfo.ev.obj);
+						}
+    					++mStats.eventErrors;
     				}
     			}
             }
             // Update minimum delay
-            if (objEntry->timeToNextUpdateMs < timeToNextUpdate)
-            {
+            if (objEntry->timeToNextUpdateMs < timeToNextUpdate) {
             	timeToNextUpdate = objEntry->timeToNextUpdateMs;
             }
         }
     }
 
     // Done
-    xSemaphoreGiveRecursive(mutex);
+    xSemaphoreGiveRecursive(mMutex);
     return timeToNextUpdate;
 }
 

@@ -61,6 +61,7 @@ public:
         enum txMovementType{vertical,horizontal,jump,mix};
         enum txType {acro, heli};
         void startInputWizard() { goToWizard(); }
+        void enableControls(bool enable);
 
 private:
         bool growing;
@@ -68,7 +69,7 @@ private:
         txMovements currentMovement;
         int movePos;
         void setTxMovement(txMovements movement);
-        Ui_InputWidget *m_config;
+        Ui_InputWidget *ui;
         wizardSteps wizardStep;
         QList<QPointer<QWidget> > extraWidgets;
         txMode transmitterMode;
@@ -166,7 +167,6 @@ private slots:
 
 protected:
         void resizeEvent(QResizeEvent *event);
-        virtual void enableControls(bool enable);
 };
 
 #endif

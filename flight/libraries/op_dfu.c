@@ -63,8 +63,6 @@ uint8_t Data2;
 uint8_t Data3;
 uint32_t Opt[3];
 
-uint8_t offset = 0;
-uint32_t aux;
 //Download vars
 uint32_t downSizeOfLastPacket = 0;
 uint32_t downPacketTotal = 0;
@@ -227,6 +225,8 @@ void processComand(uint8_t *xReceive_Buffer) {
 						numberOfWords = SizeOfLastPacket;
 					}
 					uint8_t result = 0;
+					uint32_t offset;
+					uint32_t aux;;
 					switch (currentProgrammingDestination) {
 					case Self_flash:
 						for (uint8_t x = 0; x < numberOfWords; ++x) {

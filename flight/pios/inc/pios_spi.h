@@ -49,9 +49,9 @@ extern int32_t PIOS_SPI_TransferByte(uint32_t spi_id, uint8_t b);
 extern int32_t PIOS_SPI_TransferBlock(uint32_t spi_id, const uint8_t *send_buffer, uint8_t *receive_buffer, uint16_t len, void *callback);
 extern int32_t PIOS_SPI_Busy(uint32_t spi_id);
 extern int32_t PIOS_SPI_ClaimBus(uint32_t spi_id);
-extern int32_t PIOS_SPI_ClaimBusISR(uint32_t spi_id);
+extern int32_t PIOS_SPI_ClaimBusISR(uint32_t spi_id, bool *woken);
 extern int32_t PIOS_SPI_ReleaseBus(uint32_t spi_id);
-extern int32_t PIOS_SPI_ReleaseBusISR(uint32_t spi_id);
+extern int32_t PIOS_SPI_ReleaseBusISR(uint32_t spi_id, bool *woken);
 extern void    PIOS_SPI_IRQ_Handler(uint32_t spi_id);
 extern void    PIOS_SPI_SetPrescalar(uint32_t spi_id, uint32_t prescalar);
 

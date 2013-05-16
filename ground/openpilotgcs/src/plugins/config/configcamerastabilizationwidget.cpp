@@ -43,24 +43,24 @@
 
 ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
-    m_camerastabilization = new Ui_CameraStabilizationWidget();
-    m_camerastabilization->setupUi(this);
+    ui = new Ui_CameraStabilizationWidget();
+    ui->setupUi(this);
     
-    addApplySaveButtons(m_camerastabilization->camerastabilizationSaveRAM,m_camerastabilization->camerastabilizationSaveSD);
+    addApplySaveButtons(ui->camerastabilizationSaveRAM,ui->camerastabilizationSaveSD);
     
     ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
     Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
     if(!settings->useExpertMode())
-        m_camerastabilization->camerastabilizationSaveRAM->setVisible(false);
+        ui->camerastabilizationSaveRAM->setVisible(false);
     
     
 
     // These widgets don't have direct relation to UAVObjects
     // and need special processing
     QComboBox *outputs[] = {
-        m_camerastabilization->rollChannel,
-        m_camerastabilization->pitchChannel,
-        m_camerastabilization->yawChannel,
+        ui->rollChannel,
+        ui->pitchChannel,
+        ui->yawChannel,
         
     };
     const int NUM_OUTPUTS = sizeof(outputs) / sizeof(outputs[0]);
@@ -78,10 +78,10 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
     autoLoadWidgets();
 
     // Add some widgets to track their UI dirty state and handle smartsave
-    addWidget(m_camerastabilization->enableCameraStabilization);
-    addWidget(m_camerastabilization->rollChannel);
-    addWidget(m_camerastabilization->pitchChannel);
-    addWidget(m_camerastabilization->yawChannel);
+    addWidget(ui->enableCameraStabilization);
+    addWidget(ui->rollChannel);
+    addWidget(ui->pitchChannel);
+    addWidget(ui->yawChannel);
 
     // Add some UAVObjects to monitor their changes in addition to autoloaded ones.
     // Note also that we want to reload some UAVObjects by "Reload" button and have
@@ -97,6 +97,7 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
     connect(this, SIGNAL(defaultRequested(int)), this, SLOT(defaultRequestedSlot(int)));
 
     disableMouseWheelEvents();
+    updateEnableControls();
 }
 
 ConfigCameraStabilizationWidget::~ConfigCameraStabilizationWidget()
@@ -120,7 +121,7 @@ void ConfigCameraStabilizationWidget::refreshWidgetsValues(UAVObject *obj)
     HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
     HwSettings::DataFields hwSettingsData = hwSettings->getData();
 
-    m_camerastabilization->enableCameraStabilization->setChecked(
+    ui->enableCameraStabilization->setChecked(
         hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] == HwSettings::OPTIONALMODULES_ENABLED);
 
     // Load mixer outputs which are mapped to camera controls
@@ -144,9 +145,9 @@ void ConfigCameraStabilizationWidget::refreshWidgetsValues(UAVObject *obj)
     const int NUM_MIXERS = sizeof(mixerTypes) / sizeof(mixerTypes[0]);
 
     QComboBox *outputs[] = {
-        m_camerastabilization->rollChannel,
-        m_camerastabilization->pitchChannel,
-        m_camerastabilization->yawChannel
+        ui->rollChannel,
+        ui->pitchChannel,
+        ui->yawChannel
     };
     const int NUM_OUTPUTS = sizeof(outputs) / sizeof(outputs[0]);
 
@@ -175,7 +176,7 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
     // Save state of the module enable checkbox first.
     // Do not use setData() member on whole object, if possible, since it triggers
     // unnessesary UAVObect update.
-    quint8 enableModule = m_camerastabilization->enableCameraStabilization->isChecked() ?
+    quint8 enableModule = ui->enableCameraStabilization->isChecked() ?
             HwSettings::OPTIONALMODULES_ENABLED : HwSettings::OPTIONALMODULES_DISABLED;
     HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
     hwSettings->setOptionalModules(HwSettings::OPTIONALMODULES_CAMERASTAB, enableModule);
@@ -202,13 +203,13 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
     const int NUM_MIXERS = sizeof(mixerTypes) / sizeof(mixerTypes[0]);
 
     QComboBox *outputs[] = {
-        m_camerastabilization->rollChannel,
-        m_camerastabilization->pitchChannel,
-        m_camerastabilization->yawChannel
+        ui->rollChannel,
+        ui->pitchChannel,
+        ui->yawChannel
     };
     const int NUM_OUTPUTS = sizeof(outputs) / sizeof(outputs[0]);
 
-    m_camerastabilization->message->setText("");
+    ui->message->setText("");
     bool widgetUpdated;
     do {
         widgetUpdated = false;
@@ -223,7 +224,7 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
                 // If the mixer channel already mapped to something, it should not be
                 // used for camera output, we reset it to none
                 outputs[i]->setCurrentIndex(0);
-                m_camerastabilization->message->setText("One of the channels is already assigned, reverted to none");
+                ui->message->setText("One of the channels is already assigned, reverted to none");
 
                 // Loop again or we may have inconsistent widget and UAVObject
                 widgetUpdated = true;
@@ -270,9 +271,9 @@ void ConfigCameraStabilizationWidget::defaultRequestedSlot(int group)
 
     // For outputs we set them all to none, so don't use any UAVObject to get defaults
     QComboBox *outputs[] = {
-        m_camerastabilization->rollChannel,
-        m_camerastabilization->pitchChannel,
-        m_camerastabilization->yawChannel,
+        ui->rollChannel,
+        ui->pitchChannel,
+        ui->yawChannel,
     };
     const int NUM_OUTPUTS = sizeof(outputs) / sizeof(outputs[0]);
 
@@ -280,8 +281,3 @@ void ConfigCameraStabilizationWidget::defaultRequestedSlot(int group)
         outputs[i]->setCurrentIndex(0);
     }
 }
-
-/**
-  @}
-  @}
-  */

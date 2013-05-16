@@ -44,7 +44,7 @@
 void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 			  float Q[NUMW], float dT, float P[NUMX][NUMX]);
 void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
-		  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX],
+		  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX], float K[NUMX][NUMV],
 		  uint16_t SensorsUsed);
 void RungeKutta(float X[NUMX], float U[NUMU], float dT);
 void StateEq(float X[NUMX], float U[NUMU], float Xdot[NUMX]);
@@ -54,8 +54,6 @@ void MeasurementEq(float X[NUMX], float Be[3], float Y[NUMV]);
 void LinearizeH(float X[NUMX], float Be[3], float H[NUMV][NUMX]);
 
 // Private variables
-static float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];	// linearized system matrices
-// global to init to zero and maintain zero elements
 
 // speed optimizations, describe matrix sparsity
 // derived from state equations in
@@ -86,10 +84,21 @@ static const int8_t GrowMax[NUMX] = { -1,-1,-1, 5, 5, 5, 2, 2, 2, 2, 6, 7, 8 };
 static const int8_t HrowMin[NUMV] = {  0, 1, 2, 3, 4, 5, 6, 6, 6, 2 };
 static const int8_t HrowMax[NUMV] = {  0, 1, 2, 3, 4, 5, 9, 9, 9, 2 };
 
-static float Be[3];			// local magnetic unit vector in NED frame
-static float P[NUMX][NUMX], X[NUMX];	// covariance matrix and state vector
-static float Q[NUMW], R[NUMV];		// input noise and measurement noise variances
-static float K[NUMX][NUMV];		// feedback gain matrix
+static struct EKFData {
+	// linearized system matrices
+	float F[NUMX][NUMX];
+	float G[NUMX][NUMW];
+	float H[NUMV][NUMX];
+	// local magnetic unit vector in NED frame
+	float Be[3];
+	// covariance matrix and state vector
+	float P[NUMX][NUMX];
+	float X[NUMX];
+	// input noise and measurement noise variances
+	float Q[NUMW];
+	float R[NUMV];
+	float K[NUMX][NUMV];		// feedback gain matrix
+} ekf;
 
 // Global variables
 struct NavStruct Nav;
@@ -104,52 +113,52 @@ uint16_t ins_get_num_states()
 
 void INSGPSInit()		//pretty much just a place holder for now
 {
-	Be[0] = 1.0f;
-	Be[1] = 0.0f;
-	Be[2] = 0.0f;		// local magnetic unit vector
+	ekf.Be[0] = 1.0f;
+	ekf.Be[1] = 0.0f;
+	ekf.Be[2] = 0.0f;		// local magnetic unit vector
 
 	for (int i = 0; i < NUMX; i++) {
 		for (int j = 0; j < NUMX; j++) {
-			P[i][j] = 0.0f; // zero all terms
-			F[i][j] = 0.0f;
+			ekf.P[i][j] = 0.0f; // zero all terms
+			ekf.F[i][j] = 0.0f;
 		}
 		
 		for (int j = 0; j < NUMW; j++)
-			G[i][j] = 0.0f;
+			ekf.G[i][j] = 0.0f;
 			
 		for (int j = 0; j < NUMV; j++) {
-			H[j][i] = 0.0f;
-			K[i][j] = 0.0f;
+			ekf.H[j][i] = 0.0f;
+			ekf.K[i][j] = 0.0f;
 		}
 			
-		X[i] = 0.0f;
+		ekf.X[i] = 0.0f;
 	}
 	for (int i = 0; i < NUMW; i++)
-		Q[i] = 0.0f;
+		ekf.Q[i] = 0.0f;
 	for (int i = 0; i < NUMV; i++) 
-		R[i] = 0.0f;
+		ekf.R[i] = 0.0f;
 
 	
-	P[0][0] = P[1][1] = P[2][2] = 25.0f;            // initial position variance (m^2)
-	P[3][3] = P[4][4] = P[5][5] = 5.0f;             // initial velocity variance (m/s)^2
-	P[6][6] = P[7][7] = P[8][8] = P[9][9] = 1e-5f;  // initial quaternion variance
-	P[10][10] = P[11][11] = P[12][12] = 1e-9f;      // initial gyro bias variance (rad/s)^2
+	ekf.P[0][0] = ekf.P[1][1] = ekf.P[2][2] = 25.0f;            // initial position variance (m^2)
+	ekf.P[3][3] = ekf.P[4][4] = ekf.P[5][5] = 5.0f;             // initial velocity variance (m/s)^2
+	ekf.P[6][6] = ekf.P[7][7] = ekf.P[8][8] = ekf.P[9][9] = 1e-5f;  // initial quaternion variance
+	ekf.P[10][10] = ekf.P[11][11] = ekf.P[12][12] = 1e-9f;      // initial gyro bias variance (rad/s)^2
 
-	X[0] = X[1] = X[2] = X[3] = X[4] = X[5] = 0.0f;	// initial pos and vel (m)
-	X[6] = 1.0f;
-	X[7] = X[8] = X[9] = 0.0f;	    // initial quaternion (level and North) (m/s)
-	X[10] = X[11] = X[12] = 0.0f;	// initial gyro bias (rad/s)
+	ekf.X[0] = ekf.X[1] = ekf.X[2] = ekf.X[3] = ekf.X[4] = ekf.X[5] = 0.0f;	// initial pos and vel (m)
+	ekf.X[6] = 1.0f;
+	ekf.X[7] = ekf.X[8] = ekf.X[9] = 0.0f;	    // initial quaternion (level and North) (m/s)
+	ekf.X[10] = ekf.X[11] = ekf.X[12] = 0.0f;	// initial gyro bias (rad/s)
 
-	Q[0] = Q[1] = Q[2] = 50e-4f;	// gyro noise variance (rad/s)^2
-	Q[3] = Q[4] = Q[5] = 0.00001f;	// accelerometer noise variance (m/s^2)^2
-	Q[6] = Q[7] = Q[8] = 2e-8f;	    // gyro bias random walk variance (rad/s^2)^2
+	ekf.Q[0] = ekf.Q[1] = ekf.Q[2] = 50e-4f;	// gyro noise variance (rad/s)^2
+	ekf.Q[3] = ekf.Q[4] = ekf.Q[5] = 0.00001f;	// accelerometer noise variance (m/s^2)^2
+	ekf.Q[6] = ekf.Q[7] = ekf.Q[8] = 2e-8f;	    // gyro bias random walk variance (rad/s^2)^2
 
-	R[0] = R[1] = 0.004f;	// High freq GPS horizontal position noise variance (m^2)
-	R[2] = 0.036f;          // High freq GPS vertical position noise variance (m^2)
-	R[3] = R[4] = 0.004f;   // High freq GPS horizontal velocity noise variance (m/s)^2
-	R[5] = 100.0f;          // High freq GPS vertical velocity noise variance (m/s)^2
-	R[6] = R[7] = R[8] = 0.005f;    // magnetometer unit vector noise variance
-	R[9] = .25f;                    // High freq altimeter noise variance (m^2)
+	ekf.R[0] = ekf.R[1] = 0.004f;	// High freq GPS horizontal position noise variance (m^2)
+	ekf.R[2] = 0.036f;          // High freq GPS vertical position noise variance (m^2)
+	ekf.R[3] = ekf.R[4] = 0.004f;   // High freq GPS horizontal velocity noise variance (m/s)^2
+	ekf.R[5] = 100.0f;          // High freq GPS vertical velocity noise variance (m/s)^2
+	ekf.R[6] = ekf.R[7] = ekf.R[8] = 0.005f;    // magnetometer unit vector noise variance
+	ekf.R[9] = .25f;                    // High freq altimeter noise variance (m^2)
 }
 
 void INSResetP(float PDiag[NUMX])
@@ -160,8 +169,8 @@ void INSResetP(float PDiag[NUMX])
 	for (i=0;i<NUMX;i++){
 		if (PDiag != 0){
 			for (j=0;j<NUMX;j++)
-				P[i][j]=P[j][i]=0.0f;
-			P[i][i]=PDiag[i];
+				ekf.P[i][j]=ekf.P[j][i]=0.0f;
+			ekf.P[i][i]=PDiag[i];
 		}
 	}
 }
@@ -173,7 +182,7 @@ void INSGetP(float PDiag[NUMX])
 	// retrieve diagonal elements (aka state variance)
 	for (i=0;i<NUMX;i++){
 		if (PDiag != 0){
-			PDiag[i] = P[i][i];
+			PDiag[i] = ekf.P[i][i];
 		}
 	}
 }
@@ -181,97 +190,97 @@ void INSGetP(float PDiag[NUMX])
 void INSSetState(float pos[3], float vel[3], float q[4], float gyro_bias[3], __attribute__((unused)) float accel_bias[3])
 {
 	/* Note: accel_bias not used in 13 state INS */
-	X[0] = pos[0];
-	X[1] = pos[1];
-	X[2] = pos[2];
-	X[3] = vel[0];
-	X[4] = vel[1];
-	X[5] = vel[2];
-	X[6] = q[0];
-	X[7] = q[1];
-	X[8] = q[2];
-	X[9] = q[3];
-	X[10] = gyro_bias[0];
-	X[11] = gyro_bias[1];
-	X[12] = gyro_bias[2];
+	ekf.X[0] = pos[0];
+	ekf.X[1] = pos[1];
+	ekf.X[2] = pos[2];
+	ekf.X[3] = vel[0];
+	ekf.X[4] = vel[1];
+	ekf.X[5] = vel[2];
+	ekf.X[6] = q[0];
+	ekf.X[7] = q[1];
+	ekf.X[8] = q[2];
+	ekf.X[9] = q[3];
+	ekf.X[10] = gyro_bias[0];
+	ekf.X[11] = gyro_bias[1];
+	ekf.X[12] = gyro_bias[2];
 }
 
 void INSPosVelReset(float pos[3], float vel[3]) 
 {
 	for (int i = 0; i < 6; i++) {
 		for(int j = i; j < NUMX; j++) {
-			P[i][j] = 0;  // zero the first 6 rows and columns
-			P[j][i] = 0; 
+			ekf.P[i][j] = 0;  // zero the first 6 rows and columns
+			ekf.P[j][i] = 0;
 		}
 	}
 	
-	P[0][0] = P[1][1] = P[2][2] = 25;	// initial position variance (m^2)
-	P[3][3] = P[4][4] = P[5][5] = 5;	// initial velocity variance (m/s)^2
+	ekf.P[0][0] = ekf.P[1][1] = ekf.P[2][2] = 25;	// initial position variance (m^2)
+	ekf.P[3][3] = ekf.P[4][4] = ekf.P[5][5] = 5;	// initial velocity variance (m/s)^2
 	
-	X[0] = pos[0];
-	X[1] = pos[1];
-	X[2] = pos[2];
-	X[3] = vel[0];
-	X[4] = vel[1];
-	X[5] = vel[2];	
+	ekf.X[0] = pos[0];
+	ekf.X[1] = pos[1];
+	ekf.X[2] = pos[2];
+	ekf.X[3] = vel[0];
+	ekf.X[4] = vel[1];
+	ekf.X[5] = vel[2];
 }
 
 void INSSetPosVelVar(float PosVar[3], float VelVar[3])
 {
-	R[0] = PosVar[0];
-	R[1] = PosVar[1];
-	R[2] = PosVar[2];
-	R[3] = VelVar[0];
-	R[4] = VelVar[1];
-	R[5] = VelVar[2];
+	ekf.R[0] = PosVar[0];
+	ekf.R[1] = PosVar[1];
+	ekf.R[2] = PosVar[2];
+	ekf.R[3] = VelVar[0];
+	ekf.R[4] = VelVar[1];
+	ekf.R[5] = VelVar[2];
 }
 
 void INSSetGyroBias(float gyro_bias[3])
 {
-	X[10] = gyro_bias[0];
-	X[11] = gyro_bias[1];
-	X[12] = gyro_bias[2];
+	ekf.X[10] = gyro_bias[0];
+	ekf.X[11] = gyro_bias[1];
+	ekf.X[12] = gyro_bias[2];
 }
 
 void INSSetAccelVar(float accel_var[3])
 {
-	Q[3] = accel_var[0];
-	Q[4] = accel_var[1];
-	Q[5] = accel_var[2];
+	ekf.Q[3] = accel_var[0];
+	ekf.Q[4] = accel_var[1];
+	ekf.Q[5] = accel_var[2];
 }
 
 void INSSetGyroVar(float gyro_var[3])
 {
-	Q[0] = gyro_var[0];
-	Q[1] = gyro_var[1];
-	Q[2] = gyro_var[2];
+	ekf.Q[0] = gyro_var[0];
+	ekf.Q[1] = gyro_var[1];
+	ekf.Q[2] = gyro_var[2];
 }
 
 void INSSetGyroBiasVar(float gyro_bias_var[3])
 {
-	Q[6] = gyro_bias_var[0];
-	Q[7] = gyro_bias_var[1];
-	Q[8] = gyro_bias_var[2];
+	ekf.Q[6] = gyro_bias_var[0];
+	ekf.Q[7] = gyro_bias_var[1];
+	ekf.Q[8] = gyro_bias_var[2];
 }
 
 void INSSetMagVar(float scaled_mag_var[3])
 {
-	R[6] = scaled_mag_var[0];
-	R[7] = scaled_mag_var[1];
-	R[8] = scaled_mag_var[2];
+	ekf.R[6] = scaled_mag_var[0];
+	ekf.R[7] = scaled_mag_var[1];
+	ekf.R[8] = scaled_mag_var[2];
 }
 
 void INSSetBaroVar(float baro_var)
 {
-	R[9] = baro_var;
+	ekf.R[9] = baro_var;
 }
 
 void INSSetMagNorth(float B[3])
 {
 	float mag = sqrtf(B[0] * B[0] + B[1] * B[1] + B[2] * B[2]);
-	Be[0] = B[0] / mag;
-	Be[1] = B[1] / mag;
-	Be[2] = B[2] / mag;
+	ekf.Be[0] = B[0] / mag;
+	ekf.Be[1] = B[1] / mag;
+	ekf.Be[2] = B[2] / mag;
 }
 
 void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT)
@@ -290,34 +299,34 @@ void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT)
 	U[5] = accel_data[2];
 
 	// EKF prediction step
-	LinearizeFG(X, U, F, G);
-	RungeKutta(X, U, dT);
-	qmag = sqrtf(X[6] * X[6] + X[7] * X[7] + X[8] * X[8] + X[9] * X[9]);
-	X[6] /= qmag;
-	X[7] /= qmag;
-	X[8] /= qmag;
-	X[9] /= qmag;
-	//CovariancePrediction(F,G,Q,dT,P);
+	LinearizeFG(ekf.X, U, ekf.F, ekf.G);
+	RungeKutta(ekf.X, U, dT);
+	qmag = sqrtf(ekf.X[6] * ekf.X[6] + ekf.X[7] * ekf.X[7] + ekf.X[8] * ekf.X[8] + ekf.X[9] * ekf.X[9]);
+	ekf.X[6] /= qmag;
+	ekf.X[7] /= qmag;
+	ekf.X[8] /= qmag;
+	ekf.X[9] /= qmag;
+	//CovariancePrediction(ekf.F,ekf.G,ekf.Q,dT,ekf.P);
 
 	// Update Nav solution structure
-	Nav.Pos[0] = X[0];
-	Nav.Pos[1] = X[1];
-	Nav.Pos[2] = X[2];
-	Nav.Vel[0] = X[3];
-	Nav.Vel[1] = X[4];
-	Nav.Vel[2] = X[5];
-	Nav.q[0] = X[6];
-	Nav.q[1] = X[7];
-	Nav.q[2] = X[8];
-	Nav.q[3] = X[9];
-	Nav.gyro_bias[0] = X[10];
-	Nav.gyro_bias[1] = X[11];
-	Nav.gyro_bias[2] = X[12];	
+	Nav.Pos[0] = ekf.X[0];
+	Nav.Pos[1] = ekf.X[1];
+	Nav.Pos[2] = ekf.X[2];
+	Nav.Vel[0] = ekf.X[3];
+	Nav.Vel[1] = ekf.X[4];
+	Nav.Vel[2] = ekf.X[5];
+	Nav.q[0] = ekf.X[6];
+	Nav.q[1] = ekf.X[7];
+	Nav.q[2] = ekf.X[8];
+	Nav.q[3] = ekf.X[9];
+	Nav.gyro_bias[0] = ekf.X[10];
+	Nav.gyro_bias[1] = ekf.X[11];
+	Nav.gyro_bias[2] = ekf.X[12];
 }
 
 void INSCovariancePrediction(float dT)
 {
-	CovariancePrediction(F, G, Q, dT, P);
+	CovariancePrediction(ekf.F, ekf.G, ekf.Q, dT, ekf.P);
 }
 
 float zeros[3] = { 0, 0, 0 };
@@ -386,29 +395,29 @@ void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
 	Z[9] = BaroAlt;
 
 	// EKF correction step
-	LinearizeH(X, Be, H);
-	MeasurementEq(X, Be, Y);
-	SerialUpdate(H, R, Z, Y, P, X, SensorsUsed);
-	qmag = sqrtf(X[6] * X[6] + X[7] * X[7] + X[8] * X[8] + X[9] * X[9]);
-	X[6] /= qmag;
-	X[7] /= qmag;
-	X[8] /= qmag;
-	X[9] /= qmag;
+	LinearizeH(ekf.X, ekf.Be, ekf.H);
+	MeasurementEq(ekf.X, ekf.Be, Y);
+	SerialUpdate(ekf.H, ekf.R, Z, Y, ekf.P, ekf.X, ekf.K, SensorsUsed);
+	qmag = sqrtf(ekf.X[6] * ekf.X[6] + ekf.X[7] * ekf.X[7] + ekf.X[8] * ekf.X[8] + ekf.X[9] * ekf.X[9]);
+	ekf.X[6] /= qmag;
+	ekf.X[7] /= qmag;
+	ekf.X[8] /= qmag;
+	ekf.X[9] /= qmag;
 
 	// Update Nav solution structure
-	Nav.Pos[0] = X[0];
-	Nav.Pos[1] = X[1];
-	Nav.Pos[2] = X[2];
-	Nav.Vel[0] = X[3];
-	Nav.Vel[1] = X[4];
-	Nav.Vel[2] = X[5];
-	Nav.q[0] = X[6];
-	Nav.q[1] = X[7];
-	Nav.q[2] = X[8];
-	Nav.q[3] = X[9];
-	Nav.gyro_bias[0] = X[10];
-	Nav.gyro_bias[1] = X[11];
-	Nav.gyro_bias[2] = X[12];
+	Nav.Pos[0] = ekf.X[0];
+	Nav.Pos[1] = ekf.X[1];
+	Nav.Pos[2] = ekf.X[2];
+	Nav.Vel[0] = ekf.X[3];
+	Nav.Vel[1] = ekf.X[4];
+	Nav.Vel[2] = ekf.X[5];
+	Nav.q[0] = ekf.X[6];
+	Nav.q[1] = ekf.X[7];
+	Nav.q[2] = ekf.X[8];
+	Nav.q[3] = ekf.X[9];
+	Nav.gyro_bias[0] = ekf.X[10];
+	Nav.gyro_bias[1] = ekf.X[11];
+	Nav.gyro_bias[2] = ekf.X[12];
 }
 
 //  *************  CovariancePrediction *************
@@ -505,7 +514,7 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 //  ************************************************
 
 void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
-		  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX],
+		  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX], float K[NUMX][NUMV],
 		  uint16_t SensorsUsed)
 {
 	float HP[NUMX], HPHR, Error;

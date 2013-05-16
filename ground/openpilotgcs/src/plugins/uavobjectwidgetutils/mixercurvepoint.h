@@ -39,8 +39,7 @@ QT_BEGIN_NAMESPACE
 class QGraphicsSceneMouseEvent;
 QT_END_NAMESPACE
 
-class MixerNode : public QObject,public QGraphicsItem
-{
+class MixerNode : public QObject, public QGraphicsItem {
     Q_OBJECT
 public:
     MixerNode(MixerCurveWidget *graphWidget);
@@ -48,27 +47,37 @@ public:
     QList<Edge *> edges() const;
 
     enum { Type = UserType + 10 };
-    int type() const { return Type; }
-
-    void setName(QString name) { cmdName = name; }
-    const QString& getName() { return cmdName; }
+    int type() const
+    {
+        return Type;
+    }
 
     void verticalMove(bool flag);
-    void commandNode(bool enable);
-    void commandText(QString text);
-    int  getCommandIndex() { return index; }
-    void setCommandIndex(int idx) { index = idx; }
 
-    bool getCommandActive() { return cmdActive; }
-    void setCommandActive(bool enable) { cmdActive = enable; }
-    void setToggle(bool enable) { cmdToggle = enable; }
-    bool getToggle() { return cmdToggle; }
+    void setPositiveColor(QColor color = "#609FF2")
+    {
+        positiveColor = color;
+    }
 
-    void setPositiveColor(QString color0 = "#00ff00", QString color1 = "#00ff00") { posColor0 = color0;  posColor1 = color1; }
-    void setNegativeColor(QString color0 = "#ff0000", QString color1 = "#ff0000") { negColor0 = color0; negColor1 = color1; }
-    void setImage(QImage img) { image = img; }
-    void setDrawNode(bool draw) { drawNode = draw; }
-    void setDrawText(bool draw) { drawText = draw; }
+    void setNegativeColor(QColor color = "#EF5F5F")
+    {
+        negativeColor = color;
+    }
+
+    void setImage(QImage img)
+    {
+        image = img;
+    }
+
+    void setDrawNode(bool draw)
+    {
+        drawNode = draw;
+    }
+
+    void setDrawText(bool draw)
+    {
+        drawText = draw;
+    }
 
     QRectF boundingRect() const;
     QPainterPath shape() const;
@@ -76,35 +85,29 @@ public:
 
     double value();
 
-signals:
-   void commandActivated(QString text);
-
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &val);
 
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
-    
+
 private:
-    QList<Edge *>       edgeList;
-    QPointF             newPos;
-    MixerCurveWidget*   graph;
-    QString             posColor0;
-    QString             posColor1;
-    QString             negColor0;
-    QString             negColor1;
-    QImage              image;
+    QList<Edge *> edgeList;
+    QPointF newPos;
+    MixerCurveWidget *graph;
 
-    bool    vertical;
-    QString cmdName;
-    bool    cmdActive;
-    bool    cmdNode;
-    bool    cmdToggle;
-    QString cmdText;    
-    bool    drawNode;
-    bool    drawText;
-    int     index;
+    QColor positiveColor;
+    QColor neutralColor;
+    QColor negativeColor;
+    QColor disabledColor;
+    QColor disabledTextColor;
 
+    QImage image;
+
+    bool vertical;
+    bool drawNode;
+    bool drawText;
+    int index;
 };
 
-#endif  // MIXERCURVEPOINT_H
+#endif // MIXERCURVEPOINT_H

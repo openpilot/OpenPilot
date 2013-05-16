@@ -113,7 +113,9 @@ int32_t StabilizationStart()
 	// Start main task
 	xTaskCreate(stabilizationTask, (signed char*)"Stabilization", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_STABILIZATION, taskHandle);
+#ifdef PIOS_INCLUDE_WDG
 	PIOS_WDG_RegisterFlag(PIOS_WDG_STABILIZATION);
+#endif
 	return 0;
 }
 
@@ -161,7 +163,9 @@ static void stabilizationTask(__attribute__((unused)) void* parameters)
 	while(1) {
 		float dT;
 		
+#ifdef PIOS_INCLUDE_WDG
 		PIOS_WDG_UpdateFlag(PIOS_WDG_STABILIZATION);
+#endif
 		
 		// Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
 		if ( xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE )

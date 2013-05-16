@@ -86,13 +86,13 @@ static struct bma180_dev * PIOS_BMA180_alloc(void)
  * @brief Validate the handle to the spi device
  * @returns 0 for valid device or -1 otherwise
  */
-static int32_t PIOS_BMA180_Validate(struct bma180_dev * dev)
+static int32_t PIOS_BMA180_Validate(struct bma180_dev *vdev)
 {
-	if (dev == NULL) 
+	if (vdev == NULL)
 		return -1;
-	if (dev->magic != PIOS_BMA180_DEV_MAGIC)
+	if (vdev->magic != PIOS_BMA180_DEV_MAGIC)
 		return -2;
-	if (dev->spi_id == 0)
+	if (vdev->spi_id == 0)
 		return -3;
 	return 0;
 }
@@ -128,10 +128,11 @@ int32_t PIOS_BMA180_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_
  */
 int32_t PIOS_BMA180_ClaimBus()
 {
-	if(PIOS_BMA180_Validate(dev) != 0)
+	if (PIOS_BMA180_Validate(dev) != 0) {
 		return -1;
+	}
 
-	if(PIOS_SPI_ClaimBus(dev->spi_id) != 0) {
+	if (PIOS_SPI_ClaimBus(dev->spi_id) != 0) {
 		return -1;
 	}
 
@@ -141,19 +142,22 @@ int32_t PIOS_BMA180_ClaimBus()
 }
 
 /**
- * @brief Claim the SPI bus for the accel communications and select this chip
+ * @brief Claim the SPI bus for the accel communications and select this chip. Call from an ISR.
+ * @param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
+ *                      task has is now eligible to run, else unchanged
  * @return 0 if successful, -1 if unable to claim bus
  */
-int32_t PIOS_BMA180_ClaimBusISR()
+int32_t PIOS_BMA180_ClaimBusISR(bool *woken)
 {
-	if(PIOS_BMA180_Validate(dev) != 0)
-		return -1;
-
-	if(PIOS_SPI_ClaimBusISR(dev->spi_id) != 0) {
+	if (PIOS_BMA180_Validate(dev) != 0) {
 		return -1;
 	}
 
-	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,0);
+	if (PIOS_SPI_ClaimBusISR(dev->spi_id, woken) != 0) {
+		return -1;
+	}
+
+	PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
 	return 0;
 }
 
@@ -163,12 +167,28 @@ int32_t PIOS_BMA180_ClaimBusISR()
  */
 int32_t PIOS_BMA180_ReleaseBus()
 {
+	if (PIOS_BMA180_Validate(dev) != 0) {
+		return -1;
+	}
+	PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
+
+	return PIOS_SPI_ReleaseBus(dev->spi_id);
+}
+
+/**
+ * @brief Release the SPI bus for the accel communications and end the transaction. Call from an ISR
+ * @param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
+ *                      task has is now eligible to run, else unchanged
+ * @return 0 if successful
+ */
+int32_t PIOS_BMA180_ReleaseBusISR(bool *woken)
+{
 	if(PIOS_BMA180_Validate(dev) != 0)
 		return -1;
 
-	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,1);
+	PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
 
-	return PIOS_SPI_ReleaseBus(dev->spi_id);
+	return PIOS_SPI_ReleaseBusISR(dev->spi_id, woken);
 }
 
 /**
@@ -431,19 +451,21 @@ int32_t PIOS_BMA180_Test()
 }
 
 /**
- * @brief IRQ Handler.  Read data from the BMA180 FIFO and push onto a local fifo.
+ * @brief EXTI IRQ Handler.  Read data from the BMA180 FIFO and push onto a local fifo.
+ * @return a boolean to the EXTI IRQ Handler wrapper indicating if a
+ *         higher priority task is now eligible to run
  */
 int32_t bma180_irqs = 0;
 bool PIOS_BMA180_IRQHandler(void)
 {
-	bma180_irqs++;
-	
+	bool woken = false;
 	static const uint8_t pios_bma180_req_buf[7] = {BMA_X_LSB_ADDR | 0x80,0,0,0,0,0};
 	uint8_t pios_bma180_dmabuf[8];
-
+	bma180_irqs++;
+	
 	// If we can't get the bus then just move on for efficiency
-	if(PIOS_BMA180_ClaimBusISR() != 0) {
-		return false; // Something else is using bus, miss this data
+	if (PIOS_BMA180_ClaimBusISR(&woken) != 0) {
+		return woken; // Something else is using bus, miss this data
 	}
 		
 	PIOS_SPI_TransferBlock(dev->spi_id,pios_bma180_req_buf,(uint8_t *) pios_bma180_dmabuf, 
@@ -453,11 +475,12 @@ bool PIOS_BMA180_IRQHandler(void)
 	struct pios_bma180_data data;
 	
 	// Don't release bus till data has copied
-	PIOS_BMA180_ReleaseBus();	
+	PIOS_BMA180_ReleaseBusISR(&woken);
 	
 	// Must not return before releasing bus
-	if(fifoBuf_getFree(&dev->fifo) < sizeof(data))
-		return false;
+	if (fifoBuf_getFree(&dev->fifo) < sizeof(data)) {
+		return woken;
+	}
 	
 	// Bottom two bits indicate new data and are constant zeros.  Don't right 
 	// shift because it drops sign bit
@@ -471,7 +494,7 @@ bool PIOS_BMA180_IRQHandler(void)
 	
 	fifoBuf_putData(&dev->fifo, (uint8_t *) &data, sizeof(data));
 	
-	return false;
+	return woken;
 }
 
 #endif /* PIOS_INCLUDE_BMA180 */

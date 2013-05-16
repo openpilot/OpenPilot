@@ -112,7 +112,7 @@ static int32_t fault_start(void)
 }
 MODULE_INITCALL(fault_initialize, fault_start)
 
-static void fault_task(void *parameters)
+static void fault_task(__attribute__((unused))void *parameters)
 {
 	switch (active_fault) {
 	case FAULTSETTINGS_ACTIVATEFAULT_RUNAWAYTASK:

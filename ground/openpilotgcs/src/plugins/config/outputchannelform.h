@@ -38,7 +38,7 @@ class OutputChannelForm : public ConfigTaskWidget
 public:
     explicit OutputChannelForm(const int index, QWidget *parent = NULL, const bool showLegend = false);
     ~OutputChannelForm();
-    friend class ConfigOnputWidget;
+    friend class ConfigOutputWidget;
 
     void setAssignment(const QString &assignment);
     int index() const;
@@ -57,10 +57,10 @@ signals:
     void channelChanged(int index, int value);
 
 private:
-    Ui::outputChannelForm ui;
     /// Channel index
     int m_index;
     bool m_inChannelTest;
+    Ui::outputChannelForm ui;
 
 private slots:
     void linkToggled(bool state);

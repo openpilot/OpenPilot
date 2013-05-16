@@ -126,7 +126,7 @@ static void i2c_adapter_reset_bus(struct pios_i2c_adapter *i2c_adapter);
 
 static void i2c_adapter_log_fault(enum pios_i2c_error_type type);
 
-const static struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM_STATES] = {
+static const struct i2c_adapter_transition i2c_adapter_transitions[I2C_STATE_NUM_STATES] = {
 	[I2C_STATE_FSM_FAULT] = {
 				 .entry_fn = go_fsm_fault,
 				 .next_state = {
@@ -607,9 +607,6 @@ static void i2c_adapter_inject_event(struct pios_i2c_adapter *i2c_adapter, enum 
 	 * guarantee that the entry function never depends on the previous
 	 * state.  This way, it cannot ever know what the previous state was.
 	 */
-	enum i2c_adapter_state prev_state = i2c_adapter->curr_state;
-	if (prev_state) ;
-
 	i2c_adapter->curr_state = i2c_adapter_transitions[i2c_adapter->curr_state].next_state[event];
 
 	/* Call the entry function (if any) for the next state. */
@@ -626,10 +623,6 @@ static void i2c_adapter_inject_event(struct pios_i2c_adapter *i2c_adapter, enum 
 static void i2c_adapter_process_auto(struct pios_i2c_adapter *i2c_adapter)
 {
 	PIOS_IRQ_Disable();
-
-	enum i2c_adapter_state prev_state = i2c_adapter->curr_state;
-	if (prev_state) ;
-
 	while (i2c_adapter_transitions[i2c_adapter->curr_state].next_state[I2C_EVENT_AUTO]) {
 		i2c_adapter->curr_state = i2c_adapter_transitions[i2c_adapter->curr_state].next_state[I2C_EVENT_AUTO];
 
@@ -659,7 +652,7 @@ static bool i2c_adapter_wait_for_stopped(struct pios_i2c_adapter *i2c_adapter)
 	 * in spinning on this bit in the ISR forever.
 	 */
 #define I2C_CR1_STOP_REQUESTED 0x0200
-	for (guard = 1e6;	/* FIXME: should use the configured bus timeout */
+	for (guard = 1000000;	/* FIXME: should use the configured bus timeout */
 	     guard && (i2c_adapter->cfg->regs->CR1 & I2C_CR1_STOP_REQUESTED); guard--)
 		continue;
 	if (!guard) {

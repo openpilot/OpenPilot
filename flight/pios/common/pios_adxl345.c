@@ -70,13 +70,13 @@ static struct adxl345_dev * PIOS_ADXL345_alloc(void)
  * @brief Validate the handle to the spi device
  * @returns 0 for valid device or -1 otherwise
  */
-static int32_t PIOS_ADXL345_Validate(struct adxl345_dev * dev)
+static int32_t PIOS_ADXL345_Validate(struct adxl345_dev *vdev)
 {
-	if (dev == NULL) 
+	if (vdev == NULL)
 		return -1;
-	if (dev->magic != PIOS_ADXL345_DEV_MAGIC)
+	if (vdev->magic != PIOS_ADXL345_DEV_MAGIC)
 		return -2;
-	if (dev->spi_id == 0)
+	if (vdev->spi_id == 0)
 		return -3;
 	return 0;
 }

@@ -79,11 +79,9 @@ ConfigGroundVehicleWidget::ConfigGroundVehicleWidget(QWidget *parent) :
     m_aircraft->groundVehicleType->addItems(groundVehicleTypes);
 
     // Set default model to "Turnable (car)"
-    m_aircraft->groundVehicleType->setCurrentIndex(m_aircraft->groundVehicleType->findText("Turnable (car)"));
-
-    //setupUI(m_aircraft->groundVehicleType->currentText());
-
     connect(m_aircraft->groundVehicleType, SIGNAL(currentIndexChanged(QString)), this, SLOT(setupUI(QString)));
+    m_aircraft->groundVehicleType->setCurrentIndex(m_aircraft->groundVehicleType->findText("Turnable (car)"));
+    setupUI(m_aircraft->groundVehicleType->currentText());
 }
 
 ConfigGroundVehicleWidget::~ConfigGroundVehicleWidget()
@@ -96,42 +94,32 @@ ConfigGroundVehicleWidget::~ConfigGroundVehicleWidget()
  */
 void ConfigGroundVehicleWidget::setupUI(QString frameType)
 {
-    m_aircraft->differentialSteeringMixBox->setHidden(true);
-    //STILL NEEDS WORK
-
     // Setup the UI
 
     m_aircraft->gvEngineChannelBox->setEnabled(false);
-    m_aircraft->gvEngineLabel->setEnabled(false);
-
     m_aircraft->gvAileron1ChannelBox->setEnabled(false);
-    m_aircraft->gvAileron1Label->setEnabled(false);
-
     m_aircraft->gvAileron2ChannelBox->setEnabled(false);
-    m_aircraft->gvAileron2Label->setEnabled(false);
+
+    m_aircraft->differentialSteeringSlider1->setEnabled(false);
+    m_aircraft->differentialSteeringSlider2->setEnabled(false);
 
     if (frameType == "GroundVehicleDifferential" || frameType == "Differential (tank)") {
         // Tank
         setComboCurrentIndex(m_aircraft->groundVehicleType,
                 m_aircraft->groundVehicleType->findText("Differential (tank)"));
         m_aircraft->gvMotor1ChannelBox->setEnabled(true);
-        m_aircraft->gvMotor1Label->setEnabled(true);
-
         m_aircraft->gvMotor2ChannelBox->setEnabled(true);
-        m_aircraft->gvMotor2Label->setEnabled(true);
 
         m_aircraft->gvMotor1Label->setText("Left motor");
         m_aircraft->gvMotor2Label->setText("Right motor");
 
         m_aircraft->gvSteering1ChannelBox->setEnabled(false);
-        m_aircraft->gvSteering1Label->setEnabled(false);
-
         m_aircraft->gvSteering2ChannelBox->setEnabled(false);
-        m_aircraft->gvSteering2Label->setEnabled(false);
 
         m_aircraft->gvSteering2Label->setText("Rear steering");
 
-        m_aircraft->differentialSteeringMixBox->setHidden(false);
+        m_aircraft->differentialSteeringSlider1->setEnabled(true);
+        m_aircraft->differentialSteeringSlider2->setEnabled(true);
 
         m_aircraft->gvThrottleCurve1GroupBox->setTitle("Left throttle curve");
         m_aircraft->gvThrottleCurve2GroupBox->setTitle("Right throttle curve");
@@ -140,23 +128,15 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
         // Motorcycle
         setComboCurrentIndex(m_aircraft->groundVehicleType, m_aircraft->groundVehicleType->findText("Motorcycle"));
         m_aircraft->gvMotor1ChannelBox->setEnabled(false);
-        m_aircraft->gvMotor1Label->setEnabled(false);
-
         m_aircraft->gvMotor2ChannelBox->setEnabled(true);
-        m_aircraft->gvMotor2Label->setEnabled(true);
 
         m_aircraft->gvMotor1Label->setText("Front motor");
         m_aircraft->gvMotor2Label->setText("Rear motor");
 
         m_aircraft->gvSteering1ChannelBox->setEnabled(true);
-        m_aircraft->gvSteering1Label->setEnabled(true);
-
         m_aircraft->gvSteering2ChannelBox->setEnabled(true);
-        m_aircraft->gvSteering2Label->setEnabled(true);
 
         m_aircraft->gvSteering2Label->setText("Balancing");
-
-        m_aircraft->differentialSteeringMixBox->setHidden(true);
 
         m_aircraft->gvThrottleCurve1GroupBox->setTitle("Front throttle curve");
         m_aircraft->gvThrottleCurve2GroupBox->setTitle("Rear throttle curve");
@@ -165,31 +145,40 @@ void ConfigGroundVehicleWidget::setupUI(QString frameType)
         setComboCurrentIndex(m_aircraft->groundVehicleType, m_aircraft->groundVehicleType->findText("Turnable (car)"));
 
         m_aircraft->gvMotor1ChannelBox->setEnabled(true);
-        m_aircraft->gvMotor1Label->setEnabled(true);
-
         m_aircraft->gvMotor2ChannelBox->setEnabled(true);
-        m_aircraft->gvMotor2Label->setEnabled(true);
 
         m_aircraft->gvMotor1Label->setText("Front motor");
         m_aircraft->gvMotor2Label->setText("Rear motor");
 
         m_aircraft->gvSteering1ChannelBox->setEnabled(true);
-        m_aircraft->gvSteering1Label->setEnabled(true);
-
         m_aircraft->gvSteering2ChannelBox->setEnabled(true);
-        m_aircraft->gvSteering2Label->setEnabled(true);
-
-        m_aircraft->differentialSteeringMixBox->setHidden(true);
 
         m_aircraft->gvThrottleCurve1GroupBox->setTitle("Front throttle curve");
         m_aircraft->gvThrottleCurve2GroupBox->setTitle("Rear throttle curve");
     }
 }
 
+void ConfigGroundVehicleWidget::enableControls(bool enable)
+{
+    ConfigTaskWidget::enableControls(enable);
+    if(enable) {
+        setupUI(m_aircraft->groundVehicleType->currentText());
+    }
+}
+
 void ConfigGroundVehicleWidget::registerWidgets(ConfigTaskWidget &parent) {
     parent.addWidget(m_aircraft->groundVehicleThrottle1->getCurveWidget());
+    parent.addWidget(m_aircraft->groundVehicleThrottle1);
     parent.addWidget(m_aircraft->groundVehicleThrottle2->getCurveWidget());
+    parent.addWidget(m_aircraft->groundVehicleThrottle2);
     parent.addWidget(m_aircraft->groundVehicleType);
+    parent.addWidget(m_aircraft->gvEngineChannelBox);
+    parent.addWidget(m_aircraft->gvAileron1ChannelBox);
+    parent.addWidget(m_aircraft->gvAileron2ChannelBox);
+    parent.addWidget(m_aircraft->gvMotor1ChannelBox);
+    parent.addWidget(m_aircraft->gvMotor2ChannelBox);
+    parent.addWidget(m_aircraft->gvSteering1ChannelBox);
+    parent.addWidget(m_aircraft->gvSteering2ChannelBox);
 }
 
 void ConfigGroundVehicleWidget::resetActuators(GUIConfigDataUnion *configData)

@@ -215,29 +215,29 @@ void updatePathDesired(__attribute__((unused)) UAVObjEvent * ev) {
 
 	// use local variables, dont use stack since this is huge and a callback,
 	// dont use the globals because we cant use mutexes here
-	static WaypointActiveData waypointActive;
-	static PathActionData pathAction;
-	static WaypointData waypoint;
+	static WaypointActiveData waypointActiveData;
+	static PathActionData pathActionData;
+	static WaypointData waypointData;
 	static PathDesiredData pathDesired;
 
 	// find out current waypoint
-	WaypointActiveGet(&waypointActive);
+	WaypointActiveGet(&waypointActiveData);
 
-	WaypointInstGet(waypointActive.Index,&waypoint);
-	PathActionInstGet(waypoint.Action, &pathAction);
+	WaypointInstGet(waypointActiveData.Index,&waypointData);
+	PathActionInstGet(waypointData.Action, &pathActionData);
 
-	pathDesired.End[PATHDESIRED_END_NORTH] = waypoint.Position[WAYPOINT_POSITION_NORTH];
-	pathDesired.End[PATHDESIRED_END_EAST]  = waypoint.Position[WAYPOINT_POSITION_EAST];
-	pathDesired.End[PATHDESIRED_END_DOWN]  = waypoint.Position[WAYPOINT_POSITION_DOWN];
-	pathDesired.EndingVelocity = waypoint.Velocity;
-	pathDesired.Mode = pathAction.Mode;
-	pathDesired.ModeParameters[0] = pathAction.ModeParameters[0]; 
-	pathDesired.ModeParameters[1] = pathAction.ModeParameters[1]; 
-	pathDesired.ModeParameters[2] = pathAction.ModeParameters[2]; 
-	pathDesired.ModeParameters[3] = pathAction.ModeParameters[3]; 
-	pathDesired.UID = waypointActive.Index;
+	pathDesired.End[PATHDESIRED_END_NORTH] = waypointData.Position[WAYPOINT_POSITION_NORTH];
+	pathDesired.End[PATHDESIRED_END_EAST]  = waypointData.Position[WAYPOINT_POSITION_EAST];
+	pathDesired.End[PATHDESIRED_END_DOWN]  = waypointData.Position[WAYPOINT_POSITION_DOWN];
+	pathDesired.EndingVelocity = waypointData.Velocity;
+	pathDesired.Mode = pathActionData.Mode;
+	pathDesired.ModeParameters[0] = pathActionData.ModeParameters[0];
+	pathDesired.ModeParameters[1] = pathActionData.ModeParameters[1];
+	pathDesired.ModeParameters[2] = pathActionData.ModeParameters[2];
+	pathDesired.ModeParameters[3] = pathActionData.ModeParameters[3];
+	pathDesired.UID = waypointActiveData.Index;
 
-	if(waypointActive.Index == 0) {
+	if(waypointActiveData.Index == 0) {
 		PositionActualData positionActual;
 		PositionActualGet(&positionActual);
 		// First waypoint has itself as start point (used to be home position but that proved dangerous when looping)
@@ -260,7 +260,6 @@ void updatePathDesired(__attribute__((unused)) UAVObjEvent * ev) {
 		pathDesired.StartingVelocity = waypointPrev.Velocity;
 	}
 	PathDesiredSet(&pathDesired);
-
 }
 
 // helper function to go to a specific waypoint

@@ -108,9 +108,3 @@ void ConfigTxPIDWidget::saveSettings()
     UAVObject *obj = HwSettings::GetInstance(getObjectManager());
     saveObjectToSD(obj);
 }
-
-
-/**
-  @}
-  @}
-  */

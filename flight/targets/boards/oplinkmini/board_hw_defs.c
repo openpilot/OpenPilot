@@ -582,8 +582,6 @@ const struct pios_ppm_cfg pios_ppm_main_cfg = {
 #if defined(PIOS_INCLUDE_PPM_OUT)
 #include <pios_ppm_out_priv.h>
 
-uint32_t pios_ppm_id;
-
 static const struct pios_tim_channel pios_tim_ppmout[] = {
 	{
 		.timer = TIM2,
@@ -640,7 +638,8 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
 			.GPIO_Speed = GPIO_Speed_10MHz,
 			.GPIO_Mode  = GPIO_Mode_AF_OD,
 		},
-	}
+        },
+        .vsense_active_low = false
 };
 
 #include "pios_usb_board_data_priv.h"

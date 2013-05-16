@@ -45,18 +45,19 @@
 
 #include <openpilot.h>
 
-#include "CoordinateConversions.h"
-#include "altholdsmoothed.h"
-#include "attitudeactual.h"
-#include "altitudeholdsettings.h"
-#include "altitudeholddesired.h"	// object that will be updated by the module
-#include "baroaltitude.h"
-#include "positionactual.h"
-#include "flightstatus.h"
-#include "stabilizationdesired.h"
-#include "accels.h"
-#include "taskinfo.h"
-
+#include <math.h>
+#include <CoordinateConversions.h>
+#include <altholdsmoothed.h>
+#include <attitudeactual.h>
+#include <altitudeholdsettings.h>
+#include <altitudeholddesired.h>	// object that will be updated by the module
+#include <baroaltitude.h>
+#include <positionactual.h>
+#include <flightstatus.h>
+#include <stabilizationdesired.h>
+#include <accels.h>
+#include <taskinfo.h>
+#include <pios_constants.h>
 // Private constants
 #define MAX_QUEUE_SIZE 2
 #define STACK_SIZE_BYTES 1024
@@ -340,7 +341,8 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 			// Verify that we are  in altitude hold mode
 			FlightStatusData flightStatus;
 			FlightStatusGet(&flightStatus);
-			if(flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) {
+			if(flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ||
+			   flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED) {
 				running = false;
 			}
 

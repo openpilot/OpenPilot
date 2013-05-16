@@ -50,7 +50,7 @@ public:
 
 
 private:
-        Ui_OutputWidget *m_config;
+    Ui_OutputWidget *ui;
 
 	QList<QSlider> sliders;
 

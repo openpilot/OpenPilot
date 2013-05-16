@@ -50,7 +50,7 @@ const struct pios_rcvr_driver pios_ppm_rcvr_driver = {
 #define PIOS_PPM_IN_MAX_CHANNEL_PULSE_US	2250   // microseconds
 
 /* Local Variables */
-static TIM_ICInitTypeDef TIM_ICInitStructure;
+//static TIM_ICInitTypeDef TIM_ICInitStructure;
 
 static void PIOS_PPM_Supervisor(uint32_t ppm_id);
 
@@ -156,12 +156,13 @@ extern int32_t PIOS_PPM_Init(uint32_t * ppm_id, const struct pios_ppm_cfg * cfg)
 		return -1;
 	}
 
+	TIM_ICInitTypeDef TIM_ICInitStructure = cfg->tim_ic_init;
+
 	/* Configure the channels to be in capture/compare mode */
 	for (uint8_t i = 0; i < cfg->num_channels; i++) {
 		const struct pios_tim_channel * chan = &cfg->channels[i];
 
 		/* Configure timer for input capture */
-		TIM_ICInitTypeDef TIM_ICInitStructure = cfg->tim_ic_init;
 		TIM_ICInitStructure.TIM_Channel = chan->timer_chan;
 		TIM_ICInit(chan->timer, &TIM_ICInitStructure);
 
@@ -181,12 +182,6 @@ extern int32_t PIOS_PPM_Init(uint32_t * ppm_id, const struct pios_ppm_cfg * cfg)
 			break;
 		}
 	}
-
-	/* Setup local variable which stays in this scope */
-	/* Doing this here and using a local variable saves doing it in the ISR */
-	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-	TIM_ICInitStructure.TIM_ICFilter = 0x0;
 
 	ppm_dev->supv_timer = 0;
 	if (!PIOS_RTC_RegisterTickCallback(PIOS_PPM_Supervisor, (uint32_t)ppm_dev)) {

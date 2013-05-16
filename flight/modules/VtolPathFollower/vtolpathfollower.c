@@ -566,7 +566,6 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
     StabilizationDesiredData stabDesired;
     AttitudeActualData attitudeActual;
     NedAccelData nedAccel;
-    VtolPathFollowerSettingsData vtolpathfollowerSettings;
     StabilizationSettingsData stabSettings;
     SystemSettingsData systemSettings;
 
@@ -580,8 +579,6 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
     float downCommand;
 
     SystemSettingsGet(&systemSettings);
-    VtolPathFollowerSettingsGet(&vtolpathfollowerSettings);
-
     VelocityActualGet(&velocityActual);
     VelocityDesiredGet(&velocityDesired);
     StabilizationDesiredGet(&stabDesired);

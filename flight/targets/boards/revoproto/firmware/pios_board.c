@@ -339,7 +339,7 @@ static void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg
 }
 
 static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm_cfg, const struct pios_dsm_cfg *pios_dsm_cfg, 
-		const struct pios_com_driver *pios_usart_com_driver,enum pios_dsm_proto *proto, 
+		const struct pios_com_driver *usart_com_driver,enum pios_dsm_proto *proto,
 		ManualControlSettingsChannelGroupsOptions channelgroup,uint8_t *bind)
 {
 	uint32_t pios_usart_dsm_id;
@@ -348,7 +348,7 @@ static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm
 	}
 	
 	uint32_t pios_dsm_id;
-	if (PIOS_DSM_Init(&pios_dsm_id, pios_dsm_cfg, pios_usart_com_driver,
+	if (PIOS_DSM_Init(&pios_dsm_id, pios_dsm_cfg, usart_com_driver,
 			pios_usart_dsm_id, *proto, *bind)) {
 		PIOS_Assert(0);
 	}

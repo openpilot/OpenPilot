@@ -60,9 +60,11 @@ static int32_t PIOS_L3GD20_Validate(struct l3gd20_dev * dev);
 static void PIOS_L3GD20_Config(struct pios_l3gd20_cfg const * cfg);
 static int32_t PIOS_L3GD20_SetReg(uint8_t address, uint8_t buffer);
 static int32_t PIOS_L3GD20_GetReg(uint8_t address);
+static int32_t PIOS_L3GD20_GetRegISR(uint8_t address, bool *woken);
 static int32_t PIOS_L3GD20_ClaimBus();
-static int32_t PIOS_L3GD20_ClaimBusIsr();
+static int32_t PIOS_L3GD20_ClaimBusISR(bool *woken);
 static int32_t PIOS_L3GD20_ReleaseBus();
+static int32_t PIOS_L3GD20_ReleaseBusISR(bool *woken);
 
 volatile bool l3gd20_configured = false;
 
@@ -93,13 +95,13 @@ static struct l3gd20_dev * PIOS_L3GD20_alloc(void)
  * @brief Validate the handle to the spi device
  * @returns 0 for valid device or -1 otherwise
  */
-static int32_t PIOS_L3GD20_Validate(struct l3gd20_dev * dev)
+static int32_t PIOS_L3GD20_Validate(struct l3gd20_dev *vdev)
 {
-	if (dev == NULL) 
+	if (vdev == NULL)
 		return -1;
-	if (dev->magic != PIOS_L3GD20_DEV_MAGIC)
+	if (vdev->magic != PIOS_L3GD20_DEV_MAGIC)
 		return -2;
-	if (dev->spi_id == 0)
+	if (vdev->spi_id == 0)
 		return -3;
 	return 0;
 }
@@ -191,17 +193,19 @@ static int32_t PIOS_L3GD20_ClaimBus()
 
 /**
  * @brief Claim the SPI bus for the accel communications and select this chip
+ * @param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
+ *                      task has is now eligible to run, else unchanged
  * @return 0 if successful, -1 for invalid device, -2 if unable to claim bus
  */
-static int32_t PIOS_L3GD20_ClaimBusIsr()
+static int32_t PIOS_L3GD20_ClaimBusISR(bool *woken)
 {
-	if(PIOS_L3GD20_Validate(dev) != 0)
+	if(PIOS_L3GD20_Validate(dev) != 0) {
 		return -1;
-
-	if(PIOS_SPI_ClaimBusISR(dev->spi_id) != 0)
+	}
+	if(PIOS_SPI_ClaimBusISR(dev->spi_id, woken) != 0) {
 		return -2;
-
-	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,0);
+	}
+	PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
 	return 0;
 }
 
@@ -211,12 +215,26 @@ static int32_t PIOS_L3GD20_ClaimBusIsr()
  */
 int32_t PIOS_L3GD20_ReleaseBus()
 {
-	if(PIOS_L3GD20_Validate(dev) != 0)
+	if(PIOS_L3GD20_Validate(dev) != 0) {
 		return -1;
-
-	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,1);
-
+	}
+	PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
 	return PIOS_SPI_ReleaseBus(dev->spi_id);
+}
+
+/**
+ * @brief Release the SPI bus for the accel communications and end the transaction
+ * @param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
+ *                      task has is now eligible to run, else unchanged
+ * @return 0 if successful, -1 for invalid device
+ */
+int32_t PIOS_L3GD20_ReleaseBusISR(bool *woken)
+{
+	if(PIOS_L3GD20_Validate(dev) != 0) {
+		return -1;
+	}
+	PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
+	return PIOS_SPI_ReleaseBusISR(dev->spi_id, woken);
 }
 
 /**
@@ -235,6 +253,26 @@ static int32_t PIOS_L3GD20_GetReg(uint8_t reg)
 	data = PIOS_SPI_TransferByte(dev->spi_id,0 );     // receive response
 	
 	PIOS_L3GD20_ReleaseBus();
+	return data;
+}
+
+/**
+ * @brief Read a register from L3GD20 in an ISR context
+ * @param reg[in] Register address to be read
+ * @param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
+ *                      task has is now eligible to run, else unchanged
+ * @return The register value or -1 if failure to get bus
+ */
+static int32_t PIOS_L3GD20_GetRegISR(uint8_t reg, bool *woken)
+{
+	uint8_t data;
+
+	if(PIOS_L3GD20_ClaimBusISR(woken) != 0) {
+		return -1;
+	}
+	PIOS_SPI_TransferByte(dev->spi_id,(0x80 | reg) ); // request byte
+	data = PIOS_SPI_TransferByte(dev->spi_id,0 );     // receive response
+	PIOS_L3GD20_ReleaseBusISR(woken);
 	return data;
 }
 
@@ -349,34 +387,38 @@ uint8_t PIOS_L3GD20_Test(void)
 }
 
 /**
-* @brief IRQ Handler.  Read all the data from onboard buffer
+* @brief EXTI IRQ Handler.  Read all the data from onboard buffer
+ * @return a boolean to the EXTI IRQ Handler wrapper indicating if a
+ *         higher priority task is now eligible to run
 */
 bool PIOS_L3GD20_IRQHandler(void)
 {
-	l3gd20_irq++;
-
+	bool woken = false;
 	struct pios_l3gd20_data data;
 	uint8_t buf[7] = {PIOS_L3GD20_GYRO_X_OUT_LSB | 0x80 | 0x40, 0, 0, 0, 0, 0, 0};
 	uint8_t rec[7];
 
+	l3gd20_irq++;
+
 	/* This code duplicates ReadGyros above but uses ClaimBusIsr */
-	if(PIOS_L3GD20_ClaimBusIsr() != 0)
-		return false;
-	
-	if(PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
-		PIOS_L3GD20_ReleaseBus();
-		return false;
+	if (PIOS_L3GD20_ClaimBusISR(&woken) != 0) {
+		return woken;
 	}
 	
-	PIOS_L3GD20_ReleaseBus();
+	if(PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
+		PIOS_L3GD20_ReleaseBusISR(&woken);
+		return woken;
+	}
+	
+	PIOS_L3GD20_ReleaseBusISR(&woken);
 	
 	memcpy((uint8_t *) &(data.gyro_x), &rec[1], 6);
-	data.temperature = PIOS_L3GD20_GetReg(PIOS_L3GD20_OUT_TEMP);
+	data.temperature = PIOS_L3GD20_GetRegISR(PIOS_L3GD20_OUT_TEMP, &woken);
 	
-	portBASE_TYPE xHigherPriorityTaskWoken;
-	xQueueSendToBackFromISR(dev->queue, (void *) &data, &xHigherPriorityTaskWoken);
+	signed portBASE_TYPE higherPriorityTaskWoken;
+	xQueueSendToBackFromISR(dev->queue, (void *) &data, &higherPriorityTaskWoken);
 	
-	return xHigherPriorityTaskWoken == pdTRUE;
+	return (woken || higherPriorityTaskWoken == pdTRUE);
 }
 
 #endif /* PIOS_INCLUDE_L3GD20 */

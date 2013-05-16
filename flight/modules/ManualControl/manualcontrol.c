@@ -205,8 +205,10 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 
     // Main task loop
     lastSysTime = xTaskGetTickCount();
+
+    float scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM] = {0};
+
     while (1) {
-        float scaledChannel[MANUALCONTROLSETTINGS_CHANNELGROUPS_NUMELEM];
 
         // Wait until next update
         vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD_MS / portTICK_RATE_MS);
@@ -810,13 +812,13 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
     uint8_t throttleRate;
     uint8_t throttleExp;
 
-    static portTickType lastSysTime;
+    static portTickType lastSysTimeAH;
     static bool zeroed = false;
     portTickType thisSysTime;
     float dT;
 
-    AltitudeHoldDesiredData altitudeHoldDesired;
-    AltitudeHoldDesiredGet(&altitudeHoldDesired);
+    AltitudeHoldDesiredData altitudeHoldDesiredData;
+    AltitudeHoldDesiredGet(&altitudeHoldDesiredData);
 
     AltitudeHoldSettingsThrottleExpGet(&throttleExp);
     AltitudeHoldSettingsThrottleRateGet(&throttleRate);
@@ -825,36 +827,36 @@ static void altitudeHoldDesired(ManualControlCommandData * cmd, bool changed)
     StabilizationSettingsGet(&stabSettings);
 
     thisSysTime = xTaskGetTickCount();
-	dT = ((thisSysTime == lastSysTime)? 0.001f : (thisSysTime - lastSysTime) * portTICK_RATE_MS * 0.001f);
-    lastSysTime = thisSysTime;
+	dT = ((thisSysTime == lastSysTimeAH)? 0.001f : (thisSysTime - lastSysTimeAH) * portTICK_RATE_MS * 0.001f);
+	lastSysTimeAH = thisSysTime;
 
-    altitudeHoldDesired.Roll = cmd->Roll * stabSettings.RollMax;
-    altitudeHoldDesired.Pitch = cmd->Pitch * stabSettings.PitchMax;
-    altitudeHoldDesired.Yaw = cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
+    altitudeHoldDesiredData.Roll = cmd->Roll * stabSettings.RollMax;
+    altitudeHoldDesiredData.Pitch = cmd->Pitch * stabSettings.PitchMax;
+    altitudeHoldDesiredData.Yaw = cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
 
     float currentDown;
     PositionActualDownGet(&currentDown);
     if(changed) {
         // After not being in this mode for a while init at current height
-        altitudeHoldDesired.Altitude = 0;
+        altitudeHoldDesiredData.Altitude = 0;
         zeroed = false;
     } else if (cmd->Throttle > DEADBAND_HIGH && zeroed) {
         // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
         // then apply an "exp" f(x,k) = (k∙x∙x∙x + x∙(256−k)) / 256
-        altitudeHoldDesired.Altitude += (throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
+        altitudeHoldDesiredData.Altitude += (throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
     } else if (cmd->Throttle < DEADBAND_LOW && zeroed) {
-        altitudeHoldDesired.Altitude -=  (throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
+        altitudeHoldDesiredData.Altitude -=  (throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
     } else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH) {
         // Require the stick to enter the dead band before they can move height
         zeroed = true;
     }
 
-    AltitudeHoldDesiredSet(&altitudeHoldDesired);
+    AltitudeHoldDesiredSet(&altitudeHoldDesiredData);
 }
 #else
 
 // TODO: These functions should never be accessible on CC.  Any configuration that
-// could allow them to be called sholud already throw an error to prevent this happening
+// could allow them to be called should already throw an error to prevent this happening
 // in flight
 static void updatePathDesired(__attribute__((unused)) ManualControlCommandData * cmd,
 								  __attribute__((unused)) bool changed,

@@ -91,13 +91,13 @@ static struct mpu6000_dev * PIOS_MPU6000_alloc(void)
  * @brief Validate the handle to the spi device
  * @returns 0 for valid device or -1 otherwise
  */
-static int32_t PIOS_MPU6000_Validate(struct mpu6000_dev * dev)
+static int32_t PIOS_MPU6000_Validate(struct mpu6000_dev *vdev)
 {
-	if (dev == NULL) 
+	if (vdev == NULL)
 		return -1;
-	if (dev->magic != PIOS_MPU6000_DEV_MAGIC)
+	if (vdev->magic != PIOS_MPU6000_DEV_MAGIC)
 		return -2;
-	if (dev->spi_id == 0)
+	if (vdev->spi_id == 0)
 		return -3;
 	return 0;
 }
@@ -197,7 +197,12 @@ int32_t PIOS_MPU6000_ConfigureRanges(
 {
 	if(dev == NULL)
 		return -1;
+
+	// TODO: check that changing the SPI clock speed is safe
+	// to do here given that interrupts are enabled and the bus has
+	// not been claimed/is not claimed during this call
 	PIOS_SPI_SetClockSpeed(dev->spi_id, PIOS_SPI_PRESCALER_256);
+
 	// update filter settings
 	while (PIOS_MPU6000_SetReg(PIOS_MPU6000_DLPF_CFG_REG, filterSetting) != 0);
 	
@@ -225,39 +230,63 @@ int32_t PIOS_MPU6000_ConfigureRanges(
 /**
  * @brief Claim the SPI bus for the accel communications and select this chip
  * @return 0 if successful, -1 for invalid device, -2 if unable to claim bus
- * @param fromIsr[in] Tells if the function is being called from a ISR or not
  */
-static int32_t PIOS_MPU6000_ClaimBus(bool fromIsr)
+static int32_t PIOS_MPU6000_ClaimBus()
 {
-	if(PIOS_MPU6000_Validate(dev) != 0)
+	if(PIOS_MPU6000_Validate(dev) != 0) {
 		return -1;
-	if(fromIsr){
-        if(PIOS_SPI_ClaimBusISR(dev->spi_id) != 0)
-            return -2;
-	} else {
-        if(PIOS_SPI_ClaimBus(dev->spi_id) != 0)
-            return -2;
 	}
-	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,0);
+	if (PIOS_SPI_ClaimBus(dev->spi_id) != 0) {
+		return -2;
+	}
+	PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
+	return 0;
+}
+
+/**
+ * @brief Claim the SPI bus for the accel communications and select this chip
+ * @return 0 if successful, -1 for invalid device, -2 if unable to claim bus
+ * @param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
+ *                      task has is now eligible to run, else unchanged
+ */
+static int32_t PIOS_MPU6000_ClaimBusISR(bool *woken)
+{
+	if (PIOS_MPU6000_Validate(dev) != 0) {
+		return -1;
+	}
+	if (PIOS_SPI_ClaimBusISR(dev->spi_id, woken) != 0) {
+		return -2;
+	}
+	PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 0);
 	return 0;
 }
 
 /**
  * @brief Release the SPI bus for the accel communications and end the transaction
  * @return 0 if successful
- * @param fromIsr[in] Tells if the function is being called from a ISR or not
  */
-int32_t PIOS_MPU6000_ReleaseBus(bool fromIsr)
+static int32_t PIOS_MPU6000_ReleaseBus()
 {
-	if(PIOS_MPU6000_Validate(dev) != 0)
+	if(PIOS_MPU6000_Validate(dev) != 0) {
 		return -1;
-	
-	PIOS_SPI_RC_PinSet(dev->spi_id,dev->slave_num,1);
-	if(fromIsr){
-	    return PIOS_SPI_ReleaseBusISR(dev->spi_id);
-	} else {
-	    return PIOS_SPI_ReleaseBus(dev->spi_id);
 	}
+	PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
+	return PIOS_SPI_ReleaseBus(dev->spi_id);
+}
+
+/**
+ * @brief Release the SPI bus for the accel communications and end the transaction
+ * @return 0 if successful
+ * @param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
+ *                      task has is now eligible to run, else unchanged
+ */
+static int32_t PIOS_MPU6000_ReleaseBusISR(bool *woken)
+{
+	if(PIOS_MPU6000_Validate(dev) != 0) {
+		return -1;
+	}
+	PIOS_SPI_RC_PinSet(dev->spi_id, dev->slave_num, 1);
+	return PIOS_SPI_ReleaseBusISR(dev->spi_id, woken);
 }
 
 /**
@@ -269,13 +298,14 @@ static int32_t PIOS_MPU6000_GetReg(uint8_t reg)
 {
 	uint8_t data;
 	
-	if(PIOS_MPU6000_ClaimBus(false) != 0)
+	if(PIOS_MPU6000_ClaimBus() != 0) {
 		return -1;	
+	}
 	
 	PIOS_SPI_TransferByte(dev->spi_id,(0x80 | reg) ); // request byte
 	data = PIOS_SPI_TransferByte(dev->spi_id,0 );     // receive response
 	
-	PIOS_MPU6000_ReleaseBus(false);
+	PIOS_MPU6000_ReleaseBus();
 	return data;
 }
 
@@ -289,20 +319,21 @@ static int32_t PIOS_MPU6000_GetReg(uint8_t reg)
  */
 static int32_t PIOS_MPU6000_SetReg(uint8_t reg, uint8_t data)
 {
-	if(PIOS_MPU6000_ClaimBus(false) != 0)
+	if (PIOS_MPU6000_ClaimBus() != 0) {
 		return -1;
+	}
 	
-	if(PIOS_SPI_TransferByte(dev->spi_id, 0x7f & reg) != 0) {
-		PIOS_MPU6000_ReleaseBus(false);
+	if (PIOS_SPI_TransferByte(dev->spi_id, 0x7f & reg) != 0) {
+		PIOS_MPU6000_ReleaseBus();
 		return -2;
 	}
 	
-	if(PIOS_SPI_TransferByte(dev->spi_id, data) != 0) {
-		PIOS_MPU6000_ReleaseBus(false);
+	if (PIOS_SPI_TransferByte(dev->spi_id, data) != 0) {
+		PIOS_MPU6000_ReleaseBus();
 		return -3;
 	}
-	
-	PIOS_MPU6000_ReleaseBus(false);
+
+	PIOS_MPU6000_ReleaseBus();
 	
 	return 0;
 }
@@ -318,13 +349,15 @@ int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * data)
 	uint8_t buf[7] = {PIOS_MPU6000_GYRO_X_OUT_MSB | 0x80, 0, 0, 0, 0, 0, 0};
 	uint8_t rec[7];
 	
-	if(PIOS_MPU6000_ClaimBus(false) != 0)
+	if (PIOS_MPU6000_ClaimBus() != 0) {
 		return -1;
+	}
 
-	if(PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0)
+	if (PIOS_SPI_TransferBlock(dev->spi_id, &buf[0], &rec[0], sizeof(buf), NULL) < 0) {
 		return -2;
-		
-	PIOS_MPU6000_ReleaseBus(false);
+	}
+
+	PIOS_MPU6000_ReleaseBus();
 	
 	data->gyro_x = rec[1] << 8 | rec[2];
 	data->gyro_y = rec[3] << 8 | rec[4];
@@ -407,31 +440,34 @@ int32_t PIOS_MPU6000_Test(void)
 }
 
 /**
- * @brief Run self-test operation.
- * \return 0 if test succeeded
- * \return non-zero value if test succeeded
- * @param fromIsr[in] Tells if the function is being called from a ISR or not
+ * @brief Obtains the number of bytes in the FIFO. Call from ISR only.
+ * @return the number of bytes in the FIFO
+ * @param woken[in,out] If non-NULL, will be set to true if woken was false and a higher priority
+ *                      task has is now eligible to run, else unchanged
  */
-static int32_t PIOS_MPU6000_FifoDepth(bool fromIsr)
+static int32_t PIOS_MPU6000_FifoDepthISR(bool *woken)
 {
 	uint8_t mpu6000_send_buf[3] = {PIOS_MPU6000_FIFO_CNT_MSB | 0x80, 0, 0};
 	uint8_t mpu6000_rec_buf[3];
 
-	if(PIOS_MPU6000_ClaimBus(fromIsr) != 0)
-		return -1;
-
-	if(PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
-		PIOS_MPU6000_ReleaseBus(fromIsr);
+	if(PIOS_MPU6000_ClaimBusISR(woken) != 0) {
 		return -1;
 	}
 
-	PIOS_MPU6000_ReleaseBus(fromIsr);
+	if(PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
+		PIOS_MPU6000_ReleaseBusISR(woken);
+		return -1;
+	}
+
+	PIOS_MPU6000_ReleaseBusISR(woken);
 	
 	return (mpu6000_rec_buf[1] << 8) | mpu6000_rec_buf[2];
 }
 
 /**
-* @brief IRQ Handler.  Read all the data from onboard buffer
+* @brief EXTI IRQ Handler.  Read all the data from onboard buffer
+* @return a boolean to the EXTI IRQ Handler wrapper indicating if a
+*         higher priority task is now eligible to run
 */
 uint32_t mpu6000_irq = 0;
 int32_t mpu6000_count;
@@ -446,46 +482,50 @@ uint32_t mpu6000_transfer_size;
 
 bool PIOS_MPU6000_IRQHandler(void)
 {
+	bool woken = false;
 	static uint32_t timeval;
 	mpu6000_interval_us = PIOS_DELAY_DiffuS(timeval);
 	timeval = PIOS_DELAY_GetRaw();
 
-	if (!mpu6000_configured)
+	if (!mpu6000_configured) {
 		return false;
+	}
 
-	mpu6000_count = PIOS_MPU6000_FifoDepth(true);
-	if (mpu6000_count < (int32_t)sizeof(struct pios_mpu6000_data))
-		return false;
+	mpu6000_count = PIOS_MPU6000_FifoDepthISR(&woken);
+	if (mpu6000_count < (int32_t)sizeof(struct pios_mpu6000_data)) {
+		return woken;
+	}
 
-	if (PIOS_MPU6000_ClaimBus(true) != 0)
-		return false;
+	if (PIOS_MPU6000_ClaimBusISR(&woken) != 0) {
+		return woken;
+	}
 
 	static uint8_t mpu6000_send_buf[1 + sizeof(struct pios_mpu6000_data) ] = {PIOS_MPU6000_FIFO_REG | 0x80, 0, 0, 0, 0, 0, 0, 0, 0};
 	static uint8_t mpu6000_rec_buf[1 + sizeof(struct pios_mpu6000_data) ];
 
 	if (PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
-		PIOS_MPU6000_ReleaseBus(true);
+		PIOS_MPU6000_ReleaseBusISR(&woken);
 		mpu6000_fails++;
-		return false;
+		return woken;
 	}
 
-	PIOS_MPU6000_ReleaseBus(true);
+	PIOS_MPU6000_ReleaseBusISR(&woken);
 
 	static struct pios_mpu6000_data data;
 
 	// In the case where extras samples backed up grabbed an extra
 	if (mpu6000_count >= (int32_t)(sizeof(data) * 2)) {
 		mpu6000_fifo_backup++;
-		if (PIOS_MPU6000_ClaimBus(true) != 0)
-			return false;
+		if (PIOS_MPU6000_ClaimBusISR(&woken) != 0)
+			return woken;
 
 		if (PIOS_SPI_TransferBlock(dev->spi_id, &mpu6000_send_buf[0], &mpu6000_rec_buf[0], sizeof(mpu6000_send_buf), NULL) < 0) {
-			PIOS_MPU6000_ReleaseBus(true);
+			PIOS_MPU6000_ReleaseBusISR(&woken);
 			mpu6000_fails++;
-			return false;
+			return woken;
 		}
 
-		PIOS_MPU6000_ReleaseBus(true);
+		PIOS_MPU6000_ReleaseBusISR(&woken);
 	}
 
 	// Rotate the sensor to OP convention.  The datasheet defines X as towards the right
@@ -548,14 +588,14 @@ bool PIOS_MPU6000_IRQHandler(void)
 	data.temperature = mpu6000_rec_buf[1] << 8 | mpu6000_rec_buf[2];
 #endif
 
-	portBASE_TYPE xHigherPriorityTaskWoken;
-	xQueueSendToBackFromISR(dev->queue, (void *) &data, &xHigherPriorityTaskWoken);
+	signed portBASE_TYPE higherPriorityTaskWoken;
+	xQueueSendToBackFromISR(dev->queue, (void *) &data, &higherPriorityTaskWoken);
 
 	mpu6000_irq++;
 
 	mpu6000_time_us = PIOS_DELAY_DiffuS(timeval);
 
-	return xHigherPriorityTaskWoken == pdTRUE;
+	return (woken || higherPriorityTaskWoken == pdTRUE);
 }
 
 #endif /* PIOS_INCLUDE_MPU6000 */

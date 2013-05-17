@@ -37,6 +37,7 @@
 struct pios_usb_cfg {
 	struct stm32_irq irq;
 	struct stm32_gpio vsense;
+        bool vsense_active_low;
 };
 
 extern int32_t PIOS_USB_Init(uint32_t * usb_id, const struct pios_usb_cfg * cfg);

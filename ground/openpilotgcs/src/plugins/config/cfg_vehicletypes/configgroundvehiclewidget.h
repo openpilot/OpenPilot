@@ -54,6 +54,9 @@ public:
     virtual void refreshWidgetsValues(QString frameType);
     virtual QString updateConfigObjectsFromWidgets();
 
+protected:
+    void enableControls(bool enable);
+
 private:
     Ui_GroundConfigWidget *m_aircraft;
 

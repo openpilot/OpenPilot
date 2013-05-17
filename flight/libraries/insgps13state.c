@@ -32,6 +32,7 @@
 #include "insgps.h"
 #include <math.h>
 #include <stdint.h>
+#include <pios_math.h>
 
 // constants/macros/typdefs
 #define NUMX 13			// number of states, X is the state vector
@@ -39,17 +40,11 @@
 #define NUMV 10			// number of measurements, v is the measurement noise vector
 #define NUMU 6			// number of deterministic inputs, U is the input vector
 
-#if defined(GENERAL_COV)
-// This might trick people so I have a note here.  There is a slower but bigger version of the 
-// code here but won't fit when debugging disabled (requires -Os)
-#define COVARIANCE_PREDICTION_GENERAL
-#endif
-
 // Private functions
 void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 			  float Q[NUMW], float dT, float P[NUMX][NUMX]);
 void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
-		  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX],
+		  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX], float K[NUMX][NUMV],
 		  uint16_t SensorsUsed);
 void RungeKutta(float X[NUMX], float U[NUMU], float dT);
 void StateEq(float X[NUMX], float U[NUMU], float Xdot[NUMX]);
@@ -59,12 +54,51 @@ void MeasurementEq(float X[NUMX], float Be[3], float Y[NUMV]);
 void LinearizeH(float X[NUMX], float Be[3], float H[NUMV][NUMX]);
 
 // Private variables
-float F[NUMX][NUMX], G[NUMX][NUMW], H[NUMV][NUMX];	// linearized system matrices
-													// global to init to zero and maintain zero elements
-float Be[3];			// local magnetic unit vector in NED frame
-float P[NUMX][NUMX], X[NUMX];	// covariance matrix and state vector
-float Q[NUMW], R[NUMV];		// input noise and measurement noise variances
-float K[NUMX][NUMV];		// feedback gain matrix
+
+// speed optimizations, describe matrix sparsity
+// derived from state equations in
+// LinearizeFG() and LinearizeH():
+//
+// usage F:        usage G:   usage H:
+//  0123456789abc  012345678  0123456789abc
+// 0...X.........  .........  X............
+// 1....X........  .........  .X...........
+// 2.....X.......  .........  ..X..........
+// 3......XXXX...  ...XXX...  ...X.........
+// 4......XXXX...  ...XXX...  ....X........
+// 5......XXXX...  ...XXX...  .....X.......
+// 6.......XXXXXX  XXX......  ......XXXX...
+// 7......X.XXXXX  XXX......  ......XXXX...
+// 8......XX.XXXX  XXX......  ......XXXX...
+// 9......XXX.XXX  XXX......  ..X..........
+// a.............  ......X..
+// b.............  .......X.
+// c.............  ........X
+
+static const int8_t FrowMin[NUMX] = {  3, 4, 5, 6, 6, 6, 7, 6, 6, 6,13,13,13 };
+static const int8_t FrowMax[NUMX] = {  3, 4, 5, 9, 9, 9,12,12,12,12,-1,-1,-1 };
+
+static const int8_t GrowMin[NUMX] = {  9, 9, 9, 3, 3, 3, 0, 0, 0, 0, 6, 7, 8 };
+static const int8_t GrowMax[NUMX] = { -1,-1,-1, 5, 5, 5, 2, 2, 2, 2, 6, 7, 8 };
+
+static const int8_t HrowMin[NUMV] = {  0, 1, 2, 3, 4, 5, 6, 6, 6, 2 };
+static const int8_t HrowMax[NUMV] = {  0, 1, 2, 3, 4, 5, 9, 9, 9, 2 };
+
+static struct EKFData {
+	// linearized system matrices
+	float F[NUMX][NUMX];
+	float G[NUMX][NUMW];
+	float H[NUMV][NUMX];
+	// local magnetic unit vector in NED frame
+	float Be[3];
+	// covariance matrix and state vector
+	float P[NUMX][NUMX];
+	float X[NUMX];
+	// input noise and measurement noise variances
+	float Q[NUMW];
+	float R[NUMV];
+	float K[NUMX][NUMV];		// feedback gain matrix
+} ekf;
 
 // Global variables
 struct NavStruct Nav;
@@ -79,52 +113,52 @@ uint16_t ins_get_num_states()
 
 void INSGPSInit()		//pretty much just a place holder for now
 {
-	Be[0] = 1.0f;
-	Be[1] = 0.0f;
-	Be[2] = 0.0f;		// local magnetic unit vector
+	ekf.Be[0] = 1.0f;
+	ekf.Be[1] = 0.0f;
+	ekf.Be[2] = 0.0f;		// local magnetic unit vector
 
 	for (int i = 0; i < NUMX; i++) {
 		for (int j = 0; j < NUMX; j++) {
-			P[i][j] = 0.0f; // zero all terms
-			F[i][j] = 0.0f;
+			ekf.P[i][j] = 0.0f; // zero all terms
+			ekf.F[i][j] = 0.0f;
 		}
 		
 		for (int j = 0; j < NUMW; j++)
-			G[i][j] = 0.0f;
+			ekf.G[i][j] = 0.0f;
 			
 		for (int j = 0; j < NUMV; j++) {
-			H[j][i] = 0.0f;
-			K[i][j] = 0.0f;
+			ekf.H[j][i] = 0.0f;
+			ekf.K[i][j] = 0.0f;
 		}
 			
-		X[i] = 0.0f;
+		ekf.X[i] = 0.0f;
 	}
 	for (int i = 0; i < NUMW; i++)
-		Q[i] = 0.0f;
+		ekf.Q[i] = 0.0f;
 	for (int i = 0; i < NUMV; i++) 
-		R[i] = 0.0f;
+		ekf.R[i] = 0.0f;
 
 	
-	P[0][0] = P[1][1] = P[2][2] = 25.0f;            // initial position variance (m^2)
-	P[3][3] = P[4][4] = P[5][5] = 5.0f;             // initial velocity variance (m/s)^2
-	P[6][6] = P[7][7] = P[8][8] = P[9][9] = 1e-5f;  // initial quaternion variance
-	P[10][10] = P[11][11] = P[12][12] = 1e-9f;      // initial gyro bias variance (rad/s)^2
+	ekf.P[0][0] = ekf.P[1][1] = ekf.P[2][2] = 25.0f;            // initial position variance (m^2)
+	ekf.P[3][3] = ekf.P[4][4] = ekf.P[5][5] = 5.0f;             // initial velocity variance (m/s)^2
+	ekf.P[6][6] = ekf.P[7][7] = ekf.P[8][8] = ekf.P[9][9] = 1e-5f;  // initial quaternion variance
+	ekf.P[10][10] = ekf.P[11][11] = ekf.P[12][12] = 1e-9f;      // initial gyro bias variance (rad/s)^2
 
-	X[0] = X[1] = X[2] = X[3] = X[4] = X[5] = 0.0f;	// initial pos and vel (m)
-	X[6] = 1.0f;
-	X[7] = X[8] = X[9] = 0.0f;	    // initial quaternion (level and North) (m/s)
-	X[10] = X[11] = X[12] = 0.0f;	// initial gyro bias (rad/s)
+	ekf.X[0] = ekf.X[1] = ekf.X[2] = ekf.X[3] = ekf.X[4] = ekf.X[5] = 0.0f;	// initial pos and vel (m)
+	ekf.X[6] = 1.0f;
+	ekf.X[7] = ekf.X[8] = ekf.X[9] = 0.0f;	    // initial quaternion (level and North) (m/s)
+	ekf.X[10] = ekf.X[11] = ekf.X[12] = 0.0f;	// initial gyro bias (rad/s)
 
-	Q[0] = Q[1] = Q[2] = 50e-4f;	// gyro noise variance (rad/s)^2
-	Q[3] = Q[4] = Q[5] = 0.00001f;	// accelerometer noise variance (m/s^2)^2
-	Q[6] = Q[7] = Q[8] = 2e-8f;	    // gyro bias random walk variance (rad/s^2)^2
+	ekf.Q[0] = ekf.Q[1] = ekf.Q[2] = 50e-4f;	// gyro noise variance (rad/s)^2
+	ekf.Q[3] = ekf.Q[4] = ekf.Q[5] = 0.00001f;	// accelerometer noise variance (m/s^2)^2
+	ekf.Q[6] = ekf.Q[7] = ekf.Q[8] = 2e-8f;	    // gyro bias random walk variance (rad/s^2)^2
 
-	R[0] = R[1] = 0.004f;	// High freq GPS horizontal position noise variance (m^2)
-	R[2] = 0.036f;          // High freq GPS vertical position noise variance (m^2)
-	R[3] = R[4] = 0.004f;   // High freq GPS horizontal velocity noise variance (m/s)^2
-	R[5] = 100.0f;          // High freq GPS vertical velocity noise variance (m/s)^2
-	R[6] = R[7] = R[8] = 0.005f;    // magnetometer unit vector noise variance
-	R[9] = .25f;                    // High freq altimeter noise variance (m^2)
+	ekf.R[0] = ekf.R[1] = 0.004f;	// High freq GPS horizontal position noise variance (m^2)
+	ekf.R[2] = 0.036f;          // High freq GPS vertical position noise variance (m^2)
+	ekf.R[3] = ekf.R[4] = 0.004f;   // High freq GPS horizontal velocity noise variance (m/s)^2
+	ekf.R[5] = 100.0f;          // High freq GPS vertical velocity noise variance (m/s)^2
+	ekf.R[6] = ekf.R[7] = ekf.R[8] = 0.005f;    // magnetometer unit vector noise variance
+	ekf.R[9] = .25f;                    // High freq altimeter noise variance (m^2)
 }
 
 void INSResetP(float PDiag[NUMX])
@@ -135,8 +169,8 @@ void INSResetP(float PDiag[NUMX])
 	for (i=0;i<NUMX;i++){
 		if (PDiag != 0){
 			for (j=0;j<NUMX;j++)
-				P[i][j]=P[j][i]=0.0f;
-			P[i][i]=PDiag[i];
+				ekf.P[i][j]=ekf.P[j][i]=0.0f;
+			ekf.P[i][i]=PDiag[i];
 		}
 	}
 }
@@ -148,7 +182,7 @@ void INSGetP(float PDiag[NUMX])
 	// retrieve diagonal elements (aka state variance)
 	for (i=0;i<NUMX;i++){
 		if (PDiag != 0){
-			PDiag[i] = P[i][i];
+			PDiag[i] = ekf.P[i][i];
 		}
 	}
 }
@@ -156,97 +190,97 @@ void INSGetP(float PDiag[NUMX])
 void INSSetState(float pos[3], float vel[3], float q[4], float gyro_bias[3], __attribute__((unused)) float accel_bias[3])
 {
 	/* Note: accel_bias not used in 13 state INS */
-	X[0] = pos[0];
-	X[1] = pos[1];
-	X[2] = pos[2];
-	X[3] = vel[0];
-	X[4] = vel[1];
-	X[5] = vel[2];
-	X[6] = q[0];
-	X[7] = q[1];
-	X[8] = q[2];
-	X[9] = q[3];
-	X[10] = gyro_bias[0];
-	X[11] = gyro_bias[1];
-	X[12] = gyro_bias[2];
+	ekf.X[0] = pos[0];
+	ekf.X[1] = pos[1];
+	ekf.X[2] = pos[2];
+	ekf.X[3] = vel[0];
+	ekf.X[4] = vel[1];
+	ekf.X[5] = vel[2];
+	ekf.X[6] = q[0];
+	ekf.X[7] = q[1];
+	ekf.X[8] = q[2];
+	ekf.X[9] = q[3];
+	ekf.X[10] = gyro_bias[0];
+	ekf.X[11] = gyro_bias[1];
+	ekf.X[12] = gyro_bias[2];
 }
 
 void INSPosVelReset(float pos[3], float vel[3]) 
 {
 	for (int i = 0; i < 6; i++) {
 		for(int j = i; j < NUMX; j++) {
-			P[i][j] = 0;  // zero the first 6 rows and columns
-			P[j][i] = 0; 
+			ekf.P[i][j] = 0;  // zero the first 6 rows and columns
+			ekf.P[j][i] = 0;
 		}
 	}
 	
-	P[0][0] = P[1][1] = P[2][2] = 25;	// initial position variance (m^2)
-	P[3][3] = P[4][4] = P[5][5] = 5;	// initial velocity variance (m/s)^2
+	ekf.P[0][0] = ekf.P[1][1] = ekf.P[2][2] = 25;	// initial position variance (m^2)
+	ekf.P[3][3] = ekf.P[4][4] = ekf.P[5][5] = 5;	// initial velocity variance (m/s)^2
 	
-	X[0] = pos[0];
-	X[1] = pos[1];
-	X[2] = pos[2];
-	X[3] = vel[0];
-	X[4] = vel[1];
-	X[5] = vel[2];	
+	ekf.X[0] = pos[0];
+	ekf.X[1] = pos[1];
+	ekf.X[2] = pos[2];
+	ekf.X[3] = vel[0];
+	ekf.X[4] = vel[1];
+	ekf.X[5] = vel[2];
 }
 
 void INSSetPosVelVar(float PosVar[3], float VelVar[3])
 {
-	R[0] = PosVar[0];
-	R[1] = PosVar[1];
-	R[2] = PosVar[2];
-	R[3] = VelVar[0];
-	R[4] = VelVar[1];
-	R[5] = VelVar[2];
+	ekf.R[0] = PosVar[0];
+	ekf.R[1] = PosVar[1];
+	ekf.R[2] = PosVar[2];
+	ekf.R[3] = VelVar[0];
+	ekf.R[4] = VelVar[1];
+	ekf.R[5] = VelVar[2];
 }
 
 void INSSetGyroBias(float gyro_bias[3])
 {
-	X[10] = gyro_bias[0];
-	X[11] = gyro_bias[1];
-	X[12] = gyro_bias[2];
+	ekf.X[10] = gyro_bias[0];
+	ekf.X[11] = gyro_bias[1];
+	ekf.X[12] = gyro_bias[2];
 }
 
 void INSSetAccelVar(float accel_var[3])
 {
-	Q[3] = accel_var[0];
-	Q[4] = accel_var[1];
-	Q[5] = accel_var[2];
+	ekf.Q[3] = accel_var[0];
+	ekf.Q[4] = accel_var[1];
+	ekf.Q[5] = accel_var[2];
 }
 
 void INSSetGyroVar(float gyro_var[3])
 {
-	Q[0] = gyro_var[0];
-	Q[1] = gyro_var[1];
-	Q[2] = gyro_var[2];
+	ekf.Q[0] = gyro_var[0];
+	ekf.Q[1] = gyro_var[1];
+	ekf.Q[2] = gyro_var[2];
 }
 
 void INSSetGyroBiasVar(float gyro_bias_var[3])
 {
-	Q[6] = gyro_bias_var[0];
-	Q[7] = gyro_bias_var[1];
-	Q[8] = gyro_bias_var[2];
+	ekf.Q[6] = gyro_bias_var[0];
+	ekf.Q[7] = gyro_bias_var[1];
+	ekf.Q[8] = gyro_bias_var[2];
 }
 
 void INSSetMagVar(float scaled_mag_var[3])
 {
-	R[6] = scaled_mag_var[0];
-	R[7] = scaled_mag_var[1];
-	R[8] = scaled_mag_var[2];
+	ekf.R[6] = scaled_mag_var[0];
+	ekf.R[7] = scaled_mag_var[1];
+	ekf.R[8] = scaled_mag_var[2];
 }
 
 void INSSetBaroVar(float baro_var)
 {
-	R[9] = baro_var;
+	ekf.R[9] = baro_var;
 }
 
 void INSSetMagNorth(float B[3])
 {
 	float mag = sqrtf(B[0] * B[0] + B[1] * B[1] + B[2] * B[2]);
-	Be[0] = B[0] / mag;
-	Be[1] = B[1] / mag;
-	Be[2] = B[2] / mag;
+	ekf.Be[0] = B[0] / mag;
+	ekf.Be[1] = B[1] / mag;
+	ekf.Be[2] = B[2] / mag;
 }
 
 void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT)
@@ -265,34 +299,34 @@ void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT)
 	U[5] = accel_data[2];
 
 	// EKF prediction step
-	LinearizeFG(X, U, F, G);
-	RungeKutta(X, U, dT);
-	qmag = sqrtf(X[6] * X[6] + X[7] * X[7] + X[8] * X[8] + X[9] * X[9]);
-	X[6] /= qmag;
-	X[7] /= qmag;
-	X[8] /= qmag;
-	X[9] /= qmag;
-	//CovariancePrediction(F,G,Q,dT,P);
+	LinearizeFG(ekf.X, U, ekf.F, ekf.G);
+	RungeKutta(ekf.X, U, dT);
+	qmag = sqrtf(ekf.X[6] * ekf.X[6] + ekf.X[7] * ekf.X[7] + ekf.X[8] * ekf.X[8] + ekf.X[9] * ekf.X[9]);
+	ekf.X[6] /= qmag;
+	ekf.X[7] /= qmag;
+	ekf.X[8] /= qmag;
+	ekf.X[9] /= qmag;
+	//CovariancePrediction(ekf.F,ekf.G,ekf.Q,dT,ekf.P);
 
 	// Update Nav solution structure
-	Nav.Pos[0] = X[0];
-	Nav.Pos[1] = X[1];
-	Nav.Pos[2] = X[2];
-	Nav.Vel[0] = X[3];
-	Nav.Vel[1] = X[4];
-	Nav.Vel[2] = X[5];
-	Nav.q[0] = X[6];
-	Nav.q[1] = X[7];
-	Nav.q[2] = X[8];
-	Nav.q[3] = X[9];
-	Nav.gyro_bias[0] = X[10];
-	Nav.gyro_bias[1] = X[11];
-	Nav.gyro_bias[2] = X[12];	
+	Nav.Pos[0] = ekf.X[0];
+	Nav.Pos[1] = ekf.X[1];
+	Nav.Pos[2] = ekf.X[2];
+	Nav.Vel[0] = ekf.X[3];
+	Nav.Vel[1] = ekf.X[4];
+	Nav.Vel[2] = ekf.X[5];
+	Nav.q[0] = ekf.X[6];
+	Nav.q[1] = ekf.X[7];
+	Nav.q[2] = ekf.X[8];
+	Nav.q[3] = ekf.X[9];
+	Nav.gyro_bias[0] = ekf.X[10];
+	Nav.gyro_bias[1] = ekf.X[11];
+	Nav.gyro_bias[2] = ekf.X[12];
 }
 
 void INSCovariancePrediction(float dT)
 {
-	CovariancePrediction(F, G, Q, dT, P);
+	CovariancePrediction(ekf.F, ekf.G, ekf.Q, dT, ekf.P);
 }
 
 float zeros[3] = { 0, 0, 0 };
@@ -361,29 +395,29 @@ void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
 	Z[9] = BaroAlt;
 
 	// EKF correction step
-	LinearizeH(X, Be, H);
-	MeasurementEq(X, Be, Y);
-	SerialUpdate(H, R, Z, Y, P, X, SensorsUsed);
-	qmag = sqrtf(X[6] * X[6] + X[7] * X[7] + X[8] * X[8] + X[9] * X[9]);
-	X[6] /= qmag;
-	X[7] /= qmag;
-	X[8] /= qmag;
-	X[9] /= qmag;
+	LinearizeH(ekf.X, ekf.Be, ekf.H);
+	MeasurementEq(ekf.X, ekf.Be, Y);
+	SerialUpdate(ekf.H, ekf.R, Z, Y, ekf.P, ekf.X, ekf.K, SensorsUsed);
+	qmag = sqrtf(ekf.X[6] * ekf.X[6] + ekf.X[7] * ekf.X[7] + ekf.X[8] * ekf.X[8] + ekf.X[9] * ekf.X[9]);
+	ekf.X[6] /= qmag;
+	ekf.X[7] /= qmag;
+	ekf.X[8] /= qmag;
+	ekf.X[9] /= qmag;
 
 	// Update Nav solution structure
-	Nav.Pos[0] = X[0];
-	Nav.Pos[1] = X[1];
-	Nav.Pos[2] = X[2];
-	Nav.Vel[0] = X[3];
-	Nav.Vel[1] = X[4];
-	Nav.Vel[2] = X[5];
-	Nav.q[0] = X[6];
-	Nav.q[1] = X[7];
-	Nav.q[2] = X[8];
-	Nav.q[3] = X[9];
-	Nav.gyro_bias[0] = X[10];
-	Nav.gyro_bias[1] = X[11];
-	Nav.gyro_bias[2] = X[12];
+	Nav.Pos[0] = ekf.X[0];
+	Nav.Pos[1] = ekf.X[1];
+	Nav.Pos[2] = ekf.X[2];
+	Nav.Vel[0] = ekf.X[3];
+	Nav.Vel[1] = ekf.X[4];
+	Nav.Vel[2] = ekf.X[5];
+	Nav.q[0] = ekf.X[6];
+	Nav.q[1] = ekf.X[7];
+	Nav.q[2] = ekf.X[8];
+	Nav.q[3] = ekf.X[9];
+	Nav.gyro_bias[0] = ekf.X[10];
+	Nav.gyro_bias[1] = ekf.X[11];
+	Nav.gyro_bias[2] = ekf.X[12];
 }
 
 //  *************  CovariancePrediction *************
@@ -397,972 +431,71 @@ void INSCorrection(float mag_data[3], float Pos[3], float Vel[3],
 //  The first Method is very specific to this implementation
 //  ************************************************
 
-#ifdef COVARIANCE_PREDICTION_GENERAL
-
+__attribute__((optimize("O3")))
 void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 			  float Q[NUMW], float dT, float P[NUMX][NUMX])
 {
-	float Dummy[NUMX][NUMX], dTsq;
-	uint8_t i, j, k;
 
-	//  Pnew = (I+F*T)*P*(I+F*T)' + T^2*G*Q*G' = T^2[(P/T + F*P)*(I/T + F') + G*Q*G')]
+	//  Pnew = (I+F*T)*P*(I+F*T)' + (T^2)*G*Q*G' = (T^2)[(P/T + F*P)*(I/T + F') + G*Q*G')]
 
-	dTsq = dT * dT;
+	float dT1 = 1.0f / dT; // multiplication is faster than division on fpu.
+	float dTsq = dT * dT;
 
-	for (i = 0; i < NUMX; i++)	// Calculate Dummy = (P/T +F*P)
+	float Dummy[NUMX][NUMX];
+	int8_t i;
+	for (i = 0; i < NUMX; i++) { // Calculate Dummy = (P/T +F*P)
+
+		float *Firow = F[i];
+		float *Pirow = P[i];
+		float *Dirow = Dummy[i];
+		int8_t Fistart = FrowMin[i];
+		int8_t Fiend = FrowMax[i];
+		int8_t j;
 		for (j = 0; j < NUMX; j++) {
-			Dummy[i][j] = P[i][j] / dT;
-			for (k = 0; k < NUMX; k++)
-				Dummy[i][j] += F[i][k] * P[k][j];
+
+			Dirow[j] = Pirow[j] * dT1; // Dummy = P / T ...
+			int8_t k;
+			for (k = Fistart; k <= Fiend; k++) {
+				Dirow[j] += Firow[k] * P[k][j]; // [] + F * P
+			}
 		}
-	for (i = 0; i < NUMX; i++)	// Calculate Pnew = Dummy/T + Dummy*F' + G*Qw*G'
-		for (j = i; j < NUMX; j++) {	// Use symmetry, ie only find upper triangular
-			P[i][j] = Dummy[i][j] / dT;
-			for (k = 0; k < NUMX; k++)
-				P[i][j] += Dummy[i][k] * F[j][k];	// P = Dummy/T + Dummy*F'
-			for (k = 0; k < NUMW; k++)
-				P[i][j] += Q[k] * G[i][k] * G[j][k];	// P = Dummy/T + Dummy*F' + G*Q*G'
-			P[j][i] = P[i][j] = P[i][j] * dTsq;	// Pnew = T^2*P and fill in lower triangular;
+	}
+	for (i = 0; i < NUMX; i++) { // Calculate Pnew = (T^2) [Dummy/T + Dummy*F' + G*Qw*G']
+
+		float *Dirow = Dummy[i];
+		float *Girow = G[i];
+		float *Pirow = P[i];
+		int8_t Gistart = GrowMin[i];
+		int8_t Giend = GrowMax[i];
+		int8_t j;
+		for (j = i; j < NUMX; j++) { // Use symmetry, ie only find upper triangular
+
+			float Ptmp = Dirow[j] * dT1; // Pnew = Dummy / T ...
+
+			{
+				float *Fjrow = F[j];
+				int8_t Fjstart = FrowMin[j];
+				int8_t Fjend = FrowMax[j];
+				int8_t k;
+				for (k = Fjstart; k <= Fjend; k++) {
+					Ptmp += Dirow[k] * Fjrow[k]; // [] + Dummy*F' ...
+				}
+			}
+
+			{
+				float *Gjrow = G[j];
+				int8_t Gjstart = MAX(Gistart, GrowMin[j]);
+				int8_t Gjend = MIN(Giend, GrowMax[j]);
+				int8_t k;
+				for (k = Gjstart; k <= Gjend; k++) {
+					Ptmp += Q[k] * Girow[k] * Gjrow[k]; // [] + G*Q*G' ...
+				}
+			}
+
+			P[j][i] = Pirow[j] = Ptmp * dTsq; // [] * (T^2)
 		}
+	}
 }
-
-#else
-
-void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
-			  float Q[NUMW], float dT, float P[NUMX][NUMX])
-{
-	float D[NUMX][NUMX], T, Tsq;
-	uint8_t i, j;
-
-	//  Pnew = (I+F*T)*P*(I+F*T)' + T^2*G*Q*G' = scalar expansion from symbolic manipulator
-
-	T = dT;
-	Tsq = dT * dT;
-
-	for (i = 0; i < NUMX; i++)	// Create a copy of the upper triangular of P
-		for (j = i; j < NUMX; j++)
-			D[i][j] = P[i][j];
-
-	// Brute force calculation of the elements of P
-	P[0][0] = D[3][3] * Tsq + (2 * D[0][3]) * T + D[0][0];
-	P[0][1] = P[1][0] =
-	    D[3][4] * Tsq + (D[0][4] + D[1][3]) * T + D[0][1];
-	P[0][2] = P[2][0] =
-	    D[3][5] * Tsq + (D[0][5] + D[2][3]) * T + D[0][2];
-	P[0][3] = P[3][0] =
-	    (F[3][6] * D[3][6] + F[3][7] * D[3][7] + F[3][8] * D[3][8] +
-	     F[3][9] * D[3][9]) * Tsq + (D[3][3] + F[3][6] * D[0][6] +
-					 F[3][7] * D[0][7] +
-					 F[3][8] * D[0][8] +
-					 F[3][9] * D[0][9]) * T + D[0][3];
-	P[0][4] = P[4][0] =
-	    (F[4][6] * D[3][6] + F[4][7] * D[3][7] + F[4][8] * D[3][8] +
-	     F[4][9] * D[3][9]) * Tsq + (D[3][4] + F[4][6] * D[0][6] +
-					 F[4][7] * D[0][7] +
-					 F[4][8] * D[0][8] +
-					 F[4][9] * D[0][9]) * T + D[0][4];
-	P[0][5] = P[5][0] =
-	    (F[5][6] * D[3][6] + F[5][7] * D[3][7] + F[5][8] * D[3][8] +
-	     F[5][9] * D[3][9]) * Tsq + (D[3][5] + F[5][6] * D[0][6] +
-					 F[5][7] * D[0][7] +
-					 F[5][8] * D[0][8] +
-					 F[5][9] * D[0][9]) * T + D[0][5];
-	P[0][6] = P[6][0] =
-	    (F[6][7] * D[3][7] + F[6][8] * D[3][8] + F[6][9] * D[3][9] +
-	     F[6][10] * D[3][10] + F[6][11] * D[3][11] +
-	     F[6][12] * D[3][12]) * Tsq + (D[3][6] + F[6][7] * D[0][7] +
-					   F[6][8] * D[0][8] +
-					   F[6][9] * D[0][9] +
-					   F[6][10] * D[0][10] +
-					   F[6][11] * D[0][11] +
-					   F[6][12] * D[0][12]) * T +
-	    D[0][6];
-	P[0][7] = P[7][0] =
-	    (F[7][6] * D[3][6] + F[7][8] * D[3][8] + F[7][9] * D[3][9] +
-	     F[7][10] * D[3][10] + F[7][11] * D[3][11] +
-	     F[7][12] * D[3][12]) * Tsq + (D[3][7] + F[7][6] * D[0][6] +
-					   F[7][8] * D[0][8] +
-					   F[7][9] * D[0][9] +
-					   F[7][10] * D[0][10] +
-					   F[7][11] * D[0][11] +
-					   F[7][12] * D[0][12]) * T +
-	    D[0][7];
-	P[0][8] = P[8][0] =
-	    (F[8][6] * D[3][6] + F[8][7] * D[3][7] + F[8][9] * D[3][9] +
-	     F[8][10] * D[3][10] + F[8][11] * D[3][11] +
-	     F[8][12] * D[3][12]) * Tsq + (D[3][8] + F[8][6] * D[0][6] +
-					   F[8][7] * D[0][7] +
-					   F[8][9] * D[0][9] +
-					   F[8][10] * D[0][10] +
-					   F[8][11] * D[0][11] +
-					   F[8][12] * D[0][12]) * T +
-	    D[0][8];
-	P[0][9] = P[9][0] =
-	    (F[9][6] * D[3][6] + F[9][7] * D[3][7] + F[9][8] * D[3][8] +
-	     F[9][10] * D[3][10] + F[9][11] * D[3][11] +
-	     F[9][12] * D[3][12]) * Tsq + (D[3][9] + F[9][6] * D[0][6] +
-					   F[9][7] * D[0][7] +
-					   F[9][8] * D[0][8] +
-					   F[9][10] * D[0][10] +
-					   F[9][11] * D[0][11] +
-					   F[9][12] * D[0][12]) * T +
-	    D[0][9];
-	P[0][10] = P[10][0] = D[3][10] * T + D[0][10];
-	P[0][11] = P[11][0] = D[3][11] * T + D[0][11];
-	P[0][12] = P[12][0] = D[3][12] * T + D[0][12];
-	P[1][1] = D[4][4] * Tsq + (2 * D[1][4]) * T + D[1][1];
-	P[1][2] = P[2][1] =
-	    D[4][5] * Tsq + (D[1][5] + D[2][4]) * T + D[1][2];
-	P[1][3] = P[3][1] =
-	    (F[3][6] * D[4][6] + F[3][7] * D[4][7] + F[3][8] * D[4][8] +
-	     F[3][9] * D[4][9]) * Tsq + (D[3][4] + F[3][6] * D[1][6] +
-					 F[3][7] * D[1][7] +
-					 F[3][8] * D[1][8] +
-					 F[3][9] * D[1][9]) * T + D[1][3];
-	P[1][4] = P[4][1] =
-	    (F[4][6] * D[4][6] + F[4][7] * D[4][7] + F[4][8] * D[4][8] +
-	     F[4][9] * D[4][9]) * Tsq + (D[4][4] + F[4][6] * D[1][6] +
-					 F[4][7] * D[1][7] +
-					 F[4][8] * D[1][8] +
-					 F[4][9] * D[1][9]) * T + D[1][4];
-	P[1][5] = P[5][1] =
-	    (F[5][6] * D[4][6] + F[5][7] * D[4][7] + F[5][8] * D[4][8] +
-	     F[5][9] * D[4][9]) * Tsq + (D[4][5] + F[5][6] * D[1][6] +
-					 F[5][7] * D[1][7] +
-					 F[5][8] * D[1][8] +
-					 F[5][9] * D[1][9]) * T + D[1][5];
-	P[1][6] = P[6][1] =
-	    (F[6][7] * D[4][7] + F[6][8] * D[4][8] + F[6][9] * D[4][9] +
-	     F[6][10] * D[4][10] + F[6][11] * D[4][11] +
-	     F[6][12] * D[4][12]) * Tsq + (D[4][6] + F[6][7] * D[1][7] +
-					   F[6][8] * D[1][8] +
-					   F[6][9] * D[1][9] +
-					   F[6][10] * D[1][10] +
-					   F[6][11] * D[1][11] +
-					   F[6][12] * D[1][12]) * T +
-	    D[1][6];
-	P[1][7] = P[7][1] =
-	    (F[7][6] * D[4][6] + F[7][8] * D[4][8] + F[7][9] * D[4][9] +
-	     F[7][10] * D[4][10] + F[7][11] * D[4][11] +
-	     F[7][12] * D[4][12]) * Tsq + (D[4][7] + F[7][6] * D[1][6] +
-					   F[7][8] * D[1][8] +
-					   F[7][9] * D[1][9] +
-					   F[7][10] * D[1][10] +
-					   F[7][11] * D[1][11] +
-					   F[7][12] * D[1][12]) * T +
-	    D[1][7];
-	P[1][8] = P[8][1] =
-	    (F[8][6] * D[4][6] + F[8][7] * D[4][7] + F[8][9] * D[4][9] +
-	     F[8][10] * D[4][10] + F[8][11] * D[4][11] +
-	     F[8][12] * D[4][12]) * Tsq + (D[4][8] + F[8][6] * D[1][6] +
-					   F[8][7] * D[1][7] +
-					   F[8][9] * D[1][9] +
-					   F[8][10] * D[1][10] +
-					   F[8][11] * D[1][11] +
-					   F[8][12] * D[1][12]) * T +
-	    D[1][8];
-	P[1][9] = P[9][1] =
-	    (F[9][6] * D[4][6] + F[9][7] * D[4][7] + F[9][8] * D[4][8] +
-	     F[9][10] * D[4][10] + F[9][11] * D[4][11] +
-	     F[9][12] * D[4][12]) * Tsq + (D[4][9] + F[9][6] * D[1][6] +
-					   F[9][7] * D[1][7] +
-					   F[9][8] * D[1][8] +
-					   F[9][10] * D[1][10] +
-					   F[9][11] * D[1][11] +
-					   F[9][12] * D[1][12]) * T +
-	    D[1][9];
-	P[1][10] = P[10][1] = D[4][10] * T + D[1][10];
-	P[1][11] = P[11][1] = D[4][11] * T + D[1][11];
-	P[1][12] = P[12][1] = D[4][12] * T + D[1][12];
-	P[2][2] = D[5][5] * Tsq + (2 * D[2][5]) * T + D[2][2];
-	P[2][3] = P[3][2] =
-	    (F[3][6] * D[5][6] + F[3][7] * D[5][7] + F[3][8] * D[5][8] +
-	     F[3][9] * D[5][9]) * Tsq + (D[3][5] + F[3][6] * D[2][6] +
-					 F[3][7] * D[2][7] +
-					 F[3][8] * D[2][8] +
-					 F[3][9] * D[2][9]) * T + D[2][3];
-	P[2][4] = P[4][2] =
-	    (F[4][6] * D[5][6] + F[4][7] * D[5][7] + F[4][8] * D[5][8] +
-	     F[4][9] * D[5][9]) * Tsq + (D[4][5] + F[4][6] * D[2][6] +
-					 F[4][7] * D[2][7] +
-					 F[4][8] * D[2][8] +
-					 F[4][9] * D[2][9]) * T + D[2][4];
-	P[2][5] = P[5][2] =
-	    (F[5][6] * D[5][6] + F[5][7] * D[5][7] + F[5][8] * D[5][8] +
-	     F[5][9] * D[5][9]) * Tsq + (D[5][5] + F[5][6] * D[2][6] +
-					 F[5][7] * D[2][7] +
-					 F[5][8] * D[2][8] +
-					 F[5][9] * D[2][9]) * T + D[2][5];
-	P[2][6] = P[6][2] =
-	    (F[6][7] * D[5][7] + F[6][8] * D[5][8] + F[6][9] * D[5][9] +
-	     F[6][10] * D[5][10] + F[6][11] * D[5][11] +
-	     F[6][12] * D[5][12]) * Tsq + (D[5][6] + F[6][7] * D[2][7] +
-					   F[6][8] * D[2][8] +
-					   F[6][9] * D[2][9] +
-					   F[6][10] * D[2][10] +
-					   F[6][11] * D[2][11] +
-					   F[6][12] * D[2][12]) * T +
-	    D[2][6];
-	P[2][7] = P[7][2] =
-	    (F[7][6] * D[5][6] + F[7][8] * D[5][8] + F[7][9] * D[5][9] +
-	     F[7][10] * D[5][10] + F[7][11] * D[5][11] +
-	     F[7][12] * D[5][12]) * Tsq + (D[5][7] + F[7][6] * D[2][6] +
-					   F[7][8] * D[2][8] +
-					   F[7][9] * D[2][9] +
-					   F[7][10] * D[2][10] +
-					   F[7][11] * D[2][11] +
-					   F[7][12] * D[2][12]) * T +
-	    D[2][7];
-	P[2][8] = P[8][2] =
-	    (F[8][6] * D[5][6] + F[8][7] * D[5][7] + F[8][9] * D[5][9] +
-	     F[8][10] * D[5][10] + F[8][11] * D[5][11] +
-	     F[8][12] * D[5][12]) * Tsq + (D[5][8] + F[8][6] * D[2][6] +
-					   F[8][7] * D[2][7] +
-					   F[8][9] * D[2][9] +
-					   F[8][10] * D[2][10] +
-					   F[8][11] * D[2][11] +
-					   F[8][12] * D[2][12]) * T +
-	    D[2][8];
-	P[2][9] = P[9][2] =
-	    (F[9][6] * D[5][6] + F[9][7] * D[5][7] + F[9][8] * D[5][8] +
-	     F[9][10] * D[5][10] + F[9][11] * D[5][11] +
-	     F[9][12] * D[5][12]) * Tsq + (D[5][9] + F[9][6] * D[2][6] +
-					   F[9][7] * D[2][7] +
-					   F[9][8] * D[2][8] +
-					   F[9][10] * D[2][10] +
-					   F[9][11] * D[2][11] +
-					   F[9][12] * D[2][12]) * T +
-	    D[2][9];
-	P[2][10] = P[10][2] = D[5][10] * T + D[2][10];
-	P[2][11] = P[11][2] = D[5][11] * T + D[2][11];
-	P[2][12] = P[12][2] = D[5][12] * T + D[2][12];
-	P[3][3] =
-	    (Q[3] * G[3][3] * G[3][3] + Q[4] * G[3][4] * G[3][4] +
-	     Q[5] * G[3][5] * G[3][5] + F[3][9] * (F[3][9] * D[9][9] +
-						   F[3][6] * D[6][9] +
-						   F[3][7] * D[7][9] +
-						   F[3][8] * D[8][9]) +
-	     F[3][6] * (F[3][6] * D[6][6] + F[3][7] * D[6][7] +
-			F[3][8] * D[6][8] + F[3][9] * D[6][9]) +
-	     F[3][7] * (F[3][6] * D[6][7] + F[3][7] * D[7][7] +
-			F[3][8] * D[7][8] + F[3][9] * D[7][9]) +
-	     F[3][8] * (F[3][6] * D[6][8] + F[3][7] * D[7][8] +
-			F[3][8] * D[8][8] + F[3][9] * D[8][9])) * Tsq +
-	    (2 * F[3][6] * D[3][6] + 2 * F[3][7] * D[3][7] +
-	     2 * F[3][8] * D[3][8] + 2 * F[3][9] * D[3][9]) * T + D[3][3];
-	P[3][4] = P[4][3] =
-	    (F[4][9] *
-	     (F[3][9] * D[9][9] + F[3][6] * D[6][9] + F[3][7] * D[7][9] +
-	      F[3][8] * D[8][9]) + F[4][6] * (F[3][6] * D[6][6] +
-					      F[3][7] * D[6][7] +
-					      F[3][8] * D[6][8] +
-					      F[3][9] * D[6][9]) +
-	     F[4][7] * (F[3][6] * D[6][7] + F[3][7] * D[7][7] +
-			F[3][8] * D[7][8] + F[3][9] * D[7][9]) +
-	     F[4][8] * (F[3][6] * D[6][8] + F[3][7] * D[7][8] +
-			F[3][8] * D[8][8] + F[3][9] * D[8][9]) +
-	     G[3][3] * G[4][3] * Q[3] + G[3][4] * G[4][4] * Q[4] +
-	     G[3][5] * G[4][5] * Q[5]) * Tsq + (F[3][6] * D[4][6] +
-						F[4][6] * D[3][6] +
-						F[3][7] * D[4][7] +
-						F[4][7] * D[3][7] +
-						F[3][8] * D[4][8] +
-						F[4][8] * D[3][8] +
-						F[3][9] * D[4][9] +
-						F[4][9] * D[3][9]) * T +
-	    D[3][4];
-	P[3][5] = P[5][3] =
-	    (F[5][9] *
-	     (F[3][9] * D[9][9] + F[3][6] * D[6][9] + F[3][7] * D[7][9] +
-	      F[3][8] * D[8][9]) + F[5][6] * (F[3][6] * D[6][6] +
-					      F[3][7] * D[6][7] +
-					      F[3][8] * D[6][8] +
-					      F[3][9] * D[6][9]) +
-	     F[5][7] * (F[3][6] * D[6][7] + F[3][7] * D[7][7] +
-			F[3][8] * D[7][8] + F[3][9] * D[7][9]) +
-	     F[5][8] * (F[3][6] * D[6][8] + F[3][7] * D[7][8] +
-			F[3][8] * D[8][8] + F[3][9] * D[8][9]) +
-	     G[3][3] * G[5][3] * Q[3] + G[3][4] * G[5][4] * Q[4] +
-	     G[3][5] * G[5][5] * Q[5]) * Tsq + (F[3][6] * D[5][6] +
-						F[5][6] * D[3][6] +
-						F[3][7] * D[5][7] +
-						F[5][7] * D[3][7] +
-						F[3][8] * D[5][8] +
-						F[5][8] * D[3][8] +
-						F[3][9] * D[5][9] +
-						F[5][9] * D[3][9]) * T +
-	    D[3][5];
-	P[3][6] = P[6][3] =
-	    (F[6][9] *
-	     (F[3][9] * D[9][9] + F[3][6] * D[6][9] + F[3][7] * D[7][9] +
-	      F[3][8] * D[8][9]) + F[6][10] * (F[3][9] * D[9][10] +
-					       F[3][6] * D[6][10] +
-					       F[3][7] * D[7][10] +
-					       F[3][8] * D[8][10]) +
-	     F[6][11] * (F[3][9] * D[9][11] + F[3][6] * D[6][11] +
-			 F[3][7] * D[7][11] + F[3][8] * D[8][11]) +
-	     F[6][12] * (F[3][9] * D[9][12] + F[3][6] * D[6][12] +
-			 F[3][7] * D[7][12] + F[3][8] * D[8][12]) +
-	     F[6][7] * (F[3][6] * D[6][7] + F[3][7] * D[7][7] +
-			F[3][8] * D[7][8] + F[3][9] * D[7][9]) +
-	     F[6][8] * (F[3][6] * D[6][8] + F[3][7] * D[7][8] +
-			F[3][8] * D[8][8] + F[3][9] * D[8][9])) * Tsq +
-	    (F[3][6] * D[6][6] + F[3][7] * D[6][7] + F[6][7] * D[3][7] +
-	     F[3][8] * D[6][8] + F[6][8] * D[3][8] + F[3][9] * D[6][9] +
-	     F[6][9] * D[3][9] + F[6][10] * D[3][10] +
-	     F[6][11] * D[3][11] + F[6][12] * D[3][12]) * T + D[3][6];
-	P[3][7] = P[7][3] =
-	    (F[7][9] *
-	     (F[3][9] * D[9][9] + F[3][6] * D[6][9] + F[3][7] * D[7][9] +
-	      F[3][8] * D[8][9]) + F[7][10] * (F[3][9] * D[9][10] +
-					       F[3][6] * D[6][10] +
-					       F[3][7] * D[7][10] +
-					       F[3][8] * D[8][10]) +
-	     F[7][11] * (F[3][9] * D[9][11] + F[3][6] * D[6][11] +
-			 F[3][7] * D[7][11] + F[3][8] * D[8][11]) +
-	     F[7][12] * (F[3][9] * D[9][12] + F[3][6] * D[6][12] +
-			 F[3][7] * D[7][12] + F[3][8] * D[8][12]) +
-	     F[7][6] * (F[3][6] * D[6][6] + F[3][7] * D[6][7] +
-			F[3][8] * D[6][8] + F[3][9] * D[6][9]) +
-	     F[7][8] * (F[3][6] * D[6][8] + F[3][7] * D[7][8] +
-			F[3][8] * D[8][8] + F[3][9] * D[8][9])) * Tsq +
-	    (F[3][6] * D[6][7] + F[7][6] * D[3][6] + F[3][7] * D[7][7] +
-	     F[3][8] * D[7][8] + F[7][8] * D[3][8] + F[3][9] * D[7][9] +
-	     F[7][9] * D[3][9] + F[7][10] * D[3][10] +
-	     F[7][11] * D[3][11] + F[7][12] * D[3][12]) * T + D[3][7];
-	P[3][8] = P[8][3] =
-	    (F[8][9] *
-	     (F[3][9] * D[9][9] + F[3][6] * D[6][9] + F[3][7] * D[7][9] +
-	      F[3][8] * D[8][9]) + F[8][10] * (F[3][9] * D[9][10] +
-					       F[3][6] * D[6][10] +
-					       F[3][7] * D[7][10] +
-					       F[3][8] * D[8][10]) +
-	     F[8][11] * (F[3][9] * D[9][11] + F[3][6] * D[6][11] +
-			 F[3][7] * D[7][11] + F[3][8] * D[8][11]) +
-	     F[8][12] * (F[3][9] * D[9][12] + F[3][6] * D[6][12] +
-			 F[3][7] * D[7][12] + F[3][8] * D[8][12]) +
-	     F[8][6] * (F[3][6] * D[6][6] + F[3][7] * D[6][7] +
-			F[3][8] * D[6][8] + F[3][9] * D[6][9]) +
-	     F[8][7] * (F[3][6] * D[6][7] + F[3][7] * D[7][7] +
-			F[3][8] * D[7][8] + F[3][9] * D[7][9])) * Tsq +
-	    (F[3][6] * D[6][8] + F[3][7] * D[7][8] + F[8][6] * D[3][6] +
-	     F[8][7] * D[3][7] + F[3][8] * D[8][8] + F[3][9] * D[8][9] +
-	     F[8][9] * D[3][9] + F[8][10] * D[3][10] +
-	     F[8][11] * D[3][11] + F[8][12] * D[3][12]) * T + D[3][8];
-	P[3][9] = P[9][3] =
-	    (F[9][10] *
-	     (F[3][9] * D[9][10] + F[3][6] * D[6][10] +
-	      F[3][7] * D[7][10] + F[3][8] * D[8][10]) +
-	     F[9][11] * (F[3][9] * D[9][11] + F[3][6] * D[6][11] +
-			 F[3][7] * D[7][11] + F[3][8] * D[8][11]) +
-	     F[9][12] * (F[3][9] * D[9][12] + F[3][6] * D[6][12] +
-			 F[3][7] * D[7][12] + F[3][8] * D[8][12]) +
-	     F[9][6] * (F[3][6] * D[6][6] + F[3][7] * D[6][7] +
-			F[3][8] * D[6][8] + F[3][9] * D[6][9]) +
-	     F[9][7] * (F[3][6] * D[6][7] + F[3][7] * D[7][7] +
-			F[3][8] * D[7][8] + F[3][9] * D[7][9]) +
-	     F[9][8] * (F[3][6] * D[6][8] + F[3][7] * D[7][8] +
-			F[3][8] * D[8][8] + F[3][9] * D[8][9])) * Tsq +
-	    (F[9][6] * D[3][6] + F[9][7] * D[3][7] + F[9][8] * D[3][8] +
-	     F[3][9] * D[9][9] + F[9][10] * D[3][10] +
-	     F[9][11] * D[3][11] + F[9][12] * D[3][12] +
-	     F[3][6] * D[6][9] + F[3][7] * D[7][9] +
-	     F[3][8] * D[8][9]) * T + D[3][9];
-	P[3][10] = P[10][3] =
-	    (F[3][9] * D[9][10] + F[3][6] * D[6][10] + F[3][7] * D[7][10] +
-	     F[3][8] * D[8][10]) * T + D[3][10];
-	P[3][11] = P[11][3] =
-	    (F[3][9] * D[9][11] + F[3][6] * D[6][11] + F[3][7] * D[7][11] +
-	     F[3][8] * D[8][11]) * T + D[3][11];
-	P[3][12] = P[12][3] =
-	    (F[3][9] * D[9][12] + F[3][6] * D[6][12] + F[3][7] * D[7][12] +
-	     F[3][8] * D[8][12]) * T + D[3][12];
-	P[4][4] =
-	    (Q[3] * G[4][3] * G[4][3] + Q[4] * G[4][4] * G[4][4] +
-	     Q[5] * G[4][5] * G[4][5] + F[4][9] * (F[4][9] * D[9][9] +
-						   F[4][6] * D[6][9] +
-						   F[4][7] * D[7][9] +
-						   F[4][8] * D[8][9]) +
-	     F[4][6] * (F[4][6] * D[6][6] + F[4][7] * D[6][7] +
-			F[4][8] * D[6][8] + F[4][9] * D[6][9]) +
-	     F[4][7] * (F[4][6] * D[6][7] + F[4][7] * D[7][7] +
-			F[4][8] * D[7][8] + F[4][9] * D[7][9]) +
-	     F[4][8] * (F[4][6] * D[6][8] + F[4][7] * D[7][8] +
-			F[4][8] * D[8][8] + F[4][9] * D[8][9])) * Tsq +
-	    (2 * F[4][6] * D[4][6] + 2 * F[4][7] * D[4][7] +
-	     2 * F[4][8] * D[4][8] + 2 * F[4][9] * D[4][9]) * T + D[4][4];
-	P[4][5] = P[5][4] =
-	    (F[5][9] *
-	     (F[4][9] * D[9][9] + F[4][6] * D[6][9] + F[4][7] * D[7][9] +
-	      F[4][8] * D[8][9]) + F[5][6] * (F[4][6] * D[6][6] +
-					      F[4][7] * D[6][7] +
-					      F[4][8] * D[6][8] +
-					      F[4][9] * D[6][9]) +
-	     F[5][7] * (F[4][6] * D[6][7] + F[4][7] * D[7][7] +
-			F[4][8] * D[7][8] + F[4][9] * D[7][9]) +
-	     F[5][8] * (F[4][6] * D[6][8] + F[4][7] * D[7][8] +
-			F[4][8] * D[8][8] + F[4][9] * D[8][9]) +
-	     G[4][3] * G[5][3] * Q[3] + G[4][4] * G[5][4] * Q[4] +
-	     G[4][5] * G[5][5] * Q[5]) * Tsq + (F[4][6] * D[5][6] +
-						F[5][6] * D[4][6] +
-						F[4][7] * D[5][7] +
-						F[5][7] * D[4][7] +
-						F[4][8] * D[5][8] +
-						F[5][8] * D[4][8] +
-						F[4][9] * D[5][9] +
-						F[5][9] * D[4][9]) * T +
-	    D[4][5];
-	P[4][6] = P[6][4] =
-	    (F[6][9] *
-	     (F[4][9] * D[9][9] + F[4][6] * D[6][9] + F[4][7] * D[7][9] +
-	      F[4][8] * D[8][9]) + F[6][10] * (F[4][9] * D[9][10] +
-					       F[4][6] * D[6][10] +
-					       F[4][7] * D[7][10] +
-					       F[4][8] * D[8][10]) +
-	     F[6][11] * (F[4][9] * D[9][11] + F[4][6] * D[6][11] +
-			 F[4][7] * D[7][11] + F[4][8] * D[8][11]) +
-	     F[6][12] * (F[4][9] * D[9][12] + F[4][6] * D[6][12] +
-			 F[4][7] * D[7][12] + F[4][8] * D[8][12]) +
-	     F[6][7] * (F[4][6] * D[6][7] + F[4][7] * D[7][7] +
-			F[4][8] * D[7][8] + F[4][9] * D[7][9]) +
-	     F[6][8] * (F[4][6] * D[6][8] + F[4][7] * D[7][8] +
-			F[4][8] * D[8][8] + F[4][9] * D[8][9])) * Tsq +
-	    (F[4][6] * D[6][6] + F[4][7] * D[6][7] + F[6][7] * D[4][7] +
-	     F[4][8] * D[6][8] + F[6][8] * D[4][8] + F[4][9] * D[6][9] +
-	     F[6][9] * D[4][9] + F[6][10] * D[4][10] +
-	     F[6][11] * D[4][11] + F[6][12] * D[4][12]) * T + D[4][6];
-	P[4][7] = P[7][4] =
-	    (F[7][9] *
-	     (F[4][9] * D[9][9] + F[4][6] * D[6][9] + F[4][7] * D[7][9] +
-	      F[4][8] * D[8][9]) + F[7][10] * (F[4][9] * D[9][10] +
-					       F[4][6] * D[6][10] +
-					       F[4][7] * D[7][10] +
-					       F[4][8] * D[8][10]) +
-	     F[7][11] * (F[4][9] * D[9][11] + F[4][6] * D[6][11] +
-			 F[4][7] * D[7][11] + F[4][8] * D[8][11]) +
-	     F[7][12] * (F[4][9] * D[9][12] + F[4][6] * D[6][12] +
-			 F[4][7] * D[7][12] + F[4][8] * D[8][12]) +
-	     F[7][6] * (F[4][6] * D[6][6] + F[4][7] * D[6][7] +
-			F[4][8] * D[6][8] + F[4][9] * D[6][9]) +
-	     F[7][8] * (F[4][6] * D[6][8] + F[4][7] * D[7][8] +
-			F[4][8] * D[8][8] + F[4][9] * D[8][9])) * Tsq +
-	    (F[4][6] * D[6][7] + F[7][6] * D[4][6] + F[4][7] * D[7][7] +
-	     F[4][8] * D[7][8] + F[7][8] * D[4][8] + F[4][9] * D[7][9] +
-	     F[7][9] * D[4][9] + F[7][10] * D[4][10] +
-	     F[7][11] * D[4][11] + F[7][12] * D[4][12]) * T + D[4][7];
-	P[4][8] = P[8][4] =
-	    (F[8][9] *
-	     (F[4][9] * D[9][9] + F[4][6] * D[6][9] + F[4][7] * D[7][9] +
-	      F[4][8] * D[8][9]) + F[8][10] * (F[4][9] * D[9][10] +
-					       F[4][6] * D[6][10] +
-					       F[4][7] * D[7][10] +
-					       F[4][8] * D[8][10]) +
-	     F[8][11] * (F[4][9] * D[9][11] + F[4][6] * D[6][11] +
-			 F[4][7] * D[7][11] + F[4][8] * D[8][11]) +
-	     F[8][12] * (F[4][9] * D[9][12] + F[4][6] * D[6][12] +
-			 F[4][7] * D[7][12] + F[4][8] * D[8][12]) +
-	     F[8][6] * (F[4][6] * D[6][6] + F[4][7] * D[6][7] +
-			F[4][8] * D[6][8] + F[4][9] * D[6][9]) +
-	     F[8][7] * (F[4][6] * D[6][7] + F[4][7] * D[7][7] +
-			F[4][8] * D[7][8] + F[4][9] * D[7][9])) * Tsq +
-	    (F[4][6] * D[6][8] + F[4][7] * D[7][8] + F[8][6] * D[4][6] +
-	     F[8][7] * D[4][7] + F[4][8] * D[8][8] + F[4][9] * D[8][9] +
-	     F[8][9] * D[4][9] + F[8][10] * D[4][10] +
-	     F[8][11] * D[4][11] + F[8][12] * D[4][12]) * T + D[4][8];
-	P[4][9] = P[9][4] =
-	    (F[9][10] *
-	     (F[4][9] * D[9][10] + F[4][6] * D[6][10] +
-	      F[4][7] * D[7][10] + F[4][8] * D[8][10]) +
-	     F[9][11] * (F[4][9] * D[9][11] + F[4][6] * D[6][11] +
-			 F[4][7] * D[7][11] + F[4][8] * D[8][11]) +
-	     F[9][12] * (F[4][9] * D[9][12] + F[4][6] * D[6][12] +
-			 F[4][7] * D[7][12] + F[4][8] * D[8][12]) +
-	     F[9][6] * (F[4][6] * D[6][6] + F[4][7] * D[6][7] +
-			F[4][8] * D[6][8] + F[4][9] * D[6][9]) +
-	     F[9][7] * (F[4][6] * D[6][7] + F[4][7] * D[7][7] +
-			F[4][8] * D[7][8] + F[4][9] * D[7][9]) +
-	     F[9][8] * (F[4][6] * D[6][8] + F[4][7] * D[7][8] +
-			F[4][8] * D[8][8] + F[4][9] * D[8][9])) * Tsq +
-	    (F[9][6] * D[4][6] + F[9][7] * D[4][7] + F[9][8] * D[4][8] +
-	     F[4][9] * D[9][9] + F[9][10] * D[4][10] +
-	     F[9][11] * D[4][11] + F[9][12] * D[4][12] +
-	     F[4][6] * D[6][9] + F[4][7] * D[7][9] +
-	     F[4][8] * D[8][9]) * T + D[4][9];
-	P[4][10] = P[10][4] =
-	    (F[4][9] * D[9][10] + F[4][6] * D[6][10] + F[4][7] * D[7][10] +
-	     F[4][8] * D[8][10]) * T + D[4][10];
-	P[4][11] = P[11][4] =
-	    (F[4][9] * D[9][11] + F[4][6] * D[6][11] + F[4][7] * D[7][11] +
-	     F[4][8] * D[8][11]) * T + D[4][11];
-	P[4][12] = P[12][4] =
-	    (F[4][9] * D[9][12] + F[4][6] * D[6][12] + F[4][7] * D[7][12] +
-	     F[4][8] * D[8][12]) * T + D[4][12];
-	P[5][5] =
-	    (Q[3] * G[5][3] * G[5][3] + Q[4] * G[5][4] * G[5][4] +
-	     Q[5] * G[5][5] * G[5][5] + F[5][9] * (F[5][9] * D[9][9] +
-						   F[5][6] * D[6][9] +
-						   F[5][7] * D[7][9] +
-						   F[5][8] * D[8][9]) +
-	     F[5][6] * (F[5][6] * D[6][6] + F[5][7] * D[6][7] +
-			F[5][8] * D[6][8] + F[5][9] * D[6][9]) +
-	     F[5][7] * (F[5][6] * D[6][7] + F[5][7] * D[7][7] +
-			F[5][8] * D[7][8] + F[5][9] * D[7][9]) +
-	     F[5][8] * (F[5][6] * D[6][8] + F[5][7] * D[7][8] +
-			F[5][8] * D[8][8] + F[5][9] * D[8][9])) * Tsq +
-	    (2 * F[5][6] * D[5][6] + 2 * F[5][7] * D[5][7] +
-	     2 * F[5][8] * D[5][8] + 2 * F[5][9] * D[5][9]) * T + D[5][5];
-	P[5][6] = P[6][5] =
-	    (F[6][9] *
-	     (F[5][9] * D[9][9] + F[5][6] * D[6][9] + F[5][7] * D[7][9] +
-	      F[5][8] * D[8][9]) + F[6][10] * (F[5][9] * D[9][10] +
-					       F[5][6] * D[6][10] +
-					       F[5][7] * D[7][10] +
-					       F[5][8] * D[8][10]) +
-	     F[6][11] * (F[5][9] * D[9][11] + F[5][6] * D[6][11] +
-			 F[5][7] * D[7][11] + F[5][8] * D[8][11]) +
-	     F[6][12] * (F[5][9] * D[9][12] + F[5][6] * D[6][12] +
-			 F[5][7] * D[7][12] + F[5][8] * D[8][12]) +
-	     F[6][7] * (F[5][6] * D[6][7] + F[5][7] * D[7][7] +
-			F[5][8] * D[7][8] + F[5][9] * D[7][9]) +
-	     F[6][8] * (F[5][6] * D[6][8] + F[5][7] * D[7][8] +
-			F[5][8] * D[8][8] + F[5][9] * D[8][9])) * Tsq +
-	    (F[5][6] * D[6][6] + F[5][7] * D[6][7] + F[6][7] * D[5][7] +
-	     F[5][8] * D[6][8] + F[6][8] * D[5][8] + F[5][9] * D[6][9] +
-	     F[6][9] * D[5][9] + F[6][10] * D[5][10] +
-	     F[6][11] * D[5][11] + F[6][12] * D[5][12]) * T + D[5][6];
-	P[5][7] = P[7][5] =
-	    (F[7][9] *
-	     (F[5][9] * D[9][9] + F[5][6] * D[6][9] + F[5][7] * D[7][9] +
-	      F[5][8] * D[8][9]) + F[7][10] * (F[5][9] * D[9][10] +
-					       F[5][6] * D[6][10] +
-					       F[5][7] * D[7][10] +
-					       F[5][8] * D[8][10]) +
-	     F[7][11] * (F[5][9] * D[9][11] + F[5][6] * D[6][11] +
-			 F[5][7] * D[7][11] + F[5][8] * D[8][11]) +
-	     F[7][12] * (F[5][9] * D[9][12] + F[5][6] * D[6][12] +
-			 F[5][7] * D[7][12] + F[5][8] * D[8][12]) +
-	     F[7][6] * (F[5][6] * D[6][6] + F[5][7] * D[6][7] +
-			F[5][8] * D[6][8] + F[5][9] * D[6][9]) +
-	     F[7][8] * (F[5][6] * D[6][8] + F[5][7] * D[7][8] +
-			F[5][8] * D[8][8] + F[5][9] * D[8][9])) * Tsq +
-	    (F[5][6] * D[6][7] + F[7][6] * D[5][6] + F[5][7] * D[7][7] +
-	     F[5][8] * D[7][8] + F[7][8] * D[5][8] + F[5][9] * D[7][9] +
-	     F[7][9] * D[5][9] + F[7][10] * D[5][10] +
-	     F[7][11] * D[5][11] + F[7][12] * D[5][12]) * T + D[5][7];
-	P[5][8] = P[8][5] =
-	    (F[8][9] *
-	     (F[5][9] * D[9][9] + F[5][6] * D[6][9] + F[5][7] * D[7][9] +
-	      F[5][8] * D[8][9]) + F[8][10] * (F[5][9] * D[9][10] +
-					       F[5][6] * D[6][10] +
-					       F[5][7] * D[7][10] +
-					       F[5][8] * D[8][10]) +
-	     F[8][11] * (F[5][9] * D[9][11] + F[5][6] * D[6][11] +
-			 F[5][7] * D[7][11] + F[5][8] * D[8][11]) +
-	     F[8][12] * (F[5][9] * D[9][12] + F[5][6] * D[6][12] +
-			 F[5][7] * D[7][12] + F[5][8] * D[8][12]) +
-	     F[8][6] * (F[5][6] * D[6][6] + F[5][7] * D[6][7] +
-			F[5][8] * D[6][8] + F[5][9] * D[6][9]) +
-	     F[8][7] * (F[5][6] * D[6][7] + F[5][7] * D[7][7] +
-			F[5][8] * D[7][8] + F[5][9] * D[7][9])) * Tsq +
-	    (F[5][6] * D[6][8] + F[5][7] * D[7][8] + F[8][6] * D[5][6] +
-	     F[8][7] * D[5][7] + F[5][8] * D[8][8] + F[5][9] * D[8][9] +
-	     F[8][9] * D[5][9] + F[8][10] * D[5][10] +
-	     F[8][11] * D[5][11] + F[8][12] * D[5][12]) * T + D[5][8];
-	P[5][9] = P[9][5] =
-	    (F[9][10] *
-	     (F[5][9] * D[9][10] + F[5][6] * D[6][10] +
-	      F[5][7] * D[7][10] + F[5][8] * D[8][10]) +
-	     F[9][11] * (F[5][9] * D[9][11] + F[5][6] * D[6][11] +
-			 F[5][7] * D[7][11] + F[5][8] * D[8][11]) +
-	     F[9][12] * (F[5][9] * D[9][12] + F[5][6] * D[6][12] +
-			 F[5][7] * D[7][12] + F[5][8] * D[8][12]) +
-	     F[9][6] * (F[5][6] * D[6][6] + F[5][7] * D[6][7] +
-			F[5][8] * D[6][8] + F[5][9] * D[6][9]) +
-	     F[9][7] * (F[5][6] * D[6][7] + F[5][7] * D[7][7] +
-			F[5][8] * D[7][8] + F[5][9] * D[7][9]) +
-	     F[9][8] * (F[5][6] * D[6][8] + F[5][7] * D[7][8] +
-			F[5][8] * D[8][8] + F[5][9] * D[8][9])) * Tsq +
-	    (F[9][6] * D[5][6] + F[9][7] * D[5][7] + F[9][8] * D[5][8] +
-	     F[5][9] * D[9][9] + F[9][10] * D[5][10] +
-	     F[9][11] * D[5][11] + F[9][12] * D[5][12] +
-	     F[5][6] * D[6][9] + F[5][7] * D[7][9] +
-	     F[5][8] * D[8][9]) * T + D[5][9];
-	P[5][10] = P[10][5] =
-	    (F[5][9] * D[9][10] + F[5][6] * D[6][10] + F[5][7] * D[7][10] +
-	     F[5][8] * D[8][10]) * T + D[5][10];
-	P[5][11] = P[11][5] =
-	    (F[5][9] * D[9][11] + F[5][6] * D[6][11] + F[5][7] * D[7][11] +
-	     F[5][8] * D[8][11]) * T + D[5][11];
-	P[5][12] = P[12][5] =
-	    (F[5][9] * D[9][12] + F[5][6] * D[6][12] + F[5][7] * D[7][12] +
-	     F[5][8] * D[8][12]) * T + D[5][12];
-	P[6][6] =
-	    (Q[0] * G[6][0] * G[6][0] + Q[1] * G[6][1] * G[6][1] +
-	     Q[2] * G[6][2] * G[6][2] + F[6][9] * (F[6][9] * D[9][9] +
-						   F[6][10] * D[9][10] +
-						   F[6][11] * D[9][11] +
-						   F[6][12] * D[9][12] +
-						   F[6][7] * D[7][9] +
-						   F[6][8] * D[8][9]) +
-	     F[6][10] * (F[6][9] * D[9][10] + F[6][10] * D[10][10] +
-			 F[6][11] * D[10][11] + F[6][12] * D[10][12] +
-			 F[6][7] * D[7][10] + F[6][8] * D[8][10]) +
-	     F[6][11] * (F[6][9] * D[9][11] + F[6][10] * D[10][11] +
-			 F[6][11] * D[11][11] + F[6][12] * D[11][12] +
-			 F[6][7] * D[7][11] + F[6][8] * D[8][11]) +
-	     F[6][12] * (F[6][9] * D[9][12] + F[6][10] * D[10][12] +
-			 F[6][11] * D[11][12] + F[6][12] * D[12][12] +
-			 F[6][7] * D[7][12] + F[6][8] * D[8][12]) +
-	     F[6][7] * (F[6][7] * D[7][7] + F[6][8] * D[7][8] +
-			F[6][9] * D[7][9] + F[6][10] * D[7][10] +
-			F[6][11] * D[7][11] + F[6][12] * D[7][12]) +
-	     F[6][8] * (F[6][7] * D[7][8] + F[6][8] * D[8][8] +
-			F[6][9] * D[8][9] + F[6][10] * D[8][10] +
-			F[6][11] * D[8][11] + F[6][12] * D[8][12])) * Tsq +
-	    (2 * F[6][7] * D[6][7] + 2 * F[6][8] * D[6][8] +
-	     2 * F[6][9] * D[6][9] + 2 * F[6][10] * D[6][10] +
-	     2 * F[6][11] * D[6][11] + 2 * F[6][12] * D[6][12]) * T +
-	    D[6][6];
-	P[6][7] = P[7][6] =
-	    (F[7][9] *
-	     (F[6][9] * D[9][9] + F[6][10] * D[9][10] +
-	      F[6][11] * D[9][11] + F[6][12] * D[9][12] +
-	      F[6][7] * D[7][9] + F[6][8] * D[8][9]) +
-	     F[7][10] * (F[6][9] * D[9][10] + F[6][10] * D[10][10] +
-			 F[6][11] * D[10][11] + F[6][12] * D[10][12] +
-			 F[6][7] * D[7][10] + F[6][8] * D[8][10]) +
-	     F[7][11] * (F[6][9] * D[9][11] + F[6][10] * D[10][11] +
-			 F[6][11] * D[11][11] + F[6][12] * D[11][12] +
-			 F[6][7] * D[7][11] + F[6][8] * D[8][11]) +
-	     F[7][12] * (F[6][9] * D[9][12] + F[6][10] * D[10][12] +
-			 F[6][11] * D[11][12] + F[6][12] * D[12][12] +
-			 F[6][7] * D[7][12] + F[6][8] * D[8][12]) +
-	     F[7][6] * (F[6][7] * D[6][7] + F[6][8] * D[6][8] +
-			F[6][9] * D[6][9] + F[6][10] * D[6][10] +
-			F[6][11] * D[6][11] + F[6][12] * D[6][12]) +
-	     F[7][8] * (F[6][7] * D[7][8] + F[6][8] * D[8][8] +
-			F[6][9] * D[8][9] + F[6][10] * D[8][10] +
-			F[6][11] * D[8][11] + F[6][12] * D[8][12]) +
-	     G[6][0] * G[7][0] * Q[0] + G[6][1] * G[7][1] * Q[1] +
-	     G[6][2] * G[7][2] * Q[2]) * Tsq + (F[7][6] * D[6][6] +
-						F[6][7] * D[7][7] +
-						F[6][8] * D[7][8] +
-						F[7][8] * D[6][8] +
-						F[6][9] * D[7][9] +
-						F[7][9] * D[6][9] +
-						F[6][10] * D[7][10] +
-						F[7][10] * D[6][10] +
-						F[6][11] * D[7][11] +
-						F[7][11] * D[6][11] +
-						F[6][12] * D[7][12] +
-						F[7][12] * D[6][12]) * T +
-	    D[6][7];
-	P[6][8] = P[8][6] =
-	    (F[8][9] *
-	     (F[6][9] * D[9][9] + F[6][10] * D[9][10] +
-	      F[6][11] * D[9][11] + F[6][12] * D[9][12] +
-	      F[6][7] * D[7][9] + F[6][8] * D[8][9]) +
-	     F[8][10] * (F[6][9] * D[9][10] + F[6][10] * D[10][10] +
-			 F[6][11] * D[10][11] + F[6][12] * D[10][12] +
-			 F[6][7] * D[7][10] + F[6][8] * D[8][10]) +
-	     F[8][11] * (F[6][9] * D[9][11] + F[6][10] * D[10][11] +
-			 F[6][11] * D[11][11] + F[6][12] * D[11][12] +
-			 F[6][7] * D[7][11] + F[6][8] * D[8][11]) +
-	     F[8][12] * (F[6][9] * D[9][12] + F[6][10] * D[10][12] +
-			 F[6][11] * D[11][12] + F[6][12] * D[12][12] +
-			 F[6][7] * D[7][12] + F[6][8] * D[8][12]) +
-	     F[8][6] * (F[6][7] * D[6][7] + F[6][8] * D[6][8] +
-			F[6][9] * D[6][9] + F[6][10] * D[6][10] +
-			F[6][11] * D[6][11] + F[6][12] * D[6][12]) +
-	     F[8][7] * (F[6][7] * D[7][7] + F[6][8] * D[7][8] +
-			F[6][9] * D[7][9] + F[6][10] * D[7][10] +
-			F[6][11] * D[7][11] + F[6][12] * D[7][12]) +
-	     G[6][0] * G[8][0] * Q[0] + G[6][1] * G[8][1] * Q[1] +
-	     G[6][2] * G[8][2] * Q[2]) * Tsq + (F[6][7] * D[7][8] +
-						F[8][6] * D[6][6] +
-						F[8][7] * D[6][7] +
-						F[6][8] * D[8][8] +
-						F[6][9] * D[8][9] +
-						F[8][9] * D[6][9] +
-						F[6][10] * D[8][10] +
-						F[8][10] * D[6][10] +
-						F[6][11] * D[8][11] +
-						F[8][11] * D[6][11] +
-						F[6][12] * D[8][12] +
-						F[8][12] * D[6][12]) * T +
-	    D[6][8];
-	P[6][9] = P[9][6] =
-	    (F[9][10] *
-	     (F[6][9] * D[9][10] + F[6][10] * D[10][10] +
-	      F[6][11] * D[10][11] + F[6][12] * D[10][12] +
-	      F[6][7] * D[7][10] + F[6][8] * D[8][10]) +
-	     F[9][11] * (F[6][9] * D[9][11] + F[6][10] * D[10][11] +
-			 F[6][11] * D[11][11] + F[6][12] * D[11][12] +
-			 F[6][7] * D[7][11] + F[6][8] * D[8][11]) +
-	     F[9][12] * (F[6][9] * D[9][12] + F[6][10] * D[10][12] +
-			 F[6][11] * D[11][12] + F[6][12] * D[12][12] +
-			 F[6][7] * D[7][12] + F[6][8] * D[8][12]) +
-	     F[9][6] * (F[6][7] * D[6][7] + F[6][8] * D[6][8] +
-			F[6][9] * D[6][9] + F[6][10] * D[6][10] +
-			F[6][11] * D[6][11] + F[6][12] * D[6][12]) +
-	     F[9][7] * (F[6][7] * D[7][7] + F[6][8] * D[7][8] +
-			F[6][9] * D[7][9] + F[6][10] * D[7][10] +
-			F[6][11] * D[7][11] + F[6][12] * D[7][12]) +
-	     F[9][8] * (F[6][7] * D[7][8] + F[6][8] * D[8][8] +
-			F[6][9] * D[8][9] + F[6][10] * D[8][10] +
-			F[6][11] * D[8][11] + F[6][12] * D[8][12]) +
-	     G[9][0] * G[6][0] * Q[0] + G[9][1] * G[6][1] * Q[1] +
-	     G[9][2] * G[6][2] * Q[2]) * Tsq + (F[9][6] * D[6][6] +
-						F[9][7] * D[6][7] +
-						F[9][8] * D[6][8] +
-						F[6][9] * D[9][9] +
-						F[9][10] * D[6][10] +
-						F[6][10] * D[9][10] +
-						F[9][11] * D[6][11] +
-						F[6][11] * D[9][11] +
-						F[9][12] * D[6][12] +
-						F[6][12] * D[9][12] +
-						F[6][7] * D[7][9] +
-						F[6][8] * D[8][9]) * T +
-	    D[6][9];
-	P[6][10] = P[10][6] =
-	    (F[6][9] * D[9][10] + F[6][10] * D[10][10] +
-	     F[6][11] * D[10][11] + F[6][12] * D[10][12] +
-	     F[6][7] * D[7][10] + F[6][8] * D[8][10]) * T + D[6][10];
-	P[6][11] = P[11][6] =
-	    (F[6][9] * D[9][11] + F[6][10] * D[10][11] +
-	     F[6][11] * D[11][11] + F[6][12] * D[11][12] +
-	     F[6][7] * D[7][11] + F[6][8] * D[8][11]) * T + D[6][11];
-	P[6][12] = P[12][6] =
-	    (F[6][9] * D[9][12] + F[6][10] * D[10][12] +
-	     F[6][11] * D[11][12] + F[6][12] * D[12][12] +
-	     F[6][7] * D[7][12] + F[6][8] * D[8][12]) * T + D[6][12];
-	P[7][7] =
-	    (Q[0] * G[7][0] * G[7][0] + Q[1] * G[7][1] * G[7][1] +
-	     Q[2] * G[7][2] * G[7][2] + F[7][9] * (F[7][9] * D[9][9] +
-						   F[7][10] * D[9][10] +
-						   F[7][11] * D[9][11] +
-						   F[7][12] * D[9][12] +
-						   F[7][6] * D[6][9] +
-						   F[7][8] * D[8][9]) +
-	     F[7][10] * (F[7][9] * D[9][10] + F[7][10] * D[10][10] +
-			 F[7][11] * D[10][11] + F[7][12] * D[10][12] +
-			 F[7][6] * D[6][10] + F[7][8] * D[8][10]) +
-	     F[7][11] * (F[7][9] * D[9][11] + F[7][10] * D[10][11] +
-			 F[7][11] * D[11][11] + F[7][12] * D[11][12] +
-			 F[7][6] * D[6][11] + F[7][8] * D[8][11]) +
-	     F[7][12] * (F[7][9] * D[9][12] + F[7][10] * D[10][12] +
-			 F[7][11] * D[11][12] + F[7][12] * D[12][12] +
-			 F[7][6] * D[6][12] + F[7][8] * D[8][12]) +
-	     F[7][6] * (F[7][6] * D[6][6] + F[7][8] * D[6][8] +
-			F[7][9] * D[6][9] + F[7][10] * D[6][10] +
-			F[7][11] * D[6][11] + F[7][12] * D[6][12]) +
-	     F[7][8] * (F[7][6] * D[6][8] + F[7][8] * D[8][8] +
-			F[7][9] * D[8][9] + F[7][10] * D[8][10] +
-			F[7][11] * D[8][11] + F[7][12] * D[8][12])) * Tsq +
-	    (2 * F[7][6] * D[6][7] + 2 * F[7][8] * D[7][8] +
-	     2 * F[7][9] * D[7][9] + 2 * F[7][10] * D[7][10] +
-	     2 * F[7][11] * D[7][11] + 2 * F[7][12] * D[7][12]) * T +
-	    D[7][7];
-	P[7][8] = P[8][7] =
-	    (F[8][9] *
-	     (F[7][9] * D[9][9] + F[7][10] * D[9][10] +
-	      F[7][11] * D[9][11] + F[7][12] * D[9][12] +
-	      F[7][6] * D[6][9] + F[7][8] * D[8][9]) +
-	     F[8][10] * (F[7][9] * D[9][10] + F[7][10] * D[10][10] +
-			 F[7][11] * D[10][11] + F[7][12] * D[10][12] +
-			 F[7][6] * D[6][10] + F[7][8] * D[8][10]) +
-	     F[8][11] * (F[7][9] * D[9][11] + F[7][10] * D[10][11] +
-			 F[7][11] * D[11][11] + F[7][12] * D[11][12] +
-			 F[7][6] * D[6][11] + F[7][8] * D[8][11]) +
-	     F[8][12] * (F[7][9] * D[9][12] + F[7][10] * D[10][12] +
-			 F[7][11] * D[11][12] + F[7][12] * D[12][12] +
-			 F[7][6] * D[6][12] + F[7][8] * D[8][12]) +
-	     F[8][6] * (F[7][6] * D[6][6] + F[7][8] * D[6][8] +
-			F[7][9] * D[6][9] + F[7][10] * D[6][10] +
-			F[7][11] * D[6][11] + F[7][12] * D[6][12]) +
-	     F[8][7] * (F[7][6] * D[6][7] + F[7][8] * D[7][8] +
-			F[7][9] * D[7][9] + F[7][10] * D[7][10] +
-			F[7][11] * D[7][11] + F[7][12] * D[7][12]) +
-	     G[7][0] * G[8][0] * Q[0] + G[7][1] * G[8][1] * Q[1] +
-	     G[7][2] * G[8][2] * Q[2]) * Tsq + (F[7][6] * D[6][8] +
-						F[8][6] * D[6][7] +
-						F[8][7] * D[7][7] +
-						F[7][8] * D[8][8] +
-						F[7][9] * D[8][9] +
-						F[8][9] * D[7][9] +
-						F[7][10] * D[8][10] +
-						F[8][10] * D[7][10] +
-						F[7][11] * D[8][11] +
-						F[8][11] * D[7][11] +
-						F[7][12] * D[8][12] +
-						F[8][12] * D[7][12]) * T +
-	    D[7][8];
-	P[7][9] = P[9][7] =
-	    (F[9][10] *
-	     (F[7][9] * D[9][10] + F[7][10] * D[10][10] +
-	      F[7][11] * D[10][11] + F[7][12] * D[10][12] +
-	      F[7][6] * D[6][10] + F[7][8] * D[8][10]) +
-	     F[9][11] * (F[7][9] * D[9][11] + F[7][10] * D[10][11] +
-			 F[7][11] * D[11][11] + F[7][12] * D[11][12] +
-			 F[7][6] * D[6][11] + F[7][8] * D[8][11]) +
-	     F[9][12] * (F[7][9] * D[9][12] + F[7][10] * D[10][12] +
-			 F[7][11] * D[11][12] + F[7][12] * D[12][12] +
-			 F[7][6] * D[6][12] + F[7][8] * D[8][12]) +
-	     F[9][6] * (F[7][6] * D[6][6] + F[7][8] * D[6][8] +
-			F[7][9] * D[6][9] + F[7][10] * D[6][10] +
-			F[7][11] * D[6][11] + F[7][12] * D[6][12]) +
-	     F[9][7] * (F[7][6] * D[6][7] + F[7][8] * D[7][8] +
-			F[7][9] * D[7][9] + F[7][10] * D[7][10] +
-			F[7][11] * D[7][11] + F[7][12] * D[7][12]) +
-	     F[9][8] * (F[7][6] * D[6][8] + F[7][8] * D[8][8] +
-			F[7][9] * D[8][9] + F[7][10] * D[8][10] +
-			F[7][11] * D[8][11] + F[7][12] * D[8][12]) +
-	     G[9][0] * G[7][0] * Q[0] + G[9][1] * G[7][1] * Q[1] +
-	     G[9][2] * G[7][2] * Q[2]) * Tsq + (F[9][6] * D[6][7] +
-						F[9][7] * D[7][7] +
-						F[9][8] * D[7][8] +
-						F[7][9] * D[9][9] +
-						F[9][10] * D[7][10] +
-						F[7][10] * D[9][10] +
-						F[9][11] * D[7][11] +
-						F[7][11] * D[9][11] +
-						F[9][12] * D[7][12] +
-						F[7][12] * D[9][12] +
-						F[7][6] * D[6][9] +
-						F[7][8] * D[8][9]) * T +
-	    D[7][9];
-	P[7][10] = P[10][7] =
-	    (F[7][9] * D[9][10] + F[7][10] * D[10][10] +
-	     F[7][11] * D[10][11] + F[7][12] * D[10][12] +
-	     F[7][6] * D[6][10] + F[7][8] * D[8][10]) * T + D[7][10];
-	P[7][11] = P[11][7] =
-	    (F[7][9] * D[9][11] + F[7][10] * D[10][11] +
-	     F[7][11] * D[11][11] + F[7][12] * D[11][12] +
-	     F[7][6] * D[6][11] + F[7][8] * D[8][11]) * T + D[7][11];
-	P[7][12] = P[12][7] =
-	    (F[7][9] * D[9][12] + F[7][10] * D[10][12] +
-	     F[7][11] * D[11][12] + F[7][12] * D[12][12] +
-	     F[7][6] * D[6][12] + F[7][8] * D[8][12]) * T + D[7][12];
-	P[8][8] =
-	    (Q[0] * G[8][0] * G[8][0] + Q[1] * G[8][1] * G[8][1] +
-	     Q[2] * G[8][2] * G[8][2] + F[8][9] * (F[8][9] * D[9][9] +
-						   F[8][10] * D[9][10] +
-						   F[8][11] * D[9][11] +
-						   F[8][12] * D[9][12] +
-						   F[8][6] * D[6][9] +
-						   F[8][7] * D[7][9]) +
-	     F[8][10] * (F[8][9] * D[9][10] + F[8][10] * D[10][10] +
-			 F[8][11] * D[10][11] + F[8][12] * D[10][12] +
-			 F[8][6] * D[6][10] + F[8][7] * D[7][10]) +
-	     F[8][11] * (F[8][9] * D[9][11] + F[8][10] * D[10][11] +
-			 F[8][11] * D[11][11] + F[8][12] * D[11][12] +
-			 F[8][6] * D[6][11] + F[8][7] * D[7][11]) +
-	     F[8][12] * (F[8][9] * D[9][12] + F[8][10] * D[10][12] +
-			 F[8][11] * D[11][12] + F[8][12] * D[12][12] +
-			 F[8][6] * D[6][12] + F[8][7] * D[7][12]) +
-	     F[8][6] * (F[8][6] * D[6][6] + F[8][7] * D[6][7] +
-			F[8][9] * D[6][9] + F[8][10] * D[6][10] +
-			F[8][11] * D[6][11] + F[8][12] * D[6][12]) +
-	     F[8][7] * (F[8][6] * D[6][7] + F[8][7] * D[7][7] +
-			F[8][9] * D[7][9] + F[8][10] * D[7][10] +
-			F[8][11] * D[7][11] + F[8][12] * D[7][12])) * Tsq +
-	    (2 * F[8][6] * D[6][8] + 2 * F[8][7] * D[7][8] +
-	     2 * F[8][9] * D[8][9] + 2 * F[8][10] * D[8][10] +
-	     2 * F[8][11] * D[8][11] + 2 * F[8][12] * D[8][12]) * T +
-	    D[8][8];
-	P[8][9] = P[9][8] =
-	    (F[9][10] *
-	     (F[8][9] * D[9][10] + F[8][10] * D[10][10] +
-	      F[8][11] * D[10][11] + F[8][12] * D[10][12] +
-	      F[8][6] * D[6][10] + F[8][7] * D[7][10]) +
-	     F[9][11] * (F[8][9] * D[9][11] + F[8][10] * D[10][11] +
-			 F[8][11] * D[11][11] + F[8][12] * D[11][12] +
-			 F[8][6] * D[6][11] + F[8][7] * D[7][11]) +
-	     F[9][12] * (F[8][9] * D[9][12] + F[8][10] * D[10][12] +
-			 F[8][11] * D[11][12] + F[8][12] * D[12][12] +
-			 F[8][6] * D[6][12] + F[8][7] * D[7][12]) +
-	     F[9][6] * (F[8][6] * D[6][6] + F[8][7] * D[6][7] +
-			F[8][9] * D[6][9] + F[8][10] * D[6][10] +
-			F[8][11] * D[6][11] + F[8][12] * D[6][12]) +
-	     F[9][7] * (F[8][6] * D[6][7] + F[8][7] * D[7][7] +
-			F[8][9] * D[7][9] + F[8][10] * D[7][10] +
-			F[8][11] * D[7][11] + F[8][12] * D[7][12]) +
-	     F[9][8] * (F[8][6] * D[6][8] + F[8][7] * D[7][8] +
-			F[8][9] * D[8][9] + F[8][10] * D[8][10] +
-			F[8][11] * D[8][11] + F[8][12] * D[8][12]) +
-	     G[9][0] * G[8][0] * Q[0] + G[9][1] * G[8][1] * Q[1] +
-	     G[9][2] * G[8][2] * Q[2]) * Tsq + (F[9][6] * D[6][8] +
-						F[9][7] * D[7][8] +
-						F[9][8] * D[8][8] +
-						F[8][9] * D[9][9] +
-						F[9][10] * D[8][10] +
-						F[8][10] * D[9][10] +
-						F[9][11] * D[8][11] +
-						F[8][11] * D[9][11] +
-						F[9][12] * D[8][12] +
-						F[8][12] * D[9][12] +
-						F[8][6] * D[6][9] +
-						F[8][7] * D[7][9]) * T +
-	    D[8][9];
-	P[8][10] = P[10][8] =
-	    (F[8][9] * D[9][10] + F[8][10] * D[10][10] +
-	     F[8][11] * D[10][11] + F[8][12] * D[10][12] +
-	     F[8][6] * D[6][10] + F[8][7] * D[7][10]) * T + D[8][10];
-	P[8][11] = P[11][8] =
-	    (F[8][9] * D[9][11] + F[8][10] * D[10][11] +
-	     F[8][11] * D[11][11] + F[8][12] * D[11][12] +
-	     F[8][6] * D[6][11] + F[8][7] * D[7][11]) * T + D[8][11];
-	P[8][12] = P[12][8] =
-	    (F[8][9] * D[9][12] + F[8][10] * D[10][12] +
-	     F[8][11] * D[11][12] + F[8][12] * D[12][12] +
-	     F[8][6] * D[6][12] + F[8][7] * D[7][12]) * T + D[8][12];
-	P[9][9] =
-	    (Q[0] * G[9][0] * G[9][0] + Q[1] * G[9][1] * G[9][1] +
-	     Q[2] * G[9][2] * G[9][2] + F[9][10] * (F[9][10] * D[10][10] +
-						    F[9][11] * D[10][11] +
-						    F[9][12] * D[10][12] +
-						    F[9][6] * D[6][10] +
-						    F[9][7] * D[7][10] +
-						    F[9][8] * D[8][10]) +
-	     F[9][11] * (F[9][10] * D[10][11] + F[9][11] * D[11][11] +
-			 F[9][12] * D[11][12] + F[9][6] * D[6][11] +
-			 F[9][7] * D[7][11] + F[9][8] * D[8][11]) +
-	     F[9][12] * (F[9][10] * D[10][12] + F[9][11] * D[11][12] +
-			 F[9][12] * D[12][12] + F[9][6] * D[6][12] +
-			 F[9][7] * D[7][12] + F[9][8] * D[8][12]) +
-	     F[9][6] * (F[9][6] * D[6][6] + F[9][7] * D[6][7] +
-			F[9][8] * D[6][8] + F[9][10] * D[6][10] +
-			F[9][11] * D[6][11] + F[9][12] * D[6][12]) +
-	     F[9][7] * (F[9][6] * D[6][7] + F[9][7] * D[7][7] +
-			F[9][8] * D[7][8] + F[9][10] * D[7][10] +
-			F[9][11] * D[7][11] + F[9][12] * D[7][12]) +
-	     F[9][8] * (F[9][6] * D[6][8] + F[9][7] * D[7][8] +
-			F[9][8] * D[8][8] + F[9][10] * D[8][10] +
-			F[9][11] * D[8][11] + F[9][12] * D[8][12])) * Tsq +
-	    (2 * F[9][10] * D[9][10] + 2 * F[9][11] * D[9][11] +
-	     2 * F[9][12] * D[9][12] + 2 * F[9][6] * D[6][9] +
-	     2 * F[9][7] * D[7][9] + 2 * F[9][8] * D[8][9]) * T + D[9][9];
-	P[9][10] = P[10][9] =
-	    (F[9][10] * D[10][10] + F[9][11] * D[10][11] +
-	     F[9][12] * D[10][12] + F[9][6] * D[6][10] +
-	     F[9][7] * D[7][10] + F[9][8] * D[8][10]) * T + D[9][10];
-	P[9][11] = P[11][9] =
-	    (F[9][10] * D[10][11] + F[9][11] * D[11][11] +
-	     F[9][12] * D[11][12] + F[9][6] * D[6][11] +
-	     F[9][7] * D[7][11] + F[9][8] * D[8][11]) * T + D[9][11];
-	P[9][12] = P[12][9] =
-	    (F[9][10] * D[10][12] + F[9][11] * D[11][12] +
-	     F[9][12] * D[12][12] + F[9][6] * D[6][12] +
-	     F[9][7] * D[7][12] + F[9][8] * D[8][12]) * T + D[9][12];
-	P[10][10] = Q[6] * Tsq + D[10][10];
-	P[10][11] = P[11][10] = D[10][11];
-	P[10][12] = P[12][10] = D[10][12];
-	P[11][11] = Q[7] * Tsq + D[11][11];
-	P[11][12] = P[12][11] = D[11][12];
-	P[12][12] = Q[8] * Tsq + D[12][12];
-}
-#endif
 
 //  *************  SerialUpdate *******************
 //  Does the update step of the Kalman filter for the covariance and estimate
@@ -1381,7 +514,7 @@ void CovariancePrediction(float F[NUMX][NUMX], float G[NUMX][NUMW],
 //  ************************************************
 
 void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
-		  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX],
+		  float Y[NUMV], float P[NUMX][NUMX], float X[NUMX], float K[NUMX][NUMV],
 		  uint16_t SensorsUsed)
 {
 	float HP[NUMX], HPHR, Error;
@@ -1393,11 +526,11 @@ void SerialUpdate(float H[NUMV][NUMX], float R[NUMV], float Z[NUMV],
 
 			for (j = 0; j < NUMX; j++) {	// Find Hp = H*P
 				HP[j] = 0;
-				for (k = 0; k < NUMX; k++)
+				for (k = HrowMin[m] ; k <= HrowMax[m]; k++)
 					HP[j] += H[m][k] * P[k][j];
 			}
 			HPHR = R[m];	// Find  HPHR = H*P*H' + R
-			for (k = 0; k < NUMX; k++)
+			for (k = HrowMin[m]; k <= HrowMax[m]; k++)
 				HPHR += HP[k] * H[m][k];
 
 			for (k = 0; k < NUMX; k++)

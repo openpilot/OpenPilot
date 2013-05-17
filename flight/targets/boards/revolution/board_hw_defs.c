@@ -1837,7 +1837,8 @@ static const struct pios_usb_cfg pios_usb_main_rm1_cfg = {
 			.GPIO_Mode  = GPIO_Mode_IN,
 			.GPIO_OType = GPIO_OType_OD,
 		},
-	}
+        },
+        .vsense_active_low = false
 };
 
 static const struct pios_usb_cfg pios_usb_main_rm2_cfg = {
@@ -1857,7 +1858,8 @@ static const struct pios_usb_cfg pios_usb_main_rm2_cfg = {
 			.GPIO_Mode  = GPIO_Mode_IN,
 			.GPIO_OType = GPIO_OType_OD,
 		},
-	}
+        },
+        .vsense_active_low = false
 };
 
 const struct pios_usb_cfg * PIOS_BOARD_HW_DEFS_GetUsbCfg (uint32_t board_revision)

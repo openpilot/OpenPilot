@@ -1330,7 +1330,6 @@ USB_OTG_STS USB_OTG_CoreInitDev (USB_OTG_CORE_HANDLE *pdev)
   }
   for (i = 0; i <  pdev->cfg.dev_endpoints; i++)
   {
-    USB_OTG_DEPCTL_TypeDef  depctl;
     depctl.d32 = USB_OTG_READ_REG32(&pdev->regs.OUTEP_REGS[i]->DOEPCTL);
     if (depctl.b.epena)
     {

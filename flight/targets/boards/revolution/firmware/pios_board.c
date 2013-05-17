@@ -272,7 +272,7 @@ static void PIOS_Board_configure_com(const struct pios_usart_cfg *usart_port_cfg
 }
 
 static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm_cfg, const struct pios_dsm_cfg *pios_dsm_cfg, 
-		const struct pios_com_driver *pios_usart_com_driver,enum pios_dsm_proto *proto, 
+		const struct pios_com_driver *usart_com_driver,enum pios_dsm_proto *proto,
 		ManualControlSettingsChannelGroupsOptions channelgroup,uint8_t *bind)
 {
 	uint32_t pios_usart_dsm_id;
@@ -281,7 +281,7 @@ static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm
 	}
 	
 	uint32_t pios_dsm_id;
-	if (PIOS_DSM_Init(&pios_dsm_id, pios_dsm_cfg, pios_usart_com_driver,
+	if (PIOS_DSM_Init(&pios_dsm_id, pios_dsm_cfg, usart_com_driver,
 			pios_usart_dsm_id, *proto, *bind)) {
 		PIOS_Assert(0);
 	}
@@ -293,11 +293,11 @@ static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm
 	pios_rcvr_group_map[channelgroup] = pios_dsm_rcvr_id;
 }
 
-static void PIOS_Board_configure_pwm(const struct pios_pwm_cfg *pios_pwm_cfg)
+static void PIOS_Board_configure_pwm(const struct pios_pwm_cfg *pwm_cfg)
 {
 	/* Set up the receiver port.  Later this should be optional */
 	uint32_t pios_pwm_id;
-	PIOS_PWM_Init(&pios_pwm_id, pios_pwm_cfg);
+	PIOS_PWM_Init(&pios_pwm_id, pwm_cfg);
 
 	uint32_t pios_pwm_rcvr_id;
 	if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
@@ -306,10 +306,10 @@ static void PIOS_Board_configure_pwm(const struct pios_pwm_cfg *pios_pwm_cfg)
 	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PWM] = pios_pwm_rcvr_id;
 }
 
-static void PIOS_Board_configure_ppm(const struct pios_ppm_cfg *pios_ppm_cfg)
+static void PIOS_Board_configure_ppm(const struct pios_ppm_cfg *ppm_cfg)
 {
 	uint32_t pios_ppm_id;
-	PIOS_PPM_Init(&pios_ppm_id, pios_ppm_cfg);
+	PIOS_PPM_Init(&pios_ppm_id, ppm_cfg);
 
 	uint32_t pios_ppm_rcvr_id;
 	if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
@@ -712,10 +712,8 @@ void PIOS_Board_Init(void) {
 			break;
 		case HWSETTINGS_RADIOPORT_TELEMETRY:
 		{
-			extern const struct pios_rfm22b_cfg * PIOS_BOARD_HW_DEFS_GetRfm22Cfg (uint32_t board_revision);
-			const struct pios_board_info * bdinfo = &pios_board_info_blob;
-			const struct pios_rfm22b_cfg *pios_rfm22b_cfg = PIOS_BOARD_HW_DEFS_GetRfm22Cfg(bdinfo->board_rev);
-			if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, pios_rfm22b_cfg->slave_num, pios_rfm22b_cfg)) {
+			const struct pios_rfm22b_cfg *rfm22b_cfg = PIOS_BOARD_HW_DEFS_GetRfm22Cfg(bdinfo->board_rev);
+			if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, rfm22b_cfg->slave_num, rfm22b_cfg)) {
 				PIOS_Assert(0);
 			}
 

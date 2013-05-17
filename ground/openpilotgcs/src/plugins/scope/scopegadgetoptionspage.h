@@ -38,22 +38,19 @@
 #include <QDebug>
 #include <QtGui/QColorDialog>
 
-namespace Core
-{
+namespace Core {
 class IUAVGadgetConfiguration;
 }
 
 class ScopeGadgetConfiguration;
 
-namespace Ui
-{
+namespace Ui {
 class ScopeGadgetOptionsPage;
 }
 
 using namespace Core;
 
-class ScopeGadgetOptionsPage :  public IOptionsPage
-{
+class ScopeGadgetOptionsPage :  public IOptionsPage {
     Q_OBJECT
 public:
     explicit ScopeGadgetOptionsPage(ScopeGadgetConfiguration *config, QObject *parent = 0);
@@ -66,23 +63,23 @@ private:
     Ui::ScopeGadgetOptionsPage *options_page;
     ScopeGadgetConfiguration *m_config;
 
-    void addPlotCurveConfig(QString uavObject, QString uavField, int scale, int mean, QString mathFunction, QVariant varColor);
-    void setCurvePlotProperties(QListWidgetItem *listWidgetItem, QString uavObject, QString uavField, int scale, int mean, QString mathFunction, QVariant varColor);
+    void addPlotCurveConfig(QString uavObject, QString uavField, int scale, int mean, QString mathFunction, QVariant varColor, bool antialias);
+    void setCurvePlotProperties(QListWidgetItem *listWidgetItem, QString uavObject, QString uavField, int scale, int mean,
+                                QString mathFunction, QVariant varColor, bool antialias);
     void setYAxisWidgetFromPlotCurve();
     void setButtonColor(const QColor &color);
     void validateRefreshInterval();
-    bool eventFilter( QObject * obj, QEvent * evt );
+    bool eventFilter(QObject *obj, QEvent *evt);
 
 private slots:
-    void on_spnRefreshInterval_valueChanged(int );
+    void on_spnRefreshInterval_valueChanged(int);
     void on_lstCurves_currentRowChanged(int currentRow);
     void on_btnRemoveCurve_clicked();
     void on_btnAddCurve_clicked();
-    void on_cmbUAVObjects_currentIndexChanged(QString val);    
+    void on_cmbUAVObjects_currentIndexChanged(QString val);
     void on_btnColor_clicked();
     void on_mathFunctionComboBox_currentIndexChanged(int currentIndex);
     void on_loggingEnable_clicked();
-
 };
 
 #endif // SCOPEGADGETOPTIONSPAGE_H

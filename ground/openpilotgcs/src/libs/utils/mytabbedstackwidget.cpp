@@ -91,6 +91,13 @@ void MyTabbedStackWidget::removeTab(int index)
     delete item;
 }
 
+void MyTabbedStackWidget::setWidgetsEnabled(bool enabled)
+{
+    for(int i = 0; i < m_stackWidget->count(); i++) {
+        m_stackWidget->widget(i)->setEnabled(enabled);
+    }
+}
+
 int MyTabbedStackWidget::currentIndex() const
 {
     return m_listWidget->currentRow();

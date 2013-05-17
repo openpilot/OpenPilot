@@ -103,7 +103,9 @@ int32_t ActuatorStart()
 	// Start main task
 	xTaskCreate(actuatorTask, (signed char*)"Actuator", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
 	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ACTUATOR, taskHandle);
+#ifdef PIOS_INCLUDE_WDG
 	PIOS_WDG_RegisterFlag(PIOS_WDG_ACTUATOR);
+#endif
 
 	return 0;
 }
@@ -185,7 +187,9 @@ static void actuatorTask(__attribute__((unused)) void* parameters)
 	lastSysTime = xTaskGetTickCount();
 	while (1)
 	{
+#ifdef PIOS_INCLUDE_WDG
 		PIOS_WDG_UpdateFlag(PIOS_WDG_ACTUATOR);
+#endif
 
 		// Wait until the ActuatorDesired object is updated
 		uint8_t rc = xQueueReceive(queue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS);

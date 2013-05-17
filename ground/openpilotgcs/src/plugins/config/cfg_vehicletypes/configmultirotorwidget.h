@@ -58,6 +58,7 @@ public:
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
+    void enableControls(bool enable);
 
 private:
     Ui_MultiRotorConfigWidget *m_aircraft;
@@ -77,6 +78,7 @@ private:
     void setYawMixLevel(int);
 
     void updateAirframe(QString multiRotorType);
+    void setupEnabledControls(QString multiRotorType);
 
 private slots:
     virtual void setupUI(QString airframeType);

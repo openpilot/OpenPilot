@@ -43,7 +43,7 @@ public:
     ~ConfigCameraStabilizationWidget();
 
 private:
-    Ui_CameraStabilizationWidget *m_camerastabilization;
+    Ui_CameraStabilizationWidget *ui;
     void refreshWidgetsValues(UAVObject *obj);
     void updateObjectsFromWidgets();
 

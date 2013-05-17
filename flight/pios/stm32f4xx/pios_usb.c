@@ -162,7 +162,7 @@ bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
 	if(!PIOS_USB_validate(usb_dev))
 		return false;
 
-	usb_found = (usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin);
+	usb_found = ((usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin) != 0) ^ usb_dev->cfg->vsense_active_low;
 	return usb_found;
 	return usb_found != 0 && transfer_possible ? 1 : 0;
 }

@@ -343,10 +343,10 @@ PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_internal_cfg, &pios_internal_flash_driv
 		PIOS_Assert(0);
 	}
 
-	uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
-	PIOS_Assert(rx_buffer);
+	uint8_t *gps_rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
+	PIOS_Assert(gps_rx_buffer);
 	if (PIOS_COM_Init(&pios_com_gps_id, &pios_usart_com_driver, pios_usart_gps_id,
-					  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
+					  gps_rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
 					  NULL, 0)) {
 		PIOS_Assert(0);
 	}
@@ -361,14 +361,14 @@ PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_internal_cfg, &pios_internal_flash_driv
 			PIOS_DEBUG_Assert(0);
 		}
 
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_AUX_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_AUX_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
+		uint8_t *aux_rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_AUX_RX_BUF_LEN);
+		uint8_t *aux_tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_AUX_TX_BUF_LEN);
+		PIOS_Assert(aux_rx_buffer);
+		PIOS_Assert(aux_tx_buffer);
 
 		if (PIOS_COM_Init(&pios_com_aux_id, &pios_usart_com_driver, pios_usart_aux_id,
-						  rx_buffer, PIOS_COM_AUX_RX_BUF_LEN,
-						  tx_buffer, PIOS_COM_AUX_TX_BUF_LEN)) {
+						  aux_rx_buffer, PIOS_COM_AUX_RX_BUF_LEN,
+						  aux_tx_buffer, PIOS_COM_AUX_TX_BUF_LEN)) {
 			PIOS_DEBUG_Assert(0);
 		}
 	}
@@ -383,13 +383,13 @@ PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_internal_cfg, &pios_internal_flash_driv
 			PIOS_Assert(0);
 		}
 
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
+		uint8_t *telem_rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+		uint8_t *telem_tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+		PIOS_Assert(telem_rx_buffer);
+		PIOS_Assert(telem_tx_buffer);
 		if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_usart_com_driver, pios_usart_telem_rf_id,
-						  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
-						  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
+						  telem_rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
+						  telem_tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
 			PIOS_Assert(0);
 		}
 	}

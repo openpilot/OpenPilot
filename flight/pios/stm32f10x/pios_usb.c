@@ -215,7 +215,7 @@ bool PIOS_USB_CableConnected(__attribute__((unused)) uint8_t id)
 	if (PIOS_USB_validate(usb_dev) != 0)
 		return false;
 
-	return usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin;
+	return ((usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin) != 0) ^ usb_dev->cfg->vsense_active_low;
 }
 
 /**

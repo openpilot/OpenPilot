@@ -27,10 +27,10 @@ SRC			+= $(sort $(wildcard $(PIOS_DEVLIB)*.c))
 EXTRAINCDIRS		+= $(PIOS_DEVLIB)inc
 
 # CMSIS for the F4
-include $(PIOSCOMMON)/libraries/CMSIS2/library.mk
-CMSIS2_DEVICEDIR	:= $(PIOS_DEVLIB)libraries/CMSIS2/Device/ST/STM32F4xx
-SRC			+= $(sort $(wildcard $(CMSIS2_DEVICEDIR)/Source/$(BOARD_NAME)/*.c))
-EXTRAINCDIRS		+= $(CMSIS2_DEVICEDIR)/Include
+include $(PIOSCOMMON)/libraries/CMSIS/library.mk
+CMSIS_DEVICEDIR	:= $(PIOS_DEVLIB)libraries/CMSIS2/Device/ST/STM32F4xx
+SRC			+= $(sort $(wildcard $(CMSIS_DEVICEDIR)/Source/$(BOARD_NAME)/*.c))
+EXTRAINCDIRS		+= $(CMSIS_DEVICEDIR)/Include
 
 # ST Peripheral library
 PERIPHLIB		=  $(PIOS_DEVLIB)libraries/STM32F4xx_StdPeriph_Driver

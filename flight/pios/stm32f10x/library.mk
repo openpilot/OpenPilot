@@ -21,11 +21,11 @@ ASRC			+= $(PIOS_DEVLIB)startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
 SRC			+= $(sort $(wildcard $(PIOS_DEVLIB)*.c))
 
 # CMSIS for the F1
-include $(PIOS)/common/libraries/CMSIS2/library.mk
-CMSIS_DIR		= $(PIOS_DEVLIB)libraries/CMSIS/Core/CM3
-SRC			+= $(CMSIS_DIR)/core_cm3.c
-SRC			+= $(CMSIS_DIR)/system_stm32f10x.c
-EXTRAINCDIRS		+= $(CMSIS_DIR)
+include $(PIOSCOMMON)/libraries/CMSIS/library.mk
+CMSIS_DEVICEDIR		= $(PIOS_DEVLIB)libraries/CMSIS/Core/CM3
+SRC			+= $(CMSIS_DEVICEDIR)/core_cm3.c
+SRC			+= $(CMSIS_DEVICEDIR)/system_stm32f10x.c
+EXTRAINCDIRS		+= $(CMSIS_DEVICEDIR)
 
 # ST Peripheral library
 PERIPHLIB		=  $(PIOS_DEVLIB)libraries/STM32F10x_StdPeriph_Driver

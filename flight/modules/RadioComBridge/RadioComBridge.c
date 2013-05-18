@@ -471,38 +471,41 @@ static void ProcessInputStream(UAVTalkConnection connectionHandle, uint8_t rxbyt
                     switch (obj_per.Operation) {
                     case OBJECTPERSISTENCE_OPERATION_LOAD:
                     {
-#if defined(PIOS_INCLUDE_FLASH_EEPROM)
+#if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
                         // Load the settings.
-                        OPLinkSettingsData oplinkSettings;
-                        if (PIOS_EEPROM_Load((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData)) == 0)
-                            OPLinkSettingsSet(&oplinkSettings);
-                        else
+                        void *obj = UAVObjGetByID(obj_per.ObjectID);
+                        if (obj == 0) {
                             success = false;
+                        } else {
+                            // Load selected instance
+                            success = (UAVObjLoad(obj, obj_per.InstanceID) == 0);
+                        }
 #endif
                         break;
                     }
                     case OBJECTPERSISTENCE_OPERATION_SAVE:
                     {
-#if defined(PIOS_INCLUDE_FLASH_EEPROM)
-                        // Save the settings.
-                        OPLinkSettingsData oplinkSettings;
-                        OPLinkSettingsGet(&oplinkSettings);
-                        int32_t ret = PIOS_EEPROM_Save((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData));
-                        if (ret != 0)
+#if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
+                        void *obj = UAVObjGetByID(obj_per.ObjectID);
+                        if (obj == 0) {
                             success = false;
+                        } else {
+                            // Save selected instance
+                            success = UAVObjSave(obj, obj_per.InstanceID) == 0;
+                        }
 #endif
                         break;
                     }
                     case OBJECTPERSISTENCE_OPERATION_DELETE:
                     {
-#if defined(PIOS_INCLUDE_FLASH_EEPROM)
-                        // Erase the settings.
-                        OPLinkSettingsData oplinkSettings;
-                        uint8_t *ptr = (uint8_t*)&oplinkSettings;
-                        memset(ptr, 0, sizeof(OPLinkSettingsData));
-                        int32_t ret = PIOS_EEPROM_Save(ptr, sizeof(OPLinkSettingsData));
-                        if (ret != 0)
+#if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
+                        void *obj = UAVObjGetByID(obj_per.ObjectID);
+                        if (obj == 0) {
                             success = false;
+                        } else {
+                            // Save selected instance
+                            success = UAVObjDelete(obj, obj_per.InstanceID) == 0;
+                        }
 #endif
                         break;
                     }

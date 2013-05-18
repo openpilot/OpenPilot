@@ -73,6 +73,8 @@ uint32_t pios_com_radio_id = 0;
 uint8_t *pios_uart_rx_buffer;
 uint8_t *pios_uart_tx_buffer;
 
+uintptr_t pios_uavo_settings_fs_id;
+
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
@@ -82,6 +84,12 @@ void PIOS_Board_Init(void) {
 
 	/* Delay system */
 	PIOS_DELAY_Init();
+
+#ifdef PIOS_INCLUDE_FLASH_LOGFS_SETTINGS
+    uintptr_t flash_id;
+    PIOS_Flash_Internal_Init(&flash_id, &flash_internal_cfg);
+    PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_internal_cfg, &pios_internal_flash_driver, flash_id);
+#endif
 
 	/* Initialize UAVObject libraries */
 	EventDispatcherInitialize();
@@ -109,8 +117,6 @@ void PIOS_Board_Init(void) {
 #endif	/* PIOS_INCLUDE_LED */
 
 	OPLinkSettingsData oplinkSettings;
-#if defined(PIOS_INCLUDE_FLASH_EEPROM)
- 	PIOS_EEPROM_Init(&pios_eeprom_cfg);
 
 	/* IAP System Setup */
 	PIOS_IAP_Init();
@@ -120,7 +126,8 @@ void PIOS_Board_Init(void) {
 	   PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2) {
 		OPLinkSettingsGet(&oplinkSettings);
 		OPLinkSettingsSetDefaults(&oplinkSettings,0);
-		PIOS_EEPROM_Save((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData));
+		OPLinkSettingsSet(&oplinkSettings);
+		//PIOS_EEPROM_Save((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData));
 		for (uint32_t i = 0; i < 10; i++) {
 			PIOS_DELAY_WaitmS(100);
 			PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
@@ -129,15 +136,8 @@ void PIOS_Board_Init(void) {
 		PIOS_IAP_WriteBootCmd(1,0);
 		PIOS_IAP_WriteBootCmd(2,0);
 	}
-	/* Read the settings from flash. */
-	/* NOTE: We probably need to save/restore the objID here incase the object changed but the size doesn't */
-	if (PIOS_EEPROM_Load((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData)) == 0)
-		OPLinkSettingsSet(&oplinkSettings);
-	else
-		OPLinkSettingsGet(&oplinkSettings);
-#else
 	OPLinkSettingsGet(&oplinkSettings);
-#endif /* PIOS_INCLUDE_FLASH_EEPROM */
+
 
 	/* Initialize the task monitor */
 	if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {

@@ -14,18 +14,19 @@ OPENOCD_CONFIG      := stm32f4xx.stlink.cfg
 #OPENOCD_CONFIG      := stm32f4xx.cfg
 
 # Flash memory map for OSD:
-# Sector	start			size	use
-# 0			0x0800 0000		16k		BL
-# 1			0x0800 4000		16k		BL
-# 2			0x0800 8000		16k		EE
-# 3			0x0800 C000		16k		EE
-# 4			0x0801 0000		64k		Unused
-# 5			0x0802 0000		128k	FW
-# 6			0x0804 0000		128k	FW
-# 7 		0x0806 0000		128k	FW
-# 8 		0x0808 0000		128k	Unused
-# ..								..
-# 11		0x080E 0000		128k   	Unused
+# Sector	start		size	use
+# 0		0x0800 0000	16k	BL
+# 1		0x0800 4000	16k	BL
+# 2		0x0800 8000	16k	EE
+# 3		0x0800 C000	16k	EE
+# 4		0x0801 0000	64k	Unused
+# 5		0x0802 0000	128k	FW
+# 6		0x0804 0000	128k	FW
+# 7 		0x0806 0000	128k	FW
+# 8 		0x0808 0000	128k	Unused
+# 9		0x080A 0000	128k	Unused
+# 10		0x080C 0000	128k	Unused						..
+# 11		0x080E 0000	128k	Unused
 
 # Note: These must match the values in link_$(BOARD)_memory.ld
 BL_BANK_BASE        := 0x08000000  # Start of bootloader flash

@@ -276,16 +276,20 @@ static int32_t PIOS_Flash_Internal_WriteData(uintptr_t flash_id, uint32_t addr, 
 		/* Write crosses the end of the sector */
 		return -3;
 	}
+	FLASH_Status status;
+    for (uint16_t i = 0; i < len/4; i++){
+        uint32_t data_word = *(uint32_t *)(data + i*4);
+        status = FLASH_ProgramWord(addr + i * 4, data_word);
+        if(status != FLASH_COMPLETE)
+            return -4;
+    }
 
 	/* Write the data */
-	for (uint16_t i = 0; i < len; i++) {
-		FLASH_Status status;
-		/*
-		 * This is inefficient.  Should try to do word writes.
-		 * Not sure if word writes need to be aligned though.
-		 */
+	for (uint16_t i = len - len % 4; i < len; i++) {
+
 		status = FLASH_ProgramByte(addr + i, data[i]);
-		PIOS_Assert(status == FLASH_COMPLETE);
+		if(status != FLASH_COMPLETE)
+		    return -5;
 	}
 
 	return 0;

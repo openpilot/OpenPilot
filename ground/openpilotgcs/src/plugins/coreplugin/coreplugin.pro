@@ -11,7 +11,7 @@ QT += declarative \
 
 include(../../openpilotgcsplugin.pri)
 include(../../libs/utils/utils.pri)
-include(../../libs/versioninfo/versioninfo.pri)
+include(../../libs/version_info/version_info.pri)
 include(../../shared/scriptwrapper/scriptwrapper.pri)
 include(coreplugin_dependencies.pri)
 

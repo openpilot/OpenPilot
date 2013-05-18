@@ -10,7 +10,7 @@ SOURCES += main.cpp \
 
 include(../rpath.pri)
 include(../libs/utils/utils.pri)
-include(../libs/versioninfo/versioninfo.pri)
+include(../libs/version_info/version_info.pri)
 
 LIBS *= -l$$qtLibraryName(ExtensionSystem) -l$$qtLibraryName(Aggregation)
 

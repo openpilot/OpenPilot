@@ -26,7 +26,7 @@
  */
 
 #include "gcssplashscreen.h"
-#include "versioninfo/version_info.h"
+#include "version_info/version_info.h"
 #include <QDebug>
 
 const QChar CopyrightSymbol(0x00a9);

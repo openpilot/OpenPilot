@@ -31,7 +31,7 @@
 #include <QDebug>
 #include <QCheckBox>
 #include "importsummary.h"
-#include "versioninfo/version_info.h"
+#include "version_info/version_info.h"
 
 // for menu item
 #include <coreplugin/coreconstants.h>

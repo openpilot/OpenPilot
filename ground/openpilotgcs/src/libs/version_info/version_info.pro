@@ -4,9 +4,10 @@ TARGET = VersionInfo
 include(../../openpilotgcslibrary.pri)
 
 HEADERS = version_info.h
+SOURCES = version_info.cpp
 
 #
-# This qmake file generates a version info class implementation.
+# This qmake code generates VersionInfo class implementation.
 #
 # This is a bit tricky since the script should be run always and before
 # the other dependencies evaluation.
@@ -41,7 +42,7 @@ PYTHON_DIR = python-2.7.4
     VERSION_INFO_DIR      = $$GCS_BUILD_TREE/../openpilotgcs-synthetics
     VERSION_INFO_SCRIPT   = $$ROOT_DIR/make/scripts/version-info.py
     VERSION_INFO_COMMAND  = $$PYTHON \"$$VERSION_INFO_SCRIPT\"
-    VERSION_INFO_TEMPLATE = $$GCS_SOURCE_TREE/src/libs/versioninfo/version_info.cpp.template
+    VERSION_INFO_TEMPLATE = $$GCS_SOURCE_TREE/src/libs/version_info/version_info.cpp.template
     VERSION_INFO_FILE     = $$VERSION_INFO_DIR/version_info.cpp
     UAVO_DEF_PATH         = $$ROOT_DIR/shared/uavobjectdefinition
 
@@ -67,7 +68,3 @@ PYTHON_DIR = python-2.7.4
     }
     QMAKE_EXTRA_TARGETS += version_info_hook
 }
-
-
-SOURCES = version_info.cpp
-

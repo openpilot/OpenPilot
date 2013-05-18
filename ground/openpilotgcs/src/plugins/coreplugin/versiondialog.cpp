@@ -27,7 +27,7 @@
  */
 
 #include "versiondialog.h"
-#include "versioninfo/version_info.h"
+#include "version_info/version_info.h"
 #include "coreconstants.h"
 #include "icore.h"
 

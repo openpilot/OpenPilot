@@ -25,7 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uploadergadgetwidget.h"
-#include "versioninfo/version_info.h"
+#include "version_info/version_info.h"
 #include <coreplugin/coreconstants.h>
 #include <QDebug>
 #include "flightstatus.h"

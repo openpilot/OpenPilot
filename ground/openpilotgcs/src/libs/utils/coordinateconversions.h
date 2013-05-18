@@ -36,9 +36,7 @@
 #include "math.h"
 
 namespace Utils {
-
-class QTCREATOR_UTILS_EXPORT CoordinateConversions
-{
+class QTCREATOR_UTILS_EXPORT CoordinateConversions {
 public:
     CoordinateConversions();
     int NED2LLA_HomeECEF(double BaseECEFcm[3], double NED[3], double position[3]);
@@ -52,7 +50,6 @@ public:
     void Quaternion2R(const float q[4], float Rbe[3][3]);
     void R2Quaternion(float const Rbe[3][3], float q[4]);
 };
-
 }
 
 #endif /* COORDINATECONVERSIONS_H */

@@ -46,8 +46,7 @@ SerialPluginConfiguration::SerialPluginConfiguration(QString classId, QSettings 
 }
 
 SerialPluginConfiguration::~SerialPluginConfiguration()
-{
-}
+{}
 
 /**
  * Clones a configuration.
@@ -56,6 +55,7 @@ SerialPluginConfiguration::~SerialPluginConfiguration()
 IUAVGadgetConfiguration *SerialPluginConfiguration::clone()
 {
     SerialPluginConfiguration *m = new SerialPluginConfiguration(this->classId());
+
     m->m_speed = m_speed;
     return m;
 }
@@ -64,8 +64,9 @@ IUAVGadgetConfiguration *SerialPluginConfiguration::clone()
  * Saves a configuration.
  *
  */
-void SerialPluginConfiguration::saveConfig(QSettings* settings) const {
-   settings->setValue("speed", m_speed);
+void SerialPluginConfiguration::saveConfig(QSettings *settings) const
+{
+    settings->setValue("speed", m_speed);
 }
 
 void SerialPluginConfiguration::restoresettings()
@@ -75,8 +76,7 @@ void SerialPluginConfiguration::restoresettings()
     qDebug() << "SerialPluginConfiguration::restoresettings - speed" << str;
     if (str.isEmpty()) {
         m_speed = "57600";
-    }
-    else {
+    } else {
         m_speed = str;
     }
     settings->endGroup();

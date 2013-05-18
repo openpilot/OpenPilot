@@ -1,10 +1,10 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup AirspeedModule Airspeed Module
  * @brief Communicate with airspeed sensors and return values
- * @{ 
+ * @{
  *
  * @file       baro_airspeed.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -39,13 +39,13 @@
 #include "openpilot.h"
 #include "hwsettings.h"
 #include "airspeedsettings.h"
-#include "airspeedsensor.h"	// object that will be updated by the module
+#include "airspeedsensor.h" // object that will be updated by the module
 
 #if defined(PIOS_INCLUDE_MPXV)
 
-#define CALIBRATION_IDLE_MS                     2000   //Time to wait before calibrating, in [ms]
-#define CALIBRATION_COUNT_MS                    2000   //Time to spend calibrating, in [ms]
-#define ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS    100   //low pass filter
+#define CALIBRATION_IDLE_MS                   2000   // Time to wait before calibrating, in [ms]
+#define CALIBRATION_COUNT_MS                  2000   // Time to spend calibrating, in [ms]
+#define ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS 100 // low pass filter
 
 // Private types
 
@@ -53,64 +53,63 @@
 
 // Private functions
 
-static uint16_t calibrationCount=0;
+static uint16_t calibrationCount = 0;
 
-PIOS_MPXV_descriptor sensor = { .type=PIOS_MPXV_UNKNOWN };
+PIOS_MPXV_descriptor sensor = { .type = PIOS_MPXV_UNKNOWN };
 
 
-void baro_airspeedGetMPXV(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings, int8_t airspeedADCPin){
+void baro_airspeedGetMPXV(AirspeedSensorData *airspeedSensor, AirspeedSettingsData *airspeedSettings, int8_t airspeedADCPin)
+{
+    // Ensure that the ADC pin is properly configured
+    if (airspeedADCPin < 0) {
+        airspeedSensor->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
 
-	//Ensure that the ADC pin is properly configured
-	if(airspeedADCPin <0){
-		airspeedSensor->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
-		
-		return;
-	}
-	if (sensor.type==PIOS_MPXV_UNKNOWN) {
-		switch (airspeedSettings->AirspeedSensorType) {
-			case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV7002:
-				sensor = PIOS_MPXV_7002_DESC(airspeedADCPin);
-				break;
-			case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV5004:
-				sensor = PIOS_MPXV_5004_DESC(airspeedADCPin);
-				break;
-			default:
-				airspeedSensor->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
-				return;
-		}
-	}
+        return;
+    }
+    if (sensor.type == PIOS_MPXV_UNKNOWN) {
+        switch (airspeedSettings->AirspeedSensorType) {
+        case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV7002:
+            sensor = PIOS_MPXV_7002_DESC(airspeedADCPin);
+            break;
+        case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_DIYDRONESMPXV5004:
+            sensor = PIOS_MPXV_5004_DESC(airspeedADCPin);
+            break;
+        default:
+            airspeedSensor->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+            return;
+        }
+    }
 
-	airspeedSensor->SensorValue = PIOS_MPXV_Measure(&sensor);
+    airspeedSensor->SensorValue = PIOS_MPXV_Measure(&sensor);
 
-	if (!airspeedSettings->ZeroPoint) {
-		//Calibrate sensor by averaging zero point value
-		if (calibrationCount < CALIBRATION_IDLE_MS/airspeedSettings->SamplePeriod) { //First let sensor warm up and stabilize.
-			calibrationCount++;
-			return;
-		} else if (calibrationCount <= (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/airspeedSettings->SamplePeriod) { //Then compute the average.
-			calibrationCount++; /*DO NOT MOVE FROM BEFORE sensorCalibration=... LINE, OR ELSE WILL HAVE DIVIDE BY ZERO */
+    if (!airspeedSettings->ZeroPoint) {
+        // Calibrate sensor by averaging zero point value
+        if (calibrationCount < CALIBRATION_IDLE_MS / airspeedSettings->SamplePeriod) { // First let sensor warm up and stabilize.
+            calibrationCount++;
+            return;
+        } else if (calibrationCount <= (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS) / airspeedSettings->SamplePeriod) { // Then compute the average.
+            calibrationCount++; /*DO NOT MOVE FROM BEFORE sensorCalibration=... LINE, OR ELSE WILL HAVE DIVIDE BY ZERO */
 
-			PIOS_MPXV_Calibrate(&sensor,airspeedSensor->SensorValue);
+            PIOS_MPXV_Calibrate(&sensor, airspeedSensor->SensorValue);
 
-			//Set settings UAVO. The airspeed UAVO is set elsewhere in the function.
-			if (calibrationCount > (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS)/airspeedSettings->SamplePeriod) {
-				airspeedSettings->ZeroPoint = sensor.zeroPoint;
-				AirspeedSettingsZeroPointSet(&airspeedSettings->ZeroPoint);
-			}
-			return;
-		}
-	}
-	sensor.zeroPoint = airspeedSettings->ZeroPoint;
-		
-	//Filter CAS
-	float alpha=airspeedSettings->SamplePeriod/(airspeedSettings->SamplePeriod + ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS); //Low pass filter.
-	
-	airspeedSensor->CalibratedAirspeed = PIOS_MPXV_CalcAirspeed(&sensor,airspeedSensor->SensorValue) * (alpha) + airspeedSensor->CalibratedAirspeed*(1.0f-alpha);
-	airspeedSensor->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
+            // Set settings UAVO. The airspeed UAVO is set elsewhere in the function.
+            if (calibrationCount > (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS) / airspeedSettings->SamplePeriod) {
+                airspeedSettings->ZeroPoint = sensor.zeroPoint;
+                AirspeedSettingsZeroPointSet(&airspeedSettings->ZeroPoint);
+            }
+            return;
+        }
+    }
+    sensor.zeroPoint = airspeedSettings->ZeroPoint;
 
+    // Filter CAS
+    float alpha = airspeedSettings->SamplePeriod / (airspeedSettings->SamplePeriod + ANALOG_BARO_AIRSPEED_TIME_CONSTANT_MS); // Low pass filter.
+
+    airspeedSensor->CalibratedAirspeed = PIOS_MPXV_CalcAirspeed(&sensor, airspeedSensor->SensorValue) * (alpha) + airspeedSensor->CalibratedAirspeed * (1.0f - alpha);
+    airspeedSensor->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
 }
 
-#endif
+#endif /* if defined(PIOS_INCLUDE_MPXV) */
 
 /**
  * @}

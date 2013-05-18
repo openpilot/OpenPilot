@@ -3,7 +3,7 @@
  *
  * @file       pios_com_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
+ *             Parts by Thorsten Klose (tk@midibox.org)
  * @brief      COM private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -30,12 +30,11 @@
 #include <pios.h>
 
 struct pios_com_dev {
-  uint8_t                              id;
-  const struct pios_com_driver * const driver;
+    uint8_t id;
+    const struct pios_com_driver *const driver;
 };
 
 extern struct pios_com_dev pios_com_devs[];
-extern const uint8_t             pios_com_num_devices;
+extern const uint8_t pios_com_num_devices;
 
 #endif /* PIOS_COM_PRIV_H */
-

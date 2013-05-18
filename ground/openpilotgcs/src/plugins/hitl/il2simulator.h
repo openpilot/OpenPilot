@@ -31,17 +31,16 @@
 #include <QObject>
 #include <simulator.h>
 
-class IL2Simulator: public Simulator
-{
-	Q_OBJECT
+class IL2Simulator : public Simulator {
+    Q_OBJECT
 public:
-	IL2Simulator(const SimulatorSettings& params);
-	~IL2Simulator();
+    IL2Simulator(const SimulatorSettings & params);
+    ~IL2Simulator();
 
-	void setupUdpPorts(const QString& host, int inPort, int outPort);
+    void setupUdpPorts(const QString & host, int inPort, int outPort);
 
 private slots:
-	void transmitUpdate();
+    void transmitUpdate();
 
 private:
     static const float FT2M;
@@ -54,23 +53,22 @@ private:
     static const float NM2DEG;
     static const float DEG2NM;
 
-	void processUpdate(const QByteArray& data);
-	float angleDifference(float a,float b);
+    void processUpdate(const QByteArray & data);
+    float angleDifference(float a, float b);
 
     AirParameters airParameters;
 };
 
-class IL2SimulatorCreator : public SimulatorCreator
-{
+class IL2SimulatorCreator : public SimulatorCreator {
 public:
-	IL2SimulatorCreator(const QString& classId, const QString& description)
-	:  SimulatorCreator (classId,description)
-	{}
+    IL2SimulatorCreator(const QString & classId, const QString & description)
+        :  SimulatorCreator(classId, description)
+    {}
 
-	Simulator* createSimulator(const SimulatorSettings& params)
-	{
-		return new IL2Simulator(params);
-	}
+    Simulator *createSimulator(const SimulatorSettings & params)
+    {
+        return new IL2Simulator(params);
+    }
 };
 
 #endif // IL2SIMULATOR_H

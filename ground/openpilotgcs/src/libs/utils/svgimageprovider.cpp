@@ -30,12 +30,11 @@
 #include <QPainter>
 #include <QUrl>
 
-SvgImageProvider::SvgImageProvider(const QString &basePath):
+SvgImageProvider::SvgImageProvider(const QString &basePath) :
     QObject(),
     QDeclarativeImageProvider(QDeclarativeImageProvider::Image),
     m_basePath(basePath)
-{
-}
+{}
 
 SvgImageProvider::~SvgImageProvider()
 {
@@ -45,14 +44,16 @@ SvgImageProvider::~SvgImageProvider()
 QSvgRenderer *SvgImageProvider::loadRenderer(const QString &svgFile)
 {
     QSvgRenderer *renderer = m_renderers.value(svgFile);
+
     if (!renderer) {
         renderer = new QSvgRenderer(svgFile);
 
         QString fn = QUrl::fromLocalFile(m_basePath).resolved(svgFile).toLocalFile();
 
-        //convert path to be relative to base
-        if (!renderer->isValid())
+        // convert path to be relative to base
+        if (!renderer->isValid()) {
             renderer->load(fn);
+        }
 
         if (!renderer->isValid()) {
             qWarning() << "Failed to load svg file:" << svgFile << fn;
@@ -79,7 +80,7 @@ QSvgRenderer *SvgImageProvider::loadRenderer(const QString &svgFile)
    Image {
        source: "image://svg/pfd.svg!world"
    }
-*/
+ */
 QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
     QString svgFile = id;
@@ -87,15 +88,16 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
     QString parameters;
 
     int separatorPos = id.indexOf('!');
+
     if (separatorPos != -1) {
         svgFile = id.left(separatorPos);
-        element = id.mid(separatorPos+1);
+        element = id.mid(separatorPos + 1);
     }
 
     int parametersPos = element.indexOf('?');
     if (parametersPos != -1) {
-        parameters = element.mid(parametersPos+1);
-        element = element.left(parametersPos);
+        parameters = element.mid(parametersPos + 1);
+        element    = element.left(parametersPos);
     }
 
     int hSlicesCount = 0;
@@ -120,31 +122,33 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
         }
     }
 
-    if (size)
+    if (size) {
         *size = QSize();
+    }
 
     QSvgRenderer *renderer = loadRenderer(svgFile);
-    if (!renderer)
+    if (!renderer) {
         return QImage();
+    }
 
-    qreal xScale = 1.0;
-    qreal yScale = 1.0;
+    qreal xScale  = 1.0;
+    qreal yScale  = 1.0;
 
     QSize docSize = renderer->defaultSize();
 
     if (!requestedSize.isEmpty()) {
         if (!element.isEmpty()) {
             QRectF elementBounds = renderer->boundsOnElement(element);
-            xScale = qreal(requestedSize.width())/elementBounds.width();
-            yScale = qreal(requestedSize.height())/elementBounds.height();
+            xScale = qreal(requestedSize.width()) / elementBounds.width();
+            yScale = qreal(requestedSize.height()) / elementBounds.height();
         } else if (!docSize.isEmpty()) {
-            xScale = qreal(requestedSize.width())/docSize.width();
-            yScale = qreal(requestedSize.height())/docSize.height();
+            xScale = qreal(requestedSize.width()) / docSize.width();
+            yScale = qreal(requestedSize.height()) / docSize.height();
         }
     }
 
-    //keep the aspect ratio
-    //TODO: how to configure it? as a part of image path?
+    // keep the aspect ratio
+    // TODO: how to configure it? as a part of image path?
     xScale = yScale = qMin(xScale, yScale);
 
     if (!element.isEmpty()) {
@@ -154,40 +158,41 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
         }
 
         QRectF elementBounds = renderer->boundsOnElement(element);
-        int elementWidth = qRound(elementBounds.width() * xScale);
-        int elementHeigh = qRound(elementBounds.height() * yScale);
+        int elementWidth     = qRound(elementBounds.width() * xScale);
+        int elementHeigh     = qRound(elementBounds.height() * yScale);
         int w = elementWidth;
         int h = elementHeigh;
         int x = 0;
         int y = 0;
 
         if (hSlicesCount > 1) {
-            x = (w*hSlice)/hSlicesCount;
-            w = (w*(hSlice+1))/hSlicesCount - x;
+            x = (w * hSlice) / hSlicesCount;
+            w = (w * (hSlice + 1)) / hSlicesCount - x;
         }
 
         if (vSlicesCount > 1) {
-            y = (h*(vSlice))/vSlicesCount;
-            h = (h*(vSlice+1))/vSlicesCount - y;
+            y = (h * (vSlice)) / vSlicesCount;
+            h = (h * (vSlice + 1)) / vSlicesCount - y;
         }
 
-        QImage img(w+border*2, h+border*2, QImage::Format_ARGB32_Premultiplied);
+        QImage img(w + border * 2, h + border * 2, QImage::Format_ARGB32_Premultiplied);
         img.fill(0);
         QPainter p(&img);
         p.setRenderHints(QPainter::TextAntialiasing |
                          QPainter::Antialiasing |
                          QPainter::SmoothPixmapTransform);
 
-        p.translate(-x+border,-y+border);
+        p.translate(-x + border, -y + border);
         renderer->render(&p, element, QRectF(0, 0, elementWidth, elementHeigh));
 
-        if (size)
+        if (size) {
             *size = QSize(w, h);
+        }
 
-        //img.save(element+parameters+".png");
+        // img.save(element+parameters+".png");
         return img;
     } else {
-        //render the whole svg file
+        // render the whole svg file
         int w = qRound(docSize.width() * xScale);
         int h = qRound(docSize.height() * yScale);
 
@@ -201,8 +206,9 @@ QImage SvgImageProvider::requestImage(const QString &id, QSize *size, const QSiz
         p.scale(xScale, yScale);
         renderer->render(&p, QRectF(QPointF(), QSizeF(docSize)));
 
-        if (size)
+        if (size) {
             *size = QSize(w, h);
+        }
         return img;
     }
 }
@@ -213,17 +219,18 @@ QPixmap SvgImageProvider::requestPixmap(const QString &id, QSize *size, const QS
 }
 
 /*!
-  \fn SvgImageProvider::scaledElementBounds(const QString &svgFile, const QString &element)
+   \fn SvgImageProvider::scaledElementBounds(const QString &svgFile, const QString &element)
 
-  Returns the bound of \a element in logical coordinates,
-  scalled to the default size of svg document (so the bounds of whole doc would be (0,0,1,1) ).
-*/
+   Returns the bound of \a element in logical coordinates,
+   scalled to the default size of svg document (so the bounds of whole doc would be (0,0,1,1) ).
+ */
 QRectF SvgImageProvider::scaledElementBounds(const QString &svgFile, const QString &elementName)
 {
     QSvgRenderer *renderer = loadRenderer(svgFile);
 
-    if (!renderer)
+    if (!renderer) {
         return QRectF();
+    }
 
     if (!renderer->elementExists(elementName)) {
         qWarning() << "invalid element:" << elementName << "of" << svgFile;
@@ -234,9 +241,9 @@ QRectF SvgImageProvider::scaledElementBounds(const QString &svgFile, const QStri
     QMatrix matrix = renderer->matrixForElement(elementName);
     elementBounds = matrix.mapRect(elementBounds);
 
-    QSize docSize = renderer->defaultSize();
-    return QRectF(elementBounds.x()/docSize.width(),
-                  elementBounds.y()/docSize.height(),
-                  elementBounds.width()/docSize.width(),
-                  elementBounds.height()/docSize.height());
+    QSize docSize  = renderer->defaultSize();
+    return QRectF(elementBounds.x() / docSize.width(),
+                  elementBounds.y() / docSize.height(),
+                  elementBounds.width() / docSize.width(),
+                  elementBounds.height() / docSize.height());
 }

@@ -1,4 +1,3 @@
-
 /**
  ******************************************************************************
  *
@@ -33,31 +32,30 @@
 
 UploaderPlugin::UploaderPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 UploaderPlugin::~UploaderPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool UploaderPlugin::initialize(const QStringList& args, QString *errMsg)
+bool UploaderPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new UploaderGadgetFactory(this);
-   addAutoReleasedObject(mf);
-   return true;
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new UploaderGadgetFactory(this);
+    addAutoReleasedObject(mf);
+    return true;
 }
 
 void UploaderPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void UploaderPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(UploaderPlugin)
-

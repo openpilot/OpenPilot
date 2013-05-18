@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -44,7 +44,6 @@ class QToolButton;
 QT_END_NAMESPACE
 
 namespace Core {
-
 class Command;
 
 namespace Internal {
@@ -59,8 +58,7 @@ class ComboBox;
  *
  * The SideBarItem takes ownership over the widget.
  */
-class CORE_EXPORT SideBarItem
-{
+class CORE_EXPORT SideBarItem {
 public:
     SideBarItem(QWidget *widget)
         : m_widget(widget)
@@ -68,7 +66,10 @@ public:
 
     virtual ~SideBarItem();
 
-    QWidget *widget() { return m_widget; }
+    QWidget *widget()
+    {
+        return m_widget;
+    }
 
     /* Should always return a new set of tool buttons.
      *
@@ -85,15 +86,14 @@ private:
     QWidget *m_widget;
 };
 
-class CORE_EXPORT SideBar : public MiniSplitter
-{
+class CORE_EXPORT SideBar : public MiniSplitter {
     Q_OBJECT
 public:
     /*
      * The SideBar takes ownership of the SideBarItems.
      */
-    SideBar(QList<SideBarItem*> widgetList,
-            QList<SideBarItem*> defaultVisible);
+    SideBar(QList<SideBarItem *> widgetList,
+            QList<SideBarItem *> defaultVisible);
     ~SideBar();
 
     QStringList availableItems() const;
@@ -105,8 +105,8 @@ public:
 
     void activateItem(SideBarItem *item);
 
-    void setShortcutMap(const QMap<QString, Core::Command*> &shortcutMap);
-    QMap<QString, Core::Command*> shortcutMap() const;
+    void setShortcutMap(const QMap<QString, Core::Command *> &shortcutMap);
+    QMap<QString, Core::Command *> shortcutMap() const;
 
 private slots:
     void splitSubWidget();
@@ -118,18 +118,16 @@ private:
                                                  const QString &title = QString());
     void removeSideBarWidget(Internal::SideBarWidget *widget);
 
-    QList<Internal::SideBarWidget*> m_widgets;
+    QList<Internal::SideBarWidget *> m_widgets;
 
-    QMap<QString, SideBarItem*> m_itemMap;
+    QMap<QString, SideBarItem *> m_itemMap;
     QStringList m_availableItems;
     QStringList m_defaultVisible;
-    QMap<QString, Core::Command*> m_shortcutMap;
+    QMap<QString, Core::Command *> m_shortcutMap;
 };
 
 namespace Internal {
-
-class SideBarWidget : public QWidget
-{
+class SideBarWidget : public QWidget {
     Q_OBJECT
 public:
     SideBarWidget(SideBar *sideBar, const QString &title);
@@ -162,8 +160,7 @@ private:
     QToolButton *m_closeButton;
 };
 
-class ComboBox : public QComboBox
-{
+class ComboBox : public QComboBox {
     Q_OBJECT
 
 public:
@@ -175,7 +172,6 @@ protected:
 private:
     SideBarWidget *m_sideBarWidget;
 };
-
 } // namespace Internal
 } // namespace Core
 

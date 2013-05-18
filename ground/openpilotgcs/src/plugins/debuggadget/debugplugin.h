@@ -7,7 +7,7 @@
  * @{
  * @addtogroup DebugGadgetPlugin Debug Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,16 +32,15 @@
 
 class DebugGadgetFactory;
 
-class DebugPlugin : public ExtensionSystem::IPlugin
-{
+class DebugPlugin : public ExtensionSystem::IPlugin {
 public:
-        DebugPlugin();
-   ~DebugPlugin();
+    DebugPlugin();
+    ~DebugPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
 private:
-   DebugGadgetFactory *mf;
+    DebugGadgetFactory *mf;
 };
 #endif /* DEBUGPLUGIN_H_ */

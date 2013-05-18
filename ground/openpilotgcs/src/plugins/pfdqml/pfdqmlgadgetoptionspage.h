@@ -29,14 +29,13 @@ class IUAVGadgetConfiguration;
 class PfdQmlGadgetConfiguration;
 
 namespace Ui {
-    class PfdQmlGadgetOptionsPage;
+class PfdQmlGadgetOptionsPage;
 }
 
 using namespace Core;
 
-class PfdQmlGadgetOptionsPage : public IOptionsPage
-{
-Q_OBJECT
+class PfdQmlGadgetOptionsPage : public IOptionsPage {
+    Q_OBJECT
 public:
     explicit PfdQmlGadgetOptionsPage(PfdQmlGadgetConfiguration *config, QObject *parent = 0);
 

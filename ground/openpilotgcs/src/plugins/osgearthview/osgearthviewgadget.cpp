@@ -1,12 +1,12 @@
 /********************************************************************************
-* @file       osgearthviewgadget.cpp
-* @author     The OpenPilot Team Copyright (C) 2012.
-* @addtogroup GCSPlugins GCS Plugins
-* @{
-* @addtogroup OsgEarthview Plugin
-* @{
-* @brief Osg Earth view of UAV
-*****************************************************************************/
+ * @file       osgearthviewgadget.cpp
+ * @author     The OpenPilot Team Copyright (C) 2012.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup OsgEarthview Plugin
+ * @{
+ * @brief Osg Earth view of UAV
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,10 +28,9 @@
 #include "osgearthviewgadgetconfiguration.h"
 
 OsgEarthviewGadget::OsgEarthviewGadget(QString classId, OsgEarthviewWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent),
+    m_widget(widget)
+{}
 
 OsgEarthviewGadget::~OsgEarthviewGadget()
 {
@@ -39,12 +38,12 @@ OsgEarthviewGadget::~OsgEarthviewGadget()
 }
 
 /*
-  This is called when a configuration is loaded, and updates the plugin's settings.
-  Careful: the plugin is already drawn before the loadConfiguration method is called the
-  first time, so you have to be careful not to assume all the plugin values are initialized
-  the first time you use them
+   This is called when a configuration is loaded, and updates the plugin's settings.
+   Careful: the plugin is already drawn before the loadConfiguration method is called the
+   first time, so you have to be careful not to assume all the plugin values are initialized
+   the first time you use them
  */
-void OsgEarthviewGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void OsgEarthviewGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
-    OsgEarthviewGadgetConfiguration *m = qobject_cast<OsgEarthviewGadgetConfiguration*>(config);
+    OsgEarthviewGadgetConfiguration *m = qobject_cast<OsgEarthviewGadgetConfiguration *>(config);
 }

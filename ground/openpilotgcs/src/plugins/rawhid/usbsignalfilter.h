@@ -3,8 +3,7 @@
 #include <QObject>
 #include "usbmonitor.h"
 
-class RAWHID_EXPORT USBSignalFilter : public QObject
-{
+class RAWHID_EXPORT USBSignalFilter : public QObject {
     Q_OBJECT
 private:
     int m_vid;

@@ -4,25 +4,25 @@
  * @file       projectintropage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -34,7 +34,6 @@
 #include <QtGui/QWizardPage>
 
 namespace Utils {
-
 struct ProjectIntroPagePrivate;
 
 /* Standard wizard page for a single file letting the user choose name
@@ -50,13 +49,11 @@ struct ProjectIntroPagePrivate;
  * layout, otherwise, QWizard will squeeze it due to its strange expanding
  * hacks. */
 
-class QTCREATOR_UTILS_EXPORT ProjectIntroPage : public QWizardPage
-{
-    Q_OBJECT
-    Q_DISABLE_COPY(ProjectIntroPage)
+class QTCREATOR_UTILS_EXPORT ProjectIntroPage : public QWizardPage {
+    Q_OBJECT Q_DISABLE_COPY(ProjectIntroPage)
     Q_PROPERTY(QString description READ description WRITE setPath DESIGNABLE true)
     Q_PROPERTY(QString path READ path WRITE setPath DESIGNABLE true)
-    Q_PROPERTY(QString name READ  name WRITE setName DESIGNABLE true)
+    Q_PROPERTY(QString name READ name WRITE setName DESIGNABLE true)
 public:
     explicit ProjectIntroPage(QWidget *parent = 0);
     virtual ~ProjectIntroPage();
@@ -97,7 +94,6 @@ private:
 
     ProjectIntroPagePrivate *m_d;
 };
-
 } // namespace Utils
 
 #endif // PROJECTINTROPAGE_H

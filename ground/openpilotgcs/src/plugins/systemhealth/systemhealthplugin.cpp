@@ -35,31 +35,31 @@
 
 SystemHealthPlugin::SystemHealthPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 SystemHealthPlugin::~SystemHealthPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool SystemHealthPlugin::initialize(const QStringList& args, QString *errMsg)
+bool SystemHealthPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new SystemHealthGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new SystemHealthGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void SystemHealthPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void SystemHealthPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(SystemHealthPlugin)

@@ -7,7 +7,7 @@
  * @{
  * @addtogroup HITLPlugin HITL Plugin
  * @{
- * @brief The Hardware In The Loop plugin 
+ * @brief The Hardware In The Loop plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -30,10 +30,10 @@
 #include "simulator.h"
 
 HITLGadget::HITLGadget(QString classId, HITLWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
+    IUAVGadget(classId, parent),
+    m_widget(widget)
 {
-	connect(this,SIGNAL(changeConfiguration(void)),m_widget,SLOT(stopButtonClicked(void)));
+    connect(this, SIGNAL(changeConfiguration(void)), m_widget, SLOT(stopButtonClicked(void)));
 }
 
 HITLGadget::~HITLGadget()
@@ -41,11 +41,11 @@ HITLGadget::~HITLGadget()
     delete m_widget;
 }
 
-void HITLGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void HITLGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
-    HITLConfiguration *m = qobject_cast<HITLConfiguration*>(config);
+    HITLConfiguration *m = qobject_cast<HITLConfiguration *>(config);
     // IL2 <-- Is this still necessary? [KDS]
-	emit changeConfiguration();
-	m_widget->setSettingParameters(m->Settings());
-}
+    emit changeConfiguration();
 
+    m_widget->setSettingParameters(m->Settings());
+}

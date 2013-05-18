@@ -26,10 +26,8 @@ class QGLFramebufferObject;
 class QGLWidget;
 class OsgEarthItemRenderer;
 
-class OsgEarthItem : public QDeclarativeItem
-{
-    Q_OBJECT
-    Q_DISABLE_COPY(OsgEarthItem)
+class OsgEarthItem : public QDeclarativeItem {
+    Q_OBJECT Q_DISABLE_COPY(OsgEarthItem)
 
     Q_PROPERTY(QString sceneFile READ sceneFile WRITE setSceneFile NOTIFY sceneFileChanged)
     Q_PROPERTY(qreal fieldOfView READ fieldOfView WRITE setFieldOfView NOTIFY fieldOfViewChanged)
@@ -46,17 +44,41 @@ public:
     OsgEarthItem(QDeclarativeItem *parent = 0);
     ~OsgEarthItem();
 
-    QString sceneFile() const { return m_sceneFile; }
+    QString sceneFile() const
+    {
+        return m_sceneFile;
+    }
     QString resolvedSceneFile() const;
-    qreal fieldOfView() const { return m_fieldOfView; }
+    qreal fieldOfView() const
+    {
+        return m_fieldOfView;
+    }
 
-    qreal roll() const { return m_roll; }
-    qreal pitch() const { return m_pitch; }
-    qreal yaw() const { return m_yaw; }
+    qreal roll() const
+    {
+        return m_roll;
+    }
+    qreal pitch() const
+    {
+        return m_pitch;
+    }
+    qreal yaw() const
+    {
+        return m_yaw;
+    }
 
-    double latitude() const { return m_latitude; }
-    double longitude() const { return m_longitude; }
-    double altitude() const { return m_altitude; }
+    double latitude() const
+    {
+        return m_latitude;
+    }
+    double longitude() const
+    {
+        return m_longitude;
+    }
+    double altitude() const
+    {
+        return m_altitude;
+    }
 
 protected:
     void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
@@ -106,18 +128,19 @@ private:
 
     qreal m_fieldOfView;
     QString m_sceneFile;
-
 };
 
-class OsgEarthItemRenderer : public QObject
-{
+class OsgEarthItemRenderer : public QObject {
     Q_OBJECT
 public:
     OsgEarthItemRenderer(OsgEarthItem *item, QGLWidget *glWidget);
     ~OsgEarthItemRenderer();
 
     QGLFramebufferObject *lastFrame();
-    void markDirty() { m_cameraDirty = true; }
+    void markDirty()
+    {
+        m_cameraDirty = true;
+    }
 
 public slots:
     void initScene();
@@ -135,7 +158,7 @@ private:
     osg::ref_ptr<osg::Node> m_model;
     QWeakPointer<QGLWidget> m_glWidget;
 
-    QGLFramebufferObject* m_fbo[FboCount];
+    QGLFramebufferObject *m_fbo[FboCount];
     int m_lastFboNumber;
 
     QSize m_currentSize;
@@ -146,4 +169,3 @@ private:
 QML_DECLARE_TYPE(OsgEarthItem)
 
 #endif // OSGEARTH_H
-

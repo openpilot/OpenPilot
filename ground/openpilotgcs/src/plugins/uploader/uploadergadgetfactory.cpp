@@ -33,24 +33,23 @@
 #include "uploadergadgetwidget.h"
 
 UploaderGadgetFactory::UploaderGadgetFactory(QObject *parent) :
-    IUAVGadgetFactory(QString("Uploader"), tr("Uploader"), parent),isautocapable(false)
-{
-}
+    IUAVGadgetFactory(QString("Uploader"), tr("Uploader"), parent), isautocapable(false)
+{}
 
 UploaderGadgetFactory::~UploaderGadgetFactory()
-{
-}
+{}
 
-Core::IUAVGadget* UploaderGadgetFactory::createGadget(QWidget *parent)
+Core::IUAVGadget *UploaderGadgetFactory::createGadget(QWidget *parent)
 {
-    UploaderGadgetWidget* gadgetWidget = new UploaderGadgetWidget(parent);
-    isautocapable=gadgetWidget->autoUpdateCapable();
-    connect(this,SIGNAL(autoUpdate()),gadgetWidget,SLOT(autoUpdate()));
-    connect(gadgetWidget,SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep,QVariant)),this,SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep,QVariant)));
+    UploaderGadgetWidget *gadgetWidget = new UploaderGadgetWidget(parent);
+
+    isautocapable = gadgetWidget->autoUpdateCapable();
+    connect(this, SIGNAL(autoUpdate()), gadgetWidget, SLOT(autoUpdate()));
+    connect(gadgetWidget, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)));
     return new UploaderGadget(QString("Uploader"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *UploaderGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *UploaderGadgetFactory::createConfiguration(QSettings *qSettings)
 {
     return new UploaderGadgetConfiguration(QString("Uploader"), qSettings);
 }

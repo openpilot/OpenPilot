@@ -62,17 +62,16 @@ using namespace Core;
 using namespace Core::Internal;
 
 UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadget *uavGadget, QWidget *parent) :
-        QWidget(parent),
-        m_uavGadgetManager(uavGadgetManager),
-        m_uavGadget(uavGadget),
-        m_toolBar(new QWidget(this)),
-        m_defaultToolBar(new QComboBox(this)),
-        m_uavGadgetList(new QComboBox(this)),
-        m_closeButton(new QToolButton(this)),
-        m_defaultIndex(0),
-        m_activeLabel(new QLabel)
+    QWidget(parent),
+    m_uavGadgetManager(uavGadgetManager),
+    m_uavGadget(uavGadget),
+    m_toolBar(new QWidget(this)),
+    m_defaultToolBar(new QComboBox(this)),
+    m_uavGadgetList(new QComboBox(this)),
+    m_closeButton(new QToolButton(this)),
+    m_defaultIndex(0),
+    m_activeLabel(new QLabel)
 {
-
     tl = new QVBoxLayout(this);
     tl->setSpacing(0);
     tl->setMargin(0);
@@ -82,24 +81,22 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
         m_uavGadgetList->setMaxVisibleItems(40);
         m_uavGadgetList->setContextMenuPolicy(Qt::CustomContextMenu);
         UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
-        QStringList sl = im->classIds();
+        QStringList sl    = im->classIds();
         int index = 0;
         bool startFromOne = false;
-        foreach(QString classId, sl)
-        {
+        foreach(QString classId, sl) {
             if (classId == QString("EmptyGadget")) {
                 m_defaultIndex = 0;
-                startFromOne = true;
+                startFromOne   = true;
                 m_uavGadgetList->insertItem(0, im->gadgetName(classId), classId);
                 m_uavGadgetList->setItemIcon(0, im->gadgetIcon(classId));
                 m_uavGadgetList->insertSeparator(1);
             } else {
-
                 int i = startFromOne ? 1 : 0;
-                for ( ; i < m_uavGadgetList->count(); i++)
-                {
-                    if (QString::localeAwareCompare(m_uavGadgetList->itemText(i), im->gadgetName(classId)) > 0)
+                for (; i < m_uavGadgetList->count(); i++) {
+                    if (QString::localeAwareCompare(m_uavGadgetList->itemText(i), im->gadgetName(classId)) > 0) {
                         break;
+                    }
                 }
                 m_uavGadgetList->insertItem(i, im->gadgetName(classId), classId);
                 m_uavGadgetList->setItemIcon(i, im->gadgetIcon(classId));
@@ -141,7 +138,7 @@ UAVGadgetView::UAVGadgetView(Core::UAVGadgetManager *uavGadgetManager, IUAVGadge
 
         connect(m_uavGadgetList, SIGNAL(activated(int)), this, SLOT(listSelectionActivated(int)));
         connect(m_closeButton, SIGNAL(clicked()), this, SLOT(closeView()), Qt::QueuedConnection);
-        connect(m_uavGadgetManager, SIGNAL(currentGadgetChanged(IUAVGadget*)), this, SLOT(currentGadgetChanged(IUAVGadget*)));
+        connect(m_uavGadgetManager, SIGNAL(currentGadgetChanged(IUAVGadget *)), this, SLOT(currentGadgetChanged(IUAVGadget *)));
     }
     if (m_uavGadget) {
         setGadget(m_uavGadget);
@@ -157,7 +154,7 @@ UAVGadgetView::~UAVGadgetView()
 
 bool UAVGadgetView::hasGadget(IUAVGadget *uavGadget) const
 {
-    return (m_uavGadget == uavGadget);
+    return m_uavGadget == uavGadget;
 }
 
 void UAVGadgetView::showToolbar(bool show)
@@ -172,8 +169,9 @@ void UAVGadgetView::closeView()
 
 void UAVGadgetView::removeGadget()
 {
-    if (!m_uavGadget)
+    if (!m_uavGadget) {
         return;
+    }
     tl->removeWidget(m_uavGadget->widget());
 
     m_uavGadget->setParent(0);
@@ -214,15 +212,19 @@ void UAVGadgetView::setGadget(IUAVGadget *uavGadget)
 
 void UAVGadgetView::updateToolBar()
 {
-    if (!m_uavGadget)
+    if (!m_uavGadget) {
         return;
+    }
     QComboBox *toolBar = m_uavGadget->toolBar();
-    if (!toolBar)
+    if (!toolBar) {
         toolBar = m_defaultToolBar;
-    if (m_activeToolBar == toolBar)
+    }
+    if (m_activeToolBar == toolBar) {
         return;
-    if (toolBar->count() == 0)
+    }
+    if (toolBar->count() == 0) {
         toolBar->hide();
+    }
     m_toolBar->layout()->addWidget(toolBar);
     m_activeToolBar->setVisible(false);
     m_activeToolBar = toolBar;
@@ -230,17 +232,19 @@ void UAVGadgetView::updateToolBar()
 
 void UAVGadgetView::listSelectionActivated(int index)
 {
-    if (index < 0 || index >= m_uavGadgetList->count())
+    if (index < 0 || index >= m_uavGadgetList->count()) {
         index = m_defaultIndex;
+    }
 
     QString classId = m_uavGadgetList->itemData(index).toString();
-    if (m_uavGadget && (m_uavGadget->classId() == classId))
+    if (m_uavGadget && (m_uavGadget->classId() == classId)) {
         return;
+    }
 
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
     IUAVGadget *gadget = im->createGadget(classId, this);
 
-    IUAVGadget *gadgetToRemove = m_uavGadget;
+    IUAVGadget *gadgetToRemove   = m_uavGadget;
     setGadget(gadget);
     m_uavGadgetManager->setCurrentGadget(gadget);
     im->removeGadget(gadgetToRemove);
@@ -256,7 +260,7 @@ void UAVGadgetView::currentGadgetChanged(IUAVGadget *gadget)
     m_activeLabel->setVisible(m_uavGadget == gadget);
 }
 
-void UAVGadgetView::saveState(QSettings* qSettings)
+void UAVGadgetView::saveState(QSettings *qSettings)
 {
     qSettings->setValue("type", "uavGadget");
     qSettings->setValue("classId", gadget()->classId());
@@ -265,10 +269,11 @@ void UAVGadgetView::saveState(QSettings* qSettings)
     qSettings->endGroup();
 }
 
-void UAVGadgetView::restoreState(QSettings* qSettings)
+void UAVGadgetView::restoreState(QSettings *qSettings)
 {
     QString classId = qSettings->value("classId").toString();
     int index = indexOfClassId(classId);
+
     if (index < 0) {
         index = m_defaultIndex;
     }
@@ -276,13 +281,12 @@ void UAVGadgetView::restoreState(QSettings* qSettings)
 
     IUAVGadget *newGadget;
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
-    if(qSettings->childGroups().contains("gadget")) {
+    if (qSettings->childGroups().contains("gadget")) {
         newGadget = im->createGadget(classId, this, false);
         qSettings->beginGroup("gadget");
         newGadget->restoreState(qSettings);
         qSettings->endGroup();
-    }
-    else {
+    } else {
         newGadget = im->createGadget(classId, this);
     }
 

@@ -56,29 +56,28 @@
 //
 // Configuration
 //
-#define SAMPLE_PERIOD_MS		10
+#define SAMPLE_PERIOD_MS 10
 
 // Private types
 
 // Private variables
 static struct CameraStab_data {
-	portTickType lastSysTime;
-	float inputs[CAMERASTABSETTINGS_INPUT_NUMELEM];
+    portTickType lastSysTime;
+    float inputs[CAMERASTABSETTINGS_INPUT_NUMELEM];
 
 #ifdef USE_GIMBAL_LPF
-	float attitudeFiltered[CAMERASTABSETTINGS_INPUT_NUMELEM];
+    float attitudeFiltered[CAMERASTABSETTINGS_INPUT_NUMELEM];
 #endif
 
 #ifdef USE_GIMBAL_FF
-	float ffLastAttitude[CAMERASTABSETTINGS_INPUT_NUMELEM];
-	float ffLastAttitudeFiltered[CAMERASTABSETTINGS_INPUT_NUMELEM];
-	float ffFilterAccumulator[CAMERASTABSETTINGS_INPUT_NUMELEM];
+    float ffLastAttitude[CAMERASTABSETTINGS_INPUT_NUMELEM];
+    float ffLastAttitudeFiltered[CAMERASTABSETTINGS_INPUT_NUMELEM];
+    float ffFilterAccumulator[CAMERASTABSETTINGS_INPUT_NUMELEM];
 #endif
-
 } *csd;
 
 // Private functions
-static void attitudeUpdated(UAVObjEvent* ev);
+static void attitudeUpdated(UAVObjEvent *ev);
 static float bound(float val, float limit);
 
 #ifdef USE_GIMBAL_FF
@@ -92,253 +91,258 @@ static void applyFeedForward(uint8_t index, float dT, float *attitude, CameraSta
  */
 int32_t CameraStabInitialize(void)
 {
-	bool cameraStabEnabled;
+    bool cameraStabEnabled;
 
 #ifdef MODULE_CAMERASTAB_BUILTIN
-	cameraStabEnabled = true;
+    cameraStabEnabled = true;
 #else
-	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+    uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
 
-	HwSettingsInitialize();
-	HwSettingsOptionalModulesGet(optionalModules);
+    HwSettingsInitialize();
+    HwSettingsOptionalModulesGet(optionalModules);
 
-	if (optionalModules[HWSETTINGS_OPTIONALMODULES_CAMERASTAB] == HWSETTINGS_OPTIONALMODULES_ENABLED)
-		cameraStabEnabled = true;
-	else
-		cameraStabEnabled = false;
+    if (optionalModules[HWSETTINGS_OPTIONALMODULES_CAMERASTAB] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+        cameraStabEnabled = true;
+    } else {
+        cameraStabEnabled = false;
+    }
 #endif
 
-	if (cameraStabEnabled) {
+    if (cameraStabEnabled) {
+        // allocate and initialize the static data storage only if module is enabled
+        csd = (struct CameraStab_data *)pvPortMalloc(sizeof(struct CameraStab_data));
+        if (!csd) {
+            return -1;
+        }
 
-		// allocate and initialize the static data storage only if module is enabled
-		csd = (struct CameraStab_data *) pvPortMalloc(sizeof(struct CameraStab_data));
-		if (!csd)
-			return -1;
+        // initialize camera state variables
+        memset(csd, 0, sizeof(struct CameraStab_data));
+        csd->lastSysTime = xTaskGetTickCount();
 
-		// initialize camera state variables
-		memset(csd, 0, sizeof(struct CameraStab_data));
-		csd->lastSysTime = xTaskGetTickCount();
+        AttitudeActualInitialize();
+        CameraStabSettingsInitialize();
+        CameraDesiredInitialize();
 
-		AttitudeActualInitialize();
-		CameraStabSettingsInitialize();
-		CameraDesiredInitialize();
+        UAVObjEvent ev = {
+            .obj    = AttitudeActualHandle(),
+            .instId = 0,
+            .event  = 0,
+        };
+        EventPeriodicCallbackCreate(&ev, attitudeUpdated, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
 
-		UAVObjEvent ev = {
-			.obj = AttitudeActualHandle(),
-			.instId = 0,
-			.event = 0,
-		};
-		EventPeriodicCallbackCreate(&ev, attitudeUpdated, SAMPLE_PERIOD_MS / portTICK_RATE_MS);
+        return 0;
+    }
 
-		return 0;
-	}
-
-	return -1;
+    return -1;
 }
 
 /* stub: module has no module thread */
 int32_t CameraStabStart(void)
 {
-	return 0;
+    return 0;
 }
 
 MODULE_INITCALL(CameraStabInitialize, CameraStabStart)
 
-static void attitudeUpdated(UAVObjEvent* ev)
+static void attitudeUpdated(UAVObjEvent *ev)
 {
-	if (ev->obj != AttitudeActualHandle())
-		return;
+    if (ev->obj != AttitudeActualHandle()) {
+        return;
+    }
 
-	AccessoryDesiredData accessory;
+    AccessoryDesiredData accessory;
 
-	CameraStabSettingsData cameraStab;
-	CameraStabSettingsGet(&cameraStab);
+    CameraStabSettingsData cameraStab;
+    CameraStabSettingsGet(&cameraStab);
 
-	// check how long since last update, time delta between calls in ms
-	portTickType thisSysTime = xTaskGetTickCount();
-	float dT_millis = (thisSysTime > csd->lastSysTime) ?
-				(float)((thisSysTime - csd->lastSysTime) * portTICK_RATE_MS) :
-				(float)SAMPLE_PERIOD_MS;
-	csd->lastSysTime = thisSysTime;
+    // check how long since last update, time delta between calls in ms
+    portTickType thisSysTime = xTaskGetTickCount();
+    float dT_millis = (thisSysTime > csd->lastSysTime) ?
+                      (float)((thisSysTime - csd->lastSysTime) * portTICK_RATE_MS) :
+                      (float)SAMPLE_PERIOD_MS;
+    csd->lastSysTime = thisSysTime;
 
-	// storage for elevon roll component before the pitch component has been generated
-	// we are guaranteed that the iteration order of i is roll pitch yaw
-	// that guarnteees this won't be used uninited, but the compiler doesn't know that
-	// so we init it or turn the warning/error off for each compiler
-	float elevon_roll = 0.0f;
+    // storage for elevon roll component before the pitch component has been generated
+    // we are guaranteed that the iteration order of i is roll pitch yaw
+    // that guarnteees this won't be used uninited, but the compiler doesn't know that
+    // so we init it or turn the warning/error off for each compiler
+    float elevon_roll = 0.0f;
 
-	// process axes
-	for (uint8_t i = 0; i < CAMERASTABSETTINGS_INPUT_NUMELEM; i++) {
+    // process axes
+    for (uint8_t i = 0; i < CAMERASTABSETTINGS_INPUT_NUMELEM; i++) {
+        // read and process control input
+        if (cameraStab.Input[i] != CAMERASTABSETTINGS_INPUT_NONE) {
+            if (AccessoryDesiredInstGet(cameraStab.Input[i] - CAMERASTABSETTINGS_INPUT_ACCESSORY0, &accessory) == 0) {
+                float input_rate;
+                switch (cameraStab.StabilizationMode[i]) {
+                case CAMERASTABSETTINGS_STABILIZATIONMODE_ATTITUDE:
+                    csd->inputs[i] = accessory.AccessoryVal * cameraStab.InputRange[i];
+                    break;
+                case CAMERASTABSETTINGS_STABILIZATIONMODE_AXISLOCK:
+                    input_rate     = accessory.AccessoryVal * cameraStab.InputRate[i];
+                    if (fabsf(input_rate) > cameraStab.MaxAxisLockRate) {
+                        csd->inputs[i] = bound(csd->inputs[i] + input_rate * 0.001f * dT_millis, cameraStab.InputRange[i]);
+                    }
+                    break;
+                default:
+                    PIOS_Assert(0);
+                }
+            }
+        }
 
-		// read and process control input
-		if (cameraStab.Input[i] != CAMERASTABSETTINGS_INPUT_NONE) {
-			if (AccessoryDesiredInstGet(cameraStab.Input[i] - CAMERASTABSETTINGS_INPUT_ACCESSORY0, &accessory) == 0) {
-				float input_rate;
-				switch (cameraStab.StabilizationMode[i]) {
-				case CAMERASTABSETTINGS_STABILIZATIONMODE_ATTITUDE:
-					csd->inputs[i] = accessory.AccessoryVal * cameraStab.InputRange[i];
-					break;
-				case CAMERASTABSETTINGS_STABILIZATIONMODE_AXISLOCK:
-					input_rate = accessory.AccessoryVal * cameraStab.InputRate[i];
-					if (fabsf(input_rate) > cameraStab.MaxAxisLockRate)
-						csd->inputs[i] = bound(csd->inputs[i] + input_rate * 0.001f * dT_millis, cameraStab.InputRange[i]);
-					break;
-				default:
-					PIOS_Assert(0);
-				}
-			}
-		}
+        // calculate servo output
+        float attitude;
 
-		// calculate servo output
-		float attitude;
-
-		switch (i) {
-		case CAMERASTABSETTINGS_INPUT_ROLL:
-			AttitudeActualRollGet(&attitude);
-			break;
-		case CAMERASTABSETTINGS_INPUT_PITCH:
-			AttitudeActualPitchGet(&attitude);
-			break;
-		case CAMERASTABSETTINGS_INPUT_YAW:
-			AttitudeActualYawGet(&attitude);
-			break;
-		default:
-			PIOS_Assert(0);
-		}
+        switch (i) {
+        case CAMERASTABSETTINGS_INPUT_ROLL:
+            AttitudeActualRollGet(&attitude);
+            break;
+        case CAMERASTABSETTINGS_INPUT_PITCH:
+            AttitudeActualPitchGet(&attitude);
+            break;
+        case CAMERASTABSETTINGS_INPUT_YAW:
+            AttitudeActualYawGet(&attitude);
+            break;
+        default:
+            PIOS_Assert(0);
+        }
 
 #ifdef USE_GIMBAL_LPF
-		if (cameraStab.ResponseTime) {
-			float rt = (float)cameraStab.ResponseTime[i];
-			attitude = csd->attitudeFiltered[i] = ((rt * csd->attitudeFiltered[i]) + (dT_millis * attitude)) / (rt + dT_millis);
-		}
+        if (cameraStab.ResponseTime) {
+            float rt = (float)cameraStab.ResponseTime[i];
+            attitude = csd->attitudeFiltered[i] = ((rt * csd->attitudeFiltered[i]) + (dT_millis * attitude)) / (rt + dT_millis);
+        }
 #endif
 
 #ifdef USE_GIMBAL_FF
-		if (cameraStab.FeedForward[i])
-			applyFeedForward(i, dT_millis, &attitude, &cameraStab);
+        if (cameraStab.FeedForward[i]) {
+            applyFeedForward(i, dT_millis, &attitude, &cameraStab);
+        }
 #endif
 
-		// bounding for elevon mixing occurs on the unmixed output
-		// to limit the range of the mixed output you must limit the range
-		// of both the unmixed pitch and unmixed roll
-		float output = bound((attitude + csd->inputs[i]) / cameraStab.OutputRange[i], 1.0f);
+        // bounding for elevon mixing occurs on the unmixed output
+        // to limit the range of the mixed output you must limit the range
+        // of both the unmixed pitch and unmixed roll
+        float output = bound((attitude + csd->inputs[i]) / cameraStab.OutputRange[i], 1.0f);
 
-		// set output channels
-		switch (i) {
-		case CAMERASTABSETTINGS_INPUT_ROLL:
-			// we are guaranteed that the iteration order of i is roll pitch yaw
-			// for elevon mixing we simply grab the value for later use
-			if (cameraStab.GimbalType == CAMERASTABSETTINGS_GIMBALTYPE_ROLLPITCHMIXED)
-				elevon_roll = output;
-			else
-				CameraDesiredRollOrServo1Set(&output);
-			break;
-		case CAMERASTABSETTINGS_INPUT_PITCH:
-			// we are guaranteed that the iteration order of i is roll pitch yaw
-			// for elevon mixing we use the value we previously grabbed and set both s1 and s2
-			if (cameraStab.GimbalType == CAMERASTABSETTINGS_GIMBALTYPE_ROLLPITCHMIXED) {
-				float elevon_pitch = output;
-				// elevon reversing works like this:
-				//   first use the normal reversing facilities to get servo 1 roll working in the correct direction
-				//   then use the normal reversing facilities to get servo 2 roll working in the correct direction
-				//   then use these new reversing switches to reverse servo 1 and/or 2 pitch as needed
-				// if servo 1 pitch is reversed 
-				if (cameraStab.Servo1PitchReverse == CAMERASTABSETTINGS_SERVO1PITCHREVERSE_TRUE) {
-					// use (reversed pitch) + roll
-					output = ((1.0f - elevon_pitch) + elevon_roll) / 2.0f;
-				} else {
-					// use pitch + roll
-					output = (elevon_pitch + elevon_roll) / 2.0f;
-				}
-				CameraDesiredRollOrServo1Set(&output);
-				// if servo 2 pitch is reversed 
-				if (cameraStab.Servo2PitchReverse == CAMERASTABSETTINGS_SERVO2PITCHREVERSE_TRUE) {
-					// use (reversed pitch) - roll
-					output = ((1.0f - elevon_pitch) - elevon_roll) / 2.0f;
-				} else {
-					// use pitch - roll
-					output = (elevon_pitch - elevon_roll) / 2.0f;
-				}
-				CameraDesiredPitchOrServo2Set(&output);
-			} else {
-				CameraDesiredPitchOrServo2Set(&output);
-			}
-			break;
-		case CAMERASTABSETTINGS_INPUT_YAW:
-			CameraDesiredYawSet(&output);
-			break;
-		default:
-			PIOS_Assert(0);
-		}
-	}
+        // set output channels
+        switch (i) {
+        case CAMERASTABSETTINGS_INPUT_ROLL:
+            // we are guaranteed that the iteration order of i is roll pitch yaw
+            // for elevon mixing we simply grab the value for later use
+            if (cameraStab.GimbalType == CAMERASTABSETTINGS_GIMBALTYPE_ROLLPITCHMIXED) {
+                elevon_roll = output;
+            } else {
+                CameraDesiredRollOrServo1Set(&output);
+            }
+            break;
+        case CAMERASTABSETTINGS_INPUT_PITCH:
+            // we are guaranteed that the iteration order of i is roll pitch yaw
+            // for elevon mixing we use the value we previously grabbed and set both s1 and s2
+            if (cameraStab.GimbalType == CAMERASTABSETTINGS_GIMBALTYPE_ROLLPITCHMIXED) {
+                float elevon_pitch = output;
+                // elevon reversing works like this:
+                // first use the normal reversing facilities to get servo 1 roll working in the correct direction
+                // then use the normal reversing facilities to get servo 2 roll working in the correct direction
+                // then use these new reversing switches to reverse servo 1 and/or 2 pitch as needed
+                // if servo 1 pitch is reversed
+                if (cameraStab.Servo1PitchReverse == CAMERASTABSETTINGS_SERVO1PITCHREVERSE_TRUE) {
+                    // use (reversed pitch) + roll
+                    output = ((1.0f - elevon_pitch) + elevon_roll) / 2.0f;
+                } else {
+                    // use pitch + roll
+                    output = (elevon_pitch + elevon_roll) / 2.0f;
+                }
+                CameraDesiredRollOrServo1Set(&output);
+                // if servo 2 pitch is reversed
+                if (cameraStab.Servo2PitchReverse == CAMERASTABSETTINGS_SERVO2PITCHREVERSE_TRUE) {
+                    // use (reversed pitch) - roll
+                    output = ((1.0f - elevon_pitch) - elevon_roll) / 2.0f;
+                } else {
+                    // use pitch - roll
+                    output = (elevon_pitch - elevon_roll) / 2.0f;
+                }
+                CameraDesiredPitchOrServo2Set(&output);
+            } else {
+                CameraDesiredPitchOrServo2Set(&output);
+            }
+            break;
+        case CAMERASTABSETTINGS_INPUT_YAW:
+            CameraDesiredYawSet(&output);
+            break;
+        default:
+            PIOS_Assert(0);
+        }
+    }
 }
 
 float bound(float val, float limit)
 {
-	return (val > limit) ? limit :
-		(val < -limit) ? -limit :
-		val;
+    return (val > limit) ? limit :
+           (val < -limit) ? -limit :
+           val;
 }
 
 #ifdef USE_GIMBAL_FF
 void applyFeedForward(uint8_t index, float dT_millis, float *attitude, CameraStabSettingsData *cameraStab)
 {
-	// compensate high feed forward values depending on gimbal type
-	float gimbalTypeCorrection = 1.0f;
+    // compensate high feed forward values depending on gimbal type
+    float gimbalTypeCorrection = 1.0f;
 
-	switch (cameraStab->GimbalType) {
-	case CAMERASTABSETTINGS_GIMBALTYPE_GENERIC:
-	case CAMERASTABSETTINGS_GIMBALTYPE_ROLLPITCHMIXED:
-		// no correction
-		break;
-	case CAMERASTABSETTINGS_GIMBALTYPE_YAWROLLPITCH:
-		if (index == CAMERASTABSETTINGS_INPUT_ROLL) {
-			float pitch;
-			AttitudeActualPitchGet(&pitch);
-			gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH] - fabsf(pitch))
-							/ cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH];
-		}
-		break;
-	case CAMERASTABSETTINGS_GIMBALTYPE_YAWPITCHROLL:
-		if (index == CAMERASTABSETTINGS_INPUT_PITCH) {
-			float roll;
-			AttitudeActualRollGet(&roll);
-			gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL] - fabsf(roll))
-							/ cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL];
-		}
-		break;
-	default:
-		PIOS_Assert(0);
-	}
+    switch (cameraStab->GimbalType) {
+    case CAMERASTABSETTINGS_GIMBALTYPE_GENERIC:
+    case CAMERASTABSETTINGS_GIMBALTYPE_ROLLPITCHMIXED:
+        // no correction
+        break;
+    case CAMERASTABSETTINGS_GIMBALTYPE_YAWROLLPITCH:
+        if (index == CAMERASTABSETTINGS_INPUT_ROLL) {
+            float pitch;
+            AttitudeActualPitchGet(&pitch);
+            gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH] - fabsf(pitch))
+                                   / cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH];
+        }
+        break;
+    case CAMERASTABSETTINGS_GIMBALTYPE_YAWPITCHROLL:
+        if (index == CAMERASTABSETTINGS_INPUT_PITCH) {
+            float roll;
+            AttitudeActualRollGet(&roll);
+            gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL] - fabsf(roll))
+                                   / cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL];
+        }
+        break;
+    default:
+        PIOS_Assert(0);
+    }
 
-	// apply feed forward
-	float accumulator = csd->ffFilterAccumulator[index];
-	accumulator += (*attitude - csd->ffLastAttitude[index]) * (float)cameraStab->FeedForward[index] * gimbalTypeCorrection;
-	csd->ffLastAttitude[index] = *attitude;
-	*attitude += accumulator;
+    // apply feed forward
+    float accumulator = csd->ffFilterAccumulator[index];
+    accumulator += (*attitude - csd->ffLastAttitude[index]) * (float)cameraStab->FeedForward[index] * gimbalTypeCorrection;
+    csd->ffLastAttitude[index] = *attitude;
+    *attitude   += accumulator;
 
-	float filter = (float)((accumulator > 0.0f) ? cameraStab->AccelTime[index] : cameraStab->DecelTime[index]) / dT_millis;
-	if (filter < 1.0f)
-		filter = 1.0f;
-	accumulator -= accumulator / filter;
-	csd->ffFilterAccumulator[index] = accumulator;
-	*attitude += accumulator;
+    float filter = (float)((accumulator > 0.0f) ? cameraStab->AccelTime[index] : cameraStab->DecelTime[index]) / dT_millis;
+    if (filter < 1.0f) {
+        filter = 1.0f;
+    }
+    accumulator -= accumulator / filter;
+    csd->ffFilterAccumulator[index] = accumulator;
+    *attitude   += accumulator;
 
-	// apply acceleration limit
-	float delta = *attitude - csd->ffLastAttitudeFiltered[index];
-	float maxDelta = (float)cameraStab->MaxAccel * 0.001f * dT_millis;
+    // apply acceleration limit
+    float delta    = *attitude - csd->ffLastAttitudeFiltered[index];
+    float maxDelta = (float)cameraStab->MaxAccel * 0.001f * dT_millis;
 
-	if (fabsf(delta) > maxDelta) {
-		// we are accelerating too hard
-		*attitude = csd->ffLastAttitudeFiltered[index] + ((delta > 0.0f) ? maxDelta : -maxDelta);
-	}
-	csd->ffLastAttitudeFiltered[index] = *attitude;
+    if (fabsf(delta) > maxDelta) {
+        // we are accelerating too hard
+        *attitude = csd->ffLastAttitudeFiltered[index] + ((delta > 0.0f) ? maxDelta : -maxDelta);
+    }
+    csd->ffLastAttitudeFiltered[index] = *attitude;
 }
 #endif // USE_GIMBAL_FF
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /**
  * @}

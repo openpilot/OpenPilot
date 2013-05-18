@@ -32,15 +32,14 @@
 
 class QGLContext;
 
-//Cache Svg item as GL Texture.
-//Texture is regenerated each time item is scaled
-//but it's reused during rotation, unlike DeviceCoordinateCache mode
-class QTCREATOR_UTILS_EXPORT CachedSvgItem: public QGraphicsSvgItem
-{
+// Cache Svg item as GL Texture.
+// Texture is regenerated each time item is scaled
+// but it's reused during rotation, unlike DeviceCoordinateCache mode
+class QTCREATOR_UTILS_EXPORT CachedSvgItem : public QGraphicsSvgItem {
     Q_OBJECT
 public:
-    CachedSvgItem(QGraphicsItem * parent = 0);
-    CachedSvgItem(const QString & fileName, QGraphicsItem * parent = 0);
+    CachedSvgItem(QGraphicsItem *parent = 0);
+    CachedSvgItem(const QString & fileName, QGraphicsItem *parent = 0);
     ~CachedSvgItem();
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -51,4 +50,4 @@ private:
     qreal m_scale;
 };
 
-#endif
+#endif // ifndef CACHEDSVGITEM_H

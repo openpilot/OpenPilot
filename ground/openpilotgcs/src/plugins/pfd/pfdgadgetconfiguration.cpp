@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin Primary Flight Display Plugin
  * @{
- * @brief The Primary Flight Display Gadget 
+ * @brief The Primary Flight Display Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,18 +32,18 @@
  * Loads a saved configuration or defaults if non exist.
  *
  */
-PFDGadgetConfiguration::PFDGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+PFDGadgetConfiguration::PFDGadgetConfiguration(QString classId, QSettings *qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
     m_defaultDial("Unknown"),
     beSmooth(true)
 {
-    //if a saved configuration exists load it
-    if(qSettings != 0) {
+    // if a saved configuration exists load it
+    if (qSettings != 0) {
         QString dialFile = qSettings->value("dialFile").toString();
         useOpenGLFlag = qSettings->value("useOpenGLFlag").toBool();
         hqFonts = qSettings->value("hqFonts").toBool();
         beSmooth = qSettings->value("beSmooth").toBool();
-        m_defaultDial=Utils::PathUtils().InsertDataPath(dialFile);
+        m_defaultDial = Utils::PathUtils().InsertDataPath(dialFile);
     }
 }
 
@@ -54,9 +54,10 @@ PFDGadgetConfiguration::PFDGadgetConfiguration(QString classId, QSettings* qSett
 IUAVGadgetConfiguration *PFDGadgetConfiguration::clone()
 {
     PFDGadgetConfiguration *m = new PFDGadgetConfiguration(this->classId());
-    m->m_defaultDial=m_defaultDial;
+
+    m->m_defaultDial = m_defaultDial;
     m->useOpenGLFlag = useOpenGLFlag;
-    m->hqFonts = hqFonts;
+    m->hqFonts  = hqFonts;
     m->beSmooth = beSmooth;
     return m;
 }
@@ -65,8 +66,10 @@ IUAVGadgetConfiguration *PFDGadgetConfiguration::clone()
  * Saves a configuration.
  *
  */
-void PFDGadgetConfiguration::saveConfig(QSettings* qSettings) const {
+void PFDGadgetConfiguration::saveConfig(QSettings *qSettings) const
+{
     QString dialFile = Utils::PathUtils().RemoveDataPath(m_defaultDial);
+
     qSettings->setValue("dialFile", dialFile);
     qSettings->setValue("useOpenGLFlag", useOpenGLFlag);
     qSettings->setValue("hqFonts", hqFonts);

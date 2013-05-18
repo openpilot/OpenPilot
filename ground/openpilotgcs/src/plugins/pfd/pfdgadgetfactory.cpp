@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin Primary Flight Display Plugin
  * @{
- * @brief The Primary Flight Display Gadget 
+ * @brief The Primary Flight Display Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,29 +32,27 @@
 #include <coreplugin/iuavgadget.h>
 
 PFDGadgetFactory::PFDGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("PFDGadget"),
-                          tr("Primary Flight Display"),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("PFDGadget"),
+                      tr("Primary Flight Display"),
+                      parent)
+{}
 
 PFDGadgetFactory::~PFDGadgetFactory()
-{
-}
+{}
 
-Core::IUAVGadget* PFDGadgetFactory::createGadget(QWidget *parent)
+Core::IUAVGadget *PFDGadgetFactory::createGadget(QWidget *parent)
 {
-    PFDGadgetWidget* gadgetWidget = new PFDGadgetWidget(parent);
+    PFDGadgetWidget *gadgetWidget = new PFDGadgetWidget(parent);
+
     return new PFDGadget(QString("PFDGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *PFDGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *PFDGadgetFactory::createConfiguration(QSettings *qSettings)
 {
     return new PFDGadgetConfiguration(QString("PFDGadget"), qSettings);
 }
 
 IOptionsPage *PFDGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new PFDGadgetOptionsPage(qobject_cast<PFDGadgetConfiguration*>(config));
+    return new PFDGadgetOptionsPage(qobject_cast<PFDGadgetConfiguration *>(config));
 }
-

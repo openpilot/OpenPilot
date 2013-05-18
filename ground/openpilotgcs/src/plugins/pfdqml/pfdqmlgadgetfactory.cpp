@@ -21,19 +21,18 @@
 #include <coreplugin/iuavgadget.h>
 
 PfdQmlGadgetFactory::PfdQmlGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("PfdQmlGadget"),
-                          tr("PFD (qml)"),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("PfdQmlGadget"),
+                      tr("PFD (qml)"),
+                      parent)
+{}
 
 PfdQmlGadgetFactory::~PfdQmlGadgetFactory()
-{
-}
+{}
 
-Core::IUAVGadget* PfdQmlGadgetFactory::createGadget(QWidget *parent)
+Core::IUAVGadget *PfdQmlGadgetFactory::createGadget(QWidget *parent)
 {
-    PfdQmlGadgetWidget* gadgetWidget = new PfdQmlGadgetWidget(parent);
+    PfdQmlGadgetWidget *gadgetWidget = new PfdQmlGadgetWidget(parent);
+
     return new PfdQmlGadget(QString("PfdQmlGadget"), gadgetWidget, parent);
 }
 
@@ -44,6 +43,5 @@ IUAVGadgetConfiguration *PfdQmlGadgetFactory::createConfiguration(QSettings *qSe
 
 IOptionsPage *PfdQmlGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new PfdQmlGadgetOptionsPage(qobject_cast<PfdQmlGadgetConfiguration*>(config));
+    return new PfdQmlGadgetOptionsPage(qobject_cast<PfdQmlGadgetConfiguration *>(config));
 }
-

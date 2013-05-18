@@ -16,13 +16,11 @@
 #include "importexport_global.h"
 #include <coreplugin/iconfigurableplugin.h>
 
-namespace Ui
-{
+namespace Ui {
 class ImportExportGadgetWidget;
 }
 
-class IMPORTEXPORT_EXPORT ImportExportGadgetWidget : public QWidget
-{
+class IMPORTEXPORT_EXPORT ImportExportGadgetWidget : public QWidget {
     Q_OBJECT
 public:
     ImportExportGadgetWidget(QWidget *parent = 0);
@@ -36,15 +34,15 @@ protected:
 
 private:
     Ui::ImportExportGadgetWidget *ui;
-    void writeError(const QString&) const;
-    void exportConfiguration(const QString& fileName);
-    void importConfiguration(const QString& fileName);
-    QList<Core::IConfigurablePlugin*> getConfigurables();
+    void writeError(const QString &) const;
+    void exportConfiguration(const QString & fileName);
+    void importConfiguration(const QString & fileName);
+    QList<Core::IConfigurablePlugin *> getConfigurables();
 
-	QString filename;
+    QString filename;
 
 private slots:
-	void on_resetButton_clicked();
+    void on_resetButton_clicked();
     void on_helpButton_clicked();
     void on_importButton_clicked();
     void on_exportButton_clicked();

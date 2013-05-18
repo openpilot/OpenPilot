@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup OPLinkModule OPLink Module
- * @{ 
+ * @{
  *
  * @file       oplinkmod.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.

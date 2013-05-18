@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ModelViewPlugin ModelView Plugin
  * @{
- * @brief A gadget that displays a 3D representation of the UAV 
+ * @brief A gadget that displays a 3D representation of the UAV
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -37,15 +37,14 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class ModelViewGadgetFactory : public Core::IUAVGadgetFactory
-{
+class ModelViewGadgetFactory : public Core::IUAVGadgetFactory {
     Q_OBJECT
 public:
     ModelViewGadgetFactory(QObject *parent = 0);
     ~ModelViewGadgetFactory();
 
     Core::IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 

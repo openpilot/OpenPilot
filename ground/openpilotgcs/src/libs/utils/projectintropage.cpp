@@ -4,25 +4,25 @@
  * @file       projectintropage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -35,9 +35,7 @@
 #include <QtCore/QFileInfo>
 
 namespace Utils {
-
-struct ProjectIntroPagePrivate
-{
+struct ProjectIntroPagePrivate {
     ProjectIntroPagePrivate();
     Ui::ProjectIntroPage m_ui;
     bool m_complete;
@@ -47,13 +45,12 @@ struct ProjectIntroPagePrivate
     const QString m_hintStyleSheet;
 };
 
-ProjectIntroPagePrivate::  ProjectIntroPagePrivate() :
+ProjectIntroPagePrivate::ProjectIntroPagePrivate() :
     m_complete(false),
     m_errorStyleSheet(QLatin1String("background : red;")),
     m_warningStyleSheet(QLatin1String("background : yellow;")),
     m_hintStyleSheet()
-{
-}
+{}
 
 ProjectIntroPage::ProjectIntroPage(QWidget *parent) :
     QWizardPage(parent),
@@ -112,6 +109,7 @@ void ProjectIntroPage::setDescription(const QString &description)
 void ProjectIntroPage::changeEvent(QEvent *e)
 {
     QWizardPage::changeEvent(e);
+
     switch (e->type()) {
     case QEvent::LanguageChange:
         m_d->m_ui.retranslateUi(this);
@@ -140,6 +138,7 @@ bool ProjectIntroPage::validate()
     case BaseValidatingLineEdit::Invalid:
         displayStatusMessage(Error, m_d->m_ui.nameLineEdit->errorMessage());
         return false;
+
     case BaseValidatingLineEdit::DisplayingInitialText:
         break;
     case BaseValidatingLineEdit::Valid:
@@ -169,6 +168,7 @@ bool ProjectIntroPage::validate()
 void ProjectIntroPage::slotChanged()
 {
     const bool newComplete = validate();
+
     if (newComplete != m_d->m_complete) {
         m_d->m_complete = newComplete;
         emit completeChanged();
@@ -177,8 +177,9 @@ void ProjectIntroPage::slotChanged()
 
 void ProjectIntroPage::slotActivated()
 {
-    if (m_d->m_complete)
+    if (m_d->m_complete) {
         emit activated();
+    }
 }
 
 bool ProjectIntroPage::validateProjectDirectory(const QString &name, QString *errorMessage)
@@ -206,5 +207,4 @@ void ProjectIntroPage::hideStatusLabel()
 {
     displayStatusMessage(Hint, QString());
 }
-
 } // namespace Utils

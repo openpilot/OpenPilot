@@ -8,7 +8,7 @@
  * @{
  * @addtogroup DialPlugin Dial Plugin
  * @{
- * @brief Plots flight information rotary style dials 
+ * @brief Plots flight information rotary style dials
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -43,14 +43,13 @@ class IUAVGadgetConfiguration;
 class DialGadgetConfiguration;
 
 namespace Ui {
-    class DialGadgetOptionsPage;
+class DialGadgetOptionsPage;
 }
 
 using namespace Core;
 
-class DialGadgetOptionsPage : public IOptionsPage
-{
-Q_OBJECT
+class DialGadgetOptionsPage : public IOptionsPage {
+    Q_OBJECT
 public:
     explicit DialGadgetOptionsPage(DialGadgetConfiguration *config, QObject *parent = 0);
 

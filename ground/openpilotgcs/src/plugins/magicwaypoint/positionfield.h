@@ -35,11 +35,10 @@
 #include <QtSvg/QGraphicsSvgItem>
 
 namespace Ui {
-    class PositionField;
+class PositionField;
 }
 
-class PositionField : public QGraphicsView
-{
+class PositionField : public QGraphicsView {
     Q_OBJECT
 
 public:
@@ -70,6 +69,6 @@ private:
 #endif // POSITIONFIELD_H
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

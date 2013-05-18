@@ -7,7 +7,7 @@
  * @{
  * @addtogroup DebugGadgetPlugin Debug Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -34,32 +34,31 @@
 
 DebugPlugin::DebugPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 DebugPlugin::~DebugPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool DebugPlugin::initialize(const QStringList& args, QString *errMsg)
+bool DebugPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new DebugGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new DebugGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void DebugPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void DebugPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(DebugPlugin)
-

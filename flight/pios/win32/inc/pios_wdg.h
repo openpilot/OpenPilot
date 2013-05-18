@@ -7,7 +7,7 @@
  *
  * @file       pios_wdg.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
+ *             Parts by Thorsten Klose (tk@midibox.org)
  * @brief      SPI functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -33,15 +33,15 @@
 
 #include <stdbool.h>
 
-//------------------------
+// ------------------------
 // WATCHDOG_SETTINGS
-//------------------------
-#define PIOS_WATCHDOG_TIMEOUT 250
-#define PIOS_WDG_REGISTER BKP_DR4
-#define PIOS_WDG_ACTUATOR        0x0001
-#define PIOS_WDG_STABILIZATION   0x0002
-#define PIOS_WDG_AHRS            0x0004
-#define PIOS_WDG_MANUAL          0x0008
+// ------------------------
+#define PIOS_WATCHDOG_TIMEOUT  250
+#define PIOS_WDG_REGISTER      BKP_DR4
+#define PIOS_WDG_ACTUATOR      0x0001
+#define PIOS_WDG_STABILIZATION 0x0002
+#define PIOS_WDG_AHRS          0x0004
+#define PIOS_WDG_MANUAL        0x0008
 
 void PIOS_WDG_Init();
 bool PIOS_WDG_RegisterFlag(uint16_t flag_requested);
@@ -50,4 +50,4 @@ uint16_t PIOS_WDG_GetBootupFlags();
 uint16_t PIOS_WDG_GetActiveFlags();
 void PIOS_WDG_Clear(void);
 
-#endif
+#endif // ifndef PIOS_WDG

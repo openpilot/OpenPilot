@@ -1,17 +1,17 @@
 /**
-******************************************************************************
-* @addtogroup PIOS PIOS Core hardware abstraction layer
-* @{
-* @addtogroup   PIOS_RFM22B_RCVR RFM22B Receiver Input Functions
-* @brief	 Code to output the PPM signal from the RFM22B
-* @{
-*
-* @file       pios_rfm22b_rcvr.c
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
-* @brief      Implements a receiver interface to the RFM22B device
-* @see        The GNU Public License (GPL) Version 3
-*
-*****************************************************************************/
+ ******************************************************************************
+ * @addtogroup PIOS PIOS Core hardware abstraction layer
+ * @{
+ * @addtogroup   PIOS_RFM22B_RCVR RFM22B Receiver Input Functions
+ * @brief	 Code to output the PPM signal from the RFM22B
+ * @{
+ *
+ * @file       pios_rfm22b_rcvr.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      Implements a receiver interface to the RFM22B device
+ * @see        The GNU Public License (GPL) Version 3
+ *
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,6 +51,7 @@ const struct pios_rcvr_driver pios_rfm22b_rcvr_driver = {
 int32_t PIOS_RFM22B_RCVR_Init(uint32_t rcvr_id)
 {
     struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rcvr_id;
+
     if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
         return -1;
     }
@@ -78,6 +79,7 @@ int32_t PIOS_RFM22B_RCVR_Init(uint32_t rcvr_id)
 static int32_t PIOS_RFM22B_RCVR_Get(uint32_t rcvr_id, uint8_t channel)
 {
     struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rcvr_id;
+
     if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
         return -1;
     }
@@ -95,8 +97,10 @@ static int32_t PIOS_RFM22B_RCVR_Get(uint32_t rcvr_id, uint8_t channel)
  *
  * @param[in] rcvr_id  The receiver ID.
  */
-static void PIOS_RFM22B_RCVR_Supervisor(uint32_t rcvr_id) {
+static void PIOS_RFM22B_RCVR_Supervisor(uint32_t rcvr_id)
+{
     struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rcvr_id;
+
     if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
         return;
     }
@@ -116,9 +120,9 @@ static void PIOS_RFM22B_RCVR_Supervisor(uint32_t rcvr_id) {
     rfm22b_dev->ppm_fresh = false;
 }
 
-#endif	/* PIOS_INCLUDE_RFM22B_RCVR */
+#endif /* PIOS_INCLUDE_RFM22B_RCVR */
 
-/** 
+/**
  * @}
  * @}
  */

@@ -48,14 +48,13 @@ EndPage::~EndPage()
 void EndPage::openInputWizard()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    ConfigGadgetFactory* configGadgetFactory = pm->getObject<ConfigGadgetFactory>();
+    ConfigGadgetFactory *configGadgetFactory = pm->getObject<ConfigGadgetFactory>();
 
-    if(configGadgetFactory) {
-        //Core::ModeManager::instance()->activateModeByWorkspaceName("Configuration");
+    if (configGadgetFactory) {
+        // Core::ModeManager::instance()->activateModeByWorkspaceName("Configuration");
         getWizard()->close();
         configGadgetFactory->startInputWizard();
-    }
-    else {
+    } else {
         QMessageBox msgBox;
         msgBox.setText(tr("Unable to open Input Wizard since the Config Plugin is not\nloaded in the current workspace."));
         msgBox.setStandardButtons(QMessageBox::Ok);

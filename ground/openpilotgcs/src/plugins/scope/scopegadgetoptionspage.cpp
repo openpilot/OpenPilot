@@ -103,13 +103,13 @@ QWidget *ScopeGadgetOptionsPage::createPage(QWidget *parent)
 
     // add the configured curves
     foreach(PlotCurveConfiguration * plotData, m_config->plotCurveConfigs()) {
-        QString uavObject = plotData->uavObject;
-        QString uavField = plotData->uavField;
+        QString uavObject    = plotData->uavObject;
+        QString uavField     = plotData->uavField;
         int scale = plotData->yScalePower;
         int mean = plotData->yMeanSamples;
         QString mathFunction = plotData->mathFunction;
-        QVariant varColor = plotData->color;
-        bool antialiased = plotData->drawAntialiased;
+        QVariant varColor    = plotData->color;
+        bool antialiased     = plotData->drawAntialiased;
 
         addPlotCurveConfig(uavObject, uavField, scale, mean, mathFunction, varColor, antialiased);
     }
@@ -335,7 +335,7 @@ void ScopeGadgetOptionsPage::on_btnAddCurve_clicked()
 
     QVariant varColor    = (int)QColor(options_page->btnColor->text()).rgb();
 
-    bool antialiased = options_page->drawAntialiasedCheckBox->isChecked();
+    bool antialiased     = options_page->drawAntialiasedCheckBox->isChecked();
     // Find an existing plot curve config based on the uavobject and uav field. If it
     // exists, update it, else add a new one.
     if (options_page->lstCurves->count() &&
@@ -363,7 +363,7 @@ void ScopeGadgetOptionsPage::addPlotCurveConfig(QString uavObject, QString uavFi
 void ScopeGadgetOptionsPage::setCurvePlotProperties(QListWidgetItem *listWidgetItem, QString uavObject, QString uavField, int scale,
                                                     int mean, QString mathFunction, QVariant varColor, bool antialias)
 {
-    bool parseOK = false;
+    bool parseOK  = false;
 
     // Set the properties of the newly added list item
     QRgb rgbColor = (QRgb)varColor.toInt(&parseOK);

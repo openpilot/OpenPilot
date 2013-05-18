@@ -31,7 +31,7 @@
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 
 class IUAVGadget;
-//class QList<int>;
+// class QList<int>;
 class QWidget;
 class QString;
 class ConfigGadgetWidget;
@@ -39,15 +39,17 @@ class Ui_ConfigGadget;
 
 using namespace Core;
 
-class ConfigGadget : public Core::IUAVGadget
-{
+class ConfigGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     ConfigGadget(QString classId, ConfigGadgetWidget *widget, QWidget *parent = 0);
     ~ConfigGadget();
 
-    QWidget *widget() { return (QWidget*)m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    QWidget *widget()
+    {
+        return (QWidget *)m_widget;
+    }
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 
 private:
     ConfigGadgetWidget *m_widget;

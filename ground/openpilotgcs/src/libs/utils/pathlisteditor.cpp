@@ -4,25 +4,25 @@
  * @file       pathlisteditor.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -46,7 +46,6 @@
 #include <QtCore/QDebug>
 
 namespace Utils {
-
 // ------------ PathListPlainTextEdit:
 // Replaces the platform separator ';',':' by '\n'
 // when inserting, allowing for pasting in paths
@@ -56,7 +55,7 @@ class PathListPlainTextEdit : public QPlainTextEdit {
 public:
     explicit PathListPlainTextEdit(QWidget *parent = 0);
 protected:
-    virtual void insertFromMimeData (const QMimeData *source);
+    virtual void insertFromMimeData(const QMimeData *source);
 };
 
 PathListPlainTextEdit::PathListPlainTextEdit(QWidget *parent) :
@@ -85,22 +84,22 @@ void PathListPlainTextEdit::insertFromMimeData(const QMimeData *source)
 struct PathListEditorPrivate {
     PathListEditorPrivate();
 
-    QHBoxLayout *layout;
-    QVBoxLayout *buttonLayout;
-    QToolButton *toolButton;
+    QHBoxLayout    *layout;
+    QVBoxLayout    *buttonLayout;
+    QToolButton    *toolButton;
     QMenu *buttonMenu;
     QPlainTextEdit *edit;
-    QSignalMapper *envVarMapper;
+    QSignalMapper  *envVarMapper;
     QString fileDialogTitle;
 };
 
 PathListEditorPrivate::PathListEditorPrivate()   :
-        layout(new QHBoxLayout),
-        buttonLayout(new QVBoxLayout),
-        toolButton(new QToolButton),
-        buttonMenu(new QMenu),
-        edit(new PathListPlainTextEdit),
-        envVarMapper(0)
+    layout(new QHBoxLayout),
+    buttonLayout(new QVBoxLayout),
+    toolButton(new QToolButton),
+    buttonMenu(new QMenu),
+    edit(new PathListPlainTextEdit),
+    envVarMapper(0)
 {
     layout->setMargin(0);
     layout->addWidget(edit);
@@ -110,8 +109,8 @@ PathListEditorPrivate::PathListEditorPrivate()   :
 }
 
 PathListEditor::PathListEditor(QWidget *parent) :
-        QWidget(parent),
-        m_d(new PathListEditorPrivate)
+    QWidget(parent),
+    m_d(new PathListEditorPrivate)
 {
     setLayout(m_d->layout);
     m_d->toolButton->setPopupMode(QToolButton::MenuButtonPopup);
@@ -129,28 +128,32 @@ PathListEditor::~PathListEditor()
     delete m_d;
 }
 
-static inline QAction *createAction(QObject *parent, const QString &text, QObject * receiver, const char *slotFunc)
+static inline QAction *createAction(QObject *parent, const QString &text, QObject *receiver, const char *slotFunc)
 {
     QAction *rc = new QAction(text, parent);
     QObject::connect(rc, SIGNAL(triggered()), receiver, slotFunc);
+
     return rc;
 }
 
-QAction *PathListEditor::addAction(const QString &text, QObject * receiver, const char *slotFunc)
+QAction *PathListEditor::addAction(const QString &text, QObject *receiver, const char *slotFunc)
 {
     QAction *rc = createAction(this, text, receiver, slotFunc);
+
     m_d->buttonMenu->addAction(rc);
     return rc;
 }
 
-QAction *PathListEditor::insertAction(int index /* -1 */, const QString &text, QObject * receiver, const char *slotFunc)
+QAction *PathListEditor::insertAction(int index /* -1 */, const QString &text, QObject *receiver, const char *slotFunc)
 {
     // Find the 'before' action
     QAction *beforeAction = 0;
+
     if (index >= 0) {
-        const QList<QAction*> actions = m_d->buttonMenu->actions();
-        if (index < actions.size())
+        const QList<QAction *> actions = m_d->buttonMenu->actions();
+        if (index < actions.size()) {
             beforeAction = actions.at(index);
+        }
     }
     QAction *rc = createAction(this, text, receiver, slotFunc);
     if (beforeAction) {
@@ -174,13 +177,16 @@ QString PathListEditor::pathListString() const
 QStringList PathListEditor::pathList() const
 {
     const QString text = m_d->edit->toPlainText().trimmed();
-    if (text.isEmpty())
+
+    if (text.isEmpty()) {
         return QStringList();
+    }
     // trim each line
     QStringList rc = text.split(QLatin1Char('\n'), QString::SkipEmptyParts);
     const QStringList::iterator end = rc.end();
-    for (QStringList::iterator it = rc.begin(); it != end; ++it)
+    for (QStringList::iterator it = rc.begin(); it != end; ++it) {
         *it = it->trimmed();
+    }
     return rc;
 }
 
@@ -221,15 +227,19 @@ void PathListEditor::clear()
 void PathListEditor::slotAdd()
 {
     const QString dir = QFileDialog::getExistingDirectory(this, m_d->fileDialogTitle);
-    if (!dir.isEmpty())
+
+    if (!dir.isEmpty()) {
         appendPath(QDir::toNativeSeparators(dir));
+    }
 }
 
 void PathListEditor::slotInsert()
 {
     const QString dir = QFileDialog::getExistingDirectory(this, m_d->fileDialogTitle);
-    if (!dir.isEmpty())
+
+    if (!dir.isEmpty()) {
         insertPathAtCursor(QDir::toNativeSeparators(dir));
+    }
 }
 
 QChar PathListEditor::separator()
@@ -269,9 +279,10 @@ void PathListEditor::insertPathAtCursor(const QString &path)
 {
     // If the cursor is at an empty line or at end(),
     // just insert. Else insert line before
-    QTextCursor cursor = m_d->edit->textCursor();
-    QTextBlock block = cursor.block();
+    QTextCursor cursor     = m_d->edit->textCursor();
+    QTextBlock block       = cursor.block();
     const bool needNewLine = !block.text().isEmpty();
+
     if (needNewLine) {
         cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
         cursor.insertBlock();
@@ -287,8 +298,10 @@ void PathListEditor::insertPathAtCursor(const QString &path)
 void PathListEditor::appendPath(const QString &path)
 {
     QString paths = text().trimmed();
-    if (!paths.isEmpty())
+
+    if (!paths.isEmpty()) {
         paths += QLatin1Char('\n');
+    }
     paths += path;
     setText(paths);
 }
@@ -297,14 +310,15 @@ void PathListEditor::deletePathAtCursor()
 {
     // Delete current line
     QTextCursor cursor = m_d->edit->textCursor();
+
     if (cursor.block().isValid()) {
         cursor.movePosition(QTextCursor::StartOfLine, QTextCursor::MoveAnchor);
         // Select down or until end of [last] line
-        if (!cursor.movePosition(QTextCursor::Down, QTextCursor::KeepAnchor))
+        if (!cursor.movePosition(QTextCursor::Down, QTextCursor::KeepAnchor)) {
             cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+        }
         cursor.removeSelectedText();
         m_d->edit->setTextCursor(cursor);
     }
 }
-
 } // namespace Utils

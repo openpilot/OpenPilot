@@ -7,7 +7,7 @@
  * @{
  * @addtogroup GPSGadgetPlugin GPS Gadget Plugin
  * @{
- * @brief A gadget that displays GPS status and enables basic configuration 
+ * @brief A gadget that displays GPS status and enables basic configuration
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -38,25 +38,24 @@
 
 class Ui_GpsDisplayWidget;
 
-class GpsDisplayWidget : public QWidget, public Ui_GpsDisplayWidget
-{
+class GpsDisplayWidget : public QWidget, public Ui_GpsDisplayWidget {
     Q_OBJECT
 
 public:
     GpsDisplayWidget(QWidget *parent = 0);
-   ~GpsDisplayWidget();
+    ~GpsDisplayWidget();
 
 private slots:
-   void setSVs(int);
-   void setPosition(double, double, double);
-   void setDateTime(double, double);
-   void setSpeedHeading(double, double);
-   void dumpPacket(const QString &packet);
-   void setFixType(const QString &fixtype);
-   void setDOP(double hdop, double vdop, double pdop);
+    void setSVs(int);
+    void setPosition(double, double, double);
+    void setDateTime(double, double);
+    void setSpeedHeading(double, double);
+    void dumpPacket(const QString &packet);
+    void setFixType(const QString &fixtype);
+    void setDOP(double hdop, double vdop, double pdop);
 
 private:
-   GpsConstellationWidget * gpsConstellation;
-   QGraphicsSvgItem * marker;
+    GpsConstellationWidget *gpsConstellation;
+    QGraphicsSvgItem *marker;
 };
 #endif /* GPSDISPLAYWIDGET_H_ */

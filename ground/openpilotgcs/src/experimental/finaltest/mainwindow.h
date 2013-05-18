@@ -5,7 +5,7 @@
 #include <QMainWindow>
 
 namespace Ui {
-    class MainWindow;
+class MainWindow;
 }
 
 class MainWindow : public QMainWindow {
@@ -20,13 +20,13 @@ protected:
 private:
     Ui::MainWindow *ui;
     mapcontrol::OPMapWidget *map;
-    mapcontrol::WayPointItem* wp;
+    mapcontrol::WayPointItem *wp;
     QImage ima;
     QLabel l;
 
 private slots:
     void on_pushButton_2_clicked();
-    void on_comboBox_currentIndexChanged(QString );
+    void on_comboBox_currentIndexChanged(QString);
     void on_checkBox_2_clicked(bool checked);
     void on_pushButtonGO_clicked();
     void on_pushButton_clicked();
@@ -36,7 +36,7 @@ private slots:
     void on_checkBox_clicked(bool checked);
     void on_pushButtonZoomM_clicked();
     void on_pushButtonZoomP_clicked();
-    void zoomChanged(double zoomt,double zoom,double zoomdigi);
+    void zoomChanged(double zoomt, double zoom, double zoomdigi);
     void ttl(int value);
     void time();
 };

@@ -4,25 +4,25 @@
  * @file       qtlocalpeer.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -34,7 +34,7 @@
 #if defined(Q_OS_WIN)
 #include <QtCore/QLibrary>
 #include <QtCore/qt_windows.h>
-typedef BOOL(WINAPI*PProcessIdToSessionId)(DWORD,DWORD*);
+typedef BOOL (WINAPI * PProcessIdToSessionId)(DWORD, DWORD *);
 static PProcessIdToSessionId pProcessIdToSessionId = 0;
 #endif
 
@@ -44,18 +44,17 @@ static PProcessIdToSessionId pProcessIdToSessionId = 0;
 #endif
 
 namespace SharedTools {
-
 const char *QtLocalPeer::ack = "ack";
 
 QtLocalPeer::QtLocalPeer(QObject *parent, const QString &appId)
     : QObject(parent), id(appId)
 {
-    if (id.isEmpty())
-        id = QCoreApplication::applicationFilePath();  //### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
-
+    if (id.isEmpty()) {
+        id = QCoreApplication::applicationFilePath(); // ### On win, check if this returns .../argv[0] without casefolding; .\MYAPP == .\myapp on Win
+    }
     QByteArray idc = id.toUtf8();
-    quint16 idNum = qChecksum(idc.constData(), idc.size());
-    //### could do: two 16bit checksums over separate halves of id, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
+    quint16 idNum  = qChecksum(idc.constData(), idc.size());
+    // ### could do: two 16bit checksums over separate halves of id, for a 32bit result - improved uniqeness probability. Every-other-char split would be best.
 
     socketName = QLatin1String("qtsingleapplication-")
                  + QString::number(idNum, 16);
@@ -73,7 +72,7 @@ QtLocalPeer::QtLocalPeer(QObject *parent, const QString &appId)
     socketName += QLatin1Char('-') + QString::number(::getuid(), 16);
 #endif
 
-    server = new QLocalServer(this);
+    server      = new QLocalServer(this);
     QString lockName = QDir(QDir::tempPath()).absolutePath()
                        + QLatin1Char('/') + socketName
                        + QLatin1String("-lockfile");
@@ -83,34 +82,40 @@ QtLocalPeer::QtLocalPeer(QObject *parent, const QString &appId)
 
 bool QtLocalPeer::isClient()
 {
-    if (lockFile.isLocked())
+    if (lockFile.isLocked()) {
         return false;
+    }
 
-    if (!lockFile.lock(QtLockedFile::WriteLock, false))
+    if (!lockFile.lock(QtLockedFile::WriteLock, false)) {
         return true;
+    }
 
-    if (!QLocalServer::removeServer(socketName))
+    if (!QLocalServer::removeServer(socketName)) {
         qWarning("QtSingleCoreApplication: could not cleanup socket");
+    }
     bool res = server->listen(socketName);
-    if (!res)
+    if (!res) {
         qWarning("QtSingleCoreApplication: listen on local socket failed, %s", qPrintable(server->errorString()));
+    }
     QObject::connect(server, SIGNAL(newConnection()), SLOT(receiveConnection()));
     return false;
 }
 
 bool QtLocalPeer::sendMessage(const QString &message, int timeout)
 {
-    if (!isClient())
+    if (!isClient()) {
         return false;
+    }
 
     QLocalSocket socket;
     bool connOk = false;
     for (int i = 0; i < 2; i++) {
         // Try twice, in case the other instance is just starting up
         socket.connectToServer(socketName);
-        connOk = socket.waitForConnected(timeout/2);
-        if (connOk || i)
+        connOk = socket.waitForConnected(timeout / 2);
+        if (connOk || i) {
             break;
+        }
         int ms = 250;
 #if defined(Q_OS_WIN)
         Sleep(DWORD(ms));
@@ -119,8 +124,9 @@ bool QtLocalPeer::sendMessage(const QString &message, int timeout)
         nanosleep(&ts, NULL);
 #endif
     }
-    if (!connOk)
+    if (!connOk) {
         return false;
+    }
 
     QByteArray uMsg(message.toUtf8());
     QDataStream ds(&socket);
@@ -133,28 +139,31 @@ bool QtLocalPeer::sendMessage(const QString &message, int timeout)
 
 void QtLocalPeer::receiveConnection()
 {
-    QLocalSocket* socket = server->nextPendingConnection();
-    if (!socket)
+    QLocalSocket *socket = server->nextPendingConnection();
+
+    if (!socket) {
         return;
+    }
 
     // Why doesn't Qt have a blocking stream that takes care of this shait???
-    while (socket->bytesAvailable() < static_cast<int>(sizeof(quint32)))
+    while (socket->bytesAvailable() < static_cast<int>(sizeof(quint32))) {
         socket->waitForReadyRead();
+    }
     QDataStream ds(socket);
     QByteArray uMsg;
     quint32 remaining;
     ds >> remaining;
     uMsg.resize(remaining);
     int got = 0;
-    char* uMsgBuf = uMsg.data();
-    //qDebug() << "RCV: remaining" << remaining;
+    char *uMsgBuf = uMsg.data();
+    // qDebug() << "RCV: remaining" << remaining;
     do {
-        got = ds.readRawData(uMsgBuf, remaining);
+        got        = ds.readRawData(uMsgBuf, remaining);
         remaining -= got;
-        uMsgBuf += got;
-        //qDebug() << "RCV: got" << got << "remaining" << remaining;
+        uMsgBuf   += got;
+        // qDebug() << "RCV: got" << got << "remaining" << remaining;
     } while (remaining && got >= 0 && socket->waitForReadyRead(2000));
-    //### error check: got<0
+    // ### error check: got<0
     if (got < 0) {
         qWarning() << "QtLocalPeer: Message reception failed" << socket->errorString();
         delete socket;
@@ -167,5 +176,4 @@ void QtLocalPeer::receiveConnection()
     delete socket;
     emit messageReceived(message); // ##(might take a long time to return)
 }
-
 } // namespace SharedTools

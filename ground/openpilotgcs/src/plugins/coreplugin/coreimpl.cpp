@@ -10,19 +10,19 @@
  * @{
  * @brief The Core GCS plugin
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -33,10 +33,8 @@
 
 namespace Core {
 namespace Internal {
-
 // The Core Singleton
 static CoreImpl *m_instance = 0;
-
 } // namespace Internal
 } // namespace Core
 
@@ -45,14 +43,14 @@ using namespace Core;
 using namespace Core::Internal;
 
 
-ICore* ICore::instance()
+ICore *ICore::instance()
 {
     return m_instance;
 }
 
 CoreImpl::CoreImpl(MainWindow *mainwindow)
 {
-    m_instance = this;
+    m_instance   = this;
     m_mainwindow = mainwindow;
 }
 
@@ -184,24 +182,24 @@ void CoreImpl::updateContext()
 void CoreImpl::openFiles(const QStringList &arguments)
 {
     Q_UNUSED(arguments)
-    //m_mainwindow->openFiles(arguments);
+    // m_mainwindow->openFiles(arguments);
 }
 
-void CoreImpl::readMainSettings(QSettings* qs, bool workspaceDiffOnly)
+void CoreImpl::readMainSettings(QSettings *qs, bool workspaceDiffOnly)
 {
     m_mainwindow->readSettings(qs, workspaceDiffOnly);
 }
 
-void CoreImpl::saveMainSettings(QSettings* qs)
+void CoreImpl::saveMainSettings(QSettings *qs)
 {
     m_mainwindow->saveSettings(qs);
 }
 
-void CoreImpl::readSettings(IConfigurablePlugin* plugin, QSettings* qs)
+void CoreImpl::readSettings(IConfigurablePlugin *plugin, QSettings *qs)
 {
     m_mainwindow->readSettings(plugin, qs);
 }
-void CoreImpl::saveSettings(IConfigurablePlugin* plugin, QSettings* qs)
+void CoreImpl::saveSettings(IConfigurablePlugin *plugin, QSettings *qs)
 {
     m_mainwindow->saveSettings(plugin, qs);
 }
@@ -209,4 +207,3 @@ void CoreImpl::deleteSettings()
 {
     m_mainwindow->deleteSettings();
 }
-

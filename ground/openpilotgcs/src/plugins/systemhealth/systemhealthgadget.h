@@ -38,15 +38,17 @@ class SystemHealthGadgetWidget;
 
 using namespace Core;
 
-class SystemHealthGadget : public Core::IUAVGadget
-{
+class SystemHealthGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     SystemHealthGadget(QString classId, SystemHealthGadgetWidget *widget, QWidget *parent = 0);
     ~SystemHealthGadget();
 
-    QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 
 private:
     SystemHealthGadgetWidget *m_widget;

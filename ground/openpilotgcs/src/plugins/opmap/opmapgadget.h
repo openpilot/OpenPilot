@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
  * @{
- * @brief The OpenPilot Map plugin 
+ * @brief The OpenPilot Map plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -39,15 +39,17 @@ class OPMapGadgetWidget;
 
 using namespace Core;
 
-class OPMapGadget : public Core::IUAVGadget
-{
+class OPMapGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     OPMapGadget(QString classId, OPMapGadgetWidget *widget, QWidget *parent = 0);
     ~OPMapGadget();
 
-    QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* m_config);
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    void loadConfiguration(IUAVGadgetConfiguration *m_config);
 private:
     OPMapGadgetWidget *m_widget;
     OPMapGadgetConfiguration *m_config;

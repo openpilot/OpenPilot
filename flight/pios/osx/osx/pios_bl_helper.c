@@ -35,19 +35,19 @@
 
 uint32_t PIOS_BL_HELPER_CRC_Memory_Calc()
 {
-	return 0;
+    return 0;
 }
 
 extern const struct fw_version_info fw_version_blob;
-void PIOS_BL_HELPER_FLASH_Read_Description(uint8_t * array, uint8_t size)
+void PIOS_BL_HELPER_FLASH_Read_Description(uint8_t *array, uint8_t size)
 {
-	uint8_t * desc = (uint8_t *) &fw_version_blob;
-	for (uint32_t i = 0;  i < size; i++) {
-		array[i] = desc[i];
-	}
+    uint8_t *desc = (uint8_t *)&fw_version_blob;
+
+    for (uint32_t i = 0; i < size; i++) {
+        array[i] = desc[i];
+    }
 }
 
 void PIOS_BL_HELPER_CRC_Ini()
-{
-}
+{}
 #endif

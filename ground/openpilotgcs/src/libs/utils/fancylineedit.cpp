@@ -4,25 +4,25 @@
  * @file       fancylineedit.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -39,7 +39,6 @@
 enum { margin = 6 };
 
 namespace Utils {
-
 static inline QString sideToStyleSheetString(FancyLineEdit::Side side)
 {
     return side == FancyLineEdit::Left ? QLatin1String("left") : QLatin1String("right");
@@ -50,6 +49,7 @@ static inline QString sideToStyleSheetString(FancyLineEdit::Side side)
 static QString labelStyleSheet(FancyLineEdit::Side side)
 {
     QString rc = QLatin1String("QLabel { margin-");
+
     rc += sideToStyleSheetString(side);
     rc += QLatin1String(": ");
     rc += QString::number(margin);
@@ -58,7 +58,7 @@ static QString labelStyleSheet(FancyLineEdit::Side side)
 }
 
 // --------- FancyLineEditPrivate as QObject with label
-//           event filter
+// event filter
 
 class FancyLineEditPrivate : public QObject {
 public:
@@ -92,16 +92,17 @@ FancyLineEditPrivate::FancyLineEditPrivate(QLineEdit *parent) :
     m_useLayoutDirection(false),
     m_menuTabFocusTrigger(false),
     m_showingHintText(false)
-{
-}
+{}
 
 bool FancyLineEditPrivate::eventFilter(QObject *obj, QEvent *event)
 {
-    if (!m_menu || obj != m_menuLabel)
+    if (!m_menu || obj != m_menuLabel) {
         return QObject::eventFilter(obj, event);
+    }
 
     switch (event->type()) {
-    case QEvent::MouseButtonPress: {
+    case QEvent::MouseButtonPress:
+    {
         const QMouseEvent *me = static_cast<QMouseEvent *>(event);
         m_menu->exec(me->globalPos());
         return true;
@@ -130,8 +131,7 @@ FancyLineEdit::FancyLineEdit(QWidget *parent) :
 }
 
 FancyLineEdit::~FancyLineEdit()
-{
-}
+{}
 
 // Position the menu label left or right according to size.
 // Called when switching side and from resizeEvent.
@@ -139,11 +139,11 @@ void FancyLineEdit::positionMenuLabel()
 {
     switch (side()) {
     case Left:
-        m_d->m_menuLabel->setGeometry(0, 0, m_d->m_pixmap.width()+margin, height());
+        m_d->m_menuLabel->setGeometry(0, 0, m_d->m_pixmap.width() + margin, height());
         break;
     case Right:
         m_d->m_menuLabel->setGeometry(width() - m_d->m_pixmap.width() - margin, 0,
-                                      m_d->m_pixmap.width()+margin, height());
+                                      m_d->m_pixmap.width() + margin, height());
         break;
     }
 }
@@ -154,12 +154,14 @@ void FancyLineEdit::updateStyleSheet(Side side)
     // respective side and set color according to whether we are showing the
     // hint text
     QString sheet = QLatin1String("QLineEdit{ padding-");
+
     sheet += sideToStyleSheetString(side);
     sheet += QLatin1String(": ");
     sheet += QString::number(m_d->m_pixmap.width() + margin);
     sheet += QLatin1Char(';');
-    if (m_d->m_showingHintText)
+    if (m_d->m_showingHintText) {
         sheet += QLatin1String(" color: #BBBBBB;");
+    }
     sheet += QLatin1Char('}');
     setStyleSheet(sheet);
 }
@@ -190,9 +192,10 @@ void FancyLineEdit::setSide(Side side)
 
 FancyLineEdit::Side FancyLineEdit::side() const
 {
-    if (m_d->m_useLayoutDirection)
+    if (m_d->m_useLayoutDirection) {
         return qApp->layoutDirection() == Qt::LeftToRight ? Left : Right;
-    return  m_d->m_side;
+    }
+    return m_d->m_side;
 }
 
 void FancyLineEdit::resizeEvent(QResizeEvent *)
@@ -213,12 +216,12 @@ QPixmap FancyLineEdit::pixmap() const
 
 void FancyLineEdit::setMenu(QMenu *menu)
 {
-     m_d->m_menu = menu;
+    m_d->m_menu = menu;
 }
 
 QMenu *FancyLineEdit::menu() const
 {
-    return  m_d->m_menu;
+    return m_d->m_menu;
 }
 
 bool FancyLineEdit::useLayoutDirection() const
@@ -243,8 +246,9 @@ bool FancyLineEdit::hasMenuTabFocusTrigger() const
 
 void FancyLineEdit::setMenuTabFocusTrigger(bool v)
 {
-    if (m_d->m_menuTabFocusTrigger == v)
+    if (m_d->m_menuTabFocusTrigger == v) {
         return;
+    }
 
     m_d->m_menuTabFocusTrigger = v;
     m_d->m_menuLabel->setFocusPolicy(v ? Qt::TabFocus : Qt::NoFocus);
@@ -258,12 +262,14 @@ QString FancyLineEdit::hintText() const
 void FancyLineEdit::setHintText(const QString &ht)
 {
     // Updating magic to make the property work in Designer.
-    if (ht == m_d->m_hintText)
+    if (ht == m_d->m_hintText) {
         return;
+    }
     hideHintText();
     m_d->m_hintText = ht;
-    if (!hasFocus() && !ht.isEmpty())
+    if (!hasFocus() && !ht.isEmpty()) {
         showHintText();
+    }
 }
 
 void FancyLineEdit::showHintText()
@@ -307,5 +313,4 @@ QString FancyLineEdit::typedText() const
 {
     return m_d->m_showingHintText ? QString() : text();
 }
-
 } // namespace Utils

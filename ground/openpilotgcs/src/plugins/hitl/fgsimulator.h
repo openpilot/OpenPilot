@@ -7,7 +7,7 @@
  * @{
  * @addtogroup HITLPlugin HITL Plugin
  * @{
- * @brief The Hardware In The Loop plugin 
+ * @brief The Hardware In The Loop plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -31,40 +31,37 @@
 #include <QObject>
 #include "simulator.h"
 
-class FGSimulator: public Simulator
-{
+class FGSimulator : public Simulator {
     Q_OBJECT
 
 public:
-	FGSimulator(const SimulatorSettings& params);
-	~FGSimulator();
+    FGSimulator(const SimulatorSettings & params);
+    ~FGSimulator();
 
-	bool setupProcess();
-	void setupUdpPorts(const QString& host, int inPort, int outPort);
+    bool setupProcess();
+    void setupUdpPorts(const QString & host, int inPort, int outPort);
 
 private slots:
     void transmitUpdate();
-	void processReadyRead();
+    void processReadyRead();
 
 private:
 
-    int udpCounterGCSsend; //keeps track of udp packets sent to FG
-    int udpCounterFGrecv; //keeps track of udp packets received by FG
+    int udpCounterGCSsend; // keeps track of udp packets sent to FG
+    int udpCounterFGrecv; // keeps track of udp packets received by FG
 
-	void processUpdate(const QByteArray& data);
+    void processUpdate(const QByteArray & data);
 };
 
-class FGSimulatorCreator : public SimulatorCreator
-{
+class FGSimulatorCreator : public SimulatorCreator {
 public:
-	FGSimulatorCreator(const QString& classId, const QString& description)
-	:  SimulatorCreator (classId,description)
-	{}
+    FGSimulatorCreator(const QString & classId, const QString & description)
+        :  SimulatorCreator(classId, description)
+    {}
 
-	Simulator* createSimulator(const SimulatorSettings& params)
-	{
-		return new FGSimulator(params);
-	}
-
+    Simulator *createSimulator(const SimulatorSettings & params)
+    {
+        return new FGSimulator(params);
+    }
 };
 #endif // FGSIMULATOR_H

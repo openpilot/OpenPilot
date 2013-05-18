@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    UAVObjectsTest* test = new UAVObjectsTest();
+    UAVObjectsTest *test = new UAVObjectsTest();
 
     return a.exec();
 }

@@ -39,17 +39,16 @@
 
 
 UploaderGadgetOptionsPage::UploaderGadgetOptionsPage(UploaderGadgetConfiguration *config, QObject *parent) :
-        IOptionsPage(parent),
-        m_config(config)
-{
-}
+    IOptionsPage(parent),
+    m_config(config)
+{}
 
-//creates options page widget
+// creates options page widget
 QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
 {
     Q_UNUSED(parent);
 
-    //main widget
+    // main widget
     QWidget *widget = new QWidget;
 
     return widget;
@@ -61,13 +60,7 @@ QWidget *UploaderGadgetOptionsPage::createPage(QWidget *parent)
  *
  */
 void UploaderGadgetOptionsPage::apply()
-{
-
-}
+{}
 
 void UploaderGadgetOptionsPage::finish()
-{
-
-}
-
-
+{}

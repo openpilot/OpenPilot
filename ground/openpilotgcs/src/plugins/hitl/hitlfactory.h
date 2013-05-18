@@ -7,7 +7,7 @@
  * @{
  * @addtogroup HITLPlugin HITL Plugin
  * @{
- * @brief The Hardware In The Loop plugin 
+ * @brief The Hardware In The Loop plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -37,15 +37,14 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class HITLFactory : public Core::IUAVGadgetFactory
-{
+class HITLFactory : public Core::IUAVGadgetFactory {
     Q_OBJECT
 public:
     HITLFactory(QObject *parent = 0);
     ~HITLFactory();
 
-	IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    IUAVGadget *createGadget(QWidget *parent);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 

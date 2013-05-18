@@ -1,12 +1,12 @@
 /********************************************************************************
-* @file       osgearthviewgadgetoptions.cpp
-* @author     The OpenPilot Team Copyright (C) 2012.
-* @addtogroup GCSPlugins GCS Plugins
-* @{
-* @addtogroup OsgEarthview Plugin
-* @{
-* @brief Osg Earth view of UAV
-*****************************************************************************/
+ * @file       osgearthviewgadgetoptions.cpp
+ * @author     The OpenPilot Team Copyright (C) 2012.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup OsgEarthview Plugin
+ * @{
+ * @brief Osg Earth view of UAV
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,19 +36,17 @@
 #include <QStringList>
 
 OsgEarthviewGadgetOptionsPage::OsgEarthviewGadgetOptionsPage(OsgEarthviewGadgetConfiguration *config, QObject *parent) :
-        IOptionsPage(parent),
-        m_config(config)
-{
-}
+    IOptionsPage(parent),
+    m_config(config)
+{}
 
-//creates options page widget (uses the UI file)
+// creates options page widget (uses the UI file)
 QWidget *OsgEarthviewGadgetOptionsPage::createPage(QWidget *parent)
 {
-
     options_page = new Ui::OsgEarthviewGadgetOptionsPage();
-    //main widget
+    // main widget
     QWidget *optionsPageWidget = new QWidget;
-    //main layout
+    // main layout
     options_page->setupUi(optionsPageWidget);
 
     return optionsPageWidget;
@@ -61,11 +59,8 @@ QWidget *OsgEarthviewGadgetOptionsPage::createPage(QWidget *parent)
  *
  */
 void OsgEarthviewGadgetOptionsPage::apply()
-{
-}
-
+{}
 
 
 void OsgEarthviewGadgetOptionsPage::finish()
-{
-}
+{}

@@ -46,14 +46,13 @@ class IUAVGadgetConfiguration;
 class GCSControlGadgetConfiguration;
 
 namespace Ui {
-    class GCSControlGadgetOptionsPage;
+class GCSControlGadgetOptionsPage;
 }
 
 using namespace Core;
 
-class GCSControlGadgetOptionsPage : public IOptionsPage
-{
-Q_OBJECT
+class GCSControlGadgetOptionsPage : public IOptionsPage {
+    Q_OBJECT
 public:
     explicit GCSControlGadgetOptionsPage(GCSControlGadgetConfiguration *config, QObject *parent = 0);
     ~GCSControlGadgetOptionsPage();
@@ -67,12 +66,12 @@ private:
     GCSControlGadgetConfiguration *m_config;
     SDLGamepad *sdlGamepad;
 
-    QList<QComboBox*> chList;
-    QList<QCheckBox*> chRevList;
-    QList<QComboBox*> buttonFunctionList;
-    QList<QComboBox*> buttonActionList;
-    QList<QDoubleSpinBox*> buttonValueList;
-    QList<QLabel*> buttonLabelList;
+    QList<QComboBox *> chList;
+    QList<QCheckBox *> chRevList;
+    QList<QComboBox *> buttonFunctionList;
+    QList<QComboBox *> buttonActionList;
+    QList<QDoubleSpinBox *> buttonValueList;
+    QList<QLabel *> buttonLabelList;
 
 protected slots:
     // signals from joystick
@@ -81,14 +80,38 @@ protected slots:
     void axesValues(QListInt16 values);
     void updateButtonFunction();
     void updateButtonAction(int controlID);
-    void updateButtonAction_0(void){updateButtonAction(0);};
-    void updateButtonAction_1(void){updateButtonAction(1);};
-    void updateButtonAction_2(void){updateButtonAction(2);};
-    void updateButtonAction_3(void){updateButtonAction(3);};
-    void updateButtonAction_4(void){updateButtonAction(4);};
-    void updateButtonAction_5(void){updateButtonAction(5);};
-    void updateButtonAction_6(void){updateButtonAction(6);};
-    void updateButtonAction_7(void){updateButtonAction(7);};
+    void updateButtonAction_0(void)
+    {
+        updateButtonAction(0);
+    };
+    void updateButtonAction_1(void)
+    {
+        updateButtonAction(1);
+    };
+    void updateButtonAction_2(void)
+    {
+        updateButtonAction(2);
+    };
+    void updateButtonAction_3(void)
+    {
+        updateButtonAction(3);
+    };
+    void updateButtonAction_4(void)
+    {
+        updateButtonAction(4);
+    };
+    void updateButtonAction_5(void)
+    {
+        updateButtonAction(5);
+    };
+    void updateButtonAction_6(void)
+    {
+        updateButtonAction(6);
+    };
+    void updateButtonAction_7(void)
+    {
+        updateButtonAction(7);
+    };
 };
 
 #endif // GCSCONTROLGADGETOPTIONSPAGE_H

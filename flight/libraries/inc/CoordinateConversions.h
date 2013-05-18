@@ -30,45 +30,45 @@
 #ifndef COORDINATECONVERSIONS_H_
 #define COORDINATECONVERSIONS_H_
 
-    // ****** convert Lat,Lon,Alt to ECEF  ************
+// ****** convert Lat,Lon,Alt to ECEF  ************
 void LLA2ECEF(float LLA[3], float ECEF[3]);
 
-    // ****** convert ECEF to Lat,Lon,Alt (ITERATIVE!) *********
+// ****** convert ECEF to Lat,Lon,Alt (ITERATIVE!) *********
 uint16_t ECEF2LLA(float ECEF[3], float LLA[3]);
 
 void RneFromLLA(float LLA[3], float Rne[3][3]);
 
-    // ****** find rotation matrix from rotation vector
+// ****** find rotation matrix from rotation vector
 void Rv2Rot(float Rv[3], float R[3][3]);
 
-	// ****** find roll, pitch, yaw from quaternion ********
+// ****** find roll, pitch, yaw from quaternion ********
 void Quaternion2RPY(const float q[4], float rpy[3]);
 
-	// ****** find quaternion from roll, pitch, yaw ********
+// ****** find quaternion from roll, pitch, yaw ********
 void RPY2Quaternion(const float rpy[3], float q[4]);
 
-	//** Find Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
+// ** Find Rbe, that rotates a vector from earth fixed to body frame, from quaternion **
 void Quaternion2R(float q[4], float Rbe[3][3]);
 
-	// ****** Express LLA in a local NED Base Frame ********
+// ****** Express LLA in a local NED Base Frame ********
 void LLA2Base(float LLA[3], float BaseECEF[3], float Rne[3][3], float NED[3]);
 
-	// ****** Express ECEF in a local NED Base Frame ********
+// ****** Express ECEF in a local NED Base Frame ********
 void ECEF2Base(float ECEF[3], float BaseECEF[3], float Rne[3][3], float NED[3]);
 
-	// ****** convert Rotation Matrix to Quaternion ********
-	// ****** if R converts from e to b, q is rotation from e to b ****
+// ****** convert Rotation Matrix to Quaternion ********
+// ****** if R converts from e to b, q is rotation from e to b ****
 void R2Quaternion(float R[3][3], float q[4]);
 
-	// ****** Rotation Matrix from Two Vector Directions ********
-	// ****** given two vector directions (v1 and v2) known in two frames (b and e) find Rbe ***
-	// ****** solution is approximate if can't be exact ***
+// ****** Rotation Matrix from Two Vector Directions ********
+// ****** given two vector directions (v1 and v2) known in two frames (b and e) find Rbe ***
+// ****** solution is approximate if can't be exact ***
 uint8_t RotFrom2Vectors(const float v1b[3], const float v1e[3], const float v2b[3], const float v2e[3], float Rbe[3][3]);
 
-	// ****** Vector Cross Product ********
+// ****** Vector Cross Product ********
 void CrossProduct(const float v1[3], const float v2[3], float result[3]);
 
-	// ****** Vector Magnitude ********
+// ****** Vector Magnitude ********
 float VectorMagnitude(const float v[3]);
 
 void quat_inverse(float q[4]);

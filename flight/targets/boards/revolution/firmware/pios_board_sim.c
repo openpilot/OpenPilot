@@ -7,19 +7,19 @@
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -39,30 +39,28 @@
 #include <magnetometer.h>
 #include <manualcontrolsettings.h>
 
-void Stack_Change() {
-}
+void Stack_Change() {}
 
-void Stack_Change_Weak() {
-}
+void Stack_Change_Weak() {}
 
 
 const struct pios_tcp_cfg pios_tcp_telem_cfg = {
-  .ip = "0.0.0.0",
-  .port = 9001,
+    .ip   = "0.0.0.0",
+    .port = 9001,
 };
 
 const struct pios_udp_cfg pios_udp_telem_cfg = {
-	.ip = "0.0.0.0",
-	.port = 9001,
+    .ip   = "0.0.0.0",
+    .port = 9001,
 };
 
 const struct pios_tcp_cfg pios_tcp_gps_cfg = {
-  .ip = "0.0.0.0",
-  .port = 9001,
+    .ip   = "0.0.0.0",
+    .port = 9001,
 };
 const struct pios_tcp_cfg pios_tcp_debug_cfg = {
-  .ip = "0.0.0.0",
-  .port = 9002,
+    .ip   = "0.0.0.0",
+    .port = 9002,
 };
 
 #ifdef PIOS_COM_AUX
@@ -70,42 +68,42 @@ const struct pios_tcp_cfg pios_tcp_debug_cfg = {
  * AUX USART
  */
 const struct pios_tcp_cfg pios_tcp_aux_cfg = {
-  .ip = "0.0.0.0",
-  .port = 9003,
+    .ip   = "0.0.0.0",
+    .port = 9003,
 };
 #endif
 
 #define PIOS_COM_TELEM_RF_RX_BUF_LEN 192
 #define PIOS_COM_TELEM_RF_TX_BUF_LEN 192
-#define PIOS_COM_GPS_RX_BUF_LEN 96
+#define PIOS_COM_GPS_RX_BUF_LEN      96
 
 /*
  * Board specific number of devices.
  */
 /*
-struct pios_udp_dev pios_udp_devs[] = {
-#define PIOS_UDP_TELEM  0
-  {
+   struct pios_udp_dev pios_udp_devs[] = {
+   #define PIOS_UDP_TELEM  0
+   {
     .cfg = &pios_udp0_cfg,
-  },
-#define PIOS_UDP_GPS    1
-  {
+   },
+   #define PIOS_UDP_GPS    1
+   {
     .cfg = &pios_udp1_cfg,
-  },
-#define PIOS_UDP_LOCAL    2
-  {
+   },
+   #define PIOS_UDP_LOCAL    2
+   {
     .cfg = &pios_udp2_cfg,
-  },
-#ifdef PIOS_COM_AUX
-#define PIOS_UDP_AUX    3
-  {
+   },
+   #ifdef PIOS_COM_AUX
+   #define PIOS_UDP_AUX    3
+   {
     .cfg = &pios_udp3_cfg,
-  },
-#endif
-};
+   },
+   #endif
+   };
 
-uint8_t pios_udp_num_devices = NELEMENTS(pios_udp_devs);
-*/
+   uint8_t pios_udp_num_devices = NELEMENTS(pios_udp_devs);
+ */
 /*
  * COM devices
  */
@@ -129,102 +127,101 @@ uint32_t pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_NONE];
  * initializes all the core systems on this specific hardware
  * called from System/openpilot.c
  */
-void PIOS_Board_Init(void) {
+void PIOS_Board_Init(void)
+{
+    /* Delay system */
+    PIOS_DELAY_Init();
 
-	/* Delay system */
-	PIOS_DELAY_Init();
+    /* Initialize UAVObject libraries */
+    EventDispatcherInitialize();
+    UAVObjInitialize();
+    UAVObjectsInitializeAll();
 
-	/* Initialize UAVObject libraries */
-	EventDispatcherInitialize();
-	UAVObjInitialize();
-	UAVObjectsInitializeAll();
+    AccelsInitialize();
+    BaroAltitudeInitialize();
+    MagnetometerInitialize();
+    GPSPositionInitialize();
+    GyrosInitialize();
+    GyrosBiasInitialize();
 
-	AccelsInitialize();
-	BaroAltitudeInitialize();
-	MagnetometerInitialize();
-	GPSPositionInitialize();
-	GyrosInitialize();
-	GyrosBiasInitialize();
+    /* Initialize the alarms library */
+    AlarmsInitialize();
 
-	/* Initialize the alarms library */
-	AlarmsInitialize();
+    /* Initialize the task monitor */
+    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
+        PIOS_Assert(0);
+    }
 
-	/* Initialize the task monitor */
-	if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
-		PIOS_Assert(0);
-	}
-
-	/* Initialize the delayed callback library */
-	CallbackSchedulerInitialize();
+    /* Initialize the delayed callback library */
+    CallbackSchedulerInitialize();
 
 #if defined(PIOS_INCLUDE_COM)
 #if defined(PIOS_INCLUDE_TELEMETRY_RF) && 1
-	{
-		uint32_t pios_tcp_telem_rf_id;
-		if (PIOS_TCP_Init(&pios_tcp_telem_rf_id, &pios_tcp_telem_cfg)) {
-			PIOS_Assert(0);
-		}
+    {
+        uint32_t pios_tcp_telem_rf_id;
+        if (PIOS_TCP_Init(&pios_tcp_telem_rf_id, &pios_tcp_telem_cfg)) {
+            PIOS_Assert(0);
+        }
 
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_tcp_com_driver, pios_tcp_telem_rf_id,
-						  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
-						  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
-			PIOS_Assert(0);
-		}
-	}
+        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+        PIOS_Assert(rx_buffer);
+        PIOS_Assert(tx_buffer);
+        if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_tcp_com_driver, pios_tcp_telem_rf_id,
+                          rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
+                          tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
+            PIOS_Assert(0);
+        }
+    }
 #endif /* PIOS_INCLUDE_TELEMETRY_RF */
 
 #if defined(PIOS_INCLUDE_TELEMETRY_RF) && 0
-	{
-		uint32_t pios_udp_telem_rf_id;
-		if (PIOS_UDP_Init(&pios_udp_telem_rf_id, &pios_udp_telem_cfg)) {
-			PIOS_Assert(0);
-		}
-		
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
-		uint8_t * tx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		PIOS_Assert(tx_buffer);
-		if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_udp_com_driver, pios_udp_telem_rf_id,
-						  rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
-						  tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
-			PIOS_Assert(0);
-		}
-	}
+    {
+        uint32_t pios_udp_telem_rf_id;
+        if (PIOS_UDP_Init(&pios_udp_telem_rf_id, &pios_udp_telem_cfg)) {
+            PIOS_Assert(0);
+        }
+
+        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RF_RX_BUF_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RF_TX_BUF_LEN);
+        PIOS_Assert(rx_buffer);
+        PIOS_Assert(tx_buffer);
+        if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_udp_com_driver, pios_udp_telem_rf_id,
+                          rx_buffer, PIOS_COM_TELEM_RF_RX_BUF_LEN,
+                          tx_buffer, PIOS_COM_TELEM_RF_TX_BUF_LEN)) {
+            PIOS_Assert(0);
+        }
+    }
 #endif /* PIOS_INCLUDE_TELEMETRY_RF */
 
 
 #if defined(PIOS_INCLUDE_GPS)
-	{
-		uint32_t pios_tcp_gps_id;
-		if (PIOS_TCP_Init(&pios_tcp_gps_id, &pios_tcp_gps_cfg)) {
-			PIOS_Assert(0);
-		}
-		uint8_t * rx_buffer = (uint8_t *) pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
-		PIOS_Assert(rx_buffer);
-		if (PIOS_COM_Init(&pios_com_gps_id, &pios_tcp_com_driver, pios_tcp_gps_id,
-				  rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
-				  NULL, 0)) {
-			PIOS_Assert(0);
-		}
-	}
-#endif	/* PIOS_INCLUDE_GPS */
-#endif
+    {
+        uint32_t pios_tcp_gps_id;
+        if (PIOS_TCP_Init(&pios_tcp_gps_id, &pios_tcp_gps_cfg)) {
+            PIOS_Assert(0);
+        }
+        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_GPS_RX_BUF_LEN);
+        PIOS_Assert(rx_buffer);
+        if (PIOS_COM_Init(&pios_com_gps_id, &pios_tcp_com_driver, pios_tcp_gps_id,
+                          rx_buffer, PIOS_COM_GPS_RX_BUF_LEN,
+                          NULL, 0)) {
+            PIOS_Assert(0);
+        }
+    }
+#endif /* PIOS_INCLUDE_GPS */
+#endif /* if defined(PIOS_INCLUDE_COM) */
 
 #if defined(PIOS_INCLUDE_GCSRCVR)
-	GCSReceiverInitialize();
-	uint32_t pios_gcsrcvr_id;
-	PIOS_GCSRCVR_Init(&pios_gcsrcvr_id);
-	uint32_t pios_gcsrcvr_rcvr_id;
-	if (PIOS_RCVR_Init(&pios_gcsrcvr_rcvr_id, &pios_gcsrcvr_rcvr_driver, pios_gcsrcvr_id)) {
-		PIOS_Assert(0);
-	}
-	pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
-#endif	/* PIOS_INCLUDE_GCSRCVR */
-
+    GCSReceiverInitialize();
+    uint32_t pios_gcsrcvr_id;
+    PIOS_GCSRCVR_Init(&pios_gcsrcvr_id);
+    uint32_t pios_gcsrcvr_rcvr_id;
+    if (PIOS_RCVR_Init(&pios_gcsrcvr_rcvr_id, &pios_gcsrcvr_rcvr_driver, pios_gcsrcvr_id)) {
+        PIOS_Assert(0);
+    }
+    pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
+#endif /* PIOS_INCLUDE_GCSRCVR */
 }
 
 /**

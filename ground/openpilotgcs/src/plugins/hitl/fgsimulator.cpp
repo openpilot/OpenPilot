@@ -31,25 +31,25 @@
 #include "coreplugin/threadmanager.h"
 
 #ifndef M_PI
-#define M_PI           3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
-//FGSimulator::FGSimulator(QString hostAddr, int outPort, int inPort, bool manual, QString binPath, QString dataPath) :
-//		Simulator(hostAddr, outPort, inPort,  manual, binPath, dataPath),
-//		fgProcess(NULL)
-//{
-//	// Note: Only tested on windows 7
-//#if defined(Q_WS_WIN)
-//	cmdShell = QString("c:/windows/system32/cmd.exe");
-//#else
-//	cmdShell = QString("bash");
-//#endif
-//}
+// FGSimulator::FGSimulator(QString hostAddr, int outPort, int inPort, bool manual, QString binPath, QString dataPath) :
+// Simulator(hostAddr, outPort, inPort,  manual, binPath, dataPath),
+// fgProcess(NULL)
+// {
+//// Note: Only tested on windows 7
+// #if defined(Q_WS_WIN)
+// cmdShell = QString("c:/windows/system32/cmd.exe");
+// #else
+// cmdShell = QString("bash");
+// #endif
+// }
 
-FGSimulator::FGSimulator(const SimulatorSettings& params) :
+FGSimulator::FGSimulator(const SimulatorSettings & params) :
     Simulator(params)
 {
-    udpCounterFGrecv = 0;
+    udpCounterFGrecv  = 0;
     udpCounterGCSsend = 0;
 }
 
@@ -58,14 +58,15 @@ FGSimulator::~FGSimulator()
     disconnect(simProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(processReadyRead()));
 }
 
-void FGSimulator::setupUdpPorts(const QString& host, int inPort, int outPort)
+void FGSimulator::setupUdpPorts(const QString & host, int inPort, int outPort)
 {
     Q_UNUSED(outPort);
 
-    if(inSocket->bind(QHostAddress(host), inPort))
+    if (inSocket->bind(QHostAddress(host), inPort)) {
         emit processOutput("Successfully bound to address " + host + " on port " + QString::number(inPort) + "\n");
-    else
+    } else {
         emit processOutput("Cannot bind to address " + host + " on port " + QString::number(inPort) + "\n");
+    }
 }
 
 bool FGSimulator::setupProcess()
@@ -75,17 +76,18 @@ bool FGSimulator::setupProcess()
     // Copy FlightGear generic protocol configuration file to the FG protocol directory
     // NOTE: Not working on Windows 7, if FG is installed in the "Program Files",
     // likelly due to permissions. The file should be manually copied to data/Protocol/opfgprotocol.xml
-    //	QFile xmlFile(":/flightgear/genericprotocol/opfgprotocol.xml");
-    //	xmlFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    //	QString xml = xmlFile.readAll();
-    //	xmlFile.close();
-    //	QFile xmlFileOut(pathData + "/Protocol/opfgprotocol.xml");
-    //	xmlFileOut.open(QIODevice::WriteOnly | QIODevice::Text);
-    //	xmlFileOut.write(xml.toAscii());
-    //	xmlFileOut.close();
+    // QFile xmlFile(":/flightgear/genericprotocol/opfgprotocol.xml");
+    // xmlFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    // QString xml = xmlFile.readAll();
+    // xmlFile.close();
+    // QFile xmlFileOut(pathData + "/Protocol/opfgprotocol.xml");
+    // xmlFileOut.open(QIODevice::WriteOnly | QIODevice::Text);
+    // xmlFileOut.write(xml.toAscii());
+    // xmlFileOut.close();
 
     Qt::HANDLE mainThread = QThread::currentThreadId();
-    qDebug() << "setupProcess Thread: "<< mainThread;
+
+    qDebug() << "setupProcess Thread: " << mainThread;
 
     simProcess = new QProcess();
     simProcess->setReadChannelMode(QProcess::MergedChannels);
@@ -99,8 +101,7 @@ bool FGSimulator::setupProcess()
 
     // Start shell (Note: Could not start FG directly on Windows, only through terminal!)
     simProcess->start(cmdShell);
-    if (simProcess->waitForStarted() == false)
-    {
+    if (simProcess->waitForStarted() == false) {
         emit processOutput("Error:" + simProcess->errorString());
         return false;
     }
@@ -117,19 +118,15 @@ bool FGSimulator::setupProcess()
                  "--vc=100 " +
                  "--log-level=alert " +
                  "--generic=socket,out,20," + settings.hostAddress + "," + QString::number(settings.inPort) + ",udp,opfgprotocol");
-    if(settings.manualControlEnabled) // <--[BCH] What does this do? Why does it depend on ManualControl?
-    {
+    if (settings.manualControlEnabled) { // <--[BCH] What does this do? Why does it depend on ManualControl?
         args.append(" --generic=socket,in,400," + settings.remoteAddress + "," + QString::number(settings.outPort) + ",udp,opfgprotocol");
     }
 
     // Start FlightGear - only if checkbox is selected in HITL options page
-    if (settings.startSim)
-    {
+    if (settings.startSim) {
         QString cmd("\"" + settings.binPath + "\" " + args + "\n");
         simProcess->write(cmd.toAscii());
-    }
-    else
-    {
+    } else {
         emit processOutput("Start Flightgear from the command line with the following arguments: \n\n" + args + "\n\n" +
                            "You can optionally run Flightgear from a networked computer.\n" +
                            "Make sure the computer running Flightgear can can ping your local interface adapter. ie." + settings.hostAddress + "\n"
@@ -145,8 +142,8 @@ void FGSimulator::processReadyRead()
 {
     QByteArray bytes = simProcess->readAllStandardOutput();
     QString str(bytes);
-    if ( !str.contains("Error reading data") ) // ignore error
-    {
+
+    if (!str.contains("Error reading data")) { // ignore error
         emit processOutput(str);
     }
 }
@@ -154,140 +151,133 @@ void FGSimulator::processReadyRead()
 void FGSimulator::transmitUpdate()
 {
     ActuatorDesired::DataFields actData;
-    FlightStatus::DataFields flightStatusData = flightStatus->getData();
+    FlightStatus::DataFields flightStatusData    = flightStatus->getData();
     ManualControlCommand::DataFields manCtrlData = manCtrlCommand->getData();
     float ailerons = -1;
     float elevator = -1;
-    float rudder = -1;
+    float rudder   = -1;
     float throttle = -1;
 
-    if(flightStatusData.FlightMode == FlightStatus::FLIGHTMODE_MANUAL)
-    {
+    if (flightStatusData.FlightMode == FlightStatus::FLIGHTMODE_MANUAL) {
         // Read joystick input
-        if(flightStatusData.Armed == FlightStatus::ARMED_ARMED)
-        {
+        if (flightStatusData.Armed == FlightStatus::ARMED_ARMED) {
             // Note: Pitch sign is reversed in FG ?
             ailerons = manCtrlData.Roll;
             elevator = -manCtrlData.Pitch;
-            rudder = manCtrlData.Yaw;
+            rudder   = manCtrlData.Yaw;
             throttle = manCtrlData.Throttle;
         }
-    }
-    else
-    {
+    } else {
         // Read ActuatorDesired from autopilot
-        actData = actDesired->getData();
+        actData  = actDesired->getData();
 
         ailerons = actData.Roll;
         elevator = -actData.Pitch;
-        rudder = actData.Yaw;
+        rudder   = actData.Yaw;
         throttle = actData.Throttle;
     }
 
     int allowableDifference = 10;
 
-    //qDebug() << "UDP sent:" << udpCounterGCSsend << " - UDP Received:" << udpCounterFGrecv;
+    // qDebug() << "UDP sent:" << udpCounterGCSsend << " - UDP Received:" << udpCounterFGrecv;
 
-    if(udpCounterFGrecv == udpCounterGCSsend)
+    if (udpCounterFGrecv == udpCounterGCSsend) {
         udpCounterGCSsend = 0;
-    
-    if((udpCounterGCSsend < allowableDifference) || (udpCounterFGrecv==0) ) //FG udp queue is not delayed
-    {
+    }
+
+    if ((udpCounterGCSsend < allowableDifference) || (udpCounterFGrecv == 0)) { // FG udp queue is not delayed
         udpCounterGCSsend++;
 
         // Send update to FlightGear
         QString cmd;
         cmd = QString("%1,%2,%3,%4,%5\n")
-                .arg(ailerons) //ailerons
-                .arg(elevator) //elevator
-                .arg(rudder) //rudder
-                .arg(throttle) //throttle
-                .arg(udpCounterGCSsend); //UDP packet counter delay
+              .arg(ailerons) // ailerons
+              .arg(elevator) // elevator
+              .arg(rudder) // rudder
+              .arg(throttle) // throttle
+              .arg(udpCounterGCSsend); // UDP packet counter delay
 
         QByteArray data = cmd.toAscii();
 
-        if(outSocket->writeDatagram(data, QHostAddress(settings.remoteAddress), settings.outPort) == -1)
-        {
+        if (outSocket->writeDatagram(data, QHostAddress(settings.remoteAddress), settings.outPort) == -1) {
             emit processOutput("Error sending UDP packet to FG: " + outSocket->errorString() + "\n");
         }
-    }
-    else
-    {
+    } else {
         // don't send new packet. Flightgear cannot process UDP fast enough.
         // V1.9.1 reads udp packets at set frequency and will get delayed if packets are sent too fast
         // V2.0 does not currently work with --generic-protocol
     }
-    
-    if(settings.manualControlEnabled)
-    {
-        actData.Roll = ailerons;
-        actData.Pitch = -elevator;
-        actData.Yaw = rudder;
+
+    if (settings.manualControlEnabled) {
+        actData.Roll     = ailerons;
+        actData.Pitch    = -elevator;
+        actData.Yaw      = rudder;
         actData.Throttle = throttle;
-        //actData.NumLongUpdates = (float)udpCounterFGrecv;
-        //actData.UpdateTime = (float)udpCounterGCSsend;
+        // actData.NumLongUpdates = (float)udpCounterFGrecv;
+        // actData.UpdateTime = (float)udpCounterGCSsend;
         actDesired->setData(actData);
     }
 }
 
 
-void FGSimulator::processUpdate(const QByteArray& inp)
+void FGSimulator::processUpdate(const QByteArray & inp)
 {
-    //TODO: this does not use the FLIGHT_PARAM structure, it should!
+    // TODO: this does not use the FLIGHT_PARAM structure, it should!
     // Split
     QString data(inp);
     QStringList fields = data.split(",");
     // Get xRate (deg/s)
-    //        float xRate = fields[0].toFloat() * 180.0/M_PI;
+    // float xRate = fields[0].toFloat() * 180.0/M_PI;
     // Get yRate (deg/s)
-    //        float yRate = fields[1].toFloat() * 180.0/M_PI;
+    // float yRate = fields[1].toFloat() * 180.0/M_PI;
     // Get zRate (deg/s)
-    //        float zRate = fields[2].toFloat() * 180.0/M_PI;
+    // float zRate = fields[2].toFloat() * 180.0/M_PI;
     // Get xAccel (m/s^2)
-    float xAccel = fields[3].toFloat() * FT2M;
+    float xAccel    = fields[3].toFloat() * FT2M;
     // Get yAccel (m/s^2)
-    float yAccel = fields[4].toFloat() * FT2M;
+    float yAccel    = fields[4].toFloat() * FT2M;
     // Get xAccel (m/s^2)
-    float zAccel = fields[5].toFloat() * FT2M;
+    float zAccel    = fields[5].toFloat() * FT2M;
     // Get pitch (deg)
-    float pitch = fields[6].toFloat();
+    float pitch     = fields[6].toFloat();
     // Get pitchRate (deg/s)
     float pitchRate = fields[7].toFloat();
     // Get roll (deg)
-    float roll = fields[8].toFloat();
+    float roll     = fields[8].toFloat();
     // Get rollRate (deg/s)
     float rollRate = fields[9].toFloat();
     // Get yaw (deg)
-    float yaw = fields[10].toFloat();
+    float yaw          = fields[10].toFloat();
     // Get yawRate (deg/s)
-    float yawRate = fields[11].toFloat();
+    float yawRate      = fields[11].toFloat();
     // Get latitude (deg)
-    float latitude = fields[12].toFloat();
+    float latitude     = fields[12].toFloat();
     // Get longitude (deg)
-    float longitude = fields[13].toFloat();
+    float longitude    = fields[13].toFloat();
     // Get heading (deg)
-    float heading = fields[14].toFloat();
+    float heading      = fields[14].toFloat();
     // Get altitude (m)
     float altitude_msl = fields[15].toFloat() * FT2M;
     // Get altitudeAGL (m)
     float altitude_agl = fields[16].toFloat() * FT2M;
     // Get groundspeed (m/s)
-    float groundspeed = fields[17].toFloat() * KT2MPS;
+    float groundspeed  = fields[17].toFloat() * KT2MPS;
     // Get airspeed (m/s)
-    float airspeed = fields[18].toFloat() * KT2MPS;
+    float airspeed     = fields[18].toFloat() * KT2MPS;
     // Get temperature (degC)
-    float temperature = fields[19].toFloat();
+    float temperature  = fields[19].toFloat();
     // Get pressure (kpa)
-    float pressure = fields[20].toFloat() * INHG2KPA;
+    float pressure     = fields[20].toFloat() * INHG2KPA;
     // Get VelocityActual Down (cm/s)
-    float velocityActualDown = - fields[21].toFloat() * FPS2CMPS;
+    float velocityActualDown  = -fields[21].toFloat() * FPS2CMPS;
     // Get VelocityActual East (cm/s)
-    float velocityActualEast = fields[22].toFloat() * FPS2CMPS;
+    float velocityActualEast  = fields[22].toFloat() * FPS2CMPS;
     // Get VelocityActual Down (cm/s)
     float velocityActualNorth = fields[23].toFloat() * FPS2CMPS;
 
     // Get UDP packets received by FG
     int n = fields[24].toInt();
+
     udpCounterFGrecv = n;
 
     ///////
@@ -299,18 +289,18 @@ void FGSimulator::processUpdate(const QByteArray& inp)
     float NED[3];
     // convert from cm back to meters
 
-    double LLA[3] = {latitude, longitude, altitude_msl};
+    double LLA[3] = { latitude, longitude, altitude_msl };
     double ECEF[3];
     double RNE[9];
-    Utils::CoordinateConversions().RneFromLLA(LLA,(double (*)[3])RNE);
-    Utils::CoordinateConversions().LLA2ECEF(LLA,ECEF);
-    Utils::CoordinateConversions().LLA2Base(LLA, ECEF, (float (*)[3]) RNE, NED);
+    Utils::CoordinateConversions().RneFromLLA(LLA, (double(*)[3])RNE);
+    Utils::CoordinateConversions().LLA2ECEF(LLA, ECEF);
+    Utils::CoordinateConversions().LLA2Base(LLA, ECEF, (float(*)[3])RNE, NED);
 
 
     // Update GPS Position objects
-    out.latitude = latitude * 1e7;
-    out.longitude = longitude * 1e7;
-    out.altitude = altitude_msl;
+    out.latitude    = latitude * 1e7;
+    out.longitude   = longitude * 1e7;
+    out.altitude    = altitude_msl;
     out.agl = altitude_agl;
     out.groundspeed = groundspeed;
 
@@ -319,32 +309,31 @@ void FGSimulator::processUpdate(const QByteArray& inp)
 
     // Update BaroAltitude object
     out.temperature = temperature;
-    out.pressure = pressure;
+    out.pressure    = pressure;
 
     // Update attActual object
-    out.roll = roll;       //roll;
-    out.pitch = pitch;     // pitch
-    out.heading = yaw; // yaw
+    out.roll      = roll;       // roll;
+    out.pitch     = pitch;     // pitch
+    out.heading   = yaw; // yaw
 
-    out.dstN= NED[0];
-    out.dstE= NED[1];
-    out.dstD= NED[2];
+    out.dstN      = NED[0];
+    out.dstE      = NED[1];
+    out.dstD      = NED[2];
 
     // Update VelocityActual.{North,East,Down}
-    out.velNorth = velocityActualNorth;
-    out.velEast = velocityActualEast;
-    out.velDown = velocityActualDown;
+    out.velNorth  = velocityActualNorth;
+    out.velEast   = velocityActualEast;
+    out.velDown   = velocityActualDown;
 
-    //Update gyroscope sensor data
-    out.rollRate = rollRate;
+    // Update gyroscope sensor data
+    out.rollRate  = rollRate;
     out.pitchRate = pitchRate;
-    out.yawRate = yawRate;
+    out.yawRate   = yawRate;
 
-    //Update accelerometer sensor data
-    out.accX = xAccel;
-    out.accY = yAccel;
-    out.accZ = -zAccel;
+    // Update accelerometer sensor data
+    out.accX      = xAccel;
+    out.accY      = yAccel;
+    out.accZ      = -zAccel;
 
     updateUAVOs(out);
 }
-

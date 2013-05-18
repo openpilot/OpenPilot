@@ -42,23 +42,22 @@ LoggingGadgetWidget::LoggingGadgetWidget(QWidget *parent) : QLabel(parent)
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     scpPlugin = pm->getObject<ScopeGadgetFactory>();
-
 }
 
 LoggingGadgetWidget::~LoggingGadgetWidget()
 {
-   // Do nothing
+    // Do nothing
 }
 
-void LoggingGadgetWidget::setPlugin(LoggingPlugin * p)
+void LoggingGadgetWidget::setPlugin(LoggingPlugin *p)
 {
     loggingPlugin = p;
-    connect(p,SIGNAL(stateChanged(QString)),this,SLOT(stateChanged(QString)));
-    connect(m_logging->playButton,SIGNAL(clicked()),p->getLogfile(),SLOT(resumeReplay()));
+    connect(p, SIGNAL(stateChanged(QString)), this, SLOT(stateChanged(QString)));
+    connect(m_logging->playButton, SIGNAL(clicked()), p->getLogfile(), SLOT(resumeReplay()));
     connect(m_logging->playButton, SIGNAL(clicked()), scpPlugin, SLOT(startPlotting()));
-    connect(m_logging->pauseButton,SIGNAL(clicked()),p->getLogfile(),SLOT(pauseReplay()));
+    connect(m_logging->pauseButton, SIGNAL(clicked()), p->getLogfile(), SLOT(pauseReplay()));
     connect(m_logging->pauseButton, SIGNAL(clicked()), scpPlugin, SLOT(stopPlotting()));
-    connect(m_logging->playbackSpeed,SIGNAL(valueChanged(double)),p->getLogfile(),SLOT(setReplaySpeed(double)));
+    connect(m_logging->playbackSpeed, SIGNAL(valueChanged(double)), p->getLogfile(), SLOT(setReplaySpeed(double)));
     void pauseReplay();
     void resumeReplay();
 }
@@ -70,6 +69,6 @@ void LoggingGadgetWidget::stateChanged(QString status)
 }
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

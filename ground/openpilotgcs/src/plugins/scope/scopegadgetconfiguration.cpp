@@ -55,16 +55,16 @@ ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, QSettings *q
             qSettings->beginGroup(QString("plotCurve") + QString().number(plotDatasLoadIndex));
 
             PlotCurveConfiguration *plotCurveConf = new PlotCurveConfiguration();
-            plotCurveConf->uavObject = qSettings->value("uavObject").toString();
-            plotCurveConf->uavField = qSettings->value("uavField").toString();
-            plotCurveConf->color = qSettings->value("color").value<QRgb>();
-            plotCurveConf->yScalePower  = qSettings->value("yScalePower").toInt();
-            plotCurveConf->mathFunction = qSettings->value("mathFunction").toString();
-            plotCurveConf->yMeanSamples = qSettings->value("yMeanSamples", 1).toInt();
-            plotCurveConf->yMeanSamples = qSettings->value("yMeanSamples", 1).toInt();
+            plotCurveConf->uavObject       = qSettings->value("uavObject").toString();
+            plotCurveConf->uavField        = qSettings->value("uavField").toString();
+            plotCurveConf->color           = qSettings->value("color").value<QRgb>();
+            plotCurveConf->yScalePower     = qSettings->value("yScalePower").toInt();
+            plotCurveConf->mathFunction    = qSettings->value("mathFunction").toString();
+            plotCurveConf->yMeanSamples    = qSettings->value("yMeanSamples", 1).toInt();
+            plotCurveConf->yMeanSamples    = qSettings->value("yMeanSamples", 1).toInt();
             plotCurveConf->drawAntialiased = qSettings->value("drawAntialiased", true).toBool();
-            plotCurveConf->yMinimum = qSettings->value("yMinimum").toDouble();
-            plotCurveConf->yMaximum = qSettings->value("yMaximum").toDouble();
+            plotCurveConf->yMinimum        = qSettings->value("yMinimum").toDouble();
+            plotCurveConf->yMaximum        = qSettings->value("yMaximum").toDouble();
             m_plotCurveConfigs.append(plotCurveConf);
 
             qSettings->endGroup();
@@ -72,7 +72,7 @@ ScopeGadgetConfiguration::ScopeGadgetConfiguration(QString classId, QSettings *q
 
         m_loggingEnabled = qSettings->value("LoggingEnabled").toBool();
         m_loggingNewFileOnConnect = qSettings->value("LoggingNewFileOnConnect").toBool();
-        m_loggingPath = qSettings->value("LoggingPath").toString();
+        m_loggingPath    = qSettings->value("LoggingPath").toString();
     }
 }
 
@@ -109,15 +109,15 @@ IUAVGadgetConfiguration *ScopeGadgetConfiguration::clone()
         PlotCurveConfiguration *currentPlotCurveConf = m_plotCurveConfigs.at(plotDatasLoadIndex);
 
         PlotCurveConfiguration *newPlotCurveConf     = new PlotCurveConfiguration();
-        newPlotCurveConf->uavObject    = currentPlotCurveConf->uavObject;
-        newPlotCurveConf->uavField     = currentPlotCurveConf->uavField;
-        newPlotCurveConf->color        = currentPlotCurveConf->color;
-        newPlotCurveConf->yScalePower  = currentPlotCurveConf->yScalePower;
-        newPlotCurveConf->yMeanSamples = currentPlotCurveConf->yMeanSamples;
-        newPlotCurveConf->mathFunction = currentPlotCurveConf->mathFunction;
+        newPlotCurveConf->uavObject       = currentPlotCurveConf->uavObject;
+        newPlotCurveConf->uavField        = currentPlotCurveConf->uavField;
+        newPlotCurveConf->color           = currentPlotCurveConf->color;
+        newPlotCurveConf->yScalePower     = currentPlotCurveConf->yScalePower;
+        newPlotCurveConf->yMeanSamples    = currentPlotCurveConf->yMeanSamples;
+        newPlotCurveConf->mathFunction    = currentPlotCurveConf->mathFunction;
         newPlotCurveConf->drawAntialiased = currentPlotCurveConf->drawAntialiased;
-        newPlotCurveConf->yMinimum     = currentPlotCurveConf->yMinimum;
-        newPlotCurveConf->yMaximum     = currentPlotCurveConf->yMaximum;
+        newPlotCurveConf->yMinimum        = currentPlotCurveConf->yMinimum;
+        newPlotCurveConf->yMaximum        = currentPlotCurveConf->yMaximum;
 
         m->addPlotCurveConfig(newPlotCurveConf);
     }

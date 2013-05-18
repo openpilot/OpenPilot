@@ -34,20 +34,18 @@
 #include <QStringList>
 
 SystemHealthGadgetOptionsPage::SystemHealthGadgetOptionsPage(SystemHealthGadgetConfiguration *config, QObject *parent) :
-        IOptionsPage(parent),
-        m_config(config)
-{
-}
+    IOptionsPage(parent),
+    m_config(config)
+{}
 
-//creates options page widget (uses the UI file)
+// creates options page widget (uses the UI file)
 QWidget *SystemHealthGadgetOptionsPage::createPage(QWidget *parent)
 {
-
     Q_UNUSED(parent);
     options_page = new Ui::SystemHealthGadgetOptionsPage();
-    //main widget
+    // main widget
     QWidget *optionsPageWidget = new QWidget;
-    //main layout
+    // main layout
     options_page->setupUi(optionsPageWidget);
 
     // Restore the contents from the settings:

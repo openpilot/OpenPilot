@@ -34,14 +34,13 @@ namespace Ui {
 class RevoCalibrationPage;
 }
 
-class RevoCalibrationPage : public AbstractWizardPage
-{
+class RevoCalibrationPage : public AbstractWizardPage {
     Q_OBJECT
-    
+
 public:
     explicit RevoCalibrationPage(SetupWizard *wizard, QWidget *parent = 0);
     ~RevoCalibrationPage();
-    
+
 private:
     Ui::RevoCalibrationPage *ui;
 };

@@ -28,30 +28,29 @@
 #ifndef HITLNOISEGENERATION_H
 #define HITLNOISEGENERATION_H
 
-//#include <QObject>
-//#include <simulator.h>
+// #include <QObject>
+// #include <simulator.h>
 #include "xplanesimulator.h"
 #include "hitlnoisegeneration.h"
 #include "extensionsystem/pluginmanager.h"
 #include <coreplugin/icore.h>
 #include <coreplugin/threadmanager.h>
 
-struct Noise{
+struct Noise {
     Accels::DataFields accelData;
     AttitudeActual::DataFields attActualData;
-    BaroAltitude::DataFields baroAltData;
+    BaroAltitude::DataFields   baroAltData;
     AirspeedActual::DataFields airspeedActual;
-    GPSPosition::DataFields gpsPosData;
-    GPSVelocity::DataFields gpsVelData;
+    GPSPosition::DataFields    gpsPosData;
+    GPSVelocity::DataFields    gpsVelData;
     Gyros::DataFields gyroData;
-    HomeLocation::DataFields homeData;
+    HomeLocation::DataFields   homeData;
     PositionActual::DataFields positionActualData;
     VelocityActual::DataFields velocityActualData;
 };
 
-class HitlNoiseGeneration
-{
-//	Q_OBJECT
+class HitlNoiseGeneration {
+// Q_OBJECT
 public:
     HitlNoiseGeneration();
     ~HitlNoiseGeneration();

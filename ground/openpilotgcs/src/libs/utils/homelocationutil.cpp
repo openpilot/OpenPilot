@@ -35,40 +35,45 @@
 #include "worldmagmodel.h"
 
 namespace Utils {
+HomeLocationUtil::HomeLocationUtil()
+{}
 
-    HomeLocationUtil::HomeLocationUtil()
-    {
+/**
+ * @brief Get local magnetic field
+ * @param[in] LLA The longitude-latitude-altitude coordinate to compute the magnetic field at
+ * @param[out] Be The resulting magnetic field at that location and time in [mGau](?)
+ * @returns 0 if successful, negative otherwise.
+ */
+int HomeLocationUtil::getDetails(double LLA[3], double Be[3])
+{
+    // *************
+    // check input parms
+
+    double latitude  = LLA[0];
+    double longitude = LLA[1];
+    double altitude  = LLA[2];
+
+    if (latitude != latitude) {
+        return -1; // prevent nan error
     }
-
-    /**
-     * @brief Get local magnetic field
-     * @param[in] LLA The longitude-latitude-altitude coordinate to compute the magnetic field at
-     * @param[out] Be The resulting magnetic field at that location and time in [mGau](?)
-     * @returns 0 if successful, negative otherwise.
-     */
-    int HomeLocationUtil::getDetails(double LLA[3], double Be[3])
-    {
-        // *************
-        // check input parms
-
-        double latitude = LLA[0];
-        double longitude = LLA[1];
-        double altitude = LLA[2];
-
-        if (latitude != latitude) return -1;				// prevent nan error
-        if (longitude != longitude) return -2;				// prevent nan error
-        if (altitude != altitude) return -3;				// prevent nan error
-
-        if (latitude < -90 || latitude > 90) return -4;		// range checking
-        if (longitude < -180 || longitude > 180) return -5;	// range checking
-
-        QDateTime dt = QDateTime::currentDateTime().toUTC();
-
-        // Fetch world magnetic model
-        int result = WorldMagModel().GetMagVector(LLA, dt.date().month(), dt.date().day(), dt.date().year(), Be);
-        Q_ASSERT(result == 0);
-
-        return result;
+    if (longitude != longitude) {
+        return -2; // prevent nan error
     }
+    if (altitude != altitude) {
+        return -3; // prevent nan error
+    }
+    if (latitude < -90 || latitude > 90) {
+        return -4; // range checking
+    }
+    if (longitude < -180 || longitude > 180) {
+        return -5; // range checking
+    }
+    QDateTime dt = QDateTime::currentDateTime().toUTC();
 
+    // Fetch world magnetic model
+    int result   = WorldMagModel().GetMagVector(LLA, dt.date().month(), dt.date().day(), dt.date().year(), Be);
+    Q_ASSERT(result == 0);
+
+    return result;
+}
 }

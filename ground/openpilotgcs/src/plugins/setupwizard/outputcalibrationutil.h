@@ -36,15 +36,14 @@
 #include "actuatorcommand.h"
 
 
-class OutputCalibrationUtil : public QObject
-{
+class OutputCalibrationUtil : public QObject {
     Q_OBJECT
 public:
     explicit OutputCalibrationUtil(QObject *parent = 0);
     ~OutputCalibrationUtil();
-    
+
 signals:
-    
+
 public slots:
     void startChannelOutput(quint16 channel, quint16 safeValue);
     void stopChannelOutput();

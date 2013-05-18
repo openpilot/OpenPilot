@@ -40,21 +40,20 @@
 #include "utils/mytabbedstackwidget.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 
-class ConfigGadgetWidget: public QWidget
-{
+class ConfigGadgetWidget : public QWidget {
     Q_OBJECT
-    QTextBrowser* help;
+    QTextBrowser *help;
 
 public:
     ConfigGadgetWidget(QWidget *parent = 0);
     ~ConfigGadgetWidget();
-    enum widgetTabs {hardware=0, aircraft, input, output, sensors, stabilization, camerastabilization, txpid, oplink};
+    enum widgetTabs { hardware = 0, aircraft, input, output, sensors, stabilization, camerastabilization, txpid, oplink };
     void startInputWizard();
 
 public slots:
     void onAutopilotConnect();
     void onAutopilotDisconnect();
-    void tabAboutToChange(int i,bool *);
+    void tabAboutToChange(int i, bool *);
     void updateOPLinkStatus(UAVObject *object);
     void onOPLinkDisconnect();
 
@@ -65,15 +64,15 @@ signals:
     void oplinkDisconnect();
 
 protected:
-        void resizeEvent(QResizeEvent * event);
-        MyTabbedStackWidget *ftw;
+    void resizeEvent(QResizeEvent *event);
+    MyTabbedStackWidget *ftw;
 
 private:
-	UAVDataObject* oplinkStatusObj;
+    UAVDataObject *oplinkStatusObj;
 
-	// A timer that timesout the connction to the OPLink.
-	QTimer *oplinkTimeout;
-	bool oplinkConnected;
+    // A timer that timesout the connction to the OPLink.
+    QTimer *oplinkTimeout;
+    bool oplinkConnected;
 };
 
 #endif // CONFIGGADGETWIDGET_H

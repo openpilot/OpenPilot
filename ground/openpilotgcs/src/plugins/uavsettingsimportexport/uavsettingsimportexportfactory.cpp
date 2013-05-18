@@ -52,19 +52,19 @@
 
 UAVSettingsImportExportFactory::~UAVSettingsImportExportFactory()
 {
-   // Do nothing
+    // Do nothing
 }
 
-UAVSettingsImportExportFactory::UAVSettingsImportExportFactory(QObject *parent):QObject(parent)
+UAVSettingsImportExportFactory::UAVSettingsImportExportFactory(QObject *parent) : QObject(parent)
 {
+    // Add Menu entry
+    Core::ActionManager *am   = Core::ICore::instance()->actionManager();
+    Core::ActionContainer *ac = am->actionContainer(Core::Constants::M_FILE);
+    Core::Command *cmd = am->registerAction(new QAction(this),
+                                            "UAVSettingsImportExportPlugin.UAVSettingsExport",
+                                            QList<int>() <<
+                                            Core::Constants::C_GLOBAL_ID);
 
-   // Add Menu entry
-   Core::ActionManager *am = Core::ICore::instance()->actionManager();
-   Core::ActionContainer *ac = am->actionContainer(Core::Constants::M_FILE);
-   Core::Command *cmd = am->registerAction(new QAction(this),
-                                           "UAVSettingsImportExportPlugin.UAVSettingsExport",
-                                           QList<int>() <<
-                                           Core::Constants::C_GLOBAL_ID);
     cmd->setDefaultKeySequence(QKeySequence("Ctrl+E"));
     cmd->action()->setText(tr("Export UAV Settings..."));
     ac->addAction(cmd, Core::Constants::G_FILE_SAVE);
@@ -79,7 +79,7 @@ UAVSettingsImportExportFactory::UAVSettingsImportExportFactory(QObject *parent):
     ac->addAction(cmd, Core::Constants::G_FILE_SAVE);
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(importUAVSettings()));
 
-    ac = am->actionContainer(Core::Constants::M_HELP);
+    ac  = am->actionContainer(Core::Constants::M_HELP);
     cmd = am->registerAction(new QAction(this),
                              "UAVSettingsImportExportPlugin.UAVDataExport",
                              QList<int>() <<
@@ -95,6 +95,7 @@ void UAVSettingsImportExportFactory::importUAVSettings()
     // ask for file name
     QString fileName;
     QString filters = tr("UAVObjects XML files (*.uav);; XML files (*.xml)");
+
     fileName = QFileDialog::getOpenFileName(0, tr("Import UAV Settings"), "", filters);
     if (fileName.isEmpty()) {
         return;
@@ -103,7 +104,7 @@ void UAVSettingsImportExportFactory::importUAVSettings()
     // Now open the file
     QFile file(fileName);
     QDomDocument doc("UAVObjects");
-    file.open(QFile::ReadOnly|QFile::Text);
+    file.open(QFile::ReadOnly | QFile::Text);
     if (!doc.setContent(file.readAll())) {
         QMessageBox msgBox;
         msgBox.setText(tr("File Parsing Failed."));
@@ -116,7 +117,7 @@ void UAVSettingsImportExportFactory::importUAVSettings()
 
     // find the root of settings subtree
     emit importAboutToBegin();
-    qDebug()<<"Import about to begin";
+    qDebug() << "Import about to begin";
 
     QDomElement root = doc.documentElement();
     if (root.tagName() == "uavobjects") {
@@ -133,7 +134,7 @@ void UAVSettingsImportExportFactory::importUAVSettings()
 
     // We are now ok: setup the import summary dialog & update it as we
     // go along.
-    ImportSummaryDialog swui((QWidget*)Core::ICore::instance()->mainWindow());
+    ImportSummaryDialog swui((QWidget *)Core::ICore::instance()->mainWindow());
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
@@ -143,24 +144,23 @@ void UAVSettingsImportExportFactory::importUAVSettings()
     while (!node.isNull()) {
         QDomElement e = node.toElement();
         if (e.tagName() == "object") {
-
-            //  - Read each object
-            QString uavObjectName  = e.attribute("name");
-            uint uavObjectID = e.attribute("id").toUInt(NULL,16);
+            // - Read each object
+            QString uavObjectName = e.attribute("name");
+            uint uavObjectID = e.attribute("id").toUInt(NULL, 16);
 
             // Sanity Check:
-            UAVObject *obj = objManager->getObject(uavObjectName);
+            UAVObject *obj   = objManager->getObject(uavObjectName);
             if (obj == NULL) {
                 // This object is unknown!
                 qDebug() << "Object unknown:" << uavObjectName << uavObjectID;
                 swui.addLine(uavObjectName, "Error (Object unknown)", false);
             } else {
-                //  - Update each field
-                //  - Issue and "updated" command
-                bool error = false;
-                bool setError = false;
+                // - Update each field
+                // - Issue and "updated" command
+                bool error     = false;
+                bool setError  = false;
                 QDomNode field = node.firstChild();
-                while(!field.isNull()) {
+                while (!field.isNull()) {
                     QDomElement f = field.toElement();
                     if (f.tagName() == "field") {
                         UAVObjectField *uavfield = obj->getField(f.attribute("name"));
@@ -177,12 +177,12 @@ void UAVSettingsImportExportFactory::importUAVSettings()
                                 // This is an enum:
                                 int i = 0;
                                 QStringList list = f.attribute("values").split(",");
-                                foreach (QString element, list) {
+                                foreach(QString element, list) {
                                     if (false == uavfield->checkValue(element, i)) {
                                         qDebug() << "checkValue(list) returned false on: " << uavObjectName << list;
                                         setError = true;
                                     } else {
-                            		 uavfield->setValue(element,i);
+                                        uavfield->setValue(element, i);
                                     }
                                     i++;
                                 }
@@ -223,6 +223,7 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
     // create an XML root
     QDomDocument doc("UAVObjects");
     QDomElement root = doc.createElement("uavobjects");
+
     doc.appendChild(root);
 
     // add hardware, firmware and GCS version info
@@ -230,7 +231,7 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
     root.appendChild(versionInfo);
 
     UAVObjectUtilManager *utilMngr = pm->getObject<UAVObjectUtilManager>();
-    deviceDescriptorStruct board = utilMngr->getBoardDescriptionStruct();
+    deviceDescriptorStruct board   = utilMngr->getBoardDescriptionStruct();
 
     QDomElement hw = doc.createElement("hardware");
     hw.setAttribute("type", QString().setNum(board.boardType, 16));
@@ -245,11 +246,11 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
     versionInfo.appendChild(fw);
 
     QString gcsRevision = QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
-    QString gcsGitDate = gcsRevision.mid(gcsRevision.indexOf(" ") + 1, 14);
-    QString gcsGitHash = gcsRevision.mid(gcsRevision.indexOf(":") + 1, 8);
-    QString gcsGitTag = gcsRevision.left(gcsRevision.indexOf(":"));
+    QString gcsGitDate  = gcsRevision.mid(gcsRevision.indexOf(" ") + 1, 14);
+    QString gcsGitHash  = gcsRevision.mid(gcsRevision.indexOf(":") + 1, 8);
+    QString gcsGitTag   = gcsRevision.left(gcsRevision.indexOf(":"));
 
-    QDomElement gcs = doc.createElement("gcs");
+    QDomElement gcs     = doc.createElement("gcs");
     gcs.setAttribute("date", gcsGitDate);
     gcs.setAttribute("hash", gcsGitHash);
     gcs.setAttribute("tag", gcsGitTag);
@@ -257,10 +258,9 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
 
     // create settings and/or data elements
     QDomElement settings = doc.createElement("settings");
-    QDomElement data = doc.createElement("data");
+    QDomElement data     = doc.createElement("data");
 
-    switch (what)
-    {
+    switch (what) {
     case Settings:
         root.appendChild(settings);
         break;
@@ -274,33 +274,33 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
     }
 
     // iterate over settings objects
-    QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
-    foreach (QList<UAVDataObject*> list, objList) {
-        foreach (UAVDataObject *obj, list) {
+    QList< QList<UAVDataObject *> > objList = objManager->getDataObjects();
+    foreach(QList<UAVDataObject *> list, objList) {
+        foreach(UAVDataObject * obj, list) {
             if (((what == Settings) && obj->isSettings()) ||
-                    ((what == Data) && !obj->isSettings()) ||
-                    (what == Both)) {
-
+                ((what == Data) && !obj->isSettings()) ||
+                (what == Both)) {
                 // add each object to the XML
                 QDomElement o = doc.createElement("object");
                 o.setAttribute("name", obj->getName());
-                o.setAttribute("id", QString("0x")+ QString().setNum(obj->getObjID(),16).toUpper());
+                o.setAttribute("id", QString("0x") + QString().setNum(obj->getObjID(), 16).toUpper());
                 if (fullExport) {
                     QDomElement d = doc.createElement("description");
-                    QDomText t = doc.createTextNode(obj->getDescription().remove("@Ref ", Qt::CaseInsensitive));
+                    QDomText t    = doc.createTextNode(obj->getDescription().remove("@Ref ", Qt::CaseInsensitive));
                     d.appendChild(t);
                     o.appendChild(d);
                 }
 
                 // iterate over fields
-                QList<UAVObjectField*> fieldList = obj->getFields();
+                QList<UAVObjectField *> fieldList = obj->getFields();
 
-                foreach (UAVObjectField* field, fieldList) {
+                foreach(UAVObjectField * field, fieldList) {
                     QDomElement f = doc.createElement("field");
 
                     // iterate over values
                     QString vals;
                     quint32 nelem = field->getNumElements();
+
                     for (unsigned int n = 0; n < nelem; ++n) {
                         vals.append(QString("%1,").arg(field->getValue(n).toString()));
                     }
@@ -320,10 +320,11 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
                 }
 
                 // append to the settings or data element
-                if (obj->isSettings())
+                if (obj->isSettings()) {
                     settings.appendChild(o);
-                else
+                } else {
                     data.appendChild(o);
+                }
             }
         }
     }
@@ -357,7 +358,7 @@ void UAVSettingsImportExportFactory::exportUAVSettings()
     // save file
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly) &&
-            (file.write(xml.toAscii()) != -1)) {
+        (file.write(xml.toAscii()) != -1)) {
         file.close();
     } else {
         QMessageBox::critical(0,
@@ -377,11 +378,11 @@ void UAVSettingsImportExportFactory::exportUAVSettings()
 void UAVSettingsImportExportFactory::exportUAVData()
 {
     if (QMessageBox::question(0, tr("Are you sure?"),
-        tr("This option is only useful for passing your current "
-           "system data to the technical support staff. "
-           "Do you really want to export?"),
-           QMessageBox::Ok | QMessageBox::Cancel,
-           QMessageBox::Ok) != QMessageBox::Ok) {
+                              tr("This option is only useful for passing your current "
+                                 "system data to the technical support staff. "
+                                 "Do you really want to export?"),
+                              QMessageBox::Ok | QMessageBox::Cancel,
+                              QMessageBox::Ok) != QMessageBox::Ok) {
         return;
     }
 
@@ -408,7 +409,7 @@ void UAVSettingsImportExportFactory::exportUAVData()
     // save file
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly) &&
-            (file.write(xml.toAscii()) != -1)) {
+        (file.write(xml.toAscii()) != -1)) {
         file.close();
     } else {
         QMessageBox::critical(0,

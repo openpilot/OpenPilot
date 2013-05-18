@@ -33,13 +33,13 @@
 
 #define PIOS_USB_BOARD_HID_DATA_LENGTH 64
 
-#define PIOS_USB_BOARD_EP_NUM 2
+#define PIOS_USB_BOARD_EP_NUM          2
 
-#include <pios_usb_defs.h> 	/* struct usb_* */
+#include <pios_usb_defs.h> /* struct usb_* */
 
-#define PIOS_USB_BOARD_PRODUCT_ID USB_PRODUCT_ID_OSD
-#define PIOS_USB_BOARD_DEVICE_VER USB_OP_DEVICE_VER(USB_OP_BOARD_ID_OSD, USB_OP_BOARD_MODE_BL)
-#define PIOS_USB_BOARD_SN_SUFFIX "+BL"
+#define PIOS_USB_BOARD_PRODUCT_ID      USB_PRODUCT_ID_OSD
+#define PIOS_USB_BOARD_DEVICE_VER      USB_OP_DEVICE_VER(USB_OP_BOARD_ID_OSD, USB_OP_BOARD_MODE_BL)
+#define PIOS_USB_BOARD_SN_SUFFIX       "+BL"
 
 /*
  * The bootloader uses a simplified report structure
@@ -49,4 +49,4 @@
  */
 #define PIOS_USB_BOARD_BL_HID_HAS_NO_LENGTH_BYTE
 
-#endif	/* PIOS_USB_BOARD_DATA_H */
+#endif /* PIOS_USB_BOARD_DATA_H */

@@ -1,12 +1,12 @@
 /********************************************************************************
-* @file       osgearthviewgadgetconfiguration.cpp
-* @author     The OpenPilot Team Copyright (C) 2012.
-* @addtogroup GCSPlugins GCS Plugins
-* @{
-* @addtogroup OsgEarthview Plugin
-* @{
-* @brief Osg Earth view of UAV
-*****************************************************************************/
+ * @file       osgearthviewgadgetconfiguration.cpp
+ * @author     The OpenPilot Team Copyright (C) 2012.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup OsgEarthview Plugin
+ * @{
+ * @brief Osg Earth view of UAV
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,13 +30,12 @@
  * Loads a saved configuration or defaults if non exist.
  *
  */
-OsgEarthviewGadgetConfiguration::OsgEarthviewGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+OsgEarthviewGadgetConfiguration::OsgEarthviewGadgetConfiguration(QString classId, QSettings *qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent)
 {
     Q_UNUSED(qSettings);
-    //if a saved configuration exists load it
-    if(qSettings != 0) {
-    }
+    // if a saved configuration exists load it
+    if (qSettings != 0) {}
 }
 
 /**
@@ -46,6 +45,7 @@ OsgEarthviewGadgetConfiguration::OsgEarthviewGadgetConfiguration(QString classId
 IUAVGadgetConfiguration *OsgEarthviewGadgetConfiguration::clone()
 {
     OsgEarthviewGadgetConfiguration *m = new OsgEarthviewGadgetConfiguration(this->classId());
+
     return m;
 }
 
@@ -53,5 +53,4 @@ IUAVGadgetConfiguration *OsgEarthviewGadgetConfiguration::clone()
  * Saves a configuration.
  *
  */
-void OsgEarthviewGadgetConfiguration::saveConfig(QSettings* qSettings) const {
-}
+void OsgEarthviewGadgetConfiguration::saveConfig(QSettings *qSettings) const {}

@@ -4,25 +4,25 @@
  * @file       abstractprocess_win.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -30,22 +30,24 @@
 
 #include <windows.h>
 
-namespace Utils {  
-
+namespace Utils {
 QStringList AbstractProcess::fixWinEnvironment(const QStringList &env)
 {
     QStringList envStrings = env;
+
     // add PATH if necessary (for DLL loading)
-    if (envStrings.filter(QRegExp(QLatin1String("^PATH="),Qt::CaseInsensitive)).isEmpty()) {
+    if (envStrings.filter(QRegExp(QLatin1String("^PATH="), Qt::CaseInsensitive)).isEmpty()) {
         QByteArray path = qgetenv("PATH");
-        if (!path.isEmpty())
+        if (!path.isEmpty()) {
             envStrings.prepend(QString(QLatin1String("PATH=%1")).arg(QString::fromLocal8Bit(path)));
+        }
     }
     // add systemroot if needed
-    if (envStrings.filter(QRegExp(QLatin1String("^SystemRoot="),Qt::CaseInsensitive)).isEmpty()) {
+    if (envStrings.filter(QRegExp(QLatin1String("^SystemRoot="), Qt::CaseInsensitive)).isEmpty()) {
         QByteArray systemRoot = qgetenv("SystemRoot");
-        if (!systemRoot.isEmpty())
+        if (!systemRoot.isEmpty()) {
             envStrings.prepend(QString(QLatin1String("SystemRoot=%1")).arg(QString::fromLocal8Bit(systemRoot)));
+        }
     }
     return envStrings;
 }
@@ -54,9 +56,10 @@ QString AbstractProcess::createWinCommandline(const QString &program, const QStr
 {
     const QChar doubleQuote = QLatin1Char('"');
     const QChar blank = QLatin1Char(' ');
-    const QChar backSlash = QLatin1Char('\\');
+    const QChar backSlash   = QLatin1Char('\\');
 
-    QString programName = program;
+    QString programName     = program;
+
     if (!programName.startsWith(doubleQuote) && !programName.endsWith(doubleQuote) && programName.contains(blank)) {
         programName.insert(0, doubleQuote);
         programName.append(doubleQuote);
@@ -64,8 +67,9 @@ QString AbstractProcess::createWinCommandline(const QString &program, const QStr
     // add the prgram as the first arrg ... it works better
     programName.replace(QLatin1Char('/'), backSlash);
     QString cmdLine = programName;
-    if (args.empty())
+    if (args.empty()) {
         return cmdLine;
+    }
 
     cmdLine += blank;
     for (int i = 0; i < args.size(); ++i) {
@@ -99,8 +103,10 @@ QByteArray AbstractProcess::createWinEnvironment(const QStringList &env)
 {
     QByteArray envlist;
     int pos = 0;
-    foreach (const QString &tmp, env) {
+
+    foreach(const QString &tmp, env) {
         const uint tmpSize = sizeof(TCHAR) * (tmp.length() + 1);
+
         envlist.resize(envlist.size() + tmpSize);
         memcpy(envlist.data() + pos, tmp.utf16(), tmpSize);
         pos += tmpSize;
@@ -110,5 +116,4 @@ QByteArray AbstractProcess::createWinEnvironment(const QStringList &env)
     envlist[pos++] = 0;
     return envlist;
 }
-
-} //namespace Utils
+} // namespace Utils

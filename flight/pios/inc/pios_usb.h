@@ -41,6 +41,6 @@ extern bool PIOS_USB_CheckAvailable(uint32_t id);
 #endif /* PIOS_USB_H */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

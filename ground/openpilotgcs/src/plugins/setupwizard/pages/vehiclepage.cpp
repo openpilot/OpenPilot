@@ -42,19 +42,15 @@ VehiclePage::~VehiclePage()
 
 bool VehiclePage::validatePage()
 {
-    if(ui->multirotorButton->isChecked()) {
+    if (ui->multirotorButton->isChecked()) {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_MULTI);
-    }
-    else if(ui->fixedwingButton->isChecked()) {
+    } else if (ui->fixedwingButton->isChecked()) {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_FIXEDWING);
-    }
-    else if(ui->heliButton->isChecked()) {
+    } else if (ui->heliButton->isChecked()) {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_HELI);
-    }
-    else if(ui->surfaceButton->isChecked()) {
+    } else if (ui->surfaceButton->isChecked()) {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_SURFACE);
-    }
-    else {
+    } else {
         getWizard()->setVehicleType(SetupWizard::VEHICLE_UNKNOWN);
     }
     return true;

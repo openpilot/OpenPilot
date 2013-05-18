@@ -10,19 +10,19 @@
  * @{
  * @brief The Core GCS plugin
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -39,24 +39,20 @@ QT_BEGIN_NAMESPACE
 class QSettings;
 QT_END_NAMESPACE
 
-struct CommandLocation
-{
+struct CommandLocation {
     int m_container;
     int m_position;
 };
 
 namespace Core {
-
 class UniqueIDManager;
 
 namespace Internal {
-
 class ActionContainerPrivate;
 class MainWindow;
 class CommandPrivate;
 
-class ActionManagerPrivate : public Core::ActionManager
-{
+class ActionManagerPrivate : public Core::ActionManager {
     Q_OBJECT
 
 public:
@@ -79,14 +75,14 @@ public:
 
     void readSettings(QSettings *settings);
 
-    //ActionManager Interface
+    // ActionManager Interface
     ActionContainer *createMenu(const QString &id);
     ActionContainer *createMenuBar(const QString &id);
 
     Command *registerAction(QAction *action, const QString &id,
-        const QList<int> &context);
+                            const QList<int> &context);
     Command *registerShortcut(QShortcut *shortcut, const QString &id,
-        const QList<int> &context);
+                              const QList<int> &context);
 
     Core::Command *command(const QString &id) const;
     Core::ActionContainer *actionContainer(const QString &id) const;
@@ -94,9 +90,9 @@ public:
 private:
     bool hasContext(QList<int> context) const;
     Command *registerOverridableAction(QAction *action, const QString &id,
-        bool checkUnique);
+                                       bool checkUnique);
 
-    static ActionManagerPrivate* m_instance;
+    static ActionManagerPrivate *m_instance;
     QList<int> m_defaultGroups;
 
     typedef QHash<int, CommandPrivate *> IdCmdMap;
@@ -105,14 +101,13 @@ private:
     typedef QHash<int, ActionContainerPrivate *> IdContainerMap;
     IdContainerMap m_idContainerMap;
 
-//    typedef QMap<int, int> GlobalGroupMap;
-//    GlobalGroupMap m_globalgroups;
+// typedef QMap<int, int> GlobalGroupMap;
+// GlobalGroupMap m_globalgroups;
 //
     QList<int> m_context;
 
     MainWindow *m_mainWnd;
 };
-
 } // namespace Internal
 } // namespace Core
 

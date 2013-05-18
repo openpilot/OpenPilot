@@ -45,16 +45,15 @@
 #include "uploader_global.h"
 
 using namespace OP_DFU;
-class UPLOADER_EXPORT DeviceWidget : public QWidget
-{
+class UPLOADER_EXPORT DeviceWidget : public QWidget {
     Q_OBJECT
 public:
     DeviceWidget(QWidget *parent = 0);
     void setDeviceID(int devID);
-    void setDfu(DFUObject* dfu);
+    void setDfu(DFUObject *dfu);
     void populate();
     void freeze();
-    typedef enum { STATUSICON_OK, STATUSICON_RUNNING, STATUSICON_FAIL, STATUSICON_INFO} StatusIcon;
+    typedef enum { STATUSICON_OK, STATUSICON_RUNNING, STATUSICON_FAIL, STATUSICON_INFO } StatusIcon;
     QString setOpenFileName();
     QString setSaveFileName();
 
@@ -93,7 +92,6 @@ public slots:
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
-
 };
 
 #endif // DEVICEWIDGET_H

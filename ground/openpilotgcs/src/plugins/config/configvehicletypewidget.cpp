@@ -45,14 +45,15 @@
 #include <coreplugin/generalsettings.h>
 
 /**
-  Static function to get currently assigned channelDescriptions
-  for all known vehicle types;  instantiates the appropriate object
-  then asks it to supply channel descs
-  */
+   Static function to get currently assigned channelDescriptions
+   for all known vehicle types;  instantiates the appropriate object
+   then asks it to supply channel descs
+ */
 QStringList ConfigVehicleTypeWidget::getChannelDescriptions()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objMngr = pm->getObject<UAVObjectManager>();
+
     Q_ASSERT(objMngr);
 
     // get an instance of systemsettings
@@ -104,9 +105,9 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 {
     m_aircraft = new Ui_AircraftWidget();
     m_aircraft->setupUi(this);
-    
-    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
-    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
     if (!settings->useExpertMode()) {
         m_aircraft->saveAircraftToRAM->setVisible(false);
     }
@@ -125,11 +126,11 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
     m_aircraft->aircraftType->addItems(airframeTypes);
 
     // Set default vehicle to MultiRotor
-    //m_aircraft->aircraftType->setCurrentIndex(3);
+    // m_aircraft->aircraftType->setCurrentIndex(3);
 
-	// Connect aircraft type selection dropbox to callback function
+    // Connect aircraft type selection dropbox to callback function
     connect(m_aircraft->aircraftType, SIGNAL(currentIndexChanged(int)), this, SLOT(switchAirframeType(int)));
-	
+
     // Connect the three feed forward test checkboxes
     connect(m_aircraft->ffTestBox1, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
     connect(m_aircraft->ffTestBox2, SIGNAL(clicked(bool)), this, SLOT(enableFFTest()));
@@ -157,25 +158,26 @@ ConfigVehicleTypeWidget::ConfigVehicleTypeWidget(QWidget *parent) : ConfigTaskWi
 }
 
 /**
- Destructor
+   Destructor
  */
 ConfigVehicleTypeWidget::~ConfigVehicleTypeWidget()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void ConfigVehicleTypeWidget::switchAirframeType(int index)
 {
     // TODO not safe w/r to translation!!!
     QString frameCategory = m_aircraft->aircraftType->currentText();
+
     m_aircraft->airframesWidget->setCurrentWidget(getVehicleConfigWidget(frameCategory));
 }
 
 /**
-  Refreshes the current value of the SystemSettings which holds the aircraft type
-  Note: The default behavior of ConfigTaskWidget is bypassed.
-  Therefore no automatic synchronization of UAV Objects to UI is done.
-  */
+   Refreshes the current value of the SystemSettings which holds the aircraft type
+   Note: The default behavior of ConfigTaskWidget is bypassed.
+   Therefore no automatic synchronization of UAV Objects to UI is done.
+ */
 void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
 {
     Q_UNUSED(o);
@@ -183,11 +185,11 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
     if (!allObjectsUpdated()) {
         return;
     }
-	
+
     bool dirty = isDirty();
-	
+
     // Get the Airframe type from the system settings:
-    UAVDataObject *system = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("SystemSettings")));
+    UAVDataObject *system = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("SystemSettings")));
     Q_ASSERT(system);
 
     UAVObjectField *field = system->getField(QString("AirframeType"));
@@ -198,14 +200,14 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
     QString frameType = field->getValue().toString();
     qDebug() << "ConfigVehicleTypeWidget::refreshWidgetsValues - frame type:" << frameType;
 
-    QString category = frameCategory(frameType);
+    QString category  = frameCategory(frameType);
     setComboCurrentIndex(m_aircraft->aircraftType, m_aircraft->aircraftType->findText(category));
 
     VehicleConfig *vehicleConfig = getVehicleConfigWidget(category);
     if (vehicleConfig) {
         vehicleConfig->refreshWidgetsValues(frameType);
     }
-	
+
     updateFeedForwardUI();
 
     setDirty(dirty);
@@ -214,21 +216,22 @@ void ConfigVehicleTypeWidget::refreshWidgetsValues(UAVObject *o)
 }
 
 /**
-  Sends the config to the board (airframe type)
+   Sends the config to the board (airframe type)
 
-  We do all the tasks common to all airframes, or family of airframes, and
-  we call additional methods for specific frames, so that we do not have a code
-  that is too heavy.
+   We do all the tasks common to all airframes, or family of airframes, and
+   we call additional methods for specific frames, so that we do not have a code
+   that is too heavy.
 
-  Note: The default behavior of ConfigTaskWidget is bypassed.
-  Therefore no automatic synchronization of UI to UAV Objects is done.
-*/
+   Note: The default behavior of ConfigTaskWidget is bypassed.
+   Therefore no automatic synchronization of UI to UAV Objects is done.
+ */
 void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
 {
     // Airframe type defaults to Custom
     QString airframeType = "Custom";
 
-    VehicleConfig *vehicleConfig = (VehicleConfig *) m_aircraft->airframesWidget->currentWidget();
+    VehicleConfig *vehicleConfig = (VehicleConfig *)m_aircraft->airframesWidget->currentWidget();
+
     if (vehicleConfig) {
         airframeType = vehicleConfig->updateConfigObjectsFromWidgets();
     }
@@ -260,21 +263,22 @@ void ConfigVehicleTypeWidget::updateObjectsFromWidgets()
 QString ConfigVehicleTypeWidget::frameCategory(QString frameType)
 {
     QString category;
+
     if (frameType == "FixedWing" || frameType == "Elevator aileron rudder" || frameType == "FixedWingElevon"
-            || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
+        || frameType == "Elevon" || frameType == "FixedWingVtail" || frameType == "Vtail") {
         category = "Fixed Wing";
     } else if (frameType == "Tri" || frameType == "Tricopter Y" || frameType == "QuadX" || frameType == "Quad X"
-            || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"
-            || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
-            || frameType == "Hexacopter Y6" || frameType == "Octo" || frameType == "Octocopter" || frameType == "OctoV"
-            || frameType == "Octocopter V" || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
-            || frameType == "OctoCoaxX" || frameType == "Octo Coax X") {
+               || frameType == "QuadP" || frameType == "Quad +" || frameType == "Hexa" || frameType == "Hexacopter"
+               || frameType == "HexaX" || frameType == "Hexacopter X" || frameType == "HexaCoax"
+               || frameType == "Hexacopter Y6" || frameType == "Octo" || frameType == "Octocopter" || frameType == "OctoV"
+               || frameType == "Octocopter V" || frameType == "OctoCoaxP" || frameType == "Octo Coax +"
+               || frameType == "OctoCoaxX" || frameType == "Octo Coax X") {
         category = "Multirotor";
     } else if (frameType == "HeliCP") {
         category = "Helicopter";
     } else if (frameType == "GroundVehicleCar" || frameType == "Turnable (car)"
-            || frameType == "GroundVehicleDifferential" || frameType == "Differential (tank)"
-            || frameType == "GroundVehicleMotorcyle" || frameType == "Motorcycle") {
+               || frameType == "GroundVehicleDifferential" || frameType == "Differential (tank)"
+               || frameType == "GroundVehicleMotorcyle" || frameType == "Motorcycle") {
         category = "Ground";
     } else {
         category = "Custom";
@@ -285,6 +289,7 @@ QString ConfigVehicleTypeWidget::frameCategory(QString frameType)
 VehicleConfig *ConfigVehicleTypeWidget::getVehicleConfigWidget(QString frameCategory)
 {
     VehicleConfig *vehiculeConfig;
+
     if (!vehicleIndexMap.contains(frameCategory)) {
         // create config widget
         vehiculeConfig = createVehicleConfigWidget(frameCategory);
@@ -296,7 +301,7 @@ VehicleConfig *ConfigVehicleTypeWidget::getVehicleConfigWidget(QString frameCate
         vehicleIndexMap[frameCategory] = index;
     }
     int index = vehicleIndexMap.value(frameCategory);
-    vehiculeConfig = (VehicleConfig *) m_aircraft->airframesWidget->widget(index);
+    vehiculeConfig = (VehicleConfig *)m_aircraft->airframesWidget->widget(index);
     return vehiculeConfig;
 }
 
@@ -318,8 +323,8 @@ VehicleConfig *ConfigVehicleTypeWidget::createVehicleConfigWidget(QString frameC
 }
 
 /**
-  Enables and runs feed forward testing
-  */
+   Enables and runs feed forward testing
+ */
 void ConfigVehicleTypeWidget::enableFFTest()
 {
     // Role:
@@ -327,11 +332,11 @@ void ConfigVehicleTypeWidget::enableFFTest()
     // - Every other timer event: toggle engine from 45% to 55%
     // - Every other time event: send FF settings to flight FW
     if (m_aircraft->ffTestBox1->isChecked() && m_aircraft->ffTestBox2->isChecked()
-            && m_aircraft->ffTestBox3->isChecked()) {
+        && m_aircraft->ffTestBox3->isChecked()) {
         if (!ffTuningInProgress) {
             // Initiate tuning:
-            UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(
-                    QString("ManualControlCommand")));
+            UAVDataObject *obj = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(
+                                                                   QString("ManualControlCommand")));
             UAVObject::Metadata mdata = obj->getMetadata();
             accInitialData = mdata;
             UAVObject::SetFlightAccess(mdata, UAVObject::ACCESS_READONLY);
@@ -340,7 +345,7 @@ void ConfigVehicleTypeWidget::enableFFTest()
         // Depending on phase, either move actuator or send FF settings:
         if (ffTuningPhase) {
             // Send FF settings to the board
-            UAVDataObject* mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+            UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
             Q_ASSERT(mixer);
 
             QPointer<VehicleConfig> vconfig = new VehicleConfig();
@@ -353,9 +358,9 @@ void ConfigVehicleTypeWidget::enableFFTest()
             mixer->updated();
         } else {
             // Toggle motor state
-            UAVDataObject* obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(
-                    QString("ManualControlCommand")));
-            double value = obj->getField("Throttle")->getDouble();
+            UAVDataObject *obj = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(
+                                                                   QString("ManualControlCommand")));
+            double value  = obj->getField("Throttle")->getDouble();
             double target = (value < 0.5) ? 0.55 : 0.45;
             obj->getField("Throttle")->setValue(target);
             obj->updated();
@@ -368,8 +373,8 @@ void ConfigVehicleTypeWidget::enableFFTest()
         // Disarm!
         if (ffTuningInProgress) {
             ffTuningInProgress = false;
-            UAVDataObject *obj = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(
-                    QString("ManualControlCommand")));
+            UAVDataObject *obj = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(
+                                                                   QString("ManualControlCommand")));
             UAVObject::Metadata mdata = obj->getMetadata();
             mdata = accInitialData; // Restore metadata
             obj->setMetadata(mdata);
@@ -378,13 +383,14 @@ void ConfigVehicleTypeWidget::enableFFTest()
 }
 
 /**
-  Updates the custom airframe settings based on the current airframe.
+   Updates the custom airframe settings based on the current airframe.
 
-  Note: does NOT ask for an object refresh itself!
-  */
+   Note: does NOT ask for an object refresh itself!
+ */
 void ConfigVehicleTypeWidget::updateFeedForwardUI()
 {
-    UAVDataObject *mixer = dynamic_cast<UAVDataObject*>(getObjectManager()->getObject(QString("MixerSettings")));
+    UAVDataObject *mixer = dynamic_cast<UAVDataObject *>(getObjectManager()->getObject(QString("MixerSettings")));
+
     Q_ASSERT(mixer);
 
     QPointer<VehicleConfig> vconfig = new VehicleConfig();
@@ -397,19 +403,19 @@ void ConfigVehicleTypeWidget::updateFeedForwardUI()
 }
 
 /**
- Opens the wiki from the user's default browser
+   Opens the wiki from the user's default browser
  */
 void ConfigVehicleTypeWidget::openHelp()
 {
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/x/44Cf", QUrl::StrictMode) );
+    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/x/44Cf", QUrl::StrictMode));
 }
 
 /**
-  Helper function:
-  Sets the current index on supplied combobox to index
-  if it is within bounds 0 <= index < combobox.count()
+   Helper function:
+   Sets the current index on supplied combobox to index
+   if it is within bounds 0 <= index < combobox.count()
  */
-void ConfigVehicleTypeWidget::setComboCurrentIndex(QComboBox* box, int index)
+void ConfigVehicleTypeWidget::setComboCurrentIndex(QComboBox *box, int index)
 {
     if (index >= 0 && index < box->count()) {
         box->setCurrentIndex(index);

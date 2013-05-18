@@ -38,17 +38,16 @@
 #include "pjrc_rawhid.h"
 #include "usbmonitor.h"
 
-//helper classes
+// helper classes
 class RawHIDReadThread;
 class RawHIDWriteThread;
 
 /**
-*   The actual IO device that will be used to communicate
-*   with the board.
-*/
-class RAWHID_EXPORT RawHID : public QIODevice
-{
-	Q_OBJECT
+ *   The actual IO device that will be used to communicate
+ *   with the board.
+ */
+class RAWHID_EXPORT RawHID : public QIODevice {
+    Q_OBJECT
 
     friend class RawHIDReadThread;
     friend class RawHIDWriteThread;
@@ -63,10 +62,10 @@ public:
     virtual bool isSequential() const;
 
 signals:
-	void closed();
+    void closed();
 
 public slots:
-	void onDeviceUnplugged(int num);
+    void onDeviceUnplugged(int num);
 
 protected:
     virtual qint64 readData(char *data, qint64 maxSize);
@@ -74,10 +73,10 @@ protected:
     virtual qint64 bytesAvailable() const;
     virtual qint64 bytesToWrite() const;
 
-    //! Callback from the read thread to open the device
+    // ! Callback from the read thread to open the device
     bool openDevice();
 
-    //! Callback from teh read thread to close the device
+    // ! Callback from teh read thread to close the device
     bool closeDevice();
 
     QString serialNumber;
@@ -89,7 +88,7 @@ protected:
     RawHIDReadThread *m_readThread;
     RawHIDWriteThread *m_writeThread;
 
-	QMutex *m_mutex;
+    QMutex *m_mutex;
     QMutex *m_startedMutex;
 };
 

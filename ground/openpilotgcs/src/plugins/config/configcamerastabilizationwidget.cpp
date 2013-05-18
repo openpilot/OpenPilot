@@ -45,15 +45,15 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
 {
     ui = new Ui_CameraStabilizationWidget();
     ui->setupUi(this);
-    
-    addApplySaveButtons(ui->camerastabilizationSaveRAM,ui->camerastabilizationSaveSD);
-    
-    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
-    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
-    if(!settings->useExpertMode())
+
+    addApplySaveButtons(ui->camerastabilizationSaveRAM, ui->camerastabilizationSaveSD);
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
+    if (!settings->useExpertMode()) {
         ui->camerastabilizationSaveRAM->setVisible(false);
-    
-    
+    }
+
 
     // These widgets don't have direct relation to UAVObjects
     // and need special processing
@@ -61,7 +61,6 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
         ui->rollChannel,
         ui->pitchChannel,
         ui->yawChannel,
-        
     };
     const int NUM_OUTPUTS = sizeof(outputs) / sizeof(outputs[0]);
 
@@ -69,8 +68,9 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
     for (int i = 0; i < NUM_OUTPUTS; i++) {
         outputs[i]->clear();
         outputs[i]->addItem("None");
-        for (quint32 j = 0; j < ActuatorCommand::CHANNEL_NUMELEM; j++)
-            outputs[i]->addItem(QString("Channel %1").arg(j+1));
+        for (quint32 j = 0; j < ActuatorCommand::CHANNEL_NUMELEM; j++) {
+            outputs[i]->addItem(QString("Channel %1").arg(j + 1));
+        }
     }
 
     // Load UAVObjects to widget relations from UI file
@@ -102,7 +102,7 @@ ConfigCameraStabilizationWidget::ConfigCameraStabilizationWidget(QWidget *parent
 
 ConfigCameraStabilizationWidget::~ConfigCameraStabilizationWidget()
 {
-   // Do nothing
+    // Do nothing
 }
 
 /*
@@ -155,10 +155,12 @@ void ConfigCameraStabilizationWidget::refreshWidgetsValues(UAVObject *obj)
         // Default to none if not found.
         // Then search for any mixer channels set to this
         outputs[i]->setCurrentIndex(0);
-        for (int j = 0; j < NUM_MIXERS; j++)
+        for (int j = 0; j < NUM_MIXERS; j++) {
             if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLLORSERVO1 + i) &&
-                    outputs[i]->currentIndex() != (j + 1))
+                outputs[i]->currentIndex() != (j + 1)) {
                 outputs[i]->setCurrentIndex(j + 1);
+            }
+        }
     }
 
     setDirty(dirty);
@@ -176,9 +178,10 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
     // Save state of the module enable checkbox first.
     // Do not use setData() member on whole object, if possible, since it triggers
     // unnessesary UAVObect update.
-    quint8 enableModule = ui->enableCameraStabilization->isChecked() ?
-            HwSettings::OPTIONALMODULES_ENABLED : HwSettings::OPTIONALMODULES_DISABLED;
+    quint8 enableModule    = ui->enableCameraStabilization->isChecked() ?
+                             HwSettings::OPTIONALMODULES_ENABLED : HwSettings::OPTIONALMODULES_DISABLED;
     HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
+
     hwSettings->setOptionalModules(HwSettings::OPTIONALMODULES_CAMERASTAB, enableModule);
 
     // Update mixer channels which were mapped to camera outputs in case they are
@@ -220,7 +223,7 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
 
             if ((mixerNum >= 0) && // Short circuit in case of none
                 (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_DISABLED) &&
-                (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_CAMERAROLLORSERVO1 + i) ) {
+                (*mixerTypes[mixerNum] != MixerSettings::MIXER1TYPE_CAMERAROLLORSERVO1 + i)) {
                 // If the mixer channel already mapped to something, it should not be
                 // used for camera output, we reset it to none
                 outputs[i]->setCurrentIndex(0);
@@ -230,17 +233,20 @@ void ConfigCameraStabilizationWidget::updateObjectsFromWidgets()
                 widgetUpdated = true;
             } else {
                 // Make sure no other channels have this output set
-                for (int j = 0; j < NUM_MIXERS; j++)
-                    if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLLORSERVO1 + i))
+                for (int j = 0; j < NUM_MIXERS; j++) {
+                    if (*mixerTypes[j] == (MixerSettings::MIXER1TYPE_CAMERAROLLORSERVO1 + i)) {
                         *mixerTypes[j] = MixerSettings::MIXER1TYPE_DISABLED;
+                    }
+                }
 
                 // If this channel is assigned to one of the outputs that is not disabled
                 // set it
-                if ((mixerNum >= 0) && (mixerNum < NUM_MIXERS))
+                if ((mixerNum >= 0) && (mixerNum < NUM_MIXERS)) {
                     *mixerTypes[mixerNum] = MixerSettings::MIXER1TYPE_CAMERAROLLORSERVO1 + i;
+                }
             }
         }
-    } while(widgetUpdated);
+    } while (widgetUpdated);
 
     // FIXME: Should not use setData() to prevent double updates.
     // It should be refactored after the reformatting of MixerSettings UAVObject.
@@ -263,11 +269,11 @@ void ConfigCameraStabilizationWidget::defaultRequestedSlot(int group)
     // But if you want, you could use the dirtyClone() function to get default
     // values of an object and then use them to set a widget state.
     //
-    //HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
-    //HwSettings *hwSettingsDefault=(HwSettings*)hwSettings->dirtyClone();
-    //HwSettings::DataFields hwSettingsData = hwSettingsDefault->getData();
-    //m_camerastabilization->enableCameraStabilization->setChecked(
-    //    hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] == HwSettings::OPTIONALMODULES_ENABLED);
+    // HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
+    // HwSettings *hwSettingsDefault=(HwSettings*)hwSettings->dirtyClone();
+    // HwSettings::DataFields hwSettingsData = hwSettingsDefault->getData();
+    // m_camerastabilization->enableCameraStabilization->setChecked(
+    // hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_CAMERASTAB] == HwSettings::OPTIONALMODULES_ENABLED);
 
     // For outputs we set them all to none, so don't use any UAVObject to get defaults
     QComboBox *outputs[] = {

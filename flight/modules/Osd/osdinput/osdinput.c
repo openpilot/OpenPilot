@@ -48,8 +48,8 @@ static void osdinputTask(void *parameters);
 // ****************
 // Private constants
 
-#define STACK_SIZE_BYTES            1024
-#define TASK_PRIORITY                   (tskIDLE_PRIORITY + 4)
+#define STACK_SIZE_BYTES  1024
+#define TASK_PRIORITY     (tskIDLE_PRIORITY + 4)
 #define MAX_PACKET_LENGTH 33
 // ****************
 // Private variables
@@ -58,11 +58,10 @@ static uint32_t oposdPort;
 
 static xTaskHandle osdinputTaskHandle;
 
-static char* oposd_rx_buffer;
+static char *oposd_rx_buffer;
 t_fifo_buffer rx;
 
-enum osd_pkt_type
-{
+enum osd_pkt_type {
     OSD_PKT_TYPE_MISC = 0, OSD_PKT_TYPE_NAV = 1, OSD_PKT_TYPE_MAINT = 2, OSD_PKT_TYPE_ATT = 3, OSD_PKT_TYPE_MODE = 4,
 };
 
@@ -76,7 +75,7 @@ enum osd_pkt_type
 int32_t osdinputStart(void)
 {
     // Start osdinput task
-    xTaskCreate(osdinputTask, (signed char *) "OSDINPUT", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &osdinputTaskHandle);
+    xTaskCreate(osdinputTask, (signed char *)"OSDINPUT", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &osdinputTaskHandle);
 
     return 0;
 }
@@ -92,13 +91,13 @@ int32_t osdinputInitialize(void)
     // Initialize quaternion
     AttitudeActualData attitude;
     AttitudeActualGet(&attitude);
-    attitude.q1 = 1;
-    attitude.q2 = 0;
-    attitude.q3 = 0;
-    attitude.q4 = 0;
-    attitude.Roll = 0;
+    attitude.q1    = 1;
+    attitude.q2    = 0;
+    attitude.q3    = 0;
+    attitude.q4    = 0;
+    attitude.Roll  = 0;
     attitude.Pitch = 0;
-    attitude.Yaw = 0;
+    attitude.Yaw   = 0;
     AttitudeActualSet(&attitude);
 
     oposdPort = PIOS_COM_OSD;
@@ -108,7 +107,7 @@ int32_t osdinputInitialize(void)
 
     return 0;
 }
-MODULE_INITCALL( osdinputInitialize, osdinputStart)
+MODULE_INITCALL(osdinputInitialize, osdinputStart)
 
 // ****************
 /**
@@ -119,21 +118,21 @@ static void osdinputTask(__attribute__((unused)) void *parameters)
 {
     portTickType xDelay = 100 / portTICK_RATE_MS;
     portTickType lastSysTime;
+
     lastSysTime = xTaskGetTickCount();
 
     uint8_t rx_count = 0;
-    bool start_flag = false;
+    bool start_flag  = false;
     int32_t osdRxOverflow = 0;
     uint8_t c = 0xAA;
     // Loop forever
     while (1) {
         // This blocks the task until there is something on the buffer
         while (PIOS_COM_ReceiveBuffer(oposdPort, &c, 1, xDelay) > 0) {
-
             // detect start while acquiring stream
             if (!start_flag && ((c == 0xCB) || (c == 0x34))) {
                 start_flag = true;
-                rx_count = 0;
+                rx_count   = 0;
             } else if (!start_flag) {
                 continue;
             }
@@ -142,7 +141,7 @@ static void osdinputTask(__attribute__((unused)) void *parameters)
                 // Flush the buffer and note the overflow event.
                 osdRxOverflow++;
                 start_flag = false;
-                rx_count = 0;
+                rx_count   = 0;
             } else {
                 oposd_rx_buffer[rx_count] = c;
                 rx_count++;
@@ -151,13 +150,13 @@ static void osdinputTask(__attribute__((unused)) void *parameters)
                 if (oposd_rx_buffer[1] == OSD_PKT_TYPE_ATT) {
                     AttitudeActualData attitude;
                     AttitudeActualGet(&attitude);
-                    attitude.q1 = 1;
-                    attitude.q2 = 0;
-                    attitude.q3 = 0;
-                    attitude.q4 = 0;
-                    attitude.Roll = (float) ((int16_t)(oposd_rx_buffer[3] | oposd_rx_buffer[4] << 8)) / 10.0f;
-                    attitude.Pitch = (float) ((int16_t)(oposd_rx_buffer[5] | oposd_rx_buffer[6] << 8)) / 10.0f;
-                    attitude.Yaw = (float) ((int16_t)(oposd_rx_buffer[7] | oposd_rx_buffer[8] << 8)) / 10.0f;
+                    attitude.q1    = 1;
+                    attitude.q2    = 0;
+                    attitude.q3    = 0;
+                    attitude.q4    = 0;
+                    attitude.Roll  = (float)((int16_t)(oposd_rx_buffer[3] | oposd_rx_buffer[4] << 8)) / 10.0f;
+                    attitude.Pitch = (float)((int16_t)(oposd_rx_buffer[5] | oposd_rx_buffer[6] << 8)) / 10.0f;
+                    attitude.Yaw   = (float)((int16_t)(oposd_rx_buffer[7] | oposd_rx_buffer[8] << 8)) / 10.0f;
                     AttitudeActualSet(&attitude);
                 } else if (oposd_rx_buffer[1] == OSD_PKT_TYPE_MODE) {
                     FlightStatusData status;
@@ -166,9 +165,9 @@ static void osdinputTask(__attribute__((unused)) void *parameters)
                     status.FlightMode = oposd_rx_buffer[3];
                     FlightStatusSet(&status);
                 }
-                //frame completed
+                // frame completed
                 start_flag = false;
-                rx_count = 0;
+                rx_count   = 0;
             }
         }
         vTaskDelayUntil(&lastSysTime, 50 / portTICK_RATE_MS);

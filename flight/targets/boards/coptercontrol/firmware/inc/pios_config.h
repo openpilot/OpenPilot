@@ -141,26 +141,26 @@
 /* #define PIOS_QUATERNION_STABILIZATION */
 
 /* Performance counters */
-#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD	1995998
+#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD  1995998
 
 /* Alarm Thresholds */
-#define HEAP_LIMIT_WARNING		220
-#define HEAP_LIMIT_CRITICAL		40
-#define IRQSTACK_LIMIT_WARNING		100
-#define IRQSTACK_LIMIT_CRITICAL		60
-#define CPULOAD_LIMIT_WARNING		85
-#define CPULOAD_LIMIT_CRITICAL		95
+#define HEAP_LIMIT_WARNING              220
+#define HEAP_LIMIT_CRITICAL             40
+#define IRQSTACK_LIMIT_WARNING          100
+#define IRQSTACK_LIMIT_CRITICAL         60
+#define CPULOAD_LIMIT_WARNING           85
+#define CPULOAD_LIMIT_CRITICAL          95
 
 /* Task stack sizes */
-#define PIOS_ACTUATOR_STACK_SIZE	1020
-#define PIOS_MANUAL_STACK_SIZE		800
-#define PIOS_SYSTEM_STACK_SIZE		660
-#define PIOS_STABILIZATION_STACK_SIZE	524
-#define PIOS_TELEM_STACK_SIZE		500
-#define PIOS_EVENTDISPATCHER_STACK_SIZE	130
+#define PIOS_ACTUATOR_STACK_SIZE        1020
+#define PIOS_MANUAL_STACK_SIZE          800
+#define PIOS_SYSTEM_STACK_SIZE          660
+#define PIOS_STABILIZATION_STACK_SIZE   524
+#define PIOS_TELEM_STACK_SIZE           500
+#define PIOS_EVENTDISPATCHER_STACK_SIZE 130
 
 /* This can't be too high to stop eventdispatcher thread overflowing */
-#define PIOS_EVENTDISAPTCHER_QUEUE	10
+#define PIOS_EVENTDISAPTCHER_QUEUE      10
 
 /* Revolution series */
 /* #define REVOLUTION */

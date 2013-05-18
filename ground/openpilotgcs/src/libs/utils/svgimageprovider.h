@@ -35,23 +35,22 @@
 
 #include "utils_global.h"
 
-class QTCREATOR_UTILS_EXPORT SvgImageProvider : public QObject, public QDeclarativeImageProvider
-{
+class QTCREATOR_UTILS_EXPORT SvgImageProvider : public QObject, public QDeclarativeImageProvider {
     Q_OBJECT
 public:
     SvgImageProvider(const QString &basePath);
-   ~SvgImageProvider();
+    ~SvgImageProvider();
 
     QSvgRenderer *loadRenderer(const QString &svgFile);
 
-    QImage requestImage(const QString &id, QSize *size, const QSize& requestedSize);
-    QPixmap requestPixmap(const QString &id, QSize *size, const QSize& requestedSize);
+    QImage requestImage(const QString &id, QSize *size, const QSize & requestedSize);
+    QPixmap requestPixmap(const QString &id, QSize *size, const QSize & requestedSize);
 
     Q_INVOKABLE QRectF scaledElementBounds(const QString &svgFile, const QString &elementName);
 
 private:
-    QMap<QString, QSvgRenderer*> m_renderers;
+    QMap<QString, QSvgRenderer *> m_renderers;
     QString m_basePath;
 };
 
-#endif
+#endif // ifndef SVGIMAGEPROVIDER_H_

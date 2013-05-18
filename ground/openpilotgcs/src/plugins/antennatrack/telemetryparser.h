@@ -36,17 +36,15 @@
 #include "gpsparser.h"
 
 
-class TelemetryParser: public GPSParser
-{
-
+class TelemetryParser : public GPSParser {
     Q_OBJECT
-    
+
 public:
-   TelemetryParser(QObject *parent = 0);
-   ~TelemetryParser();
+    TelemetryParser(QObject *parent = 0);
+    ~TelemetryParser();
 public slots:
-   void updateGPS(UAVObject* object1);
-   void updateHome(UAVObject* object1);
+    void updateGPS(UAVObject *object1);
+    void updateHome(UAVObject *object1);
 };
 
 #endif // TELEMETRYPARSER_H

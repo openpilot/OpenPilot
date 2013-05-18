@@ -33,11 +33,11 @@ GPSParser::GPSParser(QObject *parent) : QObject(parent)
 }
 
 GPSParser::~GPSParser()
-{
+{}
 
-}
-
-void GPSParser::processInputStream(char c) {
+void GPSParser::processInputStream(char c)
 {
-    Q_UNUSED(c)}
+    {
+        Q_UNUSED(c)
+    }
 }

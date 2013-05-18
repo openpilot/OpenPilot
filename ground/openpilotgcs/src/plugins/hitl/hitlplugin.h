@@ -7,7 +7,7 @@
  * @{
  * @addtogroup HITLPlugin HITL Plugin
  * @{
- * @brief The Hardware In The Loop plugin 
+ * @brief The Hardware In The Loop plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -35,37 +35,34 @@
 
 class HITLFactory;
 
-class HITLPlugin : public ExtensionSystem::IPlugin
-{
+class HITLPlugin : public ExtensionSystem::IPlugin {
 public:
     HITLPlugin();
-   ~HITLPlugin();
+    ~HITLPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
 
 
-   static void addSimulator(SimulatorCreator* creator)
-   {
-	  HITLPlugin::typeSimulators.append(creator);
-   }
+    static void addSimulator(SimulatorCreator *creator)
+    {
+        HITLPlugin::typeSimulators.append(creator);
+    }
 
-   static SimulatorCreator* getSimulatorCreator(const QString classId)
-   {
-	   foreach(SimulatorCreator* creator, HITLPlugin::typeSimulators)
-	   {
-		   if(classId == creator->ClassId())
-			   return creator;
-	   }
-	   return 0;
-   }
+    static SimulatorCreator *getSimulatorCreator(const QString classId)
+    {
+        foreach(SimulatorCreator * creator, HITLPlugin::typeSimulators) {
+            if (classId == creator->ClassId()) {
+                return creator;
+            }
+        }
+        return 0;
+    }
 
-   static QList<SimulatorCreator* > typeSimulators;
+    static QList<SimulatorCreator * > typeSimulators;
 
 private:
-   HITLFactory *mf;
-
-
+    HITLFactory *mf;
 };
 #endif /* HITLPLUGIN_H */

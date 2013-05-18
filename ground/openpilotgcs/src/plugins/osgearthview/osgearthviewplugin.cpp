@@ -1,12 +1,12 @@
 /********************************************************************************
-* @file       osgearthviewplugin.cpp
-* @author     The OpenPilot Team Copyright (C) 2012.
-* @addtogroup GCSPlugins GCS Plugins
-* @{
-* @addtogroup OsgEarthview Plugin
-* @{
-* @brief Osg Earth view of UAV
-*****************************************************************************/
+ * @file       osgearthviewplugin.cpp
+ * @author     The OpenPilot Team Copyright (C) 2012.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup OsgEarthview Plugin
+ * @{
+ * @brief Osg Earth view of UAV
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,34 +35,33 @@
 
 OsgEarthviewPlugin::OsgEarthviewPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 OsgEarthviewPlugin::~OsgEarthviewPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool OsgEarthviewPlugin::initialize(const QStringList& args, QString *errMsg)
+bool OsgEarthviewPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new OsgEarthviewGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new OsgEarthviewGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   osgQt::initQtWindowingSystem();
+    osgQt::initQtWindowingSystem();
 
-   return true;
+    return true;
 }
 
 void OsgEarthviewPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void OsgEarthviewPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(OsgEarthviewPlugin)
-

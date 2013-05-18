@@ -38,12 +38,14 @@
  * to place the icon above the label in ListMode. This is achieved
  * the easiest by subclassing QListWidget and overriding viewOptions().
  */
-class QTCREATOR_UTILS_EXPORT MyListWidget : public QListWidget
-{
+class QTCREATOR_UTILS_EXPORT MyListWidget : public QListWidget {
     Q_OBJECT
 public:
     MyListWidget(QWidget *parent) : QListWidget(parent), m_iconAbove(false) {}
-    void setIconAbove(bool iconAbove) { m_iconAbove = iconAbove; }
+    void setIconAbove(bool iconAbove)
+    {
+        m_iconAbove = iconAbove;
+    }
 protected:
     QStyleOptionViewItem viewOptions() const;
 private:

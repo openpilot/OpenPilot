@@ -36,8 +36,7 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class PathActionEditorGadgetFactory : public IUAVGadgetFactory
-{
+class PathActionEditorGadgetFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
     PathActionEditorGadgetFactory(QObject *parent = 0);

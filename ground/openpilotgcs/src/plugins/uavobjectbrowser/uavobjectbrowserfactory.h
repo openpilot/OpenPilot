@@ -37,15 +37,14 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class UAVObjectBrowserFactory : public Core::IUAVGadgetFactory
-{
+class UAVObjectBrowserFactory : public Core::IUAVGadgetFactory {
     Q_OBJECT
 public:
     UAVObjectBrowserFactory(QObject *parent = 0);
     ~UAVObjectBrowserFactory();
 
     Core::IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 

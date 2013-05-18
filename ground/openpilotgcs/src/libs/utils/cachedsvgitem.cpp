@@ -30,7 +30,7 @@
 #define GL_CLAMP_TO_EDGE 0x812F
 #endif
 
-CachedSvgItem::CachedSvgItem(QGraphicsItem * parent) :
+CachedSvgItem::CachedSvgItem(QGraphicsItem *parent) :
     QGraphicsSvgItem(parent),
     m_context(0),
     m_texture(0),
@@ -39,7 +39,7 @@ CachedSvgItem::CachedSvgItem(QGraphicsItem * parent) :
     setCacheMode(NoCache);
 }
 
-CachedSvgItem::CachedSvgItem(const QString & fileName, QGraphicsItem * parent):
+CachedSvgItem::CachedSvgItem(const QString & fileName, QGraphicsItem *parent) :
     QGraphicsSvgItem(fileName, parent),
     m_context(0),
     m_texture(0),
@@ -58,46 +58,47 @@ CachedSvgItem::~CachedSvgItem()
 
 void CachedSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-
     if (painter->paintEngine()->type() != QPaintEngine::OpenGL &&
-            painter->paintEngine()->type() != QPaintEngine::OpenGL2) {
-        //Fallback to direct painting
+        painter->paintEngine()->type() != QPaintEngine::OpenGL2) {
+        // Fallback to direct painting
         QGraphicsSvgItem::paint(painter, option, widget);
         return;
     }
 
     QRectF br = boundingRect();
-    QTransform transform = painter->worldTransform();
-    qreal sceneScale = transform.map(QLineF(0,0,1,0)).length();
+    QTransform transform    = painter->worldTransform();
+    qreal sceneScale        = transform.map(QLineF(0, 0, 1, 0)).length();
 
     bool stencilTestEnabled = glIsEnabled(GL_STENCIL_TEST);
     bool scissorTestEnabled = glIsEnabled(GL_SCISSOR_TEST);
 
     painter->beginNativePainting();
 
-    if (stencilTestEnabled)
+    if (stencilTestEnabled) {
         glEnable(GL_STENCIL_TEST);
-    if (scissorTestEnabled)
+    }
+    if (scissorTestEnabled) {
         glEnable(GL_SCISSOR_TEST);
+    }
 
     bool dirty = false;
     if (!m_texture) {
         glGenTextures(1, &m_texture);
-        m_context = const_cast<QGLContext*>(QGLContext::currentContext());
+        m_context = const_cast<QGLContext *>(QGLContext::currentContext());
 
-        dirty = true;
+        dirty     = true;
     }
 
     if (!qFuzzyCompare(sceneScale, m_scale)) {
         m_scale = sceneScale;
-        dirty = true;
+        dirty   = true;
     }
 
-    int textureWidth = (int(br.width()*m_scale) + 3) & ~3;
-    int textureHeight = (int(br.height()*m_scale) + 3) & ~3;
+    int textureWidth  = (int(br.width() * m_scale) + 3) & ~3;
+    int textureHeight = (int(br.height() * m_scale) + 3) & ~3;
 
     if (dirty) {
-        //qDebug() << "re-render image";
+        // qDebug() << "re-render image";
 
         QImage img(textureWidth, textureHeight, QImage::Format_ARGB32);
         {
@@ -117,15 +118,15 @@ void CachedSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 
         glBindTexture(GL_TEXTURE_2D, m_texture);
         glTexImage2D(
-                GL_TEXTURE_2D,
-                0,
-                GL_RGBA,
-                textureWidth,
-                textureHeight,
-                0,
-                GL_RGBA,
-                GL_UNSIGNED_BYTE,
-                img.bits());
+            GL_TEXTURE_2D,
+            0,
+            GL_RGBA,
+            textureWidth,
+            textureHeight,
+            0,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            img.bits());
 
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -143,15 +144,15 @@ void CachedSvgItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 
     glBindTexture(GL_TEXTURE_2D, m_texture);
 
-    //texture may be slightly large than svn image, ensure only used area is rendered
-    qreal tw = br.width()*m_scale/textureWidth;
-    qreal th = br.height()*m_scale/textureHeight;
+    // texture may be slightly large than svn image, ensure only used area is rendered
+    qreal tw = br.width() * m_scale / textureWidth;
+    qreal th = br.height() * m_scale / textureHeight;
 
     glBegin(GL_QUADS);
-    glTexCoord2d(0,  0 ); glVertex3d(br.left(), br.top(), -1);
-    glTexCoord2d(tw, 0 ); glVertex3d(br.right(), br.top(), -1);
+    glTexCoord2d(0, 0); glVertex3d(br.left(), br.top(), -1);
+    glTexCoord2d(tw, 0); glVertex3d(br.right(), br.top(), -1);
     glTexCoord2d(tw, th); glVertex3d(br.right(), br.bottom(), -1);
-    glTexCoord2d(0,  th); glVertex3d(br.left(), br.bottom(), -1);
+    glTexCoord2d(0, th); glVertex3d(br.left(), br.bottom(), -1);
     glEnd();
     glDisable(GL_TEXTURE_2D);
 

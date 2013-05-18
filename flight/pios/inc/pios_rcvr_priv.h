@@ -33,13 +33,13 @@
 
 #include <pios.h>
 
-extern int32_t PIOS_RCVR_Init(uint32_t * rcvr_id, const struct pios_rcvr_driver * driver, const uint32_t lower_id);
+extern int32_t PIOS_RCVR_Init(uint32_t *rcvr_id, const struct pios_rcvr_driver *driver, const uint32_t lower_id);
 
 extern void PIOS_RCVR_IRQ_Handler(uint32_t rcvr_id);
 
 #endif /* PIOS_RCVR_PRIV_H */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

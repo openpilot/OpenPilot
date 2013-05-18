@@ -37,17 +37,17 @@ class ImportExportGadgetWidget;
 
 using namespace Core;
 
-class IMPORTEXPORT_EXPORT ImportExportGadget : public Core::IUAVGadget
-{
+class IMPORTEXPORT_EXPORT ImportExportGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     ImportExportGadget(QString classId, ImportExportGadgetWidget *widget, QWidget *parent = 0);
     ~ImportExportGadget();
 
-    QWidget *widget() {
+    QWidget *widget()
+    {
         return m_widget;
     }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 
 private:
     ImportExportGadgetWidget *m_widget;

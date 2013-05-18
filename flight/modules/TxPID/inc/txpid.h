@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup TxPIDModule TxPID Module
- * @{ 
+ * @{
  *
  * @file       txpid.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
@@ -37,6 +37,6 @@ int32_t TxPIDInitialize(void);
 #endif // TXPID_H
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

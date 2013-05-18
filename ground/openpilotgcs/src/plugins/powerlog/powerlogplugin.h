@@ -41,50 +41,44 @@
 
 using namespace std;
 
-typedef unsigned long ULONG;    // 4 Bytes
+typedef unsigned long ULONG; // 4 Bytes
 typedef short SHORT;
-typedef unsigned short USHORT;  // 2 Bytes
-typedef unsigned char BYTE;     // 1 Byte
-typedef unsigned short WORD;    // 2 Bytes
-typedef unsigned long DWORD;    // 4 Bytes
-
+typedef unsigned short USHORT; // 2 Bytes
+typedef unsigned char BYTE; // 1 Byte
+typedef unsigned short WORD; // 2 Bytes
+typedef unsigned long DWORD; // 4 Bytes
 
 
 #define BUF_LEN 64
-struct POWERLOG_HID_PACK
-{
-        BYTE Len;
-        BYTE Type;
-        DWORD Interval;
-        BYTE LogState;
-        SHORT Current;
-        USHORT Volt;
-        DWORD Cap;
-        SHORT Cell[6];
-        USHORT RPM;
-        SHORT Temp[4];
-        USHORT Period;
-        USHORT Pulse;
+struct POWERLOG_HID_PACK {
+    BYTE   Len;
+    BYTE   Type;
+    DWORD  Interval;
+    BYTE   LogState;
+    SHORT  Current;
+    USHORT Volt;
+    DWORD  Cap;
+    SHORT  Cell[6];
+    USHORT RPM;
+    SHORT  Temp[4];
+    USHORT Period;
+    USHORT Pulse;
 };
 
-enum
-{
-        TYPE_DATA_ONLINE = 0x10,
-        TYPE_DATA_OFFLINE = 0x11,
-        TYPE_ORDER = 0x20,
+enum {
+    TYPE_DATA_ONLINE  = 0x10,
+    TYPE_DATA_OFFLINE = 0x11,
+    TYPE_ORDER = 0x20,
 };
-
-
 
 
 class PowerlogPlugin;
 
-class PowerlogThread : public QThread
-{
+class PowerlogThread : public QThread {
     Q_OBJECT
 
 public:
-    bool openFile(QString file, PowerlogPlugin * parent);
+    bool openFile(QString file, PowerlogPlugin *parent);
 
 private slots:
 
@@ -99,12 +93,11 @@ protected:
 
 private:
     void ShowInf(char *pBuf);
-    void GetShowValue(QString label,DWORD Value,WORD Len,WORD Dot);
+    void GetShowValue(QString label, DWORD Value, WORD Len, WORD Dot);
 };
 
 
-class PowerlogPlugin : public ExtensionSystem::IPlugin
-{
+class PowerlogPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
 
 
@@ -113,7 +106,7 @@ public:
     ~PowerlogPlugin();
 
     void extensionsInitialized();
-    bool initialize(const QStringList & arguments, QString * errorString);
+    bool initialize(const QStringList & arguments, QString *errorString);
     void shutdown();
 
     void setPowerlogMenuTitle(QString str);
@@ -130,11 +123,10 @@ private slots:
     void devRemoved(USBPortInfo);
 
 private:
-    Core::Command* cmd;
+    Core::Command *cmd;
     QString devSerialNumber;
-    PowerlogThread* loggingThread;
+    PowerlogThread *loggingThread;
     bool logging;
-
 };
 #endif /* POWERLOGPLUGIN_H_ */
 /**

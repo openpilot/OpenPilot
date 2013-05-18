@@ -71,22 +71,22 @@ extern int32_t PIOS_TASK_MONITOR_UnregisterTask(uint16_t task_id);
  */
 extern bool PIOS_TASK_MONITOR_IsRunning(uint16_t task_id);
 
-/** 
+/**
  * Information about a running task that has been registered
  * via a call to PIOS_TASK_MONITOR_Add().
  */
 struct pios_task_info {
-	/** Remaining task stack in bytes. */
-	uint32_t stack_remaining;
-	/** Flag indicating whether or not the task is running. */
-	bool     is_running;
-	/** Percentage of cpu time used by the task since the last call
-	 *  to PIOS_TASK_MONITOR_ForEachTask(). Low-load tasks may
-	 *  report 0% load even though they have run during the interval. */
-	uint8_t  running_time_percentage;
+    /** Remaining task stack in bytes. */
+    uint32_t stack_remaining;
+    /** Flag indicating whether or not the task is running. */
+    bool     is_running;
+    /** Percentage of cpu time used by the task since the last call
+     *  to PIOS_TASK_MONITOR_ForEachTask(). Low-load tasks may
+     *  report 0% load even though they have run during the interval. */
+    uint8_t running_time_percentage;
 };
 
-/** 
+/**
  * Iterator callback, called for each monitored task by PIOS_TASK_MONITOR_TasksIterate().
  *
  * @param task_id   The id of the task the task_info refers to.

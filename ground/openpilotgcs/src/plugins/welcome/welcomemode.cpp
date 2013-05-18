@@ -11,18 +11,18 @@
  * @brief The GCS Welcome plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -56,17 +56,14 @@ using namespace ExtensionSystem;
 using namespace Utils;
 
 namespace Welcome {
-
-struct WelcomeModePrivate
-{
+struct WelcomeModePrivate {
     WelcomeModePrivate();
 
     QDeclarativeView *declarativeView;
 };
 
 WelcomeModePrivate::WelcomeModePrivate()
-{
-}
+{}
 
 // ---  WelcomeMode
 WelcomeMode::WelcomeMode() :
@@ -100,12 +97,12 @@ int WelcomeMode::priority() const
     return m_priority;
 }
 
-QWidget* WelcomeMode::widget()
+QWidget *WelcomeMode::widget()
 {
     return m_d->declarativeView;
 }
 
-const char* WelcomeMode::uniqueModeName() const
+const char *WelcomeMode::uniqueModeName() const
 {
     return Core::Constants::MODE_WELCOME;
 }
@@ -114,6 +111,7 @@ QList<int> WelcomeMode::context() const
 {
     static QList<int> contexts = QList<int>()
                                  << Core::UniqueIDManager::instance()->uniqueIdentifier(Core::Constants::C_WELCOME_MODE);
+
     return contexts;
 }
 
@@ -131,5 +129,4 @@ void WelcomeMode::triggerAction(const QString &actionId)
 {
     Core::ModeManager::instance()->triggerAction(actionId);
 }
-
 } // namespace Welcome

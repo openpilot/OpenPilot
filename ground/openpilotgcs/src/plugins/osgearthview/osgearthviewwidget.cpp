@@ -1,12 +1,12 @@
 /********************************************************************************
-* @file       osgearthviewwidget.cpp
-* @author     The OpenPilot Team Copyright (C) 2012.
-* @addtogroup GCSPlugins GCS Plugins
-* @{
-* @addtogroup OsgEarthview Plugin Widget
-* @{
-* @brief Osg Earth view of UAV
-*****************************************************************************/
+ * @file       osgearthviewwidget.cpp
+ * @author     The OpenPilot Team Copyright (C) 2012.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup OsgEarthview Plugin Widget
+ * @{
+ * @brief Osg Earth view of UAV
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -101,26 +101,21 @@ using namespace Utils;
 
 OsgEarthviewWidget::OsgEarthviewWidget(QWidget *parent) : QWidget(parent)
 {
-
     m_widget = new Ui_OsgEarthview();
     m_widget->setupUi(this);
 
     /*viewWidget = new OsgViewerWidget(this);
-    viewWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+       viewWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    setLayout(new QVBoxLayout());
-    layout()->addWidget(viewWidget);*/
+       setLayout(new QVBoxLayout());
+       layout()->addWidget(viewWidget);*/
 }
 
 OsgEarthviewWidget::~OsgEarthviewWidget()
-{
-}
+{}
 
-void OsgEarthviewWidget::paintEvent( QPaintEvent* event )
-{
-}
+void OsgEarthviewWidget::paintEvent(QPaintEvent *event)
+{}
 
 void OsgEarthviewWidget::resizeEvent(QResizeEvent *event)
-{
-}
-
+{}

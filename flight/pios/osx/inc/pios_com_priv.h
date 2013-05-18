@@ -8,7 +8,7 @@
  *
  * @file       pios_com_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
+ *             Parts by Thorsten Klose (tk@midibox.org)
  * @brief      COM private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -39,6 +39,6 @@ extern int32_t PIOS_COM_ReceiveHandler(uint32_t com_id);
 #endif /* PIOS_COM_PRIV_H */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

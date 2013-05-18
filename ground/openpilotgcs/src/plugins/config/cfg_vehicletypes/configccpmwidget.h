@@ -52,8 +52,7 @@ typedef struct {
     int Min[CCPM_MAX_SWASH_SERVOS];
 } SwashplateServoSettingsStruct;
 
-class ConfigCcpmWidget: public VehicleConfig
-{
+class ConfigCcpmWidget : public VehicleConfig {
     Q_OBJECT
 
 public:
@@ -101,7 +100,10 @@ private:
     virtual void resetActuators(GUIConfigDataUnion *configData);
 
     int ShowDisclaimer(int messageID);
-    virtual void enableControls(bool enable) { Q_UNUSED(enable) }; // Not used by this widget
+    virtual void enableControls(bool enable)
+    {
+        Q_UNUSED(enable)
+    }; // Not used by this widget
 
     bool updatingFromHardware;
     bool updatingToHardware;
@@ -122,8 +124,8 @@ private slots:
     void SwashLvlCancelButtonPressed();
     void SwashLvlFinishButtonPressed();
 
-    //void UpdateCCPMOptionsFromUI();
-    //void UpdateCCPMUIFromOptions();
+    // void UpdateCCPMOptionsFromUI();
+    // void UpdateCCPMUIFromOptions();
 
     void SetUIComponentVisibilities();
 

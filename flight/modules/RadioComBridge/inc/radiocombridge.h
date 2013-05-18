@@ -1,10 +1,10 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup RadioComBridgeModule Com Port to Radio Bridge Module
  * @brief Bridge Com and Radio ports
- * @{ 
+ * @{
  *
  * @file       radiocombridge.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -34,6 +34,6 @@
 #endif // RADIOCOMBRIDGE_H
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

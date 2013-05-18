@@ -41,8 +41,7 @@
 
 class Ui_Widget;
 
-class ConfigMultiRotorWidget: public VehicleConfig
-{
+class ConfigMultiRotorWidget : public VehicleConfig {
     Q_OBJECT
 
 public:

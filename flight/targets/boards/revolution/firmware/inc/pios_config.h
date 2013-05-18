@@ -141,15 +141,15 @@
 /* #define PIOS_QUATERNION_STABILIZATION */
 
 /* Performance counters */
-#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD	8379692
+#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 8379692
 
 /* Alarm Thresholds */
-#define HEAP_LIMIT_WARNING		1000
-#define HEAP_LIMIT_CRITICAL		500
-#define IRQSTACK_LIMIT_WARNING		150
-#define IRQSTACK_LIMIT_CRITICAL		80
-#define CPULOAD_LIMIT_WARNING		80
-#define CPULOAD_LIMIT_CRITICAL		95
+#define HEAP_LIMIT_WARNING             1000
+#define HEAP_LIMIT_CRITICAL            500
+#define IRQSTACK_LIMIT_WARNING         150
+#define IRQSTACK_LIMIT_CRITICAL        80
+#define CPULOAD_LIMIT_WARNING          80
+#define CPULOAD_LIMIT_CRITICAL         95
 
 /* Task stack sizes */
 /* #define PIOS_ACTUATOR_STACK_SIZE	1020 */
@@ -160,7 +160,7 @@
 /* #define PIOS_EVENTDISPATCHER_STACK_SIZE	130 */
 
 /* This can't be too high to stop eventdispatcher thread overflowing */
-#define PIOS_EVENTDISAPTCHER_QUEUE	10
+#define PIOS_EVENTDISAPTCHER_QUEUE 10
 
 /* Revolution series */
 #define REVOLUTION

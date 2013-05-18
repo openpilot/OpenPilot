@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -60,28 +60,26 @@ VersionDialog::VersionDialog(QWidget *parent)
     layout->setSizeConstraint(QLayout::SetFixedSize);
 
 #ifdef UAVO_HASH
-      //: This gets conditionally inserted as argument %11 into the description string.
-     QByteArray uavoHashArray;
-     QString uavoHash = QString::fromLatin1(Core::Constants::UAVOSHA1_STR);
-     uavoHash.chop(2);
-     uavoHash.remove(0,2);
-     uavoHash=uavoHash.trimmed();
-     bool ok;
-     foreach(QString str,uavoHash.split(","))
-     {
-         uavoHashArray.append(str.toInt(&ok,16));
-     }
-     QString gcsUavoHashStr;
-     foreach(char i, uavoHashArray)
-     {
-         gcsUavoHashStr.append(QString::number(i,16).right(2));
-     }
-     QString uavoHashStr = gcsUavoHashStr;
+    // : This gets conditionally inserted as argument %11 into the description string.
+    QByteArray uavoHashArray;
+    QString uavoHash = QString::fromLatin1(Core::Constants::UAVOSHA1_STR);
+    uavoHash.chop(2);
+    uavoHash.remove(0, 2);
+    uavoHash = uavoHash.trimmed();
+    bool ok;
+    foreach(QString str, uavoHash.split(",")) {
+        uavoHashArray.append(str.toInt(&ok, 16));
+    }
+    QString gcsUavoHashStr;
+    foreach(char i, uavoHashArray) {
+        gcsUavoHashStr.append(QString::number(i, 16).right(2));
+    }
+    QString uavoHashStr = gcsUavoHashStr;
 #else
     QString uavoHashStr = "N/A";
 #endif
 
-     const QString description = tr(
+    const QString description = tr(
         "<h3>OpenPilot Ground Control Station</h3>"
         "GCS Revision: <b>%1</b><br/>"
         "UAVO Hash: %2<br/>"
@@ -100,17 +98,17 @@ VersionDialog::VersionDialog(QWidget *parent)
         "The program is provided AS IS with NO WARRANTY OF ANY KIND, "
         "INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A "
         "PARTICULAR PURPOSE.</small>"
-     ).arg(
+        ).arg(
         QString::fromLatin1(GCS_REVISION_STR).left(60), // %1
-        uavoHashStr,                                    // %2
-        QLatin1String(GCS_ORIGIN_STR),                  // $3
-        QLatin1String(__DATE__),                        // %4
-        QLatin1String(__TIME__),                        // %5
-        QLatin1String(QT_VERSION_STR),                  // %6
-        QString::number(QSysInfo::WordSize),            // %7
-        QLatin1String(GCS_AUTHOR),                      // %8
-        QLatin1String(GCS_YEAR_STR)                     // %9
-    );
+        uavoHashStr, // %2
+        QLatin1String(GCS_ORIGIN_STR), // $3
+        QLatin1String(__DATE__), // %4
+        QLatin1String(__TIME__), // %5
+        QLatin1String(QT_VERSION_STR), // %6
+        QString::number(QSysInfo::WordSize), // %7
+        QLatin1String(GCS_AUTHOR), // %8
+        QLatin1String(GCS_YEAR_STR) // %9
+        );
 
     QLabel *copyRightLabel = new QLabel(description);
     copyRightLabel->setWordWrap(true);
@@ -118,14 +116,14 @@ VersionDialog::VersionDialog(QWidget *parent)
     copyRightLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
     QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
-    QPushButton *closeButton = buttonBox->button(QDialogButtonBox::Close);
+    QPushButton *closeButton    = buttonBox->button(QDialogButtonBox::Close);
     QTC_ASSERT(closeButton, /**/);
     buttonBox->addButton(closeButton, QDialogButtonBox::ButtonRole(QDialogButtonBox::RejectRole | QDialogButtonBox::AcceptRole));
-    connect(buttonBox , SIGNAL(rejected()), this, SLOT(reject()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
     QLabel *logoLabel = new QLabel;
     logoLabel->setPixmap(QPixmap(QLatin1String(":/core/images/openpilot_logo_128.png")));
-    layout->addWidget(logoLabel , 0, 0, 1, 1);
+    layout->addWidget(logoLabel, 0, 0, 1, 1);
     layout->addWidget(copyRightLabel, 0, 1, 4, 4);
     layout->addWidget(buttonBox, 4, 0, 1, 5);
 }

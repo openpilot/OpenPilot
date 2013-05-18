@@ -37,15 +37,14 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class SystemHealthGadgetFactory : public IUAVGadgetFactory
-{
+class SystemHealthGadgetFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
     SystemHealthGadgetFactory(QObject *parent = 0);
     ~SystemHealthGadgetFactory();
 
     Core::IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 

@@ -45,20 +45,16 @@ class QModelIndex;
 QT_END_NAMESPACE
 
 namespace Core {
-
 class IContext;
 class ICore;
 class IUAVGadget;
 
 namespace Internal {
-
 class UAVGadgetView;
 class SplitterOrView;
-
 } // namespace Internal
 
-class CORE_EXPORT UAVGadgetManager : public IMode
-{
+class CORE_EXPORT UAVGadgetManager : public IMode {
     Q_OBJECT
 
 public:
@@ -67,26 +63,47 @@ public:
     virtual ~UAVGadgetManager();
 
     // IMode
-    QString name() const { return m_name; }
-    QIcon icon() const { return m_icon; }
-    int priority() const { return m_priority; }
-    void setPriority(int priority) { m_priority = priority; }
-    const char *uniqueModeName() const { return m_uniqueModeName; }
+    QString name() const
+    {
+        return m_name;
+    }
+    QIcon icon() const
+    {
+        return m_icon;
+    }
+    int priority() const
+    {
+        return m_priority;
+    }
+    void setPriority(int priority)
+    {
+        m_priority = priority;
+    }
+    const char *uniqueModeName() const
+    {
+        return m_uniqueModeName;
+    }
     QList<int> context() const;
 
     void init();
-    QWidget *widget() { return m_widget; }
+    QWidget *widget()
+    {
+        return m_widget;
+    }
 
     void ensureUAVGadgetManagerVisible();
 
     IUAVGadget *currentGadget() const;
 
-    void saveState(QSettings*) const;
-    bool restoreState(QSettings* qSettings);
+    void saveState(QSettings *) const;
+    bool restoreState(QSettings *qSettings);
 
-    void saveSettings(QSettings* qs);
-    void readSettings(QSettings* qs);
-    bool toolbarsShown() { return m_showToolbars; }
+    void saveSettings(QSettings *qs);
+    void readSettings(QSettings *qs);
+    bool toolbarsShown()
+    {
+        return m_showToolbars;
+    }
 
 signals:
     void currentGadgetChanged(IUAVGadget *gadget);
@@ -126,13 +143,12 @@ private:
     int m_priority;
     QString m_uniqueName;
     QByteArray m_uniqueNameBA;
-    const char* m_uniqueModeName;
+    const char *m_uniqueModeName;
     QWidget *m_widget;
 
     friend class Core::Internal::SplitterOrView;
     friend class Core::Internal::UAVGadgetView;
 };
-
 } // namespace Core
 
 #endif // UAVGADGETMANAGER_H

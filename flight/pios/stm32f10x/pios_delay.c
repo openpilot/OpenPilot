@@ -8,25 +8,25 @@
  *
  * @file       pios_delay.c
  * @author     Michael Smith Copyright (C) 2011
- * @brief      Delay Functions 
+ * @brief      Delay Functions
  *                 - Provides a micro-second granular delay using the CPU
  *                   cycle counter.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -35,9 +35,9 @@
 #ifdef PIOS_INCLUDE_DELAY
 
 /* these should be defined by CMSIS, but they aren't */
-#define DWT_CTRL	(*(volatile uint32_t *)0xe0001000)
-#define CYCCNTENA	(1<<0)
-#define DWT_CYCCNT	(*(volatile uint32_t *)0xe0001004)
+#define DWT_CTRL   (*(volatile uint32_t *)0xe0001000)
+#define CYCCNTENA  (1 << 0)
+#define DWT_CYCCNT (*(volatile uint32_t *)0xe0001004)
 
 
 /* cycles per microsecond */
@@ -51,20 +51,20 @@ static uint32_t us_ticks;
 
 int32_t PIOS_DELAY_Init(void)
 {
-	RCC_ClocksTypeDef	clocks;
+    RCC_ClocksTypeDef clocks;
 
-	/* compute the number of system clocks per microsecond */
-	RCC_GetClocksFreq(&clocks);
-	us_ticks = clocks.SYSCLK_Frequency / 1000000;
-	PIOS_DEBUG_Assert(us_ticks > 1);
+    /* compute the number of system clocks per microsecond */
+    RCC_GetClocksFreq(&clocks);
+    us_ticks = clocks.SYSCLK_Frequency / 1000000;
+    PIOS_DEBUG_Assert(us_ticks > 1);
 
-	/* turn on access to the DWT registers */
-	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    /* turn on access to the DWT registers */
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
 
-	/* enable the CPU cycle counter */
-	DWT_CTRL |= CYCCNTENA;
+    /* enable the CPU cycle counter */
+    DWT_CTRL |= CYCCNTENA;
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -80,31 +80,32 @@ int32_t PIOS_DELAY_Init(void)
  */
 int32_t PIOS_DELAY_WaituS(uint32_t uS)
 {
-	uint32_t	elapsed = 0;
-	uint32_t	last_count = DWT_CYCCNT;
-	
-	for (;;) {
-		uint32_t current_count = DWT_CYCCNT;
-		uint32_t elapsed_uS;
+    uint32_t elapsed    = 0;
+    uint32_t last_count = DWT_CYCCNT;
 
-		/* measure the time elapsed since the last time we checked */
-		elapsed += current_count - last_count;
-		last_count = current_count;
+    for (;;) {
+        uint32_t current_count = DWT_CYCCNT;
+        uint32_t elapsed_uS;
 
-		/* convert to microseconds */
-		elapsed_uS = elapsed / us_ticks;
-		if (elapsed_uS >= uS)
-			break;
+        /* measure the time elapsed since the last time we checked */
+        elapsed   += current_count - last_count;
+        last_count = current_count;
 
-		/* reduce the delay by the elapsed time */
-		uS -= elapsed_uS;
+        /* convert to microseconds */
+        elapsed_uS = elapsed / us_ticks;
+        if (elapsed_uS >= uS) {
+            break;
+        }
 
-		/* keep fractional microseconds for the next iteration */
-		elapsed %= us_ticks;
-	}
+        /* reduce the delay by the elapsed time */
+        uS -= elapsed_uS;
 
-	/* No error */
-	return 0;
+        /* keep fractional microseconds for the next iteration */
+        elapsed %= us_ticks;
+    }
+
+    /* No error */
+    return 0;
 }
 
 /**
@@ -120,21 +121,21 @@ int32_t PIOS_DELAY_WaituS(uint32_t uS)
  */
 int32_t PIOS_DELAY_WaitmS(uint32_t mS)
 {
-	while (mS--) {
-		PIOS_DELAY_WaituS(1000);
-	}
+    while (mS--) {
+        PIOS_DELAY_WaituS(1000);
+    }
 
-	/* No error */
-	return 0;
+    /* No error */
+    return 0;
 }
 
 /**
- * @brief Query the Delay timer for the current uS 
+ * @brief Query the Delay timer for the current uS
  * @return A microsecond value
  */
 uint32_t PIOS_DELAY_GetuS(void)
 {
-	return DWT_CYCCNT / us_ticks;
+    return DWT_CYCCNT / us_ticks;
 }
 
 /**
@@ -144,7 +145,7 @@ uint32_t PIOS_DELAY_GetuS(void)
  */
 uint32_t PIOS_DELAY_GetuSSince(uint32_t t)
 {
-	return (PIOS_DELAY_GetuS() - t);
+    return PIOS_DELAY_GetuS() - t;
 }
 
 /**
@@ -153,22 +154,23 @@ uint32_t PIOS_DELAY_GetuSSince(uint32_t t)
  */
 uint32_t PIOS_DELAY_GetRaw()
 {
-	return DWT_CYCCNT;
+    return DWT_CYCCNT;
 }
 
 /**
- * @brief Compare to raw times to and convert to us 
+ * @brief Compare to raw times to and convert to us
  * @return A microsecond value
  */
 uint32_t PIOS_DELAY_DiffuS(uint32_t raw)
 {
-	uint32_t diff = DWT_CYCCNT - raw;
-	return diff / us_ticks;
+    uint32_t diff = DWT_CYCCNT - raw;
+
+    return diff / us_ticks;
 }
 
 #endif /* PIOS_INCLUDE_DELAY */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

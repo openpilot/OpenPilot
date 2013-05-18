@@ -33,16 +33,15 @@
 
 class UploaderGadgetFactory;
 
-class UPLOADER_EXPORT UploaderPlugin : public ExtensionSystem::IPlugin
-{
+class UPLOADER_EXPORT UploaderPlugin : public ExtensionSystem::IPlugin {
 public:
-        UploaderPlugin();
-   ~UploaderPlugin();
+    UploaderPlugin();
+    ~UploaderPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
 private:
-   UploaderGadgetFactory *mf;
+    UploaderGadgetFactory *mf;
 };
 #endif // UPLOADERPLUGIN_H

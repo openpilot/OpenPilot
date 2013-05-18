@@ -5,15 +5,18 @@
 #include <QStringList>
 #include <extensionsystem/pluginmanager.h>
 
-AntennaTrackPlugin::AntennaTrackPlugin() {
-    // Do nothing
- }
-
-AntennaTrackPlugin::~AntennaTrackPlugin() {
+AntennaTrackPlugin::AntennaTrackPlugin()
+{
     // Do nothing
 }
 
-bool AntennaTrackPlugin::initialize(const QStringList& args, QString *errMsg) {
+AntennaTrackPlugin::~AntennaTrackPlugin()
+{
+    // Do nothing
+}
+
+bool AntennaTrackPlugin::initialize(const QStringList & args, QString *errMsg)
+{
     Q_UNUSED(args);
     Q_UNUSED(errMsg);
 
@@ -23,11 +26,13 @@ bool AntennaTrackPlugin::initialize(const QStringList& args, QString *errMsg) {
     return true;
 }
 
-void AntennaTrackPlugin::extensionsInitialized() {
+void AntennaTrackPlugin::extensionsInitialized()
+{
     // Do nothing
 }
 
-void AntennaTrackPlugin::shutdown() {
+void AntennaTrackPlugin::shutdown()
+{
     // Do nothing
 }
 

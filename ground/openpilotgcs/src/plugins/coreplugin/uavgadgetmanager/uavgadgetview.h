@@ -52,15 +52,11 @@ class StyledBar;
 }
 
 namespace Core {
-
 class IUAVGadget;
 class UAVGadgetManager;
 
 namespace Internal {
-
-
-class UAVGadgetView : public QWidget
-{
+class UAVGadgetView : public QWidget {
     Q_OBJECT
 
 public:
@@ -101,7 +97,6 @@ private:
     int m_defaultIndex;
     QLabel *m_activeLabel;
 };
-
 }
 }
 #endif // UAVGADGETVIEW_H

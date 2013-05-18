@@ -31,60 +31,77 @@
 #include <coreplugin/iuavgadgetconfiguration.h>
 #include <QtNetwork/QHostAddress>
 
-typedef struct{
-    int     ActionID;
-    int     FunctionID;
-    double  Amount;
-}buttonSettingsStruct;
+typedef struct {
+    int    ActionID;
+    int    FunctionID;
+    double Amount;
+} buttonSettingsStruct;
 
-typedef struct{
+typedef struct {
     int port;
     QHostAddress address;
-}portSettingsStruct;
+} portSettingsStruct;
 
 
 using namespace Core;
 
 
-
-class GCSControlGadgetConfiguration : public IUAVGadgetConfiguration
-{
+class GCSControlGadgetConfiguration : public IUAVGadgetConfiguration {
     Q_OBJECT
-    public:
-        explicit GCSControlGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+public:
+    explicit GCSControlGadgetConfiguration(QString classId, QSettings *qSettings = 0, QObject *parent = 0);
 
-    void setControlsMode(int mode) { controlsMode = mode; }
+    void setControlsMode(int mode)
+    {
+        controlsMode = mode;
+    }
     void setRPYTchannels(int roll, int pitch, int yaw, int throttle);
     void setUDPControlSettings(int port, QString host);
     int getUDPControlPort();
     QHostAddress getUDPControlHost();
-    int getControlsMode() { return controlsMode; }
+    int getControlsMode()
+    {
+        return controlsMode;
+    }
     QList<int>  getChannelsMapping();
     QList<bool>  getChannelsReverse();
 
-    buttonSettingsStruct getbuttonSettings(int i){return buttonSettings[i];}
-    void setbuttonSettingsAction(int i, int ActionID ){buttonSettings[i].ActionID=ActionID;return;}
-    void setbuttonSettingsFunction(int i, int FunctionID ){buttonSettings[i].FunctionID=FunctionID;return;}
-    void setbuttonSettingsAmount(int i, double Amount ){buttonSettings[i].Amount=Amount;return;}
-    void setChannelReverse(int i, bool Reverse ){channelReverse[i]=Reverse;return;}
+    buttonSettingsStruct getbuttonSettings(int i)
+    {
+        return buttonSettings[i];
+    }
+    void setbuttonSettingsAction(int i, int ActionID)
+    {
+        buttonSettings[i].ActionID = ActionID;
+    }
+    void setbuttonSettingsFunction(int i, int FunctionID)
+    {
+        buttonSettings[i].FunctionID = FunctionID;
+    }
+    void setbuttonSettingsAmount(int i, double Amount)
+    {
+        buttonSettings[i].Amount = Amount;
+    }
+    void setChannelReverse(int i, bool Reverse)
+    {
+        channelReverse[i] = Reverse;
+    }
 
 
-        void saveConfig(QSettings* settings) const;
-        IUAVGadgetConfiguration *clone();
+    void saveConfig(QSettings *settings) const;
+    IUAVGadgetConfiguration *clone();
 
-    private:
-        int controlsMode; // Mode1 to Mode4
-        // Joystick mappings for roll/pitch/yaw/throttle:
-        int rollChannel;
-        int pitchChannel;
-        int yawChannel;
-        int throttleChannel;
-        buttonSettingsStruct buttonSettings[8];
-        bool channelReverse[8];
-        int udp_port;
-        QHostAddress udp_host;
-
-
+private:
+    int controlsMode; // Mode1 to Mode4
+    // Joystick mappings for roll/pitch/yaw/throttle:
+    int rollChannel;
+    int pitchChannel;
+    int yawChannel;
+    int throttleChannel;
+    buttonSettingsStruct buttonSettings[8];
+    bool channelReverse[8];
+    int udp_port;
+    QHostAddress udp_host;
 };
 
 #endif // GCSCONTROLGADGETCONFIGURATION_H

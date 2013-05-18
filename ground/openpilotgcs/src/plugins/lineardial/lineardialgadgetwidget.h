@@ -7,7 +7,7 @@
  * @{
  * @addtogroup LinearDialPlugin Linear Dial Plugin
  * @{
- * @brief Impliments a gadget that displays linear gauges 
+ * @brief Impliments a gadget that displays linear gauges
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -39,86 +39,102 @@
 #include <QFile>
 #include <QTimer>
 
-class LineardialGadgetWidget : public QGraphicsView
-{
+class LineardialGadgetWidget : public QGraphicsView {
     Q_OBJECT
 
 public:
     LineardialGadgetWidget(QWidget *parent = 0);
-   ~LineardialGadgetWidget();
-   void enableOpenGL(bool flag);
-   void setDialFile(QString dfn);
-   void paint();
-   void setRange(double min, double max) { minValue=min; maxValue=max;}
-   void setGreenRange(double min, double max) {greenMin=min; greenMax=max;}
-   void setYellowRange(double min, double max) {yellowMin=min; yellowMax=max;}
-   void setRedRange(double min, double max) {redMin=min; redMax=max;}
-   void connectInput(QString obj, QString field);
-   void setIndex(double val);
-   void setDialFont(QString fontProps);
-   void setFactor (double val) { factor = val;}
-   void setDecimalPlaces(int val) { places = val;}
+    ~LineardialGadgetWidget();
+    void enableOpenGL(bool flag);
+    void setDialFile(QString dfn);
+    void paint();
+    void setRange(double min, double max)
+    {
+        minValue = min; maxValue = max;
+    }
+    void setGreenRange(double min, double max)
+    {
+        greenMin = min; greenMax = max;
+    }
+    void setYellowRange(double min, double max)
+    {
+        yellowMin = min; yellowMax = max;
+    }
+    void setRedRange(double min, double max)
+    {
+        redMin = min; redMax = max;
+    }
+    void connectInput(QString obj, QString field);
+    void setIndex(double val);
+    void setDialFont(QString fontProps);
+    void setFactor(double val)
+    {
+        factor = val;
+    }
+    void setDecimalPlaces(int val)
+    {
+        places = val;
+    }
 
 public slots:
     void updateIndex(UAVObject *object1);
 
 
 protected:
-   void paintEvent(QPaintEvent *event);
-   void resizeEvent(QResizeEvent *event);
+    void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
 private:
 
 private slots:
-   void moveIndex();
+    void moveIndex();
 
 private:
-   QSvgRenderer *m_renderer;
-   QGraphicsSvgItem *background;
-   QGraphicsSvgItem *foreground;
-   QGraphicsSvgItem *index;
-   QGraphicsSvgItem *green;
-   QGraphicsSvgItem *yellow;
-   QGraphicsSvgItem *red;
-   QGraphicsSvgItem *fieldSymbol;
+    QSvgRenderer *m_renderer;
+    QGraphicsSvgItem *background;
+    QGraphicsSvgItem *foreground;
+    QGraphicsSvgItem *index;
+    QGraphicsSvgItem *green;
+    QGraphicsSvgItem *yellow;
+    QGraphicsSvgItem *red;
+    QGraphicsSvgItem *fieldSymbol;
 
-   QGraphicsTextItem *fieldName;
-   QGraphicsTextItem *fieldValue;
+    QGraphicsTextItem *fieldName;
+    QGraphicsTextItem *fieldValue;
 
-                   // Simple flag to skip rendering if the
-   bool fgenabled; // layer does not exist.
-   bool verticalDial; // True if the dials scales vertically.
+    // Simple flag to skip rendering if the
+    bool fgenabled; // layer does not exist.
+    bool verticalDial; // True if the dials scales vertically.
 
-   qreal startX; // Where we should draw the bargraph
-   qreal startY; // green/yellow/red zones.
-   qreal bargraphSize;
-   qreal indexHeight;
-   qreal indexWidth;
+    qreal startX; // Where we should draw the bargraph
+    qreal startY; // green/yellow/red zones.
+    qreal bargraphSize;
+    qreal indexHeight;
+    qreal indexWidth;
 
-   double minValue;
-   double maxValue;
-   double greenMin;
-   double greenMax;
-   double yellowMin;
-   double yellowMax;
-   double redMin;
-   double redMax;
-   double factor;
-   int places;
+    double minValue;
+    double maxValue;
+    double greenMin;
+    double greenMax;
+    double yellowMin;
+    double yellowMax;
+    double redMin;
+    double redMax;
+    double factor;
+    int places;
 
-   // The Value and target variables
-   // are expressed in degrees
-   double indexTarget;
-   double indexValue;
+    // The Value and target variables
+    // are expressed in degrees
+    double indexTarget;
+    double indexValue;
 
-   // Rotation timer
-   QTimer dialTimer;
+    // Rotation timer
+    QTimer dialTimer;
 
-   // Name of the fields to read when an update is received:
-   UAVDataObject* obj1;
-   QString field1;
-   QString subfield1;
-   bool haveSubField1;
-
+    // Name of the fields to read when an update is received:
+    UAVDataObject *obj1;
+    QString field1;
+    QString subfield1;
+    bool haveSubField1;
 };
 #endif /* LINEARDIALGADGETWIDGET_H_ */

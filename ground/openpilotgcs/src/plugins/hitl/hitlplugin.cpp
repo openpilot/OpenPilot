@@ -7,7 +7,7 @@
  * @{
  * @addtogroup HITLPlugin HITL Plugin
  * @{
- * @brief The Hardware In The Loop plugin 
+ * @brief The Hardware In The Loop plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -34,42 +34,41 @@
 #include "il2simulator.h"
 #include "xplanesimulator.h"
 
-QList<SimulatorCreator* > HITLPlugin::typeSimulators;
+QList<SimulatorCreator * > HITLPlugin::typeSimulators;
 
 HITLPlugin::HITLPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 HITLPlugin::~HITLPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool HITLPlugin::initialize(const QStringList& args, QString *errMsg)
+bool HITLPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new HITLFactory(this);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new HITLFactory(this);
 
-   addAutoReleasedObject(mf);
+    addAutoReleasedObject(mf);
 
-   addSimulator(new AeroSimRCSimulatorCreator("ASimRC", "AeroSimRC"));
-   addSimulator(new FGSimulatorCreator("FG","FlightGear"));
-   addSimulator(new IL2SimulatorCreator("IL2","IL2"));
-   addSimulator(new XplaneSimulatorCreator("X-Plane","X-Plane"));
+    addSimulator(new AeroSimRCSimulatorCreator("ASimRC", "AeroSimRC"));
+    addSimulator(new FGSimulatorCreator("FG", "FlightGear"));
+    addSimulator(new IL2SimulatorCreator("IL2", "IL2"));
+    addSimulator(new XplaneSimulatorCreator("X-Plane", "X-Plane"));
 
-   return true;
+    return true;
 }
 
 void HITLPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void HITLPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(HITLPlugin)
-

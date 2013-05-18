@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -38,7 +38,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QMenuBar>
 
-Q_DECLARE_METATYPE(Core::Internal::MenuActionContainer*)
+Q_DECLARE_METATYPE(Core::Internal::MenuActionContainer *)
 
 using namespace Core;
 using namespace Core::Internal;
@@ -64,7 +64,7 @@ using namespace Core::Internal;
     You can define if the menu represented by this action container should automatically disable
     or hide whenever it only contains disabled items and submenus by setting the corresponding
     \l{ActionContainer::setEmptyAction()}{EmptyAction}.
-*/
+ */
 
 /*!
     \enum ActionContainer::EmptyAction
@@ -76,37 +76,37 @@ using namespace Core::Internal;
         The menu will be visible but disabled.
     \value EA_Hide
         The menu will not be visible until the state of the subitems change.
-*/
+ */
 
 /*!
     \fn ActionContainer::setEmptyAction(EmptyAction disableOrHide)
     Defines if the menu represented by this action container should automatically \a disableOrHide
     whenever it only contains disabled items and submenus.
     \sa ActionContainer::EmptyAction
-*/
+ */
 
 /*!
     \fn int ActionContainer::id() const
     \internal
-*/
+ */
 
 /*!
     \fn QMenu *ActionContainer::menu() const
     Returns the QMenu instance that is represented by this action container, or
     0 if this action container represents a menu bar.
-*/
+ */
 
 /*!
     \fn QMenuBar *ActionContainer::menuBar() const
     Returns the QMenuBar instance that is represented by this action container, or
     0 if this action container represents a menu.
-*/
+ */
 
 /*!
     \fn QAction *ActionContainer::insertLocation(const QString &group) const
     Returns an action representing the \a group,
     that could be used with \c{QWidget::insertAction}.
-*/
+ */
 
 /*!
     \fn void ActionContainer::appendGroup(const QString &identifier)
@@ -115,7 +115,7 @@ using namespace Core::Internal;
     menus directly to these parts.
     \sa addAction()
     \sa addMenu()
-*/
+ */
 
 /*!
     \fn void ActionContainer::addAction(Core::Command *action, const QString &group)
@@ -123,7 +123,7 @@ using namespace Core::Internal;
     last item of the specified \a group.
     \sa appendGroup()
     \sa addMenu()
-*/
+ */
 
 /*!
     \fn void ActionContainer::addMenu(Core::ActionContainer *menu, const QString &group)
@@ -131,30 +131,28 @@ using namespace Core::Internal;
     last item of the specified \a group.
     \sa appendGroup()
     \sa addAction()
-*/
+ */
 
 /*!
     \fn bool ActionContainer::update()
     \internal
-*/
+ */
 
 /*!
     \fn ActionContainer::~ActionContainer()
     \internal
-*/
+ */
 
 // ---------- ActionContainerPrivate ------------
 
 /*!
     \class Core::Internal::ActionContainerPrivate
     \internal
-*/
+ */
 
 ActionContainerPrivate::ActionContainerPrivate(int id)
     : m_data(0), m_id(id)
-{
-
-}
+{}
 
 void ActionContainerPrivate::setEmptyAction(EmptyAction ea)
 {
@@ -169,29 +167,34 @@ bool ActionContainerPrivate::hasEmptyAction(EmptyAction ea) const
 void ActionContainerPrivate::appendGroup(const QString &group)
 {
     int gid = UniqueIDManager::instance()->uniqueIdentifier(group);
+
     m_groups << gid;
 }
 
 QAction *ActionContainerPrivate::insertLocation(const QString &group) const
 {
-    int grpid = UniqueIDManager::instance()->uniqueIdentifier(group);
+    int grpid   = UniqueIDManager::instance()->uniqueIdentifier(group);
     int prevKey = 0;
-    int pos = ((grpid << 16) | 0xFFFF);
+    int pos     = ((grpid << 16) | 0xFFFF);
+
     return beforeAction(pos, &prevKey);
 }
 
 void ActionContainerPrivate::addAction(Command *action, const QString &group)
 {
-    if (!canAddAction(action))
+    if (!canAddAction(action)) {
         return;
+    }
 
-    ActionManagerPrivate *am = ActionManagerPrivate::instance();
+    ActionManagerPrivate *am   = ActionManagerPrivate::instance();
     UniqueIDManager *idmanager = UniqueIDManager::instance();
     int grpid = idmanager->uniqueIdentifier(Constants::G_DEFAULT_TWO);
-    if (!group.isEmpty())
+    if (!group.isEmpty()) {
         grpid = idmanager->uniqueIdentifier(group);
-    if (!m_groups.contains(grpid) && !am->defaultGroups().contains(grpid))
+    }
+    if (!m_groups.contains(grpid) && !am->defaultGroups().contains(grpid)) {
         qWarning() << "*** addAction(): Unknown group: " << group;
+    }
     int pos = ((grpid << 16) | 0xFFFF);
     addAction(action, pos, true);
 }
@@ -199,16 +202,20 @@ void ActionContainerPrivate::addAction(Command *action, const QString &group)
 void ActionContainerPrivate::addMenu(ActionContainer *menu, const QString &group)
 {
     ActionContainerPrivate *container = static_cast<ActionContainerPrivate *>(menu);
-    if (!container->canBeAddedToMenu())
-        return;
 
-    ActionManagerPrivate *am = ActionManagerPrivate::instance();
+    if (!container->canBeAddedToMenu()) {
+        return;
+    }
+
+    ActionManagerPrivate *am   = ActionManagerPrivate::instance();
     UniqueIDManager *idmanager = UniqueIDManager::instance();
     int grpid = idmanager->uniqueIdentifier(Constants::G_DEFAULT_TWO);
-    if (!group.isEmpty())
+    if (!group.isEmpty()) {
         grpid = idmanager->uniqueIdentifier(group);
-    if (!m_groups.contains(grpid) && !am->defaultGroups().contains(grpid))
+    }
+    if (!m_groups.contains(grpid) && !am->defaultGroups().contains(grpid)) {
         qWarning() << "*** addMenu(): Unknown group: " << group;
+    }
     int pos = ((grpid << 16) | 0xFFFF);
     addMenu(menu, pos, true);
 }
@@ -230,12 +237,12 @@ QMenuBar *ActionContainerPrivate::menuBar() const
 
 bool ActionContainerPrivate::canAddAction(Command *action) const
 {
-    return (action->action() != 0);
+    return action->action() != 0;
 }
 
 void ActionContainerPrivate::addAction(Command *action, int pos, bool setpos)
 {
-    Action *a = static_cast<Action *>(action);
+    Action *a   = static_cast<Action *>(action);
 
     int prevKey = 0;
     QAction *ba = beforeAction(pos, &prevKey);
@@ -244,7 +251,7 @@ void ActionContainerPrivate::addAction(Command *action, int pos, bool setpos)
         pos = calcPosition(pos, prevKey);
         CommandLocation loc;
         loc.m_container = m_id;
-        loc.m_position = pos;
+        loc.m_position  = pos;
         QList<CommandLocation> locs = a->locations();
         locs.append(loc);
         a->setLocations(locs);
@@ -266,7 +273,7 @@ void ActionContainerPrivate::addMenu(ActionContainer *menu, int pos, bool setpos
         pos = calcPosition(pos, prevKey);
         CommandLocation loc;
         loc.m_container = m_id;
-        loc.m_position = pos;
+        loc.m_position  = pos;
         mc->setLocation(loc);
     }
 
@@ -293,14 +300,18 @@ QAction *ActionContainerPrivate::beforeAction(int pos, int *prevKey) const
         ++i;
     }
 
-    if (baId == -1)
+    if (baId == -1) {
         return 0;
+    }
 
-    if (Command *cmd = am->command(baId))
+    if (Command * cmd = am->command(baId)) {
         return cmd->action();
-    if (ActionContainer *container = am->actionContainer(baId))
-        if (QMenu *menu = container->menu())
+    }
+    if (ActionContainer * container = am->actionContainer(baId)) {
+        if (QMenu * menu = container->menu()) {
             return menu->menuAction();
+        }
+    }
 
     return 0;
 }
@@ -308,13 +319,16 @@ QAction *ActionContainerPrivate::beforeAction(int pos, int *prevKey) const
 int ActionContainerPrivate::calcPosition(int pos, int prevKey) const
 {
     int grp = (pos & 0xFFFF0000);
-    if (prevKey == -1)
+
+    if (prevKey == -1) {
         return grp;
+    }
 
     int prevgrp = (prevKey & 0xFFFF0000);
 
-    if (grp != prevgrp)
+    if (grp != prevgrp) {
         return grp;
+    }
 
     return grp + (prevKey & 0xFFFF) + 10;
 }
@@ -324,7 +338,7 @@ int ActionContainerPrivate::calcPosition(int pos, int prevKey) const
 /*!
     \class Core::Internal::MenuActionContainer
     \internal
-*/
+ */
 
 MenuActionContainer::MenuActionContainer(int id)
     : ActionContainerPrivate(id), m_menu(0)
@@ -337,7 +351,7 @@ void MenuActionContainer::setMenu(QMenu *menu)
     m_menu = menu;
 
     QVariant v;
-    qVariantSetValue<MenuActionContainer*>(v, this);
+    qVariantSetValue<MenuActionContainer *>(v, this);
 
     m_menu->menuAction()->setData(v);
 }
@@ -369,14 +383,15 @@ CommandLocation MenuActionContainer::location() const
 
 bool MenuActionContainer::update()
 {
-    if (hasEmptyAction(EA_None))
+    if (hasEmptyAction(EA_None)) {
         return true;
+    }
 
     bool hasitems = false;
 
-    foreach (ActionContainer *container, subContainers()) {
+    foreach(ActionContainer * container, subContainers()) {
         if (container == this) {
-            qWarning() << Q_FUNC_INFO << "container" << (this->menu() ? this->menu()->title() : "") <<  "contains itself as subcontainer";
+            qWarning() << Q_FUNC_INFO << "container" << (this->menu() ? this->menu()->title() : "") << "contains itself as subcontainer";
             continue;
         }
         if (container->update()) {
@@ -385,7 +400,7 @@ bool MenuActionContainer::update()
         }
     }
     if (!hasitems) {
-        foreach (Command *command, commands()) {
+        foreach(Command * command, commands()) {
             if (command->isActive()) {
                 hasitems = true;
                 break;
@@ -393,10 +408,11 @@ bool MenuActionContainer::update()
         }
     }
 
-    if (hasEmptyAction(EA_Hide))
+    if (hasEmptyAction(EA_Hide)) {
         m_menu->setVisible(hasitems);
-    else if (hasEmptyAction(EA_Disable))
+    } else if (hasEmptyAction(EA_Disable)) {
         m_menu->setEnabled(hasitems);
+    }
 
     return hasitems;
 }
@@ -412,7 +428,7 @@ bool MenuActionContainer::canBeAddedToMenu() const
 /*!
     \class Core::Internal::MenuBarActionContainer
     \internal
-*/
+ */
 
 MenuBarActionContainer::MenuBarActionContainer(int id)
     : ActionContainerPrivate(id), m_menuBar(0)
@@ -442,22 +458,24 @@ void MenuBarActionContainer::insertMenu(QAction *before, QMenu *menu)
 
 bool MenuBarActionContainer::update()
 {
-    if (hasEmptyAction(EA_None))
+    if (hasEmptyAction(EA_None)) {
         return true;
+    }
 
     bool hasitems = false;
     QList<QAction *> actions = m_menuBar->actions();
-    for (int i=0; i<actions.size(); ++i) {
+    for (int i = 0; i < actions.size(); ++i) {
         if (actions.at(i)->isVisible()) {
             hasitems = true;
             break;
         }
     }
 
-    if (hasEmptyAction(EA_Hide))
+    if (hasEmptyAction(EA_Hide)) {
         m_menuBar->setVisible(hasitems);
-    else if (hasEmptyAction(EA_Disable))
+    } else if (hasEmptyAction(EA_Disable)) {
         m_menuBar->setEnabled(hasitems);
+    }
 
     return hasitems;
 }
@@ -466,4 +484,3 @@ bool MenuBarActionContainer::canBeAddedToMenu() const
 {
     return false;
 }
-

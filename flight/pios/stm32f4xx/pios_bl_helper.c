@@ -38,7 +38,7 @@
 
 uint8_t *PIOS_BL_HELPER_FLASH_If_Read(uint32_t SectorAddress)
 {
-	return (uint8_t *) (SectorAddress);
+    return (uint8_t *)(SectorAddress);
 }
 
 #if defined(PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT)
@@ -47,113 +47,114 @@ static bool erase_flash(uint32_t startAddress, uint32_t endAddress);
 
 uint8_t PIOS_BL_HELPER_FLASH_Ini()
 {
-	FLASH_Unlock();
-	FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
-	return 1;
+    FLASH_Unlock();
+    FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR | FLASH_FLAG_PGSERR);
+    return 1;
 }
 
 struct device_flash_sector {
-	uint32_t start;
-	uint32_t size;
-	uint16_t st_sector;
+    uint32_t start;
+    uint32_t size;
+    uint16_t st_sector;
 };
 
 static struct device_flash_sector flash_sectors[] = {
-	[0] = {
-		.start = 0x08000000,
-		.size  = 16 * 1024,
-		.st_sector = FLASH_Sector_0,
-	},
-	[1] = {
-		.start = 0x08004000,
-		.size  = 16 * 1024,
-		.st_sector = FLASH_Sector_1,
-	},
-	[2] = {
-		.start = 0x08008000,
-		.size  = 16 * 1024,
-		.st_sector = FLASH_Sector_2,
-	},
-	[3] = {
-		.start = 0x0800C000,
-		.size  = 16 * 1024,
-		.st_sector = FLASH_Sector_3,
-	},
-	[4] = {
-		.start = 0x08010000,
-		.size  = 64 * 1024,
-		.st_sector = FLASH_Sector_4,
-	},
-	[5] = {
-		.start = 0x08020000,
-		.size  = 128 * 1024,
-		.st_sector = FLASH_Sector_5,
-	},
-	[6] = {
-		.start = 0x08040000,
-		.size  = 128 * 1024,
-		.st_sector = FLASH_Sector_6,
-	},
-	[7] = {
-		.start = 0x08060000,
-		.size  = 128 * 1024,
-		.st_sector = FLASH_Sector_7,
-	},
-	[8] = {
-		.start = 0x08080000,
-		.size  = 128 * 1024,
-		.st_sector = FLASH_Sector_8,
-	},
-	[9] = {
-		.start = 0x080A0000,
-		.size  = 128 * 1024,
-		.st_sector = FLASH_Sector_9,
-	},
-	[10] = {
-		.start = 0x080C0000,
-		.size  = 128 * 1024,
-		.st_sector = FLASH_Sector_10,
-	},
-	[11] = {
-		.start = 0x080E0000,
-		.size  = 128 * 1024,
-		.st_sector = FLASH_Sector_11,
-	},
+    [0] =  {
+        .start     = 0x08000000,
+        .size      = 16 * 1024,
+        .st_sector = FLASH_Sector_0,
+    },
+    [1] =  {
+        .start     = 0x08004000,
+        .size      = 16 * 1024,
+        .st_sector = FLASH_Sector_1,
+    },
+    [2] =  {
+        .start     = 0x08008000,
+        .size      = 16 * 1024,
+        .st_sector = FLASH_Sector_2,
+    },
+    [3] =  {
+        .start     = 0x0800C000,
+        .size      = 16 * 1024,
+        .st_sector = FLASH_Sector_3,
+    },
+    [4] =  {
+        .start     = 0x08010000,
+        .size      = 64 * 1024,
+        .st_sector = FLASH_Sector_4,
+    },
+    [5] =  {
+        .start     = 0x08020000,
+        .size      = 128 * 1024,
+        .st_sector = FLASH_Sector_5,
+    },
+    [6] =  {
+        .start     = 0x08040000,
+        .size      = 128 * 1024,
+        .st_sector = FLASH_Sector_6,
+    },
+    [7] =  {
+        .start     = 0x08060000,
+        .size      = 128 * 1024,
+        .st_sector = FLASH_Sector_7,
+    },
+    [8] =  {
+        .start     = 0x08080000,
+        .size      = 128 * 1024,
+        .st_sector = FLASH_Sector_8,
+    },
+    [9] =  {
+        .start     = 0x080A0000,
+        .size      = 128 * 1024,
+        .st_sector = FLASH_Sector_9,
+    },
+    [10] = {
+        .start     = 0x080C0000,
+        .size      = 128 * 1024,
+        .st_sector = FLASH_Sector_10,
+    },
+    [11] = {
+        .start     = 0x080E0000,
+        .size      = 128 * 1024,
+        .st_sector = FLASH_Sector_11,
+    },
 };
 
-static bool PIOS_BL_HELPER_FLASH_GetSectorInfo(uint32_t address, uint8_t * sector_number, uint32_t *sector_start, uint32_t *sector_size)
+static bool PIOS_BL_HELPER_FLASH_GetSectorInfo(uint32_t address, uint8_t *sector_number, uint32_t *sector_start, uint32_t *sector_size)
 {
-	for (uint8_t i = 0; i < NELEMENTS(flash_sectors); i++) {
-		struct device_flash_sector * sector = &flash_sectors[i];
-		if ((address >= sector->start) && 
-			(address < (sector->start + sector->size))) {
-			/* address lies within this sector */
-			*sector_number = sector->st_sector;
-			*sector_start  = sector->start;
-			*sector_size   = sector->size;
-			return (true);
-		}
-	}
+    for (uint8_t i = 0; i < NELEMENTS(flash_sectors); i++) {
+        struct device_flash_sector *sector = &flash_sectors[i];
+        if ((address >= sector->start) &&
+            (address < (sector->start + sector->size))) {
+            /* address lies within this sector */
+            *sector_number = sector->st_sector;
+            *sector_start  = sector->start;
+            *sector_size   = sector->size;
+            return true;
+        }
+    }
 
-	return (false);
+    return false;
 }
 
 uint8_t PIOS_BL_HELPER_FLASH_Start()
 {
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
-	uint32_t startAddress = bdinfo->fw_base;
-	uint32_t endAddress = bdinfo->fw_base + bdinfo->fw_size + bdinfo->desc_size;
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
+    uint32_t startAddress = bdinfo->fw_base;
+    uint32_t endAddress   = bdinfo->fw_base + bdinfo->fw_size + bdinfo->desc_size;
 
-	bool success = erase_flash(startAddress, endAddress);
+    bool success = erase_flash(startAddress, endAddress);
 
     return (success) ? 1 : 0;
 }
 
 
-uint8_t PIOS_BL_HELPER_FLASH_Erase_Bootloader() {
+uint8_t PIOS_BL_HELPER_FLASH_Erase_Bootloader()
+{
 /// Bootloader memory space erase
     uint32_t startAddress = BL_BANK_BASE;
-    uint32_t endAddress = BL_BANK_BASE + BL_BANK_SIZE;
+    uint32_t endAddress   = BL_BANK_BASE + BL_BANK_SIZE;
 
     bool success = erase_flash(startAddress, endAddress);
 
@@ -164,14 +165,15 @@ static bool erase_flash(uint32_t startAddress, uint32_t endAddress)
 {
     uint32_t pageAddress = startAddress;
     bool fail = false;
+
     while ((pageAddress < endAddress) && (fail == false)) {
         uint8_t sector_number;
         uint32_t sector_start;
         uint32_t sector_size;
         if (!PIOS_BL_HELPER_FLASH_GetSectorInfo(pageAddress,
-                        &sector_number,
-                        &sector_start,
-                        &sector_size)) {
+                                                &sector_number,
+                                                &sector_start,
+                                                &sector_size)) {
             /* We're asking for an invalid flash address */
             PIOS_Assert(0);
         }
@@ -189,31 +191,33 @@ static bool erase_flash(uint32_t startAddress, uint32_t endAddress)
     return !fail;
 }
 
-#endif
+#endif /* if defined(PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT) */
 
 uint32_t PIOS_BL_HELPER_CRC_Memory_Calc()
 {
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
 
-	PIOS_BL_HELPER_CRC_Ini();
-	CRC_ResetDR();
-	CRC_CalcBlockCRC((uint32_t *) bdinfo->fw_base, (bdinfo->fw_size) >> 2);
-	return CRC_GetCRC();
+    PIOS_BL_HELPER_CRC_Ini();
+    CRC_ResetDR();
+    CRC_CalcBlockCRC((uint32_t *)bdinfo->fw_base, (bdinfo->fw_size) >> 2);
+    return CRC_GetCRC();
 }
 
-void PIOS_BL_HELPER_FLASH_Read_Description(uint8_t * array, uint8_t size)
+void PIOS_BL_HELPER_FLASH_Read_Description(uint8_t *array, uint8_t size)
 {
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
-	uint8_t x = 0;
-	if (size > bdinfo->desc_size) size = bdinfo->desc_size;
-	for (uint32_t i = bdinfo->fw_base + bdinfo->fw_size; i < bdinfo->fw_base + bdinfo->fw_size + size; ++i) {
-		array[x] = *PIOS_BL_HELPER_FLASH_If_Read(i);
-		++x;
-	}
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
+    uint8_t x = 0;
+
+    if (size > bdinfo->desc_size) {
+        size = bdinfo->desc_size;
+    }
+    for (uint32_t i = bdinfo->fw_base + bdinfo->fw_size; i < bdinfo->fw_base + bdinfo->fw_size + size; ++i) {
+        array[x] = *PIOS_BL_HELPER_FLASH_If_Read(i);
+        ++x;
+    }
 }
 
 void PIOS_BL_HELPER_CRC_Ini()
-{
-}
+{}
 
 #endif /* PIOS_INCLUDE_BL_HELPER */

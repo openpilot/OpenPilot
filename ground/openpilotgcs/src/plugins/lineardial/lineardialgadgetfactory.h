@@ -7,7 +7,7 @@
  * @{
  * @addtogroup LinearDialPlugin Linear Dial Plugin
  * @{
- * @brief Impliments a gadget that displays linear gauges 
+ * @brief Impliments a gadget that displays linear gauges
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -37,15 +37,14 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class LineardialGadgetFactory : public IUAVGadgetFactory
-{
+class LineardialGadgetFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
     LineardialGadgetFactory(QObject *parent = 0);
     ~LineardialGadgetFactory();
 
     Core::IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 

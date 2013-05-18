@@ -35,49 +35,115 @@
 #include "vehicleconfigurationsource.h"
 #include "vehicleconfigurationhelper.h"
 
-class SetupWizard : public QWizard, public VehicleConfigurationSource
-{
+class SetupWizard : public QWizard, public VehicleConfigurationSource {
     Q_OBJECT
 
 public:
     SetupWizard(QWidget *parent = 0);
     int nextId() const;
 
-    void setControllerType(SetupWizard::CONTROLLER_TYPE type) { m_controllerType = type; }
-    SetupWizard::CONTROLLER_TYPE getControllerType() const { return m_controllerType; }
+    void setControllerType(SetupWizard::CONTROLLER_TYPE type)
+    {
+        m_controllerType = type;
+    }
+    SetupWizard::CONTROLLER_TYPE getControllerType() const
+    {
+        return m_controllerType;
+    }
 
-    void setVehicleType(SetupWizard::VEHICLE_TYPE type) { m_vehicleType = type; }
-    SetupWizard::VEHICLE_TYPE getVehicleType() const { return m_vehicleType; }
+    void setVehicleType(SetupWizard::VEHICLE_TYPE type)
+    {
+        m_vehicleType = type;
+    }
+    SetupWizard::VEHICLE_TYPE getVehicleType() const
+    {
+        return m_vehicleType;
+    }
 
-    void setVehicleSubType(SetupWizard::VEHICLE_SUB_TYPE type) { m_vehicleSubType = type; }
-    SetupWizard::VEHICLE_SUB_TYPE getVehicleSubType() const { return m_vehicleSubType; }
+    void setVehicleSubType(SetupWizard::VEHICLE_SUB_TYPE type)
+    {
+        m_vehicleSubType = type;
+    }
+    SetupWizard::VEHICLE_SUB_TYPE getVehicleSubType() const
+    {
+        return m_vehicleSubType;
+    }
 
-    void setInputType(SetupWizard::INPUT_TYPE type) { m_inputType = type; }
-    SetupWizard::INPUT_TYPE getInputType() const { return m_inputType; }
+    void setInputType(SetupWizard::INPUT_TYPE type)
+    {
+        m_inputType = type;
+    }
+    SetupWizard::INPUT_TYPE getInputType() const
+    {
+        return m_inputType;
+    }
 
-    void setESCType(SetupWizard::ESC_TYPE type) { m_escType = type; }
-    SetupWizard::ESC_TYPE getESCType() const { return m_escType; }
+    void setESCType(SetupWizard::ESC_TYPE type)
+    {
+        m_escType = type;
+    }
+    SetupWizard::ESC_TYPE getESCType() const
+    {
+        return m_escType;
+    }
 
-    void setGPSSetting(SetupWizard::GPS_SETTING setting) { m_gpsSetting = setting; }
-    SetupWizard::GPS_SETTING getGPSSetting() const {return m_gpsSetting;}
+    void setGPSSetting(SetupWizard::GPS_SETTING setting)
+    {
+        m_gpsSetting = setting;
+    }
+    SetupWizard::GPS_SETTING getGPSSetting() const
+    {
+        return m_gpsSetting;
+    }
 
-    void setRadioSetting(SetupWizard::RADIO_SETTING setting) { m_radioSetting = setting; }
-    SetupWizard::RADIO_SETTING getRadioSetting() const {return m_radioSetting;}
+    void setRadioSetting(SetupWizard::RADIO_SETTING setting)
+    {
+        m_radioSetting = setting;
+    }
+    SetupWizard::RADIO_SETTING getRadioSetting() const
+    {
+        return m_radioSetting;
+    }
 
-    void setLevellingBias(accelGyroBias bias) { m_calibrationBias = bias; m_calibrationPerformed = true; }
-    bool isCalibrationPerformed() const { return m_calibrationPerformed; }
-    accelGyroBias getCalibrationBias() const { return m_calibrationBias; }
+    void setLevellingBias(accelGyroBias bias)
+    {
+        m_calibrationBias = bias; m_calibrationPerformed = true;
+    }
+    bool isCalibrationPerformed() const
+    {
+        return m_calibrationPerformed;
+    }
+    accelGyroBias getCalibrationBias() const
+    {
+        return m_calibrationBias;
+    }
 
-    void setActuatorSettings(QList<actuatorChannelSettings> actuatorSettings) { m_actuatorSettings = actuatorSettings; }
-    bool isMotorCalibrationPerformed() const { return m_motorCalibrationPerformed; }
-    QList<actuatorChannelSettings> getActuatorSettings() const { return m_actuatorSettings; }
+    void setActuatorSettings(QList<actuatorChannelSettings> actuatorSettings)
+    {
+        m_actuatorSettings = actuatorSettings;
+    }
+    bool isMotorCalibrationPerformed() const
+    {
+        return m_motorCalibrationPerformed;
+    }
+    QList<actuatorChannelSettings> getActuatorSettings() const
+    {
+        return m_actuatorSettings;
+    }
 
-    void setRestartNeeded(bool needed) { m_restartNeeded = needed; }
-    bool isRestartNeeded() const {return m_restartNeeded; }
+    void setRestartNeeded(bool needed)
+    {
+        m_restartNeeded = needed;
+    }
+    bool isRestartNeeded() const
+    {
+        return m_restartNeeded;
+    }
 
     QString getSummaryText();
 
-    Core::ConnectionManager* getConnectionManager() {
+    Core::ConnectionManager *getConnectionManager()
+    {
         if (!m_connectionManager) {
             m_connectionManager = Core::ICore::instance()->connectionManager();
             Q_ASSERT(m_connectionManager);
@@ -89,10 +155,10 @@ private slots:
     void customBackClicked();
     void pageChanged(int currId);
 private:
-    enum {PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
-          PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_BIAS_CALIBRATION,
-          PAGE_REVO_CALIBRATION, PAGE_OUTPUT_CALIBRATION, PAGE_SAVE, PAGE_SUMMARY,
-          PAGE_NOTYETIMPLEMENTED, PAGE_REBOOT, PAGE_END, PAGE_UPDATE};
+    enum { PAGE_START, PAGE_CONTROLLER, PAGE_VEHICLES, PAGE_MULTI, PAGE_FIXEDWING,
+           PAGE_HELI, PAGE_SURFACE, PAGE_INPUT, PAGE_OUTPUT, PAGE_BIAS_CALIBRATION,
+           PAGE_REVO_CALIBRATION, PAGE_OUTPUT_CALIBRATION, PAGE_SAVE, PAGE_SUMMARY,
+           PAGE_NOTYETIMPLEMENTED, PAGE_REBOOT, PAGE_END, PAGE_UPDATE };
     void createPages();
     bool saveHardwareSettings() const;
     bool canAutoUpdate() const;

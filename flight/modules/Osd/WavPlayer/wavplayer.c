@@ -39,9 +39,9 @@ static void WavPlayerTask(void *parameters);
 // ****************
 // Private constants
 
-#define STACK_SIZE_BYTES            1600
+#define STACK_SIZE_BYTES 1600
 
-#define TASK_PRIORITY                   (tskIDLE_PRIORITY + 4)
+#define TASK_PRIORITY    (tskIDLE_PRIORITY + 4)
 
 // ****************
 // Private variables
@@ -55,7 +55,7 @@ static uint32_t timeOfLastUpdateMs;
 int32_t WavPlayerStart(void)
 {
     // Start WavPlayer task
-    xTaskCreate(WavPlayerTask, (signed char *) "WavPlayer", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &WavPlayerTaskHandle);
+    xTaskCreate(WavPlayerTask, (signed char *)"WavPlayer", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &WavPlayerTaskHandle);
 
     return 0;
 }
@@ -66,10 +66,9 @@ int32_t WavPlayerStart(void)
  */
 int32_t WavPlayerInitialize(void)
 {
-
     return 0;
 }
-MODULE_INITCALL( WavPlayerInitialize, WavPlayerStart)
+MODULE_INITCALL(WavPlayerInitialize, WavPlayerStart)
 
 // ****************
 /**
@@ -79,11 +78,12 @@ MODULE_INITCALL( WavPlayerInitialize, WavPlayerStart)
 static void WavPlayerTask(__attribute__((unused)) void *parameters)
 {
     portTickType lastSysTime;
+
     // Loop forever
     lastSysTime = xTaskGetTickCount();
     uint32_t timeNowMs = xTaskGetTickCount() * portTICK_RATE_MS;
 
-    timeOfLastUpdateMs = timeNowMs;
+    timeOfLastUpdateMs  = timeNowMs;
     timeOfLastCommandMs = timeNowMs;
 #if defined(PIOS_INCLUDE_WAVE)
     WavePlayer_Start();

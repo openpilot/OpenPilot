@@ -11,18 +11,18 @@
  * @brief The GCS Welcome plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -40,11 +40,9 @@ class QUrl;
 QT_END_NAMESPACE
 
 namespace Welcome {
-
 struct WelcomeModePrivate;
 
-class WELCOME_EXPORT WelcomeMode : public Core::IMode
-{
+class WELCOME_EXPORT WelcomeMode : public Core::IMode {
     Q_OBJECT
 
 public:
@@ -59,8 +57,14 @@ public:
     const char *uniqueModeName() const;
     QList<int> context() const;
     void activated();
-    QString contextHelpId() const { return QLatin1String("OpenPilot GCS"); }
-    void setPriority(int priority) { m_priority = priority; }
+    QString contextHelpId() const
+    {
+        return QLatin1String("OpenPilot GCS");
+    }
+    void setPriority(int priority)
+    {
+        m_priority = priority;
+    }
 
 public slots:
     void openUrl(const QString &url);
@@ -71,7 +75,6 @@ private:
     WelcomeModePrivate *m_d;
     int m_priority;
 };
-
 } // namespace Welcome
 
 #endif // WELCOMEMODE_H

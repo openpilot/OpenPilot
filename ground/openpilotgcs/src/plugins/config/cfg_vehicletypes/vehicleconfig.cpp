@@ -1,4 +1,3 @@
-
 /**
  ******************************************************************************
  *
@@ -37,38 +36,39 @@ VehicleConfig::VehicleConfig(QWidget *parent) : ConfigTaskWidget(parent)
 {
     // Generate lists of mixerTypeNames, mixerVectorNames, channelNames
     channelNames << "None";
-    for (int i = 0; i < (int) VehicleConfig::CHANNEL_NUMELEM; i++) {
+    for (int i = 0; i < (int)VehicleConfig::CHANNEL_NUMELEM; i++) {
         mixerTypes << QString("Mixer%1Type").arg(i + 1);
         mixerVectors << QString("Mixer%1Vector").arg(i + 1);
         channelNames << QString("Channel%1").arg(i + 1);
     }
 
     mixerTypeDescriptions << "Disabled" << "Motor" << "Servo" << "CameraRoll" << "CameraPitch" << "CameraYaw"
-            << "Accessory0" << "Accessory1" << "Accessory2" << "Accessory3" << "Accessory4" << "Accessory5";
+                          << "Accessory0" << "Accessory1" << "Accessory2" << "Accessory3" << "Accessory4" << "Accessory5";
 
     // This is needed because new style tries to compact things as much as possible in grid
     // and on OSX the widget sizes of PushButtons is reported incorrectly:
     // https://bugreports.qt-project.org/browse/QTBUG-14591
-    foreach(QPushButton *btn, findChildren<QPushButton*>()) {
+    foreach(QPushButton * btn, findChildren<QPushButton *>()) {
         btn->setAttribute(Qt::WA_LayoutUsesWidgetRect);
     }
 }
 
 VehicleConfig::~VehicleConfig()
 {
-   // Do nothing
+    // Do nothing
 }
 
 GUIConfigDataUnion VehicleConfig::getConfigData()
 {
     // get an instance of systemsettings
     SystemSettings *systemSettings = SystemSettings::GetInstance(getUAVObjectManager());
+
     Q_ASSERT(systemSettings);
     SystemSettings::DataFields systemSettingsData = systemSettings->getData();
 
     // copy systemsettings -> local configData
     GUIConfigDataUnion configData;
-    for (int i = 0; i < (int) SystemSettings::GUICONFIGDATA_NUMELEM; i++) {
+    for (int i = 0; i < (int)SystemSettings::GUICONFIGDATA_NUMELEM; i++) {
         configData.UAVObject[i] = systemSettingsData.GUIConfigData[i];
     }
 
@@ -95,7 +95,7 @@ void VehicleConfig::setConfigData(GUIConfigDataUnion configData)
     }
 
     // copy parameter configData -> systemsettings
-    for (int i = 0; i < (int) SystemSettings::GUICONFIGDATA_NUMELEM; i++) {
+    for (int i = 0; i < (int)SystemSettings::GUICONFIGDATA_NUMELEM; i++) {
         guiConfig->setValue(configData.UAVObject[i], i);
     }
 }
@@ -121,9 +121,7 @@ void VehicleConfig::refreshWidgetsValues(UAVObject *o)
 }
 
 void VehicleConfig::updateObjectsFromWidgets()
-{
-
-}
+{}
 
 void VehicleConfig::resetActuators(GUIConfigDataUnion *configData)
 {
@@ -131,7 +129,8 @@ void VehicleConfig::resetActuators(GUIConfigDataUnion *configData)
 }
 
 
-void VehicleConfig::registerWidgets(ConfigTaskWidget &parent) {
+void VehicleConfig::registerWidgets(ConfigTaskWidget &parent)
+{
     Q_UNUSED(parent);
 }
 
@@ -141,15 +140,15 @@ void VehicleConfig::registerWidgets(ConfigTaskWidget &parent) {
 void VehicleConfig::populateChannelComboBoxes()
 {
     QList<QComboBox *> l = findChildren<QComboBox *>(QRegExp("\\S+ChannelBo\\S+"));
-    foreach(QComboBox *combobox, l) {
+    foreach(QComboBox * combobox, l) {
         combobox->addItems(channelNames);
     }
 }
 
 /**
-  Helper function:
-  Sets the current index on supplied combobox to index
-  if it is within bounds 0 <= index < combobox.count()
+   Helper function:
+   Sets the current index on supplied combobox to index
+   if it is within bounds 0 <= index < combobox.count()
  */
 void VehicleConfig::setComboCurrentIndex(QComboBox *box, int index)
 {
@@ -160,13 +159,13 @@ void VehicleConfig::setComboCurrentIndex(QComboBox *box, int index)
 }
 
 /**
-  Helper function:
-  enables/disables the named comboboxes within supplied owner
+   Helper function:
+   enables/disables the named comboboxes within supplied owner
  */
 void VehicleConfig::enableComboBoxes(QWidget *owner, QString boxName, int boxCount, bool enable)
 {
     for (int i = 1; i <= boxCount; i++) {
-        QComboBox* box = qFindChild<QComboBox*>(owner, QString("%0%1").arg(boxName).arg(i));
+        QComboBox *box = qFindChild<QComboBox *>(owner, QString("%0%1").arg(boxName).arg(i));
         if (box) {
             box->setEnabled(enable);
         }
@@ -224,7 +223,7 @@ void VehicleConfig::resetMixerVector(UAVDataObject *mixer, int channel)
 // Disable all servo/motor mixers (but keep camera and accessory ones)
 void VehicleConfig::resetMotorAndServoMixers(UAVDataObject *mixer)
 {
-    for (int channel = 0; channel < (int) VehicleConfig::CHANNEL_NUMELEM; channel++) {
+    for (int channel = 0; channel < (int)VehicleConfig::CHANNEL_NUMELEM; channel++) {
         QString type = getMixerType(mixer, channel);
         if ((type == "Disabled") || (type == "Motor") || (type == "Servo")) {
             setMixerType(mixer, channel, VehicleConfig::MIXERTYPE_DISABLED);
@@ -298,7 +297,7 @@ void VehicleConfig::setThrottleCurve(UAVDataObject *mixer, MixerThrottleCurveEle
         break;
     }
 
-    if (field && (field->getNumElements() == (unsigned int) curve.length())) {
+    if (field && (field->getNumElements() == (unsigned int)curve.length())) {
         for (int i = 0; i < curve.length(); i++) {
             field->setValue(curve.at(i), i);
         }
@@ -335,8 +334,9 @@ bool VehicleConfig::isValidThrottleCurve(QList<double> *curve)
 
     if (curve) {
         for (int i = 0; i < curve->count(); i++) {
-            if (curve->at(i) != 0)
+            if (curve->at(i) != 0) {
                 return true;
+            }
         }
     }
     return false;
@@ -346,6 +346,7 @@ double VehicleConfig::getCurveMin(QList<double> *curve)
 {
     // TODO initialize to max double
     double min = 0;
+
     for (int i = 0; i < curve->count(); i++) {
         min = std::min(min, curve->at(i));
     }
@@ -356,6 +357,7 @@ double VehicleConfig::getCurveMax(QList<double> *curve)
 {
     // TODO initialize to min double
     double max = 0;
+
     for (int i = 0; i < curve->count(); i++) {
         max = std::max(max, curve->at(i));
     }
@@ -363,9 +365,9 @@ double VehicleConfig::getCurveMax(QList<double> *curve)
 }
 
 /**
-  Reset the contents of a field
-  */
-void VehicleConfig::resetField(UAVObjectField * field)
+   Reset the contents of a field
+ */
+void VehicleConfig::resetField(UAVObjectField *field)
 {
     for (unsigned int i = 0; i < field->getNumElements(); i++) {
         field->setValue(0, i);
@@ -380,6 +382,7 @@ UAVObjectManager *VehicleConfig::getUAVObjectManager()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objMngr = pm->getObject<UAVObjectManager>();
+
     Q_ASSERT(objMngr);
     return objMngr;
 }

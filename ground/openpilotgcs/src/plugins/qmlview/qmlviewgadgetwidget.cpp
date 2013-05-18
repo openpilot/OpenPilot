@@ -8,7 +8,7 @@
  * @{
  * @addtogroup OPMapPlugin QML Viewer Plugin
  * @{
- * @brief The QML Viewer Gadget 
+ * @brief The QML Viewer Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -44,35 +44,36 @@
 QmlViewGadgetWidget::QmlViewGadgetWidget(QWidget *parent) :
     QDeclarativeView(parent)
 {
-    setMinimumSize(64,64);
+    setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setResizeMode(SizeRootObjectToView);
 
     QStringList objectsToExport;
     objectsToExport << "VelocityActual" <<
-                       "PositionActual" <<
-                       "AttitudeActual" <<
-                       "GPSPosition" <<
-                       "GCSTelemetryStats" <<
-                       "FlightBatteryState";
+        "PositionActual" <<
+        "AttitudeActual" <<
+        "GPSPosition" <<
+        "GCSTelemetryStats" <<
+        "FlightBatteryState";
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    foreach (const QString &objectName, objectsToExport) {
-        UAVObject* object = objManager->getObject(objectName);
-        if (object)
+    foreach(const QString &objectName, objectsToExport) {
+        UAVObject *object = objManager->getObject(objectName);
+
+        if (object) {
             engine()->rootContext()->setContextProperty(objectName, object);
-        else
+        } else {
             qWarning() << "Failed to load object" << objectName;
+        }
     }
 
     engine()->rootContext()->setContextProperty("qmlWidget", this);
 }
 
 QmlViewGadgetWidget::~QmlViewGadgetWidget()
-{
-}
+{}
 
 void QmlViewGadgetWidget::setQmlFile(QString fn)
 {
@@ -82,7 +83,7 @@ void QmlViewGadgetWidget::setQmlFile(QString fn)
     SvgImageProvider *svgProvider = new SvgImageProvider(fn);
     engine()->addImageProvider("svg", svgProvider);
 
-    //it's necessary to allow qml side to query svg element position
+    // it's necessary to allow qml side to query svg element position
     engine()->rootContext()->setContextProperty("svgRenderer", svgProvider);
     engine()->setBaseUrl(QUrl::fromLocalFile(fn));
 
@@ -95,9 +96,10 @@ void QmlViewGadgetWidget::setQmlFile(QString fn)
 }
 
 /*!
-  \brief Enables/Disables OpenGL
-  */
-void QmlViewGadgetWidget::enableOpenGL(bool flag) {
+   \brief Enables/Disables OpenGL
+ */
+void QmlViewGadgetWidget::enableOpenGL(bool flag)
+{
     if (flag) {
         setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
     } else {

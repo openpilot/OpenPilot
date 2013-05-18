@@ -4,25 +4,25 @@
  * @file       plugindialog.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -43,6 +43,7 @@ PluginDialog::PluginDialog(ExtensionSystem::PluginManager *manager)
     : m_view(new ExtensionSystem::PluginView(manager, this))
 {
     QVBoxLayout *vl = new QVBoxLayout(this);
+
     vl->setMargin(0);
     vl->setSpacing(0);
     vl->addWidget(m_view);
@@ -61,10 +62,10 @@ PluginDialog::PluginDialog(ExtensionSystem::PluginManager *manager)
     resize(650, 300);
     setWindowTitle(tr("Installed Plugins"));
 
-    connect(m_view, SIGNAL(currentPluginChanged(ExtensionSystem::PluginSpec*)),
-                this, SLOT(updateButtons()));
-    connect(m_view, SIGNAL(pluginActivated(ExtensionSystem::PluginSpec*)),
-                this, SLOT(openDetails(ExtensionSystem::PluginSpec*)));
+    connect(m_view, SIGNAL(currentPluginChanged(ExtensionSystem::PluginSpec *)),
+            this, SLOT(updateButtons()));
+    connect(m_view, SIGNAL(pluginActivated(ExtensionSystem::PluginSpec *)),
+            this, SLOT(openDetails(ExtensionSystem::PluginSpec *)));
     connect(m_detailsButton, SIGNAL(clicked()), this, SLOT(openDetails()));
     connect(m_errorDetailsButton, SIGNAL(clicked()), this, SLOT(openErrorDetails()));
 }
@@ -72,6 +73,7 @@ PluginDialog::PluginDialog(ExtensionSystem::PluginManager *manager)
 void PluginDialog::updateButtons()
 {
     ExtensionSystem::PluginSpec *selectedSpec = m_view->currentPlugin();
+
     if (selectedSpec) {
         m_detailsButton->setEnabled(true);
         m_errorDetailsButton->setEnabled(selectedSpec->hasError());
@@ -84,13 +86,14 @@ void PluginDialog::updateButtons()
 
 void PluginDialog::openDetails()
 {
-        openDetails(m_view->currentPlugin());
+    openDetails(m_view->currentPlugin());
 }
 
 void PluginDialog::openDetails(ExtensionSystem::PluginSpec *spec)
 {
-    if (!spec)
+    if (!spec) {
         return;
+    }
     QDialog dialog(this);
     dialog.setWindowTitle(tr("Plugin Details of %1").arg(spec->name()));
     QVBoxLayout *layout = new QVBoxLayout;
@@ -109,8 +112,10 @@ void PluginDialog::openDetails(ExtensionSystem::PluginSpec *spec)
 void PluginDialog::openErrorDetails()
 {
     ExtensionSystem::PluginSpec *spec = m_view->currentPlugin();
-    if (!spec)
+
+    if (!spec) {
         return;
+    }
     QDialog dialog(this);
     dialog.setWindowTitle(tr("Plugin Errors of %1").arg(spec->name()));
     QVBoxLayout *layout = new QVBoxLayout;
@@ -131,6 +136,7 @@ int main(int argc, char *argv[])
     ExtensionSystem::PluginManager manager;
     QApplication app(argc, argv);
     PluginDialog dialog(&manager);
+
     manager.setPluginPaths(QStringList() << "plugins");
     manager.loadPlugins();
     dialog.show();

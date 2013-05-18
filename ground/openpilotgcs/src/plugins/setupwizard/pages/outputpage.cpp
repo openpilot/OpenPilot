@@ -30,7 +30,7 @@
 #include "setupwizard.h"
 
 OutputPage::OutputPage(SetupWizard *wizard, QWidget *parent) :
-        AbstractWizardPage(wizard, parent),
+    AbstractWizardPage(wizard, parent),
 
     ui(new Ui::OutputPage)
 {
@@ -44,10 +44,9 @@ OutputPage::~OutputPage()
 
 bool OutputPage::validatePage()
 {
-    if(ui->rapidESCButton->isChecked()) {
+    if (ui->rapidESCButton->isChecked()) {
         getWizard()->setESCType(SetupWizard::ESC_RAPID);
-    }
-    else {
+    } else {
         getWizard()->setESCType(SetupWizard::ESC_LEGACY);
     }
 

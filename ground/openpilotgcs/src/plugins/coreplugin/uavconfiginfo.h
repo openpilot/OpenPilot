@@ -33,12 +33,10 @@
 #include "iuavgadgetconfiguration.h"
 #include "core_global.h"
 
-namespace Core
-{
-
+namespace Core {
 class IUAVGadgetConfiguration;
 
-class CORE_EXPORT UAVConfigVersion{
+class CORE_EXPORT UAVConfigVersion {
 public:
     UAVConfigVersion(QString versionString = "0.0.0");
     UAVConfigVersion(int major, int minor, int patch);
@@ -51,34 +49,57 @@ public:
     bool operator==(const UAVConfigVersion &other);
 };
 
-class CORE_EXPORT UAVConfigInfo : public QObject
-{
+class CORE_EXPORT UAVConfigInfo : public QObject {
     Q_OBJECT
 public:
 
     explicit UAVConfigInfo(QObject *parent = 0);
     explicit UAVConfigInfo(QSettings *qs, QObject *parent = 0);
-    explicit UAVConfigInfo(IUAVGadgetConfiguration* config, QObject *parent = 0);
+    explicit UAVConfigInfo(IUAVGadgetConfiguration *config, QObject *parent = 0);
     UAVConfigInfo(UAVConfigVersion version, QString nameOfConfigurable, QObject *parent = 0);
 
     enum Compatibility { FullyCompatible, MinorLossOfConfiguration, MissingConfiguration, MajorLossOfConfiguration, NotCompatible };
-    void setNameOfConfigurable(const QString nameOfConfigurable){m_nameOfConfigurable = nameOfConfigurable;}
+    void setNameOfConfigurable(const QString nameOfConfigurable)
+    {
+        m_nameOfConfigurable = nameOfConfigurable;
+    }
 
     void save(QSettings *qs);
     void read(QSettings *qs);
 
-    void setVersion(int major, int minor, int patch){m_version = UAVConfigVersion(major, minor, patch);}
-    void setVersion(const QString version){m_version = UAVConfigVersion(version);}
-    void setVersion(const UAVConfigVersion version){m_version = version;}
-    UAVConfigVersion version(){ return m_version;}
-    bool locked(){ return m_locked; }
-    void setLocked(bool locked){ m_locked = locked; }
+    void setVersion(int major, int minor, int patch)
+    {
+        m_version = UAVConfigVersion(major, minor, patch);
+    }
+    void setVersion(const QString version)
+    {
+        m_version = UAVConfigVersion(version);
+    }
+    void setVersion(const UAVConfigVersion version)
+    {
+        m_version = version;
+    }
+    UAVConfigVersion version()
+    {
+        return m_version;
+    }
+    bool locked()
+    {
+        return m_locked;
+    }
+    void setLocked(bool locked)
+    {
+        m_locked = locked;
+    }
 
     int checkCompatibilityWith(UAVConfigVersion programVersion);
     bool askToAbort(int compat, QString message);
     void notify(QString message);
     bool standardVersionHandlingOK(UAVConfigVersion programVersion);
-    bool standardVersionHandlingOK(QString programVersion){ return standardVersionHandlingOK(UAVConfigVersion(programVersion));}
+    bool standardVersionHandlingOK(QString programVersion)
+    {
+        return standardVersionHandlingOK(UAVConfigVersion(programVersion));
+    }
 
 signals:
 
@@ -88,9 +109,7 @@ private:
     UAVConfigVersion m_version;
     bool m_locked;
     QString m_nameOfConfigurable;
-
 };
-
 } // namespace Core
 
 #endif // UAVCONFIGINFO_H

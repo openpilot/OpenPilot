@@ -27,11 +27,11 @@
 #define CALLBACKSCHEDULER_H
 
 // Public types
-typedef enum{
-	CALLBACK_PRIORITY_CRITICAL = 0,
-	CALLBACK_PRIORITY_REGULAR  = 1,
-	CALLBACK_PRIORITY_LOW      = 2
-	} DelayedCallbackPriority;
+typedef enum {
+    CALLBACK_PRIORITY_CRITICAL = 0,
+    CALLBACK_PRIORITY_REGULAR  = 1,
+    CALLBACK_PRIORITY_LOW = 2
+} DelayedCallbackPriority;
 // Use the CallbackPriority to define how frequent a callback needs to be
 // called in relation to others in the same callback scheduling task.
 // The scheduler will call callbacks waiting for execution with the same
@@ -56,12 +56,12 @@ typedef enum{
 // a low priority callback can block a critical one from being executed.
 // Callbacks MUST NOT block execution!
 
-typedef enum{
-	CALLBACK_TASK_AUXILIARY     = (tskIDLE_PRIORITY + 1),
-	CALLBACK_TASK_NAVIGATION    = (tskIDLE_PRIORITY + 2),
-	CALLBACK_TASK_FLIGHTCONTROL = (tskIDLE_PRIORITY + 3),
-	CALLBACK_TASK_DEVICEDRIVER  = (tskIDLE_PRIORITY + 4),
-	} DelayedCallbackPriorityTask;
+typedef enum {
+    CALLBACK_TASK_AUXILIARY     = (tskIDLE_PRIORITY + 1),
+    CALLBACK_TASK_NAVIGATION    = (tskIDLE_PRIORITY + 2),
+    CALLBACK_TASK_FLIGHTCONTROL = (tskIDLE_PRIORITY + 3),
+    CALLBACK_TASK_DEVICEDRIVER  = (tskIDLE_PRIORITY + 4),
+} DelayedCallbackPriorityTask;
 // Use the PriorityTask to define the global importance of callback execution
 // compared to other processes in the system.
 // Callbacks dispatched in a higher PriorityTasks will halt the execution of
@@ -78,12 +78,12 @@ typedef enum{
 // WARNING: Any higher priority task can prevent lower priority code from being
 // executed! (This does not only apply to callbacks but to all FreeRTOS tasks!)
 
-typedef enum{
-	CALLBACK_UPDATEMODE_NONE     = 0,
-	CALLBACK_UPDATEMODE_SOONER   = 1,
-	CALLBACK_UPDATEMODE_LATER    = 2,
-	CALLBACK_UPDATEMODE_OVERRIDE = 3
-	} DelayedCallbackUpdateMode;
+typedef enum {
+    CALLBACK_UPDATEMODE_NONE     = 0,
+    CALLBACK_UPDATEMODE_SOONER   = 1,
+    CALLBACK_UPDATEMODE_LATER    = 2,
+    CALLBACK_UPDATEMODE_OVERRIDE = 3
+} DelayedCallbackUpdateMode;
 // When scheduling a callback for execution at a time in the future, use the
 // update mode to define what should happen if the callback is already
 // scheduled.
@@ -138,11 +138,10 @@ int32_t CallbackSchedulerStart();
  * \return CallbackInfo Pointer on success, NULL if failed.
  */
 DelayedCallbackInfo *DelayedCallbackCreate(
-	DelayedCallback cb,
-	DelayedCallbackPriority priority,
-	DelayedCallbackPriorityTask priorityTask,
-	uint32_t stacksize
-	);
+    DelayedCallback cb,
+    DelayedCallbackPriority priority,
+    DelayedCallbackPriorityTask priorityTask,
+    uint32_t stacksize);
 
 /**
  * Schedule dispatching a callback at some point in the future. The function returns immediately.
@@ -157,10 +156,9 @@ DelayedCallbackInfo *DelayedCallbackCreate(
  * \return 0: not scheduled, previous schedule takes precedence, 1: new schedule, 2: previous schedule overridden
  */
 int32_t DelayedCallbackSchedule(
-	DelayedCallbackInfo *cbinfo,
-	int32_t milliseconds,
-	DelayedCallbackUpdateMode updatemode
-	);
+    DelayedCallbackInfo *cbinfo,
+    int32_t milliseconds,
+    DelayedCallbackUpdateMode updatemode);
 
 /**
  * Dispatch an event by invoking the supplied callback. The function
@@ -168,7 +166,7 @@ int32_t DelayedCallbackSchedule(
  * \param[in] *cbinfo the callback handle
  * \return Success (-1), failure (0)
  */
-int32_t DelayedCallbackDispatch( DelayedCallbackInfo *cbinfo );
+int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo);
 
 /**
  * Dispatch an event by invoking the supplied callback. The function
@@ -184,6 +182,6 @@ int32_t DelayedCallbackDispatch( DelayedCallbackInfo *cbinfo );
  * Check the demo task for your port to find the syntax required.
  * \return Success (-1), failure (0)
  */
-int32_t DelayedCallbackDispatchFromISR( DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken );
+int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken);
 
 #endif // CALLBACKSCHEDULER_H

@@ -4,25 +4,25 @@
  * @file       stylehelper.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -39,24 +39,25 @@
 static int clamp(float x)
 {
     const int val = x > 255 ? 255 : static_cast<int>(x);
+
     return val < 0 ? 0 : val;
 }
 
 // Clamps float color values within (0, 255)
 /*
-static int range(float x, int min, int max)
-{
+   static int range(float x, int min, int max)
+   {
     int val = x > max ? max : x;
     return val < min ? min : val;
-}
-*/
+   }
+ */
 
 namespace Utils {
-
 QColor StyleHelper::mergedColors(const QColor &colorA, const QColor &colorB, int factor)
 {
     const int maxFactor = 100;
     QColor tmp = colorA;
+
     tmp.setRed((tmp.red() * factor) / maxFactor + (colorB.red() * (maxFactor - factor)) / maxFactor);
     tmp.setGreen((tmp.green() * factor) / maxFactor + (colorB.green() * (maxFactor - factor)) / maxFactor);
     tmp.setBlue((tmp.blue() * factor) / maxFactor + (colorB.blue() * (maxFactor - factor)) / maxFactor);
@@ -67,14 +68,17 @@ qreal StyleHelper::sidebarFontSize()
 {
 #if defined(Q_WS_MAC)
     return 9;
+
 #else
     return 7.5;
+
 #endif
 }
 
 QPalette StyleHelper::sidebarFontPalette(const QPalette &original)
 {
     QPalette palette = original;
+
     palette.setColor(QPalette::Active, QPalette::Text, panelTextColor());
     palette.setColor(QPalette::Active, QPalette::WindowText, panelTextColor());
     palette.setColor(QPalette::Inactive, QPalette::Text, panelTextColor().darker());
@@ -84,7 +88,7 @@ QPalette StyleHelper::sidebarFontPalette(const QPalette &original)
 
 QColor StyleHelper::panelTextColor()
 {
-    //qApp->palette().highlightedText().color();
+    // qApp->palette().highlightedText().color();
     return Qt::white;
 }
 
@@ -98,6 +102,7 @@ QColor StyleHelper::baseColor()
 QColor StyleHelper::highlightColor()
 {
     QColor result = baseColor();
+
     result.setHsv(result.hue(),
                   clamp(result.saturation()),
                   clamp(result.value() * 1.16));
@@ -107,6 +112,7 @@ QColor StyleHelper::highlightColor()
 QColor StyleHelper::shadowColor()
 {
     QColor result = baseColor();
+
     result.setHsv(result.hue(),
                   clamp(result.saturation() * 1.1),
                   clamp(result.value() * 0.70));
@@ -116,6 +122,7 @@ QColor StyleHelper::shadowColor()
 QColor StyleHelper::borderColor()
 {
     QColor result = baseColor();
+
     result.setHsv(result.hue(),
                   result.saturation(),
                   result.value() / 2);
@@ -126,8 +133,8 @@ void StyleHelper::setBaseColor(const QColor &color)
 {
     if (color.isValid() && color != m_baseColor) {
         m_baseColor = color;
-        foreach (QWidget *w, QApplication::topLevelWidgets())
-            w->update();
+        foreach(QWidget * w, QApplication::topLevelWidgets())
+        w->update();
     }
 }
 
@@ -135,6 +142,7 @@ static void verticalGradientHelper(QPainter *p, const QRect &spanRect, const QRe
 {
     QColor base = StyleHelper::baseColor();
     QLinearGradient grad(spanRect.topRight(), spanRect.topLeft());
+
     grad.setColorAt(0, StyleHelper::highlightColor());
     grad.setColorAt(0.301, base);
     grad.setColorAt(1, StyleHelper::shadowColor());
@@ -150,8 +158,8 @@ void StyleHelper::verticalGradient(QPainter *painter, const QRect &spanRect, con
     if (StyleHelper::usePixmapCache()) {
         QString key;
         key.sprintf("mh_vertical %d %d %d %d %d",
-            spanRect.width(), spanRect.height(), clipRect.width(),
-            clipRect.height(), StyleHelper::baseColor().rgb());;
+                    spanRect.width(), spanRect.height(), clipRect.width(),
+                    clipRect.height(), StyleHelper::baseColor().rgb());;
 
         QPixmap pixmap;
         if (!QPixmapCache::find(key, pixmap)) {
@@ -170,10 +178,11 @@ void StyleHelper::verticalGradient(QPainter *painter, const QRect &spanRect, con
 }
 
 static void horizontalGradientHelper(QPainter *p, const QRect &spanRect, const
-QRect &rect)
+                                     QRect &rect)
 {
     QColor base = StyleHelper::baseColor();
     QLinearGradient grad(rect.topLeft(), rect.bottomLeft());
+
     grad.setColorAt(0, StyleHelper::highlightColor().lighter(120));
     if (rect.height() == StyleHelper::navigationWidgetHeight()) {
         grad.setColorAt(0.4, StyleHelper::highlightColor());
@@ -189,7 +198,6 @@ QRect &rect)
     shadowGradient.setColorAt(0.7, highlight);
     shadowGradient.setColorAt(1, QColor(0, 0, 0, 40));
     p->fillRect(rect, shadowGradient);
-
 }
 
 void StyleHelper::horizontalGradient(QPainter *painter, const QRect &spanRect, const QRect &clipRect)
@@ -197,8 +205,8 @@ void StyleHelper::horizontalGradient(QPainter *painter, const QRect &spanRect, c
     if (StyleHelper::usePixmapCache()) {
         QString key;
         key.sprintf("mh_horizontal %d %d %d %d %d",
-            spanRect.width(), spanRect.height(), clipRect.width(),
-            clipRect.height(), StyleHelper::baseColor().rgb());
+                    spanRect.width(), spanRect.height(), clipRect.width(),
+                    clipRect.height(), StyleHelper::baseColor().rgb());
 
         QPixmap pixmap;
         if (!QPixmapCache::find(key, pixmap)) {
@@ -211,7 +219,6 @@ void StyleHelper::horizontalGradient(QPainter *painter, const QRect &spanRect, c
         }
 
         painter->drawPixmap(clipRect.topLeft(), pixmap);
-
     } else {
         horizontalGradientHelper(painter, spanRect, clipRect);
     }
@@ -221,6 +228,7 @@ static void menuGradientHelper(QPainter *p, const QRect &spanRect, const QRect &
 {
     QLinearGradient grad(spanRect.topLeft(), spanRect.bottomLeft());
     QColor menuColor = StyleHelper::mergedColors(StyleHelper::baseColor(), QColor(244, 244, 244), 25);
+
     grad.setColorAt(0, menuColor.lighter(112));
     grad.setColorAt(1, menuColor);
     p->fillRect(rect, grad);
@@ -231,8 +239,8 @@ void StyleHelper::menuGradient(QPainter *painter, const QRect &spanRect, const Q
     if (StyleHelper::usePixmapCache()) {
         QString key;
         key.sprintf("mh_menu %d %d %d %d %d",
-            spanRect.width(), spanRect.height(), clipRect.width(),
-            clipRect.height(), StyleHelper::baseColor().rgb());
+                    spanRect.width(), spanRect.height(), clipRect.width(),
+                    clipRect.height(), StyleHelper::baseColor().rgb());
 
         QPixmap pixmap;
         if (!QPixmapCache::find(key, pixmap)) {
@@ -249,5 +257,4 @@ void StyleHelper::menuGradient(QPainter *painter, const QRect &spanRect, const Q
         menuGradientHelper(painter, spanRect, clipRect);
     }
 }
-
 } // namespace Utils

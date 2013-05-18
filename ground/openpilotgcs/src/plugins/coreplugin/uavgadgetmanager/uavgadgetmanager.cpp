@@ -63,20 +63,20 @@
 #include <QtGui/QSplitter>
 #include <QtGui/QStackedLayout>
 
-Q_DECLARE_METATYPE(Core::IUAVGadget*)
+Q_DECLARE_METATYPE(Core::IUAVGadget *)
 
 using namespace Core;
 using namespace Core::Internal;
 using namespace Utils;
 
-enum { debugUAVGadgetManager=0 };
+enum { debugUAVGadgetManager = 0 };
 
 static inline ExtensionSystem::PluginManager *pluginManager()
 {
     return ExtensionSystem::PluginManager::instance();
 }
 
-//===================UAVGadgetManager=====================
+// ===================UAVGadgetManager=====================
 
 UAVGadgetManager::UAVGadgetManager(ICore *core, QString name, QIcon icon, int priority, QString uniqueName, QWidget *parent) :
     m_showToolbars(true),
@@ -88,24 +88,24 @@ UAVGadgetManager::UAVGadgetManager(ICore *core, QString name, QIcon icon, int pr
     m_priority(priority),
     m_widget(new QWidget(parent))
 {
-
     // checking that the mode name is unique gives harmless
     // warnings on the console output
     ModeManager *modeManager = ModeManager::instance();
+
     if (!modeManager->mode(uniqueName)) {
         m_uniqueName = uniqueName;
     } else {
         // this shouldn't happen
         m_uniqueName = uniqueName + QString::number(quint64(this));
     }
-    m_uniqueNameBA = m_uniqueName.toLatin1();
+    m_uniqueNameBA   = m_uniqueName.toLatin1();
     m_uniqueModeName = m_uniqueNameBA.data();
 
     connect(m_core, SIGNAL(contextAboutToChange(Core::IContext *)),
             this, SLOT(handleContextChange(Core::IContext *)));
 
-    connect(modeManager, SIGNAL(currentModeChanged(Core::IMode*)),
-            this, SLOT(modeChanged(Core::IMode*)));
+    connect(modeManager, SIGNAL(currentModeChanged(Core::IMode *)),
+            this, SLOT(modeChanged(Core::IMode *)));
 
     // other setup
     m_splitterOrView = new SplitterOrView(this, 0);
@@ -125,20 +125,21 @@ UAVGadgetManager::UAVGadgetManager(ICore *core, QString name, QIcon icon, int pr
 }
 
 UAVGadgetManager::~UAVGadgetManager()
-{
-}
+{}
 
 QList<int> UAVGadgetManager::context() const
 {
     static QList<int> contexts = QList<int>() <<
-        UniqueIDManager::instance()->uniqueIdentifier(Constants::C_UAVGADGETMANAGER);
+                                 UniqueIDManager::instance()->uniqueIdentifier(Constants::C_UAVGADGETMANAGER);
+
     return contexts;
 }
 
 void UAVGadgetManager::modeChanged(Core::IMode *mode)
 {
-    if (mode != this)
+    if (mode != this) {
         return;
+    }
 
     m_currentGadget->widget()->setFocus();
     showToolbars(toolbarsShown());
@@ -152,26 +153,31 @@ void UAVGadgetManager::init()
 
 void UAVGadgetManager::handleContextChange(Core::IContext *context)
 {
-//    if (debugUAVGadgetManager)
-//        qDebug() << Q_FUNC_INFO << context;
-    IUAVGadget *uavGadget = context ? qobject_cast<IUAVGadget*>(context) : 0;
-    if (uavGadget)
+// if (debugUAVGadgetManager)
+// qDebug() << Q_FUNC_INFO << context;
+    IUAVGadget *uavGadget = context ? qobject_cast<IUAVGadget *>(context) : 0;
+
+    if (uavGadget) {
         setCurrentGadget(uavGadget);
+    }
 }
 
 void UAVGadgetManager::setCurrentGadget(IUAVGadget *uavGadget)
 {
-    if (m_currentGadget == uavGadget)
+    if (m_currentGadget == uavGadget) {
         return;
+    }
 
     SplitterOrView *oldView = currentSplitterOrView();
     m_currentGadget = uavGadget;
-    SplitterOrView *view = currentSplitterOrView();
+    SplitterOrView *view    = currentSplitterOrView();
     if (oldView != view) {
-        if (oldView)
+        if (oldView) {
             oldView->update();
-        if (view)
+        }
+        if (view) {
             view->update();
+        }
     }
     uavGadget->widget()->setFocus();
     emit currentGadgetChanged(uavGadget);
@@ -182,8 +188,9 @@ void UAVGadgetManager::setCurrentGadget(IUAVGadget *uavGadget)
  */
 Core::Internal::SplitterOrView *UAVGadgetManager::currentSplitterOrView() const
 {
-    if (!m_splitterOrView) // this is only for startup
+    if (!m_splitterOrView) { // this is only for startup
         return 0;
+    }
     SplitterOrView *view = m_currentGadget ?
                            m_splitterOrView->findView(m_currentGadget) :
                            0;
@@ -197,33 +204,36 @@ IUAVGadget *UAVGadgetManager::currentGadget() const
 
 void UAVGadgetManager::emptyView(Core::Internal::UAVGadgetView *view)
 {
-    if (!view)
+    if (!view) {
         return;
+    }
 
     IUAVGadget *uavGadget = view->gadget();
-//    emit uavGadgetAboutToClose(uavGadget);
+// emit uavGadgetAboutToClose(uavGadget);
     removeGadget(uavGadget);
     view->removeGadget();
-//    emit uavGadgetsClosed(uavGadgets);
+// emit uavGadgetsClosed(uavGadgets);
 }
 
 
 void UAVGadgetManager::closeView(Core::Internal::UAVGadgetView *view)
 {
-    if (!view)
+    if (!view) {
         return;
+    }
     SplitterOrView *splitterOrView = m_splitterOrView->findView(view);
     Q_ASSERT(splitterOrView);
     Q_ASSERT(splitterOrView->view() == view);
-    if (splitterOrView == m_splitterOrView)
+    if (splitterOrView == m_splitterOrView) {
         return;
+    }
 
     IUAVGadget *gadget = view->gadget();
     emptyView(view);
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
     im->removeGadget(gadget);
 
-    SplitterOrView *splitter = m_splitterOrView->findSplitter(splitterOrView);
+    SplitterOrView *splitter     = m_splitterOrView->findSplitter(splitterOrView);
     Q_ASSERT(splitterOrView->hasGadget() == false);
     Q_ASSERT(splitter->isSplitter() == true);
     splitterOrView->hide();
@@ -233,36 +243,41 @@ void UAVGadgetManager::closeView(Core::Internal::UAVGadgetView *view)
 
     SplitterOrView *newCurrent = splitter->findFirstView();
     Q_ASSERT(newCurrent);
-    if (newCurrent)
+    if (newCurrent) {
         setCurrentGadget(newCurrent->gadget());
+    }
 }
 
 void UAVGadgetManager::addGadgetToContext(IUAVGadget *gadget)
 {
-    if (!gadget)
+    if (!gadget) {
         return;
+    }
     m_core->addContextObject(gadget);
 
-//   emit uavGadgetOpened(uavGadget);
+// emit uavGadgetOpened(uavGadget);
 }
 
 void UAVGadgetManager::removeGadget(IUAVGadget *gadget)
 {
-    if (!gadget)
+    if (!gadget) {
         return;
-    m_core->removeContextObject(qobject_cast<IContext*>(gadget));
+    }
+    m_core->removeContextObject(qobject_cast<IContext *>(gadget));
 }
 
 void UAVGadgetManager::ensureUAVGadgetManagerVisible()
 {
-    if (!m_widget->isVisible())
+    if (!m_widget->isVisible()) {
         m_core->modeManager()->activateMode(this->uniqueModeName());
+    }
 }
 
 void UAVGadgetManager::showToolbars(bool show)
 {
-    if (m_core->modeManager()->currentMode() != this)
+    if (m_core->modeManager()->currentMode() != this) {
         return;
+    }
 
     m_showToolbars = show;
     SplitterOrView *next = m_splitterOrView->findFirstView();
@@ -276,25 +291,27 @@ void UAVGadgetManager::showToolbars(bool show)
 
 void UAVGadgetManager::updateUavGadgetMenus()
 {
-    if (m_core->modeManager()->currentMode() != this)
+    if (m_core->modeManager()->currentMode() != this) {
         return;
-    if (!m_splitterOrView) // this is only for startup
+    }
+    if (!m_splitterOrView) { // this is only for startup
         return;
+    }
     // Splitting is only possible when the toolbars are shown
     bool hasSplitter = m_splitterOrView->isSplitter();
     emit showUavGadgetMenus(m_showToolbars, hasSplitter);
 }
 
-void UAVGadgetManager::saveState(QSettings* qSettings) const
+void UAVGadgetManager::saveState(QSettings *qSettings) const
 {
-    qSettings->setValue("version","UAVGadgetManagerV1");
-    qSettings->setValue("showToolbars",m_showToolbars);
+    qSettings->setValue("version", "UAVGadgetManagerV1");
+    qSettings->setValue("showToolbars", m_showToolbars);
     qSettings->beginGroup("splitter");
     m_splitterOrView->saveState(qSettings);
     qSettings->endGroup();
 }
 
-bool UAVGadgetManager::restoreState(QSettings* qSettings)
+bool UAVGadgetManager::restoreState(QSettings *qSettings)
 {
     removeAllSplits();
 
@@ -338,12 +355,13 @@ void UAVGadgetManager::saveSettings(QSettings *qs)
 void UAVGadgetManager::readSettings(QSettings *qs)
 {
     QString uavGadgetManagerRootKey = "UAVGadgetManager";
-    if(!qs->childGroups().contains(uavGadgetManagerRootKey)) {
+
+    if (!qs->childGroups().contains(uavGadgetManagerRootKey)) {
         return;
     }
     qs->beginGroup(uavGadgetManagerRootKey);
 
-    if(!qs->childGroups().contains(uniqueModeName())) {
+    if (!qs->childGroups().contains(uniqueModeName())) {
         qs->endGroup();
         return;
     }
@@ -359,16 +377,17 @@ void UAVGadgetManager::readSettings(QSettings *qs)
 
 void UAVGadgetManager::split(Qt::Orientation orientation)
 {
-    if (m_core->modeManager()->currentMode() != this)
+    if (m_core->modeManager()->currentMode() != this) {
         return;
+    }
 
     IUAVGadget *uavGadget = m_currentGadget;
     Q_ASSERT(uavGadget);
-    SplitterOrView *view = currentSplitterOrView();
+    SplitterOrView *view  = currentSplitterOrView();
     Q_ASSERT(view);
     view->split(orientation);
 
-    SplitterOrView *sor = m_splitterOrView->findView(uavGadget);
+    SplitterOrView *sor  = m_splitterOrView->findView(uavGadget);
     SplitterOrView *next = m_splitterOrView->findNextView(sor);
     setCurrentGadget(next->gadget());
     updateUavGadgetMenus();
@@ -386,12 +405,14 @@ void UAVGadgetManager::splitSideBySide()
 
 void UAVGadgetManager::removeCurrentSplit()
 {
-    if (m_core->modeManager()->currentMode() != this)
+    if (m_core->modeManager()->currentMode() != this) {
         return;
+    }
 
     SplitterOrView *viewToClose = currentSplitterOrView();
-    if (viewToClose == m_splitterOrView)
+    if (viewToClose == m_splitterOrView) {
         return;
+    }
     closeView(viewToClose->view());
     updateUavGadgetMenus();
 }
@@ -399,17 +420,19 @@ void UAVGadgetManager::removeCurrentSplit()
 // Removes all gadgets and splits in the workspace, except the current/active gadget.
 void UAVGadgetManager::removeAllSplits()
 {
-    if (m_core->modeManager()->currentMode() != this)
+    if (m_core->modeManager()->currentMode() != this) {
         return;
+    }
 
-    if (!m_splitterOrView->isSplitter())
+    if (!m_splitterOrView->isSplitter()) {
         return;
+    }
 
     // Use a QPointer, just in case we accidently delete the gadget we want to keep.
     QPointer<IUAVGadget> currentGadget = m_currentGadget;
 
     Q_ASSERT(currentGadget);
-    QList<IUAVGadget*> gadgets = m_splitterOrView->gadgets();
+    QList<IUAVGadget *> gadgets = m_splitterOrView->gadgets();
     Q_ASSERT(gadgets.count(currentGadget) == 1);
     gadgets.removeOne(currentGadget);
 
@@ -422,7 +445,7 @@ void UAVGadgetManager::removeAllSplits()
 
     // Remove all other gadgets from the instance manager.
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
-    foreach (IUAVGadget *g, gadgets) {
+    foreach(IUAVGadget * g, gadgets) {
         im->removeGadget(g);
     }
     updateUavGadgetMenus();
@@ -430,14 +453,16 @@ void UAVGadgetManager::removeAllSplits()
 
 void UAVGadgetManager::gotoOtherSplit()
 {
-    if (m_core->modeManager()->currentMode() != this)
+    if (m_core->modeManager()->currentMode() != this) {
         return;
+    }
 
     if (m_splitterOrView->isSplitter()) {
         SplitterOrView *currentView = currentSplitterOrView();
         SplitterOrView *view = m_splitterOrView->findNextView(currentView);
-        if (!view)
+        if (!view) {
             view = m_splitterOrView->findFirstView();
+        }
         if (view) {
             setCurrentGadget(view->gadget());
         }

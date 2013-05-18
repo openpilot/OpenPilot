@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin QML Viewer Plugin
  * @{
- * @brief The QML Viewer Gadget 
+ * @brief The QML Viewer Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,29 +32,27 @@
 #include <coreplugin/iuavgadget.h>
 
 QmlViewGadgetFactory::QmlViewGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("QmlViewGadget"),
-                          tr("QML Viewer, QML"),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("QmlViewGadget"),
+                      tr("QML Viewer, QML"),
+                      parent)
+{}
 
 QmlViewGadgetFactory::~QmlViewGadgetFactory()
-{
-}
+{}
 
-Core::IUAVGadget* QmlViewGadgetFactory::createGadget(QWidget *parent)
+Core::IUAVGadget *QmlViewGadgetFactory::createGadget(QWidget *parent)
 {
-    QmlViewGadgetWidget* gadgetWidget = new QmlViewGadgetWidget(parent);
+    QmlViewGadgetWidget *gadgetWidget = new QmlViewGadgetWidget(parent);
+
     return new QmlViewGadget(QString("QmlViewGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *QmlViewGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *QmlViewGadgetFactory::createConfiguration(QSettings *qSettings)
 {
     return new QmlViewGadgetConfiguration(QString("QmlViewGadget"), qSettings);
 }
 
 IOptionsPage *QmlViewGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new QmlViewGadgetOptionsPage(qobject_cast<QmlViewGadgetConfiguration*>(config));
+    return new QmlViewGadgetOptionsPage(qobject_cast<QmlViewGadgetConfiguration *>(config));
 }
-

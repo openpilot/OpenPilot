@@ -37,9 +37,7 @@
 #include <QDomElement>
 #include <QObject>
 
-class XMLCONFIG_EXPORT XmlConfig : QObject
-{
-
+class XMLCONFIG_EXPORT XmlConfig : QObject {
 public:
     static const QSettings::Format XmlSettingsFormat;
 
@@ -49,8 +47,8 @@ public:
 private:
     static QString rootName;
 
-    static void handleNode(QDomElement* node, QSettings::SettingsMap &map, QString path = "");
-    static QSettings::SettingsMap settingsToMap(QSettings& qs);
+    static void handleNode(QDomElement *node, QSettings::SettingsMap &map, QString path = "");
+    static QSettings::SettingsMap settingsToMap(QSettings & qs);
     static QString variantToString(const QVariant &v);
     static QVariant stringToVariant(const QString &s);
     static QStringList splitArgs(const QString &s, int idx);

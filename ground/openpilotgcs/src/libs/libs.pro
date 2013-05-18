@@ -2,6 +2,7 @@ TEMPLATE  = subdirs
 CONFIG   += ordered
 
 SUBDIRS   = \
+    versioninfo \
     qscispinbox\
     qtconcurrent \
     aggregation \

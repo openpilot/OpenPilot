@@ -6,6 +6,7 @@ TARGET = UAVSettingsImportExport
 DEFINES += UAVSETTINGSIMPORTEXPORT_LIBRARY
 include(../../openpilotgcsplugin.pri)
 include(uavsettingsimportexport_dependencies.pri)
+include(../../libs/versioninfo/versioninfo.pri)
 
 HEADERS += uavsettingsimportexport.h \
     importsummary.h \

@@ -1,16 +1,16 @@
 include(../../openpilotgcs.pri)
 include(../shared/qtsingleapplication/qtsingleapplication.pri)
-include(version_info.pri)
 
 TEMPLATE = app
 TARGET = $$GCS_APP_TARGET
 DESTDIR = $$GCS_APP_PATH
 QT += xml
 SOURCES += main.cpp \
-    gcssplashscreen.cpp \
-    version_info.cpp
+    gcssplashscreen.cpp
+
 include(../rpath.pri)
 include(../libs/utils/utils.pri)
+include(../libs/versioninfo/versioninfo.pri)
 
 LIBS *= -l$$qtLibraryName(ExtensionSystem) -l$$qtLibraryName(Aggregation)
 

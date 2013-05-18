@@ -42,7 +42,8 @@ FWINFO_BIN = $(FW_BIN).firmware_info.bin
 
 $(OUTDIR)/$(TARGET).bin: $(BL_BIN) $(FW_BIN)
 	$(V0) @$(ECHO) $(MSG_FLASH_IMG) $@
-	$(V1) $(ENTIRE_FLASH) $(EF_VERBOSE) \
+	$(V1) $(ENTIRE_FLASH) \
+		$(EF_VERBOSE) \
 		--bl-bank-base=$(BL_BANK_BASE) \
 		--bl-bank-size=$(BL_BANK_SIZE) \
 		--fw-bank-base=$(FW_BANK_BASE) \

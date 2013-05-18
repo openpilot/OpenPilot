@@ -38,13 +38,13 @@ SRC			+= $(sort $(wildcard $(PERIPHLIB)/src/*.c))
 EXTRAINCDIRS		+= $(PERIPHLIB)/inc
 
 # ST USB OTG library
-USBOTGLIB		=  $(PIOSCOMMON)/libraries/STM32_USB_OTG_Driver
+USBOTGLIB		=  $(PIOS_DEVLIB)/libraries/STM32_USB_OTG_Driver
 USBOTGLIB_SRC		=  usb_core.c usb_dcd.c usb_dcd_int.c
 SRC			+= $(addprefix $(USBOTGLIB)/src/,$(USBOTGLIB_SRC))
 EXTRAINCDIRS		+= $(USBOTGLIB)/inc
 
 # ST USB Device library
-USBDEVLIB		=  $(PIOSCOMMON)/libraries/STM32_USB_Device_Library
+USBDEVLIB		=  $(PIOS_DEVLIB)/libraries/STM32_USB_Device_Library
 SRC			+= $(sort $(wildcard $(USBDEVLIB)/Core/src/*.c))
 EXTRAINCDIRS		+= $(USBDEVLIB)/Core/inc
 

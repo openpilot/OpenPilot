@@ -23,7 +23,7 @@ SRC			+= $(sort $(wildcard $(PIOS_DEVLIB)*.c))
 # CMSIS for the F1
 include $(PIOSCOMMON)/libraries/CMSIS/library.mk
 CMSIS_DEVICEDIR		= $(PIOS_DEVLIB)libraries/CMSIS/Core/CM3
-SRC			+= $(CMSIS_DEVICEDIR)/core_cm3.c
+#SRC			+= $(CMSIS_DEVICEDIR)/core_cm3.c
 SRC			+= $(CMSIS_DEVICEDIR)/system_stm32f10x.c
 EXTRAINCDIRS		+= $(CMSIS_DEVICEDIR)
 

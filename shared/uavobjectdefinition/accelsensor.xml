@@ -7,7 +7,7 @@
         <field name="temperature" units="deg C" type="float" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="false" updatemode="manual" period="0"/>
-        <telemetryflight acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="10000"/>
         <logging updatemode="manual" period="0"/>
     </object>
 </xml>

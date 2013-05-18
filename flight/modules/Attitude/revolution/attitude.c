@@ -125,6 +125,8 @@ static void settingsUpdatedCb(UAVObjEvent *objEv);
 
 static int32_t getNED(GPSPositionData *gpsPosition, float *NED);
 
+static void magOffsetEstimation(MagnetoSensorData *mag);
+
 // check for invalid values
 static inline bool invalid(float data)
 {
@@ -161,10 +163,19 @@ static inline bool invalid_var(float data)
  */
 int32_t AttitudeInitialize(void)
 {
-    AttitudeStateInitialize();
-    AirspeedStateInitialize();
+    GyroSensorInitialize();
+    GyroStateInitialize();
+    AccelSensorInitialize();
+    AccelStateInitialize();
+    MagnetoSensorInitialize();
+    MagnetoStateInitialize();
     AirspeedSensorInitialize();
+    AirspeedStateInitialize();
+    BaroSensorInitialize();
+    GPSPositionInitialize();
+    GPSVelocityInitialize();
     AttitudeSettingsInitialize();
+    AttitudeStateInitialize();
     PositionStateInitialize();
     VelocityStateInitialize();
     RevoSettingsInitialize();
@@ -286,10 +297,12 @@ static int32_t updateAttitudeComplementary(bool first_run)
 {
     UAVObjEvent ev;
     GyroSensorData gyroSensorData;
+    GyroStateData gyroStateData;
     AccelSensorData accelSensorData;
     static int32_t timeval;
     float dT;
     static uint8_t init = 0;
+    static float gyro_bias[3] = { 0, 0, 0 };
 
     // Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
     if (xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE ||
@@ -303,6 +316,13 @@ static int32_t updateAttitudeComplementary(bool first_run)
     }
 
     AccelSensorGet(&accelSensorData);
+
+// TODO: put in separate filter
+    AccelStateData accelState;
+    accelState.x = accelSensorData.x;
+    accelState.y = accelSensorData.y;
+    accelState.z = accelSensorData.z;
+    AccelStateSet(&accelState);
 
     // During initialization and
     if (first_run) {
@@ -374,6 +394,9 @@ static int32_t updateAttitudeComplementary(bool first_run)
     }
 
     GyroSensorGet(&gyroSensorData);
+    gyroStateData.x = gyroSensorData.x;
+    gyroStateData.y = gyroSensorData.y;
+    gyroStateData.z = gyroSensorData.z;
 
     // Compute the dT using the cpu clock
     dT = PIOS_DELAY_DiffuS(timeval) / 1000000.0f;
@@ -412,6 +435,16 @@ static int32_t updateAttitudeComplementary(bool first_run)
         Quaternion2R(q, Rbe);
         MagnetoSensorGet(&mag);
 
+// TODO: separate filter!
+        if (revoCalibration.MagBiasNullingRate > 0) {
+            magOffsetEstimation(&mag);
+        }
+        MagnetoStateData mags;
+        mags.x = mag.x;
+        mags.y = mag.y;
+        mags.z = mag.z;
+        MagnetoStateSet(&mags);
+
         // If the mag is producing bad data don't use it (normally bad calibration)
         if (!isnan(mag.x) && !isinf(mag.x) && !isnan(mag.y) && !isinf(mag.y) && !isnan(mag.z) && !isinf(mag.z)) {
             rot_mult(Rbe, homeLocation.Be, brot);
@@ -438,35 +471,30 @@ static int32_t updateAttitudeComplementary(bool first_run)
     }
 
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
-// TODO
-/*
-        GyrosBiasData gyrosBias;
-    GyrosBiasGet(&gyrosBias);
-    gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi;
-    gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi;
-    gyrosBias.z -= mag_err[2] * magKi;
-    GyrosBiasSet(&gyrosBias);
+    gyro_bias[0]    -= accel_err[0] * attitudeSettings.AccelKi;
+    gyro_bias[0]    -= accel_err[1] * attitudeSettings.AccelKi;
+    gyro_bias[0]    -= mag_err[2] * magKi;
 
-    if (revoCalibration.BiasCorrectedRaw != REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
-        // if the raw values are not adjusted, we need to adjust here.
-        gyroSensorData.x -= gyrosBias.x;
-        gyroSensorData.y -= gyrosBias.y;
-        gyroSensorData.z -= gyrosBias.z;
-    }
- */
+    // Correct rates based on integral coefficient
+    gyroStateData.x -= gyro_bias[0];
+    gyroStateData.y -= gyro_bias[1];
+    gyroStateData.z -= gyro_bias[2];
 
-    // Correct rates based on error, integral component dealt with in updateSensors
-    gyroSensorData.x += accel_err[0] * attitudeSettings.AccelKp / dT;
-    gyroSensorData.y += accel_err[1] * attitudeSettings.AccelKp / dT;
-    gyroSensorData.z += accel_err[2] * attitudeSettings.AccelKp / dT + mag_err[2] * magKp / dT;
+    // save gyroscope state
+    GyroStateSet(&gyroStateData);
+
+    // Correct rates based on proportional coefficient
+    gyroStateData.x += accel_err[0] * attitudeSettings.AccelKp / dT;
+    gyroStateData.y += accel_err[1] * attitudeSettings.AccelKp / dT;
+    gyroStateData.z += accel_err[2] * attitudeSettings.AccelKp / dT + mag_err[2] * magKp / dT;
 
     // Work out time derivative from INSAlgo writeup
     // Also accounts for the fact that gyros are in deg/s
     float qdot[4];
-    qdot[0] = DEG2RAD(-q[1] * gyroSensorData.x - q[2] * gyroSensorData.y - q[3] * gyroSensorData.z) * dT / 2;
-    qdot[1] = DEG2RAD(q[0] * gyroSensorData.x - q[3] * gyroSensorData.y + q[2] * gyroSensorData.z) * dT / 2;
-    qdot[2] = DEG2RAD(q[3] * gyroSensorData.x + q[0] * gyroSensorData.y - q[1] * gyroSensorData.z) * dT / 2;
-    qdot[3] = DEG2RAD(-q[2] * gyroSensorData.x + q[1] * gyroSensorData.y + q[0] * gyroSensorData.z) * dT / 2;
+    qdot[0] = DEG2RAD(-q[1] * gyroStateData.x - q[2] * gyroStateData.y - q[3] * gyroStateData.z) * dT / 2;
+    qdot[1] = DEG2RAD(q[0] * gyroStateData.x - q[3] * gyroStateData.y + q[2] * gyroStateData.z) * dT / 2;
+    qdot[2] = DEG2RAD(q[3] * gyroStateData.x + q[0] * gyroStateData.y - q[1] * gyroStateData.z) * dT / 2;
+    qdot[3] = DEG2RAD(-q[2] * gyroStateData.x + q[1] * gyroStateData.y + q[0] * gyroStateData.z) * dT / 2;
 
     // Take a time step
     q[0]    = q[0] + qdot[0];
@@ -580,7 +608,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     UAVObjEvent ev;
     GyroSensorData gyroSensorData;
     AccelSensorData accelSensorData;
-    MagnetoSensorData magData;
+    MagnetoStateData magData;
     AirspeedSensorData airspeedData;
     BaroSensorData baroData;
     GPSPositionData gpsData;
@@ -660,11 +688,32 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     // Get most recent data
     GyroSensorGet(&gyroSensorData);
     AccelSensorGet(&accelSensorData);
-    MagnetoSensorGet(&magData);
+// TODO: separate filter!
+    if (mag_updated) {
+        MagnetoSensorData mags;
+        MagnetoSensorGet(&mags);
+        if (revoCalibration.MagBiasNullingRate > 0) {
+            magOffsetEstimation(&mags);
+        }
+        magData.x = mags.x;
+        magData.y = mags.y;
+        magData.z = mags.z;
+        MagnetoStateSet(&magData);
+    }
+    MagnetoStateGet(&magData);
+
     BaroSensorGet(&baroData);
     AirspeedSensorGet(&airspeedData);
     GPSPositionGet(&gpsData);
     GPSVelocityGet(&gpsVelData);
+
+// TODO: put in separate filter
+    AccelStateData accelState;
+    accelState.x = accelSensorData.x;
+    accelState.y = accelSensorData.y;
+    accelState.z = accelSensorData.z;
+    AccelStateSet(&accelState);
+
 
     value_error = false;
     // safety checks
@@ -806,8 +855,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
                 pos[2]     = -(baroData.Altitude + baroOffset);
             }
 
-            xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
-            MagnetoSensorGet(&magData);
+            // xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
+            // MagnetoSensorGet(&magData);
 
             AttitudeStateData attitudeState;
             AttitudeStateGet(&attitudeState);
@@ -848,13 +897,6 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
             // Because the sensor module remove the bias we need to add it
             // back in here so that the INS algorithm can track it correctly
             float gyros[3] = { DEG2RAD(gyroSensorData.x), DEG2RAD(gyroSensorData.y), DEG2RAD(gyroSensorData.z) };
-            /* TODO
-               if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
-               gyros[0] += DEG2RAD(gyrosBias.x);
-               gyros[1] += DEG2RAD(gyrosBias.y);
-               gyros[2] += DEG2RAD(gyrosBias.z);
-               }
-             */
             INSStatePrediction(gyros, &accelSensorData.x, dT);
 
             AttitudeStateData attitude;
@@ -882,13 +924,6 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     // Because the sensor module remove the bias we need to add it
     // back in here so that the INS algorithm can track it correctly
     float gyros[3] = { DEG2RAD(gyroSensorData.x), DEG2RAD(gyroSensorData.y), DEG2RAD(gyroSensorData.z) };
-    /* TODO
-       if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
-       gyros[0] += DEG2RAD(gyrosBias.x);
-       gyros[1] += DEG2RAD(gyrosBias.y);
-       gyros[2] += DEG2RAD(gyrosBias.z);
-       }
-     */
 
     // Advance the state estimate
     INSStatePrediction(gyros, &accelSensorData.x, dT);
@@ -1011,12 +1046,11 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     velocityState.Down  = Nav.Vel[2];
     VelocityStateSet(&velocityState);
 
-/* TODO
-    gyrosBias.x = RAD2DEG(Nav.gyro_bias[0]);
-    gyrosBias.y = RAD2DEG(Nav.gyro_bias[1]);
-    gyrosBias.z = RAD2DEG(Nav.gyro_bias[2]);
-    GyrosBiasSet(&gyrosBias);
- */
+    GyroStateData gyroState;
+    gyroState.x = RAD2DEG(gyros[0] - Nav.gyro_bias[0]);
+    gyroState.y = RAD2DEG(gyros[1] - Nav.gyro_bias[1]);
+    gyroState.z = RAD2DEG(gyros[2] - Nav.gyro_bias[2]);
+    GyroStateSet(&gyroState);
 
     EKFStateVarianceData vardata;
     EKFStateVarianceGet(&vardata);
@@ -1121,6 +1155,104 @@ static void settingsUpdatedCb(UAVObjEvent *ev)
         AttitudeSettingsGet(&attitudeSettings);
     }
 }
+
+/**
+ * Perform an update of the @ref MagBias based on
+ * Magnetometer Offset Cancellation: Theory and Implementation,
+ * revisited William Premerlani, October 14, 2011
+ */
+static void magOffsetEstimation(MagnetoSensorData *mag)
+{
+   #if 0
+    // Constants, to possibly go into a UAVO
+    static const float MIN_NORM_DIFFERENCE = 50;
+
+    static float B2[3] = { 0, 0, 0 };
+
+    MagBiasData magBias;
+    MagBiasGet(&magBias);
+
+    // Remove the current estimate of the bias
+    mag->x -= magBias.x;
+    mag->y -= magBias.y;
+    mag->z -= magBias.z;
+
+    // First call
+    if (B2[0] == 0 && B2[1] == 0 && B2[2] == 0) {
+        B2[0] = mag->x;
+        B2[1] = mag->y;
+        B2[2] = mag->z;
+        return;
+    }
+
+    float B1[3]     = { mag->x, mag->y, mag->z };
+    float norm_diff = sqrtf(powf(B2[0] - B1[0], 2) + powf(B2[1] - B1[1], 2) + powf(B2[2] - B1[2], 2));
+    if (norm_diff > MIN_NORM_DIFFERENCE) {
+        float norm_b1    = sqrtf(B1[0] * B1[0] + B1[1] * B1[1] + B1[2] * B1[2]);
+        float norm_b2    = sqrtf(B2[0] * B2[0] + B2[1] * B2[1] + B2[2] * B2[2]);
+        float scale      = cal.MagBiasNullingRate * (norm_b2 - norm_b1) / norm_diff;
+        float b_error[3] = { (B2[0] - B1[0]) * scale, (B2[1] - B1[1]) * scale, (B2[2] - B1[2]) * scale };
+
+        magBias.x += b_error[0];
+        magBias.y += b_error[1];
+        magBias.z += b_error[2];
+
+        MagBiasSet(&magBias);
+
+        // Store this value to compare against next update
+        B2[0] = B1[0]; B2[1] = B1[1]; B2[2] = B1[2];
+    }
+   #else // if 0
+    static float magBias[3] = { 0 };
+
+    // Remove the current estimate of the bias
+    mag->x -= magBias[0];
+    mag->y -= magBias[1];
+    mag->z -= magBias[2];
+
+    AttitudeStateData attitude;
+    AttitudeStateGet(&attitude);
+
+    const float Rxy  = sqrtf(homeLocation.Be[0] * homeLocation.Be[0] + homeLocation.Be[1] * homeLocation.Be[1]);
+    const float Rz   = homeLocation.Be[2];
+
+    const float rate = revoCalibration.MagBiasNullingRate;
+    float Rot[3][3];
+    float B_e[3];
+    float xy[2];
+    float delta[3];
+
+    // Get the rotation matrix
+    Quaternion2R(&attitude.q1, Rot);
+
+    // Rotate the mag into the NED frame
+    B_e[0] = Rot[0][0] * mag->x + Rot[1][0] * mag->y + Rot[2][0] * mag->z;
+    B_e[1] = Rot[0][1] * mag->x + Rot[1][1] * mag->y + Rot[2][1] * mag->z;
+    B_e[2] = Rot[0][2] * mag->x + Rot[1][2] * mag->y + Rot[2][2] * mag->z;
+
+    float cy = cosf(DEG2RAD(attitude.Yaw));
+    float sy = sinf(DEG2RAD(attitude.Yaw));
+
+    xy[0] = cy * B_e[0] + sy * B_e[1];
+    xy[1] = -sy * B_e[0] + cy * B_e[1];
+
+    float xy_norm = sqrtf(xy[0] * xy[0] + xy[1] * xy[1]);
+
+    delta[0] = -rate * (xy[0] / xy_norm * Rxy - xy[0]);
+    delta[1] = -rate * (xy[1] / xy_norm * Rxy - xy[1]);
+    delta[2] = -rate * (Rz - B_e[2]);
+
+    if (!isnan(delta[0]) && !isinf(delta[0]) &&
+        !isnan(delta[1]) && !isinf(delta[1]) &&
+        !isnan(delta[2]) && !isinf(delta[2])) {
+        magBias[0] += delta[0];
+        magBias[1] += delta[1];
+        magBias[2] += delta[2];
+    }
+    #endif // if 0
+}
+
+
 /**
  * @}
  * @}

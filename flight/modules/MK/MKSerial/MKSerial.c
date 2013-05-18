@@ -31,8 +31,8 @@
 #include "openpilot.h"
 #include "MkSerial.h"
 
-#include "attitudeactual.h" // object that will be updated by the module
-#include "positionactual.h"
+#include "attitudestate.h" // object that will be updated by the module
+#include "positionstate.h"
 #include "flightbatterystate.h"
 
 //
@@ -411,7 +411,7 @@ static uint16_t VersionMsg_GetVersion(const MkMsg_t *msg)
 
 static void DoConnectedToFC(void)
 {
-    AttitudeActualData attitudeData;
+    AttitudeStateData attitudeData;
     MkMsg_t msg;
 
     DEBUG_MSG("FC\n\r");
@@ -434,7 +434,7 @@ static void DoConnectedToFC(void)
 
             attitudeData.Pitch = -(float)nick / 10;
             attitudeData.Roll  = -(float)roll / 10;
-            AttitudeActualSet(&attitudeData);
+            AttitudeStateSet(&attitudeData);
         } else {
             DEBUG_MSG("TO\n\r");
             break;
@@ -446,8 +446,8 @@ static void DoConnectedToNC(void)
 {
     MkMsg_t msg;
     GpsPosition_t pos;
-    AttitudeActualData attitudeData;
-    PositionActualData positionData;
+    AttitudeStateData attitudeData;
+    PositionStateData positionData;
     FlightBatteryStateData flightBatteryData;
 
 #ifdef GENERATE_BATTERY_INFO
@@ -478,7 +478,7 @@ static void DoConnectedToNC(void)
 #endif
             attitudeData.Pitch       = -Par2Int8(&msg, OSD_MSG_NICK_IDX);
             attitudeData.Roll        = -Par2Int8(&msg, OSD_MSG_ROLL_IDX);
-            AttitudeActualSet(&attitudeData);
+            AttitudeStateSet(&attitudeData);
 
             positionData.Longitude   = pos.longitute;
             positionData.Latitude    = pos.latitude;
@@ -491,7 +491,7 @@ static void DoConnectedToNC(void)
             } else {
                 positionData.Status = POSITIONACTUAL_STATUS_FIX3D;
             }
-            PositionActualSet(&positionData);
+            PositionStateSet(&positionData);
 
 #if GENERATE_BATTERY_INFO
             if (++battStateCnt > 2) {

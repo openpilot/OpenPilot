@@ -7,9 +7,9 @@ OsgEarth {
     sceneFile: qmlWidget.earthFile
     fieldOfView: 90
 
-    yaw: AttitudeActual.Yaw
-    pitch: AttitudeActual.Pitch
-    roll: AttitudeActual.Roll
+    yaw: AttitudeState.Yaw
+    pitch: AttitudeState.Pitch
+    roll: AttitudeState.Roll
 
     latitude: qmlWidget.actualPositionUsed ?
                   GPSPosition.Latitude/10000000.0 : qmlWidget.latitude

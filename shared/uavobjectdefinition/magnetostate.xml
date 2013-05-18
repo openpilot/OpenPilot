@@ -1,5 +1,5 @@
 <xml>
-    <object name="Magnetometer" singleinstance="true" settings="false">
+    <object name="MagnetoState" singleinstance="true" settings="false">
         <description>The mag data.</description>
 	<field name="x" units="mGa" type="float" elements="1"/>
 	<field name="y" units="mGa" type="float" elements="1"/>

@@ -86,7 +86,7 @@ void PFDGadgetWidget::setToolTipPrivate()
     UAVObject::Metadata mdata = attitudeObj->getMetadata();
 
     if (mdata.flightTelemetryUpdatePeriod != updateRate) {
-        this->setToolTip("Current refresh rate:" + QString::number(mdata.flightTelemetryUpdatePeriod) + " miliseconds" + "\nIf you want to change it please edit the AttitudeActual metadata on the object browser.");
+        this->setToolTip("Current refresh rate:" + QString::number(mdata.flightTelemetryUpdatePeriod) + " miliseconds" + "\nIf you want to change it please edit the AttitudeState metadata on the object browser.");
     }
 }
 
@@ -106,7 +106,7 @@ void PFDGadgetWidget::enableOpenGL(bool flag)
    \brief Connects the widget to the relevant UAVObjects
 
    Should only be called after the PFD artwork is loaded.
-   We want: AttitudeActual, FlightBattery, Location.
+   We want: AttitudeState, FlightBattery, Location.
 
  */
 void PFDGadgetWidget::connectNeedles()
@@ -134,39 +134,39 @@ void PFDGadgetWidget::connectNeedles()
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    airspeedObj = dynamic_cast<UAVDataObject *>(objManager->getObject("AirspeedActual"));
+    airspeedObj = dynamic_cast<UAVDataObject *>(objManager->getObject("AirspeedState"));
     if (airspeedObj != NULL) {
         connect(airspeedObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateAirspeed(UAVObject *)));
     } else {
-        qDebug() << "Error: Object is unknown (AirspeedActual).";
+        qDebug() << "Error: Object is unknown (AirspeedState).";
     }
 
-    groundspeedObj = dynamic_cast<UAVDataObject *>(objManager->getObject("VelocityActual"));
+    groundspeedObj = dynamic_cast<UAVDataObject *>(objManager->getObject("VelocityState"));
     if (groundspeedObj != NULL) {
         connect(groundspeedObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateGroundspeed(UAVObject *)));
     } else {
-        qDebug() << "Error: Object is unknown (VelocityActual).";
+        qDebug() << "Error: Object is unknown (VelocityState).";
     }
 
-    altitudeObj = dynamic_cast<UAVDataObject *>(objManager->getObject("PositionActual"));
+    altitudeObj = dynamic_cast<UAVDataObject *>(objManager->getObject("PositionState"));
     if (altitudeObj != NULL) {
         connect(altitudeObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateAltitude(UAVObject *)));
     } else {
-        qDebug() << "Error: Object is unknown (PositionActual).";
+        qDebug() << "Error: Object is unknown (PositionState).";
     }
 
-    attitudeObj = dynamic_cast<UAVDataObject *>(objManager->getObject("AttitudeActual"));
+    attitudeObj = dynamic_cast<UAVDataObject *>(objManager->getObject("AttitudeState"));
     if (attitudeObj != NULL) {
         connect(attitudeObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateAttitude(UAVObject *)));
     } else {
-        qDebug() << "Error: Object is unknown (AttitudeActual).";
+        qDebug() << "Error: Object is unknown (AttitudeState).";
     }
 
-    headingObj = dynamic_cast<UAVDataObject *>(objManager->getObject("PositionActual"));
+    headingObj = dynamic_cast<UAVDataObject *>(objManager->getObject("PositionState"));
     if (headingObj != NULL) {
         connect(headingObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateHeading(UAVObject *)));
     } else {
-        qDebug() << "Error: Object is unknown (PositionActual).";
+        qDebug() << "Error: Object is unknown (PositionState).";
     }
 
     if (gcsGPSStats) {
@@ -307,7 +307,7 @@ void PFDGadgetWidget::updateAttitude(UAVObject *object1)
 /*!
    \brief Updates the compass reading and speed dial.
 
-   This also updates speed & altitude according to PositionActual data.
+   This also updates speed & altitude according to PositionState data.
 
     Note: the speed dial shows the ground speed at the moment, because
         there is no airspeed by default. Should become configurable in a future
@@ -319,7 +319,7 @@ void PFDGadgetWidget::updateHeading(UAVObject *object)
 }
 
 /*!
-   \brief Called by updates to @PositionActual to compute groundspeed from velocity
+   \brief Called by updates to @PositionState to compute groundspeed from velocity
  */
 void PFDGadgetWidget::updateGroundspeed(UAVObject *object)
 {
@@ -340,7 +340,7 @@ void PFDGadgetWidget::updateGroundspeed(UAVObject *object)
 
 
 /*!
-   \brief Called by updates to @AirspeedActual
+   \brief Called by updates to @AirspeedState
  */
 void PFDGadgetWidget::updateAirspeed(UAVObject *object)
 {
@@ -358,7 +358,7 @@ void PFDGadgetWidget::updateAirspeed(UAVObject *object)
 }
 
 /*!
-   \brief Called by the @ref PositionActual updates to show altitude
+   \brief Called by the @ref PositionState updates to show altitude
  */
 void PFDGadgetWidget::updateAltitude(UAVObject *object)
 {

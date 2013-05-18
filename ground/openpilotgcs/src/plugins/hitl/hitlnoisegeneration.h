@@ -37,16 +37,16 @@
 #include <coreplugin/threadmanager.h>
 
 struct Noise {
-    Accels::DataFields accelData;
-    AttitudeActual::DataFields attActualData;
-    BaroAltitude::DataFields   baroAltData;
-    AirspeedActual::DataFields airspeedActual;
-    GPSPosition::DataFields    gpsPosData;
-    GPSVelocity::DataFields    gpsVelData;
-    Gyros::DataFields gyroData;
-    HomeLocation::DataFields   homeData;
-    PositionActual::DataFields positionActualData;
-    VelocityActual::DataFields velocityActualData;
+    AccelState::DataFields    accelStateData;
+    AttitudeState::DataFields attStateData;
+    BaroSensor::DataFields    baroAltData;
+    AirspeedState::DataFields airspeedState;
+    GPSPosition::DataFields   gpsPosData;
+    GPSVelocity::DataFields   gpsVelData;
+    GyroState::DataFields     gyroStateData;
+    HomeLocation::DataFields  homeData;
+    PositionState::DataFields positionStateData;
+    VelocityState::DataFields velocityStateData;
 };
 
 class HitlNoiseGeneration {

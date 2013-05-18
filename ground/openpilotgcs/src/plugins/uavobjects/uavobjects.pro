@@ -24,11 +24,11 @@ OTHER_FILES += UAVObjects.pluginspec
 
 # Add in all of the synthetic/generated uavobject files
 HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
-    $$UAVOBJECT_SYNTHETICS/baroaltitude.h \
+    $$UAVOBJECT_SYNTHETICS/barosensor.h \
     $$UAVOBJECT_SYNTHETICS/airspeedsensor.h \
     $$UAVOBJECT_SYNTHETICS/airspeedsettings.h \
-    $$UAVOBJECT_SYNTHETICS/airspeedactual.h \
-    $$UAVOBJECT_SYNTHETICS/attitudeactual.h \
+    $$UAVOBJECT_SYNTHETICS/airspeedstate.h \
+    $$UAVOBJECT_SYNTHETICS/attitudestate.h \
     $$UAVOBJECT_SYNTHETICS/attitudesimulated.h \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.h \
@@ -38,11 +38,12 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/revocalibration.h \
     $$UAVOBJECT_SYNTHETICS/revosettings.h \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.h \
-    $$UAVOBJECT_SYNTHETICS/gyros.h \
-    $$UAVOBJECT_SYNTHETICS/gyrosbias.h \
-    $$UAVOBJECT_SYNTHETICS/accels.h \
-    $$UAVOBJECT_SYNTHETICS/magnetometer.h \
-    $$UAVOBJECT_SYNTHETICS/magbias.h \
+    $$UAVOBJECT_SYNTHETICS/gyrostate.h \
+    $$UAVOBJECT_SYNTHETICS/gyrosensor.h \
+    $$UAVOBJECT_SYNTHETICS/accelsensor.h \
+    $$UAVOBJECT_SYNTHETICS/accelstate.h \
+    $$UAVOBJECT_SYNTHETICS/magnetosensor.h \
+    $$UAVOBJECT_SYNTHETICS/magnetostate.h \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.h \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/systemstats.h \
@@ -65,13 +66,13 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/pathdesired.h \
     $$UAVOBJECT_SYNTHETICS/pathstatus.h \
     $$UAVOBJECT_SYNTHETICS/gpsvelocity.h \
-    $$UAVOBJECT_SYNTHETICS/positionactual.h \
+    $$UAVOBJECT_SYNTHETICS/positionstate.h \
     $$UAVOBJECT_SYNTHETICS/flightbatterystate.h \
     $$UAVOBJECT_SYNTHETICS/homelocation.h \
     $$UAVOBJECT_SYNTHETICS/mixersettings.h \
     $$UAVOBJECT_SYNTHETICS/mixerstatus.h \
     $$UAVOBJECT_SYNTHETICS/velocitydesired.h \
-    $$UAVOBJECT_SYNTHETICS/velocityactual.h \
+    $$UAVOBJECT_SYNTHETICS/velocitystate.h \
     $$UAVOBJECT_SYNTHETICS/groundtruth.h \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.h \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.h \
@@ -107,11 +108,11 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/mpu6000settings.h
 
 SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
-    $$UAVOBJECT_SYNTHETICS/baroaltitude.cpp \
+    $$UAVOBJECT_SYNTHETICS/barosensor.cpp \
     $$UAVOBJECT_SYNTHETICS/airspeedsensor.cpp \
     $$UAVOBJECT_SYNTHETICS/airspeedsettings.cpp \
-    $$UAVOBJECT_SYNTHETICS/airspeedactual.cpp \
-    $$UAVOBJECT_SYNTHETICS/attitudeactual.cpp \
+    $$UAVOBJECT_SYNTHETICS/airspeedstate.cpp \
+    $$UAVOBJECT_SYNTHETICS/attitudestate.cpp \
     $$UAVOBJECT_SYNTHETICS/attitudesimulated.cpp \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.cpp \
@@ -121,11 +122,12 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/revocalibration.cpp \
     $$UAVOBJECT_SYNTHETICS/revosettings.cpp \
     $$UAVOBJECT_SYNTHETICS/gcstelemetrystats.cpp \
-    $$UAVOBJECT_SYNTHETICS/accels.cpp \
-    $$UAVOBJECT_SYNTHETICS/gyros.cpp \
-    $$UAVOBJECT_SYNTHETICS/gyrosbias.cpp \
-    $$UAVOBJECT_SYNTHETICS/magnetometer.cpp \
-    $$UAVOBJECT_SYNTHETICS/magbias.cpp \
+    $$UAVOBJECT_SYNTHETICS/accelsensor.cpp \
+    $$UAVOBJECT_SYNTHETICS/accelstate.cpp \
+    $$UAVOBJECT_SYNTHETICS/gyrostate.cpp \
+    $$UAVOBJECT_SYNTHETICS/gyrosensor.cpp \
+    $$UAVOBJECT_SYNTHETICS/magnetosensor.cpp \
+    $$UAVOBJECT_SYNTHETICS/magnetostate.cpp \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemstats.cpp \
@@ -148,13 +150,13 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/pathstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsvelocity.cpp \
-    $$UAVOBJECT_SYNTHETICS/positionactual.cpp \
+    $$UAVOBJECT_SYNTHETICS/positionstate.cpp \
     $$UAVOBJECT_SYNTHETICS/flightbatterystate.cpp \
     $$UAVOBJECT_SYNTHETICS/homelocation.cpp \
     $$UAVOBJECT_SYNTHETICS/mixersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/mixerstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/velocitydesired.cpp \
-    $$UAVOBJECT_SYNTHETICS/velocityactual.cpp \
+    $$UAVOBJECT_SYNTHETICS/velocitystate.cpp \
     $$UAVOBJECT_SYNTHETICS/groundtruth.cpp \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/fixedwingpathfollowerstatus.cpp \

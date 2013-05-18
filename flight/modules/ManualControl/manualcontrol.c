@@ -38,14 +38,13 @@
 #include "accessorydesired.h"
 #include "actuatordesired.h"
 #include "altitudeholddesired.h"
-#include "baroaltitude.h"
 #include "flighttelemetrystats.h"
 #include "flightstatus.h"
 #include "sanitycheck.h"
 #include "manualcontrol.h"
 #include "manualcontrolsettings.h"
 #include "manualcontrolcommand.h"
-#include "positionactual.h"
+#include "positionstate.h"
 #include "pathdesired.h"
 #include "stabilizationsettings.h"
 #include "stabilizationdesired.h"
@@ -722,34 +721,34 @@ static void updatePathDesired(__attribute__((unused)) ManualControlCommandData *
 
     if (home && changed) {
         // Simple Return To Base mode - keep altitude the same, fly to home position
-        PositionActualData positionActual;
-        PositionActualGet(&positionActual);
+        PositionStateData positionState;
+        PositionStateGet(&positionState);
 
         PathDesiredData pathDesired;
         PathDesiredGet(&pathDesired);
         pathDesired.Start[PATHDESIRED_START_NORTH] = 0;
         pathDesired.Start[PATHDESIRED_START_EAST]  = 0;
-        pathDesired.Start[PATHDESIRED_START_DOWN]  = positionActual.Down - 10;
+        pathDesired.Start[PATHDESIRED_START_DOWN]  = positionState.Down - 10;
         pathDesired.End[PATHDESIRED_END_NORTH]     = 0;
         pathDesired.End[PATHDESIRED_END_EAST] = 0;
-        pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down - 10;
+        pathDesired.End[PATHDESIRED_END_DOWN] = positionState.Down - 10;
         pathDesired.StartingVelocity = 1;
         pathDesired.EndingVelocity   = 0;
         pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
         PathDesiredSet(&pathDesired);
     } else if (changed) {
         // After not being in this mode for a while init at current height
-        PositionActualData positionActual;
-        PositionActualGet(&positionActual);
+        PositionStateData positionState;
+        PositionStateGet(&positionState);
 
         PathDesiredData pathDesired;
         PathDesiredGet(&pathDesired);
-        pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North;
-        pathDesired.Start[PATHDESIRED_START_EAST]  = positionActual.East;
-        pathDesired.Start[PATHDESIRED_START_DOWN]  = positionActual.Down;
-        pathDesired.End[PATHDESIRED_END_NORTH]     = positionActual.North;
-        pathDesired.End[PATHDESIRED_END_EAST] = positionActual.East;
-        pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
+        pathDesired.Start[PATHDESIRED_START_NORTH] = positionState.North;
+        pathDesired.Start[PATHDESIRED_START_EAST]  = positionState.East;
+        pathDesired.Start[PATHDESIRED_START_DOWN]  = positionState.Down;
+        pathDesired.End[PATHDESIRED_END_NORTH]     = positionState.North;
+        pathDesired.End[PATHDESIRED_END_EAST] = positionState.East;
+        pathDesired.End[PATHDESIRED_END_DOWN] = positionState.Down;
         pathDesired.StartingVelocity = 1;
         pathDesired.EndingVelocity   = 0;
         pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
@@ -778,25 +777,25 @@ static void updateLandDesired(__attribute__((unused)) ManualControlCommandData *
        lastSysTime = thisSysTime;
      */
 
-    PositionActualData positionActual;
+    PositionStateData positionState;
 
-    PositionActualGet(&positionActual);
+    PositionStateGet(&positionState);
 
     PathDesiredData pathDesired;
     PathDesiredGet(&pathDesired);
     if (changed) {
         // After not being in this mode for a while init at current height
-        pathDesired.Start[PATHDESIRED_START_NORTH] = positionActual.North;
-        pathDesired.Start[PATHDESIRED_START_EAST]  = positionActual.East;
-        pathDesired.Start[PATHDESIRED_START_DOWN]  = positionActual.Down;
-        pathDesired.End[PATHDESIRED_END_NORTH]     = positionActual.North;
-        pathDesired.End[PATHDESIRED_END_EAST] = positionActual.East;
-        pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down;
+        pathDesired.Start[PATHDESIRED_START_NORTH] = positionState.North;
+        pathDesired.Start[PATHDESIRED_START_EAST]  = positionState.East;
+        pathDesired.Start[PATHDESIRED_START_DOWN]  = positionState.Down;
+        pathDesired.End[PATHDESIRED_END_NORTH]     = positionState.North;
+        pathDesired.End[PATHDESIRED_END_EAST] = positionState.East;
+        pathDesired.End[PATHDESIRED_END_DOWN] = positionState.Down;
         pathDesired.StartingVelocity = 1;
         pathDesired.EndingVelocity   = 0;
         pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
     }
-    pathDesired.End[PATHDESIRED_END_DOWN] = positionActual.Down + 5;
+    pathDesired.End[PATHDESIRED_END_DOWN] = positionState.Down + 5;
     PathDesiredSet(&pathDesired);
 }
 
@@ -839,7 +838,7 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     altitudeHoldDesiredData.Yaw   = cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
 
     float currentDown;
-    PositionActualDownGet(&currentDown);
+    PositionStateDownGet(&currentDown);
     if (changed) {
         // After not being in this mode for a while init at current height
         altitudeHoldDesiredData.Altitude = 0;

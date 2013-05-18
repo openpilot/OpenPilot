@@ -1721,7 +1721,7 @@ Sat SNR is displayed above (in dBHz)</source>
     </message>
     <message>
         <location/>
-        <source>AttitudeActual</source>
+        <source>AttitudeState</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -3,7 +3,7 @@
  *
  * @file       vtolpathfollower.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      This module compared @ref PositionActual to @ref PathDesired
+ * @brief      This module compared @ref PositionState to @ref PathDesired
  * and sets @ref Stabilization.  It only does this when the FlightMode field
  * of @ref FlightStatus is PathPlanner or RTH.
  *
@@ -29,11 +29,11 @@
 /**
  * Input object: FlightStatus
  * Input object: PathDesired
- * Input object: PositionActual
+ * Input object: PositionState
  * Output object: StabilizationDesired
  *
  * This module will periodically update the value of the @ref StabilizationDesired object based on
- * @ref PathDesired and @PositionActual when the Flight Mode selected in @FlightStatus is supported
+ * @ref PathDesired and @PositionState when the Flight Mode selected in @FlightStatus is supported
  * by this module.  Otherwise another module (e.g. @ref ManualControlCommand) is expected to be
  * writing to @ref StabilizationDesired.
  *
@@ -50,11 +50,11 @@
 
 #include "vtolpathfollower.h"
 
-#include "accels.h"
-#include "attitudeactual.h"
+#include "accelstate.h"
+#include "attitudestate.h"
 #include "hwsettings.h"
 #include "pathdesired.h" // object that will be updated by the module
-#include "positionactual.h"
+#include "positionstate.h"
 #include "manualcontrol.h"
 #include "flightstatus.h"
 #include "pathstatus.h"
@@ -67,7 +67,7 @@
 #include "stabilizationsettings.h"
 #include "systemsettings.h"
 #include "velocitydesired.h"
-#include "velocityactual.h"
+#include "velocitystate.h"
 #include "taskinfo.h"
 
 #include "paths.h"
@@ -286,8 +286,8 @@ static void updatePOIBearing()
     PathDesiredData pathDesired;
 
     PathDesiredGet(&pathDesired);
-    PositionActualData positionActual;
-    PositionActualGet(&positionActual);
+    PositionStateData positionState;
+    PositionStateGet(&positionState);
     CameraDesiredData cameraDesired;
     CameraDesiredGet(&cameraDesired);
     StabilizationDesiredData stabDesired;
@@ -299,9 +299,9 @@ static void updatePOIBearing()
     float yaw = 0;
     /*float elevation = 0;*/
 
-    dLoc[0] = positionActual.North - poi.North;
-    dLoc[1] = positionActual.East - poi.East;
-    dLoc[2] = positionActual.Down - poi.Down;
+    dLoc[0] = positionState.North - poi.North;
+    dLoc[1] = positionState.East - poi.East;
+    dLoc[2] = positionState.Down - poi.Down;
 
     if (dLoc[1] < 0) {
         yaw = RAD2DEG(atan2f(dLoc[1], dLoc[0])) + 180.0f;
@@ -364,7 +364,7 @@ static void updatePOIBearing()
 /**
  * Compute desired velocity from the current position and path
  *
- * Takes in @ref PositionActual and compares it to @ref PathDesired
+ * Takes in @ref PositionState and compares it to @ref PathDesired
  * and computes @ref VelocityDesired
  */
 static void updatePathVelocity()
@@ -375,11 +375,11 @@ static void updatePathVelocity()
     PathDesiredData pathDesired;
 
     PathDesiredGet(&pathDesired);
-    PositionActualData positionActual;
-    PositionActualGet(&positionActual);
+    PositionStateData positionState;
+    PositionStateGet(&positionState);
 
     float cur[3] =
-    { positionActual.North, positionActual.East, positionActual.Down };
+    { positionState.North, positionState.East, positionState.Down };
     struct path_status progress;
 
     path_progress(pathDesired.Start, pathDesired.End, cur, &progress, pathDesired.Mode);
@@ -429,7 +429,7 @@ static void updatePathVelocity()
 
     float altitudeSetpoint = pathDesired.Start[2] + (pathDesired.End[2] - pathDesired.Start[2]) * bound(progress.fractional_progress, 0, 1);
 
-    float downError = altitudeSetpoint - positionActual.Down;
+    float downError = altitudeSetpoint - positionState.Down;
     downPosIntegral = bound(downPosIntegral + downError * dT * vtolpathfollowerSettings.VerticalPosPI[VTOLPATHFOLLOWERSETTINGS_VERTICALPOSPI_KI],
                             -vtolpathfollowerSettings.VerticalPosPI[VTOLPATHFOLLOWERSETTINGS_VERTICALPOSPI_ILIMIT],
                             vtolpathfollowerSettings.VerticalPosPI[VTOLPATHFOLLOWERSETTINGS_VERTICALPOSPI_ILIMIT]);
@@ -446,7 +446,7 @@ static void updatePathVelocity()
 /**
  * Compute desired velocity from the current position
  *
- * Takes in @ref PositionActual and compares it to @ref PositionDesired
+ * Takes in @ref PositionState and compares it to @ref PositionDesired
  * and computes @ref VelocityDesired
  */
 void updateEndpointVelocity()
@@ -457,10 +457,10 @@ void updateEndpointVelocity()
 
     PathDesiredGet(&pathDesired);
 
-    PositionActualData positionActual;
+    PositionStateData positionState;
     VelocityDesiredData velocityDesired;
 
-    PositionActualGet(&positionActual);
+    PositionStateGet(&positionState);
     VelocityDesiredGet(&velocityDesired);
 
     float northError;
@@ -473,9 +473,9 @@ void updateEndpointVelocity()
     float northPos = 0, eastPos = 0, downPos = 0;
     switch (vtolpathfollowerSettings.PositionSource) {
     case VTOLPATHFOLLOWERSETTINGS_POSITIONSOURCE_EKF:
-        northPos = positionActual.North;
-        eastPos  = positionActual.East;
-        downPos  = positionActual.Down;
+        northPos = positionState.North;
+        eastPos  = positionState.East;
+        downPos  = positionState.Down;
         break;
     case VTOLPATHFOLLOWERSETTINGS_POSITIONSOURCE_GPSPOS:
     {
@@ -559,18 +559,18 @@ static void updateFixedAttitude(float *attitude)
 /**
  * Compute desired attitude from the desired velocity
  *
- * Takes in @ref NedActual which has the acceleration in the
+ * Takes in @ref NedState which has the acceleration in the
  * NED frame as the feedback term and then compares the
- * @ref VelocityActual against the @ref VelocityDesired
+ * @ref VelocityState against the @ref VelocityDesired
  */
 static void updateVtolDesiredAttitude(bool yaw_attitude)
 {
     float dT = vtolpathfollowerSettings.UpdatePeriod / 1000.0f;
 
     VelocityDesiredData velocityDesired;
-    VelocityActualData velocityActual;
+    VelocityStateData velocityState;
     StabilizationDesiredData stabDesired;
-    AttitudeActualData attitudeActual;
+    AttitudeStateData attitudeState;
     NedAccelData nedAccel;
     StabilizationSettingsData stabSettings;
     SystemSettingsData systemSettings;
@@ -585,20 +585,20 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
     float downCommand;
 
     SystemSettingsGet(&systemSettings);
-    VelocityActualGet(&velocityActual);
+    VelocityStateGet(&velocityState);
     VelocityDesiredGet(&velocityDesired);
     StabilizationDesiredGet(&stabDesired);
     VelocityDesiredGet(&velocityDesired);
-    AttitudeActualGet(&attitudeActual);
+    AttitudeStateGet(&attitudeState);
     StabilizationSettingsGet(&stabSettings);
     NedAccelGet(&nedAccel);
 
     float northVel = 0, eastVel = 0, downVel = 0;
     switch (vtolpathfollowerSettings.VelocitySource) {
     case VTOLPATHFOLLOWERSETTINGS_VELOCITYSOURCE_EKF:
-        northVel = velocityActual.North;
-        eastVel  = velocityActual.East;
-        downVel  = velocityActual.Down;
+        northVel = velocityState.North;
+        eastVel  = velocityState.East;
+        downVel  = velocityState.Down;
         break;
     case VTOLPATHFOLLOWERSETTINGS_VELOCITYSOURCE_NEDVEL:
     {
@@ -615,7 +615,7 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
         GPSPositionGet(&gpsPosition);
         northVel = gpsPosition.Groundspeed * cosf(DEG2RAD(gpsPosition.Heading));
         eastVel  = gpsPosition.Groundspeed * sinf(DEG2RAD(gpsPosition.Heading));
-        downVel  = velocityActual.Down;
+        downVel  = velocityState.Down;
     }
     break;
     default:
@@ -659,11 +659,11 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
 
     // Project the north and east command signals into the pitch and roll based on yaw.  For this to behave well the
     // craft should move similarly for 5 deg roll versus 5 deg pitch
-    stabDesired.Pitch = bound(-northCommand * cosf(DEG2RAD(attitudeActual.Yaw)) +
-                              -eastCommand * sinf(DEG2RAD(attitudeActual.Yaw)),
+    stabDesired.Pitch = bound(-northCommand * cosf(DEG2RAD(attitudeState.Yaw)) +
+                              -eastCommand * sinf(DEG2RAD(attitudeState.Yaw)),
                               -vtolpathfollowerSettings.MaxRollPitch, vtolpathfollowerSettings.MaxRollPitch);
-    stabDesired.Roll  = bound(-northCommand * sinf(DEG2RAD(attitudeActual.Yaw)) +
-                              eastCommand * cosf(DEG2RAD(attitudeActual.Yaw)),
+    stabDesired.Roll  = bound(-northCommand * sinf(DEG2RAD(attitudeState.Yaw)) +
+                              eastCommand * cosf(DEG2RAD(attitudeState.Yaw)),
                               -vtolpathfollowerSettings.MaxRollPitch, vtolpathfollowerSettings.MaxRollPitch);
 
     if (vtolpathfollowerSettings.ThrottleControl == VTOLPATHFOLLOWERSETTINGS_THROTTLECONTROL_FALSE) {
@@ -695,20 +695,20 @@ static void updateNedAccel()
     float accel_ned[3];
 
     // Collect downsampled attitude data
-    AccelsData accels;
+    AccelStateData accelState;
 
-    AccelsGet(&accels);
-    accel[0] = accels.x;
-    accel[1] = accels.y;
-    accel[2] = accels.z;
+    AccelStateGet(&accelState);
+    accel[0] = accelState.x;
+    accel[1] = accelState.y;
+    accel[2] = accelState.z;
 
     // rotate avg accels into earth frame and store it
-    AttitudeActualData attitudeActual;
-    AttitudeActualGet(&attitudeActual);
-    q[0] = attitudeActual.q1;
-    q[1] = attitudeActual.q2;
-    q[2] = attitudeActual.q3;
-    q[3] = attitudeActual.q4;
+    AttitudeStateData attitudeState;
+    AttitudeStateGet(&attitudeState);
+    q[0] = attitudeState.q1;
+    q[1] = attitudeState.q2;
+    q[2] = attitudeState.q3;
+    q[3] = attitudeState.q4;
     Quaternion2R(q, Rbe);
     for (uint8_t i = 0; i < 3; i++) {
         accel_ned[i] = 0;
@@ -757,13 +757,13 @@ static void accessoryUpdated(UAVObjEvent *ev)
     if (poiLearn.Input != POILEARNSETTINGS_INPUT_NONE) {
         if (AccessoryDesiredInstGet(poiLearn.Input - POILEARNSETTINGS_INPUT_ACCESSORY0, &accessory) == 0) {
             if (accessory.AccessoryVal < -0.5f) {
-                PositionActualData positionActual;
-                PositionActualGet(&positionActual);
+                PositionStateData positionState;
+                PositionStateGet(&positionState);
                 PoiLocationData poi;
                 PoiLocationGet(&poi);
-                poi.North = positionActual.North;
-                poi.East  = positionActual.East;
-                poi.Down  = positionActual.Down;
+                poi.North = positionState.North;
+                poi.East  = positionState.East;
+                poi.Down  = positionState.Down;
                 PoiLocationSet(&poi);
             }
         }

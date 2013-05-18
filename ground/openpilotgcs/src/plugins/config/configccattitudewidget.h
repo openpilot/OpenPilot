@@ -56,8 +56,8 @@ private slots:
 private:
     Ui_ccattitude *ui;
     QTimer timer;
-    UAVObject::Metadata initialAccelsMdata;
-    UAVObject::Metadata initialGyrosMdata;
+    UAVObject::Metadata initialAccelStateMdata;
+    UAVObject::Metadata initialGyroStateMdata;
 
     int accelUpdates;
     int gyroUpdates;

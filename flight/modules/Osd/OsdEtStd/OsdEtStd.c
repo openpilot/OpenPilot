@@ -33,8 +33,8 @@
 
 #include "flightbatterystate.h"
 #include "gpsposition.h"
-#include "attitudeactual.h"
-#include "baroaltitude.h"
+#include "attitudestate.h"
+#include "barosensor.h"
 
 //
 // Configuration
@@ -168,7 +168,7 @@ static void SetCourse(uint16_t dir)
     WriteToMsg16(OSDMSG_HOME_IDX, dir);
 }
 
-static void SetBaroAltitude(int16_t altitudeMeter)
+static void SetBaroSensor(int16_t altitudeMeter)
 {
     // calculated formula
     // ET OSD uses first update as zeropoint and then +- from that
@@ -214,7 +214,7 @@ static void GPSPositionUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     newPosData = TRUE;
 }
 
-static void BaroAltitudeUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+static void BaroSensorUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     newBaroData = TRUE;
 }
@@ -441,10 +441,10 @@ static void Run(void)
 
     if (newPosData) {
         GPSPositionData positionData;
-        AttitudeActualData attitudeActualData;
+        AttitudeStateData attitudeStateData;
 
         GPSPositionGet(&positionData);
-        AttitudeActualGet(&attitudeActualData);
+        AttitudeStateGet(&attitudeStateData);
 
         // DEBUG_MSG("%5d Pos: #stat=%d #sats=%d alt=%d\n\r", cnt,
         // positionData.Status, positionData.Satellites, (uint32_t)positionData.Altitude);
@@ -462,17 +462,17 @@ static void Run(void)
         SetCoord(OSDMSG_LON_IDX, positionData.Longitude);
         SetAltitude(positionData.Altitude);
         SetNbSats(positionData.Satellites);
-        SetCourse(attitudeActualData.Yaw);
+        SetCourse(attitudeStateData.Yaw);
 
         newPosData = FALSE;
     } else {
         msg[OSDMSG_GPS_STAT] &= ~OSDMSG_GPS_STAT_HB_FLAG;
     }
     if (newBaroData) {
-        BaroAltitudeData baroData;
+        BaroSensorData baroData;
 
-        BaroAltitudeGet(&baroData);
-        SetBaroAltitude(baroData.Altitude);
+        BaroSensorGet(&baroData);
+        SetBaroSensor(baroData.Altitude);
 
         newBaroData = FALSE;
     }
@@ -545,7 +545,7 @@ int32_t OsdEtStdInitialize(void)
 {
     GPSPositionConnectCallback(GPSPositionUpdatedCb);
     FlightBatteryStateConnectCallback(FlightBatteryStateUpdatedCb);
-    BaroAltitudeConnectCallback(BaroAltitudeUpdatedCb);
+    BaroSensorConnectCallback(BaroSensorUpdatedCb);
 
     memset(&ev, 0, sizeof(UAVObjEvent));
     EventPeriodicCallbackCreate(&ev, onTimer, 100 / portTICK_RATE_MS);

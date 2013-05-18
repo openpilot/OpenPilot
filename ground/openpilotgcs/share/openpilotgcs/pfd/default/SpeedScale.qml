@@ -3,8 +3,8 @@ import Qt 4.7
 Item {
     id: sceneItem
     property variant sceneSize
-    property real groundSpeed : 3.6 * Math.sqrt(Math.pow(VelocityActual.North,2)+
-                                                Math.pow(VelocityActual.East,2))
+    property real groundSpeed : 3.6 * Math.sqrt(Math.pow(VelocityState.North,2)+
+                                                Math.pow(VelocityState.East,2))
 
     SvgElementImage {
         id: speed_bg

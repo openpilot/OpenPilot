@@ -3,7 +3,7 @@
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup AltitudeModule Altitude Module
- * @brief Communicate with BMP085 and update @ref BaroAltitude "BaroAltitude UAV Object"
+ * @brief Communicate with BMP085 and update @ref BaroSensor "BaroSensor UAV Object"
  * @{
  *
  * @file       altitude.c
@@ -30,9 +30,9 @@
  */
 
 /**
- * Output object: BaroAltitude
+ * Output object: BaroSensor
  *
- * This module will periodically update the value of the BaroAltitude object.
+ * This module will periodically update the value of the BaroSensor object.
  *
  */
 
@@ -40,8 +40,8 @@
 
 #include "hwsettings.h"
 #include "magbaro.h"
-#include "baroaltitude.h" // object that will be updated by the module
-#include "magnetometer.h"
+#include "barosensor.h" // object that will be updated by the module
+#include "magnetosensor.h"
 #include "taskinfo.h"
 
 // Private constants
@@ -109,11 +109,11 @@ int32_t MagBaroInitialize()
 
     if (magbaroEnabled) {
 #if defined(PIOS_INCLUDE_HMC5883)
-        MagnetometerInitialize();
+        MagnetoSensorInitialize();
 #endif
 
 #if defined(PIOS_INCLUDE_BMP085)
-        BaroAltitudeInitialize();
+        BaroSensorInitialize();
 
         // init down-sampling data
         alt_ds_temp  = 0;
@@ -144,12 +144,12 @@ static void magbaroTask(__attribute__((unused)) void *parameters)
     portTickType lastSysTime;
 
 #if defined(PIOS_INCLUDE_BMP085)
-    BaroAltitudeData data;
+    BaroSensorData data;
     PIOS_BMP085_Init();
 #endif
 
 #if defined(PIOS_INCLUDE_HMC5883)
-    MagnetometerData mag;
+    MagnetoSensorData mag;
     PIOS_HMC5883_Init(&pios_hmc5883_cfg);
     uint32_t mag_update_time = PIOS_DELAY_GetRaw();
 #endif
@@ -192,8 +192,8 @@ static void magbaroTask(__attribute__((unused)) void *parameters)
             // Compute the current altitude (all pressures in kPa)
             data.Altitude = 44330.0f * (1.0f - powf((data.Pressure / (BMP085_P0 / 1000.0f)), (1.0f / 5.255f)));
 
-            // Update the AltitudeActual UAVObject
-            BaroAltitudeSet(&data);
+            // Update the BaroSensor UAVObject
+            BaroSensorSet(&data);
         }
 #endif /* if defined(PIOS_INCLUDE_BMP085) */
 
@@ -207,7 +207,7 @@ static void magbaroTask(__attribute__((unused)) void *parameters)
             mag.x = mags[0];
             mag.y = mags[1];
             mag.z = mags[2];
-            MagnetometerSet(&mag);
+            MagnetoSensorSet(&mag);
             mag_update_time = PIOS_DELAY_GetRaw();
         }
 #endif

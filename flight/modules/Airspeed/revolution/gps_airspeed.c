@@ -33,7 +33,7 @@
 #include "openpilot.h"
 #include "gps_airspeed.h"
 #include "gpsvelocity.h"
-#include "attitudeactual.h"
+#include "attitudestate.h"
 #include "CoordinateConversions.h"
 #include <pios_math.h>
 
@@ -73,8 +73,8 @@ void gps_airspeedInitialize()
     gps->gpsVelOld_E = gpsVelData.East;
     gps->gpsVelOld_D = gpsVelData.Down;
 
-    AttitudeActualData attData;
-    AttitudeActualGet(&attData);
+    AttitudeStateData attData;
+    AttitudeStateGet(&attData);
 
     float Rbe[3][3];
     float q[4] = { attData.q1, attData.q2, attData.q3, attData.q4 };
@@ -101,8 +101,8 @@ void gps_airspeedGet(float *v_air_GPS)
     float Rbe[3][3];
 
     { // Scoping to save memory. We really just need Rbe.
-        AttitudeActualData attData;
-        AttitudeActualGet(&attData);
+        AttitudeStateData attData;
+        AttitudeStateGet(&attData);
 
         float q[4] = { attData.q1, attData.q2, attData.q3, attData.q4 };
 

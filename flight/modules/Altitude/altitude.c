@@ -3,7 +3,7 @@
  * @addtogroup OpenPilotModules OpenPilot Modules
  * @{
  * @addtogroup AltitudeModule Altitude Module
- * @brief Communicate with BMP085 and update @ref BaroAltitude "BaroAltitude UAV Object"
+ * @brief Communicate with BMP085 and update @ref BaroSensor "BaroSensor UAV Object"
  * @{
  *
  * @file       altitude.c
@@ -30,9 +30,9 @@
  */
 
 /**
- * Output object: BaroAltitude
+ * Output object: BaroSensor
  *
- * This module will periodically update the value of the BaroAltitude object.
+ * This module will periodically update the value of the BaroSensor object.
  *
  */
 
@@ -41,7 +41,7 @@
 #include "hwsettings.h"
 #include "altitude.h"
 #if defined(PIOS_INCLUDE_BMP085)
-#include "baroaltitude.h" // object that will be updated by the module
+#include "barosensor.h" // object that will be updated by the module
 #endif
 #if defined(PIOS_INCLUDE_HCSR04)
 #include "sonaraltitude.h" // object that will be updated by the module
@@ -80,7 +80,7 @@ int32_t AltitudeStart()
 {
     if (altitudeEnabled) {
 #if defined(PIOS_INCLUDE_BMP085)
-        BaroAltitudeInitialize();
+        BaroSensorInitialize();
 #endif
 #if defined(PIOS_INCLUDE_HCSR04)
         SonarAltitudeInitialize();
@@ -139,7 +139,7 @@ static void altitudeTask(__attribute__((unused)) void *parameters)
     }
 #endif
 #if defined(PIOS_INCLUDE_BMP085)
-    BaroAltitudeData data;
+    BaroSensorData data;
     PIOS_BMP085_Init();
 #endif
 
@@ -206,7 +206,7 @@ static void altitudeTask(__attribute__((unused)) void *parameters)
             data.Altitude = 44330.0 * (1.0 - powf((data.Pressure / (BMP085_P0 / 1000.0)), (1.0 / 5.255)));
 
             // Update the AltitudeActual UAVObject
-            BaroAltitudeSet(&data);
+            BaroSensorSet(&data);
         }
 #endif /* if defined(PIOS_INCLUDE_BMP085) */
 

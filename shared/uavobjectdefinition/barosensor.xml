@@ -1,5 +1,5 @@
 <xml>
-    <object name="BaroAltitude" singleinstance="true" settings="false">
+    <object name="BaroSensor" singleinstance="true" settings="false">
         <description>The raw data from the barometric sensor with pressure, temperature and altitude estimate.</description>
         <field name="Altitude" units="m" type="float" elements="1"/>
         <field name="Temperature" units="C" type="float" elements="1"/>

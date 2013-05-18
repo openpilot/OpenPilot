@@ -4,7 +4,7 @@
  * @{
  * @addtogroup Sensors
  * @brief Acquires sensor data
- * Specifically updates the the @ref Gyros, @ref Accels, and @ref Magnetometer objects
+ * Specifically updates the the @ref GyroSensor, @ref AccelSensor, and @ref MagnetoSensor objects
  * @{
  *
  * @file       sensors.c
@@ -32,7 +32,7 @@
 
 /**
  * Input objects: None, takes sensor data via pios
- * Output objects: @ref Gyros @ref Accels @ref Magnetometer
+ * Output objects: @ref GyroSensor @ref AccelSensor @ref MagnetoSensor
  *
  * The module executes in its own thread.
  *
@@ -49,12 +49,10 @@
 #include <openpilot.h>
 
 #include <homelocation.h>
-#include <magnetometer.h>
-#include <magbias.h>
-#include <accels.h>
-#include <gyros.h>
-#include <gyrosbias.h>
-#include <attitudeactual.h>
+#include <magnetosensor.h>
+#include <accelsensor.h>
+#include <gyrosensor.h>
+#include <attitudestate.h>
 #include <attitudesettings.h>
 #include <revocalibration.h>
 #include <flightstatus.h>
@@ -75,14 +73,13 @@
 // Private functions
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent *objEv);
-static void magOffsetEstimation(MagnetometerData *mag);
+// static void magOffsetEstimation(MagnetoSensorData *mag);
 
 // Private variables
 static xTaskHandle sensorsTaskHandle;
 RevoCalibrationData cal;
 
 // These values are initialized by settings but can be updated by the attitude algorithm
-static bool bias_correct_gyro = true;
 
 static float mag_bias[3] = { 0, 0, 0 };
 static float mag_scale[3] = { 0, 0, 0 };
@@ -111,11 +108,9 @@ static int8_t rotate = 0;
  */
 int32_t SensorsInitialize(void)
 {
-    GyrosInitialize();
-    GyrosBiasInitialize();
-    AccelsInitialize();
-    MagnetometerInitialize();
-    MagBiasInitialize();
+    GyroSensorInitialize();
+    AccelSensorInitialize();
+    MagnetoSensorInitialize();
     RevoCalibrationInitialize();
     AttitudeSettingsInitialize();
 
@@ -238,8 +233,8 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         accel_samples = 0;
         gyro_samples  = 0;
 
-        AccelsData accelsData;
-        GyrosData gyrosData;
+        AccelSensorData accelSensorData;
+        GyroSensorData gyroSensorData;
 
         switch (bdinfo->board_rev) {
         case 0x01: // L3GD20 + BMA180 board
@@ -275,7 +270,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                 accel_scaling = PIOS_BMA180_GetScale();
 
                 // Get temp from last reading
-                accelsData.temperature = 25.0f + ((float)accel.temperature - 2.0f) / 2.0f;
+                accelSensorData.temperature = 25.0f + ((float)accel.temperature - 2.0f) / 2.0f;
             }
 #endif /* if defined(PIOS_INCLUDE_BMA180) */
 #if defined(PIOS_INCLUDE_L3GD20)
@@ -297,7 +292,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                 gyro_scaling   = PIOS_L3GD20_GetScale();
 
                 // Get temp from last reading
-                gyrosData.temperature = gyro.temperature;
+                gyroSensorData.temperature = gyro.temperature;
             }
 #endif /* if defined(PIOS_INCLUDE_L3GD20) */
             break;
@@ -330,8 +325,8 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                 gyro_scaling  = PIOS_MPU6000_GetScale();
                 accel_scaling = PIOS_MPU6000_GetAccelScale();
 
-                gyrosData.temperature  = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
-                accelsData.temperature = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
+                gyroSensorData.temperature  = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
+                accelSensorData.temperature = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
             }
 #endif /* PIOS_INCLUDE_MPU6000 */
             break;
@@ -348,15 +343,15 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                                 accels[2] * accel_scaling * accel_scale[2] - accel_bias[2] };
         if (rotate) {
             rot_mult(R, accels_out, accels);
-            accelsData.x = accels[0];
-            accelsData.y = accels[1];
-            accelsData.z = accels[2];
+            accelSensorData.x = accels[0];
+            accelSensorData.y = accels[1];
+            accelSensorData.z = accels[2];
         } else {
-            accelsData.x = accels_out[0];
-            accelsData.y = accels_out[1];
-            accelsData.z = accels_out[2];
+            accelSensorData.x = accels_out[0];
+            accelSensorData.y = accels_out[1];
+            accelSensorData.z = accels_out[2];
         }
-        AccelsSet(&accelsData);
+        AccelSensorSet(&accelSensorData);
 
         // Scale the gyros
         float gyros[3]     = { (float)gyro_accum[0] / gyro_samples,
@@ -367,30 +362,30 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                                gyros[2] * gyro_scaling * gyro_scale[2] - gyro_staticbias[2] };
         if (rotate) {
             rot_mult(R, gyros_out, gyros);
-            gyrosData.x = gyros[0];
-            gyrosData.y = gyros[1];
-            gyrosData.z = gyros[2];
+            gyroSensorData.x = gyros[0];
+            gyroSensorData.y = gyros[1];
+            gyroSensorData.z = gyros[2];
         } else {
-            gyrosData.x = gyros_out[0];
-            gyrosData.y = gyros_out[1];
-            gyrosData.z = gyros_out[2];
+            gyroSensorData.x = gyros_out[0];
+            gyroSensorData.y = gyros_out[1];
+            gyroSensorData.z = gyros_out[2];
         }
 
-        if (bias_correct_gyro) {
+/* TODO        if (bias_correct_gyro) {
             // Apply bias correction to the gyros from the state estimator
             GyrosBiasData gyrosBias;
             GyrosBiasGet(&gyrosBias);
             gyrosData.x -= gyrosBias.x;
             gyrosData.y -= gyrosBias.y;
             gyrosData.z -= gyrosBias.z;
-        }
-        GyrosSet(&gyrosData);
+        }*/
+        GyroSensorSet(&gyroSensorData);
 
         // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
         // and make it average zero (weakly)
 
 #if defined(PIOS_INCLUDE_HMC5883)
-        MagnetometerData mag;
+        MagnetoSensorData mag;
         if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
             int16_t values[3];
             PIOS_HMC5883_ReadMag(values);
@@ -410,11 +405,14 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             }
 
             // Correct for mag bias and update if the rate is non zero
+// TODO
+/*
             if (cal.MagBiasNullingRate > 0) {
                 magOffsetEstimation(&mag);
             }
+ */
 
-            MagnetometerSet(&mag);
+            MagnetoSensorSet(&mag);
             mag_update_time = PIOS_DELAY_GetRaw();
         }
 #endif /* if defined(PIOS_INCLUDE_HMC5883) */
@@ -430,9 +428,11 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
  * Magnetometer Offset Cancellation: Theory and Implementation,
  * revisited William Premerlani, October 14, 2011
  */
-static void magOffsetEstimation(MagnetometerData *mag)
-{
-#if 0
+// TODO
+/*
+   static void magOffsetEstimation(MagnetoSensorData *mag)
+   {
+   #if 0
     // Constants, to possibly go into a UAVO
     static const float MIN_NORM_DIFFERENCE = 50;
 
@@ -471,7 +471,7 @@ static void magOffsetEstimation(MagnetometerData *mag)
         // Store this value to compare against next update
         B2[0] = B1[0]; B2[1] = B1[1]; B2[2] = B1[2];
     }
-#else /* if 0 */
+   #else // if 0
     MagBiasData magBias;
     MagBiasGet(&magBias);
 
@@ -483,8 +483,8 @@ static void magOffsetEstimation(MagnetometerData *mag)
     HomeLocationData homeLocation;
     HomeLocationGet(&homeLocation);
 
-    AttitudeActualData attitude;
-    AttitudeActualGet(&attitude);
+    AttitudeStateData attitude;
+    AttitudeStateGet(&attitude);
 
     const float Rxy  = sqrtf(homeLocation.Be[0] * homeLocation.Be[0] + homeLocation.Be[1] * homeLocation.Be[1]);
     const float Rz   = homeLocation.Be[2];
@@ -523,8 +523,9 @@ static void magOffsetEstimation(MagnetometerData *mag)
         magBias.z += delta[2];
         MagBiasSet(&magBias);
     }
-#endif /* if 0 */
-}
+   #endif // if 0
+   }
+ */
 
 /**
  * Locally cache some variables from the AtttitudeSettings object
@@ -552,18 +553,9 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     gyro_scale[1]      = cal.gyro_scale[REVOCALIBRATION_GYRO_SCALE_Y];
     gyro_scale[2]      = cal.gyro_scale[REVOCALIBRATION_GYRO_SCALE_Z];
 
-    // Zero out any adaptive tracking
-    MagBiasData magBias;
-    MagBiasGet(&magBias);
-    magBias.x = 0;
-    magBias.y = 0;
-    magBias.z = 0;
-    MagBiasSet(&magBias);
-
 
     AttitudeSettingsData attitudeSettings;
     AttitudeSettingsGet(&attitudeSettings);
-    bias_correct_gyro = (cal.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE);
 
     // Indicates not to expend cycles on rotation
     if (attitudeSettings.BoardRotation[0] == 0 && attitudeSettings.BoardRotation[1] == 0 &&

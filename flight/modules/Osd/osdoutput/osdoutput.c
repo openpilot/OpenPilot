@@ -35,11 +35,11 @@
 #endif
 
 #if POSITIONACTUAL_SUPPORTED
-#include "positionactual.h"
+#include "positionstate.h"
 #endif
 
 #include "systemalarms.h"
-#include "attitudeactual.h"
+#include "attitudestate.h"
 #include "hwsettings.h"
 #include "flightstatus.h"
 
@@ -117,7 +117,7 @@ struct osd_hk_msg {
 
 static struct osd_hk_msg osd_hk_msg_buf;
 
-static volatile bool newPositionActualData = false;
+static volatile bool newPositionStateData = false;
 static volatile bool newBattData     = false;
 static volatile bool newAttitudeData = false;
 static volatile bool newAlarmData    = false;
@@ -155,15 +155,15 @@ static void send_update(__attribute__((unused)) UAVObjEvent *ev)
     case OSD_HK_PKT_TYPE_ATT:
         msg->t = OSD_HK_PKT_TYPE_ATT;
         float roll;
-        AttitudeActualRollGet(&roll);
+        AttitudeStateRollGet(&roll);
         blob->att.roll = (int16_t)(roll * 10);
 
         float pitch;
-        AttitudeActualPitchGet(&pitch);
+        AttitudeStatePitchGet(&pitch);
         blob->att.pitch = (int16_t)(pitch * 10);
 
         float yaw;
-        AttitudeActualYawGet(&yaw);
+        AttitudeStateYawGet(&yaw);
         blob->att.yaw = (int16_t)(yaw * 10);
         break;
     case OSD_HK_PKT_TYPE_MODE:
@@ -217,9 +217,9 @@ static void send_update(__attribute__((unused)) UAVObjEvent *ev)
 #endif
 
 #if POSITIONACTUAL_SUPPORTED
-    if (newPositionActualData) {
-        PositionActualData position;
-        PositionActualGet(&position);
+    if (newPositionStateData) {
+        PositionStateData position;
+        PositionStateGet(&position);
 
         /* compute 3D distance */
         float d = sqrt(
@@ -234,7 +234,7 @@ static void send_update(__attribute__((unused)) UAVObjEvent *ev)
             (home & 0xFF00 >> 8) |
             (home & 0x00FF << 8));
 
-        newPositionActualData = false;
+        newPositionStateData = false;
     }
 #else
 // blob->misc.home = 0;

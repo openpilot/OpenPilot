@@ -31,40 +31,40 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings *qSettings, QObj
     IUAVGadgetConfiguration(classId, parent)
 {
     // Default settings values
-    settings.simulatorId           = "";
-    settings.binPath               = "";
-    settings.dataPath              = "";
-    settings.manualControlEnabled  = true;
-    settings.startSim              = false;
-    settings.addNoise              = false;
-    settings.hostAddress           = "127.0.0.1";
-    settings.remoteAddress         = "127.0.0.1";
-    settings.outPort               = 0;
+    settings.simulatorId          = "";
+    settings.binPath              = "";
+    settings.dataPath             = "";
+    settings.manualControlEnabled = true;
+    settings.startSim             = false;
+    settings.addNoise             = false;
+    settings.hostAddress          = "127.0.0.1";
+    settings.remoteAddress        = "127.0.0.1";
+    settings.outPort              = 0;
     settings.inPort = 0;
-    settings.latitude              = "";
-    settings.longitude             = "";
+    settings.latitude             = "";
+    settings.longitude            = "";
 
-    settings.attRawEnabled         = false;
-    settings.attRawRate            = 20;
+    settings.attRawEnabled        = false;
+    settings.attRawRate           = 20;
 
-    settings.attActualEnabled      = true;
-    settings.attActHW              = false;
-    settings.attActSim             = true;
-    settings.attActCalc            = false;
+    settings.attStateEnabled      = true;
+    settings.attActHW             = false;
+    settings.attActSim            = true;
+    settings.attActCalc           = false;
 
-    settings.gpsPositionEnabled    = false;
-    settings.gpsPosRate            = 100;
+    settings.gpsPositionEnabled   = false;
+    settings.gpsPosRate           = 100;
 
-    settings.groundTruthEnabled    = false;
-    settings.groundTruthRate       = 100;
+    settings.groundTruthEnabled   = false;
+    settings.groundTruthRate      = 100;
 
-    settings.inputCommand          = false;
-    settings.gcsReceiverEnabled    = false;
-    settings.manualControlEnabled  = false;
-    settings.minOutputPeriod       = 100;
+    settings.inputCommand         = false;
+    settings.gcsReceiverEnabled   = false;
+    settings.manualControlEnabled = false;
+    settings.minOutputPeriod      = 100;
 
-    settings.airspeedActualEnabled = false;
-    settings.airspeedActualRate    = 100;
+    settings.airspeedStateEnabled = false;
+    settings.airspeedStateRate    = 100;
 
 
     // if a saved configuration exists load it, and overwrite defaults
@@ -86,28 +86,28 @@ HITLConfiguration::HITLConfiguration(QString classId, QSettings *qSettings, QObj
         settings.gcsReceiverEnabled   = qSettings->value("gcsReceiverEnabled").toBool();
         settings.manualControlEnabled = qSettings->value("manualControlEnabled").toBool();
 
-        settings.attRawEnabled         = qSettings->value("attRawEnabled").toBool();
-        settings.attRawRate            = qSettings->value("attRawRate").toInt();
+        settings.attRawEnabled        = qSettings->value("attRawEnabled").toBool();
+        settings.attRawRate           = qSettings->value("attRawRate").toInt();
 
-        settings.attActualEnabled      = qSettings->value("attActualEnabled").toBool();
+        settings.attStateEnabled      = qSettings->value("attStateEnabled").toBool();
         settings.attActHW = qSettings->value("attActHW").toBool();
         settings.attActSim = qSettings->value("attActSim").toBool();
-        settings.attActCalc            = qSettings->value("attActCalc").toBool();
+        settings.attActCalc           = qSettings->value("attActCalc").toBool();
 
-        settings.baroAltitudeEnabled   = qSettings->value("baroAltitudeEnabled").toBool();
-        settings.baroAltRate           = qSettings->value("baroAltRate").toInt();
+        settings.baroSensorEnabled    = qSettings->value("baroSensorEnabled").toBool();
+        settings.baroAltRate          = qSettings->value("baroAltRate").toInt();
 
-        settings.gpsPositionEnabled    = qSettings->value("gpsPositionEnabled").toBool();
-        settings.gpsPosRate            = qSettings->value("gpsPosRate").toInt();
+        settings.gpsPositionEnabled   = qSettings->value("gpsPositionEnabled").toBool();
+        settings.gpsPosRate           = qSettings->value("gpsPosRate").toInt();
 
-        settings.groundTruthEnabled    = qSettings->value("groundTruthEnabled").toBool();
-        settings.groundTruthRate       = qSettings->value("groundTruthRate").toInt();
+        settings.groundTruthEnabled   = qSettings->value("groundTruthEnabled").toBool();
+        settings.groundTruthRate      = qSettings->value("groundTruthRate").toInt();
 
-        settings.inputCommand          = qSettings->value("inputCommand").toBool();
-        settings.minOutputPeriod       = qSettings->value("minOutputPeriod").toInt();
+        settings.inputCommand         = qSettings->value("inputCommand").toBool();
+        settings.minOutputPeriod      = qSettings->value("minOutputPeriod").toInt();
 
-        settings.airspeedActualEnabled = qSettings->value("airspeedActualEnabled").toBool();
-        settings.airspeedActualRate    = qSettings->value("airspeedActualRate").toInt();
+        settings.airspeedStateEnabled = qSettings->value("airspeedStateEnabled").toBool();
+        settings.airspeedStateRate    = qSettings->value("airspeedStateRate").toInt();
     }
 }
 
@@ -144,11 +144,11 @@ void HITLConfiguration::saveConfig(QSettings *qSettings) const
 
     qSettings->setValue("attRawEnabled", settings.attRawEnabled);
     qSettings->setValue("attRawRate", settings.attRawRate);
-    qSettings->setValue("attActualEnabled", settings.attActualEnabled);
+    qSettings->setValue("attStateEnabled", settings.attStateEnabled);
     qSettings->setValue("attActHW", settings.attActHW);
     qSettings->setValue("attActSim", settings.attActSim);
     qSettings->setValue("attActCalc", settings.attActCalc);
-    qSettings->setValue("baroAltitudeEnabled", settings.baroAltitudeEnabled);
+    qSettings->setValue("baroSensorEnabled", settings.baroSensorEnabled);
     qSettings->setValue("baroAltRate", settings.baroAltRate);
     qSettings->setValue("gpsPositionEnabled", settings.gpsPositionEnabled);
     qSettings->setValue("gpsPosRate", settings.gpsPosRate);
@@ -157,6 +157,6 @@ void HITLConfiguration::saveConfig(QSettings *qSettings) const
     qSettings->setValue("inputCommand", settings.inputCommand);
     qSettings->setValue("minOutputPeriod", settings.minOutputPeriod);
 
-    qSettings->setValue("airspeedActualEnabled", settings.airspeedActualEnabled);
-    qSettings->setValue("airspeedActualRate", settings.airspeedActualRate);
+    qSettings->setValue("airspeedStateEnabled", settings.airspeedStateEnabled);
+    qSettings->setValue("airspeedStateRate", settings.airspeedStateRate);
 }

@@ -48,14 +48,14 @@
 #include "uavtalk/telemetrymanager.h"
 #include "uavobject.h"
 
-#include "positionactual.h"
+#include "positionstate.h"
 #include "homelocation.h"
 #include "gpsposition.h"
-#include "gyros.h"
-#include "attitudeactual.h"
-#include "positionactual.h"
-#include "velocityactual.h"
-#include "airspeedactual.h"
+#include "gyrostate.h"
+#include "attitudestate.h"
+#include "positionstate.h"
+#include "velocitystate.h"
+#include "airspeedstate.h"
 
 #define allow_manual_home_location_move
 
@@ -593,36 +593,36 @@ void OPMapGadgetWidget::updatePosition()
 
     // **********************
     // get the current position and heading estimates
-    AttitudeActual *attitudeActualObj = AttitudeActual::GetInstance(obm);
-    PositionActual *positionActualObj = PositionActual::GetInstance(obm);
-    VelocityActual *velocityActualObj = VelocityActual::GetInstance(obm);
-    AirspeedActual *airspeedActualObj = AirspeedActual::GetInstance(obm);
+    AttitudeState *attitudeStateObj = AttitudeState::GetInstance(obm);
+    PositionState *positionStateObj = PositionState::GetInstance(obm);
+    VelocityState *velocityStateObj = VelocityState::GetInstance(obm);
+    AirspeedState *airspeedStateObj = AirspeedState::GetInstance(obm);
 
-    Gyros *gyrosObj = Gyros::GetInstance(obm);
+    GyroState *gyroStateObj = GyroState::GetInstance(obm);
 
-    Q_ASSERT(attitudeActualObj);
-    Q_ASSERT(positionActualObj);
-    Q_ASSERT(velocityActualObj);
-    Q_ASSERT(airspeedActualObj);
-    Q_ASSERT(gyrosObj);
+    Q_ASSERT(attitudeStateObj);
+    Q_ASSERT(positionStateObj);
+    Q_ASSERT(velocityStateObj);
+    Q_ASSERT(airspeedStateObj);
+    Q_ASSERT(gyroStateObj);
 
-    AttitudeActual::DataFields attitudeActualData = attitudeActualObj->getData();
-    PositionActual::DataFields positionActualData = positionActualObj->getData();
-    VelocityActual::DataFields velocityActualData = velocityActualObj->getData();
-    AirspeedActual::DataFields airspeedActualData = airspeedActualObj->getData();
+    AttitudeState::DataFields attitudeStateData = attitudeStateObj->getData();
+    PositionState::DataFields positionStateData = positionStateObj->getData();
+    VelocityState::DataFields velocityStateData = velocityStateObj->getData();
+    AirspeedState::DataFields airspeedStateData = airspeedStateObj->getData();
 
-    Gyros::DataFields gyrosData = gyrosObj->getData();
+    GyroState::DataFields gyroStateData = gyroStateObj->getData();
 
-    double NED[3]  = { positionActualData.North, positionActualData.East, positionActualData.Down };
-    double vNED[3] = { velocityActualData.North, velocityActualData.East, velocityActualData.Down };
+    double NED[3]  = { positionStateData.North, positionStateData.East, positionStateData.Down };
+    double vNED[3] = { velocityStateData.North, velocityStateData.East, velocityStateData.Down };
 
     // Set the position and heading estimates in the painter module
     m_map->UAV->SetNED(NED);
-    m_map->UAV->SetCAS(airspeedActualData.CalibratedAirspeed);
+    m_map->UAV->SetCAS(airspeedStateData.CalibratedAirspeed);
     m_map->UAV->SetGroundspeed(vNED, m_maxUpdateRate);
 
     // Convert angular velocities into a rotationg rate around the world-frame yaw axis. This is found by simply taking the dot product of the angular Euler-rate matrix with the angular rates.
-    float psiRate_dps = 0 * gyrosData.z + sin(attitudeActualData.Roll * deg_to_rad) / cos(attitudeActualData.Pitch * deg_to_rad) * gyrosData.y + cos(attitudeActualData.Roll * deg_to_rad) / cos(attitudeActualData.Pitch * deg_to_rad) * gyrosData.z;
+    float psiRate_dps = 0 * gyroStateData.z + sin(attitudeStateData.Roll * deg_to_rad) / cos(attitudeStateData.Pitch * deg_to_rad) * gyroStateData.y + cos(attitudeStateData.Roll * deg_to_rad) / cos(attitudeStateData.Pitch * deg_to_rad) * gyroStateData.z;
 
     // Set the angular rate in the painter module
     m_map->UAV->SetYawRate(psiRate_dps); // Not correct, but I'm being lazy right now.
@@ -2178,13 +2178,13 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     homeLLA[1] = homeLocationData.Longitude / 1e7;
     homeLLA[2] = homeLocationData.Altitude;
 
-    PositionActual *positionActual = PositionActual::GetInstance(obm);
-    Q_ASSERT(positionActual != NULL);
-    PositionActual::DataFields positionActualData = positionActual->getData();
+    PositionState *positionState = PositionState::GetInstance(obm);
+    Q_ASSERT(positionState != NULL);
+    PositionState::DataFields positionStateData = positionState->getData();
 
-    NED[0] = positionActualData.North;
-    NED[1] = positionActualData.East;
-    NED[2] = positionActualData.Down;
+    NED[0] = positionStateData.North;
+    NED[1] = positionStateData.East;
+    NED[2] = positionStateData.Down;
 
     Utils::CoordinateConversions().NED2LLA_HomeLLA(homeLLA, NED, LLA);
 
@@ -2220,7 +2220,7 @@ double OPMapGadgetWidget::getUAV_Yaw()
         return 0;
     }
 
-    UAVObject *obj = dynamic_cast<UAVDataObject *>(obm->getObject(QString("AttitudeActual")));
+    UAVObject *obj = dynamic_cast<UAVDataObject *>(obm->getObject(QString("AttitudeState")));
     double yaw     = obj->getField(QString("Yaw"))->getDouble();
 
     if (yaw != yaw) {

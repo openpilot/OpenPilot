@@ -34,13 +34,13 @@
 
 #include "osdgen.h"
 
-#include "attitudeactual.h"
+#include "attitudestate.h"
 #include "gpsposition.h"
 #include "homelocation.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
 #include "osdsettings.h"
-#include "baroaltitude.h"
+#include "barosensor.h"
 #include "taskinfo.h"
 #include "flightstatus.h"
 
@@ -2137,14 +2137,14 @@ void updateGraphics()
     OsdSettingsData OsdSettings;
 
     OsdSettingsGet(&OsdSettings);
-    AttitudeActualData attitude;
-    AttitudeActualGet(&attitude);
+    AttitudeStateData attitude;
+    AttitudeStateGet(&attitude);
     GPSPositionData gpsData;
     GPSPositionGet(&gpsData);
     HomeLocationData home;
     HomeLocationGet(&home);
-    BaroAltitudeData baro;
-    BaroAltitudeGet(&baro);
+    BaroSensorData baro;
+    BaroSensorGet(&baro);
     FlightStatusData status;
     FlightStatusGet(&status);
 
@@ -2419,7 +2419,7 @@ int32_t osdgenStart(void)
  */
 int32_t osdgenInitialize(void)
 {
-    AttitudeActualInitialize();
+    AttitudeStateInitialize();
 #ifdef PIOS_INCLUDE_GPS
     GPSPositionInitialize();
 #if !defined(PIOS_GPS_MINIMAL)
@@ -2431,7 +2431,7 @@ int32_t osdgenInitialize(void)
 #endif
 #endif
     OsdSettingsInitialize();
-    BaroAltitudeInitialize();
+    BaroSensorInitialize();
     FlightStatusInitialize();
 
     return 0;

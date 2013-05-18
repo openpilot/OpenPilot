@@ -4,7 +4,7 @@
  * @{
  * @addtogroup Attitude Copter Control Attitude Estimation
  * @brief Acquires sensor data and computes attitude estimate
- * Specifically updates the the @ref AttitudeActual "AttitudeActual" and @ref AttitudeRaw "AttitudeRaw" settings objects
+ * Specifically updates the the @ref AttitudeState "AttitudeState" and @ref AttitudeRaw "AttitudeRaw" settings objects
  * @{
  *
  * @file       attitude.c
@@ -32,7 +32,7 @@
 
 /**
  * Input objects: None, takes sensor data via pios
- * Output objects: @ref AttitudeRaw @ref AttitudeActual
+ * Output objects: @ref AttitudeRaw @ref AttitudeState
  *
  * This module computes an attitude estimate from the sensor data
  *
@@ -51,25 +51,27 @@
 #include <openpilot.h>
 
 #include "attitude.h"
-#include "accels.h"
+#include "accelsensor.h"
+#include "accelstate.h"
 #include "airspeedsensor.h"
-#include "airspeedactual.h"
-#include "attitudeactual.h"
+#include "airspeedstate.h"
+#include "attitudestate.h"
 #include "attitudesettings.h"
-#include "baroaltitude.h"
+#include "barosensor.h"
 #include "flightstatus.h"
 #include "gpsposition.h"
 #include "gpsvelocity.h"
-#include "gyros.h"
-#include "gyrosbias.h"
+#include "gyrostate.h"
+#include "gyrosensor.h"
 #include "homelocation.h"
-#include "magnetometer.h"
-#include "positionactual.h"
+#include "magnetosensor.h"
+#include "magnetostate.h"
+#include "positionstate.h"
 #include "ekfconfiguration.h"
 #include "ekfstatevariance.h"
 #include "revocalibration.h"
 #include "revosettings.h"
-#include "velocityactual.h"
+#include "velocitystate.h"
 #include "taskinfo.h"
 
 #include "CoordinateConversions.h"
@@ -159,12 +161,12 @@ static inline bool invalid_var(float data)
  */
 int32_t AttitudeInitialize(void)
 {
-    AttitudeActualInitialize();
-    AirspeedActualInitialize();
+    AttitudeStateInitialize();
+    AirspeedStateInitialize();
     AirspeedSensorInitialize();
     AttitudeSettingsInitialize();
-    PositionActualInitialize();
-    VelocityActualInitialize();
+    PositionStateInitialize();
+    VelocityStateInitialize();
     RevoSettingsInitialize();
     RevoCalibrationInitialize();
     EKFConfigurationInitialize();
@@ -175,21 +177,13 @@ int32_t AttitudeInitialize(void)
     HomeLocationInitialize();
 
     // Initialize quaternion
-    AttitudeActualData attitude;
-    AttitudeActualGet(&attitude);
+    AttitudeStateData attitude;
+    AttitudeStateGet(&attitude);
     attitude.q1 = 1.0f;
     attitude.q2 = 0.0f;
     attitude.q3 = 0.0f;
     attitude.q4 = 0.0f;
-    AttitudeActualSet(&attitude);
-
-    // Cannot trust the values to init right above if BL runs
-    GyrosBiasData gyrosBias;
-    GyrosBiasGet(&gyrosBias);
-    gyrosBias.x = 0.0f;
-    gyrosBias.y = 0.0f;
-    gyrosBias.z = 0.0f;
-    GyrosBiasSet(&gyrosBias);
+    AttitudeStateSet(&attitude);
 
     AttitudeSettingsConnectCallback(&settingsUpdatedCb);
     RevoSettingsConnectCallback(&settingsUpdatedCb);
@@ -221,11 +215,11 @@ int32_t AttitudeStart(void)
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ATTITUDE, attitudeTaskHandle);
     PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
 
-    GyrosConnectQueue(gyroQueue);
-    AccelsConnectQueue(accelQueue);
-    MagnetometerConnectQueue(magQueue);
+    GyroSensorConnectQueue(gyroQueue);
+    AccelSensorConnectQueue(accelQueue);
+    MagnetoSensorConnectQueue(magQueue);
     AirspeedSensorConnectQueue(airspeedQueue);
-    BaroAltitudeConnectQueue(baroQueue);
+    BaroSensorConnectQueue(baroQueue);
     GPSPositionConnectQueue(gpsQueue);
     GPSVelocityConnectQueue(gpsVelQueue);
 
@@ -291,8 +285,8 @@ float magKp = 0.01f;
 static int32_t updateAttitudeComplementary(bool first_run)
 {
     UAVObjEvent ev;
-    GyrosData gyrosData;
-    AccelsData accelsData;
+    GyroSensorData gyroSensorData;
+    AccelSensorData accelSensorData;
     static int32_t timeval;
     float dT;
     static uint8_t init = 0;
@@ -302,13 +296,13 @@ static int32_t updateAttitudeComplementary(bool first_run)
         xQueueReceive(accelQueue, &ev, 1 / portTICK_RATE_MS) != pdTRUE) {
         // When one of these is updated so should the other
         // Do not set attitude timeout warnings in simulation mode
-        if (!AttitudeActualReadOnly()) {
+        if (!AttitudeStateReadOnly()) {
             AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
             return -1;
         }
     }
 
-    AccelsGet(&accelsData);
+    AccelSensorGet(&accelSensorData);
 
     // During initialization and
     if (first_run) {
@@ -317,43 +311,43 @@ static int32_t updateAttitudeComplementary(bool first_run)
         if (xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) != pdTRUE) {
             return -1;
         }
-        MagnetometerData magData;
-        MagnetometerGet(&magData);
+        MagnetoSensorData magData;
+        MagnetoSensorGet(&magData);
 #else
-        MagnetometerData magData;
+        MagnetoSensorData magData;
         magData.x = 100.0f;
         magData.y = 0.0f;
         magData.z = 0.0f;
 #endif
-        AttitudeActualData attitudeActual;
-        AttitudeActualGet(&attitudeActual);
+        AttitudeStateData attitudeState;
+        AttitudeStateGet(&attitudeState);
         init = 0;
 
         // Set initial attitude. Use accels to determine roll and pitch, rotate magnetic measurement accordingly,
         // so pseudo "north" vector can be estimated even if the board is not level
-        attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z);
-        float zn  = cosf(attitudeActual.Roll) * magData.z + sinf(attitudeActual.Roll) * magData.y;
-        float yn  = cosf(attitudeActual.Roll) * magData.y - sinf(attitudeActual.Roll) * magData.z;
+        attitudeState.Roll = atan2f(-accelSensorData.y, -accelSensorData.z);
+        float zn  = cosf(attitudeState.Roll) * magData.z + sinf(attitudeState.Roll) * magData.y;
+        float yn  = cosf(attitudeState.Roll) * magData.y - sinf(attitudeState.Roll) * magData.z;
 
         // rotate accels z vector according to roll
-        float azn = cosf(attitudeActual.Roll) * accelsData.z + sinf(attitudeActual.Roll) * accelsData.y;
-        attitudeActual.Pitch = atan2f(accelsData.x, -azn);
+        float azn = cosf(attitudeState.Roll) * accelSensorData.z + sinf(attitudeState.Roll) * accelSensorData.y;
+        attitudeState.Pitch = atan2f(accelSensorData.x, -azn);
 
-        float xn  = cosf(attitudeActual.Pitch) * magData.x + sinf(attitudeActual.Pitch) * zn;
+        float xn  = cosf(attitudeState.Pitch) * magData.x + sinf(attitudeState.Pitch) * zn;
 
-        attitudeActual.Yaw = atan2f(-yn, xn);
+        attitudeState.Yaw = atan2f(-yn, xn);
         // TODO: This is still a hack
         // Put this in a proper generic function in CoordinateConversion.c
         // should take 4 vectors: g (0,0,-9.81), accels, Be (or 1,0,0 if no home loc) and magnetometers (or 1,0,0 if no mags)
         // should calculate the rotation in 3d space using proper cross product math
         // SUBTODO: formulate the math required
 
-        attitudeActual.Roll  = RAD2DEG(attitudeActual.Roll);
-        attitudeActual.Pitch = RAD2DEG(attitudeActual.Pitch);
-        attitudeActual.Yaw   = RAD2DEG(attitudeActual.Yaw);
+        attitudeState.Roll  = RAD2DEG(attitudeState.Roll);
+        attitudeState.Pitch = RAD2DEG(attitudeState.Pitch);
+        attitudeState.Yaw   = RAD2DEG(attitudeState.Yaw);
 
-        RPY2Quaternion(&attitudeActual.Roll, &attitudeActual.q1);
-        AttitudeActualSet(&attitudeActual);
+        RPY2Quaternion(&attitudeState.Roll, &attitudeState.q1);
+        AttitudeStateSet(&attitudeState);
 
         timeval = PIOS_DELAY_GetRaw();
 
@@ -379,7 +373,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
         init  = 1;
     }
 
-    GyrosGet(&gyrosData);
+    GyroSensorGet(&gyroSensorData);
 
     // Compute the dT using the cpu clock
     dT = PIOS_DELAY_DiffuS(timeval) / 1000000.0f;
@@ -387,23 +381,23 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
     float q[4];
 
-    AttitudeActualData attitudeActual;
-    AttitudeActualGet(&attitudeActual);
+    AttitudeStateData attitudeState;
+    AttitudeStateGet(&attitudeState);
 
     float grot[3];
     float accel_err[3];
 
     // Get the current attitude estimate
-    quat_copy(&attitudeActual.q1, q);
+    quat_copy(&attitudeState.q1, q);
 
     // Rotate gravity to body frame and cross with accels
     grot[0] = -(2.0f * (q[1] * q[3] - q[0] * q[2]));
     grot[1] = -(2.0f * (q[2] * q[3] + q[0] * q[1]));
     grot[2] = -(q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
-    CrossProduct((const float *)&accelsData.x, (const float *)grot, accel_err);
+    CrossProduct((const float *)&accelSensorData.x, (const float *)grot, accel_err);
 
     // Account for accel magnitude
-    accel_mag     = accelsData.x * accelsData.x + accelsData.y * accelsData.y + accelsData.z * accelsData.z;
+    accel_mag     = accelSensorData.x * accelSensorData.x + accelSensorData.y * accelSensorData.y + accelSensorData.z * accelSensorData.z;
     accel_mag     = sqrtf(accel_mag);
     accel_err[0] /= accel_mag;
     accel_err[1] /= accel_mag;
@@ -413,10 +407,10 @@ static int32_t updateAttitudeComplementary(bool first_run)
         // Rotate gravity to body frame and cross with accels
         float brot[3];
         float Rbe[3][3];
-        MagnetometerData mag;
+        MagnetoSensorData mag;
 
         Quaternion2R(q, Rbe);
-        MagnetometerGet(&mag);
+        MagnetoSensorGet(&mag);
 
         // If the mag is producing bad data don't use it (normally bad calibration)
         if (!isnan(mag.x) && !isinf(mag.x) && !isnan(mag.y) && !isinf(mag.y) && !isnan(mag.z) && !isinf(mag.z)) {
@@ -444,7 +438,9 @@ static int32_t updateAttitudeComplementary(bool first_run)
     }
 
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
-    GyrosBiasData gyrosBias;
+// TODO
+/*
+        GyrosBiasData gyrosBias;
     GyrosBiasGet(&gyrosBias);
     gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi;
     gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi;
@@ -453,23 +449,24 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
     if (revoCalibration.BiasCorrectedRaw != REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
         // if the raw values are not adjusted, we need to adjust here.
-        gyrosData.x -= gyrosBias.x;
-        gyrosData.y -= gyrosBias.y;
-        gyrosData.z -= gyrosBias.z;
+        gyroSensorData.x -= gyrosBias.x;
+        gyroSensorData.y -= gyrosBias.y;
+        gyroSensorData.z -= gyrosBias.z;
     }
+ */
 
     // Correct rates based on error, integral component dealt with in updateSensors
-    gyrosData.x += accel_err[0] * attitudeSettings.AccelKp / dT;
-    gyrosData.y += accel_err[1] * attitudeSettings.AccelKp / dT;
-    gyrosData.z += accel_err[2] * attitudeSettings.AccelKp / dT + mag_err[2] * magKp / dT;
+    gyroSensorData.x += accel_err[0] * attitudeSettings.AccelKp / dT;
+    gyroSensorData.y += accel_err[1] * attitudeSettings.AccelKp / dT;
+    gyroSensorData.z += accel_err[2] * attitudeSettings.AccelKp / dT + mag_err[2] * magKp / dT;
 
     // Work out time derivative from INSAlgo writeup
     // Also accounts for the fact that gyros are in deg/s
     float qdot[4];
-    qdot[0] = DEG2RAD(-q[1] * gyrosData.x - q[2] * gyrosData.y - q[3] * gyrosData.z) * dT / 2;
-    qdot[1] = DEG2RAD(q[0] * gyrosData.x - q[3] * gyrosData.y + q[2] * gyrosData.z) * dT / 2;
-    qdot[2] = DEG2RAD(q[3] * gyrosData.x + q[0] * gyrosData.y - q[1] * gyrosData.z) * dT / 2;
-    qdot[3] = DEG2RAD(-q[2] * gyrosData.x + q[1] * gyrosData.y + q[0] * gyrosData.z) * dT / 2;
+    qdot[0] = DEG2RAD(-q[1] * gyroSensorData.x - q[2] * gyroSensorData.y - q[3] * gyroSensorData.z) * dT / 2;
+    qdot[1] = DEG2RAD(q[0] * gyroSensorData.x - q[3] * gyroSensorData.y + q[2] * gyroSensorData.z) * dT / 2;
+    qdot[2] = DEG2RAD(q[3] * gyroSensorData.x + q[0] * gyroSensorData.y - q[1] * gyroSensorData.z) * dT / 2;
+    qdot[3] = DEG2RAD(-q[2] * gyroSensorData.x + q[1] * gyroSensorData.y + q[0] * gyroSensorData.z) * dT / 2;
 
     // Take a time step
     q[0]    = q[0] + qdot[0];
@@ -500,12 +497,12 @@ static int32_t updateAttitudeComplementary(bool first_run)
         q[3] = 0.0f;
     }
 
-    quat_copy(q, &attitudeActual.q1);
+    quat_copy(q, &attitudeState.q1);
 
     // Convert into eueler degrees (makes assumptions about RPY order)
-    Quaternion2RPY(&attitudeActual.q1, &attitudeActual.Roll);
+    Quaternion2RPY(&attitudeState.q1, &attitudeState.Roll);
 
-    AttitudeActualSet(&attitudeActual);
+    AttitudeStateSet(&attitudeState);
 
     // Flush these queues for avoid errors
     xQueueReceive(baroQueue, &ev, 0);
@@ -516,12 +513,12 @@ static int32_t updateAttitudeComplementary(bool first_run)
         GPSPositionGet(&gpsPosition);
         getNED(&gpsPosition, NED);
 
-        PositionActualData positionActual;
-        PositionActualGet(&positionActual);
-        positionActual.North = NED[0];
-        positionActual.East  = NED[1];
-        positionActual.Down  = NED[2];
-        PositionActualSet(&positionActual);
+        PositionStateData positionState;
+        PositionStateGet(&positionState);
+        positionState.North = NED[0];
+        positionState.East  = NED[1];
+        positionState.Down  = NED[2];
+        PositionStateSet(&positionState);
     }
 
     if (xQueueReceive(gpsVelQueue, &ev, 0) == pdTRUE) {
@@ -529,12 +526,12 @@ static int32_t updateAttitudeComplementary(bool first_run)
         GPSVelocityData gpsVelocity;
         GPSVelocityGet(&gpsVelocity);
 
-        VelocityActualData velocityActual;
-        VelocityActualGet(&velocityActual);
-        velocityActual.North = gpsVelocity.North;
-        velocityActual.East  = gpsVelocity.East;
-        velocityActual.Down  = gpsVelocity.Down;
-        VelocityActualSet(&velocityActual);
+        VelocityStateData velocityState;
+        VelocityStateGet(&velocityState);
+        velocityState.North = gpsVelocity.North;
+        velocityState.East  = gpsVelocity.East;
+        velocityState.Down  = gpsVelocity.Down;
+        VelocityStateSet(&velocityState);
     }
 
     if (xQueueReceive(airspeedQueue, &ev, 0) == pdTRUE) {
@@ -542,17 +539,17 @@ static int32_t updateAttitudeComplementary(bool first_run)
         AirspeedSensorData airspeedSensor;
         AirspeedSensorGet(&airspeedSensor);
 
-        AirspeedActualData airspeed;
-        AirspeedActualGet(&airspeed);
+        AirspeedStateData airspeed;
+        AirspeedStateGet(&airspeed);
 
-        PositionActualData positionActual;
-        PositionActualGet(&positionActual);
+        PositionStateData positionState;
+        PositionStateGet(&positionState);
 
         if (airspeedSensor.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE) {
             // we have airspeed available
             airspeed.CalibratedAirspeed = airspeedSensor.CalibratedAirspeed;
-            airspeed.TrueAirspeed = airspeed.CalibratedAirspeed * IAS2TAS(homeLocation.Altitude - positionActual.Down);
-            AirspeedActualSet(&airspeed);
+            airspeed.TrueAirspeed = airspeed.CalibratedAirspeed * IAS2TAS(homeLocation.Altitude - positionState.Down);
+            AirspeedStateSet(&airspeed);
         }
     }
 
@@ -581,14 +578,13 @@ int32_t init_stage = 0;
 static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 {
     UAVObjEvent ev;
-    GyrosData gyrosData;
-    AccelsData accelsData;
-    MagnetometerData magData;
+    GyroSensorData gyroSensorData;
+    AccelSensorData accelSensorData;
+    MagnetoSensorData magData;
     AirspeedSensorData airspeedData;
-    BaroAltitudeData baroData;
+    BaroSensorData baroData;
     GPSPositionData gpsData;
     GPSVelocityData gpsVelData;
-    GyrosBiasData gyrosBias;
 
     static bool mag_updated = false;
     static bool baro_updated;
@@ -615,7 +611,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     if ((xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE) ||
         (xQueueReceive(accelQueue, &ev, 1 / portTICK_RATE_MS) != pdTRUE)) {
         // Do not set attitude timeout warnings in simulation mode
-        if (!AttitudeActualReadOnly()) {
+        if (!AttitudeStateReadOnly()) {
             AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
             return -1;
         }
@@ -662,33 +658,25 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     }
 
     // Get most recent data
-    GyrosGet(&gyrosData);
-    AccelsGet(&accelsData);
-    MagnetometerGet(&magData);
-    BaroAltitudeGet(&baroData);
+    GyroSensorGet(&gyroSensorData);
+    AccelSensorGet(&accelSensorData);
+    MagnetoSensorGet(&magData);
+    BaroSensorGet(&baroData);
     AirspeedSensorGet(&airspeedData);
     GPSPositionGet(&gpsData);
     GPSVelocityGet(&gpsVelData);
-    GyrosBiasGet(&gyrosBias);
 
     value_error = false;
     // safety checks
-    if (invalid(gyrosData.x) ||
-        invalid(gyrosData.y) ||
-        invalid(gyrosData.z) ||
-        invalid(accelsData.x) ||
-        invalid(accelsData.y) ||
-        invalid(accelsData.z)) {
+    if (invalid(gyroSensorData.x) ||
+        invalid(gyroSensorData.y) ||
+        invalid(gyroSensorData.z) ||
+        invalid(accelSensorData.x) ||
+        invalid(accelSensorData.y) ||
+        invalid(accelSensorData.z)) {
         // cannot run process update, raise error!
         AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
         return 0;
-    }
-    if (invalid(gyrosBias.x) ||
-        invalid(gyrosBias.y) ||
-        invalid(gyrosBias.z)) {
-        gyrosBias.x = 0.0f;
-        gyrosBias.y = 0.0f;
-        gyrosBias.z = 0.0f;
     }
 
     if (invalid(magData.x) ||
@@ -819,38 +807,38 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
             }
 
             xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
-            MagnetometerGet(&magData);
+            MagnetoSensorGet(&magData);
 
-            AttitudeActualData attitudeActual;
-            AttitudeActualGet(&attitudeActual);
+            AttitudeStateData attitudeState;
+            AttitudeStateGet(&attitudeState);
 
             // Set initial attitude. Use accels to determine roll and pitch, rotate magnetic measurement accordingly,
             // so pseudo "north" vector can be estimated even if the board is not level
-            attitudeActual.Roll = atan2f(-accelsData.y, -accelsData.z);
-            float zn  = cosf(attitudeActual.Roll) * magData.z + sinf(attitudeActual.Roll) * magData.y;
-            float yn  = cosf(attitudeActual.Roll) * magData.y - sinf(attitudeActual.Roll) * magData.z;
+            attitudeState.Roll = atan2f(-accelSensorData.y, -accelSensorData.z);
+            float zn  = cosf(attitudeState.Roll) * magData.z + sinf(attitudeState.Roll) * magData.y;
+            float yn  = cosf(attitudeState.Roll) * magData.y - sinf(attitudeState.Roll) * magData.z;
 
             // rotate accels z vector according to roll
-            float azn = cosf(attitudeActual.Roll) * accelsData.z + sinf(attitudeActual.Roll) * accelsData.y;
-            attitudeActual.Pitch = atan2f(accelsData.x, -azn);
+            float azn = cosf(attitudeState.Roll) * accelSensorData.z + sinf(attitudeState.Roll) * accelSensorData.y;
+            attitudeState.Pitch = atan2f(accelSensorData.x, -azn);
 
-            float xn  = cosf(attitudeActual.Pitch) * magData.x + sinf(attitudeActual.Pitch) * zn;
+            float xn  = cosf(attitudeState.Pitch) * magData.x + sinf(attitudeState.Pitch) * zn;
 
-            attitudeActual.Yaw = atan2f(-yn, xn);
+            attitudeState.Yaw = atan2f(-yn, xn);
             // TODO: This is still a hack
             // Put this in a proper generic function in CoordinateConversion.c
             // should take 4 vectors: g (0,0,-9.81), accels, Be (or 1,0,0 if no home loc) and magnetometers (or 1,0,0 if no mags)
             // should calculate the rotation in 3d space using proper cross product math
             // SUBTODO: formulate the math required
 
-            attitudeActual.Roll  = RAD2DEG(attitudeActual.Roll);
-            attitudeActual.Pitch = RAD2DEG(attitudeActual.Pitch);
-            attitudeActual.Yaw   = RAD2DEG(attitudeActual.Yaw);
+            attitudeState.Roll  = RAD2DEG(attitudeState.Roll);
+            attitudeState.Pitch = RAD2DEG(attitudeState.Pitch);
+            attitudeState.Yaw   = RAD2DEG(attitudeState.Yaw);
 
-            RPY2Quaternion(&attitudeActual.Roll, &attitudeActual.q1);
-            AttitudeActualSet(&attitudeActual);
+            RPY2Quaternion(&attitudeState.Roll, &attitudeState.q1);
+            AttitudeStateSet(&attitudeState);
 
-            float q[4] = { attitudeActual.q1, attitudeActual.q2, attitudeActual.q3, attitudeActual.q4 };
+            float q[4] = { attitudeState.q1, attitudeState.q2, attitudeState.q3, attitudeState.q4 };
             INSSetState(pos, zeros, q, zeros, zeros);
 
             INSResetP(ekfConfiguration.P);
@@ -859,22 +847,24 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
             // Because the sensor module remove the bias we need to add it
             // back in here so that the INS algorithm can track it correctly
-            float gyros[3] = { DEG2RAD(gyrosData.x), DEG2RAD(gyrosData.y), DEG2RAD(gyrosData.z) };
-            if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
-                gyros[0] += DEG2RAD(gyrosBias.x);
-                gyros[1] += DEG2RAD(gyrosBias.y);
-                gyros[2] += DEG2RAD(gyrosBias.z);
-            }
-            INSStatePrediction(gyros, &accelsData.x, dT);
+            float gyros[3] = { DEG2RAD(gyroSensorData.x), DEG2RAD(gyroSensorData.y), DEG2RAD(gyroSensorData.z) };
+            /* TODO
+               if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
+               gyros[0] += DEG2RAD(gyrosBias.x);
+               gyros[1] += DEG2RAD(gyrosBias.y);
+               gyros[2] += DEG2RAD(gyrosBias.z);
+               }
+             */
+            INSStatePrediction(gyros, &accelSensorData.x, dT);
 
-            AttitudeActualData attitude;
-            AttitudeActualGet(&attitude);
+            AttitudeStateData attitude;
+            AttitudeStateGet(&attitude);
             attitude.q1 = Nav.q[0];
             attitude.q2 = Nav.q[1];
             attitude.q3 = Nav.q[2];
             attitude.q4 = Nav.q[3];
             Quaternion2RPY(&attitude.q1, &attitude.Roll);
-            AttitudeActualSet(&attitude);
+            AttitudeStateSet(&attitude);
         }
 
         init_stage++;
@@ -891,25 +881,27 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
     // Because the sensor module remove the bias we need to add it
     // back in here so that the INS algorithm can track it correctly
-    float gyros[3] = { DEG2RAD(gyrosData.x), DEG2RAD(gyrosData.y), DEG2RAD(gyrosData.z) };
-    if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
-        gyros[0] += DEG2RAD(gyrosBias.x);
-        gyros[1] += DEG2RAD(gyrosBias.y);
-        gyros[2] += DEG2RAD(gyrosBias.z);
-    }
+    float gyros[3] = { DEG2RAD(gyroSensorData.x), DEG2RAD(gyroSensorData.y), DEG2RAD(gyroSensorData.z) };
+    /* TODO
+       if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
+       gyros[0] += DEG2RAD(gyrosBias.x);
+       gyros[1] += DEG2RAD(gyrosBias.y);
+       gyros[2] += DEG2RAD(gyrosBias.z);
+       }
+     */
 
     // Advance the state estimate
-    INSStatePrediction(gyros, &accelsData.x, dT);
+    INSStatePrediction(gyros, &accelSensorData.x, dT);
 
     // Copy the attitude into the UAVO
-    AttitudeActualData attitude;
-    AttitudeActualGet(&attitude);
+    AttitudeStateData attitude;
+    AttitudeStateGet(&attitude);
     attitude.q1 = Nav.q[0];
     attitude.q2 = Nav.q[1];
     attitude.q3 = Nav.q[2];
     attitude.q4 = Nav.q[3];
     Quaternion2RPY(&attitude.q1, &attitude.Roll);
-    AttitudeActualSet(&attitude);
+    AttitudeStateSet(&attitude);
 
     // Advance the covariance estimate
     INSCovariancePrediction(dT);
@@ -971,12 +963,12 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
     if (airspeed_updated) {
         // we have airspeed available
-        AirspeedActualData airspeed;
-        AirspeedActualGet(&airspeed);
+        AirspeedStateData airspeed;
+        AirspeedStateGet(&airspeed);
 
         airspeed.CalibratedAirspeed = airspeedData.CalibratedAirspeed;
         airspeed.TrueAirspeed = airspeed.CalibratedAirspeed * IAS2TAS(homeLocation.Altitude - Nav.Pos[2]);
-        AirspeedActualSet(&airspeed);
+        AirspeedStateSet(&airspeed);
 
         if (!gps_vel_updated && !gps_updated) {
             // feed airspeed into EKF, treat wind as 1e2 variance
@@ -1005,24 +997,26 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     }
 
     // Copy the position and velocity into the UAVO
-    PositionActualData positionActual;
-    PositionActualGet(&positionActual);
-    positionActual.North = Nav.Pos[0];
-    positionActual.East  = Nav.Pos[1];
-    positionActual.Down  = Nav.Pos[2];
-    PositionActualSet(&positionActual);
+    PositionStateData positionState;
+    PositionStateGet(&positionState);
+    positionState.North = Nav.Pos[0];
+    positionState.East  = Nav.Pos[1];
+    positionState.Down  = Nav.Pos[2];
+    PositionStateSet(&positionState);
 
-    VelocityActualData velocityActual;
-    VelocityActualGet(&velocityActual);
-    velocityActual.North = Nav.Vel[0];
-    velocityActual.East  = Nav.Vel[1];
-    velocityActual.Down  = Nav.Vel[2];
-    VelocityActualSet(&velocityActual);
+    VelocityStateData velocityState;
+    VelocityStateGet(&velocityState);
+    velocityState.North = Nav.Vel[0];
+    velocityState.East  = Nav.Vel[1];
+    velocityState.Down  = Nav.Vel[2];
+    VelocityStateSet(&velocityState);
 
+/* TODO
     gyrosBias.x = RAD2DEG(Nav.gyro_bias[0]);
     gyrosBias.y = RAD2DEG(Nav.gyro_bias[1]);
     gyrosBias.z = RAD2DEG(Nav.gyro_bias[2]);
     GyrosBiasSet(&gyrosBias);
+ */
 
     EKFStateVarianceData vardata;
     EKFStateVarianceGet(&vardata);
@@ -1120,7 +1114,7 @@ static void settingsUpdatedCb(UAVObjEvent *ev)
         T[1] = cosf(lat) * (alt + 6.378137E6f);
         T[2] = -1.0f;
 
-        // TODO: convert positionActual to new reference frame and gracefully update EKF state!
+        // TODO: convert positionState to new reference frame and gracefully update EKF state!
         // needed for long range flights where the reference coordinate is adjusted in flight
     }
     if (ev == NULL || ev->obj == AttitudeSettingsHandle()) {

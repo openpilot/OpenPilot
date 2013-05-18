@@ -1,5 +1,5 @@
 <xml>
-    <object name="AttitudeActual" singleinstance="true" settings="false">
+    <object name="AttitudeState" singleinstance="true" settings="false">
         <description>The updated Attitude estimation from @ref AHRSCommsModule.</description>
         <field name="q1" units="" type="float" elements="1"/>
         <field name="q2" units="" type="float" elements="1"/>

@@ -1,8 +1,8 @@
 * -------------------------------------------------------------------
-* Copyright (C) 2011-2012 ARM Limited. All rights reserved.  
+* Copyright (C) 2011-2013 ARM Limited. All rights reserved.  
 * 
-* Date:        07 March 2012  
-* Revision:    V3.01 
+* Date:        18 March 2013  
+* Revision:    V3.20 
 *  
 * Project:     Cortex Microcontroller Software Interface Standard (CMSIS)
 * Title:       Release Note for CMSIS

@@ -73,9 +73,9 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>0</IsCurrentTarget>
+        <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
-      <CpuCode>0</CpuCode>
+      <CpuCode>255</CpuCode>
       <DllOpt>
         <SimDllName>SARMCM3.DLL</SimDllName>
         <SimDllArguments></SimDllArguments>
@@ -89,20 +89,21 @@
       <DebugOpt>
         <uSim>1</uSim>
         <uTrg>0</uTrg>
-        <sLdApp>1</sLdApp>
-        <sGomain>1</sGomain>
+        <sLdApp>0</sLdApp>
+        <sGomain>0</sGomain>
         <sRbreak>1</sRbreak>
         <sRwatch>1</sRwatch>
         <sRmem>1</sRmem>
         <sRfunc>1</sRfunc>
         <sRbox>1</sRbox>
-        <tLdApp>1</tLdApp>
+        <tLdApp>0</tLdApp>
         <tGomain>0</tGomain>
         <tRbreak>1</tRbreak>
         <tRwatch>1</tRwatch>
         <tRmem>1</tRmem>
         <tRfunc>0</tRfunc>
         <tRbox>1</tRbox>
+        <tRtrace>0</tRtrace>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
         <nTsel>-1</nTsel>
@@ -145,6 +146,9 @@
         <newCpu>0</newCpu>
         <uProt>0</uProt>
       </DebugFlag>
+      <Tracepoint>
+        <THDelay>0</THDelay>
+      </Tracepoint>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
     </TargetOption>
@@ -205,7 +209,7 @@
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
-      <CpuCode>0</CpuCode>
+      <CpuCode>255</CpuCode>
       <DllOpt>
         <SimDllName>SARMCM3.DLL</SimDllName>
         <SimDllArguments></SimDllArguments>
@@ -219,20 +223,21 @@
       <DebugOpt>
         <uSim>1</uSim>
         <uTrg>0</uTrg>
-        <sLdApp>1</sLdApp>
-        <sGomain>1</sGomain>
+        <sLdApp>0</sLdApp>
+        <sGomain>0</sGomain>
         <sRbreak>1</sRbreak>
         <sRwatch>1</sRwatch>
         <sRmem>1</sRmem>
         <sRfunc>1</sRfunc>
         <sRbox>1</sRbox>
-        <tLdApp>1</tLdApp>
+        <tLdApp>0</tLdApp>
         <tGomain>0</tGomain>
         <tRbreak>1</tRbreak>
         <tRwatch>1</tRwatch>
         <tRmem>1</tRmem>
         <tRfunc>0</tRfunc>
         <tRbox>1</tRbox>
+        <tRtrace>0</tRtrace>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
         <nTsel>-1</nTsel>
@@ -275,6 +280,9 @@
         <newCpu>0</newCpu>
         <uProt>0</uProt>
       </DebugFlag>
+      <Tracepoint>
+        <THDelay>0</THDelay>
+      </Tracepoint>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
     </TargetOption>
@@ -333,9 +341,9 @@
       <OPTFL>
         <tvExp>1</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
-        <IsCurrentTarget>1</IsCurrentTarget>
+        <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
-      <CpuCode>0</CpuCode>
+      <CpuCode>255</CpuCode>
       <DllOpt>
         <SimDllName>SARMCM3.DLL</SimDllName>
         <SimDllArguments></SimDllArguments>
@@ -349,20 +357,21 @@
       <DebugOpt>
         <uSim>1</uSim>
         <uTrg>0</uTrg>
-        <sLdApp>1</sLdApp>
-        <sGomain>1</sGomain>
+        <sLdApp>0</sLdApp>
+        <sGomain>0</sGomain>
         <sRbreak>1</sRbreak>
         <sRwatch>1</sRwatch>
         <sRmem>1</sRmem>
         <sRfunc>1</sRfunc>
         <sRbox>1</sRbox>
-        <tLdApp>1</tLdApp>
+        <tLdApp>0</tLdApp>
         <tGomain>0</tGomain>
         <tRbreak>1</tRbreak>
         <tRwatch>1</tRwatch>
         <tRmem>1</tRmem>
         <tRfunc>0</tRfunc>
         <tRbox>1</tRbox>
+        <tRtrace>0</tRtrace>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
         <nTsel>-1</nTsel>
@@ -405,6 +414,9 @@
         <newCpu>0</newCpu>
         <uProt>0</uProt>
       </DebugFlag>
+      <Tracepoint>
+        <THDelay>0</THDelay>
+      </Tracepoint>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
     </TargetOption>
@@ -465,7 +477,7 @@
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>0</IsCurrentTarget>
       </OPTFL>
-      <CpuCode>0</CpuCode>
+      <CpuCode>255</CpuCode>
       <DllOpt>
         <SimDllName>SARMCM3.DLL</SimDllName>
         <SimDllArguments></SimDllArguments>
@@ -479,20 +491,21 @@
       <DebugOpt>
         <uSim>1</uSim>
         <uTrg>0</uTrg>
-        <sLdApp>1</sLdApp>
-        <sGomain>1</sGomain>
+        <sLdApp>0</sLdApp>
+        <sGomain>0</sGomain>
         <sRbreak>1</sRbreak>
         <sRwatch>1</sRwatch>
         <sRmem>1</sRmem>
         <sRfunc>1</sRfunc>
         <sRbox>1</sRbox>
-        <tLdApp>1</tLdApp>
+        <tLdApp>0</tLdApp>
         <tGomain>0</tGomain>
         <tRbreak>1</tRbreak>
         <tRwatch>1</tRwatch>
         <tRmem>1</tRmem>
         <tRfunc>0</tRfunc>
         <tRbox>1</tRbox>
+        <tRtrace>0</tRtrace>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
         <nTsel>-1</nTsel>
@@ -535,6 +548,9 @@
         <newCpu>0</newCpu>
         <uProt>0</uProt>
       </DebugFlag>
+      <Tracepoint>
+        <THDelay>0</THDelay>
+      </Tracepoint>
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
     </TargetOption>
@@ -545,6 +561,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>1</GroupNumber>
       <FileNumber>1</FileNumber>
@@ -558,6 +575,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_abs_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_abs_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -572,6 +591,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_abs_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_abs_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -586,6 +607,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_abs_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_abs_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -600,6 +623,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_abs_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_abs_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -614,6 +639,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_add_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_add_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -628,6 +655,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_add_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_add_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -642,6 +671,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_add_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_add_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -656,6 +687,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_add_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_add_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -670,6 +703,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_dot_prod_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_dot_prod_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -684,6 +719,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_dot_prod_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_dot_prod_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -698,6 +735,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_dot_prod_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_dot_prod_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -712,6 +751,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_dot_prod_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_dot_prod_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -726,6 +767,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_mult_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_mult_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -740,6 +783,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_mult_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_mult_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -754,6 +799,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_mult_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_mult_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -768,6 +815,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_mult_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_mult_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -782,6 +831,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_negate_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_negate_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -796,6 +847,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_negate_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_negate_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -810,6 +863,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_negate_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_negate_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -824,6 +879,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_negate_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_negate_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -838,6 +895,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_offset_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_offset_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -852,6 +911,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_offset_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_offset_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -866,6 +927,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_offset_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_offset_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -880,6 +943,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_offset_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_offset_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -894,6 +959,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_scale_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_scale_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -908,6 +975,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_scale_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_scale_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -922,6 +991,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_scale_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_scale_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -936,6 +1007,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_scale_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_scale_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -950,6 +1023,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_shift_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_shift_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -964,6 +1039,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_shift_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_shift_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -978,6 +1055,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_shift_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_shift_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -992,6 +1071,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_sub_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_sub_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -1006,6 +1087,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_sub_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_sub_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -1020,6 +1103,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_sub_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_sub_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>1</GroupNumber>
@@ -1034,6 +1119,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\BasicMathFunctions\arm_sub_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_sub_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -1042,6 +1129,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>2</GroupNumber>
       <FileNumber>36</FileNumber>
@@ -1055,6 +1143,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FastMathFunctions\arm_cos_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_cos_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -1069,6 +1159,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FastMathFunctions\arm_cos_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_cos_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -1083,6 +1175,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FastMathFunctions\arm_cos_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_cos_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -1097,6 +1191,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FastMathFunctions\arm_sin_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_sin_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -1111,6 +1207,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FastMathFunctions\arm_sin_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_sin_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -1125,6 +1223,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FastMathFunctions\arm_sin_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_sin_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -1139,6 +1239,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FastMathFunctions\arm_sqrt_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_sqrt_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>2</GroupNumber>
@@ -1153,6 +1255,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FastMathFunctions\arm_sqrt_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_sqrt_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -1161,6 +1265,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>44</FileNumber>
@@ -1174,6 +1279,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_conj_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_conj_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1188,6 +1295,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_conj_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_conj_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1202,6 +1311,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_conj_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_conj_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1216,6 +1327,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_dot_prod_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_dot_prod_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1230,6 +1343,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_dot_prod_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_dot_prod_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1244,6 +1359,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_dot_prod_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_dot_prod_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1258,6 +1375,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_mag_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_mag_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1272,6 +1391,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_mag_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_mag_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1286,6 +1407,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_mag_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_mag_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1300,6 +1423,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_mag_squared_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_mag_squared_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1314,6 +1439,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_mag_squared_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_mag_squared_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1328,6 +1455,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_mag_squared_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_mag_squared_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1342,6 +1471,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_mult_cmplx_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_mult_cmplx_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1356,6 +1487,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_mult_cmplx_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_mult_cmplx_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1370,6 +1503,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_mult_cmplx_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_mult_cmplx_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1384,6 +1519,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_mult_real_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_mult_real_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1398,6 +1535,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_mult_real_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_mult_real_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>3</GroupNumber>
@@ -1412,6 +1551,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\ComplexMathFunctions\arm_cmplx_mult_real_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_cmplx_mult_real_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -1420,6 +1561,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>4</GroupNumber>
       <FileNumber>62</FileNumber>
@@ -1433,6 +1575,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_biquad_cascade_df1_32x64_init_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_biquad_cascade_df1_32x64_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1447,6 +1591,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_biquad_cascade_df1_32x64_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_biquad_cascade_df1_32x64_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1461,6 +1607,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_biquad_cascade_df1_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_biquad_cascade_df1_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1475,6 +1623,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_biquad_cascade_df1_fast_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_biquad_cascade_df1_fast_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1489,6 +1639,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_biquad_cascade_df1_fast_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_biquad_cascade_df1_fast_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1503,6 +1655,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_biquad_cascade_df1_init_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_biquad_cascade_df1_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1517,6 +1671,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_biquad_cascade_df1_init_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_biquad_cascade_df1_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1531,6 +1687,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_biquad_cascade_df1_init_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_biquad_cascade_df1_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1545,6 +1703,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_biquad_cascade_df1_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_biquad_cascade_df1_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1559,6 +1719,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_biquad_cascade_df1_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_biquad_cascade_df1_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1573,6 +1735,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_biquad_cascade_df2T_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_biquad_cascade_df2T_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1587,6 +1751,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_biquad_cascade_df2T_init_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_biquad_cascade_df2T_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1601,6 +1767,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_conv_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_conv_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1613,8 +1781,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_fast_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_fast_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_fast_opt_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_fast_opt_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1627,8 +1797,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_fast_opt_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_fast_opt_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_fast_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_fast_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1643,6 +1815,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_conv_fast_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_conv_fast_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1655,8 +1829,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_partial_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_opt_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_opt_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1669,8 +1845,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_fast_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_partial_fast_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_opt_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_opt_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1683,8 +1861,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_fast_opt_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_partial_fast_opt_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_partial_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1697,8 +1877,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_fast_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_partial_fast_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_fast_opt_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_partial_fast_opt_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1711,8 +1893,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_partial_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_fast_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_partial_fast_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1725,8 +1909,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_opt_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_partial_opt_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_fast_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_partial_fast_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1739,8 +1925,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_partial_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_opt_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_partial_opt_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1755,6 +1943,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_conv_partial_opt_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_conv_partial_opt_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1767,8 +1957,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_partial_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_partial_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1781,8 +1973,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_partial_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1795,8 +1989,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_opt_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_opt_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_partial_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_partial_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1809,8 +2005,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1823,8 +2021,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_conv_opt_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_conv_opt_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_conv_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_conv_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1839,6 +2039,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_conv_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_conv_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1853,6 +2055,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_correlate_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_correlate_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1865,8 +2069,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_correlate_fast_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_correlate_fast_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_correlate_fast_opt_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_correlate_fast_opt_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1879,8 +2085,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_correlate_fast_opt_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_correlate_fast_opt_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_correlate_fast_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_correlate_fast_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1895,6 +2103,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_correlate_fast_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_correlate_fast_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1907,8 +2117,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_correlate_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_correlate_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_correlate_opt_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_correlate_opt_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1921,8 +2133,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_correlate_opt_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_correlate_opt_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_correlate_opt_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_correlate_opt_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1935,8 +2149,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_correlate_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_correlate_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_correlate_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_correlate_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1949,8 +2165,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\FilteringFunctions\arm_correlate_opt_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_correlate_opt_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\FilteringFunctions\arm_correlate_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_correlate_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1965,6 +2183,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_correlate_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_correlate_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1979,6 +2199,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_decimate_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_decimate_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -1993,6 +2215,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_decimate_fast_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_decimate_fast_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2007,6 +2231,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_decimate_fast_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_decimate_fast_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2021,6 +2247,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_decimate_init_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_decimate_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2035,6 +2263,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_decimate_init_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_decimate_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2049,6 +2279,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_decimate_init_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_decimate_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2063,6 +2295,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_decimate_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_decimate_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2077,6 +2311,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_decimate_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_decimate_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2091,6 +2327,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2105,6 +2343,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_fast_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_fast_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2119,6 +2359,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_fast_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_fast_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2133,6 +2375,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_init_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2147,6 +2391,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_init_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_init_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2161,6 +2407,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_init_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2175,6 +2423,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_init_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2189,6 +2439,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_interpolate_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_interpolate_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2203,6 +2455,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_interpolate_init_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_interpolate_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2217,6 +2471,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_interpolate_init_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_interpolate_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2231,6 +2487,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_interpolate_init_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_interpolate_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2245,6 +2503,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_interpolate_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_interpolate_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2259,6 +2519,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_interpolate_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_interpolate_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2273,6 +2535,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_lattice_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_lattice_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2287,6 +2551,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_lattice_init_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_lattice_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2301,6 +2567,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_lattice_init_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_lattice_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2315,6 +2583,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_lattice_init_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_lattice_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2329,6 +2599,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_lattice_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_lattice_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2343,6 +2615,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_lattice_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_lattice_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2357,6 +2631,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2371,6 +2647,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2385,6 +2663,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2399,6 +2679,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_sparse_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_sparse_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2413,6 +2695,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_sparse_init_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_sparse_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2427,6 +2711,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_sparse_init_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_sparse_init_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2441,6 +2727,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_sparse_init_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_sparse_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2455,6 +2743,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_sparse_init_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_sparse_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2469,6 +2759,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_sparse_q7.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_sparse_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2483,6 +2775,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_sparse_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_sparse_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2497,6 +2791,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_fir_sparse_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_fir_sparse_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2511,6 +2807,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_iir_lattice_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_iir_lattice_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2525,6 +2823,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_iir_lattice_init_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_iir_lattice_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2539,6 +2839,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_iir_lattice_init_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_iir_lattice_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2553,6 +2855,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_iir_lattice_init_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_iir_lattice_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2567,6 +2871,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_iir_lattice_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_iir_lattice_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2581,6 +2887,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_iir_lattice_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_iir_lattice_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2595,6 +2903,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_lms_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_lms_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2609,6 +2919,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_lms_init_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_lms_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2623,6 +2935,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_lms_init_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_lms_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2637,6 +2951,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_lms_init_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_lms_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2651,6 +2967,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_lms_norm_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_lms_norm_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2665,6 +2983,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_lms_norm_init_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_lms_norm_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2679,6 +2999,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_lms_norm_init_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_lms_norm_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2693,6 +3015,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_lms_norm_init_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_lms_norm_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2707,6 +3031,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_lms_norm_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_lms_norm_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2721,6 +3047,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_lms_norm_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_lms_norm_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2735,6 +3063,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_lms_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_lms_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
@@ -2749,6 +3079,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\FilteringFunctions\arm_lms_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_lms_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -2757,6 +3089,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>5</GroupNumber>
       <FileNumber>157</FileNumber>
@@ -2770,6 +3103,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_add_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_add_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2784,6 +3119,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_add_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_add_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2798,6 +3135,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_add_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_add_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2812,6 +3151,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_init_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2826,6 +3167,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_init_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2840,6 +3183,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_init_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2854,6 +3199,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_inverse_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_inverse_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2868,6 +3215,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_mult_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_mult_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2882,6 +3231,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_mult_fast_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_mult_fast_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2896,6 +3247,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_mult_fast_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_mult_fast_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2910,6 +3263,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_mult_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_mult_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2924,6 +3279,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_mult_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_mult_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2938,6 +3295,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_scale_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_scale_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2952,6 +3311,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_scale_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_scale_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2966,6 +3327,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_scale_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_scale_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2980,6 +3343,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_sub_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_sub_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -2994,6 +3359,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_sub_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_sub_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -3008,6 +3375,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_sub_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_sub_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -3022,6 +3391,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_trans_f32.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_trans_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -3036,6 +3407,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_trans_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_trans_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>5</GroupNumber>
@@ -3050,6 +3423,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\MatrixFunctions\arm_mat_trans_q31.c</PathWithFileName>
       <FilenameWithoutPath>arm_mat_trans_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -3058,6 +3433,7 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>6</GroupNumber>
       <FileNumber>178</FileNumber>
@@ -3071,11 +3447,13 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\TransformFunctions\arm_bitreversal.c</PathWithFileName>
       <FilenameWithoutPath>arm_bitreversal.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
       <FileNumber>179</FileNumber>
-      <FileType>1</FileType>
+      <FileType>2</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
       <ColumnNumber>0</ColumnNumber>
@@ -3083,8 +3461,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_cfft_radix2_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_cfft_radix2_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_bitreversal2.S</PathWithFileName>
+      <FilenameWithoutPath>arm_bitreversal2.S</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3097,8 +3477,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_cfft_radix2_init_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_cfft_radix2_init_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3111,8 +3493,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_cfft_radix2_init_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_cfft_radix2_init_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix2_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix2_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3125,8 +3509,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_cfft_radix2_init_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_cfft_radix2_init_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix2_init_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix2_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3139,8 +3525,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_cfft_radix2_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_cfft_radix2_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix2_init_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix2_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3153,8 +3541,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_cfft_radix2_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_cfft_radix2_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix2_init_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix2_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3167,8 +3557,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_cfft_radix4_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_cfft_radix4_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix2_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix2_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3181,8 +3573,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_cfft_radix4_init_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_cfft_radix4_init_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix2_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix2_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3195,8 +3589,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_cfft_radix4_init_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_cfft_radix4_init_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix4_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix4_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3209,8 +3605,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_cfft_radix4_init_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_cfft_radix4_init_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix4_init_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix4_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3223,8 +3621,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_cfft_radix4_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_cfft_radix4_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix4_init_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix4_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3237,8 +3637,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_cfft_radix4_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_cfft_radix4_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix4_init_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix4_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3251,8 +3653,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_dct4_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_dct4_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix4_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix4_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3265,8 +3669,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_dct4_init_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_dct4_init_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix4_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix4_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3279,8 +3685,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_dct4_init_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_dct4_init_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_cfft_radix8_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_cfft_radix8_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3293,8 +3701,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_dct4_init_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_dct4_init_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_dct4_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_dct4_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3307,8 +3717,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_dct4_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_dct4_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_dct4_init_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_dct4_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3321,8 +3733,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_dct4_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_dct4_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_dct4_init_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_dct4_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3335,8 +3749,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_rfft_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_rfft_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_dct4_init_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_dct4_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3349,8 +3765,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_rfft_init_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_rfft_init_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_dct4_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_dct4_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3363,8 +3781,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_rfft_init_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_rfft_init_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_dct4_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_dct4_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3377,8 +3797,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_rfft_init_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_rfft_init_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_rfft_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_rfft_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3391,8 +3813,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_rfft_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_rfft_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_rfft_fast_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_rfft_fast_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>6</GroupNumber>
@@ -3405,18 +3829,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\TransformFunctions\arm_rfft_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_rfft_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_rfft_fast_init_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_rfft_fast_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
-  </Group>
-
-  <Group>
-    <GroupName>ControllerFunctions</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
     <File>
-      <GroupNumber>7</GroupNumber>
+      <GroupNumber>6</GroupNumber>
       <FileNumber>203</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3426,11 +3845,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\ControllerFunctions\arm_pid_init_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_pid_init_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_rfft_init_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_rfft_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>7</GroupNumber>
+      <GroupNumber>6</GroupNumber>
       <FileNumber>204</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3440,11 +3861,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\ControllerFunctions\arm_pid_init_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_pid_init_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_rfft_init_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_rfft_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>7</GroupNumber>
+      <GroupNumber>6</GroupNumber>
       <FileNumber>205</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3454,11 +3877,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\ControllerFunctions\arm_pid_init_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_pid_init_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_rfft_init_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_rfft_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>7</GroupNumber>
+      <GroupNumber>6</GroupNumber>
       <FileNumber>206</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3468,11 +3893,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\ControllerFunctions\arm_pid_reset_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_pid_reset_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_rfft_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_rfft_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>7</GroupNumber>
+      <GroupNumber>6</GroupNumber>
       <FileNumber>207</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3482,9 +3909,19 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\ControllerFunctions\arm_pid_reset_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_pid_reset_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\TransformFunctions\arm_rfft_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_rfft_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
+  </Group>
+
+  <Group>
+    <GroupName>ControllerFunctions</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>7</GroupNumber>
       <FileNumber>208</FileNumber>
@@ -3496,8 +3933,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\ControllerFunctions\arm_pid_reset_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_pid_reset_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\ControllerFunctions\arm_pid_init_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_pid_init_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -3510,8 +3949,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\ControllerFunctions\arm_sin_cos_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_sin_cos_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\ControllerFunctions\arm_pid_init_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_pid_init_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>7</GroupNumber>
@@ -3524,18 +3965,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\ControllerFunctions\arm_sin_cos_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_sin_cos_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\ControllerFunctions\arm_pid_init_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_pid_init_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
-  </Group>
-
-  <Group>
-    <GroupName>StatisticsFunctions</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
     <File>
-      <GroupNumber>8</GroupNumber>
+      <GroupNumber>7</GroupNumber>
       <FileNumber>211</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3545,11 +3981,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_max_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_max_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\ControllerFunctions\arm_pid_reset_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_pid_reset_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
+      <GroupNumber>7</GroupNumber>
       <FileNumber>212</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3559,11 +3997,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_max_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_max_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\ControllerFunctions\arm_pid_reset_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_pid_reset_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
+      <GroupNumber>7</GroupNumber>
       <FileNumber>213</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3573,11 +4013,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_max_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_max_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\ControllerFunctions\arm_pid_reset_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_pid_reset_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
+      <GroupNumber>7</GroupNumber>
       <FileNumber>214</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3587,11 +4029,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_max_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_max_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\ControllerFunctions\arm_sin_cos_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_sin_cos_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>8</GroupNumber>
+      <GroupNumber>7</GroupNumber>
       <FileNumber>215</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3601,9 +4045,19 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_mean_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_mean_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\ControllerFunctions\arm_sin_cos_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_sin_cos_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
+  </Group>
+
+  <Group>
+    <GroupName>StatisticsFunctions</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>8</GroupNumber>
       <FileNumber>216</FileNumber>
@@ -3615,8 +4069,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_mean_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_mean_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_max_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_max_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3629,8 +4085,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_mean_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_mean_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_max_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_max_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3643,8 +4101,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_mean_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_mean_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_max_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_max_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3657,8 +4117,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_min_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_min_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_max_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_max_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3671,8 +4133,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_min_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_min_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_mean_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_mean_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3685,8 +4149,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_min_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_min_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_mean_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_mean_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3699,8 +4165,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_min_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_min_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_mean_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_mean_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3713,8 +4181,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_power_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_power_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_mean_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_mean_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3727,8 +4197,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_power_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_power_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_min_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_min_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3741,8 +4213,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_power_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_power_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_min_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_min_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3755,8 +4229,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_power_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_power_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_min_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_min_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3769,8 +4245,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_rms_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_rms_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_min_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_min_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3783,8 +4261,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_rms_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_rms_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_power_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_power_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3797,8 +4277,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_rms_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_rms_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_power_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_power_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3811,8 +4293,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_std_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_std_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_power_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_power_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3825,8 +4309,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_std_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_std_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_power_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_power_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3839,8 +4325,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_std_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_std_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_rms_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_rms_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3853,8 +4341,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_var_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_var_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_rms_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_rms_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3867,8 +4357,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_var_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_var_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_rms_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_rms_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>8</GroupNumber>
@@ -3881,18 +4373,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\StatisticsFunctions\arm_var_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_var_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_std_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_std_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
-  </Group>
-
-  <Group>
-    <GroupName>SupportFunctions</GroupName>
-    <tvExp>0</tvExp>
-    <tvExpOptDlg>0</tvExpOptDlg>
-    <cbSel>0</cbSel>
     <File>
-      <GroupNumber>9</GroupNumber>
+      <GroupNumber>8</GroupNumber>
       <FileNumber>236</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3902,11 +4389,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_copy_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_copy_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_std_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_std_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>9</GroupNumber>
+      <GroupNumber>8</GroupNumber>
       <FileNumber>237</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3916,11 +4405,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_copy_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_copy_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_std_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_std_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>9</GroupNumber>
+      <GroupNumber>8</GroupNumber>
       <FileNumber>238</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3930,11 +4421,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_copy_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_copy_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_var_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_var_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>9</GroupNumber>
+      <GroupNumber>8</GroupNumber>
       <FileNumber>239</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3944,11 +4437,13 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_copy_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_copy_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_var_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_var_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
-      <GroupNumber>9</GroupNumber>
+      <GroupNumber>8</GroupNumber>
       <FileNumber>240</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
@@ -3958,9 +4453,19 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_fill_f32.c</PathWithFileName>
-      <FilenameWithoutPath>arm_fill_f32.c</FilenameWithoutPath>
+      <PathWithFileName>..\StatisticsFunctions\arm_var_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_var_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
+  </Group>
+
+  <Group>
+    <GroupName>SupportFunctions</GroupName>
+    <tvExp>0</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>9</GroupNumber>
       <FileNumber>241</FileNumber>
@@ -3972,8 +4477,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_fill_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_fill_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_copy_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_copy_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -3986,8 +4493,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_fill_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_fill_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_copy_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_copy_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4000,8 +4509,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_fill_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_fill_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_copy_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_copy_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4014,8 +4525,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_float_to_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_float_to_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_copy_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_copy_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4028,8 +4541,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_float_to_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_float_to_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_fill_f32.c</PathWithFileName>
+      <FilenameWithoutPath>arm_fill_f32.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4042,8 +4557,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_float_to_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_float_to_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_fill_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_fill_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4056,8 +4573,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_q7_to_float.c</PathWithFileName>
-      <FilenameWithoutPath>arm_q7_to_float.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_fill_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_fill_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4070,8 +4589,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_q7_to_q15.c</PathWithFileName>
-      <FilenameWithoutPath>arm_q7_to_q15.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_fill_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_fill_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4084,8 +4605,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_q7_to_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_q7_to_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_float_to_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_float_to_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4098,8 +4621,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_q15_to_float.c</PathWithFileName>
-      <FilenameWithoutPath>arm_q15_to_float.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_float_to_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_float_to_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4112,8 +4637,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_q15_to_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_q15_to_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_float_to_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_float_to_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4126,8 +4653,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_q15_to_q31.c</PathWithFileName>
-      <FilenameWithoutPath>arm_q15_to_q31.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_q7_to_float.c</PathWithFileName>
+      <FilenameWithoutPath>arm_q7_to_float.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4140,8 +4669,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_q31_to_float.c</PathWithFileName>
-      <FilenameWithoutPath>arm_q31_to_float.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_q7_to_q15.c</PathWithFileName>
+      <FilenameWithoutPath>arm_q7_to_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4154,8 +4685,10 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\SupportFunctions\arm_q31_to_q7.c</PathWithFileName>
-      <FilenameWithoutPath>arm_q31_to_q7.c</FilenameWithoutPath>
+      <PathWithFileName>..\SupportFunctions\arm_q7_to_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_q7_to_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
     <File>
       <GroupNumber>9</GroupNumber>
@@ -4168,8 +4701,90 @@
       <TopLine>0</TopLine>
       <CurrentLine>0</CurrentLine>
       <bDave2>0</bDave2>
+      <PathWithFileName>..\SupportFunctions\arm_q15_to_float.c</PathWithFileName>
+      <FilenameWithoutPath>arm_q15_to_float.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>256</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\SupportFunctions\arm_q15_to_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_q15_to_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>257</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\SupportFunctions\arm_q15_to_q31.c</PathWithFileName>
+      <FilenameWithoutPath>arm_q15_to_q31.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>258</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\SupportFunctions\arm_q31_to_float.c</PathWithFileName>
+      <FilenameWithoutPath>arm_q31_to_float.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>259</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\SupportFunctions\arm_q31_to_q7.c</PathWithFileName>
+      <FilenameWithoutPath>arm_q31_to_q7.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>260</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <Focus>0</Focus>
+      <ColumnNumber>0</ColumnNumber>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <TopLine>0</TopLine>
+      <CurrentLine>0</CurrentLine>
+      <bDave2>0</bDave2>
       <PathWithFileName>..\SupportFunctions\arm_q31_to_q15.c</PathWithFileName>
       <FilenameWithoutPath>arm_q31_to_q15.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 
@@ -4178,9 +4793,10 @@
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>256</FileNumber>
+      <FileNumber>261</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <Focus>0</Focus>
@@ -4191,6 +4807,8 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\CommonTables\arm_common_tables.c</PathWithFileName>
       <FilenameWithoutPath>arm_common_tables.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
     </File>
   </Group>
 

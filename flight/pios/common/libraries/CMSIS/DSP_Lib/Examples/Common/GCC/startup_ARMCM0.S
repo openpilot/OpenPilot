@@ -1,34 +1,38 @@
 /* File: startup_ARMCM0.S
  * Purpose: startup file for Cortex-M0 devices. Should use with
  *   GCC for ARM Embedded Processors
- * Version: V1.3
- * Date: 08 Feb 2012
+ * Version: V1.4
+ * Date: 20 Dezember 2012
  *
- * Copyright (c) 2012, ARM Limited
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * Neither the name of the ARM Limited nor the
-      names of its contributors may be used to endorse or promote products
-      derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL ARM LIMITED BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+/* Copyright (c) 2011 - 2012 ARM LIMITED
+
+   All rights reserved.
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions are met:
+   - Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+   - Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+   - Neither the name of ARM nor the names of its contributors may be used
+     to endorse or promote products derived from this software without
+     specific prior written permission.
+   *
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+   ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+   POSSIBILITY OF SUCH DAMAGE.
+   ---------------------------------------------------------------------------*/
+
+
     .syntax unified
     .arch armv6-m
 
@@ -37,7 +41,7 @@
 #ifdef __STACK_SIZE
     .equ    Stack_Size, __STACK_SIZE
 #else
-    .equ    Stack_Size, 0x400
+    .equ    Stack_Size, 0x00000400
 #endif
     .globl    __StackTop
     .globl    __StackLimit
@@ -52,7 +56,7 @@ __StackTop:
 #ifdef __HEAP_SIZE
     .equ    Heap_Size, __HEAP_SIZE
 #else
-    .equ    Heap_Size, 0xC00
+    .equ    Heap_Size, 0x00000C00
 #endif
     .globl    __HeapBase
     .globl    __HeapLimit
@@ -124,7 +128,7 @@ __isr_vector:
     .text
     .thumb
     .thumb_func
-    .align 2
+    .align 1
     .globl    Reset_Handler
     .type    Reset_Handler, %function
 Reset_Handler:
@@ -140,24 +144,47 @@ Reset_Handler:
     ldr    r3, =__data_end__
 
     subs    r3, r2
-    ble    .flash_to_ram_loop_end
+    ble     .LC0
 
-    movs    r4, 0
-.flash_to_ram_loop:
-    ldr    r0, [r1,r4]
-    str    r0, [r2,r4]
-    adds    r4, 4
-    cmp    r4, r3
-    blt    .flash_to_ram_loop
-.flash_to_ram_loop_end:
+.LC1:
+    subs    r3, 4
+    ldr    r0, [r1,r3]
+    str    r0, [r2,r3]
+    bgt    .LC1
+.LC0:
 
-#ifndef __NO_SYSTEM_INIT
-    ldr    r0, =SystemInit
-    blx    r0
+#ifdef __STARTUP_CLEAR_BSS
+/*     This part of work usually is done in C library startup code. Otherwise,
+ *     define this macro to enable it in this startup.
+ *
+ *     Loop to zero out BSS section, which uses following symbols
+ *     in linker script:
+ *      __bss_start__: start of BSS section. Must align to 4
+ *      __bss_end__: end of BSS section. Must align to 4
+ */
+    ldr r1, =__bss_start__
+    ldr r2, =__bss_end__
+
+    subs    r2, r1
+    ble .LC3
+
+    movs    r0, 0
+.LC2:
+    str r0, [r1, r2]
+    subs    r2, 4
+    bge .LC2
+.LC3:
 #endif
 
-    ldr    r0, =_start
-    bx    r0
+#ifndef __NO_SYSTEM_INIT
+    bl	SystemInit
+#endif
+
+#ifndef __START
+#define __START _start
+#endif
+    bl	__START
+
     .pool
     .size Reset_Handler, . - Reset_Handler
 

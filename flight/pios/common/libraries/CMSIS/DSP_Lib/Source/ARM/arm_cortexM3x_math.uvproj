@@ -74,9 +74,9 @@
           </BeforeMake>
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
-            <RunUserProg2>0</RunUserProg2>
+            <RunUserProg2>1</RunUserProg2>
             <UserProg1Name>cmd.exe /C copy "!L" "..\..\..\Lib\ARM\"</UserProg1Name>
-            <UserProg2Name></UserProg2Name>
+            <UserProg2Name>cmd.exe /C getSizeInfo "!L" "@L_SizeInfo.txt"</UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
           </AfterMake>
@@ -118,8 +118,8 @@
           </OPTHX>
           <Simulator>
             <UseSimulator>1</UseSimulator>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
-            <RunToMain>1</RunToMain>
+            <LoadApplicationAtStartup>0</LoadApplicationAtStartup>
+            <RunToMain>0</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
             <RestoreWatchpoints>1</RestoreWatchpoints>
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
@@ -129,13 +129,14 @@
           </Simulator>
           <Target>
             <UseTarget>0</UseTarget>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
+            <LoadApplicationAtStartup>0</LoadApplicationAtStartup>
             <RunToMain>0</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
             <RestoreWatchpoints>1</RestoreWatchpoints>
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>-1</TargetSelection>
@@ -182,8 +183,8 @@
             <ldmm>1</ldmm>
             <ldXref>1</ldXref>
             <BigEnd>0</BigEnd>
-            <AdsALst>1</AdsALst>
-            <AdsACrf>1</AdsACrf>
+            <AdsALst>0</AdsALst>
+            <AdsACrf>0</AdsACrf>
             <AdsANop>0</AdsANop>
             <AdsANot>0</AdsANot>
             <AdsLLst>1</AdsLLst>
@@ -344,6 +345,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>ARM_MATH_CM3, ARM_MATH_MATRIX_CHECK, ARM_MATH_ROUNDING</Define>
@@ -359,8 +361,9 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--cpreproc --cpreproc_opts='-DARM_MATH_CM3'</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
@@ -774,14 +777,14 @@
               <FilePath>..\FilteringFunctions\arm_conv_f32.c</FilePath>
             </File>
             <File>
-              <FileName>arm_conv_fast_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_fast_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_conv_fast_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_fast_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_fast_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_fast_q31.c</FileName>
@@ -789,14 +792,19 @@
               <FilePath>..\FilteringFunctions\arm_conv_fast_q31.c</FilePath>
             </File>
             <File>
+              <FileName>arm_conv_opt_q7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_opt_q7.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_opt_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_opt_q15.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_conv_partial_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_partial_f32.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_conv_partial_fast_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_partial_fast_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_partial_fast_opt_q15.c</FileName>
@@ -804,14 +812,14 @@
               <FilePath>..\FilteringFunctions\arm_conv_partial_fast_opt_q15.c</FilePath>
             </File>
             <File>
+              <FileName>arm_conv_partial_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_partial_fast_q15.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_conv_partial_fast_q31.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_partial_fast_q31.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_conv_partial_q7.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_partial_q7.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_partial_opt_q7.c</FileName>
@@ -819,14 +827,19 @@
               <FilePath>..\FilteringFunctions\arm_conv_partial_opt_q7.c</FilePath>
             </File>
             <File>
-              <FileName>arm_conv_partial_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_partial_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_conv_partial_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_partial_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_partial_q7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_partial_q7.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_partial_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_partial_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_partial_q31.c</FileName>
@@ -839,19 +852,9 @@
               <FilePath>..\FilteringFunctions\arm_conv_q7.c</FilePath>
             </File>
             <File>
-              <FileName>arm_conv_opt_q7.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_opt_q7.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_conv_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_q15.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_conv_opt_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_opt_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_q31.c</FileName>
@@ -864,14 +867,14 @@
               <FilePath>..\FilteringFunctions\arm_correlate_f32.c</FilePath>
             </File>
             <File>
-              <FileName>arm_correlate_fast_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_correlate_fast_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_correlate_fast_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_correlate_fast_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_correlate_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_correlate_fast_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_correlate_fast_q31.c</FileName>
@@ -879,24 +882,24 @@
               <FilePath>..\FilteringFunctions\arm_correlate_fast_q31.c</FilePath>
             </File>
             <File>
-              <FileName>arm_correlate_q7.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_correlate_q7.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_correlate_opt_q7.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_correlate_opt_q7.c</FilePath>
             </File>
             <File>
-              <FileName>arm_correlate_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_correlate_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_correlate_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_correlate_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_correlate_q7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_correlate_q7.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_correlate_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_correlate_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_correlate_q31.c</FileName>
@@ -1304,6 +1307,16 @@
               <FilePath>..\TransformFunctions\arm_bitreversal.c</FilePath>
             </File>
             <File>
+              <FileName>arm_bitreversal2.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\TransformFunctions\arm_bitreversal2.S</FilePath>
+            </File>
+            <File>
+              <FileName>arm_cfft_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_cfft_f32.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_cfft_radix2_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TransformFunctions\arm_cfft_radix2_f32.c</FilePath>
@@ -1364,6 +1377,11 @@
               <FilePath>..\TransformFunctions\arm_cfft_radix4_q31.c</FilePath>
             </File>
             <File>
+              <FileName>arm_cfft_radix8_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_cfft_radix8_f32.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_dct4_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TransformFunctions\arm_dct4_f32.c</FilePath>
@@ -1397,6 +1415,16 @@
               <FileName>arm_rfft_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TransformFunctions\arm_rfft_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_rfft_fast_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_rfft_fast_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_rfft_fast_init_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_rfft_fast_init_f32.c</FilePath>
             </File>
             <File>
               <FileName>arm_rfft_init_f32.c</FileName>
@@ -1829,8 +1857,8 @@
           </OPTHX>
           <Simulator>
             <UseSimulator>1</UseSimulator>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
-            <RunToMain>1</RunToMain>
+            <LoadApplicationAtStartup>0</LoadApplicationAtStartup>
+            <RunToMain>0</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
             <RestoreWatchpoints>1</RestoreWatchpoints>
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
@@ -1840,13 +1868,14 @@
           </Simulator>
           <Target>
             <UseTarget>0</UseTarget>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
+            <LoadApplicationAtStartup>0</LoadApplicationAtStartup>
             <RunToMain>0</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
             <RestoreWatchpoints>1</RestoreWatchpoints>
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>-1</TargetSelection>
@@ -1893,8 +1922,8 @@
             <ldmm>1</ldmm>
             <ldXref>1</ldXref>
             <BigEnd>0</BigEnd>
-            <AdsALst>1</AdsALst>
-            <AdsACrf>1</AdsACrf>
+            <AdsALst>0</AdsALst>
+            <AdsACrf>0</AdsACrf>
             <AdsANop>0</AdsANop>
             <AdsANot>0</AdsANot>
             <AdsLLst>1</AdsLLst>
@@ -1920,7 +1949,7 @@
             <RvdsVP>0</RvdsVP>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
-            <StupSel>1</StupSel>
+            <StupSel>0</StupSel>
             <useUlib>0</useUlib>
             <EndSel>1</EndSel>
             <uLtcg>0</uLtcg>
@@ -1933,7 +1962,7 @@
             <NoZi3>0</NoZi3>
             <NoZi4>0</NoZi4>
             <NoZi5>0</NoZi5>
-            <Ro1Chk>1</Ro1Chk>
+            <Ro1Chk>0</Ro1Chk>
             <Ro2Chk>0</Ro2Chk>
             <Ro3Chk>0</Ro3Chk>
             <Ir1Chk>0</Ir1Chk>
@@ -2055,6 +2084,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>ARM_MATH_CM3, ARM_MATH_MATRIX_CHECK, ARM_MATH_ROUNDING</Define>
@@ -2070,8 +2100,9 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--cpreproc --cpreproc_opts='-DARM_MATH_CM3'</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
@@ -2485,14 +2516,14 @@
               <FilePath>..\FilteringFunctions\arm_conv_f32.c</FilePath>
             </File>
             <File>
-              <FileName>arm_conv_fast_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_fast_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_conv_fast_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_fast_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_fast_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_fast_q31.c</FileName>
@@ -2500,14 +2531,19 @@
               <FilePath>..\FilteringFunctions\arm_conv_fast_q31.c</FilePath>
             </File>
             <File>
+              <FileName>arm_conv_opt_q7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_opt_q7.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_opt_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_opt_q15.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_conv_partial_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_partial_f32.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_conv_partial_fast_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_partial_fast_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_partial_fast_opt_q15.c</FileName>
@@ -2515,14 +2551,14 @@
               <FilePath>..\FilteringFunctions\arm_conv_partial_fast_opt_q15.c</FilePath>
             </File>
             <File>
+              <FileName>arm_conv_partial_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_partial_fast_q15.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_conv_partial_fast_q31.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_partial_fast_q31.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_conv_partial_q7.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_partial_q7.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_partial_opt_q7.c</FileName>
@@ -2530,14 +2566,19 @@
               <FilePath>..\FilteringFunctions\arm_conv_partial_opt_q7.c</FilePath>
             </File>
             <File>
-              <FileName>arm_conv_partial_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_partial_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_conv_partial_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_partial_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_partial_q7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_partial_q7.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_partial_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_partial_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_partial_q31.c</FileName>
@@ -2550,19 +2591,9 @@
               <FilePath>..\FilteringFunctions\arm_conv_q7.c</FilePath>
             </File>
             <File>
-              <FileName>arm_conv_opt_q7.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_opt_q7.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_conv_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_q15.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_conv_opt_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_opt_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_q31.c</FileName>
@@ -2575,14 +2606,14 @@
               <FilePath>..\FilteringFunctions\arm_correlate_f32.c</FilePath>
             </File>
             <File>
-              <FileName>arm_correlate_fast_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_correlate_fast_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_correlate_fast_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_correlate_fast_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_correlate_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_correlate_fast_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_correlate_fast_q31.c</FileName>
@@ -2590,24 +2621,24 @@
               <FilePath>..\FilteringFunctions\arm_correlate_fast_q31.c</FilePath>
             </File>
             <File>
-              <FileName>arm_correlate_q7.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_correlate_q7.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_correlate_opt_q7.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_correlate_opt_q7.c</FilePath>
             </File>
             <File>
-              <FileName>arm_correlate_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_correlate_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_correlate_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_correlate_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_correlate_q7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_correlate_q7.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_correlate_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_correlate_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_correlate_q31.c</FileName>
@@ -3015,6 +3046,16 @@
               <FilePath>..\TransformFunctions\arm_bitreversal.c</FilePath>
             </File>
             <File>
+              <FileName>arm_bitreversal2.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\TransformFunctions\arm_bitreversal2.S</FilePath>
+            </File>
+            <File>
+              <FileName>arm_cfft_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_cfft_f32.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_cfft_radix2_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TransformFunctions\arm_cfft_radix2_f32.c</FilePath>
@@ -3075,6 +3116,11 @@
               <FilePath>..\TransformFunctions\arm_cfft_radix4_q31.c</FilePath>
             </File>
             <File>
+              <FileName>arm_cfft_radix8_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_cfft_radix8_f32.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_dct4_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TransformFunctions\arm_dct4_f32.c</FilePath>
@@ -3108,6 +3154,16 @@
               <FileName>arm_rfft_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TransformFunctions\arm_rfft_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_rfft_fast_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_rfft_fast_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_rfft_fast_init_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_rfft_fast_init_f32.c</FilePath>
             </File>
             <File>
               <FileName>arm_rfft_init_f32.c</FileName>
@@ -3496,9 +3552,9 @@
           </BeforeMake>
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
-            <RunUserProg2>0</RunUserProg2>
+            <RunUserProg2>1</RunUserProg2>
             <UserProg1Name>cmd.exe /C copy "!L" "..\..\..\Lib\ARM\"</UserProg1Name>
-            <UserProg2Name></UserProg2Name>
+            <UserProg2Name>cmd.exe /C getSizeInfo "!L" "@L_SizeInfo.txt"</UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
           </AfterMake>
@@ -3540,8 +3596,8 @@
           </OPTHX>
           <Simulator>
             <UseSimulator>1</UseSimulator>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
-            <RunToMain>1</RunToMain>
+            <LoadApplicationAtStartup>0</LoadApplicationAtStartup>
+            <RunToMain>0</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
             <RestoreWatchpoints>1</RestoreWatchpoints>
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
@@ -3551,13 +3607,14 @@
           </Simulator>
           <Target>
             <UseTarget>0</UseTarget>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
+            <LoadApplicationAtStartup>0</LoadApplicationAtStartup>
             <RunToMain>0</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
             <RestoreWatchpoints>1</RestoreWatchpoints>
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>-1</TargetSelection>
@@ -3604,8 +3661,8 @@
             <ldmm>1</ldmm>
             <ldXref>1</ldXref>
             <BigEnd>1</BigEnd>
-            <AdsALst>1</AdsALst>
-            <AdsACrf>1</AdsACrf>
+            <AdsALst>0</AdsALst>
+            <AdsACrf>0</AdsACrf>
             <AdsANop>0</AdsANop>
             <AdsANot>0</AdsANot>
             <AdsLLst>1</AdsLLst>
@@ -3631,7 +3688,7 @@
             <RvdsVP>0</RvdsVP>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
-            <StupSel>1</StupSel>
+            <StupSel>0</StupSel>
             <useUlib>0</useUlib>
             <EndSel>1</EndSel>
             <uLtcg>0</uLtcg>
@@ -3644,7 +3701,7 @@
             <NoZi3>0</NoZi3>
             <NoZi4>0</NoZi4>
             <NoZi5>0</NoZi5>
-            <Ro1Chk>1</Ro1Chk>
+            <Ro1Chk>0</Ro1Chk>
             <Ro2Chk>0</Ro2Chk>
             <Ro3Chk>0</Ro3Chk>
             <Ir1Chk>0</Ir1Chk>
@@ -3766,6 +3823,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>ARM_MATH_CM3, ARM_MATH_MATRIX_CHECK, ARM_MATH_ROUNDING, ARM_MATH_BIG_ENDIAN</Define>
@@ -3781,8 +3839,9 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--cpreproc --cpreproc_opts='-DARM_MATH_CM3'</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
@@ -4196,14 +4255,14 @@
               <FilePath>..\FilteringFunctions\arm_conv_f32.c</FilePath>
             </File>
             <File>
-              <FileName>arm_conv_fast_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_fast_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_conv_fast_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_fast_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_fast_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_fast_q31.c</FileName>
@@ -4211,14 +4270,19 @@
               <FilePath>..\FilteringFunctions\arm_conv_fast_q31.c</FilePath>
             </File>
             <File>
+              <FileName>arm_conv_opt_q7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_opt_q7.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_opt_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_opt_q15.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_conv_partial_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_partial_f32.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_conv_partial_fast_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_partial_fast_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_partial_fast_opt_q15.c</FileName>
@@ -4226,14 +4290,14 @@
               <FilePath>..\FilteringFunctions\arm_conv_partial_fast_opt_q15.c</FilePath>
             </File>
             <File>
+              <FileName>arm_conv_partial_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_partial_fast_q15.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_conv_partial_fast_q31.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_partial_fast_q31.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_conv_partial_q7.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_partial_q7.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_partial_opt_q7.c</FileName>
@@ -4241,14 +4305,19 @@
               <FilePath>..\FilteringFunctions\arm_conv_partial_opt_q7.c</FilePath>
             </File>
             <File>
-              <FileName>arm_conv_partial_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_partial_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_conv_partial_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_partial_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_partial_q7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_partial_q7.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_partial_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_partial_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_partial_q31.c</FileName>
@@ -4261,19 +4330,9 @@
               <FilePath>..\FilteringFunctions\arm_conv_q7.c</FilePath>
             </File>
             <File>
-              <FileName>arm_conv_opt_q7.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_opt_q7.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_conv_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_q15.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_conv_opt_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_opt_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_q31.c</FileName>
@@ -4286,14 +4345,14 @@
               <FilePath>..\FilteringFunctions\arm_correlate_f32.c</FilePath>
             </File>
             <File>
-              <FileName>arm_correlate_fast_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_correlate_fast_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_correlate_fast_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_correlate_fast_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_correlate_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_correlate_fast_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_correlate_fast_q31.c</FileName>
@@ -4301,24 +4360,24 @@
               <FilePath>..\FilteringFunctions\arm_correlate_fast_q31.c</FilePath>
             </File>
             <File>
-              <FileName>arm_correlate_q7.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_correlate_q7.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_correlate_opt_q7.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_correlate_opt_q7.c</FilePath>
             </File>
             <File>
-              <FileName>arm_correlate_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_correlate_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_correlate_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_correlate_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_correlate_q7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_correlate_q7.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_correlate_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_correlate_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_correlate_q31.c</FileName>
@@ -4726,6 +4785,16 @@
               <FilePath>..\TransformFunctions\arm_bitreversal.c</FilePath>
             </File>
             <File>
+              <FileName>arm_bitreversal2.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\TransformFunctions\arm_bitreversal2.S</FilePath>
+            </File>
+            <File>
+              <FileName>arm_cfft_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_cfft_f32.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_cfft_radix2_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TransformFunctions\arm_cfft_radix2_f32.c</FilePath>
@@ -4786,6 +4855,11 @@
               <FilePath>..\TransformFunctions\arm_cfft_radix4_q31.c</FilePath>
             </File>
             <File>
+              <FileName>arm_cfft_radix8_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_cfft_radix8_f32.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_dct4_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TransformFunctions\arm_dct4_f32.c</FilePath>
@@ -4819,6 +4893,16 @@
               <FileName>arm_rfft_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TransformFunctions\arm_rfft_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_rfft_fast_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_rfft_fast_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_rfft_fast_init_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_rfft_fast_init_f32.c</FilePath>
             </File>
             <File>
               <FileName>arm_rfft_init_f32.c</FileName>
@@ -5251,8 +5335,8 @@
           </OPTHX>
           <Simulator>
             <UseSimulator>1</UseSimulator>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
-            <RunToMain>1</RunToMain>
+            <LoadApplicationAtStartup>0</LoadApplicationAtStartup>
+            <RunToMain>0</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
             <RestoreWatchpoints>1</RestoreWatchpoints>
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
@@ -5262,13 +5346,14 @@
           </Simulator>
           <Target>
             <UseTarget>0</UseTarget>
-            <LoadApplicationAtStartup>1</LoadApplicationAtStartup>
+            <LoadApplicationAtStartup>0</LoadApplicationAtStartup>
             <RunToMain>0</RunToMain>
             <RestoreBreakpoints>1</RestoreBreakpoints>
             <RestoreWatchpoints>1</RestoreWatchpoints>
             <RestoreMemoryDisplay>1</RestoreMemoryDisplay>
             <RestoreFunctions>0</RestoreFunctions>
             <RestoreToolbox>1</RestoreToolbox>
+            <RestoreTracepoints>0</RestoreTracepoints>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>-1</TargetSelection>
@@ -5315,8 +5400,8 @@
             <ldmm>1</ldmm>
             <ldXref>1</ldXref>
             <BigEnd>1</BigEnd>
-            <AdsALst>1</AdsALst>
-            <AdsACrf>1</AdsACrf>
+            <AdsALst>0</AdsALst>
+            <AdsACrf>0</AdsACrf>
             <AdsANop>0</AdsANop>
             <AdsANot>0</AdsANot>
             <AdsLLst>1</AdsLLst>
@@ -5342,7 +5427,7 @@
             <RvdsVP>0</RvdsVP>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
-            <StupSel>1</StupSel>
+            <StupSel>0</StupSel>
             <useUlib>0</useUlib>
             <EndSel>1</EndSel>
             <uLtcg>0</uLtcg>
@@ -5355,7 +5440,7 @@
             <NoZi3>0</NoZi3>
             <NoZi4>0</NoZi4>
             <NoZi5>0</NoZi5>
-            <Ro1Chk>1</Ro1Chk>
+            <Ro1Chk>0</Ro1Chk>
             <Ro2Chk>0</Ro2Chk>
             <Ro3Chk>0</Ro3Chk>
             <Ir1Chk>0</Ir1Chk>
@@ -5477,6 +5562,7 @@
             <Rwpi>0</Rwpi>
             <wLevel>0</wLevel>
             <uThumb>0</uThumb>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define>ARM_MATH_CM3, ARM_MATH_MATRIX_CHECK, ARM_MATH_ROUNDING, ARM_MATH_BIG_ENDIAN</Define>
@@ -5492,8 +5578,9 @@
             <SplitLS>0</SplitLS>
             <SwStkChk>0</SwStkChk>
             <NoWarn>0</NoWarn>
+            <uSurpInc>0</uSurpInc>
             <VariousControls>
-              <MiscControls></MiscControls>
+              <MiscControls>--cpreproc --cpreproc_opts='-DARM_MATH_CM3'</MiscControls>
               <Define></Define>
               <Undefine></Undefine>
               <IncludePath></IncludePath>
@@ -5907,14 +5994,14 @@
               <FilePath>..\FilteringFunctions\arm_conv_f32.c</FilePath>
             </File>
             <File>
-              <FileName>arm_conv_fast_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_fast_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_conv_fast_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_fast_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_fast_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_fast_q31.c</FileName>
@@ -5922,14 +6009,19 @@
               <FilePath>..\FilteringFunctions\arm_conv_fast_q31.c</FilePath>
             </File>
             <File>
+              <FileName>arm_conv_opt_q7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_opt_q7.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_opt_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_opt_q15.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_conv_partial_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_partial_f32.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_conv_partial_fast_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_partial_fast_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_partial_fast_opt_q15.c</FileName>
@@ -5937,14 +6029,14 @@
               <FilePath>..\FilteringFunctions\arm_conv_partial_fast_opt_q15.c</FilePath>
             </File>
             <File>
+              <FileName>arm_conv_partial_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_partial_fast_q15.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_conv_partial_fast_q31.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_partial_fast_q31.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_conv_partial_q7.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_partial_q7.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_partial_opt_q7.c</FileName>
@@ -5952,14 +6044,19 @@
               <FilePath>..\FilteringFunctions\arm_conv_partial_opt_q7.c</FilePath>
             </File>
             <File>
-              <FileName>arm_conv_partial_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_partial_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_conv_partial_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_partial_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_partial_q7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_partial_q7.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_conv_partial_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_conv_partial_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_partial_q31.c</FileName>
@@ -5972,19 +6069,9 @@
               <FilePath>..\FilteringFunctions\arm_conv_q7.c</FilePath>
             </File>
             <File>
-              <FileName>arm_conv_opt_q7.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_opt_q7.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_conv_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_conv_q15.c</FilePath>
-            </File>
-            <File>
-              <FileName>arm_conv_opt_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_conv_opt_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_conv_q31.c</FileName>
@@ -5997,14 +6084,14 @@
               <FilePath>..\FilteringFunctions\arm_correlate_f32.c</FilePath>
             </File>
             <File>
-              <FileName>arm_correlate_fast_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_correlate_fast_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_correlate_fast_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_correlate_fast_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_correlate_fast_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_correlate_fast_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_correlate_fast_q31.c</FileName>
@@ -6012,24 +6099,24 @@
               <FilePath>..\FilteringFunctions\arm_correlate_fast_q31.c</FilePath>
             </File>
             <File>
-              <FileName>arm_correlate_q7.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_correlate_q7.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_correlate_opt_q7.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_correlate_opt_q7.c</FilePath>
             </File>
             <File>
-              <FileName>arm_correlate_q15.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\FilteringFunctions\arm_correlate_q15.c</FilePath>
-            </File>
-            <File>
               <FileName>arm_correlate_opt_q15.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\FilteringFunctions\arm_correlate_opt_q15.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_correlate_q7.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_correlate_q7.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_correlate_q15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\FilteringFunctions\arm_correlate_q15.c</FilePath>
             </File>
             <File>
               <FileName>arm_correlate_q31.c</FileName>
@@ -6437,6 +6524,16 @@
               <FilePath>..\TransformFunctions\arm_bitreversal.c</FilePath>
             </File>
             <File>
+              <FileName>arm_bitreversal2.S</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\TransformFunctions\arm_bitreversal2.S</FilePath>
+            </File>
+            <File>
+              <FileName>arm_cfft_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_cfft_f32.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_cfft_radix2_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TransformFunctions\arm_cfft_radix2_f32.c</FilePath>
@@ -6497,6 +6594,11 @@
               <FilePath>..\TransformFunctions\arm_cfft_radix4_q31.c</FilePath>
             </File>
             <File>
+              <FileName>arm_cfft_radix8_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_cfft_radix8_f32.c</FilePath>
+            </File>
+            <File>
               <FileName>arm_dct4_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TransformFunctions\arm_dct4_f32.c</FilePath>
@@ -6530,6 +6632,16 @@
               <FileName>arm_rfft_f32.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\TransformFunctions\arm_rfft_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_rfft_fast_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_rfft_fast_f32.c</FilePath>
+            </File>
+            <File>
+              <FileName>arm_rfft_fast_init_f32.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\TransformFunctions\arm_rfft_fast_init_f32.c</FilePath>
             </File>
             <File>
               <FileName>arm_rfft_init_f32.c</FileName>

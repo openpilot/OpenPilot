@@ -1,27 +1,44 @@
 /* ----------------------------------------------------------------------
-* Copyright (C) 2010 ARM Limited. All rights reserved.
+* Copyright (C) 2010-2012 ARM Limited. All rights reserved.
 *
-* $Date:        29. November 2010
-* $Revision:    V1.0.3
+* $Date:         17. January 2013
+* $Revision:     V1.4.0
 *
-* Project:      CMSIS DSP Library
-* Title:        arm_linear_interp_example_f32.c
+* Project:       CMSIS DSP Library
+* Title:         arm_linear_interp_example_f32.c
 *
-* Description:  Example code demonstrating usage of sin function
-*               and uses linear interpolation to get higher precision
+* Description:   Example code demonstrating usage of sin function
+*                and uses linear interpolation to get higher precision
 *
 * Target Processor: Cortex-M4/Cortex-M3
 *
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+*   - Redistributions of source code must retain the above copyright
+*     notice, this list of conditions and the following disclaimer.
+*   - Redistributions in binary form must reproduce the above copyright
+*     notice, this list of conditions and the following disclaimer in
+*     the documentation and/or other materials provided with the
+*     distribution.
+*   - Neither the name of ARM LIMITED nor the names of its contributors
+*     may be used to endorse or promote products derived from this
+*     software without specific prior written permission.
 *
-* Version 1.0.3 2010/11/29
-*    Re-organized the CMSIS folders and updated documentation.
-*
-* Version 1.0.1 2010/10/05 KK
-*    Production release and review comments incorporated.
-*
-* Version 1.0.0 2010/09/20 KK
-*    Production release and review comments incorporated.
-* ------------------------------------------------------------------- */
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+* FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+* COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+* BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+* CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+* ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+ * -------------------------------------------------------------------- */
+
 
 /**
  * @ingroup groupExamples
@@ -115,7 +132,7 @@ float32_t testLinIntOutput[TEST_LENGTH_SAMPLES];
 /*------------------------------------------------------------------------------
 *  External table used for linear interpolation
 *------------------------------------------------------------------------------*/
-extern const float arm_linear_interep_table[188495];
+extern float arm_linear_interep_table[188495];
 
 /* ----------------------------------------------------------------------
 * Global Variables for caluclating SNR's for Method1 & Method 2
@@ -128,61 +145,60 @@ float32_t snr2;
 * ---------------------------------------------------------------------------- */
 int32_t main(void)
 {
-   uint32_t i;
-   arm_status status;
+  uint32_t i;
+  arm_status status;
 
-   arm_linear_interp_instance_f32 S = {188495, -3.141592653589793238, XSPACING, (float32_t *)&arm_linear_interep_table[0]};
+  arm_linear_interp_instance_f32 S = {188495, -3.141592653589793238, XSPACING, &arm_linear_interep_table[0]};
 
-   /*------------------------------------------------------------------------------
-   *  Method 1: Test out Calculated from Cubic Interpolation
-   *------------------------------------------------------------------------------*/
-   for(i=0; i< TEST_LENGTH_SAMPLES; i++)
-   {
-      testOutput[i] = arm_sin_f32(testInputSin_f32[i]);
-   }
+  /*------------------------------------------------------------------------------
+  *  Method 1: Test out Calculated from Cubic Interpolation
+  *------------------------------------------------------------------------------*/
+  for(i=0; i< TEST_LENGTH_SAMPLES; i++)
+  {
+    testOutput[i] = arm_sin_f32(testInputSin_f32[i]);
+  }
 
-   /*------------------------------------------------------------------------------
-   *  Method 2: Test out Calculated from Cubic Interpolation and Linear interpolation
-   *------------------------------------------------------------------------------*/
+  /*------------------------------------------------------------------------------
+  *  Method 2: Test out Calculated from Cubic Interpolation and Linear interpolation
+  *------------------------------------------------------------------------------*/
 
-   for(i=0; i< TEST_LENGTH_SAMPLES; i++)
-   {
-     	testLinIntOutput[i] = arm_linear_interp_f32(&S, testInputSin_f32[i]);
-   }
+  for(i=0; i< TEST_LENGTH_SAMPLES; i++)
+  {
+      testLinIntOutput[i] = arm_linear_interp_f32(&S, testInputSin_f32[i]);
+  }
 
-   /*------------------------------------------------------------------------------
-   *  SNR calculation for method 1
-   *------------------------------------------------------------------------------*/
-   snr1 = arm_snr_f32(testRefSinOutput32_f32, testOutput, 2);
+  /*------------------------------------------------------------------------------
+  *            SNR calculation for method 1
+  *------------------------------------------------------------------------------*/
+  snr1 = arm_snr_f32(testRefSinOutput32_f32, testOutput, 2);
 
-   /*------------------------------------------------------------------------------
-   *  SNR calculation for method 2
-   *------------------------------------------------------------------------------*/
-   snr2 = arm_snr_f32(testRefSinOutput32_f32, testLinIntOutput, 2);
+  /*------------------------------------------------------------------------------
+  *            SNR calculation for method 2
+  *------------------------------------------------------------------------------*/
+  snr2 = arm_snr_f32(testRefSinOutput32_f32, testLinIntOutput, 2);
 
-   /*------------------------------------------------------------------------------
-   *  					Initialise status depending on SNR calculations
-   *------------------------------------------------------------------------------*/
-   if( snr2 > snr1)
-   {
-      status = ARM_MATH_SUCCESS;
-   }
-   else
-   {
-      status = ARM_MATH_TEST_FAILURE;
-   }
+  /*------------------------------------------------------------------------------
+  *            Initialise status depending on SNR calculations
+  *------------------------------------------------------------------------------*/
+  if( snr2 > snr1)
+  {
+    status = ARM_MATH_SUCCESS;
+  }
+  else
+  {
+    status = ARM_MATH_TEST_FAILURE;
+  }
 
-   /* ----------------------------------------------------------------------
-   ** Loop here if the signals fail the PASS check.
-   ** This denotes a test failure
-   ** ------------------------------------------------------------------- */
-   if( status != ARM_MATH_SUCCESS)
-   {
-      while(1);
-   }
+  /* ----------------------------------------------------------------------
+  ** Loop here if the signals fail the PASS check.
+  ** This denotes a test failure
+  ** ------------------------------------------------------------------- */
+  if( status != ARM_MATH_SUCCESS)
+  {
+    while(1);
+  }
 
-   while(1);                             /* main function does not return */
+  while(1);                             /* main function does not return */
 }
 
  /** \endlink */
-

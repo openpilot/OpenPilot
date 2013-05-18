@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
-  @note    Copyright (C) 2011-2012 ARM Limited. All rights reserved.
-  @par
-   ARM Limited (ARM) is supplying this software for use with Cortex-M
-   processor based microcontroller, but can be equally used for other
-   suitable  processor architectures. This file can be freely distributed.
-   Modifications to this file shall be clearly marked.
+  date: 04.07.2012
 
-  @date: 12.03.2012
+  Copyright (C) 2011 - 2012 ARM Limited. All rights reserved.
 
-  @par
-   THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED
-   OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF
-   MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.
-   ARM SHALL NOT, IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR
-   CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+   - Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+   - Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+   - Neither the name of ARM nor the names of its contributors may be used 
+     to endorse or promote products derived from this software without 
+     specific prior written permission.
 
-  This is a draft for CMSIS-SVD version 1.1
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE.
+
+  This is CMSIS-SVD version 1.1
   For backward compatibility all additional tags have been made optional.
   Extensions may be mandatory for successful device header file generation
   Other changes are related to some restructuring of the schema.
@@ -256,8 +267,11 @@
       <xs:element name="mpuPresent" type="xs:boolean"/>
       <!-- V1.1: fpuPresent specifies whether or not a floating point hardware unit is physically present -->
       <xs:element name="fpuPresent" type="xs:boolean"/>
+      <!-- V1.1: vtorPresent is used for Cortex-M0+ based devices only. It indicates whether the Vector Table Offset
+                 Register is implemented in the device or not -->				   
+      <xs:element name="vtorPresent" type="xs:boolean" minOccurs="0"/>
       <!-- V1.1: nvicPrioBits specifies the number of bits used by the Nested Vectored Interrupt Controller
-                   for defining the priority level = # priority levels -->
+                 for defining the priority level = # priority levels -->
       <xs:element name="nvicPrioBits" type="scaledNonNegativeInteger"/>
       <!-- V1.1: vendorSystickConfig is set true if a custom system timer is implemented in the device 
                    instead of the ARM specified SysTickTimer -->
@@ -291,7 +305,7 @@
         </xs:complexType>
       </xs:element>
     </xs:sequence>
-    <xs:attribute name="derivedFrom" type="identifierType" use="optional"/>
+    <xs:attribute name="derivedFrom" type="enumerationNameType" use="optional"/>
   </xs:complexType>
 
   <xs:complexType name="fieldType">

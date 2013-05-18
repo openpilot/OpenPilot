@@ -371,14 +371,6 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             gyroSensorData.z = gyros_out[2];
         }
 
-/* TODO        if (bias_correct_gyro) {
-            // Apply bias correction to the gyros from the state estimator
-            GyrosBiasData gyrosBias;
-            GyrosBiasGet(&gyrosBias);
-            gyrosData.x -= gyrosBias.x;
-            gyrosData.y -= gyrosBias.y;
-            gyrosData.z -= gyrosBias.z;
-        }*/
         GyroSensorSet(&gyroSensorData);
 
         // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
@@ -403,14 +395,6 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                 mag.y = mags[1];
                 mag.z = mags[2];
             }
-
-            // Correct for mag bias and update if the rate is non zero
-// TODO
-/*
-            if (cal.MagBiasNullingRate > 0) {
-                magOffsetEstimation(&mag);
-            }
- */
 
             MagnetoSensorSet(&mag);
             mag_update_time = PIOS_DELAY_GetRaw();

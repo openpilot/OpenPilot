@@ -649,7 +649,7 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
 	.irq = {
 		.init    = {
 			.NVIC_IRQChannel                   = USB_LP_CAN1_RX0_IRQn,
-			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
+			.NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
 			.NVIC_IRQChannelSubPriority        = 0,
 			.NVIC_IRQChannelCmd                = ENABLE,
 		},

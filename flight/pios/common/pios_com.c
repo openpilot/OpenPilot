@@ -70,9 +70,10 @@ static struct pios_com_dev * PIOS_COM_alloc(void)
 {
 	struct pios_com_dev * com_dev;
 
-	com_dev = (struct pios_com_dev *)pvPortMalloc(sizeof(*com_dev));
+	com_dev = (struct pios_com_dev *)pvPortMalloc(sizeof(struct pios_com_dev));
 	if (!com_dev) return (NULL);
 
+	memset(com_dev, 0, sizeof(struct pios_com_dev));
 	com_dev->magic = PIOS_COM_DEV_MAGIC;
 	return(com_dev);
 }
@@ -88,6 +89,8 @@ static struct pios_com_dev * PIOS_COM_alloc(void)
 	}
 
 	com_dev = &pios_com_devs[pios_com_num_devs++];
+
+	memset(com_dev, 0, sizeof(struct pios_com_dev));
 	com_dev->magic = PIOS_COM_DEV_MAGIC;
 
 	return (com_dev);
@@ -278,6 +281,18 @@ int32_t PIOS_COM_SendBufferNonBlocking(uint32_t com_id, const uint8_t *buffer, u
 	}
 
 	PIOS_Assert(com_dev->has_tx);
+
+	if (com_dev->driver->available && !com_dev->driver->available(com_dev->lower_id)) {
+		/*
+		 * Underlying device is down/unconnected.
+		 * Dump our fifo contents and act like an infinite data sink.
+		 * Failure to do this results in stale data in the fifo as well as
+		 * possibly having the caller block trying to send to a device that's
+		 * no longer accepting data.
+		 */
+		fifoBuf_clearData(&com_dev->tx);
+		return len;
+	}
 
 	if (len > fifoBuf_getFree(&com_dev->tx)) {
 		/* Buffer cannot accept all requested bytes (retry) */

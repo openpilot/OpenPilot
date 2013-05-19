@@ -44,7 +44,7 @@ ifeq ($(MCU),cortex-m3)
     include $(PIOS)/stm32f10x/library.mk
 
     ## The standard CMSIS startup
-    SRC += $(CMSIS_DIR)/system_stm32f10x.c
+    SRC += $(CMSIS_DEVICEDIR)/system_stm32f10x.c
 
     # Set linker-script name depending on selected submodel name
     LDFLAGS += -T$(LINKER_SCRIPTS_PATH)/link_$(BOARD)_memory.ld

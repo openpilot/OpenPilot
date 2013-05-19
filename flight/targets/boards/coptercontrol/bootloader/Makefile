@@ -21,7 +21,7 @@ ifndef OPENPILOT_IS_COOL
 endif
 
 ## The standard CMSIS startup
-SRC += $(CMSIS_DIR)/system_stm32f10x.c
+SRC += $(CMSIS_DEVICEDIR)/system_stm32f10x.c
 
 include ../board-info.mk
 include $(ROOT_DIR)/make/firmware-defs.mk

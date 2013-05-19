@@ -47,7 +47,7 @@ MODULES += Telemetry
 #MODULES += Battery
 #MODULES += TxPID
 
-OPTMODULES =
+OPTMODULES += ComUsbBridge
 
 # Include all camera options
 CDEFS += -DUSE_INPUT_LPF -DUSE_GIMBAL_LPF -DUSE_GIMBAL_FF

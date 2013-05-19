@@ -33,19 +33,17 @@
 
 class GCSControlGadgetFactory;
 
-class GCSControlPlugin : public ExtensionSystem::IPlugin
-{
+class GCSControlPlugin : public ExtensionSystem::IPlugin {
 public:
     GCSControlPlugin();
-   ~GCSControlPlugin();
+    ~GCSControlPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
-   SDLGamepad *sdlGamepad;
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
+    SDLGamepad *sdlGamepad;
 
 private:
-   GCSControlGadgetFactory *mf;
-
+    GCSControlGadgetFactory *mf;
 };
 #endif /* GCSControlPLUGIN_H_ */

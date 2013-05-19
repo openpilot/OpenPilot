@@ -7,7 +7,7 @@
  * @{
  * @addtogroup EmptyGadgetPlugin Empty Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -35,7 +35,7 @@
 
 EmptyGadgetWidget::EmptyGadgetWidget(QWidget *parent) : QLabel(parent)
 {
-    setMinimumSize(64,64);
+    setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     this->
     setText(tr("Choose a gadget to display in this view.\n") +
@@ -45,6 +45,5 @@ EmptyGadgetWidget::EmptyGadgetWidget(QWidget *parent) : QLabel(parent)
 
 EmptyGadgetWidget::~EmptyGadgetWidget()
 {
-   // Do nothing
+    // Do nothing
 }
-

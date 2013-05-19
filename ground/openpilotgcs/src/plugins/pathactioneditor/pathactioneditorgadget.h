@@ -32,27 +32,35 @@
 namespace Core {
 class IUAVGadget;
 }
-//class QWidget;
-//class QString;
+// class QWidget;
+// class QString;
 class PathActionEditorGadgetWidget;
 
 using namespace Core;
 
-class PathActionEditorGadget : public Core::IUAVGadget
-{
+class PathActionEditorGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     PathActionEditorGadget(QString classId, PathActionEditorGadgetWidget *widget, QWidget *parent = 0);
     ~PathActionEditorGadget();
 
-    QList<int> context() const { return m_context; }
-    QWidget *widget() { return m_widget; }
-    QString contextHelpId() const { return QString(); }
+    QList<int> context() const
+    {
+        return m_context;
+    }
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    QString contextHelpId() const
+    {
+        return QString();
+    }
 
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 private:
-        QWidget *m_widget;
-	QList<int> m_context;
+    QWidget *m_widget;
+    QList<int> m_context;
 };
 
 

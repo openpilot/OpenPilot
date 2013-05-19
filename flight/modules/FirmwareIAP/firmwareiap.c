@@ -4,7 +4,7 @@
  * @file       firmwareiap.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      In Application Programming module to support firmware upgrades by
- * 				providing a means to enter the bootloader.
+ *                              providing a means to enter the bootloader.
  *
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -40,7 +40,7 @@
 
 #define IAP_CMD_CRC         100
 #define IAP_CMD_VERIFY      101
-#define IAP_CMD_VERSION	    102
+#define IAP_CMD_VERSION     102
 
 #define IAP_STATE_READY     0
 #define IAP_STATE_STEP_1    1
@@ -49,13 +49,13 @@
 
 #define RESET_DELAY         500 /* delay between sending reset ot INS */
 
-#define TICKS2MS(t)	((t)/portTICK_RATE_MS)
-#define MS2TICKS(m)	((m)*portTICK_RATE_MS)
+#define TICKS2MS(t) ((t) / portTICK_RATE_MS)
+#define MS2TICKS(m) ((m) * portTICK_RATE_MS)
 
-const uint32_t    iap_time_2_low_end = 500;
-const uint32_t    iap_time_2_high_end = 5000;
-const uint32_t    iap_time_3_low_end = 500;
-const uint32_t    iap_time_3_high_end = 5000;
+const uint32_t iap_time_2_low_end  = 500;
+const uint32_t iap_time_2_high_end = 5000;
+const uint32_t iap_time_3_low_end  = 500;
+const uint32_t iap_time_3_high_end = 5000;
 
 // Private types
 
@@ -64,9 +64,9 @@ static uint8_t reset_count = 0;
 static portTickType lastResetSysTime;
 
 // Private functions
-static void FirmwareIAPCallback(UAVObjEvent* ev);
+static void FirmwareIAPCallback(UAVObjEvent *ev);
 
-static uint32_t	get_time(void);
+static uint32_t get_time(void);
 
 // Private types
 
@@ -89,28 +89,29 @@ static void resetTask(UAVObjEvent *);
 MODULE_INITCALL(FirmwareIAPInitialize, 0)
 int32_t FirmwareIAPInitialize()
 {
-	
-	FirmwareIAPObjInitialize();
-	
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+    FirmwareIAPObjInitialize();
 
-	FirmwareIAPObjData data;
-	FirmwareIAPObjGet(&data);
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
 
-	data.BoardType= bdinfo->board_type;
-	PIOS_BL_HELPER_FLASH_Read_Description(data.Description,FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
-	PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
-	data.BoardRevision= bdinfo->board_rev;
-	data.ArmReset=0;
-	data.crc = 0;
-	FirmwareIAPObjSet( &data );
-	if(bdinfo->magic==PIOS_BOARD_INFO_BLOB_MAGIC) FirmwareIAPObjConnectCallback( &FirmwareIAPCallback );
-	return 0;
+    FirmwareIAPObjData data;
+    FirmwareIAPObjGet(&data);
+
+    data.BoardType     = bdinfo->board_type;
+    PIOS_BL_HELPER_FLASH_Read_Description(data.Description, FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
+    PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
+    data.BoardRevision = bdinfo->board_rev;
+    data.ArmReset = 0;
+    data.crc = 0;
+    FirmwareIAPObjSet(&data);
+    if (bdinfo->magic == PIOS_BOARD_INFO_BLOB_MAGIC) {
+        FirmwareIAPObjConnectCallback(&FirmwareIAPCallback);
+    }
+    return 0;
 }
 
 int32_t FirmwareIAPStart()
 {
-	return 0;
+    return 0;
 }
 
 /*!
@@ -121,98 +122,96 @@ int32_t FirmwareIAPStart()
  * \note
  *
  */
-static uint8_t    iap_state = IAP_STATE_READY;
-static void FirmwareIAPCallback(UAVObjEvent* ev)
+static uint8_t iap_state = IAP_STATE_READY;
+static void FirmwareIAPCallback(UAVObjEvent *ev)
 {
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
-	static uint32_t   last_time = 0;
-	uint32_t          this_time;
-	uint32_t          delta;
-	
-	if(iap_state == IAP_STATE_RESETTING)
-		return;
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
+    static uint32_t last_time = 0;
+    uint32_t this_time;
+    uint32_t delta;
 
-	FirmwareIAPObjData data;
-	FirmwareIAPObjGet(&data);
-	
-	if ( ev->obj == FirmwareIAPObjHandle() )	{
-		// Get the input object data
-		FirmwareIAPObjGet(&data);
-		this_time = get_time();
-		delta = this_time - last_time;
-		last_time = this_time;
-		if((data.BoardType==bdinfo->board_type)&&(data.crc != PIOS_BL_HELPER_CRC_Memory_Calc()))
-		{
-			PIOS_BL_HELPER_FLASH_Read_Description(data.Description,FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
-			PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
-			data.BoardRevision=bdinfo->board_rev;
-			data.crc = PIOS_BL_HELPER_CRC_Memory_Calc();
-			FirmwareIAPObjSet( &data );
-		}
-		if((data.ArmReset==1)&&(iap_state!=IAP_STATE_RESETTING))
-		{
-			data.ArmReset=0;
-			FirmwareIAPObjSet( &data );
-		}
-		switch(iap_state) {
-			case IAP_STATE_READY:
-				if( data.Command == IAP_CMD_STEP_1 ) {
-					iap_state = IAP_STATE_STEP_1;
-				}            break;
-			case IAP_STATE_STEP_1:
-				if( data.Command == IAP_CMD_STEP_2 ) {
-					if( delta > iap_time_2_low_end && delta < iap_time_2_high_end ) {
-						iap_state = IAP_STATE_STEP_2;
-					} else {
-						iap_state = IAP_STATE_READY;
-					}
-				} else {
-					iap_state = IAP_STATE_READY;
-				}
-				break;
-			case IAP_STATE_STEP_2:
-				if( data.Command == IAP_CMD_STEP_3 ) {
-					if( delta > iap_time_3_low_end && delta < iap_time_3_high_end ) {
-						
-						FlightStatusData flightStatus;
-						FlightStatusGet(&flightStatus);
-						
-						if(flightStatus.Armed != FLIGHTSTATUS_ARMED_DISARMED) {
-							// Abort any attempts if not disarmed
-							iap_state = IAP_STATE_READY;
-							break;
-						}
-							
-						// we've met the three sequence of command numbers
-						// we've met the time requirements.
-						PIOS_IAP_SetRequest1();
-						PIOS_IAP_SetRequest2();
-						
-						/* Note: Cant just wait timeout value, because first time is randomized */
-						reset_count = 0;
-						lastResetSysTime = xTaskGetTickCount();
-						UAVObjEvent *event = pvPortMalloc(sizeof(UAVObjEvent));
-						memset(event, 0, sizeof(UAVObjEvent));
-						EventPeriodicCallbackCreate(event, resetTask, 100);
-						iap_state = IAP_STATE_RESETTING;
-					} else {
-						iap_state = IAP_STATE_READY;
-					}
-				} else {
-					iap_state = IAP_STATE_READY;
-				}
-				break;
-			case IAP_STATE_RESETTING:
-				// stay here permanentally, should reboot
-				break;
-			default:
-				iap_state = IAP_STATE_READY;
-				last_time = 0; // Reset the time counter, as we are not doing a IAP reset
-				break;
-		}
-	}
+    if (iap_state == IAP_STATE_RESETTING) {
+        return;
+    }
+
+    FirmwareIAPObjData data;
+    FirmwareIAPObjGet(&data);
+
+    if (ev->obj == FirmwareIAPObjHandle()) {
+        // Get the input object data
+        FirmwareIAPObjGet(&data);
+        this_time = get_time();
+        delta     = this_time - last_time;
+        last_time = this_time;
+        if ((data.BoardType == bdinfo->board_type) && (data.crc != PIOS_BL_HELPER_CRC_Memory_Calc())) {
+            PIOS_BL_HELPER_FLASH_Read_Description(data.Description, FIRMWAREIAPOBJ_DESCRIPTION_NUMELEM);
+            PIOS_SYS_SerialNumberGetBinary(data.CPUSerial);
+            data.BoardRevision = bdinfo->board_rev;
+            data.crc = PIOS_BL_HELPER_CRC_Memory_Calc();
+            FirmwareIAPObjSet(&data);
+        }
+        if ((data.ArmReset == 1) && (iap_state != IAP_STATE_RESETTING)) {
+            data.ArmReset = 0;
+            FirmwareIAPObjSet(&data);
+        }
+        switch (iap_state) {
+        case IAP_STATE_READY:
+            if (data.Command == IAP_CMD_STEP_1) {
+                iap_state = IAP_STATE_STEP_1;
+            }
+            break;
+        case IAP_STATE_STEP_1:
+            if (data.Command == IAP_CMD_STEP_2) {
+                if (delta > iap_time_2_low_end && delta < iap_time_2_high_end) {
+                    iap_state = IAP_STATE_STEP_2;
+                } else {
+                    iap_state = IAP_STATE_READY;
+                }
+            } else {
+                iap_state = IAP_STATE_READY;
+            }
+            break;
+        case IAP_STATE_STEP_2:
+            if (data.Command == IAP_CMD_STEP_3) {
+                if (delta > iap_time_3_low_end && delta < iap_time_3_high_end) {
+                    FlightStatusData flightStatus;
+                    FlightStatusGet(&flightStatus);
+
+                    if (flightStatus.Armed != FLIGHTSTATUS_ARMED_DISARMED) {
+                        // Abort any attempts if not disarmed
+                        iap_state = IAP_STATE_READY;
+                        break;
+                    }
+
+                    // we've met the three sequence of command numbers
+                    // we've met the time requirements.
+                    PIOS_IAP_SetRequest1();
+                    PIOS_IAP_SetRequest2();
+
+                    /* Note: Cant just wait timeout value, because first time is randomized */
+                    reset_count = 0;
+                    lastResetSysTime = xTaskGetTickCount();
+                    UAVObjEvent *event = pvPortMalloc(sizeof(UAVObjEvent));
+                    memset(event, 0, sizeof(UAVObjEvent));
+                    EventPeriodicCallbackCreate(event, resetTask, 100);
+                    iap_state = IAP_STATE_RESETTING;
+                } else {
+                    iap_state = IAP_STATE_READY;
+                }
+            } else {
+                iap_state = IAP_STATE_READY;
+            }
+            break;
+        case IAP_STATE_RESETTING:
+            // stay here permanentally, should reboot
+            break;
+        default:
+            iap_state = IAP_STATE_READY;
+            last_time = 0; // Reset the time counter, as we are not doing a IAP reset
+            break;
+        }
+    }
 }
-
 
 
 // Returns number of milliseconds from the start of the kernel.
@@ -228,39 +227,38 @@ static void FirmwareIAPCallback(UAVObjEvent* ev)
 
 static uint32_t get_time(void)
 {
-	portTickType	ticks;
-	
-	ticks = xTaskGetTickCount();
-	
-	return TICKS2MS(ticks);
+    portTickType ticks;
+
+    ticks = xTaskGetTickCount();
+
+    return TICKS2MS(ticks);
 }
 
 /**
- * Executed by event dispatcher callback to reset INS before resetting OP 
+ * Executed by event dispatcher callback to reset INS before resetting OP
  */
-static void resetTask(__attribute__((unused)) UAVObjEvent * ev)
+static void resetTask(__attribute__((unused)) UAVObjEvent *ev)
 {
-#if defined (PIOS_LED_HEARTBEAT)
-	PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
-#endif	/* PIOS_LED_HEARTBEAT */
+#if defined(PIOS_LED_HEARTBEAT)
+    PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+#endif /* PIOS_LED_HEARTBEAT */
 
-#if defined (PIOS_LED_ALARM)
-	PIOS_LED_Toggle(PIOS_LED_ALARM);
-#endif	/* PIOS_LED_ALARM */
+#if defined(PIOS_LED_ALARM)
+    PIOS_LED_Toggle(PIOS_LED_ALARM);
+#endif /* PIOS_LED_ALARM */
 
-	FirmwareIAPObjData data;
-	FirmwareIAPObjGet(&data);
+    FirmwareIAPObjData data;
+    FirmwareIAPObjGet(&data);
 
-	if((portTickType) (xTaskGetTickCount() - lastResetSysTime) > RESET_DELAY / portTICK_RATE_MS) {
-		lastResetSysTime = xTaskGetTickCount();
-		data.BoardType=0xFF;
-		data.ArmReset=1;
-		data.crc=reset_count; /* Must change a value for this to get to INS */
-		FirmwareIAPObjSet(&data);
-		++reset_count;
-		if(reset_count>3)
-		{
-			PIOS_SYS_Reset();
-		}
-	}
+    if ((portTickType)(xTaskGetTickCount() - lastResetSysTime) > RESET_DELAY / portTICK_RATE_MS) {
+        lastResetSysTime = xTaskGetTickCount();
+        data.BoardType   = 0xFF;
+        data.ArmReset    = 1;
+        data.crc = reset_count; /* Must change a value for this to get to INS */
+        FirmwareIAPObjSet(&data);
+        ++reset_count;
+        if (reset_count > 3) {
+            PIOS_SYS_Reset();
+        }
+    }
 }

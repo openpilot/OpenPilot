@@ -35,52 +35,48 @@
 #include "gpsparser.h"
 
 // constants/macros/typdefs
-#define NMEA_BUFFERSIZE		128
+#define NMEA_BUFFERSIZE 128
 
-typedef struct struct_GpsData
-{
-        double Latitude;
-        double Longitude;
-        double Altitude;
-        double Groundspeed;
-        double Heading;
-        int SV;
-        int Status;
-        double PDOP;
-        double HDOP;
-        double VDOP;
-        double GeoidSeparation;
-        double GPStime;
-        double GPSdate;
+typedef struct struct_GpsData {
+    double Latitude;
+    double Longitude;
+    double Altitude;
+    double Groundspeed;
+    double Heading;
+    int    SV;
+    int    Status;
+    double PDOP;
+    double HDOP;
+    double VDOP;
+    double GeoidSeparation;
+    double GPStime;
+    double GPSdate;
+} GpsData_t;
 
-}GpsData_t;
-
-class NMEAParser: public GPSParser
-{
+class NMEAParser : public GPSParser {
     Q_OBJECT
 
 public:
-   NMEAParser(QObject *parent = 0);
-   ~NMEAParser();
-   void processInputStream(char c);
-   char* nmeaGetPacketBuffer(void);
-   char nmeaChecksum(char* gps_buffer);
-   void nmeaTerminateAtChecksum(char* gps_buffer);
-   uint8_t nmeaProcess(cBuffer* rxBuffer);
-   void nmeaProcessGPGGA(char* packet);
-   void nmeaProcessGPRMC(char* packet);
-   void nmeaProcessGPVTG(char* packet);
-   void nmeaProcessGPGSA(char* packet);
-   void nmeaProcessGPGSV(char* packet);
-   void nmeaProcessGPZDA(char* packet);
-   GpsData_t GpsData;
-   cBuffer gpsRxBuffer;
-   char gpsRxData[512];
-   char NmeaPacket[NMEA_BUFFERSIZE];
-   uint32_t numUpdates;
-   uint32_t numErrors;
-   int32_t gpsRxOverflow;
-
+    NMEAParser(QObject *parent = 0);
+    ~NMEAParser();
+    void processInputStream(char c);
+    char *nmeaGetPacketBuffer(void);
+    char nmeaChecksum(char *gps_buffer);
+    void nmeaTerminateAtChecksum(char *gps_buffer);
+    uint8_t nmeaProcess(cBuffer *rxBuffer);
+    void nmeaProcessGPGGA(char *packet);
+    void nmeaProcessGPRMC(char *packet);
+    void nmeaProcessGPVTG(char *packet);
+    void nmeaProcessGPGSA(char *packet);
+    void nmeaProcessGPGSV(char *packet);
+    void nmeaProcessGPZDA(char *packet);
+    GpsData_t GpsData;
+    cBuffer gpsRxBuffer;
+    char gpsRxData[512];
+    char NmeaPacket[NMEA_BUFFERSIZE];
+    uint32_t numUpdates;
+    uint32_t numErrors;
+    int32_t gpsRxOverflow;
 };
 
 #endif // NMEAPARSER_H

@@ -36,8 +36,7 @@
 
 class Ui_PathActionEditor;
 
-class PathActionEditorGadgetWidget : public QLabel
-{
+class PathActionEditorGadgetWidget : public QLabel {
     Q_OBJECT
 
 public:
@@ -52,7 +51,7 @@ protected slots:
     void addWaypointInstance();
 
 private:
-    Ui_PathActionEditor * m_pathactioneditor;
+    Ui_PathActionEditor *m_pathactioneditor;
     PathActionEditorTreeModel *m_model;
     PathAction *pathactionObj;
     Waypoint *waypointObj;

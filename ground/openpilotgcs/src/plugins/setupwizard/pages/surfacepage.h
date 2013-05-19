@@ -34,14 +34,13 @@ namespace Ui {
 class SurfacePage;
 }
 
-class SurfacePage : public AbstractWizardPage
-{
+class SurfacePage : public AbstractWizardPage {
     Q_OBJECT
-    
+
 public:
     explicit SurfacePage(SetupWizard *wizard, QWidget *parent = 0);
     ~SurfacePage();
-    
+
 private:
     Ui::SurfacePage *ui;
 };

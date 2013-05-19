@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ConsolePlugin Console Plugin
  * @{
- * @brief The Console Gadget impliments a console view 
+ * @brief The Console Gadget impliments a console view
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -38,16 +38,24 @@ class TextEditLoggerEngine;
 
 using namespace Core;
 
-class ConsoleGadget : public Core::IUAVGadget
-{
+class ConsoleGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     ConsoleGadget(QString classId, ConsoleGadgetWidget *widget, QWidget *parent = 0);
     ~ConsoleGadget();
 
-    QList<int> context() const { return m_context; }
-    QWidget *widget() { return m_widget; }
-    QString contextHelpId() const { return QString(); }
+    QList<int> context() const
+    {
+        return m_context;
+    }
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    QString contextHelpId() const
+    {
+        return QString();
+    }
 
 private:
     QWidget *m_widget;

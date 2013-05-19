@@ -49,7 +49,7 @@
  *
  * @see SDLGamepad::setTickRate()
  */
-#define MIN_RATE 10
+#define MIN_RATE   10
 
 /**
  * Axis enumeration.
@@ -58,17 +58,16 @@
  * dealing with axes numbers. Up to 10 axes are supported. That should
  * be more than enough for every gamepad out there.
  */
-enum AxisNumber
-{
-  AXIS_1,
-  AXIS_2,
-  AXIS_3,
-  AXIS_4,
-  AXIS_5,
-  AXIS_6,
-  AXIS_7,
-  AXIS_8,
-  AXIS_9
+enum AxisNumber {
+    AXIS_1,
+    AXIS_2,
+    AXIS_3,
+    AXIS_4,
+    AXIS_5,
+    AXIS_6,
+    AXIS_7,
+    AXIS_8,
+    AXIS_9
 };
 
 /**
@@ -81,28 +80,27 @@ enum AxisNumber
  *
  * @see SDLGamepad::buttonState()
  */
-enum ButtonNumber
-{
-  BUTTON_01,
-  BUTTON_02,
-  BUTTON_03,
-  BUTTON_04,
-  BUTTON_05,
-  BUTTON_06,
-  BUTTON_07,
-  BUTTON_08,
-  BUTTON_09,
-  BUTTON_10,
-  BUTTON_11,
-  BUTTON_12,
-  BUTTON_13,
-  BUTTON_14,
-  BUTTON_15,
-  BUTTON_16,
-  BUTTON_17,
-  BUTTON_18,
-  BUTTON_19,
-  BUTTON_20
+enum ButtonNumber {
+    BUTTON_01,
+    BUTTON_02,
+    BUTTON_03,
+    BUTTON_04,
+    BUTTON_05,
+    BUTTON_06,
+    BUTTON_07,
+    BUTTON_08,
+    BUTTON_09,
+    BUTTON_10,
+    BUTTON_11,
+    BUTTON_12,
+    BUTTON_13,
+    BUTTON_14,
+    BUTTON_15,
+    BUTTON_16,
+    BUTTON_17,
+    BUTTON_18,
+    BUTTON_19,
+    BUTTON_20
 };
 
 /**
@@ -129,11 +127,10 @@ typedef QList<qint16> QListInt16;
  * @version 1.0
  * @date 2009
  */
-class SDLGAMEPADSHARED_EXPORT SDLGamepad : public QThread
-{
-  Q_OBJECT
+class SDLGAMEPADSHARED_EXPORT SDLGamepad : public QThread {
+    Q_OBJECT
 
-  public:
+public:
 
     /**
      * Class constructor.
@@ -182,7 +179,7 @@ class SDLGAMEPADSHARED_EXPORT SDLGamepad : public QThread
      */
     qint16 getButtons();
 
-  public slots:
+public slots:
 
     /**
      * Init the SDL system and set up gamepad.
@@ -227,7 +224,7 @@ class SDLGAMEPADSHARED_EXPORT SDLGamepad : public QThread
      */
     bool setGamepad(qint16 index);
 
-  private:
+private:
 
     /**
      * Variable to control thread.
@@ -312,7 +309,7 @@ class SDLGAMEPADSHARED_EXPORT SDLGamepad : public QThread
      */
     QList<qint16> buttonStates;
 
-  signals:
+signals:
 
     /**
      * A signal that emitts the number of gamepads present in SDL.

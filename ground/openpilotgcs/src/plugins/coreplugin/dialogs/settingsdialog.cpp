@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -32,7 +32,7 @@
 #include "icore.h"
 #include "coreplugin/uavgadgetinstancemanager.h"
 #include "coreplugin/uavgadgetoptionspagedecorator.h"
-//#include "coreimpl.h"
+// #include "coreimpl.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QSettings>
@@ -41,11 +41,11 @@
 #include <QtGui/QPushButton>
 
 namespace {
-    struct PageData {
-        int index;
-        QString category;
-        QString id;
-    };
+struct PageData {
+    int     index;
+    QString category;
+    QString id;
+};
 }
 
 Q_DECLARE_METATYPE(::PageData)
@@ -56,23 +56,27 @@ using namespace Core::Internal;
 // Helpers to sort by category. id
 bool optionsPageLessThan(const IOptionsPage *p1, const IOptionsPage *p2)
 {
-    const UAVGadgetOptionsPageDecorator *gp1 = qobject_cast<const UAVGadgetOptionsPageDecorator*>(p1);
-    const UAVGadgetOptionsPageDecorator *gp2 = qobject_cast<const UAVGadgetOptionsPageDecorator*>(p2);
-    if (gp1 && (gp2 == NULL))
+    const UAVGadgetOptionsPageDecorator *gp1 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p1);
+    const UAVGadgetOptionsPageDecorator *gp2 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p2);
+
+    if (gp1 && (gp2 == NULL)) {
         return false;
+    }
 
-    if (gp2 && (gp1 == NULL))
+    if (gp2 && (gp1 == NULL)) {
         return true;
+    }
 
-    if (const int cc = QString::localeAwareCompare(p1->trCategory(), p2->trCategory()))
+    if (const int cc = QString::localeAwareCompare(p1->trCategory(), p2->trCategory())) {
         return cc < 0;
+    }
 
     return QString::localeAwareCompare(p1->trName(), p2->trName()) < 0;
 }
 
-static inline QList<Core::IOptionsPage*> sortedOptionsPages()
+static inline QList<Core::IOptionsPage *> sortedOptionsPages()
 {
-    QList<Core::IOptionsPage*> rc = ExtensionSystem::PluginManager::instance()->getObjects<IOptionsPage>();
+    QList<Core::IOptionsPage *> rc = ExtensionSystem::PluginManager::instance()->getObjects<IOptionsPage>();
     qStableSort(rc.begin(), rc.end(), optionsPageLessThan);
     return rc;
 }
@@ -93,15 +97,15 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
     // restore last displayed category and page
     // this is done only if no category or page was provided through the constructor
     QString initialCategory = categoryId;
-    QString initialPage = pageId;
+    QString initialPage     = pageId;
     qDebug() << "SettingsDialog constructor initial category:" << initialCategory << ", initial page:" << initialPage;
     if (initialCategory.isEmpty() && initialPage.isEmpty()) {
         initialCategory = settings->value("LastPreferenceCategory", QVariant(QString())).toString();
-        initialPage = settings->value("LastPreferencePage", QVariant(QString())).toString();
+        initialPage     = settings->value("LastPreferencePage", QVariant(QString())).toString();
         qDebug() << "SettingsDialog settings initial category:" << initialCategory << ", initial page: " << initialPage;
     }
     // restore window size
-    int windowWidth = settings->value("SettingsWindowWidth", 0).toInt();
+    int windowWidth  = settings->value("SettingsWindowWidth", 0).toInt();
     int windowHeight = settings->value("SettingsWindowHeight", 0).toInt();
     qDebug() << "SettingsDialog window width :" << windowWidth << ", height:" << windowHeight;
     if (windowWidth > 0 && windowHeight > 0) {
@@ -112,31 +116,32 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 
     connect(buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(apply()));
-   
+
     m_instanceManager = Core::ICore::instance()->uavGadgetInstanceManager();
-    
-    connect(this, SIGNAL(settingsDialogShown(Core::Internal::SettingsDialog*)), m_instanceManager, SLOT(settingsDialogShown(Core::Internal::SettingsDialog*)));
+
+    connect(this, SIGNAL(settingsDialogShown(Core::Internal::SettingsDialog *)), m_instanceManager, SLOT(settingsDialogShown(Core::Internal::SettingsDialog *)));
     connect(this, SIGNAL(settingsDialogRemoved()), m_instanceManager, SLOT(settingsDialogRemoved()));
     connect(this, SIGNAL(categoryItemSelected()), this, SLOT(categoryItemSelectedShowChildInstead()), Qt::QueuedConnection);
 
     splitter->setCollapsible(0, false);
     splitter->setCollapsible(1, false);
     pageTree->header()->setVisible(false);
-//    pageTree->setIconSize(QSize(24, 24));
+// pageTree->setIconSize(QSize(24, 24));
 
     connect(pageTree, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-        this, SLOT(pageSelected()));
+            this, SLOT(pageSelected()));
 
     QMap<QString, QTreeWidgetItem *> categories;
 
-    QList<IOptionsPage*> pages = sortedOptionsPages();
+    QList<IOptionsPage *> pages = sortedOptionsPages();
 
     int index = 0;
     bool firstUavGadgetOptionsPageFound = false;
     QTreeWidgetItem *initialItem = 0;
-    foreach (IOptionsPage *page, pages) {
+    foreach(IOptionsPage * page, pages) {
         PageData pageData;
-        pageData.index = index;
+
+        pageData.index    = index;
         pageData.category = page->category();
         pageData.id = page->id();
 
@@ -144,14 +149,14 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
         item->setText(0, page->trName());
         item->setData(0, Qt::UserRole, qVariantFromValue(pageData));
 
-        QString trCategories = page->trCategory();
+        QString trCategories    = page->trCategory();
         QString currentCategory = page->category();
 
         QTreeWidgetItem *categoryItem;
         if (!categories.contains(currentCategory)) {
             // Above the first gadget option we insert a separator
             if (!firstUavGadgetOptionsPageFound) {
-                UAVGadgetOptionsPageDecorator *pd = qobject_cast<UAVGadgetOptionsPageDecorator*>(page);
+                UAVGadgetOptionsPageDecorator *pd = qobject_cast<UAVGadgetOptionsPageDecorator *>(page);
                 if (pd) {
                     firstUavGadgetOptionsPageFound = true;
                     QTreeWidgetItem *separator = new QTreeWidgetItem(pageTree);
@@ -168,8 +173,8 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
 
         QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(currentCategory);
         if (!categoryItemList) {
-             categoryItemList = new QList<QTreeWidgetItem *>();
-             m_categoryItemsMap.insert(currentCategory, categoryItemList);
+            categoryItemList = new QList<QTreeWidgetItem *>();
+            m_categoryItemsMap.insert(currentCategory, categoryItemList);
         }
         categoryItemList->append(item);
 
@@ -178,7 +183,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
         // creating all option pages upfront is slow, so we create place holder widgets instead
         // the real option page widget will be created later when the user selects it
         // the place holder is a QLabel and we assume that no option page will be a QLabel...
-        QLabel * placeholderWidget = new QLabel(stackedPages);
+        QLabel *placeholderWidget = new QLabel(stackedPages);
         stackedPages->addWidget(placeholderWidget);
 
         if (page->id() == initialPage && currentCategory == initialCategory) {
@@ -191,8 +196,9 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
     foreach(QString category, m_categoryItemsMap.keys()) {
         QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(category);
         if (categoryItemList->size() > 1) {
-            foreach (QTreeWidgetItem *item, *categoryItemList) {
+            foreach(QTreeWidgetItem * item, *categoryItemList) {
                 QTreeWidgetItem *categoryItem = categories.value(category);
+
                 categoryItem->addChild(item);
             }
         }
@@ -223,7 +229,7 @@ SettingsDialog::~SettingsDialog()
     }
     // delete place holders
     for (int i = 0; i < stackedPages->count(); i++) {
-        QLabel * widget = dynamic_cast<QLabel*>(stackedPages->widget(i));
+        QLabel *widget = dynamic_cast<QLabel *>(stackedPages->widget(i));
         if (widget) {
             delete widget;
         }
@@ -233,15 +239,17 @@ SettingsDialog::~SettingsDialog()
 void SettingsDialog::pageSelected()
 {
     QTreeWidgetItem *item = pageTree->currentItem();
-    if (!item)
+
+    if (!item) {
         return;
+    }
 
     PageData data = item->data(0, Qt::UserRole).value<PageData>();
-    int index = data.index;
+    int index     = data.index;
     m_currentCategory = data.category;
-    m_currentPage = data.id;
+    m_currentPage     = data.id;
     // check if we are looking at a place holder or not
-    QWidget *widget = dynamic_cast<QLabel*>(stackedPages->widget(index));
+    QWidget *widget = dynamic_cast<QLabel *>(stackedPages->widget(index));
     if (widget) {
         // place holder found, get rid of it...
         stackedPages->removeWidget(widget);
@@ -261,6 +269,7 @@ void SettingsDialog::pageSelected()
 void SettingsDialog::categoryItemSelectedShowChildInstead()
 {
     QTreeWidgetItem *item = pageTree->currentItem();
+
     item->setExpanded(true);
     pageTree->setCurrentItem(item->child(0), 0, QItemSelectionModel::SelectCurrent);
 }
@@ -268,8 +277,9 @@ void SettingsDialog::categoryItemSelectedShowChildInstead()
 void SettingsDialog::deletePage()
 {
     QTreeWidgetItem *item = pageTree->currentItem();
-    PageData data = item->data(0, Qt::UserRole).value<PageData>();
+    PageData data    = item->data(0, Qt::UserRole).value<PageData>();
     QString category = data.category;
+
     QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(category);
     QTreeWidgetItem *parentItem = item->parent();
     parentItem->removeChild(item);
@@ -280,10 +290,11 @@ void SettingsDialog::deletePage()
     pageSelected();
 }
 
-void SettingsDialog::insertPage(IOptionsPage* page)
+void SettingsDialog::insertPage(IOptionsPage *page)
 {
     PageData pageData;
-    pageData.index = m_pages.count();
+
+    pageData.index    = m_pages.count();
     pageData.category = page->category();
     pageData.id = page->id();
 
@@ -296,8 +307,9 @@ void SettingsDialog::insertPage(IOptionsPage* page)
             break;
         }
     }
-    if (!categoryItem)
+    if (!categoryItem) {
         return;
+    }
 
     // If this category has no child right now
     // we need to add the "default child"
@@ -324,6 +336,7 @@ void SettingsDialog::insertPage(IOptionsPage* page)
 void SettingsDialog::updateText(QString text)
 {
     QTreeWidgetItem *item = pageTree->currentItem();
+
     item->setText(0, text);
 }
 
@@ -337,9 +350,9 @@ void SettingsDialog::accept()
 {
     m_applied = true;
     for (int i = 0; i < m_pages.size(); i++) {
-        QWidget * widget = dynamic_cast<QLabel*>(stackedPages->widget(i));
+        QWidget *widget = dynamic_cast<QLabel *>(stackedPages->widget(i));
         if (!widget) {
-            IOptionsPage * page = m_pages.at(i);
+            IOptionsPage *page = m_pages.at(i);
             page->apply();
             page->finish();
         }
@@ -350,9 +363,9 @@ void SettingsDialog::accept()
 void SettingsDialog::reject()
 {
     for (int i = 0; i < m_pages.size(); i++) {
-        QWidget * widget = dynamic_cast<QLabel*>(stackedPages->widget(i));
+        QWidget *widget = dynamic_cast<QLabel *>(stackedPages->widget(i));
         if (!widget) {
-            IOptionsPage * page = m_pages.at(i);
+            IOptionsPage *page = m_pages.at(i);
             page->finish();
         }
     }
@@ -362,9 +375,9 @@ void SettingsDialog::reject()
 void SettingsDialog::apply()
 {
     for (int i = 0; i < m_pages.size(); i++) {
-        QWidget * widget = dynamic_cast<QLabel*>(stackedPages->widget(i));
+        QWidget *widget = dynamic_cast<QLabel *>(stackedPages->widget(i));
         if (!widget) {
-            IOptionsPage * page = m_pages.at(i);
+            IOptionsPage *page = m_pages.at(i);
             page->apply();
         }
     }
@@ -383,6 +396,7 @@ bool SettingsDialog::execDialog()
 void SettingsDialog::done(int val)
 {
     QSettings *settings = ICore::instance()->settings();
+
     settings->setValue("General/LastPreferenceCategory", m_currentCategory);
     settings->setValue("General/LastPreferencePage", m_currentPage);
     settings->setValue("General/SettingsWindowWidth", this->width());

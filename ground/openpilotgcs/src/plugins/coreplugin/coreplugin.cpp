@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -38,8 +38,7 @@ using namespace Core::Internal;
 
 CorePlugin::CorePlugin() :
     m_mainWindow(new MainWindow)
-{
-}
+{}
 
 CorePlugin::~CorePlugin()
 {
@@ -61,7 +60,7 @@ void CorePlugin::extensionsInitialized()
     m_mainWindow->extensionsInitialized();
 }
 
-void CorePlugin::remoteArgument(const QString& arg)
+void CorePlugin::remoteArgument(const QString & arg)
 {
     // An empty argument is sent to trigger activation
     // of the window via QtSingleApplication. It should be
@@ -69,7 +68,7 @@ void CorePlugin::remoteArgument(const QString& arg)
     if (arg.isEmpty()) {
         m_mainWindow->activateWindow();
     } else {
-        //m_mainWindow->openFiles(QStringList(arg));
+        // m_mainWindow->openFiles(QStringList(arg));
     }
 }
 
@@ -78,4 +77,4 @@ void CorePlugin::shutdown()
     m_mainWindow->shutdown();
 }
 
-Q_EXPORT_PLUGIN2(Core,CorePlugin)
+Q_EXPORT_PLUGIN2(Core, CorePlugin)

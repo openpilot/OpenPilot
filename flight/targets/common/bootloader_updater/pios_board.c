@@ -35,19 +35,19 @@
  */
 #include <board_hw_defs.c>
 
-void PIOS_Board_Init(void) {
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+void PIOS_Board_Init(void)
+{
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
 
-	/* LEDs */
+    /* LEDs */
 #if defined(PIOS_INCLUDE_LED)
-	const struct pios_led_cfg * led_cfg = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
-	PIOS_Assert(led_cfg);
-	PIOS_LED_Init(led_cfg);
-#endif	/* PIOS_INCLUDE_LED */
+    const struct pios_led_cfg *led_cfg = PIOS_BOARD_HW_DEFS_GetLedCfg(bdinfo->board_rev);
+    PIOS_Assert(led_cfg);
+    PIOS_LED_Init(led_cfg);
+#endif /* PIOS_INCLUDE_LED */
 
-	/* Initialize the PiOS library */
+    /* Initialize the PiOS library */
 #if defined(PIOS_INCLUDE_GPIO)
-	PIOS_GPIO_Init();
-#endif  /* PIOS_INCLUDE_GPIO */
-
+    PIOS_GPIO_Init();
+#endif /* PIOS_INCLUDE_GPIO */
 }

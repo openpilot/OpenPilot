@@ -31,13 +31,12 @@
 
 #include "../generator_common.h"
 
-class UAVObjectGeneratorMatlab
-{
+class UAVObjectGeneratorMatlab {
 public:
-    bool generate(UAVObjectParser* gen,QString templatepath,QString outputpath);
+    bool generate(UAVObjectParser *gen, QString templatepath, QString outputpath);
 
 private:
-    bool process_object(ObjectInfo* info, int numBytes);
+    bool process_object(ObjectInfo *info, int numBytes);
     QString matlabInstantiationCode;
     QString matlabSwitchCode;
     QString matlabCleanupCode;
@@ -46,7 +45,6 @@ private:
     QString matlabExportCsvCode;
     QStringList fieldTypeStrMatlab;
     QStringList fieldSizeStrMatlab;
-
 };
 
-#endif
+#endif // ifndef UAVOBJECTGENERATORMATLAB_H

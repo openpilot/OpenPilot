@@ -31,12 +31,14 @@ using namespace std;
 /**
  * Read a file and return its contents as a string
  */
-QString readFile(QString name,bool do_warn)
+QString readFile(QString name, bool do_warn)
 {
     QFile file(name);
-    if (!file.open(QFile::ReadOnly))   {
-        if (do_warn)
+
+    if (!file.open(QFile::ReadOnly)) {
+        if (do_warn) {
             std::cout << "Warning: Could not open " << name.toStdString() << endl;
+        }
         return QString();
     }
 
@@ -51,17 +53,19 @@ QString readFile(QString name,bool do_warn)
  */
 QString readFile(QString name)
 {
-    return readFile(name,true);
+    return readFile(name, true);
 }
 
 /**
  * Write contents of string to file
  */
-bool writeFile(QString name, QString& str)
+bool writeFile(QString name, QString & str)
 {
     QFile file(name);
-    if (!file.open(QFile::WriteOnly))
+
+    if (!file.open(QFile::WriteOnly)) {
         return false;
+    }
     QTextStream fileStr(&file);
     fileStr << str;
     file.close();
@@ -71,9 +75,10 @@ bool writeFile(QString name, QString& str)
 /**
  * Write contents of string to file if the content changes
  */
-bool writeFileIfDiffrent(QString name, QString& str)
+bool writeFileIfDiffrent(QString name, QString & str)
 {
-    if (str==readFile(name,false))
+    if (str == readFile(name, false)) {
         return true;
-    return writeFile(name,str);
+    }
+    return writeFile(name, str);
 }

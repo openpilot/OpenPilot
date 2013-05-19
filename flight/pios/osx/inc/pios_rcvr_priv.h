@@ -8,7 +8,7 @@
  *
  * @file       pios_rcvr_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
+ *             Parts by Thorsten Klose (tk@midibox.org)
  * @brief      USART private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -36,13 +36,13 @@
 
 extern uint32_t pios_rcvr_max_channel;
 
-extern int32_t PIOS_RCVR_Init(uint32_t * rcvr_id, const struct pios_rcvr_driver * driver, const uint32_t lower_id);
+extern int32_t PIOS_RCVR_Init(uint32_t *rcvr_id, const struct pios_rcvr_driver *driver, const uint32_t lower_id);
 
 extern void PIOS_RCVR_IRQ_Handler(uint32_t rcvr_id);
 
 #endif /* PIOS_RCVR_PRIV_H */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

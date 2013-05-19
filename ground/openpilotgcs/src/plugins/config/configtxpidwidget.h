@@ -30,8 +30,7 @@
 #include "ui_txpid.h"
 #include "configtaskwidget.h"
 
-class ConfigTxPIDWidget : public ConfigTaskWidget
-{
+class ConfigTxPIDWidget : public ConfigTaskWidget {
     Q_OBJECT
 
 public:

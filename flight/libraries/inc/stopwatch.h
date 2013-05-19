@@ -42,9 +42,9 @@
 // Prototypes
 /////////////////////////////////////////////////////////////////////////////
 
-extern s32 STOPWATCH_Init(u32 resolution, TIM_TypeDef* TIM);
-extern s32 STOPWATCH_Reset(TIM_TypeDef* TIM);
-extern u32 STOPWATCH_ValueGet(TIM_TypeDef* TIM);
+extern s32 STOPWATCH_Init(u32 resolution, TIM_TypeDef *TIM);
+extern s32 STOPWATCH_Reset(TIM_TypeDef *TIM);
+extern u32 STOPWATCH_ValueGet(TIM_TypeDef *TIM);
 
 
 /////////////////////////////////////////////////////////////////////////////

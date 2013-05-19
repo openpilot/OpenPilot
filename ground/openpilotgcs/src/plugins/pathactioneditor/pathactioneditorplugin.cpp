@@ -33,36 +33,36 @@
 
 PathActionEditorPlugin::PathActionEditorPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 PathActionEditorPlugin::~PathActionEditorPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool PathActionEditorPlugin::initialize(const QStringList& args, QString *errMsg)
+bool PathActionEditorPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new PathActionEditorGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new PathActionEditorGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void PathActionEditorPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void PathActionEditorPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(PathActionEditorPlugin)
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

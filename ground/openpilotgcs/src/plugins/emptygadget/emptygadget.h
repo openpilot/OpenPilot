@@ -7,7 +7,7 @@
  * @{
  * @addtogroup EmptyGadgetPlugin Empty Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -33,26 +33,34 @@
 namespace Core {
 class IUAVGadget;
 }
-//class QWidget;
-//class QString;
+// class QWidget;
+// class QString;
 class EmptyGadgetWidget;
 
 using namespace Core;
 
-class EmptyGadget : public Core::IUAVGadget
-{
+class EmptyGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     EmptyGadget(QString classId, EmptyGadgetWidget *widget, QWidget *parent = 0);
     ~EmptyGadget();
 
-    QList<int> context() const { return m_context; }
-    QWidget *widget() { return m_widget; }
-    QString contextHelpId() const { return QString(); }
+    QList<int> context() const
+    {
+        return m_context;
+    }
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    QString contextHelpId() const
+    {
+        return QString();
+    }
 
 private:
-        QWidget *m_widget;
-	QList<int> m_context;
+    QWidget *m_widget;
+    QList<int> m_context;
 };
 
 

@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
  * @{
- * @brief The OpenPilot Map plugin 
+ * @brief The OpenPilot Map plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -31,14 +31,13 @@
 #include <coreplugin/iuavgadgetfactory.h>
 
 namespace Core {
-	class IUAVGadget;
-	class IUAVGadgetFactory;
+class IUAVGadget;
+class IUAVGadgetFactory;
 }
 
 using namespace Core;
 
-class OPMapGadgetFactory : public Core::IUAVGadgetFactory
-{
+class OPMapGadgetFactory : public Core::IUAVGadgetFactory {
     Q_OBJECT
 
 public:
@@ -46,8 +45,8 @@ public:
     ~OPMapGadgetFactory();
 
     Core::IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 
-#endif
+#endif // ifndef OPAMP_GADGETFACTORY_H_

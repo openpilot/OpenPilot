@@ -7,7 +7,7 @@
  * @{
  * @addtogroup EmptyGadgetPlugin Empty Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -30,13 +30,12 @@
 
 #include <QtGui/QLabel>
 
-class EmptyGadgetWidget : public QLabel
-{
+class EmptyGadgetWidget : public QLabel {
     Q_OBJECT
 
 public:
     EmptyGadgetWidget(QWidget *parent = 0);
-   ~EmptyGadgetWidget();
+    ~EmptyGadgetWidget();
 
 private:
 };

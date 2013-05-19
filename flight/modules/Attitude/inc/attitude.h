@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup Attitude Attitude Module
- * @{ 
+ * @{
  *
  * @file       attitude.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.

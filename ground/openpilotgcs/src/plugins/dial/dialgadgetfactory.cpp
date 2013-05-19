@@ -8,7 +8,7 @@
  * @{
  * @addtogroup DialPlugin Dial Plugin
  * @{
- * @brief Plots flight information rotary style dials 
+ * @brief Plots flight information rotary style dials
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -33,29 +33,27 @@
 #include <coreplugin/iuavgadget.h>
 
 DialGadgetFactory::DialGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("DialGadget"),
-                          tr("Analog Dial"),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("DialGadget"),
+                      tr("Analog Dial"),
+                      parent)
+{}
 
 DialGadgetFactory::~DialGadgetFactory()
-{
-}
+{}
 
-Core::IUAVGadget* DialGadgetFactory::createGadget(QWidget *parent)
+Core::IUAVGadget *DialGadgetFactory::createGadget(QWidget *parent)
 {
-    DialGadgetWidget* gadgetWidget = new DialGadgetWidget(parent);
+    DialGadgetWidget *gadgetWidget = new DialGadgetWidget(parent);
+
     return new DialGadget(QString("DialGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *DialGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *DialGadgetFactory::createConfiguration(QSettings *qSettings)
 {
     return new DialGadgetConfiguration(QString("DialGadget"), qSettings);
 }
 
 IOptionsPage *DialGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new DialGadgetOptionsPage(qobject_cast<DialGadgetConfiguration*>(config));
+    return new DialGadgetOptionsPage(qobject_cast<DialGadgetConfiguration *>(config));
 }
-

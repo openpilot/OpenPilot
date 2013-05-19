@@ -43,8 +43,8 @@
 #define QWINEVENTNOTIFIER_P_H
 
 //
-//  W A R N I N G
-//  -------------
+// W A R N I N G
+// -------------
 //
 // This file is not part of the Qt API.  It exists for the convenience
 // of other Qt classes.  This header file may change from version to
@@ -58,10 +58,9 @@
 
 QT_BEGIN_NAMESPACE
 
-class Q_CORE_EXPORT QWinEventNotifier : public QObject
-{
+class Q_CORE_EXPORT QWinEventNotifier : public QObject {
     Q_OBJECT
-    Q_DECLARE_PRIVATE(QObject)
+                    Q_DECLARE_PRIVATE(QObject)
 
 public:
     explicit QWinEventNotifier(QObject *parent = 0);
@@ -80,7 +79,7 @@ Q_SIGNALS:
     void activated(HANDLE hEvent);
 
 protected:
-    bool event(QEvent * e);
+    bool event(QEvent *e);
 
 private:
     Q_DISABLE_COPY(QWinEventNotifier)

@@ -46,9 +46,9 @@
 
 #include "openpilot.h"
 #include "examplemodevent.h"
-#include "exampleobject1.h"	// object the module will listen for updates (input)
-#include "exampleobject2.h"	// object the module will update (output)
-#include "examplesettings.h"	// object holding module settings (input)
+#include "exampleobject1.h" // object the module will listen for updates (input)
+#include "exampleobject2.h" // object the module will update (output)
+#include "examplesettings.h" // object holding module settings (input)
 
 // Private constants
 
@@ -57,7 +57,7 @@
 // Private variables
 
 // Private functions
-static void ObjectUpdatedCb(UAVObjEvent * ev);
+static void ObjectUpdatedCb(UAVObjEvent *ev);
 
 /**
  * Initialise the module, called on startup.
@@ -65,10 +65,10 @@ static void ObjectUpdatedCb(UAVObjEvent * ev);
  */
 int32_t ExampleModEventInitialize()
 {
-	// Listen for ExampleObject1 updates, connect a callback function
-	ExampleObject1ConnectCallback(&ObjectUpdatedCb);
+    // Listen for ExampleObject1 updates, connect a callback function
+    ExampleObject1ConnectCallback(&ObjectUpdatedCb);
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -81,43 +81,43 @@ int32_t ExampleModEventInitialize()
  * important since all callbacks are executed from the same thread, so other
  * queued events can not be executed until the currently active callback returns.
  */
-static void ObjectUpdatedCb(UAVObjEvent * ev)
+static void ObjectUpdatedCb(UAVObjEvent *ev)
 {
-	ExampleSettingsData settings;
-	ExampleObject1Data data1;
-	ExampleObject2Data data2;
-	int32_t step;
+    ExampleSettingsData settings;
+    ExampleObject1Data data1;
+    ExampleObject2Data data2;
+    int32_t step;
 
-	// Make sure that the object update is for ExampleObject1
-	// This is redundant in this case since this callback will
-	// only be called for a single object, it is however possible
-	// to use the same callback for multiple object updates.
-	if (ev->obj == ExampleObject1Handle()) {
-		// Update settings with latest value
-		ExampleSettingsGet(&settings);
+    // Make sure that the object update is for ExampleObject1
+    // This is redundant in this case since this callback will
+    // only be called for a single object, it is however possible
+    // to use the same callback for multiple object updates.
+    if (ev->obj == ExampleObject1Handle()) {
+        // Update settings with latest value
+        ExampleSettingsGet(&settings);
 
-		// Get the input object
-		ExampleObject1Get(&data1);
+        // Get the input object
+        ExampleObject1Get(&data1);
 
-		// Determine how to update the output object
-		if (settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP) {
-			step = settings.StepSize;
-		} else {
-			step = -settings.StepSize;
-		}
+        // Determine how to update the output object
+        if (settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP) {
+            step = settings.StepSize;
+        } else {
+            step = -settings.StepSize;
+        }
 
-		// Update data
-		data2.Field1 = data1.Field1 + step;
-		data2.Field2 = data1.Field2 + step;
-		data2.Field3 = data1.Field3 + step;
-		data2.Field4[0] = data1.Field4[0] + step;
-		data2.Field4[1] = data1.Field4[1] + step;
+        // Update data
+        data2.Field1    = data1.Field1 + step;
+        data2.Field2    = data1.Field2 + step;
+        data2.Field3    = data1.Field3 + step;
+        data2.Field4[0] = data1.Field4[0] + step;
+        data2.Field4[1] = data1.Field4[1] + step;
 
-		// Update the ExampleObject2, after this function is called
-		// notifications to any other modules listening to that object
-		// will be sent and the GCS object will be updated through the
-		// telemetry link. All operations will take place asynchronously
-		// and the following call will return immediately.
-		ExampleObject2Set(&data2);
-	}
+        // Update the ExampleObject2, after this function is called
+        // notifications to any other modules listening to that object
+        // will be sent and the GCS object will be updated through the
+        // telemetry link. All operations will take place asynchronously
+        // and the following call will return immediately.
+        ExampleObject2Set(&data2);
+    }
 }

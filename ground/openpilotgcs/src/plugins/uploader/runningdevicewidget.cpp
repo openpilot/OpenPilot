@@ -44,22 +44,22 @@ void RunningDeviceWidget::showEvent(QShowEvent *event)
     // Thit fitInView method should only be called now, once the
     // widget is shown, otherwise it cannot compute its values and
     // the result is usually a ahrsbargraph that is way too small.
-    myDevice->devicePicture->fitInView(devicePic.rect(),Qt::KeepAspectRatio);
+    myDevice->devicePicture->fitInView(devicePic.rect(), Qt::KeepAspectRatio);
 }
 
-void RunningDeviceWidget::resizeEvent(QResizeEvent* event)
+void RunningDeviceWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
     myDevice->devicePicture->fitInView(devicePic.rect(), Qt::KeepAspectRatio);
 }
 
 /**
-  Fills the various fields for the device
-  */
+   Fills the various fields for the device
+ */
 void RunningDeviceWidget::populate()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectUtilManager* utilMngr = pm->getObject<UAVObjectUtilManager>();
+    UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
     int id = utilMngr->getBoardModel();
 
     myDevice->lblDeviceID->setText(QString("Device ID: ") + QString::number(id, 16));
@@ -95,20 +95,19 @@ void RunningDeviceWidget::populate()
     }
     myDevice->devicePicture->scene()->addPixmap(devicePic);
     myDevice->devicePicture->setSceneRect(devicePic.rect());
-    myDevice->devicePicture->fitInView(devicePic.rect(),Qt::KeepAspectRatio);
+    myDevice->devicePicture->fitInView(devicePic.rect(), Qt::KeepAspectRatio);
 
     QString serial = utilMngr->getBoardCPUSerial().toHex();
     myDevice->CPUSerial->setText(serial);
 
     QByteArray description = utilMngr->getBoardDescription();
     deviceDescriptorStruct devDesc;
-    if(UAVObjectUtilManager::descriptionToStructure(description, devDesc)) {
-        if(devDesc.gitTag.startsWith("RELEASE",Qt::CaseSensitive)) {
+    if (UAVObjectUtilManager::descriptionToStructure(description, devDesc)) {
+        if (devDesc.gitTag.startsWith("RELEASE", Qt::CaseSensitive)) {
             myDevice->lblFWTag->setText(QString("Firmware tag: ") + devDesc.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/application-certificate.svg"));
             myDevice->lblCertified->setPixmap(pix);
             myDevice->lblCertified->setToolTip(tr("Tagged officially released firmware build"));
-
         } else {
             myDevice->lblFWTag->setText(QString("Firmware tag: ") + devDesc.gitTag);
             QPixmap pix = QPixmap(QString(":uploader/images/warning.svg"));
@@ -116,7 +115,7 @@ void RunningDeviceWidget::populate()
             myDevice->lblCertified->setToolTip(tr("Untagged or custom firmware build"));
         }
         myDevice->lblGitCommitTag->setText("Git commit hash: " + devDesc.gitHash);
-        myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.gitDate.insert(4,"-").insert(7,"-"));
+        myDevice->lblFWDate->setText(QString("Firmware date: ") + devDesc.gitDate.insert(4, "-").insert(7, "-"));
     } else {
         myDevice->lblFWTag->setText(QString("Firmware tag: ") + QString(description).left(QString(description).indexOf(QChar(255))));
         myDevice->lblGitCommitTag->setText("Git commit tag: Unknown");

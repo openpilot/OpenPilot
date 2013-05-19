@@ -38,12 +38,12 @@
 #include <QtGlobal>
 
 /**
-  * @brief Constructor for JoystickControl widget.  Sets up the image of a joystick
-  */
+ * @brief Constructor for JoystickControl widget.  Sets up the image of a joystick
+ */
 PositionField::PositionField(QWidget *parent) :
     QGraphicsView(parent)
 {
-    setMinimumSize(64,64);
+    setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setScene(new QGraphicsScene(this));
     setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
@@ -59,12 +59,12 @@ PositionField::PositionField(QWidget *parent) :
     m_positiondesired = new QGraphicsSvgItem();
     m_positiondesired->setSharedRenderer(m_renderer);
     m_positiondesired->setElementId(QString("desiredPosition"));
-    m_positiondesired->setPos(0,0);
+    m_positiondesired->setPos(0, 0);
 
     m_positionactual = new QGraphicsSvgItem();
     m_positionactual->setSharedRenderer(m_renderer);
     m_positionactual->setElementId(QString("actualPosition"));
-    m_positionactual->setPos(0,0);
+    m_positionactual->setPos(0, 0);
 
     QGraphicsScene *l_scene = scene();
     l_scene->clear(); // This also deletes all items contained in the scene.
@@ -75,20 +75,18 @@ PositionField::PositionField(QWidget *parent) :
 }
 
 PositionField::~PositionField()
-{
-
-}
+{}
 
 /**
-  * @brief Update aircraft position on image (values go from -1 to 1)
-  */
+ * @brief Update aircraft position on image (values go from -1 to 1)
+ */
 void PositionField::updateDesiredIndicator(double north, double east)
 {
     QRectF sceneSize = scene()->sceneRect();
 
     m_positiondesired->setPos(
-            (east+1)/2*sceneSize.width() - m_positiondesired->boundingRect().width() / 2,
-            (-north+1)/2*sceneSize.height() - m_positiondesired->boundingRect().height() / 2);
+        (east + 1) / 2 * sceneSize.width() - m_positiondesired->boundingRect().width() / 2,
+        (-north + 1) / 2 * sceneSize.height() - m_positiondesired->boundingRect().height() / 2);
 }
 
 void PositionField::updateActualIndicator(double north, double east)
@@ -96,29 +94,29 @@ void PositionField::updateActualIndicator(double north, double east)
     QRectF sceneSize = scene()->sceneRect();
 
     m_positionactual->setPos(
-            (east+1)/2*sceneSize.width() - m_positionactual->boundingRect().width() / 2,
-            (-north+1)/2*sceneSize.height() - m_positionactual->boundingRect().height() / 2);
+        (east + 1) / 2 * sceneSize.width() - m_positionactual->boundingRect().width() / 2,
+        (-north + 1) / 2 * sceneSize.height() - m_positionactual->boundingRect().height() / 2);
 }
 
 /**
-  * @brief Redirect mouse move events to control position
-  */
+ * @brief Redirect mouse move events to control position
+ */
 void PositionField::mouseMoveEvent(QMouseEvent *event)
 {
-    QPointF point = mapToScene(event->pos());
+    QPointF point    = mapToScene(event->pos());
     QRectF sceneSize = scene()->sceneRect();
 
-    double north = - (point.y() / sceneSize.height() - .5) * 2;
+    double north     = -(point.y() / sceneSize.height() - .5) * 2;
     double east = (point.x() / sceneSize.width() - .5) * 2;
     emit positionClicked(north, east);
 }
 
 /**
-  * @brief Redirect mouse move clicks to control position
-  */
+ * @brief Redirect mouse move clicks to control position
+ */
 void PositionField::mousePressEvent(QMouseEvent *event)
 {
-    if( event->button() == Qt::LeftButton ) {
+    if (event->button() == Qt::LeftButton) {
         mouseMoveEvent(event);
     }
 }
@@ -131,8 +129,8 @@ void PositionField::paint()
 void PositionField::paintEvent(QPaintEvent *event)
 {
     // Skip painting until the dial file is loaded
-    if (! m_renderer->isValid()) {
-        qDebug()<<"Image file not loaded, not rendering";
+    if (!m_renderer->isValid()) {
+        qDebug() << "Image file not loaded, not rendering";
     }
 
     QGraphicsView::paintEvent(event);
@@ -141,11 +139,11 @@ void PositionField::paintEvent(QPaintEvent *event)
 void PositionField::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    fitInView(m_background, Qt::IgnoreAspectRatio );
+    fitInView(m_background, Qt::IgnoreAspectRatio);
 }
 
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

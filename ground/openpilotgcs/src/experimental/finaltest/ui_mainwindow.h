@@ -32,8 +32,7 @@
 
 QT_BEGIN_NAMESPACE
 
-class Ui_MainWindow
-{
+class Ui_MainWindow {
 public:
     QWidget *centralWidget;
     QWidget *widget;
@@ -75,8 +74,9 @@ public:
 
     void setupUi(QMainWindow *MainWindow)
     {
-        if (MainWindow->objectName().isEmpty())
+        if (MainWindow->objectName().isEmpty()) {
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
+        }
         MainWindow->resize(524, 551);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
@@ -174,7 +174,7 @@ public:
 
         verticalLayout_3->addWidget(groupBox_2);
 
-        groupBox_3 = new QGroupBox(widget);
+        groupBox_3     = new QGroupBox(widget);
         groupBox_3->setObjectName(QString::fromUtf8("groupBox_3"));
         verticalLayout = new QVBoxLayout(groupBox_3);
         verticalLayout->setSpacing(6);
@@ -183,7 +183,7 @@ public:
         horizontalLayout_3 = new QHBoxLayout();
         horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
-        pushButtonZoomP = new QPushButton(groupBox_3);
+        pushButtonZoomP    = new QPushButton(groupBox_3);
         pushButtonZoomP->setObjectName(QString::fromUtf8("pushButtonZoomP"));
 
         horizontalLayout_3->addWidget(pushButtonZoomP);
@@ -260,7 +260,7 @@ public:
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));
         MainWindow->addToolBar(Qt::TopToolBarArea, mainToolBar);
-        statusBar = new QStatusBar(MainWindow);
+        statusBar   = new QStatusBar(MainWindow);
         statusBar->setObjectName(QString::fromUtf8("statusBar"));
         MainWindow->setStatusBar(statusBar);
 
@@ -292,11 +292,10 @@ public:
         checkBox_2->setText(QApplication::translate("MainWindow", "UseOpenGL", 0, QApplication::UnicodeUTF8));
         pushButton->setText(QApplication::translate("MainWindow", "ReloadMap", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
-
 };
 
 namespace Ui {
-    class MainWindow: public Ui_MainWindow {};
+class MainWindow : public Ui_MainWindow {};
 } // namespace Ui
 
 QT_END_NAMESPACE

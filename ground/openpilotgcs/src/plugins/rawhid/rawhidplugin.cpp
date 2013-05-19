@@ -10,18 +10,18 @@
  * @brief Impliments a HID USB connection to the flight hardware as a QIODevice
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -41,55 +41,57 @@
 
 RawHIDConnection::RawHIDConnection()
 {
-    //added by andrew
-    RawHidHandle = NULL;
+    // added by andrew
+    RawHidHandle  = NULL;
     enablePolling = true;
 
-    m_usbMonitor = USBMonitor::instance();
+    m_usbMonitor  = USBMonitor::instance();
 
     connect(m_usbMonitor, SIGNAL(deviceDiscovered(USBPortInfo)), this, SLOT(onDeviceConnected()));
     connect(m_usbMonitor, SIGNAL(deviceRemoved(USBPortInfo)), this, SLOT(onDeviceDisconnected()));
-
 }
 
 RawHIDConnection::~RawHIDConnection()
 {
-	if (RawHidHandle)
-            if (RawHidHandle->isOpen())
-                RawHidHandle->close();
+    if (RawHidHandle) {
+        if (RawHidHandle->isOpen()) {
+            RawHidHandle->close();
+        }
+    }
 }
 
 /**
-  The USB monitor tells us a new device appeared
-  */
+   The USB monitor tells us a new device appeared
+ */
 void RawHIDConnection::onDeviceConnected()
 {
     emit availableDevChanged(this);
 }
 
 /**
-  The USB monitor tells us a device disappeard
-  */
+   The USB monitor tells us a device disappeard
+ */
 void RawHIDConnection::onDeviceDisconnected()
 {
     qDebug() << "onDeviceDisconnected()";
-    if (enablePolling)
+    if (enablePolling) {
         emit availableDevChanged(this);
+    }
 }
 
 /**
-  Returns the list of all currently available devices
-  */
+   Returns the list of all currently available devices
+ */
 QList < Core::IConnection::device> RawHIDConnection::availableDevices()
 {
     QList < Core::IConnection::device> devices;
 
-    QList<USBPortInfo> portsList = m_usbMonitor->availableDevices(USBMonitor::idVendor_OpenPilot, -1, -1,USBMonitor::Running);
+    QList<USBPortInfo> portsList = m_usbMonitor->availableDevices(USBMonitor::idVendor_OpenPilot, -1, -1, USBMonitor::Running);
     // We currently list devices by their serial number
     device dev;
     foreach(USBPortInfo prt, portsList) {
-        dev.name=prt.serialNumber;
-        dev.displayName=prt.product;
+        dev.name = prt.serialNumber;
+        dev.displayName = prt.product;
         devices.append(dev);
     }
     return devices;
@@ -97,12 +99,13 @@ QList < Core::IConnection::device> RawHIDConnection::availableDevices()
 
 QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
 {
-    //added by andrew
-    if (RawHidHandle)
+    // added by andrew
+    if (RawHidHandle) {
         closeDevice(deviceName);
-    //end added by andrew
+    }
+    // end added by andrew
 
-    //return new RawHID(deviceName);
+    // return new RawHID(deviceName);
     RawHidHandle = new RawHID(deviceName);
     return RawHidHandle;
 }
@@ -111,12 +114,11 @@ QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
 void RawHIDConnection::closeDevice(const QString &deviceName)
 {
     Q_UNUSED(deviceName);
-	if (RawHidHandle)
-	{
+    if (RawHidHandle) {
         qDebug() << "Closing the device here";
         RawHidHandle->close();
-		delete RawHidHandle;
-		RawHidHandle = NULL;
+        delete RawHidHandle;
+        RawHidHandle = NULL;
     }
 }
 
@@ -131,7 +133,7 @@ QString RawHIDConnection::shortName()
 }
 
 /**
- Tells the Raw HID plugin to stop polling for USB devices
+   Tells the Raw HID plugin to stop polling for USB devices
  */
 void RawHIDConnection::suspendPolling()
 {
@@ -139,7 +141,7 @@ void RawHIDConnection::suspendPolling()
 }
 
 /**
- Tells the Raw HID plugin to resume polling for USB devices
+   Tells the Raw HID plugin to resume polling for USB devices
  */
 void RawHIDConnection::resumePolling()
 {
@@ -150,26 +152,25 @@ void RawHIDConnection::resumePolling()
 
 RawHIDPlugin::RawHIDPlugin()
 {
-	hidConnection = NULL;	// Pip
+    hidConnection = NULL; // Pip
 }
 
 RawHIDPlugin::~RawHIDPlugin()
 {
     m_usbMonitor->quit();
     m_usbMonitor->wait(500);
-
 }
 
 void RawHIDPlugin::extensionsInitialized()
 {
-	hidConnection = new RawHIDConnection();
-	addAutoReleasedObject(hidConnection);
+    hidConnection = new RawHIDConnection();
+    addAutoReleasedObject(hidConnection);
 
-    //temp for test
-    //addAutoReleasedObject(new RawHIDTestThread);
+    // temp for test
+    // addAutoReleasedObject(new RawHIDTestThread);
 }
 
-bool RawHIDPlugin::initialize(const QStringList & arguments, QString * errorString)
+bool RawHIDPlugin::initialize(const QStringList & arguments, QString *errorString)
 {
     Q_UNUSED(arguments);
     Q_UNUSED(errorString);

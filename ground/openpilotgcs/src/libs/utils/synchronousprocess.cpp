@@ -4,25 +4,25 @@
  * @file       synchronousprocess.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -44,25 +44,24 @@ enum { debug = 0 };
 enum { defaultMaxHangTimerCount = 10 };
 
 namespace Utils {
-
 // ----------- SynchronousProcessResponse
 SynchronousProcessResponse::SynchronousProcessResponse() :
-   result(StartFailed),
-   exitCode(-1)
-{
-}
+    result(StartFailed),
+    exitCode(-1)
+{}
 
 void SynchronousProcessResponse::clear()
 {
-    result = StartFailed;
+    result   = StartFailed;
     exitCode = -1;
     stdOut.clear();
     stdErr.clear();
 }
 
-QTCREATOR_UTILS_EXPORT QDebug operator<<(QDebug str, const SynchronousProcessResponse& r)
+QTCREATOR_UTILS_EXPORT QDebug operator<<(QDebug str, const SynchronousProcessResponse & r)
 {
     QDebug nsp = str.nospace();
+
     nsp << "SynchronousProcessResponse: result=" << r.result << " ex=" << r.exitCode << '\n'
         << r.stdOut.size() << " bytes stdout, stderr=" << r.stdErr << '\n';
     return str;
@@ -78,7 +77,7 @@ struct ChannelBuffer {
     bool firstData;
     bool bufferedSignalsEnabled;
     bool firstBuffer;
-    int bufferPos;
+    int  bufferPos;
 };
 
 ChannelBuffer::ChannelBuffer() :
@@ -86,14 +85,13 @@ ChannelBuffer::ChannelBuffer() :
     bufferedSignalsEnabled(false),
     firstBuffer(true),
     bufferPos(0)
-{
-}
+{}
 
 void ChannelBuffer::clearForRun()
 {
-    firstData = true;
+    firstData   = true;
     firstBuffer = true;
-    bufferPos = 0;
+    bufferPos   = 0;
 }
 
 /* Check for complete lines read from the device and return them, moving the
@@ -103,10 +101,12 @@ QByteArray ChannelBuffer::linesRead()
 {
     // Any new lines?
     const int lastLineIndex = data.lastIndexOf('\n');
-    if (lastLineIndex == -1 || lastLineIndex <= bufferPos)
+
+    if (lastLineIndex == -1 || lastLineIndex <= bufferPos) {
         return QByteArray();
+    }
     const int nextBufferPos = lastLineIndex + 1;
-    const QByteArray lines = data.mid(bufferPos, nextBufferPos - bufferPos);
+    const QByteArray lines  = data.mid(bufferPos, nextBufferPos - bufferPos);
     bufferPos = nextBufferPos;
     return lines;
 }
@@ -114,15 +114,15 @@ QByteArray ChannelBuffer::linesRead()
 // ----------- SynchronousProcessPrivate
 struct SynchronousProcessPrivate {
     SynchronousProcessPrivate();
-    void clearForRun();
+    void       clearForRun();
 
     QTextCodec *m_stdOutCodec;
-    QProcess m_process;
-    QTimer m_timer;
+    QProcess   m_process;
+    QTimer     m_timer;
     QEventLoop m_eventLoop;
     SynchronousProcessResponse m_result;
-    int m_hangTimerCount;
-    int m_maxHangTimerCount;
+    int  m_hangTimerCount;
+    int  m_maxHangTimerCount;
     bool m_startFailure;
 
     ChannelBuffer m_stdOut;
@@ -134,8 +134,7 @@ SynchronousProcessPrivate::SynchronousProcessPrivate() :
     m_hangTimerCount(0),
     m_maxHangTimerCount(defaultMaxHangTimerCount),
     m_startFailure(false)
-{
-}
+{}
 
 void SynchronousProcessPrivate::clearForRun()
 {
@@ -152,7 +151,7 @@ SynchronousProcess::SynchronousProcess() :
 {
     m_d->m_timer.setInterval(1000);
     connect(&m_d->m_timer, SIGNAL(timeout()), this, SLOT(slotTimeout()));
-    connect(&m_d->m_process, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
+    connect(&m_d->m_process, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(finished(int, QProcess::ExitStatus)));
     connect(&m_d->m_process, SIGNAL(error(QProcess::ProcessError)), this, SLOT(error(QProcess::ProcessError)));
     connect(&m_d->m_process, SIGNAL(readyReadStandardOutput()),
             this, SLOT(stdOutReady()));
@@ -229,7 +228,7 @@ QString SynchronousProcess::workingDirectory() const
     return m_d->m_process.workingDirectory();
 }
 
-QProcess::ProcessChannelMode SynchronousProcess::processChannelMode () const
+QProcess::ProcessChannelMode SynchronousProcess::processChannelMode() const
 {
     return m_d->m_process.processChannelMode();
 }
@@ -240,10 +239,11 @@ void SynchronousProcess::setProcessChannelMode(QProcess::ProcessChannelMode m)
 }
 
 SynchronousProcessResponse SynchronousProcess::run(const QString &binary,
-                                                 const QStringList &args)
+                                                   const QStringList &args)
 {
-    if (debug)
+    if (debug) {
         qDebug() << '>' << Q_FUNC_INFO << binary << args;
+    }
 
     m_d->clearForRun();
 
@@ -267,38 +267,43 @@ SynchronousProcessResponse SynchronousProcess::run(const QString &binary,
         QApplication::restoreOverrideCursor();
     }
 
-    if (debug)
+    if (debug) {
         qDebug() << '<' << Q_FUNC_INFO << binary << m_d->m_result;
-    return  m_d->m_result;
+    }
+    return m_d->m_result;
 }
 
 void SynchronousProcess::slotTimeout()
 {
     if (++m_d->m_hangTimerCount > m_d->m_maxHangTimerCount) {
-        if (debug)
+        if (debug) {
             qDebug() << Q_FUNC_INFO << "HANG detected, killing";
+        }
         m_d->m_process.kill();
         m_d->m_result.result = SynchronousProcessResponse::Hang;
     } else {
-        if (debug)
+        if (debug) {
             qDebug() << Q_FUNC_INFO << m_d->m_hangTimerCount;
+        }
     }
 }
 
 void SynchronousProcess::finished(int exitCode, QProcess::ExitStatus e)
 {
-    if (debug)
+    if (debug) {
         qDebug() << Q_FUNC_INFO << exitCode << e;
+    }
     m_d->m_hangTimerCount = 0;
     switch (e) {
     case QProcess::NormalExit:
-        m_d->m_result.result = exitCode ? SynchronousProcessResponse::FinishedError : SynchronousProcessResponse::Finished;
+        m_d->m_result.result   = exitCode ? SynchronousProcessResponse::FinishedError : SynchronousProcessResponse::Finished;
         m_d->m_result.exitCode = exitCode;
         break;
     case QProcess::CrashExit:
         // Was hang detected before and killed?
-        if (m_d->m_result.result != SynchronousProcessResponse::Hang)
+        if (m_d->m_result.result != SynchronousProcessResponse::Hang) {
             m_d->m_result.result = SynchronousProcessResponse::TerminatedAbnormally;
+        }
         m_d->m_result.exitCode = -1;
         break;
     }
@@ -308,11 +313,13 @@ void SynchronousProcess::finished(int exitCode, QProcess::ExitStatus e)
 void SynchronousProcess::error(QProcess::ProcessError e)
 {
     m_d->m_hangTimerCount = 0;
-    if (debug)
+    if (debug) {
         qDebug() << Q_FUNC_INFO << e;
+    }
     // Was hang detected before and killed?
-    if (m_d->m_result.result != SynchronousProcessResponse::Hang)
+    if (m_d->m_result.result != SynchronousProcessResponse::Hang) {
         m_d->m_result.result = SynchronousProcessResponse::StartFailed;
+    }
     m_d->m_startFailure = true;
     m_d->m_eventLoop.quit();
 }
@@ -337,6 +344,7 @@ QString SynchronousProcess::convertStdErr(const QByteArray &ba)
 QString SynchronousProcess::convertStdOut(const QByteArray &ba) const
 {
     QString stdOut = m_d->m_stdOutCodec ? m_d->m_stdOutCodec->toUnicode(ba) : QString::fromLocal8Bit(ba.constData(), ba.size());
+
     return stdOut.remove(QLatin1Char('\r'));
 }
 
@@ -344,8 +352,10 @@ void SynchronousProcess::processStdOut(bool emitSignals)
 {
     // Handle binary data
     const QByteArray ba = m_d->m_process.readAllStandardOutput();
-    if (debug > 1)
+
+    if (debug > 1) {
         qDebug() << Q_FUNC_INFO << emitSignals << ba;
+    }
     if (!ba.isEmpty()) {
         m_d->m_stdOut.data += ba;
         if (emitSignals) {
@@ -368,8 +378,10 @@ void SynchronousProcess::processStdErr(bool emitSignals)
 {
     // Handle binary data
     const QByteArray ba = m_d->m_process.readAllStandardError();
-    if (debug > 1)
+
+    if (debug > 1) {
         qDebug() << Q_FUNC_INFO << emitSignals << ba;
+    }
     if (!ba.isEmpty()) {
         m_d->m_stdErr.data += ba;
         if (emitSignals) {
@@ -408,44 +420,52 @@ static QString checkBinary(const QDir &dir, const QString &binary)
 {
     // naive UNIX approach
     const QFileInfo info(dir.filePath(binary));
-    if (info.isFile() && info.isExecutable())
+
+    if (info.isFile() && info.isExecutable()) {
         return info.absoluteFilePath();
+    }
 
     // Does the OS have some weird extension concept or does the
     // binary have a 3 letter extension?
-    if (pathOS == OS_Unix)
+    if (pathOS == OS_Unix) {
         return QString();
+    }
     const int dotIndex = binary.lastIndexOf(QLatin1Char('.'));
-    if (dotIndex != -1 && dotIndex == binary.size() - 4)
-        return  QString();
+    if (dotIndex != -1 && dotIndex == binary.size() - 4) {
+        return QString();
+    }
 
     switch (pathOS) {
     case OS_Unix:
         break;
-    case OS_Windows: {
-            static const char *windowsExtensions[] = {".cmd", ".bat", ".exe", ".com" };
-            // Check the Windows extensions using the order
-            const int windowsExtensionCount = sizeof(windowsExtensions)/sizeof(const char*);
-            for (int e = 0; e < windowsExtensionCount; e ++) {
-                const QFileInfo windowsBinary(dir.filePath(binary + QLatin1String(windowsExtensions[e])));
-                if (windowsBinary.isFile() && windowsBinary.isExecutable())
-                    return windowsBinary.absoluteFilePath();
+    case OS_Windows:
+    {
+        static const char *windowsExtensions[] = { ".cmd", ".bat", ".exe", ".com" };
+        // Check the Windows extensions using the order
+        const int windowsExtensionCount = sizeof(windowsExtensions) / sizeof(const char *);
+        for (int e = 0; e < windowsExtensionCount; e++) {
+            const QFileInfo windowsBinary(dir.filePath(binary + QLatin1String(windowsExtensions[e])));
+            if (windowsBinary.isFile() && windowsBinary.isExecutable()) {
+                return windowsBinary.absoluteFilePath();
             }
         }
-        break;
-    case OS_Mac: {
-            // Check for Mac app folders
-            const QFileInfo appFolder(dir.filePath(binary + QLatin1String(".app")));
-            if (appFolder.isDir()) {
-                QString macBinaryPath = appFolder.absoluteFilePath();
-                macBinaryPath += QLatin1String("/Contents/MacOS/");
-                macBinaryPath += binary;
-                const QFileInfo macBinary(macBinaryPath);
-                if (macBinary.isFile() && macBinary.isExecutable())
-                    return macBinary.absoluteFilePath();
+    }
+    break;
+    case OS_Mac:
+    {
+        // Check for Mac app folders
+        const QFileInfo appFolder(dir.filePath(binary + QLatin1String(".app")));
+        if (appFolder.isDir()) {
+            QString macBinaryPath = appFolder.absoluteFilePath();
+            macBinaryPath += QLatin1String("/Contents/MacOS/");
+            macBinaryPath += binary;
+            const QFileInfo macBinary(macBinaryPath);
+            if (macBinary.isFile() && macBinary.isExecutable()) {
+                return macBinary.absoluteFilePath();
             }
         }
-        break;
+    }
+    break;
     }
     return QString();
 }
@@ -454,25 +474,30 @@ QString SynchronousProcess::locateBinary(const QString &path, const QString &bin
 {
     // Absolute file?
     const QFileInfo absInfo(binary);
-    if (absInfo.isAbsolute())
+
+    if (absInfo.isAbsolute()) {
         return checkBinary(absInfo.dir(), absInfo.fileName());
+    }
 
     // Windows finds binaries  in the current directory
     if (pathOS == OS_Windows) {
         const QString currentDirBinary = checkBinary(QDir::current(), binary);
-        if (!currentDirBinary.isEmpty())
+        if (!currentDirBinary.isEmpty()) {
             return currentDirBinary;
+        }
     }
 
     const QStringList paths = path.split(pathSeparator());
-    if (paths.empty())
+    if (paths.empty()) {
         return QString();
+    }
     const QStringList::const_iterator cend = paths.constEnd();
     for (QStringList::const_iterator it = paths.constBegin(); it != cend; ++it) {
         const QDir dir(*it);
         const QString rc = checkBinary(dir, binary);
-        if (!rc.isEmpty())
+        if (!rc.isEmpty()) {
             return rc;
+        }
     }
     return QString();
 }
@@ -480,14 +505,15 @@ QString SynchronousProcess::locateBinary(const QString &path, const QString &bin
 QString SynchronousProcess::locateBinary(const QString &binary)
 {
     const QByteArray path = qgetenv("PATH");
+
     return locateBinary(QString::fromLocal8Bit(path), binary);
 }
 
 QChar SynchronousProcess::pathSeparator()
 {
-    if (pathOS == OS_Windows)
+    if (pathOS == OS_Windows) {
         return QLatin1Char(';');
+    }
     return QLatin1Char(':');
 }
-
 } // namespace Utils

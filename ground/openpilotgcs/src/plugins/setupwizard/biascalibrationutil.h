@@ -34,13 +34,12 @@
 #include "uavobject.h"
 #include "vehicleconfigurationsource.h"
 
-class BiasCalibrationUtil : public QObject
-{
+class BiasCalibrationUtil : public QObject {
     Q_OBJECT
 public:
     explicit BiasCalibrationUtil(long measurementCount, long measurementRate);
     explicit BiasCalibrationUtil(long accelMeasurementCount, long accelMeasurementRate,
-                           long gyroMeasurementCount, long gyroMeasurementRate);
+                                 long gyroMeasurementCount, long gyroMeasurementRate);
 
 signals:
     void progress(long current, long total);
@@ -52,8 +51,8 @@ public slots:
     void abort();
 
 private slots:
-    void gyroMeasurementsUpdated(UAVObject * obj);
-    void accelMeasurementsUpdated(UAVObject * obj);
+    void gyroMeasurementsUpdated(UAVObject *obj);
+    void accelMeasurementsUpdated(UAVObject *obj);
     void timeout();
 
 private:

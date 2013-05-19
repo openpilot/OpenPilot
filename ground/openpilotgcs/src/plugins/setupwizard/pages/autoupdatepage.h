@@ -39,8 +39,7 @@ namespace Ui {
 class AutoUpdatePage;
 }
 
-class AutoUpdatePage : public AbstractWizardPage
-{
+class AutoUpdatePage : public AbstractWizardPage {
     Q_OBJECT
 
 public:
@@ -48,13 +47,15 @@ public:
     ~AutoUpdatePage();
 
 private slots:
-    void updateStatus(uploader::AutoUpdateStep ,QVariant);
-    void disableButtons(){ enableButtons(false); }
+    void updateStatus(uploader::AutoUpdateStep, QVariant);
+    void disableButtons()
+    {
+        enableButtons(false);
+    }
     void enableButtons(bool enable);
 
 private:
     Ui::AutoUpdatePage *ui;
-
 };
 
 #endif // AUTOUPDATEPAGE_H

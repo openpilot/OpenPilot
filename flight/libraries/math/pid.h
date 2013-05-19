@@ -31,18 +31,18 @@
 #ifndef PID_H
 #define PID_H
 
-//! 
+// !
 struct pid {
-	float p;
-	float i;
-	float d;
-	float iLim;
-	float iAccumulator;
-	float lastErr;
-	float lastDer;
+    float p;
+    float i;
+    float d;
+    float iLim;
+    float iAccumulator;
+    float lastErr;
+    float lastDer;
 };
 
-//! Methods to use the pid structures
+// ! Methods to use the pid structures
 float pid_apply(struct pid *pid, const float err, float dT);
 float pid_apply_setpoint(struct pid *pid, const float setpoint, const float measured, float dT);
 void pid_zero(struct pid *pid);

@@ -37,7 +37,7 @@
 #define M_PI_2_F     1.57079632679489661923132169164f      /* pi/2 */
 #define M_PI_4_F     0.78539816339744830961566084582f      /* pi/4 */
 #define M_SQRTPI_F   1.77245385090551602729816748334f      /* sqrt(pi) */
-#define M_2_SQRTPI_F 1.12837916709551257389615890312f      /* 2/sqrt(pi) */
+#define M_2_SQRTPI_F 1.12837916709551257389615890312f /* 2/sqrt(pi) */
 #define M_1_PI_F     0.31830988618379067153776752675f      /* 1/pi */
 #define M_2_PI_F     0.63661977236758134307553505349f      /* 2/pi */
 #define M_LN10_F     2.30258509299404568401799145468f      /* ln(10) */
@@ -46,11 +46,11 @@
 #define M_EULER_F    0.57721566490153286060651209008f      /* Euler constant */
 
 // Conversion macro
-#define RAD2DEG(rad)    ((rad)*(180.0f/M_PI_F))
-#define DEG2RAD(deg)    ((deg)*(M_PI_F/180.0f))
+#define RAD2DEG(rad) ((rad) * (180.0f / M_PI_F))
+#define DEG2RAD(deg) ((deg) * (M_PI_F / 180.0f))
 
 // Useful math macros
-#define MAX(a,b) ((a) > (b) ? (a) : (b))
-#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b)    ((a) > (b) ? (a) : (b))
+#define MIN(a, b)    ((a) < (b) ? (a) : (b))
 
 #endif // PIOS_MATH_H

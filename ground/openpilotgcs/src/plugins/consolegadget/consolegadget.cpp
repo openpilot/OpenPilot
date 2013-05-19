@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ConsolePlugin Console Plugin
  * @{
- * @brief The Console Gadget impliments a console view 
+ * @brief The Console Gadget impliments a console view
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -29,8 +29,8 @@
 #include "texteditloggerengine.h"
 
 ConsoleGadget::ConsoleGadget(QString classId, ConsoleGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
+    IUAVGadget(classId, parent),
+    m_widget(widget)
 {
     m_logger = new TextEditLoggerEngine(widget);
     bool suitableName = false;
@@ -38,8 +38,9 @@ ConsoleGadget::ConsoleGadget(QString classId, ConsoleGadgetWidget *widget, QWidg
     QString loggerName;
     while (!suitableName) {
         loggerName = "TextEditLogger" + QVariant(i).toString();
-        if (!qxtLog->isLoggerEngine(loggerName))
+        if (!qxtLog->isLoggerEngine(loggerName)) {
             suitableName = true;
+        }
         ++i;
     }
     qxtLog->addLoggerEngine(loggerName, m_logger);

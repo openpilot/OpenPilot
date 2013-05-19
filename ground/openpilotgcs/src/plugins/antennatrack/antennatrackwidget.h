@@ -39,37 +39,34 @@
 
 class Ui_AntennaTrackWidget;
 
-typedef struct struct_TrackData
-{
-        double Latitude;
-        double Longitude;
-        double Altitude;
-        double HomeLatitude;
-        double HomeLongitude;
-        double HomeAltitude;
+typedef struct struct_TrackData {
+    double Latitude;
+    double Longitude;
+    double Altitude;
+    double HomeLatitude;
+    double HomeLongitude;
+    double HomeAltitude;
+} TrackData_t;
 
-}TrackData_t;
-
-class AntennaTrackWidget : public QWidget, public Ui_AntennaTrackWidget
-{
+class AntennaTrackWidget : public QWidget, public Ui_AntennaTrackWidget {
     Q_OBJECT
 
 public:
     AntennaTrackWidget(QWidget *parent = 0);
-   ~AntennaTrackWidget();
-   TrackData_t TrackData;
-   void setPort(QPointer<QextSerialPort> portx);
+    ~AntennaTrackWidget();
+    TrackData_t TrackData;
+    void setPort(QPointer<QextSerialPort> portx);
 
 private slots:
-   void setPosition(double, double, double);
-   void setHomePosition(double, double, double);
-   void dumpPacket(const QString &packet);
+    void setPosition(double, double, double);
+    void setHomePosition(double, double, double);
+    void dumpPacket(const QString &packet);
 
 private:
-   void calcAntennaPosition(void);
-   QGraphicsSvgItem * marker;
-   QPointer<QextSerialPort> port;
-   double azimuth_old;
-   double elevation_old;
+    void calcAntennaPosition(void);
+    QGraphicsSvgItem *marker;
+    QPointer<QextSerialPort> port;
+    double azimuth_old;
+    double elevation_old;
 };
 #endif /* ANTENNATRACKWIDGET_H_ */

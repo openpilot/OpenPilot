@@ -13,19 +13,19 @@
  *
  ******************************************************************************
  */
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -100,71 +100,71 @@
 #define PIOS_MPU6000_PWRMGMT_STOP_CLK     0X07
 
 enum pios_mpu6000_range {
-	PIOS_MPU6000_SCALE_250_DEG  = 0x00,
-	PIOS_MPU6000_SCALE_500_DEG  = 0x08,
-	PIOS_MPU6000_SCALE_1000_DEG = 0x10,
-	PIOS_MPU6000_SCALE_2000_DEG = 0x18
+    PIOS_MPU6000_SCALE_250_DEG  = 0x00,
+    PIOS_MPU6000_SCALE_500_DEG  = 0x08,
+    PIOS_MPU6000_SCALE_1000_DEG = 0x10,
+    PIOS_MPU6000_SCALE_2000_DEG = 0x18
 };
 
 enum pios_mpu6000_filter {
-	PIOS_MPU6000_LOWPASS_256_HZ = 0x00,
-	PIOS_MPU6000_LOWPASS_188_HZ = 0x01,
-	PIOS_MPU6000_LOWPASS_98_HZ  = 0x02,
-	PIOS_MPU6000_LOWPASS_42_HZ  = 0x03,
-	PIOS_MPU6000_LOWPASS_20_HZ  = 0x04,
-	PIOS_MPU6000_LOWPASS_10_HZ  = 0x05,
-	PIOS_MPU6000_LOWPASS_5_HZ   = 0x06
+    PIOS_MPU6000_LOWPASS_256_HZ = 0x00,
+    PIOS_MPU6000_LOWPASS_188_HZ = 0x01,
+    PIOS_MPU6000_LOWPASS_98_HZ  = 0x02,
+    PIOS_MPU6000_LOWPASS_42_HZ  = 0x03,
+    PIOS_MPU6000_LOWPASS_20_HZ  = 0x04,
+    PIOS_MPU6000_LOWPASS_10_HZ  = 0x05,
+    PIOS_MPU6000_LOWPASS_5_HZ   = 0x06
 };
 
 enum pios_mpu6000_accel_range {
-	PIOS_MPU6000_ACCEL_2G = 0x00,
-	PIOS_MPU6000_ACCEL_4G = 0x08,
-	PIOS_MPU6000_ACCEL_8G = 0x10,
-	PIOS_MPU6000_ACCEL_16G = 0x18
+    PIOS_MPU6000_ACCEL_2G  = 0x00,
+    PIOS_MPU6000_ACCEL_4G  = 0x08,
+    PIOS_MPU6000_ACCEL_8G  = 0x10,
+    PIOS_MPU6000_ACCEL_16G = 0x18
 };
 
 enum pios_mpu6000_orientation { // clockwise rotation from board forward
-	PIOS_MPU6000_TOP_0DEG    = 0x00,
-	PIOS_MPU6000_TOP_90DEG   = 0x01,
-	PIOS_MPU6000_TOP_180DEG  = 0x02,
-	PIOS_MPU6000_TOP_270DEG  = 0x03
+    PIOS_MPU6000_TOP_0DEG   = 0x00,
+    PIOS_MPU6000_TOP_90DEG  = 0x01,
+    PIOS_MPU6000_TOP_180DEG = 0x02,
+    PIOS_MPU6000_TOP_270DEG = 0x03
 };
 
 struct pios_mpu6000_data {
-	int16_t gyro_x;
-	int16_t gyro_y;
-	int16_t gyro_z;
+    int16_t gyro_x;
+    int16_t gyro_y;
+    int16_t gyro_z;
 #if defined(PIOS_MPU6000_ACCEL)
-	int16_t accel_x;
-	int16_t accel_y;
-	int16_t accel_z;
+    int16_t accel_x;
+    int16_t accel_y;
+    int16_t accel_z;
 #endif /* PIOS_MPU6000_ACCEL */
-	int16_t temperature;
+    int16_t temperature;
 };
 
 struct pios_mpu6000_cfg {
-	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
-	
-	uint8_t Fifo_store;		/* FIFO storage of different readings (See datasheet page 31 for more details) */
-                                        
-                                        /* Sample rate divider to use (See datasheet page 32 for more details).*/
-        uint8_t Smpl_rate_div_no_dlp;   /* used when no dlp is applied (fs=8KHz)*/
-	uint8_t Smpl_rate_div_dlp;	/* used when dlp is on (fs=1kHz)*/
-        uint8_t interrupt_cfg;	/* Interrupt configuration (See datasheet page 35 for more details) */
-	uint8_t interrupt_en;	/* Interrupt configuration (See datasheet page 35 for more details) */
-	uint8_t User_ctl;		/* User control settings (See datasheet page 41 for more details)  */
-	uint8_t Pwr_mgmt_clk;	/* Power management and clock selection (See datasheet page 32 for more details) */
-	enum pios_mpu6000_accel_range accel_range;
-	enum pios_mpu6000_range gyro_range;
-	enum pios_mpu6000_filter filter;
-	enum pios_mpu6000_orientation orientation;
+    const struct pios_exti_cfg *exti_cfg; /* Pointer to the EXTI configuration */
+
+    uint8_t Fifo_store; /* FIFO storage of different readings (See datasheet page 31 for more details) */
+
+    /* Sample rate divider to use (See datasheet page 32 for more details).*/
+    uint8_t Smpl_rate_div_no_dlp; /* used when no dlp is applied (fs=8KHz)*/
+    uint8_t Smpl_rate_div_dlp; /* used when dlp is on (fs=1kHz)*/
+    uint8_t interrupt_cfg; /* Interrupt configuration (See datasheet page 35 for more details) */
+    uint8_t interrupt_en; /* Interrupt configuration (See datasheet page 35 for more details) */
+    uint8_t User_ctl; /* User control settings (See datasheet page 41 for more details)  */
+    uint8_t Pwr_mgmt_clk; /* Power management and clock selection (See datasheet page 32 for more details) */
+    enum pios_mpu6000_accel_range accel_range;
+    enum pios_mpu6000_range gyro_range;
+    enum pios_mpu6000_filter filter;
+    enum pios_mpu6000_orientation orientation;
 };
 
 /* Public Functions */
-extern int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_mpu6000_cfg * new_cfg);
-extern int32_t PIOS_MPU6000_ConfigureRanges(enum pios_mpu6000_range gyroRange, enum pios_mpu6000_accel_range accelRange,enum pios_mpu6000_filter filterSetting);
+extern int32_t PIOS_MPU6000_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_mpu6000_cfg *new_cfg);
+extern int32_t PIOS_MPU6000_ConfigureRanges(enum pios_mpu6000_range gyroRange, enum pios_mpu6000_accel_range accelRange, enum pios_mpu6000_filter filterSetting);
 extern xQueueHandle PIOS_MPU6000_GetQueue();
-extern int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data * buffer);
+extern int32_t PIOS_MPU6000_ReadGyros(struct pios_mpu6000_data *buffer);
 extern int32_t PIOS_MPU6000_ReadID();
 extern int32_t PIOS_MPU6000_Test();
 extern float PIOS_MPU6000_GetScale();
@@ -173,7 +173,7 @@ extern bool PIOS_MPU6000_IRQHandler(void);
 
 #endif /* PIOS_MPU6000_H */
 
-/** 
-  * @}
-  * @}
-  */
+/**
+ * @}
+ * @}
+ */

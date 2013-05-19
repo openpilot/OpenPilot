@@ -4,25 +4,25 @@
  * @file       main.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -51,6 +51,7 @@ void MyMain::select(int index)
     IText1 *t1 = Aggregation::query<IText1>(entry);
     IText2 *t2 = Aggregation::query<IText2>(entry);
     IText3 *t3 = Aggregation::query<IText3>(entry);
+
     // set the label texts and enable/disable, depending on whether
     // the respective interface implementations exist
     ui.text1->setText(t1 ? t1->text() : tr("N/A"));
@@ -81,6 +82,7 @@ int main(int argc, char *argv[])
     // the second additionally provides an IText2 implementation
     // adding a component to the aggregation is done by setting the aggregation as the parent of the component
     Aggregation::Aggregate *obj2 = new Aggregation::Aggregate;
+
     obj2->add(new IComboEntry("Entry with text 2"));
     obj2->add(new IText2("This is a text for label 2"));
 

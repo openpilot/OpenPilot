@@ -7,7 +7,7 @@
  * @{
  * @addtogroup HITLPlugin HITL Plugin
  * @{
- * @brief The Hardware In The Loop plugin 
+ * @brief The Hardware In The Loop plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,30 +32,25 @@
 #include <coreplugin/iuavgadget.h>
 
 HITLFactory::HITLFactory(QObject *parent)
-	: IUAVGadgetFactory(QString("HITL"), tr("HITL Simulation"), parent)
-{
-
-}
+    : IUAVGadgetFactory(QString("HITL"), tr("HITL Simulation"), parent)
+{}
 
 HITLFactory::~HITLFactory()
+{}
+
+Core::IUAVGadget *HITLFactory::createGadget(QWidget *parent)
 {
+    HITLWidget *gadgetWidget = new HITLWidget(parent);
+
+    return new HITLGadget(QString("HITL"), gadgetWidget, parent);
 }
 
-Core::IUAVGadget* HITLFactory::createGadget(QWidget *parent)
-{
-
-
-   HITLWidget* gadgetWidget = new HITLWidget(parent);
-   return new HITLGadget(QString("HITL"), gadgetWidget, parent);
-}
-
-IUAVGadgetConfiguration *HITLFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *HITLFactory::createConfiguration(QSettings *qSettings)
 {
     return new HITLConfiguration(QString("HITL"), qSettings);
 }
 
 IOptionsPage *HITLFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new HITLOptionsPage(qobject_cast<HITLConfiguration*>(config));
+    return new HITLOptionsPage(qobject_cast<HITLConfiguration *>(config));
 }
-

@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
  * @{
- * @brief The OpenPilot Map plugin 
+ * @brief The OpenPilot Map plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -31,11 +31,10 @@
 #include <QWidget>
 
 namespace Ui {
-    class opmap_zoom_slider_widget;
+class opmap_zoom_slider_widget;
 }
 
-class opmap_zoom_slider_widget : public QWidget
-{
+class opmap_zoom_slider_widget : public QWidget {
     Q_OBJECT
 
 public:

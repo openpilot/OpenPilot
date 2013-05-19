@@ -13,11 +13,11 @@ AutoUpdatePage::AutoUpdatePage(SetupWizard *wizard, QWidget *parent) :
     ui->setupUi(this);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     Q_ASSERT(pm);
-    UploaderGadgetFactory *uploader = pm->getObject<UploaderGadgetFactory>();
+    UploaderGadgetFactory *uploader    = pm->getObject<UploaderGadgetFactory>();
     Q_ASSERT(uploader);
     connect(ui->startUpdate, SIGNAL(clicked()), this, SLOT(disableButtons()));
     connect(ui->startUpdate, SIGNAL(clicked()), uploader, SIGNAL(autoUpdate()));
-    connect(uploader, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep,QVariant)), this, SLOT(updateStatus(uploader::AutoUpdateStep, QVariant)));
+    connect(uploader, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SLOT(updateStatus(uploader::AutoUpdateStep, QVariant)));
 }
 
 AutoUpdatePage::~AutoUpdatePage()
@@ -37,8 +37,7 @@ void AutoUpdatePage::enableButtons(bool enable = false)
 
 void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant value)
 {
-    switch(status)
-    {
+    switch (status) {
     case uploader::WAITING_DISCONNECT:
         getWizard()->setWindowFlags(getWizard()->windowFlags() & ~Qt::WindowStaysOnTopHint);
         disableButtons();

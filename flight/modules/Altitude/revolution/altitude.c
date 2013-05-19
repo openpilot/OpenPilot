@@ -1,10 +1,10 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup AltitudeModule Altitude Module
  * @brief Communicate with BMP085 and update @ref BaroAltitude "BaroAltitude UAV Object"
- * @{ 
+ * @{
  *
  * @file       altitude.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -39,15 +39,15 @@
 #include <openpilot.h>
 
 #include "altitude.h"
-#include "baroaltitude.h"	// object that will be updated by the module
+#include "baroaltitude.h" // object that will be updated by the module
 #if defined(PIOS_INCLUDE_HCSR04)
-#include "sonaraltitude.h"	// object that will be updated by the module
+#include "sonaraltitude.h" // object that will be updated by the module
 #endif
 #include "taskinfo.h"
 
 // Private constants
 #define STACK_SIZE_BYTES 500
-#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
+#define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
 
 // Private types
 
@@ -62,12 +62,12 @@ static void altitudeTask(void *parameters);
  * \returns 0 on success or -1 if initialisation failed
  */
 int32_t AltitudeStart()
-{	
-	// Start main task
-	xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ALTITUDE, taskHandle);
+{
+    // Start main task
+    xTaskCreate(altitudeTask, (signed char *)"Altitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
+    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ALTITUDE, taskHandle);
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -76,11 +76,11 @@ int32_t AltitudeStart()
  */
 int32_t AltitudeInitialize()
 {
-	BaroAltitudeInitialize();
+    BaroAltitudeInitialize();
 #if defined(PIOS_INCLUDE_HCSR04)
-	SonarAltitudeInitialize();
+    SonarAltitudeInitialize();
 #endif
-	return 0;
+    return 0;
 }
 MODULE_INITCALL(AltitudeInitialize, AltitudeStart)
 /**
@@ -88,85 +88,83 @@ MODULE_INITCALL(AltitudeInitialize, AltitudeStart)
  */
 static void altitudeTask(__attribute__((unused)) void *parameters)
 {
-	BaroAltitudeData data;
-	
+    BaroAltitudeData data;
+
 #if defined(PIOS_INCLUDE_HCSR04)
-	SonarAltitudeData sonardata;
-	int32_t value = 0, timeout = 10, sample_rate = 0;
-	float coeff = 0.25, height_out = 0, height_in = 0;
-	PIOS_HCSR04_Trigger();
+    SonarAltitudeData sonardata;
+    int32_t value = 0, timeout = 10, sample_rate = 0;
+    float coeff   = 0.25, height_out = 0, height_in = 0;
+    PIOS_HCSR04_Trigger();
 #endif
 
-	// TODO: Check the pressure sensor and set a warning if it fails test
-	
+    // TODO: Check the pressure sensor and set a warning if it fails test
+
 // Option to change the interleave between Temp and Pressure conversions
 // Undef for normal operation
-//#define PIOS_MS5611_SLOW_TEMP_RATE 20
- 
+// #define PIOS_MS5611_SLOW_TEMP_RATE 20
+
 #ifdef PIOS_MS5611_SLOW_TEMP_RATE
-	uint8_t temp_press_interleave_count = 1;
+    uint8_t temp_press_interleave_count = 1;
 #endif
-	// Main task loop
-	while (1)
-	{
+    // Main task loop
+    while (1) {
 #if defined(PIOS_INCLUDE_HCSR04)
-		// Compute the current altitude
-		// depends on baro samplerate
-		if(!(sample_rate--)) {
-			if(PIOS_HCSR04_Completed()) {
-				value = PIOS_HCSR04_Get();
-				//from 3.4cm to 5.1m
-				if((value > 100) && (value < 15000)) {
-					height_in = value * 0.00034f / 2.0f;
-					height_out = (height_out * (1 - coeff)) + (height_in * coeff);
-					sonardata.Altitude = height_out; // m/us
-				}
+        // Compute the current altitude
+        // depends on baro samplerate
+        if (!(sample_rate--)) {
+            if (PIOS_HCSR04_Completed()) {
+                value = PIOS_HCSR04_Get();
+                // from 3.4cm to 5.1m
+                if ((value > 100) && (value < 15000)) {
+                    height_in  = value * 0.00034f / 2.0f;
+                    height_out = (height_out * (1 - coeff)) + (height_in * coeff);
+                    sonardata.Altitude = height_out; // m/us
+                }
 
-				// Update the SonarAltitude UAVObject
-				SonarAltitudeSet(&sonardata);
-				timeout = 10;
-				PIOS_HCSR04_Trigger();
-			}
-			if(!(timeout--)) {
-				//retrigger
-				timeout = 10;
-				PIOS_HCSR04_Trigger();
-			}
-			sample_rate = 25;
-		}
-#endif
-		float temp, press;
+                // Update the SonarAltitude UAVObject
+                SonarAltitudeSet(&sonardata);
+                timeout = 10;
+                PIOS_HCSR04_Trigger();
+            }
+            if (!(timeout--)) {
+                // retrigger
+                timeout = 10;
+                PIOS_HCSR04_Trigger();
+            }
+            sample_rate = 25;
+        }
+#endif /* if defined(PIOS_INCLUDE_HCSR04) */
+        float temp, press;
 #ifdef PIOS_MS5611_SLOW_TEMP_RATE
-		temp_press_interleave_count --;
-		if(temp_press_interleave_count == 0)
-		{
+        temp_press_interleave_count--;
+        if (temp_press_interleave_count == 0) {
 #endif
-		// Update the temperature data
-		PIOS_MS5611_StartADC(TemperatureConv);
-		vTaskDelay(PIOS_MS5611_GetDelay());
-		PIOS_MS5611_ReadADC();
-			
-#ifdef PIOS_MS5611_SLOW_TEMP_RATE
-			temp_press_interleave_count=PIOS_MS5611_SLOW_TEMP_RATE;
-		}
-#endif
-		
-		// Update the pressure data
-		PIOS_MS5611_StartADC(PressureConv);
-		vTaskDelay(PIOS_MS5611_GetDelay());
-		PIOS_MS5611_ReadADC();
+        // Update the temperature data
+        PIOS_MS5611_StartADC(TemperatureConv);
+        vTaskDelay(PIOS_MS5611_GetDelay());
+        PIOS_MS5611_ReadADC();
 
-		
-		temp = PIOS_MS5611_GetTemperature();
-		press = PIOS_MS5611_GetPressure();
-		
-		data.Temperature = temp;
-		data.Pressure = press;
-		data.Altitude = 44330.0f * (1.0f - powf(data.Pressure / MS5611_P0, (1.0f / 5.255f)));
-	
-		// Update the AltitudeActual UAVObject
-		BaroAltitudeSet(&data);
-	}
+#ifdef PIOS_MS5611_SLOW_TEMP_RATE
+        temp_press_interleave_count = PIOS_MS5611_SLOW_TEMP_RATE;
+    }
+#endif
+
+        // Update the pressure data
+        PIOS_MS5611_StartADC(PressureConv);
+        vTaskDelay(PIOS_MS5611_GetDelay());
+        PIOS_MS5611_ReadADC();
+
+
+        temp  = PIOS_MS5611_GetTemperature();
+        press = PIOS_MS5611_GetPressure();
+
+        data.Temperature = temp;
+        data.Pressure    = press;
+        data.Altitude    = 44330.0f * (1.0f - powf(data.Pressure / MS5611_P0, (1.0f / 5.255f)));
+
+        // Update the AltitudeActual UAVObject
+        BaroAltitudeSet(&data);
+    }
 }
 
 /**

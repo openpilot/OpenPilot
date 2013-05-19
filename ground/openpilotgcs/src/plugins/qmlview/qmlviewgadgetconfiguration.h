@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin QML Viewer Plugin
  * @{
- * @brief The QML Viewer Gadget 
+ * @brief The QML Viewer Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,21 +32,32 @@
 
 using namespace Core;
 
-class QmlViewGadgetConfiguration : public IUAVGadgetConfiguration
-{
-Q_OBJECT
+class QmlViewGadgetConfiguration : public IUAVGadgetConfiguration {
+    Q_OBJECT
 public:
-    explicit QmlViewGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+    explicit QmlViewGadgetConfiguration(QString classId, QSettings *qSettings = 0, QObject *parent = 0);
 
-    //set dial configuration functions
-    void setDialFile(QString dialFile){m_defaultDial=dialFile;}
-    void setUseOpenGL(bool flag) { useOpenGLFlag = flag; }
+    // set dial configuration functions
+    void setDialFile(QString dialFile)
+    {
+        m_defaultDial = dialFile;
+    }
+    void setUseOpenGL(bool flag)
+    {
+        useOpenGLFlag = flag;
+    }
 
-    //get dial configuration functions
-    QString dialFile() {return m_defaultDial;}
-    bool useOpenGL() { return useOpenGLFlag; }
+    // get dial configuration functions
+    QString dialFile()
+    {
+        return m_defaultDial;
+    }
+    bool useOpenGL()
+    {
+        return useOpenGLFlag;
+    }
 
-    void saveConfig(QSettings* settings) const;
+    void saveConfig(QSettings *settings) const;
     IUAVGadgetConfiguration *clone();
 
 private:

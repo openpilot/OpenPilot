@@ -38,20 +38,19 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class UPLOADER_EXPORT UploaderGadgetFactory : public Core::IUAVGadgetFactory
-{
+class UPLOADER_EXPORT UploaderGadgetFactory : public Core::IUAVGadgetFactory {
     Q_OBJECT
 public:
     UploaderGadgetFactory(QObject *parent = 0);
     ~UploaderGadgetFactory();
 
     Core::IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings);
     bool isAutoUpdateCapable();
 private:
     bool isautocapable;
 signals:
-    void autoUpdateSignal(uploader::AutoUpdateStep,QVariant);
+    void autoUpdateSignal(uploader::AutoUpdateStep, QVariant);
     void autoUpdate();
 };
 

@@ -1,5 +1,3 @@
-
-
 #ifndef QEXTSERIALPORT_GLOBAL_H
 #define QEXTSERIALPORT_GLOBAL_H
 
@@ -12,4 +10,3 @@
 #endif
 
 #endif // QEXTSERIALPORT_GLOBAL_H
-

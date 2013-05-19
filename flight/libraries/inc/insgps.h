@@ -1,6 +1,6 @@
 /**
  ******************************************************************************
- * @addtogroup AHRS 
+ * @addtogroup AHRS
  * @{
  * @addtogroup INSGPS
  * @{
@@ -35,24 +35,24 @@
 #include "stdint.h"
 
 /**
-  * @addtogroup Constants
-  * @{
-  */
-#define POS_SENSORS 0x007
+ * @addtogroup Constants
+ * @{
+ */
+#define POS_SENSORS       0x007
 #define HORIZ_POS_SENSORS 0x003
-#define VER_POS_SENSORS 0x004
-#define HORIZ_SENSORS 0x018
-#define VERT_SENSORS  0x020
-#define MAG_SENSORS 0x1C0
-#define BARO_SENSOR 0x200
+#define VER_POS_SENSORS   0x004
+#define HORIZ_SENSORS     0x018
+#define VERT_SENSORS      0x020
+#define MAG_SENSORS       0x1C0
+#define BARO_SENSOR       0x200
 
-#define FULL_SENSORS 0x3FF
+#define FULL_SENSORS      0x3FF
 
 /**
-  * @}
-  */
+ * @}
+ */
 
-//  Exposed Function Prototypes
+// Exposed Function Prototypes
 void INSGPSInit();
 void INSStatePrediction(float gyro_data[3], float accel_data[3], float dT);
 void INSCovariancePrediction(float dT);
@@ -74,20 +74,20 @@ void INSPosVelReset(float pos[3], float vel[3]);
 void MagCorrection(float mag_data[3]);
 void MagVelBaroCorrection(float mag_data[3], float Vel[3], float BaroAlt);
 void FullCorrection(float mag_data[3], float Pos[3], float Vel[3],
-		    float BaroAlt);
+                    float BaroAlt);
 void GpsBaroCorrection(float Pos[3], float Vel[3], float BaroAlt);
 void GpsMagCorrection(float mag_data[3], float Pos[3], float Vel[2]);
 void VelBaroCorrection(float Vel[3], float BaroAlt);
 
 uint16_t ins_get_num_states();
 
-//  Nav structure containing current solution
+// Nav structure containing current solution
 extern struct NavStruct {
-	float Pos[3];		// Position in meters and relative to a local NED frame
-	float Vel[3];		// Velocity in meters and in NED
-	float q[4];		// unit quaternion rotation relative to NED
-	float gyro_bias[3];
-	float accel_bias[3];
+    float Pos[3]; // Position in meters and relative to a local NED frame
+    float Vel[3]; // Velocity in meters and in NED
+    float q[4]; // unit quaternion rotation relative to NED
+    float gyro_bias[3];
+    float accel_bias[3];
 } Nav;
 
 /**

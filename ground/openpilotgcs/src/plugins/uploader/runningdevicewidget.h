@@ -41,29 +41,27 @@
 #include "uavobjectutilmanager.h"
 #include "uploader_global.h"
 
-class UPLOADER_EXPORT RunningDeviceWidget : public QWidget
-{
+class UPLOADER_EXPORT RunningDeviceWidget : public QWidget {
     Q_OBJECT
 public:
-    RunningDeviceWidget( QWidget *parent = 0);
+    RunningDeviceWidget(QWidget *parent = 0);
     void populate();
     void freeze();
     QString setOpenFileName();
     QString setSaveFileName();
-    typedef enum { STATUSICON_OK, STATUSICON_RUNNING, STATUSICON_FAIL, STATUSICON_INFO} StatusIcon;
+    typedef enum { STATUSICON_OK, STATUSICON_RUNNING, STATUSICON_FAIL, STATUSICON_INFO } StatusIcon;
 
 private:
     Ui_runningDeviceWidget *myDevice;
     int deviceID;
     QPixmap devicePic;
-    //void status(QString str, StatusIcon ic);
+    // void status(QString str, StatusIcon ic);
 
 signals:
 
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
-
 };
 
 #endif // RUNNINGDEVICEWIDGET_H

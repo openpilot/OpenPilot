@@ -51,12 +51,12 @@
 
 void ExampleStart(void)
 {
-	ExampleModPeriodicInitialize();
-	ExampleModThreadInitialize();
+    ExampleModPeriodicInitialize();
+    ExampleModThreadInitialize();
 }
 
 void ExampleInitialize(void)
 {
-	ExampleModEventInitialize();
+    ExampleModEventInitialize();
 }
 MODULE_INITCALL(ExampleInitialize, ExampleStart)

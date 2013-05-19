@@ -48,21 +48,21 @@
  *    for DSM2/DSMJ:
  *      1 byte - lost frame counter (8 bit)
  *      1 byte - data format (for master receiver bound with 3 or 5 pulses),
- *      	 or unknown (for slave receiver bound with 4 or 6 pulses,
+ *               or unknown (for slave receiver bound with 4 or 6 pulses,
  *               some sources call it also the lost frame counter)
  *    for DSMX:
  *      1 byte - unknown data (does not look like lost frame counter)
  *      1 byte - unknown data, has been seen only 0xB2 so far
 
  * 14 bytes - up to 7 channels (16 bit word per channel) with encoded channel
- * 	      number, channel value, the "2nd frame in a sequence" flag.
- * 	      Unused channels have FF FF instead of data bytes.
+ *            number, channel value, the "2nd frame in a sequence" flag.
+ *            Unused channels have FF FF instead of data bytes.
  *
  * Data format identification:
  *   - for DSM2/DSMJ: [0 0 0 R 0 0 N1 N0]
  *     where
- *   	  R is data resolution (0 - 10 bits, 1 - 11 bits),
- *   	  N1..N0 is the number of frames required to receive all channel
+ *        R is data resolution (0 - 10 bits, 1 - 11 bits),
+ *        N1..N0 is the number of frames required to receive all channel
  *        data (01 or 10 are known to the moment, which means 1 or 2 frames).
  *        Three values for the transmitter information byte have been seen
  *        thus far: 0x01, 0x02, 0x12.
@@ -78,7 +78,7 @@
  * - for 10 bit: [F 0 C3 C2 C1 C0 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0]
  * - for 11 bit: [F C3 C2 C1 C0 D10 D9 D8 D7 D6 D5 D4 D3 D2 D1 D0]
  *   where
- *   	F is normally 0 but set to 1 for the first channel of the 2nd frame,
+ *      F is normally 0 but set to 1 for the first channel of the 2nd frame,
  *      C3 to C0 is the channel number, 4 bit, zero-based, in any order,
  *      Dx..D0 - channel data (10 or 11 bits)
  *
@@ -98,37 +98,37 @@
  * master.
  */
 
-#define DSM_CHANNELS_PER_FRAME		7
-#define DSM_FRAME_LENGTH		(1+1+DSM_CHANNELS_PER_FRAME*2)
-#define DSM_DSM2_RES_MASK		0x0010
-#define DSM_2ND_FRAME_MASK		0x8000
+#define DSM_CHANNELS_PER_FRAME 7
+#define DSM_FRAME_LENGTH       (1 + 1 + DSM_CHANNELS_PER_FRAME * 2)
+#define DSM_DSM2_RES_MASK      0x0010
+#define DSM_2ND_FRAME_MASK     0x8000
 
 /*
  * Include lost frame counter and provide it as a last channel value
  * for debugging. Currently is not used by the receiver layer.
  */
-//#define DSM_LOST_FRAME_COUNTER
+// #define DSM_LOST_FRAME_COUNTER
 
 /* DSM protocol variations */
 enum pios_dsm_proto {
-	PIOS_DSM_PROTO_DSM2,
-	PIOS_DSM_PROTO_DSMX10BIT,
-	PIOS_DSM_PROTO_DSMX11BIT,
+    PIOS_DSM_PROTO_DSM2,
+    PIOS_DSM_PROTO_DSMX10BIT,
+    PIOS_DSM_PROTO_DSMX11BIT,
 };
 
 /* DSM receiver instance configuration */
 struct pios_dsm_cfg {
-	struct stm32_gpio bind;
+    struct stm32_gpio bind;
 };
 
 extern const struct pios_rcvr_driver pios_dsm_rcvr_driver;
 
 extern int32_t PIOS_DSM_Init(uint32_t *dsm_id,
-			     const struct pios_dsm_cfg *cfg,
-			     const struct pios_com_driver *driver,
-			     uint32_t lower_id,
-			     enum pios_dsm_proto proto,
-			     uint8_t bind);
+                             const struct pios_dsm_cfg *cfg,
+                             const struct pios_com_driver *driver,
+                             uint32_t lower_id,
+                             enum pios_dsm_proto proto,
+                             uint8_t bind);
 
 #endif /* PIOS_DSM_PRIV_H */
 

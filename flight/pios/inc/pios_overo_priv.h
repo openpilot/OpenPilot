@@ -36,19 +36,19 @@
 extern const struct pios_com_driver pios_overo_com_driver;
 
 struct pios_overo_cfg {
-	SPI_TypeDef *regs;
-	uint32_t remap;				/* GPIO_Remap_* or GPIO_AF_* */
-	SPI_InitTypeDef init;
-	bool use_crc;
-	struct stm32_dma dma;
-	struct stm32_gpio sclk;
-	struct stm32_gpio miso;
-	struct stm32_gpio mosi;
-	uint32_t slave_count;
-	struct stm32_gpio ssel[];
+    SPI_TypeDef       *regs;
+    uint32_t          remap;                         /* GPIO_Remap_* or GPIO_AF_* */
+    SPI_InitTypeDef   init;
+    bool use_crc;
+    struct stm32_dma  dma;
+    struct stm32_gpio sclk;
+    struct stm32_gpio miso;
+    struct stm32_gpio mosi;
+    uint32_t          slave_count;
+    struct stm32_gpio ssel[];
 };
 
-extern int32_t PIOS_OVERO_Init(uint32_t * overo_id, const struct pios_overo_cfg * cfg);
+extern int32_t PIOS_OVERO_Init(uint32_t *overo_id, const struct pios_overo_cfg *cfg);
 
 #endif /* PIOS_OVERO_H */
 

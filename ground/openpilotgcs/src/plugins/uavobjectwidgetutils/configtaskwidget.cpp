@@ -883,9 +883,9 @@ void ConfigTaskWidget::reloadButtonClicked()
     if (!list) {
         return;
     }
-    ObjectPersistence *objper     = dynamic_cast<ObjectPersistence *>(getObjectManager()->getObject(ObjectPersistence::NAME));
+    ObjectPersistence *objper = dynamic_cast<ObjectPersistence *>(getObjectManager()->getObject(ObjectPersistence::NAME));
     timeOut = new QTimer(this);
-    QEventLoop *eventLoop = new QEventLoop(this);
+    QEventLoop *eventLoop     = new QEventLoop(this);
     connect(timeOut, SIGNAL(timeout()), eventLoop, SLOT(quit()));
     connect(objper, SIGNAL(objectUpdated(UAVObject *)), eventLoop, SLOT(quit()));
 

@@ -4,25 +4,25 @@
  * @file       submiteditorwidget.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -44,11 +44,9 @@ enum { debug = 0 };
 enum { defaultLineWidth = 72 };
 
 namespace Utils {
-
 // QActionPushButton: A push button tied to an action
 // (similar to a QToolButton)
-class QActionPushButton : public QPushButton
-{
+class QActionPushButton : public QPushButton {
     Q_OBJECT
 public:
     explicit QActionPushButton(QAction *a);
@@ -58,7 +56,7 @@ private slots:
 };
 
 QActionPushButton::QActionPushButton(QAction *a) :
-     QPushButton(a->icon(), a->text())
+    QPushButton(a->icon(), a->text())
 {
     connect(a, SIGNAL(changed()), this, SLOT(actionChanged()));
     connect(this, SIGNAL(clicked()), a, SLOT(trigger()));
@@ -67,20 +65,23 @@ QActionPushButton::QActionPushButton(QAction *a) :
 
 void QActionPushButton::actionChanged()
 {
-    if (const QAction *a = qobject_cast<QAction*>(sender()))
+    if (const QAction * a = qobject_cast<QAction *>(sender())) {
         setEnabled(a->isEnabled());
+    }
 }
 
 // Helpers to retrieve model data
 static inline bool listModelChecked(const QAbstractItemModel *model, int row, int column = 0)
 {
     const QModelIndex checkableIndex = model->index(row, column, QModelIndex());
+
     return model->data(checkableIndex, Qt::CheckStateRole).toInt() == Qt::Checked;
 }
 
 static inline QString listModelText(const QAbstractItemModel *model, int row, int column)
 {
     const QModelIndex index = model->index(row, column, QModelIndex());
+
     return model->data(index, Qt::DisplayRole).toString();
 }
 
@@ -88,9 +89,12 @@ static inline QString listModelText(const QAbstractItemModel *model, int row, in
 static bool listModelContainsCheckedItem(const QAbstractItemModel *model)
 {
     const int count = model->rowCount();
-    for (int i = 0; i < count; i++)
-        if (listModelChecked(model, i, 0))
+
+    for (int i = 0; i < count; i++) {
+        if (listModelChecked(model, i, 0)) {
             return true;
+        }
+    }
     return false;
 }
 
@@ -98,19 +102,21 @@ static bool listModelContainsCheckedItem(const QAbstractItemModel *model)
 QList<int> selectedRows(const QAbstractItemView *view)
 {
     const QModelIndexList indexList = view->selectionModel()->selectedRows(0);
-    if (indexList.empty())
+
+    if (indexList.empty()) {
         return QList<int>();
+    }
     QList<int> rc;
     const QModelIndexList::const_iterator cend = indexList.constEnd();
-    for (QModelIndexList::const_iterator it = indexList.constBegin(); it != cend; ++it)
+    for (QModelIndexList::const_iterator it = indexList.constBegin(); it != cend; ++it) {
         rc.push_back(it->row());
+    }
     return rc;
 }
 
 // -----------  SubmitEditorWidgetPrivate
 
-struct SubmitEditorWidgetPrivate
-{
+struct SubmitEditorWidgetPrivate {
     // A pair of position/action to extend context menus
     typedef QPair<int, QPointer<QAction> > AdditionalContextMenuAction;
 
@@ -119,8 +125,8 @@ struct SubmitEditorWidgetPrivate
     Ui::SubmitEditorWidget m_ui;
     bool m_filesSelected;
     bool m_filesChecked;
-    int m_fileNameColumn;
-    int m_activatedRow;
+    int  m_fileNameColumn;
+    int  m_activatedRow;
 
     QList<AdditionalContextMenuAction> descriptionEditContextMenuActions;
     QVBoxLayout *m_fieldLayout;
@@ -135,8 +141,7 @@ SubmitEditorWidgetPrivate::SubmitEditorWidgetPrivate() :
     m_activatedRow(-1),
     m_fieldLayout(0),
     m_lineWidth(defaultLineWidth)
-{
-}
+{}
 
 SubmitEditorWidget::SubmitEditorWidget(QWidget *parent) :
     QWidget(parent),
@@ -165,7 +170,7 @@ SubmitEditorWidget::~SubmitEditorWidget()
 }
 
 void SubmitEditorWidget::registerActions(QAction *editorUndoAction, QAction *editorRedoAction,
-                         QAction *submitAction, QAction *diffAction)
+                                         QAction *submitAction, QAction *diffAction)
 {
     if (editorUndoAction) {
         editorUndoAction->setEnabled(m_d->m_ui.description->document()->isUndoAvailable());
@@ -181,8 +186,9 @@ void SubmitEditorWidget::registerActions(QAction *editorUndoAction, QAction *edi
     if (submitAction) {
         if (debug) {
             int count = 0;
-            if (const QAbstractItemModel *model = m_d->m_ui.fileView->model())
+            if (const QAbstractItemModel * model = m_d->m_ui.fileView->model()) {
                 count = model->rowCount();
+            }
             qDebug() << Q_FUNC_INFO << submitAction << count << "items" << m_d->m_filesChecked;
         }
         submitAction->setEnabled(m_d->m_filesChecked);
@@ -190,8 +196,9 @@ void SubmitEditorWidget::registerActions(QAction *editorUndoAction, QAction *edi
         m_d->m_ui.buttonLayout->addWidget(new QActionPushButton(submitAction));
     }
     if (diffAction) {
-        if (debug)
+        if (debug) {
             qDebug() << diffAction << m_d->m_filesSelected;
+        }
         diffAction->setEnabled(m_d->m_filesSelected);
         connect(this, SIGNAL(fileSelectionChanged(bool)), diffAction, SLOT(setEnabled(bool)));
         connect(diffAction, SIGNAL(triggered()), this, SLOT(triggerDiffSelected()));
@@ -199,7 +206,7 @@ void SubmitEditorWidget::registerActions(QAction *editorUndoAction, QAction *edi
     }
 }
 
-void SubmitEditorWidget::unregisterActions(QAction *editorUndoAction,  QAction *editorRedoAction,
+void SubmitEditorWidget::unregisterActions(QAction *editorUndoAction, QAction *editorRedoAction,
                                            QAction *submitAction, QAction *diffAction)
 {
     if (editorUndoAction) {
@@ -211,12 +218,13 @@ void SubmitEditorWidget::unregisterActions(QAction *editorUndoAction,  QAction *
         disconnect(editorRedoAction, SIGNAL(triggered()), m_d->m_ui.description, SLOT(redo()));
     }
 
-    if (submitAction)
+    if (submitAction) {
         disconnect(this, SIGNAL(fileCheckStateChanged(bool)), submitAction, SLOT(setEnabled(bool)));
+    }
 
     if (diffAction) {
-         disconnect(this, SIGNAL(fileSelectionChanged(bool)), diffAction, SLOT(setEnabled(bool)));
-         disconnect(diffAction, SIGNAL(triggered()), this, SLOT(triggerDiffSelected()));
+        disconnect(this, SIGNAL(fileSelectionChanged(bool)), diffAction, SLOT(setEnabled(bool)));
+        disconnect(diffAction, SIGNAL(triggered()), this, SLOT(triggerDiffSelected()));
     }
 }
 
@@ -224,6 +232,7 @@ void SubmitEditorWidget::unregisterActions(QAction *editorUndoAction,  QAction *
 static inline QString trimMessageText(const QString &t)
 {
     QString rc = t.trimmed();
+
     rc += QLatin1Char('\n');
     return rc;
 }
@@ -235,7 +244,8 @@ static QString wrappedText(const QTextEdit *e)
     const QChar newLine = QLatin1Char('\n');
     QString rc;
     QTextCursor cursor(e->document());
-    cursor.movePosition(QTextCursor::Start);    
+
+    cursor.movePosition(QTextCursor::Start);
     while (!cursor.atEnd()) {
         cursor.select(QTextCursor::LineUnderCursor);
         rc += cursor.selectedText();
@@ -249,9 +259,10 @@ static QString wrappedText(const QTextEdit *e)
 QString SubmitEditorWidget::descriptionText() const
 {
     QString rc = trimMessageText(lineWrap() ? wrappedText(m_d->m_ui.description) : m_d->m_ui.description->toPlainText());
+
     // append field entries
-    foreach(const SubmitFieldWidget *fw, m_d->m_fieldWidgets)
-        rc += fw->fieldValues();
+    foreach(const SubmitFieldWidget * fw, m_d->m_fieldWidgets)
+    rc += fw->fieldValues();
     return rc;
 }
 
@@ -267,11 +278,12 @@ bool SubmitEditorWidget::lineWrap() const
 
 void SubmitEditorWidget::setLineWrap(bool v)
 {
-    if (debug)
+    if (debug) {
         qDebug() << Q_FUNC_INFO << v;
+    }
     if (v) {
         m_d->m_ui.description->setLineWrapColumnOrWidth(m_d->m_lineWidth);
-        m_d->m_ui.description->setLineWrapMode(QTextEdit::FixedColumnWidth);        
+        m_d->m_ui.description->setLineWrapMode(QTextEdit::FixedColumnWidth);
     } else {
         m_d->m_ui.description->setLineWrapMode(QTextEdit::NoWrap);
     }
@@ -284,13 +296,16 @@ int SubmitEditorWidget::lineWrapWidth() const
 
 void SubmitEditorWidget::setLineWrapWidth(int v)
 {
-    if (debug)
+    if (debug) {
         qDebug() << Q_FUNC_INFO << v << lineWrap();
-    if (m_d->m_lineWidth == v)
+    }
+    if (m_d->m_lineWidth == v) {
         return;
+    }
     m_d->m_lineWidth = v;
-    if (lineWrap())
+    if (lineWrap()) {
         m_d->m_ui.description->setLineWrapColumnOrWidth(v);
+    }
 }
 
 int SubmitEditorWidget::fileNameColumn() const
@@ -321,17 +336,18 @@ void SubmitEditorWidget::setFileModel(QAbstractItemModel *model)
 
     if (model->rowCount()) {
         const int columnCount = model->columnCount();
-        for (int c = 0;  c < columnCount; c++)
+        for (int c = 0; c < columnCount; c++) {
             m_d->m_ui.fileView->resizeColumnToContents(c);
+        }
     }
 
-    connect(model, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+    connect(model, SIGNAL(dataChanged(QModelIndex, QModelIndex)),
             this, SLOT(updateSubmitAction()));
     connect(model, SIGNAL(modelReset()),
             this, SLOT(updateSubmitAction()));
-    connect(model, SIGNAL(rowsInserted(QModelIndex,int,int)),
+    connect(model, SIGNAL(rowsInserted(QModelIndex, int, int)),
             this, SLOT(updateSubmitAction()));
-    connect(model, SIGNAL(rowsRemoved(QModelIndex,int,int)),
+    connect(model, SIGNAL(rowsRemoved(QModelIndex, int, int)),
             this, SLOT(updateSubmitAction()));
     connect(m_d->m_ui.fileView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
             this, SLOT(updateDiffAction()));
@@ -346,14 +362,17 @@ QAbstractItemModel *SubmitEditorWidget::fileModel() const
 QStringList SubmitEditorWidget::selectedFiles() const
 {
     const QList<int> selection = selectedRows(m_d->m_ui.fileView);
-    if (selection.empty())
+
+    if (selection.empty()) {
         return QStringList();
+    }
 
     QStringList rc;
     const QAbstractItemModel *model = m_d->m_ui.fileView->model();
     const int count = selection.size();
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) {
         rc.push_back(listModelText(model, selection.at(i), fileNameColumn()));
+    }
     return rc;
 }
 
@@ -361,12 +380,16 @@ QStringList SubmitEditorWidget::checkedFiles() const
 {
     QStringList rc;
     const QAbstractItemModel *model = m_d->m_ui.fileView->model();
-    if (!model)
+
+    if (!model) {
         return rc;
+    }
     const int count = model->rowCount();
-    for (int i = 0; i < count; i++)
-        if (listModelChecked(model, i, 0))
+    for (int i = 0; i < count; i++) {
+        if (listModelChecked(model, i, 0)) {
             rc.push_back(listModelText(model, i, fileNameColumn()));
+        }
+    }
     return rc;
 }
 
@@ -378,8 +401,10 @@ QTextEdit *SubmitEditorWidget::descriptionEdit() const
 void SubmitEditorWidget::triggerDiffSelected()
 {
     const QStringList sel = selectedFiles();
-    if (!sel.empty())
+
+    if (!sel.empty()) {
         emit diffSelected(sel);
+    }
 }
 
 void SubmitEditorWidget::diffActivatedDelayed()
@@ -406,6 +431,7 @@ void SubmitEditorWidget::updateActions()
 void SubmitEditorWidget::updateSubmitAction()
 {
     const bool newFilesCheckedState = hasCheckedFiles();
+
     if (m_d->m_filesChecked != newFilesCheckedState) {
         m_d->m_filesChecked = newFilesCheckedState;
         emit fileCheckStateChanged(m_d->m_filesChecked);
@@ -416,6 +442,7 @@ void SubmitEditorWidget::updateSubmitAction()
 void SubmitEditorWidget::updateDiffAction()
 {
     const bool filesSelected = hasSelection();
+
     if (m_d->m_filesSelected != filesSelected) {
         m_d->m_filesSelected = filesSelected;
         emit fileSelectionChanged(m_d->m_filesSelected);
@@ -425,21 +452,24 @@ void SubmitEditorWidget::updateDiffAction()
 bool SubmitEditorWidget::hasSelection() const
 {
     // Not present until model is set
-    if (const QItemSelectionModel *sm = m_d->m_ui.fileView->selectionModel())
+    if (const QItemSelectionModel * sm = m_d->m_ui.fileView->selectionModel()) {
         return sm->hasSelection();
+    }
     return false;
 }
 
 bool SubmitEditorWidget::hasCheckedFiles() const
 {
-    if (const QAbstractItemModel *model = m_d->m_ui.fileView->model())
+    if (const QAbstractItemModel * model = m_d->m_ui.fileView->model()) {
         return listModelContainsCheckedItem(model);
+    }
     return false;
 }
 
 void SubmitEditorWidget::changeEvent(QEvent *e)
 {
     QWidget::changeEvent(e);
+
     switch (e->type()) {
     case QEvent::LanguageChange:
         m_d->m_ui.retranslateUi(this);
@@ -462,7 +492,7 @@ void SubmitEditorWidget::addSubmitFieldWidget(SubmitFieldWidget *f)
         QHBoxLayout *outerLayout = new QHBoxLayout;
         outerLayout->addLayout(m_d->m_fieldLayout);
         outerLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Ignored));
-        QBoxLayout *descrLayout = qobject_cast<QBoxLayout*>(m_d->m_ui.descriptionBox->layout());
+        QBoxLayout *descrLayout  = qobject_cast<QBoxLayout *>(m_d->m_ui.descriptionBox->layout());
         Q_ASSERT(descrLayout);
         descrLayout->addLayout(outerLayout);
     }
@@ -487,9 +517,10 @@ void SubmitEditorWidget::insertDescriptionEditContextMenuAction(int pos, QAction
 
 void SubmitEditorWidget::editorCustomContextMenuRequested(const QPoint &pos)
 {
-    QMenu *menu = m_d->m_ui.description->createStandardContextMenu();    
+    QMenu *menu = m_d->m_ui.description->createStandardContextMenu();
+
     // Extend
-    foreach (const SubmitEditorWidgetPrivate::AdditionalContextMenuAction &a, m_d->descriptionEditContextMenuActions) {
+    foreach(const SubmitEditorWidgetPrivate::AdditionalContextMenuAction & a, m_d->descriptionEditContextMenuActions) {
         if (a.second) {
             if (a.first >= 0) {
                 menu->insertAction(menu->actions().at(a.first), a.second);
@@ -501,7 +532,6 @@ void SubmitEditorWidget::editorCustomContextMenuRequested(const QPoint &pos)
     menu->exec(m_d->m_ui.description->mapToGlobal(pos));
     delete menu;
 }
-
 } // namespace Utils
 
 #include "submiteditorwidget.moc"

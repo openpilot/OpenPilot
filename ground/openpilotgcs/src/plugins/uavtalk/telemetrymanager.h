@@ -36,8 +36,7 @@
 #include <QIODevice>
 #include <QObject>
 
-class UAVTALK_EXPORT TelemetryManager: public QObject
-{
+class UAVTALK_EXPORT TelemetryManager : public QObject {
     Q_OBJECT
 
 public:
@@ -61,10 +60,10 @@ private slots:
     void onStop();
 
 private:
-    UAVObjectManager* objMngr;
-    UAVTalk* utalk;
-    Telemetry* telemetry;
-    TelemetryMonitor* telemetryMon;
+    UAVObjectManager *objMngr;
+    UAVTalk *utalk;
+    Telemetry *telemetry;
+    TelemetryMonitor *telemetryMon;
     QIODevice *device;
     bool autopilotConnected;
 };

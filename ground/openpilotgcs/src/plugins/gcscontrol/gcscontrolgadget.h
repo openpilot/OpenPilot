@@ -41,27 +41,35 @@
 namespace Core {
 class IUAVGadget;
 }
-//class QWidget;
-//class QString;
+// class QWidget;
+// class QString;
 class GCSControlGadgetWidget;
 
 using namespace Core;
 
-class GCSControlGadget : public Core::IUAVGadget
-{
+class GCSControlGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
-    GCSControlGadget(QString classId, GCSControlGadgetWidget *widget, QWidget *parent = 0, QObject *plugin=0);
+    GCSControlGadget(QString classId, GCSControlGadgetWidget *widget, QWidget *parent = 0, QObject *plugin = 0);
     ~GCSControlGadget();
 
-    QList<int> context() const { return m_context; }
-    QWidget *widget() { return m_widget; }
-    QString contextHelpId() const { return QString(); }
+    QList<int> context() const
+    {
+        return m_context;
+    }
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    QString contextHelpId() const
+    {
+        return QString();
+    }
 
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 
 private:
-    ManualControlCommand* getManualControlCommand();
+    ManualControlCommand *getManualControlCommand();
     double constrain(double value);
     QTime joystickTime;
     QWidget *m_widget;

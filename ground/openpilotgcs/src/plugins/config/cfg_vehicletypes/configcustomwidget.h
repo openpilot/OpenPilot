@@ -41,8 +41,7 @@
 
 class Ui_Widget;
 
-class ConfigCustomWidget: public VehicleConfig
-{
+class ConfigCustomWidget : public VehicleConfig {
     Q_OBJECT
 
 public:
@@ -67,11 +66,9 @@ private:
 private slots:
     virtual void setupUI(QString airframeType);
     virtual bool throwConfigError(int numMotors);
-
 };
 
-class SpinBoxDelegate : public QItemDelegate
-{
+class SpinBoxDelegate : public QItemDelegate {
     Q_OBJECT
 
 public:

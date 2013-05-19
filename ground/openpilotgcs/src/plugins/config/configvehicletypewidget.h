@@ -53,8 +53,7 @@
  * TODO consider to call "super" to benefit from default logic...
  * TODO improve handling of relationship with VehicleConfig derived classes (i.e. ConfigTaskWidget within ConfigTaskWidget)
  */
-class ConfigVehicleTypeWidget: public ConfigTaskWidget
-{
+class ConfigVehicleTypeWidget : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
@@ -90,7 +89,6 @@ private slots:
     void switchAirframeType(int index);
     void openHelp();
     void enableFFTest();
-
 };
 
 #endif // CONFIGVEHICLETYPEWIDGET_H

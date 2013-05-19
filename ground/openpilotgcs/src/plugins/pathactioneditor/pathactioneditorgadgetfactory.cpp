@@ -30,18 +30,17 @@
 #include <QDebug>
 
 PathActionEditorGadgetFactory::PathActionEditorGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("PathActionEditorGadget"),
-                          tr("PathAction Editor"),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("PathActionEditorGadget"),
+                      tr("PathAction Editor"),
+                      parent)
+{}
 
 PathActionEditorGadgetFactory::~PathActionEditorGadgetFactory()
+{}
+
+IUAVGadget *PathActionEditorGadgetFactory::createGadget(QWidget *parent)
 {
+    PathActionEditorGadgetWidget *gadgetWidget = new PathActionEditorGadgetWidget(parent);
 
-}
-
-IUAVGadget* PathActionEditorGadgetFactory::createGadget(QWidget *parent) {
-    PathActionEditorGadgetWidget* gadgetWidget = new PathActionEditorGadgetWidget(parent);
     return new PathActionEditorGadget(QString("PathActionEditorGadget"), gadgetWidget, parent);
 }

@@ -39,38 +39,36 @@
 #include <QFile>
 #include <QTimer>
 
-class SystemHealthGadgetWidget : public QGraphicsView
-{
+class SystemHealthGadgetWidget : public QGraphicsView {
     Q_OBJECT
 
 public:
     SystemHealthGadgetWidget(QWidget *parent = 0);
-   ~SystemHealthGadgetWidget();
-   void setSystemFile(QString dfn);
-   void setIndicator(QString indicator);
-   void paint();
+    ~SystemHealthGadgetWidget();
+    void setSystemFile(QString dfn);
+    void setIndicator(QString indicator);
+    void paint();
 
 protected:
-   void paintEvent(QPaintEvent *event);
-   void resizeEvent(QResizeEvent *event);
-   void mousePressEvent ( QMouseEvent * event );
+    void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
+    void mousePressEvent(QMouseEvent *event);
 
 private slots:
-   void updateAlarms(UAVObject *systemAlarm); // Called by the systemalarms UAVObject
-   void onAutopilotConnect();
-   void onAutopilotDisconnect();
+    void updateAlarms(UAVObject *systemAlarm); // Called by the systemalarms UAVObject
+    void onAutopilotConnect();
+    void onAutopilotDisconnect();
 
 private:
-   QSvgRenderer *m_renderer;
-   QGraphicsSvgItem *background;
-   QGraphicsSvgItem *foreground;
-   QGraphicsSvgItem *nolink;
+    QSvgRenderer *m_renderer;
+    QGraphicsSvgItem *background;
+    QGraphicsSvgItem *foreground;
+    QGraphicsSvgItem *nolink;
 
-                   // Simple flag to skip rendering if the
-   bool fgenabled; // layer does not exist.
+    // Simple flag to skip rendering if the
+    bool fgenabled; // layer does not exist.
 
-   void showAlarmDescriptionForItemId(const QString itemId, const QPoint& location);
-   void showAllAlarmDescriptions(const QPoint &location);
-
+    void showAlarmDescriptionForItemId(const QString itemId, const QPoint & location);
+    void showAllAlarmDescriptions(const QPoint &location);
 };
 #endif /* SYSTEMHEALTHGADGETWIDGET_H_ */

@@ -34,17 +34,16 @@ namespace Ui {
 class RebootPage;
 }
 
-class RebootPage : public AbstractWizardPage
-{
+class RebootPage : public AbstractWizardPage {
     Q_OBJECT
-    
+
 public:
     explicit RebootPage(SetupWizard *wizard, QWidget *parent = 0);
     ~RebootPage();
 
     void initializePage();
     bool validatePage();
-    
+
 private:
     Ui::RebootPage *ui;
     QTimer m_timer;

@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
  * @{
- * @brief The OpenPilot Map plugin 
+ * @brief The OpenPilot Map plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,32 +32,32 @@
 
 OPMapPlugin::OPMapPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 OPMapPlugin::~OPMapPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool OPMapPlugin::initialize(const QStringList& args, QString *errMsg)
+bool OPMapPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
 
-   mf = new OPMapGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    mf = new OPMapGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void OPMapPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void OPMapPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(OPMapPlugin)

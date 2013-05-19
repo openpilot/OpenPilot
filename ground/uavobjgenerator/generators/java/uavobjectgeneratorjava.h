@@ -28,22 +28,21 @@
 #define UAVOBJECTGENERATORJAVA_H
 
 #define JAVA_TEMPLATE_DIR "ground/openpilotgcs/src/libs/juavobjects/templates/"
-#define JAVA_CODE_DIR "java/src/org/openpilot/uavtalk"
+#define JAVA_CODE_DIR     "java/src/org/openpilot/uavtalk"
 
 #include "../generator_common.h"
 
-class UAVObjectGeneratorJava
-{
+class UAVObjectGeneratorJava {
 public:
-    bool generate(UAVObjectParser* gen,QString templatepath,QString outputpath);
+    bool generate(UAVObjectParser *gen, QString templatepath, QString outputpath);
 
 private:
-    bool process_object(ObjectInfo* info);
+    bool process_object(ObjectInfo *info);
 
     QString javaCodeTemplate, javaIncludeTemplate;
-    QStringList fieldTypeStrCPP,fieldTypeStrCPPClass;
+    QStringList fieldTypeStrCPP, fieldTypeStrCPPClass;
     QDir javaCodePath;
     QDir javaOutputPath;
- };
+};
 
-#endif
+#endif // ifndef UAVOBJECTGENERATORJAVA_H

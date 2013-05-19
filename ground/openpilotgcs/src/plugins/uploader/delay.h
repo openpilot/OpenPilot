@@ -17,8 +17,7 @@
 #define DELAY_H
 #include <QThread>
 
-class delay : public QThread
-{
+class delay : public QThread {
 public:
     static void msleep(unsigned long msecs)
     {

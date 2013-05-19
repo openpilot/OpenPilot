@@ -45,35 +45,32 @@
 
 
 LoggingConnection::LoggingConnection()
-{
-
-}
+{}
 
 LoggingConnection::~LoggingConnection()
-{
-}
+{}
 
 void LoggingConnection::onEnumerationChanged()
 {
-        emit availableDevChanged(this);
+    emit availableDevChanged(this);
 }
 
 QList <Core::IConnection::device> LoggingConnection::availableDevices()
 {
     QList <device> list;
     device d;
-    d.displayName="Logfile replay...";
-    d.name="Logfile replay...";
-    list <<d;
+    d.displayName = "Logfile replay...";
+    d.name = "Logfile replay...";
+    list << d;
 
     return list;
 }
 
-QIODevice* LoggingConnection::openDevice(const QString &deviceName)
+QIODevice *LoggingConnection::openDevice(const QString &deviceName)
 {
     Q_UNUSED(deviceName)
 
-    if (logFile.isOpen()){
+    if (logFile.isOpen()) {
         logFile.close();
     }
     QString fileName = QFileDialog::getOpenFileName(NULL, tr("Open file"), QString(""), tr("OpenPilot Log (*.opl)"));
@@ -86,7 +83,7 @@ QIODevice* LoggingConnection::openDevice(const QString &deviceName)
 void LoggingConnection::startReplay(QString file)
 {
     logFile.setFileName(file);
-    if(logFile.open(QIODevice::ReadOnly)) {
+    if (logFile.open(QIODevice::ReadOnly)) {
         qDebug() << "Replaying " << file;
         // state = REPLAY;
         logFile.startReplay();
@@ -96,8 +93,8 @@ void LoggingConnection::startReplay(QString file)
 void LoggingConnection::closeDevice(const QString &deviceName)
 {
     Q_UNUSED(deviceName);
-    //we have to delete the serial connection we created
-    if (logFile.isOpen()){
+    // we have to delete the serial connection we created
+    if (logFile.isOpen()) {
         logFile.close();
         m_deviceOpened = false;
     }
@@ -115,17 +112,13 @@ QString LoggingConnection::shortName()
 }
 
 
-
-
-
-
 /**
-  * Sets the file to use for logging and takes the parent plugin
-  * to connect to stop logging signal
-  * @param[in] file File name to write to
-  * @param[in] parent plugin
-  */
-bool LoggingThread::openFile(QString file, LoggingPlugin * parent)
+ * Sets the file to use for logging and takes the parent plugin
+ * to connect to stop logging signal
+ * @param[in] file File name to write to
+ * @param[in] parent plugin
+ */
+bool LoggingThread::openFile(QString file, LoggingPlugin *parent)
 {
     logFile.setFileName(file);
     logFile.open(QIODevice::WriteOnly);
@@ -134,53 +127,52 @@ bool LoggingThread::openFile(QString file, LoggingPlugin * parent)
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
     uavTalk = new UAVTalk(&logFile, objManager);
-    connect(parent,SIGNAL(stopLoggingSignal()),this,SLOT(stopLogging()));
+    connect(parent, SIGNAL(stopLoggingSignal()), this, SLOT(stopLogging()));
 
     return true;
 };
 
 /**
-  * Logs an object update to the file.  Data format is the
-  * timestamp as a 32 bit uint counting ms from start of
-  * file writing (flight time will be embedded in stream),
-  * then object packet size, then the packed UAVObject.
-  */
-void LoggingThread::objectUpdated(UAVObject * obj)
+ * Logs an object update to the file.  Data format is the
+ * timestamp as a 32 bit uint counting ms from start of
+ * file writing (flight time will be embedded in stream),
+ * then object packet size, then the packed UAVObject.
+ */
+void LoggingThread::objectUpdated(UAVObject *obj)
 {
     QWriteLocker locker(&lock);
-    if(!uavTalk->sendObject(obj,false,false) )
+
+    if (!uavTalk->sendObject(obj, false, false)) {
         qDebug() << "Error logging " << obj->getName();
+    }
 };
 
 /**
-  * Connect signals from all the objects updates to the write routine then
-  * run event loop
-  */
+ * Connect signals from all the objects updates to the write routine then
+ * run event loop
+ */
 void LoggingThread::run()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    QList< QList<UAVObject*> > list;
+    QList< QList<UAVObject *> > list;
     list = objManager->getObjects();
-    QList< QList<UAVObject*> >::const_iterator i;
-    QList<UAVObject*>::const_iterator j;
+    QList< QList<UAVObject *> >::const_iterator i;
+    QList<UAVObject *>::const_iterator j;
     int objects = 0;
 
-    for (i = list.constBegin(); i != list.constEnd(); ++i)
-    {
-        for (j = (*i).constBegin(); j != (*i).constEnd(); ++j)
-        {
-            connect(*j, SIGNAL(objectUpdated(UAVObject*)), (LoggingThread*) this, SLOT(objectUpdated(UAVObject*)));
+    for (i = list.constBegin(); i != list.constEnd(); ++i) {
+        for (j = (*i).constBegin(); j != (*i).constEnd(); ++j) {
+            connect(*j, SIGNAL(objectUpdated(UAVObject *)), (LoggingThread *)this, SLOT(objectUpdated(UAVObject *)));
             objects++;
-            //qDebug() << "Detected " << j[0];
+            // qDebug() << "Detected " << j[0];
         }
     }
 
-    GCSTelemetryStats* gcsStatsObj = GCSTelemetryStats::GetInstance(objManager);
+    GCSTelemetryStats *gcsStatsObj = GCSTelemetryStats::GetInstance(objManager);
     GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
-    if ( gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED )
-    {
+    if (gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED) {
         qDebug() << "Logging: connected already, ask for all settings";
         retrieveSettings();
     } else {
@@ -193,8 +185,8 @@ void LoggingThread::run()
 
 
 /**
-  * Pass this command to the correct thread then close the file
-  */
+ * Pass this command to the correct thread then close the file
+ */
 void LoggingThread::stopLogging()
 {
     QWriteLocker locker(&lock);
@@ -203,16 +195,14 @@ void LoggingThread::stopLogging()
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    QList< QList<UAVObject*> > list;
+    QList< QList<UAVObject *> > list;
     list = objManager->getObjects();
-    QList< QList<UAVObject*> >::const_iterator i;
-    QList<UAVObject*>::const_iterator j;
+    QList< QList<UAVObject *> >::const_iterator i;
+    QList<UAVObject *>::const_iterator j;
 
-    for (i = list.constBegin(); i != list.constEnd(); ++i)
-    {
-        for (j = (*i).constBegin(); j != (*i).constEnd(); ++j)
-        {
-            disconnect(*j, SIGNAL(objectUpdated(UAVObject*)), (LoggingThread*) this, SLOT(objectUpdated(UAVObject*)));
+    for (i = list.constBegin(); i != list.constEnd(); ++i) {
+        for (j = (*i).constBegin(); j != (*i).constEnd(); ++j) {
+            disconnect(*j, SIGNAL(objectUpdated(UAVObject *)), (LoggingThread *)this, SLOT(objectUpdated(UAVObject *)));
         }
     }
 
@@ -230,20 +220,18 @@ void LoggingThread::retrieveSettings()
     queue.clear();
     // Get all objects, add metaobjects, settings and data objects with OnChange update mode to the queue
     // Get UAVObjectManager instance
-    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
+    ExtensionSystem::PluginManager *pm   = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objMngr = pm->getObject<UAVObjectManager>();
-    QList< QList<UAVDataObject*> > objs = objMngr->getDataObjects();
-    for (int n = 0; n < objs.length(); ++n)
-    {
-        UAVDataObject* obj = objs[n][0];
-        if ( obj->isSettings() )
-                {
-                    queue.enqueue(obj);
-                }
+    QList< QList<UAVDataObject *> > objs = objMngr->getDataObjects();
+    for (int n = 0; n < objs.length(); ++n) {
+        UAVDataObject *obj = objs[n][0];
+        if (obj->isSettings()) {
+            queue.enqueue(obj);
         }
+    }
     // Start retrieving
     qDebug() << tr("Logging: retrieve settings objects from the autopilot (%1 objects)")
-                  .arg( queue.length());
+        .arg(queue.length());
     retrieveNextObject();
 }
 
@@ -254,15 +242,14 @@ void LoggingThread::retrieveSettings()
 void LoggingThread::retrieveNextObject()
 {
     // If queue is empty return
-    if ( queue.isEmpty() )
-    {
+    if (queue.isEmpty()) {
         qDebug() << "Logging: Object retrieval completed";
         return;
     }
     // Get next object from the queue
-    UAVObject* obj = queue.dequeue();
+    UAVObject *obj = queue.dequeue();
     // Connect to object
-    connect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(transactionCompleted(UAVObject*,bool)));
+    connect(obj, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transactionCompleted(UAVObject *, bool)));
     // Request update
     obj->requestUpdate();
 }
@@ -270,28 +257,24 @@ void LoggingThread::retrieveNextObject()
 /**
  * Called by the retrieved object when a transaction is completed.
  */
-void LoggingThread::transactionCompleted(UAVObject* obj, bool success)
+void LoggingThread::transactionCompleted(UAVObject *obj, bool success)
 {
     Q_UNUSED(success);
     // Disconnect from sending object
     obj->disconnect(this);
     // Process next object if telemetry is still available
     // Get stats objects
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    ExtensionSystem::PluginManager *pm     = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    GCSTelemetryStats* gcsStatsObj = GCSTelemetryStats::GetInstance(objManager);
+    GCSTelemetryStats *gcsStatsObj         = GCSTelemetryStats::GetInstance(objManager);
     GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
-    if ( gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED )
-    {
+    if (gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED) {
         retrieveNextObject();
-    }
-    else
-    {
+    } else {
         qDebug() << "Logging: Object retrieval has been cancelled";
         queue.clear();
     }
 }
-
 
 
 /****************************************************************
@@ -306,17 +289,18 @@ LoggingPlugin::LoggingPlugin() : state(IDLE)
 
 LoggingPlugin::~LoggingPlugin()
 {
-    if (loggingThread)
+    if (loggingThread) {
         delete loggingThread;
+    }
 
     // Don't delete it, the plugin manager will do it:
-    //delete logConnection;
+    // delete logConnection;
 }
 
 /**
-  * Add Logging plugin to File menu
-  */
-bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
+ * Add Logging plugin to File menu
+ */
+bool LoggingPlugin::initialize(const QStringList & args, QString *errMsg)
 {
     Q_UNUSED(args);
     Q_UNUSED(errMsg);
@@ -325,14 +309,14 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
 
 
     // Add Menu entry
-    Core::ActionManager* am = Core::ICore::instance()->actionManager();
-    Core::ActionContainer* ac = am->actionContainer(Core::Constants::M_TOOLS);
+    Core::ActionManager *am   = Core::ICore::instance()->actionManager();
+    Core::ActionContainer *ac = am->actionContainer(Core::Constants::M_TOOLS);
 
     // Command to start logging
     cmd = am->registerAction(new QAction(this),
-                                            "LoggingPlugin.Logging",
-                                            QList<int>() <<
-                                            Core::Constants::C_GLOBAL_ID);
+                             "LoggingPlugin.Logging",
+                             QList<int>() <<
+                             Core::Constants::C_GLOBAL_ID);
     cmd->setDefaultKeySequence(QKeySequence("Ctrl+L"));
     cmd->action()->setText("Start logging...");
 
@@ -347,33 +331,29 @@ bool LoggingPlugin::initialize(const QStringList& args, QString *errMsg)
     addAutoReleasedObject(mf);
 
     // Map signal from end of replay to replay stopped
-    connect(getLogfile(),SIGNAL(replayFinished()), this, SLOT(replayStopped()));
-    connect(getLogfile(),SIGNAL(replayStarted()), this, SLOT(replayStarted()));
+    connect(getLogfile(), SIGNAL(replayFinished()), this, SLOT(replayStopped()));
+    connect(getLogfile(), SIGNAL(replayStarted()), this, SLOT(replayStarted()));
 
     return true;
 }
 
 /**
-  * The action that is triggered by the menu item which opens the
-  * file and begins logging if successful
-  */
+ * The action that is triggered by the menu item which opens the
+ * file and begins logging if successful
+ */
 void LoggingPlugin::toggleLogging()
 {
-    if(state == IDLE)
-    {
-
+    if (state == IDLE) {
         QString fileName = QFileDialog::getSaveFileName(NULL, tr("Start Log"),
-                                    tr("OP-%0.opl").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")),
-                                    tr("OpenPilot Log (*.opl)"));
-        if (fileName.isEmpty())
+                                                        tr("OP-%0.opl").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss")),
+                                                        tr("OpenPilot Log (*.opl)"));
+        if (fileName.isEmpty()) {
             return;
+        }
 
         startLogging(fileName);
         cmd->action()->setText(tr("Stop logging"));
-
-    }
-    else if(state == LOGGING)
-    {
+    } else if (state == LOGGING) {
         stopLogging();
         cmd->action()->setText(tr("Start logging..."));
     }
@@ -381,18 +361,18 @@ void LoggingPlugin::toggleLogging()
 
 
 /**
-  * Starts the logging thread to a certain file
-  */
+ * Starts the logging thread to a certain file
+ */
 void LoggingPlugin::startLogging(QString file)
 {
     qDebug() << "Logging to " << file;
     // We have to delete the previous logging thread if is was still there!
-    if (loggingThread)
+    if (loggingThread) {
         delete loggingThread;
+    }
     loggingThread = new LoggingThread();
-    if(loggingThread->openFile(file,this))
-    {
-        connect(loggingThread,SIGNAL(finished()),this,SLOT(loggingStopped()));
+    if (loggingThread->openFile(file, this)) {
+        connect(loggingThread, SIGNAL(finished()), this, SLOT(loggingStopped()));
         state = LOGGING;
         loggingThread->start();
         emit stateChanged("LOGGING");
@@ -404,24 +384,25 @@ void LoggingPlugin::startLogging(QString file)
 }
 
 /**
-  * Send the stop logging signal to the LoggingThread
-  */
+ * Send the stop logging signal to the LoggingThread
+ */
 void LoggingPlugin::stopLogging()
 {
     emit stopLoggingSignal();
-    disconnect( this,SIGNAL(stopLoggingSignal()),0,0);
 
+    disconnect(this, SIGNAL(stopLoggingSignal()), 0, 0);
 }
 
 
 /**
-  * Receive the logging stopped signal from the LoggingThread
-  * and change status to not logging
-  */
+ * Receive the logging stopped signal from the LoggingThread
+ * and change status to not logging
+ */
 void LoggingPlugin::loggingStopped()
 {
-    if(state == LOGGING)
+    if (state == LOGGING) {
         state = IDLE;
+    }
 
     emit stateChanged("IDLE");
 
@@ -430,8 +411,8 @@ void LoggingPlugin::loggingStopped()
 }
 
 /**
-  * Received the replay stopped signal from the LogFile
-  */
+ * Received the replay stopped signal from the LogFile
+ */
 void LoggingPlugin::replayStopped()
 {
     state = IDLE;
@@ -439,15 +420,13 @@ void LoggingPlugin::replayStopped()
 }
 
 /**
-  * Received the replay started signal from the LogFile
-  */
+ * Received the replay started signal from the LogFile
+ */
 void LoggingPlugin::replayStarted()
 {
     state = REPLAY;
     emit stateChanged("REPLAY");
 }
-
-
 
 
 void LoggingPlugin::extensionsInitialized()

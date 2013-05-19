@@ -36,8 +36,7 @@
 #include <QList>
 
 
-class ConfigRevoHWWidget: public ConfigTaskWidget
-{
+class ConfigRevoHWWidget : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
@@ -49,7 +48,7 @@ private:
     void setupCustomCombos();
 
 protected slots:
-    void refreshWidgetsValues(UAVObject * obj = NULL);
+    void refreshWidgetsValues(UAVObject *obj = NULL);
     void updateObjectsFromWidgets();
 
 private slots:
@@ -59,7 +58,6 @@ private slots:
     void mainPortChanged(int index);
     void modemPortChanged(int index);
     void openHelp();
-
 };
 
 #endif // CONFIGREVOHWWIDGET_H

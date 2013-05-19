@@ -36,8 +36,7 @@
 #include <QList>
 #include "smartsavebutton.h"
 
-class ConfigCCHWWidget: public ConfigTaskWidget
-{
+class ConfigCCHWWidget : public ConfigTaskWidget {
     Q_OBJECT
 
 public:

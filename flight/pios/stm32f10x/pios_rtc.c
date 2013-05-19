@@ -39,40 +39,40 @@
 #endif
 
 struct rtc_callback_entry {
-  void (*fn)(uint32_t);
-  uint32_t data;
+    void     (*fn)(uint32_t);
+    uint32_t data;
 };
 
 #define PIOS_RTC_MAX_CALLBACKS 3
 struct rtc_callback_entry rtc_callback_list[PIOS_RTC_MAX_CALLBACKS];
 static uint8_t rtc_callback_next = 0;
 
-void PIOS_RTC_Init(const struct pios_rtc_cfg * cfg)
+void PIOS_RTC_Init(const struct pios_rtc_cfg *cfg)
 {
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_BKP | RCC_APB1Periph_PWR,
-			       ENABLE);
-	PWR_BackupAccessCmd(ENABLE);
-	
-	RCC_RTCCLKConfig(cfg->clksrc);
-	RCC_RTCCLKCmd(ENABLE);
-	RTC_WaitForLastTask();
-	RTC_WaitForSynchro();
-	RTC_WaitForLastTask();
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_BKP | RCC_APB1Periph_PWR,
+                           ENABLE);
+    PWR_BackupAccessCmd(ENABLE);
 
-	/* Configure and enable the RTC Second interrupt */
-	NVIC_Init(&cfg->irq.init);
-	RTC_ITConfig( RTC_IT_SEC, ENABLE );
-	RTC_WaitForLastTask();
+    RCC_RTCCLKConfig(cfg->clksrc);
+    RCC_RTCCLKCmd(ENABLE);
+    RTC_WaitForLastTask();
+    RTC_WaitForSynchro();
+    RTC_WaitForLastTask();
 
-	RTC_SetPrescaler(cfg->prescaler);
-	RTC_WaitForLastTask();
-	RTC_SetCounter(0);
-	RTC_WaitForLastTask();
+    /* Configure and enable the RTC Second interrupt */
+    NVIC_Init(&cfg->irq.init);
+    RTC_ITConfig(RTC_IT_SEC, ENABLE);
+    RTC_WaitForLastTask();
+
+    RTC_SetPrescaler(cfg->prescaler);
+    RTC_WaitForLastTask();
+    RTC_SetCounter(0);
+    RTC_WaitForLastTask();
 }
 
 uint32_t PIOS_RTC_Counter()
 {
-	return RTC_GetCounter();
+    return RTC_GetCounter();
 }
 
 /* FIXME: This shouldn't use hard-coded clock rates, dividers or prescalers.
@@ -80,51 +80,51 @@ uint32_t PIOS_RTC_Counter()
  */
 float PIOS_RTC_Rate()
 {
-	return (float) (8e6f / 128.0f) / (1 + PIOS_RTC_PRESCALER);
+    return (float)(8e6f / 128.0f) / (1 + PIOS_RTC_PRESCALER);
 }
 
-float PIOS_RTC_MsPerTick() 
+float PIOS_RTC_MsPerTick()
 {
-	return 1000.0f / PIOS_RTC_Rate();
+    return 1000.0f / PIOS_RTC_Rate();
 }
 
 /* TODO: This needs a mutex around rtc_callbacks[] */
 bool PIOS_RTC_RegisterTickCallback(void (*fn)(uint32_t id), uint32_t data)
 {
-	struct rtc_callback_entry * cb;
-	if (rtc_callback_next >= PIOS_RTC_MAX_CALLBACKS) {
-		return false;
-	}
+    struct rtc_callback_entry *cb;
 
-	cb = &rtc_callback_list[rtc_callback_next++];
+    if (rtc_callback_next >= PIOS_RTC_MAX_CALLBACKS) {
+        return false;
+    }
 
-	cb->fn   = fn;
-	cb->data = data;
-	return true;
+    cb       = &rtc_callback_list[rtc_callback_next++];
+
+    cb->fn   = fn;
+    cb->data = data;
+    return true;
 }
 
-void PIOS_RTC_irq_handler (void)
+void PIOS_RTC_irq_handler(void)
 {
-	if (RTC_GetITStatus(RTC_IT_SEC))
-	{
-		/* Call all registered callbacks */
-		for (uint8_t i = 0; i < rtc_callback_next; i++) {
-			struct rtc_callback_entry * cb = &rtc_callback_list[i];
-			if (cb->fn) {
-				(cb->fn)(cb->data);
-			}
-		}
+    if (RTC_GetITStatus(RTC_IT_SEC)) {
+        /* Call all registered callbacks */
+        for (uint8_t i = 0; i < rtc_callback_next; i++) {
+            struct rtc_callback_entry *cb = &rtc_callback_list[i];
+            if (cb->fn) {
+                (cb->fn)(cb->data);
+            }
+        }
 
-		/* Wait until last write operation on RTC registers has finished */
-		RTC_WaitForLastTask();
-		/* Clear the RTC Second interrupt */
-		RTC_ClearITPendingBit(RTC_IT_SEC);
-	}
+        /* Wait until last write operation on RTC registers has finished */
+        RTC_WaitForLastTask();
+        /* Clear the RTC Second interrupt */
+        RTC_ClearITPendingBit(RTC_IT_SEC);
+    }
 }
 
 #endif /* PIOS_INCLUDE_RTC */
 
-/** 
+/**
  * @}
  * @}
  */

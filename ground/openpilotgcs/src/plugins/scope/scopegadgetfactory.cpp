@@ -32,15 +32,13 @@
 #include <coreplugin/iuavgadget.h>
 
 ScopeGadgetFactory::ScopeGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("ScopeGadget"),
-                          tr("Scope"),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("ScopeGadget"),
+                      tr("Scope"),
+                      parent)
+{}
 
 ScopeGadgetFactory::~ScopeGadgetFactory()
-{
-}
+{}
 
 void ScopeGadgetFactory::stopPlotting()
 {
@@ -53,20 +51,21 @@ void ScopeGadgetFactory::startPlotting()
 }
 
 
-Core::IUAVGadget* ScopeGadgetFactory::createGadget(QWidget *parent)
+Core::IUAVGadget *ScopeGadgetFactory::createGadget(QWidget *parent)
 {
-    ScopeGadgetWidget* gadgetWidget = new ScopeGadgetWidget(parent);
-    connect(this,SIGNAL(onStartPlotting()), gadgetWidget, SLOT(startPlotting()));
-    connect(this,SIGNAL(onStopPlotting()), gadgetWidget, SLOT(stopPlotting()));
+    ScopeGadgetWidget *gadgetWidget = new ScopeGadgetWidget(parent);
+
+    connect(this, SIGNAL(onStartPlotting()), gadgetWidget, SLOT(startPlotting()));
+    connect(this, SIGNAL(onStopPlotting()), gadgetWidget, SLOT(stopPlotting()));
     return new ScopeGadget(QString("ScopeGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *ScopeGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *ScopeGadgetFactory::createConfiguration(QSettings *qSettings)
 {
     return new ScopeGadgetConfiguration(QString("ScopeGadget"), qSettings);
 }
 
 IOptionsPage *ScopeGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new ScopeGadgetOptionsPage(qobject_cast<ScopeGadgetConfiguration*>(config));
+    return new ScopeGadgetOptionsPage(qobject_cast<ScopeGadgetConfiguration *>(config));
 }

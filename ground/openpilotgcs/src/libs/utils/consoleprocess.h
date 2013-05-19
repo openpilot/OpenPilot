@@ -4,25 +4,25 @@
  * @file       consoleprocess.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -51,9 +51,7 @@ class QTemporaryFile;
 QT_END_NAMESPACE
 
 namespace Utils {
-
-class QTCREATOR_UTILS_EXPORT ConsoleProcess : public QObject, public AbstractProcess
-{
+class QTCREATOR_UTILS_EXPORT ConsoleProcess : public QObject, public AbstractProcess {
     Q_OBJECT
 
 public:
@@ -64,16 +62,34 @@ public:
     bool start(const QString &program, const QStringList &args);
     void stop();
 
-    void setMode(Mode m) { m_mode = m; }
-    Mode mode() const { return m_mode; }
+    void setMode(Mode m)
+    {
+        m_mode = m;
+    }
+    Mode mode() const
+    {
+        return m_mode;
+    }
 
     bool isRunning() const; // This reflects the state of the console+stub
-    qint64 applicationPID() const { return m_appPid; }
-    int exitCode() const { return m_appCode; } // This will be the signal number if exitStatus == CrashExit
-    QProcess::ExitStatus exitStatus() const { return m_appStatus; }
+    qint64 applicationPID() const
+    {
+        return m_appPid;
+    }
+    int exitCode() const
+    {
+        return m_appCode;
+    } // This will be the signal number if exitStatus == CrashExit
+    QProcess::ExitStatus exitStatus() const
+    {
+        return m_appStatus;
+    }
 
 #ifdef Q_OS_UNIX
-    void setSettings(QSettings *settings) { m_settings = settings; }
+    void setSettings(QSettings *settings)
+    {
+        m_settings = settings;
+    }
     static QString defaultTerminalEmulator();
     static QString terminalEmulator(const QSettings *settings);
     static void setTerminalEmulator(QSettings *settings, const QString &term);
@@ -132,9 +148,7 @@ private:
     QByteArray m_stubServerDir;
     QSettings *m_settings;
 #endif
-
 };
+} // namespace Utils
 
-} //namespace Utils
-
-#endif
+#endif // ifndef CONSOLEPROCESS_H

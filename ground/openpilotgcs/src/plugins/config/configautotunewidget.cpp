@@ -1,4 +1,3 @@
-
 #include "configautotunewidget.h"
 
 #include <QDebug>
@@ -34,22 +33,25 @@ ConfigAutotuneWidget::ConfigAutotuneWidget(QWidget *parent) :
 
     RelayTuning *relayTuning = RelayTuning::GetInstance(getObjectManager());
     Q_ASSERT(relayTuning);
-    if(relayTuning)
-        connect(relayTuning, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(recomputeStabilization()));
+    if (relayTuning) {
+        connect(relayTuning, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(recomputeStabilization()));
+    }
 
     // Connect the apply button for the stabilization settings
     connect(m_autotune->useComputedValues, SIGNAL(pressed()), this, SLOT(saveStabilization()));
 }
 
 /**
-  * Apply the stabilization settings computed
-  */
+ * Apply the stabilization settings computed
+ */
 void ConfigAutotuneWidget::saveStabilization()
 {
     StabilizationSettings *stabilizationSettings = StabilizationSettings::GetInstance(getObjectManager());
+
     Q_ASSERT(stabilizationSettings);
-    if(!stabilizationSettings)
+    if (!stabilizationSettings) {
         return;
+    }
 
     // Make sure to recompute in case the other stab settings changed since
     // the last time
@@ -61,25 +63,29 @@ void ConfigAutotuneWidget::saveStabilization()
 }
 
 /**
-  * Called whenever the gain ratios or measured values
-  * are changed
-  */
+ * Called whenever the gain ratios or measured values
+ * are changed
+ */
 void ConfigAutotuneWidget::recomputeStabilization()
 {
     RelayTuningSettings *relayTuningSettings = RelayTuningSettings::GetInstance(getObjectManager());
+
     Q_ASSERT(relayTuningSettings);
-    if (!relayTuningSettings)
+    if (!relayTuningSettings) {
         return;
+    }
 
     RelayTuning *relayTuning = RelayTuning::GetInstance(getObjectManager());
     Q_ASSERT(relayTuning);
-    if(!relayTuning)
+    if (!relayTuning) {
         return;
+    }
 
     StabilizationSettings *stabilizationSettings = StabilizationSettings::GetInstance(getObjectManager());
     Q_ASSERT(stabilizationSettings);
-    if(!stabilizationSettings)
+    if (!stabilizationSettings) {
         return;
+    }
 
     RelayTuning::DataFields relayTuningData = relayTuning->getData();
     RelayTuningSettings::DataFields tuningSettingsData = relayTuningSettings->getData();
@@ -94,24 +100,25 @@ void ConfigAutotuneWidget::recomputeStabilization()
 
     // For now just run over roll and pitch
     for (int i = 0; i < 2; i++) {
-        if (relayTuningData.Period[i] == 0 || relayTuningData.Gain[i] == 0)
+        if (relayTuningData.Period[i] == 0 || relayTuningData.Gain[i] == 0) {
             continue;
+        }
 
-        double wu = 1000.0 * 2 * M_PI / relayTuningData.Period[i]; // ultimate freq = output osc freq (rad/s)
+        double wu  = 1000.0 * 2 * M_PI / relayTuningData.Period[i]; // ultimate freq = output osc freq (rad/s)
 
-        double wc = wu * gain_ratio_r;      // target openloop crossover frequency (rad/s)
-        double zc = wc * zero_ratio_r;      // controller zero location (rad/s)
-        double kpu = 4.0f / M_PI / relayTuningData.Gain[i];  // ultimate gain, i.e. the proportional gain for instablity
-        double kp = kpu * gain_ratio_r;     // proportional gain
-        double ki = zc * kp;                // integral gain
+        double wc  = wu * gain_ratio_r;      // target openloop crossover frequency (rad/s)
+        double zc  = wc * zero_ratio_r;      // controller zero location (rad/s)
+        double kpu = 4.0f / M_PI / relayTuningData.Gain[i]; // ultimate gain, i.e. the proportional gain for instablity
+        double kp  = kpu * gain_ratio_r;     // proportional gain
+        double ki  = zc * kp;                // integral gain
 
         // Now calculate gains for the next loop out knowing it is the integral of
         // the inner loop -- the plant is position/velocity = scale*1/s
-        double wc2 = wc * gain_ratio_p;          // crossover of the attitude loop
-        double kp2 = wc2;                       // kp of attitude
-        double ki2 = wc2 * zero_ratio_p * kp2;  // ki of attitude
+        double wc2 = wc * gain_ratio_p; // crossover of the attitude loop
+        double kp2 = wc2; // kp of attitude
+        double ki2 = wc2 * zero_ratio_p * kp2; // ki of attitude
 
-        switch(i) {
+        switch (i) {
         case 0: // Roll
 
             stabSettings.RollRatePID[StabilizationSettings::ROLLRATEPID_KP] = kp;
@@ -141,9 +148,9 @@ void ConfigAutotuneWidget::recomputeStabilization()
 void ConfigAutotuneWidget::refreshWidgetsValues(UAVObject *obj)
 {
     HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
-    if(obj==hwSettings)
-    {
-        bool dirtyBack=isDirty();
+
+    if (obj == hwSettings) {
+        bool dirtyBack = isDirty();
         HwSettings::DataFields hwSettingsData = hwSettings->getData();
         m_autotune->enableAutoTune->setChecked(
             hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_AUTOTUNE] == HwSettings::OPTIONALMODULES_ENABLED);
@@ -155,8 +162,9 @@ void ConfigAutotuneWidget::updateObjectsFromWidgets()
 {
     HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
     HwSettings::DataFields hwSettingsData = hwSettings->getData();
+
     hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_AUTOTUNE] =
-         m_autotune->enableAutoTune->isChecked() ? HwSettings::OPTIONALMODULES_ENABLED : HwSettings::OPTIONALMODULES_DISABLED;
+        m_autotune->enableAutoTune->isChecked() ? HwSettings::OPTIONALMODULES_ENABLED : HwSettings::OPTIONALMODULES_DISABLED;
     hwSettings->setData(hwSettingsData);
     ConfigTaskWidget::updateObjectsFromWidgets();
 }

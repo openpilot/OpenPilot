@@ -38,8 +38,7 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class NotifyPluginFactory : public IUAVGadgetFactory
-{
+class NotifyPluginFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
     NotifyPluginFactory(QObject *parent = 0);

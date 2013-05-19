@@ -3,16 +3,15 @@
 
 #include "ipconnectionplugin.h"
 
-//Simple class for creating & destroying a socket in the real-time thread
-//Needed because sockets need to be created in the same thread that they're used
-class IPConnection : public QObject
-{
+// Simple class for creating & destroying a socket in the real-time thread
+// Needed because sockets need to be created in the same thread that they're used
+class IPConnection : public QObject {
     Q_OBJECT
 
 public:
 
     IPConnection(IPconnectionConnection *connection);
-    //virtual ~IPConnection();
+    // virtual ~IPConnection();
 
 public slots:
 

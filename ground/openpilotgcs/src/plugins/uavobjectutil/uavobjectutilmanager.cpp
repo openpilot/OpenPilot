@@ -45,43 +45,40 @@
 
 UAVObjectUtilManager::UAVObjectUtilManager()
 {
-    mutex = new QMutex(QMutex::Recursive);
+    mutex     = new QMutex(QMutex::Recursive);
     saveState = IDLE;
     failureTimer.stop();
     failureTimer.setSingleShot(true);
     failureTimer.setInterval(1000);
-    connect(&failureTimer, SIGNAL(timeout()),this,SLOT(objectPersistenceOperationFailed()));
+    connect(&failureTimer, SIGNAL(timeout()), this, SLOT(objectPersistenceOperationFailed()));
 
-    pm = NULL;
-    obm = NULL;
+    pm   = NULL;
+    obm  = NULL;
     obum = NULL;
 
-    pm = ExtensionSystem::PluginManager::instance();
-    if (pm)
-    {
-        obm = pm->getObject<UAVObjectManager>();
+    pm   = ExtensionSystem::PluginManager::instance();
+    if (pm) {
+        obm  = pm->getObject<UAVObjectManager>();
         obum = pm->getObject<UAVObjectUtilManager>();
     }
-
 }
 
 UAVObjectUtilManager::~UAVObjectUtilManager()
 {
-//	while (!queue.isEmpty())
-	{
-	}
+// while (!queue.isEmpty())
+    {}
 
-	disconnect();
+    disconnect();
 
-	if (mutex)
-	{
-		delete mutex;
-		mutex = NULL;
-	}
+    if (mutex) {
+        delete mutex;
+        mutex = NULL;
+    }
 }
 
 
-UAVObjectManager* UAVObjectUtilManager::getObjectManager() {
+UAVObjectManager *UAVObjectUtilManager::getObjectManager()
+{
     Q_ASSERT(obm);
     return obm;
 }
@@ -92,8 +89,8 @@ UAVObjectManager* UAVObjectUtilManager::getObjectManager() {
 //
 
 /*
-  Add a new object to save in the queue
-  */
+   Add a new object to save in the queue
+ */
 void UAVObjectUtilManager::saveObjectToSD(UAVObject *obj)
 {
     // Add to queue
@@ -103,35 +100,32 @@ void UAVObjectUtilManager::saveObjectToSD(UAVObject *obj)
 
     // If queue length is one, then start sending (call sendNextObject)
     // Otherwise, do nothing, it's sending anyway
-    if (queue.length()==1)
+    if (queue.length() == 1) {
         saveNextObject();
-
-
+    }
 }
 
 void UAVObjectUtilManager::saveNextObject()
 {
-    if ( queue.isEmpty() )
-    {
+    if (queue.isEmpty()) {
         return;
     }
 
     Q_ASSERT(saveState == IDLE);
 
     // Get next object from the queue
-    UAVObject* obj = queue.head();
+    UAVObject *obj = queue.head();
     qDebug() << "Send save object request to board " << obj->getName();
 
-    ObjectPersistence* objper = dynamic_cast<ObjectPersistence*>( getObjectManager()->getObject(ObjectPersistence::NAME) );
-    connect(objper, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
-    connect(objper, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(objectPersistenceUpdated(UAVObject *)));
+    ObjectPersistence *objper = dynamic_cast<ObjectPersistence *>(getObjectManager()->getObject(ObjectPersistence::NAME));
+    connect(objper, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject *, bool)));
+    connect(objper, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(objectPersistenceUpdated(UAVObject *)));
     saveState = AWAITING_ACK;
-    if (obj != NULL)
-    {
+    if (obj != NULL) {
         ObjectPersistence::DataFields data;
-        data.Operation = ObjectPersistence::OPERATION_SAVE;
-        data.Selection = ObjectPersistence::SELECTION_SINGLEOBJECT;
-        data.ObjectID = obj->getObjID();
+        data.Operation  = ObjectPersistence::OPERATION_SAVE;
+        data.Selection  = ObjectPersistence::SELECTION_SINGLEOBJECT;
+        data.ObjectID   = obj->getObjID();
         data.InstanceID = obj->getInstID();
         objper->setData(data);
         objper->updated();
@@ -144,16 +138,16 @@ void UAVObjectUtilManager::saveNextObject()
 }
 
 /**
-  * @brief Process the transactionCompleted message from Telemetry indicating request sent successfully
-  * @param[in] The object just transsacted.  Must be ObjectPersistance
-  * @param[in] success Indicates that the transaction did not time out
-  *
-  * After a failed transaction (usually timeout) resends the save request.  After a succesful
-  * transaction will then wait for a save completed update from the autopilot.
-  */
-void UAVObjectUtilManager::objectPersistenceTransactionCompleted(UAVObject* obj, bool success)
+ * @brief Process the transactionCompleted message from Telemetry indicating request sent successfully
+ * @param[in] The object just transsacted.  Must be ObjectPersistance
+ * @param[in] success Indicates that the transaction did not time out
+ *
+ * After a failed transaction (usually timeout) resends the save request.  After a succesful
+ * transaction will then wait for a save completed update from the autopilot.
+ */
+void UAVObjectUtilManager::objectPersistenceTransactionCompleted(UAVObject *obj, bool success)
 {
-    if(success) {
+    if (success) {
         Q_ASSERT(obj->getName().compare("ObjectPersistence") == 0);
         Q_ASSERT(saveState == AWAITING_ACK);
         // Two things can happen:
@@ -163,7 +157,7 @@ void UAVObjectUtilManager::objectPersistenceTransactionCompleted(UAVObject* obj,
         // For this reason, we will arm a 1 second timer to make provision for this and not block
         // the queue:
         saveState = AWAITING_COMPLETED;
-        disconnect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject*,bool)));
+        disconnect(obj, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(objectPersistenceTransactionCompleted(UAVObject *, bool)));
         failureTimer.start(2000); // Create a timeout
     } else {
         // Can be caused by timeout errors on sending.  Forget it and send next.
@@ -178,20 +172,20 @@ void UAVObjectUtilManager::objectPersistenceTransactionCompleted(UAVObject* obj,
 }
 
 /**
-  * @brief Object persistence operation failed, i.e. we never got an update
-  * from the board saying "completed".
-  */
+ * @brief Object persistence operation failed, i.e. we never got an update
+ * from the board saying "completed".
+ */
 void UAVObjectUtilManager::objectPersistenceOperationFailed()
 {
-    if(saveState == AWAITING_COMPLETED) {
-        //TODO: some warning that this operation failed somehow
+    if (saveState == AWAITING_COMPLETED) {
+        // TODO: some warning that this operation failed somehow
         // We have to disconnect the object persistence 'updated' signal
         // and ask to save the next object:
 
-        ObjectPersistence * objectPersistence = ObjectPersistence::GetInstance(getObjectManager());
+        ObjectPersistence *objectPersistence = ObjectPersistence::GetInstance(getObjectManager());
         Q_ASSERT(objectPersistence);
 
-        UAVObject* obj = queue.dequeue(); // We can now remove the object, it failed anyway.
+        UAVObject *obj = queue.dequeue(); // We can now remove the object, it failed anyway.
         Q_ASSERT(obj);
 
         objectPersistence->disconnect(this);
@@ -201,31 +195,29 @@ void UAVObjectUtilManager::objectPersistenceOperationFailed()
 
         saveNextObject();
     }
-
 }
 
 
-
 /**
-  * @brief Process the ObjectPersistence updated message to confirm the right object saved
-  * then requests next object be saved.
-  * @param[in] The object just received.  Must be ObjectPersistance
-  */
-void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject * obj)
+ * @brief Process the ObjectPersistence updated message to confirm the right object saved
+ * then requests next object be saved.
+ * @param[in] The object just received.  Must be ObjectPersistance
+ */
+void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject *obj)
 {
     Q_ASSERT(obj);
     Q_ASSERT(obj->getObjID() == ObjectPersistence::OBJID);
     ObjectPersistence::DataFields objectPersistence = ((ObjectPersistence *)obj)->getData();
 
-    if(saveState == AWAITING_COMPLETED && objectPersistence.Operation == ObjectPersistence::OPERATION_ERROR) {
+    if (saveState == AWAITING_COMPLETED && objectPersistence.Operation == ObjectPersistence::OPERATION_ERROR) {
         failureTimer.stop();
         objectPersistenceOperationFailed();
     } else if (saveState == AWAITING_COMPLETED &&
                objectPersistence.Operation == ObjectPersistence::OPERATION_COMPLETED) {
         failureTimer.stop();
         // Check right object saved
-        UAVObject* savingObj = queue.head();
-        if(objectPersistence.ObjectID != savingObj->getObjID() ) {
+        UAVObject *savingObj = queue.head();
+        if (objectPersistence.ObjectID != savingObj->getObjID()) {
             objectPersistenceOperationFailed();
             return;
         }
@@ -240,45 +232,49 @@ void UAVObjectUtilManager::objectPersistenceUpdated(UAVObject * obj)
 }
 
 /**
-  * Helper function that makes sure FirmwareIAP is updated and then returns the data
-  */
+ * Helper function that makes sure FirmwareIAP is updated and then returns the data
+ */
 FirmwareIAPObj::DataFields UAVObjectUtilManager::getFirmwareIap()
 {
     FirmwareIAPObj::DataFields dummy;
 
     FirmwareIAPObj *firmwareIap = FirmwareIAPObj::GetInstance(obm);
+
     Q_ASSERT(firmwareIap);
-    if (!firmwareIap)
+    if (!firmwareIap) {
         return dummy;
+    }
 
     return firmwareIap->getData();
 }
 
 /**
-  * Get the UAV Board model, for anyone interested. Return format is:
-  * (Board Type << 8) + BoardRevision.
-  */
+ * Get the UAV Board model, for anyone interested. Return format is:
+ * (Board Type << 8) + BoardRevision.
+ */
 int UAVObjectUtilManager::getBoardModel()
 {
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
-    qDebug()<<"Board type="<<firmwareIapData.BoardType;
-    qDebug()<<"Board revision="<<firmwareIapData.BoardRevision;
-    int ret=firmwareIapData.BoardType <<8;
+
+    qDebug() << "Board type=" << firmwareIapData.BoardType;
+    qDebug() << "Board revision=" << firmwareIapData.BoardRevision;
+    int ret = firmwareIapData.BoardType << 8;
     ret = ret + firmwareIapData.BoardRevision;
-    qDebug()<<"Board info="<<ret;
+    qDebug() << "Board info=" << ret;
     return ret;
 }
 
 /**
-  * Get the UAV Board CPU Serial Number, for anyone interested. Return format is a byte array
-  */
+ * Get the UAV Board CPU Serial Number, for anyone interested. Return format is a byte array
+ */
 QByteArray UAVObjectUtilManager::getBoardCPUSerial()
 {
     QByteArray cpuSerial;
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    for (unsigned int i = 0; i < FirmwareIAPObj::CPUSERIAL_NUMELEM; i++)
+    for (unsigned int i = 0; i < FirmwareIAPObj::CPUSERIAL_NUMELEM; i++) {
         cpuSerial.append(firmwareIapData.CPUSerial[i]);
+    }
 
     return cpuSerial;
 }
@@ -286,23 +282,24 @@ QByteArray UAVObjectUtilManager::getBoardCPUSerial()
 quint32 UAVObjectUtilManager::getFirmwareCRC()
 {
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
+
     return firmwareIapData.crc;
 }
 
 /**
-  * Get the UAV Board Description, for anyone interested.
-  */
+ * Get the UAV Board Description, for anyone interested.
+ */
 QByteArray UAVObjectUtilManager::getBoardDescription()
 {
     QByteArray ret;
     FirmwareIAPObj::DataFields firmwareIapData = getFirmwareIap();
 
-    for (unsigned int i = 0; i < FirmwareIAPObj::DESCRIPTION_NUMELEM; i++)
+    for (unsigned int i = 0; i < FirmwareIAPObj::DESCRIPTION_NUMELEM; i++) {
         ret.append(firmwareIapData.Description[i]);
+    }
 
     return ret;
 }
-
 
 
 // ******************************
@@ -313,6 +310,7 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
     double Be[3];
 
     int result = Utils::HomeLocationUtil().getDetails(LLA, Be);
+
     Q_ASSERT(result == 0);
 
     // save the new settings
@@ -320,20 +318,21 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
     Q_ASSERT(homeLocation != NULL);
 
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
-    homeLocationData.Latitude = LLA[0] * 1e7;
+    homeLocationData.Latitude  = LLA[0] * 1e7;
     homeLocationData.Longitude = LLA[1] * 1e7;
-    homeLocationData.Altitude = LLA[2];
+    homeLocationData.Altitude  = LLA[2];
 
-    homeLocationData.Be[0] = Be[0];
-    homeLocationData.Be[1] = Be[1];
-    homeLocationData.Be[2] = Be[2];
+    homeLocationData.Be[0]     = Be[0];
+    homeLocationData.Be[1]     = Be[1];
+    homeLocationData.Be[2]     = Be[2];
 
     homeLocationData.Set = HomeLocation::SET_TRUE;
 
     homeLocation->setData(homeLocationData);
 
-    if (save_to_sdcard)
+    if (save_to_sdcard) {
         saveObjectToSD(homeLocation);
+    }
 
     return 0;
 }
@@ -341,31 +340,37 @@ int UAVObjectUtilManager::setHomeLocation(double LLA[3], bool save_to_sdcard)
 int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])
 {
     HomeLocation *homeLocation = HomeLocation::GetInstance(obm);
+
     Q_ASSERT(homeLocation != NULL);
 
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
-    set = homeLocationData.Set;
+    set    = homeLocationData.Set;
 
-    LLA[0] = homeLocationData.Latitude*1e-7;
-    LLA[1] = homeLocationData.Longitude*1e-7;
+    LLA[0] = homeLocationData.Latitude * 1e-7;
+    LLA[1] = homeLocationData.Longitude * 1e-7;
     LLA[2] = homeLocationData.Altitude;
 
-	if (LLA[0] != LLA[0]) LLA[0] = 0; // nan detection
-	else
-	if (LLA[0] >  90) LLA[0] =  90;
-	else
-	if (LLA[0] < -90) LLA[0] = -90;
+    if (LLA[0] != LLA[0]) {
+        LLA[0] = 0; // nan detection
+    } else if (LLA[0] > 90) {
+        LLA[0] = 90;
+    } else if (LLA[0] < -90) {
+        LLA[0] = -90;
+    }
 
-	if (LLA[1] != LLA[1]) LLA[1] = 0; // nan detection
-	else
-	if (LLA[1] >  180) LLA[1] =  180;
-	else
-	if (LLA[1] < -180) LLA[1] = -180;
+    if (LLA[1] != LLA[1]) {
+        LLA[1] = 0; // nan detection
+    } else if (LLA[1] > 180) {
+        LLA[1] = 180;
+    } else if (LLA[1] < -180) {
+        LLA[1] = -180;
+    }
 
-	if (LLA[2] != LLA[2]) LLA[2] = 0; // nan detection
-
-	return 0;	// OK
+    if (LLA[2] != LLA[2]) {
+        LLA[2] = 0; // nan detection
+    }
+    return 0; // OK
 }
 
 
@@ -375,6 +380,7 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])
 int UAVObjectUtilManager::getGPSPosition(double LLA[3])
 {
     GPSPosition *gpsPosition = GPSPosition::GetInstance(obm);
+
     Q_ASSERT(gpsPosition != NULL);
 
     GPSPosition::DataFields gpsPositionData = gpsPosition->getData();
@@ -383,86 +389,90 @@ int UAVObjectUtilManager::getGPSPosition(double LLA[3])
     LLA[1] = gpsPositionData.Longitude;
     LLA[2] = gpsPositionData.Altitude;
 
-	if (LLA[0] != LLA[0]) LLA[0] = 0; // nan detection
-	else
-	if (LLA[0] >  90) LLA[0] =  90;
-	else
-	if (LLA[0] < -90) LLA[0] = -90;
+    if (LLA[0] != LLA[0]) {
+        LLA[0] = 0; // nan detection
+    } else if (LLA[0] > 90) {
+        LLA[0] = 90;
+    } else if (LLA[0] < -90) {
+        LLA[0] = -90;
+    }
 
-	if (LLA[1] != LLA[1]) LLA[1] = 0; // nan detection
-	else
-	if (LLA[1] >  180) LLA[1] =  180;
-	else
-	if (LLA[1] < -180) LLA[1] = -180;
+    if (LLA[1] != LLA[1]) {
+        LLA[1] = 0; // nan detection
+    } else if (LLA[1] > 180) {
+        LLA[1] = 180;
+    } else if (LLA[1] < -180) {
+        LLA[1] = -180;
+    }
 
-	if (LLA[2] != LLA[2]) LLA[2] = 0; // nan detection
-
-	return 0;	// OK
+    if (LLA[2] != LLA[2]) {
+        LLA[2] = 0; // nan detection
+    }
+    return 0; // OK
 }
 
 deviceDescriptorStruct UAVObjectUtilManager::getBoardDescriptionStruct()
 {
     deviceDescriptorStruct ret;
-    descriptionToStructure(getBoardDescription(),ret);
+
+    descriptionToStructure(getBoardDescription(), ret);
     return ret;
 }
 
 bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescriptorStruct & struc)
 {
-   if (desc.startsWith("OpFw")) {
-       /*
-        * This looks like a binary with a description at the end
-        *  4 bytes: header: "OpFw"
-        *  4 bytes: git commit hash (short version of SHA1)
-        *  4 bytes: Unix timestamp of last git commit
-        *  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
-        *  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
-        *  20 bytes: SHA1 sum of the firmware.
-        *  20 bytes: SHA1 sum of the UAVO definition files.
-        *  20 bytes: free for now.
-        */
+    if (desc.startsWith("OpFw")) {
+        /*
+         * This looks like a binary with a description at the end
+         *  4 bytes: header: "OpFw"
+         *  4 bytes: git commit hash (short version of SHA1)
+         *  4 bytes: Unix timestamp of last git commit
+         *  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
+         *  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
+         *  20 bytes: SHA1 sum of the firmware.
+         *  20 bytes: SHA1 sum of the UAVO definition files.
+         *  20 bytes: free for now.
+         */
 
-       // Note: the ARM binary is big-endian:
-       quint32 gitCommitHash = desc.at(7) & 0xFF;
-       for (int i = 1; i < 4; i++) {
-           gitCommitHash = gitCommitHash << 8;
-           gitCommitHash += desc.at(7-i) & 0xFF;
-       }
-       struc.gitHash = QString("%1").arg(gitCommitHash, 8, 16, QChar('0'));
+        // Note: the ARM binary is big-endian:
+        quint32 gitCommitHash = desc.at(7) & 0xFF;
+        for (int i = 1; i < 4; i++) {
+            gitCommitHash  = gitCommitHash << 8;
+            gitCommitHash += desc.at(7 - i) & 0xFF;
+        }
+        struc.gitHash = QString("%1").arg(gitCommitHash, 8, 16, QChar('0'));
 
-       quint32 gitDate = desc.at(11) & 0xFF;
-       for (int i = 1; i < 4; i++) {
-           gitDate = gitDate << 8;
-           gitDate += desc.at(11-i) & 0xFF;
-       }
-       struc.gitDate = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyyMMdd HH:mm");
+        quint32 gitDate = desc.at(11) & 0xFF;
+        for (int i = 1; i < 4; i++) {
+            gitDate  = gitDate << 8;
+            gitDate += desc.at(11 - i) & 0xFF;
+        }
+        struc.gitDate = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyyMMdd HH:mm");
 
-       QString gitTag = QString(desc.mid(14,26));
-       struc.gitTag = gitTag;
+        QString gitTag = QString(desc.mid(14, 26));
+        struc.gitTag  = gitTag;
 
-       // TODO: check platform compatibility
-       QByteArray targetPlatform = desc.mid(12,2);
-       struc.boardType = (int)targetPlatform.at(0);
-       struc.boardRevision = (int)targetPlatform.at(1);
-       struc.fwHash.clear();
-       struc.fwHash=desc.mid(40,20);
-       struc.uavoHash.clear();
-       struc.uavoHash=desc.mid(60,20);
-       qDebug()<<__FUNCTION__<<":description from board:";
-       foreach(char x,desc)
-       {
-           qDebug()<<QString::number(x,16);
-       }
+        // TODO: check platform compatibility
+        QByteArray targetPlatform = desc.mid(12, 2);
+        struc.boardType     = (int)targetPlatform.at(0);
+        struc.boardRevision = (int)targetPlatform.at(1);
+        struc.fwHash.clear();
+        struc.fwHash   = desc.mid(40, 20);
+        struc.uavoHash.clear();
+        struc.uavoHash = desc.mid(60, 20);
+        qDebug() << __FUNCTION__ << ":description from board:";
+        foreach(char x, desc) {
+            qDebug() << QString::number(x, 16);
+        }
 
-       qDebug()<<__FUNCTION__<<":uavoHash:";
-       QByteArray array2=struc.uavoHash.data();
-       foreach(char x,array2)
-       {
-           qDebug()<<QString::number(x,16);
-       }
-       return true;
-   }
-   return false;
+        qDebug() << __FUNCTION__ << ":uavoHash:";
+        QByteArray array2 = struc.uavoHash.data();
+        foreach(char x, array2) {
+            qDebug() << QString::number(x, 16);
+        }
+        return true;
+    }
+    return false;
 }
 
 // ******************************

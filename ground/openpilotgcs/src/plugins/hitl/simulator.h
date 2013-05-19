@@ -65,15 +65,14 @@
  * just imagine this was a class without methods and all public properties
  */
 typedef struct _FLIGHT_PARAM {
-
     // time
     float T;
     float dT;
     unsigned int i;
 
     // speeds
-    float cas; //Calibrated airspeed
-    float tas; //True airspeed
+    float cas; // Calibrated airspeed
+    float tas; // True airspeed
     float groundspeed;
 
     // position (absolute)
@@ -91,104 +90,100 @@ typedef struct _FLIGHT_PARAM {
     float ddY;
     float ddZ;
 
-    //angle
+    // angle
     float azimuth;
     float pitch;
     float roll;
 
-    //rotation speed
+    // rotation speed
     float dAzimuth;
     float dPitch;
     float dRoll;
-
 } FLIGHT_PARAM;
 
-struct AirParameters
-{
+struct AirParameters {
     float groundDensity;
     float groundTemp;
     float seaLevelPress;
     float tempLapseRate;
     float univGasConstant;
     float dryAirConstant;
-    float relativeHumidity; //[%]
-    float M; //Molar mass
+    float relativeHumidity; // [%]
+    float M; // Molar mass
 };
 
-typedef struct _CONNECTION
-{
+typedef struct _CONNECTION {
     QString simulatorId;
     QString binPath;
     QString dataPath;
     QString hostAddress;
     QString remoteAddress;
-    int outPort;
-    int inPort;
-    bool startSim;
-    bool addNoise;
+    int     outPort;
+    int     inPort;
+    bool    startSim;
+    bool    addNoise;
     QString latitude;
     QString longitude;
 
-//    bool homeLocation;
+// bool homeLocation;
 
-    bool attRawEnabled;
-    quint8 attRawRate;
+    bool    attRawEnabled;
+    quint8  attRawRate;
 
-    bool attActualEnabled;
-    bool attActHW;
-    bool attActSim;
-    bool attActCalc;
+    bool    attActualEnabled;
+    bool    attActHW;
+    bool    attActSim;
+    bool    attActCalc;
 
-    bool baroAltitudeEnabled;
+    bool    baroAltitudeEnabled;
     quint16 baroAltRate;
 
-    bool groundTruthEnabled;
+    bool    groundTruthEnabled;
     quint16 groundTruthRate;
 
-    bool gpsPositionEnabled;
+    bool    gpsPositionEnabled;
     quint16 gpsPosRate;
 
-    bool inputCommand;
-    bool gcsReceiverEnabled;
-    bool manualControlEnabled;
+    bool    inputCommand;
+    bool    gcsReceiverEnabled;
+    bool    manualControlEnabled;
     quint16 minOutputPeriod;
 
-    bool airspeedActualEnabled;
+    bool    airspeedActualEnabled;
     quint16 airspeedActualRate;
-
 } SimulatorSettings;
 
 
-struct Output2Hardware{
+struct Output2Hardware {
     float latitude;
     float longitude;
     float altitude;
-    float agl;                //[m]
+    float agl; // [m]
     float heading;
-    float groundspeed;        //[m/s]
-    float calibratedAirspeed; //[m/s]
-    float trueAirspeed;       //[m/s]
+    float groundspeed; // [m/s]
+    float calibratedAirspeed; // [m/s]
+    float trueAirspeed; // [m/s]
     float angleOfAttack;
     float angleOfSlip;
     float roll;
     float pitch;
     float pressure;
     float temperature;
-    float velNorth;   //[m/s]
-    float velEast;    //[m/s]
-    float velDown;    //[m/s]
-    float dstN;       //[m]
-    float dstE;       //[m]
-    float dstD;       //[m]
-    float accX;       //[m/s^2]
-    float accY;       //[m/s^2]
-    float accZ;       //[m/s^2]
-    float rollRate;   //[deg/s]
-    float pitchRate;  //[deg/s]
-    float yawRate;    //[deg/s]
-    float delT;       //[s]
+    float velNorth; // [m/s]
+    float velEast; // [m/s]
+    float velDown; // [m/s]
+    float dstN; // [m]
+    float dstE; // [m]
+    float dstD; // [m]
+    float accX; // [m/s^2]
+    float accY; // [m/s^2]
+    float accZ; // [m/s^2]
+    float rollRate; // [deg/s]
+    float pitchRate; // [deg/s]
+    float yawRate; // [deg/s]
+    float delT; // [s]
 
-    float rc_channel[GCSReceiver::CHANNEL_NUMELEM]; //Elements in rc_channel are between -1 and 1
+    float rc_channel[GCSReceiver::CHANNEL_NUMELEM]; // Elements in rc_channel are between -1 and 1
 
 
     float rollDesired;
@@ -201,33 +196,50 @@ struct Output2Hardware{
     float consumption;
 };
 
-//struct Output2Simulator{
-//    float roll;
-//    float pitch;
-//    float yaw;
-//    float throttle;
+// struct Output2Simulator{
+// float roll;
+// float pitch;
+// float yaw;
+// float throttle;
 
-//    float ailerons;
-//    float rudder;
-//    float elevator;
-//    float motor;
-//};
+// float ailerons;
+// float rudder;
+// float elevator;
+// float motor;
+// };
 
-class Simulator : public QObject
-{
+class Simulator : public QObject {
     Q_OBJECT
 
 public:
-    Simulator(const SimulatorSettings& params);
+    Simulator(const SimulatorSettings & params);
     virtual ~Simulator();
 
-    bool isAutopilotConnected() const { return autopilotConnectionStatus; }
-    bool isSimulatorConnected() const { return simConnectionStatus; }
-    QString Name() const { return name; }
-    void setName(QString str) { name = str; }
+    bool isAutopilotConnected() const
+    {
+        return autopilotConnectionStatus;
+    }
+    bool isSimulatorConnected() const
+    {
+        return simConnectionStatus;
+    }
+    QString Name() const
+    {
+        return name;
+    }
+    void setName(QString str)
+    {
+        name = str;
+    }
 
-    QString SimulatorId() const { return simulatorId; }
-    void setSimulatorId(QString str) { simulatorId = str; }
+    QString SimulatorId() const
+    {
+        return simulatorId;
+    }
+    void setSimulatorId(QString str)
+    {
+        simulatorId = str;
+    }
 
     float airDensityFromAltitude(float alt, AirParameters air, float gravity);
     float airPressureFromAltitude(float alt, AirParameters air, float gravity);
@@ -235,13 +247,28 @@ public:
     float tas2cas(float TAS, float alt, AirParameters air, float gravity);
 
 
-    static bool IsStarted() { return isStarted; }
-    static void setStarted(bool val) { isStarted = val; }
-    static QStringList& Instances() { return Simulator::instances; }
-    static void setInstance(const QString& str) { Simulator::instances.append(str); }
+    static bool IsStarted()
+    {
+        return isStarted;
+    }
+    static void setStarted(bool val)
+    {
+        isStarted = val;
+    }
+    static QStringList & Instances()
+    {
+        return Simulator::instances;
+    }
+    static void setInstance(const QString & str)
+    {
+        Simulator::instances.append(str);
+    }
 
     virtual void stopProcess() {}
-    virtual void setupUdpPorts(const QString& host, int inPort, int outPort) { Q_UNUSED(host) Q_UNUSED(inPort) Q_UNUSED(outPort)}
+    virtual void setupUdpPorts(const QString & host, int inPort, int outPort)
+    {
+        Q_UNUSED(host) Q_UNUSED(inPort) Q_UNUSED(outPort)
+    }
 
     void resetInitialHomePosition();
     void updateUAVOs(Output2Hardware out);
@@ -258,19 +285,22 @@ signals:
     void deleteSimProcess();
     void myStart();
 public slots:
-    Q_INVOKABLE virtual bool setupProcess() { return true;}
+    Q_INVOKABLE virtual bool setupProcess()
+    {
+        return true;
+    }
 private slots:
     void onStart();
-    //void transmitUpdate();
+    // void transmitUpdate();
     void receiveUpdate();
     void onAutopilotConnect();
     void onAutopilotDisconnect();
     void onSimulatorConnectionTimeout();
-    void telStatsUpdated(UAVObject* obj);
+    void telStatsUpdated(UAVObject *obj);
     Q_INVOKABLE void onDeleteSimulator(void);
 
     virtual void transmitUpdate() = 0;
-    virtual void processUpdate(const QByteArray& data) = 0;
+    virtual void processUpdate(const QByteArray & data) = 0;
 
 protected:
     static const float GEE;
@@ -281,30 +311,30 @@ protected:
     static const float DEG2RAD;
     static const float RAD2DEG;
 
-    QProcess* simProcess;
-    QTime* time;
-    QUdpSocket* inSocket;//(new QUdpSocket());
-    QUdpSocket* outSocket;
+    QProcess *simProcess;
+    QTime *time;
+    QUdpSocket *inSocket; // (new QUdpSocket());
+    QUdpSocket *outSocket;
 
-    ActuatorCommand* actCommand;
-    ActuatorDesired* actDesired;
-    ManualControlCommand* manCtrlCommand;
-    FlightStatus* flightStatus;
-    FlightBatteryState* flightBatt;
-    BaroAltitude* baroAlt;
-    AirspeedActual* airspeedActual;
-    AttitudeActual* attActual;
-    AttitudeSettings* attSettings;
-    VelocityActual* velActual;
-    GPSPosition* gpsPos;
-    GPSVelocity* gpsVel;
-    PositionActual* posActual;
-    HomeLocation* posHome;
-    Accels* accels;
-    Gyros*  gyros;
-    GCSTelemetryStats* telStats;
-    GCSReceiver* gcsReceiver;
-    GroundTruth* groundTruth;
+    ActuatorCommand *actCommand;
+    ActuatorDesired *actDesired;
+    ManualControlCommand *manCtrlCommand;
+    FlightStatus *flightStatus;
+    FlightBatteryState *flightBatt;
+    BaroAltitude *baroAlt;
+    AirspeedActual *airspeedActual;
+    AttitudeActual *attActual;
+    AttitudeSettings *attSettings;
+    VelocityActual *velActual;
+    GPSPosition *gpsPos;
+    GPSVelocity *gpsVel;
+    PositionActual *posActual;
+    HomeLocation *posHome;
+    Accels *accels;
+    Gyros *gyros;
+    GCSTelemetryStats *telStats;
+    GCSReceiver *gcsReceiver;
+    GroundTruth *groundTruth;
 
     SimulatorSettings settings;
 
@@ -322,8 +352,8 @@ private:
     int simTimeout;
     volatile bool autopilotConnectionStatus;
     volatile bool simConnectionStatus;
-    QTimer* txTimer;
-    QTimer* simTimer;
+    QTimer *txTimer;
+    QTimer *simTimer;
 
     QTime attRawTime;
     QTime gpsPosTime;
@@ -337,9 +367,9 @@ private:
     QString simulatorId;
     volatile static bool isStarted;
     static QStringList instances;
-    //QList<QScopedPointer<UAVDataObject> > requiredUAVObjects;
-    void setupOutputObject(UAVObject* obj, quint32 updatePeriod);
-    void setupInputObject(UAVObject* obj, quint32 updatePeriod);
+    // QList<QScopedPointer<UAVDataObject> > requiredUAVObjects;
+    void setupOutputObject(UAVObject *obj, quint32 updatePeriod);
+    void setupInputObject(UAVObject *obj, quint32 updatePeriod);
     void setupWatchedObject(UAVObject *obj, quint32 updatePeriod);
     void setupObjects();
 
@@ -347,9 +377,7 @@ private:
 };
 
 
-
-class SimulatorCreator
-{
+class SimulatorCreator {
 public:
     SimulatorCreator(QString id, QString descr) :
         classId(id),
@@ -357,10 +385,16 @@ public:
     {}
     virtual ~SimulatorCreator() {}
 
-    QString ClassId() const {return classId;}
-    QString Description() const {return description;}
+    QString ClassId() const
+    {
+        return classId;
+    }
+    QString Description() const
+    {
+        return description;
+    }
 
-    virtual Simulator* createSimulator(const SimulatorSettings& params) = 0;
+    virtual Simulator *createSimulator(const SimulatorSettings & params) = 0;
 
 private:
     QString classId;

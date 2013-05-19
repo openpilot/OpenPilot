@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin Primary Flight Display Plugin
  * @{
- * @brief The Primary Flight Display Gadget 
+ * @brief The Primary Flight Display Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -40,14 +40,13 @@ class IUAVGadgetConfiguration;
 class PFDGadgetConfiguration;
 
 namespace Ui {
-    class PFDGadgetOptionsPage;
+class PFDGadgetOptionsPage;
 }
 
 using namespace Core;
 
-class PFDGadgetOptionsPage : public IOptionsPage
-{
-Q_OBJECT
+class PFDGadgetOptionsPage : public IOptionsPage {
+    Q_OBJECT
 public:
     explicit PFDGadgetOptionsPage(PFDGadgetConfiguration *config, QObject *parent = 0);
 

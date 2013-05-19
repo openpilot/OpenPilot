@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
  * @{
- * @brief The OpenPilot Map plugin 
+ * @brief The OpenPilot Map plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -64,17 +64,15 @@
 
 // ******************************************************
 
-namespace Ui
-{
-    class OPMap_Widget;
+namespace Ui {
+class OPMap_Widget;
 }
 
 using namespace mapcontrol;
 
 // ******************************************************
 
-typedef struct t_home
-{
+typedef struct t_home {
     internals::PointLatLng coord;
     double altitude;
     bool locked;
@@ -83,23 +81,22 @@ typedef struct t_home
 // ******************************************************
 
 enum opMapModeType { Normal_MapMode = 0,
-                     MagicWaypoint_MapMode = 1};
+                     MagicWaypoint_MapMode = 1 };
 
 // ******************************************************
 
-class OPMapGadgetWidget : public QWidget
-{
+class OPMapGadgetWidget : public QWidget {
     Q_OBJECT
 
 public:
     OPMapGadgetWidget(QWidget *parent = 0);
-   ~OPMapGadgetWidget();
+    ~OPMapGadgetWidget();
 
     /**
-    * @brief public functions
-    *
-    * @param
-    */
+     * @brief public functions
+     *
+     * @param
+     */
     void setHome(QPointF pos);
     void setHome(internals::PointLatLng pos_lat_lon, double altitude);
     void goHome();
@@ -112,13 +109,13 @@ public:
     void setUseMemoryCache(bool useMemoryCache);
     void setCacheLocation(QString cacheLocation);
     void setMapMode(opMapModeType mode);
-	void SetUavPic(QString UAVPic);
+    void SetUavPic(QString UAVPic);
     void setMaxUpdateRate(int update_rate);
     void setHomePosition(QPointF pos);
     void setOverlayOpacity(qreal value);
     bool getGPSPosition(double &latitude, double &longitude, double &altitude);
 signals:
-    void defaultLocationAndZoomChanged(double lng,double lat,double zoom);
+    void defaultLocationAndZoomChanged(double lng, double lat, double zoom);
     void overlayOpacityChanged(qreal);
 
 public slots:
@@ -141,10 +138,10 @@ private slots:
     void zoomOut();
 
     /**
-    * @brief signals received from the various map plug-in widget user controls
-    *
-    * Some are currently disabled for the v1.0 plugin version.
-    */
+     * @brief signals received from the various map plug-in widget user controls
+     *
+     * Some are currently disabled for the v1.0 plugin version.
+     */
     void on_toolButtonZoomM_clicked();
     void on_toolButtonZoomP_clicked();
     void on_toolButtonMapHome_clicked();
@@ -157,17 +154,17 @@ private slots:
     void on_toolButtonMoveToWP_clicked();
 
     /**
-    * @brief signals received from the map object
-    */
-    void zoomChanged(double zoomt,double zoom, double zoomd);
+     * @brief signals received from the map object
+     */
+    void zoomChanged(double zoomt, double zoom, double zoomd);
     void OnCurrentPositionChanged(internals::PointLatLng point);
     void OnTileLoadComplete();
     void OnTileLoadStart();
     void OnTilesStillToLoad(int number);
 
     /**
-    * @brief mouse right click context menu signals
-    */
+     * @brief mouse right click context menu signals
+     */
     void onReloadAct_triggered();
     void onRipAct_triggered();
     void onCopyMouseLatLonToClipAct_triggered();
@@ -207,43 +204,43 @@ private slots:
     void onClearUAVtrailAct_triggered();
     void onUAVTrailTimeActGroup_triggered(QAction *action);
     void onUAVTrailDistanceActGroup_triggered(QAction *action);
-	void onMaxUpdateRateActGroup_triggered(QAction *action);
+    void onMaxUpdateRateActGroup_triggered(QAction *action);
     void onChangeDefaultLocalAndZoom();
     void on_tbFind_clicked();
-    void onHomeDoubleClick(HomeItem*);
+    void onHomeDoubleClick(HomeItem *);
     void onOverlayOpacityActGroup_triggered(QAction *action);
     void on_leFind_returnPressed();
 
 private:
-	int m_min_zoom;
-	int m_max_zoom;
-    double m_heading;	// uav heading
-	internals::PointLatLng m_mouse_lat_lon;
-	internals::PointLatLng m_context_menu_lat_lon;
-	int m_prev_tile_number;
+    int m_min_zoom;
+    int m_max_zoom;
+    double m_heading; // uav heading
+    internals::PointLatLng m_mouse_lat_lon;
+    internals::PointLatLng m_context_menu_lat_lon;
+    int m_prev_tile_number;
     opMapModeType m_map_mode;
-	int m_maxUpdateRate;
-	t_home m_home_position;
-	QStringList findPlaceWordList;
+    int m_maxUpdateRate;
+    t_home m_home_position;
+    QStringList findPlaceWordList;
     QCompleter *findPlaceCompleter;
     QTimer *m_updateTimer;
     QTimer *m_statusUpdateTimer;
     Ui::OPMap_Widget *m_widget;
     mapcontrol::OPMapWidget *m_map;
-	ExtensionSystem::PluginManager *pm;
-	UAVObjectManager *obm;
-	UAVObjectUtilManager *obum;
+    ExtensionSystem::PluginManager *pm;
+    UAVObjectManager *obm;
+    UAVObjectUtilManager *obum;
     QPointer<opmap_edit_waypoint_dialog> waypoint_edit_dialog;
     QStandardItemModel wayPoint_treeView_model;
     mapcontrol::WayPointItem *m_mouse_waypoint;
     QPointer<modelUavoProxy> UAVProxy;
     QMutex m_map_mutex;
-	bool m_telemetry_connected;
+    bool m_telemetry_connected;
     QAction *closeAct1;
     QAction *closeAct2;
     QAction *reloadAct;
     QAction *ripAct;
-	QAction *copyMouseLatLonToClipAct;
+    QAction *copyMouseLatLonToClipAct;
     QAction *copyMouseLatToClipAct;
     QAction *copyMouseLonToClipAct;
     QAction *showCompassAct;
@@ -293,11 +290,11 @@ private:
     QList<QAction *> zoomAct;
     QList<QAction *> overlayOpacityAct;
 
-	QActionGroup *maxUpdateRateActGroup;
-	QList<QAction *> maxUpdateRateAct;
+    QActionGroup *maxUpdateRateActGroup;
+    QList<QAction *> maxUpdateRateAct;
 
     void createActions();
-	void homeMagicWaypoint();
+    void homeMagicWaypoint();
     void moveToMagicWaypointPosition();
     void hideMagicWaypointControls();
     void showMagicWaypointControls();
@@ -307,15 +304,15 @@ private:
     double bearing(internals::PointLatLng from, internals::PointLatLng to);
     internals::PointLatLng destPoint(internals::PointLatLng source, double bear, double dist);
 
-	bool getUAVPosition(double &latitude, double &longitude, double &altitude);
+    bool getUAVPosition(double &latitude, double &longitude, double &altitude);
     double getUAV_Yaw();
 
     void setMapFollowingMode();
 
-	bool setHomeLocationObject();
+    bool setHomeLocationObject();
     QMenu contextMenu;
     internals::PointLatLng lastLatLngMouse;
-    WayPointItem * magicWayPoint;
+    WayPointItem *magicWayPoint;
 
     QPointer<flightDataModel> model;
     QPointer<pathPlanner> table;

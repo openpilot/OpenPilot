@@ -31,8 +31,8 @@
 #ifndef PIOS_USB_UTIL_H
 #define PIOS_USB_UTIL_H
 
-#include <stdint.h>		/* uint8_t */
+#include <stdint.h> /* uint8_t */
 
-uint8_t * PIOS_USB_UTIL_AsciiToUtf8(uint8_t * dst, uint8_t * src, uint16_t srclen);
+uint8_t *PIOS_USB_UTIL_AsciiToUtf8(uint8_t *dst, uint8_t *src, uint16_t srclen);
 
-#endif	/* PIOS_USB_UTIL_H */
+#endif /* PIOS_USB_UTIL_H */

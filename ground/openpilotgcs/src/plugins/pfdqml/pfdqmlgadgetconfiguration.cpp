@@ -33,21 +33,21 @@ PfdQmlGadgetConfiguration::PfdQmlGadgetConfiguration(QString classId, QSettings 
     m_altitude(0),
     m_cacheOnly(false)
 {
-    //if a saved configuration exists load it
-    if(qSettings != 0) {
-        m_qmlFile = qSettings->value("qmlFile").toString();
-        m_qmlFile=Utils::PathUtils().InsertDataPath(m_qmlFile);
+    // if a saved configuration exists load it
+    if (qSettings != 0) {
+        m_qmlFile            = qSettings->value("qmlFile").toString();
+        m_qmlFile            = Utils::PathUtils().InsertDataPath(m_qmlFile);
 
-        m_earthFile = qSettings->value("earthFile").toString();
-        m_earthFile=Utils::PathUtils().InsertDataPath(m_earthFile);
+        m_earthFile          = qSettings->value("earthFile").toString();
+        m_earthFile          = Utils::PathUtils().InsertDataPath(m_earthFile);
 
-        m_openGLEnabled = qSettings->value("openGLEnabled", true).toBool();
-        m_terrainEnabled = qSettings->value("terrainEnabled").toBool();
+        m_openGLEnabled      = qSettings->value("openGLEnabled", true).toBool();
+        m_terrainEnabled     = qSettings->value("terrainEnabled").toBool();
         m_actualPositionUsed = qSettings->value("actualPositionUsed").toBool();
-        m_latitude = qSettings->value("latitude").toDouble();
-        m_longitude = qSettings->value("longitude").toDouble();
-        m_altitude = qSettings->value("altitude").toDouble();
-        m_cacheOnly = qSettings->value("cacheOnly").toBool();
+        m_latitude           = qSettings->value("latitude").toDouble();
+        m_longitude          = qSettings->value("longitude").toDouble();
+        m_altitude           = qSettings->value("altitude").toDouble();
+        m_cacheOnly          = qSettings->value("cacheOnly").toBool();
     }
 }
 
@@ -58,15 +58,16 @@ PfdQmlGadgetConfiguration::PfdQmlGadgetConfiguration(QString classId, QSettings 
 IUAVGadgetConfiguration *PfdQmlGadgetConfiguration::clone()
 {
     PfdQmlGadgetConfiguration *m = new PfdQmlGadgetConfiguration(this->classId());
-    m->m_qmlFile = m_qmlFile;
-    m->m_openGLEnabled = m_openGLEnabled;
-    m->m_earthFile = m_earthFile;
-    m->m_terrainEnabled = m_terrainEnabled;
+
+    m->m_qmlFile            = m_qmlFile;
+    m->m_openGLEnabled      = m_openGLEnabled;
+    m->m_earthFile          = m_earthFile;
+    m->m_terrainEnabled     = m_terrainEnabled;
     m->m_actualPositionUsed = m_actualPositionUsed;
-    m->m_latitude = m_latitude;
-    m->m_longitude = m_longitude;
-    m->m_altitude = m_altitude;
-    m->m_cacheOnly = m_cacheOnly;
+    m->m_latitude           = m_latitude;
+    m->m_longitude          = m_longitude;
+    m->m_altitude           = m_altitude;
+    m->m_cacheOnly          = m_cacheOnly;
 
     return m;
 }
@@ -75,8 +76,10 @@ IUAVGadgetConfiguration *PfdQmlGadgetConfiguration::clone()
  * Saves a configuration.
  *
  */
-void PfdQmlGadgetConfiguration::saveConfig(QSettings* qSettings) const {
-    QString qmlFile = Utils::PathUtils().RemoveDataPath(m_qmlFile);
+void PfdQmlGadgetConfiguration::saveConfig(QSettings *qSettings) const
+{
+    QString qmlFile   = Utils::PathUtils().RemoveDataPath(m_qmlFile);
+
     qSettings->setValue("qmlFile", qmlFile);
     QString earthFile = Utils::PathUtils().RemoveDataPath(m_earthFile);
     qSettings->setValue("earthFile", earthFile);

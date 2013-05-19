@@ -4,25 +4,25 @@
  * @file       iplugin.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -212,7 +212,7 @@
     Plugins have access to the plugin manager
     (and its object pool) via the PluginManager::instance()
     method.
-*/
+ */
 
 /*!
     \fn bool IPlugin::initialize(const QStringList &arguments, QString *errorString)
@@ -224,7 +224,7 @@
     the \a errorString should be set to a user-readable message
     describing the reason.
     \sa extensionsInitialized()
-*/
+ */
 
 /*!
     \fn void IPlugin::extensionsInitialized()
@@ -236,7 +236,7 @@
     look in the plugin manager's object pool for objects that have
     been provided by dependent plugins.
     \sa initialize()
-*/
+ */
 
 /*!
     \fn void IPlugin::shutdown()
@@ -246,28 +246,28 @@
     disconnect from the PluginManager::aboutToRemoveObject() signal
     if getting the signal (and probably doing lots of stuff to update
     the internal and visible state) doesn't make sense during shutdown.
-*/
+ */
 
 using namespace ExtensionSystem;
 
 /*!
     \fn IPlugin::IPlugin()
     \internal
-*/
+ */
 IPlugin::IPlugin()
     : d(new Internal::IPluginPrivate())
-{
-}
+{}
 
 /*!
     \fn IPlugin::~IPlugin()
     \internal
-*/
+ */
 IPlugin::~IPlugin()
 {
     PluginManager *pm = PluginManager::instance();
-    foreach (QObject *obj, d->addedObjectsInReverseOrder)
-        pm->removeObject(obj);
+
+    foreach(QObject * obj, d->addedObjectsInReverseOrder)
+    pm->removeObject(obj);
     qDeleteAll(d->addedObjectsInReverseOrder);
     d->addedObjectsInReverseOrder.clear();
     delete d;
@@ -278,7 +278,7 @@ IPlugin::~IPlugin()
     \fn PluginSpec *IPlugin::pluginSpec() const
     Returns the PluginSpec corresponding to this plugin.
     This is not available in the constructor.
-*/
+ */
 PluginSpec *IPlugin::pluginSpec() const
 {
     return d->pluginSpec;
@@ -288,7 +288,7 @@ PluginSpec *IPlugin::pluginSpec() const
     \fn void IPlugin::addObject(QObject *obj)
     Convenience method that registers \a obj in the plugin manager's
     plugin pool by just calling PluginManager::addObject().
-*/
+ */
 void IPlugin::addObject(QObject *obj)
 {
     PluginManager::instance()->addObject(obj);
@@ -303,7 +303,7 @@ void IPlugin::addObject(QObject *obj)
     removed and deleted in reverse order of registration when
     the IPlugin instance is destroyed.
     \sa PluginManager::addObject()
-*/
+ */
 void IPlugin::addAutoReleasedObject(QObject *obj)
 {
     d->addedObjectsInReverseOrder.prepend(obj);
@@ -314,9 +314,8 @@ void IPlugin::addAutoReleasedObject(QObject *obj)
     \fn void IPlugin::removeObject(QObject *obj)
     Convenience method that unregisters \a obj from the plugin manager's
     plugin pool by just calling PluginManager::removeObject().
-*/
+ */
 void IPlugin::removeObject(QObject *obj)
 {
     PluginManager::instance()->removeObject(obj);
 }
-

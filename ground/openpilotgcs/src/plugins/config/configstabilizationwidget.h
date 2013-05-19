@@ -37,8 +37,7 @@
 #include <QTimer>
 
 
-class ConfigStabilizationWidget: public ConfigTaskWidget
-{
+class ConfigStabilizationWidget : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
@@ -47,7 +46,7 @@ public:
 
 private:
     Ui_StabilizationWidget *ui;
-    QTimer * realtimeUpdates;
+    QTimer *realtimeUpdates;
 
     // Milliseconds between automatic 'Instant Updates'
     static const int AUTOMATIC_UPDATE_RATE = 500;
@@ -58,7 +57,7 @@ protected slots:
 private slots:
     void realtimeUpdatesSlot(bool value);
     void linkCheckBoxes(bool value);
-    void processLinkedWidgets(QWidget*);
+    void processLinkedWidgets(QWidget *);
 };
 
 #endif // ConfigStabilizationWidget_H

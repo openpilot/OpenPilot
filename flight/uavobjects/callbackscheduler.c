@@ -30,34 +30,33 @@
 
 // Private constants
 #define STACK_SIZE 128
-#define MAX_SLEEP 1000
+#define MAX_SLEEP  1000
 
 // Private types
 /**
  * task information
  */
 struct DelayedCallbackTaskStruct {
-        DelayedCallbackInfo *callbackQueue[CALLBACK_PRIORITY_LOW + 1];
-        DelayedCallbackInfo *queueCursor[CALLBACK_PRIORITY_LOW + 1];
-	xTaskHandle callbackSchedulerTaskHandle;
-	signed char name[3];
-	uint32_t stackSize;
-	DelayedCallbackPriorityTask priorityTask;
-	xSemaphoreHandle signal;
-	struct DelayedCallbackTaskStruct *next;
+    DelayedCallbackInfo *callbackQueue[CALLBACK_PRIORITY_LOW + 1];
+    DelayedCallbackInfo *queueCursor[CALLBACK_PRIORITY_LOW + 1];
+    xTaskHandle callbackSchedulerTaskHandle;
+    signed char name[3];
+    uint32_t    stackSize;
+    DelayedCallbackPriorityTask priorityTask;
+    xSemaphoreHandle signal;
+    struct DelayedCallbackTaskStruct *next;
 };
 
 /**
  * callback information
  */
 struct DelayedCallbackInfoStruct {
-	DelayedCallback cb;
-	bool volatile waiting;
-	uint32_t volatile scheduletime;
-	struct DelayedCallbackTaskStruct *task;
-	struct DelayedCallbackInfoStruct *next;
+    DelayedCallback   cb;
+    bool volatile     waiting;
+    uint32_t volatile scheduletime;
+    struct DelayedCallbackTaskStruct *task;
+    struct DelayedCallbackInfoStruct *next;
 };
-
 
 
 // Private variables
@@ -76,18 +75,18 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
  */
 int32_t CallbackSchedulerInitialize()
 {
-	// Initialize variables
-	schedulerTasks = NULL;
-	schedulerStarted = false;
+    // Initialize variables
+    schedulerTasks   = NULL;
+    schedulerStarted = false;
 
-	// Create mutex
-	mutex = xSemaphoreCreateRecursiveMutex();
-	if (mutex == NULL) {
-		return -1;
-	}
+    // Create mutex
+    mutex = xSemaphoreCreateRecursiveMutex();
+    if (mutex == NULL) {
+        return -1;
+    }
 
-	// Done
-	return 0;
+    // Done
+    return 0;
 }
 
 /**
@@ -102,34 +101,34 @@ int32_t CallbackSchedulerInitialize()
  */
 int32_t CallbackSchedulerStart()
 {
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	// only call once
-	PIOS_Assert(schedulerStarted == false);
+    // only call once
+    PIOS_Assert(schedulerStarted == false);
 
-	// start tasks
-	struct DelayedCallbackTaskStruct *cursor = NULL;
-	int t = 0;
-	LL_FOREACH(schedulerTasks, cursor) {
-		xTaskCreate(
-			CallbackSchedulerTask,
-			cursor->name,
-			cursor->stackSize/4,
-			cursor,
-			cursor->priorityTask,
-			&cursor->callbackSchedulerTaskHandle
-			);
-		if (TASKINFO_RUNNING_CALLBACKSCHEDULER0+t <= TASKINFO_RUNNING_CALLBACKSCHEDULER3) {
-			PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t, cursor->callbackSchedulerTaskHandle);
-		}
-		t++;
-	}
+    // start tasks
+    struct DelayedCallbackTaskStruct *cursor = NULL;
+    int t = 0;
+    LL_FOREACH(schedulerTasks, cursor) {
+        xTaskCreate(
+            CallbackSchedulerTask,
+            cursor->name,
+            cursor->stackSize / 4,
+            cursor,
+            cursor->priorityTask,
+            &cursor->callbackSchedulerTaskHandle
+            );
+        if (TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t <= TASKINFO_RUNNING_CALLBACKSCHEDULER3) {
+            PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t, cursor->callbackSchedulerTaskHandle);
+        }
+        t++;
+    }
 
-	schedulerStarted = true;
+    schedulerStarted = true;
 
-	xSemaphoreGiveRecursive(mutex);
+    xSemaphoreGiveRecursive(mutex);
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -145,47 +144,45 @@ int32_t CallbackSchedulerStart()
  * \return 0: not scheduled, previous schedule takes precedence, 1: new schedule, 2: previous schedule overridden
  */
 int32_t DelayedCallbackSchedule(
-	DelayedCallbackInfo *cbinfo,
-	int32_t milliseconds,
-	DelayedCallbackUpdateMode updatemode
-	)
+    DelayedCallbackInfo *cbinfo,
+    int32_t milliseconds,
+    DelayedCallbackUpdateMode updatemode)
 {
-	int32_t result = 0;
+    int32_t result = 0;
 
-	PIOS_Assert(cbinfo);
+    PIOS_Assert(cbinfo);
 
-	if (milliseconds <= 0) {
-		milliseconds = 0; // we can and will not schedule in the past since that ruins the wraparound of uint32_t
-	}
+    if (milliseconds <= 0) {
+        milliseconds = 0; // we can and will not schedule in the past since that ruins the wraparound of uint32_t
+    }
 
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	uint32_t new = xTaskGetTickCount() + (milliseconds/portTICK_RATE_MS);
-	if (!new) {
-		new = 1; // zero has a special meaning, schedule at time 1 instead
-	}
+    uint32_t new = xTaskGetTickCount() + (milliseconds / portTICK_RATE_MS);
+    if (!new) {
+        new = 1; // zero has a special meaning, schedule at time 1 instead
+    }
 
-	int32_t diff = new - cbinfo->scheduletime;
-	if ( (!cbinfo->scheduletime)
-	   || ((updatemode & CALLBACK_UPDATEMODE_SOONER) && diff < 0)
-	   || ((updatemode & CALLBACK_UPDATEMODE_LATER ) && diff > 0)
-	   ) {
+    int32_t diff = new - cbinfo->scheduletime;
+    if ((!cbinfo->scheduletime)
+        || ((updatemode & CALLBACK_UPDATEMODE_SOONER) && diff < 0)
+        || ((updatemode & CALLBACK_UPDATEMODE_LATER) && diff > 0)
+        ) {
+        // the scheduletime may be updated
+        if (!cbinfo->scheduletime) {
+            result = 1;
+        } else {
+            result = 2;
+        }
+        cbinfo->scheduletime = new;
 
-		// the scheduletime may be updated
-		if (!cbinfo->scheduletime) {
-			result = 1;
-		} else {
-			result = 2;
-		}
-		cbinfo->scheduletime = new;
+        // scheduler needs to be notified to adapt sleep times
+        xSemaphoreGive(cbinfo->task->signal);
+    }
 
-		// scheduler needs to be notified to adapt sleep times
-		xSemaphoreGive(cbinfo->task->signal);
-	}
+    xSemaphoreGiveRecursive(mutex);
 
-	xSemaphoreGiveRecursive(mutex);
-
-	return result;
+    return result;
 }
 
 /**
@@ -196,12 +193,12 @@ int32_t DelayedCallbackSchedule(
  */
 int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo)
 {
-	PIOS_Assert(cbinfo);
+    PIOS_Assert(cbinfo);
 
-	// no semaphore needed for the callback
-	cbinfo->waiting = true;
-	// but the scheduler as a whole needs to be notified
-	return xSemaphoreGive(cbinfo->task->signal);
+    // no semaphore needed for the callback
+    cbinfo->waiting = true;
+    // but the scheduler as a whole needs to be notified
+    return xSemaphoreGive(cbinfo->task->signal);
 }
 
 /**
@@ -220,12 +217,12 @@ int32_t DelayedCallbackDispatch(DelayedCallbackInfo *cbinfo)
  */
 int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigherPriorityTaskWoken)
 {
-	PIOS_Assert(cbinfo);
+    PIOS_Assert(cbinfo);
 
-	// no semaphore needed for the callback
-	cbinfo->waiting = true;
-	// but the scheduler as a whole needs to be notified
-	return xSemaphoreGiveFromISR(cbinfo->task->signal, pxHigherPriorityTaskWoken);
+    // no semaphore needed for the callback
+    cbinfo->waiting = true;
+    // but the scheduler as a whole needs to be notified
+    return xSemaphoreGiveFromISR(cbinfo->task->signal, pxHigherPriorityTaskWoken);
 }
 
 /**
@@ -241,100 +238,98 @@ int32_t DelayedCallbackDispatchFromISR(DelayedCallbackInfo *cbinfo, long *pxHigh
  * \return CallbackInfo Pointer on success, NULL if failed.
  */
 DelayedCallbackInfo *DelayedCallbackCreate(
-	DelayedCallback cb,
-	DelayedCallbackPriority priority,
-	DelayedCallbackPriorityTask priorityTask,
-	uint32_t stacksize
-	)
+    DelayedCallback cb,
+    DelayedCallbackPriority priority,
+    DelayedCallbackPriorityTask priorityTask,
+    uint32_t stacksize)
 {
+    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
 
-	xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+    // find appropriate scheduler task matching priorityTask
+    struct DelayedCallbackTaskStruct *task = NULL;
+    int t = 0;
+    LL_FOREACH(schedulerTasks, task) {
+        if (task->priorityTask == priorityTask) {
+            break; // found
+        }
+        t++;
+    }
+    // if given priorityTask does not exist, create it
+    if (!task) {
+        // allocate memory if possible
+        task = (struct DelayedCallbackTaskStruct *)pvPortMalloc(sizeof(struct DelayedCallbackTaskStruct));
+        if (!task) {
+            xSemaphoreGiveRecursive(mutex);
+            return NULL;
+        }
 
-	// find appropriate scheduler task matching priorityTask
-	struct DelayedCallbackTaskStruct *task = NULL;
-	int t = 0;
-	LL_FOREACH(schedulerTasks, task) {
-		if (task->priorityTask == priorityTask) {
-			break; // found
-		}
-		t++;
-	}
-	// if given priorityTask does not exist, create it
-	if (!task) {
-		// allocate memory if possible
-		task = (struct DelayedCallbackTaskStruct*)pvPortMalloc(sizeof(struct DelayedCallbackTaskStruct));
-		if (!task) {
-			xSemaphoreGiveRecursive(mutex);
-			return NULL;
-		}
+        // initialize structure
+        for (DelayedCallbackPriority p = 0; p <= CALLBACK_PRIORITY_LOW; p++) {
+            task->callbackQueue[p] = NULL;
+            task->queueCursor[p]   = NULL;
+        }
+        task->name[0]      = 'C';
+        task->name[1]      = 'a' + t;
+        task->name[2]      = 0;
+        task->stackSize    = ((STACK_SIZE > stacksize) ? STACK_SIZE : stacksize);
+        task->priorityTask = priorityTask;
+        task->next = NULL;
 
-		// initialize structure
-		for (DelayedCallbackPriority p = 0; p <= CALLBACK_PRIORITY_LOW; p++) {
-			task->callbackQueue[p] = NULL;
-			task->queueCursor[p]   = NULL;
-		}
-		task->name[0]      = 'C';
-		task->name[1]      = 'a'+t;
-		task->name[2]      = 0;
-		task->stackSize    = ((STACK_SIZE>stacksize)?STACK_SIZE:stacksize);
-		task->priorityTask = priorityTask;
-		task->next         = NULL;
+        // create the signaling semaphore
+        vSemaphoreCreateBinary(task->signal);
+        if (!task->signal) {
+            xSemaphoreGiveRecursive(mutex);
+            return NULL;
+        }
 
-		// create the signaling semaphore
-		vSemaphoreCreateBinary( task->signal );
-		if (!task->signal) {
-			xSemaphoreGiveRecursive(mutex);
-			return NULL;
-		}
+        // add to list of scheduler tasks
+        LL_APPEND(schedulerTasks, task);
 
-		// add to list of scheduler tasks
-		LL_APPEND(schedulerTasks, task);
+        // Previously registered tasks are spawned when CallbackSchedulerStart() is called.
+        // Tasks registered afterwards need to spawn upon creation.
+        if (schedulerStarted) {
+            xTaskCreate(
+                CallbackSchedulerTask,
+                task->name,
+                task->stackSize / 4,
+                task,
+                task->priorityTask,
+                &task->callbackSchedulerTaskHandle
+                );
+            if (TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t <= TASKINFO_RUNNING_CALLBACKSCHEDULER3) {
+                PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t, task->callbackSchedulerTaskHandle);
+            }
+        }
+    }
 
-		// Previously registered tasks are spawned when CallbackSchedulerStart() is called.
-		// Tasks registered afterwards need to spawn upon creation.
-		if (schedulerStarted) {
-			xTaskCreate( 
-				CallbackSchedulerTask,
-				task->name,
-				task->stackSize/4,
-				task,
-				task->priorityTask,
-				&task->callbackSchedulerTaskHandle
-				);
-			if (TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t <= TASKINFO_RUNNING_CALLBACKSCHEDULER3) {
-				PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_CALLBACKSCHEDULER0 + t, task->callbackSchedulerTaskHandle);
-			}
-		}
-	}
-
-	if (!schedulerStarted && stacksize > task->stackSize) {
-		task->stackSize = stacksize; // previous to task initialisation we can still adapt to the maximum needed stack
-	}
+    if (!schedulerStarted && stacksize > task->stackSize) {
+        task->stackSize = stacksize; // previous to task initialisation we can still adapt to the maximum needed stack
+    }
 
 
-	if (stacksize > task->stackSize) {
-		xSemaphoreGiveRecursive(mutex);
-		return NULL; // error - not enough memory
-	}
+    if (stacksize > task->stackSize) {
+        xSemaphoreGiveRecursive(mutex);
+        return NULL; // error - not enough memory
+    }
 
-	// initialize callback scheduling info
-	DelayedCallbackInfo *info = (DelayedCallbackInfo*)pvPortMalloc(sizeof(DelayedCallbackInfo));
-	if (!info) {
-		xSemaphoreGiveRecursive(mutex);
-		return NULL; // error - not enough memory
-	}
-	info->next         = NULL;
-	info->waiting      = false;
-	info->scheduletime = 0;
-	info->task         = task;
-	info->cb           = cb;
+    // initialize callback scheduling info
+    DelayedCallbackInfo *info = (DelayedCallbackInfo *)pvPortMalloc(sizeof(DelayedCallbackInfo));
+    if (!info) {
+        xSemaphoreGiveRecursive(mutex);
+        return NULL; // error - not enough memory
+    }
+    info->next    = NULL;
+    info->waiting = false;
+    info->scheduletime = 0;
+    info->task    = task;
+    info->cb = cb;
 
-	// add to scheduling queue
-	LL_APPEND(task->callbackQueue[priority], info);
+    // add to scheduling queue
+    LL_APPEND(task->callbackQueue[priority], info);
 
-	xSemaphoreGiveRecursive(mutex);
+    xSemaphoreGiveRecursive(mutex);
 
-	return info;
+    return info;
 }
 
 /**
@@ -345,60 +340,59 @@ DelayedCallbackInfo *DelayedCallbackCreate(
  */
 static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCallbackPriority priority)
 {
+    int32_t result = MAX_SLEEP;
+    int32_t diff   = 0;
 
-	int32_t result = MAX_SLEEP;
-	int32_t diff   = 0;
+    // no such queue
+    if (priority > CALLBACK_PRIORITY_LOW) {
+        return result;
+    }
 
-	// no such queue
-	if (priority > CALLBACK_PRIORITY_LOW) {
-		return result;
-	}
+    // queue is empty, search a lower priority queue
+    if (task->callbackQueue[priority] == NULL) {
+        return runNextCallback(task, priority + 1);
+    }
 
-	// queue is empty, search a lower priority queue
-	if (task->callbackQueue[priority] == NULL) {
-		return runNextCallback(task, priority + 1);
-	}
-
-	DelayedCallbackInfo *current = task->queueCursor[priority];
-	DelayedCallbackInfo *next;
-	do {
-		if (current == NULL) {
-			next = task->callbackQueue[priority]; // loop around the end of the list
-			// also attempt to run a callback that has lower priority
-			// every time the queue is completely traversed
-			diff = runNextCallback(task, priority + 1);
-			if (!diff) {
-				task->queueCursor[priority] = next; // the recursive call has executed a callback
-				return 0;
-			}
-			if (diff < result) {
-				result = diff; // adjust sleep time
-			}
-		} else {
-			next = current->next;
-			xSemaphoreTakeRecursive(mutex, portMAX_DELAY); // access to scheduletime should be mutex protected
-			if (current->scheduletime) {
-				diff = current->scheduletime - xTaskGetTickCount();
-				if (diff <= 0) {
-					current->waiting = true;
-				} else if (diff < result) {
-					result = diff; // adjust sleep time
-				}
-			}
-			if (current->waiting) {
-				task->queueCursor[priority] = next;
-				current->scheduletime = 0; // any schedules are reset
-				current->waiting = false; // the flag is reset just before execution.
-				xSemaphoreGiveRecursive(mutex);
-				current->cb(); // call the callback
-				return 0;
-			}
-			xSemaphoreGiveRecursive(mutex);
-		}
-		current = next;
-	} while (current != task->queueCursor[priority]);
-	// once the list has been traversed entirely without finding any to be executed task, abort (nothing to do)
-	return result;
+    DelayedCallbackInfo *current = task->queueCursor[priority];
+    DelayedCallbackInfo *next;
+    do {
+        if (current == NULL) {
+            next = task->callbackQueue[priority]; // loop around the end of the list
+            // also attempt to run a callback that has lower priority
+            // every time the queue is completely traversed
+            diff = runNextCallback(task, priority + 1);
+            if (!diff) {
+                task->queueCursor[priority] = next; // the recursive call has executed a callback
+                return 0;
+            }
+            if (diff < result) {
+                result = diff; // adjust sleep time
+            }
+        } else {
+            next = current->next;
+            xSemaphoreTakeRecursive(mutex, portMAX_DELAY); // access to scheduletime should be mutex protected
+            if (current->scheduletime) {
+                diff = current->scheduletime - xTaskGetTickCount();
+                if (diff <= 0) {
+                    current->waiting = true;
+                } else if (diff < result) {
+                    result = diff; // adjust sleep time
+                }
+            }
+            if (current->waiting) {
+                task->queueCursor[priority] = next;
+                current->scheduletime = 0; // any schedules are reset
+                current->waiting = false; // the flag is reset just before execution.
+                xSemaphoreGiveRecursive(mutex);
+                current->cb(); // call the callback
+                return 0;
+            }
+            xSemaphoreGiveRecursive(mutex);
+        }
+        current = next;
+    } while (current != task->queueCursor[priority]);
+    // once the list has been traversed entirely without finding any to be executed task, abort (nothing to do)
+    return result;
 }
 
 /**
@@ -407,15 +401,13 @@ static int32_t runNextCallback(struct DelayedCallbackTaskStruct *task, DelayedCa
  */
 static void CallbackSchedulerTask(void *task)
 {
-	uint32_t delay = 0;
+    uint32_t delay = 0;
 
-	while (1) {
-
-		delay = runNextCallback((struct DelayedCallbackTaskStruct*)task, CALLBACK_PRIORITY_CRITICAL);
-		if (delay) {
-			// nothing to do but sleep
-			xSemaphoreTake(((struct DelayedCallbackTaskStruct*)task)->signal, delay);
-		}
-	}
+    while (1) {
+        delay = runNextCallback((struct DelayedCallbackTaskStruct *)task, CALLBACK_PRIORITY_CRITICAL);
+        if (delay) {
+            // nothing to do but sleep
+            xSemaphoreTake(((struct DelayedCallbackTaskStruct *)task)->signal, delay);
+        }
+    }
 }
-

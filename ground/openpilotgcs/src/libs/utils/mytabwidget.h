@@ -37,8 +37,7 @@
  * tabMoved(int, int) which QTabBar has but for some reason is
  * not made available from QTabWidget.
  */
-class QTCREATOR_UTILS_EXPORT MyTabWidget : public QTabWidget
-{
+class QTCREATOR_UTILS_EXPORT MyTabWidget : public QTabWidget {
     Q_OBJECT
 
 public:

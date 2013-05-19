@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ModelViewPlugin ModelView Plugin
  * @{
- * @brief A gadget that displays a 3D representation of the UAV 
+ * @brief A gadget that displays a 3D representation of the UAV
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -38,15 +38,17 @@ class ModelViewGadgetWidget;
 
 using namespace Core;
 
-class ModelViewGadget : public Core::IUAVGadget
-{
+class ModelViewGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     ModelViewGadget(QString classId, ModelViewGadgetWidget *widget, QWidget *parent = 0);
     ~ModelViewGadget();
 
-    QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 
 private:
     ModelViewGadgetWidget *m_widget;

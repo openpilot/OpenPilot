@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin Primary Flight Display Plugin
  * @{
- * @brief The Primary Flight Display Gadget 
+ * @brief The Primary Flight Display Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,16 +32,15 @@
 
 class OsgEarthviewGadgetFactory;
 
-class OsgEarthviewPlugin : public ExtensionSystem::IPlugin
-{
+class OsgEarthviewPlugin : public ExtensionSystem::IPlugin {
 public:
-        OsgEarthviewPlugin();
-   ~OsgEarthviewPlugin();
+    OsgEarthviewPlugin();
+    ~OsgEarthviewPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
 private:
-   OsgEarthviewGadgetFactory *mf;
+    OsgEarthviewGadgetFactory *mf;
 };
 #endif /* PFDPLUGIN_H_ */

@@ -38,14 +38,13 @@
 #include <QTimer>
 
 namespace Ui {
-    class Widget;
+class Widget;
 }
 
-const float RAD2DEG = (float)(180.0/M_PI);
-const float DEG2RAD = (float)(M_PI/180.0);
+const float RAD2DEG = (float)(180.0 / M_PI);
+const float DEG2RAD = (float)(M_PI / 180.0);
 
-class Widget : public QWidget
-{
+class Widget : public QWidget {
     Q_OBJECT
 
 public:

@@ -35,8 +35,7 @@ namespace Ui {
 class BiasCalibrationPage;
 }
 
-class BiasCalibrationPage : public AbstractWizardPage
-{
+class BiasCalibrationPage : public AbstractWizardPage {
     Q_OBJECT
 
 public:
@@ -53,7 +52,7 @@ private slots:
 
 private:
     static const int BIAS_CYCLES = 200;
-    static const int BIAS_RATE = 50;
+    static const int BIAS_RATE   = 50;
 
     Ui::BiasCalibrationPage *ui;
     BiasCalibrationUtil *m_calibrationUtil;

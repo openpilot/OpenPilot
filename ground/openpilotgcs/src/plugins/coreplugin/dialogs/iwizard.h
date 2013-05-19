@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -37,10 +37,8 @@ class QIcon;
 QT_END_NAMESPACE
 
 namespace Core {
-
 class CORE_EXPORT IWizard
-    : public QObject
-{
+    : public QObject {
     Q_OBJECT
 public:
     enum Kind {
@@ -52,22 +50,21 @@ public:
     IWizard(QObject *parent = 0) : QObject(parent) {}
     virtual ~IWizard() {}
 
-    virtual Kind kind() const = 0;
-    virtual QIcon icon() const = 0;
+    virtual Kind kind() const           = 0;
+    virtual QIcon icon() const          = 0;
     virtual QString description() const = 0;
-    virtual QString name() const = 0;
+    virtual QString name() const        = 0;
 
-    virtual QString category() const = 0;
-    virtual QString trCategory() const = 0;
+    virtual QString category() const    = 0;
+    virtual QString trCategory() const  = 0;
 
     virtual QStringList runWizard(const QString &path, QWidget *parent) = 0;
 
     // Utility to find all registered wizards
-    static QList<IWizard*> allWizards();
+    static QList<IWizard *> allWizards();
     // Utility to find all registered wizards of a certain kind
-    static QList<IWizard*> wizardsOfKind(Kind kind);
+    static QList<IWizard *> wizardsOfKind(Kind kind);
 };
-
 } // namespace Core
 
 #endif // IWIZARD_H

@@ -32,17 +32,16 @@
 #include <QDebug>
 
 PathActionEditorGadget::PathActionEditorGadget(QString classId, PathActionEditorGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent),
+    m_widget(widget)
+{}
 
 PathActionEditorGadget::~PathActionEditorGadget()
 {
     delete m_widget;
 }
 
-void PathActionEditorGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void PathActionEditorGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
     Q_UNUSED(config);
 }

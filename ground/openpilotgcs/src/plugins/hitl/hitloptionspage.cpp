@@ -7,21 +7,21 @@
  * @{
  * @addtogroup HITLPlugin HITL Plugin
  * @{
- * @brief The Hardware In The Loop plugin 
+ * @brief The Hardware In The Loop plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -36,12 +36,10 @@
 #include <simulator.h>
 
 
-
 HITLOptionsPage::HITLOptionsPage(HITLConfiguration *conf, QObject *parent) :
     IOptionsPage(parent),
-	config(conf)
-{
-}
+    config(conf)
+{}
 
 QWidget *HITLOptionsPage::createPage(QWidget *parent)
 {
@@ -49,31 +47,31 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
 
     // Create page
     m_optionsPage = new Ui::HITLOptionsPage();
-    QWidget* optionsPageWidget = new QWidget;
+    QWidget *optionsPageWidget = new QWidget;
     m_optionsPage->setupUi(optionsPageWidget);
-	int index = 0;
-	foreach(SimulatorCreator* creator, HITLPlugin::typeSimulators)
-	{
-		m_optionsPage->chooseFlightSimulator->insertItem(index++, creator->Description(),creator->ClassId());
-	}
+    int index = 0;
+    foreach(SimulatorCreator * creator, HITLPlugin::typeSimulators) {
+        m_optionsPage->chooseFlightSimulator->insertItem(index++, creator->Description(), creator->ClassId());
+    }
 
-	//QString classId = widget->listSimulators->itemData(0).toString();
-	//SimulatorCreator* creator = HITLPlugin::getSimulatorCreator(classId);
+    // QString classId = widget->listSimulators->itemData(0).toString();
+    // SimulatorCreator* creator = HITLPlugin::getSimulatorCreator(classId);
 
-	//QWidget* embedPage = creator->createOptionsPage();
-	//m_optionsPage->verticalLayout->addWidget(embedPage);
+    // QWidget* embedPage = creator->createOptionsPage();
+    // m_optionsPage->verticalLayout->addWidget(embedPage);
 
-	m_optionsPage->executablePath->setExpectedKind(Utils::PathChooser::File);
-	m_optionsPage->executablePath->setPromptDialogTitle(tr("Choose flight simulator executable"));
-	m_optionsPage->dataPath->setExpectedKind(Utils::PathChooser::Directory);
-	m_optionsPage->dataPath->setPromptDialogTitle(tr("Choose flight simulator data directory"));
+    m_optionsPage->executablePath->setExpectedKind(Utils::PathChooser::File);
+    m_optionsPage->executablePath->setPromptDialogTitle(tr("Choose flight simulator executable"));
+    m_optionsPage->dataPath->setExpectedKind(Utils::PathChooser::Directory);
+    m_optionsPage->dataPath->setPromptDialogTitle(tr("Choose flight simulator data directory"));
 
     // Restore the contents from the settings:
-    foreach(SimulatorCreator* creator, HITLPlugin::typeSimulators)
-    {
+    foreach(SimulatorCreator * creator, HITLPlugin::typeSimulators) {
         QString id = config->Settings().simulatorId;
-        if(creator->ClassId() == id)
+
+        if (creator->ClassId() == id) {
             m_optionsPage->chooseFlightSimulator->setCurrentIndex(HITLPlugin::typeSimulators.indexOf(creator));
+        }
     }
 
     m_optionsPage->executablePath->setPath(config->Settings().binPath);
@@ -98,11 +96,10 @@ QWidget *HITLOptionsPage::createPage(QWidget *parent)
     m_optionsPage->attRawCheckbox->setChecked(config->Settings().attRawEnabled);
 
 
-
     m_optionsPage->attRawRateSpinbox->setValue(config->Settings().attRawRate);
     m_optionsPage->gpsPosRateSpinbox->setValue(config->Settings().gpsPosRate);
     m_optionsPage->groundTruthRateSpinbox->setValue(config->Settings().groundTruthRate);
-//    m_optionsPage->attActualRate->setValue(config->Settings().attActualRate);
+// m_optionsPage->attActualRate->setValue(config->Settings().attActualRate);
 
     m_optionsPage->baroAltitudeCheckbox->setChecked(config->Settings().baroAltitudeEnabled);
     m_optionsPage->baroAltRateSpinbox->setValue(config->Settings().baroAltRate);
@@ -124,48 +121,48 @@ void HITLOptionsPage::apply()
     SimulatorSettings settings;
     int i = m_optionsPage->chooseFlightSimulator->currentIndex();
 
-    settings.simulatorId = m_optionsPage->chooseFlightSimulator->itemData(i).toString();
-    settings.binPath = m_optionsPage->executablePath->path();
-    settings.dataPath = m_optionsPage->dataPath->path();
-    settings.startSim = m_optionsPage->startSim->isChecked();
-    settings.addNoise = m_optionsPage->noiseCheckBox->isChecked();
-    settings.hostAddress = m_optionsPage->hostAddress->text();
-    settings.remoteAddress = m_optionsPage->remoteAddress->text();
+    settings.simulatorId           = m_optionsPage->chooseFlightSimulator->itemData(i).toString();
+    settings.binPath               = m_optionsPage->executablePath->path();
+    settings.dataPath              = m_optionsPage->dataPath->path();
+    settings.startSim              = m_optionsPage->startSim->isChecked();
+    settings.addNoise              = m_optionsPage->noiseCheckBox->isChecked();
+    settings.hostAddress           = m_optionsPage->hostAddress->text();
+    settings.remoteAddress         = m_optionsPage->remoteAddress->text();
 
     settings.inPort = m_optionsPage->inputPort->text().toInt();
-    settings.outPort = m_optionsPage->outputPort->text().toInt();
-    settings.longitude = m_optionsPage->longitude->text();
-    settings.latitude = m_optionsPage->latitude->text();
+    settings.outPort               = m_optionsPage->outputPort->text().toInt();
+    settings.longitude             = m_optionsPage->longitude->text();
+    settings.latitude              = m_optionsPage->latitude->text();
 
-    settings.addNoise = m_optionsPage->noiseCheckBox->isChecked();
+    settings.addNoise              = m_optionsPage->noiseCheckBox->isChecked();
 
-    settings.attRawEnabled = m_optionsPage->attRawCheckbox->isChecked();
-    settings.attRawRate = m_optionsPage->attRawRateSpinbox->value();
+    settings.attRawEnabled         = m_optionsPage->attRawCheckbox->isChecked();
+    settings.attRawRate            = m_optionsPage->attRawRateSpinbox->value();
 
-    settings.attActualEnabled = m_optionsPage->attActualCheckbox->isChecked();
+    settings.attActualEnabled      = m_optionsPage->attActualCheckbox->isChecked();
 
-    settings.gpsPositionEnabled = m_optionsPage->gpsPositionCheckbox->isChecked();
-    settings.gpsPosRate = m_optionsPage->gpsPosRateSpinbox->value();
+    settings.gpsPositionEnabled    = m_optionsPage->gpsPositionCheckbox->isChecked();
+    settings.gpsPosRate            = m_optionsPage->gpsPosRateSpinbox->value();
 
-    settings.groundTruthEnabled = m_optionsPage->groundTruthCheckbox->isChecked();
-    settings.groundTruthRate = m_optionsPage->groundTruthRateSpinbox->value();
+    settings.groundTruthEnabled    = m_optionsPage->groundTruthCheckbox->isChecked();
+    settings.groundTruthRate       = m_optionsPage->groundTruthRateSpinbox->value();
 
-    settings.baroAltitudeEnabled = m_optionsPage->baroAltitudeCheckbox->isChecked();
-    settings.baroAltRate = m_optionsPage->baroAltRateSpinbox->value();
+    settings.baroAltitudeEnabled   = m_optionsPage->baroAltitudeCheckbox->isChecked();
+    settings.baroAltRate           = m_optionsPage->baroAltRateSpinbox->value();
 
-    settings.minOutputPeriod = m_optionsPage->minOutputPeriodSpinbox->value();
+    settings.minOutputPeriod       = m_optionsPage->minOutputPeriodSpinbox->value();
 
-    settings.manualControlEnabled = m_optionsPage->manualControlRadioButton->isChecked();
-    settings.gcsReceiverEnabled = m_optionsPage->gcsReceiverRadioButton->isChecked();
+    settings.manualControlEnabled  = m_optionsPage->manualControlRadioButton->isChecked();
+    settings.gcsReceiverEnabled    = m_optionsPage->gcsReceiverRadioButton->isChecked();
 
-    settings.attActHW = m_optionsPage->attActHW->isChecked();
-    settings.attActSim = m_optionsPage->attActSim->isChecked();
-    settings.attActCalc = m_optionsPage->attActCalc->isChecked();
+    settings.attActHW              = m_optionsPage->attActHW->isChecked();
+    settings.attActSim             = m_optionsPage->attActSim->isChecked();
+    settings.attActCalc            = m_optionsPage->attActCalc->isChecked();
 
-    settings.airspeedActualEnabled=m_optionsPage->airspeedActualCheckbox->isChecked();
-    settings.airspeedActualRate=m_optionsPage->airspeedRateSpinbox->value();
+    settings.airspeedActualEnabled = m_optionsPage->airspeedActualCheckbox->isChecked();
+    settings.airspeedActualRate    = m_optionsPage->airspeedRateSpinbox->value();
 
-    //Write settings to file
+    // Write settings to file
     config->setSimulatorSettings(settings);
 }
 

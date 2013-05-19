@@ -7,7 +7,7 @@
  *
  * @file       pios_wdg.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
+ *             Parts by Thorsten Klose (tk@midibox.org)
  * @brief      SPI functions header.
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -39,10 +39,10 @@ uint16_t PIOS_WDG_GetActiveFlags();
 void PIOS_WDG_Clear(void);
 bool PIOS_WDG_Check();
 
-#define PIOS_WDG_ACTUATOR        0x0001
-#define PIOS_WDG_STABILIZATION   0x0002
-#define PIOS_WDG_ATTITUDE        0x0004
-#define PIOS_WDG_MANUAL          0x0008
-#define PIOS_WDG_SENSORS         0x0010
+#define PIOS_WDG_ACTUATOR      0x0001
+#define PIOS_WDG_STABILIZATION 0x0002
+#define PIOS_WDG_ATTITUDE      0x0004
+#define PIOS_WDG_MANUAL        0x0008
+#define PIOS_WDG_SENSORS       0x0010
 
 #endif

@@ -15,59 +15,58 @@
 #include "positionactual.h"
 #include "gcstelemetrystats.h"
 
-class Simulator: public QObject
-{
-	Q_OBJECT
+class Simulator : public QObject {
+    Q_OBJECT
 public:
-	//static ISimulator* Instance();
-//protected:
-	Simulator();
-	~ISimulator();
+    // static ISimulator* Instance();
+// protected:
+    Simulator();
+    ~ISimulator();
 
-	bool isAutopilotConnected();
-	bool isFGConnected();
+    bool isAutopilotConnected();
+    bool isFGConnected();
 
 signals:
-	void myStart();
-	void autopilotConnected();
-	void autopilotDisconnected();
-	void fgConnected();
-	void fgDisconnected();
+    void myStart();
+    void autopilotConnected();
+    void autopilotDisconnected();
+    void fgConnected();
+    void fgDisconnected();
 
 private slots:
-	void onStart();
-	void transmitUpdate();
-	void receiveUpdate();
-	void onAutopilotConnect();
-	void onAutopilotDisconnect();
-	void onFGConnectionTimeout();
-	void telStatsUpdated(UAVObject* obj);
+    void onStart();
+    void transmitUpdate();
+    void receiveUpdate();
+    void onAutopilotConnect();
+    void onAutopilotDisconnect();
+    void onFGConnectionTimeout();
+    void telStatsUpdated(UAVObject *obj);
 
 private:
-	//static ISimulator* _instance;
+    // static ISimulator* _instance;
 
-	QUdpSocket* inSocket;
-	QUdpSocket* outSocket;
-	ActuatorDesired* actDesired;
-	AltitudeActual* altActual;
-	VelocityActual* velActual;
-	AttitudeActual* attActual;
-	PositionActual* posActual;
-	GCSTelemetryStats* telStats;
-	QHostAddress fgHost;
-	int inPort;
-	int outPort;
-	int updatePeriod;
-	QTimer* txTimer;
-	QTimer* fgTimer;
-	bool autopilotConnectionStatus;
-	bool fgConnectionStatus;
-	int fgTimeout;
+    QUdpSocket *inSocket;
+    QUdpSocket *outSocket;
+    ActuatorDesired *actDesired;
+    AltitudeActual *altActual;
+    VelocityActual *velActual;
+    AttitudeActual *attActual;
+    PositionActual *posActual;
+    GCSTelemetryStats *telStats;
+    QHostAddress fgHost;
+    int inPort;
+    int outPort;
+    int updatePeriod;
+    QTimer *txTimer;
+    QTimer *fgTimer;
+    bool autopilotConnectionStatus;
+    bool fgConnectionStatus;
+    int fgTimeout;
 
-	void processUpdate(QString& data);
-	void setupOutputObject(UAVObject* obj, int updatePeriod);
-	void setupInputObject(UAVObject* obj, int updatePeriod);
-	void setupObjects();
+    void processUpdate(QString & data);
+    void setupOutputObject(UAVObject *obj, int updatePeriod);
+    void setupInputObject(UAVObject *obj, int updatePeriod);
+    void setupObjects();
 };
 
 

@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ModelViewPlugin ModelView Plugin
  * @{
- * @brief A gadget that displays a 3D representation of the UAV 
+ * @brief A gadget that displays a 3D representation of the UAV
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -42,34 +42,32 @@
 #include "attitudeactual.h"
 
 
-
-class ModelViewGadgetWidget : public QGLWidget
-{
+class ModelViewGadgetWidget : public QGLWidget {
     Q_OBJECT
 
 public:
     ModelViewGadgetWidget(QWidget *parent = 0);
-   ~ModelViewGadgetWidget();
-   void setAcFilename(QString acf);
+    ~ModelViewGadgetWidget();
+    void setAcFilename(QString acf);
 
-   void setBgFilename(QString bgf);
-   void setVboEnable(bool eVbo);
-   void reloadScene();
-   void updateAttitude(int value);
+    void setBgFilename(QString bgf);
+    void setVboEnable(bool eVbo);
+    void reloadScene();
+    void updateAttitude(int value);
 
 private:
-   void initializeGL();
-   void paintGL();
-   void resizeGL(int width, int height);
-   // Create GLC_Object to display
-   void CreateScene();
+    void initializeGL();
+    void paintGL();
+    void resizeGL(int width, int height);
+    // Create GLC_Object to display
+    void CreateScene();
 
-   //Mouse events
-   void mousePressEvent(QMouseEvent * e);
-   void mouseMoveEvent(QMouseEvent * e);
-   void mouseReleaseEvent(QMouseEvent * e);
-   void wheelEvent(QWheelEvent * e);
-   void keyPressEvent(QKeyEvent * e);
+    // Mouse events
+    void mousePressEvent(QMouseEvent *e);
+    void mouseMoveEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
+    void wheelEvent(QWheelEvent *e);
+    void keyPressEvent(QKeyEvent *e);
 
 //////////////////////////////////////////////////////////////////////
 // Private slots Functions
@@ -78,20 +76,20 @@ private slots:
     void updateAttitude();
 
 private:
-    GLC_Factory* m_pFactory;
+    GLC_Factory *m_pFactory;
     GLC_Light m_Light;
     GLC_World m_World;
     GLC_Viewport m_GlView;
     GLC_MoverController m_MoverController;
     GLC_BoundingBox m_ModelBoundingBox;
-    //! The timer used for motion
+    // ! The timer used for motion
     QTimer m_MotionTimer;
 
     QString acFilename;
     QString bgFilename;
     bool vboEnable;
 
-    AttitudeActual* attActual;
+    AttitudeActual *attActual;
 };
 
 #endif /* MODELVIEWGADGETWIDGET_H_ */

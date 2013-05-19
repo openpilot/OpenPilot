@@ -1,12 +1,12 @@
 /********************************************************************************
-* @file       osgearthviewgadgetfactory.cpp
-* @author     The OpenPilot Team Copyright (C) 2012.
-* @addtogroup GCSPlugins GCS Plugins
-* @{
-* @addtogroup OsgEarthview Plugin
-* @{
-* @brief Osg Earth view of UAV
-*****************************************************************************/
+ * @file       osgearthviewgadgetfactory.cpp
+ * @author     The OpenPilot Team Copyright (C) 2012.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup OsgEarthview Plugin
+ * @{
+ * @brief Osg Earth view of UAV
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,29 +30,27 @@
 #include <coreplugin/iuavgadget.h>
 
 OsgEarthviewGadgetFactory::OsgEarthviewGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("OsgEarthviewGadget"),
-                          tr("Osg Earth View"),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("OsgEarthviewGadget"),
+                      tr("Osg Earth View"),
+                      parent)
+{}
 
 OsgEarthviewGadgetFactory::~OsgEarthviewGadgetFactory()
-{
-}
+{}
 
-Core::IUAVGadget* OsgEarthviewGadgetFactory::createGadget(QWidget *parent)
+Core::IUAVGadget *OsgEarthviewGadgetFactory::createGadget(QWidget *parent)
 {
-    OsgEarthviewWidget* gadgetWidget = new OsgEarthviewWidget(parent);
+    OsgEarthviewWidget *gadgetWidget = new OsgEarthviewWidget(parent);
+
     return new OsgEarthviewGadget(QString("OsgEarthviewGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *OsgEarthviewGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *OsgEarthviewGadgetFactory::createConfiguration(QSettings *qSettings)
 {
     return new OsgEarthviewGadgetConfiguration(QString("OsgEarthviewGadget"), qSettings);
 }
 
 IOptionsPage *OsgEarthviewGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new OsgEarthviewGadgetOptionsPage(qobject_cast<OsgEarthviewGadgetConfiguration*>(config));
+    return new OsgEarthviewGadgetOptionsPage(qobject_cast<OsgEarthviewGadgetConfiguration *>(config));
 }
-

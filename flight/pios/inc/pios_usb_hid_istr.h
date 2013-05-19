@@ -89,7 +89,7 @@ void ESOF_Callback(void);
 /* Interrupt subroutines user callbacks prototypes.
    These callbacks are called into the respective interrupt sunroutine functinos
    and can be tailored for various user application purposes.
-     Note: Make sure that the correspondant interrupt is enabled through the 
+     Note: Make sure that the correspondant interrupt is enabled through the
      definition in usb_conf.h file */
 void INTR_MODEMISMATCH_Callback(void);
 void INTR_SOFINTR_Callback(void);

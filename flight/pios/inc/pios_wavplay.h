@@ -34,19 +34,19 @@
 
 #include <pios_stm32.h>
 
-#define BUFFERSIZE	512	//Defines the buffer size to hold data from the SD card.
+#define BUFFERSIZE 512 // Defines the buffer size to hold data from the SD card.
 
 struct pios_dac_cfg {
-	TIM_TypeDef *timer;
-	TIM_TimeBaseInitTypeDef time_base_init;
-	struct stm32_irq irq;
-	struct stm32_dma dma;
-	uint32_t channel;
-	DAC_InitTypeDef dac_init;
-	struct stm32_gpio dac_io;
+    TIM_TypeDef *timer;
+    TIM_TimeBaseInitTypeDef time_base_init;
+    struct stm32_irq  irq;
+    struct stm32_dma  dma;
+    uint32_t channel;
+    DAC_InitTypeDef   dac_init;
+    struct stm32_gpio dac_io;
 };
 
-extern void PIOS_WavPlay_Init(const struct pios_dac_cfg * cfg);
+extern void PIOS_WavPlay_Init(const struct pios_dac_cfg *cfg);
 extern uint8_t WavePlayer_Start(void);
 
 #endif /* PIOS_WAVPLAY_H */

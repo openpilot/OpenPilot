@@ -36,15 +36,17 @@
 #include <QMutexLocker>
 #include "aerosimrcdatastruct.h"
 
-class UdpSender : public QObject
-{
-//    Q_OBJECT
+class UdpSender : public QObject {
+// Q_OBJECT
 public:
     explicit UdpSender(const QList<quint8> map, bool isTX, QObject *parent = 0);
     ~UdpSender();
     void init(const QString &remoteHost, quint16 remotePort);
     void sendDatagram(const simToPlugin *stp);
-    quint32 pcks() { return packetsSended; }
+    quint32 pcks()
+    {
+        return packetsSended;
+    }
 
 private:
     QUdpSocket *outSocket;
@@ -57,9 +59,8 @@ private:
 };
 
 
-class UdpReceiver : public QThread
-{
-//    Q_OBJECT
+class UdpReceiver : public QThread {
+// Q_OBJECT
 public:
     explicit UdpReceiver(const QList<quint8> map, bool isRX, QObject *parent = 0);
     ~UdpReceiver();
@@ -69,9 +70,18 @@ public:
     // function getChannels for other threads
     void setChannels(pluginToSim *pts);
     void getFlighStatus(quint8 &arm, quint8 &mod);
-    quint8 getArmed() { return armed; }
-    quint8 getMode() { return mode; }
-    quint32 pcks() { return packetsRecived; }
+    quint8 getArmed()
+    {
+        return armed;
+    }
+    quint8 getMode()
+    {
+        return mode;
+    }
+    quint32 pcks()
+    {
+        return packetsRecived;
+    }
 
 private:
     volatile bool stopped;

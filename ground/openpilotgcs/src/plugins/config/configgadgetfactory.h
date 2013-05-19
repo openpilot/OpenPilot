@@ -38,9 +38,8 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class CONFIG_EXPORT ConfigGadgetFactory:  public Core::IUAVGadgetFactory
-{
-   Q_OBJECT
+class CONFIG_EXPORT ConfigGadgetFactory :  public Core::IUAVGadgetFactory {
+    Q_OBJECT
 public:
     ConfigGadgetFactory(QObject *parent = 0);
     ~ConfigGadgetFactory();

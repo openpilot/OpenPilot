@@ -35,6 +35,7 @@ GCSSplashScreen::GCSSplashScreen() :
 {
     QString revision;
     QString year;
+
 #ifdef GCS_REVISION
     revision = GCS_REVISION;
 #else
@@ -48,7 +49,7 @@ GCSSplashScreen::GCSSplashScreen() :
 #endif
 
     setWindowFlags(windowFlags());
-    m_pixmap = new QPixmap(":/app/splash.png");
+    m_pixmap  = new QPixmap(":/app/splash.png");
 
     m_painter = new QPainter(m_pixmap);
     m_painter->setPen(Qt::lightGray);
@@ -58,19 +59,19 @@ GCSSplashScreen::GCSSplashScreen() :
                         QString(" 2010-") + year +
                         QString(tr(" The OpenPilot Project - All Rights Reserved")));
 
-    m_painter->drawText(406, 173, 310, 100, Qt::TextWordWrap|Qt::AlignTop|Qt::AlignLeft,
+    m_painter->drawText(406, 173, 310, 100, Qt::TextWordWrap | Qt::AlignTop | Qt::AlignLeft,
                         QString(tr("GCS Revision - ")) + revision);
     setPixmap(*m_pixmap);
 }
 
 GCSSplashScreen::~GCSSplashScreen()
-{
-}
+{}
 
 void GCSSplashScreen::drawMessageText(const QString &message)
 {
     QPixmap pix(*m_pixmap);
     QPainter progressPainter(&pix);
+
     progressPainter.setPen(Qt::lightGray);
     QFont font("Tahoma", 13);
     progressPainter.setFont(font);
@@ -79,7 +80,8 @@ void GCSSplashScreen::drawMessageText(const QString &message)
 }
 
 void GCSSplashScreen::showPluginLoadingProgress(ExtensionSystem::PluginSpec *pluginSpec)
-{    
+{
     QString message(tr("Loading ") + pluginSpec->name() + " plugin...");
+
     drawMessageText(message);
 }

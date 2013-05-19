@@ -7,7 +7,7 @@
  * @{
  * @addtogroup GPSGadgetPlugin GPS Gadget Plugin
  * @{
- * @brief A gadget that displays GPS status and enables basic configuration 
+ * @brief A gadget that displays GPS status and enables basic configuration
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -35,31 +35,31 @@
 
 GpsDisplayPlugin::GpsDisplayPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 GpsDisplayPlugin::~GpsDisplayPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool GpsDisplayPlugin::initialize(const QStringList& args, QString *errMsg)
+bool GpsDisplayPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new GpsDisplayGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new GpsDisplayGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void GpsDisplayPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void GpsDisplayPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(GpsDisplayPlugin)

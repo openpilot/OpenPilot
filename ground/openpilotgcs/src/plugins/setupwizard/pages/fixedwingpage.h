@@ -34,14 +34,13 @@ namespace Ui {
 class FixedWingPage;
 }
 
-class FixedWingPage : public AbstractWizardPage
-{
+class FixedWingPage : public AbstractWizardPage {
     Q_OBJECT
-    
+
 public:
     explicit FixedWingPage(SetupWizard *wizard, QWidget *parent = 0);
     ~FixedWingPage();
-    
+
 private:
     Ui::FixedWingPage *ui;
 };

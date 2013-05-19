@@ -42,25 +42,24 @@
 #include <QMutex>
 
 /*!
-  \brief This class is used to render the time values on the horizontal axis for the
-  ChronoPlot.
-  */
-class TimeScaleDraw : public QwtScaleDraw
-{
+   \brief This class is used to render the time values on the horizontal axis for the
+   ChronoPlot.
+ */
+class TimeScaleDraw : public QwtScaleDraw {
 public:
-    TimeScaleDraw() {
-    }
-    virtual QwtText label(double v) const {
-        uint seconds = (uint)(v);
+    TimeScaleDraw() {}
+    virtual QwtText label(double v) const
+    {
+        uint seconds     = (uint)(v);
         QDateTime upTime = QDateTime::fromTime_t(seconds);
-        QTime timePart = upTime.time().addMSecs((v - seconds )* 1000);
+        QTime timePart   = upTime.time().addMSecs((v - seconds) * 1000);
+
         upTime.setTime(timePart);
         return upTime.toLocalTime().toString("hh:mm:ss");
     }
 };
 
-class ScopeGadgetWidget : public QwtPlot
-{
+class ScopeGadgetWidget : public QwtPlot {
     Q_OBJECT
 
 public:
@@ -70,34 +69,58 @@ public:
     void setupSequentialPlot();
     void setupChronoPlot();
     void setupUAVObjectPlot();
-    PlotType plotType(){return m_plotType;}
+    PlotType plotType()
+    {
+        return m_plotType;
+    }
 
-    void setXWindowSize(double xWindowSize){m_xWindowSize = xWindowSize;}
-    double xWindowSize(){return m_xWindowSize;}
-    void setRefreshInterval(double refreshInterval){m_refreshInterval = refreshInterval;}
-    int refreshInterval(){return m_refreshInterval;}
+    void setXWindowSize(double xWindowSize)
+    {
+        m_xWindowSize = xWindowSize;
+    }
+    double xWindowSize()
+    {
+        return m_xWindowSize;
+    }
+    void setRefreshInterval(double refreshInterval)
+    {
+        m_refreshInterval = refreshInterval;
+    }
+    int refreshInterval()
+    {
+        return m_refreshInterval;
+    }
 
 
     void addCurvePlot(QString uavObject, QString uavFieldSubField, int scaleOrderFactor = 0, int meanSamples = 1,
-                      QString mathFunction= "None", QPen pen = QPen(Qt::black), bool antialiased = true);
+                      QString mathFunction = "None", QPen pen = QPen(Qt::black), bool antialiased = true);
     void clearCurvePlots();
     int csvLoggingStart();
     int csvLoggingStop();
     void csvLoggingSetName(QString);
-    void setLoggingEnabled(bool value){m_csvLoggingEnabled=value;}
-    void setLoggingNewFileOnConnect(bool value){m_csvLoggingNewFileOnConnect=value;}
-    void setLoggingPath(QString value){m_csvLoggingPath=value;}
+    void setLoggingEnabled(bool value)
+    {
+        m_csvLoggingEnabled = value;
+    }
+    void setLoggingNewFileOnConnect(bool value)
+    {
+        m_csvLoggingNewFileOnConnect = value;
+    }
+    void setLoggingPath(QString value)
+    {
+        m_csvLoggingPath = value;
+    }
 
 protected:
-	void mousePressEvent(QMouseEvent *e);
-	void mouseReleaseEvent(QMouseEvent *e);
-	void mouseDoubleClickEvent(QMouseEvent *e);
-	void mouseMoveEvent(QMouseEvent *e);
-	void wheelEvent(QWheelEvent *e);
+    void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *e);
+    void mouseDoubleClickEvent(QMouseEvent *e);
+    void mouseMoveEvent(QMouseEvent *e);
+    void wheelEvent(QWheelEvent *e);
     void showEvent(QShowEvent *e);
 
 private slots:
-    void uavObjectReceived(UAVObject*);
+    void uavObjectReceived(UAVObject *);
     void replotNewData();
     void showCurve(QwtPlotItem *item, bool on);
     void startPlotting();
@@ -115,7 +138,7 @@ private:
     double m_xWindowSize;
     int m_refreshInterval;
     QList<QString> m_connectedUAVObjects;
-    QMap<QString, PlotData*> m_curvesData;
+    QMap<QString, PlotData *> m_curvesData;
 
     QTimer *replotTimer;
 
@@ -136,14 +159,14 @@ private:
     QString m_csvLoggingBuffer;
     QFile m_csvLoggingFile;
 
-	QMutex mutex;
+    QMutex mutex;
 
     int csvLoggingInsertHeader();
     int csvLoggingAddData();
     int csvLoggingInsertData();
 
-	void deleteLegend();
-	void addLegend();
+    void deleteLegend();
+    void addLegend();
 };
 
 

@@ -35,12 +35,12 @@ extern int32_t PIOS_USB_HID_Reenumerate(void);
 extern int32_t PIOS_USB_HID_ChangeConnectionState(uint32_t Connected);
 extern bool PIOS_USB_HID_CheckAvailable(uint8_t id);
 
-extern void PIOS_USB_HID_RegisterHidDescriptor(const uint8_t * desc, uint16_t length);
-extern void PIOS_USB_HID_RegisterHidReport(const uint8_t * desc, uint16_t length);
+extern void PIOS_USB_HID_RegisterHidDescriptor(const uint8_t *desc, uint16_t length);
+extern void PIOS_USB_HID_RegisterHidReport(const uint8_t *desc, uint16_t length);
 
 #endif /* PIOS_USB_HID_H */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

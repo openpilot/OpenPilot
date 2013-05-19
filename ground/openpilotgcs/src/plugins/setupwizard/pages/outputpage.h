@@ -34,15 +34,14 @@ namespace Ui {
 class OutputPage;
 }
 
-class OutputPage : public AbstractWizardPage
-{
+class OutputPage : public AbstractWizardPage {
     Q_OBJECT
-    
+
 public:
     explicit OutputPage(SetupWizard *wizard, QWidget *parent = 0);
     ~OutputPage();
     bool validatePage();
-    
+
 private:
     Ui::OutputPage *ui;
 };

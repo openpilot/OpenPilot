@@ -30,8 +30,8 @@
 #include <extensionsystem/iplugin.h>
 #include "uavobjectutil/uavobjectutilmanager.h"
 #include "uavsettingsimportexport_global.h"
-#include "../../gcs_version_info.h"
 #include "uavsettingsimportexportfactory.h"
+
 class UAVSETTINGSIMPORTEXPORT_EXPORT UAVSettingsImportExportPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
 

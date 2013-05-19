@@ -44,33 +44,8 @@ namespace Constants {
     "." STRINGIFY(GCS_VERSION_RELEASE)
 
 const char *const GCS_VERSION_LONG = GCS_VERSION;
-
-#ifdef GCS_REVISION
-const char *const GCS_REVISION_STR = GCS_REVISION;
-#else
-const char *const GCS_REVISION_STR = "N/A";
-#endif
-
-#ifdef GCS_YEAR
-const char *const GCS_YEAR_STR = GCS_YEAR;
-#else
-const char *const GCS_YEAR_STR = "2013";
-#endif
-
-#ifdef GCS_ORIGIN
-const char *const GCS_ORIGIN_STR = GCS_ORIGIN;
-#else
-const char *const GCS_ORIGIN_STR = "unknown repository";
-#endif
-
-#ifdef UAVO_HASH
-const char *const UAVOSHA1_STR = STRINGIFY(UAVO_HASH);
-#else
-const char *const UAVOSHA1_STR = "";
-#endif
-
-const char *const GCS_AUTHOR   = "The OpenPilot Project";
-const char *const GCS_HELP     = "http://wiki.openpilot.org";
+const char *const GCS_AUTHOR = "The OpenPilot Project";
+const char *const GCS_HELP   = "http://wiki.openpilot.org";
 
 #undef GCS_VERSION
 #undef STRINGIFY

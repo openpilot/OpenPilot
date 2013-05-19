@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QCheckBox>
 #include "importsummary.h"
+#include "version_info/version_info.h"
 
 // for menu item
 #include <coreplugin/coreconstants.h>
@@ -245,7 +246,7 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
     fw.setAttribute("tag", board.gitTag);
     versionInfo.appendChild(fw);
 
-    QString gcsRevision = QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
+    QString gcsRevision = VersionInfo::revision();
     QString gcsGitDate  = gcsRevision.mid(gcsRevision.indexOf(" ") + 1, 14);
     QString gcsGitHash  = gcsRevision.mid(gcsRevision.indexOf(":") + 1, 8);
     QString gcsGitTag   = gcsRevision.left(gcsRevision.indexOf(":"));

@@ -48,7 +48,7 @@ static uint32_t RawTemperature;
 static uint32_t RawPressure;
 static int64_t Pressure;
 static int64_t Temperature;
-
+static int32_t lastConversionStart;
 static int32_t PIOS_MS5611_Read(uint8_t address, uint8_t *buffer, uint8_t len);
 static int32_t PIOS_MS5611_WriteCommand(uint8_t command);
 
@@ -98,7 +98,7 @@ int32_t PIOS_MS5611_StartADC(ConversionTypeTypeDef Type)
             continue;
         }
     }
-
+    lastConversionStart = PIOS_DELAY_GetRaw();
     CurrentRead = Type;
 
     return 0;
@@ -111,7 +111,7 @@ int32_t PIOS_MS5611_GetDelay()
 {
     switch (oversampling) {
     case MS5611_OSR_256:
-        return 2;
+        return 1;
 
     case MS5611_OSR_512:
         return 2;
@@ -130,6 +130,34 @@ int32_t PIOS_MS5611_GetDelay()
     }
     return 10;
 }
+
+/**
+ * @brief Return the delay for the current osr in uS
+ */
+uint32_t PIOS_MS5611_GetDelayUs()
+{
+    switch (oversampling) {
+    case MS5611_OSR_256:
+        return 600;
+
+    case MS5611_OSR_512:
+        return 1170;
+
+    case MS5611_OSR_1024:
+        return 2280;
+
+    case MS5611_OSR_2048:
+        return 4540;
+
+    case MS5611_OSR_4096:
+        return 9040;
+
+    default:
+        break;
+    }
+    return 10;
+}
+
 /**
  * Read the ADC conversion value (once ADC conversion has completed)
  * \param[in] PresOrTemp BMP085_PRES_ADDR or BMP085_TEMP_ADDR
@@ -143,6 +171,9 @@ int32_t PIOS_MS5611_ReadADC(void)
     Data[1] = 0;
     Data[2] = 0;
 
+    while (PIOS_MS5611_GetDelayUs() > PIOS_DELAY_DiffuS(lastConversionStart)) {
+        vTaskDelay(0);
+    }
     static int64_t deltaTemp;
 
     /* Read and store the 16bit result */

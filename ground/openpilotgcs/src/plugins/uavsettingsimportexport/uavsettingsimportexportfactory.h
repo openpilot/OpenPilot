@@ -28,7 +28,7 @@
 #define UAVSETTINGSIMPORTEXPORTFACTORY_H
 #include "uavsettingsimportexport_global.h"
 #include "uavobjectutil/uavobjectutilmanager.h"
-#include "../../gcs_version_info.h"
+
 class UAVSETTINGSIMPORTEXPORT_EXPORT UAVSettingsImportExportFactory : public QObject {
     Q_OBJECT
 

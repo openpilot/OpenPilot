@@ -28,7 +28,7 @@
 
 #include "authorsdialog.h"
 
-#include "../../gcs_version_info.h"
+#include "version_info/version_info.h"
 #include "coreconstants.h"
 #include "icore.h"
 
@@ -71,30 +71,31 @@ AuthorsDialog::AuthorsDialog(QWidget *parent)
     version += QDate(2007, 25, 10).toString(Qt::SystemLocaleDate);
 
     QString ideRev;
-#ifdef GCS_REVISION
-    // : This gets conditionally inserted as argument %8 into the description string.
-    ideRev = tr("From revision %1<br/>").arg(QString::fromLatin1(GCS_REVISION_STR).left(10));
-#endif
 
- #ifdef UAVO_HASH
-    // : This gets conditionally inserted as argument %11 into the description string.
-    QByteArray uavoHashArray;
-    QString uavoHash = QString::fromLatin1(Core::Constants::UAVOSHA1_STR);
-    uavoHash.chop(2);
-    uavoHash.remove(0, 2);
-    uavoHash = uavoHash.trimmed();
-    bool ok;
-    foreach(QString str, uavoHash.split(",")) {
-        uavoHashArray.append(str.toInt(&ok, 16));
+    // : This gets conditionally inserted as argument %8 into the description string.
+    ideRev = tr("From revision %1<br/>").arg(VersionInfo::revision().left(10));
+
+    QString uavoHashStr;
+    if (VersionInfo::uavoHash().length() > 15) {
+        // : This gets conditionally inserted as argument %11 into the description string.
+        QByteArray uavoHashArray;
+        QString uavoHash = VersionInfo::uavoHash();
+        uavoHash.chop(2);
+        uavoHash.remove(0, 2);
+        uavoHash = uavoHash.trimmed();
+        bool ok;
+        foreach(QString str, uavoHash.split(",")) {
+            uavoHashArray.append(str.toInt(&ok, 16));
+        }
+        QString gcsUavoHashStr;
+        foreach(char i, uavoHashArray) {
+            gcsUavoHashStr.append(QString::number(i, 16).right(2));
+        }
+        uavoHashStr = gcsUavoHashStr;
+    } else {
+        uavoHashStr = "N/A";
     }
-    QString gcsUavoHashStr;
-    foreach(char i, uavoHashArray) {
-        gcsUavoHashStr.append(QString::number(i, 16).right(2));
-    }
-    QString uavoHashStr = gcsUavoHashStr;
-#else
-    QString uavoHashStr = "N/A";
-#endif
+
     const QString description = tr(
         "<h3>OpenPilot Ground Control Station</h3>"
         "GCS Revision: <b>%1</b><br/>"
@@ -115,15 +116,15 @@ AuthorsDialog::AuthorsDialog(QWidget *parent)
         "INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A "
         "PARTICULAR PURPOSE.</small>"
         ).arg(
-        QString::fromLatin1(GCS_REVISION_STR).left(60), // %1
+        VersionInfo::revision().left(60), // %1
         uavoHashStr, // %2
-        QLatin1String(GCS_ORIGIN_STR), // $3
+        VersionInfo::origin(), // $3
         QLatin1String(__DATE__), // %4
         QLatin1String(__TIME__), // %5
         QLatin1String(QT_VERSION_STR), // %6
         QString::number(QSysInfo::WordSize), // %7
         QLatin1String(GCS_AUTHOR), // %8
-        QLatin1String(GCS_YEAR_STR) // %9
+        VersionInfo::year() // %9
         );
     // Expose the version description to the QML doc
     view->rootContext()->setContextProperty("version", description);

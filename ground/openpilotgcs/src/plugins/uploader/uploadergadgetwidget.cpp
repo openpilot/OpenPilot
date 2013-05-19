@@ -25,7 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "uploadergadgetwidget.h"
-#include "../../gcs_version_info.h"
+#include "version_info/version_info.h"
 #include <coreplugin/coreconstants.h>
 #include <QDebug>
 #include "flightstatus.h"
@@ -891,7 +891,7 @@ void UploaderGadgetWidget::versionMatchCheck()
     UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
     deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
     QByteArray uavoHashArray;
-    QString uavoHash = QString::fromLatin1(Core::Constants::UAVOSHA1_STR);
+    QString uavoHash = VersionInfo::uavoHash();
 
     uavoHash.chop(2);
     uavoHash.remove(0, 2);
@@ -903,7 +903,7 @@ void UploaderGadgetWidget::versionMatchCheck()
 
     QByteArray fwVersion = boardDescription.uavoHash;
     if (fwVersion != uavoHashArray) {
-        QString gcsDescription = QString::fromLatin1(Core::Constants::GCS_REVISION_STR);
+        QString gcsDescription = VersionInfo::revision();
         QString gcsGitHash     = gcsDescription.mid(gcsDescription.indexOf(":") + 1, 8);
         gcsGitHash.remove(QRegExp("^[0]*"));
         QString gcsGitDate     = gcsDescription.mid(gcsDescription.indexOf(" ") + 1, 14);

@@ -67,10 +67,10 @@ struct pios_usb_hid_dev {
 
     bool     usb_if_enabled;
 
-    uint8_t  rx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH];
+    uint8_t  rx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH] __attribute__((aligned(4)));
     bool     rx_active;
 
-    uint8_t  tx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH];
+    uint8_t  tx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH] __attribute__((aligned(4)));
     bool     tx_active;
 
     uint32_t rx_dropped;
@@ -87,11 +87,12 @@ static struct pios_usb_hid_dev *PIOS_USB_HID_alloc(void)
 {
     struct pios_usb_hid_dev *usb_hid_dev;
 
-    usb_hid_dev = (struct pios_usb_hid_dev *)pvPortMalloc(sizeof(*usb_hid_dev));
+    usb_hid_dev = (struct pios_usb_hid_dev *)pvPortMalloc(sizeof(struct pios_usb_hid_dev));
     if (!usb_hid_dev) {
         return NULL;
     }
 
+    memset(usb_hid_dev, 0, sizeof(struct pios_usb_hid_dev));
     usb_hid_dev->magic = PIOS_USB_HID_DEV_MAGIC;
     return usb_hid_dev;
 }
@@ -107,6 +108,8 @@ static struct pios_usb_hid_dev *PIOS_USB_HID_alloc(void)
     }
 
     usb_hid_dev = &pios_usb_hid_devs[pios_usb_hid_num_devs++];
+
+    memset(usb_hid_dev, 0, sizeof(struct pios_usb_hid_dev));
     usb_hid_dev->magic = PIOS_USB_HID_DEV_MAGIC;
 
     return usb_hid_dev;
@@ -116,7 +119,7 @@ static struct pios_usb_hid_dev *PIOS_USB_HID_alloc(void)
 static void PIOS_USB_HID_IF_Init(uint32_t usb_hid_id);
 static void PIOS_USB_HID_IF_DeInit(uint32_t usb_hid_id);
 static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request *req);
-static void PIOS_USB_HID_IF_CtrlDataOut(uint32_t usb_hid_id, struct usb_setup_request *req);
+static void PIOS_USB_HID_IF_CtrlDataOut(uint32_t usb_hid_id, const struct usb_setup_request *req);
 
 static struct pios_usb_ifops usb_hid_ifops = {
     .init   = PIOS_USB_HID_IF_Init,
@@ -356,6 +359,13 @@ static void PIOS_USB_HID_IF_DeInit(uint32_t usb_hid_id)
 static uint8_t hid_protocol;
 static uint8_t hid_altset;
 
+struct hid_idle_msg {
+    uint8_t idle_period;
+    uint8_t report_id;
+};
+static struct hid_idle_msg hid_idle;
+static uint8_t dummy_report[2];
+
 static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request *req)
 {
     struct pios_usb_hid_dev *usb_hid_dev = (struct pios_usb_hid_dev *)usb_hid_id;
@@ -408,19 +418,21 @@ static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request 
         case USB_HID_REQ_SET_PROTOCOL:
             hid_protocol = (uint8_t)(req->wValue);
             break;
+        case USB_HID_REQ_SET_IDLE:
+            /* Idle rates are currently ignored but decoded for debugging */
+            hid_idle.idle_period = req->wValue & 0xFF00 >> 8;
+            hid_idle.report_id   = req->wValue & 0x00FF;
+            break;
         case USB_HID_REQ_GET_PROTOCOL:
             PIOS_USBHOOK_CtrlTx(&hid_protocol, 1);
             break;
         case USB_HID_REQ_GET_REPORT:
-        {
             /* Give back a dummy input report */
-            uint8_t dummy_report[2] = {
-                [0] = req->wValue >> 8, /* Report ID */
-                [1] = 0x00,
-            };
-            PIOS_USBHOOK_CtrlTx(dummy_report, sizeof(dummy_report));
-        }
-        break;
+            dummy_report[0] = req->wValue & 0xFF; /* Report ID */
+            dummy_report[1] = 0x00; /* dummy value */
+            PIOS_USBHOOK_CtrlTx(dummy_report,
+                                MIN(sizeof(dummy_report), req->wLength));
+            break;
         default:
             /* Unhandled class request */
             return false;
@@ -436,7 +448,7 @@ static bool PIOS_USB_HID_IF_Setup(uint32_t usb_hid_id, struct usb_setup_request 
     return true;
 }
 
-static void PIOS_USB_HID_IF_CtrlDataOut(__attribute__((unused)) uint32_t usb_hid_id, __attribute__((unused)) struct usb_setup_request *req)
+static void PIOS_USB_HID_IF_CtrlDataOut(__attribute__((unused)) uint32_t usb_hid_id, __attribute__((unused)) const struct usb_setup_request *req)
 {
     /* HID devices don't have any OUT data stages on the control endpoint */
     PIOS_Assert(0);

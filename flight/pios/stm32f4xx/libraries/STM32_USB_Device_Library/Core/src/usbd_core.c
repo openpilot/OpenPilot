@@ -2,20 +2,26 @@
   ******************************************************************************
   * @file    usbd_core.c
   * @author  MCD Application Team
-  * @version V1.0.0
-  * @date    22-July-2011 
+  * @version V1.1.0
+  * @date    19-March-2012
   * @brief   This file provides all the USBD core functions.
   ******************************************************************************
   * @attention
   *
-  * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
-  * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
-  * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
-  * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
-  * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
-  * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  * <h2><center>&copy; COPYRIGHT 2012 STMicroelectronics</center></h2>
   *
-  * <h2><center>&copy; COPYRIGHT 2011 STMicroelectronics</center></h2>
+  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  * You may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at:
+  *
+  *        http://www.st.com/software_license_agreement_liberty_v2
+  *
+  * Unless required by applicable law or agreed to in writing, software 
+  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  *
   ******************************************************************************
   */ 
 
@@ -79,6 +85,7 @@ static uint8_t USBD_DevDisconnected(USB_OTG_CORE_HANDLE  *pdev);
 #endif
 static uint8_t USBD_IsoINIncomplete(USB_OTG_CORE_HANDLE  *pdev);
 static uint8_t USBD_IsoOUTIncomplete(USB_OTG_CORE_HANDLE  *pdev);
+static uint8_t  USBD_RunTestMode (USB_OTG_CORE_HANDLE  *pdev) ;
 /**
 * @}
 */ 
@@ -87,7 +94,7 @@ static uint8_t USBD_IsoOUTIncomplete(USB_OTG_CORE_HANDLE  *pdev);
 * @{
 */ 
 
-
+__IO USB_OTG_DCTL_TypeDef SET_TEST_MODE;
 
 USBD_DCD_INT_cb_TypeDef USBD_DCD_INT_cb = 
 {
@@ -152,7 +159,7 @@ void USBD_Init(USB_OTG_CORE_HANDLE *pdev,
 
 /**
 * @brief  USBD_DeInit 
-*         Re-Initialize th deviuce library
+*         Re-Initialize th device library
 * @param  pdev: device instance
 * @retval status: status
 */
@@ -293,6 +300,11 @@ static uint8_t USBD_DataInStage(USB_OTG_CORE_HANDLE *pdev , uint8_t epnum)
         }
       }
     }
+    if (pdev->dev.test_mode == 1)
+    {
+      USBD_RunTestMode(pdev); 
+      pdev->dev.test_mode = 0;
+    }
   }
   else if((pdev->dev.class_cb->DataIn != NULL)&& 
           (pdev->dev.device_status == USB_OTG_CONFIGURED))
@@ -300,6 +312,21 @@ static uint8_t USBD_DataInStage(USB_OTG_CORE_HANDLE *pdev , uint8_t epnum)
     pdev->dev.class_cb->DataIn(pdev, epnum); 
   }  
   return USBD_OK;
+}
+
+
+
+
+/**
+* @brief  USBD_RunTestMode 
+*         Launch test mode process
+* @param  pdev: device instance
+* @retval status
+*/
+static uint8_t  USBD_RunTestMode (USB_OTG_CORE_HANDLE  *pdev) 
+{
+  USB_OTG_WRITE_REG32(&pdev->regs.DREGS->DCTL, SET_TEST_MODE.d32);
+  return USBD_OK;  
 }
 
 /**
@@ -341,6 +368,7 @@ static uint8_t USBD_Resume(USB_OTG_CORE_HANDLE  *pdev)
 {
   /* Upon Resume call usr call back */
   pdev->dev.usr_cb->DeviceResumed(); 
+  pdev->dev.device_status = pdev->dev.device_old_status;  
   pdev->dev.device_status = USB_OTG_CONFIGURED;  
   return USBD_OK;
 }
@@ -355,7 +383,7 @@ static uint8_t USBD_Resume(USB_OTG_CORE_HANDLE  *pdev)
 
 static uint8_t USBD_Suspend(USB_OTG_CORE_HANDLE  *pdev)
 {
-  
+  pdev->dev.device_old_status = pdev->dev.device_status;
   pdev->dev.device_status  = USB_OTG_SUSPENDED;
   /* Upon Resume call usr call back */
   pdev->dev.usr_cb->DeviceSuspended(); 
@@ -442,6 +470,7 @@ static uint8_t USBD_IsoOUTIncomplete(USB_OTG_CORE_HANDLE  *pdev)
 static uint8_t USBD_DevConnected(USB_OTG_CORE_HANDLE  *pdev)
 {
   pdev->dev.usr_cb->DeviceConnected();
+  pdev->dev.connection_status = 1;  
   return USBD_OK;
 }
 
@@ -455,6 +484,7 @@ static uint8_t USBD_DevDisconnected(USB_OTG_CORE_HANDLE  *pdev)
 {
   pdev->dev.usr_cb->DeviceDisconnected();
   pdev->dev.class_cb->DeInit(pdev, 0);
+  pdev->dev.connection_status = 0;    
   return USBD_OK;
 }
 #endif
@@ -472,5 +502,5 @@ static uint8_t USBD_DevDisconnected(USB_OTG_CORE_HANDLE  *pdev)
 * @}
 */ 
 
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
 

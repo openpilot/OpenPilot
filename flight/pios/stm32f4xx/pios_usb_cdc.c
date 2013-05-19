@@ -35,18 +35,21 @@
 
 #include "pios_usb_cdc_priv.h"
 #include "pios_usb_board_data.h" /* PIOS_BOARD_*_DATA_LENGTH */
+#include "pios_usbhook.h" /* PIOS_USBHOOK_* */
 
+/* Implement COM layer driver API */
 static void PIOS_USB_CDC_RegisterTxCallback(uint32_t usbcdc_id, pios_com_callback tx_out_cb, uint32_t context);
 static void PIOS_USB_CDC_RegisterRxCallback(uint32_t usbcdc_id, pios_com_callback rx_in_cb, uint32_t context);
 static void PIOS_USB_CDC_TxStart(uint32_t usbcdc_id, uint16_t tx_bytes_avail);
 static void PIOS_USB_CDC_RxStart(uint32_t usbcdc_id, uint16_t rx_bytes_avail);
+static bool PIOS_USB_CDC_Available(uint32_t usbcdc_id);
 
 const struct pios_com_driver pios_usb_cdc_com_driver = {
     .tx_start   = PIOS_USB_CDC_TxStart,
     .rx_start   = PIOS_USB_CDC_RxStart,
     .bind_tx_cb = PIOS_USB_CDC_RegisterTxCallback,
     .bind_rx_cb = PIOS_USB_CDC_RegisterRxCallback,
-    .available  = PIOS_USB_CheckAvailable,
+    .available  = PIOS_USB_CDC_Available,
 };
 
 enum pios_usb_cdc_dev_magic {
@@ -64,11 +67,30 @@ struct pios_usb_cdc_dev {
     pios_com_callback tx_out_cb;
     uint32_t tx_out_context;
 
-    uint8_t  rx_packet_buffer[PIOS_USB_BOARD_CDC_DATA_LENGTH];
-    uint8_t  tx_packet_buffer[PIOS_USB_BOARD_CDC_DATA_LENGTH];
+    bool     usb_ctrl_if_enabled;
+    bool     usb_data_if_enabled;
+
+    uint8_t  rx_packet_buffer[PIOS_USB_BOARD_CDC_DATA_LENGTH] __attribute__((aligned(4)));
+    volatile bool rx_active;
+
+    /*
+     * NOTE: This is -1 as somewhat of a hack.  It ensures that we always send packets
+     * that are strictly < maxPacketSize for this interface which means we never have
+     * to bother with zero length packets (ZLP).
+     */
+    uint8_t  tx_packet_buffer[PIOS_USB_BOARD_CDC_DATA_LENGTH - 1] __attribute__((aligned(4)));
+    volatile bool tx_active;
+
+    uint8_t  ctrl_tx_packet_buffer[PIOS_USB_BOARD_CDC_MGMT_LENGTH] __attribute__((aligned(4)));
 
     uint32_t rx_dropped;
     uint32_t rx_oversize;
+
+    /*
+     * Used to hold the current state of the simulated UART.  Changes to this
+     * variable may trigger new USB CDC Notification packets to be sent to the host.
+     */
+    volatile uint16_t prev_uart_state;
 };
 
 static bool PIOS_USB_CDC_validate(struct pios_usb_cdc_dev *usb_cdc_dev)
@@ -81,11 +103,12 @@ static struct pios_usb_cdc_dev *PIOS_USB_CDC_alloc(void)
 {
     struct pios_usb_cdc_dev *usb_cdc_dev;
 
-    usb_cdc_dev = (struct pios_usb_cdc_dev *)pvPortMalloc(sizeof(*usb_cdc_dev));
+    usb_cdc_dev = (struct pios_usb_cdc_dev *)pvPortMalloc(sizeof(struct pios_usb_cdc_dev));
     if (!usb_cdc_dev) {
         return NULL;
     }
 
+    memset(usb_cdc_dev, 0, sizeof(struct pios_usb_cdc_dev));
     usb_cdc_dev->magic = PIOS_USB_CDC_DEV_MAGIC;
     return usb_cdc_dev;
 }
@@ -101,21 +124,41 @@ static struct pios_usb_cdc_dev *PIOS_USB_CDC_alloc(void)
     }
 
     usb_cdc_dev = &pios_usb_cdc_devs[pios_usb_cdc_num_devs++];
+
+    memset(usb_cdc_dev, 0, sizeof(struct pios_usb_cdc_dev));
     usb_cdc_dev->magic = PIOS_USB_CDC_DEV_MAGIC;
 
     return usb_cdc_dev;
 }
 #endif /* if defined(PIOS_INCLUDE_FREERTOS) */
 
-static void PIOS_USB_CDC_DATA_EP_IN_Callback(void);
-static void PIOS_USB_CDC_DATA_EP_OUT_Callback(void);
-static void PIOS_USB_CDC_CTRL_EP_IN_Callback(void);
+/* Implement USB_IFOPS for CDC Control Interface */
+static void PIOS_USB_CDC_CTRL_IF_Init(uint32_t usb_cdc_id);
+static void PIOS_USB_CDC_CTRL_IF_DeInit(uint32_t usb_cdc_id);
+static bool PIOS_USB_CDC_CTRL_IF_Setup(uint32_t usb_cdc_id, struct usb_setup_request *req);
+static void PIOS_USB_CDC_CTRL_IF_CtrlDataOut(uint32_t usb_cdc_id, const struct usb_setup_request *req);
+
+static struct pios_usb_ifops usb_cdc_ctrl_ifops = {
+    .init   = PIOS_USB_CDC_CTRL_IF_Init,
+    .deinit = PIOS_USB_CDC_CTRL_IF_DeInit,
+    .setup  = PIOS_USB_CDC_CTRL_IF_Setup,
+    .ctrl_data_out = PIOS_USB_CDC_CTRL_IF_CtrlDataOut,
+};
+
+/* Implement USB_IFOPS for CDC Data Interface */
+static void PIOS_USB_CDC_DATA_IF_Init(uint32_t usb_cdc_id);
+static void PIOS_USB_CDC_DATA_IF_DeInit(uint32_t usb_cdc_id);
+static bool PIOS_USB_CDC_DATA_IF_Setup(uint32_t usb_cdc_id, struct usb_setup_request *req);
+static void PIOS_USB_CDC_DATA_IF_CtrlDataOut(uint32_t usb_cdc_id, const struct usb_setup_request *req);
+
+static struct pios_usb_ifops usb_cdc_data_ifops = {
+    .init   = PIOS_USB_CDC_DATA_IF_Init,
+    .deinit = PIOS_USB_CDC_DATA_IF_DeInit,
+    .setup  = PIOS_USB_CDC_DATA_IF_Setup,
+    .ctrl_data_out = PIOS_USB_CDC_DATA_IF_CtrlDataOut,
+};
 
 static uint32_t pios_usb_cdc_id;
-
-/* Need a better way to pull these in */
-extern void(*pEpInt_IN[7]) (void);
-extern void(*pEpInt_OUT[7]) (void);
 
 int32_t PIOS_USB_CDC_Init(uint32_t *usbcdc_id, const struct pios_usb_cdc_cfg *cfg, uint32_t lower_id)
 {
@@ -135,10 +178,24 @@ int32_t PIOS_USB_CDC_Init(uint32_t *usbcdc_id, const struct pios_usb_cdc_cfg *cf
 
     pios_usb_cdc_id  = (uint32_t)usb_cdc_dev;
 
-    /* Bind lower level callbacks into the USB infrastructure */
-    pEpInt_OUT[cfg->ctrl_tx_ep - 1] = PIOS_USB_CDC_CTRL_EP_IN_Callback;
-    pEpInt_IN[cfg->data_tx_ep - 1]  = PIOS_USB_CDC_DATA_EP_IN_Callback;
-    pEpInt_OUT[cfg->data_rx_ep - 1] = PIOS_USB_CDC_DATA_EP_OUT_Callback;
+    /* Rx and Tx are not active yet */
+    usb_cdc_dev->rx_active           = false;
+    usb_cdc_dev->tx_active           = false;
+
+    /* Clear stats */
+    usb_cdc_dev->rx_dropped          = 0;
+    usb_cdc_dev->rx_oversize         = 0;
+
+    /* Initialize the uart state */
+    usb_cdc_dev->prev_uart_state     = 0;
+
+    /* Register class specific interface callbacks with the USBHOOK layer */
+    usb_cdc_dev->usb_ctrl_if_enabled = false;
+    PIOS_USBHOOK_RegisterIfOps(cfg->ctrl_if, &usb_cdc_ctrl_ifops, (uint32_t)usb_cdc_dev);
+
+    /* Register class specific interface callbacks with the USBHOOK layer */
+    usb_cdc_dev->usb_data_if_enabled = false;
+    PIOS_USBHOOK_RegisterIfOps(cfg->data_if, &usb_cdc_data_ifops, (uint32_t)usb_cdc_dev);
 
     *usbcdc_id = (uint32_t)usb_cdc_dev;
 
@@ -148,6 +205,91 @@ out_fail:
     return -1;
 }
 
+static bool PIOS_USB_CDC_SendData(struct pios_usb_cdc_dev *usb_cdc_dev)
+{
+    uint16_t bytes_to_tx;
+
+    if (!usb_cdc_dev->tx_out_cb) {
+        return false;
+    }
+
+    bool need_yield = false;
+    bytes_to_tx = (usb_cdc_dev->tx_out_cb)(usb_cdc_dev->tx_out_context,
+                                           usb_cdc_dev->tx_packet_buffer,
+                                           sizeof(usb_cdc_dev->tx_packet_buffer),
+                                           NULL,
+                                           &need_yield);
+    if (bytes_to_tx == 0) {
+        return false;
+    }
+
+    /*
+     * Mark this endpoint as being tx active _before_ actually transmitting
+     * to make sure we don't race with the Tx completion interrupt
+     */
+    usb_cdc_dev->tx_active = true;
+
+    PIOS_USBHOOK_EndpointTx(usb_cdc_dev->cfg->data_tx_ep,
+                            usb_cdc_dev->tx_packet_buffer,
+                            bytes_to_tx);
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+    if (need_yield) {
+        vPortYieldFromISR();
+    }
+#endif /* PIOS_INCLUDE_FREERTOS */
+
+    return true;
+}
+
+static void PIOS_USB_CDC_RxStart(uint32_t usbcdc_id, uint16_t rx_bytes_avail)
+{
+    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)usbcdc_id;
+
+    bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
+
+    PIOS_Assert(valid);
+
+    /* Make sure this USB interface has been initialized */
+    if (!usb_cdc_dev->usb_data_if_enabled) {
+        return;
+    }
+
+    if (!PIOS_USB_CheckAvailable(usb_cdc_dev->lower_id)) {
+        return;
+    }
+
+    // If endpoint was stalled and there is now space make it valid
+    if (!usb_cdc_dev->rx_active && (rx_bytes_avail >= PIOS_USB_BOARD_CDC_DATA_LENGTH)) {
+        PIOS_USBHOOK_EndpointRx(usb_cdc_dev->cfg->data_rx_ep,
+                                usb_cdc_dev->rx_packet_buffer,
+                                sizeof(usb_cdc_dev->rx_packet_buffer));
+        usb_cdc_dev->rx_active = true;
+    }
+}
+
+static void PIOS_USB_CDC_TxStart(uint32_t usbcdc_id, __attribute__((unused)) uint16_t tx_bytes_avail)
+{
+    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)usbcdc_id;
+
+    bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
+
+    PIOS_Assert(valid);
+
+    /* Make sure this USB interface has been initialized */
+    if (!usb_cdc_dev->usb_data_if_enabled) {
+        return;
+    }
+
+    if (!PIOS_USB_CheckAvailable(usb_cdc_dev->lower_id)) {
+        return;
+    }
+
+    if (!usb_cdc_dev->tx_active) {
+        /* Transmitter is not currently active, send a report */
+        PIOS_USB_CDC_SendData(usb_cdc_dev);
+    }
+}
 
 static void PIOS_USB_CDC_RegisterRxCallback(uint32_t usbcdc_id, pios_com_callback rx_in_cb, uint32_t context)
 {
@@ -181,164 +323,37 @@ static void PIOS_USB_CDC_RegisterTxCallback(uint32_t usbcdc_id, pios_com_callbac
     usb_cdc_dev->tx_out_cb = tx_out_cb;
 }
 
-static void PIOS_USB_CDC_RxStart(uint32_t usbcdc_id, uint16_t rx_bytes_avail)
+static bool PIOS_USB_CDC_CTRL_EP_IN_Callback(uint32_t usb_cdc_id, uint8_t epnum, uint16_t len);
+
+static void PIOS_USB_CDC_CTRL_IF_Init(uint32_t usb_cdc_id)
 {
-    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)usbcdc_id;
+    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)usb_cdc_id;
 
-    bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
-
-    PIOS_Assert(valid);
-
-    if (!PIOS_USB_CheckAvailable(usb_cdc_dev->lower_id)) {
+    if (!PIOS_USB_CDC_validate(usb_cdc_dev)) {
         return;
     }
 
-    // If endpoint was stalled and there is now space make it valid
-    PIOS_IRQ_Disable();
-    if ((GetEPRxStatus(usb_cdc_dev->cfg->data_rx_ep) != EP_RX_VALID) &&
-        (rx_bytes_avail >= sizeof(usb_cdc_dev->rx_packet_buffer))) {
-        SetEPRxStatus(usb_cdc_dev->cfg->data_rx_ep, EP_RX_VALID);
-    }
-    PIOS_IRQ_Enable();
+    /* Register endpoint specific callbacks with the USBHOOK layer */
+    PIOS_USBHOOK_RegisterEpInCallback(usb_cdc_dev->cfg->ctrl_tx_ep,
+                                      sizeof(usb_cdc_dev->ctrl_tx_packet_buffer),
+                                      PIOS_USB_CDC_CTRL_EP_IN_Callback,
+                                      (uint32_t)usb_cdc_dev);
+    usb_cdc_dev->usb_ctrl_if_enabled = true;
 }
 
-static void PIOS_USB_CDC_SendData(struct pios_usb_cdc_dev *usb_cdc_dev)
+static void PIOS_USB_CDC_CTRL_IF_DeInit(uint32_t usb_cdc_id)
 {
-    uint16_t bytes_to_tx;
+    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)usb_cdc_id;
 
-    if (!usb_cdc_dev->tx_out_cb) {
+    if (!PIOS_USB_CDC_validate(usb_cdc_dev)) {
         return;
     }
 
-    bool need_yield = false;
-    bytes_to_tx = (usb_cdc_dev->tx_out_cb)(usb_cdc_dev->tx_out_context,
-                                           usb_cdc_dev->tx_packet_buffer,
-                                           sizeof(usb_cdc_dev->tx_packet_buffer),
-                                           NULL,
-                                           &need_yield);
-    if (bytes_to_tx == 0) {
-        return;
-    }
-
-    UserToPMABufferCopy(usb_cdc_dev->tx_packet_buffer,
-                        GetEPTxAddr(usb_cdc_dev->cfg->data_tx_ep),
-                        bytes_to_tx);
-    SetEPTxCount(usb_cdc_dev->cfg->data_tx_ep, bytes_to_tx);
-    SetEPTxValid(usb_cdc_dev->cfg->data_tx_ep);
-
-#if defined(PIOS_INCLUDE_FREERTOS)
-    if (need_yield) {
-        vPortYieldFromISR();
-    }
-#endif /* PIOS_INCLUDE_FREERTOS */
+    /* DeRegister endpoint specific callbacks with the USBHOOK layer */
+    usb_cdc_dev->usb_data_if_enabled = false;
 }
 
-static void PIOS_USB_CDC_TxStart(uint32_t usbcdc_id, uint16_t tx_bytes_avail)
-{
-    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)usbcdc_id;
-
-    bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
-
-    PIOS_Assert(valid);
-
-    if (!PIOS_USB_CheckAvailable(usb_cdc_dev->lower_id)) {
-        return;
-    }
-
-    if (GetEPTxStatus(usb_cdc_dev->cfg->data_tx_ep) == EP_TX_VALID) {
-        /* Endpoint is already transmitting */
-        return;
-    }
-
-    PIOS_USB_CDC_SendData(usb_cdc_dev);
-}
-
-static void PIOS_USB_CDC_DATA_EP_IN_Callback(void)
-{
-    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
-
-    bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
-
-    PIOS_Assert(valid);
-
-    PIOS_USB_CDC_SendData(usb_cdc_dev);
-}
-
-static void PIOS_USB_CDC_DATA_EP_OUT_Callback(void)
-{
-    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
-
-    bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
-
-    PIOS_Assert(valid);
-
-    uint32_t DataLength;
-
-    /* Get the number of received data on the selected Endpoint */
-    DataLength = GetEPRxCount(usb_cdc_dev->cfg->data_rx_ep);
-    if (DataLength > sizeof(usb_cdc_dev->rx_packet_buffer)) {
-        usb_cdc_dev->rx_oversize++;
-        DataLength = sizeof(usb_cdc_dev->rx_packet_buffer);
-    }
-
-    /* Use the memory interface function to read from the selected endpoint */
-    PMAToUserBufferCopy((uint8_t *)usb_cdc_dev->rx_packet_buffer,
-                        GetEPRxAddr(usb_cdc_dev->cfg->data_rx_ep),
-                        DataLength);
-
-    if (!usb_cdc_dev->rx_in_cb) {
-        /* No Rx call back registered, disable the receiver */
-        SetEPRxStatus(usb_cdc_dev->cfg->data_rx_ep, EP_RX_NAK);
-        return;
-    }
-
-    uint16_t headroom;
-    bool need_yield = false;
-    uint16_t rc;
-    rc = (usb_cdc_dev->rx_in_cb)(usb_cdc_dev->rx_in_context,
-                                 usb_cdc_dev->rx_packet_buffer,
-                                 DataLength,
-                                 &headroom,
-                                 &need_yield);
-
-    if (rc < DataLength) {
-        /* Lost bytes on rx */
-        usb_cdc_dev->rx_dropped += (DataLength - rc);
-    }
-
-    if (headroom >= sizeof(usb_cdc_dev->rx_packet_buffer)) {
-        /* We have room for a maximum length message */
-        SetEPRxStatus(usb_cdc_dev->cfg->data_rx_ep, EP_RX_VALID);
-    } else {
-        /* Not enough room left for a message, apply backpressure */
-        SetEPRxStatus(usb_cdc_dev->cfg->data_rx_ep, EP_RX_NAK);
-    }
-
-#if defined(PIOS_INCLUDE_FREERTOS)
-    if (need_yield) {
-        vPortYieldFromISR();
-    }
-#endif /* PIOS_INCLUDE_FREERTOS */
-}
-
-RESULT PIOS_USB_CDC_SetControlLineState(void)
-{
-    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
-
-    bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
-
-    PIOS_Assert(valid);
-
-    static uint16_t control_line_state;
-
-    uint8_t wValue0 = pInformation->USBwValue0;
-    uint8_t wValue1 = pInformation->USBwValue1;
-
-    control_line_state = wValue1 << 8 | wValue0;
-
-    return USB_SUCCESS;
-}
-
+static uint8_t cdc_altset;
 static struct usb_cdc_line_coding line_coding = {
     .dwDTERate   = htousbl(57600),
     .bCharFormat = USB_CDC_LINE_CODING_STOP_1,
@@ -346,34 +361,129 @@ static struct usb_cdc_line_coding line_coding = {
     .bDataBits   = 8,
 };
 
-RESULT PIOS_USB_CDC_SetLineCoding(void)
+static uint16_t control_line_state;
+
+static bool PIOS_USB_CDC_CTRL_IF_Setup(uint32_t usb_cdc_id, struct usb_setup_request *req)
 {
-    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
+    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)usb_cdc_id;
 
-    bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
+    if (!PIOS_USB_CDC_validate(usb_cdc_dev)) {
+        return false;
+    }
 
-    PIOS_Assert(valid);
+    /* Make sure this is a request for an interface we know about */
+    uint8_t ifnum = req->wIndex & 0xFF;
+    if (ifnum != usb_cdc_dev->cfg->ctrl_if) {
+        return false;
+    }
 
-    return USB_SUCCESS;
+    switch (req->bmRequestType & (USB_REQ_TYPE_MASK | USB_REQ_RECIPIENT_MASK)) {
+    case (USB_REQ_TYPE_STANDARD | USB_REQ_RECIPIENT_INTERFACE):
+        switch (req->bRequest) {
+        case USB_REQ_GET_INTERFACE:
+            PIOS_USBHOOK_CtrlTx(&cdc_altset, 1);
+            break;
+        case USB_REQ_SET_INTERFACE:
+            cdc_altset = (uint8_t)(req->wValue);
+            break;
+        default:
+            /* Unhandled standard request */
+            return false;
+
+            break;
+        }
+        break;
+    case (USB_REQ_TYPE_CLASS | USB_REQ_RECIPIENT_INTERFACE):
+        switch (req->bRequest) {
+        case USB_CDC_REQ_SET_LINE_CODING:
+            PIOS_USBHOOK_CtrlRx((uint8_t *)&line_coding, sizeof(line_coding));
+            break;
+        case USB_CDC_REQ_GET_LINE_CODING:
+            PIOS_USBHOOK_CtrlTx((uint8_t *)&line_coding, sizeof(line_coding));
+            break;
+        case USB_CDC_REQ_SET_CONTROL_LINE_STATE:
+            control_line_state = req->wValue;
+            break;
+        default:
+            /* Unhandled class request */
+            return false;
+
+            break;
+        }
+        break;
+    default:
+        /* Unhandled request */
+        return false;
+    }
+
+    return true;
 }
 
-const uint8_t *PIOS_USB_CDC_GetLineCoding(uint16_t Length)
+static bool PIOS_USB_CDC_Available(uint32_t usbcdc_id)
 {
-    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
+    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)usbcdc_id;
 
     bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
 
     PIOS_Assert(valid);
 
-    if (Length == 0) {
-        pInformation->Ctrl_Info.Usb_wLength = sizeof(line_coding);
-        return NULL;
-    } else {
-        return (uint8_t *)&line_coding;
+    return PIOS_USB_CheckAvailable(usb_cdc_dev->lower_id) &&
+           (control_line_state & USB_CDC_CONTROL_LINE_STATE_DTE_PRESENT);
+}
+
+/**
+ * Called *after* the data has been written to the buffer provided in the setup stage.  The
+ * setup request is passed in here again so we know *which* EP0 data out has just completed.
+ */
+static void PIOS_USB_CDC_CTRL_IF_CtrlDataOut(uint32_t usb_cdc_id, const struct usb_setup_request *req)
+{
+    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)usb_cdc_id;
+
+    if (!PIOS_USB_CDC_validate(usb_cdc_dev)) {
+        return;
+    }
+
+    /* Make sure this is a request for an interface we know about */
+    uint8_t ifnum = req->wIndex & 0xFF;
+    if (ifnum != usb_cdc_dev->cfg->ctrl_if) {
+        return;
+    }
+
+    switch (req->bmRequestType & (USB_REQ_TYPE_MASK | USB_REQ_RECIPIENT_MASK)) {
+    case (USB_REQ_TYPE_STANDARD | USB_REQ_RECIPIENT_INTERFACE):
+        switch (req->bRequest) {
+        default:
+            /* Unhandled standard request */
+            return;
+
+            break;
+        }
+        break;
+    case (USB_REQ_TYPE_CLASS | USB_REQ_RECIPIENT_INTERFACE):
+        switch (req->bRequest) {
+        case USB_CDC_REQ_SET_LINE_CODING:
+            /*
+             * If we cared to, this is where we would apply the new line coding
+             * that is now stored in the line_coding struct.  This could be used
+             * to notify the upper COM layer that the baud rate has changed.  This
+             * may be useful in the case of a COM USB bridge where we would
+             * auto-adjust the USART baud rate based on the line coding set here.
+             */
+            break;
+        default:
+            /* Unhandled class request */
+            return;
+
+            break;
+        }
+        break;
+    default:
+        /* Unhandled request */
+        return;
     }
 }
 
-struct usb_cdc_serial_state_report uart_state = {
+static struct usb_cdc_serial_state_report uart_state = {
     .bmRequestType = 0xA1,
     .bNotification = USB_CDC_NOTIFICATION_SERIAL_STATE,
     .wValue      = 0,
@@ -382,7 +492,10 @@ struct usb_cdc_serial_state_report uart_state = {
     .bmUartState = htousbs(0),
 };
 
-static void PIOS_USB_CDC_CTRL_EP_IN_Callback(void)
+static bool PIOS_USB_CDC_CTRL_EP_IN_Callback(
+    __attribute__((unused)) uint32_t usb_cdc_id,
+    __attribute__((unused)) uint8_t epnum,
+    __attribute__((unused)) uint16_t len)
 {
     struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
 
@@ -401,13 +514,170 @@ static void PIOS_USB_CDC_CTRL_EP_IN_Callback(void)
      *      1:  bTxCarrier  DSR
      *      0:  bRxCarrier  DCD
      */
-    uart_state.bmUartState = htousbs(0x0003);
 
-    UserToPMABufferCopy((uint8_t *)&uart_state,
-                        GetEPTxAddr(usb_cdc_dev->cfg->data_tx_ep),
-                        sizeof(uart_state));
-    SetEPTxCount(usb_cdc_dev->cfg->data_tx_ep, PIOS_USB_BOARD_CDC_MGMT_LENGTH);
-    SetEPTxValid(usb_cdc_dev->cfg->data_tx_ep);
+    /* Currently, we only handle TxCarrier and RxCarrier reporting */
+    uint16_t new_uart_state = 0;
+    if (usb_cdc_dev->tx_out_cb) {
+        /* Someone is going to providing FC->PC data, advertise an RxCarrier to the host */
+        new_uart_state |= 0x1;
+    }
+    if (usb_cdc_dev->rx_in_cb) {
+        /* Someone is consuming PC->FC data, advertise a TxCarrier to the host */
+        new_uart_state |= 0x2;
+    }
+
+    /* Has anything changed since we last sent a notification? */
+    if ((new_uart_state ^ usb_cdc_dev->prev_uart_state) & 0x3) {
+        usb_cdc_dev->prev_uart_state = new_uart_state;
+
+        uart_state.bmUartState = htousbs(new_uart_state);
+
+        PIOS_USBHOOK_EndpointTx(usb_cdc_dev->cfg->ctrl_tx_ep,
+                                (uint8_t *)&uart_state,
+                                sizeof(uart_state));
+    }
+
+    return true;
+}
+
+static bool PIOS_USB_CDC_DATA_EP_IN_Callback(uint32_t usb_cdc_id, uint8_t epnum, uint16_t len);
+static bool PIOS_USB_CDC_DATA_EP_OUT_Callback(uint32_t usb_cdc_id, uint8_t epnum, uint16_t len);
+
+static void PIOS_USB_CDC_DATA_IF_Init(uint32_t usb_cdc_id)
+{
+    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)usb_cdc_id;
+
+    if (!PIOS_USB_CDC_validate(usb_cdc_dev)) {
+        return;
+    }
+
+    /* Register endpoint specific callbacks with the USBHOOK layer */
+    PIOS_USBHOOK_RegisterEpInCallback(usb_cdc_dev->cfg->data_tx_ep,
+                                      sizeof(usb_cdc_dev->tx_packet_buffer),
+                                      PIOS_USB_CDC_DATA_EP_IN_Callback,
+                                      (uint32_t)usb_cdc_dev);
+    PIOS_USBHOOK_RegisterEpOutCallback(usb_cdc_dev->cfg->data_rx_ep,
+                                       sizeof(usb_cdc_dev->rx_packet_buffer),
+                                       PIOS_USB_CDC_DATA_EP_OUT_Callback,
+                                       (uint32_t)usb_cdc_dev);
+    usb_cdc_dev->usb_data_if_enabled = true;
+}
+
+static void PIOS_USB_CDC_DATA_IF_DeInit(uint32_t usb_cdc_id)
+{
+    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)usb_cdc_id;
+
+    if (!PIOS_USB_CDC_validate(usb_cdc_dev)) {
+        return;
+    }
+
+    /* DeRegister endpoint specific callbacks with the USBHOOK layer */
+    usb_cdc_dev->usb_data_if_enabled = false;
+    PIOS_USBHOOK_DeRegisterEpInCallback(usb_cdc_dev->cfg->data_tx_ep);
+    PIOS_USBHOOK_DeRegisterEpOutCallback(usb_cdc_dev->cfg->data_rx_ep);
+}
+
+static bool PIOS_USB_CDC_DATA_IF_Setup(
+    __attribute__((unused)) uint32_t usb_cdc_id,
+    __attribute__((unused)) struct usb_setup_request *req)
+{
+    /* There are no valid EP0 transactions for CDC DATA interfaces */
+    PIOS_Assert(0);
+
+    return false;
+}
+
+/**
+ * Called *after* the data has been written to the buffer provided in the setup stage.  The
+ * setup request is passed in here again so we know *which* EP0 data out has just completed.
+ */
+static void PIOS_USB_CDC_DATA_IF_CtrlDataOut(
+    __attribute__((unused)) uint32_t usb_cdc_id,
+    __attribute__((unused)) const struct usb_setup_request *req)
+{
+    /* CDC DATA interfaces don't have any OUT data stages on the control endpoint */
+    PIOS_Assert(0);
+}
+
+/**
+ * @brief Callback used to indicate a transmission from device INto host completed
+ * Checks if any data remains, pads it into HID packet and sends.
+ */
+static bool PIOS_USB_CDC_DATA_EP_IN_Callback(
+    __attribute__((unused)) uint32_t usb_cdc_id,
+    __attribute__((unused)) uint8_t epnum,
+    __attribute__((unused)) uint16_t len)
+{
+    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
+
+    bool valid = PIOS_USB_CDC_validate(usb_cdc_dev);
+
+    PIOS_Assert(valid);
+
+    bool rc = PIOS_USB_CDC_SendData(usb_cdc_dev);
+    if (!rc) {
+        /* No additional data was transmitted, note that tx is no longer active */
+        usb_cdc_dev->tx_active = false;
+    }
+
+    return rc;
+}
+
+static bool PIOS_USB_CDC_DATA_EP_OUT_Callback(
+    __attribute__((unused)) uint32_t usb_cdc_id,
+    __attribute__((unused)) uint8_t epnum,
+    uint16_t len)
+{
+    struct pios_usb_cdc_dev *usb_cdc_dev = (struct pios_usb_cdc_dev *)pios_usb_cdc_id;
+
+    if (!PIOS_USB_CDC_validate(usb_cdc_dev)) {
+        return false;
+    }
+
+    if (len > sizeof(usb_cdc_dev->rx_packet_buffer)) {
+        len = sizeof(usb_cdc_dev->rx_packet_buffer);
+    }
+
+    if (!usb_cdc_dev->rx_in_cb) {
+        /* No Rx call back registered, disable the receiver */
+        usb_cdc_dev->rx_active = false;
+        return false;
+    }
+
+    uint16_t headroom;
+    bool need_yield = false;
+    uint16_t bytes_rxed;
+    bytes_rxed = (usb_cdc_dev->rx_in_cb)(usb_cdc_dev->rx_in_context,
+                                         usb_cdc_dev->rx_packet_buffer,
+                                         len,
+                                         &headroom,
+                                         &need_yield);
+
+    if (bytes_rxed < len) {
+        /* Lost bytes on rx */
+        usb_cdc_dev->rx_dropped += (len - bytes_rxed);
+    }
+
+    bool rc;
+    if (headroom >= sizeof(usb_cdc_dev->rx_packet_buffer)) {
+        /* We have room for a maximum length message */
+        PIOS_USBHOOK_EndpointRx(usb_cdc_dev->cfg->data_rx_ep,
+                                usb_cdc_dev->rx_packet_buffer,
+                                sizeof(usb_cdc_dev->rx_packet_buffer));
+        rc = true;
+    } else {
+        /* Not enough room left for a message, apply backpressure */
+        usb_cdc_dev->rx_active = false;
+        rc = false;
+    }
+
+#if defined(PIOS_INCLUDE_FREERTOS)
+    if (need_yield) {
+        vPortYieldFromISR();
+    }
+#endif /* PIOS_INCLUDE_FREERTOS */
+
+    return rc;
 }
 
 #endif /* PIOS_INCLUDE_USB_CDC */

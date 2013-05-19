@@ -235,7 +235,7 @@ static const struct usb_config_hid_cdc config_hid_cdc = {
         .bLength              = sizeof(struct usb_cdc_acm_func_desc),
         .bDescriptorType    = USB_DESC_TYPE_CLASS_SPECIFIC,
         .bDescriptorSubType = USB_CDC_DESC_SUBTYPE_ABSTRACT_CTRL,
-        .bmCapabilities     = 0x00,
+        .bmCapabilities     = 0x02, /* line coding and serial state */
     },
     .cdc_union                = {
         .bLength              = sizeof(struct usb_cdc_union_func_desc),

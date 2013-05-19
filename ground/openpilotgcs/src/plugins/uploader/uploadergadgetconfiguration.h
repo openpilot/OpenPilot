@@ -34,31 +34,72 @@
 
 using namespace Core;
 
-class UPLOADER_EXPORT UploaderGadgetConfiguration : public IUAVGadgetConfiguration
-{
-Q_OBJECT
+class UPLOADER_EXPORT UploaderGadgetConfiguration : public IUAVGadgetConfiguration {
+    Q_OBJECT
 public:
-    explicit UploaderGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+    explicit UploaderGadgetConfiguration(QString classId, QSettings *qSettings = 0, QObject *parent = 0);
 
-    //set port configuration functions
-    void setSpeed(BaudRateType speed) {m_defaultSpeed=speed;}
-    void setDataBits(DataBitsType databits) {m_defaultDataBits=databits;}
-    void setFlow(FlowType flow) {m_defaultFlow=flow;}
-    void setParity(ParityType parity) {m_defaultParity=parity;}
-    void setStopBits(StopBitsType stopbits) {m_defaultStopBits=stopbits;}
-    void setPort(QString port){m_defaultPort=port;}
-    void setTimeOut(long timeout){m_defaultTimeOut=timeout;}
+    // set port configuration functions
+    void setSpeed(BaudRateType speed)
+    {
+        m_defaultSpeed = speed;
+    }
+    void setDataBits(DataBitsType databits)
+    {
+        m_defaultDataBits = databits;
+    }
+    void setFlow(FlowType flow)
+    {
+        m_defaultFlow = flow;
+    }
+    void setParity(ParityType parity)
+    {
+        m_defaultParity = parity;
+    }
+    void setStopBits(StopBitsType stopbits)
+    {
+        m_defaultStopBits = stopbits;
+    }
+    void setPort(QString port)
+    {
+        m_defaultPort = port;
+    }
+    void setTimeOut(long timeout)
+    {
+        m_defaultTimeOut = timeout;
+    }
 
-    //get port configuration functions
-    BaudRateType Speed() {return m_defaultSpeed;}
-    DataBitsType DataBits() {return m_defaultDataBits;}
-    FlowType Flow() {return m_defaultFlow;}
-    ParityType Parity() {return m_defaultParity;}
-    StopBitsType StopBits() {return m_defaultStopBits;}
-    QString Port(){return m_defaultPort;}
-    long TimeOut(){return m_defaultTimeOut;}
+    // get port configuration functions
+    BaudRateType Speed()
+    {
+        return m_defaultSpeed;
+    }
+    DataBitsType DataBits()
+    {
+        return m_defaultDataBits;
+    }
+    FlowType Flow()
+    {
+        return m_defaultFlow;
+    }
+    ParityType Parity()
+    {
+        return m_defaultParity;
+    }
+    StopBitsType StopBits()
+    {
+        return m_defaultStopBits;
+    }
+    QString Port()
+    {
+        return m_defaultPort;
+    }
+    long TimeOut()
+    {
+        return m_defaultTimeOut;
+    }
 
-    void saveConfig(QSettings* settings) const;
+    void saveConfig(QSettings *settings) const;
     IUAVGadgetConfiguration *clone();
 
 private:

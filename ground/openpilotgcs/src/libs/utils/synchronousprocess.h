@@ -4,25 +4,25 @@
  * @file       synchronousprocess.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -42,12 +42,10 @@ class QByteArray;
 QT_END_NAMESPACE
 
 namespace Utils {
-
 struct SynchronousProcessPrivate;
 
 /* Result of SynchronousProcess execution */
-struct QTCREATOR_UTILS_EXPORT SynchronousProcessResponse
-{
+struct QTCREATOR_UTILS_EXPORT SynchronousProcessResponse {
     enum Result {
         // Finished with return code 0
         Finished,
@@ -58,13 +56,14 @@ struct QTCREATOR_UTILS_EXPORT SynchronousProcessResponse
         // Executable could not be started
         StartFailed,
         // Hang, no output after time out
-        Hang };
+        Hang
+    };
 
     SynchronousProcessResponse();
     void clear();
 
-    Result result;
-    int exitCode;
+    Result  result;
+    int     exitCode;
     QString stdOut;
     QString stdErr;
 };
@@ -83,8 +82,7 @@ QTCREATOR_UTILS_EXPORT QDebug operator<<(QDebug str, const SynchronousProcessRes
  * stdOutBufferedSignalsEnabled()/setStdErrBufferedSignalsEnabled().
  * They would typically be used for log windows. */
 
-class QTCREATOR_UTILS_EXPORT SynchronousProcess : public QObject
-{
+class QTCREATOR_UTILS_EXPORT SynchronousProcess : public QObject {
     Q_OBJECT
 public:
     SynchronousProcess();
@@ -97,7 +95,7 @@ public:
     void setStdOutCodec(QTextCodec *c);
     QTextCodec *stdOutCodec() const;
 
-    QProcess::ProcessChannelMode processChannelMode () const;
+    QProcess::ProcessChannelMode processChannelMode() const;
     void setProcessChannelMode(QProcess::ProcessChannelMode m);
 
     bool stdOutBufferedSignalsEnabled() const;
@@ -142,7 +140,6 @@ private:
 
     SynchronousProcessPrivate *m_d;
 };
-
 } // namespace Utils
 
-#endif
+#endif // ifndef SYNCHRONOUSPROCESS_H

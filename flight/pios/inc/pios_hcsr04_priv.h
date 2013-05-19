@@ -37,15 +37,15 @@
 #include <pios_tim_priv.h>
 
 struct pios_hcsr04_cfg {
-	TIM_ICInitTypeDef tim_ic_init;
-	const struct pios_tim_channel * channels;
-	uint8_t num_channels;
-	struct stm32_gpio trigger;
+    TIM_ICInitTypeDef tim_ic_init;
+    const struct pios_tim_channel *channels;
+    uint8_t num_channels;
+    struct stm32_gpio trigger;
 };
 
 extern const struct pios_rcvr_driver pios_pwm_rcvr_driver;
 
-extern int32_t PIOS_HCSR04_Init(uint32_t * pwm_id, const struct pios_hcsr04_cfg * cfg);
+extern int32_t PIOS_HCSR04_Init(uint32_t *pwm_id, const struct pios_hcsr04_cfg *cfg);
 
 #endif /* PIOS_HCSR04_PRIV_H */
 

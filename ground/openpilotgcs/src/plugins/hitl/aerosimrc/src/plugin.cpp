@@ -45,12 +45,12 @@ UdpReceiver *rcvr;
 const float RAD2DEG = (float)(180.0 / M_PI);
 const float DEG2RAD = (float)(M_PI / 180.0);
 
-//extern "C" int __stdcall DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
-extern "C" int __stdcall DllMain(void*, quint32 fdwReason, void*)
+// extern "C" int __stdcall DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+extern "C" int __stdcall DllMain(void *, quint32 fdwReason, void *)
 {
     switch (fdwReason) {
     case 0:
-//        qDebug() << hinstDLL << "DLL_PROCESS_DETACH " << lpvReserved;
+// qDebug() << hinstDLL << "DLL_PROCESS_DETACH " << lpvReserved;
 // free resources here
         rcvr->stop();
         rcvr->wait(500);
@@ -59,13 +59,13 @@ extern "C" int __stdcall DllMain(void*, quint32 fdwReason, void*)
         qDebug("------");
         break;
     case 1:
-//        qDebug() << hinstDLL << " DLL_PROCESS_ATTACH " << lpvReserved;
+// qDebug() << hinstDLL << " DLL_PROCESS_ATTACH " << lpvReserved;
         break;
     case 2:
-//        qDebug() << hinstDLL << "DLL_THREAD_ATTACH " << lpvReserved;
+// qDebug() << hinstDLL << "DLL_THREAD_ATTACH " << lpvReserved;
         break;
     case 3:
-//        qDebug() << hinstDLL << "DLL_THREAD_DETACH " << lpvReserved;
+// qDebug() << hinstDLL << "DLL_THREAD_DETACH " << lpvReserved;
         break;
     }
     return true;
@@ -115,28 +115,28 @@ SIM_DLL_EXPORT void AeroSIMRC_Plugin_Init(pluginInit *p)
     qDebug() << "AeroSIMRC_Plugin_Init done";
 }
 
-//-----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 
-void Run_Command_Reset(/*const simToPlugin *stp,
-                               pluginToSim *pts*/)
+void Run_Command_Reset( /*const simToPlugin *stp,
+                                pluginToSim *pts*/)
 {
     // Print some debug info, although it will only be seen during one frame
     debugInfo.append("\nRESET");
 }
 
 void Run_Command_WindowSizeAndPos(const simToPlugin *stp,
-                                        pluginToSim *pts)
+                                  pluginToSim *pts)
 {
     static quint8 snSequence = 0;
     quint8 idx = snSequence * 4;
 
-    if (snSequence >= videoModes.at(0)) {   // set fullscreen
+    if (snSequence >= videoModes.at(0)) { // set fullscreen
         pts->newScreenX = 0;
         pts->newScreenY = 0;
         pts->newScreenW = stp->screenW;
         pts->newScreenH = stp->screenH;
         snSequence = 0;
-    } else {                                // set video mode from config
+    } else { // set video mode from config
         pts->newScreenX = videoModes.at(idx + 1);
         pts->newScreenY = videoModes.at(idx + 2);
         pts->newScreenW = videoModes.at(idx + 3);
@@ -146,11 +146,11 @@ void Run_Command_WindowSizeAndPos(const simToPlugin *stp,
 }
 
 void Run_Command_MoveToNextWaypoint(const simToPlugin *stp,
-                                          pluginToSim *pts)
+                                    pluginToSim *pts)
 {
     static quint8 snSequence = 0;
 
-    switch(snSequence) {
+    switch (snSequence) {
     case 0:
         pts->newPosX = stp->wpAX;
         pts->newPosY = stp->wpAY;
@@ -179,16 +179,17 @@ void Run_Command_MoveToNextWaypoint(const simToPlugin *stp,
     default:
         qFatal("Run_Command_MoveToNextWaypoint switch error");
     }
-    pts->modelOverrideFlags = 0;
+    pts->modelOverrideFlags  = 0;
     pts->modelOverrideFlags |= OVR_POS;
 
     snSequence++;
-    if(snSequence > 4)
+    if (snSequence > 4) {
         snSequence = 0;
+    }
 }
 
 void Run_BlinkLEDs(const simToPlugin *stp,
-                         pluginToSim *pts)
+                   pluginToSim *pts)
 {
     if ((stp->simMenuStatus & MenuEnable) != 0) {
         pts->newMenuStatus |= MenuLedGreen;
@@ -198,14 +199,15 @@ void Run_BlinkLEDs(const simToPlugin *stp,
         rcvr->getFlighStatus(armed, mode);
         debugInfo.append(QString("armed: %1, mode: %2\n").arg(armed).arg(mode));
 
-        if (armed == 0)         // disarm
+        if (armed == 0) { // disarm
             timeout = 1000;
-        else if (armed == 1)    // arming
+        } else if (armed == 1) { // arming
             timeout = 40;
-        else if (armed == 2)    // armed
+        } else if (armed == 2) { // armed
             timeout = 100;
-        else                    // unknown
+        } else { // unknown
             timeout = 2000;
+        }
         if (ledTimer.elapsed() > timeout) {
             ledTimer.restart();
             pts->newMenuStatus ^= MenuLedBlue;
@@ -235,7 +237,7 @@ void Run_BlinkLEDs(const simToPlugin *stp,
             pts->newMenuStatus &= ~MenuFMode3;
             pts->newMenuStatus &= ~MenuFMode2;
             pts->newMenuStatus |= MenuFMode1;
-        } else /*(mode == 0)*/ {
+        } else { /*(mode == 0)*/
             pts->newMenuStatus &= ~MenuFMode3;
             pts->newMenuStatus &= ~MenuFMode2;
             pts->newMenuStatus &= ~MenuFMode1;
@@ -246,112 +248,112 @@ void Run_BlinkLEDs(const simToPlugin *stp,
 }
 
 void InfoText(const simToPlugin *stp,
-                    pluginToSim *pts)
+              pluginToSim *pts)
 {
     debugInfo.append(
-                QString(
-                    "Plugin Folder = %1\n"
-                    "Output Folder = %2\n"
-                    "nStructSize = %3  "
-                    "fIntegrationTimeStep = %4\n"
-                    "\n"
-                    "Aileron   TX = %5  RX = %6  RCMD TX = %7  RX = %8\n"
-                    "Elevator  TX = %9  RX = %10  RCMD TX = %11  RX = %12\n"
-                    "Throttle  TX = %13  RX = %14  RCMD TX = %15  RX = %16\n"
-                    "Rudder    TX = %17  RX = %18  RCMD TX = %19  RX = %20\n"
-                    "Channel5  TX = %21  RX = %22  RCMD TX = %23  RX = %24\n"
-                    "Channel6  TX = %25  RX = %26  RCMD TX = %27  RX = %28\n"
-                    "Channel7  TX = %29  RX = %30  RCMD TX = %31  RX = %32\n"
-                    "PluginCh1 TX = %33  RX = %34  RCMD TX = %35  RX = %36\n"
-                    "PluginCh2 TX = %37  RX = %38  RCMD TX = %39  RX = %40\n"
-                    "FPVCamPan TX = %41  RX = %42  RCMD TX = %43  RX = %44\n"
-                    "FPVCamTil TX = %45  RX = %46  RCMD TX = %47  RX = %48\n"
-                    "\n"
-                    "MenuItems = %49\n"
-                    // Model data
-                    "\n"
-                    "fPosX,Y,Z    = (%50, %51, %52)\n"
-                    "fVelX,Y,Z    = (%53, %54, %55)\n"
-                    "fAngVelX,Y,Z = (%56, %57, %58)\n"
-                    "fAccelX,Y,Z  = (%59, %60, %61)\n"
-                    "\n"
-                    "Lat, Long    = %62, %63\n"
-                    "fHeightAboveTerrain = %64\n"
-                    "\n"
-                    "fHeading = %65   fPitch = %66   fRoll = %67\n"
-                    )
-                .arg(pluginFolder)
-                .arg(outputFolder)
-                .arg(stp->structSize)
-                .arg(1.0 / stp->simTimeStep, 4, 'f', 1)
-                .arg(stp->chSimTX[Ch1Aileron], 5, 'f', 2)
-                .arg(stp->chSimRX[Ch1Aileron], 5, 'f', 2)
-                .arg(pts->chNewTX[Ch1Aileron], 5, 'f', 2)
-                .arg(pts->chNewRX[Ch1Aileron], 5, 'f', 2)
-                .arg(stp->chSimTX[Ch2Elevator], 5, 'f', 2)
-                .arg(stp->chSimRX[Ch2Elevator], 5, 'f', 2)
-                .arg(pts->chNewTX[Ch2Elevator], 5, 'f', 2)
-                .arg(pts->chNewRX[Ch2Elevator], 5, 'f', 2)
-                .arg(stp->chSimTX[Ch3Throttle], 5, 'f', 2)
-                .arg(stp->chSimRX[Ch3Throttle], 5, 'f', 2)
-                .arg(pts->chNewTX[Ch3Throttle], 5, 'f', 2)
-                .arg(pts->chNewRX[Ch3Throttle], 5, 'f', 2)
-                .arg(stp->chSimTX[Ch4Rudder], 5, 'f', 2)
-                .arg(stp->chSimRX[Ch4Rudder], 5, 'f', 2)
-                .arg(pts->chNewTX[Ch4Rudder], 5, 'f', 2)
-                .arg(pts->chNewRX[Ch4Rudder], 5, 'f', 2)
-                .arg(stp->chSimTX[Ch5], 5, 'f', 2)
-                .arg(stp->chSimRX[Ch5], 5, 'f', 2)
-                .arg(pts->chNewTX[Ch5], 5, 'f', 2)
-                .arg(pts->chNewRX[Ch5], 5, 'f', 2)
-                .arg(stp->chSimTX[Ch6], 5, 'f', 2)
-                .arg(stp->chSimRX[Ch6], 5, 'f', 2)
-                .arg(pts->chNewTX[Ch6], 5, 'f', 2)
-                .arg(pts->chNewRX[Ch6], 5, 'f', 2)
-                .arg(stp->chSimTX[Ch7], 5, 'f', 2)
-                .arg(stp->chSimRX[Ch7], 5, 'f', 2)
-                .arg(pts->chNewTX[Ch7], 5, 'f', 2)
-                .arg(pts->chNewRX[Ch7], 5, 'f', 2)
-                .arg(stp->chSimTX[Ch23Plugin1], 5, 'f', 2)
-                .arg(stp->chSimRX[Ch23Plugin1], 5, 'f', 2)
-                .arg(pts->chNewTX[Ch23Plugin1], 5, 'f', 2)
-                .arg(pts->chNewRX[Ch23Plugin1], 5, 'f', 2)
-                .arg(stp->chSimTX[Ch24Plugin2], 5, 'f', 2)
-                .arg(stp->chSimRX[Ch24Plugin2], 5, 'f', 2)
-                .arg(pts->chNewTX[Ch24Plugin2], 5, 'f', 2)
-                .arg(pts->chNewRX[Ch24Plugin2], 5, 'f', 2)
-                .arg(stp->chSimTX[Ch12FPVCamPan], 5, 'f', 2)
-                .arg(stp->chSimRX[Ch12FPVCamPan], 5, 'f', 2)
-                .arg(pts->chNewTX[Ch12FPVCamPan], 5, 'f', 2)
-                .arg(pts->chNewRX[Ch12FPVCamPan], 5, 'f', 2)
-                .arg(stp->chSimTX[Ch13FPVCamTilt], 5, 'f', 2)
-                .arg(stp->chSimRX[Ch13FPVCamTilt], 5, 'f', 2)
-                .arg(pts->chNewTX[Ch13FPVCamTilt], 5, 'f', 2)
-                .arg(pts->chNewRX[Ch13FPVCamTilt], 5, 'f', 2)
-                .arg(stp->simMenuStatus)
-                .arg(stp->posX, 5, 'f', 2)
-                .arg(stp->posY, 5, 'f', 2)
-                .arg(stp->posZ, 5, 'f', 2)
-                .arg(stp->velX, 5, 'f', 2)
-                .arg(stp->velY, 5, 'f', 2)
-                .arg(stp->velZ, 5, 'f', 2)
-                .arg(stp->angVelXm, 5, 'f', 2)
-                .arg(stp->angVelYm, 5, 'f', 2)
-                .arg(stp->angVelZm, 5, 'f', 2)
-                .arg(stp->accelXm, 5, 'f', 2)
-                .arg(stp->accelYm, 5, 'f', 2)
-                .arg(stp->accelZm, 5, 'f', 2)
-                .arg(stp->latitude, 5, 'f', 2)
-                .arg(stp->longitude, 5, 'f', 2)
-                .arg(stp->AGL, 5, 'f', 2)
-                .arg(stp->heading*RAD2DEG, 5, 'f', 2)
-                .arg(stp->pitch*RAD2DEG, 5, 'f', 2)
-                .arg(stp->roll*RAD2DEG, 5, 'f', 2)
-    );
+        QString(
+            "Plugin Folder = %1\n"
+            "Output Folder = %2\n"
+            "nStructSize = %3  "
+            "fIntegrationTimeStep = %4\n"
+            "\n"
+            "Aileron   TX = %5  RX = %6  RCMD TX = %7  RX = %8\n"
+            "Elevator  TX = %9  RX = %10  RCMD TX = %11  RX = %12\n"
+            "Throttle  TX = %13  RX = %14  RCMD TX = %15  RX = %16\n"
+            "Rudder    TX = %17  RX = %18  RCMD TX = %19  RX = %20\n"
+            "Channel5  TX = %21  RX = %22  RCMD TX = %23  RX = %24\n"
+            "Channel6  TX = %25  RX = %26  RCMD TX = %27  RX = %28\n"
+            "Channel7  TX = %29  RX = %30  RCMD TX = %31  RX = %32\n"
+            "PluginCh1 TX = %33  RX = %34  RCMD TX = %35  RX = %36\n"
+            "PluginCh2 TX = %37  RX = %38  RCMD TX = %39  RX = %40\n"
+            "FPVCamPan TX = %41  RX = %42  RCMD TX = %43  RX = %44\n"
+            "FPVCamTil TX = %45  RX = %46  RCMD TX = %47  RX = %48\n"
+            "\n"
+            "MenuItems = %49\n"
+            // Model data
+            "\n"
+            "fPosX,Y,Z    = (%50, %51, %52)\n"
+            "fVelX,Y,Z    = (%53, %54, %55)\n"
+            "fAngVelX,Y,Z = (%56, %57, %58)\n"
+            "fAccelX,Y,Z  = (%59, %60, %61)\n"
+            "\n"
+            "Lat, Long    = %62, %63\n"
+            "fHeightAboveTerrain = %64\n"
+            "\n"
+            "fHeading = %65   fPitch = %66   fRoll = %67\n"
+            )
+        .arg(pluginFolder)
+        .arg(outputFolder)
+        .arg(stp->structSize)
+        .arg(1.0 / stp->simTimeStep, 4, 'f', 1)
+        .arg(stp->chSimTX[Ch1Aileron], 5, 'f', 2)
+        .arg(stp->chSimRX[Ch1Aileron], 5, 'f', 2)
+        .arg(pts->chNewTX[Ch1Aileron], 5, 'f', 2)
+        .arg(pts->chNewRX[Ch1Aileron], 5, 'f', 2)
+        .arg(stp->chSimTX[Ch2Elevator], 5, 'f', 2)
+        .arg(stp->chSimRX[Ch2Elevator], 5, 'f', 2)
+        .arg(pts->chNewTX[Ch2Elevator], 5, 'f', 2)
+        .arg(pts->chNewRX[Ch2Elevator], 5, 'f', 2)
+        .arg(stp->chSimTX[Ch3Throttle], 5, 'f', 2)
+        .arg(stp->chSimRX[Ch3Throttle], 5, 'f', 2)
+        .arg(pts->chNewTX[Ch3Throttle], 5, 'f', 2)
+        .arg(pts->chNewRX[Ch3Throttle], 5, 'f', 2)
+        .arg(stp->chSimTX[Ch4Rudder], 5, 'f', 2)
+        .arg(stp->chSimRX[Ch4Rudder], 5, 'f', 2)
+        .arg(pts->chNewTX[Ch4Rudder], 5, 'f', 2)
+        .arg(pts->chNewRX[Ch4Rudder], 5, 'f', 2)
+        .arg(stp->chSimTX[Ch5], 5, 'f', 2)
+        .arg(stp->chSimRX[Ch5], 5, 'f', 2)
+        .arg(pts->chNewTX[Ch5], 5, 'f', 2)
+        .arg(pts->chNewRX[Ch5], 5, 'f', 2)
+        .arg(stp->chSimTX[Ch6], 5, 'f', 2)
+        .arg(stp->chSimRX[Ch6], 5, 'f', 2)
+        .arg(pts->chNewTX[Ch6], 5, 'f', 2)
+        .arg(pts->chNewRX[Ch6], 5, 'f', 2)
+        .arg(stp->chSimTX[Ch7], 5, 'f', 2)
+        .arg(stp->chSimRX[Ch7], 5, 'f', 2)
+        .arg(pts->chNewTX[Ch7], 5, 'f', 2)
+        .arg(pts->chNewRX[Ch7], 5, 'f', 2)
+        .arg(stp->chSimTX[Ch23Plugin1], 5, 'f', 2)
+        .arg(stp->chSimRX[Ch23Plugin1], 5, 'f', 2)
+        .arg(pts->chNewTX[Ch23Plugin1], 5, 'f', 2)
+        .arg(pts->chNewRX[Ch23Plugin1], 5, 'f', 2)
+        .arg(stp->chSimTX[Ch24Plugin2], 5, 'f', 2)
+        .arg(stp->chSimRX[Ch24Plugin2], 5, 'f', 2)
+        .arg(pts->chNewTX[Ch24Plugin2], 5, 'f', 2)
+        .arg(pts->chNewRX[Ch24Plugin2], 5, 'f', 2)
+        .arg(stp->chSimTX[Ch12FPVCamPan], 5, 'f', 2)
+        .arg(stp->chSimRX[Ch12FPVCamPan], 5, 'f', 2)
+        .arg(pts->chNewTX[Ch12FPVCamPan], 5, 'f', 2)
+        .arg(pts->chNewRX[Ch12FPVCamPan], 5, 'f', 2)
+        .arg(stp->chSimTX[Ch13FPVCamTilt], 5, 'f', 2)
+        .arg(stp->chSimRX[Ch13FPVCamTilt], 5, 'f', 2)
+        .arg(pts->chNewTX[Ch13FPVCamTilt], 5, 'f', 2)
+        .arg(pts->chNewRX[Ch13FPVCamTilt], 5, 'f', 2)
+        .arg(stp->simMenuStatus)
+        .arg(stp->posX, 5, 'f', 2)
+        .arg(stp->posY, 5, 'f', 2)
+        .arg(stp->posZ, 5, 'f', 2)
+        .arg(stp->velX, 5, 'f', 2)
+        .arg(stp->velY, 5, 'f', 2)
+        .arg(stp->velZ, 5, 'f', 2)
+        .arg(stp->angVelXm, 5, 'f', 2)
+        .arg(stp->angVelYm, 5, 'f', 2)
+        .arg(stp->angVelZm, 5, 'f', 2)
+        .arg(stp->accelXm, 5, 'f', 2)
+        .arg(stp->accelYm, 5, 'f', 2)
+        .arg(stp->accelZm, 5, 'f', 2)
+        .arg(stp->latitude, 5, 'f', 2)
+        .arg(stp->longitude, 5, 'f', 2)
+        .arg(stp->AGL, 5, 'f', 2)
+        .arg(stp->heading * RAD2DEG, 5, 'f', 2)
+        .arg(stp->pitch * RAD2DEG, 5, 'f', 2)
+        .arg(stp->roll * RAD2DEG, 5, 'f', 2)
+        );
 }
 
 SIM_DLL_EXPORT void AeroSIMRC_Plugin_Run(const simToPlugin *stp,
-                                               pluginToSim *pts)
+                                         pluginToSim *pts)
 {
     debugInfo = "---\n";
     // By default do not change the Menu Items of type CheckBox
@@ -365,7 +367,7 @@ SIM_DLL_EXPORT void AeroSIMRC_Plugin_Run(const simToPlugin *stp,
     bool isNextWp = (stp->simMenuStatus & MenuNextWpt) != 0;
     // Run commands
     if (isReset) {
-        Run_Command_Reset(/*stp, pts*/);
+        Run_Command_Reset( /*stp, pts*/);
     } else if (isScreen) {
         Run_Command_WindowSizeAndPos(stp, pts);
     } else if (isNextWp) {
@@ -373,10 +375,12 @@ SIM_DLL_EXPORT void AeroSIMRC_Plugin_Run(const simToPlugin *stp,
     } else {
         Run_BlinkLEDs(stp, pts);
         if (isEnable) {
-            if (isTxON)
+            if (isTxON) {
                 sndr->sendDatagram(stp);
-            if (isRxON)
+            }
+            if (isRxON) {
                 rcvr->setChannels(pts);
+            }
         }
 
         // network lag

@@ -27,12 +27,13 @@
 #include "uavobjectgeneratorpython.h"
 using namespace std;
 
-bool UAVObjectGeneratorPython::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
+bool UAVObjectGeneratorPython::generate(UAVObjectParser *parser, QString templatepath, QString outputpath)
+{
     // Load template and setup output directory
-    pythonCodePath = QDir( templatepath + QString("flight/modules/FlightPlan/lib"));
-    pythonOutputPath = QDir( outputpath + QString("python") );
+    pythonCodePath     = QDir(templatepath + QString("flight/modules/FlightPlan/lib"));
+    pythonOutputPath   = QDir(outputpath + QString("python"));
     pythonOutputPath.mkpath(pythonOutputPath.absolutePath());
-    pythonCodeTemplate = readFile( pythonCodePath.absoluteFilePath("uavobject.pyt.template") );
+    pythonCodeTemplate = readFile(pythonCodePath.absoluteFilePath("uavobject.pyt.template"));
     if (pythonCodeTemplate.isEmpty()) {
         std::cerr << "Problem reading python templates" << endl;
         return false;
@@ -40,7 +41,7 @@ bool UAVObjectGeneratorPython::generate(UAVObjectParser* parser,QString template
 
     // Process each object
     for (int objidx = 0; objidx < parser->getNumObjects(); ++objidx) {
-        ObjectInfo* info=parser->getObjectByIndex(objidx);
+        ObjectInfo *info = parser->getObjectByIndex(objidx);
         process_object(info);
     }
 
@@ -50,10 +51,11 @@ bool UAVObjectGeneratorPython::generate(UAVObjectParser* parser,QString template
 /**
  * Generate the python object files
  */
-bool UAVObjectGeneratorPython::process_object(ObjectInfo* info)
+bool UAVObjectGeneratorPython::process_object(ObjectInfo *info)
 {
-    if (info == NULL)
+    if (info == NULL) {
         return false;
+    }
 
     // Prepare output strings
     QString outCode = pythonCodeTemplate;
@@ -63,35 +65,33 @@ bool UAVObjectGeneratorPython::process_object(ObjectInfo* info)
 
     // Replace the ($DATAFIELDS) tag
     QString datafields;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
+    for (int n = 0; n < info->fields.length(); ++n) {
         // Class header
         datafields.append(QString("# Field %1 definition\n").arg(info->fields[n]->name));
         datafields.append(QString("class %1Field(UAVObjectField):\n").arg(info->fields[n]->name));
         // Only for enum types
-        if (info->fields[n]->type == FIELDTYPE_ENUM)
-        {
+        if (info->fields[n]->type == FIELDTYPE_ENUM) {
             datafields.append(QString("    # Enumeration options\n"));
             // Go through each option
             QStringList options = info->fields[n]->options;
             for (int m = 0; m < options.length(); ++m) {
                 QString name = options[m].toUpper().replace(QRegExp(ENUM_SPECIAL_CHARS), "");
-                if (name[0].isDigit())
+                if (name[0].isDigit()) {
                     name = QString("N%1").arg(name);
+                }
                 datafields.append(QString("    %1 = %2\n").arg(name).arg(m));
             }
         }
         // Generate element names (only if field has more than one element)
-        if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames)
-        {
+        if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames) {
             datafields.append(QString("    # Array element names\n"));
             // Go through the element names
             QStringList elemNames = info->fields[n]->elementNames;
-            for (int m = 0; m < elemNames.length(); ++m)
-            {
+            for (int m = 0; m < elemNames.length(); ++m) {
                 QString name = elemNames[m].toUpper().replace(QRegExp(ENUM_SPECIAL_CHARS), "");
-                if (name[0].isDigit())
+                if (name[0].isDigit()) {
                     name = QString("N%1").arg(name);
+                }
                 datafields.append(QString("    %1 = %2\n").arg(name).arg(m));
             }
         }
@@ -103,15 +103,14 @@ bool UAVObjectGeneratorPython::process_object(ObjectInfo* info)
 
     // Replace the $(DATAFIELDINIT) tag
     QString fields;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
+    for (int n = 0; n < info->fields.length(); ++n) {
         fields.append(QString("        self.%1 = %1Field()\n").arg(info->fields[n]->name));
         fields.append(QString("        self.addField(self.%1)\n").arg(info->fields[n]->name));
     }
     outCode.replace(QString("$(DATAFIELDINIT)"), fields);
 
     // Write the Python code
-    bool res = writeFileIfDiffrent( pythonOutputPath.absolutePath() + "/" + info->namelc + ".py", outCode );
+    bool res = writeFileIfDiffrent(pythonOutputPath.absolutePath() + "/" + info->namelc + ".py", outCode);
     if (!res) {
         cout << "Error: Could not write Python output files" << endl;
         return false;

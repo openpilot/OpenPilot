@@ -31,23 +31,21 @@
 #include "scope_global.h"
 #include <coreplugin/iuavgadgetfactory.h>
 
-namespace Core
-{
+namespace Core {
 class IUAVGadget;
 class IUAVGadgetFactory;
 }
 
 using namespace Core;
 
-class SCOPE_EXPORT ScopeGadgetFactory : public IUAVGadgetFactory
-{
+class SCOPE_EXPORT ScopeGadgetFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
     ScopeGadgetFactory(QObject *parent = 0);
     ~ScopeGadgetFactory();
 
     Core::IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 
 public slots:
@@ -57,7 +55,6 @@ public slots:
 signals:
     void onStopPlotting();
     void onStartPlotting();
-
 };
 
 #endif // SCOPEGADGETFACTORY_H_

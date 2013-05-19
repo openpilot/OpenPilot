@@ -8,12 +8,12 @@
  *
  * @file       pios_spi.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	        Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
+ *              Parts by Thorsten Klose (tk@midibox.org) (tk@midibox.org)
  * @brief      Hardware Abstraction Layer for SPI ports of STM32
  * @see        The GNU Public License (GPL) Version 3
  * @notes
  *
- * The PIOS Watchdog provides a HAL to initialize a watchdog 
+ * The PIOS Watchdog provides a HAL to initialize a watchdog
  *
  *****************************************************************************/
 /*
@@ -34,17 +34,17 @@
 
 #include "pios.h"
 
-/** 
+/**
  * @brief Initialize the watchdog timer for a specified timeout
  *
- * It is important to note that this function returns the achieved timeout 
- * for this hardware.  For hardware indendence this should be checked when 
- * scheduling updates.  Other hardware dependent details may need to be 
- * considered such as a window time which sets a minimum update time, 
- * and this function should return a recommended delay for clearing.  
+ * It is important to note that this function returns the achieved timeout
+ * for this hardware.  For hardware indendence this should be checked when
+ * scheduling updates.  Other hardware dependent details may need to be
+ * considered such as a window time which sets a minimum update time,
+ * and this function should return a recommended delay for clearing.
  *
  * For the STM32 nominal clock rate is 32 khz, but for the maximum clock rate of
- * 60 khz and a prescalar of 4 yields a clock rate of 15 khz.  The delay that is 
+ * 60 khz and a prescalar of 4 yields a clock rate of 15 khz.  The delay that is
  * set in the watchdog assumes the nominal clock rate, but the delay for FreeRTOS
  * to use is 75% of the minimal delay.
  *
@@ -52,65 +52,64 @@
  * @returns Maximum recommended delay between updates
  */
 void PIOS_WDG_Init()
-{
-}
+{}
 
 /**
- * @brief Register a module against the watchdog 
- * 
+ * @brief Register a module against the watchdog
+ *
  * There are two ways to use PIOS WDG: this is for when
- * multiple modules must be monitored.  In this case they 
- * must first register against the watchdog system and 
+ * multiple modules must be monitored.  In this case they
+ * must first register against the watchdog system and
  * only when all of the modules have been updated with the
- * watchdog be cleared.  Each module must have its own 
- * bit in the 16 bit 
+ * watchdog be cleared.  Each module must have its own
+ * bit in the 16 bit
  *
  * @param[in] flag the bit this module wants to use
  * @returns True if that bit is unregistered
  */
-bool PIOS_WDG_RegisterFlag(uint16_t flag_requested) 
+bool PIOS_WDG_RegisterFlag(uint16_t flag_requested)
 {
-	return true;
+    return true;
 }
 
 /**
  * @brief Function called by modules to indicate they are still running
  *
- * This function will set this flag in the active flags register (which is 
+ * This function will set this flag in the active flags register (which is
  * a backup regsiter) and if all the registered flags are set will clear
  * the watchdog and set only this flag in the backup register
  *
  * @param[in] flag the flag to set
  * @return true if the watchdog cleared, false if flags are pending
  */
-bool PIOS_WDG_UpdateFlag(uint16_t flag) 
-{	
-	return true;		
+bool PIOS_WDG_UpdateFlag(uint16_t flag)
+{
+    return true;
 }
 
-/** 
+/**
  * @brief Returns the flags that were set at bootup
- * 
- * This is used for diagnostics, if only one flag not set this 
+ *
+ * This is used for diagnostics, if only one flag not set this
  * was likely the module that wasn't running before reset
- * 
+ *
  * @return The active flags register from bootup
  */
 uint16_t PIOS_WDG_GetBootupFlags()
 {
-	return (uint16_t) 0xffff;
+    return (uint16_t)0xffff;
 }
 
-/** 
+/**
  * @brief Returns the currently active flags
- * 
+ *
  * For external monitoring
- * 
+ *
  * @return The active flags register
  */
 uint16_t PIOS_WDG_GetActiveFlags()
 {
-	return (uint16_t) 0xffff;
+    return (uint16_t)0xffff;
 }
 
 /**
@@ -119,5 +118,4 @@ uint16_t PIOS_WDG_GetActiveFlags()
  * This function must be called at the appropriate delay to prevent a reset event occuring
  */
 void PIOS_WDG_Clear(void)
-{
-}
+{}

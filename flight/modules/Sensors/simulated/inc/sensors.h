@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup Sensors Sensors Module
- * @{ 
+ * @{
  *
  * @file       attitude.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.

@@ -59,7 +59,8 @@ void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration *config)
         int mean = plotCurveConfig->yMeanSamples;
         QString mathFunction = plotCurveConfig->mathFunction;
         QRgb color = plotCurveConfig->color;
-        bool antialiased = plotCurveConfig->drawAntialiased;
+        bool antialiased     = plotCurveConfig->drawAntialiased;
+
         widget->addCurvePlot(
             uavObject,
             uavField,
@@ -71,7 +72,7 @@ void ScopeGadget::loadConfiguration(IUAVGadgetConfiguration *config)
                  Qt::SolidLine,
                  Qt::SquareCap,
                  Qt::BevelJoin),
-                 antialiased
+            antialiased
             );
     }
 

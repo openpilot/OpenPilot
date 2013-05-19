@@ -5,14 +5,13 @@
 
 class AntennaTrackGadgetFactory;
 
-class AntennaTrackPlugin : public ExtensionSystem::IPlugin
-{
+class AntennaTrackPlugin : public ExtensionSystem::IPlugin {
 public:
     AntennaTrackPlugin();
     ~AntennaTrackPlugin();
 
     void extensionsInitialized();
-    bool initialize(const QStringList & arguments, QString * errorString);
+    bool initialize(const QStringList & arguments, QString *errorString);
     void shutdown();
 private:
     AntennaTrackGadgetFactory *mf;

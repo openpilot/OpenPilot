@@ -32,16 +32,15 @@
 
 class UAVObjectBrowserFactory;
 
-class BrowserPlugin : public ExtensionSystem::IPlugin
-{
+class BrowserPlugin : public ExtensionSystem::IPlugin {
 public:
-        BrowserPlugin();
-   ~BrowserPlugin();
+    BrowserPlugin();
+    ~BrowserPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
 private:
-   UAVObjectBrowserFactory *mf;
+    UAVObjectBrowserFactory *mf;
 };
 #endif /* UAVOBJECTBROWSERPLUGIN_H_ */

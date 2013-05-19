@@ -7,7 +7,7 @@
  * @{
  * @addtogroup GCSControlGadgetPlugin GCSControl Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -35,8 +35,7 @@
 
 class Ui_GCSControl;
 
-class GCSControlGadgetWidget : public QLabel
-{
+class GCSControlGadgetWidget : public QLabel {
     Q_OBJECT
 
 public:
@@ -68,7 +67,7 @@ protected slots:
 private:
     Ui_GCSControl *m_gcscontrol;
     UAVObject::Metadata mccInitialData;
-    double leftX,leftY,rightX,rightY;
+    double leftX, leftY, rightX, rightY;
 };
 
 #endif /* GCSControlGADGETWIDGET_H_ */

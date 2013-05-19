@@ -34,8 +34,8 @@ Widget::Widget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    inSocket = NULL;
-    outSocket = NULL;
+    inSocket      = NULL;
+    outSocket     = NULL;
     screenTimeout.start();
     packetCounter = 0;
 
@@ -45,10 +45,10 @@ Widget::Widget(QWidget *parent) :
 
 Widget::~Widget()
 {
-    if(outSocket) {
+    if (outSocket) {
         delete outSocket;
     }
-    if(inSocket) {
+    if (inSocket) {
         delete inSocket;
     }
     delete ui;
@@ -80,7 +80,7 @@ void Widget::on_btReciveStart_clicked()
 
 void Widget::on_btReciveStop_clicked()
 {
-    if(inSocket) {
+    if (inSocket) {
         delete inSocket;
         inSocket = NULL;
         ui->listWidget->addItem("unbind ok");
@@ -98,8 +98,8 @@ void Widget::on_btTransmitStart_clicked()
     on_btTransmitStop_clicked();
 
     outSocket = new QUdpSocket();
-    outHost = ui->simHost->text();
-    outPort = ui->simPort->text().toInt();
+    outHost   = ui->simHost->text();
+    outPort   = ui->simPort->text().toInt();
 
     ui->listWidget->addItem("transmit started");
     ui->btTransmitStop->setEnabled(1);
@@ -110,7 +110,7 @@ void Widget::on_btTransmitStart_clicked()
 
 void Widget::on_btTransmitStop_clicked()
 {
-    if(outSocket) {
+    if (outSocket) {
         delete outSocket;
         outSocket = NULL;
         ui->listWidget->addItem("transmit stopped");
@@ -135,8 +135,9 @@ void Widget::readDatagram()
         Q_UNUSED(datagramSize);
 
         processDatagram(datagram);
-        if (ui->autoAnswer->isChecked())
+        if (ui->autoAnswer->isChecked()) {
             sendDatagram();
+        }
     }
 }
 
@@ -146,24 +147,25 @@ void Widget::processDatagram(const QByteArray &data)
 {
     QByteArray buf = data;
     QDataStream stream(&buf, QIODevice::ReadOnly);
+
     stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
 
     // check magic header
     quint32 magic;
     stream >> magic;
-    if (magic == 0x4153494D) {  // "AERO"
-        float   timeStep,
-                homeX, homeY, homeZ,
-                WpHX, WpHY, WpLat, WpLon,
-                posX, posY, posZ,
-                velX, velY, velZ,
-                angX, angY, angZ,
-                accX, accY, accZ,
-                lat, lon, alt,
-                head, pitch, roll,
-                volt, curr,
-                rx, ry, rz, fx, fy, fz, ux, uy, uz,
-                chAil, chEle, chThr, chRud, chPlg1, chPlg2, chFpv1, chFpv2;
+    if (magic == 0x4153494D) { // "AERO"
+        float timeStep,
+              homeX, homeY, homeZ,
+              WpHX, WpHY, WpLat, WpLon,
+              posX, posY, posZ,
+              velX, velY, velZ,
+              angX, angY, angZ,
+              accX, accY, accZ,
+              lat, lon, alt,
+              head, pitch, roll,
+              volt, curr,
+              rx, ry, rz, fx, fy, fz, ux, uy, uz,
+              chAil, chEle, chThr, chRud, chPlg1, chPlg2, chFpv1, chFpv2;
 
         stream >> timeStep;
         stream >> homeX >> homeY >> homeZ;
@@ -179,59 +181,61 @@ void Widget::processDatagram(const QByteArray &data)
         stream >> chAil >> chEle >> chThr >> chRud >> chPlg1 >> chPlg2 >> chFpv1 >> chFpv2;
         stream >> packetCounter;
 
-        if(ui->tabWidget->currentIndex() != 0)
+        if (ui->tabWidget->currentIndex() != 0) {
             return;
+        }
 
-        if (screenTimeout.elapsed() < 200)
+        if (screenTimeout.elapsed() < 200) {
             return;
+        }
 
         ui->listWidget->clear();
         /*
-        ui->listWidget->addItem("time step (s)");
-        ui->listWidget->addItem(QString("%1")
+           ui->listWidget->addItem("time step (s)");
+           ui->listWidget->addItem(QString("%1")
                                 .arg(timeStep);
-        ui->listWidget->addItem("home location (m)");
-        ui->listWidget->addItem(QString("%1, %2, %3")
+           ui->listWidget->addItem("home location (m)");
+           ui->listWidget->addItem(QString("%1, %2, %3")
                                 .arg(homeX, 7, 'f', 4)
                                 .arg(homeY, 7, 'f', 4)
                                 .arg(homeZ, 7, 'f', 4));
-        ui->listWidget->addItem("home waypoint");
-        ui->listWidget->addItem(QString("%1, %2, %3, %4")
+           ui->listWidget->addItem("home waypoint");
+           ui->listWidget->addItem(QString("%1, %2, %3, %4")
                                 .arg(WpHX, 7, 'f', 4)
                                 .arg(WpHY, 7, 'f', 4)
                                 .arg(WpLat, 7, 'f', 4)
                                 .arg(WpLon, 7, 'f', 4));
-        ui->listWidget->addItem("model position (m)");
-        ui->listWidget->addItem(QString("%1, %2, %3")
+           ui->listWidget->addItem("model position (m)");
+           ui->listWidget->addItem(QString("%1, %2, %3")
                                 .arg(posX, 7, 'f', 4)
                                 .arg(posY, 7, 'f', 4)
                                 .arg(posZ, 7, 'f', 4));
-        ui->listWidget->addItem("model velocity (m/s)");
-        ui->listWidget->addItem(QString("%1, %2, %3")
+           ui->listWidget->addItem("model velocity (m/s)");
+           ui->listWidget->addItem(QString("%1, %2, %3")
                                 .arg(velX, 7, 'f', 4)
                                 .arg(velY, 7, 'f', 4)
                                 .arg(velZ, 7, 'f', 4));
-        ui->listWidget->addItem("model angular velocity (rad/s)");
-        ui->listWidget->addItem(QString("%1, %2, %3")
+           ui->listWidget->addItem("model angular velocity (rad/s)");
+           ui->listWidget->addItem(QString("%1, %2, %3")
                                 .arg(angX, 7, 'f', 4)
                                 .arg(angY, 7, 'f', 4)
                                 .arg(angZ, 7, 'f', 4));
-        ui->listWidget->addItem("model acceleration (m/s/s)");
-        ui->listWidget->addItem(QString("%1, %2, %3")
+           ui->listWidget->addItem("model acceleration (m/s/s)");
+           ui->listWidget->addItem(QString("%1, %2, %3")
                                 .arg(accX, 7, 'f', 4)
                                 .arg(accY, 7, 'f', 4)
                                 .arg(accZ, 7, 'f', 4));
-        ui->listWidget->addItem("model coordinates (deg, deg, m)");
-        ui->listWidget->addItem(QString("%1, %2, %3")
+           ui->listWidget->addItem("model coordinates (deg, deg, m)");
+           ui->listWidget->addItem(QString("%1, %2, %3")
                                 .arg(lat, 7, 'f', 4)
                                 .arg(lon, 7, 'f', 4)
                                 .arg(alt, 7, 'f', 4));
-        ui->listWidget->addItem("model electrics");
-        ui->listWidget->addItem(QString("%1V, %2A")
+           ui->listWidget->addItem("model electrics");
+           ui->listWidget->addItem(QString("%1V, %2A")
                                 .arg(volt, 7, 'f', 4)
                                 .arg(curr, 7, 'f', 4));
-        ui->listWidget->addItem("channels");
-        ui->listWidget->addItem(QString("%1 %2 %3 %4 %5 %6 %7 %8")
+           ui->listWidget->addItem("channels");
+           ui->listWidget->addItem(QString("%1 %2 %3 %4 %5 %6 %7 %8")
                                 .arg(chAil, 6, 'f', 3)
                                 .arg(chEle, 6, 'f', 3)
                                 .arg(chThr, 6, 'f', 3)
@@ -240,18 +244,18 @@ void Widget::processDatagram(const QByteArray &data)
                                 .arg(chPlg2, 6, 'f', 3)
                                 .arg(chFpv1, 6, 'f', 3)
                                 .arg(chFpv2, 6, 'f', 3));
-        ui->listWidget->addItem("datagram size (bytes), packet counter");
-        ui->listWidget->addItem(QString("%1 %2")
+           ui->listWidget->addItem("datagram size (bytes), packet counter");
+           ui->listWidget->addItem(QString("%1 %2")
                                 .arg(data.size())
                                 .arg(packetCounter));
-*/
+         */
 
         // matrix calculation start
         // model matrix
-        QMatrix4x4 m = QMatrix4x4( fy,  fx, -fz,  0.0,
-                                   ry,  rx, -rz,  0.0,
-                                  -uy, -ux,  uz,  0.0,
-                                  0.0, 0.0, 0.0,  1.0);
+        QMatrix4x4 m = QMatrix4x4(fy, fx, -fz, 0.0,
+                                  ry, rx, -rz, 0.0,
+                                  -uy, -ux, uz, 0.0,
+                                  0.0, 0.0, 0.0, 1.0);
         m.optimize();
 
         // world matrix
@@ -301,9 +305,9 @@ void Widget::processDatagram(const QByteArray &data)
                                 .arg(q.scalar(), 7, 'f', 4));
         ui->listWidget->addItem("model attitude (deg)");
         ui->listWidget->addItem(QString("%1, %2, %3")
-                                .arg(roll*RAD2DEG, 7, 'f', 4)
-                                .arg(pitch*RAD2DEG, 7, 'f', 4)
-                                .arg(head*RAD2DEG, 7, 'f', 4));
+                                .arg(roll * RAD2DEG, 7, 'f', 4)
+                                .arg(pitch * RAD2DEG, 7, 'f', 4)
+                                .arg(head * RAD2DEG, 7, 'f', 4));
         ui->listWidget->addItem("CC attitude calculated (deg)");
         ui->listWidget->addItem(QString("%1, %2, %3")
                                 .arg(rpy.x(), 7, 'f', 4)
@@ -311,16 +315,16 @@ void Widget::processDatagram(const QByteArray &data)
                                 .arg(rpy.z(), 7, 'f', 4));
 
         screenTimeout.restart();
-
     } else if (magic == 0x52434D44) { // "RCMD"
         qreal ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10;
         stream >> ch1 >> ch2 >> ch3 >> ch4 >> ch5 >> ch6 >> ch7 >> ch8 >> ch9 >> ch10;
         quint8 armed, mode;
         stream >> armed >> mode;
 
-        if(ui->tabWidget->currentIndex() == 0) {
-            if (screenTimeout.elapsed() < 200)
+        if (ui->tabWidget->currentIndex() == 0) {
+            if (screenTimeout.elapsed() < 200) {
                 return;
+            }
             ui->listWidget->clear();
             ui->listWidget->addItem("channels");
             ui->listWidget->addItem("CH1: " + QString::number(ch1));
@@ -344,10 +348,11 @@ void Widget::processDatagram(const QByteArray &data)
 
 void Widget::sendDatagram()
 {
-    if(!outSocket)
+    if (!outSocket) {
         return;
+    }
 
-    float ch[10];   // = {0,0,0,0,0,0,0,0,0,0};
+    float ch[10]; // = {0,0,0,0,0,0,0,0,0,0};
     quint8 armed;
     quint8 fmode;
     const float coeff = 1.0 / 512.0;
@@ -430,30 +435,31 @@ void Widget::asQuat2RPY(const QQuaternion &q, QVector3D &rpy)
     qreal pitch;
     qreal yaw;
 
-    const qreal d2 = 2.0;
+    const qreal d2  = 2.0;
     const qreal qss = q.scalar() * q.scalar();
     const qreal qxx = q.x() * q.x();
     const qreal qyy = q.y() * q.y();
     const qreal qzz = q.z() * q.z();
 
     qreal test = -d2 * (q.x() * q.z() - q.scalar() * q.y());
+
     if (qFabs(test) > 0.998) {
         // ~86.3°, gimbal lock
         qreal R10 = d2 * (q.x() * q.y() - q.scalar() * q.z());
         qreal R11 = qss - qxx + qyy - qzz;
 
-        roll = 0.0;
+        roll  = 0.0;
         pitch = copysign(M_PI_2, test);
-        yaw = qAtan2(-R10, R11);
+        yaw   = qAtan2(-R10, R11);
     } else {
         qreal R12 = d2 * (q.y() * q.z() + q.scalar() * q.x());
         qreal R22 = qss - qxx - qyy + qzz;
         qreal R01 = d2 * (q.x() * q.y() + q.scalar() * q.z());
         qreal R00 = qss + qxx - qyy - qzz;
 
-        roll    = qAtan2(R12, R22);
-        pitch   = qAsin(test);
-        yaw     = qAtan2(R01, R00);
+        roll  = qAtan2(R12, R22);
+        pitch = qAsin(test);
+        yaw   = qAtan2(R01, R00);
     }
     rpy.setX(RAD2DEG * roll);
     rpy.setY(RAD2DEG * pitch);
@@ -477,15 +483,15 @@ void Widget::asMatrix2RPY(const QMatrix4x4 &m, QVector3D &rpy)
         yaw   = qAtan2(m(0, 1), m(0, 0));
     }
 
-    rpy.setX(roll  * RAD2DEG);
+    rpy.setX(roll * RAD2DEG);
     rpy.setY(pitch * RAD2DEG);
-    rpy.setZ(yaw   * RAD2DEG);
+    rpy.setZ(yaw * RAD2DEG);
 }
 
 /* // not used
 
-void Widget::ccRPY2Quat(const QVector3D &rpy, QQuaternion &q)
-{
+   void Widget::ccRPY2Quat(const QVector3D &rpy, QQuaternion &q)
+   {
     float phi, theta, psi;
     float cphi, sphi, ctheta, stheta, cpsi, spsi;
 
@@ -510,10 +516,10 @@ void Widget::ccRPY2Quat(const QVector3D &rpy, QQuaternion &q)
         q.setY(-q.y());
         q.setZ(-q.z());
     }
-}
+   }
 
-void Widget::ccQuat2Matrix(const QQuaternion &q, QMatrix4x4 &m)
-{
+   void Widget::ccQuat2Matrix(const QQuaternion &q, QMatrix4x4 &m)
+   {
     float q0s = q.scalar() * q.scalar();
     float q1s = q.x() * q.x();
     float q2s = q.y() * q.y();
@@ -533,5 +539,5 @@ void Widget::ccQuat2Matrix(const QQuaternion &q, QMatrix4x4 &m)
                    m10, m11, m12, 0,
                    m20, m21, m22, 0,
                    0,   0,   0,   1);
-}
-*/
+   }
+ */

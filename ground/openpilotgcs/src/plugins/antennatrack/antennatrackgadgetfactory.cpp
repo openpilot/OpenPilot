@@ -32,29 +32,27 @@
 #include <coreplugin/iuavgadget.h>
 
 AntennaTrackGadgetFactory::AntennaTrackGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("AntennaTrackGadget"),
-                          tr("Antenna Track Gadget"),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("AntennaTrackGadget"),
+                      tr("Antenna Track Gadget"),
+                      parent)
+{}
 
 AntennaTrackGadgetFactory::~AntennaTrackGadgetFactory()
-{
-}
+{}
 
-Core::IUAVGadget* AntennaTrackGadgetFactory::createGadget(QWidget *parent)
+Core::IUAVGadget *AntennaTrackGadgetFactory::createGadget(QWidget *parent)
 {
-    AntennaTrackWidget* gadgetWidget = new AntennaTrackWidget(parent);
+    AntennaTrackWidget *gadgetWidget = new AntennaTrackWidget(parent);
+
     return new AntennaTrackGadget(QString("AntennaTrackGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *AntennaTrackGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *AntennaTrackGadgetFactory::createConfiguration(QSettings *qSettings)
 {
     return new AntennaTrackGadgetConfiguration(QString("AntennaTrackGadget"), qSettings);
 }
 
 IOptionsPage *AntennaTrackGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new AntennaTrackGadgetOptionsPage(qobject_cast<AntennaTrackGadgetConfiguration*>(config));
+    return new AntennaTrackGadgetOptionsPage(qobject_cast<AntennaTrackGadgetConfiguration *>(config));
 }
-

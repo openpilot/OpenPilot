@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -40,7 +40,6 @@ template <class T> class QList;
 QT_END_NAMESPACE
 
 namespace Core {
-
 class ActionManager;
 class IContext;
 class IWizard;
@@ -56,8 +55,7 @@ class UAVGadgetManager;
 class UAVGadgetInstanceManager;
 class IConfigurablePlugin;
 
-class CORE_EXPORT ICore : public QObject
-{
+class CORE_EXPORT ICore : public QObject {
     Q_OBJECT
 
 public:
@@ -71,16 +69,16 @@ public:
                                    QWidget *parent = 0) = 0;
 
     virtual bool showWarningWithOptions(const QString &title, const QString &text,
-                                       const QString &details = QString(),
-                                       const QString &settingsCategory = QString(),
-                                       const QString &settingsId = QString(),
-                                       QWidget *parent = 0) = 0;
+                                        const QString &details = QString(),
+                                        const QString &settingsCategory = QString(),
+                                        const QString &settingsId = QString(),
+                                        QWidget *parent = 0) = 0;
 
-    virtual ActionManager *actionManager() const = 0;
-    virtual UniqueIDManager *uniqueIDManager() const = 0;
-    virtual MessageManager *messageManager() const = 0;
-    virtual VariableManager *variableManager() const = 0;
-    virtual ThreadManager *threadManager() const = 0;
+    virtual ActionManager *actionManager() const         = 0;
+    virtual UniqueIDManager *uniqueIDManager() const     = 0;
+    virtual MessageManager *messageManager() const       = 0;
+    virtual VariableManager *variableManager() const     = 0;
+    virtual ThreadManager *threadManager() const         = 0;
     virtual ModeManager *modeManager() const = 0;
     virtual ConnectionManager *connectionManager() const = 0;
     virtual UAVGadgetInstanceManager *uavGadgetInstanceManager() const = 0;
@@ -88,23 +86,23 @@ public:
 
     virtual QSettings *settings(QSettings::Scope scope = QSettings::UserScope) const = 0;
     virtual SettingsDatabase *settingsDatabase() const = 0;
-    virtual void readMainSettings(QSettings* qs, bool workspaceDiffOnly = false) = 0;
-    virtual void saveMainSettings(QSettings* qs) = 0;
-    virtual void readSettings(IConfigurablePlugin* plugin, QSettings* qs = 0) = 0;
-    virtual void saveSettings(IConfigurablePlugin* plugin, QSettings* qs = 0) = 0;
+    virtual void readMainSettings(QSettings *qs, bool workspaceDiffOnly = false)     = 0;
+    virtual void saveMainSettings(QSettings *qs) = 0;
+    virtual void readSettings(IConfigurablePlugin *plugin, QSettings *qs = 0) = 0;
+    virtual void saveSettings(IConfigurablePlugin *plugin, QSettings *qs = 0) = 0;
     virtual void deleteSettings() = 0;
 
-    virtual QString resourcePath() const = 0;
+    virtual QString resourcePath() const    = 0;
 
     virtual QMainWindow *mainWindow() const = 0;
 
     // adds and removes additional active contexts, this context is appended to the
     // currently active contexts. call updateContext after changing
-    virtual IContext *currentContextObject() const = 0;
-    virtual void addAdditionalContext(int context) = 0;
-    virtual void removeAdditionalContext(int context) = 0;
+    virtual IContext *currentContextObject() const      = 0;
+    virtual void addAdditionalContext(int context)      = 0;
+    virtual void removeAdditionalContext(int context)   = 0;
     virtual bool hasContext(int context) const = 0;
-    virtual void addContextObject(IContext *context) = 0;
+    virtual void addContextObject(IContext *context)    = 0;
     virtual void removeContextObject(IContext *context) = 0;
 
     virtual void updateContext() = 0;
@@ -120,7 +118,6 @@ signals:
     void contextAboutToChange(Core::IContext *context);
     void contextChanged(Core::IContext *context);
 };
-
 } // namespace Core
 
 #endif // ICORE_H

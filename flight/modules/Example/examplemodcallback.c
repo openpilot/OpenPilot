@@ -45,14 +45,14 @@
  */
 
 #include "openpilot.h"
-#include "exampleobject1.h"	// object the module will listen for updates (input)
-#include "exampleobject2.h"	// object the module will update (output)
-#include "examplesettings.h"	// object holding module settings (input)
+#include "exampleobject1.h" // object the module will listen for updates (input)
+#include "exampleobject2.h" // object the module will update (output)
+#include "examplesettings.h" // object holding module settings (input)
 
 // Private constants
-#define STACK_SIZE configMINIMAL_STACK_SIZE
+#define STACK_SIZE        configMINIMAL_STACK_SIZE
 #define CALLBACK_PRIORITY CALLBACK_PRIORITY_LOW
-#define CBTASK_PRIORITY CALLBACK_TASKPRIORITY_AUXILIARY
+#define CBTASK_PRIORITY   CALLBACK_TASKPRIORITY_AUXILIARY
 // Private types
 
 // Private variables
@@ -68,12 +68,12 @@ static void DelayedCb();
  */
 int32_t ExampleModCallbackInitialize()
 {
-	// Listen for ExampleObject1 updates, connect a callback function
-	ExampleObject1ConnectCallback(&ObjectUpdatedCb);
+    // Listen for ExampleObject1 updates, connect a callback function
+    ExampleObject1ConnectCallback(&ObjectUpdatedCb);
 
-	cbinfo = DelayedCallbackCreate(&DelayedCb, CALLBACK_PRIORITY, CBTASK_PRIORITY, STACK_SIZE);
-	
-	return 0;
+    cbinfo = DelayedCallbackCreate(&DelayedCb, CALLBACK_PRIORITY, CBTASK_PRIORITY, STACK_SIZE);
+
+    return 0;
 }
 
 /**
@@ -85,7 +85,7 @@ int32_t ExampleModCallbackInitialize()
  */
 static void ObjectUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-	DelayedCallbackDispatch(cbinfo);
+    DelayedCallbackDispatch(cbinfo);
 }
 
 /**
@@ -101,40 +101,39 @@ static void ObjectUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
  * do not block regular threads. They are therefore saver to use.
  */
 static void DelayedCb();
-	ExampleSettingsData settings;
-	ExampleObject1Data data1;
-	ExampleObject2Data data2;
-	int32_t step;
+ExampleSettingsData settings;
+ExampleObject1Data data1;
+ExampleObject2Data data2;
+int32_t step;
 
-	// Update settings with latest value
-	ExampleSettingsGet(&settings);
+// Update settings with latest value
+ExampleSettingsGet(&settings);
 
-	// Get the input object
-	ExampleObject1Get(&data1);
+// Get the input object
+ExampleObject1Get(&data1);
 
-	// Determine how to update the output object
-	if (settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP) {
-		step = settings.StepSize;
-	} else {
-		step = -settings.StepSize;
-	}
+// Determine how to update the output object
+if (settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP) {
+    step = settings.StepSize;
+} else {
+    step = -settings.StepSize;
+}
 
-	// Update data
-	data2.Field1 = data1.Field1 + step;
-	data2.Field2 = data1.Field2 + step;
-	data2.Field3 = data1.Field3 + step;
-	data2.Field4[0] = data1.Field4[0] + step;
-	data2.Field4[1] = data1.Field4[1] + step;
+// Update data
+data2.Field1    = data1.Field1 + step;
+data2.Field2    = data1.Field2 + step;
+data2.Field3    = data1.Field3 + step;
+data2.Field4[0] = data1.Field4[0] + step;
+data2.Field4[1] = data1.Field4[1] + step;
 
-	// Update the ExampleObject2, after this function is called
-	// notifications to any other modules listening to that object
-	// will be sent and the GCS object will be updated through the
-	// telemetry link. All operations will take place asynchronously
-	// and the following call will return immediately.
-	ExampleObject2Set(&data2);
+// Update the ExampleObject2, after this function is called
+// notifications to any other modules listening to that object
+// will be sent and the GCS object will be updated through the
+// telemetry link. All operations will take place asynchronously
+// and the following call will return immediately.
+ExampleObject2Set(&data2);
 
-	//call the module again 10 seconds later,
-	//even if the exampleobject has not been updated
-	DelayedCallbackSchedule(cbinfo, 10*1000, CALLBACK_UPDATEMODE_NONE);
-	
+// call the module again 10 seconds later,
+// even if the exampleobject has not been updated
+DelayedCallbackSchedule(cbinfo, 10 * 1000, CALLBACK_UPDATEMODE_NONE);
 }

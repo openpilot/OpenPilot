@@ -41,51 +41,53 @@
 static uint8_t transfer_possible = 0;
 
 enum pios_usb_dev_magic {
-	PIOS_USB_DEV_MAGIC = 0x17365904,
+    PIOS_USB_DEV_MAGIC = 0x17365904,
 };
 
 struct pios_usb_dev {
-	enum pios_usb_dev_magic     magic;
-	const struct pios_usb_cfg * cfg;
+    enum pios_usb_dev_magic   magic;
+    const struct pios_usb_cfg *cfg;
 };
 
 /**
  * @brief Validate the usb device structure
  * @returns true if valid device or false otherwise
  */
-static bool PIOS_USB_validate(struct pios_usb_dev * usb_dev)
+static bool PIOS_USB_validate(struct pios_usb_dev *usb_dev)
 {
-	return (usb_dev && (usb_dev->magic == PIOS_USB_DEV_MAGIC));
+    return usb_dev && (usb_dev->magic == PIOS_USB_DEV_MAGIC);
 }
 
 #if defined(PIOS_INCLUDE_FREERTOS)
-static struct pios_usb_dev * PIOS_USB_alloc(void)
+static struct pios_usb_dev *PIOS_USB_alloc(void)
 {
-	struct pios_usb_dev * usb_dev;
+    struct pios_usb_dev *usb_dev;
 
-	usb_dev = (struct pios_usb_dev *)pvPortMalloc(sizeof(*usb_dev));
-	if (!usb_dev) return(NULL);
+    usb_dev = (struct pios_usb_dev *)pvPortMalloc(sizeof(*usb_dev));
+    if (!usb_dev) {
+        return NULL;
+    }
 
-	usb_dev->magic = PIOS_USB_DEV_MAGIC;
-	return(usb_dev);
+    usb_dev->magic = PIOS_USB_DEV_MAGIC;
+    return usb_dev;
 }
 #else
 static struct pios_usb_dev pios_usb_devs[PIOS_USB_MAX_DEVS];
 static uint8_t pios_usb_num_devs;
-static struct pios_usb_dev * PIOS_USB_alloc(void)
+static struct pios_usb_dev *PIOS_USB_alloc(void)
 {
-	struct pios_usb_dev * usb_dev;
+    struct pios_usb_dev *usb_dev;
 
-	if (pios_usb_num_devs >= PIOS_USB_MAX_DEVS) {
-		return (NULL);
-	}
+    if (pios_usb_num_devs >= PIOS_USB_MAX_DEVS) {
+        return NULL;
+    }
 
-	usb_dev = &pios_usb_devs[pios_usb_num_devs++];
-	usb_dev->magic = PIOS_USB_DEV_MAGIC;
+    usb_dev = &pios_usb_devs[pios_usb_num_devs++];
+    usb_dev->magic = PIOS_USB_DEV_MAGIC;
 
-	return (usb_dev);
+    return usb_dev;
 }
-#endif
+#endif /* if defined(PIOS_INCLUDE_FREERTOS) */
 
 
 /**
@@ -93,31 +95,33 @@ static struct pios_usb_dev * PIOS_USB_alloc(void)
  * \return < 0 if initialisation failed
  */
 static uint32_t pios_usb_id;
-int32_t PIOS_USB_Init(uint32_t * usb_id, const struct pios_usb_cfg * cfg)
+int32_t PIOS_USB_Init(uint32_t *usb_id, const struct pios_usb_cfg *cfg)
 {
-	PIOS_Assert(usb_id);
-	PIOS_Assert(cfg);
+    PIOS_Assert(usb_id);
+    PIOS_Assert(cfg);
 
-	struct pios_usb_dev * usb_dev;
+    struct pios_usb_dev *usb_dev;
 
-	usb_dev = (struct pios_usb_dev *) PIOS_USB_alloc();
-	if (!usb_dev) goto out_fail;
+    usb_dev = (struct pios_usb_dev *)PIOS_USB_alloc();
+    if (!usb_dev) {
+        goto out_fail;
+    }
 
-	/* Bind the configuration to the device instance */
-	usb_dev->cfg = cfg;
+    /* Bind the configuration to the device instance */
+    usb_dev->cfg = cfg;
 
-	/*
-	 * This is a horrible hack to make this available to
-	 * the interrupt callbacks.  This should go away ASAP.
-	 */
-	pios_usb_id = (uint32_t) usb_dev;
+    /*
+     * This is a horrible hack to make this available to
+     * the interrupt callbacks.  This should go away ASAP.
+     */
+    pios_usb_id  = (uint32_t)usb_dev;
 
-	*usb_id = (uint32_t) usb_dev;
+    *usb_id = (uint32_t)usb_dev;
 
-	return 0;		/* No error */
+    return 0; /* No error */
 
 out_fail:
-	return(-1);
+    return -1;
 }
 
 /**
@@ -128,25 +132,25 @@ out_fail:
  */
 int32_t PIOS_USB_ChangeConnectionState(bool connected)
 {
-	// In all cases: re-initialise USB HID driver
-	if (connected) {
-		transfer_possible = 1;
+    // In all cases: re-initialise USB HID driver
+    if (connected) {
+        transfer_possible = 1;
 
-		//TODO: Check SetEPRxValid(ENDP1);
+        // TODO: Check SetEPRxValid(ENDP1);
 
 #if defined(USB_LED_ON)
-		USB_LED_ON;	// turn the USB led on
+        USB_LED_ON; // turn the USB led on
 #endif
-	} else {
-		// Cable disconnected: disable transfers
-		transfer_possible = 0;
+    } else {
+        // Cable disconnected: disable transfers
+        transfer_possible = 0;
 
 #if defined(USB_LED_OFF)
-		USB_LED_OFF;	// turn the USB led off
+        USB_LED_OFF; // turn the USB led off
 #endif
-	}
+    }
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -157,14 +161,16 @@ int32_t PIOS_USB_ChangeConnectionState(bool connected)
 uint32_t usb_found;
 bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
 {
-	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_id;
+    struct pios_usb_dev *usb_dev = (struct pios_usb_dev *)pios_usb_id;
 
-	if(!PIOS_USB_validate(usb_dev))
-		return false;
+    if (!PIOS_USB_validate(usb_dev)) {
+        return false;
+    }
 
-	usb_found = ((usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin) != 0) ^ usb_dev->cfg->vsense_active_low;
-	return usb_found;
-	return usb_found != 0 && transfer_possible ? 1 : 0;
+    usb_found = ((usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin) != 0) ^ usb_dev->cfg->vsense_active_low;
+    return usb_found;
+
+    return usb_found != 0 && transfer_possible ? 1 : 0;
 }
 
 /*
@@ -177,89 +183,83 @@ bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
 
 void USB_OTG_BSP_Init(__attribute__((unused)) USB_OTG_CORE_HANDLE *pdev)
 {
-	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_id;
+    struct pios_usb_dev *usb_dev = (struct pios_usb_dev *)pios_usb_id;
 
-	bool valid = PIOS_USB_validate(usb_dev);
-	PIOS_Assert(valid);
+    bool valid = PIOS_USB_validate(usb_dev);
+
+    PIOS_Assert(valid);
 
 #define FORCE_DISABLE_USB_IRQ 1
 #if FORCE_DISABLE_USB_IRQ
-	/* Make sure we disable the USB interrupt since it may be left on by bootloader */
-	NVIC_InitTypeDef NVIC_InitStructure;
-	NVIC_InitStructure = usb_dev->cfg->irq.init;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
-	NVIC_Init(&NVIC_InitStructure);
+    /* Make sure we disable the USB interrupt since it may be left on by bootloader */
+    NVIC_InitTypeDef NVIC_InitStructure;
+    NVIC_InitStructure = usb_dev->cfg->irq.init;
+    NVIC_InitStructure.NVIC_IRQChannelCmd = DISABLE;
+    NVIC_Init(&NVIC_InitStructure);
 #endif
 
-	/* Configure USB D-/D+ (DM/DP) pins */
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 | GPIO_Pin_12;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);
+    /* Configure USB D-/D+ (DM/DP) pins */
+    GPIO_InitTypeDef GPIO_InitStructure;
+    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_11 | GPIO_Pin_12;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF;
+    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+    GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-	GPIO_PinAFConfig(GPIOA, GPIO_PinSource11, GPIO_AF_OTG1_FS);
-	GPIO_PinAFConfig(GPIOA, GPIO_PinSource12, GPIO_AF_OTG1_FS);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource11, GPIO_AF_OTG1_FS);
+    GPIO_PinAFConfig(GPIOA, GPIO_PinSource12, GPIO_AF_OTG1_FS);
 
-	/* Configure VBUS sense pin */
-	GPIO_Init(usb_dev->cfg->vsense.gpio, &usb_dev->cfg->vsense.init);
+    /* Configure VBUS sense pin */
+    GPIO_Init(usb_dev->cfg->vsense.gpio, &usb_dev->cfg->vsense.init);
 
-	/* Enable USB OTG Clock */
-	RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_OTG_FS, ENABLE);
+    /* Enable USB OTG Clock */
+    RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_OTG_FS, ENABLE);
 }
 
 void USB_OTG_BSP_EnableInterrupt(__attribute__((unused)) USB_OTG_CORE_HANDLE *pdev)
 {
-	struct pios_usb_dev * usb_dev = (struct pios_usb_dev *) pios_usb_id;
+    struct pios_usb_dev *usb_dev = (struct pios_usb_dev *)pios_usb_id;
 
-	bool valid = PIOS_USB_validate(usb_dev);
-	PIOS_Assert(valid);
+    bool valid = PIOS_USB_validate(usb_dev);
 
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+    PIOS_Assert(valid);
 
-	NVIC_Init(&usb_dev->cfg->irq.init);
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
+
+    NVIC_Init(&usb_dev->cfg->irq.init);
 }
 
 #ifdef USE_HOST_MODE
 void USB_OTG_BSP_DriveVBUS(USB_OTG_CORE_HANDLE *pdev, uint8_t state)
-{
-
-}
+{}
 
 void USB_OTG_BSP_ConfigVBUS(USB_OTG_CORE_HANDLE *pdev)
+{}
+#endif /* USE_HOST_MODE */
+
+void USB_OTG_BSP_TimeInit(void)
+{}
+
+void USB_OTG_BSP_uDelay(const uint32_t usec)
 {
+    uint32_t count = 0;
+    const uint32_t utime = (120 * usec / 7);
 
-}
-#endif	/* USE_HOST_MODE */
-
-void USB_OTG_BSP_TimeInit ( void )
-{
-
-}
-
-void USB_OTG_BSP_uDelay (const uint32_t usec)
-{
-	uint32_t count = 0;
-	const uint32_t utime = (120 * usec / 7);
-	do {
-		if (++count > utime) {
-			return ;
-		}
-	}
-	while (1); 
+    do {
+        if (++count > utime) {
+            return;
+        }
+    } while (1);
 }
 
-void USB_OTG_BSP_mDelay (const uint32_t msec)
+void USB_OTG_BSP_mDelay(const uint32_t msec)
 {
-	USB_OTG_BSP_uDelay(msec * 1000);
+    USB_OTG_BSP_uDelay(msec * 1000);
 }
 
-void USB_OTG_BSP_TimerIRQ (void)
-{
-
-}
+void USB_OTG_BSP_TimerIRQ(void)
+{}
 
 #endif /* PIOS_INCLUDE_USB */
 

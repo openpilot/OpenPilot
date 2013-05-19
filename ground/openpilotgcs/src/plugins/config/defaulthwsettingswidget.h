@@ -38,8 +38,7 @@
 
 class Ui_Widget;
 
-class DefaultHwSettingsWidget : public QWidget
-{
+class DefaultHwSettingsWidget : public QWidget {
     Q_OBJECT
 
 public:

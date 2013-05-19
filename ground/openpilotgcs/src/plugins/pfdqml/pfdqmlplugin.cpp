@@ -24,32 +24,31 @@
 
 PfdQmlPlugin::PfdQmlPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 PfdQmlPlugin::~PfdQmlPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool PfdQmlPlugin::initialize(const QStringList& args, QString *errMsg)
+bool PfdQmlPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new PfdQmlGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new PfdQmlGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void PfdQmlPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void PfdQmlPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(PfdQmlPlugin)
-

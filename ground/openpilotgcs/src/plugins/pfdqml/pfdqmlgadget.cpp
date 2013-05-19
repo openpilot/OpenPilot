@@ -19,10 +19,9 @@
 #include "pfdqmlgadgetconfiguration.h"
 
 PfdQmlGadget::PfdQmlGadget(QString classId, PfdQmlGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent),
+    m_widget(widget)
+{}
 
 PfdQmlGadget::~PfdQmlGadget()
 {
@@ -30,14 +29,15 @@ PfdQmlGadget::~PfdQmlGadget()
 }
 
 /*
-  This is called when a configuration is loaded, and updates the plugin's settings.
-  Careful: the plugin is already drawn before the loadConfiguration method is called the
-  first time, so you have to be careful not to assume all the plugin values are initialized
-  the first time you use them
+   This is called when a configuration is loaded, and updates the plugin's settings.
+   Careful: the plugin is already drawn before the loadConfiguration method is called the
+   first time, so you have to be careful not to assume all the plugin values are initialized
+   the first time you use them
  */
-void PfdQmlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void PfdQmlGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
-    PfdQmlGadgetConfiguration *m = qobject_cast<PfdQmlGadgetConfiguration*>(config);
+    PfdQmlGadgetConfiguration *m = qobject_cast<PfdQmlGadgetConfiguration *>(config);
+
     m_widget->setOpenGLEnabled(m->openGLEnabled());
     m_widget->setQmlFile(m->qmlFile());
     m_widget->setEarthFile(m->earthFile());
@@ -47,8 +47,8 @@ void PfdQmlGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     m_widget->setLongitude(m->longitude());
     m_widget->setAltitude(m->altitude());
 
-    //setting OSGEARTH_CACHE_ONLY seems to work the most reliably
-    //between osgEarth versions I tried
+    // setting OSGEARTH_CACHE_ONLY seems to work the most reliably
+    // between osgEarth versions I tried
     if (m->cacheOnly()) {
         qputenv("OSGEARTH_CACHE_ONLY", "true");
     } else {

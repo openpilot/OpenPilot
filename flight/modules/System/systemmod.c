@@ -1,19 +1,19 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @brief The OpenPilot Modules do the majority of the control in OpenPilot.  The 
+ * @brief The OpenPilot Modules do the majority of the control in OpenPilot.  The
  * @ref SystemModule "System Module" starts all the other modules that then take care
- * of all the telemetry and control algorithms and such.  This is done through the @ref PIOS 
+ * of all the telemetry and control algorithms and such.  This is done through the @ref PIOS
  * "PIOS Hardware abstraction layer" which then contains hardware specific implementations
  * (currently only STM32 supported)
  *
- * @{ 
+ * @{
  * @addtogroup SystemModule System Module
  * @brief Initializes PIOS and other modules runs monitoring
  * After initializing all the modules (currently selected by Makefile but in
  * future controlled by configuration on SD card) runs basic monitoring and
  * alarms.
- * @{ 
+ * @{
  *
  * @file       systemmod.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -58,20 +58,20 @@
 #include <sanitycheck.h>
 
 
-//#define DEBUG_THIS_FILE
+// #define DEBUG_THIS_FILE
 
 #if defined(PIOS_INCLUDE_DEBUG_CONSOLE) && defined(DEBUG_THIS_FILE)
-#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(PIOS_COM_DEBUG, format, ## __VA_ARGS__)
+#define DEBUG_MSG(format, ...) PIOS_COM_SendFormattedString(PIOS_COM_DEBUG, format,##__VA_ARGS__)
 #else
 #define DEBUG_MSG(format, ...)
 #endif
 
 // Private constants
-#define SYSTEM_UPDATE_PERIOD_MS 1000
-#define LED_BLINK_RATE_HZ 5
+#define SYSTEM_UPDATE_PERIOD_MS        1000
+#define LED_BLINK_RATE_HZ              5
 
 #ifndef IDLE_COUNTS_PER_SEC_AT_NO_LOAD
-#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998	// calibrated by running tests/test_cpuload.c
+#define IDLE_COUNTS_PER_SEC_AT_NO_LOAD 995998 // calibrated by running tests/test_cpuload.c
 // must be updated if the FreeRTOS or compiler
 // optimisation options are changed.
 #endif
@@ -82,7 +82,7 @@
 #define STACK_SIZE_BYTES 924
 #endif
 
-#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
+#define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
 
 // Private types
 
@@ -96,8 +96,8 @@ static bool mallocFailed;
 static HwSettingsData bootHwSettings;
 
 // Private functions
-static void objectUpdatedCb(UAVObjEvent * ev);
-static void hwSettingsUpdatedCb(UAVObjEvent * ev);
+static void objectUpdatedCb(UAVObjEvent *ev);
+static void hwSettingsUpdatedCb(UAVObjEvent *ev);
 #ifdef DIAG_TASKS
 static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_info *task_info, void *context);
 #endif
@@ -116,7 +116,7 @@ int32_t SystemModStart(void)
 {
     // Initialize vars
     stackOverflow = false;
-    mallocFailed = false;
+    mallocFailed  = false;
     // Create system task
     xTaskCreate(systemTask, (signed char *)"System", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &systemTaskHandle);
     // Register task
@@ -131,7 +131,6 @@ int32_t SystemModStart(void)
  */
 int32_t SystemModInitialize(void)
 {
-
     // Must registers objects here for system thread because ObjectManager started in OpenPilotInit
     SystemSettingsInitialize();
     SystemStatsInitialize();
@@ -146,8 +145,9 @@ int32_t SystemModInitialize(void)
 #endif
 
     objectPersistenceQueue = xQueueCreate(1, sizeof(UAVObjEvent));
-    if (objectPersistenceQueue == NULL)
+    if (objectPersistenceQueue == NULL) {
         return -1;
+    }
 
     SystemModStart();
 
@@ -158,13 +158,13 @@ MODULE_INITCALL(SystemModInitialize, 0)
 /**
  * System task, periodically executes every SYSTEM_UPDATE_PERIOD_MS
  */
-static void systemTask(__attribute__((unused))void *parameters)
+static void systemTask(__attribute__((unused)) void *parameters)
 {
-	/* start the delayed callback scheduler */
-	CallbackSchedulerStart();
+    /* start the delayed callback scheduler */
+    CallbackSchedulerStart();
 
-	/* create all modules thread */
-	MODULE_TASKCREATE_ALL;
+    /* create all modules thread */
+    MODULE_TASKCREATE_ALL;
 
     if (mallocFailed) {
         /* We failed to malloc during task creation,
@@ -186,19 +186,19 @@ static void systemTask(__attribute__((unused))void *parameters)
     // Listen for SettingPersistance object updates, connect a callback function
     ObjectPersistenceConnectQueue(objectPersistenceQueue);
 
-	// Load a copy of HwSetting active at boot time
-	HwSettingsGet(&bootHwSettings);
+    // Load a copy of HwSetting active at boot time
+    HwSettingsGet(&bootHwSettings);
     // Whenever the configuration changes, make sure it is safe to fly
     HwSettingsConnectCallback(hwSettingsUpdatedCb);
 
 #ifdef DIAG_TASKS
-	TaskInfoData taskInfoData;
+    TaskInfoData taskInfoData;
 #endif
 
-	// Main system loop
-	while (1) {
-		// Update the system statistics
-		updateStats();
+    // Main system loop
+    while (1) {
+        // Update the system statistics
+        updateStats();
 
         // Update the system alarms
         updateSystemAlarms();
@@ -208,35 +208,35 @@ static void systemTask(__attribute__((unused))void *parameters)
 #endif
 
 #ifdef DIAG_TASKS
-		// Update the task status object
-		PIOS_TASK_MONITOR_ForEachTask(taskMonitorForEachCallback, &taskInfoData);
-		TaskInfoSet(&taskInfoData);
+        // Update the task status object
+        PIOS_TASK_MONITOR_ForEachTask(taskMonitorForEachCallback, &taskInfoData);
+        TaskInfoSet(&taskInfoData);
 #endif
 
         // Flash the heartbeat LED
 #if defined(PIOS_LED_HEARTBEAT)
         PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
         DEBUG_MSG("+ 0x%08x\r\n", 0xDEADBEEF);
-#endif	/* PIOS_LED_HEARTBEAT */
+#endif /* PIOS_LED_HEARTBEAT */
 
         // Turn on the error LED if an alarm is set
-#if defined (PIOS_LED_ALARM)
+#if defined(PIOS_LED_ALARM)
         if (AlarmsHasWarnings()) {
             PIOS_LED_On(PIOS_LED_ALARM);
         } else {
             PIOS_LED_Off(PIOS_LED_ALARM);
         }
-#endif	/* PIOS_LED_ALARM */
+#endif /* PIOS_LED_ALARM */
 
         FlightStatusData flightStatus;
         FlightStatusGet(&flightStatus);
 
         UAVObjEvent ev;
         int delayTime = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED ?
-        SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2) :
-        SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS;
+                        SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2) :
+                        SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS;
 
-        if(xQueueReceive(objectPersistenceQueue, &ev, delayTime) == pdTRUE) {
+        if (xQueueReceive(objectPersistenceQueue, &ev, delayTime) == pdTRUE) {
             // If object persistence is updated call the callback
             objectUpdatedCb(&ev);
         }
@@ -246,7 +246,7 @@ static void systemTask(__attribute__((unused))void *parameters)
 /**
  * Function called in response to object updates
  */
-static void objectUpdatedCb(UAVObjEvent * ev)
+static void objectUpdatedCb(UAVObjEvent *ev)
 {
     ObjectPersistenceData objper;
     UAVObjHandle obj;
@@ -296,8 +296,9 @@ static void objectUpdatedCb(UAVObjEvent * ev)
                 vTaskDelay(10);
 
                 // Verify saving worked
-                if (retval == 0)
+                if (retval == 0) {
                     retval = UAVObjLoad(obj, objper.InstanceID);
+                }
             } else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLSETTINGS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
                 retval = UAVObjSaveSettings();
             } else if (objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLMETAOBJECTS || objper.Selection == OBJECTPERSISTENCE_SELECTION_ALLOBJECTS) {
@@ -321,20 +322,20 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 #if defined(PIOS_INCLUDE_FLASH_LOGFS_SETTINGS)
             retval = PIOS_FLASHFS_Format(0);
 #else
-			retval = -1;
+            retval = -1;
 #endif
         }
         switch (retval) {
-            case 0:
-                objper.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
-                ObjectPersistenceSet(&objper);
-                break;
-            case -1:
-                objper.Operation = OBJECTPERSISTENCE_OPERATION_ERROR;
-                ObjectPersistenceSet(&objper);
-                break;
-            default:
-                break;
+        case 0:
+            objper.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
+            ObjectPersistenceSet(&objper);
+            break;
+        case -1:
+            objper.Operation = OBJECTPERSISTENCE_OPERATION_ERROR;
+            ObjectPersistenceSet(&objper);
+            break;
+        default:
+            break;
         }
     }
 }
@@ -342,9 +343,10 @@ static void objectUpdatedCb(UAVObjEvent * ev)
 /**
  * Called whenever hardware settings changed
  */
-static void hwSettingsUpdatedCb(__attribute__((unused))UAVObjEvent * ev)
+static void hwSettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     HwSettingsData currentHwSettings;
+
     HwSettingsGet(&currentHwSettings);
     // check whether the Hw Configuration has changed from the one used at boot time
     if (memcmp(&bootHwSettings, &currentHwSettings, sizeof(HwSettingsData)) != 0) {
@@ -355,18 +357,19 @@ static void hwSettingsUpdatedCb(__attribute__((unused))UAVObjEvent * ev)
 #ifdef DIAG_TASKS
 static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_info *task_info, void *context)
 {
-	TaskInfoData *taskData = (TaskInfoData *)context;
-	// By convention, there is a direct mapping between task monitor task_id's and members
-	// of the TaskInfoXXXXElem enums
-	PIOS_DEBUG_Assert(task_id < TASKINFO_RUNNING_NUMELEM);
-	taskData->Running[task_id] = task_info->is_running? TASKINFO_RUNNING_TRUE: TASKINFO_RUNNING_FALSE;
-	taskData->StackRemaining[task_id] = task_info->stack_remaining;
-	taskData->RunningTime[task_id] = task_info->running_time_percentage;
+    TaskInfoData *taskData = (TaskInfoData *)context;
+
+    // By convention, there is a direct mapping between task monitor task_id's and members
+    // of the TaskInfoXXXXElem enums
+    PIOS_DEBUG_Assert(task_id < TASKINFO_RUNNING_NUMELEM);
+    taskData->Running[task_id]        = task_info->is_running ? TASKINFO_RUNNING_TRUE : TASKINFO_RUNNING_FALSE;
+    taskData->StackRemaining[task_id] = task_info->stack_remaining;
+    taskData->RunningTime[task_id]    = task_info->running_time_percentage;
 }
 #endif
 
 /**
- * Called periodically to update the I2C statistics 
+ * Called periodically to update the I2C statistics
  */
 #ifdef DIAG_I2C_WDG_STATS
 static void updateI2Cstats()
@@ -378,7 +381,7 @@ static void updateI2Cstats()
     struct pios_i2c_fault_history history;
     PIOS_I2C_GetDiagnostics(&history, &i2cStats.event_errors);
 
-    for(uint8_t i = 0; (i < I2C_LOG_DEPTH) && (i < I2CSTATS_EVENT_LOG_NUMELEM); i++) {
+    for (uint8_t i = 0; (i < I2C_LOG_DEPTH) && (i < I2CSTATS_EVENT_LOG_NUMELEM); i++) {
         i2cStats.evirq_log[i] = history.evirq[i];
         i2cStats.erirq_log[i] = history.erirq[i];
         i2cStats.event_log[i] = history.event[i];
@@ -392,11 +395,12 @@ static void updateI2Cstats()
 static void updateWDGstats()
 {
     WatchdogStatusData watchdogStatus;
+
     watchdogStatus.BootupFlags = PIOS_WDG_GetBootupFlags();
     watchdogStatus.ActiveFlags = PIOS_WDG_GetActiveFlags();
     WatchdogStatusSet(&watchdogStatus);
 }
-#endif
+#endif /* ifdef DIAG_I2C_WDG_STATS */
 
 /**
  * Called periodically to update the system stats
@@ -408,35 +412,28 @@ static uint16_t GetFreeIrqStackSize(void)
 #if !defined(ARCH_POSIX) && !defined(ARCH_WIN32) && defined(CHECK_IRQ_STACK)
     extern uint32_t _irq_stack_top;
     extern uint32_t _irq_stack_end;
-    uint32_t pattern = 0x0000A5A5;
-    uint32_t *ptr = &_irq_stack_end;
+    uint32_t pattern    = 0x0000A5A5;
+    uint32_t *ptr       = &_irq_stack_end;
 
 #if 1 /* the ugly way accurate but takes more time, useful for debugging */
-    uint32_t stack_size = (((uint32_t)&_irq_stack_top - (uint32_t)&_irq_stack_end) & ~3 ) / 4;
+    uint32_t stack_size = (((uint32_t)&_irq_stack_top - (uint32_t)&_irq_stack_end) & ~3) / 4;
 
-    for (i=0; i< stack_size; i++)
-    {
-        if (ptr[i] != pattern)
-        {
-            i=i*4;
+    for (i = 0; i < stack_size; i++) {
+        if (ptr[i] != pattern) {
+            i = i * 4;
             break;
         }
     }
 #else /* faster way but not accurate */
-    if (*(volatile uint32_t *)((uint32_t)ptr + IRQSTACK_LIMIT_CRITICAL) != pattern)
-    {
+    if (*(volatile uint32_t *)((uint32_t)ptr + IRQSTACK_LIMIT_CRITICAL) != pattern) {
         i = IRQSTACK_LIMIT_CRITICAL - 1;
-    }
-    else if (*(volatile uint32_t *)((uint32_t)ptr + IRQSTACK_LIMIT_WARNING) != pattern)
-    {
+    } else if (*(volatile uint32_t *)((uint32_t)ptr + IRQSTACK_LIMIT_WARNING) != pattern) {
         i = IRQSTACK_LIMIT_WARNING - 1;
-    }
-    else
-    {
+    } else {
         i = IRQSTACK_LIMIT_WARNING;
     }
 #endif
-#endif
+#endif /* if !defined(ARCH_POSIX) && !defined(ARCH_WIN32) && defined(CHECK_IRQ_STACK) */
     return i;
 }
 
@@ -450,7 +447,7 @@ static void updateStats()
 
     // Get stats and update
     SystemStatsGet(&stats);
-    stats.FlightTime = xTaskGetTickCount() * portTICK_RATE_MS;
+    stats.FlightTime    = xTaskGetTickCount() * portTICK_RATE_MS;
 #if defined(ARCH_POSIX) || defined(ARCH_WIN32)
     // POSIX port of FreeRTOS doesn't have xPortGetFreeHeapSize()
     stats.HeapRemaining = 10240;
@@ -468,10 +465,10 @@ static void updateStats()
 
     portTickType now = xTaskGetTickCount();
     if (now > lastTickCount) {
-        uint32_t dT = (xTaskGetTickCount() - lastTickCount) * portTICK_RATE_MS;	// in ms
-        stats.CPULoad = 100 - (uint8_t) roundf(100.0f * ((float) idleCounter / ((float) dT / 1000.0f)) / (float) IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
-    } //else: TickCount has wrapped, do not calc now
-    lastTickCount = now;
+        uint32_t dT = (xTaskGetTickCount() - lastTickCount) * portTICK_RATE_MS; // in ms
+        stats.CPULoad = 100 - (uint8_t)roundf(100.0f * ((float)idleCounter / ((float)dT / 1000.0f)) / (float)IDLE_COUNTS_PER_SEC_AT_NO_LOAD);
+    } // else: TickCount has wrapped, do not calc now
+    lastTickCount    = now;
     idleCounterClear = 1;
 
 #if defined(PIOS_INCLUDE_ADC) && defined(PIOS_ADC_USE_TEMP_SENSOR)
@@ -479,12 +476,12 @@ static void updateStats()
     float temp_voltage = 3.3f * PIOS_ADC_PinGet(3) / ((1 << 12) - 1);
     const float STM32_TEMP_V25 = 0.76f; /* V */
     const float STM32_TEMP_AVG_SLOPE = 2.5f; /* mV/C */
-    stats.CPUTemp = (temp_voltage-STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
+    stats.CPUTemp = (temp_voltage - STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
 #else
     float temp_voltage = 3.3f * PIOS_ADC_PinGet(0) / ((1 << 12) - 1);
     const float STM32_TEMP_V25 = 1.43f; /* V */
     const float STM32_TEMP_AVG_SLOPE = 4.3f; /* mV/C */
-    stats.CPUTemp = (temp_voltage-STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
+    stats.CPUTemp = (temp_voltage - STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
 #endif
 #endif
     SystemStatsSet(&stats);
@@ -498,20 +495,21 @@ static void updateSystemAlarms()
     SystemStatsData stats;
     UAVObjStats objStats;
     EventStats evStats;
+
     SystemStatsGet(&stats);
 
     // Check heap, IRQ stack and malloc failures
     if (mallocFailed || (stats.HeapRemaining < HEAP_LIMIT_CRITICAL)
 #if !defined(ARCH_POSIX) && !defined(ARCH_WIN32) && defined(CHECK_IRQ_STACK)
-            || (stats.IRQStackRemaining < IRQSTACK_LIMIT_CRITICAL)
+        || (stats.IRQStackRemaining < IRQSTACK_LIMIT_CRITICAL)
 #endif
-            ) {
+        ) {
         AlarmsSet(SYSTEMALARMS_ALARM_OUTOFMEMORY, SYSTEMALARMS_ALARM_CRITICAL);
     } else if ((stats.HeapRemaining < HEAP_LIMIT_WARNING)
 #if !defined(ARCH_POSIX) && !defined(ARCH_WIN32) && defined(CHECK_IRQ_STACK)
-    || (stats.IRQStackRemaining < IRQSTACK_LIMIT_WARNING)
+               || (stats.IRQStackRemaining < IRQSTACK_LIMIT_WARNING)
 #endif
-    ) {
+               ) {
         AlarmsSet(SYSTEMALARMS_ALARM_OUTOFMEMORY, SYSTEMALARMS_ALARM_WARNING);
     } else {
         AlarmsClear(SYSTEMALARMS_ALARM_OUTOFMEMORY);
@@ -547,12 +545,11 @@ static void updateSystemAlarms()
     if (objStats.lastCallbackErrorID || objStats.lastQueueErrorID || evStats.lastErrorID) {
         SystemStatsData sysStats;
         SystemStatsGet(&sysStats);
-        sysStats.EventSystemWarningID = evStats.lastErrorID;
+        sysStats.EventSystemWarningID    = evStats.lastErrorID;
         sysStats.ObjectManagerCallbackID = objStats.lastCallbackErrorID;
-        sysStats.ObjectManagerQueueID = objStats.lastQueueErrorID;
+        sysStats.ObjectManagerQueueID    = objStats.lastQueueErrorID;
         SystemStatsSet(&sysStats);
     }
-
 }
 
 /**
@@ -573,13 +570,15 @@ void vApplicationIdleHook(void)
  * Called by the RTOS when a stack overflow is detected.
  */
 #define DEBUG_STACK_OVERFLOW 0
-void vApplicationStackOverflowHook(__attribute__((unused))xTaskHandle * pxTask,
-		__attribute__((unused))signed portCHAR * pcTaskName)
+void vApplicationStackOverflowHook(__attribute__((unused)) xTaskHandle *pxTask,
+                                   __attribute__((unused)) signed portCHAR *pcTaskName)
 {
     stackOverflow = true;
 #if DEBUG_STACK_OVERFLOW
     static volatile bool wait_here = true;
-    while(wait_here);
+    while (wait_here) {
+        ;
+    }
     wait_here = true;
 #endif
 }
@@ -593,7 +592,9 @@ void vApplicationMallocFailedHook(void)
     mallocFailed = true;
 #if DEBUG_MALLOC_FAILURES
     static volatile bool wait_here = true;
-    while(wait_here);
+    while (wait_here) {
+        ;
+    }
     wait_here = true;
 #endif
 }

@@ -7,19 +7,19 @@
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -33,43 +33,42 @@
  * initializes all the core systems on this specific hardware
  * called from System/openpilot.c
  */
-void PIOS_Board_Init(void) {
+void PIOS_Board_Init(void)
+{
+    /* Delay system */
+    PIOS_DELAY_Init();
 
-	/* Delay system */
-	PIOS_DELAY_Init();
+    /* Initialize UAVObject libraries */
+    EventDispatcherInitialize();
+    UAVObjInitialize();
 
-	/* Initialize UAVObject libraries */
-	EventDispatcherInitialize();
-	UAVObjInitialize();
+    /* Initialize the alarms library */
+    AlarmsInitialize();
 
-	/* Initialize the alarms library */
-	AlarmsInitialize();
+    /* Initialize the task monitor */
+    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
+        PIOS_Assert(0);
+    }
 
-	/* Initialize the task monitor */
-	if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
-		PIOS_Assert(0);
-	}
+    /* Initialize the delayed callback library */
+    CallbackSchedulerInitialize();
 
-	/* Initialize the delayed callback library */
-	CallbackSchedulerInitialize();
-
-	/* Initialize the PiOS library */
-	PIOS_COM_Init();
-
+    /* Initialize the PiOS library */
+    PIOS_COM_Init();
 }
 
 
 const struct pios_udp_cfg pios_udp0_cfg = {
-  .ip = "0.0.0.0",
-  .port = 9000,
+    .ip   = "0.0.0.0",
+    .port = 9000,
 };
 const struct pios_udp_cfg pios_udp1_cfg = {
-  .ip = "0.0.0.0",
-  .port = 9001,
+    .ip   = "0.0.0.0",
+    .port = 9001,
 };
 const struct pios_udp_cfg pios_udp2_cfg = {
-  .ip = "0.0.0.0",
-  .port = 9002,
+    .ip   = "0.0.0.0",
+    .port = 9002,
 };
 
 #ifdef PIOS_COM_AUX
@@ -77,8 +76,8 @@ const struct pios_udp_cfg pios_udp2_cfg = {
  * AUX USART
  */
 const struct pios_udp_cfg pios_udp3_cfg = {
-  .ip = "0.0.0.0",
-  .port = 9003,
+    .ip   = "0.0.0.0",
+    .port = 9003,
 };
 #endif
 
@@ -86,23 +85,23 @@ const struct pios_udp_cfg pios_udp3_cfg = {
  * Board specific number of devices.
  */
 struct pios_udp_dev pios_udp_devs[] = {
-#define PIOS_UDP_TELEM  0
-  {
-    .cfg = &pios_udp0_cfg,
-  },
-#define PIOS_UDP_GPS    1
-  {
-    .cfg = &pios_udp1_cfg,
-  },
-#define PIOS_UDP_LOCAL    2
-  {
-    .cfg = &pios_udp2_cfg,
-  },
+#define PIOS_UDP_TELEM 0
+    {
+        .cfg = &pios_udp0_cfg,
+    },
+#define PIOS_UDP_GPS   1
+    {
+        .cfg = &pios_udp1_cfg,
+    },
+#define PIOS_UDP_LOCAL 2
+    {
+        .cfg = &pios_udp2_cfg,
+    },
 #ifdef PIOS_COM_AUX
-#define PIOS_UDP_AUX    3
-  {
-    .cfg = &pios_udp3_cfg,
-  },
+#define PIOS_UDP_AUX   3
+    {
+        .cfg = &pios_udp3_cfg,
+    },
 #endif
 };
 
@@ -119,23 +118,23 @@ extern const struct pios_com_driver pios_serial_com_driver;
 extern const struct pios_com_driver pios_udp_com_driver;
 
 struct pios_com_dev pios_com_devs[] = {
-  {
-    .id     = PIOS_UDP_TELEM,
-    .driver = &pios_udp_com_driver,
-  },
-  {
-    .id     = PIOS_UDP_GPS,
-    .driver = &pios_udp_com_driver,
-  },
-  {
-    .id     = PIOS_UDP_LOCAL,
-    .driver = &pios_udp_com_driver,
-  },
+    {
+        .id     = PIOS_UDP_TELEM,
+        .driver = &pios_udp_com_driver,
+    },
+    {
+        .id     = PIOS_UDP_GPS,
+        .driver = &pios_udp_com_driver,
+    },
+    {
+        .id     = PIOS_UDP_LOCAL,
+        .driver = &pios_udp_com_driver,
+    },
 #ifdef PIOS_COM_AUX
-  {
-    .id     = PIOS_UDP_AUX,
-    .driver = &pios_udp_com_driver,
-  },
+    {
+        .id     = PIOS_UDP_AUX,
+        .driver = &pios_udp_com_driver,
+    },
 #endif
 };
 

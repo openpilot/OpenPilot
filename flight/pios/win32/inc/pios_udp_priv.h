@@ -3,7 +3,7 @@
  *
  * @file       pios_udp_priv.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * 	       Parts by Thorsten Klose (tk@midibox.org)
+ *             Parts by Thorsten Klose (tk@midibox.org)
  * @brief      UDP private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -36,29 +36,28 @@
 #include <fcntl.h>
 
 
-
 struct pios_udp_cfg {
-  const char * ip;
-  uint16_t port;
+    const char *ip;
+    uint16_t   port;
 };
 
 struct pios_udp_buffer {
-  uint8_t   buf[PIOS_UDP_RX_BUFFER_SIZE];
-  uint16_t  head;
-  uint16_t  tail;
-  uint16_t  size;
+    uint8_t  buf[PIOS_UDP_RX_BUFFER_SIZE];
+    uint16_t head;
+    uint16_t tail;
+    uint16_t size;
 };
 
 struct pios_udp_dev {
-  const struct pios_udp_cfg * const cfg;
-  struct pios_udp_buffer      rx;
-  SOCKET socket;
-  struct sockaddr_in server;
-  struct sockaddr_in client;
-  uint32_t clientLength;
+    const struct pios_udp_cfg *const cfg;
+    struct pios_udp_buffer rx;
+    SOCKET socket;
+    struct sockaddr_in     server;
+    struct sockaddr_in     client;
+    uint32_t clientLength;
 };
 
 extern struct pios_udp_dev pios_udp_devs[];
-extern uint8_t             pios_udp_num_devices;
+extern uint8_t pios_udp_num_devices;
 
 #endif /* PIOS_UDP_PRIV_H */

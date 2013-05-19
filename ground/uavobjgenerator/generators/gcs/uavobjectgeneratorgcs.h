@@ -31,16 +31,15 @@
 
 #include "../generator_common.h"
 
-class UAVObjectGeneratorGCS
-{
+class UAVObjectGeneratorGCS {
 public:
-    bool generate(UAVObjectParser* gen,QString templatepath,QString outputpath);
+    bool generate(UAVObjectParser *gen, QString templatepath, QString outputpath);
 
 private:
-    bool process_object(ObjectInfo* info);
+    bool process_object(ObjectInfo *info);
 
-    QString gcsCodeTemplate,gcsIncludeTemplate;
-    QStringList fieldTypeStrCPP,fieldTypeStrCPPClass;
+    QString gcsCodeTemplate, gcsIncludeTemplate;
+    QStringList fieldTypeStrCPP, fieldTypeStrCPPClass;
     QDir gcsCodePath;
     QDir gcsOutputPath;
 };

@@ -35,20 +35,46 @@
 #include <QStringList>
 #include <QDebug>
 
-class Settings : public QObject
-{
+class Settings : public QObject {
 public:
     explicit Settings(QString settingsPath, QObject *parent = 0);
     void read();
-    QString remoteHost() { return sendToHost; }
-    quint16 remotePort() { return sendToPort; }
-    QString localHost() { return listenOnHost; }
-    quint16 localPort() { return listenOnPort; }
-    QList<quint8> getInputMap() { return inputMap; }
-    QList<quint8> getOutputMap() { return outputMap; }
-    bool isToRX() { return sendToRX; }
-    bool isFromTX() { return takeFromTX; }
-    QList<quint16> getVideoModes() { return videoModes; }
+    QString remoteHost()
+    {
+        return sendToHost;
+    }
+    quint16 remotePort()
+    {
+        return sendToPort;
+    }
+    QString localHost()
+    {
+        return listenOnHost;
+    }
+    quint16 localPort()
+    {
+        return listenOnPort;
+    }
+    QList<quint8> getInputMap()
+    {
+        return inputMap;
+    }
+    QList<quint8> getOutputMap()
+    {
+        return outputMap;
+    }
+    bool isToRX()
+    {
+        return sendToRX;
+    }
+    bool isFromTX()
+    {
+        return takeFromTX;
+    }
+    QList<quint16> getVideoModes()
+    {
+        return videoModes;
+    }
 
 private:
     QHash<QString, quint8> channels;

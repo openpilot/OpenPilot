@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup TelemetryModule Telemetry Module
  * @brief Main telemetry module
  * Starts three tasks (RX, TX, and priority TX) that watch event queues
  * and handle all the telemetry of the UAVobjects
- * @{ 
+ * @{
  *
  * @file       telemetry.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -40,9 +40,9 @@
 
 // Private constants
 #define OVEROSYNC_PACKET_SIZE 1024
-#define MAX_QUEUE_SIZE   40
-#define STACK_SIZE_BYTES 512
-#define TASK_PRIORITY (tskIDLE_PRIORITY + 0)
+#define MAX_QUEUE_SIZE        40
+#define STACK_SIZE_BYTES      512
+#define TASK_PRIORITY         (tskIDLE_PRIORITY + 0)
 
 // Private types
 
@@ -52,31 +52,31 @@ static UAVTalkConnection uavTalkCon;
 static xTaskHandle overoSyncTaskHandle;
 volatile bool buffer_swap_failed;
 volatile uint32_t buffer_swap_timeval;
-FILE * fid;
+FILE *fid;
 
 // Private functions
 static void overoSyncTask(void *parameters);
-static int32_t packData(uint8_t * data, int32_t length);
+static int32_t packData(uint8_t *data, int32_t length);
 static void registerObject(UAVObjHandle obj);
 
 struct dma_transaction {
-	uint8_t tx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__ ((aligned(4)));
-	uint8_t rx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__ ((aligned(4)));
+    uint8_t tx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__((aligned(4)));
+    uint8_t rx_buffer[OVEROSYNC_PACKET_SIZE] __attribute__((aligned(4)));
 };
 
 struct overosync {
-	struct dma_transaction transactions[2];
-	uint32_t active_transaction_id;
-	uint32_t loading_transaction_id;
-	xSemaphoreHandle transaction_lock;
-	xSemaphoreHandle buffer_lock;
-	volatile bool transaction_done;
-	uint32_t sent_bytes;
-	uint32_t write_pointer;
-	uint32_t sent_objects;
-	uint32_t failed_objects;
-	uint32_t received_objects;
-	uint32_t framesync_error;
+    struct dma_transaction transactions[2];
+    uint32_t active_transaction_id;
+    uint32_t loading_transaction_id;
+    xSemaphoreHandle transaction_lock;
+    xSemaphoreHandle buffer_lock;
+    volatile bool    transaction_done;
+    uint32_t sent_bytes;
+    uint32_t write_pointer;
+    uint32_t sent_objects;
+    uint32_t failed_objects;
+    uint32_t received_objects;
+    uint32_t framesync_error;
 };
 
 struct overosync *overosync;
@@ -88,15 +88,15 @@ struct overosync *overosync;
  */
 int32_t OveroSyncInitialize(void)
 {
-	OveroSyncStatsInitialize();
+    OveroSyncStatsInitialize();
 
-	// Create object queues
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+    // Create object queues
+    queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
-	// Initialise UAVTalk
-	uavTalkCon = UAVTalkInitialize(&packData);
+    // Initialise UAVTalk
+    uavTalkCon = UAVTalkInitialize(&packData);
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -106,33 +106,36 @@ int32_t OveroSyncInitialize(void)
  */
 int32_t OveroSyncStart(void)
 {
-	overosync = (struct overosync *) pvPortMalloc(sizeof(*overosync));
-	if(overosync == NULL)
-		return -1;
+    overosync = (struct overosync *)pvPortMalloc(sizeof(*overosync));
+    if (overosync == NULL) {
+        return -1;
+    }
 
-	overosync->transaction_lock = xSemaphoreCreateMutex();
-	if(overosync->transaction_lock == NULL)
-		return -1;
+    overosync->transaction_lock = xSemaphoreCreateMutex();
+    if (overosync->transaction_lock == NULL) {
+        return -1;
+    }
 
-	overosync->buffer_lock = xSemaphoreCreateMutex();
-	if(overosync->buffer_lock == NULL)
-		return -1;
+    overosync->buffer_lock = xSemaphoreCreateMutex();
+    if (overosync->buffer_lock == NULL) {
+        return -1;
+    }
 
-	overosync->active_transaction_id = 0;
-	overosync->loading_transaction_id = 0;
-	overosync->write_pointer = 0;
-	overosync->sent_bytes = 0;
-	overosync->framesync_error = 0;
+    overosync->active_transaction_id  = 0;
+    overosync->loading_transaction_id = 0;
+    overosync->write_pointer   = 0;
+    overosync->sent_bytes      = 0;
+    overosync->framesync_error = 0;
 
-	// Process all registered objects and connect queue for updates
-	UAVObjIterate(&registerObject);
-	
-	// Start telemetry tasks
-	xTaskCreate(overoSyncTask, (signed char *)"OveroSync", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &overoSyncTaskHandle);
-	
-	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_OVEROSYNC, overoSyncTaskHandle);
-	
-	return 0;
+    // Process all registered objects and connect queue for updates
+    UAVObjIterate(&registerObject);
+
+    // Start telemetry tasks
+    xTaskCreate(overoSyncTask, (signed char *)"OveroSync", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &overoSyncTaskHandle);
+
+    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_OVEROSYNC, overoSyncTaskHandle);
+
+    return 0;
 }
 
 MODULE_INITCALL(OveroSyncInitialize, OveroSyncStart)
@@ -144,12 +147,13 @@ MODULE_INITCALL(OveroSyncInitialize, OveroSyncStart)
  */
 static void registerObject(UAVObjHandle obj)
 {
-	int32_t eventMask;
-	eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-	if (UAVObjIsMetaobject(obj)) {
-		eventMask |= EV_UNPACKED;	// we also need to act on remote updates (unpack events)
-	}
-	UAVObjConnectQueue(obj, queue, eventMask);
+    int32_t eventMask;
+
+    eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+    if (UAVObjIsMetaobject(obj)) {
+        eventMask |= EV_UNPACKED; // we also need to act on remote updates (unpack events)
+    }
+    UAVObjConnectQueue(obj, queue, eventMask);
 }
 
 /**
@@ -163,48 +167,47 @@ static void registerObject(UAVObjHandle obj)
  */
 static void overoSyncTask(__attribute__((unused)) void *parameters)
 {
-	UAVObjEvent ev;
+    UAVObjEvent ev;
 
-	// Kick off SPI transfers (once one is completed another will automatically transmit)
-	overosync->transaction_done = true;
-	overosync->sent_objects = 0;
-	overosync->failed_objects = 0;
-	overosync->received_objects = 0;
-	
-	portTickType lastUpdateTime = xTaskGetTickCount();
-	portTickType updateTime;
-	
-	fid = fopen("sim_log.opl", "w");
+    // Kick off SPI transfers (once one is completed another will automatically transmit)
+    overosync->transaction_done = true;
+    overosync->sent_objects     = 0;
+    overosync->failed_objects   = 0;
+    overosync->received_objects = 0;
 
-	// Loop forever
-	while (1) {
-		// Wait for queue message
-		if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
-		
-			// Check it will fit before packetizing
-			if ((overosync->write_pointer + UAVObjGetNumBytes(ev.obj) + 12) >=
-				sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer)) {
-				overosync->failed_objects ++;
-			} else {
-				// Process event.  This calls transmitData
-				UAVTalkSendObject(uavTalkCon, ev.obj, ev.instId, false, 0);
-			}
+    portTickType lastUpdateTime = xTaskGetTickCount();
+    portTickType updateTime;
 
-			updateTime = xTaskGetTickCount();
-			if(((portTickType) (updateTime - lastUpdateTime)) > 1000) {
-				// Update stats.  This will trigger a local send event too
-				OveroSyncStatsData syncStats;
-				syncStats.Send = overosync->sent_bytes;
-				syncStats.Received = 0;
-				syncStats.Connected = syncStats.Send > 500 ? OVEROSYNCSTATS_CONNECTED_TRUE : OVEROSYNCSTATS_CONNECTED_FALSE;
-				syncStats.DroppedUpdates = overosync->failed_objects;
-				OveroSyncStatsSet(&syncStats);
-				overosync->failed_objects = 0;
-				overosync->sent_bytes = 0;
-				lastUpdateTime = updateTime;
-			}
-		}
-	}
+    fid = fopen("sim_log.opl", "w");
+
+    // Loop forever
+    while (1) {
+        // Wait for queue message
+        if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
+            // Check it will fit before packetizing
+            if ((overosync->write_pointer + UAVObjGetNumBytes(ev.obj) + 12) >=
+                sizeof(overosync->transactions[overosync->loading_transaction_id].tx_buffer)) {
+                overosync->failed_objects++;
+            } else {
+                // Process event.  This calls transmitData
+                UAVTalkSendObject(uavTalkCon, ev.obj, ev.instId, false, 0);
+            }
+
+            updateTime = xTaskGetTickCount();
+            if (((portTickType)(updateTime - lastUpdateTime)) > 1000) {
+                // Update stats.  This will trigger a local send event too
+                OveroSyncStatsData syncStats;
+                syncStats.Send      = overosync->sent_bytes;
+                syncStats.Received  = 0;
+                syncStats.Connected = syncStats.Send > 500 ? OVEROSYNCSTATS_CONNECTED_TRUE : OVEROSYNCSTATS_CONNECTED_FALSE;
+                syncStats.DroppedUpdates  = overosync->failed_objects;
+                OveroSyncStatsSet(&syncStats);
+                overosync->failed_objects = 0;
+                overosync->sent_bytes     = 0;
+                lastUpdateTime = updateTime;
+            }
+        }
+    }
 }
 
 /**
@@ -214,25 +217,25 @@ static void overoSyncTask(__attribute__((unused)) void *parameters)
  * \return -1 on failure
  * \return number of bytes transmitted on success
  */
-static int32_t packData(uint8_t * data, int32_t length)
+static int32_t packData(uint8_t *data, int32_t length)
 {
-	// Get the lock for manipulating the buffer
-	xSemaphoreTake(overosync->buffer_lock, portMAX_DELAY);
+    // Get the lock for manipulating the buffer
+    xSemaphoreTake(overosync->buffer_lock, portMAX_DELAY);
 
-	portTickType tickTime = xTaskGetTickCount();
-	uint64_t packetSize = data[2] + (data[3] << 8);
-	fwrite((void *) &tickTime, 1, sizeof(tickTime), fid);
-	fwrite((void *) &packetSize, sizeof(packetSize), 1, fid);
-	fwrite((void *) data, 1, length, fid);
-	overosync->sent_bytes += length;
-	overosync->sent_objects++;
+    portTickType tickTime = xTaskGetTickCount();
+    uint64_t packetSize   = data[2] + (data[3] << 8);
+    fwrite((void *)&tickTime, 1, sizeof(tickTime), fid);
+    fwrite((void *)&packetSize, sizeof(packetSize), 1, fid);
+    fwrite((void *)data, 1, length, fid);
+    overosync->sent_bytes += length;
+    overosync->sent_objects++;
 
-	xSemaphoreGive(overosync->buffer_lock);
-	
-	return length;
+    xSemaphoreGive(overosync->buffer_lock);
+
+    return length;
 }
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

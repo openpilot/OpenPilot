@@ -102,38 +102,40 @@
 
     Returns true when the import should be done, false otherwise.
 
-*/
+ */
 
 #include "uavconfiginfo.h"
 #include <QMessageBox>
 
-#define VERSION_DEFAULT  "0.0.0"
+#define VERSION_DEFAULT "0.0.0"
 
-#define TEXT_MINOR_LOSS_OF_CONFIGURATION  tr( \
-" Some of the configured features might not be supported \
+#define TEXT_MINOR_LOSS_OF_CONFIGURATION \
+    tr( \
+        " Some of the configured features might not be supported \
 by your version of the plugin. You might want to upgrade the plugin.")
 
-#define TEXT_MISSING_CONFIGURATION  tr( \
-" Some configuration is missing in the imported config and will be replaced \
+#define TEXT_MISSING_CONFIGURATION \
+    tr( \
+        " Some configuration is missing in the imported config and will be replaced \
 by default settings.")
 
-#define TEXT_MAJOR_LOSS_OF_CONFIGURATION  tr( \
-" Major features can't be imported \
+#define TEXT_MAJOR_LOSS_OF_CONFIGURATION \
+    tr( \
+        " Major features can't be imported \
 by your version of the plugin. You should upgrade the plugin to import these settings.")
 
-#define TEXT_NOT_COMPATIBLE  tr( \
-" The imported settings are not compatible with this plugin and won't be imported!")
+#define TEXT_NOT_COMPATIBLE \
+    tr( \
+        " The imported settings are not compatible with this plugin and won't be imported!")
 
 using namespace Core;
 
 UAVConfigInfo::UAVConfigInfo(QObject *parent) :
-        QObject(parent),
-        m_version(VERSION_DEFAULT),
-        m_locked(false),
-        m_nameOfConfigurable("")
-{
-
-}
+    QObject(parent),
+    m_version(VERSION_DEFAULT),
+    m_locked(false),
+    m_nameOfConfigurable("")
+{}
 
 UAVConfigInfo::UAVConfigInfo(QSettings *qs, QObject *parent) :
     QObject(parent),
@@ -143,16 +145,14 @@ UAVConfigInfo::UAVConfigInfo(QSettings *qs, QObject *parent) :
 }
 
 UAVConfigInfo::UAVConfigInfo(UAVConfigVersion version, QString nameOfConfigurable, QObject *parent) :
-        QObject(parent),
-        m_version(version),
-        m_locked(false),
-        m_nameOfConfigurable(nameOfConfigurable)
-{
-
-}
+    QObject(parent),
+    m_version(version),
+    m_locked(false),
+    m_nameOfConfigurable(nameOfConfigurable)
+{}
 
 UAVConfigInfo::UAVConfigInfo(IUAVGadgetConfiguration *config, QObject *parent) :
-        QObject(parent)
+    QObject(parent)
 {
     m_locked = config->locked();
     m_nameOfConfigurable = config->classId() + "-" + config->name();
@@ -169,21 +169,21 @@ void UAVConfigInfo::save(QSettings *qs)
 void UAVConfigInfo::read(QSettings *qs)
 {
     qs->beginGroup("configInfo");
-    m_version = UAVConfigVersion( qs->value("version", VERSION_DEFAULT ).toString());
-    m_locked = qs->value("locked", false ).toBool();
+    m_version = UAVConfigVersion(qs->value("version", VERSION_DEFAULT).toString());
+    m_locked  = qs->value("locked", false).toBool();
     qs->endGroup();
 }
 
 bool UAVConfigInfo::askToAbort(int compat, QString message)
 {
     QMessageBox msgBox;
+
     msgBox.setInformativeText(tr("Do you want to continue the import?"));
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
 
     int result;
 
-    switch(compat){
-
+    switch (compat) {
     case FullyCompatible:
         return false;
 
@@ -215,30 +215,35 @@ bool UAVConfigInfo::askToAbort(int compat, QString message)
     default:
         msgBox.setText("INTERNAL ERROR: " + message + tr("Unknown compatibility level: " + compat));
     }
-    if ( result == QMessageBox::Ok )
+    if (result == QMessageBox::Ok) {
         return false;
-    else
+    } else {
         return true;
-
+    }
 }
 
 void UAVConfigInfo::notify(QString message)
 {
     QMessageBox msgBox;
+
     msgBox.setText(message);
     msgBox.exec();
 }
 
 int UAVConfigInfo::checkCompatibilityWith(UAVConfigVersion programVersion)
 {
-    if ( m_version.majorNr != programVersion.majorNr )
+    if (m_version.majorNr != programVersion.majorNr) {
         return NotCompatible;
-    if ( m_version.minorNr < programVersion.minorNr )
+    }
+    if (m_version.minorNr < programVersion.minorNr) {
         return MissingConfiguration;
-    if ( m_version.minorNr > programVersion.minorNr )
+    }
+    if (m_version.minorNr > programVersion.minorNr) {
         return MajorLossOfConfiguration;
-    if ( m_version.patchNr > programVersion.patchNr )
+    }
+    if (m_version.patchNr > programVersion.patchNr) {
         return MinorLossOfConfiguration;
+    }
 
     return FullyCompatible;
 }
@@ -246,31 +251,30 @@ int UAVConfigInfo::checkCompatibilityWith(UAVConfigVersion programVersion)
 bool UAVConfigInfo::standardVersionHandlingOK(UAVConfigVersion programVersion)
 {
     return !askToAbort(
-            checkCompatibilityWith(programVersion),
-            "("+m_nameOfConfigurable+")");
+        checkCompatibilityWith(programVersion),
+        "(" + m_nameOfConfigurable + ")");
 }
 
 UAVConfigVersion::UAVConfigVersion(int majorNum, int minorNum, int patchNum)
-    :majorNr(majorNum)
-    ,minorNr(minorNum)
-    ,patchNr(patchNum)
-{
-}
+    : majorNr(majorNum)
+    , minorNr(minorNum)
+    , patchNr(patchNum)
+{}
 
 UAVConfigVersion::UAVConfigVersion(QString versionString)
 {
     int begin;
     int end = 0;
 
-    begin = end;
-    end = versionString.indexOf(".", begin);
-    majorNr = versionString.mid(begin, end-begin).toInt();
+    begin   = end;
+    end     = versionString.indexOf(".", begin);
+    majorNr = versionString.mid(begin, end - begin).toInt();
 
-    begin = end+1;
-    end = versionString.indexOf(".", begin);
-    minorNr = versionString.mid(begin, end-begin).toInt();
+    begin   = end + 1;
+    end     = versionString.indexOf(".", begin);
+    minorNr = versionString.mid(begin, end - begin).toInt();
 
-    begin = end+1;
+    begin   = end + 1;
     patchNr = versionString.mid(begin).toInt();
 }
 

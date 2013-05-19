@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ConsolePlugin Console Plugin
  * @{
- * @brief The Console Gadget impliments a console view 
+ * @brief The Console Gadget impliments a console view
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,13 +32,12 @@
 
 ConsoleGadgetWidget::ConsoleGadgetWidget(QWidget *parent) : QTextEdit(parent)
 {
-    setMinimumSize(64,64);
+    setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setReadOnly(true);
 }
 
 ConsoleGadgetWidget::~ConsoleGadgetWidget()
 {
-   // Do nothing
+    // Do nothing
 }
-

@@ -31,61 +31,58 @@
 #include <QObject>
 #include <simulator.h>
 
-class XplaneSimulator: public Simulator
-{
-	Q_OBJECT
+class XplaneSimulator : public Simulator {
+    Q_OBJECT
 public:
-	XplaneSimulator(const SimulatorSettings& params);
-	~XplaneSimulator();
-        bool setupProcess();
+    XplaneSimulator(const SimulatorSettings & params);
+    ~XplaneSimulator();
+    bool setupProcess();
 
-	void setupUdpPorts(const QString& host, int inPort, int outPort);
+    void setupUdpPorts(const QString & host, int inPort, int outPort);
 
 private slots:
-	void transmitUpdate();
+    void transmitUpdate();
 
 private:
-    enum XplaneOutputData //***WARNING***: Elements in this enum are in a precise order, do
-    {                     // not change. Cf. http://www.nuclearprojects.com/xplane/info.shtml
-		FramRate,
-		Times,
-		SimStats,
-		Speed,
-		Gload,
-		AtmosphereWeather,
-		AtmosphereAircraft,
-		SystemPressures,
-		Joystick1,
-		Joystick2,
-		ArtStab,
-		FlightCon,
-		WingSweep,
-		Trim,
-		Brakes,
-		AngularMoments,
-		AngularAccelerations,
+    enum XplaneOutputData // ***WARNING***: Elements in this enum are in a precise order, do
+    { // not change. Cf. http://www.nuclearprojects.com/xplane/info.shtml
+        FramRate,
+        Times,
+        SimStats,
+        Speed,
+        Gload,
+        AtmosphereWeather,
+        AtmosphereAircraft,
+        SystemPressures,
+        Joystick1,
+        Joystick2,
+        ArtStab,
+        FlightCon,
+        WingSweep,
+        Trim,
+        Brakes,
+        AngularMoments,
+        AngularAccelerations,
         AngularVelocities,
         PitchRollHeading,
-		AoA,
+        AoA,
         LatitudeLongitudeAltitude,
-		LocVelDistTraveled
-	};
+        LocVelDistTraveled
+    };
 
-	void processUpdate(const QByteArray& data);
-
+    void processUpdate(const QByteArray & data);
 };
 
-class XplaneSimulatorCreator : public SimulatorCreator
-{
+class XplaneSimulatorCreator : public SimulatorCreator {
 public:
-	XplaneSimulatorCreator(const QString& classId, const QString& description)
-	:  SimulatorCreator (classId,description)
-	{}
+    XplaneSimulatorCreator(const QString & classId, const QString & description)
+        :  SimulatorCreator(classId, description)
+    {}
 
-	Simulator* createSimulator(const SimulatorSettings& params)
-	{
-		return new XplaneSimulator(params);
-	}
+    Simulator *createSimulator(const SimulatorSettings & params)
+    {
+        return new XplaneSimulator(params);
+    }
 };
 
 #endif // XPLANESIMULATOR_H

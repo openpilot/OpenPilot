@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -38,21 +38,18 @@ class QIcon;
 QT_END_NAMESPACE
 
 namespace Core {
-
-class CORE_EXPORT IMode : public IContext
-{
+class CORE_EXPORT IMode : public IContext {
     Q_OBJECT
 public:
     IMode(QObject *parent = 0) : IContext(parent) {}
     virtual ~IMode() {}
 
     virtual QString name() const = 0;
-    virtual QIcon icon() const = 0;
+    virtual QIcon icon() const   = 0;
     virtual int priority() const = 0;
     virtual void setPriority(int priority) = 0;
     virtual const char *uniqueModeName() const = 0;
 };
-
 } // namespace Core
 
 #endif // IMODE_H

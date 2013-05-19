@@ -30,10 +30,9 @@
 #include "systemhealthgadgetconfiguration.h"
 
 SystemHealthGadget::SystemHealthGadget(QString classId, SystemHealthGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent),
+    m_widget(widget)
+{}
 
 SystemHealthGadget::~SystemHealthGadget()
 {
@@ -41,13 +40,14 @@ SystemHealthGadget::~SystemHealthGadget()
 }
 
 /*
-  This is called when a configuration is loaded, and updates the plugin's settings.
-  Careful: the plugin is already drawn before the loadConfiguration method is called the
-  first time, so you have to be careful not to assume all the plugin values are initialized
-  the first time you use them
+   This is called when a configuration is loaded, and updates the plugin's settings.
+   Careful: the plugin is already drawn before the loadConfiguration method is called the
+   first time, so you have to be careful not to assume all the plugin values are initialized
+   the first time you use them
  */
-void SystemHealthGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void SystemHealthGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
-    SystemHealthGadgetConfiguration *m = qobject_cast<SystemHealthGadgetConfiguration*>(config);
+    SystemHealthGadgetConfiguration *m = qobject_cast<SystemHealthGadgetConfiguration *>(config);
+
     m_widget->setSystemFile(m->getSystemFile()); // Triggers widget repaint
 }

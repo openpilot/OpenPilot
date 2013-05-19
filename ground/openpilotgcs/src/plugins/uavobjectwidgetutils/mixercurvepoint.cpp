@@ -43,14 +43,14 @@ MixerNode::MixerNode(MixerCurveWidget *graphWidget)
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);
     setZValue(-1);
-    vertical = false;
-    drawNode = true;
-    drawText = true;
+    vertical          = false;
+    drawNode          = true;
+    drawText          = true;
 
-    positiveColor = "#609FF2";  //blueish?
-    neutralColor = "#14CE24";  //greenish?
-    negativeColor = "#EF5F5F";  //redish?
-    disabledColor = "#dddddd";
+    positiveColor     = "#609FF2";  // blueish?
+    neutralColor      = "#14CE24";  // greenish?
+    negativeColor     = "#EF5F5F";  // redish?
+    disabledColor     = "#dddddd";
     disabledTextColor = "#aaaaaa";
 }
 
@@ -74,6 +74,7 @@ QRectF MixerNode::boundingRect() const
 QPainterPath MixerNode::shape() const
 {
     QPainterPath path;
+
     path.addEllipse(boundingRect());
     return path;
 }
@@ -81,6 +82,7 @@ QPainterPath MixerNode::shape() const
 void MixerNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
     QString text = QString().sprintf("%.2f", value());
+
     painter->setFont(graph->font());
     if (drawNode) {
         QRadialGradient gradient(-3, -3, 10);
@@ -88,11 +90,9 @@ void MixerNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
         QColor color;
         if (value() < 0) {
             color = negativeColor;
-        }
-        else if (value() == 0) {
+        } else if (value() == 0) {
             color = neutralColor;
-        }
-        else {
+        } else {
             color = positiveColor;
         }
 
@@ -117,24 +117,27 @@ void MixerNode::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     }
 
     if (drawText) {
-        if(graph->isEnabled()) {
+        if (graph->isEnabled()) {
             painter->setPen(QPen(drawNode ? Qt::white : Qt::black, 0));
         } else {
             painter->setPen(QPen(disabledTextColor));
         }
 
-        painter->drawText( (value() < 0) ? -10 : -8, 3, text);
+        painter->drawText((value() < 0) ? -10 : -8, 3, text);
     }
 }
 
-void MixerNode::verticalMove(bool flag){
+void MixerNode::verticalMove(bool flag)
+{
     vertical = flag;
 }
 
-double MixerNode::value() {
-    double h = graph->sceneRect().height();
+double MixerNode::value()
+{
+    double h     = graph->sceneRect().height();
     double ratio = (h - pos().y()) / h;
-    return ((graph->getMax() - graph->getMin()) * ratio ) + graph->getMin();
+
+    return ((graph->getMax() - graph->getMin()) * ratio) + graph->getMin();
 }
 
 
@@ -144,26 +147,30 @@ QVariant MixerNode::itemChange(GraphicsItemChange change, const QVariant &val)
     double h = graph->sceneRect().height();
 
     switch (change) {
-    case ItemPositionChange: {
-
-        if (!vertical)
-                break;
+    case ItemPositionChange:
+    {
+        if (!vertical) {
+            break;
+        }
 
         // Force node to move vertically
         newPos.setX(pos().x());
 
         // Stay inside graph
-        if (newPos.y() < 0)
+        if (newPos.y() < 0) {
             newPos.setY(0);
-        //qDebug() << h << " - " << newPos.y();
-        if (newPos.y() > h)
+        }
+        // qDebug() << h << " - " << newPos.y();
+        if (newPos.y() > h) {
             newPos.setY(h);
+        }
 
-          return newPos;
+        return newPos;
     }
-    case ItemPositionHasChanged: {
-        foreach (Edge *edge, edgeList)
-            edge->adjust();
+    case ItemPositionHasChanged:
+    {
+        foreach(Edge * edge, edgeList)
+        edge->adjust();
 
         update();
 
@@ -172,7 +179,8 @@ QVariant MixerNode::itemChange(GraphicsItemChange change, const QVariant &val)
     }
     default:
         break;
-    };
+    }
+    ;
 
     return QGraphicsItem::itemChange(change, val);
 }

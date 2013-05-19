@@ -31,8 +31,7 @@
 #include "ui_outputchannelform.h"
 #include "configtaskwidget.h"
 
-class OutputChannelForm : public ConfigTaskWidget
-{
+class OutputChannelForm : public ConfigTaskWidget {
     Q_OBJECT
 
 public:

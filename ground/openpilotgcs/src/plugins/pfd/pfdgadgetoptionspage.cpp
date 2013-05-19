@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin Primary Flight Display Plugin
  * @{
- * @brief The Primary Flight Display Gadget 
+ * @brief The Primary Flight Display Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -38,22 +38,20 @@
 #include <QStringList>
 
 PFDGadgetOptionsPage::PFDGadgetOptionsPage(PFDGadgetConfiguration *config, QObject *parent) :
-        IOptionsPage(parent),
-        m_config(config)
-{
-}
+    IOptionsPage(parent),
+    m_config(config)
+{}
 
-//creates options page widget (uses the UI file)
+// creates options page widget (uses the UI file)
 QWidget *PFDGadgetOptionsPage::createPage(QWidget *parent)
 {
     Q_UNUSED(parent);
 
     options_page = new Ui::PFDGadgetOptionsPage();
-    //main widget
+    // main widget
     QWidget *optionsPageWidget = new QWidget;
-    //main layout
+    // main layout
     options_page->setupUi(optionsPageWidget);
-
 
 
     // Restore the contents from the settings:
@@ -83,7 +81,5 @@ void PFDGadgetOptionsPage::apply()
 }
 
 
-
 void PFDGadgetOptionsPage::finish()
-{
-}
+{}

@@ -40,14 +40,13 @@ class IUAVGadgetConfiguration;
 class SystemHealthGadgetConfiguration;
 
 namespace Ui {
-    class SystemHealthGadgetOptionsPage;
+class SystemHealthGadgetOptionsPage;
 }
 
 using namespace Core;
 
-class SystemHealthGadgetOptionsPage : public IOptionsPage
-{
-Q_OBJECT
+class SystemHealthGadgetOptionsPage : public IOptionsPage {
+    Q_OBJECT
 public:
     explicit SystemHealthGadgetOptionsPage(SystemHealthGadgetConfiguration *config, QObject *parent = 0);
 

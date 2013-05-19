@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -37,9 +37,7 @@ class QWidget;
 QT_END_NAMESPACE
 
 namespace Core {
-
-class CORE_EXPORT IContext : public QObject
-{
+class CORE_EXPORT IContext : public QObject {
     Q_OBJECT
 public:
     IContext(QObject *parent = 0) : QObject(parent) {}
@@ -47,28 +45,34 @@ public:
 
     virtual QList<int> context() const = 0;
     virtual QWidget *widget() = 0;
-    virtual QString contextHelpId() const { return QString(); }
+    virtual QString contextHelpId() const
+    {
+        return QString();
+    }
 };
 
-class BaseContext : public Core::IContext
-{
+class BaseContext : public Core::IContext {
 public:
     BaseContext(QWidget *widget, const QList<int> &context, QObject *parent = 0)
         : Core::IContext(parent),
         m_widget(widget),
         m_context(context)
+    {}
+
+    QList<int> context() const
     {
+        return m_context;
     }
 
-    QList<int> context() const { return m_context; }
-
-    QWidget *widget() { return m_widget; }
+    QWidget *widget()
+    {
+        return m_widget;
+    }
 
 private:
     QWidget *m_widget;
     QList<int> m_context;
 };
-
 } // namespace Core
 
-#endif //ICONTEXT_H
+#endif // ICONTEXT_H

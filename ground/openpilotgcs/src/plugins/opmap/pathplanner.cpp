@@ -33,7 +33,7 @@
 
 pathPlanner::pathPlanner(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::pathPlannerUI),wid(NULL),myModel(NULL)
+    ui(new Ui::pathPlannerUI), wid(NULL), myModel(NULL)
 {
     ui->setupUi(this);
 }
@@ -41,31 +41,31 @@ pathPlanner::pathPlanner(QWidget *parent) :
 pathPlanner::~pathPlanner()
 {
     delete ui;
-    if(wid)
+    if (wid) {
         delete wid;
+    }
 }
-void pathPlanner::setModel(flightDataModel *model,QItemSelectionModel *selection)
+void pathPlanner::setModel(flightDataModel *model, QItemSelectionModel *selection)
 {
-    myModel=model;
+    myModel = model;
     ui->tableView->setModel(model);
     ui->tableView->setSelectionModel(selection);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setItemDelegate(new MapDataDelegate(this));
-    connect(model,SIGNAL(rowsInserted(const QModelIndex&,int,int)),this,SLOT(rowsInserted(const QModelIndex&,int,int)));
-    wid=new opmap_edit_waypoint_dialog(NULL,model,selection);
+    connect(model, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(rowsInserted(const QModelIndex &, int, int)));
+    wid = new opmap_edit_waypoint_dialog(NULL, model, selection);
     ui->tableView->resizeColumnsToContents();
 }
 
-void pathPlanner::rowsInserted ( const QModelIndex & parent, int start, int end )
+void pathPlanner::rowsInserted(const QModelIndex & parent, int start, int end)
 {
     Q_UNUSED(parent);
-    for(int x=start;x<end+1;x++)
-    {
-        QModelIndex index=ui->tableView->model()->index(x,flightDataModel::MODE);
+    for (int x = start; x < end + 1; x++) {
+        QModelIndex index = ui->tableView->model()->index(x, flightDataModel::MODE);
         ui->tableView->openPersistentEditor(index);
-        index=ui->tableView->model()->index(x,flightDataModel::CONDITION);
+        index = ui->tableView->model()->index(x, flightDataModel::CONDITION);
         ui->tableView->openPersistentEditor(index);
-        index=ui->tableView->model()->index(x,flightDataModel::COMMAND);
+        index = ui->tableView->model()->index(x, flightDataModel::COMMAND);
         ui->tableView->openPersistentEditor(index);
         ui->tableView->size().setHeight(10);
     }
@@ -88,24 +88,27 @@ void pathPlanner::on_tbInsert_clicked()
 
 void pathPlanner::on_tbReadFromFile_clicked()
 {
-    if(!myModel)
+    if (!myModel) {
         return;
+    }
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"));
     myModel->readFromFile(fileName);
 }
 
 void pathPlanner::on_tbSaveToFile_clicked()
 {
-    if(!myModel)
+    if (!myModel) {
         return;
+    }
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"));
     myModel->writeToFile(fileName);
 }
 
 void pathPlanner::on_tbDetails_clicked()
 {
-    if(wid)
-       wid->show();
+    if (wid) {
+        wid->show();
+    }
 }
 
 void pathPlanner::on_tbSendToUAV_clicked()

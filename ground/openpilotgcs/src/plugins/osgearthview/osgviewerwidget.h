@@ -1,12 +1,12 @@
 /********************************************************************************
-* @file       osgviewerwidget.h
-* @author     The OpenPilot Team Copyright (C) 2012.
-* @addtogroup GCSPlugins GCS Plugins
-* @{
-* @addtogroup OsgEarthview Plugin
-* @{
-* @brief Osg Earth view of UAV
-*****************************************************************************/
+ * @file       osgviewerwidget.h
+ * @author     The OpenPilot Team Copyright (C) 2012.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup OsgEarthview Plugin
+ * @{
+ * @brief Osg Earth view of UAV
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -82,8 +82,7 @@ using namespace osgEarth::Annotation;
 
 #include <iostream>
 
-class OsgViewerWidget : public QWidget, public osgViewer::CompositeViewer
-{
+class OsgViewerWidget : public QWidget, public osgViewer::CompositeViewer {
     Q_OBJECT
 public:
     explicit OsgViewerWidget(QWidget *parent = 0);
@@ -96,20 +95,20 @@ protected:
     void paintEvent(QPaintEvent *event);
 
     /* Create a osgQt::GraphicsWindowQt to add to the widget */
-    QWidget* createViewWidget( osg::Camera* camera, osg::Node* scene );
+    QWidget *createViewWidget(osg::Camera *camera, osg::Node *scene);
 
     /* Create an osg::Camera which sets up the OSG view */
-    osg::Camera* createCamera( int x, int y, int w, int h, const std::string& name, bool windowDecoration );
+    osg::Camera *createCamera(int x, int y, int w, int h, const std::string & name, bool windowDecoration);
 
     /* Get the model to render */
-    osg::Node* createAirplane();
+    osg::Node *createAirplane();
 
 private: /* Private variables */
     QTimer _timer;
-    EarthManipulator* manip;
-    osgEarth::Util::ObjectLocatorNode* uavPos;
-    osg::MatrixTransform* uavAttitudeAndScale;
-    osgEarth::MapNode* mapNode;
+    EarthManipulator *manip;
+    osgEarth::Util::ObjectLocatorNode *uavPos;
+    osg::MatrixTransform *uavAttitudeAndScale;
+    osgEarth::MapNode *mapNode;
 };
 
 

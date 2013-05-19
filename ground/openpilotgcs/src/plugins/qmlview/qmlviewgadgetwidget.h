@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin QML Viewer Plugin
  * @{
- * @brief The QML Viewer Gadget 
+ * @brief The QML Viewer Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -40,21 +40,23 @@
 
 class UAVObject;
 
-class QmlViewGadgetWidget : public QDeclarativeView
-{
+class QmlViewGadgetWidget : public QDeclarativeView {
     Q_OBJECT
 
 public:
     QmlViewGadgetWidget(QWidget *parent = 0);
-   ~QmlViewGadgetWidget();
-   void setQmlFile(QString fn);
+    ~QmlViewGadgetWidget();
+    void setQmlFile(QString fn);
 
-   void enableOpenGL(bool flag);
-   void enableSmoothUpdates(bool flag) { beSmooth = flag; }
+    void enableOpenGL(bool flag);
+    void enableSmoothUpdates(bool flag)
+    {
+        beSmooth = flag;
+    }
 
 private:
-   // Flag to enable better rendering of fonts in OpenGL
-   bool beSmooth;
-   QString m_fn;
+    // Flag to enable better rendering of fonts in OpenGL
+    bool beSmooth;
+    QString m_fn;
 };
 #endif /* QmlViewGADGETWIDGET_H_ */

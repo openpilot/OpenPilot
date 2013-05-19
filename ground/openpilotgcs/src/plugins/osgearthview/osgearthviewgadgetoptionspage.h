@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin Primary Flight Display Plugin
  * @{
- * @brief The Primary Flight Display Gadget 
+ * @brief The Primary Flight Display Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -40,14 +40,13 @@ class IUAVGadgetConfiguration;
 class OsgEarthviewGadgetConfiguration;
 
 namespace Ui {
-    class OsgEarthviewGadgetOptionsPage;
+class OsgEarthviewGadgetOptionsPage;
 }
 
 using namespace Core;
 
-class OsgEarthviewGadgetOptionsPage : public IOptionsPage
-{
-Q_OBJECT
+class OsgEarthviewGadgetOptionsPage : public IOptionsPage {
+    Q_OBJECT
 public:
     explicit OsgEarthviewGadgetOptionsPage(OsgEarthviewGadgetConfiguration *config, QObject *parent = 0);
 

@@ -7,7 +7,7 @@
  * @{
  * @addtogroup EmptyGadgetPlugin Empty Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -30,18 +30,17 @@
 #include <coreplugin/iuavgadget.h>
 
 EmptyGadgetFactory::EmptyGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("EmptyGadget"),
-                          tr("Choose Gadget..."),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("EmptyGadget"),
+                      tr("Choose Gadget..."),
+                      parent)
+{}
 
 EmptyGadgetFactory::~EmptyGadgetFactory()
+{}
+
+IUAVGadget *EmptyGadgetFactory::createGadget(QWidget *parent)
 {
+    EmptyGadgetWidget *gadgetWidget = new EmptyGadgetWidget(parent);
 
-}
-
-IUAVGadget* EmptyGadgetFactory::createGadget(QWidget *parent) {
-    EmptyGadgetWidget* gadgetWidget = new EmptyGadgetWidget(parent);
     return new EmptyGadget(QString("EmptyGadget"), gadgetWidget, parent);
 }

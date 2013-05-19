@@ -41,6 +41,8 @@ QDebug qNotifyDebug();
 QNoDebug qNotifyDebug();
 #endif
 
-#define qNotifyDebug_if(test) if(test) qNotifyDebug()
+#define qNotifyDebug_if(test) \
+    if (test) \
+        qNotifyDebug()
 
 #endif // NOTIFYLOGGING_H

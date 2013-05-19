@@ -1,10 +1,10 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup AirspeedModule Airspeed Module
  * @brief Calculate airspeed as a function of the difference between sequential GPS velocity and attitude measurements
- * @{ 
+ * @{
  *
  * @file       baro_airspeed_etasv3.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.

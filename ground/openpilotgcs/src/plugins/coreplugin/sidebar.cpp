@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -48,17 +48,19 @@ SideBarItem::~SideBarItem()
     delete m_widget;
 }
 
-SideBar::SideBar(QList<SideBarItem*> itemList,
-                 QList<SideBarItem*> defaultVisible)
+SideBar::SideBar(QList<SideBarItem *> itemList,
+                 QList<SideBarItem *> defaultVisible)
 {
     setOrientation(Qt::Vertical);
-    foreach (SideBarItem *item, itemList) {
+    foreach(SideBarItem * item, itemList) {
         const QString title = item->widget()->windowTitle();
+
         m_itemMap.insert(title, item);
     }
-    foreach (SideBarItem *item, defaultVisible) {
-        if (!itemList.contains(item))
+    foreach(SideBarItem * item, defaultVisible) {
+        if (!itemList.contains(item)) {
             continue;
+        }
         m_defaultVisible.append(item->widget()->windowTitle());
     }
 
@@ -77,7 +79,7 @@ QStringList SideBar::availableItems() const
 
 void SideBar::makeItemAvailable(SideBarItem *item)
 {
-    QMap<QString, SideBarItem*>::const_iterator it = m_itemMap.constBegin();
+    QMap<QString, SideBarItem *>::const_iterator it = m_itemMap.constBegin();
     while (it != m_itemMap.constEnd()) {
         if (it.value() == item) {
             m_availableItems.append(it.key());
@@ -100,6 +102,7 @@ SideBarItem *SideBar::item(const QString &title)
 SideBarWidget *SideBar::insertSideBarWidget(int position, const QString &title)
 {
     SideBarWidget *item = new SideBarWidget(this, title);
+
     connect(item, SIGNAL(splitMe()), this, SLOT(splitSubWidget()));
     connect(item, SIGNAL(closeMe()), this, SLOT(closeSubWidget()));
     connect(item, SIGNAL(currentWidgetChanged()), this, SLOT(updateWidgets()));
@@ -119,8 +122,9 @@ void SideBar::removeSideBarWidget(SideBarWidget *widget)
 
 void SideBar::splitSubWidget()
 {
-    SideBarWidget *original = qobject_cast<SideBarWidget*>(sender());
+    SideBarWidget *original = qobject_cast<SideBarWidget *>(sender());
     int pos = indexOf(original) + 1;
+
     insertSideBarWidget(pos);
     updateWidgets();
 }
@@ -128,9 +132,10 @@ void SideBar::splitSubWidget()
 void SideBar::closeSubWidget()
 {
     if (m_widgets.count() != 1) {
-        SideBarWidget *widget = qobject_cast<SideBarWidget*>(sender());
-        if (!widget)
+        SideBarWidget *widget = qobject_cast<SideBarWidget *>(sender());
+        if (!widget) {
             return;
+        }
         removeSideBarWidget(widget);
         updateWidgets();
     }
@@ -138,44 +143,48 @@ void SideBar::closeSubWidget()
 
 void SideBar::updateWidgets()
 {
-    foreach (SideBarWidget *i, m_widgets)
-        i->updateAvailableItems();
+    foreach(SideBarWidget * i, m_widgets)
+    i->updateAvailableItems();
 }
 
 void SideBar::saveSettings(QSettings *settings)
 {
     QStringList views;
-    for (int i = 0; i < m_widgets.count(); ++i)
+
+    for (int i = 0; i < m_widgets.count(); ++i) {
         views.append(m_widgets.at(i)->currentItemTitle());
+    }
     settings->setValue("HelpSideBar/Views", views);
-    settings->setValue("HelpSideBar/Visible", true);//isVisible());
+    settings->setValue("HelpSideBar/Visible", true); // isVisible());
     settings->setValue("HelpSideBar/VerticalPosition", saveState());
     settings->setValue("HelpSideBar/Width", width());
 }
 
 void SideBar::readSettings(QSettings *settings)
 {
-    foreach (SideBarWidget *widget, m_widgets)
-        removeSideBarWidget(widget);
+    foreach(SideBarWidget * widget, m_widgets)
+    removeSideBarWidget(widget);
 
     if (settings->contains("HelpSideBar/Views")) {
         QStringList views = settings->value("HelpSideBar/Views").toStringList();
         if (views.count()) {
-            foreach (const QString &title, views)
-                insertSideBarWidget(m_widgets.count(), title);
+            foreach(const QString &title, views)
+            insertSideBarWidget(m_widgets.count(), title);
         } else {
             insertSideBarWidget(0);
         }
     } else {
-        foreach (const QString &title, m_defaultVisible)
-            insertSideBarWidget(m_widgets.count(), title);
+        foreach(const QString &title, m_defaultVisible)
+        insertSideBarWidget(m_widgets.count(), title);
     }
 
-    if (settings->contains("HelpSideBar/Visible"))
+    if (settings->contains("HelpSideBar/Visible")) {
         setVisible(settings->value("HelpSideBar/Visible").toBool());
+    }
 
-    if (settings->contains("HelpSideBar/VerticalPosition"))
+    if (settings->contains("HelpSideBar/VerticalPosition")) {
         restoreState(settings->value("HelpSideBar/VerticalPosition").toByteArray());
+    }
 
     if (settings->contains("HelpSideBar/Width")) {
         QSize s = size();
@@ -186,7 +195,7 @@ void SideBar::readSettings(QSettings *settings)
 
 void SideBar::activateItem(SideBarItem *item)
 {
-    QMap<QString, SideBarItem*>::const_iterator it = m_itemMap.constBegin();
+    QMap<QString, SideBarItem *>::const_iterator it = m_itemMap.constBegin();
     QString title;
     while (it != m_itemMap.constEnd()) {
         if (it.value() == item) {
@@ -196,8 +205,9 @@ void SideBar::activateItem(SideBarItem *item)
         ++it;
     }
 
-    if (title.isEmpty())
+    if (title.isEmpty()) {
         return;
+    }
 
     for (int i = 0; i < m_widgets.count(); ++i) {
         if (m_widgets.at(i)->currentItemTitle() == title) {
@@ -212,16 +222,15 @@ void SideBar::activateItem(SideBarItem *item)
     item->widget()->setFocus();
 }
 
-void SideBar::setShortcutMap(const QMap<QString, Core::Command*> &shortcutMap)
+void SideBar::setShortcutMap(const QMap<QString, Core::Command *> &shortcutMap)
 {
     m_shortcutMap = shortcutMap;
 }
 
-QMap<QString, Core::Command*> SideBar::shortcutMap() const
+QMap<QString, Core::Command *> SideBar::shortcutMap() const
 {
     return m_shortcutMap;
 }
-
 
 
 SideBarWidget::SideBarWidget(SideBar *sideBar, const QString &title)
@@ -231,7 +240,7 @@ SideBarWidget::SideBarWidget(SideBar *sideBar, const QString &title)
     m_comboBox = new ComboBox(this);
     m_comboBox->setMinimumContentsLength(15);
 
-    m_toolbar = new QToolBar(this);
+    m_toolbar  = new QToolBar(this);
     m_toolbar->setContentsMargins(0, 0, 0, 0);
     m_toolbar->addWidget(m_comboBox);
 
@@ -263,8 +272,9 @@ SideBarWidget::SideBarWidget(SideBar *sideBar, const QString &title)
     if (lst.count()) {
         m_comboBox->addItems(lst);
         m_comboBox->setCurrentIndex(0);
-        if (t.isEmpty())
+        if (t.isEmpty()) {
             t = m_comboBox->currentText();
+        }
     }
     setCurrentItem(t);
 
@@ -273,8 +283,7 @@ SideBarWidget::SideBarWidget(SideBar *sideBar, const QString &title)
 }
 
 SideBarWidget::~SideBarWidget()
-{
-}
+{}
 
 QString SideBarWidget::currentItemTitle() const
 {
@@ -285,38 +294,43 @@ void SideBarWidget::setCurrentItem(const QString &title)
 {
     if (!title.isEmpty()) {
         int idx = m_comboBox->findText(title);
-        if (idx < 0)
+        if (idx < 0) {
             idx = 0;
+        }
         bool blocked = m_comboBox->blockSignals(true);
         m_comboBox->setCurrentIndex(idx);
         m_comboBox->blockSignals(blocked);
     }
 
     SideBarItem *item = m_sideBar->item(title);
-    if (!item)
+    if (!item) {
         return;
+    }
     removeCurrentItem();
     m_currentItem = item;
     layout()->addWidget(m_currentItem->widget());
 
     // Add buttons and remember their actions for later removal
-    foreach (QToolButton *b, m_currentItem->createToolBarWidgets())
-        m_addedToolBarActions.append(m_toolbar->insertWidget(m_splitAction, b));
+    foreach(QToolButton * b, m_currentItem->createToolBarWidgets())
+    m_addedToolBarActions.append(m_toolbar->insertWidget(m_splitAction, b));
 }
 
 void SideBarWidget::updateAvailableItems()
 {
-    bool blocked = m_comboBox->blockSignals(true);
-    QString current = m_comboBox->currentText();
+    bool blocked     = m_comboBox->blockSignals(true);
+    QString current  = m_comboBox->currentText();
+
     m_comboBox->clear();
     QStringList itms = m_sideBar->availableItems();
-    if (!current.isEmpty() && !itms.contains(current))
+    if (!current.isEmpty() && !itms.contains(current)) {
         itms.append(current);
+    }
     qSort(itms);
     m_comboBox->addItems(itms);
     int idx = m_comboBox->findText(current);
-    if (idx < 0)
+    if (idx < 0) {
         idx = 0;
+    }
     m_comboBox->setCurrentIndex(idx);
     m_splitButton->setEnabled(itms.count() > 1);
     m_comboBox->blockSignals(blocked);
@@ -324,8 +338,9 @@ void SideBarWidget::updateAvailableItems()
 
 void SideBarWidget::removeCurrentItem()
 {
-    if (!m_currentItem)
+    if (!m_currentItem) {
         return;
+    }
 
     QWidget *w = m_currentItem->widget();
     layout()->removeWidget(w);
@@ -347,19 +362,19 @@ void SideBarWidget::setCurrentIndex(int)
 
 Core::Command *SideBarWidget::command(const QString &title) const
 {
-    const QMap<QString, Core::Command*> shortcutMap = m_sideBar->shortcutMap();
-    QMap<QString, Core::Command*>::const_iterator r = shortcutMap.find(title);
-    if (r != shortcutMap.end())
+    const QMap<QString, Core::Command *> shortcutMap = m_sideBar->shortcutMap();
+
+    QMap<QString, Core::Command *>::const_iterator r = shortcutMap.find(title);
+    if (r != shortcutMap.end()) {
         return r.value();
+    }
     return 0;
 }
 
 
-
 ComboBox::ComboBox(SideBarWidget *sideBarWidget)
     : m_sideBarWidget(sideBarWidget)
-{
-}
+{}
 
 bool ComboBox::event(QEvent *e)
 {

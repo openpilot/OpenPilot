@@ -1,13 +1,13 @@
 /********************************************************************************
-*
-* @file       osgearthviewgadget.h
-* @author     The OpenPilot Team Copyright (C) 2012.
-* @addtogroup GCSPlugins GCS Plugins
-* @{
-* @addtogroup OsgEarthview Plugin
-* @{
-* @brief Osg Earth view of UAV
-*****************************************************************************/
+ *
+ * @file       osgearthviewgadget.h
+ * @author     The OpenPilot Team Copyright (C) 2012.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup OsgEarthview Plugin
+ * @{
+ * @brief Osg Earth view of UAV
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,15 +37,17 @@ class OsgEarthviewWidget;
 
 using namespace Core;
 
-class OsgEarthviewGadget : public Core::IUAVGadget
-{
+class OsgEarthviewGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     OsgEarthviewGadget(QString classId, OsgEarthviewWidget *widget, QWidget *parent = 0);
     ~OsgEarthviewGadget();
 
-    QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 
 private:
     OsgEarthviewWidget *m_widget;

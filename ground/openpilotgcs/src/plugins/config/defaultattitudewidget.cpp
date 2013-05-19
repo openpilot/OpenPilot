@@ -31,8 +31,8 @@
 #include <QDebug>
 
 DefaultAttitudeWidget::DefaultAttitudeWidget(QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui_defaultattitude)
+    QWidget(parent),
+    ui(new Ui_defaultattitude)
 {
     ui->setupUi(this);
 }
@@ -41,4 +41,3 @@ DefaultAttitudeWidget::~DefaultAttitudeWidget()
 {
     delete ui;
 }
-

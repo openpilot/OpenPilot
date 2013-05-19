@@ -35,11 +35,8 @@
 #include "uavgadgetview.h"
 
 namespace Core {
-
 namespace Internal {
-
-class SplitterOrView  : public QWidget
-{
+class SplitterOrView : public QWidget {
     Q_OBJECT
 public:
     SplitterOrView(UAVGadgetManager *uavGadgetManager, Core::IUAVGadget *uavGadget = 0);
@@ -48,20 +45,41 @@ public:
     void split(Qt::Orientation orientation);
     void unsplit();
 
-    inline bool isView() const { return m_view != 0; }
+    inline bool isView() const
+    {
+        return m_view != 0;
+    }
 
-    inline bool isSplitter() const { return m_splitter != 0; }
-    inline Core::IUAVGadget *gadget() const { return m_view ? m_view->gadget() : 0; }
-    inline bool hasGadget(Core::IUAVGadget *uavGadget) const { return m_view && m_view->hasGadget(uavGadget); }
-    inline bool hasGadget() const { return m_view && (m_view->gadget() != 0); }
-    inline UAVGadgetView *view() const { return m_view; }
-    inline QSplitter *splitter() const { return m_splitter; }
-    QList<Core::IUAVGadget*> gadgets();
+    inline bool isSplitter() const
+    {
+        return m_splitter != 0;
+    }
+    inline Core::IUAVGadget *gadget() const
+    {
+        return m_view ? m_view->gadget() : 0;
+    }
+    inline bool hasGadget(Core::IUAVGadget *uavGadget) const
+    {
+        return m_view && m_view->hasGadget(uavGadget);
+    }
+    inline bool hasGadget() const
+    {
+        return m_view && (m_view->gadget() != 0);
+    }
+    inline UAVGadgetView *view() const
+    {
+        return m_view;
+    }
+    inline QSplitter *splitter() const
+    {
+        return m_splitter;
+    }
+    QList<Core::IUAVGadget *> gadgets();
     QSplitter *takeSplitter();
     UAVGadgetView *takeView();
 
-    void saveState(QSettings*) const;
-    void restoreState(QSettings*);
+    void saveState(QSettings *) const;
+    void restoreState(QSettings *);
 
     SplitterOrView *findView(Core::IUAVGadget *uavGadget);
     SplitterOrView *findView(UAVGadgetView *view);
@@ -71,18 +89,21 @@ public:
 
     SplitterOrView *findNextView(SplitterOrView *view);
 
-    QSize sizeHint() const { return minimumSizeHint(); }
+    QSize sizeHint() const
+    {
+        return minimumSizeHint();
+    }
     QSize minimumSizeHint() const;
 
     void unsplitAll(IUAVGadget *currentGadget);
 
 protected:
-//    void paintEvent(QPaintEvent *);
+// void paintEvent(QPaintEvent *);
     void mousePressEvent(QMouseEvent *e);
 
 private slots:
     // Called when the user moves the splitter, and updates our m_sizes.
-    void onSplitterMoved( int pos, int index );
+    void onSplitterMoved(int pos, int index);
 
 private:
     void unsplitAll_helper();
@@ -103,8 +124,6 @@ private:
     // The splitter sizes. We keep our own copy of these, since after loading they can't realiably be retrieved.
     QList<int> m_sizes;
 };
-
-
 }
 }
 #endif // SPLITTERORVIEW_H

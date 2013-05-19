@@ -1,10 +1,10 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup AirspeedModule Airspeed Module
  * @brief Communicate with EagleTree Airspeed Sensor and update @ref BaroAirspeed "BaroAirspeed UAV Object"
- * @{ 
+ * @{
  *
  * @file       airspeed.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.

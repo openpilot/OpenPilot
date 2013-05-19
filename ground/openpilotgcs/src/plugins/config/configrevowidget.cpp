@@ -837,35 +837,35 @@ void ConfigRevoWidget::computeScaleBias()
 
 void ConfigRevoWidget::storeAndClearBoardRotation()
 {
-    if(!isBoardRotationStored) {
+    if (!isBoardRotationStored) {
         // Store current board rotation
         isBoardRotationStored = true;
         AttitudeSettings *attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
         Q_ASSERT(attitudeSettings);
-        AttitudeSettings::DataFields data = attitudeSettings->getData();
-        storedBoardRotation[AttitudeSettings::BOARDROTATION_YAW] = data.BoardRotation[AttitudeSettings::BOARDROTATION_YAW];
-        storedBoardRotation[AttitudeSettings::BOARDROTATION_ROLL] = data.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL];
+        AttitudeSettings::DataFields data  = attitudeSettings->getData();
+        storedBoardRotation[AttitudeSettings::BOARDROTATION_YAW]   = data.BoardRotation[AttitudeSettings::BOARDROTATION_YAW];
+        storedBoardRotation[AttitudeSettings::BOARDROTATION_ROLL]  = data.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL];
         storedBoardRotation[AttitudeSettings::BOARDROTATION_PITCH] = data.BoardRotation[AttitudeSettings::BOARDROTATION_PITCH];
 
         // Set board rotation to no rotation
-        data.BoardRotation[AttitudeSettings::BOARDROTATION_YAW] = 0;
-        data.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL] = 0;
-        data.BoardRotation[AttitudeSettings::BOARDROTATION_PITCH] = 0;
+        data.BoardRotation[AttitudeSettings::BOARDROTATION_YAW]    = 0;
+        data.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL]   = 0;
+        data.BoardRotation[AttitudeSettings::BOARDROTATION_PITCH]  = 0;
         attitudeSettings->setData(data);
     }
 }
 
 void ConfigRevoWidget::recallBoardRotation()
 {
-    if(isBoardRotationStored) {
+    if (isBoardRotationStored) {
         // Recall current board rotation
         isBoardRotationStored = false;
 
         AttitudeSettings *attitudeSettings = AttitudeSettings::GetInstance(getObjectManager());
         Q_ASSERT(attitudeSettings);
-        AttitudeSettings::DataFields data = attitudeSettings->getData();
-        data.BoardRotation[AttitudeSettings::BOARDROTATION_YAW] = storedBoardRotation[AttitudeSettings::BOARDROTATION_YAW];
-        data.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL] = storedBoardRotation[AttitudeSettings::BOARDROTATION_ROLL];
+        AttitudeSettings::DataFields data  = attitudeSettings->getData();
+        data.BoardRotation[AttitudeSettings::BOARDROTATION_YAW]   = storedBoardRotation[AttitudeSettings::BOARDROTATION_YAW];
+        data.BoardRotation[AttitudeSettings::BOARDROTATION_ROLL]  = storedBoardRotation[AttitudeSettings::BOARDROTATION_ROLL];
         data.BoardRotation[AttitudeSettings::BOARDROTATION_PITCH] = storedBoardRotation[AttitudeSettings::BOARDROTATION_PITCH];
         attitudeSettings->setData(data);
     }
@@ -1016,7 +1016,6 @@ void ConfigRevoWidget::doGetNoiseSample(UAVObject *obj)
     if (mag_accum_x.length() >= NOISE_SAMPLES &&
         gyro_accum_x.length() >= NOISE_SAMPLES &&
         accel_accum_x.length() >= NOISE_SAMPLES) {
-
         // No need to for more updates
         Magnetometer *mags = Magnetometer::GetInstance(getObjectManager());
         Accels *accels     = Accels::GetInstance(getObjectManager());

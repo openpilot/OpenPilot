@@ -7,7 +7,7 @@
  * @{
  * @addtogroup EmptyGadgetPlugin Empty Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -37,8 +37,7 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class EmptyGadgetFactory : public IUAVGadgetFactory
-{
+class EmptyGadgetFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
     EmptyGadgetFactory(QObject *parent = 0);

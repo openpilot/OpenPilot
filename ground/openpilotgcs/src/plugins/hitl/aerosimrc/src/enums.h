@@ -30,21 +30,20 @@
 
 // Custom Menu Item masks
 enum MenuMasks {
-    MenuEnable      = (1 << 0),
-    MenuTx          = (1 << 1),
-    MenuRx          = (1 << 2),
-    MenuScreen      = (1 << 3),
-    MenuNextWpt     = (1 << 4),
-    MenuCmdReset    = (1 << 5),
-    MenuLedBlue     = (1 << 6),
-    MenuLedGreen    = (1 << 7),
-    MenuFMode1      = (1 << 8),
-    MenuFMode2      = (1 << 9),
-    MenuFMode3      = (1 << 10)
+    MenuEnable   = (1 << 0),
+    MenuTx       = (1 << 1),
+    MenuRx       = (1 << 2),
+    MenuScreen   = (1 << 3),
+    MenuNextWpt  = (1 << 4),
+    MenuCmdReset = (1 << 5),
+    MenuLedBlue  = (1 << 6),
+    MenuLedGreen = (1 << 7),
+    MenuFMode1   = (1 << 8),
+    MenuFMode2   = (1 << 9),
+    MenuFMode3   = (1 << 10)
 };
 
-enum EOverrideFlags
-{
+enum EOverrideFlags {
     OVR_POS             = (1 << 0),
     OVR_VEL             = (1 << 1),
     OVR_ANG_VEL         = (1 << 2),
@@ -53,7 +52,7 @@ enum EOverrideFlags
     OVR_ENGINE_RPM      = (1 << 5),  // Override RPM of all Engines or Motors
     OVR_BAT_VOLT        = (1 << 6),  // Override motor Battery Voltage
     OVR_BAT_AMP         = (1 << 7),  // Override motor Battery current
-    OVR_BAT_AH_CONSUMED = (1 << 8),  // Override motor Battery AmpsHour consumed
+    OVR_BAT_AH_CONSUMED = (1 << 8), // Override motor Battery AmpsHour consumed
     OVR_FUEL_CONSUMED   = (1 << 9)   // Override Fuel consumed (gas & jet engines)
 };
 

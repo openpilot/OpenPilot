@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup TelemetryModule Telemetry Module
  * @brief Main telemetry module
  * Starts three tasks (RX, TX, and priority TX) that watch event queues
  * and handle all the telemetry of the UAVobjects
- * @{ 
+ * @{
  *
  * @file       telemetry.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -40,15 +40,15 @@
 #include "taskinfo.h"
 
 // Private constants
-#define MAX_QUEUE_SIZE   TELEM_QUEUE_SIZE
-#define STACK_SIZE_BYTES PIOS_TELEM_STACK_SIZE
-#define TASK_PRIORITY_RX (tskIDLE_PRIORITY + 2)
-#define TASK_PRIORITY_TX (tskIDLE_PRIORITY + 2)
-#define TASK_PRIORITY_TXPRI (tskIDLE_PRIORITY + 2)
-#define REQ_TIMEOUT_MS 250
-#define MAX_RETRIES 2
+#define MAX_QUEUE_SIZE         TELEM_QUEUE_SIZE
+#define STACK_SIZE_BYTES       PIOS_TELEM_STACK_SIZE
+#define TASK_PRIORITY_RX       (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY_TX       (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY_TXPRI    (tskIDLE_PRIORITY + 2)
+#define REQ_TIMEOUT_MS         250
+#define MAX_RETRIES            2
 #define STATS_UPDATE_PERIOD_MS 4000
-#define CONNECTION_TIMEOUT_MS 8000
+#define CONNECTION_TIMEOUT_MS  8000
 
 // Private types
 
@@ -74,11 +74,11 @@ static UAVTalkConnection uavTalkCon;
 // Private functions
 static void telemetryTxTask(void *parameters);
 static void telemetryRxTask(void *parameters);
-static int32_t transmitData(uint8_t * data, int32_t length);
+static int32_t transmitData(uint8_t *data, int32_t length);
 static void registerObject(UAVObjHandle obj);
 static void updateObject(UAVObjHandle obj, int32_t eventType);
 static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs);
-static void processObjEvent(UAVObjEvent * ev);
+static void processObjEvent(UAVObjEvent *ev);
 static void updateTelemetryStats();
 static void gcsTelemetryStatsUpdated();
 static void updateSettings();
@@ -91,24 +91,24 @@ static uint32_t getComPort();
  */
 int32_t TelemetryStart(void)
 {
-	// Process all registered objects and connect queue for updates
-	UAVObjIterate(&registerObject);
-    
-	// Listen to objects of interest
-	GCSTelemetryStatsConnectQueue(priorityQueue);
-    
-	// Start telemetry tasks
-	xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
-	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTX, telemetryTxTaskHandle);
-	xTaskCreate(telemetryRxTask, (signed char *)"TelRx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
-	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
+    // Process all registered objects and connect queue for updates
+    UAVObjIterate(&registerObject);
+
+    // Listen to objects of interest
+    GCSTelemetryStatsConnectQueue(priorityQueue);
+
+    // Start telemetry tasks
+    xTaskCreate(telemetryTxTask, (signed char *)"TelTx", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY_TX, &telemetryTxTaskHandle);
+    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTX, telemetryTxTaskHandle);
+    xTaskCreate(telemetryRxTask, (signed char *)"TelRx", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
+    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
 
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
-	xTaskCreate(telemetryTxPriTask, (signed char *)"TelPriTx", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY_TXPRI, &telemetryTxPriTaskHandle);
-	PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTXPRI, telemetryTxPriTaskHandle);
+    xTaskCreate(telemetryTxPriTask, (signed char *)"TelPriTx", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY_TXPRI, &telemetryTxPriTaskHandle);
+    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTXPRI, telemetryTxPriTaskHandle);
 #endif
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -118,34 +118,34 @@ int32_t TelemetryStart(void)
  */
 int32_t TelemetryInitialize(void)
 {
-	FlightTelemetryStatsInitialize();
-	GCSTelemetryStatsInitialize();
+    FlightTelemetryStatsInitialize();
+    GCSTelemetryStatsInitialize();
 
-	// Initialize vars
-	timeOfLastObjectUpdate = 0;
+    // Initialize vars
+    timeOfLastObjectUpdate = 0;
 
-	// Create object queues
-	queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+    // Create object queues
+    queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
-	priorityQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
+    priorityQueue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 #endif
 
-	// Update telemetry settings
-	telemetryPort = PIOS_COM_TELEM_RF;
-	HwSettingsInitialize();
-	updateSettings();
-    
-	// Initialise UAVTalk
-	uavTalkCon = UAVTalkInitialize(&transmitData);
-    
-	// Create periodic event that will be used to update the telemetry stats
-	txErrors = 0;
-	txRetries = 0;
-	UAVObjEvent ev;
-	memset(&ev, 0, sizeof(UAVObjEvent));
-	EventPeriodicQueueCreate(&ev, priorityQueue, STATS_UPDATE_PERIOD_MS);
+    // Update telemetry settings
+    telemetryPort = PIOS_COM_TELEM_RF;
+    HwSettingsInitialize();
+    updateSettings();
 
-	return 0;
+    // Initialise UAVTalk
+    uavTalkCon = UAVTalkInitialize(&transmitData);
+
+    // Create periodic event that will be used to update the telemetry stats
+    txErrors   = 0;
+    txRetries  = 0;
+    UAVObjEvent ev;
+    memset(&ev, 0, sizeof(UAVObjEvent));
+    EventPeriodicQueueCreate(&ev, priorityQueue, STATS_UPDATE_PERIOD_MS);
+
+    return 0;
 }
 
 MODULE_INITCALL(TelemetryInitialize, TelemetryStart)
@@ -157,31 +157,31 @@ MODULE_INITCALL(TelemetryInitialize, TelemetryStart)
  */
 static void registerObject(UAVObjHandle obj)
 {
-	if (UAVObjIsMetaobject(obj)) {
-		/* Only connect change notifications for meta objects.  No periodic updates */
-		UAVObjConnectQueue(obj, priorityQueue, EV_MASK_ALL_UPDATES);
-		return;
-	} else {
-		UAVObjMetadata metadata;
-		UAVObjUpdateMode updateMode;
-		UAVObjGetMetadata(obj, &metadata);
-		updateMode = UAVObjGetTelemetryUpdateMode(&metadata);
+    if (UAVObjIsMetaobject(obj)) {
+        /* Only connect change notifications for meta objects.  No periodic updates */
+        UAVObjConnectQueue(obj, priorityQueue, EV_MASK_ALL_UPDATES);
+        return;
+    } else {
+        UAVObjMetadata metadata;
+        UAVObjUpdateMode updateMode;
+        UAVObjGetMetadata(obj, &metadata);
+        updateMode = UAVObjGetTelemetryUpdateMode(&metadata);
 
-		/* Only create a periodic event for objects that are periodic */
-		if ((updateMode == UPDATEMODE_PERIODIC) ||
-			(updateMode == UPDATEMODE_THROTTLED)) {
-			// Setup object for periodic updates
-			UAVObjEvent ev = {
-				.obj    = obj,
-				.instId = UAVOBJ_ALL_INSTANCES,
-				.event  = EV_UPDATED_PERIODIC,
-			};
-			EventPeriodicQueueCreate(&ev, queue, 0);
-		}
+        /* Only create a periodic event for objects that are periodic */
+        if ((updateMode == UPDATEMODE_PERIODIC) ||
+            (updateMode == UPDATEMODE_THROTTLED)) {
+            // Setup object for periodic updates
+            UAVObjEvent ev = {
+                .obj    = obj,
+                .instId = UAVOBJ_ALL_INSTANCES,
+                .event  = EV_UPDATED_PERIODIC,
+            };
+            EventPeriodicQueueCreate(&ev, queue, 0);
+        }
 
-		// Setup object for telemetry updates
-		updateObject(obj, EV_NONE);
-	}
+        // Setup object for telemetry updates
+        updateObject(obj, EV_NONE);
+    }
 }
 
 /**
@@ -190,118 +190,119 @@ static void registerObject(UAVObjHandle obj)
  */
 static void updateObject(UAVObjHandle obj, int32_t eventType)
 {
-	UAVObjMetadata metadata;
-	UAVObjUpdateMode updateMode;
-	int32_t eventMask;
+    UAVObjMetadata metadata;
+    UAVObjUpdateMode updateMode;
+    int32_t eventMask;
 
-	if (UAVObjIsMetaobject(obj)) {
-		/* This function updates the periodic updates for the object.
-		 * Meta Objects cannot have periodic updates.
-		 */
-		PIOS_Assert(false);
-		return;
-	}
+    if (UAVObjIsMetaobject(obj)) {
+        /* This function updates the periodic updates for the object.
+         * Meta Objects cannot have periodic updates.
+         */
+        PIOS_Assert(false);
+        return;
+    }
 
-	// Get metadata
-	UAVObjGetMetadata(obj, &metadata);
-	updateMode = UAVObjGetTelemetryUpdateMode(&metadata);
+    // Get metadata
+    UAVObjGetMetadata(obj, &metadata);
+    updateMode = UAVObjGetTelemetryUpdateMode(&metadata);
 
-	// Setup object depending on update mode
-	switch (updateMode) {
-	case UPDATEMODE_PERIODIC:
-		// Set update period
-		setUpdatePeriod(obj, metadata.telemetryUpdatePeriod);
-		// Connect queue
-		eventMask = EV_UPDATED_PERIODIC | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-		UAVObjConnectQueue(obj, priorityQueue, eventMask);
-		break;
-	case UPDATEMODE_ONCHANGE:
-		// Set update period
-		setUpdatePeriod(obj, 0);
-		// Connect queue
-		eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-		UAVObjConnectQueue(obj, priorityQueue, eventMask);
-		break;
-	case UPDATEMODE_THROTTLED:
-		if ((eventType == EV_UPDATED_PERIODIC) || (eventType == EV_NONE)) {
-			// If we received a periodic update, we can change back to update on change
-			eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-			// Set update period on initialization and metadata change
-			if (eventType == EV_NONE)
-				setUpdatePeriod(obj, metadata.telemetryUpdatePeriod);
-		} else {
-			// Otherwise, we just received an object update, so switch to periodic for the timeout period to prevent more updates
-			eventMask = EV_UPDATED_PERIODIC | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-		}
-		UAVObjConnectQueue(obj, priorityQueue, eventMask);
-		break;
-	case UPDATEMODE_MANUAL:
-		// Set update period
-		setUpdatePeriod(obj, 0);
-		// Connect queue
-		eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
-		UAVObjConnectQueue(obj, priorityQueue, eventMask);
-		break;
-	}
+    // Setup object depending on update mode
+    switch (updateMode) {
+    case UPDATEMODE_PERIODIC:
+        // Set update period
+        setUpdatePeriod(obj, metadata.telemetryUpdatePeriod);
+        // Connect queue
+        eventMask = EV_UPDATED_PERIODIC | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+        UAVObjConnectQueue(obj, priorityQueue, eventMask);
+        break;
+    case UPDATEMODE_ONCHANGE:
+        // Set update period
+        setUpdatePeriod(obj, 0);
+        // Connect queue
+        eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+        UAVObjConnectQueue(obj, priorityQueue, eventMask);
+        break;
+    case UPDATEMODE_THROTTLED:
+        if ((eventType == EV_UPDATED_PERIODIC) || (eventType == EV_NONE)) {
+            // If we received a periodic update, we can change back to update on change
+            eventMask = EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+            // Set update period on initialization and metadata change
+            if (eventType == EV_NONE) {
+                setUpdatePeriod(obj, metadata.telemetryUpdatePeriod);
+            }
+        } else {
+            // Otherwise, we just received an object update, so switch to periodic for the timeout period to prevent more updates
+            eventMask = EV_UPDATED_PERIODIC | EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+        }
+        UAVObjConnectQueue(obj, priorityQueue, eventMask);
+        break;
+    case UPDATEMODE_MANUAL:
+        // Set update period
+        setUpdatePeriod(obj, 0);
+        // Connect queue
+        eventMask = EV_UPDATED_MANUAL | EV_UPDATE_REQ;
+        UAVObjConnectQueue(obj, priorityQueue, eventMask);
+        break;
+    }
 }
 
 /**
  * Processes queue events
  */
-static void processObjEvent(UAVObjEvent * ev)
+static void processObjEvent(UAVObjEvent *ev)
 {
-	UAVObjMetadata metadata;
-	UAVObjUpdateMode updateMode;
-	FlightTelemetryStatsData flightStats;
-	int32_t retries;
-	int32_t success;
+    UAVObjMetadata metadata;
+    UAVObjUpdateMode updateMode;
+    FlightTelemetryStatsData flightStats;
+    int32_t retries;
+    int32_t success;
 
-	if (ev->obj == 0) {
-		updateTelemetryStats();
-	} else if (ev->obj == GCSTelemetryStatsHandle()) {
-		gcsTelemetryStatsUpdated();
-	} else {
-		FlightTelemetryStatsGet(&flightStats);
-		// Get object metadata
-		UAVObjGetMetadata(ev->obj, &metadata);
-		updateMode = UAVObjGetTelemetryUpdateMode(&metadata);
+    if (ev->obj == 0) {
+        updateTelemetryStats();
+    } else if (ev->obj == GCSTelemetryStatsHandle()) {
+        gcsTelemetryStatsUpdated();
+    } else {
+        FlightTelemetryStatsGet(&flightStats);
+        // Get object metadata
+        UAVObjGetMetadata(ev->obj, &metadata);
+        updateMode = UAVObjGetTelemetryUpdateMode(&metadata);
 
-		// Act on event
-		retries = 0;
-		success = -1;
-		if (ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL || ((ev->event == EV_UPDATED_PERIODIC) && (updateMode != UPDATEMODE_THROTTLED))) {
-			// Send update to GCS (with retries)
-			while (retries < MAX_RETRIES && success == -1) {
-				success = UAVTalkSendObject(uavTalkCon, ev->obj, ev->instId, UAVObjGetTelemetryAcked(&metadata), REQ_TIMEOUT_MS);	// call blocks until ack is received or timeout
-				++retries;
-			}
-			// Update stats
-			txRetries += (retries - 1);
-			if (success == -1) {
-				++txErrors;
-			}
-		} else if (ev->event == EV_UPDATE_REQ) {
-			// Request object update from GCS (with retries)
-			while (retries < MAX_RETRIES && success == -1) {
-				success = UAVTalkSendObjectRequest(uavTalkCon, ev->obj, ev->instId, REQ_TIMEOUT_MS);	// call blocks until update is received or timeout
-				++retries;
-			}
-			// Update stats
-			txRetries += (retries - 1);
-			if (success == -1) {
-				++txErrors;
-			}
-		}
-		// If this is a metaobject then make necessary telemetry updates
-		if (UAVObjIsMetaobject(ev->obj)) {
-			updateObject(UAVObjGetLinkedObj(ev->obj), EV_NONE);	// linked object will be the actual object the metadata are for
-		} else {
-			if (updateMode == UPDATEMODE_THROTTLED) {
-				// If this is UPDATEMODE_THROTTLED, the event mask changes on every event.
-				updateObject(ev->obj, ev->event);
-			}
-		}
-	}
+        // Act on event
+        retries    = 0;
+        success    = -1;
+        if (ev->event == EV_UPDATED || ev->event == EV_UPDATED_MANUAL || ((ev->event == EV_UPDATED_PERIODIC) && (updateMode != UPDATEMODE_THROTTLED))) {
+            // Send update to GCS (with retries)
+            while (retries < MAX_RETRIES && success == -1) {
+                success = UAVTalkSendObject(uavTalkCon, ev->obj, ev->instId, UAVObjGetTelemetryAcked(&metadata), REQ_TIMEOUT_MS); // call blocks until ack is received or timeout
+                ++retries;
+            }
+            // Update stats
+            txRetries += (retries - 1);
+            if (success == -1) {
+                ++txErrors;
+            }
+        } else if (ev->event == EV_UPDATE_REQ) {
+            // Request object update from GCS (with retries)
+            while (retries < MAX_RETRIES && success == -1) {
+                success = UAVTalkSendObjectRequest(uavTalkCon, ev->obj, ev->instId, REQ_TIMEOUT_MS); // call blocks until update is received or timeout
+                ++retries;
+            }
+            // Update stats
+            txRetries += (retries - 1);
+            if (success == -1) {
+                ++txErrors;
+            }
+        }
+        // If this is a metaobject then make necessary telemetry updates
+        if (UAVObjIsMetaobject(ev->obj)) {
+            updateObject(UAVObjGetLinkedObj(ev->obj), EV_NONE); // linked object will be the actual object the metadata are for
+        } else {
+            if (updateMode == UPDATEMODE_THROTTLED) {
+                // If this is UPDATEMODE_THROTTLED, the event mask changes on every event.
+                updateObject(ev->obj, ev->event);
+            }
+        }
+    }
 }
 
 /**
@@ -309,16 +310,16 @@ static void processObjEvent(UAVObjEvent * ev)
  */
 static void telemetryTxTask(__attribute__((unused)) void *parameters)
 {
-	UAVObjEvent ev;
+    UAVObjEvent ev;
 
-	// Loop forever
-	while (1) {
-		// Wait for queue message
-		if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
-			// Process event
-			processObjEvent(&ev);
-		}
-	}
+    // Loop forever
+    while (1) {
+        // Wait for queue message
+        if (xQueueReceive(queue, &ev, portMAX_DELAY) == pdTRUE) {
+            // Process event
+            processObjEvent(&ev);
+        }
+    }
 }
 
 /**
@@ -327,16 +328,16 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
 static void telemetryTxPriTask(__attribute__((unused)) void *parameters)
 {
-	UAVObjEvent ev;
+    UAVObjEvent ev;
 
-	// Loop forever
-	while (1) {
-		// Wait for queue message
-		if (xQueueReceive(priorityQueue, &ev, portMAX_DELAY) == pdTRUE) {
-			// Process event
-			processObjEvent(&ev);
-		}
-	}
+    // Loop forever
+    while (1) {
+        // Wait for queue message
+        if (xQueueReceive(priorityQueue, &ev, portMAX_DELAY) == pdTRUE) {
+            // Process event
+            processObjEvent(&ev);
+        }
+    }
 }
 #endif
 
@@ -345,26 +346,25 @@ static void telemetryTxPriTask(__attribute__((unused)) void *parameters)
  */
 static void telemetryRxTask(__attribute__((unused)) void *parameters)
 {
+    // Task loop
+    while (1) {
+        uint32_t inputPort = getComPort();
 
-	// Task loop
-	while (1) {
-		uint32_t inputPort = getComPort();
+        if (inputPort) {
+            // Block until data are available
+            uint8_t serial_data[1];
+            uint16_t bytes_to_process;
 
-		if (inputPort) {
-			// Block until data are available
-			uint8_t serial_data[1];
-			uint16_t bytes_to_process;
-
-			bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), 500);
-			if (bytes_to_process > 0) {
-				for (uint8_t i = 0; i < bytes_to_process; i++) {
-					UAVTalkProcessInputStream(uavTalkCon,serial_data[i]);
-				}
-			}
-		} else {
-			vTaskDelay(5);
-		}
-	}
+            bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, serial_data, sizeof(serial_data), 500);
+            if (bytes_to_process > 0) {
+                for (uint8_t i = 0; i < bytes_to_process; i++) {
+                    UAVTalkProcessInputStream(uavTalkCon, serial_data[i]);
+                }
+            }
+        } else {
+            vTaskDelay(5);
+        }
+    }
 }
 
 /**
@@ -374,14 +374,15 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
  * \return -1 on failure
  * \return number of bytes transmitted on success
  */
-static int32_t transmitData(uint8_t * data, int32_t length)
+static int32_t transmitData(uint8_t *data, int32_t length)
 {
-	uint32_t outputPort = getComPort();
+    uint32_t outputPort = getComPort();
 
-	if (outputPort)
-		return PIOS_COM_SendBuffer(outputPort, data, length);
+    if (outputPort) {
+        return PIOS_COM_SendBuffer(outputPort, data, length);
+    }
 
-	return -1;
+    return -1;
 }
 
 /**
@@ -393,13 +394,13 @@ static int32_t transmitData(uint8_t * data, int32_t length)
  */
 static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
 {
-	UAVObjEvent ev;
+    UAVObjEvent ev;
 
-	// Add object for periodic updates
-	ev.obj = obj;
-	ev.instId = UAVOBJ_ALL_INSTANCES;
-	ev.event = EV_UPDATED_PERIODIC;
-	return EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
+    // Add object for periodic updates
+    ev.obj    = obj;
+    ev.instId = UAVOBJ_ALL_INSTANCES;
+    ev.event  = EV_UPDATED_PERIODIC;
+    return EventPeriodicQueueUpdate(&ev, queue, updatePeriodMs);
 }
 
 /**
@@ -409,13 +410,14 @@ static int32_t setUpdatePeriod(UAVObjHandle obj, int32_t updatePeriodMs)
  */
 static void gcsTelemetryStatsUpdated()
 {
-	FlightTelemetryStatsData flightStats;
-	GCSTelemetryStatsData gcsStats;
-	FlightTelemetryStatsGet(&flightStats);
-	GCSTelemetryStatsGet(&gcsStats);
-	if (flightStats.Status != FLIGHTTELEMETRYSTATS_STATUS_CONNECTED || gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED) {
-		updateTelemetryStats();
-	}
+    FlightTelemetryStatsData flightStats;
+    GCSTelemetryStatsData gcsStats;
+
+    FlightTelemetryStatsGet(&flightStats);
+    GCSTelemetryStatsGet(&gcsStats);
+    if (flightStats.Status != FLIGHTTELEMETRYSTATS_STATUS_CONNECTED || gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED) {
+        updateTelemetryStats();
+    }
 }
 
 /**
@@ -423,89 +425,89 @@ static void gcsTelemetryStatsUpdated()
  */
 static void updateTelemetryStats()
 {
-	UAVTalkStats utalkStats;
-	FlightTelemetryStatsData flightStats;
-	GCSTelemetryStatsData gcsStats;
-	uint8_t forceUpdate;
-	uint8_t connectionTimeout;
-	uint32_t timeNow;
+    UAVTalkStats utalkStats;
+    FlightTelemetryStatsData flightStats;
+    GCSTelemetryStatsData gcsStats;
+    uint8_t forceUpdate;
+    uint8_t connectionTimeout;
+    uint32_t timeNow;
 
-	// Get stats
-	UAVTalkGetStats(uavTalkCon, &utalkStats);
-	UAVTalkResetStats(uavTalkCon);
+    // Get stats
+    UAVTalkGetStats(uavTalkCon, &utalkStats);
+    UAVTalkResetStats(uavTalkCon);
 
-	// Get object data
-	FlightTelemetryStatsGet(&flightStats);
-	GCSTelemetryStatsGet(&gcsStats);
+    // Get object data
+    FlightTelemetryStatsGet(&flightStats);
+    GCSTelemetryStatsGet(&gcsStats);
 
-	// Update stats object
-	if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
-		flightStats.RxDataRate = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
-		flightStats.TxDataRate = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
-		flightStats.RxFailures += utalkStats.rxErrors;
-		flightStats.TxFailures += txErrors;
-		flightStats.TxRetries += txRetries;
-		txErrors = 0;
-		txRetries = 0;
-	} else {
-		flightStats.RxDataRate = 0;
-		flightStats.TxDataRate = 0;
-		flightStats.RxFailures = 0;
-		flightStats.TxFailures = 0;
-		flightStats.TxRetries = 0;
-		txErrors = 0;
-		txRetries = 0;
-	}
+    // Update stats object
+    if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
+        flightStats.RxDataRate  = (float)utalkStats.rxBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+        flightStats.TxDataRate  = (float)utalkStats.txBytes / ((float)STATS_UPDATE_PERIOD_MS / 1000.0f);
+        flightStats.RxFailures += utalkStats.rxErrors;
+        flightStats.TxFailures += txErrors;
+        flightStats.TxRetries  += txRetries;
+        txErrors = 0;
+        txRetries = 0;
+    } else {
+        flightStats.RxDataRate = 0;
+        flightStats.TxDataRate = 0;
+        flightStats.RxFailures = 0;
+        flightStats.TxFailures = 0;
+        flightStats.TxRetries  = 0;
+        txErrors = 0;
+        txRetries = 0;
+    }
 
-	// Check for connection timeout
-	timeNow = xTaskGetTickCount() * portTICK_RATE_MS;
-	if (utalkStats.rxObjects > 0) {
-		timeOfLastObjectUpdate = timeNow;
-	}
-	if ((timeNow - timeOfLastObjectUpdate) > CONNECTION_TIMEOUT_MS) {
-		connectionTimeout = 1;
-	} else {
-		connectionTimeout = 0;
-	}
+    // Check for connection timeout
+    timeNow = xTaskGetTickCount() * portTICK_RATE_MS;
+    if (utalkStats.rxObjects > 0) {
+        timeOfLastObjectUpdate = timeNow;
+    }
+    if ((timeNow - timeOfLastObjectUpdate) > CONNECTION_TIMEOUT_MS) {
+        connectionTimeout = 1;
+    } else {
+        connectionTimeout = 0;
+    }
 
-	// Update connection state
-	forceUpdate = 1;
-	if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED) {
-		// Wait for connection request
-		if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_HANDSHAKEREQ) {
-			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK;
-		}
-	} else if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK) {
-		// Wait for connection
-		if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_CONNECTED) {
-			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_CONNECTED;
-		} else if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_DISCONNECTED) {
-			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
-		}
-	} else if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
-		if (gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED || connectionTimeout) {
-			flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
-		} else {
-			forceUpdate = 0;
-		}
-	} else {
-		flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
-	}
+    // Update connection state
+    forceUpdate = 1;
+    if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED) {
+        // Wait for connection request
+        if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_HANDSHAKEREQ) {
+            flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK;
+        }
+    } else if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_HANDSHAKEACK) {
+        // Wait for connection
+        if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_CONNECTED) {
+            flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_CONNECTED;
+        } else if (gcsStats.Status == GCSTELEMETRYSTATS_STATUS_DISCONNECTED) {
+            flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
+        }
+    } else if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
+        if (gcsStats.Status != GCSTELEMETRYSTATS_STATUS_CONNECTED || connectionTimeout) {
+            flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
+        } else {
+            forceUpdate = 0;
+        }
+    } else {
+        flightStats.Status = FLIGHTTELEMETRYSTATS_STATUS_DISCONNECTED;
+    }
 
-	// Update the telemetry alarm
-	if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
-		AlarmsClear(SYSTEMALARMS_ALARM_TELEMETRY);
-	} else {
-		AlarmsSet(SYSTEMALARMS_ALARM_TELEMETRY, SYSTEMALARMS_ALARM_ERROR);
-	}
+    // Update the telemetry alarm
+    if (flightStats.Status == FLIGHTTELEMETRYSTATS_STATUS_CONNECTED) {
+        AlarmsClear(SYSTEMALARMS_ALARM_TELEMETRY);
+    } else {
+        AlarmsSet(SYSTEMALARMS_ALARM_TELEMETRY, SYSTEMALARMS_ALARM_ERROR);
+    }
 
-	// Update object
-	FlightTelemetryStatsSet(&flightStats);
+    // Update object
+    FlightTelemetryStatsSet(&flightStats);
 
-	// Force telemetry update if not connected
-	if (forceUpdate) {
-		FlightTelemetryStatsUpdated();
-	}
+    // Force telemetry update if not connected
+    if (forceUpdate) {
+        FlightTelemetryStatsUpdated();
+    }
 }
 
 /**
@@ -517,55 +519,56 @@ static void updateTelemetryStats()
  */
 static void updateSettings()
 {
-	
-	if (telemetryPort) {
-		// Retrieve settings
-		uint8_t speed;
-		HwSettingsTelemetrySpeedGet(&speed);
+    if (telemetryPort) {
+        // Retrieve settings
+        uint8_t speed;
+        HwSettingsTelemetrySpeedGet(&speed);
 
-		// Set port speed
-		switch (speed) {
-		case HWSETTINGS_TELEMETRYSPEED_2400:
-			PIOS_COM_ChangeBaud(telemetryPort, 2400);
-			break;
-		case HWSETTINGS_TELEMETRYSPEED_4800:
-			PIOS_COM_ChangeBaud(telemetryPort, 4800);
-			break;
-		case HWSETTINGS_TELEMETRYSPEED_9600:
-			PIOS_COM_ChangeBaud(telemetryPort, 9600);
-			break;
-		case HWSETTINGS_TELEMETRYSPEED_19200:
-			PIOS_COM_ChangeBaud(telemetryPort, 19200);
-			break;
-		case HWSETTINGS_TELEMETRYSPEED_38400:
-			PIOS_COM_ChangeBaud(telemetryPort, 38400);
-			break;
-		case HWSETTINGS_TELEMETRYSPEED_57600:
-			PIOS_COM_ChangeBaud(telemetryPort, 57600);
-			break;
-		case HWSETTINGS_TELEMETRYSPEED_115200:
-			PIOS_COM_ChangeBaud(telemetryPort, 115200);
-			break;
-		}
-	}
+        // Set port speed
+        switch (speed) {
+        case HWSETTINGS_TELEMETRYSPEED_2400:
+            PIOS_COM_ChangeBaud(telemetryPort, 2400);
+            break;
+        case HWSETTINGS_TELEMETRYSPEED_4800:
+            PIOS_COM_ChangeBaud(telemetryPort, 4800);
+            break;
+        case HWSETTINGS_TELEMETRYSPEED_9600:
+            PIOS_COM_ChangeBaud(telemetryPort, 9600);
+            break;
+        case HWSETTINGS_TELEMETRYSPEED_19200:
+            PIOS_COM_ChangeBaud(telemetryPort, 19200);
+            break;
+        case HWSETTINGS_TELEMETRYSPEED_38400:
+            PIOS_COM_ChangeBaud(telemetryPort, 38400);
+            break;
+        case HWSETTINGS_TELEMETRYSPEED_57600:
+            PIOS_COM_ChangeBaud(telemetryPort, 57600);
+            break;
+        case HWSETTINGS_TELEMETRYSPEED_115200:
+            PIOS_COM_ChangeBaud(telemetryPort, 115200);
+            break;
+        }
+    }
 }
 
 /**
- * Determine input/output com port as highest priority available 
+ * Determine input/output com port as highest priority available
  */
-static uint32_t getComPort() {
+static uint32_t getComPort()
+{
 #if defined(PIOS_INCLUDE_USB)
-	if ( PIOS_COM_Available(PIOS_COM_TELEM_USB) )
-		return PIOS_COM_TELEM_USB;
-	else
+    if (PIOS_COM_Available(PIOS_COM_TELEM_USB)) {
+        return PIOS_COM_TELEM_USB;
+    } else
 #endif /* PIOS_INCLUDE_USB */
-		if ( PIOS_COM_Available(telemetryPort) )
-			return telemetryPort;
-		else
-			return 0;
+    if (PIOS_COM_Available(telemetryPort)) {
+        return telemetryPort;
+    } else {
+        return 0;
+    }
 }
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

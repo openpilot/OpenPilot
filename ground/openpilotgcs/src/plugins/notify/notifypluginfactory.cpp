@@ -25,27 +25,25 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "notifypluginfactory.h"
-//#include "notifypluginwidget.h"
+// #include "notifypluginwidget.h"
 #include "notifyplugin.h"
 #include "notifypluginconfiguration.h"
 #include "notifypluginoptionspage.h"
 #include <coreplugin/iuavgadget.h>
 
 NotifyPluginFactory::NotifyPluginFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("Notify Plugin"),
-                          tr("Notify Plugin"),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("Notify Plugin"),
+                      tr("Notify Plugin"),
+                      parent)
+{}
 
 NotifyPluginFactory::~NotifyPluginFactory()
-{
-}
+{}
 
-Core::IUAVGadget* NotifyPluginFactory::createGadget(QWidget *parent)
+Core::IUAVGadget *NotifyPluginFactory::createGadget(QWidget *parent)
 {
-  //  NotifyPluginWidget* gadgetWidget = new NotifyPluginWidget(parent);
-    return (Core::IUAVGadget*)0;//new NotifyPlugin(QString("NotifyPlugin"), gadgetWidget, parent);
+    // NotifyPluginWidget* gadgetWidget = new NotifyPluginWidget(parent);
+    return (Core::IUAVGadget *)0; // new NotifyPlugin(QString("NotifyPlugin"), gadgetWidget, parent);
 }
 
 IUAVGadgetConfiguration *NotifyPluginFactory::createConfiguration(const QByteArray &state)
@@ -55,7 +53,5 @@ IUAVGadgetConfiguration *NotifyPluginFactory::createConfiguration(const QByteArr
 
 IOptionsPage *NotifyPluginFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new NotifyPluginOptionsPage(qobject_cast<NotifyPluginConfiguration*>(config));
+    return new NotifyPluginOptionsPage(qobject_cast<NotifyPluginConfiguration *>(config));
 }
-
-

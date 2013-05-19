@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -43,18 +43,16 @@ class QFileInfo;
 QT_END_NAMESPACE
 
 namespace Core {
-
 class MimeTypeData;
 class MimeDatabasePrivate;
 
 namespace Internal {
-    class BaseMimeTypeParser;
-    class FileMatchContext;
+class BaseMimeTypeParser;
+class FileMatchContext;
 }
 
 /* Magic (file contents) matcher interface. */
-class CORE_EXPORT IMagicMatcher
-{
+class CORE_EXPORT IMagicMatcher {
     Q_DISABLE_COPY(IMagicMatcher)
 protected:
     IMagicMatcher() {}
@@ -69,8 +67,7 @@ public:
 /* Utility class: A standard Magic match rule based on contents. Provides
  * static factory methods for creation (currently only for "string". This can
  * be extended to handle "little16"/"big16", etc.). */
-class CORE_EXPORT MagicRule
-{
+class CORE_EXPORT MagicRule {
     Q_DISABLE_COPY(MagicRule)
 public:
     explicit MagicRule(const QByteArray &pattern, int startPos, int endPos);
@@ -87,8 +84,7 @@ private:
 
 /* Utility class: A Magic matcher that checks a number of rules based on
  * operator "or". It is used for rules parsed from XML files. */
-class CORE_EXPORT MagicRuleMatcher : public IMagicMatcher
-{
+class CORE_EXPORT MagicRuleMatcher : public IMagicMatcher {
     Q_DISABLE_COPY(MagicRuleMatcher)
 public:
     typedef  QSharedPointer<MagicRule> MagicRuleSharedPointer;
@@ -115,15 +111,14 @@ private:
  * Extensions:
  * - List of suffixes and preferred suffix (derived from glob patterns).
  */
-class CORE_EXPORT MimeType
-{
+class CORE_EXPORT MimeType {
 public:
     /* Return value of a glob match, which is higher than magic */
     enum { GlobMatchPriority = 101 };
 
     MimeType();
-    MimeType(const MimeType&);
-    MimeType &operator=(const MimeType&);
+    MimeType(const MimeType &);
+    MimeType &operator=(const MimeType &);
     ~MimeType();
 
     void clear();
@@ -156,7 +151,7 @@ public:
 
     // Extension over standard mime data
     QString preferredSuffix() const;
-    bool setPreferredSuffix(const QString&);
+    bool setPreferredSuffix(const QString &);
 
     // Check for type or one of the aliases
     bool matchesType(const QString &type) const;
@@ -188,8 +183,7 @@ private:
  *
  * A good testcase is to run it over '/usr/share/mime/<*>/<*>.xml' on Linux. */
 
-class CORE_EXPORT MimeDatabase
-{
+class CORE_EXPORT MimeDatabase {
     Q_DISABLE_COPY(MimeDatabase)
 public:
     MimeDatabase();
@@ -198,7 +192,7 @@ public:
 
     bool addMimeTypes(const QString &fileName, QString *errorMessage);
     bool addMimeTypes(QIODevice *device, QString *errorMessage);
-    bool addMimeType(const  MimeType &mt);
+    bool addMimeType(const MimeType &mt);
 
     // Returns a mime type or Null one if none found
     MimeType findByType(const QString &type) const;
@@ -220,7 +214,6 @@ public:
 private:
     MimeDatabasePrivate *m_d;
 };
-
 } // namespace Core
 
 #endif // MIMEDATABASE_H

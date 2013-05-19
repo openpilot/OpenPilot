@@ -14,12 +14,12 @@
 * 225 = sync byte, indicates start of a packet
 * L1 = 1 byte for size of data payload. (sequence number is part of data payload.)
 * S# = 1 byte for sequence number.
-* 			Seq of 0 = seq # synchronise request, forces other end to reset receive sequence number to 1.
-* 				sender of synchronise request will reset the tx seq number to 1
-* 			Seq # of 1..127 = normal data packets. Sequence number is incremented by for each transmitted
-* 				packet.  Rolls over from 127 to 1.
-* 			if most sig. bit is set then the packet is an ACK packet of data packet sequence number of the
-* 				lower 7 bits (1..127)
+*                       Seq of 0 = seq # synchronise request, forces other end to reset receive sequence number to 1.
+*                               sender of synchronise request will reset the tx seq number to 1
+*                       Seq # of 1..127 = normal data packets. Sequence number is incremented by for each transmitted
+*                               packet.  Rolls over from 127 to 1.
+*                       if most sig. bit is set then the packet is an ACK packet of data packet sequence number of the
+*                               lower 7 bits (1..127)
 * App Data may contain 0..254 bytes. The sequence number is consider part of the payload.
 * CRC 16 - 16 bits of CRC values of Sequence # and data bytes.
 *
@@ -44,15 +44,15 @@
 * 4. pointer to a buffer to be used for transmission
 * 5. length of each buffer (rx and tx)
 * 6. Four functions:
-*  	1. write byte = writes a byte out the serial port (or other comm device)
-* 	2. read byte = retrieves a byte from the serial port. Returns -1 if a byte is not available
-* 	3. callback = function to call when a valid data packet has been received. This function is responsible
-* 		to do what needs to be done with the data when it is received. The primary mission of this function
-* 		should be to copy the data to a private buffer out of the working receive buffer to prevent overrun.
-* 		processing should be kept to a minimum.
-* 	4. get time = function should return the current time. Note that time units are not specified it just
-* 		needs to be some measure of time that increments as time passes by.  The timeout values for a given
-* 		port should the units used/returned by the get time function.
+*       1. write byte = writes a byte out the serial port (or other comm device)
+*       2. read byte = retrieves a byte from the serial port. Returns -1 if a byte is not available
+*       3. callback = function to call when a valid data packet has been received. This function is responsible
+*               to do what needs to be done with the data when it is received. The primary mission of this function
+*               should be to copy the data to a private buffer out of the working receive buffer to prevent overrun.
+*               processing should be kept to a minimum.
+*       4. get time = function should return the current time. Note that time units are not specified it just
+*               needs to be some measure of time that increments as time passes by.  The timeout values for a given
+*               port should the units used/returned by the get time function.
 *
 * All of the state information of a communication port is contained in a Port_t structure. This allows this
 * module to operature on multiple communication ports with a single code base.
@@ -70,7 +70,6 @@
 /** INCLUDE FILES **/
 
 
-
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
@@ -78,60 +77,60 @@
 #include "ssp.h"
 
 /** PRIVATE DEFINITIONS **/
-#define SYNC                        225                     // Sync character used in Serial Protocol
-#define ESC                         224                     // ESC character used in Serial Protocol
-#define ESC_SYNC                    1                       // ESC_SYNC character used in Serial Protocol
-#define ACK_BIT                     0x80                    // Ack bit, bit 7 of sequence number, 1 = Acknowledge, 0 =
-                                                            //    new packet
+#define SYNC     225                     // Sync character used in Serial Protocol
+#define ESC      224                     // ESC character used in Serial Protocol
+#define ESC_SYNC 1 // ESC_SYNC character used in Serial Protocol
+#define ACK_BIT  0x80                    // Ack bit, bit 7 of sequence number, 1 = Acknowledge, 0 =
+                                         // new packet
 // packet location definitions.
-#define LENGTH  0
-#define SEQNUM  1
-#define DATA	2
+#define LENGTH   0
+#define SEQNUM   1
+#define DATA     2
 
 
 // Make larger sized integers from smaller sized integers
-#define MAKEWORD16( ub, lb )  ((uint16_t)0x0000 | ((uint16_t)(ub) << 8) | (uint16_t)(lb) )
-#define MAKEWORD32( uw, lw ) ((uint32_t)(0x0UL | ((uint32_t)(uw) << 16) | (uint32_t)(lw)) )
-#define MAKEWORD32B( b3, b2, b1, b0 ) ((uint32_t)((uint32_t)(b3)<< 24) | ((uint32_t)(b2)<<16) | ((uint32_t)(b1)<<8) | ((uint32_t)(b0) )
+#define MAKEWORD16(ub, lb)          ((uint16_t)0x0000 | ((uint16_t)(ub) << 8) | (uint16_t)(lb))
+#define MAKEWORD32(uw, lw)          ((uint32_t)(0x0UL | ((uint32_t)(uw) << 16) | (uint32_t)(lw)))
+#define MAKEWORD32B(b3, b2, b1, b0) ((uint32_t)((uint32_t)(b3) << 24) | ((uint32_t)(b2) << 16) | ((uint32_t)(b1) << 8) | ((uint32_t)(b0))
 
 
 // Used to extract smaller integers from larger sized intergers
-#define LOWERBYTE( w )        (uint8_t)((w) & 0x00ff )
-#define UPPERBYTE( w )        (uint8_t)(((w) & 0xff00) >> 8 )
-#define UPPERWORD(lw)         (uint16_t)(((lw) & 0xffff0000) >> 16 )
-#define LOWERWORD(lw)         (uint16_t)((lw) & 0x0000ffff)
+#define LOWERBYTE(w)                (uint8_t)((w) & 0x00ff)
+#define UPPERBYTE(w)                (uint8_t)(((w) & 0xff00) >> 8)
+#define UPPERWORD(lw)               (uint16_t)(((lw) & 0xffff0000) >> 16)
+#define LOWERWORD(lw)               (uint16_t)((lw) & 0x0000ffff)
 
 // Macros to operate on a target and bitmask.
-#define CLEARBIT( a, b )  ((a) = (a) & ~(b))
-#define SETBIT( a, b )    ((a) = (a) | (b) )
-#define	TOGGLEBIT(a,b)	  ((a) = (a) ^ (b) )
+#define CLEARBIT(a, b)              ((a) = (a) & ~(b))
+#define SETBIT(a, b)                ((a) = (a) | (b))
+#define TOGGLEBIT(a, b)             ((a) = (a) ^ (b))
 
 // test bit macros operate using a bit mask.
-#define	ISBITSET( a, b )  ( ((a) & (b)) == (b) ? TRUE : FALSE )
-#define	ISBITCLEAR( a, b) (	(~(a) & (b)) == (b) ? TRUE : FALSE )
+#define ISBITSET(a, b)              (((a) & (b)) == (b) ? TRUE : FALSE)
+#define ISBITCLEAR(a, b)            ((~(a) & (b)) == (b) ? TRUE : FALSE)
 
 /** PRIVATE FUNCTIONS **/
-//static void   	sf_SendSynchPacket( Port_t *thisport );
-static uint16_t sf_crc16( uint16_t crc, uint8_t data );
-static void   	sf_write_byte( Port_t *thisport, uint8_t c );
-static void   	sf_SetSendTimeout( Port_t *thisport );
-static uint16_t sf_CheckTimeout( Port_t *thisport );
-static int16_t 	sf_DecodeState( Port_t *thisport, uint8_t c );
-static int16_t 	sf_ReceiveState( Port_t *thisport, uint8_t c );
+// static void          sf_SendSynchPacket( Port_t *thisport );
+static uint16_t sf_crc16(uint16_t crc, uint8_t data);
+static void     sf_write_byte(Port_t *thisport, uint8_t c);
+static void     sf_SetSendTimeout(Port_t *thisport);
+static uint16_t sf_CheckTimeout(Port_t *thisport);
+static int16_t  sf_DecodeState(Port_t *thisport, uint8_t c);
+static int16_t  sf_ReceiveState(Port_t *thisport, uint8_t c);
 
-static void   	sf_SendPacket( Port_t *thisport );
-static void   	sf_SendAckPacket( Port_t *thisport, uint8_t seqNumber);
-static void     sf_MakePacket( uint8_t *buf, const uint8_t * pdata, uint16_t length, uint8_t seqNo );
-static int16_t 	sf_ReceivePacket(Port_t *thisport);
+static void     sf_SendPacket(Port_t *thisport);
+static void     sf_SendAckPacket(Port_t *thisport, uint8_t seqNumber);
+static void     sf_MakePacket(uint8_t *buf, const uint8_t *pdata, uint16_t length, uint8_t seqNo);
+static int16_t  sf_ReceivePacket(Port_t *thisport);
 
 /* Flag bit masks...*/
-#define SENT_SYNCH		(0x01)
-#define	ACK_RECEIVED	(0x02)
-#define ACK_EXPECTED	(0x04)
+#define SENT_SYNCH       (0x01)
+#define ACK_RECEIVED     (0x02)
+#define ACK_EXPECTED     (0x04)
 
-#define SSP_AWAITING_ACK	0
-#define SSP_ACKED			1
-#define SSP_IDLE			2
+#define SSP_AWAITING_ACK 0
+#define SSP_ACKED        1
+#define SSP_IDLE         2
 
 /** PRIVATE DATA **/
 static const uint16_t CRC_TABLE[] = {
@@ -167,7 +166,7 @@ static const uint16_t CRC_TABLE[] = {
     0x4E00, 0x8EC1, 0x8F81, 0x4F40, 0x8D01, 0x4DC0, 0x4C80, 0x8C41,
     0x4400, 0x84C1, 0x8581, 0x4540, 0x8701, 0x47C0, 0x4680, 0x8641,
     0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040
-  };
+};
 
 /** EXTERNAL DATA **/
 
@@ -188,24 +187,24 @@ static const uint16_t CRC_TABLE[] = {
  * Must be called before calling the Send or REceive process functions.
  */
 
-void ssp_Init( Port_t *thisport, const PortConfig_t* const info)
+void ssp_Init(Port_t *thisport, const PortConfig_t *const info)
 {
-    thisport->pfCallBack 	= info->pfCallBack;
-	thisport->pfSerialRead 	= info->pfSerialRead;
-	thisport->pfSerialWrite = info->pfSerialWrite;
+    thisport->pfCallBack    = info->pfCallBack;
+    thisport->pfSerialRead  = info->pfSerialRead;
+    thisport->pfSerialWrite = info->pfSerialWrite;
     thisport->pfGetTime     = info->pfGetTime;
 
-    thisport->maxRetryCount	= info->max_retry;
-	thisport->timeoutLen	= info->timeoutLen;
-	thisport->txBufSize     = info->txBufSize;
-	thisport->rxBufSize 	= info->rxBufSize;
-	thisport->txBuf         = info->txBuf;
-	thisport->rxBuf         = info->rxBuf;
-	thisport->retryCount    = 0;
-   	thisport->sendSynch		= FALSE;		//TRUE;
-   	thisport->rxSeqNo 		= 255;
-   	thisport->txSeqNo 		= 255;
-   	thisport->SendState		= SSP_IDLE;
+    thisport->maxRetryCount = info->max_retry;
+    thisport->timeoutLen    = info->timeoutLen;
+    thisport->txBufSize     = info->txBufSize;
+    thisport->rxBufSize     = info->rxBufSize;
+    thisport->txBuf = info->txBuf;
+    thisport->rxBuf = info->rxBuf;
+    thisport->retryCount    = 0;
+    thisport->sendSynch     = FALSE;                // TRUE;
+    thisport->rxSeqNo = 255;
+    thisport->txSeqNo = 255;
+    thisport->SendState     = SSP_IDLE;
 }
 
 /*!
@@ -219,35 +218,35 @@ void ssp_Init( Port_t *thisport, const PortConfig_t* const info)
  * \note
  *
  */
-int16_t ssp_SendProcess( Port_t *thisport )
+int16_t ssp_SendProcess(Port_t *thisport)
 {
-	int16_t value = SSP_TX_WAITING;
+    int16_t value = SSP_TX_WAITING;
 
-	if (thisport->SendState == SSP_AWAITING_ACK ) {
-		if (sf_CheckTimeout(thisport) == TRUE) {
-			if (thisport->retryCount < thisport->maxRetryCount) {
-				// Try again
-				sf_SendPacket(thisport);
-				sf_SetSendTimeout(thisport);
-				value = SSP_TX_WAITING;
-			} else {
-				// Give up, # of trys has exceded the limit
-				value = SSP_TX_TIMEOUT;
-				CLEARBIT( thisport->flags, ACK_RECEIVED);
+    if (thisport->SendState == SSP_AWAITING_ACK) {
+        if (sf_CheckTimeout(thisport) == TRUE) {
+            if (thisport->retryCount < thisport->maxRetryCount) {
+                // Try again
+                sf_SendPacket(thisport);
+                sf_SetSendTimeout(thisport);
+                value = SSP_TX_WAITING;
+            } else {
+                // Give up, # of trys has exceded the limit
+                value = SSP_TX_TIMEOUT;
+                CLEARBIT(thisport->flags, ACK_RECEIVED);
                 thisport->SendState = SSP_IDLE;
-			}
-		} else {
-			value = SSP_TX_WAITING;
-		}
-    } else if( thisport->SendState == SSP_ACKED ) {
-    	SETBIT( thisport->flags, ACK_RECEIVED);
+            }
+        } else {
+            value = SSP_TX_WAITING;
+        }
+    } else if (thisport->SendState == SSP_ACKED) {
+        SETBIT(thisport->flags, ACK_RECEIVED);
         value = SSP_TX_ACKED;
         thisport->SendState = SSP_IDLE;
-	} else {
-		thisport->SendState = SSP_IDLE;
+    } else {
+        thisport->SendState = SSP_IDLE;
         value = SSP_TX_IDLE;
     }
-	return value;
+    return value;
 }
 
 /*!
@@ -260,17 +259,17 @@ int16_t ssp_SendProcess( Port_t *thisport )
  */
 int16_t ssp_ReceiveProcess(Port_t *thisport)
 {
-	int16_t b;
-	int16_t packet_status = SSP_RX_IDLE;
+    int16_t b;
+    int16_t packet_status = SSP_RX_IDLE;
 
-	do {
-		b = thisport->pfSerialRead(); // attempt to read a char from the serial buffer
-		if (b != -1) {
-			packet_status = sf_ReceiveState(thisport, b); // process the newly received byte in the receive state machine
-		}
-		// keep going until either we received a full packet or there are no more bytes to process
-	} while (packet_status != SSP_RX_COMPLETE && b != -1);
-	return packet_status;
+    do {
+        b = thisport->pfSerialRead(); // attempt to read a char from the serial buffer
+        if (b != -1) {
+            packet_status = sf_ReceiveState(thisport, b); // process the newly received byte in the receive state machine
+        }
+        // keep going until either we received a full packet or there are no more bytes to process
+    } while (packet_status != SSP_RX_COMPLETE && b != -1);
+    return packet_status;
 }
 
 /*!
@@ -282,13 +281,13 @@ int16_t ssp_ReceiveProcess(Port_t *thisport)
  *
  */
 
-int16_t	ssp_ReceiveByte(Port_t *thisport )
+int16_t ssp_ReceiveByte(Port_t *thisport)
 {
     int16_t b;
     int16_t packet_status = SSP_RX_IDLE;
 
     b = thisport->pfSerialRead();
-    if( b != -1 ) {
+    if (b != -1) {
         packet_status = sf_ReceiveState(thisport, b);
     }
     return packet_status;
@@ -305,17 +304,17 @@ int16_t	ssp_ReceiveByte(Port_t *thisport )
  * \note
  *
  */
-uint16_t   ssp_SendDataBlock( Port_t *thisport, uint8_t *data, uint16_t length )
+uint16_t   ssp_SendDataBlock(Port_t *thisport, uint8_t *data, uint16_t length)
 {
-    int16_t    packet_status = SSP_TX_WAITING;
-    uint16_t   retval = FALSE;
+    int16_t packet_status = SSP_TX_WAITING;
+    uint16_t retval = FALSE;
 
-    packet_status = ssp_SendData( thisport, data, length );		// send the data
-	while( packet_status == SSP_TX_WAITING )  {					// check the status
-		(void)ssp_ReceiveProcess( thisport );					// process any bytes received.
-        packet_status = ssp_SendProcess( thisport );			// check the send status
+    packet_status = ssp_SendData(thisport, data, length); // send the data
+    while (packet_status == SSP_TX_WAITING) { // check the status
+        (void)ssp_ReceiveProcess(thisport); // process any bytes received.
+        packet_status = ssp_SendProcess(thisport); // check the send status
     }
-    if( packet_status == SSP_TX_ACKED )  {						// figure out what happened to the packet
+    if (packet_status == SSP_TX_ACKED) { // figure out what happened to the packet
         retval = TRUE;
     } else {
         retval = FALSE;
@@ -335,54 +334,53 @@ uint16_t   ssp_SendDataBlock( Port_t *thisport, uint8_t *data, uint16_t length )
  * \note
  *
  */
-int16_t ssp_SendData( Port_t *thisport, const uint8_t *data, const uint16_t length )
+int16_t ssp_SendData(Port_t *thisport, const uint8_t *data, const uint16_t length)
 {
-
     int16_t value = SSP_TX_WAITING;
 
-    if( (length + 2) > thisport->txBufSize ) {
+    if ((length + 2) > thisport->txBufSize) {
         // TRYING to send too much data.
         value = SSP_TX_BUFOVERRUN;
-    } else if( thisport->SendState == SSP_IDLE ) {
+    } else if (thisport->SendState == SSP_IDLE) {
 #ifdef ACTIVE_SYNCH
-        if( thisport->sendSynch == TRUE )  {
+        if (thisport->sendSynch == TRUE) {
             sf_SendSynchPacket(thisport);
         }
 #endif
 
 #ifdef SYNCH_SEND
-        if( length == 0 ) {
+        if (length == 0) {
             // TODO this method could allow a task/user to start a synchronisation step if a zero is mistakenly passed to this function.
-            //      could add a check for a NULL data pointer, or use some sort of static flag that can only be accessed by a static function
-            //      that must be called before calling this function.
+            // could add a check for a NULL data pointer, or use some sort of static flag that can only be accessed by a static function
+            // that must be called before calling this function.
             // we are attempting to send a synch packet
-            thisport->txSeqNo = 0;                        // make this zero to cause the other end to re-synch with us
+            thisport->txSeqNo = 0; // make this zero to cause the other end to re-synch with us
             SETBIT(thisport->flags, SENT_SYNCH);
         } else {
             // we are sending a data packet
-            CLEARBIT( thisport->txSeqNo, ACK_BIT );     // make sure we are not sending a ACK packet
-            thisport->txSeqNo++;                        // update the sequence number.
-            if( thisport->txSeqNo > 0x7F) {             // check for sequence number rollover
-                thisport->txSeqNo = 1;                  // if we do have rollover then reset to 1 not zero,
-                                                        // zero is reserviced for synchronization requests
+            CLEARBIT(thisport->txSeqNo, ACK_BIT); // make sure we are not sending a ACK packet
+            thisport->txSeqNo++; // update the sequence number.
+            if (thisport->txSeqNo > 0x7F) { // check for sequence number rollover
+                thisport->txSeqNo = 1; // if we do have rollover then reset to 1 not zero,
+                                       // zero is reserviced for synchronization requests
             }
         }
 
 #else
-        CLEARBIT( thisport->txSeqNo, ACK_BIT );     // make sure we are not sending a ACK packet
-        thisport->txSeqNo++;                        // update the sequence number.
-        if( thisport->txSeqNo > 0x7F) {             // check for sequence number rollover
-            thisport->txSeqNo = 1;                  // if we do have rollover then reset to 1 not zero,
-                                                    // zero is reserved for synchronization requests
+        CLEARBIT(thisport->txSeqNo, ACK_BIT); // make sure we are not sending a ACK packet
+        thisport->txSeqNo++; // update the sequence number.
+        if (thisport->txSeqNo > 0x7F) { // check for sequence number rollover
+            thisport->txSeqNo = 1; // if we do have rollover then reset to 1 not zero,
+                                   // zero is reserved for synchronization requests
         }
-#endif
-       	CLEARBIT( thisport->flags, ACK_RECEIVED);
-        thisport->SendState = SSP_AWAITING_ACK;
+#endif // ifdef SYNCH_SEND
+        CLEARBIT(thisport->flags, ACK_RECEIVED);
+        thisport->SendState  = SSP_AWAITING_ACK;
         value = SSP_TX_WAITING;
-		thisport->retryCount = 0;				// zero out the retry counter for this transmission
-        sf_MakePacket( thisport->txBuf, data, length, thisport->txSeqNo );
-		sf_SendPacket( thisport );				// punch out the packet to the serial port
-        sf_SetSendTimeout( thisport );	// do the timeout values
+        thisport->retryCount = 0; // zero out the retry counter for this transmission
+        sf_MakePacket(thisport->txBuf, data, length, thisport->txSeqNo);
+        sf_SendPacket(thisport); // punch out the packet to the serial port
+        sf_SetSendTimeout(thisport); // do the timeout values
     } else {
         // error we are already sending a packet. Need to wait for the current packet to be acked or timeout.
         value = SSP_TX_BUSY;
@@ -399,46 +397,47 @@ int16_t ssp_SendData( Port_t *thisport, const uint8_t *data, const uint16_t leng
  * \note
  * A. send a packet with a sequence number equal to zero
  * B. if timed out then:
- * 		send synch packet again
- * 		increment try counter
- * 		if number of tries exceed maximum try limit then exit
+ *              send synch packet again
+ *              increment try counter
+ *              if number of tries exceed maximum try limit then exit
  * C. goto A
  */
-uint16_t ssp_Synchronise( Port_t *thisport )
+uint16_t ssp_Synchronise(Port_t *thisport)
 {
-    int16_t     packet_status;
-    uint16_t    retval = FALSE;
+    int16_t packet_status;
+    uint16_t retval = FALSE;
 
 #ifndef USE_SENDPACKET_DATA
-    thisport->txSeqNo = 0;                        // make this zero to cause the other end to re-synch with us
+    thisport->txSeqNo = 0; // make this zero to cause the other end to re-synch with us
     SETBIT(thisport->flags, SENT_SYNCH);
     // TODO - should this be using ssp_SendPacketData()??
-    sf_MakePacket( thisport->txBuf, NULL, 0, thisport->txSeqNo );    // construct the packet
-    sf_SendPacket( thisport );
-    sf_SetSendTimeout( thisport );
+    sf_MakePacket(thisport->txBuf, NULL, 0, thisport->txSeqNo); // construct the packet
+    sf_SendPacket(thisport);
+    sf_SetSendTimeout(thisport);
     thisport->SendState = SSP_AWAITING_ACK;
     packet_status = SSP_TX_WAITING;
 #else
-    packet_status = ssp_SendData( thisport, NULL, 0 );
+    packet_status = ssp_SendData(thisport, NULL, 0);
 #endif
-	while( packet_status == SSP_TX_WAITING )  {      	// we loop until we time out.
-		(void)ssp_ReceiveProcess( thisport );			// do the receive process
-        packet_status = ssp_SendProcess( thisport );	// do the send process
+    while (packet_status == SSP_TX_WAITING) { // we loop until we time out.
+        (void)ssp_ReceiveProcess(thisport); // do the receive process
+        packet_status = ssp_SendProcess(thisport); // do the send process
     }
     thisport->sendSynch = FALSE;
-    switch( packet_status ) {
+    switch (packet_status) {
     case SSP_TX_ACKED:
         retval = TRUE;
         break;
-    case SSP_TX_BUSY:         // intentional fall through.
-    case SSP_TX_TIMEOUT:      // intentional fall through.
+    case SSP_TX_BUSY: // intentional fall through.
+    case SSP_TX_TIMEOUT: // intentional fall through.
     case SSP_TX_BUFOVERRUN:
         retval = FALSE;
         break;
     default:
         retval = FALSE;
         break;
-    };
+    }
+    ;
     return retval;
 }
 
@@ -452,14 +451,14 @@ uint16_t ssp_Synchronise( Port_t *thisport )
  * Packet should be formed through the use of sf_MakePacket before calling this function.
  */
 static void sf_SendPacket(Port_t *thisport)
- {
-	// add 3 to packet data length for: 1 length + 2 CRC (packet overhead)
-	uint8_t packetLen = thisport->txBuf[LENGTH] + 3;
+{
+    // add 3 to packet data length for: 1 length + 2 CRC (packet overhead)
+    uint8_t packetLen = thisport->txBuf[LENGTH] + 3;
 
     // use the raw serial write function so the SYNC byte does not get 'escaped'
-	thisport->pfSerialWrite(SYNC);
-    for( uint8_t x = 0; x < packetLen; x++ ) {
-		sf_write_byte(thisport, thisport->txBuf[x] );
+    thisport->pfSerialWrite(SYNC);
+    for (uint8_t x = 0; x < packetLen; x++) {
+        sf_write_byte(thisport, thisport->txBuf[x]);
     }
     thisport->retryCount++;
 }
@@ -481,26 +480,25 @@ static void sf_SendPacket(Port_t *thisport)
  *  3. TODO: Should this function return an error if data length to be sent is greater th tx buffer size?
  *
  */
-void sf_MakePacket( uint8_t *txBuf, const uint8_t * pdata, uint16_t length, uint8_t seqNo )
+void sf_MakePacket(uint8_t *txBuf, const uint8_t *pdata, uint16_t length, uint8_t seqNo)
 {
-    uint16_t    crc = 0xffff;
-    uint16_t    bufPos = 0;
-    uint8_t     b;
+    uint16_t crc    = 0xffff;
+    uint16_t bufPos = 0;
+    uint8_t b;
 
     // add 1 for the seq. number
     txBuf[LENGTH] = length + 1;
     txBuf[SEQNUM] = seqNo;
-    crc = sf_crc16( crc, seqNo );
+    crc    = sf_crc16(crc, seqNo);
 
-    length = length + 2;    // add two for the length and seqno bytes which are added before the loop.
-    for( bufPos = 2; bufPos < length; bufPos++ ) {
-        b = *pdata++;
+    length = length + 2; // add two for the length and seqno bytes which are added before the loop.
+    for (bufPos = 2; bufPos < length; bufPos++) {
+        b   = *pdata++;
         txBuf[bufPos] = b;
-        crc = sf_crc16( crc, b );    // update CRC value
+        crc = sf_crc16(crc, b); // update CRC value
     }
     txBuf[bufPos++] = LOWERBYTE(crc);
     txBuf[bufPos]   = UPPERBYTE(crc);
-
 }
 
 /*!
@@ -513,13 +511,13 @@ void sf_MakePacket( uint8_t *txBuf, const uint8_t * pdata, uint16_t length, uint
  *
  */
 
-static void sf_SendAckPacket( Port_t *thisport, uint8_t seqNumber)
+static void sf_SendAckPacket(Port_t *thisport, uint8_t seqNumber)
 {
-    uint8_t    AckSeqNumber = SETBIT( seqNumber, ACK_BIT );
+    uint8_t AckSeqNumber = SETBIT(seqNumber, ACK_BIT);
 
     // create the packet, note we pass AckSequenceNumber directly
-    sf_MakePacket( thisport->txBuf, NULL, 0, AckSeqNumber );
-    sf_SendPacket( thisport );
+    sf_MakePacket(thisport->txBuf, NULL, 0, AckSeqNumber);
+    sf_SendPacket(thisport);
     // we don't set the timeout for an ACK because we don't ACK our ACKs in this protocol
 }
 
@@ -532,30 +530,30 @@ static void sf_SendAckPacket( Port_t *thisport, uint8_t seqNumber)
  * \note
  *
  */
-static void sf_write_byte( Port_t *thisport, uint8_t c )
+static void sf_write_byte(Port_t *thisport, uint8_t c)
 {
-	if( c == SYNC ) {							// check for SYNC byte
-		thisport->pfSerialWrite( ESC );         // since we are not starting a packet we must ESCAPE the SYNCH byte
-		thisport->pfSerialWrite( ESC_SYNC );    // now send the escaped synch char
-	} else if( c == ESC ) {						// Check for ESC character
-		thisport->pfSerialWrite( ESC );			// if it is, we need to send it twice
-		thisport->pfSerialWrite( ESC );
-	} else {
-		thisport->pfSerialWrite( c );			// otherwise write the byte to serial port
-	}
+    if (c == SYNC) { // check for SYNC byte
+        thisport->pfSerialWrite(ESC); // since we are not starting a packet we must ESCAPE the SYNCH byte
+        thisport->pfSerialWrite(ESC_SYNC); // now send the escaped synch char
+    } else if (c == ESC) { // Check for ESC character
+        thisport->pfSerialWrite(ESC); // if it is, we need to send it twice
+        thisport->pfSerialWrite(ESC);
+    } else {
+        thisport->pfSerialWrite(c); // otherwise write the byte to serial port
+    }
 }
 
 /************************************************************************************************************
-*
-*  NAME:          uint16_t ssp_crc16( uint16_t crc, uint16_t data )
-*  DESCRIPTION:   Uses crc_table to calculate new crc
-*  ARGUMENTS:
-*        arg1:    crc
-*        arg2:    data - byte to calculate into CRC
-*  RETURN:        New crc
-*  CREATED:    5/8/02
-*
-*************************************************************************************************************/
+ *
+ *  NAME:          uint16_t ssp_crc16( uint16_t crc, uint16_t data )
+ *  DESCRIPTION:   Uses crc_table to calculate new crc
+ *  ARGUMENTS:
+ *        arg1:    crc
+ *        arg2:    data - byte to calculate into CRC
+ *  RETURN:        New crc
+ *  CREATED:    5/8/02
+ *
+ *************************************************************************************************************/
 /*!
  * \brief   calculates the new CRC value for 'data'
  * \param   crc = current CRC value
@@ -566,9 +564,9 @@ static void sf_write_byte( Port_t *thisport, uint8_t c )
  *
  */
 
-static uint16_t sf_crc16( uint16_t crc, uint8_t data )
+static uint16_t sf_crc16(uint16_t crc, uint8_t data)
 {
-   return (crc >> 8) ^ CRC_TABLE[( crc ^ data ) & 0x00FF ];
+    return (crc >> 8) ^ CRC_TABLE[(crc ^ data) & 0x00FF];
 }
 
 
@@ -581,11 +579,12 @@ static uint16_t sf_crc16( uint16_t crc, uint8_t data )
  *
  */
 
-static void sf_SetSendTimeout( Port_t *thisport )
+static void sf_SetSendTimeout(Port_t *thisport)
 {
-    uint32_t   timeout;
+    uint32_t timeout;
+
     timeout = thisport->pfGetTime() + thisport->timeoutLen;
-	thisport->timeout = timeout;
+    thisport->timeout = timeout;
 }
 
 /*!
@@ -597,13 +596,13 @@ static void sf_SetSendTimeout( Port_t *thisport )
  * \note
  *
  */
-static uint16_t   sf_CheckTimeout( Port_t *thisport )
+static uint16_t   sf_CheckTimeout(Port_t *thisport)
 {
-    uint16_t    retval = FALSE;
-    uint32_t    current_time;
+    uint16_t retval = FALSE;
+    uint32_t current_time;
 
     current_time = thisport->pfGetTime();
-    if( current_time > thisport->timeout )  {
+    if (current_time > thisport->timeout) {
         retval = TRUE;
     }
     return retval;
@@ -611,15 +610,15 @@ static uint16_t   sf_CheckTimeout( Port_t *thisport )
 
 
 /****************************************************************************
- *  NAME:   sf_ReceiveState
- *  DESC:   Implements the receive state handling code for escaped and unescaped data
- *  ARGS:	thisport - which port to operate on
- *  		c - incoming byte
- *  RETURN:
- *  CREATED:
- *  NOTES:
- *  1. change from using pointer to functions.
- ****************************************************************************/
+*  NAME:   sf_ReceiveState
+*  DESC:   Implements the receive state handling code for escaped and unescaped data
+*  ARGS:	thisport - which port to operate on
+*               c - incoming byte
+*  RETURN:
+*  CREATED:
+*  NOTES:
+*  1. change from using pointer to functions.
+****************************************************************************/
 /*!
  * \brief   implements the receive state handling code for escaped and unescaped data
  * \param   thisport = which port to use
@@ -629,46 +628,46 @@ static uint16_t   sf_CheckTimeout( Port_t *thisport )
  * \note
  *
  */
-static int16_t sf_ReceiveState( Port_t *thisport, uint8_t c )
+static int16_t sf_ReceiveState(Port_t *thisport, uint8_t c)
 {
-	int16_t	retval = SSP_RX_RECEIVING;
+    int16_t retval = SSP_RX_RECEIVING;
 
-	switch( thisport->InputState ) {
-	case state_unescaped_e:
-	    if( c == SYNC ) {
-	         thisport->DecodeState = decode_len1_e;
-	    } else if ( c == ESC ) {
-			 thisport->InputState = state_escaped_e;
-	    } else {
-			retval = sf_DecodeState( thisport, c);
-		}
-		break;	// end of unescaped state.
-	case state_escaped_e:
-		thisport->InputState = state_unescaped_e;
-		if( c == SYNC ) {
-			thisport->DecodeState = decode_len1_e;
-		} else if (c == ESC_SYNC ) {
-			retval = sf_DecodeState( thisport, SYNC);
-		} else {
-			retval = sf_DecodeState( thisport, c);
-		}
-		break;	// end of the escaped state.
-	default:
-		break;
-	}
-	return retval;
+    switch (thisport->InputState) {
+    case state_unescaped_e:
+        if (c == SYNC) {
+            thisport->DecodeState = decode_len1_e;
+        } else if (c == ESC) {
+            thisport->InputState = state_escaped_e;
+        } else {
+            retval = sf_DecodeState(thisport, c);
+        }
+        break; // end of unescaped state.
+    case state_escaped_e:
+        thisport->InputState = state_unescaped_e;
+        if (c == SYNC) {
+            thisport->DecodeState = decode_len1_e;
+        } else if (c == ESC_SYNC) {
+            retval = sf_DecodeState(thisport, SYNC);
+        } else {
+            retval = sf_DecodeState(thisport, c);
+        }
+        break; // end of the escaped state.
+    default:
+        break;
+    }
+    return retval;
 }
 
 /****************************************************************************
- *  NAME:   sf_DecodeState
- *  DESC:   Implements the receive state finite state machine
- *  ARGS:	thisport - which port to operate on
- *  		c - incoming byte
- *  RETURN:
- *  CREATED:
- *  NOTES:
- *  1. change from using pointer to functions.
- ****************************************************************************/
+*  NAME:   sf_DecodeState
+*  DESC:   Implements the receive state finite state machine
+*  ARGS:	thisport - which port to operate on
+*               c - incoming byte
+*  RETURN:
+*  CREATED:
+*  NOTES:
+*  1. change from using pointer to functions.
+****************************************************************************/
 
 /*!
  * \brief   implements the receiving decoding state machine
@@ -679,86 +678,87 @@ static int16_t sf_ReceiveState( Port_t *thisport, uint8_t c )
  * \note
  *
  */
-static int16_t sf_DecodeState( Port_t *thisport, uint8_t c )
+static int16_t sf_DecodeState(Port_t *thisport, uint8_t c)
 {
-	int16_t	retval;
-	switch( thisport->DecodeState ) {
-	case decode_idle_e:
+    int16_t retval;
+
+    switch (thisport->DecodeState) {
+    case decode_idle_e:
         // 'c' is ignored in this state as the only way to leave the idle state is
         // recognition of the SYNC byte in the sf_ReceiveState function.
         retval = SSP_RX_IDLE;
-		break;
-	case decode_len1_e:
-		thisport->rxBuf[LENGTH]= c;
-		thisport->rxBufLen = c;
-        if( thisport->rxBufLen <= thisport->rxBufSize ) {
-			thisport->DecodeState = decode_seqNo_e;
-			retval = SSP_RX_RECEIVING;
-		} else {
-			thisport->DecodeState = decode_idle_e;
-			retval = SSP_RX_IDLE;
-		}
-		break;
-	case decode_seqNo_e:
-		thisport->rxBuf[SEQNUM] = c;
-		thisport->crc = 0xffff;
-		thisport->rxBufLen--;		// subtract 1 for the seq. no.
-		thisport->rxBufPos = 2;
+        break;
+    case decode_len1_e:
+        thisport->rxBuf[LENGTH] = c;
+        thisport->rxBufLen = c;
+        if (thisport->rxBufLen <= thisport->rxBufSize) {
+            thisport->DecodeState = decode_seqNo_e;
+            retval = SSP_RX_RECEIVING;
+        } else {
+            thisport->DecodeState = decode_idle_e;
+            retval = SSP_RX_IDLE;
+        }
+        break;
+    case decode_seqNo_e:
+        thisport->rxBuf[SEQNUM] = c;
+        thisport->crc = 0xffff;
+        thisport->rxBufLen--; // subtract 1 for the seq. no.
+        thisport->rxBufPos = 2;
 
-		thisport->crc = sf_crc16( thisport->crc, c );
-		if( thisport->rxBufLen > 0 ) {
-			thisport->DecodeState = decode_data_e;
-		} else {
-			thisport->DecodeState = decode_crc1_e;
-		}
-		retval = SSP_RX_RECEIVING;
-		break;
-	case decode_data_e:
-		thisport->rxBuf[ (thisport->rxBufPos)++] = c;
-		thisport->crc = sf_crc16( thisport->crc, c );
-		if( thisport->rxBufPos == (thisport->rxBufLen+2) ) {
+        thisport->crc = sf_crc16(thisport->crc, c);
+        if (thisport->rxBufLen > 0) {
+            thisport->DecodeState = decode_data_e;
+        } else {
             thisport->DecodeState = decode_crc1_e;
-		}
-		retval = SSP_RX_RECEIVING;
-		break;
-	case decode_crc1_e:
-		thisport->crc = sf_crc16( thisport->crc, c );
-		thisport->DecodeState = decode_crc2_e;
-		retval = SSP_RX_RECEIVING;
-		break;
-	case decode_crc2_e:
-		thisport->DecodeState = decode_idle_e;
+        }
+        retval = SSP_RX_RECEIVING;
+        break;
+    case decode_data_e:
+        thisport->rxBuf[(thisport->rxBufPos)++] = c;
+        thisport->crc = sf_crc16(thisport->crc, c);
+        if (thisport->rxBufPos == (thisport->rxBufLen + 2)) {
+            thisport->DecodeState = decode_crc1_e;
+        }
+        retval = SSP_RX_RECEIVING;
+        break;
+    case decode_crc1_e:
+        thisport->crc = sf_crc16(thisport->crc, c);
+        thisport->DecodeState = decode_crc2_e;
+        retval = SSP_RX_RECEIVING;
+        break;
+    case decode_crc2_e:
+        thisport->DecodeState = decode_idle_e;
         // verify the CRC value for the packet
-		if( sf_crc16( thisport->crc, c) == 0)	{
-			// TODO shouldn't the return value of sf_ReceivePacket() be checked?
-			sf_ReceivePacket( thisport );
-			retval = SSP_RX_COMPLETE;
-		} else {
-			thisport->RxError++;
-			retval = SSP_RX_IDLE;
-		}
-		break;
-	default:
-		thisport->DecodeState = decode_idle_e;	// unknown state so reset to idle state and wait for the next start of a packet.
-		retval = SSP_RX_IDLE;
-		break;
-	}
-	return retval;
+        if (sf_crc16(thisport->crc, c) == 0) {
+            // TODO shouldn't the return value of sf_ReceivePacket() be checked?
+            sf_ReceivePacket(thisport);
+            retval = SSP_RX_COMPLETE;
+        } else {
+            thisport->RxError++;
+            retval = SSP_RX_IDLE;
+        }
+        break;
+    default:
+        thisport->DecodeState = decode_idle_e; // unknown state so reset to idle state and wait for the next start of a packet.
+        retval = SSP_RX_IDLE;
+        break;
+    }
+    return retval;
 }
 
 /************************************************************************************************************
-*
-*  NAME:             int16_t sf_ReceivePacket( )
-*  DESCRIPTION:      Receive one packet, assumed that data is in rec.buff[]
-*   ARGUMENTS:
-*   RETURN:          0 . no new packet was received, could be ack or same packet
-*                    1 . new packet received
-*                    SSP_PACKET_?
-*                    SSP_PACKET_COMPLETE
-*                    SSP_PACKET_ACK
-*   CREATED:         5/8/02
-*
-*************************************************************************************************************/
+ *
+ *  NAME:             int16_t sf_ReceivePacket( )
+ *  DESCRIPTION:      Receive one packet, assumed that data is in rec.buff[]
+ *   ARGUMENTS:
+ *   RETURN:          0 . no new packet was received, could be ack or same packet
+ *                    1 . new packet received
+ *                    SSP_PACKET_?
+ *                    SSP_PACKET_COMPLETE
+ *                    SSP_PACKET_ACK
+ *   CREATED:         5/8/02
+ *
+ *************************************************************************************************************/
 /*!
  * \brief   receive one packet. calls the callback function if needed.
  * \param   thisport = which port to use
@@ -772,46 +772,45 @@ static int16_t sf_DecodeState( Port_t *thisport, uint8_t c )
 
 static int16_t sf_ReceivePacket(Port_t *thisport)
 {
-	int16_t value = FALSE;
+    int16_t value = FALSE;
 
-	if( ISBITSET(thisport->rxBuf[SEQNUM], ACK_BIT ) ) {
-		//  Received an ACK packet, need to check if it matches the previous sent packet
-		if( ( thisport->rxBuf[SEQNUM] & 0x7F) == (thisport->txSeqNo & 0x7f)) {
-			//  It matches the last packet sent by us
-			SETBIT( thisport->txSeqNo, ACK_BIT );
-			thisport->SendState = SSP_ACKED;
-			value = FALSE;
-		}
+    if (ISBITSET(thisport->rxBuf[SEQNUM], ACK_BIT)) {
+        // Received an ACK packet, need to check if it matches the previous sent packet
+        if ((thisport->rxBuf[SEQNUM] & 0x7F) == (thisport->txSeqNo & 0x7f)) {
+            // It matches the last packet sent by us
+            SETBIT(thisport->txSeqNo, ACK_BIT);
+            thisport->SendState = SSP_ACKED;
+            value = FALSE;
+        }
         // else ignore the ACK packet
-	} else {
-		//  Received a 'data' packet, figure out what type of packet we received...
-		if( thisport->rxBuf[SEQNUM] == 0 ) {
-			// Synchronize sequence number with host
+    } else {
+        // Received a 'data' packet, figure out what type of packet we received...
+        if (thisport->rxBuf[SEQNUM] == 0) {
+            // Synchronize sequence number with host
 #ifdef ACTIVE_SYNCH
             thisport->sendSynch = TRUE;
 #endif
-			sf_SendAckPacket( thisport, thisport->rxBuf[SEQNUM] );
-			thisport->rxSeqNo = 0;
-			value = FALSE;
-		} else if( thisport->rxBuf[SEQNUM] == thisport->rxSeqNo ) {
-			// Already seen this packet, just ack it, don't act on the packet.
-			sf_SendAckPacket( thisport, thisport->rxBuf[SEQNUM] );
-			value = FALSE;
-		} else {
-			//New Packet
-			thisport->rxSeqNo = thisport->rxBuf[SEQNUM];
-			// Let the application do something with the data/packet.
-			if( thisport->pfCallBack != NULL ) {
-				// skip the first two bytes (length and seq. no.) in the buffer.
-				thisport->pfCallBack( &(thisport->rxBuf[2]), thisport->rxBufLen);
-			}
-			// after we send the ACK, it is possible for the host to send a new packet.
-			// Thus the application needs to copy the data and reset the receive buffer
-			// inside of thisport->pfCallBack()
-			sf_SendAckPacket( thisport, thisport->rxBuf[SEQNUM] );
-			value = TRUE;
-		}
-	}
-	return value;
+            sf_SendAckPacket(thisport, thisport->rxBuf[SEQNUM]);
+            thisport->rxSeqNo   = 0;
+            value = FALSE;
+        } else if (thisport->rxBuf[SEQNUM] == thisport->rxSeqNo) {
+            // Already seen this packet, just ack it, don't act on the packet.
+            sf_SendAckPacket(thisport, thisport->rxBuf[SEQNUM]);
+            value = FALSE;
+        } else {
+            // New Packet
+            thisport->rxSeqNo = thisport->rxBuf[SEQNUM];
+            // Let the application do something with the data/packet.
+            if (thisport->pfCallBack != NULL) {
+                // skip the first two bytes (length and seq. no.) in the buffer.
+                thisport->pfCallBack(&(thisport->rxBuf[2]), thisport->rxBufLen);
+            }
+            // after we send the ACK, it is possible for the host to send a new packet.
+            // Thus the application needs to copy the data and reset the receive buffer
+            // inside of thisport->pfCallBack()
+            sf_SendAckPacket(thisport, thisport->rxBuf[SEQNUM]);
+            value = TRUE;
+        }
+    }
+    return value;
 }
-

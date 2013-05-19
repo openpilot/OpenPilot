@@ -29,10 +29,9 @@
 
 #include "../generator_common.h"
 
-class UAVObjectGeneratorWireshark
-{
+class UAVObjectGeneratorWireshark {
 public:
-    bool generate(UAVObjectParser* gen,QString templatepath,QString outputpath);
+    bool generate(UAVObjectParser *gen, QString templatepath, QString outputpath);
     QStringList fieldTypeStrHf;
     QStringList fieldTypeStrGlib;
     QString wiresharkCodeTemplate, wiresharkMakeTemplate;
@@ -40,9 +39,7 @@ public:
     QDir wiresharkOutputPath;
 
 private:
-    bool process_object(ObjectInfo* info, QDir outputpath);
-
+    bool process_object(ObjectInfo *info, QDir outputpath);
 };
 
 #endif
-

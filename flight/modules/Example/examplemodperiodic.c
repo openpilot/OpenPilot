@@ -46,12 +46,12 @@
 
 #include "openpilot.h"
 #include "examplemodperiodic.h"
-#include "exampleobject2.h"	// object that will be updated by the module
-#include "examplesettings.h"	// object holding module settings
+#include "exampleobject2.h" // object that will be updated by the module
+#include "examplesettings.h" // object holding module settings
 
 // Private constants
-#define STACK_SIZE configMINIMAL_STACK_SIZE
-#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
+#define STACK_SIZE    configMINIMAL_STACK_SIZE
+#define TASK_PRIORITY (tskIDLE_PRIORITY + 1)
 
 // Private types
 
@@ -67,10 +67,10 @@ static void exampleTask(void *parameters);
  */
 int32_t ExampleModPeriodicInitialize()
 {
-	// Start main task
-	xTaskCreate(exampleTask, (signed char *)"ExamplePeriodic", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
+    // Start main task
+    xTaskCreate(exampleTask, (signed char *)"ExamplePeriodic", STACK_SIZE, NULL, TASK_PRIORITY, &taskHandle);
 
-	return 0;
+    return 0;
 }
 
 /**
@@ -78,45 +78,45 @@ int32_t ExampleModPeriodicInitialize()
  */
 static void exampleTask(__attribute__((unused)) void *parameters)
 {
-	ExampleSettingsData settings;
-	ExampleObject2Data data;
-	int32_t step;
-	portTickType lastSysTime;
+    ExampleSettingsData settings;
+    ExampleObject2Data data;
+    int32_t step;
+    portTickType lastSysTime;
 
-	// Main task loop
-	lastSysTime = xTaskGetTickCount();
-	while (1) {
-		// Update settings with latest value
-		ExampleSettingsGet(&settings);
+    // Main task loop
+    lastSysTime = xTaskGetTickCount();
+    while (1) {
+        // Update settings with latest value
+        ExampleSettingsGet(&settings);
 
-		// Get the object data
-		ExampleObject2Get(&data);
+        // Get the object data
+        ExampleObject2Get(&data);
 
-		// Determine how to update the data
-		if (settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP) {
-			step = settings.StepSize;
-		} else {
-			step = -settings.StepSize;
-		}
+        // Determine how to update the data
+        if (settings.StepDirection == EXAMPLESETTINGS_STEPDIRECTION_UP) {
+            step = settings.StepSize;
+        } else {
+            step = -settings.StepSize;
+        }
 
-		// Update the data
-		data.Field1 += step;
-		data.Field2 += step;
-		data.Field3 += step;
-		data.Field4[0] += step;
-		data.Field4[1] += step;
+        // Update the data
+        data.Field1    += step;
+        data.Field2    += step;
+        data.Field3    += step;
+        data.Field4[0] += step;
+        data.Field4[1] += step;
 
-		// Update the ExampleObject, after this function is called
-		// notifications to any other modules listening to that object
-		// will be sent and the GCS object will be updated through the
-		// telemetry link. All operations will take place asynchronously
-		// and the following call will return immediately.
-		ExampleObject2Set(&data);
+        // Update the ExampleObject, after this function is called
+        // notifications to any other modules listening to that object
+        // will be sent and the GCS object will be updated through the
+        // telemetry link. All operations will take place asynchronously
+        // and the following call will return immediately.
+        ExampleObject2Set(&data);
 
-		// Since this module executes at fixed time intervals, we need to
-		// block the task until it is time for the next update.
-		// The settings field is in ms, to convert to RTOS ticks we need
-		// to divide by portTICK_RATE_MS.
-		vTaskDelayUntil(&lastSysTime, settings.UpdatePeriod / portTICK_RATE_MS);
-	}
+        // Since this module executes at fixed time intervals, we need to
+        // block the task until it is time for the next update.
+        // The settings field is in ms, to convert to RTOS ticks we need
+        // to divide by portTICK_RATE_MS.
+        vTaskDelayUntil(&lastSysTime, settings.UpdatePeriod / portTICK_RATE_MS);
+    }
 }

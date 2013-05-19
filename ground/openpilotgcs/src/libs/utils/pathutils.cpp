@@ -32,112 +32,111 @@
 
 
 namespace Utils {
+PathUtils::PathUtils()
+{}
 
-    PathUtils::PathUtils()
-    {
+/**
+   Returns the base path of the share directory.
 
-    }
-
-    /**
-      Returns the base path of the share directory.
-
-      Path is in Qt/Unix conventions, separated by "/".
-      */
+   Path is in Qt/Unix conventions, separated by "/".
+ */
 QString PathUtils::GetDataPath()
 {
     // This routine works with "/" as the standard:
     // Figure out root:  Up one from 'bin'
     QDir rootDir = QApplication::applicationDirPath();
+
     rootDir.cdUp();
     const QString rootDirPath = rootDir.canonicalPath();
     QString dataPath = rootDirPath;
     dataPath += QLatin1Char('/');
     dataPath += QLatin1String(GCS_DATA_BASENAME);
     dataPath += QLatin1Char('/');
-   return dataPath;
+    return dataPath;
 }
 
 /**
-  Cuts the standard data path from the 'path' argument. If path does not start
-with the standard data path, then do nothing.
+   Cuts the standard data path from the 'path' argument. If path does not start
+   with the standard data path, then do nothing.
 
    Always returns a path converted to "/".
-  */
+ */
 QString PathUtils::RemoveDataPath(QString path)
 {
     // Depending on the platform, we might get either "/" or "\"
     // so we need to go to the standard ("/")
     QString goodPath = QDir::fromNativeSeparators(path);
+
     if (goodPath.startsWith(GetDataPath())) {
-        int i = goodPath.length()- GetDataPath().length();
+        int i = goodPath.length() - GetDataPath().length();
         return QString("%%DATAPATH%%") + goodPath.right(i);
-    } else
+    } else {
         return goodPath;
+    }
 }
 
 /**
-  Inserts the data path (only if the path starts with %%DATAPATH%%)
+   Inserts the data path (only if the path starts with %%DATAPATH%%)
 
-  Returns a "/" or "\" separated path depending on platform conventions.
-  */
+   Returns a "/" or "\" separated path depending on platform conventions.
+ */
 QString PathUtils::InsertDataPath(QString path)
 {
-    if (path.startsWith(QString("%%DATAPATH%%")))
-    {
+    if (path.startsWith(QString("%%DATAPATH%%"))) {
         QString newPath = GetDataPath();
-        newPath += path.right(path.length()-12);
+        newPath += path.right(path.length() - 12);
         return QDir::toNativeSeparators(newPath);
     }
     return QDir::toNativeSeparators(path);
 }
 
 /**
-  Gets a standard user-writable location for the system
-  */
+   Gets a standard user-writable location for the system
+ */
 QString PathUtils::GetStoragePath()
 {
     // This routine works with "/" as the standard:
     // Work out where the settings are stored on the machine
-    QSettings set(XmlConfig::XmlSettingsFormat, QSettings::UserScope,QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS_config"));
+    QSettings set(XmlConfig::XmlSettingsFormat, QSettings::UserScope, QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS_config"));
     QFileInfo f(set.fileName());
     QDir dir(f.absoluteDir());
 
     const QString homeDirPath = dir.canonicalPath();
     QString storagePath = homeDirPath;
+
     storagePath += QLatin1Char('/');
     // storagePath += QLatin1String("OpenPilot");
     // storagePath += QLatin1Char('/');
-   return storagePath;
+    return storagePath;
 }
 
 /**
-  Removes the standard storage path and replace with a tag
-  */
+   Removes the standard storage path and replace with a tag
+ */
 QString PathUtils::RemoveStoragePath(QString path)
 {
     // Depending on the platform, we might get either "/" or "\"
     // so we need to go to the standard ("/")
     QString goodPath = QDir::fromNativeSeparators(path);
+
     if (goodPath.startsWith(GetStoragePath())) {
-        int i = goodPath.length()- GetStoragePath().length();
+        int i = goodPath.length() - GetStoragePath().length();
         return QString("%%STOREPATH%%") + goodPath.right(i);
-    } else
+    } else {
         return goodPath;
+    }
 }
 
 /**
-  Inserts the standard storage path is there is a storage path tag
-  */
+   Inserts the standard storage path is there is a storage path tag
+ */
 QString PathUtils::InsertStoragePath(QString path)
 {
-    if (path.startsWith(QString("%%STOREPATH%%")))
-    {
+    if (path.startsWith(QString("%%STOREPATH%%"))) {
         QString newPath = GetStoragePath();
-        newPath += path.right(path.length()-13);
+        newPath += path.right(path.length() - 13);
         return QDir::toNativeSeparators(newPath);
     }
     return QDir::toNativeSeparators(path);
-
 }
-
 }

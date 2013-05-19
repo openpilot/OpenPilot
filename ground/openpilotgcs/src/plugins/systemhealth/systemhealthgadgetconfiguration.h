@@ -34,26 +34,30 @@ using namespace Core;
 
 /* This is a generic system health gadget displaying
    system alarms for one or more components.
-  */
-class SystemHealthGadgetConfiguration : public IUAVGadgetConfiguration
-{
-Q_OBJECT
+ */
+class SystemHealthGadgetConfiguration : public IUAVGadgetConfiguration {
+    Q_OBJECT
 public:
-    explicit SystemHealthGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+    explicit SystemHealthGadgetConfiguration(QString classId, QSettings *qSettings = 0, QObject *parent = 0);
 
-    //set system health configuration functions
-    void setSystemFile(QString filename){systemFile=filename;}
+    // set system health configuration functions
+    void setSystemFile(QString filename)
+    {
+        systemFile = filename;
+    }
 
-    //get dial configuration functions
-    QString getSystemFile() {return systemFile;}
+    // get dial configuration functions
+    QString getSystemFile()
+    {
+        return systemFile;
+    }
 
-    void saveConfig(QSettings* settings) const;
+    void saveConfig(QSettings *settings) const;
     IUAVGadgetConfiguration *clone();
 
 private:
     // systemFile contains the source SVG:
     QString systemFile;
-
 };
 
 #endif // SYSTEMHEALTHGADGETCONFIGURATION_H

@@ -37,8 +37,7 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class MagicWaypointGadgetFactory : public IUAVGadgetFactory
-{
+class MagicWaypointGadgetFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
     MagicWaypointGadgetFactory(QObject *parent = 0);

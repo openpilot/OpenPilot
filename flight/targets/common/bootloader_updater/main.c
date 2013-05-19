@@ -8,21 +8,21 @@
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  * @brief      This is the file with the main function of the OpenPilot BootLoader
  * @see        The GNU Public License (GPL) Version 3
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -44,13 +44,12 @@ void error(int, int);
 extern uint32_t _binary_start;
 extern uint32_t _binary_end;
 extern uint32_t _binary_size;
-const uint32_t  *embedded_image_start = (uint32_t *) &(_binary_start);
-const uint32_t  *embedded_image_end   = (uint32_t *) &(_binary_end);
-const uint32_t   embedded_image_size  = (uint32_t)   &(_binary_size);
+const uint32_t *embedded_image_start = (uint32_t *)&(_binary_start);
+const uint32_t *embedded_image_end   = (uint32_t *)&(_binary_end);
+const uint32_t embedded_image_size   = (uint32_t)&(_binary_size);
 
 int main()
 {
-
     PIOS_SYS_Init();
     PIOS_Board_Init();
     PIOS_LED_On(PIOS_LED_HEARTBEAT);
@@ -58,9 +57,10 @@ int main()
     PIOS_LED_Off(PIOS_LED_HEARTBEAT);
 
     /// Self overwrite check
-    uint32_t base_address = SCB ->VTOR;
-    if ((BL_BANK_BASE + embedded_image_size) > base_address)
+    uint32_t base_address = SCB->VTOR;
+    if ((BL_BANK_BASE + embedded_image_size) > base_address) {
         error(PIOS_LED_HEARTBEAT, 1);
+    }
     ///
 
     /*
@@ -72,10 +72,10 @@ int main()
      */
 
     /* Calculate how far the board_info_blob is from the beginning of the bootloader */
-    uint32_t board_info_blob_offset = (uint32_t) &pios_board_info_blob - (uint32_t) BL_BANK_BASE;
+    uint32_t board_info_blob_offset = (uint32_t)&pios_board_info_blob - (uint32_t)BL_BANK_BASE;
 
     /* Use the same offset into our embedded bootloader image */
-    struct pios_board_info *new_board_info_blob = (struct pios_board_info *) ((uint32_t) embedded_image_start + board_info_blob_offset);
+    struct pios_board_info *new_board_info_blob = (struct pios_board_info *)((uint32_t)embedded_image_start + board_info_blob_offset);
 
     /* Compare the two board info blobs to make sure they're for the same HW revision */
     if ((pios_board_info_blob.magic != new_board_info_blob->magic) ||
@@ -92,7 +92,7 @@ int main()
 
     fail = (PIOS_BL_HELPER_FLASH_Erase_Bootloader() != 1);
 
-    if (fail == true){
+    if (fail == true) {
         error(PIOS_LED_HEARTBEAT, 3);
     }
     ///
@@ -125,19 +125,18 @@ int main()
     for (;;) {
         PIOS_DELAY_WaitmS(1000);
     }
-
 }
 
 void error(int led, int code)
 {
-	for (;;) {
-		PIOS_DELAY_WaitmS(1000);
-		for (int x = 0; x < code; x++) {
-			PIOS_LED_On(led);
-			PIOS_DELAY_WaitmS(200);
-			PIOS_LED_Off(led);
-			PIOS_DELAY_WaitmS(1000);
-		}
-		PIOS_DELAY_WaitmS(3000);
-		}
+    for (;;) {
+        PIOS_DELAY_WaitmS(1000);
+        for (int x = 0; x < code; x++) {
+            PIOS_LED_On(led);
+            PIOS_DELAY_WaitmS(200);
+            PIOS_LED_Off(led);
+            PIOS_DELAY_WaitmS(1000);
+        }
+        PIOS_DELAY_WaitmS(3000);
+    }
 }

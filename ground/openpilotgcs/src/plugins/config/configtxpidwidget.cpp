@@ -35,11 +35,12 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
     m_txpid = new Ui_TxPIDWidget();
     m_txpid->setupUi(this);
-    
-    ExtensionSystem::PluginManager *pm=ExtensionSystem::PluginManager::instance();
-    Core::Internal::GeneralSettings * settings=pm->getObject<Core::Internal::GeneralSettings>();
-    if(!settings->useExpertMode())
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    Core::Internal::GeneralSettings *settings = pm->getObject<Core::Internal::GeneralSettings>();
+    if (!settings->useExpertMode()) {
         m_txpid->Apply->setVisible(false);
+    }
     autoLoadWidgets();
     addApplySaveButtons(m_txpid->Apply, m_txpid->Save);
 
@@ -82,13 +83,14 @@ ConfigTxPIDWidget::ConfigTxPIDWidget(QWidget *parent) : ConfigTaskWidget(parent)
 
 ConfigTxPIDWidget::~ConfigTxPIDWidget()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void ConfigTxPIDWidget::refreshValues()
 {
     HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
     HwSettings::DataFields hwSettingsData = hwSettings->getData();
+
     m_txpid->TxPIDEnable->setChecked(
         hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_TXPID] == HwSettings::OPTIONALMODULES_ENABLED);
 }
@@ -97,6 +99,7 @@ void ConfigTxPIDWidget::applySettings()
 {
     HwSettings *hwSettings = HwSettings::GetInstance(getObjectManager());
     HwSettings::DataFields hwSettingsData = hwSettings->getData();
+
     hwSettingsData.OptionalModules[HwSettings::OPTIONALMODULES_TXPID] =
         m_txpid->TxPIDEnable->isChecked() ? HwSettings::OPTIONALMODULES_ENABLED : HwSettings::OPTIONALMODULES_DISABLED;
     hwSettings->setData(hwSettingsData);

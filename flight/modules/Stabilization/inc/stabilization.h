@@ -1,12 +1,12 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup StabilizationModule Stabilization Module
  * @brief Stabilization PID loops in an airframe type independent manner
- * @note This object updates the @ref ActuatorDesired "Actuator Desired" based on the 
+ * @note This object updates the @ref ActuatorDesired "Actuator Desired" based on the
  * PID loops on the @ref AttitudeDesired "Attitude Desired" and @ref AttitudeActual "Attitude Actual"
- * @{ 
+ * @{
  *
  * @file       stabilization.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -33,13 +33,13 @@
 #ifndef STABILIZATION_H
 #define STABILIZATION_H
 
-enum {ROLL,PITCH,YAW,MAX_AXES};
+enum { ROLL, PITCH, YAW, MAX_AXES };
 
 int32_t StabilizationInitialize();
 
 #endif // STABILIZATION_H
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

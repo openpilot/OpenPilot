@@ -8,7 +8,7 @@
  * @{
  * @addtogroup DialPlugin Dial Plugin
  * @{
- * @brief Plots flight information rotary style dials 
+ * @brief Plots flight information rotary style dials
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -31,10 +31,9 @@
 #include "dialgadgetconfiguration.h"
 
 DialGadget::DialGadget(QString classId, DialGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent),
+    m_widget(widget)
+{}
 
 DialGadget::~DialGadget()
 {
@@ -42,20 +41,21 @@ DialGadget::~DialGadget()
 }
 
 /*
-  This is called when a configuration is loaded, and updates the plugin's settings.
-  Careful: the plugin is already drawn before the loadConfiguration method is called the
-  first time, so you have to be careful not to assume all the plugin values are initialized
-  the first time you use them
+   This is called when a configuration is loaded, and updates the plugin's settings.
+   Careful: the plugin is already drawn before the loadConfiguration method is called the
+   first time, so you have to be careful not to assume all the plugin values are initialized
+   the first time you use them
  */
-void DialGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void DialGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
-    DialGadgetConfiguration *m = qobject_cast<DialGadgetConfiguration*>(config);
+    DialGadgetConfiguration *m = qobject_cast<DialGadgetConfiguration *>(config);
+
     m_widget->setDialFile(m->dialFile(), m->dialBackground(), m->dialForeground(), m->dialNeedle1(),
-                          m->dialNeedle2(),m->dialNeedle3(),m->getN1Move(), m->getN2Move(),
+                          m->dialNeedle2(), m->dialNeedle3(), m->getN1Move(), m->getN2Move(),
                           m->getN3Move());
 
-	m_widget->enableOpenGL(m->useOpenGL());
-	m_widget->enableSmoothUpdates(m->getBeSmooth());
+    m_widget->enableOpenGL(m->useOpenGL());
+    m_widget->enableSmoothUpdates(m->getBeSmooth());
 
     m_widget->setN1Min(m->getN1Min());
     m_widget->setN1Max(m->getN1Max());
@@ -67,8 +67,8 @@ void DialGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     m_widget->setN3Max(m->getN3Max());
     m_widget->setN3Factor(m->getN3Factor());
     m_widget->setDialFont(m->getFont());
-    m_widget->connectNeedles(m->getN1DataObject(),m->getN1ObjField(),
-                             m->getN2DataObject(),m->getN2ObjField(),
-                             m->getN3DataObject(),m->getN3ObjField()
+    m_widget->connectNeedles(m->getN1DataObject(), m->getN1ObjField(),
+                             m->getN2DataObject(), m->getN2ObjField(),
+                             m->getN3DataObject(), m->getN3ObjField()
                              );
 }

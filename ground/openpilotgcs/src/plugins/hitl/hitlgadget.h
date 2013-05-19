@@ -7,7 +7,7 @@
  * @{
  * @addtogroup HITLPlugin HITL Plugin
  * @{
- * @brief The Hardware In The Loop plugin 
+ * @brief The Hardware In The Loop plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -38,22 +38,24 @@ class Simulator;
 
 using namespace Core;
 
-class HITLGadget : public Core::IUAVGadget
-{
+class HITLGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
-	HITLGadget(QString classId, HITLWidget *widget, QWidget *parent = 0);
-	~HITLGadget();
+    HITLGadget(QString classId, HITLWidget *widget, QWidget *parent = 0);
+    ~HITLGadget();
 
-    QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 
 signals:
-	void changeConfiguration();
+    void changeConfiguration();
 
 private:
-	HITLWidget* m_widget;
-	Simulator* simulator;
+    HITLWidget *m_widget;
+    Simulator *simulator;
 };
 
 

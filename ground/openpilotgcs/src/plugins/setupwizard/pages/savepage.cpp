@@ -32,7 +32,7 @@
 #include "vehicleconfigurationhelper.h"
 
 SavePage::SavePage(SetupWizard *wizard, QWidget *parent) :
-        AbstractWizardPage(wizard, parent),
+    AbstractWizardPage(wizard, parent),
     ui(new Ui::SavePage), m_successfulWrite(false)
 {
     ui->setupUi(this);
@@ -45,7 +45,7 @@ SavePage::~SavePage()
 }
 
 bool SavePage::validatePage()
-{    
+{
     return true;
 }
 
@@ -56,7 +56,7 @@ bool SavePage::isComplete() const
 
 void SavePage::writeToController()
 {
-    if(!getWizard()->getConnectionManager()->isConnected()) {
+    if (!getWizard()->getConnectionManager()->isConnected()) {
         QMessageBox msgBox;
         msgBox.setText(tr("An OpenPilot controller must be connected to your computer to save the "
                           "configuration.\nPlease connect your OpenPilot controller to your computer and try again."));
@@ -68,11 +68,11 @@ void SavePage::writeToController()
 
     enableButtons(false);
     VehicleConfigurationHelper helper(getWizard());
-    connect(&helper, SIGNAL(saveProgress(int, int, QString)),this, SLOT(saveProgress(int, int, QString)));
+    connect(&helper, SIGNAL(saveProgress(int, int, QString)), this, SLOT(saveProgress(int, int, QString)));
 
     m_successfulWrite = helper.setupVehicle();
 
-    disconnect(&helper, SIGNAL(saveProgress(int, int, QString)),this, SLOT(saveProgress(int, int, QString)));
+    disconnect(&helper, SIGNAL(saveProgress(int, int, QString)), this, SLOT(saveProgress(int, int, QString)));
     ui->saveProgressLabel->setText(QString("<font color='%1'>%2</font>").arg(m_successfulWrite ? "green" : "red", ui->saveProgressLabel->text()));
     enableButtons(true);
 
@@ -92,13 +92,13 @@ void SavePage::enableButtons(bool enable)
 void SavePage::saveProgress(int total, int current, QString description)
 {
     qDebug() << "Progress " << current << "(" << total << ")";
-    if(ui->saveProgressBar->maximum() != total) {
+    if (ui->saveProgressBar->maximum() != total) {
         ui->saveProgressBar->setMaximum(total);
     }
-    if(ui->saveProgressBar->value() != current) {
+    if (ui->saveProgressBar->value() != current) {
         ui->saveProgressBar->setValue(current);
     }
-    if(ui->saveProgressLabel->text() != description) {
+    if (ui->saveProgressLabel->text() != description) {
         ui->saveProgressLabel->setText(description);
     }
 }

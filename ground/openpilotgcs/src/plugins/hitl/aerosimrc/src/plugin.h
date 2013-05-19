@@ -38,16 +38,13 @@
 SIM_DLL_EXPORT void AeroSIMRC_Plugin_ReportStructSizes(
     quint32 *sizeSimToPlugin,
     quint32 *sizePluginToSim,
-    quint32 *sizePluginInit
-);
+    quint32 *sizePluginInit);
 
 SIM_DLL_EXPORT void AeroSIMRC_Plugin_Init(
-    pluginInit *p
-);
+    pluginInit *p);
 
 SIM_DLL_EXPORT void AeroSIMRC_Plugin_Run(
     const simToPlugin *stp,
-    pluginToSim *pts
-);
+    pluginToSim *pts);
 
 #endif // PLUGIN_H

@@ -85,14 +85,14 @@ public:
 
     enum buttonTypeEnum { none, save_button, apply_button, reload_button, default_button, help_button };
     struct uiRelationAutomation {
-        QString        objname;
-        QString        fieldname;
-        QString        element;
-        QString        url;
+        QString objname;
+        QString fieldname;
+        QString element;
+        QString url;
         buttonTypeEnum buttonType;
         QList<int>     buttonGroup;
-        double scale;
-        bool haslimits;
+        double  scale;
+        bool    haslimits;
     };
 
     ConfigTaskWidget(QWidget *parent = 0);

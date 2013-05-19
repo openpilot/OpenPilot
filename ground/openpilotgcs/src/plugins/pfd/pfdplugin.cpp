@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin Primary Flight Display Plugin
  * @{
- * @brief The Primary Flight Display Gadget 
+ * @brief The Primary Flight Display Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -35,32 +35,31 @@
 
 PFDPlugin::PFDPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 PFDPlugin::~PFDPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool PFDPlugin::initialize(const QStringList& args, QString *errMsg)
+bool PFDPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new PFDGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new PFDGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void PFDPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void PFDPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(PFDPlugin)
-

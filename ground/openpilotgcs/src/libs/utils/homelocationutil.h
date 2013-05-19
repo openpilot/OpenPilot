@@ -34,18 +34,14 @@
 // ******************************
 
 namespace Utils {
+class QTCREATOR_UTILS_EXPORT HomeLocationUtil {
+public:
+    HomeLocationUtil();
 
-	class QTCREATOR_UTILS_EXPORT HomeLocationUtil
-    {
-        public:
-			HomeLocationUtil();
+    int getDetails(double LLA[3], double Be[3]);
 
-            int getDetails(double LLA[3], double Be[3]);
-
-        private:
-
-    };
-
+private:
+};
 }
 
 // ******************************

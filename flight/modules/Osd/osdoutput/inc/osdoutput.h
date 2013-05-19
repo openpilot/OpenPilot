@@ -32,7 +32,7 @@
 
 int32_t osdoutputInitialize(void);
 
-#endif	/* OSDOUTPUT_H */
+#endif /* OSDOUTPUT_H */
 
 /**
  * @}

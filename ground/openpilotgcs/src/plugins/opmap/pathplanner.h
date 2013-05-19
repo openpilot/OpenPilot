@@ -35,38 +35,37 @@ namespace Ui {
 class pathPlannerUI;
 }
 
-class pathPlanner : public QWidget
-{
+class pathPlanner : public QWidget {
     Q_OBJECT
-    
+
 public:
     explicit pathPlanner(QWidget *parent = 0);
     ~pathPlanner();
-    
-    void setModel(flightDataModel *model,QItemSelectionModel *selection);
+
+    void setModel(flightDataModel *model, QItemSelectionModel *selection);
 private slots:
-        void rowsInserted ( const QModelIndex & parent, int start, int end );
+    void rowsInserted(const QModelIndex & parent, int start, int end);
 
-        void on_tbAdd_clicked();
+    void on_tbAdd_clicked();
 
-        void on_tbDelete_clicked();
+    void on_tbDelete_clicked();
 
-        void on_tbInsert_clicked();
+    void on_tbInsert_clicked();
 
-        void on_tbReadFromFile_clicked();
+    void on_tbReadFromFile_clicked();
 
-        void on_tbSaveToFile_clicked();
+    void on_tbSaveToFile_clicked();
 
-        void on_tbDetails_clicked();
+    void on_tbDetails_clicked();
 
-        void on_tbSendToUAV_clicked();
+    void on_tbSendToUAV_clicked();
 
-        void on_tbFetchFromUAV_clicked();
+    void on_tbFetchFromUAV_clicked();
 
 private:
     Ui::pathPlannerUI *ui;
-    opmap_edit_waypoint_dialog * wid;
-    flightDataModel * myModel;
+    opmap_edit_waypoint_dialog *wid;
+    flightDataModel *myModel;
 signals:
     void sendPathPlanToUAV();
     void receivePathPlanFromUAV();

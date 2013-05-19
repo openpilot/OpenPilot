@@ -33,7 +33,7 @@
 
 BiasCalibrationPage::BiasCalibrationPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
-    ui(new Ui::BiasCalibrationPage),  m_calibrationUtil(0)
+    ui(new Ui::BiasCalibrationPage), m_calibrationUtil(0)
 {
     ui->setupUi(this);
     connect(ui->levelButton, SIGNAL(clicked()), this, SLOT(performCalibration()));
@@ -41,7 +41,7 @@ BiasCalibrationPage::BiasCalibrationPage(SetupWizard *wizard, QWidget *parent) :
 
 BiasCalibrationPage::~BiasCalibrationPage()
 {
-    if(m_calibrationUtil) {
+    if (m_calibrationUtil) {
         delete m_calibrationUtil;
     }
     delete ui;
@@ -69,7 +69,7 @@ void BiasCalibrationPage::enableButtons(bool enable)
 
 void BiasCalibrationPage::performCalibration()
 {
-    if(!getWizard()->getConnectionManager()->isConnected()) {
+    if (!getWizard()->getConnectionManager()->isConnected()) {
         QMessageBox msgBox;
         msgBox.setText(tr("An OpenPilot controller must be connected to your computer to perform bias "
                           "calculations.\nPlease connect your OpenPilot controller to your computer and try again."));
@@ -83,12 +83,11 @@ void BiasCalibrationPage::performCalibration()
     ui->progressLabel->setText(QString(tr("Retrieving data...")));
 
 
-    if(!m_calibrationUtil)
-    {
+    if (!m_calibrationUtil) {
         m_calibrationUtil = new BiasCalibrationUtil(BIAS_CYCLES, BIAS_RATE);
     }
 
-    connect(m_calibrationUtil, SIGNAL(progress(long,long)), this, SLOT(calibrationProgress(long,long)));
+    connect(m_calibrationUtil, SIGNAL(progress(long, long)), this, SLOT(calibrationProgress(long, long)));
     connect(m_calibrationUtil, SIGNAL(done(accelGyroBias)), this, SLOT(calibrationDone(accelGyroBias)));
     connect(m_calibrationUtil, SIGNAL(timeout(QString)), this, SLOT(calibrationTimeout(QString)));
 
@@ -97,10 +96,10 @@ void BiasCalibrationPage::performCalibration()
 
 void BiasCalibrationPage::calibrationProgress(long current, long total)
 {
-    if(ui->levellinProgressBar->maximum() != (int)total) {
+    if (ui->levellinProgressBar->maximum() != (int)total) {
         ui->levellinProgressBar->setMaximum((int)total);
     }
-    if(ui->levellinProgressBar->value() != (int)current) {
+    if (ui->levellinProgressBar->value() != (int)current) {
         ui->levellinProgressBar->setValue((int)current);
     }
 }
@@ -125,9 +124,8 @@ void BiasCalibrationPage::calibrationTimeout(QString message)
 
 void BiasCalibrationPage::stopCalibration()
 {
-    if(m_calibrationUtil)
-    {
-        disconnect(m_calibrationUtil, SIGNAL(progress(long,long)), this, SLOT(calibrationProgress(long,long)));
+    if (m_calibrationUtil) {
+        disconnect(m_calibrationUtil, SIGNAL(progress(long, long)), this, SLOT(calibrationProgress(long, long)));
         disconnect(m_calibrationUtil, SIGNAL(done(accelGyroBias)), this, SLOT(calibrationDone(accelGyroBias)));
         disconnect(m_calibrationUtil, SIGNAL(timeout(QString)), this, SLOT(calibrationTimeout(QString)));
         ui->progressLabel->setText(QString(tr("<font color='green'>Done!</font>")));

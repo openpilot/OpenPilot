@@ -33,7 +33,7 @@ MultiPage::MultiPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
     ui(new Ui::MultiPage)
 {
-    ui->setupUi(this);    
+    ui->setupUi(this);
 
     QSvgRenderer *renderer = new QSvgRenderer();
     renderer->load(QString(":/configgadget/images/multirotor-shapes.svg"));
@@ -65,7 +65,8 @@ void MultiPage::initializePage()
 
 bool MultiPage::validatePage()
 {
-    SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE) ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
+    SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE)ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
+
     getWizard()->setVehicleSubType(type);
     return true;
 }
@@ -73,7 +74,7 @@ bool MultiPage::validatePage()
 void MultiPage::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
-    if(m_multiPic) {
+    if (m_multiPic) {
         ui->typeGraphicsView->setSceneRect(m_multiPic->boundingRect());
         ui->typeGraphicsView->fitInView(m_multiPic, Qt::KeepAspectRatio);
     }
@@ -108,71 +109,71 @@ void MultiPage::setupMultiTypesCombo()
 
     // Fredrik Arvidsson(m_thread) 2012-08-26 Disable Octos until further notice
     /*
-    ui->typeCombo->addItem(tr("Octocopter"), SetupWizard::MULTI_ROTOR_OCTO);
-    m_descriptions << tr("Octocopter");
+       ui->typeCombo->addItem(tr("Octocopter"), SetupWizard::MULTI_ROTOR_OCTO);
+       m_descriptions << tr("Octocopter");
 
-    ui->typeCombo->addItem(tr("Octocopter Coax X"), SetupWizard::MULTI_ROTOR_OCTO_COAX_X);
-    m_descriptions << tr("Octocopter Coax X");
+       ui->typeCombo->addItem(tr("Octocopter Coax X"), SetupWizard::MULTI_ROTOR_OCTO_COAX_X);
+       m_descriptions << tr("Octocopter Coax X");
 
-    ui->typeCombo->addItem(tr("Octocopter Coax +"), SetupWizard::MULTI_ROTOR_OCTO_COAX_PLUS);
-    m_descriptions << tr("Octocopter Coax +");
+       ui->typeCombo->addItem(tr("Octocopter Coax +"), SetupWizard::MULTI_ROTOR_OCTO_COAX_PLUS);
+       m_descriptions << tr("Octocopter Coax +");
 
-    ui->typeCombo->addItem(tr("Octocopter V"), SetupWizard::MULTI_ROTOR_OCTO_V);
-    m_descriptions << tr("Octocopter V");
-    */
+       ui->typeCombo->addItem(tr("Octocopter V"), SetupWizard::MULTI_ROTOR_OCTO_V);
+       m_descriptions << tr("Octocopter V");
+     */
 }
 
 void MultiPage::updateAvailableTypes()
 {
     /*
-    QVariant enable = (getWizard()->getInputType() == SetupWizard::INPUT_PWM) ? QVariant(0) : QVariant(1 | 32);
-    ui->typeCombo->model()->setData(ui->typeCombo->model()->index(6, 0), enable, Qt::UserRole - 1);
-    ui->typeCombo->model()->setData(ui->typeCombo->model()->index(7, 0), enable, Qt::UserRole - 1);
-    ui->typeCombo->model()->setData(ui->typeCombo->model()->index(8, 0), enable, Qt::UserRole - 1);
-    ui->typeCombo->model()->setData(ui->typeCombo->model()->index(9, 0), enable, Qt::UserRole - 1);
-    */
+       QVariant enable = (getWizard()->getInputType() == SetupWizard::INPUT_PWM) ? QVariant(0) : QVariant(1 | 32);
+       ui->typeCombo->model()->setData(ui->typeCombo->model()->index(6, 0), enable, Qt::UserRole - 1);
+       ui->typeCombo->model()->setData(ui->typeCombo->model()->index(7, 0), enable, Qt::UserRole - 1);
+       ui->typeCombo->model()->setData(ui->typeCombo->model()->index(8, 0), enable, Qt::UserRole - 1);
+       ui->typeCombo->model()->setData(ui->typeCombo->model()->index(9, 0), enable, Qt::UserRole - 1);
+     */
 }
 
 void MultiPage::updateImageAndDescription()
 {
-    SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE) ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
-    QString elementId = "";
+    SetupWizard::VEHICLE_SUB_TYPE type = (SetupWizard::VEHICLE_SUB_TYPE)ui->typeCombo->itemData(ui->typeCombo->currentIndex()).toInt();
+    QString elementId   = "";
     QString description = m_descriptions.at(ui->typeCombo->currentIndex());
-    switch(type)
-    {
-        case SetupWizard::MULTI_ROTOR_TRI_Y:
-            elementId = "tri";
-            break;
-        case SetupWizard::MULTI_ROTOR_QUAD_X:
-            elementId = "quad-x";
-            break;
-        case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
-            elementId = "quad-plus";
-            break;
-        case SetupWizard::MULTI_ROTOR_HEXA:
-            elementId = "quad-hexa";
-            break;
-        case SetupWizard::MULTI_ROTOR_HEXA_COAX_Y:
-            elementId = "hexa-coax";
-            break;
-        case SetupWizard::MULTI_ROTOR_HEXA_H:
-            elementId = "quad-hexa-H";
-            break;
-        case SetupWizard::MULTI_ROTOR_OCTO:
-            elementId = "quad-octo";
-            break;
-        case SetupWizard::MULTI_ROTOR_OCTO_COAX_X:
-            elementId = "octo-coax-X";
-            break;
-        case SetupWizard::MULTI_ROTOR_OCTO_COAX_PLUS:
-            elementId = "octo-coax-P";
-            break;
-        case SetupWizard::MULTI_ROTOR_OCTO_V:
-            elementId = "quad-octo-v";
-            break;
-        default:
-            elementId = "";
-            break;
+
+    switch (type) {
+    case SetupWizard::MULTI_ROTOR_TRI_Y:
+        elementId = "tri";
+        break;
+    case SetupWizard::MULTI_ROTOR_QUAD_X:
+        elementId = "quad-x";
+        break;
+    case SetupWizard::MULTI_ROTOR_QUAD_PLUS:
+        elementId = "quad-plus";
+        break;
+    case SetupWizard::MULTI_ROTOR_HEXA:
+        elementId = "quad-hexa";
+        break;
+    case SetupWizard::MULTI_ROTOR_HEXA_COAX_Y:
+        elementId = "hexa-coax";
+        break;
+    case SetupWizard::MULTI_ROTOR_HEXA_H:
+        elementId = "quad-hexa-H";
+        break;
+    case SetupWizard::MULTI_ROTOR_OCTO:
+        elementId = "quad-octo";
+        break;
+    case SetupWizard::MULTI_ROTOR_OCTO_COAX_X:
+        elementId = "octo-coax-X";
+        break;
+    case SetupWizard::MULTI_ROTOR_OCTO_COAX_PLUS:
+        elementId = "octo-coax-P";
+        break;
+    case SetupWizard::MULTI_ROTOR_OCTO_V:
+        elementId = "quad-octo-v";
+        break;
+    default:
+        elementId = "";
+        break;
     }
     m_multiPic->setElementId(elementId);
     ui->typeGraphicsView->setSceneRect(m_multiPic->boundingRect());

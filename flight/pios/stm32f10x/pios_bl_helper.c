@@ -38,7 +38,7 @@
 
 uint8_t *PIOS_BL_HELPER_FLASH_If_Read(uint32_t SectorAddress)
 {
-	return (uint8_t *) (SectorAddress);
+    return (uint8_t *)(SectorAddress);
 }
 
 #if defined(PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT)
@@ -53,28 +53,31 @@ uint8_t PIOS_BL_HELPER_FLASH_Ini()
 
 uint8_t PIOS_BL_HELPER_FLASH_Start()
 {
-    const struct pios_board_info * bdinfo = &pios_board_info_blob;
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
     uint32_t startAddress = bdinfo->fw_base;
-    uint32_t endAddress = bdinfo->fw_base + bdinfo->fw_size + bdinfo->desc_size;
+    uint32_t endAddress   = bdinfo->fw_base + bdinfo->fw_size + bdinfo->desc_size;
 
     bool success = erase_flash(startAddress, endAddress);
 
     return (success) ? 1 : 0;
 }
 
-uint8_t PIOS_BL_HELPER_FLASH_Erase_Bootloader() {
+uint8_t PIOS_BL_HELPER_FLASH_Erase_Bootloader()
+{
 /// Bootloader memory space erase
     uint32_t startAddress = BL_BANK_BASE;
-    uint32_t endAddress = BL_BANK_BASE + BL_BANK_SIZE;
+    uint32_t endAddress   = BL_BANK_BASE + BL_BANK_SIZE;
 
     bool success = erase_flash(startAddress, endAddress);
 
     return (success) ? 1 : 0;
 }
 
-static bool erase_flash(uint32_t startAddress, uint32_t endAddress) {
+static bool erase_flash(uint32_t startAddress, uint32_t endAddress)
+{
     uint32_t pageAddress = startAddress;
     uint8_t fail = false;
+
     while ((pageAddress < endAddress) && (fail == false)) {
         for (int retry = 0; retry < MAX_DEL_RETRYS; ++retry) {
             if (FLASH_ErasePage(pageAddress) == FLASH_COMPLETE) {
@@ -87,39 +90,42 @@ static bool erase_flash(uint32_t startAddress, uint32_t endAddress) {
 
 #ifdef STM32F10X_HD
         pageAddress += 2048;
-#elif defined (STM32F10X_MD)
+#elif defined(STM32F10X_MD)
         pageAddress += 1024;
 #endif
     }
     return !fail;
 }
 
-#endif
+#endif /* if defined(PIOS_INCLUDE_BL_HELPER_WRITE_SUPPORT) */
 
 uint32_t PIOS_BL_HELPER_CRC_Memory_Calc()
 {
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
 
-	PIOS_BL_HELPER_CRC_Ini();
-	CRC_ResetDR();
-	CRC_CalcBlockCRC((uint32_t *) bdinfo->fw_base, (bdinfo->fw_size) >> 2);
-	return CRC_GetCRC();
+    PIOS_BL_HELPER_CRC_Ini();
+    CRC_ResetDR();
+    CRC_CalcBlockCRC((uint32_t *)bdinfo->fw_base, (bdinfo->fw_size) >> 2);
+    return CRC_GetCRC();
 }
 
-void PIOS_BL_HELPER_FLASH_Read_Description(uint8_t * array, uint8_t size)
+void PIOS_BL_HELPER_FLASH_Read_Description(uint8_t *array, uint8_t size)
 {
-	const struct pios_board_info * bdinfo = &pios_board_info_blob;
-	uint8_t x = 0;
-	if (size > bdinfo->desc_size) size = bdinfo->desc_size;
-	for (uint32_t i = bdinfo->fw_base + bdinfo->fw_size; i < bdinfo->fw_base + bdinfo->fw_size + size; ++i) {
-		array[x] = *PIOS_BL_HELPER_FLASH_If_Read(i);
-		++x;
-	}
+    const struct pios_board_info *bdinfo = &pios_board_info_blob;
+    uint8_t x = 0;
+
+    if (size > bdinfo->desc_size) {
+        size = bdinfo->desc_size;
+    }
+    for (uint32_t i = bdinfo->fw_base + bdinfo->fw_size; i < bdinfo->fw_base + bdinfo->fw_size + size; ++i) {
+        array[x] = *PIOS_BL_HELPER_FLASH_If_Read(i);
+        ++x;
+    }
 }
 
 void PIOS_BL_HELPER_CRC_Ini()
 {
-	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
 }
 
 #endif /* PIOS_INCLUDE_BL_HELPER */

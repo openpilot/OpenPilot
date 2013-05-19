@@ -34,8 +34,7 @@ namespace Ui {
 class InputPage;
 }
 
-class InputPage : public AbstractWizardPage
-{
+class InputPage : public AbstractWizardPage {
     Q_OBJECT
 
 public:

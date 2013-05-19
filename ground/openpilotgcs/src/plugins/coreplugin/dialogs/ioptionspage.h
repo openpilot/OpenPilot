@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -39,9 +39,7 @@ class QWidget;
 QT_END_NAMESPACE
 
 namespace Core {
-
-class CORE_EXPORT IOptionsPage : public QObject
-{
+class CORE_EXPORT IOptionsPage : public QObject {
     Q_OBJECT
 public:
     IOptionsPage(QObject *parent = 0) :
@@ -49,24 +47,41 @@ public:
         m_icon(QIcon()) {}
     virtual ~IOptionsPage() {}
 
-    void setIcon(QIcon icon) { m_icon = icon; }
-    QIcon icon() { return m_icon; }
+    void setIcon(QIcon icon)
+    {
+        m_icon = icon;
+    }
+    QIcon icon()
+    {
+        return m_icon;
+    }
 
     /*  gadget options pages can leave these 4 functions as is,
         since they are decorated by UAVGadgetOptionsPageDecorator,
         all other options pages must override these */
-    virtual QString id() const { return ""; };
-    virtual QString trName() const { return ""; };
-    virtual QString category() const { return "DefaultCategory"; };
-    virtual QString trCategory() const { return "DefaultCategory"; };
+    virtual QString id() const
+    {
+        return "";
+    };
+    virtual QString trName() const
+    {
+        return "";
+    };
+    virtual QString category() const
+    {
+        return "DefaultCategory";
+    };
+    virtual QString trCategory() const
+    {
+        return "DefaultCategory";
+    };
 
     virtual QWidget *createPage(QWidget *parent) = 0;
-    virtual void apply() = 0;
+    virtual void apply()  = 0;
     virtual void finish() = 0;
 private:
     QIcon m_icon;
 };
-
 } // namespace Core
 
 #endif // IOPTIONSPAGE_H

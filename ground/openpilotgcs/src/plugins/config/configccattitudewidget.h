@@ -37,8 +37,7 @@
 
 class Ui_Widget;
 
-class ConfigCCAttitudeWidget : public ConfigTaskWidget
-{
+class ConfigCCAttitudeWidget : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
@@ -48,7 +47,7 @@ public:
     virtual void updateObjectsFromWidgets();
 
 private slots:
-    void sensorsUpdated(UAVObject * obj);
+    void sensorsUpdated(UAVObject *obj);
     void timeout();
     void startAccelCalibration();
     void openHelp();
@@ -71,7 +70,6 @@ private:
     static const float ACCEL_SCALE = 0.004f * 9.81f;
 protected:
     virtual void enableControls(bool enable);
-
 };
 
 #endif // CCATTITUDEWIDGET_H

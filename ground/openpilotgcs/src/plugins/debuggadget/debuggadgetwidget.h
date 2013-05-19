@@ -7,7 +7,7 @@
  * @{
  * @addtogroup DebugGadgetPlugin Debug Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -30,8 +30,7 @@
 
 #include <QtGui/QLabel>
 #include "ui_debug.h"
-class DebugGadgetWidget : public QLabel
-{
+class DebugGadgetWidget : public QLabel {
     Q_OBJECT
 
 public:
@@ -41,9 +40,9 @@ public:
 private:
     Ui_Form *m_config;
 private slots:
-        void saveLog();
-        void dbgMsgError( const QString & level, const QList<QVariant> & msgs );
-        void dbgMsg( const QString & level, const QList<QVariant> & msgs );
+    void saveLog();
+    void dbgMsgError(const QString & level, const QList<QVariant> & msgs);
+    void dbgMsg(const QString & level, const QList<QVariant> & msgs);
 };
 
 #endif /* DEBUGGADGETWIDGET_H_ */

@@ -10,18 +10,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -35,20 +35,30 @@
 class Ui_TopOptionsPage;
 
 namespace Core {
-
 class IUAVGadgetConfiguration;
 class UAVGadgetInstanceManager;
 
-class CORE_EXPORT UAVGadgetOptionsPageDecorator : public Core::IOptionsPage
-{
-Q_OBJECT
+class CORE_EXPORT UAVGadgetOptionsPageDecorator : public Core::IOptionsPage {
+    Q_OBJECT
 public:
     explicit UAVGadgetOptionsPageDecorator(IOptionsPage *page, IUAVGadgetConfiguration *config, bool isSingleConfigurationGadget = false, QObject *parent = 0);
 
-    QString id() const { return m_id; }
-    QString trName() const { return m_id; }
-    QString category() const { return m_category; }
-    QString trCategory() const { return m_categoryTr; }
+    QString id() const
+    {
+        return m_id;
+    }
+    QString trName() const
+    {
+        return m_id;
+    }
+    QString category() const
+    {
+        return m_category;
+    }
+    QString trCategory() const
+    {
+        return m_categoryTr;
+    }
 
     QWidget *createPage(QWidget *parent);
     void apply();
@@ -74,7 +84,6 @@ private:
 
     Ui_TopOptionsPage *m_page;
 };
-
 } // namespace Core
 
 #endif // UAVGADGETOPTIONSPAGEDECORATOR_H

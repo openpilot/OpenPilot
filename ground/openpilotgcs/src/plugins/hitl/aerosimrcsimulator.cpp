@@ -37,12 +37,12 @@ AeroSimRCSimulator::AeroSimRCSimulator(const SimulatorSettings &params)
 }
 
 AeroSimRCSimulator::~AeroSimRCSimulator()
-{
-}
+{}
 
 bool AeroSimRCSimulator::setupProcess()
 {
     QMutexLocker locker(&lock);
+
     return true;
 }
 
@@ -60,6 +60,7 @@ void AeroSimRCSimulator::transmitUpdate()
 {
     // read actuator output
     ActuatorCommand::DataFields actCmdData;
+
     actCmdData = actCommand->getData();
     float channels[10];
     for (int i = 0; i < 10; ++i) {
@@ -73,34 +74,34 @@ void AeroSimRCSimulator::transmitUpdate()
     }
 
     ActuatorDesired::DataFields actData;
-    FlightStatus::DataFields flightStatusData = flightStatus->getData();
+    FlightStatus::DataFields flightStatusData    = flightStatus->getData();
     ManualControlCommand::DataFields manCtrlData = manCtrlCommand->getData();
-    float roll = -1;
-    float pitch = -1;
-    float yaw = -1;
+    float roll     = -1;
+    float pitch    = -1;
+    float yaw      = -1;
     float throttle = -1;
 
     if (flightStatusData.FlightMode == FlightStatus::FLIGHTMODE_MANUAL) {
         // Read joystick input
         if (flightStatusData.Armed == FlightStatus::ARMED_ARMED) {
             // Note: Pitch sign is reversed in FG ?
-            roll = manCtrlData.Roll;
-            pitch = -manCtrlData.Pitch;
-            yaw = manCtrlData.Yaw;
+            roll     = manCtrlData.Roll;
+            pitch    = -manCtrlData.Pitch;
+            yaw      = manCtrlData.Yaw;
             throttle = manCtrlData.Throttle;
         }
     } else {
         // Read ActuatorDesired from autopilot
-        actData = actDesired->getData();
+        actData  = actDesired->getData();
 
-        roll = actData.Roll;
-        pitch = -actData.Pitch;
-        yaw = actData.Yaw;
-        throttle = (actData.Throttle*2.0)-1.0;
+        roll     = actData.Roll;
+        pitch    = -actData.Pitch;
+        yaw      = actData.Yaw;
+        throttle = (actData.Throttle * 2.0) - 1.0;
     }
     channels[0] = roll;
     channels[1] = pitch;
-    if(throttle < -1) {
+    if (throttle < -1) {
         throttle = -1;
     }
     channels[2] = throttle;
@@ -110,19 +111,19 @@ void AeroSimRCSimulator::transmitUpdate()
     quint8 armed;
     quint8 mode;
     armed = flightStatusData.Armed;
-    mode = flightStatusData.FlightMode;
+    mode  = flightStatusData.FlightMode;
 
     QByteArray data;
     // 50 - current size of values, 4(quint32) + 10*4(float) + 2(quint8) + 4(quint32)
     data.resize(50);
     QDataStream stream(&data, QIODevice::WriteOnly);
     stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-    stream << quint32(0x52434D44);      // magic header, "RCMD"
+    stream << quint32(0x52434D44); // magic header, "RCMD"
     for (int i = 0; i < 10; ++i) {
-        stream << channels[i];          // channels
+        stream << channels[i]; // channels
     }
-    stream << armed << mode;            // flight status
-    stream << udpCounterASrecv;         // packet counter
+    stream << armed << mode; // flight status
+    stream << udpCounterASrecv; // packet counter
 
     if (outSocket->writeDatagram(data, QHostAddress(settings.remoteAddress), settings.outPort) == -1) {
         qDebug() << "write failed: " << outSocket->errorString();
@@ -154,25 +155,25 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     // check magic header
     quint32 magic;
     stream >> magic;
-    if (magic != 0x4153494D) {   // "AERO"
+    if (magic != 0x4153494D) { // "AERO"
         qDebug() << "wrong magic: " << magic << ", correct: " << quint32(0x4153494D);
         return;
     }
 
 #define AEROSIM_RCCHANNEL_NUMELEM 8
-    float   delT,
-            homeX, homeY, homeZ,
-            WpHX, WpHY, WpLat, WpLon,
-            posX, posY, posZ,   // world
-            velX, velY, velZ,   // world
-            angX, angY, angZ,   // model
-            accX, accY, accZ;   // model
-    qreal  lat, lon;
-    float   agl,      // world
-            yaw, pitch, roll,   // model
-            volt, curr, cons,
-            rx, ry, rz, fx, fy, fz, ux, uy, uz, // matrix
-            ch[AEROSIM_RCCHANNEL_NUMELEM];
+    float delT,
+          homeX, homeY, homeZ,
+          WpHX, WpHY, WpLat, WpLon,
+          posX, posY, posZ, // world
+          velX, velY, velZ, // world
+          angX, angY, angZ, // model
+          accX, accY, accZ; // model
+    qreal lat, lon;
+    float agl, // world
+          yaw, pitch, roll, // model
+          volt, curr, cons,
+          rx, ry, rz, fx, fy, fz, ux, uy, uz, // matrix
+          ch[AEROSIM_RCCHANNEL_NUMELEM];
 
     stream >> delT;
     stream >> homeX >> homeY >> homeZ;
@@ -195,65 +196,65 @@ void AeroSimRCSimulator::processUpdate(const QByteArray &data)
     out.delT = delT;
 
     /*************************************************************************************/
-    for (int i=0; i< AEROSIM_RCCHANNEL_NUMELEM; i++) {
-        out.rc_channel[i]=ch[i]; //Elements in rc_channel are between -1 and 1
+    for (int i = 0; i < AEROSIM_RCCHANNEL_NUMELEM; i++) {
+        out.rc_channel[i] = ch[i]; // Elements in rc_channel are between -1 and 1
     }
 
     /**********************************************************************************************/
     QMatrix4x4 mat;
-    mat = QMatrix4x4( fy,  fx, -fz,  0.0,           // model matrix
-                      ry,  rx, -rz,  0.0,           // (X,Y,Z) -> (+Y,+X,-Z)
-                     -uy, -ux,  uz,  0.0,
-                     0.0, 0.0, 0.0,  1.0);
+    mat = QMatrix4x4(fy, fx, -fz, 0.0, // model matrix
+                     ry, rx, -rz, 0.0, // (X,Y,Z) -> (+Y,+X,-Z)
+                     -uy, -ux, uz, 0.0,
+                     0.0, 0.0, 0.0, 1.0);
     mat.optimize();
 
-    QQuaternion quat;                               // model quat
+    QQuaternion quat; // model quat
     asMatrix2Quat(mat, quat);
 
     /*************************************************************************************/
     // rotate gravity
-    QVector3D acc = QVector3D(accY, accX, -accZ);   // accel (X,Y,Z) -> (+Y,+X,-Z)
+    QVector3D acc = QVector3D(accY, accX, -accZ); // accel (X,Y,Z) -> (+Y,+X,-Z)
     QVector3D gee = QVector3D(0.0, 0.0, -GEE);
     QQuaternion qWorld = quat.conjugate();
-    gee = qWorld.rotatedVector(gee);
+    gee  = qWorld.rotatedVector(gee);
     acc += gee;
 
-    out.rollRate = angY * RAD2DEG;       // gyros (X,Y,Z) -> (+Y,+X,-Z)
+    out.rollRate  = angY * RAD2DEG;       // gyros (X,Y,Z) -> (+Y,+X,-Z)
     out.pitchRate = angX * RAD2DEG;
-    out.yawRate = angZ * -RAD2DEG;
+    out.yawRate   = angZ * -RAD2DEG;
 
     out.accX = acc.x();
     out.accY = acc.y();
     out.accZ = acc.z();
 
     /*************************************************************************************/
-    QVector3D rpy;          // model roll, pitch, yaw
+    QVector3D rpy; // model roll, pitch, yaw
     asMatrix2RPY(mat, rpy);
 
-    out.roll  = rpy.x();
-    out.pitch = rpy.y();
+    out.roll    = rpy.x();
+    out.pitch   = rpy.y();
     out.heading = rpy.z();
 
 
     /**********************************************************************************************/
-    out.altitude = posZ;
+    out.altitude    = posZ;
     out.agl = posZ;
-    out.heading = yaw * RAD2DEG;
-    out.latitude = lat * 10e6;
-    out.longitude = lon * 10e6;
+    out.heading     = yaw * RAD2DEG;
+    out.latitude    = lat * 10e6;
+    out.longitude   = lon * 10e6;
     out.groundspeed = qSqrt(velX * velX + velY * velY);
 
     /**********************************************************************************************/
-    out.dstN = posY;
-    out.dstE = posX;
-    out.dstD = -posZ;
+    out.dstN        = posY;
+    out.dstE        = posX;
+    out.dstD        = -posZ;
 
-    out.velNorth = velY;
-    out.velEast = velX;
-    out.velDown = -velZ;
+    out.velNorth    = velY;
+    out.velEast     = velX;
+    out.velDown     = -velZ;
 
-    out.voltage = volt;
-    out.current = curr;
+    out.voltage     = volt;
+    out.current     = curr;
     out.consumption = cons * 1000.0;
 
     updateUAVOs(out);
@@ -306,7 +307,7 @@ void AeroSimRCSimulator::asMatrix2RPY(const QMatrix4x4 &m, QVector3D &rpy)
         yaw   = qAtan2(m(0, 1), m(0, 0));
     }
 
-    rpy.setX(roll  * RAD2DEG);
+    rpy.setX(roll * RAD2DEG);
     rpy.setY(pitch * RAD2DEG);
-    rpy.setZ(yaw   * RAD2DEG);
+    rpy.setZ(yaw * RAD2DEG);
 }

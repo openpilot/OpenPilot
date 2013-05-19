@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -44,19 +44,17 @@
 #include <QtGui/QFileDialog>
 #include <QtDebug>
 
-Q_DECLARE_METATYPE(Core::Internal::ShortcutItem*)
+Q_DECLARE_METATYPE(Core::Internal::ShortcutItem *)
 
 using namespace Core;
 using namespace Core::Internal;
 
 ShortcutSettings::ShortcutSettings(QObject *parent)
     : IOptionsPage(parent)
-{
-}
+{}
 
 ShortcutSettings::~ShortcutSettings()
-{
-}
+{}
 
 // IOptionsPage
 
@@ -84,7 +82,7 @@ QWidget *ShortcutSettings::createPage(QWidget *parent)
 {
     m_keyNum = m_key[0] = m_key[1] = m_key[2] = m_key[3] = 0;
 
-    m_page = new Ui_ShortcutSettings();
+    m_page   = new Ui_ShortcutSettings();
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
 
@@ -92,15 +90,15 @@ QWidget *ShortcutSettings::createPage(QWidget *parent)
     m_page->shortcutEdit->installEventFilter(this);
 
     connect(m_page->resetButton, SIGNAL(clicked()),
-        this, SLOT(resetKeySequence()));
+            this, SLOT(resetKeySequence()));
     connect(m_page->removeButton, SIGNAL(clicked()),
-        this, SLOT(removeKeySequence()));
+            this, SLOT(removeKeySequence()));
     connect(m_page->exportButton, SIGNAL(clicked()),
-        this, SLOT(exportAction()));
+            this, SLOT(exportAction()));
     connect(m_page->importButton, SIGNAL(clicked()),
-        this, SLOT(importAction()));
+            this, SLOT(importAction()));
     connect(m_page->defaultButton, SIGNAL(clicked()),
-        this, SLOT(defaultAction()));
+            this, SLOT(defaultAction()));
 
     initialize();
 
@@ -108,7 +106,7 @@ QWidget *ShortcutSettings::createPage(QWidget *parent)
 
     connect(m_page->filterEdit, SIGNAL(textChanged(QString)), this, SLOT(filterChanged(QString)));
     connect(m_page->commandList, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-        this, SLOT(commandChanged(QTreeWidgetItem *)));
+            this, SLOT(commandChanged(QTreeWidgetItem *)));
     connect(m_page->shortcutEdit, SIGNAL(textChanged(QString)), this, SLOT(keyChanged()));
 
     new Utils::TreeWidgetColumnStretcher(m_page->commandList, 1);
@@ -120,8 +118,8 @@ QWidget *ShortcutSettings::createPage(QWidget *parent)
 
 void ShortcutSettings::apply()
 {
-    foreach (ShortcutItem *item, m_scitems)
-        item->m_cmd->setKeySequence(item->m_key);
+    foreach(ShortcutItem * item, m_scitems)
+    item->m_cmd->setKeySequence(item->m_key);
 }
 
 void ShortcutSettings::finish()
@@ -136,16 +134,17 @@ bool ShortcutSettings::eventFilter(QObject *o, QEvent *e)
 {
     Q_UNUSED(o)
 
-    if ( e->type() == QEvent::KeyPress ) {
-        QKeyEvent *k = static_cast<QKeyEvent*>(e);
+    if (e->type() == QEvent::KeyPress) {
+        QKeyEvent *k = static_cast<QKeyEvent *>(e);
         handleKeyEvent(k);
         return true;
     }
 
-    if ( e->type() == QEvent::Shortcut ||
-         e->type() == QEvent::ShortcutOverride  ||
-         e->type() == QEvent::KeyRelease )
+    if (e->type() == QEvent::Shortcut ||
+        e->type() == QEvent::ShortcutOverride ||
+        e->type() == QEvent::KeyRelease) {
         return true;
+    }
 
     return false;
 }
@@ -164,7 +163,7 @@ void ShortcutSettings::commandChanged(QTreeWidgetItem *current)
 
 void ShortcutSettings::filterChanged(const QString &f)
 {
-    for (int i=0; i<m_page->commandList->topLevelItemCount(); ++i) {
+    for (int i = 0; i < m_page->commandList->topLevelItemCount(); ++i) {
         QTreeWidgetItem *item = m_page->commandList->topLevelItem(i);
         item->setHidden(filter(f, item));
     }
@@ -173,6 +172,7 @@ void ShortcutSettings::filterChanged(const QString &f)
 void ShortcutSettings::keyChanged()
 {
     QTreeWidgetItem *current = m_page->commandList->currentItem();
+
     if (current && current->data(0, Qt::UserRole).isValid()) {
         ShortcutItem *scitem = qVariantValue<ShortcutItem *>(current->data(0, Qt::UserRole));
         scitem->m_key = QKeySequence(m_key[0], m_key[1], m_key[2], m_key[3]);
@@ -193,11 +193,13 @@ void ShortcutSettings::setKeySequence(const QKeySequence &key)
 bool ShortcutSettings::filter(const QString &f, const QTreeWidgetItem *item)
 {
     if (item->childCount() == 0) {
-        if (f.isEmpty())
+        if (f.isEmpty()) {
             return false;
+        }
         for (int i = 0; i < item->columnCount(); ++i) {
-            if (item->text(i).contains(f, Qt::CaseInsensitive))
+            if (item->text(i).contains(f, Qt::CaseInsensitive)) {
                 return false;
+            }
         }
         return true;
     }
@@ -218,6 +220,7 @@ bool ShortcutSettings::filter(const QString &f, const QTreeWidgetItem *item)
 void ShortcutSettings::resetKeySequence()
 {
     QTreeWidgetItem *current = m_page->commandList->currentItem();
+
     if (current && current->data(0, Qt::UserRole).isValid()) {
         ShortcutItem *scitem = qVariantValue<ShortcutItem *>(current->data(0, Qt::UserRole));
         setKeySequence(scitem->m_cmd->defaultKeySequence());
@@ -235,19 +238,22 @@ void ShortcutSettings::importAction()
     UniqueIDManager *uidm = UniqueIDManager::instance();
 
     QString fileName = QFileDialog::getOpenFileName(0, tr("Import Keyboard Mapping Scheme"),
-        ICore::instance()->resourcePath() + "/schemes/",
-        tr("Keyboard Mapping Scheme (*.kms)"));
+                                                    ICore::instance()->resourcePath() + "/schemes/",
+                                                    tr("Keyboard Mapping Scheme (*.kms)"));
+
     if (!fileName.isEmpty()) {
         CommandsFile cf(fileName);
         QMap<QString, QKeySequence> mapping = cf.importCommands();
 
-        foreach (ShortcutItem *item, m_scitems) {
+        foreach(ShortcutItem * item, m_scitems) {
             QString sid = uidm->stringForUniqueIdentifier(item->m_cmd->id());
+
             if (mapping.contains(sid)) {
                 item->m_key = mapping.value(sid);
                 item->m_item->setText(2, item->m_key);
-                if (item->m_item == m_page->commandList->currentItem())
+                if (item->m_item == m_page->commandList->currentItem()) {
                     commandChanged(item->m_item);
+                }
             }
         }
     }
@@ -255,11 +261,12 @@ void ShortcutSettings::importAction()
 
 void ShortcutSettings::defaultAction()
 {
-    foreach (ShortcutItem *item, m_scitems) {
+    foreach(ShortcutItem * item, m_scitems) {
         item->m_key = item->m_cmd->defaultKeySequence();
         item->m_item->setText(2, item->m_key);
-        if (item->m_item == m_page->commandList->currentItem())
+        if (item->m_item == m_page->commandList->currentItem()) {
             commandChanged(item->m_item);
+        }
     }
 }
 
@@ -283,17 +290,19 @@ void ShortcutSettings::initialize()
     m_am = ActionManagerPrivate::instance();
     UniqueIDManager *uidm = UniqueIDManager::instance();
 
-    foreach (Command *c, m_am->commands()) {
-        if (c->hasAttribute(Command::CA_NonConfigureable))
+    foreach(Command * c, m_am->commands()) {
+        if (c->hasAttribute(Command::CA_NonConfigureable)) {
             continue;
-        if (c->action() && c->action()->isSeparator())
+        }
+        if (c->action() && c->action()->isSeparator()) {
             continue;
+        }
 
         QTreeWidgetItem *item = 0;
         ShortcutItem *s = new ShortcutItem;
         m_scitems << s;
-        item = new QTreeWidgetItem(m_page->commandList);
-        s->m_cmd = c;
+        item      = new QTreeWidgetItem(m_page->commandList);
+        s->m_cmd  = c;
         s->m_item = item;
 
         item->setText(0, uidm->stringForUniqueIdentifier(c->id()));
@@ -316,29 +325,31 @@ void ShortcutSettings::initialize()
 void ShortcutSettings::handleKeyEvent(QKeyEvent *e)
 {
     int nextKey = e->key();
-    if ( m_keyNum > 3 ||
-         nextKey == Qt::Key_Control ||
-         nextKey == Qt::Key_Shift ||
-         nextKey == Qt::Key_Meta ||
-         nextKey == Qt::Key_Alt )
-         return;
+
+    if (m_keyNum > 3 ||
+        nextKey == Qt::Key_Control ||
+        nextKey == Qt::Key_Shift ||
+        nextKey == Qt::Key_Meta ||
+        nextKey == Qt::Key_Alt) {
+        return;
+    }
 
     nextKey |= translateModifiers(e->modifiers(), e->text());
     switch (m_keyNum) {
-        case 0:
-            m_key[0] = nextKey;
-            break;
-        case 1:
-            m_key[1] = nextKey;
-            break;
-        case 2:
-            m_key[2] = nextKey;
-            break;
-        case 3:
-            m_key[3] = nextKey;
-            break;
-        default:
-            break;
+    case 0:
+        m_key[0] = nextKey;
+        break;
+    case 1:
+        m_key[1] = nextKey;
+        break;
+    case 2:
+        m_key[2] = nextKey;
+        break;
+    case 3:
+        m_key[3] = nextKey;
+        break;
+    default:
+        break;
     }
     m_keyNum++;
     QKeySequence ks(m_key[0], m_key[1], m_key[2], m_key[3]);
@@ -350,18 +361,23 @@ int ShortcutSettings::translateModifiers(Qt::KeyboardModifiers state,
                                          const QString &text)
 {
     int result = 0;
+
     // The shift modifier only counts when it is not used to type a symbol
     // that is only reachable using the shift key anyway
     if ((state & Qt::ShiftModifier) && (text.size() == 0
                                         || !text.at(0).isPrint()
                                         || text.at(0).isLetter()
-                                        || text.at(0).isSpace()))
+                                        || text.at(0).isSpace())) {
         result |= Qt::SHIFT;
-    if (state & Qt::ControlModifier)
+    }
+    if (state & Qt::ControlModifier) {
         result |= Qt::CTRL;
-    if (state & Qt::MetaModifier)
+    }
+    if (state & Qt::MetaModifier) {
         result |= Qt::META;
-    if (state & Qt::AltModifier)
+    }
+    if (state & Qt::AltModifier) {
         result |= Qt::ALT;
+    }
     return result;
 }

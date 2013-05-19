@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -42,19 +42,17 @@ QT_END_NAMESPACE
 
 namespace Core {
 namespace Internal {
+struct FancyTab {
+    QIcon   icon;
+    QString text;
+    QString toolTip;
+};
 
-    struct FancyTab {
-        QIcon icon;
-        QString text;
-        QString toolTip;
-    };
-
-class FancyTabBar : public QWidget
-{
+class FancyTabBar : public QWidget {
     Q_OBJECT
 
 public:
-    FancyTabBar(QWidget *parent = 0, bool isVertical=false);
+    FancyTabBar(QWidget *parent = 0, bool isVertical = false);
     ~FancyTabBar();
 
     bool event(QEvent *event);
@@ -69,28 +67,53 @@ public:
     QSize sizeHint() const;
     QSize minimumSizeHint() const;
 
-    void insertTab(int index, const QIcon &icon, const QString &label) {
+    void insertTab(int index, const QIcon &icon, const QString &label)
+    {
         FancyTab tab;
+
         tab.icon = icon;
         tab.text = label;
         m_tabs.insert(index, tab);
     }
-    void removeTab(int index) {
+    void removeTab(int index)
+    {
         m_tabs.removeAt(index);
-        if ( m_currentIndex >= m_tabs.length() )
+        if (m_currentIndex >= m_tabs.length()) {
             m_currentIndex = m_tabs.length() - 1;
+        }
     }
     void updateTabNameIcon(int index, const QIcon &icon, const QString &label);
     void setCurrentIndex(int index);
-    int currentIndex() const { return m_currentIndex; }
+    int currentIndex() const
+    {
+        return m_currentIndex;
+    }
 
-    void setTabToolTip(int index, QString toolTip) { m_tabs[index].toolTip = toolTip; }
-    QString tabToolTip(int index) const { return m_tabs.at(index).toolTip; }
+    void setTabToolTip(int index, QString toolTip)
+    {
+        m_tabs[index].toolTip = toolTip;
+    }
+    QString tabToolTip(int index) const
+    {
+        return m_tabs.at(index).toolTip;
+    }
 
-    void setIconSize(int s) { iconSize = s; }
-    QIcon tabIcon(int index) const {return m_tabs.at(index).icon; }
-    QString tabText(int index) const { return m_tabs.at(index).text; }
-    int count() const {return m_tabs.count(); }
+    void setIconSize(int s)
+    {
+        iconSize = s;
+    }
+    QIcon tabIcon(int index) const
+    {
+        return m_tabs.at(index).icon;
+    }
+    QString tabText(int index) const
+    {
+        return m_tabs.at(index).text;
+    }
+    int count() const
+    {
+        return m_tabs.count();
+    }
     QRect tabRect(int index) const;
 
 
@@ -112,11 +135,9 @@ private:
     bool verticalTabs;
 
     QSize tabSizeHint(bool minimum = false) const;
-
 };
 
-class FancyTabWidget : public QWidget
-{
+class FancyTabWidget : public QWidget {
     Q_OBJECT
 
 public:
@@ -130,7 +151,10 @@ public:
     int cornerWidgetCount() const;
     void setTabToolTip(int index, const QString &toolTip);
     void updateTabNameIcon(int index, const QIcon &icon, const QString &label);
-    void setIconSize(int s) { m_tabBar->setIconSize(s); }
+    void setIconSize(int s)
+    {
+        m_tabBar->setIconSize(s);
+    }
 
     void paintEvent(QPaintEvent *event);
 
@@ -154,7 +178,6 @@ private:
     QWidget *m_selectionWidget;
     QStatusBar *m_statusBar;
 };
-
 } // namespace Internal
 } // namespace Core
 

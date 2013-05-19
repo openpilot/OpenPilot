@@ -33,22 +33,23 @@
 #include <QPainter>
 #include <extensionsystem/pluginspec.h>
 
-class GCSSplashScreen : public QSplashScreen
-{
+class GCSSplashScreen : public QSplashScreen {
     Q_OBJECT
 public:
     explicit GCSSplashScreen();
     ~GCSSplashScreen();
-    
+
 public slots:
     void showPluginLoadingProgress(ExtensionSystem::PluginSpec *pluginSpec);
-    void showProgressMessage(const QString &message) { drawMessageText(message); }
+    void showProgressMessage(const QString &message)
+    {
+        drawMessageText(message);
+    }
 
 private:
     QPixmap *m_pixmap;
     QPainter *m_painter;
     void drawMessageText(const QString &message);
-
 };
 
 #endif // GCSSPLASHSCREEN_H

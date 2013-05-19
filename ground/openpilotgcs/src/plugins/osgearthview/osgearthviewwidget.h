@@ -1,12 +1,12 @@
 /********************************************************************************
-* @file       osgearthviewwidget.h
-* @author     The OpenPilot Team Copyright (C) 2012.
-* @addtogroup GCSPlugins GCS Plugins
-* @{
-* @addtogroup OsgEarthview Plugin
-* @{
-* @brief Osg Earth view of UAV
-*****************************************************************************/
+ * @file       osgearthviewwidget.h
+ * @author     The OpenPilot Team Copyright (C) 2012.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup OsgEarthview Plugin
+ * @{
+ * @brief Osg Earth view of UAV
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,19 +83,18 @@ using namespace osgEarth::Annotation;
 
 class Ui_OsgEarthview;
 
-class OsgEarthviewWidget : public QWidget
-{
+class OsgEarthviewWidget : public QWidget {
     Q_OBJECT
 
 public:
     OsgEarthviewWidget(QWidget *parent = 0);
-   ~OsgEarthviewWidget();
+    ~OsgEarthviewWidget();
 
 public slots:
 
 protected: /* Protected methods */
-   void paintEvent(QPaintEvent *event);
-   void resizeEvent(QResizeEvent *event);
+    void paintEvent(QPaintEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
     OsgViewerWidget *viewWidget;
     Ui_OsgEarthview *m_widget;

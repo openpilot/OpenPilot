@@ -4,25 +4,25 @@
  * @file       abstractprocess.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -34,27 +34,37 @@
 #include <QtCore/QStringList>
 
 namespace Utils {
-
-class QTCREATOR_UTILS_EXPORT AbstractProcess
-{
+class QTCREATOR_UTILS_EXPORT AbstractProcess {
 public:
     AbstractProcess() {}
     virtual ~AbstractProcess() {}
 
-    QString workingDirectory() const { return m_workingDir; }
-    void setWorkingDirectory(const QString &dir) { m_workingDir = dir; }
+    QString workingDirectory() const
+    {
+        return m_workingDir;
+    }
+    void setWorkingDirectory(const QString &dir)
+    {
+        m_workingDir = dir;
+    }
 
-    QStringList environment() const { return m_environment; }
-    void setEnvironment(const QStringList &env) { m_environment = env; }
+    QStringList environment() const
+    {
+        return m_environment;
+    }
+    void setEnvironment(const QStringList &env)
+    {
+        m_environment = env;
+    }
 
     virtual bool start(const QString &program, const QStringList &args) = 0;
     virtual void stop() = 0;
 
     virtual bool isRunning() const = 0;
     virtual qint64 applicationPID() const = 0;
-    virtual int exitCode() const = 0;
+    virtual int exitCode() const   = 0;
 
-//signals:
+// signals:
     virtual void processError(const QString &error) = 0;
 
 #ifdef Q_OS_WIN
@@ -71,8 +81,6 @@ private:
     QString m_workingDir;
     QStringList m_environment;
 };
-
-} //namespace Utils
+} // namespace Utils
 
 #endif // ABSTRACTPROCESS_H
-

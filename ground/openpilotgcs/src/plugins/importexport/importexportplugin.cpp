@@ -50,25 +50,25 @@ ImportExportPlugin::~ImportExportPlugin()
     // Do nothing
 }
 
-bool ImportExportPlugin::initialize(const QStringList& args, QString *errMsg)
+bool ImportExportPlugin::initialize(const QStringList & args, QString *errMsg)
 {
     Q_UNUSED(args);
     Q_UNUSED(errMsg);
 
     // Add Menu entry
-    Core::ActionManager* am = Core::ICore::instance()->actionManager();
-    Core::ActionContainer* ac = am->actionContainer(Core::Constants::M_FILE);
+    Core::ActionManager *am   = Core::ICore::instance()->actionManager();
+    Core::ActionContainer *ac = am->actionContainer(Core::Constants::M_FILE);
 
-    Core::Command* cmd = am->registerAction(new QAction(this),
+    Core::Command *cmd = am->registerAction(new QAction(this),
                                             "ImportExportPlugin.ImportExport",
                                             QList<int>() <<
                                             Core::Constants::C_GLOBAL_ID);
     cmd->setDefaultKeySequence(QKeySequence("Ctrl+S"));
     cmd->action()->setText(tr("GCS Settings Import/Export..."));
 
-//    ac->menu()->addSeparator();
-//    ac->appendGroup("ImportExport");
-//    ac->addAction(cmd, "ImportExport");
+// ac->menu()->addSeparator();
+// ac->appendGroup("ImportExport");
+// ac->addAction(cmd, "ImportExport");
     ac->addAction(cmd, Core::Constants::G_FILE_SAVE);
 
 

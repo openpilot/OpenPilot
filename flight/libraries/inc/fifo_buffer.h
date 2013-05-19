@@ -30,9 +30,8 @@
 
 // *********************
 
-typedef struct
-{
-    uint8_t *buf_ptr;
+typedef struct {
+    uint8_t  *buf_ptr;
     volatile uint16_t rd;
     volatile uint16_t wr;
     uint16_t buf_size;
@@ -62,4 +61,4 @@ void fifoBuf_init(t_fifo_buffer *buf, const void *buffer, const uint16_t buffer_
 
 // *********************
 
-#endif
+#endif // ifndef _FIFO_BUFFER_H_

@@ -32,32 +32,31 @@
 
 BrowserPlugin::BrowserPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 BrowserPlugin::~BrowserPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool BrowserPlugin::initialize(const QStringList& args, QString *errMsg)
+bool BrowserPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new UAVObjectBrowserFactory(this);
-   addAutoReleasedObject(mf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new UAVObjectBrowserFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void BrowserPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void BrowserPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(BrowserPlugin)
-

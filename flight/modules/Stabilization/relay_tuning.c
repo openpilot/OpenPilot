@@ -38,7 +38,7 @@
 #include "sin_lookup.h"
 
 /**
- * Apply a step function for the stabilization controller and monitor the 
+ * Apply a step function for the stabilization controller and monitor the
  * result
  *
  * Used to  Replace the rate PID with a relay to measure the critical properties of this axis
@@ -46,101 +46,101 @@
  */
 int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 {
-	RelayTuningData relay;
-	RelayTuningGet(&relay);
+    RelayTuningData relay;
 
-	static portTickType lastHighTime;
-	static portTickType lastLowTime;
+    RelayTuningGet(&relay);
 
-	static float accum_sin, accum_cos;
-	static uint32_t accumulated = 0;
+    static portTickType lastHighTime;
+    static portTickType lastLowTime;
 
-	const uint16_t DEGLITCH_TIME = 20; // ms
-	const float AMPLITUDE_ALPHA = 0.95f;
-	const float PERIOD_ALPHA = 0.95f;
+    static float accum_sin, accum_cos;
+    static uint32_t accumulated  = 0;
 
-	portTickType thisTime = xTaskGetTickCount();
+    const uint16_t DEGLITCH_TIME = 20; // ms
+    const float AMPLITUDE_ALPHA  = 0.95f;
+    const float PERIOD_ALPHA     = 0.95f;
 
-	static bool rateRelayRunning[MAX_AXES];
+    portTickType thisTime = xTaskGetTickCount();
 
-	// This indicates the current estimate of the smoothed error.  So when it is high
-	// we are waiting for it to go low.
-	static bool high = false;
+    static bool rateRelayRunning[MAX_AXES];
 
-	// On first run initialize estimates to something reasonable
-	if(reinit) {
-		rateRelayRunning[axis] = false;
-		relay.Period[axis] = 200;
-		relay.Gain[axis] = 0;
+    // This indicates the current estimate of the smoothed error.  So when it is high
+    // we are waiting for it to go low.
+    static bool high = false;
 
-		accum_sin = 0;
-		accum_cos = 0;
-		accumulated = 0;
+    // On first run initialize estimates to something reasonable
+    if (reinit) {
+        rateRelayRunning[axis] = false;
+        relay.Period[axis]     = 200;
+        relay.Gain[axis] = 0;
 
-		// These should get reinitialized anyway
-		high = true;
-		lastHighTime = thisTime;
-		lastLowTime = thisTime;
-		RelayTuningSet(&relay);
-	}
+        accum_sin   = 0;
+        accum_cos   = 0;
+        accumulated = 0;
+
+        // These should get reinitialized anyway
+        high = true;
+        lastHighTime = thisTime;
+        lastLowTime  = thisTime;
+        RelayTuningSet(&relay);
+    }
 
 
-	RelayTuningSettingsData relaySettings;
-	RelayTuningSettingsGet(&relaySettings);
+    RelayTuningSettingsData relaySettings;
+    RelayTuningSettingsGet(&relaySettings);
 
-	// Compute output, simple threshold on error
-	*output = high ? relaySettings.Amplitude : -relaySettings.Amplitude;
+    // Compute output, simple threshold on error
+    *output = high ? relaySettings.Amplitude : -relaySettings.Amplitude;
 
-	/**** The code below here is to estimate the properties of the oscillation ****/
+    /**** The code below here is to estimate the properties of the oscillation ****/
 
-	// Make sure the period can't go below limit
-	if (relay.Period[axis] < DEGLITCH_TIME)
-		relay.Period[axis] = DEGLITCH_TIME;
+    // Make sure the period can't go below limit
+    if (relay.Period[axis] < DEGLITCH_TIME) {
+        relay.Period[axis] = DEGLITCH_TIME;
+    }
 
-	// Project the error onto a sine and cosine of the same frequency
-	// to accumulate the average amplitude
-	int32_t dT = thisTime - lastHighTime;
-	float phase = ((float)360 * (float)dT) / relay.Period[axis];
-	if(phase >= 360)
-		phase = 0;
-	accum_sin += sin_lookup_deg(phase) * error;
-	accum_cos += cos_lookup_deg(phase) * error;
-	accumulated ++;
+    // Project the error onto a sine and cosine of the same frequency
+    // to accumulate the average amplitude
+    int32_t dT  = thisTime - lastHighTime;
+    float phase = ((float)360 * (float)dT) / relay.Period[axis];
+    if (phase >= 360) {
+        phase = 0;
+    }
+    accum_sin += sin_lookup_deg(phase) * error;
+    accum_cos += cos_lookup_deg(phase) * error;
+    accumulated++;
 
-	// Make sure we've had enough time since last transition then check for a change in the output
-	bool time_hysteresis = (high ? (thisTime - lastHighTime) : (thisTime - lastLowTime)) > DEGLITCH_TIME;
+    // Make sure we've had enough time since last transition then check for a change in the output
+    bool time_hysteresis = (high ? (thisTime - lastHighTime) : (thisTime - lastLowTime)) > DEGLITCH_TIME;
 
-	if ( !high && time_hysteresis && error > relaySettings.HysteresisThresh ){
-		/* POSITIVE CROSSING DETECTED */
+    if (!high && time_hysteresis && error > relaySettings.HysteresisThresh) {
+        /* POSITIVE CROSSING DETECTED */
 
-		float this_amplitude = 2 * sqrtf(accum_sin*accum_sin + accum_cos*accum_cos) / accumulated;
-		float this_gain = this_amplitude / relaySettings.Amplitude;
+        float this_amplitude = 2 * sqrtf(accum_sin * accum_sin + accum_cos * accum_cos) / accumulated;
+        float this_gain = this_amplitude / relaySettings.Amplitude;
 
-		accumulated = 0;
-		accum_sin = 0;
-		accum_cos = 0;
+        accumulated = 0;
+        accum_sin   = 0;
+        accum_cos   = 0;
 
-		if(rateRelayRunning[axis] == false) {
-			rateRelayRunning[axis] = true;
-			relay.Period[axis] = 200;
-			relay.Gain[axis] = 0;
-		} else {
-			// Low pass filter each amplitude and period
-			relay.Gain[axis] = relay.Gain[axis] * AMPLITUDE_ALPHA + this_gain * (1 - AMPLITUDE_ALPHA);
-			relay.Period[axis] = relay.Period[axis] * PERIOD_ALPHA + dT * (1 - PERIOD_ALPHA);
-		}
-		lastHighTime = thisTime;
-		high = true;
-		RelayTuningSet(&relay);
+        if (rateRelayRunning[axis] == false) {
+            rateRelayRunning[axis] = true;
+            relay.Period[axis]     = 200;
+            relay.Gain[axis] = 0;
+        } else {
+            // Low pass filter each amplitude and period
+            relay.Gain[axis]   = relay.Gain[axis] * AMPLITUDE_ALPHA + this_gain * (1 - AMPLITUDE_ALPHA);
+            relay.Period[axis] = relay.Period[axis] * PERIOD_ALPHA + dT * (1 - PERIOD_ALPHA);
+        }
+        lastHighTime = thisTime;
+        high = true;
+        RelayTuningSet(&relay);
+    } else if (high && time_hysteresis && error < -relaySettings.HysteresisThresh) {
+        /* FALLING CROSSING DETECTED */
 
-	} else if ( high && time_hysteresis && error < -relaySettings.HysteresisThresh ) {
-		/* FALLING CROSSING DETECTED */
+        lastLowTime = thisTime;
+        high = false;
+    }
 
-		lastLowTime = thisTime;
-		high = false;
-
-	}
-
-	return 0;
+    return 0;
 }
-

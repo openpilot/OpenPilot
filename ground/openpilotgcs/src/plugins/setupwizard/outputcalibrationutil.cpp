@@ -35,6 +35,7 @@ OutputCalibrationUtil::OutputCalibrationUtil(QObject *parent) :
     QObject(parent), m_outputChannel(-1), m_safeValue(1000)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+
     m_uavObjectManager = pm->getObject<UAVObjectManager>();
     Q_ASSERT(m_uavObjectManager);
 }
@@ -46,31 +47,30 @@ OutputCalibrationUtil::~OutputCalibrationUtil()
 
 void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValue)
 {
-    if(m_outputChannel < 0 && channel < ActuatorCommand::CHANNEL_NUMELEM)
-    {
-        //Start output...
+    if (m_outputChannel < 0 && channel < ActuatorCommand::CHANNEL_NUMELEM) {
+        // Start output...
         m_outputChannel = channel;
-        m_safeValue = safeValue;
+        m_safeValue     = safeValue;
 
         qDebug() << "Starting output for channel " << m_outputChannel << "...";
 
         ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(m_uavObjectManager);
         Q_ASSERT(actuatorCommand);
-        UAVObject::Metadata metaData = actuatorCommand->getMetadata();
+        UAVObject::Metadata metaData     = actuatorCommand->getMetadata();
         m_savedActuatorCommandMetadata = metaData;
 
-        //Store current data for later restore
-        m_savedActuatorCommandData = actuatorCommand->getData();
+        // Store current data for later restore
+        m_savedActuatorCommandData     = actuatorCommand->getData();
 
-        //Enable actuator control from GCS...
-        //Store current metadata for later restore
+        // Enable actuator control from GCS...
+        // Store current metadata for later restore
         UAVObject::SetFlightAccess(metaData, UAVObject::ACCESS_READONLY);
         UAVObject::SetFlightTelemetryUpdateMode(metaData, UAVObject::UPDATEMODE_ONCHANGE);
         UAVObject::SetGcsTelemetryAcked(metaData, false);
         UAVObject::SetGcsTelemetryUpdateMode(metaData, UAVObject::UPDATEMODE_ONCHANGE);
         metaData.gcsTelemetryUpdatePeriod = 100;
 
-        //Apply changes
+        // Apply changes
         actuatorCommand->setMetadata(metaData);
         actuatorCommand->updated();
 
@@ -80,17 +80,16 @@ void OutputCalibrationUtil::startChannelOutput(quint16 channel, quint16 safeValu
 
 void OutputCalibrationUtil::stopChannelOutput()
 {
-    if(m_outputChannel >= 0)
-    {
+    if (m_outputChannel >= 0) {
         qDebug() << "Stopping output for channel " << m_outputChannel << "...";
-        //Stop output...
+        // Stop output...
         setChannelOutputValue(m_safeValue);
         qDebug() << "Settings output for channel " << m_outputChannel << " to " << m_safeValue;
 
         // Restore metadata to what it was before
         ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(m_uavObjectManager);
         Q_ASSERT(actuatorCommand);
-        //actuatorCommand->setData(m_savedActuatorCommandData);
+        // actuatorCommand->setData(m_savedActuatorCommandData);
         actuatorCommand->setMetadata(m_savedActuatorCommandMetadata);
         actuatorCommand->updated();
 
@@ -102,9 +101,8 @@ void OutputCalibrationUtil::stopChannelOutput()
 
 void OutputCalibrationUtil::setChannelOutputValue(quint16 value)
 {
-    if(m_outputChannel >= 0)
-    {
-        //Set output value
+    if (m_outputChannel >= 0) {
+        // Set output value
         qDebug() << "Setting output value for channel " << m_outputChannel << " to " << value << ".";
         ActuatorCommand *actuatorCommand = ActuatorCommand::GetInstance(m_uavObjectManager);
         Q_ASSERT(actuatorCommand);

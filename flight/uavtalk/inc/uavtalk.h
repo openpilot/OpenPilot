@@ -30,7 +30,7 @@
 #define UAVTALK_H
 
 // Public types
-typedef int32_t (*UAVTalkOutputStream)(uint8_t* data, int32_t length);
+typedef int32_t (*UAVTalkOutputStream)(uint8_t *data, int32_t length);
 
 typedef struct {
     uint32_t txBytes;
@@ -43,9 +43,9 @@ typedef struct {
     uint32_t rxErrors;
 } UAVTalkStats;
 
-typedef void* UAVTalkConnection;
+typedef void *UAVTalkConnection;
 
-typedef enum {UAVTALK_STATE_ERROR=0, UAVTALK_STATE_SYNC, UAVTALK_STATE_TYPE, UAVTALK_STATE_SIZE, UAVTALK_STATE_OBJID, UAVTALK_STATE_INSTID, UAVTALK_STATE_TIMESTAMP, UAVTALK_STATE_DATA, UAVTALK_STATE_CS, UAVTALK_STATE_COMPLETE} UAVTalkRxState;
+typedef enum { UAVTALK_STATE_ERROR = 0, UAVTALK_STATE_SYNC, UAVTALK_STATE_TYPE, UAVTALK_STATE_SIZE, UAVTALK_STATE_OBJID, UAVTALK_STATE_INSTID, UAVTALK_STATE_TIMESTAMP, UAVTALK_STATE_DATA, UAVTALK_STATE_CS, UAVTALK_STATE_COMPLETE } UAVTalkRxState;
 
 // Public functions
 UAVTalkConnection UAVTalkInitialize(UAVTalkOutputStream outputStream);

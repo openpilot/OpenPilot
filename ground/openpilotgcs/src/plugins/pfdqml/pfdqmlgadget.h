@@ -27,15 +27,17 @@ class PfdQmlGadgetWidget;
 
 using namespace Core;
 
-class PfdQmlGadget : public Core::IUAVGadget
-{
+class PfdQmlGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     PfdQmlGadget(QString classId, PfdQmlGadgetWidget *widget, QWidget *parent = 0);
     ~PfdQmlGadget();
 
-    QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 
 private:
     PfdQmlGadgetWidget *m_widget;

@@ -45,7 +45,7 @@
 QString XmlConfig::rootName = "gcs";
 
 const QSettings::Format XmlConfig::XmlSettingsFormat =
-        QSettings::registerFormat("xml", XmlConfig::readXmlFile, XmlConfig::writeXmlFile);
+    QSettings::registerFormat("xml", XmlConfig::readXmlFile, XmlConfig::writeXmlFile);
 
 
 bool XmlConfig::readXmlFile(QIODevice &device, QSettings::SettingsMap &map)
@@ -57,7 +57,7 @@ bool XmlConfig::readXmlFile(QIODevice &device, QSettings::SettingsMap &map)
     int errorColumn;
 
     if (!domDoc.setContent(&device, true, &errorStr, &errorLine,
-                                &errorColumn)) {
+                           &errorColumn)) {
         QString err = QString(tr("GCS config")) +
                       tr("Parse error at line %1, column %2:\n%3")
                       .arg(errorLine)
@@ -72,17 +72,17 @@ bool XmlConfig::readXmlFile(QIODevice &device, QSettings::SettingsMap &map)
     return true;
 }
 
-void XmlConfig::handleNode(QDomElement* node, QSettings::SettingsMap &map, QString path)
+void XmlConfig::handleNode(QDomElement *node, QSettings::SettingsMap &map, QString path)
 {
-    if ( !node ){
+    if (!node) {
         return;
     }
-  //  qDebug() << "XmlConfig::handleNode start";
+    // qDebug() << "XmlConfig::handleNode start";
 
     QString nodeName = node->nodeName();
     // For arrays, QT will use simple numbers as keys, which is not a valid element in XML.
     // Therefore we prefixed these.
-    if ( nodeName.startsWith(NUM_PREFIX) ){
+    if (nodeName.startsWith(NUM_PREFIX)) {
         nodeName.replace(NUM_PREFIX, "");
     }
     // Xml tags are restrictive with allowed characters,
@@ -90,42 +90,42 @@ void XmlConfig::handleNode(QDomElement* node, QSettings::SettingsMap &map, QStri
     nodeName = nodeName.replace("__PCT__", "%");
     nodeName = QUrl::fromPercentEncoding(nodeName.toAscii());
 
-    if ( nodeName == XmlConfig::rootName )
+    if (nodeName == XmlConfig::rootName) {
         ;
-    else if ( path == "" )
+    } else if (path == "") {
         path = nodeName;
-    else
+    } else {
         path += "/" + nodeName;
+    }
 
-//    qDebug() << "Node: " << ": " << path << " Children: " << node->childNodes().length();
-    for ( uint i = 0; i < node->childNodes().length(); ++i ){
+// qDebug() << "Node: " << ": " << path << " Children: " << node->childNodes().length();
+    for (uint i = 0; i < node->childNodes().length(); ++i) {
         QDomNode child = node->childNodes().item(i);
-        if ( child.isElement() ){
-            handleNode( static_cast<QDomElement*>(&child), map, path);
-        }
-        else if ( child.isText() ){
-//            qDebug() << "Key: " << path << " Value:" << node->text();
+        if (child.isElement()) {
+            handleNode(static_cast<QDomElement *>(&child), map, path);
+        } else if (child.isText()) {
+// qDebug() << "Key: " << path << " Value:" << node->text();
             map.insert(path, stringToVariant(node->text()));
-        }
-        else{
+        } else {
             qDebug() << "Child not Element or text!" << child.nodeType();
         }
     }
-//    qDebug() << "XmlConfig::handleNode end";
+// qDebug() << "XmlConfig::handleNode end";
 }
 
 bool XmlConfig::writeXmlFile(QIODevice &device, const QSettings::SettingsMap &map)
 {
     QDomDocument outDocument;
-//    qDebug() << "writeXmlFile start";
-    outDocument.appendChild( outDocument.createElement(XmlConfig::rootName));
+
+// qDebug() << "writeXmlFile start";
+    outDocument.appendChild(outDocument.createElement(XmlConfig::rootName));
     QMapIterator<QString, QVariant> iter(map);
     while (iter.hasNext()) {
         iter.next();
-//        qDebug() << "Entry: " << iter.key() << ": " << iter.value().toString() << endl;
+// qDebug() << "Entry: " << iter.key() << ": " << iter.value().toString() << endl;
         QDomNode node = outDocument.firstChild();
-        foreach ( QString elem, iter.key().split('/')){
-            if ( elem == "" ){
+        foreach(QString elem, iter.key().split('/')) {
+            if (elem == "") {
                 continue;
             }
             // Xml tags are restrictive with allowed characters,
@@ -134,14 +134,14 @@ bool XmlConfig::writeXmlFile(QIODevice &device, const QSettings::SettingsMap &ma
             elem = elem.replace("%", "__PCT__");
             // For arrays, QT will use simple numbers as keys, which is not a valid element in XML.
             // Therefore we prefixed these.
-            if ( elem.startsWith(NUM_PREFIX) ){
+            if (elem.startsWith(NUM_PREFIX)) {
                 qWarning() << "ERROR: Settings must not start with " << NUM_PREFIX
-                        << " in: " + iter.key();
+                           << " in: " + iter.key();
             }
-            if ( QRegExp("[0-9]").exactMatch(elem.left(1)) ){
+            if (QRegExp("[0-9]").exactMatch(elem.left(1))) {
                 elem.prepend(NUM_PREFIX);
             }
-            if ( node.firstChildElement(elem).isNull() ){
+            if (node.firstChildElement(elem).isNull()) {
                 node.appendChild(outDocument.createElement(elem));
             }
             node = node.firstChildElement(elem);
@@ -149,18 +149,20 @@ bool XmlConfig::writeXmlFile(QIODevice &device, const QSettings::SettingsMap &ma
         node.appendChild(outDocument.createTextNode(variantToString(iter.value())));
     }
     device.write(outDocument.toByteArray(2).constData());
-//    qDebug() << "Dokument:\n" << outDocument.toByteArray(2).constData();
-//    qDebug() << "writeXmlFile end";
+// qDebug() << "Dokument:\n" << outDocument.toByteArray(2).constData();
+// qDebug() << "writeXmlFile end";
     return true;
 }
 
 
-QSettings::SettingsMap XmlConfig::settingsToMap(QSettings& qs){
+QSettings::SettingsMap XmlConfig::settingsToMap(QSettings & qs)
+{
     qDebug() << "settingsToMap:---------------";
     QSettings::SettingsMap map;
     QStringList keys = qs.allKeys();
-    foreach (QString key, keys) {
+    foreach(QString key, keys) {
         QVariant val = qs.value(key);
+
         qDebug() << key << val.toString();
         map.insert(key, val);
     }
@@ -173,34 +175,38 @@ QString XmlConfig::variantToString(const QVariant &v)
     QString result;
 
     switch (v.type()) {
-        case QVariant::Invalid:
-            result = QLatin1String("@Invalid()");
-            break;
+    case QVariant::Invalid:
+        result = QLatin1String("@Invalid()");
+        break;
 
-        case QVariant::ByteArray: {
-            QByteArray a = v.toByteArray().toBase64();
-            result = QLatin1String("@ByteArray(");
-            result += QString::fromLatin1(a.constData(), a.size());
-            result += QLatin1Char(')');
-            break;
-        }
+    case QVariant::ByteArray:
+    {
+        QByteArray a = v.toByteArray().toBase64();
+        result  = QLatin1String("@ByteArray(");
+        result += QString::fromLatin1(a.constData(), a.size());
+        result += QLatin1Char(')');
+        break;
+    }
 
-        case QVariant::String:
-        case QVariant::LongLong:
-        case QVariant::ULongLong:
-        case QVariant::Int:
-        case QVariant::UInt:
-        case QVariant::Bool:
-        case QVariant::Double:
-        case QVariant::KeySequence:
-        case QVariant::Color: {
-            result = v.toString();
-            if (result.startsWith(QLatin1Char('@')))
-                result.prepend(QLatin1Char('@'));
-            break;
+    case QVariant::String:
+    case QVariant::LongLong:
+    case QVariant::ULongLong:
+    case QVariant::Int:
+    case QVariant::UInt:
+    case QVariant::Bool:
+    case QVariant::Double:
+    case QVariant::KeySequence:
+    case QVariant::Color:
+    {
+        result = v.toString();
+        if (result.startsWith(QLatin1Char('@'))) {
+            result.prepend(QLatin1Char('@'));
         }
+        break;
+    }
 #ifndef QT_NO_GEOM_VARIANT
-    case QVariant::Rect: {
+    case QVariant::Rect:
+    {
         QRect r = qvariant_cast<QRect>(v);
         result += QLatin1String("@Rect(");
         result += QString::number(r.x());
@@ -213,7 +219,8 @@ QString XmlConfig::variantToString(const QVariant &v)
         result += QLatin1Char(')');
         break;
     }
-    case QVariant::Size: {
+    case QVariant::Size:
+    {
         QSize s = qvariant_cast<QSize>(v);
         result += QLatin1String("@Size(");
         result += QString::number(s.width());
@@ -222,7 +229,8 @@ QString XmlConfig::variantToString(const QVariant &v)
         result += QLatin1Char(')');
         break;
     }
-    case QVariant::Point: {
+    case QVariant::Point:
+    {
         QPoint p = qvariant_cast<QPoint>(v);
         result += QLatin1String("@Point(");
         result += QString::number(p.x());
@@ -233,7 +241,8 @@ QString XmlConfig::variantToString(const QVariant &v)
     }
 #endif // !QT_NO_GEOM_VARIANT
 
-    default: {
+    default:
+    {
 #ifndef QT_NO_DATASTREAM
         QByteArray a;
         {
@@ -242,20 +251,20 @@ QString XmlConfig::variantToString(const QVariant &v)
             s << v;
         }
 
-        result = QLatin1String("@Variant(");
+        result  = QLatin1String("@Variant(");
         result += QString::fromLatin1(a.toBase64().constData());
         result += QLatin1Char(')');
-	// These were being much too noisy!!
-        //qDebug() << "Variant Type: " << v.type();
-        //qDebug()<< "Variant: " << result;
+        // These were being much too noisy!!
+        // qDebug() << "Variant Type: " << v.type();
+        // qDebug()<< "Variant: " << result;
 #else
         Q_ASSERT(!"QSettings: Cannot save custom types without QDataStream support");
 #endif
         break;
     }
-}
+    }
 
-return result;
+    return result;
 }
 
 QVariant XmlConfig::stringToVariant(const QString &s)
@@ -272,30 +281,34 @@ QVariant XmlConfig::stringToVariant(const QString &s)
                 QVariant result;
                 stream >> result;
                 return result;
+
 #else
                 Q_ASSERT(!"QSettings: Cannot load custom types without QDataStream support");
 #endif
 #ifndef QT_NO_GEOM_VARIANT
             } else if (s.startsWith(QLatin1String("@Rect("))) {
                 QStringList args = splitArgs(s, 5);
-                if (args.size() == 4)
+                if (args.size() == 4) {
                     return QVariant(QRect(args[0].toInt(), args[1].toInt(), args[2].toInt(), args[3].toInt()));
+                }
             } else if (s.startsWith(QLatin1String("@Size("))) {
                 QStringList args = splitArgs(s, 5);
-                if (args.size() == 2)
+                if (args.size() == 2) {
                     return QVariant(QSize(args[0].toInt(), args[1].toInt()));
+                }
             } else if (s.startsWith(QLatin1String("@Point("))) {
                 QStringList args = splitArgs(s, 6);
-                if (args.size() == 2)
+                if (args.size() == 2) {
                     return QVariant(QPoint(args[0].toInt(), args[1].toInt()));
+                }
 #endif
             } else if (s == QLatin1String("@Invalid()")) {
                 return QVariant();
             }
-
         }
-        if (s.startsWith(QLatin1String("@@")))
+        if (s.startsWith(QLatin1String("@@"))) {
             return QVariant(s.mid(1));
+        }
     }
 
     return QVariant(s);
@@ -304,6 +317,7 @@ QVariant XmlConfig::stringToVariant(const QString &s)
 QStringList XmlConfig::splitArgs(const QString &s, int idx)
 {
     int l = s.length();
+
     Q_ASSERT(l > 0);
     Q_ASSERT(s.at(idx) == QLatin1Char('('));
     Q_ASSERT(s.at(l - 1) == QLatin1Char(')'));

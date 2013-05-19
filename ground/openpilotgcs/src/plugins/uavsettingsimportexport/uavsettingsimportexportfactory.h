@@ -29,8 +29,7 @@
 #include "uavsettingsimportexport_global.h"
 #include "uavobjectutil/uavobjectutilmanager.h"
 
-class UAVSETTINGSIMPORTEXPORT_EXPORT UAVSettingsImportExportFactory : public QObject
-{
+class UAVSETTINGSIMPORTEXPORT_EXPORT UAVSettingsImportExportFactory : public QObject {
     Q_OBJECT
 
 public:
@@ -48,7 +47,6 @@ private slots:
 signals:
     void importAboutToBegin();
     void importEnded();
-
 };
 
 #endif // UAVSETTINGSIMPORTEXPORTFACTORY_H

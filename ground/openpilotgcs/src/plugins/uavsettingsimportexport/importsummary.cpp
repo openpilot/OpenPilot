@@ -26,28 +26,27 @@
  */
 #include "importsummary.h"
 
-ImportSummaryDialog::ImportSummaryDialog( QWidget *parent) :
+ImportSummaryDialog::ImportSummaryDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ImportSummaryDialog)
 {
-   ui->setupUi(this);
-   setWindowTitle(tr("Import Summary"));
+    ui->setupUi(this);
+    setWindowTitle(tr("Import Summary"));
 
-   ui->importSummaryList->setColumnCount(3);
-   ui->importSummaryList->setRowCount(0);
-   QStringList header;
-   header.append("Save");
-   header.append("Name");
-   header.append("Status");
-   ui->importSummaryList->setHorizontalHeaderLabels(header);
-   ui->progressBar->setValue(0);
+    ui->importSummaryList->setColumnCount(3);
+    ui->importSummaryList->setRowCount(0);
+    QStringList header;
+    header.append("Save");
+    header.append("Name");
+    header.append("Status");
+    ui->importSummaryList->setHorizontalHeaderLabels(header);
+    ui->progressBar->setValue(0);
 
-   connect( ui->closeButton, SIGNAL(clicked()), this, SLOT(close()));
-   connect(ui->saveToFlash, SIGNAL(clicked()), this, SLOT(doTheSaving()));
+    connect(ui->closeButton, SIGNAL(clicked()), this, SLOT(close()));
+    connect(ui->saveToFlash, SIGNAL(clicked()), this, SLOT(doTheSaving()));
 
-   // Connect the help button
-   connect(ui->helpButton, SIGNAL(clicked()), this, SLOT(openHelp()));
-
+    // Connect the help button
+    connect(ui->helpButton, SIGNAL(clicked()), this, SLOT(openHelp()));
 }
 
 ImportSummaryDialog::~ImportSummaryDialog()
@@ -56,30 +55,30 @@ ImportSummaryDialog::~ImportSummaryDialog()
 }
 
 /*
-  Open the right page on the wiki
-  */
+   Open the right page on the wiki
+ */
 void ImportSummaryDialog::openHelp()
 {
-    QDesktopServices::openUrl( QUrl("http://wiki.openpilot.org/display/Doc/UAV+Settings+import-export", QUrl::StrictMode) );
+    QDesktopServices::openUrl(QUrl("http://wiki.openpilot.org/display/Doc/UAV+Settings+import-export", QUrl::StrictMode));
 }
 
 /*
-  Adds a new line about a UAVObject along with its status
-  (whether it got saved OK or not)
-  */
+   Adds a new line about a UAVObject along with its status
+   (whether it got saved OK or not)
+ */
 void ImportSummaryDialog::addLine(QString uavObjectName, QString text, bool status)
 {
-    ui->importSummaryList->setRowCount(ui->importSummaryList->rowCount()+1);
-    int row = ui->importSummaryList->rowCount()-1;
-    ui->importSummaryList->setCellWidget(row,0,new QCheckBox(ui->importSummaryList));
+    ui->importSummaryList->setRowCount(ui->importSummaryList->rowCount() + 1);
+    int row = ui->importSummaryList->rowCount() - 1;
+    ui->importSummaryList->setCellWidget(row, 0, new QCheckBox(ui->importSummaryList));
     QTableWidgetItem *objName = new QTableWidgetItem(uavObjectName);
     ui->importSummaryList->setItem(row, 1, objName);
-    QCheckBox *box = dynamic_cast<QCheckBox*>(ui->importSummaryList->cellWidget(row,0));
-    ui->importSummaryList->setItem(row,2,new QTableWidgetItem(text));
+    QCheckBox *box = dynamic_cast<QCheckBox *>(ui->importSummaryList->cellWidget(row, 0));
+    ui->importSummaryList->setItem(row, 2, new QTableWidgetItem(text));
 
-    //Disable editability and selectability in table elements
-    ui->importSummaryList->item(row,1)->setFlags(!Qt::ItemIsEditable);
-    ui->importSummaryList->item(row,2)->setFlags(!Qt::ItemIsEditable);
+    // Disable editability and selectability in table elements
+    ui->importSummaryList->item(row, 1)->setFlags(!Qt::ItemIsEditable);
+    ui->importSummaryList->item(row, 2)->setFlags(!Qt::ItemIsEditable);
 
     if (status) {
         box->setChecked(true);
@@ -88,36 +87,38 @@ void ImportSummaryDialog::addLine(QString uavObjectName, QString text, bool stat
         box->setEnabled(false);
     }
 
-   this->repaint();
-   this->showEvent(NULL);
+    this->repaint();
+    this->showEvent(NULL);
 }
 
 /*
-  Saves every checked UAVObjet in the list to Flash
-  */
+   Saves every checked UAVObjet in the list to Flash
+ */
 void ImportSummaryDialog::doTheSaving()
 {
-    int itemCount=0;
+    int itemCount = 0;
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVObjectUtilManager *utilManager = pm->getObject<UAVObjectUtilManager>();
-    connect(utilManager, SIGNAL(saveCompleted(int,bool)), this, SLOT(updateSaveCompletion()));
+    UAVObjectUtilManager *utilManager  = pm->getObject<UAVObjectUtilManager>();
 
-    for(int i=0; i < ui->importSummaryList->rowCount(); i++) {
-        QCheckBox *box = dynamic_cast<QCheckBox*>(ui->importSummaryList->cellWidget(i,0));
+    connect(utilManager, SIGNAL(saveCompleted(int, bool)), this, SLOT(updateSaveCompletion()));
+
+    for (int i = 0; i < ui->importSummaryList->rowCount(); i++) {
+        QCheckBox *box = dynamic_cast<QCheckBox *>(ui->importSummaryList->cellWidget(i, 0));
         if (box->isChecked()) {
-        ++itemCount;
+            ++itemCount;
         }
     }
-    if(itemCount==0)
+    if (itemCount == 0) {
         return;
-    ui->progressBar->setMaximum(itemCount+1);
+    }
+    ui->progressBar->setMaximum(itemCount + 1);
     ui->progressBar->setValue(1);
-    for(int i=0; i < ui->importSummaryList->rowCount(); i++) {
-        QString uavObjectName = ui->importSummaryList->item(i,1)->text();
-        QCheckBox *box = dynamic_cast<QCheckBox*>(ui->importSummaryList->cellWidget(i,0));
+    for (int i = 0; i < ui->importSummaryList->rowCount(); i++) {
+        QString uavObjectName = ui->importSummaryList->item(i, 1)->text();
+        QCheckBox *box = dynamic_cast<QCheckBox *>(ui->importSummaryList->cellWidget(i, 0));
         if (box->isChecked()) {
-            UAVObject* obj = objManager->getObject(uavObjectName);
+            UAVObject *obj = objManager->getObject(uavObjectName);
             utilManager->saveObjectToSD(obj);
             this->repaint();
         }
@@ -125,15 +126,13 @@ void ImportSummaryDialog::doTheSaving()
 
     ui->saveToFlash->setEnabled(false);
     ui->closeButton->setEnabled(false);
-
 }
 
 
 void ImportSummaryDialog::updateSaveCompletion()
 {
-    ui->progressBar->setValue(ui->progressBar->value()+1);
-    if(ui->progressBar->value()==ui->progressBar->maximum())
-    {
+    ui->progressBar->setValue(ui->progressBar->value() + 1);
+    if (ui->progressBar->value() == ui->progressBar->maximum()) {
         ui->saveToFlash->setEnabled(true);
         ui->closeButton->setEnabled(true);
     }
@@ -142,6 +141,7 @@ void ImportSummaryDialog::updateSaveCompletion()
 void ImportSummaryDialog::changeEvent(QEvent *e)
 {
     QDialog::changeEvent(e);
+
     switch (e->type()) {
     case QEvent::LanguageChange:
         ui->retranslateUi(this);
@@ -155,8 +155,7 @@ void ImportSummaryDialog::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event)
     ui->importSummaryList->resizeColumnsToContents();
-    int width = ui->importSummaryList->width()-(ui->importSummaryList->columnWidth(0)+
-                                                ui->importSummaryList->columnWidth(2));
-    ui->importSummaryList->setColumnWidth(1,width-15);
+    int width = ui->importSummaryList->width() - (ui->importSummaryList->columnWidth(0) +
+                                                  ui->importSummaryList->columnWidth(2));
+    ui->importSummaryList->setColumnWidth(1, width - 15);
 }
-

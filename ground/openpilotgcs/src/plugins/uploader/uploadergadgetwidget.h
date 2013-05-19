@@ -63,14 +63,13 @@ using namespace uploader;
 
 class FlightStatus;
 
-class UPLOADER_EXPORT UploaderGadgetWidget : public QWidget
-{
+class UPLOADER_EXPORT UploaderGadgetWidget : public QWidget {
     Q_OBJECT
 
 
 public:
     UploaderGadgetWidget(QWidget *parent = 0);
-   ~UploaderGadgetWidget();
+    ~UploaderGadgetWidget();
     void log(QString str);
     bool autoUpdateCapable();
 public slots:
@@ -81,35 +80,35 @@ public slots:
     bool autoUpdate();
     void autoUpdateProgress(int);
 signals:
-    void autoUpdateSignal(uploader::AutoUpdateStep,QVariant);
+    void autoUpdateSignal(uploader::AutoUpdateStep, QVariant);
 private:
-     Ui_UploaderWidget *m_config;
-     DFUObject *dfu;
-     IAPStep currentStep;
-     bool resetOnly;
-     void clearLog();
-     QString getPortDevice(const QString &friendName);
-     QProgressDialog* m_progress;
-     QTimer* m_timer;
-     QLineEdit* openFileNameLE;
-     QEventLoop m_eventloop;
-     QErrorMessage * msg;
-     void connectSignalSlot(QWidget * widget);
-     int autoUpdateConnectTimeout;
-     FlightStatus * getFlightStatus();
-     void bootButtonsSetEnable(bool enabled);
+    Ui_UploaderWidget *m_config;
+    DFUObject *dfu;
+    IAPStep currentStep;
+    bool resetOnly;
+    void clearLog();
+    QString getPortDevice(const QString &friendName);
+    QProgressDialog *m_progress;
+    QTimer *m_timer;
+    QLineEdit *openFileNameLE;
+    QEventLoop m_eventloop;
+    QErrorMessage *msg;
+    void connectSignalSlot(QWidget *widget);
+    int autoUpdateConnectTimeout;
+    FlightStatus *getFlightStatus();
+    void bootButtonsSetEnable(bool enabled);
 private slots:
     void onPhisicalHWConnect();
     void versionMatchCheck();
-    void error(QString errorString,int errorNumber);
-    void info(QString infoString,int infoNumber);
-    void goToBootloader(UAVObject* = NULL, bool = false);
+    void error(QString errorString, int errorNumber);
+    void info(QString infoString, int infoNumber);
+    void goToBootloader(UAVObject * = NULL, bool = false);
     void systemHalt();
     void systemReset();
     void systemBoot();
     void systemSafeBoot();
-	void systemEraseBoot();
-	void commonSystemBoot(bool safeboot = false, bool erase = false);
+    void systemEraseBoot();
+    void commonSystemBoot(bool safeboot = false, bool erase = false);
     void systemRescue();
     void getSerialPorts();
     void perform();

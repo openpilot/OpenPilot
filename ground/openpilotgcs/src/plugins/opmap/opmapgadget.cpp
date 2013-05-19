@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
  * @{
- * @brief The OpenPilot Map plugin 
+ * @brief The OpenPilot Map plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -28,21 +28,20 @@
 #include "opmapgadgetwidget.h"
 
 OPMapGadget::OPMapGadget(QString classId, OPMapGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-    m_widget(widget),m_config(NULL)
+    IUAVGadget(classId, parent),
+    m_widget(widget), m_config(NULL)
 {
-    connect(m_widget,SIGNAL(defaultLocationAndZoomChanged(double,double,double)),this,SLOT(saveDefaultLocation(double,double,double)));
-    connect(m_widget,SIGNAL(overlayOpacityChanged(qreal)),this,SLOT(saveOpacity(qreal)));
+    connect(m_widget, SIGNAL(defaultLocationAndZoomChanged(double, double, double)), this, SLOT(saveDefaultLocation(double, double, double)));
+    connect(m_widget, SIGNAL(overlayOpacityChanged(qreal)), this, SLOT(saveOpacity(qreal)));
 }
 
 OPMapGadget::~OPMapGadget()
 {
     delete m_widget;
 }
-void OPMapGadget::saveDefaultLocation(double lng,double lat,double zoom)
+void OPMapGadget::saveDefaultLocation(double lng, double lat, double zoom)
 {
-    if(m_config)
-    {
+    if (m_config) {
         m_config->setLatitude(lat);
         m_config->setLongitude(lng);
         m_config->setZoom(zoom);
@@ -52,14 +51,13 @@ void OPMapGadget::saveDefaultLocation(double lng,double lat,double zoom)
 
 void OPMapGadget::saveOpacity(qreal value)
 {
-    if(m_config)
-    {
+    if (m_config) {
         m_config->setOpacity(value);
     }
 }
 void OPMapGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
-    m_config = qobject_cast<OPMapGadgetConfiguration*>(config);
+    m_config = qobject_cast<OPMapGadgetConfiguration *>(config);
     m_widget->setMapProvider(m_config->mapProvider());
     m_widget->setUseOpenGL(m_config->useOpenGL());
     m_widget->setShowTileGridLines(m_config->showTileGridLines());
@@ -72,4 +70,3 @@ void OPMapGadget::loadConfiguration(IUAVGadgetConfiguration *config)
     m_widget->setHomePosition(QPointF(m_config->longitude(), m_config->latitude()));
     m_widget->setOverlayOpacity(m_config->opacity());
 }
-

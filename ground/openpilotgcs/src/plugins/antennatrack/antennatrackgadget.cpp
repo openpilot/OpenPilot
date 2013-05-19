@@ -30,61 +30,59 @@
 #include "antennatrackgadgetconfiguration.h"
 
 AntennaTrackGadget::AntennaTrackGadget(QString classId, AntennaTrackWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget),
-        connected(FALSE)
+    IUAVGadget(classId, parent),
+    m_widget(widget),
+    connected(FALSE)
 {
-    connect(m_widget->connectButton, SIGNAL(clicked(bool)), this,SLOT(onConnect()));
-    connect(m_widget->disconnectButton, SIGNAL(clicked(bool)), this,SLOT(onDisconnect()));
+    connect(m_widget->connectButton, SIGNAL(clicked(bool)), this, SLOT(onConnect()));
+    connect(m_widget->disconnectButton, SIGNAL(clicked(bool)), this, SLOT(onDisconnect()));
 }
 
 AntennaTrackGadget::~AntennaTrackGadget()
-{
-}
+{}
 
 /*
-  This is called when a configuration is loaded, and updates the plugin's settings.
-  Careful: the plugin is already drawn before the loadConfiguration method is called the
-  first time, so you have to be careful not to assume all the plugin values are initialized
-  the first time you use them
+   This is called when a configuration is loaded, and updates the plugin's settings.
+   Careful: the plugin is already drawn before the loadConfiguration method is called the
+   first time, so you have to be careful not to assume all the plugin values are initialized
+   the first time you use them
  */
-void AntennaTrackGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void AntennaTrackGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
     // Delete the (old)port, this also closes it.
-    if(port) {
+    if (port) {
         delete port;
     }
 
     // Delete the (old)parser, this also disconnects all signals.
-    if(parser) {
+    if (parser) {
         delete parser;
     }
 
-    AntennaTrackGadgetConfiguration *AntennaTrackConfig = qobject_cast< AntennaTrackGadgetConfiguration*>(config);
+    AntennaTrackGadgetConfiguration *AntennaTrackConfig = qobject_cast< AntennaTrackGadgetConfiguration *>(config);
 
     PortSettings portsettings;
-    portsettings.BaudRate=AntennaTrackConfig->speed();
-    portsettings.DataBits=AntennaTrackConfig->dataBits();
-    portsettings.FlowControl=AntennaTrackConfig->flow();
-    portsettings.Parity=AntennaTrackConfig->parity();
-    portsettings.StopBits=AntennaTrackConfig->stopBits();
-    portsettings.Timeout_Millisec=AntennaTrackConfig->timeOut();
+    portsettings.BaudRate    = AntennaTrackConfig->speed();
+    portsettings.DataBits    = AntennaTrackConfig->dataBits();
+    portsettings.FlowControl = AntennaTrackConfig->flow();
+    portsettings.Parity = AntennaTrackConfig->parity();
+    portsettings.StopBits    = AntennaTrackConfig->stopBits();
+    portsettings.Timeout_Millisec = AntennaTrackConfig->timeOut();
 
     // In case we find no port, buttons disabled
     m_widget->connectButton->setEnabled(false);
     m_widget->disconnectButton->setEnabled(false);
 
     QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
-    foreach( QextPortInfo nport, ports ) {
-        if(nport.friendName == AntennaTrackConfig->port())
-        {
+    foreach(QextPortInfo nport, ports) {
+        if (nport.friendName == AntennaTrackConfig->port()) {
             qDebug() << "Using Serial port";
-            //parser = new NMEAParser();
+            // parser = new NMEAParser();
 
 #ifdef Q_OS_WIN
-            port=new QextSerialPort(nport.portName,portsettings,QextSerialPort::EventDriven);
+            port = new QextSerialPort(nport.portName, portsettings, QextSerialPort::EventDriven);
 #else
-            port=new QextSerialPort(nport.physName,portsettings,QextSerialPort::EventDriven);
+            port = new QextSerialPort(nport.physName, portsettings, QextSerialPort::EventDriven);
 #endif
             m_widget->setPort(port);
             m_widget->connectButton->setEnabled(true);
@@ -99,32 +97,33 @@ void AntennaTrackGadget::loadConfiguration(IUAVGadgetConfiguration* config)
     qDebug() << "Using Telemetry parser";
     parser = new TelemetryParser();
 
-    connect(parser, SIGNAL(position(double,double,double)), m_widget,SLOT(setPosition(double,double,double)));
-    connect(parser, SIGNAL(home(double,double,double)), m_widget,SLOT(setHomePosition(double,double,double)));
+    connect(parser, SIGNAL(position(double, double, double)), m_widget, SLOT(setPosition(double, double, double)));
+    connect(parser, SIGNAL(home(double, double, double)), m_widget, SLOT(setHomePosition(double, double, double)));
     connect(parser, SIGNAL(packet(QString)), m_widget, SLOT(dumpPacket(QString)));
 }
 
-void AntennaTrackGadget::onConnect() {
+void AntennaTrackGadget::onConnect()
+{
     m_widget->textBrowser->append(QString("Connecting to Tracker ...\n"));
     // TODO: Somehow mark that we're running, and disable connect button while so?
 
     if (port) {
-        qDebug() <<  "Opening: " <<  port->portName() << ".";
-        bool isOpen =  port->open(QIODevice::ReadWrite);
-        qDebug() <<  "Open: " << isOpen;
-        if(isOpen) {
+        qDebug() << "Opening: " << port->portName() << ".";
+        bool isOpen = port->open(QIODevice::ReadWrite);
+        qDebug() << "Open: " << isOpen;
+        if (isOpen) {
             m_widget->connectButton->setEnabled(false);
             m_widget->disconnectButton->setEnabled(true);
         }
     } else {
         qDebug() << "Port undefined or invalid.";
     }
-
 }
 
-void AntennaTrackGadget::onDisconnect() {
+void AntennaTrackGadget::onDisconnect()
+{
     if (port) {
-        qDebug() <<  "Closing: " <<  port->portName() << ".";
+        qDebug() << "Closing: " << port->portName() << ".";
         port->close();
         m_widget->connectButton->setEnabled(true);
         m_widget->disconnectButton->setEnabled(false);
@@ -133,23 +132,27 @@ void AntennaTrackGadget::onDisconnect() {
     }
 }
 
-void AntennaTrackGadget::onDataAvailable() {
+void AntennaTrackGadget::onDataAvailable()
+{
     int avail = port->bytesAvailable();
-    if( avail > 0 ) {
+
+    if (avail > 0) {
         QByteArray serialData;
         serialData.resize(avail);
         int bytesRead = port->read(serialData.data(), serialData.size());
-        if( bytesRead > 0 ) {
+        if (bytesRead > 0) {
             processNewSerialData(serialData);
         }
     }
 }
 
-void AntennaTrackGadget::processNewSerialData(QByteArray serialData) {
-    int dataLength = serialData.size();
-    const char* data = serialData.constData();
+void AntennaTrackGadget::processNewSerialData(QByteArray serialData)
+{
+    int dataLength   = serialData.size();
+    const char *data = serialData.constData();
+
     m_widget->textBrowser->append(QString(serialData));
-    for(int pos = 0; pos < dataLength; pos++) {
-        //parser->processInputStream(data[pos]);
+    for (int pos = 0; pos < dataLength; pos++) {
+        // parser->processInputStream(data[pos]);
     }
 }

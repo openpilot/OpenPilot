@@ -59,6 +59,7 @@ void myQDebugHandler(QtMsgType type, const char *msg)
 
     ts << time.currentTime().toString("hh:mm:ss.zzz") << " " << txt << endl;
 
-    if (type == QtFatalMsg)
+    if (type == QtFatalMsg) {
         abort();
+    }
 }

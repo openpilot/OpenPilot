@@ -11,19 +11,19 @@
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -36,8 +36,8 @@
  * Telemetry on main USART
  */
 const struct pios_udp_cfg pios_udp_telem_cfg = {
-  .ip = "0.0.0.0",
-  .port = 9000,
+    .ip   = "0.0.0.0",
+    .port = 9000,
 };
 #endif /* PIOS_COM_TELEM */
 
@@ -46,8 +46,8 @@ const struct pios_udp_cfg pios_udp_telem_cfg = {
  * GPS USART
  */
 const struct pios_udp_cfg pios_udp_gps_cfg = {
-  .ip = "0.0.0.0",
-  .port = 9001,
+    .ip   = "0.0.0.0",
+    .port = 9001,
 };
 
 #endif /* PIOS_INCLUDE_GPS */
@@ -57,8 +57,8 @@ const struct pios_udp_cfg pios_udp_gps_cfg = {
  * AUX USART (UART label on rev2)
  */
 const struct pios_udp_cfg pios_udp_aux_cfg = {
-  .ip = "0.0.0.0",
-  .port = 9002,
+    .ip   = "0.0.0.0",
+    .port = 9002,
 };
 #endif /* PIOS_COM_AUX */
 
@@ -69,4 +69,3 @@ const struct pios_udp_cfg pios_udp_aux_cfg = {
 #include <pios_com_priv.h>
 
 #endif /* PIOS_INCLUDE_COM */
-

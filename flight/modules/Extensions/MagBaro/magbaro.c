@@ -1,10 +1,10 @@
 /**
  ******************************************************************************
  * @addtogroup OpenPilotModules OpenPilot Modules
- * @{ 
+ * @{
  * @addtogroup AltitudeModule Altitude Module
  * @brief Communicate with BMP085 and update @ref BaroAltitude "BaroAltitude UAV Object"
- * @{ 
+ * @{
  *
  * @file       altitude.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
@@ -40,14 +40,14 @@
 
 #include "hwsettings.h"
 #include "magbaro.h"
-#include "baroaltitude.h"	// object that will be updated by the module
+#include "baroaltitude.h" // object that will be updated by the module
 #include "magnetometer.h"
 #include "taskinfo.h"
 
 // Private constants
 #define STACK_SIZE_BYTES 600
-#define TASK_PRIORITY (tskIDLE_PRIORITY+1)
-#define UPDATE_PERIOD 100
+#define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
+#define UPDATE_PERIOD    100
 
 // Private types
 
@@ -58,19 +58,19 @@ static xTaskHandle taskHandle;
 static bool magbaroEnabled;
 
 #if defined(PIOS_INCLUDE_BMP085)
-#define alt_ds_size    4
+#define alt_ds_size 4
 static int32_t alt_ds_temp = 0;
 static int32_t alt_ds_pres = 0;
-static int alt_ds_count = 0;
+static int alt_ds_count    = 0;
 #endif
 
 #if defined(PIOS_INCLUDE_HMC5883)
 int32_t mag_test;
-static float mag_bias[3] = {0,0,0};
-static float mag_scale[3] = {1,1,1};
+static float mag_bias[3] = { 0, 0, 0 };
+static float mag_scale[3] = { 1, 1, 1 };
 #endif
 
-        // Private functions
+// Private functions
 static void magbaroTask(void *parameters);
 
 /**
@@ -79,14 +79,13 @@ static void magbaroTask(void *parameters);
  */
 int32_t MagBaroStart()
 {
-
-	if (magbaroEnabled) {
-		// Start main task
-		xTaskCreate(magbaroTask, (signed char *)"MagBaro", STACK_SIZE_BYTES/4, NULL, TASK_PRIORITY, &taskHandle);
-		PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_MAGBARO, taskHandle);
-		return 0;
-	}
-	return -1;
+    if (magbaroEnabled) {
+        // Start main task
+        xTaskCreate(magbaroTask, (signed char *)"MagBaro", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &taskHandle);
+        PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_MAGBARO, taskHandle);
+        return 0;
+    }
+    return -1;
 }
 
 /**
@@ -96,34 +95,33 @@ int32_t MagBaroStart()
 int32_t MagBaroInitialize()
 {
 #ifdef MODULE_MAGBARO_BUILTIN
-	magbaroEnabled = 1;
+    magbaroEnabled = 1;
 #else
-	HwSettingsInitialize();
-	uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
-	HwSettingsOptionalModulesGet(optionalModules);
-	if (optionalModules[HWSETTINGS_OPTIONALMODULES_MAGBARO] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
-		magbaroEnabled = 1;
-	} else {
-		magbaroEnabled = 0;
-	}
+    HwSettingsInitialize();
+    uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+    HwSettingsOptionalModulesGet(optionalModules);
+    if (optionalModules[HWSETTINGS_OPTIONALMODULES_MAGBARO] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+        magbaroEnabled = 1;
+    } else {
+        magbaroEnabled = 0;
+    }
 #endif
 
-	if(magbaroEnabled)
-	{
+    if (magbaroEnabled) {
 #if defined(PIOS_INCLUDE_HMC5883)
-		MagnetometerInitialize();
+        MagnetometerInitialize();
 #endif
 
 #if defined(PIOS_INCLUDE_BMP085)
-		BaroAltitudeInitialize();
+        BaroAltitudeInitialize();
 
-		// init down-sampling data
-		alt_ds_temp = 0;
-		alt_ds_pres = 0;
-		alt_ds_count = 0;
+        // init down-sampling data
+        alt_ds_temp  = 0;
+        alt_ds_pres  = 0;
+        alt_ds_count = 0;
 #endif
-	}
-	return 0;
+    }
+    return 0;
 }
 MODULE_INITCALL(MagBaroInitialize, MagBaroStart)
 /**
@@ -132,94 +130,91 @@ MODULE_INITCALL(MagBaroInitialize, MagBaroStart)
 #if defined(PIOS_INCLUDE_HMC5883)
 static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
 #ifdef PIOS_HMC5883_HAS_GPIOS
-	.exti_cfg = 0,
+    .exti_cfg  = 0,
 #endif
-	.M_ODR = PIOS_HMC5883_ODR_15,
-	.Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL,
-	.Gain = PIOS_HMC5883_GAIN_1_9,
-	.Mode = PIOS_HMC5883_MODE_CONTINUOUS,
-
+    .M_ODR     = PIOS_HMC5883_ODR_15,
+    .Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL,
+    .Gain = PIOS_HMC5883_GAIN_1_9,
+    .Mode = PIOS_HMC5883_MODE_CONTINUOUS,
 };
 #endif
 
 static void magbaroTask(__attribute__((unused)) void *parameters)
 {
-	portTickType lastSysTime;
-	
+    portTickType lastSysTime;
+
 #if defined(PIOS_INCLUDE_BMP085)
-	BaroAltitudeData data;
-	PIOS_BMP085_Init();
+    BaroAltitudeData data;
+    PIOS_BMP085_Init();
 #endif
 
 #if defined(PIOS_INCLUDE_HMC5883)
-	MagnetometerData mag;
-	PIOS_HMC5883_Init(&pios_hmc5883_cfg);
-	uint32_t mag_update_time = PIOS_DELAY_GetRaw();
+    MagnetometerData mag;
+    PIOS_HMC5883_Init(&pios_hmc5883_cfg);
+    uint32_t mag_update_time = PIOS_DELAY_GetRaw();
 #endif
 
-	// Main task loop
-	lastSysTime = xTaskGetTickCount();
-	while (1)
-	{
+    // Main task loop
+    lastSysTime = xTaskGetTickCount();
+    while (1) {
 #if defined(PIOS_INCLUDE_BMP085)
-		// Update the temperature data
-		PIOS_BMP085_StartADC(TemperatureConv);
+        // Update the temperature data
+        PIOS_BMP085_StartADC(TemperatureConv);
 #ifdef PIOS_BMP085_HAS_GPIOS
-		xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
+        xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
 #else
-		vTaskDelay(5 / portTICK_RATE_MS);
+        vTaskDelay(5 / portTICK_RATE_MS);
 #endif
-		PIOS_BMP085_ReadADC();
-		alt_ds_temp += PIOS_BMP085_GetTemperature();
+        PIOS_BMP085_ReadADC();
+        alt_ds_temp += PIOS_BMP085_GetTemperature();
 
-		// Update the pressure data
-		PIOS_BMP085_StartADC(PressureConv);
+        // Update the pressure data
+        PIOS_BMP085_StartADC(PressureConv);
 #ifdef PIOS_BMP085_HAS_GPIOS
-		xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
+        xSemaphoreTake(PIOS_BMP085_EOC, portMAX_DELAY);
 #else
-		vTaskDelay(26 / portTICK_RATE_MS);
+        vTaskDelay(26 / portTICK_RATE_MS);
 #endif
-		PIOS_BMP085_ReadADC();
-		alt_ds_pres += PIOS_BMP085_GetPressure();
+        PIOS_BMP085_ReadADC();
+        alt_ds_pres += PIOS_BMP085_GetPressure();
 
-		if (++alt_ds_count >= alt_ds_size)
-		{
-			alt_ds_count = 0;
+        if (++alt_ds_count >= alt_ds_size) {
+            alt_ds_count     = 0;
 
-			// Convert from 1/10ths of degC to degC
-			data.Temperature = alt_ds_temp / (10.0f * alt_ds_size);
-			alt_ds_temp = 0;
+            // Convert from 1/10ths of degC to degC
+            data.Temperature = alt_ds_temp / (10.0f * alt_ds_size);
+            alt_ds_temp   = 0;
 
-			// Convert from Pa to kPa
-			data.Pressure = alt_ds_pres / (1000.0f * alt_ds_size);
-			alt_ds_pres = 0;
+            // Convert from Pa to kPa
+            data.Pressure = alt_ds_pres / (1000.0f * alt_ds_size);
+            alt_ds_pres   = 0;
 
-			// Compute the current altitude (all pressures in kPa)
-			data.Altitude = 44330.0f * (1.0f - powf((data.Pressure / (BMP085_P0 / 1000.0f)), (1.0f / 5.255f)));
+            // Compute the current altitude (all pressures in kPa)
+            data.Altitude = 44330.0f * (1.0f - powf((data.Pressure / (BMP085_P0 / 1000.0f)), (1.0f / 5.255f)));
 
-			// Update the AltitudeActual UAVObject
-			BaroAltitudeSet(&data);
-		}
-#endif
+            // Update the AltitudeActual UAVObject
+            BaroAltitudeSet(&data);
+        }
+#endif /* if defined(PIOS_INCLUDE_BMP085) */
 
 #if defined(PIOS_INCLUDE_HMC5883)
-		if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 100000) {
-			int16_t values[3];
-			PIOS_HMC5883_ReadMag(values);
-			float mags[3] = {(float) values[1] * mag_scale[0] - mag_bias[0],
-			                (float) values[0] * mag_scale[1] - mag_bias[1],
-			                -(float) values[2] * mag_scale[2] - mag_bias[2]};
-			mag.x = mags[0];
-			mag.y = mags[1];
-			mag.z = mags[2];
-			MagnetometerSet(&mag);
-			mag_update_time = PIOS_DELAY_GetRaw();
-		}
+        if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 100000) {
+            int16_t values[3];
+            PIOS_HMC5883_ReadMag(values);
+            float mags[3] = { (float)values[1] * mag_scale[0] - mag_bias[0],
+                              (float)values[0] * mag_scale[1] - mag_bias[1],
+                              -(float)values[2] * mag_scale[2] - mag_bias[2] };
+            mag.x = mags[0];
+            mag.y = mags[1];
+            mag.z = mags[2];
+            MagnetometerSet(&mag);
+            mag_update_time = PIOS_DELAY_GetRaw();
+        }
 #endif
 
-		// Delay until it is time to read the next sample
-		vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD / portTICK_RATE_MS);
-	}
+        // Delay until it is time to read the next sample
+        vTaskDelayUntil(&lastSysTime, UPDATE_PERIOD / portTICK_RATE_MS);
+    }
 }
 
 /**

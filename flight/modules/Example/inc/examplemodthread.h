@@ -29,4 +29,3 @@
 int32_t ExampleModThreadInitialize();
 
 #endif // EXAMPLEMODTHREAD_H
-

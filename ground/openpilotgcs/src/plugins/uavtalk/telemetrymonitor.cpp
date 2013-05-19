@@ -33,10 +33,10 @@
 /**
  * Constructor
  */
-TelemetryMonitor::TelemetryMonitor(UAVObjectManager* objMngr, Telemetry* tel)
+TelemetryMonitor::TelemetryMonitor(UAVObjectManager *objMngr, Telemetry *tel)
 {
-    this->objMngr = objMngr;
-    this->tel = tel;
+    this->objMngr    = objMngr;
+    this->tel        = tel;
     this->objPending = NULL;
     this->connectionTimer = new QTime();
 
@@ -44,11 +44,11 @@ TelemetryMonitor::TelemetryMonitor(UAVObjectManager* objMngr, Telemetry* tel)
     mutex = new QMutex(QMutex::Recursive);
 
     // Get stats objects
-    gcsStatsObj = GCSTelemetryStats::GetInstance(objMngr);
+    gcsStatsObj    = GCSTelemetryStats::GetInstance(objMngr);
     flightStatsObj = FlightTelemetryStats::GetInstance(objMngr);
 
     // Listen for flight stats updates
-    connect(flightStatsObj, SIGNAL(objectUpdated(UAVObject*)), this, SLOT(flightStatsUpdated(UAVObject*)));
+    connect(flightStatsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(flightStatsUpdated(UAVObject *)));
 
     // Start update timer
     statsTimer = new QTimer(this);
@@ -56,14 +56,16 @@ TelemetryMonitor::TelemetryMonitor(UAVObjectManager* objMngr, Telemetry* tel)
     statsTimer->start(STATS_CONNECT_PERIOD_MS);
 
     Core::ConnectionManager *cm = Core::ICore::instance()->connectionManager();
-    connect(this,SIGNAL(connected()),cm,SLOT(telemetryConnected()));
-    connect(this,SIGNAL(disconnected()),cm,SLOT(telemetryDisconnected()));
-    connect(this,SIGNAL(telemetryUpdated(double,double)),cm,SLOT(telemetryUpdated(double,double)));
+    connect(this, SIGNAL(connected()), cm, SLOT(telemetryConnected()));
+    connect(this, SIGNAL(disconnected()), cm, SLOT(telemetryDisconnected()));
+    connect(this, SIGNAL(telemetryUpdated(double, double)), cm, SLOT(telemetryUpdated(double, double)));
 }
 
-TelemetryMonitor::~TelemetryMonitor() {
+TelemetryMonitor::~TelemetryMonitor()
+{
     // Before saying goodbye, set the GCS connection status to disconnected too:
     GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
+
     gcsStats.Status = GCSTelemetryStats::STATUS_DISCONNECTED;
     // Set data
     gcsStatsObj->setData(gcsStats);
@@ -77,27 +79,19 @@ void TelemetryMonitor::startRetrievingObjects()
     // Clear object queue
     queue.clear();
     // Get all objects, add metaobjects, settings and data objects with OnChange update mode to the queue
-    QList< QList<UAVObject*> > objs = objMngr->getObjects();
-    for (int n = 0; n < objs.length(); ++n)
-    {
-        UAVObject* obj = objs[n][0];
-        UAVMetaObject* mobj = dynamic_cast<UAVMetaObject*>(obj);
-        UAVDataObject* dobj = dynamic_cast<UAVDataObject*>(obj);
+    QList< QList<UAVObject *> > objs = objMngr->getObjects();
+    for (int n = 0; n < objs.length(); ++n) {
+        UAVObject *obj = objs[n][0];
+        UAVMetaObject *mobj = dynamic_cast<UAVMetaObject *>(obj);
+        UAVDataObject *dobj = dynamic_cast<UAVDataObject *>(obj);
         UAVObject::Metadata mdata = obj->getMetadata();
-        if ( mobj != NULL )
-        {
+        if (mobj != NULL) {
             queue.enqueue(obj);
-        }
-        else if ( dobj != NULL )
-        {
-            if ( dobj->isSettings() )
-            {
+        } else if (dobj != NULL) {
+            if (dobj->isSettings()) {
                 queue.enqueue(obj);
-            }
-            else
-            {
-                if ( UAVObject::GetFlightTelemetryUpdateMode(mdata) == UAVObject::UPDATEMODE_ONCHANGE )
-                {
+            } else {
+                if (UAVObject::GetFlightTelemetryUpdateMode(mdata) == UAVObject::UPDATEMODE_ONCHANGE) {
                     queue.enqueue(obj);
                 }
             }
@@ -105,7 +99,7 @@ void TelemetryMonitor::startRetrievingObjects()
     }
     // Start retrieving
     qxtLog->debug(tr("Starting to retrieve meta and settings objects from the autopilot (%1 objects)")
-                  .arg( queue.length()) );
+                  .arg(queue.length()));
     retrieveNextObject();
 }
 
@@ -124,17 +118,16 @@ void TelemetryMonitor::stopRetrievingObjects()
 void TelemetryMonitor::retrieveNextObject()
 {
     // If queue is empty return
-    if ( queue.isEmpty() )
-    {
+    if (queue.isEmpty()) {
         qxtLog->debug("Object retrieval completed");
         emit connected();
         return;
     }
     // Get next object from the queue
-    UAVObject* obj = queue.dequeue();
-    //qxtLog->trace( tr("Retrieving object: %1").arg(obj->getName()) );
+    UAVObject *obj = queue.dequeue();
+    // qxtLog->trace( tr("Retrieving object: %1").arg(obj->getName()) );
     // Connect to object
-    connect(obj, SIGNAL(transactionCompleted(UAVObject*,bool)), this, SLOT(transactionCompleted(UAVObject*,bool)));
+    connect(obj, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transactionCompleted(UAVObject *, bool)));
     // Request update
     obj->requestUpdate();
     objPending = obj;
@@ -143,7 +136,7 @@ void TelemetryMonitor::retrieveNextObject()
 /**
  * Called by the retrieved object when a transaction is completed.
  */
-void TelemetryMonitor::transactionCompleted(UAVObject* obj, bool success)
+void TelemetryMonitor::transactionCompleted(UAVObject *obj, bool success)
 {
     Q_UNUSED(success);
     QMutexLocker locker(mutex);
@@ -152,12 +145,9 @@ void TelemetryMonitor::transactionCompleted(UAVObject* obj, bool success)
     objPending = NULL;
     // Process next object if telemetry is still available
     GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
-    if ( gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED )
-    {
+    if (gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED) {
         retrieveNextObject();
-    }
-    else
-    {
+    } else {
         stopRetrievingObjects();
     }
 }
@@ -165,7 +155,7 @@ void TelemetryMonitor::transactionCompleted(UAVObject* obj, bool success)
 /**
  * Called each time the flight stats object is updated by the autopilot
  */
-void TelemetryMonitor::flightStatsUpdated(UAVObject* obj)
+void TelemetryMonitor::flightStatsUpdated(UAVObject *obj)
 {
     Q_UNUSED(obj);
     QMutexLocker locker(mutex);
@@ -173,9 +163,8 @@ void TelemetryMonitor::flightStatsUpdated(UAVObject* obj)
     // Force update if not yet connected
     GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
     FlightTelemetryStats::DataFields flightStats = flightStatsObj->getData();
-    if ( gcsStats.Status != GCSTelemetryStats::STATUS_CONNECTED ||
-         flightStats.Status != FlightTelemetryStats::STATUS_CONNECTED )
-    {
+    if (gcsStats.Status != GCSTelemetryStats::STATUS_CONNECTED ||
+        flightStats.Status != FlightTelemetryStats::STATUS_CONNECTED) {
         processStatsUpdates();
     }
 }
@@ -190,51 +179,41 @@ void TelemetryMonitor::processStatsUpdates()
     // Get telemetry stats
     GCSTelemetryStats::DataFields gcsStats = gcsStatsObj->getData();
     FlightTelemetryStats::DataFields flightStats = flightStatsObj->getData();
-    Telemetry::TelemetryStats telStats = tel->getStats();
+    Telemetry::TelemetryStats telStats     = tel->getStats();
+
     tel->resetStats();
 
-    // Update stats object 
-    gcsStats.RxDataRate = (float)telStats.rxBytes / ((float)statsTimer->interval()/1000.0);
-    gcsStats.TxDataRate = (float)telStats.txBytes / ((float)statsTimer->interval()/1000.0);
+    // Update stats object
+    gcsStats.RxDataRate  = (float)telStats.rxBytes / ((float)statsTimer->interval() / 1000.0);
+    gcsStats.TxDataRate  = (float)telStats.txBytes / ((float)statsTimer->interval() / 1000.0);
     gcsStats.RxFailures += telStats.rxErrors;
     gcsStats.TxFailures += telStats.txErrors;
-    gcsStats.TxRetries += telStats.txRetries;
+    gcsStats.TxRetries  += telStats.txRetries;
 
     // Check for a connection timeout
     bool connectionTimeout;
-    if ( telStats.rxObjects > 0 )
-    {
+    if (telStats.rxObjects > 0) {
         connectionTimer->start();
     }
-    if ( connectionTimer->elapsed() > CONNECTION_TIMEOUT_MS  )
-    {
+    if (connectionTimer->elapsed() > CONNECTION_TIMEOUT_MS) {
         connectionTimeout = true;
-    }
-    else
-    {
+    } else {
         connectionTimeout = false;
     }
 
     // Update connection state
     int oldStatus = gcsStats.Status;
-    if ( gcsStats.Status == GCSTelemetryStats::STATUS_DISCONNECTED )
-    {
+    if (gcsStats.Status == GCSTelemetryStats::STATUS_DISCONNECTED) {
         // Request connection
         gcsStats.Status = GCSTelemetryStats::STATUS_HANDSHAKEREQ;
-    }
-    else if ( gcsStats.Status == GCSTelemetryStats::STATUS_HANDSHAKEREQ )
-    {
+    } else if (gcsStats.Status == GCSTelemetryStats::STATUS_HANDSHAKEREQ) {
         // Check for connection acknowledge
-        if ( flightStats.Status == FlightTelemetryStats::STATUS_HANDSHAKEACK )
-        {
+        if (flightStats.Status == FlightTelemetryStats::STATUS_HANDSHAKEACK) {
             gcsStats.Status = GCSTelemetryStats::STATUS_CONNECTED;
         }
-    }
-    else if ( gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED )
-    {
+    } else if (gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED) {
         // Check if the connection is still active and the the autopilot is still connected
-        if (flightStats.Status == FlightTelemetryStats::STATUS_DISCONNECTED || connectionTimeout)
-        {
+        if (flightStats.Status == FlightTelemetryStats::STATUS_DISCONNECTED || connectionTimeout) {
             gcsStats.Status = GCSTelemetryStats::STATUS_DISCONNECTED;
         }
     }
@@ -245,25 +224,21 @@ void TelemetryMonitor::processStatsUpdates()
     gcsStatsObj->setData(gcsStats);
 
     // Force telemetry update if not yet connected
-    if ( gcsStats.Status != GCSTelemetryStats::STATUS_CONNECTED ||
-         flightStats.Status != FlightTelemetryStats::STATUS_CONNECTED )
-    {
+    if (gcsStats.Status != GCSTelemetryStats::STATUS_CONNECTED ||
+        flightStats.Status != FlightTelemetryStats::STATUS_CONNECTED) {
         gcsStatsObj->updated();
     }
 
     // Act on new connections or disconnections
-    if (gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED && gcsStats.Status != oldStatus)
-    {
+    if (gcsStats.Status == GCSTelemetryStats::STATUS_CONNECTED && gcsStats.Status != oldStatus) {
         statsTimer->setInterval(STATS_UPDATE_PERIOD_MS);
         qxtLog->info("Connection with the autopilot established");
         startRetrievingObjects();
     }
-    if (gcsStats.Status == GCSTelemetryStats::STATUS_DISCONNECTED && gcsStats.Status != oldStatus)
-    {
+    if (gcsStats.Status == GCSTelemetryStats::STATUS_DISCONNECTED && gcsStats.Status != oldStatus) {
         statsTimer->setInterval(STATS_CONNECT_PERIOD_MS);
         qxtLog->info("Connection with the autopilot lost");
         qxtLog->info("Trying to connect to the autopilot");
         emit disconnected();
     }
 }
-

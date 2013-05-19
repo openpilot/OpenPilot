@@ -41,23 +41,19 @@
 IPconnectionOptionsPage::IPconnectionOptionsPage(IPconnectionConfiguration *config, QObject *parent) :
     IOptionsPage(parent),
     m_config(config)
-{
-
-}
+{}
 IPconnectionOptionsPage::~IPconnectionOptionsPage()
-{
-}
+{}
 QWidget *IPconnectionOptionsPage::createPage(QWidget *parent)
 {
-
     m_page = new Ui::IPconnectionOptionsPage();
     QWidget *w = new QWidget(parent);
     m_page->setupUi(w);
 
     m_page->Port->setValue(m_config->Port());
     m_page->HostName->setText(m_config->HostName());
-    m_page->UseTCP->setChecked(m_config->UseTCP()?true:false);
-    m_page->UseUDP->setChecked(m_config->UseTCP()?false:true);
+    m_page->UseTCP->setChecked(m_config->UseTCP() ? true : false);
+    m_page->UseUDP->setChecked(m_config->UseTCP() ? false : true);
 
     return w;
 }
@@ -66,17 +62,13 @@ void IPconnectionOptionsPage::apply()
 {
     m_config->setPort(m_page->Port->value());
     m_config->setHostName(m_page->HostName->text());
-    m_config->setUseTCP(m_page->UseTCP->isChecked()?1:0);
+    m_config->setUseTCP(m_page->UseTCP->isChecked() ? 1 : 0);
     m_config->savesettings();
 
     emit availableDevChanged();
-
-
-
 }
 
 void IPconnectionOptionsPage::finish()
 {
     delete m_page;
 }
-

@@ -29,13 +29,12 @@
 
 #include "../generator_common.h"
 
-class UAVObjectGeneratorPython
-{
+class UAVObjectGeneratorPython {
 public:
-    bool generate(UAVObjectParser* gen,QString templatepath,QString outputpath);
+    bool generate(UAVObjectParser *gen, QString templatepath, QString outputpath);
 
 private:
-    bool process_object(ObjectInfo* info);
+    bool process_object(ObjectInfo *info);
 
     QString pythonCodeTemplate;
     QDir pythonCodePath;

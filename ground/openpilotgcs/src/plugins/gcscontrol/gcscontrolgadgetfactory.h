@@ -39,17 +39,15 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class GCSControlGadgetFactory : public IUAVGadgetFactory
-{
+class GCSControlGadgetFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
     GCSControlGadgetFactory(QObject *parent = 0);
     ~GCSControlGadgetFactory();
 
     IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
-
 };
 
 #endif // GCSControlGADGETFACTORY_H_

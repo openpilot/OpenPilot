@@ -4,25 +4,25 @@
  * @file       qtlockedfile_win.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -32,24 +32,26 @@
 #include <QtCore/QFileInfo>
 
 namespace SharedTools {
-
 #define SEMAPHORE_PREFIX "QtLockedFile semaphore "
-#define MUTEX_PREFIX "QtLockedFile mutex "
-#define SEMAPHORE_MAX 100
+#define MUTEX_PREFIX     "QtLockedFile mutex "
+#define SEMAPHORE_MAX    100
 
 static QString errorCodeToString(DWORD errorCode)
 {
     QString result;
     char *data = 0;
-    FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-                    0, errorCode, 0,
-                    (char*)&data, 0, 0);
-    result = QString::fromLocal8Bit(data);
-    if (data != 0)
-        LocalFree(data);
 
-    if (result.endsWith("\n"))
+    FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+                   0, errorCode, 0,
+                   (char *)&data, 0, 0);
+    result = QString::fromLocal8Bit(data);
+    if (data != 0) {
+        LocalFree(data);
+    }
+
+    if (result.endsWith("\n")) {
         result.truncate(result.length() - 1);
+    }
 
     return result;
 }
@@ -61,24 +63,27 @@ bool QtLockedFile::lock(LockMode mode, bool block)
         return false;
     }
 
-    if (mode == m_lock_mode)
+    if (mode == m_lock_mode) {
         return true;
+    }
 
-    if (m_lock_mode != 0)
+    if (m_lock_mode != 0) {
         unlock();
+    }
 
     if (m_semaphore_hnd == 0) {
         QFileInfo fi(*this);
         QString sem_name = QString::fromLatin1(SEMAPHORE_PREFIX)
                            + fi.absoluteFilePath().toLower();
 
-        QT_WA( {
-            m_semaphore_hnd = CreateSemaphoreW(0, SEMAPHORE_MAX, SEMAPHORE_MAX,
-                                               (TCHAR*)sem_name.utf16());
-        } , {
-            m_semaphore_hnd = CreateSemaphoreA(0, SEMAPHORE_MAX, SEMAPHORE_MAX,
-                                               sem_name.toLocal8Bit().constData());
-        } );
+        QT_WA({
+                  m_semaphore_hnd = CreateSemaphoreW(0, SEMAPHORE_MAX, SEMAPHORE_MAX,
+                                                     (TCHAR *)sem_name.utf16());
+              }, {
+                  m_semaphore_hnd = CreateSemaphoreA(0, SEMAPHORE_MAX, SEMAPHORE_MAX,
+                                                     sem_name.toLocal8Bit().constData());
+              }
+              );
 
         if (m_semaphore_hnd == 0) {
             qWarning("QtLockedFile::lock(): CreateSemaphore: %s",
@@ -97,11 +102,12 @@ bool QtLockedFile::lock(LockMode mode, bool block)
             QFileInfo fi(*this);
             QString mut_name = QString::fromLatin1(MUTEX_PREFIX)
                                + fi.absoluteFilePath().toLower();
-            QT_WA( {
-                    m_mutex_hnd = CreateMutexW(NULL, FALSE, (TCHAR*)mut_name.utf16());
-                } , {
-                    m_mutex_hnd = CreateMutexA(NULL, FALSE, mut_name.toLocal8Bit().constData());
-            } );
+            QT_WA({
+                      m_mutex_hnd = CreateMutexW(NULL, FALSE, (TCHAR *)mut_name.utf16());
+                  }, {
+                      m_mutex_hnd = CreateMutexA(NULL, FALSE, mut_name.toLocal8Bit().constData());
+                  }
+                  );
 
             if (m_mutex_hnd == 0) {
                 qWarning("QtLockedFile::lock(): CreateMutex: %s",
@@ -110,8 +116,9 @@ bool QtLockedFile::lock(LockMode mode, bool block)
             }
         }
         DWORD res = WaitForSingleObject(m_mutex_hnd, block ? INFINITE : 0);
-        if (res == WAIT_TIMEOUT)
+        if (res == WAIT_TIMEOUT) {
             return false;
+        }
         if (res == WAIT_FAILED) {
             qWarning("QtLockedFile::lock(): WaitForSingleObject (mutex): %s",
                      errorCodeToString(GetLastError()).toLatin1().constData());
@@ -131,22 +138,25 @@ bool QtLockedFile::lock(LockMode mode, bool block)
                     // Fall through
                 }
             }
-            if (gotMutex)
+            if (gotMutex) {
                 ReleaseMutex(m_mutex_hnd);
+            }
             return false;
-	}
+        }
         if (res != WAIT_OBJECT_0) {
-            if (gotMutex)
+            if (gotMutex) {
                 ReleaseMutex(m_mutex_hnd);
+            }
             qWarning("QtLockedFile::lock(): WaitForSingleObject (semaphore): %s",
-                        errorCodeToString(GetLastError()).toLatin1().constData());
+                     errorCodeToString(GetLastError()).toLatin1().constData());
             return false;
         }
     }
 
     m_lock_mode = mode;
-    if (gotMutex)
+    if (gotMutex) {
         ReleaseMutex(m_mutex_hnd);
+    }
     return true;
 }
 
@@ -157,19 +167,21 @@ bool QtLockedFile::unlock()
         return false;
     }
 
-    if (!isLocked())
+    if (!isLocked()) {
         return true;
+    }
 
     int increment;
-    if (m_lock_mode == ReadLock)
+    if (m_lock_mode == ReadLock) {
         increment = 1;
-    else
+    } else {
         increment = SEMAPHORE_MAX;
+    }
 
     DWORD ret = ReleaseSemaphore(m_semaphore_hnd, increment, 0);
     if (ret == 0) {
         qWarning("QtLockedFile::unlock(): ReleaseSemaphore: %s",
-                    errorCodeToString(GetLastError()).toLatin1().constData());
+                 errorCodeToString(GetLastError()).toLatin1().constData());
         return false;
     }
 
@@ -179,13 +191,14 @@ bool QtLockedFile::unlock()
 
 QtLockedFile::~QtLockedFile()
 {
-    if (isOpen())
+    if (isOpen()) {
         unlock();
+    }
     if (m_mutex_hnd != 0) {
         DWORD ret = CloseHandle(m_mutex_hnd);
         if (ret == 0) {
             qWarning("QtLockedFile::~QtLockedFile(): CloseHandle (mutex): %s",
-                        errorCodeToString(GetLastError()).toLatin1().constData());
+                     errorCodeToString(GetLastError()).toLatin1().constData());
         }
         m_mutex_hnd = 0;
     }
@@ -193,10 +206,9 @@ QtLockedFile::~QtLockedFile()
         DWORD ret = CloseHandle(m_semaphore_hnd);
         if (ret == 0) {
             qWarning("QtLockedFile::~QtLockedFile(): CloseHandle (semaphore): %s",
-                        errorCodeToString(GetLastError()).toLatin1().constData());
+                     errorCodeToString(GetLastError()).toLatin1().constData());
         }
         m_semaphore_hnd = 0;
     }
 }
-
 } // namespace SharedTools

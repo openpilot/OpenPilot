@@ -30,4 +30,3 @@ int32_t FirmwareIAPInitialize();
 int32_t FirmwareIAPStart();
 
 #endif // FIRMWAREIAP_H
-

@@ -192,7 +192,7 @@ void ConfigGadgetWidget::onAutopilotConnect()
     // First of all, check what Board type we are talking to, and
     // if necessary, remove/add tabs in the config gadget:
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    UAVObjectUtilManager *utilMngr = pm->getObject<UAVObjectUtilManager>();
+    UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
     if (utilMngr) {
         int selectedIndex = ftw->currentIndex();
         int board = utilMngr->getBoardModel();

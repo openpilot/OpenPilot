@@ -41,14 +41,13 @@ class IUAVGadgetConfiguration;
 class AntennaTrackGadgetConfiguration;
 
 namespace Ui {
-    class AntennaTrackGadgetOptionsPage;
+class AntennaTrackGadgetOptionsPage;
 }
 
 using namespace Core;
 
-class AntennaTrackGadgetOptionsPage : public IOptionsPage
-{
-Q_OBJECT
+class AntennaTrackGadgetOptionsPage : public IOptionsPage {
+    Q_OBJECT
 public:
     explicit AntennaTrackGadgetOptionsPage(AntennaTrackGadgetConfiguration *config, QObject *parent = 0);
 

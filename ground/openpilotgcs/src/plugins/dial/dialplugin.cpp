@@ -8,7 +8,7 @@
  * @{
  * @addtogroup DialPlugin Dial Plugin
  * @{
- * @brief Plots flight information rotary style dials 
+ * @brief Plots flight information rotary style dials
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -36,32 +36,31 @@
 
 DialPlugin::DialPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 DialPlugin::~DialPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool DialPlugin::initialize(const QStringList& args, QString *errMsg)
+bool DialPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new DialGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new DialGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void DialPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void DialPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(DialPlugin)
-

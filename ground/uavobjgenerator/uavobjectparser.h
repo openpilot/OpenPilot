@@ -48,75 +48,74 @@ typedef enum {
 } FieldType;
 
 typedef struct {
-    QString name;
-    QString units;
-    FieldType type;
+    QString     name;
+    QString     units;
+    FieldType   type;
     int numElements;
     int numBytes;
     QStringList elementNames;
     QStringList options; // for enums only
     bool defaultElementNames;
     QStringList defaultValues;
-    QString limitValues;
+    QString     limitValues;
 } FieldInfo;
 
 /**
  * Object update mode
  */
 typedef enum {
-    UPDATEMODE_MANUAL =    0, /** Manually update object, by calling the updated() function */
-    UPDATEMODE_PERIODIC =  1, /** Automatically update object at periodic intervals */
+    UPDATEMODE_MANUAL    = 0, /** Manually update object, by calling the updated() function */
+    UPDATEMODE_PERIODIC  = 1, /** Automatically update object at periodic intervals */
     UPDATEMODE_ONCHANGE  = 2, /** Only update object when its data changes */
-    UPDATEMODE_THROTTLED = 3  /** Object is updated on change, but not more often than the interval time */
+    UPDATEMODE_THROTTLED = 3 /** Object is updated on change, but not more often than the interval time */
 } UpdateMode;
 
 
 typedef enum {
     ACCESS_READWRITE = 0,
-    ACCESS_READONLY = 1
+    ACCESS_READONLY  = 1
 } AccessMode;
 
 
 typedef struct  {
-    QString name;
-    QString namelc; /** name in lowercase */
-    QString filename;
-    quint32 id;
-    bool isSingleInst;
-    bool isSettings;
+    QString    name;
+    QString    namelc; /** name in lowercase */
+    QString    filename;
+    quint32    id;
+    bool       isSingleInst;
+    bool       isSettings;
     AccessMode gcsAccess;
     AccessMode flightAccess;
-    bool flightTelemetryAcked;
+    bool       flightTelemetryAcked;
     UpdateMode flightTelemetryUpdateMode; /** Update mode used by the autopilot (UpdateMode) */
     int flightTelemetryUpdatePeriod; /** Update period used by the autopilot (only if telemetry mode is PERIODIC) */
-    bool gcsTelemetryAcked;
+    bool       gcsTelemetryAcked;
     UpdateMode gcsTelemetryUpdateMode; /** Update mode used by the GCS (UpdateMode) */
     int gcsTelemetryUpdatePeriod; /** Update period used by the GCS (only if telemetry mode is PERIODIC) */
     UpdateMode loggingUpdateMode; /** Update mode used by the logging module (UpdateMode) */
     int loggingUpdatePeriod; /** Update period used by the logging module (only if logging mode is PERIODIC) */
-    QList<FieldInfo*> fields; /** The data fields for the object **/
-    QString description; /** Description used for Doxygen **/
-    QString category; /** Description used for Doxygen **/
+    QList<FieldInfo *> fields; /** The data fields for the object **/
+    QString    description; /** Description used for Doxygen **/
+    QString    category; /** Description used for Doxygen **/
 } ObjectInfo;
 
-class UAVObjectParser
-{
+class UAVObjectParser {
 public:
 
     // Functions
     UAVObjectParser();
-    QString parseXML(QString& xml, QString& filename);
+    QString parseXML(QString & xml, QString & filename);
     int getNumObjects();
-    QList<ObjectInfo*> getObjectInfo();
+    QList<ObjectInfo *> getObjectInfo();
     QString getObjectName(int objIndex);
     quint32 getObjectID(int objIndex);
 
-    ObjectInfo* getObjectByIndex(int objIndex);
+    ObjectInfo *getObjectByIndex(int objIndex);
     int getNumBytes(int objIndex);
     QStringList all_units;
 
 private:
-    QList<ObjectInfo*> objInfo;
+    QList<ObjectInfo *> objInfo;
     QStringList fieldTypeStrXML;
     QList<int> fieldTypeNumBytes;
     QStringList updateModeStr;
@@ -124,15 +123,15 @@ private:
     QStringList accessModeStr;
     QStringList accessModeStrXML;
 
-    QString processObjectAttributes(QDomNode& node, ObjectInfo* info);
-    QString processObjectFields(QDomNode& childNode, ObjectInfo* info);
-    QString processObjectAccess(QDomNode& childNode, ObjectInfo* info);
-    QString processObjectDescription(QDomNode& childNode, QString * description);
-    QString processObjectCategory(QDomNode& childNode, QString * category);
-    QString processObjectMetadata(QDomNode& childNode, UpdateMode* mode, int* period, bool* acked);
-    void calculateID(ObjectInfo* info);
+    QString processObjectAttributes(QDomNode & node, ObjectInfo *info);
+    QString processObjectFields(QDomNode & childNode, ObjectInfo *info);
+    QString processObjectAccess(QDomNode & childNode, ObjectInfo *info);
+    QString processObjectDescription(QDomNode & childNode, QString *description);
+    QString processObjectCategory(QDomNode & childNode, QString *category);
+    QString processObjectMetadata(QDomNode & childNode, UpdateMode *mode, int *period, bool *acked);
+    void calculateID(ObjectInfo *info);
     quint32 updateHash(quint32 value, quint32 hash);
-    quint32 updateHash(QString& value, quint32 hash);
+    quint32 updateHash(QString & value, quint32 hash);
 };
 
 #endif // UAVOBJECTPARSER_H

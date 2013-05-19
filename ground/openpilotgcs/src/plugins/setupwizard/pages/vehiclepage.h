@@ -34,10 +34,9 @@ namespace Ui {
 class VehiclePage;
 }
 
-class VehiclePage : public AbstractWizardPage
-{
+class VehiclePage : public AbstractWizardPage {
     Q_OBJECT
-    
+
 public:
     explicit VehiclePage(SetupWizard *wizard, QWidget *parent = 0);
     ~VehiclePage();

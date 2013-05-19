@@ -34,14 +34,13 @@ namespace Ui {
 class NotYetImplementedPage;
 }
 
-class NotYetImplementedPage : public AbstractWizardPage
-{
+class NotYetImplementedPage : public AbstractWizardPage {
     Q_OBJECT
-    
+
 public:
     explicit NotYetImplementedPage(SetupWizard *wizard, QWidget *parent = 0);
     ~NotYetImplementedPage();
-    
+
 private:
     Ui::NotYetImplementedPage *ui;
 };

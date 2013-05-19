@@ -38,17 +38,15 @@
 #include "uavobjectutil/uavobjectutilmanager.h"
 
 
-
 namespace Ui {
-    class ImportSummaryDialog;
+class ImportSummaryDialog;
 }
 
-class ImportSummaryDialog : public QDialog
-{
+class ImportSummaryDialog : public QDialog {
     Q_OBJECT
 
 public:
-    ImportSummaryDialog(QWidget *parent=0);
+    ImportSummaryDialog(QWidget *parent = 0);
     ~ImportSummaryDialog();
     void addLine(QString objectName, QString text, bool status);
 
@@ -65,7 +63,6 @@ public slots:
 private slots:
     void doTheSaving();
     void openHelp();
-
 };
 
 #endif // IMPORTSUMMARY_H

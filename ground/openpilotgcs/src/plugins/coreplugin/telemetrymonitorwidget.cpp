@@ -7,8 +7,8 @@
 
 TelemetryMonitorWidget::TelemetryMonitorWidget(QWidget *parent) : QGraphicsView(parent)
 {
-    setMinimumSize(180,100);
-    setMaximumSize(180,100);
+    setMinimumSize(180, 100);
+    setMaximumSize(180, 100);
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -18,7 +18,7 @@ TelemetryMonitorWidget::TelemetryMonitorWidget(QWidget *parent) : QGraphicsView(
     setAttribute(Qt::WA_TranslucentBackground);
     setWindowFlags(Qt::FramelessWindowHint);
 
-    QGraphicsScene *scene = new QGraphicsScene(0,0,180,100, this);
+    QGraphicsScene *scene  = new QGraphicsScene(0, 0, 180, 100, this);
 
     QSvgRenderer *renderer = new QSvgRenderer();
     if (renderer->load(QString(":/core/images/tx-rx.svg"))) {
@@ -27,9 +27,9 @@ TelemetryMonitorWidget::TelemetryMonitorWidget(QWidget *parent) : QGraphicsView(
         graph->setElementId("txrxBackground");
 
         QString name;
-        QGraphicsSvgItem* pt;
+        QGraphicsSvgItem *pt;
 
-        for (int i=0; i<NODE_NUMELEM; i++) {
+        for (int i = 0; i < NODE_NUMELEM; i++) {
             name = QString("tx%0").arg(i);
             if (renderer->elementExists(name)) {
                 pt = new QGraphicsSvgItem();
@@ -53,13 +53,13 @@ TelemetryMonitorWidget::TelemetryMonitorWidget(QWidget *parent) : QGraphicsView(
 
         txSpeed = new QGraphicsTextItem();
         txSpeed->setDefaultTextColor(Qt::white);
-        txSpeed->setFont(QFont("Helvetica",22,2));
+        txSpeed->setFont(QFont("Helvetica", 22, 2));
         txSpeed->setParentItem(graph);
         scene->addItem(txSpeed);
 
         rxSpeed = new QGraphicsTextItem();
         rxSpeed->setDefaultTextColor(Qt::white);
-        rxSpeed->setFont(QFont("Helvetica",22,2));
+        rxSpeed->setFont(QFont("Helvetica", 22, 2));
         rxSpeed->setParentItem(graph);
         scene->addItem(rxSpeed);
 
@@ -68,8 +68,8 @@ TelemetryMonitorWidget::TelemetryMonitorWidget(QWidget *parent) : QGraphicsView(
     }
 
     connected = false;
-    txValue = 0.0;
-    rxValue = 0.0;
+    txValue   = 0.0;
+    rxValue   = 0.0;
 
     setMin(0.0);
     setMax(1200.0);
@@ -79,34 +79,36 @@ TelemetryMonitorWidget::TelemetryMonitorWidget(QWidget *parent) : QGraphicsView(
 
 TelemetryMonitorWidget::~TelemetryMonitorWidget()
 {
-    while (!txNodes.isEmpty())
+    while (!txNodes.isEmpty()) {
         delete txNodes.takeFirst();
+    }
 
-    while (!rxNodes.isEmpty())
+    while (!rxNodes.isEmpty()) {
         delete rxNodes.takeFirst();
+    }
 }
 
 void TelemetryMonitorWidget::connect()
 {
     connected = true;
 
-    //flash the lights
+    // flash the lights
     updateTelemetry(maxValue, maxValue);
 }
 
 void TelemetryMonitorWidget::disconnect()
 {
-    //flash the lights
+    // flash the lights
     updateTelemetry(maxValue, maxValue);
 
     connected = false;
-    updateTelemetry(0.0,0.0);
+    updateTelemetry(0.0, 0.0);
 }
 /*!
-  \brief Called by the UAVObject which got updated
+   \brief Called by the UAVObject which got updated
 
-  Updates the numeric value and/or the icon if the dial wants this.
-  */
+   Updates the numeric value and/or the icon if the dial wants this.
+ */
 void TelemetryMonitorWidget::updateTelemetry(double txRate, double rxRate)
 {
     txValue = txRate;
@@ -119,29 +121,30 @@ void TelemetryMonitorWidget::updateTelemetry(double txRate, double rxRate)
 // this enables smooth movement in moveIndex below
 void TelemetryMonitorWidget::showTelemetry()
 {
-    txIndex = (txValue-minValue)/(maxValue-minValue) * NODE_NUMELEM;
-    rxIndex = (rxValue-minValue)/(maxValue-minValue) * NODE_NUMELEM;
+    txIndex = (txValue - minValue) / (maxValue - minValue) * NODE_NUMELEM;
+    rxIndex = (rxValue - minValue) / (maxValue - minValue) * NODE_NUMELEM;
 
-    if (connected)
+    if (connected) {
         this->setToolTip(QString("Tx: %0 bytes/sec\nRx: %1 bytes/sec").arg(txValue).arg(rxValue));
-    else
+    } else {
         this->setToolTip(QString("Disconnected"));
+    }
 
     int i;
     int nodeMargin = 8;
     int leftMargin = 60;
-    QGraphicsItem* node;
+    QGraphicsItem *node;
 
-    for (i=0; i < txNodes.count(); i++) {
+    for (i = 0; i < txNodes.count(); i++) {
         node = txNodes.at(i);
-        node->setPos((i*(node->boundingRect().width() + nodeMargin)) + leftMargin, (node->boundingRect().height()/2) - 2);
+        node->setPos((i * (node->boundingRect().width() + nodeMargin)) + leftMargin, (node->boundingRect().height() / 2) - 2);
         node->setVisible(connected && i < txIndex);
         node->update();
     }
 
-    for (i=0; i < rxNodes.count(); i++) {
+    for (i = 0; i < rxNodes.count(); i++) {
         node = rxNodes.at(i);
-        node->setPos((i*(node->boundingRect().width() + nodeMargin)) + leftMargin, (node->boundingRect().height()*2) - 2);
+        node->setPos((i * (node->boundingRect().width() + nodeMargin)) + leftMargin, (node->boundingRect().height() * 2) - 2);
         node->setVisible(connected && i < rxIndex);
         node->update();
     }
@@ -165,11 +168,10 @@ void TelemetryMonitorWidget::showEvent(QShowEvent *event)
     fitInView(graph, Qt::KeepAspectRatio);
 }
 
-void TelemetryMonitorWidget::resizeEvent(QResizeEvent* event)
+void TelemetryMonitorWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
 
-    graph->setPos(0,-130);
+    graph->setPos(0, -130);
     fitInView(graph, Qt::KeepAspectRatio);
 }
-

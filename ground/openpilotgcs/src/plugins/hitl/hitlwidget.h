@@ -7,7 +7,7 @@
  * @{
  * @addtogroup HITLPlugin HITL Plugin
  * @{
- * @brief The Hardware In The Loop plugin 
+ * @brief The Hardware In The Loop plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -34,37 +34,39 @@
 
 class Ui_HITLWidget;
 
-class HITLWidget : public QWidget
-{
+class HITLWidget : public QWidget {
     Q_OBJECT
 
 public:
     HITLWidget(QWidget *parent = 0);
     ~HITLWidget();
 
-	void setSettingParameters(const SimulatorSettings& params) {settings = params;}
+    void setSettingParameters(const SimulatorSettings & params)
+    {
+        settings = params;
+    }
 signals:
-	void deleteSimulator();
+    void deleteSimulator();
 
 private slots:
     void startButtonClicked();
     void stopButtonClicked();
-	void buttonClearLogClicked();
+    void buttonClearLogClicked();
     void onProcessOutput(QString text);
     void onAutopilotConnect();
     void onAutopilotDisconnect();
-	void onSimulatorConnect();
-	void onSimulatorDisconnect();
+    void onSimulatorConnect();
+    void onSimulatorDisconnect();
 
 private:
-    Ui_HITLWidget* widget;
-	Simulator* simulator;
-	SimulatorSettings settings;
+    Ui_HITLWidget *widget;
+    Simulator *simulator;
+    SimulatorSettings settings;
 
-	QString greenColor;
-	QString strAutopilotDisconnected;
-	QString strSimulatorDisconnected;
-	QString strAutopilotConnected;
+    QString greenColor;
+    QString strAutopilotDisconnected;
+    QString strSimulatorDisconnected;
+    QString strAutopilotConnected;
     QString strStyleEnable;
     QString strStyleDisable;
 };

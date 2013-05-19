@@ -13,19 +13,19 @@
  *
  ******************************************************************************
  */
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -103,38 +103,38 @@
 #define PIOS_L3GD20_PWRMGMT_STOP_CLK     0X07
 
 enum pios_l3gd20_range {
-	PIOS_L3GD20_SCALE_250_DEG  = 0x00,
-	PIOS_L3GD20_SCALE_500_DEG  = 0x10,
-	PIOS_L3GD20_SCALE_2000_DEG = 0x3
+    PIOS_L3GD20_SCALE_250_DEG  = 0x00,
+    PIOS_L3GD20_SCALE_500_DEG  = 0x10,
+    PIOS_L3GD20_SCALE_2000_DEG = 0x3
 };
 
 enum pios_l3gd20_filter {
-	PIOS_L3GD20_LOWPASS_256_HZ = 0x00,
-	PIOS_L3GD20_LOWPASS_188_HZ = 0x01,
-	PIOS_L3GD20_LOWPASS_98_HZ  = 0x02,
-	PIOS_L3GD20_LOWPASS_42_HZ  = 0x03,
-	PIOS_L3GD20_LOWPASS_20_HZ  = 0x04,
-	PIOS_L3GD20_LOWPASS_10_HZ  = 0x05,
-	PIOS_L3GD20_LOWPASS_5_HZ   = 0x06
+    PIOS_L3GD20_LOWPASS_256_HZ = 0x00,
+    PIOS_L3GD20_LOWPASS_188_HZ = 0x01,
+    PIOS_L3GD20_LOWPASS_98_HZ  = 0x02,
+    PIOS_L3GD20_LOWPASS_42_HZ  = 0x03,
+    PIOS_L3GD20_LOWPASS_20_HZ  = 0x04,
+    PIOS_L3GD20_LOWPASS_10_HZ  = 0x05,
+    PIOS_L3GD20_LOWPASS_5_HZ   = 0x06
 };
 
 struct pios_l3gd20_data {
-	int16_t gyro_x;
-	int16_t gyro_y;
-	int16_t gyro_z;
-	int16_t temperature;
+    int16_t gyro_x;
+    int16_t gyro_y;
+    int16_t gyro_z;
+    int16_t temperature;
 };
 
 struct pios_l3gd20_cfg {
-	const struct pios_exti_cfg * exti_cfg; /* Pointer to the EXTI configuration */
+    const struct pios_exti_cfg *exti_cfg; /* Pointer to the EXTI configuration */
 
-	enum pios_l3gd20_range range;
+    enum pios_l3gd20_range     range;
 };
 
 /* Public Functions */
-extern int32_t PIOS_L3GD20_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_l3gd20_cfg * cfg);
+extern int32_t PIOS_L3GD20_Init(uint32_t spi_id, uint32_t slave_num, const struct pios_l3gd20_cfg *cfg);
 extern xQueueHandle PIOS_L3GD20_GetQueue();
-extern int32_t PIOS_L3GD20_ReadGyros(struct pios_l3gd20_data * buffer);
+extern int32_t PIOS_L3GD20_ReadGyros(struct pios_l3gd20_data *buffer);
 extern int32_t PIOS_L3GD20_SetRange(enum pios_l3gd20_range range);
 extern float PIOS_L3GD20_GetScale();
 extern int32_t PIOS_L3GD20_ReadID();
@@ -143,7 +143,7 @@ extern bool PIOS_L3GD20_IRQHandler();
 
 #endif /* PIOS_L3GD20_H */
 
-/** 
-  * @}
-  * @}
-  */
+/**
+ * @}
+ * @}
+ */

@@ -33,29 +33,31 @@
 #include "scopegadgetwidget.h"
 
 class IUAVGadget;
-//class QList<int>;
+// class QList<int>;
 class QWidget;
 class QString;
 class ScopeGadgetWidget;
 
 using namespace Core;
 
-class ScopeGadget : public Core::IUAVGadget
-{
+class ScopeGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     ScopeGadget(QString classId, ScopeGadgetWidget *widget, QWidget *parent = 0);
     ~ScopeGadget();
 
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 
-    QList<int> context() const {
+    QList<int> context() const
+    {
         return m_context;
     }
-    QWidget *widget() {
+    QWidget *widget()
+    {
         return m_widget;
     }
-    QString contextHelpId() const {
+    QString contextHelpId() const
+    {
         return QString();
     }
 

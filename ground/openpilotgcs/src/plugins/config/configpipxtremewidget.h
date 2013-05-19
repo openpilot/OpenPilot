@@ -1,14 +1,14 @@
 /**
-******************************************************************************
-*
-* @file       configpipxtremewidget.h
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
-* @addtogroup GCSPlugins GCS Plugins
-* @{
-* @addtogroup ConfigPlugin Config Plugin
-* @{
-* @brief The Configuration Gadget used to configure PipXtreme
-*****************************************************************************/
+ ******************************************************************************
+ *
+ * @file       configpipxtremewidget.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup ConfigPlugin Config Plugin
+ * @{
+ * @brief The Configuration Gadget used to configure PipXtreme
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,38 +32,37 @@
 #include "ui_pipxtreme.h"
 #include "configtaskwidget.h"
 
-class ConfigPipXtremeWidget : public ConfigTaskWidget
-{
-	Q_OBJECT
+class ConfigPipXtremeWidget : public ConfigTaskWidget {
+    Q_OBJECT
 
 public:
-	ConfigPipXtremeWidget(QWidget *parent = 0);
-	~ConfigPipXtremeWidget();
-    
+    ConfigPipXtremeWidget(QWidget *parent = 0);
+    ~ConfigPipXtremeWidget();
+
 public slots:
-	void updateStatus(UAVObject *object1);
-	void updateSettings(UAVObject *object1);
+    void updateStatus(UAVObject *object1);
+    void updateSettings(UAVObject *object1);
 
 private:
-	Ui_PipXtremeWidget *m_oplink;
+    Ui_PipXtremeWidget *m_oplink;
 
-	// The OPLink status UAVObject
-	UAVDataObject *oplinkStatusObj;
+    // The OPLink status UAVObject
+    UAVDataObject *oplinkStatusObj;
 
-	// The OPLink ssettins UAVObject
-	OPLinkSettings* oplinkSettingsObj;
+    // The OPLink ssettins UAVObject
+    OPLinkSettings *oplinkSettingsObj;
 
-	// Are the settings current?
-	bool settingsUpdated;
+    // Are the settings current?
+    bool settingsUpdated;
 
-	// Signal mappers to add arguments to signals.
-	QSignalMapper *signalMapperAddBinding;
-	QSignalMapper *signalMapperRemBinding;
+    // Signal mappers to add arguments to signals.
+    QSignalMapper *signalMapperAddBinding;
+    QSignalMapper *signalMapperRemBinding;
 
 private slots:
-	void disconnected();
-	void addBinding(QWidget *w);
-	void removeBinding(QWidget *w);
+    void disconnected();
+    void addBinding(QWidget *w);
+    void removeBinding(QWidget *w);
 };
 
 #endif // CONFIGTXPIDWIDGET_H

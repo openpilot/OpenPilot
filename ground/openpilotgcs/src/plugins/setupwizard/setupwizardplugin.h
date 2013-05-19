@@ -31,23 +31,22 @@
 #include <QWizard>
 #include "setupwizard.h"
 
-class SetupWizardPlugin : public ExtensionSystem::IPlugin
-{
+class SetupWizardPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
 public:
-   SetupWizardPlugin();
-   ~SetupWizardPlugin();
+    SetupWizardPlugin();
+    ~SetupWizardPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
 
 private slots:
-   void showSetupWizard();
-   void wizardTerminated();
+    void showSetupWizard();
+    void wizardTerminated();
 
 private:
-   bool wizardRunning;
+    bool wizardRunning;
 };
 
 #endif // SETUPWIZARDPLUGIN_H

@@ -35,15 +35,17 @@ using namespace Core;
 
 /* Despite its name, this is actually a generic analog Serial
    supporting up to two rotating "needle" indicators.
-  */
-class SerialPluginConfiguration : public IUAVGadgetConfiguration
-{
-Q_OBJECT
+ */
+class SerialPluginConfiguration : public IUAVGadgetConfiguration {
+    Q_OBJECT
 public:
     explicit SerialPluginConfiguration(QString classId, QSettings *qSettings = 0, QObject *parent = 0);
     virtual ~SerialPluginConfiguration();
 
-    QString speed() { return m_speed; }
+    QString speed()
+    {
+        return m_speed;
+    }
     void saveConfig(QSettings *settings) const;
     IUAVGadgetConfiguration *clone();
     void savesettings() const;
@@ -54,8 +56,10 @@ private:
     QSettings *settings;
 
 public slots:
-    void setSpeed(QString speed) { m_speed = speed; }
-
+    void setSpeed(QString speed)
+    {
+        m_speed = speed;
+    }
 };
 
 #endif // SERIALPLUGINCONFIGURATION_H

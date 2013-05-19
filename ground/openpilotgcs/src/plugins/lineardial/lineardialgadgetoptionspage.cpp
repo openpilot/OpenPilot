@@ -7,7 +7,7 @@
  * @{
  * @addtogroup LinearDialPlugin Linear Dial Plugin
  * @{
- * @brief Impliments a gadget that displays linear gauges 
+ * @brief Impliments a gadget that displays linear gauges
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -38,21 +38,20 @@
 #include <QFontDialog>
 
 LineardialGadgetOptionsPage::LineardialGadgetOptionsPage(LineardialGadgetConfiguration *config, QObject *parent) :
-        IOptionsPage(parent),
-        m_config(config)
+    IOptionsPage(parent),
+    m_config(config)
 {
     font = QFont("Arial", 12); // Default in case nothing exists yet.
 }
 
-//creates options page widget (uses the UI file)
+// creates options page widget (uses the UI file)
 QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
 {
-
     Q_UNUSED(parent);
     options_page = new Ui::LineardialGadgetOptionsPage();
-    //main widget
+    // main widget
     QWidget *optionsPageWidget = new QWidget;
-    //main layout
+    // main layout
     options_page->setupUi(optionsPageWidget);
 
 
@@ -75,27 +74,27 @@ QWidget *LineardialGadgetOptionsPage::createPage(QWidget *parent)
     options_page->redMax->setValue(m_config->getRedMax());
     options_page->factor->setValue(m_config->getFactor());
     options_page->decPlaces->setValue(m_config->getDecimalPlaces());
-	font.fromString(m_config->getFont());
-	options_page->useOpenGL->setChecked(m_config->useOpenGL());
+    font.fromString(m_config->getFont());
+    options_page->useOpenGL->setChecked(m_config->useOpenGL());
 
     // Fills the combo boxes for the UAVObjects
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    QList< QList<UAVDataObject*> > objList = objManager->getDataObjects();
-    foreach (QList<UAVDataObject*> list, objList) {
-        foreach (UAVDataObject* obj, list) {
+    QList< QList<UAVDataObject *> > objList = objManager->getDataObjects();
+    foreach(QList<UAVDataObject *> list, objList) {
+        foreach(UAVDataObject * obj, list) {
             options_page->objectName->addItem(obj->getName());
         }
     }
-    //select saved UAV Object field values
-    if(options_page->objectName->findText(m_config->getSourceDataObject())!=-1){
+    // select saved UAV Object field values
+    if (options_page->objectName->findText(m_config->getSourceDataObject()) != -1) {
         options_page->objectName->setCurrentIndex(options_page->objectName->findText(m_config->getSourceDataObject()));
         // Now load the object field values:
-        UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(m_config->getSourceDataObject()) );
-        if (obj != NULL ) {
-                on_objectName_currentIndexChanged(m_config->getSourceDataObject());
-                // And set the highlighed value from the settings:
-                options_page->objectField->setCurrentIndex(options_page->objectField->findText(m_config->getSourceObjectField()));
+        UAVDataObject *obj = dynamic_cast<UAVDataObject *>(objManager->getObject(m_config->getSourceDataObject()));
+        if (obj != NULL) {
+            on_objectName_currentIndexChanged(m_config->getSourceDataObject());
+            // And set the highlighed value from the settings:
+            options_page->objectField->setCurrentIndex(options_page->objectField->findText(m_config->getSourceObjectField()));
         }
     }
 
@@ -122,7 +121,6 @@ void LineardialGadgetOptionsPage::on_rangeMin_valueChanged(double val)
     options_page->greenMax->setMinimum(val);
     options_page->yellowMax->setMinimum(val);
     options_page->redMax->setMinimum(val);
-
 }
 
 /**
@@ -155,16 +153,16 @@ void LineardialGadgetOptionsPage::apply()
     m_config->setDialFile(options_page->svgSourceFile->path());
     double rangeMin = options_page->minValue->value();
     double rangeMax = options_page->maxValue->value();
-    m_config->setRange(rangeMin,rangeMax);
-    m_config->setGreenRange(options_page->greenMin->value(),options_page->greenMax->value());
-    m_config->setYellowRange(options_page->yellowMin->value(),options_page->yellowMax->value());
-    m_config->setRedRange(options_page->redMin->value(),options_page->redMax->value());
+    m_config->setRange(rangeMin, rangeMax);
+    m_config->setGreenRange(options_page->greenMin->value(), options_page->greenMax->value());
+    m_config->setYellowRange(options_page->yellowMin->value(), options_page->yellowMax->value());
+    m_config->setRedRange(options_page->redMin->value(), options_page->redMax->value());
     m_config->setSourceDataObject(options_page->objectName->currentText());
     m_config->setSourceObjField(options_page->objectField->currentText());
     m_config->setFont(font.toString());
     m_config->setDecimalPlaces(options_page->decPlaces->value());
     m_config->setFactor(options_page->factor->value());
-	m_config->setUseOpenGL(options_page->useOpenGL->checkState());
+    m_config->setUseOpenGL(options_page->useOpenGL->checkState());
 }
 
 /**
@@ -174,34 +172,32 @@ void LineardialGadgetOptionsPage::apply()
 void LineardialGadgetOptionsPage::on_fontPicker_clicked()
 {
     bool ok;
-    font = QFontDialog::getFont(&ok, font , qobject_cast<QWidget*>(this));
+
+    font = QFontDialog::getFont(&ok, font, qobject_cast<QWidget *>(this));
 }
 
 
 /*
-  Fills in the field1 combo box when value is changed in the
-  object1 field
-*/
-void LineardialGadgetOptionsPage::on_objectName_currentIndexChanged(QString val) {
+   Fills in the field1 combo box when value is changed in the
+   object1 field
+ */
+void LineardialGadgetOptionsPage::on_objectName_currentIndexChanged(QString val)
+{
     options_page->objectField->clear();
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    UAVDataObject* obj = dynamic_cast<UAVDataObject*>( objManager->getObject(val) );
-    QList<UAVObjectField*> fieldList = obj->getFields();
-    foreach (UAVObjectField* field, fieldList) {
-        if(field->getElementNames().count() > 1)
-        {
-            foreach(QString elemName , field->getElementNames())
-            {
+    UAVDataObject *obj = dynamic_cast<UAVDataObject *>(objManager->getObject(val));
+    QList<UAVObjectField *> fieldList  = obj->getFields();
+    foreach(UAVObjectField * field, fieldList) {
+        if (field->getElementNames().count() > 1) {
+            foreach(QString elemName, field->getElementNames()) {
                 options_page->objectField->addItem(field->getName() + "-" + elemName);
             }
-        }
-        else
+        } else {
             options_page->objectField->addItem(field->getName());
+        }
     }
 }
 
 void LineardialGadgetOptionsPage::finish()
-{
-
-}
+{}

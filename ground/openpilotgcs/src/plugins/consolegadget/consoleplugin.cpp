@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ConsolePlugin Console Plugin
  * @{
- * @brief The Console Gadget impliments a console view 
+ * @brief The Console Gadget impliments a console view
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -34,32 +34,31 @@
 
 ConsolePlugin::ConsolePlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 ConsolePlugin::~ConsolePlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool ConsolePlugin::initialize(const QStringList& args, QString *errMsg)
+bool ConsolePlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mf = new ConsoleGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mf = new ConsoleGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void ConsolePlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void ConsolePlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(ConsolePlugin)
-

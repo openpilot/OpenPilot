@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
  * @{
- * @brief The OpenPilot Map plugin 
+ * @brief The OpenPilot Map plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify

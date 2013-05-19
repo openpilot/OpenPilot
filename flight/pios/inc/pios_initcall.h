@@ -6,32 +6,32 @@
  * @brief Initcall Macros
  * @{
  *
- * @file       pios_initcall.h  
+ * @file       pios_initcall.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2011.
  * @brief      Initcall header
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
 #ifndef PIOS_INITCALL_H
 #define PIOS_INITCALL_H
 
-/* 
+/*
  * This implementation is heavily based on the Linux Kernel initcall
  * infrastructure:
  *   http://lxr.linux.no/#linux/include/linux/init.h
@@ -44,8 +44,8 @@
 
 typedef int32_t (*initcall_t)(void);
 typedef struct {
-	initcall_t fn_minit;
-	initcall_t fn_tinit;
+    initcall_t fn_minit;
+    initcall_t fn_tinit;
 } initmodule_t;
 
 /* Init module section */
@@ -58,20 +58,22 @@ extern void StartModules();
 
 #define MODULE_INITCALL(ifn, sfn)
 
-#define MODULE_TASKCREATE_ALL { \
-	/* Start all module threads */ \
-	StartModules(); \
-	}
+#define MODULE_TASKCREATE_ALL \
+    { \
+        /* Start all module threads */ \
+        StartModules(); \
+    }
 
-#define MODULE_INITIALISE_ALL { \
-	/* Initialize modules */ \
-	InitModules(); \
-	/* Initialize the system thread */ \
-	SystemModInitialize();}
+#define MODULE_INITIALISE_ALL \
+    { \
+        /* Initialize modules */ \
+        InitModules(); \
+        /* Initialize the system thread */ \
+        SystemModInitialize(); }
 
 #else
 
-/* initcalls are now grouped by functionality into separate 
+/* initcalls are now grouped by functionality into separate
  * subsections. Ordering inside the subsections is determined
  * by link order.
  *
@@ -79,27 +81,33 @@ extern void StartModules();
  * can point at the same handler without causing duplicate-symbol build errors.
  */
 
-#define __define_initcall(level,fn,id) \
-	static initcall_t __initcall_##fn##id __attribute__((__used__)) \
-	__attribute__((__section__(".initcall" level ".init"))) = fn
+#define __define_initcall(level, fn, id) \
+    static initcall_t __initcall_##fn##id __attribute__((__used__)) \
+    __attribute__((__section__(".initcall" level ".init"))) = fn
 
 #define __define_module_initcall(level, ifn, sfn) \
-	static initmodule_t __initcall_##fn __attribute__((__used__)) \
-	__attribute__((__section__(".initcall" level ".init"))) = { .fn_minit = ifn, .fn_tinit = sfn };
+    static initmodule_t __initcall_##fn __attribute__((__used__)) \
+    __attribute__((__section__(".initcall" level ".init"))) = { .fn_minit = ifn, .fn_tinit = sfn };
 
-#define MODULE_INITCALL(ifn, sfn)		__define_module_initcall("module", ifn, sfn)
+#define MODULE_INITCALL(ifn, sfn) __define_module_initcall("module", ifn, sfn)
 
-#define MODULE_INITIALISE_ALL  { for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) \
-									if (fn->fn_minit) \
-										(fn->fn_minit)(); }
+#define MODULE_INITIALISE_ALL \
+    { for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) { \
+          if (fn->fn_minit) { \
+              (fn->fn_minit)(); } \
+      } \
+    }
 
-#define MODULE_TASKCREATE_ALL  { for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) \
-									if (fn->fn_tinit) \
-									   (fn->fn_tinit)(); }
+#define MODULE_TASKCREATE_ALL \
+    { for (initmodule_t *fn = __module_initcall_start; fn < __module_initcall_end; fn++) { \
+          if (fn->fn_tinit) { \
+              (fn->fn_tinit)(); } \
+      } \
+    }
 
 #endif /* USE_SIM_POSIX */
 
-#endif	/* PIOS_INITCALL_H */
+#endif /* PIOS_INITCALL_H */
 
 /**
  * @}

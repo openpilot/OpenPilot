@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin Primary Flight Display Plugin
  * @{
- * @brief The Primary Flight Display Gadget 
+ * @brief The Primary Flight Display Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,25 +32,48 @@
 
 using namespace Core;
 
-class PFDGadgetConfiguration : public IUAVGadgetConfiguration
-{
-Q_OBJECT
+class PFDGadgetConfiguration : public IUAVGadgetConfiguration {
+    Q_OBJECT
 public:
-    explicit PFDGadgetConfiguration(QString classId, QSettings* qSettings = 0, QObject *parent = 0);
+    explicit PFDGadgetConfiguration(QString classId, QSettings *qSettings = 0, QObject *parent = 0);
 
-    //set dial configuration functions
-    void setDialFile(QString dialFile){m_defaultDial=dialFile;}
-    void setUseOpenGL(bool flag) { useOpenGLFlag = flag; }
-    void setHqFonts(bool flag) { hqFonts = flag; }
-    void setBeSmooth(bool flag) { beSmooth = flag;}
+    // set dial configuration functions
+    void setDialFile(QString dialFile)
+    {
+        m_defaultDial = dialFile;
+    }
+    void setUseOpenGL(bool flag)
+    {
+        useOpenGLFlag = flag;
+    }
+    void setHqFonts(bool flag)
+    {
+        hqFonts = flag;
+    }
+    void setBeSmooth(bool flag)
+    {
+        beSmooth = flag;
+    }
 
-    //get dial configuration functions
-    QString dialFile() {return m_defaultDial;}
-    bool useOpenGL() { return useOpenGLFlag; }
-    bool getHqFonts() { return hqFonts; }
-    bool getBeSmooth() { return beSmooth; }
+    // get dial configuration functions
+    QString dialFile()
+    {
+        return m_defaultDial;
+    }
+    bool useOpenGL()
+    {
+        return useOpenGLFlag;
+    }
+    bool getHqFonts()
+    {
+        return hqFonts;
+    }
+    bool getBeSmooth()
+    {
+        return beSmooth;
+    }
 
-    void saveConfig(QSettings* settings) const;
+    void saveConfig(QSettings *settings) const;
     IUAVGadgetConfiguration *clone();
 
 private:

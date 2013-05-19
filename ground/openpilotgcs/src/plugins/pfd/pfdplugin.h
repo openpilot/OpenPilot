@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin Primary Flight Display Plugin
  * @{
- * @brief The Primary Flight Display Gadget 
+ * @brief The Primary Flight Display Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,16 +32,15 @@
 
 class PFDGadgetFactory;
 
-class PFDPlugin : public ExtensionSystem::IPlugin
-{
+class PFDPlugin : public ExtensionSystem::IPlugin {
 public:
-        PFDPlugin();
-   ~PFDPlugin();
+    PFDPlugin();
+    ~PFDPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
 private:
-   PFDGadgetFactory *mf;
+    PFDGadgetFactory *mf;
 };
 #endif /* PFDPLUGIN_H_ */

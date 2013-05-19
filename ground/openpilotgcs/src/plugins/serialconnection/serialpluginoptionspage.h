@@ -10,7 +10,7 @@
  * @{
  * @brief Impliments serial connection to the flight hardware for Telemetry
  *****************************************************************************/
- /*
+/*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
@@ -42,21 +42,32 @@ class IUAVpluginConfiguration;
 class SerialPluginConfiguration;
 
 namespace Ui {
-    class SerialPluginOptionsPage;
+class SerialPluginOptionsPage;
 }
 
 using namespace Core;
 
-class SerialPluginOptionsPage : public IOptionsPage
-{
-Q_OBJECT
+class SerialPluginOptionsPage : public IOptionsPage {
+    Q_OBJECT
 public:
     explicit SerialPluginOptionsPage(SerialPluginConfiguration *config, QObject *parent = 0);
 
-    QString id() const { return QLatin1String("settings"); }
-    QString trName() const { return tr("settings"); }
-    QString category() const { return "Serial Telemetry"; }
-    QString trCategory() const { return "Serial Telemetry"; }
+    QString id() const
+    {
+        return QLatin1String("settings");
+    }
+    QString trName() const
+    {
+        return tr("settings");
+    }
+    QString category() const
+    {
+        return "Serial Telemetry";
+    }
+    QString trCategory() const
+    {
+        return "Serial Telemetry";
+    }
     QWidget *createPage(QWidget *parent);
     void apply();
     void finish();
@@ -64,8 +75,6 @@ public:
 private:
     Ui::SerialPluginOptionsPage *options_page;
     SerialPluginConfiguration *m_config;
-
-
 };
 
 #endif // SERIALpluginOPTIONSPAGE_H

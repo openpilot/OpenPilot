@@ -38,17 +38,16 @@ namespace Ui {
 class ControllerPage;
 }
 
-class ControllerPage : public AbstractWizardPage
-{
+class ControllerPage : public AbstractWizardPage {
     Q_OBJECT
-    
+
 public:
     explicit ControllerPage(SetupWizard *wizard, QWidget *parent = 0);
     ~ControllerPage();
     void initializePage();
     bool isComplete() const;
     bool validatePage();
-    
+
 private:
     Ui::ControllerPage *ui;
     bool anyControllerConnected();

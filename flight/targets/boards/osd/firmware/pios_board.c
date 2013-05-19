@@ -104,6 +104,8 @@ uint32_t pios_com_gps_id;
 uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_telem_rf_id;
 
+uintptr_t pios_uavo_settings_fs_id;
+
 /**
  * TIM3 is triggered by the HSYNC signal into its ETR line and will divide the
  *  APB1_CLOCK to generate a pixel clock that is used by the SPI CLK lines.
@@ -161,11 +163,10 @@ void PIOS_Board_Init(void)
 #endif
 #endif /* PIOS_INCLUDE_SPI */
 
-#ifdef PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
+#ifdef PIOS_INCLUDE_FLASH_LOGFS_SETTINGS
     uintptr_t flash_id;
-    uintptr_t fs_id;
     PIOS_Flash_Internal_Init(&flash_id, &flash_internal_cfg);
-    PIOS_FLASHFS_Logfs_Init(&fs_id, &flashfs_internal_cfg, &pios_internal_flash_driver, flash_id);
+    PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_internal_cfg, &pios_internal_flash_driver, flash_id);
 #elif !defined(PIOS_USE_SETTINGS_ON_SDCARD)
 #error No setting storage specified. (define PIOS_USE_SETTINGS_ON_SDCARD or INCLUDE_FLASH_SECTOR_SETTINGS)
 #endif

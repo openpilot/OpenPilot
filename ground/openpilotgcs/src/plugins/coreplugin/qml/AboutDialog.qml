@@ -79,7 +79,7 @@
         }
 		//  This tab is for the authors/contributors/credits
         Rectangle {
-			property string title: "Authors"
+			property string title: "Contributors"
 			anchors.fill: parent; color: "#e3e3e3"
 			Rectangle {
 				anchors.fill: parent; anchors.margins: 20

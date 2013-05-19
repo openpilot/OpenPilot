@@ -107,9 +107,10 @@
 /* #define PIOS_INCLUDE_SDCARD */
 /* #define LOG_FILENAME "startup.log" */
 #define PIOS_INCLUDE_FLASH
-#define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS
+#define PIOS_INCLUDE_FLASH_LOGFS_SETTINGS
 /* #define FLASH_FREERTOS */
 /* #define PIOS_INCLUDE_FLASH_EEPROM */
+/* #define PIOS_INCLUDE_FLASH_INTERNAL */
 
 /* PIOS radio modules */
 /* #define PIOS_INCLUDE_RFM22B */

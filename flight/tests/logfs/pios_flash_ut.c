@@ -2,7 +2,7 @@
 #include <stdio.h> /* fopen/fread/fwrite/fseek */
 #include <assert.h> /* assert */
 #include <string.h> /* memset */
-
+#include <unistd.h>
 #include <stdbool.h>
 #include "pios_flash_ut_priv.h"
 
@@ -54,6 +54,26 @@ int32_t PIOS_Flash_UT_Init(uintptr_t *flash_id, const struct pios_flash_ut_cfg *
 
     return 0;
 }
+
+int32_t PIOS_Flash_UT_Destroy(uintptr_t flash_id)
+{
+    /* Check inputs */
+    assert(flash_id);
+    struct flash_ut_dev *flash_dev = (void *)flash_id;
+
+    if (flash_dev->flash_file == NULL) {
+        return -1;
+    }
+
+    fclose(flash_dev->flash_file);
+
+    free(flash_dev);
+
+    unlink(FLASH_IMAGE_FILE);
+
+    return 0;
+}
+
 
 /**********************************
  *

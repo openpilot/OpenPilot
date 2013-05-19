@@ -675,8 +675,9 @@ const struct pios_rfm22b_cfg *PIOS_BOARD_HW_DEFS_GetRfm22Cfg(uint32_t board_revi
 #if defined(PIOS_INCLUDE_FLASH)
 #include "pios_flashfs_logfs_priv.h"
 #include "pios_flash_jedec_priv.h"
+#include "pios_flash_internal_priv.h"
 
-static const struct flashfs_logfs_cfg flashfs_m25p_cfg = {
+static const struct flashfs_logfs_cfg flashfs_external_cfg = {
     .fs_magic      = 0x99abceef,
     .total_fs_size = 0x00200000, /* 2M bytes (32 sectors = entire chip) */
     .arena_size    = 0x00010000, /* 256 * slot size */
@@ -685,6 +686,20 @@ static const struct flashfs_logfs_cfg flashfs_m25p_cfg = {
     .start_offset  = 0,          /* start at the beginning of the chip */
     .sector_size   = 0x00010000, /* 64K bytes */
     .page_size     = 0x00000100, /* 256 bytes */
+};
+
+
+static const struct pios_flash_internal_cfg flash_internal_cfg = {};
+
+static const struct flashfs_logfs_cfg flashfs_internal_cfg = {
+    .fs_magic      = 0x99abcfef,
+    .total_fs_size = EE_BANK_SIZE, /* 32K bytes (2x16KB sectors) */
+    .arena_size    = 0x00004000, /* 64 * slot size = 16K bytes = 1 sector */
+    .slot_size     = 0x00000100, /* 256 bytes */
+
+    .start_offset  = EE_BANK_BASE, /* start after the bootloader */
+    .sector_size   = 0x00004000, /* 16K bytes */
+    .page_size     = 0x00004000, /* 16K bytes */
 };
 
 #endif /* PIOS_INCLUDE_FLASH */

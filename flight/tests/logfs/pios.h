@@ -1,8 +1,13 @@
 #ifndef PIOS_H
 #define PIOS_H
 
-/* PIOS board specific feature selection */
+/* PIOS Feature Selection */
 #include "pios_config.h"
+
+#ifdef PIOS_INCLUDE_FREERTOS
+/* FreeRTOS Includes */
+#include "FreeRTOS.h"
+#endif
 
 #ifdef PIOS_INCLUDE_FLASH
 #include <pios_flash.h>

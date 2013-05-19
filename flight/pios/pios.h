@@ -279,11 +279,14 @@
 #endif
 
 #ifdef PIOS_INCLUDE_FLASH
-/* #define PIOS_INCLUDE_FLASH_SECTOR_SETTINGS */
+/* #define PIOS_INCLUDE_FLASH_LOGFS_SETTINGS */
 /* #define FLASH_FREERTOS */
 #include <pios_flash.h>
 #include <pios_flashfs.h>
 #endif
+
+/* driver for storage on internal flash */
+/* #define PIOS_INCLUDE_FLASH_INTERNAL */
 
 #ifdef PIOS_INCLUDE_FLASH_EEPROM
 #include <pios_eeprom.h>

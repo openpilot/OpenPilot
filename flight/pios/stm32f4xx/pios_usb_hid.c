@@ -87,10 +87,10 @@ static struct pios_usb_hid_dev * PIOS_USB_HID_alloc(void)
 {
 	struct pios_usb_hid_dev * usb_hid_dev;
 
-	usb_hid_dev = (struct pios_usb_hid_dev *)pvPortMalloc(sizeof(*usb_hid_dev));
+	usb_hid_dev = (struct pios_usb_hid_dev *)pvPortMalloc(sizeof(struct pios_usb_hid_dev));
 	if (!usb_hid_dev) return(NULL);
 
-	memset(usb_hid_dev, 0, sizeof(*usb_hid_dev));
+	memset(usb_hid_dev, 0, sizeof(struct pios_usb_hid_dev));
 	usb_hid_dev->magic = PIOS_USB_HID_DEV_MAGIC;
 	return(usb_hid_dev);
 }
@@ -107,7 +107,7 @@ static struct pios_usb_hid_dev * PIOS_USB_HID_alloc(void)
 
 	usb_hid_dev = &pios_usb_hid_devs[pios_usb_hid_num_devs++];
 
-	memset(usb_hid_dev, 0, sizeof(*usb_hid_dev));
+	memset(usb_hid_dev, 0, sizeof(struct pios_usb_hid_dev));
 	usb_hid_dev->magic = PIOS_USB_HID_DEV_MAGIC;
 
 	return (usb_hid_dev);

@@ -68,7 +68,7 @@
 /* PIOS USB functions */
 #define PIOS_INCLUDE_USB
 #define PIOS_INCLUDE_USB_HID
-/* #define PIOS_INCLUDE_USB_CDC */
+#define PIOS_INCLUDE_USB_CDC
 /* #define PIOS_INCLUDE_USB_RCTX */
 
 /* PIOS sensor interfaces */

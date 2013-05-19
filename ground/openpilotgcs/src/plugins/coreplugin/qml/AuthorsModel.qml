@@ -62,6 +62,8 @@ ListModel {
 	ListElement{ name:"Sami Korhonen" }
 
 	ListElement{ name:"Thorsten Klose" }
+	
+	ListElement{ name:"Rick King" }
 
 	ListElement{ name:"Hallvard Kristiansen" }
 
@@ -92,6 +94,8 @@ ListModel {
 	ListElement{ name:"Cathy Moss" }
 
 	ListElement{ name:"Angus Peart" }
+	
+	ListElement{ name:"John Pike" }
 
 	ListElement{ name:"Dmytro Poplavskiy" }
 

@@ -77,7 +77,7 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         getWizard()->setWindowIcon(qApp->windowIcon());
         enableButtons(true);
         getWizard()->show();
-        ui->statusLabel->setText("Something went wrong, you will have to manualy upgrade the board using the uploader plugin");
+        ui->statusLabel->setText("Something went wrong, you will have to manually upgrade the board using the uploader plugin");
         break;
     }
 }

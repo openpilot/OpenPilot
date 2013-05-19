@@ -60,6 +60,11 @@ UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
     connect(cm, SIGNAL(deviceConnected(QIODevice *)), this, SLOT(onPhisicalHWConnect()));
     getSerialPorts();
 
+    m_config->autoUpdateButton->setEnabled(autoUpdateCapable());
+    connect(m_config->autoUpdateButton, SIGNAL(clicked()), this, SLOT(startAutoUpdate()));
+    connect(m_config->autoUpdateOkButton, SIGNAL(clicked()), this, SLOT(closeAutoUpdate()));
+    m_config->autoUpdateGroupBox->setVisible(false);
+
     QIcon rbi;
     rbi.addFile(QString(":uploader/images/view-refresh.svg"));
     m_config->refreshPorts->setIcon(rbi);
@@ -814,6 +819,68 @@ void UploaderGadgetWidget::downloadEnded(bool succeed)
     // device is halted so no reset
     m_config->resetButton->setEnabled(false);
     m_config->rescueButton->setEnabled(true);
+}
+
+void UploaderGadgetWidget::startAutoUpdate()
+{
+    m_config->buttonFrame->setEnabled(false);
+    m_config->splitter->setEnabled(false);
+    m_config->autoUpdateGroupBox->setVisible(true);
+    m_config->autoUpdateOkButton->setEnabled(false);
+    connect(this, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SLOT(autoUpdateStatus(uploader::AutoUpdateStep, QVariant)));
+    autoUpdate();
+}
+
+void UploaderGadgetWidget::finishAutoUpdate()
+{
+    disconnect(this, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SLOT(autoUpdateStatus(uploader::AutoUpdateStep, QVariant)));
+    m_config->autoUpdateOkButton->setEnabled(true);
+}
+
+void UploaderGadgetWidget::closeAutoUpdate()
+{
+    m_config->autoUpdateGroupBox->setVisible(false);
+    m_config->buttonFrame->setEnabled(true);
+    m_config->splitter->setEnabled(true);
+}
+
+void UploaderGadgetWidget::autoUpdateStatus(uploader::AutoUpdateStep status, QVariant value)
+{
+    switch(status)
+    {
+    case uploader::WAITING_DISCONNECT:
+        m_config->autoUpdateLabel->setText("Waiting for all OpenPilot boards to be disconnected from USB.");
+        break;
+    case uploader::WAITING_CONNECT:
+        m_config->autoUpdateLabel->setText("Please connect the OpenPilot board to the USB port.");
+        m_config->autoUpdateProgressBar->setValue(value.toInt());
+        break;
+    case uploader::JUMP_TO_BL:
+        m_config->autoUpdateProgressBar->setValue(0);
+        m_config->autoUpdateLabel->setText("Bringing the board into boot loader mode.");
+        break;
+    case uploader::LOADING_FW:
+        m_config->autoUpdateLabel->setText("Preparing to upload firmware to the board.");
+        break;
+    case uploader::UPLOADING_FW:
+        m_config->autoUpdateLabel->setText("Uploading firmware to the board.");
+        m_config->autoUpdateProgressBar->setValue(value.toInt());
+        break;
+    case uploader::UPLOADING_DESC:
+        m_config->autoUpdateLabel->setText("Uploading description of the new firmware to the board.");
+        break;
+    case uploader::BOOTING:
+        m_config->autoUpdateLabel->setText("Rebooting the board.");
+        break;
+    case uploader::SUCCESS:
+        m_config->autoUpdateLabel->setText("<font color='green'>Board was updated successfully, press OK to finish.</font>");
+        finishAutoUpdate();
+        break;
+    case uploader::FAILURE:
+        m_config->autoUpdateLabel->setText("<font color='red'>Something went wrong, you will have to manually upgrade the board. Press OK to continue.</font>");
+        finishAutoUpdate();
+        break;
+    }
 }
 
 /**

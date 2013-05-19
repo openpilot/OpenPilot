@@ -36,7 +36,7 @@ OPTMODULES =
 # Use file-extension c for "c-only"-files
 ifndef TESTAPP
     ## The standard CMSIS startup
-    SRC += $(CMSIS_DIR)/system_stm32f10x.c
+    SRC += $(CMSIS_DEVICEDIR)/system_stm32f10x.c
 
     ## Application Core
     SRC += ../pios_usb_board_data.c

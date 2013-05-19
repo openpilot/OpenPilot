@@ -44,6 +44,9 @@ extern const struct pios_com_driver pios_usb_cdc_com_driver;
 
 extern int32_t PIOS_USB_CDC_Init(uint32_t * usbcdc_id, const struct pios_usb_cdc_cfg * cfg, uint32_t lower_id);
 
+/* From USB CDC Spec Section 6.2.14 SetControlLineState */
+#define USB_CDC_CONTROL_LINE_STATE_DTE_PRESENT 0x01
+
 #endif /* PIOS_USB_CDC_PRIV_H */
 
 /**

@@ -38,6 +38,7 @@ UAVOBJSRCFILENAMES += accelsensor
 UAVOBJSRCFILENAMES += magnetosensor
 UAVOBJSRCFILENAMES += magnetostate
 UAVOBJSRCFILENAMES += barosensor
+UAVOBJSRCFILENAMES += barostate
 UAVOBJSRCFILENAMES += airspeedsensor
 UAVOBJSRCFILENAMES += airspeedsettings
 UAVOBJSRCFILENAMES += airspeedstate

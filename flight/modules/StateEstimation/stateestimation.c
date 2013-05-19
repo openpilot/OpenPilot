@@ -29,48 +29,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-// TODO goes in header
-
-
-typedef enum {
-    gyr_UPDATED     = 1 << 0,
-        acc_UPDATED = 1 << 1,
-        mag_UPDATED = 1 << 2,
-        pos_UPDATED = 1 << 3,
-        vel_UPDATED = 1 << 4,
-        air_UPDATED = 1 << 5,
-        bar_UPDATED = 1 << 6,
-} sensorUpdates;
-
-typedef struct {
-    float gyr[3];
-    float acc[3];
-    float mag[3];
-    float pos[3];
-    float vel[3];
-    float air[2];
-    float bar[1];
-    sensorUpdates updated;
-} stateEstimation;
-
-#define ISSET(bitfield, bit) ((bitfield) & (bit) ? 1 : 0)
-#define UNSET(bitfield, bit) (bitfield) &= ~(bit)
-
-
-typedef struct stateFilterStruct {
-    int32_t (*init)(void);
-    int32_t (*filter)(stateEstimation *state);
-} stateFilter;
-
-struct filterQueueStruct;
-typedef struct filterQueueStruct {
-    stateFilter *filter;
-    struct filterQueueStruct *next;
-} filtereQueue;
-
-//
-
-#include <openpilot.h>
+#include "inc/stateestimation.h"
 
 #include <gyrosensor.h>
 #include <accelsensor.h>
@@ -92,18 +51,24 @@ typedef struct filterQueueStruct {
 #include "homelocation.h"
 #include "flightstatus.h"
 
-#include "CoordinateConversions.h"
+// #include "CoordinateConversions.h"
 
 // Private constants
 #define STACK_SIZE_BYTES  2048
-#define CALLBACK_PRIORITY CALLBACK_PRIORITY_HIGH
-#define TASK_PRIORITY     CALLBACK_TASKPRIORITY_FLIGHTCONTROL
+#define CALLBACK_PRIORITY CALLBACK_PRIORITY_REGULAR
+#define TASK_PRIORITY     CALLBACK_TASK_FLIGHTCONTROL
 #define TIMEOUT_MS        100
 
 // Private types
 
+struct filterQueueStruct;
+
+typedef struct filterQueueStruct {
+    stateFilter *filter;
+    struct filterQueueStruct *next;
+} filterQueue;
+
 // Private variables
-static xTaskHandle attitudeTaskHandle;
 static DelayedCallbackInfo *stateEstimationCallback;
 
 static volatile RevoSettingsData revoSettings;
@@ -114,54 +79,54 @@ static int32_t fusionAlgorithm  = -1;
 static filterQueue *filterChain = NULL;
 
 // different filters available to state estimation
-static stateFilter *magFilter;
-static stateFilter *baroFilter;
-static stateFilter *airFilter;
-static stateFilter *stationaryFilter;
-static stateFilter *cfFilter;
-static stateFilter *cfmFilter;
-static stateFilter *ekf13iFilter;
-static stateFilter *ekf13Filter;
-static stateFilter *ekf16Filter;
-static stateFilter *ekf16iFilter;
+static stateFilter magFilter;
+static stateFilter baroFilter;
+static stateFilter airFilter;
+static stateFilter stationaryFilter;
+static stateFilter cfFilter;
+static stateFilter cfmFilter;
+static stateFilter ekf13iFilter;
+static stateFilter ekf13Filter;
+static stateFilter ekf16Filter;
+static stateFilter ekf16iFilter;
 
 // preconfigured filter chains selectable via revoSettings.FusionAlgorithm
 static const filterQueue *cfQueue = &(filterQueue) {
-    .filter = magFilter,
+    .filter = &magFilter,
     .next   = &(filterQueue) {
-        .filter = baroFilter,
+        .filter = &baroFilter,
         .next   = &(filterQueue) {
-            .filter = airFilter,
+            .filter = &airFilter,
             .next   = &(filterQueue) {
-                .filter = cfFilter,
+                .filter = &cfFilter,
                 .next   = NULL,
-            }
+            },
         }
     }
 };
 static const filterQueue *cfmQueue = &(filterQueue) {
-    .filter = magFilter,
+    .filter = &magFilter,
     .next   = &(filterQueue) {
-        .filter = baroFilter,
+        .filter = &baroFilter,
         .next   = &(filterQueue) {
-            .filter = airFilter,
+            .filter = &airFilter,
             .next   = &(filterQueue) {
-                .filter = cfmFilter,
+                .filter = &cfmFilter,
                 .next   = NULL,
             }
         }
     }
 };
 static const filterQueue *ekf13iQueue = &(filterQueue) {
-    .filter = magFilter,
+    .filter = &magFilter,
     .next   = &(filterQueue) {
-        .filter = baroFilter,
+        .filter = &baroFilter,
         .next   = &(filterQueue) {
-            .filter = stationaryFilter,
+            .filter = &stationaryFilter,
             .next   = &(filterQueue) {
-                .filter = airFilter,
+                .filter = &airFilter,
                 .next   = &(filterQueue) {
-                    .filter = ekf13iFilter,
+                    .filter = &ekf13iFilter,
                     .next   = NULL,
                 }
             }
@@ -169,28 +134,28 @@ static const filterQueue *ekf13iQueue = &(filterQueue) {
     }
 };
 static const filterQueue *ekf13Queue = &(filterQueue) {
-    .filter = magFilter,
+    .filter = &magFilter,
     .next   = &(filterQueue) {
-        .filter = baroFilter,
+        .filter = &baroFilter,
         .next   = &(filterQueue) {
-            .filter = airFilter,
+            .filter = &airFilter,
             .next   = &(filterQueue) {
-                .filter = ekf13Filter,
+                .filter = &ekf13Filter,
                 .next   = NULL,
             }
         }
     }
 };
 static const filterQueue *ekf16iQueue = &(filterQueue) {
-    .filter = magFilter,
+    .filter = &magFilter,
     .next   = &(filterQueue) {
-        .filter = baroFilter,
+        .filter = &baroFilter,
         .next   = &(filterQueue) {
-            .filter = stationaryFilter,
+            .filter = &stationaryFilter,
             .next   = &(filterQueue) {
-                .filter = airFilter,
+                .filter = &airFilter,
                 .next   = &(filterQueue) {
-                    .filter = ekf16iFilter,
+                    .filter = &ekf16iFilter,
                     .next   = NULL,
                 }
             }
@@ -198,13 +163,13 @@ static const filterQueue *ekf16iQueue = &(filterQueue) {
     }
 };
 static const filterQueue *ekf16Queue = &(filterQueue) {
-    .filter = magFilter,
+    .filter = &magFilter,
     .next   = &(filterQueue) {
-        .filter = baroFilter,
+        .filter = &baroFilter,
         .next   = &(filterQueue) {
-            .filter = airFilter,
+            .filter = &airFilter,
             .next   = &(filterQueue) {
-                .filter = ekf16Filter,
+                .filter = &ekf16Filter,
                 .next   = NULL,
             }
         }
@@ -217,6 +182,7 @@ static void settingsUpdatedCb(UAVObjEvent *objEv);
 static void sensorUpdatedCb(UAVObjEvent *objEv);
 static void StateEstimationCb(void);
 static void getNED(GPSPositionData *gpsPosition, float *NED);
+static float sane(float value);
 
 
 /**
@@ -255,16 +221,16 @@ int32_t StateEstimationStart(void)
     settingsUpdatedCb(NULL);
 
     // Initialize Filters
-    magFilter        = filterMagInitialize();
-    baroFilter       = filterBaroInitialize();
-    airFilter        = filterAirInitialize();
-    stationaryFilter = filterStationaryInitialize();
-    cfFilter         = filterCFInitialize();
-    cfmFilter        = filterCFMInitialize();
-    ekf13iFilter     = filterEKF13iInitialize();
-    ekf13Filter      = filterEKF13Initialize();
-    ekf16Filter      = filterEKF16Initialize();
-    ekf16iFilter     = filterEKF16iInitialize();
+    filterMagInitialize(&magFilter);
+    filterBaroInitialize(&baroFilter);
+    filterAirInitialize(&airFilter);
+    filterStationaryInitialize(&stationaryFilter);
+    filterCFInitialize(&cfFilter);
+    filterCFMInitialize(&cfmFilter);
+    filterEKF13iInitialize(&ekf13iFilter);
+    filterEKF13Initialize(&ekf13Filter);
+    filterEKF16Initialize(&ekf16Filter);
+    filterEKF16iInitialize(&ekf16iFilter);
 
     return 0;
 }
@@ -280,57 +246,57 @@ static void StateEstimationCb(void)
     uint8_t alarm = 0;
 
     // set alarm to warning if called through timeout
-    if (updatedSensor == 0) {
+    if (updatedSensors == 0) {
         AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
         alarm = 1;
     }
 
     // check if a new filter chain should be initialized
-    if (fusionAlgorithm != revoSettings.fusionAlgorithm) {
+    if (fusionAlgorithm != revoSettings.FusionAlgorithm) {
         FlightStatusData fs;
         FlightStatusGet(&fs);
         if (fs.Armed == FLIGHTSTATUS_ARMED_DISARMED || fusionAlgorithm == -1) {
-            filterQueue *newFilterChain;
-            switch (fusionAlgorithm) {
-            case REVOSETTINGS.FUSIONALGORITHM_COMPLEMENTARY:
+            const filterQueue *newFilterChain;
+            switch (revoSettings.FusionAlgorithm) {
+            case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARY:
                 newFilterChain = cfQueue;
                 break;
-            case REVOSETTINGS.FUSIONALGORITHM_COMPLEMENTARYMAG:
+            case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAG:
                 newFilterChain = cfmQueue;
                 break;
-            case REVOSETTINGS.FUSIONALGORITHM_INS13INDOOR:
+            case REVOSETTINGS_FUSIONALGORITHM_INS13INDOOR:
                 newFilterChain = ekf13iQueue;
                 break;
-            case REVOSETTINGS.FUSIONALGORITHM_INS13OUTDOOR:
+            case REVOSETTINGS_FUSIONALGORITHM_INS13OUTDOOR:
                 newFilterChain = ekf13Queue;
                 break;
-            case REVOSETTINGS.FUSIONALGORITHM_INS16INDOOR:
+            case REVOSETTINGS_FUSIONALGORITHM_INS16INDOOR:
                 newFilterChain = ekf16iQueue;
                 break;
-            case REVOSETTINGS.FUSIONALGORITHM_INS16OUTDOOR:
+            case REVOSETTINGS_FUSIONALGORITHM_INS16OUTDOOR:
                 newFilterChain = ekf16Queue;
                 break;
             default:
                 newFilterChain = NULL;
             }
             // initialize filters in chain
-            filterQueue *current = newFilterChain;
+            filterQueue *current = (filterQueue *)newFilterChain;
             bool error = 0;
             while (current != NULL) {
-                int32_t result = current.init();
+                int32_t result = current->filter->init();
                 if (result != 0) {
                     error = 1;
                     break;
                 }
-                current = current.next;
+                current = current->next;
             }
             if (error) {
                 AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
                 return;
             } else {
                 // set new fusion algortithm
-                filterChain = newFilterChain;
-                fustionAlgorithm = revoSettings.fusionAlgorithm;
+                filterChain     = (filterQueue *)newFilterChain;
+                fusionAlgorithm = revoSettings.FusionAlgorithm;
             }
         }
     }
@@ -344,7 +310,7 @@ static void StateEstimationCb(void)
 #define SANITYCHECK3(sensorname, shortname, a1, a2, a3) \
     if (ISSET(states.updated, shortname##_UPDATED)) { \
         sensorname##Data s; \
-        sensorname##GET(&s); \
+        sensorname##Get(&s); \
         if (sane(s.a1) && sane(s.a2) && sane(s.a3)) { \
             states.shortname[0] = s.a1; \
             states.shortname[1] = s.a2; \
@@ -361,7 +327,7 @@ static void StateEstimationCb(void)
 #define SANITYCHECK1(sensorname, shortname, a1, EXTRACHECK) \
     if (ISSET(states.updated, shortname##_UPDATED)) { \
         sensorname##Data s; \
-        sensorname##GET(&s); \
+        sensorname##Get(&s); \
         if (sane(s.a1) && EXTRACHECK) { \
             states.shortname[0] = s.a1; \
         } \
@@ -386,14 +352,14 @@ static void StateEstimationCb(void)
     // at this point sensor state is stored in "states" with some rudimentary filtering applied
 
     // apply all filters in the current filter chain
-    filterQueue *current = filterChain;
+    filterQueue *current = (filterQueue *)filterChain;
     bool error = 0;
     while (current != NULL) {
-        int32_t result = current.filter(&states);
+        int32_t result = current->filter->filter(&states);
         if (result != 0) {
             error = 1;
         }
-        current = current.next;
+        current = current->next;
     }
     if (error) {
         AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
@@ -403,11 +369,11 @@ static void StateEstimationCb(void)
 #define STORE3(statename, shortname, a1, a2, a3) \
     if (ISSET(states.updated, shortname##_UPDATED)) { \
         statename##Data s; \
-        statename##GET(&s); \
+        statename##Get(&s); \
         s.a1 = states.shortname[0]; \
         s.a2 = states.shortname[1]; \
         s.a3 = states.shortname[2]; \
-        statename##SET(&s); \
+        statename##Set(&s); \
     }
     STORE3(GyroState, gyr, x, y, z);
     STORE3(AccelState, acc, x, y, z);
@@ -417,19 +383,18 @@ static void StateEstimationCb(void)
 #define STORE2(statename, shortname, a1, a2) \
     if (ISSET(states.updated, shortname##_UPDATED)) { \
         statename##Data s; \
-        statename##GET(&s); \
+        statename##Get(&s); \
         s.a1 = states.shortname[0]; \
         s.a2 = states.shortname[1]; \
-        s.a3 = states.shortname[2]; \
-        statename##SET(&s); \
+        statename##Set(&s); \
     }
     STORE2(AirspeedState, air, CalibratedAirspeed, TrueAirspeed);
 #define STORE1(statename, shortname, a1) \
     if (ISSET(states.updated, shortname##_UPDATED)) { \
         statename##Data s; \
-        statename##GET(&s); \
+        statename##Get(&s); \
         s.a1 = states.shortname[0]; \
-        statename##SET(&s); \
+        statename##Set(&s); \
     }
     STORE1(BaroState, bar, Altitude);
 
@@ -438,12 +403,16 @@ static void StateEstimationCb(void)
     if (!alarm) {
         AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
     }
-    DelayedCallbackSchedule(stateEstimationCallback, TIMEOUT_MS, UPDATEMODE_SOONER);
+    DelayedCallbackSchedule(stateEstimationCallback, TIMEOUT_MS, CALLBACK_UPDATEMODE_SOONER);
 }
 
+
+/**
+ * Callback for eventdispatcher when HomeLocation or RevoSettings has been updated
+ */
 static void settingsUpdatedCb(UAVObjEvent *ev)
 {
-    HomeLocationGet(&homeLocation);
+    HomeLocationGet((HomeLocationData *)&homeLocation);
 
     if (sane(homeLocation.Latitude) && sane(homeLocation.Longitude) && sane(homeLocation.Altitude) && sane(homeLocation.Be[0]) && sane(homeLocation.Be[1]) && sane(homeLocation.Be[2])) {
         // Compute matrix to convert deltaLLA to NED
@@ -459,9 +428,13 @@ static void settingsUpdatedCb(UAVObjEvent *ev)
         // needed for long range flights where the reference coordinate is adjusted in flight
     }
 
-    RevoSettingsGet(&revoSettings);
+    RevoSettingsGet((RevoSettingsData *)&revoSettings);
 }
 
+/**
+ * Callback for eventdispatcher when any sensor UAVObject has been updated
+ * updates the list of "recently updated UAVObjects" and dispatches the state estimator callback
+ */
 static void sensorUpdatedCb(UAVObjEvent *ev)
 {
     if (!ev) {
@@ -519,6 +492,19 @@ static void getNED(GPSPositionData *gpsPosition, float *NED)
     NED[2] = LLA2NEDM[2] * dL[2];
 }
 
+/**
+ * @brief sanity check for float values
+ * @note makes sure a float value is safe for further processing, ie not NAN and not INF
+ * @param[in] float value
+ * @returns true for safe and false for unsafe
+ */
+static float sane(float value)
+{
+    if (isnan(value) || isinf(value)) {
+        return false;
+    }
+    return true;
+}
 
 /**
  * @}

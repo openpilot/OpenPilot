@@ -3,6 +3,7 @@ TARGET = Uploader
 DEFINES += UPLOADER_LIBRARY
 QT += svg
 include(uploader_dependencies.pri)
+include(../../libs/version_info/version_info.pri)
 INCLUDEPATH += ../../libs/qextserialport/src
 macx {
     QMAKE_CXXFLAGS  += -fpermissive

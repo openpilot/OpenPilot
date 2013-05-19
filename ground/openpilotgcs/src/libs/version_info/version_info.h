@@ -1,13 +1,10 @@
 /**
  ******************************************************************************
- *
- * @file       gcssplashscreen.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @addtogroup [Group]
+ * @file       version_info.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
+ * @addtogroup VersionInfo
  * @{
- * @addtogroup GCSSplashScreen
- * @{
- * @brief [Brief]
+ * @brief      GCS version info class header.
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -25,30 +22,19 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef GCSSPLASHSCREEN_H
-#define GCSSPLASHSCREEN_H
+#ifndef VERSION_INFO_H
+#define VERSION_INFO_H
 
-#include <QSplashScreen>
-#include <QPixmap>
-#include <QPainter>
-#include <extensionsystem/pluginspec.h>
+#include <QString>
 
-class GCSSplashScreen : public QSplashScreen
-{
-    Q_OBJECT
+class VersionInfo {
 public:
-    explicit GCSSplashScreen();
-    ~GCSSplashScreen();
-    
-public slots:
-    void showPluginLoadingProgress(ExtensionSystem::PluginSpec *pluginSpec);
-    void showProgressMessage(const QString &message) { drawMessageText(message); }
-
+    static QString revision();
+    static QString year();
+    static QString origin();
+    static QString uavoHash();
 private:
-    QPixmap *m_pixmap;
-    QPainter *m_painter;
-    void drawMessageText(const QString &message);
-
+    VersionInfo();
 };
 
-#endif // GCSSPLASHSCREEN_H
+#endif // VERSION_INFO_H

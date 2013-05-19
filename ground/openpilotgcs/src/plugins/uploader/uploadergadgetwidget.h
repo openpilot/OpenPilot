@@ -122,7 +122,6 @@ private slots:
     void finishAutoUpdate();
     void closeAutoUpdate();
     void autoUpdateStatus(uploader::AutoUpdateStep status, QVariant value);
-
 };
 
 #endif // UPLOADERGADGETWIDGET_H

@@ -846,8 +846,7 @@ void UploaderGadgetWidget::closeAutoUpdate()
 
 void UploaderGadgetWidget::autoUpdateStatus(uploader::AutoUpdateStep status, QVariant value)
 {
-    switch(status)
-    {
+    switch (status) {
     case uploader::WAITING_DISCONNECT:
         m_config->autoUpdateLabel->setText("Waiting for all OpenPilot boards to be disconnected from USB.");
         break;

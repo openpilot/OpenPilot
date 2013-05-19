@@ -93,7 +93,8 @@ UAVOBJSRCFILENAMES += hwsettings
 UAVOBJSRCFILENAMES += receiveractivity
 UAVOBJSRCFILENAMES += cameradesired
 UAVOBJSRCFILENAMES += camerastabsettings
-UAVOBJSRCFILENAMES += altitudeholdsettings                                                                                                            
+UAVOBJSRCFILENAMES += altitudeholdsettings 
+UAVOBJSRCFILENAMES += revosettings
 UAVOBJSRCFILENAMES += altitudeholddesired
 
 UAVOBJSRC = $(foreach UAVOBJSRCFILE,$(UAVOBJSRCFILENAMES),$(UAVOBJSYNTHDIR)/$(UAVOBJSRCFILE).c )

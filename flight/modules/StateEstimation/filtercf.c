@@ -205,7 +205,7 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
 
         // Set initial attitude. Use accels to determine roll and pitch, rotate magnetic measurement accordingly,
         // so pseudo "north" vector can be estimated even if the board is not level
-        attitudeState.Roll = atan2f(-accel[2], -accel[3]);
+        attitudeState.Roll = atan2f(-accel[1], -accel[2]);
         float zn  = cosf(attitudeState.Roll) * mag[2] + sinf(attitudeState.Roll) * mag[1];
         float yn  = cosf(attitudeState.Roll) * mag[1] - sinf(attitudeState.Roll) * mag[2];
 

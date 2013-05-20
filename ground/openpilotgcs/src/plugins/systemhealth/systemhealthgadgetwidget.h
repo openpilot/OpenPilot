@@ -64,7 +64,7 @@ private:
     QGraphicsSvgItem *background;
     QGraphicsSvgItem *foreground;
     QGraphicsSvgItem *nolink;
-
+    QStringList *missingElements;
     // Simple flag to skip rendering if the
     bool fgenabled; // layer does not exist.
 

@@ -48,7 +48,7 @@ SystemHealthGadgetWidget::SystemHealthGadgetWidget(QWidget *parent) : QGraphicsV
     background = new QGraphicsSvgItem();
     foreground = new QGraphicsSvgItem();
     nolink     = new QGraphicsSvgItem();
-
+    missingElements = new QStringList();
     paint();
 
     // Now connect the widget to the SystemAlarms UAVObject
@@ -100,26 +100,32 @@ void SystemHealthGadgetWidget::updateAlarms(UAVObject *systemAlarm)
         for (uint i = 0; i < field->getNumElements(); ++i) {
             QString element = field->getElementNames()[i];
             QString value   = field->getValue(i).toString();
-            if (m_renderer->elementExists(element)) {
-                QMatrix blockMatrix = m_renderer->matrixForElement(element);
-                qreal startX = blockMatrix.mapRect(m_renderer->boundsOnElement(element)).x();
-                qreal startY = blockMatrix.mapRect(m_renderer->boundsOnElement(element)).y();
-                QString element2    = element + "-" + value;
-                if (m_renderer->elementExists(element2)) {
-                    QGraphicsSvgItem *ind = new QGraphicsSvgItem();
-                    ind->setSharedRenderer(m_renderer);
-                    ind->setElementId(element2);
-                    ind->setParentItem(background);
-                    QTransform matrix;
-                    matrix.translate(startX, startY);
-                    ind->setTransform(matrix, false);
-                } else {
-                    if (value.compare("Uninitialised") != 0) {
-                        qDebug() << "Warning: element " << element2 << " not found in SVG.";
+            if (!missingElements->contains(element)){
+                if (m_renderer->elementExists(element)) {
+                    QMatrix blockMatrix = m_renderer->matrixForElement(element);
+                    qreal startX = blockMatrix.mapRect(m_renderer->boundsOnElement(element)).x();
+                    qreal startY = blockMatrix.mapRect(m_renderer->boundsOnElement(element)).y();
+                    QString element2    = element + "-" + value;
+                    if (!missingElements->contains(element2)) {
+                        if (m_renderer->elementExists(element2)) {
+                            QGraphicsSvgItem *ind = new QGraphicsSvgItem();
+                            ind->setSharedRenderer(m_renderer);
+                            ind->setElementId(element2);
+                            ind->setParentItem(background);
+                            QTransform matrix;
+                            matrix.translate(startX, startY);
+                            ind->setTransform(matrix, false);
+                        } else {
+                            if (value.compare("Uninitialised") != 0) {
+                                missingElements->append(element2);
+                                qDebug() << "Warning: element " << element2 << " not found in SVG.";
+                            }
+                        }
                     }
+                } else {
+                    missingElements->append(element);
+                    qDebug() << "Warning: Element " << element << " not found in SVG.";
                 }
-            } else {
-                qDebug() << "Warning: Element " << element << " not found in SVG.";
             }
         }
     }
@@ -133,6 +139,8 @@ SystemHealthGadgetWidget::~SystemHealthGadgetWidget()
 
 void SystemHealthGadgetWidget::setSystemFile(QString dfn)
 {
+    // Clear the list of elements not found on svg
+    missingElements->clear();
     setBackgroundBrush(QBrush(Utils::StyleHelper::baseColor()));
     if (QFile::exists(dfn)) {
         m_renderer->load(dfn);

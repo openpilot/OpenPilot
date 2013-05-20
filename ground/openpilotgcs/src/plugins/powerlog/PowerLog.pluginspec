@@ -6,6 +6,6 @@
     <url>http://www.openpilot.org</url>
     <dependencyList>
         <dependency name="Core" version="1.0.0"/>
-        <dependency name="RawHID" version="1.0.0"/>
+        <dependency name="opHID" version="1.0.0"/>
     </dependencyList>
 </plugin>    

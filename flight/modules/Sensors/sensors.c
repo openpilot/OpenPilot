@@ -4,7 +4,7 @@
  * @{
  * @addtogroup Sensors
  * @brief Acquires sensor data
- * Specifically updates the the @ref GyroSensor, @ref AccelSensor, and @ref MagnetoSensor objects
+ * Specifically updates the the @ref GyroSensor, @ref AccelSensor, and @ref MagSensor objects
  * @{
  *
  * @file       sensors.c
@@ -32,7 +32,7 @@
 
 /**
  * Input objects: None, takes sensor data via pios
- * Output objects: @ref GyroSensor @ref AccelSensor @ref MagnetoSensor
+ * Output objects: @ref GyroSensor @ref AccelSensor @ref MagSensor
  *
  * The module executes in its own thread.
  *
@@ -49,7 +49,7 @@
 #include <openpilot.h>
 
 #include <homelocation.h>
-#include <magnetosensor.h>
+#include <magsensor.h>
 #include <accelsensor.h>
 #include <gyrosensor.h>
 #include <attitudestate.h>
@@ -73,7 +73,7 @@
 // Private functions
 static void SensorsTask(void *parameters);
 static void settingsUpdatedCb(UAVObjEvent *objEv);
-// static void magOffsetEstimation(MagnetoSensorData *mag);
+// static void magOffsetEstimation(MagSensorData *mag);
 
 // Private variables
 static xTaskHandle sensorsTaskHandle;
@@ -110,7 +110,7 @@ int32_t SensorsInitialize(void)
 {
     GyroSensorInitialize();
     AccelSensorInitialize();
-    MagnetoSensorInitialize();
+    MagSensorInitialize();
     RevoCalibrationInitialize();
     AttitudeSettingsInitialize();
 
@@ -131,7 +131,9 @@ int32_t SensorsStart(void)
     // Start main task
     xTaskCreate(SensorsTask, (signed char *)"Sensors", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &sensorsTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SENSORS, sensorsTaskHandle);
+#ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_SENSORS);
+#endif
 
     return 0;
 }
@@ -201,7 +203,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
     if (accel_test < 0 || gyro_test < 0 || mag_test < 0) {
         AlarmsSet(SYSTEMALARMS_ALARM_SENSORS, SYSTEMALARMS_ALARM_CRITICAL);
         while (1) {
+#ifdef PIOS_INCLUDE_WDG
             PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
+#endif
             vTaskDelay(10);
         }
     }
@@ -216,7 +220,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         timeval = PIOS_DELAY_GetRaw();
 
         if (error) {
+#ifdef PIOS_INCLUDE_WDG
             PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
+#endif
             lastSysTime = xTaskGetTickCount();
             vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
             AlarmsSet(SYSTEMALARMS_ALARM_SENSORS, SYSTEMALARMS_ALARM_CRITICAL);
@@ -377,7 +383,7 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         // and make it average zero (weakly)
 
 #if defined(PIOS_INCLUDE_HMC5883)
-        MagnetoSensorData mag;
+        MagSensorData mag;
         if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
             int16_t values[3];
             PIOS_HMC5883_ReadMag(values);
@@ -396,12 +402,14 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
                 mag.z = mags[2];
             }
 
-            MagnetoSensorSet(&mag);
+            MagSensorSet(&mag);
             mag_update_time = PIOS_DELAY_GetRaw();
         }
 #endif /* if defined(PIOS_INCLUDE_HMC5883) */
 
+#ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
+#endif
 
         lastSysTime = xTaskGetTickCount();
     }

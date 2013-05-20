@@ -4,7 +4,7 @@
  * @{
  * @addtogroup Sensors
  * @brief Acquires sensor data
- * Specifically updates the the @ref GyroSensor, @ref AccelSensor, and @ref MagnetoSensor objects
+ * Specifically updates the the @ref GyroSensor, @ref AccelSensor, and @ref MagSensor objects
  * @{
  *
  * @file       sensors.c
@@ -32,7 +32,7 @@
 
 /**
  * Input objects: None, takes sensor data via pios
- * Output objects: @ref GyroSensor @ref AccelSensor @ref MagnetoSensor
+ * Output objects: @ref GyroSensor @ref AccelSensor @ref MagSensor
  *
  * The module executes in its own thread.
  *
@@ -113,7 +113,7 @@ int32_t SensorsInitialize(void)
     // GyrosBiasInitialize();
     GPSPositionInitialize();
     GPSVelocityInitialize();
-    MagnetoSensorInitialize();
+    MagSensorInitialize();
     MagBiasInitialize();
     RevoCalibrationInitialize();
 
@@ -252,11 +252,11 @@ static void simulateConstant()
 
     // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
     // and make it average zero (weakly)
-    MagnetoSensorData mag;
+    MagSensorData mag;
     mag.x = 400;
     mag.y = 0;
     mag.z = 800;
-    MagnetoSensorSet(&mag);
+    MagSensorSet(&mag);
 }
 
 static void simulateModelAgnostic()
@@ -314,11 +314,11 @@ static void simulateModelAgnostic()
 
     // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
     // and make it average zero (weakly)
-    MagnetoSensorData mag;
+    MagSensorData mag;
     mag.x = 400;
     mag.y = 0;
     mag.z = 800;
-    MagnetoSensorSet(&mag);
+    MagSensorSet(&mag);
 }
 
 float thrustToDegs   = 50;
@@ -528,12 +528,12 @@ static void simulateModelQuadcopter()
     // Update mag periodically
     static uint32_t last_mag_time = 0;
     if (PIOS_DELAY_DiffuS(last_mag_time) / 1.0e6 > MAG_PERIOD) {
-        MagnetoSensorData mag;
+        MagSensorData mag;
         mag.x = homeLocation.Be[0] * Rbe[0][0] + homeLocation.Be[1] * Rbe[0][1] + homeLocation.Be[2] * Rbe[0][2];
         mag.y = homeLocation.Be[0] * Rbe[1][0] + homeLocation.Be[1] * Rbe[1][1] + homeLocation.Be[2] * Rbe[1][2];
         mag.z = homeLocation.Be[0] * Rbe[2][0] + homeLocation.Be[1] * Rbe[2][1] + homeLocation.Be[2] * Rbe[2][2];
 
-        MagnetoSensorSet(&mag);
+        MagSensorSet(&mag);
         last_mag_time = PIOS_DELAY_GetRaw();
     }
 
@@ -811,11 +811,11 @@ static void simulateModelAirplane()
     // Update mag periodically
     static uint32_t last_mag_time = 0;
     if (PIOS_DELAY_DiffuS(last_mag_time) / 1.0e6 > MAG_PERIOD) {
-        MagnetoSensorData mag;
+        MagSensorData mag;
         mag.x = 100 + homeLocation.Be[0] * Rbe[0][0] + homeLocation.Be[1] * Rbe[0][1] + homeLocation.Be[2] * Rbe[0][2];
         mag.y = 100 + homeLocation.Be[0] * Rbe[1][0] + homeLocation.Be[1] * Rbe[1][1] + homeLocation.Be[2] * Rbe[1][2];
         mag.z = 100 + homeLocation.Be[0] * Rbe[2][0] + homeLocation.Be[1] * Rbe[2][1] + homeLocation.Be[2] * Rbe[2][2];
-        MagnetoSensorSet(&mag);
+        MagSensorSet(&mag);
         last_mag_time = PIOS_DELAY_GetRaw();
     }
 

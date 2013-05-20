@@ -35,7 +35,7 @@
 #include <barosensor.h>
 #include <gpsposition.h>
 #include <gyrosensor.h>
-#include <magnetosensor.h>
+#include <magsensor.h>
 #include <manualcontrolsettings.h>
 
 void Stack_Change() {}
@@ -138,7 +138,7 @@ void PIOS_Board_Init(void)
 
     AccelSensorInitialize();
     BaroSensorInitialize();
-    MagnetoSensorInitialize();
+    MagSensorInitialize();
     GPSPositionInitialize();
     GyroStatInitialize();
     GyroSensorInitialize();

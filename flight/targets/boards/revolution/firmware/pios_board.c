@@ -391,7 +391,9 @@ void PIOS_Board_Init(void)
         PIOS_IAP_WriteBootCmd(1, 0);
         PIOS_IAP_WriteBootCmd(2, 0);
     }
+#ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_Init();
+#endif
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();

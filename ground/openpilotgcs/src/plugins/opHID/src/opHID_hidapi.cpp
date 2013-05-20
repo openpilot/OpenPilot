@@ -68,10 +68,17 @@ opHID_hidapi::~opHID_hidapi()
 }
 
 
-// Function: enumerate the HID devices connected.
-// Return: 
-//    - a pointer to a list of HID devices found
-//    - number of HID devices found
+/**
+* \brief Enumerate the list of HID device with our vendor id
+*
+* \note Why don't we use the one from within the hidapi directly
+*      in caller? because later we will do more parsing herer.
+*      WARNING: our vendor id is harcoded here (not good idea).
+*
+* \param[out] devices_found Number of devices found.
+* \return error.
+* \retval 0 on success.
+*/
 int opHID_hidapi::enumerate(int *devices_found)
 {
 	*devices_found = 0;
@@ -128,13 +135,15 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
         OPHID_WARNING("WARNING: device seems already open.");
     }
 
-    // if caller knows which one to look for open it
-    if (vid != -1 && pid != -1)
+    // This is a hack to prevent changing all the callers (for now)
+    if (vid == -1)
+        vid = 0;
+    if (pid == -1)
+        pid = 0;
+
+    // If caller knows which one to look for open it right away
+    if (vid != 0 && pid != 0)
     {
-        if (pid == -1)
-            pid = 0;
-        if (vid == -1)
-            vid = 0;
         hidapi_device.handle = hid_open(vid, pid, NULL);
 
         if (!hidapi_device.handle)
@@ -158,47 +167,25 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
             return 0;
         }
 
-        // Look for the first one of interest
         if (devices_found)
         {
-//            devices_found = false;
+            // Look for the first one of interest for now
             current_device_ptr = hidapi_device.list_ptr;
-#if 0
-            // Currently assuming the last one is the right one
-            // This won't be necessary true later (TODO)
-            while (current_device_ptr) 
-            {
-                // 
-                if (current_device_ptr->vendor_id == vid)
-                {
-                    devices_found = true;
-                    break;
-                }
-                current_device_ptr = current_device_ptr->next;
-            }
-#endif
-        }
 
-        if (devices_found)
-        {
             OPHID_DEBUG("Opening device VID(%04hx).PID(%04hx)", 
                       current_device_ptr->vendor_id, 
                       current_device_ptr->product_id);
             
-            vid = current_device_ptr->vendor_id;
-            pid = current_device_ptr->product_id;
-
-            if (hidapi_device.list_ptr)
-                hid_free_enumeration(hidapi_device.list_ptr);
-
-            hidapi_device.handle = hid_open(vid /*current_device_ptr->vendor_id*/,
-                                            pid /*current_device_ptr->product_id*/, 
+            hidapi_device.handle = hid_open(current_device_ptr->vendor_id,
+                                            current_device_ptr->product_id, 
                                             NULL);
             if (!hidapi_device.handle)
             {
                 OPHID_ERROR("Unable to open device.");    
                 devices_found = false;
             }
+  
+            hid_free_enumeration(hidapi_device.list_ptr);
         }
     }
 

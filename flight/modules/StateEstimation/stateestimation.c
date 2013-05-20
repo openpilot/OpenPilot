@@ -33,7 +33,7 @@
 
 #include <gyrosensor.h>
 #include <accelsensor.h>
-#include <magnetosensor.h>
+#include <magsensor.h>
 #include <barosensor.h>
 #include <airspeedsensor.h>
 #include <gpsposition.h>
@@ -41,7 +41,7 @@
 
 #include <gyrostate.h>
 #include <accelstate.h>
-#include <magnetostate.h>
+#include <magstate.h>
 #include <barostate.h>
 #include <airspeedstate.h>
 #include <positionstate.h>
@@ -198,7 +198,7 @@ int32_t StateEstimationInitialize(void)
 
     GyroSensorConnectCallback(&sensorUpdatedCb);
     AccelSensorConnectCallback(&sensorUpdatedCb);
-    MagnetoSensorConnectCallback(&sensorUpdatedCb);
+    MagSensorConnectCallback(&sensorUpdatedCb);
     BaroSensorConnectCallback(&sensorUpdatedCb);
     AirspeedSensorConnectCallback(&sensorUpdatedCb);
     GPSPositionConnectCallback(&sensorUpdatedCb);
@@ -322,7 +322,7 @@ static void StateEstimationCb(void)
     }
     SANITYCHECK3(GyroSensor, gyr, x, y, z);
     SANITYCHECK3(AccelSensor, acc, x, y, z);
-    SANITYCHECK3(MagnetoSensor, mag, x, y, z);
+    SANITYCHECK3(MagSensor, mag, x, y, z);
     SANITYCHECK3(GPSVelocity, vel, North, East, Down);
 #define SANITYCHECK1(sensorname, shortname, a1, EXTRACHECK) \
     if (ISSET(states.updated, shortname##_UPDATED)) { \
@@ -377,7 +377,7 @@ static void StateEstimationCb(void)
     }
     STORE3(GyroState, gyr, x, y, z);
     STORE3(AccelState, acc, x, y, z);
-    STORE3(MagnetoState, mag, x, y, z);
+    STORE3(MagState, mag, x, y, z);
     STORE3(PositionState, pos, North, East, Down);
     STORE3(VelocityState, vel, North, East, Down);
 #define STORE2(statename, shortname, a1, a2) \
@@ -449,7 +449,7 @@ static void sensorUpdatedCb(UAVObjEvent *ev)
         updatedSensors |= acc_UPDATED;
     }
 
-    if (ev->obj == MagnetoSensorHandle()) {
+    if (ev->obj == MagSensorHandle()) {
         updatedSensors |= mag_UPDATED;
     }
 

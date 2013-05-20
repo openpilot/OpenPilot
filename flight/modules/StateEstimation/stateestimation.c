@@ -193,6 +193,22 @@ static bool sane(float value);
 int32_t StateEstimationInitialize(void)
 {
     RevoSettingsInitialize();
+    HomeLocationInitialize();
+
+    GyroSensorInitialize();
+    MagSensorInitialize();
+    BaroSensorInitialize();
+    AirspeedSensorInitialize();
+    GPSPositionInitialize();
+    GPSVelocityInitialize();
+
+    GyroStateInitialize();
+    AccelStateInitialize();
+    MagStateInitialize();
+    BaroStateInitialize();
+    AirspeedStateInitialize();
+    PositionStateInitialize();
+    VelocityStateInitialize();
 
     RevoSettingsConnectCallback(&settingsUpdatedCb);
     HomeLocationConnectCallback(&settingsUpdatedCb);
@@ -248,7 +264,6 @@ static void StateEstimationCb(void)
 
     // set alarm to warning if called through timeout
     if (updatedSensors == 0) {
-        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
         alarm = 1;
     }
 
@@ -355,21 +370,12 @@ static void StateEstimationCb(void)
 
     // apply all filters in the current filter chain
     filterQueue *current = (filterQueue *)filterChain;
-    uint8_t error = 0;
     while (current != NULL) {
         int32_t result = current->filter->filter(&states);
-        if (result > error) {
-            error = result;
-            alarm = 1;
+        if (result > alarm) {
+            alarm = result;
         }
         current = current->next;
-    }
-    if (error == 1) {
-        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
-    } else if (error == 2) {
-        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-    } else if (error == 3) {
-        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
     }
 
     // the final output of filters is saved in state variables
@@ -418,7 +424,13 @@ static void StateEstimationCb(void)
 
 
     // clear alarms if everything is alright, then schedule callback execution after timeout
-    if (!alarm) {
+    if (alarm == 1) {
+        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
+    } else if (alarm == 2) {
+        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+    } else if (alarm >= 3) {
+        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
+    } else {
         AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
     }
     DelayedCallbackSchedule(stateEstimationCallback, TIMEOUT_MS, CALLBACK_UPDATEMODE_SOONER);

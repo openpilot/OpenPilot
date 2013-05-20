@@ -80,7 +80,6 @@ void filterCFInitialize(stateFilter *handle)
     handle->init   = &initwithoutmag;
     handle->filter = &filter;
     FlightStatusConnectCallback(&flightStatusUpdatedCb);
-    HomeLocationConnectCallback(&flightStatusUpdatedCb);
     flightStatusUpdatedCb(NULL);
 }
 
@@ -107,6 +106,7 @@ static int32_t maininit(void)
     first_run    = 1;
     accelUpdated = 0;
     AttitudeSettingsGet(&attitudeSettings);
+    HomeLocationGet(&homeLocation);
 
     const float fakeDt = 0.0025f;
     if (attitudeSettings.AccelTau < 0.0001f) {
@@ -401,7 +401,6 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
 static void flightStatusUpdatedCb(UAVObjEvent *ev)
 {
     FlightStatusGet(&flightStatus);
-    HomeLocationGet(&homeLocation);
 }
 
 /**

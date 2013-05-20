@@ -476,8 +476,8 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
     gyro_bias[0]    -= accel_err[0] * attitudeSettings.AccelKi;
-    gyro_bias[0]    -= accel_err[1] * attitudeSettings.AccelKi;
-    gyro_bias[0]    -= mag_err[2] * magKi;
+    gyro_bias[1]    -= accel_err[1] * attitudeSettings.AccelKi;
+    gyro_bias[2]    -= mag_err[2] * magKi;
 
     // Correct rates based on integral coefficient
     gyroStateData.x -= gyro_bias[0];

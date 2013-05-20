@@ -224,7 +224,9 @@ int32_t AttitudeStart(void)
     // Start main task
     xTaskCreate(AttitudeTask, (signed char *)"Attitude", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &attitudeTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_ATTITUDE, attitudeTaskHandle);
+#ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_ATTITUDE);
+#endif
 
     GyroSensorConnectQueue(gyroQueue);
     AccelSensorConnectQueue(accelQueue);
@@ -282,7 +284,9 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
             initialization_required = true;
         }
 
+#ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
+#endif
     }
 }
 

@@ -44,15 +44,15 @@
  */
 
 struct __attribute__((packed)) fw_version_info {
-	uint8_t magic[4];
-	uint32_t commit_hash_prefix;
-	uint32_t timestamp;
-	uint8_t board_type;
-	uint8_t board_revision;
-	uint8_t commit_tag_name[26];
-	uint8_t sha1sum[20];
-	uint8_t uavosha1[20];
-	uint8_t pad[20];
+    uint8_t magic[4];
+    uint32_t commit_hash_prefix;
+    uint32_t timestamp;
+    uint8_t board_type;
+    uint8_t board_revision;
+    uint8_t commit_tag_name[26];
+    uint8_t sha1sum[20];
+    uint8_t uavosha1[20];
+    uint8_t pad[20];
 };
 
 #if (defined(__MACH__) && defined(__APPLE__))
@@ -60,16 +60,12 @@ const struct fw_version_info fw_version_blob __attribute__((used)) __attribute__
 #else
 const struct fw_version_info fw_version_blob __attribute__((used)) __attribute__((__section__(".fw_version_blob"))) = {
 #endif
-	.magic = { 'O','p','F','w' },
-	.commit_hash_prefix = 0x${HASH8},
-	.timestamp = ${UNIXTIME},
-	.board_type = ${BOARD_TYPE},
-	.board_revision = ${BOARD_REVISION},
-	.commit_tag_name = "${FWTAG}",
-	.sha1sum = { ${SHA1} },
-	.uavosha1 = { ${UAVOSHA1} },
-}; 
-
-/**
- * @}
- */
+    .magic              = { 'O','p','F','w' },
+    .commit_hash_prefix = 0x${HASH8},
+    .timestamp          = ${UNIXTIME},
+    .board_type         = ${BOARD_TYPE},
+    .board_revision     = ${BOARD_REVISION},
+    .commit_tag_name    = "${FWTAG}",
+    .sha1sum            = { ${SHA1} },
+    .uavosha1           = { ${UAVOSHA1} },
+};

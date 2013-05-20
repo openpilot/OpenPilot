@@ -133,10 +133,10 @@ endef
 define OPFW_TEMPLATE
 FORCE:
 
-$(1).firmware_info.c: $(1) $(ROOT_DIR)/make/templates/firmware_info.c.template FORCE
+$(1).firmware_info.c: $(1) $(ROOT_DIR)/flight/templates/firmware_info.c.template FORCE
 	@$(ECHO) $(MSG_FWINFO) $$(call toprel, $$@)
 	$(V1) $(VERSION_INFO) \
-		--template=$(ROOT_DIR)/make/templates/firmware_info.c.template \
+		--template=$(ROOT_DIR)/flight/templates/firmware_info.c.template \
 		--outfile=$$@ \
 		--image=$(1) \
 		--type=$(2) \

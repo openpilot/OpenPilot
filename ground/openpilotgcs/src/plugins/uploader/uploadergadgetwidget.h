@@ -118,6 +118,10 @@ private slots:
     void uploadEnded(bool succeed);
     void downloadStarted();
     void downloadEnded(bool succeed);
+    void startAutoUpdate();
+    void finishAutoUpdate();
+    void closeAutoUpdate();
+    void autoUpdateStatus(uploader::AutoUpdateStep status, QVariant value);
 };
 
 #endif // UPLOADERGADGETWIDGET_H

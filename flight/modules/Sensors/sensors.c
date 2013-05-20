@@ -131,7 +131,9 @@ int32_t SensorsStart(void)
     // Start main task
     xTaskCreate(SensorsTask, (signed char *)"Sensors", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &sensorsTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_SENSORS, sensorsTaskHandle);
+#ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_RegisterFlag(PIOS_WDG_SENSORS);
+#endif
 
     return 0;
 }
@@ -201,7 +203,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
     if (accel_test < 0 || gyro_test < 0 || mag_test < 0) {
         AlarmsSet(SYSTEMALARMS_ALARM_SENSORS, SYSTEMALARMS_ALARM_CRITICAL);
         while (1) {
+#ifdef PIOS_INCLUDE_WDG
             PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
+#endif
             vTaskDelay(10);
         }
     }
@@ -216,7 +220,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         timeval = PIOS_DELAY_GetRaw();
 
         if (error) {
+#ifdef PIOS_INCLUDE_WDG
             PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
+#endif
             lastSysTime = xTaskGetTickCount();
             vTaskDelayUntil(&lastSysTime, SENSOR_PERIOD / portTICK_RATE_MS);
             AlarmsSet(SYSTEMALARMS_ALARM_SENSORS, SYSTEMALARMS_ALARM_CRITICAL);
@@ -401,7 +407,9 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         }
 #endif /* if defined(PIOS_INCLUDE_HMC5883) */
 
+#ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_SENSORS);
+#endif
 
         lastSysTime = xTaskGetTickCount();
     }

@@ -2264,7 +2264,7 @@
             <color>4294901760</color>
             <mathFunction>None</mathFunction>
             <uavField>x</uavField>
-            <uavObject>MagnetoState</uavObject>
+            <uavObject>MagState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2274,7 +2274,7 @@
             <color>4283782655</color>
             <mathFunction>None</mathFunction>
             <uavField>y</uavField>
-            <uavObject>MagnetoState</uavObject>
+            <uavObject>MagState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>
@@ -2284,7 +2284,7 @@
             <color>4283804160</color>
             <mathFunction>None</mathFunction>
             <uavField>z</uavField>
-            <uavObject>MagnetoState</uavObject>
+            <uavObject>MagState</uavObject>
             <yMaximum>0</yMaximum>
             <yMeanSamples>1</yMeanSamples>
             <yMinimum>0</yMinimum>

@@ -64,8 +64,8 @@
 #include "gyrostate.h"
 #include "gyrosensor.h"
 #include "homelocation.h"
-#include "magnetosensor.h"
-#include "magnetostate.h"
+#include "magsensor.h"
+#include "magstate.h"
 #include "positionstate.h"
 #include "ekfconfiguration.h"
 #include "ekfstatevariance.h"
@@ -125,7 +125,7 @@ static void settingsUpdatedCb(UAVObjEvent *objEv);
 
 static int32_t getNED(GPSPositionData *gpsPosition, float *NED);
 
-static void magOffsetEstimation(MagnetoSensorData *mag);
+static void magOffsetEstimation(MagSensorData *mag);
 
 // check for invalid values
 static inline bool invalid(float data)
@@ -167,8 +167,8 @@ int32_t AttitudeInitialize(void)
     GyroStateInitialize();
     AccelSensorInitialize();
     AccelStateInitialize();
-    MagnetoSensorInitialize();
-    MagnetoStateInitialize();
+    MagSensorInitialize();
+    MagStateInitialize();
     AirspeedSensorInitialize();
     AirspeedStateInitialize();
     BaroSensorInitialize();
@@ -230,7 +230,7 @@ int32_t AttitudeStart(void)
 
     GyroSensorConnectQueue(gyroQueue);
     AccelSensorConnectQueue(accelQueue);
-    MagnetoSensorConnectQueue(magQueue);
+    MagSensorConnectQueue(magQueue);
     AirspeedSensorConnectQueue(airspeedQueue);
     BaroSensorConnectQueue(baroQueue);
     GPSPositionConnectQueue(gpsQueue);
@@ -335,10 +335,10 @@ static int32_t updateAttitudeComplementary(bool first_run)
         if (xQueueReceive(magQueue, &ev, 0 / portTICK_RATE_MS) != pdTRUE) {
             return -1;
         }
-        MagnetoSensorData magData;
-        MagnetoSensorGet(&magData);
+        MagSensorData magData;
+        MagSensorGet(&magData);
 #else
-        MagnetoSensorData magData;
+        MagSensorData magData;
         magData.x = 100.0f;
         magData.y = 0.0f;
         magData.z = 0.0f;
@@ -434,20 +434,20 @@ static int32_t updateAttitudeComplementary(bool first_run)
         // Rotate gravity to body frame and cross with accels
         float brot[3];
         float Rbe[3][3];
-        MagnetoSensorData mag;
+        MagSensorData mag;
 
         Quaternion2R(q, Rbe);
-        MagnetoSensorGet(&mag);
+        MagSensorGet(&mag);
 
 // TODO: separate filter!
         if (revoCalibration.MagBiasNullingRate > 0) {
             magOffsetEstimation(&mag);
         }
-        MagnetoStateData mags;
+        MagStateData mags;
         mags.x = mag.x;
         mags.y = mag.y;
         mags.z = mag.z;
-        MagnetoStateSet(&mags);
+        MagStateSet(&mags);
 
         // If the mag is producing bad data don't use it (normally bad calibration)
         if (!isnan(mag.x) && !isinf(mag.x) && !isnan(mag.y) && !isinf(mag.y) && !isnan(mag.z) && !isinf(mag.z)) {
@@ -612,7 +612,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     UAVObjEvent ev;
     GyroSensorData gyroSensorData;
     AccelSensorData accelSensorData;
-    MagnetoStateData magData;
+    MagStateData magData;
     AirspeedSensorData airspeedData;
     BaroSensorData baroData;
     GPSPositionData gpsData;
@@ -694,17 +694,17 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     AccelSensorGet(&accelSensorData);
 // TODO: separate filter!
     if (mag_updated) {
-        MagnetoSensorData mags;
-        MagnetoSensorGet(&mags);
+        MagSensorData mags;
+        MagSensorGet(&mags);
         if (revoCalibration.MagBiasNullingRate > 0) {
             magOffsetEstimation(&mags);
         }
         magData.x = mags.x;
         magData.y = mags.y;
         magData.z = mags.z;
-        MagnetoStateSet(&magData);
+        MagStateSet(&magData);
     }
-    MagnetoStateGet(&magData);
+    MagStateGet(&magData);
 
     BaroSensorGet(&baroData);
     AirspeedSensorGet(&airspeedData);
@@ -860,7 +860,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
             }
 
             // xQueueReceive(magQueue, &ev, 100 / portTICK_RATE_MS);
-            // MagnetoSensorGet(&magData);
+            // MagSensorGet(&magData);
 
             AttitudeStateData attitudeState;
             AttitudeStateGet(&attitudeState);
@@ -1162,10 +1162,10 @@ static void settingsUpdatedCb(UAVObjEvent *ev)
 
 /**
  * Perform an update of the @ref MagBias based on
- * Magnetometer Offset Cancellation: Theory and Implementation,
+ * Magmeter Offset Cancellation: Theory and Implementation,
  * revisited William Premerlani, October 14, 2011
  */
-static void magOffsetEstimation(MagnetoSensorData *mag)
+static void magOffsetEstimation(MagSensorData *mag)
 {
    #if 0
     // Constants, to possibly go into a UAVO

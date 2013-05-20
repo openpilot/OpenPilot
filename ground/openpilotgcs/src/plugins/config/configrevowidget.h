@@ -92,7 +92,7 @@ private:
 
     UAVObject::Metadata initialAccelStateMdata;
     UAVObject::Metadata initialGyroStateMdata;
-    UAVObject::Metadata initialMagnetoStateMdata;
+    UAVObject::Metadata initialMagStateMdata;
     UAVObject::Metadata initialBaroSensorMdata;
     float initialMagCorrectionRate;
 

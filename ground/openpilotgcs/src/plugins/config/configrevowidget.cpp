@@ -46,7 +46,7 @@
 #include <homelocation.h>
 #include <accelstate.h>
 #include <gyrostate.h>
-#include <magnetostate.h>
+#include <magstate.h>
 
 #define GRAVITY 9.81f
 #include "assertions.h"
@@ -585,10 +585,10 @@ void ConfigRevoWidget::doStartSixPointCalibration()
 #endif
 
     /* Need to get as many mag updates as possible */
-    MagnetoState *mag = MagnetoState::GetInstance(getObjectManager());
+    MagState *mag = MagState::GetInstance(getObjectManager());
     Q_ASSERT(mag);
-    initialMagnetoStateMdata = mag->getMetadata();
-    mdata = initialMagnetoStateMdata;
+    initialMagStateMdata = mag->getMetadata();
+    mdata = initialMagStateMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     mag->setMetadata(mdata);
@@ -624,7 +624,7 @@ void ConfigRevoWidget::savePositionData()
 
     AccelState *accelState = AccelState::GetInstance(getObjectManager());
     Q_ASSERT(accelState);
-    MagnetoState *mag = MagnetoState::GetInstance(getObjectManager());
+    MagState *mag = MagState::GetInstance(getObjectManager());
     Q_ASSERT(mag);
 
     connect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject *)));
@@ -653,10 +653,10 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
             accel_accum_y.append(accelStateData.y);
             accel_accum_z.append(accelStateData.z);
 #endif
-        } else if (obj->getObjID() == MagnetoState::OBJID) {
-            MagnetoState *mag = MagnetoState::GetInstance(getObjectManager());
+        } else if (obj->getObjID() == MagState::OBJID) {
+            MagState *mag = MagState::GetInstance(getObjectManager());
             Q_ASSERT(mag);
-            MagnetoState::DataFields magData = mag->getData();
+            MagState::DataFields magData = mag->getData();
             mag_accum_x.append(magData.x);
             mag_accum_y.append(magData.y);
             mag_accum_z.append(magData.z);
@@ -685,7 +685,7 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
 #endif
 
         // Store the mean for this position for the mag
-        MagnetoState *mag = MagnetoState::GetInstance(getObjectManager());
+        MagState *mag = MagState::GetInstance(getObjectManager());
         Q_ASSERT(mag);
         disconnect(mag, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetSixPointCalibrationMeasurement(UAVObject *)));
         mag_data_x[position] = listMean(mag_accum_x);
@@ -722,7 +722,7 @@ void ConfigRevoWidget::doGetSixPointCalibrationMeasurement(UAVObject *obj)
 #ifdef SIX_POINT_CAL_ACCEL
             accelState->setMetadata(initialAccelStateMdata);
 #endif
-            mag->setMetadata(initialMagnetoStateMdata);
+            mag->setMetadata(initialMagStateMdata);
 
             // Recall saved board rotation
             recallBoardRotation();
@@ -928,7 +928,7 @@ void ConfigRevoWidget::doStartNoiseMeasurement()
     Q_ASSERT(accelState);
     GyroState *gyroState   = GyroState::GetInstance(getObjectManager());
     Q_ASSERT(gyroState);
-    MagnetoState *mag = MagnetoState::GetInstance(getObjectManager());
+    MagState *mag = MagState::GetInstance(getObjectManager());
     Q_ASSERT(mag);
 
     UAVObject::Metadata mdata;
@@ -945,8 +945,8 @@ void ConfigRevoWidget::doStartNoiseMeasurement()
     mdata.flightTelemetryUpdatePeriod = 100;
     gyroState->setMetadata(mdata);
 
-    initialMagnetoStateMdata = mag->getMetadata();
-    mdata = initialMagnetoStateMdata;
+    initialMagStateMdata = mag->getMetadata();
+    mdata = initialMagStateMdata;
     UAVObject::SetFlightTelemetryUpdateMode(mdata, UAVObject::UPDATEMODE_PERIODIC);
     mdata.flightTelemetryUpdatePeriod = 100;
     mag->setMetadata(mdata);
@@ -990,11 +990,11 @@ void ConfigRevoWidget::doGetNoiseSample(UAVObject *obj)
         accel_accum_z.append(accelStateData.z);
         break;
     }
-    case MagnetoState::OBJID:
+    case MagState::OBJID:
     {
-        MagnetoState *mags = MagnetoState::GetInstance(getObjectManager());
+        MagState *mags = MagState::GetInstance(getObjectManager());
         Q_ASSERT(mags);
-        MagnetoState::DataFields magData = mags->getData();
+        MagState::DataFields magData = mags->getData();
         mag_accum_x.append(magData.x);
         mag_accum_y.append(magData.y);
         mag_accum_z.append(magData.z);
@@ -1017,7 +1017,7 @@ void ConfigRevoWidget::doGetNoiseSample(UAVObject *obj)
         gyro_accum_x.length() >= NOISE_SAMPLES &&
         accel_accum_x.length() >= NOISE_SAMPLES) {
         // No need to for more updates
-        MagnetoState *mags     = MagnetoState::GetInstance(getObjectManager());
+        MagState *mags = MagState::GetInstance(getObjectManager());
         AccelState *accelState = AccelState::GetInstance(getObjectManager());
         GyroState *gyroState   = GyroState::GetInstance(getObjectManager());
         disconnect(accelState, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(doGetNoiseSample(UAVObject *)));

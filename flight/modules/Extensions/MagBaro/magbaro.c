@@ -41,7 +41,7 @@
 #include "hwsettings.h"
 #include "magbaro.h"
 #include "barosensor.h" // object that will be updated by the module
-#include "magnetosensor.h"
+#include "magsensor.h"
 #include "taskinfo.h"
 
 // Private constants
@@ -109,7 +109,7 @@ int32_t MagBaroInitialize()
 
     if (magbaroEnabled) {
 #if defined(PIOS_INCLUDE_HMC5883)
-        MagnetoSensorInitialize();
+        MagSensorInitialize();
 #endif
 
 #if defined(PIOS_INCLUDE_BMP085)
@@ -149,7 +149,7 @@ static void magbaroTask(__attribute__((unused)) void *parameters)
 #endif
 
 #if defined(PIOS_INCLUDE_HMC5883)
-    MagnetoSensorData mag;
+    MagSensorData mag;
     PIOS_HMC5883_Init(&pios_hmc5883_cfg);
     uint32_t mag_update_time = PIOS_DELAY_GetRaw();
 #endif
@@ -207,7 +207,7 @@ static void magbaroTask(__attribute__((unused)) void *parameters)
             mag.x = mags[0];
             mag.y = mags[1];
             mag.z = mags[2];
-            MagnetoSensorSet(&mag);
+            MagSensorSet(&mag);
             mag_update_time = PIOS_DELAY_GetRaw();
         }
 #endif

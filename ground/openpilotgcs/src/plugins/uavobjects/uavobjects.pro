@@ -42,8 +42,8 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/gyrosensor.h \
     $$UAVOBJECT_SYNTHETICS/accelsensor.h \
     $$UAVOBJECT_SYNTHETICS/accelstate.h \
-    $$UAVOBJECT_SYNTHETICS/magnetosensor.h \
-    $$UAVOBJECT_SYNTHETICS/magnetostate.h \
+    $$UAVOBJECT_SYNTHETICS/magsensor.h \
+    $$UAVOBJECT_SYNTHETICS/magstate.h \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.h \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.h \
     $$UAVOBJECT_SYNTHETICS/systemstats.h \
@@ -126,8 +126,8 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/accelstate.cpp \
     $$UAVOBJECT_SYNTHETICS/gyrostate.cpp \
     $$UAVOBJECT_SYNTHETICS/gyrosensor.cpp \
-    $$UAVOBJECT_SYNTHETICS/magnetosensor.cpp \
-    $$UAVOBJECT_SYNTHETICS/magnetostate.cpp \
+    $$UAVOBJECT_SYNTHETICS/magsensor.cpp \
+    $$UAVOBJECT_SYNTHETICS/magstate.cpp \
     $$UAVOBJECT_SYNTHETICS/camerastabsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/flighttelemetrystats.cpp \
     $$UAVOBJECT_SYNTHETICS/systemstats.cpp \

@@ -191,7 +191,7 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
     if (first_run) {
 #if defined(PIOS_INCLUDE_HMC5883)
         // wait until mags have been updated
-        if (!mag_updated) {
+        if (!magUpdated) {
             return 1;
         }
 #else
@@ -398,7 +398,7 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
     return 0;
 }
 
-static void flightStatusUpdatedCb(UAVObjEvent *ev)
+static void flightStatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     FlightStatusGet(&flightStatus);
 }

@@ -183,7 +183,7 @@ static void settingsUpdatedCb(UAVObjEvent *objEv);
 static void sensorUpdatedCb(UAVObjEvent *objEv);
 static void StateEstimationCb(void);
 static void getNED(GPSPositionData *gpsPosition, float *NED);
-static float sane(float value);
+static bool sane(float value);
 
 
 /**
@@ -236,7 +236,7 @@ int32_t StateEstimationStart(void)
     return 0;
 }
 
-MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
+MODULE_INITCALL(StateEstimationInitialize, StateEstimationStart)
 
 /**
  * Module callback
@@ -428,7 +428,7 @@ static void StateEstimationCb(void)
 /**
  * Callback for eventdispatcher when HomeLocation or RevoSettings has been updated
  */
-static void settingsUpdatedCb(UAVObjEvent *ev)
+static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     HomeLocationGet((HomeLocationData *)&homeLocation);
 
@@ -516,7 +516,7 @@ static void getNED(GPSPositionData *gpsPosition, float *NED)
  * @param[in] float value
  * @returns true for safe and false for unsafe
  */
-static float sane(float value)
+static bool sane(float value)
 {
     if (isnan(value) || isinf(value)) {
         return false;

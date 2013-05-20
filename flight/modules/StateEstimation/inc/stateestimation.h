@@ -36,16 +36,18 @@ typedef enum {
     gyr_UPDATED     = 1 << 0,
         acc_UPDATED = 1 << 1,
         mag_UPDATED = 1 << 2,
-        pos_UPDATED = 1 << 3,
-        vel_UPDATED = 1 << 4,
-        air_UPDATED = 1 << 5,
-        bar_UPDATED = 1 << 6,
+        att_UPDATED = 1 << 3,
+        pos_UPDATED = 1 << 4,
+        vel_UPDATED = 1 << 5,
+        air_UPDATED = 1 << 6,
+        bar_UPDATED = 1 << 7,
 } sensorUpdates;
 
 typedef struct {
     float gyr[3];
     float acc[3];
     float mag[3];
+    float att[4];
     float pos[3];
     float vel[3];
     float air[2];

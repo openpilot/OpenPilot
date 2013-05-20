@@ -44,6 +44,7 @@
 #include <magstate.h>
 #include <barostate.h>
 #include <airspeedstate.h>
+#include <attitudestate.h>
 #include <positionstate.h>
 #include <velocitystate.h>
 
@@ -51,7 +52,7 @@
 #include "homelocation.h"
 #include "flightstatus.h"
 
-// #include "CoordinateConversions.h"
+#include "CoordinateConversions.h"
 
 // Private constants
 #define STACK_SIZE_BYTES  2048
@@ -397,6 +398,17 @@ static void StateEstimationCb(void)
         statename##Set(&s); \
     }
     STORE1(BaroState, bar, Altitude);
+    // attitude nees manual conversion from quaternion to euler
+    if (ISSET(states.updated, att_UPDATED)) { \
+        AttitudeStateData s;
+        AttitudeStateGet(&s);
+        s.q1 = states.att[0];
+        s.q2 = states.att[1];
+        s.q3 = states.att[2];
+        s.q4 = states.att[3];
+        Quaternion2RPY(&s.q1, &s.Roll);
+        AttitudeStateSet(&s);
+    }
 
 
     // clear alarms if everything is alright, then schedule callback execution after timeout

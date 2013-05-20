@@ -355,16 +355,21 @@ static void StateEstimationCb(void)
 
     // apply all filters in the current filter chain
     filterQueue *current = (filterQueue *)filterChain;
-    bool error = 0;
+    uint8_t error = 0;
     while (current != NULL) {
         int32_t result = current->filter->filter(&states);
-        if (result != 0) {
-            error = 1;
+        if (result > error) {
+            error = result;
+            alarm = 1;
         }
         current = current->next;
     }
-    if (error) {
+    if (error == 1) {
+        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
+    } else if (error == 2) {
         AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+    } else if (error == 3) {
+        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
     }
 
     // the final output of filters is saved in state variables

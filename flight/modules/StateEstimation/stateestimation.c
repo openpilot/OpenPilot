@@ -95,9 +95,9 @@ static stateFilter ekf16iFilter;
 static const filterQueue *cfQueue = &(filterQueue) {
     .filter = &magFilter,
     .next   = &(filterQueue) {
-        .filter = &baroFilter,
+        .filter = &airFilter,
         .next   = &(filterQueue) {
-            .filter = &airFilter,
+            .filter = &baroFilter,
             .next   = &(filterQueue) {
                 .filter = &cfFilter,
                 .next   = NULL,
@@ -108,9 +108,9 @@ static const filterQueue *cfQueue = &(filterQueue) {
 static const filterQueue *cfmQueue = &(filterQueue) {
     .filter = &magFilter,
     .next   = &(filterQueue) {
-        .filter = &baroFilter,
+        .filter = &airFilter,
         .next   = &(filterQueue) {
-            .filter = &airFilter,
+            .filter = &baroFilter,
             .next   = &(filterQueue) {
                 .filter = &cfmFilter,
                 .next   = NULL,
@@ -121,11 +121,11 @@ static const filterQueue *cfmQueue = &(filterQueue) {
 static const filterQueue *ekf13iQueue = &(filterQueue) {
     .filter = &magFilter,
     .next   = &(filterQueue) {
-        .filter = &baroFilter,
+        .filter = &airFilter,
         .next   = &(filterQueue) {
-            .filter = &stationaryFilter,
+            .filter = &baroFilter,
             .next   = &(filterQueue) {
-                .filter = &airFilter,
+                .filter = &stationaryFilter,
                 .next   = &(filterQueue) {
                     .filter = &ekf13iFilter,
                     .next   = NULL,
@@ -137,9 +137,9 @@ static const filterQueue *ekf13iQueue = &(filterQueue) {
 static const filterQueue *ekf13Queue = &(filterQueue) {
     .filter = &magFilter,
     .next   = &(filterQueue) {
-        .filter = &baroFilter,
+        .filter = &airFilter,
         .next   = &(filterQueue) {
-            .filter = &airFilter,
+            .filter = &baroFilter,
             .next   = &(filterQueue) {
                 .filter = &ekf13Filter,
                 .next   = NULL,
@@ -150,11 +150,11 @@ static const filterQueue *ekf13Queue = &(filterQueue) {
 static const filterQueue *ekf16iQueue = &(filterQueue) {
     .filter = &magFilter,
     .next   = &(filterQueue) {
-        .filter = &baroFilter,
+        .filter = &airFilter,
         .next   = &(filterQueue) {
-            .filter = &stationaryFilter,
+            .filter = &baroFilter,
             .next   = &(filterQueue) {
-                .filter = &airFilter,
+                .filter = &stationaryFilter,
                 .next   = &(filterQueue) {
                     .filter = &ekf16iFilter,
                     .next   = NULL,
@@ -166,9 +166,9 @@ static const filterQueue *ekf16iQueue = &(filterQueue) {
 static const filterQueue *ekf16Queue = &(filterQueue) {
     .filter = &magFilter,
     .next   = &(filterQueue) {
-        .filter = &baroFilter,
+        .filter = &airFilter,
         .next   = &(filterQueue) {
-            .filter = &airFilter,
+            .filter = &baroFilter,
             .next   = &(filterQueue) {
                 .filter = &ekf16Filter,
                 .next   = NULL,
@@ -338,6 +338,7 @@ static void StateEstimationCb(void)
     }
     SANITYCHECK1(BaroSensor, bar, Altitude, 1);
     SANITYCHECK1(AirspeedSensor, air, CalibratedAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
+    states.air[1] = 0.0f; // sensor does not provide true airspeed, needs to be calculated by filter
 
     // GPS is a tiny bit more tricky as GPSPosition is not float (otherwise the conversion to NED could sit in a filter) but integers, for precision reasons
     if (ISSET(states.updated, pos_UPDATED)) {

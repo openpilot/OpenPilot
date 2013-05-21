@@ -33,6 +33,9 @@
 #include <QDebug>
 #include <QString>
 #include <QMutex>
+#if defined(Q_OS_UNIX)
+#include <usb.h>
+#endif
 #include "hidapi.h"
 #include "opHID_const.h"
 #include "opHID_global.h"

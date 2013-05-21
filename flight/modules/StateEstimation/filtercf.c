@@ -52,8 +52,9 @@ static AttitudeSettingsData attitudeSettings;
 static FlightStatusData flightStatus;
 static HomeLocationData homeLocation;
 
-static bool first_run = 1;
-static bool useMag    = 0;
+static bool initialized = 0;
+static bool first_run   = 1;
+static bool useMag = 0;
 static float currentAccel[3];
 static float currentMag[3];
 static float gyroBias[3];
@@ -74,17 +75,28 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
 
 static void flightStatusUpdatedCb(UAVObjEvent *ev);
 
+static void globalInit(void);
+
+
+static void globalInit(void)
+{
+    if (!initialized) {
+        initialized = 1;
+        FlightStatusConnectCallback(&flightStatusUpdatedCb);
+        flightStatusUpdatedCb(NULL);
+    }
+}
 
 void filterCFInitialize(stateFilter *handle)
 {
+    globalInit();
     handle->init   = &initwithoutmag;
     handle->filter = &filter;
-    FlightStatusConnectCallback(&flightStatusUpdatedCb);
-    flightStatusUpdatedCb(NULL);
 }
 
 void filterCFMInitialize(stateFilter *handle)
 {
+    globalInit();
     handle->init   = &initwithmag;
     handle->filter = &filter;
 }
@@ -158,9 +170,6 @@ static int32_t filter(stateEstimation *state)
             accelUpdated = 0;
             magUpdated   = 0;
         }
-        state->gyr[0] -= gyroBias[0];
-        state->gyr[1] -= gyroBias[1];
-        state->gyr[2] -= gyroBias[2];
     }
     return result;
 }
@@ -226,13 +235,11 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
         attitudeState.Pitch = RAD2DEG(attitudeState.Pitch);
         attitudeState.Yaw   = RAD2DEG(attitudeState.Yaw);
 
-        RPY2Quaternion(&attitudeState.Roll, &attitudeState.q1);
-        q[0]    = attitudeState.q1;
-        q[1]    = attitudeState.q1;
-        q[2]    = attitudeState.q1;
-        q[3]    = attitudeState.q1;
+        RPY2Quaternion(&attitudeState.Roll, q);
 
-        timeval = PIOS_DELAY_GetRaw();
+        first_run = 0;
+
+        timeval   = PIOS_DELAY_GetRaw();
 
         return 0;
     }
@@ -338,14 +345,12 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
     gyroBias[0] -= accel_err[0] * attitudeSettings.AccelKi;
     gyroBias[1] -= accel_err[1] * attitudeSettings.AccelKi;
-    if (useMag) {
-        gyroBias[2] -= mag_err[2] * magKi;
-    }
+    gyroBias[2] -= mag_err[2] * magKi;
 
     // Correct rates based on integral coefficient
-    gyro[0] -= gyroBias[0];
-    gyro[1] -= gyroBias[1];
-    gyro[2] -= gyroBias[2];
+    gyro[0]     -= gyroBias[0];
+    gyro[1]     -= gyroBias[1];
+    gyro[2]     -= gyroBias[2];
 
     float gyrotmp[3] = { gyro[0], gyro[1], gyro[2] };
     // Correct rates based on proportional coefficient
@@ -388,10 +393,7 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
     // If quaternion has become inappropriately short or is nan reinit.
     // THIS SHOULD NEVER ACTUALLY HAPPEN
     if ((fabsf(qmag) < 1.0e-3f) || isnan(qmag)) {
-        q[0] = 1.0f;
-        q[1] = 0.0f;
-        q[2] = 0.0f;
-        q[3] = 0.0f;
+        first_run = 1;
         return 2;
     }
 

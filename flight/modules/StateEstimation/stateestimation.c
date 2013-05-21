@@ -260,7 +260,9 @@ MODULE_INITCALL(StateEstimationInitialize, StateEstimationStart)
 static void StateEstimationCb(void)
 {
     // alarms flag
-    uint8_t alarm = 0;
+    int8_t alarm = 0;
+    static int8_t lastAlarm = -1;
+    static uint16_t alarmcounter = 0;
 
     // set alarm to warning if called through timeout
     if (updatedSensors == 0) {
@@ -422,13 +424,27 @@ static void StateEstimationCb(void)
         AttitudeStateSet(&s);
     }
 
+    // throttle alarms, raise alarm flags immediately
+    // but require system to run for a while before decreasing
+    // to prevent alarm flapping
+    if (alarm >= lastAlarm) {
+        lastAlarm    = alarm;
+        alarmcounter = 0;
+    } else {
+        if (alarmcounter < 100) {
+            alarmcounter++;
+        } else {
+            lastAlarm    = alarm;
+            alarmcounter = 0;
+        }
+    }
 
     // clear alarms if everything is alright, then schedule callback execution after timeout
-    if (alarm == 1) {
+    if (lastAlarm == 1) {
         AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
-    } else if (alarm == 2) {
+    } else if (lastAlarm == 2) {
         AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-    } else if (alarm >= 3) {
+    } else if (lastAlarm >= 3) {
         AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
     } else {
         AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);

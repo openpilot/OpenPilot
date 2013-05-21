@@ -51,8 +51,9 @@
 static EKFConfigurationData ekfConfiguration;
 static HomeLocationData homeLocation;
 
-static bool first_run = 1;
-static bool usePos    = 0;
+static bool initialized = 0;
+static bool first_run   = 1;
+static bool usePos = 0;
 
 
 // Private functions
@@ -64,14 +65,27 @@ static int32_t filter(stateEstimation *state);
 static inline bool invalid(float data);
 static inline bool invalid_var(float data);
 
+static void globalInit(void);
+
+
+static void globalInit(void)
+{
+    if (!initialized) {
+        initialized = 1;
+        EKFConfigurationInitialize();
+        EKFStateVarianceInitialize();
+    }
+}
 
 void filterEKF13iInitialize(stateFilter *handle)
 {
+    globalInit();
     handle->init   = &init13i;
     handle->filter = &filter;
 }
 void filterEKF13Initialize(stateFilter *handle)
 {
+    globalInit();
     handle->init   = &init13;
     handle->filter = &filter;
 }
@@ -80,11 +94,13 @@ void filterEKF13Initialize(stateFilter *handle)
 // XXX
 void filterEKF16iInitialize(stateFilter *handle)
 {
+    globalInit();
     handle->init   = &init13i;
     handle->filter = &filter;
 }
 void filterEKF16Initialize(stateFilter *handle)
 {
+    globalInit();
     handle->init   = &init13;
     handle->filter = &filter;
 }

@@ -100,7 +100,7 @@ void SystemHealthGadgetWidget::updateAlarms(UAVObject *systemAlarm)
         for (uint i = 0; i < field->getNumElements(); ++i) {
             QString element = field->getElementNames()[i];
             QString value   = field->getValue(i).toString();
-            if (!missingElements->contains(element)){
+            if (!missingElements->contains(element)) {
                 if (m_renderer->elementExists(element)) {
                     QMatrix blockMatrix = m_renderer->matrixForElement(element);
                     qreal startX = blockMatrix.mapRect(m_renderer->boundsOnElement(element)).x();

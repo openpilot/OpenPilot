@@ -30,25 +30,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <usb.h>
 #include <QDebug>
 #include <QString>
 #include <QMutex>
 #include "hidapi.h"
 #include "opHID_const.h"
 #include "opHID_global.h"
-
-typedef struct hid_struct hid_t;
-struct hid_struct
-{
-    usb_dev_handle *usb;
-    int open;
-    int iface;
-    int ep_in;
-    int ep_out;
-    struct hid_struct *prev;
-    struct hid_struct *next;
-};
 
 struct hidapi_wrapper_device
 {

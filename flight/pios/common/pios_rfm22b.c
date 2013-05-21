@@ -85,7 +85,7 @@
 #define MAX_RADIOSTATS_MISS_COUNT        3
 
 // The time between PPM updates
-#define PPM_UPDATE_PERIOD_MS             20
+#define PPM_UPDATE_PERIOD_MS             30
 
 // this is too adjust the RF module so that it is on frequency
 #define OSC_LOAD_CAP                     0x7F  // cap = 12.5pf .. default
@@ -1375,6 +1375,8 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22b_dev->destination_id   = 0xffffffff;
     rfm22b_dev->send_status = false;
     rfm22b_dev->send_connection_request = false;
+    rfm22b_dev->send_ack_nack = false;
+    rfm22b_dev->resend_packet = false;
 
     // Initialize the packets.
     rfm22b_dev->rx_packet_len  = 0;
@@ -1801,54 +1803,63 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
         return RADIO_EVENT_RX_MODE;
     }
 
-    // See if there's a packet ready to send.
-    if (radio_dev->tx_packet) {
-        p = radio_dev->tx_packet;
-    } else {
-        // Don't send a packet if we're waiting for an ACK
-        if (radio_dev->prev_tx_packet) {
-            return RADIO_EVENT_RX_MODE;
-        }
-
-        // Send a connection request?
-        if (!p && radio_dev->send_connection_request) {
-            p = (PHPacketHandle) & (radio_dev->con_packet);
-            radio_dev->send_connection_request = false;
-        }
-
 #ifdef PIOS_PPM_RECEIVER
-        // Send a PPM packet?
-        if (!p && radio_dev->send_ppm) {
-            p = (PHPacketHandle) & (radio_dev->ppm_packet);
-            radio_dev->send_ppm = false;
-        }
+    // Send a PPM packet?
+    if (radio_dev->send_ppm) {
+        p = (PHPacketHandle) & (radio_dev->ppm_packet);
+        radio_dev->send_ppm = false;
+    }
 #endif
 
-        // Send status?
-        if (!p && radio_dev->send_status) {
-            p = (PHPacketHandle) & (radio_dev->status_packet);
-            radio_dev->send_status = false;
+    // Send an ACK/NACK?
+    if (!p && radio_dev->send_ack_nack) {
+        p = (PHPacketHandle) & (radio_dev->ack_nack_packet);
+        radio_dev->send_ack_nack = false;
+    }
+
+    // Resend a packet?
+    if (!p && radio_dev->resend_packet) {
+        p = radio_dev->prev_tx_packet;
+        radio_dev->prev_tx_packet = NULL;
+        radio_dev->resend_packet = false;
+    }
+
+    // Don't send another packet if we're waiting for an ACK.
+    if (!p && radio_dev->prev_tx_packet) {
+        return RADIO_EVENT_RX_MODE;
+    }
+
+    // Send a connection request?
+    if (!p && radio_dev->send_connection_request) {
+        p = (PHPacketHandle) & (radio_dev->con_packet);
+        radio_dev->send_connection_request = false;
+    }
+
+    // Try to get some data to send
+    if (!p) {
+        bool need_yield = false;
+        p = &radio_dev->data_packet;
+        p->header.type = PACKET_TYPE_DATA;
+        p->header.destination_id = radio_dev->destination_id;
+        if (radio_dev->tx_out_cb && (p->header.data_size == 0)) {
+            p->header.data_size = (radio_dev->tx_out_cb)(radio_dev->tx_out_context, p->data, PH_MAX_DATA, NULL, &need_yield);
         }
 
-        // Try to get some data to send
-        if (!p) {
-            bool need_yield = false;
-            p = &radio_dev->data_packet;
-            p->header.type = PACKET_TYPE_DATA;
-            p->header.destination_id = radio_dev->destination_id;
-            if (radio_dev->tx_out_cb && (p->header.data_size == 0)) {
-                p->header.data_size = (radio_dev->tx_out_cb)(radio_dev->tx_out_context, p->data, PH_MAX_DATA, NULL, &need_yield);
-            }
-
-            // Don't send any data until we're connected.
-            if (!rfm22_isConnected(radio_dev)) {
-                p->header.data_size = 0;
-            }
-            if (p->header.data_size == 0) {
-                p = NULL;
-            }
+        // Don't send any data until we're connected.
+        if (!rfm22_isConnected(radio_dev)) {
+            p->header.data_size = 0;
+        }
+        if (p->header.data_size == 0) {
+            p = NULL;
         }
     }
+
+    // Send status?
+    if (!p && radio_dev->send_status) {
+        p = (PHPacketHandle) & (radio_dev->status_packet);
+        radio_dev->send_status = false;
+    }
+
     if (!p) {
         return RADIO_EVENT_RX_MODE;
     }
@@ -1902,9 +1913,10 @@ static enum pios_radio_event radio_txData(struct pios_rfm22b_dev *radio_dev)
             if (radio_dev->rx_packet.header.type == PACKET_TYPE_CON_REQUEST) {
                 rfm22_setConnectionParameters(radio_dev);
             }
-        } else if ((radio_dev->tx_packet->header.type != PACKET_TYPE_NACK) && (radio_dev->tx_packet->header.type != PACKET_TYPE_PPM) &&
-                   (radio_dev->tx_packet->header.type != PACKET_TYPE_STATUS) && (radio_dev->tx_packet->header.type != PACKET_TYPE_PPM)) {
-            // We need to wait for an ACK if this packet it not an ACK, NACK, or PPM.
+        } else if ((radio_dev->tx_packet->header.type != PACKET_TYPE_NACK) &&
+                   (radio_dev->tx_packet->header.type != PACKET_TYPE_PPM) &&
+                   (radio_dev->tx_packet->header.type != PACKET_TYPE_STATUS)) {
+            // We need to wait for an ACK if this packet it not an ACK, NACK, PPM, or status packet.
             radio_dev->prev_tx_packet = radio_dev->tx_packet;
         }
         radio_dev->tx_packet  = 0;
@@ -2058,7 +2070,11 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
             if (seq_num == (prev_seq_num + 1)) {
                 portTickType local_rx_time  = radio_dev->rx_complete_ticks;
                 portTickType remote_tx_time = radio_dev->rx_packet.header.prev_tx_time;
-                radio_dev->time_delta = remote_tx_time - local_rx_time;
+                portTickType time_delta = remote_tx_time - local_rx_time;
+                portTickType time_delta_delta = (time_delta > radio_dev->time_delta) ? (time_delta - radio_dev->time_delta) : (radio_dev->time_delta - time_delta);
+                if (time_delta_delta <= 2) {
+                    radio_dev->time_delta = remote_tx_time - local_rx_time;
+                }
             } else if (seq_num > prev_seq_num) {
                 // Add any missed packets into the stats.
                 uint16_t missed_packets = seq_num - prev_seq_num - 1;
@@ -2130,8 +2146,8 @@ static enum pios_radio_event radio_rxData(struct pios_rfm22b_dev *radio_dev)
  */
 static void rfm22_sendStatus(struct pios_rfm22b_dev *rfm22b_dev)
 {
-    // Don't send if a status is already queued.
-    if (rfm22b_dev->send_status) {
+    // Don't send if a status is already queued or if we're the coordinator and not connected.
+    if (rfm22b_dev->send_status || (rfm22b_dev->coordinator && !rfm22_isConnected(rfm22b_dev))) {
         return;
     }
 
@@ -2205,7 +2221,7 @@ static enum pios_radio_event rfm22_sendAck(struct pios_rfm22b_dev *rfm22b_dev)
         aph->header.destination_id = rfm22b_dev->destination_id;
         aph->header.type = PACKET_TYPE_ACK;
         aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
-        rfm22b_dev->tx_packet = (PHPacketHandle)aph;
+        rfm22b_dev->send_ack_nack = true;
     }
     return RADIO_EVENT_TX_START;
 }
@@ -2220,10 +2236,13 @@ static enum pios_radio_event rfm22_sendNack(struct pios_rfm22b_dev *rfm22b_dev)
 {
     PHAckNackPacketHandle aph = (PHAckNackPacketHandle)(&(rfm22b_dev->ack_nack_packet));
 
-    aph->header.destination_id = rfm22b_dev->destination_id;
-    aph->header.type = PACKET_TYPE_NACK;
-    aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
-    rfm22b_dev->tx_packet = (PHPacketHandle)aph;
+    // We don't NACK PPM or status packets.
+    if ((rfm22b_dev->rx_packet.header.type != PACKET_TYPE_PPM) && (rfm22b_dev->rx_packet.header.type != PACKET_TYPE_STATUS)) {
+        aph->header.destination_id = rfm22b_dev->destination_id;
+        aph->header.type = PACKET_TYPE_NACK;
+        aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
+        rfm22b_dev->send_ack_nack = true;
+    }
     return RADIO_EVENT_TX_START;
 }
 
@@ -2462,9 +2481,6 @@ static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev)
  */
 static enum pios_radio_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm22b_dev)
 {
-    // Set our connection state to connected
-    rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTED;
-
     // Copy the connection packet
     PHConnectionPacketHandle cph  = (PHConnectionPacketHandle)(&(rfm22b_dev->rx_packet));
     PHConnectionPacketHandle lcph = (PHConnectionPacketHandle)(&(rfm22b_dev->con_packet));
@@ -2509,11 +2525,9 @@ static portTickType rfm22_coordinatorTime(struct pios_rfm22b_dev *rfm22b_dev, po
 static bool rfm22_timeToSend(struct pios_rfm22b_dev *rfm22b_dev)
 {
     portTickType time = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
-    // Divide time into 8ms blocks.  Coordinator sends in firs 2 ms, and remote send in 5th and 6th ms.
-    bool tts = (rfm22b_dev->coordinator) ? ((time & 0x06) == 0) : (((time + 4) & 0x06) == 0);
-
-    // Noone starts a transmit just prior to a channel change.
-    return tts && ((time & 0x7e) < 0x7b);
+    // Divide time into 8ms blocks.  Coordinator sends in first 2 ms, and remote send in 5th and 6th ms.
+    // Channel changes occur in the last 2 ms.
+    return (rfm22b_dev->coordinator) ? ((time & 0x0C) == 0) : (((time + 8) & 0x0C) == 0);
 }
 
 /**
@@ -2524,13 +2538,10 @@ static bool rfm22_timeToSend(struct pios_rfm22b_dev *rfm22b_dev)
 static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev)
 {
     portTickType time = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
-    // We change channels every 128 ms.
-    uint16_t n = (time >> 7) & 0xffff;
-
-    // The channel is calculated using the 16 bit CRC as the pseudo random number generator.
-    n = PIOS_CRC16_updateByte(n, 0);
-    float num_channels = rfm22b_dev->num_channels;
-    return (uint8_t)(num_channels * (float)n / (float)0xffff);
+    // Divide time into 8ms blocks.  Coordinator sends in first 2 ms, and remote send in 5th and 6th ms.
+    // Channel changes occur in the last 2 ms.
+    uint8_t n = (((time + 0x0C) >> 4) & 0xff);
+    return PIOS_CRC_updateByte(0, n) % rfm22b_dev->num_channels;
 }
 
 /**

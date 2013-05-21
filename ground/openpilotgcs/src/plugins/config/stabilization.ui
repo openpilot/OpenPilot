@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1075</width>
-    <height>834</height>
+    <width>983</width>
+    <height>736</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -603,8 +603,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1045</width>
-            <height>751</height>
+            <width>953</width>
+            <height>653</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -2638,7 +2638,7 @@ border-radius: 5;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>195</height>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -2749,7 +2749,7 @@ border-radius: 5;</string>
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>131</height>
+                  <height>0</height>
                  </size>
                 </property>
                 <property name="palette">
@@ -5503,7 +5503,7 @@ border-radius: 5;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>195</height>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -6119,7 +6119,7 @@ border-radius: 5;</string>
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>131</height>
+                  <height>0</height>
                  </size>
                 </property>
                 <property name="palette">
@@ -8480,271 +8480,6 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="label_157">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="text">
-                    <string>Integral</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QSlider" name="horizontalSlider_85">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>25</height>
-                    </size>
-                   </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="maximum">
-                    <number>100</number>
-                   </property>
-                   <property name="sliderPosition">
-                    <number>50</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="tickPosition">
-                    <enum>QSlider::TicksBelow</enum>
-                   </property>
-                   <property name="tickInterval">
-                    <number>25</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:RollPI</string>
-                     <string>element:Ki</string>
-                     <string>scale:0.1</string>
-                     <string>haslimits:yes</string>
-                     <string>buttongroup:2,10</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="2">
-                  <widget class="QSpinBox" name="spinBox_18">
-                   <property name="minimumSize">
-                    <size>
-                     <width>50</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>50</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="maximum">
-                    <number>200</number>
-                   </property>
-                   <property name="value">
-                    <number>200</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:RollPI</string>
-                     <string>element:Ki</string>
-                     <string>scale:0.1</string>
-                     <string>haslimits:yes</string>
-                     <string>buttongroup:2,10</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="3">
-                  <widget class="QSlider" name="horizontalSlider_86">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>25</height>
-                    </size>
-                   </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="maximum">
-                    <number>100</number>
-                   </property>
-                   <property name="sliderPosition">
-                    <number>50</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="tickPosition">
-                    <enum>QSlider::TicksBelow</enum>
-                   </property>
-                   <property name="tickInterval">
-                    <number>25</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:PitchPI</string>
-                     <string>element:Ki</string>
-                     <string>scale:0.1</string>
-                     <string>haslimits:yes</string>
-                     <string>buttongroup:2,10</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="4">
-                  <widget class="QSpinBox" name="spinBox_19">
-                   <property name="minimumSize">
-                    <size>
-                     <width>50</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>50</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="maximum">
-                    <number>200</number>
-                   </property>
-                   <property name="value">
-                    <number>200</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:PitchPI</string>
-                     <string>element:Ki</string>
-                     <string>scale:0.1</string>
-                     <string>haslimits:yes</string>
-                     <string>buttongroup:2,10</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="5">
-                  <widget class="QSlider" name="horizontalSlider_87">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>25</height>
-                    </size>
-                   </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="maximum">
-                    <number>100</number>
-                   </property>
-                   <property name="sliderPosition">
-                    <number>50</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="tickPosition">
-                    <enum>QSlider::TicksBelow</enum>
-                   </property>
-                   <property name="tickInterval">
-                    <number>25</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:YawPI</string>
-                     <string>element:Ki</string>
-                     <string>scale:0.1</string>
-                     <string>haslimits:yes</string>
-                     <string>buttongroup:2,10</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="6">
-                  <widget class="QSpinBox" name="spinBox_20">
-                   <property name="minimumSize">
-                    <size>
-                     <width>50</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>50</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="maximum">
-                    <number>200</number>
-                   </property>
-                   <property name="value">
-                    <number>200</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:YawPI</string>
-                     <string>element:Ki</string>
-                     <string>scale:0.1</string>
-                     <string>haslimits:yes</string>
-                     <string>buttongroup:2,10</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="0" column="2">
                   <spacer name="horizontalSpacer_2">
                    <property name="orientation">
@@ -8793,6 +8528,19 @@ border-radius: 5;</string>
                     <size>
                      <width>40</width>
                      <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="2" column="5">
+                  <spacer name="horizontalSpacer_48">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>1</height>
                     </size>
                    </property>
                   </spacer>
@@ -9018,8 +8766,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1045</width>
-            <height>751</height>
+            <width>936</width>
+            <height>702</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -19005,8 +18753,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1045</width>
-            <height>751</height>
+            <width>953</width>
+            <height>653</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -27262,12 +27010,6 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>spinBox_14</tabstop>
   <tabstop>horizontalSlider_84</tabstop>
   <tabstop>spinBox_15</tabstop>
-  <tabstop>horizontalSlider_85</tabstop>
-  <tabstop>spinBox_18</tabstop>
-  <tabstop>horizontalSlider_86</tabstop>
-  <tabstop>spinBox_19</tabstop>
-  <tabstop>horizontalSlider_87</tabstop>
-  <tabstop>spinBox_20</tabstop>
   <tabstop>lowThrottleZeroIntegral_8</tabstop>
   <tabstop>checkBox_7</tabstop>
   <tabstop>checkBox_8</tabstop>

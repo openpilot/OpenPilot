@@ -113,7 +113,7 @@ const uint32_t SENSOR_QUEUE_SIZE    = 10;
 static bool volatile variance_error = true;
 static bool volatile initialization_required = true;
 static uint32_t volatile running_algorithm   = 0xffffffff; // we start with no algorithm running
-
+static float rollPitchBiasRate = 0;
 // Private functions
 static void AttitudeTask(void *parameters);
 
@@ -367,18 +367,21 @@ static int32_t updateAttitudeComplementary(bool first_run)
     if ((init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
         // For first 7 seconds use accels to get gyro bias
         attitudeSettings.AccelKp     = 1.0f;
-        attitudeSettings.AccelKi     = 0.9f;
+        attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
+        rollPitchBiasRate = 0.01f;
         magKp = 1.0f;
     } else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
         attitudeSettings.AccelKp     = 1.0f;
-        attitudeSettings.AccelKi     = 0.9f;
+        attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
+        rollPitchBiasRate = 0.01f;
         magKp = 1.0f;
         init = 0;
     } else if (init == 0) {
         // Reload settings (all the rates)
         AttitudeSettingsGet(&attitudeSettings);
+        rollPitchBiasRate = 0.0f;
         magKp = 0.01f;
         init  = 1;
     }
@@ -450,8 +453,8 @@ static int32_t updateAttitudeComplementary(bool first_run)
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
     GyrosBiasData gyrosBias;
     GyrosBiasGet(&gyrosBias);
-    gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi;
-    gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi;
+    gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi + gyrosData.x * rollPitchBiasRate;;
+    gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi + gyrosData.y * rollPitchBiasRate;
     gyrosBias.z -= mag_err[2] * magKi;
     GyrosBiasSet(&gyrosBias);
 

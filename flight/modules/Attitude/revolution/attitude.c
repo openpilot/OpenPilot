@@ -289,8 +289,6 @@ float accel_mag;
 float qmag;
 float attitudeDt;
 float mag_err[3];
-float magKi = 0.000001f;
-float magKp = 0.01f;
 
 static int32_t updateAttitudeComplementary(bool first_run)
 {
@@ -370,19 +368,18 @@ static int32_t updateAttitudeComplementary(bool first_run)
         attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
         rollPitchBiasRate = 0.01f;
-        magKp = 1.0f;
+        attitudeSettings.MagKp = 1.0f;
     } else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
         attitudeSettings.AccelKp     = 1.0f;
         attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
         rollPitchBiasRate = 0.01f;
-        magKp = 1.0f;
+        attitudeSettings.MagKp = 1.0f;
         init = 0;
     } else if (init == 0) {
         // Reload settings (all the rates)
         AttitudeSettingsGet(&attitudeSettings);
         rollPitchBiasRate = 0.0f;
-        magKp = 0.01f;
         init  = 1;
     }
 
@@ -453,22 +450,26 @@ static int32_t updateAttitudeComplementary(bool first_run)
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
     GyrosBiasData gyrosBias;
     GyrosBiasGet(&gyrosBias);
-    gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi + gyrosData.x * rollPitchBiasRate;;
-    gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi + gyrosData.y * rollPitchBiasRate;
-    gyrosBias.z -= mag_err[2] * magKi;
-    GyrosBiasSet(&gyrosBias);
+    if(revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
+        gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi + (gyrosData.x + gyrosBias.x) * rollPitchBiasRate;;
+        gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi + (gyrosData.y + gyrosBias.y) * rollPitchBiasRate;
+    } else {
+        gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi + gyrosData.x * rollPitchBiasRate;;
+        gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi + gyrosData.y * rollPitchBiasRate;
 
-    if (revoCalibration.BiasCorrectedRaw != REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
         // if the raw values are not adjusted, we need to adjust here.
         gyrosData.x -= gyrosBias.x;
         gyrosData.y -= gyrosBias.y;
         gyrosData.z -= gyrosBias.z;
     }
 
+    gyrosBias.z -= mag_err[2] * attitudeSettings.MagKi;
+    GyrosBiasSet(&gyrosBias);
+
     // Correct rates based on error, integral component dealt with in updateSensors
     gyrosData.x += accel_err[0] * attitudeSettings.AccelKp / dT;
     gyrosData.y += accel_err[1] * attitudeSettings.AccelKp / dT;
-    gyrosData.z += accel_err[2] * attitudeSettings.AccelKp / dT + mag_err[2] * magKp / dT;
+    gyrosData.z += accel_err[2] * attitudeSettings.AccelKp / dT + mag_err[2] * attitudeSettings.MagKp / dT;
 
     // Work out time derivative from INSAlgo writeup
     // Also accounts for the fact that gyros are in deg/s

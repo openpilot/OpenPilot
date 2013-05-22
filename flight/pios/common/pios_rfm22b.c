@@ -2464,12 +2464,37 @@ static void rfm22_setConnectionParameters(struct pios_rfm22b_dev *rfm22b_dev)
 
     // Call the com port configuration function
     if (rfm22b_dev->com_config_cb) {
-        rfm22b_dev->com_config_cb(cph->main_port, cph->flexi_port, cph->vcp_port, cph->com_speed,
-                                  cph->min_frequency, cph->max_frequency, cph->channel_spacing);
+        rfm22b_dev->com_config_cb(cph->main_port, cph->flexi_port, cph->vcp_port, cph->com_speed);
     }
 
-    // Configure this modem from the connection request message.
+    // Configure this modem min an max frequency.
     rfm22_setNominalCarrierFrequency(rfm22b_dev, cph->min_frequency, cph->max_frequency, cph->channel_spacing);
+
+    // Configure the modem datarate.
+    rfm22b_dev->datarate = RFM22_datarate_64000;
+    switch (cph->com_speed) {
+    case OPLINKSETTINGS_COMSPEED_2400:
+        rfm22b_dev->datarate = RFM22_datarate_8000;
+        break;
+    case OPLINKSETTINGS_COMSPEED_4800:
+        rfm22b_dev->datarate = RFM22_datarate_8000;
+        break;
+    case OPLINKSETTINGS_COMSPEED_9600:
+        rfm22b_dev->datarate = RFM22_datarate_16000;
+        break;
+    case OPLINKSETTINGS_COMSPEED_19200:
+        rfm22b_dev->datarate = RFM22_datarate_32000;
+        break;
+    case OPLINKSETTINGS_COMSPEED_38400:
+        rfm22b_dev->datarate = RFM22_datarate_57600;
+        break;
+    case OPLINKSETTINGS_COMSPEED_57600:
+        rfm22b_dev->datarate = RFM22_datarate_128000;
+        break;
+    case OPLINKSETTINGS_COMSPEED_115200:
+        rfm22b_dev->datarate = RFM22_datarate_192000;
+        break;
+    }
     pios_rfm22_setDatarate(rfm22b_dev, rfm22b_dev->datarate, true);
 }
 

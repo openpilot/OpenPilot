@@ -33,38 +33,42 @@
 
 // Private constants
 
+#define STACK_REQUIRED 64
+
 // Private types
 
 // Private variables
 
 // Private functions
 
-static int32_t init(void);
-static int32_t filter(stateEstimation *state);
+static int32_t init(stateFilter *self);
+static int32_t filter(stateFilter *self, stateEstimation *state);
 
 
-void filterStationaryInitialize(stateFilter *handle)
+int32_t filterStationaryInitialize(stateFilter *handle)
 {
-    handle->init   = &init;
-    handle->filter = &filter;
+    handle->init      = &init;
+    handle->filter    = &filter;
+    handle->localdata = NULL;
+    return STACK_REQUIRED;
 }
 
-static int32_t init(void)
+static int32_t init(__attribute__((unused)) stateFilter *self)
 {
     return 0;
 }
 
-static int32_t filter(stateEstimation *state)
+static int32_t filter(__attribute__((unused)) stateFilter *self, stateEstimation *state)
 {
     state->pos[0]   = 0.0f;
     state->pos[1]   = 0.0f;
     state->pos[2]   = 0.0f;
-    state->updated |= pos_UPDATED;
+    state->updated |= SENSORUPDATES_pos;
 
     state->vel[0]   = 0.0f;
     state->vel[1]   = 0.0f;
     state->vel[2]   = 0.0f;
-    state->updated |= vel_UPDATED;
+    state->updated |= SENSORUPDATES_vel;
 
     return 0;
 }

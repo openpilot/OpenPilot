@@ -38,41 +38,50 @@
 #include <CoordinateConversions.h>
 
 // Private constants
+//
+#define STACK_REQUIRED 256
 
 // Private types
+struct data {
+    HomeLocationData    homeLocation;
+    RevoCalibrationData revoCalibration;
+    float magBias[3];
+};
 
 // Private variables
 
-static HomeLocationData homeLocation;
-static RevoCalibrationData revoCalibration;
-static float magBias[3] = { 0 };
-
 // Private functions
 
-static int32_t init(void);
-static int32_t filter(stateEstimation *state);
-static void magOffsetEstimation(float mag[3]);
+static int32_t init(stateFilter *self);
+static int32_t filter(stateFilter *self, stateEstimation *state);
+static void magOffsetEstimation(struct data *this, float mag[3]);
 
 
-void filterMagInitialize(stateFilter *handle)
+int32_t filterMagInitialize(stateFilter *handle)
 {
-    handle->init   = &init;
-    handle->filter = &filter;
+    handle->init      = &init;
+    handle->filter    = &filter;
+    handle->localdata = pvPortMalloc(sizeof(struct data));
+    return STACK_REQUIRED;
 }
 
-static int32_t init(void)
+static int32_t init(stateFilter *self)
 {
-    magBias[0] = magBias[1] = magBias[2] = 0.0f;
-    HomeLocationGet(&homeLocation);
-    RevoCalibrationGet(&revoCalibration);
+    struct data *this = (struct data *)self->localdata;
+
+    this->magBias[0] = this->magBias[1] = this->magBias[2] = 0.0f;
+    HomeLocationGet(&this->homeLocation);
+    RevoCalibrationGet(&this->revoCalibration);
     return 0;
 }
 
-static int32_t filter(stateEstimation *state)
+static int32_t filter(stateFilter *self, stateEstimation *state)
 {
-    if (ISSET(state->updated, mag_UPDATED)) {
-        if (revoCalibration.MagBiasNullingRate > 0) {
-            magOffsetEstimation(state->mag);
+    struct data *this = (struct data *)self->localdata;
+
+    if (ISSET(state->updated, SENSORUPDATES_mag)) {
+        if (this->revoCalibration.MagBiasNullingRate > 0) {
+            magOffsetEstimation(this, state->mag);
         }
     }
 
@@ -84,7 +93,7 @@ static int32_t filter(stateEstimation *state)
  * Magmeter Offset Cancellation: Theory and Implementation,
  * revisited William Premerlani, October 14, 2011
  */
-static void magOffsetEstimation(float mag[3])
+static void magOffsetEstimation(struct data *this, float mag[3])
 {
 #if 0
     // Constants, to possibly go into a UAVO
@@ -127,10 +136,10 @@ static void magOffsetEstimation(float mag[3])
     }
 #else // if 0
 
-    const float Rxy  = sqrtf(homeLocation.Be[0] * homeLocation.Be[0] + homeLocation.Be[1] * homeLocation.Be[1]);
-    const float Rz   = homeLocation.Be[2];
+    const float Rxy  = sqrtf(this->homeLocation.Be[0] * this->homeLocation.Be[0] + this->homeLocation.Be[1] * this->homeLocation.Be[1]);
+    const float Rz   = this->homeLocation.Be[2];
 
-    const float rate = revoCalibration.MagBiasNullingRate;
+    const float rate = this->revoCalibration.MagBiasNullingRate;
     float Rot[3][3];
     float B_e[3];
     float xy[2];
@@ -162,15 +171,15 @@ static void magOffsetEstimation(float mag[3])
     if (!isnan(delta[0]) && !isinf(delta[0]) &&
         !isnan(delta[1]) && !isinf(delta[1]) &&
         !isnan(delta[2]) && !isinf(delta[2])) {
-        magBias[0] += delta[0];
-        magBias[1] += delta[1];
-        magBias[2] += delta[2];
+        this->magBias[0] += delta[0];
+        this->magBias[1] += delta[1];
+        this->magBias[2] += delta[2];
     }
 
     // Add bias to state estimation
-    mag[0] += magBias[0];
-    mag[1] += magBias[1];
-    mag[2] += magBias[2];
+    mag[0] += this->magBias[0];
+    mag[1] += this->magBias[1];
+    mag[2] += this->magBias[2];
 
 #endif // if 0
 }

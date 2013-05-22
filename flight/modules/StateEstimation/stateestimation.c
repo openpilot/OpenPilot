@@ -42,7 +42,6 @@
 #include <gyrostate.h>
 #include <accelstate.h>
 #include <magstate.h>
-#include <barostate.h>
 #include <airspeedstate.h>
 #include <attitudestate.h>
 #include <positionstate.h>
@@ -55,7 +54,7 @@
 #include "CoordinateConversions.h"
 
 // Private constants
-#define STACK_SIZE_BYTES  2048
+#define STACK_SIZE_BYTES  256
 #define CALLBACK_PRIORITY CALLBACK_PRIORITY_REGULAR
 #define TASK_PRIORITY     CALLBACK_TASK_FLIGHTCONTROL
 #define TIMEOUT_MS        100
@@ -185,7 +184,7 @@ static void StateEstimationCb(void);
 static void getNED(GPSPositionData *gpsPosition, float *NED);
 static bool sane(float value);
 
-static inline int32_t maxint32_t(int32_t a, int2_t b)
+static inline int32_t maxint32_t(int32_t a, int32_t b)
 {
     if (a > b) {
         return a;
@@ -212,7 +211,6 @@ int32_t StateEstimationInitialize(void)
     GyroStateInitialize();
     AccelStateInitialize();
     MagStateInitialize();
-    BaroStateInitialize();
     AirspeedStateInitialize();
     PositionStateInitialize();
     VelocityStateInitialize();
@@ -316,7 +314,7 @@ static void StateEstimationCb(void)
                 current = (filterPipeline *)newFilterChain;
                 bool error = 0;
                 while (current != NULL) {
-                    int32_t result = current->filter->init();
+                    int32_t result = current->filter->init((stateFilter *)current->filter);
                     if (result != 0) {
                         error = 1;
                         break;
@@ -340,7 +338,7 @@ static void StateEstimationCb(void)
 
         // most sensors get only rudimentary sanity checks
 #define SANITYCHECK3(sensorname, shortname, a1, a2, a3) \
-    if (ISSET(states.updated, shortname##_UPDATED)) { \
+    if (ISSET(states.updated, SENSORUPDATES_##shortname)) { \
         sensorname##Data s; \
         sensorname##Get(&s); \
         if (sane(s.a1) && sane(s.a2) && sane(s.a3)) { \
@@ -349,36 +347,36 @@ static void StateEstimationCb(void)
             states.shortname[2] = s.a3; \
         } \
         else { \
-            UNSET(states.updated, shortname##_UPDATED); \
+            UNSET(states.updated, SENSORUPDATES_##shortname); \
         } \
     }
-        SANITYCHECK3(GyroSensor, gyr, x, y, z);
-        SANITYCHECK3(AccelSensor, acc, x, y, z);
+        SANITYCHECK3(GyroSensor, gyro, x, y, z);
+        SANITYCHECK3(AccelSensor, accel, x, y, z);
         SANITYCHECK3(MagSensor, mag, x, y, z);
         SANITYCHECK3(GPSVelocity, vel, North, East, Down);
 #define SANITYCHECK1(sensorname, shortname, a1, EXTRACHECK) \
-    if (ISSET(states.updated, shortname##_UPDATED)) { \
+    if (ISSET(states.updated, SENSORUPDATES_##shortname)) { \
         sensorname##Data s; \
         sensorname##Get(&s); \
         if (sane(s.a1) && EXTRACHECK) { \
             states.shortname[0] = s.a1; \
         } \
         else { \
-            UNSET(states.updated, shortname##_UPDATED); \
+            UNSET(states.updated, SENSORUPDATES_##shortname); \
         } \
     }
-        SANITYCHECK1(BaroSensor, bar, Altitude, 1);
-        SANITYCHECK1(AirspeedSensor, air, CalibratedAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
-        states.air[1] = 0.0f; // sensor does not provide true airspeed, needs to be calculated by filter
+        SANITYCHECK1(BaroSensor, baro, Altitude, 1);
+        SANITYCHECK1(AirspeedSensor, airspeed, CalibratedAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
+        states.airspeed[1] = 0.0f; // sensor does not provide true airspeed, needs to be calculated by filter
 
         // GPS is a tiny bit more tricky as GPSPosition is not float (otherwise the conversion to NED could sit in a filter) but integers, for precision reasons
-        if (ISSET(states.updated, pos_UPDATED)) {
+        if (ISSET(states.updated, SENSORUPDATES_pos)) {
             GPSPositionData s;
             GPSPositionGet(&s);
             if (homeLocation.Set == HOMELOCATION_SET_TRUE && sane(s.Latitude) && sane(s.Longitude) && sane(s.Altitude) && (fabsf(s.Latitude) > 1e-5f || fabsf(s.Latitude) > 1e-5f || fabsf(s.Latitude) > 1e-5f)) {
                 getNED(&s, states.pos);
             } else {
-                UNSET(states.updated, pos_UPDATED);
+                UNSET(states.updated, SENSORUPDATES_pos);
             }
         }
 
@@ -395,7 +393,7 @@ static void StateEstimationCb(void)
     case RUNSTATE_FILTER:
 
         if (current != NULL) {
-            int32_t result = current->filter->filter(&states);
+            int32_t result = current->filter->filter((stateFilter *)current->filter, &states);
             if (result > alarm) {
                 alarm = result;
             }
@@ -413,7 +411,7 @@ static void StateEstimationCb(void)
 
         // the final output of filters is saved in state variables
 #define STORE3(statename, shortname, a1, a2, a3) \
-    if (ISSET(states.updated, shortname##_UPDATED)) { \
+    if (ISSET(states.updated, SENSORUPDATES_##shortname)) { \
         statename##Data s; \
         statename##Get(&s); \
         s.a1 = states.shortname[0]; \
@@ -421,36 +419,28 @@ static void StateEstimationCb(void)
         s.a3 = states.shortname[2]; \
         statename##Set(&s); \
     }
-        STORE3(GyroState, gyr, x, y, z);
-        STORE3(AccelState, acc, x, y, z);
+        STORE3(GyroState, gyro, x, y, z);
+        STORE3(AccelState, accel, x, y, z);
         STORE3(MagState, mag, x, y, z);
         STORE3(PositionState, pos, North, East, Down);
         STORE3(VelocityState, vel, North, East, Down);
 #define STORE2(statename, shortname, a1, a2) \
-    if (ISSET(states.updated, shortname##_UPDATED)) { \
+    if (ISSET(states.updated, SENSORUPDATES_##shortname)) { \
         statename##Data s; \
         statename##Get(&s); \
         s.a1 = states.shortname[0]; \
         s.a2 = states.shortname[1]; \
         statename##Set(&s); \
     }
-        STORE2(AirspeedState, air, CalibratedAirspeed, TrueAirspeed);
-#define STORE1(statename, shortname, a1) \
-    if (ISSET(states.updated, shortname##_UPDATED)) { \
-        statename##Data s; \
-        statename##Get(&s); \
-        s.a1 = states.shortname[0]; \
-        statename##Set(&s); \
-    }
-        STORE1(BaroState, bar, Altitude);
+        STORE2(AirspeedState, airspeed, CalibratedAirspeed, TrueAirspeed);
         // attitude nees manual conversion from quaternion to euler
-        if (ISSET(states.updated, att_UPDATED)) { \
+        if (ISSET(states.updated, SENSORUPDATES_attitude)) { \
             AttitudeStateData s;
             AttitudeStateGet(&s);
-            s.q1 = states.att[0];
-            s.q2 = states.att[1];
-            s.q3 = states.att[2];
-            s.q4 = states.att[3];
+            s.q1 = states.attitude[0];
+            s.q2 = states.attitude[1];
+            s.q3 = states.attitude[2];
+            s.q4 = states.attitude[3];
             Quaternion2RPY(&s.q1, &s.Roll);
             AttitudeStateSet(&s);
         }
@@ -528,31 +518,31 @@ static void sensorUpdatedCb(UAVObjEvent *ev)
     }
 
     if (ev->obj == GyroSensorHandle()) {
-        updatedSensors |= gyr_UPDATED;
+        updatedSensors |= SENSORUPDATES_gyro;
     }
 
     if (ev->obj == AccelSensorHandle()) {
-        updatedSensors |= acc_UPDATED;
+        updatedSensors |= SENSORUPDATES_accel;
     }
 
     if (ev->obj == MagSensorHandle()) {
-        updatedSensors |= mag_UPDATED;
+        updatedSensors |= SENSORUPDATES_mag;
     }
 
     if (ev->obj == GPSPositionHandle()) {
-        updatedSensors |= pos_UPDATED;
+        updatedSensors |= SENSORUPDATES_pos;
     }
 
     if (ev->obj == GPSVelocityHandle()) {
-        updatedSensors |= vel_UPDATED;
+        updatedSensors |= SENSORUPDATES_vel;
     }
 
     if (ev->obj == BaroSensorHandle()) {
-        updatedSensors |= bar_UPDATED;
+        updatedSensors |= SENSORUPDATES_baro;
     }
 
     if (ev->obj == AirspeedSensorHandle()) {
-        updatedSensors |= air_UPDATED;
+        updatedSensors |= SENSORUPDATES_airspeed;
     }
 
     DelayedCallbackDispatch(stateEstimationCallback);

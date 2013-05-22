@@ -44,25 +44,33 @@
 
 // Private constants
 
+#define STACK_REQUIRED 2048
 
 // Private types
+struct data {
+    EKFConfigurationData ekfConfiguration;
+    HomeLocationData     homeLocation;
+
+    bool    usePos;
+
+    int32_t init_stage;
+
+    stateEstimation work;
+
+    uint32_t ins_last_time;
+    bool     inited;
+};
 
 // Private variables
-static EKFConfigurationData ekfConfiguration;
-static HomeLocationData homeLocation;
-
 static bool initialized = 0;
-static bool first_run   = 1;
-static bool usePos = 0;
 
 
 // Private functions
 
-static int32_t init13i(void);
-static int32_t init13(void);
-static int32_t maininit(void);
-static int32_t filter(stateEstimation *state);
-static inline bool invalid(float data);
+static int32_t init13i(stateFilter *self);
+static int32_t init13(stateFilter *self);
+static int32_t maininit(stateFilter *self);
+static int32_t filter(stateFilter *self, stateEstimation *state);
 static inline bool invalid_var(float data);
 
 static void globalInit(void);
@@ -77,73 +85,90 @@ static void globalInit(void)
     }
 }
 
-void filterEKF13iInitialize(stateFilter *handle)
+int32_t filterEKF13iInitialize(stateFilter *handle)
 {
     globalInit();
-    handle->init   = &init13i;
-    handle->filter = &filter;
+    handle->init      = &init13i;
+    handle->filter    = &filter;
+    handle->localdata = pvPortMalloc(sizeof(struct data));
+    return STACK_REQUIRED;
 }
-void filterEKF13Initialize(stateFilter *handle)
+int32_t filterEKF13Initialize(stateFilter *handle)
 {
     globalInit();
-    handle->init   = &init13;
-    handle->filter = &filter;
+    handle->init      = &init13;
+    handle->filter    = &filter;
+    handle->localdata = pvPortMalloc(sizeof(struct data));
+    return STACK_REQUIRED;
 }
 // XXX
 // TODO: Until the 16 state EKF is implemented, run 13 state, so compilation runs through
 // XXX
-void filterEKF16iInitialize(stateFilter *handle)
+int32_t filterEKF16iInitialize(stateFilter *handle)
 {
     globalInit();
-    handle->init   = &init13i;
-    handle->filter = &filter;
+    handle->init      = &init13i;
+    handle->filter    = &filter;
+    handle->localdata = pvPortMalloc(sizeof(struct data));
+    return STACK_REQUIRED;
 }
-void filterEKF16Initialize(stateFilter *handle)
+int32_t filterEKF16Initialize(stateFilter *handle)
 {
     globalInit();
-    handle->init   = &init13;
-    handle->filter = &filter;
+    handle->init      = &init13;
+    handle->filter    = &filter;
+    handle->localdata = pvPortMalloc(sizeof(struct data));
+    return STACK_REQUIRED;
 }
 
 
-static int32_t init13i(void)
+static int32_t init13i(stateFilter *self)
 {
-    usePos = 0;
-    return maininit();
+    struct data *this = (struct data *)self->localdata;
+
+    this->usePos = 0;
+    return maininit(self);
 }
 
-static int32_t init13(void)
+static int32_t init13(stateFilter *self)
 {
-    usePos = 1;
-    return maininit();
+    struct data *this = (struct data *)self->localdata;
+
+    this->usePos = 1;
+    return maininit(self);
 }
 
-static int32_t maininit(void)
+static int32_t maininit(stateFilter *self)
 {
-    first_run = 1;
+    struct data *this = (struct data *)self->localdata;
 
-    EKFConfigurationGet(&ekfConfiguration);
+    this->inited        = false;
+    this->init_stage    = 0;
+    this->work.updated  = 0;
+    this->ins_last_time = PIOS_DELAY_GetRaw();
+
+    EKFConfigurationGet(&this->ekfConfiguration);
     int t;
     // plausibility check
     for (t = 0; t < EKFCONFIGURATION_P_NUMELEM; t++) {
-        if (invalid_var(ekfConfiguration.P[t])) {
+        if (invalid_var(this->ekfConfiguration.P[t])) {
             return 2;
         }
     }
     for (t = 0; t < EKFCONFIGURATION_Q_NUMELEM; t++) {
-        if (invalid_var(ekfConfiguration.Q[t])) {
+        if (invalid_var(this->ekfConfiguration.Q[t])) {
             return 2;
         }
     }
     for (t = 0; t < EKFCONFIGURATION_R_NUMELEM; t++) {
-        if (invalid_var(ekfConfiguration.R[t])) {
+        if (invalid_var(this->ekfConfiguration.R[t])) {
             return 2;
         }
     }
-    HomeLocationGet(&homeLocation);
+    HomeLocationGet(&this->homeLocation);
     // Don't require HomeLocation.Set to be true but at least require a mag configuration (allows easily
     // switching between indoor and outdoor mode with Set = false)
-    if ((homeLocation.Be[0] * homeLocation.Be[0] + homeLocation.Be[1] * homeLocation.Be[1] + homeLocation.Be[2] * homeLocation.Be[2] < 1e-5f)) {
+    if ((this->homeLocation.Be[0] * this->homeLocation.Be[0] + this->homeLocation.Be[1] * this->homeLocation.Be[1] + this->homeLocation.Be[2] * this->homeLocation.Be[2] < 1e-5f)) {
         return 2;
     }
 
@@ -154,14 +179,9 @@ static int32_t maininit(void)
 /**
  * Collect all required state variables, then run complementary filter
  */
-static int32_t filter(stateEstimation *state)
+static int32_t filter(stateFilter *self, stateEstimation *state)
 {
-    static int32_t init_stage;
-
-    static stateEstimation work;
-
-    static uint32_t ins_last_time = 0;
-    static bool inited;
+    struct data *this    = (struct data *)self->localdata;
 
     const float zeros[3] = { 0.0f, 0.0f, 0.0f };
 
@@ -169,58 +189,52 @@ static int32_t filter(stateEstimation *state)
     float dT;
     uint16_t sensors = 0;
 
-    if (inited) {
-        work.updated = 0;
-    }
-
-    if (first_run) {
-        first_run     = false;
-        inited        = false;
-        init_stage    = 0;
-
-        work.updated  = 0;
-
-        ins_last_time = PIOS_DELAY_GetRaw();
-
-        return 1;
-    }
-
-    work.updated |= state->updated;
+    this->work.updated |= state->updated;
 
     // Get most recent data
 #define UPDATE(shortname, num) \
-    if (ISSET(state->updated, shortname##_UPDATED)) { \
+    if (ISSET(state->updated, SENSORUPDATES_##shortname)) { \
         uint8_t t; \
         for (t = 0; t < num; t++) { \
-            work.shortname[t] = state->shortname[t]; \
+            this->work.shortname[t] = state->shortname[t]; \
         } \
     }
-    UPDATE(gyr, 3);
-    UPDATE(acc, 3);
+    UPDATE(gyro, 3);
+    UPDATE(accel, 3);
     UPDATE(mag, 3);
-    UPDATE(bar, 1);
+    UPDATE(baro, 1);
     UPDATE(pos, 3);
     UPDATE(vel, 3);
-    UPDATE(air, 2);
+    UPDATE(airspeed, 2);
 
+    // check whether mandatory updates are present accels must have been supplied already,
+    // and gyros must be supplied just now for a prediction step to take place
+    // ("gyros last" rule for multi object synchronization)
+    if (!(ISSET(this->work.updated, SENSORUPDATES_accel) && ISSET(state->updated, SENSORUPDATES_gyro))) {
+        UNSET(state->updated, SENSORUPDATES_pos);
+        UNSET(state->updated, SENSORUPDATES_vel);
+        UNSET(state->updated, SENSORUPDATES_attitude);
+        UNSET(state->updated, SENSORUPDATES_gyro);
+        return 0;
+    }
 
-    if (usePos) {
+    if (this->usePos) {
         GPSPositionData gpsData;
         GPSPositionGet(&gpsData);
         // Have a minimum requirement for gps usage
         if ((gpsData.Satellites < 7) ||
             (gpsData.PDOP > 4.0f) ||
             (gpsData.Latitude == 0 && gpsData.Longitude == 0) ||
-            (homeLocation.Set != HOMELOCATION_SET_TRUE)) {
-            UNSET(state->updated, pos_UPDATED);
-            UNSET(state->updated, vel_UPDATED);
-            UNSET(work.updated, pos_UPDATED);
-            UNSET(work.updated, vel_UPDATED);
+            (this->homeLocation.Set != HOMELOCATION_SET_TRUE)) {
+            UNSET(state->updated, SENSORUPDATES_pos);
+            UNSET(state->updated, SENSORUPDATES_vel);
+            UNSET(this->work.updated, SENSORUPDATES_pos);
+            UNSET(this->work.updated, SENSORUPDATES_vel);
         }
     }
 
-    dT = PIOS_DELAY_DiffuS(ins_last_time) / 1.0e6f;
-    ins_last_time = PIOS_DELAY_GetRaw();
+    dT = PIOS_DELAY_DiffuS(this->ins_last_time) / 1.0e6f;
+    this->ins_last_time = PIOS_DELAY_GetRaw();
 
     // This should only happen at start up or at mode switches
     if (dT > 0.01f) {
@@ -229,28 +243,28 @@ static int32_t filter(stateEstimation *state)
         dT = 0.001f;
     }
 
-    if (!inited && ISSET(work.updated, mag_UPDATED) && ISSET(work.updated, bar_UPDATED) && ISSET(work.updated, pos_UPDATED)) {
+    if (!this->inited && ISSET(this->work.updated, SENSORUPDATES_mag) && ISSET(this->work.updated, SENSORUPDATES_baro) && ISSET(this->work.updated, SENSORUPDATES_pos)) {
         // Don't initialize until all sensors are read
-        if (init_stage == 0) {
+        if (this->init_stage == 0) {
             // Reset the INS algorithm
             INSGPSInit();
-            INSSetMagVar((float[3]) { ekfConfiguration.R[EKFCONFIGURATION_R_MAGX],
-                                      ekfConfiguration.R[EKFCONFIGURATION_R_MAGY],
-                                      ekfConfiguration.R[EKFCONFIGURATION_R_MAGZ] }
+            INSSetMagVar((float[3]) { this->ekfConfiguration.R[EKFCONFIGURATION_R_MAGX],
+                                      this->ekfConfiguration.R[EKFCONFIGURATION_R_MAGY],
+                                      this->ekfConfiguration.R[EKFCONFIGURATION_R_MAGZ] }
                          );
-            INSSetAccelVar((float[3]) { ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELX],
-                                        ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELY],
-                                        ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELZ] }
+            INSSetAccelVar((float[3]) { this->ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELX],
+                                        this->ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELY],
+                                        this->ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELZ] }
                            );
-            INSSetGyroVar((float[3]) { ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROX],
-                                       ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROY],
-                                       ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROZ] }
+            INSSetGyroVar((float[3]) { this->ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROX],
+                                       this->ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROY],
+                                       this->ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROZ] }
                           );
-            INSSetGyroBiasVar((float[3]) { ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTX],
-                                           ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTY],
-                                           ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTZ] }
+            INSSetGyroBiasVar((float[3]) { this->ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTX],
+                                           this->ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTY],
+                                           this->ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTZ] }
                               );
-            INSSetBaroVar(ekfConfiguration.R[EKFCONFIGURATION_R_BAROZ]);
+            INSSetBaroVar(this->ekfConfiguration.R[EKFCONFIGURATION_R_BAROZ]);
 
             // Initialize the gyro bias
             float gyro_bias[3] = { 0.0f, 0.0f, 0.0f };
@@ -261,15 +275,15 @@ static int32_t filter(stateEstimation *state)
 
             // Set initial attitude. Use accels to determine roll and pitch, rotate magnetic measurement accordingly,
             // so pseudo "north" vector can be estimated even if the board is not level
-            attitudeState.Roll = atan2f(-work.acc[1], -work.acc[2]);
-            float zn  = cosf(attitudeState.Roll) * work.mag[2] + sinf(attitudeState.Roll) * work.mag[1];
-            float yn  = cosf(attitudeState.Roll) * work.mag[1] - sinf(attitudeState.Roll) * work.mag[2];
+            attitudeState.Roll = atan2f(-this->work.accel[1], -this->work.accel[2]);
+            float zn  = cosf(attitudeState.Roll) * this->work.mag[2] + sinf(attitudeState.Roll) * this->work.mag[1];
+            float yn  = cosf(attitudeState.Roll) * this->work.mag[1] - sinf(attitudeState.Roll) * this->work.mag[2];
 
             // rotate accels z vector according to roll
-            float azn = cosf(attitudeState.Roll) * work.acc[2] + sinf(attitudeState.Roll) * work.acc[1];
-            attitudeState.Pitch = atan2f(work.acc[0], -azn);
+            float azn = cosf(attitudeState.Roll) * this->work.accel[2] + sinf(attitudeState.Roll) * this->work.accel[1];
+            attitudeState.Pitch = atan2f(this->work.accel[0], -azn);
 
-            float xn  = cosf(attitudeState.Pitch) * work.mag[0] + sinf(attitudeState.Pitch) * zn;
+            float xn  = cosf(attitudeState.Pitch) * this->work.mag[0] + sinf(attitudeState.Pitch) * zn;
 
             attitudeState.Yaw = atan2f(-yn, xn);
             // TODO: This is still a hack
@@ -282,122 +296,125 @@ static int32_t filter(stateEstimation *state)
             attitudeState.Pitch = RAD2DEG(attitudeState.Pitch);
             attitudeState.Yaw   = RAD2DEG(attitudeState.Yaw);
 
-            RPY2Quaternion(&attitudeState.Roll, work.att);
+            RPY2Quaternion(&attitudeState.Roll, this->work.attitude);
 
-            INSSetState(work.pos, (float *)zeros, work.att, (float *)zeros, (float *)zeros);
+            INSSetState(this->work.pos, (float *)zeros, this->work.attitude, (float *)zeros, (float *)zeros);
 
-            INSResetP(ekfConfiguration.P);
+            INSResetP(this->ekfConfiguration.P);
         } else {
             // Run prediction a bit before any corrections
 
-            float gyros[3] = { DEG2RAD(work.gyr[0]), DEG2RAD(work.gyr[1]), DEG2RAD(work.gyr[2]) };
-            INSStatePrediction(gyros, work.acc, dT);
+            float gyros[3] = { DEG2RAD(this->work.gyro[0]), DEG2RAD(this->work.gyro[1]), DEG2RAD(this->work.gyro[2]) };
+            INSStatePrediction(gyros, this->work.accel, dT);
 
-            state->att[0]   = Nav.q[0];
-            state->att[1]   = Nav.q[1];
-            state->att[2]   = Nav.q[2];
-            state->att[3]   = Nav.q[3];
-            state->gyr[0]  += Nav.gyro_bias[0];
-            state->gyr[1]  += Nav.gyro_bias[1];
-            state->gyr[2]  += Nav.gyro_bias[2];
+            // Copy the attitude into the state
+            // NOTE: updating gyr correctly is valid, because this code is reached only when SENSORUPDATES_gyro is already true
+            state->attitude[0] = Nav.q[0];
+            state->attitude[1] = Nav.q[1];
+            state->attitude[2] = Nav.q[2];
+            state->attitude[3] = Nav.q[3];
+            state->gyro[0]    += Nav.gyro_bias[0];
+            state->gyro[1]    += Nav.gyro_bias[1];
+            state->gyro[2]    += Nav.gyro_bias[2];
             state->pos[0]   = Nav.Pos[0];
             state->pos[1]   = Nav.Pos[1];
             state->pos[2]   = Nav.Pos[2];
             state->vel[0]   = Nav.Vel[0];
             state->vel[1]   = Nav.Vel[1];
             state->vel[2]   = Nav.Vel[2];
-            state->updated |= att_UPDATED | pos_UPDATED | vel_UPDATED | gyr_UPDATED;
+            state->updated |= SENSORUPDATES_attitude | SENSORUPDATES_pos | SENSORUPDATES_vel;
         }
 
-        init_stage++;
-        if (init_stage > 10) {
-            inited = true;
+        this->init_stage++;
+        if (this->init_stage > 10) {
+            this->inited = true;
         }
 
         return 0;
     }
 
-    if (!inited) {
+    if (!this->inited) {
         return 1;
     }
 
-    float gyros[3] = { DEG2RAD(work.gyr[0]), DEG2RAD(work.gyr[1]), DEG2RAD(work.gyr[2]) };
+    float gyros[3] = { DEG2RAD(this->work.gyro[0]), DEG2RAD(this->work.gyro[1]), DEG2RAD(this->work.gyro[2]) };
 
     // Advance the state estimate
-    INSStatePrediction(gyros, work.acc, dT);
+    INSStatePrediction(gyros, this->work.accel, dT);
 
-    // Copy the attitude into the UAVO
-    state->att[0]   = Nav.q[0];
-    state->att[1]   = Nav.q[1];
-    state->att[2]   = Nav.q[2];
-    state->att[3]   = Nav.q[3];
-    state->gyr[0]  += Nav.gyro_bias[0];
-    state->gyr[1]  += Nav.gyro_bias[1];
-    state->gyr[2]  += Nav.gyro_bias[2];
+    // Copy the attitude into the state
+    // NOTE: updating gyr correctly is valid, because this code is reached only when SENSORUPDATES_gyro is already true
+    state->attitude[0] = Nav.q[0];
+    state->attitude[1] = Nav.q[1];
+    state->attitude[2] = Nav.q[2];
+    state->attitude[3] = Nav.q[3];
+    state->gyro[0]    += Nav.gyro_bias[0];
+    state->gyro[1]    += Nav.gyro_bias[1];
+    state->gyro[2]    += Nav.gyro_bias[2];
     state->pos[0]   = Nav.Pos[0];
     state->pos[1]   = Nav.Pos[1];
     state->pos[2]   = Nav.Pos[2];
     state->vel[0]   = Nav.Vel[0];
     state->vel[1]   = Nav.Vel[1];
     state->vel[2]   = Nav.Vel[2];
-    state->updated |= att_UPDATED | pos_UPDATED | vel_UPDATED | gyr_UPDATED;
+    state->updated |= SENSORUPDATES_attitude | SENSORUPDATES_pos | SENSORUPDATES_vel;
 
     // Advance the covariance estimate
     INSCovariancePrediction(dT);
 
-    if (ISSET(work.updated, mag_UPDATED)) {
+    if (ISSET(this->work.updated, SENSORUPDATES_mag)) {
         sensors |= MAG_SENSORS;
     }
 
-    if (ISSET(work.updated, bar_UPDATED)) {
+    if (ISSET(this->work.updated, SENSORUPDATES_baro)) {
         sensors |= BARO_SENSOR;
     }
 
-    INSSetMagNorth(homeLocation.Be);
+    INSSetMagNorth(this->homeLocation.Be);
 
-    if (!usePos) {
+    if (!this->usePos) {
         // position and velocity variance used in indoor mode
-        INSSetPosVelVar((float[3]) { ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
-                                     ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
-                                     ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR] },
-                        (float[3]) { ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR],
-                                     ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR],
-                                     ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR] }
+        INSSetPosVelVar((float[3]) { this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
+                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
+                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR] },
+                        (float[3]) { this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR],
+                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR],
+                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR] }
                         );
     } else {
         // position and velocity variance used in outdoor mode
-        INSSetPosVelVar((float[3]) { ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSNORTH],
-                                     ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSEAST],
-                                     ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSDOWN] },
-                        (float[3]) { ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELNORTH],
-                                     ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELEAST],
-                                     ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELDOWN] }
+        INSSetPosVelVar((float[3]) { this->ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSNORTH],
+                                     this->ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSEAST],
+                                     this->ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSDOWN] },
+                        (float[3]) { this->ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELNORTH],
+                                     this->ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELEAST],
+                                     this->ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELDOWN] }
                         );
     }
 
-    if (ISSET(work.updated, pos_UPDATED)) {
+    if (ISSET(this->work.updated, SENSORUPDATES_pos)) {
         sensors |= POS_SENSORS;
     }
 
-    if (ISSET(work.updated, vel_UPDATED)) {
+    if (ISSET(this->work.updated, SENSORUPDATES_vel)) {
         sensors |= HORIZ_SENSORS | VERT_SENSORS;
     }
 
-    if (ISSET(work.updated, air_UPDATED) && ((!ISSET(work.updated, vel_UPDATED) && !ISSET(work.updated, pos_UPDATED)) | !usePos)) {
+    if (ISSET(this->work.updated, SENSORUPDATES_airspeed) && ((!ISSET(this->work.updated, SENSORUPDATES_vel) && !ISSET(this->work.updated, SENSORUPDATES_pos)) | !this->usePos)) {
         // HACK: feed airspeed into EKF as velocity, treat wind as 1e2 variance
         sensors |= HORIZ_SENSORS | VERT_SENSORS;
-        INSSetPosVelVar((float[3]) { ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
-                                     ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
-                                     ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR] },
-                        (float[3]) { ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED],
-                                     ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED],
-                                     ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED] }
+        INSSetPosVelVar((float[3]) { this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
+                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
+                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR] },
+                        (float[3]) { this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED],
+                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED],
+                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED] }
                         );
         // rotate airspeed vector into NED frame - airspeed is measured in X axis only
         float R[3][3];
         Quaternion2R(Nav.q, R);
-        float vtas[3] = { work.air[1], 0.0f, 0.0f };
-        rot_mult(R, vtas, work.vel);
+        float vtas[3] = { this->work.airspeed[1], 0.0f, 0.0f };
+        rot_mult(R, vtas, this->work.vel);
     }
 
     /*
@@ -405,7 +422,7 @@ static int32_t filter(stateEstimation *state)
      * although probably should occur within INS itself
      */
     if (sensors) {
-        INSCorrection(work.mag, work.pos, work.vel, work.bar[0], sensors);
+        INSCorrection(this->work.mag, this->work.pos, this->work.vel, this->work.baro[0], sensors);
     }
 
     EKFStateVarianceData vardata;
@@ -413,22 +430,16 @@ static int32_t filter(stateEstimation *state)
     INSGetP(vardata.P);
     EKFStateVarianceSet(&vardata);
 
-    return 0;
-}
+    // all sensor data has been used, reset!
+    this->work.updated = 0;
 
-// check for invalid values
-static inline bool invalid(float data)
-{
-    if (isnan(data) || isinf(data)) {
-        return true;
-    }
-    return false;
+    return 0;
 }
 
 // check for invalid variance values
 static inline bool invalid_var(float data)
 {
-    if (invalid(data)) {
+    if (isnan(data) || isinf(data)) {
         return true;
     }
     if (data < 1e-15f) { // var should not be close to zero. And not negative either.

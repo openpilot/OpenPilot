@@ -44,34 +44,36 @@
 
 // Private constants
 
+#define STACK_REQUIRED 512
 
 // Private types
+struct data {
+    AttitudeSettingsData attitudeSettings;
+    HomeLocationData     homeLocation;
+    bool    first_run;
+    bool    useMag;
+    float   currentAccel[3];
+    float   currentMag[3];
+    float   gyroBias[3];
+    bool    accelUpdated;
+    bool    magUpdated;
+    float   accel_alpha;
+    bool    accel_filter_enabled;
+    int32_t timeval;
+    uint8_t init;
+};
 
 // Private variables
-static AttitudeSettingsData attitudeSettings;
+bool initialized = 0;
 static FlightStatusData flightStatus;
-static HomeLocationData homeLocation;
-
-static bool initialized = 0;
-static bool first_run   = 1;
-static bool useMag = 0;
-static float currentAccel[3];
-static float currentMag[3];
-static float gyroBias[3];
-static bool accelUpdated = 0;
-static bool magUpdated   = 0;
-
-
-static float accel_alpha = 0;
-static bool accel_filter_enabled = false;
 
 // Private functions
 
-static int32_t initwithmag(void);
-static int32_t initwithoutmag(void);
-static int32_t maininit(void);
-static int32_t filter(stateEstimation *state);
-static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], float q[4]);
+static int32_t initwithmag(stateFilter *self);
+static int32_t initwithoutmag(stateFilter *self);
+static int32_t maininit(stateFilter *self);
+static int32_t filter(stateFilter *self, stateEstimation *state);
+static int32_t complementaryFilter(struct data *this, float gyro[3], float accel[3], float mag[3], float attitude[4]);
 
 static void flightStatusUpdatedCb(UAVObjEvent *ev);
 
@@ -87,52 +89,62 @@ static void globalInit(void)
     }
 }
 
-void filterCFInitialize(stateFilter *handle)
+int32_t filterCFInitialize(stateFilter *handle)
 {
     globalInit();
-    handle->init   = &initwithoutmag;
-    handle->filter = &filter;
+    handle->init      = &initwithoutmag;
+    handle->filter    = &filter;
+    handle->localdata = pvPortMalloc(sizeof(struct data));
+    return STACK_REQUIRED;
 }
 
-void filterCFMInitialize(stateFilter *handle)
+int32_t filterCFMInitialize(stateFilter *handle)
 {
     globalInit();
-    handle->init   = &initwithmag;
-    handle->filter = &filter;
+    handle->init      = &initwithmag;
+    handle->filter    = &filter;
+    handle->localdata = pvPortMalloc(sizeof(struct data));
+    return STACK_REQUIRED;
 }
 
-static int32_t initwithmag(void)
+static int32_t initwithmag(stateFilter *self)
 {
-    useMag = 1;
-    return maininit();
+    struct data *this = (struct data *)self->localdata;
+
+    this->useMag = 1;
+    return maininit(self);
 }
 
-static int32_t initwithoutmag(void)
+static int32_t initwithoutmag(stateFilter *self)
 {
-    useMag = 0;
-    return maininit();
+    struct data *this = (struct data *)self->localdata;
+
+    this->useMag = 0;
+    return maininit(self);
 }
 
-static int32_t maininit(void)
+static int32_t maininit(stateFilter *self)
 {
-    first_run    = 1;
-    accelUpdated = 0;
-    AttitudeSettingsGet(&attitudeSettings);
-    HomeLocationGet(&homeLocation);
+    struct data *this = (struct data *)self->localdata;
+
+    this->first_run    = 1;
+    this->accelUpdated = 0;
+    AttitudeSettingsGet(&this->attitudeSettings);
+    HomeLocationGet(&this->homeLocation);
 
     const float fakeDt = 0.0025f;
-    if (attitudeSettings.AccelTau < 0.0001f) {
-        accel_alpha = 0; // not trusting this to resolve to 0
-        accel_filter_enabled = false;
+    if (this->attitudeSettings.AccelTau < 0.0001f) {
+        this->accel_alpha = 0; // not trusting this to resolve to 0
+        this->accel_filter_enabled = false;
     } else {
-        accel_alpha = expf(-fakeDt / attitudeSettings.AccelTau);
-        accel_filter_enabled = true;
+        this->accel_alpha = expf(-fakeDt / this->attitudeSettings.AccelTau);
+        this->accel_filter_enabled = true;
     }
 
     // reset gyro Bias
-    gyroBias[0] = 0.0f;
-    gyroBias[1] = 0.0f;
-    gyroBias[2] = 0.0f;
+    this->gyroBias[0] = 0.0f;
+    this->gyroBias[1] = 0.0f;
+    this->gyroBias[2] = 0.0f;
 
     return 0;
 }
@@ -140,47 +152,49 @@ static int32_t maininit(void)
 /**
  * Collect all required state variables, then run complementary filter
  */
-static int32_t filter(stateEstimation *state)
+static int32_t filter(stateFilter *self, stateEstimation *state)
 {
-    int32_t result = 0;
+    struct data *this = (struct data *)self->localdata;
 
-    if (ISSET(state->updated, mag_UPDATED)) {
-        magUpdated    = 1;
-        currentMag[0] = state->mag[0];
-        currentMag[1] = state->mag[1];
-        currentMag[2] = state->mag[2];
+    int32_t result    = 0;
+
+    if (ISSET(state->updated, SENSORUPDATES_mag)) {
+        this->magUpdated    = 1;
+        this->currentMag[0] = state->mag[0];
+        this->currentMag[1] = state->mag[1];
+        this->currentMag[2] = state->mag[2];
     }
-    if (ISSET(state->updated, acc_UPDATED)) {
-        accelUpdated    = 1;
-        currentAccel[0] = state->acc[0];
-        currentAccel[1] = state->acc[1];
-        currentAccel[2] = state->acc[2];
+    if (ISSET(state->updated, SENSORUPDATES_accel)) {
+        this->accelUpdated    = 1;
+        this->currentAccel[0] = state->accel[0];
+        this->currentAccel[1] = state->accel[1];
+        this->currentAccel[2] = state->accel[2];
     }
-    if (ISSET(state->updated, gyr_UPDATED)) {
-        if (accelUpdated) {
-            float att[4];
-            result = complementaryFilter(state->gyr, currentAccel, currentMag, att);
+    if (ISSET(state->updated, SENSORUPDATES_gyro)) {
+        if (this->accelUpdated) {
+            float attitude[4];
+            result = complementaryFilter(this, state->gyro, this->currentAccel, this->currentMag, attitude);
             if (!result) {
-                state->att[0]   = att[0];
-                state->att[1]   = att[1];
-                state->att[2]   = att[2];
-                state->att[3]   = att[3];
-                state->updated |= att_UPDATED;
+                state->attitude[0] = attitude[0];
+                state->attitude[1] = attitude[1];
+                state->attitude[2] = attitude[2];
+                state->attitude[3] = attitude[3];
+                state->updated    |= SENSORUPDATES_attitude;
             }
-            accelUpdated = 0;
-            magUpdated   = 0;
+            this->accelUpdated = 0;
+            this->magUpdated   = 0;
         }
     }
     return result;
 }
 
 
-static inline void apply_accel_filter(const float *raw, float *filtered)
+static inline void apply_accel_filter(const struct data *this, const float *raw, float *filtered)
 {
-    if (accel_filter_enabled) {
-        filtered[0] = filtered[0] * accel_alpha + raw[0] * (1 - accel_alpha);
-        filtered[1] = filtered[1] * accel_alpha + raw[1] * (1 - accel_alpha);
-        filtered[2] = filtered[2] * accel_alpha + raw[2] * (1 - accel_alpha);
+    if (this->accel_filter_enabled) {
+        filtered[0] = filtered[0] * this->accel_alpha + raw[0] * (1 - this->accel_alpha);
+        filtered[1] = filtered[1] * this->accel_alpha + raw[1] * (1 - this->accel_alpha);
+        filtered[2] = filtered[2] * this->accel_alpha + raw[2] * (1 - this->accel_alpha);
     } else {
         filtered[0] = raw[0];
         filtered[1] = raw[1];
@@ -188,19 +202,17 @@ static inline void apply_accel_filter(const float *raw, float *filtered)
     }
 }
 
-static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], float q[4])
+static int32_t complementaryFilter(struct data *this, float gyro[3], float accel[3], float mag[3], float attitude[4])
 {
-    static int32_t timeval;
     float dT;
-    static uint8_t init = 0;
     float magKp = 0.0f; // TODO: make this non hardcoded at some point
     float magKi = 0.000001f;
 
     // During initialization and
-    if (first_run) {
+    if (this->first_run) {
 #if defined(PIOS_INCLUDE_HMC5883)
         // wait until mags have been updated
-        if (!magUpdated) {
+        if (!this->magUpdated) {
             return 1;
         }
 #else
@@ -210,7 +222,7 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
 #endif
         AttitudeStateData attitudeState; // base on previous state
         AttitudeStateGet(&attitudeState);
-        init = 0;
+        this->init = 0;
 
         // Set initial attitude. Use accels to determine roll and pitch, rotate magnetic measurement accordingly,
         // so pseudo "north" vector can be estimated even if the board is not level
@@ -235,37 +247,37 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
         attitudeState.Pitch = RAD2DEG(attitudeState.Pitch);
         attitudeState.Yaw   = RAD2DEG(attitudeState.Yaw);
 
-        RPY2Quaternion(&attitudeState.Roll, q);
+        RPY2Quaternion(&attitudeState.Roll, attitude);
 
-        first_run = 0;
+        this->first_run = 0;
 
-        timeval   = PIOS_DELAY_GetRaw();
+        this->timeval   = PIOS_DELAY_GetRaw();
 
         return 0;
     }
 
-    if ((init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
+    if ((this->init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
         // For first 7 seconds use accels to get gyro bias
-        attitudeSettings.AccelKp     = 1.0f;
-        attitudeSettings.AccelKi     = 0.9f;
-        attitudeSettings.YawBiasRate = 0.23f;
+        this->attitudeSettings.AccelKp     = 1.0f;
+        this->attitudeSettings.AccelKi     = 0.9f;
+        this->attitudeSettings.YawBiasRate = 0.23f;
         magKp = 1.0f;
-    } else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
-        attitudeSettings.AccelKp     = 1.0f;
-        attitudeSettings.AccelKi     = 0.9f;
-        attitudeSettings.YawBiasRate = 0.23f;
+    } else if ((this->attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
+        this->attitudeSettings.AccelKp     = 1.0f;
+        this->attitudeSettings.AccelKi     = 0.9f;
+        this->attitudeSettings.YawBiasRate = 0.23f;
         magKp = 1.0f;
-        init = 0;
-    } else if (init == 0) {
+        this->init = 0;
+    } else if (this->init == 0) {
         // Reload settings (all the rates)
-        AttitudeSettingsGet(&attitudeSettings);
+        AttitudeSettingsGet(&this->attitudeSettings);
         magKp = 0.01f;
-        init  = 1;
+        this->init = 1;
     }
 
     // Compute the dT using the cpu clock
-    dT = PIOS_DELAY_DiffuS(timeval) / 1000000.0f;
-    timeval = PIOS_DELAY_GetRaw();
+    dT = PIOS_DELAY_DiffuS(this->timeval) / 1000000.0f;
+    this->timeval = PIOS_DELAY_GetRaw();
     if (dT < 0.001f) { // safe bounds
         dT = 0.001f;
     }
@@ -274,21 +286,21 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
     AttitudeStateGet(&attitudeState);
 
     // Get the current attitude estimate
-    quat_copy(&attitudeState.q1, q);
+    quat_copy(&attitudeState.q1, attitude);
 
     float accels_filtered[3];
     // Apply smoothing to accel values, to reduce vibration noise before main calculations.
-    apply_accel_filter(accel, accels_filtered);
+    apply_accel_filter(this, accel, accels_filtered);
 
     // Rotate gravity to body frame and cross with accels
     float grot[3];
-    grot[0] = -(2.0f * (q[1] * q[3] - q[0] * q[2]));
-    grot[1] = -(2.0f * (q[2] * q[3] + q[0] * q[1]));
-    grot[2] = -(q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
+    grot[0] = -(2.0f * (attitude[1] * attitude[3] - attitude[0] * attitude[2]));
+    grot[1] = -(2.0f * (attitude[2] * attitude[3] + attitude[0] * attitude[1]));
+    grot[2] = -(attitude[0] * attitude[0] - attitude[1] * attitude[1] - attitude[2] * attitude[2] + attitude[3] * attitude[3]);
 
     float grot_filtered[3];
     float accel_err[3];
-    apply_accel_filter(grot, grot_filtered);
+    apply_accel_filter(this, grot, grot_filtered);
     CrossProduct((const float *)accels_filtered, (const float *)grot_filtered, accel_err);
 
     // Account for accel magnitude
@@ -299,7 +311,7 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
 
     // Account for filtered gravity vector magnitude
     float grot_mag;
-    if (accel_filter_enabled) {
+    if (this->accel_filter_enabled) {
         grot_mag = sqrtf(grot_filtered[0] * grot_filtered[0] + grot_filtered[1] * grot_filtered[1] + grot_filtered[2] * grot_filtered[2]);
     } else {
         grot_mag = 1.0f;
@@ -313,14 +325,14 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
     accel_err[2] /= (accel_mag * grot_mag);
 
     float mag_err[3] = { 0.0f };
-    if (magUpdated && useMag) {
+    if (this->magUpdated && this->useMag) {
         // Rotate gravity to body frame and cross with accels
         float brot[3];
         float Rbe[3][3];
 
-        Quaternion2R(q, Rbe);
+        Quaternion2R(attitude, Rbe);
 
-        rot_mult(Rbe, homeLocation.Be, brot);
+        rot_mult(Rbe, this->homeLocation.Be, brot);
 
         float mag_len = sqrtf(mag[0] * mag[0] + mag[1] * mag[1] + mag[2] * mag[2]);
         mag[0]  /= mag_len;
@@ -343,57 +355,57 @@ static int32_t complementaryFilter(float gyro[3], float accel[3], float mag[3], 
     }
 
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
-    gyroBias[0] -= accel_err[0] * attitudeSettings.AccelKi;
-    gyroBias[1] -= accel_err[1] * attitudeSettings.AccelKi;
-    gyroBias[2] -= mag_err[2] * magKi;
+    this->gyroBias[0] -= accel_err[0] * this->attitudeSettings.AccelKi;
+    this->gyroBias[1] -= accel_err[1] * this->attitudeSettings.AccelKi;
+    this->gyroBias[2] -= mag_err[2] * magKi;
 
     // Correct rates based on integral coefficient
-    gyro[0]     -= gyroBias[0];
-    gyro[1]     -= gyroBias[1];
-    gyro[2]     -= gyroBias[2];
+    gyro[0] -= this->gyroBias[0];
+    gyro[1] -= this->gyroBias[1];
+    gyro[2] -= this->gyroBias[2];
 
     float gyrotmp[3] = { gyro[0], gyro[1], gyro[2] };
     // Correct rates based on proportional coefficient
-    gyrotmp[0] += accel_err[0] * attitudeSettings.AccelKp / dT;
-    gyrotmp[1] += accel_err[1] * attitudeSettings.AccelKp / dT;
-    if (useMag) {
-        gyrotmp[2] += accel_err[2] * attitudeSettings.AccelKp / dT + mag_err[2] * magKp / dT;
+    gyrotmp[0] += accel_err[0] * this->attitudeSettings.AccelKp / dT;
+    gyrotmp[1] += accel_err[1] * this->attitudeSettings.AccelKp / dT;
+    if (this->useMag) {
+        gyrotmp[2] += accel_err[2] * this->attitudeSettings.AccelKp / dT + mag_err[2] * magKp / dT;
     } else {
-        gyrotmp[2] += accel_err[2] * attitudeSettings.AccelKp / dT;
+        gyrotmp[2] += accel_err[2] * this->attitudeSettings.AccelKp / dT;
     }
 
     // Work out time derivative from INSAlgo writeup
     // Also accounts for the fact that gyros are in deg/s
     float qdot[4];
-    qdot[0] = DEG2RAD(-q[1] * gyrotmp[0] - q[2] * gyrotmp[1] - q[3] * gyrotmp[2]) * dT / 2;
-    qdot[1] = DEG2RAD(q[0] * gyrotmp[0] - q[3] * gyrotmp[1] + q[2] * gyrotmp[2]) * dT / 2;
-    qdot[2] = DEG2RAD(q[3] * gyrotmp[0] + q[0] * gyrotmp[1] - q[1] * gyrotmp[2]) * dT / 2;
-    qdot[3] = DEG2RAD(-q[2] * gyrotmp[0] + q[1] * gyrotmp[1] + q[0] * gyrotmp[2]) * dT / 2;
+    qdot[0]     = DEG2RAD(-attitude[1] * gyrotmp[0] - attitude[2] * gyrotmp[1] - attitude[3] * gyrotmp[2]) * dT / 2;
+    qdot[1]     = DEG2RAD(attitude[0] * gyrotmp[0] - attitude[3] * gyrotmp[1] + attitude[2] * gyrotmp[2]) * dT / 2;
+    qdot[2]     = DEG2RAD(attitude[3] * gyrotmp[0] + attitude[0] * gyrotmp[1] - attitude[1] * gyrotmp[2]) * dT / 2;
+    qdot[3]     = DEG2RAD(-attitude[2] * gyrotmp[0] + attitude[1] * gyrotmp[1] + attitude[0] * gyrotmp[2]) * dT / 2;
 
     // Take a time step
-    q[0]    = q[0] + qdot[0];
-    q[1]    = q[1] + qdot[1];
-    q[2]    = q[2] + qdot[2];
-    q[3]    = q[3] + qdot[3];
+    attitude[0] = attitude[0] + qdot[0];
+    attitude[1] = attitude[1] + qdot[1];
+    attitude[2] = attitude[2] + qdot[2];
+    attitude[3] = attitude[3] + qdot[3];
 
-    if (q[0] < 0.0f) {
-        q[0] = -q[0];
-        q[1] = -q[1];
-        q[2] = -q[2];
-        q[3] = -q[3];
+    if (attitude[0] < 0.0f) {
+        attitude[0] = -attitude[0];
+        attitude[1] = -attitude[1];
+        attitude[2] = -attitude[2];
+        attitude[3] = -attitude[3];
     }
 
     // Renomalize
-    float qmag = sqrtf(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
-    q[0] = q[0] / qmag;
-    q[1] = q[1] / qmag;
-    q[2] = q[2] / qmag;
-    q[3] = q[3] / qmag;
+    float qmag = sqrtf(attitude[0] * attitude[0] + attitude[1] * attitude[1] + attitude[2] * attitude[2] + attitude[3] * attitude[3]);
+    attitude[0] = attitude[0] / qmag;
+    attitude[1] = attitude[1] / qmag;
+    attitude[2] = attitude[2] / qmag;
+    attitude[3] = attitude[3] / qmag;
 
     // If quaternion has become inappropriately short or is nan reinit.
     // THIS SHOULD NEVER ACTUALLY HAPPEN
     if ((fabsf(qmag) < 1.0e-3f) || isnan(qmag)) {
-        first_run = 1;
+        this->first_run = 1;
         return 2;
     }
 

@@ -34,6 +34,8 @@
 
 // Private constants
 
+#define STACK_REQUIRED 64
+
 // low pass filter configuration to calculate offset
 // of barometric altitude sensor
 // reasoning: updates at: 10 Hz, tau= 300 s settle time
@@ -41,49 +43,57 @@
 #define BARO_OFFSET_LOWPASS_ALPHA 0.9997f
 
 // Private types
+struct data {
+    float baroOffset;
+    bool  first_run;
+};
 
 // Private variables
-static float baroOffset = 0.0f;
-static bool first_run   = 1;
 
 // Private functions
 
-static int32_t init(void);
-static int32_t filter(stateEstimation *state);
+static int32_t init(stateFilter *self);
+static int32_t filter(stateFilter *self, stateEstimation *state);
 
 
-void filterBaroInitialize(stateFilter *handle)
+int32_t filterBaroInitialize(stateFilter *handle)
 {
-    handle->init   = &init;
-    handle->filter = &filter;
+    handle->init      = &init;
+    handle->filter    = &filter;
+    handle->localdata = pvPortMalloc(sizeof(struct data));
+    return STACK_REQUIRED;
 }
 
-static int32_t init(void)
+static int32_t init(stateFilter *self)
 {
-    baroOffset = 0.0f;
-    first_run  = 1;
+    struct data *this = (struct data *)self->localdata;
+
+    this->baroOffset = 0.0f;
+    this->first_run  = 1;
     return 0;
 }
 
-static int32_t filter(stateEstimation *state)
+static int32_t filter(stateFilter *self, stateEstimation *state)
 {
-    if (first_run) {
+    struct data *this = (struct data *)self->localdata;
+
+    if (this->first_run) {
         // Initialize to current altitude reading at initial location
-        if (ISSET(state->updated, bar_UPDATED)) {
-            first_run  = 0;
-            baroOffset = state->bar[0];
+        if (ISSET(state->updated, SENSORUPDATES_baro)) {
+            this->first_run  = 0;
+            this->baroOffset = state->baro[0];
         }
     } else {
         // Track barometric altitude offset with a low pass filter
         // based on GPS altitude if available
-        if (ISSET(state->updated, pos_UPDATED)) {
-            baroOffset = BARO_OFFSET_LOWPASS_ALPHA * baroOffset +
-                         (1.0f - BARO_OFFSET_LOWPASS_ALPHA)
-                         * (-state->pos[2] - state->bar[0]);
+        if (ISSET(state->updated, SENSORUPDATES_pos)) {
+            this->baroOffset = BARO_OFFSET_LOWPASS_ALPHA * this->baroOffset +
+                               (1.0f - BARO_OFFSET_LOWPASS_ALPHA)
+                               * (-state->pos[2] - state->baro[0]);
         }
         // calculate bias corrected altitude
-        if (ISSET(state->updated, bar_UPDATED)) {
-            state->bar[0] -= baroOffset;
+        if (ISSET(state->updated, SENSORUPDATES_baro)) {
+            state->baro[0] -= this->baroOffset;
         }
     }
 

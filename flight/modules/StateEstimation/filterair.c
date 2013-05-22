@@ -43,38 +43,43 @@
 #define IAS2TAS(alt) (1.0f + (0.02f * (alt) / 304.8f))
 
 // Private types
-
-// Private variables
-static float altitude = 0.0f;
+struct data {
+    float altitude;
+};
 
 // Private functions
 
-static int32_t init(void);
-static int32_t filter(stateEstimation *state);
+static int32_t init(stateFilter *self);
+static int32_t filter(stateFilter *self, stateEstimation *state);
 
 
 int32_t filterAirInitialize(stateFilter *handle)
 {
-    handle->init   = &init;
-    handle->filter = &filter;
+    handle->init      = &init;
+    handle->filter    = &filter;
+    handle->localdata = pvPortMalloc(sizeof(struct data));
     return STACK_REQUIRED;
 }
 
-static int32_t init(void)
+static int32_t init(stateFilter *self)
 {
-    altitude = 0.0f;
+    struct data *this = (struct data *)self->localdata;
+
+    this->altitude = 0.0f;
     return 0;
 }
 
-static int32_t filter(stateEstimation *state)
+static int32_t filter(stateFilter *self, stateEstimation *state)
 {
+    struct data *this = (struct data *)self->localdata;
+
     // take static pressure altitude estimation for
     if (ISSET(state->updated, SENSORUPDATES_baro)) {
-        altitude = state->baro[0];
+        this->altitude = state->baro[0];
     }
     // calculate true airspeed estimation
     if (ISSET(state->updated, SENSORUPDATES_airspeed)) {
-        state->air[1] = state->airspeed[0] * IAS2TAS(altitude);
+        state->airspeed[1] = state->airspeed[0] * IAS2TAS(this->altitude);
     }
 
     return 0;

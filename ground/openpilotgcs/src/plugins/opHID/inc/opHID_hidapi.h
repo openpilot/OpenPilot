@@ -40,12 +40,6 @@
 #include "opHID_const.h"
 #include "opHID_global.h"
 
-struct hidapi_wrapper_device
-{
-    struct hid_device_info *list_ptr;
-    hid_device *handle;
-};
-
 
 class OPHID_EXPORT opHID_hidapi: public QObject
 {
@@ -58,8 +52,6 @@ public:
 
     ~opHID_hidapi();
 
-    int enumerate(int *devices_found);
-
     int open(int max, int vid, int pid, int usage_page, int usage);
 
     int receive(int, void *buf, int len, int timeout);
@@ -71,7 +63,10 @@ public:
     QString getserial(int num);
 
 private:
-    struct hidapi_wrapper_device hidapi_device;
+
+    int enumerate(struct hid_device_info **current_device_pptr, int *devices_found);
+
+    hid_device *handle;
 
     /** A mutex to protect hid write */
     QMutex hid_write_Mtx;

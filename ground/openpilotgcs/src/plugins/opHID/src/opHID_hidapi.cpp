@@ -43,8 +43,7 @@ opHID_hidapi::opHID_hidapi()
 {
     OPHID_TRACE("IN");
 
-    hidapi_device.list_ptr = NULL;
-    hidapi_device.handle = NULL;
+    handle = NULL;
 
     // Make sure hidapi lib is ready
     if (hid_init())
@@ -75,39 +74,44 @@ opHID_hidapi::~opHID_hidapi()
 *      in caller? because later we will do more parsing herer.
 *      WARNING: our vendor id is harcoded here (not good idea).
 *
+* \param[out] current_device_pptr Pointer to the list of device
 * \param[out] devices_found Number of devices found.
 * \return error.
 * \retval 0 on success.
 */
-int opHID_hidapi::enumerate(int *devices_found)
+int opHID_hidapi::enumerate(struct hid_device_info **current_device_pptr, int *devices_found)
 {
-	*devices_found = 0;
-	struct hid_device_info *current_device_ptr = NULL;
+    int retry = 5;
+    *devices_found = 0;
 
-	OPHID_TRACE("IN");
+    struct hid_device_info *current_device_ptr = NULL;
 
-	// Free any previous enumeration
-	if (hidapi_device.list_ptr)
-		hid_free_enumeration(hidapi_device.list_ptr);
+    OPHID_TRACE("IN");
 
-	// Enumerate	
-	hidapi_device.list_ptr = hid_enumerate(USB_VID, 0x0);
+    while(retry--)
+    {
+        // Enumerate	
+        *current_device_pptr = hid_enumerate(USB_VID, 0x0);
 
-	// Display the list of devices found (for debug)
-	current_device_ptr = hidapi_device.list_ptr; 
+        // Display the list of devices found (for debug)
+        current_device_ptr = *current_device_pptr;
 
         while (current_device_ptr) {
-                OPHID_DEBUG("HID Device Found");
-                OPHID_DEBUG("  type:............VID(%04hx).PID(%04hx)", current_device_ptr->vendor_id, current_device_ptr->product_id);
-                OPHID_DEBUG("  path:............%s", current_device_ptr->path);
-                OPHID_DEBUG("  Release:.........%hx", current_device_ptr->release_number);
-                OPHID_DEBUG("  Interface:.......%d", current_device_ptr->interface_number);
-                current_device_ptr = current_device_ptr->next;
-                (*devices_found)++;
+            OPHID_DEBUG("HID Device Found");
+            OPHID_DEBUG("  type:............VID(%04hx).PID(%04hx)", current_device_ptr->vendor_id, current_device_ptr->product_id);
+            OPHID_DEBUG("  path:............%s", current_device_ptr->path);
+            OPHID_DEBUG("  Release:.........%hx", current_device_ptr->release_number);
+            OPHID_DEBUG("  Interface:.......%d", current_device_ptr->interface_number);
+            current_device_ptr = current_device_ptr->next;
+            (*devices_found)++;
         }
 
-	OPHID_TRACE("OUT");
-        return OPHID_NO_ERROR;
+        if (*devices_found)
+            break;
+    }
+
+    OPHID_TRACE("OUT");
+    return OPHID_NO_ERROR;
 }
 
 
@@ -124,15 +128,17 @@ int opHID_hidapi::enumerate(int *devices_found)
 int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
 {
     int devices_found = false;
-    struct hid_device_info *current_device_ptr = NULL;	
+    struct hid_device_info *current_device_ptr = NULL;
+    struct hid_device_info *last_device_ptr = NULL;
+    struct hid_device_info **current_device_pptr = &current_device_ptr;
 
     OPHID_TRACE("IN");
 
     OPHID_DEBUG("max: %d, vid: 0x%X, pid: 0x%X, usage_page: %d, usage: %d.", max, vid, pid, usage_page, usage);
 
-    if (hidapi_device.handle)
+    if (handle)
     {
-        OPHID_WARNING("WARNING: device seems already open.");
+        OPHID_WARNING("HID device seems already open.");
     }
 
     // This is a hack to prevent changing all the callers (for now)
@@ -144,9 +150,9 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
     // If caller knows which one to look for open it right away
     if (vid != 0 && pid != 0)
     {
-        hidapi_device.handle = hid_open(vid, pid, NULL);
+        handle = hid_open(vid, pid, NULL);
 
-        if (!hidapi_device.handle)
+        if (!handle)
         {
             OPHID_ERROR("Unable to open device.");
             devices_found = false;
@@ -161,7 +167,7 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
     else
     {
         // Get the list of available hid devices
-        if (enumerate(&devices_found) != OPHID_NO_ERROR)
+        if (enumerate(current_device_pptr, &devices_found) != OPHID_NO_ERROR)
         {
             OPHID_ERROR("Error during enumeration");
             return 0;
@@ -169,23 +175,32 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
 
         if (devices_found)
         {
-            // Look for the first one of interest for now
-            current_device_ptr = hidapi_device.list_ptr;
+            // Look for the last one in the list
+            // WARNING: for now this prevent to have devices chained
+            last_device_ptr = current_device_ptr;
+            while (last_device_ptr->next)
+                last_device_ptr = last_device_ptr->next;
 
             OPHID_DEBUG("Opening device VID(%04hx).PID(%04hx)", 
-                      current_device_ptr->vendor_id, 
-                      current_device_ptr->product_id);
+                      last_device_ptr->vendor_id, 
+                      last_device_ptr->product_id);
             
-            hidapi_device.handle = hid_open(current_device_ptr->vendor_id,
-                                            current_device_ptr->product_id, 
-                                            NULL);
-            if (!hidapi_device.handle)
+            handle = hid_open(last_device_ptr->vendor_id,
+                              last_device_ptr->product_id, 
+                              NULL);
+
+            hid_free_enumeration(current_device_ptr);
+
+            if (!handle)
             {
                 OPHID_ERROR("Unable to open device.");    
                 devices_found = false;
             }
-  
-            hid_free_enumeration(hidapi_device.list_ptr);
+
+        }
+        else
+        {
+            OPHID_WARNING("Unable to find any HID device.");
         }
     }
 
@@ -229,14 +244,14 @@ int opHID_hidapi::receive(int num, void *buf, int len, int timeout)
         return OPHID_ERROR_PARAMETER;
     }
 
-    if (hidapi_device.handle == NULL)
+    if (handle == NULL)
     {
         OPHID_ERROR("Handle invalid.");
         return OPHID_ERROR_HANDLE;
     }
 
     hid_read_Mtx.lock();
-    bytes_read = hid_read(hidapi_device.handle, (unsigned char*)buf, len);
+    bytes_read = hid_read(handle, (unsigned char*)buf, len);
     hid_read_Mtx.unlock();
 
     // hidapi lib does not expose the libusb errors.
@@ -281,7 +296,7 @@ int opHID_hidapi::send(int num, void *buf, int len, int timeout)
         return OPHID_ERROR_PARAMETER;
     }
 
-    if (hidapi_device.handle == NULL)
+    if (handle == NULL)
     {
         OPHID_ERROR("Handle invalid.");
         return OPHID_ERROR_HANDLE;
@@ -291,7 +306,7 @@ int opHID_hidapi::send(int num, void *buf, int len, int timeout)
     while(retry--)
     {
         hid_write_Mtx.lock();
-        bytes_written = hid_write(hidapi_device.handle, (const unsigned char*)buf, len);
+        bytes_written = hid_write(handle, (const unsigned char*)buf, len);
         hid_write_Mtx.unlock();
         if (bytes_written >= 0)
         {
@@ -328,13 +343,13 @@ QString opHID_hidapi::getserial(int num)
 
     wchar_t buf[USB_MAX_STRING_SIZE];
     
-    if (hidapi_device.handle == NULL)
+    if (handle == NULL)
     {
         OPHID_ERROR("Handle invalid.");
         return QString("");
     }
 
-    if (hid_get_serial_number_string(hidapi_device.handle, buf, USB_MAX_STRING_SIZE) < 0)
+    if (hid_get_serial_number_string(handle, buf, USB_MAX_STRING_SIZE) < 0)
     {
         OPHID_ERROR("Unable to read serial number string.");
         return QString("");
@@ -359,8 +374,10 @@ void opHID_hidapi::close(int num)
 
     OPHID_TRACE("IN");
 
-    if (hidapi_device.handle)
-       hid_close(hidapi_device.handle);
+    if (handle)
+       hid_close(handle);
+
+    handle = NULL;
 
     OPHID_TRACE("OUT");
 }

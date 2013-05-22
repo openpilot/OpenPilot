@@ -33,25 +33,25 @@
 #include <openpilot.h>
 
 typedef enum {
-    gyr_UPDATED     = 1 << 0,
-        acc_UPDATED = 1 << 1,
-        mag_UPDATED = 1 << 2,
-        att_UPDATED = 1 << 3,
-        pos_UPDATED = 1 << 4,
-        vel_UPDATED = 1 << 5,
-        air_UPDATED = 1 << 6,
-        bar_UPDATED = 1 << 7,
+    SENSORUPDATES_gyro         = 1 << 0,
+        SENSORUPDATES_accel    = 1 << 1,
+        SENSORUPDATES_mag      = 1 << 2,
+        SENSORUPDATES_attitude = 1 << 3,
+        SENSORUPDATES_pos      = 1 << 4,
+        SENSORUPDATES_vel      = 1 << 5,
+        SENSORUPDATES_airspeed = 1 << 6,
+        SENSORUPDATES_baro     = 1 << 7,
 } sensorUpdates;
 
 typedef struct {
-    float gyr[3];
-    float acc[3];
+    float gyro[3];
+    float accel[3];
     float mag[3];
-    float att[4];
+    float attitude[4];
     float pos[3];
     float vel[3];
-    float air[2];
-    float bar[1];
+    float airspeed[2];
+    float baro[1];
     sensorUpdates updated;
 } stateEstimation;
 
@@ -60,20 +60,21 @@ typedef struct {
 
 
 typedef struct stateFilterStruct {
-    int32_t (*init)(void);
-    int32_t (*filter)(stateEstimation *state);
+    int32_t (*init)(struct stateFilterStruct *self);
+    int32_t (*filter)(struct stateFilterStruct *self, stateEstimation *state);
+    void *localdata;
 } stateFilter;
 
 
-void filterMagInitialize(stateFilter *handle);
-void filterBaroInitialize(stateFilter *handle);
-void filterAirInitialize(stateFilter *handle);
-void filterStationaryInitialize(stateFilter *handle);
-void filterCFInitialize(stateFilter *handle);
-void filterCFMInitialize(stateFilter *handle);
-void filterEKF13iInitialize(stateFilter *handle);
-void filterEKF13Initialize(stateFilter *handle);
-void filterEKF16iInitialize(stateFilter *handle);
-void filterEKF16Initialize(stateFilter *handle);
+int32_t filterMagInitialize(stateFilter *handle);
+int32_t filterBaroInitialize(stateFilter *handle);
+int32_t filterAirInitialize(stateFilter *handle);
+int32_t filterStationaryInitialize(stateFilter *handle);
+int32_t filterCFInitialize(stateFilter *handle);
+int32_t filterCFMInitialize(stateFilter *handle);
+int32_t filterEKF13iInitialize(stateFilter *handle);
+int32_t filterEKF13Initialize(stateFilter *handle);
+int32_t filterEKF16iInitialize(stateFilter *handle);
+int32_t filterEKF16Initialize(stateFilter *handle);
 
 #endif // STATEESTIMATION_H

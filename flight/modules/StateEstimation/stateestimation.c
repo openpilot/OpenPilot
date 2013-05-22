@@ -62,12 +62,12 @@
 
 // Private types
 
-struct filterQueueStruct;
+struct filterPipelineStruct;
 
-typedef struct filterQueueStruct {
-    stateFilter *filter;
-    struct filterQueueStruct *next;
-} filterQueue;
+typedef const struct filterPipelineStruct {
+    const stateFilter *filter;
+    const struct filterPipelineStruct *next;
+} filterPipeline;
 
 // Private variables
 static DelayedCallbackInfo *stateEstimationCallback;
@@ -76,8 +76,8 @@ static volatile RevoSettingsData revoSettings;
 static volatile HomeLocationData homeLocation;
 static float LLA2NEDM[3];
 static volatile sensorUpdates updatedSensors;
-static int32_t fusionAlgorithm  = -1;
-static filterQueue *filterChain = NULL;
+static int32_t fusionAlgorithm     = -1;
+static filterPipeline *filterChain = NULL;
 
 // different filters available to state estimation
 static stateFilter magFilter;
@@ -92,41 +92,41 @@ static stateFilter ekf16Filter;
 static stateFilter ekf16iFilter;
 
 // preconfigured filter chains selectable via revoSettings.FusionAlgorithm
-static const filterQueue *cfQueue = &(filterQueue) {
+static filterPipeline *cfQueue = &(filterPipeline) {
     .filter = &magFilter,
-    .next   = &(filterQueue) {
+    .next   = &(filterPipeline) {
         .filter = &airFilter,
-        .next   = &(filterQueue) {
+        .next   = &(filterPipeline) {
             .filter = &baroFilter,
-            .next   = &(filterQueue) {
+            .next   = &(filterPipeline) {
                 .filter = &cfFilter,
                 .next   = NULL,
             },
         }
     }
 };
-static const filterQueue *cfmQueue = &(filterQueue) {
+static const filterPipeline *cfmQueue = &(filterPipeline) {
     .filter = &magFilter,
-    .next   = &(filterQueue) {
+    .next   = &(filterPipeline) {
         .filter = &airFilter,
-        .next   = &(filterQueue) {
+        .next   = &(filterPipeline) {
             .filter = &baroFilter,
-            .next   = &(filterQueue) {
+            .next   = &(filterPipeline) {
                 .filter = &cfmFilter,
                 .next   = NULL,
             }
         }
     }
 };
-static const filterQueue *ekf13iQueue = &(filterQueue) {
+static const filterPipeline *ekf13iQueue = &(filterPipeline) {
     .filter = &magFilter,
-    .next   = &(filterQueue) {
+    .next   = &(filterPipeline) {
         .filter = &airFilter,
-        .next   = &(filterQueue) {
+        .next   = &(filterPipeline) {
             .filter = &baroFilter,
-            .next   = &(filterQueue) {
+            .next   = &(filterPipeline) {
                 .filter = &stationaryFilter,
-                .next   = &(filterQueue) {
+                .next   = &(filterPipeline) {
                     .filter = &ekf13iFilter,
                     .next   = NULL,
                 }
@@ -134,28 +134,28 @@ static const filterQueue *ekf13iQueue = &(filterQueue) {
         }
     }
 };
-static const filterQueue *ekf13Queue = &(filterQueue) {
+static const filterPipeline *ekf13Queue = &(filterPipeline) {
     .filter = &magFilter,
-    .next   = &(filterQueue) {
+    .next   = &(filterPipeline) {
         .filter = &airFilter,
-        .next   = &(filterQueue) {
+        .next   = &(filterPipeline) {
             .filter = &baroFilter,
-            .next   = &(filterQueue) {
+            .next   = &(filterPipeline) {
                 .filter = &ekf13Filter,
                 .next   = NULL,
             }
         }
     }
 };
-static const filterQueue *ekf16iQueue = &(filterQueue) {
+static const filterPipeline *ekf16iQueue = &(filterPipeline) {
     .filter = &magFilter,
-    .next   = &(filterQueue) {
+    .next   = &(filterPipeline) {
         .filter = &airFilter,
-        .next   = &(filterQueue) {
+        .next   = &(filterPipeline) {
             .filter = &baroFilter,
-            .next   = &(filterQueue) {
+            .next   = &(filterPipeline) {
                 .filter = &stationaryFilter,
-                .next   = &(filterQueue) {
+                .next   = &(filterPipeline) {
                     .filter = &ekf16iFilter,
                     .next   = NULL,
                 }
@@ -163,13 +163,13 @@ static const filterQueue *ekf16iQueue = &(filterQueue) {
         }
     }
 };
-static const filterQueue *ekf16Queue = &(filterQueue) {
+static const filterPipeline *ekf16Queue = &(filterPipeline) {
     .filter = &magFilter,
-    .next   = &(filterQueue) {
+    .next   = &(filterPipeline) {
         .filter = &airFilter,
-        .next   = &(filterQueue) {
+        .next   = &(filterPipeline) {
             .filter = &baroFilter,
-            .next   = &(filterQueue) {
+            .next   = &(filterPipeline) {
                 .filter = &ekf16Filter,
                 .next   = NULL,
             }
@@ -185,6 +185,13 @@ static void StateEstimationCb(void);
 static void getNED(GPSPositionData *gpsPosition, float *NED);
 static bool sane(float value);
 
+static inline int32_t maxint32_t(int32_t a, int2_t b)
+{
+    if (a > b) {
+        return a;
+    }
+    return b;
+}
 
 /**
  * Initialise the module.  Called before the start function
@@ -221,7 +228,20 @@ int32_t StateEstimationInitialize(void)
     GPSPositionConnectCallback(&sensorUpdatedCb);
     GPSVelocityConnectCallback(&sensorUpdatedCb);
 
-    stateEstimationCallback = DelayedCallbackCreate(&StateEstimationCb, CALLBACK_PRIORITY, TASK_PRIORITY, STACK_SIZE_BYTES);
+    uint32_t stack_required = STACK_SIZE_BYTES;
+    // Initialize Filters
+    stack_required = maxint32_t(stack_required, filterMagInitialize(&magFilter));
+    stack_required = maxint32_t(stack_required, filterBaroInitialize(&baroFilter));
+    stack_required = maxint32_t(stack_required, filterAirInitialize(&airFilter));
+    stack_required = maxint32_t(stack_required, filterStationaryInitialize(&stationaryFilter));
+    stack_required = maxint32_t(stack_required, filterCFInitialize(&cfFilter));
+    stack_required = maxint32_t(stack_required, filterCFMInitialize(&cfmFilter));
+    stack_required = maxint32_t(stack_required, filterEKF13iInitialize(&ekf13iFilter));
+    stack_required = maxint32_t(stack_required, filterEKF13Initialize(&ekf13Filter));
+    stack_required = maxint32_t(stack_required, filterEKF16Initialize(&ekf16Filter));
+    stack_required = maxint32_t(stack_required, filterEKF16iInitialize(&ekf16iFilter));
+
+    stateEstimationCallback = DelayedCallbackCreate(&StateEstimationCb, CALLBACK_PRIORITY, TASK_PRIORITY, stack_required);
 
     return 0;
 }
@@ -237,18 +257,6 @@ int32_t StateEstimationStart(void)
     // Force settings update to make sure rotation loaded
     settingsUpdatedCb(NULL);
 
-    // Initialize Filters
-    filterMagInitialize(&magFilter);
-    filterBaroInitialize(&baroFilter);
-    filterAirInitialize(&airFilter);
-    filterStationaryInitialize(&stationaryFilter);
-    filterCFInitialize(&cfFilter);
-    filterCFMInitialize(&cfmFilter);
-    filterEKF13iInitialize(&ekf13iFilter);
-    filterEKF13Initialize(&ekf13Filter);
-    filterEKF16Initialize(&ekf16Filter);
-    filterEKF16iInitialize(&ekf16iFilter);
-
     return 0;
 }
 
@@ -259,72 +267,78 @@ MODULE_INITCALL(StateEstimationInitialize, StateEstimationStart)
  */
 static void StateEstimationCb(void)
 {
-    // alarms flag
-    int8_t alarm = 0;
+    static enum { RUNSTATE_LOAD = 0, RUNSTATE_FILTER = 1, RUNSTATE_SAVE = 2 } runState = RUNSTATE_LOAD;
+    static int8_t alarm     = 0;
     static int8_t lastAlarm = -1;
     static uint16_t alarmcounter = 0;
+    static filterPipeline *current;
+    static stateEstimation states;
 
-    // set alarm to warning if called through timeout
-    if (updatedSensors == 0) {
-        alarm = 1;
-    }
+    switch (runState) {
+    case RUNSTATE_LOAD:
 
-    // check if a new filter chain should be initialized
-    if (fusionAlgorithm != revoSettings.FusionAlgorithm) {
-        FlightStatusData fs;
-        FlightStatusGet(&fs);
-        if (fs.Armed == FLIGHTSTATUS_ARMED_DISARMED || fusionAlgorithm == -1) {
-            const filterQueue *newFilterChain;
-            switch (revoSettings.FusionAlgorithm) {
-            case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARY:
-                newFilterChain = cfQueue;
-                break;
-            case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAG:
-                newFilterChain = cfmQueue;
-                break;
-            case REVOSETTINGS_FUSIONALGORITHM_INS13INDOOR:
-                newFilterChain = ekf13iQueue;
-                break;
-            case REVOSETTINGS_FUSIONALGORITHM_INS13OUTDOOR:
-                newFilterChain = ekf13Queue;
-                break;
-            case REVOSETTINGS_FUSIONALGORITHM_INS16INDOOR:
-                newFilterChain = ekf16iQueue;
-                break;
-            case REVOSETTINGS_FUSIONALGORITHM_INS16OUTDOOR:
-                newFilterChain = ekf16Queue;
-                break;
-            default:
-                newFilterChain = NULL;
-            }
-            // initialize filters in chain
-            filterQueue *current = (filterQueue *)newFilterChain;
-            bool error = 0;
-            while (current != NULL) {
-                int32_t result = current->filter->init();
-                if (result != 0) {
-                    error = 1;
+        alarm = 0;
+
+        // set alarm to warning if called through timeout
+        if (updatedSensors == 0) {
+            alarm = 1;
+        }
+
+        // check if a new filter chain should be initialized
+        if (fusionAlgorithm != revoSettings.FusionAlgorithm) {
+            FlightStatusData fs;
+            FlightStatusGet(&fs);
+            if (fs.Armed == FLIGHTSTATUS_ARMED_DISARMED || fusionAlgorithm == -1) {
+                const filterPipeline *newFilterChain;
+                switch (revoSettings.FusionAlgorithm) {
+                case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARY:
+                    newFilterChain = cfQueue;
                     break;
+                case REVOSETTINGS_FUSIONALGORITHM_COMPLEMENTARYMAG:
+                    newFilterChain = cfmQueue;
+                    break;
+                case REVOSETTINGS_FUSIONALGORITHM_INS13INDOOR:
+                    newFilterChain = ekf13iQueue;
+                    break;
+                case REVOSETTINGS_FUSIONALGORITHM_INS13OUTDOOR:
+                    newFilterChain = ekf13Queue;
+                    break;
+                case REVOSETTINGS_FUSIONALGORITHM_INS16INDOOR:
+                    newFilterChain = ekf16iQueue;
+                    break;
+                case REVOSETTINGS_FUSIONALGORITHM_INS16OUTDOOR:
+                    newFilterChain = ekf16Queue;
+                    break;
+                default:
+                    newFilterChain = NULL;
                 }
-                current = current->next;
-            }
-            if (error) {
-                AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-                return;
-            } else {
-                // set new fusion algortithm
-                filterChain     = (filterQueue *)newFilterChain;
-                fusionAlgorithm = revoSettings.FusionAlgorithm;
+                // initialize filters in chain
+                current = (filterPipeline *)newFilterChain;
+                bool error = 0;
+                while (current != NULL) {
+                    int32_t result = current->filter->init();
+                    if (result != 0) {
+                        error = 1;
+                        break;
+                    }
+                    current = current->next;
+                }
+                if (error) {
+                    AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+                    return;
+                } else {
+                    // set new fusion algortithm
+                    filterChain     = (filterPipeline *)newFilterChain;
+                    fusionAlgorithm = revoSettings.FusionAlgorithm;
+                }
             }
         }
-    }
 
-    // read updated sensor UAVObjects and set initial state
-    stateEstimation states;
-    states.updated  = updatedSensors;
-    updatedSensors ^= states.updated;
+        // read updated sensor UAVObjects and set initial state
+        states.updated  = updatedSensors;
+        updatedSensors ^= states.updated;
 
-    // most sensors get only rudimentary sanity checks
+        // most sensors get only rudimentary sanity checks
 #define SANITYCHECK3(sensorname, shortname, a1, a2, a3) \
     if (ISSET(states.updated, shortname##_UPDATED)) { \
         sensorname##Data s; \
@@ -338,10 +352,10 @@ static void StateEstimationCb(void)
             UNSET(states.updated, shortname##_UPDATED); \
         } \
     }
-    SANITYCHECK3(GyroSensor, gyr, x, y, z);
-    SANITYCHECK3(AccelSensor, acc, x, y, z);
-    SANITYCHECK3(MagSensor, mag, x, y, z);
-    SANITYCHECK3(GPSVelocity, vel, North, East, Down);
+        SANITYCHECK3(GyroSensor, gyr, x, y, z);
+        SANITYCHECK3(AccelSensor, acc, x, y, z);
+        SANITYCHECK3(MagSensor, mag, x, y, z);
+        SANITYCHECK3(GPSVelocity, vel, North, East, Down);
 #define SANITYCHECK1(sensorname, shortname, a1, EXTRACHECK) \
     if (ISSET(states.updated, shortname##_UPDATED)) { \
         sensorname##Data s; \
@@ -353,34 +367,51 @@ static void StateEstimationCb(void)
             UNSET(states.updated, shortname##_UPDATED); \
         } \
     }
-    SANITYCHECK1(BaroSensor, bar, Altitude, 1);
-    SANITYCHECK1(AirspeedSensor, air, CalibratedAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
-    states.air[1] = 0.0f; // sensor does not provide true airspeed, needs to be calculated by filter
+        SANITYCHECK1(BaroSensor, bar, Altitude, 1);
+        SANITYCHECK1(AirspeedSensor, air, CalibratedAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
+        states.air[1] = 0.0f; // sensor does not provide true airspeed, needs to be calculated by filter
 
-    // GPS is a tiny bit more tricky as GPSPosition is not float (otherwise the conversion to NED could sit in a filter) but integers, for precision reasons
-    if (ISSET(states.updated, pos_UPDATED)) {
-        GPSPositionData s;
-        GPSPositionGet(&s);
-        if (homeLocation.Set == HOMELOCATION_SET_TRUE && sane(s.Latitude) && sane(s.Longitude) && sane(s.Altitude) && (fabsf(s.Latitude) > 1e-5f || fabsf(s.Latitude) > 1e-5f || fabsf(s.Latitude) > 1e-5f)) {
-            getNED(&s, states.pos);
-        } else {
-            UNSET(states.updated, pos_UPDATED);
+        // GPS is a tiny bit more tricky as GPSPosition is not float (otherwise the conversion to NED could sit in a filter) but integers, for precision reasons
+        if (ISSET(states.updated, pos_UPDATED)) {
+            GPSPositionData s;
+            GPSPositionGet(&s);
+            if (homeLocation.Set == HOMELOCATION_SET_TRUE && sane(s.Latitude) && sane(s.Longitude) && sane(s.Altitude) && (fabsf(s.Latitude) > 1e-5f || fabsf(s.Latitude) > 1e-5f || fabsf(s.Latitude) > 1e-5f)) {
+                getNED(&s, states.pos);
+            } else {
+                UNSET(states.updated, pos_UPDATED);
+            }
         }
-    }
 
-    // at this point sensor state is stored in "states" with some rudimentary filtering applied
+        // at this point sensor state is stored in "states" with some rudimentary filtering applied
 
-    // apply all filters in the current filter chain
-    filterQueue *current = (filterQueue *)filterChain;
-    while (current != NULL) {
-        int32_t result = current->filter->filter(&states);
-        if (result > alarm) {
-            alarm = result;
+        // apply all filters in the current filter chain
+        current  = (filterPipeline *)filterChain;
+
+        // we are not done, re-dispatch self execution
+        runState = RUNSTATE_FILTER;
+        DelayedCallbackDispatch(stateEstimationCallback);
+        break;
+
+    case RUNSTATE_FILTER:
+
+        if (current != NULL) {
+            int32_t result = current->filter->filter(&states);
+            if (result > alarm) {
+                alarm = result;
+            }
+            current = current->next;
         }
-        current = current->next;
-    }
 
-    // the final output of filters is saved in state variables
+        // we are not done, re-dispatch self execution
+        if (!current) {
+            runState = RUNSTATE_SAVE;
+        }
+        DelayedCallbackDispatch(stateEstimationCallback);
+        break;
+
+    case RUNSTATE_SAVE:
+
+        // the final output of filters is saved in state variables
 #define STORE3(statename, shortname, a1, a2, a3) \
     if (ISSET(states.updated, shortname##_UPDATED)) { \
         statename##Data s; \
@@ -390,11 +421,11 @@ static void StateEstimationCb(void)
         s.a3 = states.shortname[2]; \
         statename##Set(&s); \
     }
-    STORE3(GyroState, gyr, x, y, z);
-    STORE3(AccelState, acc, x, y, z);
-    STORE3(MagState, mag, x, y, z);
-    STORE3(PositionState, pos, North, East, Down);
-    STORE3(VelocityState, vel, North, East, Down);
+        STORE3(GyroState, gyr, x, y, z);
+        STORE3(AccelState, acc, x, y, z);
+        STORE3(MagState, mag, x, y, z);
+        STORE3(PositionState, pos, North, East, Down);
+        STORE3(VelocityState, vel, North, East, Down);
 #define STORE2(statename, shortname, a1, a2) \
     if (ISSET(states.updated, shortname##_UPDATED)) { \
         statename##Data s; \
@@ -403,7 +434,7 @@ static void StateEstimationCb(void)
         s.a2 = states.shortname[1]; \
         statename##Set(&s); \
     }
-    STORE2(AirspeedState, air, CalibratedAirspeed, TrueAirspeed);
+        STORE2(AirspeedState, air, CalibratedAirspeed, TrueAirspeed);
 #define STORE1(statename, shortname, a1) \
     if (ISSET(states.updated, shortname##_UPDATED)) { \
         statename##Data s; \
@@ -411,45 +442,54 @@ static void StateEstimationCb(void)
         s.a1 = states.shortname[0]; \
         statename##Set(&s); \
     }
-    STORE1(BaroState, bar, Altitude);
-    // attitude nees manual conversion from quaternion to euler
-    if (ISSET(states.updated, att_UPDATED)) { \
-        AttitudeStateData s;
-        AttitudeStateGet(&s);
-        s.q1 = states.att[0];
-        s.q2 = states.att[1];
-        s.q3 = states.att[2];
-        s.q4 = states.att[3];
-        Quaternion2RPY(&s.q1, &s.Roll);
-        AttitudeStateSet(&s);
-    }
+        STORE1(BaroState, bar, Altitude);
+        // attitude nees manual conversion from quaternion to euler
+        if (ISSET(states.updated, att_UPDATED)) { \
+            AttitudeStateData s;
+            AttitudeStateGet(&s);
+            s.q1 = states.att[0];
+            s.q2 = states.att[1];
+            s.q3 = states.att[2];
+            s.q4 = states.att[3];
+            Quaternion2RPY(&s.q1, &s.Roll);
+            AttitudeStateSet(&s);
+        }
 
-    // throttle alarms, raise alarm flags immediately
-    // but require system to run for a while before decreasing
-    // to prevent alarm flapping
-    if (alarm >= lastAlarm) {
-        lastAlarm    = alarm;
-        alarmcounter = 0;
-    } else {
-        if (alarmcounter < 100) {
-            alarmcounter++;
-        } else {
+        // throttle alarms, raise alarm flags immediately
+        // but require system to run for a while before decreasing
+        // to prevent alarm flapping
+        if (alarm >= lastAlarm) {
             lastAlarm    = alarm;
             alarmcounter = 0;
+        } else {
+            if (alarmcounter < 100) {
+                alarmcounter++;
+            } else {
+                lastAlarm    = alarm;
+                alarmcounter = 0;
+            }
         }
-    }
 
-    // clear alarms if everything is alright, then schedule callback execution after timeout
-    if (lastAlarm == 1) {
-        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
-    } else if (lastAlarm == 2) {
-        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
-    } else if (lastAlarm >= 3) {
-        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
-    } else {
-        AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+        // clear alarms if everything is alright, then schedule callback execution after timeout
+        if (lastAlarm == 1) {
+            AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_WARNING);
+        } else if (lastAlarm == 2) {
+            AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+        } else if (lastAlarm >= 3) {
+            AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
+        } else {
+            AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
+        }
+
+        // we are done, re-schedule next self execution
+        runState = RUNSTATE_LOAD;
+        if (updatedSensors) {
+            DelayedCallbackDispatch(stateEstimationCallback);
+        } else {
+            DelayedCallbackSchedule(stateEstimationCallback, TIMEOUT_MS, CALLBACK_UPDATEMODE_SOONER);
+        }
+        break;
     }
-    DelayedCallbackSchedule(stateEstimationCallback, TIMEOUT_MS, CALLBACK_UPDATEMODE_SOONER);
 }
 
 

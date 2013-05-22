@@ -36,6 +36,8 @@
 
 // Private constants
 
+#define STACK_REQUIRED 64
+
 // simple IAS to TAS aproximation - 2% increase per 1000ft
 // since we do not have flowing air temperature information
 #define IAS2TAS(alt) (1.0f + (0.02f * (alt) / 304.8f))
@@ -51,10 +53,11 @@ static int32_t init(void);
 static int32_t filter(stateEstimation *state);
 
 
-void filterAirInitialize(stateFilter *handle)
+int32_t filterAirInitialize(stateFilter *handle)
 {
     handle->init   = &init;
     handle->filter = &filter;
+    return STACK_REQUIRED;
 }
 
 static int32_t init(void)
@@ -66,12 +69,12 @@ static int32_t init(void)
 static int32_t filter(stateEstimation *state)
 {
     // take static pressure altitude estimation for
-    if (ISSET(state->updated, bar_UPDATED)) {
-        altitude = state->bar[0];
+    if (ISSET(state->updated, SENSORUPDATES_baro)) {
+        altitude = state->baro[0];
     }
     // calculate true airspeed estimation
-    if (ISSET(state->updated, air_UPDATED)) {
-        state->air[1] = state->air[0] * IAS2TAS(altitude);
+    if (ISSET(state->updated, SENSORUPDATES_airspeed)) {
+        state->air[1] = state->airspeed[0] * IAS2TAS(altitude);
     }
 
     return 0;

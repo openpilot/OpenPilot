@@ -34,7 +34,6 @@
 
 #include <ekfconfiguration.h>
 #include <ekfstatevariance.h>
-#include <gpspositionsensor.h>
 #include <attitudestate.h>
 #include <homelocation.h>
 
@@ -216,21 +215,6 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         UNSET_MASK(state->updated, SENSORUPDATES_attitude);
         UNSET_MASK(state->updated, SENSORUPDATES_gyro);
         return 0;
-    }
-
-    if (this->usePos) {
-        GPSPositionSensorData gpsData;
-        GPSPositionSensorGet(&gpsData);
-        // Have a minimum requirement for gps usage
-        if ((gpsData.Satellites < 7) ||
-            (gpsData.PDOP > 4.0f) ||
-            (gpsData.Latitude == 0 && gpsData.Longitude == 0) ||
-            (this->homeLocation.Set != HOMELOCATION_SET_TRUE)) {
-            UNSET_MASK(state->updated, SENSORUPDATES_pos);
-            UNSET_MASK(state->updated, SENSORUPDATES_vel);
-            UNSET_MASK(this->work.updated, SENSORUPDATES_pos);
-            UNSET_MASK(this->work.updated, SENSORUPDATES_vel);
-        }
     }
 
     dT = PIOS_DELAY_DiffuS(this->ins_last_time) / 1.0e6f;

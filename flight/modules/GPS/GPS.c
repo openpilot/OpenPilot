@@ -262,7 +262,8 @@ static void gpsTask(__attribute__((unused)) void *parameters)
             // criteria for GPS-OK taken from this post...
             // http://forums.openpilot.org/topic/1523-professors-insgps-in-svn/page__view__findpost__p__5220
             if ((gpspositionsensor.PDOP < 3.5f) && (gpspositionsensor.Satellites >= 7) &&
-                (gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D)) {
+                (gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
+                (gpspositionsensor.Latitude != 0 || gpspositionsensor.Longitude != 0)) {
                 AlarmsClear(SYSTEMALARMS_ALARM_GPS);
 #ifdef PIOS_GPS_SETS_HOMELOCATION
                 HomeLocationData home;

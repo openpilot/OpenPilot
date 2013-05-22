@@ -156,8 +156,8 @@ void Simulator::onStart()
     attSettings   = AttitudeSettings::GetInstance(objManager);
     accelState    = AccelState::GetInstance(objManager);
     gyroState     = GyroState::GetInstance(objManager);
-    gpsPos = GPSPosition::GetInstance(objManager);
-    gpsVel = GPSVelocity::GetInstance(objManager);
+    gpsPos = GPSPositionSensor::GetInstance(objManager);
+    gpsVel = GPSVelocitySensor::GetInstance(objManager);
     telStats      = GCSTelemetryStats::GetInstance(objManager);
     groundTruth   = GroundTruth::GetInstance(objManager);
 
@@ -633,8 +633,8 @@ void Simulator::updateUAVOs(Output2Hardware out)
         if (gpsPosTime.msecsTo(currentTime) >= settings.gpsPosRate) {
             qDebug() << " GPS time:" << gpsPosTime << ", currentTime: " << currentTime << ", difference: " << gpsPosTime.msecsTo(currentTime);
             // Update GPS Position objects
-            GPSPosition::DataFields gpsPosData;
-            memset(&gpsPosData, 0, sizeof(GPSPosition::DataFields));
+            GPSPositionSensor::DataFields gpsPosData;
+            memset(&gpsPosData, 0, sizeof(GPSPositionSensor::DataFields));
             gpsPosData.Altitude        = out.altitude + noise.gpsPosData.Altitude;
             gpsPosData.Heading         = out.heading + noise.gpsPosData.Heading;
             gpsPosData.Groundspeed     = out.groundspeed + noise.gpsPosData.Groundspeed;
@@ -644,13 +644,13 @@ void Simulator::updateUAVOs(Output2Hardware out)
             gpsPosData.PDOP = 3.0;
             gpsPosData.VDOP = gpsPosData.PDOP * 1.5;
             gpsPosData.Satellites      = 10;
-            gpsPosData.Status = GPSPosition::STATUS_FIX3D;
+            gpsPosData.Status = GPSPositionSensor::STATUS_FIX3D;
 
             gpsPos->setData(gpsPosData);
 
             // Update GPS Velocity.{North,East,Down}
-            GPSVelocity::DataFields gpsVelData;
-            memset(&gpsVelData, 0, sizeof(GPSVelocity::DataFields));
+            GPSVelocitySensor::DataFields gpsVelData;
+            memset(&gpsVelData, 0, sizeof(GPSVelocitySensor::DataFields));
             gpsVelData.North = out.velNorth + noise.gpsVelData.North;
             gpsVelData.East  = out.velEast + noise.gpsVelData.East;
             gpsVelData.Down  = out.velDown + noise.gpsVelData.Down;

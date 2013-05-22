@@ -34,7 +34,7 @@
 
 #include <ekfconfiguration.h>
 #include <ekfstatevariance.h>
-#include <gpsposition.h>
+#include <gpspositionsensor.h>
 #include <attitudestate.h>
 #include <homelocation.h>
 
@@ -219,8 +219,8 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     }
 
     if (this->usePos) {
-        GPSPositionData gpsData;
-        GPSPositionGet(&gpsData);
+        GPSPositionSensorData gpsData;
+        GPSPositionSensorGet(&gpsData);
         // Have a minimum requirement for gps usage
         if ((gpsData.Satellites < 7) ||
             (gpsData.PDOP > 4.0f) ||

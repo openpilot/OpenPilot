@@ -53,8 +53,6 @@
 #include "flightstatus.h"
 #include "pathstatus.h"
 #include "airspeedstate.h"
-#include "gpsvelocity.h"
-#include "gpsposition.h"
 #include "fixedwingpathfollowersettings.h"
 #include "fixedwingpathfollowerstatus.h"
 #include "homelocation.h"

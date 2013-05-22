@@ -87,9 +87,9 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/taskinfo.c
     SRC += $(OPUAVSYNTHDIR)/mixerstatus.c
     SRC += $(OPUAVSYNTHDIR)/homelocation.c
-    SRC += $(OPUAVSYNTHDIR)/gpsposition.c
+    SRC += $(OPUAVSYNTHDIR)/gpspositionsensor.c
     SRC += $(OPUAVSYNTHDIR)/gpssatellites.c
-    SRC += $(OPUAVSYNTHDIR)/gpsvelocity.c
+    SRC += $(OPUAVSYNTHDIR)/gpsvelocitysensor.c
     SRC += $(OPUAVSYNTHDIR)/gpstime.c
     SRC += $(OPUAVSYNTHDIR)/osdsettings.c
     SRC += $(OPUAVSYNTHDIR)/barosensor.c

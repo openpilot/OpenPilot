@@ -170,11 +170,11 @@ void PFDGadgetWidget::connectNeedles()
     }
 
     if (gcsGPSStats) {
-        gpsObj = dynamic_cast<UAVDataObject *>(objManager->getObject("GPSPosition"));
+        gpsObj = dynamic_cast<UAVDataObject *>(objManager->getObject("GPSPositionSensor"));
         if (gpsObj != NULL) {
             connect(gpsObj, SIGNAL(objectUpdated(UAVObject *)), this, SLOT(updateGPS(UAVObject *)));
         } else {
-            qDebug() << "Error: Object is unknown (GPSPosition).";
+            qDebug() << "Error: Object is unknown (GPSPositionSensor).";
         }
     }
 

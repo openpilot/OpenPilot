@@ -58,8 +58,8 @@
 #include "barosensor.h"
 #include "gyrosensor.h"
 #include "flightstatus.h"
-#include "gpsposition.h"
-#include "gpsvelocity.h"
+#include "gpspositionsensor.h"
+#include "gpsvelocitysensor.h"
 #include "homelocation.h"
 #include "sensor.h"
 #include "ratedesired.h"
@@ -111,8 +111,8 @@ int32_t SensorsInitialize(void)
     AirspeedSensorInitialize();
     GyroSensorInitialize();
     // GyrosBiasInitialize();
-    GPSPositionInitialize();
-    GPSVelocityInitialize();
+    GPSPositionSensorInitialize();
+    GPSVelocitySensorInitialize();
     MagSensorInitialize();
     MagBiasInitialize();
     RevoCalibrationInitialize();
@@ -243,12 +243,12 @@ static void simulateConstant()
     baroSensor.Altitude = 1;
     BaroSensorSet(&baroSensor);
 
-    GPSPositionData gpsPosition;
-    GPSPositionGet(&gpsPosition);
+    GPSPositionSensorData gpsPosition;
+    GPSPositionSensorGet(&gpsPosition);
     gpsPosition.Latitude  = 0;
     gpsPosition.Longitude = 0;
     gpsPosition.Altitude  = 0;
-    GPSPositionSet(&gpsPosition);
+    GPSPositionSensorSet(&gpsPosition);
 
     // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
     // and make it average zero (weakly)
@@ -305,12 +305,12 @@ static void simulateModelAgnostic()
     baroSensor.Altitude = 1;
     BaroSensorSet(&baroSensor);
 
-    GPSPositionData gpsPosition;
-    GPSPositionGet(&gpsPosition);
+    GPSPositionSensorData gpsPosition;
+    GPSPositionSensorGet(&gpsPosition);
     gpsPosition.Latitude  = 0;
     gpsPosition.Longitude = 0;
     gpsPosition.Altitude  = 0;
-    GPSPositionSet(&gpsPosition);
+    GPSPositionSensorSet(&gpsPosition);
 
     // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
     // and make it average zero (weakly)
@@ -500,8 +500,8 @@ static void simulateModelQuadcopter()
         gps_drift[1] = gps_drift[1] * 0.95 + rand_gauss() / 10.0;
         gps_drift[2] = gps_drift[2] * 0.95 + rand_gauss() / 10.0;
 
-        GPSPositionData gpsPosition;
-        GPSPositionGet(&gpsPosition);
+        GPSPositionSensorData gpsPosition;
+        GPSPositionSensorGet(&gpsPosition);
         gpsPosition.Latitude    = homeLocation.Latitude + ((pos[0] + gps_drift[0]) / T[0] * 10.0e6);
         gpsPosition.Longitude   = homeLocation.Longitude + ((pos[1] + gps_drift[1]) / T[1] * 10.0e6);
         gpsPosition.Altitude    = homeLocation.Altitude + ((pos[2] + gps_drift[2]) / T[2]);
@@ -509,19 +509,19 @@ static void simulateModelQuadcopter()
         gpsPosition.Heading     = 180 / M_PI * atan2(vel[1] + gps_vel_drift[1], vel[0] + gps_vel_drift[0]);
         gpsPosition.Satellites  = 7;
         gpsPosition.PDOP = 1;
-        GPSPositionSet(&gpsPosition);
+        GPSPositionSensorSet(&gpsPosition);
         last_gps_time    = PIOS_DELAY_GetRaw();
     }
 
     // Update GPS Velocity measurements
     static uint32_t last_gps_vel_time = 1000; // Delay by a millisecond
     if (PIOS_DELAY_DiffuS(last_gps_vel_time) / 1.0e6 > GPS_PERIOD) {
-        GPSVelocityData gpsVelocity;
-        GPSVelocityGet(&gpsVelocity);
+        GPSVelocitySensorData gpsVelocity;
+        GPSVelocitySensorGet(&gpsVelocity);
         gpsVelocity.North = vel[0] + gps_vel_drift[0];
         gpsVelocity.East  = vel[1] + gps_vel_drift[1];
         gpsVelocity.Down  = vel[2] + gps_vel_drift[2];
-        GPSVelocitySet(&gpsVelocity);
+        GPSVelocitySensorSet(&gpsVelocity);
         last_gps_vel_time = PIOS_DELAY_GetRaw();
     }
 
@@ -783,8 +783,8 @@ static void simulateModelAirplane()
         gps_drift[1] = gps_drift[1] * 0.95 + rand_gauss() / 10.0;
         gps_drift[2] = gps_drift[2] * 0.95 + rand_gauss() / 10.0;
 
-        GPSPositionData gpsPosition;
-        GPSPositionGet(&gpsPosition);
+        GPSPositionSensorData gpsPosition;
+        GPSPositionSensorGet(&gpsPosition);
         gpsPosition.Latitude    = homeLocation.Latitude + ((pos[0] + gps_drift[0]) / T[0] * 10.0e6);
         gpsPosition.Longitude   = homeLocation.Longitude + ((pos[1] + gps_drift[1]) / T[1] * 10.0e6);
         gpsPosition.Altitude    = homeLocation.Altitude + ((pos[2] + gps_drift[2]) / T[2]);
@@ -792,19 +792,19 @@ static void simulateModelAirplane()
         gpsPosition.Heading     = 180 / M_PI * atan2(vel[1] + gps_vel_drift[1], vel[0] + gps_vel_drift[0]);
         gpsPosition.Satellites  = 7;
         gpsPosition.PDOP = 1;
-        GPSPositionSet(&gpsPosition);
+        GPSPositionSensorSet(&gpsPosition);
         last_gps_time    = PIOS_DELAY_GetRaw();
     }
 
     // Update GPS Velocity measurements
     static uint32_t last_gps_vel_time = 1000; // Delay by a millisecond
     if (PIOS_DELAY_DiffuS(last_gps_vel_time) / 1.0e6 > GPS_PERIOD) {
-        GPSVelocityData gpsVelocity;
-        GPSVelocityGet(&gpsVelocity);
+        GPSVelocitySensorData gpsVelocity;
+        GPSVelocitySensorGet(&gpsVelocity);
         gpsVelocity.North = vel[0] + gps_vel_drift[0];
         gpsVelocity.East  = vel[1] + gps_vel_drift[1];
         gpsVelocity.Down  = vel[2] + gps_vel_drift[2];
-        GPSVelocitySet(&gpsVelocity);
+        GPSVelocitySensorSet(&gpsVelocity);
         last_gps_vel_time = PIOS_DELAY_GetRaw();
     }
 

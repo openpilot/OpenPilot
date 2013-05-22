@@ -50,7 +50,7 @@
 
 #include "positionstate.h"
 #include "homelocation.h"
-#include "gpsposition.h"
+#include "gpspositionsensor.h"
 #include "gyrostate.h"
 #include "attitudestate.h"
 #include "positionstate.h"
@@ -579,10 +579,10 @@ void OPMapGadgetWidget::updatePosition()
 
     // *************
     // get the current GPS position and heading
-    GPSPosition *gpsPositionObj = GPSPosition::GetInstance(obm);
+    GPSPositionSensor *gpsPositionObj = GPSPositionSensor::GetInstance(obm);
     Q_ASSERT(gpsPositionObj);
 
-    GPSPosition::DataFields gpsPositionData = gpsPositionObj->getData();
+    GPSPositionSensor::DataFields gpsPositionData = gpsPositionObj->getData();
 
     gps_heading   = gpsPositionData.Heading;
     gps_latitude  = gpsPositionData.Latitude;
@@ -2236,7 +2236,7 @@ double OPMapGadgetWidget::getUAV_Yaw()
     return yaw;
 }
 
-bool OPMapGadgetWidget::getGPSPosition(double &latitude, double &longitude, double &altitude)
+bool OPMapGadgetWidget::getGPSPositionSensor(double &latitude, double &longitude, double &altitude)
 {
     double LLA[3];
 
@@ -2244,7 +2244,7 @@ bool OPMapGadgetWidget::getGPSPosition(double &latitude, double &longitude, doub
         return false;
     }
 
-    if (obum->getGPSPosition(LLA) < 0) {
+    if (obum->getGPSPositionSensor(LLA) < 0) {
         return false; // error
     }
     latitude  = LLA[0];

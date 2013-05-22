@@ -96,7 +96,7 @@ using namespace osgEarth::Annotation;
 #include "utils/worldmagmodel.h"
 #include "utils/coordinateconversions.h"
 #include "attitudestate.h"
-#include "gpsposition.h"
+#include "gpspositionsensor.h"
 #include "homelocation.h"
 #include "positionstate.h"
 #include "systemsettings.h"
@@ -270,8 +270,8 @@ void OsgViewerWidget::paintEvent(QPaintEvent *event)
         CoordinateConversions().NED2LLA_HomeLLA(homeLLA, NED, LLA);
         uavPos->getLocator()->setPosition(osg::Vec3d(LLA[1], LLA[0], LLA[2])); // Note this takes longtitude first
     } else {
-        GPSPosition *gpsPosObj = GPSPosition::GetInstance(objMngr);
-        GPSPosition::DataFields gpsPos = gpsPosObj->getData();
+        GPSPositionSensor *gpsPosObj = GPSPositionSensor::GetInstance(objMngr);
+        GPSPositionSensor::DataFields gpsPos = gpsPosObj->getData();
         uavPos->getLocator()->setPosition(osg::Vec3d(gpsPos.Longitude / 10.0e6, gpsPos.Latitude / 10.0e6, gpsPos.Altitude));
     }
 

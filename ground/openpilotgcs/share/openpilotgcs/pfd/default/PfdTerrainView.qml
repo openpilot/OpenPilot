@@ -12,9 +12,9 @@ OsgEarth {
     roll: AttitudeState.Roll
 
     latitude: qmlWidget.actualPositionUsed ?
-                  GPSPosition.Latitude/10000000.0 : qmlWidget.latitude
+                  GPSPositionSensor.Latitude/10000000.0 : qmlWidget.latitude
     longitude: qmlWidget.actualPositionUsed ?
-                   GPSPosition.Longitude/10000000.0 : qmlWidget.longitude
+                   GPSPositionSensor.Longitude/10000000.0 : qmlWidget.longitude
     altitude: qmlWidget.actualPositionUsed ?
-                  GPSPosition.Altitude : qmlWidget.altitude
+                  GPSPositionSensor.Altitude : qmlWidget.altitude
 }

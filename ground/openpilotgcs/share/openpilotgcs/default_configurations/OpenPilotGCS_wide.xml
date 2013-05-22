@@ -449,7 +449,7 @@
           <dialForegroundID>foreground</dialForegroundID>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>GPSPosition</needle1DataObject>
+          <needle1DataObject>GPSPositionSensor</needle1DataObject>
           <needle1Factor>3.6</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
@@ -551,7 +551,7 @@
           <dialFile>%%DATAPATH%%dials/default/speed.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>GPSPosition</needle1DataObject>
+          <needle1DataObject>GPSPositionSensor</needle1DataObject>
           <needle1Factor>3.6</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
@@ -750,7 +750,7 @@
           <dialFile>%%DATAPATH%%dials/hi-contrast/speed.svg</dialFile>
           <dialNeedleID1>needle</dialNeedleID1>
           <font>MS Shell Dlg 2,8.25,-1,5,50,0,0,0,0,0</font>
-          <needle1DataObject>GPSPosition</needle1DataObject>
+          <needle1DataObject>GPSPositionSensor</needle1DataObject>
           <needle1Factor>3.6</needle1Factor>
           <needle1MaxValue>120</needle1MaxValue>
           <needle1MinValue>0</needle1MinValue>
@@ -1219,7 +1219,7 @@
           <minValue>0</minValue>
           <redMax>0</redMax>
           <redMin>0</redMin>
-          <sourceDataObject>GPSPosition</sourceDataObject>
+          <sourceDataObject>GPSPositionSensor</sourceDataObject>
           <sourceObjectField>Satellites</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>0</yellowMax>
@@ -1242,7 +1242,7 @@
           <minValue>0</minValue>
           <redMax>33</redMax>
           <redMin>0</redMin>
-          <sourceDataObject>GPSPosition</sourceDataObject>
+          <sourceDataObject>GPSPositionSensor</sourceDataObject>
           <sourceObjectField>Status</sourceObjectField>
           <useOpenGLFlag>false</useOpenGLFlag>
           <yellowMax>66</yellowMax>

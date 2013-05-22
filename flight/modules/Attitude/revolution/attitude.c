@@ -59,8 +59,8 @@
 #include "attitudesettings.h"
 #include "barosensor.h"
 #include "flightstatus.h"
-#include "gpsposition.h"
-#include "gpsvelocity.h"
+#include "gpspositionsensor.h"
+#include "gpsvelocitysensor.h"
 #include "gyrostate.h"
 #include "gyrosensor.h"
 #include "homelocation.h"
@@ -123,7 +123,7 @@ static int32_t updateAttitudeComplementary(bool first_run);
 static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode);
 static void settingsUpdatedCb(UAVObjEvent *objEv);
 
-static int32_t getNED(GPSPositionData *gpsPosition, float *NED);
+static int32_t getNED(GPSPositionSensorData *gpsPosition, float *NED);
 
 static void magOffsetEstimation(MagSensorData *mag);
 
@@ -172,8 +172,8 @@ int32_t AttitudeInitialize(void)
     AirspeedSensorInitialize();
     AirspeedStateInitialize();
     BaroSensorInitialize();
-    GPSPositionInitialize();
-    GPSVelocityInitialize();
+    GPSPositionSensorInitialize();
+    GPSVelocitySensorInitialize();
     AttitudeSettingsInitialize();
     AttitudeStateInitialize();
     PositionStateInitialize();
@@ -233,8 +233,8 @@ int32_t AttitudeStart(void)
     MagSensorConnectQueue(magQueue);
     AirspeedSensorConnectQueue(airspeedQueue);
     BaroSensorConnectQueue(baroQueue);
-    GPSPositionConnectQueue(gpsQueue);
-    GPSVelocityConnectQueue(gpsVelQueue);
+    GPSPositionSensorConnectQueue(gpsQueue);
+    GPSVelocitySensorConnectQueue(gpsVelQueue);
 
     return 0;
 }
@@ -541,8 +541,8 @@ static int32_t updateAttitudeComplementary(bool first_run)
     if (xQueueReceive(gpsQueue, &ev, 0) == pdTRUE && homeLocation.Set == HOMELOCATION_SET_TRUE) {
         float NED[3];
         // Transform the GPS position into NED coordinates
-        GPSPositionData gpsPosition;
-        GPSPositionGet(&gpsPosition);
+        GPSPositionSensorData gpsPosition;
+        GPSPositionSensorGet(&gpsPosition);
         getNED(&gpsPosition, NED);
 
         PositionStateData positionState;
@@ -555,8 +555,8 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
     if (xQueueReceive(gpsVelQueue, &ev, 0) == pdTRUE) {
         // Transform the GPS position into NED coordinates
-        GPSVelocityData gpsVelocity;
-        GPSVelocityGet(&gpsVelocity);
+        GPSVelocitySensorData gpsVelocity;
+        GPSVelocitySensorGet(&gpsVelocity);
 
         VelocityStateData velocityState;
         VelocityStateGet(&velocityState);
@@ -615,8 +615,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     MagStateData magData;
     AirspeedSensorData airspeedData;
     BaroSensorData baroData;
-    GPSPositionData gpsData;
-    GPSVelocityData gpsVelData;
+    GPSPositionSensorData gpsData;
+    GPSVelocitySensorData gpsVelData;
 
     static bool mag_updated = false;
     static bool baro_updated;
@@ -677,13 +677,13 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     airspeed_updated |= xQueueReceive(airspeedQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE;
 
     // Check if we are running simulation
-    if (!GPSPositionReadOnly()) {
+    if (!GPSPositionSensorReadOnly()) {
         gps_updated |= (xQueueReceive(gpsQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
     } else {
         gps_updated |= pdTRUE && outdoor_mode;
     }
 
-    if (!GPSVelocityReadOnly()) {
+    if (!GPSVelocitySensorReadOnly()) {
         gps_vel_updated |= (xQueueReceive(gpsVelQueue, &ev, 0 / portTICK_RATE_MS) == pdTRUE) && outdoor_mode;
     } else {
         gps_vel_updated |= pdTRUE && outdoor_mode;
@@ -708,8 +708,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
     BaroSensorGet(&baroData);
     AirspeedSensorGet(&airspeedData);
-    GPSPositionGet(&gpsData);
-    GPSVelocityGet(&gpsVelData);
+    GPSPositionSensorGet(&gpsData);
+    GPSVelocitySensorGet(&gpsVelData);
 
 // TODO: put in separate filter
     AccelStateData accelState;
@@ -845,8 +845,8 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
             float pos[3] = { 0.0f, 0.0f, 0.0f };
 
             if (outdoor_mode) {
-                GPSPositionData gpsPosition;
-                GPSPositionGet(&gpsPosition);
+                GPSPositionSensorData gpsPosition;
+                GPSPositionSensorGet(&gpsPosition);
 
                 // Transform the GPS position into NED coordinates
                 getNED(&gpsPosition, pos);
@@ -1074,7 +1074,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
  * @returns 0 for success, -1 for failure
  */
 float T[3];
-static int32_t getNED(GPSPositionData *gpsPosition, float *NED)
+static int32_t getNED(GPSPositionSensorData *gpsPosition, float *NED)
 {
     float dL[3] = { DEG2RAD((gpsPosition->Latitude - homeLocation.Latitude) / 10.0e6f),
                     DEG2RAD((gpsPosition->Longitude - homeLocation.Longitude) / 10.0e6f),

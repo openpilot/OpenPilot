@@ -99,8 +99,8 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/attitudesettings.c
     SRC += $(OPUAVSYNTHDIR)/camerastabsettings.c
     SRC += $(OPUAVSYNTHDIR)/cameradesired.c
-    SRC += $(OPUAVSYNTHDIR)/gpsposition.c
-    SRC += $(OPUAVSYNTHDIR)/gpsvelocity.c
+    SRC += $(OPUAVSYNTHDIR)/gpspositionsensor.c
+    SRC += $(OPUAVSYNTHDIR)/gpsvelocitysensor.c
     SRC += $(OPUAVSYNTHDIR)/hwsettings.c
     SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
     SRC += $(OPUAVSYNTHDIR)/receiveractivity.c

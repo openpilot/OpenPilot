@@ -49,8 +49,8 @@
 #include "flightstatus.h"
 #include "gcsreceiver.h"
 #include "gcstelemetrystats.h"
-#include "gpsposition.h"
-#include "gpsvelocity.h"
+#include "gpspositionsensor.h"
+#include "gpsvelocitysensor.h"
 #include "groundtruth.h"
 #include "gyrostate.h"
 #include "homelocation.h"
@@ -326,8 +326,8 @@ protected:
     AttitudeState *attState;
     AttitudeSettings *attSettings;
     VelocityState *velState;
-    GPSPosition *gpsPos;
-    GPSVelocity *gpsVel;
+    GPSPositionSensor *gpsPos;
+    GPSVelocitySensor *gpsVel;
     PositionState *posState;
     HomeLocation *posHome;
     AccelState *accelState;

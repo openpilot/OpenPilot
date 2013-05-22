@@ -35,7 +35,7 @@
 #include "osdgen.h"
 
 #include "attitudestate.h"
-#include "gpsposition.h"
+#include "gpspositionsensor.h"
 #include "homelocation.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
@@ -2036,8 +2036,8 @@ void calcHomeArrow(int16_t m_yaw)
     HomeLocationData home;
 
     HomeLocationGet(&home);
-    GPSPositionData gpsData;
-    GPSPositionGet(&gpsData);
+    GPSPositionSensorData gpsData;
+    GPSPositionSensorGet(&gpsData);
 
     /** http://www.movable-type.co.uk/scripts/latlong.html **/
     float lat1, lat2, lon1, lon2, a, c, d, x, y, brng, u2g;
@@ -2139,8 +2139,8 @@ void updateGraphics()
     OsdSettingsGet(&OsdSettings);
     AttitudeStateData attitude;
     AttitudeStateGet(&attitude);
-    GPSPositionData gpsData;
-    GPSPositionGet(&gpsData);
+    GPSPositionSensorData gpsData;
+    GPSPositionSensorGet(&gpsData);
     HomeLocationData home;
     HomeLocationGet(&home);
     BaroSensorData baro;
@@ -2421,7 +2421,7 @@ int32_t osdgenInitialize(void)
 {
     AttitudeStateInitialize();
 #ifdef PIOS_INCLUDE_GPS
-    GPSPositionInitialize();
+    GPSPositionSensorInitialize();
 #if !defined(PIOS_GPS_MINIMAL)
     GPSTimeInitialize();
     GPSSatellitesInitialize();

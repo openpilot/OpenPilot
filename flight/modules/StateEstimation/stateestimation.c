@@ -36,8 +36,8 @@
 #include <magsensor.h>
 #include <barosensor.h>
 #include <airspeedsensor.h>
-#include <gpsposition.h>
-#include <gpsvelocity.h>
+#include <gpspositionsensor.h>
+#include <gpsvelocitysensor.h>
 
 #include <gyrostate.h>
 #include <accelstate.h>
@@ -181,7 +181,7 @@ static const filterPipeline *ekf16Queue = &(filterPipeline) {
 static void settingsUpdatedCb(UAVObjEvent *objEv);
 static void sensorUpdatedCb(UAVObjEvent *objEv);
 static void StateEstimationCb(void);
-static void getNED(GPSPositionData *gpsPosition, float *NED);
+static void getNED(GPSPositionSensorData *gpsPosition, float *NED);
 static bool sane(float value);
 
 static inline int32_t maxint32_t(int32_t a, int32_t b)
@@ -205,8 +205,8 @@ int32_t StateEstimationInitialize(void)
     MagSensorInitialize();
     BaroSensorInitialize();
     AirspeedSensorInitialize();
-    GPSPositionInitialize();
-    GPSVelocityInitialize();
+    GPSPositionSensorInitialize();
+    GPSVelocitySensorInitialize();
 
     GyroStateInitialize();
     AccelStateInitialize();
@@ -223,8 +223,8 @@ int32_t StateEstimationInitialize(void)
     MagSensorConnectCallback(&sensorUpdatedCb);
     BaroSensorConnectCallback(&sensorUpdatedCb);
     AirspeedSensorConnectCallback(&sensorUpdatedCb);
-    GPSPositionConnectCallback(&sensorUpdatedCb);
-    GPSVelocityConnectCallback(&sensorUpdatedCb);
+    GPSPositionSensorConnectCallback(&sensorUpdatedCb);
+    GPSVelocitySensorConnectCallback(&sensorUpdatedCb);
 
     uint32_t stack_required = STACK_SIZE_BYTES;
     // Initialize Filters
@@ -353,7 +353,7 @@ static void StateEstimationCb(void)
         SANITYCHECK3(GyroSensor, gyro, x, y, z);
         SANITYCHECK3(AccelSensor, accel, x, y, z);
         SANITYCHECK3(MagSensor, mag, x, y, z);
-        SANITYCHECK3(GPSVelocity, vel, North, East, Down);
+        SANITYCHECK3(GPSVelocitySensor, vel, North, East, Down);
 #define SANITYCHECK1(sensorname, shortname, a1, EXTRACHECK) \
     if (ISSET(states.updated, SENSORUPDATES_##shortname)) { \
         sensorname##Data s; \
@@ -369,10 +369,10 @@ static void StateEstimationCb(void)
         SANITYCHECK1(AirspeedSensor, airspeed, CalibratedAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
         states.airspeed[1] = 0.0f; // sensor does not provide true airspeed, needs to be calculated by filter
 
-        // GPS is a tiny bit more tricky as GPSPosition is not float (otherwise the conversion to NED could sit in a filter) but integers, for precision reasons
+        // GPS is a tiny bit more tricky as GPSPositionSensor is not float (otherwise the conversion to NED could sit in a filter) but integers, for precision reasons
         if (ISSET(states.updated, SENSORUPDATES_pos)) {
-            GPSPositionData s;
-            GPSPositionGet(&s);
+            GPSPositionSensorData s;
+            GPSPositionSensorGet(&s);
             if (homeLocation.Set == HOMELOCATION_SET_TRUE && sane(s.Latitude) && sane(s.Longitude) && sane(s.Altitude) && (fabsf(s.Latitude) > 1e-5f || fabsf(s.Latitude) > 1e-5f || fabsf(s.Latitude) > 1e-5f)) {
                 getNED(&s, states.pos);
             } else {
@@ -529,11 +529,11 @@ static void sensorUpdatedCb(UAVObjEvent *ev)
         updatedSensors |= SENSORUPDATES_mag;
     }
 
-    if (ev->obj == GPSPositionHandle()) {
+    if (ev->obj == GPSPositionSensorHandle()) {
         updatedSensors |= SENSORUPDATES_pos;
     }
 
-    if (ev->obj == GPSVelocityHandle()) {
+    if (ev->obj == GPSVelocitySensorHandle()) {
         updatedSensors |= SENSORUPDATES_vel;
     }
 
@@ -557,7 +557,7 @@ static void sensorUpdatedCb(UAVObjEvent *ev)
  * @param[out] NED frame coordinates
  * @returns 0 for success, -1 for failure
  */
-static void getNED(GPSPositionData *gpsPosition, float *NED)
+static void getNED(GPSPositionSensorData *gpsPosition, float *NED)
 {
     float dL[3] = { DEG2RAD((gpsPosition->Latitude - homeLocation.Latitude) / 10.0e6f),
                     DEG2RAD((gpsPosition->Longitude - homeLocation.Longitude) / 10.0e6f),

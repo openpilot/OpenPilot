@@ -1829,7 +1829,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location/>
-        <source>GPSPosition</source>
+        <source>GPSPositionSensor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

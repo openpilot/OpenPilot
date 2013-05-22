@@ -52,7 +52,7 @@ QmlViewGadgetWidget::QmlViewGadgetWidget(QWidget *parent) :
     objectsToExport << "VelocityState" <<
         "PositionState" <<
         "AttitudeState" <<
-        "GPSPosition" <<
+        "GPSPositionSensor" <<
         "GCSTelemetryStats" <<
         "FlightBatteryState";
 

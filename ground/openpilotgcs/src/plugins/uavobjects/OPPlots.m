@@ -10,9 +10,9 @@ function OPPlots()
           [VelocityState.East]
           [VelocityState.Down]]/100;
 
-    TimeGPSPos = [GPSPosition.timestamp]/1000;
-    Vgps=[[GPSPosition.Groundspeed].*cos([GPSPosition.Heading]*pi/180)
-          [GPSPosition.Groundspeed].*sin([GPSPosition.Heading]*pi/180)];
+    TimeGPSPos = [GPSPositionSensor.timestamp]/1000;
+    Vgps=[[GPSPositionSensor.Groundspeed].*cos([GPSPositionSensor.Heading]*pi/180)
+          [GPSPositionSensor.Groundspeed].*sin([GPSPositionSensor.Heading]*pi/180)];
 
     figure(1);
     plot(TimeVA,VA(1,:),TimeVA,VA(2,:),TimeGPSPos,Vgps(1,:),TimeGPSPos,Vgps(2,:));
@@ -30,10 +30,10 @@ function OPPlots()
           [PositionState.East]
           [PositionState.Down]]/100;
 
-    TimeGPSPos = [GPSPosition.timestamp]/1000;
-    LLA=[[GPSPosition.Latitude]*1e-7;
-         [GPSPosition.Longitude]*1e-7;
-         [GPSPosition.Altitude]+[GPSPosition.GeoidSeparation]];
+    TimeGPSPos = [GPSPositionSensor.timestamp]/1000;
+    LLA=[[GPSPositionSensor.Latitude]*1e-7;
+         [GPSPositionSensor.Longitude]*1e-7;
+         [GPSPositionSensor.Altitude]+[GPSPositionSensor.GeoidSeparation]];
     BaseECEF = LLA2ECEF([HomeLocation.Latitude*1e-7, HomeLocation.Longitude*1e-7, HomeLocation.Altitude]');
     Rne = RneFromLLA([HomeLocation.Latitude*1e-7, HomeLocation.Longitude*1e-7, HomeLocation.Altitude]');
     GPSPos=LLA2Base(LLA,BaseECEF,Rne); 

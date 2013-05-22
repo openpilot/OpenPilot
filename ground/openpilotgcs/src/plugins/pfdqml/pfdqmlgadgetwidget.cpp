@@ -55,7 +55,7 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
         "VelocityDesired" <<
         "PositionDesired" <<
         "AttitudeHoldDesired" <<
-        "GPSPosition" <<
+        "GPSPositionSensor" <<
         "GCSTelemetryStats" <<
         "FlightBatteryState";
 

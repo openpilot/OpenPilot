@@ -58,8 +58,8 @@
 #include "manualcontrol.h"
 #include "flightstatus.h"
 #include "pathstatus.h"
-#include "gpsvelocity.h"
-#include "gpsposition.h"
+#include "gpsvelocitysensor.h"
+#include "gpspositionsensor.h"
 #include "homelocation.h"
 #include "vtolpathfollowersettings.h"
 #include "nedaccel.h"
@@ -481,8 +481,8 @@ void updateEndpointVelocity()
     {
         // this used to work with the NEDposition UAVObject
         // however this UAVObject has been removed
-        GPSPositionData gpsPosition;
-        GPSPositionGet(&gpsPosition);
+        GPSPositionSensorData gpsPosition;
+        GPSPositionSensorGet(&gpsPosition);
         HomeLocationData homeLocation;
         HomeLocationGet(&homeLocation);
         float lat    = DEG2RAD(homeLocation.Latitude / 10.0e6f);
@@ -602,8 +602,8 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
         break;
     case VTOLPATHFOLLOWERSETTINGS_VELOCITYSOURCE_NEDVEL:
     {
-        GPSVelocityData gpsVelocity;
-        GPSVelocityGet(&gpsVelocity);
+        GPSVelocitySensorData gpsVelocity;
+        GPSVelocitySensorGet(&gpsVelocity);
         northVel = gpsVelocity.North;
         eastVel  = gpsVelocity.East;
         downVel  = gpsVelocity.Down;
@@ -611,8 +611,8 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
     break;
     case VTOLPATHFOLLOWERSETTINGS_VELOCITYSOURCE_GPSPOS:
     {
-        GPSPositionData gpsPosition;
-        GPSPositionGet(&gpsPosition);
+        GPSPositionSensorData gpsPosition;
+        GPSPositionSensorGet(&gpsPosition);
         northVel = gpsPosition.Groundspeed * cosf(DEG2RAD(gpsPosition.Heading));
         eastVel  = gpsPosition.Groundspeed * sinf(DEG2RAD(gpsPosition.Heading));
         downVel  = velocityState.Down;

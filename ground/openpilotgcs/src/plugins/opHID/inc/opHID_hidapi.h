@@ -33,7 +33,7 @@
 #include <QDebug>
 #include <QString>
 #include <QMutex>
-#if defined(Q_OS_UNIX)
+#if defined(Q_OS_LINUX)
 #include <usb.h>
 #endif
 #include "hidapi.h"

@@ -499,11 +499,14 @@ static int32_t updateAttitudeComplementary(bool first_run)
     GyrosBiasData gyrosBias;
     GyrosBiasGet(&gyrosBias);
     if(revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
-        gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi + (gyrosData.x + gyrosBias.x) * rollPitchBiasRate;
-        gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi + (gyrosData.y + gyrosBias.y) * rollPitchBiasRate;
+        gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi - gyrosData.x * rollPitchBiasRate;
+        gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi - gyrosData.y * rollPitchBiasRate;
+        gyrosBias.z -= - gyrosData.z * rollPitchBiasRate;
+
     } else {
-        gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi + gyrosData.x * rollPitchBiasRate;;
-        gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi + gyrosData.y * rollPitchBiasRate;
+        gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi - (gyrosData.x - gyrosBias.x) * rollPitchBiasRate;;
+        gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi - (gyrosData.y - gyrosBias.y) * rollPitchBiasRate;
+        gyrosBias.z -= - (gyrosData.z - gyrosBias.z) * rollPitchBiasRate;
 
         // if the raw values are not adjusted, we need to adjust here.
         gyrosData.x -= gyrosBias.x;

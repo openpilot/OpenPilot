@@ -387,24 +387,25 @@ static int32_t updateAttitudeComplementary(bool first_run)
         attitudeSettings.AccelKp     = 1.0f;
         attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
-        accel_filter_enabled = false;
-        rollPitchBiasRate = 0.01f;
+        accel_filter_enabled   = false;
+        rollPitchBiasRate      = 0.01f;
         attitudeSettings.MagKp = 1.0f;
     } else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
         attitudeSettings.AccelKp     = 1.0f;
         attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
-        accel_filter_enabled = false;
-        rollPitchBiasRate = 0.01f;
+        accel_filter_enabled   = false;
+        rollPitchBiasRate      = 0.01f;
         attitudeSettings.MagKp = 1.0f;
         init = 0;
     } else if (init == 0) {
         // Reload settings (all the rates)
         AttitudeSettingsGet(&attitudeSettings);
         rollPitchBiasRate = 0.0f;
-        if (accel_alpha > 0.0f)
+        if (accel_alpha > 0.0f) {
             accel_filter_enabled = true;
-        init  = 1;
+        }
+        init = 1;
     }
 
     GyrosGet(&gyrosData);
@@ -437,10 +438,10 @@ static int32_t updateAttitudeComplementary(bool first_run)
     CrossProduct((const float *)accels_filtered, (const float *)grot_filtered, accel_err);
 
     // Account for accel magnitude
-    accel_mag     = accels_filtered[0]*accels_filtered[0] + accels_filtered[1]*accels_filtered[1] + accels_filtered[2]*accels_filtered[2];
-    accel_mag     = sqrtf(accel_mag);
+    accel_mag = accels_filtered[0] * accels_filtered[0] + accels_filtered[1] * accels_filtered[1] + accels_filtered[2] * accels_filtered[2];
+    accel_mag = sqrtf(accel_mag);
 
-    //TODO! check accel vector magnitude value for correctness
+    // TODO! check accel vector magnitude value for correctness
 
     accel_err[0] /= accel_mag;
     accel_err[1] /= accel_mag;
@@ -448,17 +449,16 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
     float grot_mag;
     if (accel_filter_enabled) {
+        grot_mag = sqrtf(grot_filtered[0] * grot_filtered[0] + grot_filtered[1] * grot_filtered[1] + grot_filtered[2] * grot_filtered[2]);
+    } else {
+        grot_mag = 1.0f;
+    }
 
-            grot_mag = sqrtf(grot_filtered[0] * grot_filtered[0] + grot_filtered[1] * grot_filtered[1] + grot_filtered[2] * grot_filtered[2]);
-        } else {
-            grot_mag = 1.0f;
-        }
+    // TODO! check grot_mag value for correctness.
 
-        // TODO! check grot_mag value for correctness.
-
-        accel_err[0] /= (accel_mag * grot_mag);
-        accel_err[1] /= (accel_mag * grot_mag);
-        accel_err[2] /= (accel_mag * grot_mag);
+    accel_err[0] /= (accel_mag * grot_mag);
+    accel_err[1] /= (accel_mag * grot_mag);
+    accel_err[2] /= (accel_mag * grot_mag);
 
 
     if (xQueueReceive(magQueue, &ev, 0) != pdTRUE) {
@@ -498,15 +498,14 @@ static int32_t updateAttitudeComplementary(bool first_run)
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
     GyrosBiasData gyrosBias;
     GyrosBiasGet(&gyrosBias);
-    if(revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
+    if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
         gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi - gyrosData.x * rollPitchBiasRate;
         gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi - gyrosData.y * rollPitchBiasRate;
-        gyrosBias.z -= - gyrosData.z * rollPitchBiasRate;
-
+        gyrosBias.z -= -gyrosData.z * rollPitchBiasRate;
     } else {
         gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi - (gyrosData.x - gyrosBias.x) * rollPitchBiasRate;;
         gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi - (gyrosData.y - gyrosBias.y) * rollPitchBiasRate;
-        gyrosBias.z -= - (gyrosData.z - gyrosBias.z) * rollPitchBiasRate;
+        gyrosBias.z -= -(gyrosData.z - gyrosBias.z) * rollPitchBiasRate;
 
         // if the raw values are not adjusted, we need to adjust here.
         gyrosData.x -= gyrosBias.x;

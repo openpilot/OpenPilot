@@ -394,6 +394,9 @@ void PIOS_Board_Init(void)
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_Init();
 #endif
+    /* Initialize the delayed callback library */
+    CallbackSchedulerInitialize();
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -406,9 +409,6 @@ void PIOS_Board_Init(void)
     if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
         PIOS_Assert(0);
     }
-
-    /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
 
     /* Set up pulse timers */
     PIOS_TIM_InitClock(&tim_1_cfg);

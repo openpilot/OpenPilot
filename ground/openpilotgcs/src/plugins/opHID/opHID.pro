@@ -53,7 +53,9 @@ linux-g++ {
     LIBS += `pkg-config libusb-1.0 --libs` -lrt -lpthread
     INCLUDEPATH += /usr/include/libusb-1.0 
 #    INCLUDEPATH += `pkg-config libusb-1.0 --cflags`
-
+!exists(/usr/include/libusb-1.0) {
+    error(Install libusb-1.0.0-dev using your package manager.)
+ }
 }
 linux-g++-64 {
     SOURCES += src/opHID_usbmon_linux.cpp
@@ -67,6 +69,8 @@ linux-g++-64 {
     LIBS += `pkg-config libusb-1.0 --libs` -lrt -lpthread
     INCLUDEPATH += /usr/include/libusb-1.0
 #    INCLUDEPATH += `pkg-config libusb-1.0 --cflags`
-
+!exists(/usr/include/libusb-1.0) {
+    error(Install libusb-1.0.0-dev using your package manager.)
+ }
 }
 

@@ -79,20 +79,20 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 
     if (this->first_run) {
         // Initialize to current altitude reading at initial location
-        if (ISSET(state->updated, SENSORUPDATES_baro)) {
+        if (IS_SET(state->updated, SENSORUPDATES_baro)) {
             this->first_run  = 0;
             this->baroOffset = state->baro[0];
         }
     } else {
         // Track barometric altitude offset with a low pass filter
         // based on GPS altitude if available
-        if (ISSET(state->updated, SENSORUPDATES_pos)) {
+        if (IS_SET(state->updated, SENSORUPDATES_pos)) {
             this->baroOffset = BARO_OFFSET_LOWPASS_ALPHA * this->baroOffset +
                                (1.0f - BARO_OFFSET_LOWPASS_ALPHA)
                                * (-state->pos[2] - state->baro[0]);
         }
         // calculate bias corrected altitude
-        if (ISSET(state->updated, SENSORUPDATES_baro)) {
+        if (IS_SET(state->updated, SENSORUPDATES_baro)) {
             state->baro[0] -= this->baroOffset;
         }
     }

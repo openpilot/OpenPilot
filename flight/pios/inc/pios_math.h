@@ -46,11 +46,19 @@
 #define M_EULER_F    0.57721566490153286060651209008f      /* Euler constant */
 
 // Conversion macro
-#define RAD2DEG(rad) ((rad) * (180.0f / M_PI_F))
-#define DEG2RAD(deg) ((deg) * (M_PI_F / 180.0f))
+#define RAD2DEG(rad)            ((rad) * (180.0f / M_PI_F))
+#define DEG2RAD(deg)            ((deg) * (M_PI_F / 180.0f))
 
 // Useful math macros
-#define MAX(a, b)    ((a) > (b) ? (a) : (b))
-#define MIN(a, b)    ((a) < (b) ? (a) : (b))
+#define MAX(a, b)               ((a) > (b) ? (a) : (b))
+#define MIN(a, b)               ((a) < (b) ? (a) : (b))
+
+#define ISREAL(f)               (!isnan(f) && !isinf(f))
+
+// Bitfield access
+
+#define IS_SET(field, mask)     (((field) & (mask)) == (mask))
+#define SET_MASK(field, mask)   (field) |= (mask)
+#define UNSET_MASK(field, mask) (field) &= ~(mask)
 
 #endif // PIOS_MATH_H

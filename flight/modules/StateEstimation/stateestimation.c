@@ -36,7 +36,7 @@
 #include <magsensor.h>
 #include <barosensor.h>
 #include <airspeedsensor.h>
-#include <gpspositionsensor.h>
+#include <positionsensor.h>
 #include <gpsvelocitysensor.h>
 
 #include <gyrostate.h>
@@ -57,7 +57,7 @@
 #define STACK_SIZE_BYTES  256
 #define CALLBACK_PRIORITY CALLBACK_PRIORITY_REGULAR
 #define TASK_PRIORITY     CALLBACK_TASK_FLIGHTCONTROL
-#define TIMEOUT_MS        100
+#define TIMEOUT_MS        10
 
 // Private types
 
@@ -181,8 +181,6 @@ static const filterPipeline *ekf16Queue = &(filterPipeline) {
 static void settingsUpdatedCb(UAVObjEvent *objEv);
 static void sensorUpdatedCb(UAVObjEvent *objEv);
 static void StateEstimationCb(void);
-static void getNED(GPSPositionSensorData *gpsPosition, float *NED);
-static bool sane(float value);
 
 static inline int32_t maxint32_t(int32_t a, int32_t b)
 {
@@ -205,7 +203,7 @@ int32_t StateEstimationInitialize(void)
     MagSensorInitialize();
     BaroSensorInitialize();
     AirspeedSensorInitialize();
-    GPSPositionSensorInitialize();
+    PositionSensorInitialize();
     GPSVelocitySensorInitialize();
 
     GyroStateInitialize();
@@ -223,7 +221,7 @@ int32_t StateEstimationInitialize(void)
     MagSensorConnectCallback(&sensorUpdatedCb);
     BaroSensorConnectCallback(&sensorUpdatedCb);
     AirspeedSensorConnectCallback(&sensorUpdatedCb);
-    GPSPositionSensorConnectCallback(&sensorUpdatedCb);
+    PositionSensorConnectCallback(&sensorUpdatedCb);
     GPSVelocitySensorConnectCallback(&sensorUpdatedCb);
 
     uint32_t stack_required = STACK_SIZE_BYTES;
@@ -271,6 +269,7 @@ static void StateEstimationCb(void)
     static uint16_t alarmcounter = 0;
     static filterPipeline *current;
     static stateEstimation states;
+    static uint32_t last_time;
 
     switch (runState) {
     case RUNSTATE_LOAD:
@@ -279,7 +278,11 @@ static void StateEstimationCb(void)
 
         // set alarm to warning if called through timeout
         if (updatedSensors == 0) {
-            alarm = 1;
+            if (PIOS_DELAY_DiffuS(last_time) > 1000 * TIMEOUT_MS) {
+                alarm = 1;
+            }
+        } else {
+            last_time = PIOS_DELAY_GetRaw();
         }
 
         // check if a new filter chain should be initialized
@@ -338,47 +341,37 @@ static void StateEstimationCb(void)
 
         // most sensors get only rudimentary sanity checks
 #define SANITYCHECK3(sensorname, shortname, a1, a2, a3) \
-    if (ISSET(states.updated, SENSORUPDATES_##shortname)) { \
+    if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
         sensorname##Data s; \
         sensorname##Get(&s); \
-        if (sane(s.a1) && sane(s.a2) && sane(s.a3)) { \
+        if (ISREAL(s.a1) && ISREAL(s.a2) && ISREAL(s.a3)) { \
             states.shortname[0] = s.a1; \
             states.shortname[1] = s.a2; \
             states.shortname[2] = s.a3; \
         } \
         else { \
-            UNSET(states.updated, SENSORUPDATES_##shortname); \
+            UNSET_MASK(states.updated, SENSORUPDATES_##shortname); \
         } \
     }
         SANITYCHECK3(GyroSensor, gyro, x, y, z);
         SANITYCHECK3(AccelSensor, accel, x, y, z);
         SANITYCHECK3(MagSensor, mag, x, y, z);
+        SANITYCHECK3(PositionSensor, pos, North, East, Down);
         SANITYCHECK3(GPSVelocitySensor, vel, North, East, Down);
 #define SANITYCHECK1(sensorname, shortname, a1, EXTRACHECK) \
-    if (ISSET(states.updated, SENSORUPDATES_##shortname)) { \
+    if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
         sensorname##Data s; \
         sensorname##Get(&s); \
-        if (sane(s.a1) && EXTRACHECK) { \
+        if (ISREAL(s.a1) && EXTRACHECK) { \
             states.shortname[0] = s.a1; \
         } \
         else { \
-            UNSET(states.updated, SENSORUPDATES_##shortname); \
+            UNSET_MASK(states.updated, SENSORUPDATES_##shortname); \
         } \
     }
         SANITYCHECK1(BaroSensor, baro, Altitude, 1);
         SANITYCHECK1(AirspeedSensor, airspeed, CalibratedAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
         states.airspeed[1] = 0.0f; // sensor does not provide true airspeed, needs to be calculated by filter
-
-        // GPS is a tiny bit more tricky as GPSPositionSensor is not float (otherwise the conversion to NED could sit in a filter) but integers, for precision reasons
-        if (ISSET(states.updated, SENSORUPDATES_pos)) {
-            GPSPositionSensorData s;
-            GPSPositionSensorGet(&s);
-            if (homeLocation.Set == HOMELOCATION_SET_TRUE && sane(s.Latitude) && sane(s.Longitude) && sane(s.Altitude) && (fabsf(s.Latitude) > 1e-5f || fabsf(s.Latitude) > 1e-5f || fabsf(s.Latitude) > 1e-5f)) {
-                getNED(&s, states.pos);
-            } else {
-                UNSET(states.updated, SENSORUPDATES_pos);
-            }
-        }
 
         // at this point sensor state is stored in "states" with some rudimentary filtering applied
 
@@ -411,7 +404,7 @@ static void StateEstimationCb(void)
 
         // the final output of filters is saved in state variables
 #define STORE3(statename, shortname, a1, a2, a3) \
-    if (ISSET(states.updated, SENSORUPDATES_##shortname)) { \
+    if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
         statename##Data s; \
         statename##Get(&s); \
         s.a1 = states.shortname[0]; \
@@ -425,7 +418,7 @@ static void StateEstimationCb(void)
         STORE3(PositionState, pos, North, East, Down);
         STORE3(VelocityState, vel, North, East, Down);
 #define STORE2(statename, shortname, a1, a2) \
-    if (ISSET(states.updated, SENSORUPDATES_##shortname)) { \
+    if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
         statename##Data s; \
         statename##Get(&s); \
         s.a1 = states.shortname[0]; \
@@ -434,7 +427,7 @@ static void StateEstimationCb(void)
     }
         STORE2(AirspeedState, airspeed, CalibratedAirspeed, TrueAirspeed);
         // attitude nees manual conversion from quaternion to euler
-        if (ISSET(states.updated, SENSORUPDATES_attitude)) { \
+        if (IS_SET(states.updated, SENSORUPDATES_attitude)) { \
             AttitudeStateData s;
             AttitudeStateGet(&s);
             s.q1 = states.attitude[0];
@@ -490,7 +483,7 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     HomeLocationGet((HomeLocationData *)&homeLocation);
 
-    if (sane(homeLocation.Latitude) && sane(homeLocation.Longitude) && sane(homeLocation.Altitude) && sane(homeLocation.Be[0]) && sane(homeLocation.Be[1]) && sane(homeLocation.Be[2])) {
+    if (ISREAL(homeLocation.Latitude) && ISREAL(homeLocation.Longitude) && ISREAL(homeLocation.Altitude) && ISREAL(homeLocation.Be[0]) && ISREAL(homeLocation.Be[1]) && ISREAL(homeLocation.Be[2])) {
         // Compute matrix to convert deltaLLA to NED
         float lat, alt;
         lat = DEG2RAD(homeLocation.Latitude / 10.0e6f);
@@ -529,7 +522,7 @@ static void sensorUpdatedCb(UAVObjEvent *ev)
         updatedSensors |= SENSORUPDATES_mag;
     }
 
-    if (ev->obj == GPSPositionSensorHandle()) {
+    if (ev->obj == PositionSensorHandle()) {
         updatedSensors |= SENSORUPDATES_pos;
     }
 
@@ -548,39 +541,6 @@ static void sensorUpdatedCb(UAVObjEvent *ev)
     DelayedCallbackDispatch(stateEstimationCallback);
 }
 
-/**
- * @brief Convert the GPS LLA position into NED coordinates
- * @note this method uses a taylor expansion around the home coordinates
- * to convert to NED which allows it to be done with all floating
- * calculations
- * @param[in] Current GPS coordinates
- * @param[out] NED frame coordinates
- * @returns 0 for success, -1 for failure
- */
-static void getNED(GPSPositionSensorData *gpsPosition, float *NED)
-{
-    float dL[3] = { DEG2RAD((gpsPosition->Latitude - homeLocation.Latitude) / 10.0e6f),
-                    DEG2RAD((gpsPosition->Longitude - homeLocation.Longitude) / 10.0e6f),
-                    (gpsPosition->Altitude + gpsPosition->GeoidSeparation - homeLocation.Altitude) };
-
-    NED[0] = LLA2NEDM[0] * dL[0];
-    NED[1] = LLA2NEDM[1] * dL[1];
-    NED[2] = LLA2NEDM[2] * dL[2];
-}
-
-/**
- * @brief sanity check for float values
- * @note makes sure a float value is safe for further processing, ie not NAN and not INF
- * @param[in] float value
- * @returns true for safe and false for unsafe
- */
-static bool sane(float value)
-{
-    if (isnan(value) || isinf(value)) {
-        return false;
-    }
-    return true;
-}
 
 /**
  * @}

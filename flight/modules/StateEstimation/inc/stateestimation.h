@@ -55,10 +55,6 @@ typedef struct {
     sensorUpdates updated;
 } stateEstimation;
 
-#define ISSET(bitfield, bit) ((bitfield) & (bit) ? 1 : 0)
-#define UNSET(bitfield, bit) (bitfield) &= ~(bit)
-
-
 typedef struct stateFilterStruct {
     int32_t (*init)(struct stateFilterStruct *self);
     int32_t (*filter)(struct stateFilterStruct *self, stateEstimation *state);

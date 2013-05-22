@@ -158,19 +158,19 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 
     int32_t result    = 0;
 
-    if (ISSET(state->updated, SENSORUPDATES_mag)) {
+    if (IS_SET(state->updated, SENSORUPDATES_mag)) {
         this->magUpdated    = 1;
         this->currentMag[0] = state->mag[0];
         this->currentMag[1] = state->mag[1];
         this->currentMag[2] = state->mag[2];
     }
-    if (ISSET(state->updated, SENSORUPDATES_accel)) {
+    if (IS_SET(state->updated, SENSORUPDATES_accel)) {
         this->accelUpdated    = 1;
         this->currentAccel[0] = state->accel[0];
         this->currentAccel[1] = state->accel[1];
         this->currentAccel[2] = state->accel[2];
     }
-    if (ISSET(state->updated, SENSORUPDATES_gyro)) {
+    if (IS_SET(state->updated, SENSORUPDATES_gyro)) {
         if (this->accelUpdated) {
             float attitude[4];
             result = complementaryFilter(this, state->gyro, this->currentAccel, this->currentMag, attitude);

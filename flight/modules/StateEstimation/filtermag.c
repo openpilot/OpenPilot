@@ -79,7 +79,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 {
     struct data *this = (struct data *)self->localdata;
 
-    if (ISSET(state->updated, SENSORUPDATES_mag)) {
+    if (IS_SET(state->updated, SENSORUPDATES_mag)) {
         if (this->revoCalibration.MagBiasNullingRate > 0) {
             magOffsetEstimation(this, state->mag);
         }

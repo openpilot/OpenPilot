@@ -74,11 +74,11 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     struct data *this = (struct data *)self->localdata;
 
     // take static pressure altitude estimation for
-    if (ISSET(state->updated, SENSORUPDATES_baro)) {
+    if (IS_SET(state->updated, SENSORUPDATES_baro)) {
         this->altitude = state->baro[0];
     }
     // calculate true airspeed estimation
-    if (ISSET(state->updated, SENSORUPDATES_airspeed)) {
+    if (IS_SET(state->updated, SENSORUPDATES_airspeed)) {
         state->airspeed[1] = state->airspeed[0] * IAS2TAS(this->altitude);
     }
 

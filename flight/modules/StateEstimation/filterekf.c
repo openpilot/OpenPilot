@@ -193,7 +193,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 
     // Get most recent data
 #define UPDATE(shortname, num) \
-    if (ISSET(state->updated, SENSORUPDATES_##shortname)) { \
+    if (IS_SET(state->updated, SENSORUPDATES_##shortname)) { \
         uint8_t t; \
         for (t = 0; t < num; t++) { \
             this->work.shortname[t] = state->shortname[t]; \
@@ -210,11 +210,11 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     // check whether mandatory updates are present accels must have been supplied already,
     // and gyros must be supplied just now for a prediction step to take place
     // ("gyros last" rule for multi object synchronization)
-    if (!(ISSET(this->work.updated, SENSORUPDATES_accel) && ISSET(state->updated, SENSORUPDATES_gyro))) {
-        UNSET(state->updated, SENSORUPDATES_pos);
-        UNSET(state->updated, SENSORUPDATES_vel);
-        UNSET(state->updated, SENSORUPDATES_attitude);
-        UNSET(state->updated, SENSORUPDATES_gyro);
+    if (!(IS_SET(this->work.updated, SENSORUPDATES_accel) && IS_SET(state->updated, SENSORUPDATES_gyro))) {
+        UNSET_MASK(state->updated, SENSORUPDATES_pos);
+        UNSET_MASK(state->updated, SENSORUPDATES_vel);
+        UNSET_MASK(state->updated, SENSORUPDATES_attitude);
+        UNSET_MASK(state->updated, SENSORUPDATES_gyro);
         return 0;
     }
 
@@ -226,10 +226,10 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             (gpsData.PDOP > 4.0f) ||
             (gpsData.Latitude == 0 && gpsData.Longitude == 0) ||
             (this->homeLocation.Set != HOMELOCATION_SET_TRUE)) {
-            UNSET(state->updated, SENSORUPDATES_pos);
-            UNSET(state->updated, SENSORUPDATES_vel);
-            UNSET(this->work.updated, SENSORUPDATES_pos);
-            UNSET(this->work.updated, SENSORUPDATES_vel);
+            UNSET_MASK(state->updated, SENSORUPDATES_pos);
+            UNSET_MASK(state->updated, SENSORUPDATES_vel);
+            UNSET_MASK(this->work.updated, SENSORUPDATES_pos);
+            UNSET_MASK(this->work.updated, SENSORUPDATES_vel);
         }
     }
 
@@ -243,7 +243,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         dT = 0.001f;
     }
 
-    if (!this->inited && ISSET(this->work.updated, SENSORUPDATES_mag) && ISSET(this->work.updated, SENSORUPDATES_baro) && ISSET(this->work.updated, SENSORUPDATES_pos)) {
+    if (!this->inited && IS_SET(this->work.updated, SENSORUPDATES_mag) && IS_SET(this->work.updated, SENSORUPDATES_baro) && IS_SET(this->work.updated, SENSORUPDATES_pos)) {
         // Don't initialize until all sensors are read
         if (this->init_stage == 0) {
             // Reset the INS algorithm
@@ -362,11 +362,11 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     // Advance the covariance estimate
     INSCovariancePrediction(dT);
 
-    if (ISSET(this->work.updated, SENSORUPDATES_mag)) {
+    if (IS_SET(this->work.updated, SENSORUPDATES_mag)) {
         sensors |= MAG_SENSORS;
     }
 
-    if (ISSET(this->work.updated, SENSORUPDATES_baro)) {
+    if (IS_SET(this->work.updated, SENSORUPDATES_baro)) {
         sensors |= BARO_SENSOR;
     }
 
@@ -392,15 +392,15 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
                         );
     }
 
-    if (ISSET(this->work.updated, SENSORUPDATES_pos)) {
+    if (IS_SET(this->work.updated, SENSORUPDATES_pos)) {
         sensors |= POS_SENSORS;
     }
 
-    if (ISSET(this->work.updated, SENSORUPDATES_vel)) {
+    if (IS_SET(this->work.updated, SENSORUPDATES_vel)) {
         sensors |= HORIZ_SENSORS | VERT_SENSORS;
     }
 
-    if (ISSET(this->work.updated, SENSORUPDATES_airspeed) && ((!ISSET(this->work.updated, SENSORUPDATES_vel) && !ISSET(this->work.updated, SENSORUPDATES_pos)) | !this->usePos)) {
+    if (IS_SET(this->work.updated, SENSORUPDATES_airspeed) && ((!IS_SET(this->work.updated, SENSORUPDATES_vel) && !IS_SET(this->work.updated, SENSORUPDATES_pos)) | !this->usePos)) {
         // HACK: feed airspeed into EKF as velocity, treat wind as 1e2 variance
         sensors |= HORIZ_SENSORS | VERT_SENSORS;
         INSSetPosVelVar((float[3]) { this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],

@@ -62,7 +62,7 @@
 /* Local Defines */
 #define STACK_SIZE_BYTES                 200
 #define TASK_PRIORITY                    (tskIDLE_PRIORITY + 2)
-#define ISR_TIMEOUT                      2 // ms
+#define ISR_TIMEOUT                      1 // ms
 #define EVENT_QUEUE_SIZE                 5
 #define RFM22B_DEFAULT_RX_DATARATE       RFM22_datarate_9600
 #define RFM22B_DEFAULT_TX_POWER          RFM22_tx_pwr_txpow_0
@@ -1375,13 +1375,13 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     rfm22b_dev->destination_id   = 0xffffffff;
     rfm22b_dev->send_status = false;
     rfm22b_dev->send_connection_request = false;
-    rfm22b_dev->send_ack_nack = false;
-    rfm22b_dev->resend_packet = false;
+    rfm22b_dev->send_ack_nack    = false;
+    rfm22b_dev->resend_packet    = false;
 
     // Initialize the packets.
-    rfm22b_dev->rx_packet_len  = 0;
-    rfm22b_dev->tx_packet      = NULL;
-    rfm22b_dev->prev_tx_packet = NULL;
+    rfm22b_dev->rx_packet_len    = 0;
+    rfm22b_dev->tx_packet = NULL;
+    rfm22b_dev->prev_tx_packet   = NULL;
     rfm22b_dev->data_packet.header.data_size = 0;
 
     // Initialize the devide state
@@ -2068,9 +2068,9 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
             // which should match the time that the last packet was received.
             uint16_t prev_seq_num = radio_dev->stats.rx_seq;
             if (seq_num == (prev_seq_num + 1)) {
-                portTickType local_rx_time  = radio_dev->rx_complete_ticks;
-                portTickType remote_tx_time = radio_dev->rx_packet.header.prev_tx_time;
-                portTickType time_delta = remote_tx_time - local_rx_time;
+                portTickType local_rx_time    = radio_dev->rx_complete_ticks;
+                portTickType remote_tx_time   = radio_dev->rx_packet.header.prev_tx_time;
+                portTickType time_delta       = remote_tx_time - local_rx_time;
                 portTickType time_delta_delta = (time_delta > radio_dev->time_delta) ? (time_delta - radio_dev->time_delta) : (radio_dev->time_delta - time_delta);
                 if (time_delta_delta <= 2) {
                     radio_dev->time_delta = remote_tx_time - local_rx_time;
@@ -2221,7 +2221,7 @@ static enum pios_radio_event rfm22_sendAck(struct pios_rfm22b_dev *rfm22b_dev)
         aph->header.destination_id = rfm22b_dev->destination_id;
         aph->header.type = PACKET_TYPE_ACK;
         aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
-        rfm22b_dev->send_ack_nack = true;
+        rfm22b_dev->send_ack_nack  = true;
     }
     return RADIO_EVENT_TX_START;
 }
@@ -2241,7 +2241,7 @@ static enum pios_radio_event rfm22_sendNack(struct pios_rfm22b_dev *rfm22b_dev)
         aph->header.destination_id = rfm22b_dev->destination_id;
         aph->header.type = PACKET_TYPE_NACK;
         aph->header.data_size = PH_ACK_NACK_DATA_SIZE(aph);
-        rfm22b_dev->send_ack_nack = true;
+        rfm22b_dev->send_ack_nack  = true;
     }
     return RADIO_EVENT_TX_START;
 }
@@ -2484,6 +2484,7 @@ static enum pios_radio_event rfm22_acceptConnection(struct pios_rfm22b_dev *rfm2
     // Copy the connection packet
     PHConnectionPacketHandle cph  = (PHConnectionPacketHandle)(&(rfm22b_dev->rx_packet));
     PHConnectionPacketHandle lcph = (PHConnectionPacketHandle)(&(rfm22b_dev->con_packet));
+
     memcpy((uint8_t *)lcph, (uint8_t *)cph, PH_PACKET_SIZE((PHPacketHandle)cph));
 
     // Set the destination ID to the source of the connection request message.
@@ -2525,9 +2526,10 @@ static portTickType rfm22_coordinatorTime(struct pios_rfm22b_dev *rfm22b_dev, po
 static bool rfm22_timeToSend(struct pios_rfm22b_dev *rfm22b_dev)
 {
     portTickType time = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
-    // Divide time into 8ms blocks.  Coordinator sends in first 2 ms, and remote send in 5th and 6th ms.
-    // Channel changes occur in the last 2 ms.
-    return (rfm22b_dev->coordinator) ? ((time & 0x0C) == 0) : (((time + 8) & 0x0C) == 0);
+
+    // Divide time into 8ms blocks.  Coordinator sends in first 1 ms, and remote send in 4th.
+    // Channel changes occurs in the 7th.
+    return (rfm22b_dev->coordinator) ? ((time & 0x7) == 0) : ((time & 0x7) == 3);
 }
 
 /**
@@ -2540,7 +2542,8 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev)
     portTickType time = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
     // Divide time into 8ms blocks.  Coordinator sends in first 2 ms, and remote send in 5th and 6th ms.
     // Channel changes occur in the last 2 ms.
-    uint8_t n = (((time + 0x0C) >> 4) & 0xff);
+    uint8_t n = (((time + 2) >> 3) & 0xff);
+
     return PIOS_CRC_updateByte(0, n) % rfm22b_dev->num_channels;
 }
 

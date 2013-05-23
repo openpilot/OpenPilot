@@ -84,6 +84,8 @@ static void globalInit(void)
 {
     if (!initialized) {
         initialized = 1;
+        FlightStatusInitialize();
+        HomeLocationInitialize();
         FlightStatusConnectCallback(&flightStatusUpdatedCb);
         flightStatusUpdatedCb(NULL);
     }

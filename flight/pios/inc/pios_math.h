@@ -53,10 +53,9 @@
 #define MAX(a, b)               ((a) > (b) ? (a) : (b))
 #define MIN(a, b)               ((a) < (b) ? (a) : (b))
 
-#define ISREAL(f)               (!isnan(f) && !isinf(f))
+#define IS_REAL(f)              (!isnan(f) && !isinf(f))
 
 // Bitfield access
-
 #define IS_SET(field, mask)     (((field) & (mask)) == (mask))
 #define SET_MASK(field, mask)   (field) |= (mask)
 #define UNSET_MASK(field, mask) (field) &= ~(mask)

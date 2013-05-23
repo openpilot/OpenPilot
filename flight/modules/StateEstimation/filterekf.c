@@ -37,7 +37,6 @@
 #include <attitudestate.h>
 #include <homelocation.h>
 
-
 #include <insgps.h>
 #include <CoordinateConversions.h>
 
@@ -81,6 +80,7 @@ static void globalInit(void)
         initialized = 1;
         EKFConfigurationInitialize();
         EKFStateVarianceInitialize();
+        HomeLocationInitialize();
     }
 }
 

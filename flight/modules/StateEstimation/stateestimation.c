@@ -48,7 +48,6 @@
 #include <velocitystate.h>
 
 #include "revosettings.h"
-#include "homelocation.h"
 #include "flightstatus.h"
 
 #include "CoordinateConversions.h"
@@ -72,8 +71,6 @@ typedef const struct filterPipelineStruct {
 static DelayedCallbackInfo *stateEstimationCallback;
 
 static volatile RevoSettingsData revoSettings;
-static volatile HomeLocationData homeLocation;
-static float LLA2NEDM[3];
 static volatile sensorUpdates updatedSensors;
 static int32_t fusionAlgorithm     = -1;
 static filterPipeline *filterChain = NULL;
@@ -197,7 +194,6 @@ static inline int32_t maxint32_t(int32_t a, int32_t b)
 int32_t StateEstimationInitialize(void)
 {
     RevoSettingsInitialize();
-    HomeLocationInitialize();
 
     GyroSensorInitialize();
     MagSensorInitialize();
@@ -214,7 +210,6 @@ int32_t StateEstimationInitialize(void)
     VelocityStateInitialize();
 
     RevoSettingsConnectCallback(&settingsUpdatedCb);
-    HomeLocationConnectCallback(&settingsUpdatedCb);
 
     GyroSensorConnectCallback(&sensorUpdatedCb);
     AccelSensorConnectCallback(&sensorUpdatedCb);
@@ -344,7 +339,7 @@ static void StateEstimationCb(void)
     if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
         sensorname##Data s; \
         sensorname##Get(&s); \
-        if (ISREAL(s.a1) && ISREAL(s.a2) && ISREAL(s.a3)) { \
+        if (IS_REAL(s.a1) && IS_REAL(s.a2) && IS_REAL(s.a3)) { \
             states.shortname[0] = s.a1; \
             states.shortname[1] = s.a2; \
             states.shortname[2] = s.a3; \
@@ -362,7 +357,7 @@ static void StateEstimationCb(void)
     if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
         sensorname##Data s; \
         sensorname##Get(&s); \
-        if (ISREAL(s.a1) && EXTRACHECK) { \
+        if (IS_REAL(s.a1) && EXTRACHECK) { \
             states.shortname[0] = s.a1; \
         } \
         else { \
@@ -477,26 +472,10 @@ static void StateEstimationCb(void)
 
 
 /**
- * Callback for eventdispatcher when HomeLocation or RevoSettings has been updated
+ * Callback for eventdispatcher when RevoSettings has been updated
  */
 static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    HomeLocationGet((HomeLocationData *)&homeLocation);
-
-    if (ISREAL(homeLocation.Latitude) && ISREAL(homeLocation.Longitude) && ISREAL(homeLocation.Altitude) && ISREAL(homeLocation.Be[0]) && ISREAL(homeLocation.Be[1]) && ISREAL(homeLocation.Be[2])) {
-        // Compute matrix to convert deltaLLA to NED
-        float lat, alt;
-        lat = DEG2RAD(homeLocation.Latitude / 10.0e6f);
-        alt = homeLocation.Altitude;
-
-        LLA2NEDM[0] = alt + 6.378137E6f;
-        LLA2NEDM[1] = cosf(lat) * (alt + 6.378137E6f);
-        LLA2NEDM[2] = -1.0f;
-
-        // TODO: convert positionState to new reference frame and gracefully update EKF state!
-        // needed for long range flights where the reference coordinate is adjusted in flight
-    }
-
     RevoSettingsGet((RevoSettingsData *)&revoSettings);
 }
 

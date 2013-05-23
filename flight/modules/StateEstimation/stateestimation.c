@@ -58,6 +58,51 @@
 #define TASK_PRIORITY     CALLBACK_TASK_FLIGHTCONTROL
 #define TIMEOUT_MS        10
 
+// local macros, ONLY to be used in the middle of StateEstimationCb in section RUNSTATE_LOAD after the update of states updated!
+#define FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(sensorname, shortname, a1, a2, a3) \
+    if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
+        sensorname##Data s; \
+        sensorname##Get(&s); \
+        if (IS_REAL(s.a1) && IS_REAL(s.a2) && IS_REAL(s.a3)) { \
+            states.shortname[0] = s.a1; \
+            states.shortname[1] = s.a2; \
+            states.shortname[2] = s.a3; \
+        } \
+        else { \
+            UNSET_MASK(states.updated, SENSORUPDATES_##shortname); \
+        } \
+    }
+#define FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_1_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(sensorname, shortname, a1, EXTRACHECK) \
+    if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
+        sensorname##Data s; \
+        sensorname##Get(&s); \
+        if (IS_REAL(s.a1) && EXTRACHECK) { \
+            states.shortname[0] = s.a1; \
+        } \
+        else { \
+            UNSET_MASK(states.updated, SENSORUPDATES_##shortname); \
+        } \
+    }
+
+// local macros, ONLY to be used in the middle of StateEstimationCb in section RUNSTATE_SAVE before the check of alarms!
+#define EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(statename, shortname, a1, a2, a3) \
+    if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
+        statename##Data s; \
+        statename##Get(&s); \
+        s.a1 = states.shortname[0]; \
+        s.a2 = states.shortname[1]; \
+        s.a3 = states.shortname[2]; \
+        statename##Set(&s); \
+    }
+#define EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_2_DIMENSIONS(statename, shortname, a1, a2) \
+    if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
+        statename##Data s; \
+        statename##Get(&s); \
+        s.a1 = states.shortname[0]; \
+        s.a2 = states.shortname[1]; \
+        statename##Set(&s); \
+    }
+
 // Private types
 
 struct filterPipelineStruct;
@@ -253,6 +298,7 @@ int32_t StateEstimationStart(void)
 
 MODULE_INITCALL(StateEstimationInitialize, StateEstimationStart)
 
+
 /**
  * Module callback
  */
@@ -334,39 +380,15 @@ static void StateEstimationCb(void)
         states.updated  = updatedSensors;
         updatedSensors ^= states.updated;
 
-        // most sensors get only rudimentary sanity checks
-#define SANITYCHECK3(sensorname, shortname, a1, a2, a3) \
-    if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
-        sensorname##Data s; \
-        sensorname##Get(&s); \
-        if (IS_REAL(s.a1) && IS_REAL(s.a2) && IS_REAL(s.a3)) { \
-            states.shortname[0] = s.a1; \
-            states.shortname[1] = s.a2; \
-            states.shortname[2] = s.a3; \
-        } \
-        else { \
-            UNSET_MASK(states.updated, SENSORUPDATES_##shortname); \
-        } \
-    }
-        SANITYCHECK3(GyroSensor, gyro, x, y, z);
-        SANITYCHECK3(AccelSensor, accel, x, y, z);
-        SANITYCHECK3(MagSensor, mag, x, y, z);
-        SANITYCHECK3(PositionSensor, pos, North, East, Down);
-        SANITYCHECK3(GPSVelocitySensor, vel, North, East, Down);
-#define SANITYCHECK1(sensorname, shortname, a1, EXTRACHECK) \
-    if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
-        sensorname##Data s; \
-        sensorname##Get(&s); \
-        if (IS_REAL(s.a1) && EXTRACHECK) { \
-            states.shortname[0] = s.a1; \
-        } \
-        else { \
-            UNSET_MASK(states.updated, SENSORUPDATES_##shortname); \
-        } \
-    }
-        SANITYCHECK1(BaroSensor, baro, Altitude, 1);
-        SANITYCHECK1(AirspeedSensor, airspeed, CalibratedAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
-        states.airspeed[1] = 0.0f; // sensor does not provide true airspeed, needs to be calculated by filter
+        // fetch sensors, check values, and load into state struct
+        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GyroSensor, gyro, x, y, z);
+        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(AccelSensor, accel, x, y, z);
+        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(MagSensor, mag, x, y, z);
+        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(PositionSensor, pos, North, East, Down);
+        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GPSVelocitySensor, vel, North, East, Down);
+        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_1_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(BaroSensor, baro, Altitude, true);
+        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_1_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(AirspeedSensor, airspeed, CalibratedAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
+        states.airspeed[1] = 0.0f; // sensor does not provide true airspeed, needs to be calculated by filter, set to zero for now
 
         // at this point sensor state is stored in "states" with some rudimentary filtering applied
 
@@ -398,29 +420,12 @@ static void StateEstimationCb(void)
     case RUNSTATE_SAVE:
 
         // the final output of filters is saved in state variables
-#define STORE3(statename, shortname, a1, a2, a3) \
-    if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
-        statename##Data s; \
-        statename##Get(&s); \
-        s.a1 = states.shortname[0]; \
-        s.a2 = states.shortname[1]; \
-        s.a3 = states.shortname[2]; \
-        statename##Set(&s); \
-    }
-        STORE3(GyroState, gyro, x, y, z);
-        STORE3(AccelState, accel, x, y, z);
-        STORE3(MagState, mag, x, y, z);
-        STORE3(PositionState, pos, North, East, Down);
-        STORE3(VelocityState, vel, North, East, Down);
-#define STORE2(statename, shortname, a1, a2) \
-    if (IS_SET(states.updated, SENSORUPDATES_##shortname)) { \
-        statename##Data s; \
-        statename##Get(&s); \
-        s.a1 = states.shortname[0]; \
-        s.a2 = states.shortname[1]; \
-        statename##Set(&s); \
-    }
-        STORE2(AirspeedState, airspeed, CalibratedAirspeed, TrueAirspeed);
+        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(GyroState, gyro, x, y, z);
+        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(AccelState, accel, x, y, z);
+        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(MagState, mag, x, y, z);
+        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(PositionState, pos, North, East, Down);
+        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_3_DIMENSIONS(VelocityState, vel, North, East, Down);
+        EXPORT_STATE_TO_UAVOBJECT_IF_UPDATED_2_DIMENSIONS(AirspeedState, airspeed, CalibratedAirspeed, TrueAirspeed);
         // attitude nees manual conversion from quaternion to euler
         if (IS_SET(states.updated, SENSORUPDATES_attitude)) { \
             AttitudeStateData s;

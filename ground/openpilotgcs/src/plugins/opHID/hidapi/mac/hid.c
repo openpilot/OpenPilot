@@ -24,6 +24,7 @@
 
 #include <IOKit/hid/IOHIDManager.h>
 #include <IOKit/hid/IOHIDKeys.h>
+#include <IOKit/IOKitLib.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <wchar.h>
 #include <locale.h>
@@ -264,46 +265,6 @@ static int get_string_property(IOHIDDeviceRef device, CFStringRef prop, wchar_t 
 
 }
 
-static int get_string_property_utf8(IOHIDDeviceRef device, CFStringRef prop, char *buf, size_t len)
-{
-	CFStringRef str;
-	if (!len)
-		return 0;
-
-	str = IOHIDDeviceGetProperty(device, prop);
-
-	buf[0] = 0;
-
-	if (str) {
-		len--;
-
-		CFIndex str_len = CFStringGetLength(str);
-		CFRange range;
-		range.location = 0;
-		range.length = str_len;
-		CFIndex used_buf_len;
-		CFIndex chars_copied;
-		chars_copied = CFStringGetBytes(str,
-			range,
-			kCFStringEncodingUTF8,
-			(char)'?',
-			FALSE,
-			(UInt8*)buf,
-			len,
-			&used_buf_len);
-
-		if (used_buf_len == len)
-			buf[len] = 0; /* len is decremented above */
-		else
-			buf[used_buf_len] = 0;
-
-		return used_buf_len;
-	}
-	else
-		return 0;
-}
-
-
 static int get_serial_number(IOHIDDeviceRef device, wchar_t *buf, size_t len)
 {
 	return get_string_property(device, CFSTR(kIOHIDSerialNumberKey), buf, len);
@@ -330,33 +291,54 @@ static wchar_t *dup_wcs(const wchar_t *s)
 	return ret;
 }
 
+#if MAC_OS_X_VERSION_MIN_REQUIRED != MAC_OS_X_VERSION_10_5
+#warning "hidapi must be compiled/linked with -mmacosx-version-min=10.5 if you want OS X 10.5 compatibility"
+#endif
 
-static int make_path(IOHIDDeviceRef device, char *buf, size_t len)
+/* hidapi_IOHIDDeviceGetService()
+ *
+ * Return the io_service_t corresponding to a given IOHIDDeviceRef, either by:
+ * - on OS X 10.6 and above, calling IOHIDDeviceGetService()
+ * - on OS X 10.5, extract it from the IOHIDDevice struct
+ */
+static io_service_t hidapi_IOHIDDeviceGetService(IOHIDDeviceRef device)
 {
-	int res;
-	unsigned short vid, pid;
-	char transport[32];
-	int32_t location;
+	/* When compiled with '-mmacosx-version-min=10.5', IOHIDDeviceGetService()
+	 * is weakly linked in so we can decide to use it (or not) at runtime.
+	 */
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1060
+	if (IOHIDDeviceGetService != NULL) {
+		/* OS X 10.6 and above: IOHIDDeviceGetService() exists */
+		return IOHIDDeviceGetService(device);
+	}
+	else
+#endif
+       	{
+		/* OS X 10.5: IOHIDDeviceGetService() doesn't exist.
+		 * Be naughty and pull the service out of the IOHIDDevice.
+		 * Tested and working on OS X 10.5.8 i386, x86_64, and ppc
+		 */
+		struct IOHIDDevice_internal {
+			/* The first field of the IOHIDDevice struct is a
+			 * CFRuntimeBase (which is a private CF struct).
+			 *
+			 * a, b, and c are the 3 fields that make up a CFRuntimeBase.
+			 * See http://opensource.apple.com/source/CF/CF-476.18/CFRuntime.h
+			 *
+			 * The second field of the IOHIDDevice is the io_service_t we're looking for.
+			 */
+			//CFRuntimeBase base;
+			uintptr_t a;
+			uint8_t b[4];
+#if __LP64__
+			uint32_t c;
+#endif
+			io_service_t service;
+		};
+		struct IOHIDDevice_internal *tmp = (struct IOHIDDevice_internal *)device;
 
-	buf[0] = '\0';
-
-	res = get_string_property_utf8(
-		device, CFSTR(kIOHIDTransportKey),
-		transport, sizeof(transport));
-
-	if (!res)
-		return -1;
-
-	location = get_location_id(device);
-	vid = get_vendor_id(device);
-	pid = get_product_id(device);
-
-	res = snprintf(buf, len, "%s_%04hx_%04hx_%x",
-                       transport, vid, pid, location);
-
-
-	buf[len-1] = '\0';
-	return res+1;
+		return tmp->service;
+	}
 }
 
 /* Initialize the IOHIDManager. Return 0 for success and -1 for failure. */
@@ -433,7 +415,6 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, 
 		unsigned short dev_pid;
 		#define BUF_LEN 256
 		wchar_t buf[BUF_LEN];
-		char cbuf[BUF_LEN];
 
 		IOHIDDeviceRef dev = device_array[i];
 
@@ -447,7 +428,9 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, 
 		if ((vendor_id == 0x0 || vendor_id == dev_vid) &&
 		    (product_id == 0x0 || product_id == dev_pid)) {
 			struct hid_device_info *tmp;
-			size_t len;
+			io_object_t iokit_dev;
+			kern_return_t res;
+			io_string_t path;
 
 			/* VID/PID match. Create the record. */
 			tmp = malloc(sizeof(struct hid_device_info));
@@ -465,8 +448,14 @@ struct hid_device_info  HID_API_EXPORT *hid_enumerate(unsigned short vendor_id, 
 
 			/* Fill out the record */
 			cur_dev->next = NULL;
-			len = make_path(dev, cbuf, sizeof(cbuf));
-			cur_dev->path = strdup(cbuf);
+
+			/* Fill in the path (IOService plane) */
+			iokit_dev = hidapi_IOHIDDeviceGetService(dev);
+			res = IORegistryEntryGetPath(iokit_dev, kIOServicePlane, path);
+			if (res == KERN_SUCCESS)
+				cur_dev->path = strdup(path);
+			else
+				cur_dev->path = strdup("");
 
 			/* Serial Number */
 			get_serial_number(dev, buf, BUF_LEN);
@@ -680,76 +669,77 @@ static void *read_thread(void *param)
 	return NULL;
 }
 
+/* hid_open_path()
+ *
+ * path must be a valid path to an IOHIDDevice in the IOService plane
+ * Example: "IOService:/AppleACPIPlatformExpert/PCI0@0/AppleACPIPCI/EHC1@1D,7/AppleUSBEHCI/PLAYSTATION(R)3 Controller@fd120000/IOUSBInterface@0/IOUSBHIDDriver"
+ */
 hid_device * HID_API_EXPORT hid_open_path(const char *path)
 {
-	int i;
 	hid_device *dev = NULL;
-	CFIndex num_devices;
-
+	io_registry_entry_t entry = MACH_PORT_NULL;
+	
 	dev = new_hid_device();
 
 	/* Set up the HID Manager if it hasn't been done */
 	if (hid_init() < 0)
 		return NULL;
 
-	/* give the IOHIDManager a chance to update itself */
-	process_pending_events();
+	/* Get the IORegistry entry for the given path */
+	entry = IORegistryEntryFromPath(kIOMasterPortDefault, path);
+	if (entry == MACH_PORT_NULL) {
+		/* Path wasn't valid (maybe device was removed?) */
+		goto return_error;
+	}
 
-	CFSetRef device_set = IOHIDManagerCopyDevices(hid_mgr);
+	/* Create an IOHIDDevice for the entry */
+	dev->device_handle = IOHIDDeviceCreate(kCFAllocatorDefault, entry);
+	if (dev->device_handle == NULL) {
+		/* Error creating the HID device */
+		goto return_error;
+	}
 
-	num_devices = CFSetGetCount(device_set);
-	IOHIDDeviceRef *device_array = calloc(num_devices, sizeof(IOHIDDeviceRef));
-	CFSetGetValues(device_set, (const void **) device_array);
-	for (i = 0; i < num_devices; i++) {
-		char cbuf[BUF_LEN];
-		size_t len;
-		IOHIDDeviceRef os_dev = device_array[i];
+	/* Open the IOHIDDevice */
+	IOReturn ret = IOHIDDeviceOpen(dev->device_handle, kIOHIDOptionsTypeSeizeDevice);
+	if (ret == kIOReturnSuccess) {
+		char str[32];
 
-		len = make_path(os_dev, cbuf, sizeof(cbuf));
-		if (!strcmp(cbuf, path)) {
-			/* Matched Paths. Open this Device. */
-			IOReturn ret = IOHIDDeviceOpen(os_dev, kIOHIDOptionsTypeSeizeDevice);
-			if (ret == kIOReturnSuccess) {
-				char str[32];
+		/* Create the buffers for receiving data */
+		dev->max_input_report_len = (CFIndex) get_max_report_length(dev->device_handle);
+		dev->input_report_buf = calloc(dev->max_input_report_len, sizeof(uint8_t));
 
-				free(device_array);
-				CFRetain(os_dev);
-				CFRelease(device_set);
-				dev->device_handle = os_dev;
+		/* Create the Run Loop Mode for this device.
+		   printing the reference seems to work. */
+		sprintf(str, "HIDAPI_%p", dev->device_handle);
+		dev->run_loop_mode = 
+			CFStringCreateWithCString(NULL, str, kCFStringEncodingASCII);
+		
+		/* Attach the device to a Run Loop */
+		IOHIDDeviceRegisterInputReportCallback(
+			dev->device_handle, dev->input_report_buf, dev->max_input_report_len,
+			&hid_report_callback, dev);
+		IOHIDDeviceRegisterRemovalCallback(dev->device_handle, hid_device_removal_callback, dev);
 
-				/* Create the buffers for receiving data */
-				dev->max_input_report_len = (CFIndex) get_max_report_length(os_dev);
-				dev->input_report_buf = calloc(dev->max_input_report_len, sizeof(uint8_t));
+		/* Start the read thread */
+		pthread_create(&dev->thread, NULL, read_thread, dev);
 
-				/* Create the Run Loop Mode for this device.
-				   printing the reference seems to work. */
-				sprintf(str, "HIDAPI_%p", os_dev);
-				dev->run_loop_mode =
-					CFStringCreateWithCString(NULL, str, kCFStringEncodingASCII);
-
-				/* Attach the device to a Run Loop */
-				IOHIDDeviceRegisterInputReportCallback(
-					os_dev, dev->input_report_buf, dev->max_input_report_len,
-					&hid_report_callback, dev);
-				IOHIDDeviceRegisterRemovalCallback(dev->device_handle, hid_device_removal_callback, dev);
-
-				/* Start the read thread */
-				pthread_create(&dev->thread, NULL, read_thread, dev);
-
-				/* Wait here for the read thread to be initialized. */
-				pthread_barrier_wait(&dev->barrier);
-
-				return dev;
-			}
-			else {
-				goto return_error;
-			}
-		}
+		/* Wait here for the read thread to be initialized. */
+		pthread_barrier_wait(&dev->barrier);
+		
+		IOObjectRelease(entry);
+		return dev;
+	}
+	else {
+		goto return_error;
 	}
 
 return_error:
-	free(device_array);
-	CFRelease(device_set);
+	if (dev->device_handle != NULL)
+		CFRelease(dev->device_handle);
+
+	if (entry != MACH_PORT_NULL)
+		IOObjectRelease(entry);
+
 	free_hid_device(dev);
 	return NULL;
 }

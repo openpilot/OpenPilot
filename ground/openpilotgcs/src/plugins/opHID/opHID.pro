@@ -9,7 +9,7 @@ HEADERS += inc/opHID_global.h \
            inc/opHID_const.h \
            inc/opHID_usbmon.h \
            inc/opHID_usbsignal.h \
-           inc/hidapi.h
+           hidapi/hidapi.h
 SOURCES += src/opHID_plugin.cpp \
            src/opHID.cpp \
            src/opHID_usbsignal.cpp \

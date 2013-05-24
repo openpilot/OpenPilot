@@ -59,6 +59,7 @@ struct data {
     bool    magUpdated;
     float   accel_alpha;
     bool    accel_filter_enabled;
+    float   rollPitchBiasRate;
     int32_t timeval;
     uint8_t init;
 };
@@ -207,8 +208,6 @@ static inline void apply_accel_filter(const struct data *this, const float *raw,
 static int32_t complementaryFilter(struct data *this, float gyro[3], float accel[3], float mag[3], float attitude[4])
 {
     float dT;
-    float magKp = 0.0f; // TODO: make this non hardcoded at some point
-    float magKi = 0.000001f;
 
     // During initialization and
     if (this->first_run) {
@@ -261,19 +260,26 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
     if ((this->init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
         // For first 7 seconds use accels to get gyro bias
         this->attitudeSettings.AccelKp     = 1.0f;
-        this->attitudeSettings.AccelKi     = 0.9f;
+        this->attitudeSettings.AccelKi     = 0.0f;
         this->attitudeSettings.YawBiasRate = 0.23f;
-        magKp = 1.0f;
+        this->accel_filter_enabled   = false;
+        this->rollPitchBiasRate      = 0.01f;
+        this->attitudeSettings.MagKp = 1.0f;
     } else if ((this->attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
         this->attitudeSettings.AccelKp     = 1.0f;
-        this->attitudeSettings.AccelKi     = 0.9f;
+        this->attitudeSettings.AccelKi     = 0.0f;
         this->attitudeSettings.YawBiasRate = 0.23f;
-        magKp = 1.0f;
+        this->accel_filter_enabled   = false;
+        this->rollPitchBiasRate      = 0.01f;
+        this->attitudeSettings.MagKp = 1.0f;
         this->init = 0;
     } else if (this->init == 0) {
         // Reload settings (all the rates)
         AttitudeSettingsGet(&this->attitudeSettings);
-        magKp = 0.01f;
+        this->rollPitchBiasRate = 0.0f;
+        if (this->accel_alpha > 0.0f) {
+            this->accel_filter_enabled = true;
+        }
         this->init = 1;
     }
 
@@ -356,22 +362,26 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         mag_err[0] = mag_err[1] = mag_err[2] = 0.0f;
     }
 
-    // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
-    this->gyroBias[0] -= accel_err[0] * this->attitudeSettings.AccelKi;
-    this->gyroBias[1] -= accel_err[1] * this->attitudeSettings.AccelKi;
-    this->gyroBias[2] -= mag_err[2] * magKi;
-
     // Correct rates based on integral coefficient
     gyro[0] -= this->gyroBias[0];
     gyro[1] -= this->gyroBias[1];
     gyro[2] -= this->gyroBias[2];
+
+    // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
+    this->gyroBias[0] -= accel_err[0] * this->attitudeSettings.AccelKi - gyro[0] * this->rollPitchBiasRate;
+    this->gyroBias[1] -= accel_err[1] * this->attitudeSettings.AccelKi - gyro[1] * this->rollPitchBiasRate;;
+    if (this->useMag) {
+        this->gyroBias[2] -= mag_err[2] * this->attitudeSettings.MagKi - gyro[2] * this->rollPitchBiasRate;
+    } else {
+        this->gyroBias[2] -= -gyro[2] * this->rollPitchBiasRate;
+    }
 
     float gyrotmp[3] = { gyro[0], gyro[1], gyro[2] };
     // Correct rates based on proportional coefficient
     gyrotmp[0] += accel_err[0] * this->attitudeSettings.AccelKp / dT;
     gyrotmp[1] += accel_err[1] * this->attitudeSettings.AccelKp / dT;
     if (this->useMag) {
-        gyrotmp[2] += accel_err[2] * this->attitudeSettings.AccelKp / dT + mag_err[2] * magKp / dT;
+        gyrotmp[2] += accel_err[2] * this->attitudeSettings.AccelKp / dT + mag_err[2] * this->attitudeSettings.MagKp / dT;
     } else {
         gyrotmp[2] += accel_err[2] * this->attitudeSettings.AccelKp / dT;
     }

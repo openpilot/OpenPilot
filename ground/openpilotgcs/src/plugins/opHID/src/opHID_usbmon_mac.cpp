@@ -35,11 +35,7 @@
 #include <QDebug>
 #include "opHID_const.h"
 
-#define OP_LOOPMODE_NAME_MAC "Open_Pilot_Loop_Mode"
-
-#define printf               qDebug
-
-// ! Local helper functions
+// Local helper functions
 static bool HID_GetIntProperty(IOHIDDeviceRef dev, CFStringRef property, int *value);
 static bool HID_GetStrProperty(IOHIDDeviceRef dev, CFStringRef property, QString & value);
 
@@ -60,9 +56,6 @@ USBMonitor::USBMonitor(QObject *parent) : QThread(parent)
 USBMonitor::~USBMonitor()
 {
     m_terminate = true;
-    // if(hid_manager != NULL)
-    // IOHIDManagerUnscheduleFromRunLoop(hid_manager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-// quit();
 
     while (hid_manager != 0) {
         this->sleep(10);

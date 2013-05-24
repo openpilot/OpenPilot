@@ -26,14 +26,14 @@
  */
 
 
-#include "opHID_usbmon.h"
+#include "ophid_usbmon.h"
 #include <IOKit/IOKitLib.h>
 #include <IOKit/hid/IOHIDLib.h>
 #include <CoreFoundation/CFString.h>
 #include <CoreFoundation/CFArray.h>
 #include <QMutexLocker>
 #include <QDebug>
-#include "opHID_const.h"
+#include "ophid_const.h"
 
 // Local helper functions
 static bool HID_GetIntProperty(IOHIDDeviceRef dev, CFStringRef property, int *value);

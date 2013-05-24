@@ -60,7 +60,7 @@ extern "C" {
 #include <stdlib.h>
 
 
-#include "hidapi.h"
+#include "../hidapi.h"
 
 #ifdef _MSC_VER
 	/* Thanks Microsoft, but I know how to use strncpy(). */

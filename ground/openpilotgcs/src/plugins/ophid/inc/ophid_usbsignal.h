@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       usbmonitor.h
+ * @file       ophid_usbsignal.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -29,7 +29,7 @@
 #define OPHID_USBSIGNAL_H
 
 #include <QObject>
-#include "opHID_usbmon.h"
+#include "ophid_usbmon.h"
 
 class OPHID_EXPORT USBSignalFilter : public QObject {
     Q_OBJECT

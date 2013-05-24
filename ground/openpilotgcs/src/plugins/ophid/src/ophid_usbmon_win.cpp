@@ -30,9 +30,9 @@
 #include <initguid.h>
 #include <QEventLoop>
 #include <QTimer>
-#include "opHID_usbmon.h"
+#include "ophid_usbmon.h"
 #include <QDebug>
-#include "opHID_const.h"
+#include "ophid_const.h"
 
 #define printf qDebug
 

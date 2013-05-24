@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       pjrc_rawhid.h
+ * @file       ophid_hidapi.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -36,9 +36,9 @@
 #if defined(Q_OS_LINUX)
 #include <usb.h>
 #endif
-#include "hidapi.h"
-#include "opHID_const.h"
-#include "opHID_global.h"
+#include "../hidapi/hidapi.h"
+#include "ophid_const.h"
+#include "ophid_global.h"
 
 
 class OPHID_EXPORT opHID_hidapi : public QObject {

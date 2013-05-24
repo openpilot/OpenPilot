@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       rawhid.h
+ * @file       ophid_plugin.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -33,9 +33,9 @@
 #include <extensionsystem/iplugin.h>
 #include "coreplugin/iconnection.h"
 
-#include "opHID.h"
-#include "opHID_global.h"
-#include "opHID_usbmon.h"
+#include "ophid.h"
+#include "ophid_global.h"
+#include "ophid_usbmon.h"
 
 class IConnection;
 class RawHIDConnection;

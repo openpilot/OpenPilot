@@ -30,8 +30,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "opHID_const.h"
-#include "opHID_hidapi.h"
+#include "ophid_const.h"
+#include "ophid_hidapi.h"
 
 /**
  * \brief Constructor

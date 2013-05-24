@@ -25,15 +25,15 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "opHID_global.h"
-#include "opHID_plugin.h"
+#include "ophid_global.h"
+#include "ophid_plugin.h"
 #include <extensionsystem/pluginmanager.h>
 
 #include <QtCore/QtPlugin>
 #include <QtCore/QMutexLocker>
 
-#include "opHID_hidapi.h"
-#include "opHID_const.h"
+#include "ophid_hidapi.h"
+#include "ophid_const.h"
 
 
 /**

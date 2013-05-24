@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       rawhid.h
+ * @file       ophid.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -28,14 +28,14 @@
 #ifndef OPHID_H
 #define OPHID_H
 
-#include "opHID_global.h"
+#include "ophid_global.h"
 
 #include <QThread>
 #include <QIODevice>
 #include <QMutex>
 #include <QByteArray>
-#include "opHID_hidapi.h"
-#include "opHID_usbmon.h"
+#include "ophid_hidapi.h"
+#include "ophid_usbmon.h"
 
 class RawHIDReadThread;
 class RawHIDWriteThread;

@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       usbmonitor.h
+ * @file       ophid_usbmon.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -28,7 +28,7 @@
 #ifndef OPHID_USBMON_H
 #define OPHID_USBMON_H
 
-#include "opHID_global.h"
+#include "ophid_global.h"
 
 #include <QThread>
 #include <QMutex>

@@ -47,7 +47,7 @@
 #include "libusb.h"
 #include "iconv.h"
 
-#include "hidapi.h"
+#include "../hidapi.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -25,9 +25,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "opHID_usbmon.h"
+#include "ophid_usbmon.h"
 #include <QDebug>
-#include "opHID_const.h"
+#include "ophid_const.h"
 
 
 /**

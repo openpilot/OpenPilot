@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       rawhid_global.h
+ * @file       ophid_global.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup GCSPlugins GCS Plugins
  * @{

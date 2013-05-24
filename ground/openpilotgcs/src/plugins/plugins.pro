@@ -30,7 +30,7 @@ SUBDIRS += plugin_welcome
 
 # opHID connection plugin
 SUBDIRS += plugin_opHID
-plugin_opHID.subdir = opHID
+plugin_opHID.subdir = ophid
 plugin_opHID.depends = plugin_coreplugin
 
 # Serial port connection plugin

@@ -68,7 +68,8 @@ USBSignalFilter::USBSignalFilter(int vid, int pid, int boardModel, int runState)
     connect(USBMonitor::instance(),
             SIGNAL(deviceDiscovered(USBPortInfo)),
             this,
-            SLOT(m_deviceDiscovered(USBPortInfo)));
+			SLOT(m_deviceDiscovered(USBPortInfo)),
+			Qt::QueuedConnection);
 }
 
 

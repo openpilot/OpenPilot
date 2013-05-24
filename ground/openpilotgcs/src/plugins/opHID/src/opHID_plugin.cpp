@@ -49,8 +49,13 @@ RawHIDConnection::RawHIDConnection()
 
     m_usbMonitor = USBMonitor::instance();
 
-    connect(m_usbMonitor, SIGNAL(deviceDiscovered(USBPortInfo)), this, SLOT(onDeviceConnected()));
-    connect(m_usbMonitor, SIGNAL(deviceRemoved(USBPortInfo)), this, SLOT(onDeviceDisconnected()));
+#ifndef __APPLE__
+	connect(m_usbMonitor, SIGNAL(deviceDiscovered(USBPortInfo)), this, SLOT(onDeviceConnected()));
+	connect(m_usbMonitor, SIGNAL(deviceRemoved(USBPortInfo)), this, SLOT(onDeviceDisconnected()));
+#else
+	connect(m_usbMonitor, SIGNAL(deviceDiscovered()), this, SLOT(onDeviceConnected()));
+	connect(m_usbMonitor, SIGNAL(deviceRemoved()), this, SLOT(onDeviceDisconnected()));
+#endif
 
 }
 

@@ -137,6 +137,9 @@ signals:
       \param info The device that has been discovered.
     */
     void deviceDiscovered( const USBPortInfo & info );
+#ifdef __APPLE__
+	void deviceDiscovered();
+#endif // __APPLE__
     /*!
       A device has been disconnected from the system.
 
@@ -145,6 +148,9 @@ signals:
       \param info The device that was disconnected.
     */
     void deviceRemoved( const USBPortInfo & info );
+#ifdef __APPLE__
+	void deviceRemoved();
+#endif // __APPLE__
 
 private slots:
     /**
@@ -197,6 +203,13 @@ private:
     USBRegistrationWidget* notificationWidget;
 #endif
 #endif
+
+#ifdef __APPLE__
+protected:
+	bool m_terminate;
+
+	void run();
+#endif // __APPLE__
 
 };
 #endif // OPHID_USBMON_H

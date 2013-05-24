@@ -230,12 +230,12 @@ static bool HID_GetIntProperty(IOHIDDeviceRef dev, CFStringRef property, int *va
  */
 static bool HID_GetStrProperty(IOHIDDeviceRef dev, CFStringRef property, QString & value)
 {
-    CFTypeRef prop = IOHIDDeviceGetProperty(dev, property);
+    CFStringRef prop = static_cast<CFStringRef>(IOHIDDeviceGetProperty(dev, property));
 
     if (prop) {
         if (CFStringGetTypeID() == CFGetTypeID(prop)) { // if a string
             char buffer[2550];
-            bool success = CFStringGetCString((CFStringRef)prop, buffer, sizeof(buffer), kCFStringEncodingMacRoman);
+            bool success = CFStringGetCString(prop, buffer, sizeof(buffer), kCFStringEncodingMacRoman);
             value = QString(buffer);
             return success;
         }

@@ -137,13 +137,14 @@ signals:
      */
     void deviceDiscovered(const USBPortInfo & info);
     void deviceDiscovered();
-       /*!
-          A device has been disconnected from the system.
 
-          setUpNotifications() must be called first to enable event-driven device notifications.
-          Currently only implemented on Windows and OS X.
-          \param info The device that was disconnected.
-        */
+    /*!
+       A device has been disconnected from the system.
+
+       setUpNotifications() must be called first to enable event-driven device notifications.
+       Currently only implemented on Windows and OS X.
+       \param info The device that was disconnected.
+     */
     void deviceRemoved(const USBPortInfo & info);
     void deviceRemoved();
 

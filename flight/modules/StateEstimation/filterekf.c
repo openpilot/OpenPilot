@@ -44,6 +44,14 @@
 
 #define STACK_REQUIRED 2048
 
+#define IMPORT_SENSOR_IF_UPDATED(shortname, num) \
+    if (IS_SET(state->updated, SENSORUPDATES_##shortname)) { \
+        uint8_t t; \
+        for (t = 0; t < num; t++) { \
+            this->work.shortname[t] = state->shortname[t]; \
+        } \
+    }
+
 // Private types
 struct data {
     EKFConfigurationData ekfConfiguration;
@@ -191,20 +199,13 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     this->work.updated |= state->updated;
 
     // Get most recent data
-#define UPDATE(shortname, num) \
-    if (IS_SET(state->updated, SENSORUPDATES_##shortname)) { \
-        uint8_t t; \
-        for (t = 0; t < num; t++) { \
-            this->work.shortname[t] = state->shortname[t]; \
-        } \
-    }
-    UPDATE(gyro, 3);
-    UPDATE(accel, 3);
-    UPDATE(mag, 3);
-    UPDATE(baro, 1);
-    UPDATE(pos, 3);
-    UPDATE(vel, 3);
-    UPDATE(airspeed, 2);
+    IMPORT_SENSOR_IF_UPDATED(gyro, 3);
+    IMPORT_SENSOR_IF_UPDATED(accel, 3);
+    IMPORT_SENSOR_IF_UPDATED(mag, 3);
+    IMPORT_SENSOR_IF_UPDATED(baro, 1);
+    IMPORT_SENSOR_IF_UPDATED(pos, 3);
+    IMPORT_SENSOR_IF_UPDATED(vel, 3);
+    IMPORT_SENSOR_IF_UPDATED(airspeed, 2);
 
     // check whether mandatory updates are present accels must have been supplied already,
     // and gyros must be supplied just now for a prediction step to take place
@@ -332,9 +333,9 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     state->attitude[1] = Nav.q[1];
     state->attitude[2] = Nav.q[2];
     state->attitude[3] = Nav.q[3];
-    state->gyro[0]    += Nav.gyro_bias[0];
-    state->gyro[1]    += Nav.gyro_bias[1];
-    state->gyro[2]    += Nav.gyro_bias[2];
+    state->gyro[0]    -= Nav.gyro_bias[0];
+    state->gyro[1]    -= Nav.gyro_bias[1];
+    state->gyro[2]    -= Nav.gyro_bias[2];
     state->pos[0]   = Nav.Pos[0];
     state->pos[1]   = Nav.Pos[1];
     state->pos[2]   = Nav.Pos[2];

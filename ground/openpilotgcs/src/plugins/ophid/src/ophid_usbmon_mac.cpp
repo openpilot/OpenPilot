@@ -48,7 +48,7 @@ USBMonitor::USBMonitor(QObject *parent) : QThread(parent)
     hid_manager = NULL;
     listMutex   = new QMutex();
     knowndevices.clear();
-
+    qRegisterMetaType<USBPortInfo>("USBPortInfo");
     m_terminate = false;
     start();
 }

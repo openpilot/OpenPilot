@@ -2,7 +2,7 @@
 	<object name="OPLinkSettings" singleinstance="true" settings="true">
 		<description>OPLink configurations options.</description>
 		<field name="Bindings" units="hex" type="uint32" elements="8" defaultvalue="0"/>
-		<field name="RemoteMainPort" units="" type="enum" elements="8" options="Disabled,Serial,PPM" defaultvalue="Telemetry"/>
+		<field name="RemoteMainPort" units="" type="enum" elements="8" options="Disabled,Serial,PPM" defaultvalue="Disabled"/>
 		<field name="RemoteFlexiPort" units="" type="enum" elements="8" options="Disabled,Serial,PPM" defaultvalue="Disabled"/>
 		<field name="RemoteVCPPort" units="" type="enum" elements="8" options="Disabled,Serial" defaultvalue="Disabled"/>
 		<field name="ComSpeed" units="bps" type="enum" elements="8" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="38400"/>

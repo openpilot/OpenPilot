@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1075</width>
-    <height>834</height>
+    <width>983</width>
+    <height>736</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -479,6 +479,9 @@
      <property name="acceptDrops">
       <bool>false</bool>
      </property>
+     <property name="toolTip">
+      <string/>
+     </property>
      <property name="autoFillBackground">
       <bool>false</bool>
      </property>
@@ -603,8 +606,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1045</width>
-            <height>751</height>
+            <width>953</width>
+            <height>653</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -622,6 +625,9 @@
            </property>
            <item>
             <widget class="QGroupBox" name="basicResponsivenessGroupBox">
+             <property name="toolTip">
+              <string/>
+             </property>
              <property name="styleSheet">
               <string notr="true"/>
              </property>
@@ -648,6 +654,9 @@
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
+                </property>
+                <property name="toolTip">
+                 <string>Reset all values to GCS defaults</string>
                 </property>
                 <property name="text">
                  <string>Default</string>
@@ -1229,6 +1238,9 @@
                      <bold>true</bold>
                     </font>
                    </property>
+                   <property name="toolTip">
+                    <string>This thing really can preform, it is a lot more responsive this way</string>
+                   </property>
                    <property name="autoFillBackground">
                     <bool>false</bool>
                    </property>
@@ -1281,6 +1293,9 @@ border-radius: 5;</string>
                  </item>
                  <item row="2" column="1" colspan="5">
                   <widget class="QSlider" name="RateResponsivenessSlider">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Rate Mode slider can be adjusted to value ranges whose responsivness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="minimum">
                     <number>100</number>
                    </property>
@@ -1906,6 +1921,9 @@ border-radius: 5;</string>
                      <bold>true</bold>
                     </font>
                    </property>
+                   <property name="toolTip">
+                    <string>Lazy Sunday afternoon flying, fly's nice and stable</string>
+                   </property>
                    <property name="autoFillBackground">
                     <bool>false</bool>
                    </property>
@@ -2456,6 +2474,9 @@ border-radius: 5;</string>
                      <bold>true</bold>
                     </font>
                    </property>
+                   <property name="toolTip">
+                    <string>Damn this is insane how quick it moves. Mostly used by the Pro's</string>
+                   </property>
                    <property name="autoFillBackground">
                     <bool>false</bool>
                    </property>
@@ -2506,6 +2527,9 @@ border-radius: 5;</string>
                  </item>
                  <item row="1" column="1" colspan="5">
                   <widget class="QSlider" name="AttitudeResponsivenessSlider">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Attitude Mode slider can be adjusted to value ranges whose responsivness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="minimum">
                     <number>10</number>
                    </property>
@@ -2540,6 +2564,9 @@ border-radius: 5;</string>
                  </item>
                  <item row="3" column="1" colspan="5">
                   <widget class="QSlider" name="RateYawResponsivenessSlider">
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Rate mode Yaw slider can be adjusted to value ranges whose responsivness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="minimum">
                     <number>100</number>
                    </property>
@@ -2638,7 +2665,7 @@ border-radius: 5;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>195</height>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -2673,6 +2700,9 @@ border-radius: 5;</string>
                 </property>
                 <property name="focusPolicy">
                  <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link roll &amp;amp; pitch sliders to move together, thus giving same value for both roll &amp;amp; pitch when setting up a symetrical vehicle that requires both to be the same&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="styleSheet">
                  <string notr="true"/>
@@ -2749,7 +2779,7 @@ border-radius: 5;</string>
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>131</height>
+                  <height>0</height>
                  </size>
                 </property>
                 <property name="palette">
@@ -4354,8 +4384,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
-Then lower the value by 5 or so.</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Rate mode (inner loop). Too much will make your vehicle oscillate in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -4472,8 +4501,7 @@ Then lower the value by 5 or so.</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
-Then lower the value by 5 or so.</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Rate mode (inner loop). Too much will make your vehicle oscillate in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -4523,8 +4551,7 @@ Then lower the value by 5 or so.</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>Slowly raise Proportional until you start seeing clear oscillations when you fly.
-Then lower the value by 5 or so.</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Rate mode (inner loop). Too much will make your vehicle oscillate in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -4652,8 +4679,7 @@ Then lower the value by 5 or so.</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>As a rule of thumb, you can set the Integral at roughly the same
-value as the Kp.</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stabilty your vehicle will have when flying tilted (ie forward flight) in Rate Mode. A good starting point for Integral is the same as Proportional&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -4800,8 +4826,7 @@ value as the Kp.</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>As a rule of thumb, you can set the Integral at roughly the same
-value as the Kp.</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stabilty your vehicle will have when flying tilted (ie forward flight) in Rate Mode. A good starting point for Integral is the same as Proportional&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -4851,8 +4876,7 @@ value as the Kp.</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>As a rule of thumb, you can set the Integral at roughly the same
-value as the Kp.</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stabilty your vehicle will have when flying tilted (ie forward flight) in Rate Mode. A good starting point for Integral is the same as Proportional&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -5503,7 +5527,7 @@ border-radius: 5;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>195</height>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -6053,6 +6077,9 @@ border-radius: 5;</string>
                 <property name="focusPolicy">
                  <enum>Qt::StrongFocus</enum>
                 </property>
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link roll &amp;amp; pitch sliders to move together, thus giving same value for both roll &amp;amp; pitch when setting up a symetrical vehicle that requires both to be the same.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
                 <property name="styleSheet">
                  <string notr="true"/>
                 </property>
@@ -6119,7 +6146,7 @@ border-radius: 5;</string>
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
-                  <height>131</height>
+                  <height>0</height>
                  </size>
                 </property>
                 <property name="palette">
@@ -8251,6 +8278,9 @@ border-radius: 5;</string>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Attitude mode (outer loop). Too much will make your vehicle oscillate in Attitude Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
@@ -8332,6 +8362,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Attitude mode (outer loop). Too much will make your vehicle oscillate in Attitude Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -8415,6 +8448,9 @@ border-radius: 5;</string>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Attitude mode (outer loop). Too much will make your vehicle oscillate in Attitude Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
@@ -8480,271 +8516,6 @@ border-radius: 5;</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="label_157">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="text">
-                    <string>Integral</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QSlider" name="horizontalSlider_85">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>25</height>
-                    </size>
-                   </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="maximum">
-                    <number>100</number>
-                   </property>
-                   <property name="sliderPosition">
-                    <number>50</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="tickPosition">
-                    <enum>QSlider::TicksBelow</enum>
-                   </property>
-                   <property name="tickInterval">
-                    <number>25</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:RollPI</string>
-                     <string>element:Ki</string>
-                     <string>scale:0.1</string>
-                     <string>haslimits:yes</string>
-                     <string>buttongroup:2,10</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="2">
-                  <widget class="QSpinBox" name="spinBox_18">
-                   <property name="minimumSize">
-                    <size>
-                     <width>50</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>50</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="maximum">
-                    <number>200</number>
-                   </property>
-                   <property name="value">
-                    <number>200</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:RollPI</string>
-                     <string>element:Ki</string>
-                     <string>scale:0.1</string>
-                     <string>haslimits:yes</string>
-                     <string>buttongroup:2,10</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="3">
-                  <widget class="QSlider" name="horizontalSlider_86">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>25</height>
-                    </size>
-                   </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="maximum">
-                    <number>100</number>
-                   </property>
-                   <property name="sliderPosition">
-                    <number>50</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="tickPosition">
-                    <enum>QSlider::TicksBelow</enum>
-                   </property>
-                   <property name="tickInterval">
-                    <number>25</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:PitchPI</string>
-                     <string>element:Ki</string>
-                     <string>scale:0.1</string>
-                     <string>haslimits:yes</string>
-                     <string>buttongroup:2,10</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="4">
-                  <widget class="QSpinBox" name="spinBox_19">
-                   <property name="minimumSize">
-                    <size>
-                     <width>50</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>50</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="maximum">
-                    <number>200</number>
-                   </property>
-                   <property name="value">
-                    <number>200</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:PitchPI</string>
-                     <string>element:Ki</string>
-                     <string>scale:0.1</string>
-                     <string>haslimits:yes</string>
-                     <string>buttongroup:2,10</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="5">
-                  <widget class="QSlider" name="horizontalSlider_87">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>25</height>
-                    </size>
-                   </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="maximum">
-                    <number>100</number>
-                   </property>
-                   <property name="sliderPosition">
-                    <number>50</number>
-                   </property>
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="tickPosition">
-                    <enum>QSlider::TicksBelow</enum>
-                   </property>
-                   <property name="tickInterval">
-                    <number>25</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:YawPI</string>
-                     <string>element:Ki</string>
-                     <string>scale:0.1</string>
-                     <string>haslimits:yes</string>
-                     <string>buttongroup:2,10</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="6">
-                  <widget class="QSpinBox" name="spinBox_20">
-                   <property name="minimumSize">
-                    <size>
-                     <width>50</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>50</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                   <property name="focusPolicy">
-                    <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="maximum">
-                    <number>200</number>
-                   </property>
-                   <property name="value">
-                    <number>200</number>
-                   </property>
-                   <property name="objrelation" stdset="0">
-                    <stringlist>
-                     <string>objname:StabilizationSettings</string>
-                     <string>fieldname:YawPI</string>
-                     <string>element:Ki</string>
-                     <string>scale:0.1</string>
-                     <string>haslimits:yes</string>
-                     <string>buttongroup:2,10</string>
-                    </stringlist>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="0" column="2">
                   <spacer name="horizontalSpacer_2">
                    <property name="orientation">
@@ -8797,6 +8568,19 @@ border-radius: 5;</string>
                    </property>
                   </spacer>
                  </item>
+                 <item row="2" column="5">
+                  <spacer name="horizontalSpacer_48">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>1</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
                 </layout>
                </widget>
               </item>
@@ -8844,7 +8628,7 @@ border-radius: 5;</string>
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>When the throttle is low, zero the intergral term to prevent intergral wind-up</string>
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This function will avoid integral windup when at idle. Integral windup is an accumulation of over-correction and can make the vehicle flip during a slow takeoff.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true"/>
@@ -8896,7 +8680,7 @@ border-radius: 5;</string>
                    </size>
                   </property>
                   <property name="toolTip">
-                   <string>Enabling this feature mean that any changes made to the sliders will be instantly sent and used by the Flight Controller, useful for two person tuning where one normally flies and ones changes the GCS.</string>
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this feature mean that any changes made to the sliders will be instantly sent and used by the Flight Controller, useful for two person tuning where one normally flies and ones changes the GCS.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                   </property>
                   <property name="styleSheet">
                    <string notr="true"/>
@@ -9017,9 +8801,9 @@ border-radius: 5;</string>
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
-            <width>1045</width>
-            <height>751</height>
+            <y>-49</y>
+            <width>936</width>
+            <height>702</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -10110,6 +9894,9 @@ border-radius: 5;</string>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum deg your vehicle will tilt at full stick input when in Attitude mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
@@ -10191,7 +9978,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum rotation rate in degress per second on an axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -10260,7 +10047,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the degress per second the your vehcle will tilt/rotate at full stick input when in all modes except Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -10313,7 +10100,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum deg your vehicle will tilt at full stick input when in Attitude mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -10363,6 +10150,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum rotation rate in degress per second on an axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -11571,6 +11361,9 @@ border-radius: 5;</string>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the degress per second the your vehcle will tilt/rotate at full stick input when in all modes except Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
@@ -12188,7 +11981,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the degress per second the your vehcle will tilt/rotate at full stick input when in all modes except Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -12241,7 +12034,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum deg your vehicle will tilt at full stick input when in Attitude mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -12296,7 +12089,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum rotation rate in degress per second on an axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -12934,6 +12727,9 @@ border-radius: 5;</string>
               </item>
               <item row="0" column="0">
                <widget class="QCheckBox" name="checkBox_3">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link roll &amp;amp; pitch values together, thus giving the same value for each when setting up a symetrical vehicle that requires both to be the same.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
                 <property name="styleSheet">
                  <string notr="true"/>
                 </property>
@@ -13453,6 +13249,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This makes the control output respond faster due to fast stick movements or external disturbance like wind gusts.It also acts like a dampener, thus allowing higher KP settings. Only effects Rate Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -14071,8 +13870,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>As a rule of thumb, you can set the Ki at roughly the same
-value as the Kp.</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stabilty your vehicle will have when flying tilted (ie forward flight) in Rate Mode. A good starting point for Integral is the same as Proportional.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -14122,8 +13920,7 @@ value as the Kp.</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>As a rule of thumb, you can set the Ki at roughly the same
-value as the Kp.</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stabilty your vehicle will have when flying tilted (ie forward flight) in Rate Mode. A good starting point for Integral is the same as Proportional.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -14173,10 +13970,7 @@ value as the Kp.</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
-Then lower the value by 20% or so.
-
-You can usually go for higher values for Yaw factors.</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Rate mode (inner loop). Too much will make your vehicle oscillate in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -14226,7 +14020,7 @@ You can usually go for higher values for Yaw factors.</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This makes the control output respond faster due to fast stick movements or external disturbance like wind gusts.It also acts like a dampener, thus allowing higher KP settings. Only effects Rate Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -15433,8 +15227,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
-Then lower the value by 20% or so.</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Rate mode (inner loop). Too much will make your vehicle oscillate in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -15500,8 +15293,7 @@ Then lower the value by 20% or so.</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>As a rule of thumb, you can set the Ki at roughly the same
-value as the Kp.</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stabilty your vehicle will have when flying tilted (ie forward flight) in Rate Mode. A good starting point for Integral is the same as Proportional.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -15582,8 +15374,7 @@ value as the Kp.</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>Slowly raise Kp until you start seeing clear oscillations when you fly.
-Then lower the value by 20% or so.</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Rate mode (inner loop). Too much will make your vehicle oscillate in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -15633,7 +15424,7 @@ Then lower the value by 20% or so.</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This makes the control output respond faster due to fast stick movements or external disturbance like wind gusts.It also acts like a dampener, thus allowing higher KP settings. Only effects Rate Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -16249,6 +16040,9 @@ Then lower the value by 20% or so.</string>
               </property>
               <item row="0" column="0">
                <widget class="QCheckBox" name="checkBox_2">
+                <property name="toolTip">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link roll &amp;amp; pitch values together, thus giving the same value for each when setting up a symetrical vehicle that requires both to be the same.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
                 <property name="styleSheet">
                  <string notr="true"/>
                 </property>
@@ -18474,7 +18268,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Attitude mode (outer loop). Too much will make your vehicle oscillate in Attitude Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -18522,6 +18316,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Attitude mode (outer loop). Too much will make your vehicle oscillate in Attitude Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -18571,7 +18368,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Attitude mode (outer loop). Too much will make your vehicle oscillate in Attitude Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -18656,7 +18453,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stabilty your vehicle will have when flying tilted (ie forward flight) in Attitude Mode. Adding Ki in Attitude when Ki is present in Rate is not recommended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -18720,6 +18517,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stabilty your vehicle will have when flying tilted (ie forward flight) in Attitude Mode. Adding Ki in Attitude when Ki is present in Rate is not recommended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -18785,7 +18585,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stabilty your vehicle will have when flying tilted (ie forward flight) in Attitude Mode. Adding Ki in Attitude when Ki is present in Rate is not recommended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -18863,7 +18663,7 @@ border-radius: 5;</string>
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Enabling this feature mean that any changes made to the sliders will be instantly sent and used by the Flight Controller, useful for two person tuning where one normally flies and ones changes the GCS.</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this feature mean that any changes made to the sliders will be instantly sent and used by the Flight Controller, useful for two person tuning where one normally flies and ones changes the GCS.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="styleSheet">
                  <string notr="true"/>
@@ -19005,8 +18805,8 @@ border-radius: 5;</string>
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>1045</width>
-            <height>751</height>
+            <width>953</width>
+            <height>653</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -21376,7 +21176,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In Weak Leveling mode, this setting acts like Attitude Kp. If you make this setting too high, it can cause oscillations.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -21444,7 +21244,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In Weak Leveling mode, this is the maximum number of degrees per second that weak leveling will move the vehicle.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -21512,7 +21312,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In AxisLock mode, this is the maximum number of degrees of correction. If movement by outside forces (eg Wind) are less than the set value your vehicle will return to centre. More than set amount and will only move your vehicle the set amount back to centre.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -21583,7 +21383,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In AxisLock mode, this setting controls how many degrees per second you can request with the stick before OpenPilot stops trying to gently hold its position and goes into normal rate mode. This setting works almost like a dead band. Default value should work fine.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -21987,6 +21787,9 @@ border-radius: 5;</string>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum value of the integral (KP) that is used in Rate Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
@@ -22038,7 +21841,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum value of the integral (KP) that is used in Rate Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -23191,7 +22994,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum value of the integral (KP) that is used in AttitudeMode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -23270,6 +23073,9 @@ border-radius: 5;</string>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum value of the integral (KP) that is used in AttitudeMode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -23379,7 +23185,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum value of the integral (KP) that is used in AttitudeMode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -23992,7 +23798,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string/>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum value of the integral (KP) that is used in Rate Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -25167,7 +24973,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>The proportional term for the accelerometer, the higher this term the more weight the  accel is given</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The proportional term for the accelerometer, the higher this term the more weight the accel is given.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -26319,7 +26125,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>GyroTau is a gyro filter, the higher the factor the more filtering is applied to the gyros</string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In effect, a vibrations filter for the gyro.  Default 0.005 - Max .020.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -26934,7 +26740,7 @@ border-radius: 5;</string>
                     <enum>Qt::StrongFocus</enum>
                    </property>
                    <property name="toolTip">
-                    <string>The intergral term for the accelerometer within the filter </string>
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The intergral term for the accelerometer within the filter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>
@@ -27014,7 +26820,7 @@ border-radius: 5;</string>
                  </size>
                 </property>
                 <property name="toolTip">
-                 <string>Enabling this feature mean that any changes made to the sliders will be instantly sent and used by the Flight Controller, useful for two person tuning where one normally flies and ones changes the GCS.</string>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this feature mean that any changes made to the sliders will be instantly sent and used by the Flight Controller, useful for two person tuning where one normally flies and ones changes the GCS.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="styleSheet">
                  <string notr="true"/>
@@ -27262,12 +27068,6 @@ Useful if you have accidentally changed some settings.</string>
   <tabstop>spinBox_14</tabstop>
   <tabstop>horizontalSlider_84</tabstop>
   <tabstop>spinBox_15</tabstop>
-  <tabstop>horizontalSlider_85</tabstop>
-  <tabstop>spinBox_18</tabstop>
-  <tabstop>horizontalSlider_86</tabstop>
-  <tabstop>spinBox_19</tabstop>
-  <tabstop>horizontalSlider_87</tabstop>
-  <tabstop>spinBox_20</tabstop>
   <tabstop>lowThrottleZeroIntegral_8</tabstop>
   <tabstop>checkBox_7</tabstop>
   <tabstop>checkBox_8</tabstop>

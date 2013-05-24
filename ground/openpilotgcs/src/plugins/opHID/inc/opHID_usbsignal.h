@@ -31,8 +31,7 @@
 #include <QObject>
 #include "opHID_usbmon.h"
 
-class OPHID_EXPORT USBSignalFilter : public QObject
-{
+class OPHID_EXPORT USBSignalFilter : public QObject {
     Q_OBJECT
 
 private:
@@ -52,4 +51,3 @@ public:
 };
 
 #endif // OPHID_USBSIGNAL_H
-

@@ -37,7 +37,7 @@
 
 #define OP_LOOPMODE_NAME_MAC "Open_Pilot_Loop_Mode"
 
-#define printf qDebug
+#define printf               qDebug
 
 // ! Local helper functions
 static bool HID_GetIntProperty(IOHIDDeviceRef dev, CFStringRef property, int *value);
@@ -48,25 +48,25 @@ static bool HID_GetStrProperty(IOHIDDeviceRef dev, CFStringRef property, QString
  */
 USBMonitor::USBMonitor(QObject *parent) : QThread(parent)
 {
-	m_instance  = this;
-	hid_manager = NULL;
-	listMutex   = new QMutex();
-	knowndevices.clear();
+    m_instance  = this;
+    hid_manager = NULL;
+    listMutex   = new QMutex();
+    knowndevices.clear();
 
-	m_terminate = false;
+    m_terminate = false;
     start();
 }
 
 USBMonitor::~USBMonitor()
 {
-	m_terminate = true;
+    m_terminate = true;
     // if(hid_manager != NULL)
     // IOHIDManagerUnscheduleFromRunLoop(hid_manager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-//	quit();
+// quit();
 
-	while (hid_manager != 0) {
-		this->sleep(10);
-	}
+    while (hid_manager != 0) {
+        this->sleep(10);
+    }
 }
 
 void USBMonitor::deviceEventReceived()
@@ -90,7 +90,7 @@ void USBMonitor::removeDevice(IOHIDDeviceRef dev)
             QMutexLocker locker(listMutex);
             knowndevices.removeAt(i);
             emit deviceRemoved(port);
-			emit deviceRemoved();
+            emit deviceRemoved();
             return;
         }
     }
@@ -113,9 +113,9 @@ void USBMonitor::addDevice(USBPortInfo info)
 {
     QMutexLocker locker(listMutex);
 
-	knowndevices.append(info);
-	emit deviceDiscovered(info);
-	emit deviceDiscovered();
+    knowndevices.append(info);
+    emit deviceDiscovered(info);
+    emit deviceDiscovered();
 }
 
 void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
@@ -187,38 +187,38 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
 
 void USBMonitor::run()
 {
-	IOReturn ret;
+    IOReturn ret;
 
-	hid_manager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
-	if (hid_manager == NULL || CFGetTypeID(hid_manager) != IOHIDManagerGetTypeID()) {
-		if (hid_manager) {
-			CFRelease(hid_manager);
-		}
-		assert(0);
-	}
+    hid_manager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
+    if (hid_manager == NULL || CFGetTypeID(hid_manager) != IOHIDManagerGetTypeID()) {
+        if (hid_manager) {
+            CFRelease(hid_manager);
+        }
+        assert(0);
+    }
 
-	// No matching filter
-	IOHIDManagerSetDeviceMatching(hid_manager, NULL);
+    // No matching filter
+    IOHIDManagerSetDeviceMatching(hid_manager, NULL);
 
-	CFRunLoopRef loop = CFRunLoopGetCurrent();
-	// set up a callbacks for device attach & detach
-	IOHIDManagerScheduleWithRunLoop(hid_manager, loop, kCFRunLoopDefaultMode);
-	IOHIDManagerRegisterDeviceMatchingCallback(hid_manager, attach_callback, this);
-	IOHIDManagerRegisterDeviceRemovalCallback(hid_manager, detach_callback, this);
-	ret = IOHIDManagerOpen(hid_manager, kIOHIDOptionsTypeNone);
-	if (ret != kIOReturnSuccess) {
-		IOHIDManagerUnscheduleFromRunLoop(hid_manager, loop, kCFRunLoopDefaultMode);
-		CFRelease(hid_manager);
-		return;
-	}
+    CFRunLoopRef loop = CFRunLoopGetCurrent();
+    // set up a callbacks for device attach & detach
+    IOHIDManagerScheduleWithRunLoop(hid_manager, loop, kCFRunLoopDefaultMode);
+    IOHIDManagerRegisterDeviceMatchingCallback(hid_manager, attach_callback, this);
+    IOHIDManagerRegisterDeviceRemovalCallback(hid_manager, detach_callback, this);
+    ret = IOHIDManagerOpen(hid_manager, kIOHIDOptionsTypeNone);
+    if (ret != kIOReturnSuccess) {
+        IOHIDManagerUnscheduleFromRunLoop(hid_manager, loop, kCFRunLoopDefaultMode);
+        CFRelease(hid_manager);
+        return;
+    }
 
-	while(!m_terminate) {
-		CFRunLoopRunInMode(kCFRunLoopDefaultMode, 1, false);
-	}
-	IOHIDManagerUnscheduleFromRunLoop(hid_manager, loop, kCFRunLoopDefaultMode);
-	CFRelease(hid_manager);
+    while (!m_terminate) {
+        CFRunLoopRunInMode(kCFRunLoopDefaultMode, 1, false);
+    }
+    IOHIDManagerUnscheduleFromRunLoop(hid_manager, loop, kCFRunLoopDefaultMode);
+    CFRelease(hid_manager);
 
-	hid_manager = NULL;
+    hid_manager = NULL;
 }
 
 /**

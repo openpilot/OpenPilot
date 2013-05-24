@@ -10,18 +10,18 @@
  * @brief Impliments a HID USB connection to the flight hardware as a QIODevice
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -42,12 +42,11 @@ class RawHIDConnection;
 
 
 /**
-*   Define a connection via the IConnection interface
-*   Plugin will add a instance of this class to the pool,
-*   so the connection manager can use it.
-*/
-class OPHID_EXPORT RawHIDConnection: public Core::IConnection
-{
+ *   Define a connection via the IConnection interface
+ *   Plugin will add a instance of this class to the pool,
+ *   so the connection manager can use it.
+ */
+class OPHID_EXPORT RawHIDConnection : public Core::IConnection {
     Q_OBJECT
 
 public:
@@ -63,7 +62,10 @@ public:
     virtual void suspendPolling();
     virtual void resumePolling();
 
-    bool deviceOpened() { return (RawHidHandle != NULL); }	// Pip
+    bool deviceOpened()
+    {
+        return RawHidHandle != NULL;
+    } // Pip
 
 protected slots:
     void onDeviceConnected();
@@ -75,13 +77,12 @@ private:
 
 protected:
     QMutex m_enumMutex;
-    USBMonitor* m_usbMonitor;
+    USBMonitor *m_usbMonitor;
     bool m_deviceOpened;
 };
 
 class OPHID_EXPORT RawHIDPlugin
-    : public ExtensionSystem::IPlugin
-{
+    : public ExtensionSystem::IPlugin {
     Q_OBJECT
 
 public:
@@ -93,9 +94,7 @@ public:
 
 private:
     RawHIDConnection *hidConnection;
-    USBMonitor* m_usbMonitor;
-
+    USBMonitor *m_usbMonitor;
 };
 
 #endif // OPHID_PLUGIN_H
-

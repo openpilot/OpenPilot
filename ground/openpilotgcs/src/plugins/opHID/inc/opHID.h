@@ -41,11 +41,10 @@ class RawHIDReadThread;
 class RawHIDWriteThread;
 
 /**
-*   The actual IO device that will be used to communicate
-*   with the board.
-*/
-class OPHID_EXPORT RawHID : public QIODevice
-{
+ *   The actual IO device that will be used to communicate
+ *   with the board.
+ */
+class OPHID_EXPORT RawHID : public QIODevice {
     Q_OBJECT
 
     friend class RawHIDReadThread;
@@ -72,10 +71,10 @@ protected:
     virtual qint64 bytesAvailable() const;
     virtual qint64 bytesToWrite() const;
 
-    //! Callback from the read thread to open the device
+    // ! Callback from the read thread to open the device
     bool openDevice();
 
-    //! Callback from teh read thread to close the device
+    // ! Callback from teh read thread to close the device
     bool closeDevice();
 
     QString serialNumber;
@@ -92,4 +91,3 @@ protected:
 };
 
 #endif // OPHID_H
-

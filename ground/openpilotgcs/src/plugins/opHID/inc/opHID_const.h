@@ -28,39 +28,37 @@
 #ifndef OPHID_CONST_H
 #define OPHID_CONST_H
 
-#define printf qDebug
+#define printf         qDebug
 #define OPHID_DEBUG_ON 1
 #ifdef OPHID_DEBUG_ON
-#define OPHID_DEBUG(fmt, args...)      qDebug("[DEBUG] "fmt, ## args)
-#define OPHID_TRACE(fmt, args...)      qDebug("[TRACE] %s:%s:%d: "fmt, __FILE__, __func__, __LINE__, ## args)
-#define OPHID_ERROR(fmt, args...)      qDebug("[ERROR] %s:%s:%d: "fmt, __FILE__, __func__, __LINE__, ## args)
-#define OPHID_WARNING(fmt, args...)    qDebug("[WARNING] "fmt, ## args)
+#define OPHID_DEBUG(fmt, args ...)   qDebug("[DEBUG] "fmt,##args)
+#define OPHID_TRACE(fmt, args ...)   qDebug("[TRACE] %s:%s:%d: "fmt, __FILE__, __func__, __LINE__,##args)
+#define OPHID_ERROR(fmt, args ...)   qDebug("[ERROR] %s:%s:%d: "fmt, __FILE__, __func__, __LINE__,##args)
+#define OPHID_WARNING(fmt, args ...) qDebug("[WARNING] "fmt,##args)
 #else
-#define OPHID_DEBUG(fmt, args...)
-#define OPHID_TRACE(fmt, args...)
-#define OPHID_ERROR(fmt, args...)
-#define OPHID_WARNING(fmt, args...)
+#define OPHID_DEBUG(fmt, args ...)
+#define OPHID_TRACE(fmt, args ...)
+#define OPHID_ERROR(fmt, args ...)
+#define OPHID_WARNING(fmt, args ...)
 #endif
 
 
-
 // USB
-#define USB_MAX_DEVICES      10
-#define USB_VID              0x20A0
-#define USB_PID              0x4117
-#define USB_USAGE_PAGE       0xFF9C
-#define USB_USAGE            0x0001
-#define USB_DEV_SERIAL_LEN   24
-#define USB_PID_ANY          -1
-#define USB_MAX_STRING_SIZE  255
+#define USB_MAX_DEVICES       10
+#define USB_VID               0x20A0
+#define USB_PID               0x4117
+#define USB_USAGE_PAGE        0xFF9C
+#define USB_USAGE             0x0001
+#define USB_DEV_SERIAL_LEN    24
+#define USB_PID_ANY           -1
+#define USB_MAX_STRING_SIZE   255
 
 // ERROR
-#define OPHID_NO_ERROR          0
-#define OPHID_ERROR_RET        -1
-#define OPHID_ERROR_POINTER    -2
-#define OPHID_ERROR_PARAMETER  -3
-#define OPHID_ERROR_HANDLE     -4
-#define OPHID_ERROR_INIT       -5
+#define OPHID_NO_ERROR        0
+#define OPHID_ERROR_RET       -1
+#define OPHID_ERROR_POINTER   -2
+#define OPHID_ERROR_PARAMETER -3
+#define OPHID_ERROR_HANDLE    -4
+#define OPHID_ERROR_INIT      -5
 
 #endif // OPHID_CONST_H
-

@@ -41,10 +41,8 @@
 #include "opHID_global.h"
 
 
-class OPHID_EXPORT opHID_hidapi: public QObject
-{
-
-     Q_OBJECT
+class OPHID_EXPORT opHID_hidapi : public QObject {
+    Q_OBJECT
 
 public:
 
@@ -64,7 +62,7 @@ public:
 
 private:
 
-    int enumerate(struct hid_device_info **current_device_pptr, int *devices_found);
+    int enumerate(struct hid_device_info * *current_device_pptr, int *devices_found);
 
     hid_device *handle;
 
@@ -78,4 +76,4 @@ signals:
     void deviceUnplugged(int);
 };
 
-#endif
+#endif // ifndef OPHID_HIDAPI_H

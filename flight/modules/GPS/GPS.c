@@ -72,7 +72,7 @@ static void setPositionSensor(GPSPositionSensorData *gpsData);
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
-        #define STACK_SIZE_BYTES 850
+        #define STACK_SIZE_BYTES 1024
 #else
 #if defined(PIOS_GPS_MINIMAL)
         #define STACK_SIZE_BYTES 500
@@ -349,11 +349,11 @@ static void setPositionSensor(GPSPositionSensorData *gpsData)
     float ECEF[3];
     float Rne[3][3];
     {
-        float LLA[3] = { home.Latitude, home.Longitude, home.Altitude };
+        float LLA[3] = { (home.Latitude) / 10e6f, (home.Longitude) / 10e6f, (home.Altitude) };
         LLA2ECEF(LLA, ECEF);
         RneFromLLA(LLA, Rne);
     }
-    { float LLA[3] = { gpsData->Latitude, gpsData->Longitude, gpsData->Altitude + gpsData->GeoidSeparation };
+    { float LLA[3] = { (gpsData->Latitude) / 10e6f, (gpsData->Longitude) / 10e6f, gpsData->Altitude + gpsData->GeoidSeparation };
       float NED[3];
       LLA2Base(LLA, ECEF, Rne, NED);
       pos.North = NED[0];

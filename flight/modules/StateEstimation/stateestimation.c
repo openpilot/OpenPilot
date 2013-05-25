@@ -377,8 +377,8 @@ static void StateEstimationCb(void)
         }
 
         // read updated sensor UAVObjects and set initial state
-        states.updated  = updatedSensors;
-        updatedSensors ^= states.updated;
+        states.updated = updatedSensors;
+        updatedSensors = 0;
 
         // fetch sensors, check values, and load into state struct
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GyroSensor, gyro, x, y, z);

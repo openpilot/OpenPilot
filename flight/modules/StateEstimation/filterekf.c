@@ -298,9 +298,9 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             state->attitude[1] = Nav.q[1];
             state->attitude[2] = Nav.q[2];
             state->attitude[3] = Nav.q[3];
-            state->gyro[0]    += Nav.gyro_bias[0];
-            state->gyro[1]    += Nav.gyro_bias[1];
-            state->gyro[2]    += Nav.gyro_bias[2];
+            state->gyro[0]    -= RAD2DEG(Nav.gyro_bias[0]);
+            state->gyro[1]    -= RAD2DEG(Nav.gyro_bias[1]);
+            state->gyro[2]    -= RAD2DEG(Nav.gyro_bias[2]);
             state->pos[0]   = Nav.Pos[0];
             state->pos[1]   = Nav.Pos[1];
             state->pos[2]   = Nav.Pos[2];
@@ -333,9 +333,9 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     state->attitude[1] = Nav.q[1];
     state->attitude[2] = Nav.q[2];
     state->attitude[3] = Nav.q[3];
-    state->gyro[0]    -= Nav.gyro_bias[0];
-    state->gyro[1]    -= Nav.gyro_bias[1];
-    state->gyro[2]    -= Nav.gyro_bias[2];
+    state->gyro[0]    -= RAD2DEG(Nav.gyro_bias[0]);
+    state->gyro[1]    -= RAD2DEG(Nav.gyro_bias[1]);
+    state->gyro[2]    -= RAD2DEG(Nav.gyro_bias[2]);
     state->pos[0]   = Nav.Pos[0];
     state->pos[1]   = Nav.Pos[1];
     state->pos[2]   = Nav.Pos[2];

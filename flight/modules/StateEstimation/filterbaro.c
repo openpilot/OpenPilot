@@ -45,6 +45,7 @@
 // Private types
 struct data {
     float baroOffset;
+    float baroAlt;
     bool  first_run;
 };
 
@@ -82,6 +83,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         if (IS_SET(state->updated, SENSORUPDATES_baro)) {
             this->first_run  = 0;
             this->baroOffset = state->baro[0];
+            this->baroAlt    = state->baro[0];
         }
     } else {
         // Track barometric altitude offset with a low pass filter
@@ -89,10 +91,11 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         if (IS_SET(state->updated, SENSORUPDATES_pos)) {
             this->baroOffset = BARO_OFFSET_LOWPASS_ALPHA * this->baroOffset +
                                (1.0f - BARO_OFFSET_LOWPASS_ALPHA)
-                               * (-state->pos[2] - state->baro[0]);
+                               * (this->baroAlt + state->pos[2]);
         }
         // calculate bias corrected altitude
         if (IS_SET(state->updated, SENSORUPDATES_baro)) {
+            this->baroAlt   = state->baro[0];
             state->baro[0] -= this->baroOffset;
         }
     }

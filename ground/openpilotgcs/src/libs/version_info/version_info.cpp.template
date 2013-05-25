@@ -27,9 +27,84 @@ VersionInfo::VersionInfo()
 {
 }
 
+QString VersionInfo::origin()
+{
+    return "${ORIGIN}";
+}
+
 QString VersionInfo::revision()
 {
     return "${REVISION}";
+}
+
+QString VersionInfo::hash()
+{
+    return "${HASH}";
+}
+
+QString VersionInfo::uavoHashTxt()
+{
+    return "${UAVOSHA1TXT}";
+}
+
+QString VersionInfo::uavoHash()
+{
+    return "{ ${UAVOSHA1} }";
+}
+
+QString VersionInfo::label()
+{
+    return "${LABEL}";
+}
+
+QString VersionInfo::tag()
+{
+    return "${TAG}";
+}
+
+QString VersionInfo::tagOrBranch()
+{
+    return "${TAG_OR_BRANCH}";
+}
+
+QString VersionInfo::tagOrHash8()
+{
+    return "${TAG_OR_HASH8}";
+}
+
+QString VersionInfo::hash8()
+{
+    return "${HASH8}";
+}
+
+QString VersionInfo::fwTag()
+{
+    return "${FWTAG}";
+}
+
+QString VersionInfo::unixTime()
+{
+    return "${UNIXTIME}";
+}
+
+QString VersionInfo::dateTime()
+{
+    return "${DATETIME}";
+}
+
+QString VersionInfo::date()
+{
+    return "${DATE}";
+}
+
+QString VersionInfo::day()
+{
+    return "${DAY}";
+}
+
+QString VersionInfo::month()
+{
+    return "${MONTH}";
 }
 
 QString VersionInfo::year()
@@ -37,12 +112,17 @@ QString VersionInfo::year()
     return "${YEAR}";
 }
 
-QString VersionInfo::origin()
+QString VersionInfo::hour()
 {
-    return "${ORIGIN}";
+    return "${HOUR}";
 }
 
-QString VersionInfo::uavoHash()
+QString VersionInfo::minute()
 {
-    return "{ ${UAVOSHA1} }";
+    return "${MINUTE}";
+}
+
+QString VersionInfo::dirty()
+{
+    return "${DIRTY}";
 }

@@ -32,9 +32,10 @@
 #include "hwsettings.h"
 #include <QDesktopServices>
 #include <QUrl>
+#include <QMessageBox>
 
 
-ConfigRevoHWWidget::ConfigRevoHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
+ConfigRevoHWWidget::ConfigRevoHWWidget(QWidget *parent) : ConfigTaskWidget(parent), m_refreshing(true)
 {
     m_ui = new Ui_RevoHWWidget();
     m_ui->setupUi(this);
@@ -75,6 +76,7 @@ ConfigRevoHWWidget::ConfigRevoHWWidget(QWidget *parent) : ConfigTaskWidget(paren
     populateWidgets();
     refreshWidgetsValues();
     forceConnectedState();
+    m_refreshing = false;
 }
 
 ConfigRevoHWWidget::~ConfigRevoHWWidget()
@@ -93,17 +95,19 @@ void ConfigRevoHWWidget::setupCustomCombos()
 
     connect(m_ui->cbFlexi, SIGNAL(currentIndexChanged(int)), this, SLOT(flexiPortChanged(int)));
     connect(m_ui->cbMain, SIGNAL(currentIndexChanged(int)), this, SLOT(mainPortChanged(int)));
-    connect(m_ui->cbModem, SIGNAL(currentIndexChanged(int)), this, SLOT(modemPortChanged(int)));
+    connect(m_ui->cbModem, SIGNAL(currentIndexChanged(int)), this, SLOT(modemPortChanged(int)));    
 }
 
 void ConfigRevoHWWidget::refreshWidgetsValues(UAVObject *obj)
 {
+    m_refreshing = true;
     ConfigTaskWidget::refreshWidgetsValues(obj);
 
     usbVCPPortChanged(0);
     mainPortChanged(0);
     flexiPortChanged(0);
     modemPortChanged(0);
+    m_refreshing = false;
 }
 
 void ConfigRevoHWWidget::updateObjectsFromWidgets()
@@ -291,6 +295,9 @@ void ConfigRevoHWWidget::modemPortChanged(int index)
         m_ui->cbTxPower->setVisible(true);
         m_ui->lblInitFreq->setVisible(true);
         m_ui->leInitFreq->setVisible(true);
+        if(!m_refreshing) {
+            QMessageBox::warning(this, tr("Warning"), tr("Activating the Radio requires an antenna be attached or modem damage will occur."));
+        }
     } else {
         m_ui->lblTxPower->setVisible(false);
         m_ui->cbTxPower->setVisible(false);

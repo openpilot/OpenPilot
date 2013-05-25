@@ -47,7 +47,9 @@ static void updateSettings();
 // ****************
 // Private constants
 
-#define STACK_SIZE_BYTES 280
+#define U2C_STACK_SIZE_BYTES 260
+#define C2U_STACK_SIZE_BYTES 316
+
 #define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
 
 #define BRIDGE_BUF_LEN   10
@@ -76,9 +78,9 @@ static int32_t comUsbBridgeStart(void)
 {
     if (bridge_enabled) {
         // Start tasks
-        xTaskCreate(com2UsbBridgeTask, (signed char *)"Com2UsbBridge", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &com2UsbBridgeTaskHandle);
+        xTaskCreate(com2UsbBridgeTask, (signed char *)"Com2UsbBridge", C2U_STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &com2UsbBridgeTaskHandle);
         PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_COM2USBBRIDGE, com2UsbBridgeTaskHandle);
-        xTaskCreate(usb2ComBridgeTask, (signed char *)"Usb2ComBridge", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &usb2ComBridgeTaskHandle);
+        xTaskCreate(usb2ComBridgeTask, (signed char *)"Usb2ComBridge", U2C_STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY, &usb2ComBridgeTaskHandle);
         PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_USB2COMBRIDGE, usb2ComBridgeTaskHandle);
         return 0;
     }

@@ -2,9 +2,9 @@
 #define OP_DFU_H
 
 #include <QByteArray>
-#include <opHID/inc/opHID_hidapi.h>
-#include <opHID/inc/opHID_usbmon.h>
-#include <opHID/inc/opHID_usbsignal.h>
+#include <ophid/inc/ophid_hidapi.h>
+#include <ophid/inc/ophid_usbmon.h>
+#include <ophid/inc/ophid_usbsignal.h>
 #include <QDebug>
 #include <QFile>
 #include <QThread>

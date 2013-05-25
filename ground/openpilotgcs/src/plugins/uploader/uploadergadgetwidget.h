@@ -45,7 +45,7 @@
 #include "coreplugin/icore.h"
 #include "coreplugin/connectionmanager.h"
 
-#include "opHID/inc/opHID_plugin.h"
+#include "ophid/inc/ophid_plugin.h"
 #include <QtGui/QWidget>
 #include <QLabel>
 #include <QLineEdit>

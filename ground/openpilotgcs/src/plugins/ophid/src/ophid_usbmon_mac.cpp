@@ -42,24 +42,20 @@ static bool HID_GetStrProperty(IOHIDDeviceRef dev, CFStringRef property, QString
 /**
    Initialize the USB monitor here
  */
-USBMonitor::USBMonitor(QObject *parent) : QThread(parent)
+USBMonitor::USBMonitor(QObject *parent) : QThread(parent), m_terminate(1)
 {
     m_instance  = this;
     hid_manager = NULL;
     listMutex   = new QMutex();
     knowndevices.clear();
     qRegisterMetaType<USBPortInfo>("USBPortInfo");
-    m_terminate = false;
     start();
 }
 
 USBMonitor::~USBMonitor()
 {
-    m_terminate = true;
-
-    while (hid_manager != 0) {
-        this->sleep(10);
-    }
+    m_terminate.tryAcquire();
+    wait();
 }
 
 void USBMonitor::deviceEventReceived()
@@ -205,7 +201,7 @@ void USBMonitor::run()
         return;
     }
 
-    while (!m_terminate) {
+    while (m_terminate.available()) {
         CFRunLoopRunInMode(kCFRunLoopDefaultMode, 1, false);
     }
     IOHIDManagerUnscheduleFromRunLoop(hid_manager, loop, kCFRunLoopDefaultMode);

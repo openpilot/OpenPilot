@@ -32,6 +32,7 @@
 
 #include <QThread>
 #include <QMutex>
+#include <QSemaphore>
 
 // Arch dependent
 #if defined(Q_OS_MAC)
@@ -202,7 +203,7 @@ private:
 
 #ifdef __APPLE__
 protected:
-    bool m_terminate;
+    QSemaphore m_terminate;
 
     void run();
 #endif // __APPLE__

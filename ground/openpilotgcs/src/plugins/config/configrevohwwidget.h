@@ -44,6 +44,7 @@ public:
     ~ConfigRevoHWWidget();
 
 private:
+    bool m_refreshing;
     Ui_RevoHWWidget *m_ui;
     void setupCustomCombos();
 

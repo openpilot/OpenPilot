@@ -32,8 +32,8 @@
 #include <coreplugin/actionmanager/actionmanager.h>
 #include <coreplugin/iconnection.h>
 #include <extensionsystem/iplugin.h>
-#include "rawhid/usbmonitor.h"
-#include "rawhid/pjrc_rawhid.h"
+#include "opHID/inc/opHID_usbmon.h"
+#include "opHID/inc/opHID_hidapi.h"
 
 #include <QThread>
 #include <QReadWriteLock>

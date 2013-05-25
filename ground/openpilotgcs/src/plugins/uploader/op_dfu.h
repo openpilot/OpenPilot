@@ -2,9 +2,9 @@
 #define OP_DFU_H
 
 #include <QByteArray>
-#include <rawhid/pjrc_rawhid.h>
-#include <rawhid/usbmonitor.h>
-#include <rawhid/usbsignalfilter.h>
+#include <ophid/inc/ophid_hidapi.h>
+#include <ophid/inc/ophid_usbmon.h>
+#include <ophid/inc/ophid_usbsignal.h>
 #include <QDebug>
 #include <QFile>
 #include <QThread>
@@ -181,7 +181,7 @@ private:
 
 
     // USB Bootloader:
-    pjrc_rawhid hidHandle;
+    opHID_hidapi hidHandle;
     int setStartBit(int command)
     {
         return command | 0x20;

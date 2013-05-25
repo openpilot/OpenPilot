@@ -30,7 +30,6 @@
 /**
  * We have 100 bytes for the whole description.
  *
- *
  * Structure is:
  *   4 bytes: header: "OpFw".
  *   4 bytes: GIT commit tag (short version of SHA1).
@@ -66,6 +65,6 @@ const struct fw_version_info fw_version_blob __attribute__((used)) __attribute__
     .board_type         = ${BOARD_TYPE},
     .board_revision     = ${BOARD_REVISION},
     .commit_tag_name    = "${FWTAG}",
-    .sha1sum            = { ${SHA1} },
-    .uavosha1           = { ${UAVOSHA1} },
+    .sha1sum            = { ${IMAGE_HASH_ARRAY} },
+    .uavosha1           = { ${UAVO_HASH_ARRAY} },
 };

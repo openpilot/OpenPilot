@@ -44,8 +44,8 @@ public:
     static QString origin();
     static QString revision();
     static QString hash();
-    static QString uavoHashTxt();
     static QString uavoHash();
+    static QString uavoHashArray();
     static QString label();
     static QString tag();
     static QString tagOrBranch();

@@ -42,14 +42,14 @@ QString VersionInfo::hash()
     return "${HASH}";
 }
 
-QString VersionInfo::uavoHashTxt()
-{
-    return "${UAVOSHA1TXT}";
-}
-
 QString VersionInfo::uavoHash()
 {
-    return "{ ${UAVOSHA1} }";
+    return "${UAVO_HASH}";
+}
+
+QString VersionInfo::uavoHashArray()
+{
+    return "{ ${UAVO_HASH_ARRAY} }";
 }
 
 QString VersionInfo::label()

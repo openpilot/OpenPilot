@@ -292,7 +292,7 @@ void ConfigRevoHWWidget::modemPortChanged(int index)
         m_ui->cbTxPower->setVisible(true);
         m_ui->lblInitFreq->setVisible(true);
         m_ui->leInitFreq->setVisible(true);
-        QMessageBox::warning(this, tr("Warning"), tr("Activating the Radio requires an antenna be attached, or modem damage will occur."));
+        QMessageBox::warning(this, tr("Warning"), tr("Activating the Radio requires an antenna be attached or modem damage will occur."));
     } else {
         m_ui->lblTxPower->setVisible(false);
         m_ui->cbTxPower->setVisible(false);

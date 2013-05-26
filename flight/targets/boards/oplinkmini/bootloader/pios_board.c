@@ -3,7 +3,7 @@
  *
  * @file       pios_board.c
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      Defines board specific static initializers for hardware for the PipBee board.
+ * @brief      Defines board specific static initializers for hardware for the OPLink Mini board.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/

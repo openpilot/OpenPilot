@@ -36,15 +36,16 @@
 static const uint8_t usb_product_id[20] = {
     sizeof(usb_product_id),
     USB_DESC_TYPE_STRING,
+    'O',                   0,
     'P',                   0,
+    'L',                   0,
     'i',                   0,
-    'p',                   0,
-    'X',                   0,
-    't',                   0,
-    'r',                   0,
-    'e',                   0,
-    'm',                   0,
-    'e',                   0,
+    'n',                   0,
+    'k',                   0,
+    'M',                   0,
+    'i',                   0,
+    'n',                   0,
+	'i',                   0,
 };
 
 static uint8_t usb_serial_number[2 + PIOS_SYS_SERIAL_NUM_ASCII_LEN * 2 + (sizeof(PIOS_USB_BOARD_SN_SUFFIX) - 1) * 2] = {

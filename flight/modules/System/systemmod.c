@@ -471,8 +471,8 @@ static void updateStats()
     lastTickCount    = now;
     idleCounterClear = 1;
 #if defined(PIOS_INCLUDE_ADC) && defined(PIOS_ADC_USE_TEMP_SENSOR)
-    float temp_voltage = PIOS_ADC_VOLTAGE_SCALE * PIOS_ADC_PinGet(PIOS_ADC_TEMPERATURE_PIN);
-    stats.CPUTemp = (temp_voltage-PIOS_ADC_STM32_TEMP_V25) * 1000.0f / PIOS_ADC_STM32_TEMP_AVG_SLOPE + 25.0f;
+    float temp_voltage = PIOS_ADC_PinGetVolt(PIOS_ADC_TEMPERATURE_PIN);
+    stats.CPUTemp = (temp_voltage - PIOS_ADC_STM32_TEMP_V25) * 1000.0f / PIOS_ADC_STM32_TEMP_AVG_SLOPE + 25.0f;
 #endif
     SystemStatsSet(&stats);
 }

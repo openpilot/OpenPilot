@@ -325,6 +325,10 @@ int32_t PIOS_ADC_PinGet(uint32_t pin)
     return -1;
 }
 
+float PIOS_ADC_PinGetVolt(uint32_t pin){
+    return ((float)PIOS_ADC_PinGet(pin)) * PIOS_ADC_VOLTAGE_SCALE;
+}
+
 /**
  * @brief Set a callback function that is executed whenever
  * the ADC double buffer swaps

@@ -265,16 +265,15 @@ static const struct pios_rfm22b_transition rfm22b_transitions[RADIO_STATE_NUM_ST
     [RADIO_STATE_RX_DATA] =               {
         .entry_fn   = radio_rxData,
         .next_state =                     {
-            [RADIO_EVENT_INT_RECEIVED]         = RADIO_STATE_RX_DATA,
-            [RADIO_EVENT_TX_START]             = RADIO_STATE_TX_START,
-            [RADIO_EVENT_REQUEST_CONNECTION]   = RADIO_STATE_REQUESTING_CONNECTION,
-            [RADIO_EVENT_ACK_TIMEOUT]          = RADIO_STATE_RECEIVING_NACK,
-            [RADIO_EVENT_RX_COMPLETE]          = RADIO_STATE_SENDING_ACK,
+            [RADIO_EVENT_INT_RECEIVED]    = RADIO_STATE_RX_DATA,
+            [RADIO_EVENT_TX_START]        = RADIO_STATE_TX_START,
+            [RADIO_EVENT_ACK_TIMEOUT]     = RADIO_STATE_RECEIVING_NACK,
+            [RADIO_EVENT_RX_COMPLETE]     = RADIO_STATE_SENDING_ACK,
             [RADIO_EVENT_RX_MODE] = RADIO_STATE_RX_MODE,
-            [RADIO_EVENT_STATUS_RECEIVED]      = RADIO_STATE_RECEIVING_STATUS,
+            [RADIO_EVENT_STATUS_RECEIVED] = RADIO_STATE_RECEIVING_STATUS,
             [RADIO_EVENT_CONNECTION_REQUESTED] = RADIO_STATE_ACCEPTING_CONNECTION,
-            [RADIO_EVENT_PACKET_ACKED]         = RADIO_STATE_RECEIVING_ACK,
-            [RADIO_EVENT_PACKET_NACKED]        = RADIO_STATE_RECEIVING_NACK,
+            [RADIO_EVENT_PACKET_ACKED]    = RADIO_STATE_RECEIVING_ACK,
+            [RADIO_EVENT_PACKET_NACKED]   = RADIO_STATE_RECEIVING_NACK,
             [RADIO_EVENT_FAILURE]     = RADIO_STATE_RX_FAILURE,
             [RADIO_EVENT_TIMEOUT]     = RADIO_STATE_TIMEOUT,
             [RADIO_EVENT_ERROR]       = RADIO_STATE_ERROR,
@@ -307,6 +306,7 @@ static const struct pios_rfm22b_transition rfm22b_transitions[RADIO_STATE_NUM_ST
         .entry_fn   = rfm22_receiveStatus,
         .next_state =                     {
             [RADIO_EVENT_RX_COMPLETE] = RADIO_STATE_TX_START,
+            [RADIO_EVENT_REQUEST_CONNECTION] = RADIO_STATE_REQUESTING_CONNECTION,
             [RADIO_EVENT_TIMEOUT]     = RADIO_STATE_TIMEOUT,
             [RADIO_EVENT_ERROR] = RADIO_STATE_ERROR,
             [RADIO_EVENT_INITIALIZE]  = RADIO_STATE_INITIALIZING,
@@ -517,7 +517,7 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
     PIOS_EXTI_Init(cfg->exti_cfg);
 
     // Register the watchdog timer for the radio driver task
-#ifdef PIOS_WDG_RFM22B
+#if defined(PIOS_INCLUDE_WDG) && defined(PIOS_WDG_RFM22B)
     PIOS_WDG_RegisterFlag(PIOS_WDG_RFM22B);
 #endif /* PIOS_WDG_RFM22B */
 
@@ -1156,7 +1156,7 @@ static void pios_rfm22_task(void *parameters)
     portTickType lastPPMTicks    = lastEventTicks;
 
     while (1) {
-#ifdef PIOS_WDG_RFM22B
+#if defined(PIOS_INCLUDE_WDG) && defined(PIOS_WDG_RFM22B)
         // Update the watchdog timer
         PIOS_WDG_UpdateFlag(PIOS_WDG_RFM22B);
 #endif /* PIOS_WDG_RFM22B */
@@ -1988,21 +1988,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
         switch (p->header.type) {
         case PACKET_TYPE_STATUS:
             ret_event = RADIO_EVENT_STATUS_RECEIVED;
-
-            // Send a connection request message if we're not connected, and this is a status message from a modem that we're bound to.
-            if (radio_dev->coordinator && !rfm22_isConnected(radio_dev)) {
-                PHStatusPacketHandle status = (PHStatusPacketHandle) & (radio_dev->rx_packet);
-                uint32_t source_id = status->source_id;
-                for (uint8_t i = 0; OPLINKSETTINGS_BINDINGS_NUMELEM; ++i) {
-                    if (radio_dev->bindings[i].pairID == source_id) {
-                        radio_dev->cur_binding = i;
-                        ret_event = RADIO_EVENT_REQUEST_CONNECTION;
-                        break;
-                    }
-                }
-            }
             break;
-
         case PACKET_TYPE_CON_REQUEST:
             ret_event = RADIO_EVENT_CONNECTION_REQUESTED;
             break;
@@ -2333,19 +2319,20 @@ static enum pios_radio_event rfm22_receiveNack(struct pios_rfm22b_dev *rfm22b_de
  * @param[in] rfm22b_dev  The device structure
  * @return enum pios_radio_event  The next event to inject
  */
-static enum pios_radio_event rfm22_receiveStatus(struct pios_rfm22b_dev *rfm22b_dev)
+static enum pios_radio_event rfm22_receiveStatus(struct pios_rfm22b_dev *radio_dev)
 {
-    PHStatusPacketHandle status = (PHStatusPacketHandle) & (rfm22b_dev->rx_packet);
-    int8_t rssi    = rfm22b_dev->rssi_dBm;
-    int8_t afc     = rfm22b_dev->afc_correction_Hz;
-    uint32_t id    = status->source_id;
+    PHStatusPacketHandle status = (PHStatusPacketHandle) & (radio_dev->rx_packet);
+    int8_t rssi = radio_dev->rssi_dBm;
+    int8_t afc  = radio_dev->afc_correction_Hz;
+    uint32_t id = status->source_id;
+    enum pios_radio_event ret_event = RADIO_EVENT_RX_COMPLETE;
 
     // Have we seen this device recently?
     bool found     = false;
     uint8_t id_idx = 0;
 
     for (; id_idx < OPLINKSTATUS_PAIRIDS_NUMELEM; ++id_idx) {
-        if (rfm22b_dev->pair_stats[id_idx].pairID == id) {
+        if (radio_dev->pair_stats[id_idx].pairID == id) {
             found = true;
             break;
         }
@@ -2353,27 +2340,37 @@ static enum pios_radio_event rfm22_receiveStatus(struct pios_rfm22b_dev *rfm22b_
 
     // If we have seen it, update the RSSI and reset the last contact couter
     if (found) {
-        rfm22b_dev->pair_stats[id_idx].rssi = rssi;
-        rfm22b_dev->pair_stats[id_idx].afc_correction = afc;
-        rfm22b_dev->pair_stats[id_idx].lastContact    = 0;
-
-        // If we haven't seen it, find a slot to put it in.
+        radio_dev->pair_stats[id_idx].rssi = rssi;
+        radio_dev->pair_stats[id_idx].afc_correction = afc;
+        radio_dev->pair_stats[id_idx].lastContact = 0;
     } else {
+        // If we haven't seen it, find a slot to put it in.
         uint8_t min_idx = 0;
-        int8_t min_rssi = rfm22b_dev->pair_stats[0].rssi;
+        int8_t min_rssi = radio_dev->pair_stats[0].rssi;
         for (id_idx = 1; id_idx < OPLINKSTATUS_PAIRIDS_NUMELEM; ++id_idx) {
-            if (rfm22b_dev->pair_stats[id_idx].rssi < min_rssi) {
-                min_rssi = rfm22b_dev->pair_stats[id_idx].rssi;
+            if (radio_dev->pair_stats[id_idx].rssi < min_rssi) {
+                min_rssi = radio_dev->pair_stats[id_idx].rssi;
                 min_idx  = id_idx;
             }
         }
-        rfm22b_dev->pair_stats[min_idx].pairID = id;
-        rfm22b_dev->pair_stats[min_idx].rssi   = rssi;
-        rfm22b_dev->pair_stats[min_idx].afc_correction = afc;
-        rfm22b_dev->pair_stats[min_idx].lastContact = 0;
+        radio_dev->pair_stats[min_idx].pairID = id;
+        radio_dev->pair_stats[min_idx].rssi   = rssi;
+        radio_dev->pair_stats[min_idx].afc_correction = afc;
+        radio_dev->pair_stats[min_idx].lastContact = 0;
     }
 
-    return RADIO_EVENT_RX_COMPLETE;
+    // Send a connection request message if we're not connected, and this is a status message from a modem that we're bound to.
+    if (radio_dev->coordinator && !rfm22_isConnected(radio_dev)) {
+        for (uint8_t i = 0; i < OPLINKSETTINGS_BINDINGS_NUMELEM; ++i) {
+            if (radio_dev->bindings[i].pairID == id) {
+                radio_dev->cur_binding = i;
+                ret_event = RADIO_EVENT_REQUEST_CONNECTION;
+                break;
+            }
+        }
+    }
+
+    return ret_event;
 }
 
 

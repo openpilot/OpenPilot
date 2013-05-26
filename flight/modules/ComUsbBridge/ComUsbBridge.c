@@ -50,9 +50,9 @@ static void updateSettings();
 #define U2C_STACK_SIZE_BYTES 260
 #define C2U_STACK_SIZE_BYTES 316
 
-#define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
+#define TASK_PRIORITY        (tskIDLE_PRIORITY + 1)
 
-#define BRIDGE_BUF_LEN   10
+#define BRIDGE_BUF_LEN       10
 
 // ****************
 // Private variables

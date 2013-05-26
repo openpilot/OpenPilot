@@ -2178,8 +2178,8 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
         Q_ASSERT(gpsPositionObj);
 
         GPSPosition::DataFields gpsPositionData = gpsPositionObj->getData();
-        latitude  = gpsPositionData.Latitude / 1e7f;
-        longitude = gpsPositionData.Longitude / 1e7f;
+        latitude  = gpsPositionData.Latitude / 1.0e7;
+        longitude = gpsPositionData.Longitude / 1.0e7;
         altitude  = gpsPositionData.Altitude;
         return true;
     }
@@ -2187,8 +2187,8 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     Q_ASSERT(homeLocation != NULL);
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
-    homeLLA[0] = homeLocationData.Latitude / 1e7;
-    homeLLA[1] = homeLocationData.Longitude / 1e7;
+    homeLLA[0] = homeLocationData.Latitude / 1.0e7;
+    homeLLA[1] = homeLocationData.Longitude / 1.0e7;
     homeLLA[2] = homeLocationData.Altitude;
 
 

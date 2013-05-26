@@ -128,8 +128,7 @@ static void init_pins(void)
 
     GPIO_StructInit(&GPIO_InitStructure);
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AIN;
-
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AN;
     for (uint32_t i = 0; i < PIOS_ADC_NUM_PINS; ++i) {
         if (config[i].port == NULL) {
             continue;

@@ -202,7 +202,7 @@ Section "-Localization" InSecLocalization
 SectionEnd
 
 ; Copy firmware files
-Section "Firmware" InSecFirmware
+Section /o "-Firmware" InSecFirmware
   SetOutPath "$INSTDIR\firmware"
   File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
 SectionEnd

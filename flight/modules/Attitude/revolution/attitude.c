@@ -113,6 +113,13 @@ const uint32_t SENSOR_QUEUE_SIZE    = 10;
 static bool volatile variance_error = true;
 static bool volatile initialization_required = true;
 static uint32_t volatile running_algorithm   = 0xffffffff; // we start with no algorithm running
+static float rollPitchBiasRate = 0;
+
+// Accel filtering
+static float accel_alpha = 0;
+static bool accel_filter_enabled = false;
+static float accels_filtered[3];
+static float grot_filtered[3];
 
 // Private functions
 static void AttitudeTask(void *parameters);
@@ -285,12 +292,23 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
     }
 }
 
+static inline void apply_accel_filter(const float *raw, float *filtered)
+{
+    if (accel_filter_enabled) {
+        filtered[0] = filtered[0] * accel_alpha + raw[0] * (1 - accel_alpha);
+        filtered[1] = filtered[1] * accel_alpha + raw[1] * (1 - accel_alpha);
+        filtered[2] = filtered[2] * accel_alpha + raw[2] * (1 - accel_alpha);
+    } else {
+        filtered[0] = raw[0];
+        filtered[1] = raw[1];
+        filtered[2] = raw[2];
+    }
+}
+
 float accel_mag;
 float qmag;
 float attitudeDt;
 float mag_err[3];
-float magKi = 0.000001f;
-float magKp = 0.01f;
 
 static int32_t updateAttitudeComplementary(bool first_run)
 {
@@ -367,20 +385,27 @@ static int32_t updateAttitudeComplementary(bool first_run)
     if ((init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
         // For first 7 seconds use accels to get gyro bias
         attitudeSettings.AccelKp     = 1.0f;
-        attitudeSettings.AccelKi     = 0.9f;
+        attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
-        magKp = 1.0f;
+        accel_filter_enabled   = false;
+        rollPitchBiasRate      = 0.01f;
+        attitudeSettings.MagKp = 1.0f;
     } else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
         attitudeSettings.AccelKp     = 1.0f;
-        attitudeSettings.AccelKi     = 0.9f;
+        attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
-        magKp = 1.0f;
+        accel_filter_enabled   = false;
+        rollPitchBiasRate      = 0.01f;
+        attitudeSettings.MagKp = 1.0f;
         init = 0;
     } else if (init == 0) {
         // Reload settings (all the rates)
         AttitudeSettingsGet(&attitudeSettings);
-        magKp = 0.01f;
-        init  = 1;
+        rollPitchBiasRate = 0.0f;
+        if (accel_alpha > 0.0f) {
+            accel_filter_enabled = true;
+        }
+        init = 1;
     }
 
     GyrosGet(&gyrosData);
@@ -400,18 +425,41 @@ static int32_t updateAttitudeComplementary(bool first_run)
     // Get the current attitude estimate
     quat_copy(&attitudeActual.q1, q);
 
+    // Apply smoothing to accel values, to reduce vibration noise before main calculations.
+    apply_accel_filter((const float *)&accelsData.x, accels_filtered);
+
     // Rotate gravity to body frame and cross with accels
     grot[0] = -(2.0f * (q[1] * q[3] - q[0] * q[2]));
     grot[1] = -(2.0f * (q[2] * q[3] + q[0] * q[1]));
     grot[2] = -(q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
-    CrossProduct((const float *)&accelsData.x, (const float *)grot, accel_err);
+
+    apply_accel_filter(grot, grot_filtered);
+
+    CrossProduct((const float *)accels_filtered, (const float *)grot_filtered, accel_err);
 
     // Account for accel magnitude
-    accel_mag     = accelsData.x * accelsData.x + accelsData.y * accelsData.y + accelsData.z * accelsData.z;
-    accel_mag     = sqrtf(accel_mag);
+    accel_mag = accels_filtered[0] * accels_filtered[0] + accels_filtered[1] * accels_filtered[1] + accels_filtered[2] * accels_filtered[2];
+    accel_mag = sqrtf(accel_mag);
+
+    // TODO! check accel vector magnitude value for correctness
+
     accel_err[0] /= accel_mag;
     accel_err[1] /= accel_mag;
     accel_err[2] /= accel_mag;
+
+    float grot_mag;
+    if (accel_filter_enabled) {
+        grot_mag = sqrtf(grot_filtered[0] * grot_filtered[0] + grot_filtered[1] * grot_filtered[1] + grot_filtered[2] * grot_filtered[2]);
+    } else {
+        grot_mag = 1.0f;
+    }
+
+    // TODO! check grot_mag value for correctness.
+
+    accel_err[0] /= (accel_mag * grot_mag);
+    accel_err[1] /= (accel_mag * grot_mag);
+    accel_err[2] /= (accel_mag * grot_mag);
+
 
     if (xQueueReceive(magQueue, &ev, 0) != pdTRUE) {
         // Rotate gravity to body frame and cross with accels
@@ -450,22 +498,28 @@ static int32_t updateAttitudeComplementary(bool first_run)
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
     GyrosBiasData gyrosBias;
     GyrosBiasGet(&gyrosBias);
-    gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi;
-    gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi;
-    gyrosBias.z -= mag_err[2] * magKi;
-    GyrosBiasSet(&gyrosBias);
+    if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
+        gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi - gyrosData.x * rollPitchBiasRate;
+        gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi - gyrosData.y * rollPitchBiasRate;
+        gyrosBias.z -= -gyrosData.z * rollPitchBiasRate;
+    } else {
+        gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi - (gyrosData.x - gyrosBias.x) * rollPitchBiasRate;;
+        gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi - (gyrosData.y - gyrosBias.y) * rollPitchBiasRate;
+        gyrosBias.z -= -(gyrosData.z - gyrosBias.z) * rollPitchBiasRate;
 
-    if (revoCalibration.BiasCorrectedRaw != REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
         // if the raw values are not adjusted, we need to adjust here.
         gyrosData.x -= gyrosBias.x;
         gyrosData.y -= gyrosBias.y;
         gyrosData.z -= gyrosBias.z;
     }
 
+    gyrosBias.z -= mag_err[2] * attitudeSettings.MagKi;
+    GyrosBiasSet(&gyrosBias);
+
     // Correct rates based on error, integral component dealt with in updateSensors
     gyrosData.x += accel_err[0] * attitudeSettings.AccelKp / dT;
     gyrosData.y += accel_err[1] * attitudeSettings.AccelKp / dT;
-    gyrosData.z += accel_err[2] * attitudeSettings.AccelKp / dT + mag_err[2] * magKp / dT;
+    gyrosData.z += accel_err[2] * attitudeSettings.AccelKp / dT + mag_err[2] * attitudeSettings.MagKp / dT;
 
     // Work out time derivative from INSAlgo writeup
     // Also accounts for the fact that gyros are in deg/s
@@ -1129,6 +1183,16 @@ static void settingsUpdatedCb(UAVObjEvent *ev)
     }
     if (ev == NULL || ev->obj == AttitudeSettingsHandle()) {
         AttitudeSettingsGet(&attitudeSettings);
+
+        // Calculate accel filter alpha, in the same way as for gyro data in stabilization module.
+        const float fakeDt = 0.0025f;
+        if (attitudeSettings.AccelTau < 0.0001f) {
+            accel_alpha = 0; // not trusting this to resolve to 0
+            accel_filter_enabled = false;
+        } else {
+            accel_alpha = expf(-fakeDt / attitudeSettings.AccelTau);
+            accel_filter_enabled = true;
+        }
     }
 }
 /**

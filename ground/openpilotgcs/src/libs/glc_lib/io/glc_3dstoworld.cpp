@@ -348,7 +348,7 @@ GLC_3DRep GLC_3dsToWorld::create3DRep(Lib3dsMesh* p3dsMesh)
 	}
 
 	// free normal memmory
-	delete[] normalL;
+	free(normalL);
 	// Compute loading progress
 	++m_CurrentMeshNumber;
 	m_CurrentQuantumValue = static_cast<int>((static_cast<double>(m_CurrentMeshNumber) / m_NumberOfMeshes) * (100 - m_InitQuantumValue)) + m_InitQuantumValue;

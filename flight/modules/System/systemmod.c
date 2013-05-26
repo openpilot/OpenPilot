@@ -470,19 +470,9 @@ static void updateStats()
     } // else: TickCount has wrapped, do not calc now
     lastTickCount    = now;
     idleCounterClear = 1;
-
 #if defined(PIOS_INCLUDE_ADC) && defined(PIOS_ADC_USE_TEMP_SENSOR)
-#if defined(STM32F4XX)
-    float temp_voltage = 3.3f * PIOS_ADC_PinGet(3) / ((1 << 12) - 1);
-    const float STM32_TEMP_V25 = 0.76f; /* V */
-    const float STM32_TEMP_AVG_SLOPE = 2.5f; /* mV/C */
-    stats.CPUTemp = (temp_voltage - STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
-#else
-    float temp_voltage = 3.3f * PIOS_ADC_PinGet(0) / ((1 << 12) - 1);
-    const float STM32_TEMP_V25 = 1.43f; /* V */
-    const float STM32_TEMP_AVG_SLOPE = 4.3f; /* mV/C */
-    stats.CPUTemp = (temp_voltage - STM32_TEMP_V25) * 1000.0f / STM32_TEMP_AVG_SLOPE + 25.0f;
-#endif
+    float temp_voltage = PIOS_ADC_VOLTAGE_SCALE * PIOS_ADC_PinGet(PIOS_ADC_TEMPERATURE_PIN);
+    stats.CPUTemp = (temp_voltage-PIOS_ADC_STM32_TEMP_V25) * 1000.0f / PIOS_ADC_STM32_TEMP_AVG_SLOPE + 25.0f;
 #endif
     SystemStatsSet(&stats);
 }

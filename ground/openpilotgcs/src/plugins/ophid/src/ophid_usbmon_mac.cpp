@@ -40,7 +40,9 @@ static bool HID_GetIntProperty(IOHIDDeviceRef dev, CFStringRef property, int *va
 static bool HID_GetStrProperty(IOHIDDeviceRef dev, CFStringRef property, QString & value);
 
 /**
-   Initialize the USB monitor here
+ * \brief Initialize the USB monitor
+ *
+ * \note 
  */
 USBMonitor::USBMonitor(QObject *parent) : QThread(parent), m_terminate(1)
 {
@@ -52,17 +54,32 @@ USBMonitor::USBMonitor(QObject *parent) : QThread(parent), m_terminate(1)
     start();
 }
 
+/**
+ * \brief Free the USB monitor
+ *
+ * \note 
+ */
 USBMonitor::~USBMonitor()
 {
     m_terminate.tryAcquire();
     wait();
 }
 
+/**
+ * \brief Event received callback
+ *
+ * \note 
+ */
 void USBMonitor::deviceEventReceived()
 {
     qDebug() << "Device event";
 }
 
+/**
+ * \brief instace of USB monitor
+ *
+ * \note 
+ */
 USBMonitor *USBMonitor::instance()
 {
     return m_instance;
@@ -71,6 +88,11 @@ USBMonitor *USBMonitor::instance()
 USBMonitor *USBMonitor::m_instance = 0;
 
 
+/**
+ * \brief Remove device
+ *
+ * \note 
+ */
 void USBMonitor::removeDevice(IOHIDDeviceRef dev)
 {
     for (int i = 0; i < knowndevices.length(); i++) {
@@ -85,8 +107,11 @@ void USBMonitor::removeDevice(IOHIDDeviceRef dev)
     }
 }
 
+
 /**
- * @brief Static callback for the USB driver to indicate device removed
+ * \brief Static callback for the USB driver to indicate device removed
+ *
+ * \note 
  */
 void USBMonitor::detach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
 {
@@ -98,6 +123,12 @@ void USBMonitor::detach_callback(void *context, IOReturn r, void *hid_mgr, IOHID
     instance()->removeDevice(dev);
 }
 
+
+/**
+ * \brief Add device
+ *
+ * \note 
+ */
 void USBMonitor::addDevice(USBPortInfo info)
 {
     QMutexLocker locker(listMutex);
@@ -107,6 +138,12 @@ void USBMonitor::addDevice(USBPortInfo info)
     emit deviceDiscovered();
 }
 
+
+/**
+ * \brief Attach device
+ *
+ * \note 
+ */
 void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
 {
     Q_UNUSED(context);
@@ -139,8 +176,11 @@ void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHID
     }
 }
 
+
 /**
-   Returns a list of all currently available devices
+ * \brief Returns a list of all currently available devices
+ *
+ * \note 
  */
 QList<USBPortInfo> USBMonitor::availableDevices()
 {
@@ -174,6 +214,12 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
     return thePortsWeWant;
 }
 
+
+/**
+ * \brief USBMonitor thread
+ *
+ * \note 
+ */
 void USBMonitor::run()
 {
     IOReturn ret;
@@ -251,3 +297,4 @@ static bool HID_GetStrProperty(IOHIDDeviceRef dev, CFStringRef property, QString
     }
     return false;
 }
+

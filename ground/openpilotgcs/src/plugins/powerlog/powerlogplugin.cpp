@@ -69,7 +69,7 @@ void PowerlogThread::run()
     // TODO: pop up a dialog here!
 
     qDebug() << "Connect a Junsi PowerLog 6S and watch the logging output";
-    pjrc_rawhid hidHandle;
+    opHID_hidapi hidHandle;
     int numDevices = hidHandle.open(1, 0x0483, 0x5750, 0, 0); // 0xff9c,0x0001);
     if (numDevices == 0) {
         numDevices = hidHandle.open(1, 0x0483, 0, 0, 0);

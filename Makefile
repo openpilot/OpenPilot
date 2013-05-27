@@ -563,7 +563,7 @@ $$(UAVO_COLLECTION_DIR)/$(1)/uavohash: $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml
         # The sed bit truncates the UAVO hash to 16 hex digits
 	$$(V1) $$(VERSION_INFO) \
 			--uavodir=$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition \
-			--format='$$$${UAVOSHA1TXT}' | \
+			--format='$$$${UAVO_HASH}' | \
 		$(SED) -e 's|\(................\).*|\1|' > $$@
 
 	$$(V0) @$(ECHO) " UAVOHASH  $(1) ->" $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)

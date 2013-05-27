@@ -60,10 +60,10 @@ VersionDialog::VersionDialog(QWidget *parent)
     layout->setSizeConstraint(QLayout::SetFixedSize);
 
     QString uavoHashStr;
-    if (VersionInfo::uavoHash().length() > 15) {
+    if (VersionInfo::uavoHashArray().length() > 15) {
         // : This gets conditionally inserted as argument %11 into the description string.
         QByteArray uavoHashArray;
-        QString uavoHash = VersionInfo::uavoHash();
+        QString uavoHash = VersionInfo::uavoHashArray();
         uavoHash.chop(2);
         uavoHash.remove(0, 2);
         uavoHash = uavoHash.trimmed();

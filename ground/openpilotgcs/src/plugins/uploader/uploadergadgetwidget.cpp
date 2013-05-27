@@ -957,7 +957,7 @@ void UploaderGadgetWidget::versionMatchCheck()
     UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
     deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
     QByteArray uavoHashArray;
-    QString uavoHash = VersionInfo::uavoHash();
+    QString uavoHash = VersionInfo::uavoHashArray();
 
     uavoHash.chop(2);
     uavoHash.remove(0, 2);

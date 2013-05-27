@@ -1185,7 +1185,7 @@ static void settingsUpdatedCb(UAVObjEvent *ev)
         AttitudeSettingsGet(&attitudeSettings);
 
         // Calculate accel filter alpha, in the same way as for gyro data in stabilization module.
-        const float fakeDt = 0.0025f;
+        const float fakeDt = 0.0015f;
         if (attitudeSettings.AccelTau < 0.0001f) {
             accel_alpha = 0; // not trusting this to resolve to 0
             accel_filter_enabled = false;

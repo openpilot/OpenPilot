@@ -295,8 +295,6 @@ extern uint32_t pios_packet_handler;
 #define PIOS_ADC_VOLTAGE_SCALE    3.30f / 4096.0f
 
 #define PIOS_ADC_USE_TEMP_SENSOR
-
-#define PIOS_ADC_VOLTAGE_SCALE 3.30f/4096.0f
 #define PIOS_ADC_TEMPERATURE_PIN 3
 #define PIOS_ADC_STM32_TEMP_V25 0.76f       /* V */
 #define PIOS_ADC_STM32_TEMP_AVG_SLOPE 2.5f  /* mV/C */

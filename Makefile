@@ -440,7 +440,7 @@ sim_osx_%: uavobjects_flight
 all_ground: openpilotgcs
 
 # Convenience target for the GCS
-.PHONY: gcs gcs_clean gcs_all_clean
+.PHONY: gcs gcs_clean
 gcs: openpilotgcs
 gcs_clean: openpilotgcs_clean
 
@@ -946,7 +946,6 @@ help:
 	@$(ECHO) "     gcs                  - Build the Ground Control System (GCS) application (debug|release)"
 	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application (debug|release)"
 	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
-	@$(ECHO) "     gcs_all_clean        - Remove the Ground Control System (GCS) application (all build confgurations)"
 	@$(ECHO)
 	@$(ECHO) "   [AndroidGCS]"
 	@$(ECHO) "     androidgcs           - Build the Android Ground Control System (GCS) application"

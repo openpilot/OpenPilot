@@ -2173,7 +2173,7 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     PositionActual *positionActual = PositionActual::GetInstance(obm);
     Q_ASSERT(positionActual != NULL);
     PositionActual::DataFields positionActualData = positionActual->getData();
-    if(positionActualData.North == 0 && positionActualData.East == 0 && positionActualData.Down == 0){
+    if (positionActualData.North == 0 && positionActualData.East == 0 && positionActualData.Down == 0) {
         GPSPosition *gpsPositionObj = GPSPosition::GetInstance(obm);
         Q_ASSERT(gpsPositionObj);
 
@@ -2191,10 +2191,9 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
     homeLLA[1] = homeLocationData.Longitude / 1.0e7;
     homeLLA[2] = homeLocationData.Altitude;
 
-
-    NED[0] = positionActualData.North;
-    NED[1] = positionActualData.East;
-    NED[2] = positionActualData.Down;
+    NED[0]     = positionActualData.North;
+    NED[1]     = positionActualData.East;
+    NED[2]     = positionActualData.Down;
 
     Utils::CoordinateConversions().NED2LLA_HomeLLA(homeLLA, NED, LLA);
 

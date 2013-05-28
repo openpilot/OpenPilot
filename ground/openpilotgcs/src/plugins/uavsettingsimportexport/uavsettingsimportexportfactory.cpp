@@ -241,7 +241,7 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
     versionInfo.appendChild(hw);
 
     QDomElement fw = doc.createElement("firmware");
-    QString uavo = board.uavoHash.toHex();
+    QString uavo   = board.uavoHash.toHex();
     fw.setAttribute("tag", board.gitTag);
     fw.setAttribute("date", board.gitDate);
     fw.setAttribute("hash", board.gitHash);

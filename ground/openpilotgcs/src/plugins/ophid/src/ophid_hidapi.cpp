@@ -171,6 +171,8 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
 
         if (devices_found) {
 
+            devices_found = 0;
+
             // Go through the list until we can open one
             // WARNING: for now this prevent to have device chained
             tmp_device_ptr = current_device_ptr;
@@ -186,7 +188,10 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
                                   NULL);
 
                 if (handle)
+                {
+                    devices_found = 1 ;
                     break;
+                }
 
                 tmp_device_ptr = tmp_device_ptr->next;
             }

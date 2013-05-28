@@ -2146,7 +2146,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location line="+2"/>
-        <source>Notify Plugin</source>
+        <source>Notification</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

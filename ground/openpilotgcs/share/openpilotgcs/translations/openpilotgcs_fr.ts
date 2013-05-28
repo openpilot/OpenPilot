@@ -2175,8 +2175,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location line="+2"/>
-        <source>Notify Plugin</source>
-        <translation>Plugin de Notification</translation>
+        <source>Notification</source>
+        <translation>Notification</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>

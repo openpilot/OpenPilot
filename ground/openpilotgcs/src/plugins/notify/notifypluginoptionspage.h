@@ -76,7 +76,7 @@ public:
     }
     QString trCategory() const
     {
-        return tr("Notify Plugin");
+        return tr("Notification");
     }
 
     QWidget *createPage(QWidget *parent);

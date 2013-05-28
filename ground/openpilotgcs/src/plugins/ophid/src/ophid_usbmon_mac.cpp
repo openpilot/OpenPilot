@@ -42,7 +42,7 @@ static bool HID_GetStrProperty(IOHIDDeviceRef dev, CFStringRef property, QString
 /**
  * \brief Initialize the USB monitor
  *
- * \note 
+ * \note
  */
 USBMonitor::USBMonitor(QObject *parent) : QThread(parent), m_terminate(1)
 {
@@ -57,7 +57,7 @@ USBMonitor::USBMonitor(QObject *parent) : QThread(parent), m_terminate(1)
 /**
  * \brief Free the USB monitor
  *
- * \note 
+ * \note
  */
 USBMonitor::~USBMonitor()
 {
@@ -68,7 +68,7 @@ USBMonitor::~USBMonitor()
 /**
  * \brief Event received callback
  *
- * \note 
+ * \note
  */
 void USBMonitor::deviceEventReceived()
 {
@@ -78,7 +78,7 @@ void USBMonitor::deviceEventReceived()
 /**
  * \brief instace of USB monitor
  *
- * \note 
+ * \note
  */
 USBMonitor *USBMonitor::instance()
 {
@@ -91,7 +91,7 @@ USBMonitor *USBMonitor::m_instance = 0;
 /**
  * \brief Remove device
  *
- * \note 
+ * \note
  */
 void USBMonitor::removeDevice(IOHIDDeviceRef dev)
 {
@@ -111,7 +111,7 @@ void USBMonitor::removeDevice(IOHIDDeviceRef dev)
 /**
  * \brief Static callback for the USB driver to indicate device removed
  *
- * \note 
+ * \note
  */
 void USBMonitor::detach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
 {
@@ -127,7 +127,7 @@ void USBMonitor::detach_callback(void *context, IOReturn r, void *hid_mgr, IOHID
 /**
  * \brief Add device
  *
- * \note 
+ * \note
  */
 void USBMonitor::addDevice(USBPortInfo info)
 {
@@ -142,7 +142,7 @@ void USBMonitor::addDevice(USBPortInfo info)
 /**
  * \brief Attach device
  *
- * \note 
+ * \note
  */
 void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
 {
@@ -180,7 +180,7 @@ void USBMonitor::attach_callback(void *context, IOReturn r, void *hid_mgr, IOHID
 /**
  * \brief Returns a list of all currently available devices
  *
- * \note 
+ * \note
  */
 QList<USBPortInfo> USBMonitor::availableDevices()
 {
@@ -218,7 +218,7 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
 /**
  * \brief USBMonitor thread
  *
- * \note 
+ * \note
  */
 void USBMonitor::run()
 {
@@ -297,4 +297,3 @@ static bool HID_GetStrProperty(IOHIDDeviceRef dev, CFStringRef property, QString
     }
     return false;
 }
-

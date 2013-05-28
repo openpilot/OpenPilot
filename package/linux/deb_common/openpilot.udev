@@ -4,7 +4,7 @@
     SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415a", MODE="0664", GROUP="plugdev"
     # OpenPilot CopterControl flight control board
     SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415b", MODE="0664", GROUP="plugdev"
-    # OpenPilot Pipx radio modem board
+    # OpenPilot OPlink Mini radio modem board
     SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415c", MODE="0664", GROUP="plugdev"
     # OpenPilot CopterControl3D flight control board
     SUBSYSTEM=="usb", ATTRS{idVendor}=="20a0", ATTRS{idProduct}=="415d", MODE="0664", GROUP="plugdev"

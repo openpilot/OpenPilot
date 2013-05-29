@@ -1,6 +1,6 @@
 <xml>
-    <object name="MagState" singleinstance="true" settings="false">
-        <description>The mag data.</description>
+    <object name="MagState" singleinstance="true" settings="false" category="State">
+        <description>The filtered magnet vector.</description>
 	<field name="x" units="mGa" type="float" elements="1"/>
 	<field name="y" units="mGa" type="float" elements="1"/>
 	<field name="z" units="mGa" type="float" elements="1"/>

@@ -369,7 +369,7 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
 
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
     this->gyroBias[0] -= accel_err[0] * this->attitudeSettings.AccelKi - gyro[0] * this->rollPitchBiasRate;
-    this->gyroBias[1] -= accel_err[1] * this->attitudeSettings.AccelKi - gyro[1] * this->rollPitchBiasRate;;
+    this->gyroBias[1] -= accel_err[1] * this->attitudeSettings.AccelKi - gyro[1] * this->rollPitchBiasRate;
     if (this->useMag) {
         this->gyroBias[2] -= mag_err[2] * this->attitudeSettings.MagKi - gyro[2] * this->rollPitchBiasRate;
     } else {

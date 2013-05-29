@@ -1,6 +1,6 @@
 <xml>
-    <object name="AccelSensor" singleinstance="true" settings="false">
-        <description>The accel data.</description>
+    <object name="AccelSensor" singleinstance="true" settings="false" category="Sensors">
+        <description>Calibrated sensor data from 3 axis accelerometer in m/s².</description>
 	<field name="x" units="m/s^2" type="float" elements="1"/>
 	<field name="y" units="m/s^2" type="float" elements="1"/>
 	<field name="z" units="m/s^2" type="float" elements="1"/>

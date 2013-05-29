@@ -1,5 +1,5 @@
 <xml>
-    <object name="AccelState" singleinstance="true" settings="false">
+    <object name="AccelState" singleinstance="true" settings="false" category="State">
         <description>The filtered acceleration data.</description>
 	<field name="x" units="m/s^2" type="float" elements="1"/>
 	<field name="y" units="m/s^2" type="float" elements="1"/>

@@ -1,6 +1,6 @@
 <xml>
-    <object name="MagSensor" singleinstance="true" settings="false">
-        <description>The mag data.</description>
+    <object name="MagSensor" singleinstance="true" settings="false" category="Sensors">
+        <description>Calibrated sensor data from 3 axis magnetometer in MilliGauss.</description>
 	<field name="x" units="mGa" type="float" elements="1"/>
 	<field name="y" units="mGa" type="float" elements="1"/>
 	<field name="z" units="mGa" type="float" elements="1"/>

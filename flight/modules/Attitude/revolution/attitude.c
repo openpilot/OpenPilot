@@ -703,8 +703,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
         magData.y = mags.y;
         magData.z = mags.z;
         MagStateSet(&magData);
+    } else {
+        MagStateGet(&magData);
     }
-    MagStateGet(&magData);
 
     BaroSensorGet(&baroData);
     AirspeedSensorGet(&airspeedData);
@@ -1051,9 +1052,9 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     VelocityStateSet(&velocityState);
 
     GyroStateData gyroState;
-    gyroState.x = RAD2DEG(gyros[0] - Nav.gyro_bias[0]);
-    gyroState.y = RAD2DEG(gyros[1] - Nav.gyro_bias[1]);
-    gyroState.z = RAD2DEG(gyros[2] - Nav.gyro_bias[2]);
+    gyroState.x = RAD2DEG(gyros[0] - RAD2DEG(Nav.gyro_bias[0]));
+    gyroState.y = RAD2DEG(gyros[1] - RAD2DEG(Nav.gyro_bias[1]));
+    gyroState.z = RAD2DEG(gyros[2] - RAD2DEG(Nav.gyro_bias[2]));
     GyroStateSet(&gyroState);
 
     EKFStateVarianceData vardata;

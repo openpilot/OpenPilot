@@ -1,6 +1,6 @@
 <xml>
-    <object name="GPSVelocitySensor" singleinstance="true" settings="false">
-        <description>Raw GPS data from @ref GPSModule.</description>
+    <object name="GPSVelocitySensor" singleinstance="true" settings="false" category="Sensors">
+        <description>Raw GPS velocity in NED frame and m/s from @ref GPSModule.</description>
         <field name="North" units="m/s" type="float" elements="1"/>
         <field name="East" units="m/s" type="float" elements="1"/>
         <field name="Down" units="m/s" type="float" elements="1"/>

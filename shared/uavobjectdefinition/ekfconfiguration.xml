@@ -23,9 +23,9 @@
 		</elementnames>
 	</field>
 	<field name="Q" units="1^2" type="float" defaultvalue="
+		0.001, 0.001, 0.001,
 		0.1, 0.1, 0.1,
-		10.0, 10.0, 10.0,
-		0.00000002, 0.00000002, 0.00000002">
+		0.000000002, 0.000000002, 0.000000002">
 		<elementnames>
 			<elementname>GyroX</elementname>
 			<elementname>GyroY</elementname>
@@ -41,7 +41,7 @@
 	<field name="R" units="1^2" type="float" defaultvalue="
 		1.0, 1.0, 1.0,
 		0.1, 0.1, 0.1,
-		1.0, 1.0, 1.0,
+		10000.0, 10000.0, 10000.0,
 		0.1">
 		<elementnames>
 			<elementname>GPSPosNorth</elementname>
@@ -57,8 +57,8 @@
 		</elementnames>
 	</field>
 	<field name="FakeR" type="float" units="1^2" defaultvalue="
-		1000000,
-		100000,
+		10000,
+		1000,
 		100">
 		<elementnames>
 			<elementname>FakeGPSPosIndoor</elementname>

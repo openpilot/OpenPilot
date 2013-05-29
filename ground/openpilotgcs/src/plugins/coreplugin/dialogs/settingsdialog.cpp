@@ -102,6 +102,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
     QSettings *settings = ICore::instance()->settings();
 
     settings->beginGroup("General");
+    settings->beginGroup("Settings");
 
     // restore last displayed category and page
     // this is done only if no category or page was provided through the constructor
@@ -115,31 +116,26 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
     }
 
     // restore window size
-    int windowWidth  = settings->value("SettingsWindowWidth", 0).toInt();
-    int windowHeight = settings->value("SettingsWindowHeight", 0).toInt();
+    int windowWidth  = settings->value("WindowWidth", 0).toInt();
+    int windowHeight = settings->value("WindowHeight", 0).toInt();
     qDebug() << "SettingsDialog window width :" << windowWidth << ", height:" << windowHeight;
     if (windowWidth > 0 && windowHeight > 0) {
         resize(windowWidth, windowHeight);
     }
 
     // restore splitter size
-    int size0 = settings->value("SettingsSplitterSize0", 0).toInt();
-    int size1 = settings->value("SettingsSplitterSize1", 0).toInt();
-    qDebug() << "SettingsDialog splitter size0:" << size0 << ", size1:" << size1;
+    int splitterPosition = settings->value("SplitterPosition", 350).toInt();
+    qDebug() << "SettingsDialog splitter position:" << splitterPosition;
     QList<int> sizes;
-    if (size0 > 0 && size1 > 0) {
-        sizes << size0 << size1;
-    }
-    else {
-        sizes << 150 << 300;
-    }
+    sizes << splitterPosition << 400;
     splitter->setSizes(sizes);
 
     settings->endGroup();
+    settings->endGroup();
 
     // all extra space must go to the option page and none to the tree
-    splitter->setStretchFactor(splitter->indexOf(pageTree), 0);
-    splitter->setStretchFactor(splitter->indexOf(layoutWidget), 1);
+    splitter->setStretchFactor(0, 0);
+    splitter->setStretchFactor(1, 1);
 
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 
@@ -172,10 +168,11 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
         }
     }
 
-    // the plugin options page list sorted by untranslated names to facilitate access to the language settings when GCS
-    // is not running in a language understood by the user.
+    // the plugin options page list is sorted by untranslated category and names
+    // this is done to facilitate access to the language settings when GCS is not running in a language understood by the user.
     qStableSort(pluginPages.begin(), pluginPages.end(), compareOptionsPageByCategoryAndId);
-    // the plugin options page list sorted is sorted by translated names
+
+    // the plugin options page list is sorted by translated names
     qStableSort(gadgetPages.begin(), gadgetPages.end(), compareOptionsPageByCategoryAndNameTr);
 
     // will hold the initially selected item if any
@@ -184,14 +181,14 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
     // add plugin pages
     foreach(IOptionsPage *page, pluginPages) {
         QTreeWidgetItem *item = addPage(page);
-        // to automatically expand all plugin categories, uncomment next line
-        //item->parent()->setExpanded(true);
+        // automatically expand all plugin categories
+        item->parent()->setExpanded(true);
         if (page->id() == initialPage && page->category() == initialCategory) {
             initialItem = item;
         }
     }
 
-    // insert separator bewteen plugin and gadget pages
+    // insert separator between plugin and gadget pages
     QTreeWidgetItem *separator = new QTreeWidgetItem(pageTree);
     separator->setFlags(separator->flags() & ~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled);
     separator->setText(0, QString(30, 0xB7));
@@ -453,16 +450,17 @@ void SettingsDialog::done(int val)
 {
     QSettings *settings = ICore::instance()->settings();
     settings->beginGroup("General");
+    settings->beginGroup("Settings");
 
     settings->setValue("LastPreferenceCategory", m_currentCategory);
     settings->setValue("LastPreferencePage", m_currentPage);
-    settings->setValue("SettingsWindowWidth", this->width());
-    settings->setValue("SettingsWindowHeight", this->height());
+    settings->setValue("WindowWidth", this->width());
+    settings->setValue("WindowHeight", this->height());
     QList<int> sizes = splitter->sizes();
     qDebug() << "SettingsDialog splitter saving size0:" << sizes[0] << ", size1:" << sizes[1];
-    settings->setValue("SettingsSplitterSize0", sizes[0]);
-    settings->setValue("SettingsSplitterSize1", sizes[1]);
+    settings->setValue("SplitterPosition", sizes[0]);
 
+    settings->endGroup();
     settings->endGroup();
 
     QDialog::done(val);

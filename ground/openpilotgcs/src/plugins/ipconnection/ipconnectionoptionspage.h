@@ -58,7 +58,7 @@ public:
     }
     QString category() const
     {
-        return "IP Network Telemetry";
+        return "Telemetry - IP Network";
     };
     QString trCategory() const
     {

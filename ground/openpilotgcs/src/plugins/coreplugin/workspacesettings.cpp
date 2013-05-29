@@ -60,12 +60,12 @@ QString WorkspaceSettings::trName() const
 
 QString WorkspaceSettings::category() const
 {
-    return QLatin1String("GCS");
+    return QLatin1String("Environment");
 }
 
 QString WorkspaceSettings::trCategory() const
 {
-    return tr("GCS");
+    return tr("Environment");
 }
 
 QWidget *WorkspaceSettings::createPage(QWidget *parent)

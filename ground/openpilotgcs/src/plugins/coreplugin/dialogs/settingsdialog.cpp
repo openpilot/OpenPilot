@@ -32,7 +32,6 @@
 #include "icore.h"
 #include "coreplugin/uavgadgetinstancemanager.h"
 #include "coreplugin/uavgadgetoptionspagedecorator.h"
-// #include "coreimpl.h"
 
 #include <QtCore/QDebug>
 #include <QtCore/QSettings>
@@ -40,49 +39,58 @@
 #include <QtGui/QLabel>
 #include <QtGui/QPushButton>
 
+using namespace Core;
+using namespace Core::Internal;
+
 namespace {
-struct PageData {
-    int     index;
-    QString category;
-    QString id;
-};
+
+    struct PageData {
+        int index;
+        QString category;
+        QString id;
+
+    };
+
+    // helper to sort by translated category and name
+    bool compareOptionsPageByCategoryAndNameTr(const IOptionsPage *p1, const IOptionsPage *p2)
+    {
+        const UAVGadgetOptionsPageDecorator *gp1 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p1);
+        const UAVGadgetOptionsPageDecorator *gp2 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p2);
+        if (gp1 && !gp2) {
+            return false;
+        }
+        if (gp2 && !gp1) {
+            return true;
+        }
+        if (const int cc = QString::localeAwareCompare(p1->trCategory(), p2->trCategory())) {
+            return cc < 0;
+        }
+        return QString::localeAwareCompare(p1->trName(), p2->trName()) < 0;
+    }
+
+    // helper to sort by category and id
+    bool compareOptionsPageByCategoryAndId(const IOptionsPage *p1, const IOptionsPage *p2)
+    {
+        const UAVGadgetOptionsPageDecorator *gp1 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p1);
+        const UAVGadgetOptionsPageDecorator *gp2 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p2);
+        if (gp1 && !gp2) {
+            return false;
+        }
+        if (gp2 && !gp1) {
+            return true;
+        }
+        if (const int cc = QString::localeAwareCompare(p1->category(), p2->category())) {
+            return cc < 0;
+        }
+        return QString::localeAwareCompare(p1->id(), p2->id()) < 0;
+    }
+
 }
 
 Q_DECLARE_METATYPE(::PageData)
 
-using namespace Core;
-using namespace Core::Internal;
-
-// Helpers to sort by category. id
-bool optionsPageLessThan(const IOptionsPage *p1, const IOptionsPage *p2)
-{
-    const UAVGadgetOptionsPageDecorator *gp1 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p1);
-    const UAVGadgetOptionsPageDecorator *gp2 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p2);
-
-    if (gp1 && (gp2 == NULL)) {
-        return false;
-    }
-
-    if (gp2 && (gp1 == NULL)) {
-        return true;
-    }
-
-    if (const int cc = QString::localeAwareCompare(p1->trCategory(), p2->trCategory())) {
-        return cc < 0;
-    }
-
-    return QString::localeAwareCompare(p1->trName(), p2->trName()) < 0;
-}
-
-static inline QList<Core::IOptionsPage *> sortedOptionsPages()
-{
-    QList<Core::IOptionsPage *> rc = ExtensionSystem::PluginManager::instance()->getObjects<IOptionsPage>();
-    qStableSort(rc.begin(), rc.end(), optionsPageLessThan);
-    return rc;
-}
-
-SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const QString &pageId)
-    : QDialog(parent), m_applied(false)
+SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const QString &pageId) :
+        QDialog(parent), m_applied(false)
 {
     setupUi(this);
 #ifdef Q_OS_MAC
@@ -92,6 +100,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
 #endif
 
     QSettings *settings = ICore::instance()->settings();
+
     settings->beginGroup("General");
 
     // restore last displayed category and page
@@ -104,6 +113,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
         initialPage     = settings->value("LastPreferencePage", QVariant(QString())).toString();
         qDebug() << "SettingsDialog settings initial category:" << initialCategory << ", initial page: " << initialPage;
     }
+
     // restore window size
     int windowWidth  = settings->value("SettingsWindowWidth", 0).toInt();
     int windowHeight = settings->value("SettingsWindowHeight", 0).toInt();
@@ -111,7 +121,25 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
     if (windowWidth > 0 && windowHeight > 0) {
         resize(windowWidth, windowHeight);
     }
+
+    // restore splitter size
+    int size0 = settings->value("SettingsSplitterSize0", 0).toInt();
+    int size1 = settings->value("SettingsSplitterSize1", 0).toInt();
+    qDebug() << "SettingsDialog splitter size0:" << size0 << ", size1:" << size1;
+    QList<int> sizes;
+    if (size0 > 0 && size1 > 0) {
+        sizes << size0 << size1;
+    }
+    else {
+        sizes << 150 << 300;
+    }
+    splitter->setSizes(sizes);
+
     settings->endGroup();
+
+    // all extra space must go to the option page and none to the tree
+    splitter->setStretchFactor(splitter->indexOf(pageTree), 0);
+    splitter->setStretchFactor(splitter->indexOf(layoutWidget), 1);
 
     buttonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 
@@ -119,106 +147,73 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
 
     m_instanceManager = Core::ICore::instance()->uavGadgetInstanceManager();
 
-    connect(this, SIGNAL(settingsDialogShown(Core::Internal::SettingsDialog *)), m_instanceManager, SLOT(settingsDialogShown(Core::Internal::SettingsDialog *)));
+    connect(this, SIGNAL(settingsDialogShown(Core::Internal::SettingsDialog *)), m_instanceManager,
+            SLOT(settingsDialogShown(Core::Internal::SettingsDialog *)));
     connect(this, SIGNAL(settingsDialogRemoved()), m_instanceManager, SLOT(settingsDialogRemoved()));
-    connect(this, SIGNAL(categoryItemSelected()), this, SLOT(categoryItemSelectedShowChildInstead()), Qt::QueuedConnection);
+    connect(this, SIGNAL(categoryItemSelected()), this, SLOT(categoryItemSelectedShowChildInstead()),
+            Qt::QueuedConnection);
 
     splitter->setCollapsible(0, false);
     splitter->setCollapsible(1, false);
     pageTree->header()->setVisible(false);
-// pageTree->setIconSize(QSize(24, 24));
 
-    connect(pageTree, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-            this, SLOT(pageSelected()));
+    connect(pageTree, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT(pageSelected()));
 
-    QMap<QString, QTreeWidgetItem *> categories;
+    QList<Core::IOptionsPage *> pluginPages;
+    QList<Core::IOptionsPage *> gadgetPages;
 
-    QList<IOptionsPage *> pages = sortedOptionsPages();
+    // get all pages and split them between plugin and gadget list
+    QList<Core::IOptionsPage *> pages = ExtensionSystem::PluginManager::instance()->getObjects<IOptionsPage>();
+    foreach(IOptionsPage *page, pages) {
+        if (qobject_cast<UAVGadgetOptionsPageDecorator *>(page)) {
+            gadgetPages.append(page);
+        } else {
+            pluginPages.append(page);
+        }
+    }
 
-    int index = 0;
-    bool firstUavGadgetOptionsPageFound = false;
+    // the plugin options page list sorted by untranslated names to facilitate access to the language settings when GCS
+    // is not running in a language understood by the user.
+    qStableSort(pluginPages.begin(), pluginPages.end(), compareOptionsPageByCategoryAndId);
+    // the plugin options page list sorted is sorted by translated names
+    qStableSort(gadgetPages.begin(), gadgetPages.end(), compareOptionsPageByCategoryAndNameTr);
+
+    // will hold the initially selected item if any
     QTreeWidgetItem *initialItem = 0;
-    foreach(IOptionsPage * page, pages) {
-        PageData pageData;
 
-        pageData.index    = index;
-        pageData.category = page->category();
-        pageData.id = page->id();
-
-        QTreeWidgetItem *item = new QTreeWidgetItem;
-        item->setText(0, page->trName());
-        item->setData(0, Qt::UserRole, qVariantFromValue(pageData));
-
-        QString trCategories    = page->trCategory();
-        QString currentCategory = page->category();
-
-        QTreeWidgetItem *categoryItem;
-        if (!categories.contains(currentCategory)) {
-            // Above the first gadget option we insert a separator
-            if (!firstUavGadgetOptionsPageFound) {
-                UAVGadgetOptionsPageDecorator *pd = qobject_cast<UAVGadgetOptionsPageDecorator *>(page);
-                if (pd) {
-                    firstUavGadgetOptionsPageFound = true;
-                    QTreeWidgetItem *separator = new QTreeWidgetItem(pageTree);
-                    separator->setFlags(separator->flags() & ~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled);
-                    separator->setText(0, QString(30, 0xB7));
-                }
-            }
-            categoryItem = new QTreeWidgetItem(pageTree);
-            categoryItem->setIcon(0, page->icon());
-            categoryItem->setText(0, trCategories);
-            categoryItem->setData(0, Qt::UserRole, qVariantFromValue(pageData));
-            categories.insert(currentCategory, categoryItem);
-        }
-
-        QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(currentCategory);
-        if (!categoryItemList) {
-            categoryItemList = new QList<QTreeWidgetItem *>();
-            m_categoryItemsMap.insert(currentCategory, categoryItemList);
-        }
-        categoryItemList->append(item);
-
-        m_pages.append(page);
-
-        // creating all option pages upfront is slow, so we create place holder widgets instead
-        // the real option page widget will be created later when the user selects it
-        // the place holder is a QLabel and we assume that no option page will be a QLabel...
-        QLabel *placeholderWidget = new QLabel(stackedPages);
-        stackedPages->addWidget(placeholderWidget);
-
-        if (page->id() == initialPage && currentCategory == initialCategory) {
+    // add plugin pages
+    foreach(IOptionsPage *page, pluginPages) {
+        QTreeWidgetItem *item = addPage(page);
+        // to automatically expand all plugin categories, uncomment next line
+        //item->parent()->setExpanded(true);
+        if (page->id() == initialPage && page->category() == initialCategory) {
             initialItem = item;
         }
-
-        index++;
     }
 
-    foreach(QString category, m_categoryItemsMap.keys()) {
-        QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(category);
-        if (categoryItemList->size() > 1) {
-            foreach(QTreeWidgetItem * item, *categoryItemList) {
-                QTreeWidgetItem *categoryItem = categories.value(category);
+    // insert separator bewteen plugin and gadget pages
+    QTreeWidgetItem *separator = new QTreeWidgetItem(pageTree);
+    separator->setFlags(separator->flags() & ~Qt::ItemIsSelectable & ~Qt::ItemIsEnabled);
+    separator->setText(0, QString(30, 0xB7));
 
-                categoryItem->addChild(item);
-            }
+    // add gadget pages
+    foreach(IOptionsPage *page, gadgetPages) {
+        QTreeWidgetItem *item = addPage(page);
+        if (page->id() == initialPage && page->category() == initialCategory) {
+            initialItem = item;
         }
     }
 
+    // handle initially selected item
     if (initialItem) {
-        if (!initialItem->parent()) {
-            // item has no parent, meaning it is single child
-            // so select category item instead as single child are not added to the tree
-            initialItem = categories.value(initialCategory);
+        if (initialItem->isHidden()) {
+            // item is hidden, meaning it is single child
+            // so select parent category item instead
+            initialItem = initialItem->parent();
         }
         pageTree->setCurrentItem(initialItem);
     }
 
-    QList<int> sizes;
-    sizes << 150 << 300;
-    splitter->setSizes(sizes);
-
-    splitter->setStretchFactor(splitter->indexOf(pageTree), 0);
-    splitter->setStretchFactor(splitter->indexOf(layoutWidget), 1);
 }
 
 SettingsDialog::~SettingsDialog()
@@ -234,6 +229,64 @@ SettingsDialog::~SettingsDialog()
             delete widget;
         }
     }
+}
+
+QTreeWidgetItem *SettingsDialog::addPage(IOptionsPage *page) {
+    PageData pageData;
+    pageData.index = m_pages.count();
+    pageData.category = page->category();
+    pageData.id = page->id();
+
+    QString category = page->category();
+
+    QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(category);
+    if (!categoryItemList) {
+        categoryItemList = new QList<QTreeWidgetItem *>();
+        m_categoryItemsMap.insert(category, categoryItemList);
+    }
+
+    QTreeWidgetItem *categoryItem = NULL;
+    for (int i = 0; i < pageTree->topLevelItemCount(); ++i) {
+        QTreeWidgetItem *tw = pageTree->topLevelItem(i);
+        PageData data = tw->data(0, Qt::UserRole).value<PageData>();
+        if (data.category == page->category()) {
+            categoryItem = tw;
+            break;
+        }
+    }
+    if (!categoryItem) {
+        categoryItem = new QTreeWidgetItem(pageTree);
+        categoryItem->setIcon(0, page->icon());
+        categoryItem->setText(0, page->trCategory());
+        categoryItem->setData(0, Qt::UserRole, qVariantFromValue(pageData));
+    }
+
+    QTreeWidgetItem *item = new QTreeWidgetItem(categoryItem);
+    item->setText(0, page->trName());
+    item->setData(0, Qt::UserRole, qVariantFromValue(pageData));
+
+    switch (categoryItemList->size()) {
+    case 0:
+        item->setHidden(true);
+        break;
+    case 1:
+        categoryItemList->at(0)->setHidden(false);
+        break;
+    default:
+        break;
+    }
+
+    categoryItemList->append(item);
+
+    m_pages.append(page);
+
+    // creating all option pages upfront is slow, so we create place holder widgets instead
+    // the real option page widget will be created later when the user selects it
+    // the place holder is a QLabel and we assume that no option page will be a QLabel...
+    QLabel *placeholderWidget = new QLabel(stackedPages);
+    stackedPages->addWidget(placeholderWidget);
+
+    return item;
 }
 
 void SettingsDialog::pageSelected()
@@ -281,15 +334,18 @@ void SettingsDialog::deletePage()
     QString category = data.category;
 
     QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(category);
-    QTreeWidgetItem *parentItem = item->parent();
-    parentItem->removeChild(item);
-    categoryItemList->removeOne(item);
-    if (parentItem->childCount() == 1) {
-        parentItem->removeChild(parentItem->child(0));
+    if (categoryItemList) {
+        categoryItemList->removeOne(item);
+        QTreeWidgetItem *parentItem = item->parent();
+        parentItem->removeChild(item);
+        if (parentItem->childCount() == 1) {
+            parentItem->child(0)->setHidden(true);
+        }
     }
     pageSelected();
 }
 
+// TODO duplicates a lot of the addPage code...
 void SettingsDialog::insertPage(IOptionsPage *page)
 {
     PageData pageData;
@@ -314,9 +370,9 @@ void SettingsDialog::insertPage(IOptionsPage *page)
     // If this category has no child right now
     // we need to add the "default child"
     QList<QTreeWidgetItem *> *categoryItemList = m_categoryItemsMap.value(page->category());
-    if (categoryItem->childCount() == 0) {
+    if (categoryItem->childCount() == 1) {
         QTreeWidgetItem *defaultItem = categoryItemList->at(0);
-        categoryItem->addChild(defaultItem);
+        defaultItem->setHidden(false);
     }
 
     QTreeWidgetItem *item = new QTreeWidgetItem;
@@ -396,10 +452,18 @@ bool SettingsDialog::execDialog()
 void SettingsDialog::done(int val)
 {
     QSettings *settings = ICore::instance()->settings();
+    settings->beginGroup("General");
 
-    settings->setValue("General/LastPreferenceCategory", m_currentCategory);
-    settings->setValue("General/LastPreferencePage", m_currentPage);
-    settings->setValue("General/SettingsWindowWidth", this->width());
-    settings->setValue("General/SettingsWindowHeight", this->height());
+    settings->setValue("LastPreferenceCategory", m_currentCategory);
+    settings->setValue("LastPreferencePage", m_currentPage);
+    settings->setValue("SettingsWindowWidth", this->width());
+    settings->setValue("SettingsWindowHeight", this->height());
+    QList<int> sizes = splitter->sizes();
+    qDebug() << "SettingsDialog splitter saving size0:" << sizes[0] << ", size1:" << sizes[1];
+    settings->setValue("SettingsSplitterSize0", sizes[0]);
+    settings->setValue("SettingsSplitterSize1", sizes[1]);
+
+    settings->endGroup();
+
     QDialog::done(val);
 }

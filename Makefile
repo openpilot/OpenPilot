@@ -440,7 +440,7 @@ sim_osx_%: uavobjects_flight
 all_ground: openpilotgcs
 
 # Convenience target for the GCS
-.PHONY: gcs gcs_clean gcs_all_clean
+.PHONY: gcs gcs_clean
 gcs: openpilotgcs
 gcs_clean: openpilotgcs_clean
 
@@ -563,7 +563,7 @@ $$(UAVO_COLLECTION_DIR)/$(1)/uavohash: $$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml
         # The sed bit truncates the UAVO hash to 16 hex digits
 	$$(V1) $$(VERSION_INFO) \
 			--uavodir=$$(UAVO_COLLECTION_DIR)/$(1)/uavo-xml/shared/uavobjectdefinition \
-			--format='$$$${UAVOSHA1TXT}' | \
+			--format='$$$${UAVO_HASH}' | \
 		$(SED) -e 's|\(................\).*|\1|' > $$@
 
 	$$(V0) @$(ECHO) " UAVOHASH  $(1) ->" $$$$(cat $$(UAVO_COLLECTION_DIR)/$(1)/uavohash)
@@ -764,7 +764,7 @@ package: all_fw all_ground uavobjects_matlab
 	$(V1) [ ! -d "$(PACKAGE_DIR)" ] || $(RM) -rf "$(PACKAGE_DIR)"
 	$(V1) $(MKDIR) -p "$(PACKAGE_DIR)/firmware"
 	$(foreach fw_targ, $(PACKAGE_FW_TARGETS), $(call COPY_FW_FILES,$(fw_targ),.opfw,.opfw))
-	$(foreach fw_targ, $(PACKAGE_ELF_TARGETS), $(call COPY_FW_FILES,$(fw_targ),.elf,))
+	$(foreach fw_targ, $(PACKAGE_ELF_TARGETS), $(call COPY_FW_FILES,$(fw_targ),.elf,.elf))
 	$(MAKE) --no-print-directory -C $(ROOT_DIR)/package --file=$(UNAME).mk $@
 
 ##############################
@@ -946,7 +946,6 @@ help:
 	@$(ECHO) "     gcs                  - Build the Ground Control System (GCS) application (debug|release)"
 	@$(ECHO) "     gcs_clean            - Remove the Ground Control System (GCS) application (debug|release)"
 	@$(ECHO) "                            Supported build configurations: GCS_BUILD_CONF=debug|release (default is $(GCS_BUILD_CONF))"
-	@$(ECHO) "     gcs_all_clean        - Remove the Ground Control System (GCS) application (all build confgurations)"
 	@$(ECHO)
 	@$(ECHO) "   [AndroidGCS]"
 	@$(ECHO) "     androidgcs           - Build the Android Ground Control System (GCS) application"

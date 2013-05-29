@@ -271,7 +271,7 @@ def xtrim(string, suffix, length):
         assert n > 0, "length of truncated string+suffix exceeds maximum length"
         return ''.join([string[:n], '+', suffix])
 
-def get_hash_of_dirs(directory, verbose = 0, raw = 0):
+def get_hash_of_dirs(directory, verbose = 0, raw = 0, n = 40):
     """Return hash of XML files from UAVObject definition directory"""
     import hashlib, os
     SHAhash = hashlib.sha1()
@@ -322,7 +322,7 @@ def get_hash_of_dirs(directory, verbose = 0, raw = 0):
         print 'Final hash is', SHAhash.hexdigest()
 
     if raw == 1:
-        return SHAhash.hexdigest()
+        return SHAhash.hexdigest()[:n]
     else:
         hex_stream = lambda s:",".join(['0x'+hex(ord(c))[2:].zfill(2) for c in s])
         return hex_stream(SHAhash.digest())
@@ -417,9 +417,10 @@ string given.
         MINUTE = r.time('%M'),
         BOARD_TYPE = args.type,
         BOARD_REVISION = args.revision,
-        SHA1 = sha1(args.image),
-        UAVOSHA1TXT = get_hash_of_dirs(args.uavodir, verbose = 0, raw = 1),
-        UAVOSHA1 = get_hash_of_dirs(args.uavodir, verbose = 0, raw = 0),
+        UAVO_HASH = get_hash_of_dirs(args.uavodir, verbose = 0, raw = 1),
+        UAVO_HASH8 = get_hash_of_dirs(args.uavodir, verbose = 0, raw = 1, n = 8),
+        UAVO_HASH_ARRAY = get_hash_of_dirs(args.uavodir, verbose = 0, raw = 0),
+        IMAGE_HASH_ARRAY = sha1(args.image),
     )
 
     # Process positional arguments in the form of:

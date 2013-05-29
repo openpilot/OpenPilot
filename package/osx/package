@@ -20,7 +20,7 @@ device=$(hdiutil attach "${TEMP_FILE}" | \
 
 # packaging goes here
 cp -a "${APP_PATH}" "/Volumes/${VOL_NAME}"
-ls "${FW_DIR}" | xargs -n 1 -I {} cp "${FW_DIR}/{}" "/Volumes/${VOL_NAME}/Firmware"
+#ls "${FW_DIR}" | xargs -n 1 -I {} cp "${FW_DIR}/{}" "/Volumes/${VOL_NAME}/Firmware"
 cp "${BUILD_DIR}/uavobject-synthetics/matlab/OPLogConvert.m" "/Volumes/${VOL_NAME}/Utilities"
 cp "${ROOT_DIR}/HISTORY.txt" "/Volumes/${VOL_NAME}"
 

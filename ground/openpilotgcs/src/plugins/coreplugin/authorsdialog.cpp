@@ -75,31 +75,10 @@ AuthorsDialog::AuthorsDialog(QWidget *parent)
     // : This gets conditionally inserted as argument %8 into the description string.
     ideRev = tr("From revision %1<br/>").arg(VersionInfo::revision().left(10));
 
-    QString uavoHashStr;
-    if (VersionInfo::uavoHash().length() > 15) {
-        // : This gets conditionally inserted as argument %11 into the description string.
-        QByteArray uavoHashArray;
-        QString uavoHash = VersionInfo::uavoHash();
-        uavoHash.chop(2);
-        uavoHash.remove(0, 2);
-        uavoHash = uavoHash.trimmed();
-        bool ok;
-        foreach(QString str, uavoHash.split(",")) {
-            uavoHashArray.append(str.toInt(&ok, 16));
-        }
-        QString gcsUavoHashStr;
-        foreach(char i, uavoHashArray) {
-            gcsUavoHashStr.append(QString::number(i, 16).right(2));
-        }
-        uavoHashStr = gcsUavoHashStr;
-    } else {
-        uavoHashStr = "N/A";
-    }
-
     const QString description = tr(
         "<h3>OpenPilot Ground Control Station</h3>"
         "GCS Revision: <b>%1</b><br/>"
-        "UAVO Hash: %2<br/>"
+        "UAVO Hash: <b>%2</b><br/>"
         "<br/>"
         "Built from %3<br/>"
         "Built on %4 at %5<br/>"
@@ -117,7 +96,7 @@ AuthorsDialog::AuthorsDialog(QWidget *parent)
         "PARTICULAR PURPOSE.</small>"
         ).arg(
         VersionInfo::revision().left(60), // %1
-        uavoHashStr, // %2
+        VersionInfo::uavoHash().left(8), // %2
         VersionInfo::origin(), // $3
         QLatin1String(__DATE__), // %4
         QLatin1String(__TIME__), // %5

@@ -187,9 +187,8 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
                                   tmp_device_ptr->product_id,
                                   NULL);
 
-                if (handle)
-                {
-                    devices_found = 1 ;
+                if (handle) {
+                    devices_found = 1;
                     break;
                 }
 

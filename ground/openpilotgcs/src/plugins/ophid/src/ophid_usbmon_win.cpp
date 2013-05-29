@@ -131,6 +131,7 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
 #define TCHARToQString(x)     QString::fromLocal8Bit((x))
 #define TCHARToQStringN(x, y) QString::fromLocal8Bit((x), (y))
 #endif /*UNICODE*/
+#define HIDMATCHSTRING "COL01"
 
 void USBMonitor::setUpNotifications()
 {
@@ -193,7 +194,7 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
             DWORD nSize = 0;
             TCHAR buf[MAX_PATH];
             if (SetupDiGetDeviceInstanceId(devInfo, &spDevInfoData, buf, MAX_PATH, &nSize) &&
-                deviceID.contains(TCHARToQString(buf))) { // we found a match
+                deviceID.contains(TCHARToQString(buf)) && deviceID.contains(HIDMATCHSTRING)) { // we found a match
                 USBPortInfo info;
                 info.devicePath = deviceID;
                 if (wParam == DBT_DEVICEARRIVAL) {

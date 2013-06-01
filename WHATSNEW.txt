@@ -1,5 +1,124 @@
 Short summary of changes.  For a complete list see the git log.
 
+--- RELEASE-13.06 --- Italian Stallion Release ---
+
+This is the first Revo software release which also supports CC, CC3D, OPLinkMini and unreleased
+yet OP OSD boards. This is a major change: from different toolchains and build system to the whole
+source code reformatting according to project style guidelines. The goal of this release is to
+provide CC-style features for new Revo platform + radio using Revo's internal modem and external
+OPLinkMini board. All advanced features like Altitude Hold, Position Hold, Guidance, Return to Home,
+AutoLanding etc. are not released yet and planned for followin releases.
+
+Flight code changes:
+- initial version of Revo code;
+- initial version of OPLinkMini code;
+- CopterControl/CC3D code reworked to reuse parts of Revo code;
+- switched to new ARM-supported GCC 4.7 toolchain with hardware floating point support;
+- major code cleanup and use of compiler warning flags to early catch errors;
+- major directory and Makefiles reorganisation and cleanup;
+- all source code fixed to use float variables instead of doubles (to use hardware FPU);
+- added multi-binding support for OPLinkMini;
+- added frequency hopping for Revo and OPLinkMini;
+- replaced entire flash generation code;
+- new U-Blox GPS binary protocol parser;
+- added STM32 DSP library;
+- updated STM32 CMSIS library;
+- updated STM32 USB OTG driver;
+- updated STM32 F1 StdPeriph driver library;
+- updated STM32 F4 StdPeriph driver library;
+- updated FreeRTOS (real-time operating system used by the flight code to run many tasks);
+- PyMite moved to a library;
+- fixed nasty bug in PyMite Makefile, single file was rebuilt 5 times fo no reason;
+- added configurable accel/gyro rates;
+- added visualisation of errors in bootloader updater;
+- added numerous sanity checks to the flight code to prevent unsafe arming;
+- new flash file system, much faster and higly optimised;
+- Revo settings are now stored in embedded MCU flash freeing up external one for flight logs;
+- OPLinkMini now stores settings in the MCU flash using FlashFS too;
+- a catalog of known flash types is used to support different flash types by the same firmware;
+- fixed broken overo submodule remote repository link;
+- fixed DSMX protocol error with some Tx/Rx combintions;
+- added new pios_*.h headers to support commonly used constants, functions and defines;
+- numerous fixes for data alignment and memory allocation strategy;
+- new bootloaders to support more features (for example, board settings erase);
+- added new feature to erase settings without special firmware;
+- removed CC/CC3D setting erase firmware (now not necessary due to new erase feature);
+- introduced new delayed callback scheduler to run modules from a single task;
+- many changes to AeroSim-RC simulator interface;
+- fixed broken debug pins API;
+- fixed few bugs in the EKF code;
+- introduced bootloader updater for F4 boards (including Revo and OSD);
+- some changes in RAM and flash memory partitioning to better utilize resources;
+- changes in bootloader to allow remote reboot via serial port or radio modem;
+- the EKF "Huge Formula" is replaced by optimised set of of loops to make it editable;
+- Cyr's attitude patch is ported from CC3D to Revo;
+- added magnetometer options (mags are disabled by default for Revo complimenary filter);
+- advance camera stabilisation is now officially released;
+- fixed numerous internal firmware bugs (too many to list here).
+
+GCS code changes:
+- nice loading splash screen;
+- now GCS uses system language by default if translation is available, English otherwise;
+- French translation officially added. Please help with other languages;
+- fixed some crashes of uploader gadget;
+- fixed double config read on restore;
+- improvements in GCS options dialog handling;
+- optimised option dialog creating;
+- added UI tooltips for many options;
+- removed unused yet options from configuration UI;
+- removed GCS config dialog on the first run, one default is used now if missing;
+- added Revo configuration page, similar to CC/CC3D one;
+- added OPLinkMini configuration page;
+- hardware options are now dynamically enabled/disabled to allow supported configurations only;
+- new artwork for all boards everywhere;
+- optimised some 3D models;
+- new About dialog showing version info and contrubutors list;
+- fixed badly broken HiTL options dialog;
+- fixed compilation problem on OSX, now GCS should be compatible with OSX 10.5+;
+- major vehicle config cleanup with lazy creation (speeds up GCS start);
+- UI config pages improvements (responsiveness, etc)
+- new auto-update feature added, *.opfw firmware files removed from distributables;
+- anti-aliased scope plugin;
+- numerous code fixes and cleanups (too many to list here).
+
+Common parts:
+- added simple toolchain install make targets;
+- added self-hosted toolchains to ensure that they're always available;
+- added support for globally istalled tools used by many working copies;
+- added Windows bootstrap script to pull all other build tools;
+- added unit testing framework, also supported by Bamboo CI server and agents;
+- added code style formatting make targets, easy to use by developers;
+- added doxygen make targets. The documentation still must be completely revised, though;
+- enforced global line ending policy, source files are updated accordingly;
+- reworked packaging to provide correct dependencies and safe multi-threaded builds;
+- multiply renames of board names and directories, now we have correct names;
+- fixed dependencies in Makefiles, now 'make -j' works reliably;
+- CLEAN_BUILD make option is deprecated, use 'package' or 'clean_package' instead;
+- simposix elf is now included into linux distribution and can be run with default GCS settings;
+- revised 'make help' message;
+
+Android GCS:
+- not officially released yet;
+- full rewrite has been started;
+
+Infrastructure:
+- Bamboo continuous integration server is actively used;
+- around 10 build agents running 4 different operating systems are set up;
+- every push to any branch is now build-tested, and unit tests run are performed;
+
+Due to major rework of all code and integration of Revo code into mainline (next) it is almost
+impossible to list all corresponding JIRA issues for the list above. Some of them can be found
+using this link:
+
+http://progress.openpilot.org/issues/?filter=10860
+
+OP-678, OP-693, OP-719, OP-747, OP-761, OP-769, OP-770, OP-772, OP-792, OP-807, OP-812, OP-816,
+OP-817, OP-820, OP-821, OP-843, OP-846, OP-854, OP-855, OP-856, OP-864, OP-867, OP-871, OP-873,
+OP-874, OP-875, OP-879, OP-885, OP-886, OP-888, OP-889, OP-890, OP-891, OP-892, OP-893, OP-894,
+OP-895, OP-896, OP-897, OP-898, OP-899, OP-900, OP-903, OP-905, OP-906, OP-907, OP-910, OP-912,
+OP-917, OP-920, OP-925, OP-926, OP-928, OP-935, OP-936, OP-939, OP-952, OP-955, OP-957, OP-968,
+OP-969, OP-970, OP-977, OP-980
+
 2012-11-17
 Advanced camera stabilization features.
 They include optional manual control input filtering (moved from camera stabilization to manual

@@ -104,8 +104,12 @@ ListModel {
 	ListElement{ name:"Richard Querin" }
 
 	ListElement{ name:"Randy Ram" }
+	
+	ListElement{ name:"Philippe Renon" }
 
 	ListElement{ name:"Laurent Ribon" }
+
+	ListElement{ name:"Mathieu Rondonneau" }
 
 	ListElement{ name:"Julien Rouviere" }
 
@@ -136,6 +140,8 @@ ListModel {
 	ListElement{ name:"Rowan Taubitz" }
 
 	ListElement{ name:"Andrew Thoms" }
+
+	ListElement{ name:"Philippe Vanhaesendonck" }
 
 	ListElement{ name:"Jasper van Loenen" }
 

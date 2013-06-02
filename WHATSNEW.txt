@@ -2,12 +2,115 @@ Short summary of changes.  For a complete list see the git log.
 
 --- RELEASE-13.06 --- Italian Stallion Release ---
 
-This is the first Revo software release which also supports CC, CC3D, OPLinkMini and unreleased
-yet OP OSD boards. This is a major change: from different toolchains and build system to the whole
-source code reformatting according to project style guidelines. The goal of this release is to
-provide CC-style features for new Revo platform + radio using Revo's internal modem and external
-OPLinkMini board. All advanced features like Altitude Hold, Position Hold, Guidance, Return to Home,
-AutoLanding etc. are not released yet and planned for followin releases.
+This is the first Revolution software release which also supports CC, CC3D, OPLinkMini and
+unreleased yet OP OSD boards. This is a major change: from different toolchains and build
+system to the whole source code reformatting according to project style guidelines. The goal
+of this release is to provide CC-style features for new Revo platform + radio using Revo's
+internal modem and external OPLinkMini board. All advanced features like Altitude Hold,
+Position Hold, Guidance, Return to Home, AutoLanding etc. are not released yet and planned
+for following releases.
+
+Some video tutorials:
+  http://wiki.openpilot.org/display/DocDE/OpenPilot+Tutorials
+
+Important Release Notes:
+
+- Since this release the packaged distribution does not contain firmware files in a folder.
+  They are now integrated into the GCS so always are up to date. To update you must use
+  either Vehicle Setup Wizard (big green button on the Welcome GCS tab) or new Auto-Update
+  button on the Firmware tab.
+
+- New Auto-Update feature simplifies all OpenPilot board firmware updates. Just click it
+  and follow on-screen directions to reflash your board (CC, CC3D, OPLinkMini, Revolution
+  or OSD prototypes). Internally it is the same as Rescue but uses embedded firmware images,
+  no need to browse for them anymore.
+
+- New bootloaders are REQUIRED for this release to support some of new features like settings
+  erase and some others. As always, bootloaders can be updated without any special programmer
+  hardware using bootloader updaters firmware. Currently F1 boards (CC, CC3D, OPLinkMini)
+  require bootloader version 4 or higher, and F4 boards (Revolution, OSD prototype) require
+  bootloader version 5 or higher. Check the wiki for details of how to update them:
+  http://wiki.openpilot.org/display/BUILDS/Bootloader+update
+
+- New feature: settings erase option. In the past some special settings erase firmware was
+  used to erase bad or incompatible settings from CC/CC3D boards. Now it is deprecated, and
+  this functionality is now integrated into bootloader and firmware. To erase any board
+  settings you must have latest bootloader. Then enter DFU (boot) mode (using Halt or Rescue
+  function) and click "Erase settings" button on the Firmware tab and follow on-screen
+  instructions. This will NOT work with older bootloader, and the button will be disabled.
+
+- On Linux you should remove OpenPilot package if was installed, then install new one. This
+  is a known issue and likely be fixed later.
+
+- On Windows there is a CDC driver installer option. This is an optional USB virtual serial
+  port useful, for example, for updating your GPS configuration using U-Blox u-Center software.
+  But it is NOT required to configure boards. If not installed, virtual serial port features
+  will not be available. This driver is not signed by Microsoft, but in fact it uses serial
+  port drivers from Windows and only driver information INF file is supplied by the OpenPilot.
+  Hence it is safe to install.
+
+- Due to changes in USB descriptors to support new features, USB drivers on Windows must be
+  updated. If after Rescue or Wizard or Auto-Update button the GCS cannot connect to the board,
+  it may be due to this issue. To resolve you should remove old drivers (ones with yellow
+  exclamation mark) and allow Windows to find them again. Here is how:
+
+  Windows XP:
+  - click on the desktop "My Computer" icon and select "Properties";
+  - select the "Hardware" tab by clicking on it once;
+  - select the "Device Manager" tab by clicking on it;
+  - scroll down the list until you see the "Universal Serial Bus Controllers" selection.
+    Click it to expand the list of USB drivers. Right-click on the driver(s) you wish to
+    uninstall and select the "Uninstall" function. The driver will be uninstalled.
+
+  Windows 7/Vista:
+  - on the desktop right-click the "Computer" icon and select "Properties";
+  - select "Device Manager" in the upper left-hand corner of the window;
+  - scroll down the list until you see the "Universal Serial Bus Controllers" selection.
+    Click it once to expand the list of USB drivers. Right-click on the driver(s) you wish
+    to uninstall and select the "Uninstall" function. The driver will be uninstalled.
+
+  Then disconnect the board from USB, wait few seconds and connect it back. Windows should find new
+  drivers and install them properly.
+
+- GCS now uses system default language (only French and English are available yet, please
+  contribute). You can choose language using GCS Options dialog if you have existing GCS
+  configuaration.
+
+- This release provides only CC3D-class features + radio. For example, it does NOT use
+  magnetometers to correct yaw and uses simple complimentary filter for attitude estimation.
+  So you should expect from it only CC3D-like performance. More advanced features will be
+  enabled step by step in the following releases with some help from new contributors,
+  we hope. Remember that the first Revo hardware batch was inended for developers, not
+  end users.
+
+- Lots of help tooltips were added to the GCS. Try watching them when tuning.
+
+- If GCS crashes when switching to the Flight data tab, it usually means your PC needs newer
+  video drivers. That tab contains ModelView widget which uses OpenGL. It is known to crash
+  in some cases.
+
+- Sensor calibration is not final. It will be reworked completely to increase its accuracy
+  and make it easier to use.
+
+- AltitudeHold mode is enabled, but it is not officially released. Do not expect it to be of
+  production quality. But you may play with it and report your issues and suggestions. It is
+  recommended to use some foam to protect baro sensor from wind and light. Also note that
+  throttle stick in AltitudeHold mode is used to control vertical velocity.
+
+- Tuning your system please set PIDs as tight as possible for better stabilisation. To soften
+  the stick response if necessary use new Responsiveness options. This will result in better
+  stabilisation, and at the same time soft or sharp response according to your preferences.
+
+- There is no configuration options for Radio module in the Revo config except for Radio
+  enable/disable and output power. This is intentional because all configuration should be
+  done using its paired ground OPLink coordinator. Enable radio in the Revo, save and
+  disconnect Revo from USB. Power it from external supply to continue. Then connect OPLink
+  board to USB and scroll down the GCS config widget to find OPLink icon in the end of list.
+  This icon is only available when OPLink is connected and recognised, this also requires new
+  bootloader and matching to Revo and GCS firmware on the OPLink board. To pair select the Revo
+  side Radio address in the list of found boards, select it, click Add to add to the list of
+  paired radios and click Save. After USB unplugging and plugging back your OPLink should show
+  "Connected", and you can continue with configuration.
 
 Flight code changes:
 - initial version of Revo code;
@@ -72,14 +175,15 @@ GCS code changes:
 - hardware options are now dynamically enabled/disabled to allow supported configurations only;
 - new artwork for all boards everywhere;
 - optimised some 3D models;
-- new About dialog showing version info and contrubutors list;
+- new About dialog showing version info and contributors list;
 - fixed badly broken HiTL options dialog;
 - fixed compilation problem on OSX, now GCS should be compatible with OSX 10.5+;
 - major vehicle config cleanup with lazy creation (speeds up GCS start);
 - UI config pages improvements (responsiveness, etc)
 - new auto-update feature added, *.opfw firmware files removed from distributables;
 - anti-aliased scope plugin;
-- numerous code fixes and cleanups (too many to list here).
+- numerous code fixes and cleanups (too many to list here);
+- USB HID code is replaced by new cross-platform hidapi library to fix old Linux/OSX problems.
 
 Common parts:
 - added simple toolchain install make targets;
@@ -96,6 +200,7 @@ Common parts:
 - CLEAN_BUILD make option is deprecated, use 'package' or 'clean_package' instead;
 - simposix elf is now included into linux distribution and can be run with default GCS settings;
 - revised 'make help' message;
+- updated Windows driver to support Revolution and use correct board names.
 
 Android GCS:
 - not officially released yet;

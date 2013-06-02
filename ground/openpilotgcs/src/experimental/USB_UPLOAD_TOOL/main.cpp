@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
             cout << "| examples:                                                              |\n";
             cout << "|                                                                        |\n";
             cout << "| program and verify device #0                                           |\n";
-            cout << "| OPUploadTool -p c:/OpenPilot.bin -w \"Openpilot Firmware\" -v -d 0       |\n";
+            cout << "| OPUploadTool -p c:/OpenPilot.bin -w \"OpenPilot Firmware\" -v -d 0     |\n";
             cout << "|                                                                        |\n";
             cout << "| Perform a quick compare of FW in file with FW in device #1             |\n";
             cout << "| OPUploadTool -ch c:/OpenPilot2.bin -d 2                                |\n";

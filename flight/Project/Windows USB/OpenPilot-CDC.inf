@@ -32,7 +32,7 @@ AddService = usbser, 0x00000002, LowerFilter_Service_Inst
 HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
 
 [Strings]
-ProviderName = "OpenPilot Team"
-CopterControl = "CopterControl Virtual Serial Port"
-OPLink = "OPLink Virtual Serial Port"
-Revolution = "Revolution Virtual Serial Port"
+ProviderName = "OpenPilot"
+CopterControl = "CopterControl Virtual COM Port"
+OPLink = "OPLink Virtual COM Port"
+Revolution = "Revolution Virtual COM Port"

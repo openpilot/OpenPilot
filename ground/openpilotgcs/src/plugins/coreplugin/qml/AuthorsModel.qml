@@ -130,6 +130,8 @@ ListModel {
 	ListElement{ name:"Alex Sowa" }
 
 	ListElement{ name:"Pete Stapley" }
+	
+	ListElement{ name:"Vova Starikh" }
 
 	ListElement{ name:"Rowan Taubitz" }
 
@@ -150,6 +152,8 @@ ListModel {
 	ListElement{ name:"Mat Wellington" }
 
 	ListElement{ name:"Kendal Wells" }
+
+	ListElement { name: "David Willis" }
 
 	ListElement{ name:"Dmitriy Zaitsev" }
 }

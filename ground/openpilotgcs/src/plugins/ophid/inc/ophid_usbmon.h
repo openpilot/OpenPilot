@@ -194,7 +194,7 @@ private:
      */
     static QString getDeviceProperty(HDEVINFO devInfo, PSP_DEVINFO_DATA devData, DWORD property);
     static int infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO & devInfo, DWORD & index);
-    static void enumerateDevicesWin(const GUID & guidDev, QList<USBPortInfo> *infoList);
+    void enumerateDevicesWin(const GUID & guidDev);
     bool matchAndDispatchChangedDevice(const QString & deviceID, const GUID & guid, WPARAM wParam);
 #ifdef QT_GUI_LIB
     USBRegistrationWidget *notificationWidget;

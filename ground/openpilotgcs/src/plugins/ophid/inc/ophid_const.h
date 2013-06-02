@@ -60,5 +60,6 @@
 #define OPHID_ERROR_PARAMETER -3
 #define OPHID_ERROR_HANDLE    -4
 #define OPHID_ERROR_INIT      -5
+#define OPHID_ERROR_ENUMERATION -6
 
 #endif // OPHID_CONST_H

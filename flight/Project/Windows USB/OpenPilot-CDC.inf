@@ -1,25 +1,27 @@
 [Version]
-Signature="$Windows NT$"
-Class=Ports
-ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
-Provider=%ProviderName%
-DriverVer=10/15/2009,1.0.0.0
+Signature = "$Windows NT$"
+Class = Ports
+ClassGuid = {4D36E978-E325-11CE-BFC1-08002BE10318}
+Provider = %ProviderName%
+DriverVer = 10/15/2009,1.0.0.0
 
 [MANUFACTURER]
-%ProviderName%=DeviceList, NTx86, NTamd64
+%ProviderName% = DeviceList, NTx86, NTamd64
 
 [DeviceList.NTx86]
-%CopterControl%= DriverInstall,USB\VID_20A0&PID_415b&MI_00
-%OPLink%= DriverInstall,USB\VID_20A0&PID_415c&MI_00
+%CopterControl% = DriverInstall,USB\VID_20A0&PID_415b&MI_00
+%OPLink% = DriverInstall,USB\VID_20A0&PID_415c&MI_00
+%Revolution% = DriverInstall,USB\VID_20A0&PID_415e&MI_00
 
 [DeviceList.NTamd64]
-%CopterControl%= DriverInstall,USB\VID_20A0&PID_415b&MI_00
-%OPLink%= DriverInstall,USB\VID_20A0&PID_415c&MI_00
+%CopterControl% = DriverInstall,USB\VID_20A0&PID_415b&MI_00
+%OPLink% = DriverInstall,USB\VID_20A0&PID_415c&MI_00
+%Revolution% = DriverInstall,USB\VID_20A0&PID_415e&MI_00
 
 [DriverInstall]
-include=mdmcpq.inf
-CopyFiles=FakeModemCopyFileSection
-AddReg=LowerFilterAddReg,SerialPropPageAddReg
+include = mdmcpq.inf
+CopyFiles = FakeModemCopyFileSection
+AddReg = LowerFilterAddReg,SerialPropPageAddReg
 
 [DriverInstall.Services]
 include = mdmcpq.inf
@@ -30,6 +32,7 @@ AddService = usbser, 0x00000002, LowerFilter_Service_Inst
 HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
 
 [Strings]
-ProviderName = "CDC Driver"
-CopterControl = "OpenPilot CDC Driver"
-OPLink = "OpenPilot CDC Driver"
+ProviderName = "OpenPilot"
+CopterControl = "CopterControl Virtual COM Port"
+OPLink = "OPLink Virtual COM Port"
+Revolution = "Revolution Virtual COM Port"

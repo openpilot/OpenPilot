@@ -1,16 +1,18 @@
-This is the Milestones file of the OpenPilot project, its intent is to record the major accomplishments achieved by people using the OpenPilot platform and who gets the karma for performing them.
+This is the Milestones file of the OpenPilot project, its intent is to record the major accomplishments
+achieved by people using the OpenPilot platform and who gets the karma for performing them.
 
+The Contributors list in the About dialog of the GCS application records the developers and contributors.
+This file is different as it is aimed at recording and giving credit to the people who achieve milestones
+in the use of OpenPilot.
 
-The CREDITS.txt in SVN records the developers and the achievements made by each individual; this file is different as it is aimed at recording and giving credit to the people who achieve milestones in the use of OpenPilot.
-
+Notice: now we have the rule: no video - it has never happened. So please make sure you have video
+recorded if you want to submit your milestone (listed below or not yet) to this list.
 
 The fields are:
-
-Milestone description (M)
-Credited to (C)
-Date (D)
-Video (V) - Optional link to video showing milestone
-
+  (M) Milestone description
+  (C) Credited to
+  (D) Date
+  (V) Link to video showing milestone
 
 M: OpenPilot driving EagleTree OSD
 C: Frederic Goddeeris
@@ -147,7 +149,6 @@ C: Sergey Solodennikov (alconaft43)
 D: August 2011
 V: http://www.youtube.com/watch?v=8SrfIS7OkB4
 
-
 M: First CopterControl Return to Base Fixed Wing
 C: Eric Price (Corvus Corax)
 D: August 2011
@@ -168,23 +169,17 @@ C: Kavin Gustafson (k_g)
 D: October 2012
 V: http://www.youtube.com/watch?v=MGO68TqIwKk
 
+M: First successful flight using just a mobile phone
+C: Jose (please complete details), demoed in Portugal
+D: 
+V: 
+
 M: First CopterControl over 10km FixedWing navigation flight
 C: 
 D: 
 V: 
 
 M: First successful flight using the GCS only and no RC TX
-C: 
-D: 
-V: 
-
-M: First successful flight using just a mobile phone
-C: Jose (please complete details), demoed in Portugal
-D: 
-V: 
-
-
-M: First Revo Altitude Hold using Sonar
 C: 
 D: 
 V: 
@@ -199,16 +194,17 @@ C:
 D: 
 V: 
 
+
 M: First Revo Navigated flight on a FixedWing
 C: It got done somewhere along the line, likely Corvus.
 
+M: First Revo 5km Navigated flight on a FixedWing
+C: Eric Price (Corvus Corax)
+D: March 2012
+V: 
+
 M: First Revo Navigated flight on a MultiRotor
 C: It got done somewhere along the line, James or Sami
-
-M: First Revo Navigated flight on a Heli
-C:
-D:
-V:
 
 M: First Revo 1km Navigated flight on a MultiRotor
 C:
@@ -220,10 +216,10 @@ C:
 D:
 V:
 
-M: First Revo 5km Navigated flight on a FixedWing
-C: Eric Price (Corvus Corax)
-D: March 2012
-V: 
+M: First Revo Navigated flight on a Heli
+C:
+D:
+V:
 
 M: First Revo 1km Navigated flight on a Heli
 C:
@@ -234,6 +230,11 @@ M: First Revo 5km Navigated flight on a Heli
 C:
 D:
 V:
+
+M: First Revo Altitude Hold using Sonar
+C: 
+D: 
+V: 
 
 M: First use of the Magic Waypoint feature
 C:
@@ -251,7 +252,7 @@ D:
 V:
 
 M: First Auto landing on a MultiRotor using Revo
-C:
+C: Sami (please complete details)
 D:
 V:
 
@@ -264,4 +265,3 @@ M: First Auto landing on a Heli using Revo
 C:
 D:
 V:
-

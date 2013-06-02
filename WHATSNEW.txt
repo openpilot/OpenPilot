@@ -122,6 +122,7 @@ Flight code changes:
 - all source code fixed to use float variables instead of doubles (to use hardware FPU);
 - added multi-binding support for OPLinkMini;
 - added frequency hopping for Revo and OPLinkMini;
+- added auto-configuration for OPLinkMini remote modem / Revo;
 - replaced entire flash generation code;
 - new U-Blox GPS binary protocol parser;
 - added STM32 DSP library;

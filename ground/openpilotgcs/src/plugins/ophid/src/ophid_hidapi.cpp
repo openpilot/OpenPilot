@@ -132,7 +132,7 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
     int devices_found = false;
     struct hid_device_info *current_device_ptr    = NULL;
     struct hid_device_info *tmp_device_ptr        = NULL;
-    struct hid_device_info **current_device_pptr  = &current_device_ptr;
+    struct hid_device_info * *current_device_pptr = &current_device_ptr;
 
     OPHID_TRACE("IN");
 
@@ -170,7 +170,6 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
         }
 
         if (devices_found) {
-
             devices_found = 0;
 
             // Go through the list until we can open one
@@ -178,7 +177,6 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
             tmp_device_ptr = current_device_ptr;
 
             while (tmp_device_ptr) {
-
                 OPHID_DEBUG("Opening device VID(%04hx).PID(%04hx)",
                             tmp_device_ptr->vendor_id,
                             tmp_device_ptr->product_id);

@@ -70,10 +70,10 @@ void USBMonitor::deviceEventReceived()
 
     dev = udev_monitor_receive_device(this->monitor);
     if (dev) {
-        //this->monitorNotifier->setEnabled(0);
+        // this->monitorNotifier->setEnabled(0);
         QString action  = QString(udev_device_get_action(dev));
         QString devtype = QString(udev_device_get_devtype(dev));
-        qDebug() << "[DEBUG] Action: " << action << " device: " <<devtype;
+        qDebug() << "[DEBUG] Action: " << action << " device: " << devtype;
         if (action == "add" && devtype == "usb_device") {
             printPortInfo(dev);
             emit deviceDiscovered(makePortInfo(dev));
@@ -83,7 +83,7 @@ void USBMonitor::deviceEventReceived()
         }
 
         udev_device_unref(dev);
-        //this->monitorNotifier->setEnabled(1);
+        // this->monitorNotifier->setEnabled(1);
     } else {
         OPHID_ERROR("No Device event from udev. Spurious event?.");
     }
@@ -123,7 +123,7 @@ USBMonitor::USBMonitor(QObject *parent) : QThread(parent)
     this->monitor = udev_monitor_new_from_netlink(this->context, "udev");
     udev_monitor_filter_add_match_subsystem_devtype(
         this->monitor, "usb", NULL);
-    //udev_monitor_filter_add_match_tag(this->monitor, "openpilot"); 
+    // udev_monitor_filter_add_match_tag(this->monitor, "openpilot");
     udev_monitor_enable_receiving(this->monitor);
     this->monitorNotifier = new QSocketNotifier(
         udev_monitor_get_fd(this->monitor), QSocketNotifier::Read, this);
@@ -168,7 +168,7 @@ QList<USBPortInfo> USBMonitor::availableDevices()
 
     enumerate = udev_enumerate_new(this->context);
     udev_enumerate_add_match_subsystem(enumerate, "usb");
-    //udev_enumerate_add_match_tag(enumerate, "openpilot");
+    // udev_enumerate_add_match_tag(enumerate, "openpilot");
     udev_enumerate_add_match_sysattr(enumerate, "idVendor", "20a0");
     udev_enumerate_scan_devices(enumerate);
     devices = udev_enumerate_get_list_entry(enumerate);
@@ -216,8 +216,8 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
     QList<USBPortInfo> thePortsWeWant;
 
     foreach(USBPortInfo port, allPorts) {
-        if ((port.vendorID == vid || vid == -1) && 
-            (port.productID == pid || pid == -1) && 
+        if ((port.vendorID == vid || vid == -1) &&
+            (port.productID == pid || pid == -1) &&
             ((port.bcdDevice >> 8) == bcdDeviceMSB || bcdDeviceMSB == -1) &&
             ((port.bcdDevice & 0x00ff) == bcdDeviceLSB || bcdDeviceLSB == -1)) {
             OPHID_DEBUG("Append: 0x%X/0x%X/0x%X", port.vendorID, port.productID, port.bcdDevice);

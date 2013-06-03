@@ -43,54 +43,51 @@ using namespace Core;
 using namespace Core::Internal;
 
 namespace {
+struct PageData {
+    int     index;
+    QString category;
+    QString id;
+};
 
-    struct PageData {
-        int index;
-        QString category;
-        QString id;
+// helper to sort by translated category and name
+bool compareOptionsPageByCategoryAndNameTr(const IOptionsPage *p1, const IOptionsPage *p2)
+{
+    const UAVGadgetOptionsPageDecorator *gp1 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p1);
+    const UAVGadgetOptionsPageDecorator *gp2 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p2);
 
-    };
-
-    // helper to sort by translated category and name
-    bool compareOptionsPageByCategoryAndNameTr(const IOptionsPage *p1, const IOptionsPage *p2)
-    {
-        const UAVGadgetOptionsPageDecorator *gp1 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p1);
-        const UAVGadgetOptionsPageDecorator *gp2 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p2);
-        if (gp1 && !gp2) {
-            return false;
-        }
-        if (gp2 && !gp1) {
-            return true;
-        }
-        if (const int cc = QString::localeAwareCompare(p1->trCategory(), p2->trCategory())) {
-            return cc < 0;
-        }
-        return QString::localeAwareCompare(p1->trName(), p2->trName()) < 0;
+    if (gp1 && !gp2) {
+        return false;
     }
-
-    // helper to sort by category and id
-    bool compareOptionsPageByCategoryAndId(const IOptionsPage *p1, const IOptionsPage *p2)
-    {
-        const UAVGadgetOptionsPageDecorator *gp1 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p1);
-        const UAVGadgetOptionsPageDecorator *gp2 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p2);
-        if (gp1 && !gp2) {
-            return false;
-        }
-        if (gp2 && !gp1) {
-            return true;
-        }
-        if (const int cc = QString::localeAwareCompare(p1->category(), p2->category())) {
-            return cc < 0;
-        }
-        return QString::localeAwareCompare(p1->id(), p2->id()) < 0;
+    if (gp2 && !gp1) {
+        return true;
     }
-
+    if (const int cc = QString::localeAwareCompare(p1->trCategory(), p2->trCategory())) {
+        return cc < 0;
+    }
+    return QString::localeAwareCompare(p1->trName(), p2->trName()) < 0;
 }
 
-Q_DECLARE_METATYPE(::PageData)
+// helper to sort by category and id
+bool compareOptionsPageByCategoryAndId(const IOptionsPage *p1, const IOptionsPage *p2)
+{
+    const UAVGadgetOptionsPageDecorator *gp1 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p1);
+    const UAVGadgetOptionsPageDecorator *gp2 = qobject_cast<const UAVGadgetOptionsPageDecorator *>(p2);
 
-SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const QString &pageId) :
-        QDialog(parent), m_applied(false)
+    if (gp1 && !gp2) {
+        return false;
+    }
+    if (gp2 && !gp1) {
+        return true;
+    }
+    if (const int cc = QString::localeAwareCompare(p1->category(), p2->category())) {
+        return cc < 0;
+    }
+    return QString::localeAwareCompare(p1->id(), p2->id()) < 0;
+}
+}
+
+Q_DECLARE_METATYPE(::PageData) SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const QString &pageId) :
+    QDialog(parent), m_applied(false)
 {
     setupUi(this);
 #ifdef Q_OS_MAC
@@ -129,8 +126,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
     QList<int> sizes;
     if (size0 > 0 && size1 > 0) {
         sizes << size0 << size1;
-    }
-    else {
+    } else {
         sizes << 150 << 300;
     }
     splitter->setSizes(sizes);
@@ -164,7 +160,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
 
     // get all pages and split them between plugin and gadget list
     QList<Core::IOptionsPage *> pages = ExtensionSystem::PluginManager::instance()->getObjects<IOptionsPage>();
-    foreach(IOptionsPage *page, pages) {
+    foreach(IOptionsPage * page, pages) {
         if (qobject_cast<UAVGadgetOptionsPageDecorator *>(page)) {
             gadgetPages.append(page);
         } else {
@@ -182,10 +178,11 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
     QTreeWidgetItem *initialItem = 0;
 
     // add plugin pages
-    foreach(IOptionsPage *page, pluginPages) {
+    foreach(IOptionsPage * page, pluginPages) {
         QTreeWidgetItem *item = addPage(page);
+
         // to automatically expand all plugin categories, uncomment next line
-        //item->parent()->setExpanded(true);
+        // item->parent()->setExpanded(true);
         if (page->id() == initialPage && page->category() == initialCategory) {
             initialItem = item;
         }
@@ -197,8 +194,9 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
     separator->setText(0, QString(30, 0xB7));
 
     // add gadget pages
-    foreach(IOptionsPage *page, gadgetPages) {
+    foreach(IOptionsPage * page, gadgetPages) {
         QTreeWidgetItem *item = addPage(page);
+
         if (page->id() == initialPage && page->category() == initialCategory) {
             initialItem = item;
         }
@@ -213,7 +211,6 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
         }
         pageTree->setCurrentItem(initialItem);
     }
-
 }
 
 SettingsDialog::~SettingsDialog()
@@ -231,9 +228,11 @@ SettingsDialog::~SettingsDialog()
     }
 }
 
-QTreeWidgetItem *SettingsDialog::addPage(IOptionsPage *page) {
+QTreeWidgetItem *SettingsDialog::addPage(IOptionsPage *page)
+{
     PageData pageData;
-    pageData.index = m_pages.count();
+
+    pageData.index    = m_pages.count();
     pageData.category = page->category();
     pageData.id = page->id();
 
@@ -452,6 +451,7 @@ bool SettingsDialog::execDialog()
 void SettingsDialog::done(int val)
 {
     QSettings *settings = ICore::instance()->settings();
+
     settings->beginGroup("General");
 
     settings->setValue("LastPreferenceCategory", m_currentCategory);

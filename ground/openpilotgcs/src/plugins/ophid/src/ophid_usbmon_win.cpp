@@ -54,8 +54,6 @@ USBMonitor *USBMonitor::m_instance = 0;
 /**
  * \brief Device event received
  *
- * \note 
- *
  */
 void USBMonitor::deviceEventReceived()
 {
@@ -67,8 +65,6 @@ void USBMonitor::deviceEventReceived()
 /**
  * \brief Get the instance of the USBMONITOR
  *
- * \note 
- *
  * \return instance
  */
 USBMonitor *USBMonitor::instance()
@@ -79,8 +75,6 @@ USBMonitor *USBMonitor::instance()
 
 /**
  * \brief Constructor 
- *
- * \note
  *
  */
 USBMonitor::USBMonitor(QObject *parent) : QThread(parent)
@@ -100,8 +94,6 @@ USBMonitor::USBMonitor(QObject *parent) : QThread(parent)
 /**
  * \brief Destructor
  *
- * \note
- *
  */
 USBMonitor::~USBMonitor()
 {
@@ -116,8 +108,6 @@ USBMonitor::~USBMonitor()
 
 /**
  * \brief return the device that matches the describtion
- *
- * \note
  *
  * \param[in] vid
  * \param[in] pid
@@ -190,8 +180,6 @@ void USBMonitor::setUpNotifications()
 /**
  * \brief filter out the windows signal we don't want to handle
  *
- * \note
- *
  * \param[in] wParam event
  * \param[out] lParam interface
  * \return status.
@@ -216,8 +204,6 @@ LRESULT USBMonitor::onDeviceChangeWin(WPARAM wParam, LPARAM lParam)
 
 /**
  * \brief re-root windows event for any device changes in the system
- *
- * \note
  *
  * \param[in] message
  * \param[out] result Broadcast that we took care of the event, if it is not the case, let the Widget know it so it can handle it instead.
@@ -245,7 +231,7 @@ bool USBRegistrationWidget::winEvent(MSG *message, long *result)
 /**
  * \brief filter out the device based on information and populate to be added 
  *
- * \note Called from pooling during startup and from device plug/unplug windows signal
+ * \note Triggered from device plug/unplug windows signal
  *
  * \param[in] deviceID The device that triggered the event
  * \param[in] guid Device class
@@ -326,8 +312,6 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
 
 /**
  * \brief Get the list of currently handled devices
- *
- * \note
  *
  * \return QList
  * \retval  List of handled devices

@@ -183,16 +183,6 @@ private:
 #elif defined(Q_OS_WIN32)
     GUID guid_hid;
     void setUpNotifications();
-    /*!
-     * Get specific property from registry.
-     * \param devInfo pointer to the device information set that contains the interface
-     *    and its underlying device. Returned by SetupDiGetClassDevs() function.
-     * \param devData pointer to an SP_DEVINFO_DATA structure that defines the device instance.
-     *    this is returned by SetupDiGetDeviceInterfaceDetail() function.
-     * \param property registry property. One of defined SPDRP_* constants.
-     * \return property string.
-     */
-    static QString getDeviceProperty(HDEVINFO devInfo, PSP_DEVINFO_DATA devData, DWORD property);
     static int infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO & devInfo, DWORD & index);
     void enumerateDevicesWin(const GUID & guidDev);
     bool matchAndDispatchChangedDevice(const QString & deviceID, const GUID & guid, WPARAM wParam);

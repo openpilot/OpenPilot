@@ -34,24 +34,55 @@
 #include <QDebug>
 #include "ophid_const.h"
 
-#define printf qDebug
+/* Gordon Schumacher's macros for TCHAR -> QString conversions and vice versa */
+#ifdef UNICODE
+#define QStringToTCHAR(x)     (wchar_t *)x.utf16()
+#define PQStringToTCHAR(x)    (wchar_t *)x->utf16()
+#define TCHARToQString(x)     QString::fromUtf16((ushort *)(x))
+#define TCHARToQStringN(x, y) QString::fromUtf16((ushort *)(x), (y))
+#else
+#define QStringToTCHAR(x)     x.local8Bit().constData()
+#define PQStringToTCHAR(x)    x->local8Bit().constData()
+#define TCHARToQString(x)     QString::fromLocal8Bit((x))
+#define TCHARToQStringN(x, y) QString::fromLocal8Bit((x), (y))
+#endif /*UNICODE*/
 
-static QMutex DeviceChangeMutex;
 
+USBMonitor *USBMonitor::m_instance = 0;
+
+
+/**
+ * \brief Device event received
+ *
+ * \note 
+ *
+ */
 void USBMonitor::deviceEventReceived()
 {
-    qDebug() << "Device event";
-    // Dispatch and emit the signals here...
+    OPHID_DEBUG("Device event");
 }
 
+
+
+/**
+ * \brief Get the instance of the USBMONITOR
+ *
+ * \note 
+ *
+ * \return instance
+ */
 USBMonitor *USBMonitor::instance()
 {
     return m_instance;
 }
 
-USBMonitor *USBMonitor::m_instance = 0;
 
-
+/**
+ * \brief Constructor 
+ *
+ * \note
+ *
+ */
 USBMonitor::USBMonitor(QObject *parent) : QThread(parent)
 {
     HidD_GetHidGuid(&guid_hid);
@@ -65,6 +96,13 @@ USBMonitor::USBMonitor(QObject *parent) : QThread(parent)
     m_instance = this;
 }
 
+
+/**
+ * \brief Destructor
+ *
+ * \note
+ *
+ */
 USBMonitor::~USBMonitor()
 {
 #if (defined QT_GUI_LIB)
@@ -75,22 +113,25 @@ USBMonitor::~USBMonitor()
     quit();
 }
 
+
 /**
-   Be a bit more picky and ask only for a specific type of device:
-     On OpenPilot, the bcdDeviceLSB indicates the run state: bootloader or running.
-     bcdDeviceMSB indicates the board model.
+ * \brief return the device that matches the describtion
+ *
+ * \note
+ *
+ * \param[in] vid
+ * \param[in] pid
+ * \param[in] bcddeviceMSN Board model
+ * \param[in] bcdLSB Run state (bl or running)
+ * \return list
+ * \retval  device
  */
 QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceMSB, int bcdDeviceLSB)
 {
-    int i;
     QList<USBPortInfo> thePortsWeWant;
 
     OPHID_TRACE("IN");
     
-    // Trigger enumeration
-    //OPHID_DEBUG("Enumerate");
-    //availableDevices();
-
     // Print the list
     qDebug() << "List off (" << knowndevices.length() << ") devices that are tracked:";
     foreach(USBPortInfo info, knowndevices /*thePortsWeWant*/) {
@@ -98,7 +139,7 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
 	         << " bcdDevice:" << info.bcdDevice 
 		 << " devicePath:" << info.devicePath;
 
-        //
+        // Filter to return only the one request (if exists)
         if ((info.vendorID == vid || vid == -1) &&
             (info.productID == pid || pid == -1) && 
 	    ((info.bcdDevice >> 8) == bcdDeviceMSB || bcdDeviceMSB == -1) &&
@@ -114,28 +155,13 @@ QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceM
 }
 
 
-// see http://msdn.microsoft.com/en-us/library/ms791134.aspx for list of GUID classes
-/*#ifndef GUID_DEVCLASS_PORTS
-   DEFINE_GUID(GUID_DEVCLASS_PORTS, //0x4d1e55b2, 0xf16f, 0x11cf, 0x88, 0xcb, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30);
-                                 //0x745a17a0, 0x74d3, 0x11d0, 0xb6, 0xfe, 0x00, 0xa0, 0xc9, 0x0f, 0x57, 0xda);
-                                   0xA5DCBF10, 0x6530, 0x11D2, 0x90, 0x1F, 0x00, 0xC0, 0x4F, 0xB9, 0x51, 0xED);
-   #endif
+/**
+ * \brief Create all appropriate filter and connctions
+ *
+ * \note Poll the devices to create our internal list of already connected devices
+ *       This is to handle the case when GCS is started with a device already connected
+ *
  */
-/* Gordon Schumacher's macros for TCHAR -> QString conversions and vice versa */
-#ifdef UNICODE
-#define QStringToTCHAR(x)     (wchar_t *)x.utf16()
-#define PQStringToTCHAR(x)    (wchar_t *)x->utf16()
-#define TCHARToQString(x)     QString::fromUtf16((ushort *)(x))
-#define TCHARToQStringN(x, y) QString::fromUtf16((ushort *)(x), (y))
-#else
-#define QStringToTCHAR(x)     x.local8Bit().constData()
-#define PQStringToTCHAR(x)    x->local8Bit().constData()
-#define TCHARToQString(x)     QString::fromLocal8Bit((x))
-#define TCHARToQStringN(x, y) QString::fromLocal8Bit((x), (y))
-#endif /*UNICODE*/
-#define HID2IGNOREUC "COL02"
-#define HID2IGNORElc "col02"
-
 void USBMonitor::setUpNotifications()
 {
 #ifdef QT_GUI_LIB
@@ -152,14 +178,25 @@ void USBMonitor::setUpNotifications()
     if (RegisterDeviceNotification(notificationWidget->winId(), &dbh, DEVICE_NOTIFY_WINDOW_HANDLE) == NULL) {
         qWarning() << "RegisterDeviceNotification failed:" << GetLastError();
     }
-    // setting up notifications doesn't tell us about devices already connected
-    // so get those manually
+    // discover the devices curently connected
     foreach(USBPortInfo port, availableDevices())
     emit deviceDiscovered(port);
 #else
     qWarning("GUI not enabled - can't register for device notifications.");
 #endif // QT_GUI_LIB
 }
+
+
+/**
+ * \brief filter out the windows signal we don't want to handle
+ *
+ * \note
+ *
+ * \param[in] wParam event
+ * \param[out] lParam interface
+ * \return status.
+ * \retval 0
+ */
 LRESULT USBMonitor::onDeviceChangeWin(WPARAM wParam, LPARAM lParam)
 {
     OPHID_TRACE("IN");
@@ -175,6 +212,18 @@ LRESULT USBMonitor::onDeviceChangeWin(WPARAM wParam, LPARAM lParam)
     OPHID_TRACE("OUT");
     return 0;
 }
+
+
+/**
+ * \brief re-root windows event for any device changes in the system
+ *
+ * \note
+ *
+ * \param[in] message
+ * \param[out] result Broadcast that we took care of the event, if it is not the case, let the Widget know it so it can handle it instead.
+ * \return status.
+ * \retval device handled or not
+ */
 #ifdef QT_GUI_LIB
 bool USBRegistrationWidget::winEvent(MSG *message, long *result)
 {
@@ -191,83 +240,79 @@ bool USBRegistrationWidget::winEvent(MSG *message, long *result)
     return ret;
 }
 #endif
+
+
+/**
+ * \brief filter out the device based on information and populate to be added 
+ *
+ * \note Called from pooling during startup and from device plug/unplug windows signal
+ *
+ * \param[in] deviceID The device that triggered the event
+ * \param[in] guid Device class
+ * \param[in] wParam Windows event
+ * \return status.
+ * \retval 0
+ */
 bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const GUID & guid, WPARAM wParam)
 {
-    qDebug() << "USB_MONITOR matchAndDispatchChangedDevice deviceID=" << deviceID;
-    bool rv = false;
+    OPHID_TRACE("IN");
+
+    qDebug() << "[STATUS CHANGE] from device ID: " << deviceID;
     bool rc;
+    SP_DEVINFO_DATA spDevInfoData;
     DWORD dwFlag = (DBT_DEVICEARRIVAL == wParam) ? DIGCF_PRESENT : 0/*DIGCF_ALLCLASSES*/;
     HDEVINFO devInfo;
-//    QString qHIDSymbolicName="HID"; 
-//    WCHAR wHIDSymbolicName[10];
-//    qHIDSymbolicName.toWCharArray(wHIDSymbolicName);
     
-    if ((devInfo = SetupDiGetClassDevs(&guid, NULL, NULL, dwFlag | DIGCF_DEVICEINTERFACE)) != INVALID_HANDLE_VALUE) {
-        SP_DEVINFO_DATA spDevInfoData;
+    devInfo = SetupDiGetClassDevs(&guid, NULL, NULL, dwFlag | DIGCF_DEVICEINTERFACE);
+
+    if (devInfo != INVALID_HANDLE_VALUE) {
         spDevInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
         for (DWORD i = 0; SetupDiEnumDeviceInfo(devInfo, i, &spDevInfoData); i++) {
             DWORD nSize = 0;
             TCHAR buf[MAX_PATH];
 	    rc = SetupDiGetDeviceInstanceId(devInfo, &spDevInfoData, buf, MAX_PATH, &nSize);
-	    qDebug() << "PATH:" << TCHARToQString(buf);
-            if (rc && deviceID.contains(TCHARToQString(buf)) /*&& !QString().contains(TCHARToQString(HID2IGNOREUC))*/) { // we found a match
-	        qDebug() << "ACCEPTED" << TCHARToQString(buf);
+	    qDebug() << "Found:" << TCHARToQString(buf);
+            if (rc && deviceID.contains(TCHARToQString(buf))) {
+	        qDebug() << "[MATCH] " << TCHARToQString(buf);
                 USBPortInfo info;
                 info.devicePath = deviceID;
                 if (wParam == DBT_DEVICEARRIVAL) {
-                    qDebug() << "USB_MONITOR INSERTION";
-                    if (infoFromHandle(guid, info, devInfo, i) != 1) {
-                        qDebug() << "USB_MONITOR infoFromHandle failed on matchAndDispatchChangedDevice";
+                    qDebug() << "[INSERTED]";
+                    if (infoFromHandle(guid, info, devInfo, i) != OPHID_NO_ERROR) {
+                        OPHID_ERROR("Not found");
                         break;
                     }
 		    if (knowndevices.length()) {
                         foreach(USBPortInfo m_info, knowndevices) {
-		    
-		            qDebug() << m_info.devicePath;
-		            qDebug() << info.devicePath;
-
                             if (m_info.serialNumber == info.serialNumber && 
 			        m_info.productID == info.productID && 
 				m_info.bcdDevice == info.bcdDevice && 
 				m_info.devicePath == info.devicePath) {
-                                qDebug() << "USB_MONITOR device already present don't emit signal";
+                                OPHID_ERROR("Already present");
                                 break;
                             }
                         }
 		    }
                     if (info.bcdDevice == 0 || info.product.isEmpty()) {
-                        qDebug() << "USB_MONITOR empty information on device not emiting signal";
+                        OPHID_ERROR("Missing parameters");
                         break;
                     }
                     knowndevices.append(info);
-                    qDebug() << "USB_MONITOR emit device discovered on device:" 
+                    qDebug() << "[SIGNAL] Device discovered on device:" 
 		             << info.product 
 			     << info.bcdDevice;
                     emit deviceDiscovered(info);
                     break;
                 } else if (wParam == DBT_DEVICEREMOVECOMPLETE) {
-                    bool found = false;
-    //                DeviceChangeMutex.lock();
                     for (int x = 0; x < knowndevices.count(); ++x) {
-                       // if (knowndevices[x].devicePath == deviceID) {
                             USBPortInfo temp = knowndevices.at(x);
                             knowndevices.removeAt(x);
-                            qDebug() << "USB_MONITOR emit device removed on device:" << temp.product << temp.bcdDevice;
-                          
-			    //emit deviceRemoved(temp);
-			 
-                            found = true;
-                    //        break;
-                    //    }
+                            qDebug() << "[SIGNAL] Device removed on device:" 
+			             << temp.product 
+				     << temp.bcdDevice;
                     }
-
-                    //if (!found) {
-                    //    qDebug() << "USB_MONITOR emit device removed on unknown device";
-                        emit deviceRemoved(info);
-                    //}
-		    //else
-		        break;
-//		    DeviceChangeMutex.unlock();
+                    emit deviceRemoved(info);
+		    break;
                 }
                 break;
             }
@@ -275,22 +320,18 @@ bool USBMonitor::matchAndDispatchChangedDevice(const QString & deviceID, const G
         SetupDiDestroyDeviceInfoList(devInfo);
     }
     OPHID_TRACE("OUT");
-    return rv;
-}
-
-QString USBMonitor::getDeviceProperty(HDEVINFO devInfo, PSP_DEVINFO_DATA devData, DWORD property)
-{
-    DWORD buffSize = 0;
-
-    SetupDiGetDeviceRegistryProperty(devInfo, devData, property, NULL, NULL, 0, &buffSize);
-    BYTE *buff     = new BYTE[buffSize];
-    SetupDiGetDeviceRegistryProperty(devInfo, devData, property, NULL, buff, buffSize, NULL);
-    QString result = TCHARToQString(buff);
-    delete[] buff;
-    return result;
+    return 0;
 }
 
 
+/**
+ * \brief Get the list of currently handled devices
+ *
+ * \note
+ *
+ * \return QList
+ * \retval  List of handled devices
+ */
 QList<USBPortInfo> USBMonitor::availableDevices() {
 
      enumerateDevicesWin(guid_hid);
@@ -298,29 +339,30 @@ QList<USBPortInfo> USBMonitor::availableDevices() {
 }
 
 
+/**
+ * \brief enumerate devices
+ *
+ * \note fill our device list. This is called only from pooling during init.
+ *
+ * \param[in] GUID Filter for HID devices
+ */
 void USBMonitor::enumerateDevicesWin(const GUID & guid)
 {
     HDEVINFO devInfo;
     USBPortInfo info;
     DWORD j = 0;
     DWORD i = 0;
-    OPHID_TRACE("IN");
-    DeviceChangeMutex.lock();
+    SP_DEVINFO_DATA devInfoData;
 
-//    QString qHIDSymbolicName = "HID";
-//    WCHAR wHIDSymbolicName[10];
-//    qHIDSymbolicName.toWCharArray(wHIDSymbolicName);
-    // qDebug()<<"enumerateDevicesWin1";
-    if ((devInfo = SetupDiGetClassDevs(&guid, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE)) != INVALID_HANDLE_VALUE) {
-        // qDebug()<<"enumerateDevicesWin2";
-        SP_DEVINFO_DATA devInfoData;
+    OPHID_TRACE("IN");
+    
+    devInfo = SetupDiGetClassDevs(&guid, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+
+    if (devInfo != INVALID_HANDLE_VALUE) {
         devInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
-	// only handle the first one enumerated that matches openpilot vendor
-	// the second one is expected to be the gamepad controller which we don't want to deal with
         for (i = 0; SetupDiEnumDeviceInfo(devInfo, i, &devInfoData); i++) {
             int r = infoFromHandle(guid, info, devInfo, i);
-            if (r == 1) {
-                //infoList->append(info);
+            if (r == OPHID_NO_ERROR) {
 		knowndevices.append(info);
 		j++;
 	//	break;
@@ -331,14 +373,25 @@ void USBMonitor::enumerateDevicesWin(const GUID & guid)
         SetupDiDestroyDeviceInfoList(devInfo);
     }
     OPHID_DEBUG("Added %d device(s).", j);
-    DeviceChangeMutex.unlock();
     OPHID_TRACE("OUT");
 }
 
+
+/**
+ * \brief filter out the device based on information and populate to be added 
+ *
+ * \note Called from pooling during startup and from device plug/unplug windows signal
+ *
+ * \param[in] GUID Filter for HID devices
+ * \param[out] info new device to be added to our private list (once all filter are validated)
+ * \param[in] devInfo device information set.
+ * \param[in] index
+ * \return status.
+ * \retval  OPHID_NO_ERROR, OPHID_ERROR_RET, OPHID_ERROR_ENUMERATION
+ */
 int USBMonitor::infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO & devInfo, DWORD & index)
 {
     OPHID_TRACE("IN");
-    // qDebug()<<"index0="<<index;
     int ret;
     HANDLE h;
     SP_DEVICE_INTERFACE_DATA iface;
@@ -351,45 +404,49 @@ int USBMonitor::infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO &
 
     iface.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
 
+    // Enumerate the device interface that are contained in the device information set.
     ret = SetupDiEnumDeviceInterfaces(devInfo, NULL, &guid, index, &iface);
     if (!ret) {
         ret = OPHID_ERROR_ENUMERATION;
 	goto leave;
     }
-    // qDebug()<<"index1="<<index;
+
+    // Fill the interface information
     SetupDiGetInterfaceDeviceDetail(devInfo, &iface, NULL, 0, &reqd_size, NULL);
     details = (SP_DEVICE_INTERFACE_DETAIL_DATA *)malloc(reqd_size);
     if (details == NULL) {
-        ret = 2;
+        ret = OPHID_ERROR_RET;
 	goto leave;
     }
-    // qDebug()<<"index2="<<index;
     memset(details, 0, reqd_size);
     details->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
     ret = SetupDiGetDeviceInterfaceDetail(devInfo, &iface, details, reqd_size, NULL, NULL);
     if (!ret) {
         free(details);
-        ret = 2;
+        ret = OPHID_ERROR_RET;
 	goto leave;
     }
-    // qDebug()<<"index3="<<index;
-   qDevicePath = QString().fromWCharArray(details->DevicePath).toUpper();
+    qDevicePath = QString().fromWCharArray(details->DevicePath).toUpper();
 
-   // Exclude any non-openpilot devices
-   if (!qDevicePath.contains("VID_20A0")) {
-      ret = 2;
-      goto leave;
-   }
-
-   if (qDevicePath.contains("COL02")) { 
-      ret = 2;
-      goto leave;
-   }
-   //.replace("#","\\").remove(0,4);
-   //WCHAR wDevicePath[256];
-   //qDevicePath.toWCharArray(wDevicePath);
-   qDebug() << "Found device with valid PATH: " << qDevicePath;
-    h = CreateFile(details->DevicePath /*DevicePath*/, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+    // Exclude any non-openpilot devices
+    if (!qDevicePath.contains("VID_20A0")) {
+        ret = OPHID_ERROR_RET;
+        goto leave;
+    }
+    // Exclude second hid which (probably) is the gamepad controller
+    if (qDevicePath.contains("COL02")) { 
+        ret = OPHID_ERROR_RET;
+        goto leave;
+    }
+   
+    qDebug() << "Found device with valid PATH: " << qDevicePath;
+    h = CreateFile(details->DevicePath, 
+                   GENERIC_READ | GENERIC_WRITE,
+                   FILE_SHARE_READ | FILE_SHARE_WRITE, 
+		   NULL, 
+		   OPEN_EXISTING, 
+		   FILE_FLAG_OVERLAPPED, 
+		   NULL);
 
     if (h == INVALID_HANDLE_VALUE) {
         DWORD err = GetLastError();
@@ -398,19 +455,19 @@ int USBMonitor::infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO &
         // Let's not log it :)
         if (err == ERROR_ACCESS_DENIED) {
             free(details);
-	    ret = 2;
+	    ret = OPHID_ERROR_RET;
 	    goto leave;
         }
 
-        qDebug() << "Problem opening handle, path: " << QString().fromWCharArray(details->DevicePath);
+        qDebug() << "Problem opening handle, path: " 
+	         << QString().fromWCharArray(details->DevicePath);
 
         free(details);
-        ret = 2;
+        ret = OPHID_ERROR_RET;
 	goto leave;
     }
-    // qDebug()<<"index4="<<index;
+
     free(details);
-    // qDebug()<<"DETAILS???"<<QString().fromWCharArray(details->DevicePath).toUpper().replace("#", "\\");
     attrib.Size    = sizeof(HIDD_ATTRIBUTES);
     ret = HidD_GetAttributes(h, &attrib);
     info.vendorID  = attrib.VendorID;
@@ -420,23 +477,22 @@ int USBMonitor::infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO &
 
     if (attrib.VendorID != 0x20A0) {
        CloseHandle(h);
-       ret = 2;
+       ret = OPHID_ERROR_RET;
        goto leave;
     }
 
     if (!ret || !HidD_GetPreparsedData(h, &hid_data)) {
         CloseHandle(h);
-        ret = 2;
+        ret = OPHID_ERROR_RET;
 	goto leave;
     }
-    // qDebug()<<"index5="<<index;
     if (!HidP_GetCaps(hid_data, &capabilities)) {
         HidD_FreePreparsedData(hid_data);
         CloseHandle(h);
-        ret = 2;
+        ret = OPHID_ERROR_RET;
 	goto leave;
     }
-    // qDebug()<<"index6="<<index;
+
     info.UsagePage = capabilities.UsagePage;
     info.Usage     = capabilities.Usage;
     HidD_FreePreparsedData(hid_data);
@@ -447,10 +503,9 @@ int USBMonitor::infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO &
     info.manufacturer = QString().fromUtf16((ushort *)temp, -1);
     HidD_GetProductString(h, temp, sizeof(temp));
     info.product = QString().fromUtf16((ushort *)temp, -1);
-    // qDebug()<<"index="<<index<<"ProductID="<<info.product;
     CloseHandle(h);
     h = NULL;
-    ret = 1;
+    ret = OPHID_NO_ERROR;
 
 leave:
     OPHID_TRACE("OUT");

@@ -162,6 +162,7 @@ Section "Core files" InSecCore
   File "${PROJECT_ROOT}\README.txt"
   File "${PROJECT_ROOT}\WHATSNEW.txt"
   File "${PROJECT_ROOT}\MILESTONES.txt"
+  File "${PROJECT_ROOT}\GPLv3.txt"
 SectionEnd
 
 ; Copy GCS plugins

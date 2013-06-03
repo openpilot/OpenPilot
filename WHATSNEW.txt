@@ -112,6 +112,9 @@ Important Release Notes:
   paired radios and click Save. After USB unplugging and plugging back your OPLink should show
   "Connected", and you can continue with configuration.
 
+- Don't set Revo modem or OPLinkMini output power to high values without antenna connected,
+  this can damage the hardware.
+
 Flight code changes:
 - initial version of Revo code;
 - initial version of OPLinkMini code;

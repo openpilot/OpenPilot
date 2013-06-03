@@ -104,8 +104,12 @@ ListModel {
 	ListElement{ name:"Richard Querin" }
 
 	ListElement{ name:"Randy Ram" }
+	
+	ListElement{ name:"Philippe Renon" }
 
 	ListElement{ name:"Laurent Ribon" }
+
+	ListElement{ name:"Mathieu Rondonneau" }
 
 	ListElement{ name:"Julien Rouviere" }
 
@@ -130,10 +134,14 @@ ListModel {
 	ListElement{ name:"Alex Sowa" }
 
 	ListElement{ name:"Pete Stapley" }
+	
+	ListElement{ name:"Vova Starikh" }
 
 	ListElement{ name:"Rowan Taubitz" }
 
 	ListElement{ name:"Andrew Thoms" }
+
+	ListElement{ name:"Philippe Vanhaesendonck" }
 
 	ListElement{ name:"Jasper van Loenen" }
 
@@ -150,6 +158,8 @@ ListModel {
 	ListElement{ name:"Mat Wellington" }
 
 	ListElement{ name:"Kendal Wells" }
+
+	ListElement { name: "David Willis" }
 
 	ListElement{ name:"Dmitriy Zaitsev" }
 }

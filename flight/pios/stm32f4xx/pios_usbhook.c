@@ -46,6 +46,8 @@
 #include "usbd_req.h" /* USBD_CtlError */
 #include "usb_dcd_int.h" /* USBD_OTG_ISR_Handler */
 
+static void reconnect(void);
+
 /*
  * External API
  */
@@ -82,6 +84,9 @@ static USBD_Usr_cb_TypeDef user_callbacks;
 
 void PIOS_USBHOOK_Activate(void)
 {
+
+    PIOS_USB_RegisterDisconnectionCallback(&reconnect);
+
     USBD_Init(&pios_usb_otg_core_handle,
               USB_OTG_FS_CORE_ID,
               &device_callbacks,
@@ -271,12 +276,7 @@ static USBD_DEVICE device_callbacks = {
 static void PIOS_USBHOOK_USR_Init(void)
 {
     PIOS_USB_ChangeConnectionState(false);
-
-#if 1
-    /* Force a physical disconnect/reconnect */
-    DCD_DevDisconnect(&pios_usb_otg_core_handle);
-    DCD_DevConnect(&pios_usb_otg_core_handle);
-#endif
+    reconnect();
 }
 
 static void PIOS_USBHOOK_USR_DeviceReset(__attribute__((unused)) uint8_t speed)
@@ -482,5 +482,11 @@ static USBD_Class_cb_TypeDef class_callbacks = {
     .GetUsrStrDescriptor      = PIOS_USBHOOK_CLASS_GetUsrStrDescriptor,
 #endif /* USB_SUPPORT_USER_STRING_DESC */
 };
+
+static void reconnect(void){
+    /* Force a physical disconnect/reconnect */
+    DCD_DevDisconnect(&pios_usb_otg_core_handle);
+    DCD_DevConnect(&pios_usb_otg_core_handle);
+}
 
 #endif /* PIOS_INCLUDE_USB */

@@ -34,11 +34,13 @@
 
 #include "usb_core.h"
 #include "pios_usb_board_data.h"
-#include "pios_usb_priv.h"
-
+#include <pios_usb_priv.h>
+#include <pios_helpers.h>
 
 /* Rx/Tx status */
 static uint8_t transfer_possible = 0;
+
+static void (*disconnection_cb_list[3])(void);
 
 enum pios_usb_dev_magic {
     PIOS_USB_DEV_MAGIC = 0x17365904,
@@ -48,6 +50,8 @@ struct pios_usb_dev {
     enum pios_usb_dev_magic   magic;
     const struct pios_usb_cfg *cfg;
 };
+
+static void raiseDisconnectionCallbacks(void);
 
 /**
  * @brief Validate the usb device structure
@@ -162,15 +166,43 @@ uint32_t usb_found;
 bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
 {
     struct pios_usb_dev *usb_dev = (struct pios_usb_dev *)pios_usb_id;
-
+    static bool lastStatus = false;
     if (!PIOS_USB_validate(usb_dev)) {
         return false;
     }
 
     usb_found = ((usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin) != 0) ^ usb_dev->cfg->vsense_active_low;
-    return usb_found;
 
-    return usb_found != 0 && transfer_possible ? 1 : 0;
+    bool status = usb_found != 0 && transfer_possible ? 1 : 0;
+
+    if(lastStatus && !status){
+        raiseDisconnectionCallbacks();
+    }
+    lastStatus = status;
+    return status;
+}
+
+/*
+ *
+ * Register a physical disconnection callback
+ *
+ */
+void PIOS_USB_RegisterDisconnectionCallback(void (*disconnectionCB)(void)){
+    PIOS_Assert(disconnectionCB);
+    for(uint32_t i = 0; i < NELEMENTS(disconnection_cb_list); i++){
+        if(disconnection_cb_list[i] == NULL){
+            disconnection_cb_list[i] = disconnectionCB;
+            return;
+        }
+    }
+    PIOS_Assert(0);
+}
+
+static void raiseDisconnectionCallbacks(void){
+    uint32_t i = 0;
+    while(i < NELEMENTS(disconnection_cb_list) && disconnection_cb_list[i] != NULL){
+        (disconnection_cb_list[i++])();
+    }
 }
 
 /*

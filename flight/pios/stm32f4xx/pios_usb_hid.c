@@ -254,7 +254,7 @@ static void PIOS_USB_HID_RxStart(uint32_t usbhid_id, uint16_t rx_bytes_avail)
 
     // add a timeout to prevent connection drops
     static uint32_t last_rx_time_raw = 0;
-    if(PIOS_DELAY_DiffuS(last_rx_time_raw) > 1000000){
+    if (PIOS_DELAY_DiffuS(last_rx_time_raw) > 1000000) {
         usb_hid_dev->rx_active = false;
     }
 

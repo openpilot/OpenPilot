@@ -84,7 +84,6 @@ static USBD_Usr_cb_TypeDef user_callbacks;
 
 void PIOS_USBHOOK_Activate(void)
 {
-
     PIOS_USB_RegisterDisconnectionCallback(&reconnect);
 
     USBD_Init(&pios_usb_otg_core_handle,
@@ -484,7 +483,8 @@ static USBD_Class_cb_TypeDef class_callbacks = {
 #endif /* USB_SUPPORT_USER_STRING_DESC */
 };
 
-static void reconnect(void){
+static void reconnect(void)
+{
     /* Force a physical disconnect/reconnect */
     DCD_DevDisconnect(&pios_usb_otg_core_handle);
     DCD_DevConnect(&pios_usb_otg_core_handle);

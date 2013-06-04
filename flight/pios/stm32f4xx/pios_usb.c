@@ -40,7 +40,7 @@
 /* Rx/Tx status */
 static uint8_t transfer_possible = 0;
 
-static void (*disconnection_cb_list[3])(void);
+static void(*disconnection_cb_list[3]) (void);
 
 enum pios_usb_dev_magic {
     PIOS_USB_DEV_MAGIC = 0x17365904,
@@ -167,6 +167,7 @@ bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
 {
     struct pios_usb_dev *usb_dev = (struct pios_usb_dev *)pios_usb_id;
     static bool lastStatus = false;
+
     if (!PIOS_USB_validate(usb_dev)) {
         return false;
     }
@@ -175,7 +176,7 @@ bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
 
     bool status = usb_found != 0 && transfer_possible ? 1 : 0;
 
-    if(lastStatus && !status){
+    if (lastStatus && !status) {
         raiseDisconnectionCallbacks();
     }
     lastStatus = status;
@@ -187,10 +188,11 @@ bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
  * Register a physical disconnection callback
  *
  */
-void PIOS_USB_RegisterDisconnectionCallback(void (*disconnectionCB)(void)){
+void PIOS_USB_RegisterDisconnectionCallback(void (*disconnectionCB)(void))
+{
     PIOS_Assert(disconnectionCB);
-    for(uint32_t i = 0; i < NELEMENTS(disconnection_cb_list); i++){
-        if(disconnection_cb_list[i] == NULL){
+    for (uint32_t i = 0; i < NELEMENTS(disconnection_cb_list); i++) {
+        if (disconnection_cb_list[i] == NULL) {
             disconnection_cb_list[i] = disconnectionCB;
             return;
         }
@@ -198,9 +200,11 @@ void PIOS_USB_RegisterDisconnectionCallback(void (*disconnectionCB)(void)){
     PIOS_Assert(0);
 }
 
-static void raiseDisconnectionCallbacks(void){
+static void raiseDisconnectionCallbacks(void)
+{
     uint32_t i = 0;
-    while(i < NELEMENTS(disconnection_cb_list) && disconnection_cb_list[i] != NULL){
+
+    while (i < NELEMENTS(disconnection_cb_list) && disconnection_cb_list[i] != NULL) {
         (disconnection_cb_list[i++])();
     }
 }

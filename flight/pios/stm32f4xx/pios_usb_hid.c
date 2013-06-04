@@ -29,14 +29,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "pios.h"
+#include <pios.h>
 
 #ifdef PIOS_INCLUDE_USB_HID
 
-#include "pios_usb_hid_priv.h"
+#include <pios_usb_hid_priv.h>
 #include "pios_usb_board_data.h" /* PIOS_BOARD_*_DATA_LENGTH */
-#include "pios_usbhook.h" /* PIOS_USBHOOK_* */
-
+#include <pios_usbhook.h> /* PIOS_USBHOOK_* */
+#include <pios_delay.h>
 static void PIOS_USB_HID_RegisterTxCallback(uint32_t usbhid_id, pios_com_callback tx_out_cb, uint32_t context);
 static void PIOS_USB_HID_RegisterRxCallback(uint32_t usbhid_id, pios_com_callback rx_in_cb, uint32_t context);
 static void PIOS_USB_HID_TxStart(uint32_t usbhid_id, uint16_t tx_bytes_avail);
@@ -252,6 +252,12 @@ static void PIOS_USB_HID_RxStart(uint32_t usbhid_id, uint16_t rx_bytes_avail)
         return;
     }
 
+    // add a timeout to prevent connection drops
+    static uint32_t last_rx_time_raw = 0;
+    if(PIOS_DELAY_DiffuS(last_rx_time_raw) > 1000000){
+        usb_hid_dev->rx_active = false;
+    }
+
     // If endpoint was stalled and there is now space make it valid
 #ifdef PIOS_USB_BOARD_BL_HID_HAS_NO_LENGTH_BYTE
     uint16_t max_payload_length = PIOS_USB_BOARD_HID_DATA_LENGTH - 1;
@@ -260,6 +266,7 @@ static void PIOS_USB_HID_RxStart(uint32_t usbhid_id, uint16_t rx_bytes_avail)
 #endif
 
     if (!usb_hid_dev->rx_active && (rx_bytes_avail >= max_payload_length)) {
+        last_rx_time_raw = PIOS_DELAY_GetRaw();
         PIOS_USBHOOK_EndpointRx(usb_hid_dev->cfg->data_rx_ep,
                                 usb_hid_dev->rx_packet_buffer,
                                 sizeof(usb_hid_dev->rx_packet_buffer));

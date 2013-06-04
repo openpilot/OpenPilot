@@ -93,7 +93,7 @@ int32_t FlightPlanInitialize()
 
     return 0;
 }
-MODULE_INITCALL(FlightPlanInitialize, FlightPlanStart)
+MODULE_INITCALL(FlightPlanInitialize, FlightPlanStart);
 /**
  * Module task
  */

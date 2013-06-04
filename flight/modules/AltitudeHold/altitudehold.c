@@ -104,7 +104,7 @@ int32_t AltitudeHoldInitialize()
 
     return 0;
 }
-MODULE_INITCALL(AltitudeHoldInitialize, AltitudeHoldStart)
+MODULE_INITCALL(AltitudeHoldInitialize, AltitudeHoldStart);
 
 float tau;
 float throttleIntegral;

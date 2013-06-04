@@ -190,7 +190,7 @@ int32_t GPSInitialize(void)
     return -1;
 }
 
-MODULE_INITCALL(GPSInitialize, GPSStart)
+MODULE_INITCALL(GPSInitialize, GPSStart);
 
 // ****************
 /**

@@ -116,7 +116,7 @@ int32_t AutotuneStart(void)
     return 0;
 }
 
-MODULE_INITCALL(AutotuneInitialize, AutotuneStart)
+MODULE_INITCALL(AutotuneInitialize, AutotuneStart);
 
 /**
  * Module thread, should not return.

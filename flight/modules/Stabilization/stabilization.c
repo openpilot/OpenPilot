@@ -138,7 +138,7 @@ int32_t StabilizationInitialize()
     return 0;
 }
 
-MODULE_INITCALL(StabilizationInitialize, StabilizationStart)
+MODULE_INITCALL(StabilizationInitialize, StabilizationStart);
 
 /**
  * Module task

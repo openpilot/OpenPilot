@@ -86,7 +86,7 @@ static void resetTask(UAVObjEvent *);
  * \note
  *
  */
-MODULE_INITCALL(FirmwareIAPInitialize, 0)
+MODULE_INITCALL(FirmwareIAPInitialize, 0);
 int32_t FirmwareIAPInitialize()
 {
     FirmwareIAPObjInitialize();

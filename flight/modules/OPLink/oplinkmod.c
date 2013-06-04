@@ -117,7 +117,7 @@ int32_t OPLinkModInitialize(void)
     return 0;
 }
 
-MODULE_INITCALL(OPLinkModInitialize, 0)
+MODULE_INITCALL(OPLinkModInitialize, 0);
 
 /**
  * System task, periodically executes every SYSTEM_UPDATE_PERIOD_MS

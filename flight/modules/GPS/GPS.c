@@ -346,14 +346,14 @@ static void setPositionSensor(GPSPositionSensorData *gpsData)
     PositionSensorData pos;
     PositionSensorGet(&pos);
 
-    float ECEF[3];
-    float Rne[3][3];
+    double ECEF[3];
+    double Rne[3][3];
     {
         float LLA[3] = { (home.Latitude) / 10e6f, (home.Longitude) / 10e6f, (home.Altitude) };
         LLA2ECEF(LLA, ECEF);
         RneFromLLA(LLA, Rne);
     }
-    { float LLA[3] = { (gpsData->Latitude) / 10e6f, (gpsData->Longitude) / 10e6f, gpsData->Altitude + gpsData->GeoidSeparation };
+    { float LLA[3] = { (gpsData->Latitude) / 10e6d, (gpsData->Longitude) / 10e6d, gpsData->Altitude + gpsData->GeoidSeparation };
       float NED[3];
       LLA2Base(LLA, ECEF, Rne, NED);
       pos.North = NED[0];

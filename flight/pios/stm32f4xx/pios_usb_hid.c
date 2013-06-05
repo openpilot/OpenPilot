@@ -218,12 +218,12 @@ static bool PIOS_USB_HID_SendReport(struct pios_usb_hid_dev *usb_hid_dev)
 #ifdef PIOS_USB_BOARD_BL_HID_HAS_NO_LENGTH_BYTE
     PIOS_USBHOOK_EndpointTx(usb_hid_dev->cfg->data_tx_ep,
                             usb_hid_dev->tx_packet_buffer,
-                            bytes_to_tx + 1);
+                            sizeof(usb_hid_dev->tx_packet_buffer));
 #else
     usb_hid_dev->tx_packet_buffer[1] = bytes_to_tx;
     PIOS_USBHOOK_EndpointTx(usb_hid_dev->cfg->data_tx_ep,
                             usb_hid_dev->tx_packet_buffer,
-                            bytes_to_tx + 2);
+                            sizeof(usb_hid_dev->tx_packet_buffer));
 #endif
 
 #if defined(PIOS_INCLUDE_FREERTOS)

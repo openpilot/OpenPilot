@@ -24,8 +24,10 @@ def create_qml_file(args):
         if name.strip():
             names_list += "    ListElement { name: \"" + name.strip() + "\" }\n"
 
-    with open(args.template, "rt") as template_file, open(args.outfile, "wt") as output_file:
+    with open(args.template, "rt") as template_file:
         template = template_file.read()
+
+    with open(args.outfile, "wt") as output_file:
         output_file.write(template.replace("${LIST_ELEMENTS}", names_list.rstrip()))
 
     return 0

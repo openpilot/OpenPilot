@@ -422,6 +422,13 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     EKFStateVarianceGet(&vardata);
     INSGetP(vardata.P);
     EKFStateVarianceSet(&vardata);
+    int t;
+    for (t = 0; t < EKFSTATEVARIANCE_P_NUMELEM; t++) {
+        if (invalid_var(vardata.P[t])) {
+            INSResetP(this->ekfConfiguration.P);
+            break;
+        }
+    }
 
     // all sensor data has been used, reset!
     this->work.updated = 0;

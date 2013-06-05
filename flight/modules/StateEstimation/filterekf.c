@@ -43,6 +43,8 @@
 // Private constants
 
 #define STACK_REQUIRED 2048
+#define DT_ALPHA       1e-3f
+#define DT_INIT        (1.0f / 666.0f) // initialize with 666 Hz (default sensor update rate on revo)
 
 #define IMPORT_SENSOR_IF_UPDATED(shortname, num) \
     if (IS_SET(state->updated, SENSORUPDATES_##shortname)) { \
@@ -65,6 +67,8 @@ struct data {
 
     uint32_t ins_last_time;
     bool     inited;
+
+    float    dTa;
 };
 
 // Private variables
@@ -153,6 +157,7 @@ static int32_t maininit(stateFilter *self)
     this->init_stage    = 0;
     this->work.updated  = 0;
     this->ins_last_time = PIOS_DELAY_GetRaw();
+    this->dTa = DT_INIT;
 
     EKFConfigurationGet(&this->ekfConfiguration);
     int t;
@@ -228,6 +233,8 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         dT = 0.001f;
     }
 
+    this->dTa = this->dTa * (1.0f - DT_ALPHA) + dT * DT_ALPHA; // low pass for average dT, compensate timing jitter from scheduler
+
     if (!this->inited && IS_SET(this->work.updated, SENSORUPDATES_mag) && IS_SET(this->work.updated, SENSORUPDATES_baro) && IS_SET(this->work.updated, SENSORUPDATES_pos)) {
         // Don't initialize until all sensors are read
         if (this->init_stage == 0) {
@@ -291,7 +298,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             // Run prediction a bit before any corrections
 
             float gyros[3] = { DEG2RAD(this->work.gyro[0]), DEG2RAD(this->work.gyro[1]), DEG2RAD(this->work.gyro[2]) };
-            INSStatePrediction(gyros, this->work.accel, dT);
+            INSStatePrediction(gyros, this->work.accel, this->dTa);
 
             // Copy the attitude into the state
             // NOTE: updating gyr correctly is valid, because this code is reached only when SENSORUPDATES_gyro is already true
@@ -326,7 +333,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     float gyros[3] = { DEG2RAD(this->work.gyro[0]), DEG2RAD(this->work.gyro[1]), DEG2RAD(this->work.gyro[2]) };
 
     // Advance the state estimate
-    INSStatePrediction(gyros, this->work.accel, dT);
+    INSStatePrediction(gyros, this->work.accel, this->dTa);
 
     // Copy the attitude into the state
     // NOTE: updating gyr correctly is valid, because this code is reached only when SENSORUPDATES_gyro is already true
@@ -346,7 +353,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     state->updated |= SENSORUPDATES_attitude | SENSORUPDATES_pos | SENSORUPDATES_vel;
 
     // Advance the covariance estimate
-    INSCovariancePrediction(dT);
+    INSCovariancePrediction(this->dTa);
 
     if (IS_SET(this->work.updated, SENSORUPDATES_mag)) {
         sensors |= MAG_SENSORS;

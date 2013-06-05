@@ -26,7 +26,7 @@ def create_qml_file(args):
 
     with open(args.template, "rt") as template_file, open(args.outfile, "wt") as output_file:
         template = template_file.read()
-        output_file.write(template.replace("${LIST_ELEMENTS}\n", names_list))
+        output_file.write(template.replace("${LIST_ELEMENTS}", names_list.rstrip()))
 
     return 0
 

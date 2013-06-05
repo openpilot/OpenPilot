@@ -3,6 +3,9 @@
 # http://wiki.openpilot.org/display/Doc/Coding+Style
 #
 
+*.pri		text eol=crlf
+*.pro		text eol=crlf
+
 *.c		text eol=crlf
 *.cpp		text eol=crlf
 *.h		text eol=crlf
@@ -13,9 +16,9 @@
 *.qml		text eol=crlf
 *.pluginspec	text eol=crlf
 
-*.pri		text eol=crlf
-*.pro		text eol=crlf
-
 *.h.template	text eol=crlf
 *.c.template	text eol=crlf
 *.cpp.template	text eol=crlf
+*.qml.template	text eol=crlf
+
+*.py		text eol=lf

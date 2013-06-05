@@ -25,7 +25,7 @@ include(../../python.pri)
                             --infile=\"$$AUTHORS_SOURCE\" \
                             --template=\"$$AUTHORS_TEMPLATE\" \
                             --outfile=\"$$AUTHORS_FILE\"
-    authors.depends = FORCE
+    authors.depends = $$AUTHORS_SOURCE
     QMAKE_EXTRA_TARGETS += authors
 
     # Hook authors target in between qmake's Makefile update and

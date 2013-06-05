@@ -1,5 +1,5 @@
 <xml>
-    <object name="GyroSensor" singleinstance="true" settings="false" catgory="Sensors">
+    <object name="GyroSensor" singleinstance="true" settings="false" category="Sensors">
         <description>Calibrated sensor data from 3 axis gyroscope in deg/s.</description>
 	<field name="x" units="deg/s" type="float" elements="1"/>
 	<field name="y" units="deg/s" type="float" elements="1"/>

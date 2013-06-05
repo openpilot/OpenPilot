@@ -48,20 +48,21 @@
 
 #include <openpilot.h>
 
-#include "attitude.h"
+#include "attitudestate.h"
 #include "accelsensor.h"
 #include "actuatordesired.h"
 #include "attitudestate.h"
 #include "attitudesimulated.h"
 #include "attitudesettings.h"
-#include "rawairspeed.h"
+#include "airspeedsensor.h"
 #include "barosensor.h"
+#include "magsensor.h"
 #include "gyrosensor.h"
 #include "flightstatus.h"
 #include "gpspositionsensor.h"
 #include "gpsvelocitysensor.h"
 #include "homelocation.h"
-#include "sensor.h"
+// #include "sensor.h"
 #include "ratedesired.h"
 #include "revocalibration.h"
 #include "systemsettings.h"
@@ -114,7 +115,6 @@ int32_t SensorsInitialize(void)
     GPSPositionSensorInitialize();
     GPSVelocitySensorInitialize();
     MagSensorInitialize();
-    MagBiasInitialize();
     RevoCalibrationInitialize();
 
     return 0;

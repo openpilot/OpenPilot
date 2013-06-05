@@ -496,6 +496,9 @@ margin:1px;</string>
            <layout class="QGridLayout" name="gridLayout_5">
             <item row="0" column="0">
              <widget class="QLabel" name="label_14">
+              <property name="toolTip">
+               <string>Adjusts how much weight is given to the accelerometers in the attitude calculation.</string>
+              </property>
               <property name="styleSheet">
                <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
 color: rgb(255, 255, 255);
@@ -513,6 +516,9 @@ margin:1px;</string>
             </item>
             <item row="1" column="0">
              <widget class="QDoubleSpinBox" name="accelTau">
+              <property name="toolTip">
+               <string>Adjusts how much weight is given to the accelerometers in the attitude calculation.</string>
+              </property>
               <property name="maximum">
                <double>2.000000000000000</double>
               </property>

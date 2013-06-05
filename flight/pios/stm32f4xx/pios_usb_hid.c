@@ -68,10 +68,10 @@ struct pios_usb_hid_dev {
     bool     usb_if_enabled;
 
     uint8_t  rx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH] __attribute__((aligned(4)));
-    bool     rx_active;
+    volatile bool     rx_active;
 
     uint8_t  tx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH] __attribute__((aligned(4)));
-    bool     tx_active;
+    volatile bool     tx_active;
 
     uint32_t rx_dropped;
     uint32_t rx_oversize;
@@ -187,7 +187,7 @@ static bool PIOS_USB_HID_SendReport(struct pios_usb_hid_dev *usb_hid_dev)
     if (!usb_hid_dev->tx_out_cb) {
         return false;
     }
-
+    WRITE_MEMORY_BARRIER();
     bool need_yield = false;
 #ifdef PIOS_USB_BOARD_BL_HID_HAS_NO_LENGTH_BYTE
     bytes_to_tx = (usb_hid_dev->tx_out_cb)(usb_hid_dev->tx_out_context,
@@ -310,6 +310,7 @@ static void PIOS_USB_HID_RegisterRxCallback(uint32_t usbhid_id, pios_com_callbac
      * field to determine if it's ok to dereference _cb and _context
      */
     usb_hid_dev->rx_in_context = context;
+    WRITE_MEMORY_BARRIER();
     usb_hid_dev->rx_in_cb = rx_in_cb;
 }
 
@@ -326,6 +327,7 @@ static void PIOS_USB_HID_RegisterTxCallback(uint32_t usbhid_id, pios_com_callbac
      * field to determine if it's ok to dereference _cb and _context
      */
     usb_hid_dev->tx_out_context = context;
+    WRITE_MEMORY_BARRIER();
     usb_hid_dev->tx_out_cb = tx_out_cb;
 }
 
@@ -508,7 +510,7 @@ static bool PIOS_USB_HID_EP_OUT_Callback(uint32_t usb_hid_id, __attribute__((unu
         usb_hid_dev->rx_active = false;
         return false;
     }
-
+    WRITE_MEMORY_BARRIER();
     /* The first byte is report ID (not checked), the second byte is the valid data length */
     uint16_t headroom;
     bool need_yield = false;

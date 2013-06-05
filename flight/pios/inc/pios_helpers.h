@@ -36,5 +36,6 @@
  */
 #define NELEMENTS(x) (sizeof(x) / sizeof((x)[0]))
 
+#define WRITE_MEMORY_BARRIER() asm volatile("":::"memory")
 
 #endif // PIOS_HELPERS_H

@@ -357,6 +357,8 @@ void VehicleConfigurationHelper::applySensorBiasConfiguration()
             data.GyroBias[AttitudeSettings::GYROBIAS_Y]    = -(bias.m_gyroYBias * GYRO_SCALE);
             data.GyroBias[AttitudeSettings::GYROBIAS_Z]    = -(bias.m_gyroZBias * GYRO_SCALE);
 
+            data.BiasCorrectGyro = AttitudeSettings::BIASCORRECTGYRO_TRUE;
+
             copterControlCalibration->setData(data);
             addModifiedObject(copterControlCalibration, tr("Writing gyro and accelerometer bias settings"));
             break;

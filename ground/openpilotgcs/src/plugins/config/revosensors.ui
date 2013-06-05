@@ -497,7 +497,7 @@ margin:1px;</string>
             <item row="0" column="0">
              <widget class="QLabel" name="label_14">
               <property name="toolTip">
-               <string>Adjusts how much weight is given to the accelerometers in the attitude calculation.</string>
+               <string>Adjusts how much smoothing is given to the accelerometers in the attitude calculation. Incrementing this value can help mitigating the effect of vibrations but a too high value may make the attitude unstable.</string>
               </property>
               <property name="styleSheet">
                <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -517,7 +517,7 @@ margin:1px;</string>
             <item row="1" column="0">
              <widget class="QDoubleSpinBox" name="accelTau">
               <property name="toolTip">
-               <string>Adjusts how much weight is given to the accelerometers in the attitude calculation.</string>
+               <string>Adjusts how much smoothing is given to the accelerometers in the attitude calculation. Incrementing this value can help mitigating the effect of vibrations but a too high value may make the attitude unstable.</string>
               </property>
               <property name="maximum">
                <double>2.000000000000000</double>

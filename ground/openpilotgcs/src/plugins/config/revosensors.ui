@@ -504,7 +504,7 @@ font: bold 12px;
 margin:1px;</string>
               </property>
               <property name="text">
-               <string>AccelTau</string>
+               <string>Accelerometers</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>

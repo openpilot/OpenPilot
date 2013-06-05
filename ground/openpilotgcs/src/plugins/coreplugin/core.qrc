@@ -63,9 +63,9 @@
 		<file>images/cpu.png</file>
 		<file>images/tx-rx.svg</file>
 		<file>qml/images/tab.png</file>
-		<file>qml/AboutDialog.qml</file>
-		<file>qml/AuthorsModel.qml</file>
 		<file>qml/ScrollDecorator.qml</file>
 		<file>qml/TabWidget.qml</file>
+		<file>qml/AboutDialog.qml</file>
+		<file alias="qml/AuthorsModel.qml">../../../../../build/openpilotgcs-synthetics/AuthorsModel.qml</file>
     </qresource>
 </RCC>

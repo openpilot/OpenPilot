@@ -49,6 +49,9 @@ enum pios_usb_dev_magic {
 struct pios_usb_dev {
     enum pios_usb_dev_magic   magic;
     const struct pios_usb_cfg *cfg;
+#ifdef PIOS_INCLUDE_FREERTOS
+    xSemaphoreHandle statusCheckSemaphore;
+#endif
 };
 
 static void raiseDisconnectionCallbacks(void);
@@ -71,7 +74,8 @@ static struct pios_usb_dev *PIOS_USB_alloc(void)
     if (!usb_dev) {
         return NULL;
     }
-
+    vSemaphoreCreateBinary(usb_dev->statusCheckSemaphore);
+    xSemaphoreGive(usb_dev->statusCheckSemaphore);
     usb_dev->magic = PIOS_USB_DEV_MAGIC;
     return usb_dev;
 }
@@ -176,10 +180,17 @@ bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
 
     bool status = usb_found != 0 && transfer_possible ? 1 : 0;
 
-    if (lastStatus && !status) {
+#ifdef PIOS_INCLUDE_FREERTOS
+    while(xSemaphoreTakeFromISR(usb_dev->statusCheckSemaphore, NULL) != pdTRUE);
+#endif
+    bool reconnect = (lastStatus && !status);
+    lastStatus = status;
+#ifdef PIOS_INCLUDE_FREERTOS
+    xSemaphoreGiveFromISR(usb_dev->statusCheckSemaphore, NULL);
+#endif
+    if(reconnect) {
         raiseDisconnectionCallbacks();
     }
-    lastStatus = status;
     return status;
 }
 

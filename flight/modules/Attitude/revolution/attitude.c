@@ -388,14 +388,14 @@ static int32_t updateAttitudeComplementary(bool first_run)
         attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
         accel_filter_enabled   = false;
-        rollPitchBiasRate      = 0.01f;
+        rollPitchBiasRate      = 0.0f;
         attitudeSettings.MagKp = 1.0f;
     } else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
         attitudeSettings.AccelKp     = 1.0f;
         attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
         accel_filter_enabled   = false;
-        rollPitchBiasRate      = 0.01f;
+        rollPitchBiasRate      = 0.015f;
         attitudeSettings.MagKp = 1.0f;
         init = 0;
     } else if (init == 0) {

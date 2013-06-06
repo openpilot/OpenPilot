@@ -181,14 +181,16 @@ bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
     bool status = usb_found != 0 && transfer_possible ? 1 : 0;
 
 #ifdef PIOS_INCLUDE_FREERTOS
-    while(xSemaphoreTakeFromISR(usb_dev->statusCheckSemaphore, NULL) != pdTRUE);
+    while (xSemaphoreTakeFromISR(usb_dev->statusCheckSemaphore, NULL) != pdTRUE) {
+        ;
+    }
 #endif
     bool reconnect = (lastStatus && !status);
     lastStatus = status;
 #ifdef PIOS_INCLUDE_FREERTOS
     xSemaphoreGiveFromISR(usb_dev->statusCheckSemaphore, NULL);
 #endif
-    if(reconnect) {
+    if (reconnect) {
         raiseDisconnectionCallbacks();
     }
     return status;

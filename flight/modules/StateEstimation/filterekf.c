@@ -240,10 +240,11 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         if (this->init_stage == 0) {
             // Reset the INS algorithm
             INSGPSInit();
-            // variance is measured in mGaus, but internally the EKF works with a normalized  vector. Scaling factor from old AHRS code (1000*1000)
-            INSSetMagVar((float[3]) { this->ekfConfiguration.R[EKFCONFIGURATION_R_MAGX] / 1e6f,
-                                      this->ekfConfiguration.R[EKFCONFIGURATION_R_MAGY] / 1e6f,
-                                      this->ekfConfiguration.R[EKFCONFIGURATION_R_MAGZ] / 1e6f }
+            // variance is measured in mGaus, but internally the EKF works with a normalized  vector. Scale down by Be^2
+            float Be2 = this->homeLocation.Be[0] * this->homeLocation.Be[0] + this->homeLocation.Be[1] * this->homeLocation.Be[1] + this->homeLocation.Be[2] * this->homeLocation.Be[2];
+            INSSetMagVar((float[3]) { this->ekfConfiguration.R[EKFCONFIGURATION_R_MAGX] / Be2,
+                                      this->ekfConfiguration.R[EKFCONFIGURATION_R_MAGY] / Be2,
+                                      this->ekfConfiguration.R[EKFCONFIGURATION_R_MAGZ] / Be2 }
                          );
             INSSetAccelVar((float[3]) { this->ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELX],
                                         this->ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELY],

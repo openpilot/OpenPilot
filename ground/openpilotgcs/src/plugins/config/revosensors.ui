@@ -497,7 +497,7 @@ margin:1px;</string>
             <item row="0" column="0">
              <widget class="QLabel" name="label_14">
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Adjusts how much smoothing is given to the accelerometers in the attitude calculation. Incrementing this value can help mitigating the effect of vibrations but a too high value may make the attitude unstable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string/>
               </property>
               <property name="styleSheet">
                <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
@@ -517,7 +517,16 @@ margin:1px;</string>
             <item row="1" column="0">
              <widget class="QDoubleSpinBox" name="accelTau">
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Adjusts how much smoothing is given to the accelerometers in the attitude calculation. Incrementing this value can help mitigating the effect of vibrations but a too high value may make the attitude unstable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Accelerometer filtering.
+
+Sets the amount of lowpass filtering of accelerometer data 
+for the attitude estimation. Higher values apply a stronger 
+filter, which may help with drifting in attitude mode.
+
+Range: 0.00 - 0.20, Good starting value: 0.05 - 0.10
+Start low and raise until drift stops.
+
+A setting of 0.00 disables the filter.</string>
               </property>
               <property name="maximum">
                <double>2.000000000000000</double>

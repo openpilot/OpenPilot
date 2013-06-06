@@ -81,7 +81,7 @@ endif
 
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
 
-# Changing PYTHON_DIR, also update it in ground\openpilotgcs\src\app\gcsversioninfo.pri
+# Changing PYTHON_DIR, also update it in ground/openpilotgcs/src/python.pri
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
 QT_SDK_DIR      := $(TOOLS_DIR)/qt-4.8.4
 MINGW_DIR       := $(TOOLS_DIR)/mingw-4.4.0

@@ -125,7 +125,7 @@ static int32_t comUsbBridgeInitialize(void)
 
     return 0;
 }
-MODULE_INITCALL(comUsbBridgeInitialize, comUsbBridgeStart)
+MODULE_INITCALL(comUsbBridgeInitialize, comUsbBridgeStart);
 
 /**
  * Main task. It does not return.

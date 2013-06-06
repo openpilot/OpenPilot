@@ -107,7 +107,7 @@ int32_t osdinputInitialize(void)
 
     return 0;
 }
-MODULE_INITCALL(osdinputInitialize, osdinputStart)
+MODULE_INITCALL(osdinputInitialize, osdinputStart);
 
 // ****************
 /**

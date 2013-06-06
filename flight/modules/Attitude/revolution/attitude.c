@@ -241,7 +241,7 @@ int32_t AttitudeStart(void)
     return 0;
 }
 
-MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
+MODULE_INITCALL(AttitudeInitialize, AttitudeStart);
 
 /**
  * Module thread, should not return.

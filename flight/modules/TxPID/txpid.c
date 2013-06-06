@@ -138,7 +138,7 @@ int32_t TxPIDStart(void)
     return 0;
 }
 
-MODULE_INITCALL(TxPIDInitialize, TxPIDStart)
+MODULE_INITCALL(TxPIDInitialize, TxPIDStart);
 
 /**
  * Update PIDs callback function

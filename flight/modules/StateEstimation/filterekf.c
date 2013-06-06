@@ -427,6 +427,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     for (t = 0; t < EKFSTATEVARIANCE_P_NUMELEM; t++) {
         if (invalid_var(vardata.P[t])) {
             INSResetP(this->ekfConfiguration.P);
+            this->init_stage = -1;
             break;
         }
     }
@@ -434,7 +435,11 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     // all sensor data has been used, reset!
     this->work.updated = 0;
 
-    return 0;
+    if (this->init_stage < 0) {
+        return 2;
+    } else {
+        return 0;
+    }
 }
 
 // check for invalid variance values

@@ -38,7 +38,7 @@
  * and we cannot define a linker script for each of them atm
  */
 
-#define MODULE_INITCALL(ifn, sfn);
+#define MODULE_INITCALL(ifn, sfn)
 
 #define MODULE_TASKCREATE_ALL
 

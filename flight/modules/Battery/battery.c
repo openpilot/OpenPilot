@@ -122,7 +122,7 @@ int32_t BatteryInitialize(void)
     return 0;
 }
 
-MODULE_INITCALL(BatteryInitialize, 0)
+MODULE_INITCALL(BatteryInitialize, 0);
 #define HAS_SENSOR(x) batterySettings.SensorType[x] == FLIGHTBATTERYSETTINGS_SENSORTYPE_ENABLED
 static void onTimer(__attribute__((unused)) UAVObjEvent *ev)
 {

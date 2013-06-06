@@ -7,5 +7,7 @@
 *.sh		text eol=lf
 
 /doxygen/*				text eol=lf
-/templates/*.txt			text eol=crlf
 /uncrustify/*.cfg			text eol=lf
+
+/templates/*.txt			text eol=crlf
+/templates/build-info.txt 		text eol=lf

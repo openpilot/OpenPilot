@@ -139,7 +139,7 @@ int32_t ActuatorInitialize()
 
     return 0;
 }
-MODULE_INITCALL(ActuatorInitialize, ActuatorStart)
+MODULE_INITCALL(ActuatorInitialize, ActuatorStart);
 
 /**
  * @brief Main Actuator module task

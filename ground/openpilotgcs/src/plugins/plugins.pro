@@ -28,10 +28,10 @@ plugin_welcome.subdir = welcome
 plugin_welcome.depends = plugin_coreplugin
 SUBDIRS += plugin_welcome
 
-# RawHID connection plugin
-SUBDIRS += plugin_rawhid
-plugin_rawhid.subdir = rawhid
-plugin_rawhid.depends = plugin_coreplugin
+# opHID connection plugin
+SUBDIRS += plugin_opHID
+plugin_opHID.subdir = ophid
+plugin_opHID.depends = plugin_coreplugin
 
 # Serial port connection plugin
 SUBDIRS += plugin_serial
@@ -93,7 +93,7 @@ plugin_uploader.subdir = uploader
 plugin_uploader.depends = plugin_coreplugin
 plugin_uploader.depends += plugin_uavobjects
 plugin_uploader.depends += plugin_uavtalk
-plugin_uploader.depends += plugin_rawhid
+plugin_uploader.depends += plugin_opHID
 plugin_uploader.depends += plugin_uavobjectutil
 SUBDIRS += plugin_uploader
 

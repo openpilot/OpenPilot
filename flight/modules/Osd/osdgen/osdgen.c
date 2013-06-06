@@ -2436,7 +2436,7 @@ int32_t osdgenInitialize(void)
 
     return 0;
 }
-MODULE_INITCALL(osdgenInitialize, osdgenStart)
+MODULE_INITCALL(osdgenInitialize, osdgenStart);
 
 // ****************
 /**

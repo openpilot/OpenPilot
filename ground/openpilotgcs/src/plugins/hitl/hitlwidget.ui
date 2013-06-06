@@ -187,6 +187,12 @@ color: rgba(0, 0, 0, 128);
         </property>
         <item>
          <widget class="QPushButton" name="startButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="toolTip">
            <string>Request update</string>
           </property>
@@ -208,7 +214,7 @@ color: rgba(0, 0, 0, 128);
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>10</width>
+            <width>5</width>
             <height>20</height>
            </size>
           </property>
@@ -218,6 +224,12 @@ color: rgba(0, 0, 0, 128);
          <widget class="QPushButton" name="stopButton">
           <property name="enabled">
            <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
           <property name="toolTip">
            <string>Send update</string>
@@ -348,22 +360,6 @@ color: rgba(0, 0, 0, 128);
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Preferred</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>10</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
          <spacer name="horizontalSpacer_6">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -390,7 +386,7 @@ color: rgba(0, 0, 0, 128);
          </widget>
         </item>
         <item>
-         <spacer name="horizontalSpacer_8">
+         <spacer name="horizontalSpacer_3">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -399,27 +395,44 @@ color: rgba(0, 0, 0, 128);
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>5</width>
+            <width>10</width>
             <height>20</height>
            </size>
           </property>
          </spacer>
         </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
+        <item alignment="Qt::AlignRight">
          <widget class="QPushButton" name="buttonClearLog">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>140</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="sizeIncrement">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Clear Log</string>
           </property>
@@ -466,6 +479,12 @@ color: rgba(0, 0, 0, 128);
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>startButton</tabstop>
+  <tabstop>stopButton</tabstop>
+  <tabstop>buttonClearLog</tabstop>
+  <tabstop>textBrowser</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

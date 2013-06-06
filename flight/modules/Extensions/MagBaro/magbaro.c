@@ -123,7 +123,7 @@ int32_t MagBaroInitialize()
     }
     return 0;
 }
-MODULE_INITCALL(MagBaroInitialize, MagBaroStart)
+MODULE_INITCALL(MagBaroInitialize, MagBaroStart);
 /**
  * Module thread, should not return.
  */

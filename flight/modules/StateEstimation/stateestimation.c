@@ -296,7 +296,7 @@ int32_t StateEstimationStart(void)
     return 0;
 }
 
-MODULE_INITCALL(StateEstimationInitialize, StateEstimationStart)
+MODULE_INITCALL(StateEstimationInitialize, StateEstimationStart);
 
 
 /**

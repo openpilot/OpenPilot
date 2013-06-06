@@ -68,7 +68,7 @@ int32_t WavPlayerInitialize(void)
 {
     return 0;
 }
-MODULE_INITCALL(WavPlayerInitialize, WavPlayerStart)
+MODULE_INITCALL(WavPlayerInitialize, WavPlayerStart);
 
 // ****************
 /**

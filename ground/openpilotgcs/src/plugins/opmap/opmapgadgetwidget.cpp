@@ -2170,21 +2170,30 @@ bool OPMapGadgetWidget::getUAVPosition(double &latitude, double &longitude, doub
 
     Q_ASSERT(obm != NULL);
 
+    PositionState *positionState = PositionState::GetInstance(obm);
+    Q_ASSERT(positionState != NULL);
+    PositionState::DataFields positionStateData = positionState->getData();
+    if (positionStateData.North == 0 && positionStateData.East == 0 && positionStateData.Down == 0) {
+        GPSPositionSensor *gpsPositionObj = GPSPositionSensor::GetInstance(obm);
+        Q_ASSERT(gpsPositionObj);
+
+        GPSPositionSensor::DataFields gpsPositionData = gpsPositionObj->getData();
+        latitude  = gpsPositionData.Latitude / 1.0e7;
+        longitude = gpsPositionData.Longitude / 1.0e7;
+        altitude  = gpsPositionData.Altitude;
+        return true;
+    }
     HomeLocation *homeLocation = HomeLocation::GetInstance(obm);
     Q_ASSERT(homeLocation != NULL);
     HomeLocation::DataFields homeLocationData = homeLocation->getData();
 
-    homeLLA[0] = homeLocationData.Latitude / 1e7;
-    homeLLA[1] = homeLocationData.Longitude / 1e7;
+    homeLLA[0] = homeLocationData.Latitude / 1.0e7;
+    homeLLA[1] = homeLocationData.Longitude / 1.0e7;
     homeLLA[2] = homeLocationData.Altitude;
 
-    PositionState *positionState = PositionState::GetInstance(obm);
-    Q_ASSERT(positionState != NULL);
-    PositionState::DataFields positionStateData = positionState->getData();
-
-    NED[0] = positionStateData.North;
-    NED[1] = positionStateData.East;
-    NED[2] = positionStateData.Down;
+    NED[0]     = positionStateData.North;
+    NED[1]     = positionStateData.East;
+    NED[2]     = positionStateData.Down;
 
     Utils::CoordinateConversions().NED2LLA_HomeLLA(homeLLA, NED, LLA);
 

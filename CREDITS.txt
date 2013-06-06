@@ -1,206 +1,77 @@
-This is a credits file of people that are or have been key contributors to the OpenPilot code base in this Git repository. 
-Without the work of the people in this file and many that are not who help the community, OpenPilot would not be what it is today.
-
-It is sorted alphabetically by name and formatted so that it allows for easy grepping and beautification by scripts.
-
-The fields are:
-
-Name (N)
-Description of work (D)
-Current maintainer function (M)
-
-----------
-
-N: Connor Abbott
-D: Win32 OpenPilot port
-
-N: David Ankers
-D: Co-founder, Project Coordination
-D: Minor GCS infrastructure, updating the credit file
-M: Admin
-
-N: Sergiy Anikeyev
-D: Improvments to Camera Gimbal control
-
-N: Pedro Assuncao
-D: Initial GCS Settings Gadget work
-
-N: Fredrik Arvidsson
-D: GCS Setup Wizard
-M: GCS Setup Wizard
-
-N: Werner Backes
-D: Port of CopterControl to PS3 Move Controller (MoveCopter)
-
-N: Jose Barros
-D: Next-Gen OP Map Lib, Y-Modem Library, Uploader Plugin
-D: OP Bootloader, AHRS Bootloader, OPUploadTool and much else
-M: Bootloader, OP MAP Lib 
-
-N: David "Buzz" Carlson
-D: 3D ModelView GCS Plugin, sponsor of HITL merge work and XPlane addition
-
-N: James Cotton
-D: Multiplatform HID implementation (firmware & GCS), GCS Joystick control
-D: Posix OpenPilot work and Mac implementation
-D: Firmware implementation of Professor Schinstock's INS/GPS
-D: Android GCS and much else
-M: Architecture co-lead, Android GCS Lead
-
-N: Steve Doll
-D: Much Artwork, Logo rework, Welcome page design
-
-N: Piotr Esden-Tempski
-D: Floss-JTAG Rev A, 4-layer initial design
-
-N: Richard Flay
-D: Multiple fixes / Review guru
-
-N: Darren Furniss
-D: GCS Artwork and Android GCS Artwork
-
-N: Frederic Goddeeris
-D: I2C work and FreeRTOS work, MK integration
-D: EagleTree OSD implementation
-
-N: Daniel Godin
-D: Sponsor: Notify Plugin for the GCS
-
-N: Bani Greyling
-D: GCS Scope plugin
-
-N: Nuno Guedes
-D: 3D artwork, moving surfaces and work on ModelView
-D: PFD Artwork
-
-N: Erik Gustavsson
-D: Attitude LPF improvments to Self Level
-
-N: Peter Gunnarsson
-D: GCS Core Developer
-D: Multiple GCS plugins, Gadget foundations, UAVObject viewer
-
-N: Dean Hall
-D: Creator of http://pythononachip.org
-
-N: Joe Hlebasko
-D: Early versions of Main Board & Production OP GPS
-M: Hardware Architecture Team
-
-N: Andy Honecker
-D: Hardware design review and optimisation
-
-N: Mark James
-D: Some of Silk Icon set used in GCS - http://www.famfamfam.com/lab/icons/silk
-
-N: Sami Korhonen
-D: GPS Module, Spektrum RC Module, OSD work
-M: OpenPilot OSD
-
-N: Thorsten Klose
-D: Embedded STM32 infrastructure
-
-N: Hallvard Kristiansen
-D: GCS Artwork, Quad layout diagrams
-
-N: Mike Labranche
-D: Tab bar Telem Monitor
-
-N: Edouard Lafargue
-D: GCS Dial Plugins, GCS PFD Plugin, GCS GPS plugin, GCS Config plugin
-D: Artwork including standard display dials
-
-N: Matt Lipski
-D: Deluxe Dials Set artwork, (Artificial Horizon, Compass, Turn Indicator)
-
-N: Les Newell
-D: Advanced mixer matrix, SPI protocol based on UAVObjects, feedforward
-
-N: Ken Northup
-D: 3D Modelling, Easystar adaption from FMS
-
-N: Guy McCaldin
-D: Artwork and design including work on the Deluxe Dial Set
-
-N: Alessio Morale
-D: Firmware/Architecture Lead
-
-N: Cathy Moss
-D: Hardware design Lead: Gen 2 Mainboard, PipXtreme, Current Sensor
-D: PipXtreme designer, creator OP Map Plugin
-
-N: Angus Peart
-D: Co-founder, Principal hardware architect.
-D: Hardware design of early OpenPilot, AHRS, GPS and other hardware
-
-N: Dmytro Poplavskiy
-D: QML PFD, QML Welcome page
-M: Qml plugins
-
-N: Eric Price
-D: IL2 HITL GCS Plugin, Posix OpenPilot, Advanced stabilisation module
-M: SITL Posix, SLAM work
-
-N: Richard Querin
-D: Graphic Design, OpenPilot Logo
-
-N: Laurent Ribon
-D: The GLC_lib as used in the ModelView Plugin
-D: See: http://www.glc-lib.net/
-
-N: Julien Rouviere
-D: GCS Framework and Plugins for the GCS
-
-N: Zik Saleeba
-D: Initial schematic based on Zik's Flying Fox schematic
-
-N: Professor Dale Schinstock
-D: Lead INS Developer
-D: Creator of the OpenPilot INS / EKF
-
-N: Professor Kenn Sebesta
-D: Lead Fixed Wing Developer CC3D / Controls
-D: GCS improvments including HiTL Merge
-M: Fixed Wing support CC3D
-
-N: Oleg Semyonov
-D: Core Developer & Project organisation
-D: TxPID module
-M: CameraStab module
-M: Common part of multi-platform packaging system
-M: Windows NSIS Installer
-
-N: Stacey Sheldon
-D: Core Embedded Developer
-D: SPI protocol for AHRS, I2C rewrite and much core work
-
-N: Troy Schultz
-D: INS design review and optimisation
-
-N: Dr. Erhard Siegl
-D: Configuration engine for the GCS
-
-N: Pete Stapley
-D: PPM inputs
-
-N: Rowan Taubitz
-D: Hardware debugging and testing, creation of 2-layer Floss-JTAG Rev B
-D: Creation of Next-Gen FOSS-JTAG board
-
-N: Andrew Thoms
-D: IP Telemtry plugin for the GCS
-D: Helicopter support code and mixing for CCPM
-
-N: Vassilis Varveropoulos
-D: Co-founder, Principal embedded software architect.
-D: Module architecture and UAVTalk/UAVObjects implementation.
-
-N: Alex Vrubel
-D: Russian translation of the GCS
-
-N: Brian Webb
-D: Modem lead developer
-M: OP Modems
-
-N: Dmitriy Zaitsev
-D: AeroSim-RC HiTL plugin
+Connor Abbott
+David Ankers
+Sergiy Anikeyev
+Pedro Assuncao
+Fredrik Arvidsson
+Werner Backes
+Jose Barros
+Pete  Boehl
+David Carlson
+James Cotton
+Steve Doll
+Piotr Esden-Tempski
+Richard Flay
+Peter Farnworth
+Ed Faulkner
+Darren Furniss
+Frederic Goddeeris
+Daniel Godin
+Bani Greyling
+Nuno Guedes
+Erik Gustavsson
+Peter Gunnarsson
+Dean Hall
+Joe Hlebasko
+Andy Honecker
+Ryan Hunt
+Mark James
+Sami Korhonen
+Thorsten Klose
+Hallvard Kristiansen
+Edouard Lafargue
+Mike Labranche
+Fredrik Larsson
+Pablo Lema
+David Llama
+Matt Lipski
+Les Newell
+Ken Northup
+Greg Matthews
+Guy McCaldin
+Gary Mortimer
+Alessio Morale
+Cathy Moss
+Angus Peart
+Dmytro Poplavskiy
+Eric Price
+Richard Querin
+Randy Ram
+Philippe Renon
+Laurent Ribon
+Mathieu Rondonneau
+Julien Rouviere
+Jackson Russell
+Zik Saleeba
+Professor Dale Schinstock
+Professor Kenn Sebesta
+Oleg Semyonov
+Stacey Sheldon
+Troy Schultz
+Dr. Erhard Siegl
+Mike Smith
+Alex Sowa
+Pete Stapley
+Vova Starikh
+Rowan Taubitz
+Andrew Thoms
+Philippe Vanhaesendonck
+Jasper van Loenen
+Vassilis Varveropoulos
+Kevin Vertucio
+Alex Vrubel
+Brian Webb
+Justin Welander
+Mat Wellington
+Kendal Wells
+David Willis
+Dmitriy Zaitsev

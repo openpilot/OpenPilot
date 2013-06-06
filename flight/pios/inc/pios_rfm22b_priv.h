@@ -794,6 +794,8 @@ struct pios_rfm22b_dev {
     bool         send_status;
     bool         send_ppm;
     bool         send_connection_request;
+    bool         send_ack_nack;
+    bool         resend_packet;
 
     // The initial frequency
     uint32_t     init_frequency;

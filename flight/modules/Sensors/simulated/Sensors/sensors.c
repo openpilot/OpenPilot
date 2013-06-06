@@ -134,7 +134,7 @@ int32_t SensorsStart(void)
     return 0;
 }
 
-MODULE_INITCALL(SensorsInitialize, SensorsStart)
+MODULE_INITCALL(SensorsInitialize, SensorsStart);
 
 /**
  * Simulated sensor task.  Run a model of the airframe and produce sensor values

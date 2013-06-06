@@ -122,7 +122,7 @@ int32_t AltitudeInitialize()
     HwSettingsCC_RcvrPortGet(&hwsettings_rcvrport);
     return 0;
 }
-MODULE_INITCALL(AltitudeInitialize, AltitudeStart)
+MODULE_INITCALL(AltitudeInitialize, AltitudeStart);
 /**
  * Module thread, should not return.
  */

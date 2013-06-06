@@ -62,7 +62,7 @@ public:
     }
     QString category() const
     {
-        return "Serial Telemetry";
+        return "Telemetry - Serial";
     }
     QString trCategory() const
     {

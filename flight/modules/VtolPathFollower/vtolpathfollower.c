@@ -147,7 +147,7 @@ int32_t VtolPathFollowerInitialize()
     return 0;
 }
 
-MODULE_INITCALL(VtolPathFollowerInitialize, VtolPathFollowerStart)
+MODULE_INITCALL(VtolPathFollowerInitialize, VtolPathFollowerStart);
 
 static float northVelIntegral = 0;
 static float eastVelIntegral  = 0;

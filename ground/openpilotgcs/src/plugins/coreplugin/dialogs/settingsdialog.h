@@ -75,6 +75,8 @@ private:
     bool m_applied;
     QString m_currentCategory;
     QString m_currentPage;
+
+    QTreeWidgetItem *addPage(IOptionsPage *page);
 };
 } // namespace Internal
 } // namespace Core

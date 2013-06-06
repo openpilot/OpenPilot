@@ -423,14 +423,14 @@ bool UAVObjectUtilManager::descriptionToStructure(QByteArray desc, deviceDescrip
 {
     if (desc.startsWith("OpFw")) {
         /*
-         * This looks like a binary with a description at the end
-         *  4 bytes: header: "OpFw"
-         *  4 bytes: git commit hash (short version of SHA1)
-         *  4 bytes: Unix timestamp of last git commit
-         *  2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
-         *  26 bytes: commit tag if it is there, otherwise "Unreleased". Zero-padded
+         * This looks like a binary with a description at the end:
+         *   4 bytes: header: "OpFw".
+         *   4 bytes: GIT commit tag (short version of SHA1).
+         *   4 bytes: Unix timestamp of compile time.
+         *   2 bytes: target platform. Should follow same rule as BOARD_TYPE and BOARD_REVISION in board define files.
+         *  26 bytes: commit tag if it is there, otherwise branch name. '-dirty' may be added if needed. Zero-padded.
          *  20 bytes: SHA1 sum of the firmware.
-         *  20 bytes: SHA1 sum of the UAVO definition files.
+         *  20 bytes: SHA1 sum of the uavo definitions.
          *  20 bytes: free for now.
          */
 

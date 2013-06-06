@@ -23,7 +23,7 @@
     <message>
         <location line="+38"/>
         <source>OpenPilot GCS - Plugin loader messages</source>
-        <translation type="unfinished">Openpilot GCS - Messages du chargeur de modules complémentaires</translation>
+        <translation type="unfinished">OpenPilot GCS - Messages du chargeur de modules complémentaires</translation>
     </message>
 </context>
 <context>
@@ -158,12 +158,12 @@
     <message>
         <location line="+168"/>
         <source>About &amp;OpenPilot GCS</source>
-        <translation>A propos d&apos;&amp;Openpilot GCS</translation>
+        <translation>A propos d&apos;&amp;OpenPilot GCS</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>About &amp;OpenPilot GCS...</source>
-        <translation>A propos d&apos;&amp;Openpilot GCS...</translation>
+        <translation>A propos d&apos;&amp;OpenPilot GCS...</translation>
     </message>
     <message>
         <location line="-164"/>
@@ -415,7 +415,7 @@
     <message>
         <location filename="../../../src/plugins/coreplugin/versiondialog.cpp" line="+57"/>
         <source>About OpenPilot GCS</source>
-        <translation>A propos d&apos;Openpilot GCS</translation>
+        <translation>A propos d&apos;OpenPilot GCS</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -2175,8 +2175,8 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location line="+2"/>
-        <source>Notify Plugin</source>
-        <translation>Plugin de Notification</translation>
+        <source>Notification</source>
+        <translation>Notification</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
@@ -12844,7 +12844,7 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Sélection du type de véhicule&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour continuer, l&apos;assistant a besoin de connaître sur quel type de véhicule la carte Openpilot va être utilisée. Cette étape est cruciale car une grande partie de la configuration qui suit est spécifique au type de véhicule.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Pour continuer, l&apos;assistant a besoin de connaître sur quel type de véhicule la carte OpenPilot va être utilisée. Cette étape est cruciale car une grande partie de la configuration qui suit est spécifique au type de véhicule.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Allez-y et sélectionnez le type de véhicule pour lequel vous souhaitez créer une configuration.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
@@ -14471,12 +14471,12 @@ or power cycle to force a board reset.</source>
     <message>
         <location line="-141"/>
         <location line="+141"/>
-        <source>Please disconnect all openpilot boards</source>
+        <source>Please disconnect your OpenPilot board</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
-        <source>Please connect the board (USB only!)</source>
+        <source>Please connect your OpenPilot board (USB only!)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -14486,7 +14486,7 @@ or power cycle to force a board reset.</source>
     </message>
     <message>
         <location line="+16"/>
-        <source>Openpilot Uploader</source>
+        <source>OpenPilot Uploader</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

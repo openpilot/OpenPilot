@@ -541,7 +541,7 @@ bool UploaderGadgetWidget::autoUpdate()
     connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
     while (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0) {
         emit autoUpdateSignal(WAITING_DISCONNECT, QVariant());
-        if (QMessageBox::warning(this, tr("OpenPilot Uploader"), tr("Please disconnect all openpilot boards"), QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
+        if (QMessageBox::warning(this, tr("OpenPilot Uploader"), tr("Please disconnect your OpenPilot board"), QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
             emit autoUpdateSignal(FAILURE, QVariant());
             return false;
         }
@@ -684,7 +684,7 @@ void UploaderGadgetWidget::systemRescue()
     log("**********************************************************");
     log("You will be prompted to first connect USB, then system power");
     if (USBMonitor::instance()->availableDevices(0x20a0, -1, -1, -1).length() > 0) {
-        if (QMessageBox::warning(this, tr("OpenPilot Uploader"), tr("Please disconnect all openpilot boards"), QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
+        if (QMessageBox::warning(this, tr("OpenPilot Uploader"), tr("Please disconnect your OpenPilot board"), QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel) {
             m_config->rescueButton->setEnabled(true);
             return;
         }
@@ -695,7 +695,7 @@ void UploaderGadgetWidget::systemRescue()
     log("** Follow those instructions to attempt a system rescue **");
     log("**********************************************************");
     log("You will be prompted to first connect USB, then system power");
-    m_progress = new QProgressDialog(tr("Please connect the board (USB only!)"), tr("Cancel"), 0, 20);
+    m_progress = new QProgressDialog(tr("Please connect your OpenPilot board (USB only!)"), tr("Cancel"), 0, 20);
     QProgressBar *bar = new QProgressBar(m_progress);
     bar->setFormat("Timeout");
     m_progress->setBar(bar);
@@ -710,7 +710,7 @@ void UploaderGadgetWidget::systemRescue()
     if (!m_timer->isActive()) {
         m_progress->close();
         m_timer->stop();
-        QMessageBox::warning(this, tr("Openpilot Uploader"), tr("No board connection was detected!"));
+        QMessageBox::warning(this, tr("OpenPilot Uploader"), tr("No board connection was detected!"));
         m_config->rescueButton->setEnabled(true);
         return;
     }
@@ -957,7 +957,7 @@ void UploaderGadgetWidget::versionMatchCheck()
     UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
     deviceDescriptorStruct boardDescription = utilMngr->getBoardDescriptionStruct();
     QByteArray uavoHashArray;
-    QString uavoHash = VersionInfo::uavoHash();
+    QString uavoHash = VersionInfo::uavoHashArray();
 
     uavoHash.chop(2);
     uavoHash.remove(0, 2);

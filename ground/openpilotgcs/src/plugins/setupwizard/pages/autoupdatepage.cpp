@@ -70,7 +70,7 @@ void AutoUpdatePage::updateStatus(uploader::AutoUpdateStep status, QVariant valu
         break;
     case uploader::SUCCESS:
         enableButtons(true);
-        ui->statusLabel->setText("Board Updated, please press the 'next' button below");
+        ui->statusLabel->setText("Board updated, please press 'Next' to continue");
         break;
     case uploader::FAILURE:
         getWizard()->setWindowFlags(getWizard()->windowFlags() | Qt::WindowStaysOnTopHint);

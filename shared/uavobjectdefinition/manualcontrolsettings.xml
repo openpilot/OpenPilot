@@ -23,7 +23,7 @@
         <field name="Stabilization1Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw"
 		options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,RelayRate,RelayAttitude"
-		defaultvalue="Attitude,Attitude,Rate"
+		defaultvalue="Attitude,Attitude,AxisLock"
 		limits="%NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude;"/>
         <field name="Stabilization2Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw"
@@ -33,7 +33,7 @@
         <field name="Stabilization3Settings" units="" type="enum"
 		elementnames="Roll,Pitch,Yaw"
 		options="None,Rate,Attitude,AxisLock,WeakLeveling,VirtualBar,RelayRate,RelayAttitude"
-		defaultvalue="Attitude,Attitude,Rate"
+		defaultvalue="Rate,Rate,Rate"
 		limits="%NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude; %NE:RelayRate:RelayAttitude;"/>
 
 	<!-- Note these options values should be identical to those defined in FlightMode -->
@@ -44,7 +44,7 @@
                type="enum"
                elements="6"
                options="Manual,Stabilized1,Stabilized2,Stabilized3,Autotune,AltitudeHold,VelocityControl,PositionHold,ReturnToBase,Land,PathPlanner,POI"
-               defaultvalue="Manual,Stabilized1,Stabilized2,Stabilized3,AltitudeHold,PositionHold"
+               defaultvalue="Stabilized1,Stabilized2,Stabilized3,AltitudeHold,PositionHold,Manual"
                limits="\
                        %0401NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\
                        %0402NE:Autotune:AltitudeHold:VelocityControl:PositionHold:ReturnToBase:Land:PathPlanner:POI,\

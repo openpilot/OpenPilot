@@ -241,20 +241,18 @@ QString UAVSettingsImportExportFactory::createXMLDocument(const enum storedData 
     versionInfo.appendChild(hw);
 
     QDomElement fw = doc.createElement("firmware");
+    QString uavo   = board.uavoHash.toHex();
+    fw.setAttribute("tag", board.gitTag);
     fw.setAttribute("date", board.gitDate);
     fw.setAttribute("hash", board.gitHash);
-    fw.setAttribute("tag", board.gitTag);
+    fw.setAttribute("uavo", uavo.left(8));
     versionInfo.appendChild(fw);
 
-    QString gcsRevision = VersionInfo::revision();
-    QString gcsGitDate  = gcsRevision.mid(gcsRevision.indexOf(" ") + 1, 14);
-    QString gcsGitHash  = gcsRevision.mid(gcsRevision.indexOf(":") + 1, 8);
-    QString gcsGitTag   = gcsRevision.left(gcsRevision.indexOf(":"));
-
-    QDomElement gcs     = doc.createElement("gcs");
-    gcs.setAttribute("date", gcsGitDate);
-    gcs.setAttribute("hash", gcsGitHash);
-    gcs.setAttribute("tag", gcsGitTag);
+    QDomElement gcs = doc.createElement("gcs");
+    gcs.setAttribute("tag", VersionInfo::tagOrBranch() + VersionInfo::dirty());
+    gcs.setAttribute("date", VersionInfo::dateTime());
+    gcs.setAttribute("hash", VersionInfo::hash().left(8));
+    gcs.setAttribute("uavo", VersionInfo::uavoHash().left(8));
     versionInfo.appendChild(gcs);
 
     // create settings and/or data elements

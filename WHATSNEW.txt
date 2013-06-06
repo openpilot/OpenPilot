@@ -1,0 +1,505 @@
+--- RELEASE-13.06 --- Italian Stallion Release ---
+
+This is the first official OpenPilot Revolution software release. This version
+also supports the CopterControl, CC3D, OPLinkMini and the upcoming OP OSD.
+There a number of significant backend changes in this version compared to
+previous software releases: from new toolchains and build system to a source
+code reformatting that is inline with our project style guidelines.
+
+The goal of this release is to provide CC3D-style features for the new
+Revolution platform (using the Revo's internal modem and external OPLinkMini
+board). Advanced features such as Altitude Hold, Position Hold, Guidance,
+Return to Home, and AutoLanding are still in development and will be available
+in future releases. The availability of those features will depend on how many
+people are able to contribute with code, testing and documentation.
+
+Remember that the first Revo hardware batch was intended for developers/
+bleeding-edge testers, not end users who want a 100% final platform.
+
+- New bootloaders are REQUIRED for this release to support new features such
+  as erase settings and others. As always, bootloaders can be updated without
+  any special programmer hardware using the bootloader updater firmware files.
+- F1 boards (CC, CC3D, OPLinkMini) require bootloader version 4 or higher.
+- F4 boards (Revolution, OSD prototype) require bootloader version 5 or higher.
+- Check the wiki for details of how to update them:
+  http://wiki.openpilot.org/display/BUILDS/Bootloader+update
+
+Please remember to take a moment to view these important tutorials:
+  http://wiki.openpilot.org/display/Doc/OpenPilot+Tutorials
+
+What's New / Release Notes
+--------------------------
+
+NEW:
+
+- Firmware folders removed.
+  The firmware files folder has been removed in this release. These files
+  are now integrated into the GCS so they are always up to date and there is
+  less risk of a firmware mismatch. To update your firmware you must use
+  either Vehicle Setup Wizard (big green button at the top right on the
+  Welcome GCS tab) or the new Auto-Update button on the GCS Firmware tab.
+
+- Responsiveness sliders.
+  To simplify tuning, we have introduced a new Responsiveness slider that
+  will allow you to modify stick response. For best results, you should
+  still tune your system with PIDs as tight as possible for better
+  stabilisation. This will result in better stabilisation, and at the
+  same time soft or sharp response according to your preferences.
+
+- Auto-Update firmware.
+  This feature simplifies all OpenPilot board firmware updates. Now all
+  you have to do is click "Auto-update" on the Firmware tab and follow the
+  instructions to reflash your OpenPilot board. This is essentially the
+  same as Rescue but uses the embedded firmware images so there is no need
+  to browse for them anymore.
+
+- Erase Settings Option.
+  We previously had a hacky way to delete bad or incompatible settings from
+  our OpenPilot boards. This old special firmware that did this is now
+  deprecated and the functionality is now integrated into the latest
+  bootloaders and firmwares.
+
+  To erase settings enter DFU (boot) mode (using Halt or Rescue function)
+  and click the "Erase settings" button on the Firmware tab and follow the
+  instructions. This will NOT work with an older bootloader and the "Erase
+  settings" button will be disabled if an out of date bootloader is detected.
+
+- Language defaults.
+  GCS now uses the system default language (only French and English are
+  available currently, please contribute translations). You can change the
+  language in the GCS Options at any time.
+
+- CDC driver install option (Windows only).
+  This is an optional USB virtual serial port that is useful, for example,
+  for updating your GPS configuration using the U-Blox u-Center software.
+  It is NOT required for normal configuration of OpenPilot boards. If it is
+  not installed, virtual serial port features will not be available. This
+  driver is not signed by Microsoft, but in fact it uses serial port drivers
+  from Windows and only the driver information INF file is supplied by
+  OpenPilot.
+
+- Lots of help tooltips were added to the GCS. Hovering your mouse over an
+  option in the GCS will show them, please review for help during tuning/
+  setting up.
+
+- A large amount of general improvements, code clean ups and minor bugs
+  resolved.
+
+KNOWN ISSUES:
+
+- On Linux you should remove the OpenPilot package if it was previously
+  installed, then install this new one. This is a known issue and likely
+  be fixed later.
+
+- Due to changes in USB descriptors to support new features, USB drivers
+  on Windows must be updated. If after using Rescue or Wizard or Auto-Update
+  button the GCS cannot connect to the board, you may be experiencing this
+  USB issue. To resolve it you should remove the old drivers (ones with
+  yellow exclamation mark) and allow Windows to find them again.
+
+  Here is how to do it:
+
+  Windows XP:
+   - Right click on "My Computer" on your desktop and select "Properties".
+   - Select the "Hardware" tab.
+   - Select the "Device Manager".
+   - Scroll down the list until you see the "Universal Serial Bus Controllers"
+     selection.
+   - Click it to expand the list of USB drivers. Right-click on the driver(s)
+     you wish to uninstall and select "Uninstall".
+
+  Windows 7/Vista:
+   - Right click on "My Computer" on your desktop and select "Properties".
+   - Select "Device Manager" in the upper left-hand corner of the window.
+   - Scroll down the list until you see the "Universal Serial Bus Controllers"
+     selection.
+   - Click it to expand the list of USB drivers. Right-click on the driver(s)
+     you wish to uninstall and select "Uninstall".
+
+  Then disconnect the board from USB, wait few seconds and re-connect it to
+  your computer. Windows should find new drivers and install them properly.
+
+- If GCS crashes when switching to the Flight Data tab, it usually means
+  your PC needs newer video drivers. That tab contains a ModelView widget
+  which uses OpenGL. It is known to crash on some graphics cards with old
+  and buggy drivers.
+
+- Sensor calibration is not final. It will be reworked completely to
+  increase its accuracy and make it easier to use.
+
+- AltitudeHold mode is enabled, but it is not officially supported. Do
+  not expect it to work perfectly and be considered production quality.
+  You may play with it and report your issues and suggestions at your own
+  risk. If you are not using a case for your Revo, we strongly recommend
+  covering the barometer sensor with some foam to shield the sensor from
+  wind and light.
+
+- Note that throttle stick in AltitudeHold mode is used to control vertical
+  velocity, sometimes called vario altitude in other platforms, centre stick
+  means hold altitude and there is a dead band around centre stick.
+
+- There are currently no configuration options for the Radio module in
+  the Revolution except for Radio enable/disable and output power. This is
+  intentional because all configuration should be done using its paired
+  ground OPLink coordinator.
+
+  How to configure the Revolution to OPLinkMini radio link:
+
+  - Make sure you have the newest bootloaders and matching firmwares
+    between the Revolution, GCS and OPLink.
+  - Enable the radio in the Revolution, click save and disconnect the board
+    from USB.
+  - Power it from external supply to continue.
+  - Then connect the OPLink board to USB and scroll down in the GCS config
+    widget to find OPLink icon at the end of list. This icon is only
+    available when an OPLink is detected.
+  - To pair the two radios, select the Revolution side radio address in the
+    list of found boards, select it, click Add to add to the list of paired
+    radios and click Save. After unplugging the board from the USB and
+    plugging back your OPLink it should show "Connected", and you can
+    continue with the configuration.
+
+- Do not set the Revolution modem or OPLinkMini output power to high values
+  without antenna connected, this can damage the hardware.
+
+JIRA issues addressed in this release:
+
+Due to major rework of all code and integration of Revo code into mainline
+(next) it is almost impossible to list all corresponding JIRA issues for the
+list above. Some of them can be found using this link:
+  http://progress.openpilot.org/issues/?filter=10860
+
+OP-678, OP-693, OP-719, OP-726, OP-727, OP-747, OP-761, OP-769, OP-770,
+OP-772, OP-792, OP-804, OP-807, OP-812, OP-816, OP-817, OP-820, OP-821,
+OP-843, OP-846, OP-854, OP-855, OP-856, OP-861, OP-864, OP-867, OP-871,
+OP-873, OP-874, OP-875, OP-879, OP-885, OP-886, OP-888, OP-889, OP-890,
+OP-891, OP-892, OP-893, OP-894, OP-895, OP-896, OP-897, OP-898, OP-899,
+OP-900, OP-903, OP-905, OP-906, OP-907, OP-910, OP-912, OP-917, OP-920,
+OP-925, OP-926, OP-928, OP-935, OP-936, OP-939, OP-952, OP-955, OP-957,
+OP-968, OP-969, OP-970, OP-977, OP-980, OP-981, OP-982, OP-983, OP-987,
+OP-988, OP-989
+
+Short summary of changes. For a complete list see the git log.
+
+Flight code changes:
+- initial version of Revo code;
+- initial version of OPLinkMini code;
+- CopterControl/CC3D code reworked to reuse parts of Revo code;
+- switched to new ARM-supported GCC 4.7 toolchain with hardware floating point support;
+- major code cleanup and use of compiler warning flags to early catch errors;
+- major directory and Makefiles reorganisation and cleanup;
+- all source code fixed to use float variables instead of doubles (to use hardware FPU);
+- added multi-binding support for OPLinkMini;
+- added frequency hopping for Revo and OPLinkMini;
+- added auto-configuration for OPLinkMini remote modem / Revo;
+- replaced entire flash generation code;
+- new U-Blox GPS binary protocol parser;
+- added STM32 DSP library;
+- updated STM32 CMSIS library;
+- updated STM32 USB OTG driver;
+- updated STM32 F1 StdPeriph driver library;
+- updated STM32 F4 StdPeriph driver library;
+- updated FreeRTOS (real-time operating system used by the flight code to run many tasks);
+- PyMite moved to a library;
+- fixed nasty bug in PyMite Makefile, single file was rebuilt 5 times fo no reason;
+- added configurable accel/gyro rates;
+- added visualisation of errors in bootloader updater;
+- added numerous sanity checks to the flight code to prevent unsafe arming;
+- new flash file system, much faster and higly optimised;
+- Revo settings are now stored in embedded MCU flash freeing up external one for flight logs;
+- OPLinkMini now stores settings in the MCU flash using FlashFS too;
+- a catalog of known flash types is used to support different flash types by the same firmware;
+- fixed broken overo submodule remote repository link;
+- fixed DSMX protocol error with some Tx/Rx combintions;
+- added new pios_*.h headers to support commonly used constants, functions and defines;
+- numerous fixes for data alignment and memory allocation strategy;
+- new bootloaders to support more features (for example, board settings erase);
+- added new feature to erase settings without special firmware;
+- removed CC/CC3D setting erase firmware (now not necessary due to new erase feature);
+- introduced new delayed callback scheduler to run modules from a single task;
+- many changes to AeroSim-RC simulator interface;
+- fixed broken debug pins API;
+- fixed few bugs in the EKF code;
+- introduced bootloader updater for F4 boards (including Revo and OSD);
+- some changes in RAM and flash memory partitioning to better utilize resources;
+- changes in bootloader to allow remote reboot via serial port or radio modem;
+- the EKF "Huge Formula" is replaced by optimised set of of loops to make it editable;
+- Cyr's attitude patch is ported from CC3D to Revo;
+- added magnetometer options (mags are disabled by default for Revo complimenary filter);
+- advance camera stabilisation is now officially released;
+- fixed numerous internal firmware bugs (too many to list here).
+
+GCS code changes:
+- nice loading splash screen;
+- now GCS uses system language by default if translation is available, English otherwise;
+- French translation officially added. Please help with other languages;
+- fixed some crashes of uploader gadget;
+- fixed double config read on restore;
+- improvements in GCS options dialog handling;
+- optimised option dialog creating;
+- added UI tooltips for many options;
+- removed unused yet options from configuration UI;
+- removed GCS config dialog on the first run, one default is used now if missing;
+- added Revo configuration page, similar to CC/CC3D one;
+- added OPLinkMini configuration page;
+- hardware options are now dynamically enabled/disabled to allow supported configurations only;
+- new artwork for all boards everywhere;
+- optimised some 3D models;
+- new About dialog showing version info and contributors list;
+- fixed badly broken HiTL options dialog;
+- fixed compilation problem on OSX, now GCS should be compatible with OSX 10.5+;
+- major vehicle config cleanup with lazy creation (speeds up GCS start);
+- UI config pages improvements (responsiveness, etc)
+- new auto-update feature added, *.opfw firmware files removed from distributables;
+- anti-aliased scope plugin;
+- numerous code fixes and cleanups (too many to list here);
+- USB HID code is replaced by new cross-platform hidapi library to fix old Linux/OSX problems.
+
+Common parts:
+- added simple toolchain install make targets;
+- added self-hosted toolchains to ensure that they're always available;
+- added support for globally istalled tools used by many working copies;
+- added Windows bootstrap script to pull all other build tools;
+- added unit testing framework, also supported by Bamboo CI server and agents;
+- added code style formatting make targets, easy to use by developers;
+- added doxygen make targets. The documentation still must be completely revised, though;
+- enforced global line ending policy, source files are updated accordingly;
+- reworked packaging to provide correct dependencies and safe multi-threaded builds;
+- multiply renames of board names and directories, now we have correct names;
+- fixed dependencies in Makefiles, now 'make -j' works reliably;
+- CLEAN_BUILD make option is deprecated, use 'package' or 'clean_package' instead;
+- simposix elf is now included into linux distribution and can be run with default GCS settings;
+- revised 'make help' message;
+- updated Windows driver to support Revolution and use correct board names.
+
+Android GCS:
+- old and buggy code was removed;
+- full rewrite has been started.
+
+Infrastructure:
+- Bamboo continuous integration server is actively used;
+- around 10 build agents running 4 different operating systems are set up;
+- every push to any branch is now build-tested, and unit tests run are performed;
+
+2012-11-17
+Advanced camera stabilization features.
+They include optional manual control input filtering (moved from camera stabilization to manual
+control input and now available also for main controls), optional airframe attitude filtering
+used by camera stabilization, and optional camera actuator feed forward to improve gimbal response.
+
+--- RELEASE-12.10.2 --- Mayan Apocalypse Release ---
+
+List of issues resolved in this maintenance release:
+http://progress.openpilot.org/issues/?filter=10361
+
+OP-459, OP-545, OP-674, OP-679, OP-685, OP-686, OP-687, OP-690, OP-691,
+OP-702, OP-703, OP-714, OP-715, OP-716, OP-721, OP-728, OP-746, OP-748,
+OP-749, OP-750, OP-758, OP-759, OP-760
+
+Here is a list of some known unresolved issues. If an issue has JIRA ID [OP-XXX],
+you may track it using the following URL: http://bugs.openpilot.org/browse/OP-XXX
+
++ Only French translation is updated, use English for other locales or help with translations.
++ Radio Wizard confused by a reversed throttle, fix it on your transmitter before starting wizard.
++ Radio Wizard Throttle display does not show full range properly.
++ [Windows 8] USB Driver is broken.
++ Firmware Update Instructions on Firmware Tab not entirely accurate for all upgrade paths.
++ Tricopter's using Vehicle Wizard need to check servo does not need reversed manually.
++ XAircraft ESCs uses non-standard PPM range which may cause issues with Vehicle Wizard.
++ Spectrum Satellite Receivers setup in Radio Wizard may have wrong protocol set.
++ Old Intel 965 have an OpenGL bug that turns the QML PFD black and while.
++ [OP-732] Import UAV Settings for inactive modules crashes the running firmware (board restarts).
+           Workaround: update firmware, power cycle, enable modules, power cycle, import configuration.
++ [OP-747] Board infinitely reboots itself after firmware upgrade (settings erase firmware is a workaround).
++ [OP-723] GCS uses the system language ot the 1st run. After restart it uses English (can be changed later).
++ [OP-725] GCS camera stab config error message disappears too fast (but config error is cleared as it should)
++ [OP-767] GCS does not send AttitudeActual packets over serial port when GPS is connected and system is armed
++ [OP-768] GCS does not show UAV position on the map (master or next CC branches, but works in Revo branches)
++ [OP-769] Can't enter "12,45" on German system. Workaround: change GCS language (in fact, locale) to German.
+
+2012-11-12
+Implemented smoothing filter for accelerometer data.
+Added support for Mode 3 and Mode 4 to the TX Configuration Wizard.
+
+--- RELEASE-12.10.1 ---
+
+2012-10-26
+Temporary disabled AutoTune GCS GUI. It was listed as an experimental
+feature in the previous release, there were however a few cases where
+it did not behave as expected.
+
+--- RELEASE-12.10 ---
+
+2012-10-06
+Receiver port can now be configured as PPM *and* PWM inputs.
+Pin 1 is PPM, other pins are PWM inputs.
+
+2012-07-27
+Added the ability to load stylesheets from external file according to operating system:
+macos.qss, linux.qss, windows.qss
+Files should be placed inside the app folder.
+
+2012-07-27
+Several UI changes. 
+MixerCurveWidget refactoring, now as a simple and advanced view.
+
+2012-07-27
+Added "advanced mode" option to general settings. Right now it only shows the hidden apply buttons.
+To enable go to tools->options->General and click one of the checkboxes to give focus to the form,
+then press F7
+
+2012-07-27
+Made the flight mode switch and accessory pots move according to user input on the input wizard.
+
+2012-07-27
+Changed the board pictures on the uploader widget
+
+2012-07-27
+Add more verbose debug output on the UAVOBJECTS saving code.
+
+2012-08-11
+CopterControl can now emulate an 8-channel USB HID joystick.  Primarily,
+this lets you use any RC transmitter with flight simulators on your PC.
+
+2012-07-20
+AeroSimRC simulator plugin is now included into the Windows distribution
+(will be installed into .../OpenPilot/misc/AeroSIM-RC directory).  Still
+being an experimental development tool, it could be used to play with
+HITL version 2.  Other platforms include udp_test utility which can be
+used to check the connectivity with AeroSimRC plugin running on Windows
+machine.
+
+2012-07-10
+On Windows the installation mode was changed from per-user to per-machine
+(for all users) installation.  It is recommended to completely uninstall
+previous version before installing new one to remove per-user installed
+files.  Per-machine installation requires elevated (administrator) previleges
+during install.  But since the same rights are now required to install
+optional CDC driver (virtual communication port), it was deemed acceptable.
+
+2012-06-04
+AeroSimRC support merged into next
+
+2012-05-26
+VirtualFlybar which allows a more aggressive flight mode than rate mode
+support.  Also PiroCompensation added.
+
+2012-05-26
+Revert some UI changes that didn't work consistently between OSX and Windows.
+
+2012-05-24
+Merged the updated firmware for the PipXtreme, thanks to Brian for a lot of
+work on this.
+
+2012-05-04
+Support for CC3D.  This involved changes to various things such as the sensors
+being split from AttitudeRaw to Accels,Gyros,Magnetometer.  A single firmware
+image fw_coptercontrol will run on both CC and CC3D.  When compiling the
+bootloader one must set the HW_REVISION to the appropriate value.  0x01 is for
+CC and 0x02 is for CC3D.  If the wrong bootloader is installed the firmware
+will not run.
+
+2012-05-02
+Reduction in the memory usage due to the UAVObject metadata.  Now the update
+periods are using a smaller data type and the various flags relating to access
+controls and update modes are stored in a bitfield.  The UAVObjectBrowser has
+not been updated to allow these modes to be easily changed.
+
+2012-03-31
+Support for ground vehicle configuration has been added to the the GCS.
+
+2012-02-14
+New QML based system to allow more flexible UI.  Upgraded stabilization
+configuration.
+
+2012-01-02
+CC FW now supports USB Virtual Com Port (VCP/CDC) in addition to the original HID interface
+New ComUsbBridge module can bridge any serial port to the USB CDC port
+CC FW now detects repeated faults during init and boots with default hwsettings
+
+2012-01-02
+Added new camera stabilization features: AxisLock mode and LPF.
+
+2011-12-10
+Merged a change that sorts the UAVO fields based on size.  Because this changes
+all of the objects, erase all existing flash files based on this.
+
+2011-11-04
+New Spektrum/JR satellite receiver driver implementation.
+It now provides explicit selection of DSM2 (and DSMJ), DSMX (10bit) and
+DSMX (11bit) serial protocol variations to better serve different frame
+and resolution modes. The protocol name used now is DSM instead of
+previously used Spektrum to make it less ambiguous when used with JR
+2.4GHz radios.
+
+2011-10-20
+Inputs can be remapped to outputs to allow up to 10 channels of control.  The
+receiver inputs remap as follows:
+Receiver 3 because output channel 7
+Receiver 4 because output channel 8
+Receiver 5 because output channel 9
+Receiver 6 because output channel 10
+
+2011-10-11
+Fix for the Mac telemetry rates and specifically how long enumeration took.
+
+2011-10-08
+Make the flash chip need to be have bad magic for a full second before erasing
+settings.  Should avoid random lost settings.
+
+2011-09-12
+Max rate now ONLY applies to attitude and axis lock mode.  Manual rate is the
+only term that limits the rate mode now (and in axis lock when you push stick
+only manual rate applies).  Also integrals are reset when unused.
+
+2011-09-09
+Some large updates to the input system.  Now multiple receivers can be
+connected at once.  A wizard was added for configuring the input channels.  A
+specific collective pitch channel was added.
+
+2011-09-04
+Improvements to the failsafe handling code for inputs.  PWM power off is now
+detected properly.  Powering on transmitter for Spektrum Satellite no longer
+causes a glitch on servos.
+
+2011-08-10
+Added Camera Stabilization and a gui to configure this.  This is a software
+selectable module from the GUI.  However, a restart is required to make it
+active.  The GUI does not currently expose the configuration for using the
+transmitter to change the view angle but this is supported by the hardware.
+
+2011-08-10
+By default a lot of diagnostic objects that were enabled by default are now
+disabled in the build.  This include TaskInfo (and all the FreeRTOS options
+that provide that debugging information).  Also MixerStatus, I2CStatus,
+WatchdogStatus and RateDesired.  These can be reenabled for debugging with
+-DDIAG_ALL.
+
+2011-08-04
+Fixed packaging aesthetic issues.  Also avoid runtime issues on OSX Lion by
+disabling the ModelView and Notify plugins for now (sorry).
+
+2011-07-29
+Added support for PPM receivers from James W. Now all 4 interfaces (R/C
+standard PWM, combined PPM (MK), Spektrum satellite, Futaba S.Bus) are
+supported and configurable through the GCS hardware configuration tab.
+
+2011-07-17
+Updated module initialization from Mathieu which separates the initialization
+from the task startup.  Also implements a method to reclaim unused ram from
+initialization and end of memory for the FreeRTOS heap.
+
+2011-07-12
+Improvements to the stabilization code.  Included a LPF on the gyros to smooth
+out noise in high vibration environments.  Also two new modes: axis-lock and
+weak leveling.  Axis-lock will try and hold an axis at a fixed position and
+reject any disturbances.  This is like heading-hold on a heli for the tail but
+can be useful for other axes.  Weak leveling is rate mode with a weak
+correction to self level the craft - good for easier rate mode flying.
+
+2011-07-07
+Dynamic hardware configuration from Stac.  The input type is now
+selected from ManualControlSettings.InputMode and the aircraft must be rebooted
+after changing this.  Also for CopterControl the HwSettings object must
+indicate which modules are connected to which ports.  PPM currently not
+working.

@@ -138,7 +138,7 @@ int32_t SensorsStart(void)
     return 0;
 }
 
-MODULE_INITCALL(SensorsInitialize, SensorsStart)
+MODULE_INITCALL(SensorsInitialize, SensorsStart);
 
 int32_t accel_test;
 int32_t gyro_test;

@@ -385,12 +385,12 @@ UAVTalkRxState UAVTalkProcessInputStreamQuiet(UAVTalkConnection connectionHandle
             if (iproc->obj) {
                 iproc->length = UAVObjGetNumBytes(iproc->obj);
                 iproc->instanceLength = (UAVObjIsSingleInstance(iproc->obj) ? 0 : 2);
-                iproc->timestampLength = (iproc->type & UAVTALK_TIMESTAMPED) ? 2 : 0;
             } else {
                 // We don't know if it's a multi-instance object, so just assume it's 0.
                 iproc->instanceLength = 0;
                 iproc->length = iproc->packet_size - iproc->rxPacketLength;
             }
+            iproc->timestampLength = (iproc->type & UAVTALK_TIMESTAMPED) ? 2 : 0;
         }
 
         // Check length and determine next state

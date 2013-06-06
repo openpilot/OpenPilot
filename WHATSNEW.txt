@@ -1,119 +1,185 @@
-Short summary of changes.  For a complete list see the git log.
-
 --- RELEASE-13.06 --- Italian Stallion Release ---
 
-This is the first Revolution software release which also supports CC, CC3D, OPLinkMini and
-unreleased yet OP OSD boards. This is a major change: from different toolchains and build
-system to the whole source code reformatting according to project style guidelines. The goal
-of this release is to provide CC-style features for new Revo platform + radio using Revo's
-internal modem and external OPLinkMini board. All advanced features like Altitude Hold,
-Position Hold, Guidance, Return to Home, AutoLanding etc. are not released yet and planned
-for following releases.
+This is the first official OpenPilot Revolution software release. This version
+also supports the CopterControl, CC3D, OPLinkMini and the upcoming OP OSD.
+There a number of significant backend changes in this version compared to
+previous software releases: from new toolchains and build system to a source
+code reformatting that is inline with our project style guidelines.
 
-Some video tutorials:
-  http://wiki.openpilot.org/display/DocDE/OpenPilot+Tutorials
+The goal of this release is to provide CC3D-style features for the new
+Revolution platform (using the Revo's internal modem and external OPLinkMini
+board). Advanced features such as Altitude Hold, Position Hold, Guidance,
+Return to Home, and AutoLanding are still in development and will be available
+in future releases. The availability of those features will depend on how many
+people are able to contribute with code, testing and documentation.
 
-Important Release Notes:
+Remember that the first Revo hardware batch was intended for developers/
+bleeding-edge testers, not end users who want a 100% final platform.
 
-- Since this release the packaged distribution does not contain firmware files in a folder.
-  They are now integrated into the GCS so always are up to date. To update you must use
-  either Vehicle Setup Wizard (big green button on the Welcome GCS tab) or new Auto-Update
-  button on the Firmware tab.
-
-- New Auto-Update feature simplifies all OpenPilot board firmware updates. Just click it
-  and follow on-screen directions to reflash your board (CC, CC3D, OPLinkMini, Revolution
-  or OSD prototypes). Internally it is the same as Rescue but uses embedded firmware images,
-  no need to browse for them anymore.
-
-- New bootloaders are REQUIRED for this release to support some of new features like settings
-  erase and some others. As always, bootloaders can be updated without any special programmer
-  hardware using bootloader updaters firmware. Currently F1 boards (CC, CC3D, OPLinkMini)
-  require bootloader version 4 or higher, and F4 boards (Revolution, OSD prototype) require
-  bootloader version 5 or higher. Check the wiki for details of how to update them:
+- New bootloaders are REQUIRED for this release to support new features such
+  as erase settings and others. As always, bootloaders can be updated without
+  any special programmer hardware using the bootloader updater firmware files.
+- F1 boards (CC, CC3D, OPLinkMini) require bootloader version 4 or higher.
+- F4 boards (Revolution, OSD prototype) require bootloader version 5 or higher.
+- Check the wiki for details of how to update them:
   http://wiki.openpilot.org/display/BUILDS/Bootloader+update
 
-- New feature: settings erase option. In the past some special settings erase firmware was
-  used to erase bad or incompatible settings from CC/CC3D boards. Now it is deprecated, and
-  this functionality is now integrated into bootloader and firmware. To erase any board
-  settings you must have latest bootloader. Then enter DFU (boot) mode (using Halt or Rescue
-  function) and click "Erase settings" button on the Firmware tab and follow on-screen
-  instructions. This will NOT work with older bootloader, and the button will be disabled.
+Please remember to take a moment to view these important tutorials:
+  http://wiki.openpilot.org/display/Doc/OpenPilot+Tutorials
 
-- On Linux you should remove OpenPilot package if was installed, then install new one. This
-  is a known issue and likely be fixed later.
+What's New / Release Notes
+--------------------------
 
-- On Windows there is a CDC driver installer option. This is an optional USB virtual serial
-  port useful, for example, for updating your GPS configuration using U-Blox u-Center software.
-  But it is NOT required to configure boards. If not installed, virtual serial port features
-  will not be available. This driver is not signed by Microsoft, but in fact it uses serial
-  port drivers from Windows and only driver information INF file is supplied by the OpenPilot.
-  Hence it is safe to install.
+NEW:
 
-- Due to changes in USB descriptors to support new features, USB drivers on Windows must be
-  updated. If after Rescue or Wizard or Auto-Update button the GCS cannot connect to the board,
-  it may be due to this issue. To resolve you should remove old drivers (ones with yellow
-  exclamation mark) and allow Windows to find them again. Here is how:
+- Firmware folders removed.
+  The firmware files folder has been removed in this release. These files
+  are now integrated into the GCS so they are always up to date and there is
+  less risk of a firmware mismatch. To update your firmware you must use
+  either Vehicle Setup Wizard (big green button at the top right on the
+  Welcome GCS tab) or the new Auto-Update button on the GCS Firmware tab.
+
+- Responsiveness sliders.
+  To simplify tuning, we have introduced a new Responsiveness slider that
+  will allow you to modify stick response. For best results, you should
+  still tune your system with PIDs as tight as possible for better
+  stabilisation. This will result in better stabilisation, and at the
+  same time soft or sharp response according to your preferences.
+
+- Auto-Update firmware.
+  This feature simplifies all OpenPilot board firmware updates. Now all
+  you have to do is click "Auto-update" on the Firmware tab and follow the
+  instructions to reflash your OpenPilot board. This is essentially the
+  same as Rescue but uses the embedded firmware images so there is no need
+  to browse for them anymore.
+
+- Erase Settings Option.
+  We previously had a hacky way to delete bad or incompatible settings from
+  our OpenPilot boards. This old special firmware that did this is now
+  deprecated and the functionality is now integrated into the latest
+  bootloaders and firmwares.
+
+  To erase settings enter DFU (boot) mode (using Halt or Rescue function)
+  and click the "Erase settings" button on the Firmware tab and follow the
+  instructions. This will NOT work with an older bootloader and the "Erase
+  settings" button will be disabled if an out of date bootloader is detected.
+
+- Language defaults.
+  GCS now uses the system default language (only French and English are
+  available currently, please contribute translations). You can change the
+  language in the GCS Options at any time.
+
+- CDC driver install option (Windows only).
+  This is an optional USB virtual serial port that is useful, for example,
+  for updating your GPS configuration using the U-Blox u-Center software.
+  It is NOT required for normal configuration of OpenPilot boards. If it is
+  not installed, virtual serial port features will not be available. This
+  driver is not signed by Microsoft, but in fact it uses serial port drivers
+  from Windows and only the driver information INF file is supplied by
+  OpenPilot.
+
+- Lots of help tooltips were added to the GCS. Hovering your mouse over an
+  option in the GCS will show them, please review for help during tuning/
+  setting up.
+
+- A large amount of general improvements, code clean ups and minor bugs
+  resolved.
+
+KNOWN ISSUES:
+
+- On Linux you should remove the OpenPilot package if it was previously
+  installed, then install this new one. This is a known issue and likely
+  be fixed later.
+
+- Due to changes in USB descriptors to support new features, USB drivers
+  on Windows must be updated. If after using Rescue or Wizard or Auto-Update
+  button the GCS cannot connect to the board, you may be experiencing this
+  USB issue. To resolve it you should remove the old drivers (ones with
+  yellow exclamation mark) and allow Windows to find them again.
+
+  Here is how to do it:
 
   Windows XP:
-  - click on the desktop "My Computer" icon and select "Properties";
-  - select the "Hardware" tab by clicking on it once;
-  - select the "Device Manager" tab by clicking on it;
-  - scroll down the list until you see the "Universal Serial Bus Controllers" selection.
-    Click it to expand the list of USB drivers. Right-click on the driver(s) you wish to
-    uninstall and select the "Uninstall" function. The driver will be uninstalled.
+   - Right click on "My Computer" on your desktop and select "Properties".
+   - Select the "Hardware" tab.
+   - Select the "Device Manager".
+   - Scroll down the list until you see the "Universal Serial Bus Controllers"
+     selection.
+   - Click it to expand the list of USB drivers. Right-click on the driver(s)
+     you wish to uninstall and select "Uninstall".
 
   Windows 7/Vista:
-  - on the desktop right-click the "Computer" icon and select "Properties";
-  - select "Device Manager" in the upper left-hand corner of the window;
-  - scroll down the list until you see the "Universal Serial Bus Controllers" selection.
-    Click it once to expand the list of USB drivers. Right-click on the driver(s) you wish
-    to uninstall and select the "Uninstall" function. The driver will be uninstalled.
+   - Right click on "My Computer" on your desktop and select "Properties".
+   - Select "Device Manager" in the upper left-hand corner of the window.
+   - Scroll down the list until you see the "Universal Serial Bus Controllers"
+     selection.
+   - Click it to expand the list of USB drivers. Right-click on the driver(s)
+     you wish to uninstall and select "Uninstall".
 
-  Then disconnect the board from USB, wait few seconds and connect it back. Windows should find new
-  drivers and install them properly.
+  Then disconnect the board from USB, wait few seconds and re-connect it to
+  your computer. Windows should find new drivers and install them properly.
 
-- GCS now uses system default language (only French and English are available yet, please
-  contribute). You can choose language using GCS Options dialog if you have existing GCS
-  configuaration.
+- If GCS crashes when switching to the Flight Data tab, it usually means
+  your PC needs newer video drivers. That tab contains a ModelView widget
+  which uses OpenGL. It is known to crash on some graphics cards with old
+  and buggy drivers.
 
-- This release provides only CC3D-class features + radio. For example, it does NOT use
-  magnetometers to correct yaw and uses simple complimentary filter for attitude estimation.
-  So you should expect from it only CC3D-like performance. More advanced features will be
-  enabled step by step in the following releases with some help from new contributors,
-  we hope. Remember that the first Revo hardware batch was inended for developers, not
-  end users.
+- Sensor calibration is not final. It will be reworked completely to
+  increase its accuracy and make it easier to use.
 
-- Lots of help tooltips were added to the GCS. Try watching them when tuning.
+- AltitudeHold mode is enabled, but it is not officially supported. Do
+  not expect it to work perfectly and be considered production quality.
+  You may play with it and report your issues and suggestions at your own
+  risk. If you are not using a case for your Revo, we strongly recommend
+  covering the barometer sensor with some foam to shield the sensor from
+  wind and light.
 
-- If GCS crashes when switching to the Flight data tab, it usually means your PC needs newer
-  video drivers. That tab contains ModelView widget which uses OpenGL. It is known to crash
-  in some cases.
+- Note that throttle stick in AltitudeHold mode is used to control vertical
+  velocity, sometimes called vario altitude in other platforms, centre stick
+  means hold altitude and there is a dead band around centre stick.
 
-- Sensor calibration is not final. It will be reworked completely to increase its accuracy
-  and make it easier to use.
+- There are currently no configuration options for the Radio module in
+  the Revolution except for Radio enable/disable and output power. This is
+  intentional because all configuration should be done using its paired
+  ground OPLink coordinator.
 
-- AltitudeHold mode is enabled, but it is not officially released. Do not expect it to be of
-  production quality. But you may play with it and report your issues and suggestions. It is
-  recommended to use some foam to protect baro sensor from wind and light. Also note that
-  throttle stick in AltitudeHold mode is used to control vertical velocity.
+  How to configure the Revolution to OPLinkMini radio link:
 
-- Tuning your system please set PIDs as tight as possible for better stabilisation. To soften
-  the stick response if necessary use new Responsiveness options. This will result in better
-  stabilisation, and at the same time soft or sharp response according to your preferences.
+  - Make sure you have the newest bootloaders and matching firmwares
+    between the Revolution, GCS and OPLink.
+  - Enable the radio in the Revolution, click save and disconnect the board
+    from USB.
+  - Power it from external supply to continue.
+  - Then connect the OPLink board to USB and scroll down in the GCS config
+    widget to find OPLink icon at the end of list. This icon is only
+    available when an OPLink is detected.
+  - To pair the two radios, select the Revolution side radio address in the
+    list of found boards, select it, click Add to add to the list of paired
+    radios and click Save. After unplugging the board from the USB and
+    plugging back your OPLink it should show "Connected", and you can
+    continue with the configuration.
 
-- There is no configuration options for Radio module in the Revo config except for Radio
-  enable/disable and output power. This is intentional because all configuration should be
-  done using its paired ground OPLink coordinator. Enable radio in the Revo, save and
-  disconnect Revo from USB. Power it from external supply to continue. Then connect OPLink
-  board to USB and scroll down the GCS config widget to find OPLink icon in the end of list.
-  This icon is only available when OPLink is connected and recognised, this also requires new
-  bootloader and matching to Revo and GCS firmware on the OPLink board. To pair select the Revo
-  side Radio address in the list of found boards, select it, click Add to add to the list of
-  paired radios and click Save. After USB unplugging and plugging back your OPLink should show
-  "Connected", and you can continue with configuration.
+- Do not set the Revolution modem or OPLinkMini output power to high values
+  without antenna connected, this can damage the hardware.
 
-- Don't set Revo modem or OPLinkMini output power to high values without antenna connected,
-  this can damage the hardware.
+JIRA issues addressed in this release:
+
+Due to major rework of all code and integration of Revo code into mainline
+(next) it is almost impossible to list all corresponding JIRA issues for the
+list above. Some of them can be found using this link:
+  http://progress.openpilot.org/issues/?filter=10860
+
+OP-678, OP-693, OP-719, OP-726, OP-727, OP-747, OP-761, OP-769, OP-770,
+OP-772, OP-792, OP-804, OP-807, OP-812, OP-816, OP-817, OP-820, OP-821,
+OP-843, OP-846, OP-854, OP-855, OP-856, OP-861, OP-864, OP-867, OP-871,
+OP-873, OP-874, OP-875, OP-879, OP-885, OP-886, OP-888, OP-889, OP-890,
+OP-891, OP-892, OP-893, OP-894, OP-895, OP-896, OP-897, OP-898, OP-899,
+OP-900, OP-903, OP-905, OP-906, OP-907, OP-910, OP-912, OP-917, OP-920,
+OP-925, OP-926, OP-928, OP-935, OP-936, OP-939, OP-952, OP-955, OP-957,
+OP-968, OP-969, OP-970, OP-977, OP-980, OP-981, OP-982, OP-983, OP-987,
+OP-988, OP-989
+
+Short summary of changes. For a complete list see the git log.
 
 Flight code changes:
 - initial version of Revo code;
@@ -207,26 +273,13 @@ Common parts:
 - updated Windows driver to support Revolution and use correct board names.
 
 Android GCS:
-- not officially released yet;
-- full rewrite has been started;
+- old and buggy code was removed;
+- full rewrite has been started.
 
 Infrastructure:
 - Bamboo continuous integration server is actively used;
 - around 10 build agents running 4 different operating systems are set up;
 - every push to any branch is now build-tested, and unit tests run are performed;
-
-Due to major rework of all code and integration of Revo code into mainline (next) it is almost
-impossible to list all corresponding JIRA issues for the list above. Some of them can be found
-using this link:
-
-http://progress.openpilot.org/issues/?filter=10860
-
-OP-678, OP-693, OP-719, OP-747, OP-761, OP-769, OP-770, OP-772, OP-792, OP-807, OP-812, OP-816,
-OP-817, OP-820, OP-821, OP-843, OP-846, OP-854, OP-855, OP-856, OP-864, OP-867, OP-871, OP-873,
-OP-874, OP-875, OP-879, OP-885, OP-886, OP-888, OP-889, OP-890, OP-891, OP-892, OP-893, OP-894,
-OP-895, OP-896, OP-897, OP-898, OP-899, OP-900, OP-903, OP-905, OP-906, OP-907, OP-910, OP-912,
-OP-917, OP-920, OP-925, OP-926, OP-928, OP-935, OP-936, OP-939, OP-952, OP-955, OP-957, OP-968,
-OP-969, OP-970, OP-977, OP-980
 
 2012-11-17
 Advanced camera stabilization features.

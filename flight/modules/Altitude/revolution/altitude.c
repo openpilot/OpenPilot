@@ -82,7 +82,7 @@ int32_t AltitudeInitialize()
 #endif
     return 0;
 }
-MODULE_INITCALL(AltitudeInitialize, AltitudeStart)
+MODULE_INITCALL(AltitudeInitialize, AltitudeStart);
 /**
  * Module thread, should not return.
  */

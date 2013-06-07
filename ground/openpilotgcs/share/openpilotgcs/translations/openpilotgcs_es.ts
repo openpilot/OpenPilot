@@ -14034,12 +14034,12 @@ or power cycle to force a board reset.</source>
     <message>
         <location line="-141"/>
         <location line="+141"/>
-        <source>Please disconnect all openpilot boards</source>
+        <source>Please disconnect your OpenPilot board</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
-        <source>Please connect the board (USB only!)</source>
+        <source>Please connect your OpenPilot board (USB only!)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -14049,7 +14049,7 @@ or power cycle to force a board reset.</source>
     </message>
     <message>
         <location line="+16"/>
-        <source>Openpilot Uploader</source>
+        <source>OpenPilot Uploader</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

@@ -127,7 +127,7 @@ int32_t FixedWingPathFollowerInitialize()
     }
     return 0;
 }
-MODULE_INITCALL(FixedWingPathFollowerInitialize, FixedWingPathFollowerStart)
+MODULE_INITCALL(FixedWingPathFollowerInitialize, FixedWingPathFollowerStart);
 
 static float northVelIntegral = 0;
 static float eastVelIntegral  = 0;

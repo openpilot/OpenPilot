@@ -86,8 +86,8 @@ extern void StartModules();
     __attribute__((__section__(".initcall" level ".init"))) = fn
 
 #define __define_module_initcall(level, ifn, sfn) \
-    static initmodule_t __initcall_##fn __attribute__((__used__)) \
-    __attribute__((__section__(".initcall" level ".init"))) = { .fn_minit = ifn, .fn_tinit = sfn };
+    static initmodule_t __initcall_##ifn __attribute__((__used__)) \
+    __attribute__((__section__(".initcall" level ".init"))) = { .fn_minit = ifn, .fn_tinit = sfn }
 
 #define MODULE_INITCALL(ifn, sfn) __define_module_initcall("module", ifn, sfn)
 

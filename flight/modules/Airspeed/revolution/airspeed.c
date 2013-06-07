@@ -124,7 +124,7 @@ int32_t AirspeedInitialize()
 
     return 0;
 }
-MODULE_INITCALL(AirspeedInitialize, AirspeedStart)
+MODULE_INITCALL(AirspeedInitialize, AirspeedStart);
 
 
 /**

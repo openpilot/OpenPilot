@@ -116,7 +116,7 @@
 ;--------------------------------
 ; Settings for MUI_PAGE_FINISH
   !define MUI_FINISHPAGE_RUN
-  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\HISTORY.txt"
+  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\WHATSNEW.txt"
   !define MUI_FINISHPAGE_RUN_FUNCTION "RunApplication"
 
 ;--------------------------------
@@ -158,7 +158,11 @@ Section "Core files" InSecCore
   SetOutPath "$INSTDIR\bin"
   File /r "${GCS_BUILD_TREE}\bin\*"
   SetOutPath "$INSTDIR"
-  File "${PROJECT_ROOT}\HISTORY.txt"
+  File "${PROJECT_ROOT}\LICENSE.txt"
+  File "${PROJECT_ROOT}\README.txt"
+  File "${PROJECT_ROOT}\WHATSNEW.txt"
+  File "${PROJECT_ROOT}\MILESTONES.txt"
+  File "${PROJECT_ROOT}\GPLv3.txt"
 SectionEnd
 
 ; Copy GCS plugins
@@ -244,8 +248,14 @@ Section "Shortcuts" InSecShortcuts
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS.lnk" "$INSTDIR\bin\openpilotgcs.exe" \
 	"" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS (clean configuration).lnk" "$INSTDIR\bin\openpilotgcs.exe" \
-	"-clean-config" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
-  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot ChangeLog.lnk" "$INSTDIR\HISTORY.txt" \
+	"-reset" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot License.lnk" "$INSTDIR\LICENSE.txt" \
+	"" "$INSTDIR\bin\openpilotgcs.exe" 0
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot ReadMe.lnk" "$INSTDIR\README.txt" \
+	"" "$INSTDIR\bin\openpilotgcs.exe" 0
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot ReleaseNotes.lnk" "$INSTDIR\WHATSNEW.txt" \
+	"" "$INSTDIR\bin\openpilotgcs.exe" 0
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Milestones.lnk" "$INSTDIR\MILESTONES.txt" \
 	"" "$INSTDIR\bin\openpilotgcs.exe" 0
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Website.lnk" "http://www.openpilot.org" \
 	"" "$INSTDIR\bin\openpilotgcs.exe" 0
@@ -267,7 +277,7 @@ Section ; create uninstall info
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "UninstallString" '"$INSTDIR\Uninstall.exe"'
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayIcon" '"$INSTDIR\bin\openpilotgcs.exe"'
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "Publisher" "OpenPilot Team"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayVersion" "Stumpy"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayVersion" "Italian Stallion"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "URLInfoAbout" "http://www.openpilot.org"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "HelpLink" "http://wiki.openpilot.org"
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "EstimatedSize" 100600
@@ -317,7 +327,7 @@ Section "un.OpenPilot GCS" UnSecProgram
   RMDir /r /rebootok "$INSTDIR\utilities"
   RMDir /r /rebootok "$INSTDIR\drivers"
   RMDir /r /rebootok "$INSTDIR\misc"
-  Delete /rebootok "$INSTDIR\HISTORY.txt"
+  Delete /rebootok "$INSTDIR\*.txt"
   Delete /rebootok "$INSTDIR\Uninstall.exe"
 
   ; Remove directory

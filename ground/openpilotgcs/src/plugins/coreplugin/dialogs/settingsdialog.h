@@ -36,11 +36,9 @@
 #include "coreplugin/dialogs/ioptionspage.h"
 
 namespace Core {
-
 class UAVGadgetInstanceManager;
 
 namespace Internal {
-
 class SettingsDialog : public QDialog, public::Ui::SettingsDialog {
     Q_OBJECT
 
@@ -80,9 +78,7 @@ private:
 
     QTreeWidgetItem *addPage(IOptionsPage *page);
 };
-
 } // namespace Internal
-
 } // namespace Core
 
 #endif // SETTINGSDIALOG_H

@@ -246,7 +246,7 @@ static int32_t RadioComBridgeInitialize(void)
 
     return 0;
 }
-MODULE_INITCALL(RadioComBridgeInitialize, RadioComBridgeStart)
+MODULE_INITCALL(RadioComBridgeInitialize, RadioComBridgeStart);
 
 /**
  * Telemetry transmit task, regular priority

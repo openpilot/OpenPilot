@@ -13,6 +13,12 @@ VOL_NAME="OpenPilot"
 rm -f "${TEMP_FILE}"
 rm -f "${OUT_FILE}"
 
+# if the file doesn't exist, try to create folder
+if [ ! -f "/Volumes/${VOL_NAME}" ]
+then
+hdiutil unmount "/Volumes/${VOL_NAME}"
+fi
+
 hdiutil convert "${ROOT_DIR}/package/osx/OpenPilot.dmg" \
     -format UDRW -o "${TEMP_FILE}"
 device=$(hdiutil attach "${TEMP_FILE}" | \
@@ -22,7 +28,11 @@ device=$(hdiutil attach "${TEMP_FILE}" | \
 cp -a "${APP_PATH}" "/Volumes/${VOL_NAME}"
 #ls "${FW_DIR}" | xargs -n 1 -I {} cp "${FW_DIR}/{}" "/Volumes/${VOL_NAME}/Firmware"
 cp "${BUILD_DIR}/uavobject-synthetics/matlab/OPLogConvert.m" "/Volumes/${VOL_NAME}/Utilities"
-cp "${ROOT_DIR}/HISTORY.txt" "/Volumes/${VOL_NAME}"
+cp "${ROOT_DIR}/WHATSNEW.txt" "/Volumes/${VOL_NAME}"
+cp "${ROOT_DIR}/README.txt" "/Volumes/${VOL_NAME}/Docs"
+cp "${ROOT_DIR}/MILESTONES.txt" "/Volumes/${VOL_NAME}/Docs"
+cp "${ROOT_DIR}/LICENSE.txt" "/Volumes/${VOL_NAME}/Docs"
+cp "${ROOT_DIR}/GPLv3.txt" "/Volumes/${VOL_NAME}/Docs"
 
 "${ROOT_DIR}/package/osx/libraries" \
     "/Volumes/${VOL_NAME}/OpenPilot GCS.app" || exit 1

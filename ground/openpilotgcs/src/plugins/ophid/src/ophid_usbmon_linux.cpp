@@ -65,14 +65,15 @@ void printPortInfo(struct udev_device *dev)
  */
 void USBMonitor::deviceEventReceived()
 {
-    qDebug() << "Device event";
+    OPHID_TRACE("IN");
     struct udev_device *dev;
 
     dev = udev_monitor_receive_device(this->monitor);
     if (dev) {
-        printf("------- Got Device Event");
+        // this->monitorNotifier->setEnabled(0);
         QString action  = QString(udev_device_get_action(dev));
         QString devtype = QString(udev_device_get_devtype(dev));
+        qDebug() << "[DEBUG] Action: " << action << " device: " << devtype;
         if (action == "add" && devtype == "usb_device") {
             printPortInfo(dev);
             emit deviceDiscovered(makePortInfo(dev));
@@ -82,9 +83,11 @@ void USBMonitor::deviceEventReceived()
         }
 
         udev_device_unref(dev);
+        // this->monitorNotifier->setEnabled(1);
     } else {
-        printf("No Device from receive_device(). An error occured.");
+        OPHID_ERROR("No Device event from udev. Spurious event?.");
     }
+    OPHID_TRACE("OUT");
 }
 
 
@@ -120,12 +123,13 @@ USBMonitor::USBMonitor(QObject *parent) : QThread(parent)
     this->monitor = udev_monitor_new_from_netlink(this->context, "udev");
     udev_monitor_filter_add_match_subsystem_devtype(
         this->monitor, "usb", NULL);
+    // udev_monitor_filter_add_match_tag(this->monitor, "openpilot");
     udev_monitor_enable_receiving(this->monitor);
     this->monitorNotifier = new QSocketNotifier(
         udev_monitor_get_fd(this->monitor), QSocketNotifier::Read, this);
     connect(this->monitorNotifier, SIGNAL(activated(int)),
             this, SLOT(deviceEventReceived()));
-    qDebug() << "Starting the Udev client";
+    OPHID_DEBUG("Starting the Udev client");
 
     start(); // Start the thread event loop so that the socketnotifier works
 }
@@ -139,7 +143,9 @@ USBMonitor::USBMonitor(QObject *parent) : QThread(parent)
  */
 USBMonitor::~USBMonitor()
 {
+    OPHID_TRACE("IN");
     quit();
+    OPHID_TRACE("OUT");
 }
 
 
@@ -158,9 +164,12 @@ QList<USBPortInfo> USBMonitor::availableDevices()
     struct udev_enumerate *enumerate;
     struct udev_device *dev;
 
+    OPHID_TRACE("IN");
+
     enumerate = udev_enumerate_new(this->context);
     udev_enumerate_add_match_subsystem(enumerate, "usb");
-    // udev_enumerate_add_match_sysattr(enumerate, "idVendor", "20a0");
+    // udev_enumerate_add_match_tag(enumerate, "openpilot");
+    udev_enumerate_add_match_sysattr(enumerate, "idVendor", "20a0");
     udev_enumerate_scan_devices(enumerate);
     devices = udev_enumerate_get_list_entry(enumerate);
     // Will use the 'native' udev functions to loop:
@@ -171,7 +180,9 @@ QList<USBPortInfo> USBMonitor::availableDevices()
            and create a udev_device object (dev) representing it */
         path = udev_list_entry_get_name(dev_list_entry);
         dev  = udev_device_new_from_syspath(this->context, path);
+        OPHID_DEBUG("Found path: %s", path);
         if (QString(udev_device_get_devtype(dev)) == "usb_device") {
+            OPHID_DEBUG("Added path: %s", path);
             devicesList.append(makePortInfo(dev));
         }
         udev_device_unref(dev);
@@ -179,6 +190,7 @@ QList<USBPortInfo> USBMonitor::availableDevices()
     // free the enumerator object
     udev_enumerate_unref(enumerate);
 
+    OPHID_TRACE("OUT");
     return devicesList;
 }
 
@@ -199,15 +211,21 @@ QList<USBPortInfo> USBMonitor::availableDevices()
  */
 QList<USBPortInfo> USBMonitor::availableDevices(int vid, int pid, int bcdDeviceMSB, int bcdDeviceLSB)
 {
+    OPHID_TRACE("IN");
     QList<USBPortInfo> allPorts = availableDevices();
     QList<USBPortInfo> thePortsWeWant;
 
     foreach(USBPortInfo port, allPorts) {
-        if ((port.vendorID == vid || vid == -1) && (port.productID == pid || pid == -1) && ((port.bcdDevice >> 8) == bcdDeviceMSB || bcdDeviceMSB == -1) &&
+        if ((port.vendorID == vid || vid == -1) &&
+            (port.productID == pid || pid == -1) &&
+            ((port.bcdDevice >> 8) == bcdDeviceMSB || bcdDeviceMSB == -1) &&
             ((port.bcdDevice & 0x00ff) == bcdDeviceLSB || bcdDeviceLSB == -1)) {
+            OPHID_DEBUG("Append: 0x%X/0x%X/0x%X", port.vendorID, port.productID, port.bcdDevice);
             thePortsWeWant.append(port);
         }
     }
+
+    OPHID_TRACE("OUT");
     return thePortsWeWant;
 }
 
@@ -225,10 +243,6 @@ USBPortInfo USBMonitor::makePortInfo(struct udev_device *dev)
 {
     USBPortInfo prtInfo;
     bool ok;
-
-#ifdef OPHID_DEBUG_INFO
-    printPortInfo(dev);
-#endif
 
     prtInfo.vendorID     = QString(udev_device_get_sysattr_value(dev, "idVendor")).toInt(&ok, 16);
     prtInfo.productID    = QString(udev_device_get_sysattr_value(dev, "idProduct")).toInt(&ok, 16);

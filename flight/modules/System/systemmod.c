@@ -154,7 +154,7 @@ int32_t SystemModInitialize(void)
     return 0;
 }
 
-MODULE_INITCALL(SystemModInitialize, 0)
+MODULE_INITCALL(SystemModInitialize, 0);
 /**
  * System task, periodically executes every SYSTEM_UPDATE_PERIOD_MS
  */

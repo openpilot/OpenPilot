@@ -142,7 +142,7 @@ int32_t CameraStabStart(void)
     return 0;
 }
 
-MODULE_INITCALL(CameraStabInitialize, CameraStabStart)
+MODULE_INITCALL(CameraStabInitialize, CameraStabStart);
 
 static void attitudeUpdated(UAVObjEvent *ev)
 {

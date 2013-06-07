@@ -111,7 +111,7 @@ int32_t PathPlannerInitialize()
     return 0;
 }
 
-MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart)
+MODULE_INITCALL(PathPlannerInitialize, PathPlannerStart);
 
 /**
  * Module task

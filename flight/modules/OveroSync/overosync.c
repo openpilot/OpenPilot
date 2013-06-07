@@ -136,7 +136,7 @@ int32_t OveroSyncStart(void)
     return 0;
 }
 
-MODULE_INITCALL(OveroSyncInitialize, OveroSyncStart)
+MODULE_INITCALL(OveroSyncInitialize, OveroSyncStart);
 
 /**
  * Register a new object, adds object to local list and connects the queue depending on the object's

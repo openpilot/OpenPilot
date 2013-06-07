@@ -1,5 +1,4 @@
 /**
-﻿/**
  ******************************************************************************
  *
  * @file       configccpmwidget.cpp
@@ -1112,10 +1111,10 @@ void ConfigCcpmWidget::SwashLvlStartButtonPressed()
         oldSwashLvlConfiguration.ServoChannels[2] = m_aircraft->ccpmServoYChannel->currentIndex() - 1;
         oldSwashLvlConfiguration.ServoChannels[3] = m_aircraft->ccpmServoZChannel->currentIndex() - 1;
         // if servos are used
-        oldSwashLvlConfiguration.Used[0] = ((m_aircraft->ccpmServoWChannel->isEnabled()) && (m_aircraft->ccpmServoWChannel->currentIndex() - 1 > 0));
-        oldSwashLvlConfiguration.Used[1] = ((m_aircraft->ccpmServoXChannel->isEnabled()) && (m_aircraft->ccpmServoXChannel->currentIndex() - 1 > 0));
-        oldSwashLvlConfiguration.Used[2] = ((m_aircraft->ccpmServoYChannel->isEnabled()) && (m_aircraft->ccpmServoYChannel->currentIndex() - 1 > 0));
-        oldSwashLvlConfiguration.Used[3] = ((m_aircraft->ccpmServoZChannel->isEnabled()) && (m_aircraft->ccpmServoZChannel->currentIndex() - 1 > 0));
+        oldSwashLvlConfiguration.Used[0] = ((m_aircraft->ccpmServoWChannel->isEnabled()) && (m_aircraft->ccpmServoWChannel->currentIndex() > 0));
+        oldSwashLvlConfiguration.Used[1] = ((m_aircraft->ccpmServoXChannel->isEnabled()) && (m_aircraft->ccpmServoXChannel->currentIndex() > 0));
+        oldSwashLvlConfiguration.Used[2] = ((m_aircraft->ccpmServoYChannel->isEnabled()) && (m_aircraft->ccpmServoYChannel->currentIndex() > 0));
+        oldSwashLvlConfiguration.Used[3] = ((m_aircraft->ccpmServoZChannel->isEnabled()) && (m_aircraft->ccpmServoZChannel->currentIndex() > 0));
         // min,neutral,max values for the servos
         for (i = 0; i < CCPM_MAX_SWASH_SERVOS; i++) {
             oldSwashLvlConfiguration.Min[i]     = MinField->getValue(oldSwashLvlConfiguration.ServoChannels[i]).toInt();

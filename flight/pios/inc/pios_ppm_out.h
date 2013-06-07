@@ -7,7 +7,7 @@
  * @{
  *
  * @file       pios_ppm_out_priv.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @brief      ppm private structures.
  * @see        The GNU Public License (GPL) Version 3
  *
@@ -28,19 +28,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_PPM_OUT_PRIV_H
-#define PIOS_PPM_OUT_PRIV_H
+#ifndef PIOS_PPM_OUT_H
+#define PIOS_PPM_OUT_H
 
-#include <pios.h>
+extern void PIOS_PPM_OUT_Set(uint32_t ppm_out_id, uint8_t servo, uint16_t position);
 
-struct pios_ppm_out_cfg {
-    TIM_OCInitTypeDef tim_oc_init;
-    const struct pios_tim_channel *channel;
-};
-
-extern int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg *cfg);
-
-#endif /* PIOS_PPM_PRIV_H */
+#endif /* PIOS_PPM_H */
 
 /**
  * @}

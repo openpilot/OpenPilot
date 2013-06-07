@@ -231,6 +231,7 @@ ConfigRevoWidget::ConfigRevoWidget(QWidget *parent) :
     addUAVObjectToWidgetRelation("AttitudeSettings", "BoardRotation", m_ui->rollRotation, AttitudeSettings::BOARDROTATION_ROLL);
     addUAVObjectToWidgetRelation("AttitudeSettings", "BoardRotation", m_ui->pitchRotation, AttitudeSettings::BOARDROTATION_PITCH);
     addUAVObjectToWidgetRelation("AttitudeSettings", "BoardRotation", m_ui->yawRotation, AttitudeSettings::BOARDROTATION_YAW);
+    addUAVObjectToWidgetRelation("AttitudeSettings", "AccelTau", m_ui->accelTau);
 
     populateWidgets();
     refreshWidgetsValues();

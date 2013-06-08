@@ -392,7 +392,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
         return 0;
     }
 
-    if ((xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
+    if ((xTaskGetTickCount() < 10000) && (xTaskGetTickCount() > 4000)) {
         // For first 7 seconds use accels to get gyro bias
         attitudeSettings.AccelKp     = 1.0f;
         attitudeSettings.AccelKi     = 0.0f;

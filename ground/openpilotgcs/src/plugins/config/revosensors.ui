@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>643</width>
-    <height>531</height>
+    <width>649</width>
+    <height>510</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <bool>true</bool>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <property name="autoFillBackground">
@@ -337,11 +337,209 @@ p, li { white-space: pre-wrap; }
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_6">
        <item>
-        <layout class="QHBoxLayout" name="ahrsSettingsLayout">
+        <layout class="QGridLayout" name="gridLayout_4">
          <property name="margin">
           <number>6</number>
          </property>
-         <item>
+         <item row="1" column="1">
+          <widget class="QGroupBox" name="groupBox_3">
+           <property name="title">
+            <string>Rotate virtual attitude relative to board</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,0,0,0">
+            <item row="1" column="2">
+             <spacer name="horizontalSpacer_8">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="3">
+             <widget class="QSpinBox" name="pitchRotation">
+              <property name="minimum">
+               <number>-90</number>
+              </property>
+              <property name="maximum">
+               <number>90</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="4">
+             <spacer name="horizontalSpacer_9">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_12">
+              <property name="minimumSize">
+               <size>
+                <width>70</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+              </property>
+              <property name="text">
+               <string>Roll</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="5">
+             <widget class="QLabel" name="label_13">
+              <property name="minimumSize">
+               <size>
+                <width>70</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+              </property>
+              <property name="text">
+               <string>Yaw</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <spacer name="horizontalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item row="1" column="1">
+             <widget class="QSpinBox" name="rollRotation">
+              <property name="minimum">
+               <number>-180</number>
+              </property>
+              <property name="maximum">
+               <number>180</number>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QLabel" name="label_15">
+              <property name="minimumSize">
+               <size>
+                <width>70</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+              </property>
+              <property name="text">
+               <string>Pitch</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="5">
+             <widget class="QSpinBox" name="yawRotation">
+              <property name="minimum">
+               <number>-180</number>
+              </property>
+              <property name="maximum">
+               <number>180</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="groupBox_4">
+           <property name="title">
+            <string>Filtering</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_5">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_14">
+              <property name="toolTip">
+               <string/>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+              </property>
+              <property name="text">
+               <string>Accelerometers</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QDoubleSpinBox" name="accelTau">
+              <property name="toolTip">
+               <string>Accelerometer filtering.
+
+Sets the amount of lowpass filtering of accelerometer data 
+for the attitude estimation. Higher values apply a stronger 
+filter, which may help with drifting in attitude mode.
+
+Range: 0.00 - 0.20, Good starting value: 0.05 - 0.10
+Start low and raise until drift stops.
+
+A setting of 0.00 disables the filter.</string>
+              </property>
+              <property name="maximum">
+               <double>2.000000000000000</double>
+              </property>
+              <property name="singleStep">
+               <double>0.010000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="0" column="0">
           <widget class="QGroupBox" name="groupBox_2">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -388,7 +586,7 @@ p, li { white-space: pre-wrap; }
            </layout>
           </widget>
          </item>
-         <item>
+         <item row="0" column="1">
           <widget class="QGroupBox" name="groupBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -570,149 +768,23 @@ p, li { white-space: pre-wrap; }
            </layout>
           </widget>
          </item>
+         <item row="0" column="2">
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Expanding</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>50</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_3">
-         <property name="title">
-          <string>Rotate virtual attitude relative to board</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0,1,0,1,0">
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_12">
-            <property name="styleSheet">
-             <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-            </property>
-            <property name="text">
-             <string>Roll</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QSpinBox" name="rollRotation">
-            <property name="minimum">
-             <number>-180</number>
-            </property>
-            <property name="maximum">
-             <number>180</number>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="4">
-           <spacer name="horizontalSpacer_9">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="1" column="5">
-           <widget class="QSpinBox" name="yawRotation">
-            <property name="minimum">
-             <number>-180</number>
-            </property>
-            <property name="maximum">
-             <number>180</number>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="5">
-           <widget class="QLabel" name="label_13">
-            <property name="styleSheet">
-             <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-            </property>
-            <property name="text">
-             <string>Yaw</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <spacer name="horizontalSpacer_8">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="label_15">
-            <property name="styleSheet">
-             <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
-color: rgb(255, 255, 255);
-border-radius: 5;
-font: bold 12px;
-margin:1px;</string>
-            </property>
-            <property name="text">
-             <string>Pitch</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QSpinBox" name="pitchRotation">
-            <property name="minimum">
-             <number>-90</number>
-            </property>
-            <property name="maximum">
-             <number>90</number>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <spacer name="horizontalSpacer_7">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="1" column="6">
-           <spacer name="horizontalSpacer_10">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
        </item>
        <item>
         <spacer name="verticalSpacer">

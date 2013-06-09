@@ -39,6 +39,7 @@
 #include <attitudestate.h>
 #include <flightstatus.h>
 #include <homelocation.h>
+#include <revocalibration.h>
 
 #include <CoordinateConversions.h>
 
@@ -62,6 +63,7 @@ struct data {
     float   rollPitchBiasRate;
     int32_t timeval;
     uint8_t init;
+    bool    magCalibrated;
 };
 
 // Private variables
@@ -87,6 +89,7 @@ static void globalInit(void)
         initialized = 1;
         FlightStatusInitialize();
         HomeLocationInitialize();
+        RevoCalibrationInitialize();
         FlightStatusConnectCallback(&flightStatusUpdatedCb);
         flightStatusUpdatedCb(NULL);
     }
@@ -130,8 +133,9 @@ static int32_t maininit(stateFilter *self)
 {
     struct data *this = (struct data *)self->localdata;
 
-    this->first_run    = 1;
-    this->accelUpdated = 0;
+    this->first_run     = 1;
+    this->accelUpdated  = 0;
+    this->magCalibrated = true;
     AttitudeSettingsGet(&this->attitudeSettings);
     HomeLocationGet(&this->homeLocation);
 
@@ -221,6 +225,16 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         mag[1] = 0.0f;
         mag[2] = 0.0f;
 #endif
+        float magBias[3];
+        RevoCalibrationmag_biasGet(magBias);
+        // don't trust Mag for initial orientation if it has not been calibrated
+        if (magBias[0] < 1e-6f && magBias[1] < 1e-6f && magBias[2] < 1e-6f) {
+            this->magCalibrated = false;
+            mag[0] = 100.0f;
+            mag[1] = 0.0f;
+            mag[2] = 0.0f;
+        }
+
         AttitudeStateData attitudeState; // base on previous state
         AttitudeStateGet(&attitudeState);
         this->init = 0;
@@ -257,21 +271,21 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         return 0;
     }
 
-    if ((this->init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
+    if ((this->init == 0 && xTaskGetTickCount() < 10000) && (xTaskGetTickCount() > 4000)) {
         // For first 7 seconds use accels to get gyro bias
         this->attitudeSettings.AccelKp     = 1.0f;
         this->attitudeSettings.AccelKi     = 0.0f;
         this->attitudeSettings.YawBiasRate = 0.23f;
         this->accel_filter_enabled   = false;
         this->rollPitchBiasRate      = 0.01f;
-        this->attitudeSettings.MagKp = 1.0f;
+        this->attitudeSettings.MagKp = this->magCalibrated ? 1.0f : 0.0f;
     } else if ((this->attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
         this->attitudeSettings.AccelKp     = 1.0f;
         this->attitudeSettings.AccelKi     = 0.0f;
         this->attitudeSettings.YawBiasRate = 0.23f;
         this->accel_filter_enabled   = false;
         this->rollPitchBiasRate      = 0.01f;
-        this->attitudeSettings.MagKp = 1.0f;
+        this->attitudeSettings.MagKp = this->magCalibrated ? 1.0f : 0.0f;
         this->init = 0;
     } else if (this->init == 0) {
         // Reload settings (all the rates)
@@ -371,7 +385,7 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
     this->gyroBias[0] -= accel_err[0] * this->attitudeSettings.AccelKi - gyro[0] * this->rollPitchBiasRate;
     this->gyroBias[1] -= accel_err[1] * this->attitudeSettings.AccelKi - gyro[1] * this->rollPitchBiasRate;
     if (this->useMag) {
-        this->gyroBias[2] -= mag_err[2] * this->attitudeSettings.MagKi - gyro[2] * this->rollPitchBiasRate;
+        this->gyroBias[2] -= -mag_err[2] * this->attitudeSettings.MagKi - gyro[2] * this->rollPitchBiasRate;
     } else {
         this->gyroBias[2] -= -gyro[2] * this->rollPitchBiasRate;
     }

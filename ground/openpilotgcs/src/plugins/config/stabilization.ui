@@ -1275,10 +1275,10 @@ border-radius: 5;</string>
                     <number>10</number>
                    </property>
                    <property name="maximum">
-                    <number>255</number>
+                    <number>180</number>
                    </property>
                    <property name="value">
-                    <number>115</number>
+                    <number>83</number>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -2534,13 +2534,13 @@ border-radius: 5;</string>
                     <number>10</number>
                    </property>
                    <property name="maximum">
-                    <number>255</number>
+                    <number>180</number>
                    </property>
                    <property name="singleStep">
                     <number>1</number>
                    </property>
                    <property name="value">
-                    <number>115</number>
+                    <number>83</number>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -8801,7 +8801,7 @@ border-radius: 5;</string>
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>-49</y>
+            <y>0</y>
             <width>936</width>
             <height>702</height>
            </rect>
@@ -9907,7 +9907,7 @@ border-radius: 5;</string>
                     <number>0</number>
                    </property>
                    <property name="maximum">
-                    <double>255.000000000000000</double>
+                    <double>180.000000000000000</double>
                    </property>
                    <property name="singleStep">
                     <double>1.000000000000000</double>
@@ -10112,7 +10112,7 @@ border-radius: 5;</string>
                     <number>0</number>
                    </property>
                    <property name="maximum">
-                    <double>255.000000000000000</double>
+                    <double>180.000000000000000</double>
                    </property>
                    <property name="singleStep">
                     <double>1.000000000000000</double>
@@ -12049,7 +12049,7 @@ border-radius: 5;</string>
                     <number>0</number>
                    </property>
                    <property name="maximum">
-                    <double>255.000000000000000</double>
+                    <double>180.000000000000000</double>
                    </property>
                    <property name="singleStep">
                     <double>1.000000000000000</double>

@@ -325,6 +325,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
     float dT;
     static uint8_t init = 0;
     static float gyro_bias[3] = { 0, 0, 0 };
+    static bool magCalibrated = true;
 
     // Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
     if (xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE ||
@@ -361,6 +362,15 @@ static int32_t updateAttitudeComplementary(bool first_run)
         magData.y = 0.0f;
         magData.z = 0.0f;
 #endif
+        float magBias[3];
+        RevoCalibrationmag_biasGet(magBias);
+        // don't trust Mag for initial orientation if it has not been calibrated
+        if (magBias[0] < 1e-6f && magBias[1] < 1e-6f && magBias[2] < 1e-6f) {
+            magCalibrated = false;
+            magData.x     = 100.0f;
+            magData.y     = 0.0f;
+            magData.z     = 0.0f;
+        }
         AttitudeStateData attitudeState;
         AttitudeStateGet(&attitudeState);
         init = 0;
@@ -396,21 +406,22 @@ static int32_t updateAttitudeComplementary(bool first_run)
         return 0;
     }
 
-    if ((init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
+    if ((xTaskGetTickCount() < 10000) && (xTaskGetTickCount() > 4000)) {
         // For first 7 seconds use accels to get gyro bias
         attitudeSettings.AccelKp     = 1.0f;
         attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
         accel_filter_enabled   = false;
         rollPitchBiasRate      = 0.01f;
-        attitudeSettings.MagKp = 1.0f;
+        attitudeSettings.MagKp = magCalibrated ? 1.0f : 0.0f;
+        init = 0;
     } else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
         attitudeSettings.AccelKp     = 1.0f;
         attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
         accel_filter_enabled   = false;
         rollPitchBiasRate      = 0.01f;
-        attitudeSettings.MagKp = 1.0f;
+        attitudeSettings.MagKp = magCalibrated ? 1.0f : 0.0f;
         init = 0;
     } else if (init == 0) {
         // Reload settings (all the rates)
@@ -523,14 +534,14 @@ static int32_t updateAttitudeComplementary(bool first_run)
     }
 
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
-    gyro_bias[0]    -= accel_err[0] * attitudeSettings.AccelKi - (gyroStateData.x - gyro_bias[0]) * rollPitchBiasRate;
-    gyro_bias[1]    -= accel_err[1] * attitudeSettings.AccelKi - (gyroStateData.y - gyro_bias[1]) * rollPitchBiasRate;
-    gyro_bias[2]    -= mag_err[2] * attitudeSettings.MagKi - (gyroStateData.z - gyro_bias[2]) * rollPitchBiasRate;
-
     // Correct rates based on integral coefficient
     gyroStateData.x -= gyro_bias[0];
     gyroStateData.y -= gyro_bias[1];
     gyroStateData.z -= gyro_bias[2];
+
+    gyro_bias[0]    -= accel_err[0] * attitudeSettings.AccelKi - (gyroStateData.x) * rollPitchBiasRate;
+    gyro_bias[1]    -= accel_err[1] * attitudeSettings.AccelKi - (gyroStateData.y) * rollPitchBiasRate;
+    gyro_bias[2]    -= -mag_err[2] * attitudeSettings.MagKi - (gyroStateData.z) * rollPitchBiasRate;
 
     // save gyroscope state
     GyroStateSet(&gyroStateData);

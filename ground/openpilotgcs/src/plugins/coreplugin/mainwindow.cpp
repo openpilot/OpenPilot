@@ -177,7 +177,8 @@ MainWindow::MainWindow() :
 #endif
     m_modeManager = new ModeManager(this, m_modeStack);
 
-    m_connectionManager = new ConnectionManager(this, m_modeStack);
+    m_connectionManager = new ConnectionManager(this);
+    m_modeStack->setCornerWidget(m_connectionManager, Qt::TopRightCorner);
 
     m_messageManager    = new MessageManager;
     setCentralWidget(m_modeStack);
@@ -1214,8 +1215,9 @@ void MainWindow::readSettings(QSettings *qs, bool workspaceDiffOnly)
 
     createWorkspaces(qs);
 
-    // Read tab ordering
+    // Restore tab ordering
     qs->beginGroup(QLatin1String(modePriorities));
+
     QStringList modeNames = qs->childKeys();
     QMap<QString, int> map;
     foreach(QString modeName, modeNames) {
@@ -1224,6 +1226,12 @@ void MainWindow::readSettings(QSettings *qs, bool workspaceDiffOnly)
     m_modeManager->reorderModes(map);
 
     qs->endGroup();
+
+    // Restore selected tab
+    if (m_workspaceSettings->restoreSelectedOnStartup()) {
+        int index = qs->value(QLatin1String("SelectedWorkspace")).toInt();
+        m_modeStack->setCurrentIndex(index);
+    }
 }
 
 
@@ -1262,12 +1270,16 @@ void MainWindow::saveSettings(QSettings *qs)
     }
     qs->endGroup();
 
+    // Write selected tab
+    qs->setValue(QLatin1String("SelectedWorkspace"), m_modeStack->currentIndex());
+
     foreach(UAVGadgetManager * manager, m_uavGadgetManagers) {
         manager->saveSettings(qs);
     }
 
     m_actionManager->saveSettings(qs);
     m_generalSettings->saveSettings(qs);
+
     qs->beginGroup("General");
     qs->setValue("Description", m_config_description);
     qs->setValue("Details", m_config_details);

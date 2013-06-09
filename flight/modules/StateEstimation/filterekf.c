@@ -425,7 +425,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     EKFStateVarianceSet(&vardata);
     int t;
     for (t = 0; t < EKFSTATEVARIANCE_P_NUMELEM; t++) {
-        if (invalid_var(vardata.P[t])) {
+        if (!IS_REAL(vardata.P[t]) || vardata.P[t] <= 0.0f) {
             INSResetP(this->ekfConfiguration.P);
             this->init_stage = -1;
             break;

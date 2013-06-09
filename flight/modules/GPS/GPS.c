@@ -276,8 +276,12 @@ static void gpsTask(__attribute__((unused)) void *parameters)
 #ifdef PIOS_GPS_SETS_POSITIONSENSOR
                 setPositionSensor(&gpspositionsensor);
 #endif
-            } else if (gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) {
+            } else if ((gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
+                       (gpspositionsensor.Latitude != 0 || gpspositionsensor.Longitude != 0)) {
                 AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_WARNING);
+#ifdef PIOS_GPS_SETS_POSITIONSENSOR
+                setPositionSensor(&gpspositionsensor);
+#endif
             } else {
                 AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
             }

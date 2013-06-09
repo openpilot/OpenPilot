@@ -311,6 +311,14 @@ static void StateEstimationCb(void)
     static filterPipeline *current;
     static stateEstimation states;
     static uint32_t last_time;
+    static uint16_t bootDelay = 64;
+
+    // after system startup, first few sensor readings might be messed up, delay until everything has settled
+    if (bootDelay) {
+        bootDelay--;
+        DelayedCallbackSchedule(stateEstimationCallback, TIMEOUT_MS, CALLBACK_UPDATEMODE_SOONER);
+        return;
+    }
 
     switch (runState) {
     case RUNSTATE_LOAD:

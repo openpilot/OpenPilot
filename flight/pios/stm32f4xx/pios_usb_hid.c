@@ -29,14 +29,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "pios.h"
+#include <pios.h>
 
 #ifdef PIOS_INCLUDE_USB_HID
 
-#include "pios_usb_hid_priv.h"
+#include <pios_usb_hid_priv.h>
 #include "pios_usb_board_data.h" /* PIOS_BOARD_*_DATA_LENGTH */
-#include "pios_usbhook.h" /* PIOS_USBHOOK_* */
-
+#include <pios_usbhook.h> /* PIOS_USBHOOK_* */
+#include <pios_delay.h>
 static void PIOS_USB_HID_RegisterTxCallback(uint32_t usbhid_id, pios_com_callback tx_out_cb, uint32_t context);
 static void PIOS_USB_HID_RegisterRxCallback(uint32_t usbhid_id, pios_com_callback rx_in_cb, uint32_t context);
 static void PIOS_USB_HID_TxStart(uint32_t usbhid_id, uint16_t tx_bytes_avail);
@@ -68,10 +68,10 @@ struct pios_usb_hid_dev {
     bool     usb_if_enabled;
 
     uint8_t  rx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH] __attribute__((aligned(4)));
-    bool     rx_active;
+    volatile bool rx_active;
 
     uint8_t  tx_packet_buffer[PIOS_USB_BOARD_HID_DATA_LENGTH] __attribute__((aligned(4)));
-    bool     tx_active;
+    volatile bool tx_active;
 
     uint32_t rx_dropped;
     uint32_t rx_oversize;
@@ -187,7 +187,7 @@ static bool PIOS_USB_HID_SendReport(struct pios_usb_hid_dev *usb_hid_dev)
     if (!usb_hid_dev->tx_out_cb) {
         return false;
     }
-
+    READ_MEMORY_BARRIER();
     bool need_yield = false;
 #ifdef PIOS_USB_BOARD_BL_HID_HAS_NO_LENGTH_BYTE
     bytes_to_tx = (usb_hid_dev->tx_out_cb)(usb_hid_dev->tx_out_context,
@@ -252,6 +252,12 @@ static void PIOS_USB_HID_RxStart(uint32_t usbhid_id, uint16_t rx_bytes_avail)
         return;
     }
 
+    // add a timeout to prevent connection drops
+    static uint32_t last_rx_time_raw = 0;
+    if (PIOS_DELAY_DiffuS(last_rx_time_raw) > 1000000) {
+        usb_hid_dev->rx_active = false;
+    }
+
     // If endpoint was stalled and there is now space make it valid
 #ifdef PIOS_USB_BOARD_BL_HID_HAS_NO_LENGTH_BYTE
     uint16_t max_payload_length = PIOS_USB_BOARD_HID_DATA_LENGTH - 1;
@@ -260,6 +266,7 @@ static void PIOS_USB_HID_RxStart(uint32_t usbhid_id, uint16_t rx_bytes_avail)
 #endif
 
     if (!usb_hid_dev->rx_active && (rx_bytes_avail >= max_payload_length)) {
+        last_rx_time_raw = PIOS_DELAY_GetRaw();
         PIOS_USBHOOK_EndpointRx(usb_hid_dev->cfg->data_rx_ep,
                                 usb_hid_dev->rx_packet_buffer,
                                 sizeof(usb_hid_dev->rx_packet_buffer));
@@ -303,6 +310,7 @@ static void PIOS_USB_HID_RegisterRxCallback(uint32_t usbhid_id, pios_com_callbac
      * field to determine if it's ok to dereference _cb and _context
      */
     usb_hid_dev->rx_in_context = context;
+    WRITE_MEMORY_BARRIER();
     usb_hid_dev->rx_in_cb = rx_in_cb;
 }
 
@@ -319,6 +327,7 @@ static void PIOS_USB_HID_RegisterTxCallback(uint32_t usbhid_id, pios_com_callbac
      * field to determine if it's ok to dereference _cb and _context
      */
     usb_hid_dev->tx_out_context = context;
+    WRITE_MEMORY_BARRIER();
     usb_hid_dev->tx_out_cb = tx_out_cb;
 }
 
@@ -340,6 +349,8 @@ static void PIOS_USB_HID_IF_Init(uint32_t usb_hid_id)
                                        PIOS_USB_HID_EP_OUT_Callback,
                                        (uint32_t)usb_hid_dev);
     usb_hid_dev->usb_if_enabled = true;
+    usb_hid_dev->tx_active = false;
+    usb_hid_dev->rx_active = false;
 }
 
 static void PIOS_USB_HID_IF_DeInit(uint32_t usb_hid_id)
@@ -352,6 +363,8 @@ static void PIOS_USB_HID_IF_DeInit(uint32_t usb_hid_id)
 
     /* DeRegister endpoint specific callbacks with the USBHOOK layer */
     usb_hid_dev->usb_if_enabled = false;
+    usb_hid_dev->tx_active = false;
+    usb_hid_dev->rx_active = false;
     PIOS_USBHOOK_DeRegisterEpInCallback(usb_hid_dev->cfg->data_tx_ep);
     PIOS_USBHOOK_DeRegisterEpOutCallback(usb_hid_dev->cfg->data_rx_ep);
 }
@@ -497,7 +510,7 @@ static bool PIOS_USB_HID_EP_OUT_Callback(uint32_t usb_hid_id, __attribute__((unu
         usb_hid_dev->rx_active = false;
         return false;
     }
-
+    READ_MEMORY_BARRIER();
     /* The first byte is report ID (not checked), the second byte is the valid data length */
     uint16_t headroom;
     bool need_yield = false;

@@ -34,11 +34,13 @@
 
 #include "usb_core.h"
 #include "pios_usb_board_data.h"
-#include "pios_usb_priv.h"
-
+#include <pios_usb_priv.h>
+#include <pios_helpers.h>
 
 /* Rx/Tx status */
 static uint8_t transfer_possible = 0;
+
+static void(*disconnection_cb_list[3]) (void);
 
 enum pios_usb_dev_magic {
     PIOS_USB_DEV_MAGIC = 0x17365904,
@@ -47,7 +49,12 @@ enum pios_usb_dev_magic {
 struct pios_usb_dev {
     enum pios_usb_dev_magic   magic;
     const struct pios_usb_cfg *cfg;
+#ifdef PIOS_INCLUDE_FREERTOS
+    xSemaphoreHandle statusCheckSemaphore;
+#endif
 };
+
+static void raiseDisconnectionCallbacks(void);
 
 /**
  * @brief Validate the usb device structure
@@ -67,7 +74,8 @@ static struct pios_usb_dev *PIOS_USB_alloc(void)
     if (!usb_dev) {
         return NULL;
     }
-
+    vSemaphoreCreateBinary(usb_dev->statusCheckSemaphore);
+    xSemaphoreGive(usb_dev->statusCheckSemaphore);
     usb_dev->magic = PIOS_USB_DEV_MAGIC;
     return usb_dev;
 }
@@ -162,15 +170,56 @@ uint32_t usb_found;
 bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
 {
     struct pios_usb_dev *usb_dev = (struct pios_usb_dev *)pios_usb_id;
+    static bool lastStatus = false;
 
     if (!PIOS_USB_validate(usb_dev)) {
         return false;
     }
 
     usb_found = ((usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin) != 0) ^ usb_dev->cfg->vsense_active_low;
-    return usb_found;
 
-    return usb_found != 0 && transfer_possible ? 1 : 0;
+    bool status = usb_found != 0 && transfer_possible ? 1 : 0;
+    bool reconnect = false;
+#ifdef PIOS_INCLUDE_FREERTOS
+    if(xSemaphoreTakeFromISR(usb_dev->statusCheckSemaphore, NULL) == pdTRUE) {
+#endif
+        reconnect = (lastStatus && !status);
+        lastStatus = status;
+#ifdef PIOS_INCLUDE_FREERTOS
+        xSemaphoreGiveFromISR(usb_dev->statusCheckSemaphore, NULL);
+    }
+#endif
+    if (reconnect) {
+        raiseDisconnectionCallbacks();
+    }
+
+    return status;
+}
+
+/*
+ *
+ * Register a physical disconnection callback
+ *
+ */
+void PIOS_USB_RegisterDisconnectionCallback(void (*disconnectionCB)(void))
+{
+    PIOS_Assert(disconnectionCB);
+    for (uint32_t i = 0; i < NELEMENTS(disconnection_cb_list); i++) {
+        if (disconnection_cb_list[i] == NULL) {
+            disconnection_cb_list[i] = disconnectionCB;
+            return;
+        }
+    }
+    PIOS_Assert(0);
+}
+
+static void raiseDisconnectionCallbacks(void)
+{
+    uint32_t i = 0;
+
+    while (i < NELEMENTS(disconnection_cb_list) && disconnection_cb_list[i] != NULL) {
+        (disconnection_cb_list[i++])();
+    }
 }
 
 /*

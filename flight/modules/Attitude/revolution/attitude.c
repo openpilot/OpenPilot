@@ -318,6 +318,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
     static int32_t timeval;
     float dT;
     static uint8_t init = 0;
+    static bool magCalibrated = true;
 
     // Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
     if (xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE ||
@@ -347,6 +348,15 @@ static int32_t updateAttitudeComplementary(bool first_run)
         magData.y = 0.0f;
         magData.z = 0.0f;
 #endif
+        float magBias[3];
+        RevoCalibrationmag_biasGet(magBias);
+        // don't trust Mag for initial orientation if it has not been calibrated
+        if (magBias[0] < 1e-6f && magBias[1] < 1e-6f && magBias[2] < 1e-6f) {
+            magCalibrated = false;
+            magData.x     = 100.0f;
+            magData.y     = 0.0f;
+            magData.z     = 0.0f;
+        }
         AttitudeActualData attitudeActual;
         AttitudeActualGet(&attitudeActual);
         init = 0;
@@ -382,21 +392,22 @@ static int32_t updateAttitudeComplementary(bool first_run)
         return 0;
     }
 
-    if ((init == 0 && xTaskGetTickCount() < 7000) && (xTaskGetTickCount() > 1000)) {
+    if ((xTaskGetTickCount() < 10000) && (xTaskGetTickCount() > 4000)) {
         // For first 7 seconds use accels to get gyro bias
         attitudeSettings.AccelKp     = 1.0f;
         attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
         accel_filter_enabled   = false;
         rollPitchBiasRate      = 0.01f;
-        attitudeSettings.MagKp = 1.0f;
+        attitudeSettings.MagKp = magCalibrated ? 1.0f : 0.0f;
+        init = 0;
     } else if ((attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE) && (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMING)) {
         attitudeSettings.AccelKp     = 1.0f;
         attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
         accel_filter_enabled   = false;
         rollPitchBiasRate      = 0.01f;
-        attitudeSettings.MagKp = 1.0f;
+        attitudeSettings.MagKp = magCalibrated ? 1.0f : 0.0f;
         init = 0;
     } else if (init == 0) {
         // Reload settings (all the rates)
@@ -498,22 +509,16 @@ static int32_t updateAttitudeComplementary(bool first_run)
     // Accumulate integral of error.  Scale here so that units are (deg/s) but Ki has units of s
     GyrosBiasData gyrosBias;
     GyrosBiasGet(&gyrosBias);
-    if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_TRUE) {
-        gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi - gyrosData.x * rollPitchBiasRate;
-        gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi - gyrosData.y * rollPitchBiasRate;
-        gyrosBias.z -= -gyrosData.z * rollPitchBiasRate;
-    } else {
-        gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi - (gyrosData.x - gyrosBias.x) * rollPitchBiasRate;;
-        gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi - (gyrosData.y - gyrosBias.y) * rollPitchBiasRate;
-        gyrosBias.z -= -(gyrosData.z - gyrosBias.z) * rollPitchBiasRate;
-
+    if (revoCalibration.BiasCorrectedRaw == REVOCALIBRATION_BIASCORRECTEDRAW_FALSE) {
         // if the raw values are not adjusted, we need to adjust here.
         gyrosData.x -= gyrosBias.x;
         gyrosData.y -= gyrosBias.y;
         gyrosData.z -= gyrosBias.z;
     }
 
-    gyrosBias.z -= mag_err[2] * attitudeSettings.MagKi;
+    gyrosBias.x -= accel_err[0] * attitudeSettings.AccelKi - gyrosData.x * rollPitchBiasRate;
+    gyrosBias.y -= accel_err[1] * attitudeSettings.AccelKi - gyrosData.y * rollPitchBiasRate;
+    gyrosBias.z -= -mag_err[2] * attitudeSettings.MagKi - gyrosData.z * rollPitchBiasRate;
     GyrosBiasSet(&gyrosBias);
 
     // Correct rates based on error, integral component dealt with in updateSensors

@@ -178,16 +178,16 @@ bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
 
     usb_found = ((usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin) != 0) ^ usb_dev->cfg->vsense_active_low;
 
-    bool status = usb_found != 0 && transfer_possible ? 1 : 0;
+    bool status    = usb_found != 0 && transfer_possible ? 1 : 0;
     bool reconnect = false;
 #ifdef PIOS_INCLUDE_FREERTOS
-    if(xSemaphoreTakeFromISR(usb_dev->statusCheckSemaphore, NULL) == pdTRUE) {
+    if (xSemaphoreTakeFromISR(usb_dev->statusCheckSemaphore, NULL) == pdTRUE) {
 #endif
-        reconnect = (lastStatus && !status);
-        lastStatus = status;
+    reconnect  = (lastStatus && !status);
+    lastStatus = status;
 #ifdef PIOS_INCLUDE_FREERTOS
-        xSemaphoreGiveFromISR(usb_dev->statusCheckSemaphore, NULL);
-    }
+    xSemaphoreGiveFromISR(usb_dev->statusCheckSemaphore, NULL);
+}
 #endif
     if (reconnect) {
         raiseDisconnectionCallbacks();

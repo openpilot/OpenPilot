@@ -192,6 +192,11 @@ void PIOS_Board_Init(void)
         PIOS_DEBUG_Assert(0);
     }
 
+    /* Initialize the task monitor */
+    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
+        PIOS_Assert(0);
+    }
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -230,11 +235,6 @@ void PIOS_Board_Init(void)
         /* Too many failed boot attempts, force hwsettings to defaults */
         HwSettingsSetDefaults(HwSettingsHandle(), 0);
         AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
-    }
-
-    /* Initialize the task monitor */
-    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
-        PIOS_Assert(0);
     }
 
     /* Initialize the delayed callback library */

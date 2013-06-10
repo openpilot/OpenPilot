@@ -811,6 +811,11 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     const float DEADBAND_HIGH = 1.0f / 2 + DEADBAND / 2;
     const float DEADBAND_LOW  = 1.0f / 2 - DEADBAND / 2;
 
+    // Stop updating AltitudeHoldDesired triggering a failsafe condition.
+    if (cmd->Throttle < 0) {
+        return;
+    }
+
     // this is the max speed in m/s at the extents of throttle
     uint8_t throttleRate;
     uint8_t throttleExp;

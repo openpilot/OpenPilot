@@ -1158,7 +1158,23 @@ out_end_trans:
 out_exit:
     return rc;
 }
+/**
+ * @brief Returs stats for the filesystems
+ * @param[in] fs_id The filesystem to use for this action
+ * @return 0 if success or error code
+ * @retval -1 if fs_id is not a valid filesystem instance
+ */
+int32_t PIOS_FLASHFS_GetStats(uintptr_t fs_id, struct PIOS_FLASHFS_Stats *stats){
+    PIOS_Assert(stats);
+    struct logfs_state *logfs = (struct logfs_state *)fs_id;
 
+    if (!PIOS_FLASHFS_Logfs_validate(logfs)) {
+        return -1;
+    }
+    stats->num_active_slots = logfs->num_active_slots;
+    stats->num_free_slots = logfs->num_free_slots;
+    return 0;
+}
 #endif /* PIOS_INCLUDE_FLASH */
 
 /**

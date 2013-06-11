@@ -77,7 +77,7 @@ uint32_t pios_com_hkosd_id;
 uint32_t pios_usb_rctx_id;
 
 uintptr_t pios_uavo_settings_fs_id;
-
+uintptr_t pios_user_fs_id = 0;
 /**
  * Configuration for MPU6000 chip
  */

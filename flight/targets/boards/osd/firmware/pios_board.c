@@ -105,6 +105,7 @@ uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_telem_rf_id;
 
 uintptr_t pios_uavo_settings_fs_id;
+uintptr_t pios_user_fs_id = 0;
 
 /**
  * TIM3 is triggered by the HSYNC signal into its ETR line and will divide the

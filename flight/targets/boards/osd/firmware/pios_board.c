@@ -105,6 +105,7 @@ uint32_t pios_com_telem_usb_id;
 uint32_t pios_com_telem_rf_id;
 
 uintptr_t pios_uavo_settings_fs_id;
+uintptr_t pios_user_fs_id = 0;
 
 /**
  * TIM3 is triggered by the HSYNC signal into its ETR line and will divide the
@@ -171,6 +172,10 @@ void PIOS_Board_Init(void)
 #error No setting storage specified. (define PIOS_USE_SETTINGS_ON_SDCARD or INCLUDE_FLASH_SECTOR_SETTINGS)
 #endif
 
+    /* Initialize the task monitor */
+    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
+        PIOS_Assert(0);
+    }
 
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
@@ -185,11 +190,6 @@ void PIOS_Board_Init(void)
 
     /* Initialize the alarms library */
     AlarmsInitialize();
-
-    /* Initialize the task monitor */
-    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
-        PIOS_Assert(0);
-    }
 
     /* Initialize the delayed callback library */
     CallbackSchedulerInitialize();

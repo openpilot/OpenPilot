@@ -91,6 +91,11 @@ void PIOS_Board_Init(void)
     PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_internal_cfg, &pios_internal_flash_driver, flash_id);
 #endif
 
+    /* Initialize the task monitor */
+    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
+        PIOS_Assert(0);
+    }
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -137,12 +142,6 @@ void PIOS_Board_Init(void)
         PIOS_IAP_WriteBootCmd(2, 0);
     }
     OPLinkSettingsGet(&oplinkSettings);
-
-
-    /* Initialize the task monitor */
-    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
-        PIOS_Assert(0);
-    }
 
     /* Initialize the delayed callback library */
     CallbackSchedulerInitialize();

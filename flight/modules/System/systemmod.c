@@ -53,6 +53,7 @@
 #include <watchdogstatus.h>
 #include <taskinfo.h>
 #include <hwsettings.h>
+#include <pios_flashfs.h>
 
 // Flight Libraries
 #include <sanitycheck.h>
@@ -94,7 +95,7 @@ static xQueueHandle objectPersistenceQueue;
 static bool stackOverflow;
 static bool mallocFailed;
 static HwSettingsData bootHwSettings;
-
+static struct PIOS_FLASHFS_Stats fsStats;
 // Private functions
 static void objectUpdatedCb(UAVObjEvent *ev);
 static void hwSettingsUpdatedCb(UAVObjEvent *ev);
@@ -108,6 +109,10 @@ static void systemTask(void *parameters);
 static void updateI2Cstats();
 static void updateWDGstats();
 #endif
+
+extern uintptr_t pios_uavo_settings_fs_id;
+extern uintptr_t pios_user_fs_id;
+
 /**
  * Create the module task.
  * \returns 0 on success or -1 if initialization failed
@@ -462,7 +467,18 @@ static void updateStats()
     if (idleCounterClear) {
         idleCounter = 0;
     }
-
+#if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
+    if(pios_uavo_settings_fs_id){
+        PIOS_FLASHFS_GetStats(pios_uavo_settings_fs_id, &fsStats);
+        stats.SysSlotsFree = fsStats.num_free_slots;
+        stats.SysSlotsActive = fsStats.num_active_slots;
+    }
+    if(pios_user_fs_id){
+        PIOS_FLASHFS_GetStats(pios_user_fs_id, &fsStats);
+        stats.UsrSlotsFree = fsStats.num_free_slots;
+        stats.UsrSlotsActive = fsStats.num_active_slots;
+    }
+#endif
     portTickType now = xTaskGetTickCount();
     if (now > lastTickCount) {
         uint32_t dT = (xTaskGetTickCount() - lastTickCount) * portTICK_RATE_MS; // in ms

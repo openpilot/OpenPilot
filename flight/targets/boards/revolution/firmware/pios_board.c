@@ -350,21 +350,16 @@ void PIOS_Board_Init(void)
     /* Connect flash to the appropriate interface and configure it */
     uintptr_t flash_id;
 
-    // initialize the internal settings storage flash
-    if (PIOS_Flash_Internal_Init(&flash_id, &flash_internal_cfg)) {
-        PIOS_DEBUG_Assert(0);
-    }
-
-    if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_internal_cfg, &pios_internal_flash_driver, flash_id)) {
-        PIOS_DEBUG_Assert(0);
-    }
-
     // Initialize the external USER flash
     if (PIOS_Flash_Jedec_Init(&flash_id, pios_spi_telem_flash_id, 1)) {
         PIOS_DEBUG_Assert(0);
     }
 
-    if (PIOS_FLASHFS_Logfs_Init(&pios_user_fs_id, &flashfs_external_cfg, &pios_jedec_flash_driver, flash_id)) {
+    if (PIOS_FLASHFS_Logfs_Init(&pios_uavo_settings_fs_id, &flashfs_external_system_cfg, &pios_jedec_flash_driver, flash_id)) {
+        PIOS_DEBUG_Assert(0);
+    }
+
+    if (PIOS_FLASHFS_Logfs_Init(&pios_user_fs_id, &flashfs_external_user_cfg, &pios_jedec_flash_driver, flash_id)) {
         PIOS_DEBUG_Assert(0);
     }
 
@@ -387,6 +382,12 @@ void PIOS_Board_Init(void)
 #ifdef PIOS_INCLUDE_WDG
     PIOS_WDG_Init();
 #endif
+
+    /* Initialize the task monitor */
+    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
+        PIOS_Assert(0);
+    }
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -394,11 +395,6 @@ void PIOS_Board_Init(void)
     HwSettingsInitialize();
     /* Initialize the alarms library */
     AlarmsInitialize();
-
-    /* Initialize the task monitor */
-    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
-        PIOS_Assert(0);
-    }
 
     /* Initialize the delayed callback library */
     CallbackSchedulerInitialize();

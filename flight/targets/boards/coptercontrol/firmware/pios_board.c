@@ -77,7 +77,7 @@ uint32_t pios_com_hkosd_id;
 uint32_t pios_usb_rctx_id;
 
 uintptr_t pios_uavo_settings_fs_id;
-
+uintptr_t pios_user_fs_id = 0;
 /**
  * Configuration for MPU6000 chip
  */
@@ -192,6 +192,11 @@ void PIOS_Board_Init(void)
         PIOS_DEBUG_Assert(0);
     }
 
+    /* Initialize the task monitor */
+    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
+        PIOS_Assert(0);
+    }
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -230,11 +235,6 @@ void PIOS_Board_Init(void)
         /* Too many failed boot attempts, force hwsettings to defaults */
         HwSettingsSetDefaults(HwSettingsHandle(), 0);
         AlarmsSet(SYSTEMALARMS_ALARM_BOOTFAULT, SYSTEMALARMS_ALARM_CRITICAL);
-    }
-
-    /* Initialize the task monitor */
-    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
-        PIOS_Assert(0);
     }
 
     /* Initialize the delayed callback library */

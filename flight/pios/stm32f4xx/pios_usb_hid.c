@@ -252,12 +252,6 @@ static void PIOS_USB_HID_RxStart(uint32_t usbhid_id, uint16_t rx_bytes_avail)
         return;
     }
 
-    // add a timeout to prevent connection drops
-    static uint32_t last_rx_time_raw = 0;
-    if (PIOS_DELAY_DiffuS(last_rx_time_raw) > 1000000) {
-        usb_hid_dev->rx_active = false;
-    }
-
     // If endpoint was stalled and there is now space make it valid
 #ifdef PIOS_USB_BOARD_BL_HID_HAS_NO_LENGTH_BYTE
     uint16_t max_payload_length = PIOS_USB_BOARD_HID_DATA_LENGTH - 1;
@@ -266,7 +260,6 @@ static void PIOS_USB_HID_RxStart(uint32_t usbhid_id, uint16_t rx_bytes_avail)
 #endif
 
     if (!usb_hid_dev->rx_active && (rx_bytes_avail >= max_payload_length)) {
-        last_rx_time_raw = PIOS_DELAY_GetRaw();
         PIOS_USBHOOK_EndpointRx(usb_hid_dev->cfg->data_rx_ep,
                                 usb_hid_dev->rx_packet_buffer,
                                 sizeof(usb_hid_dev->rx_packet_buffer));

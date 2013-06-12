@@ -63,6 +63,7 @@
 #define STACK_SIZE_BYTES 1024
 #define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
 #define ACCEL_DOWNSAMPLE 4
+#define TIMEOUT_TRESHOLD 200000
 // Private types
 
 // Private variables
@@ -130,7 +131,9 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 
     // Force update of the settings
     SettingsUpdatedCb(&ev);
-
+    // Failsafe handling
+    uint32_t lastAltitudeHoldDesiredUpdate = 0;
+    bool enterFailSafe = false;
     // Listen for updates.
     AltitudeHoldDesiredConnectQueue(queue);
     BaroSensorConnectQueue(queue);
@@ -144,6 +147,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
     // Main task loop
     bool baro_updated = false;
     while (1) {
+        enterFailSafe = PIOS_DELAY_DiffuS(lastAltitudeHoldDesiredUpdate) > TIMEOUT_TRESHOLD;
         // Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
         if (xQueueReceive(queue, &ev, 100 / portTICK_RATE_MS) != pdTRUE) {
             if (!running) {
@@ -173,6 +177,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 starting_altitude = altHold.Altitude;
             } else if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) {
                 running = false;
+                lastAltitudeHoldDesiredUpdate = PIOS_DELAY_GetRaw();
             }
         } else if (ev.obj == AccelStateHandle()) {
             static uint32_t timeval;
@@ -352,6 +357,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             }
 
             if (!running) {
+                lastAltitudeHoldDesiredUpdate = PIOS_DELAY_GetRaw();
                 continue;
             }
 
@@ -370,24 +376,31 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 
             // Instead of explicit limit on integral you output limit feedback
             StabilizationDesiredGet(&stabilizationDesired);
-            stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp + throttleIntegral -
-                                            altHold.Velocity * altitudeHoldSettings.Kd - altHold.Accel * altitudeHoldSettings.Ka;
-            if (stabilizationDesired.Throttle > 1) {
-                throttleIntegral -= (stabilizationDesired.Throttle - 1);
-                stabilizationDesired.Throttle = 1;
-            } else if (stabilizationDesired.Throttle < 0) {
-                throttleIntegral -= stabilizationDesired.Throttle;
-                stabilizationDesired.Throttle = 0;
+            if (!enterFailSafe) {
+                stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp + throttleIntegral -
+                                                altHold.Velocity * altitudeHoldSettings.Kd - altHold.Accel * altitudeHoldSettings.Ka;
+                if (stabilizationDesired.Throttle > 1) {
+                    throttleIntegral -= (stabilizationDesired.Throttle - 1);
+                    stabilizationDesired.Throttle = 1;
+                } else if (stabilizationDesired.Throttle < 0) {
+                    throttleIntegral -= stabilizationDesired.Throttle;
+                    stabilizationDesired.Throttle = 0;
+                }
+            } else {
+                // shutdown motors
+                stabilizationDesired.Throttle = -1;
             }
-
             stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL]  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
             stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
             stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW]   = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
             stabilizationDesired.Roll  = altitudeHoldDesired.Roll;
             stabilizationDesired.Pitch = altitudeHoldDesired.Pitch;
             stabilizationDesired.Yaw   = altitudeHoldDesired.Yaw;
+
             StabilizationDesiredSet(&stabilizationDesired);
         } else if (ev.obj == AltitudeHoldDesiredHandle()) {
+            // reset the failsafe timer
+            lastAltitudeHoldDesiredUpdate = PIOS_DELAY_GetRaw();
             AltitudeHoldDesiredGet(&altitudeHoldDesired);
         }
     }

@@ -118,6 +118,11 @@ void PIOS_Board_Init(void)
     /* Delay system */
     PIOS_DELAY_Init();
 
+    /* Initialize the task monitor */
+    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
+        PIOS_Assert(0);
+    }
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -128,11 +133,6 @@ void PIOS_Board_Init(void)
 
     /* Initialize the alarms library */
     AlarmsInitialize();
-
-    /* Initialize the task monitor */
-    if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
-        PIOS_Assert(0);
-    }
 
     /* Initialize the delayed callback library */
     CallbackSchedulerInitialize();

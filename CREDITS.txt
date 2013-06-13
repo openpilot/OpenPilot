@@ -16,6 +16,7 @@ Ed Faulkner
 Darren Furniss
 Frederic Goddeeris
 Daniel Godin
+Anthony Gomez
 Bani Greyling
 Nuno Guedes
 Erik Gustavsson
@@ -27,6 +28,7 @@ Ryan Hunt
 Mark James
 Sami Korhonen
 Thorsten Klose
+Ricky King
 Hallvard Kristiansen
 Edouard Lafargue
 Mike Labranche
@@ -36,12 +38,14 @@ David Llama
 Matt Lipski
 Les Newell
 Ken Northup
+Ben Matthews
 Greg Matthews
 Guy McCaldin
 Gary Mortimer
 Alessio Morale
 Cathy Moss
 Angus Peart
+John Pike
 Dmytro Poplavskiy
 Eric Price
 Richard Querin
@@ -58,6 +62,7 @@ Oleg Semyonov
 Stacey Sheldon
 Troy Schultz
 Dr. Erhard Siegl
+Dusty Anne Smith
 Mike Smith
 Alex Sowa
 Pete Stapley
@@ -69,6 +74,7 @@ Jasper van Loenen
 Vassilis Varveropoulos
 Kevin Vertucio
 Alex Vrubel
+Mike Walters
 Brian Webb
 Justin Welander
 Mat Wellington

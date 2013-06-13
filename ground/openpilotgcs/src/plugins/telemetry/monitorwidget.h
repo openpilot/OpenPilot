@@ -49,8 +49,6 @@ private:
     double minValue;
     double maxValue;
 
-    Qt::AspectRatioMode aspectRatioMode;
-
     QGraphicsSvgItem *graph;
 
     QPointer<QGraphicsTextItem> txSpeed;
@@ -58,6 +56,8 @@ private:
 
     QList<QGraphicsSvgItem*> txNodes;
     QList<QGraphicsSvgItem*> rxNodes;
+
+    Qt::AspectRatioMode aspectRatioMode;
 };
 
 #endif // MONITORWIDGET_H

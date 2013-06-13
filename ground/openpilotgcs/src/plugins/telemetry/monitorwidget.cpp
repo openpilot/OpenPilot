@@ -33,20 +33,29 @@ namespace {
         return item;
     }
 
-    // TODO elementId must be a rectangle and not a text element...
+    /**
+     * Create a text item based on a svg rectangle.
+     * The rectangle must be in the correct location (hint: use a "text" layer on top of the "background layer")
+     * The font size will be set to match as well as possible the rectangle height but it is not guaranteed.
+     *
+     * It is possible to show the text rectangle to help understand layout issues.
+     *
+     */
     // TODO move to some utility class that can be reused by other SVG manipulating code
-    QGraphicsTextItem *createTextItem(QGraphicsSvgItem *parent, QString elementId, QString fontName)
+    QGraphicsTextItem *createTextItem(QGraphicsSvgItem *parent, QString elementId, QString fontName,
+            bool showRect = false)
     {
-#ifdef DEBUG_TEXT
-        // create and display the text rectangle
-        createSvgItem(parent, elementId);
-#endif
+        if (showRect) {
+            // create and display the text rectangle
+            // needs to be done first otherwise the rectangle will blank out the text.
+            createSvgItem(parent, elementId);
+        }
 
         QGraphicsTextItem *item = new QGraphicsTextItem();
 
         QSvgRenderer *renderer = parent->renderer();
 
-        // move new text item to location of target element
+        // move new text item to location of rectangle element
         QMatrix elementMatrix = renderer->matrixForElement(elementId);
         QRectF elementRect = elementMatrix.mapRect(renderer->boundsOnElement(elementId));
 
@@ -57,26 +66,32 @@ namespace {
 
         item->setParentItem(parent);
         item->setTransform(matrix, false);
+        // to right align or center text we must provide a text width
         //item->setTextWidth(elementRect.width());
 
+        // create font to match the rectangle height
+        // there is not guaranteed that all fonts will play well...
         QFont font(fontName);
-        //font.setStyleHint(QFont::TypeWriter);
+        // not sure if PreferMatch helps to get the correct font size (i.e. that fits the text rectangle nicely)
         font.setStyleStrategy(QFont::PreferMatch);
         font.setPointSizeF(fontPointSizeF);
 
         item->setFont(font);
 
-//        qDebug() << "Font point size: " << fontPointSizeF;
-//        qDebug() << "Font pixel size: " << font.pixelSize();
-//        qDebug() << "Font point size: " << font.pointSize();
-//        qDebug() << "Font point size F: " << font.pointSizeF();
-//        qDebug() << "Font exact match: " << font.exactMatch();
+#ifdef DEBUG_FONT
+        // just in case
+        qDebug() << "Font point size: " << fontPointSizeF;
+        qDebug() << "Font pixel size: " << font.pixelSize();
+        qDebug() << "Font point size: " << font.pointSize();
+        qDebug() << "Font point size F: " << font.pointSizeF();
+        qDebug() << "Font exact match: " << font.exactMatch();
 
-//        QFontInfo fontInfo(font);
-//        qDebug() << "Font info pixel size: " << fontInfo.pixelSize();
-//        qDebug() << "Font info point size: " << fontInfo.pointSize();
-//        qDebug() << "Font info point size F: " << fontInfo.pointSizeF();
-//        qDebug() << "Font info exact match: " << fontInfo.exactMatch();
+        QFontInfo fontInfo(font);
+        qDebug() << "Font info pixel size: " << fontInfo.pixelSize();
+        qDebug() << "Font info point size: " << fontInfo.pointSize();
+        qDebug() << "Font info point size F: " << fontInfo.pointSizeF();
+        qDebug() << "Font info exact match: " << fontInfo.exactMatch();
+#endif
         return item;
     }
 
@@ -85,7 +100,7 @@ namespace {
 MonitorWidget::MonitorWidget(QWidget *parent) :
         QGraphicsView(parent), aspectRatioMode(Qt::KeepAspectRatio)
 {
-//    setMinimumWidth(180);
+    //setMinimumWidth(180);
 
     QGraphicsScene *scene = new QGraphicsScene();
     setScene(scene);
@@ -107,6 +122,7 @@ MonitorWidget::MonitorWidget(QWidget *parent) :
         graph = new QGraphicsSvgItem();
         graph->setSharedRenderer(renderer);
         graph->setElementId("background");
+
         graph->setFlags(QGraphicsItem::ItemClipsChildrenToShape | QGraphicsItem::ItemClipsToShape);
 
         scene->addItem(graph);
@@ -117,7 +133,7 @@ MonitorWidget::MonitorWidget(QWidget *parent) :
         i = 0;
         while (true) {
             QString id = QString("tx%0").arg(i);
-            QString bgId = QString("bg_tx%0").arg(i);
+            QString bgId = QString("tx_bg%0").arg(i);
             if (!renderer->elementExists(id) || !renderer->elementExists(bgId)) {
                 break;
             }
@@ -131,7 +147,7 @@ MonitorWidget::MonitorWidget(QWidget *parent) :
         i = 0;
         while (true) {
             QString id = QString("rx%0").arg(i);
-            QString bgId = QString("bg_rx%0").arg(i);
+            QString bgId = QString("rx_bg%0").arg(i);
             if (!renderer->elementExists(id) || !renderer->elementExists(bgId)) {
                 break;
             }
@@ -240,7 +256,6 @@ void MonitorWidget::telemetryUpdated(double txRate, double rxRate)
             node->setVisible(visible);
             node->update();
         }
-        //node->setOpacity(0.25);
     }
 
     for (int i = 0; i < rxNodes.count(); i++) {

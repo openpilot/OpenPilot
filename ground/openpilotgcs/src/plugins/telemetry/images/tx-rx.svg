@@ -106,7 +106,7 @@
            x="13"
            y="35">Tx</tspan></text>
       <rect
-         id="bg_tx0"
+         id="tx_bg0"
          ry="13"
          y="10"
          x="72"
@@ -114,7 +114,7 @@
          height="25"
          style="fill:#4d4d4d;stroke:none" />
       <rect
-         id="bg_tx1"
+         id="tx_bg1"
          ry="13"
          y="10"
          x="132"
@@ -122,7 +122,7 @@
          height="25"
          style="fill:#4d4d4d;stroke:none" />
       <rect
-         id="bg_tx2"
+         id="tx_bg2"
          ry="13"
          y="10"
          x="192"
@@ -130,7 +130,7 @@
          height="25"
          style="fill:#4d4d4d;stroke:none" />
       <rect
-         id="bg_tx3"
+         id="tx_bg3"
          ry="13"
          y="10"
          x="252"
@@ -138,7 +138,7 @@
          height="25"
          style="fill:#4d4d4d;stroke:none" />
       <rect
-         id="bg_tx4"
+         id="tx_bg4"
          ry="13"
          y="10"
          x="312"
@@ -146,7 +146,7 @@
          height="25"
          style="fill:#4d4d4d;stroke:none" />
       <rect
-         id="bg_tx5"
+         id="tx_bg5"
          ry="13"
          y="10"
          x="372"
@@ -154,7 +154,7 @@
          height="25"
          style="fill:#4d4d4d;stroke:none" />
       <rect
-         id="bg_tx6"
+         id="tx_bg6"
          ry="13"
          y="10"
          x="432"
@@ -174,7 +174,7 @@
            id="tspan3046"
            sodipodi:role="line">Rx</tspan></text>
       <rect
-         id="bg_rx0"
+         id="rx_bg0"
          ry="13"
          y="46"
          x="72"
@@ -182,7 +182,7 @@
          height="25"
          style="fill:#4d4d4d;stroke:none" />
       <rect
-         id="bg_rx1"
+         id="rx_bg1"
          ry="13"
          y="46"
          x="132"
@@ -190,7 +190,7 @@
          height="25"
          style="fill:#4d4d4d;stroke:none" />
       <rect
-         id="bg_rx2"
+         id="rx_bg2"
          ry="13"
          y="46"
          x="192"
@@ -198,7 +198,7 @@
          height="25"
          style="fill:#4d4d4d;stroke:none" />
       <rect
-         id="bg_rx3"
+         id="rx_bg3"
          ry="13"
          y="46"
          x="252"
@@ -206,7 +206,7 @@
          height="25"
          style="fill:#4d4d4d;stroke:none" />
       <rect
-         id="bg_rx4"
+         id="rx_bg4"
          ry="13"
          y="46"
          x="312"
@@ -214,7 +214,7 @@
          height="25"
          style="fill:#4d4d4d;stroke:none" />
       <rect
-         id="bg_rx5"
+         id="rx_bg5"
          ry="13"
          y="46"
          x="372"
@@ -222,7 +222,7 @@
          height="25"
          style="fill:#4d4d4d;stroke:none" />
       <rect
-         id="bg_rx6"
+         id="rx_bg6"
          ry="13"
          y="46"
          x="432"

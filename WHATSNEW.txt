@@ -127,6 +127,12 @@ KNOWN ISSUES:
 - Sensor calibration is not final. It will be reworked completely to
   increase its accuracy and make it easier to use.
 
+- Until the calibration is reworked, default attitude estimation algorithm
+  used by Revo is a complimentary filter with magnetometers disabled. Hence
+  Revo does not use them yet to correct yaw drift. Magnetometers can be
+  enabled, but you should properly calibrate them first. That's the reason
+  why they are disabled by default.
+
 - AltitudeHold mode is enabled, but it is not officially supported. Do
   not expect it to work perfectly and be considered production quality.
   You may play with it and report your issues and suggestions at your own

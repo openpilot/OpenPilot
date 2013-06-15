@@ -31,7 +31,7 @@
 #ifndef PIOS_RFM22B_H
 #define PIOS_RFM22B_H
 
-#include <packet_handler.h>
+#include <uavobjectmanager.h>
 #include <oplinksettings.h>
 
 /* Constant definitions */
@@ -104,28 +104,21 @@ struct rfm22b_stats {
     uint8_t  link_state;
 };
 
-/* Callback function prototypes */
-typedef void (*PIOS_RFM22B_ComConfigCallback)(OPLinkSettingsRemoteMainPortOptions main_port, OPLinkSettingsRemoteFlexiPortOptions flexi_port,
-                                              OPLinkSettingsRemoteVCPPortOptions vcp_port, OPLinkSettingsComSpeedOptions com_speed);
-
 /* Public Functions */
 extern int32_t PIOS_RFM22B_Init(uint32_t *rfb22b_id, uint32_t spi_id, uint32_t slave_num, const struct pios_rfm22b_cfg *cfg);
 extern void PIOS_RFM22B_Reinit(uint32_t rfb22b_id);
 extern void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr);
-extern void PIOS_RFM22B_SetFrequencyRange(uint32_t rfm22b_id, uint32_t min_freq, uint32_t max_freq, uint32_t step_size);
-extern void PIOS_RFM22B_SetInitialFrequency(uint32_t rfm22b_id, uint32_t init_freq);
-extern void PIOS_RFM22B_SetDestinationId(uint32_t rfm22b_id, uint32_t dest_id);
-extern void PIOS_RFM22B_SetComConfigCallback(uint32_t rfm22b_id, PIOS_RFM22B_ComConfigCallback cb);
-extern void PIOS_RFM22B_SetBindings(uint32_t rfm22b_id, const uint32_t bindingPairIDs[], const uint8_t mainPortSettings[],
-                                    const uint8_t flexiPortSettings[], const uint8_t vcpPortSettings[], const uint8_t comSpeeds[]);
+extern void PIOS_RFM22B_SetChannelConfig(uint32_t rfm22b_id, uint8_t num_chan, uint8_t min_chan, uint8_t max_chan, uint8_t chan_set, uint8_t packet_period, bool oneway);
+extern void PIOS_RFM22B_SetCoordinator(uint32_t rfm22b_id, bool coordinator);
+extern void PIOS_RFM22B_SetCoordinatorID(uint32_t rfm22b_id, uint32_t coord_id);
 extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
 extern bool PIOS_RFM22B_IsCoordinator(uint32_t rfb22b_id);
 extern void PIOS_RFM22B_GetStats(uint32_t rfm22b_id, struct rfm22b_stats *stats);
 extern uint8_t PIOS_RFM2B_GetPairStats(uint32_t rfm22b_id, uint32_t *device_ids, int8_t *RSSIs, uint8_t max_pairs);
 extern bool PIOS_RFM22B_InRxWait(uint32_t rfb22b_id);
 extern bool PIOS_RFM22B_LinkStatus(uint32_t rfm22b_id);
-extern bool PIOS_RFM22B_ReceivePacket(uint32_t rfm22b_id, PHPacketHandle p);
-extern bool PIOS_RFM22B_TransmitPacket(uint32_t rfm22b_id, PHPacketHandle p);
+extern bool PIOS_RFM22B_ReceivePacket(uint32_t rfm22b_id, uint8_t *p);
+extern bool PIOS_RFM22B_TransmitPacket(uint32_t rfm22b_id, uint8_t *p, uint8_t len);
 extern pios_rfm22b_int_result PIOS_RFM22B_ProcessTx(uint32_t rfm22b_id);
 extern pios_rfm22b_int_result PIOS_RFM22B_ProcessRx(uint32_t rfm22b_id);
 

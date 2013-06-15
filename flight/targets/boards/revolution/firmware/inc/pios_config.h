@@ -118,7 +118,7 @@
 #define PIOS_INCLUDE_RFM22B_COM
 #define PIOS_INCLUDE_RFM22B_RCVR
 /* #define PIOS_INCLUDE_PPM_OUT */
-/* #define PIOS_RFM22B_DEBUG_ON_TELEM */
+#define PIOS_RFM22B_DEBUG_ON_TELEM
 
 /* PIOS misc peripherals */
 /* #define PIOS_INCLUDE_VIDEO */

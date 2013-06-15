@@ -34,6 +34,8 @@
 
 #include "pios_rfm22b_priv.h"
 
+#include <gcsreceiver.h>
+
 /* Provide a RCVR driver */
 static int32_t PIOS_RFM22B_RCVR_Get(uint32_t rcvr_id, uint8_t channel);
 static void PIOS_RFM22B_RCVR_Supervisor(uint32_t rcvr_id);

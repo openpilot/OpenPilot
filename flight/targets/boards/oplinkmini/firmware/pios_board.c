@@ -75,6 +75,12 @@ uint8_t *pios_uart_tx_buffer;
 
 uintptr_t pios_uavo_settings_fs_id;
 
+// Forward definitions
+static void PIOS_InitUartMainPort();
+static void PIOS_InitUartFlexiPort();
+static void PIOS_InitPPMMainPort(bool input);
+static void PIOS_InitPPMFlexiPort(bool input);
+
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
@@ -216,12 +222,14 @@ void PIOS_Board_Init(void)
     /* Initalize the RFM22B radio COM device. */
 #if defined(PIOS_INCLUDE_RFM22B)
     {
+        // Configure the RFM22B device
         const struct pios_board_info *bdinfo     = &pios_board_info_blob;
         const struct pios_rfm22b_cfg *rfm22b_cfg = PIOS_BOARD_HW_DEFS_GetRfm22Cfg(bdinfo->board_rev);
         if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, rfm22b_cfg->slave_num, rfm22b_cfg)) {
             PIOS_Assert(0);
         }
 
+        // Configure the radio com interface
         uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
         uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
         PIOS_Assert(rx_buffer);
@@ -231,16 +239,115 @@ void PIOS_Board_Init(void)
                           tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
             PIOS_Assert(0);
         }
+        uint32_t comBaud = 9600;
+        switch (oplinkSettings.ComSpeed) {
+        case OPLINKSETTINGS_COMSPEED_2400:
+            comBaud = 2400;
+            break;
+        case OPLINKSETTINGS_COMSPEED_4800:
+            comBaud = 4800;
+            break;
+        case OPLINKSETTINGS_COMSPEED_9600:
+            comBaud = 9600;
+            break;
+        case OPLINKSETTINGS_COMSPEED_19200:
+            comBaud = 19200;
+            break;
+        case OPLINKSETTINGS_COMSPEED_38400:
+            comBaud = 38400;
+            break;
+        case OPLINKSETTINGS_COMSPEED_57600:
+            comBaud = 57600;
+            break;
+        case OPLINKSETTINGS_COMSPEED_115200:
+            comBaud = 115200;
+            break;
+        }
+        PIOS_COM_ChangeBaud(pios_com_rfm22b_id, comBaud);
 
-        /* Set the RFM22B bindings. */
-        PIOS_RFM22B_SetBindings(pios_rfm22b_id, oplinkSettings.Bindings, oplinkSettings.RemoteMainPort,
-                                oplinkSettings.RemoteFlexiPort, oplinkSettings.RemoteVCPPort, oplinkSettings.ComSpeed);
+        // Set the radio configuration parameters.
+        PIOS_RFM22B_SetChannelConfig(pios_rfm22b_id, oplinkSettings.NumChannels, oplinkSettings.MinChannel, oplinkSettings.MaxChannel, oplinkSettings.ChannelSet,
+                                     oplinkSettings.PacketTime, (oplinkSettings.OneWayLink == OPLINKSETTINGS_ONEWAYLINK_TRUE));
+        PIOS_RFM22B_SetCoordinator(pios_rfm22b_id, (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE));
+        PIOS_RFM22B_SetCoordinatorID(pios_rfm22b_id, oplinkSettings.CoordID);
+
+        // Reinitilize the modem to affect te changes.
+        PIOS_RFM22B_Reinit(pios_rfm22b_id);
     }
 #endif /* PIOS_INCLUDE_RFM22B */
 
     /* Allocate the uart buffers. */
     pios_uart_rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_RX_BUF_LEN);
     pios_uart_tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
+
+    // Configure the main port
+    bool is_coordinator = PIOS_RFM22B_IsCoordinator(pios_rfm22b_id);
+    switch (oplinkSettings.MainPort) {
+    case OPLINKSETTINGS_MAINPORT_TELEMETRY:
+    case OPLINKSETTINGS_MAINPORT_SERIAL:
+        /* Configure the main port for uart serial */
+        PIOS_InitUartMainPort();
+        PIOS_COM_TELEMETRY = PIOS_COM_TELEM_UART_MAIN;
+        break;
+    case OPLINKSETTINGS_MAINPORT_PPM:
+        PIOS_InitPPMMainPort(is_coordinator);
+        break;
+    case OPLINKSETTINGS_MAINPORT_DISABLED:
+        break;
+    }
+
+    // Configure the flexi port
+    switch (oplinkSettings.FlexiPort) {
+    case OPLINKSETTINGS_FLEXIPORT_TELEMETRY:
+    case OPLINKSETTINGS_FLEXIPORT_SERIAL:
+        /* Configure the flexi port as uart serial */
+        PIOS_InitUartFlexiPort();
+        PIOS_COM_TELEMETRY = PIOS_COM_TELEM_UART_FLEXI;
+        break;
+    case OPLINKSETTINGS_FLEXIPORT_PPM:
+        PIOS_InitPPMFlexiPort(is_coordinator);
+        break;
+    case OPLINKSETTINGS_FLEXIPORT_DISABLED:
+        break;
+    }
+
+    // Configure the USB VCP port
+    switch (oplinkSettings.VCPPort) {
+    case OPLINKSETTINGS_VCPPORT_SERIAL:
+        PIOS_COM_TELEMETRY = PIOS_COM_TELEM_USB_VCP;
+        break;
+    case OPLINKSETTINGS_VCPPORT_DISABLED:
+        break;
+    }
+
+    // Update the com baud rate.
+    uint32_t comBaud = 9600;
+    switch (oplinkSettings.ComSpeed) {
+    case OPLINKSETTINGS_COMSPEED_2400:
+        comBaud = 2400;
+        break;
+    case OPLINKSETTINGS_COMSPEED_4800:
+        comBaud = 4800;
+        break;
+    case OPLINKSETTINGS_COMSPEED_9600:
+        comBaud = 9600;
+        break;
+    case OPLINKSETTINGS_COMSPEED_19200:
+        comBaud = 19200;
+        break;
+    case OPLINKSETTINGS_COMSPEED_38400:
+        comBaud = 38400;
+        break;
+    case OPLINKSETTINGS_COMSPEED_57600:
+        comBaud = 57600;
+        break;
+    case OPLINKSETTINGS_COMSPEED_115200:
+        comBaud = 115200;
+        break;
+    }
+    if (PIOS_COM_TELEMETRY) {
+        PIOS_COM_ChangeBaud(PIOS_COM_TELEMETRY, comBaud);
+    }
 
     /* Remap AFIO pin */
     GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST, ENABLE);
@@ -251,7 +358,7 @@ void PIOS_Board_Init(void)
     PIOS_GPIO_Init();
 }
 
-void PIOS_InitUartMainPort()
+static void PIOS_InitUartMainPort()
 {
 #ifndef PIOS_RFM22B_DEBUG_ON_TELEM
     uint32_t pios_usart1_id;
@@ -268,7 +375,7 @@ void PIOS_InitUartMainPort()
 #endif
 }
 
-void PIOS_InitUartFlexiPort()
+static void PIOS_InitUartFlexiPort()
 {
     uint32_t pios_usart3_id;
 
@@ -284,7 +391,7 @@ void PIOS_InitUartFlexiPort()
     }
 }
 
-void PIOS_InitPPMMainPort(bool input)
+static void PIOS_InitPPMMainPort(bool input)
 {
 #if defined(PIOS_INCLUDE_PPM)
     /* PPM input is configured on the coordinator modem and output on the remote modem. */
@@ -300,7 +407,7 @@ void PIOS_InitPPMMainPort(bool input)
 #endif /* PIOS_INCLUDE_PPM */
 }
 
-void PIOS_InitPPMFlexiPort(bool input)
+static void PIOS_InitPPMFlexiPort(bool input)
 {
 #if defined(PIOS_INCLUDE_PPM)
     /* PPM input is configured on the coordinator modem and output on the remote modem. */

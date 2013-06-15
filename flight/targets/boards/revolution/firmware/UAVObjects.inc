@@ -87,7 +87,10 @@ UAVOBJSRCFILENAMES += hwsettings
 UAVOBJSRCFILENAMES += receiveractivity
 UAVOBJSRCFILENAMES += cameradesired
 UAVOBJSRCFILENAMES += camerastabsettings
-UAVOBJSRCFILENAMES += altitudeholdsettings                                                                                                            
+UAVOBJSRCFILENAMES += altitudeholdsettings
+UAVOBJSRCFILENAMES += oplinksettings
+UAVOBJSRCFILENAMES += oplinkstatus
+
 UAVOBJSRCFILENAMES += altitudeholddesired
 UAVOBJSRCFILENAMES += waypoint
 UAVOBJSRCFILENAMES += waypointactive

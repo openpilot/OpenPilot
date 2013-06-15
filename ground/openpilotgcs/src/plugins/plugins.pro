@@ -244,8 +244,3 @@ plugin_setupwizard.depends += plugin_config
 plugin_setupwizard.depends += plugin_uploader
 SUBDIRS += plugin_setupwizard
 
-# Junsi Powerlog plugin
-#plugin_powerlog.subdir = powerlog
-#plugin_powerlog.depends = plugin_coreplugin
-#plugin_powerlog.depends += plugin_rawhid
-#SUBDIRS += plugin_powerlog

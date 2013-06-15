@@ -27960,10 +27960,16 @@ border-radius: 5;</string>
                  <item row="2" column="6">
                   <widget class="QSlider" name="AltThrRateSlider">
                    <property name="maximum">
-                    <number>20</number>
+                    <number>10</number>
+                   </property>
+                   <property name="singleStep">
+                    <number>1</number>
+                   </property>
+                   <property name="pageStep">
+                    <number>1</number>
                    </property>
                    <property name="value">
-                    <number>10</number>
+                    <number>5</number>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -27971,12 +27977,15 @@ border-radius: 5;</string>
                    <property name="tickPosition">
                     <enum>QSlider::TicksBelow</enum>
                    </property>
+                   <property name="tickInterval">
+                    <number>0</number>
+                   </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
                      <string>objname:AltitudeHoldSettings</string>
                      <string>fieldname:ThrottleRate</string>
                      <string>haslimits:no</string>
-                     <string>scale:1</string>
+                     <string>scale:0.5</string>
                      <string>buttongroup:99</string>
                     </stringlist>
                    </property>
@@ -28096,9 +28105,6 @@ border-radius: 5;</string>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Rate mode (inner loop). Too much will make your vehicle oscillate in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
@@ -28211,9 +28217,6 @@ border-radius: 5;</string>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stabilty your vehicle will have when flying tilted (ie forward flight) in Rate Mode. A good starting point for Integral is the same as Proportional.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
@@ -28224,13 +28227,13 @@ border-radius: 5;</string>
                     <number>1</number>
                    </property>
                    <property name="maximum">
-                    <double>20.000000000000000</double>
+                    <double>5.000000000000000</double>
                    </property>
                    <property name="singleStep">
                     <double>0.100000000000000</double>
                    </property>
                    <property name="value">
-                    <double>10.000000000000000</double>
+                    <double>2.500000000000000</double>
                    </property>
                    <property name="objrelation" stdset="0">
                     <stringlist>
@@ -29391,9 +29394,6 @@ border-radius: 5;</string>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Rate mode (inner loop). Too much will make your vehicle oscillate in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
@@ -29440,9 +29440,6 @@ border-radius: 5;</string>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
                    </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stabilty your vehicle will have when flying tilted (ie forward flight) in Rate Mode. A good starting point for Integral is the same as Proportional.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                   </property>
                    <property name="styleSheet">
                     <string notr="true"/>
                    </property>
@@ -29488,9 +29485,6 @@ border-radius: 5;</string>
                    </property>
                    <property name="focusPolicy">
                     <enum>Qt::StrongFocus</enum>
-                   </property>
-                   <property name="toolTip">
-                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This makes the control output respond faster due to fast stick movements or external disturbance like wind gusts.It also acts like a dampener, thus allowing higher KP settings. Only effects Rate Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                    <property name="styleSheet">
                     <string notr="true"/>

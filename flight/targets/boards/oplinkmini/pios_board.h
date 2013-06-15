@@ -238,6 +238,8 @@ extern uint32_t pios_ppm_out_id;
 #define PIOS_ADC_TEMPERATURE_PIN 0
 #define PIOS_ADC_STM32_TEMP_V25 1.43f /* V */
 #define PIOS_ADC_STM32_TEMP_AVG_SLOPE 4.3f /* mV/C */
+#define PIOS_CONVERT_VOLT_TO_CPU_TEMP(x) ((PIOS_ADC_STM32_TEMP_V25 - x)  * 1000.0f / PIOS_ADC_STM32_TEMP_AVG_SLOPE + 25.0f)
+
 // ------------------------
 // PIOS_RCVR
 // See also pios_board.c

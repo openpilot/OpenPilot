@@ -298,6 +298,7 @@ extern uint32_t pios_packet_handler;
 #define PIOS_ADC_TEMPERATURE_PIN 3
 #define PIOS_ADC_STM32_TEMP_V25 0.76f       /* V */
 #define PIOS_ADC_STM32_TEMP_AVG_SLOPE 2.5f  /* mV/C */
+#define PIOS_CONVERT_VOLT_TO_CPU_TEMP(x) ((x - PIOS_ADC_STM32_TEMP_V25)  * 1000.0f / PIOS_ADC_STM32_TEMP_AVG_SLOPE + 25.0f)
 
 // -------------------------
 // USB

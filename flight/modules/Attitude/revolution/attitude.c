@@ -75,10 +75,12 @@
 #include "CoordinateConversions.h"
 
 // Private constants
-#define STACK_SIZE_BYTES    2048
-#define TASK_PRIORITY       (tskIDLE_PRIORITY + 3)
-#define FAILSAFE_TIMEOUT_MS 10
+#define STACK_SIZE_BYTES          2048
+#define TASK_PRIORITY             (tskIDLE_PRIORITY + 3)
+#define FAILSAFE_TIMEOUT_MS       10
 
+#define CALIBRATION_DELAY         4000
+#define CALIBRATION_DURATION      6000
 // low pass filter configuration to calculate offset
 // of barometric altitude sensor
 // reasoning: updates at: 10 Hz, tau= 300 s settle time
@@ -319,6 +321,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
     float dT;
     static uint8_t init = 0;
     static bool magCalibrated = true;
+    static uint32_t initStartupTime = 0;
 
     // Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
     if (xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE ||
@@ -389,10 +392,26 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
         timeval = PIOS_DELAY_GetRaw();
 
+        // wait calibration_delay only at powerup
+        if (xTaskGetTickCount() < 3000) {
+            initStartupTime = 0;
+        } else {
+            initStartupTime = xTaskGetTickCount() - CALIBRATION_DELAY;
+        }
+
+        // Zero gyro bias
+        // This is really needed after updating calibration settings.
+        GyrosBiasData zeroGyrosBias;
+        GyrosBiasGet(&zeroGyrosBias);
+        zeroGyrosBias.x = 0;
+        zeroGyrosBias.y = 0;
+        zeroGyrosBias.z = 0;
+        GyrosBiasSet(&zeroGyrosBias);
         return 0;
     }
 
-    if ((xTaskGetTickCount() < 10000) && (xTaskGetTickCount() > 4000)) {
+    if ((xTaskGetTickCount() - initStartupTime < CALIBRATION_DURATION + CALIBRATION_DELAY) &&
+        (xTaskGetTickCount() - initStartupTime > CALIBRATION_DELAY)) {
         // For first 7 seconds use accels to get gyro bias
         attitudeSettings.AccelKp     = 1.0f;
         attitudeSettings.AccelKi     = 0.0f;
@@ -619,8 +638,9 @@ static int32_t updateAttitudeComplementary(bool first_run)
         }
     }
 
-
-    if (variance_error) {
+    if (!init) {
+        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+    } else if (variance_error) {
         AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
     } else {
         AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);

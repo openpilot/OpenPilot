@@ -38,10 +38,12 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <pios.h>
+
+#include <uavobjectmanager.h>
 #include <openpilot.h>
 
 #include <oplinkstatus.h>
-#include <oplinksettings.h>
 #include <taskinfo.h>
 
 #include <pios_rfm22b.h>

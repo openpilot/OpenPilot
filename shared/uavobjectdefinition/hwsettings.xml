@@ -17,8 +17,6 @@
 		<field name="RM_FlexiPort" units="function" type="enum" elements="1" options="Disabled,Telemetry,GPS,I2C,DSM2,DSMX (10bit),DSMX (11bit),DebugConsole,ComBridge,OsdHk" defaultvalue="Disabled"/>
 
 		<field name="RadioPort" units="function" type="enum" elements="1" options="Disabled,Telemetry" defaultvalue="Disabled"/>
-		<field name="MaxRFPower" units="mW" type="enum" elements="1" options="1.25,1.6,3.16,6.3,12.6,25,50,100" defaultvalue="1.25"/>
-		<field name="DefaultFrequency" units="Hz" type="uint32" elements="1" defaultvalue="433000000"/>
 		  
 		<field name="TelemetrySpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>
 		<field name="GPSSpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="57600"/>

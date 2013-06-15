@@ -30,6 +30,8 @@
 #include <uavobjectsinit.h>
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
+#include <oplinksettings.h>
+#include <oplinkstatus.h>
 #include <taskinfo.h>
 
 /*
@@ -391,8 +393,9 @@ void PIOS_Board_Init(void)
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
-
     HwSettingsInitialize();
+    OPLinkStatusInitialize();
+
     /* Initialize the alarms library */
     AlarmsInitialize();
 
@@ -704,25 +707,54 @@ void PIOS_Board_Init(void)
 
     /* Initalize the RFM22B radio COM device. */
 #if defined(PIOS_INCLUDE_RFM22B)
+    /* Is the radio turned on? */
     uint8_t hwsettings_radioport;
     HwSettingsRadioPortGet(&hwsettings_radioport);
-    uint8_t hwsettings_maxrfpower;
-    HwSettingsMaxRFPowerGet(&hwsettings_maxrfpower);
-    uint32_t hwsettings_deffreq;
-    HwSettingsDefaultFrequencyGet(&hwsettings_deffreq);
     switch (hwsettings_radioport) {
     case HWSETTINGS_RADIOPORT_DISABLED:
         break;
     case HWSETTINGS_RADIOPORT_TELEMETRY:
     {
+        // Initialize out status object.
+        OPLinkStatusData oplinkStatus;
+        OPLinkStatusGet(&oplinkStatus);
+        oplinkStatus.BoardType     = bdinfo->board_type;
+        PIOS_BL_HELPER_FLASH_Read_Description(oplinkStatus.Description, OPLINKSTATUS_DESCRIPTION_NUMELEM);
+        PIOS_SYS_SerialNumberGetBinary(oplinkStatus.CPUSerial);
+        oplinkStatus.BoardRevision = bdinfo->board_rev;
+        OPLinkStatusSet(&oplinkStatus);
+
+        /* Initialize the OPLinkSettings object. */
+        OPLinkSettingsInitialize();
+
+        /* Fetch the OPinkSettings object. */
+        OPLinkSettingsData oplinkSettings;
+        OPLinkSettingsGet(&oplinkSettings);
+
+        /* Configure the RFM22B device. */
         const struct pios_rfm22b_cfg *rfm22b_cfg = PIOS_BOARD_HW_DEFS_GetRfm22Cfg(bdinfo->board_rev);
         if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, rfm22b_cfg->slave_num, rfm22b_cfg)) {
             PIOS_Assert(0);
         }
 
-        // Set the modem parameters and reinitilize the modem.
-        PIOS_RFM22B_SetInitialFrequency(pios_rfm22b_id, hwsettings_deffreq);
-        switch (hwsettings_maxrfpower) {
+        /* Configure the radio com interface */
+        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
+        PIOS_Assert(rx_buffer);
+        PIOS_Assert(tx_buffer);
+        if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_rfm22b_com_driver, pios_rfm22b_id,
+                          rx_buffer, PIOS_COM_RFM22B_RF_RX_BUF_LEN,
+                          tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
+            PIOS_Assert(0);
+        }
+
+        /* Set the radio configuration parameters. */
+        PIOS_RFM22B_SetChannelConfig(pios_rfm22b_id, oplinkSettings.NumChannels, oplinkSettings.MinChannel, oplinkSettings.MaxChannel, oplinkSettings.ChannelSet,
+                                     oplinkSettings.PacketTime, (oplinkSettings.OneWayLink == OPLINKSETTINGS_ONEWAYLINK_TRUE));
+        PIOS_RFM22B_SetCoordinatorID(pios_rfm22b_id, oplinkSettings.CoordID);
+
+        /* Set the modem Tx poer level */
+        switch (oplinkSettings.MaxRFPower) {
         case OPLINKSETTINGS_MAXRFPOWER_125:
             PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_0);
             break;
@@ -751,19 +783,10 @@ void PIOS_Board_Init(void)
             // do nothing
             break;
         }
+
+        /* Reinitialize the modem. */
         PIOS_RFM22B_Reinit(pios_rfm22b_id);
 
-#ifdef PIOS_INCLUDE_RFM22B_COM
-        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
-        PIOS_Assert(rx_buffer);
-        PIOS_Assert(tx_buffer);
-        if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_rfm22b_com_driver, pios_rfm22b_id,
-                          rx_buffer, PIOS_COM_RFM22B_RF_RX_BUF_LEN,
-                          tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
-            PIOS_Assert(0);
-        }
-#endif
 #ifdef PIOS_INCLUDE_RFM22B_RCVR
         if (PIOS_RFM22B_RCVR_Init(pios_rfm22b_id) != 0) {
             PIOS_Assert(0);

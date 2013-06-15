@@ -55,14 +55,14 @@ private:
     // Are the settings current?
     bool settingsUpdated;
 
-    // Signal mappers to add arguments to signals.
-    QSignalMapper *signalMapperAddBinding;
-    QSignalMapper *signalMapperRemBinding;
+    void SetPairID(QLineEdit *pairIdWidget);
 
 private slots:
     void disconnected();
-    void addBinding(QWidget *w);
-    void removeBinding(QWidget *w);
+    void bind1();
+    void bind2();
+    void bind3();
+    void bind4();
 };
 
 #endif // CONFIGTXPIDWIDGET_H

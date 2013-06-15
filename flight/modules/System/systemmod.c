@@ -204,7 +204,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
     while (1) {
         // Update the system statistics
         updateStats();
-        cycleCount = cycleCount > 0 ? cycleCount - 1 : 3;
+        cycleCount = cycleCount > 0 ? cycleCount - 1 : 7;
 
         // Update the system alarms
         updateSystemAlarms();
@@ -224,7 +224,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
         uint8_t armingStatus;
         FlightStatusArmedGet(&armingStatus);
         if ((armingStatus == FLIGHTSTATUS_ARMED_ARMED && (cycleCount & 0x1)) ||
-            (armingStatus != FLIGHTSTATUS_ARMED_ARMED && (cycleCount & 0x2))) {
+            (armingStatus != FLIGHTSTATUS_ARMED_ARMED && (cycleCount & 0x4))) {
             PIOS_LED_On(PIOS_LED_HEARTBEAT);
         } else {
             PIOS_LED_Off(PIOS_LED_HEARTBEAT);
@@ -238,7 +238,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
         if (AlarmsHasCritical()) {
             PIOS_LED_On(PIOS_LED_ALARM);
         } else if( (AlarmsHasErrors() && (cycleCount & 0x1)) ||
-                (!AlarmsHasErrors() && AlarmsHasWarnings() && (cycleCount & 0x2))){
+                (!AlarmsHasErrors() && AlarmsHasWarnings() && (cycleCount & 0x4))){
             PIOS_LED_On(PIOS_LED_ALARM);
         } else {
             PIOS_LED_Off(PIOS_LED_ALARM);
@@ -247,7 +247,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
 
 
         UAVObjEvent ev;
-        int delayTime = SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ);
+        int delayTime = SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2);
 
         if (xQueueReceive(objectPersistenceQueue, &ev, delayTime) == pdTRUE) {
             // If object persistence is updated call the callback

@@ -638,7 +638,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
         }
     }
 
-    if (!init) {
+    if (!init && flightStatus.Armed == FLIGHTSTATUS_ARMED_DISARMED) {
         AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
     } else if (variance_error) {
         AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);

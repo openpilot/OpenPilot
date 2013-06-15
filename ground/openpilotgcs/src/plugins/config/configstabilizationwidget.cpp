@@ -92,10 +92,6 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 
     connect(this, SIGNAL(autoPilotConnected()), this, SLOT(onBoardConnected()));
 
-    // Link by default
-    ui->checkBox_7->setChecked(true);
-    ui->checkBox_8->setChecked(true);
-
     disableMouseWheelEvents();
     updateEnableControls();
 }

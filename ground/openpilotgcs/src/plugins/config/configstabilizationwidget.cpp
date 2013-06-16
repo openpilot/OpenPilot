@@ -90,9 +90,7 @@ ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTa
 
     connect(this, SIGNAL(widgetContentsChanged(QWidget *)), this, SLOT(processLinkedWidgets(QWidget *)));
 
-    // Link by default
-    ui->checkBox_7->setChecked(true);
-    ui->checkBox_8->setChecked(true);
+    connect(this, SIGNAL(autoPilotConnected()), this, SLOT(onBoardConnected()));
 
     disableMouseWheelEvents();
     updateEnableControls();
@@ -102,7 +100,6 @@ ConfigStabilizationWidget::~ConfigStabilizationWidget()
 {
     // Do nothing
 }
-
 
 void ConfigStabilizationWidget::refreshWidgetsValues(UAVObject *o)
 {
@@ -193,4 +190,14 @@ void ConfigStabilizationWidget::processLinkedWidgets(QWidget *widget)
             ui->ratePitchKi_4->setValue(ui->RateResponsivenessSlider->value());
         }
     }
+}
+
+void ConfigStabilizationWidget::onBoardConnected()
+{
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    UAVObjectUtilManager *utilMngr = pm->getObject<UAVObjectUtilManager>();
+    Q_ASSERT(utilMngr);
+
+    // If Revolution board enable misc tab, otherwise disable it
+    ui->Miscellaneous->setEnabled((utilMngr->getBoardModel() & 0xff00) == 0x0900);
 }

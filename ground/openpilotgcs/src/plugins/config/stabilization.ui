@@ -28146,7 +28146,7 @@ border-radius: 5;</string>
                     <string notr="true"/>
                    </property>
                    <property name="text">
-                    <string>Rate</string>
+                    <string>Max Vertical Speed</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

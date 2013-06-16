@@ -112,7 +112,6 @@ extern void PIOS_RFM22B_SetChannelConfig(uint32_t rfm22b_id, uint8_t num_chan, u
 extern void PIOS_RFM22B_SetCoordinator(uint32_t rfm22b_id, bool coordinator);
 extern void PIOS_RFM22B_SetCoordinatorID(uint32_t rfm22b_id, uint32_t coord_id);
 extern uint32_t PIOS_RFM22B_DeviceID(uint32_t rfb22b_id);
-extern bool PIOS_RFM22B_IsCoordinator(uint32_t rfb22b_id);
 extern void PIOS_RFM22B_GetStats(uint32_t rfm22b_id, struct rfm22b_stats *stats);
 extern uint8_t PIOS_RFM2B_GetPairStats(uint32_t rfm22b_id, uint32_t *device_ids, int8_t *RSSIs, uint8_t max_pairs);
 extern bool PIOS_RFM22B_InRxWait(uint32_t rfb22b_id);

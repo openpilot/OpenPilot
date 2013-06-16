@@ -483,22 +483,6 @@ static bool rfm22_isConnected(struct pios_rfm22b_dev *rfm22b_dev)
 }
 
 /**
- * Returns true if the modem is configured as a coordinator.
- *
- * @param[in] rfm22b_id The RFM22B device index.
- * @return True if the modem is configured as a coordinator.
- */
-bool PIOS_RFM22B_IsCoordinator(uint32_t rfm22b_id)
-{
-    struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-
-    if (PIOS_RFM22B_Validate(rfm22b_dev)) {
-        return rfm22_isCoordinator(rfm22b_dev);
-    }
-    return false;
-}
-
-/**
  * Returns true if the modem is not actively sending or receiving a packet.
  *
  * @param[in] rfm22b_id The RFM22B device index.

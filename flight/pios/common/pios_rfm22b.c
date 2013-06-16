@@ -2013,8 +2013,18 @@ static portTickType rfm22_coordinatorTime(struct pios_rfm22b_dev *rfm22b_dev, po
 static bool rfm22_timeToSend(struct pios_rfm22b_dev *rfm22b_dev)
 {
     portTickType time = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
+    bool is_coordinator = rfm22_isCoordinator(rfm22b_dev);
 
-    if (!rfm22_isCoordinator(rfm22b_dev)) {
+    // If this is a one-way link, only the coordinator can send.
+    if (rfm22b_dev->one_way_link) {
+        if (is_coordinator) {
+            return ((time -1) % (rfm22b_dev->packet_period)) == 0;
+        } else {
+            return false;
+        }
+    }
+
+    if (!is_coordinator) {
         time += rfm22b_dev->packet_period - 1;
     } else {
         time -= 1;

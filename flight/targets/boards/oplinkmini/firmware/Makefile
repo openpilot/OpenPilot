@@ -49,10 +49,10 @@ ifndef TESTAPP
     SRC += $(OPUAVOBJ)/callbackscheduler.c
 
     ## UAVObjects
-    SRC += $(OPUAVSYNTHDIR)/gcsreceiver.c
     SRC += $(OPUAVSYNTHDIR)/oplinkstatus.c
     SRC += $(OPUAVSYNTHDIR)/oplinksettings.c
     SRC += $(OPUAVSYNTHDIR)/objectpersistence.c
+    SRC += $(OPUAVSYNTHDIR)/oplinkreceiver.c
 else
     ## Test Code
     SRC += $(OPTESTS)/test_common.c

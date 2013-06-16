@@ -221,6 +221,7 @@ void PIOS_Board_Init(void)
 
     /* Initalize the RFM22B radio COM device. */
 #if defined(PIOS_INCLUDE_RFM22B)
+    bool is_coordinator = (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
     {
         // Configure the RFM22B device
         const struct pios_board_info *bdinfo     = &pios_board_info_blob;
@@ -265,10 +266,41 @@ void PIOS_Board_Init(void)
         }
         PIOS_COM_ChangeBaud(pios_com_rfm22b_id, comBaud);
 
+        /* Set the modem Tx poer level */
+        switch (oplinkSettings.MaxRFPower) {
+        case OPLINKSETTINGS_MAXRFPOWER_125:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_0);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_16:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_1);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_316:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_2);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_63:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_3);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_126:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_4);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_25:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_5);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_50:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_6);
+            break;
+        case OPLINKSETTINGS_MAXRFPOWER_100:
+            PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_7);
+            break;
+        default:
+            // do nothing
+            break;
+        }
+
         // Set the radio configuration parameters.
         PIOS_RFM22B_SetChannelConfig(pios_rfm22b_id, oplinkSettings.NumChannels, oplinkSettings.MinChannel, oplinkSettings.MaxChannel, oplinkSettings.ChannelSet,
                                      oplinkSettings.PacketTime, (oplinkSettings.OneWayLink == OPLINKSETTINGS_ONEWAYLINK_TRUE));
-        PIOS_RFM22B_SetCoordinator(pios_rfm22b_id, (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE));
+        PIOS_RFM22B_SetCoordinator(pios_rfm22b_id, is_coordinator);
         PIOS_RFM22B_SetCoordinatorID(pios_rfm22b_id, oplinkSettings.CoordID);
 
         // Reinitilize the modem to affect te changes.
@@ -281,7 +313,6 @@ void PIOS_Board_Init(void)
     pios_uart_tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
 
     // Configure the main port
-    bool is_coordinator = PIOS_RFM22B_IsCoordinator(pios_rfm22b_id);
     switch (oplinkSettings.MainPort) {
     case OPLINKSETTINGS_MAINPORT_TELEMETRY:
     case OPLINKSETTINGS_MAINPORT_SERIAL:

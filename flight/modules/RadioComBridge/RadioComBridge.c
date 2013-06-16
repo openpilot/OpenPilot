@@ -35,7 +35,9 @@
 #include <oplinkstatus.h>
 #include <objectpersistence.h>
 #include <oplinksettings.h>
+#include <oplinkreceiver.h>
 #include <uavtalk_priv.h>
+#include <pios_ppm_out.h>
 #include <pios_rfm22b.h>
 #include <ecc.h>
 #if defined(PIOS_INCLUDE_FLASH_EEPROM)
@@ -65,6 +67,7 @@ typedef struct {
     xTaskHandle telemetryRxTaskHandle;
     xTaskHandle radioTxTaskHandle;
     xTaskHandle radioRxTaskHandle;
+    xTaskHandle PPMInputTaskHandle;
 
     // The UAVTalk connection on the com side.
     UAVTalkConnection telemUAVTalkCon;
@@ -94,11 +97,13 @@ static void telemetryTxTask(void *parameters);
 static void telemetryRxTask(void *parameters);
 static void radioTxTask(void *parameters);
 static void radioRxTask(void *parameters);
+static void PPMInputTask(void *parameters);
 static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length);
 static int32_t RadioSendHandler(uint8_t *buf, int32_t length);
 static void ProcessTelemetryStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t rxbyte);
 static void ProcessRadioStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t rxbyte);
 static void objectPersistenceUpdatedCb(UAVObjEvent *objEv);
+static void oplinkReceiverUpdatedCb(UAVObjEvent *objEv);
 
 // ****************
 // Private variables
@@ -116,6 +121,7 @@ static int32_t RadioComBridgeStart(void)
         // Get the settings.
         OPLinkSettingsData oplinkSettings;
         OPLinkSettingsGet(&oplinkSettings);
+        bool is_coordinator = (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
 
         // We will not parse/send UAVTalk if any ports are configured as Serial (except for over the USB HID port).
         data->parseUAVTalk = ((oplinkSettings.MainPort != OPLINKSETTINGS_MAINPORT_SERIAL) &&
@@ -156,12 +162,29 @@ static int32_t RadioComBridgeStart(void)
         // Configure our UAVObjects for updates.
         UAVObjConnectQueue(UAVObjGetByID(OPLINKSTATUS_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
         UAVObjConnectQueue(UAVObjGetByID(OBJECTPERSISTENCE_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL);
+        if (is_coordinator) {
+            UAVObjConnectQueue(UAVObjGetByID(OPLINKRECEIVER_OBJID), data->radioEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
+        } else {
+            UAVObjConnectQueue(UAVObjGetByID(OPLINKRECEIVER_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
+        }
+
+        // Configure the UAVObject callbacks
+        ObjectPersistenceConnectCallback(&objectPersistenceUpdatedCb);
+        if (!is_coordinator) {
+            OPLinkReceiverConnectCallback(&oplinkReceiverUpdatedCb);
+        }
 
         // Start the primary tasks for receiving/sending UAVTalk packets from the GCS.
         xTaskCreate(telemetryTxTask, (signed char *)"telemetryTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
         xTaskCreate(telemetryRxTask, (signed char *)"telemetryRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryRxTaskHandle));
         xTaskCreate(radioTxTask, (signed char *)"radioTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioTxTaskHandle));
         xTaskCreate(radioRxTask, (signed char *)"radioRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioRxTaskHandle));
+        if (PIOS_PPM_RECEIVER != 0) {
+            xTaskCreate(PPMInputTask, (signed char *)"PPMInputTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->PPMInputTaskHandle));
+#ifdef PIOS_INCLUDE_WDG
+            PIOS_WDG_RegisterFlag(PIOS_WDG_PPMINPUT);
+#endif
+        }
 
         // Register the watchdog timers.
 #ifdef PIOS_INCLUDE_WDG
@@ -192,9 +215,7 @@ static int32_t RadioComBridgeInitialize(void)
     // Initialize the UAVObjects that we use
     OPLinkStatusInitialize();
     ObjectPersistenceInitialize();
-
-    // Configure the UAVObject callbacks
-    ObjectPersistenceConnectCallback(&objectPersistenceUpdatedCb);
+    OPLinkReceiverInitialize();
 
     // Initialise UAVTalk
     data->telemUAVTalkCon   = UAVTalkInitialize(&UAVTalkSendHandler);
@@ -203,13 +224,6 @@ static int32_t RadioComBridgeInitialize(void)
     // Initialize the queues.
     data->uavtalkEventQueue = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(UAVObjEvent));
     data->radioEventQueue   = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(UAVObjEvent));
-
-    // Configure our UAVObjects for updates.
-    UAVObjConnectQueue(UAVObjGetByID(OPLINKSTATUS_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
-    UAVObjConnectQueue(UAVObjGetByID(OBJECTPERSISTENCE_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL);
-#if defined(PIOS_INCLUDE_RFM22B_GCSRECEIVER)
-    UAVObjConnectQueue(UAVObjGetByID(GCSRECEIVER_OBJID), data->uavtalkEventQueue, EV_UPDATED | EV_UPDATED_MANUAL | EV_UPDATE_REQ);
-#endif
 
     // Initialize the statistics.
     data->comTxErrors   = 0;
@@ -389,6 +403,42 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
     }
 }
 
+
+/**
+ * @brief Reads the PPM input device and sends out OPLinkReceiver objects.
+ *
+ * @param[in] parameters  The task parameters (unused)
+ */
+static void PPMInputTask(__attribute__((unused)) void *parameters)
+{
+    xSemaphoreHandle sem = PIOS_RCVR_GetSemaphore(PIOS_PPM_RECEIVER, 1);
+    OPLinkReceiverData opl_rcvr;
+
+    // Task loop
+    while (1) {
+#ifdef PIOS_INCLUDE_WDG
+        PIOS_WDG_UpdateFlag(PIOS_WDG_PPMINPUT);
+#endif
+
+        // Wait for the receiver semaphore.
+        bool valid_input_detected = false;
+        if (xSemaphoreTake(sem, MAX_PORT_DELAY) == pdTRUE) {
+            // Read the receiver inputs.
+            for (uint8_t i = 0; i < OPLINKRECEIVER_CHANNEL_NUMELEM; ++i) {
+                opl_rcvr.Channel[i] = PIOS_RCVR_Read(PIOS_PPM_RECEIVER, i + 1);
+                if ((opl_rcvr.Channel[i] != PIOS_RCVR_INVALID) && (opl_rcvr.Channel[i] != PIOS_RCVR_TIMEOUT)) {
+                    valid_input_detected = true;
+                }
+            }
+        }
+
+        // Set the receiver UAVO if we detected valid input.
+        if (valid_input_detected) {
+            OPLinkReceiverSet(&opl_rcvr);
+        }
+    }
+}
+
 /**
  * @brief Transmit data buffer to the com port.
  *
@@ -471,8 +521,15 @@ static void ProcessRadioStream(UAVTalkConnection inConnectionHandle, UAVTalkConn
     } else if (state == UAVTALK_STATE_COMPLETE) {
         // We only want to unpack certain objects from the remote modem.
         uint32_t objId = UAVTalkGetPacketObjId(inConnectionHandle);
-        if (objId != OPLINKSTATUS_OBJID) {
+        switch (objId) {
+        case OPLINKSTATUS_OBJID:
+            break;
+        case OPLINKRECEIVER_OBJID:
+            UAVTalkReceiveObject(inConnectionHandle);
+            break;
+        default:
             UAVTalkRelayPacket(inConnectionHandle, outConnectionHandle);
+            break;
         }
     }
 }
@@ -491,7 +548,7 @@ static void objectPersistenceUpdatedCb(__attribute__((unused)) UAVObjEvent *objE
     // Is this concerning or setting object?
     if (obj_per.ObjectID == OPLINKSETTINGS_OBJID) {
         // Is this a save, load, or delete?
-        bool success = true;
+        bool success = false;
         switch (obj_per.Operation) {
         case OBJECTPERSISTENCE_OPERATION_LOAD:
         {
@@ -540,5 +597,21 @@ static void objectPersistenceUpdatedCb(__attribute__((unused)) UAVObjEvent *objE
             obj_per.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
             ObjectPersistenceSet(&obj_per);
         }
+    }
+}
+
+/**
+ * @brief Callback that is called when the OPLinkReceiver UAVObject is changed.
+ * @param[in] objEv  The event that precipitated the callback.
+ */
+static void oplinkReceiverUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
+{
+    // Get the OPLinkReceiver object.
+    OPLinkReceiverData opl_rcvr;
+
+    OPLinkReceiverGet(&opl_rcvr);
+
+    for (uint8_t i = 0; i < OPLINKRECEIVER_CHANNEL_NUMELEM; ++i) {
+        PIOS_PPM_OUT_Set(PIOS_PPM_OUTPUT, i, opl_rcvr.Channel[i]);
     }
 }

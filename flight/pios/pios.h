@@ -241,10 +241,6 @@
 #include <pios_sbus.h>
 #endif
 
-#ifdef PIOS_INCLUDE_GCSRCVR
-/* only priv header */
-#endif
-
 /* PIOS abstract receiver interface */
 #ifdef PIOS_INCLUDE_RCVR
 #include <pios_rcvr.h>

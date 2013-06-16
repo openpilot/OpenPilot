@@ -59,6 +59,7 @@ UAVOBJSRCFILENAMES += mixersettings
 UAVOBJSRCFILENAMES += mixerstatus
 UAVOBJSRCFILENAMES += nedaccel
 UAVOBJSRCFILENAMES += objectpersistence
+UAVOBJSRCFILENAMES += oplinkreceiver
 UAVOBJSRCFILENAMES += overosyncstats
 UAVOBJSRCFILENAMES += overosyncsettings
 UAVOBJSRCFILENAMES += pathaction

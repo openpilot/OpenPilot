@@ -32,6 +32,8 @@
 #include <manualcontrolsettings.h>
 #include <oplinksettings.h>
 #include <oplinkstatus.h>
+#include <oplinkreceiver.h>
+#include <pios_oplinkrcvr_priv.h>
 #include <taskinfo.h>
 
 /*
@@ -787,16 +789,6 @@ void PIOS_Board_Init(void)
         /* Reinitialize the modem. */
         PIOS_RFM22B_Reinit(pios_rfm22b_id);
 
-#ifdef PIOS_INCLUDE_RFM22B_RCVR
-        if (PIOS_RFM22B_RCVR_Init(pios_rfm22b_id) != 0) {
-            PIOS_Assert(0);
-        }
-        uint32_t pios_rfm22b_rcvr_id;
-        if (PIOS_RCVR_Init(&pios_rfm22b_rcvr_id, &pios_rfm22b_rcvr_driver, pios_rfm22b_id)) {
-            PIOS_Assert(0);
-        }
-        pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_OPLINK] = pios_rfm22b_rcvr_id;
-#endif
         break;
     }
     }
@@ -857,6 +849,19 @@ void PIOS_Board_Init(void)
     }
     pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
 #endif /* PIOS_INCLUDE_GCSRCVR */
+
+#if defined(PIOS_INCLUDE_OPLINKRCVR)
+    {
+        OPLinkReceiverInitialize();
+        uint32_t pios_oplinkrcvr_id;
+        PIOS_OPLinkRCVR_Init(&pios_oplinkrcvr_id);
+        uint32_t pios_oplinkrcvr_rcvr_id;
+        if (PIOS_RCVR_Init(&pios_oplinkrcvr_rcvr_id, &pios_oplinkrcvr_rcvr_driver, pios_oplinkrcvr_id)) {
+            PIOS_Assert(0);
+        }
+        pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_OPLINK] = pios_oplinkrcvr_rcvr_id;
+    }
+#endif /* PIOS_INCLUDE_OPLINKRCVR */
 
 #ifndef PIOS_ENABLE_DEBUG_PINS
     // pios_servo_cfg points to the correct configuration based on input port settings

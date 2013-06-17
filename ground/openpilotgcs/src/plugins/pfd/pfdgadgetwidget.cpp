@@ -328,7 +328,7 @@ void PFDGadgetWidget::updateGroundspeed(UAVObject *object)
 
     if (northField && eastField) {
         double val = floor(sqrt(pow(northField->getDouble(), 2) + pow(eastField->getDouble(), 2)) * 10) / 10;
-        groundspeedTarget = 3.6 * val * speedScaleHeight / 30;
+        groundspeedTarget = val * speedScaleHeight / 30;
 
         if (!dialTimer.isActive()) {
             dialTimer.start(); // Rearm the dial Timer which might be stopped.

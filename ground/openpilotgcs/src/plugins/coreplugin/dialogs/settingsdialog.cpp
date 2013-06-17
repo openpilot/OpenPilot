@@ -48,7 +48,6 @@ namespace {
         int index;
         QString category;
         QString id;
-
     };
 
     // helper to sort by translated category and name
@@ -146,14 +145,15 @@ SettingsDialog::SettingsDialog(QWidget *parent, const QString &categoryId, const
     connect(this, SIGNAL(settingsDialogShown(Core::Internal::SettingsDialog *)), m_instanceManager,
             SLOT(settingsDialogShown(Core::Internal::SettingsDialog *)));
     connect(this, SIGNAL(settingsDialogRemoved()), m_instanceManager, SLOT(settingsDialogRemoved()));
-    connect(this, SIGNAL(categoryItemSelected()), this, SLOT(categoryItemSelectedShowChildInstead()),
-            Qt::QueuedConnection);
+
+    // needs to be queued to be able to change the selection from the selection change signal call
+    connect(this, SIGNAL(categoryItemSelected()), this, SLOT(onCategorySelected()), Qt::QueuedConnection);
 
     splitter->setCollapsible(0, false);
     splitter->setCollapsible(1, false);
     pageTree->header()->setVisible(false);
 
-    connect(pageTree, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT(pageSelected()));
+    connect(pageTree, SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)), this, SLOT(onItemSelected()));
 
     QList<Core::IOptionsPage *> pluginPages;
     QList<Core::IOptionsPage *> gadgetPages;
@@ -286,18 +286,31 @@ QTreeWidgetItem *SettingsDialog::addPage(IOptionsPage *page) {
     return item;
 }
 
-void SettingsDialog::pageSelected()
+void SettingsDialog::onItemSelected()
 {
     QTreeWidgetItem *item = pageTree->currentItem();
-
     if (!item) {
         return;
     }
 
+    if (pageTree->indexOfTopLevelItem(item) >= 0) {
+        if (item->childCount() == 1) {
+            // single child : category will not be expanded
+            item = item->child(0);
+        }
+        else if (item->childCount() > 1) {
+            // multiple children : expand category and select 1st child
+            emit categoryItemSelected();
+            return;
+        }
+    }
+
+    // get user data
     PageData data = item->data(0, Qt::UserRole).value<PageData>();
     int index     = data.index;
     m_currentCategory = data.category;
     m_currentPage     = data.id;
+
     // check if we are looking at a place holder or not
     QWidget *widget = dynamic_cast<QLabel *>(stackedPages->widget(index));
     if (widget) {
@@ -308,25 +321,23 @@ void SettingsDialog::pageSelected()
         IOptionsPage *page = m_pages.at(index);
         stackedPages->insertWidget(index, page->createPage(stackedPages));
     }
+
     stackedPages->setCurrentIndex(index);
-    // If user selects a toplevel item, select the first child for them
-    // I.e. Top level items are not really selectable
-    if ((pageTree->indexOfTopLevelItem(item) >= 0) && (item->childCount() > 0)) {
-        emit categoryItemSelected();
-    }
 }
 
-void SettingsDialog::categoryItemSelectedShowChildInstead()
+void SettingsDialog::onCategorySelected()
 {
     QTreeWidgetItem *item = pageTree->currentItem();
-
-    item->setExpanded(true);
-    pageTree->setCurrentItem(item->child(0), 0, QItemSelectionModel::SelectCurrent);
+    if (item->childCount() > 1) {
+        item->setExpanded(true);
+        pageTree->setCurrentItem(item->child(0), 0, QItemSelectionModel::SelectCurrent);
+    }
 }
 
 void SettingsDialog::deletePage()
 {
     QTreeWidgetItem *item = pageTree->currentItem();
+
     PageData data    = item->data(0, Qt::UserRole).value<PageData>();
     QString category = data.category;
 
@@ -337,9 +348,9 @@ void SettingsDialog::deletePage()
         parentItem->removeChild(item);
         if (parentItem->childCount() == 1) {
             parentItem->child(0)->setHidden(true);
+            pageTree->setCurrentItem(parentItem, 0, QItemSelectionModel::SelectCurrent);
         }
     }
-    pageSelected();
 }
 
 // TODO duplicates a lot of the addPage code...

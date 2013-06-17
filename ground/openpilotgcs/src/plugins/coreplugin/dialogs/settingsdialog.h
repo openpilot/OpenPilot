@@ -64,11 +64,11 @@ public slots:
     void done(int);
 
 private slots:
-    void pageSelected();
+    void onItemSelected();
+    void onCategorySelected();
     void accept();
     void reject();
     void apply();
-    void categoryItemSelectedShowChildInstead();
 
 private:
     QList<Core::IOptionsPage *> m_pages;

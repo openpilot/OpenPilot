@@ -46,6 +46,10 @@ void PfdQmlGadget::loadConfiguration(IUAVGadgetConfiguration *config)
     m_widget->setLatitude(m->latitude());
     m_widget->setLongitude(m->longitude());
     m_widget->setAltitude(m->altitude());
+    m_widget->setSpeedFactor(m->speedFactor());
+    m_widget->setSpeedUnit(m->speedUnit());
+    m_widget->setAltitudeFactor(m->altitudeFactor());
+    m_widget->setAltitudeUnit(m->altitudeUnit());
 
     // setting OSGEARTH_CACHE_ONLY seems to work the most reliably
     // between osgEarth versions I tried

@@ -137,6 +137,34 @@ void UAVTalkGetStats(UAVTalkConnection connectionHandle, UAVTalkStats *statsOut)
 }
 
 /**
+ * Get communication statistics counters
+ * \param[in] connection UAVTalkConnection to be used
+ * @param[out] statsOut Statistics counters
+ */
+void UAVTalkAddStats(UAVTalkConnection connectionHandle, UAVTalkStats *statsOut)
+{
+    UAVTalkConnectionData *connection;
+
+    CHECKCONHANDLE(connectionHandle, connection, return );
+
+    // Lock
+    xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
+
+    // Copy stats
+    statsOut->txBytes += connection->stats.txBytes;
+    statsOut->rxBytes += connection->stats.rxBytes;
+    statsOut->txObjectBytes += connection->stats.txObjectBytes;
+    statsOut->rxObjectBytes += connection->stats.rxObjectBytes;
+    statsOut->txObjects += connection->stats.txObjects;
+    statsOut->rxObjects += connection->stats.rxObjects;
+    statsOut->txErrors += connection->stats.txErrors;
+    statsOut->txErrors += connection->stats.txErrors;
+
+    // Release lock
+    xSemaphoreGiveRecursive(connection->lock);
+}
+
+/**
  * Reset the statistics counters.
  * \param[in] connection UAVTalkConnection to be used
  */

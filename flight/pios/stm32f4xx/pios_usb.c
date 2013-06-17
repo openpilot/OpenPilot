@@ -53,9 +53,9 @@ struct pios_usb_dev {
     xSemaphoreHandle statusCheckSemaphore;
 #endif
 };
-
+#ifdef PIOS_INCLUDE_FREERTOS
 static void raiseDisconnectionCallbacks(void);
-
+#endif
 /**
  * @brief Validate the usb device structure
  * @returns true if valid device or false otherwise
@@ -170,30 +170,33 @@ uint32_t usb_found;
 bool PIOS_USB_CheckAvailable(__attribute__((unused)) uint32_t id)
 {
     struct pios_usb_dev *usb_dev = (struct pios_usb_dev *)pios_usb_id;
-    static bool lastStatus = false;
 
     if (!PIOS_USB_validate(usb_dev)) {
         return false;
     }
 
     usb_found = ((usb_dev->cfg->vsense.gpio->IDR & usb_dev->cfg->vsense.init.GPIO_Pin) != 0) ^ usb_dev->cfg->vsense_active_low;
-
+// Please note that checks of transfer_possible and the reconnection handling is
+// suppressed for non freertos mode (aka bootloader) as this is causing problems detecting connection and
+// broken communications.
+#ifdef PIOS_INCLUDE_FREERTOS
+    static bool lastStatus = false;
     bool status    = usb_found != 0 && transfer_possible ? 1 : 0;
     bool reconnect = false;
-#ifdef PIOS_INCLUDE_FREERTOS
     if (xSemaphoreTakeFromISR(usb_dev->statusCheckSemaphore, NULL) == pdTRUE) {
-#endif
-    reconnect  = (lastStatus && !status);
-    lastStatus = status;
-#ifdef PIOS_INCLUDE_FREERTOS
-    xSemaphoreGiveFromISR(usb_dev->statusCheckSemaphore, NULL);
-}
-#endif
+        reconnect  = (lastStatus && !status);
+        lastStatus = status;
+        xSemaphoreGiveFromISR(usb_dev->statusCheckSemaphore, NULL);
+    }
     if (reconnect) {
         raiseDisconnectionCallbacks();
     }
-
     return status;
+
+#else
+    return usb_found;
+
+#endif
 }
 
 /*
@@ -212,7 +215,7 @@ void PIOS_USB_RegisterDisconnectionCallback(void (*disconnectionCB)(void))
     }
     PIOS_Assert(0);
 }
-
+#ifdef PIOS_INCLUDE_FREERTOS
 static void raiseDisconnectionCallbacks(void)
 {
     uint32_t i = 0;
@@ -221,7 +224,7 @@ static void raiseDisconnectionCallbacks(void)
         (disconnection_cb_list[i++])();
     }
 }
-
+#endif
 /*
  *
  * Provide STM32 USB OTG BSP layer API

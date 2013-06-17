@@ -167,7 +167,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
 {
     /* start the delayed callback scheduler */
     CallbackSchedulerStart();
-    uint8_t cycleCount;
+    uint8_t cycleCount = 0;
     /* create all modules thread */
     MODULE_TASKCREATE_ALL;
 

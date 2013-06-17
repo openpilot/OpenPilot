@@ -412,7 +412,8 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
     if ((xTaskGetTickCount() - initStartupTime < CALIBRATION_DURATION + CALIBRATION_DELAY) &&
         (xTaskGetTickCount() - initStartupTime > CALIBRATION_DELAY)) {
-        // For first 7 seconds use accels to get gyro bias
+        // For first CALIBRATION_DURATION seconds after CALIBRATION_DELAY from startup
+        // Zero gyro bias assuming it is steady, smoothing the gyro input value applying rollPitchBiasRate.
         attitudeSettings.AccelKp     = 1.0f;
         attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;

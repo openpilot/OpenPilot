@@ -167,7 +167,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
 {
     /* start the delayed callback scheduler */
     CallbackSchedulerStart();
-    static uint8_t cycleCount;
+    uint8_t cycleCount;
     /* create all modules thread */
     MODULE_TASKCREATE_ALL;
 
@@ -237,8 +237,8 @@ static void systemTask(__attribute__((unused)) void *parameters)
 #if defined(PIOS_LED_ALARM)
         if (AlarmsHasCritical()) {
             PIOS_LED_On(PIOS_LED_ALARM);
-        } else if( (AlarmsHasErrors() && (cycleCount & 0x1)) ||
-                (!AlarmsHasErrors() && AlarmsHasWarnings() && (cycleCount & 0x4))){
+        } else if ((AlarmsHasErrors() && (cycleCount & 0x1)) ||
+                   (!AlarmsHasErrors() && AlarmsHasWarnings() && (cycleCount & 0x4))) {
             PIOS_LED_On(PIOS_LED_ALARM);
         } else {
             PIOS_LED_Off(PIOS_LED_ALARM);

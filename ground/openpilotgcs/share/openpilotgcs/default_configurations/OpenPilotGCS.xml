@@ -2759,11 +2759,47 @@
             <type>splitter</type>
           </side0>
           <side1>
-            <classId>PFDGadget</classId>
-            <gadget>
-              <activeConfiguration>raw</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
+            <side0>
+              <side0>
+                <classId>DialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Deluxe Attitude</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side0>
+              <side1>
+                <classId>DialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Deluxe Baro Altimeter</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side1>
+              <splitterOrientation>2</splitterOrientation>
+              <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+              <type>splitter</type>
+            </side0>
+            <side1>
+              <side0>
+                <classId>DialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Deluxe Compass</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side0>
+              <side1>
+                <classId>DialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Deluxe Climbrate</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side1>
+              <splitterOrientation>2</splitterOrientation>
+              <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+              <type>splitter</type>
+            </side1>
+            <splitterOrientation>1</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+            <type>splitter</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
           <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABLwAAAAIAAAHf)</splitterSizes>

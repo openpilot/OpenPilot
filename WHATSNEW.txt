@@ -184,7 +184,8 @@ OP-899, OP-900, OP-903, OP-905, OP-906, OP-907, OP-910, OP-912, OP-917,
 OP-920, OP-925, OP-926, OP-928, OP-935, OP-936, OP-939, OP-952, OP-955, 
 OP-957, OP-958, OP-965, OP-968, OP-969, OP-970, OP-976, OP-977, OP-980, 
 OP-981, OP-982, OP-983, OP-987, OP-988, OP-989, OP-990, OP-991, OP-993
-OP-997, OP-998, OP-999
+OP-997, OP-998, OP-999, OP-1000, OP-1005, OP-1009, OP-1011, OP-1012, OP-1013,
+
 
 Short summary of changes. For a complete list see the git log.
 
@@ -234,6 +235,10 @@ Flight code changes:
 - Cyr's attitude patch is ported from CC3D to Revo;
 - added magnetometer options (mags are disabled by default for Revo complimenary filter);
 - advance camera stabilisation is now officially released;
+- Revo alarm led now distinguish between Critical(lit led), Error(blink fast), Warning(blink slowly) Alarm condition
+- Revo alarm led flash fast(like in Error Alarm) during calibration using complementary attitude estimation.
+- Redo gyro bias zero after calibration parameters changes
+- Do not raise GPS alarm if a gps port is not configured.
 - fixed numerous internal firmware bugs (too many to list here).
 
 GCS code changes:
@@ -261,6 +266,10 @@ GCS code changes:
 - anti-aliased scope plugin;
 - numerous code fixes and cleanups (too many to list here);
 - USB HID code is replaced by new cross-platform hidapi library to fix old Linux/OSX problems.
+- Adds GUI to set Altitude Hold filter parameters.
+- Adds configurable units for velocity/speed and altitude in QML PFD. Units are configured in settings panel.
+- Reduces precision of the PDOP value in the PFD display to 1 decimal.
+- Remove deprecated powerlog
 
 Common parts:
 - added simple toolchain install make targets;

@@ -31,7 +31,7 @@ Item {
 
     Text {
         id: gps_text
-        text: "GPS: " + GPSPosition.Satellites + "\nPDP: " + Math.round(GPSPosition.PDOP*1000)/1000
+        text: "GPS: " + GPSPosition.Satellites + "\nPDP: " + Math.round(GPSPosition.PDOP*10)/10
         color: "white"
         font.family: "Arial"
         font.pixelSize: telemetry_status.height * 0.75

@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/pfd">
-        <file>images/pfd-default.svg</file>
-    </qresource>
-</RCC>

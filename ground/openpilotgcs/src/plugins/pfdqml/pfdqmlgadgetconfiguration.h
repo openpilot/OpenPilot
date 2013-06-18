@@ -18,6 +18,7 @@
 #define PFDQMLGADGETCONFIGURATION_H
 
 #include <coreplugin/iuavgadgetconfiguration.h>
+#include <QMap>
 
 using namespace Core;
 
@@ -62,6 +63,14 @@ public:
     {
         m_cacheOnly = flag;
     }
+    void setSpeedFactor(double factor)
+    {
+        m_speedFactor = factor;
+    }
+    void setAltitudeFactor(double factor)
+    {
+        m_altitudeFactor = factor;
+    }
 
     QString qmlFile() const
     {
@@ -99,6 +108,34 @@ public:
     {
         return m_cacheOnly;
     }
+    double speedFactor() const
+    {
+        return m_speedFactor;
+    }
+    double altitudeFactor() const
+    {
+        return m_altitudeFactor;
+    }
+
+    QString speedUnit() const
+    {
+        return  m_speedMap[m_speedFactor];
+    }
+
+    QString altitudeUnit() const
+    {
+        return m_altitudeMap[m_altitudeFactor];
+    }
+
+    QMapIterator<double, QString> speedMapIterator()
+    {
+        return QMapIterator<double, QString>(m_speedMap);
+    }
+
+    QMapIterator<double, QString> altitudeMapIterator()
+    {
+        return QMapIterator<double, QString>(m_altitudeMap);
+    }
 
     void saveConfig(QSettings *settings) const;
     IUAVGadgetConfiguration *clone();
@@ -113,6 +150,10 @@ private:
     double m_longitude;
     double m_altitude;
     bool m_cacheOnly;
+    double m_speedFactor;
+    double m_altitudeFactor;
+    QMap<double, QString> m_speedMap;
+    QMap<double, QString> m_altitudeMap;
 };
 
 #endif // PfdQmlGADGETCONFIGURATION_H

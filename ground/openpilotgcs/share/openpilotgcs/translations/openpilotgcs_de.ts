@@ -13563,24 +13563,6 @@ Move the %1 stick.</source>
     </message>
 </context>
 <context>
-    <name>PowerlogPlugin</name>
-    <message>
-        <location filename="../../../src/plugins/powerlog/powerlogplugin.cpp" line="+295"/>
-        <source>Log filename</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>PowerLog-%0.csv</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Comma Separated Values (*.csv)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QmlViewGadgetFactory</name>
     <message>
         <location filename="../../../src/plugins/qmlview/qmlviewgadgetfactory.cpp" line="+36"/>

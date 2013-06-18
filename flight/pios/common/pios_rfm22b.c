@@ -1584,7 +1584,7 @@ static bool rfm22_setFreqHopChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t 
     D3_LED_TOGGLE;
 #endif // PIOS_RFM22B_DEBUG_ON_TELEM
     rfm22b_dev->channel = channel;
-    rfm22_write(rfm22b_dev, RFM22_frequency_hopping_channel_select, channel);
+    rfm22_write_claim(rfm22b_dev, RFM22_frequency_hopping_channel_select, channel);
     return true;
 }
 

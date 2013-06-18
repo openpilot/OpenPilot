@@ -22,7 +22,7 @@
 
 PfdQmlGadgetFactory::PfdQmlGadgetFactory(QObject *parent) :
     IUAVGadgetFactory(QString("PfdQmlGadget"),
-                      tr("PFD (qml)"),
+                      tr("PFD"),
                       parent)
 {}
 

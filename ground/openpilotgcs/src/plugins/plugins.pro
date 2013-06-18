@@ -132,12 +132,6 @@ plugin_gpsdisplay.depends = plugin_coreplugin
 plugin_gpsdisplay.depends += plugin_uavobjects
 SUBDIRS += plugin_gpsdisplay
 
-# Primary Flight Display (PFD) gadget
-plugin_pfd.subdir = pfd
-plugin_pfd.depends = plugin_coreplugin
-plugin_pfd.depends += plugin_uavobjects
-SUBDIRS += plugin_pfd
-
 # QML viewer gadget
 plugin_qmlview.subdir = qmlview
 plugin_qmlview.depends = plugin_coreplugin
@@ -150,7 +144,7 @@ plugin_pathactioneditor.depends = plugin_coreplugin
 plugin_pathactioneditor.depends += plugin_uavobjects
 SUBDIRS += plugin_pathactioneditor
 
-# Primary Flight Display (PFD) gadget, QML version
+# Primary Flight Display (PFD) gadget
 plugin_pfdqml.subdir = pfdqml
 plugin_pfdqml.depends = plugin_coreplugin
 plugin_pfdqml.depends += plugin_uavobjects

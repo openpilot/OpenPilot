@@ -296,9 +296,6 @@
 #ifdef PIOS_INCLUDE_RFM22B_COM
 #include <pios_rfm22b_com.h>
 #endif
-#ifdef PIOS_INCLUDE_RFM22B_RCVR
-#include <pios_rfm22b_rcvr.h>
-#endif
 #endif /* PIOS_INCLUDE_RFM22B */
 
 /* PIOS misc peripherals */

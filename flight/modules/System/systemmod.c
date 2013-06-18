@@ -167,7 +167,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
 {
     /* start the delayed callback scheduler */
     CallbackSchedulerStart();
-
+    uint8_t cycleCount = 0;
     /* create all modules thread */
     MODULE_TASKCREATE_ALL;
 
@@ -204,6 +204,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
     while (1) {
         // Update the system statistics
         updateStats();
+        cycleCount = cycleCount > 0 ? cycleCount - 1 : 7;
 
         // Update the system alarms
         updateSystemAlarms();
@@ -220,26 +221,33 @@ static void systemTask(__attribute__((unused)) void *parameters)
 
         // Flash the heartbeat LED
 #if defined(PIOS_LED_HEARTBEAT)
-        PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
+        uint8_t armingStatus;
+        FlightStatusArmedGet(&armingStatus);
+        if ((armingStatus == FLIGHTSTATUS_ARMED_ARMED && (cycleCount & 0x1)) ||
+            (armingStatus != FLIGHTSTATUS_ARMED_ARMED && (cycleCount & 0x4))) {
+            PIOS_LED_On(PIOS_LED_HEARTBEAT);
+        } else {
+            PIOS_LED_Off(PIOS_LED_HEARTBEAT);
+        }
+
         DEBUG_MSG("+ 0x%08x\r\n", 0xDEADBEEF);
 #endif /* PIOS_LED_HEARTBEAT */
 
         // Turn on the error LED if an alarm is set
 #if defined(PIOS_LED_ALARM)
-        if (AlarmsHasWarnings()) {
+        if (AlarmsHasCritical()) {
+            PIOS_LED_On(PIOS_LED_ALARM);
+        } else if ((AlarmsHasErrors() && (cycleCount & 0x1)) ||
+                   (!AlarmsHasErrors() && AlarmsHasWarnings() && (cycleCount & 0x4))) {
             PIOS_LED_On(PIOS_LED_ALARM);
         } else {
             PIOS_LED_Off(PIOS_LED_ALARM);
         }
 #endif /* PIOS_LED_ALARM */
 
-        FlightStatusData flightStatus;
-        FlightStatusGet(&flightStatus);
 
         UAVObjEvent ev;
-        int delayTime = flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED ?
-                        SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2) :
-                        SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS;
+        int delayTime = SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2);
 
         if (xQueueReceive(objectPersistenceQueue, &ev, delayTime) == pdTRUE) {
             // If object persistence is updated call the callback

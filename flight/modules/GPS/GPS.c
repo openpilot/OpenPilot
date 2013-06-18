@@ -112,8 +112,6 @@ int32_t GPSStart(void)
             PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_GPS, gpsTaskHandle);
             return 0;
         }
-
-        AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_ERROR);
     }
     return -1;
 }

@@ -468,14 +468,14 @@ static void updateStats()
         idleCounter = 0;
     }
 #if !defined(ARCH_POSIX) && !defined(ARCH_WIN32)
-    if(pios_uavo_settings_fs_id){
+    if (pios_uavo_settings_fs_id) {
         PIOS_FLASHFS_GetStats(pios_uavo_settings_fs_id, &fsStats);
-        stats.SysSlotsFree = fsStats.num_free_slots;
+        stats.SysSlotsFree   = fsStats.num_free_slots;
         stats.SysSlotsActive = fsStats.num_active_slots;
     }
-    if(pios_user_fs_id){
+    if (pios_user_fs_id) {
         PIOS_FLASHFS_GetStats(pios_user_fs_id, &fsStats);
-        stats.UsrSlotsFree = fsStats.num_free_slots;
+        stats.UsrSlotsFree   = fsStats.num_free_slots;
         stats.UsrSlotsActive = fsStats.num_active_slots;
     }
 #endif

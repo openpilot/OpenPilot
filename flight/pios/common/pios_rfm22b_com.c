@@ -67,14 +67,8 @@ static void PIOS_RFM22B_COM_ChangeBaud(uint32_t rfm22b_id, uint32_t baud)
     }
     // Set the RF data rate on the modem to ~2X the selected buad rate because the modem is half duplex.
     enum rfm22b_datarate datarate = RFM22_datarate_64000;
-    if (baud <= 1024) {
-        datarate = RFM22_datarate_500;
-    } else if (baud <= 2048) {
-        datarate = RFM22_datarate_1000;
-    } else if (baud <= 4096) {
-        datarate = RFM22_datarate_8000;
-    } else if (baud <= 9600) {
-        datarate = RFM22_datarate_16000;
+    if (baud <= 9600) {
+        datarate = RFM22_datarate_19200;
     } else if (baud <= 19200) {
         datarate = RFM22_datarate_32000;
     } else if (baud <= 38400) {

@@ -58,21 +58,14 @@ enum rfm22b_tx_power {
 };
 
 enum rfm22b_datarate {
-    RFM22_datarate_500    = 0,
-    RFM22_datarate_1000   = 1,
-    RFM22_datarate_2000   = 2,
-    RFM22_datarate_4000   = 3,
-    RFM22_datarate_8000   = 4,
-    RFM22_datarate_9600   = 5,
-    RFM22_datarate_16000  = 6,
-    RFM22_datarate_19200  = 7,
-    RFM22_datarate_24000  = 8,
-    RFM22_datarate_32000  = 9,
-    RFM22_datarate_57600  = 10,
-    RFM22_datarate_64000  = 11,
-    RFM22_datarate_128000 = 12,
-    RFM22_datarate_192000 = 13,
-    RFM22_datarate_256000 = 14,
+    RFM22_datarate_9600   = 0,
+    RFM22_datarate_19200  = 1,
+    RFM22_datarate_32000  = 2,
+    RFM22_datarate_57600  = 3,
+    RFM22_datarate_64000  = 4,
+    RFM22_datarate_128000 = 5,
+    RFM22_datarate_192000 = 6,
+    RFM22_datarate_256000 = 7,
 };
 
 typedef enum {

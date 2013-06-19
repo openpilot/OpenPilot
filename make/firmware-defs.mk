@@ -95,14 +95,15 @@ gccversion:
 	@$(ECHO) $(MSG_LOAD_FILE) $(call toprel, $@)
 	$(V1) $(OBJCOPY) -O binary $< $@
 
+replace_special_chars = $(subst @,_,$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$1)))))
 %.bin.o: %.bin
 	@$(ECHO) $(MSG_BIN_OBJ) $(call toprel, $@)
 	$(V1) $(OBJCOPY) -I binary -O elf32-littlearm --binary-architecture arm \
 		--rename-section .data=.rodata,alloc,load,readonly,data,contents \
 		--wildcard \
-		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_start=_binary_start \
-		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_end=_binary_end \
-		--redefine-sym _binary_$(subst :,_,$(subst -,_,$(subst .,_,$(subst /,_,$<))))_size=_binary_size \
+		--redefine-sym _binary_$(call replace_special_chars,$<)_start=_binary_start \
+		--redefine-sym _binary_$(call replace_special_chars,$<)_end=_binary_end \
+		--redefine-sym _binary_$(call replace_special_chars,$<)_size=_binary_size \
 		$< $@
 
 # Create extended listing file/disassambly from ELF output file.

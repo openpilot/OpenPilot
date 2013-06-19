@@ -322,6 +322,9 @@ void SettingsDialog::onItemSelected()
         stackedPages->insertWidget(index, page->createPage(stackedPages));
     }
 
+    IOptionsPage *page = m_pages.at(index);
+    page->updateState();
+
     stackedPages->setCurrentIndex(index);
 }
 
@@ -465,10 +468,11 @@ void SettingsDialog::done(int val)
 
     settings->setValue("LastPreferenceCategory", m_currentCategory);
     settings->setValue("LastPreferencePage", m_currentPage);
+
     settings->setValue("WindowWidth", this->width());
     settings->setValue("WindowHeight", this->height());
+
     QList<int> sizes = splitter->sizes();
-    qDebug() << "SettingsDialog splitter saving size0:" << sizes[0] << ", size1:" << sizes[1];
     settings->setValue("SplitterPosition", sizes[0]);
 
     settings->endGroup();

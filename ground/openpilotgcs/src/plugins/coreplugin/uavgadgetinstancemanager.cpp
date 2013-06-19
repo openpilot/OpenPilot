@@ -303,21 +303,29 @@ void UAVGadgetInstanceManager::removeAllGadgets()
 }
 
 
-bool UAVGadgetInstanceManager::canDeleteConfiguration(IUAVGadgetConfiguration *config)
+bool UAVGadgetInstanceManager::isConfigurationActive(IUAVGadgetConfiguration *config)
 {
-    // to be able to delete a configuration, no instance must be using it
+    // check if there is gadget currently using the configuration
     foreach(IUAVGadget * gadget, m_gadgetInstances) {
         if (gadget->activeConfiguration() == config) {
-            return false;
-        }
-    }
-    // and it cannot be the only configuration
-    foreach(IUAVGadgetConfiguration * c, m_configurations) {
-        if (c != config && c->classId() == config->classId()) {
             return true;
         }
     }
     return false;
+}
+
+UAVGadgetInstanceManager::DeleteStatus UAVGadgetInstanceManager::canDeleteConfiguration(IUAVGadgetConfiguration *config)
+{
+    // to be able to delete a configuration, no instance must be using it
+    if (isConfigurationActive(config)) {
+        return UAVGadgetInstanceManager::KO_ACTIVE;
+    }
+    // and it cannot be the only configuration
+    QList<IUAVGadgetConfiguration *> *configs = provisionalConfigurations(config->classId());
+    if (configs->count() <= 1) {
+        return UAVGadgetInstanceManager::KO_LONE;
+    }
+    return UAVGadgetInstanceManager::OK;
 }
 
 void UAVGadgetInstanceManager::deleteConfiguration(IUAVGadgetConfiguration *config)
@@ -499,6 +507,30 @@ QList<IUAVGadgetConfiguration *> *UAVGadgetInstanceManager::configurations(QStri
     foreach(IUAVGadgetConfiguration * config, m_configurations) {
         if (config->classId() == classId) {
             configs->append(config);
+        }
+    }
+    return configs;
+}
+
+QList<IUAVGadgetConfiguration *> *UAVGadgetInstanceManager::provisionalConfigurations(QString classId) const
+{
+    QList<IUAVGadgetConfiguration *> *configs = new QList<IUAVGadgetConfiguration *>;
+    // add current configurations
+    foreach(IUAVGadgetConfiguration * config, m_configurations) {
+        if (config->classId() == classId) {
+            configs->append(config);
+        }
+    }
+    // add provisional configurations
+    foreach(IUAVGadgetConfiguration * config, m_provisionalConfigs) {
+        if (config->classId() == classId) {
+            configs->append(config);
+        }
+    }
+    // remove provisional configurations
+    foreach(IUAVGadgetConfiguration * config, m_provisionalDeletes) {
+        if (config->classId() == classId) {
+            configs->removeOne(config);
         }
     }
     return configs;

@@ -479,7 +479,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
         grot_mag = 1.0f;
     }
 
-    // TODO! check grot_mag value for correctness.
+    // TODO! check grot_mag & accel vector magnitude values for correctness.
 
     accel_err[0] /= (accel_mag * grot_mag);
     accel_err[1] /= (accel_mag * grot_mag);

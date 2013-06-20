@@ -98,7 +98,7 @@ void UAVGadgetOptionsPageDecorator::updateState()
         break;
     case UAVGadgetInstanceManager::KO_ACTIVE:
         m_page->deleteButton->setEnabled(false);
-        m_page->deleteButton->setToolTip(tr("Cannot delete a currently in use configuration"));
+        m_page->deleteButton->setToolTip(tr("Cannot delete a configuration currently in use"));
         break;
     case UAVGadgetInstanceManager::KO_LONE:
         m_page->deleteButton->setEnabled(false);

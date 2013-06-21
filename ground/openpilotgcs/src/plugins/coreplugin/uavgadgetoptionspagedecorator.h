@@ -67,6 +67,7 @@ public:
 signals:
 
 public slots:
+    void updateState();
 
 private slots:
     void cloneConfiguration();

@@ -30728,7 +30728,7 @@ color: rgb(255, 255, 255);
 border-radius: 5;</string>
                    </property>
                    <property name="text">
-                    <string>Throttle Stick Responce</string>
+                    <string>Throttle Stick Response</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>

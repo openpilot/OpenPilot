@@ -199,5 +199,5 @@ void ConfigStabilizationWidget::onBoardConnected()
     Q_ASSERT(utilMngr);
 
     // If Revolution board enable misc tab, otherwise disable it
-    ui->Miscellaneous->setEnabled((utilMngr->getBoardModel() & 0xff00) == 0x0900);
+    ui->AltitudeHold->setEnabled((utilMngr->getBoardModel() & 0xff00) == 0x0900);
 }

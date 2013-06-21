@@ -460,6 +460,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
         case FLIGHTMODE_GUIDANCE:
             switch (flightStatus.FlightMode) {
             case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD:
+            case FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO:
                 altitudeHoldDesired(&cmd, lastFlightMode != flightStatus.FlightMode);
                 break;
             case FLIGHTSTATUS_FLIGHTMODE_POSITIONHOLD:
@@ -820,17 +821,24 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     uint8_t throttleRate;
     uint8_t throttleExp;
 
+    static uint8_t flightMode;
     static portTickType lastSysTimeAH;
     static bool zeroed = false;
     portTickType thisSysTime;
     float dT;
 
-    AltitudeHoldDesiredData altitudeHoldDesiredData;
+    FlightStatusFlightModeGet(&flightMode);
 
+    AltitudeHoldDesiredData altitudeHoldDesiredData;
     AltitudeHoldDesiredGet(&altitudeHoldDesiredData);
 
-    AltitudeHoldSettingsThrottleExpGet(&throttleExp);
-    AltitudeHoldSettingsThrottleRateGet(&throttleRate);
+    if (flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) {
+        throttleExp  = 128;
+        throttleRate = 0;
+    } else {
+        AltitudeHoldSettingsThrottleExpGet(&throttleExp);
+        AltitudeHoldSettingsThrottleRateGet(&throttleRate);
+    }
 
     StabilizationSettingsData stabSettings;
     StabilizationSettingsGet(&stabSettings);
@@ -851,12 +859,13 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
         zeroed = false;
     } else if (cmd->Throttle > DEADBAND_HIGH && zeroed) {
         // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
-        // then apply an "exp" f(x,k) = (k∙x∙x∙x + x∙(256−k)) / 256
+        // then apply an "exp" f(x,k) = (k*x*x*x + x*(256−k)) / 256
         altitudeHoldDesiredData.Altitude += (throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
     } else if (cmd->Throttle < DEADBAND_LOW && zeroed) {
         altitudeHoldDesiredData.Altitude -= (throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
-    } else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH) {
+    } else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH && (throttleRate != 0)) {
         // Require the stick to enter the dead band before they can move height
+        // Vario is not "engaged" when throttleRate == 0
         zeroed = true;
     }
 

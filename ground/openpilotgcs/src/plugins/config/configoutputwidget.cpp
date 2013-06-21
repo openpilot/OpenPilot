@@ -110,6 +110,11 @@ ConfigOutputWidget::ConfigOutputWidget(QWidget *parent) : ConfigTaskWidget(paren
     updateEnableControls();
 }
 
+ConfigOutputWidget::~ConfigOutputWidget()
+{
+    // Do nothing
+}
+
 void ConfigOutputWidget::enableControls(bool enable)
 {
     ConfigTaskWidget::enableControls(enable);
@@ -118,11 +123,6 @@ void ConfigOutputWidget::enableControls(bool enable)
         ui->channelOutTest->setChecked(false);
     }
     ui->channelOutTest->setEnabled(enable);
-}
-
-ConfigOutputWidget::~ConfigOutputWidget()
-{
-    // Do nothing
 }
 
 /**
@@ -242,6 +242,8 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
 {
     Q_UNUSED(obj);
 
+    bool dirty = isDirty();
+
     // Get Actuator Settings
     ActuatorSettings *actuatorSettings = ActuatorSettings::GetInstance(getObjectManager());
     Q_ASSERT(actuatorSettings);
@@ -353,6 +355,8 @@ void ConfigOutputWidget::refreshWidgetsValues(UAVObject *obj)
         int neutral = actuatorSettingsData.ChannelNeutral[outputChannelForm->index()];
         outputChannelForm->neutral(neutral);
     }
+
+    setDirty(dirty);
 }
 
 /**

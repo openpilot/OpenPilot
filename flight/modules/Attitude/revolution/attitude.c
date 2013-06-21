@@ -472,12 +472,6 @@ static int32_t updateAttitudeComplementary(bool first_run)
     accel_mag = accels_filtered[0] * accels_filtered[0] + accels_filtered[1] * accels_filtered[1] + accels_filtered[2] * accels_filtered[2];
     accel_mag = sqrtf(accel_mag);
 
-    // TODO! check accel vector magnitude value for correctness
-
-    accel_err[0] /= accel_mag;
-    accel_err[1] /= accel_mag;
-    accel_err[2] /= accel_mag;
-
     float grot_mag;
     if (accel_filter_enabled) {
         grot_mag = sqrtf(grot_filtered[0] * grot_filtered[0] + grot_filtered[1] * grot_filtered[1] + grot_filtered[2] * grot_filtered[2]);
@@ -485,7 +479,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
         grot_mag = 1.0f;
     }
 
-    // TODO! check grot_mag value for correctness.
+    // TODO! check grot_mag & accel vector magnitude values for correctness.
 
     accel_err[0] /= (accel_mag * grot_mag);
     accel_err[1] /= (accel_mag * grot_mag);

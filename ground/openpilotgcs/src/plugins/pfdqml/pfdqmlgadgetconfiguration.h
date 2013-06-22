@@ -119,7 +119,7 @@ public:
 
     QString speedUnit() const
     {
-        return  m_speedMap[m_speedFactor];
+        return m_speedMap[m_speedFactor];
     }
 
     QString altitudeUnit() const

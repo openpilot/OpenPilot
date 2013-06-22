@@ -39,7 +39,6 @@ class QWidget;
 QT_END_NAMESPACE
 
 namespace Core {
-
 class CORE_EXPORT IOptionsPage : public QObject {
     Q_OBJECT
 
@@ -89,13 +88,11 @@ public:
 
 public slots:
     virtual void updateState()
-    {
-    };
+    {};
 
 private:
     QIcon m_icon;
 };
-
 } // namespace Core
 
 #endif // IOPTIONSPAGE_H

@@ -177,8 +177,9 @@ Q_DECLARE_METATYPE(::PageData) SettingsDialog::SettingsDialog(QWidget *parent, c
     QTreeWidgetItem *initialItem = 0;
 
     // add plugin pages
-    foreach(IOptionsPage *page, pluginPages) {
+    foreach(IOptionsPage * page, pluginPages) {
         QTreeWidgetItem *item = addPage(page);
+
         // automatically expand all plugin categories
         item->parent()->setExpanded(true);
         if (page->id() == initialPage && page->category() == initialCategory) {
@@ -289,6 +290,7 @@ QTreeWidgetItem *SettingsDialog::addPage(IOptionsPage *page)
 void SettingsDialog::onItemSelected()
 {
     QTreeWidgetItem *item = pageTree->currentItem();
+
     if (!item) {
         return;
     }
@@ -297,8 +299,7 @@ void SettingsDialog::onItemSelected()
         if (item->childCount() == 1) {
             // single child : category will not be expanded
             item = item->child(0);
-        }
-        else if (item->childCount() > 1) {
+        } else if (item->childCount() > 1) {
             // multiple children : expand category and select 1st child
             emit categoryItemSelected();
             return;
@@ -331,6 +332,7 @@ void SettingsDialog::onItemSelected()
 void SettingsDialog::onCategorySelected()
 {
     QTreeWidgetItem *item = pageTree->currentItem();
+
     if (item->childCount() > 1) {
         item->setExpanded(true);
         pageTree->setCurrentItem(item->child(0), 0, QItemSelectionModel::SelectCurrent);

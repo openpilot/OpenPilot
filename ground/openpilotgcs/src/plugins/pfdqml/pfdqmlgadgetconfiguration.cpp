@@ -35,13 +35,12 @@ PfdQmlGadgetConfiguration::PfdQmlGadgetConfiguration(QString classId, QSettings 
     m_speedFactor(1.0),
     m_altitudeFactor(1.0)
 {
+    m_speedMap[1.0]       = "m/s";
+    m_speedMap[3.6]       = "km/h";
+    m_speedMap[2.2369]    = "mph";
+    m_speedMap[1.9438]    = "knots";
 
-    m_speedMap[1.0] = "m/s";
-    m_speedMap[3.6] = "km/h";
-    m_speedMap[2.2369] = "mph";
-    m_speedMap[1.9438] = "knots";
-
-    m_altitudeMap[1.0] = "m";
+    m_altitudeMap[1.0]    = "m";
     m_altitudeMap[3.2808] = "ft";
 
     // if a saved configuration exists load it

@@ -51,7 +51,7 @@ UAVGadgetOptionsPageDecorator::UAVGadgetOptionsPageDecorator(IOptionsPage *page,
 QWidget *UAVGadgetOptionsPageDecorator::createPage(QWidget *parent)
 {
     m_page = new Ui_TopOptionsPage();
-    QWidget *w = new QWidget(parent);
+    QWidget *w  = new QWidget(parent);
     m_page->setupUi(w);
 
     QWidget *wi = m_optionsPage->createPage(w);
@@ -91,7 +91,7 @@ void UAVGadgetOptionsPageDecorator::updateState()
         m_page->lockCheckBox->hide();
         m_page->nameLineEdit->setDisabled(true);
     }
-    switch(m_instanceManager->canDeleteConfiguration(m_config)) {
+    switch (m_instanceManager->canDeleteConfiguration(m_config)) {
     case UAVGadgetInstanceManager::OK:
         m_page->deleteButton->setEnabled(true);
         m_page->deleteButton->setToolTip(tr("Delete this configuration"));

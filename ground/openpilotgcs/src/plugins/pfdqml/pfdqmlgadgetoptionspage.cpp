@@ -62,20 +62,18 @@ QWidget *PfdQmlGadgetOptionsPage::createPage(QWidget *parent)
     options_page->altitude->setText(QString::number(m_config->altitude()));
     options_page->useOnlyCache->setChecked(m_config->cacheOnly());
 
-    //Setup units combos
+    // Setup units combos
     QMapIterator<double, QString> iter = m_config->speedMapIterator();
-    while(iter.hasNext())
-    {
-         iter.next();
-         options_page->speedUnitCombo->addItem(iter.value(), iter.key());
+    while (iter.hasNext()) {
+        iter.next();
+        options_page->speedUnitCombo->addItem(iter.value(), iter.key());
     }
     options_page->speedUnitCombo->setCurrentIndex(options_page->speedUnitCombo->findData(m_config->speedFactor()));
 
     iter = m_config->altitudeMapIterator();
-    while(iter.hasNext())
-    {
-         iter.next();
-         options_page->altUnitCombo->addItem(iter.value(), iter.key());
+    while (iter.hasNext()) {
+        iter.next();
+        options_page->altUnitCombo->addItem(iter.value(), iter.key());
     }
     options_page->altUnitCombo->setCurrentIndex(options_page->altUnitCombo->findData(m_config->altitudeFactor()));
 

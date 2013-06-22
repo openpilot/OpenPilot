@@ -41,7 +41,6 @@ class PluginManager;
 }
 
 namespace Core {
-
 namespace Internal {
 class SettingsDialog;
 }
@@ -120,7 +119,6 @@ private:
     void readConfigs_1_1_0(QSettings *qs);
     void readConfigs_1_2_0(QSettings *qs);
 };
-
 } // namespace Core
 
 #endif // UAVGADGETINSTANCEMANAGER_H

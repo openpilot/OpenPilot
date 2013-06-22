@@ -683,7 +683,7 @@ static const struct flashfs_logfs_cfg flashfs_external_user_cfg = {
     .arena_size    = 0x00010000, /* 256 * slot size */
     .slot_size     = 0x00000100, /* 256 bytes */
 
-    .start_offset  = 0x40000,     /* start at the beginning of the chip */
+    .start_offset  = 0x40000,    /* start offset */
     .sector_size   = 0x00010000, /* 64K bytes */
     .page_size     = 0x00000100, /* 256 bytes */
 };

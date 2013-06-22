@@ -214,7 +214,7 @@ Flight code changes:
 - added visualisation of errors in bootloader updater;
 - added numerous sanity checks to the flight code to prevent unsafe arming;
 - new flash file system, much faster and higly optimised;
-- Revo settings are now stored in embedded MCU flash freeing up external one for flight logs;
+- Revo data flash is splitted into two partitions, one for settings, another for user data (logs, etc);
 - OPLinkMini now stores settings in the MCU flash using FlashFS too;
 - a catalog of known flash types is used to support different flash types by the same firmware;
 - fixed broken overo submodule remote repository link;

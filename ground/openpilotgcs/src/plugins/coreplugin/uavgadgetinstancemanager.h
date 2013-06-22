@@ -53,22 +53,30 @@ class IUAVGadgetFactory;
 class CORE_EXPORT UAVGadgetInstanceManager : public QObject {
     Q_OBJECT
 public:
+    enum DeleteStatus { OK, KO_ACTIVE, KO_LONE };
+
     explicit UAVGadgetInstanceManager(QObject *parent = 0);
     ~UAVGadgetInstanceManager();
+
     void readSettings(QSettings *qs);
     void saveSettings(QSettings *qs);
+
     IUAVGadget *createGadget(QString classId, QWidget *parent, bool loadDefaultConfiguration = true);
     void removeGadget(IUAVGadget *gadget);
     void removeAllGadgets();
-    bool canDeleteConfiguration(IUAVGadgetConfiguration *config);
+
+    bool isConfigurationActive(IUAVGadgetConfiguration *config);
+    DeleteStatus canDeleteConfiguration(IUAVGadgetConfiguration *config);
     void deleteConfiguration(IUAVGadgetConfiguration *config);
     void cloneConfiguration(IUAVGadgetConfiguration *config);
     void applyChanges(IUAVGadgetConfiguration *config);
     void configurationNameEdited(QString text, bool hasText = true);
+
     QStringList classIds() const
     {
         return m_classIdNameMap.keys();
     }
+
     QStringList configurationNames(QString classId) const;
     QString gadgetName(QString classId) const;
     QIcon gadgetIcon(QString classId) const;
@@ -84,10 +92,6 @@ public slots:
     void settingsDialogRemoved();
 
 private:
-    IUAVGadgetFactory *factory(QString classId) const;
-    void createOptionsPages();
-    QList<IUAVGadgetConfiguration *> *configurations(QString classId) const;
-    QString suggestName(QString classId, QString name);
     QList<IUAVGadget *> m_gadgetInstances;
     QList<IUAVGadgetFactory *> m_factories;
     QList<IUAVGadgetConfiguration *> m_configurations;
@@ -100,8 +104,18 @@ private:
     QList<IOptionsPage *> m_provisionalOptionsPages;
     Core::Internal::SettingsDialog *m_settingsDialog;
     ExtensionSystem::PluginManager *m_pm;
-    int indexForConfig(QList<IUAVGadgetConfiguration *> configurations,
-                       QString classId, QString configName);
+
+    IUAVGadgetFactory *factory(QString classId) const;
+
+    void createOptionsPages();
+
+    QList<IUAVGadgetConfiguration *> *configurations(QString classId) const;
+    QList<IUAVGadgetConfiguration *> *provisionalConfigurations(QString classId) const;
+
+    QString suggestName(QString classId, QString name);
+
+    int indexForConfig(QList<IUAVGadgetConfiguration *> configurations, QString classId, QString configName);
+
     void readConfigs_1_1_0(QSettings *qs);
     void readConfigs_1_2_0(QSettings *qs);
 };

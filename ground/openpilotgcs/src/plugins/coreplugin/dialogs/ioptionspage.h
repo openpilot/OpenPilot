@@ -41,6 +41,7 @@ QT_END_NAMESPACE
 namespace Core {
 class CORE_EXPORT IOptionsPage : public QObject {
     Q_OBJECT
+
 public:
     IOptionsPage(QObject *parent = 0) :
         QObject(parent),
@@ -51,6 +52,7 @@ public:
     {
         m_icon = icon;
     }
+
     QIcon icon()
     {
         return m_icon;
@@ -63,22 +65,31 @@ public:
     {
         return "";
     };
+
     virtual QString trName() const
     {
         return "";
     };
+
     virtual QString category() const
     {
         return "DefaultCategory";
     };
+
     virtual QString trCategory() const
     {
         return "DefaultCategory";
     };
 
     virtual QWidget *createPage(QWidget *parent) = 0;
+
     virtual void apply()  = 0;
     virtual void finish() = 0;
+
+public slots:
+    virtual void updateState()
+    {};
+
 private:
     QIcon m_icon;
 };

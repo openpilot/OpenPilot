@@ -51,18 +51,8 @@ UAVGadgetOptionsPageDecorator::UAVGadgetOptionsPageDecorator(IOptionsPage *page,
 QWidget *UAVGadgetOptionsPageDecorator::createPage(QWidget *parent)
 {
     m_page = new Ui_TopOptionsPage();
-    QWidget *w = new QWidget(parent);
+    QWidget *w  = new QWidget(parent);
     m_page->setupUi(w);
-    if (m_config->locked()) {
-        m_page->deleteButton->hide();
-        m_page->lockCheckBox->hide();
-        m_page->nameLineEdit->setDisabled(true);
-    }
-    if (!m_instanceManager->canDeleteConfiguration(m_config)) {
-        m_page->deleteButton->setDisabled(true);
-    }
-    m_page->lockCheckBox->hide(); //
-    m_page->nameLineEdit->setText(m_id);
 
     QWidget *wi = m_optionsPage->createPage(w);
     wi->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
@@ -72,6 +62,8 @@ QWidget *UAVGadgetOptionsPageDecorator::createPage(QWidget *parent)
     if (m_isSingleConfigurationGadget) {
         m_page->configurationBox->hide();
     }
+
+    updateState();
 
     connect(m_page->cloneButton, SIGNAL(clicked()), this, SLOT(cloneConfiguration()));
     connect(m_page->deleteButton, SIGNAL(clicked()), this, SLOT(deleteConfiguration()));
@@ -90,6 +82,35 @@ void UAVGadgetOptionsPageDecorator::apply()
 void UAVGadgetOptionsPageDecorator::finish()
 {
     m_optionsPage->finish();
+}
+
+void UAVGadgetOptionsPageDecorator::updateState()
+{
+    if (m_config->locked()) {
+        m_page->deleteButton->hide();
+        m_page->lockCheckBox->hide();
+        m_page->nameLineEdit->setDisabled(true);
+    }
+    switch (m_instanceManager->canDeleteConfiguration(m_config)) {
+    case UAVGadgetInstanceManager::OK:
+        m_page->deleteButton->setEnabled(true);
+        m_page->deleteButton->setToolTip(tr("Delete this configuration"));
+        break;
+    case UAVGadgetInstanceManager::KO_ACTIVE:
+        m_page->deleteButton->setEnabled(false);
+        m_page->deleteButton->setToolTip(tr("Cannot delete a configuration currently in use"));
+        break;
+    case UAVGadgetInstanceManager::KO_LONE:
+        m_page->deleteButton->setEnabled(false);
+        m_page->deleteButton->setToolTip(tr("Cannot delete the last configuration"));
+        break;
+    default:
+        m_page->deleteButton->setEnabled(false);
+        m_page->deleteButton->setToolTip(tr("DON'T KNOW !"));
+        break;
+    }
+    m_page->lockCheckBox->hide();
+    m_page->nameLineEdit->setText(m_id);
 }
 
 void UAVGadgetOptionsPageDecorator::cloneConfiguration()

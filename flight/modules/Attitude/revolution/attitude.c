@@ -77,10 +77,12 @@
 #include "CoordinateConversions.h"
 
 // Private constants
-#define STACK_SIZE_BYTES    2048
-#define TASK_PRIORITY       (tskIDLE_PRIORITY + 3)
-#define FAILSAFE_TIMEOUT_MS 10
+#define STACK_SIZE_BYTES          2048
+#define TASK_PRIORITY             (tskIDLE_PRIORITY + 3)
+#define FAILSAFE_TIMEOUT_MS       10
 
+#define CALIBRATION_DELAY         4000
+#define CALIBRATION_DURATION      6000
 // low pass filter configuration to calculate offset
 // of barometric altitude sensor
 // reasoning: updates at: 10 Hz, tau= 300 s settle time
@@ -326,6 +328,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
     static uint8_t init = 0;
     static float gyro_bias[3] = { 0, 0, 0 };
     static bool magCalibrated = true;
+    static uint32_t initStartupTime = 0;
 
     // Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
     if (xQueueReceive(gyroQueue, &ev, FAILSAFE_TIMEOUT_MS / portTICK_RATE_MS) != pdTRUE ||
@@ -403,11 +406,28 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
         timeval = PIOS_DELAY_GetRaw();
 
+        // wait calibration_delay only at powerup
+        if (xTaskGetTickCount() < 3000) {
+            initStartupTime = 0;
+        } else {
+            initStartupTime = xTaskGetTickCount() - CALIBRATION_DELAY;
+        }
+
+        // Zero gyro bias
+        // This is really needed after updating calibration settings.
+        GyrosBiasData zeroGyrosBias;
+        GyrosBiasGet(&zeroGyrosBias);
+        zeroGyrosBias.x = 0;
+        zeroGyrosBias.y = 0;
+        zeroGyrosBias.z = 0;
+        GyrosBiasSet(&zeroGyrosBias);
         return 0;
     }
 
-    if ((xTaskGetTickCount() < 10000) && (xTaskGetTickCount() > 4000)) {
-        // For first 7 seconds use accels to get gyro bias
+    if ((xTaskGetTickCount() - initStartupTime < CALIBRATION_DURATION + CALIBRATION_DELAY) &&
+        (xTaskGetTickCount() - initStartupTime > CALIBRATION_DELAY)) {
+        // For first CALIBRATION_DURATION seconds after CALIBRATION_DELAY from startup
+        // Zero gyro bias assuming it is steady, smoothing the gyro input value applying rollPitchBiasRate.
         attitudeSettings.AccelKp     = 1.0f;
         attitudeSettings.AccelKi     = 0.0f;
         attitudeSettings.YawBiasRate = 0.23f;
@@ -469,12 +489,6 @@ static int32_t updateAttitudeComplementary(bool first_run)
     accel_mag = accels_filtered[0] * accels_filtered[0] + accels_filtered[1] * accels_filtered[1] + accels_filtered[2] * accels_filtered[2];
     accel_mag = sqrtf(accel_mag);
 
-    // TODO! check accel vector magnitude value for correctness
-
-    accel_err[0] /= accel_mag;
-    accel_err[1] /= accel_mag;
-    accel_err[2] /= accel_mag;
-
     float grot_mag;
     if (accel_filter_enabled) {
         grot_mag = sqrtf(grot_filtered[0] * grot_filtered[0] + grot_filtered[1] * grot_filtered[1] + grot_filtered[2] * grot_filtered[2]);
@@ -482,7 +496,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
         grot_mag = 1.0f;
     }
 
-    // TODO! check grot_mag value for correctness.
+    // TODO! check grot_mag & accel vector magnitude values for correctness.
 
     accel_err[0] /= (accel_mag * grot_mag);
     accel_err[1] /= (accel_mag * grot_mag);
@@ -644,8 +658,9 @@ static int32_t updateAttitudeComplementary(bool first_run)
         }
     }
 
-
-    if (variance_error) {
+    if (!init && flightStatus.Armed == FLIGHTSTATUS_ARMED_DISARMED) {
+        AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_ERROR);
+    } else if (variance_error) {
         AlarmsSet(SYSTEMALARMS_ALARM_ATTITUDE, SYSTEMALARMS_ALARM_CRITICAL);
     } else {
         AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);

@@ -72,7 +72,8 @@ void baro_airspeedGetETASV3(AirspeedSensorData *airspeedSensor, AirspeedSettings
         // Calibrate sensor by averaging zero point value
         if (calibrationCount <= CALIBRATION_IDLE_MS / airspeedSettings->SamplePeriod) {
             calibrationCount++;
-            calibrationCount2++;
+            calibrationSum    = 0;
+            calibrationCount2 = 0;
             return;
         } else if (calibrationCount <= (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS) / airspeedSettings->SamplePeriod) {
             calibrationCount++;
@@ -81,6 +82,9 @@ void baro_airspeedGetETASV3(AirspeedSensorData *airspeedSensor, AirspeedSettings
             if (calibrationCount > (CALIBRATION_IDLE_MS + CALIBRATION_COUNT_MS) / airspeedSettings->SamplePeriod) {
                 airspeedSettings->ZeroPoint = (int16_t)(((float)calibrationSum) / calibrationCount2);
                 AirspeedSettingsZeroPointSet(&airspeedSettings->ZeroPoint);
+                calibrationCount  = 0;
+                calibrationSum    = 0;
+                calibrationCount2 = 0;
             }
             return;
         }

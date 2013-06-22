@@ -24,10 +24,10 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             // The altitude scale represents 30 meters,
             // move it in 0..5m range
-            anchors.verticalCenterOffset: -height/30 * (PositionState.Down-Math.floor(PositionState.Down/5)*5)
+            anchors.verticalCenterOffset: -height/30 * (PositionState.Down-Math.floor(PositionState.Down/5*qmlWidget.altitudeFactor)*5)
             anchors.left: parent.left
 
-            property int topNumber: 15-Math.floor(PositionState.Down/5)*5
+            property int topNumber: 15-Math.floor(PositionState.Down/5*qmlWidget.altitudeFactor)*5
 
             // Altitude numbers
             Column {
@@ -52,7 +52,6 @@ Item {
         }
     }
 
-
     SvgElementImage {
         id: altitude_window
         clip: true
@@ -69,7 +68,7 @@ Item {
 
         Text {
             id: altitude_text
-            text: Math.floor(-PositionState.Down).toFixed()
+            text: Math.floor(-PositionState.Down * qmlWidget.altitudeFactor).toFixed()
             color: "white"
             font {
                 family: "Arial"
@@ -78,4 +77,26 @@ Item {
             anchors.centerIn: parent
         }
     }
+
+    SvgElementImage {
+        id: altitude_unit
+        elementName: "altitude-unit"
+        sceneSize: sceneItem.sceneSize
+        clip: true
+
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+
+        Text {
+            id: altitude_unit_text
+            text: qmlWidget.altitudeUnit
+            color: "white"
+            font {
+                family: "Arial"
+                pixelSize: parent.height
+            }
+            anchors.right: parent.right
+        }
+    }
+
 }

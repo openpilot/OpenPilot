@@ -5,13 +5,16 @@
     <Description>Default configuration</Description>
     <Details>Default configuration built to work on all screen sizes</Details>
     <ExpertMode>false</ExpertMode>
-    <LastPreferenceCategory></LastPreferenceCategory>
-    <LastPreferencePage></LastPreferencePage>
     <SaveSettingsOnExit>true</SaveSettingsOnExit>
-    <SettingsWindowHeight>600</SettingsWindowHeight>
-    <SettingsWindowWidth>800</SettingsWindowWidth>
     <StyleSheet>default</StyleSheet>
     <UDPMirror>false</UDPMirror>
+    <Settings>
+      <LastPreferenceCategory>Environment</LastPreferenceCategory>
+      <LastPreferencePage>General</LastPreferencePage>
+      <WindowHeight>600</WindowHeight>
+      <WindowWidth>800</WindowWidth>
+      <SplitterPosition>150</SplitterPosition>
+    </Settings>
   </General>
   <IPconnection>
     <Current>
@@ -1819,33 +1822,7 @@
           <useOpenGL>true</useOpenGL>
         </data>
       </default>
-    </OPMapGadget>
-    <PFDGadget>
-      <raw>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <beSmooth>false</beSmooth>
-          <dialFile>%%DATAPATH%%pfd/default/pfd.svg</dialFile>
-          <hqFonts>false</hqFonts>
-          <useOpenGLFlag>false</useOpenGLFlag>
-        </data>
-      </raw>
-      <smooth>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <beSmooth>true</beSmooth>
-          <dialFile>%%DATAPATH%%pfd/default/pfd.svg</dialFile>
-          <hqFonts>false</hqFonts>
-          <useOpenGLFlag>false</useOpenGLFlag>
-        </data>
-      </smooth>
-    </PFDGadget>
+    </OPMapGadget>    
     <PfdQmlGadget>
       <NoTerrain>
         <configInfo>
@@ -1855,12 +1832,14 @@
         <data>
           <actualPositionUsed>false</actualPositionUsed>
           <altitude>2000</altitude>
+          <altitudeFactor>1</altitudeFactor>
           <cacheOnly>false</cacheOnly>
           <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
           <latitude>46.6715</latitude>
           <longitude>10.1589</longitude>
           <openGLEnabled>true</openGLEnabled>
           <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
+          <speedFactor>1</speedFactor>
           <terrainEnabled>false</terrainEnabled>
         </data>
       </NoTerrain>
@@ -2783,11 +2762,47 @@
             <type>splitter</type>
           </side0>
           <side1>
-            <classId>PFDGadget</classId>
-            <gadget>
-              <activeConfiguration>raw</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
+            <side0>
+              <side0>
+                <classId>DialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Deluxe Attitude</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side0>
+              <side1>
+                <classId>DialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Deluxe Baro Altimeter</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side1>
+              <splitterOrientation>2</splitterOrientation>
+              <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+              <type>splitter</type>
+            </side0>
+            <side1>
+              <side0>
+                <classId>DialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Deluxe Compass</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side0>
+              <side1>
+                <classId>DialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Deluxe Climbrate</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side1>
+              <splitterOrientation>2</splitterOrientation>
+              <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+              <type>splitter</type>
+            </side1>
+            <splitterOrientation>1</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+            <type>splitter</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
           <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABLwAAAAIAAAHf)</splitterSizes>

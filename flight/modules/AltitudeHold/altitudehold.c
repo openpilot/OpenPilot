@@ -139,11 +139,15 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
     BaroSensorConnectQueue(queue);
     FlightStatusConnectQueue(queue);
     AccelStateConnectQueue(queue);
-
+    bool altitudeHoldFlightMode = false;
     BaroSensorAltitudeGet(&smoothed_altitude);
     running = false;
     enum init_state { WAITING_BARO, WAITIING_INIT, INITED } init = WAITING_BARO;
 
+    uint8_t flightMode;
+    FlightStatusFlightModeGet(&flightMode);
+    // initialize enable flag
+    altitudeHoldFlightMode = flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD || flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO;
     // Main task loop
     bool baro_updated = false;
     while (1) {
@@ -161,10 +165,9 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 
             init = (init == WAITING_BARO) ? WAITIING_INIT : init;
         } else if (ev.obj == FlightStatusHandle()) {
-            FlightStatusData flightStatus;
-            FlightStatusGet(&flightStatus);
-
-            if (flightStatus.FlightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD && !running) {
+            FlightStatusFlightModeGet(&flightMode);
+            altitudeHoldFlightMode = flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD || flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO;
+            if (altitudeHoldFlightMode && !running) {
                 // Copy the current throttle as a starting point for integral
                 StabilizationDesiredThrottleGet(&throttleIntegral);
                 switchThrottle = throttleIntegral;
@@ -175,7 +178,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 AltHoldSmoothedData altHold;
                 AltHoldSmoothedGet(&altHold);
                 starting_altitude = altHold.Altitude;
-            } else if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD) {
+            } else if (!altitudeHoldFlightMode) {
                 running = false;
                 lastAltitudeHoldDesiredUpdate = PIOS_DELAY_GetRaw();
             }
@@ -348,11 +351,10 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 
             AltHoldSmoothedGet(&altHold);
 
-            // Verify that we are  in altitude hold mode
-            FlightStatusData flightStatus;
-            FlightStatusGet(&flightStatus);
-            if (flightStatus.FlightMode != FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD ||
-                flightStatus.Armed != FLIGHTSTATUS_ARMED_ARMED) {
+            // Verify that we are in altitude hold mode
+            uint8_t armed;
+            FlightStatusArmedGet(&armed);
+            if (!altitudeHoldFlightMode || armed != FLIGHTSTATUS_ARMED_ARMED) {
                 running = false;
             }
 

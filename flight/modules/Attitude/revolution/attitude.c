@@ -415,12 +415,9 @@ static int32_t updateAttitudeComplementary(bool first_run)
 
         // Zero gyro bias
         // This is really needed after updating calibration settings.
-        GyrosBiasData zeroGyrosBias;
-        GyrosBiasGet(&zeroGyrosBias);
-        zeroGyrosBias.x = 0;
-        zeroGyrosBias.y = 0;
-        zeroGyrosBias.z = 0;
-        GyrosBiasSet(&zeroGyrosBias);
+        gyro_bias[0] = 0.0f;
+        gyro_bias[1] = 0.0f;
+        gyro_bias[2] = 0.0f;
         return 0;
     }
 

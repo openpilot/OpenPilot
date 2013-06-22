@@ -39,17 +39,19 @@ class UAVObjectBrowserWidget;
 
 using namespace Core;
 
-class UAVObjectBrowser : public Core::IUAVGadget
-{
+class UAVObjectBrowser : public Core::IUAVGadget {
     Q_OBJECT
 public:
     UAVObjectBrowser(QString classId, UAVObjectBrowserWidget *widget, QWidget *parent = 0);
     ~UAVObjectBrowser();
 
-    QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 private slots:
-    void viewOptionsChangedSlot(bool categorized,bool scientific,bool metadata);
+    void viewOptionsChangedSlot(bool categorized, bool scientific, bool metadata);
 private:
     UAVObjectBrowserWidget *m_widget;
     UAVObjectBrowserConfiguration *m_config;

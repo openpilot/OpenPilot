@@ -39,38 +39,44 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
     m_actualPositionUsed(false),
     m_latitude(46.671478),
     m_longitude(10.158932),
-    m_altitude(2000)
+    m_altitude(2000),
+    m_speedUnit("m/s"),
+    m_speedFactor(1.0),
+    m_altitudeUnit("m"),
+    m_altitudeFactor(1.0)
 {
-    setMinimumSize(64,64);
+    setMinimumSize(64, 64);
     setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setResizeMode(SizeRootObjectToView);
 
-    //setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+    // setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
     QStringList objectsToExport;
     objectsToExport << "VelocityActual" <<
-                       "PositionActual" <<
-                       "AttitudeActual" <<
-                       "Accels" <<
-                       "VelocityDesired" <<
-                       "PositionDesired" <<
-                       "AttitudeHoldDesired" <<
-                       "GPSPosition" <<
-                       "GCSTelemetryStats" <<
-                       "FlightBatteryState";
+        "PositionActual" <<
+        "AttitudeActual" <<
+        "Accels" <<
+        "VelocityDesired" <<
+        "PositionDesired" <<
+        "AttitudeHoldDesired" <<
+        "GPSPosition" <<
+        "GCSTelemetryStats" <<
+        "FlightBatteryState";
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
 
-    foreach (const QString &objectName, objectsToExport) {
-        UAVObject* object = objManager->getObject(objectName);
-        if (object)
+    foreach(const QString &objectName, objectsToExport) {
+        UAVObject *object = objManager->getObject(objectName);
+
+        if (object) {
             engine()->rootContext()->setContextProperty(objectName, object);
-        else
+        } else {
             qWarning() << "Failed to load object" << objectName;
+        }
     }
 
-    //to expose settings values
+    // to expose settings values
     engine()->rootContext()->setContextProperty("qmlWidget", this);
 #ifdef USE_OSG
     qmlRegisterType<OsgEarthItem>("org.OpenPilot", 1, 0, "OsgEarth");
@@ -78,8 +84,7 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
 }
 
 PfdQmlGadgetWidget::~PfdQmlGadgetWidget()
-{
-}
+{}
 
 void PfdQmlGadgetWidget::setQmlFile(QString fn)
 {
@@ -89,7 +94,7 @@ void PfdQmlGadgetWidget::setQmlFile(QString fn)
     SvgImageProvider *svgProvider = new SvgImageProvider(fn);
     engine()->addImageProvider("svg", svgProvider);
 
-    //it's necessary to allow qml side to query svg element position
+    // it's necessary to allow qml side to query svg element position
     engine()->rootContext()->setContextProperty("svgRenderer", svgProvider);
     engine()->setBaseUrl(QUrl::fromLocalFile(fn));
 
@@ -112,10 +117,44 @@ void PfdQmlGadgetWidget::setEarthFile(QString arg)
 void PfdQmlGadgetWidget::setTerrainEnabled(bool arg)
 {
     bool wasEnabled = terrainEnabled();
+
     m_terrainEnabled = arg;
 
-    if (wasEnabled != terrainEnabled())
+    if (wasEnabled != terrainEnabled()) {
         emit terrainEnabledChanged(terrainEnabled());
+    }
+}
+
+void PfdQmlGadgetWidget::setSpeedUnit(QString unit)
+{
+    if (m_speedUnit != unit) {
+        m_speedUnit = unit;
+        emit speedUnitChanged(unit);
+    }
+}
+
+void PfdQmlGadgetWidget::setSpeedFactor(double factor)
+{
+    if (m_speedFactor != factor) {
+        m_speedFactor = factor;
+        emit speedFactorChanged(factor);
+    }
+}
+
+void PfdQmlGadgetWidget::setAltitudeUnit(QString unit)
+{
+    if (m_altitudeUnit != unit) {
+        m_altitudeUnit = unit;
+        emit altitudeUnitChanged(unit);
+    }
+}
+
+void PfdQmlGadgetWidget::setAltitudeFactor(double factor)
+{
+    if (m_altitudeFactor != factor) {
+        m_altitudeFactor = factor;
+        emit altitudeFactorChanged(factor);
+    }
 }
 
 void PfdQmlGadgetWidget::setOpenGLEnabled(bool arg)
@@ -124,18 +163,19 @@ void PfdQmlGadgetWidget::setOpenGLEnabled(bool arg)
         m_openGLEnabled = arg;
 
         qDebug() << Q_FUNC_INFO << "Set OPENGL" << m_openGLEnabled;
-        if (m_openGLEnabled)
+        if (m_openGLEnabled) {
             setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
-        else
+        } else {
             setViewport(new QWidget);
+        }
 
-        //update terrainEnabled status with opengl status chaged
+        // update terrainEnabled status with opengl status chaged
         setTerrainEnabled(m_terrainEnabled);
     }
 }
 
-//Switch between PositionActual UAVObject position
-//and pre-defined latitude/longitude/altitude properties
+// Switch between PositionActual UAVObject position
+// and pre-defined latitude/longitude/altitude properties
 void PfdQmlGadgetWidget::setActualPositionUsed(bool arg)
 {
     if (m_actualPositionUsed != arg) {
@@ -146,7 +186,7 @@ void PfdQmlGadgetWidget::setActualPositionUsed(bool arg)
 
 void PfdQmlGadgetWidget::setLatitude(double arg)
 {
-    //not sure qFuzzyCompare is accurate enough for geo coordinates
+    // not sure qFuzzyCompare is accurate enough for geo coordinates
     if (m_latitude != arg) {
         m_latitude = arg;
         emit latitudeChanged(arg);
@@ -163,7 +203,7 @@ void PfdQmlGadgetWidget::setLongitude(double arg)
 
 void PfdQmlGadgetWidget::setAltitude(double arg)
 {
-    if (!qFuzzyCompare(m_altitude,arg)) {
+    if (!qFuzzyCompare(m_altitude, arg)) {
         m_altitude = arg;
         emit altitudeChanged(arg);
     }

@@ -29,27 +29,26 @@
 #define NOTIFYPLUGINGADGET_H
 
 #include <coreplugin/iuavgadget.h>
-//#include "NotifyPlugingadgetwidget.h"
+// #include "NotifyPlugingadgetwidget.h"
 
 class IUAVGadget;
 class QWidget;
 class QString;
-//class NotifyPluginGadgetWidget;
+// class NotifyPluginGadgetWidget;
 
 using namespace Core;
 
-class NotifyPluginGadget : public Core::IUAVGadget
-{
+class NotifyPluginGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     NotifyPluginGadget(QString classId, NotifyPluginGadgetWidget *widget, QWidget *parent = 0);
     ~NotifyPluginGadget();
 
-  //  QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    // QWidget *widget() { return m_widget; }
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 
 private:
-//    NotifyPluginGadgetWidget *m_widget;
+// NotifyPluginGadgetWidget *m_widget;
 };
 
 

@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
  * @{
- * @brief The OpenPilot Map plugin 
+ * @brief The OpenPilot Map plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,27 +32,25 @@
 #include <coreplugin/iuavgadget.h>
 
 OPMapGadgetFactory::OPMapGadgetFactory(QObject *parent) :
-                IUAVGadgetFactory(QString("OPMapGadget"), tr("OPMap"), parent)
-{
-}
+    IUAVGadgetFactory(QString("OPMapGadget"), tr("OPMap"), parent)
+{}
 
 OPMapGadgetFactory::~OPMapGadgetFactory()
-{
-}
+{}
 
-Core::IUAVGadget * OPMapGadgetFactory::createGadget(QWidget *parent)
+Core::IUAVGadget *OPMapGadgetFactory::createGadget(QWidget *parent)
 {
     OPMapGadgetWidget *gadgetWidget = new OPMapGadgetWidget(parent);
+
     return new OPMapGadget(QString("OPMapGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *OPMapGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *OPMapGadgetFactory::createConfiguration(QSettings *qSettings)
 {
     return new OPMapGadgetConfiguration(QString("OPMapGadget"), qSettings);
 }
 
-IOptionsPage * OPMapGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
+IOptionsPage *OPMapGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new OPMapGadgetOptionsPage(qobject_cast<OPMapGadgetConfiguration*>(config));
+    return new OPMapGadgetOptionsPage(qobject_cast<OPMapGadgetConfiguration *>(config));
 }
-

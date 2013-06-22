@@ -27,8 +27,8 @@
 			<option>Disabled</option>
 			<option>Motor</option>
 			<option>Servo</option>
-			<option>CameraRoll</option>
-			<option>CameraPitch</option>
+			<option>CameraRollOrServo1</option>
+			<option>CameraPitchOrServo2</option>
 			<option>CameraYaw</option>
 			<option>Accessory0</option>
 			<option>Accessory1</option>
@@ -75,6 +75,12 @@
 	<field name="Mixer10Type"   cloneof="Mixer1Type"/>
 	<field name="Mixer10Vector" cloneof="Mixer1Vector"/>
 
+        <field name="Mixer11Type"   cloneof="Mixer1Type"/>
+	<field name="Mixer11Vector" cloneof="Mixer1Vector"/>
+        
+        <field name="Mixer12Type"   cloneof="Mixer1Type"/>
+	<field name="Mixer12Vector" cloneof="Mixer1Vector"/>
+        
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

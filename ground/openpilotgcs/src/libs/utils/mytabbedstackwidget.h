@@ -36,8 +36,7 @@
  * MyTabbedStackWidget is a MyListWidget combined with a QStackedWidget,
  * similar in function to QTabWidget.
  */
-class QTCREATOR_UTILS_EXPORT MyTabbedStackWidget : public QWidget
-{
+class QTCREATOR_UTILS_EXPORT MyTabbedStackWidget : public QWidget {
     Q_OBJECT
 
 public:
@@ -45,17 +44,31 @@ public:
 
     void insertTab(int index, QWidget *tab, const QIcon &icon, const QString &label);
     void removeTab(int index);
-    void setIconSize(int size) { m_listWidget->setIconSize(QSize(size, size)); }
+    void setIconSize(int size)
+    {
+        m_listWidget->setIconSize(QSize(size, size));
+    }
+
+    void setWidgetsEnabled(bool enabled);
 
     int currentIndex() const;
 
     void insertCornerWidget(int index, QWidget *widget);
-    int cornerWidgetCount() { return m_cornerWidgetCount; }
-    QWidget * currentWidget(){return m_stackWidget->currentWidget();}
-    QWidget * getWidget(int index) {return m_stackWidget->widget(index);}
+    int cornerWidgetCount()
+    {
+        return m_cornerWidgetCount;
+    }
+    QWidget *currentWidget()
+    {
+        return m_stackWidget->currentWidget();
+    }
+    QWidget *getWidget(int index)
+    {
+        return m_stackWidget->widget(index);
+    }
 
 signals:
-    void currentAboutToShow(int index,bool * proceed);
+    void currentAboutToShow(int index, bool *proceed);
     void currentChanged(int index);
 
 public slots:

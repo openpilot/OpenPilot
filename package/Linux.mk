@@ -1,0 +1,62 @@
+#
+# Linux-specific packaging script
+#
+
+ifndef OPENPILOT_IS_COOL
+    $(error Top level Makefile must be used to build this target)
+endif
+
+FW_DIR := $(PACKAGE_DIR)/firmware
+
+# Update this number for every formal release.  The Deb packaging system relies on this to know to update a
+# package or not.  Otherwise, the user has to uninstall first.
+# Until we do that, package name does NOT include $(VERNUM) and uses $(PACKAGE_LBL) only
+VERNUM			:= 0.1.0
+VERSION_FULL		:= $(VERNUM)-$(PACKAGE_LBL)
+DEB_BUILD_DIR		:= $(ROOT_DIR)/debian
+
+SED_DATE_STRG		= $(shell date -R)
+SED_SCRIPT		= s/<VERSION>/$(VERNUM)/;s/<DATE>/$(SED_DATE_STRG)/
+
+DEB_CFG_CMN		:= $(ROOT_DIR)/package/linux/deb_common
+DEB_CFG_I386_DIR	:= $(ROOT_DIR)/package/linux/deb_i386
+DEB_CFG_AMD64_DIR	:= $(ROOT_DIR)/package/linux/deb_amd64
+DEB_CFG_CMN_FILES	:= $(shell ls $(DEB_CFG_CMN))
+DEB_CFG_I386_FILES	:= $(shell ls $(DEB_CFG_I386_DIR))
+DEB_CFG_AMD64_FILES	:= $(shell ls $(DEB_CFG_AMD64_DIR))
+
+DEB_PLATFORM		:= amd64
+DEB_MACHINE_DIR		:= $(DEB_CFG_AMD64_DIR)
+DEB_MACHINE_FILES	:= $(DEB_CFG_AMD64_FILES)
+MACHINE_TYPE		:= $(shell uname -m)
+ifneq ($(MACHINE_TYPE), x86_64)
+ DEB_PLATFORM		:= i386
+ DEB_MACHINE_DIR	:= $(DEB_CFG_I386_DIR)
+ DEB_MACHINE_FILES	:= $(DEB_CFG_I386_FILES)
+endif
+DEB_PACKAGE_NAME	:= openpilot_$(VERNUM)_$(DEB_PLATFORM)
+FULL_PACKAGE_NAME	:= $(PACKAGE_NAME)$(PACKAGE_SEP)$(PACKAGE_LBL)$(PACKAGE_SEP)$(DEB_PLATFORM)
+
+ALL_DEB_FILES  = $(foreach f, $(DEB_CFG_CMN_FILES), $(DEB_BUILD_DIR)/$(f))
+ALL_DEB_FILES += $(foreach f, $(DEB_MACHINE_FILES), $(DEB_BUILD_DIR)/$(f))
+
+.PHONY: package
+package: $(ALL_DEB_FILES)
+	$(V1) echo "Building Linux package, please wait..."
+	$(V1) mkdir -p $(DEB_BUILD_DIR)
+	$(V1)$(shell echo $(FW_DIR) > $(BUILD_DIR)/package_dir)
+	$(V1)sed -i -e "$(SED_SCRIPT)" $(DEB_BUILD_DIR)/changelog
+	$(V1) cd .. && dpkg-buildpackage -b -us -uc
+	$(V1) mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).deb $(BUILD_DIR)/$(FULL_PACKAGE_NAME).deb
+	$(V1) mv $(ROOT_DIR)/../$(DEB_PACKAGE_NAME).changes $(BUILD_DIR)/$(FULL_PACKAGE_NAME).changes
+	$(V1) rm -rf $(DEB_BUILD_DIR)
+
+define CP_DEB_FILES_TEMPLATE
+.PHONY: $(2)/$(1)
+$(2)/$(1): $(3)/$(1)
+	$(V1) mkdir -p $(2)
+	$(V1) cp -a $$< $$@
+endef
+
+$(foreach cpfile, $(DEB_CFG_CMN_FILES), $(eval $(call CP_DEB_FILES_TEMPLATE,$(cpfile),$(DEB_BUILD_DIR),$(DEB_CFG_CMN))))
+$(foreach cpfile, $(DEB_MACHINE_FILES), $(eval $(call CP_DEB_FILES_TEMPLATE,$(cpfile),$(DEB_BUILD_DIR),$(DEB_MACHINE_DIR))))

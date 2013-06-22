@@ -1,8 +1,45 @@
 <xml>
     <object name="SystemAlarms" singleinstance="true" settings="false">
-        <description>Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.</description>
-        <field name="Alarm" units="" type="enum" options="Uninitialised,OK,Warning,Error,Critical"
-        elementnames="OutOfMemory,StackOverflow,CPUOverload,EventSystem,Telemetry,ManualControl,Actuator,Attitude,Sensors,Stabilization,Guidance,Battery,FlightTime,I2C,GPS,BootFault" defaultvalue="Uninitialised"/>
+        <description>Alarms from OpenPilot to indicate failure conditions or warnings.  Set by various modules.  Some modules may have a module defined Status and Substatus fields that details its condition.</description>
+        <field name="Alarm" units="" type="enum" options="Uninitialised,OK,Warning,Error,Critical" defaultvalue="Uninitialised">
+		<elementnames>
+			<elementname>SystemConfiguration</elementname>
+			<elementname>BootFault</elementname>
+			<elementname>OutOfMemory</elementname>
+			<elementname>StackOverflow</elementname>
+			<elementname>CPUOverload</elementname>
+			<elementname>EventSystem</elementname>
+			<elementname>Telemetry</elementname>
+			<elementname>ManualControl</elementname>
+			<elementname>Actuator</elementname>
+			<elementname>Attitude</elementname>
+			<elementname>Sensors</elementname>
+			<elementname>Stabilization</elementname>
+			<elementname>Guidance</elementname>
+			<elementname>Battery</elementname>
+			<elementname>FlightTime</elementname>
+			<elementname>I2C</elementname>
+			<elementname>GPS</elementname>
+			<elementname>Power</elementname>
+		</elementnames>
+	</field>
+	<field name="ExtendedAlarmStatus" units="" type="enum" defaultvalue="None">
+		<elementnames>
+			<elementname>SystemConfiguration</elementname>
+			<elementname>BootFault</elementname>
+		</elementnames>
+		<options>
+			<option>None</option>
+			<option>RebootRequired</option>
+			<option>FlightMode</option>
+		</options>
+	</field>
+	<field name="ExtendedAlarmSubStatus" units="" type="uint8" defaultvalue="0">
+		<elementnames>
+			<elementname>SystemConfiguration</elementname>
+			<elementname>BootFault</elementname>
+		</elementnames>
+	</field>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

@@ -32,12 +32,14 @@ MyTabWidget::MyTabWidget(QWidget *parent)
     : QTabWidget(parent)
 {
     QTabBar *tabBar = QTabWidget::tabBar();
-    connect(tabBar, SIGNAL(tabMoved(int, int)), this, SLOT(myTabMoved(int,int)));
+
+    connect(tabBar, SIGNAL(tabMoved(int, int)), this, SLOT(myTabMoved(int, int)));
 }
 
 void MyTabWidget::moveTab(int from, int to)
 {
     QTabBar *tabBar = QTabWidget::tabBar();
+
     tabBar->moveTab(from, to);
 }
 

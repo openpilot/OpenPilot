@@ -26,8 +26,7 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class PfdQmlGadgetFactory : public IUAVGadgetFactory
-{
+class PfdQmlGadgetFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
     PfdQmlGadgetFactory(QObject *parent = 0);

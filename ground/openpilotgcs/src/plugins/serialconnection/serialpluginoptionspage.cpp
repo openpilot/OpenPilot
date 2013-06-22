@@ -10,7 +10,7 @@
  * @{
  * @brief Impliments serial connection to the flight hardware for Telemetry
  *****************************************************************************/
- /*
+/*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
@@ -32,50 +32,48 @@
 #include "extensionsystem/pluginmanager.h"
 
 SerialPluginOptionsPage::SerialPluginOptionsPage(SerialPluginConfiguration *config, QObject *parent) :
-        IOptionsPage(parent),
-        m_config(config)
-{
-}
+    IOptionsPage(parent),
+    m_config(config)
+{}
 
-//creates options page widget (uses the UI file)
+// creates options page widget (uses the UI file)
 QWidget *SerialPluginOptionsPage::createPage(QWidget *parent)
 {
-
     Q_UNUSED(parent);
     options_page = new Ui::SerialPluginOptionsPage();
-    //main widget
+    // main widget
     QWidget *optionsPageWidget = new QWidget;
-    //main layout
+    // main layout
     options_page->setupUi(optionsPageWidget);
     QStringList allowedSpeeds;
-    allowedSpeeds<<"1200"
-#ifdef Q_OS_UNIX
-                 <<"1800"              //POSIX ONLY
-#endif
-                 <<"2400"
-                 <<"4800"
-                 <<"9600"
-#ifdef Q_OS_WIN
-                 <<"14400"             //WINDOWS ONLY
-#endif
-                 <<"19200"
-                 <<"38400"
-#ifdef Q_OS_WIN
-                 <<"56000"             //WINDOWS ONLY
-#endif
-                 <<"57600"
-#ifdef Q_OS_UNIX
-                 <<"76800"             //POSIX ONLY
-#endif
-                 <<"115200"
-#ifdef Q_OS_WIN
-                 <<"128000"            //WINDOWS ONLY
-                 <<"230400"            //WINDOWS ONLY
-                 <<"256000"            //WINDOWS ONLY
-                 <<"460800"            //WINDOWS ONLY
-                 <<"921600"            //WINDOWS ONLY
-#endif
-                   ;
+    allowedSpeeds << "1200"
+        #ifdef Q_OS_UNIX
+                  << "1800"              // POSIX ONLY
+        #endif
+                  << "2400"
+                  << "4800"
+                  << "9600"
+        #ifdef Q_OS_WIN
+                  << "14400"             // WINDOWS ONLY
+        #endif
+                  << "19200"
+                  << "38400"
+        #ifdef Q_OS_WIN
+                  << "56000"             // WINDOWS ONLY
+        #endif
+                  << "57600"
+        #ifdef Q_OS_UNIX
+                  << "76800"             // POSIX ONLY
+        #endif
+                  << "115200"
+        #ifdef Q_OS_WIN
+                  << "128000"            // WINDOWS ONLY
+                  << "230400"            // WINDOWS ONLY
+                  << "256000"            // WINDOWS ONLY
+                  << "460800"            // WINDOWS ONLY
+                  << "921600"            // WINDOWS ONLY
+        #endif
+    ;
 
 
     options_page->cb_speed->addItems(allowedSpeeds);
@@ -94,7 +92,6 @@ void SerialPluginOptionsPage::apply()
     m_config->setSpeed(options_page->cb_speed->currentText());
     m_config->savesettings();
 }
-
 
 
 void SerialPluginOptionsPage::finish()

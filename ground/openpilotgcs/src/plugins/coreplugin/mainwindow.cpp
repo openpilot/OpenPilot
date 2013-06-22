@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -84,7 +84,7 @@
 #include <QtGui/QToolButton>
 #include <QtGui/QMessageBox>
 #include <QDesktopServices>
-#include "dialogs/importsettings.h"
+#include <QElapsedTimer>
 #include <QDir>
 
 using namespace Core;
@@ -104,7 +104,7 @@ MainWindow::MainWindow() :
     m_settings(new QSettings(XmlConfig::XmlSettingsFormat, QSettings::UserScope,
                              QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS_config"), this)),
     m_globalSettings(new QSettings(XmlConfig::XmlSettingsFormat, QSettings::SystemScope,
-                                 QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS_config"), this)),
+                                   QLatin1String("OpenPilot"), QLatin1String("OpenPilotGCS_config"), this)),
     m_settingsDatabase(new SettingsDatabase(QFileInfo(m_settings->fileName()).path(),
                                             QLatin1String("OpenPilotGCS_config"),
                                             this)),
@@ -149,10 +149,11 @@ MainWindow::MainWindow() :
         // Sometimes we get the standard windows 95 style as a fallback
         // e.g. if we are running on a KDE4 desktop
         QByteArray desktopEnvironment = qgetenv("DESKTOP_SESSION");
-        if (desktopEnvironment == "kde")
+        if (desktopEnvironment == "kde") {
             baseName = QLatin1String("plastique");
-        else
+        } else {
             baseName = QLatin1String("cleanlooks");
+        }
     }
 #endif
     qApp->setStyle(new ManhattanStyle(baseName));
@@ -166,7 +167,7 @@ MainWindow::MainWindow() :
     registerDefaultActions();
 
     m_modeStack = new MyTabWidget(this);
-    m_modeStack->setIconSize(QSize(24,24));
+    m_modeStack->setIconSize(QSize(24, 24));
     m_modeStack->setTabPosition(QTabWidget::South);
     m_modeStack->setMovable(false);
     m_modeStack->setMinimumWidth(512);
@@ -178,18 +179,18 @@ MainWindow::MainWindow() :
 
     m_connectionManager = new ConnectionManager(this, m_modeStack);
 
-    m_messageManager = new MessageManager;
+    m_messageManager    = new MessageManager;
     setCentralWidget(m_modeStack);
 
-    connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
-            this, SLOT(updateFocusWidget(QWidget*,QWidget*)));
-    connect(m_workspaceSettings, SIGNAL(tabBarSettingsApplied(QTabWidget::TabPosition,bool)),
-            this, SLOT(applyTabBarSettings(QTabWidget::TabPosition,bool)));
-    connect(m_modeManager, SIGNAL(newModeOrder(QVector<IMode*>)), m_workspaceSettings, SLOT(newModeOrder(QVector<IMode*>)));
+    connect(QApplication::instance(), SIGNAL(focusChanged(QWidget *, QWidget *)),
+            this, SLOT(updateFocusWidget(QWidget *, QWidget *)));
+    connect(m_workspaceSettings, SIGNAL(tabBarSettingsApplied(QTabWidget::TabPosition, bool)),
+            this, SLOT(applyTabBarSettings(QTabWidget::TabPosition, bool)));
+    connect(m_modeManager, SIGNAL(newModeOrder(QVector<IMode *>)), m_workspaceSettings, SLOT(newModeOrder(QVector<IMode *>)));
     statusBar()->setProperty("p_styled", true);
     setAcceptDrops(true);
-    foreach (QString engine, qxtLog->allLoggerEngines())
-        qxtLog->removeLoggerEngine(engine);
+    foreach(QString engine, qxtLog->allLoggerEngines())
+    qxtLog->removeLoggerEngine(engine);
     qxtLog->addLoggerEngine("std", new QxtBasicSTDLoggerEngine());
     qxtLog->installAsMessageHandler();
     qxtLog->enableAllLogLevels();
@@ -197,21 +198,19 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
-	if (m_connectionManager)	// Pip
-	{
-		m_connectionManager->disconnectDevice();
-		m_connectionManager->suspendPolling();
-	}
+    if (m_connectionManager) { // Pip
+        m_connectionManager->disconnectDevice();
+        m_connectionManager->suspendPolling();
+    }
 
-	hide();
+    hide();
 
-	qxtLog->removeAsMessageHandler();
-    foreach (QString engine, qxtLog->allLoggerEngines())
-        qxtLog->removeLoggerEngine(engine);
+    qxtLog->removeAsMessageHandler();
+    foreach(QString engine, qxtLog->allLoggerEngines())
+    qxtLog->removeLoggerEngine(engine);
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     if (m_uavGadgetManagers.count() > 0) {
-        foreach (UAVGadgetManager *mode, m_uavGadgetManagers)
-        {
+        foreach(UAVGadgetManager * mode, m_uavGadgetManagers) {
             pm->removeObject(mode);
             delete mode;
         }
@@ -221,11 +220,11 @@ MainWindow::~MainWindow()
     pm->removeObject(m_generalSettings);
     pm->removeObject(m_workspaceSettings);
     delete m_messageManager;
-    m_messageManager = 0;
+    m_messageManager    = 0;
     delete m_shortcutSettings;
-    m_shortcutSettings = 0;
+    m_shortcutSettings  = 0;
     delete m_generalSettings;
-    m_generalSettings = 0;
+    m_generalSettings   = 0;
     delete m_workspaceSettings;
     m_workspaceSettings = 0;
     delete m_settings;
@@ -235,10 +234,10 @@ MainWindow::~MainWindow()
 
     pm->removeObject(m_coreImpl);
     delete m_coreImpl;
-    m_coreImpl = 0;
+    m_coreImpl     = 0;
 
     delete m_modeManager;
-    m_modeManager = 0;
+    m_modeManager  = 0;
     delete m_mimeDatabase;
     m_mimeDatabase = 0;
 }
@@ -247,7 +246,7 @@ bool MainWindow::init(QString *errorMessage)
 {
     Q_UNUSED(errorMessage)
 
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    ExtensionSystem::PluginManager * pm = ExtensionSystem::PluginManager::instance();
     pm->addObject(m_coreImpl);
     m_modeManager->init();
     m_connectionManager->init();
@@ -259,63 +258,46 @@ bool MainWindow::init(QString *errorMessage)
     return true;
 }
 
-void MainWindow::modeChanged(Core::IMode */*mode*/)
-{
-
-}
+void MainWindow::modeChanged(Core::IMode * /*mode*/)
+{}
 
 void MainWindow::extensionsInitialized()
 {
     QSettings *qs = m_settings;
-    QSettings *settings;
-    QString commandLine;
-    if ( ! qs->allKeys().count() ) {
-        foreach(QString str, qApp->arguments()) {
-            if(str.contains("configfile")) {
-                qDebug() << "ass";
-                commandLine = str.split("=").at(1);
-                qDebug() << commandLine;
-            }
-        }
-        QDir directory(QCoreApplication::applicationDirPath());
-#ifdef Q_OS_MAC
-            directory.cdUp();
-            directory.cd("Resources");
-#else
-            directory.cdUp();
-            directory.cd("share");
-            directory.cd("openpilotgcs");
-#endif
-        directory.cd("default_configurations");
 
-        qDebug() << "Looking for default config files in: " + directory.absolutePath();
-        bool showDialog = true;
-        QString filename;
-        if(!commandLine.isEmpty()) {
-            if(QFile::exists(directory.absolutePath() + QDir::separator()+commandLine)) {
-                filename = directory.absolutePath() + QDir::separator()+commandLine;
-                qDebug() << "Load configuration from command line";
-                settings = new QSettings(filename, XmlConfig::XmlSettingsFormat);
-                showDialog = false;
-            }
-        }
-        if(showDialog) {
-            importSettings *dialog = new importSettings(this);
-            dialog->loadFiles(directory.absolutePath());
-            dialog->exec();
-            filename = dialog->choosenConfig();
-            settings = new QSettings(filename, XmlConfig::XmlSettingsFormat);
-            delete dialog;
-        }
-        qs = settings;
-        qDebug() << "Load default config from resource " << filename;
-    }
     qs->beginGroup("General");
-    m_config_description=qs->value("Description", "none").toString();
-    m_config_details=qs->value("Details", "none").toString();
-    m_config_stylesheet=qs->value("StyleSheet", "none").toString();
-    loadStyleSheet(m_config_stylesheet);
+
+    m_config_description = qs->value("Description", "none").toString();
+    m_config_details     = qs->value("Details", "none").toString();
+    m_config_stylesheet  = qs->value("StyleSheet", "none").toString();
+
+    qDebug() << "Configured style sheet:" << m_config_stylesheet;
+    if (m_config_stylesheet == "wide") {
+        // OP-869 just in case some user configuration still references the now obsolete "wide" style sheet
+        m_config_stylesheet = "default";
+    }
+
+    // Load common style sheet
+    QString style    = loadStyleSheet(m_config_stylesheet + ".qss");
+
+    // Load and concatenate platform specific style sheet
+    QString fileName = m_config_stylesheet;
+#ifdef Q_OS_MAC
+    fileName += "_macos.qss";
+#elif defined(Q_OS_LINUX)
+    fileName += "_linux.qss";
+#else
+    fileName += "_windows.qss";
+#endif
+    style    += loadStyleSheet(fileName);
+
+    // We'll use qApp macro to get the QApplication pointer
+    // and set the style sheet application wide.
+    qDebug() << "Setting application style sheet to:" << style;
+    qApp->setStyleSheet(style);
+
     qs->endGroup();
+
     m_uavGadgetInstanceManager = new UAVGadgetInstanceManager(this);
     m_uavGadgetInstanceManager->readSettings(qs);
 
@@ -329,54 +311,47 @@ void MainWindow::extensionsInitialized()
     emit m_coreImpl->coreOpened();
 }
 
-void MainWindow::loadStyleSheet(QString name) {
-    /* Let's use QFile and point to a resource... */
-    QDir directory(QCoreApplication::applicationDirPath());
+QString MainWindow::loadStyleSheet(QString fileName)
+{
+    // Let's use QFile and point to a resource...
+    QDir dir(QCoreApplication::applicationDirPath());
+
 #ifdef Q_OS_MAC
-    directory.cdUp();
-    directory.cd("Resources");
+    dir.cdUp();
+    dir.cd("Resources");
 #else
-    directory.cdUp();
-    directory.cd("share");
-    directory.cd("openpilotgcs");
+    dir.cdUp();
+    dir.cd("share");
+    dir.cd("openpilotgcs");
 #endif
-    directory.cd("stylesheets");
-#ifdef Q_OS_MAC
-    QFile data(directory.absolutePath()+QDir::separator()+name+"_macos.qss");
-#elif defined(Q_OS_LINUX)
-    QFile data(directory.absolutePath()+QDir::separator()+name+"_linux.qss");
-#else
-    QFile data(directory.absolutePath()+QDir::separator()+name+"_windows.qss");
-#endif
+    dir.cd("stylesheets");
     QString style;
-    /* ...to open the file */
-    if(data.open(QFile::ReadOnly)) {
-        /* QTextStream... */
-        QTextStream styleIn(&data);
-        /* ...read file to a string. */
-        style = styleIn.readAll();
-        data.close();
-        /* We'll use qApp macro to get the QApplication pointer
-         * and set the style sheet application wide. */
-        qApp->setStyleSheet(style);
-        qDebug()<<"Loaded stylesheet:"<<style;
+    // ...to open the file
+    QFile file(dir.absolutePath() + QDir::separator() + fileName);
+    qDebug() << "Loading style sheet file" << file.fileName();
+    if (file.open(QFile::ReadOnly)) {
+        // QTextStream...
+        QTextStream textStream(&file);
+        // ...read file to a string.
+        style = textStream.readAll();
+        file.close();
+    } else {
+        qDebug() << "Failed to open style sheet file" << file.fileName();
     }
-    else
-        qDebug()<<"Failed to openstylesheet file"<<directory.absolutePath()<<name;
+    return style;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if ( !m_generalSettings->saveSettingsOnExit() ){
+    if (!m_generalSettings->saveSettingsOnExit()) {
         m_dontSaveSettings = true;
     }
-    if ( !m_dontSaveSettings ){
+    if (!m_dontSaveSettings) {
         emit m_coreImpl->saveSettingsRequested();
     }
 
-    const QList<ICoreListener *> listeners =
-        ExtensionSystem::PluginManager::instance()->getObjects<ICoreListener>();
-    foreach (ICoreListener *listener, listeners) {
+    const QList<ICoreListener *> listeners = ExtensionSystem::PluginManager::instance()->getObjects<ICoreListener>();
+    foreach(ICoreListener * listener, listeners) {
         if (!listener->coreAboutToClose()) {
             event->ignore();
             return;
@@ -385,7 +360,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
     emit m_coreImpl->coreAboutToClose();
 
-    if ( !m_dontSaveSettings ){
+    if (!m_dontSaveSettings) {
         saveSettings(m_settings);
         m_uavGadgetInstanceManager->saveSettings(m_settings);
     }
@@ -393,17 +368,19 @@ void MainWindow::closeEvent(QCloseEvent *event)
 }
 
 // Check for desktop file manager file drop events
-
 static bool isDesktopFileManagerDrop(const QMimeData *d, QStringList *files = 0)
 {
-    if (files)
+    if (files) {
         files->clear();
+    }
     // Extract dropped files from Mime data.
-    if (!d->hasFormat(QLatin1String(uriListMimeFormatC)))
+    if (!d->hasFormat(QLatin1String(uriListMimeFormatC))) {
         return false;
+    }
     const QList<QUrl> urls = d->urls();
-    if (urls.empty())
+    if (urls.empty()) {
         return false;
+    }
     // Try to find local files
     bool hasFiles = false;
     const QList<QUrl>::const_iterator cend = urls.constEnd();
@@ -433,9 +410,10 @@ void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 void MainWindow::dropEvent(QDropEvent *event)
 {
     QStringList files;
+
     if (isDesktopFileManagerDrop(event->mimeData(), &files)) {
         event->accept();
-        //openFiles(files);
+        // openFiles(files);
     } else {
         event->ignore();
     }
@@ -448,7 +426,7 @@ IContext *MainWindow::currentContextObject() const
 
 QStatusBar *MainWindow::statusBar() const
 {
-    return new QStatusBar();// m_modeStack->statusBar();
+    return new QStatusBar(); // m_modeStack->statusBar();
 }
 
 void MainWindow::registerDefaultContainers()
@@ -515,11 +493,10 @@ void MainWindow::registerDefaultContainers()
     ac->appendGroup(Constants::G_HELP_ABOUT);
 }
 
-static Command *createSeparator(ActionManager *am, QObject *parent,
-                                const QString &name,
-                                const QList<int> &context)
+static Command *createSeparator(ActionManager *am, QObject *parent, const QString &name, const QList<int> &context)
 {
     QAction *tmpaction = new QAction(parent);
+
     tmpaction->setSeparator(true);
     Command *cmd = am->registerAction(tmpaction, name, context);
     return cmd;
@@ -528,17 +505,18 @@ static Command *createSeparator(ActionManager *am, QObject *parent,
 void MainWindow::registerDefaultActions()
 {
     ActionManagerPrivate *am = m_actionManager;
-    ActionContainer *mfile = am->actionContainer(Constants::M_FILE);
-    ActionContainer *medit = am->actionContainer(Constants::M_EDIT);
-    ActionContainer *mtools = am->actionContainer(Constants::M_TOOLS);
+    ActionContainer *mfile   = am->actionContainer(Constants::M_FILE);
+    ActionContainer *medit   = am->actionContainer(Constants::M_EDIT);
+    ActionContainer *mtools  = am->actionContainer(Constants::M_TOOLS);
     ActionContainer *mwindow = am->actionContainer(Constants::M_WINDOW);
-    ActionContainer *mhelp = am->actionContainer(Constants::M_HELP);
+    ActionContainer *mhelp   = am->actionContainer(Constants::M_HELP);
 
     // File menu separators
     Command *cmd = createSeparator(am, this, QLatin1String("QtCreator.File.Sep.Save"), m_globalContext);
+
     mfile->addAction(cmd, Constants::G_FILE_SAVE);
 
-    cmd =  createSeparator(am, this, QLatin1String("QtCreator.File.Sep.Close"), m_globalContext);
+    cmd = createSeparator(am, this, QLatin1String("QtCreator.File.Sep.Close"), m_globalContext);
     mfile->addAction(cmd, Constants::G_FILE_CLOSE);
 
     cmd = createSeparator(am, this, QLatin1String("QtCreator.File.Sep.Other"), m_globalContext);
@@ -573,12 +551,12 @@ void MainWindow::registerDefaultActions()
     // New File Action
 
     /*
-    m_newAction = new QAction(QIcon(Constants::ICON_NEWFILE), tr("&New File or Project..."), this);
-    cmd = am->registerAction(m_newAction, Constants::NEW, m_globalContext);
-    cmd->setDefaultKeySequence(QKeySequence::New);
-    mfile->addAction(cmd, Constants::G_FILE_NEW);
-    connect(m_newAction, SIGNAL(triggered()), this, SLOT(newFile()));
-*/
+       m_newAction = new QAction(QIcon(Constants::ICON_NEWFILE), tr("&New File or Project..."), this);
+       cmd = am->registerAction(m_newAction, Constants::NEW, m_globalContext);
+       cmd->setDefaultKeySequence(QKeySequence::New);
+       mfile->addAction(cmd, Constants::G_FILE_NEW);
+       connect(m_newAction, SIGNAL(triggered()), this, SLOT(newFile()));
+     */
 
     // Open Action
 /*
@@ -587,7 +565,7 @@ void MainWindow::registerDefaultActions()
     cmd->setDefaultKeySequence(QKeySequence::Open);
     mfile->addAction(cmd, Constants::G_FILE_OPEN);
     connect(m_openAction, SIGNAL(triggered()), this, SLOT(openFile()));
-*/
+ */
 
     // Open With Action
 /*
@@ -595,14 +573,14 @@ void MainWindow::registerDefaultActions()
     cmd = am->registerAction(m_openWithAction, Constants::OPEN_WITH, m_globalContext);
     mfile->addAction(cmd, Constants::G_FILE_OPEN);
     connect(m_openWithAction, SIGNAL(triggered()), this, SLOT(openFileWith()));
-*/
+ */
 
-        // File->Recent Files Menu
+    // File->Recent Files Menu
 /*
     ActionContainer *ac = am->createMenu(Constants::M_FILE_RECENTFILES);
     mfile->addMenu(ac, Constants::G_FILE_OPEN);
     ac->menu()->setTitle(tr("Recent Files"));
-*/
+ */
 /*
     // Save Action
     QAction *tmpaction = new QAction(QIcon(Constants::ICON_SAVEFILE), tr("&Save"), this);
@@ -615,13 +593,13 @@ void MainWindow::registerDefaultActions()
     // Save As Action
     tmpaction = new QAction(tr("Save &As..."), this);
     cmd = am->registerAction(tmpaction, Constants::SAVEAS, m_globalContext);
-#ifdef Q_WS_MAC
+   #ifdef Q_WS_MAC
     cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+Shift+S")));
-#endif
+   #endif
     cmd->setAttribute(Command::CA_UpdateText);
     cmd->setDefaultText(tr("Save &As..."));
     mfile->addAction(cmd, Constants::G_FILE_SAVE);
-    */
+ */
 
     // SaveAll Action
     m_saveAllAction = new QAction(tr("Save &GCS Default Settings"), this);
@@ -728,8 +706,8 @@ void MainWindow::registerDefaultActions()
      * UavGadgetManager Actions
      */
     const QList<int> uavGadgetManagerContext =
-                QList<int>() << CoreImpl::instance()->uniqueIDManager()->uniqueIdentifier(Constants::C_UAVGADGETMANAGER);
-    //Window menu separators
+        QList<int>() << CoreImpl::instance()->uniqueIDManager()->uniqueIdentifier(Constants::C_UAVGADGETMANAGER);
+    // Window menu separators
     QAction *tmpaction1 = new QAction(this);
     tmpaction1->setSeparator(true);
     cmd = am->registerAction(tmpaction1, QLatin1String("OpenPilot.Window.Sep.Split"), uavGadgetManagerContext);
@@ -741,7 +719,7 @@ void MainWindow::registerDefaultActions()
     cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+Shift+F10")));
     mwindow->addAction(cmd, Constants::G_WINDOW_HIDE_TOOLBAR);
 
-    //Window menu separators
+    // Window menu separators
     QAction *tmpaction2 = new QAction(this);
     tmpaction2->setSeparator(true);
     cmd = am->registerAction(tmpaction2, QLatin1String("OpenPilot.Window.Sep.Split2"), uavGadgetManagerContext);
@@ -778,12 +756,12 @@ void MainWindow::registerDefaultActions()
     cmd->setDefaultKeySequence(QKeySequence(tr("%1+N").arg(prefix)));
     mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
 
-    //Help Action
+    // Help Action
     tmpaction = new QAction(QIcon(Constants::ICON_HELP), tr("&Help..."), this);
     cmd = am->registerAction(tmpaction, Constants::G_HELP_HELP, m_globalContext);
     mhelp->addAction(cmd, Constants::G_HELP_HELP);
     tmpaction->setEnabled(true);
-    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(showHelp()));
+    connect(tmpaction, SIGNAL(triggered()), this, SLOT(showHelp()));
 
     // About sep
 #ifndef Q_WS_MAC // doesn't have the "About" actions in the Help menu
@@ -795,19 +773,17 @@ void MainWindow::registerDefaultActions()
 
     // About GCS Action
 #ifdef Q_WS_MAC
-    tmpaction = new QAction(QIcon(Constants::ICON_OPENPILOT), tr("About &OpenPilot GCS"), this); // it's convention not to add dots to the about menu
-#else
-    tmpaction = new QAction(QIcon(Constants::ICON_OPENPILOT), tr("About &OpenPilot GCS..."), this);
-#endif
-    cmd = am->registerAction(tmpaction, Constants::ABOUT_OPENPILOTGCS, m_globalContext);
-    mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
-    tmpaction->setEnabled(true);
-#ifdef Q_WS_MAC
-    cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
-#endif
-    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutOpenPilotGCS()));
 
-    //About Plugins Action
+#else
+
+#endif
+
+#ifdef Q_WS_MAC
+
+#endif
+    connect(tmpaction, SIGNAL(triggered()), this, SLOT(aboutOpenPilotGCS()));
+
+    // About Plugins Action
     tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &Plugins..."), this);
     cmd = am->registerAction(tmpaction, Constants::ABOUT_PLUGINS, m_globalContext);
     mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
@@ -815,39 +791,35 @@ void MainWindow::registerDefaultActions()
 #ifdef Q_WS_MAC
     cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
 #endif
-    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutPlugins()));
+    connect(tmpaction, SIGNAL(triggered()), this, SLOT(aboutPlugins()));
 
-    //Credits Action
-    tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &Authors..."), this);
+    // Credits Action
+    tmpaction = new QAction(QIcon(Constants::ICON_PLUGIN), tr("About &OpenPilot..."), this);
     cmd = am->registerAction(tmpaction, Constants::ABOUT_AUTHORS, m_globalContext);
     mhelp->addAction(cmd, Constants::G_HELP_ABOUT);
     tmpaction->setEnabled(true);
 #ifdef Q_WS_MAC
     cmd->action()->setMenuRole(QAction::ApplicationSpecificRole);
 #endif
-    connect(tmpaction, SIGNAL(triggered()), this,  SLOT(aboutOpenPilotAuthors()));
-
-
+    connect(tmpaction, SIGNAL(triggered()), this, SLOT(aboutOpenPilotAuthors()));
 }
 
 void MainWindow::newFile()
-{
-}
+{}
 
 void MainWindow::openFile()
-{
-}
+{}
 
 /*static QList<IFileFactory*> getNonEditorFileFactories()
-{
+   {
     QList<IFileFactory*> tmp;
     return tmp;
-}
+   }
 
-static IFileFactory *findFileFactory(const QList<IFileFactory*> &fileFactories,
+   static IFileFactory *findFileFactory(const QList<IFileFactory*> &fileFactories,
                                      const MimeDatabase *db,
                                      const QFileInfo &fi)
-{
+   {
     if (const MimeType mt = db->findByFile(fi)) {
         const QString type = mt.type();
         foreach (IFileFactory *factory, fileFactories) {
@@ -856,11 +828,11 @@ static IFileFactory *findFileFactory(const QList<IFileFactory*> &fileFactories,
         }
     }
     return 0;
-}
+   }
 
-// opens either an editor or loads a project
-void MainWindow::openFiles(const QStringList &fileNames)
-{
+   // opens either an editor or loads a project
+   void MainWindow::openFiles(const QStringList &fileNames)
+   {
     QList<IFileFactory*> nonEditorFileFactories = getNonEditorFileFactories();
 
     foreach (const QString &fileName, fileNames) {
@@ -872,27 +844,27 @@ void MainWindow::openFiles(const QStringList &fileNames)
 
         }
     }
-}*/
+   }*/
 
 void MainWindow::setFocusToEditor()
-{
+{}
 
-}
-
-bool MainWindow::showOptionsDialog(const QString &category,
-                                   const QString &page,
-                                   QWidget *parent)
+bool MainWindow::showOptionsDialog(const QString &category, const QString &page, QWidget *parent)
 {
     emit m_coreImpl->optionsDialogRequested();
-    if (!parent)
+
+    if (!parent) {
         parent = this;
+    }
     SettingsDialog dlg(parent, category, page);
     return dlg.execDialog();
 }
 
 void MainWindow::saveAll()
 {
-    if ( m_dontSaveSettings) return;
+    if (m_dontSaveSettings) {
+        return;
+    }
 
     emit m_coreImpl->saveSettingsRequested();
     saveSettings(); // OpenPilot-specific.
@@ -905,23 +877,23 @@ void MainWindow::exit()
     // since on close we are going to delete everything
     // so to prevent the deleting of that object we
     // just append it
-    QTimer::singleShot(0, this,  SLOT(close()));
+    QTimer::singleShot(0, this, SLOT(close()));
 }
 
 void MainWindow::openFileWith()
+{}
+
+void MainWindow::applyTabBarSettings(QTabWidget::TabPosition pos, bool movable)
 {
-
-}
-
-void MainWindow::applyTabBarSettings(QTabWidget::TabPosition pos, bool movable) {
-    if (m_modeStack->tabPosition() != pos)
+    if (m_modeStack->tabPosition() != pos) {
         m_modeStack->setTabPosition(pos);
+    }
     m_modeStack->setMovable(movable);
 }
 
 void MainWindow::showHelp()
 {
-    QDesktopServices::openUrl( QUrl(Constants::GCS_HELP, QUrl::StrictMode) );
+    QDesktopServices::openUrl(QUrl(Constants::GCS_HELP, QUrl::StrictMode));
 }
 
 ActionManager *MainWindow::actionManager() const
@@ -941,20 +913,21 @@ MessageManager *MainWindow::messageManager() const
 
 QSettings *MainWindow::settings(QSettings::Scope scope) const
 {
-    if (scope == QSettings::UserScope)
+    if (scope == QSettings::UserScope) {
         return m_settings;
-    else
+    } else {
         return m_globalSettings;
+    }
 }
 
 VariableManager *MainWindow::variableManager() const
 {
-     return m_variableManager;
+    return m_variableManager;
 }
 
 ThreadManager *MainWindow::threadManager() const
 {
-     return m_threadManager;
+    return m_threadManager;
 }
 
 ConnectionManager *MainWindow::connectionManager() const
@@ -962,7 +935,7 @@ ConnectionManager *MainWindow::connectionManager() const
     return m_connectionManager;
 }
 
-QList<UAVGadgetManager*> MainWindow::uavGadgetManagers() const
+QList<UAVGadgetManager *> MainWindow::uavGadgetManagers() const
 {
     return m_uavGadgetManagers;
 }
@@ -983,7 +956,7 @@ MimeDatabase *MainWindow::mimeDatabase() const
     return m_mimeDatabase;
 }
 
-GeneralSettings * MainWindow::generalSettings() const
+GeneralSettings *MainWindow::generalSettings() const
 {
     return m_generalSettings;
 }
@@ -995,43 +968,51 @@ IContext *MainWindow::contextObject(QWidget *widget)
 
 void MainWindow::addContextObject(IContext *context)
 {
-    if (!context)
+    if (!context) {
         return;
+    }
     QWidget *widget = context->widget();
-    if (m_contextWidgets.contains(widget))
+    if (m_contextWidgets.contains(widget)) {
         return;
+    }
 
     m_contextWidgets.insert(widget, context);
 }
 
 void MainWindow::removeContextObject(IContext *context)
 {
-    if (!context)
+    if (!context) {
         return;
+    }
 
     QWidget *widget = context->widget();
-    if (!m_contextWidgets.contains(widget))
+    if (!m_contextWidgets.contains(widget)) {
         return;
+    }
 
     m_contextWidgets.remove(widget);
-    if (m_activeContext == context)
+    if (m_activeContext == context) {
         updateContextObject(0);
+    }
 }
 
 void MainWindow::changeEvent(QEvent *e)
 {
     QMainWindow::changeEvent(e);
+
     if (e->type() == QEvent::ActivationChange) {
         if (isActiveWindow()) {
-            if (debugMainWindow)
+            if (debugMainWindow) {
                 qDebug() << "main window activated";
+            }
             emit windowActivated();
         }
     } else if (e->type() == QEvent::WindowStateChange) {
 #ifdef Q_WS_MAC
         bool minimized = isMinimized();
-        if (debugMainWindow)
+        if (debugMainWindow) {
             qDebug() << "main window state changed to minimized=" << minimized;
+        }
         m_minimizeAction->setEnabled(!minimized);
         m_zoomAction->setEnabled(!minimized);
 #else
@@ -1046,8 +1027,9 @@ void MainWindow::updateFocusWidget(QWidget *old, QWidget *now)
     Q_UNUSED(old)
 
     // Prevent changing the context object just because the menu is activated
-    if (qobject_cast<QMenuBar*>(now))
+    if (qobject_cast<QMenuBar *>(now)) {
         return;
+    }
 
     IContext *newContext = 0;
     if (focusWidget()) {
@@ -1067,16 +1049,18 @@ void MainWindow::updateFocusWidget(QWidget *old, QWidget *now)
 
 void MainWindow::updateContextObject(IContext *context)
 {
-    if (context == m_activeContext)
+    if (context == m_activeContext) {
         return;
+    }
     IContext *oldContext = m_activeContext;
     m_activeContext = context;
     if (!context || oldContext != m_activeContext) {
         emit m_coreImpl->contextAboutToChange(context);
         updateContext();
-        if (debugMainWindow)
+        if (debugMainWindow) {
             qDebug() << "new context object =" << context << (context ? context->widget() : 0)
                      << (context ? context->widget()->metaObject()->className() : 0);
+        }
         emit m_coreImpl->contextChanged(context);
     }
 }
@@ -1088,8 +1072,8 @@ void MainWindow::resetContext()
 
 void MainWindow::shutdown()
 {
-    disconnect(QApplication::instance(), SIGNAL(focusChanged(QWidget*,QWidget*)),
-               this, SLOT(updateFocusWidget(QWidget*,QWidget*)));
+    disconnect(QApplication::instance(), SIGNAL(focusChanged(QWidget *, QWidget *)),
+               this, SLOT(updateFocusWidget(QWidget *, QWidget *)));
     m_activeContext = 0;
 
     // We have to remove all the existing gagdets at his point, not
@@ -1108,21 +1092,23 @@ void MainWindow::showUavGadgetMenus(bool show, bool hasSplitter)
     m_gotoOtherSplitAction->setEnabled(show && hasSplitter);
 }
 
-inline int takeLeastPriorityUavGadgetManager(const QList<Core::UAVGadgetManager*> m_uavGadgetManagers) {
+inline int takeLeastPriorityUavGadgetManager(const QList<Core::UAVGadgetManager *> m_uavGadgetManagers)
+{
     int index = 0;
-    int prio = m_uavGadgetManagers.at(0)->priority();
+    int prio  = m_uavGadgetManagers.at(0)->priority();
+
     for (int i = 0; i < m_uavGadgetManagers.count(); i++) {
         int prio2 = m_uavGadgetManagers.at(i)->priority();
         if (prio2 < prio) {
-            prio = prio2;
+            prio  = prio2;
             index = i;
         }
     }
     return index;
 }
 
-void MainWindow::createWorkspaces(QSettings* qs, bool diffOnly) {
-
+void MainWindow::createWorkspaces(QSettings *qs, bool diffOnly)
+{
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
     Core::UAVGadgetManager *uavGadgetManager;
@@ -1130,12 +1116,14 @@ void MainWindow::createWorkspaces(QSettings* qs, bool diffOnly) {
     // If diffOnly is true, we only add/remove the number of workspaces
     // that has changed,
     // otherwise a complete reload of workspaces is done
-    int toRemoveFirst = m_uavGadgetManagers.count();
+    int toRemoveFirst   = m_uavGadgetManagers.count();
     int newWorkspacesNo = m_workspaceSettings->numberOfWorkspaces();
-    if (diffOnly && m_uavGadgetManagers.count() > newWorkspacesNo)
+
+    if (diffOnly && m_uavGadgetManagers.count() > newWorkspacesNo) {
         toRemoveFirst = m_uavGadgetManagers.count() - newWorkspacesNo;
-    else
+    } else {
         toRemoveFirst = 0;
+    }
 
     int removed = 0;
 
@@ -1154,13 +1142,18 @@ void MainWindow::createWorkspaces(QSettings* qs, bool diffOnly) {
     } else {
         m_uavGadgetManagers.clear();
     }
+
+    QElapsedTimer totalTimer;
+    totalTimer.start();
     for (int i = start; i < newWorkspacesNo; ++i) {
+        QElapsedTimer timer;
+        timer.start();
 
         const QString name     = m_workspaceSettings->name(i);
         const QString iconName = m_workspaceSettings->iconName(i);
         const QString modeName = m_workspaceSettings->modeName(i);
-        uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), name,
-                                                      QIcon(iconName), 90-i+1, modeName, this);
+        uavGadgetManager = new Core::UAVGadgetManager(CoreImpl::instance(), name, QIcon(iconName), 90 - i + 1, modeName,
+                                                      this);
 
         connect(uavGadgetManager, SIGNAL(showUavGadgetMenus(bool, bool)), this, SLOT(showUavGadgetMenus(bool, bool)));
 
@@ -1174,19 +1167,21 @@ void MainWindow::createWorkspaces(QSettings* qs, bool diffOnly) {
         pm->addObject(uavGadgetManager);
         m_uavGadgetManagers.append(uavGadgetManager);
         uavGadgetManager->readSettings(qs);
+        qDebug() << "MainWindow::createWorkspaces - creating workspace" << name << "took" << timer.elapsed() << "ms";
     }
+    qDebug() << "MainWindow::createWorkspaces - creating workspaces took" << totalTimer.elapsed() << "ms";
 }
 
-static const char *settingsGroup = "MainWindow";
-static const char *geometryKey = "Geometry";
+static const char *settingsGroup  = "MainWindow";
+static const char *geometryKey    = "Geometry";
 static const char *colorKey = "Color";
 static const char *maxKey = "Maximized";
-static const char *fullScreenKey = "FullScreen";
+static const char *fullScreenKey  = "FullScreen";
 static const char *modePriorities = "ModePriorities";
 
-void MainWindow::readSettings(QSettings* qs, bool workspaceDiffOnly)
+void MainWindow::readSettings(QSettings *qs, bool workspaceDiffOnly)
 {
-    if ( !qs ){
+    if (!qs) {
         qs = m_settings;
     }
 
@@ -1208,8 +1203,9 @@ void MainWindow::readSettings(QSettings* qs, bool workspaceDiffOnly)
     } else {
         resize(750, 400);
     }
-    if (qs->value(QLatin1String(maxKey), false).toBool())
+    if (qs->value(QLatin1String(maxKey), false).toBool()) {
         setWindowState(Qt::WindowMaximized);
+    }
     setFullScreen(qs->value(QLatin1String(fullScreenKey), false).toBool());
 
     qs->endGroup();
@@ -1222,21 +1218,22 @@ void MainWindow::readSettings(QSettings* qs, bool workspaceDiffOnly)
     qs->beginGroup(QLatin1String(modePriorities));
     QStringList modeNames = qs->childKeys();
     QMap<QString, int> map;
-    foreach (QString modeName, modeNames) {
+    foreach(QString modeName, modeNames) {
         map.insert(modeName, qs->value(modeName).toInt());
     }
     m_modeManager->reorderModes(map);
 
     qs->endGroup();
-
 }
 
 
-void MainWindow::saveSettings(QSettings* qs)
+void MainWindow::saveSettings(QSettings *qs)
 {
-    if ( m_dontSaveSettings ) return;
+    if (m_dontSaveSettings) {
+        return;
+    }
 
-    if ( !qs ){
+    if (!qs) {
         qs = m_settings;
     }
 
@@ -1247,8 +1244,8 @@ void MainWindow::saveSettings(QSettings* qs)
     qs->setValue(QLatin1String(colorKey), Utils::StyleHelper::baseColor());
 
     if (windowState() & (Qt::WindowMaximized | Qt::WindowFullScreen)) {
-        qs->setValue(QLatin1String(maxKey), (bool) (windowState() & Qt::WindowMaximized));
-        qs->setValue(QLatin1String(fullScreenKey), (bool) (windowState() & Qt::WindowFullScreen));
+        qs->setValue(QLatin1String(maxKey), (bool)(windowState() & Qt::WindowMaximized));
+        qs->setValue(QLatin1String(fullScreenKey), (bool)(windowState() & Qt::WindowFullScreen));
     } else {
         qs->setValue(QLatin1String(maxKey), false);
         qs->setValue(QLatin1String(fullScreenKey), false);
@@ -1259,52 +1256,54 @@ void MainWindow::saveSettings(QSettings* qs)
 
     // Write tab ordering
     qs->beginGroup(QLatin1String(modePriorities));
-    QVector<IMode*> modes = m_modeManager->modes();
-    foreach (IMode *mode, modes) {
+    QVector<IMode *> modes = m_modeManager->modes();
+    foreach(IMode * mode, modes) {
         qs->setValue(QLatin1String(mode->uniqueModeName()), mode->priority());
     }
     qs->endGroup();
 
-    foreach (UAVGadgetManager *manager, m_uavGadgetManagers) {
+    foreach(UAVGadgetManager * manager, m_uavGadgetManagers) {
         manager->saveSettings(qs);
     }
 
     m_actionManager->saveSettings(qs);
     m_generalSettings->saveSettings(qs);
     qs->beginGroup("General");
-    qs->setValue("Description",m_config_description);
-    qs->setValue("Details",m_config_details);
-    qs->setValue("StyleSheet",m_config_stylesheet);
+    qs->setValue("Description", m_config_description);
+    qs->setValue("Details", m_config_details);
+    qs->setValue("StyleSheet", m_config_stylesheet);
     qs->endGroup();
 }
 
-void MainWindow::readSettings(IConfigurablePlugin* plugin, QSettings* qs)
+void MainWindow::readSettings(IConfigurablePlugin *plugin, QSettings *qs)
 {
-    if ( !qs ){
+    if (!qs) {
         qs = m_settings;
     }
 
     UAVConfigInfo configInfo;
-    QObject* qo = reinterpret_cast<QObject *>(plugin);
+    QObject *qo = reinterpret_cast<QObject *>(plugin);
     QString configName = qo->metaObject()->className();
 
     qs->beginGroup("Plugins");
     qs->beginGroup(configName);
     configInfo.read(qs);
-    configInfo.setNameOfConfigurable("Plugin-"+configName);
+    configInfo.setNameOfConfigurable("Plugin-" + configName);
     qs->beginGroup("data");
     plugin->readConfig(qs, &configInfo);
 
     qs->endGroup();
     qs->endGroup();
     qs->endGroup();
-
 }
 
-void MainWindow::saveSettings(IConfigurablePlugin* plugin, QSettings* qs)
+void MainWindow::saveSettings(IConfigurablePlugin *plugin, QSettings *qs)
 {
-    if ( m_dontSaveSettings ) return;
-    if ( !qs ){
+    if (m_dontSaveSettings) {
+        return;
+    }
+
+    if (!qs) {
         qs = m_settings;
     }
 
@@ -1319,7 +1318,6 @@ void MainWindow::saveSettings(IConfigurablePlugin* plugin, QSettings* qs)
     configInfo.save(qs);
     qs->endGroup();
     qs->endGroup();
-
 }
 
 void MainWindow::deleteSettings()
@@ -1331,21 +1329,25 @@ void MainWindow::deleteSettings()
 
 void MainWindow::addAdditionalContext(int context)
 {
-    if (context == 0)
+    if (context == 0) {
         return;
+    }
 
-    if (!m_additionalContexts.contains(context))
+    if (!m_additionalContexts.contains(context)) {
         m_additionalContexts.prepend(context);
+    }
 }
 
 void MainWindow::removeAdditionalContext(int context)
 {
-    if (context == 0)
+    if (context == 0) {
         return;
+    }
 
     int index = m_additionalContexts.indexOf(context);
-    if (index != -1)
+    if (index != -1) {
         m_additionalContexts.removeAt(index);
+    }
 }
 
 bool MainWindow::hasContext(int context) const
@@ -1357,16 +1359,18 @@ void MainWindow::updateContext()
 {
     QList<int> contexts;
 
-    if (m_activeContext)
+    if (m_activeContext) {
         contexts += m_activeContext->context();
+    }
 
     contexts += m_additionalContexts;
 
     QList<int> uniquecontexts;
     for (int i = 0; i < contexts.size(); ++i) {
         const int c = contexts.at(i);
-        if (!uniquecontexts.contains(c))
+        if (!uniquecontexts.contains(c)) {
             uniquecontexts << c;
+        }
     }
 
     m_actionManager->setContext(uniquecontexts);
@@ -1376,6 +1380,7 @@ void MainWindow::aboutToShowRecentFiles()
 {
     ActionContainer *aci =
         m_actionManager->actionContainer(Constants::M_FILE_RECENTFILES);
+
     if (aci) {
         aci->menu()->clear();
 
@@ -1387,12 +1392,13 @@ void MainWindow::aboutToShowRecentFiles()
 
 void MainWindow::openRecentFile()
 {
-    QAction *action = qobject_cast<QAction*>(sender());
-    if (!action)
+    QAction *action = qobject_cast<QAction *>(sender());
+
+    if (!action) {
         return;
-    QString fileName = action->data().toString();
-    if (!fileName.isEmpty()) {
     }
+    QString fileName = action->data().toString();
+    if (!fileName.isEmpty()) {}
 }
 
 void MainWindow::aboutOpenPilotGCS()
@@ -1435,22 +1441,24 @@ void MainWindow::destroyAuthorsDialog()
 void MainWindow::aboutPlugins()
 {
     PluginDialog dialog(this);
+
     dialog.exec();
 }
 
 void MainWindow::setFullScreen(bool on)
 {
-    if (bool(windowState() & Qt::WindowFullScreen) == on)
+    if (bool(windowState() & Qt::WindowFullScreen) == on) {
         return;
+    }
 
     if (on) {
         setWindowState(windowState() | Qt::WindowFullScreen);
-        //statusBar()->hide();
-        //menuBar()->hide();
+        // statusBar()->hide();
+        // menuBar()->hide();
     } else {
         setWindowState(windowState() & ~Qt::WindowFullScreen);
-        //menuBar()->show();
-        //statusBar()->show();
+        // menuBar()->show();
+        // statusBar()->show();
     }
 }
 
@@ -1464,15 +1472,18 @@ bool MainWindow::showWarningWithOptions(const QString &title,
                                         const QString &settingsId,
                                         QWidget *parent)
 {
-    if (parent == 0)
+    if (parent == 0) {
         parent = this;
+    }
     QMessageBox msgBox(QMessageBox::Warning, title, text,
                        QMessageBox::Ok, parent);
-    if (details.isEmpty())
+    if (details.isEmpty()) {
         msgBox.setDetailedText(details);
+    }
     QAbstractButton *settingsButton = 0;
-    if (!settingsId.isEmpty() || !settingsCategory.isEmpty())
+    if (!settingsId.isEmpty() || !settingsCategory.isEmpty()) {
         settingsButton = msgBox.addButton(tr("Settings..."), QMessageBox::AcceptRole);
+    }
     msgBox.exec();
     if (settingsButton && msgBox.clickedButton() == settingsButton) {
         return showOptionsDialog(settingsCategory, settingsId);

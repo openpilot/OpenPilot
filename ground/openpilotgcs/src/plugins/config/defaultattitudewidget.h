@@ -38,8 +38,7 @@
 
 class Ui_Widget;
 
-class DefaultAttitudeWidget : public QWidget
-{
+class DefaultAttitudeWidget : public QWidget {
     Q_OBJECT
 
 public:

@@ -3,7 +3,6 @@
         <file>images/help2.png</file>
         <file>images/ahrs-calib.svg</file>
         <file>images/paper-plane.svg</file>
-        <file>images/curve-bg.svg</file>
         <file>images/multirotor-shapes.svg</file>
         <file>images/ccpm_setup.svg</file>
         <file>images/PipXtreme.png</file>
@@ -30,5 +29,6 @@
         <file>images/camstab_normal.png</file>
         <file>images/pipx-selected.png</file>
         <file>images/pipx-normal.png</file>
+        <file>images/revolution_top.png</file>
     </qresource>
 </RCC>

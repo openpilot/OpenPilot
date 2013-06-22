@@ -31,8 +31,8 @@
 #include <QDebug>
 
 DefaultHwSettingsWidget::DefaultHwSettingsWidget(QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui_defaulthwsettings)
+    QWidget(parent),
+    ui(new Ui_defaulthwsettings)
 {
     ui->setupUi(this);
 }
@@ -41,4 +41,3 @@ DefaultHwSettingsWidget::~DefaultHwSettingsWidget()
 {
     delete ui;
 }
-

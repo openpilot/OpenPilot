@@ -34,42 +34,42 @@
 
 GCSControlPlugin::GCSControlPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 GCSControlPlugin::~GCSControlPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool GCSControlPlugin::initialize(const QStringList& args, QString *errMsg)
+bool GCSControlPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
     sdlGamepad = new SDLGamepad();
-   if(sdlGamepad->init()) {
-       sdlGamepad->start();
-       qRegisterMetaType<QListInt16>("QListInt16");
-       qRegisterMetaType<ButtonNumber>("ButtonNumber");
-   }
-   mf = new GCSControlGadgetFactory(this);
-   addAutoReleasedObject(mf);
+    if (sdlGamepad->init()) {
+        sdlGamepad->start();
+        qRegisterMetaType<QListInt16>("QListInt16");
+        qRegisterMetaType<ButtonNumber>("ButtonNumber");
+    }
+    mf = new GCSControlGadgetFactory(this);
+    addAutoReleasedObject(mf);
 
-   return true;
+    return true;
 }
 
 void GCSControlPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void GCSControlPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(GCSControlPlugin)
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

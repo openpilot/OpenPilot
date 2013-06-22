@@ -3,6 +3,7 @@
         <description>Battery status information.</description> 
         <field name="Voltage" units="V" type="float" elements="1" defaultvalue="0.0"/>
 	<field name="Current" units="A" type="float"  elements="1" defaultvalue="0.0"/>
+	<field name="BoardSupplyVoltage" units="V" type="float" elements="1" defaultvalue="0.0"/>
 	<field name="PeakCurrent" units="A" type="float"  elements="1" defaultvalue="0.0"/>
 	<field name="AvgCurrent" units="A" type="float"  elements="1" defaultvalue="0.0"/>
 	<field name="ConsumedEnergy" units="mAh" type="float" elements="1" defaultvalue="0.0"/>           

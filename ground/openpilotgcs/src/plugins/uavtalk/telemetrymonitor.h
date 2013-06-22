@@ -40,12 +40,11 @@
 #include "systemstats.h"
 #include "telemetry.h"
 
-class TelemetryMonitor : public QObject
-{
+class TelemetryMonitor : public QObject {
     Q_OBJECT
 
 public:
-    TelemetryMonitor(UAVObjectManager* objMngr, Telemetry* tel);
+    TelemetryMonitor(UAVObjectManager *objMngr, Telemetry *tel);
     ~TelemetryMonitor();
 
 signals:
@@ -54,24 +53,24 @@ signals:
     void telemetryUpdated(double txRate, double rxRate);
 
 public slots:
-    void transactionCompleted(UAVObject* obj, bool success);
+    void transactionCompleted(UAVObject *obj, bool success);
     void processStatsUpdates();
-    void flightStatsUpdated(UAVObject* obj);
+    void flightStatsUpdated(UAVObject *obj);
 
 private:
-    static const int STATS_UPDATE_PERIOD_MS = 4000;
+    static const int STATS_UPDATE_PERIOD_MS  = 4000;
     static const int STATS_CONNECT_PERIOD_MS = 2000;
-    static const int CONNECTION_TIMEOUT_MS = 8000;
+    static const int CONNECTION_TIMEOUT_MS   = 8000;
 
-    UAVObjectManager* objMngr;
-    Telemetry* tel;
-    QQueue<UAVObject*> queue;
-    GCSTelemetryStats* gcsStatsObj;
-    FlightTelemetryStats* flightStatsObj;
-    QTimer* statsTimer;
-    UAVObject* objPending;
-    QMutex* mutex;
-    QTime* connectionTimer;
+    UAVObjectManager *objMngr;
+    Telemetry *tel;
+    QQueue<UAVObject *> queue;
+    GCSTelemetryStats *gcsStatsObj;
+    FlightTelemetryStats *flightStatsObj;
+    QTimer *statsTimer;
+    UAVObject *objPending;
+    QMutex *mutex;
+    QTime *connectionTimer;
 
     void startRetrievingObjects();
     void retrieveNextObject();

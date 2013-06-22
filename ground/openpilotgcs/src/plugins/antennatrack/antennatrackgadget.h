@@ -41,18 +41,20 @@ class AntennaTrackWidget;
 
 using namespace Core;
 
-class AntennaTrackGadget : public Core::IUAVGadget
-{
+class AntennaTrackGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     AntennaTrackGadget(QString classId, AntennaTrackWidget *widget, QWidget *parent = 0);
     ~AntennaTrackGadget();
 
-    QWidget *widget() { return m_widget; }
+    QWidget *widget()
+    {
+        return m_widget;
+    }
 
-    //   void setMode(QString mode);  // Either UAVTalk or serial port
+    // void setMode(QString mode);  // Either UAVTalk or serial port
 
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 public slots:
     void onConnect();
     void onDisconnect();

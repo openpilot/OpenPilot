@@ -31,49 +31,47 @@
 #include <QDebug>
 
 PlotData::PlotData(QString p_uavObject, QString p_uavField)
-{    
+{
     uavObject = p_uavObject;
 
-    if(p_uavField.contains("-"))
-    {
+    if (p_uavField.contains("-")) {
         QStringList fieldSubfield = p_uavField.split("-", QString::SkipEmptyParts);
-        uavField = fieldSubfield.at(0);
-        uavSubField = fieldSubfield.at(1);
+        uavField     = fieldSubfield.at(0);
+        uavSubField  = fieldSubfield.at(1);
         haveSubField = true;
-    }
-    else
-    {
-        uavField =  p_uavField;
+    } else {
+        uavField     = p_uavField;
         haveSubField = false;
     }
 
-    xData = new QVector<double>();
-    yData = new QVector<double>();
-    yDataHistory = new QVector<double>();
+    xData           = new QVector<double>();
+    yData           = new QVector<double>();
+    yDataHistory    = new QVector<double>();
 
-    curve = 0;
-    scalePower = 0;
+    curve           = 0;
+    scalePower      = 0;
     meanSamples = 1;
-    meanSum = 0.0f;
-//    mathFunction=0;
-    correctionSum = 0.0f;
+    meanSum         = 0.0f;
+// mathFunction=0;
+    correctionSum   = 0.0f;
     correctionCount = 0;
-    yMinimum = 0;
-    yMaximum = 0;
+    yMinimum        = 0;
+    yMaximum        = 0;
 
-    m_xWindowSize = 0;
+    m_xWindowSize   = 0;
 }
 
-double PlotData::valueAsDouble(UAVObject* obj, UAVObjectField* field)
+double PlotData::valueAsDouble(UAVObject *obj, UAVObjectField *field)
 {
     Q_UNUSED(obj);
     QVariant value;
 
-    if(haveSubField){
+    if (haveSubField) {
         int indexOfSubField = field->getElementNames().indexOf(QRegExp(uavSubField, Qt::CaseSensitive, QRegExp::FixedString));
         value = field->getValue(indexOfSubField);
-    }else
+    } else {
         value = field->getValue();
+    }
 
     // qDebug() << "Data  (" << value.typeName() << ") " <<  value.toString();
 
@@ -88,63 +86,60 @@ PlotData::~PlotData()
 }
 
 
-bool SequentialPlotData::append(UAVObject* obj)
+bool SequentialPlotData::append(UAVObject *obj)
 {
     if (uavObject == obj->getName()) {
-
-        //Get the field of interest
-        UAVObjectField* field =  obj->getField(uavField);
+        // Get the field of interest
+        UAVObjectField *field = obj->getField(uavField);
 
         if (field) {
-
             double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
 
-            //Perform scope math, if necessary
-            if (mathFunction  == "Boxcar average" || mathFunction  == "Standard deviation"){
-                //Put the new value at the front
-                yDataHistory->append( currentValue );
+            // Perform scope math, if necessary
+            if (mathFunction == "Boxcar average" || mathFunction == "Standard deviation") {
+                // Put the new value at the front
+                yDataHistory->append(currentValue);
 
                 // calculate average value
                 meanSum += currentValue;
-                if(yDataHistory->size() > meanSamples) {
+                if (yDataHistory->size() > meanSamples) {
                     meanSum -= yDataHistory->first();
                     yDataHistory->pop_front();
                 }
 
                 // make sure to correct the sum every meanSamples steps to prevent it
                 // from running away due to floating point rounding errors
-                correctionSum+=currentValue;
+                correctionSum += currentValue;
                 if (++correctionCount >= meanSamples) {
                     meanSum = correctionSum;
                     correctionSum = 0.0f;
                     correctionCount = 0;
                 }
 
-                double boxcarAvg=meanSum/yDataHistory->size();
+                double boxcarAvg = meanSum / yDataHistory->size();
 
-                if ( mathFunction  == "Standard deviation" ){
-                    //Calculate square of sample standard deviation, with Bessel's correction
-                    double stdSum=0;
-                    for (int i=0; i < yDataHistory->size(); i++){
-                        stdSum+= pow(yDataHistory->at(i)- boxcarAvg,2)/(meanSamples-1);
+                if (mathFunction == "Standard deviation") {
+                    // Calculate square of sample standard deviation, with Bessel's correction
+                    double stdSum = 0;
+                    for (int i = 0; i < yDataHistory->size(); i++) {
+                        stdSum += pow(yDataHistory->at(i) - boxcarAvg, 2) / (meanSamples - 1);
                     }
                     yData->append(sqrt(stdSum));
-                }
-                else  {
+                } else {
                     yData->append(boxcarAvg);
                 }
-            }
-            else{
-                yData->append( currentValue );
+            } else {
+                yData->append(currentValue);
             }
 
-            if (yData->size() > m_xWindowSize) { //If new data overflows the window, remove old data...
+            if (yData->size() > m_xWindowSize) { // If new data overflows the window, remove old data...
                 yData->pop_front();
-            } else //...otherwise, add a new y point at position xData
+            } else { // ...otherwise, add a new y point at position xData
                 xData->insert(xData->size(), xData->size());
+            }
 
-            //notify the gui of changes in the data
-            //dataChanged();
+            // notify the gui of changes in the data
+            // dataChanged();
             return true;
         }
     }
@@ -152,65 +147,63 @@ bool SequentialPlotData::append(UAVObject* obj)
     return false;
 }
 
-bool ChronoPlotData::append(UAVObject* obj)
+bool ChronoPlotData::append(UAVObject *obj)
 {
     if (uavObject == obj->getName()) {
-        //Get the field of interest
-        UAVObjectField* field =  obj->getField(uavField);
-        //qDebug() << "uavObject: " << uavObject << ", uavField: " << uavField;
+        // Get the field of interest
+        UAVObjectField *field = obj->getField(uavField);
+        // qDebug() << "uavObject: " << uavObject << ", uavField: " << uavField;
 
         if (field) {
-            QDateTime NOW = QDateTime::currentDateTime(); //THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
+            QDateTime NOW = QDateTime::currentDateTime(); // THINK ABOUT REIMPLEMENTING THIS TO SHOW UAVO TIME, NOT SYSTEM TIME
             double currentValue = valueAsDouble(obj, field) * pow(10, scalePower);
 
-            //Perform scope math, if necessary
-            if (mathFunction  == "Boxcar average" || mathFunction  == "Standard deviation"){
-                //Put the new value at the back
-                yDataHistory->append( currentValue );
+            // Perform scope math, if necessary
+            if (mathFunction == "Boxcar average" || mathFunction == "Standard deviation") {
+                // Put the new value at the back
+                yDataHistory->append(currentValue);
 
                 // calculate average value
                 meanSum += currentValue;
-                if(yDataHistory->size() > meanSamples) {
+                if (yDataHistory->size() > meanSamples) {
                     meanSum -= yDataHistory->first();
                     yDataHistory->pop_front();
                 }
                 // make sure to correct the sum every meanSamples steps to prevent it
                 // from running away due to floating point rounding errors
-                correctionSum+=currentValue;
+                correctionSum += currentValue;
                 if (++correctionCount >= meanSamples) {
                     meanSum = correctionSum;
                     correctionSum = 0.0f;
                     correctionCount = 0;
                 }
 
-                double boxcarAvg=meanSum/yDataHistory->size();
-//qDebug()<<mathFunction;
-                if ( mathFunction  == "Standard deviation" ){
-                    //Calculate square of sample standard deviation, with Bessel's correction
-                    double stdSum=0;
-                    for (int i=0; i < yDataHistory->size(); i++){
-                        stdSum+= pow(yDataHistory->at(i)- boxcarAvg,2)/(meanSamples-1);
+                double boxcarAvg = meanSum / yDataHistory->size();
+// qDebug()<<mathFunction;
+                if (mathFunction == "Standard deviation") {
+                    // Calculate square of sample standard deviation, with Bessel's correction
+                    double stdSum = 0;
+                    for (int i = 0; i < yDataHistory->size(); i++) {
+                        stdSum += pow(yDataHistory->at(i) - boxcarAvg, 2) / (meanSamples - 1);
                     }
                     yData->append(sqrt(stdSum));
-                }
-                else  {
+                } else {
                     yData->append(boxcarAvg);
                 }
-            }
-            else{
-                yData->append( currentValue );
+            } else {
+                yData->append(currentValue);
             }
 
             double valueX = NOW.toTime_t() + NOW.time().msec() / 1000.0;
             xData->append(valueX);
 
-            //qDebug() << "Data  " << uavObject << "." << field->getName() << " X,Y:" << valueX << "," <<  valueY;
+            // qDebug() << "Data  " << uavObject << "." << field->getName() << " X,Y:" << valueX << "," <<  valueY;
 
-            //Remove stale data
+            // Remove stale data
             removeStaleData();
 
-            //notify the gui of chages in the data
-            //dataChanged();
+            // notify the gui of chages in the data
+            // dataChanged();
             return true;
         }
     }
@@ -224,8 +217,9 @@ void ChronoPlotData::removeStaleData()
     double oldestValue;
 
     while (1) {
-        if (xData->size() == 0)
+        if (xData->size() == 0) {
             break;
+        }
 
         newestValue = xData->last();
         oldestValue = xData->first();
@@ -233,21 +227,22 @@ void ChronoPlotData::removeStaleData()
         if (newestValue - oldestValue > m_xWindowSize) {
             yData->pop_front();
             xData->pop_front();
-        } else
+        } else {
             break;
+        }
     }
 
-    //qDebug() << "removeStaleData ";
+    // qDebug() << "removeStaleData ";
 }
 
 void ChronoPlotData::removeStaleDataTimeout()
 {
     removeStaleData();
-    //dataChanged();
-    //qDebug() << "removeStaleDataTimeout";
+    // dataChanged();
+    // qDebug() << "removeStaleDataTimeout";
 }
 
-bool UAVObjectPlotData::append(UAVObject* obj)
+bool UAVObjectPlotData::append(UAVObject *obj)
 {
     Q_UNUSED(obj);
     return false;

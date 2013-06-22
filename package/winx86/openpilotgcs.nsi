@@ -1,7 +1,7 @@
 ﻿#
 # Project: OpenPilot
 # NSIS configuration file for OpenPilot GCS
-# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2012.
+# The OpenPilot Team, http://www.openpilot.org, Copyright (C) 2010-2013.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -36,9 +36,9 @@
   ; Tree root locations (relative to this script location)
   !define PROJECT_ROOT   "..\.."
   !define NSIS_DATA_TREE "."
-  !define GCS_BUILD_TREE "..\..\build\ground\openpilotgcs"
+  !define GCS_BUILD_TREE "..\..\build\openpilotgcs_release"
   !define UAVO_SYNTH_TREE "..\..\build\uavobject-synthetics"
-  !define AEROSIMRC_TREE "..\..\build\ground\AeroSIM-RC"
+  !define AEROSIMRC_TREE "${GCS_BUILD_TREE}\misc\AeroSIM-RC"
 
   ; Default installation folder
   InstallDir "$PROGRAMFILES\OpenPilot"
@@ -61,7 +61,7 @@
 ; !define PRODUCT_VERSION "0.0.0.0"
 ; !define FILE_VERSION "${TAG_OR_BRANCH}:${HASH8} ${DATETIME}"
 ; !define BUILD_DESCRIPTION "${TAG_OR_BRANCH}:${HASH8} built from ${ORIGIN}, committed ${DATETIME} as ${HASH}"
-  !include "${GCS_BUILD_TREE}\openpilotgcs.nsh"
+  !include "${GCS_BUILD_TREE}\..\openpilotgcs-synthetics\openpilotgcs.nsh"
 
   Name "${PRODUCT_NAME}"
   OutFile "${PACKAGE_DIR}\..\${OUT_FILE}"
@@ -72,7 +72,7 @@
   VIAddVersionKey "Comments" "${INSTALLER_NAME}. ${BUILD_DESCRIPTION}"
   VIAddVersionKey "CompanyName" "The OpenPilot Team, http://www.openpilot.org"
   VIAddVersionKey "LegalTrademarks" "${PRODUCT_NAME} is a trademark of The OpenPilot Team"
-  VIAddVersionKey "LegalCopyright" "© 2010-2012 The OpenPilot Team"
+  VIAddVersionKey "LegalCopyright" "© 2010-2013 The OpenPilot Team"
   VIAddVersionKey "FileDescription" "${INSTALLER_NAME}"
 
 ;--------------------------------
@@ -93,16 +93,30 @@
 ;--------------------------------
 ; Branding
 
-  BrandingText "© 2010-2012 The OpenPilot Team, http://www.openpilot.org"
+  BrandingText "© 2010-2013 The OpenPilot Team, http://www.openpilot.org"
 
   !define MUI_ICON "${NSIS_DATA_TREE}\resources\openpilot.ico"
   !define MUI_HEADERIMAGE
   !define MUI_HEADERIMAGE_BITMAP "${NSIS_DATA_TREE}\resources\header.bmp"
-  !define MUI_HEADERIMAGE_BITMAP_NOSTRETCH
   !define MUI_WELCOMEFINISHPAGE_BITMAP "${NSIS_DATA_TREE}\resources\welcome.bmp"
-  !define MUI_WELCOMEFINISHPAGE_BITMAP_NOSTRETCH
   !define MUI_UNWELCOMEFINISHPAGE_BITMAP "${NSIS_DATA_TREE}\resources\welcome.bmp"
-  !define MUI_UNWELCOMEFINISHPAGE_BITMAP_NOSTRETCH
+
+  !define HEADER_BGCOLOR "0x8C8C8C"
+  !define HEADER_FGCOLOR "0x343434"
+
+  !macro SetHeaderColors un
+    Function ${un}SetHeaderColors
+      GetDlgItem $r3 $HWNDPARENT 1034
+      SetCtlColors $r3 ${HEADER_BGCOLOR} ${HEADER_FGCOLOR}
+      GetDlgItem $r3 $HWNDPARENT 1037
+      SetCtlColors $r3 ${HEADER_BGCOLOR} ${HEADER_FGCOLOR}
+      GetDlgItem $r3 $HWNDPARENT 1038
+      SetCtlColors $r3 ${HEADER_BGCOLOR} ${HEADER_FGCOLOR}
+    FunctionEnd
+  !macroend
+
+  !insertmacro SetHeaderColors ""
+  !insertmacro SetHeaderColors "un."
 
 ;--------------------------------
 ; Language selection dialog settings
@@ -116,11 +130,13 @@
 ;--------------------------------
 ; Settings for MUI_PAGE_FINISH
   !define MUI_FINISHPAGE_RUN
-  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\HISTORY.txt"
+  !define MUI_FINISHPAGE_SHOWREADME "$INSTDIR\WHATSNEW.txt"
   !define MUI_FINISHPAGE_RUN_FUNCTION "RunApplication"
 
 ;--------------------------------
 ; Pages
+
+  !define MUI_PAGE_CUSTOMFUNCTION_PRE "SetHeaderColors"
 
   !insertmacro MUI_PAGE_WELCOME
   !insertmacro MUI_PAGE_LICENSE "$(LicenseFile)"
@@ -128,6 +144,8 @@
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
   !insertmacro MUI_PAGE_FINISH
+
+  !define MUI_PAGE_CUSTOMFUNCTION_PRE "un.SetHeaderColors"
 
   !insertmacro MUI_UNPAGE_WELCOME
   !insertmacro MUI_UNPAGE_CONFIRM
@@ -158,7 +176,11 @@ Section "Core files" InSecCore
   SetOutPath "$INSTDIR\bin"
   File /r "${GCS_BUILD_TREE}\bin\*"
   SetOutPath "$INSTDIR"
-  File "${PROJECT_ROOT}\HISTORY.txt"
+  File "${PROJECT_ROOT}\LICENSE.txt"
+  File "${PROJECT_ROOT}\README.txt"
+  File "${PROJECT_ROOT}\WHATSNEW.txt"
+  File "${PROJECT_ROOT}\MILESTONES.txt"
+  File "${PROJECT_ROOT}\GPLv3.txt"
 SectionEnd
 
 ; Copy GCS plugins
@@ -202,12 +224,9 @@ Section "-Localization" InSecLocalization
 SectionEnd
 
 ; Copy firmware files
-Section "Firmware" InSecFirmware
-; SetOutPath "$INSTDIR\firmware\${FIRMWARE_DIR}"
-; File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
+Section /o "-Firmware" InSecFirmware
   SetOutPath "$INSTDIR\firmware"
-  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_coptercontrol-${PACKAGE_LBL}.opfw"
-  File "${PACKAGE_DIR}\${FIRMWARE_DIR}\fw_pipxtreme-${PACKAGE_LBL}.opfw"
+  File /r "${PACKAGE_DIR}\${FIRMWARE_DIR}\*"
 SectionEnd
 
 ; Copy utility files
@@ -247,8 +266,14 @@ Section "Shortcuts" InSecShortcuts
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS.lnk" "$INSTDIR\bin\openpilotgcs.exe" \
 	"" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot GCS (clean configuration).lnk" "$INSTDIR\bin\openpilotgcs.exe" \
-	"-clean-config" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
-  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot ChangeLog.lnk" "$INSTDIR\HISTORY.txt" \
+	"-reset" "$INSTDIR\bin\openpilotgcs.exe" 0 "" "" "${PRODUCT_NAME} ${PRODUCT_VERSION}. ${BUILD_DESCRIPTION}"
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot License.lnk" "$INSTDIR\LICENSE.txt" \
+	"" "$INSTDIR\bin\openpilotgcs.exe" 0
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot ReadMe.lnk" "$INSTDIR\README.txt" \
+	"" "$INSTDIR\bin\openpilotgcs.exe" 0
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot ReleaseNotes.lnk" "$INSTDIR\WHATSNEW.txt" \
+	"" "$INSTDIR\bin\openpilotgcs.exe" 0
+  CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Milestones.lnk" "$INSTDIR\MILESTONES.txt" \
 	"" "$INSTDIR\bin\openpilotgcs.exe" 0
   CreateShortCut "$SMPROGRAMS\OpenPilot\OpenPilot Website.lnk" "http://www.openpilot.org" \
 	"" "$INSTDIR\bin\openpilotgcs.exe" 0
@@ -265,9 +290,15 @@ Section ; create uninstall info
   ; Write the installation path into the registry
   WriteRegStr HKCU "Software\OpenPilot" "Install Location" $INSTDIR
 
-  ; Write the uninstall keys for Windows
+   ; Write the uninstall keys for Windows
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayName" "OpenPilot GCS"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "UninstallString" '"$INSTDIR\Uninstall.exe"'
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayIcon" '"$INSTDIR\bin\openpilotgcs.exe"'
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "Publisher" "OpenPilot Team"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "DisplayVersion" "Italian Stallion"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "URLInfoAbout" "http://www.openpilot.org"
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "HelpLink" "http://wiki.openpilot.org"
+  WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "EstimatedSize" 100600
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenPilot" "NoRepair" 1
 
@@ -314,7 +345,7 @@ Section "un.OpenPilot GCS" UnSecProgram
   RMDir /r /rebootok "$INSTDIR\utilities"
   RMDir /r /rebootok "$INSTDIR\drivers"
   RMDir /r /rebootok "$INSTDIR\misc"
-  Delete /rebootok "$INSTDIR\HISTORY.txt"
+  Delete /rebootok "$INSTDIR\*.txt"
   Delete /rebootok "$INSTDIR\Uninstall.exe"
 
   ; Remove directory

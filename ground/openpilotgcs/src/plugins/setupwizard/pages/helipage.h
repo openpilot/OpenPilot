@@ -34,14 +34,13 @@ namespace Ui {
 class HeliPage;
 }
 
-class HeliPage : public AbstractWizardPage
-{
+class HeliPage : public AbstractWizardPage {
     Q_OBJECT
-    
+
 public:
     explicit HeliPage(SetupWizard *wizard, QWidget *parent = 0);
     ~HeliPage();
-    
+
 private:
     Ui::HeliPage *ui;
 };

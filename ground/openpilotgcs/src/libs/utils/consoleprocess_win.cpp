@@ -4,25 +4,25 @@
  * @file       consoleprocess_win.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -62,8 +62,9 @@ ConsoleProcess::~ConsoleProcess()
 
 bool ConsoleProcess::start(const QString &program, const QStringList &args)
 {
-    if (isRunning())
+    if (isRunning()) {
         return false;
+    }
 
     const QString err = stubServerListen();
     if (!err.isEmpty()) {
@@ -83,8 +84,8 @@ bool ConsoleProcess::start(const QString &program, const QStringList &args)
         QTextStream out(m_tempFile);
         out.setCodec("UTF-16LE");
         out.setGenerateByteOrderMark(false);
-        foreach (const QString &var, fixWinEnvironment(environment()))
-            out << var << QChar(0);
+        foreach(const QString &var, fixWinEnvironment(environment()))
+        out << var << QChar(0);
         out << QChar(0);
     }
 
@@ -96,8 +97,9 @@ bool ConsoleProcess::start(const QString &program, const QStringList &args)
     ZeroMemory(m_pid, sizeof(PROCESS_INFORMATION));
 
     QString workDir = QDir::toNativeSeparators(workingDirectory());
-    if (!workDir.isEmpty() && !workDir.endsWith('\\'))
+    if (!workDir.isEmpty() && !workDir.endsWith('\\')) {
         workDir.append('\\');
+    }
 
     QStringList stubArgs;
     stubArgs << modeOption(m_mode)
@@ -108,9 +110,9 @@ bool ConsoleProcess::start(const QString &program, const QStringList &args)
              << msgPromptToClose();
 
     const QString cmdLine = createWinCommandline(
-            QCoreApplication::applicationDirPath() + QLatin1String("/qtcreator_process_stub.exe"), stubArgs);
+        QCoreApplication::applicationDirPath() + QLatin1String("/qtcreator_process_stub.exe"), stubArgs);
 
-    bool success = CreateProcessW(0, (WCHAR*)cmdLine.utf16(),
+    bool success = CreateProcessW(0, (WCHAR *)cmdLine.utf16(),
                                   0, 0, FALSE, CREATE_NEW_CONSOLE,
                                   0, 0,
                                   &si, m_pid);
@@ -153,8 +155,9 @@ QString ConsoleProcess::stubServerListen()
 {
     if (m_stubServer.listen(QString::fromLatin1("creator-%1-%2")
                             .arg(QCoreApplication::applicationPid())
-                            .arg(rand())))
+                            .arg(rand()))) {
         return QString();
+    }
     return m_stubServer.errorString();
 }
 
@@ -162,8 +165,9 @@ void ConsoleProcess::stubServerShutdown()
 {
     delete m_stubSocket;
     m_stubSocket = 0;
-    if (m_stubServer.isListening())
+    if (m_stubServer.isListening()) {
         m_stubServer.close();
+    }
 }
 
 void ConsoleProcess::stubConnectionAvailable()
@@ -184,12 +188,12 @@ void ConsoleProcess::readStubOutput()
         } else if (out.startsWith("pid ")) {
             // Wil not need it any more
             delete m_tempFile;
-            m_tempFile = 0;
+            m_tempFile  = 0;
 
-            m_appPid = out.mid(4).toInt();
+            m_appPid    = out.mid(4).toInt();
             m_hInferior = OpenProcess(
-                    SYNCHRONIZE | PROCESS_QUERY_INFORMATION | PROCESS_TERMINATE,
-                    FALSE, m_appPid);
+                SYNCHRONIZE | PROCESS_QUERY_INFORMATION | PROCESS_TERMINATE,
+                FALSE, m_appPid);
             if (m_hInferior == NULL) {
                 emit processError(tr("Cannot obtain a handle to the inferior: %1")
                                   .arg(winErrorMessage(GetLastError())));
@@ -213,19 +217,20 @@ void ConsoleProcess::cleanupInferior()
     inferiorFinishedNotifier = 0;
     CloseHandle(m_hInferior);
     m_hInferior = NULL;
-    m_appPid = 0;
+    m_appPid    = 0;
 }
 
 void ConsoleProcess::inferiorExited()
 {
     DWORD chldStatus;
 
-    if (!GetExitCodeProcess(m_hInferior, &chldStatus))
+    if (!GetExitCodeProcess(m_hInferior, &chldStatus)) {
         emit processError(tr("Cannot obtain exit status from inferior: %1")
                           .arg(winErrorMessage(GetLastError())));
+    }
     cleanupInferior();
     m_appStatus = QProcess::NormalExit;
-    m_appCode = chldStatus;
+    m_appCode   = chldStatus;
     emit processStopped();
 }
 
@@ -245,16 +250,16 @@ void ConsoleProcess::cleanupStub()
 void ConsoleProcess::stubExited()
 {
     // The stub exit might get noticed before we read the pid for the kill.
-    if (m_stubSocket && m_stubSocket->state() == QLocalSocket::ConnectedState)
+    if (m_stubSocket && m_stubSocket->state() == QLocalSocket::ConnectedState) {
         m_stubSocket->waitForDisconnected();
+    }
     cleanupStub();
     if (m_hInferior != NULL) {
         TerminateProcess(m_hInferior, (unsigned)-1);
         cleanupInferior();
         m_appStatus = QProcess::CrashExit;
-        m_appCode = -1;
+        m_appCode   = -1;
         emit processStopped();
     }
     emit wrapperStopped();
 }
-

@@ -27,48 +27,48 @@
 #ifndef CONFIGFIXEDWINGWIDGET_H
 #define CONFIGFIXEDWINGWIDGET_H
 
-#include "ui_airframe.h"
+#include "cfg_vehicletypes/vehicleconfig.h"
+#include "ui_airframe_fixedwing.h"
 #include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavtalk/telemetrymanager.h"
+
 #include <QtGui/QWidget>
 #include <QList>
 #include <QItemDelegate>
 
 class Ui_Widget;
 
-class ConfigFixedWingWidget: public VehicleConfig
-{
+class ConfigFixedWingWidget : public VehicleConfig {
     Q_OBJECT
 
 public:
-    ConfigFixedWingWidget(Ui_AircraftWidget *aircraft = 0, QWidget *parent = 0);
+    static QStringList getChannelDescriptions();
+
+    ConfigFixedWingWidget(QWidget *parent = 0);
     ~ConfigFixedWingWidget();
 
-    friend class ConfigVehicleTypeWidget;
+    virtual void refreshWidgetsValues(QString frameType);
+    virtual QString updateConfigObjectsFromWidgets();
 
 private:
-    Ui_AircraftWidget *m_aircraft;
+    Ui_FixedWingConfigWidget *m_aircraft;
+
+    virtual void registerWidgets(ConfigTaskWidget &parent);
+    virtual void resetActuators(GUIConfigDataUnion *configData);
 
     bool setupFrameFixedWing(QString airframeType);
     bool setupFrameElevon(QString airframeType);
     bool setupFrameVtail(QString airframeType);
 
-    virtual void ResetActuators(GUIConfigDataUnion* configData);
-    static QStringList getChannelDescriptions();
+protected:
+    void enableControls(bool enable);
 
 private slots:
     virtual void setupUI(QString airframeType);
-    virtual void refreshWidgetsValues(QString frameType);
-    virtual QString updateConfigObjectsFromWidgets();
     virtual bool throwConfigError(QString airframeType);
-
-
-protected:
-
 };
-
 
 #endif // CONFIGFIXEDWINGWIDGET_H

@@ -30,20 +30,20 @@
 #include <coreplugin/iuavgadget.h>
 
 LoggingGadgetFactory::LoggingGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("LoggingGadget"),
-                          tr("Logging"),
-                          parent)
+    IUAVGadgetFactory(QString("LoggingGadget"),
+                      tr("Logging"),
+                      parent)
 {
-    loggingPlugin = (LoggingPlugin *) parent;
+    loggingPlugin = (LoggingPlugin *)parent;
 }
 
 LoggingGadgetFactory::~LoggingGadgetFactory()
+{}
+
+IUAVGadget *LoggingGadgetFactory::createGadget(QWidget *parent)
 {
+    LoggingGadgetWidget *gadgetWidget = new LoggingGadgetWidget(parent);
 
-}
-
-IUAVGadget* LoggingGadgetFactory::createGadget(QWidget *parent) {
-    LoggingGadgetWidget* gadgetWidget = new LoggingGadgetWidget(parent);
     gadgetWidget->setPlugin(loggingPlugin);
     return new LoggingGadget(QString("LoggingGadget"), gadgetWidget, parent);
 }

@@ -36,9 +36,7 @@
 #include <QSettings>
 
 namespace Utils {
-
-class QTCREATOR_UTILS_EXPORT PathUtils
-{
+class QTCREATOR_UTILS_EXPORT PathUtils {
 public:
     PathUtils();
     QString GetDataPath();
@@ -48,9 +46,7 @@ public:
     QString GetStoragePath();
     QString RemoveStoragePath(QString path);
     QString InsertStoragePath(QString path);
-
 };
-
 }
 
 #endif /* PATHUTILS_H */

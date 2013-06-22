@@ -7,7 +7,7 @@
  * @{
  * @addtogroup DebugGadgetPlugin Debug Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -30,18 +30,17 @@
 #include <coreplugin/iuavgadget.h>
 
 DebugGadgetFactory::DebugGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("DebugGadget"),
-                          tr("DebugGadget"),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("DebugGadget"),
+                      tr("DebugGadget"),
+                      parent)
+{}
 
 DebugGadgetFactory::~DebugGadgetFactory()
+{}
+
+IUAVGadget *DebugGadgetFactory::createGadget(QWidget *parent)
 {
+    DebugGadgetWidget *gadgetWidget = new DebugGadgetWidget(parent);
 
-}
-
-IUAVGadget* DebugGadgetFactory::createGadget(QWidget *parent) {
-    DebugGadgetWidget* gadgetWidget = new DebugGadgetWidget(parent);
     return new DebugGadget(QString("DebugGadget"), gadgetWidget, parent);
 }

@@ -13,15 +13,26 @@
 			<elementname>GPS</elementname>
 			<elementname>ManualControl</elementname>
 			<elementname>Altitude</elementname>
+			<elementname>Airspeed</elementname>
 			<elementname>Stabilization</elementname>
 			<elementname>AltitudeHold</elementname>
-			<elementname>Guidance</elementname>
+			<elementname>PathPlanner</elementname>
+			<elementname>PathFollower</elementname>
 			<elementname>FlightPlan</elementname>
 			<elementname>Com2UsbBridge</elementname>
 			<elementname>Usb2ComBridge</elementname>
 			<elementname>OveroSync</elementname>
+			<elementname>ModemRx</elementname>
+			<elementname>ModemTx</elementname>
+			<elementname>ModemStat</elementname>
 			<elementname>Autotune</elementname>
 			<elementname>EventDispatcher</elementname>
+			<elementname>MagBaro</elementname>
+			<elementname>OSDGen</elementname>
+			<elementname>CallbackScheduler0</elementname>
+			<elementname>CallbackScheduler1</elementname>
+			<elementname>CallbackScheduler2</elementname>
+			<elementname>CallbackScheduler3</elementname>
 		</elementnames>
 	</field> 
 	<field name="Running" units="bool" type="enum">
@@ -36,15 +47,26 @@
 			<elementname>GPS</elementname>
 			<elementname>ManualControl</elementname>
 			<elementname>Altitude</elementname>
+			<elementname>Airspeed</elementname>
 			<elementname>Stabilization</elementname>
 			<elementname>AltitudeHold</elementname>
-			<elementname>Guidance</elementname>
+			<elementname>PathPlanner</elementname>
+			<elementname>PathFollower</elementname>
 			<elementname>FlightPlan</elementname>
 			<elementname>Com2UsbBridge</elementname>
 			<elementname>Usb2ComBridge</elementname>
 			<elementname>OveroSync</elementname>
+			<elementname>ModemRx</elementname>
+			<elementname>ModemTx</elementname>
+			<elementname>ModemStat</elementname>
 			<elementname>Autotune</elementname>
 			<elementname>EventDispatcher</elementname>
+			<elementname>MagBaro</elementname>
+			<elementname>OSDGen</elementname>
+			<elementname>CallbackScheduler0</elementname>
+			<elementname>CallbackScheduler1</elementname>
+			<elementname>CallbackScheduler2</elementname>
+			<elementname>CallbackScheduler3</elementname>
 		</elementnames>
 		<options>
 			<option>False</option>
@@ -63,15 +85,26 @@
 			<elementname>GPS</elementname>
 			<elementname>ManualControl</elementname>
 			<elementname>Altitude</elementname>
+			<elementname>Airspeed</elementname>
 			<elementname>Stabilization</elementname>
 			<elementname>AltitudeHold</elementname>
-			<elementname>Guidance</elementname>
+			<elementname>PathPlanner</elementname>
+			<elementname>PathFollower</elementname>
 			<elementname>FlightPlan</elementname>
 			<elementname>Com2UsbBridge</elementname>
 			<elementname>Usb2ComBridge</elementname>
 			<elementname>OveroSync</elementname>
+			<elementname>ModemRx</elementname>
+			<elementname>ModemTx</elementname>
+			<elementname>ModemStat</elementname>
 			<elementname>Autotune</elementname>
 			<elementname>EventDispatcher</elementname>
+			<elementname>MagBaro</elementname>
+			<elementname>OSDGen</elementname>
+			<elementname>CallbackScheduler0</elementname>
+			<elementname>CallbackScheduler1</elementname>
+			<elementname>CallbackScheduler2</elementname>
+			<elementname>CallbackScheduler3</elementname>
 		</elementnames>
 	</field> 
         <access gcs="readwrite" flight="readwrite"/>

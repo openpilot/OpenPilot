@@ -7,7 +7,7 @@
  * @{
  * @addtogroup GPSGadgetPlugin GPS Gadget Plugin
  * @{
- * @brief A gadget that displays GPS status and enables basic configuration 
+ * @brief A gadget that displays GPS status and enables basic configuration
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,29 +32,27 @@
 #include <coreplugin/iuavgadget.h>
 
 GpsDisplayGadgetFactory::GpsDisplayGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("GpsDisplayGadget"),
-                          tr("GPS Display"),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("GpsDisplayGadget"),
+                      tr("GPS Display"),
+                      parent)
+{}
 
 GpsDisplayGadgetFactory::~GpsDisplayGadgetFactory()
-{
-}
+{}
 
-Core::IUAVGadget* GpsDisplayGadgetFactory::createGadget(QWidget *parent)
+Core::IUAVGadget *GpsDisplayGadgetFactory::createGadget(QWidget *parent)
 {
-    GpsDisplayWidget* gadgetWidget = new GpsDisplayWidget(parent);
+    GpsDisplayWidget *gadgetWidget = new GpsDisplayWidget(parent);
+
     return new GpsDisplayGadget(QString("GpsDisplayGadget"), gadgetWidget, parent);
 }
 
-IUAVGadgetConfiguration *GpsDisplayGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *GpsDisplayGadgetFactory::createConfiguration(QSettings *qSettings)
 {
     return new GpsDisplayGadgetConfiguration(QString("GpsDisplayGadget"), qSettings);
 }
 
 IOptionsPage *GpsDisplayGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new GpsDisplayGadgetOptionsPage(qobject_cast<GpsDisplayGadgetConfiguration*>(config));
+    return new GpsDisplayGadgetOptionsPage(qobject_cast<GpsDisplayGadgetConfiguration *>(config));
 }
-

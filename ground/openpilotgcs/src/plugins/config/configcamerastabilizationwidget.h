@@ -34,8 +34,7 @@
 #include "uavobject.h"
 #include "camerastabsettings.h"
 
-class ConfigCameraStabilizationWidget: public ConfigTaskWidget
-{
+class ConfigCameraStabilizationWidget : public ConfigTaskWidget {
     Q_OBJECT
 
 public:
@@ -43,7 +42,7 @@ public:
     ~ConfigCameraStabilizationWidget();
 
 private:
-    Ui_CameraStabilizationWidget *m_camerastabilization;
+    Ui_CameraStabilizationWidget *ui;
     void refreshWidgetsValues(UAVObject *obj);
     void updateObjectsFromWidgets();
 

@@ -7,7 +7,7 @@
  * @{
  * @addtogroup GPSGadgetPlugin GPS Gadget Plugin
  * @{
- * @brief A gadget that displays GPS status and enables basic configuration 
+ * @brief A gadget that displays GPS status and enables basic configuration
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -41,14 +41,13 @@ class IUAVGadgetConfiguration;
 class GpsDisplayGadgetConfiguration;
 
 namespace Ui {
-    class GpsDisplayGadgetOptionsPage;
+class GpsDisplayGadgetOptionsPage;
 }
 
 using namespace Core;
 
-class GpsDisplayGadgetOptionsPage : public IOptionsPage
-{
-Q_OBJECT
+class GpsDisplayGadgetOptionsPage : public IOptionsPage {
+    Q_OBJECT
 public:
     explicit GpsDisplayGadgetOptionsPage(GpsDisplayGadgetConfiguration *config, QObject *parent = 0);
 

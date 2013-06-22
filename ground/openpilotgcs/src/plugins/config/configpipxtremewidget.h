@@ -1,14 +1,14 @@
 /**
-******************************************************************************
-*
-* @file       configpipxtremewidget.h
-* @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
-* @addtogroup GCSPlugins GCS Plugins
-* @{
-* @addtogroup ConfigPlugin Config Plugin
-* @{
-* @brief The Configuration Gadget used to configure PipXtreme
-*****************************************************************************/
+ ******************************************************************************
+ *
+ * @file       configpipxtremewidget.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @addtogroup GCSPlugins GCS Plugins
+ * @{
+ * @addtogroup ConfigPlugin Config Plugin
+ * @{
+ * @brief The Configuration Gadget used to configure PipXtreme
+ *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,43 +27,42 @@
 #ifndef CONFIGPIPXTREMEWIDGET_H
 #define CONFIGPIPXTREMEWIDGET_H
 
+#include <oplinksettings.h>
+
 #include "ui_pipxtreme.h"
 #include "configtaskwidget.h"
 
-class ConfigPipXtremeWidget : public ConfigTaskWidget
-{
-	Q_OBJECT
+class ConfigPipXtremeWidget : public ConfigTaskWidget {
+    Q_OBJECT
 
 public:
-	ConfigPipXtremeWidget(QWidget *parent = 0);
-	~ConfigPipXtremeWidget();
-    
+    ConfigPipXtremeWidget(QWidget *parent = 0);
+    ~ConfigPipXtremeWidget();
+
 public slots:
-	void updateStatus(UAVObject *object1);
-	void updateSettings(UAVObject *object1);
+    void updateStatus(UAVObject *object1);
+    void updateSettings(UAVObject *object1);
 
 private:
-	Ui_PipXtremeWidget *m_pipx;
+    Ui_PipXtremeWidget *m_oplink;
 
-	// The PipXtreme status UAVObject
-	UAVDataObject* pipxStatusObj;
+    // The OPLink status UAVObject
+    UAVDataObject *oplinkStatusObj;
 
-	// The PipXtreme ssettins UAVObject
-	UAVDataObject* pipxSettingsObj;
+    // The OPLink ssettins UAVObject
+    OPLinkSettings *oplinkSettingsObj;
 
-	bool settingsUpdated;
+    // Are the settings current?
+    bool settingsUpdated;
+
+    // Signal mappers to add arguments to signals.
+    QSignalMapper *signalMapperAddBinding;
+    QSignalMapper *signalMapperRemBinding;
 
 private slots:
-	void refreshValues();
-	void applySettings();
-	void saveSettings();
-	void disconnected();
-	void pairIDToggled(bool checked, quint8 idx);
-	void pair1Toggled(bool checked);
-	void pair2Toggled(bool checked);
-	void pair3Toggled(bool checked);
-	void pair4Toggled(bool checked);
-	void pairBToggled(bool checked);
+    void disconnected();
+    void addBinding(QWidget *w);
+    void removeBinding(QWidget *w);
 };
 
 #endif // CONFIGTXPIDWIDGET_H

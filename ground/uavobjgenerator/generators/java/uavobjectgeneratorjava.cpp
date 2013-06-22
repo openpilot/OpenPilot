@@ -28,19 +28,20 @@
 #include "uavobjectgeneratorjava.h"
 using namespace std;
 
-bool UAVObjectGeneratorJava::generate(UAVObjectParser* parser,QString templatepath,QString outputpath) {
+bool UAVObjectGeneratorJava::generate(UAVObjectParser *parser, QString templatepath, QString outputpath)
+{
     fieldTypeStrCPP << "Byte" << "Short" << "Int" <<
         "Short" << "Int" << "Long" << "Float" << "Byte";
 
     fieldTypeStrCPPClass << "INT8" << "INT16" << "INT32"
-        << "UINT8" << "UINT16" << "UINT32" << "FLOAT32" << "ENUM";
+                         << "UINT8" << "UINT16" << "UINT32" << "FLOAT32" << "ENUM";
 
-    javaCodePath = QDir( templatepath + QString(JAVA_TEMPLATE_DIR));
-    javaOutputPath = QDir( outputpath + QString("java") );
+    javaCodePath     = QDir(templatepath + QString(JAVA_TEMPLATE_DIR));
+    javaOutputPath   = QDir(outputpath + QString("java"));
     javaOutputPath.mkpath(javaOutputPath.absolutePath());
 
-    javaCodeTemplate = readFile( javaCodePath.absoluteFilePath("uavobjecttemplate.java") );
-    QString javaInitTemplate = readFile( javaCodePath.absoluteFilePath("uavobjectsinittemplate.java") );
+    javaCodeTemplate = readFile(javaCodePath.absoluteFilePath("uavobject.java.template"));
+    QString javaInitTemplate = readFile(javaCodePath.absoluteFilePath("uavobjectsinit.java.template"));
 
     if (javaCodeTemplate.isEmpty() || javaInitTemplate.isEmpty()) {
         std::cerr << "Problem reading java code templates" << endl;
@@ -51,7 +52,7 @@ bool UAVObjectGeneratorJava::generate(UAVObjectParser* parser,QString templatepa
     QString javaObjInit;
 
     for (int objidx = 0; objidx < parser->getNumObjects(); ++objidx) {
-        ObjectInfo* info=parser->getObjectByIndex(objidx);
+        ObjectInfo *info = parser->getObjectByIndex(objidx);
         process_object(info);
 
         javaObjInit.append("\t\t\tobjMngr.registerObject( new " + info->name + "() );\n");
@@ -59,9 +60,9 @@ bool UAVObjectGeneratorJava::generate(UAVObjectParser* parser,QString templatepa
     }
 
     // Write the gcs object inialization files
-    javaInitTemplate.replace( QString("$(OBJINC)"), objInc);
-    javaInitTemplate.replace( QString("$(OBJINIT)"), javaObjInit);
-    bool res = writeFileIfDiffrent( javaOutputPath.absolutePath() + "/UAVObjectsInitialize.java", javaInitTemplate );
+    javaInitTemplate.replace(QString("$(OBJINC)"), objInc);
+    javaInitTemplate.replace(QString("$(OBJINIT)"), javaObjInit);
+    bool res = writeFileIfDiffrent(javaOutputPath.absolutePath() + "/UAVObjectsInitialize.java", javaInitTemplate);
     if (!res) {
         cout << "Error: Could not write output files" << endl;
         return false;
@@ -74,14 +75,15 @@ bool UAVObjectGeneratorJava::generate(UAVObjectParser* parser,QString templatepa
 /**
  * Generate the java object files
  */
-bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
+bool UAVObjectGeneratorJava::process_object(ObjectInfo *info)
 {
-    if (info == NULL)
+    if (info == NULL) {
         return false;
+    }
 
     // Prepare output strings
     QString outInclude = javaIncludeTemplate;
-    QString outCode = javaCodeTemplate;
+    QString outCode    = javaCodeTemplate;
 
     // Replace common tags
     replaceCommonTags(outInclude, info);
@@ -90,62 +92,57 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
     // Replace the $(DATAFIELDS) tag
     QString type;
     QString fields;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
+    for (int n = 0; n < info->fields.length(); ++n) {
         // Determine type
         type = fieldTypeStrCPP[info->fields[n]->type];
         // Append field
-        if ( info->fields[n]->numElements > 1 )
-        {
-            fields.append( QString("        %1 %2[%3];\n").arg(type).arg(info->fields[n]->name)
-                           .arg(info->fields[n]->numElements) );
-        }
-        else
-        {
-            fields.append( QString("        %1 %2;\n").arg(type).arg(info->fields[n]->name) );
+        if (info->fields[n]->numElements > 1) {
+            fields.append(QString("        %1 %2[%3];\n").arg(type).arg(info->fields[n]->name)
+                          .arg(info->fields[n]->numElements));
+        } else {
+            fields.append(QString("        %1 %2;\n").arg(type).arg(info->fields[n]->name));
         }
     }
     outInclude.replace(QString("$(DATAFIELDS)"), fields);
 
     // Replace the $(FIELDSINIT) tag
     QString finit;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
+    for (int n = 0; n < info->fields.length(); ++n) {
         finit.append("\n");
 
         // Setup element names
-        QString varElemName = info->fields[n]->name + "ElemNames";
-        finit.append( QString("\t\tList<String> %1 = new ArrayList<String>();\n").arg(varElemName) );
+        QString varElemName   = info->fields[n]->name + "ElemNames";
+        finit.append(QString("\t\tList<String> %1 = new ArrayList<String>();\n").arg(varElemName));
         QStringList elemNames = info->fields[n]->elementNames;
-        for (int m = 0; m < elemNames.length(); ++m)
-            finit.append( QString("\t\t%1.add(\"%2\");\n")
-                          .arg(varElemName)
-                          .arg(elemNames[m]) );
+        for (int m = 0; m < elemNames.length(); ++m) {
+            finit.append(QString("\t\t%1.add(\"%2\");\n")
+                         .arg(varElemName)
+                         .arg(elemNames[m]));
+        }
 
         // Only for enum types
         if (info->fields[n]->type == FIELDTYPE_ENUM) {
             QString varOptionName = info->fields[n]->name + "EnumOptions";
-            finit.append( QString("\t\tList<String> %1 = new ArrayList<String>();\n").arg(varOptionName) );
-            QStringList options = info->fields[n]->options;
-            for (int m = 0; m < options.length(); ++m)
-            {
-                finit.append( QString("\t\t%1.add(\"%2\");\n")
-                              .arg(varOptionName)
-                              .arg(options[m]) );
+            finit.append(QString("\t\tList<String> %1 = new ArrayList<String>();\n").arg(varOptionName));
+            QStringList options   = info->fields[n]->options;
+            for (int m = 0; m < options.length(); ++m) {
+                finit.append(QString("\t\t%1.add(\"%2\");\n")
+                             .arg(varOptionName)
+                             .arg(options[m]));
             }
-            finit.append( QString("\t\tfields.add( new UAVObjectField(\"%1\", \"%2\", UAVObjectField.FieldType.ENUM, %3, %4) );\n")
-                          .arg(info->fields[n]->name)
-                          .arg(info->fields[n]->units)
-                          .arg(varElemName)
-                          .arg(varOptionName) );
+            finit.append(QString("\t\tfields.add( new UAVObjectField(\"%1\", \"%2\", UAVObjectField.FieldType.ENUM, %3, %4) );\n")
+                         .arg(info->fields[n]->name)
+                         .arg(info->fields[n]->units)
+                         .arg(varElemName)
+                         .arg(varOptionName));
         }
         // For all other types
         else {
-            finit.append( QString("\t\tfields.add( new UAVObjectField(\"%1\", \"%2\", UAVObjectField.FieldType.%3, %4, null) );\n")
-                          .arg(info->fields[n]->name)
-                          .arg(info->fields[n]->units)
-                          .arg(fieldTypeStrCPPClass[info->fields[n]->type])
-                          .arg(varElemName) );
+            finit.append(QString("\t\tfields.add( new UAVObjectField(\"%1\", \"%2\", UAVObjectField.FieldType.%3, %4, null) );\n")
+                         .arg(info->fields[n]->name)
+                         .arg(info->fields[n]->units)
+                         .arg(fieldTypeStrCPPClass[info->fields[n]->type])
+                         .arg(varElemName));
         }
     }
     outCode.replace(QString("$(FIELDSINIT)"), finit);
@@ -153,25 +150,22 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
     // Replace the $(DATAFIELDINFO) tag
     QString name;
     QString enums;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
+    for (int n = 0; n < info->fields.length(); ++n) {
         enums.append(QString("    // Field %1 information\n").arg(info->fields[n]->name));
         // Only for enum types
-        if (info->fields[n]->type == FIELDTYPE_ENUM)
-        {
+        if (info->fields[n]->type == FIELDTYPE_ENUM) {
             enums.append(QString("    /* Enumeration options for field %1 */\n").arg(info->fields[n]->name));
             enums.append("    typedef enum { ");
             // Go through each option
             QStringList options = info->fields[n]->options;
             for (int m = 0; m < options.length(); ++m) {
-                QString s = (m != (options.length()-1)) ? "%1_%2=%3, " : "%1_%2=%3";
-                enums.append( s.arg( info->fields[n]->name.toUpper() )
-                               .arg( options[m].toUpper().replace(QRegExp(ENUM_SPECIAL_CHARS), "") )
-                               .arg(m) );
-
+                QString s = (m != (options.length() - 1)) ? "%1_%2=%3, " : "%1_%2=%3";
+                enums.append(s.arg(info->fields[n]->name.toUpper())
+                             .arg(options[m].toUpper().replace(QRegExp(ENUM_SPECIAL_CHARS), ""))
+                             .arg(m));
             }
-            enums.append( QString(" } %1Options;\n")
-                          .arg( info->fields[n]->name ) );
+            enums.append(QString(" } %1Options;\n")
+                         .arg(info->fields[n]->name));
         }
         // Generate element names (only if field has more than one element)
         if (info->fields[n]->numElements > 1 && !info->fields[n]->defaultElementNames) {
@@ -180,75 +174,61 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
             // Go through the element names
             QStringList elemNames = info->fields[n]->elementNames;
             for (int m = 0; m < elemNames.length(); ++m) {
-                QString s = (m != (elemNames.length()-1)) ? "%1_%2=%3, " : "%1_%2=%3";
-                enums.append( s.arg( info->fields[n]->name.toUpper() )
-                               .arg( elemNames[m].toUpper() )
-                               .arg(m) );
-
+                QString s = (m != (elemNames.length() - 1)) ? "%1_%2=%3, " : "%1_%2=%3";
+                enums.append(s.arg(info->fields[n]->name.toUpper())
+                             .arg(elemNames[m].toUpper())
+                             .arg(m));
             }
-            enums.append( QString(" } %1Elem;\n")
-                          .arg( info->fields[n]->name ) );
+            enums.append(QString(" } %1Elem;\n")
+                         .arg(info->fields[n]->name));
         }
         // Generate array information
         if (info->fields[n]->numElements > 1) {
             enums.append(QString("    /* Number of elements for field %1 */\n").arg(info->fields[n]->name));
-            enums.append( QString("    static const quint32 %1_NUMELEM = %2;\n")
-                          .arg( info->fields[n]->name.toUpper() )
-                          .arg( info->fields[n]->numElements ) );
+            enums.append(QString("    static const quint32 %1_NUMELEM = %2;\n")
+                         .arg(info->fields[n]->name.toUpper())
+                         .arg(info->fields[n]->numElements));
         }
     }
     outInclude.replace(QString("$(DATAFIELDINFO)"), enums);
 
     // Replace the $(INITFIELDS) tag
     QString initfields;
-    for (int n = 0; n < info->fields.length(); ++n)
-    {
-        if (!info->fields[n]->defaultValues.isEmpty() )
-        {
+    for (int n = 0; n < info->fields.length(); ++n) {
+        if (!info->fields[n]->defaultValues.isEmpty()) {
             // For non-array fields
-            if ( info->fields[n]->numElements == 1)
-            {
-                if ( info->fields[n]->type == FIELDTYPE_ENUM )
-                {
-                    initfields.append( QString("\t\tgetField(\"%1\").setValue(\"%2\");\n")
-                                .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->defaultValues[0] ) );
+            if (info->fields[n]->numElements == 1) {
+                if (info->fields[n]->type == FIELDTYPE_ENUM) {
+                    initfields.append(QString("\t\tgetField(\"%1\").setValue(\"%2\");\n")
+                                      .arg(info->fields[n]->name)
+                                      .arg(info->fields[n]->defaultValues[0]));
+                } else if (info->fields[n]->type == FIELDTYPE_FLOAT32) {
+                    initfields.append(QString("\t\tgetField(\"%1\").setValue(%2);\n")
+                                      .arg(info->fields[n]->name)
+                                      .arg(info->fields[n]->defaultValues[0].toFloat()));
+                } else {
+                    initfields.append(QString("\t\tgetField(\"%1\").setValue(%2);\n")
+                                      .arg(info->fields[n]->name)
+                                      .arg(info->fields[n]->defaultValues[0].toInt()));
                 }
-                else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 )
-                {
-                    initfields.append( QString("\t\tgetField(\"%1\").setValue(%2);\n")
-                                .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->defaultValues[0].toFloat() ) );
-                }
-                else
-                {
-                    initfields.append( QString("\t\tgetField(\"%1\").setValue(%2);\n")
-                                .arg( info->fields[n]->name )
-                                .arg( info->fields[n]->defaultValues[0].toInt() ) );
-                }
-            }
-            else
-            {
+            } else {
                 // Initialize all fields in the array
-                for (int idx = 0; idx < info->fields[n]->numElements; ++idx)
-                {
-                    if ( info->fields[n]->type == FIELDTYPE_ENUM ) {
-                        initfields.append( QString("\t\tgetField(\"%1\").setValue(\"%3\",%2);\n")
-                                    .arg( info->fields[n]->name )
-                                    .arg( idx )
-                                    .arg( info->fields[n]->defaultValues[idx] ) );
-                    }
-                    else if ( info->fields[n]->type == FIELDTYPE_FLOAT32 ) {
-                        initfields.append( QString("\t\tgetField(\"%1\").setValue(%3,%2);\n")
-                                    .arg( info->fields[n]->name )
-                                    .arg( idx )
-                                    .arg( info->fields[n]->defaultValues[idx].toFloat() ) );
-                    }
-                    else {
-                        initfields.append( QString("\t\tgetField(\"%1\").setValue(%3,%2);\n")
-                                    .arg( info->fields[n]->name )
-                                    .arg( idx )
-                                    .arg( info->fields[n]->defaultValues[idx].toInt() ) );
+                for (int idx = 0; idx < info->fields[n]->numElements; ++idx) {
+                    if (info->fields[n]->type == FIELDTYPE_ENUM) {
+                        initfields.append(QString("\t\tgetField(\"%1\").setValue(\"%3\",%2);\n")
+                                          .arg(info->fields[n]->name)
+                                          .arg(idx)
+                                          .arg(info->fields[n]->defaultValues[idx]));
+                    } else if (info->fields[n]->type == FIELDTYPE_FLOAT32) {
+                        initfields.append(QString("\t\tgetField(\"%1\").setValue(%3,%2);\n")
+                                          .arg(info->fields[n]->name)
+                                          .arg(idx)
+                                          .arg(info->fields[n]->defaultValues[idx].toFloat()));
+                    } else {
+                        initfields.append(QString("\t\tgetField(\"%1\").setValue(%3,%2);\n")
+                                          .arg(info->fields[n]->name)
+                                          .arg(idx)
+                                          .arg(info->fields[n]->defaultValues[idx].toInt()));
                     }
                 }
             }
@@ -258,7 +238,7 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
     outCode.replace(QString("$(INITFIELDS)"), initfields);
 
     // Write the java code
-    bool res = writeFileIfDiffrent( javaOutputPath.absolutePath() + "/" + info->name + ".java", outCode );
+    bool res = writeFileIfDiffrent(javaOutputPath.absolutePath() + "/" + info->name + ".java", outCode);
     if (!res) {
         cout << "Error: Could not write gcs output files" << endl;
         return false;
@@ -266,4 +246,3 @@ bool UAVObjectGeneratorJava::process_object(ObjectInfo* info)
 
     return true;
 }
-

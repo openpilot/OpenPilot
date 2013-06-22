@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -43,7 +43,6 @@ class QPushButton;
 QT_END_NAMESPACE
 
 namespace Core {
-
 class IMode;
 class IOutputPane;
 
@@ -53,8 +52,7 @@ class MainWindow;
 }
 
 
-class CORE_EXPORT OutputPanePlaceHolder : public QWidget
-{
+class CORE_EXPORT OutputPanePlaceHolder : public QWidget {
     friend class Core::Internal::OutputPaneManager; // needs to set m_visible and thus access m_current
     Q_OBJECT
 public:
@@ -62,20 +60,21 @@ public:
     ~OutputPanePlaceHolder();
     void setCloseable(bool b);
     bool closeable();
-    static OutputPanePlaceHolder *getCurrent() { return m_current; }
+    static OutputPanePlaceHolder *getCurrent()
+    {
+        return m_current;
+    }
 
 private slots:
     void currentModeChanged(Core::IMode *);
 private:
     Core::IMode *m_mode;
     bool m_closeable;
-    static OutputPanePlaceHolder* m_current;
+    static OutputPanePlaceHolder *m_current;
 };
 
 namespace Internal {
-
-class OutputPaneManager : public QWidget
-{
+class OutputPaneManager : public QWidget {
     Q_OBJECT
 
 public:
@@ -127,7 +126,7 @@ private:
     QToolButton *m_nextToolButton;
     QWidget *m_toolBar;
 
-    QMap<int, Core::IOutputPane*> m_pageMap;
+    QMap<int, Core::IOutputPane *> m_pageMap;
     int m_lastIndex;
 
     QStackedWidget *m_outputWidgetPane;
@@ -136,7 +135,6 @@ private:
     QMap<int, QPushButton *> m_buttons;
     QMap<QAction *, int> m_actions;
 };
-
 } // namespace Internal
 } // namespace Core
 

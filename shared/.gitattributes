@@ -1,0 +1,5 @@
+#
+# Shared UAVObject definisiton should have LF line endings
+#
+
+/uavobjectdefinition/*.xml	text eol=lf

@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -44,13 +44,13 @@ using namespace Core::Internal;
 
 RightPanePlaceHolder *RightPanePlaceHolder::m_current = 0;
 
-RightPanePlaceHolder* RightPanePlaceHolder::current()
+RightPanePlaceHolder *RightPanePlaceHolder::current()
 {
     return m_current;
 }
 
 RightPanePlaceHolder::RightPanePlaceHolder(Core::IMode *mode, QWidget *parent)
-    :QWidget(parent), m_mode(mode)
+    : QWidget(parent), m_mode(mode)
 {
     setLayout(new QVBoxLayout);
     layout()->setMargin(0);
@@ -73,14 +73,15 @@ void RightPanePlaceHolder::applyStoredSize(int width)
         if (splitter) {
             // A splitter we need to resize the splitter sizes
             QList<int> sizes = splitter->sizes();
-            int index = splitter->indexOf(this);
-            int diff = width - sizes.at(index);
+            int index  = splitter->indexOf(this);
+            int diff   = width - sizes.at(index);
             int adjust = sizes.count() > 1 ? (diff / (sizes.count() - 1)) : 0;
             for (int i = 0; i < sizes.count(); ++i) {
-                if (i != index)
+                if (i != index) {
                     sizes[i] -= adjust;
+                }
             }
-            sizes[index]= width;
+            sizes[index] = width;
             splitter->setSizes(sizes);
         } else {
             QSize s = size();
@@ -152,6 +153,7 @@ RightPaneWidget::~RightPaneWidget()
 void RightPaneWidget::objectAdded(QObject *obj)
 {
     BaseRightPaneWidget *rpw = qobject_cast<BaseRightPaneWidget *>(obj);
+
     if (rpw) {
         layout()->addWidget(rpw->widget());
         setFocusProxy(rpw->widget());
@@ -161,6 +163,7 @@ void RightPaneWidget::objectAdded(QObject *obj)
 void RightPaneWidget::aboutToRemoveObject(QObject *obj)
 {
     BaseRightPaneWidget *rpw = qobject_cast<BaseRightPaneWidget *>(obj);
+
     if (rpw) {
         delete rpw->widget();
     }
@@ -178,8 +181,9 @@ int RightPaneWidget::storedWidth()
 
 void RightPaneWidget::resizeEvent(QResizeEvent *re)
 {
-    if (m_width && re->size().width())
+    if (m_width && re->size().width()) {
         m_width = re->size().width();
+    }
     QWidget::resizeEvent(re);
 }
 
@@ -194,15 +198,16 @@ void RightPaneWidget::readSettings(QSettings *settings)
     if (settings->contains("RightPane/Visible")) {
         setShown(settings->value("RightPane/Visible").toBool());
     } else {
-        setShown(false); //TODO set to false
+        setShown(false); // TODO set to false
     }
 
     if (settings->contains("RightPane/Width")) {
         m_width = settings->value("RightPane/Width").toInt();
-        if (!m_width)
+        if (!m_width) {
             m_width = 500;
+        }
     } else {
-        m_width = 500; //pixel
+        m_width = 500; // pixel
     }
     // Apply
     if (RightPanePlaceHolder::m_current) {
@@ -212,8 +217,9 @@ void RightPaneWidget::readSettings(QSettings *settings)
 
 void RightPaneWidget::setShown(bool b)
 {
-    if (RightPanePlaceHolder::m_current)
+    if (RightPanePlaceHolder::m_current) {
         RightPanePlaceHolder::m_current->setVisible(b);
+    }
     m_shown = b;
 }
 
@@ -232,9 +238,7 @@ BaseRightPaneWidget::BaseRightPaneWidget(QWidget *widget)
 }
 
 BaseRightPaneWidget::~BaseRightPaneWidget()
-{
-
-}
+{}
 
 QWidget *BaseRightPaneWidget::widget() const
 {

@@ -28,10 +28,10 @@ plugin_welcome.subdir = welcome
 plugin_welcome.depends = plugin_coreplugin
 SUBDIRS += plugin_welcome
 
-# RawHID connection plugin
-SUBDIRS += plugin_rawhid
-plugin_rawhid.subdir = rawhid
-plugin_rawhid.depends = plugin_coreplugin
+# opHID connection plugin
+SUBDIRS += plugin_opHID
+plugin_opHID.subdir = ophid
+plugin_opHID.depends = plugin_coreplugin
 
 # Serial port connection plugin
 SUBDIRS += plugin_serial
@@ -93,7 +93,7 @@ plugin_uploader.subdir = uploader
 plugin_uploader.depends = plugin_coreplugin
 plugin_uploader.depends += plugin_uavobjects
 plugin_uploader.depends += plugin_uavtalk
-plugin_uploader.depends += plugin_rawhid
+plugin_uploader.depends += plugin_opHID
 plugin_uploader.depends += plugin_uavobjectutil
 SUBDIRS += plugin_uploader
 
@@ -132,19 +132,19 @@ plugin_gpsdisplay.depends = plugin_coreplugin
 plugin_gpsdisplay.depends += plugin_uavobjects
 SUBDIRS += plugin_gpsdisplay
 
-# Primary Flight Display (PFD) gadget
-plugin_pfd.subdir = pfd
-plugin_pfd.depends = plugin_coreplugin
-plugin_pfd.depends += plugin_uavobjects
-SUBDIRS += plugin_pfd
-
 # QML viewer gadget
 plugin_qmlview.subdir = qmlview
 plugin_qmlview.depends = plugin_coreplugin
 plugin_qmlview.depends += plugin_uavobjects
 SUBDIRS += plugin_qmlview
 
-# Primary Flight Display (PFD) gadget, QML version
+# PathAction Editor gadget
+plugin_pathactioneditor.subdir = pathactioneditor
+plugin_pathactioneditor.depends = plugin_coreplugin
+plugin_pathactioneditor.depends += plugin_uavobjects
+SUBDIRS += plugin_pathactioneditor
+
+# Primary Flight Display (PFD) gadget
 plugin_pfdqml.subdir = pfdqml
 plugin_pfdqml.depends = plugin_coreplugin
 plugin_pfdqml.depends += plugin_uavobjects
@@ -155,19 +155,12 @@ plugin_ipconnection.subdir = ipconnection
 plugin_ipconnection.depends = plugin_coreplugin
 SUBDIRS += plugin_ipconnection
 
-# HITLNEW Simulation gadget
-plugin_hitlnew.subdir = hitlnew
-plugin_hitlnew.depends = plugin_coreplugin
-plugin_hitlnew.depends += plugin_uavobjects
-plugin_hitlnew.depends += plugin_uavtalk
-SUBDIRS += plugin_hitlnew
-
-# HITLNEW Simulation gadget v2
-plugin_hitl_v2.subdir = hitlv2
-plugin_hitl_v2.depends = plugin_coreplugin
-plugin_hitl_v2.depends += plugin_uavobjects
-plugin_hitl_v2.depends += plugin_uavtalk
-SUBDIRS += plugin_hitl_v2
+#HITL Simulation gadget
+plugin_hitl.subdir = hitl
+plugin_hitl.depends = plugin_coreplugin
+plugin_hitl.depends += plugin_uavobjects
+plugin_hitl.depends += plugin_uavtalk
+SUBDIRS += plugin_hitl
 
 # Export and Import GCS Configuration
 plugin_importexport.subdir = importexport
@@ -206,6 +199,15 @@ plugin_uavobjectutil.depends = plugin_coreplugin
 plugin_uavobjectutil.depends += plugin_uavobjects
 SUBDIRS += plugin_uavobjectutil
 
+# OSG Earth View plugin
+OSG {
+    plugin_osgearthview.subdir = osgearthview
+    plugin_osgearthview.depends = plugin_coreplugin
+    plugin_osgearthview.depends += plugin_uavobjects
+    plugin_osgearthview.depends += plugin_uavobjectwidgetutils
+    SUBDIRS += plugin_osgearthview
+}
+
 # Magic Waypoint gadget
 plugin_magicwaypoint.subdir = magicwaypoint
 plugin_magicwaypoint.depends = plugin_coreplugin
@@ -236,8 +238,3 @@ plugin_setupwizard.depends += plugin_config
 plugin_setupwizard.depends += plugin_uploader
 SUBDIRS += plugin_setupwizard
 
-# Junsi Powerlog plugin
-#plugin_powerlog.subdir = powerlog
-#plugin_powerlog.depends = plugin_coreplugin
-#plugin_powerlog.depends += plugin_rawhid
-#SUBDIRS += plugin_powerlog

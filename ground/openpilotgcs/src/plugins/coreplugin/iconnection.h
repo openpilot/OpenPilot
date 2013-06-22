@@ -36,46 +36,52 @@
 #include "core_global.h"
 
 namespace Core {
-
 /**
-*   An IConnection object define a "type of connection",
-*   for instance USB, Serial, Network, ...
-*/
-class CORE_EXPORT IConnection : public QObject
-{
+ *   An IConnection object define a "type of connection",
+ *   for instance USB, Serial, Network, ...
+ */
+class CORE_EXPORT IConnection : public QObject {
     Q_OBJECT
 
 public:
     /**
-    *   Return the list of devices found on the system
-    */
-    struct device
-    {
+     *   Return the list of devices found on the system
+     */
+    struct device {
         QString name;
         QString displayName;
-        bool operator==(device i){return this->name==i.name;}
+        bool operator==(device i)
+        {
+            return this->name == i.name;
+        }
     };
 
     virtual QList <device> availableDevices() = 0;
 
     /**
-    *   Open a device, and return a QIODevice interface from it
-    *   It should be a dynamically created object as it will be
-    *   deleted by the connection manager.
-    */
+     *   Open a device, and return a QIODevice interface from it
+     *   It should be a dynamically created object as it will be
+     *   deleted by the connection manager.
+     */
     virtual QIODevice *openDevice(const QString &deviceName) = 0;
 
-    virtual void closeDevice(const QString &deviceName) { Q_UNUSED(deviceName) };
+    virtual void closeDevice(const QString &deviceName)
+    {
+        Q_UNUSED(deviceName)
+    };
 
     /**
-    *   Connection type name "USB HID"
-    */
+     *   Connection type name "USB HID"
+     */
     virtual QString connectionName() = 0;
 
     /**
-    *   Short name to display in a combo box
-    */
-    virtual QString shortName() {return connectionName();}
+     *   Short name to display in a combo box
+     */
+    virtual QString shortName()
+    {
+        return connectionName();
+    }
 
     /**
      * Manage whether the plugin is allowed to poll for devices
@@ -86,11 +92,10 @@ public:
 
 signals:
     /**
-    *   Available devices list has changed, signal it to connection manager (and whoever wants to know)
-    */
+     *   Available devices list has changed, signal it to connection manager (and whoever wants to know)
+     */
     void availableDevChanged(IConnection *);
 };
-
-} //namespace Core
+} // namespace Core
 
 #endif // ICONNECTION_H

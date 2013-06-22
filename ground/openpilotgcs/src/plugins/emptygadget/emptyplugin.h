@@ -7,7 +7,7 @@
  * @{
  * @addtogroup EmptyGadgetPlugin Empty Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,16 +32,15 @@
 
 class EmptyGadgetFactory;
 
-class EmptyPlugin : public ExtensionSystem::IPlugin
-{
+class EmptyPlugin : public ExtensionSystem::IPlugin {
 public:
-        EmptyPlugin();
-   ~EmptyPlugin();
+    EmptyPlugin();
+    ~EmptyPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
 private:
-   EmptyGadgetFactory *mf;
+    EmptyGadgetFactory *mf;
 };
 #endif /* EMPTYPLUGIN_H_ */

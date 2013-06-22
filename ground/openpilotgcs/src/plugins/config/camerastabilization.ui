@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>786</width>
-    <height>566</height>
+    <height>791</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -64,8 +64,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>741</width>
-            <height>559</height>
+            <width>762</width>
+            <height>658</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout">
@@ -130,7 +130,7 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>130</height>
+               <height>110</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -285,7 +285,7 @@ have to define channel output range using Output configuration tab.</string>
               <item row="2" column="0">
                <widget class="QLabel" name="label_43">
                 <property name="text">
-                 <string>Output Range</string>
+                 <string>Output Range (Angle)</string>
                 </property>
                </widget>
               </item>
@@ -340,7 +340,7 @@ font: bold 12px;
 margin:1px;</string>
                 </property>
                 <property name="text">
-                 <string>Pitch</string>
+                 <string>Pitch Or Servo2</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
@@ -369,7 +369,7 @@ font: bold 12px;
 margin:1px;</string>
                 </property>
                 <property name="text">
-                 <string>Roll</string>
+                 <string>Roll Or Servo1</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
@@ -390,7 +390,7 @@ margin:1px;</string>
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>250</height>
+               <height>187</height>
               </size>
              </property>
              <property name="maximumSize">
@@ -403,9 +403,6 @@ margin:1px;</string>
               <string>Advanced Settings (Control)</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_8">
-              <property name="verticalSpacing">
-               <number>6</number>
-              </property>
               <item row="0" column="3">
                <widget class="QLabel" name="label_32">
                 <property name="minimumSize">
@@ -653,34 +650,6 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
                 </property>
                </widget>
               </item>
-              <item row="5" column="3">
-               <widget class="QSpinBox" name="yawResponseTime">
-                <property name="focusPolicy">
-                 <enum>Qt::StrongFocus</enum>
-                </property>
-                <property name="toolTip">
-                 <string>Input low-pass filter response time for yaw axis, ms.
-
-This option smoothes the stick input. Zero value disables LPF.</string>
-                </property>
-                <property name="maximum">
-                 <number>1000</number>
-                </property>
-                <property name="value">
-                 <number>150</number>
-                </property>
-                <property name="objrelation" stdset="0">
-                 <stringlist>
-                  <string>objname:CameraStabSettings</string>
-                  <string>fieldname:ResponseTime</string>
-                  <string>element:Yaw</string>
-                  <string>haslimits:no</string>
-                  <string>scale:1</string>
-                  <string>buttongroup:1</string>
-                 </stringlist>
-                </property>
-               </widget>
-              </item>
               <item row="2" column="2">
                <widget class="QComboBox" name="pitchStabilizationMode">
                 <property name="focusPolicy">
@@ -751,34 +720,6 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
                  <stringlist>
                   <string>objname:CameraStabSettings</string>
                   <string>fieldname:InputRate</string>
-                  <string>element:Pitch</string>
-                  <string>haslimits:no</string>
-                  <string>scale:1</string>
-                  <string>buttongroup:1</string>
-                 </stringlist>
-                </property>
-               </widget>
-              </item>
-              <item row="5" column="2">
-               <widget class="QSpinBox" name="pitchResponseTime">
-                <property name="focusPolicy">
-                 <enum>Qt::StrongFocus</enum>
-                </property>
-                <property name="toolTip">
-                 <string>Input low-pass filter response time for pitch axis, ms.
-
-This option smoothes the stick input. Zero value disables LPF.</string>
-                </property>
-                <property name="maximum">
-                 <number>1000</number>
-                </property>
-                <property name="value">
-                 <number>150</number>
-                </property>
-                <property name="objrelation" stdset="0">
-                 <stringlist>
-                  <string>objname:CameraStabSettings</string>
-                  <string>fieldname:ResponseTime</string>
                   <string>element:Pitch</string>
                   <string>haslimits:no</string>
                   <string>scale:1</string>
@@ -865,59 +806,24 @@ AxisLock: camera remembers tracking attitude. Input controls the rate of deflect
                 </property>
                </widget>
               </item>
-              <item row="5" column="1">
-               <widget class="QSpinBox" name="rollResponseTime">
-                <property name="focusPolicy">
-                 <enum>Qt::StrongFocus</enum>
-                </property>
-                <property name="toolTip">
-                 <string>Input low-pass filter response time for roll axis, ms.
-
-This option smoothes the stick input. Zero value disables LPF.</string>
-                </property>
-                <property name="maximum">
-                 <number>1000</number>
-                </property>
-                <property name="value">
-                 <number>150</number>
-                </property>
-                <property name="objrelation" stdset="0">
-                 <stringlist>
-                  <string>objname:CameraStabSettings</string>
-                  <string>fieldname:ResponseTime</string>
-                  <string>element:Roll</string>
-                  <string>haslimits:no</string>
-                  <string>scale:1</string>
-                  <string>buttongroup:1</string>
-                 </stringlist>
-                </property>
-               </widget>
-              </item>
-              <item row="6" column="0">
+              <item row="5" column="0">
                <widget class="QLabel" name="label_36">
                 <property name="text">
                  <string>MaxAxisLockRate</string>
                 </property>
                </widget>
               </item>
-              <item row="5" column="0">
-               <widget class="QLabel" name="label_37">
-                <property name="text">
-                 <string>Response Time</string>
-                </property>
-               </widget>
-              </item>
               <item row="4" column="0">
                <widget class="QLabel" name="label_38">
                 <property name="text">
-                 <string>Input Rate</string>
+                 <string>Input Rate (Speed)</string>
                 </property>
                </widget>
               </item>
               <item row="3" column="0">
                <widget class="QLabel" name="label_39">
                 <property name="text">
-                 <string>Input Range</string>
+                 <string>Input Range (Angle)</string>
                 </property>
                </widget>
               </item>
@@ -928,14 +834,14 @@ This option smoothes the stick input. Zero value disables LPF.</string>
                 </property>
                </widget>
               </item>
-              <item row="6" column="2" colspan="2">
+              <item row="5" column="2" colspan="2">
                <widget class="QLabel" name="label_41">
                 <property name="text">
                  <string>(the same value for Roll, Pitch, Yaw)</string>
                 </property>
                </widget>
               </item>
-              <item row="6" column="1">
+              <item row="5" column="1">
                <widget class="QDoubleSpinBox" name="MaxAxisLockRate">
                 <property name="focusPolicy">
                  <enum>Qt::StrongFocus</enum>
@@ -974,30 +880,471 @@ value.</string>
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="groupBox_4">
+            <widget class="QGroupBox" name="groupBox_3">
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>71</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>16777215</width>
-               <height>16777215</height>
+               <height>187</height>
               </size>
              </property>
              <property name="title">
-              <string>Messages</string>
+              <string>Expert Settings (Attitude Filter and Feed Forward)</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <widget class="QLabel" name="message">
-                <property name="autoFillBackground">
-                 <bool>false</bool>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="0" column="1">
+               <widget class="QLabel" name="label_49">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>16</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
                 </property>
                 <property name="text">
-                 <string/>
+                 <string>Roll</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QLabel" name="label_50">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>16</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+                </property>
+                <property name="text">
+                 <string>Pitch</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QLabel" name="label_51">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>16</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background-color: qlineargradient(spread:reflect, x1:0.507, y1:0, x2:0.507, y2:0.772, stop:0.208955 rgba(74, 74, 74, 255), stop:0.78607 rgba(36, 36, 36, 255));
+color: rgb(255, 255, 255);
+border-radius: 5;
+font: bold 12px;
+margin:1px;</string>
+                </property>
+                <property name="text">
+                 <string>Yaw</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_2">
+                <property name="text">
+                 <string>Attitude Filter RT</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QSpinBox" name="rollResponseTime">
+                <property name="toolTip">
+                 <string>Roll axis attitude filter response time
+
+Range: 0-250ms, 0 disables the filter (default).
+
+Smoothes estimated airframe attitude used by camera stabilization.</string>
+                </property>
+                <property name="maximum">
+                 <number>250</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:ResponseTime</string>
+                  <string>element:Roll</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2">
+               <widget class="QSpinBox" name="pitchResponseTime">
+                <property name="toolTip">
+                 <string>Pitch axis attitude filter response time
+
+Range: 0-250ms, 0 disables the filter (default).
+
+Smoothes estimated airframe attitude used by camera stabilization.</string>
+                </property>
+                <property name="maximum">
+                 <number>250</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:ResponseTime</string>
+                  <string>element:Pitch</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3">
+               <widget class="QSpinBox" name="yawResponseTime">
+                <property name="toolTip">
+                 <string>Yaw axis attitude filter response time
+
+Range: 0-250ms, 0 disables the filter (default).
+
+Smoothes estimated airframe attitude used by camera stabilization.</string>
+                </property>
+                <property name="maximum">
+                 <number>250</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:ResponseTime</string>
+                  <string>element:Yaw</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>FF Servo Acceleration</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="rollFeedForward">
+                <property name="toolTip">
+                 <string>Roll servo feed forward acceleration
+
+Range: 0-25, 0 disables feed forward for the axis (default).
+
+Good starting value is 2-7.
+Too high value may burn your servo!</string>
+                </property>
+                <property name="maximum">
+                 <number>25</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:FeedForward</string>
+                  <string>element:Roll</string>
+                  <string>haslimits:no</string>
+                  <string>scale:1</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QSpinBox" name="pitchFeedForward">
+                <property name="toolTip">
+                 <string>Pitch servo feed forward acceleration
+
+Range: 0-25, 0 disables feed forward for the axis (default).
+
+Good starting value is 2-7.
+Too high value may burn your servo!</string>
+                </property>
+                <property name="maximum">
+                 <number>25</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:FeedForward</string>
+                  <string>element:Pitch</string>
+                  <string>haslimits:no</string>
+                  <string>scale:1</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="3">
+               <widget class="QSpinBox" name="yawFeedForward">
+                <property name="toolTip">
+                 <string>Yaw servo feed forward acceleration
+
+Range: 0-25, 0 disables feed forward for the axis (default).
+
+Good starting value is 2-7.
+Too high value may burn your servo!</string>
+                </property>
+                <property name="maximum">
+                 <number>25</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:FeedForward</string>
+                  <string>element:Yaw</string>
+                  <string>haslimits:no</string>
+                  <string>scale:1</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="0">
+               <widget class="QLabel" name="label_48">
+                <property name="text">
+                 <string>FF Accel Time Constant</string>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="1">
+               <widget class="QSpinBox" name="rollAccelTime">
+                <property name="toolTip">
+                 <string>Roll servo feed forward acceleration time constant
+
+Range: 0-50ms, default is 5.</string>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:AccelTime</string>
+                  <string>element:Roll</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="2">
+               <widget class="QSpinBox" name="pitchAccelTime">
+                <property name="toolTip">
+                 <string>Pitch servo feed forward acceleration time constant
+
+Range: 0-50ms, default is 5.</string>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:AccelTime</string>
+                  <string>element:Pitch</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="3" column="3">
+               <widget class="QSpinBox" name="yawAccelTime">
+                <property name="toolTip">
+                 <string>Yaw servo feed forward acceleration time constant
+
+Range: 0-50ms, default is 5.</string>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:AccelTime</string>
+                  <string>element:Yaw</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="0">
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>FF Decel Time Constant</string>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="1">
+               <widget class="QSpinBox" name="rollDecelTime">
+                <property name="toolTip">
+                 <string>Roll servo feed forward deceleration time constant
+
+Range: 0-50ms, default is 5.</string>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:DecelTime</string>
+                  <string>element:Roll</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="2">
+               <widget class="QSpinBox" name="pitchDecelTime">
+                <property name="toolTip">
+                 <string>Pitch servo feed forward deceleration time constant
+
+Range: 0-50ms, default is 5.</string>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:DecelTime</string>
+                  <string>element:Pitch</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="4" column="3">
+               <widget class="QSpinBox" name="yawDecelTime">
+                <property name="toolTip">
+                 <string>Yaw servo feed forward deceleration time constant
+
+Range: 0-50ms, default is 5.</string>
+                </property>
+                <property name="maximum">
+                 <number>50</number>
+                </property>
+                <property name="value">
+                 <number>5</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:DecelTime</string>
+                  <string>element:Yaw</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="0">
+               <widget class="QLabel" name="label_47">
+                <property name="text">
+                 <string>Gimbal Type:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="1">
+               <widget class="QComboBox" name="gimbalType">
+                <property name="focusPolicy">
+                 <enum>Qt::StrongFocus</enum>
+                </property>
+                <property name="toolTip">
+                 <string>Gimbal type
+
+Used to limit feed forward acceleration at extreme angles.
+Generic type provides no limit.</string>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:GimbalType</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Yaw-Roll-Pitch</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item row="5" column="2">
+               <widget class="QLabel" name="label_6">
+                <property name="text">
+                 <string>FF Max Acceleration</string>
+                </property>
+               </widget>
+              </item>
+              <item row="5" column="3">
+               <widget class="QSpinBox" name="maxAccel">
+                <property name="toolTip">
+                 <string>Feed forward maximum acceleration
+
+Range: 0-1000, default is 500.
+
+The same value is used for all axes.</string>
+                </property>
+                <property name="maximum">
+                 <number>1000</number>
+                </property>
+                <property name="value">
+                 <number>500</number>
+                </property>
+                <property name="objrelation" stdset="0">
+                 <stringlist>
+                  <string>objname:CameraStabSettings</string>
+                  <string>fieldname:MaxAccel</string>
+                  <string>buttongroup:1</string>
+                 </stringlist>
                 </property>
                </widget>
               </item>
@@ -1005,12 +1352,16 @@ value.</string>
             </widget>
            </item>
            <item>
-            <spacer name="verticalSpacer_2">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Input configuration also provides smoothing for controls. Look for RT options on the RC Input tab.</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Expanding</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -1026,6 +1377,37 @@ value.</string>
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Messages</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QLabel" name="message">
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -1221,7 +1603,44 @@ Apply or Save button afterwards.</string>
   </layout>
  </widget>
  <tabstops>
-  <tabstop>scrollArea</tabstop>
+  <tabstop>enableCameraStabilization</tabstop>
+  <tabstop>rollChannel</tabstop>
+  <tabstop>pitchChannel</tabstop>
+  <tabstop>yawChannel</tabstop>
+  <tabstop>rollOutputRange</tabstop>
+  <tabstop>pitchOutputRange</tabstop>
+  <tabstop>yawOutputRange</tabstop>
+  <tabstop>rollInputChannel</tabstop>
+  <tabstop>pitchInputChannel</tabstop>
+  <tabstop>yawInputChannel</tabstop>
+  <tabstop>rollStabilizationMode</tabstop>
+  <tabstop>pitchStabilizationMode</tabstop>
+  <tabstop>yawStabilizationMode</tabstop>
+  <tabstop>rollInputRange</tabstop>
+  <tabstop>pitchInputRange</tabstop>
+  <tabstop>yawInputRange</tabstop>
+  <tabstop>rollInputRate</tabstop>
+  <tabstop>pitchInputRate</tabstop>
+  <tabstop>yawInputRate</tabstop>
+  <tabstop>MaxAxisLockRate</tabstop>
+  <tabstop>rollResponseTime</tabstop>
+  <tabstop>pitchResponseTime</tabstop>
+  <tabstop>yawResponseTime</tabstop>
+  <tabstop>rollFeedForward</tabstop>
+  <tabstop>pitchFeedForward</tabstop>
+  <tabstop>yawFeedForward</tabstop>
+  <tabstop>rollAccelTime</tabstop>
+  <tabstop>pitchAccelTime</tabstop>
+  <tabstop>yawAccelTime</tabstop>
+  <tabstop>rollDecelTime</tabstop>
+  <tabstop>pitchDecelTime</tabstop>
+  <tabstop>yawDecelTime</tabstop>
+  <tabstop>gimbalType</tabstop>
+  <tabstop>maxAccel</tabstop>
+  <tabstop>camerastabilizationResetToDefaults</tabstop>
+  <tabstop>pushButton</tabstop>
+  <tabstop>camerastabilizationSaveRAM</tabstop>
+  <tabstop>camerastabilizationSaveSD</tabstop>
  </tabstops>
  <resources>
   <include location="../coreplugin/core.qrc"/>

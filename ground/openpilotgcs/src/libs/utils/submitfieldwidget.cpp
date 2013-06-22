@@ -4,25 +4,25 @@
  * @file       submitfieldwidget.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -46,22 +46,22 @@ enum { spacing = 2 };
 static void inline setComboBlocked(QComboBox *cb, int index)
 {
     const bool blocked = cb->blockSignals(true);
+
     cb->setCurrentIndex(index);
     cb->blockSignals(blocked);
 }
 
 namespace Utils {
-
 // Field/Row entry
 struct FieldEntry {
     FieldEntry();
     void createGui(const QIcon &removeIcon);
     void deleteGuiLater();
 
-    QComboBox *combo;
+    QComboBox   *combo;
     QHBoxLayout *layout;
-    QLineEdit *lineEdit;
-    QToolBar *toolBar;
+    QLineEdit   *lineEdit;
+    QToolBar    *toolBar;
     QToolButton *clearButton;
     QToolButton *browseButton;
     int comboIndex;
@@ -75,22 +75,21 @@ FieldEntry::FieldEntry() :
     clearButton(0),
     browseButton(0),
     comboIndex(0)
-{
-}
+{}
 
 void FieldEntry::createGui(const QIcon &removeIcon)
 {
-    layout = new QHBoxLayout;
+    layout       = new QHBoxLayout;
     layout->setMargin(0);
-    layout ->setSpacing(spacing);
-    combo = new QComboBox;
+    layout->setSpacing(spacing);
+    combo        = new QComboBox;
     layout->addWidget(combo);
-    lineEdit = new QLineEdit;
+    lineEdit     = new QLineEdit;
     layout->addWidget(lineEdit);
-    toolBar = new QToolBar;
+    toolBar      = new QToolBar;
     toolBar->setProperty("_q_custom_style_disabled", QVariant(true));
     layout->addWidget(toolBar);
-    clearButton = new QToolButton;
+    clearButton  = new QToolButton;
     clearButton->setIcon(removeIcon);
     toolBar->addWidget(clearButton);
     browseButton = new QToolButton;
@@ -103,7 +102,7 @@ void FieldEntry::deleteGuiLater()
     clearButton->deleteLater();
     browseButton->deleteLater();
     toolBar->deleteLater();
-    lineEdit->deleteLater();    
+    lineEdit->deleteLater();
     combo->deleteLater();
     layout->deleteLater();
 }
@@ -116,11 +115,11 @@ struct SubmitFieldWidgetPrivate {
     int findField(const QString &f, int excluded = -1) const;
     inline QString fieldText(int) const;
     inline QString fieldValue(int) const;
-    inline void focusField(int);
+    inline void    focusField(int);
 
-    const QIcon removeFieldIcon;
-    QStringList fields;
-    QCompleter *completer;
+    const QIcon    removeFieldIcon;
+    QStringList    fields;
+    QCompleter     *completer;
     bool hasBrowseButton;
     bool allowDuplicateFields;
 
@@ -129,21 +128,22 @@ struct SubmitFieldWidgetPrivate {
 };
 
 SubmitFieldWidgetPrivate::SubmitFieldWidgetPrivate() :
-        removeFieldIcon(QLatin1String(":/utils/images/removesubmitfield.png")),
-        completer(0),
-        hasBrowseButton(false),
-        allowDuplicateFields(false),
-        layout(0)
-{
-}
+    removeFieldIcon(QLatin1String(":/utils/images/removesubmitfield.png")),
+    completer(0),
+    hasBrowseButton(false),
+    allowDuplicateFields(false),
+    layout(0)
+{}
 
 int SubmitFieldWidgetPrivate::findSender(const QObject *o) const
 {
     const int count = fieldEntries.size();
+
     for (int i = 0; i < count; i++) {
         const FieldEntry &fe = fieldEntries.at(i);
-        if (fe.combo == o || fe.browseButton == o || fe.clearButton == o || fe.lineEdit == o)
+        if (fe.combo == o || fe.browseButton == o || fe.clearButton == o || fe.lineEdit == o) {
             return i;
+        }
     }
     return -1;
 }
@@ -151,9 +151,12 @@ int SubmitFieldWidgetPrivate::findSender(const QObject *o) const
 int SubmitFieldWidgetPrivate::findField(const QString &ft, int excluded) const
 {
     const int count = fieldEntries.size();
-    for (int i = 0; i < count; i++)
-        if (i != excluded && fieldText(i) == ft)
+
+    for (int i = 0; i < count; i++) {
+        if (i != excluded && fieldText(i) == ft) {
             return i;
+        }
+    }
     return -1;
 }
 
@@ -174,8 +177,8 @@ void SubmitFieldWidgetPrivate::focusField(int pos)
 
 // SubmitFieldWidget
 SubmitFieldWidget::SubmitFieldWidget(QWidget *parent) :
-        QWidget(parent),
-        m_d(new SubmitFieldWidgetPrivate)
+    QWidget(parent),
+    m_d(new SubmitFieldWidgetPrivate)
 {
     m_d->layout = new QVBoxLayout;
     m_d->layout->setMargin(0);
@@ -191,12 +194,14 @@ SubmitFieldWidget::~SubmitFieldWidget()
 void SubmitFieldWidget::setFields(const QStringList & f)
 {
     // remove old fields
-    for (int i = m_d->fieldEntries.size() - 1 ; i >= 0 ; i--)
-        removeField(i);    
+    for (int i = m_d->fieldEntries.size() - 1; i >= 0; i--) {
+        removeField(i);
+    }
 
     m_d->fields = f;
-    if (!f.empty())
+    if (!f.empty()) {
         createField(f.front());
+    }
 }
 
 QStringList SubmitFieldWidget::fields() const
@@ -211,11 +216,12 @@ bool SubmitFieldWidget::hasBrowseButton() const
 
 void SubmitFieldWidget::setHasBrowseButton(bool d)
 {
-    if (m_d->hasBrowseButton == d)
+    if (m_d->hasBrowseButton == d) {
         return;
+    }
     m_d->hasBrowseButton = d;
     foreach(const FieldEntry &fe, m_d->fieldEntries)
-        fe.browseButton->setVisible(d);
+    fe.browseButton->setVisible(d);
 }
 
 bool SubmitFieldWidget::allowDuplicateFields() const
@@ -235,11 +241,12 @@ QCompleter *SubmitFieldWidget::completer() const
 
 void SubmitFieldWidget::setCompleter(QCompleter *c)
 {
-    if (c == m_d->completer)
+    if (c == m_d->completer) {
         return;
+    }
     m_d->completer = c;
     foreach(const FieldEntry &fe, m_d->fieldEntries)
-        fe.lineEdit->setCompleter(c);
+    fe.lineEdit->setCompleter(c);
 }
 
 QString SubmitFieldWidget::fieldValue(int pos) const
@@ -254,12 +261,14 @@ void SubmitFieldWidget::setFieldValue(int pos, const QString &value)
 
 QString SubmitFieldWidget::fieldValues() const
 {
-    const QChar blank = QLatin1Char(' ');
+    const QChar blank   = QLatin1Char(' ');
     const QChar newLine = QLatin1Char('\n');
     // Format as "RevBy: value\nSigned-Off: value\n"
     QString rc;
+
     foreach(const FieldEntry &fe, m_d->fieldEntries) {
         const QString value = fe.lineEdit->text().trimmed();
+
         if (!value.isEmpty()) {
             rc += fe.combo->currentText();
             rc += blank;
@@ -273,6 +282,7 @@ QString SubmitFieldWidget::fieldValues() const
 void SubmitFieldWidget::createField(const QString &f)
 {
     FieldEntry fe;
+
     fe.createGui(m_d->removeFieldIcon);
     fe.combo->addItems(m_d->fields);
     if (!f.isEmpty()) {
@@ -284,11 +294,13 @@ void SubmitFieldWidget::createField(const QString &f)
     }
 
     connect(fe.browseButton, SIGNAL(clicked()), this, SLOT(slotBrowseButtonClicked()));
-    if (!m_d->hasBrowseButton)
+    if (!m_d->hasBrowseButton) {
         fe.browseButton->setVisible(false);
+    }
 
-    if (m_d->completer)
+    if (m_d->completer) {
         fe.lineEdit->setCompleter(m_d->completer);
+    }
 
     connect(fe.combo, SIGNAL(currentIndexChanged(int)),
             this, SLOT(slotComboIndexChanged(int)));
@@ -302,6 +314,7 @@ void SubmitFieldWidget::slotRemove()
 {
     // Never remove first entry
     const int index = m_d->findSender(sender());
+
     switch (index) {
     case -1:
         break;
@@ -316,8 +329,9 @@ void SubmitFieldWidget::slotRemove()
 
 void SubmitFieldWidget::removeField(int index)
 {
-    FieldEntry fe = m_d->fieldEntries.takeAt(index);
-    QLayoutItem * item = m_d->layout->takeAt(index);
+    FieldEntry fe     = m_d->fieldEntries.takeAt(index);
+    QLayoutItem *item = m_d->layout->takeAt(index);
+
     fe.deleteGuiLater();
     delete item;
 }
@@ -325,10 +339,13 @@ void SubmitFieldWidget::removeField(int index)
 void SubmitFieldWidget::slotComboIndexChanged(int comboIndex)
 {
     const int pos = m_d->findSender(sender());
-    if (debug)
+
+    if (debug) {
         qDebug() << '>' << Q_FUNC_INFO << pos;
-    if (pos == -1)
+    }
+    if (pos == -1) {
         return;
+    }
     // Accept new index or reset combo to previous value?
     int &previousIndex = m_d->fieldEntries[pos].comboIndex;
     if (comboIndexChange(pos, comboIndex)) {
@@ -336,8 +353,9 @@ void SubmitFieldWidget::slotComboIndexChanged(int comboIndex)
     } else {
         setComboBlocked(m_d->fieldEntries.at(pos).combo, previousIndex);
     }
-    if (debug)
+    if (debug) {
         qDebug() << '<' << Q_FUNC_INFO << pos;
+    }
 }
 
 // Handle change of a combo. Return "false" if the combo
@@ -345,6 +363,7 @@ void SubmitFieldWidget::slotComboIndexChanged(int comboIndex)
 bool SubmitFieldWidget::comboIndexChange(int pos, int index)
 {
     const QString newField = m_d->fieldEntries.at(pos).combo->itemText(index);
+
     // If the field is visible elsewhere: focus the existing one and refuse
     if (!m_d->allowDuplicateFields) {
         const int existingFieldIndex = m_d->findField(newField, pos);
@@ -354,8 +373,9 @@ bool SubmitFieldWidget::comboIndexChange(int pos, int index)
         }
     }
     // Empty value: just change the field
-    if (m_d->fieldValue(pos).isEmpty())
+    if (m_d->fieldValue(pos).isEmpty()) {
         return true;
+    }
     // Non-empty: Create a new field and reset the triggering combo
     createField(newField);
     return false;
@@ -366,5 +386,4 @@ void SubmitFieldWidget::slotBrowseButtonClicked()
     const int pos = m_d->findSender(sender());
     emit browseButtonClicked(pos, m_d->fieldText(pos));
 }
-
 }

@@ -28,51 +28,52 @@
 #include <cmath>
 
 template<typename MatrixBase>
-bool hasNaN(const MatrixBase& expr);
+bool hasNaN(const MatrixBase & expr);
 
 template<typename MatrixBase>
-bool hasInf(const MatrixBase& expr);
+bool hasInf(const MatrixBase & expr);
 
 template<typename MatrixBase>
-bool perpendicular(const MatrixBase& expl, const MatrixBase& expr);
+bool perpendicular(const MatrixBase & expl, const MatrixBase & expr);
 
 template<typename MatrixBase>
-bool hasNaN(const MatrixBase& expr)
+bool hasNaN(const MatrixBase & expr)
 {
-	for (int j = 0; j != expr.cols(); ++j) {
-		for (int i = 0; i != expr.rows(); ++i) {
-			if (std::isnan(expr.coeff(i, j)))
-				return true;
-		}
-	}
-	return false;
+    for (int j = 0; j != expr.cols(); ++j) {
+        for (int i = 0; i != expr.rows(); ++i) {
+            if (std::isnan(expr.coeff(i, j))) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 template<typename MatrixBase>
-bool hasInf(const MatrixBase& expr)
+bool hasInf(const MatrixBase & expr)
 {
-	for (int i = 0; i != expr.cols(); ++i) {
-		for (int j = 0; j != expr.rows(); ++j) {
-			if (std::isinf(expr.coeff(j, i)))
-				return true;
-		}
-	}
-	return false;
+    for (int i = 0; i != expr.cols(); ++i) {
+        for (int j = 0; j != expr.rows(); ++j) {
+            if (std::isinf(expr.coeff(j, i))) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 template<typename MatrixBase>
-bool isReal(const MatrixBase& exp)
+bool isReal(const MatrixBase & exp)
 {
-	return !hasNaN(exp) && ! hasInf(exp);
+    return !hasNaN(exp) && !hasInf(exp);
 }
 
 template<typename MatrixBase>
-bool perpendicular(const MatrixBase& lhs, const MatrixBase& rhs)
+bool perpendicular(const MatrixBase & lhs, const MatrixBase & rhs)
 {
-	// A really weak check for "almost perpendicular".  Use it for debugging
-	// purposes only.
-	return fabs(rhs.dot(lhs)) < 0.0001;
+    // A really weak check for "almost perpendicular".  Use it for debugging
+    // purposes only.
+    return fabs(rhs.dot(lhs)) < 0.0001;
 }
 
 #endif /* ASSERTIONS_HPP_ */
-

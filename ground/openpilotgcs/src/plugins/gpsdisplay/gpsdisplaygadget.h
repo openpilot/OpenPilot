@@ -7,7 +7,7 @@
  * @{
  * @addtogroup GPSGadgetPlugin GPS Gadget Plugin
  * @{
- * @brief A gadget that displays GPS status and enables basic configuration 
+ * @brief A gadget that displays GPS status and enables basic configuration
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -42,18 +42,20 @@ class GpsDisplayWidget;
 
 using namespace Core;
 
-class GpsDisplayGadget : public Core::IUAVGadget
-{
+class GpsDisplayGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     GpsDisplayGadget(QString classId, GpsDisplayWidget *widget, QWidget *parent = 0);
     ~GpsDisplayGadget();
 
-    QWidget *widget() { return m_widget; }
+    QWidget *widget()
+    {
+        return m_widget;
+    }
 
-    //   void setMode(QString mode);  // Either UAVTalk or serial port
+    // void setMode(QString mode);  // Either UAVTalk or serial port
 
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 public slots:
     void onConnect();
     void onDisconnect();

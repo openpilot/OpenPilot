@@ -33,17 +33,16 @@
 #include <QDebug>
 
 MagicWaypointGadget::MagicWaypointGadget(QString classId, MagicWaypointGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent),
+    m_widget(widget)
+{}
 
 MagicWaypointGadget::~MagicWaypointGadget()
 {
     delete m_widget;
 }
 
-void MagicWaypointGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void MagicWaypointGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
     Q_UNUSED(config);
 }

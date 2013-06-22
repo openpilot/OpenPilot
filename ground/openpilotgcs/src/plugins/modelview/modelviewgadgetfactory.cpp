@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ModelViewPlugin ModelView Plugin
  * @{
- * @brief A gadget that displays a 3D representation of the UAV 
+ * @brief A gadget that displays a 3D representation of the UAV
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -33,27 +33,25 @@
 #include <coreplugin/iuavgadget.h>
 
 ModelViewGadgetFactory::ModelViewGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("ModelViewGadget"), tr("ModelView"), parent)
-{
-}
+    IUAVGadgetFactory(QString("ModelViewGadget"), tr("ModelView"), parent)
+{}
 
 ModelViewGadgetFactory::~ModelViewGadgetFactory()
+{}
+
+Core::IUAVGadget *ModelViewGadgetFactory::createGadget(QWidget *parent)
 {
+    ModelViewGadgetWidget *gadgetWidget = new ModelViewGadgetWidget(parent);
+
+    return new ModelViewGadget(QString("ModelViewGadget"), gadgetWidget, parent);
 }
 
-Core::IUAVGadget* ModelViewGadgetFactory::createGadget(QWidget *parent)
-{
-	ModelViewGadgetWidget* gadgetWidget = new ModelViewGadgetWidget(parent);        
-        return new ModelViewGadget(QString("ModelViewGadget"), gadgetWidget, parent);
-}
-
-IUAVGadgetConfiguration *ModelViewGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *ModelViewGadgetFactory::createConfiguration(QSettings *qSettings)
 {
     return new ModelViewGadgetConfiguration(QString("ModelViewGadget"), qSettings);
 }
 
 IOptionsPage *ModelViewGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new ModelViewGadgetOptionsPage(qobject_cast<ModelViewGadgetConfiguration*>(config));
+    return new ModelViewGadgetOptionsPage(qobject_cast<ModelViewGadgetConfiguration *>(config));
 }
-

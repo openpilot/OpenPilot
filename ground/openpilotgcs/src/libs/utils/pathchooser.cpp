@@ -4,25 +4,25 @@
  * @file       pathchooser.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -43,18 +43,16 @@
 #include <QtGui/QToolButton>
 #include <QtGui/QPushButton>
 
-/*static*/ const char * const Utils::PathChooser::browseButtonLabel =
+/*static*/ const char *const Utils::PathChooser::browseButtonLabel =
 #ifdef Q_WS_MAC
-                   QT_TRANSLATE_NOOP("Utils::PathChooser", "Choose...");
+    QT_TRANSLATE_NOOP("Utils::PathChooser", "Choose...");
 #else
-                   QT_TRANSLATE_NOOP("Utils::PathChooser", "Browse...");
+    QT_TRANSLATE_NOOP("Utils::PathChooser", "Browse...");
 #endif
 
 namespace Utils {
-
 // ------------------ PathValidatingLineEdit
-class PathValidatingLineEdit : public BaseValidatingLineEdit
-{
+class PathValidatingLineEdit : public BaseValidatingLineEdit {
 public:
     explicit PathValidatingLineEdit(PathChooser *chooser, QWidget *parent = 0);
 
@@ -69,7 +67,7 @@ PathValidatingLineEdit::PathValidatingLineEdit(PathChooser *chooser, QWidget *pa
     BaseValidatingLineEdit(parent),
     m_chooser(chooser)
 {
-    QTC_ASSERT(chooser, return);
+    QTC_ASSERT(chooser, return );
 }
 
 bool PathValidatingLineEdit::validate(const QString &value, QString *errorMessage) const
@@ -78,30 +76,27 @@ bool PathValidatingLineEdit::validate(const QString &value, QString *errorMessag
 }
 
 // ------------------ PathChooserPrivate
-struct PathChooserPrivate
-{
+struct PathChooserPrivate {
     PathChooserPrivate(PathChooser *chooser);
 
     QHBoxLayout *m_hLayout;
     PathValidatingLineEdit *m_lineEdit;
     PathChooser::Kind m_acceptingKind;
-    QString m_dialogTitleOverride;
-    QString m_dialogFilter;
-    QString m_initialBrowsePathOverride;
+    QString     m_dialogTitleOverride;
+    QString     m_dialogFilter;
+    QString     m_initialBrowsePathOverride;
 };
 
 PathChooserPrivate::PathChooserPrivate(PathChooser *chooser) :
     m_hLayout(new QHBoxLayout),
     m_lineEdit(new PathValidatingLineEdit(chooser)),
     m_acceptingKind(PathChooser::Directory)
-{
-}
+{}
 
 PathChooser::PathChooser(QWidget *parent) :
     QWidget(parent),
     m_d(new PathChooserPrivate(this))
 {
-
     m_d->m_hLayout->setContentsMargins(0, 0, 0, 0);
 
     connect(m_d->m_lineEdit, SIGNAL(validReturnPressed()), this, SIGNAL(returnPressed()));
@@ -139,7 +134,7 @@ void PathChooser::addButton(const QString &text, QObject *receiver, const char *
 
 QAbstractButton *PathChooser::buttonAtIndex(int index) const
 {
-    return findChildren<QAbstractButton*>().at(index);
+    return findChildren<QAbstractButton *>().at(index);
 }
 
 QString PathChooser::path() const
@@ -157,15 +152,19 @@ void PathChooser::slotBrowse()
     emit beforeBrowsing();
 
     QString predefined = path();
+
     if ((predefined.isEmpty() || !QFileInfo(predefined).isDir())
-            && !m_d->m_initialBrowsePathOverride.isNull()) {
+        && !m_d->m_initialBrowsePathOverride.isNull()) {
         predefined = m_d->m_initialBrowsePathOverride;
-        if (!QFileInfo(predefined).isDir())
+
+        if (!QFileInfo(predefined).isDir()) {
             predefined.clear();
+        }
     }
 
-    if (predefined.startsWith(":"))
+    if (predefined.startsWith(":")) {
         predefined.clear();
+    }
 
     // Prompt for a file/dir
     QString dialogTitle;
@@ -173,14 +172,14 @@ void PathChooser::slotBrowse()
     switch (m_d->m_acceptingKind) {
     case PathChooser::Directory:
         newPath = QFileDialog::getExistingDirectory(this,
-                makeDialogTitle(tr("Choose a directory")), predefined);
+                                                    makeDialogTitle(tr("Choose a directory")), predefined);
         break;
 
     case PathChooser::File: // fall through
     case PathChooser::Command:
         newPath = QFileDialog::getOpenFileName(this,
-                makeDialogTitle(tr("Choose a file")), predefined,
-                m_d->m_dialogFilter);
+                                               makeDialogTitle(tr("Choose a file")), predefined,
+                                               m_d->m_dialogFilter);
         break;
 
     default:
@@ -190,8 +189,9 @@ void PathChooser::slotBrowse()
     // Delete trailing slashes unless it is "/"|"\\", only
     if (!newPath.isEmpty()) {
         newPath = QDir::toNativeSeparators(newPath);
-        if (newPath.size() > 1 && newPath.endsWith(QDir::separator()))
+        if (newPath.size() > 1 && newPath.endsWith(QDir::separator())) {
             newPath.truncate(newPath.size() - 1);
+        }
         setPath(newPath);
     }
 
@@ -211,8 +211,9 @@ QString PathChooser::errorMessage() const
 bool PathChooser::validatePath(const QString &path, QString *errorMessage)
 {
     if (path.isEmpty()) {
-        if (errorMessage)
+        if (errorMessage) {
             *errorMessage = tr("The path must not be empty.");
+        }
         return false;
     }
 
@@ -224,8 +225,9 @@ bool PathChooser::validatePath(const QString &path, QString *errorMessage)
     case PathChooser::Directory: // fall through
     case PathChooser::File:
         if (!fi.exists()) {
-            if (errorMessage)
+            if (errorMessage) {
                 *errorMessage = tr("The path '%1' does not exist.").arg(path);
+            }
             return false;
         }
         break;
@@ -239,16 +241,18 @@ bool PathChooser::validatePath(const QString &path, QString *errorMessage)
     switch (m_d->m_acceptingKind) {
     case PathChooser::Directory:
         if (!isDir) {
-            if (errorMessage)
+            if (errorMessage) {
                 *errorMessage = tr("The path '%1' is not a directory.").arg(path);
+            }
             return false;
         }
         break;
 
     case PathChooser::File:
         if (isDir) {
-            if (errorMessage)
+            if (errorMessage) {
                 *errorMessage = tr("The path '%1' is not a file.").arg(path);
+            }
             return false;
         }
         break;
@@ -277,8 +281,10 @@ QString PathChooser::homePath()
     // does not let people actually display the contents of their home
     // directory. Alternatively, create a QtCreator-specific directory?
     return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+
 #else
     return QDir::homePath();
+
 #endif
 }
 
@@ -319,10 +325,10 @@ void PathChooser::setInitialBrowsePathBackup(const QString &path)
 
 QString PathChooser::makeDialogTitle(const QString &title)
 {
-    if (m_d->m_dialogTitleOverride.isNull())
+    if (m_d->m_dialogTitleOverride.isNull()) {
         return title;
-    else
+    } else {
         return m_d->m_dialogTitleOverride;
+    }
 }
-
 } // namespace Utils

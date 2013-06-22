@@ -50,7 +50,6 @@
         <file>images/optionsicon.png</file>
         <file>images/helpicon.png</file>
         <file>images/openpiloticon.png</file>
-        <file>CREDITS.html</file>
         <file>images/ah.png</file>
         <file>images/config.png</file>
         <file>images/flight.png</file>
@@ -62,5 +61,10 @@
         <file>images/helpicon.svg</file>
         <file>images/cpu.png</file>
         <file>images/tx-rx.svg</file>
+        <file>qml/images/tab.png</file>
+        <file>qml/ScrollDecorator.qml</file>
+        <file>qml/TabWidget.qml</file>
+        <file>qml/AboutDialog.qml</file>
+        <file alias="qml/AuthorsModel.qml">../../../../../build/openpilotgcs-synthetics/AuthorsModel.qml</file>
     </qresource>
 </RCC>

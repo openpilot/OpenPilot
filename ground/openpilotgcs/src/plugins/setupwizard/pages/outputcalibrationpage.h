@@ -38,22 +38,24 @@ namespace Ui {
 class OutputCalibrationPage;
 }
 
-class OutputCalibrationPage : public AbstractWizardPage
-{
+class OutputCalibrationPage : public AbstractWizardPage {
     Q_OBJECT
-    
+
 public:
     explicit OutputCalibrationPage(SetupWizard *wizard, QWidget *parent = 0);
     ~OutputCalibrationPage();
     void initializePage();
     bool validatePage();
 
-    bool isFinished() { return m_currentWizardIndex >= m_wizardIndexes.size() - 1; }
+    bool isFinished()
+    {
+        return m_currentWizardIndex >= m_wizardIndexes.size() - 1;
+    }
 
 protected:
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
-    
+
 public slots:
     void customBackClicked();
 
@@ -90,7 +92,7 @@ private:
     qint16 m_currentWizardIndex;
 
     QList<QString> m_vehicleElementIds;
-    QList<QGraphicsSvgItem*> m_vehicleItems;
+    QList<QGraphicsSvgItem *> m_vehicleItems;
     QList<quint16> m_vehicleHighlightElementIndexes;
     QList<quint16> m_channelIndex;
     QList<quint16> m_wizardIndexes;
@@ -98,7 +100,6 @@ private:
     QList<actuatorChannelSettings> m_actuatorSettings;
 
     OutputCalibrationUtil *m_calibrationUtil;
-
 };
 
 #endif // OUTPUTCALIBRATIONPAGE_H

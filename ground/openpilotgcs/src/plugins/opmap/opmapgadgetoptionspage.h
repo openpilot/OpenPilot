@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin OpenPilot Map Plugin
  * @{
- * @brief The OpenPilot Map plugin 
+ * @brief The OpenPilot Map plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -33,18 +33,17 @@
 class OPMapGadgetConfiguration;
 
 namespace Core {
-    class IUAVGadgetConfiguration;
+class IUAVGadgetConfiguration;
 }
 
 namespace Ui {
-    class OPMapGadgetOptionsPage;
+class OPMapGadgetOptionsPage;
 }
 
 using namespace Core;
 
-class OPMapGadgetOptionsPage : public IOptionsPage
-{
-Q_OBJECT
+class OPMapGadgetOptionsPage : public IOptionsPage {
+    Q_OBJECT
 public:
     explicit OPMapGadgetOptionsPage(OPMapGadgetConfiguration *config, QObject *parent = 0);
 

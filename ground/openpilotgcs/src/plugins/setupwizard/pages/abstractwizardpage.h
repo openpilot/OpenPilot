@@ -31,8 +31,7 @@
 #include <QWizardPage>
 #include "setupwizard.h"
 
-class AbstractWizardPage : public QWizardPage
-{
+class AbstractWizardPage : public QWizardPage {
     Q_OBJECT
 protected:
     explicit AbstractWizardPage(SetupWizard *wizard, QWidget *parent = 0);
@@ -41,8 +40,10 @@ private:
     SetupWizard *m_wizard;
 
 public:
-    SetupWizard* getWizard() { return m_wizard; }
-
+    SetupWizard *getWizard()
+    {
+        return m_wizard;
+    }
 };
 
 #endif // ABSTRACTWIZARDPAGE_H

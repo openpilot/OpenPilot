@@ -36,7 +36,7 @@
 
 QString readFile(QString name);
 QString readFile(QString name);
-bool writeFile(QString name, QString& str);
-bool writeFileIfDiffrent(QString name, QString& str);
+bool writeFile(QString name, QString & str);
+bool writeFileIfDiffrent(QString name, QString & str);
 
 #endif

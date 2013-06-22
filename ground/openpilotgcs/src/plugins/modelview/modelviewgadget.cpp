@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ModelViewPlugin ModelView Plugin
  * @{
- * @brief A gadget that displays a 3D representation of the UAV 
+ * @brief A gadget that displays a 3D representation of the UAV
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -29,22 +29,21 @@
 #include "modelviewgadgetconfiguration.h"
 
 ModelViewGadget::ModelViewGadget(QString classId, ModelViewGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent),
+    m_widget(widget)
+{}
 
 ModelViewGadget::~ModelViewGadget()
 {
     delete m_widget;
 }
 
-void ModelViewGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void ModelViewGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
-    ModelViewGadgetConfiguration *m = qobject_cast<ModelViewGadgetConfiguration*>(config);
+    ModelViewGadgetConfiguration *m = qobject_cast<ModelViewGadgetConfiguration *>(config);
+
     m_widget->setAcFilename(m->acFilename());
     m_widget->setBgFilename(m->bgFilename());
     m_widget->setVboEnable(m->vboEnabled());
     m_widget->reloadScene();
 }
-

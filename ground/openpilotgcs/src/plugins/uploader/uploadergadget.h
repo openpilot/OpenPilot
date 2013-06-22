@@ -39,19 +39,20 @@ class UploaderGadgetWidget;
 
 using namespace Core;
 
-class UPLOADER_EXPORT UploaderGadget : public Core::IUAVGadget
-{
+class UPLOADER_EXPORT UploaderGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     UploaderGadget(QString classId, UploaderGadgetWidget *widget, QWidget *parent = 0);
     ~UploaderGadget();
 
-    QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 
 private:
     UploaderGadgetWidget *m_widget;
 };
 
 #endif // UPLOADERGADGET_H
-

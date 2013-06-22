@@ -8,7 +8,7 @@
  * @{
  * @addtogroup DialPlugin Dial Plugin
  * @{
- * @brief Plots flight information rotary style dials 
+ * @brief Plots flight information rotary style dials
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -39,15 +39,17 @@ class DialGadgetWidget;
 
 using namespace Core;
 
-class DialGadget : public Core::IUAVGadget
-{
+class DialGadget : public Core::IUAVGadget {
     Q_OBJECT
 public:
     DialGadget(QString classId, DialGadgetWidget *widget, QWidget *parent = 0);
     ~DialGadget();
 
-    QWidget *widget() { return m_widget; }
-    void loadConfiguration(IUAVGadgetConfiguration* config);
+    QWidget *widget()
+    {
+        return m_widget;
+    }
+    void loadConfiguration(IUAVGadgetConfiguration *config);
 
 private:
     DialGadgetWidget *m_widget;

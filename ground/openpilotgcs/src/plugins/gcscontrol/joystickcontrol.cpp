@@ -33,8 +33,8 @@
 #include <QMouseEvent>
 
 /**
-  * @brief Constructor for JoystickControl widget.  Sets up the image of a joystick
-  */
+ * @brief Constructor for JoystickControl widget.  Sets up the image of a joystick
+ */
 JoystickControl::JoystickControl(QWidget *parent) : QGraphicsView(parent)
 {
     setMinimumSize(64, 64);
@@ -61,7 +61,7 @@ JoystickControl::JoystickControl(QWidget *parent) : QGraphicsView(parent)
     m_joystickArea->setPos(
         (m_background->boundingRect().width() - m_joystickArea->boundingRect().width()) * 0.5,
         (m_background->boundingRect().height() - m_joystickArea->boundingRect().height()) * 0.5
-    );
+        );
     m_joystickArea->setVisible(false);
 
     QGraphicsScene *l_scene = scene();
@@ -80,50 +80,61 @@ JoystickControl::~JoystickControl()
 }
 
 /**
-  * @brief Enables/Disables OpenGL
-  */
+ * @brief Enables/Disables OpenGL
+ */
 void JoystickControl::enableOpenGL(bool flag)
 {
-    if (flag)
+    if (flag) {
         setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
-    else
+    } else {
         setViewport(new QWidget);
+    }
 }
 
 /**
-  * @brief Update the displayed position based on an MCC update
-  */
+ * @brief Update the displayed position based on an MCC update
+ */
 void JoystickControl::changePosition(double x, double y)
 {
     QRectF areaSize = m_joystickArea->boundingRect();
     QPointF point(
         ((1.0 + x) * areaSize.width() - m_joystickEnd->boundingRect().width()) * 0.5,
         ((1.0 - y) * areaSize.height() - m_joystickEnd->boundingRect().height()) * 0.5
-    );
+        );
+
     m_joystickEnd->setPos(m_joystickArea->mapToScene(point));
 }
 
 /**
-  * @brief Redirect mouse move events to control position
-  */
+ * @brief Redirect mouse move events to control position
+ */
 void JoystickControl::mouseMoveEvent(QMouseEvent *event)
 {
-    QPointF point = m_joystickArea->mapFromScene(mapToScene(event->pos()));
+    QPointF point   = m_joystickArea->mapFromScene(mapToScene(event->pos()));
     QSizeF areaSize = m_joystickArea->boundingRect().size();
 
-    double y = - (point.y() / areaSize.height() - 0.5) * 2.0;
+    double y = -(point.y() / areaSize.height() - 0.5) * 2.0;
     double x = (point.x() / areaSize.width() - 0.5) * 2.0;
-    if (y < -1.0) y = -1.0;
-    if (y >  1.0) y =  1.0;
-    if (x < -1.0) x = -1.0;
-    if (x >  1.0) x =  1.0;
+
+    if (y < -1.0) {
+        y = -1.0;
+    }
+    if (y > 1.0) {
+        y = 1.0;
+    }
+    if (x < -1.0) {
+        x = -1.0;
+    }
+    if (x > 1.0) {
+        x = 1.0;
+    }
 
     emit positionClicked(x, y);
 }
 
 /**
-  * @brief Redirect mouse move clicks to control position
-  */
+ * @brief Redirect mouse move clicks to control position
+ */
 void JoystickControl::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
@@ -153,6 +164,6 @@ void JoystickControl::resizeEvent(QResizeEvent *event)
 }
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

@@ -28,45 +28,48 @@
 #include "dblspindelegate.h"
 
 /**
-  Helper delegate for the custom mixer editor table.
-  */
+   Helper delegate for the custom mixer editor table.
+ */
 DoubleSpinDelegate::DoubleSpinDelegate(QObject *parent)
-     : QItemDelegate(parent)
- {    
-    m_min = 0.0;
-    m_max = 1.0;
+    : QItemDelegate(parent)
+{
+    m_min      = 0.0;
+    m_max      = 1.0;
     m_decimals = 2;
-    m_step = 0.01;
- }
+    m_step     = 0.01;
+}
 
 QWidget *DoubleSpinDelegate::createEditor(QWidget *parent,
-    const QStyleOptionViewItem &/* option */,
-    const QModelIndex &/* index */) const
+                                          const QStyleOptionViewItem & /* option */,
+                                          const QModelIndex & /* index */) const
 {
     QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
+
     editor->setMinimum(m_min);
     editor->setMaximum(m_max);
     editor->setDecimals(m_decimals);
     editor->setSingleStep(m_step);
 
-    connect(editor,SIGNAL(valueChanged(double)), this, SLOT(valueChanged()));
+    connect(editor, SIGNAL(valueChanged(double)), this, SLOT(valueChanged()));
 
     return editor;
 }
 
 void DoubleSpinDelegate::setEditorData(QWidget *editor,
-                                    const QModelIndex &index) const
+                                       const QModelIndex &index) const
 {
     double value = index.model()->data(index, Qt::EditRole).toDouble();
 
-    QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+    QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox *>(editor);
+
     spinBox->setValue(value);
 }
 
 void DoubleSpinDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
-                                   const QModelIndex &index) const
+                                      const QModelIndex &index) const
 {
-    QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+    QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox *>(editor);
+
     spinBox->interpretText();
     double value = spinBox->value();
 
@@ -74,7 +77,7 @@ void DoubleSpinDelegate::setModelData(QWidget *editor, QAbstractItemModel *model
 }
 
 void DoubleSpinDelegate::updateEditorGeometry(QWidget *editor,
-    const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+                                              const QStyleOptionViewItem &option, const QModelIndex & /* index */) const
 {
     editor->setGeometry(option.rect);
 }
@@ -83,4 +86,3 @@ void DoubleSpinDelegate::valueChanged()
 {
     emit ValueChanged();
 }
-

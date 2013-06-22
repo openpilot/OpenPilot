@@ -44,9 +44,8 @@ class QSpinBox;
 
 using namespace Core;
 
-class UPLOADER_EXPORT UploaderGadgetOptionsPage : public IOptionsPage
-{
-Q_OBJECT
+class UPLOADER_EXPORT UploaderGadgetOptionsPage : public IOptionsPage {
+    Q_OBJECT
 public:
     explicit UploaderGadgetOptionsPage(UploaderGadgetConfiguration *config, QObject *parent = 0);
 

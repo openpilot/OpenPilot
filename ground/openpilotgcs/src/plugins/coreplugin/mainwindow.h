@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -44,7 +44,6 @@ class MyTabWidget;
 QT_END_NAMESPACE
 
 namespace Core {
-
 class ActionManager;
 class BaseMode;
 class BaseView;
@@ -67,7 +66,6 @@ class UAVGadgetInstanceManager;
 
 
 namespace Internal {
-
 class ActionManagerPrivate;
 class CoreImpl;
 class FancyTabWidget;
@@ -77,8 +75,7 @@ class WorkspaceSettings;
 class VersionDialog;
 class AuthorsDialog;
 
-class CORE_EXPORT MainWindow : public EventFilteringMainWindow
-{
+class CORE_EXPORT MainWindow : public EventFilteringMainWindow {
     Q_OBJECT
 
 public:
@@ -93,17 +90,17 @@ public:
     void addContextObject(IContext *contex);
     void removeContextObject(IContext *contex);
     void resetContext();
-    void readSettings(QSettings* qs = 0, bool workspaceDiffOnly = false);
-    void saveSettings(QSettings* qs = 0);
-    void readSettings(IConfigurablePlugin* plugin, QSettings* qs = 0);
-    void saveSettings(IConfigurablePlugin* plugin, QSettings* qs = 0);
+    void readSettings(QSettings *qs = 0, bool workspaceDiffOnly = false);
+    void saveSettings(QSettings *qs = 0);
+    void readSettings(IConfigurablePlugin *plugin, QSettings *qs = 0);
+    void saveSettings(IConfigurablePlugin *plugin, QSettings *qs = 0);
     void deleteSettings();
     void openFiles(const QStringList &fileNames);
 
     Core::ActionManager *actionManager() const;
     Core::UniqueIDManager *uniqueIDManager() const;
     Core::MessageManager *messageManager() const;
-    QList<UAVGadgetManager*> uavGadgetManagers() const;
+    QList<UAVGadgetManager *> uavGadgetManagers() const;
     UAVGadgetInstanceManager *uavGadgetInstanceManager() const;
     Core::ConnectionManager *connectionManager() const;
     Core::VariableManager *variableManager() const;
@@ -112,8 +109,11 @@ public:
     Core::MimeDatabase *mimeDatabase() const;
     Internal::GeneralSettings *generalSettings() const;
     QSettings *settings(QSettings::Scope scope) const;
-    inline SettingsDatabase *settingsDatabase() const { return m_settingsDatabase; }
-    IContext * currentContextObject() const;
+    inline SettingsDatabase *settingsDatabase() const
+    {
+        return m_settingsDatabase;
+    }
+    IContext *currentContextObject() const;
     QStatusBar *statusBar() const;
     void addAdditionalContext(int context);
     void removeAdditionalContext(int context);
@@ -169,8 +169,8 @@ private:
     void updateContextObject(IContext *context);
     void registerDefaultContainers();
     void registerDefaultActions();
-    void createWorkspaces(QSettings* qs, bool diffOnly = false);
-    void loadStyleSheet(QString name);
+    void createWorkspaces(QSettings *qs, bool diffOnly = false);
+    QString loadStyleSheet(QString name);
 
     CoreImpl *m_coreImpl;
     UniqueIDManager *m_uniqueIDManager;
@@ -185,7 +185,7 @@ private:
     VariableManager *m_variableManager;
     ThreadManager *m_threadManager;
     ModeManager *m_modeManager;
-    QList<UAVGadgetManager*> m_uavGadgetManagers;
+    QList<UAVGadgetManager *> m_uavGadgetManagers;
     UAVGadgetInstanceManager *m_uavGadgetInstanceManager;
     ConnectionManager *m_connectionManager;
     MimeDatabase *m_mimeDatabase;
@@ -194,7 +194,7 @@ private:
     VersionDialog *m_versionDialog;
     AuthorsDialog *m_authorsDialog;
 
-    IContext * m_activeContext;
+    IContext *m_activeContext;
 
     QMap<QWidget *, IContext *> m_contextWidgets;
 
@@ -226,9 +226,7 @@ private:
     QAction *m_minimizeAction;
     QAction *m_zoomAction;
 #endif
-
 };
-
 } // namespace Internal
 } // namespace Core
 

@@ -17,8 +17,8 @@
 		65904F2614632C1700FD9482 /* board-info.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "board-info.mk"; sourceTree = "<group>"; };
 		65904F2714632C1700FD9482 /* board-info.mk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "board-info.mk"; sourceTree = "<group>"; };
 		65904F2814632C1700FD9482 /* version-info.py */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.python; path = "version-info.py"; sourceTree = "<group>"; };
-		65904F2914632C1700FD9482 /* firmwareinfotemplate.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = firmwareinfotemplate.c; sourceTree = "<group>"; };
-		65904F2A14632C1700FD9482 /* gcsversioninfotemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gcsversioninfotemplate.h; sourceTree = "<group>"; };
+		65904F2914632C1700FD9482 /* firmware_info.c.template */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = firmware_info.c.template; sourceTree = "<group>"; };
+		65904F2A14632C1700FD9482 /* gcs_version_info.h.template */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gcs_version_info.h.template; sourceTree = "<group>"; };
 		65904F2D14632C1700FD9482 /* README.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		65904F2E14632C1700FD9482 /* shell_script.reg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = shell_script.reg; sourceTree = "<group>"; };
 		65904F2F14632C1700FD9482 /* install */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = install; sourceTree = "<group>"; };
@@ -63,7 +63,7 @@
 				65904F1E14632C1700FD9482 /* esc */,
 				65904F1F14632C1700FD9482 /* ins */,
 				65904F2014632C1700FD9482 /* openpilot */,
-				65904F2114632C1700FD9482 /* pipxtreme */,
+				65904F2114632C1700FD9482 /* oplink */,
 			);
 			path = boards;
 			sourceTree = "<group>";
@@ -79,8 +79,8 @@
 		65904F1A14632C1700FD9482 /* templates */ = {
 			isa = PBXGroup;
 			children = (
-				65904F2914632C1700FD9482 /* firmwareinfotemplate.c */,
-				65904F2A14632C1700FD9482 /* gcsversioninfotemplate.h */,
+				65904F2914632C1700FD9482 /* firmware_info.c.template */,
+				65904F2A14632C1700FD9482 /* gcs_version_info.h.template */,
 			);
 			path = templates;
 			sourceTree = "<group>";
@@ -136,12 +136,12 @@
 			path = openpilot;
 			sourceTree = "<group>";
 		};
-		65904F2114632C1700FD9482 /* pipxtreme */ = {
+		65904F2114632C1700FD9482 /* oplink */ = {
 			isa = PBXGroup;
 			children = (
 				65904F2714632C1700FD9482 /* board-info.mk */,
 			);
-			path = pipxtreme;
+			path = oplink;
 			sourceTree = "<group>";
 		};
 		65904F2B14632C1700FD9482 /* bin */ = {

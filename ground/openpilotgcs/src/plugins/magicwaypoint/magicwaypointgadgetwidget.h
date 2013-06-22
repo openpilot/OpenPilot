@@ -7,7 +7,7 @@
  * @{
  * @addtogroup GCSControlGadgetPlugin GCSControl Gadget Plugin
  * @{
- * @brief A place holder gadget plugin 
+ * @brief A place holder gadget plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -29,13 +29,12 @@
 #define MagicWaypointGADGETWIDGET_H_
 
 #include <QtGui/QLabel>
-#include "positiondesired.h"
+#include "pathdesired.h"
 #include "positionactual.h"
 
 class Ui_MagicWaypoint;
 
-class MagicWaypointGadgetWidget : public QLabel
-{
+class MagicWaypointGadgetWidget : public QLabel {
     Q_OBJECT
 
 public:
@@ -48,13 +47,14 @@ signals:
 
 protected slots:
     void scaleChanged(int scale);
-    void positionObjectChanged(UAVObject *);
+    void positionActualChanged(UAVObject *);
+    void pathDesiredChanged(UAVObject *);
     void positionSelected(double north, double east);
 
 private:
-    PositionDesired * getPositionDesired();
-    PositionActual * getPositionActual();
-    Ui_MagicWaypoint * m_magicwaypoint;
+    PathDesired *getPathDesired();
+    PositionActual *getPositionActual();
+    Ui_MagicWaypoint *m_magicwaypoint;
 };
 
 #endif /* MagicWaypointGADGETWIDGET_H_ */

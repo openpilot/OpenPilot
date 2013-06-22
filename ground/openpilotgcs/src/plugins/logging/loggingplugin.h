@@ -45,13 +45,12 @@ class LoggingPlugin;
 class LoggingGadgetFactory;
 
 /**
-*   Define a connection via the IConnection interface
-*   Plugin will add a instance of this class to the pool,
-*   so the connection manager can use it.
-*/
+ *   Define a connection via the IConnection interface
+ *   Plugin will add a instance of this class to the pool,
+ *   so the connection manager can use it.
+ */
 class LoggingConnection
-    : public Core::IConnection
-{
+    : public Core::IConnection {
     Q_OBJECT
 public:
     LoggingConnection();
@@ -64,8 +63,14 @@ public:
     virtual QString connectionName();
     virtual QString shortName();
 
-    bool deviceOpened() {return m_deviceOpened;}
-    LogFile* getLogfile() { return &logFile;}
+    bool deviceOpened()
+    {
+        return m_deviceOpened;
+    }
+    LogFile *getLogfile()
+    {
+        return &logFile;
+    }
 
 
 private:
@@ -81,16 +86,14 @@ protected:
 };
 
 
-
-class LoggingThread : public QThread
-{
-Q_OBJECT
+class LoggingThread : public QThread {
+    Q_OBJECT
 public:
-    bool openFile(QString file, LoggingPlugin * parent);
+    bool openFile(QString file, LoggingPlugin *parent);
 
 private slots:
-    void objectUpdated(UAVObject * obj);
-    void transactionCompleted(UAVObject* obj, bool success);
+    void objectUpdated(UAVObject *obj);
+    void transactionCompleted(UAVObject *obj, bool success);
 
 public slots:
     void stopLogging();
@@ -99,18 +102,16 @@ protected:
     void run();
     QReadWriteLock lock;
     LogFile logFile;
-    UAVTalk * uavTalk;
+    UAVTalk *uavTalk;
 
 private:
-    QQueue<UAVDataObject*> queue;
+    QQueue<UAVDataObject *> queue;
 
     void retrieveSettings();
     void retrieveNextObject();
-
 };
 
-class LoggingPlugin : public ExtensionSystem::IPlugin
-{
+class LoggingPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
 
 public:
@@ -118,11 +119,17 @@ public:
     ~LoggingPlugin();
 
     void extensionsInitialized();
-    bool initialize(const QStringList & arguments, QString * errorString);
+    bool initialize(const QStringList & arguments, QString *errorString);
     void shutdown();
 
-    LoggingConnection* getLogConnection() { return logConnection; };
-    LogFile* getLogfile() { return logConnection->getLogfile();}
+    LoggingConnection *getLogConnection()
+    {
+        return logConnection;
+    };
+    LogFile *getLogfile()
+    {
+        return logConnection->getLogfile();
+    }
     void setLogMenuTitle(QString str);
 
 
@@ -133,11 +140,11 @@ signals:
 
 
 protected:
-    enum {IDLE, LOGGING, REPLAY} state;
-    LoggingThread * loggingThread;
+    enum { IDLE, LOGGING, REPLAY } state;
+    LoggingThread *loggingThread;
 
     // These are used for replay, logging in its own thread
-    LoggingConnection* logConnection;
+    LoggingConnection *logConnection;
 
 private slots:
     void toggleLogging();
@@ -149,8 +156,7 @@ private slots:
 
 private:
     LoggingGadgetFactory *mf;
-    Core::Command* cmd;
-
+    Core::Command *cmd;
 };
 #endif /* LoggingPLUGIN_H_ */
 /**

@@ -4,25 +4,25 @@
  * @file       aggregate.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -39,7 +39,7 @@
     Components that are bundled to an Aggregate can be "cast" to each other
     and have a coupled life cycle. See the documentation of Aggregation::Aggregate for
     details and examples.
-*/
+ */
 
 /*!
     \class Aggregation::Aggregate
@@ -97,7 +97,7 @@
 
     Aggregation aware code never uses qobject_cast, but always uses
     Aggregation::query which behaves like a qobject_cast as a fallback.
-*/
+ */
 
 /*!
     \fn T *Aggregate::component()
@@ -107,7 +107,7 @@
 
     \sa Aggregate::components()
     \sa Aggregate::add()
-*/
+ */
 
 /*!
     \fn QList<T *> Aggregate::components()
@@ -116,17 +116,17 @@
 
     \sa Aggregate::component()
     \sa Aggregate::add()
-*/
+ */
 
 /*!
     \fn T *Aggregation::query<T *>(Aggregate *obj)
     \internal
-*/
+ */
 
 /*!
     \fn QList<T *> Aggregation::query_all<T *>(Aggregate *obj)
     \internal
-*/
+ */
 
 /*!
     \relates Aggregation::Aggregate
@@ -138,7 +138,7 @@
     checked, or if it doesn't belong to an Aggregate null is returned.
 
     \sa Aggregate::component()
-*/
+ */
 
 /*!
     \relates Aggregation::Aggregate
@@ -148,7 +148,7 @@
     type are returned. Otherwise, \a obj is returned if it is of the requested type.
 
     \sa Aggregate::components()
-*/
+ */
 
 using namespace Aggregation;
 
@@ -156,26 +156,29 @@ using namespace Aggregation;
     \fn Aggregate *Aggregate::parentAggregate(QObject *obj)
 
     Returns the Aggregate object of \a obj if there is one. Otherwise returns 0.
-*/
+ */
 Aggregate *Aggregate::parentAggregate(QObject *obj)
 {
     QReadLocker locker(&lock());
+
     return aggregateMap().value(obj);
 }
 
 QHash<QObject *, Aggregate *> &Aggregate::aggregateMap()
 {
     static QHash<QObject *, Aggregate *> map;
+
     return map;
 }
 
 /*!
     \fn QReadWriteLock &Aggregate::lock()
     \internal
-*/
+ */
 QReadWriteLock &Aggregate::lock()
 {
     static QReadWriteLock lock;
+
     return lock;
 }
 
@@ -185,11 +188,12 @@ QReadWriteLock &Aggregate::lock()
     Creates a new Aggregate with the given \a parent.
     The \a parent is passed directly passed to the QObject part
     of the class and is not used beside that.
-*/
+ */
 Aggregate::Aggregate(QObject *parent)
     : QObject(parent)
 {
     QWriteLocker locker(&lock());
+
     aggregateMap().insert(this, this);
 }
 
@@ -197,12 +201,13 @@ Aggregate::Aggregate(QObject *parent)
     \fn Aggregate::~Aggregate()
 
     Deleting the aggregate automatically deletes all its components.
-*/
+ */
 Aggregate::~Aggregate()
 {
     QWriteLocker locker(&lock());
-    foreach (QObject *component, m_components) {
-        disconnect(component, SIGNAL(destroyed(QObject*)), this, SLOT(deleteSelf(QObject*)));
+
+    foreach(QObject * component, m_components) {
+        disconnect(component, SIGNAL(destroyed(QObject *)), this, SLOT(deleteSelf(QObject *)));
         aggregateMap().remove(component);
     }
     qDeleteAll(m_components);
@@ -226,19 +231,22 @@ void Aggregate::deleteSelf(QObject *obj)
     Adds the \a component to the aggregate.
 
     \sa Aggregate::remove()
-*/
+ */
 void Aggregate::add(QObject *component)
 {
-    if (!component)
+    if (!component) {
         return;
+    }
     QWriteLocker locker(&lock());
     Aggregate *parentAggregation = aggregateMap().value(component);
-    if (parentAggregation == this)
+    if (parentAggregation == this) {
         return;
-    if (parentAggregation)
+    }
+    if (parentAggregation) {
         parentAggregation->remove(component);
+    }
     m_components.append(component);
-    connect(component, SIGNAL(destroyed(QObject*)), this, SLOT(deleteSelf(QObject*)));
+    connect(component, SIGNAL(destroyed(QObject *)), this, SLOT(deleteSelf(QObject *)));
     aggregateMap().insert(component, this);
 }
 
@@ -248,13 +256,14 @@ void Aggregate::add(QObject *component)
     Removes the \a component from the aggregate.
 
     \sa Aggregate::add()
-*/
+ */
 void Aggregate::remove(QObject *component)
 {
-    if (!component)
+    if (!component) {
         return;
+    }
     QWriteLocker locker(&lock());
     aggregateMap().remove(component);
     m_components.removeAll(component);
-    disconnect(component, SIGNAL(destroyed(QObject*)), this, SLOT(deleteSelf(QObject*)));
+    disconnect(component, SIGNAL(destroyed(QObject *)), this, SLOT(deleteSelf(QObject *)));
 }

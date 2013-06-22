@@ -4,25 +4,25 @@
  * @file       basevalidatinglineedit.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -33,17 +33,16 @@
 enum { debug = 0 };
 
 namespace Utils {
-
 struct BaseValidatingLineEditPrivate {
     explicit BaseValidatingLineEditPrivate(const QWidget *w);
 
     const QColor m_okTextColor;
-    QColor m_errorTextColor;
+    QColor  m_errorTextColor;
 
     BaseValidatingLineEdit::State m_state;
     QString m_errorMessage;
     QString m_initialText;
-    bool m_firstChange;
+    bool    m_firstChange;
 };
 
 BaseValidatingLineEditPrivate::BaseValidatingLineEditPrivate(const QWidget *w) :
@@ -51,8 +50,7 @@ BaseValidatingLineEditPrivate::BaseValidatingLineEditPrivate(const QWidget *w) :
     m_errorTextColor(Qt::red),
     m_state(BaseValidatingLineEdit::Invalid),
     m_firstChange(true)
-{
-}
+{}
 
 BaseValidatingLineEdit::BaseValidatingLineEdit(QWidget *parent) :
     QLineEdit(parent),
@@ -87,9 +85,9 @@ QColor BaseValidatingLineEdit::errorColor() const
     return m_bd->m_errorTextColor;
 }
 
-void BaseValidatingLineEdit::setErrorColor(const  QColor &c)
+void BaseValidatingLineEdit::setErrorColor(const QColor &c)
 {
-     m_bd->m_errorTextColor = c;
+    m_bd->m_errorTextColor = c;
 }
 
 QColor BaseValidatingLineEdit::textColor(const QWidget *w)
@@ -100,6 +98,7 @@ QColor BaseValidatingLineEdit::textColor(const QWidget *w)
 void BaseValidatingLineEdit::setTextColor(QWidget *w, const QColor &c)
 {
     QPalette palette = w->palette();
+
     palette.setColor(QPalette::Active, QPalette::Text, c);
     w->setPalette(palette);
 }
@@ -125,11 +124,12 @@ void BaseValidatingLineEdit::slotChanged(const QString &t)
     // Are we displaying the initial text?
     const bool isDisplayingInitialText = !m_bd->m_initialText.isEmpty() && t == m_bd->m_initialText;
     const State newState = isDisplayingInitialText ?
-                               DisplayingInitialText :
-                               (validate(t, &m_bd->m_errorMessage) ? Valid : Invalid);
+                           DisplayingInitialText :
+                           (validate(t, &m_bd->m_errorMessage) ? Valid : Invalid);
     setToolTip(m_bd->m_errorMessage);
-    if (debug)
-        qDebug() << Q_FUNC_INFO << t << "State" <<  m_bd->m_state << "->" << newState << m_bd->m_errorMessage;
+    if (debug) {
+        qDebug() << Q_FUNC_INFO << t << "State" << m_bd->m_state << "->" << newState << m_bd->m_errorMessage;
+    }
     // Changed..figure out if valid changed. DisplayingInitialText is not valid,
     // but should not show error color. Also trigger on the first change.
     if (newState != m_bd->m_state || m_bd->m_firstChange) {
@@ -146,13 +146,13 @@ void BaseValidatingLineEdit::slotChanged(const QString &t)
 
 void BaseValidatingLineEdit::slotReturnPressed()
 {
-    if (isValid())
+    if (isValid()) {
         emit validReturnPressed();
+    }
 }
 
 void BaseValidatingLineEdit::triggerChanged()
 {
     slotChanged(text());
 }
-
 } // namespace Utils

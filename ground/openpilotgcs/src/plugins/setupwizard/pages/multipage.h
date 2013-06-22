@@ -38,10 +38,9 @@ namespace Ui {
 class MultiPage;
 }
 
-class MultiPage : public AbstractWizardPage
-{
+class MultiPage : public AbstractWizardPage {
     Q_OBJECT
-    
+
 public:
     explicit MultiPage(SetupWizard *wizard, QWidget *parent = 0);
     ~MultiPage();
@@ -51,7 +50,7 @@ public:
 
 protected:
     void resizeEvent(QResizeEvent *event);
-    
+
 private:
     Ui::MultiPage *ui;
     void setupMultiTypesCombo();

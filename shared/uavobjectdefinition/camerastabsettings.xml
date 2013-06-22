@@ -4,10 +4,17 @@
         <field name="Input" units="channel" type="enum" elementnames="Roll,Pitch,Yaw" options="Accessory0,Accessory1,Accessory2,Accessory3,Accessory4,Accessory5,None" defaultvalue="None"/>
         <field name="InputRange" units="deg" type="uint8" elementnames="Roll,Pitch,Yaw" defaultvalue="20"/>
         <field name="InputRate" units="deg/s" type="uint8" elementnames="Roll,Pitch,Yaw" defaultvalue="50"/>
-        <field name="ResponseTime" units="ms" type="uint16" elementnames="Roll,Pitch,Yaw" defaultvalue="150"/>
         <field name="StabilizationMode" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="Attitude,AxisLock" defaultvalue="Attitude"/>
         <field name="MaxAxisLockRate" units="deg/s" type="float" elements="1" defaultvalue="1"/>
         <field name="OutputRange" units="deg" type="uint8" elementnames="Roll,Pitch,Yaw" defaultvalue="20"/>
+        <field name="ResponseTime" units="ms" type="uint8" elementnames="Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="GimbalType" units="" type="enum" elements="1" options="Generic,Yaw-Roll-Pitch,Yaw-Pitch-Roll,Roll-Pitch-Mixed" defaultvalue="Generic"/>
+        <field name="FeedForward" units="" type="uint8" elementnames="Roll,Pitch,Yaw" defaultvalue="0"/>
+        <field name="MaxAccel" units="units/sec" type="uint16" elements="1" defaultvalue="500"/>
+        <field name="AccelTime" units="ms" type="uint8" elementnames="Roll,Pitch,Yaw" defaultvalue="5"/>
+        <field name="DecelTime" units="ms" type="uint8" elementnames="Roll,Pitch,Yaw" defaultvalue="5"/>
+        <field name="Servo1PitchReverse" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
+        <field name="Servo2PitchReverse" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

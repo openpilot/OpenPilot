@@ -40,20 +40,19 @@ namespace Ui {
 class ConnectionDiagram;
 }
 
-class ConnectionDiagram : public QDialog
-{
+class ConnectionDiagram : public QDialog {
     Q_OBJECT
-    
+
 public:
     explicit ConnectionDiagram(QWidget *parent, VehicleConfigurationSource *configSource);
     ~ConnectionDiagram();
-    
+
 private:
     Ui::ConnectionDiagram *ui;
     VehicleConfigurationSource *m_configSource;
 
     QSvgRenderer *m_renderer;
-    QGraphicsSvgItem* m_background;
+    QGraphicsSvgItem *m_background;
     QGraphicsScene *m_scene;
 
     void setupGraphicsScene();

@@ -26,21 +26,17 @@
  */
 #include "configgadget.h"
 #include "configgadgetwidget.h"
-#include "configgadgetconfiguration.h"
 
 ConfigGadget::ConfigGadget(QString classId, ConfigGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent), m_widget(widget)
+{}
 
 ConfigGadget::~ConfigGadget()
 {
     delete m_widget;
 }
 
-void ConfigGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void ConfigGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
-   Q_UNUSED(config);
+    Q_UNUSED(config);
 }
-

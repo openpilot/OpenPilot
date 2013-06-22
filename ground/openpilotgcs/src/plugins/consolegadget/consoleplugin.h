@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ConsolePlugin Console Plugin
  * @{
- * @brief The Console Gadget impliments a console view 
+ * @brief The Console Gadget impliments a console view
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,16 +32,15 @@
 
 class ConsoleGadgetFactory;
 
-class ConsolePlugin : public ExtensionSystem::IPlugin
-{
+class ConsolePlugin : public ExtensionSystem::IPlugin {
 public:
-        ConsolePlugin();
-   ~ConsolePlugin();
+    ConsolePlugin();
+    ~ConsolePlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
 private:
-   ConsoleGadgetFactory *mf;
+    ConsoleGadgetFactory *mf;
 };
 #endif /* CONSOLEPLUGIN_H_ */

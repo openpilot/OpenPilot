@@ -28,11 +28,10 @@
 #include "uploadergadgetwidget.h"
 #include "uploadergadgetconfiguration.h"
 
-UploaderGadget::UploaderGadget(QString classId,  UploaderGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+UploaderGadget::UploaderGadget(QString classId, UploaderGadgetWidget *widget, QWidget *parent) :
+    IUAVGadget(classId, parent),
+    m_widget(widget)
+{}
 
 UploaderGadget::~UploaderGadget()
 {
@@ -42,10 +41,9 @@ UploaderGadget::~UploaderGadget()
  * Loads a configuration.
  *
  */
-void UploaderGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void UploaderGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
     Q_UNUSED(config);
 /*    UploaderGadgetConfiguration *m = qobject_cast< UploaderGadgetConfiguration*>(config);
-  */
+ */
 }
-

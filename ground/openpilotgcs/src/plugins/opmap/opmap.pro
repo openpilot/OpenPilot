@@ -1,5 +1,9 @@
 QT += xml
 TEMPLATE = lib
+PATHPLANNER {
+    DEFINES += USE_PATHPLANNER
+}
+
 TARGET = OPMapGadget
 include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)

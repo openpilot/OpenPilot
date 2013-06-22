@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ModelViewPlugin ModelView Plugin
  * @{
- * @brief A gadget that displays a 3D representation of the UAV 
+ * @brief A gadget that displays a 3D representation of the UAV
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -34,32 +34,31 @@
 
 ModelViewPlugin::ModelViewPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
 ModelViewPlugin::~ModelViewPlugin()
 {
-   // Do nothing
+    // Do nothing
 }
 
-bool ModelViewPlugin::initialize(const QStringList& args, QString *errMsg)
+bool ModelViewPlugin::initialize(const QStringList & args, QString *errMsg)
 {
-   Q_UNUSED(args);
-   Q_UNUSED(errMsg);
-   mvf = new ModelViewGadgetFactory(this);
-   addAutoReleasedObject(mvf);
+    Q_UNUSED(args);
+    Q_UNUSED(errMsg);
+    mvf = new ModelViewGadgetFactory(this);
+    addAutoReleasedObject(mvf);
 
-   return true;
+    return true;
 }
 
 void ModelViewPlugin::extensionsInitialized()
 {
-   // Do nothing
+    // Do nothing
 }
 
 void ModelViewPlugin::shutdown()
 {
-   // Do nothing
+    // Do nothing
 }
 Q_EXPORT_PLUGIN(ModelViewPlugin)
-

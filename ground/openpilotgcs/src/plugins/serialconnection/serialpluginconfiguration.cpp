@@ -30,11 +30,13 @@
 #include "utils/pathutils.h"
 #include <coreplugin/icore.h>
 
+#include <QDebug>
+
 /**
  * Loads a saved configuration or defaults if non exist.
  *
  */
-SerialPluginConfiguration::SerialPluginConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+SerialPluginConfiguration::SerialPluginConfiguration(QString classId, QSettings *qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
     m_speed("57600")
 {
@@ -43,6 +45,9 @@ SerialPluginConfiguration::SerialPluginConfiguration(QString classId, QSettings*
     settings = Core::ICore::instance()->settings();
 }
 
+SerialPluginConfiguration::~SerialPluginConfiguration()
+{}
+
 /**
  * Clones a configuration.
  *
@@ -50,7 +55,8 @@ SerialPluginConfiguration::SerialPluginConfiguration(QString classId, QSettings*
 IUAVGadgetConfiguration *SerialPluginConfiguration::clone()
 {
     SerialPluginConfiguration *m = new SerialPluginConfiguration(this->classId());
-        m->m_speed=m_speed;
+
+    m->m_speed = m_speed;
     return m;
 }
 
@@ -58,26 +64,27 @@ IUAVGadgetConfiguration *SerialPluginConfiguration::clone()
  * Saves a configuration.
  *
  */
-void SerialPluginConfiguration::saveConfig(QSettings* settings) const {
-   settings->setValue("speed", m_speed);
+void SerialPluginConfiguration::saveConfig(QSettings *settings) const
+{
+    settings->setValue("speed", m_speed);
 }
+
 void SerialPluginConfiguration::restoresettings()
 {
     settings->beginGroup(QLatin1String("SerialConnection"));
-    QString str=(settings->value(QLatin1String("speed"), tr("")).toString());
-    if(str.isEmpty())
-        m_speed="57600";
-    else
-        m_speed=str;
+    QString str = (settings->value(QLatin1String("speed"), tr("")).toString());
+    qDebug() << "SerialPluginConfiguration::restoresettings - speed" << str;
+    if (str.isEmpty()) {
+        m_speed = "57600";
+    } else {
+        m_speed = str;
+    }
     settings->endGroup();
-
 }
+
 void SerialPluginConfiguration::savesettings() const
 {
     settings->beginGroup(QLatin1String("SerialConnection"));
     settings->setValue(QLatin1String("speed"), m_speed);
     settings->endGroup();
-}
-SerialPluginConfiguration::~SerialPluginConfiguration()
-{
 }

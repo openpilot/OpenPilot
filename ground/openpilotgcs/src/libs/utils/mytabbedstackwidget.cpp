@@ -33,10 +33,10 @@
 
 MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool iconAbove)
     : QWidget(parent),
-      m_vertical(isVertical),
-      m_iconAbove(iconAbove)
+    m_vertical(isVertical),
+    m_iconAbove(iconAbove)
 {
-    m_listWidget = new MyListWidget(this);
+    m_listWidget  = new MyListWidget(this);
     m_listWidget->setIconAbove(m_iconAbove);
     m_stackWidget = new QStackedWidget();
     m_stackWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -69,7 +69,7 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
     m_stackWidget->setContentsMargins(0, 0, 0, 0);
     setLayout(toplevelLayout);
 
-    connect(m_listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(showWidget(int)),Qt::QueuedConnection);
+    connect(m_listWidget, SIGNAL(currentRowChanged(int)), this, SLOT(showWidget(int)), Qt::QueuedConnection);
 }
 
 void MyTabbedStackWidget::insertTab(const int index, QWidget *tab, const QIcon &icon, const QString &label)
@@ -83,12 +83,20 @@ void MyTabbedStackWidget::insertTab(const int index, QWidget *tab, const QIcon &
 
 void MyTabbedStackWidget::removeTab(int index)
 {
-    QWidget * wid=m_stackWidget->widget(index);
+    QWidget *wid = m_stackWidget->widget(index);
+
     m_stackWidget->removeWidget(wid);
     delete wid;
     QListWidgetItem *item = m_listWidget->item(index);
     m_listWidget->removeItemWidget(item);
     delete item;
+}
+
+void MyTabbedStackWidget::setWidgetsEnabled(bool enabled)
+{
+    for (int i = 0; i < m_stackWidget->count(); i++) {
+        m_stackWidget->widget(i)->setEnabled(enabled);
+    }
 }
 
 int MyTabbedStackWidget::currentIndex() const
@@ -103,18 +111,16 @@ void MyTabbedStackWidget::setCurrentIndex(int index)
 
 void MyTabbedStackWidget::showWidget(int index)
 {
-    if(m_stackWidget->currentIndex()==index)
+    if (m_stackWidget->currentIndex() == index) {
         return;
-    bool proceed=false;
-    emit currentAboutToShow(index,&proceed);
-    if(proceed)
-    {
+    }
+    bool proceed = false;
+    emit currentAboutToShow(index, &proceed);
+    if (proceed) {
         m_stackWidget->setCurrentIndex(index);
         emit currentChanged(index);
-    }
-    else
-    {
-        m_listWidget->setCurrentRow(m_stackWidget->currentIndex(),QItemSelectionModel::ClearAndSelect);
+    } else {
+        m_listWidget->setCurrentRow(m_stackWidget->currentIndex(), QItemSelectionModel::ClearAndSelect);
     }
 }
 
@@ -124,4 +130,3 @@ void MyTabbedStackWidget::insertCornerWidget(int index, QWidget *widget)
 
     widget->hide();
 }
-

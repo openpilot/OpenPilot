@@ -35,7 +35,6 @@
  */
 GpsConstellationWidget::GpsConstellationWidget(QWidget *parent) : QGraphicsView(parent)
 {
-
     // Create a layout, add a QGraphicsView and put the SVG inside.
     // The constellation widget looks like this:
     // |--------------------|
@@ -64,7 +63,7 @@ GpsConstellationWidget::GpsConstellationWidget(QWidget *parent) : QGraphicsView(
     setScene(scene);
 
     // Now create 'maxSatellites' satellite icons which we will move around on the map:
-    for (int i=0; i < MAX_SATTELITES;i++) {
+    for (int i = 0; i < MAX_SATTELITES; i++) {
         satellites[i][0] = 0;
         satellites[i][1] = 0;
         satellites[i][2] = 0;
@@ -75,7 +74,7 @@ GpsConstellationWidget::GpsConstellationWidget(QWidget *parent) : QGraphicsView(
         satIcons[i]->setElementId("sat-notSeen");
         satIcons[i]->hide();
 
-        satTexts[i] = new QGraphicsSimpleTextItem("##",satIcons[i]);
+        satTexts[i] = new QGraphicsSimpleTextItem("##", satIcons[i]);
         satTexts[i]->setBrush(QColor("Black"));
         satTexts[i]->setFont(QFont("Courier"));
     }
@@ -86,8 +85,8 @@ GpsConstellationWidget::~GpsConstellationWidget()
     delete scene;
     scene = 0;
 
-    //delete renderer;
-    //renderer = 0;
+    // delete renderer;
+    // renderer = 0;
 }
 
 void GpsConstellationWidget::showEvent(QShowEvent *event)
@@ -98,13 +97,12 @@ void GpsConstellationWidget::showEvent(QShowEvent *event)
     // the result is usually a ahrsbargraph that is way too small.
     fitInView(world, Qt::KeepAspectRatio);
     // Scale, can't use fitInView since that doesn't work until we're shown.
- //   qreal factor = height()/world->boundingRect().height();
-//    world->setScale(factor);
- //   setSceneRect(world->boundingRect());
-
+    // qreal factor = height()/world->boundingRect().height();
+// world->setScale(factor);
+// setSceneRect(world->boundingRect());
 }
 
-void GpsConstellationWidget::resizeEvent(QResizeEvent* event)
+void GpsConstellationWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
     fitInView(world, Qt::KeepAspectRatio);
@@ -124,10 +122,10 @@ void GpsConstellationWidget::updateSat(int index, int prn, int elevation, int az
     satellites[index][3] = snr;
 
     if (prn && elevation >= 0) {
-        QPointF opd = polarToCoord(elevation,azimuth);
+        QPointF opd = polarToCoord(elevation, azimuth);
         opd += QPointF(-satIcons[index]->boundingRect().center().x(),
                        -satIcons[index]->boundingRect().center().y());
-        satIcons[index]->setTransform(QTransform::fromTranslate(opd.x(),opd.y()), false);
+        satIcons[index]->setTransform(QTransform::fromTranslate(opd.x(), opd.y()), false);
         if (snr) {
             satIcons[index]->setElementId("satellite");
         } else {
@@ -135,30 +133,29 @@ void GpsConstellationWidget::updateSat(int index, int prn, int elevation, int az
         }
         satIcons[index]->show();
 
-        QRectF iconRect = satIcons[index]->boundingRect();
+        QRectF iconRect   = satIcons[index]->boundingRect();
         QString prnString = QString().number(prn);
-        if(prnString.length() == 1) {
+        if (prnString.length() == 1) {
             prnString = "0" + prnString;
         }
         satTexts[index]->setText(prnString);
         QRectF textRect = satTexts[index]->boundingRect();
 
         QTransform matrix;
-        qreal scale = 0.70 * (iconRect.width() / textRect.width());
-        matrix.translate(iconRect.width()/2, iconRect.height()/2);
-        matrix.scale(scale,scale);
-        matrix.translate(-textRect.width()/2,-textRect.height()/2);
-        satTexts[index]->setTransform(matrix,false);
+        qreal scale     = 0.70 * (iconRect.width() / textRect.width());
+        matrix.translate(iconRect.width() / 2, iconRect.height() / 2);
+        matrix.scale(scale, scale);
+        matrix.translate(-textRect.width() / 2, -textRect.height() / 2);
+        satTexts[index]->setTransform(matrix, false);
     } else {
         satIcons[index]->hide();
     }
-
 }
 
 /**
-  Converts the elevation/azimuth to X/Y coordinates on the map
+   Converts the elevation/azimuth to X/Y coordinates on the map
 
-  */
+ */
 QPointF GpsConstellationWidget::polarToCoord(int elevation, int azimuth)
 {
     double x;
@@ -167,18 +164,17 @@ QPointF GpsConstellationWidget::polarToCoord(int elevation, int azimuth)
     double rad_azimuth;
 
 
-    rad_elevation = M_PI*elevation/180;
-    rad_azimuth = M_PI*azimuth/180;
+    rad_elevation = M_PI * elevation / 180;
+    rad_azimuth   = M_PI * azimuth / 180;
 
-    x = cos(rad_elevation)*sin(rad_azimuth);
-    y = -cos(rad_elevation)*cos(rad_azimuth);
+    x = cos(rad_elevation) * sin(rad_azimuth);
+    y = -cos(rad_elevation) * cos(rad_azimuth);
 
-    x = world->boundingRect().width()/2 * x;
-    y = world->boundingRect().height()/2 * y;
+    x = world->boundingRect().width() / 2 * x;
+    y = world->boundingRect().height() / 2 * y;
 
     x = (world->boundingRect().width() / 2) + x;
     y = (world->boundingRect().height() / 2) + y;
 
-    return QPointF(x,y);
-
+    return QPointF(x, y);
 }

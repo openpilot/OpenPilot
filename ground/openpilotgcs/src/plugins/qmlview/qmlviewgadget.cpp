@@ -8,7 +8,7 @@
  * @{
  * @addtogroup OPMapPlugin QML Viewer Plugin
  * @{
- * @brief The QML Viewer Gadget 
+ * @brief The QML Viewer Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -31,10 +31,9 @@
 #include "qmlviewgadgetconfiguration.h"
 
 QmlViewGadget::QmlViewGadget(QString classId, QmlViewGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent),
+    m_widget(widget)
+{}
 
 QmlViewGadget::~QmlViewGadget()
 {
@@ -42,14 +41,15 @@ QmlViewGadget::~QmlViewGadget()
 }
 
 /*
-  This is called when a configuration is loaded, and updates the plugin's settings.
-  Careful: the plugin is already drawn before the loadConfiguration method is called the
-  first time, so you have to be careful not to assume all the plugin values are initialized
-  the first time you use them
+   This is called when a configuration is loaded, and updates the plugin's settings.
+   Careful: the plugin is already drawn before the loadConfiguration method is called the
+   first time, so you have to be careful not to assume all the plugin values are initialized
+   the first time you use them
  */
-void QmlViewGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void QmlViewGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
-    QmlViewGadgetConfiguration *m = qobject_cast<QmlViewGadgetConfiguration*>(config);
+    QmlViewGadgetConfiguration *m = qobject_cast<QmlViewGadgetConfiguration *>(config);
+
     m_widget->setQmlFile(m->dialFile());
     m_widget->enableOpenGL(m->useOpenGL());
 }

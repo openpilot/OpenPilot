@@ -32,13 +32,12 @@ homeEditor::homeEditor(HomeItem *home, QWidget *parent) :
     ui(new Ui::homeEditor),
     myhome(home)
 {
-    if(!home)
-    {
+    if (!home) {
         deleteLater();
         return;
     }
     ui->setupUi(this);
-    this->setAttribute(Qt::WA_DeleteOnClose,true);
+    this->setAttribute(Qt::WA_DeleteOnClose, true);
     ui->altitude->setValue(home->Altitude());
     ui->latitude->setValue(home->Coord().Lat());
     ui->longitude->setValue(home->Coord().Lng());
@@ -52,7 +51,7 @@ homeEditor::~homeEditor()
 
 void homeEditor::on_buttonBox_accepted()
 {
-    myhome->SetCoord(internals::PointLatLng(ui->latitude->value(),ui->longitude->value()));
+    myhome->SetCoord(internals::PointLatLng(ui->latitude->value(), ui->longitude->value()));
     myhome->SetAltitude(ui->altitude->value());
 }
 

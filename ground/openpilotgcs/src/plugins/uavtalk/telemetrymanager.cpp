@@ -35,17 +35,16 @@ TelemetryManager::TelemetryManager() :
 {
     moveToThread(Core::ICore::instance()->threadManager()->getRealTimeThread());
     // Get UAVObjectManager instance
-    ExtensionSystem::PluginManager* pm = ExtensionSystem::PluginManager::instance();
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     objMngr = pm->getObject<UAVObjectManager>();
 
     // connect to start stop signals
-    connect(this, SIGNAL(myStart()), this, SLOT(onStart()),Qt::QueuedConnection);
-    connect(this, SIGNAL(myStop()), this, SLOT(onStop()),Qt::QueuedConnection);
+    connect(this, SIGNAL(myStart()), this, SLOT(onStart()), Qt::QueuedConnection);
+    connect(this, SIGNAL(myStop()), this, SLOT(onStop()), Qt::QueuedConnection);
 }
 
 TelemetryManager::~TelemetryManager()
-{
-}
+{}
 
 bool TelemetryManager::isConnected()
 {
@@ -54,14 +53,14 @@ bool TelemetryManager::isConnected()
 
 void TelemetryManager::start(QIODevice *dev)
 {
-    device=dev;
+    device = dev;
     emit myStart();
 }
 
 void TelemetryManager::onStart()
 {
-    utalk = new UAVTalk(device, objMngr);
-    telemetry = new Telemetry(utalk, objMngr);
+    utalk        = new UAVTalk(device, objMngr);
+    telemetry    = new Telemetry(utalk, objMngr);
     telemetryMon = new TelemetryMonitor(objMngr, telemetry);
     connect(telemetryMon, SIGNAL(connected()), this, SLOT(onConnect()));
     connect(telemetryMon, SIGNAL(disconnected()), this, SLOT(onDisconnect()));

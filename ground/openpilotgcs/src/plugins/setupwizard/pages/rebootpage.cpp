@@ -46,7 +46,7 @@ RebootPage::~RebootPage()
 
 void RebootPage::initializePage()
 {
-    if(!m_timer.isActive()) {
+    if (!m_timer.isActive()) {
         connect(&m_timer, SIGNAL(timeout()), this, SLOT(toggleLabel()));
         m_timer.setInterval(500);
         m_timer.setSingleShot(false);

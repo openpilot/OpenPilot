@@ -1,0 +1,18 @@
+<xml>
+    <object name="GroundTruth" singleinstance="true" settings="false">
+        <description>Ground truth data output by a simulator.</description>
+        <field name="AccelerationXYZ" units="m/s^2" type="float" elements="3"/>
+        <field name="PositionNED" units="m" type="float" elements="3"/>
+        <field name="VelocityNED" units="m/s" type="float" elements="3"/>
+        <field name="RPY" units="deg" type="float" elements="3"/>
+        <field name="AngularRates" units="deg/s" type="float" elements="3"/>
+        <field name="TrueAirspeed" units="m/s" type="float" elements="1"/>
+        <field name="CalibratedAirspeed" units="m/s" type="float" elements="1"/>
+        <field name="AngleOfAttack" units="deg" type="float" elements="1"/>
+        <field name="AngleOfSlip" units="deg" type="float" elements="1"/>
+        <access gcs="readwrite" flight="readonly"/>
+        <telemetrygcs acked="false" updatemode="periodic" period="1000"/>
+        <telemetryflight acked="false" updatemode="manual" period="50000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

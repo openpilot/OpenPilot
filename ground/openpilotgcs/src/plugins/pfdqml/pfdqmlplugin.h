@@ -21,16 +21,15 @@
 
 class PfdQmlGadgetFactory;
 
-class PfdQmlPlugin : public ExtensionSystem::IPlugin
-{
+class PfdQmlPlugin : public ExtensionSystem::IPlugin {
 public:
-   PfdQmlPlugin();
-   ~PfdQmlPlugin();
+    PfdQmlPlugin();
+    ~PfdQmlPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList &arguments, QString *errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList &arguments, QString *errorString);
+    void shutdown();
 private:
-   PfdQmlGadgetFactory *mf;
+    PfdQmlGadgetFactory *mf;
 };
 #endif /* PFDQMLPLUGIN_H_ */

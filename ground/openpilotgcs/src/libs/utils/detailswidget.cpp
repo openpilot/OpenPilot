@@ -4,25 +4,25 @@
  * @file       detailswidget.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief      
+ * @brief
  * @see        The GNU Public License (GPL) Version 3
- * @defgroup   
+ * @defgroup
  * @{
- * 
+ *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -39,12 +39,11 @@ using namespace Utils;
 
 DetailsWidget::DetailsWidget(QWidget *parent)
     : QWidget(parent),
-      m_summaryLabel(new QLabel(this)),
-      m_detailsButton(new DetailsButton(this)),
-      m_widget(0),
-      m_toolWidget(0),
-      m_grid(new QGridLayout(this))
-
+    m_summaryLabel(new QLabel(this)),
+    m_detailsButton(new DetailsButton(this)),
+    m_widget(0),
+    m_toolWidget(0),
+    m_grid(new QGridLayout(this))
 {
     m_grid->setContentsMargins(4, 3, 4, 3);
 
@@ -65,26 +64,25 @@ DetailsWidget::DetailsWidget(QWidget *parent)
 }
 
 DetailsWidget::~DetailsWidget()
-{
-
-}
+{}
 
 void DetailsWidget::paintEvent(QPaintEvent *paintEvent)
 {
-    //TL-->                 ___________  <-- TR
-    //                     |           |
-    //ML->   ______________| <--MM     | <--MR
-    //       |                         |
-    //BL->   |_________________________| <-- BR
+    // TL-->                 ___________  <-- TR
+    // |           |
+    // ML->   ______________| <--MM     | <--MR
+    // |                         |
+    // BL->   |_________________________| <-- BR
 
 
     QWidget::paintEvent(paintEvent);
 
-    if (!m_detailsButton->isToggled())
+    if (!m_detailsButton->isToggled()) {
         return;
+    }
 
     const QRect detailsGeometry = m_detailsButton->geometry();
-    const QRect widgetGeometry = m_widget ? m_widget->geometry() : QRect(x(), y() + height(), width(), 0);
+    const QRect widgetGeometry  = m_widget ? m_widget->geometry() : QRect(x(), y() + height(), width(), 0);
 
     QPoint tl(detailsGeometry.topLeft());
     tl += QPoint(-3, -3);
@@ -114,8 +112,10 @@ void DetailsWidget::paintEvent(QPaintEvent *paintEvent)
 void DetailsWidget::detailsButtonClicked()
 {
     bool visible = m_detailsButton->isToggled();
-    if (m_widget)
+
+    if (m_widget) {
         m_widget->setVisible(visible);
+    }
     m_dummyWidget->setVisible(visible);
     fixUpLayout();
 }
@@ -137,8 +137,9 @@ bool DetailsWidget::expanded() const
 
 void DetailsWidget::setExpanded(bool v)
 {
-    if (expanded() != v)
+    if (expanded() != v) {
         m_detailsButton->animateClick();
+    }
 }
 
 QWidget *DetailsWidget::widget() const
@@ -148,8 +149,9 @@ QWidget *DetailsWidget::widget() const
 
 void DetailsWidget::setWidget(QWidget *widget)
 {
-    if (m_widget == widget)
+    if (m_widget == widget) {
         return;
+    }
     if (m_widget) {
         m_grid->removeWidget(m_widget);
         m_widget = 0;
@@ -165,8 +167,9 @@ void DetailsWidget::setWidget(QWidget *widget)
 
 void DetailsWidget::setToolWidget(QWidget *widget)
 {
-    if (m_toolWidget == widget)
+    if (m_toolWidget == widget) {
         return;
+    }
     if (m_toolWidget) {
         m_grid->removeWidget(m_toolWidget);
         m_toolWidget = 0;
@@ -184,16 +187,17 @@ QWidget *DetailsWidget::toolWidget() const
 
 void DetailsWidget::fixUpLayout()
 {
-    if (!m_widget)
+    if (!m_widget) {
         return;
+    }
     QWidget *parent = m_widget;
     QStack<QWidget *> widgets;
-    while((parent = parent->parentWidget()) && parent && parent->layout()) {
+    while ((parent = parent->parentWidget()) && parent && parent->layout()) {
         widgets.push(parent);
         parent->layout()->update();
     }
 
-    while(!widgets.isEmpty()) {
+    while (!widgets.isEmpty()) {
         widgets.pop()->layout()->activate();
     }
 }

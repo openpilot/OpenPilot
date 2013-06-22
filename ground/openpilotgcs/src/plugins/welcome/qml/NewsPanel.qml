@@ -10,7 +10,7 @@ Item {
 
     Text {
         id: header
-        text: "Project News"
+        text: qsTr("Project News")
         width: parent.width
         color: "#44515c"
         font {
@@ -53,7 +53,7 @@ Item {
                 spacing: 4
                 Text {
                     text: title
-                    width: view.width
+                    width: view.width - 4
                     textFormat: text.indexOf("&") > 0 ? Text.StyledText : Text.PlainText
                     elide: Text.ElideRight
                     font.bold: true
@@ -62,8 +62,10 @@ Item {
 
                 Text {
                     text: description
-                    width: view.width
+                    width: view.width - 4
                     textFormat: text.indexOf("&") > 0 ? Text.StyledText : Text.PlainText
+                    maximumLineCount: 3
+                    wrapMode: Text.WordWrap
                     elide: Text.ElideRight
                     color: mouseArea.containsMouse ? "#224d81" : "black"
                 }

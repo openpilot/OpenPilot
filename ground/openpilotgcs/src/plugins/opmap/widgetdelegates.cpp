@@ -29,31 +29,35 @@
 #include <QRadioButton>
 #include <QDebug>
 QWidget *MapDataDelegate::createEditor(QWidget *parent,
-                                        const QStyleOptionViewItem & option,
-                                        const QModelIndex & index) const
+                                       const QStyleOptionViewItem & option,
+                                       const QModelIndex & index) const
 {
-    int column=index.column();
-    QComboBox * box;
-    switch(column)
-    {
+    int column = index.column();
+    QComboBox *box;
+
+    switch (column) {
     case flightDataModel::MODE:
-        box=new QComboBox(parent);
-        MapDataDelegate::loadComboBox(box,flightDataModel::MODE);
+        box = new QComboBox(parent);
+        MapDataDelegate::loadComboBox(box, flightDataModel::MODE);
         return box;
+
         break;
     case flightDataModel::CONDITION:
-        box=new QComboBox(parent);
-        MapDataDelegate::loadComboBox(box,flightDataModel::CONDITION);
+        box = new QComboBox(parent);
+        MapDataDelegate::loadComboBox(box, flightDataModel::CONDITION);
         return box;
+
         break;
 
     case flightDataModel::COMMAND:
-        box=new QComboBox(parent);
-        MapDataDelegate::loadComboBox(box,flightDataModel::COMMAND);
+        box = new QComboBox(parent);
+        MapDataDelegate::loadComboBox(box, flightDataModel::COMMAND);
         return box;
+
         break;
     default:
-        return QItemDelegate::createEditor(parent,option,index);
+        return QItemDelegate::createEditor(parent, option, index);
+
         break;
     }
 
@@ -62,82 +66,84 @@ QWidget *MapDataDelegate::createEditor(QWidget *parent,
 }
 
 void MapDataDelegate::setEditorData(QWidget *editor,
-                                     const QModelIndex &index) const
+                                    const QModelIndex &index) const
 {
-    if(!index.isValid())
+    if (!index.isValid()) {
         return;
-    QString className=editor->metaObject()->className();
+    }
+    QString className = editor->metaObject()->className();
     if (className.contains("QComboBox")) {
         int value = index.model()->data(index, Qt::EditRole).toInt();
-        QComboBox *comboBox = static_cast<QComboBox*>(editor);
-        int x=comboBox->findData(value);
-        qDebug()<<"VALUE="<<x;
+        QComboBox *comboBox = static_cast<QComboBox *>(editor);
+        int x     = comboBox->findData(value);
+        qDebug() << "VALUE=" << x;
         comboBox->setCurrentIndex(x);
-    }
-    else
+    } else {
         QItemDelegate::setEditorData(editor, index);
+    }
 }
 
 void MapDataDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
-                                    const QModelIndex &index) const
+                                   const QModelIndex &index) const
 {
-    QString className=editor->metaObject()->className();
+    QString className = editor->metaObject()->className();
+
     if (className.contains("QComboBox")) {
-        QComboBox *comboBox = static_cast<QComboBox*>(editor);
+        QComboBox *comboBox = static_cast<QComboBox *>(editor);
         int value = comboBox->itemData(comboBox->currentIndex()).toInt();
         model->setData(index, value, Qt::EditRole);
+    } else {
+        QItemDelegate::setModelData(editor, model, index);
     }
-    else
-        QItemDelegate::setModelData(editor,model,index);
 }
 
 void MapDataDelegate::updateEditorGeometry(QWidget *editor,
-                                            const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
+                                           const QStyleOptionViewItem &option, const QModelIndex & /* index */) const
 {
     editor->setGeometry(option.rect);
 }
 
 void MapDataDelegate::loadComboBox(QComboBox *combo, flightDataModel::pathPlanDataEnum type)
 {
-    switch(type)
-    {
+    switch (type) {
     case flightDataModel::MODE:
-        combo->addItem("Fly Direct",MODE_FLYENDPOINT);
-        combo->addItem("Fly Vector",MODE_FLYVECTOR);
-        combo->addItem("Fly Circle Right",MODE_FLYCIRCLERIGHT);
-        combo->addItem("Fly Circle Left",MODE_FLYCIRCLELEFT);
+        combo->addItem("Fly Direct", MODE_FLYENDPOINT);
+        combo->addItem("Fly Vector", MODE_FLYVECTOR);
+        combo->addItem("Fly Circle Right", MODE_FLYCIRCLERIGHT);
+        combo->addItem("Fly Circle Left", MODE_FLYCIRCLELEFT);
 
-        combo->addItem("Drive Direct",MODE_DRIVEENDPOINT);
-        combo->addItem("Drive Vector",MODE_DRIVEVECTOR);
-        combo->addItem("Drive Circle Right",MODE_DRIVECIRCLELEFT);
-        combo->addItem("Drive Circle Left",MODE_DRIVECIRCLERIGHT);
+        combo->addItem("Drive Direct", MODE_DRIVEENDPOINT);
+        combo->addItem("Drive Vector", MODE_DRIVEVECTOR);
+        combo->addItem("Drive Circle Right", MODE_DRIVECIRCLELEFT);
+        combo->addItem("Drive Circle Left", MODE_DRIVECIRCLERIGHT);
 
-        combo->addItem("Fixed Attitude",MODE_FIXEDATTITUDE);
-        combo->addItem("Set Accessory",MODE_SETACCESSORY);
-        combo->addItem("Disarm Alarm",MODE_DISARMALARM);
+        combo->addItem("Fixed Attitude", MODE_FIXEDATTITUDE);
+        combo->addItem("Set Accessory", MODE_SETACCESSORY);
+        combo->addItem("Disarm Alarm", MODE_DISARMALARM);
         break;
     case flightDataModel::CONDITION:
-        combo->addItem("None",ENDCONDITION_NONE);
-        combo->addItem("Timeout",ENDCONDITION_TIMEOUT);
-        combo->addItem("Distance to tgt",ENDCONDITION_DISTANCETOTARGET);
-        combo->addItem("Leg remaining",ENDCONDITION_LEGREMAINING);
-        combo->addItem("Above Altitude",ENDCONDITION_ABOVEALTITUDE);
-        combo->addItem("Pointing towards next",ENDCONDITION_POINTINGTOWARDSNEXT);
-        combo->addItem("Python script",ENDCONDITION_PYTHONSCRIPT);
-        combo->addItem("Immediate",ENDCONDITION_IMMEDIATE);
+        combo->addItem("None", ENDCONDITION_NONE);
+        combo->addItem("Timeout", ENDCONDITION_TIMEOUT);
+        combo->addItem("Distance to tgt", ENDCONDITION_DISTANCETOTARGET);
+        combo->addItem("Leg remaining", ENDCONDITION_LEGREMAINING);
+        combo->addItem("Below Error", ENDCONDITION_BELOWERROR);
+        combo->addItem("Above Altitude", ENDCONDITION_ABOVEALTITUDE);
+        combo->addItem("Above Speed", ENDCONDITION_ABOVESPEED);
+        combo->addItem("Pointing towards next", ENDCONDITION_POINTINGTOWARDSNEXT);
+        combo->addItem("Python script", ENDCONDITION_PYTHONSCRIPT);
+        combo->addItem("Immediate", ENDCONDITION_IMMEDIATE);
         break;
     case flightDataModel::COMMAND:
-        combo->addItem("On conditon next wp",COMMAND_ONCONDITIONNEXTWAYPOINT);
-        combo->addItem("On NOT conditon next wp",COMMAND_ONNOTCONDITIONNEXTWAYPOINT);
-        combo->addItem("On conditon jump wp",COMMAND_ONCONDITIONJUMPWAYPOINT);
-        combo->addItem("On NOT conditon jump wp",COMMAND_ONNOTCONDITIONJUMPWAYPOINT);
-        combo->addItem("On conditon jump wp else next wp",COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT);
+        combo->addItem("On conditon next wp", COMMAND_ONCONDITIONNEXTWAYPOINT);
+        combo->addItem("On NOT conditon next wp", COMMAND_ONNOTCONDITIONNEXTWAYPOINT);
+        combo->addItem("On conditon jump wp", COMMAND_ONCONDITIONJUMPWAYPOINT);
+        combo->addItem("On NOT conditon jump wp", COMMAND_ONNOTCONDITIONJUMPWAYPOINT);
+        combo->addItem("On conditon jump wp else next wp", COMMAND_IFCONDITIONJUMPWAYPOINTELSENEXTWAYPOINT);
         break;
     default:
         break;
     }
 }
 
-MapDataDelegate::MapDataDelegate(QObject *parent):QItemDelegate(parent)
-{
-}
+MapDataDelegate::MapDataDelegate(QObject *parent) : QItemDelegate(parent)
+{}

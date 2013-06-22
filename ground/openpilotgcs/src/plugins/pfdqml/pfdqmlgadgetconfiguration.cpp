@@ -31,23 +31,35 @@ PfdQmlGadgetConfiguration::PfdQmlGadgetConfiguration(QString classId, QSettings 
     m_latitude(0),
     m_longitude(0),
     m_altitude(0),
-    m_cacheOnly(false)
+    m_cacheOnly(false),
+    m_speedFactor(1.0),
+    m_altitudeFactor(1.0)
 {
-    //if a saved configuration exists load it
-    if(qSettings != 0) {
-        m_qmlFile = qSettings->value("qmlFile").toString();
-        m_qmlFile=Utils::PathUtils().InsertDataPath(m_qmlFile);
+    m_speedMap[1.0]       = "m/s";
+    m_speedMap[3.6]       = "km/h";
+    m_speedMap[2.2369]    = "mph";
+    m_speedMap[1.9438]    = "knots";
 
-        m_earthFile = qSettings->value("earthFile").toString();
-        m_earthFile=Utils::PathUtils().InsertDataPath(m_earthFile);
+    m_altitudeMap[1.0]    = "m";
+    m_altitudeMap[3.2808] = "ft";
 
-        m_openGLEnabled = qSettings->value("openGLEnabled", true).toBool();
-        m_terrainEnabled = qSettings->value("terrainEnabled").toBool();
+    // if a saved configuration exists load it
+    if (qSettings != 0) {
+        m_qmlFile            = qSettings->value("qmlFile").toString();
+        m_qmlFile            = Utils::PathUtils().InsertDataPath(m_qmlFile);
+
+        m_earthFile          = qSettings->value("earthFile").toString();
+        m_earthFile          = Utils::PathUtils().InsertDataPath(m_earthFile);
+
+        m_openGLEnabled      = qSettings->value("openGLEnabled", true).toBool();
+        m_terrainEnabled     = qSettings->value("terrainEnabled").toBool();
         m_actualPositionUsed = qSettings->value("actualPositionUsed").toBool();
-        m_latitude = qSettings->value("latitude").toDouble();
-        m_longitude = qSettings->value("longitude").toDouble();
-        m_altitude = qSettings->value("altitude").toDouble();
-        m_cacheOnly = qSettings->value("cacheOnly").toBool();
+        m_latitude           = qSettings->value("latitude").toDouble();
+        m_longitude          = qSettings->value("longitude").toDouble();
+        m_altitude           = qSettings->value("altitude").toDouble();
+        m_cacheOnly          = qSettings->value("cacheOnly").toBool();
+        m_speedFactor        = qSettings->value("speedFactor").toDouble();
+        m_altitudeFactor     = qSettings->value("altitudeFactor").toDouble();
     }
 }
 
@@ -58,15 +70,18 @@ PfdQmlGadgetConfiguration::PfdQmlGadgetConfiguration(QString classId, QSettings 
 IUAVGadgetConfiguration *PfdQmlGadgetConfiguration::clone()
 {
     PfdQmlGadgetConfiguration *m = new PfdQmlGadgetConfiguration(this->classId());
-    m->m_qmlFile = m_qmlFile;
-    m->m_openGLEnabled = m_openGLEnabled;
-    m->m_earthFile = m_earthFile;
-    m->m_terrainEnabled = m_terrainEnabled;
+
+    m->m_qmlFile            = m_qmlFile;
+    m->m_openGLEnabled      = m_openGLEnabled;
+    m->m_earthFile          = m_earthFile;
+    m->m_terrainEnabled     = m_terrainEnabled;
     m->m_actualPositionUsed = m_actualPositionUsed;
-    m->m_latitude = m_latitude;
-    m->m_longitude = m_longitude;
-    m->m_altitude = m_altitude;
-    m->m_cacheOnly = m_cacheOnly;
+    m->m_latitude           = m_latitude;
+    m->m_longitude          = m_longitude;
+    m->m_altitude           = m_altitude;
+    m->m_cacheOnly          = m_cacheOnly;
+    m->m_speedFactor        = m_speedFactor;
+    m->m_altitudeFactor     = m_altitudeFactor;
 
     return m;
 }
@@ -75,8 +90,10 @@ IUAVGadgetConfiguration *PfdQmlGadgetConfiguration::clone()
  * Saves a configuration.
  *
  */
-void PfdQmlGadgetConfiguration::saveConfig(QSettings* qSettings) const {
-    QString qmlFile = Utils::PathUtils().RemoveDataPath(m_qmlFile);
+void PfdQmlGadgetConfiguration::saveConfig(QSettings *qSettings) const
+{
+    QString qmlFile   = Utils::PathUtils().RemoveDataPath(m_qmlFile);
+
     qSettings->setValue("qmlFile", qmlFile);
     QString earthFile = Utils::PathUtils().RemoveDataPath(m_earthFile);
     qSettings->setValue("earthFile", earthFile);
@@ -88,4 +105,6 @@ void PfdQmlGadgetConfiguration::saveConfig(QSettings* qSettings) const {
     qSettings->setValue("longitude", m_longitude);
     qSettings->setValue("altitude", m_altitude);
     qSettings->setValue("cacheOnly", m_cacheOnly);
+    qSettings->setValue("speedFactor", m_speedFactor);
+    qSettings->setValue("altitudeFactor", m_altitudeFactor);
 }

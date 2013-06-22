@@ -7,7 +7,7 @@
  * @{
  * @addtogroup ConsolePlugin Console Plugin
  * @{
- * @brief The Console Gadget impliments a console view 
+ * @brief The Console Gadget impliments a console view
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -37,8 +37,7 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class ConsoleGadgetFactory : public IUAVGadgetFactory
-{
+class ConsoleGadgetFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
     ConsoleGadgetFactory(QObject *parent = 0);

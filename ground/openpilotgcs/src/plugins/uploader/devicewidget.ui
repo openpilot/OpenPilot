@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>576</width>
+    <width>584</width>
     <height>500</height>
    </rect>
   </property>
@@ -24,10 +24,16 @@
        <layout class="QHBoxLayout" name="horizontalLayout_6">
         <item>
          <widget class="QGraphicsView" name="gVDevice">
-          <property name="maximumSize">
+          <property name="minimumSize">
            <size>
             <width>160</width>
             <height>160</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>350</width>
+            <height>350</height>
            </size>
           </property>
           <property name="styleSheet">
@@ -35,6 +41,9 @@
           </property>
           <property name="frameShape">
            <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="renderHints">
+           <set>QPainter::HighQualityAntialiasing</set>
           </property>
          </widget>
         </item>
@@ -101,9 +110,9 @@
                </widget>
               </item>
               <item>
-               <widget class="QCheckBox" name="youdont">
+               <widget class="QCheckBox" name="confirmCheckBox">
                 <property name="text">
-                 <string>I know what I'm doing</string>
+                 <string>I know what I'm doing!</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>

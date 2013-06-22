@@ -1,8 +1,8 @@
 <xml>
     <object name="ActuatorCommand" singleinstance="true" settings="false">
         <description>Contains the pulse duration sent to each of the channels.  Set by @ref ActuatorModule</description>
-        <field name="Channel" units="us" type="int16" elements="10"/>
-        <field name="UpdateTime" units="ms" type="uint8" elements="1"/>
+        <field name="Channel" units="us" type="int16" elements="12"/>
+        <field name="UpdateTime" units="ms" type="uint16" elements="1"/>
         <field name="MaxUpdateTime" units="ms" type="uint16" elements="1"/>
         <field name="NumFailedUpdates" units="" type="uint8" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>

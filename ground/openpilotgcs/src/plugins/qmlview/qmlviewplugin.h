@@ -7,7 +7,7 @@
  * @{
  * @addtogroup OPMapPlugin QML Viewer Plugin
  * @{
- * @brief The QML Viewer Gadget 
+ * @brief The QML Viewer Gadget
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -32,16 +32,15 @@
 
 class QmlViewGadgetFactory;
 
-class QmlViewPlugin : public ExtensionSystem::IPlugin
-{
+class QmlViewPlugin : public ExtensionSystem::IPlugin {
 public:
-   QmlViewPlugin();
-   ~QmlViewPlugin();
+    QmlViewPlugin();
+    ~QmlViewPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
 private:
-   QmlViewGadgetFactory *mf;
+    QmlViewGadgetFactory *mf;
 };
 #endif /* QMLVIEWPLUGIN_H_ */

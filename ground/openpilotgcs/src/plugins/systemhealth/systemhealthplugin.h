@@ -32,16 +32,15 @@
 
 class SystemHealthGadgetFactory;
 
-class SystemHealthPlugin : public ExtensionSystem::IPlugin
-{
+class SystemHealthPlugin : public ExtensionSystem::IPlugin {
 public:
-        SystemHealthPlugin();
-        ~SystemHealthPlugin();
+    SystemHealthPlugin();
+    ~SystemHealthPlugin();
 
-   void extensionsInitialized();
-   bool initialize(const QStringList & arguments, QString * errorString);
-   void shutdown();
+    void extensionsInitialized();
+    bool initialize(const QStringList & arguments, QString *errorString);
+    void shutdown();
 private:
-   SystemHealthGadgetFactory *mf;
+    SystemHealthGadgetFactory *mf;
 };
 #endif /* SYSTEMHEALTHPLUGIN_H_ */

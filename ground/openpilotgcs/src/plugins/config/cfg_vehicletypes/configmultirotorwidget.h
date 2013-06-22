@@ -27,35 +27,45 @@
 #ifndef CONFIGMULTIROTORWIDGET_H
 #define CONFIGMULTIROTORWIDGET_H
 
-#include "ui_airframe.h"
-#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "cfg_vehicletypes/vehicleconfig.h"
-
+#include "ui_airframe_multirotor.h"
+#include "../uavobjectwidgetutils/configtaskwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "uavtalk/telemetrymanager.h"
+
+#include <QtCore/QList>
 #include <QtGui/QWidget>
-#include <QList>
-#include <QItemDelegate>
+#include <QtGui/QItemDelegate>
 
 class Ui_Widget;
 
-class ConfigMultiRotorWidget: public VehicleConfig
-{
+class ConfigMultiRotorWidget : public VehicleConfig {
     Q_OBJECT
 
 public:
-    ConfigMultiRotorWidget(Ui_AircraftWidget *aircraft = 0, QWidget *parent = 0);
+    static const QString CHANNELBOXNAME;
+    static QStringList getChannelDescriptions();
+
+    ConfigMultiRotorWidget(QWidget *parent = 0);
     ~ConfigMultiRotorWidget();
 
-    friend class ConfigVehicleTypeWidget;
+    virtual void refreshWidgetsValues(QString frameType);
+    virtual QString updateConfigObjectsFromWidgets();
+
+protected:
+    void showEvent(QShowEvent *event);
+    void resizeEvent(QResizeEvent *event);
+    void enableControls(bool enable);
 
 private:
-    Ui_AircraftWidget *m_aircraft;
-
-    QWidget *uiowner;
+    Ui_MultiRotorConfigWidget *m_aircraft;
     QGraphicsSvgItem *quad;
+    bool invertMotors;
+
+    virtual void registerWidgets(ConfigTaskWidget &parent);
+    virtual void resetActuators(GUIConfigDataUnion *configData);
 
     bool setupQuad(bool pLayout);
     bool setupHexa(bool pLayout);
@@ -64,28 +74,16 @@ private:
     void setupMotors(QList<QString> motorList);
     void setupQuadMotor(int channel, double roll, double pitch, double yaw);
 
-    float invertMotors;
-
-    virtual void ResetActuators(GUIConfigDataUnion* configData);
-    static QStringList getChannelDescriptions();
-    static const QString CHANNELBOXNAME;
     void setYawMixLevel(int);
 
-    void drawAirframe(QString multiRotorType);
+    void updateAirframe(QString multiRotorType);
+    void setupEnabledControls(QString multiRotorType);
 
 private slots:
     virtual void setupUI(QString airframeType);
-    virtual void refreshWidgetsValues(QString frameType);
-    virtual QString updateConfigObjectsFromWidgets();
     virtual bool throwConfigError(int numMotors);
 
-
-protected:
-
-signals:
-    void configurationChanged();
-
+    void reverseMultirotorMotor();
 };
-
 
 #endif // CONFIGMULTIROTORWIDGET_H

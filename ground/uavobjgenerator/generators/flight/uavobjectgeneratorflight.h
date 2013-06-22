@@ -27,21 +27,20 @@
 #ifndef UAVOBJECTGENERATORFLIGHT_H
 #define UAVOBJECTGENERATORFLIGHT_H
 
+#define FLIGHT_CODE_DIR "flight/uavobjects"
+
 #include "../generator_common.h"
 
-class UAVObjectGeneratorFlight
-{
+class UAVObjectGeneratorFlight {
 public:
-    bool generate(UAVObjectParser* gen,QString templatepath,QString outputpath);
+    bool generate(UAVObjectParser *gen, QString templatepath, QString outputpath);
     QStringList fieldTypeStrC;
     QString flightCodeTemplate, flightIncludeTemplate, flightInitTemplate, flightInitIncludeTemplate, flightMakeTemplate;
     QDir flightCodePath;
     QDir flightOutputPath;
 
 private:
-    bool process_object(ObjectInfo* info);
-
+    bool process_object(ObjectInfo *info);
 };
 
 #endif
-

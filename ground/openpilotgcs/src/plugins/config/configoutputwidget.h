@@ -40,40 +40,39 @@
 class Ui_OutputWidget;
 class OutputChannelForm;
 
-class ConfigOutputWidget: public ConfigTaskWidget
-{
-	Q_OBJECT
+class ConfigOutputWidget : public ConfigTaskWidget {
+    Q_OBJECT
 
 public:
-        ConfigOutputWidget(QWidget *parent = 0);
-        ~ConfigOutputWidget();
+    ConfigOutputWidget(QWidget *parent = 0);
+    ~ConfigOutputWidget();
 
 
 private:
-        Ui_OutputWidget *m_config;
+    Ui_OutputWidget *ui;
 
-	QList<QSlider> sliders;
+    QList<QSlider> sliders;
 
-	void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, QCheckBox *rev, int value);
+    void updateChannelInSlider(QSlider *slider, QLabel *min, QLabel *max, QCheckBox *rev, int value);
 
-	void assignChannel(UAVDataObject *obj, QString str);
-	void assignOutputChannel(UAVDataObject *obj, QString str);
-    OutputChannelForm* getOutputChannelForm(const int index) const;
-	int mccDataRate;
+    void assignChannel(UAVDataObject *obj, QString str);
+    void assignOutputChannel(UAVDataObject *obj, QString str);
+    OutputChannelForm *getOutputChannelForm(const int index) const;
+    int mccDataRate;
 
-	UAVObject::Metadata accInitialData;
+    UAVObject::Metadata accInitialData;
 
-        bool wasItMe;
+    bool wasItMe;
 private slots:
-        void stopTests();
-        void disableIfNotMe(UAVObject *obj);
-        virtual void refreshWidgetsValues(UAVObject * obj=NULL);
-        void updateObjectsFromWidgets();
-	void runChannelTests(bool state);
-        void sendChannelTest(int index, int value);
-        void openHelp();
+    void stopTests();
+    void disableIfNotMe(UAVObject *obj);
+    virtual void refreshWidgetsValues(UAVObject *obj = NULL);
+    void updateObjectsFromWidgets();
+    void runChannelTests(bool state);
+    void sendChannelTest(int index, int value);
+    void openHelp();
 protected:
-        void enableControls(bool enable);
+    void enableControls(bool enable);
 };
 
-#endif
+#endif // ifndef CONFIGOUTPUTWIDGET_H

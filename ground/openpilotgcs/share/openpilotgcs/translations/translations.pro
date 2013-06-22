@@ -1,6 +1,9 @@
 include(../../../openpilotgcs.pri)
 
-LANGUAGES = de es fr ru zh_CN
+# Commented languages with outdated translations
+# Allow removing the 'C' language in default config files at first start.
+# Need to be uncommented for update in all languages files (make ts)
+LANGUAGES = fr # de es ru zh_CN
 
 # var, prepend, append
 defineReplace(prependAll) {

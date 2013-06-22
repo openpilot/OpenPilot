@@ -3,6 +3,7 @@
         <description>Select airframe type.  Currently used by @ref ActuatorModule to choose mixing from @ref ActuatorDesired to @ref ActuatorCommand</description>
         <field name="AirframeType" units="" type="enum" elements="1" options="FixedWing,FixedWingElevon,FixedWingVtail,VTOL,HeliCP,QuadX,QuadP,Hexa,Octo,Custom,HexaX,OctoV,OctoCoaxP,OctoCoaxX,HexaCoax,Tri,GroundVehicleCar,GroundVehicleDifferential,GroundVehicleMotorcycle" defaultvalue="QuadX"/>
         <field name="GUIConfigData" units="bits" type="uint32" elements="4" defaultvalue="0"/>
+        <field name="GPSDataProtocol" units="" type="enum" elements="1" options="NMEA,UBX" defaultvalue="UBX"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

@@ -32,10 +32,9 @@
 #include "importexportgadgetconfiguration.h"
 
 ImportExportGadget::ImportExportGadget(QString classId, ImportExportGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent),
+    m_widget(widget)
+{}
 
 ImportExportGadget::~ImportExportGadget()
 {
@@ -43,14 +42,14 @@ ImportExportGadget::~ImportExportGadget()
 }
 
 /*
-  This is called when a configuration is loaded, and updates the plugin's settings.
-  Careful: the plugin is already drawn before the loadConfiguration method is called the
-  first time, so you have to be careful not to assume all the plugin values are initialized
-  the first time you use them
+   This is called when a configuration is loaded, and updates the plugin's settings.
+   Careful: the plugin is already drawn before the loadConfiguration method is called the
+   first time, so you have to be careful not to assume all the plugin values are initialized
+   the first time you use them
  */
-void ImportExportGadget::loadConfiguration(IUAVGadgetConfiguration* config)
+void ImportExportGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 {
-    m_widget->loadConfiguration(qobject_cast<ImportExportGadgetConfiguration*>(config));
+    m_widget->loadConfiguration(qobject_cast<ImportExportGadgetConfiguration *>(config));
 }
 /**
  * @}

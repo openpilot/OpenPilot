@@ -38,18 +38,20 @@ class IUAVGadgetFactory;
 using namespace Core;
 class LoggingPlugin;
 
-class LoggingGadgetFactory : public IUAVGadgetFactory
-{
+class LoggingGadgetFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
     LoggingGadgetFactory(QObject *parent = 0);
     ~LoggingGadgetFactory();
 
-    void setPlugin(LoggingPlugin * p) { loggingPlugin = p; };
+    void setPlugin(LoggingPlugin *p)
+    {
+        loggingPlugin = p;
+    };
 
     IUAVGadget *createGadget(QWidget *parent);
 private:
-    LoggingPlugin * loggingPlugin;
+    LoggingPlugin *loggingPlugin;
 };
 
 #endif // LoggingGADGETFACTORY_H_

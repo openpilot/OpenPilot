@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -45,14 +45,15 @@ using namespace Core::Internal;
 
 PluginDialog::PluginDialog(QWidget *parent)
     : QDialog(parent),
-      m_view(new ExtensionSystem::PluginView(ExtensionSystem::PluginManager::instance(), this))
+    m_view(new ExtensionSystem::PluginView(ExtensionSystem::PluginManager::instance(), this))
 {
     QVBoxLayout *vl = new QVBoxLayout(this);
+
     vl->addWidget(m_view);
 
     m_detailsButton = new QPushButton(tr("Details"), this);
     m_errorDetailsButton = new QPushButton(tr("Error Details"), this);
-    m_closeButton = new QPushButton(tr("Close"), this);
+    m_closeButton   = new QPushButton(tr("Close"), this);
     m_detailsButton->setEnabled(false);
     m_errorDetailsButton->setEnabled(false);
     m_closeButton->setEnabled(true);
@@ -70,10 +71,10 @@ PluginDialog::PluginDialog(QWidget *parent)
     setWindowTitle(tr("Installed Plugins"));
     setWindowIcon(QIcon(":/core/images/pluginicon.png"));
 
-    connect(m_view, SIGNAL(currentPluginChanged(ExtensionSystem::PluginSpec*)),
+    connect(m_view, SIGNAL(currentPluginChanged(ExtensionSystem::PluginSpec *)),
             this, SLOT(updateButtons()));
-    connect(m_view, SIGNAL(pluginActivated(ExtensionSystem::PluginSpec*)),
-            this, SLOT(openDetails(ExtensionSystem::PluginSpec*)));
+    connect(m_view, SIGNAL(pluginActivated(ExtensionSystem::PluginSpec *)),
+            this, SLOT(openDetails(ExtensionSystem::PluginSpec *)));
     connect(m_detailsButton, SIGNAL(clicked()), this, SLOT(openDetails()));
     connect(m_errorDetailsButton, SIGNAL(clicked()), this, SLOT(openErrorDetails()));
     connect(m_closeButton, SIGNAL(clicked()), this, SLOT(accept()));
@@ -83,6 +84,7 @@ PluginDialog::PluginDialog(QWidget *parent)
 void PluginDialog::updateButtons()
 {
     ExtensionSystem::PluginSpec *selectedSpec = m_view->currentPlugin();
+
     if (selectedSpec) {
         m_detailsButton->setEnabled(true);
         m_errorDetailsButton->setEnabled(selectedSpec->hasError());
@@ -100,8 +102,9 @@ void PluginDialog::openDetails()
 
 void PluginDialog::openDetails(ExtensionSystem::PluginSpec *spec)
 {
-    if (!spec)
+    if (!spec) {
         return;
+    }
     QDialog dialog(this);
     dialog.setWindowTitle(tr("Plugin Details of %1").arg(spec->name()));
     QVBoxLayout *layout = new QVBoxLayout;
@@ -120,8 +123,10 @@ void PluginDialog::openDetails(ExtensionSystem::PluginSpec *spec)
 void PluginDialog::openErrorDetails()
 {
     ExtensionSystem::PluginSpec *spec = m_view->currentPlugin();
-    if (!spec)
+
+    if (!spec) {
         return;
+    }
     QDialog dialog(this);
     dialog.setWindowTitle(tr("Plugin Errors of %1").arg(spec->name()));
     QVBoxLayout *layout = new QVBoxLayout;
@@ -136,4 +141,3 @@ void PluginDialog::openErrorDetails()
     dialog.resize(500, 300);
     dialog.exec();
 }
-

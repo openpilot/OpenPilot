@@ -47,92 +47,102 @@ MagicWaypointGadgetWidget::MagicWaypointGadgetWidget(QWidget *parent) : QLabel(p
     m_magicwaypoint->setupUi(this);
 
     // Connect object updated event from UAVObject to also update check boxes
-    connect(getPositionDesired(), SIGNAL(objectUpdated(UAVObject*)), this, SLOT(positionObjectChanged(UAVObject*)));
-    connect(getPositionActual(), SIGNAL(objectUpdated(UAVObject*)), this, SLOT(positionObjectChanged(UAVObject*)));
+    connect(getPathDesired(), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(positionObjectChanged(UAVObject *)));
+    connect(getPositionActual(), SIGNAL(objectUpdated(UAVObject *)), this, SLOT(positionObjectChanged(UAVObject *)));
 
     // Connect updates from the position widget to this widget
-    connect(m_magicwaypoint->widgetPosition, SIGNAL(positionClicked(double,double)), this, SLOT(positionSelected(double,double)));
-    connect(this, SIGNAL(positionActualObjectChanged(double,double)), m_magicwaypoint->widgetPosition, SLOT(updateActualIndicator(double,double)));
-    connect(this, SIGNAL(positionDesiredObjectChanged(double,double)), m_magicwaypoint->widgetPosition, SLOT(updateDesiredIndicator(double,double)));
+    connect(m_magicwaypoint->widgetPosition, SIGNAL(positionClicked(double, double)), this, SLOT(positionSelected(double, double)));
+    connect(this, SIGNAL(positionActualObjectChanged(double, double)), m_magicwaypoint->widgetPosition, SLOT(updateActualIndicator(double, double)));
+    connect(this, SIGNAL(positionDesiredObjectChanged(double, double)), m_magicwaypoint->widgetPosition, SLOT(updateDesiredIndicator(double, double)));
 
     // Catch changes in scale for visualization
     connect(m_magicwaypoint->horizontalSliderScale, SIGNAL(valueChanged(int)), this, SLOT(scaleChanged(int)));
+
+    // Make sure the scale is correctly visualized
+    m_magicwaypoint->horizontalSliderScale->setValue(10);
 }
 
 MagicWaypointGadgetWidget::~MagicWaypointGadgetWidget()
 {
-   // Do nothing
+    // Do nothing
 }
 
 /*!
-  \brief Returns the @ref PositionDesired UAVObject
-  */
-PositionDesired* MagicWaypointGadgetWidget::getPositionDesired()
+   \brief Returns the @ref PositionDesired UAVObject
+ */
+PathDesired *MagicWaypointGadgetWidget::getPathDesired()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    PositionDesired* obj = dynamic_cast<PositionDesired*>( objManager->getObject(QString("PositionDesired")) );
+    PathDesired *obj = PathDesired::GetInstance(objManager);
+
+    Q_ASSERT(obj != NULL); // Save crashes later
     return obj;
 }
 
 /*!
-  \brief Returns the @ref PositionActual UAVObject
-  */
-PositionActual* MagicWaypointGadgetWidget::getPositionActual()
+   \brief Returns the @ref PositionActual UAVObject
+ */
+PositionActual *MagicWaypointGadgetWidget::getPositionActual()
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
     UAVObjectManager *objManager = pm->getObject<UAVObjectManager>();
-    PositionActual* obj = dynamic_cast<PositionActual*>( objManager->getObject(QString("PositionActual")) );
+    PositionActual *obj = PositionActual::GetInstance(objManager);
+
+    Q_ASSERT(obj != NULL);
     return obj;
 }
 
 /**
-  * Detect changes in scale and update visualization (does not change position)
-  */
-void MagicWaypointGadgetWidget::scaleChanged(int scale) {
+ * Detect changes in scale and update visualization (does not change position)
+ */
+void MagicWaypointGadgetWidget::scaleChanged(int scale)
+{
     Q_UNUSED(scale);
-    positionObjectChanged(getPositionDesired());
-    positionObjectChanged(getPositionActual());
+    pathDesiredChanged(getPathDesired());
+    positionActualChanged(getPositionActual());
 }
 
 /**
-  * Emit a position changed signal when @ref PositionDesired or @ref PositionActual object is changed
-  */
-void MagicWaypointGadgetWidget::positionObjectChanged(UAVObject* obj)
+ * Emit a position changed signal when @ref PositionActual object is changed
+ */
+void MagicWaypointGadgetWidget::positionActualChanged(UAVObject *)
+{
+    PositionActual::DataFields positionActual = getPositionActual()->getData();
+    double scale = m_magicwaypoint->horizontalSliderScale->value();
+
+    emit positionActualObjectChanged(positionActual.North / scale,
+                                     positionActual.East / scale);
+}
+
+/**
+ * Emit a position changed signal when @ref PathDesired is changed
+ */
+void MagicWaypointGadgetWidget::pathDesiredChanged(UAVObject *)
+{
+    PathDesired::DataFields pathDesired = getPathDesired()->getData();
+    double scale = m_magicwaypoint->horizontalSliderScale->value();
+
+    emit positionDesiredObjectChanged(pathDesired.End[PathDesired::END_NORTH] / scale,
+                                      pathDesired.End[PathDesired::END_EAST] / scale);
+}
+
+/**
+ * Slot called by visualization when a new @ref PathDesired is requested
+ */
+void MagicWaypointGadgetWidget::positionSelected(double north, double east)
 {
     double scale = m_magicwaypoint->horizontalSliderScale->value();
-    double north = obj->getField("North")->getDouble() / scale;
-    double east = obj->getField("East")->getDouble() / scale;
 
-    if(obj->getName().compare("PositionDesired")) {
-        emit positionDesiredObjectChanged(north,east);
-    } else {
-        emit positionActualObjectChanged(north,east);
-    }
+    PathDesired::DataFields pathDesired = getPathDesired()->getData();
 
+    pathDesired.End[PathDesired::END_NORTH] = north * scale;
+    pathDesired.End[PathDesired::END_EAST]  = east * scale;
+    pathDesired.Mode = PathDesired::MODE_FLYENDPOINT;
+    getPathDesired()->setData(pathDesired);
 }
 
 /**
-  * Slot called by visualization when a new @ref PositionDesired is requested
-  */
-void MagicWaypointGadgetWidget::positionSelected(double north, double east) {
-    double scale = m_magicwaypoint->horizontalSliderScale->value();
-
-    PositionDesired * posDesired = getPositionDesired();
-    if(posDesired) {
-        UAVObjectField * field = posDesired->getField("North");
-        if(field)
-            field->setDouble(north * scale);
-
-        field = posDesired->getField("East");
-        if(field)
-            field->setDouble(east * scale);
-
-        posDesired->updated();
-    }
-}
-
-/**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

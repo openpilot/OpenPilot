@@ -37,15 +37,14 @@ class IUAVGadgetFactory;
 
 using namespace Core;
 
-class AntennaTrackGadgetFactory : public IUAVGadgetFactory
-{
+class AntennaTrackGadgetFactory : public IUAVGadgetFactory {
     Q_OBJECT
 public:
     AntennaTrackGadgetFactory(QObject *parent = 0);
     ~AntennaTrackGadgetFactory();
 
     Core::IUAVGadget *createGadget(QWidget *parent);
-    IUAVGadgetConfiguration *createConfiguration(QSettings* qSettings);
+    IUAVGadgetConfiguration *createConfiguration(QSettings *qSettings);
     IOptionsPage *createOptionsPage(IUAVGadgetConfiguration *config);
 };
 

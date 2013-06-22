@@ -32,16 +32,14 @@
 #include "uavobject.h"
 
 LoggingGadget::LoggingGadget(QString classId, LoggingGadgetWidget *widget, QWidget *parent) :
-        IUAVGadget(classId, parent),
-        m_widget(widget)
-{
-}
+    IUAVGadget(classId, parent),
+    m_widget(widget)
+{}
 
 LoggingGadget::~LoggingGadget()
 {
     delete m_widget;
 }
 
-void LoggingGadget::loadConfiguration(IUAVGadgetConfiguration* config)
-{
-}
+void LoggingGadget::loadConfiguration(IUAVGadgetConfiguration *config)
+{}

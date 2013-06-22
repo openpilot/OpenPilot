@@ -2,18 +2,26 @@
   <General>
     <AutoConnect>true</AutoConnect>
     <AutoSelect>true</AutoSelect>
-    <ExpertMode>false</ExpertMode>
-    <LastPreferenceCategory>Notify Plugin</LastPreferenceCategory>
-    <LastPreferencePage>settings</LastPreferencePage>
-    <SaveSettingsOnExit>true</SaveSettingsOnExit>
-    <SettingsWindowHeight>700</SettingsWindowHeight>
-    <SettingsWindowWidth>800</SettingsWindowWidth>
-    <OverrideLanguage>C</OverrideLanguage>
-    <UDPMirror>false</UDPMirror>
     <Description>Wide configuration</Description>
-    <Details>Default configuration built for wide screens (17"up)</Details>
-    <StyleSheet>wide</StyleSheet>
+    <Details>Default configuration built for wide screens (17" and up)</Details>
+    <ExpertMode>false</ExpertMode>
+    <LastPreferenceCategory></LastPreferenceCategory>
+    <LastPreferencePage></LastPreferencePage>
+    <SaveSettingsOnExit>true</SaveSettingsOnExit>
+    <SettingsWindowHeight>600</SettingsWindowHeight>
+    <SettingsWindowWidth>800</SettingsWindowWidth>
+    <StyleSheet>default</StyleSheet>
+    <UDPMirror>false</UDPMirror>
   </General>
+  <IPconnection>
+    <Current>
+      <arr_1>
+        <Port>9000</Port>
+        <UseTCP>0</UseTCP>
+      </arr_1>
+      <size>1</size>
+    </Current>
+  </IPconnection>
   <KeyBindings>
     <size>0</size>
   </KeyBindings>
@@ -947,19 +955,74 @@
       </GPS__PCT__20Mouse>
     </GpsDisplayGadget>
     <HITL>
+      <AeroSimRC__PCT__20HITL>
+        <configInfo>
+          <locked>false</locked>
+          <version>0.0.0</version>
+        </configInfo>
+        <data>
+          <addNoise>false</addNoise>
+          <attActCalc>false</attActCalc>
+          <attActHW>false</attActHW>
+          <attActSim>true</attActSim>
+          <attActualEnabled>true</attActualEnabled>
+          <attRawEnabled>true</attRawEnabled>
+          <attRawRate>20</attRawRate>
+          <baroAltRate>50</baroAltRate>
+          <baroAltitudeEnabled>false</baroAltitudeEnabled>
+          <binPath></binPath>
+          <dataPath></dataPath>
+          <gcsReceiverEnabled>true</gcsReceiverEnabled>
+          <gpsPosRate>100</gpsPosRate>
+          <gpsPositionEnabled>false</gpsPositionEnabled>
+          <groundTruthEnabled>true</groundTruthEnabled>
+          <groundTruthRate>100</groundTruthRate>
+          <hostAddress>0.0.0.0</hostAddress>
+          <inPort>40100</inPort>
+          <inputCommand>true</inputCommand>
+          <latitude></latitude>
+          <longitude></longitude>
+          <manualControlEnabled>false</manualControlEnabled>
+          <manualOutput>false</manualOutput>
+          <minOutputPeriod>40</minOutputPeriod>
+          <outPort>40200</outPort>
+          <remoteAddress>127.0.0.1</remoteAddress>
+          <simulatorId>ASimRC</simulatorId>
+          <startSim>false</startSim>
+        </data>
+      </AeroSimRC__PCT__20HITL>
       <Flightgear__PCT__20HITL>
         <configInfo>
           <locked>false</locked>
           <version>0.0.0</version>
         </configInfo>
         <data>
+          <addNoise>false</addNoise>
+          <attActCalc>false</attActCalc>
+          <attActHW>false</attActHW>
+          <attActSim>true</attActSim>
+          <attActualEnabled>true</attActualEnabled>
+          <attRawEnabled>true</attRawEnabled>
+          <attRawRate>20</attRawRate>
+          <baroAltRate>50</baroAltRate>
+          <baroAltitudeEnabled>false</baroAltitudeEnabled>
           <binPath>\usr\games\fgfs</binPath>
           <dataPath>\usr\share\games\FlightGear</dataPath>
+          <gcsReceiverEnabled>false</gcsReceiverEnabled>
+          <gpsPosRate>100</gpsPosRate>
+          <gpsPositionEnabled>false</gpsPositionEnabled>
+          <groundTruthEnabled>true</groundTruthEnabled>
+          <groundTruthRate>100</groundTruthRate>
           <hostAddress>127.0.0.1</hostAddress>
           <inPort>9009</inPort>
-          <manual>false</manual>
+          <inputCommand>true</inputCommand>
+          <latitude></latitude>
+          <longitude></longitude>
+          <manualControlEnabled>true</manualControlEnabled>
+          <manualOutput>false</manualOutput>
+          <minOutputPeriod>40</minOutputPeriod>
           <outPort>9010</outPort>
-          <remoteHostAddress>127.0.0.1</remoteHostAddress>
+          <remoteAddress>127.0.0.1</remoteAddress>
           <simulatorId>FG</simulatorId>
           <startSim>true</startSim>
         </data>
@@ -970,51 +1033,37 @@
           <version>0.0.0</version>
         </configInfo>
         <data>
-          <binPath>\home\lafargue\X-Plane 9\X-Plane-i686</binPath>
-          <dataPath>\usr\share\games\FlightGear</dataPath>
-          <hostAddress>127.0.0.3</hostAddress>
+          <addNoise>false</addNoise>
+          <attActCalc>false</attActCalc>
+          <attActHW>false</attActHW>
+          <attActSim>true</attActSim>
+          <attActualEnabled>true</attActualEnabled>
+          <attRawEnabled>true</attRawEnabled>
+          <attRawRate>20</attRawRate>
+          <baroAltRate>50</baroAltRate>
+          <baroAltitudeEnabled>false</baroAltitudeEnabled>
+          <binPath></binPath>
+          <dataPath></dataPath>
+          <gcsReceiverEnabled>false</gcsReceiverEnabled>
+          <gpsPosRate>100</gpsPosRate>
+          <gpsPositionEnabled>false</gpsPositionEnabled>
+          <groundTruthEnabled>true</groundTruthEnabled>
+          <groundTruthRate>100</groundTruthRate>
+          <hostAddress>0.0.0.0</hostAddress>
           <inPort>6756</inPort>
-          <manual>false</manual>
+          <inputCommand>true</inputCommand>
+          <latitude></latitude>
+          <longitude></longitude>
+          <manualControlEnabled>true</manualControlEnabled>
+          <manualOutput>false</manualOutput>
+          <minOutputPeriod>40</minOutputPeriod>
           <outPort>49000</outPort>
-          <remoteHostAddress>127.0.0.1</remoteHostAddress>
+          <remoteAddress>127.0.0.1</remoteAddress>
           <simulatorId>X-Plane</simulatorId>
           <startSim>false</startSim>
         </data>
       </XPlane__PCT__20HITL>
     </HITL>
-    <HITLv2>
-      <default>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <attActCalc>false</attActCalc>
-          <attActHW>false</attActHW>
-          <attActSim>true</attActSim>
-          <attActual>true</attActual>
-          <attRaw>true</attRaw>
-          <attRawRate>20</attRawRate>
-          <gcsReciever>true</gcsReciever>
-          <gpsPosRate>200</gpsPosRate>
-          <gpsPosition>true</gpsPosition>
-          <homeLocRate>0</homeLocRate>
-          <homeLocation>true</homeLocation>
-          <hostAddress>127.0.0.1</hostAddress>
-          <inPort>40100</inPort>
-          <inputCommand>true</inputCommand>
-          <manualControl>false</manualControl>
-          <manualOutput>false</manualOutput>
-          <outPort>40200</outPort>
-          <outputRate>20</outputRate>
-          <remoteAddress>127.0.0.1</remoteAddress>
-          <simulatorId>ASimRC</simulatorId>
-          <sonarAltRate>50</sonarAltRate>
-          <sonarAltitude>false</sonarAltitude>
-          <sonarMaxAlt>@Variant(AAAAh0CgAAA=)</sonarMaxAlt>
-        </data>
-      </default>
-    </HITLv2>
     <LineardialGadget>
       <Accel__PCT__20Horizontal__PCT__20X>
         <configInfo>
@@ -1748,33 +1797,7 @@
           <useOpenGL>true</useOpenGL>
         </data>
       </default>
-    </OPMapGadget>
-    <PFDGadget>
-      <raw>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <beSmooth>false</beSmooth>
-          <dialFile>%%DATAPATH%%pfd/default/pfd.svg</dialFile>
-          <hqFonts>false</hqFonts>
-          <useOpenGLFlag>false</useOpenGLFlag>
-        </data>
-      </raw>
-      <smooth>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <beSmooth>true</beSmooth>
-          <dialFile>%%DATAPATH%%pfd/default/pfd.svg</dialFile>
-          <hqFonts>false</hqFonts>
-          <useOpenGLFlag>false</useOpenGLFlag>
-        </data>
-      </smooth>
-    </PFDGadget>
+    </OPMapGadget>    
     <PfdQmlGadget>
       <NoTerrain>
         <configInfo>
@@ -1784,12 +1807,14 @@
         <data>
           <actualPositionUsed>false</actualPositionUsed>
           <altitude>2000</altitude>
+          <altitudeFactor>1</altitudeFactor>
           <cacheOnly>false</cacheOnly>
           <earthFile>%%DATAPATH%%pfd/default/readymap.earth</earthFile>
           <latitude>46.6715</latitude>
           <longitude>10.1589</longitude>
           <openGLEnabled>true</openGLEnabled>
           <qmlFile>%%DATAPATH%%pfd/default/Pfd.qml</qmlFile>
+          <speedFactor>1</speedFactor>
           <terrainEnabled>false</terrainEnabled>
         </data>
       </NoTerrain>
@@ -2424,14 +2449,7 @@
             <yMinimum>0</yMinimum>
             <yScalePower>0</yScalePower>
           </plotCurve0>
-          <plotCurve1>
-            <color>0</color>
-            <yMaximum>0</yMaximum>
-            <yMeanSamples>1</yMeanSamples>
-            <yMinimum>0</yMinimum>
-            <yScalePower>0</yScalePower>
-          </plotCurve1>
-          <plotCurveCount>2</plotCurveCount>
+          <plotCurveCount>1</plotCurveCount>
           <plotType>1</plotType>
           <refreshInterval>800</refreshInterval>
         </data>
@@ -2465,22 +2483,6 @@
         </data>
       </default>
     </UAVObjectBrowser>
-    <Uploader>
-      <default>
-        <configInfo>
-          <locked>false</locked>
-          <version>0.0.0</version>
-        </configInfo>
-        <data>
-          <defaultDataBits>3</defaultDataBits>
-          <defaultFlow>0</defaultFlow>
-          <defaultParity>0</defaultParity>
-          <defaultPort>/dev/ttyS0</defaultPort>
-          <defaultSpeed>14</defaultSpeed>
-          <defaultStopBits>0</defaultStopBits>
-        </data>
-      </default>
-    </Uploader>
     <configInfo>
       <locked>false</locked>
       <version>1.2.0</version>
@@ -2759,11 +2761,47 @@
             <type>splitter</type>
           </side0>
           <side1>
-            <classId>PFDGadget</classId>
-            <gadget>
-              <activeConfiguration>raw</activeConfiguration>
-            </gadget>
-            <type>uavGadget</type>
+            <side0>
+              <side0>
+                <classId>DialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Deluxe Attitude</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side0>
+              <side1>
+                <classId>DialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Deluxe Baro Altimeter</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side1>
+              <splitterOrientation>2</splitterOrientation>
+              <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+              <type>splitter</type>
+            </side0>
+            <side1>
+              <side0>
+                <classId>DialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Deluxe Compass</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side0>
+              <side1>
+                <classId>DialGadget</classId>
+                <gadget>
+                  <activeConfiguration>Deluxe Climbrate</activeConfiguration>
+                </gadget>
+                <type>uavGadget</type>
+              </side1>
+              <splitterOrientation>2</splitterOrientation>
+              <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+              <type>splitter</type>
+            </side1>
+            <splitterOrientation>1</splitterOrientation>
+            <splitterSizes>@Variant(AAAACQAAAAA=)</splitterSizes>
+            <type>splitter</type>
           </side1>
           <splitterOrientation>2</splitterOrientation>
           <splitterSizes>@Variant(AAAACQAAAAIAAAACAAABLwAAAAIAAAHf)</splitterSizes>

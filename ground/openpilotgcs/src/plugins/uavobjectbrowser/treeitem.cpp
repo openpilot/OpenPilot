@@ -10,18 +10,18 @@
  * @brief The UAVObject Browser gadget plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -45,8 +45,7 @@ bool HighLightManager::add(TreeItem *itemToAdd)
     QMutexLocker locker(&m_listMutex);
 
     // Check so that the item isn't already in the list
-    if(!m_itemsList.contains(itemToAdd))
-    {
+    if (!m_itemsList.contains(itemToAdd)) {
         m_itemsList.append(itemToAdd);
         return true;
     }
@@ -78,17 +77,15 @@ void HighLightManager::checkItemsExpired()
     QMutexLocker locker(&m_listMutex);
 
     // Get a mutable iterator for the list
-    QMutableLinkedListIterator<TreeItem*> iter(m_itemsList);
+    QMutableLinkedListIterator<TreeItem *> iter(m_itemsList);
 
     // This is the timestamp to compare with
     QTime now = QTime::currentTime();
 
     // Loop over all items, check if they expired.
-    while(iter.hasNext())
-    {
-        TreeItem* item = iter.next();
-        if(item->getHiglightExpires() < now)
-        {
+    while (iter.hasNext()) {
+        TreeItem *item = iter.next();
+        if (item->getHiglightExpires() < now) {
             // If expired, call removeHighlight
             item->removeHighlight();
 
@@ -101,19 +98,18 @@ void HighLightManager::checkItemsExpired()
 int TreeItem::m_highlightTimeMs = 500;
 
 TreeItem::TreeItem(const QList<QVariant> &data, TreeItem *parent) :
-        QObject(0),
-        m_data(data),
-        m_parent(parent),
-        m_highlight(false),
-        m_changed(false)
-{
-}
+    QObject(0),
+    m_data(data),
+    m_parent(parent),
+    m_highlight(false),
+    m_changed(false)
+{}
 
 TreeItem::TreeItem(const QVariant &data, TreeItem *parent) :
-        QObject(0),
-        m_parent(parent),
-        m_highlight(false),
-        m_changed(false)
+    QObject(0),
+    m_parent(parent),
+    m_highlight(false),
+    m_changed(false)
 {
     m_data << data << "" << "";
 }
@@ -132,6 +128,7 @@ void TreeItem::appendChild(TreeItem *child)
 void TreeItem::insertChild(TreeItem *child)
 {
     int index = nameIndex(child->data(0).toString());
+
     m_children.insert(index, child);
     child->setParentTree(this);
 }
@@ -148,8 +145,9 @@ int TreeItem::childCount() const
 
 int TreeItem::row() const
 {
-    if (m_parent)
-        return m_parent->m_children.indexOf(const_cast<TreeItem*>(this));
+    if (m_parent) {
+        return m_parent->m_children.indexOf(const_cast<TreeItem *>(this));
+    }
 
     return 0;
 }
@@ -169,35 +167,35 @@ void TreeItem::setData(QVariant value, int column)
     m_data.replace(column, value);
 }
 
-void TreeItem::update() {
-    foreach(TreeItem *child, treeChildren())
-        child->update();
+void TreeItem::update()
+{
+    foreach(TreeItem * child, treeChildren())
+    child->update();
 }
 
-void TreeItem::apply() {
-    foreach(TreeItem *child, treeChildren())
-        child->apply();
+void TreeItem::apply()
+{
+    foreach(TreeItem * child, treeChildren())
+    child->apply();
 }
 
 /*
  * Called after a value has changed to trigger highlightning of tree item.
  */
-void TreeItem::setHighlight(bool highlight) {
+void TreeItem::setHighlight(bool highlight)
+{
     m_highlight = highlight;
-    m_changed = false;
+    m_changed   = false;
     if (highlight) {
         // Update the expires timestamp
         m_highlightExpires = QTime::currentTime().addMSecs(m_highlightTimeMs);
 
         // Add to highlightmanager
-        if(m_highlightManager->add(this))
-        {
+        if (m_highlightManager->add(this)) {
             // Only emit signal if it was added
             emit updateHighlight(this);
         }
-    }
-    else if(m_highlightManager->remove(this))
-    {
+    } else if (m_highlightManager->remove(this)) {
         // Only emit signal if it was removed
         emit updateHighlight(this);
     }
@@ -205,15 +203,15 @@ void TreeItem::setHighlight(bool highlight) {
     // If we have a parent, call recursively to update highlight status of parents.
     // This will ensure that the root of a leaf that is changed also is highlighted.
     // Only updates that really changes values will trigger highlight of parents.
-    if(m_parent)
-    {
+    if (m_parent) {
         m_parent->setHighlight(highlight);
     }
 }
 
-void TreeItem::removeHighlight() {
+void TreeItem::removeHighlight()
+{
     m_highlight = false;
-    //update();
+    // update();
     emit updateHighlight(this);
 }
 

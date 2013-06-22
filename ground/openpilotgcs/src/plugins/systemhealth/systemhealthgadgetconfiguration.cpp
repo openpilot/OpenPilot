@@ -32,13 +32,13 @@
  * Loads a saved configuration or defaults if non exist.
  *
  */
-SystemHealthGadgetConfiguration::SystemHealthGadgetConfiguration(QString classId, QSettings* qSettings, QObject *parent) :
+SystemHealthGadgetConfiguration::SystemHealthGadgetConfiguration(QString classId, QSettings *qSettings, QObject *parent) :
     IUAVGadgetConfiguration(classId, parent),
     systemFile("Unknown")
 {
-    //if a saved configuration exists load it
-    if(qSettings != 0) {
-        QString diagram= qSettings->value("diagram").toString();
+    // if a saved configuration exists load it
+    if (qSettings != 0) {
+        QString diagram = qSettings->value("diagram").toString();
         systemFile = Utils::PathUtils().InsertDataPath(diagram);
     }
 }
@@ -50,7 +50,8 @@ SystemHealthGadgetConfiguration::SystemHealthGadgetConfiguration(QString classId
 IUAVGadgetConfiguration *SystemHealthGadgetConfiguration::clone()
 {
     SystemHealthGadgetConfiguration *m = new SystemHealthGadgetConfiguration(this->classId());
-    m->systemFile=systemFile;
+
+    m->systemFile = systemFile;
     return m;
 }
 
@@ -58,7 +59,9 @@ IUAVGadgetConfiguration *SystemHealthGadgetConfiguration::clone()
  * Saves a configuration.
  *
  */
-void SystemHealthGadgetConfiguration::saveConfig(QSettings* qSettings) const {
+void SystemHealthGadgetConfiguration::saveConfig(QSettings *qSettings) const
+{
     QString diagram = Utils::PathUtils().RemoveDataPath(systemFile);
+
     qSettings->setValue("diagram", diagram);
 }

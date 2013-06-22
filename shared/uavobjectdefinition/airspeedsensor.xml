@@ -1,0 +1,12 @@
+<xml>
+    <object name="AirspeedSensor" singleinstance="true" settings="false">
+        <description>The raw data from the dynamic pressure sensor with pressure, temperature and airspeed.</description>
+        <field name="SensorConnected" units="" type="enum" elements="1" options="False,True"/>
+        <field name="SensorValue" units="raw" type="uint16" elements="1"/>
+        <field name="CalibratedAirspeed" units="m/s" type="float" elements="1"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetryflight acked="false" updatemode="periodic" period="1000"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

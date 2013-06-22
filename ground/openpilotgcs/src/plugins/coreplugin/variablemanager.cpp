@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -52,7 +52,7 @@ void VariableManager::insert(const QString &variable, const QString &value)
 void VariableManager::insertFileInfo(const QString &tag, const QFileInfo &file)
 {
     insert(tag, file.filePath());
-    insert(tag  + QLatin1String(":absoluteFilePath"), file.absoluteFilePath());
+    insert(tag + QLatin1String(":absoluteFilePath"), file.absoluteFilePath());
     insert(tag + QLatin1String(":absolutePath"), file.absolutePath());
     insert(tag + QLatin1String(":baseName"), file.baseName());
     insert(tag + QLatin1String(":canonicalPath"), file.canonicalPath());
@@ -100,6 +100,7 @@ bool VariableManager::remove(const QString &variable)
 QString VariableManager::resolve(const QString &stringWithVariables) const
 {
     QString result = stringWithVariables;
+
     QMapIterator<QString, QString> i(m_map);
     while (i.hasNext()) {
         i.next();

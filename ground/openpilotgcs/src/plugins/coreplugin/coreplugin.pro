@@ -1,21 +1,29 @@
 TEMPLATE = lib
 TARGET = Core
 DEFINES += CORE_LIBRARY
-QT += xml \
+
+QT += declarative \
+    xml \
     network \
     script \
     svg \
-    sql
+    sql 
+
 include(../../openpilotgcsplugin.pri)
 include(../../libs/utils/utils.pri)
+include(../../libs/version_info/version_info.pri)
 include(../../shared/scriptwrapper/scriptwrapper.pri)
 include(coreplugin_dependencies.pri)
+include(authorsdialog.pri)
+
 INCLUDEPATH += dialogs \
     uavgadgetmanager \
     actionmanager
+
 DEPENDPATH += dialogs \
     uavgadgetmanager \
     actionmanager
+
 SOURCES += mainwindow.cpp \
     tabpositionindicator.cpp \
     fancyactionbar.cpp \
@@ -63,8 +71,8 @@ SOURCES += mainwindow.cpp \
     workspacesettings.cpp \
     uavconfiginfo.cpp \
     authorsdialog.cpp \
-    telemetrymonitorwidget.cpp \
-    dialogs/importsettings.cpp
+    telemetrymonitorwidget.cpp
+
 HEADERS += mainwindow.h \
     tabpositionindicator.h \
     fancyactionbar.h \
@@ -125,22 +133,22 @@ HEADERS += mainwindow.h \
     uavconfiginfo.h \
     authorsdialog.h \
     iconfigurableplugin.h \
-    telemetrymonitorwidget.h \
-    dialogs/importsettings.h
+    telemetrymonitorwidget.h
+
 FORMS += dialogs/settingsdialog.ui \
     dialogs/shortcutsettings.ui \
     generalsettings.ui \
     uavgadgetoptionspage.ui \
-    workspacesettings.ui \
-    dialogs/importsettings.ui
+    workspacesettings.ui
+
 RESOURCES += core.qrc \
     fancyactionbar.qrc
+
 unix:!macx { 
     images.files = images/openpilot_logo_*.png
     images.files = images/qtcreator_logo_*.png
     images.path = /share/pixmaps
     INSTALLS += images
 }
-OTHER_FILES += Core.pluginspec
 
-include(gcsversioninfo.pri)
+OTHER_FILES += Core.pluginspec

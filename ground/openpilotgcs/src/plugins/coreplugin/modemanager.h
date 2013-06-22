@@ -11,18 +11,18 @@
  * @brief The Core GCS plugin
  *****************************************************************************/
 /*
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
@@ -44,7 +44,6 @@ class MyTabWidget;
 QT_END_NAMESPACE
 
 namespace Core {
-
 class Command;
 class IMode;
 
@@ -54,29 +53,34 @@ class FancyActionBar;
 class MainWindow;
 } // namespace Internal
 
-class CORE_EXPORT ModeManager : public QObject
-{
+class CORE_EXPORT ModeManager : public QObject {
     Q_OBJECT
 
 public:
     ModeManager(Internal::MainWindow *mainWindow, MyTabWidget *modeStack);
 
     void init();
-    static ModeManager *instance() { return m_instance; }
+    static ModeManager *instance()
+    {
+        return m_instance;
+    }
 
-    IMode* currentMode() const;
-    IMode* mode(const QString &id) const;
+    IMode *currentMode() const;
+    IMode *mode(const QString &id) const;
 
     void addAction(Command *command, int priority, QMenu *menu = 0);
     void addWidget(QWidget *widget);
     void updateModeNameIcon(IMode *mode, const QIcon &icon, const QString &label);
-    QVector<IMode*> modes() const { return m_modes; }
+    QVector<IMode *> modes() const
+    {
+        return m_modes;
+    }
     void reorderModes(QMap<QString, int> priorities);
 
 signals:
     void currentModeAboutToChange(Core::IMode *mode);
     void currentModeChanged(Core::IMode *mode);
-    void newModeOrder(QVector<IMode*> modes);
+    void newModeOrder(QVector<IMode *> modes);
 
 public slots:
     void activateMode(const QString &id);
@@ -99,15 +103,14 @@ private:
     static ModeManager *m_instance;
     Internal::MainWindow *m_mainWindow;
     MyTabWidget *m_modeStack;
-    QMap<Command*, int> m_actions;
-    QVector<IMode*> m_modes;
-    QVector<Command*> m_modeShortcuts;
+    QMap<Command *, int> m_actions;
+    QVector<IMode *> m_modes;
+    QVector<Command *> m_modeShortcuts;
     QSignalMapper *m_signalMapper;
     QList<int> m_addedContexts;
     QList<int> m_tabOrder;
     bool m_isReprioritizing;
 };
-
 } // namespace Core
 
 #endif // MODEMANAGER_H

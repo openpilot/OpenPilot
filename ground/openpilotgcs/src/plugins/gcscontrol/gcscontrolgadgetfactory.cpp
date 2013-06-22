@@ -30,30 +30,27 @@
 #include <coreplugin/iuavgadget.h>
 
 GCSControlGadgetFactory::GCSControlGadgetFactory(QObject *parent) :
-        IUAVGadgetFactory(QString("GCSControlGadget"),
-                          tr("Controller"),
-                          parent)
-{
-}
+    IUAVGadgetFactory(QString("GCSControlGadget"),
+                      tr("Controller"),
+                      parent)
+{}
 
 GCSControlGadgetFactory::~GCSControlGadgetFactory()
+{}
+
+IUAVGadget *GCSControlGadgetFactory::createGadget(QWidget *parent)
 {
+    GCSControlGadgetWidget *gadgetWidget = new GCSControlGadgetWidget(parent);
 
-}
-
-IUAVGadget* GCSControlGadgetFactory::createGadget(QWidget *parent) {
-    GCSControlGadgetWidget* gadgetWidget = new GCSControlGadgetWidget(parent);
     return new GCSControlGadget(QString("GCSControlGadget"), gadgetWidget, parent, this->parent());
 }
 
-IUAVGadgetConfiguration *GCSControlGadgetFactory::createConfiguration(QSettings* qSettings)
+IUAVGadgetConfiguration *GCSControlGadgetFactory::createConfiguration(QSettings *qSettings)
 {
     return new GCSControlGadgetConfiguration(QString("GCSControlGadget"), qSettings);
 }
 
 IOptionsPage *GCSControlGadgetFactory::createOptionsPage(IUAVGadgetConfiguration *config)
 {
-    return new GCSControlGadgetOptionsPage(qobject_cast<GCSControlGadgetConfiguration*>(config), this->parent());
+    return new GCSControlGadgetOptionsPage(qobject_cast<GCSControlGadgetConfiguration *>(config), this->parent());
 }
-
-

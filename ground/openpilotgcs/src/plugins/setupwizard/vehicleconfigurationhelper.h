@@ -50,12 +50,11 @@ struct mixerChannelSettings {
         : type(t), throttle1(th1), throttle2(th2), roll(r), pitch(p), yaw(y) {}
 };
 
-class VehicleConfigurationHelper : public QObject
-{
+class VehicleConfigurationHelper : public QObject {
     Q_OBJECT
 
 public:
-    VehicleConfigurationHelper(VehicleConfigurationSource* configSource);
+    VehicleConfigurationHelper(VehicleConfigurationSource *configSource);
     bool setupVehicle(bool save = true);
     bool setupHardwareSettings(bool save = true);
     static const qint16 LEGACY_ESC_FREQUENCE;
@@ -66,22 +65,22 @@ signals:
 
 private:
     static const int MIXER_TYPE_DISABLED = 0;
-    static const int MIXER_TYPE_MOTOR = 1;
-    static const int MIXER_TYPE_SERVO = 2;
+    static const int MIXER_TYPE_MOTOR    = 1;
+    static const int MIXER_TYPE_SERVO    = 2;
     static const float DEFAULT_ENABLED_ACCEL_TAU = 0.1;
 
     VehicleConfigurationSource *m_configSource;
     UAVObjectManager *m_uavoManager;
 
-    QList<QPair<UAVDataObject*, QString>* > m_modifiedObjects;
-    void addModifiedObject(UAVDataObject* object, QString description);
+    QList<QPair<UAVDataObject *, QString> * > m_modifiedObjects;
+    void addModifiedObject(UAVDataObject *object, QString description);
     void clearModifiedObjects();
 
     void applyHardwareConfiguration();
     void applyVehicleConfiguration();
     void applyActuatorConfiguration();
     void applyFlighModeConfiguration();
-    void applyLevellingConfiguration();
+    void applySensorBiasConfiguration();
     void applyStabilizationConfiguration();
     void applyManualControlDefaults();
 
@@ -106,11 +105,9 @@ private:
     void setupOctoCopter();
 
 private slots:
-    void uAVOTransactionCompleted(UAVObject* object, bool success);
+    void uAVOTransactionCompleted(UAVObject *object, bool success);
     void uAVOTransactionCompleted(int oid, bool success);
     void saveChangesTimeout();
-
-
 };
 
 #endif // VEHICLECONFIGURATIONHELPER_H

@@ -33,26 +33,37 @@
 class IPconnectionConfiguration;
 
 namespace Core {
-    class IUAVGadgetConfiguration;
+class IUAVGadgetConfiguration;
 }
 
 namespace Ui {
-    class IPconnectionOptionsPage;
+class IPconnectionOptionsPage;
 }
 
 using namespace Core;
 
-class IPconnectionOptionsPage : public IOptionsPage
-{
-Q_OBJECT
+class IPconnectionOptionsPage : public IOptionsPage {
+    Q_OBJECT
 public:
     explicit IPconnectionOptionsPage(IPconnectionConfiguration *config, QObject *parent = 0);
     virtual ~IPconnectionOptionsPage();
 
-    QString id() const { return QLatin1String("settings"); }
-    QString trName() const { return tr("settings"); }
-    QString category() const { return "IP Network Telemetry"; };
-    QString trCategory() const { return "IP Network Telemetry"; };
+    QString id() const
+    {
+        return QLatin1String("settings");
+    }
+    QString trName() const
+    {
+        return tr("settings");
+    }
+    QString category() const
+    {
+        return "Telemetry - IP Network";
+    };
+    QString trCategory() const
+    {
+        return "IP Network Telemetry";
+    };
 
     QWidget *createPage(QWidget *parent);
     void apply();
@@ -65,7 +76,6 @@ public slots:
 private:
     IPconnectionConfiguration *m_config;
     Ui::IPconnectionOptionsPage *m_page;
-
 };
 
 #endif // IPconnectionOPTIONSPAGE_H

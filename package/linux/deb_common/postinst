@@ -20,7 +20,7 @@ set -e
 
 case "$1" in
     configure)
-        sudo udevadm control --reload-rules >&2
+        /sbin/udevadm control --reload-rules >&2
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

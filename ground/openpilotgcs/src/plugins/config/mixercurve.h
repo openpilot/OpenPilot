@@ -43,23 +43,22 @@ namespace Ui {
 class MixerCurve;
 }
 
-class  MixerCurve : public QFrame
-{
+class MixerCurve : public QFrame {
     Q_OBJECT
-    
+
 public:
     explicit MixerCurve(QWidget *parent = 0);
     ~MixerCurve();
 
 
     /* Enumeration options for ThrottleCurves */
-    typedef enum { MIXERCURVE_THROTTLE=0, MIXERCURVE_PITCH=1 } MixerCurveType;
+    typedef enum { MIXERCURVE_THROTTLE = 0, MIXERCURVE_PITCH = 1 } MixerCurveType;
 
     void setMixerType(MixerCurveType curveType);
-    void initCurve (const QList<double>* points);
+    void initCurve(const QList<double> *points);
     QList<double> getCurve();
     void initLinearCurve(int numPoints, double maxValue = 1, double minValue = 0);
-    void setCurve(const QList<double>* points);
+    void setCurve(const QList<double> *points);
     void setMin(double value);
     double getMin();
     void setMax(double value);
@@ -69,7 +68,10 @@ public:
     double getCurveStep();
     double setRange(double min, double max);
 
-    MixerCurveWidget* getCurveWidget() { return m_curve; }
+    MixerCurveWidget *getCurveWidget()
+    {
+        return m_curve;
+    }
 
 signals:
 
@@ -84,7 +86,6 @@ public slots:
     void UpdateSettingsTable();
 
 private slots:
-    void CommandActivated(MixerNode* node = 0);
     void SettingsTableChanged();
     void CurveTypeChanged();
     void CurveMinChanged(double value);
@@ -92,12 +93,11 @@ private slots:
     void UpdateCurveUI();
 
 private:
-    Ui::MixerCurve* m_mixerUI;
-    MixerCurveWidget* m_curve;
-    QTableWidget* m_settings;
+    Ui::MixerCurve *m_mixerUI;
+    MixerCurveWidget *m_curve;
+    QTableWidget *m_settings;
     MixerCurveType m_curveType;
-    DoubleSpinDelegate* m_spinDelegate;
-
+    DoubleSpinDelegate *m_spinDelegate;
 };
 
 #endif // MIXERCURVE_H

@@ -32,27 +32,25 @@
 #include <QtCore>
 #include <stdint.h>
 
-class GPSParser: public QObject
-{
+class GPSParser : public QObject {
     Q_OBJECT
-public:
-    ~GPSParser();
+public: ~GPSParser();
     virtual void processInputStream(char c);
 
 protected:
     GPSParser(QObject *parent = 0);
 
 signals:
-   void sv(int); // Satellites in view
-   void position(double,double,double); // Lat, Lon, Alt
-   void datetime(double,double); // Date then time
-   void speedheading(double,double);
-   void packet(QString); // Raw NMEA Packet (or just info)
-   void satellite(int,int,int,int,int); // Index, PRN, Elevation, Azimuth, SNR
-   void fixmode(QString); // Mode of fix: "Auto", "Manual".
-   void fixtype(QString); // Type of fix: "NoGPS", "NoFix", "Fix2D", "Fix3D".
-   void dop(double, double, double); // HDOP, VDOP, PDOP
-   void fixSVs(QList<int>); // SV's used for fix.
+    void sv(int); // Satellites in view
+    void position(double, double, double); // Lat, Lon, Alt
+    void datetime(double, double); // Date then time
+    void speedheading(double, double);
+    void packet(QString); // Raw NMEA Packet (or just info)
+    void satellite(int, int, int, int, int); // Index, PRN, Elevation, Azimuth, SNR
+    void fixmode(QString); // Mode of fix: "Auto", "Manual".
+    void fixtype(QString); // Type of fix: "NoGPS", "NoFix", "Fix2D", "Fix3D".
+    void dop(double, double, double); // HDOP, VDOP, PDOP
+    void fixSVs(QList<int>); // SV's used for fix.
 };
 
 #endif // GPSPARSER_H

@@ -4,7 +4,7 @@ Item {
     id: sceneItem
     property variant sceneSize
     property real groundSpeed : qmlWidget.speedFactor * Math.sqrt(Math.pow(VelocityState.North,2)+
-                                                Math.pow(VelocityActual.State,2))
+                                                Math.pow(VelocityState.East,2))
 
     SvgElementImage {
         id: speed_bg

@@ -54,7 +54,7 @@ Rectangle {
                 sceneSize: background.sceneSize
                 smooth: true
 
-                property real sideSlip: Accels.y
+                property real sideSlip: AccelState.y
                 //smooth side slip changes, a low pass filter replacement
                 //accels are updated once per second
                 Behavior on sideSlip {

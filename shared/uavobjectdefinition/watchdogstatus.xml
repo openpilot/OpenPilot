@@ -1,5 +1,5 @@
 <xml>
-    <object name="WatchdogStatus" singleinstance="true" settings="false">
+    <object name="WatchdogStatus" singleinstance="true" settings="false" category="System">
         <description>For monitoring the flags in the watchdog and especially the bootup flags</description>
         <field name="BootupFlags" units="" type="uint16" elements="1"/>
         <field name="ActiveFlags" units="" type="uint16" elements="1"/>

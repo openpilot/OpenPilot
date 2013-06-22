@@ -1,5 +1,5 @@
 <xml>
-	<object name="OPLinkSettings" singleinstance="true" settings="true">
+	<object name="OPLinkSettings" singleinstance="true" settings="true" category="System">
 		<description>OPLink configurations options.</description>
 		<field name="Bindings" units="hex" type="uint32" elements="8" defaultvalue="0"/>
 		<field name="RemoteMainPort" units="" type="enum" elements="8" options="Disabled,Serial,PPM" defaultvalue="Disabled"/>

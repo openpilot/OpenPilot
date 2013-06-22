@@ -1,5 +1,5 @@
 <xml>
-    <object name="FixedWingPathFollowerStatus" singleinstance="true" settings="false">
+    <object name="FixedWingPathFollowerStatus" singleinstance="true" settings="false" category="Control">
         <description>Object Storing Debugging Information on PID internals</description>
 	<field name="Error" units="" type="float" elementnames="Bearing,Speed,Power" />
 	<field name="ErrorInt" units="" type="float" elementnames="Bearing,Speed,Power" />

@@ -1,5 +1,5 @@
 <xml>
-    <object name="Waypoint" singleinstance="false" settings="false">
+    <object name="Waypoint" singleinstance="false" settings="false" category="Navigation">
         <description>A waypoint the aircraft can try and hit.  Used by the @ref PathPlanner module</description>
         <field name="Position" units="m" type="float" elementnames="North, East, Down"/>
 	<field name="Velocity" units="m/s" type="float" elements="1"/>

@@ -1,5 +1,5 @@
 <xml>
-    <object name="FixedWingPathFollowerSettings" singleinstance="true" settings="true">
+    <object name="FixedWingPathFollowerSettings" singleinstance="true" settings="true" category="Control">
         <description>Settings for the @ref FixedWingPathFollowerModule</description>
 
         <!-- these coefficients control desired movement in airspace -->

@@ -1,5 +1,5 @@
 <xml>
-    <object name="EKFStateVariance" singleinstance="true" settings="false">
+    <object name="EKFStateVariance" singleinstance="true" settings="false" category="State">
         <description>Extended Kalman Filter state covariance</description>
 	<field name="P" units="1^2" type="float">
 		<elementnames>

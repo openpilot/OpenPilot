@@ -1,5 +1,5 @@
 <xml>
-    <object name="OveroSyncSettings" singleinstance="true" settings="true">
+    <object name="OveroSyncSettings" singleinstance="true" settings="true" category="System">
         <description>Settings to control the behavior of the overo sync module</description>
         <field name="LogOn" units="" type="enum" options="Never,Always,Armed" elements="1" defaultvalue="Armed"/>
         <access gcs="readwrite" flight="readwrite"/>

@@ -1,5 +1,5 @@
 <xml>
-    <object name="FlightBatterySettings" singleinstance="true" settings="true">
+    <object name="FlightBatterySettings" singleinstance="true" settings="true" category="Sensors">
         <description>Flight Battery configuration.</description>
         
         <field name="Type" units="" type="enum" elements="1" options="LiPo,A123,LiCo,LiFeSO4,None" defaultvalue="LiPo"/>

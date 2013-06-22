@@ -1,5 +1,5 @@
 <xml>
-    <object name="PathStatus" singleinstance="true" settings="false">
+    <object name="PathStatus" singleinstance="true" settings="false" category="Navigation">
         <description>Status of the current path mode  Can come from any @ref PathFollower module</description>
 
 	<field name="UID" units="" type="int16" elements="1" default="0"/>

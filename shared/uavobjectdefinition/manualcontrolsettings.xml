@@ -1,5 +1,5 @@
 <xml>
-    <object name="ManualControlSettings" singleinstance="true" settings="true">
+    <object name="ManualControlSettings" singleinstance="true" settings="true" category="Control">
         <description>Settings to indicate how to decode receiver input by @ref ManualControlModule.</description>
         <field name="ChannelGroups" units="Channel Group" type="enum" 
 	       elementnames="Throttle,Roll,Pitch,Yaw,FlightMode,Collective,Accessory0,Accessory1,Accessory2"

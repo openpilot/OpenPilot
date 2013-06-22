@@ -1,5 +1,5 @@
 <xml>
-    <object name="MixerStatus" singleinstance="true" settings="false">
+    <object name="MixerStatus" singleinstance="true" settings="false" category="Control">
         <description>Status for the matrix mixer showing the output of each mixer after all scaling</description>
         <field name="Mixer1" units="" type="float" elements="1"/>
         <field name="Mixer2" units="" type="float" elements="1"/>

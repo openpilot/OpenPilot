@@ -52,153 +52,6 @@
  */
 #include "../board_hw_defs.c"
 
-/**
- * Sensor configurations
- */
-
-#if defined(PIOS_INCLUDE_ADC)
-#include "pios_adc_priv.h"
-void PIOS_ADC_DMC_irq_handler(void);
-void DMA2_Stream4_IRQHandler(void) __attribute__((alias("PIOS_ADC_DMC_irq_handler")));
-struct pios_adc_cfg pios_adc_cfg = {
-    .adc_dev = ADC1,
-    .dma     = {
-        .irq                                       = {
-            .flags = (DMA_FLAG_TCIF4 | DMA_FLAG_TEIF4 | DMA_FLAG_HTIF4),
-            .init  = {
-                .NVIC_IRQChannel    = DMA2_Stream4_IRQn,
-                .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-                .NVIC_IRQChannelSubPriority        = 0,
-                .NVIC_IRQChannelCmd = ENABLE,
-            },
-        },
-        .rx                                        = {
-            .channel = DMA2_Stream4,
-            .init    = {
-                .DMA_Channel                       = DMA_Channel_0,
-                .DMA_PeripheralBaseAddr            = (uint32_t)&ADC1->DR
-            },
-        }
-    },
-    .half_flag = DMA_IT_HTIF4,
-    .full_flag = DMA_IT_TCIF4,
-};
-void PIOS_ADC_DMC_irq_handler(void)
-{
-    /* Call into the generic code to handle the IRQ for this specific device */
-    PIOS_ADC_DMA_Handler();
-}
-
-#endif /* if defined(PIOS_INCLUDE_ADC) */
-
-#if defined(PIOS_INCLUDE_HMC5883)
-#include "pios_hmc5883.h"
-static const struct pios_exti_cfg pios_exti_hmc5883_cfg __exti_config = {
-    .vector = PIOS_HMC5883_IRQHandler,
-    .line   = EXTI_Line7,
-    .pin    = {
-        .gpio = GPIOB,
-        .init = {
-            .GPIO_Pin   = GPIO_Pin_7,
-            .GPIO_Speed = GPIO_Speed_100MHz,
-            .GPIO_Mode  = GPIO_Mode_IN,
-            .GPIO_OType = GPIO_OType_OD,
-            .GPIO_PuPd  = GPIO_PuPd_NOPULL,
-        },
-    },
-    .irq                                       = {
-        .init                                  = {
-            .NVIC_IRQChannel    = EXTI9_5_IRQn,
-            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_LOW,
-            .NVIC_IRQChannelSubPriority        = 0,
-            .NVIC_IRQChannelCmd = ENABLE,
-        },
-    },
-    .exti                                      = {
-        .init                                  = {
-            .EXTI_Line    = EXTI_Line7, // matches above GPIO pin
-            .EXTI_Mode    = EXTI_Mode_Interrupt,
-            .EXTI_Trigger = EXTI_Trigger_Rising,
-            .EXTI_LineCmd = ENABLE,
-        },
-    },
-};
-
-static const struct pios_hmc5883_cfg pios_hmc5883_cfg = {
-    .exti_cfg  = &pios_exti_hmc5883_cfg,
-    .M_ODR     = PIOS_HMC5883_ODR_75,
-    .Meas_Conf = PIOS_HMC5883_MEASCONF_NORMAL,
-    .Gain = PIOS_HMC5883_GAIN_1_9,
-    .Mode = PIOS_HMC5883_MODE_CONTINUOUS,
-};
-#endif /* PIOS_INCLUDE_HMC5883 */
-
-/**
- * Configuration for the MS5611 chip
- */
-#if defined(PIOS_INCLUDE_MS5611)
-#include "pios_ms5611.h"
-static const struct pios_ms5611_cfg pios_ms5611_cfg = {
-    .oversampling = MS5611_OSR_4096,
-};
-#endif /* PIOS_INCLUDE_MS5611 */
-
-
-/**
- * Configuration for the MPU6000 chip
- */
-#if defined(PIOS_INCLUDE_MPU6000)
-#include "pios_mpu6000.h"
-#include "pios_mpu6000_config.h"
-static const struct pios_exti_cfg pios_exti_mpu6000_cfg __exti_config = {
-    .vector = PIOS_MPU6000_IRQHandler,
-    .line   = EXTI_Line4,
-    .pin    = {
-        .gpio = GPIOC,
-        .init = {
-            .GPIO_Pin   = GPIO_Pin_4,
-            .GPIO_Speed = GPIO_Speed_100MHz,
-            .GPIO_Mode  = GPIO_Mode_IN,
-            .GPIO_OType = GPIO_OType_OD,
-            .GPIO_PuPd  = GPIO_PuPd_NOPULL,
-        },
-    },
-    .irq                                       = {
-        .init                                  = {
-            .NVIC_IRQChannel    = EXTI4_IRQn,
-            .NVIC_IRQChannelPreemptionPriority = PIOS_IRQ_PRIO_HIGH,
-            .NVIC_IRQChannelSubPriority        = 0,
-            .NVIC_IRQChannelCmd = ENABLE,
-        },
-    },
-    .exti                                      = {
-        .init                                  = {
-            .EXTI_Line    = EXTI_Line4, // matches above GPIO pin
-            .EXTI_Mode    = EXTI_Mode_Interrupt,
-            .EXTI_Trigger = EXTI_Trigger_Rising,
-            .EXTI_LineCmd = ENABLE,
-        },
-    },
-};
-
-static const struct pios_mpu6000_cfg pios_mpu6000_cfg = {
-    .exti_cfg   = &pios_exti_mpu6000_cfg,
-    .Fifo_store = PIOS_MPU6000_FIFO_TEMP_OUT | PIOS_MPU6000_FIFO_GYRO_X_OUT | PIOS_MPU6000_FIFO_GYRO_Y_OUT | PIOS_MPU6000_FIFO_GYRO_Z_OUT,
-    // Clock at 8 khz, downsampled by 12 for 666Hz
-    .Smpl_rate_div_no_dlp = 11,
-    // with dlp on output rate is 500Hz
-    .Smpl_rate_div_dlp    = 1,
-    .interrupt_cfg = PIOS_MPU6000_INT_CLR_ANYRD,
-    .interrupt_en  = PIOS_MPU6000_INTEN_DATA_RDY,
-    .User_ctl             = PIOS_MPU6000_USERCTL_FIFO_EN | PIOS_MPU6000_USERCTL_DIS_I2C,
-    .Pwr_mgmt_clk  = PIOS_MPU6000_PWRMGMT_PLL_X_CLK,
-    .accel_range   = PIOS_MPU6000_ACCEL_8G,
-    .gyro_range    = PIOS_MPU6000_SCALE_2000_DEG,
-    .filter               = PIOS_MPU6000_LOWPASS_256_HZ,
-    .orientation   = PIOS_MPU6000_TOP_180DEG
-};
-#endif /* PIOS_INCLUDE_MPU6000 */
-
 /* One slot per selectable receiver group.
  *  eg. PWM, PPM, GCS, SPEKTRUM1, SPEKTRUM2, SBUS
  * NOTE: No slot in this map for NONE.
@@ -243,6 +96,9 @@ uint32_t pios_rfm22b_id        = 0;
 
 uintptr_t pios_uavo_settings_fs_id;
 uintptr_t pios_user_fs_id;
+
+uint32_t pios_servo_enable_mask = PIOS_SERVOPORT_ALL_TIMERS_ENABLE_MASK;
+uint32_t pios_pwm_in_enable_mask = PIOS_SERVOPORT_PWM_IN_ENABLE_MASK;
 
 /*
  * Setup a com port based on the passed cfg, driver and buffer sizes. tx size of -1 make the port rx only
@@ -299,12 +155,12 @@ static void PIOS_Board_configure_dsm(const struct pios_usart_cfg *pios_usart_dsm
     pios_rcvr_group_map[channelgroup] = pios_dsm_rcvr_id;
 }
 
-static void PIOS_Board_configure_pwm(const struct pios_pwm_cfg *pwm_cfg)
+static void PIOS_Board_configure_pwm(const struct pios_pwm_cfg *pwm_cfg, uint32_t enable_mask)
 {
     /* Set up the receiver port.  Later this should be optional */
     uint32_t pios_pwm_id;
 
-    PIOS_PWM_Init(&pios_pwm_id, pwm_cfg);
+    PIOS_PWM_Init(&pios_pwm_id, pwm_cfg, enable_mask >> PIOS_SERVOPORT_FIRST_INPUT);
 
     uint32_t pios_pwm_rcvr_id;
     if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
@@ -432,6 +288,7 @@ void PIOS_Board_Init(void)
 
     /* Set up pulse timers */
     PIOS_TIM_InitClock(&tim_1_cfg);
+    PIOS_TIM_InitClock(&tim_2_cfg);
     PIOS_TIM_InitClock(&tim_3_cfg);
     PIOS_TIM_InitClock(&tim_4_cfg);
     PIOS_TIM_InitClock(&tim_5_cfg);
@@ -848,24 +705,20 @@ void PIOS_Board_Init(void)
     OPLinkStatusSet(&oplinkStatus);
 #endif /* PIOS_INCLUDE_RFM22B */
 
-#if defined(PIOS_INCLUDE_PWM) || defined(PIOS_INCLUDE_PWM)
-
-    const struct pios_servo_cfg *pios_servo_cfg;
-    // default to servo outputs only
-    pios_servo_cfg = &pios_servo_cfg_out;
-#endif
-
     /* Configure the receiver port*/
     uint8_t hwsettings_rcvrport;
     HwSettingsRM_RcvrPortGet(&hwsettings_rcvrport);
     //
     switch (hwsettings_rcvrport) {
     case HWSETTINGS_RM_RCVRPORT_DISABLED:
+        pios_servo_enable_mask &= ~PIOS_SERVOPORT_PWM_IN_ENABLE_MASK;
+        pios_pwm_in_enable_mask = 0;
         break;
     case HWSETTINGS_RM_RCVRPORT_PWM:
 #if defined(PIOS_INCLUDE_PWM)
+        pios_servo_enable_mask &= ~PIOS_SERVOPORT_PWM_IN_ENABLE_MASK;
         /* Set up the receiver port.  Later this should be optional */
-        PIOS_Board_configure_pwm(&pios_pwm_cfg);
+        PIOS_Board_configure_pwm(&pios_pwm_cfg, pios_pwm_in_enable_mask);
 #endif /* PIOS_INCLUDE_PWM */
         break;
     case HWSETTINGS_RM_RCVRPORT_PPM:
@@ -874,21 +727,24 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_PPM)
         if (hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_PPMOUTPUTS) {
             // configure servo outputs and the remaining 5 inputs as outputs
-            pios_servo_cfg = &pios_servo_cfg_out_in_ppm;
+            pios_servo_enable_mask &= ~PIOS_SERVOPORT_PPM_IN_ENABLE_MASK;
+            pios_pwm_in_enable_mask = 0;
+        } else {
+            pios_servo_enable_mask &= ~PIOS_SERVOPORT_PWM_IN_ENABLE_MASK;
         }
 
         PIOS_Board_configure_ppm(&pios_ppm_cfg);
 
-        // enable pwm on the remaining channels
+        // enable pwm in on the remaining channels
         if (hwsettings_rcvrport == HWSETTINGS_RM_RCVRPORT_PPMPWM) {
-            PIOS_Board_configure_pwm(&pios_pwm_ppm_cfg);
+            pios_pwm_in_enable_mask &= ~PIOS_SERVOPORT_PPM_IN_ENABLE_MASK;
+            PIOS_Board_configure_pwm(&pios_pwm_cfg, pios_pwm_in_enable_mask);
         }
 
         break;
 #endif /* PIOS_INCLUDE_PPM */
     case HWSETTINGS_RM_RCVRPORT_OUTPUTS:
-        // configure only the servo outputs
-        pios_servo_cfg = &pios_servo_cfg_out_in;
+        // mask already configured to enable all channels as outputs
         break;
     }
 
@@ -919,7 +775,7 @@ void PIOS_Board_Init(void)
 
 #ifndef PIOS_ENABLE_DEBUG_PINS
     // pios_servo_cfg points to the correct configuration based on input port settings
-    PIOS_Servo_Init(pios_servo_cfg);
+    PIOS_Servo_Init(&pios_servo_cfg_out, pios_servo_enable_mask);
 #else
     PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
 #endif

@@ -33,7 +33,7 @@
 #ifdef PIOS_INCLUDE_PWM
 
 #include "pios_pwm_priv.h"
-
+#include <pios_helpers.h>
 /* Provide a RCVR driver */
 static int32_t PIOS_PWM_Get(uint32_t rcvr_id, uint8_t channel);
 
@@ -52,6 +52,7 @@ enum pios_pwm_dev_magic {
 struct pios_pwm_dev {
     enum pios_pwm_dev_magic   magic;
     const struct pios_pwm_cfg *cfg;
+    uint32_t enable_mask;
 
     uint8_t  CaptureState[PIOS_PWM_NUM_INPUTS];
     uint16_t RiseValue[PIOS_PWM_NUM_INPUTS];
@@ -107,7 +108,7 @@ static const struct pios_tim_callbacks tim_callbacks = {
 /**
  * Initialises all the pins
  */
-int32_t PIOS_PWM_Init(uint32_t *pwm_id, const struct pios_pwm_cfg *cfg)
+int32_t PIOS_PWM_Init(uint32_t *pwm_id, const struct pios_pwm_cfg *cfg, uint32_t enable_mask)
 {
     PIOS_DEBUG_Assert(pwm_id);
     PIOS_DEBUG_Assert(cfg);
@@ -121,7 +122,7 @@ int32_t PIOS_PWM_Init(uint32_t *pwm_id, const struct pios_pwm_cfg *cfg)
 
     /* Bind the configuration to the device instance */
     pwm_dev->cfg = cfg;
-
+    pwm_dev->enable_mask = enable_mask;
     for (uint8_t i = 0; i < PIOS_PWM_NUM_INPUTS; i++) {
         /* Flush counter variables */
         pwm_dev->CaptureState[i] = 0;
@@ -131,37 +132,39 @@ int32_t PIOS_PWM_Init(uint32_t *pwm_id, const struct pios_pwm_cfg *cfg)
     }
 
     uint32_t tim_id;
-    if (PIOS_TIM_InitChannels(&tim_id, cfg->channels, cfg->num_channels, &tim_callbacks, (uint32_t)pwm_dev)) {
+    if (PIOS_TIM_InitChannels(&tim_id, cfg->channels, cfg->num_channels, enable_mask, &tim_callbacks, (uint32_t)pwm_dev)) {
         return -1;
     }
 
     /* Configure the channels to be in capture/compare mode */
     for (uint8_t i = 0; i < cfg->num_channels; i++) {
-        const struct pios_tim_channel *chan   = &cfg->channels[i];
+        if(BitCheck(enable_mask, i)) {
+            const struct pios_tim_channel *chan   = &cfg->channels[i];
 
-        /* Configure timer for input capture */
-        TIM_ICInitTypeDef TIM_ICInitStructure = cfg->tim_ic_init;
-        TIM_ICInitStructure.TIM_Channel = chan->timer_chan;
-        TIM_ICInit(chan->timer, &TIM_ICInitStructure);
+            /* Configure timer for input capture */
+            TIM_ICInitTypeDef TIM_ICInitStructure = cfg->tim_ic_init;
+            TIM_ICInitStructure.TIM_Channel = chan->timer_chan;
+            TIM_ICInit(chan->timer, &TIM_ICInitStructure);
 
-        /* Enable the Capture Compare Interrupt Request */
-        switch (chan->timer_chan) {
-        case TIM_Channel_1:
-            TIM_ITConfig(chan->timer, TIM_IT_CC1, ENABLE);
-            break;
-        case TIM_Channel_2:
-            TIM_ITConfig(chan->timer, TIM_IT_CC2, ENABLE);
-            break;
-        case TIM_Channel_3:
-            TIM_ITConfig(chan->timer, TIM_IT_CC3, ENABLE);
-            break;
-        case TIM_Channel_4:
-            TIM_ITConfig(chan->timer, TIM_IT_CC4, ENABLE);
-            break;
+            /* Enable the Capture Compare Interrupt Request */
+            switch (chan->timer_chan) {
+            case TIM_Channel_1:
+                TIM_ITConfig(chan->timer, TIM_IT_CC1, ENABLE);
+                break;
+            case TIM_Channel_2:
+                TIM_ITConfig(chan->timer, TIM_IT_CC2, ENABLE);
+                break;
+            case TIM_Channel_3:
+                TIM_ITConfig(chan->timer, TIM_IT_CC3, ENABLE);
+                break;
+            case TIM_Channel_4:
+                TIM_ITConfig(chan->timer, TIM_IT_CC4, ENABLE);
+                break;
+
+            // Need the update event for that timer to detect timeouts
+            TIM_ITConfig(chan->timer, TIM_IT_Update, ENABLE);
+            }
         }
-
-        // Need the update event for that timer to detect timeouts
-        TIM_ITConfig(chan->timer, TIM_IT_Update, ENABLE);
     }
 
     *pwm_id = (uint32_t)pwm_dev;
@@ -188,7 +191,7 @@ static int32_t PIOS_PWM_Get(uint32_t rcvr_id, uint8_t channel)
         return PIOS_RCVR_INVALID;
     }
 
-    if (channel >= PIOS_PWM_NUM_INPUTS) {
+    if (channel >= PIOS_PWM_NUM_INPUTS || !BitCheck(pwm_dev->enable_mask, channel)) {
         /* Channel out of range */
         return PIOS_RCVR_INVALID;
     }
@@ -204,7 +207,7 @@ static void PIOS_PWM_tim_overflow_cb(__attribute__((unused)) uint32_t tim_id, ui
         return;
     }
 
-    if (channel >= pwm_dev->cfg->num_channels) {
+    if (channel >= pwm_dev->cfg->num_channels || !BitCheck(pwm_dev->enable_mask, channel)) {
         /* Channel out of range */
         return;
     }
@@ -229,7 +232,7 @@ static void PIOS_PWM_tim_edge_cb(__attribute__((unused)) uint32_t tim_id, uint32
         return;
     }
 
-    if (chan_idx >= pwm_dev->cfg->num_channels) {
+    if (chan_idx >= pwm_dev->cfg->num_channels || !BitCheck(pwm_dev->enable_mask, chan_idx)) {
         /* Channel out of range */
         return;
     }

@@ -44,7 +44,7 @@ struct pios_servo_cfg {
     uint8_t  num_channels;
 };
 
-extern int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg);
+extern int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg, uint32_t enable_mask);
 
 #endif /* PIOS_SERVO_PRIV_H */
 

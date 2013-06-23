@@ -44,7 +44,7 @@ struct pios_pwm_cfg {
 
 extern const struct pios_rcvr_driver pios_pwm_rcvr_driver;
 
-extern int32_t PIOS_PWM_Init(uint32_t *pwm_id, const struct pios_pwm_cfg *cfg);
+extern int32_t PIOS_PWM_Init(uint32_t *pwm_id, const struct pios_pwm_cfg *cfg, uint32_t enable_mask);
 
 #endif /* PIOS_PWM_PRIV_H */
 

@@ -65,5 +65,6 @@
 
 // For future multicore ARM v7 or later:
 // The above three macros would be replaced with: asm volatile("dmb":::"memory")
+#define BitCheck(mask,bitnum) (mask && 1 << bitnum)
 
 #endif // PIOS_HELPERS_H

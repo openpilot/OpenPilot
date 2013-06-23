@@ -249,6 +249,7 @@ extern uint32_t pios_com_hkosd_id;
 // -------------------------
 // Servo outputs
 // -------------------------
+#define PIOS_SERVO_TIMER_CLOCK  1000000
 #define PIOS_SERVO_UPDATE_HZ         50
 #define PIOS_SERVOS_INITIAL_POSITION 0 /* dont want to start motors, have no pulse till settings loaded */
 

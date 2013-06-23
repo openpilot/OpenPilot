@@ -44,6 +44,7 @@ struct pios_tim_dev {
 
     const struct pios_tim_channel   *channels;
     uint8_t num_channels;
+    uint32_t enable_mask;
 
     const struct pios_tim_callbacks *callbacks;
     uint32_t context;
@@ -132,7 +133,7 @@ int32_t PIOS_TIM_InitClock(const struct pios_tim_clock_cfg *cfg)
     return 0;
 }
 
-int32_t PIOS_TIM_InitChannels(uint32_t *tim_id, const struct pios_tim_channel *channels, uint8_t num_channels, const struct pios_tim_callbacks *callbacks, uint32_t context)
+int32_t PIOS_TIM_InitChannels(uint32_t *tim_id, const struct pios_tim_channel *channels, uint8_t num_channels, uint32_t enable_mask, const struct pios_tim_callbacks *callbacks, uint32_t context)
 {
     PIOS_Assert(channels);
     PIOS_Assert(num_channels);
@@ -146,37 +147,23 @@ int32_t PIOS_TIM_InitChannels(uint32_t *tim_id, const struct pios_tim_channel *c
     /* Bind the configuration to the device instance */
     tim_dev->channels     = channels;
     tim_dev->num_channels = num_channels;
+    tim_dev->enable_mask = enable_mask;
     tim_dev->callbacks    = callbacks;
     tim_dev->context = context;
 
     /* Configure the pins */
     for (uint8_t i = 0; i < num_channels; i++) {
-        const struct pios_tim_channel *chan = &(channels[i]);
+        if(BitCheck(enable_mask, i)) {
+            const struct pios_tim_channel *chan = &(channels[i]);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    // commented out for now as f4 starts all clocks
+            GPIO_Init(chan->pin.gpio, &chan->pin.init);
 
-        /* Enable the peripheral clock for the GPIO */
-/*		switch ((uint32_t)chan->pin.gpio) {
-                case (uint32_t) GPIOA:
-                        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-                        break;
-                case (uint32_t) GPIOB:
-                        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-                        break;
-                case (uint32_t) GPIOC:
-                        RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-                        break;
-                default:
-                        PIOS_Assert(0);
-                        break;
-                }
- */                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       // commented out for now as f4 starts all clocks
-        GPIO_Init(chan->pin.gpio, &chan->pin.init);
+            PIOS_DEBUG_Assert(chan->remaP);
 
-        PIOS_DEBUG_Assert(chan->remaP);
-
-        // Second parameter should technically be PinSource but they are numerically the same
-        GPIO_PinAFConfig(chan->pin.gpio, chan->pin.pin_source, chan->remap);
+            // Second parameter should technically be PinSource but they are numerically the same
+            GPIO_PinAFConfig(chan->pin.gpio, chan->pin.pin_source, chan->remap);
+        }
     }
-
     *tim_id = (uint32_t)tim_dev;
 
     return 0;

@@ -268,6 +268,7 @@ extern uint32_t pios_packet_handler;
 // -------------------------
 #define PIOS_SERVO_UPDATE_HZ         50
 #define PIOS_SERVOS_INITIAL_POSITION 0 /* dont want to start motors, have no pulse till settings loaded */
+#define PIOS_SERVO_TIMER_CLOCK  1000000
 
 // --------------------------
 // Timer controller settings

@@ -23,6 +23,6 @@ struct pios_tim_callbacks {
 };
 
 extern int32_t PIOS_TIM_InitClock(const struct pios_tim_clock_cfg *cfg);
-extern int32_t PIOS_TIM_InitChannels(uint32_t *tim_id, const struct pios_tim_channel *channels, uint8_t num_channels, const struct pios_tim_callbacks *callbacks, uint32_t context);
+extern int32_t PIOS_TIM_InitChannels(uint32_t *tim_id, const struct pios_tim_channel *channels, uint8_t num_channels, uint32_t enable_mask, const struct pios_tim_callbacks *callbacks, uint32_t context);
 
 #endif /* PIOS_TIM_PRIV_H */

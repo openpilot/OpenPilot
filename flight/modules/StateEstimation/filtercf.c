@@ -62,6 +62,7 @@ struct data {
     bool    accel_filter_enabled;
     float   rollPitchBiasRate;
     int32_t timeval;
+    int32_t starttime;
     uint8_t init;
     bool    magCalibrated;
 };
@@ -267,11 +268,16 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         this->first_run = 0;
 
         this->timeval   = PIOS_DELAY_GetRaw();
+        this->starttime = this->timeval;
 
-        return 0;
+        return 0; // must return zero on initial initialization, so attitude will init with a valid quaternion
     }
 
-    if ((this->init == 0 && xTaskGetTickCount() < 10000) && (xTaskGetTickCount() > 4000)) {
+    if (this->init == 0 && PIOS_DELAY_DiffuS(this->starttime) < 4000000) {
+        // wait 4 seconds for the user to get his hands off in case the board was just powered
+        this->timeval = PIOS_DELAY_GetRaw();
+        return 1;
+    } else if (this->init == 0 && PIOS_DELAY_DiffuS(this->starttime) < 10000000 && PIOS_DELAY_DiffuS(this->starttime) >= 4000000) {
         // For first 7 seconds use accels to get gyro bias
         this->attitudeSettings.AccelKp     = 1.0f;
         this->attitudeSettings.AccelKi     = 0.0f;

@@ -441,7 +441,11 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         return 2;
     }
 
-    return 0;
+    if (this->init) {
+        return 0;
+    } else {
+        return 2; // return "critical" for now, so users can see the zeroing period, switch to more graceful notification later
+    }
 }
 
 static void flightStatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)

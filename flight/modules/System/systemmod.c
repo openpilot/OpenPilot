@@ -472,7 +472,7 @@ static void updateStats()
     idleCounterClear = 1;
 #if defined(PIOS_INCLUDE_ADC) && defined(PIOS_ADC_USE_TEMP_SENSOR)
     float temp_voltage = PIOS_ADC_PinGetVolt(PIOS_ADC_TEMPERATURE_PIN);
-    stats.CPUTemp = PIOS_CONVERT_VOLT_TO_CPU_TEMP(temp_voltage);;
+    stats.CPUTemp    = PIOS_CONVERT_VOLT_TO_CPU_TEMP(temp_voltage);;
 #endif
     SystemStatsSet(&stats);
 }

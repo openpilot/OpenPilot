@@ -57,7 +57,8 @@ struct pios_adc_dev {
     enum pios_adc_dev_magic magic;
 };
 
-float PIOS_ADC_PinGetVolt(uint32_t pin){
+float PIOS_ADC_PinGetVolt(uint32_t pin)
+{
     return ((float)PIOS_ADC_PinGet(pin)) * PIOS_ADC_VOLTAGE_SCALE;
 }
 

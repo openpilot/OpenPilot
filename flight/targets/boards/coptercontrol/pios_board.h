@@ -25,7 +25,7 @@
 
 #ifndef PIOS_BOARD_H
 #define PIOS_BOARD_H
-
+#include <pios_architecture.h>
 // ------------------------
 // Timers and Channels Used
 // ------------------------
@@ -213,12 +213,7 @@ extern uint32_t pios_com_hkosd_id;
 #define PIOS_ADC_RATE                    (72.0e6f / 1.0f / 8.0f / 252.0f / (PIOS_ADC_NUM_CHANNELS >> PIOS_ADC_USE_ADC2))
 #define PIOS_ADC_MAX_OVERSAMPLING        36
 
-#define PIOS_ADC_VOLTAGE_SCALE 3.30f/4096.0f
-
-#define PIOS_ADC_TEMPERATURE_PIN 0
-#define PIOS_ADC_STM32_TEMP_V25 1.43f /* V */
-#define PIOS_ADC_STM32_TEMP_AVG_SLOPE 4.3f /* mV/C */
-#define PIOS_CONVERT_VOLT_TO_CPU_TEMP(x) ((PIOS_ADC_STM32_TEMP_V25 - x)  * 1000.0f / PIOS_ADC_STM32_TEMP_AVG_SLOPE + 25.0f)
+#define PIOS_ADC_TEMPERATURE_PIN         0
 
 // ------------------------
 // PIOS_RCVR

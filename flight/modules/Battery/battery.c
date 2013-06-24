@@ -141,7 +141,7 @@ static void onTimer(__attribute__((unused)) UAVObjEvent *ev)
     }
 
     if (currentADCPin >= 0) {
-        flightBatteryData.Current =  PIOS_ADC_PinGetVolt(currentADCPin) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_CURRENTFACTOR]; // in Amps
+        flightBatteryData.Current = PIOS_ADC_PinGetVolt(currentADCPin) * batterySettings.SensorCalibrations[FLIGHTBATTERYSETTINGS_SENSORCALIBRATIONS_CURRENTFACTOR]; // in Amps
         if (flightBatteryData.Current > flightBatteryData.PeakCurrent) {
             flightBatteryData.PeakCurrent = flightBatteryData.Current; // in Amps
         }

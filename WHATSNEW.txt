@@ -1,3 +1,8 @@
+2013-06-24
+Temporary disabled AltitudeHold and AltitudeVario flight modes. They were not
+officially supported. But since people expected well-known production quality
+behavior, it is better to make them final, then reenable.
+
 --- RELEASE-13.06 --- Italian Stallion Release ---
 
 This is the first official OpenPilot Revolution software release. This version

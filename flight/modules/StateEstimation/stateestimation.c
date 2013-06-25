@@ -129,8 +129,6 @@ static stateFilter cfFilter;
 static stateFilter cfmFilter;
 static stateFilter ekf13iFilter;
 static stateFilter ekf13Filter;
-static stateFilter ekf16Filter;
-static stateFilter ekf16iFilter;
 
 // preconfigured filter chains selectable via revoSettings.FusionAlgorithm
 static filterPipeline *cfQueue = &(filterPipeline) {
@@ -183,35 +181,6 @@ static const filterPipeline *ekf13Queue = &(filterPipeline) {
             .filter = &baroFilter,
             .next   = &(filterPipeline) {
                 .filter = &ekf13Filter,
-                .next   = NULL,
-            }
-        }
-    }
-};
-static const filterPipeline *ekf16iQueue = &(filterPipeline) {
-    .filter = &magFilter,
-    .next   = &(filterPipeline) {
-        .filter = &airFilter,
-        .next   = &(filterPipeline) {
-            .filter = &baroFilter,
-            .next   = &(filterPipeline) {
-                .filter = &stationaryFilter,
-                .next   = &(filterPipeline) {
-                    .filter = &ekf16iFilter,
-                    .next   = NULL,
-                }
-            }
-        }
-    }
-};
-static const filterPipeline *ekf16Queue = &(filterPipeline) {
-    .filter = &magFilter,
-    .next   = &(filterPipeline) {
-        .filter = &airFilter,
-        .next   = &(filterPipeline) {
-            .filter = &baroFilter,
-            .next   = &(filterPipeline) {
-                .filter = &ekf16Filter,
                 .next   = NULL,
             }
         }
@@ -274,8 +243,6 @@ int32_t StateEstimationInitialize(void)
     stack_required = maxint32_t(stack_required, filterCFMInitialize(&cfmFilter));
     stack_required = maxint32_t(stack_required, filterEKF13iInitialize(&ekf13iFilter));
     stack_required = maxint32_t(stack_required, filterEKF13Initialize(&ekf13Filter));
-    stack_required = maxint32_t(stack_required, filterEKF16Initialize(&ekf16Filter));
-    stack_required = maxint32_t(stack_required, filterEKF16iInitialize(&ekf16iFilter));
 
     stateEstimationCallback = DelayedCallbackCreate(&StateEstimationCb, CALLBACK_PRIORITY, TASK_PRIORITY, stack_required);
 
@@ -352,12 +319,6 @@ static void StateEstimationCb(void)
                     break;
                 case REVOSETTINGS_FUSIONALGORITHM_INS13OUTDOOR:
                     newFilterChain = ekf13Queue;
-                    break;
-                case REVOSETTINGS_FUSIONALGORITHM_INS16INDOOR:
-                    newFilterChain = ekf16iQueue;
-                    break;
-                case REVOSETTINGS_FUSIONALGORITHM_INS16OUTDOOR:
-                    newFilterChain = ekf16Queue;
                     break;
                 default:
                     newFilterChain = NULL;

@@ -43,7 +43,7 @@ class ConfigStabilizationWidget : public ConfigTaskWidget {
 public:
     ConfigStabilizationWidget(QWidget *parent = 0);
     ~ConfigStabilizationWidget();
-    bool shouldObjectBeSaved(UAVObject * object);
+    bool shouldObjectBeSaved(UAVObject *object);
 
 private:
     Ui_StabilizationWidget *ui;
@@ -62,7 +62,6 @@ private slots:
     void linkCheckBoxes(bool value);
     void processLinkedWidgets(QWidget *);
     void onBoardConnected();
-
 };
 
 #endif // ConfigStabilizationWidget_H

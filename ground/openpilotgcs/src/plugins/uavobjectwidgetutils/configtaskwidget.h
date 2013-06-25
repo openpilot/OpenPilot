@@ -144,7 +144,7 @@ public:
     void addHelpButton(QPushButton *button, QString url);
     void forceShadowUpdates();
     void forceConnectedState();
-    virtual bool shouldObjectBeSaved(UAVObject * object);
+    virtual bool shouldObjectBeSaved(UAVObject *object);
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();

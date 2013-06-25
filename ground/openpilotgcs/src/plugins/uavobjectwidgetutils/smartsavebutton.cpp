@@ -78,7 +78,7 @@ void smartSaveButton::processOperation(QPushButton *button, bool save)
     foreach(UAVDataObject * obj, objects) {
         UAVObject::Metadata mdata = obj->getMetadata();
 
-        //Should we really save this object to the board?
+        // Should we really save this object to the board?
         if (!configWidget->shouldObjectBeSaved(obj) || UAVObject::GetGcsAccess(mdata) == UAVObject::ACCESS_READONLY) {
             qDebug() << obj->getName() << "was skipped.";
             continue;
@@ -95,7 +95,7 @@ void smartSaveButton::processOperation(QPushButton *button, bool save)
             timer.start(3000);
             loop.exec();
             if (!timer.isActive()) {
-                qDebug() << "Upload of" << obj->getName() << "timed out." ;
+                qDebug() << "Upload of" << obj->getName() << "timed out.";
             }
             timer.stop();
 
@@ -116,7 +116,7 @@ void smartSaveButton::processOperation(QPushButton *button, bool save)
         current_objectID = obj->getObjID();
         if (save && (obj->isSettings())) {
             for (int i = 0; i < 3; ++i) {
-                qDebug() << "Saving"  << obj->getName() << "to board.";
+                qDebug() << "Saving" << obj->getName() << "to board.";
                 connect(utilMngr, SIGNAL(saveCompleted(int, bool)), this, SLOT(saving_finished(int, bool)));
                 connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
                 utilMngr->saveObjectToSD(obj);
@@ -208,7 +208,7 @@ void smartSaveButton::enableControls(bool value)
 void smartSaveButton::resetIcons()
 {
     foreach(QPushButton * button, buttonList.keys())
-        button->setIcon(QIcon());
+    button->setIcon(QIcon());
 }
 
 void smartSaveButton::apply()

@@ -208,10 +208,9 @@ void ConfigStabilizationWidget::onBoardConnected()
 bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)
 {
     // AltitudeHoldSettings should only be saved for Revolution board to avoid error.
-    if((boardModel & 0xff00) != 0x0900) {
-        return dynamic_cast<AltitudeHoldSettings*>(object) == 0;
-    }
-    else {
+    if ((boardModel & 0xff00) != 0x0900) {
+        return dynamic_cast<AltitudeHoldSettings *>(object) == 0;
+    } else {
         return true;
     }
 }

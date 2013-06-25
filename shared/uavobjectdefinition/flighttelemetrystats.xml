@@ -1,5 +1,5 @@
 <xml>
-    <object name="FlightTelemetryStats" singleinstance="true" settings="false">
+    <object name="FlightTelemetryStats" singleinstance="true" settings="false" category="System">
         <description>Maintains the telemetry statistics from the OpenPilot flight computer.</description>
         <field name="Status" units="" type="enum" elements="1" options="Disconnected,HandshakeReq,HandshakeAck,Connected"/>
         <field name="TxDataRate" units="bytes/sec" type="float" elements="1"/>

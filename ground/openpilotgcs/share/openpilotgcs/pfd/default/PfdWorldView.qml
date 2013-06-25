@@ -23,10 +23,10 @@ Item {
                 id: pitchTranslate
                 x: Math.round((world.parent.width - world.width)/2)
                 y: Math.round((world.parent.height - world.height)/2 +
-                              AttitudeActual.Pitch*world.parent.height/94)
+                              AttitudeState.Pitch*world.parent.height/94)
             },
             Rotation {
-                angle: -AttitudeActual.Roll
+                angle: -AttitudeState.Roll
                 origin.x : world.parent.width/2
                 origin.y : world.parent.height/2
             }

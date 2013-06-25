@@ -32,8 +32,8 @@
 
 #include "openpilot.h"
 #include "gps_airspeed.h"
-#include "gpsvelocity.h"
-#include "attitudeactual.h"
+#include "gpsvelocitysensor.h"
+#include "attitudestate.h"
 #include "CoordinateConversions.h"
 #include <pios_math.h>
 
@@ -66,15 +66,15 @@ void gps_airspeedInitialize()
     gps = (struct GPSGlobals *)pvPortMalloc(sizeof(struct GPSGlobals));
 
     // GPS airspeed calculation variables
-    GPSVelocityData gpsVelData;
-    GPSVelocityGet(&gpsVelData);
+    GPSVelocitySensorData gpsVelData;
+    GPSVelocitySensorGet(&gpsVelData);
 
     gps->gpsVelOld_N = gpsVelData.North;
     gps->gpsVelOld_E = gpsVelData.East;
     gps->gpsVelOld_D = gpsVelData.Down;
 
-    AttitudeActualData attData;
-    AttitudeActualGet(&attData);
+    AttitudeStateData attData;
+    AttitudeStateGet(&attData);
 
     float Rbe[3][3];
     float q[4] = { attData.q1, attData.q2, attData.q3, attData.q4 };
@@ -101,8 +101,8 @@ void gps_airspeedGet(float *v_air_GPS)
     float Rbe[3][3];
 
     { // Scoping to save memory. We really just need Rbe.
-        AttitudeActualData attData;
-        AttitudeActualGet(&attData);
+        AttitudeStateData attData;
+        AttitudeStateGet(&attData);
 
         float q[4] = { attData.q1, attData.q2, attData.q3, attData.q4 };
 
@@ -115,8 +115,8 @@ void gps_airspeedGet(float *v_air_GPS)
 
     // If there's more than a 5 degree difference between two fuselage measurements, then we have sufficient delta to continue.
     if (fabsf(cosDiff) < cosf(DEG2RAD(5.0f))) {
-        GPSVelocityData gpsVelData;
-        GPSVelocityGet(&gpsVelData);
+        GPSVelocitySensorData gpsVelData;
+        GPSVelocitySensorGet(&gpsVelData);
 
         // Calculate the norm^2 of the difference between the two GPS vectors
         float normDiffGPS2 = powf(gpsVelData.North - gps->gpsVelOld_N, 2.0f) + powf(gpsVelData.East - gps->gpsVelOld_E, 2.0f) + powf(gpsVelData.Down - gps->gpsVelOld_D, 2.0f);

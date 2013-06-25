@@ -32,11 +32,12 @@
 
 #include <openpilot.h>
 
-#include "gpsposition.h"
+#include "gpspositionsensor.h"
 #include "homelocation.h"
+#include "positionsensor.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
-#include "gpsvelocity.h"
+#include "gpsvelocitysensor.h"
 #include "systemsettings.h"
 #include "taskinfo.h"
 #include "hwsettings.h"
@@ -56,8 +57,11 @@ static void gpsTask(void *parameters);
 static void updateSettings();
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
-static void setHomeLocation(GPSPositionData *gpsData);
+static void setHomeLocation(GPSPositionSensorData *gpsData);
 static float GravityAccel(float latitude, float longitude, float altitude);
+#endif
+#ifdef PIOS_GPS_SETS_POSITIONSENSOR
+static void setPositionSensor(GPSPositionSensorData *gpsData);
 #endif
 
 // ****************
@@ -68,7 +72,7 @@ static float GravityAccel(float latitude, float longitude, float altitude);
 
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 // Unfortunately need a good size stack for the WMM calculation
-        #define STACK_SIZE_BYTES 850
+        #define STACK_SIZE_BYTES 1024
 #else
 #if defined(PIOS_GPS_MINIMAL)
         #define STACK_SIZE_BYTES 500
@@ -145,23 +149,27 @@ int32_t GPSInitialize(void)
     // These objects MUST be initialized for Revolution
     // because the rest of the system expects to just
     // attach to their queues
-    GPSPositionInitialize();
-    GPSVelocityInitialize();
+    GPSPositionSensorInitialize();
+    GPSVelocitySensorInitialize();
     GPSTimeInitialize();
     GPSSatellitesInitialize();
     HomeLocationInitialize();
+    PositionSensorInitialize();
     updateSettings();
 
 #else
     if (gpsPort && gpsEnabled) {
-        GPSPositionInitialize();
-        GPSVelocityInitialize();
+        GPSPositionSensorInitialize();
+        GPSVelocitySensorInitialize();
 #if !defined(PIOS_GPS_MINIMAL)
         GPSTimeInitialize();
         GPSSatellitesInitialize();
 #endif
-#ifdef PIOS_GPS_SETS_HOMELOCATION
+#if (defined(PIOS_GPS_SETS_HOMELOCATION) || defined(PIOS_GPS_SETS_POSITIONSENSOR))
         HomeLocationInitialize();
+#endif
+#ifdef PIOS_GPS_SETS_POSITIONSENSOR
+        PositionSensorInitialize();
 #endif
         updateSettings();
     }
@@ -200,7 +208,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
     portTickType xDelay = 100 / portTICK_RATE_MS;
     uint32_t timeNowMs  = xTaskGetTickCount() * portTICK_RATE_MS;
 
-    GPSPositionData gpsposition;
+    GPSPositionSensorData gpspositionsensor;
     uint8_t gpsProtocol;
 
     SystemSettingsGPSDataProtocolGet(&gpsProtocol);
@@ -208,7 +216,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
     timeOfLastUpdateMs  = timeNowMs;
     timeOfLastCommandMs = timeNowMs;
 
-    GPSPositionGet(&gpsposition);
+    GPSPositionSensorGet(&gpspositionsensor);
     // Loop forever
     while (1) {
         uint8_t c;
@@ -219,12 +227,12 @@ static void gpsTask(__attribute__((unused)) void *parameters)
             switch (gpsProtocol) {
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
             case SYSTEMSETTINGS_GPSDATAPROTOCOL_NMEA:
-                res = parse_nmea_stream(c, gps_rx_buffer, &gpsposition, &gpsRxStats);
+                res = parse_nmea_stream(c, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
                 break;
 #endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
             case SYSTEMSETTINGS_GPSDATAPROTOCOL_UBX:
-                res = parse_ubx_stream(c, gps_rx_buffer, &gpsposition, &gpsRxStats);
+                res = parse_ubx_stream(c, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
                 break;
 #endif
             default:
@@ -244,25 +252,30 @@ static void gpsTask(__attribute__((unused)) void *parameters)
         if ((timeNowMs - timeOfLastUpdateMs) >= GPS_TIMEOUT_MS) {
             // we have not received any valid GPS sentences for a while.
             // either the GPS is not plugged in or a hardware problem or the GPS has locked up.
-            uint8_t status = GPSPOSITION_STATUS_NOGPS;
-            GPSPositionStatusSet(&status);
+            uint8_t status = GPSPOSITIONSENSOR_STATUS_NOGPS;
+            GPSPositionSensorStatusSet(&status);
             AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_ERROR);
         } else {
             // we appear to be receiving GPS sentences OK, we've had an update
             // criteria for GPS-OK taken from this post...
             // http://forums.openpilot.org/topic/1523-professors-insgps-in-svn/page__view__findpost__p__5220
-            if ((gpsposition.PDOP < 3.5f) && (gpsposition.Satellites >= 7) &&
-                (gpsposition.Status == GPSPOSITION_STATUS_FIX3D)) {
+            if ((gpspositionsensor.PDOP < 3.5f) && (gpspositionsensor.Satellites >= 7) &&
+                (gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
+                (gpspositionsensor.Latitude != 0 || gpspositionsensor.Longitude != 0)) {
                 AlarmsClear(SYSTEMALARMS_ALARM_GPS);
 #ifdef PIOS_GPS_SETS_HOMELOCATION
                 HomeLocationData home;
                 HomeLocationGet(&home);
 
                 if (home.Set == HOMELOCATION_SET_FALSE) {
-                    setHomeLocation(&gpsposition);
+                    setHomeLocation(&gpspositionsensor);
                 }
 #endif
-            } else if (gpsposition.Status == GPSPOSITION_STATUS_FIX3D) {
+#ifdef PIOS_GPS_SETS_POSITIONSENSOR
+                setPositionSensor(&gpspositionsensor);
+#endif
+            } else if ((gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
+                       (gpspositionsensor.Latitude != 0 || gpspositionsensor.Longitude != 0)) {
                 AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_WARNING);
             } else {
                 AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_CRITICAL);
@@ -290,7 +303,7 @@ static float GravityAccel(float latitude, __attribute__((unused)) float longitud
 
 // ****************
 
-static void setHomeLocation(GPSPositionData *gpsData)
+static void setHomeLocation(GPSPositionSensorData *gpsData)
 {
     HomeLocationData home;
 
@@ -322,6 +335,32 @@ static void setHomeLocation(GPSPositionData *gpsData)
     }
 }
 #endif /* ifdef PIOS_GPS_SETS_HOMELOCATION */
+
+#ifdef PIOS_GPS_SETS_POSITIONSENSOR
+static void setPositionSensor(GPSPositionSensorData *gpsData)
+{
+    HomeLocationData home;
+
+    HomeLocationGet(&home);
+    PositionSensorData pos;
+    PositionSensorGet(&pos);
+
+    double ECEF[3];
+    double Rne[3][3];
+    {
+        float LLA[3] = { (home.Latitude) / 10e6f, (home.Longitude) / 10e6f, (home.Altitude) };
+        LLA2ECEF(LLA, ECEF);
+        RneFromLLA(LLA, Rne);
+    }
+    { float LLA[3] = { (gpsData->Latitude) / 10e6d, (gpsData->Longitude) / 10e6d, gpsData->Altitude + gpsData->GeoidSeparation };
+      float NED[3];
+      LLA2Base(LLA, ECEF, Rne, NED);
+      pos.North = NED[0];
+      pos.East  = NED[1];
+      pos.Down  = NED[2]; }
+    PositionSensorSet(&pos);
+}
+#endif /* ifdef PIOS_GPS_SETS_POSITIONSENSOR */
 
 /**
  * Update the GPS settings, called on startup.

@@ -52,14 +52,14 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
     // setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
     QStringList objectsToExport;
-    objectsToExport << "VelocityActual" <<
-        "PositionActual" <<
-        "AttitudeActual" <<
-        "Accels" <<
+    objectsToExport << "VelocityState" <<
+        "PositionState" <<
+        "AttitudeState" <<
+        "AccelState" <<
         "VelocityDesired" <<
-        "PositionDesired" <<
-        "AttitudeHoldDesired" <<
-        "GPSPosition" <<
+        "PathDesired" <<
+        "AltitudeHoldDesired" <<
+        "GPSPositionSensor" <<
         "GCSTelemetryStats" <<
         "FlightBatteryState";
 
@@ -174,7 +174,7 @@ void PfdQmlGadgetWidget::setOpenGLEnabled(bool arg)
     }
 }
 
-// Switch between PositionActual UAVObject position
+// Switch between PositionState UAVObject position
 // and pre-defined latitude/longitude/altitude properties
 void PfdQmlGadgetWidget::setActualPositionUsed(bool arg)
 {

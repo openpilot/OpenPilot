@@ -93,9 +93,9 @@ using namespace osgEarth::Annotation;
 #include "utils/homelocationutil.h"
 #include "utils/worldmagmodel.h"
 #include "utils/coordinateconversions.h"
-#include "attitudeactual.h"
+#include "attitudestate.h"
 #include "homelocation.h"
-#include "positionactual.h"
+#include "positionstate.h"
 
 using namespace Utils;
 

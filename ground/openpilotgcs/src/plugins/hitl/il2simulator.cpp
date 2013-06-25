@@ -262,20 +262,20 @@ void IL2Simulator::processUpdate(const QByteArray & inp)
     out.dstE         = current.X;
     out.dstD         = -current.Z;
 
-    // Update BaroAltitude object
+    // Update BaroSensor object
     out.altitude     = current.Z;
     out.agl          = current.Z;
     out.temperature  = airParameters.groundTemp + (current.Z * airParameters.tempLapseRate) - 273.0;
     out.pressure     = airPressureFromAltitude(current.Z, airParameters, gravity); // kpa
 
 
-    // Update attActual object
+    // Update attState object
     out.roll    = current.roll;   // roll;
     out.pitch   = current.pitch;  // pitch
     out.heading = current.azimuth; // yaw
 
 
-    // Update VelocityActual.{North,East,Down}
+    // Update VelocityState.{North,East,Down}
     out.velNorth = current.dY;
     out.velEast  = current.dX;
     out.velDown  = -current.dZ;

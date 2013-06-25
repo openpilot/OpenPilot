@@ -1,5 +1,5 @@
 <xml>
-    <object name="NedAccel" singleinstance="true" settings="false">
+    <object name="NedAccel" singleinstance="true" settings="false" category="State">
         <description>The projection of acceleration in the NED reference frame used by @ref Guidance.</description>
         <field name="North" units="m/s^2" type="float" elements="1"/>
         <field name="East" units="m/s^2" type="float" elements="1"/>

@@ -5,19 +5,19 @@ function OPPlots()
 	 
     %load('specificfilename')
 
-    TimeVA = [VelocityActual.timestamp]/1000;
-    VA = [[VelocityActual.North]
-          [VelocityActual.East]
-          [VelocityActual.Down]]/100;
+    TimeVA = [VelocityState.timestamp]/1000;
+    VA = [[VelocityState.North]
+          [VelocityState.East]
+          [VelocityState.Down]]/100;
 
-    TimeGPSPos = [GPSPosition.timestamp]/1000;
-    Vgps=[[GPSPosition.Groundspeed].*cos([GPSPosition.Heading]*pi/180)
-          [GPSPosition.Groundspeed].*sin([GPSPosition.Heading]*pi/180)];
+    TimeGPSPos = [GPSPositionSensor.timestamp]/1000;
+    Vgps=[[GPSPositionSensor.Groundspeed].*cos([GPSPositionSensor.Heading]*pi/180)
+          [GPSPositionSensor.Groundspeed].*sin([GPSPositionSensor.Heading]*pi/180)];
 
     figure(1);
     plot(TimeVA,VA(1,:),TimeVA,VA(2,:),TimeGPSPos,Vgps(1,:),TimeGPSPos,Vgps(2,:));
-    s1='Velocity Actual North';
-    s2='Velocity Actual East';
+    s1='Velocity State North';
+    s2='Velocity State East';
     s3='GPS Velocity North';
     s4='GPS Velocity East';
     legend(s1,s2,s3,s4);
@@ -25,23 +25,23 @@ function OPPlots()
     ylabel('Velocity (m/s)');
 
 
-    TimePA = [PositionActual.timestamp]/1000;
-    PA = [[PositionActual.North]
-          [PositionActual.East]
-          [PositionActual.Down]]/100;
+    TimePA = [PositionState.timestamp]/1000;
+    PA = [[PositionState.North]
+          [PositionState.East]
+          [PositionState.Down]]/100;
 
-    TimeGPSPos = [GPSPosition.timestamp]/1000;
-    LLA=[[GPSPosition.Latitude]*1e-7;
-         [GPSPosition.Longitude]*1e-7;
-         [GPSPosition.Altitude]+[GPSPosition.GeoidSeparation]];
+    TimeGPSPos = [GPSPositionSensor.timestamp]/1000;
+    LLA=[[GPSPositionSensor.Latitude]*1e-7;
+         [GPSPositionSensor.Longitude]*1e-7;
+         [GPSPositionSensor.Altitude]+[GPSPositionSensor.GeoidSeparation]];
     BaseECEF = LLA2ECEF([HomeLocation.Latitude*1e-7, HomeLocation.Longitude*1e-7, HomeLocation.Altitude]');
     Rne = RneFromLLA([HomeLocation.Latitude*1e-7, HomeLocation.Longitude*1e-7, HomeLocation.Altitude]');
     GPSPos=LLA2Base(LLA,BaseECEF,Rne); 
 
     figure(2);
     plot(TimePA,PA(1,:),TimePA,PA(2,:),TimeGPSPos,GPSPos(1,:),TimeGPSPos,GPSPos(2,:));
-    s1='Position Actual North';
-    s2='Position Actual East';
+    s1='Position State North';
+    s2='Position State East';
     s3='GPS Position North';
     s4='GPS Position East';
     legend(s1,s2,s3,s4);
@@ -50,7 +50,7 @@ function OPPlots()
 
     figure(3);
     plot3(PA(2,:),PA(1,:),PA(3,:),GPSPos(2,:),GPSPos(1,:),GPSPos(3,:));
-    s1='Pos Actual';
+    s1='Pos State';
     s2='GPS Pos';
     legend(s1,s2);
     xlabel('East (m)');

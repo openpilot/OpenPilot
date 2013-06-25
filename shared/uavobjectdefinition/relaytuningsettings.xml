@@ -1,5 +1,5 @@
 <xml>
-    <object name="RelayTuningSettings" singleinstance="true" settings="true">
+    <object name="RelayTuningSettings" singleinstance="true" settings="true" category="Control">
         <description>Setting to run a relay tuning algorithm</description>
 	<field name="RateGain" units="" type="float" elements="1" defaultvalue="0.3333"/>
 	<field name="AttitudeGain" units="" type="float" elements="1" defaultvalue="0.2"/>

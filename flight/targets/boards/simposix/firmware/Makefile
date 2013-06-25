@@ -38,6 +38,8 @@ MODULES += VtolPathFollower
 MODULES += CameraStab
 MODULES += Telemetry
 MODULES += FirmwareIAP
+MODULES += StateEstimation
+MODULES += Sensors/simulated/Sensors
 #MODULES += OveroSync
 
 # Paths

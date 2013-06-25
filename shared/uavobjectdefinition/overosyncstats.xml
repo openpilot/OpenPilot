@@ -1,5 +1,5 @@
 <xml>
-    <object name="OveroSyncStats" singleinstance="true" settings="false">
+    <object name="OveroSyncStats" singleinstance="true" settings="false" category="System">
         <description>Maintains statistics on transfer rate to and from over</description>
         <field name="Connected" units="" type="enum" options="False,True" elements="1" default="False"/>
 	<field name="Send" units="B/s" type="uint32" elements="1"/>

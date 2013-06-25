@@ -1,6 +1,6 @@
 <xml>
-    <object name="AirspeedActual" singleinstance="true" settings="false">
-        <description>UAVO for true airspeed, calibrated airspeed, angle of attack, and angle of slip</description>
+    <object name="AirspeedState" singleinstance="true" settings="false" category="State">
+        <description>UAVO for true airspeed and calibrated airspeed state estimation.</description>
         <field name="CalibratedAirspeed" units="m/s" type="float" elements="1"/>
         <field name="TrueAirspeed" units="m/s" type="float" elements="1"/>
         <access gcs="readwrite" flight="readwrite"/>

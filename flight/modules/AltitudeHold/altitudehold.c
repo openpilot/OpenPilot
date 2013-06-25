@@ -28,7 +28,7 @@
 
 /**
  * Input object: ActiveWaypoint
- * Input object: PositionActual
+ * Input object: PositionState
  * Input object: ManualControlCommand
  * Output object: AttitudeDesired
  *
@@ -48,14 +48,14 @@
 #include <math.h>
 #include <CoordinateConversions.h>
 #include <altholdsmoothed.h>
-#include <attitudeactual.h>
+#include <attitudestate.h>
 #include <altitudeholdsettings.h>
 #include <altitudeholddesired.h> // object that will be updated by the module
-#include <baroaltitude.h>
-#include <positionactual.h>
+#include <barosensor.h>
+#include <positionstate.h>
 #include <flightstatus.h>
 #include <stabilizationdesired.h>
-#include <accels.h>
+#include <accelstate.h>
 #include <taskinfo.h>
 #include <pios_constants.h>
 // Private constants
@@ -136,11 +136,11 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
     bool enterFailSafe = false;
     // Listen for updates.
     AltitudeHoldDesiredConnectQueue(queue);
-    BaroAltitudeConnectQueue(queue);
+    BaroSensorConnectQueue(queue);
     FlightStatusConnectQueue(queue);
-    AccelsConnectQueue(queue);
+    AccelStateConnectQueue(queue);
     bool altitudeHoldFlightMode = false;
-    BaroAltitudeAltitudeGet(&smoothed_altitude);
+    BaroSensorAltitudeGet(&smoothed_altitude);
     running = false;
     enum init_state { WAITING_BARO, WAITIING_INIT, INITED } init = WAITING_BARO;
 
@@ -160,7 +160,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 
             // Todo: Add alarm if it should be running
             continue;
-        } else if (ev.obj == BaroAltitudeHandle()) {
+        } else if (ev.obj == BaroSensorHandle()) {
             baro_updated = true;
 
             init = (init == WAITING_BARO) ? WAITIING_INIT : init;
@@ -182,7 +182,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 running = false;
                 lastAltitudeHoldDesiredUpdate = PIOS_DELAY_GetRaw();
             }
-        } else if (ev.obj == AccelsHandle()) {
+        } else if (ev.obj == AccelStateHandle()) {
             static uint32_t timeval;
 
             static float z[4] = { 0, 0, 0, 0 };
@@ -205,17 +205,17 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             S[1] = altitudeHoldSettings.AccelNoise;
             G[2] = altitudeHoldSettings.AccelDrift;
 
-            AccelsData accels;
-            AccelsGet(&accels);
-            AttitudeActualData attitudeActual;
-            AttitudeActualGet(&attitudeActual);
-            BaroAltitudeData baro;
-            BaroAltitudeGet(&baro);
+            AccelStateData accelState;
+            AccelStateGet(&accelState);
+            AttitudeStateData attitudeState;
+            AttitudeStateGet(&attitudeState);
+            BaroSensorData baro;
+            BaroSensorGet(&baro);
 
             /* Downsample accels to stop this calculation consuming too much CPU */
-            accels_accum[0] += accels.x;
-            accels_accum[1] += accels.y;
-            accels_accum[2] += accels.z;
+            accels_accum[0] += accelState.x;
+            accels_accum[1] += accelState.y;
+            accels_accum[2] += accelState.z;
             accel_downsample_count++;
 
             if (accel_downsample_count < ACCEL_DOWNSAMPLE) {
@@ -223,9 +223,9 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             }
 
             accel_downsample_count = 0;
-            accels.x = accels_accum[0] / ACCEL_DOWNSAMPLE;
-            accels.y = accels_accum[1] / ACCEL_DOWNSAMPLE;
-            accels.z = accels_accum[2] / ACCEL_DOWNSAMPLE;
+            accelState.x    = accels_accum[0] / ACCEL_DOWNSAMPLE;
+            accelState.y    = accels_accum[1] / ACCEL_DOWNSAMPLE;
+            accelState.z    = accels_accum[2] / ACCEL_DOWNSAMPLE;
             accels_accum[0] = accels_accum[1] = accels_accum[2] = 0;
 
             thisTime = xTaskGetTickCount();
@@ -233,7 +233,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             if (init == WAITIING_INIT) {
                 z[0] = baro.Altitude;
                 z[1] = 0;
-                z[2] = accels.z;
+                z[2] = accelState.z;
                 z[3] = 0;
                 init = INITED;
             } else if (init == WAITING_BARO) {
@@ -244,14 +244,14 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             // rotate avg accels into earth frame and store it
             if (1) {
                 float q[4], Rbe[3][3];
-                q[0] = attitudeActual.q1;
-                q[1] = attitudeActual.q2;
-                q[2] = attitudeActual.q3;
-                q[3] = attitudeActual.q4;
+                q[0] = attitudeState.q1;
+                q[1] = attitudeState.q2;
+                q[2] = attitudeState.q3;
+                q[3] = attitudeState.q4;
                 Quaternion2R(q, Rbe);
-                x[1] = -(Rbe[0][2] * accels.x + Rbe[1][2] * accels.y + Rbe[2][2] * accels.z + 9.81f);
+                x[1] = -(Rbe[0][2] * accelState.x + Rbe[1][2] * accelState.y + Rbe[2][2] * accelState.z + 9.81f);
             } else {
-                x[1] = -accels.z + 9.81f;
+                x[1] = -accelState.z + 9.81f;
             }
 
             dT = PIOS_DELAY_DiffuS(timeval) / 1.0e6f;

@@ -1,6 +1,6 @@
 <xml>
-    <object name="GyrosBias" singleinstance="true" settings="false">
-        <description>The gyro data.</description>
+    <object name="GyroState" singleinstance="true" settings="false" category="State">
+        <description>The filtered rotation sensor data.</description>
 	<field name="x" units="deg/s" type="float" elements="1"/>
 	<field name="y" units="deg/s" type="float" elements="1"/>
 	<field name="z" units="deg/s" type="float" elements="1"/>

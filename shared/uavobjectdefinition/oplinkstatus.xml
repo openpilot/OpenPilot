@@ -1,5 +1,5 @@
 <xml>
-	<object name="OPLinkStatus" singleinstance="true" settings="false">
+	<object name="OPLinkStatus" singleinstance="true" settings="false" category="System">
 		<description>OPLink device status.</description>
 		<field name="Description" units="" type="uint8" elements="40"/> 
 		<field name="CPUSerial" units="hex" type="uint8" elements="12" /> 

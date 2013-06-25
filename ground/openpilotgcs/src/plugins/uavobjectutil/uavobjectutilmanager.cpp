@@ -38,7 +38,7 @@
 
 #include "firmwareiapobj.h"
 #include "homelocation.h"
-#include "gpsposition.h"
+#include "gpspositionsensor.h"
 
 // ******************************
 // constructor/destructor
@@ -377,13 +377,13 @@ int UAVObjectUtilManager::getHomeLocation(bool &set, double LLA[3])
 // ******************************
 // GPS
 
-int UAVObjectUtilManager::getGPSPosition(double LLA[3])
+int UAVObjectUtilManager::getGPSPositionSensor(double LLA[3])
 {
-    GPSPosition *gpsPosition = GPSPosition::GetInstance(obm);
+    GPSPositionSensor *gpsPosition = GPSPositionSensor::GetInstance(obm);
 
     Q_ASSERT(gpsPosition != NULL);
 
-    GPSPosition::DataFields gpsPositionData = gpsPosition->getData();
+    GPSPositionSensor::DataFields gpsPositionData = gpsPosition->getData();
 
     LLA[0] = gpsPositionData.Latitude;
     LLA[1] = gpsPositionData.Longitude;

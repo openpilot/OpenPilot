@@ -31,12 +31,12 @@ Item {
 
     Text {
         id: gps_text
-        text: "GPS: " + GPSPosition.Satellites + "\nPDP: " + Math.round(GPSPosition.PDOP*10)/10
+        text: "GPS: " + GPSPositionSensor.Satellites + "\nPDP: " + Math.round(GPSPositionSensor.PDOP*10)/10
         color: "white"
         font.family: "Arial"
         font.pixelSize: telemetry_status.height * 0.75
 
-        visible: GPSPosition.Satellites > 0
+        visible: GPSPositionSensor.Satellites > 0
 
         property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "gps-txt")
         x: Math.floor(scaledBounds.x * sceneItem.width)

@@ -1,5 +1,5 @@
 <xml>
-    <object name="TaskInfo" singleinstance="true" settings="false">
+    <object name="TaskInfo" singleinstance="true" settings="false" category="System">
         <description>Task information</description>
         <field name="StackRemaining" units="bytes" type="uint16">
 		<elementnames>

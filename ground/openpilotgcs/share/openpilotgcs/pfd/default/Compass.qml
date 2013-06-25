@@ -19,8 +19,8 @@ Item {
         //split compass band to 8 parts to ensure it doesn't exceed the max texture size
         Row {
             anchors.centerIn: parent
-            //the band is 540 degrees wide, AttitudeActual.Yaw is converted to -180..180 range
-            anchors.horizontalCenterOffset: -1*((AttitudeActual.Yaw+180+720) % 360 - 180)/540*width
+            //the band is 540 degrees wide, AttitudeState.Yaw is converted to -180..180 range
+            anchors.horizontalCenterOffset: -1*((AttitudeState.Yaw+180+720) % 360 - 180)/540*width
 
             Repeater {
                 model: 5

@@ -1,5 +1,5 @@
 <xml>
-    <object name="GPSSatellites" singleinstance="true" settings="false">
+    <object name="GPSSatellites" singleinstance="true" settings="false" category="Sensors">
         <description>Contains information about the GPS satellites in view from @ref GPSModule.</description>
         <field name="SatsInView" units="" type="int8" elements="1"/>
         <field name="PRN" units="" type="int8" elements="16"/>

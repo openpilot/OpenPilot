@@ -34,7 +34,7 @@
 
 #include "osdinput.h"
 
-#include "attitudeactual.h"
+#include "attitudestate.h"
 #include "taskinfo.h"
 #include "flightstatus.h"
 
@@ -86,11 +86,11 @@ int32_t osdinputStart(void)
  */
 int32_t osdinputInitialize(void)
 {
-    AttitudeActualInitialize();
+    AttitudeStateInitialize();
     FlightStatusInitialize();
     // Initialize quaternion
-    AttitudeActualData attitude;
-    AttitudeActualGet(&attitude);
+    AttitudeStateData attitude;
+    AttitudeStateGet(&attitude);
     attitude.q1    = 1;
     attitude.q2    = 0;
     attitude.q3    = 0;
@@ -98,7 +98,7 @@ int32_t osdinputInitialize(void)
     attitude.Roll  = 0;
     attitude.Pitch = 0;
     attitude.Yaw   = 0;
-    AttitudeActualSet(&attitude);
+    AttitudeStateSet(&attitude);
 
     oposdPort = PIOS_COM_OSD;
 
@@ -148,8 +148,8 @@ static void osdinputTask(__attribute__((unused)) void *parameters)
             }
             if (rx_count == 11) {
                 if (oposd_rx_buffer[1] == OSD_PKT_TYPE_ATT) {
-                    AttitudeActualData attitude;
-                    AttitudeActualGet(&attitude);
+                    AttitudeStateData attitude;
+                    AttitudeStateGet(&attitude);
                     attitude.q1    = 1;
                     attitude.q2    = 0;
                     attitude.q3    = 0;
@@ -157,7 +157,7 @@ static void osdinputTask(__attribute__((unused)) void *parameters)
                     attitude.Roll  = (float)((int16_t)(oposd_rx_buffer[3] | oposd_rx_buffer[4] << 8)) / 10.0f;
                     attitude.Pitch = (float)((int16_t)(oposd_rx_buffer[5] | oposd_rx_buffer[6] << 8)) / 10.0f;
                     attitude.Yaw   = (float)((int16_t)(oposd_rx_buffer[7] | oposd_rx_buffer[8] << 8)) / 10.0f;
-                    AttitudeActualSet(&attitude);
+                    AttitudeStateSet(&attitude);
                 } else if (oposd_rx_buffer[1] == OSD_PKT_TYPE_MODE) {
                     FlightStatusData status;
                     FlightStatusGet(&status);

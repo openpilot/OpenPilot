@@ -1,5 +1,5 @@
 <xml>
-    <object name="AltitudeHoldSettings" singleinstance="true" settings="true">
+    <object name="AltitudeHoldSettings" singleinstance="true" settings="true" category="Control">
         <description>Settings for the @ref AltitudeHold module</description>
 	<field name="Kp" units="throttle/m" type="float" elements="1" defaultvalue="0.0001"/>
 	<field name="Ki" units="throttle/m" type="float" elements="1" defaultvalue="0"/>

@@ -1,5 +1,5 @@
 <xml>
-    <object name="SystemSettings" singleinstance="true" settings="true">
+    <object name="SystemSettings" singleinstance="true" settings="true" category="System">
         <description>Select airframe type.  Currently used by @ref ActuatorModule to choose mixing from @ref ActuatorDesired to @ref ActuatorCommand</description>
         <field name="AirframeType" units="" type="enum" elements="1" options="FixedWing,FixedWingElevon,FixedWingVtail,VTOL,HeliCP,QuadX,QuadP,Hexa,Octo,Custom,HexaX,OctoV,OctoCoaxP,OctoCoaxX,HexaCoax,Tri,GroundVehicleCar,GroundVehicleDifferential,GroundVehicleMotorcycle" defaultvalue="QuadX"/>
         <field name="GUIConfigData" units="bits" type="uint32" elements="4" defaultvalue="0"/>

@@ -1,5 +1,5 @@
 <xml>
-    <object name="FlightBatteryState" singleinstance="true" settings="false">
+    <object name="FlightBatteryState" singleinstance="true" settings="false" category="Sensors">
         <description>Battery status information.</description> 
         <field name="Voltage" units="V" type="float" elements="1" defaultvalue="0.0"/>
 	<field name="Current" units="A" type="float"  elements="1" defaultvalue="0.0"/>

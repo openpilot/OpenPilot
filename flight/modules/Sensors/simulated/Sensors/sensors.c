@@ -4,7 +4,7 @@
  * @{
  * @addtogroup Sensors
  * @brief Acquires sensor data
- * Specifically updates the the @ref Gyros, @ref Accels, and @ref Magnetometer objects
+ * Specifically updates the the @ref GyroSensor, @ref AccelSensor, and @ref MagSensor objects
  * @{
  *
  * @file       sensors.c
@@ -32,7 +32,7 @@
 
 /**
  * Input objects: None, takes sensor data via pios
- * Output objects: @ref Gyros @ref Accels @ref Magnetometer
+ * Output objects: @ref GyroSensor @ref AccelSensor @ref MagSensor
  *
  * The module executes in its own thread.
  *
@@ -48,22 +48,21 @@
 
 #include <openpilot.h>
 
-#include "attitude.h"
-#include "accels.h"
+#include "attitudestate.h"
+#include "accelsensor.h"
 #include "actuatordesired.h"
-#include "attitudeactual.h"
+#include "attitudestate.h"
 #include "attitudesimulated.h"
 #include "attitudesettings.h"
-#include "rawairspeed.h"
-#include "baroaltitude.h"
-#include "gyros.h"
-#include "gyrosbias.h"
+#include "airspeedsensor.h"
+#include "barosensor.h"
+#include "magsensor.h"
+#include "gyrosensor.h"
 #include "flightstatus.h"
-#include "gpsposition.h"
-#include "gpsvelocity.h"
+#include "gpspositionsensor.h"
+#include "gpsvelocitysensor.h"
 #include "homelocation.h"
-#include "magnetometer.h"
-#include "magbias.h"
+// #include "sensor.h"
 #include "ratedesired.h"
 #include "revocalibration.h"
 #include "systemsettings.h"
@@ -90,8 +89,6 @@ static void simulateModelAgnostic();
 static void simulateModelQuadcopter();
 static void simulateModelAirplane();
 
-static void magOffsetEstimation(MagnetometerData *mag);
-
 static float accel_bias[3];
 
 static float rand_gauss();
@@ -109,16 +106,15 @@ int32_t SensorsInitialize(void)
     accel_bias[1] = rand_gauss() / 10;
     accel_bias[2] = rand_gauss() / 10;
 
-    AccelsInitialize();
+    AccelSensorInitialize();
     AttitudeSimulatedInitialize();
-    BaroAltitudeInitialize();
+    BaroSensorInitialize();
     AirspeedSensorInitialize();
-    GyrosInitialize();
-    GyrosBiasInitialize();
-    GPSPositionInitialize();
-    GPSVelocityInitialize();
-    MagnetometerInitialize();
-    MagBiasInitialize();
+    GyroSensorInitialize();
+    // GyrosBiasInitialize();
+    GPSPositionSensorInitialize();
+    GPSVelocitySensorInitialize();
+    MagSensorInitialize();
     RevoCalibrationInitialize();
 
     return 0;
@@ -218,47 +214,49 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
 
 static void simulateConstant()
 {
-    AccelsData accelsData; // Skip get as we set all the fields
+    AccelSensorData accelSensorData; // Skip get as we set all the fields
 
-    accelsData.x = 0;
-    accelsData.y = 0;
-    accelsData.z = -GRAV;
-    accelsData.temperature = 0;
-    AccelsSet(&accelsData);
+    accelSensorData.x = 0;
+    accelSensorData.y = 0;
+    accelSensorData.z = -GRAV;
+    accelSensorData.temperature = 0;
+    AccelSensorSet(&accelSensorData);
 
-    GyrosData gyrosData; // Skip get as we set all the fields
-    gyrosData.x = 0;
-    gyrosData.y = 0;
-    gyrosData.z = 0;
+    GyroSensorData gyroSensorData; // Skip get as we set all the fields
+    gyroSensorData.x = 0;
+    gyroSensorData.y = 0;
+    gyroSensorData.z = 0;
 
+/* TODO
     // Apply bias correction to the gyros
     GyrosBiasData gyrosBias;
     GyrosBiasGet(&gyrosBias);
-    gyrosData.x += gyrosBias.x;
-    gyrosData.y += gyrosBias.y;
-    gyrosData.z += gyrosBias.z;
+    gyroSensorData.x += gyrosBias.x;
+    gyroSensorData.y += gyrosBias.y;
+    gyroSensorData.z += gyrosBias.z;
+ */
 
-    GyrosSet(&gyrosData);
+    GyroSensorSet(&gyroSensorData);
 
-    BaroAltitudeData baroAltitude;
-    BaroAltitudeGet(&baroAltitude);
-    baroAltitude.Altitude = 1;
-    BaroAltitudeSet(&baroAltitude);
+    BaroSensorData baroSensor;
+    BaroSensorGet(&baroSensor);
+    baroSensor.Altitude = 1;
+    BaroSensorSet(&baroSensor);
 
-    GPSPositionData gpsPosition;
-    GPSPositionGet(&gpsPosition);
+    GPSPositionSensorData gpsPosition;
+    GPSPositionSensorGet(&gpsPosition);
     gpsPosition.Latitude  = 0;
     gpsPosition.Longitude = 0;
     gpsPosition.Altitude  = 0;
-    GPSPositionSet(&gpsPosition);
+    GPSPositionSensorSet(&gpsPosition);
 
     // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
     // and make it average zero (weakly)
-    MagnetometerData mag;
+    MagSensorData mag;
     mag.x = 400;
     mag.y = 0;
     mag.z = 800;
-    MagnetometerSet(&mag);
+    MagSensorSet(&mag);
 }
 
 static void simulateModelAgnostic()
@@ -267,58 +265,60 @@ static void simulateModelAgnostic()
     float q[4];
 
     // Simulate accels based on current attitude
-    AttitudeActualData attitudeActual;
+    AttitudeStateData attitudeState;
 
-    AttitudeActualGet(&attitudeActual);
-    q[0] = attitudeActual.q1;
-    q[1] = attitudeActual.q2;
-    q[2] = attitudeActual.q3;
-    q[3] = attitudeActual.q4;
+    AttitudeStateGet(&attitudeState);
+    q[0] = attitudeState.q1;
+    q[1] = attitudeState.q2;
+    q[2] = attitudeState.q3;
+    q[3] = attitudeState.q4;
     Quaternion2R(q, Rbe);
 
-    AccelsData accelsData; // Skip get as we set all the fields
-    accelsData.x = -GRAV * Rbe[0][2];
-    accelsData.y = -GRAV * Rbe[1][2];
-    accelsData.z = -GRAV * Rbe[2][2];
-    accelsData.temperature = 30;
-    AccelsSet(&accelsData);
+    AccelSensorData accelSensorData; // Skip get as we set all the fields
+    accelSensorData.x = -GRAV * Rbe[0][2];
+    accelSensorData.y = -GRAV * Rbe[1][2];
+    accelSensorData.z = -GRAV * Rbe[2][2];
+    accelSensorData.temperature = 30;
+    AccelSensorSet(&accelSensorData);
 
     RateDesiredData rateDesired;
     RateDesiredGet(&rateDesired);
 
-    GyrosData gyrosData; // Skip get as we set all the fields
-    gyrosData.x = rateDesired.Roll + rand_gauss();
-    gyrosData.y = rateDesired.Pitch + rand_gauss();
-    gyrosData.z = rateDesired.Yaw + rand_gauss();
+    GyroSensorData gyroSensorData; // Skip get as we set all the fields
+    gyroSensorData.x = rateDesired.Roll + rand_gauss();
+    gyroSensorData.y = rateDesired.Pitch + rand_gauss();
+    gyroSensorData.z = rateDesired.Yaw + rand_gauss();
 
+/* TODO
     // Apply bias correction to the gyros
     GyrosBiasData gyrosBias;
     GyrosBiasGet(&gyrosBias);
-    gyrosData.x += gyrosBias.x;
-    gyrosData.y += gyrosBias.y;
-    gyrosData.z += gyrosBias.z;
+    gyroSensorData.x += gyrosBias.x;
+    gyroSensorData.y += gyrosBias.y;
+    gyroSensorData.z += gyrosBias.z;
+ */
 
-    GyrosSet(&gyrosData);
+    GyroSensorSet(&gyroSensorData);
 
-    BaroAltitudeData baroAltitude;
-    BaroAltitudeGet(&baroAltitude);
-    baroAltitude.Altitude = 1;
-    BaroAltitudeSet(&baroAltitude);
+    BaroSensorData baroSensor;
+    BaroSensorGet(&baroSensor);
+    baroSensor.Altitude = 1;
+    BaroSensorSet(&baroSensor);
 
-    GPSPositionData gpsPosition;
-    GPSPositionGet(&gpsPosition);
+    GPSPositionSensorData gpsPosition;
+    GPSPositionSensorGet(&gpsPosition);
     gpsPosition.Latitude  = 0;
     gpsPosition.Longitude = 0;
     gpsPosition.Altitude  = 0;
-    GPSPositionSet(&gpsPosition);
+    GPSPositionSensorSet(&gpsPosition);
 
     // Because most crafts wont get enough information from gravity to zero yaw gyro, we try
     // and make it average zero (weakly)
-    MagnetometerData mag;
+    MagSensorData mag;
     mag.x = 400;
     mag.y = 0;
     mag.z = 800;
-    MagnetometerSet(&mag);
+    MagSensorSet(&mag);
 }
 
 float thrustToDegs   = 50;
@@ -369,10 +369,10 @@ static void simulateModelQuadcopter()
 // rpy[1] = control_scaling * actuatorDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
 // rpy[2] = control_scaling * actuatorDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
 //
-// GyrosData gyrosData; // Skip get as we set all the fields
-// gyrosData.x = rpy[0] * 180 / M_PI + rand_gauss();
-// gyrosData.y = rpy[1] * 180 / M_PI + rand_gauss();
-// gyrosData.z = rpy[2] * 180 / M_PI + rand_gauss();
+// GyrosData gyroSensorData; // Skip get as we set all the fields
+// gyroSensorData.x = rpy[0] * 180 / M_PI + rand_gauss();
+// gyroSensorData.y = rpy[1] * 180 / M_PI + rand_gauss();
+// gyroSensorData.z = rpy[2] * 180 / M_PI + rand_gauss();
 
     RateDesiredData rateDesired;
     RateDesiredGet(&rateDesired);
@@ -381,11 +381,11 @@ static void simulateModelQuadcopter()
     rpy[1] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
     rpy[2] = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
 
-    GyrosData gyrosData; // Skip get as we set all the fields
-    gyrosData.x = rpy[0] + rand_gauss();
-    gyrosData.y = rpy[1] + rand_gauss();
-    gyrosData.z = rpy[2] + rand_gauss();
-    GyrosSet(&gyrosData);
+    GyroSensorData gyroSensorData; // Skip get as we set all the fields
+    gyroSensorData.x = rpy[0] + rand_gauss();
+    gyroSensorData.y = rpy[1] + rand_gauss();
+    gyroSensorData.z = rpy[2] + rand_gauss();
+    GyroSensorSet(&gyroSensorData);
 
     // Predict the attitude forward in time
     float qdot[4];
@@ -407,13 +407,13 @@ static void simulateModelQuadcopter()
     q[3]    = q[3] / qmag;
 
     if (overideAttitude) {
-        AttitudeActualData attitudeActual;
-        AttitudeActualGet(&attitudeActual);
-        attitudeActual.q1 = q[0];
-        attitudeActual.q2 = q[1];
-        attitudeActual.q3 = q[2];
-        attitudeActual.q4 = q[3];
-        AttitudeActualSet(&attitudeActual);
+        AttitudeStateData attitudeState;
+        AttitudeStateGet(&attitudeState);
+        attitudeState.q1 = q[0];
+        attitudeState.q2 = q[1];
+        attitudeState.q3 = q[2];
+        attitudeState.q4 = q[3];
+        AttitudeStateSet(&attitudeState);
     }
 
     static float wind[3] = { 0, 0, 0 };
@@ -454,12 +454,12 @@ static void simulateModelQuadcopter()
     ned_accel[2] -= 9.81;
 
     // Transform the accels back in to body frame
-    AccelsData accelsData; // Skip get as we set all the fields
-    accelsData.x = ned_accel[0] * Rbe[0][0] + ned_accel[1] * Rbe[0][1] + ned_accel[2] * Rbe[0][2] + accel_bias[0];
-    accelsData.y = ned_accel[0] * Rbe[1][0] + ned_accel[1] * Rbe[1][1] + ned_accel[2] * Rbe[1][2] + accel_bias[1];
-    accelsData.z = ned_accel[0] * Rbe[2][0] + ned_accel[1] * Rbe[2][1] + ned_accel[2] * Rbe[2][2] + accel_bias[2];
-    accelsData.temperature = 30;
-    AccelsSet(&accelsData);
+    AccelSensorData accelSensorData; // Skip get as we set all the fields
+    accelSensorData.x = ned_accel[0] * Rbe[0][0] + ned_accel[1] * Rbe[0][1] + ned_accel[2] * Rbe[0][2] + accel_bias[0];
+    accelSensorData.y = ned_accel[0] * Rbe[1][0] + ned_accel[1] * Rbe[1][1] + ned_accel[2] * Rbe[1][2] + accel_bias[1];
+    accelSensorData.z = ned_accel[0] * Rbe[2][0] + ned_accel[1] * Rbe[2][1] + ned_accel[2] * Rbe[2][2] + accel_bias[2];
+    accelSensorData.temperature = 30;
+    AccelSensorSet(&accelSensorData);
 
     if (baro_offset == 0) {
         // Hacky initialization
@@ -471,10 +471,10 @@ static void simulateModelQuadcopter()
     // Update baro periodically
     static uint32_t last_baro_time = 0;
     if (PIOS_DELAY_DiffuS(last_baro_time) / 1.0e6 > BARO_PERIOD) {
-        BaroAltitudeData baroAltitude;
-        BaroAltitudeGet(&baroAltitude);
-        baroAltitude.Altitude = -pos[2] + baro_offset;
-        BaroAltitudeSet(&baroAltitude);
+        BaroSensorData baroSensor;
+        BaroSensorGet(&baroSensor);
+        baroSensor.Altitude = -pos[2] + baro_offset;
+        BaroSensorSet(&baroSensor);
         last_baro_time = PIOS_DELAY_GetRaw();
     }
 
@@ -500,8 +500,8 @@ static void simulateModelQuadcopter()
         gps_drift[1] = gps_drift[1] * 0.95 + rand_gauss() / 10.0;
         gps_drift[2] = gps_drift[2] * 0.95 + rand_gauss() / 10.0;
 
-        GPSPositionData gpsPosition;
-        GPSPositionGet(&gpsPosition);
+        GPSPositionSensorData gpsPosition;
+        GPSPositionSensorGet(&gpsPosition);
         gpsPosition.Latitude    = homeLocation.Latitude + ((pos[0] + gps_drift[0]) / T[0] * 10.0e6);
         gpsPosition.Longitude   = homeLocation.Longitude + ((pos[1] + gps_drift[1]) / T[1] * 10.0e6);
         gpsPosition.Altitude    = homeLocation.Altitude + ((pos[2] + gps_drift[2]) / T[2]);
@@ -509,34 +509,31 @@ static void simulateModelQuadcopter()
         gpsPosition.Heading     = 180 / M_PI * atan2(vel[1] + gps_vel_drift[1], vel[0] + gps_vel_drift[0]);
         gpsPosition.Satellites  = 7;
         gpsPosition.PDOP = 1;
-        GPSPositionSet(&gpsPosition);
+        GPSPositionSensorSet(&gpsPosition);
         last_gps_time    = PIOS_DELAY_GetRaw();
     }
 
     // Update GPS Velocity measurements
     static uint32_t last_gps_vel_time = 1000; // Delay by a millisecond
     if (PIOS_DELAY_DiffuS(last_gps_vel_time) / 1.0e6 > GPS_PERIOD) {
-        GPSVelocityData gpsVelocity;
-        GPSVelocityGet(&gpsVelocity);
+        GPSVelocitySensorData gpsVelocity;
+        GPSVelocitySensorGet(&gpsVelocity);
         gpsVelocity.North = vel[0] + gps_vel_drift[0];
         gpsVelocity.East  = vel[1] + gps_vel_drift[1];
         gpsVelocity.Down  = vel[2] + gps_vel_drift[2];
-        GPSVelocitySet(&gpsVelocity);
+        GPSVelocitySensorSet(&gpsVelocity);
         last_gps_vel_time = PIOS_DELAY_GetRaw();
     }
 
     // Update mag periodically
     static uint32_t last_mag_time = 0;
     if (PIOS_DELAY_DiffuS(last_mag_time) / 1.0e6 > MAG_PERIOD) {
-        MagnetometerData mag;
+        MagSensorData mag;
         mag.x = homeLocation.Be[0] * Rbe[0][0] + homeLocation.Be[1] * Rbe[0][1] + homeLocation.Be[2] * Rbe[0][2];
         mag.y = homeLocation.Be[0] * Rbe[1][0] + homeLocation.Be[1] * Rbe[1][1] + homeLocation.Be[2] * Rbe[1][2];
         mag.z = homeLocation.Be[0] * Rbe[2][0] + homeLocation.Be[1] * Rbe[2][1] + homeLocation.Be[2] * Rbe[2][2];
 
-        // Run the offset compensation algorithm from the firmware
-        magOffsetEstimation(&mag);
-
-        MagnetometerSet(&mag);
+        MagSensorSet(&mag);
         last_mag_time = PIOS_DELAY_GetRaw();
     }
 
@@ -615,20 +612,20 @@ static void simulateModelAirplane()
     // rpy[1] = control_scaling * actuatorDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
     // rpy[2] = control_scaling * actuatorDesired.Yaw * (1 - ACTUATOR_ALPHA) + rpy[2] * ACTUATOR_ALPHA;
     //
-    // GyrosData gyrosData; // Skip get as we set all the fields
-    // gyrosData.x = rpy[0] * 180 / M_PI + rand_gauss();
-    // gyrosData.y = rpy[1] * 180 / M_PI + rand_gauss();
-    // gyrosData.z = rpy[2] * 180 / M_PI + rand_gauss();
+    // GyrosData gyroSensorData; // Skip get as we set all the fields
+    // gyroSensorData.x = rpy[0] * 180 / M_PI + rand_gauss();
+    // gyroSensorData.y = rpy[1] * 180 / M_PI + rand_gauss();
+    // gyroSensorData.z = rpy[2] * 180 / M_PI + rand_gauss();
 
     /**** 1. Update attitude ****/
     RateDesiredData rateDesired;
     RateDesiredGet(&rateDesired);
 
     // Need to get roll angle for easy cross coupling
-    AttitudeActualData attitudeActual;
-    AttitudeActualGet(&attitudeActual);
-    double roll  = attitudeActual.Roll;
-    double pitch = attitudeActual.Pitch;
+    AttitudeStateData attitudeState;
+    AttitudeStateGet(&attitudeState);
+    double roll  = attitudeState.Roll;
+    double pitch = attitudeState.Pitch;
 
     rpy[0]  = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Roll * (1 - ACTUATOR_ALPHA) + rpy[0] * ACTUATOR_ALPHA;
     rpy[1]  = (flightStatus.Armed == FLIGHTSTATUS_ARMED_ARMED) * rateDesired.Pitch * (1 - ACTUATOR_ALPHA) + rpy[1] * ACTUATOR_ALPHA;
@@ -636,11 +633,11 @@ static void simulateModelAirplane()
     rpy[2] += roll * ROLL_HEADING_COUPLING;
 
 
-    GyrosData gyrosData; // Skip get as we set all the fields
-    gyrosData.x = rpy[0] + rand_gauss();
-    gyrosData.y = rpy[1] + rand_gauss();
-    gyrosData.z = rpy[2] + rand_gauss();
-    GyrosSet(&gyrosData);
+    GyroSensorData gyroSensorData; // Skip get as we set all the fields
+    gyroSensorData.x = rpy[0] + rand_gauss();
+    gyroSensorData.y = rpy[1] + rand_gauss();
+    gyroSensorData.z = rpy[2] + rand_gauss();
+    GyroSensorSet(&gyroSensorData);
 
     // Predict the attitude forward in time
     float qdot[4];
@@ -662,13 +659,13 @@ static void simulateModelAirplane()
     q[3]    = q[3] / qmag;
 
     if (overideAttitude) {
-        AttitudeActualData attitudeActual;
-        AttitudeActualGet(&attitudeActual);
-        attitudeActual.q1 = q[0];
-        attitudeActual.q2 = q[1];
-        attitudeActual.q3 = q[2];
-        attitudeActual.q4 = q[3];
-        AttitudeActualSet(&attitudeActual);
+        AttitudeStateData attitudeState;
+        AttitudeStateGet(&attitudeState);
+        attitudeState.q1 = q[0];
+        attitudeState.q2 = q[1];
+        attitudeState.q3 = q[2];
+        attitudeState.q4 = q[3];
+        AttitudeStateSet(&attitudeState);
     }
 
     /**** 2. Update position based on velocity ****/
@@ -730,12 +727,12 @@ static void simulateModelAirplane()
     ned_accel[2] -= GRAV;
 
     // Transform the accels back in to body frame
-    AccelsData accelsData; // Skip get as we set all the fields
-    accelsData.x = ned_accel[0] * Rbe[0][0] + ned_accel[1] * Rbe[0][1] + ned_accel[2] * Rbe[0][2] + accel_bias[0];
-    accelsData.y = ned_accel[0] * Rbe[1][0] + ned_accel[1] * Rbe[1][1] + ned_accel[2] * Rbe[1][2] + accel_bias[1];
-    accelsData.z = ned_accel[0] * Rbe[2][0] + ned_accel[1] * Rbe[2][1] + ned_accel[2] * Rbe[2][2] + accel_bias[2];
-    accelsData.temperature = 30;
-    AccelsSet(&accelsData);
+    AccelSensorData accelSensorData; // Skip get as we set all the fields
+    accelSensorData.x = ned_accel[0] * Rbe[0][0] + ned_accel[1] * Rbe[0][1] + ned_accel[2] * Rbe[0][2] + accel_bias[0];
+    accelSensorData.y = ned_accel[0] * Rbe[1][0] + ned_accel[1] * Rbe[1][1] + ned_accel[2] * Rbe[1][2] + accel_bias[1];
+    accelSensorData.z = ned_accel[0] * Rbe[2][0] + ned_accel[1] * Rbe[2][1] + ned_accel[2] * Rbe[2][2] + accel_bias[2];
+    accelSensorData.temperature = 30;
+    AccelSensorSet(&accelSensorData);
 
     if (baro_offset == 0) {
         // Hacky initialization
@@ -747,10 +744,10 @@ static void simulateModelAirplane()
     // Update baro periodically
     static uint32_t last_baro_time = 0;
     if (PIOS_DELAY_DiffuS(last_baro_time) / 1.0e6 > BARO_PERIOD) {
-        BaroAltitudeData baroAltitude;
-        BaroAltitudeGet(&baroAltitude);
-        baroAltitude.Altitude = -pos[2] + baro_offset;
-        BaroAltitudeSet(&baroAltitude);
+        BaroSensorData baroSensor;
+        BaroSensorGet(&baroSensor);
+        baroSensor.Altitude = -pos[2] + baro_offset;
+        BaroSensorSet(&baroSensor);
         last_baro_time = PIOS_DELAY_GetRaw();
     }
 
@@ -786,8 +783,8 @@ static void simulateModelAirplane()
         gps_drift[1] = gps_drift[1] * 0.95 + rand_gauss() / 10.0;
         gps_drift[2] = gps_drift[2] * 0.95 + rand_gauss() / 10.0;
 
-        GPSPositionData gpsPosition;
-        GPSPositionGet(&gpsPosition);
+        GPSPositionSensorData gpsPosition;
+        GPSPositionSensorGet(&gpsPosition);
         gpsPosition.Latitude    = homeLocation.Latitude + ((pos[0] + gps_drift[0]) / T[0] * 10.0e6);
         gpsPosition.Longitude   = homeLocation.Longitude + ((pos[1] + gps_drift[1]) / T[1] * 10.0e6);
         gpsPosition.Altitude    = homeLocation.Altitude + ((pos[2] + gps_drift[2]) / T[2]);
@@ -795,31 +792,30 @@ static void simulateModelAirplane()
         gpsPosition.Heading     = 180 / M_PI * atan2(vel[1] + gps_vel_drift[1], vel[0] + gps_vel_drift[0]);
         gpsPosition.Satellites  = 7;
         gpsPosition.PDOP = 1;
-        GPSPositionSet(&gpsPosition);
+        GPSPositionSensorSet(&gpsPosition);
         last_gps_time    = PIOS_DELAY_GetRaw();
     }
 
     // Update GPS Velocity measurements
     static uint32_t last_gps_vel_time = 1000; // Delay by a millisecond
     if (PIOS_DELAY_DiffuS(last_gps_vel_time) / 1.0e6 > GPS_PERIOD) {
-        GPSVelocityData gpsVelocity;
-        GPSVelocityGet(&gpsVelocity);
+        GPSVelocitySensorData gpsVelocity;
+        GPSVelocitySensorGet(&gpsVelocity);
         gpsVelocity.North = vel[0] + gps_vel_drift[0];
         gpsVelocity.East  = vel[1] + gps_vel_drift[1];
         gpsVelocity.Down  = vel[2] + gps_vel_drift[2];
-        GPSVelocitySet(&gpsVelocity);
+        GPSVelocitySensorSet(&gpsVelocity);
         last_gps_vel_time = PIOS_DELAY_GetRaw();
     }
 
     // Update mag periodically
     static uint32_t last_mag_time = 0;
     if (PIOS_DELAY_DiffuS(last_mag_time) / 1.0e6 > MAG_PERIOD) {
-        MagnetometerData mag;
+        MagSensorData mag;
         mag.x = 100 + homeLocation.Be[0] * Rbe[0][0] + homeLocation.Be[1] * Rbe[0][1] + homeLocation.Be[2] * Rbe[0][2];
         mag.y = 100 + homeLocation.Be[0] * Rbe[1][0] + homeLocation.Be[1] * Rbe[1][1] + homeLocation.Be[2] * Rbe[1][2];
         mag.z = 100 + homeLocation.Be[0] * Rbe[2][0] + homeLocation.Be[1] * Rbe[2][1] + homeLocation.Be[2] * Rbe[2][2];
-        magOffsetEstimation(&mag);
-        MagnetometerSet(&mag);
+        MagSensorSet(&mag);
         last_mag_time = PIOS_DELAY_GetRaw();
     }
 
@@ -857,105 +853,6 @@ static float rand_gauss(void)
     }
 }
 
-/**
- * Perform an update of the @ref MagBias based on
- * Magnetometer Offset Cancellation: Theory and Implementation,
- * revisited William Premerlani, October 14, 2011
- */
-static void magOffsetEstimation(MagnetometerData *mag)
-{
-#if 0
-    RevoCalibrationData cal;
-    RevoCalibrationGet(&cal);
-
-    // Constants, to possibly go into a UAVO
-    static const float MIN_NORM_DIFFERENCE = 50;
-
-    static float B2[3] = { 0, 0, 0 };
-
-    MagBiasData magBias;
-    MagBiasGet(&magBias);
-
-    // Remove the current estimate of the bias
-    mag->x -= magBias.x;
-    mag->y -= magBias.y;
-    mag->z -= magBias.z;
-
-    // First call
-    if (B2[0] == 0 && B2[1] == 0 && B2[2] == 0) {
-        B2[0] = mag->x;
-        B2[1] = mag->y;
-        B2[2] = mag->z;
-        return;
-    }
-
-    float B1[3]     = { mag->x, mag->y, mag->z };
-    float norm_diff = sqrtf(powf(B2[0] - B1[0], 2) + powf(B2[1] - B1[1], 2) + powf(B2[2] - B1[2], 2));
-    if (norm_diff > MIN_NORM_DIFFERENCE) {
-        float norm_b1    = sqrtf(B1[0] * B1[0] + B1[1] * B1[1] + B1[2] * B1[2]);
-        float norm_b2    = sqrtf(B2[0] * B2[0] + B2[1] * B2[1] + B2[2] * B2[2]);
-        float scale      = cal.MagBiasNullingRate * (norm_b2 - norm_b1) / norm_diff;
-        float b_error[3] = { (B2[0] - B1[0]) * scale, (B2[1] - B1[1]) * scale, (B2[2] - B1[2]) * scale };
-
-        magBias.x += b_error[0];
-        magBias.y += b_error[1];
-        magBias.z += b_error[2];
-
-        MagBiasSet(&magBias);
-
-        // Store this value to compare against next update
-        B2[0] = B1[0]; B2[1] = B1[1]; B2[2] = B1[2];
-    }
-#else /* if 0 */
-    HomeLocationData homeLocation;
-    HomeLocationGet(&homeLocation);
-
-    AttitudeActualData attitude;
-    AttitudeActualGet(&attitude);
-
-    MagBiasData magBias;
-    MagBiasGet(&magBias);
-
-    // Remove the current estimate of the bias
-    mag->x -= magBias.x;
-    mag->y -= magBias.y;
-    mag->z -= magBias.z;
-
-    const float Rxy  = sqrtf(homeLocation.Be[0] * homeLocation.Be[0] + homeLocation.Be[1] * homeLocation.Be[1]);
-    const float Rz   = homeLocation.Be[2];
-
-    const float rate = 0.01;
-    float R[3][3];
-    float B_e[3];
-    float xy[2];
-    float delta[3];
-
-    // Get the rotation matrix
-    Quaternion2R(&attitude.q1, R);
-
-    // Rotate the mag into the NED frame
-    B_e[0] = R[0][0] * mag->x + R[1][0] * mag->y + R[2][0] * mag->z;
-    B_e[1] = R[0][1] * mag->x + R[1][1] * mag->y + R[2][1] * mag->z;
-    B_e[2] = R[0][2] * mag->x + R[1][2] * mag->y + R[2][2] * mag->z;
-
-    float cy = cosf(attitude.Yaw * M_PI / 180.0f);
-    float sy = sinf(attitude.Yaw * M_PI / 180.0f);
-
-    xy[0] = cy * B_e[0] + sy * B_e[1];
-    xy[1] = -sy * B_e[0] + cy * B_e[1];
-
-    float xy_norm = sqrtf(xy[0] * xy[0] + xy[1] * xy[1]);
-
-    delta[0]   = -rate * (xy[0] / xy_norm * Rxy - xy[0]);
-    delta[1]   = -rate * (xy[1] / xy_norm * Rxy - xy[1]);
-    delta[2]   = -rate * (Rz - B_e[2]);
-
-    magBias.x += delta[0];
-    magBias.y += delta[1];
-    magBias.z += delta[2];
-    MagBiasSet(&magBias);
-#endif /* if 0 */
-}
 
 /**
  * @}

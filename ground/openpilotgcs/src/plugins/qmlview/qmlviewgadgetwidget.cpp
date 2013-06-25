@@ -49,10 +49,10 @@ QmlViewGadgetWidget::QmlViewGadgetWidget(QWidget *parent) :
     setResizeMode(SizeRootObjectToView);
 
     QStringList objectsToExport;
-    objectsToExport << "VelocityActual" <<
-        "PositionActual" <<
-        "AttitudeActual" <<
-        "GPSPosition" <<
+    objectsToExport << "VelocityState" <<
+        "PositionState" <<
+        "AttitudeState" <<
+        "GPSPositionSensor" <<
         "GCSTelemetryStats" <<
         "FlightBatteryState";
 

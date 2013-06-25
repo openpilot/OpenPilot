@@ -1,6 +1,6 @@
 <xml>
-    <object name="GPSPosition" singleinstance="true" settings="false">
-        <description>Raw GPS data from @ref GPSModule.  Should only be used by @ref AHRSCommsModule.</description>
+    <object name="GPSPositionSensor" singleinstance="true" settings="false" category="Sensors">
+        <description>Raw GPS data from @ref GPSModule.</description>
         <field name="Status" units="" type="enum" elements="1" options="NoGPS,NoFix,Fix2D,Fix3D"/>
         <field name="Latitude" units="degrees x 10^-7" type="int32" elements="1"/>
         <field name="Longitude" units="degrees x 10^-7" type="int32" elements="1"/>

@@ -48,7 +48,7 @@
 #include "openpilot.h"
 
 #include "accessorydesired.h"
-#include "attitudeactual.h"
+#include "attitudestate.h"
 #include "camerastabsettings.h"
 #include "cameradesired.h"
 #include "hwsettings.h"
@@ -119,12 +119,12 @@ int32_t CameraStabInitialize(void)
         memset(csd, 0, sizeof(struct CameraStab_data));
         csd->lastSysTime = xTaskGetTickCount();
 
-        AttitudeActualInitialize();
+        AttitudeStateInitialize();
         CameraStabSettingsInitialize();
         CameraDesiredInitialize();
 
         UAVObjEvent ev = {
-            .obj    = AttitudeActualHandle(),
+            .obj    = AttitudeStateHandle(),
             .instId = 0,
             .event  = 0,
         };
@@ -146,7 +146,7 @@ MODULE_INITCALL(CameraStabInitialize, CameraStabStart);
 
 static void attitudeUpdated(UAVObjEvent *ev)
 {
-    if (ev->obj != AttitudeActualHandle()) {
+    if (ev->obj != AttitudeStateHandle()) {
         return;
     }
 
@@ -195,13 +195,13 @@ static void attitudeUpdated(UAVObjEvent *ev)
 
         switch (i) {
         case CAMERASTABSETTINGS_INPUT_ROLL:
-            AttitudeActualRollGet(&attitude);
+            AttitudeStateRollGet(&attitude);
             break;
         case CAMERASTABSETTINGS_INPUT_PITCH:
-            AttitudeActualPitchGet(&attitude);
+            AttitudeStatePitchGet(&attitude);
             break;
         case CAMERASTABSETTINGS_INPUT_YAW:
-            AttitudeActualYawGet(&attitude);
+            AttitudeStateYawGet(&attitude);
             break;
         default:
             PIOS_Assert(0);
@@ -297,7 +297,7 @@ void applyFeedForward(uint8_t index, float dT_millis, float *attitude, CameraSta
     case CAMERASTABSETTINGS_GIMBALTYPE_YAWROLLPITCH:
         if (index == CAMERASTABSETTINGS_INPUT_ROLL) {
             float pitch;
-            AttitudeActualPitchGet(&pitch);
+            AttitudeStatePitchGet(&pitch);
             gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH] - fabsf(pitch))
                                    / cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH];
         }
@@ -305,7 +305,7 @@ void applyFeedForward(uint8_t index, float dT_millis, float *attitude, CameraSta
     case CAMERASTABSETTINGS_GIMBALTYPE_YAWPITCHROLL:
         if (index == CAMERASTABSETTINGS_INPUT_PITCH) {
             float roll;
-            AttitudeActualRollGet(&roll);
+            AttitudeStateRollGet(&roll);
             gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL] - fabsf(roll))
                                    / cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL];
         }

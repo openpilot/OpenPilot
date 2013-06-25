@@ -24,10 +24,10 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             // The altitude scale represents 30 meters,
             // move it in 0..5m range
-            anchors.verticalCenterOffset: -height/30 * (PositionActual.Down-Math.floor(PositionActual.Down/5*qmlWidget.altitudeFactor)*5)
+            anchors.verticalCenterOffset: -height/30 * (PositionState.Down-Math.floor(PositionState.Down/5*qmlWidget.altitudeFactor)*5)
             anchors.left: parent.left
 
-            property int topNumber: 15-Math.floor(PositionActual.Down/5*qmlWidget.altitudeFactor)*5
+            property int topNumber: 15-Math.floor(PositionState.Down/5*qmlWidget.altitudeFactor)*5
 
             // Altitude numbers
             Column {
@@ -68,7 +68,7 @@ Item {
 
         Text {
             id: altitude_text
-            text: Math.floor(-PositionActual.Down * qmlWidget.altitudeFactor).toFixed()
+            text: Math.floor(-PositionState.Down * qmlWidget.altitudeFactor).toFixed()
             color: "white"
             font {
                 family: "Arial"

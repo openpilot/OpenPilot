@@ -1,5 +1,5 @@
 <xml>
-    <object name="ActuatorSettings" singleinstance="true" settings="true">
+    <object name="ActuatorSettings" singleinstance="true" settings="true" category="Control">
         <description>Settings for the @ref ActuatorModule that controls the channel assignments for the mixer based on AircraftType</description>
         <field name="ChannelUpdateFreq" units="Hz" type="uint16" elements="6" defaultvalue="50"/>
         <field name="ChannelMax" units="us" type="int16" elements="12" defaultvalue="1000"/>

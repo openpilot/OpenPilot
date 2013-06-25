@@ -28,7 +28,7 @@
 
 /**
  * Input object: ActiveWaypoint
- * Input object: PositionActual
+ * Input object: PositionState
  * Input object: ManualControlCommand
  * Output object: AttitudeDesired
  *
@@ -45,17 +45,14 @@
 
 #include <openpilot.h>
 
-#include "accels.h"
 #include "hwsettings.h"
-#include "attitudeactual.h"
+#include "attitudestate.h"
 #include "pathdesired.h" // object that will be updated by the module
-#include "positionactual.h"
+#include "positionstate.h"
 #include "manualcontrol.h"
 #include "flightstatus.h"
 #include "pathstatus.h"
-#include "airspeedactual.h"
-#include "gpsvelocity.h"
-#include "gpsposition.h"
+#include "airspeedstate.h"
 #include "fixedwingpathfollowersettings.h"
 #include "fixedwingpathfollowerstatus.h"
 #include "homelocation.h"
@@ -63,7 +60,7 @@
 #include "stabilizationsettings.h"
 #include "systemsettings.h"
 #include "velocitydesired.h"
-#include "velocityactual.h"
+#include "velocitystate.h"
 #include "taskinfo.h"
 
 #include "paths.h"
@@ -87,7 +84,7 @@ static void SettingsUpdatedCb(UAVObjEvent *ev);
 static void updatePathVelocity();
 static uint8_t updateFixedDesiredAttitude();
 static void updateFixedAttitude();
-static void airspeedActualUpdatedCb(UAVObjEvent *ev);
+static void airspeedStateUpdatedCb(UAVObjEvent *ev);
 static float bound(float val, float min, float max);
 
 /**
@@ -121,7 +118,7 @@ int32_t FixedWingPathFollowerInitialize()
         PathDesiredInitialize();
         PathStatusInitialize();
         VelocityDesiredInitialize();
-        AirspeedActualInitialize();
+        AirspeedStateInitialize();
     } else {
         followerEnabled = false;
     }
@@ -139,7 +136,7 @@ static float powerIntegral    = 0;
 static float airspeedErrorInt = 0;
 
 // correct speed by measured airspeed
-static float indicatedAirspeedActualBias = 0;
+static float indicatedAirspeedStateBias = 0;
 
 /**
  * Module thread, should not return.
@@ -151,7 +148,7 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
 
     portTickType lastUpdateTime;
 
-    AirspeedActualConnectCallback(airspeedActualUpdatedCb);
+    AirspeedStateConnectCallback(airspeedStateUpdatedCb);
     FixedWingPathFollowerSettingsConnectCallback(SettingsUpdatedCb);
     PathDesiredConnectCallback(SettingsUpdatedCb);
 
@@ -247,21 +244,21 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
 /**
  * Compute desired velocity from the current position and path
  *
- * Takes in @ref PositionActual and compares it to @ref PathDesired
+ * Takes in @ref PositionState and compares it to @ref PathDesired
  * and computes @ref VelocityDesired
  */
 static void updatePathVelocity()
 {
-    PositionActualData positionActual;
+    PositionStateData positionState;
 
-    PositionActualGet(&positionActual);
-    VelocityActualData velocityActual;
-    VelocityActualGet(&velocityActual);
+    PositionStateGet(&positionState);
+    VelocityStateData velocityState;
+    VelocityStateGet(&velocityState);
 
     // look ahead fixedwingpathfollowerSettings.HeadingFeedForward seconds
-    float cur[3] = { positionActual.North + (velocityActual.North * fixedwingpathfollowerSettings.HeadingFeedForward),
-                     positionActual.East + (velocityActual.East * fixedwingpathfollowerSettings.HeadingFeedForward),
-                     positionActual.Down + (velocityActual.Down * fixedwingpathfollowerSettings.HeadingFeedForward) };
+    float cur[3] = { positionState.North + (velocityState.North * fixedwingpathfollowerSettings.HeadingFeedForward),
+                     positionState.East + (velocityState.East * fixedwingpathfollowerSettings.HeadingFeedForward),
+                     positionState.Down + (velocityState.Down * fixedwingpathfollowerSettings.HeadingFeedForward) };
     struct path_status progress;
 
     path_progress(pathDesired.Start, pathDesired.End, cur, &progress, pathDesired.Mode);
@@ -307,11 +304,11 @@ static void updatePathVelocity()
     // turn steep unless there is enough space complete the turn before crossing the flightpath
     // in this case the plane effectively needs to be turned around
     // indicators:
-    // difference between correction_direction and velocityactual >90 degrees and
-    // difference between path_direction and velocityactual >90 degrees  ( 4th sector, facing away from eerything )
+    // difference between correction_direction and velocitystate >90 degrees and
+    // difference between path_direction and velocitystate >90 degrees  ( 4th sector, facing away from eerything )
     // fix: ignore correction, steer in path direction until the situation has become better (condition doesn't apply anymore)
-    float angle1 = RAD2DEG(atan2f(progress.path_direction[1], progress.path_direction[0]) - atan2f(velocityActual.East, velocityActual.North));
-    float angle2 = RAD2DEG(atan2f(progress.correction_direction[1], progress.correction_direction[0]) - atan2f(velocityActual.East, velocityActual.North));
+    float angle1 = RAD2DEG(atan2f(progress.path_direction[1], progress.path_direction[0]) - atan2f(velocityState.East, velocityState.North));
+    float angle2 = RAD2DEG(atan2f(progress.correction_direction[1], progress.correction_direction[0]) - atan2f(velocityState.East, velocityState.North));
     if (angle1 < -180.0f) {
         angle1 += 360.0f;
     }
@@ -337,7 +334,7 @@ static void updatePathVelocity()
     velocityDesired.North *= groundspeed / l;
     velocityDesired.East  *= groundspeed / l;
 
-    float downError = altitudeSetpoint - positionActual.Down;
+    float downError = altitudeSetpoint - positionState.Down;
     velocityDesired.Down   = downError * fixedwingpathfollowerSettings.VerticalPosP;
 
     // update pathstatus
@@ -370,9 +367,9 @@ static void updateFixedAttitude(float *attitude)
 /**
  * Compute desired attitude from the desired velocity
  *
- * Takes in @ref NedActual which has the acceleration in the
+ * Takes in @ref NedState which has the acceleration in the
  * NED frame as the feedback term and then compares the
- * @ref VelocityActual against the @ref VelocityDesired
+ * @ref VelocityState against the @ref VelocityDesired
  */
 static uint8_t updateFixedDesiredAttitude()
 {
@@ -381,17 +378,16 @@ static uint8_t updateFixedDesiredAttitude()
     float dT = fixedwingpathfollowerSettings.UpdatePeriod / 1000.0f; // Convert from [ms] to [s]
 
     VelocityDesiredData velocityDesired;
-    VelocityActualData velocityActual;
+    VelocityStateData velocityState;
     StabilizationDesiredData stabDesired;
-    AttitudeActualData attitudeActual;
-    AccelsData accels;
+    AttitudeStateData attitudeState;
     StabilizationSettingsData stabSettings;
     FixedWingPathFollowerStatusData fixedwingpathfollowerStatus;
-    AirspeedActualData airspeedActual;
+    AirspeedStateData airspeedState;
 
-    float groundspeedActual;
+    float groundspeedState;
     float groundspeedDesired;
-    float indicatedAirspeedActual;
+    float indicatedAirspeedState;
     float indicatedAirspeedDesired;
     float airspeedError;
 
@@ -406,13 +402,12 @@ static uint8_t updateFixedDesiredAttitude()
 
     FixedWingPathFollowerStatusGet(&fixedwingpathfollowerStatus);
 
-    VelocityActualGet(&velocityActual);
+    VelocityStateGet(&velocityState);
     StabilizationDesiredGet(&stabDesired);
     VelocityDesiredGet(&velocityDesired);
-    AttitudeActualGet(&attitudeActual);
-    AccelsGet(&accels);
+    AttitudeStateGet(&attitudeState);
     StabilizationSettingsGet(&stabSettings);
-    AirspeedActualGet(&airspeedActual);
+    AirspeedStateGet(&airspeedState);
 
 
     /**
@@ -420,59 +415,59 @@ static uint8_t updateFixedDesiredAttitude()
      */
 
     // Current ground speed
-    groundspeedActual = sqrtf(velocityActual.East * velocityActual.East + velocityActual.North * velocityActual.North);
-    // note that airspeedActualBias is ( calibratedAirspeed - groundSpeed ) at the time of measurement,
+    groundspeedState = sqrtf(velocityState.East * velocityState.East + velocityState.North * velocityState.North);
+    // note that airspeedStateBias is ( calibratedAirspeed - groundSpeed ) at the time of measurement,
     // but thanks to accelerometers,  groundspeed reacts faster to changes in direction
     // than airspeed and gps sensors alone
-    indicatedAirspeedActual = groundspeedActual + indicatedAirspeedActualBias;
+    indicatedAirspeedState   = groundspeedState + indicatedAirspeedStateBias;
 
     // Desired ground speed
-    groundspeedDesired = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
-    indicatedAirspeedDesired = bound(groundspeedDesired + indicatedAirspeedActualBias,
+    groundspeedDesired       = sqrtf(velocityDesired.North * velocityDesired.North + velocityDesired.East * velocityDesired.East);
+    indicatedAirspeedDesired = bound(groundspeedDesired + indicatedAirspeedStateBias,
                                      fixedwingpathfollowerSettings.BestClimbRateSpeed,
                                      fixedwingpathfollowerSettings.CruiseSpeed);
 
     // Airspeed error
-    airspeedError = indicatedAirspeedDesired - indicatedAirspeedActual;
+    airspeedError = indicatedAirspeedDesired - indicatedAirspeedState;
 
     // Vertical speed error
     descentspeedDesired = bound(
         velocityDesired.Down,
         -fixedwingpathfollowerSettings.VerticalVelMax,
         fixedwingpathfollowerSettings.VerticalVelMax);
-    descentspeedError = descentspeedDesired - velocityActual.Down;
+    descentspeedError = descentspeedDesired - velocityState.Down;
 
     // Error condition: wind speed is higher than maximum allowed speed. We are forced backwards!
     fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_WIND] = 0;
-    if (groundspeedDesired - indicatedAirspeedActualBias <= 0) {
+    if (groundspeedDesired - indicatedAirspeedStateBias <= 0) {
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_WIND] = 1;
         result = 0;
     }
     // Error condition: plane too slow or too fast
     fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHSPEED] = 0;
     fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWSPEED]  = 0;
-    if (indicatedAirspeedActual > fixedwingpathfollowerSettings.AirSpeedMax) {
+    if (indicatedAirspeedState > fixedwingpathfollowerSettings.AirSpeedMax) {
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_OVERSPEED] = 1;
         result = 0;
     }
-    if (indicatedAirspeedActual > fixedwingpathfollowerSettings.CruiseSpeed * 1.2f) {
+    if (indicatedAirspeedState > fixedwingpathfollowerSettings.CruiseSpeed * 1.2f) {
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHSPEED] = 1;
         result = 0;
     }
-    if (indicatedAirspeedActual < fixedwingpathfollowerSettings.BestClimbRateSpeed * 0.8f && 1) { // The next three && 1 are placeholders for UAVOs representing LANDING and TAKEOFF
+    if (indicatedAirspeedState < fixedwingpathfollowerSettings.BestClimbRateSpeed * 0.8f && 1) { // The next three && 1 are placeholders for UAVOs representing LANDING and TAKEOFF
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWSPEED] = 1;
         result = 0;
     }
-    if (indicatedAirspeedActual < fixedwingpathfollowerSettings.StallSpeedClean && 1 && 1) { // Where the && 1 represents the UAVO that will control whether the airplane is prepped for landing or not
+    if (indicatedAirspeedState < fixedwingpathfollowerSettings.StallSpeedClean && 1 && 1) { // Where the && 1 represents the UAVO that will control whether the airplane is prepped for landing or not
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_STALLSPEED] = 1;
         result = 0;
     }
-    if (indicatedAirspeedActual < fixedwingpathfollowerSettings.StallSpeedDirty && 1) {
+    if (indicatedAirspeedState < fixedwingpathfollowerSettings.StallSpeedDirty && 1) {
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_STALLSPEED] = 1;
         result = 0;
     }
 
-    if (indicatedAirspeedActual < 1e-6f) {
+    if (indicatedAirspeedState < 1e-6f) {
         // prevent division by zero, abort without controlling anything. This guidance mode is not suited for takeoff or touchdown, or handling stationary planes
         // also we cannot handle planes flying backwards, lets just wait until the nose drops
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWSPEED] = 1;
@@ -515,7 +510,7 @@ static uint8_t updateFixedDesiredAttitude()
     // Error condition: plane cannot hold altitude at current speed.
     fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWPOWER] = 0;
     if (powerCommand >= fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MAX] && // throttle at maximum
-        velocityActual.Down > 0 && // we ARE going down
+        velocityState.Down > 0 && // we ARE going down
         descentspeedDesired < 0 && // we WANT to go up
         airspeedError > 0) { // we are too slow already
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWPOWER] = 1;
@@ -524,7 +519,7 @@ static uint8_t updateFixedDesiredAttitude()
     // Error condition: plane keeps climbing despite minimum throttle (opposite of above)
     fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHPOWER] = 0;
     if (powerCommand >= fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MIN] && // throttle at minimum
-        velocityActual.Down < 0 && // we ARE going up
+        velocityState.Down < 0 && // we ARE going up
         descentspeedDesired > 0 && // we WANT to go down
         airspeedError < 0) { // we are too fast already
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHPOWER] = 1;
@@ -565,7 +560,7 @@ static uint8_t updateFixedDesiredAttitude()
     // Error condition: high speed dive
     fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_PITCHCONTROL] = 0;
     if (pitchCommand >= fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_MAX] && // pitch demand is full up
-        velocityActual.Down > 0 && // we ARE going down
+        velocityState.Down > 0 && // we ARE going down
         descentspeedDesired < 0 && // we WANT to go up
         airspeedError < 0) { // we are too fast already
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_PITCHCONTROL] = 1;
@@ -576,7 +571,7 @@ static uint8_t updateFixedDesiredAttitude()
      * Compute desired roll command
      */
     if (groundspeedDesired > 1e-6f) {
-        bearingError = RAD2DEG(atan2f(velocityDesired.East, velocityDesired.North) - atan2f(velocityActual.East, velocityActual.North));
+        bearingError = RAD2DEG(atan2f(velocityDesired.East, velocityDesired.North) - atan2f(velocityState.East, velocityState.North));
     } else {
         // if we are not supposed to move, run in a circle
         bearingError = -90.0f;
@@ -645,17 +640,17 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     PathDesiredGet(&pathDesired);
 }
 
-static void airspeedActualUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+static void airspeedStateUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    AirspeedActualData airspeedActual;
-    VelocityActualData velocityActual;
+    AirspeedStateData airspeedState;
+    VelocityStateData velocityState;
 
-    AirspeedActualGet(&airspeedActual);
-    VelocityActualGet(&velocityActual);
-    float groundspeed = sqrtf(velocityActual.East * velocityActual.East + velocityActual.North * velocityActual.North);
+    AirspeedStateGet(&airspeedState);
+    VelocityStateGet(&velocityState);
+    float groundspeed = sqrtf(velocityState.East * velocityState.East + velocityState.North * velocityState.North);
 
 
-    indicatedAirspeedActualBias = airspeedActual.CalibratedAirspeed - groundspeed;
+    indicatedAirspeedStateBias = airspeedState.CalibratedAirspeed - groundspeed;
     // note - we do fly by Indicated Airspeed (== calibrated airspeed)
     // however since airspeed is updated less often than groundspeed, we use sudden changes to groundspeed to offset the airspeed by the same measurement.
 }

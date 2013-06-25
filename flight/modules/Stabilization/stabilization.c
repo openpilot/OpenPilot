@@ -5,7 +5,7 @@
  * @addtogroup StabilizationModule Stabilization Module
  * @brief Stabilization PID loops in an airframe type independent manner
  * @note This object updates the @ref ActuatorDesired "Actuator Desired" based on the
- * PID loops on the @ref AttitudeDesired "Attitude Desired" and @ref AttitudeActual "Attitude Actual"
+ * PID loops on the @ref AttitudeDesired "Attitude Desired" and @ref AttitudeState "Attitude State"
  * @{
  *
  * @file       stabilization.c
@@ -40,8 +40,8 @@
 #include "relaytuning.h"
 #include "relaytuningsettings.h"
 #include "stabilizationdesired.h"
-#include "attitudeactual.h"
-#include "gyros.h"
+#include "attitudestate.h"
+#include "gyrostate.h"
 #include "flightstatus.h"
 #include "manualcontrol.h" // Just to get a macro
 #include "taskinfo.h"
@@ -104,8 +104,8 @@ int32_t StabilizationStart()
     queue = xQueueCreate(MAX_QUEUE_SIZE, sizeof(UAVObjEvent));
 
     // Listen for updates.
-    // AttitudeActualConnectQueue(queue);
-    GyrosConnectQueue(queue);
+    // AttitudeStateConnectQueue(queue);
+    GyroStateConnectQueue(queue);
 
     StabilizationSettingsConnectCallback(SettingsUpdatedCb);
     SettingsUpdatedCb(StabilizationSettingsHandle());
@@ -152,8 +152,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
     ActuatorDesiredData actuatorDesired;
     StabilizationDesiredData stabDesired;
     RateDesiredData rateDesired;
-    AttitudeActualData attitudeActual;
-    GyrosData gyrosData;
+    AttitudeStateData attitudeState;
+    GyroStateData gyroStateData;
     FlightStatusData flightStatus;
 
     SettingsUpdatedCb((UAVObjEvent *)NULL);
@@ -178,8 +178,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
         FlightStatusGet(&flightStatus);
         StabilizationDesiredGet(&stabDesired);
-        AttitudeActualGet(&attitudeActual);
-        GyrosGet(&gyrosData);
+        AttitudeStateGet(&attitudeState);
+        GyroStateGet(&gyroStateData);
 #ifdef DIAG_RATEDESIRED
         RateDesiredGet(&rateDesired);
 #endif
@@ -195,32 +195,32 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         if (stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
             rpy_desired[0] = stabDesired.Roll;
         } else {
-            rpy_desired[0] = attitudeActual.Roll;
+            rpy_desired[0] = attitudeState.Roll;
         }
 
         if (stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
             rpy_desired[1] = stabDesired.Pitch;
         } else {
-            rpy_desired[1] = attitudeActual.Pitch;
+            rpy_desired[1] = attitudeState.Pitch;
         }
 
         if (stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
             rpy_desired[2] = stabDesired.Yaw;
         } else {
-            rpy_desired[2] = attitudeActual.Yaw;
+            rpy_desired[2] = attitudeState.Yaw;
         }
 
         RPY2Quaternion(rpy_desired, q_desired);
         quat_inverse(q_desired);
-        quat_mult(q_desired, &attitudeActual.q1, q_error);
+        quat_mult(q_desired, &attitudeState.q1, q_error);
         quat_inverse(q_error);
         Quaternion2RPY(q_error, local_error);
 
 #else /* if defined(PIOS_QUATERNION_STABILIZATION) */
         // Simpler algorithm for CC, less memory
-        float local_error[3] = { stabDesired.Roll - attitudeActual.Roll,
-                                 stabDesired.Pitch - attitudeActual.Pitch,
-                                 stabDesired.Yaw - attitudeActual.Yaw };
+        float local_error[3] = { stabDesired.Roll - attitudeState.Roll,
+                                 stabDesired.Pitch - attitudeState.Pitch,
+                                 stabDesired.Yaw - attitudeState.Yaw };
         // find shortest way
         float modulo = fmodf(local_error[2] + 180.0f, 360.0f);
         if (modulo < 0) {
@@ -231,9 +231,9 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 #endif /* if defined(PIOS_QUATERNION_STABILIZATION) */
 
         float gyro_filtered[3];
-        gyro_filtered[0] = gyro_filtered[0] * gyro_alpha + gyrosData.x * (1 - gyro_alpha);
-        gyro_filtered[1] = gyro_filtered[1] * gyro_alpha + gyrosData.y * (1 - gyro_alpha);
-        gyro_filtered[2] = gyro_filtered[2] * gyro_alpha + gyrosData.z * (1 - gyro_alpha);
+        gyro_filtered[0] = gyro_filtered[0] * gyro_alpha + gyroStateData.x * (1 - gyro_alpha);
+        gyro_filtered[1] = gyro_filtered[1] * gyro_alpha + gyroStateData.y * (1 - gyro_alpha);
+        gyro_filtered[2] = gyro_filtered[2] * gyro_alpha + gyroStateData.z * (1 - gyro_alpha);
 
         float *attitudeDesiredAxis = &stabDesired.Roll;
         float *actuatorDesiredAxis = &actuatorDesired.Roll;

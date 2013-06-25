@@ -300,11 +300,11 @@ void XplaneSimulator::processUpdate(const QByteArray & dataBuf)
 
         out.calibratedAirspeed = airspeed_keas * 1.15 * 1.6089 / 3.6; // Convert from [kts] to [m/s]
 
-        // Update BaroAltitude object
+        // Update BaroSensor object
         out.temperature = temperature;
         out.pressure    = pressure;
 
-        // Update attActual object
+        // Update attState object
         out.roll      = roll;       // roll;
         out.pitch     = pitch;     // pitch
         out.heading   = heading; // yaw
@@ -314,7 +314,7 @@ void XplaneSimulator::processUpdate(const QByteArray & dataBuf)
         out.dstE      = dstX;
         out.dstD      = -dstZ;
 
-        // Update VelocityActual.{North,East,Down}
+        // Update VelocityState.{North,East,Down}
         out.velNorth  = velY;
         out.velEast   = velX;
         out.velDown   = -velZ;
@@ -332,9 +332,9 @@ void XplaneSimulator::processUpdate(const QByteArray & dataBuf)
         updateUAVOs(out);
     }
     // issue manual update
-    // attActual->updated();
-    // altActual->updated();
-    // posActual->updated();
+    // attState->updated();
+    // altState->updated();
+    // posState->updated();
 }
 
 

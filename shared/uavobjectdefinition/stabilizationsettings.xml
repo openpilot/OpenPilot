@@ -1,5 +1,5 @@
 <xml>
-    <object name="StabilizationSettings" singleinstance="true" settings="true">
+    <object name="StabilizationSettings" singleinstance="true" settings="true" category="Control">
         <description>PID settings used by the Stabilization module to combine the @ref AttitudeActual and @ref AttitudeDesired to compute @ref ActuatorDesired</description>
 	<field name="RollMax" units="degrees" type="uint8" elements="1" defaultvalue="42" limits="%BE:0:180"/>
 	<field name="PitchMax" units="degrees" type="uint8" elements="1" defaultvalue="42" limits="%BE:0:180"/>

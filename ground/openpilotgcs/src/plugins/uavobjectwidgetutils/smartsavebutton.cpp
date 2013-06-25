@@ -25,8 +25,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "smartsavebutton.h"
+#include "configtaskwidget.h"
 
-smartSaveButton::smartSaveButton()
+smartSaveButton::smartSaveButton(ConfigTaskWidget *configTaskWidget) : configWidget(configTaskWidget)
 {}
 
 void smartSaveButton::addButtons(QPushButton *save, QPushButton *apply)
@@ -77,60 +78,65 @@ void smartSaveButton::processOperation(QPushButton *button, bool save)
     foreach(UAVDataObject * obj, objects) {
         UAVObject::Metadata mdata = obj->getMetadata();
 
-        if (UAVObject::GetGcsAccess(mdata) == UAVObject::ACCESS_READONLY) {
+        //Should we really save this object to the board?
+        if (!configWidget->shouldObjectBeSaved(obj) || UAVObject::GetGcsAccess(mdata) == UAVObject::ACCESS_READONLY) {
+            qDebug() << obj->getName() << "was skipped.";
             continue;
         }
+
         up_result = false;
         current_object = obj;
         for (int i = 0; i < 3; ++i) {
-            qDebug() << "SMARTSAVEBUTTON" << "Upload try number" << i << "Object" << obj->getName();
+            qDebug() << "Uploading" << obj->getName() << "to board.";
             connect(obj, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transaction_finished(UAVObject *, bool)));
             connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
             obj->updated();
+
             timer.start(3000);
-            // qDebug()<<"begin loop";
             loop.exec();
-            if (timer.isActive()) {
-                qDebug() << "SMARTSAVEBUTTON" << "Upload did not timeout" << i << "Object" << obj->getName();
-            } else {
-                qDebug() << "SMARTSAVEBUTTON" << "Upload TIMEOUT" << i << "Object" << obj->getName();
+            if (!timer.isActive()) {
+                qDebug() << "Upload of" << obj->getName() << "timed out." ;
             }
             timer.stop();
+
             disconnect(obj, SIGNAL(transactionCompleted(UAVObject *, bool)), this, SLOT(transaction_finished(UAVObject *, bool)));
             disconnect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
             if (up_result) {
+                qDebug() << "Upload of" << obj->getName() << "successful.";
                 break;
             }
         }
         if (up_result == false) {
-            qDebug() << "SMARTSAVEBUTTON" << "Object upload error:" << obj->getName();
+            qDebug() << "Upload of" << obj->getName() << "failed after 3 tries.";
             error = true;
             continue;
         }
+
         sv_result = false;
         current_objectID = obj->getObjID();
         if (save && (obj->isSettings())) {
             for (int i = 0; i < 3; ++i) {
-                qDebug() << "SMARTSAVEBUTTON" << "Save try number" << i << "Object" << obj->getName();
+                qDebug() << "Saving"  << obj->getName() << "to board.";
                 connect(utilMngr, SIGNAL(saveCompleted(int, bool)), this, SLOT(saving_finished(int, bool)));
                 connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
                 utilMngr->saveObjectToSD(obj);
+
                 timer.start(3000);
                 loop.exec();
-                if (timer.isActive()) {
-                    qDebug() << "SMARTSAVEBUTTON" << "Saving did not timeout" << i << "Object" << obj->getName();
-                } else {
-                    qDebug() << "SMARTSAVEBUTTON" << "Saving TIMEOUT" << i << "Object" << obj->getName();
+                if (!timer.isActive()) {
+                    qDebug() << "Saving of" << obj->getName() << "timed out.";
                 }
                 timer.stop();
+
                 disconnect(utilMngr, SIGNAL(saveCompleted(int, bool)), this, SLOT(saving_finished(int, bool)));
                 disconnect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
                 if (sv_result) {
+                    qDebug() << "Saving of" << obj->getName() << "successful.";
                     break;
                 }
             }
             if (sv_result == false) {
-                qDebug() << "SMARTSAVEBUTTON" << "failed to save:" << obj->getName();
+                qDebug() << "Saving of" << obj->getName() << "failed after 3 tries.";
                 error = true;
             }
         }
@@ -189,7 +195,6 @@ void smartSaveButton::saving_finished(int id, bool result)
 {
     if (id == current_objectID) {
         sv_result = result;
-        // qDebug()<<"saving_finished result="<<result;
         loop.quit();
     }
 }
@@ -203,7 +208,7 @@ void smartSaveButton::enableControls(bool value)
 void smartSaveButton::resetIcons()
 {
     foreach(QPushButton * button, buttonList.keys())
-    button->setIcon(QIcon());
+        button->setIcon(QIcon());
 }
 
 void smartSaveButton::apply()

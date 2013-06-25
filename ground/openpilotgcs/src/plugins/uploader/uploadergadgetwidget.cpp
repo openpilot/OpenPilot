@@ -32,6 +32,8 @@
 
 #define DFU_DEBUG true
 
+const int UploaderGadgetWidget::AUTOUPDATE_CLOSE_TIMEOUT = 7000;
+
 UploaderGadgetWidget::UploaderGadgetWidget(QWidget *parent) : QWidget(parent)
 {
     m_config    = new Ui_UploaderWidget();
@@ -358,16 +360,10 @@ void UploaderGadgetWidget::goToBootloader(UAVObject *callerObj, bool success)
             dw->populate();
             m_config->systemElements->addTab(dw, QString("Device") + QString::number(i));
         }
-        /*
-           m_config->haltButton->setEnabled(false);
-           m_config->resetButton->setEnabled(false);
-         */
+
         // Need to re-enable in case we were not connected
         bootButtonsSetEnable(true);
-        /*
-           m_config->telemetryLink->setEnabled(false);
-           m_config->rescueButton->setEnabled(false);
-         */
+
         if (resetOnly) {
             resetOnly = false;
             delay::msleep(3500);
@@ -835,10 +831,14 @@ void UploaderGadgetWidget::finishAutoUpdate()
 {
     disconnect(this, SIGNAL(autoUpdateSignal(uploader::AutoUpdateStep, QVariant)), this, SLOT(autoUpdateStatus(uploader::AutoUpdateStep, QVariant)));
     m_config->autoUpdateOkButton->setEnabled(true);
+    connect(&autoUpdateCloseTimer, SIGNAL(timeout()), this, SLOT(closeAutoUpdate()));
+    autoUpdateCloseTimer.start(AUTOUPDATE_CLOSE_TIMEOUT);
 }
 
 void UploaderGadgetWidget::closeAutoUpdate()
 {
+    autoUpdateCloseTimer.stop();
+    disconnect(&autoUpdateCloseTimer, SIGNAL(timeout()), this, SLOT(closeAutoUpdate()));
     m_config->autoUpdateGroupBox->setVisible(false);
     m_config->buttonFrame->setEnabled(true);
     m_config->splitter->setEnabled(true);

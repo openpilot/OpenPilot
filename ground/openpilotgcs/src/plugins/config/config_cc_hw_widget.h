@@ -46,6 +46,7 @@ private slots:
     void openHelp();
     void refreshValues();
     void widgetsContentsChanged();
+    void enableSaveButtons(bool enable);
 
 private:
     Ui_CC_HW_Widget *m_telemetry;

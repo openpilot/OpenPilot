@@ -43,6 +43,7 @@ class ConfigStabilizationWidget : public ConfigTaskWidget {
 public:
     ConfigStabilizationWidget(QWidget *parent = 0);
     ~ConfigStabilizationWidget();
+    bool shouldObjectBeSaved(UAVObject *object);
 
 private:
     Ui_StabilizationWidget *ui;
@@ -50,6 +51,8 @@ private:
 
     // Milliseconds between automatic 'Instant Updates'
     static const int AUTOMATIC_UPDATE_RATE = 500;
+
+    int boardModel;
 
 protected slots:
     void refreshWidgetsValues(UAVObject *o = NULL);

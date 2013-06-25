@@ -84,7 +84,7 @@ ConfigCCHWWidget::ConfigCCHWWidget(QWidget *parent) : ConfigTaskWidget(parent)
     addUAVObjectToWidgetRelation("HwSettings", "GPSSpeed", m_telemetry->gpsSpeed);
     addUAVObjectToWidgetRelation("HwSettings", "ComUsbBridgeSpeed", m_telemetry->comUsbBridgeSpeed);
     connect(m_telemetry->cchwHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
-    enableControls(false);
+    enableSaveButtons(false);
     populateWidgets();
     refreshWidgetsValues();
     forceConnectedState();
@@ -108,24 +108,30 @@ void ConfigCCHWWidget::widgetsContentsChanged()
          (m_telemetry->cbUsbVcp->currentIndex() == HwSettings::USB_VCPPORT_DEBUGCONSOLE)) ||
         ((m_telemetry->cbUsbVcp->currentIndex() == HwSettings::USB_VCPPORT_DEBUGCONSOLE) &&
          (m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_DEBUGCONSOLE))) {
-        enableControls(false);
+        enableSaveButtons(false);
         m_telemetry->problems->setText(tr("Warning: you have configured more than one DebugConsole, this currently is not supported"));
     } else if (((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_TELEMETRY) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_TELEMETRY)) ||
                ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_GPS) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_GPS)) ||
                ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_DEBUGCONSOLE) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_DEBUGCONSOLE)) ||
                ((m_telemetry->cbTele->currentIndex() == HwSettings::CC_MAINPORT_COMBRIDGE) && (m_telemetry->cbFlexi->currentIndex() == HwSettings::CC_FLEXIPORT_COMBRIDGE))) {
-        enableControls(false);
+        enableSaveButtons(false);
         m_telemetry->problems->setText(tr("Warning: you have configured both MainPort and FlexiPort for the same function, this currently is not supported"));
     } else if ((m_telemetry->cbUsbHid->currentIndex() == HwSettings::USB_HIDPORT_USBTELEMETRY) && (m_telemetry->cbUsbVcp->currentIndex() == HwSettings::USB_VCPPORT_USBTELEMETRY)) {
-        enableControls(false);
+        enableSaveButtons(false);
         m_telemetry->problems->setText(tr("Warning: you have configured both USB HID Port and USB VCP Port for the same function, this currently is not supported"));
     } else if ((m_telemetry->cbUsbHid->currentIndex() != HwSettings::USB_HIDPORT_USBTELEMETRY) && (m_telemetry->cbUsbVcp->currentIndex() != HwSettings::USB_VCPPORT_USBTELEMETRY)) {
-        enableControls(false);
+        enableSaveButtons(false);
         m_telemetry->problems->setText(tr("Warning: you have disabled USB Telemetry on both USB HID Port and USB VCP Port, this currently is not supported"));
     } else {
         m_telemetry->problems->setText("");
-        enableControls(true);
+        enableSaveButtons(true);
     }
+}
+
+void ConfigCCHWWidget::enableSaveButtons(bool enable)
+{
+    m_telemetry->saveTelemetryToRAM->setEnabled(enable);
+    m_telemetry->saveTelemetryToSD->setEnabled(enable);
 }
 
 void ConfigCCHWWidget::openHelp()

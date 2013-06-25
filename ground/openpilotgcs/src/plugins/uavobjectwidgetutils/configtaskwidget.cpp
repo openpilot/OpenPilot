@@ -413,7 +413,7 @@ void ConfigTaskWidget::helpButtonPressed()
 void ConfigTaskWidget::addApplySaveButtons(QPushButton *update, QPushButton *save)
 {
     if (!smartsave) {
-        smartsave = new smartSaveButton();
+        smartsave = new smartSaveButton(this);
         connect(smartsave, SIGNAL(preProcessOperations()), this, SLOT(updateObjectsFromWidgets()));
         connect(smartsave, SIGNAL(saveSuccessfull()), this, SLOT(clearDirty()));
         connect(smartsave, SIGNAL(beginOp()), this, SLOT(disableObjUpdates()));
@@ -457,6 +457,12 @@ void ConfigTaskWidget::enableControls(bool enable)
             }
         }
     }
+}
+
+bool ConfigTaskWidget::shouldObjectBeSaved(UAVObject *object)
+{
+    Q_UNUSED(object);
+    return true;
 }
 
 /**

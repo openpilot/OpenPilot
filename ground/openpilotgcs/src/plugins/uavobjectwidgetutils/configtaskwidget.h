@@ -144,6 +144,7 @@ public:
     void addHelpButton(QPushButton *button, QString url);
     void forceShadowUpdates();
     void forceConnectedState();
+    virtual bool shouldObjectBeSaved(UAVObject * object);
 public slots:
     void onAutopilotDisconnect();
     void onAutopilotConnect();
@@ -204,8 +205,10 @@ protected slots:
     virtual void refreshWidgetsValues(UAVObject *obj = NULL);
     virtual void updateObjectsFromWidgets();
     virtual void helpButtonPressed();
+
 protected:
     virtual void enableControls(bool enable);
+
     void checkWidgetsLimits(QWidget *widget, UAVObjectField *field, int index, bool hasLimits, QVariant value, double scale);
     void updateEnableControls();
 };

@@ -38,8 +38,10 @@
 
 #include <extensionsystem/pluginmanager.h>
 #include <coreplugin/generalsettings.h>
+#include "altitudeholdsettings.h"
 
-ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent)
+ConfigStabilizationWidget::ConfigStabilizationWidget(QWidget *parent) : ConfigTaskWidget(parent),
+    boardModel(0)
 {
     ui = new Ui_StabilizationWidget();
     ui->setupUi(this);
@@ -198,7 +200,18 @@ void ConfigStabilizationWidget::onBoardConnected()
     UAVObjectUtilManager *utilMngr     = pm->getObject<UAVObjectUtilManager>();
 
     Q_ASSERT(utilMngr);
-
+    boardModel = utilMngr->getBoardModel();
     // If Revolution board enable misc tab, otherwise disable it
-    ui->AltitudeHold->setEnabled((utilMngr->getBoardModel() & 0xff00) == 0x0900);
+    ui->AltitudeHold->setEnabled((boardModel & 0xff00) == 0x0900);
+}
+
+bool ConfigStabilizationWidget::shouldObjectBeSaved(UAVObject *object)
+{
+    // AltitudeHoldSettings should only be saved for Revolution board to avoid error.
+    if((boardModel & 0xff00) != 0x0900) {
+        return dynamic_cast<AltitudeHoldSettings*>(object) == 0;
+    }
+    else {
+        return true;
+    }
 }

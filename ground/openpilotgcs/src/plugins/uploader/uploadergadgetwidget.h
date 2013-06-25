@@ -97,6 +97,8 @@ private:
     int autoUpdateConnectTimeout;
     FlightStatus *getFlightStatus();
     void bootButtonsSetEnable(bool enabled);
+    static const int AUTOUPDATE_CLOSE_TIMEOUT;
+    QTimer autoUpdateCloseTimer;
 private slots:
     void onPhisicalHWConnect();
     void versionMatchCheck();

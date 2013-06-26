@@ -718,38 +718,50 @@ struct pios_rfm22b_dev {
     struct rfm22b_stats    stats;
 
     // Stats
-    uint16_t     errors;
+    uint16_t errors;
 
     // RSSI in dBm
-    int8_t       rssi_dBm;
+    int8_t   rssi_dBm;
 
     // The tx data packet
-    uint8_t      tx_packet[RFM22B_MAX_PACKET_LEN];
+    uint8_t  tx_packet[RFM22B_MAX_PACKET_LEN];
     // The current tx packet
-    uint8_t      *tx_packet_handle;
+    uint8_t  *tx_packet_handle;
     // The tx data read index
-    uint16_t     tx_data_rd;
+    uint16_t tx_data_rd;
     // The tx data write index
-    uint16_t     tx_data_wr;
+    uint16_t tx_data_wr;
     // The tx packet sequence number
-    uint16_t     tx_seq;
+    uint16_t tx_seq;
 
     // The rx data packet
-    uint8_t      rx_packet[RFM22B_MAX_PACKET_LEN];
+    uint8_t  rx_packet[RFM22B_MAX_PACKET_LEN];
     // The rx data packet
-    uint8_t      *rx_packet_handle;
+    uint8_t  *rx_packet_handle;
     // The receive buffer write index
-    uint16_t     rx_buffer_wr;
+    uint16_t rx_buffer_wr;
     // The receive buffer write index
-    uint16_t     rx_packet_len;
+    uint16_t rx_packet_len;
+
+    // The PPM buffer
+    int16_t  ppm[RFM22B_PPM_NUM_CHANNELS];
+    // The PPM packet received callback.
+    PPMReceivedCallback ppm_callback;
+
     // The id that the packet was received from
     uint32_t     rx_destination_id;
     // The maximum packet length (including header, etc.)
     uint8_t      max_packet_len;
-    // The time alloted for transmission of a packet.
-    uint8_t      packet_period;
+    // The packet transmit time in ms.
+    uint8_t      packet_time;
     // Do all packets originate from the coordinator modem?
     bool         one_way_link;
+    // Should this modem send PPM data?
+    bool         ppm_send_mode;
+    // Should this modem receive PPM data?
+    bool         ppm_recv_mode;
+    // Are we sending / receiving only PPM data?
+    bool         ppm_only_mode;
 
     // The channel list
     uint8_t      channels[RFM22B_NUM_CHANNELS];

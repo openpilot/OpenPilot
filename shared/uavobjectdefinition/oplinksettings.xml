@@ -2,18 +2,18 @@
 	<object name="OPLinkSettings" singleinstance="true" settings="true">
 		<description>OPLink configurations options.</description>
                 <field name="Coordinator" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
-                <field name="OneWayLink" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
+                <field name="OneWay" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
+                <field name="PPM" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
+                <field name="PPMOnly" units="" type="enum" elements="1" options="FALSE,TRUE" defaultvalue="FALSE"/>
 		<field name="CoordID" units="hex" type="uint32" elements="1" defaultvalue="0"/>
 		<field name="MainPort" units="" type="enum" elements="1" options="Disabled,Telemetry,Serial,PPM" defaultvalue="Telemetry"/>
 		<field name="FlexiPort" units="" type="enum" elements="1" options="Disabled,Telemetry,Serial,PPM" defaultvalue="Disabled"/>
 		<field name="VCPPort" units="" type="enum" elements="1" options="Disabled,Serial" defaultvalue="Disabled"/>
-		<field name="ComSpeed" units="bps" type="enum" elements="1" options="2400,4800,9600,19200,38400,57600,115200" defaultvalue="38400"/>
-		<field name="MaxRFPower" units="mW" type="enum" elements="1" options="1.25,1.6,3.16,6.3,12.6,25,50,100" defaultvalue="1.25"/>
+		<field name="ComSpeed" units="bps" type="enum" elements="1" options="4800,9600,19200,38400,57600,115200" defaultvalue="38400"/>
+		<field name="MaxRFPower" units="mW" type="enum" elements="1" options="0,1.25,1.6,3.16,6.3,12.6,25,50,100" defaultvalue="0"/>
 		<field name="MinChannel" units="" type="uint8" elements="1" defaultvalue="0"/>
 		<field name="MaxChannel" units="" type="uint8" elements="1" defaultvalue="250"/>
-		<field name="NumChannels" units="" type="uint8" elements="1" defaultvalue="10"/>
 		<field name="ChannelSet" units="" type="uint8" elements="1" defaultvalue="39"/>
-		<field name="PacketTime" units="ms" type="uint8" elements="1" defaultvalue="15"/>
 
 		<access gcs="readwrite" flight="readwrite"/>
 		<telemetrygcs acked="true" updatemode="onchange" period="0"/>

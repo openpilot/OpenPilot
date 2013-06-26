@@ -37,7 +37,6 @@
 #include <oplinksettings.h>
 #include <oplinkreceiver.h>
 #include <uavtalk_priv.h>
-#include <pios_ppm_out.h>
 #include <pios_rfm22b.h>
 #include <ecc.h>
 #if defined(PIOS_INCLUDE_FLASH_EEPROM)
@@ -49,14 +48,14 @@
 // ****************
 // Private constants
 
-#define STACK_SIZE_BYTES 150
-#define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
-#define MAX_RETRIES      2
-#define RETRY_TIMEOUT_MS 20
-#define EVENT_QUEUE_SIZE 10
-#define MAX_PORT_DELAY   200
-#define EV_SEND_ACK      0x20
-#define EV_SEND_NACK     0x30
+#define STACK_SIZE_BYTES  150
+#define TASK_PRIORITY     (tskIDLE_PRIORITY + 1)
+#define MAX_RETRIES       2
+#define RETRY_TIMEOUT_MS  20
+#define EVENT_QUEUE_SIZE  10
+#define MAX_PORT_DELAY    200
+#define SERIAL_RX_BUF_LEN 100
+#define PPM_INPUT_TIMEOUT 100
 
 // ****************
 // Private types
@@ -68,6 +67,7 @@ typedef struct {
     xTaskHandle radioTxTaskHandle;
     xTaskHandle radioRxTaskHandle;
     xTaskHandle PPMInputTaskHandle;
+    xTaskHandle serialRxTaskHandle;
 
     // The UAVTalk connection on the com side.
     UAVTalkConnection telemUAVTalkCon;
@@ -77,14 +77,17 @@ typedef struct {
     xQueueHandle uavtalkEventQueue;
     xQueueHandle radioEventQueue;
 
+    // The raw serial Rx buffer
+    uint8_t  serialRxBuf[SERIAL_RX_BUF_LEN];
+
     // Error statistics.
-    uint32_t     comTxErrors;
-    uint32_t     comTxRetries;
-    uint32_t     UAVTalkErrors;
-    uint32_t     droppedPackets;
+    uint32_t comTxErrors;
+    uint32_t comTxRetries;
+    uint32_t UAVTalkErrors;
+    uint32_t droppedPackets;
 
     // Should we parse UAVTalk?
-    bool parseUAVTalk;
+    bool     parseUAVTalk;
 
     // The current configured uart speed
     OPLinkSettingsComSpeedOptions comSpeed;
@@ -95,6 +98,7 @@ typedef struct {
 
 static void telemetryTxTask(void *parameters);
 static void telemetryRxTask(void *parameters);
+static void serialRxTask(void *parameters);
 static void radioTxTask(void *parameters);
 static void radioRxTask(void *parameters);
 static void PPMInputTask(void *parameters);
@@ -103,7 +107,6 @@ static int32_t RadioSendHandler(uint8_t *buf, int32_t length);
 static void ProcessTelemetryStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t rxbyte);
 static void ProcessRadioStream(UAVTalkConnection inConnectionHandle, UAVTalkConnection outConnectionHandle, uint8_t rxbyte);
 static void objectPersistenceUpdatedCb(UAVObjEvent *objEv);
-static void oplinkReceiverUpdatedCb(UAVObjEvent *objEv);
 
 // ****************
 // Private variables
@@ -170,21 +173,25 @@ static int32_t RadioComBridgeStart(void)
 
         // Configure the UAVObject callbacks
         ObjectPersistenceConnectCallback(&objectPersistenceUpdatedCb);
-        if (!is_coordinator) {
-            OPLinkReceiverConnectCallback(&oplinkReceiverUpdatedCb);
-        }
 
         // Start the primary tasks for receiving/sending UAVTalk packets from the GCS.
         xTaskCreate(telemetryTxTask, (signed char *)"telemetryTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryTxTaskHandle));
         xTaskCreate(telemetryRxTask, (signed char *)"telemetryRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->telemetryRxTaskHandle));
-        xTaskCreate(radioTxTask, (signed char *)"radioTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioTxTaskHandle));
-        xTaskCreate(radioRxTask, (signed char *)"radioRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioRxTaskHandle));
         if (PIOS_PPM_RECEIVER != 0) {
             xTaskCreate(PPMInputTask, (signed char *)"PPMInputTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->PPMInputTaskHandle));
 #ifdef PIOS_INCLUDE_WDG
             PIOS_WDG_RegisterFlag(PIOS_WDG_PPMINPUT);
 #endif
         }
+        if (!data->parseUAVTalk) {
+            // If the user wants raw serial communication, we need to spawn another thread to handle it.
+            xTaskCreate(serialRxTask, (signed char *)"serialRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->serialRxTaskHandle));
+#ifdef PIOS_INCLUDE_WDG
+            PIOS_WDG_RegisterFlag(PIOS_WDG_SERIALRX);
+#endif
+        }
+        xTaskCreate(radioTxTask, (signed char *)"radioTxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioTxTaskHandle));
+        xTaskCreate(radioRxTask, (signed char *)"radioRxTask", STACK_SIZE_BYTES, NULL, TASK_PRIORITY, &(data->radioRxTaskHandle));
 
         // Register the watchdog timers.
 #ifdef PIOS_INCLUDE_WDG
@@ -264,28 +271,6 @@ static void telemetryTxTask(__attribute__((unused)) void *parameters)
                     }
                 }
                 data->comTxRetries += retries;
-            } else if (ev.event == EV_SEND_ACK) {
-                // Send the ACK
-                uint32_t retries = 0;
-                int32_t success  = -1;
-                while (retries < MAX_RETRIES && success == -1) {
-                    success = UAVTalkSendAck(data->telemUAVTalkCon, ev.obj, ev.instId) == 0;
-                    if (!success) {
-                        ++retries;
-                    }
-                }
-                data->comTxRetries += retries;
-            } else if (ev.event == EV_SEND_NACK) {
-                // Send the NACK
-                uint32_t retries = 0;
-                int32_t success  = -1;
-                while (retries < MAX_RETRIES && success == -1) {
-                    success = UAVTalkSendNack(data->telemUAVTalkCon, UAVObjGetID(ev.obj)) == 0;
-                    if (!success) {
-                        ++retries;
-                    }
-                }
-                data->comTxRetries += retries;
             }
         }
     }
@@ -320,28 +305,6 @@ static void radioTxTask(__attribute__((unused)) void *parameters)
                     }
                 }
                 data->comTxRetries += retries;
-            } else if (ev.event == EV_SEND_ACK) {
-                // Send the ACK
-                uint32_t retries = 0;
-                int32_t success  = -1;
-                while (retries < MAX_RETRIES && success == -1) {
-                    success = UAVTalkSendAck(data->radioUAVTalkCon, ev.obj, ev.instId) == 0;
-                    if (!success) {
-                        ++retries;
-                    }
-                }
-                data->comTxRetries += retries;
-            } else if (ev.event == EV_SEND_NACK) {
-                // Send the NACK
-                uint32_t retries = 0;
-                int32_t success  = -1;
-                while (retries < MAX_RETRIES && success == -1) {
-                    success = UAVTalkSendNack(data->radioUAVTalkCon, UAVObjGetID(ev.obj)) == 0;
-                    if (!success) {
-                        ++retries;
-                    }
-                }
-                data->comTxRetries += retries;
             }
         }
     }
@@ -359,13 +322,17 @@ static void radioRxTask(__attribute__((unused)) void *parameters)
 #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_RADIORX);
 #endif
-        uint8_t serial_data[1];
-        uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
-        if (bytes_to_process > 0) {
-            // Pass the data through the UAVTalk parser.
-            for (uint8_t i = 0; i < bytes_to_process; i++) {
-                ProcessRadioStream(data->radioUAVTalkCon, data->telemUAVTalkCon, serial_data[i]);
+        if (PIOS_COM_RADIO) {
+            uint8_t serial_data[1];
+            uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
+            if (bytes_to_process > 0) {
+                // Pass the data through the UAVTalk parser.
+                for (uint8_t i = 0; i < bytes_to_process; i++) {
+                    ProcessRadioStream(data->radioUAVTalkCon, data->telemUAVTalkCon, serial_data[i]);
+                }
             }
+        } else {
+            vTaskDelay(5);
         }
     }
 }
@@ -403,7 +370,6 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
     }
 }
 
-
 /**
  * @brief Reads the PPM input device and sends out OPLinkReceiver objects.
  *
@@ -412,29 +378,54 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
 static void PPMInputTask(__attribute__((unused)) void *parameters)
 {
     xSemaphoreHandle sem = PIOS_RCVR_GetSemaphore(PIOS_PPM_RECEIVER, 1);
-    OPLinkReceiverData opl_rcvr;
+    int16_t channels[RFM22B_PPM_NUM_CHANNELS];
 
-    // Task loop
     while (1) {
-#ifdef PIOS_INCLUDE_WDG
+ #ifdef PIOS_INCLUDE_WDG
         PIOS_WDG_UpdateFlag(PIOS_WDG_PPMINPUT);
-#endif
+ #endif
 
         // Wait for the receiver semaphore.
-        bool valid_input_detected = false;
-        if (xSemaphoreTake(sem, MAX_PORT_DELAY) == pdTRUE) {
+        if (xSemaphoreTake(sem, PPM_INPUT_TIMEOUT) == pdTRUE) {
             // Read the receiver inputs.
             for (uint8_t i = 0; i < OPLINKRECEIVER_CHANNEL_NUMELEM; ++i) {
-                opl_rcvr.Channel[i] = PIOS_RCVR_Read(PIOS_PPM_RECEIVER, i + 1);
-                if ((opl_rcvr.Channel[i] != PIOS_RCVR_INVALID) && (opl_rcvr.Channel[i] != PIOS_RCVR_TIMEOUT)) {
-                    valid_input_detected = true;
-                }
+                channels[i] = PIOS_RCVR_Read(PIOS_PPM_RECEIVER, i + 1);
+            }
+        } else {
+            // Failsafe
+            for (uint8_t i = 0; i < OPLINKRECEIVER_CHANNEL_NUMELEM; ++i) {
+                channels[i] = PIOS_RCVR_INVALID;
             }
         }
 
-        // Set the receiver UAVO if we detected valid input.
-        if (valid_input_detected) {
-            OPLinkReceiverSet(&opl_rcvr);
+        // Pass the channel values to the radio device.
+        PIOS_RFM22B_PPMSet(pios_rfm22b_id, channels);
+    }
+}
+
+/**
+ * @brief Receive raw serial data from the USB/COM port.
+ *
+ * @param[in] parameters  The task parameters
+ */
+static void serialRxTask(__attribute__((unused)) void *parameters)
+{
+    // Task loop
+    while (1) {
+        uint32_t inputPort = PIOS_COM_TELEMETRY;
+#ifdef PIOS_INCLUDE_WDG
+        PIOS_WDG_UpdateFlag(PIOS_WDG_SERIALRX);
+#endif
+        if (inputPort && PIOS_COM_RADIO) {
+            // Receive some data.
+            uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(inputPort, data->serialRxBuf, sizeof(data->serialRxBuf), MAX_PORT_DELAY);
+
+            // Send the data over the radio link.
+            if (bytes_to_process > 0) {
+                PIOS_COM_SendBufferNonBlocking(PIOS_COM_RADIO, data->serialRxBuf, bytes_to_process);
+            }
+        } else {
+            vTaskDelay(5);
         }
     }
 }
@@ -597,21 +588,5 @@ static void objectPersistenceUpdatedCb(__attribute__((unused)) UAVObjEvent *objE
             obj_per.Operation = OBJECTPERSISTENCE_OPERATION_COMPLETED;
             ObjectPersistenceSet(&obj_per);
         }
-    }
-}
-
-/**
- * @brief Callback that is called when the OPLinkReceiver UAVObject is changed.
- * @param[in] objEv  The event that precipitated the callback.
- */
-static void oplinkReceiverUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
-{
-    // Get the OPLinkReceiver object.
-    OPLinkReceiverData opl_rcvr;
-
-    OPLinkReceiverGet(&opl_rcvr);
-
-    for (uint8_t i = 0; i < OPLINKRECEIVER_CHANNEL_NUMELEM; ++i) {
-        PIOS_PPM_OUT_Set(PIOS_PPM_OUTPUT, i, opl_rcvr.Channel[i]);
     }
 }

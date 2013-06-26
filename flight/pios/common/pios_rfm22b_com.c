@@ -55,31 +55,12 @@ const struct pios_com_driver pios_rfm22b_com_driver = {
 /**
  * Changes the baud rate of the RFM22B peripheral without re-initialising.
  *
- * @param[in] rfm22b_id RFM22B name (GPS, TELEM, AUX)
+ * @param[in] rfm22b_id  The defice ID
  * @param[in] baud Requested baud rate
  */
-static void PIOS_RFM22B_COM_ChangeBaud(uint32_t rfm22b_id, uint32_t baud)
-{
-    struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
-
-    if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
-        return;
-    }
-    // Set the RF data rate on the modem to ~2X the selected buad rate because the modem is half duplex.
-    enum rfm22b_datarate datarate = RFM22_datarate_64000;
-    if (baud <= 9600) {
-        datarate = RFM22_datarate_19200;
-    } else if (baud <= 19200) {
-        datarate = RFM22_datarate_32000;
-    } else if (baud <= 38400) {
-        datarate = RFM22_datarate_57600;
-    } else if (baud <= 57600) {
-        datarate = RFM22_datarate_128000;
-    } else if (baud <= 115200) {
-        datarate = RFM22_datarate_192000;
-    }
-    rfm22b_dev->datarate = datarate;
-}
+static void PIOS_RFM22B_COM_ChangeBaud(__attribute__((unused)) uint32_t rfm22b_id,
+                                       __attribute__((unused)) uint32_t baud)
+{}
 
 /**
  * Start a receive from the COM device
@@ -97,14 +78,10 @@ static void PIOS_RFM22B_COM_RxStart(__attribute__((unused)) uint32_t rfm22b_id,
  * @param[in] rfm22b_dev  The device ID.
  * @param[in] tx_bytes_available  The number of bytes available to transmit
  */
-static void PIOS_RFM22B_COM_TxStart(uint32_t rfm22b_id, __attribute__((unused)) uint16_t tx_bytes_avail)
-{
-    struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+static void PIOS_RFM22B_COM_TxStart(__attribute__((unused)) uint32_t rfm22b_id,
+                                    __attribute__((unused)) uint16_t tx_bytes_avail)
+{}
 
-    if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
-        return;
-    }
-}
 
 /**
  * Register the callback to pass received data to

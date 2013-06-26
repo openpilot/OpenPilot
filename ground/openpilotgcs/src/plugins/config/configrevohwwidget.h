@@ -57,7 +57,6 @@ private slots:
     void usbHIDPortChanged(int index);
     void flexiPortChanged(int index);
     void mainPortChanged(int index);
-    void modemPortChanged(int index);
     void openHelp();
 };
 

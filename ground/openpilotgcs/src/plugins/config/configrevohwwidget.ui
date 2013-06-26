@@ -123,33 +123,16 @@
            </property>
            <item row="2" column="2">
             <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
-             <item row="16" column="4">
-              <spacer name="horizontalSpacer_8">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_4">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
                </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Minimum</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>120</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="10" column="0">
-              <widget class="QComboBox" name="cbUSBVCPSpeed">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="12" column="3">
-              <widget class="QLabel" name="label_3">
                <property name="text">
-                <string>Main Port</string>
+                <string>USB HID Function</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignBottom|Qt::AlignHCenter</set>
@@ -172,8 +155,28 @@
                </property>
               </spacer>
              </item>
-             <item row="12" column="5">
-              <spacer name="horizontalSpacer_6">
+             <item row="15" column="1">
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <item alignment="Qt::AlignTop">
+                <widget class="QComboBox" name="cbFlexiTelemSpeed">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item alignment="Qt::AlignTop">
+                <widget class="QComboBox" name="cbFlexiGPSSpeed"/>
+               </item>
+               <item alignment="Qt::AlignTop">
+                <widget class="QComboBox" name="cbFlexiComSpeed"/>
+               </item>
+              </layout>
+             </item>
+             <item row="16" column="1">
+              <spacer name="horizontalSpacer_7">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -188,21 +191,8 @@
                </property>
               </spacer>
              </item>
-             <item row="6" column="5">
-              <widget class="QComboBox" name="cbSonar">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="0">
-              <widget class="QLabel" name="lblUSBVCPSpeed">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
+             <item row="14" column="3">
+              <widget class="QLabel" name="lblMainSpeed">
                <property name="text">
                 <string>Speed</string>
                </property>
@@ -242,8 +232,115 @@
                </property>
               </widget>
              </item>
+             <item row="13" column="1">
+              <widget class="QComboBox" name="cbFlexi"/>
+             </item>
+             <item row="16" column="4">
+              <spacer name="horizontalSpacer_8">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Minimum</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>70</width>
+                 <height>10</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="12" column="1">
+              <widget class="QLabel" name="label_5">
+               <property name="text">
+                <string>Flexi Port</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="5">
+              <widget class="QComboBox" name="cbSonar">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="13" column="3">
+              <widget class="QComboBox" name="cbMain"/>
+             </item>
+             <item row="10" column="5">
+              <spacer name="verticalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="12" column="3">
+              <widget class="QLabel" name="label_3">
+               <property name="text">
+                <string>Main Port</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="0">
+              <widget class="QComboBox" name="cbUSBVCPSpeed">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="5">
+              <spacer name="horizontalSpacer_6">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Minimum</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>120</width>
+                 <height>10</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
              <item row="8" column="0">
               <widget class="QComboBox" name="cbUSBVCPFunction"/>
+             </item>
+             <item row="6" column="0">
+              <widget class="QComboBox" name="cbUSBHIDFunction"/>
+             </item>
+             <item row="9" column="0">
+              <widget class="QLabel" name="lblUSBVCPSpeed">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Speed</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+               </property>
+              </widget>
              </item>
              <item row="5" column="5">
               <widget class="QLabel" name="label_9">
@@ -260,194 +357,6 @@
                 <set>Qt::AlignBottom|Qt::AlignHCenter</set>
                </property>
               </widget>
-             </item>
-             <item row="1" column="0">
-              <spacer name="verticalSpacer_4">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>120</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="13" column="3">
-              <widget class="QComboBox" name="cbMain"/>
-             </item>
-             <item row="7" column="0">
-              <widget class="QLabel" name="label_8">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>USB VCP Function</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="14" column="3">
-              <widget class="QLabel" name="lblMainSpeed">
-               <property name="text">
-                <string>Speed</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="15" column="1">
-              <layout class="QVBoxLayout" name="verticalLayout_5">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <item alignment="Qt::AlignTop">
-                <widget class="QComboBox" name="cbFlexiTelemSpeed">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item alignment="Qt::AlignTop">
-                <widget class="QComboBox" name="cbFlexiGPSSpeed"/>
-               </item>
-               <item alignment="Qt::AlignTop">
-                <widget class="QComboBox" name="cbFlexiComSpeed"/>
-               </item>
-              </layout>
-             </item>
-             <item row="12" column="0">
-              <spacer name="horizontalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Minimum</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>120</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item row="12" column="1">
-              <widget class="QLabel" name="label_5">
-               <property name="text">
-                <string>Flexi Port</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QComboBox" name="cbRcvr"/>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_4">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>USB HID Function</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0">
-              <widget class="QComboBox" name="cbUSBHIDFunction"/>
-             </item>
-             <item row="15" column="3">
-              <layout class="QVBoxLayout" name="verticalLayout_6">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <item>
-                <widget class="QComboBox" name="cbMainTelemSpeed">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QComboBox" name="cbMainGPSSpeed"/>
-               </item>
-               <item>
-                <widget class="QComboBox" name="cbMainComSpeed"/>
-               </item>
-              </layout>
-             </item>
-             <item row="13" column="1">
-              <widget class="QComboBox" name="cbFlexi"/>
-             </item>
-             <item row="12" column="2">
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Radio</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="13" column="2">
-              <widget class="QComboBox" name="cbModem"/>
-             </item>
-             <item row="14" column="2">
-              <widget class="QLabel" name="lblRadioSpeed">
-               <property name="text">
-                <string>Speed</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="15" column="2">
-              <widget class="QComboBox" name="cbRadioSpeed"/>
-             </item>
-             <item row="14" column="1">
-              <widget class="QLabel" name="lblFlexiSpeed">
-               <property name="text">
-                <string>Speed</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="16" column="1">
-              <spacer name="horizontalSpacer_7">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Minimum</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>120</width>
-                 <height>10</height>
-                </size>
-               </property>
-              </spacer>
              </item>
              <item row="2" column="0">
               <widget class="QLabel" name="label_7">
@@ -480,6 +389,87 @@
                 </size>
                </property>
               </spacer>
+             </item>
+             <item row="12" column="0">
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Minimum</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>120</width>
+                 <height>10</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="label_8">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>USB VCP Function</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>120</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item row="14" column="1">
+              <widget class="QLabel" name="lblFlexiSpeed">
+               <property name="text">
+                <string>Speed</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignBottom|Qt::AlignHCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="15" column="3">
+              <layout class="QVBoxLayout" name="verticalLayout_6">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QComboBox" name="cbMainTelemSpeed">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="cbMainGPSSpeed"/>
+               </item>
+               <item>
+                <widget class="QComboBox" name="cbMainComSpeed"/>
+               </item>
+              </layout>
+             </item>
+             <item row="3" column="0">
+              <widget class="QComboBox" name="cbRcvr"/>
              </item>
              <item row="16" column="3">
               <spacer name="horizontalSpacer_9">
@@ -545,22 +535,6 @@
                </property>
               </spacer>
              </item>
-             <item row="10" column="5">
-              <spacer name="verticalSpacer_6">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
              <item row="11" column="5">
               <spacer name="verticalSpacer_9">
                <property name="orientation">
@@ -584,7 +558,7 @@
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>120</width>
+                 <width>80</width>
                  <height>10</height>
                 </size>
                </property>

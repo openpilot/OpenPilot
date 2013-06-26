@@ -34,15 +34,22 @@
 // This module uses the RFM22B's internal packet handling hardware to
 // encapsulate our own packet data.
 //
-// The RFM22B internal hardware packet handler configuration is as follows ..
+// The RFM22B internal hardware packet handler configuration is as follows:
 //
-// 4-byte (32-bit) preamble .. alternating 0's & 1's
+// 6-byte (32-bit) preamble .. alternating 0's & 1's
 // 4-byte (32-bit) sync
 // 1-byte packet length (number of data bytes to follow)
 // 0 to 255 user data bytes
+// 4 byte ECC
 //
-// Our own packet data will also contain it's own header and 32-bit CRC
-// as a single 16-bit CRC is not sufficient for wireless comms.
+// OR in PPM only mode:
+//
+// 6-byte (32-bit) preamble .. alternating 0's & 1's
+// 4-byte (32-bit) sync
+// 1-byte packet length (number of data bytes to follow)
+// 1 byte valid bitmask
+// 8 PPM values (0-255)
+// 1 byte CRC
 //
 // *****************************************************************
 
@@ -64,11 +71,10 @@
 #define RFM22B_DEFAULT_TX_POWER          RFM22_tx_pwr_txpow_0
 #define RFM22B_NOMINAL_CARRIER_FREQUENCY 430000000
 #define RFM22B_LINK_QUALITY_THRESHOLD    20
-#define RFM22B_DEFAULT_NUM_CHANNELS      1
 #define RFM22B_DEFAULT_MIN_CHANNEL       0
 #define RFM22B_DEFAULT_MAX_CHANNEL       250
 #define RFM22B_DEFAULT_CHANNEL_SET       24
-#define RFM22B_DEFAULT_PACKET_PERIOD     15
+#define RFM22B_PPM_ONLY_DATARATE         RFM22_datarate_9600
 
 // The maximum amount of time without activity before initiating a reset.
 #define PIOS_RFM22B_SUPERVISOR_TIMEOUT   100  // ms
@@ -80,6 +86,7 @@
 #define RX_PREAMBLE_NIBBLES              6   // 5 to 31 (number of nibbles)
 #define SYNC_BYTES                       4
 #define HEADER_BYTES                     4
+#define LENGTH_BYTES                     1
 
 // the size of the rf modules internal FIFO buffers
 #define FIFO_SIZE                        64
@@ -217,12 +224,13 @@ static const struct pios_rfm22b_transition rfm22b_transitions[RADIO_STATE_NUM_ST
     [RADIO_STATE_RX_MODE] =       {
         .entry_fn   = radio_setRxMode,
         .next_state =             {
-            [RADIO_EVENT_TX_START]     = RADIO_STATE_TX_START,
             [RADIO_EVENT_INT_RECEIVED] = RADIO_STATE_RX_DATA,
-            [RADIO_EVENT_TIMEOUT] = RADIO_STATE_TIMEOUT,
-            [RADIO_EVENT_ERROR] = RADIO_STATE_ERROR,
-            [RADIO_EVENT_INITIALIZE]   = RADIO_STATE_INITIALIZING,
-            [RADIO_EVENT_FATAL_ERROR]  = RADIO_STATE_FATAL_ERROR,
+            [RADIO_EVENT_TX_START]     = RADIO_STATE_TX_START,
+            [RADIO_EVENT_RX_MODE]     = RADIO_STATE_RX_MODE,
+            [RADIO_EVENT_TIMEOUT]     = RADIO_STATE_TIMEOUT,
+            [RADIO_EVENT_ERROR]       = RADIO_STATE_ERROR,
+            [RADIO_EVENT_INITIALIZE]  = RADIO_STATE_INITIALIZING,
+            [RADIO_EVENT_FATAL_ERROR] = RADIO_STATE_FATAL_ERROR,
         },
     },
     [RADIO_STATE_RX_DATA] =       {
@@ -294,33 +302,37 @@ static const struct pios_rfm22b_transition rfm22b_transitions[RADIO_STATE_NUM_ST
 };
 
 // xtal 10 ppm, 434MHz
-static const uint32_t data_rate[] = { 9600, 19200, 32000, 57600, 64000, 128000, 192000, 256000 };
-static const uint8_t modulation_index[] = { 1, 1, 1, 1, 1, 1, 1, 1 };
+static const uint32_t data_rate[] = { 9600, 19200, 32000, 57600, 128000, 192000, 256000 };
+static const uint8_t modulation_index[] = { 1, 1, 1, 1, 1, 1, 1 };
 
-static const uint8_t reg_1C[] = { 0x01, 0x05, 0x16, 0x06, 0x07, 0x83, 0x8A, 0x8C }; // rfm22_if_filter_bandwidth
+static const uint8_t reg_1C[] = { 0x01, 0x05, 0x16, 0x06, 0x83, 0x8A, 0x8C }; // rfm22_if_filter_bandwidth
 
-static const uint8_t reg_1D[] = { 0x40, 0x40, 0x44, 0x40, 0x44, 0x44, 0x44, 0x44 }; // rfm22_afc_loop_gearshift_override
-static const uint8_t reg_1E[] = { 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x02 }; // rfm22_afc_timing_control
+static const uint8_t reg_1D[] = { 0x40, 0x40, 0x44, 0x40, 0x44, 0x44, 0x44 }; // rfm22_afc_loop_gearshift_override
+static const uint8_t reg_1E[] = { 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x02 }; // rfm22_afc_timing_control
 
-static const uint8_t reg_1F[] = { 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03 }; // rfm22_clk_recovery_gearshift_override
-static const uint8_t reg_20[] = { 0xA1, 0xD0, 0x3F, 0x45, 0x3F, 0x5E, 0x3F, 0x2F }; // rfm22_clk_recovery_oversampling_ratio
-static const uint8_t reg_21[] = { 0x20, 0x00, 0x02, 0x01, 0x02, 0x01, 0x02, 0x02 }; // rfm22_clk_recovery_offset2
+static const uint8_t reg_1F[] = { 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03 }; // rfm22_clk_recovery_gearshift_override
+static const uint8_t reg_20[] = { 0xA1, 0xD0, 0x3F, 0x45, 0x5E, 0x3F, 0x2F }; // rfm22_clk_recovery_oversampling_ratio
+static const uint8_t reg_21[] = { 0x20, 0x00, 0x02, 0x01, 0x01, 0x02, 0x02 }; // rfm22_clk_recovery_offset2
 static const uint8_t reg_22[] = { 0x4E, 0x9D, 0x0C, 0xD7, 0x0c, 0x5D, 0x0C, 0xBB }; // rfm22_clk_recovery_offset1
-static const uint8_t reg_23[] = { 0xA5, 0x49, 0x4A, 0xDC, 0x4A, 0x86, 0x4A, 0x0D }; // rfm22_clk_recovery_offset0
+static const uint8_t reg_23[] = { 0xA5, 0x49, 0x4A, 0xDC, 0x86, 0x4A, 0x0D }; // rfm22_clk_recovery_offset0
 static const uint8_t reg_24[] = { 0x00, 0x00, 0x07, 0x07, 0x07, 0x05, 0x07, 0x07 }; // rfm22_clk_recovery_timing_loop_gain1
-static const uint8_t reg_25[] = { 0x34, 0x8, 0xFF, 0x6E, 0xFF, 0x74, 0xFF, 0xFF }; // rfm22_clk_recovery_timing_loop_gain0
+static const uint8_t reg_25[] = { 0x34, 0x8, 0xFF, 0x6E, 0x74, 0xFF, 0xFF }; // rfm22_clk_recovery_timing_loop_gain0
 
-static const uint8_t reg_2A[] = { 0x1E, 0x24, 0x17, 0x2D, 0x31, 0x50, 0x50, 0x50 }; // rfm22_afc_limiter .. AFC_pull_in_range = �AFCLimiter[7:0] x (hbsel+1) x 625 Hz
+static const uint8_t reg_2A[] = { 0x1E, 0x24, 0x17, 0x2D, 0x50, 0x50, 0x50 }; // rfm22_afc_limiter .. AFC_pull_in_range = �AFCLimiter[7:0] x (hbsel+1) x 625 Hz
 
-static const uint8_t reg_58[] = { 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 }; // rfm22_cpcuu
-static const uint8_t reg_69[] = { 0x60, 0x60, 0x20, 0x60, 0x20, 0x20, 0x20, 0x20 }; // rfm22_agc_override1
-static const uint8_t reg_6E[] = { 0x4E, 0x9D, 0x08, 0x0E, 0x10, 0x20, 0x31, 0x41 }; // rfm22_tx_data_rate1
-static const uint8_t reg_6F[] = { 0xA5, 0x49, 0x31, 0xBF, 0x62, 0xC5, 0x27, 0x89 }; // rfm22_tx_data_rate0
+static const uint8_t reg_58[] = { 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 }; // rfm22_cpcuu
+static const uint8_t reg_69[] = { 0x60, 0x60, 0x20, 0x60, 0x20, 0x20, 0x20 }; // rfm22_agc_override1
+static const uint8_t reg_6E[] = { 0x4E, 0x9D, 0x08, 0x0E, 0x20, 0x31, 0x41 }; // rfm22_tx_data_rate1
+static const uint8_t reg_6F[] = { 0xA5, 0x49, 0x31, 0xBF, 0xC5, 0x27, 0x89 }; // rfm22_tx_data_rate0
 
-static const uint8_t reg_70[] = { 0x2C, 0x2C, 0x0D, 0x0C, 0x0C, 0x0D, 0x0D, 0x0D }; // rfm22_modulation_mode_control1
-static const uint8_t reg_71[] = { 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23 }; // rfm22_modulation_mode_control2
+static const uint8_t reg_70[] = { 0x2C, 0x2C, 0x0D, 0x0C, 0x0D, 0x0D, 0x0D }; // rfm22_modulation_mode_control1
+static const uint8_t reg_71[] = { 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23 }; // rfm22_modulation_mode_control2
 
-static const uint8_t reg_72[] = { 0x30, 0x48, 0x1A, 0x2E, 0x33, 0x66, 0x9A, 0xCD }; // rfm22_frequency_deviation
+static const uint8_t reg_72[] = { 0x30, 0x48, 0x1A, 0x2E, 0x66, 0x9A, 0xCD }; // rfm22_frequency_deviation
+
+static const uint8_t packet_time[] = { 80, 40, 25, 15, 8, 6, 5 };
+static const uint8_t packet_time_ppm[] = { 26, 25, 25, 15, 8, 6, 5 };
+static const uint8_t num_channels[] = { 3, 3, 4, 6, 9, 12, 15 };
 
 static struct pios_rfm22b_dev *g_rfm22b_dev = NULL;
 
@@ -364,6 +376,9 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
     rfm22b_dev->rx_in_cb      = NULL;
     rfm22b_dev->tx_out_cb     = NULL;
 
+    // Initialzie the PPM callback.
+    rfm22b_dev->ppm_callback  = NULL;
+
     // Initialize the stats.
     rfm22b_dev->stats.packets_per_sec = 0;
     rfm22b_dev->stats.rx_good = 0;
@@ -381,7 +396,8 @@ int32_t PIOS_RFM22B_Init(uint32_t *rfm22b_id, uint32_t spi_id, uint32_t slave_nu
     rfm22b_dev->stats.tx_failure   = 0;
 
     // Initialize the channels.
-    PIOS_RFM22B_SetChannelConfig(*rfm22b_id, RFM22B_DEFAULT_NUM_CHANNELS, RFM22B_DEFAULT_MIN_CHANNEL, RFM22B_DEFAULT_MAX_CHANNEL, RFM22B_DEFAULT_CHANNEL_SET, RFM22B_DEFAULT_PACKET_PERIOD, false);
+    PIOS_RFM22B_SetChannelConfig(*rfm22b_id, RFM22B_DEFAULT_RX_DATARATE, RFM22B_DEFAULT_MIN_CHANNEL,
+                                 RFM22B_DEFAULT_MAX_CHANNEL, RFM22B_DEFAULT_CHANNEL_SET, false, false, false, false);
 
     // Create the event queue
     rfm22b_dev->eventQueue = xQueueCreate(EVENT_QUEUE_SIZE, sizeof(enum pios_radio_event));
@@ -521,32 +537,53 @@ void PIOS_RFM22B_SetTxPower(uint32_t rfm22b_id, enum rfm22b_tx_power tx_pwr)
  * The channel spacing is 10MHz / 250 = 40kHz
  *
  * @param[in] rfm22b_id  The RFM22B device index.
- * @param[in] num_channels  The number of channels to use for frequency hopping.
+ * @param[in] datarate  The desired datarate.
  * @param[in] min_chan  The minimum channel.
  * @param[in] max_chan  The maximum channel.
  * @param[in] chan_set  The "seed" for selecting a channel sequence.
- * @param[in] packet_period  The fixed time alloted to sending a single packet
+ * @param[in] coordinator Is this modem an coordinator.
+ * @param[in] ppm_mode Should this modem send/receive ppm packets?
  * @param[in] oneway Only the coordinator can send packets if true.
  */
-void PIOS_RFM22B_SetChannelConfig(uint32_t rfm22b_id, uint8_t num_chan, uint8_t min_chan, uint8_t max_chan, uint8_t chan_set, uint8_t packet_period, bool oneway)
+void PIOS_RFM22B_SetChannelConfig(uint32_t rfm22b_id, enum rfm22b_datarate datarate, uint8_t min_chan, uint8_t max_chan, uint8_t chan_set, bool coordinator, bool oneway, bool ppm_mode, bool ppm_only)
 {
     struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 
     if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
         return;
     }
-    rfm22b_dev->packet_period = packet_period;
-    rfm22b_dev->num_channels  = num_chan;
+    ppm_mode = ppm_mode || ppm_only;
+    rfm22b_dev->coordinator   = coordinator;
     rfm22b_dev->one_way_link  = oneway;
+    rfm22b_dev->ppm_send_mode = ppm_mode && coordinator;
+    rfm22b_dev->ppm_recv_mode = ppm_mode && !coordinator;
+    if (ppm_mode && (datarate <= RFM22B_PPM_ONLY_DATARATE)) {
+        ppm_only = true;
+    }
+    rfm22b_dev->ppm_only_mode = ppm_only;
+    if (ppm_only) {
+        rfm22b_dev->datarate = RFM22B_PPM_ONLY_DATARATE;
+    } else {
+        rfm22b_dev->datarate = datarate;
+    }
+    rfm22b_dev->packet_time = (ppm_mode ? packet_time_ppm[datarate] : packet_time[datarate]);
 
     // Find the first N channels that meet the min/max criteria out of the random channel list.
     uint8_t num_found = 0;
-    for (uint16_t i = 0; (i < RFM22B_NUM_CHANNELS) && (num_found < num_chan); ++i) {
+    for (uint16_t i = 0; (i < RFM22B_NUM_CHANNELS) && (num_found < num_channels[datarate]); ++i) {
         uint8_t idx  = (i + chan_set) % RFM22B_NUM_CHANNELS;
         uint8_t chan = channel_list[idx];
         if ((chan >= min_chan) && (chan <= max_chan)) {
             rfm22b_dev->channels[num_found++] = chan;
         }
+    }
+
+    // Calculate the maximum packet length from the datarate.
+    float bytes_per_period = (float)data_rate[datarate] * (float)(rfm22b_dev->packet_time - 2) / 9000;
+
+    rfm22b_dev->max_packet_len = bytes_per_period - TX_PREAMBLE_NIBBLES / 2 - SYNC_BYTES - HEADER_BYTES - LENGTH_BYTES;
+    if (rfm22b_dev->max_packet_len > RFM22B_MAX_PACKET_LEN) {
+        rfm22b_dev->max_packet_len = RFM22B_MAX_PACKET_LEN;
     }
 }
 
@@ -654,11 +691,6 @@ bool PIOS_RFM22B_ReceivePacket(uint32_t rfm22b_id, uint8_t *p)
     struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
 
     if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
-        return false;
-    }
-
-    // Are we already in Rx mode?
-    if ((rfm22b_dev->rfm22b_state == RFM22B_STATE_RX_MODE) || (rfm22b_dev->rfm22b_state == RFM22B_STATE_RX_WAIT)) {
         return false;
     }
     rfm22b_dev->rx_packet_handle = p;
@@ -1006,6 +1038,61 @@ pios_rfm22b_int_result PIOS_RFM22B_ProcessRx(uint32_t rfm22b_id)
 }
 
 /**
+ * Set the PPM packet received callback.
+ *
+ * @param[in] rfm22b_dev  The RFM22B device ID.
+ * @param[in] cb          The callback function pointer.
+ */
+void PIOS_RFM22B_SetPPMCallback(uint32_t rfm22b_id, PPMReceivedCallback cb)
+{
+    struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+
+    if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
+        return;
+    }
+
+    rfm22b_dev->ppm_callback = cb;
+}
+
+/**
+ * Set the PPM values to be transmitted.
+ *
+ * @param[in] rfm22b_dev  The RFM22B device ID.
+ * @param[in] channels    The PPM channel values.
+ */
+extern void PIOS_RFM22B_PPMSet(uint32_t rfm22b_id, int16_t *channels)
+{
+    struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+
+    if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
+        return;
+    }
+
+    for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
+        rfm22b_dev->ppm[i] = channels[i];
+    }
+}
+
+/**
+ * Fetch the PPM values that have been received.
+ *
+ * @param[in] rfm22b_dev  The RFM22B device structure pointer.
+ * @param[out] channels   The PPM channel values.
+ */
+extern void PIOS_RFM22B_PPMGet(uint32_t rfm22b_id, int16_t *channels)
+{
+    struct pios_rfm22b_dev *rfm22b_dev = (struct pios_rfm22b_dev *)rfm22b_id;
+
+    if (!PIOS_RFM22B_Validate(rfm22b_dev)) {
+        return;
+    }
+
+    for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
+        channels[i] = rfm22b_dev->ppm[i];
+    }
+}
+
+/**
  * Validate that the device structure is valid.
  *
  * @param[in] rfm22b_dev  The RFM22B device structure pointer.
@@ -1057,42 +1144,44 @@ static void pios_rfm22_task(void *parameters)
             // Has it been too long since the last event?
             portTickType curTicks = xTaskGetTickCount();
             if (pios_rfm22_time_difference_ms(lastEventTicks, curTicks) > PIOS_RFM22B_SUPERVISOR_TIMEOUT) {
-                // Transsition through an error event.
-                rfm22_process_event(rfm22b_dev, RADIO_EVENT_ERROR);
-
                 // Clear the event queue.
                 enum pios_radio_event event;
                 while (xQueueReceive(rfm22b_dev->eventQueue, &event, 0) == pdTRUE) {
                     // Do nothing;
                 }
                 lastEventTicks = xTaskGetTickCount();
+
+                // Transsition through an error event.
+                rfm22_process_event(rfm22b_dev, RADIO_EVENT_ERROR);
             }
         }
 
         // Change channels if necessary.
-        rfm22_changeChannel(rfm22b_dev);
+        if (rfm22_changeChannel(rfm22b_dev)) {
+            rfm22_process_event(rfm22b_dev, RADIO_EVENT_RX_MODE);
+        }
 
         portTickType curTicks = xTaskGetTickCount();
         // Have we been sending / receiving this packet too long?
+
         if ((rfm22b_dev->packet_start_ticks > 0) &&
-            (pios_rfm22_time_difference_ms(rfm22b_dev->packet_start_ticks, curTicks) > (rfm22b_dev->packet_period * 3))) {
+            (pios_rfm22_time_difference_ms(rfm22b_dev->packet_start_ticks, curTicks) > (rfm22b_dev->packet_time * 3))) {
             rfm22_process_event(rfm22b_dev, RADIO_EVENT_TIMEOUT);
         }
 
-        // Send a packet if it's our time slice
+        // Start transmitting a packet if it's time.
         bool time_to_send = rfm22_timeToSend(rfm22b_dev);
-#ifdef PIOS_RFM22B_DEBUG_ON_TELEM
+   #ifdef PIOS_RFM22B_DEBUG_ON_TELEM
         if (time_to_send) {
             D4_LED_ON;
         } else {
             D4_LED_OFF;
         }
-#endif
+   #endif
 
-        // Start transmitting a packet if it's time.
         if (time_to_send && PIOS_RFM22B_InRxWait((uint32_t)rfm22b_dev)) {
             // If the on_sync_channel flag is set, it means that we were on the sync channel, but no packet was received, so transition to a non-connected state.
-            if (rfm22b_dev->on_sync_channel) {
+            if (!rfm22_isCoordinator(rfm22b_dev) && rfm22b_dev->on_sync_channel) {
                 rfm22b_dev->on_sync_channel = false;
                 if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED) {
                     rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTING;
@@ -1234,7 +1323,7 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
     }
 
     // Initialize the state
-    rfm22b_dev->stats.link_state  = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
+    rfm22b_dev->stats.link_state  = OPLINKSTATUS_LINKSTATE_ENABLED;
 
     // Initialize the packets.
     rfm22b_dev->rx_packet_len     = 0;
@@ -1442,16 +1531,7 @@ static enum pios_radio_event rfm22_init(struct pios_rfm22b_dev *rfm22b_dev)
 static void pios_rfm22_setDatarate(struct pios_rfm22b_dev *rfm22b_dev)
 {
     enum rfm22b_datarate datarate = rfm22b_dev->datarate;
-    bool data_whitening    = true;
-    uint32_t datarate_bps  = data_rate[datarate];
-
-    // Calculate the maximum packet length from the datarate.
-    float bytes_per_period = (float)datarate_bps * (float)(rfm22b_dev->packet_period) / 9000;
-
-    rfm22b_dev->max_packet_len = bytes_per_period - TX_PREAMBLE_NIBBLES / 2 - SYNC_BYTES - HEADER_BYTES - 5;
-    if (rfm22b_dev->max_packet_len > RFM22B_MAX_PACKET_LEN) {
-        rfm22b_dev->max_packet_len = RFM22B_MAX_PACKET_LEN;
-    }
+    bool data_whitening = true;
 
     // Claim the SPI bus.
     rfm22_claimBus(rfm22b_dev);
@@ -1649,9 +1729,9 @@ static void rfm22_rxFailure(struct pios_rfm22b_dev *rfm22b_dev)
  */
 static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
 {
-    uint8_t *p  = radio_dev->rx_packet;
+    uint8_t *p  = radio_dev->tx_packet;
     uint8_t len = 0;
-    uint8_t max_data_len = radio_dev->max_packet_len - RS_ECC_NPARITY;
+    uint8_t max_data_len = radio_dev->max_packet_len - (radio_dev->ppm_only_mode ? 0 : RS_ECC_NPARITY);
 
     // Don't send if it's not our turn, or if we're receiving a packet.
     if (!rfm22_timeToSend(radio_dev) || !PIOS_RFM22B_InRxWait((uint32_t)radio_dev)) {
@@ -1663,10 +1743,44 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
         return RADIO_EVENT_RX_MODE;
     }
 
-    // Try to get some data to send
-    if (radio_dev->tx_out_cb) {
+    // Should we append PPM data to the packet?
+    if (radio_dev->ppm_send_mode) {
+        len = RFM22B_PPM_NUM_CHANNELS + (radio_dev->ppm_only_mode ? 2 : 1);
+
+        // Ensure we can fit the PPM data in the packet.
+        if (max_data_len < len) {
+            return RADIO_EVENT_RX_MODE;
+        }
+
+        // The first byte is a bitmask of valid channels.
+        p[0] = 0;
+
+        // Read the PPM input.
+        for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
+            int32_t val = radio_dev->ppm[i];
+            if ((val == PIOS_RCVR_INVALID) || (val == PIOS_RCVR_TIMEOUT)) {
+                p[i + 1] = 0;
+            } else {
+                p[0]    |= 1 << i;
+                p[i + 1] = (val < 1000) ? 0 : ((val >= 1900) ? 255 : (uint8_t)(256 * (val - 1000) / 900));
+            }
+        }
+
+        // The last byte is a CRC.
+        if (radio_dev->ppm_only_mode) {
+            uint8_t crc = 0;
+            for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS + 1; ++i) {
+                crc = PIOS_CRC_updateByte(crc, p[i]);
+            }
+            p[RFM22B_PPM_NUM_CHANNELS + 1] = crc;
+        }
+    }
+
+    // Append data from the com interface if applicable.
+    if (!radio_dev->ppm_only_mode && radio_dev->tx_out_cb) {
+        // Try to get some data to send
         bool need_yield = false;
-        len = (radio_dev->tx_out_cb)(radio_dev->tx_out_context, p, max_data_len, NULL, &need_yield);
+        len += (radio_dev->tx_out_cb)(radio_dev->tx_out_context, p + len, max_data_len - len, NULL, &need_yield);
     }
 
     // Always send a packet on the sync channel if this modem is a coordinator.
@@ -1677,14 +1791,13 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
     // Increment the packet sequence number.
     radio_dev->stats.tx_seq++;
 
-    // Change the channel.
-    rfm22_changeChannel(radio_dev);
-
     // Add the error correcting code.
-    if (len != 0) {
-        encode_data((unsigned char *)p, len, (unsigned char *)p);
+    if (!radio_dev->ppm_only_mode) {
+        if (len != 0) {
+            encode_data((unsigned char *)p, len, (unsigned char *)p);
+        }
+        len += RS_ECC_NPARITY;
     }
-    len += RS_ECC_NPARITY;
 
     // Transmit the packet.
     PIOS_RFM22B_TransmitPacket((uint32_t)radio_dev, p, len);
@@ -1693,7 +1806,7 @@ static enum pios_radio_event radio_txStart(struct pios_rfm22b_dev *radio_dev)
 }
 
 /**
- * Receive packet data.
+ * Transmit packet data.
  *
  * @param[in] rfm22b_dev The device structure
  * @return enum pios_radio_event  The next event to inject
@@ -1749,19 +1862,66 @@ static enum pios_radio_event radio_setRxMode(struct pios_rfm22b_dev *rfm22b_dev)
  */
 static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_dev, uint8_t *p, uint16_t rx_len)
 {
-    uint8_t data_len = rx_len - RS_ECC_NPARITY;
-    // Attempt to correct any errors in the packet.
     bool good_packet = true;
     bool corrected_packet = false;
+    uint8_t data_len = rx_len;
 
-    if (data_len > 0) {
-        decode_data((unsigned char *)p, rx_len);
+    // We don't rsencode ppm only packets.
+    if (!radio_dev->ppm_only_mode) {
+        data_len -= RS_ECC_NPARITY;
 
-        good_packet = check_syndrome() == 0;
-        // We have an error.  Try to correct it.
-        if (!good_packet && (correct_errors_erasures((unsigned char *)p, rx_len, 0, 0) != 0)) {
-            // We corrected it
-            corrected_packet = true;
+        // Attempt to correct any errors in the packet.
+        if (data_len > 0) {
+            decode_data((unsigned char *)p, rx_len);
+            good_packet = check_syndrome() == 0;
+
+            // We have an error.  Try to correct it.
+            if (!good_packet && (correct_errors_erasures((unsigned char *)p, rx_len, 0, 0) != 0)) {
+                // We corrected it
+                corrected_packet = true;
+            }
+        }
+    }
+
+    // Should we pull PPM data off of the head of the packet?
+    if ((good_packet || corrected_packet) && radio_dev->ppm_recv_mode) {
+        uint8_t ppm_len = RFM22B_PPM_NUM_CHANNELS + (radio_dev->ppm_only_mode ? 2 : 1);
+
+        // Ensure the packet it long enough
+        if (data_len < ppm_len) {
+            good_packet = false;
+        }
+
+        // Verify the CRC if this is a PPM only packet.
+        if ((good_packet || corrected_packet) && radio_dev->ppm_only_mode) {
+            uint8_t crc = 0;
+            for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS + 1; ++i) {
+                crc = PIOS_CRC_updateByte(crc, p[i]);
+            }
+            if (p[RFM22B_PPM_NUM_CHANNELS + 1] != crc) {
+                good_packet = false;
+                corrected_packet = false;
+            }
+        }
+
+        if (good_packet || corrected_packet) {
+            for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
+                // Is this a valid channel?
+                if (p[0] & (1 << i)) {
+                    uint32_t val = p[i + 1];
+                    radio_dev->ppm[i] = (uint16_t)(1000 + val * 900 / 256);
+                } else {
+                    radio_dev->ppm[i] = PIOS_RCVR_INVALID;
+                }
+            }
+
+            p += RFM22B_PPM_NUM_CHANNELS + 1;
+            data_len -= RFM22B_PPM_NUM_CHANNELS + 1;
+
+            // Call the PPM received callback if it's available.
+            if (radio_dev->ppm_callback) {
+                radio_dev->ppm_callback(radio_dev->ppm);
+            }
         }
     }
 
@@ -1780,7 +1940,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
     if (good_packet || corrected_packet) {
         // Send the data to the com port
         bool rx_need_yield;
-        if (radio_dev->rx_in_cb) {
+        if (radio_dev->rx_in_cb && (data_len > 0) && !radio_dev->ppm_only_mode) {
             (radio_dev->rx_in_cb)(radio_dev->rx_in_context, p, data_len, NULL, &rx_need_yield);
         }
 
@@ -1985,10 +2145,14 @@ static void rfm22_synchronizeClock(struct pios_rfm22b_dev *rfm22b_dev)
     portTickType start_time = rfm22b_dev->packet_start_ticks;
 
     // This packet was transmitted on channel 0, calculate the time delta that will force us to transmit on channel 0 at the time this packet started.
-    uint16_t frequency_hop_cycle_time = rfm22b_dev->packet_period * rfm22b_dev->num_channels;
+    uint8_t num_chan    = num_channels[rfm22b_dev->datarate];
+    uint16_t frequency_hop_cycle_time = rfm22b_dev->packet_time * num_chan;
     uint16_t time_delta = start_time % frequency_hop_cycle_time;
 
-    rfm22b_dev->time_delta = frequency_hop_cycle_time - time_delta + 1;
+    // Calculate the adjustment for the preamble
+    uint8_t offset = (uint8_t)ceil(35000.0F / data_rate[rfm22b_dev->datarate]);
+
+    rfm22b_dev->time_delta = frequency_hop_cycle_time - time_delta + offset;
 }
 
 /**
@@ -2012,24 +2176,26 @@ static portTickType rfm22_coordinatorTime(struct pios_rfm22b_dev *rfm22b_dev, po
  */
 static bool rfm22_timeToSend(struct pios_rfm22b_dev *rfm22b_dev)
 {
-    portTickType time = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
-    bool is_coordinator = rfm22_isCoordinator(rfm22b_dev);
+    portTickType time     = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
+    bool is_coordinator   = rfm22_isCoordinator(rfm22b_dev);
 
     // If this is a one-way link, only the coordinator can send.
+    uint8_t packet_period = rfm22b_dev->packet_time;
+
     if (rfm22b_dev->one_way_link) {
         if (is_coordinator) {
-            return ((time -1) % (rfm22b_dev->packet_period)) == 0;
+            return ((time - 1) % (packet_period)) == 0;
         } else {
             return false;
         }
     }
 
     if (!is_coordinator) {
-        time += rfm22b_dev->packet_period - 1;
+        time += packet_period - 1;
     } else {
         time -= 1;
     }
-    return (time % (rfm22b_dev->packet_period * 2)) == 0;
+    return (time % (packet_period * 2)) == 0;
 }
 
 /**
@@ -2041,11 +2207,14 @@ static bool rfm22_timeToSend(struct pios_rfm22b_dev *rfm22b_dev)
 static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t index)
 {
     // Make sure we don't index outside of the range.
-    uint8_t idx = index % rfm22b_dev->num_channels;
+    uint8_t num_chan = num_channels[rfm22b_dev->datarate];
+    uint8_t idx = index % num_chan;
 
-    rfm22b_dev->channel_index = idx;
-    if (idx == 0) {
-        rfm22b_dev->on_sync_channel = true;
+    if (idx != rfm22b_dev->channel_index) {
+        rfm22b_dev->channel_index = idx;
+        if (idx == 0) {
+            rfm22b_dev->on_sync_channel = true;
+        }
     }
     return rfm22b_dev->channels[idx];
 }
@@ -2060,7 +2229,8 @@ static uint8_t rfm22_calcChannelFromClock(struct pios_rfm22b_dev *rfm22b_dev)
     portTickType time = rfm22_coordinatorTime(rfm22b_dev, xTaskGetTickCount());
     // Divide time into 8ms blocks.  Coordinator sends in first 2 ms, and remote send in 5th and 6th ms.
     // Channel changes occur in the last 2 ms.
-    uint8_t n = (time / rfm22b_dev->packet_period) % rfm22b_dev->num_channels;
+    uint8_t num_chan  = num_channels[rfm22b_dev->datarate];
+    uint8_t n = (time / rfm22b_dev->packet_time) % num_chan;
 
     return rfm22_calcChannel(rfm22b_dev, n);
 }

@@ -97,22 +97,6 @@ int32_t OPLinkModInitialize(void)
 {
     // Must registers objects here for system thread because ObjectManager started in OpenPilotInit
 
-    // Initialize out status object.
-    OPLinkStatusInitialize();
-    OPLinkStatusData oplinkStatus;
-    OPLinkStatusGet(&oplinkStatus);
-
-    // Get our hardware information.
-    const struct pios_board_info *bdinfo = &pios_board_info_blob;
-
-    oplinkStatus.BoardType     = bdinfo->board_type;
-    PIOS_BL_HELPER_FLASH_Read_Description(oplinkStatus.Description, OPLINKSTATUS_DESCRIPTION_NUMELEM);
-    PIOS_SYS_SerialNumberGetBinary(oplinkStatus.CPUSerial);
-    oplinkStatus.BoardRevision = bdinfo->board_rev;
-
-    // Update the object
-    OPLinkStatusSet(&oplinkStatus);
-
     // Call the module start function.
     OPLinkModStart();
 

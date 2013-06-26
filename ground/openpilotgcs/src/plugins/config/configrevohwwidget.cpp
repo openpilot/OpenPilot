@@ -65,9 +65,6 @@ ConfigRevoHWWidget::ConfigRevoHWWidget(QWidget *parent) : ConfigTaskWidget(paren
     addUAVObjectToWidgetRelation("HwSettings", "GPSSpeed", m_ui->cbMainGPSSpeed);
     addUAVObjectToWidgetRelation("HwSettings", "ComUsbBridgeSpeed", m_ui->cbMainComSpeed);
 
-    addUAVObjectToWidgetRelation("HwSettings", "RadioPort", m_ui->cbModem);
-    addUAVObjectToWidgetRelation("HwSettings", "TelemetrySpeed", m_ui->cbRadioSpeed);
-
     connect(m_ui->cchwHelp, SIGNAL(clicked()), this, SLOT(openHelp()));
 
     setupCustomCombos();
@@ -94,7 +91,6 @@ void ConfigRevoHWWidget::setupCustomCombos()
 
     connect(m_ui->cbFlexi, SIGNAL(currentIndexChanged(int)), this, SLOT(flexiPortChanged(int)));
     connect(m_ui->cbMain, SIGNAL(currentIndexChanged(int)), this, SLOT(mainPortChanged(int)));
-    connect(m_ui->cbModem, SIGNAL(currentIndexChanged(int)), this, SLOT(modemPortChanged(int)));
 }
 
 void ConfigRevoHWWidget::refreshWidgetsValues(UAVObject *obj)
@@ -105,7 +101,6 @@ void ConfigRevoHWWidget::refreshWidgetsValues(UAVObject *obj)
     usbVCPPortChanged(0);
     mainPortChanged(0);
     flexiPortChanged(0);
-    modemPortChanged(0);
     m_refreshing = false;
 }
 
@@ -202,9 +197,6 @@ void ConfigRevoHWWidget::flexiPortChanged(int index)
         if (m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_TELEMETRY) {
             m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
         }
-        if (m_ui->cbModem->currentIndex() == HwSettings::RADIOPORT_TELEMETRY) {
-            m_ui->cbModem->setCurrentIndex(HwSettings::RADIOPORT_DISABLED);
-        }
         break;
     case HwSettings::RM_FLEXIPORT_GPS:
         m_ui->cbFlexiGPSSpeed->setVisible(true);
@@ -248,9 +240,6 @@ void ConfigRevoHWWidget::mainPortChanged(int index)
         if (m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_TELEMETRY) {
             m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
         }
-        if (m_ui->cbModem->currentIndex() == HwSettings::RADIOPORT_TELEMETRY) {
-            m_ui->cbModem->setCurrentIndex(HwSettings::RADIOPORT_DISABLED);
-        }
         break;
     case HwSettings::RM_MAINPORT_GPS:
         m_ui->cbMainGPSSpeed->setVisible(true);
@@ -276,26 +265,6 @@ void ConfigRevoHWWidget::mainPortChanged(int index)
     default:
         m_ui->lblMainSpeed->setVisible(false);
         break;
-    }
-}
-
-void ConfigRevoHWWidget::modemPortChanged(int index)
-{
-    Q_UNUSED(index);
-
-    if (m_ui->cbModem->currentIndex() == HwSettings::RADIOPORT_TELEMETRY) {
-        if (m_ui->cbMain->currentIndex() == HwSettings::RM_MAINPORT_TELEMETRY) {
-            m_ui->cbMain->setCurrentIndex(HwSettings::RM_MAINPORT_DISABLED);
-        }
-        if (m_ui->cbFlexi->currentIndex() == HwSettings::RM_FLEXIPORT_TELEMETRY) {
-            m_ui->cbFlexi->setCurrentIndex(HwSettings::RM_FLEXIPORT_DISABLED);
-        }
-        m_ui->cbRadioSpeed->setVisible(true);
-        if (!m_refreshing) {
-            QMessageBox::warning(this, tr("Warning"), tr("Activating the Radio requires an antenna be attached or modem damage will occur."));
-        }
-    } else {
-        m_ui->cbRadioSpeed->setVisible(false);
     }
 }
 

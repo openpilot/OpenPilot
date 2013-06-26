@@ -24,7 +24,7 @@
 		<field name="RXRate" units="Bps" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="TXSeq" units="" type="uint16" elements="1" defaultvalue="0"/>
 		<field name="RXSeq" units="" type="uint16" elements="1" defaultvalue="0"/>
-		<field name="LinkState" units="function" type="enum" elements="1" options="Disconnected,Connecting,Connected" defaultvalue="Disconnected"/>
+		<field name="LinkState" units="function" type="enum" elements="1" options="Disabled,Enabled,Disconnected,Connecting,Connected" defaultvalue="Disabled"/>
 		<field name="PairIDs" units="hex" type="uint32" elements="4" defaultvalue="0"/>
 		<field name="PairSignalStrengths" units="dBm" type="int8" elements="4" defaultvalue="-127"/>
 

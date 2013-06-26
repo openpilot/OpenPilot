@@ -33,7 +33,7 @@
 
 ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget(parent)
 {
-    m_oplink = new Ui_PipXtremeWidget();
+    m_oplink = new Ui_OPLinkWidget();
     m_oplink->setupUi(this);
 
     // Connect to the OPLinkStatus object updates
@@ -65,14 +65,14 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     addUAVObjectToWidgetRelation("OPLinkSettings", "VCPPort", m_oplink->VCPPort);
     addUAVObjectToWidgetRelation("OPLinkSettings", "ComSpeed", m_oplink->ComSpeed);
     addUAVObjectToWidgetRelation("OPLinkSettings", "MaxRFPower", m_oplink->MaxRFTxPower);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "NumChannels", m_oplink->NumChannels);
     addUAVObjectToWidgetRelation("OPLinkSettings", "MinChannel", m_oplink->MinimumChannel);
     addUAVObjectToWidgetRelation("OPLinkSettings", "MaxChannel", m_oplink->MaximumChannel);
     addUAVObjectToWidgetRelation("OPLinkSettings", "ChannelSet", m_oplink->ChannelSet);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "PacketTime", m_oplink->PacketLength);
     addUAVObjectToWidgetRelation("OPLinkSettings", "CoordID", m_oplink->CoordID);
     addUAVObjectToWidgetRelation("OPLinkSettings", "Coordinator", m_oplink->Coordinator);
-    addUAVObjectToWidgetRelation("OPLinkSettings", "OneWayLink", m_oplink->OneWayLink);
+    addUAVObjectToWidgetRelation("OPLinkSettings", "OneWay", m_oplink->OneWayLink);
+    addUAVObjectToWidgetRelation("OPLinkSettings", "PPMOnly", m_oplink->PPMOnly);
+    addUAVObjectToWidgetRelation("OPLinkSettings", "PPM", m_oplink->PPM);
 
     addUAVObjectToWidgetRelation("OPLinkStatus", "DeviceID", m_oplink->DeviceID);
     addUAVObjectToWidgetRelation("OPLinkStatus", "RxGood", m_oplink->Good);
@@ -99,6 +99,12 @@ ConfigPipXtremeWidget::ConfigPipXtremeWidget(QWidget *parent) : ConfigTaskWidget
     connect(m_oplink->Bind2, SIGNAL(clicked()), this, SLOT(bind2()));
     connect(m_oplink->Bind3, SIGNAL(clicked()), this, SLOT(bind3()));
     connect(m_oplink->Bind4, SIGNAL(clicked()), this, SLOT(bind3()));
+
+    // Connect the selection changed signals.
+    connect(m_oplink->PPMOnly, SIGNAL(toggled(bool)), this, SLOT(ppmOnlyToggled(bool)));
+    connect(m_oplink->ComSpeed, SIGNAL(currentIndexChanged(int)), this, SLOT(comSpeedChanged(int)));
+
+    ppmOnlyToggled(m_oplink->PPMOnly->isChecked());
 
     // Add scroll bar when necessary
     QScrollArea *scroll = new QScrollArea;
@@ -226,6 +232,56 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
 
     if (!settingsUpdated) {
         settingsUpdated = true;
+
+        // Enable components based on the board type connected.
+        UAVObjectField *board_type_field = oplinkStatusObj->getField("BoardType");
+        if (board_type_field) {
+            switch (board_type_field->getValue().toInt()) {
+            case 0x09: // Revolution
+                m_oplink->MainPort->setVisible(false);
+                m_oplink->MainPortLabel->setVisible(false);
+                m_oplink->FlexiPort->setVisible(false);
+                m_oplink->FlexiPortLabel->setVisible(false);
+                m_oplink->VCPPort->setVisible(false);
+                m_oplink->VCPPortLabel->setVisible(false);
+                m_oplink->FlexiIOPort->setVisible(false);
+                m_oplink->FlexiIOPortLabel->setVisible(false);
+                m_oplink->Coordinator->setVisible(false);
+                m_oplink->PPM->setVisible(true);
+                break;
+            case 0x03: // OPLinkMini
+                m_oplink->MainPort->setVisible(true);
+                m_oplink->MainPortLabel->setVisible(true);
+                m_oplink->FlexiPort->setVisible(true);
+                m_oplink->FlexiPortLabel->setVisible(true);
+                m_oplink->VCPPort->setVisible(true);
+                m_oplink->VCPPortLabel->setVisible(true);
+                m_oplink->FlexiIOPort->setVisible(false);
+                m_oplink->FlexiIOPortLabel->setVisible(false);
+                m_oplink->Coordinator->setVisible(true);
+                m_oplink->PPM->setVisible(false);
+                break;
+            case 0x0A:
+                m_oplink->MainPort->setVisible(true);
+                m_oplink->MainPortLabel->setVisible(true);
+                m_oplink->FlexiPort->setVisible(true);
+                m_oplink->FlexiPortLabel->setVisible(true);
+                m_oplink->VCPPort->setVisible(true);
+                m_oplink->VCPPortLabel->setVisible(true);
+                m_oplink->FlexiIOPort->setVisible(true);
+                m_oplink->FlexiIOPortLabel->setVisible(true);
+                m_oplink->Coordinator->setVisible(true);
+                m_oplink->PPM->setVisible(false);
+                break;
+            default:
+                // This shouldn't happen.
+                break;
+            }
+        } else {
+            qDebug() << "BoardType not found.";
+        }
+
+        // Enable the push buttons.
         enableControls(true);
     }
 }
@@ -234,6 +290,8 @@ void ConfigPipXtremeWidget::disconnected()
 {
     if (settingsUpdated) {
         settingsUpdated = false;
+
+        // Enable the push buttons.
         enableControls(false);
     }
 }
@@ -268,6 +326,36 @@ void ConfigPipXtremeWidget::bind3()
 void ConfigPipXtremeWidget::bind4()
 {
     SetPairID(m_oplink->PairID1);
+}
+
+void ConfigPipXtremeWidget::ppmOnlyToggled(bool on)
+{
+    if (on) {
+        m_oplink->PPM->setEnabled(false);
+        m_oplink->OneWayLink->setEnabled(false);
+        m_oplink->ComSpeed->setEnabled(false);
+    } else {
+        m_oplink->PPM->setEnabled(true);
+        m_oplink->OneWayLink->setEnabled(true);
+        m_oplink->ComSpeed->setEnabled(true);
+        // Change the comspeed from 4800 of PPM only is turned off.
+        if (m_oplink->ComSpeed->currentIndex() == OPLinkSettings::COMSPEED_4800) {
+            m_oplink->ComSpeed->setCurrentIndex(OPLinkSettings::COMSPEED_9600);
+        }
+    }
+}
+
+void ConfigPipXtremeWidget::comSpeedChanged(int index)
+{
+    qDebug() << "comSpeedChanged: " << index;
+    switch (index) {
+    case OPLinkSettings::COMSPEED_4800:
+        m_oplink->PPMOnly->setChecked(true);
+        break;
+    default:
+        m_oplink->PPMOnly->setChecked(false);
+        break;
+    }
 }
 
 /**

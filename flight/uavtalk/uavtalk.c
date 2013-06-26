@@ -151,14 +151,14 @@ void UAVTalkAddStats(UAVTalkConnection connectionHandle, UAVTalkStats *statsOut)
     xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
 
     // Copy stats
-    statsOut->txBytes += connection->stats.txBytes;
-    statsOut->rxBytes += connection->stats.rxBytes;
+    statsOut->txBytes       += connection->stats.txBytes;
+    statsOut->rxBytes       += connection->stats.rxBytes;
     statsOut->txObjectBytes += connection->stats.txObjectBytes;
     statsOut->rxObjectBytes += connection->stats.rxObjectBytes;
-    statsOut->txObjects += connection->stats.txObjects;
-    statsOut->rxObjects += connection->stats.rxObjects;
-    statsOut->txErrors += connection->stats.txErrors;
-    statsOut->txErrors += connection->stats.txErrors;
+    statsOut->txObjects     += connection->stats.txObjects;
+    statsOut->rxObjects     += connection->stats.rxObjects;
+    statsOut->txErrors      += connection->stats.txErrors;
+    statsOut->txErrors      += connection->stats.txErrors;
 
     // Release lock
     xSemaphoreGiveRecursive(connection->lock);

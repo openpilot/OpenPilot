@@ -157,8 +157,8 @@ int32_t TelemetryInitialize(void)
 #endif
 
     // Create periodic event that will be used to update the telemetry stats
-    txErrors   = 0;
-    txRetries  = 0;
+    txErrors  = 0;
+    txRetries = 0;
     UAVObjEvent ev;
     memset(&ev, 0, sizeof(UAVObjEvent));
     EventPeriodicQueueCreate(&ev, priorityQueue, STATS_UPDATE_PERIOD_MS);

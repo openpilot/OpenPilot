@@ -44,7 +44,7 @@ public slots:
     void updateSettings(UAVObject *object1);
 
 private:
-    Ui_PipXtremeWidget *m_oplink;
+    Ui_OPLinkWidget *m_oplink;
 
     // The OPLink status UAVObject
     UAVDataObject *oplinkStatusObj;
@@ -63,6 +63,8 @@ private slots:
     void bind2();
     void bind3();
     void bind4();
+    void ppmOnlyToggled(bool toggled);
+    void comSpeedChanged(int index);
 };
 
 #endif // CONFIGTXPIDWIDGET_H

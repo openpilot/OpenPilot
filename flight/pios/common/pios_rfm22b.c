@@ -562,6 +562,7 @@ void PIOS_RFM22B_SetChannelConfig(uint32_t rfm22b_id, enum rfm22b_datarate datar
     rfm22b_dev->ppm_only_mode = ppm_only;
     if (ppm_only) {
         rfm22b_dev->one_way_link = true;
+        datarate = RFM22B_PPM_ONLY_DATARATE;
         rfm22b_dev->datarate     = RFM22B_PPM_ONLY_DATARATE;
     } else {
         rfm22b_dev->one_way_link = oneway;
@@ -1906,11 +1907,13 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
         }
 
         if (good_packet || corrected_packet) {
+            bool valid_input_detected = false;
             for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
                 // Is this a valid channel?
                 if (p[0] & (1 << i)) {
                     uint32_t val = p[i + 1];
-                    radio_dev->ppm[i] = (uint16_t)(1000 + val * 900 / 256);
+                    radio_dev->ppm[i]    = (uint16_t)(1000 + val * 900 / 256);
+                    valid_input_detected = true;
                 } else {
                     radio_dev->ppm[i] = PIOS_RCVR_INVALID;
                 }
@@ -1920,7 +1923,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
             data_len -= RFM22B_PPM_NUM_CHANNELS + 1;
 
             // Call the PPM received callback if it's available.
-            if (radio_dev->ppm_callback) {
+            if (valid_input_detected && radio_dev->ppm_callback) {
                 radio_dev->ppm_callback(radio_dev->ppm);
             }
         }

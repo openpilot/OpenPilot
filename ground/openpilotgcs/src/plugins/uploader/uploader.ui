@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>822</width>
+    <width>812</width>
     <height>523</height>
    </rect>
   </property>
@@ -27,7 +27,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>804</width>
+        <width>794</width>
         <height>505</height>
        </rect>
       </property>
@@ -51,55 +51,20 @@
            <number>0</number>
           </property>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <widget class="QPushButton" name="autoUpdateButton">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="toolTip">
-               <string>Start a guided procedure to manually
-recover a system which does not boot.
-
-Rescue is possible in USB mode only.</string>
-              </property>
-              <property name="text">
-               <string>Auto Update</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="haltButton">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="toolTip">
-               <string>Tells the mainboard to go down
-to bootloader mode.
-(Only enabled if telemetry link is established, either
-through serial or USB)</string>
-              </property>
-              <property name="text">
-               <string>Halt</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="resetButton">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="toolTip">
-               <string>Reset the system.
-(Only enabled if telemetry link is established, either
-through serial or USB)</string>
-              </property>
-              <property name="text">
-               <string>Reset</string>
-              </property>
-             </widget>
-            </item>
-            <item>
+           <layout class="QGridLayout" name="gridLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="horizontalSpacing">
+             <number>6</number>
+            </property>
+            <item row="0" column="3" colspan="2">
              <widget class="QPushButton" name="bootButton">
               <property name="enabled">
                <bool>true</bool>
@@ -117,7 +82,33 @@ menu on the right.</string>
               </property>
              </widget>
             </item>
-            <item>
+            <item row="1" column="5" colspan="3">
+             <widget class="QPushButton" name="eraseBootButton">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and earlier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Erase settings</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="5" colspan="3">
+             <widget class="QPushButton" name="rescueButton">
+              <property name="toolTip">
+               <string>Start a guided procedure to manually
+recover a system which does not boot.
+
+Rescue is possible in USB mode only.</string>
+              </property>
+              <property name="text">
+               <string>Rescue</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="3" colspan="2">
              <widget class="QPushButton" name="safeBootButton">
               <property name="enabled">
                <bool>true</bool>
@@ -135,53 +126,8 @@ menu on the right.</string>
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QPushButton" name="rescueButton">
-              <property name="toolTip">
-               <string>Start a guided procedure to manually
-recover a system which does not boot.
-
-Rescue is possible in USB mode only.</string>
-              </property>
-              <property name="text">
-               <string>Rescue</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="eraseBootButton">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and earlier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="text">
-               <string>Erase settings</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
+            <item row="0" column="9">
              <widget class="QComboBox" name="telemetryLink">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
-              </property>
               <property name="toolTip">
                <string>When telemetry is not connected, select the communication
 method using this combo box.
@@ -192,8 +138,14 @@ halting a running board.</string>
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="10">
              <widget class="QToolButton" name="refreshPorts">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>23</height>
+               </size>
+              </property>
               <property name="toolTip">
                <string>Refresh the list of serial ports</string>
               </property>
@@ -202,7 +154,43 @@ halting a running board.</string>
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="haltButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>Tells the mainboard to go down
+to bootloader mode.
+(Only enabled if telemetry link is established, either
+through serial or USB)</string>
+              </property>
+              <property name="text">
+               <string>Halt</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="12">
+             <widget class="QPushButton" name="pbHelp">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="../coreplugin/core.qrc">
+                <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>18</width>
+                <height>18</height>
+               </size>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="11">
              <widget class="QLabel" name="boardStatus">
               <property name="font">
                <font>
@@ -215,25 +203,55 @@ halting a running board.</string>
               </property>
              </widget>
             </item>
-            <item>
-             <widget class="QPushButton" name="pbHelp">
+            <item row="1" column="2">
+             <widget class="QPushButton" name="resetButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>Reset the system.
+(Only enabled if telemetry link is established, either
+through serial or USB)</string>
+              </property>
               <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="../coreplugin/core.qrc">
-                <normaloff>:/core/images/helpicon.svg</normaloff>:/core/images/helpicon.svg</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>30</width>
-                <height>30</height>
-               </size>
-              </property>
-              <property name="flat">
-               <bool>true</bool>
+               <string>Reset</string>
               </property>
              </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QPushButton" name="autoUpdateButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>75</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Start a guided procedure to manually
+recover a system which does not boot.
+
+Rescue is possible in USB mode only.</string>
+              </property>
+              <property name="text">
+               <string>Auto Update</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
             </item>
            </layout>
           </item>

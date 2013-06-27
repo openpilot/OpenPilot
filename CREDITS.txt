@@ -26,10 +26,11 @@ Joe Hlebasko
 Andy Honecker
 Ryan Hunt
 Mark James
-Sami Korhonen
-Thorsten Klose
 Ricky King
+Thorsten Klose
+Sami Korhonen
 Hallvard Kristiansen
+Alan Krum
 Edouard Lafargue
 Mike Labranche
 Fredrik Larsson

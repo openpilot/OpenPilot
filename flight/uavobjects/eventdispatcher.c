@@ -299,7 +299,7 @@ static void eventTask()
         timeToNextUpdateMs = processPeriodicUpdates();
     }
 
-    DelayedCallbackSchedule(eventSchedulerCallback, timeToNextUpdateMs, CALLBACK_UPDATEMODE_SOONER);
+    DelayedCallbackSchedule(eventSchedulerCallback, timeToNextUpdateMs - (xTaskGetTickCount() * portTICK_RATE_MS), CALLBACK_UPDATEMODE_SOONER);
 }
 
 /**

@@ -95,6 +95,9 @@ void PIOS_Board_Init(void)
     if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
         PIOS_Assert(0);
     }
+    
+    /* Initialize the delayed callback library */
+    CallbackSchedulerInitialize();
 
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
@@ -142,9 +145,6 @@ void PIOS_Board_Init(void)
         PIOS_IAP_WriteBootCmd(2, 0);
     }
     OPLinkSettingsGet(&oplinkSettings);
-
-    /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
 
 #if defined(PIOS_INCLUDE_TIM)
     /* Set up pulse timers */

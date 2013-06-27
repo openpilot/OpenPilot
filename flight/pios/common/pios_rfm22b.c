@@ -554,7 +554,6 @@ void PIOS_RFM22B_SetChannelConfig(uint32_t rfm22b_id, enum rfm22b_datarate datar
     }
     ppm_mode = ppm_mode || ppm_only;
     rfm22b_dev->coordinator   = coordinator;
-    rfm22b_dev->one_way_link  = oneway;
     rfm22b_dev->ppm_send_mode = ppm_mode && coordinator;
     rfm22b_dev->ppm_recv_mode = ppm_mode && !coordinator;
     if (ppm_mode && (datarate <= RFM22B_PPM_ONLY_DATARATE)) {
@@ -562,9 +561,11 @@ void PIOS_RFM22B_SetChannelConfig(uint32_t rfm22b_id, enum rfm22b_datarate datar
     }
     rfm22b_dev->ppm_only_mode = ppm_only;
     if (ppm_only) {
-        rfm22b_dev->datarate = RFM22B_PPM_ONLY_DATARATE;
+        rfm22b_dev->one_way_link = true;
+        rfm22b_dev->datarate     = RFM22B_PPM_ONLY_DATARATE;
     } else {
-        rfm22b_dev->datarate = datarate;
+        rfm22b_dev->one_way_link = oneway;
+        rfm22b_dev->datarate     = datarate;
     }
     rfm22b_dev->packet_time = (ppm_mode ? packet_time_ppm[datarate] : packet_time[datarate]);
 

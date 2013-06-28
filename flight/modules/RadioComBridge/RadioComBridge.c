@@ -326,9 +326,14 @@ static void radioRxTask(__attribute__((unused)) void *parameters)
             uint8_t serial_data[1];
             uint16_t bytes_to_process = PIOS_COM_ReceiveBuffer(PIOS_COM_RADIO, serial_data, sizeof(serial_data), MAX_PORT_DELAY);
             if (bytes_to_process > 0) {
-                // Pass the data through the UAVTalk parser.
-                for (uint8_t i = 0; i < bytes_to_process; i++) {
-                    ProcessRadioStream(data->radioUAVTalkCon, data->telemUAVTalkCon, serial_data[i]);
+                if (data->parseUAVTalk) {
+                    // Pass the data through the UAVTalk parser.
+                    for (uint8_t i = 0; i < bytes_to_process; i++) {
+                        ProcessRadioStream(data->radioUAVTalkCon, data->telemUAVTalkCon, serial_data[i]);
+                    }
+                } else if (PIOS_COM_TELEMETRY) {
+                    // Send the data straight to the telemetry port.
+                    PIOS_COM_SendBufferNonBlocking(PIOS_COM_TELEMETRY, serial_data, bytes_to_process);
                 }
             }
         } else {
@@ -465,6 +470,9 @@ static int32_t UAVTalkSendHandler(uint8_t *buf, int32_t length)
  */
 static int32_t RadioSendHandler(uint8_t *buf, int32_t length)
 {
+    if (!data->parseUAVTalk) {
+        return length;
+    }
     uint32_t outputPort = PIOS_COM_RADIO;
 
     // Don't send any data unless the radio port is available.

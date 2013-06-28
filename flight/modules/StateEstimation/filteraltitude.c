@@ -39,7 +39,7 @@
 
 #define STACK_REQUIRED 128
 
-#define BARO_SENSOR_KP 0.05f
+#define BARO_SENSOR_KP 0.03f
 #define ACCEL_DRIFT_KP 0.001f
 #define DT_ALPHA       1e-3f
 
@@ -49,6 +49,7 @@ struct data {
     float   pos[3]; // position updates from other filters
     float   vel[3]; // position updates from other filters
     float   dTA;
+    float   dTA2;
     int32_t lastTime;
     float   baroLast;
     int32_t baroLastTime;
@@ -86,6 +87,7 @@ static int32_t init(stateFilter *self)
     this->vel[1]    = 0.0f;
     this->vel[2]    = 0.0f;
     this->dTA = -1;
+    this->dTA2      = -1;
     this->first_run = 1;
     return 0;
 }
@@ -133,6 +135,10 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             // correct velocity and position state (integration)
             // low pass for average dT, compensate timing jitter from scheduler
             float dT = PIOS_DELAY_DiffuS(this->lastTime) / 1.0e6f;
+            this->lastTime = PIOS_DELAY_GetRaw();
+            if (dT < 0.001f) {
+                dT = 0.001f;
+            }
             if (this->dTA < 0) {
                 this->dTA = dT;
             } else {
@@ -142,13 +148,13 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             this->state[0] += this->state[1] * this->dTA;
 
             state->pos[0]   = this->pos[0];
-            state->pos[1]   = this->pos[2];
+            state->pos[1]   = this->pos[1];
             state->pos[2]   = -this->state[0];
             state->updated |= SENSORUPDATES_pos;
 
             state->vel[0]   = this->vel[0];
-            state->vel[1]   = this->vel[2];
-            state->vel[2]   = -this->state[0];
+            state->vel[1]   = this->vel[1];
+            state->vel[2]   = -this->state[1];
             state->updated |= SENSORUPDATES_vel;
         }
         if (IS_SET(state->updated, SENSORUPDATES_baro)) {
@@ -156,21 +162,28 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             this->state[0] = (1.0f - BARO_SENSOR_KP) * this->state[0] + BARO_SENSOR_KP * state->baro[0];
 
             // correct the velocity state (low pass differentiation)
+            // low pass for average dT, compensate timing jitter from scheduler
             float dT = PIOS_DELAY_DiffuS(this->baroLastTime) / 1.0e6f;
+            this->baroLastTime = PIOS_DELAY_GetRaw();
             if (dT < 0.001f) {
                 dT = 0.001f;
             }
-            this->state[1]  = (1.0f - BARO_SENSOR_KP) * this->state[1] + BARO_SENSOR_KP * (state->baro[0] - this->baroLast) / dT;
+            if (this->dTA2 < 0) {
+                this->dTA2 = dT;
+            } else {
+                this->dTA2 = this->dTA2 * (1.0f - DT_ALPHA) + dT * DT_ALPHA;
+            }
+            this->state[1]  = (1.0f - (BARO_SENSOR_KP * BARO_SENSOR_KP)) * this->state[1] + (BARO_SENSOR_KP * BARO_SENSOR_KP) * (state->baro[0] - this->baroLast) / this->dTA2;
             this->baroLast  = state->baro[0];
 
             state->pos[0]   = this->pos[0];
-            state->pos[1]   = this->pos[2];
+            state->pos[1]   = this->pos[1];
             state->pos[2]   = -this->state[0];
             state->updated |= SENSORUPDATES_pos;
 
             state->vel[0]   = this->vel[0];
-            state->vel[1]   = this->vel[2];
-            state->vel[2]   = -this->state[0];
+            state->vel[1]   = this->vel[1];
+            state->vel[2]   = -this->state[1];
             state->updated |= SENSORUPDATES_vel;
         }
     }

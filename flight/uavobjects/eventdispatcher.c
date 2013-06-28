@@ -288,15 +288,16 @@ static void eventTask()
 
     // Wait for queue message
     int limit = MAX_QUEUE_SIZE;
+
     while (xQueueReceive(mQueue, &evInfo, 0) == pdTRUE) {
         // Invoke callback, if any
         if (evInfo.cb != 0) {
             evInfo.cb(&evInfo.ev); // the function is expected to copy the event information
         }
-	// limit loop to max queue size to slightly reduce the impact of recursive events
-	if (!--limit) {
-		break;
-	}
+        // limit loop to max queue size to slightly reduce the impact of recursive events
+        if (!--limit) {
+            break;
+        }
     }
 
     // Process periodic updates

@@ -95,7 +95,7 @@ void PIOS_Board_Init(void)
     if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
         PIOS_Assert(0);
     }
-    
+
     /* Initialize the delayed callback library */
     CallbackSchedulerInitialize();
 

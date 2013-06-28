@@ -41,18 +41,18 @@
 
 #define BARO_SENSOR_KP 0.05f
 #define ACCEL_DRIFT_KP 0.001f
-#define DT_ALPHA 1e-3f
+#define DT_ALPHA       1e-3f
 
 // Private types
 struct data {
-    float state[3]; // state = altitude,velocity,accel_offset
-    float pos[3]; // position updates from other filters
-    float vel[3]; // position updates from other filters
-    float dTA;
+    float   state[3]; // state = altitude,velocity,accel_offset
+    float   pos[3]; // position updates from other filters
+    float   vel[3]; // position updates from other filters
+    float   dTA;
     int32_t lastTime;
-    float baroLast;
+    float   baroLast;
     int32_t baroLastTime;
-    bool  first_run;
+    bool    first_run;
 };
 
 // Private variables
@@ -76,17 +76,17 @@ static int32_t init(stateFilter *self)
 {
     struct data *this = (struct data *)self->localdata;
 
-    this->state[0] = 0.0f;
-    this->state[1] = 0.0f;
-    this->state[2] = 0.0f;
-    this->pos[0] = 0.0f;
-    this->pos[1] = 0.0f;
-    this->pos[2] = 0.0f;
-    this->vel[0] = 0.0f;
-    this->vel[1] = 0.0f;
-    this->vel[2] = 0.0f;
+    this->state[0]  = 0.0f;
+    this->state[1]  = 0.0f;
+    this->state[2]  = 0.0f;
+    this->pos[0]    = 0.0f;
+    this->pos[1]    = 0.0f;
+    this->pos[2]    = 0.0f;
+    this->vel[0]    = 0.0f;
+    this->vel[1]    = 0.0f;
+    this->vel[2]    = 0.0f;
     this->dTA = -1;
-    this->first_run  = 1;
+    this->first_run = 1;
     return 0;
 }
 
@@ -97,83 +97,82 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     if (this->first_run) {
         // Initialize to current altitude reading at initial location
         if (IS_SET(state->updated, SENSORUPDATES_accel)) {
-	    this->lastTime = PIOS_DELAY_GetRaw();
-	}
+            this->lastTime = PIOS_DELAY_GetRaw();
+        }
         if (IS_SET(state->updated, SENSORUPDATES_baro)) {
-            this->first_run  = 0;
-	    this->baroLastTime = PIOS_DELAY_GetRaw();
-            this->state[0] = state->baro[0];
-	    this->baroLast = state->baro[0];
+            this->first_run    = 0;
+            this->baroLastTime = PIOS_DELAY_GetRaw();
+            this->state[0]     = state->baro[0];
+            this->baroLast     = state->baro[0];
         }
     } else {
-
         // save existing position and velocity updates so GPS will still work
         if (IS_SET(state->updated, SENSORUPDATES_pos)) {
-           this->pos[0] = state->pos[0];
-           this->pos[1] = state->pos[1];
-           this->pos[2] = state->pos[2];
-           state->pos[2] = -this->state[0];
+            this->pos[0]  = state->pos[0];
+            this->pos[1]  = state->pos[1];
+            this->pos[2]  = state->pos[2];
+            state->pos[2] = -this->state[0];
         }
         if (IS_SET(state->updated, SENSORUPDATES_vel)) {
-           this->vel[0] = state->vel[0];
-           this->vel[1] = state->vel[1];
-           this->vel[2] = state->vel[2];
-           state->vel[2] = -this->state[1];
+            this->vel[0]  = state->vel[0];
+            this->vel[1]  = state->vel[1];
+            this->vel[2]  = state->vel[2];
+            state->vel[2] = -this->state[1];
         }
-        if(IS_SET(state->updated, SENSORUPDATES_accel)) {
+        if (IS_SET(state->updated, SENSORUPDATES_accel)) {
+            // rotate accels into global coordinate frame
+            AttitudeStateData att;
+            AttitudeStateGet(&att);
+            float Rbe[3][3];
+            Quaternion2R(&att.q1, Rbe);
+            float current = -(Rbe[0][2] * state->accel[0] + Rbe[1][2] * state->accel[1] + Rbe[2][2] * state->accel[2] + 9.81f);
 
-	    // rotate accels into global coordinate frame
-	    AttitudeStateData att;
-	    AttitudeStateGet(&att);
-	    float Rbe[3][3];
-	    Quaternion2R(&att.q1, Rbe);
-	    float current = -(Rbe[0][2] * state->accel[0] + Rbe[1][2] * state->accel[1] + Rbe[2][2] * state->accel[2] + 9.81f);
-
-	    // correct accel offset (low pass zeroing)
+            // correct accel offset (low pass zeroing)
             this->state[2] = (1.0f - ACCEL_DRIFT_KP) * this->state[2] + ACCEL_DRIFT_KP * current;
 
-	    // correct velocity and position state (integration)
-	    // low pass for average dT, compensate timing jitter from scheduler 
-	    float dT = PIOS_DELAY_DiffuS(this->lastTime) / 1.0e6f;
-	    if (this->dTA<0) {
-	    	this->dTA = dT;
-	    } else {
-	    	this->dTA = this->dTA * (1.0f - DT_ALPHA) + dT * DT_ALPHA;
-	    }
-	    this->state[1] += (current - this->state[1]) * this->dTA;
+            // correct velocity and position state (integration)
+            // low pass for average dT, compensate timing jitter from scheduler
+            float dT = PIOS_DELAY_DiffuS(this->lastTime) / 1.0e6f;
+            if (this->dTA < 0) {
+                this->dTA = dT;
+            } else {
+                this->dTA = this->dTA * (1.0f - DT_ALPHA) + dT * DT_ALPHA;
+            }
+            this->state[1] += (current - this->state[1]) * this->dTA;
             this->state[0] += this->state[1] * this->dTA;
-            
-	    state->pos[0] = this->pos[0];
-            state->pos[1] = this->pos[2];
-	    state->pos[2] = -this->state[0];
-	    state->updated |= SENSORUPDATES_pos;
 
-            state->vel[0] = this->vel[0];
-            state->vel[1] = this->vel[2];
-	    state->vel[2] = -this->state[0];
-	    state->updated |= SENSORUPDATES_vel;
-	}
-	if (IS_SET(state->updated, SENSORUPDATES_baro)) {
+            state->pos[0]   = this->pos[0];
+            state->pos[1]   = this->pos[2];
+            state->pos[2]   = -this->state[0];
+            state->updated |= SENSORUPDATES_pos;
 
-	    // correct the altitude state (simple low pass)
-	    this->state[0] = (1.0f - BARO_SENSOR_KP) * this->state[0] + BARO_SENSOR_KP * state->baro[0];
+            state->vel[0]   = this->vel[0];
+            state->vel[1]   = this->vel[2];
+            state->vel[2]   = -this->state[0];
+            state->updated |= SENSORUPDATES_vel;
+        }
+        if (IS_SET(state->updated, SENSORUPDATES_baro)) {
+            // correct the altitude state (simple low pass)
+            this->state[0] = (1.0f - BARO_SENSOR_KP) * this->state[0] + BARO_SENSOR_KP * state->baro[0];
 
-	    // correct the velocity state (low pass differentiation)
-	    float dT = PIOS_DELAY_DiffuS(this->baroLastTime) / 1.0e6f;
-	    if (dT<0.001f) dT = 0.001f;
-	    this->state[1] = (1.0f - BARO_SENSOR_KP) * this->state[1] + BARO_SENSOR_KP * (state->baro[0] - this->baroLast) / dT;
-	    this->baroLast = state->baro[0];
+            // correct the velocity state (low pass differentiation)
+            float dT = PIOS_DELAY_DiffuS(this->baroLastTime) / 1.0e6f;
+            if (dT < 0.001f) {
+                dT = 0.001f;
+            }
+            this->state[1]  = (1.0f - BARO_SENSOR_KP) * this->state[1] + BARO_SENSOR_KP * (state->baro[0] - this->baroLast) / dT;
+            this->baroLast  = state->baro[0];
 
-            state->pos[0] = this->pos[0];
-            state->pos[1] = this->pos[2];
-	    state->pos[2] = -this->state[0];
-	    state->updated |= SENSORUPDATES_pos;
+            state->pos[0]   = this->pos[0];
+            state->pos[1]   = this->pos[2];
+            state->pos[2]   = -this->state[0];
+            state->updated |= SENSORUPDATES_pos;
 
-            state->vel[0] = this->vel[0];
-            state->vel[1] = this->vel[2];
-	    state->vel[2] = -this->state[0];
-	    state->updated |= SENSORUPDATES_vel;
-	}
+            state->vel[0]   = this->vel[0];
+            state->vel[1]   = this->vel[2];
+            state->vel[2]   = -this->state[0];
+            state->updated |= SENSORUPDATES_vel;
+        }
     }
 
     return 0;

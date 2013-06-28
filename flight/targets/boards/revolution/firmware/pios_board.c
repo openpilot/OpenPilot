@@ -737,6 +737,7 @@ void PIOS_Board_Init(void)
     oplinkStatus.BoardRevision = bdinfo->board_rev;
 
     /* Is the radio turned on? */
+    bool is_coordinator = (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
     bool is_oneway = (oplinkSettings.OneWay == OPLINKSETTINGS_ONEWAY_TRUE);
     bool ppm_mode  = (oplinkSettings.PPM == OPLINKSETTINGS_PPM_TRUE);
     bool ppm_only  = (oplinkSettings.PPMOnly == OPLINKSETTINGS_PPMONLY_TRUE);
@@ -783,7 +784,7 @@ void PIOS_Board_Init(void)
         }
 
         /* Set the radio configuration parameters. */
-        PIOS_RFM22B_SetChannelConfig(pios_rfm22b_id, datarate, oplinkSettings.MinChannel, oplinkSettings.MaxChannel, oplinkSettings.ChannelSet, false, is_oneway, ppm_mode, ppm_only);
+        PIOS_RFM22B_SetChannelConfig(pios_rfm22b_id, datarate, oplinkSettings.MinChannel, oplinkSettings.MaxChannel, oplinkSettings.ChannelSet, is_coordinator, is_oneway, ppm_mode, ppm_only);
         PIOS_RFM22B_SetCoordinatorID(pios_rfm22b_id, oplinkSettings.CoordID);
 
         /* Set the PPM callback if we should be receiving PPM. */

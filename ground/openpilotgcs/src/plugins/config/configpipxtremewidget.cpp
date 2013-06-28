@@ -246,7 +246,6 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
                 m_oplink->VCPPortLabel->setVisible(false);
                 m_oplink->FlexiIOPort->setVisible(false);
                 m_oplink->FlexiIOPortLabel->setVisible(false);
-                m_oplink->Coordinator->setVisible(false);
                 m_oplink->PPM->setVisible(true);
                 break;
             case 0x03: // OPLinkMini
@@ -258,7 +257,6 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
                 m_oplink->VCPPortLabel->setVisible(true);
                 m_oplink->FlexiIOPort->setVisible(false);
                 m_oplink->FlexiIOPortLabel->setVisible(false);
-                m_oplink->Coordinator->setVisible(true);
                 m_oplink->PPM->setVisible(false);
                 break;
             case 0x0A:
@@ -270,7 +268,6 @@ void ConfigPipXtremeWidget::updateSettings(UAVObject *object)
                 m_oplink->VCPPortLabel->setVisible(true);
                 m_oplink->FlexiIOPort->setVisible(true);
                 m_oplink->FlexiIOPortLabel->setVisible(true);
-                m_oplink->Coordinator->setVisible(true);
                 m_oplink->PPM->setVisible(false);
                 break;
             default:

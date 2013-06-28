@@ -32,6 +32,7 @@
 
 #include "inc/stateestimation.h"
 #include <attitudestate.h>
+#include <altitudefiltersettings.h>
 
 #include <CoordinateConversions.h>
 
@@ -39,8 +40,6 @@
 
 #define STACK_REQUIRED 128
 
-#define BARO_SENSOR_KP 0.03f
-#define ACCEL_DRIFT_KP 0.001f
 #define DT_ALPHA       1e-3f
 
 // Private types
@@ -51,9 +50,11 @@ struct data {
     float   dTA;
     float   dTA2;
     int32_t lastTime;
+    float   accelLast;
     float   baroLast;
     int32_t baroLastTime;
     bool    first_run;
+    AltitudeFilterSettingsData settings;
 };
 
 // Private variables
@@ -70,6 +71,7 @@ int32_t filterAltitudeInitialize(stateFilter *handle)
     handle->filter    = &filter;
     handle->localdata = pvPortMalloc(sizeof(struct data));
     AttitudeStateInitialize();
+    AltitudeFilterSettingsInitialize();
     return STACK_REQUIRED;
 }
 
@@ -86,9 +88,12 @@ static int32_t init(stateFilter *self)
     this->vel[0]    = 0.0f;
     this->vel[1]    = 0.0f;
     this->vel[2]    = 0.0f;
-    this->dTA = -1;
-    this->dTA2      = -1;
+    this->dTA = -1.0f;
+    this->dTA2      = -1.0f;
+    this->baroLast  = 0.0f;
+    this->accelLast = 0.0f;
     this->first_run = 1;
+    AltitudeFilterSettingsGet(&this->settings);
     return 0;
 }
 
@@ -104,8 +109,6 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         if (IS_SET(state->updated, SENSORUPDATES_baro)) {
             this->first_run    = 0;
             this->baroLastTime = PIOS_DELAY_GetRaw();
-            this->state[0]     = state->baro[0];
-            this->baroLast     = state->baro[0];
         }
     } else {
         // save existing position and velocity updates so GPS will still work
@@ -130,7 +133,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             float current = -(Rbe[0][2] * state->accel[0] + Rbe[1][2] * state->accel[1] + Rbe[2][2] * state->accel[2] + 9.81f);
 
             // correct accel offset (low pass zeroing)
-            this->state[2] = (1.0f - ACCEL_DRIFT_KP) * this->state[2] + ACCEL_DRIFT_KP * current;
+            this->state[2] = (1.0f - this->settings.AccelDriftKi) * this->state[2] + this->settings.AccelDriftKi * current;
 
             // correct velocity and position state (integration)
             // low pass for average dT, compensate timing jitter from scheduler
@@ -144,8 +147,13 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             } else {
                 this->dTA = this->dTA * (1.0f - DT_ALPHA) + dT * DT_ALPHA;
             }
-            this->state[1] += (current - this->state[1]) * this->dTA;
-            this->state[0] += this->state[1] * this->dTA;
+            float speedLast = this->state[1];
+
+            this->state[1] += 0.5f * (this->accelLast + (current - this->state[2])) * this->dTA;
+            this->accelLast = current - this->state[2];
+
+            this->state[0] += 0.5f * (speedLast + this->state[1]) * this->dTA;
+
 
             state->pos[0]   = this->pos[0];
             state->pos[1]   = this->pos[1];
@@ -159,7 +167,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         }
         if (IS_SET(state->updated, SENSORUPDATES_baro)) {
             // correct the altitude state (simple low pass)
-            this->state[0] = (1.0f - BARO_SENSOR_KP) * this->state[0] + BARO_SENSOR_KP * state->baro[0];
+            this->state[0] = (1.0f - this->settings.BaroKp) * this->state[0] + this->settings.BaroKp * state->baro[0];
 
             // correct the velocity state (low pass differentiation)
             // low pass for average dT, compensate timing jitter from scheduler
@@ -173,7 +181,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             } else {
                 this->dTA2 = this->dTA2 * (1.0f - DT_ALPHA) + dT * DT_ALPHA;
             }
-            this->state[1]  = (1.0f - (BARO_SENSOR_KP * BARO_SENSOR_KP)) * this->state[1] + (BARO_SENSOR_KP * BARO_SENSOR_KP) * (state->baro[0] - this->baroLast) / this->dTA2;
+            this->state[1]  = (1.0f - (this->settings.BaroKp * this->settings.BaroKp)) * this->state[1] + (this->settings.BaroKp * this->settings.BaroKp) * (state->baro[0] - this->baroLast) / this->dTA2;
             this->baroLast  = state->baro[0];
 
             state->pos[0]   = this->pos[0];

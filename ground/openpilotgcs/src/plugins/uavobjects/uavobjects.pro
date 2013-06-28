@@ -33,6 +33,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.h \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.h \
+    $$UAVOBJECT_SYNTHETICS/altitudefiltersettings.h \
     $$UAVOBJECT_SYNTHETICS/ekfconfiguration.h \
     $$UAVOBJECT_SYNTHETICS/ekfstatevariance.h \
     $$UAVOBJECT_SYNTHETICS/revocalibration.h \
@@ -118,6 +119,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/altholdsmoothed.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholddesired.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.cpp \
+    $$UAVOBJECT_SYNTHETICS/altitudefiltersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/ekfconfiguration.cpp \
     $$UAVOBJECT_SYNTHETICS/ekfstatevariance.cpp \
     $$UAVOBJECT_SYNTHETICS/revocalibration.cpp \

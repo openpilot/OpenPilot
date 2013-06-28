@@ -64,6 +64,7 @@ typedef struct stateFilterStruct {
 
 int32_t filterMagInitialize(stateFilter *handle);
 int32_t filterBaroInitialize(stateFilter *handle);
+int32_t filterAltitudeInitialize(stateFilter *handle);
 int32_t filterAirInitialize(stateFilter *handle);
 int32_t filterStationaryInitialize(stateFilter *handle);
 int32_t filterCFInitialize(stateFilter *handle);

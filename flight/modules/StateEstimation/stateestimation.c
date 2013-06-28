@@ -123,6 +123,7 @@ static filterPipeline *filterChain = NULL;
 // different filters available to state estimation
 static stateFilter magFilter;
 static stateFilter baroFilter;
+static stateFilter altitudeFilter;
 static stateFilter airFilter;
 static stateFilter stationaryFilter;
 static stateFilter cfFilter;
@@ -138,9 +139,12 @@ static filterPipeline *cfQueue = &(filterPipeline) {
         .next   = &(filterPipeline) {
             .filter = &baroFilter,
             .next   = &(filterPipeline) {
-                .filter = &cfFilter,
-                .next   = NULL,
-            },
+                .filter = &altitudeFilter,
+                .next   = &(filterPipeline) {
+                    .filter = &cfFilter,
+                    .next   = NULL,
+                }
+            }
         }
     }
 };
@@ -151,8 +155,11 @@ static const filterPipeline *cfmQueue = &(filterPipeline) {
         .next   = &(filterPipeline) {
             .filter = &baroFilter,
             .next   = &(filterPipeline) {
-                .filter = &cfmFilter,
-                .next   = NULL,
+                .filter = &altitudeFilter,
+                .next   = &(filterPipeline) {
+                    .filter = &cfmFilter,
+                    .next   = NULL,
+                }
             }
         }
     }
@@ -237,6 +244,7 @@ int32_t StateEstimationInitialize(void)
     // Initialize Filters
     stack_required = maxint32_t(stack_required, filterMagInitialize(&magFilter));
     stack_required = maxint32_t(stack_required, filterBaroInitialize(&baroFilter));
+    stack_required = maxint32_t(stack_required, filterAltitudeInitialize(&altitudeFilter));
     stack_required = maxint32_t(stack_required, filterAirInitialize(&airFilter));
     stack_required = maxint32_t(stack_required, filterStationaryInitialize(&stationaryFilter));
     stack_required = maxint32_t(stack_required, filterCFInitialize(&cfFilter));

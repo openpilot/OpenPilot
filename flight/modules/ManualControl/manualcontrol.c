@@ -863,10 +863,10 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
         zeroed = false;
     } else if (cmd->Throttle > DEADBAND_HIGH && zeroed) {
         // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1
-        // then apply an "exp" f(x,k) = (k*x*x*x + x*(256−k)) / 256
-        altitudeHoldDesiredData.Altitude += (throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
+        // then apply an "exp" f(x,k) = (k*x*x*x + (255-k)*x) / 255
+        altitudeHoldDesiredData.Altitude += (throttleExp * powf((cmd->Throttle - DEADBAND_HIGH) / (DEADBAND_LOW), 3) + (255 - throttleExp) * (cmd->Throttle - DEADBAND_HIGH) / DEADBAND_LOW) / 255 * throttleRate * dT;
     } else if (cmd->Throttle < DEADBAND_LOW && zeroed) {
-        altitudeHoldDesiredData.Altitude -= (throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (256 - throttleExp)) / 256 * throttleRate * dT;
+        altitudeHoldDesiredData.Altitude -= (throttleExp * powf((DEADBAND_LOW - (cmd->Throttle < 0 ? 0 : cmd->Throttle)) / DEADBAND_LOW, 3) + (255 - throttleExp) * (DEADBAND_LOW - cmd->Throttle) / DEADBAND_LOW) / 255 * throttleRate * dT;
     } else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH && (throttleRate != 0)) {
         // Require the stick to enter the dead band before they can move height
         // Vario is not "engaged" when throttleRate == 0

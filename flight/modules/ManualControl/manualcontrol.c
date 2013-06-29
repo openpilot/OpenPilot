@@ -38,6 +38,7 @@
 #include "accessorydesired.h"
 #include "actuatordesired.h"
 #include "altitudeholddesired.h"
+#include "altholdsmoothed.h
 #include "flighttelemetrystats.h"
 #include "flightstatus.h"
 #include "sanitycheck.h"
@@ -859,7 +860,9 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     PositionStateDownGet(&currentDown);
     if (changed) {
         // After not being in this mode for a while init at current height
-        altitudeHoldDesiredData.Altitude = 0;
+        AltHoldSmoothedData altHold;
+        AltHoldSmoothedGet(&altHold);
+        altitudeHoldDesiredData.Altitude = altHold.Altitude;
         zeroed = false;
     } else if (cmd->Throttle > DEADBAND_HIGH && zeroed) {
         // being the two band symmetrical I can divide by DEADBAND_LOW to scale it to a value betweeon 0 and 1

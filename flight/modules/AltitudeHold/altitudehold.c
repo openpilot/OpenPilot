@@ -174,10 +174,6 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 error    = 0;
                 velocity = 0;
                 running  = true;
-
-                AltHoldSmoothedData altHold;
-                AltHoldSmoothedGet(&altHold);
-                starting_altitude = altHold.Altitude;
             } else if (!altitudeHoldFlightMode) {
                 running = false;
                 lastAltitudeHoldDesiredUpdate = PIOS_DELAY_GetRaw();
@@ -364,7 +360,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             }
 
             // Compute the altitude error
-            error = (starting_altitude + altitudeHoldDesired.Altitude) - altHold.Altitude;
+            error = altitudeHoldDesired.Altitude - altHold.Altitude;
 
             // Compute integral off altitude error
             throttleIntegral += error * altitudeHoldSettings.Ki * dT;

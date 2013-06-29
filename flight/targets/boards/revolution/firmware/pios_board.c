@@ -773,10 +773,10 @@ void PIOS_Board_Init(void)
             datarate = RFM22_datarate_32000;
             break;
         case OPLINKSETTINGS_COMSPEED_38400:
-            datarate = RFM22_datarate_57600;
+            datarate = RFM22_datarate_64000;
             break;
         case OPLINKSETTINGS_COMSPEED_57600:
-            datarate = RFM22_datarate_128000;
+            datarate = RFM22_datarate_100000;
             break;
         case OPLINKSETTINGS_COMSPEED_115200:
             datarate = RFM22_datarate_192000;

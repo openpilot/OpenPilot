@@ -65,9 +65,10 @@ enum rfm22b_datarate {
     RFM22_datarate_32000  = 2,
     RFM22_datarate_57600  = 3,
     RFM22_datarate_64000  = 4,
-    RFM22_datarate_128000 = 5,
-    RFM22_datarate_192000 = 6,
-    RFM22_datarate_256000 = 7,
+    RFM22_datarate_100000 = 5,
+    RFM22_datarate_128000 = 6,
+    RFM22_datarate_192000 = 7,
+    RFM22_datarate_256000 = 8,
 };
 
 typedef enum {

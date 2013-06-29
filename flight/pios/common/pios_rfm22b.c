@@ -302,37 +302,46 @@ static const struct pios_rfm22b_transition rfm22b_transitions[RADIO_STATE_NUM_ST
 };
 
 // xtal 10 ppm, 434MHz
-static const uint32_t data_rate[] = { 9600, 19200, 32000, 57600, 128000, 192000, 256000 };
-static const uint8_t modulation_index[] = { 1, 1, 1, 1, 1, 1, 1 };
+static const uint32_t data_rate[] = {
+    9600, // 96 kbps, 433 HMz, 30 khz freq dev
+    19200, // 19.2 kbps, 433 MHz, 45 khz freq dev
+    32000, // 32 kbps, 433 MHz, 45 khz freq dev
+    57600, // 57.6 kbps, 433 MHz, 45 khz freq dev
+    64000, // 64 kbps, 433 MHz, 45 khz freq dev
+    100000, // 100 kbps, 433 MHz, 60 khz freq dev
+    128000, // 128 kbps, 433 MHz, 90 khz freq dev
+    192000, // 192 kbps, 433 MHz, 128 khz freq dev
+    256000, // 256 kbps, 433 MHz, 150 khz freq dev
+};
 
-static const uint8_t reg_1C[] = { 0x01, 0x05, 0x16, 0x06, 0x83, 0x8A, 0x8C }; // rfm22_if_filter_bandwidth
+static const uint8_t reg_1C[] = { 0x01, 0x05, 0x06, 0x95, 0x95, 0x81, 0x88, 0x8B, 0x8D }; // rfm22_if_filter_bandwidth
 
-static const uint8_t reg_1D[] = { 0x40, 0x40, 0x44, 0x40, 0x44, 0x44, 0x44 }; // rfm22_afc_loop_gearshift_override
-static const uint8_t reg_1E[] = { 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x02 }; // rfm22_afc_timing_control
+static const uint8_t reg_1D[] = { 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40 }; // rfm22_afc_loop_gearshift_override
+static const uint8_t reg_1E[] = { 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x0A, 0x02 }; // rfm22_afc_timing_control
 
-static const uint8_t reg_1F[] = { 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03 }; // rfm22_clk_recovery_gearshift_override
-static const uint8_t reg_20[] = { 0xA1, 0xD0, 0x3F, 0x45, 0x5E, 0x3F, 0x2F }; // rfm22_clk_recovery_oversampling_ratio
-static const uint8_t reg_21[] = { 0x20, 0x00, 0x02, 0x01, 0x01, 0x02, 0x02 }; // rfm22_clk_recovery_offset2
-static const uint8_t reg_22[] = { 0x4E, 0x9D, 0x0C, 0xD7, 0x0c, 0x5D, 0x0C, 0xBB }; // rfm22_clk_recovery_offset1
-static const uint8_t reg_23[] = { 0xA5, 0x49, 0x4A, 0xDC, 0x86, 0x4A, 0x0D }; // rfm22_clk_recovery_offset0
-static const uint8_t reg_24[] = { 0x00, 0x00, 0x07, 0x07, 0x07, 0x05, 0x07, 0x07 }; // rfm22_clk_recovery_timing_loop_gain1
-static const uint8_t reg_25[] = { 0x34, 0x8, 0xFF, 0x6E, 0x74, 0xFF, 0xFF }; // rfm22_clk_recovery_timing_loop_gain0
+static const uint8_t reg_1F[] = { 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03, 0x03 }; // rfm22_clk_recovery_gearshift_override
+static const uint8_t reg_20[] = { 0xA1, 0xD0, 0x7D, 0x68, 0x5E, 0x78, 0x5E, 0x3F, 0x2F }; // rfm22_clk_recovery_oversampling_ratio
+static const uint8_t reg_21[] = { 0x20, 0x00, 0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x02 }; // rfm22_clk_recovery_offset2
+static const uint8_t reg_22[] = { 0x4E, 0x9D, 0x06, 0x3A, 0x5D, 0x11, 0x5D, 0x0C, 0xBB }; // rfm22_clk_recovery_offset1
+static const uint8_t reg_23[] = { 0xA5, 0x49, 0x25, 0x93, 0x86, 0x11, 0x86, 0x4A, 0x0D }; // rfm22_clk_recovery_offset0
+static const uint8_t reg_24[] = { 0x00, 0x00, 0x01, 0x03, 0x03, 0x03, 0x03, 0x06, 0x07 }; // rfm22_clk_recovery_timing_loop_gain1
+static const uint8_t reg_25[] = { 0x34, 0x88, 0x77, 0x29, 0xE2, 0x90, 0xE2, 0x1A, 0xFF }; // rfm22_clk_recovery_timing_loop_gain0
 
-static const uint8_t reg_2A[] = { 0x1E, 0x24, 0x17, 0x2D, 0x50, 0x50, 0x50 }; // rfm22_afc_limiter .. AFC_pull_in_range = �AFCLimiter[7:0] x (hbsel+1) x 625 Hz
+static const uint8_t reg_2A[] = { 0x1E, 0x24, 0x28, 0x3C, 0x3C, 0x50, 0x50, 0x50, 0x50 }; // rfm22_afc_limiter .. AFC_pull_in_range = �AFCLimiter[7:0] x (hbsel+1) x 625 Hz
 
-static const uint8_t reg_58[] = { 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80 }; // rfm22_cpcuu
-static const uint8_t reg_69[] = { 0x60, 0x60, 0x20, 0x60, 0x20, 0x20, 0x20 }; // rfm22_agc_override1
-static const uint8_t reg_6E[] = { 0x4E, 0x9D, 0x08, 0x0E, 0x20, 0x31, 0x41 }; // rfm22_tx_data_rate1
-static const uint8_t reg_6F[] = { 0xA5, 0x49, 0x31, 0xBF, 0xC5, 0x27, 0x89 }; // rfm22_tx_data_rate0
+static const uint8_t reg_58[] = { 0x80, 0x80, 0x80, 0x80, 0x80, 0xC0, 0xC0, 0xC0, 0xED }; // rfm22_cpcuu
+static const uint8_t reg_69[] = { 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60, 0x60 }; // rfm22_agc_override1
+static const uint8_t reg_6E[] = { 0x4E, 0x9D, 0x08, 0x0E, 0x10, 0x19, 0x20, 0x31, 0x41 }; // rfm22_tx_data_rate1
+static const uint8_t reg_6F[] = { 0xA5, 0x49, 0x31, 0xBF, 0x62, 0x9A, 0xC5, 0x27, 0x89 }; // rfm22_tx_data_rate0
 
-static const uint8_t reg_70[] = { 0x2C, 0x2C, 0x0D, 0x0C, 0x0D, 0x0D, 0x0D }; // rfm22_modulation_mode_control1
-static const uint8_t reg_71[] = { 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23 }; // rfm22_modulation_mode_control2
+static const uint8_t reg_70[] = { 0x2C, 0x2C, 0x0C, 0x0C, 0x0C, 0x0C, 0x0C, 0x0C, 0x0C }; // rfm22_modulation_mode_control1
+static const uint8_t reg_71[] = { 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23, 0x23 }; // rfm22_modulation_mode_control2
 
-static const uint8_t reg_72[] = { 0x30, 0x48, 0x1A, 0x2E, 0x66, 0x9A, 0xCD }; // rfm22_frequency_deviation
+static const uint8_t reg_72[] = { 0x30, 0x48, 0x48, 0x48, 0x48, 0x60, 0x90, 0xCD, 0x0F }; // rfm22_frequency_deviation
 
-static const uint8_t packet_time[] = { 80, 40, 25, 15, 8, 6, 5 };
-static const uint8_t packet_time_ppm[] = { 26, 25, 25, 15, 8, 6, 5 };
-static const uint8_t num_channels[] = { 3, 3, 4, 6, 9, 12, 15 };
+static const uint8_t packet_time[] = { 80, 40, 25, 15, 13, 10, 8, 6, 5 };
+static const uint8_t packet_time_ppm[] = { 26, 25, 25, 15, 13, 10, 8, 6, 5 };
+static const uint8_t num_channels[] = { 4, 4, 4, 6, 8, 8, 10, 12, 16 };
 
 static struct pios_rfm22b_dev *g_rfm22b_dev = NULL;
 
@@ -1186,9 +1195,11 @@ static void pios_rfm22_task(void *parameters)
             if (!rfm22_isCoordinator(rfm22b_dev) && rfm22b_dev->on_sync_channel) {
                 rfm22b_dev->on_sync_channel = false;
                 if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED) {
-                    rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_CONNECTING;
-                } else {
                     rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
+                    // Set the PPM outputs to INVALID
+                    for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
+                        rfm22b_dev->ppm[i] = PIOS_RCVR_INVALID;
+                    }
                 }
             }
 

@@ -238,17 +238,13 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 
             x[0] = baro.Altitude;
             // rotate avg accels into earth frame and store it
-            if (1) {
-                float q[4], Rbe[3][3];
-                q[0] = attitudeState.q1;
-                q[1] = attitudeState.q2;
-                q[2] = attitudeState.q3;
-                q[3] = attitudeState.q4;
-                Quaternion2R(q, Rbe);
-                x[1] = -(Rbe[0][2] * accelState.x + Rbe[1][2] * accelState.y + Rbe[2][2] * accelState.z + 9.81f);
-            } else {
-                x[1] = -accelState.z + 9.81f;
-            }
+            float q[4], Rbe[3][3];
+            q[0] = attitudeState.q1;
+            q[1] = attitudeState.q2;
+            q[2] = attitudeState.q3;
+            q[3] = attitudeState.q4;
+            Quaternion2R(q, Rbe);
+            x[1] = -(Rbe[0][2] * accelState.x + Rbe[1][2] * accelState.y + Rbe[2][2] * accelState.z + 9.81f);
 
             dT = PIOS_DELAY_DiffuS(timeval) / 1.0e6f;
             timeval = PIOS_DELAY_GetRaw();

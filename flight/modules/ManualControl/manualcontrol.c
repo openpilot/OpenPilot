@@ -38,7 +38,7 @@
 #include "accessorydesired.h"
 #include "actuatordesired.h"
 #include "altitudeholddesired.h"
-#include "altholdsmoothed.h
+#include "altholdsmoothed.h"
 #include "flighttelemetrystats.h"
 #include "flightstatus.h"
 #include "sanitycheck.h"

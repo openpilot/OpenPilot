@@ -125,6 +125,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 {
     AltitudeHoldDesiredData altitudeHoldDesired;
     StabilizationDesiredData stabilizationDesired;
+    float q[4], Rbe[3][3];
 
     portTickType thisTime, lastUpdateTime;
     UAVObjEvent ev;
@@ -238,7 +239,6 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 
             x[0] = baro.Altitude;
             // rotate avg accels into earth frame and store it
-            float q[4], Rbe[3][3];
             q[0] = attitudeState.q1;
             q[1] = attitudeState.q2;
             q[2] = attitudeState.q3;
@@ -373,6 +373,10 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             if (!enterFailSafe) {
                 stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp + throttleIntegral -
                                                 altHold.Velocity * altitudeHoldSettings.Kd - altHold.Accel * altitudeHoldSettings.Ka;
+                // scale up throttle to compensate for roll/pitch angle but limit this to 60 deg (cos(60) == 0.5) to prevent excessive scaling
+                float throttlescale = Rbe[2][2] < 0.5f ? 0.5f : Rbe[2][2];
+                stabilizationDesired.Throttle /= throttlescale;
+
                 if (stabilizationDesired.Throttle > 1) {
                     throttleIntegral -= (stabilizationDesired.Throttle - 1);
                     stabilizationDesired.Throttle = 1;

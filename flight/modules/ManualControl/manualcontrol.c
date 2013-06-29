@@ -851,8 +851,6 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     altitudeHoldDesiredData.Pitch = cmd->Pitch * stabSettings.PitchMax;
     altitudeHoldDesiredData.Yaw   = cmd->Yaw * stabSettings.ManualRate[STABILIZATIONSETTINGS_MANUALRATE_YAW];
 
-    float currentDown;
-    PositionStateDownGet(&currentDown);
     if (changed) {
         // After not being in this mode for a while init at current height
         AltHoldSmoothedData altHold;

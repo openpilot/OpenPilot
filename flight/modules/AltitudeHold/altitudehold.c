@@ -125,6 +125,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 {
     AltitudeHoldDesiredData altitudeHoldDesired;
     StabilizationDesiredData stabilizationDesired;
+    AltHoldSmoothedData altHold;
     float q[4], Rbe[3][3];
 
     portTickType thisTime, lastUpdateTime;
@@ -174,6 +175,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 switchThrottle = throttleIntegral;
                 error    = 0;
                 velocity = 0;
+                altitudeHoldDesired.Altitude = altHold.Altitude;
                 running  = true;
             } else if (!altitudeHoldFlightMode) {
                 running = false;
@@ -334,7 +336,6 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 V[3][3] = -K[3][0] * P[2][3] - P[3][3] * (K[3][0] - 1.0f);
             }
 
-            AltHoldSmoothedData altHold;
             AltHoldSmoothedGet(&altHold);
             altHold.Altitude = z[0];
             altHold.Velocity = z[1];

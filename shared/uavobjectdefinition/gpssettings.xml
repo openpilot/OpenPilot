@@ -1,0 +1,12 @@
+<xml>
+    <object name="GPSSettings" singleinstance="true" settings="true" category="Sensors">
+        <description>GPS Module specific settings</description>
+        <field name="DataProtocol" units="" type="enum" elements="1" options="NMEA,UBX" defaultvalue="UBX"/>
+        <field name="MinSattelites" units="" type="uint8" elements="1" defaultvalue="7"/>
+        <field name="MaxPDOP" units="" type="float" elements="1" defaultvalue="3.5"/>
+        <access gcs="readwrite" flight="readwrite"/>
+        <telemetrygcs acked="true" updatemode="onchange" period="0"/>
+        <telemetryflight acked="true" updatemode="onchange" period="0"/>
+        <logging updatemode="manual" period="0"/>
+    </object>
+</xml>

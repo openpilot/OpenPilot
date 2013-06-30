@@ -48,7 +48,7 @@ class QTimer;
 class UAVObjectTreeModel : public QAbstractItemModel {
     Q_OBJECT
 public:
-    explicit UAVObjectTreeModel(QObject *parent = 0, bool categorize = true, bool useScientificNotation = false);
+    explicit UAVObjectTreeModel(QObject *parent = 0, bool categorize = false, bool useScientificNotation = false);
     ~UAVObjectTreeModel();
 
     QVariant data(const QModelIndex &index, int role) const;

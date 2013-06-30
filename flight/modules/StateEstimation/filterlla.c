@@ -73,7 +73,7 @@ static int32_t init(__attribute__((unused)) stateFilter *self)
 
     GPSSettingsGet(&this->settings);
     HomeLocationGet(&this->home);
-    if (this->home.Set != HOMELOCATION_SET_TRUE) {
+    if (this->home.Set == HOMELOCATION_SET_TRUE) {
         // calculate home location coordinate reference
         int32_t LLAi[3] = {
             this->home.Latitude,

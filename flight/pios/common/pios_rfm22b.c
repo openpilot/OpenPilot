@@ -1189,20 +1189,7 @@ static void pios_rfm22_task(void *parameters)
             D4_LED_OFF;
         }
    #endif
-
         if (time_to_send && PIOS_RFM22B_InRxWait((uint32_t)rfm22b_dev)) {
-            // If the on_sync_channel flag is set, it means that we were on the sync channel, but no packet was received, so transition to a non-connected state.
-            if (!rfm22_isCoordinator(rfm22b_dev) && rfm22b_dev->on_sync_channel) {
-                rfm22b_dev->on_sync_channel = false;
-                if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED) {
-                    rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
-                    // Set the PPM outputs to INVALID
-                    for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
-                        rfm22b_dev->ppm[i] = PIOS_RCVR_INVALID;
-                    }
-                }
-            }
-
             rfm22_process_event(rfm22b_dev, RADIO_EVENT_TX_START);
         }
     }
@@ -2225,12 +2212,33 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t ind
     uint8_t num_chan = num_channels[rfm22b_dev->datarate];
     uint8_t idx = index % num_chan;
 
+    // Are we switching to a new channel?
     if (idx != rfm22b_dev->channel_index) {
-        rfm22b_dev->channel_index = idx;
-        if (idx == 0) {
+        
+        // If the on_sync_channel flag is set, it means that we were on the sync channel, but no packet was received, so transition to a non-connected state.
+        if (!rfm22_isCoordinator(rfm22b_dev) && (rfm22b_dev->channel_index == 0) && rfm22b_dev->on_sync_channel) {
+            rfm22b_dev->on_sync_channel = false;
+
+            // Set the link state to disconnected.
+            if (rfm22b_dev->stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED) {
+                rfm22b_dev->stats.link_state = OPLINKSTATUS_LINKSTATE_DISCONNECTED;
+                // Set the PPM outputs to INVALID
+                for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
+                    rfm22b_dev->ppm[i] = PIOS_RCVR_INVALID;
+                }
+            }
+
+            // Stay on the sync channel.
+            idx = 0;
+
+        } else if (idx == 0) {
+            // If we're switching to the sync channel, set a flag that can be used to detect if a packet was received.
             rfm22b_dev->on_sync_channel = true;
         }
+
+        rfm22b_dev->channel_index = idx;
     }
+
     return rfm22b_dev->channels[idx];
 }
 

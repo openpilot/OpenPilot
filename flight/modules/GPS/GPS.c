@@ -34,7 +34,6 @@
 
 #include "gpspositionsensor.h"
 #include "homelocation.h"
-#include "positionsensor.h"
 #include "gpstime.h"
 #include "gpssatellites.h"
 #include "gpsvelocitysensor.h"
@@ -59,9 +58,6 @@ static void updateSettings();
 #ifdef PIOS_GPS_SETS_HOMELOCATION
 static void setHomeLocation(GPSPositionSensorData *gpsData);
 static float GravityAccel(float latitude, float longitude, float altitude);
-#endif
-#ifdef PIOS_GPS_SETS_POSITIONSENSOR
-static void setPositionSensor(GPSPositionSensorData *gpsData);
 #endif
 
 // ****************
@@ -154,7 +150,6 @@ int32_t GPSInitialize(void)
     GPSTimeInitialize();
     GPSSatellitesInitialize();
     HomeLocationInitialize();
-    PositionSensorInitialize();
     updateSettings();
 
 #else
@@ -165,11 +160,8 @@ int32_t GPSInitialize(void)
         GPSTimeInitialize();
         GPSSatellitesInitialize();
 #endif
-#if (defined(PIOS_GPS_SETS_HOMELOCATION) || defined(PIOS_GPS_SETS_POSITIONSENSOR))
+#if defined(PIOS_GPS_SETS_HOMELOCATION)
         HomeLocationInitialize();
-#endif
-#ifdef PIOS_GPS_SETS_POSITIONSENSOR
-        PositionSensorInitialize();
 #endif
         updateSettings();
     }
@@ -271,9 +263,6 @@ static void gpsTask(__attribute__((unused)) void *parameters)
                     setHomeLocation(&gpspositionsensor);
                 }
 #endif
-#ifdef PIOS_GPS_SETS_POSITIONSENSOR
-                setPositionSensor(&gpspositionsensor);
-#endif
             } else if ((gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
                        (gpspositionsensor.Latitude != 0 || gpspositionsensor.Longitude != 0)) {
                 AlarmsSet(SYSTEMALARMS_ALARM_GPS, SYSTEMALARMS_ALARM_WARNING);
@@ -335,32 +324,6 @@ static void setHomeLocation(GPSPositionSensorData *gpsData)
     }
 }
 #endif /* ifdef PIOS_GPS_SETS_HOMELOCATION */
-
-#ifdef PIOS_GPS_SETS_POSITIONSENSOR
-static void setPositionSensor(GPSPositionSensorData *gpsData)
-{
-    HomeLocationData home;
-
-    HomeLocationGet(&home);
-    PositionSensorData pos;
-    PositionSensorGet(&pos);
-
-    double ECEF[3];
-    double Rne[3][3];
-    {
-        float LLA[3] = { (home.Latitude) / 10e6f, (home.Longitude) / 10e6f, (home.Altitude) };
-        LLA2ECEF(LLA, ECEF);
-        RneFromLLA(LLA, Rne);
-    }
-    { float LLA[3] = { (gpsData->Latitude) / 10e6d, (gpsData->Longitude) / 10e6d, gpsData->Altitude + gpsData->GeoidSeparation };
-      float NED[3];
-      LLA2Base(LLA, ECEF, Rne, NED);
-      pos.North = NED[0];
-      pos.East  = NED[1];
-      pos.Down  = NED[2]; }
-    PositionSensorSet(&pos);
-}
-#endif /* ifdef PIOS_GPS_SETS_POSITIONSENSOR */
 
 /**
  * Update the GPS settings, called on startup.

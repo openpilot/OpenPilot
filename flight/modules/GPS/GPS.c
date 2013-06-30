@@ -37,7 +37,7 @@
 #include "gpstime.h"
 #include "gpssatellites.h"
 #include "gpsvelocitysensor.h"
-#include "systemsettings.h"
+#include "gpssettings.h"
 #include "taskinfo.h"
 #include "hwsettings.h"
 
@@ -168,13 +168,13 @@ int32_t GPSInitialize(void)
 #endif /* if defined(REVOLUTION) */
 
     if (gpsPort && gpsEnabled) {
-        SystemSettingsInitialize();
-        SystemSettingsGPSDataProtocolGet(&gpsProtocol);
+        GPSSettingsInitialize();
+        GPSSettingsDataProtocolGet(&gpsProtocol);
         switch (gpsProtocol) {
-        case SYSTEMSETTINGS_GPSDATAPROTOCOL_NMEA:
+        case GPSSETTINGS_DATAPROTOCOL_NMEA:
             gps_rx_buffer = pvPortMalloc(NMEA_MAX_PACKET_LENGTH);
             break;
-        case SYSTEMSETTINGS_GPSDATAPROTOCOL_UBX:
+        case GPSSETTINGS_DATAPROTOCOL_UBX:
             gps_rx_buffer = pvPortMalloc(sizeof(struct UBXPacket));
             break;
         default:
@@ -201,9 +201,9 @@ static void gpsTask(__attribute__((unused)) void *parameters)
     uint32_t timeNowMs  = xTaskGetTickCount() * portTICK_RATE_MS;
 
     GPSPositionSensorData gpspositionsensor;
-    uint8_t gpsProtocol;
+    GPSSettingsData gpsSettings;
 
-    SystemSettingsGPSDataProtocolGet(&gpsProtocol);
+    GPSSettingsGet(&gpsSettings);
 
     timeOfLastUpdateMs  = timeNowMs;
     timeOfLastCommandMs = timeNowMs;
@@ -216,14 +216,14 @@ static void gpsTask(__attribute__((unused)) void *parameters)
         // This blocks the task until there is something on the buffer
         while (PIOS_COM_ReceiveBuffer(gpsPort, &c, 1, xDelay) > 0) {
             int res;
-            switch (gpsProtocol) {
+            switch (gpsSettings.DataProtocol) {
 #if defined(PIOS_INCLUDE_GPS_NMEA_PARSER)
-            case SYSTEMSETTINGS_GPSDATAPROTOCOL_NMEA:
+            case GPSSETTINGS_DATAPROTOCOL_NMEA:
                 res = parse_nmea_stream(c, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
                 break;
 #endif
 #if defined(PIOS_INCLUDE_GPS_UBX_PARSER)
-            case SYSTEMSETTINGS_GPSDATAPROTOCOL_UBX:
+            case GPSSETTINGS_DATAPROTOCOL_UBX:
                 res = parse_ubx_stream(c, gps_rx_buffer, &gpspositionsensor, &gpsRxStats);
                 break;
 #endif
@@ -251,7 +251,7 @@ static void gpsTask(__attribute__((unused)) void *parameters)
             // we appear to be receiving GPS sentences OK, we've had an update
             // criteria for GPS-OK taken from this post...
             // http://forums.openpilot.org/topic/1523-professors-insgps-in-svn/page__view__findpost__p__5220
-            if ((gpspositionsensor.PDOP < 3.5f) && (gpspositionsensor.Satellites >= 7) &&
+            if ((gpspositionsensor.PDOP < gpsSettings.MaxPDOP) && (gpspositionsensor.Satellites >= gpsSettings.MinSattelites) &&
                 (gpspositionsensor.Status == GPSPOSITIONSENSOR_STATUS_FIX3D) &&
                 (gpspositionsensor.Latitude != 0 || gpspositionsensor.Longitude != 0)) {
                 AlarmsClear(SYSTEMALARMS_ALARM_GPS);

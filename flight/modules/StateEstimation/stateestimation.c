@@ -36,7 +36,7 @@
 #include <magsensor.h>
 #include <barosensor.h>
 #include <airspeedsensor.h>
-#include <positionsensor.h>
+#include <gpspositionsensor.h>
 #include <gpsvelocitysensor.h>
 
 #include <gyrostate.h>
@@ -125,6 +125,7 @@ static stateFilter magFilter;
 static stateFilter baroFilter;
 static stateFilter airFilter;
 static stateFilter stationaryFilter;
+static stateFilter llaFilter;
 static stateFilter cfFilter;
 static stateFilter cfmFilter;
 static stateFilter ekf13iFilter;
@@ -136,11 +137,14 @@ static filterPipeline *cfQueue = &(filterPipeline) {
     .next   = &(filterPipeline) {
         .filter = &airFilter,
         .next   = &(filterPipeline) {
-            .filter = &baroFilter,
+            .filter = &llaFilter,
             .next   = &(filterPipeline) {
-                .filter = &cfFilter,
-                .next   = NULL,
-            },
+                .filter = &baroFilter,
+                .next   = &(filterPipeline) {
+                    .filter = &cfFilter,
+                    .next   = NULL,
+                }
+            }
         }
     }
 };
@@ -149,10 +153,13 @@ static const filterPipeline *cfmQueue = &(filterPipeline) {
     .next   = &(filterPipeline) {
         .filter = &airFilter,
         .next   = &(filterPipeline) {
-            .filter = &baroFilter,
+            .filter = &llaFilter,
             .next   = &(filterPipeline) {
-                .filter = &cfmFilter,
-                .next   = NULL,
+                .filter = &baroFilter,
+                .next   = &(filterPipeline) {
+                    .filter = &cfmFilter,
+                    .next   = NULL,
+                }
             }
         }
     }
@@ -162,12 +169,15 @@ static const filterPipeline *ekf13iQueue = &(filterPipeline) {
     .next   = &(filterPipeline) {
         .filter = &airFilter,
         .next   = &(filterPipeline) {
-            .filter = &baroFilter,
+            .filter = &llaFilter,
             .next   = &(filterPipeline) {
-                .filter = &stationaryFilter,
+                .filter = &baroFilter,
                 .next   = &(filterPipeline) {
-                    .filter = &ekf13iFilter,
-                    .next   = NULL,
+                    .filter = &stationaryFilter,
+                    .next   = &(filterPipeline) {
+                        .filter = &ekf13iFilter,
+                        .next   = NULL,
+                    }
                 }
             }
         }
@@ -178,10 +188,13 @@ static const filterPipeline *ekf13Queue = &(filterPipeline) {
     .next   = &(filterPipeline) {
         .filter = &airFilter,
         .next   = &(filterPipeline) {
-            .filter = &baroFilter,
+            .filter = &llaFilter,
             .next   = &(filterPipeline) {
-                .filter = &ekf13Filter,
-                .next   = NULL,
+                .filter = &baroFilter,
+                .next   = &(filterPipeline) {
+                    .filter = &ekf13Filter,
+                    .next   = NULL,
+                }
             }
         }
     }
@@ -213,8 +226,8 @@ int32_t StateEstimationInitialize(void)
     MagSensorInitialize();
     BaroSensorInitialize();
     AirspeedSensorInitialize();
-    PositionSensorInitialize();
     GPSVelocitySensorInitialize();
+    GPSPositionSensorInitialize();
 
     GyroStateInitialize();
     AccelStateInitialize();
@@ -230,8 +243,8 @@ int32_t StateEstimationInitialize(void)
     MagSensorConnectCallback(&sensorUpdatedCb);
     BaroSensorConnectCallback(&sensorUpdatedCb);
     AirspeedSensorConnectCallback(&sensorUpdatedCb);
-    PositionSensorConnectCallback(&sensorUpdatedCb);
     GPSVelocitySensorConnectCallback(&sensorUpdatedCb);
+    GPSPositionSensorConnectCallback(&sensorUpdatedCb);
 
     uint32_t stack_required = STACK_SIZE_BYTES;
     // Initialize Filters
@@ -239,6 +252,7 @@ int32_t StateEstimationInitialize(void)
     stack_required = maxint32_t(stack_required, filterBaroInitialize(&baroFilter));
     stack_required = maxint32_t(stack_required, filterAirInitialize(&airFilter));
     stack_required = maxint32_t(stack_required, filterStationaryInitialize(&stationaryFilter));
+    stack_required = maxint32_t(stack_required, filterLLAInitialize(&llaFilter));
     stack_required = maxint32_t(stack_required, filterCFInitialize(&cfFilter));
     stack_required = maxint32_t(stack_required, filterCFMInitialize(&cfmFilter));
     stack_required = maxint32_t(stack_required, filterEKF13iInitialize(&ekf13iFilter));
@@ -353,11 +367,11 @@ static void StateEstimationCb(void)
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GyroSensor, gyro, x, y, z);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(AccelSensor, accel, x, y, z);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(MagSensor, mag, x, y, z);
-        FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(PositionSensor, pos, North, East, Down);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_3_DIMENSIONS(GPSVelocitySensor, vel, North, East, Down);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_1_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(BaroSensor, baro, Altitude, true);
         FETCH_SENSOR_FROM_UAVOBJECT_CHECK_AND_LOAD_TO_STATE_1_DIMENSION_WITH_CUSTOM_EXTRA_CHECK(AirspeedSensor, airspeed, CalibratedAirspeed, s.SensorConnected == AIRSPEEDSENSOR_SENSORCONNECTED_TRUE);
         states.airspeed[1] = 0.0f; // sensor does not provide true airspeed, needs to be calculated by filter, set to zero for now
+        // GPS position data (LLA) is not fetched here since it does not contain floats. The filter must do all checks itself
 
         // at this point sensor state is stored in "states" with some rudimentary filtering applied
 
@@ -475,8 +489,8 @@ static void sensorUpdatedCb(UAVObjEvent *ev)
         updatedSensors |= SENSORUPDATES_mag;
     }
 
-    if (ev->obj == PositionSensorHandle()) {
-        updatedSensors |= SENSORUPDATES_pos;
+    if (ev->obj == GPSPositionSensorHandle()) {
+        updatedSensors |= SENSORUPDATES_lla;
     }
 
     if (ev->obj == GPSVelocitySensorHandle()) {

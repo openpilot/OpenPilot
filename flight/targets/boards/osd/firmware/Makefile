@@ -91,6 +91,7 @@ ifndef TESTAPP
     SRC += $(OPUAVSYNTHDIR)/gpssatellites.c
     SRC += $(OPUAVSYNTHDIR)/gpsvelocitysensor.c
     SRC += $(OPUAVSYNTHDIR)/gpstime.c
+    SRC += $(OPUAVSYNTHDIR)/gpssettings.c
     SRC += $(OPUAVSYNTHDIR)/osdsettings.c
     SRC += $(OPUAVSYNTHDIR)/barosensor.c
     SRC += $(OPUAVSYNTHDIR)/magsensor.c

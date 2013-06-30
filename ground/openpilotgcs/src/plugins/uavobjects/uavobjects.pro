@@ -62,11 +62,11 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/gpspositionsensor.h \
     $$UAVOBJECT_SYNTHETICS/gpstime.h \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.h \
+    $$UAVOBJECT_SYNTHETICS/gpssettings.h \
     $$UAVOBJECT_SYNTHETICS/pathaction.h \
     $$UAVOBJECT_SYNTHETICS/pathdesired.h \
     $$UAVOBJECT_SYNTHETICS/pathstatus.h \
     $$UAVOBJECT_SYNTHETICS/gpsvelocitysensor.h \
-    $$UAVOBJECT_SYNTHETICS/positionsensor.h \
     $$UAVOBJECT_SYNTHETICS/positionstate.h \
     $$UAVOBJECT_SYNTHETICS/flightbatterystate.h \
     $$UAVOBJECT_SYNTHETICS/homelocation.h \
@@ -147,11 +147,11 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/gpspositionsensor.cpp \
     $$UAVOBJECT_SYNTHETICS/gpstime.cpp \
     $$UAVOBJECT_SYNTHETICS/gpssatellites.cpp \
+    $$UAVOBJECT_SYNTHETICS/gpssettings.cpp \
     $$UAVOBJECT_SYNTHETICS/pathaction.cpp \
     $$UAVOBJECT_SYNTHETICS/pathdesired.cpp \
     $$UAVOBJECT_SYNTHETICS/pathstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/gpsvelocitysensor.cpp \
-    $$UAVOBJECT_SYNTHETICS/positionsensor.cpp \
     $$UAVOBJECT_SYNTHETICS/positionstate.cpp \
     $$UAVOBJECT_SYNTHETICS/flightbatterystate.cpp \
     $$UAVOBJECT_SYNTHETICS/homelocation.cpp \

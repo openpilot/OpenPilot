@@ -173,6 +173,12 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 // Copy the current throttle as a starting point for integral
                 StabilizationDesiredThrottleGet(&throttleIntegral);
                 switchThrottle = throttleIntegral;
+                throttleIntegral *= Rbe[2][2]; // rotate into earth frame
+                if (throttleIntegral > 1) {
+                    throttleIntegral = 1;
+                } else if (throttleIntegral < 0) {
+                    throttleIntegral = 0;
+                }
                 error    = 0;
                 velocity = 0;
                 altitudeHoldDesired.Altitude = altHold.Altitude;

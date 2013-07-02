@@ -25,7 +25,6 @@
 
 #ifndef PIOS_BOARD_H
 #define PIOS_BOARD_H
-#include <pios_architecture.h>
 // ------------------------
 // Timers and Channels Used
 // ------------------------

@@ -28,8 +28,6 @@
 
 #include <stdbool.h>
 
-#include <pios_architecture.h>
-
 // *****************************************************************
 // Timers and Channels Used
 

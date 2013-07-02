@@ -44,7 +44,7 @@
 
 // Private types
 struct data {
-    float   state[3]; // state = altitude,velocity,accel_offset
+    float   state[4]; // state = altitude,velocity,accel_offset,accel
     float   pos[3]; // position updates from other filters
     float   vel[3]; // position updates from other filters
     float   dTA;
@@ -82,6 +82,7 @@ static int32_t init(stateFilter *self)
     this->state[0]  = 0.0f;
     this->state[1]  = 0.0f;
     this->state[2]  = 0.0f;
+    this->state[3]  = 0.0f;
     this->pos[0]    = 0.0f;
     this->pos[1]    = 0.0f;
     this->pos[2]    = 0.0f;
@@ -132,8 +133,11 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             Quaternion2R(&att.q1, Rbe);
             float current = -(Rbe[0][2] * state->accel[0] + Rbe[1][2] * state->accel[1] + Rbe[2][2] * state->accel[2] + 9.81f);
 
+            // low pass filter accelerometers
+            this->state[3] = (1.0f - this->settings.AccelLowPassKp) * this->state[3] + this->settings.AccelLowPassKp * current;
+
             // correct accel offset (low pass zeroing)
-            this->state[2] = (1.0f - this->settings.AccelDriftKi) * this->state[2] + this->settings.AccelDriftKi * current;
+            this->state[2] = (1.0f - this->settings.AccelDriftKi) * this->state[2] + this->settings.AccelDriftKi * this->state[3];
 
             // correct velocity and position state (integration)
             // low pass for average dT, compensate timing jitter from scheduler
@@ -149,8 +153,8 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             }
             float speedLast = this->state[1];
 
-            this->state[1] += 0.5f * (this->accelLast + (current - this->state[2])) * this->dTA;
-            this->accelLast = current - this->state[2];
+            this->state[1] += 0.5f * (this->accelLast + (this->state[3] - this->state[2])) * this->dTA;
+            this->accelLast = this->state[3] - this->state[2];
 
             this->state[0] += 0.5f * (speedLast + this->state[1]) * this->dTA;
 

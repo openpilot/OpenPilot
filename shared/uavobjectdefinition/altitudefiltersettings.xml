@@ -1,6 +1,7 @@
 <xml>
     <object name="AltitudeFilterSettings" singleinstance="true" settings="true" category="State">
         <description>Settings for the @ref State Estimator module plugin altitudeFilter</description>
+        <field name="AccelLowPassKp" units="m/s^2" type="float" elements="1" defaultvalue="0.07"/>
         <field name="AccelDriftKi" units="m/s^2" type="float" elements="1" defaultvalue="0.0005"/>
         <field name="BaroKp" units="m" type="float" elements="1" defaultvalue="0.02"/>
         <access gcs="readwrite" flight="readwrite"/>

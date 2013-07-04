@@ -1477,6 +1477,9 @@
             </item>
             <item row="6" column="2">
              <widget class="QCheckBox" name="Coordinator">
+              <property name="statusTip">
+               <string>This modem will be a coordinator and other modems will bind to it.</string>
+              </property>
               <property name="text">
                <string>Coordinator</string>
               </property>
@@ -1507,7 +1510,11 @@
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="4" column="3">
-          <widget class="QComboBox" name="ComSpeed"/>
+          <widget class="QComboBox" name="ComSpeed">
+           <property name="statusTip">
+            <string>Com speed in bps.</string>
+           </property>
+          </widget>
          </item>
          <item row="4" column="2">
           <widget class="QLabel" name="ComSpeedLabel">
@@ -1632,6 +1639,9 @@
          </item>
          <item row="0" column="0">
           <widget class="QCheckBox" name="OneWayLink">
+           <property name="statusTip">
+            <string>If selected, data will only be transmitted from the coordinator to the Rx modem.</string>
+           </property>
            <property name="text">
             <string>One-Way Link</string>
            </property>
@@ -1639,6 +1649,9 @@
          </item>
          <item row="4" column="0">
           <widget class="QCheckBox" name="PPMOnly">
+           <property name="statusTip">
+            <string>Only PPM packets will be transmitted.</string>
+           </property>
            <property name="text">
             <string>PPM Only</string>
            </property>
@@ -1656,6 +1669,9 @@
          </item>
          <item row="6" column="1">
           <widget class="QSpinBox" name="MaximumChannel">
+           <property name="toolTip">
+            <string>Channel 0 is 430 MHz, channel 249 is 440 MHz, and the channel spacing is 40 KHz.</string>
+           </property>
            <property name="maximum">
             <number>249</number>
            </property>
@@ -1673,6 +1689,9 @@
          </item>
          <item row="7" column="1">
           <widget class="QSpinBox" name="MinimumChannel">
+           <property name="toolTip">
+            <string>Channel 0 is 430 MHz, channel 249 is 440 MHz, and the channel spacing is 40 KHz.</string>
+           </property>
            <property name="maximum">
             <number>249</number>
            </property>
@@ -1690,6 +1709,9 @@
          </item>
          <item row="9" column="1">
           <widget class="QSpinBox" name="ChannelSet">
+           <property name="toolTip">
+            <string>Sets the random sequence of channels to use for frequency hopping.</string>
+           </property>
            <property name="maximum">
             <number>249</number>
            </property>
@@ -1697,6 +1719,9 @@
          </item>
          <item row="10" column="0">
           <widget class="QCheckBox" name="PPM">
+           <property name="statusTip">
+            <string>PPM packets will be received by this modem.  Must be selected if Coordinator modem is configured for PPM.</string>
+           </property>
            <property name="text">
             <string>PPM</string>
            </property>

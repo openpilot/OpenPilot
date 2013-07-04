@@ -32,6 +32,9 @@
 #include <pios_ppm_out.h>
 #include <oplinksettings.h>
 #include <taskinfo.h>
+#ifdef PIOS_INCLUDE_SERVO
+#include <pios_servo.h>
+#endif
 
 /*
  * Pull in the board-specific static HW definitions.
@@ -76,11 +79,9 @@ uint8_t *pios_uart_tx_buffer;
 
 uintptr_t pios_uavo_settings_fs_id;
 
+uint8_t servo_count = 0;
+
 // Forward definitions
-static void PIOS_InitUartMainPort();
-static void PIOS_InitUartFlexiPort();
-static void PIOS_InitPPMMainPort(bool input);
-static void PIOS_InitPPMFlexiPort(bool input);
 static void PIOS_Board_PPM_callback(const int16_t *channels);
 
 /**
@@ -232,16 +233,53 @@ void PIOS_Board_Init(void)
     bool is_oneway = (oplinkSettings.OneWay == OPLINKSETTINGS_ONEWAY_TRUE);
     bool ppm_only  = (oplinkSettings.PPMOnly == OPLINKSETTINGS_PPMONLY_TRUE);
     bool ppm_mode  = false;
+    bool servo_main = false;
+    bool servo_flexi = false;
     switch (oplinkSettings.MainPort) {
     case OPLINKSETTINGS_MAINPORT_TELEMETRY:
     case OPLINKSETTINGS_MAINPORT_SERIAL:
+    {
         /* Configure the main port for uart serial */
-        PIOS_InitUartMainPort();
+#ifndef PIOS_RFM22B_DEBUG_ON_TELEM
+        uint32_t pios_usart1_id;
+        if (PIOS_USART_Init(&pios_usart1_id, &pios_usart_serial_cfg)) {
+            PIOS_Assert(0);
+        }
+        PIOS_Assert(pios_uart_rx_buffer);
+        PIOS_Assert(pios_uart_tx_buffer);
+        if (PIOS_COM_Init(&pios_com_telem_uart_main_id, &pios_usart_com_driver, pios_usart1_id,
+                          pios_uart_rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
+                          pios_uart_tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
+            PIOS_Assert(0);
+        }
         PIOS_COM_TELEMETRY = PIOS_COM_TELEM_UART_MAIN;
+#endif
         break;
+    }
     case OPLINKSETTINGS_MAINPORT_PPM:
-        PIOS_InitPPMMainPort(is_coordinator);
+    {
+#if defined(PIOS_INCLUDE_PPM)
+        /* PPM input is configured on the coordinator modem and output on the remote modem. */
+        if (is_coordinator) {
+            uint32_t pios_ppm_id;
+            PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_main_cfg);
+            
+            if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
+                PIOS_Assert(0);
+            }
+        }
+        // For some reason, PPM output on the main port doesn't work.
+#if defined(PIOS_INCLUDE_PPM_OUT)
+        else {
+            PIOS_PPM_Out_Init(&pios_ppm_out_id, &pios_main_ppm_out_cfg);
+        }
+#endif /* PIOS_INCLUDE_PPM_OUT */
         ppm_mode = true;
+#endif /* PIOS_INCLUDE_PPM */
+        break;
+    }
+    case OPLINKSETTINGS_MAINPORT_PWM:
+        servo_main = true;
         break;
     case OPLINKSETTINGS_MAINPORT_DISABLED:
         break;
@@ -251,13 +289,44 @@ void PIOS_Board_Init(void)
     switch (oplinkSettings.FlexiPort) {
     case OPLINKSETTINGS_FLEXIPORT_TELEMETRY:
     case OPLINKSETTINGS_FLEXIPORT_SERIAL:
+    {
         /* Configure the flexi port as uart serial */
-        PIOS_InitUartFlexiPort();
+        uint32_t pios_usart3_id;
+
+        if (PIOS_USART_Init(&pios_usart3_id, &pios_usart_telem_flexi_cfg)) {
+            PIOS_Assert(0);
+        }
+        PIOS_Assert(pios_uart_rx_buffer);
+        PIOS_Assert(pios_uart_tx_buffer);
+        if (PIOS_COM_Init(&pios_com_telem_uart_flexi_id, &pios_usart_com_driver, pios_usart3_id,
+                          pios_uart_rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
+                          pios_uart_tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
+            PIOS_Assert(0);
+        }
         PIOS_COM_TELEMETRY = PIOS_COM_TELEM_UART_FLEXI;
         break;
+    }
     case OPLINKSETTINGS_FLEXIPORT_PPM:
-        PIOS_InitPPMFlexiPort(is_coordinator);
+    {
+#if defined(PIOS_INCLUDE_PPM)
+        /* PPM input is configured on the coordinator modem and output on the remote modem. */
+        if (is_coordinator) {
+            uint32_t pios_ppm_id;
+            PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_flexi_cfg);
+
+            if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
+                PIOS_Assert(0);
+            }
+        }
+        else {
+            PIOS_PPM_Out_Init(&pios_ppm_out_id, &pios_flexi_ppm_out_cfg);
+        }
+#endif /* PIOS_INCLUDE_PPM */
         ppm_mode = true;
+        break;
+    }
+    case OPLINKSETTINGS_FLEXIPORT_PWM:
+        servo_flexi = true;
         break;
     case OPLINKSETTINGS_FLEXIPORT_DISABLED:
         break;
@@ -271,6 +340,22 @@ void PIOS_Board_Init(void)
     case OPLINKSETTINGS_VCPPORT_DISABLED:
         break;
     }
+
+#if defined(PIOS_INCLUDE_SERVO)
+    if (servo_main) {
+        if (servo_flexi) {
+            servo_count = 4;
+            PIOS_Servo_Init(&pios_servo_main_flexi_cfg);
+        } else {
+            servo_count = 2;
+            PIOS_Servo_Init(&pios_servo_main_cfg);
+        }
+    } else if (servo_flexi) {
+        servo_count = 2;
+        PIOS_Servo_Init(&pios_servo_flexi_cfg);
+    }
+    ppm_mode = ppm_mode || (servo_count > 0);
+#endif
 
     // Initialize out status object.
     OPLinkStatusData oplinkStatus;
@@ -412,83 +497,22 @@ void PIOS_Board_Init(void)
     PIOS_GPIO_Init();
 }
 
-static void PIOS_InitUartMainPort()
-{
-#ifndef PIOS_RFM22B_DEBUG_ON_TELEM
-    uint32_t pios_usart1_id;
-    if (PIOS_USART_Init(&pios_usart1_id, &pios_usart_serial_cfg)) {
-        PIOS_Assert(0);
-    }
-    PIOS_Assert(pios_uart_rx_buffer);
-    PIOS_Assert(pios_uart_tx_buffer);
-    if (PIOS_COM_Init(&pios_com_telem_uart_main_id, &pios_usart_com_driver, pios_usart1_id,
-                      pios_uart_rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
-                      pios_uart_tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
-        PIOS_Assert(0);
-    }
-#endif
-}
-
-static void PIOS_InitUartFlexiPort()
-{
-    uint32_t pios_usart3_id;
-
-    if (PIOS_USART_Init(&pios_usart3_id, &pios_usart_telem_flexi_cfg)) {
-        PIOS_Assert(0);
-    }
-    PIOS_Assert(pios_uart_rx_buffer);
-    PIOS_Assert(pios_uart_tx_buffer);
-    if (PIOS_COM_Init(&pios_com_telem_uart_flexi_id, &pios_usart_com_driver, pios_usart3_id,
-                      pios_uart_rx_buffer, PIOS_COM_TELEM_RX_BUF_LEN,
-                      pios_uart_tx_buffer, PIOS_COM_TELEM_TX_BUF_LEN)) {
-        PIOS_Assert(0);
-    }
-}
-
-static void PIOS_InitPPMMainPort(bool input)
-{
-#if defined(PIOS_INCLUDE_PPM)
-    /* PPM input is configured on the coordinator modem and output on the remote modem. */
-    if (input) {
-        uint32_t pios_ppm_id;
-        PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_main_cfg);
-
-        if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
-            PIOS_Assert(0);
-        }
-    }
-    // For some reason, PPM output on the main port doesn't work.
-#endif /* PIOS_INCLUDE_PPM */
-}
-
-static void PIOS_InitPPMFlexiPort(bool input)
-{
-#if defined(PIOS_INCLUDE_PPM)
-    /* PPM input is configured on the coordinator modem and output on the remote modem. */
-    if (input) {
-        uint32_t pios_ppm_id;
-        PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_flexi_cfg);
-
-        if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
-            PIOS_Assert(0);
-        }
-    }
-#if defined(PIOS_INCLUDE_PPM_OUT)
-    else {
-        PIOS_PPM_Out_Init(&pios_ppm_out_id, &pios_ppm_out_cfg);
-    }
-#endif /* PIOS_INCLUDE_PPM_OUT */
-#endif /* PIOS_INCLUDE_PPM */
-}
-
 static void PIOS_Board_PPM_callback(const int16_t *channels)
 {
 #if defined(PIOS_INCLUDE_PPM) && defined(PIOS_INCLUDE_PPM_OUT)
     if (pios_ppm_out_id) {
         for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
-            PIOS_PPM_OUT_Set(PIOS_PPM_OUTPUT, i, channels[i]);
+            if (channels[i] != PIOS_RCVR_INVALID) {
+                PIOS_PPM_OUT_Set(PIOS_PPM_OUTPUT, i, channels[i]);
+            }
         }
     }
+#if defined(PIOS_INCLUDE_SERVO)
+    for (uint8_t i = 0; i < servo_count; ++i) {
+        uint16_t val = (channels[i] == PIOS_RCVR_INVALID) ? 0 : channels[i];
+        PIOS_Servo_Set(i, val);
+    }
+#endif /* PIOS_INCLUDE_SERVO */
 #endif /* PIOS_INCLUDE_PPM && PIOS_INCLUDE_PPM_OUT */
 }
 

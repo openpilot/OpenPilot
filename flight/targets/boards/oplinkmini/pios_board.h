@@ -250,6 +250,11 @@ extern uint32_t pios_ppm_out_id;
 #define PIOS_PPM_NUM_INPUTS          8
 
 // -------------------------
+// Receiver PWM inputs
+// -------------------------
+#define PIOS_PWM_NUM_INPUTS          4
+
+// -------------------------
 // Servo outputs
 // -------------------------
 #define PIOS_SERVO_UPDATE_HZ         50

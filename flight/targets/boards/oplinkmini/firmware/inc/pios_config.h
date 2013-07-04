@@ -87,7 +87,7 @@
 /* #define PIOS_INCLUDE_HCSR04 */
 
 /* PIOS receiver drivers */
-/* #define PIOS_INCLUDE_PWM */
+#define PIOS_INCLUDE_PWM
 #define PIOS_INCLUDE_PPM
 /* #define PIOS_INCLUDE_PPM_FLEXI */
 /* #define PIOS_INCLUDE_DSM */
@@ -101,7 +101,7 @@
 /* PIOS common peripherals */
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
-/* #define PIOS_INCLUDE_SERVO */
+#define PIOS_INCLUDE_SERVO
 /* #define PIOS_INCLUDE_I2C_ESC */
 /* #define PIOS_INCLUDE_OVERO */
 /* #define PIOS_OVERO_SPI */

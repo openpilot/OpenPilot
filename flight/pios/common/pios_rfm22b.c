@@ -77,7 +77,7 @@
 #define RFM22B_PPM_ONLY_DATARATE         RFM22_datarate_9600
 
 // The maximum amount of time without activity before initiating a reset.
-#define PIOS_RFM22B_SUPERVISOR_TIMEOUT   100  // ms
+#define PIOS_RFM22B_SUPERVISOR_TIMEOUT   150  // ms
 
 // this is too adjust the RF module so that it is on frequency
 #define OSC_LOAD_CAP                     0x7F  // cap = 12.5pf .. default
@@ -1905,13 +1905,11 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
         }
 
         if (good_packet || corrected_packet) {
-            bool valid_input_detected = false;
             for (uint8_t i = 0; i < RFM22B_PPM_NUM_CHANNELS; ++i) {
                 // Is this a valid channel?
                 if (p[0] & (1 << i)) {
                     uint32_t val = p[i + 1];
                     radio_dev->ppm[i]    = (uint16_t)(1000 + val * 900 / 256);
-                    valid_input_detected = true;
                 } else {
                     radio_dev->ppm[i] = PIOS_RCVR_INVALID;
                 }
@@ -1921,7 +1919,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
             data_len -= RFM22B_PPM_NUM_CHANNELS + 1;
 
             // Call the PPM received callback if it's available.
-            if (valid_input_detected && radio_dev->ppm_callback) {
+            if (radio_dev->ppm_callback) {
                 radio_dev->ppm_callback(radio_dev->ppm);
             }
         }
@@ -2214,7 +2212,6 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t ind
 
     // Are we switching to a new channel?
     if (idx != rfm22b_dev->channel_index) {
-        
         // If the on_sync_channel flag is set, it means that we were on the sync channel, but no packet was received, so transition to a non-connected state.
         if (!rfm22_isCoordinator(rfm22b_dev) && (rfm22b_dev->channel_index == 0) && rfm22b_dev->on_sync_channel) {
             rfm22b_dev->on_sync_channel = false;
@@ -2230,7 +2227,6 @@ static uint8_t rfm22_calcChannel(struct pios_rfm22b_dev *rfm22b_dev, uint8_t ind
 
             // Stay on the sync channel.
             idx = 0;
-
         } else if (idx == 0) {
             // If we're switching to the sync channel, set a flag that can be used to detect if a packet was received.
             rfm22b_dev->on_sync_channel = true;

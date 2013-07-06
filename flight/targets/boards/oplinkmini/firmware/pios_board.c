@@ -337,14 +337,14 @@ void PIOS_Board_Init(void)
     if (servo_main) {
         if (servo_flexi) {
             servo_count = 4;
-            PIOS_Servo_Init(&pios_servo_main_flexi_cfg);
+            PIOS_Servo_Init(&pios_servo_main_flexi_cfg, PIOS_SERVO_ENABLE_ALL);
         } else {
             servo_count = 2;
-            PIOS_Servo_Init(&pios_servo_main_cfg);
+            PIOS_Servo_Init(&pios_servo_main_cfg, PIOS_SERVO_ENABLE_ALL);
         }
     } else if (servo_flexi) {
         servo_count = 2;
-        PIOS_Servo_Init(&pios_servo_flexi_cfg);
+        PIOS_Servo_Init(&pios_servo_flexi_cfg, PIOS_SERVO_ENABLE_ALL);
     }
     ppm_mode = ppm_mode || (servo_count > 0);
 #endif

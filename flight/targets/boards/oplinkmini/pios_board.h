@@ -75,7 +75,9 @@
 #define PIOS_WDG_TELEMETRYRX  0x0002
 #define PIOS_WDG_RADIOTX      0x0004
 #define PIOS_WDG_RADIORX      0x0008
-#define PIOS_WDG_RFM22B       0x0016
+#define PIOS_WDG_RFM22B       0x000f
+#define PIOS_WDG_PPMINPUT     0x0010
+#define PIOS_WDG_SERIALRX     0x0020
 
 // ------------------------
 // TELEMETRY
@@ -246,6 +248,11 @@ extern uint32_t pios_ppm_out_id;
 // -------------------------
 #define PIOS_PPM_MAX_DEVS            1
 #define PIOS_PPM_NUM_INPUTS          8
+
+// -------------------------
+// Receiver PWM inputs
+// -------------------------
+#define PIOS_PWM_NUM_INPUTS          4
 
 // -------------------------
 // Servo outputs

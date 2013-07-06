@@ -2,12 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS RFM22B Receiver Input Functions
+ * @addtogroup   PIOS_PPM PPM Functions
+ * @brief PIOS interface to write to ppm port
  * @{
  *
- * @file       pios_rfm22b_rcvr.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      RFM22B Receiver Input functions header.
+ * @file       pios_ppm_out_priv.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
+ * @brief      ppm private structures.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -27,14 +28,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_RFM22B_RCVR_H
+#ifndef PIOS_PPM_OUT_H
+#define PIOS_PPM_OUT_H
 
-#define PIOS_RFM22B_RCVR_MAX_CHANNELS 12
+extern void PIOS_PPM_OUT_Set(uint32_t ppm_out_id, uint8_t servo, uint16_t position);
 
-extern const struct pios_rcvr_driver pios_rfm22b_rcvr_driver;
+#endif /* PIOS_PPM_H */
 
-extern int32_t PIOS_RFM22B_RCVR_Init(uint32_t rcvr_id);
-
-#define PIOS_RFM22B_RCVR_H
-
-#endif /* PIOS_RFM22B_RCVR_H */
+/**
+ * @}
+ * @}
+ */

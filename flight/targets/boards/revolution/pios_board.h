@@ -229,6 +229,7 @@ extern uint32_t pios_packet_handler;
 #define PIOS_RCVR_MAX_CHANNELS       12
 #define PIOS_GCSRCVR_TIMEOUT_MS      100
 #define PIOS_RFM22B_RCVR_TIMEOUT_MS  200
+#define PIOS_OPLINK_RCVR_TIMEOUT_MS  100
 
 // -------------------------
 // Receiver PPM input

@@ -36,18 +36,17 @@
 #include <uavobjectmanager.h>
 #include <oplinkstatus.h>
 #include "pios_rfm22b.h"
-#include "pios_rfm22b_rcvr.h"
+
+// ************************************
+
+#define RFM22B_MAX_PACKET_LEN                     64
+#define RFM22B_NUM_CHANNELS                       250
 
 // ************************************
 
 #define RFM22_DEVICE_VERSION_V2                   0x02
 #define RFM22_DEVICE_VERSION_A0                   0x04
 #define RFM22_DEVICE_VERSION_B1                   0x06
-
-// ************************************
-
-#define RFM22_MIN_CARRIER_FREQUENCY_HZ            240000000ul
-#define RFM22_MAX_CARRIER_FREQUENCY_HZ            930000000ul
 
 // ************************************
 
@@ -534,19 +533,12 @@ enum pios_rfm22b_dev_magic {
 enum pios_radio_state {
     RADIO_STATE_UNINITIALIZED,
     RADIO_STATE_INITIALIZING,
-    RADIO_STATE_REQUESTING_CONNECTION,
-    RADIO_STATE_ACCEPTING_CONNECTION,
     RADIO_STATE_RX_MODE,
     RADIO_STATE_RX_DATA,
     RADIO_STATE_RX_FAILURE,
-    RADIO_STATE_RECEIVING_STATUS,
     RADIO_STATE_TX_START,
     RADIO_STATE_TX_DATA,
     RADIO_STATE_TX_FAILURE,
-    RADIO_STATE_SENDING_ACK,
-    RADIO_STATE_SENDING_NACK,
-    RADIO_STATE_RECEIVING_ACK,
-    RADIO_STATE_RECEIVING_NACK,
     RADIO_STATE_TIMEOUT,
     RADIO_STATE_ERROR,
     RADIO_STATE_FATAL_ERROR,
@@ -559,16 +551,9 @@ enum pios_radio_event {
     RADIO_EVENT_INT_RECEIVED,
     RADIO_EVENT_INITIALIZE,
     RADIO_EVENT_INITIALIZED,
-    RADIO_EVENT_REQUEST_CONNECTION,
-    RADIO_EVENT_CONNECTION_REQUESTED,
-    RADIO_EVENT_PACKET_ACKED,
-    RADIO_EVENT_PACKET_NACKED,
-    RADIO_EVENT_ACK_TIMEOUT,
     RADIO_EVENT_RX_MODE,
     RADIO_EVENT_RX_COMPLETE,
-    RADIO_EVENT_STATUS_RECEIVED,
     RADIO_EVENT_TX_START,
-    RADIO_EVENT_FAILURE,
     RADIO_EVENT_TIMEOUT,
     RADIO_EVENT_ERROR,
     RADIO_EVENT_FATAL_ERROR,
@@ -602,14 +587,6 @@ typedef struct {
     int8_t   afc_correction;
     uint8_t  lastContact;
 } rfm22b_pair_stats;
-
-typedef struct {
-    uint32_t pairID;
-    OPLinkSettingsRemoteMainPortOptions  main_port;
-    OPLinkSettingsRemoteFlexiPortOptions flexi_port;
-    OPLinkSettingsRemoteVCPPortOptions   vcp_port;
-    OPLinkSettingsComSpeedOptions com_speed;
-} rfm22b_binding;
 
 enum pios_rfm22b_chip_power_state {
     RFM22B_IDLE_STATE    = 0x00,
@@ -683,27 +660,22 @@ typedef struct {
     rfm22b_int_status_2 int_status_2;
 } rfm22b_device_status;
 
-
 struct pios_rfm22b_dev {
     enum pios_rfm22b_dev_magic magic;
     struct pios_rfm22b_cfg     cfg;
 
     // The SPI bus information
-    uint32_t spi_id;
-    uint32_t slave_num;
+    uint32_t    spi_id;
+    uint32_t    slave_num;
+
+    // Should this modem ack as a coordinator.
+    bool        coordinator;
 
     // The device ID
-    uint32_t deviceID;
+    uint32_t    deviceID;
 
-    // The destination ID
-    uint32_t destination_id;
-
-    // The list of bound radios.
-    rfm22b_binding bindings[OPLINKSETTINGS_BINDINGS_NUMELEM];
-    uint8_t     cur_binding;
-
-    // Is this device a coordinator?
-    bool        coordinator;
+    // The coodinator ID (0 if this modem is a coordinator).
+    uint32_t    coordinatorID;
 
     // The task handle
     xTaskHandle taskHandle;
@@ -713,9 +685,6 @@ struct pios_rfm22b_dev {
 
     // ISR pending semaphore
     xSemaphoreHandle  isrPending;
-
-    // The com configuration callback
-    PIOS_RFM22B_ComConfigCallback com_config_cb;
 
     // The COM callback functions.
     pios_com_callback rx_in_cb;
@@ -755,11 +724,9 @@ struct pios_rfm22b_dev {
     int8_t   rssi_dBm;
 
     // The tx data packet
-    PHPacket data_packet;
+    uint8_t  tx_packet[RFM22B_MAX_PACKET_LEN];
     // The current tx packet
-    PHPacketHandle tx_packet;
-    // The previous tx packet (waiting for an ACK)
-    PHPacketHandle prev_tx_packet;
+    uint8_t  *tx_packet_handle;
     // The tx data read index
     uint16_t tx_data_rd;
     // The tx data write index
@@ -768,65 +735,52 @@ struct pios_rfm22b_dev {
     uint16_t tx_seq;
 
     // The rx data packet
-    PHPacket rx_packet;
+    uint8_t  rx_packet[RFM22B_MAX_PACKET_LEN];
     // The rx data packet
-    PHPacketHandle rx_packet_handle;
+    uint8_t  *rx_packet_handle;
     // The receive buffer write index
     uint16_t rx_buffer_wr;
     // The receive buffer write index
     uint16_t rx_packet_len;
 
-    // The status packet
-    PHStatusPacket  status_packet;
+    // The PPM buffer
+    int16_t  ppm[RFM22B_PPM_NUM_CHANNELS];
+    // The PPM packet received callback.
+    PPMReceivedCallback ppm_callback;
 
-    // The ACK/NACK packet
-    PHAckNackPacket ack_nack_packet;
+    // The id that the packet was received from
+    uint32_t     rx_destination_id;
+    // The maximum packet length (including header, etc.)
+    uint8_t      max_packet_len;
+    // The packet transmit time in ms.
+    uint8_t      packet_time;
+    // Do all packets originate from the coordinator modem?
+    bool         one_way_link;
+    // Should this modem send PPM data?
+    bool         ppm_send_mode;
+    // Should this modem receive PPM data?
+    bool         ppm_recv_mode;
+    // Are we sending / receiving only PPM data?
+    bool         ppm_only_mode;
 
-#ifdef PIOS_PPM_RECEIVER
-    // The PPM packet
-    PHPpmPacket ppm_packet;
-#endif
-
-    // The connection packet.
-    PHConnectionPacket con_packet;
-
-    // Send flags
-    bool         send_status;
-    bool         send_ppm;
-    bool         send_connection_request;
-    bool         send_ack_nack;
-    bool         resend_packet;
-
-    // The initial frequency
-    uint32_t     init_frequency;
+    // The channel list
+    uint8_t      channels[RFM22B_NUM_CHANNELS];
     // The number of frequency hopping channels.
-    uint16_t     num_channels;
-
+    uint8_t      num_channels;
     // The frequency hopping step size
     float        frequency_step_size;
     // current frequency hop channel
-    uint8_t      frequency_hop_channel;
+    uint8_t      channel;
+    // current frequency hop channel index
+    uint8_t      channel_index;
     // afc correction reading (in Hz)
     int8_t       afc_correction_Hz;
 
     // The packet timers.
     portTickType packet_start_ticks;
     portTickType tx_complete_ticks;
-    portTickType rx_complete_ticks;
     portTickType time_delta;
-
-    // The maximum time (ms) that it should take to transmit / receive a packet.
-    uint32_t     max_packet_time;
-
-    // The maximum time to wait for an ACK.
-    uint8_t      max_ack_delay;
-
-#ifdef PIOS_INCLUDE_RFM22B_RCVR
-    // The PPM channel values
-    uint16_t ppm_channel[PIOS_RFM22B_RCVR_MAX_CHANNELS];
-    uint32_t ppm_supv_timer;
-    bool     ppm_fresh;
-#endif
+    bool         on_sync_channel;
 };
 
 

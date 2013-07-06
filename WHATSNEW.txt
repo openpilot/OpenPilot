@@ -1,9 +1,25 @@
-2013-06-24
-Temporary disabled AltitudeHold and AltitudeVario flight modes. They were not
-officially supported. But since people expected well-known production quality
-behavior, it is better to make them final, then reenable.
+--- RELEASE-13.06.02 ---
 
---- RELEASE-13.06 --- Italian Stallion Release ---
+Refactoring of OPLink radio driver.  Auto-configuration was removed, and a
+one-way link was added, including a ppm-only mode that is intended to be used
+when only a PPM link is desired.  PPM-only mode configures the modem as a
+one-way link running at 9600 bps (air datarate) and only sends PPM packets.
+
+--- RELEASE-13.06.01 --- Italian Stallion Release ---
+It applies the following changes to previously not released to public RELEASE-13.06
+
+- Temporary disabled AltitudeHold and AltitudeVario flight modes. They were not
+officially supported. But since people expected well-known production quality
+behavior, it is better to make them final, then reenable
+- Fix windows hid connection failure if board was already connected and gcs started;
+- Fixed a bug that lead to disabled controls with some settings combination in CC/CC3D hardware page
+- Fixed a bug that prevent to correct saving stabilization settings for CC/CC3D
+- Fixes Uploader GUI and automatically close AutoUpdate panel after 7s
+
+JIRA issues addressed in this release:
+OP-1028 OP-1020 OP-1024  
+
+--- RELEASE-13.06 ---
 
 This is the first official OpenPilot Revolution software release. This version
 also supports the CopterControl, CC3D, OPLinkMini and the upcoming OP OSD.
@@ -138,14 +154,14 @@ KNOWN ISSUES:
   enabled, but you should properly calibrate them first. That's the reason
   why they are disabled by default.
 
-- AltitudeHold mode is enabled, but it is not officially supported. Do
+- AltitudeHold/Vario modes are enabled but not officially supported. Do
   not expect it to work perfectly and be considered production quality.
   You may play with it and report your issues and suggestions at your own
   risk. If you are not using a case for your Revo, we strongly recommend
   covering the barometer sensor with some foam to shield the sensor from
   wind and light.
 
-- Note that throttle stick in AltitudeHold mode is used to control vertical
+- Note that throttle stick in AltitudeVario mode is used to control vertical
   velocity, sometimes called vario altitude in other platforms, centre stick
   means hold altitude and there is a dead band around centre stick.
 

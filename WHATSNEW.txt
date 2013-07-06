@@ -1,3 +1,9 @@
+2013-07-05
+Refactoring of OPLink radio driver.  Auto-configuration was removed, and a
+one-way link was added, including a ppm-only mode that is intended to be used
+when only a PPM link is desired.  PPM-only mode configures the modem as a
+one-way link running at 9600 bps (air datarate) and only sends PPM packets.
+
 2013-06-24
 Temporary disabled AltitudeHold and AltitudeVario flight modes. They were not
 officially supported. But since people expected well-known production quality

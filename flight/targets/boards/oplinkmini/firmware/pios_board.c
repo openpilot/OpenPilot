@@ -124,6 +124,18 @@ void PIOS_Board_Init(void)
     PIOS_RTC_Init(&pios_rtc_main_cfg);
 #endif /* PIOS_INCLUDE_RTC */
 
+    /* IAP System Setup */
+    PIOS_IAP_Init();
+    // check for safe mode commands from gcs
+    if (PIOS_IAP_ReadBootCmd(0) == PIOS_IAP_CLEAR_FLASH_CMD_0 &&
+        PIOS_IAP_ReadBootCmd(1) == PIOS_IAP_CLEAR_FLASH_CMD_1 &&
+        PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2) {
+        PIOS_FLASHFS_Format(pios_uavo_settings_fs_id);
+        PIOS_IAP_WriteBootCmd(0, 0);
+        PIOS_IAP_WriteBootCmd(1, 0);
+        PIOS_IAP_WriteBootCmd(2, 0);
+    }
+
 #if defined(PIOS_INCLUDE_RFM22B)
     OPLinkSettingsInitialize();
     OPLinkStatusInitialize();
@@ -132,28 +144,6 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_LED)
     PIOS_LED_Init(&pios_led_cfg);
 #endif /* PIOS_INCLUDE_LED */
-
-    OPLinkSettingsData oplinkSettings;
-
-    /* IAP System Setup */
-    PIOS_IAP_Init();
-    // check for safe mode commands from gcs
-    if (PIOS_IAP_ReadBootCmd(0) == PIOS_IAP_CLEAR_FLASH_CMD_0 &&
-        PIOS_IAP_ReadBootCmd(1) == PIOS_IAP_CLEAR_FLASH_CMD_1 &&
-        PIOS_IAP_ReadBootCmd(2) == PIOS_IAP_CLEAR_FLASH_CMD_2) {
-        OPLinkSettingsGet(&oplinkSettings);
-        OPLinkSettingsSetDefaults(&oplinkSettings, 0);
-        OPLinkSettingsSet(&oplinkSettings);
-        // PIOS_EEPROM_Save((uint8_t*)&oplinkSettings, sizeof(OPLinkSettingsData));
-        for (uint32_t i = 0; i < 10; i++) {
-            PIOS_DELAY_WaitmS(100);
-            PIOS_LED_Toggle(PIOS_LED_HEARTBEAT);
-        }
-        PIOS_IAP_WriteBootCmd(0, 0);
-        PIOS_IAP_WriteBootCmd(1, 0);
-        PIOS_IAP_WriteBootCmd(2, 0);
-    }
-    OPLinkSettingsGet(&oplinkSettings);
 
     /* Initialize the delayed callback library */
     CallbackSchedulerInitialize();
@@ -229,6 +219,8 @@ void PIOS_Board_Init(void)
     pios_uart_tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_TELEM_TX_BUF_LEN);
 
     // Configure the main port
+    OPLinkSettingsData oplinkSettings;
+    OPLinkSettingsGet(&oplinkSettings);
     bool is_coordinator = (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
     bool is_oneway = (oplinkSettings.OneWay == OPLINKSETTINGS_ONEWAY_TRUE);
     bool ppm_only  = (oplinkSettings.PPMOnly == OPLINKSETTINGS_PPMONLY_TRUE);

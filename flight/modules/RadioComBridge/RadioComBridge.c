@@ -522,6 +522,7 @@ static void ProcessRadioStream(UAVTalkConnection inConnectionHandle, UAVTalkConn
         uint32_t objId = UAVTalkGetPacketObjId(inConnectionHandle);
         switch (objId) {
         case OPLINKSTATUS_OBJID:
+        case OPLINKSETTINGS_OBJID:
             break;
         case OPLINKRECEIVER_OBJID:
             UAVTalkReceiveObject(inConnectionHandle);

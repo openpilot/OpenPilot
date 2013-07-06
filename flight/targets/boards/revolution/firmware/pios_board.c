@@ -30,6 +30,10 @@
 #include <uavobjectsinit.h>
 #include <hwsettings.h>
 #include <manualcontrolsettings.h>
+#include <oplinksettings.h>
+#include <oplinkstatus.h>
+#include <oplinkreceiver.h>
+#include <pios_oplinkrcvr_priv.h>
 #include <taskinfo.h>
 
 /*
@@ -315,6 +319,17 @@ static void PIOS_Board_configure_ppm(const struct pios_ppm_cfg *ppm_cfg)
     pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_PPM] = pios_ppm_rcvr_id;
 }
 
+static void PIOS_Board_PPM_callback(const int16_t *channels)
+{
+    uint8_t max_chan = (RFM22B_PPM_NUM_CHANNELS < OPLINKRECEIVER_CHANNEL_NUMELEM) ? RFM22B_PPM_NUM_CHANNELS : OPLINKRECEIVER_CHANNEL_NUMELEM;
+    OPLinkReceiverData opl_rcvr;
+
+    for (uint8_t i = 0; i < max_chan; ++i) {
+        opl_rcvr.Channel[i] = channels[i];
+    }
+    OPLinkReceiverSet(&opl_rcvr);
+}
+
 /**
  * PIOS_Board_Init()
  * initializes all the core subsystems on this specific hardware
@@ -391,8 +406,12 @@ void PIOS_Board_Init(void)
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
-
     HwSettingsInitialize();
+#if defined(PIOS_INCLUDE_RFM22B)
+    OPLinkSettingsInitialize();
+    OPLinkStatusInitialize();
+#endif /* PIOS_INCLUDE_RFM22B */
+
     /* Initialize the alarms library */
     AlarmsInitialize();
 
@@ -704,25 +723,77 @@ void PIOS_Board_Init(void)
 
     /* Initalize the RFM22B radio COM device. */
 #if defined(PIOS_INCLUDE_RFM22B)
-    uint8_t hwsettings_radioport;
-    HwSettingsRadioPortGet(&hwsettings_radioport);
-    uint8_t hwsettings_maxrfpower;
-    HwSettingsMaxRFPowerGet(&hwsettings_maxrfpower);
-    uint32_t hwsettings_deffreq;
-    HwSettingsDefaultFrequencyGet(&hwsettings_deffreq);
-    switch (hwsettings_radioport) {
-    case HWSETTINGS_RADIOPORT_DISABLED:
-        break;
-    case HWSETTINGS_RADIOPORT_TELEMETRY:
-    {
+
+    /* Fetch the OPinkSettings object. */
+    OPLinkSettingsData oplinkSettings;
+    OPLinkSettingsGet(&oplinkSettings);
+
+    // Initialize out status object.
+    OPLinkStatusData oplinkStatus;
+    OPLinkStatusGet(&oplinkStatus);
+    oplinkStatus.BoardType     = bdinfo->board_type;
+    PIOS_BL_HELPER_FLASH_Read_Description(oplinkStatus.Description, OPLINKSTATUS_DESCRIPTION_NUMELEM);
+    PIOS_SYS_SerialNumberGetBinary(oplinkStatus.CPUSerial);
+    oplinkStatus.BoardRevision = bdinfo->board_rev;
+
+    /* Is the radio turned on? */
+    bool is_coordinator = (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
+    bool is_oneway = (oplinkSettings.OneWay == OPLINKSETTINGS_ONEWAY_TRUE);
+    bool ppm_mode  = (oplinkSettings.PPM == OPLINKSETTINGS_PPM_TRUE);
+    bool ppm_only  = (oplinkSettings.PPMOnly == OPLINKSETTINGS_PPMONLY_TRUE);
+    if (oplinkSettings.MaxRFPower != OPLINKSETTINGS_MAXRFPOWER_0) {
+        /* Configure the RFM22B device. */
         const struct pios_rfm22b_cfg *rfm22b_cfg = PIOS_BOARD_HW_DEFS_GetRfm22Cfg(bdinfo->board_rev);
         if (PIOS_RFM22B_Init(&pios_rfm22b_id, PIOS_RFM22_SPI_PORT, rfm22b_cfg->slave_num, rfm22b_cfg)) {
             PIOS_Assert(0);
         }
 
-        // Set the modem parameters and reinitilize the modem.
-        PIOS_RFM22B_SetInitialFrequency(pios_rfm22b_id, hwsettings_deffreq);
-        switch (hwsettings_maxrfpower) {
+        /* Configure the radio com interface */
+        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
+        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
+        PIOS_Assert(rx_buffer);
+        PIOS_Assert(tx_buffer);
+        if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_rfm22b_com_driver, pios_rfm22b_id,
+                          rx_buffer, PIOS_COM_RFM22B_RF_RX_BUF_LEN,
+                          tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
+            PIOS_Assert(0);
+        }
+        oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_ENABLED;
+
+        // Set the RF data rate on the modem to ~2X the selected buad rate because the modem is half duplex.
+        enum rfm22b_datarate datarate = RFM22_datarate_64000;
+        switch (oplinkSettings.ComSpeed) {
+        case OPLINKSETTINGS_COMSPEED_4800:
+            datarate = RFM22_datarate_9600;
+            break;
+        case OPLINKSETTINGS_COMSPEED_9600:
+            datarate = RFM22_datarate_19200;
+            break;
+        case OPLINKSETTINGS_COMSPEED_19200:
+            datarate = RFM22_datarate_32000;
+            break;
+        case OPLINKSETTINGS_COMSPEED_38400:
+            datarate = RFM22_datarate_64000;
+            break;
+        case OPLINKSETTINGS_COMSPEED_57600:
+            datarate = RFM22_datarate_100000;
+            break;
+        case OPLINKSETTINGS_COMSPEED_115200:
+            datarate = RFM22_datarate_192000;
+            break;
+        }
+
+        /* Set the radio configuration parameters. */
+        PIOS_RFM22B_SetChannelConfig(pios_rfm22b_id, datarate, oplinkSettings.MinChannel, oplinkSettings.MaxChannel, oplinkSettings.ChannelSet, is_coordinator, is_oneway, ppm_mode, ppm_only);
+        PIOS_RFM22B_SetCoordinatorID(pios_rfm22b_id, oplinkSettings.CoordID);
+
+        /* Set the PPM callback if we should be receiving PPM. */
+        if (ppm_mode) {
+            PIOS_RFM22B_SetPPMCallback(pios_rfm22b_id, PIOS_Board_PPM_callback);
+        }
+
+        /* Set the modem Tx poer level */
+        switch (oplinkSettings.MaxRFPower) {
         case OPLINKSETTINGS_MAXRFPOWER_125:
             PIOS_RFM22B_SetTxPower(pios_rfm22b_id, RFM22_tx_pwr_txpow_0);
             break;
@@ -751,32 +822,14 @@ void PIOS_Board_Init(void)
             // do nothing
             break;
         }
-        PIOS_RFM22B_Reinit(pios_rfm22b_id);
 
-#ifdef PIOS_INCLUDE_RFM22B_COM
-        uint8_t *rx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_RX_BUF_LEN);
-        uint8_t *tx_buffer = (uint8_t *)pvPortMalloc(PIOS_COM_RFM22B_RF_TX_BUF_LEN);
-        PIOS_Assert(rx_buffer);
-        PIOS_Assert(tx_buffer);
-        if (PIOS_COM_Init(&pios_com_telem_rf_id, &pios_rfm22b_com_driver, pios_rfm22b_id,
-                          rx_buffer, PIOS_COM_RFM22B_RF_RX_BUF_LEN,
-                          tx_buffer, PIOS_COM_RFM22B_RF_TX_BUF_LEN)) {
-            PIOS_Assert(0);
-        }
-#endif
-#ifdef PIOS_INCLUDE_RFM22B_RCVR
-        if (PIOS_RFM22B_RCVR_Init(pios_rfm22b_id) != 0) {
-            PIOS_Assert(0);
-        }
-        uint32_t pios_rfm22b_rcvr_id;
-        if (PIOS_RCVR_Init(&pios_rfm22b_rcvr_id, &pios_rfm22b_rcvr_driver, pios_rfm22b_id)) {
-            PIOS_Assert(0);
-        }
-        pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_OPLINK] = pios_rfm22b_rcvr_id;
-#endif
-        break;
+        /* Reinitialize the modem. */
+        PIOS_RFM22B_Reinit(pios_rfm22b_id);
+    } else {
+        oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_DISABLED;
     }
-    }
+
+    OPLinkStatusSet(&oplinkStatus);
 #endif /* PIOS_INCLUDE_RFM22B */
 
 #if defined(PIOS_INCLUDE_PWM) || defined(PIOS_INCLUDE_PWM)
@@ -834,6 +887,19 @@ void PIOS_Board_Init(void)
     }
     pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_GCS] = pios_gcsrcvr_rcvr_id;
 #endif /* PIOS_INCLUDE_GCSRCVR */
+
+#if defined(PIOS_INCLUDE_OPLINKRCVR)
+    {
+        OPLinkReceiverInitialize();
+        uint32_t pios_oplinkrcvr_id;
+        PIOS_OPLinkRCVR_Init(&pios_oplinkrcvr_id);
+        uint32_t pios_oplinkrcvr_rcvr_id;
+        if (PIOS_RCVR_Init(&pios_oplinkrcvr_rcvr_id, &pios_oplinkrcvr_rcvr_driver, pios_oplinkrcvr_id)) {
+            PIOS_Assert(0);
+        }
+        pios_rcvr_group_map[MANUALCONTROLSETTINGS_CHANNELGROUPS_OPLINK] = pios_oplinkrcvr_rcvr_id;
+    }
+#endif /* PIOS_INCLUDE_OPLINKRCVR */
 
 #ifndef PIOS_ENABLE_DEBUG_PINS
     // pios_servo_cfg points to the correct configuration based on input port settings

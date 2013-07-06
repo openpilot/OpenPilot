@@ -87,12 +87,13 @@
 /* #define PIOS_INCLUDE_HCSR04 */
 
 /* PIOS receiver drivers */
-/* #define PIOS_INCLUDE_PWM */
+#define PIOS_INCLUDE_PWM
 #define PIOS_INCLUDE_PPM
 /* #define PIOS_INCLUDE_PPM_FLEXI */
 /* #define PIOS_INCLUDE_DSM */
 /* #define PIOS_INCLUDE_SBUS */
-#define PIOS_INCLUDE_GCSRCVR
+/* #define PIOS_INCLUDE_GCSRCVR */
+/* #define PIOS_INCLUDE_OPLINKRCVR */
 
 /* PIOS abstract receiver interface */
 #define PIOS_INCLUDE_RCVR
@@ -100,7 +101,7 @@
 /* PIOS common peripherals */
 #define PIOS_INCLUDE_LED
 #define PIOS_INCLUDE_IAP
-/* #define PIOS_INCLUDE_SERVO */
+#define PIOS_INCLUDE_SERVO
 /* #define PIOS_INCLUDE_I2C_ESC */
 /* #define PIOS_INCLUDE_OVERO */
 /* #define PIOS_OVERO_SPI */
@@ -115,7 +116,6 @@
 /* PIOS radio modules */
 #define PIOS_INCLUDE_RFM22B
 #define PIOS_INCLUDE_RFM22B_COM
-/* #define PIOS_INCLUDE_RFM22B_RCVR */
 #define PIOS_INCLUDE_PPM_OUT
 /* #define PIOS_RFM22B_DEBUG_ON_TELEM */
 

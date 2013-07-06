@@ -1,3 +1,10 @@
+--- RELEASE-13.06.02 ---
+
+Refactoring of OPLink radio driver.  Auto-configuration was removed, and a
+one-way link was added, including a ppm-only mode that is intended to be used
+when only a PPM link is desired.  PPM-only mode configures the modem as a
+one-way link running at 9600 bps (air datarate) and only sends PPM packets.
+
 --- RELEASE-13.06.01 --- Italian Stallion Release ---
 It applies the following changes to previously not released to public RELEASE-13.06
 

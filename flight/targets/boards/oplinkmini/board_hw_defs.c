@@ -491,7 +491,7 @@ static const struct pios_tim_channel pios_tim_all_port_pins[] = {
 
 static const struct pios_tim_channel pios_tim_main_port_ppm = {
     .timer = TIM1,
-    .timer_chan = TIM_Channel_3,
+    .timer_chan         = TIM_Channel_3,
     .pin   = {
         .gpio = GPIOA,
         .init = {
@@ -504,7 +504,7 @@ static const struct pios_tim_channel pios_tim_main_port_ppm = {
 
 static const struct pios_tim_channel pios_tim_flexi_port_ppm = {
     .timer = TIM2,
-    .timer_chan = TIM_Channel_4,
+    .timer_chan         = TIM_Channel_4,
     .pin   = {
         .gpio = GPIOB,
         .init = {
@@ -513,7 +513,7 @@ static const struct pios_tim_channel pios_tim_flexi_port_ppm = {
             .GPIO_Speed = GPIO_Speed_2MHz,
         },
     },
-    .remap = GPIO_PartialRemap2_TIM2,
+    .remap              = GPIO_PartialRemap2_TIM2,
 };
 
 #endif /* PIOS_INCLUDE_TIM */

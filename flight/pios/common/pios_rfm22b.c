@@ -1909,7 +1909,7 @@ static enum pios_radio_event radio_receivePacket(struct pios_rfm22b_dev *radio_d
                 // Is this a valid channel?
                 if (p[0] & (1 << i)) {
                     uint32_t val = p[i + 1];
-                    radio_dev->ppm[i]    = (uint16_t)(1000 + val * 900 / 256);
+                    radio_dev->ppm[i] = (uint16_t)(1000 + val * 900 / 256);
                 } else {
                     radio_dev->ppm[i] = PIOS_RCVR_INVALID;
                 }

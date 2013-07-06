@@ -222,10 +222,10 @@ void PIOS_Board_Init(void)
     OPLinkSettingsData oplinkSettings;
     OPLinkSettingsGet(&oplinkSettings);
     bool is_coordinator = (oplinkSettings.Coordinator == OPLINKSETTINGS_COORDINATOR_TRUE);
-    bool is_oneway = (oplinkSettings.OneWay == OPLINKSETTINGS_ONEWAY_TRUE);
-    bool ppm_only  = (oplinkSettings.PPMOnly == OPLINKSETTINGS_PPMONLY_TRUE);
-    bool ppm_mode  = false;
-    bool servo_main = false;
+    bool is_oneway   = (oplinkSettings.OneWay == OPLINKSETTINGS_ONEWAY_TRUE);
+    bool ppm_only    = (oplinkSettings.PPMOnly == OPLINKSETTINGS_PPMONLY_TRUE);
+    bool ppm_mode    = false;
+    bool servo_main  = false;
     bool servo_flexi = false;
     switch (oplinkSettings.MainPort) {
     case OPLINKSETTINGS_MAINPORT_TELEMETRY:
@@ -255,7 +255,7 @@ void PIOS_Board_Init(void)
         if (is_coordinator) {
             uint32_t pios_ppm_id;
             PIOS_PPM_Init(&pios_ppm_id, &pios_ppm_main_cfg);
-            
+
             if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
                 PIOS_Assert(0);
             }
@@ -309,8 +309,7 @@ void PIOS_Board_Init(void)
             if (PIOS_RCVR_Init(&pios_ppm_rcvr_id, &pios_ppm_rcvr_driver, pios_ppm_id)) {
                 PIOS_Assert(0);
             }
-        }
-        else {
+        } else {
             PIOS_PPM_Out_Init(&pios_ppm_out_id, &pios_flexi_ppm_out_cfg);
         }
 #endif /* PIOS_INCLUDE_PPM */

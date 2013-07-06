@@ -169,7 +169,7 @@ extern int32_t PIOS_PPM_Init(uint32_t *ppm_id, const struct pios_ppm_cfg *cfg)
     }
 
     uint32_t tim_id;
-    if (PIOS_TIM_InitChannels(&tim_id, cfg->channels, cfg->num_channels, &tim_callbacks, (uint32_t)ppm_dev)) {
+    if (PIOS_TIM_InitChannels(&tim_id, cfg->channels, cfg->num_channels, 0xffff, &tim_callbacks, (uint32_t)ppm_dev)) {
         return -1;
     }
 

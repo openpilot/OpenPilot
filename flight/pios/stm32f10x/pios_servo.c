@@ -37,51 +37,62 @@
 
 /* Private Function Prototypes */
 
-static const struct pios_servo_cfg *servo_cfg;
+struct pios_servo_dev {
+    const struct pios_servo_cfg *cfg;
+    uint32_t enable_mask;
+};
+
+struct pios_servo_dev *pios_servo_dev;
 
 /**
  * Initialise Servos
  */
-int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg)
+int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg, uint32_t enable_mask)
 {
     uint32_t tim_id;
 
-    if (PIOS_TIM_InitChannels(&tim_id, cfg->channels, cfg->num_channels, NULL, 0)) {
+    PIOS_Assert(cfg);
+    if (PIOS_TIM_InitChannels(&tim_id, cfg->channels, cfg->num_channels, enable_mask, NULL, 0)) {
         return -1;
     }
+    // Traps multiple initializations
+    PIOS_Assert(!pios_servo_dev);
+    pios_servo_dev =(struct pios_servo_dev*) pvPortMalloc(sizeof(struct pios_servo_dev));
 
     /* Store away the requested configuration */
-    servo_cfg = cfg;
+    pios_servo_dev->cfg = cfg;
+    pios_servo_dev->enable_mask = enable_mask;
 
     /* Configure the channels to be in output compare mode */
     for (uint8_t i = 0; i < cfg->num_channels; i++) {
-        const struct pios_tim_channel *chan = &cfg->channels[i];
+        if(BitCheck(enable_mask, i)) {
+            const struct pios_tim_channel *chan = &cfg->channels[i];
 
-        /* Set up for output compare function */
-        switch (chan->timer_chan) {
-        case TIM_Channel_1:
-            TIM_OC1Init(chan->timer, &cfg->tim_oc_init);
-            TIM_OC1PreloadConfig(chan->timer, TIM_OCPreload_Enable);
-            break;
-        case TIM_Channel_2:
-            TIM_OC2Init(chan->timer, &cfg->tim_oc_init);
-            TIM_OC2PreloadConfig(chan->timer, TIM_OCPreload_Enable);
-            break;
-        case TIM_Channel_3:
-            TIM_OC3Init(chan->timer, &cfg->tim_oc_init);
-            TIM_OC3PreloadConfig(chan->timer, TIM_OCPreload_Enable);
-            break;
-        case TIM_Channel_4:
-            TIM_OC4Init(chan->timer, &cfg->tim_oc_init);
-            TIM_OC4PreloadConfig(chan->timer, TIM_OCPreload_Enable);
-            break;
+            /* Set up for output compare function */
+            switch (chan->timer_chan) {
+            case TIM_Channel_1:
+                TIM_OC1Init(chan->timer, &cfg->tim_oc_init);
+                TIM_OC1PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+                break;
+            case TIM_Channel_2:
+                TIM_OC2Init(chan->timer, &cfg->tim_oc_init);
+                TIM_OC2PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+                break;
+            case TIM_Channel_3:
+                TIM_OC3Init(chan->timer, &cfg->tim_oc_init);
+                TIM_OC3PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+                break;
+            case TIM_Channel_4:
+                TIM_OC4Init(chan->timer, &cfg->tim_oc_init);
+                TIM_OC4PreloadConfig(chan->timer, TIM_OCPreload_Enable);
+                break;
+            }
+
+            TIM_ARRPreloadConfig(chan->timer, ENABLE);
+            TIM_CtrlPWMOutputs(chan->timer, ENABLE);
+            TIM_Cmd(chan->timer, ENABLE);
         }
-
-        TIM_ARRPreloadConfig(chan->timer, ENABLE);
-        TIM_CtrlPWMOutputs(chan->timer, ENABLE);
-        TIM_Cmd(chan->timer, ENABLE);
     }
-
     return 0;
 }
 
@@ -90,32 +101,34 @@ int32_t PIOS_Servo_Init(const struct pios_servo_cfg *cfg)
  * \param[in] array of rates in Hz
  * \param[in] maximum number of banks
  */
-void PIOS_Servo_SetHz(const uint16_t *speeds, uint8_t banks)
+void PIOS_Servo_SetHz(const uint16_t *update_rates, uint8_t banks)
 {
-    if (!servo_cfg) {
+    if (!pios_servo_dev) {
         return;
     }
-
-    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = servo_cfg->tim_base_init;
+    TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure = pios_servo_dev->cfg->tim_base_init;
     TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
     TIM_TimeBaseStructure.TIM_CounterMode   = TIM_CounterMode_Up;
     TIM_TimeBaseStructure.TIM_Prescaler     = (PIOS_MASTER_CLOCK / 1000000) - 1;
 
     uint8_t set = 0;
 
-    for (uint8_t i = 0; (i < servo_cfg->num_channels) && (set < banks); i++) {
-        bool new = true;
-        const struct pios_tim_channel *chan = &servo_cfg->channels[i];
+    for (uint8_t i = 0; (i < pios_servo_dev->cfg->num_channels) && (set < banks); i++) {
+        if(BitCheck(pios_servo_dev->enable_mask, i)) {
+            bool new = true;
+            const struct pios_tim_channel *chan = &pios_servo_dev->cfg->channels[i];
 
-        /* See if any previous channels use that same timer */
-        for (uint8_t j = 0; (j < i) && new; j++) {
-            new &= chan->timer != servo_cfg->channels[j].timer;
-        }
+            /* See if any previous channels use that same timer */
+            for (uint8_t j = 0; (j < i) && new; j++) {
+                new &= !BitCheck(pios_servo_dev->enable_mask, j) ||
+                        (chan->timer != pios_servo_dev->cfg->channels[j].timer);
+            }
 
-        if (new) {
-            TIM_TimeBaseStructure.TIM_Period = ((1000000 / speeds[set]) - 1);
-            TIM_TimeBaseInit(chan->timer, &TIM_TimeBaseStructure);
-            set++;
+            if (new) {
+                TIM_TimeBaseStructure.TIM_Period = ((PIOS_SERVO_TIMER_CLOCK / update_rates[set]) - 1);
+                TIM_TimeBaseInit(chan->timer, &TIM_TimeBaseStructure);
+                set++;
+            }
         }
     }
 }
@@ -127,13 +140,13 @@ void PIOS_Servo_SetHz(const uint16_t *speeds, uint8_t banks)
  */
 void PIOS_Servo_Set(uint8_t servo, uint16_t position)
 {
-    /* Make sure servo exists */
-    if (!servo_cfg || servo >= servo_cfg->num_channels) {
+    /* Make sure servo exists and is enabled */
+    if (!pios_servo_dev || servo >= pios_servo_dev->cfg->num_channels || !BitCheck(pios_servo_dev->enable_mask, position)) {
         return;
     }
 
     /* Update the position */
-    const struct pios_tim_channel *chan = &servo_cfg->channels[servo];
+    const struct pios_tim_channel *chan = &pios_servo_dev->cfg->channels[servo];
     switch (chan->timer_chan) {
     case TIM_Channel_1:
         TIM_SetCompare1(chan->timer, position);

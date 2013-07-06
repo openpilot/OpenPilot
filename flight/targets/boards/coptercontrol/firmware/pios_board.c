@@ -758,7 +758,7 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_PWM)
         {
             uint32_t pios_pwm_id;
-            PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
+            PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg,0xFFFF);
 
             uint32_t pios_pwm_rcvr_id;
             if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
@@ -800,7 +800,7 @@ void PIOS_Board_Init(void)
 #if defined(PIOS_INCLUDE_PWM)
         {
             uint32_t pios_pwm_id;
-            PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_with_ppm_cfg);
+            PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_with_ppm_cfg, 0xFFFF);
 
             uint32_t pios_pwm_rcvr_id;
             if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
@@ -832,11 +832,11 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_CC_RCVRPORT_PWM:
     case HWSETTINGS_CC_RCVRPORT_PPM:
     case HWSETTINGS_CC_RCVRPORT_PPMPWM:
-        PIOS_Servo_Init(&pios_servo_cfg);
+        PIOS_Servo_Init(&pios_servo_cfg,0xFFFF);
         break;
     case HWSETTINGS_CC_RCVRPORT_PPMOUTPUTS:
     case HWSETTINGS_CC_RCVRPORT_OUTPUTS:
-        PIOS_Servo_Init(&pios_servo_rcvr_cfg);
+        PIOS_Servo_Init(&pios_servo_rcvr_cfg, 0xFFFF);
         break;
     }
 #else

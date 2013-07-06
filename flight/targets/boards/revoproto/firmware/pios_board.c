@@ -832,7 +832,7 @@ void PIOS_Board_Init(void)
         {
             /* Set up the receiver port.  Later this should be optional */
             uint32_t pios_pwm_id;
-            PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg);
+            PIOS_PWM_Init(&pios_pwm_id, &pios_pwm_cfg, PIOS_SERVO_ENABLE_ALL);
 
             uint32_t pios_pwm_rcvr_id;
             if (PIOS_RCVR_Init(&pios_pwm_rcvr_id, &pios_pwm_rcvr_driver, pios_pwm_id)) {
@@ -911,13 +911,13 @@ void PIOS_Board_Init(void)
     case HWSETTINGS_RV_RCVRPORT_PWM:
     case HWSETTINGS_RV_RCVRPORT_PPM:
         /* Set up the servo outputs */
-        PIOS_Servo_Init(&pios_servo_cfg);
+        PIOS_Servo_Init(&pios_servo_cfg, PIOS_SERVO_ENABLE_ALL);
         break;
     case HWSETTINGS_RV_RCVRPORT_PPMOUTPUTS:
     case HWSETTINGS_RV_RCVRPORT_OUTPUTS:
         // PIOS_Servo_Init(&pios_servo_rcvr_cfg);
         // TODO: Prepare the configurations on board_hw_defs and handle here:
-        PIOS_Servo_Init(&pios_servo_cfg);
+        PIOS_Servo_Init(&pios_servo_cfg, PIOS_SERVO_ENABLE_ALL);
         break;
     }
 #else

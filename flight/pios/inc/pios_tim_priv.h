@@ -22,6 +22,8 @@ struct pios_tim_callbacks {
     void (*edge)(uint32_t tim_id, uint32_t context, uint8_t chan_idx, uint16_t count);
 };
 
+#define PIOS_TIM_ENABLE_ALL 0xFFFFFFFF
+
 extern int32_t PIOS_TIM_InitClock(const struct pios_tim_clock_cfg *cfg);
 extern int32_t PIOS_TIM_InitChannels(uint32_t *tim_id, const struct pios_tim_channel *channels, uint8_t num_channels, uint32_t enable_mask, const struct pios_tim_callbacks *callbacks, uint32_t context);
 

@@ -463,7 +463,7 @@ void PIOS_Board_Init(void)
 
 #if defined(PIOS_INCLUDE_VIDEO)
     PIOS_TIM_InitClock(&tim_8_cfg);
-    PIOS_Servo_Init(&pios_servo_cfg);
+    PIOS_Servo_Init(&pios_servo_cfg, PIOS_SERVO_ENABLE_ALL);
     // Start the pixel and line clock counter
     // PIOS_TIM_InitClock(&pios_tim4_cfg);
     PIOS_Video_Init(&pios_video_cfg);

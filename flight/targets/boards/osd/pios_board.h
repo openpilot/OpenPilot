@@ -148,6 +148,12 @@
 
 #define STOPWATCH_TIMER					TIM4*/
 
+// -------------------------
+// Servo outputs
+// -------------------------
+#define PIOS_SERVO_TIMER_CLOCK  1000000
+
+
 // ------------------------
 // PIOS_SPI
 // See also pios_board.c

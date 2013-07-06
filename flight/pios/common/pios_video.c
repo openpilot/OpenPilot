@@ -181,7 +181,7 @@ static void reset_hsync_timers()
     // all the memory but somehow leaving it out breaks the timer functionality.
     // I do not see how these can be related
     if (failcount == 0) {
-        if (PIOS_TIM_InitChannels(&tim_id, channels, 1, &px_callback, 0) < 0) {
+        if (PIOS_TIM_InitChannels(&tim_id, channels, 1,PIOS_TIM_ENABLE_ALL, &px_callback, 0) < 0) {
             failcount++;
         }
     }
@@ -214,11 +214,11 @@ static void configure_hsync_timers()
 
     // Init the channel to output the pixel clock
     channels = &dev_cfg->pixel_timer;
-    PIOS_TIM_InitChannels(&tim_id, channels, 1, &px_callback, 0);
+    PIOS_TIM_InitChannels(&tim_id, channels, 1, PIOS_TIM_ENABLE_ALL, &px_callback, 0);
 
     // Init the channel to capture the pulse
     channels = &dev_cfg->hsync_capture;
-    PIOS_TIM_InitChannels(&tim_id, channels, 1, &px_callback, 0);
+    PIOS_TIM_InitChannels(&tim_id, channels, 1, PIOS_TIM_ENABLE_ALL, &px_callback, 0);
 
     // Configure the input capture channel
     TIM_ICInitTypeDef TIM_ICInitStructure;

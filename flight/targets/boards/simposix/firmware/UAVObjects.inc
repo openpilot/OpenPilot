@@ -95,6 +95,7 @@ UAVOBJSRCFILENAMES += receiveractivity
 UAVOBJSRCFILENAMES += cameradesired
 UAVOBJSRCFILENAMES += camerastabsettings
 UAVOBJSRCFILENAMES += altitudeholdsettings 
+UAVOBJSRCFILENAMES += altitudefiltersettings 
 UAVOBJSRCFILENAMES += revosettings
 UAVOBJSRCFILENAMES += altitudeholddesired
 UAVOBJSRCFILENAMES += ekfconfiguration

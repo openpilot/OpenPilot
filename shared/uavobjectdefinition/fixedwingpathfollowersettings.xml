@@ -3,20 +3,14 @@
         <description>Settings for the @ref FixedWingPathFollowerModule</description>
 
         <!-- these coefficients control desired movement in airspace -->
-        <field name="AirSpeedMax" units="m/s" type="float" elements="1" defaultvalue="30"/>
-                <!-- Vne, i.e. maximum airspeed the airframe can handle -->
-        <field name="CruiseSpeed" units="m/s" type="float" elements="1" defaultvalue="20"/>
+        <field name="HorizontalVelMax" units="m/s" type="float" elements="1" defaultvalue="20"/>
                 <!-- Maximum speed the autopilot will try to achieve, usually for long distances -->
-        <field name="BestClimbRateSpeed" units="m/s" type="float" elements="1" defaultvalue="10"/>
+        <field name="HorizontalVelMin" units="m/s" type="float" elements="1" defaultvalue="10"/>
                 <!-- V_y, Minimum speed the autopilot will try to fly, for example when loitering -->
-        <field name="StallSpeedClean" units="m/s" type="float" elements="1" defaultvalue="8"/>
-                <!-- Vs1, i.e. stall speed in clean configuration- leave some safety margin -->
-        <field name="StallSpeedDirty" units="m/s" type="float" elements="1" defaultvalue="8"/>
-                <!-- Vs0, i.e. stall speed with flaps and landing gear deployed - leave some safety margin -->
         <field name="VerticalVelMax" units="m/s" type="float" elements="1" defaultvalue="10"/>
                 <!-- maximum allowed climb or sink rate in guided flight-->
 
-        <field name="HeadingFeedForward" units="s" type="float" elements="1" defaultvalue="3.0"/>
+        <field name="CourseFeedForward" units="s" type="float" elements="1" defaultvalue="3.0"/>
                 <!-- how many seconds to plan the flight vector ahead when initiating necessary heading changes - increase for planes with sluggish response -->
 
         <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
@@ -25,7 +19,7 @@
                 <!-- proportional coefficient for desired vertical speed in relation to altitude displacement-->
 
         <!-- these coefficients control actual control outputs -->
-        <field name="BearingPI" units="deg/deg" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.2, 0, 0"/>
+        <field name="CoursePI" units="deg/deg" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.2, 0, 0"/>
                 <!-- coefficients for desired bank angle in relation to ground bearing error - this controls heading -->
 
         <field name="SpeedPI" units="deg / (m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="1.5, .15, 20"/>

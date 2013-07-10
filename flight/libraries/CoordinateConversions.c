@@ -35,23 +35,29 @@
 #define MIN_ALLOWABLE_MAGNITUDE 1e-30f
 
 // ****** convert Lat,Lon,Alt to ECEF  ************
-void LLA2ECEF(float LLA[3], double ECEF[3])
+void LLA2ECEF(int32_t LLAi[3], double ECEF[3])
 {
-    const double a = 6378137.0d; // Equatorial Radius
-    const double e = 8.1819190842622e-2d; // Eccentricity
+    const double a  = 6378137.0d; // Equatorial Radius
+    const double e  = 8.1819190842622e-2d; // Eccentricity
+    const double e2 = e * e; // Eccentricity squared
     double sinLat, sinLon, cosLat, cosLon;
     double N;
+    double LLA[3]   = {
+        (double)LLAi[0] * 1e-7d,
+        (double)LLAi[1] * 1e-7d,
+        (double)LLAi[2] * 1e-4d
+    };
 
-    sinLat = sin(DEG2RAD(LLA[0]));
-    sinLon = sin(DEG2RAD(LLA[1]));
-    cosLat = cos(DEG2RAD(LLA[0]));
-    cosLon = cos(DEG2RAD(LLA[1]));
+    sinLat = sin(DEG2RAD_D(LLA[0]));
+    sinLon = sin(DEG2RAD_D(LLA[1]));
+    cosLat = cos(DEG2RAD_D(LLA[0]));
+    cosLon = cos(DEG2RAD_D(LLA[1]));
 
-    N = a / sqrt(1.0d - e * e * sinLat * sinLat); // prime vertical radius of curvature
+    N = a / sqrt(1.0d - e2 * sinLat * sinLat); // prime vertical radius of curvature
 
-    ECEF[0] = (N + (double)LLA[2]) * cosLat * cosLon;
-    ECEF[1] = (N + (double)LLA[2]) * cosLat * sinLon;
-    ECEF[2] = ((1 - e * e) * N + (double)LLA[2]) * sinLat;
+    ECEF[0] = (N + LLA[2]) * cosLat * cosLon;
+    ECEF[1] = (N + LLA[2]) * cosLat * sinLon;
+    ECEF[2] = ((1.0d - e2) * N + LLA[2]) * sinLat;
 }
 
 // ****** convert ECEF to Lat,Lon,Alt (ITERATIVE!) *********
@@ -100,14 +106,14 @@ uint16_t ECEF2LLA(double ECEF[3], float LLA[3])
 }
 
 // ****** find ECEF to NED rotation matrix ********
-void RneFromLLA(float LLA[3], double Rne[3][3])
+void RneFromLLA(int32_t LLAi[3], float Rne[3][3])
 {
-    double sinLat, sinLon, cosLat, cosLon;
+    float sinLat, sinLon, cosLat, cosLon;
 
-    sinLat    = sin(DEG2RAD(LLA[0]));
-    sinLon    = sin(DEG2RAD(LLA[1]));
-    cosLat    = cos(DEG2RAD(LLA[0]));
-    cosLon    = cos(DEG2RAD(LLA[1]));
+    sinLat    = sinf(DEG2RAD((float)LLAi[0] * 1e-7f));
+    sinLon    = sinf(DEG2RAD((float)LLAi[1] * 1e-7f));
+    cosLat    = cosf(DEG2RAD((float)LLAi[0] * 1e-7f));
+    cosLon    = cosf(DEG2RAD((float)LLAi[1] * 1e-7f));
 
     Rne[0][0] = -sinLat * cosLon;
     Rne[0][1] = -sinLat * sinLon;
@@ -188,16 +194,16 @@ void Quaternion2R(float q[4], float Rbe[3][3])
 }
 
 // ****** Express LLA in a local NED Base Frame ********
-void LLA2Base(float LLA[3], double BaseECEF[3], double Rne[3][3], float NED[3])
+void LLA2Base(int32_t LLAi[3], double BaseECEF[3], float Rne[3][3], float NED[3])
 {
     double ECEF[3];
-    double diff[3];
+    float diff[3];
 
-    LLA2ECEF(LLA, ECEF);
+    LLA2ECEF(LLAi, ECEF);
 
-    diff[0] = (ECEF[0] - BaseECEF[0]);
-    diff[1] = (ECEF[1] - BaseECEF[1]);
-    diff[2] = (ECEF[2] - BaseECEF[2]);
+    diff[0] = (float)(ECEF[0] - BaseECEF[0]);
+    diff[1] = (float)(ECEF[1] - BaseECEF[1]);
+    diff[2] = (float)(ECEF[2] - BaseECEF[2]);
 
     NED[0]  = Rne[0][0] * diff[0] + Rne[0][1] * diff[1] + Rne[0][2] * diff[2];
     NED[1]  = Rne[1][0] * diff[0] + Rne[1][1] * diff[1] + Rne[1][2] * diff[2];
@@ -205,13 +211,13 @@ void LLA2Base(float LLA[3], double BaseECEF[3], double Rne[3][3], float NED[3])
 }
 
 // ****** Express ECEF in a local NED Base Frame ********
-void ECEF2Base(double ECEF[3], double BaseECEF[3], double Rne[3][3], float NED[3])
+void ECEF2Base(double ECEF[3], double BaseECEF[3], float Rne[3][3], float NED[3])
 {
-    double diff[3];
+    float diff[3];
 
-    diff[0] = (ECEF[0] - BaseECEF[0]);
-    diff[1] = (ECEF[1] - BaseECEF[1]);
-    diff[2] = (ECEF[2] - BaseECEF[2]);
+    diff[0] = (float)(ECEF[0] - BaseECEF[0]);
+    diff[1] = (float)(ECEF[1] - BaseECEF[1]);
+    diff[2] = (float)(ECEF[2] - BaseECEF[2]);
 
     NED[0]  = Rne[0][0] * diff[0] + Rne[0][1] * diff[1] + Rne[0][2] * diff[2];
     NED[1]  = Rne[1][0] * diff[0] + Rne[1][1] * diff[1] + Rne[1][2] * diff[2];

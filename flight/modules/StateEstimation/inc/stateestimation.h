@@ -41,6 +41,7 @@ typedef enum {
         SENSORUPDATES_vel      = 1 << 5,
         SENSORUPDATES_airspeed = 1 << 6,
         SENSORUPDATES_baro     = 1 << 7,
+        SENSORUPDATES_lla      = 1 << 8,
 } sensorUpdates;
 
 typedef struct {
@@ -67,6 +68,7 @@ int32_t filterBaroInitialize(stateFilter *handle);
 int32_t filterAltitudeInitialize(stateFilter *handle);
 int32_t filterAirInitialize(stateFilter *handle);
 int32_t filterStationaryInitialize(stateFilter *handle);
+int32_t filterLLAInitialize(stateFilter *handle);
 int32_t filterCFInitialize(stateFilter *handle);
 int32_t filterCFMInitialize(stateFilter *handle);
 int32_t filterEKF13iInitialize(stateFilter *handle);

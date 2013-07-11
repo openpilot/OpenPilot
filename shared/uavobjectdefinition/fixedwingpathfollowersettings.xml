@@ -15,30 +15,30 @@
 
         <field name="HorizontalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
                 <!-- proportional coefficient for correction vector in path vector field to get back on course - reduce for fast planes to prevent course oscillations -->
-        <field name="VerticalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.05"/>
+        <field name="VerticalPosP" units="(m/s)/m" type="float" elements="1" defaultvalue="0.2"/>
                 <!-- proportional coefficient for desired vertical speed in relation to altitude displacement-->
 
         <!-- these coefficients control actual control outputs -->
         <field name="CoursePI" units="deg/deg" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.2, 0, 0"/>
                 <!-- coefficients for desired bank angle in relation to ground bearing error - this controls heading -->
 
-        <field name="SpeedPI" units="deg / (m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="1.5, .15, 20"/>
+        <field name="SpeedPI" units="deg / (m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="2.5, .25, 10"/>
                 <!-- coefficients for desired pitch
                      in relation to speed error IASerror -->
         <field name="VerticalToPitchCrossFeed" units="deg / (m/s)" type="float" elementnames="Kp,Max" defaultvalue="5, 10"/>
                 <!-- coefficients for adjusting desired pitch
                      in relation to "vertical speed error -->
-        <field name="AirspeedToPowerCrossFeed" units="1 / (m/s)" type="float" elementnames="Kp,Max" defaultvalue="0.1, 1"/>
+        <field name="AirspeedToPowerCrossFeed" units="1 / (m/s)" type="float" elementnames="Kp,Max" defaultvalue="0.2, 1"/>
                 <!-- proportional coefficient for adjusting vertical speed error for power calculation
                      in relation to airspeed error IASerror -->
-        <field name="PowerPI" units="1/(m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.01,0.01,0.8"/>
+        <field name="PowerPI" units="1/(m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.05,0.05,0.5"/>
                 <!-- proportional coefficient for desired throttle
                      in relation to vertical speed error (absolute but including crossfeed) -->
 
         <!-- output limits -->
         <field name="RollLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-35,0,35" />
                 <!-- maximum allowed bank angles in navigates flight -->
-        <field name="PitchLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-10,5,10" />
+        <field name="PitchLimit" units="deg" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="-10,5,20" />
                 <!-- maximum allowed pitch angles and setpoint for neutral pitch -->
         <field name="ThrottleLimit" units="" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="0.1,0.5,0.9" />
                 <!-- minimum and maximum allowed throttle and setpoint for cruise speed -->

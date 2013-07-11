@@ -4,7 +4,8 @@
 		<field name="Kp" units="throttle/m" type="float" elements="1" defaultvalue="0"/>
 		<field name="Kp2" units="throttle/m^2" type="float" elements="1" defaultvalue="0.03"/>
 		<field name="Kv" units="throttle/(m/s)" type="float" elements="1" defaultvalue="0.01"/>
-		<field name="Ki" units="throttle/m" type="float" elements="1" defaultvalue="0"/>
+	    <field name="AltitudeKi" units="throttle/m" type="float" elements="1" defaultvalue="0"/>
+	    <field name="VelocityKi" units="throttle/m" type="float" elements="1" defaultvalue="0"/>	
 		<field name="Kd" units="throttle/m" type="float" elements="1" defaultvalue="0.03"/>
 		<field name="Ka" units="throttle/(m/s^2)" type="float" elements="1" defaultvalue="0.005"/>
 		<field name="VelocityTau" units="" type="float" elements="1" defaultvalue="0.05"/>

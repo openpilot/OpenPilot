@@ -130,7 +130,7 @@ static float northVelIntegral = 0;
 static float eastVelIntegral  = 0;
 static float downVelIntegral  = 0;
 
-static float bearingIntegral  = 0;
+static float courseIntegral   = 0;
 static float speedIntegral    = 0;
 static float powerIntegral    = 0;
 static float airspeedErrorInt = 0;
@@ -231,7 +231,7 @@ static void pathfollowerTask(__attribute__((unused)) void *parameters)
             northVelIntegral = 0;
             eastVelIntegral  = 0;
             downVelIntegral  = 0;
-            bearingIntegral  = 0;
+            courseIntegral   = 0;
             speedIntegral    = 0;
             powerIntegral    = 0;
 
@@ -398,8 +398,12 @@ static uint8_t updateFixedDesiredAttitude()
     float descentspeedError;
     float powerCommand;
 
-    float bearingError;
-    float bearingCommand;
+    float bearing;
+    float heading;
+    float headingError;
+    float course;
+    float courseError;
+    float courseCommand;
 
     FixedWingPathFollowerStatusGet(&fixedwingpathfollowerStatus);
 
@@ -439,12 +443,6 @@ static uint8_t updateFixedDesiredAttitude()
         fixedwingpathfollowerSettings.VerticalVelMax);
     descentspeedError = descentspeedDesired - velocityState.Down;
 
-    // Error condition: wind speed is higher than maximum allowed speed. We are forced backwards!
-    fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_WIND] = 0;
-    if (groundspeedDesired - indicatedAirspeedStateBias <= 0) {
-        fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_WIND] = 1;
-        result = 0;
-    }
     // Error condition: plane too slow or too fast
     fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHSPEED] = 0;
     fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWSPEED]  = 0;
@@ -566,34 +564,57 @@ static uint8_t updateFixedDesiredAttitude()
     }
 
     /**
+     * Calculate where we are heading and why (wind issues)
+     */
+    bearing = attitudeState.Yaw;
+    heading = RAD2DEG(atan2f(velocityState.East, velocityState.North));
+    headingError = heading - bearing;
+    if (headingError < -180.0f) {
+        headingError += 360.0f;
+    }
+    if (headingError > 180.0f) {
+        headingError -= 360.0f;
+    }
+    // Error condition: wind speed is higher than airspeed. We are forced backwards!
+    fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_WIND] = 0;
+    if (headingError > 90.0f || headingError < -90.0f) {
+        // we are flying backwards
+        fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_WIND] = 1;
+        result = 0;
+    }
+
+    /**
      * Compute desired roll command
      */
     if (groundspeedDesired > 1e-6f) {
-        bearingError = RAD2DEG(atan2f(velocityDesired.East, velocityDesired.North) - atan2f(velocityState.East, velocityState.North));
+        course = RAD2DEG(atan2f(velocityDesired.East, velocityDesired.North));
+
+        courseError = course - heading;
     } else {
         // if we are not supposed to move, run in a circle
-        bearingError = -90.0f;
+        courseError = -90.0f;
+        result = 0;
     }
 
-    if (bearingError < -180.0f) {
-        bearingError += 360.0f;
+    if (courseError < -180.0f) {
+        courseError += 360.0f;
     }
-    if (bearingError > 180.0f) {
-        bearingError -= 360.0f;
+    if (courseError > 180.0f) {
+        courseError -= 360.0f;
     }
 
-    bearingIntegral = bound(bearingIntegral + bearingError * dT * fixedwingpathfollowerSettings.CoursePI[FIXEDWINGPATHFOLLOWERSETTINGS_COURSEPI_KI],
-                            -fixedwingpathfollowerSettings.CoursePI[FIXEDWINGPATHFOLLOWERSETTINGS_COURSEPI_ILIMIT],
-                            fixedwingpathfollowerSettings.CoursePI[FIXEDWINGPATHFOLLOWERSETTINGS_COURSEPI_ILIMIT]);
-    bearingCommand  = (bearingError * fixedwingpathfollowerSettings.CoursePI[FIXEDWINGPATHFOLLOWERSETTINGS_COURSEPI_KP] +
-                       bearingIntegral);
+    courseIntegral = bound(courseIntegral + courseError * dT * fixedwingpathfollowerSettings.CoursePI[FIXEDWINGPATHFOLLOWERSETTINGS_COURSEPI_KI],
+                           -fixedwingpathfollowerSettings.CoursePI[FIXEDWINGPATHFOLLOWERSETTINGS_COURSEPI_ILIMIT],
+                           fixedwingpathfollowerSettings.CoursePI[FIXEDWINGPATHFOLLOWERSETTINGS_COURSEPI_ILIMIT]);
+    courseCommand  = (courseError * fixedwingpathfollowerSettings.CoursePI[FIXEDWINGPATHFOLLOWERSETTINGS_COURSEPI_KP] +
+                      courseIntegral);
 
-    fixedwingpathfollowerStatus.Error[FIXEDWINGPATHFOLLOWERSTATUS_ERROR_COURSE]       = bearingError;
-    fixedwingpathfollowerStatus.ErrorInt[FIXEDWINGPATHFOLLOWERSTATUS_ERRORINT_COURSE] = bearingIntegral;
-    fixedwingpathfollowerStatus.Command[FIXEDWINGPATHFOLLOWERSTATUS_COMMAND_COURSE]   = bearingCommand;
+    fixedwingpathfollowerStatus.Error[FIXEDWINGPATHFOLLOWERSTATUS_ERROR_COURSE]       = courseError;
+    fixedwingpathfollowerStatus.ErrorInt[FIXEDWINGPATHFOLLOWERSTATUS_ERRORINT_COURSE] = courseIntegral;
+    fixedwingpathfollowerStatus.Command[FIXEDWINGPATHFOLLOWERSTATUS_COMMAND_COURSE]   = courseCommand;
 
     stabDesired.Roll = bound(fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_NEUTRAL] +
-                             bearingCommand,
+                             courseCommand,
                              fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_MIN],
                              fixedwingpathfollowerSettings.RollLimit[FIXEDWINGPATHFOLLOWERSETTINGS_ROLLLIMIT_MAX]);
 

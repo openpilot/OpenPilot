@@ -937,6 +937,9 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
  */
 static bool okToArm(void)
 {
+    // update checks
+    configuration_check();
+
     // read alarms
     SystemAlarmsData alarms;
 

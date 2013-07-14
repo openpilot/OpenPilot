@@ -58,6 +58,8 @@
 #include <accelstate.h>
 #include <taskinfo.h>
 #include <pios_constants.h>
+#include <velocitystate.h>
+#include <positionstate.h>
 // Private constants
 #define MAX_QUEUE_SIZE   2
 #define STACK_SIZE_BYTES 1024
@@ -107,18 +109,15 @@ int32_t AltitudeHoldInitialize()
 }
 MODULE_INITCALL(AltitudeHoldInitialize, AltitudeHoldStart);
 
-float tau;
 float throttleIntegral;
+float switchThrottle;
 float velocity;
-float decay;
-float velocity_decay;
 bool running = false;
 float error;
 float velError;
+uint32_t timeval;
 
-float switchThrottle;
-float smoothed_altitude;
-float starting_altitude;
+bool posUpdated;
 
 /**
  * Module thread, should not return.
@@ -128,11 +127,17 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
     AltitudeHoldDesiredData altitudeHoldDesired;
     StabilizationDesiredData stabilizationDesired;
     AltHoldSmoothedData altHold;
+    AttitudeStateData attitudeState;
+    AccelStateData accelState;
+    VelocityStateData velocityData;
+    float dT;
     float q[4], Rbe[3][3];
 
     portTickType thisTime, lastUpdateTime;
     UAVObjEvent ev;
 
+    timeval = 0;
+    lastUpdateTime = 0;
     // Force update of the settings
     SettingsUpdatedCb(&ev);
     // Failsafe handling
@@ -140,11 +145,11 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
     bool enterFailSafe = false;
     // Listen for updates.
     AltitudeHoldDesiredConnectQueue(queue);
-    BaroSensorConnectQueue(queue);
-    FlightStatusConnectQueue(queue);
     AccelStateConnectQueue(queue);
+    PositionStateConnectQueue(queue);
+    FlightStatusConnectQueue(queue);
+    VelocityStateConnectQueue(queue);
     bool altitudeHoldFlightMode = false;
-    BaroSensorAltitudeGet(&smoothed_altitude);
     running = false;
     enum init_state { WAITING_BARO, WAITIING_INIT, INITED } init = WAITING_BARO;
 
@@ -153,7 +158,6 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
     // initialize enable flag
     altitudeHoldFlightMode = flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD || flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO;
     // Main task loop
-    bool baro_updated = false;
     while (1) {
         enterFailSafe = PIOS_DELAY_DiffuS(lastAltitudeHoldDesiredUpdate) > TIMEOUT_TRESHOLD;
         // Wait until the AttitudeRaw object is updated, if a timeout then go to failsafe
@@ -164,8 +168,8 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 
             // Todo: Add alarm if it should be running
             continue;
-        } else if (ev.obj == BaroSensorHandle()) {
-            baro_updated = true;
+        } else if (ev.obj == PositionStateHandle()) {
+            posUpdated = true;
 
             init = (init == WAITING_BARO) ? WAITIING_INIT : init;
         } else if (ev.obj == FlightStatusHandle()) {
@@ -190,167 +194,29 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 lastAltitudeHoldDesiredUpdate = PIOS_DELAY_GetRaw();
             }
         } else if (ev.obj == AccelStateHandle()) {
-            static uint32_t timeval;
+            dT = PIOS_DELAY_DiffuS(timeval) / 1.0e6f;
+            timeval = PIOS_DELAY_GetRaw();
 
-            static float z[4] = { 0, 0, 0, 0 };
-            float z_new[4];
-            float P[4][4], K[4][2], x[2];
-            float G[4] = { 1.0e-15f, 1.0e-15f, 1.0e-3f, 1.0e-7f };
-            static float V[4][4] = {
-                { 10.0f, 0.0f,   0.0f,   0.0f    },
-                { 0.0f,  100.0f, 0.0f,   0.0f    },
-                { 0.0f,  0.0f,   100.0f, 0.0f    },
-                { 0.0f,  0.0f,   0.0f,   1000.0f }
-            };
-            static uint32_t accel_downsample_count = 0;
-            static float accels_accum[3] = { 0.0f, 0.0f, 0.0f };
-            float dT;
-            static float S[2] = { 1.0f, 10.0f };
+            AltHoldSmoothedGet(&altHold);
 
-            /* Somehow this always assigns to zero.  Compiler bug? Race condition? */
-            S[0] = altitudeHoldSettings.PressureNoise;
-            S[1] = altitudeHoldSettings.AccelNoise;
-            G[2] = altitudeHoldSettings.AccelDrift;
-
-            AccelStateData accelState;
-            AccelStateGet(&accelState);
-            AttitudeStateData attitudeState;
             AttitudeStateGet(&attitudeState);
-            BaroSensorData baro;
-            BaroSensorGet(&baro);
 
-            /* Downsample accels to stop this calculation consuming too much CPU */
-            accels_accum[0] += accelState.x;
-            accels_accum[1] += accelState.y;
-            accels_accum[2] += accelState.z;
-            accel_downsample_count++;
-
-            if (accel_downsample_count < ACCEL_DOWNSAMPLE) {
-                continue;
-            }
-
-            accel_downsample_count = 0;
-            accelState.x    = accels_accum[0] / ACCEL_DOWNSAMPLE;
-            accelState.y    = accels_accum[1] / ACCEL_DOWNSAMPLE;
-            accelState.z    = accels_accum[2] / ACCEL_DOWNSAMPLE;
-            accels_accum[0] = accels_accum[1] = accels_accum[2] = 0;
-
-            thisTime = xTaskGetTickCount();
-
-            if (init == WAITIING_INIT) {
-                z[0] = baro.Altitude;
-                z[1] = 0;
-                z[2] = accelState.z;
-                z[3] = 0;
-                init = INITED;
-            } else if (init == WAITING_BARO) {
-                continue;
-            }
-
-            x[0] = baro.Altitude;
-            // rotate avg accels into earth frame and store it
             q[0] = attitudeState.q1;
             q[1] = attitudeState.q2;
             q[2] = attitudeState.q3;
             q[3] = attitudeState.q4;
             Quaternion2R(q, Rbe);
-            x[1] = -(Rbe[0][2] * accelState.x + Rbe[1][2] * accelState.y + Rbe[2][2] * accelState.z + 9.81f);
 
-            dT = PIOS_DELAY_DiffuS(timeval) / 1.0e6f;
-            timeval = PIOS_DELAY_GetRaw();
+            AccelStateGet(&accelState);
+            altHold.Accel = 0.95f * altHold.Accel + 0.05f * (Rbe[0][2] * accelState.x + Rbe[1][2] * accelState.y + Rbe[2][2] * accelState.z + 9.81f);
 
-            P[0][0] = dT * (V[0][1] + dT * V[1][1]) + V[0][0] + G[0] + dT * V[1][0];
-            P[0][1] = dT * (V[0][2] + dT * V[1][2]) + V[0][1] + dT * V[1][1];
-            P[0][2] = V[0][2] + dT * V[1][2];
-            P[0][3] = V[0][3] + dT * V[1][3];
-            P[1][0] = dT * (V[1][1] + dT * V[2][1]) + V[1][0] + dT * V[2][0];
-            P[1][1] = dT * (V[1][2] + dT * V[2][2]) + V[1][1] + G[1] + dT * V[2][1];
-            P[1][2] = V[1][2] + dT * V[2][2];
-            P[1][3] = V[1][3] + dT * V[2][3];
-            P[2][0] = V[2][0] + dT * V[2][1];
-            P[2][1] = V[2][1] + dT * V[2][2];
-            P[2][2] = V[2][2] + G[2];
-            P[2][3] = V[2][3];
-            P[3][0] = V[3][0] + dT * V[3][1];
-            P[3][1] = V[3][1] + dT * V[3][2];
-            P[3][2] = V[3][2];
-            P[3][3] = V[3][3] + G[3];
+            VelocityStateGet(&velocityData);
 
-            if (baro_updated) {
-                K[0][0]  = -(V[2][2] * S[0] + V[2][3] * S[0] + V[3][2] * S[0] + V[3][3] * S[0] + G[2] * S[0] + G[3] * S[0] + S[0] * S[1]) / (V[0][0] * G[2] + V[0][0] * G[3] + V[2][2] * G[0] + V[2][3] * G[0] + V[3][2] * G[0] + V[3][3] * G[0] + V[0][0] * S[1] + V[2][2] * S[0] + V[2][3] * S[0] + V[3][2] * S[0] + V[3][3] * S[0] + V[0][0] * V[2][2] - V[0][2] * V[2][0] + V[0][0] * V[2][3] + V[0][0] * V[3][2] - V[0][2] * V[3][0] - V[2][0] * V[0][3] + V[0][0] * V[3][3] - V[0][3] * V[3][0] + G[0] * G[2] + G[0] * G[3] + G[0] * S[1] + G[2] * S[0] + G[3] * S[0] + S[0] * S[1] + (dT * dT) * V[1][1] * V[2][2] - (dT * dT) * V[1][2] * V[2][1] + (dT * dT) * V[1][1] * V[2][3] + (dT * dT) * V[1][1] * V[3][2] - (dT * dT) * V[1][2] * V[3][1] - (dT * dT) * V[2][1] * V[1][3] + (dT * dT) * V[1][1] * V[3][3] - (dT * dT) * V[1][3] * V[3][1] + dT * V[0][1] * G[2] + dT * V[1][0] * G[2] + dT * V[0][1] * G[3] + dT * V[1][0] * G[3] + dT * V[0][1] * S[1] + dT * V[1][0] * S[1] + (dT * dT) * V[1][1] * G[2] + (dT * dT) * V[1][1] * G[3] + (dT * dT) * V[1][1] * S[1] + dT * V[0][1] * V[2][2] + dT * V[1][0] * V[2][2] - dT * V[0][2] * V[2][1] - dT * V[2][0] * V[1][2] + dT * V[0][1] * V[2][3] + dT * V[0][1] * V[3][2] + dT * V[1][0] * V[2][3] + dT * V[1][0] * V[3][2] - dT * V[0][2] * V[3][1] - dT * V[2][0] * V[1][3] - dT * V[0][3] * V[2][1] - dT * V[1][2] * V[3][0] + dT * V[0][1] * V[3][3] + dT * V[1][0] * V[3][3] - dT * V[0][3] * V[3][1] - dT * V[3][0] * V[1][3]) + 1.0f;
-                K[0][1]  = ((V[0][2] + V[0][3]) * S[0] + dT * (V[1][2] + V[1][3]) * S[0]) / (V[0][0] * G[2] + V[0][0] * G[3] + V[2][2] * G[0] + V[2][3] * G[0] + V[3][2] * G[0] + V[3][3] * G[0] + V[0][0] * S[1] + V[2][2] * S[0] + V[2][3] * S[0] + V[3][2] * S[0] + V[3][3] * S[0] + V[0][0] * V[2][2] - V[0][2] * V[2][0] + V[0][0] * V[2][3] + V[0][0] * V[3][2] - V[0][2] * V[3][0] - V[2][0] * V[0][3] + V[0][0] * V[3][3] - V[0][3] * V[3][0] + G[0] * G[2] + G[0] * G[3] + G[0] * S[1] + G[2] * S[0] + G[3] * S[0] + S[0] * S[1] + (dT * dT) * V[1][1] * V[2][2] - (dT * dT) * V[1][2] * V[2][1] + (dT * dT) * V[1][1] * V[2][3] + (dT * dT) * V[1][1] * V[3][2] - (dT * dT) * V[1][2] * V[3][1] - (dT * dT) * V[2][1] * V[1][3] + (dT * dT) * V[1][1] * V[3][3] - (dT * dT) * V[1][3] * V[3][1] + dT * V[0][1] * G[2] + dT * V[1][0] * G[2] + dT * V[0][1] * G[3] + dT * V[1][0] * G[3] + dT * V[0][1] * S[1] + dT * V[1][0] * S[1] + (dT * dT) * V[1][1] * G[2] + (dT * dT) * V[1][1] * G[3] + (dT * dT) * V[1][1] * S[1] + dT * V[0][1] * V[2][2] + dT * V[1][0] * V[2][2] - dT * V[0][2] * V[2][1] - dT * V[2][0] * V[1][2] + dT * V[0][1] * V[2][3] + dT * V[0][1] * V[3][2] + dT * V[1][0] * V[2][3] + dT * V[1][0] * V[3][2] - dT * V[0][2] * V[3][1] - dT * V[2][0] * V[1][3] - dT * V[0][3] * V[2][1] - dT * V[1][2] * V[3][0] + dT * V[0][1] * V[3][3] + dT * V[1][0] * V[3][3] - dT * V[0][3] * V[3][1] - dT * V[3][0] * V[1][3]);
-                K[1][0]  = (V[1][0] * G[2] + V[1][0] * G[3] + V[1][0] * S[1] + V[1][0] * V[2][2] - V[2][0] * V[1][2] + V[1][0] * V[2][3] + V[1][0] * V[3][2] - V[2][0] * V[1][3] - V[1][2] * V[3][0] + V[1][0] * V[3][3] - V[3][0] * V[1][3] + (dT * dT) * V[2][1] * V[3][2] - (dT * dT) * V[2][2] * V[3][1] + (dT * dT) * V[2][1] * V[3][3] - (dT * dT) * V[3][1] * V[2][3] + dT * V[1][1] * G[2] + dT * V[2][0] * G[2] + dT * V[1][1] * G[3] + dT * V[2][0] * G[3] + dT * V[1][1] * S[1] + dT * V[2][0] * S[1] + (dT * dT) * V[2][1] * G[2] + (dT * dT) * V[2][1] * G[3] + (dT * dT) * V[2][1] * S[1] + dT * V[1][1] * V[2][2] - dT * V[1][2] * V[2][1] + dT * V[1][1] * V[2][3] + dT * V[1][1] * V[3][2] + dT * V[2][0] * V[3][2] - dT * V[1][2] * V[3][1] - dT * V[2][1] * V[1][3] - dT * V[3][0] * V[2][2] + dT * V[1][1] * V[3][3] + dT * V[2][0] * V[3][3] - dT * V[3][0] * V[2][3] - dT * V[1][3] * V[3][1]) / (V[0][0] * G[2] + V[0][0] * G[3] + V[2][2] * G[0] + V[2][3] * G[0] + V[3][2] * G[0] + V[3][3] * G[0] + V[0][0] * S[1] + V[2][2] * S[0] + V[2][3] * S[0] + V[3][2] * S[0] + V[3][3] * S[0] + V[0][0] * V[2][2] - V[0][2] * V[2][0] + V[0][0] * V[2][3] + V[0][0] * V[3][2] - V[0][2] * V[3][0] - V[2][0] * V[0][3] + V[0][0] * V[3][3] - V[0][3] * V[3][0] + G[0] * G[2] + G[0] * G[3] + G[0] * S[1] + G[2] * S[0] + G[3] * S[0] + S[0] * S[1] + (dT * dT) * V[1][1] * V[2][2] - (dT * dT) * V[1][2] * V[2][1] + (dT * dT) * V[1][1] * V[2][3] + (dT * dT) * V[1][1] * V[3][2] - (dT * dT) * V[1][2] * V[3][1] - (dT * dT) * V[2][1] * V[1][3] + (dT * dT) * V[1][1] * V[3][3] - (dT * dT) * V[1][3] * V[3][1] + dT * V[0][1] * G[2] + dT * V[1][0] * G[2] + dT * V[0][1] * G[3] + dT * V[1][0] * G[3] + dT * V[0][1] * S[1] + dT * V[1][0] * S[1] + (dT * dT) * V[1][1] * G[2] + (dT * dT) * V[1][1] * G[3] + (dT * dT) * V[1][1] * S[1] + dT * V[0][1] * V[2][2] + dT * V[1][0] * V[2][2] - dT * V[0][2] * V[2][1] - dT * V[2][0] * V[1][2] + dT * V[0][1] * V[2][3] + dT * V[0][1] * V[3][2] + dT * V[1][0] * V[2][3] + dT * V[1][0] * V[3][2] - dT * V[0][2] * V[3][1] - dT * V[2][0] * V[1][3] - dT * V[0][3] * V[2][1] - dT * V[1][2] * V[3][0] + dT * V[0][1] * V[3][3] + dT * V[1][0] * V[3][3] - dT * V[0][3] * V[3][1] - dT * V[3][0] * V[1][3]);
-                K[1][1]  = (V[1][2] * G[0] + V[1][3] * G[0] + V[1][2] * S[0] + V[1][3] * S[0] + V[0][0] * V[1][2] - V[1][0] * V[0][2] + V[0][0] * V[1][3] - V[1][0] * V[0][3] + (dT * dT) * V[0][1] * V[2][2] + (dT * dT) * V[1][0] * V[2][2] - (dT * dT) * V[0][2] * V[2][1] - (dT * dT) * V[2][0] * V[1][2] + (dT * dT) * V[0][1] * V[2][3] + (dT * dT) * V[1][0] * V[2][3] - (dT * dT) * V[2][0] * V[1][3] - (dT * dT) * V[0][3] * V[2][1] + (dT * dT * dT) * V[1][1] * V[2][2] - (dT * dT * dT) * V[1][2] * V[2][1] + (dT * dT * dT) * V[1][1] * V[2][3] - (dT * dT * dT) * V[2][1] * V[1][3] + dT * V[2][2] * G[0] + dT * V[2][3] * G[0] + dT * V[2][2] * S[0] + dT * V[2][3] * S[0] + dT * V[0][0] * V[2][2] + dT * V[0][1] * V[1][2] - dT * V[0][2] * V[1][1] - dT * V[0][2] * V[2][0] + dT * V[0][0] * V[2][3] + dT * V[0][1] * V[1][3] - dT * V[1][1] * V[0][3] - dT * V[2][0] * V[0][3]) / (V[0][0] * G[2] + V[0][0] * G[3] + V[2][2] * G[0] + V[2][3] * G[0] + V[3][2] * G[0] + V[3][3] * G[0] + V[0][0] * S[1] + V[2][2] * S[0] + V[2][3] * S[0] + V[3][2] * S[0] + V[3][3] * S[0] + V[0][0] * V[2][2] - V[0][2] * V[2][0] + V[0][0] * V[2][3] + V[0][0] * V[3][2] - V[0][2] * V[3][0] - V[2][0] * V[0][3] + V[0][0] * V[3][3] - V[0][3] * V[3][0] + G[0] * G[2] + G[0] * G[3] + G[0] * S[1] + G[2] * S[0] + G[3] * S[0] + S[0] * S[1] + (dT * dT) * V[1][1] * V[2][2] - (dT * dT) * V[1][2] * V[2][1] + (dT * dT) * V[1][1] * V[2][3] + (dT * dT) * V[1][1] * V[3][2] - (dT * dT) * V[1][2] * V[3][1] - (dT * dT) * V[2][1] * V[1][3] + (dT * dT) * V[1][1] * V[3][3] - (dT * dT) * V[1][3] * V[3][1] + dT * V[0][1] * G[2] + dT * V[1][0] * G[2] + dT * V[0][1] * G[3] + dT * V[1][0] * G[3] + dT * V[0][1] * S[1] + dT * V[1][0] * S[1] + (dT * dT) * V[1][1] * G[2] + (dT * dT) * V[1][1] * G[3] + (dT * dT) * V[1][1] * S[1] + dT * V[0][1] * V[2][2] + dT * V[1][0] * V[2][2] - dT * V[0][2] * V[2][1] - dT * V[2][0] * V[1][2] + dT * V[0][1] * V[2][3] + dT * V[0][1] * V[3][2] + dT * V[1][0] * V[2][3] + dT * V[1][0] * V[3][2] - dT * V[0][2] * V[3][1] - dT * V[2][0] * V[1][3] - dT * V[0][3] * V[2][1] - dT * V[1][2] * V[3][0] + dT * V[0][1] * V[3][3] + dT * V[1][0] * V[3][3] - dT * V[0][3] * V[3][1] - dT * V[3][0] * V[1][3]);
-                K[2][0]  = (V[2][0] * G[3] - V[3][0] * G[2] + V[2][0] * S[1] + V[2][0] * V[3][2] - V[3][0] * V[2][2] + V[2][0] * V[3][3] - V[3][0] * V[2][3] + dT * V[2][1] * G[3] - dT * V[3][1] * G[2] + dT * V[2][1] * S[1] + dT * V[2][1] * V[3][2] - dT * V[2][2] * V[3][1] + dT * V[2][1] * V[3][3] - dT * V[3][1] * V[2][3]) / (V[0][0] * G[2] + V[0][0] * G[3] + V[2][2] * G[0] + V[2][3] * G[0] + V[3][2] * G[0] + V[3][3] * G[0] + V[0][0] * S[1] + V[2][2] * S[0] + V[2][3] * S[0] + V[3][2] * S[0] + V[3][3] * S[0] + V[0][0] * V[2][2] - V[0][2] * V[2][0] + V[0][0] * V[2][3] + V[0][0] * V[3][2] - V[0][2] * V[3][0] - V[2][0] * V[0][3] + V[0][0] * V[3][3] - V[0][3] * V[3][0] + G[0] * G[2] + G[0] * G[3] + G[0] * S[1] + G[2] * S[0] + G[3] * S[0] + S[0] * S[1] + (dT * dT) * V[1][1] * V[2][2] - (dT * dT) * V[1][2] * V[2][1] + (dT * dT) * V[1][1] * V[2][3] + (dT * dT) * V[1][1] * V[3][2] - (dT * dT) * V[1][2] * V[3][1] - (dT * dT) * V[2][1] * V[1][3] + (dT * dT) * V[1][1] * V[3][3] - (dT * dT) * V[1][3] * V[3][1] + dT * V[0][1] * G[2] + dT * V[1][0] * G[2] + dT * V[0][1] * G[3] + dT * V[1][0] * G[3] + dT * V[0][1] * S[1] + dT * V[1][0] * S[1] + (dT * dT) * V[1][1] * G[2] + (dT * dT) * V[1][1] * G[3] + (dT * dT) * V[1][1] * S[1] + dT * V[0][1] * V[2][2] + dT * V[1][0] * V[2][2] - dT * V[0][2] * V[2][1] - dT * V[2][0] * V[1][2] + dT * V[0][1] * V[2][3] + dT * V[0][1] * V[3][2] + dT * V[1][0] * V[2][3] + dT * V[1][0] * V[3][2] - dT * V[0][2] * V[3][1] - dT * V[2][0] * V[1][3] - dT * V[0][3] * V[2][1] - dT * V[1][2] * V[3][0] + dT * V[0][1] * V[3][3] + dT * V[1][0] * V[3][3] - dT * V[0][3] * V[3][1] - dT * V[3][0] * V[1][3]);
-                K[2][1]  = (V[0][0] * G[2] + V[2][2] * G[0] + V[2][3] * G[0] + V[2][2] * S[0] + V[2][3] * S[0] + V[0][0] * V[2][2] - V[0][2] * V[2][0] + V[0][0] * V[2][3] - V[2][0] * V[0][3] + G[0] * G[2] + G[2] * S[0] + (dT * dT) * V[1][1] * V[2][2] - (dT * dT) * V[1][2] * V[2][1] + (dT * dT) * V[1][1] * V[2][3] - (dT * dT) * V[2][1] * V[1][3] + dT * V[0][1] * G[2] + dT * V[1][0] * G[2] + (dT * dT) * V[1][1] * G[2] + dT * V[0][1] * V[2][2] + dT * V[1][0] * V[2][2] - dT * V[0][2] * V[2][1] - dT * V[2][0] * V[1][2] + dT * V[0][1] * V[2][3] + dT * V[1][0] * V[2][3] - dT * V[2][0] * V[1][3] - dT * V[0][3] * V[2][1]) / (V[0][0] * G[2] + V[0][0] * G[3] + V[2][2] * G[0] + V[2][3] * G[0] + V[3][2] * G[0] + V[3][3] * G[0] + V[0][0] * S[1] + V[2][2] * S[0] + V[2][3] * S[0] + V[3][2] * S[0] + V[3][3] * S[0] + V[0][0] * V[2][2] - V[0][2] * V[2][0] + V[0][0] * V[2][3] + V[0][0] * V[3][2] - V[0][2] * V[3][0] - V[2][0] * V[0][3] + V[0][0] * V[3][3] - V[0][3] * V[3][0] + G[0] * G[2] + G[0] * G[3] + G[0] * S[1] + G[2] * S[0] + G[3] * S[0] + S[0] * S[1] + (dT * dT) * V[1][1] * V[2][2] - (dT * dT) * V[1][2] * V[2][1] + (dT * dT) * V[1][1] * V[2][3] + (dT * dT) * V[1][1] * V[3][2] - (dT * dT) * V[1][2] * V[3][1] - (dT * dT) * V[2][1] * V[1][3] + (dT * dT) * V[1][1] * V[3][3] - (dT * dT) * V[1][3] * V[3][1] + dT * V[0][1] * G[2] + dT * V[1][0] * G[2] + dT * V[0][1] * G[3] + dT * V[1][0] * G[3] + dT * V[0][1] * S[1] + dT * V[1][0] * S[1] + (dT * dT) * V[1][1] * G[2] + (dT * dT) * V[1][1] * G[3] + (dT * dT) * V[1][1] * S[1] + dT * V[0][1] * V[2][2] + dT * V[1][0] * V[2][2] - dT * V[0][2] * V[2][1] - dT * V[2][0] * V[1][2] + dT * V[0][1] * V[2][3] + dT * V[0][1] * V[3][2] + dT * V[1][0] * V[2][3] + dT * V[1][0] * V[3][2] - dT * V[0][2] * V[3][1] - dT * V[2][0] * V[1][3] - dT * V[0][3] * V[2][1] - dT * V[1][2] * V[3][0] + dT * V[0][1] * V[3][3] + dT * V[1][0] * V[3][3] - dT * V[0][3] * V[3][1] - dT * V[3][0] * V[1][3]);
-                K[3][0]  = (-V[2][0] * G[3] + V[3][0] * G[2] + V[3][0] * S[1] - V[2][0] * V[3][2] + V[3][0] * V[2][2] - V[2][0] * V[3][3] + V[3][0] * V[2][3] - dT * V[2][1] * G[3] + dT * V[3][1] * G[2] + dT * V[3][1] * S[1] - dT * V[2][1] * V[3][2] + dT * V[2][2] * V[3][1] - dT * V[2][1] * V[3][3] + dT * V[3][1] * V[2][3]) / (V[0][0] * G[2] + V[0][0] * G[3] + V[2][2] * G[0] + V[2][3] * G[0] + V[3][2] * G[0] + V[3][3] * G[0] + V[0][0] * S[1] + V[2][2] * S[0] + V[2][3] * S[0] + V[3][2] * S[0] + V[3][3] * S[0] + V[0][0] * V[2][2] - V[0][2] * V[2][0] + V[0][0] * V[2][3] + V[0][0] * V[3][2] - V[0][2] * V[3][0] - V[2][0] * V[0][3] + V[0][0] * V[3][3] - V[0][3] * V[3][0] + G[0] * G[2] + G[0] * G[3] + G[0] * S[1] + G[2] * S[0] + G[3] * S[0] + S[0] * S[1] + (dT * dT) * V[1][1] * V[2][2] - (dT * dT) * V[1][2] * V[2][1] + (dT * dT) * V[1][1] * V[2][3] + (dT * dT) * V[1][1] * V[3][2] - (dT * dT) * V[1][2] * V[3][1] - (dT * dT) * V[2][1] * V[1][3] + (dT * dT) * V[1][1] * V[3][3] - (dT * dT) * V[1][3] * V[3][1] + dT * V[0][1] * G[2] + dT * V[1][0] * G[2] + dT * V[0][1] * G[3] + dT * V[1][0] * G[3] + dT * V[0][1] * S[1] + dT * V[1][0] * S[1] + (dT * dT) * V[1][1] * G[2] + (dT * dT) * V[1][1] * G[3] + (dT * dT) * V[1][1] * S[1] + dT * V[0][1] * V[2][2] + dT * V[1][0] * V[2][2] - dT * V[0][2] * V[2][1] - dT * V[2][0] * V[1][2] + dT * V[0][1] * V[2][3] + dT * V[0][1] * V[3][2] + dT * V[1][0] * V[2][3] + dT * V[1][0] * V[3][2] - dT * V[0][2] * V[3][1] - dT * V[2][0] * V[1][3] - dT * V[0][3] * V[2][1] - dT * V[1][2] * V[3][0] + dT * V[0][1] * V[3][3] + dT * V[1][0] * V[3][3] - dT * V[0][3] * V[3][1] - dT * V[3][0] * V[1][3]);
-                K[3][1]  = (V[0][0] * G[3] + V[3][2] * G[0] + V[3][3] * G[0] + V[3][2] * S[0] + V[3][3] * S[0] + V[0][0] * V[3][2] - V[0][2] * V[3][0] + V[0][0] * V[3][3] - V[0][3] * V[3][0] + G[0] * G[3] + G[3] * S[0] + (dT * dT) * V[1][1] * V[3][2] - (dT * dT) * V[1][2] * V[3][1] + (dT * dT) * V[1][1] * V[3][3] - (dT * dT) * V[1][3] * V[3][1] + dT * V[0][1] * G[3] + dT * V[1][0] * G[3] + (dT * dT) * V[1][1] * G[3] + dT * V[0][1] * V[3][2] + dT * V[1][0] * V[3][2] - dT * V[0][2] * V[3][1] - dT * V[1][2] * V[3][0] + dT * V[0][1] * V[3][3] + dT * V[1][0] * V[3][3] - dT * V[0][3] * V[3][1] - dT * V[3][0] * V[1][3]) / (V[0][0] * G[2] + V[0][0] * G[3] + V[2][2] * G[0] + V[2][3] * G[0] + V[3][2] * G[0] + V[3][3] * G[0] + V[0][0] * S[1] + V[2][2] * S[0] + V[2][3] * S[0] + V[3][2] * S[0] + V[3][3] * S[0] + V[0][0] * V[2][2] - V[0][2] * V[2][0] + V[0][0] * V[2][3] + V[0][0] * V[3][2] - V[0][2] * V[3][0] - V[2][0] * V[0][3] + V[0][0] * V[3][3] - V[0][3] * V[3][0] + G[0] * G[2] + G[0] * G[3] + G[0] * S[1] + G[2] * S[0] + G[3] * S[0] + S[0] * S[1] + (dT * dT) * V[1][1] * V[2][2] - (dT * dT) * V[1][2] * V[2][1] + (dT * dT) * V[1][1] * V[2][3] + (dT * dT) * V[1][1] * V[3][2] - (dT * dT) * V[1][2] * V[3][1] - (dT * dT) * V[2][1] * V[1][3] + (dT * dT) * V[1][1] * V[3][3] - (dT * dT) * V[1][3] * V[3][1] + dT * V[0][1] * G[2] + dT * V[1][0] * G[2] + dT * V[0][1] * G[3] + dT * V[1][0] * G[3] + dT * V[0][1] * S[1] + dT * V[1][0] * S[1] + (dT * dT) * V[1][1] * G[2] + (dT * dT) * V[1][1] * G[3] + (dT * dT) * V[1][1] * S[1] + dT * V[0][1] * V[2][2] + dT * V[1][0] * V[2][2] - dT * V[0][2] * V[2][1] - dT * V[2][0] * V[1][2] + dT * V[0][1] * V[2][3] + dT * V[0][1] * V[3][2] + dT * V[1][0] * V[2][3] + dT * V[1][0] * V[3][2] - dT * V[0][2] * V[3][1] - dT * V[2][0] * V[1][3] - dT * V[0][3] * V[2][1] - dT * V[1][2] * V[3][0] + dT * V[0][1] * V[3][3] + dT * V[1][0] * V[3][3] - dT * V[0][3] * V[3][1] - dT * V[3][0] * V[1][3]);
+            altHold.Velocity = 0.95f * altHold.Velocity + 0.05f * (Rbe[0][2] * velocityData.East + Rbe[1][2] * velocityData.North + Rbe[2][2] * velocityData.Down);
 
-                z_new[0] = -K[0][0] * (dT * z[1] - x[0] + z[0]) + dT * z[1] - K[0][1] * (-x[1] + z[2] + z[3]) + z[0];
-                z_new[1] = -K[1][0] * (dT * z[1] - x[0] + z[0]) + dT * z[2] - K[1][1] * (-x[1] + z[2] + z[3]) + z[1];
-                z_new[2] = -K[2][0] * (dT * z[1] - x[0] + z[0]) - K[2][1] * (-x[1] + z[2] + z[3]) + z[2];
-                z_new[3] = -K[3][0] * (dT * z[1] - x[0] + z[0]) - K[3][1] * (-x[1] + z[2] + z[3]) + z[3];
+            PositionStateDownGet(&altHold.Altitude);
 
-                memcpy(z, z_new, sizeof(z_new));
-
-                V[0][0] = -K[0][1] * P[2][0] - K[0][1] * P[3][0] - P[0][0] * (K[0][0] - 1.0f);
-                V[0][1] = -K[0][1] * P[2][1] - K[0][1] * P[3][2] - P[0][1] * (K[0][0] - 1.0f);
-                V[0][2] = -K[0][1] * P[2][2] - K[0][1] * P[3][2] - P[0][2] * (K[0][0] - 1.0f);
-                V[0][3] = -K[0][1] * P[2][3] - K[0][1] * P[3][3] - P[0][3] * (K[0][0] - 1.0f);
-                V[1][0] = P[1][0] - K[1][0] * P[0][0] - K[1][1] * P[2][0] - K[1][1] * P[3][0];
-                V[1][1] = P[1][1] - K[1][0] * P[0][1] - K[1][1] * P[2][1] - K[1][1] * P[3][2];
-                V[1][2] = P[1][2] - K[1][0] * P[0][2] - K[1][1] * P[2][2] - K[1][1] * P[3][2];
-                V[1][3] = P[1][3] - K[1][0] * P[0][3] - K[1][1] * P[2][3] - K[1][1] * P[3][3];
-                V[2][0] = -K[2][0] * P[0][0] - K[2][1] * P[3][0] - P[2][0] * (K[2][1] - 1.0f);
-                V[2][1] = -K[2][0] * P[0][1] - K[2][1] * P[3][2] - P[2][1] * (K[2][1] - 1.0f);
-                V[2][2] = -K[2][0] * P[0][2] - K[2][1] * P[3][2] - P[2][2] * (K[2][1] - 1.0f);
-                V[2][3] = -K[2][0] * P[0][3] - K[2][1] * P[3][3] - P[2][3] * (K[2][1] - 1.0f);
-                V[3][0] = -K[3][0] * P[0][0] - K[3][1] * P[2][0] - P[3][0] * (K[3][1] - 1.0f);
-                V[3][1] = -K[3][0] * P[0][1] - K[3][1] * P[2][1] - P[3][2] * (K[3][1] - 1.0f);
-                V[3][2] = -K[3][0] * P[0][2] - K[3][1] * P[2][2] - P[3][2] * (K[3][1] - 1.0f);
-                V[3][3] = -K[3][0] * P[0][3] - K[3][1] * P[2][3] - P[3][3] * (K[3][1] - 1.0f);
-
-
-                baro_updated = false;
-            } else {
-                K[0][0]  = (V[0][2] + V[0][3] + dT * V[1][2] + dT * V[1][3]) / (V[2][2] + V[2][3] + V[3][2] + V[3][3] + G[2] + G[3] + S[1]);
-                K[1][0]  = (V[1][2] + V[1][3] + dT * V[2][2] + dT * V[2][3]) / (V[2][2] + V[2][3] + V[3][2] + V[3][3] + G[2] + G[3] + S[1]);
-                K[2][0]  = (V[2][2] + V[2][3] + G[2]) / (V[2][2] + V[2][3] + V[3][2] + V[3][3] + G[2] + G[3] + S[1]);
-                K[3][0]  = (V[3][2] + V[3][3] + G[3]) / (V[2][2] + V[2][3] + V[3][2] + V[3][3] + G[2] + G[3] + S[1]);
-
-
-                z_new[0] = dT * z[1] - K[0][0] * (-x[1] + z[2] + z[3]) + z[0];
-                z_new[1] = dT * z[2] - K[1][0] * (-x[1] + z[2] + z[3]) + z[1];
-                z_new[2] = -K[2][0] * (-x[1] + z[2] + z[3]) + z[2];
-                z_new[3] = -K[3][0] * (-x[1] + z[2] + z[3]) + z[3];
-
-                memcpy(z, z_new, sizeof(z_new));
-
-                V[0][0] = P[0][0] - K[0][0] * P[2][0] - K[0][0] * P[3][0];
-                V[0][1] = P[0][1] - K[0][0] * P[2][1] - K[0][0] * P[3][2];
-                V[0][2] = P[0][2] - K[0][0] * P[2][2] - K[0][0] * P[3][2];
-                V[0][3] = P[0][3] - K[0][0] * P[2][3] - K[0][0] * P[3][3];
-                V[1][0] = P[1][0] - K[1][0] * P[2][0] - K[1][0] * P[3][0];
-                V[1][1] = P[1][1] - K[1][0] * P[2][1] - K[1][0] * P[3][2];
-                V[1][2] = P[1][2] - K[1][0] * P[2][2] - K[1][0] * P[3][2];
-                V[1][3] = P[1][3] - K[1][0] * P[2][3] - K[1][0] * P[3][3];
-                V[2][0] = -K[2][0] * P[3][0] - P[2][0] * (K[2][0] - 1.0f);
-                V[2][1] = -K[2][0] * P[3][2] - P[2][1] * (K[2][0] - 1.0f);
-                V[2][2] = -K[2][0] * P[3][2] - P[2][2] * (K[2][0] - 1.0f);
-                V[2][3] = -K[2][0] * P[3][3] - P[2][3] * (K[2][0] - 1.0f);
-                V[3][0] = -K[3][0] * P[2][0] - P[3][0] * (K[3][0] - 1.0f);
-                V[3][1] = -K[3][0] * P[2][1] - P[3][2] * (K[3][0] - 1.0f);
-                V[3][2] = -K[3][0] * P[2][2] - P[3][2] * (K[3][0] - 1.0f);
-                V[3][3] = -K[3][0] * P[2][3] - P[3][3] * (K[3][0] - 1.0f);
-            }
-
-            AltHoldSmoothedGet(&altHold);
-            altHold.Altitude = z[0];
-            altHold.Velocity = z[1];
-            altHold.Accel    = z[2];
             AltHoldSmoothedSet(&altHold);
-
-            AltHoldSmoothedGet(&altHold);
 
             // Verify that we are in altitude hold mode
             uint8_t armed;
@@ -372,7 +238,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 // Compute integral off altitude error
                 throttleIntegral += error * altitudeHoldSettings.Ki * dT;
             }
-
+            thisTime = xTaskGetTickCount();
             // Only update stabilizationDesired less frequently
             if ((thisTime - lastUpdateTime) < 20) {
                 continue;
@@ -384,14 +250,15 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             StabilizationDesiredGet(&stabilizationDesired);
             if (!enterFailSafe) {
                 if(fabsf(altitudeHoldDesired.Velocity) < 1e-3f) {
-                    stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp + throttleIntegral -
-                                                    altHold.Velocity * altitudeHoldSettings.Kd - altHold.Accel * altitudeHoldSettings.Ka;
+                    stabilizationDesired.Throttle = - error * altitudeHoldSettings.Kp + throttleIntegral +
+                                                    altHold.Velocity * altitudeHoldSettings.Kd;// - altHold.Accel * altitudeHoldSettings.Ka;
                     // scale up throttle to compensate for roll/pitch angle but limit this to 60 deg (cos(60) == 0.5) to prevent excessive scaling
                     float throttlescale = Rbe[2][2] < 0.5f ? 0.5f : Rbe[2][2];
                     stabilizationDesired.Throttle /= throttlescale;
                 } else {
-                    stabilizationDesired.Throttle = velError * altitudeHoldSettings.Kv + throttleIntegral;
+                    stabilizationDesired.Throttle = -velError * altitudeHoldSettings.Kv + throttleIntegral;
                 }
+
                 if (stabilizationDesired.Throttle > 1) {
                     throttleIntegral -= (stabilizationDesired.Throttle - 1);
                     stabilizationDesired.Throttle = 1;

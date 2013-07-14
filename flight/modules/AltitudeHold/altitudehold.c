@@ -114,6 +114,8 @@ float decay;
 float velocity_decay;
 bool running = false;
 float error;
+float velError;
+
 float switchThrottle;
 float smoothed_altitude;
 float starting_altitude;
@@ -364,9 +366,12 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 
             // Compute the altitude error
             error = altitudeHoldDesired.Altitude - altHold.Altitude;
+            velError = altitudeHoldDesired.Velocity - altHold.Velocity;
 
-            // Compute integral off altitude error
-            throttleIntegral += error * altitudeHoldSettings.Ki * dT;
+            if(fabsf(altitudeHoldDesired.Velocity) < 1e-3f) {
+                // Compute integral off altitude error
+                throttleIntegral += error * altitudeHoldSettings.Ki * dT;
+            }
 
             // Only update stabilizationDesired less frequently
             if ((thisTime - lastUpdateTime) < 20) {
@@ -378,12 +383,15 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             // Instead of explicit limit on integral you output limit feedback
             StabilizationDesiredGet(&stabilizationDesired);
             if (!enterFailSafe) {
-                stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp + throttleIntegral -
-                                                altHold.Velocity * altitudeHoldSettings.Kd - altHold.Accel * altitudeHoldSettings.Ka;
-                // scale up throttle to compensate for roll/pitch angle but limit this to 60 deg (cos(60) == 0.5) to prevent excessive scaling
-                float throttlescale = Rbe[2][2] < 0.5f ? 0.5f : Rbe[2][2];
-                stabilizationDesired.Throttle /= throttlescale;
-
+                if(fabsf(altitudeHoldDesired.Velocity) < 1e-3f) {
+                    stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp + throttleIntegral -
+                                                    altHold.Velocity * altitudeHoldSettings.Kd - altHold.Accel * altitudeHoldSettings.Ka;
+                    // scale up throttle to compensate for roll/pitch angle but limit this to 60 deg (cos(60) == 0.5) to prevent excessive scaling
+                    float throttlescale = Rbe[2][2] < 0.5f ? 0.5f : Rbe[2][2];
+                    stabilizationDesired.Throttle /= throttlescale;
+                } else {
+                    stabilizationDesired.Throttle = velError * altitudeHoldSettings.Kv + throttleIntegral;
+                }
                 if (stabilizationDesired.Throttle > 1) {
                     throttleIntegral -= (stabilizationDesired.Throttle - 1);
                     stabilizationDesired.Throttle = 1;

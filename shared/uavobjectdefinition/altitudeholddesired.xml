@@ -1,6 +1,7 @@
 <xml>
     <object name="AltitudeHoldDesired" singleinstance="true" settings="false" category="Control">
         <description>Holds the desired altitude (from manual control) as well as the desired attitude to pass through</description>
+        <field name="Velocity" units="m/s" type ="float" elements="1"/>
         <field name="Altitude" units="m" type="float" elements="1"/>
         <field name="Roll" units="deg" type="float" elements="1"/>
         <field name="Pitch" units="deg" type="float" elements="1"/>

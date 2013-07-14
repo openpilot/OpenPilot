@@ -7,9 +7,7 @@
         <field name="Capacity" units="mAh"  type="uint32"  elements="1" defaultvalue="2200"/>
 
         <field name="CellVoltageThresholds" units="V"  type="float" elementnames="Warning, Alarm" defaultvalue="3.4,3.1"/>
-        <field name="SensorCalibrations" units="" type="float" elementnames="VoltageFactor, CurrentFactor" defaultvalue="1.0, 1.0"/>
-        <field name="VSensorOutImpedance" units="KOhm"  type="uint8"  elements="1" defaultvalue="0"/>
-        <field name="ISensorOutImpedance" units="KOhm"  type="uint8"  elements="1" defaultvalue="0"/>
+        <field name="SensorCalibrations" units="" type="float" elementnames="VoltageFactor, CurrentFactor, VoltageZero, CurrentZero" defaultvalue="1.0, 1.0, 0.0, 0.0"/>
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

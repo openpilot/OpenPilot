@@ -160,10 +160,10 @@ static void onTimer(__attribute__((unused)) UAVObjEvent *ev)
        it makes sense to saturate at max and min values, because a misreading could as easily be very large, as negative. The simple
        sign check doesn't catch this.*/
     energyRemaining = batterySettings.Capacity - flightBatteryData.ConsumedEnergy; // in mAh
-    if (flightBatteryData.AvgCurrent > 0) {
+    if (batterySettings.Capacity > 0 && flightBatteryData.AvgCurrent > 0) {
         flightBatteryData.EstimatedFlightTime = (energyRemaining / (flightBatteryData.AvgCurrent * 1000.0f)) * 3600.0f; // in Sec
     } else {
-        flightBatteryData.EstimatedFlightTime = 9999;
+        flightBatteryData.EstimatedFlightTime = 0;
     }
 
     // generate alarms where needed...
@@ -174,9 +174,9 @@ static void onTimer(__attribute__((unused)) UAVObjEvent *ev)
         AlarmsSet(SYSTEMALARMS_ALARM_FLIGHTTIME, SYSTEMALARMS_ALARM_ERROR);
     } else {
         // FIXME: should make the timer alarms user configurable
-        if (flightBatteryData.EstimatedFlightTime < 30) {
+        if (batterySettings.Capacity > 0 && flightBatteryData.EstimatedFlightTime < 30) {
             AlarmsSet(SYSTEMALARMS_ALARM_FLIGHTTIME, SYSTEMALARMS_ALARM_CRITICAL);
-        } else if (flightBatteryData.EstimatedFlightTime < 120) {
+        } else if (batterySettings.Capacity > 0 && flightBatteryData.EstimatedFlightTime < 120) {
             AlarmsSet(SYSTEMALARMS_ALARM_FLIGHTTIME, SYSTEMALARMS_ALARM_WARNING);
         } else {
             AlarmsClear(SYSTEMALARMS_ALARM_FLIGHTTIME);

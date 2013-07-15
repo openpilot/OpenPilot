@@ -31,7 +31,7 @@
         <field name="AirspeedToPowerCrossFeed" units="1 / (m/s)" type="float" elementnames="Kp,Max" defaultvalue="0.2, 1"/>
                 <!-- proportional coefficient for adjusting vertical speed error for power calculation
                      in relation to airspeed error IASerror -->
-        <field name="PowerPI" units="1/(m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.05,0.05,0.5"/>
+        <field name="PowerPI" units="1/(m/s)" type="float" elements="3" elementnames="Kp,Ki,ILimit" defaultvalue="0.01,0.05,0.5"/>
                 <!-- proportional coefficient for desired throttle
                      in relation to vertical speed error (absolute but including crossfeed) -->
 

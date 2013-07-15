@@ -6,9 +6,8 @@
 	<field name="Ki" units="throttle/m" type="float" elements="1" defaultvalue="0"/>
 	<field name="Kd" units="throttle/m" type="float" elements="1" defaultvalue="0.03"/>
 	<field name="Ka" units="throttle/(m/s^2)" type="float" elements="1" defaultvalue="0.005"/>
-	<field name="PressureNoise" units="m" type="float" elements="1" defaultvalue="0.4"/>
-	<field name="AccelNoise" units="m/s^2" type="float" elements="1" defaultvalue="5"/>
-	<field name="AccelDrift" units="m/s^2" type="float" elements="1" defaultvalue="0.001"/>
+	<field name="VelocityTau" units="" type="float" elements="1" defaultvalue="0.05"/>
+	<field name="AccelTau" units="" type="float" elements="1" defaultvalue="0.05"/>
 	<field name="ThrottleExp" units="" type="uint8" elements="1" defaultvalue="128"/>
 	<field name="ThrottleRate" units="m/s" type="uint8" elements="1" defaultvalue="5"/>
         <access gcs="readwrite" flight="readwrite"/>

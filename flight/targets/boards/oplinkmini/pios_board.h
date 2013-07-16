@@ -25,7 +25,6 @@
 
 #ifndef PIOS_BOARD_H
 #define PIOS_BOARD_H
-
 #define ADD_ONE_ADC
 
 // ------------------------
@@ -234,6 +233,8 @@ extern uint32_t pios_ppm_out_id;
 // ADCCLK = PCLK2 / 2
 #define PIOS_ADC_RATE                    (72.0e6 / 1.0 / 8.0 / 252.0 / (PIOS_ADC_NUM_CHANNELS >> PIOS_ADC_USE_ADC2))
 #define PIOS_ADC_MAX_OVERSAMPLING        36
+
+#define PIOS_ADC_TEMPERATURE_PIN         0
 
 // ------------------------
 // PIOS_RCVR

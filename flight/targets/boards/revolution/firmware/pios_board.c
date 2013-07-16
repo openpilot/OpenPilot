@@ -908,6 +908,16 @@ void PIOS_Board_Init(void)
     PIOS_DEBUG_Init(pios_tim_servoport_all_pins, NELEMENTS(pios_tim_servoport_all_pins));
 #endif
 
+    // Disable GPIO_A8 Pullup to prevent wrong results on battery voltage readout
+    GPIO_InitTypeDef gpioA8 = {
+        .GPIO_Speed = GPIO_Speed_2MHz,
+        .GPIO_Mode  = GPIO_Mode_IN,
+        .GPIO_PuPd  = GPIO_PuPd_NOPULL,
+        .GPIO_Pin   = GPIO_Pin_8,
+        .GPIO_OType = GPIO_OType_OD,
+    };
+    GPIO_Init(GPIOA, &gpioA8);
+
     if (PIOS_I2C_Init(&pios_i2c_mag_pressure_adapter_id, &pios_i2c_mag_pressure_adapter_cfg)) {
         PIOS_DEBUG_Assert(0);
     }

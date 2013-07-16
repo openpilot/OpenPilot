@@ -20,6 +20,7 @@ ASRC			+= $(PIOS_DEVLIB)startup_stm32f10x_$(MODEL)$(MODEL_SUFFIX).S
 
 # PIOS device library source and includes
 SRC			+= $(sort $(wildcard $(PIOS_DEVLIB)*.c))
+EXTRAINCDIRS		+= $(PIOS_DEVLIB)inc
 
 # CMSIS for the F1
 include $(PIOSCOMMON)/libraries/CMSIS/library.mk

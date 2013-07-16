@@ -250,6 +250,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             if (!enterFailSafe) {
                 if(fabsf(altitudeHoldDesired.Velocity) < 1e-3f) {
                     stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp
+                                                    + error * fabsf(error) * altitudeHoldSettings.Kp2
                                                     + throttleIntegral
                                                     - altHold.Velocity * altitudeHoldSettings.Kd
                                                     - altHold.Accel * altitudeHoldSettings.Ka;

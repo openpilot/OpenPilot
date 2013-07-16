@@ -867,7 +867,7 @@ static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed)
     } else if (cmd->Throttle >= DEADBAND_LOW && cmd->Throttle <= DEADBAND_HIGH && (throttleRate != 0)) {
         // Require the stick to enter the dead band before they can move height
         // Vario is not "engaged" when throttleRate == 0
-        if(fabsf(altitudeHoldDesiredData.Velocity) > 1e-3f) {
+        if (fabsf(altitudeHoldDesiredData.Velocity) > 1e-3f) {
             altitudeHoldDesiredData.Altitude = altHoldSmoothed.Altitude;
             altitudeHoldDesiredData.Velocity = 0.0f;
         }

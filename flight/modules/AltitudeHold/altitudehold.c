@@ -135,10 +135,11 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
     float lastVertVelocity;
     portTickType thisTime, lastUpdateTime;
     UAVObjEvent ev;
+
     dT = 0;
     lastVertVelocity = 0;
     timeval = 0;
-    lastUpdateTime = 0;
+    lastUpdateTime   = 0;
     // Force update of the settings
     SettingsUpdatedCb(&ev);
     // Failsafe handling
@@ -146,7 +147,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
     bool enterFailSafe = false;
     // Listen for updates.
     AltitudeHoldDesiredConnectQueue(queue);
-    //PositionStateConnectQueue(queue);
+    // PositionStateConnectQueue(queue);
     FlightStatusConnectQueue(queue);
     VelocityStateConnectQueue(queue);
     bool altitudeHoldFlightMode = false;
@@ -180,7 +181,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 Quaternion2R(q, Rbe);
                 // Copy the current throttle as a starting point for integral
                 StabilizationDesiredThrottleGet(&throttleIntegral);
-                switchThrottle = throttleIntegral;
+                switchThrottle    = throttleIntegral;
                 throttleIntegral *= Rbe[2][2]; // rotate into earth frame
                 if (throttleIntegral > 1) {
                     throttleIntegral = 1;
@@ -196,8 +197,8 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 lastAltitudeHoldDesiredUpdate = PIOS_DELAY_GetRaw();
             }
         } else if (ev.obj == VelocityStateHandle()) {
-            init = (init == WAITING_BARO) ? WAITIING_INIT : init;
-            dT = 0.1f * PIOS_DELAY_DiffuS(timeval) / 1.0e6f + 0.9f * dT;
+            init    = (init == WAITING_BARO) ? WAITIING_INIT : init;
+            dT      = 0.1f * PIOS_DELAY_DiffuS(timeval) / 1.0e6f + 0.9f * dT;
             timeval = PIOS_DELAY_GetRaw();
 
             AltHoldSmoothedGet(&altHold);
@@ -205,11 +206,11 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             VelocityStateGet(&velocityData);
 
             altHold.Velocity = -(velAlpha * altHold.Velocity + (1 - velAlpha) * velocityData.Down);
-            float vertAccel = (velocityData.Down - lastVertVelocity)/dT;
+            float vertAccel = (velocityData.Down - lastVertVelocity) / dT;
 
             lastVertVelocity = velocityData.Down;
 
-            altHold.Accel = -(accelAlpha * altHold.Accel + (1 - accelAlpha) * vertAccel);
+            altHold.Accel    = -(accelAlpha * altHold.Accel + (1 - accelAlpha) * vertAccel);
             altHold.StateUpdateInterval = dT;
 
             PositionStateDownGet(&altHold.Altitude);
@@ -230,10 +231,10 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             }
 
             // Compute the altitude error
-            error = altitudeHoldDesired.Altitude - altHold.Altitude;
+            error    = altitudeHoldDesired.Altitude - altHold.Altitude;
             velError = altitudeHoldDesired.Velocity - altHold.Velocity;
 
-            if(fabsf(altitudeHoldDesired.Velocity) < 1e-3f) {
+            if (fabsf(altitudeHoldDesired.Velocity) < 1e-3f) {
                 // Compute integral off altitude error
                 throttleIntegral += error * altitudeHoldSettings.Ki * dT;
             }
@@ -248,7 +249,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             // Instead of explicit limit on integral you output limit feedback
             StabilizationDesiredGet(&stabilizationDesired);
             if (!enterFailSafe) {
-                if(fabsf(altitudeHoldDesired.Velocity) < 1e-3f) {
+                if (fabsf(altitudeHoldDesired.Velocity) < 1e-3f) {
                     stabilizationDesired.Throttle = error * altitudeHoldSettings.Kp
                                                     + error * fabsf(error) * altitudeHoldSettings.Kp2
                                                     + throttleIntegral
@@ -298,6 +299,6 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     AltitudeHoldSettingsGet(&altitudeHoldSettings);
-    accelAlpha = expf(-(1000.0f/666.0f * ACCEL_DOWNSAMPLE)/ altitudeHoldSettings.AccelTau);
-    velAlpha = expf(-(1000.0f/666.0f * ACCEL_DOWNSAMPLE)/ altitudeHoldSettings.VelocityTau);
+    accelAlpha = expf(-(1000.0f / 666.0f * ACCEL_DOWNSAMPLE) / altitudeHoldSettings.AccelTau);
+    velAlpha   = expf(-(1000.0f / 666.0f * ACCEL_DOWNSAMPLE) / altitudeHoldSettings.VelocityTau);
 }

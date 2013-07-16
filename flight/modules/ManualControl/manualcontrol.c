@@ -61,7 +61,7 @@
 #if defined(PIOS_MANUAL_STACK_SIZE)
 #define STACK_SIZE_BYTES  PIOS_MANUAL_STACK_SIZE
 #else
-#define STACK_SIZE_BYTES  1024
+#define STACK_SIZE_BYTES  1152
 #endif
 
 #define TASK_PRIORITY     (tskIDLE_PRIORITY + 4)
@@ -323,9 +323,12 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 cmd.Yaw = 0;
                 cmd.Pitch      = 0;
                 cmd.Collective = 0;
-                // cmd.FlightMode = MANUALCONTROLCOMMAND_FLIGHTMODE_AUTO; // don't do until AUTO implemented and functioning
-                // Important: Throttle < 0 will reset Stabilization coefficients among other things. Either change this,
-                // or leave throttle at IDLE speed or above when going into AUTO-failsafe.
+                if (settings.FailsafeBehavior != MANUALCONTROLSETTINGS_FAILSAFEBEHAVIOR_NONE) {
+                    FlightStatusGet(&flightStatus);
+
+                    flightStatus.FlightMode = settings.FlightModePosition[settings.FailsafeBehavior - 1];
+                    FlightStatusSet(&flightStatus);
+                }
                 AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
 
                 AccessoryDesiredData accessory;
@@ -724,15 +727,17 @@ static void updatePathDesired(__attribute__((unused)) ManualControlCommandData *
         // Simple Return To Base mode - keep altitude the same, fly to home position
         PositionStateData positionState;
         PositionStateGet(&positionState);
+        ManualControlSettingsData settings;
+        ManualControlSettingsGet(&settings);
 
         PathDesiredData pathDesired;
         PathDesiredGet(&pathDesired);
         pathDesired.Start[PATHDESIRED_START_NORTH] = 0;
         pathDesired.Start[PATHDESIRED_START_EAST]  = 0;
-        pathDesired.Start[PATHDESIRED_START_DOWN]  = positionState.Down - 10;
+        pathDesired.Start[PATHDESIRED_START_DOWN]  = positionState.Down - settings.ReturnToHomeAltitudeOffset;
         pathDesired.End[PATHDESIRED_END_NORTH]     = 0;
         pathDesired.End[PATHDESIRED_END_EAST] = 0;
-        pathDesired.End[PATHDESIRED_END_DOWN] = positionState.Down - 10;
+        pathDesired.End[PATHDESIRED_END_DOWN] = positionState.Down - settings.ReturnToHomeAltitudeOffset;
         pathDesired.StartingVelocity = 1;
         pathDesired.EndingVelocity   = 0;
         pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
@@ -937,6 +942,9 @@ static uint32_t timeDifferenceMs(portTickType start_time, portTickType end_time)
  */
 static bool okToArm(void)
 {
+    // update checks
+    configuration_check();
+
     // read alarms
     SystemAlarmsData alarms;
 

@@ -371,7 +371,7 @@ static uint8_t conditionDistanceToTarget()
     if (pathAction.ConditionParameters[1] > 0.5f) {
         distance = sqrtf(powf(waypoint.Position[0] - positionState.North, 2)
                          + powf(waypoint.Position[1] - positionState.East, 2)
-                         + powf(waypoint.Position[1] - positionState.Down, 2));
+                         + powf(waypoint.Position[2] - positionState.Down, 2));
     } else {
         distance = sqrtf(powf(waypoint.Position[0] - positionState.North, 2)
                          + powf(waypoint.Position[1] - positionState.East, 2));

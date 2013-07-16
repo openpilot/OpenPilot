@@ -135,6 +135,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
     float lastVertVelocity;
     portTickType thisTime, lastUpdateTime;
     UAVObjEvent ev;
+    dT = 0;
     lastVertVelocity = 0;
     timeval = 0;
     lastUpdateTime = 0;
@@ -145,7 +146,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
     bool enterFailSafe = false;
     // Listen for updates.
     AltitudeHoldDesiredConnectQueue(queue);
-    PositionStateConnectQueue(queue);
+    //PositionStateConnectQueue(queue);
     FlightStatusConnectQueue(queue);
     VelocityStateConnectQueue(queue);
     bool altitudeHoldFlightMode = false;
@@ -167,10 +168,6 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 
             // Todo: Add alarm if it should be running
             continue;
-        } else if (ev.obj == PositionStateHandle()) {
-            posUpdated = true;
-
-            init = (init == WAITING_BARO) ? WAITIING_INIT : init;
         } else if (ev.obj == FlightStatusHandle()) {
             FlightStatusFlightModeGet(&flightMode);
             altitudeHoldFlightMode = flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEHOLD || flightMode == FLIGHTSTATUS_FLIGHTMODE_ALTITUDEVARIO;
@@ -199,8 +196,8 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 lastAltitudeHoldDesiredUpdate = PIOS_DELAY_GetRaw();
             }
         } else if (ev.obj == VelocityStateHandle()) {
-
-            dT = PIOS_DELAY_DiffuS(timeval) / 1.0e6f;
+            init = (init == WAITING_BARO) ? WAITIING_INIT : init;
+            dT = 0.1f * PIOS_DELAY_DiffuS(timeval) / 1.0e6f + 0.9f * dT;
             timeval = PIOS_DELAY_GetRaw();
 
             AltHoldSmoothedGet(&altHold);
@@ -213,6 +210,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             lastVertVelocity = velocityData.Down;
 
             altHold.Accel = -(accelAlpha * altHold.Accel + (1 - accelAlpha) * vertAccel);
+            altHold.StateUpdateInterval = dT;
 
             PositionStateDownGet(&altHold.Altitude);
             altHold.Altitude = -altHold.Altitude;
@@ -244,7 +242,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             if ((thisTime - lastUpdateTime) < 20) {
                 continue;
             }
-
+            altHold.ThrottleUpdateInterval = thisTime - lastUpdateTime;
             lastUpdateTime = thisTime;
 
             // Instead of explicit limit on integral you output limit feedback

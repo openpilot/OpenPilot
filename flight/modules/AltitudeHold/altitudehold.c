@@ -66,12 +66,15 @@
 #define TASK_PRIORITY    (tskIDLE_PRIORITY + 1)
 #define ACCEL_DOWNSAMPLE 4
 #define TIMEOUT_TRESHOLD 200000
+#define DESIRED_UPDATE_RATE_MS 20 // milliseconds
 // Private types
 
 // Private variables
 static xTaskHandle altitudeHoldTaskHandle;
 static xQueueHandle queue;
 static AltitudeHoldSettingsData altitudeHoldSettings;
+static float throttleAlpha = 1.0f;
+static float throttle_old = 0.0f;
 
 // Private functions
 static void altitudeHoldTask(void *parameters);
@@ -119,6 +122,9 @@ float accelAlpha;
 float velAlpha;
 bool running = false;
 float error;
+float switchThrottle;
+float smoothed_altitude;
+float starting_altitude;
 float velError;
 uint32_t timeval;
 bool posUpdated;
@@ -241,7 +247,7 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 
             thisTime = xTaskGetTickCount();
             // Only update stabilizationDesired less frequently
-            if ((thisTime - lastUpdateTime) < 20) {
+            if ((thisTime - lastUpdateTime)*1000/configTICK_RATE_HZ  < DESIRED_UPDATE_RATE_MS) {
                 continue;
             }
             altHold.ThrottleUpdateInterval = thisTime - lastUpdateTime;
@@ -265,6 +271,8 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 Quaternion2R(q, Rbe);
                 float throttlescale = Rbe[2][2] < 0.5f ? 0.5f : Rbe[2][2];
                 stabilizationDesired.Throttle /= throttlescale;
+                stabilizationDesired.Throttle = stabilizationDesired.Throttle * throttleAlpha + throttle_old * (1.0f - throttleAlpha);
+                throttle_old = stabilizationDesired.Throttle;
                 fblimit = 0;
 
                 if (stabilizationDesired.Throttle > 1) {
@@ -299,4 +307,14 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     AltitudeHoldSettingsGet(&altitudeHoldSettings);
     accelAlpha = expf(-(1000.0f / 666.0f * ACCEL_DOWNSAMPLE) / altitudeHoldSettings.AccelTau);
     velAlpha   = expf(-(1000.0f / 666.0f * ACCEL_DOWNSAMPLE) / altitudeHoldSettings.VelocityTau);
+
+    // don't use throttle filter if specified cutoff frequency is too low or above nyquist criteria (half the sampling frequency)
+    if (altitudeHoldSettings.ThrottleFilterCutoff > 0.001f && altitudeHoldSettings.ThrottleFilterCutoff < 2000.0f/DESIRED_UPDATE_RATE_MS)
+    {
+        throttleAlpha = (float)DESIRED_UPDATE_RATE_MS/((float)DESIRED_UPDATE_RATE_MS + 1000.0f/(2.0f*M_PI_F*altitudeHoldSettings.ThrottleFilterCutoff));
+    }
+    else
+    {
+        throttleAlpha = 1.0f;
+    }
 }

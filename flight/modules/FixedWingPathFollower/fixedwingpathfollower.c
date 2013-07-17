@@ -446,19 +446,19 @@ static uint8_t updateFixedDesiredAttitude()
     // Error condition: plane too slow or too fast
     fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHSPEED] = 0;
     fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWSPEED]  = 0;
-    if (indicatedAirspeedState > systemSettings.AirSpeedMax) {
+    if (indicatedAirspeedState > systemSettings.AirSpeedMax * fixedwingpathfollowerSettings.Safetymargins[FIXEDWINGPATHFOLLOWERSETTINGS_SAFETYMARGINS_OVERSPEED]) {
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_OVERSPEED] = 1;
         result = 0;
     }
-    if (indicatedAirspeedState > fixedwingpathfollowerSettings.HorizontalVelMax * 1.2f) {
+    if (indicatedAirspeedState > fixedwingpathfollowerSettings.HorizontalVelMax * fixedwingpathfollowerSettings.Safetymargins[FIXEDWINGPATHFOLLOWERSETTINGS_SAFETYMARGINS_HIGHSPEED]) {
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHSPEED] = 1;
         result = 0;
     }
-    if (indicatedAirspeedState < fixedwingpathfollowerSettings.HorizontalVelMin * 0.8f) {
+    if (indicatedAirspeedState < fixedwingpathfollowerSettings.HorizontalVelMin * fixedwingpathfollowerSettings.Safetymargins[FIXEDWINGPATHFOLLOWERSETTINGS_SAFETYMARGINS_LOWSPEED]) {
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWSPEED] = 1;
         result = 0;
     }
-    if (indicatedAirspeedState < systemSettings.AirSpeedMin) {
+    if (indicatedAirspeedState < systemSettings.AirSpeedMin * fixedwingpathfollowerSettings.Safetymargins[FIXEDWINGPATHFOLLOWERSETTINGS_SAFETYMARGINS_STALLSPEED]) {
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_STALLSPEED] = 1;
         result = 0;
     }
@@ -508,7 +508,8 @@ static uint8_t updateFixedDesiredAttitude()
     if (powerCommand >= fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MAX] && // throttle at maximum
         velocityState.Down > 0 && // we ARE going down
         descentspeedDesired < 0 && // we WANT to go up
-        airspeedError > 0) { // we are too slow already
+        airspeedError > 0 && // we are too slow already
+        fixedwingpathfollowerSettings.Safetymargins[FIXEDWINGPATHFOLLOWERSETTINGS_SAFETYMARGINS_LOWPOWER] > 0.5f) { // alarm switched on
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_LOWPOWER] = 1;
         result = 0;
     }
@@ -517,7 +518,8 @@ static uint8_t updateFixedDesiredAttitude()
     if (powerCommand >= fixedwingpathfollowerSettings.ThrottleLimit[FIXEDWINGPATHFOLLOWERSETTINGS_THROTTLELIMIT_MIN] && // throttle at minimum
         velocityState.Down < 0 && // we ARE going up
         descentspeedDesired > 0 && // we WANT to go down
-        airspeedError < 0) { // we are too fast already
+        airspeedError < 0 && // we are too fast already
+                        fixedwingpathfollowerSettings.Safetymargins[FIXEDWINGPATHFOLLOWERSETTINGS_SAFETYMARGINS_HIGHPOWER] > 0.5f) { // alarm switched on
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_HIGHPOWER] = 1;
         result = 0;
     }
@@ -558,7 +560,8 @@ static uint8_t updateFixedDesiredAttitude()
     if (pitchCommand >= fixedwingpathfollowerSettings.PitchLimit[FIXEDWINGPATHFOLLOWERSETTINGS_PITCHLIMIT_MAX] && // pitch demand is full up
         velocityState.Down > 0 && // we ARE going down
         descentspeedDesired < 0 && // we WANT to go up
-        airspeedError < 0) { // we are too fast already
+        airspeedError < 0 && // we are too fast already
+                        fixedwingpathfollowerSettings.Safetymargins[FIXEDWINGPATHFOLLOWERSETTINGS_SAFETYMARGINS_PITCHCONTROL] > 0.5f) { // alarm switched on
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_PITCHCONTROL] = 1;
         result = 0;
     }
@@ -577,7 +580,9 @@ static uint8_t updateFixedDesiredAttitude()
     }
     // Error condition: wind speed is higher than airspeed. We are forced backwards!
     fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_WIND] = 0;
-    if (headingError > 90.0f || headingError < -90.0f) {
+    if ((headingError > fixedwingpathfollowerSettings.Safetymargins[FIXEDWINGPATHFOLLOWERSETTINGS_SAFETYMARGINS_WIND] ||
+         headingError < -fixedwingpathfollowerSettings.Safetymargins[FIXEDWINGPATHFOLLOWERSETTINGS_SAFETYMARGINS_WIND]) &&
+        fixedwingpathfollowerSettings.Safetymargins[FIXEDWINGPATHFOLLOWERSETTINGS_SAFETYMARGINS_HIGHPOWER] > 0.5f) { // alarm switched on
         // we are flying backwards
         fixedwingpathfollowerStatus.Errors[FIXEDWINGPATHFOLLOWERSTATUS_ERRORS_WIND] = 1;
         result = 0;

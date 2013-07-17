@@ -1,12 +1,12 @@
 <xml>
     <object name="AltitudeHoldSettings" singleinstance="true" settings="true" category="Control">
         <description>Settings for the @ref AltitudeHold module</description>
-        <field name="Kp" units="throttle/m" type="float" elements="1" defaultvalue="0"/>
-        <field name="Kp2" units="throttle/m^2" type="float" elements="1" defaultvalue="0.08"/>
+        <field name="AltitudeKp" units="throttle/m" type="float" elements="1" defaultvalue="0"/>
+        <field name="Altitude2Kp" units="throttle/m^2" type="float" elements="1" defaultvalue="0.08"/>
+        <field name="VelocityKp" units="throttle/(m/s)" type="float" elements="1" defaultvalue="0.1"/>
         <field name="AltitudeKi" units="throttle/m" type="float" elements="1" defaultvalue="0.1"/>
         <field name="VelocityKi" units="throttle/m" type="float" elements="1" defaultvalue="0.2"/>	
-        <field name="Kd" units="throttle/m" type="float" elements="1" defaultvalue="0.18"/>
-        <field name="Ka" units="throttle/(m/s^2)" type="float" elements="1" defaultvalue="0.05"/>
+        <field name="AltitudeKd" units="throttle/m" type="float" elements="1" defaultvalue="0.18"/>
         <field name="VelocityTau" units="" type="float" elements="1" defaultvalue="0.5"/>
         <field name="AccelTau" units="" type="float" elements="1" defaultvalue="0.5"/>
         <field name="ThrottleFilterCutoff" units="Hz" type="float" elements="1" defaultvalue="2"/>

@@ -84,10 +84,11 @@ AccelGyroSettingsData agcal;
 // These values are initialized by settings but can be updated by the attitude algorithm
 
 static float mag_bias[3] = { 0, 0, 0 };
-static float mag_scale[3] = { 0, 0, 0 };
+static float mag_transform[3][3]={{ 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1}};
 // temp coefficient to calculate gyro bias
 static volatile bool gyro_temp_calibrated  = false;
 static volatile bool accel_temp_calibrated = false;
+
 static float R[3][3] = {
     { 0 }
 };
@@ -119,6 +120,7 @@ int32_t SensorsInitialize(void)
 
     RevoCalibrationConnectCallback(&settingsUpdatedCb);
     AttitudeSettingsConnectCallback(&settingsUpdatedCb);
+
     AccelGyroSettingsConnectCallback(&settingsUpdatedCb);
     return 0;
 }
@@ -359,7 +361,6 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             accels_out[1] -= agcal.accel_temp_coeff.Y * ctemp;
             accels_out[2] -= agcal.accel_temp_coeff.Z * ctemp;
         }
-
         if (rotate) {
             rot_mult(R, accels_out, accels);
             accelSensorData.x = accels[0];
@@ -389,7 +390,6 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
             gyros_out[1] -= (agcal.gyro_temp_coeff.Y + agcal.gyro_temp_coeff.Y2 * ctemp) * ctemp;
             gyros_out[2] -= (agcal.gyro_temp_coeff.Z + agcal.gyro_temp_coeff.Z2 * ctemp) * ctemp;
         }
-
         if (rotate) {
             rot_mult(R, gyros_out, gyros);
             gyroSensorData.x = gyros[0];
@@ -411,20 +411,16 @@ static void SensorsTask(__attribute__((unused)) void *parameters)
         if (PIOS_HMC5883_NewDataAvailable() || PIOS_DELAY_DiffuS(mag_update_time) > 150000) {
             int16_t values[3];
             PIOS_HMC5883_ReadMag(values);
-            float mags[3] = { (float)values[1] * mag_scale[0] - mag_bias[0],
-                              (float)values[0] * mag_scale[1] - mag_bias[1],
-                              -(float)values[2] * mag_scale[2] - mag_bias[2] };
-            if (rotate) {
-                float mag_out[3];
-                rot_mult(R, mags, mag_out);
-                mag.x = mag_out[0];
-                mag.y = mag_out[1];
-                mag.z = mag_out[2];
-            } else {
-                mag.x = mags[0];
-                mag.y = mags[1];
-                mag.z = mags[2];
-            }
+            float mags[3] = { (float)values[1] - mag_bias[0],
+                              (float)values[0] - mag_bias[1],
+                              -(float)values[2] - mag_bias[2] };
+
+            float mag_out[3];
+            rot_mult(mag_transform, mags, mag_out);
+
+            mag.x = mag_out[0];
+            mag.y = mag_out[1];
+            mag.z = mag_out[2];
 
             MagSensorSet(&mag);
             mag_update_time = PIOS_DELAY_GetRaw();
@@ -449,9 +445,6 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     mag_bias[0]  = cal.mag_bias.X;
     mag_bias[1]  = cal.mag_bias.Y;
     mag_bias[2]  = cal.mag_bias.Z;
-    mag_scale[0] = cal.mag_scale.X;
-    mag_scale[1] = cal.mag_scale.Y;
-    mag_scale[2] = cal.mag_scale.Z;
 
     accel_temp_calibrated = (agcal.temp_calibrated_extent.max - agcal.temp_calibrated_extent.min > .1f) &&
                             (fabsf(agcal.accel_temp_coeff.X) > 1e-9f || fabsf(agcal.accel_temp_coeff.Y) > 1e-9f || fabsf(agcal.accel_temp_coeff.Z) > 1e-9f);
@@ -469,14 +462,44 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         attitudeSettings.BoardRotation.Yaw == 0) {
         rotate = 0;
     } else {
-        float rotationQuat[4];
+        rotate = 1;
+    }
+    float rotationQuat[4];
         const float rpy[3] = { attitudeSettings.BoardRotation.Roll,
                                attitudeSettings.BoardRotation.Pitch,
                                attitudeSettings.BoardRotation.Yaw };
-        RPY2Quaternion(rpy, rotationQuat);
-        Quaternion2R(rotationQuat, R);
-        rotate = 1;
-    }
+    RPY2Quaternion(rpy, rotationQuat);
+    Quaternion2R(rotationQuat, R);
+
+    mag_transform[0][0] = R[0][0] * cal.mag_transform.r0c0 +
+                          R[1][0] * cal.mag_transform.r0c1 +
+                          R[2][0] * cal.mag_transform.r0c2;
+    mag_transform[0][1] = R[0][1] * cal.mag_transform.r0c0 +
+                          R[1][1] * cal.mag_transform.r0c1 +
+                          R[2][1] * cal.mag_transform.r0c2;
+    mag_transform[0][2] = R[0][2] * cal.mag_transform.r0c0 +
+                          R[1][2] * cal.mag_transform.r0c1 +
+                          R[2][2] * cal.mag_transform.r0c2;
+
+    mag_transform[1][0] = R[0][0] * cal.mag_transform.r1c0 +
+                          R[1][0] * cal.mag_transform.r1c1 +
+                          R[2][0] * cal.mag_transform.r1c2;
+    mag_transform[1][1] = R[0][1] * cal.mag_transform.r1c0 +
+                          R[1][1] * cal.mag_transform.r1c1 +
+                          R[2][1] * cal.mag_transform.r1c2;
+    mag_transform[1][2] = R[0][2] * cal.mag_transform.r1c0 +
+                          R[1][2] * cal.mag_transform.r1c1 +
+                          R[2][2] * cal.mag_transform.r1c2;
+
+    mag_transform[1][0] = R[0][0] * cal.mag_transform.r2c0 +
+                          R[1][0] * cal.mag_transform.r2c1 +
+                          R[2][0] * cal.mag_transform.r2c2;
+    mag_transform[2][1] = R[0][1] * cal.mag_transform.r2c0 +
+                          R[1][1] * cal.mag_transform.r2c1 +
+                          R[2][1] * cal.mag_transform.r2c2;
+    mag_transform[2][2] = R[0][2] * cal.mag_transform.r2c0 +
+                          R[1][2] * cal.mag_transform.r2c1 +
+                          R[2][2] * cal.mag_transform.r2c2;
 }
 /**
  * @}

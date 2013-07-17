@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_LED LED Functions
- * @brief PIOS interface for LEDs
+ * @addtogroup PIOS_LED LED Functions
+ * @brief STM32 Hardware LED handling code
  * @{
  *
- * @file       pios_led_priv.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      LED private definitions.
+ * @file       pios_led.c
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @brief      LED functions, init, toggle, on & off.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,14 +28,52 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_LED_PRIV_H
-#define PIOS_LED_PRIV_H
+#include "pios.h"
+
+#ifdef PIOS_INCLUDE_LED
 
 #include <pios_gpio_priv.h>
+#include <pios_gpio.h>
 
-extern int32_t PIOS_LED_Init(const struct pios_gpio_cfg *cfg);
+static uint32_t pios_led_gpios_id;
 
-#endif /* PIOS_LED_PRIV_H */
+/**
+ * Initialises all the LED's
+ */
+int32_t PIOS_LED_Init(const struct pios_gpio_cfg *cfg)
+{
+    PIOS_Assert(cfg);
+    return PIOS_GPIO_Init(&pios_led_gpios_id, cfg);
+}
+
+/**
+ * Turn on LED
+ * \param[in] LED LED id
+ */
+void PIOS_LED_On(uint32_t led_id)
+{
+    PIOS_GPIO_On(pios_led_gpios_id, led_id);
+}
+
+/**
+ * Turn off LED
+ * \param[in] LED LED id
+ */
+void PIOS_LED_Off(uint32_t led_id)
+{
+    PIOS_GPIO_Off(pios_led_gpios_id, led_id);
+}
+
+/**
+ * Toggle LED on/off
+ * \param[in] LED LED id
+ */
+void PIOS_LED_Toggle(uint32_t led_id)
+{
+    PIOS_GPIO_Toggle(pios_led_gpios_id, led_id);
+}
+
+#endif /* PIOS_INCLUDE_LED */
 
 /**
  * @}

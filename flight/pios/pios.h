@@ -81,6 +81,8 @@
 #include "semphr.h"
 #endif
 
+#include <stdbool.h>
+
 #include <pios_architecture.h>
 
 #ifdef PIOS_INCLUDE_TASK_MONITOR

@@ -1089,27 +1089,27 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
         // Calc channel see assumptions7
         switch (settings->Arming) {
         case MANUALCONTROLSETTINGS_ARMING_ROLLLEFT:
-            armingInputLevel = -1.0f * cmd->Roll;
-            break;
-        case MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT:
             armingInputLevel = 1.0f * cmd->Roll;
             break;
-        case MANUALCONTROLSETTINGS_ARMING_PITCHAFT:
-            armingInputLevel = -1.0f * cmd->Pitch;
+        case MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT:
+            armingInputLevel = -1.0f * cmd->Roll;
             break;
         case MANUALCONTROLSETTINGS_ARMING_PITCHFORWARD:
             armingInputLevel = 1.0f * cmd->Pitch;
             break;
+        case MANUALCONTROLSETTINGS_ARMING_PITCHAFT:
+            armingInputLevel = -1.0f * cmd->Pitch;
+            break;
         case MANUALCONTROLSETTINGS_ARMING_YAWLEFT:
-            armingInputLevel = -1.0f * cmd->Yaw;
+            armingInputLevel = 1.0f * cmd->Yaw;
             break;
         case MANUALCONTROLSETTINGS_ARMING_YAWRIGHT:
-            armingInputLevel = 1.0f * cmd->Yaw;
+            armingInputLevel = -1.0f * cmd->Yaw;
             break;
         case MANUALCONTROLSETTINGS_ARMING_ACCESSORY0:
         case MANUALCONTROLSETTINGS_ARMING_ACCESSORY1:
         case MANUALCONTROLSETTINGS_ARMING_ACCESSORY2:
-            armingInputLevel = (float)armSwitch;
+            armingInputLevel = -1.0f * (float)armSwitch;
             break;
         }
 

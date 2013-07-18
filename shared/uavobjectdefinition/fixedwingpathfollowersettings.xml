@@ -42,8 +42,14 @@
                 <!-- maximum allowed pitch angles and setpoint for neutral pitch -->
         <field name="ThrottleLimit" units="" type="float" elements="3" elementnames="Min,Neutral,Max" defaultvalue="0.1,0.5,0.9" />
                 <!-- minimum and maximum allowed throttle and setpoint for cruise speed -->
-
+        <field name="Safetymargins" units="" type="float"
+                elementnames="Wind, Stallspeed, Lowspeed, Highspeed, Overspeed, Lowpower, Highpower, Pitchcontrol"
+                defaultvalue="90, 1.0, 0.5, 1.5, 1.0, 1, 1, 1" />
+                <!-- Wind: degrees of crabbing allowed
+                     Speeds: percentage (1.0=100%) of the limit to be over/onder
+                     Power & Control: flag to turn on/off 0.0 =off 1.0 = on -->
         <field name="UpdatePeriod" units="ms" type="int32" elements="1" defaultvalue="100"/>
+
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>
         <telemetryflight acked="true" updatemode="onchange" period="0"/>

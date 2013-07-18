@@ -67,7 +67,6 @@
 #define TASK_PRIORITY     (tskIDLE_PRIORITY + 4)
 #define UPDATE_PERIOD_MS  20
 #define THROTTLE_FAILSAFE -0.1f
-#define ARMED_TIME_MS     1000
 #define ARMED_THRESHOLD   0.50f
 // safe band to allow a bit of calibration error or trim offset (in microseconds)
 #define CONNECTION_OFFSET 250
@@ -1137,7 +1136,7 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
         case ARM_STATE_ARMING_MANUAL:
             setArmedIfChanged(FLIGHTSTATUS_ARMED_ARMING);
 
-            if (manualArm && (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)) {
+            if (manualArm && (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings->ArmingSequenceTime)) {
                 armState = ARM_STATE_ARMED;
             } else if (!manualArm) {
                 armState = ARM_STATE_DISARMED;
@@ -1166,7 +1165,7 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
             break;
 
         case ARM_STATE_DISARMING_MANUAL:
-            if (manualDisarm && (timeDifferenceMs(armedDisarmStart, lastSysTime) > ARMED_TIME_MS)) {
+            if (manualDisarm && (timeDifferenceMs(armedDisarmStart, lastSysTime) > settings->DisarmingSequenceTime)) {
                 armState = ARM_STATE_DISARMED;
             } else if (!manualDisarm) {
                 armState = ARM_STATE_ARMED;

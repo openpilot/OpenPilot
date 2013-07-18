@@ -98,7 +98,7 @@ static void updateLandDesired(ManualControlCommandData *cmd, bool changed);
 static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed);
 static void updatePathDesired(ManualControlCommandData *cmd, bool changed, bool home);
 static void processFlightMode(ManualControlSettingsData *settings, float flightMode);
-static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings);
+static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings, bool armSwitch);
 static void setArmedIfChanged(uint8_t val);
 static void configurationUpdatedCb(UAVObjEvent *ev);
 
@@ -317,6 +317,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 disconnected_count = 0;
             }
 
+            bool armSwitch = false;
             if (cmd.Connected == MANUALCONTROLCOMMAND_CONNECTED_FALSE) {
                 cmd.Throttle   = -1;      // Shut down engine with no control
                 cmd.Roll       = 0;
@@ -414,6 +415,12 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 #ifdef USE_INPUT_LPF
                     applyLPF(&accessory.AccessoryVal, MANUALCONTROLSETTINGS_RESPONSETIME_ACCESSORY2, &settings, dT);
 #endif
+                    if (accessory.AccessoryVal > ARMED_THRESHOLD) {
+                        armSwitch = true;
+                    } else {
+                        armSwitch = false;
+                    }
+
                     if (AccessoryDesiredInstSet(2, &accessory) != 0) {
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
@@ -423,7 +430,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
             }
 
             // Process arming outside conditional so system will disarm when disconnected
-            processArm(&cmd, &settings);
+            processArm(&cmd, &settings, armSwitch);
 
             // Update cmd object
             ManualControlCommandSet(&cmd);
@@ -1012,9 +1019,13 @@ static void setArmedIfChanged(uint8_t val)
  * @param[out] cmd The structure to set the armed in
  * @param[in] settings Settings indicating the necessary position
  */
-static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings)
+static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings, bool armSwitch)
 {
     bool lowThrottle = cmd->Throttle <= 0;
+
+    if (((settings->Arming - MANUALCONTROLSETTINGS_ARMING_ROLLLEFT) / 2) == ARMING_CHANNEL_ACCESSORY2) {
+        lowThrottle = true;
+    }
 
     if (forcedDisArm()) {
         // PathPlanner forces explicit disarming due to error condition (crash, impact, fire, ...)
@@ -1071,6 +1082,9 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
             break;
         case ARMING_CHANNEL_YAW:
             armingInputLevel = sign * cmd->Yaw;
+            break;
+        case ARMING_CHANNEL_ACCESSORY2:
+            armingInputLevel = (armSwitch ? -1 : 1);
             break;
         }
 

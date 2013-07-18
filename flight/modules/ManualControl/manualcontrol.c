@@ -1045,7 +1045,7 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
     case MANUALCONTROLSETTINGS_ARMING_ACCESSORY0:
     case MANUALCONTROLSETTINGS_ARMING_ACCESSORY1:
     case MANUALCONTROLSETTINGS_ARMING_ACCESSORY2:
-        if (!armSwitch) {
+        if (armSwitch < 0) {
             lowThrottle = true;
         }
         break;

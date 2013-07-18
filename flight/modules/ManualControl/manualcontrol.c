@@ -98,7 +98,7 @@ static void updateLandDesired(ManualControlCommandData *cmd, bool changed);
 static void altitudeHoldDesired(ManualControlCommandData *cmd, bool changed);
 static void updatePathDesired(ManualControlCommandData *cmd, bool changed, bool home);
 static void processFlightMode(ManualControlSettingsData *settings, float flightMode);
-static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings, bool armSwitch);
+static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings, int8_t armSwitch);
 static void setArmedIfChanged(uint8_t val);
 static void configurationUpdatedCb(UAVObjEvent *ev);
 
@@ -125,7 +125,7 @@ static struct rcvr_activity_fsm activity_fsm;
 static void resetRcvrActivity(struct rcvr_activity_fsm *fsm);
 static bool updateRcvrActivity(struct rcvr_activity_fsm *fsm);
 
-#define assumptions (assumptions1 && assumptions3 && assumptions5 && assumptions7 && assumptions8 && assumptions_flightmode && assumptions_channelcount)
+#define assumptions (assumptions1 && assumptions3 && assumptions5 && assumptions_flightmode && assumptions_channelcount)
 
 /**
  * Module starting
@@ -317,7 +317,7 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
                 disconnected_count = 0;
             }
 
-            bool armSwitch = false;
+            int8_t armSwitch = 0;
             if (cmd.Connected == MANUALCONTROLCOMMAND_CONNECTED_FALSE) {
                 cmd.Throttle   = -1;      // Shut down engine with no control
                 cmd.Roll       = 0;
@@ -395,6 +395,13 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 #ifdef USE_INPUT_LPF
                     applyLPF(&accessory.AccessoryVal, MANUALCONTROLSETTINGS_RESPONSETIME_ACCESSORY0, &settings, dT);
 #endif
+                    if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_ACCESSORY0) {
+                        if (accessory.AccessoryVal > ARMED_THRESHOLD) {
+                            armSwitch = 1;
+                        } else if (accessory.AccessoryVal < -ARMED_THRESHOLD) {
+                            armSwitch = -1;
+                        }
+                    }
                     if (AccessoryDesiredInstSet(0, &accessory) != 0) {
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
@@ -405,6 +412,13 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 #ifdef USE_INPUT_LPF
                     applyLPF(&accessory.AccessoryVal, MANUALCONTROLSETTINGS_RESPONSETIME_ACCESSORY1, &settings, dT);
 #endif
+                    if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_ACCESSORY1) {
+                        if (accessory.AccessoryVal > ARMED_THRESHOLD) {
+                            armSwitch = 1;
+                        } else if (accessory.AccessoryVal < -ARMED_THRESHOLD) {
+                            armSwitch = -1;
+                        }
+                    }
                     if (AccessoryDesiredInstSet(1, &accessory) != 0) {
                         AlarmsSet(SYSTEMALARMS_ALARM_MANUALCONTROL, SYSTEMALARMS_ALARM_WARNING);
                     }
@@ -415,10 +429,12 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
 #ifdef USE_INPUT_LPF
                     applyLPF(&accessory.AccessoryVal, MANUALCONTROLSETTINGS_RESPONSETIME_ACCESSORY2, &settings, dT);
 #endif
-                    if (accessory.AccessoryVal > ARMED_THRESHOLD) {
-                        armSwitch = true;
-                    } else {
-                        armSwitch = false;
+                    if (settings.Arming == MANUALCONTROLSETTINGS_ARMING_ACCESSORY2) {
+                        if (accessory.AccessoryVal > ARMED_THRESHOLD) {
+                            armSwitch = 1;
+                        } else if (accessory.AccessoryVal < -ARMED_THRESHOLD) {
+                            armSwitch = -1;
+                        }
                     }
 
                     if (AccessoryDesiredInstSet(2, &accessory) != 0) {
@@ -1019,11 +1035,11 @@ static void setArmedIfChanged(uint8_t val)
  * @param[out] cmd The structure to set the armed in
  * @param[in] settings Settings indicating the necessary position
  */
-static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings, bool armSwitch)
+static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData *settings, int8_t armSwitch)
 {
     bool lowThrottle = cmd->Throttle <= 0;
 
-    if (((settings->Arming - MANUALCONTROLSETTINGS_ARMING_ROLLLEFT) / 2) == ARMING_CHANNEL_ACCESSORY2) {
+    if (settings->Arming == MANUALCONTROLSETTINGS_ARMING_ACCESSORY2) {
         lowThrottle = true;
     }
 
@@ -1072,19 +1088,29 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
         float armingInputLevel = 0;
 
         // Calc channel see assumptions7
-        int8_t sign = ((settings->Arming - MANUALCONTROLSETTINGS_ARMING_ROLLLEFT) % 2) ? -1 : 1;
-        switch ((settings->Arming - MANUALCONTROLSETTINGS_ARMING_ROLLLEFT) / 2) {
-        case ARMING_CHANNEL_ROLL:
-            armingInputLevel = sign * cmd->Roll;
+        switch (settings->Arming) {
+        case MANUALCONTROLSETTINGS_ARMING_ROLLLEFT:
+            armingInputLevel = -1.0f * cmd->Roll;
             break;
-        case ARMING_CHANNEL_PITCH:
-            armingInputLevel = sign * cmd->Pitch;
+        case MANUALCONTROLSETTINGS_ARMING_ROLLRIGHT:
+            armingInputLevel = 1.0f * cmd->Roll;
             break;
-        case ARMING_CHANNEL_YAW:
-            armingInputLevel = sign * cmd->Yaw;
+        case MANUALCONTROLSETTINGS_ARMING_PITCHAFT:
+            armingInputLevel = -1.0f * cmd->Pitch;
             break;
-        case ARMING_CHANNEL_ACCESSORY2:
-            armingInputLevel = (armSwitch ? -1 : 1);
+        case MANUALCONTROLSETTINGS_ARMING_PITCHFORWARD:
+            armingInputLevel = 1.0f * cmd->Pitch;
+            break;
+        case MANUALCONTROLSETTINGS_ARMING_YAWLEFT:
+            armingInputLevel = -1.0f * cmd->Yaw;
+            break;
+        case MANUALCONTROLSETTINGS_ARMING_YAWRIGHT:
+            armingInputLevel = 1.0f * cmd->Yaw;
+            break;
+        case MANUALCONTROLSETTINGS_ARMING_ACCESSORY0:
+        case MANUALCONTROLSETTINGS_ARMING_ACCESSORY1:
+        case MANUALCONTROLSETTINGS_ARMING_ACCESSORY2:
+            armingInputLevel = (float)armSwitch;
             break;
         }
 

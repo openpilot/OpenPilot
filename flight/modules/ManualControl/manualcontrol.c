@@ -1038,8 +1038,19 @@ static void processArm(ManualControlCommandData *cmd, ManualControlSettingsData 
 {
     bool lowThrottle = cmd->Throttle <= 0;
 
-    if (settings->Arming == MANUALCONTROLSETTINGS_ARMING_ACCESSORY2) {
-        lowThrottle = true;
+    /**
+     * do NOT check throttle if disarming via switch, must be instant
+     */
+    switch (settings->Arming) {
+    case MANUALCONTROLSETTINGS_ARMING_ACCESSORY0:
+    case MANUALCONTROLSETTINGS_ARMING_ACCESSORY1:
+    case MANUALCONTROLSETTINGS_ARMING_ACCESSORY2:
+        if (!armSwitch) {
+            lowThrottle = true;
+        }
+        break;
+    default:
+        break;
     }
 
     if (forcedDisArm()) {

@@ -43,6 +43,7 @@
 #include "airspeedsensor.h" // object that will be updated by the module
 #include "baro_airspeed_etasv3.h"
 #include "baro_airspeed_mpxv.h"
+#include "gps_airspeed.h"
 #include "taskinfo.h"
 
 // Private constants
@@ -164,6 +165,9 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
             baro_airspeedGetETASV3(&airspeedData, &airspeedSettings);
             break;
 #endif
+        case AIRSPEEDSETTINGS_AIRSPEEDSENSORTYPE_GROUNDSPEEDBASEDWINDESTIMATION:
+            gps_airspeedGet(&airspeedData, &airspeedSettings);
+            break;
         default:
             airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
         }

@@ -44,7 +44,7 @@
                 <!-- minimum and maximum allowed throttle and setpoint for cruise speed -->
         <field name="Safetymargins" units="" type="float"
                 elementnames="Wind, Stallspeed, Lowspeed, Highspeed, Overspeed, Lowpower, Highpower, Pitchcontrol"
-                defaultvalue="90, 0.0, 0.5, 1.5, 0.0, 1, 1, 1" />
+                defaultvalue="90, 1.0, 0.5, 1.5, 1.0, 1, 1, 1" />
                 <!-- Wind: degrees of crabbing allowed
                      Speeds: percentage (1.0=100%) of the limit to be over/onder
                      Power & Control: flag to turn on/off 0.0 =off 1.0 = on -->

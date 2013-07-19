@@ -88,6 +88,10 @@ bool UrlFactory::IsCorrectGoogleVersions()
 
 void UrlFactory::TryCorrectGoogleVersions()
 {
+    static bool versionRetrieved = false;
+    if (versionRetrieved){
+        return;
+    }
     QMutexLocker locker(&mutex);
 
 
@@ -167,6 +171,7 @@ void UrlFactory::TryCorrectGoogleVersions()
 #endif // DEBUG_URLFACTORY
         }
         reply->deleteLater();
+        versionRetrieved = true;
     }
 }
 

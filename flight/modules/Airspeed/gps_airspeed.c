@@ -133,8 +133,7 @@ void gps_airspeedGet(AirspeedSensorData *airspeedData, __attribute__((unused)) A
             airspeedData->CalibratedAirspeed = 0;
             airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
         } else {
-            airspeedData->CalibratedAirspeed = 0;
-            airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+            airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
         }
 
         // Save old variables for next pass
@@ -145,7 +144,7 @@ void gps_airspeedGet(AirspeedSensorData *airspeedData, __attribute__((unused)) A
         gps->RbeCol1_old[0] = Rbe[0][0];
         gps->RbeCol1_old[1] = Rbe[0][1];
         gps->RbeCol1_old[2] = Rbe[0][2];
-    } else {}
+    }
 }
 
 

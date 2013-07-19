@@ -140,6 +140,7 @@ static void airspeedTask(__attribute__((unused)) void *parameters)
 
     AirspeedSettingsUpdatedCb(NULL);
 
+    gps_airspeedInitialize();
 
     airspeedData.SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
 

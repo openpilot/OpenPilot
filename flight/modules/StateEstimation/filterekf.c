@@ -328,7 +328,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     }
 
     if (!this->inited) {
-        return 1;
+        return 3;
     }
 
     float gyros[3] = { DEG2RAD(this->work.gyro[0]), DEG2RAD(this->work.gyro[1]), DEG2RAD(this->work.gyro[2]) };

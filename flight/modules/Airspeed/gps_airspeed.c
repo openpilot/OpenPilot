@@ -133,7 +133,7 @@ void gps_airspeedGet(AirspeedSensorData *airspeedData, __attribute__((unused)) A
             airspeedData->CalibratedAirspeed = 0;
             airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
         } else {
-            airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
+            airspeedData->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
         }
 
         // Save old variables for next pass

@@ -436,7 +436,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     this->work.updated = 0;
 
     if (this->init_stage < 0) {
-        return 2;
+        return 1;
     } else {
         return 0;
     }

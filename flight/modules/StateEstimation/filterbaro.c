@@ -32,19 +32,16 @@
 
 #include "inc/stateestimation.h"
 
+#include <revosettings.h>
+
 // Private constants
 
 #define STACK_REQUIRED 64
 
-// low pass filter configuration to calculate offset
-// of barometric altitude sensor
-// reasoning: updates at: 10 Hz, tau= 300 s settle time
-// exp(-(1/f) / tau ) ~=~ 0.9997
-#define BARO_OFFSET_LOWPASS_ALPHA 0.9997f
-
 // Private types
 struct data {
     float   baroOffset;
+    float   baroGPSOffsetCorrectionAlpha;
     float   baroAlt;
     int16_t first_run;
 };
@@ -71,6 +68,17 @@ static int32_t init(stateFilter *self)
 
     this->baroOffset = 0.0f;
     this->first_run  = 100;
+
+    // Low pass filter configuration to calculate offset of barometric altitude sensor.
+    // Defaults: updates at 5 Hz, tau = 300s settle time, exp(-(1/f)/tau) ~= 0.9993335555062
+    // Set BaroOffsetFilterTau = 0 to completely disable baro offset updates.
+    RevoSettingsData revoSettings;
+    RevoSettingsInitialize();
+    RevoSettingsGet(&revoSettings);
+
+    this->baroGPSOffsetCorrectionAlpha = (revoSettings.BaroGPSOffsetCorrectionTau < 0.0001f) ?
+        1.0f : expf(-(1.0f / revoSettings.BaroGPSOffsetCorrectionFrequency) / revoSettings.BaroGPSOffsetCorrectionTau);
+
     return 0;
 }
 
@@ -90,9 +98,8 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
         // Track barometric altitude offset with a low pass filter
         // based on GPS altitude if available
         if (IS_SET(state->updated, SENSORUPDATES_pos)) {
-            this->baroOffset = BARO_OFFSET_LOWPASS_ALPHA * this->baroOffset +
-                               (1.0f - BARO_OFFSET_LOWPASS_ALPHA)
-                               * (this->baroAlt + state->pos[2]);
+            this->baroOffset = this->baroOffset * this->baroGPSOffsetCorrectionAlpha +
+                               (1.0f - this->baroGPSOffsetCorrectionAlpha) * (this->baroAlt + state->pos[2]);
         }
         // calculate bias corrected altitude
         if (IS_SET(state->updated, SENSORUPDATES_baro)) {

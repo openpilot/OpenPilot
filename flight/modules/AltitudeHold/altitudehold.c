@@ -66,7 +66,7 @@
 #define TASK_PRIORITY          (tskIDLE_PRIORITY + 1)
 #define ACCEL_DOWNSAMPLE       4
 #define TIMEOUT_TRESHOLD       200000
-#define DESIRED_UPDATE_RATE_MS 20 // milliseconds
+#define DESIRED_UPDATE_RATE_MS 100 // milliseconds
 // Private types
 
 // Private variables
@@ -113,7 +113,7 @@ int32_t AltitudeHoldInitialize()
 MODULE_INITCALL(AltitudeHoldInitialize, AltitudeHoldStart);
 
 float tau;
-float accelAlpha;
+float positionAlpha;
 float velAlpha;
 bool running = false;
 
@@ -137,14 +137,13 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
     VelocityStateData velocityData;
     float dT;
     float fblimit = 0;
-    float lastVertVelocity;
+
     portTickType thisTime, lastUpdateTime;
     UAVObjEvent ev;
 
     dT = 0;
-    lastVertVelocity = 0;
     timeval = 0;
-    lastUpdateTime   = 0;
+    lastUpdateTime = 0;
     // Force update of the settings
     SettingsUpdatedCb(&ev);
     // Failsafe handling
@@ -215,15 +214,10 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             VelocityStateGet(&velocityData);
 
             altHold.Velocity = -(velAlpha * altHold.Velocity + (1 - velAlpha) * velocityData.Down);
-            float vertAccel = (velocityData.Down - lastVertVelocity) / dT;
 
-            lastVertVelocity = velocityData.Down;
-
-            altHold.Accel    = -(accelAlpha * altHold.Accel + (1 - accelAlpha) * vertAccel);
-            altHold.StateUpdateInterval = dT;
-
-            PositionStateDownGet(&altHold.Altitude);
-            altHold.Altitude = -altHold.Altitude;
+            float position;
+            PositionStateDownGet(&position);
+            altHold.Altitude = -(positionAlpha * position) + (1 - positionAlpha) * altHold.Altitude;
 
             AltHoldSmoothedSet(&altHold);
 
@@ -246,8 +240,8 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             velError   = altitudeHoldDesired.Velocity - altHold.Velocity;
 
             // Compute altitude and velocity integral
-            altitudeIntegral += (error - fblimit) * altitudeHoldSettings.AltitudeKi * dT;
-            velocityIntegral += (velError - fblimit) * altitudeHoldSettings.VelocityKi * dT;
+            altitudeIntegral += (error - fblimit) * altitudeHoldSettings.AltitudePID[ALTITUDEHOLDSETTINGS_ALTITUDEPID_KI] * dT;
+            velocityIntegral += (velError - fblimit) * altitudeHoldSettings.VelocityPI[ALTITUDEHOLDSETTINGS_VELOCITYPI_KI] * dT;
 
 
             thisTime = xTaskGetTickCount();
@@ -255,17 +249,15 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
             if ((thisTime - lastUpdateTime) * 1000 / configTICK_RATE_HZ < DESIRED_UPDATE_RATE_MS) {
                 continue;
             }
-            altHold.ThrottleUpdateInterval = thisTime - lastUpdateTime;
             lastUpdateTime = thisTime;
 
             // Instead of explicit limit on integral you output limit feedback
             StabilizationDesiredGet(&stabilizationDesired);
             if (!enterFailSafe) {
                 stabilizationDesired.Throttle = altitudeIntegral + velocityIntegral
-                                                + error * fabsf(error) * altitudeHoldSettings.Altitude2Kp
-                                                + error * altitudeHoldSettings.AltitudeKp
-                                                + velError * altitudeHoldSettings.VelocityKp
-                                                + derivative * altitudeHoldSettings.AltitudeKd;
+                                                + error * altitudeHoldSettings.AltitudePID[ALTITUDEHOLDSETTINGS_ALTITUDEPID_KP]
+                                                + velError * altitudeHoldSettings.VelocityPI[ALTITUDEHOLDSETTINGS_VELOCITYPI_KP]
+                                                + derivative * altitudeHoldSettings.AltitudePID[ALTITUDEHOLDSETTINGS_ALTITUDEPID_KD];
 
                 // scale up throttle to compensate for roll/pitch angle but limit this to 60 deg (cos(60) == 0.5) to prevent excessive scaling
                 AttitudeStateData attitudeState;
@@ -312,8 +304,8 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
     AltitudeHoldSettingsGet(&altitudeHoldSettings);
-    accelAlpha = expf(-(1000.0f / 666.0f * ACCEL_DOWNSAMPLE) / altitudeHoldSettings.AccelTau);
-    velAlpha   = expf(-(1000.0f / 666.0f * ACCEL_DOWNSAMPLE) / altitudeHoldSettings.VelocityTau);
+    positionAlpha = expf(-(1000.0f / 666.0f * ACCEL_DOWNSAMPLE) / altitudeHoldSettings.PositionTau);
+    velAlpha = expf(-(1000.0f / 666.0f * ACCEL_DOWNSAMPLE) / altitudeHoldSettings.VelocityTau);
 
     // don't use throttle filter if specified cutoff frequency is too low or above nyquist criteria (half the sampling frequency)
     if (altitudeHoldSettings.ThrottleFilterCutoff > 0.001f && altitudeHoldSettings.ThrottleFilterCutoff < 2000.0f / DESIRED_UPDATE_RATE_MS) {

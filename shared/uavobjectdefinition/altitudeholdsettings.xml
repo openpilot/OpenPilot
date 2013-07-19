@@ -1,14 +1,10 @@
 <xml>
     <object name="AltitudeHoldSettings" singleinstance="true" settings="true" category="Control">
         <description>Settings for the @ref AltitudeHold module</description>
-        <field name="AltitudeKp" units="throttle/m" type="float" elements="1" defaultvalue="0"/>
-        <field name="Altitude2Kp" units="throttle/m^2" type="float" elements="1" defaultvalue="0.08"/>
-        <field name="VelocityKp" units="throttle/(m/s)" type="float" elements="1" defaultvalue="0.1"/>
-        <field name="AltitudeKi" units="throttle/m" type="float" elements="1" defaultvalue="0.1"/>
-        <field name="VelocityKi" units="throttle/m" type="float" elements="1" defaultvalue="0.2"/>	
-        <field name="AltitudeKd" units="throttle/m" type="float" elements="1" defaultvalue="0.18"/>
+        <field name="AltitudePID" units="throttle/m" type="float" elementnames="Kp,Ki,Kd" defaultvalue="0.18,0.06,0.01"/>
+        <field name="VelocityPI" units="throttle/m" type="float" elementnames="Kp,Ki" defaultvalue="0.1,0.1"/>
         <field name="VelocityTau" units="" type="float" elements="1" defaultvalue="0.5"/>
-        <field name="AccelTau" units="" type="float" elements="1" defaultvalue="0.5"/>
+        <field name="PositionTau" units="" type="float" elements="1" defaultvalue="0.5"/>
         <field name="ThrottleFilterCutoff" units="Hz" type="float" elements="1" defaultvalue="2"/>
         <field name="ThrottleExp" units="" type="uint8" elements="1" defaultvalue="128"/>
         <field name="ThrottleRate" units="m/s" type="uint8" elements="1" defaultvalue="5"/>

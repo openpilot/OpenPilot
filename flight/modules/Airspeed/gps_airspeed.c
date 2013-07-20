@@ -52,6 +52,7 @@ struct GPSGlobals {
     float gpsVelOld_N;
     float gpsVelOld_E;
     float gpsVelOld_D;
+    float oldAirspeed;
 };
 
 // Private variables
@@ -75,6 +76,8 @@ void gps_airspeedInitialize()
     gps->gpsVelOld_N = gpsVelData.North;
     gps->gpsVelOld_E = gpsVelData.East;
     gps->gpsVelOld_D = gpsVelData.Down;
+
+    gps->oldAirspeed = 0.0f;
 
     AttitudeStateData attData;
     AttitudeStateGet(&attData);
@@ -121,6 +124,12 @@ void gps_airspeedGet(AirspeedSensorData *airspeedData, __attribute__((unused)) A
         VelocityStateData gpsVelData;
         VelocityStateGet(&gpsVelData);
 
+        if (gpsVelData.North * gpsVelData.North + gpsVelData.East * gpsVelData.East + gpsVelData.Down * gpsVelData.Down < 1.0f) {
+            airspeedData->CalibratedAirspeed = 0;
+            airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+            return; // do not calculate if gps velocity is insufficient...
+        }
+
         // Calculate the norm^2 of the difference between the two GPS vectors
         float normDiffGPS2 = powf(gpsVelData.North - gps->gpsVelOld_N, 2.0f) + powf(gpsVelData.East - gps->gpsVelOld_E, 2.0f) + powf(gpsVelData.Down - gps->gpsVelOld_D, 2.0f);
 
@@ -128,12 +137,15 @@ void gps_airspeedGet(AirspeedSensorData *airspeedData, __attribute__((unused)) A
         float normDiffAttitude2 = powf(Rbe[0][0] - gps->RbeCol1_old[0], 2.0f) + powf(Rbe[0][1] - gps->RbeCol1_old[1], 2.0f) + powf(Rbe[0][2] - gps->RbeCol1_old[2], 2.0f);
 
         // Airspeed magnitude is the ratio between the two difference norms
-        airspeedData->CalibratedAirspeed = sqrtf(normDiffGPS2 / normDiffAttitude2);
+        float airspeed = sqrtf(normDiffGPS2 / normDiffAttitude2);
         if (!IS_REAL(airspeedData->CalibratedAirspeed)) {
             airspeedData->CalibratedAirspeed = 0;
             airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
         } else {
-            airspeedData->SensorConnected = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
+            // need a low pass filter to filter out spikes in non coordinated maneuvers
+            airspeedData->CalibratedAirspeed = 0.99f * gps->oldAirspeed + 0.01f * airspeed;
+            gps->oldAirspeed = airspeedData->CalibratedAirspeed;
+            airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
         }
 
         // Save old variables for next pass

@@ -37,6 +37,9 @@
 
 	<field name="LowThrottleZeroAxis" units="" type="enum" elementnames="Roll,Pitch,Yaw" options="FALSE,TRUE" defaultvalue="FALSE,FALSE,FALSE"/>
 
+	<field name="ScaleToAirspeed" units="m/s" type="float" elements="1" defaultvalue="0"/>
+	<field name="ScaleToAirspeedLimits" units="" type="float" elementnames="Min,Max" defaultvalue="0.05,10"/>
+
 	<access gcs="readwrite" flight="readwrite"/>
 	<telemetrygcs acked="true" updatemode="onchange" period="0"/>
 	<telemetryflight acked="true" updatemode="onchange" period="0"/>

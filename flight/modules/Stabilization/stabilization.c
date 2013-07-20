@@ -195,7 +195,7 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         float speedScaleFactor;
         // Scale PID coefficients based on current airspeed estimation - needed for fixed wing planes
         AirspeedStateGet(&airspeedState);
-        if (settings.ScaleToAirspeed < 0.1f || airspeedState.CalibratedAirspeed<0.1f) {
+        if (settings.ScaleToAirspeed < 0.1f || airspeedState.CalibratedAirspeed < 0.1f) {
             // feature has been turned off
             speedScaleFactor = 1.0f;
         } else {

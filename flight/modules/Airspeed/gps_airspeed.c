@@ -102,7 +102,7 @@ void gps_airspeedInitialize()
  *  where "f" is the fuselage vector in earth coordinates.
  *  We then solve for |V| = |V_gps_2-V_gps_1|/ |f_2 - f1|.
  */
-void gps_airspeedGet(AirspeedSensorData *airspeedData, __attribute__((unused)) AirspeedSettingsData *airspeedSettings)
+void gps_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *airspeedSettings)
 {
     float Rbe[3][3];
 
@@ -143,7 +143,7 @@ void gps_airspeedGet(AirspeedSensorData *airspeedData, __attribute__((unused)) A
             airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
         } else {
             // need a low pass filter to filter out spikes in non coordinated maneuvers
-            airspeedData->CalibratedAirspeed = 0.99f * gps->oldAirspeed + 0.01f * airspeed;
+            airspeedData->CalibratedAirspeed = (1.0f - airspeedSettings->GroundSpeedBasedEstimationLowPassAlpha) * gps->oldAirspeed + airspeedSettings->GroundSpeedBasedEstimationLowPassAlpha * airspeed;
             gps->oldAirspeed = airspeedData->CalibratedAirspeed;
             airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
         }

@@ -69,15 +69,8 @@ static int32_t init(stateFilter *self)
     this->baroOffset = 0.0f;
     this->first_run  = 100;
 
-    // Low pass filter configuration to calculate offset of barometric altitude sensor.
-    // Defaults: updates at 5 Hz, tau = 300s settle time, exp(-(1/f)/tau) ~= 0.9993335555062
-    // Set BaroOffsetFilterTau = 0 to completely disable baro offset updates.
-    RevoSettingsData revoSettings;
     RevoSettingsInitialize();
-    RevoSettingsGet(&revoSettings);
-
-    this->baroGPSOffsetCorrectionAlpha = (revoSettings.BaroGPSOffsetCorrectionTau < 0.0001f) ?
-        1.0f : expf(-(1.0f / revoSettings.BaroGPSOffsetCorrectionFrequency) / revoSettings.BaroGPSOffsetCorrectionTau);
+    RevoSettingsBaroGPSOffsetCorrectionAlphaGet(&this->baroGPSOffsetCorrectionAlpha);
 
     return 0;
 }

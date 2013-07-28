@@ -1,14 +1,10 @@
 /**
  ******************************************************************************
- * @addtogroup PIOS PIOS Core hardware abstraction layer
- * @{
- * @addtogroup   PIOS_PPM PPM Functions
- * @brief PIOS interface to write to ppm port
- * @{
  *
- * @file       pios_ppm_out_priv.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      ppm private structures.
+ * @file       pios_architecture.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
+ * @brief      Architecture specific macros and definitions
+ *             --
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,21 +24,16 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_PPM_OUT_PRIV_H
-#define PIOS_PPM_OUT_PRIV_H
+#ifndef PIOS_ARCHITECTURE_H
+#define PIOS_ARCHITECTURE_H
 
-#include <pios.h>
+// defines for adc
+#define PIOS_ADC_VOLTAGE_SCALE        3.30f / 4096.0f
 
-struct pios_ppm_out_cfg {
-    TIM_OCInitTypeDef tim_oc_init;
-    const struct pios_tim_channel *channel;
-};
+// defines for Temp measurements
+#define PIOS_ADC_STM32_TEMP_V25       1.43f /* V */
+#define PIOS_ADC_STM32_TEMP_AVG_SLOPE 4.3f /* mV/C */
+#define PIOS_CONVERT_VOLT_TO_CPU_TEMP(x) ((PIOS_ADC_STM32_TEMP_V25 - x) * 1000.0f / PIOS_ADC_STM32_TEMP_AVG_SLOPE + 25.0f)
 
-extern int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg *cfg);
 
-#endif /* PIOS_PPM_PRIV_H */
-
-/**
- * @}
- * @}
- */
+#endif /* PIOS_ARCHITECTURE_H */

@@ -31,9 +31,11 @@
 
 
 #include "openpilot.h"
-#include "gps_airspeed.h"
-#include "gpsvelocitysensor.h"
+#include "velocitystate.h"
 #include "attitudestate.h"
+#include "airspeedsensor.h"
+#include "airspeedsettings.h"
+#include "gps_airspeed.h"
 #include "CoordinateConversions.h"
 #include <pios_math.h>
 
@@ -50,6 +52,7 @@ struct GPSGlobals {
     float gpsVelOld_N;
     float gpsVelOld_E;
     float gpsVelOld_D;
+    float oldAirspeed;
 };
 
 // Private variables
@@ -66,12 +69,15 @@ void gps_airspeedInitialize()
     gps = (struct GPSGlobals *)pvPortMalloc(sizeof(struct GPSGlobals));
 
     // GPS airspeed calculation variables
-    GPSVelocitySensorData gpsVelData;
-    GPSVelocitySensorGet(&gpsVelData);
+    VelocityStateInitialize();
+    VelocityStateData gpsVelData;
+    VelocityStateGet(&gpsVelData);
 
     gps->gpsVelOld_N = gpsVelData.North;
     gps->gpsVelOld_E = gpsVelData.East;
     gps->gpsVelOld_D = gpsVelData.Down;
+
+    gps->oldAirspeed = 0.0f;
 
     AttitudeStateData attData;
     AttitudeStateGet(&attData);
@@ -96,7 +102,7 @@ void gps_airspeedInitialize()
  *  where "f" is the fuselage vector in earth coordinates.
  *  We then solve for |V| = |V_gps_2-V_gps_1|/ |f_2 - f1|.
  */
-void gps_airspeedGet(float *v_air_GPS)
+void gps_airspeedGet(AirspeedSensorData *airspeedData, AirspeedSettingsData *airspeedSettings)
 {
     float Rbe[3][3];
 
@@ -115,8 +121,14 @@ void gps_airspeedGet(float *v_air_GPS)
 
     // If there's more than a 5 degree difference between two fuselage measurements, then we have sufficient delta to continue.
     if (fabsf(cosDiff) < cosf(DEG2RAD(5.0f))) {
-        GPSVelocitySensorData gpsVelData;
-        GPSVelocitySensorGet(&gpsVelData);
+        VelocityStateData gpsVelData;
+        VelocityStateGet(&gpsVelData);
+
+        if (gpsVelData.North * gpsVelData.North + gpsVelData.East * gpsVelData.East + gpsVelData.Down * gpsVelData.Down < 1.0f) {
+            airspeedData->CalibratedAirspeed = 0;
+            airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+            return; // do not calculate if gps velocity is insufficient...
+        }
 
         // Calculate the norm^2 of the difference between the two GPS vectors
         float normDiffGPS2 = powf(gpsVelData.North - gps->gpsVelOld_N, 2.0f) + powf(gpsVelData.East - gps->gpsVelOld_E, 2.0f) + powf(gpsVelData.Down - gps->gpsVelOld_D, 2.0f);
@@ -125,7 +137,16 @@ void gps_airspeedGet(float *v_air_GPS)
         float normDiffAttitude2 = powf(Rbe[0][0] - gps->RbeCol1_old[0], 2.0f) + powf(Rbe[0][1] - gps->RbeCol1_old[1], 2.0f) + powf(Rbe[0][2] - gps->RbeCol1_old[2], 2.0f);
 
         // Airspeed magnitude is the ratio between the two difference norms
-        *v_air_GPS = sqrtf(normDiffGPS2 / normDiffAttitude2);
+        float airspeed = sqrtf(normDiffGPS2 / normDiffAttitude2);
+        if (!IS_REAL(airspeedData->CalibratedAirspeed)) {
+            airspeedData->CalibratedAirspeed = 0;
+            airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_FALSE;
+        } else {
+            // need a low pass filter to filter out spikes in non coordinated maneuvers
+            airspeedData->CalibratedAirspeed = (1.0f - airspeedSettings->GroundSpeedBasedEstimationLowPassAlpha) * gps->oldAirspeed + airspeedSettings->GroundSpeedBasedEstimationLowPassAlpha * airspeed;
+            gps->oldAirspeed = airspeedData->CalibratedAirspeed;
+            airspeedData->SensorConnected    = AIRSPEEDSENSOR_SENSORCONNECTED_TRUE;
+        }
 
         // Save old variables for next pass
         gps->gpsVelOld_N    = gpsVelData.North;
@@ -135,7 +156,7 @@ void gps_airspeedGet(float *v_air_GPS)
         gps->RbeCol1_old[0] = Rbe[0][0];
         gps->RbeCol1_old[1] = Rbe[0][1];
         gps->RbeCol1_old[2] = Rbe[0][2];
-    } else {}
+    }
 }
 
 

@@ -32,14 +32,19 @@
 
 #ifdef PIOS_INCLUDE_PPM
 
-#include "pios_ppm_priv.h"
+#include <pios_stm32.h>
 
+#include "pios_ppm_priv.h"
 
 /* Provide a RCVR driver */
 static int32_t PIOS_PPM_Get(uint32_t rcvr_id, uint8_t channel);
+static xSemaphoreHandle PIOS_PPM_Get_Semaphore(uint32_t rcvr_id, uint8_t channel);
 
 const struct pios_rcvr_driver pios_ppm_rcvr_driver = {
-    .read = PIOS_PPM_Get,
+    .read          = PIOS_PPM_Get,
+#if defined(PIOS_INCLUDE_FREERTOS)
+    .get_semaphore = PIOS_PPM_Get_Semaphore
+#endif
 };
 
 #define PIOS_PPM_IN_MIN_NUM_CHANNELS     4
@@ -76,6 +81,10 @@ struct pios_ppm_dev {
     uint8_t  supv_timer;
     bool     Tracking;
     bool     Fresh;
+
+#ifdef PIOS_INCLUDE_FREERTOS
+    xSemaphoreHandle new_sample_semaphores[PIOS_PPM_IN_MIN_NUM_CHANNELS];
+#endif /* PIOS_INCLUDE_FREERTOS */
 };
 
 static bool PIOS_PPM_validate(struct pios_ppm_dev *ppm_dev)
@@ -91,6 +100,11 @@ static struct pios_ppm_dev *PIOS_PPM_alloc(void)
     ppm_dev = (struct pios_ppm_dev *)pvPortMalloc(sizeof(*ppm_dev));
     if (!ppm_dev) {
         return NULL;
+    }
+
+    // Initialize the semaphores to 0.
+    for (uint8_t i = 0; i < PIOS_PPM_IN_MIN_NUM_CHANNELS; ++i) {
+        ppm_dev->new_sample_semaphores[i] = 0;
     }
 
     ppm_dev->magic = PIOS_PPM_DEV_MAGIC;
@@ -199,6 +213,28 @@ out_fail:
     return -1;
 }
 
+#if defined(PIOS_INCLUDE_FREERTOS)
+static xSemaphoreHandle PIOS_PPM_Get_Semaphore(uint32_t rcvr_id, uint8_t channel)
+{
+    struct pios_ppm_dev *ppm_dev = (struct pios_ppm_dev *)rcvr_id;
+
+    if (!PIOS_PPM_validate(ppm_dev)) {
+        /* Invalid device specified */
+        return 0;
+    }
+
+    if (channel >= PIOS_PPM_IN_MAX_NUM_CHANNELS) {
+        /* Channel out of range */
+        return 0;
+    }
+
+    if (ppm_dev->new_sample_semaphores[channel] == 0) {
+        vSemaphoreCreateBinary(ppm_dev->new_sample_semaphores[channel]);
+    }
+    return ppm_dev->new_sample_semaphores[channel];
+}
+#endif /* if defined(PIOS_INCLUDE_FREERTOS) */
+
 /**
  * Get the value of an input channel
  * \param[in] channel Number of the channel desired (zero based)
@@ -296,6 +332,15 @@ static void PIOS_PPM_tim_edge_cb(__attribute__((unused)) uint32_t tim_id,
                  i < PIOS_PPM_IN_MAX_NUM_CHANNELS; i++) {
                 ppm_dev->CaptureValue[i] = PIOS_RCVR_TIMEOUT;
             }
+#if defined(PIOS_INCLUDE_FREERTOS)
+            /* Signal that a new sample is ready on this channel. */
+            if (ppm_dev->new_sample_semaphores[chan_idx] != 0) {
+                signed portBASE_TYPE pxHigherPriorityTaskWoken = pdFALSE;
+                if (xSemaphoreGiveFromISR(ppm_dev->new_sample_semaphores[chan_idx], &pxHigherPriorityTaskWoken) == pdTRUE) {
+                    portEND_SWITCHING_ISR(pxHigherPriorityTaskWoken); /* FIXME: is this the right place for this? */
+                }
+            }
+#endif /* USE_FREERTOS */
         }
 
         ppm_dev->Fresh      = TRUE;

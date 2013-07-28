@@ -81,6 +81,8 @@
 #include "semphr.h"
 #endif
 
+#include <pios_architecture.h>
+
 #ifdef PIOS_INCLUDE_TASK_MONITOR
 #ifndef PIOS_INCLUDE_FREERTOS
 #error PiOS Task Monitor requires PIOS_INCLUDE_FREERTOS to be defined
@@ -241,10 +243,6 @@
 #include <pios_sbus.h>
 #endif
 
-#ifdef PIOS_INCLUDE_GCSRCVR
-/* only priv header */
-#endif
-
 /* PIOS abstract receiver interface */
 #ifdef PIOS_INCLUDE_RCVR
 #include <pios_rcvr.h>
@@ -299,9 +297,6 @@
 #include <pios_rfm22b.h>
 #ifdef PIOS_INCLUDE_RFM22B_COM
 #include <pios_rfm22b_com.h>
-#endif
-#ifdef PIOS_INCLUDE_RFM22B_RCVR
-#include <pios_rfm22b_rcvr.h>
 #endif
 #endif /* PIOS_INCLUDE_RFM22B */
 

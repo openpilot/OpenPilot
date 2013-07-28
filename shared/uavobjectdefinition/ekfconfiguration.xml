@@ -41,7 +41,7 @@
 	<field name="R" units="1^2" type="float" defaultvalue="
 		10, 10, 1000,
 		1, 1, 1,
-		1000, 1000, 1000,
+		5000, 5000, 5000,
 		1">
 		<elementnames>
 			<elementname>GPSPosNorth</elementname>

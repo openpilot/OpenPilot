@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_PPM PPM Functions
- * @brief PIOS interface to write to ppm port
+ * @addtogroup   PIOS_OPLinkRCVR OPLink Receiver Functions
+ * @brief PIOS interface to read from OPLink receiver port
  * @{
  *
- * @file       pios_ppm_out_priv.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
- * @brief      ppm private structures.
+ * @file       pios_oplinkrcvr_priv.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
+ * @brief      OPLINK receiver private functions
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,19 +28,16 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_PPM_OUT_PRIV_H
-#define PIOS_PPM_OUT_PRIV_H
+#ifndef PIOS_OPLINKRCVR_PRIV_H
+#define PIOS_OPLINKRCVR_PRIV_H
 
 #include <pios.h>
 
-struct pios_ppm_out_cfg {
-    TIM_OCInitTypeDef tim_oc_init;
-    const struct pios_tim_channel *channel;
-};
+extern const struct pios_rcvr_driver pios_oplinkrcvr_rcvr_driver;
 
-extern int32_t PIOS_PPM_Out_Init(uint32_t *ppm_out_id, const struct pios_ppm_out_cfg *cfg);
+extern int32_t PIOS_OPLinkRCVR_Init(uint32_t *oplinkrcvr_id);
 
-#endif /* PIOS_PPM_PRIV_H */
+#endif /* PIOS_OPLINKRCVR_PRIV_H */
 
 /**
  * @}

@@ -44,6 +44,7 @@
 #define STACK_SIZE_BYTES       PIOS_TELEM_STACK_SIZE
 #define TASK_PRIORITY_RX       (tskIDLE_PRIORITY + 2)
 #define TASK_PRIORITY_TX       (tskIDLE_PRIORITY + 2)
+#define TASK_PRIORITY_RADRX    (tskIDLE_PRIORITY + 2)
 #define TASK_PRIORITY_TXPRI    (tskIDLE_PRIORITY + 2)
 #define REQ_TIMEOUT_MS         250
 #define MAX_RETRIES            2
@@ -66,14 +67,23 @@ static void telemetryTxPriTask(void *parameters);
 
 static xTaskHandle telemetryTxTaskHandle;
 static xTaskHandle telemetryRxTaskHandle;
+#ifdef PIOS_INCLUDE_RFM22B
+static xTaskHandle radioRxTaskHandle;
+#endif
 static uint32_t txErrors;
 static uint32_t txRetries;
 static uint32_t timeOfLastObjectUpdate;
 static UAVTalkConnection uavTalkCon;
+#ifdef PIOS_INCLUDE_RFM22B
+static UAVTalkConnection radioUavTalkCon;
+#endif
 
 // Private functions
 static void telemetryTxTask(void *parameters);
 static void telemetryRxTask(void *parameters);
+#ifdef PIOS_INCLUDE_RFM22B
+static void radioRxTask(void *parameters);
+#endif
 static int32_t transmitData(uint8_t *data, int32_t length);
 static void registerObject(UAVObjHandle obj);
 static void updateObject(UAVObjHandle obj, int32_t eventType);
@@ -82,7 +92,7 @@ static void processObjEvent(UAVObjEvent *ev);
 static void updateTelemetryStats();
 static void gcsTelemetryStatsUpdated();
 static void updateSettings();
-static uint32_t getComPort();
+static uint32_t getComPort(bool input);
 
 /**
  * Initialise the telemetry module
@@ -102,6 +112,11 @@ int32_t TelemetryStart(void)
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYTX, telemetryTxTaskHandle);
     xTaskCreate(telemetryRxTask, (signed char *)"TelRx", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY_RX, &telemetryRxTaskHandle);
     PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_TELEMETRYRX, telemetryRxTaskHandle);
+
+#ifdef PIOS_INCLUDE_RFM22B
+    xTaskCreate(radioRxTask, (signed char *)"RadioRx", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY_RADRX, &radioRxTaskHandle);
+    PIOS_TASK_MONITOR_RegisterTask(TASKINFO_RUNNING_RADIORX, radioRxTaskHandle);
+#endif
 
 #if defined(PIOS_TELEM_PRIORITY_QUEUE)
     xTaskCreate(telemetryTxPriTask, (signed char *)"TelPriTx", STACK_SIZE_BYTES / 4, NULL, TASK_PRIORITY_TXPRI, &telemetryTxPriTaskHandle);
@@ -137,10 +152,13 @@ int32_t TelemetryInitialize(void)
 
     // Initialise UAVTalk
     uavTalkCon = UAVTalkInitialize(&transmitData);
+#ifdef PIOS_INCLUDE_RFM22B
+    radioUavTalkCon = UAVTalkInitialize(&transmitData);
+#endif
 
     // Create periodic event that will be used to update the telemetry stats
-    txErrors   = 0;
-    txRetries  = 0;
+    txErrors  = 0;
+    txRetries = 0;
     UAVObjEvent ev;
     memset(&ev, 0, sizeof(UAVObjEvent));
     EventPeriodicQueueCreate(&ev, priorityQueue, STATS_UPDATE_PERIOD_MS);
@@ -342,13 +360,13 @@ static void telemetryTxPriTask(__attribute__((unused)) void *parameters)
 #endif
 
 /**
- * Telemetry transmit task. Processes queue events and periodic updates.
+ * Telemetry receive task. Processes queue events and periodic updates.
  */
 static void telemetryRxTask(__attribute__((unused)) void *parameters)
 {
     // Task loop
     while (1) {
-        uint32_t inputPort = getComPort();
+        uint32_t inputPort = getComPort(true);
 
         if (inputPort) {
             // Block until data are available
@@ -367,6 +385,32 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
     }
 }
 
+#ifdef PIOS_INCLUDE_RFM22B
+/**
+ * Radio telemetry receive task. Processes queue events and periodic updates.
+ */
+static void radioRxTask(__attribute__((unused)) void *parameters)
+{
+    // Task loop
+    while (1) {
+        if (telemetryPort) {
+            // Block until data are available
+            uint8_t serial_data[1];
+            uint16_t bytes_to_process;
+
+            bytes_to_process = PIOS_COM_ReceiveBuffer(telemetryPort, serial_data, sizeof(serial_data), 500);
+            if (bytes_to_process > 0) {
+                for (uint8_t i = 0; i < bytes_to_process; i++) {
+                    UAVTalkProcessInputStream(radioUavTalkCon, serial_data[i]);
+                }
+            }
+        } else {
+            vTaskDelay(5);
+        }
+    }
+}
+#endif /* PIOS_INCLUDE_RFM22B */
+
 /**
  * Transmit data buffer to the modem or USB port.
  * \param[in] data Data buffer to send
@@ -376,7 +420,7 @@ static void telemetryRxTask(__attribute__((unused)) void *parameters)
  */
 static int32_t transmitData(uint8_t *data, int32_t length)
 {
-    uint32_t outputPort = getComPort();
+    uint32_t outputPort = getComPort(false);
 
     if (outputPort) {
         return PIOS_COM_SendBuffer(outputPort, data, length);
@@ -434,6 +478,10 @@ static void updateTelemetryStats()
 
     // Get stats
     UAVTalkGetStats(uavTalkCon, &utalkStats);
+#ifdef PIOS_INCLUDE_RFM22B
+    UAVTalkAddStats(radioUavTalkCon, &utalkStats);
+    UAVTalkResetStats(radioUavTalkCon);
+#endif
     UAVTalkResetStats(uavTalkCon);
 
     // Get object data
@@ -553,15 +601,19 @@ static void updateSettings()
 
 /**
  * Determine input/output com port as highest priority available
+ * @param[in] input Returns the approproate input com port if true, else the appropriate output com port
  */
-static uint32_t getComPort()
+static uint32_t getComPort(bool input)
 {
+#ifndef PIOS_INCLUDE_RFM22B
+    input = false;
+#endif
 #if defined(PIOS_INCLUDE_USB)
     if (PIOS_COM_Available(PIOS_COM_TELEM_USB)) {
         return PIOS_COM_TELEM_USB;
     } else
 #endif /* PIOS_INCLUDE_USB */
-    if (PIOS_COM_Available(telemetryPort)) {
+    if (!input && PIOS_COM_Available(telemetryPort)) {
         return telemetryPort;
     } else {
         return 0;

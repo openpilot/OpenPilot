@@ -23,7 +23,7 @@
 	<field name="ErrorDestination" units="waypoint" type="int16" elements="1" default="0"/>
 
         <access gcs="readwrite" flight="readwrite"/>
-        <telemetrygcs acked="false" updatemode="manual" period="0"/>
+        <telemetrygcs acked="true" updatemode="manual" period="0"/>
         <telemetryflight acked="false" updatemode="periodic" period="4000"/>
         <logging updatemode="periodic" period="1000"/>
     </object>

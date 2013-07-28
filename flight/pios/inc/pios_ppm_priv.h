@@ -31,9 +31,6 @@
 #ifndef PIOS_PPM_PRIV_H
 #define PIOS_PPM_PRIV_H
 
-#include <pios.h>
-#include <pios_stm32.h>
-
 struct pios_ppm_cfg {
     TIM_ICInitTypeDef tim_ic_init;
     const struct pios_tim_channel *channels;

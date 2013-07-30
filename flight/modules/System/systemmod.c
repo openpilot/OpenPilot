@@ -169,12 +169,13 @@ MODULE_INITCALL(SystemModInitialize, 0);
 static void systemTask(__attribute__((unused)) void *parameters)
 {
     uint8_t cycleCount = 0;
+
     /* create all modules thread */
     MODULE_TASKCREATE_ALL;
 
     /* start the delayed callback scheduler */
     CallbackSchedulerStart();
-    
+
     if (mallocFailed) {
         /* We failed to malloc during task creation,
          * system behaviour is undefined.  Reset and let

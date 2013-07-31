@@ -358,7 +358,7 @@ static void updateFixedAttitude(float *attitude)
     stabDesired.Pitch    = attitude[1];
     stabDesired.Yaw      = attitude[2];
     stabDesired.Throttle = attitude[3];
-    stabDesired.StabilizationMode.fields.Roll = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.StabilizationMode.fields.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.fields.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.fields.Yaw   = STABILIZATIONDESIRED_STABILIZATIONMODE_RATE;
     StabilizationDesiredSet(&stabDesired);
@@ -494,9 +494,9 @@ static uint8_t updateFixedDesiredAttitude()
                    speedErrorToPowerCommandComponent;
 
     // Output internal state to telemetry
-    fixedwingpathfollowerStatus.Error.fields.Power       = descentspeedError;
+    fixedwingpathfollowerStatus.Error.fields.Power    = descentspeedError;
     fixedwingpathfollowerStatus.ErrorInt.fields.Power = powerIntegral;
-    fixedwingpathfollowerStatus.Command.fields.Power   = powerCommand;
+    fixedwingpathfollowerStatus.Command.fields.Power  = powerCommand;
 
     // set throttle
     stabDesired.Throttle = bound(fixedwingpathfollowerSettings.ThrottleLimit.fields.Neutral + powerCommand,
@@ -519,7 +519,7 @@ static uint8_t updateFixedDesiredAttitude()
         velocityState.Down < 0 && // we ARE going up
         descentspeedDesired > 0 && // we WANT to go down
         airspeedError < 0 && // we are too fast already
-                        fixedwingpathfollowerSettings.Safetymargins.fields.Highpower > 0.5f) { // alarm switched on
+        fixedwingpathfollowerSettings.Safetymargins.fields.Highpower > 0.5f) { // alarm switched on
         fixedwingpathfollowerStatus.Errors.fields.Highpower = 1;
         result = 0;
     }
@@ -547,9 +547,9 @@ static uint8_t updateFixedDesiredAttitude()
                      + airspeedErrorInt * fixedwingpathfollowerSettings.SpeedPI.fields.Ki
                      ) + verticalSpeedToPitchCommandComponent;
 
-    fixedwingpathfollowerStatus.Error.fields.Speed       = airspeedError;
+    fixedwingpathfollowerStatus.Error.fields.Speed    = airspeedError;
     fixedwingpathfollowerStatus.ErrorInt.fields.Speed = airspeedErrorInt;
-    fixedwingpathfollowerStatus.Command.fields.Speed   = pitchCommand;
+    fixedwingpathfollowerStatus.Command.fields.Speed  = pitchCommand;
 
     stabDesired.Pitch = bound(fixedwingpathfollowerSettings.PitchLimit.fields.Neutral + pitchCommand,
                               fixedwingpathfollowerSettings.PitchLimit.fields.Min,
@@ -561,7 +561,7 @@ static uint8_t updateFixedDesiredAttitude()
         velocityState.Down > 0 && // we ARE going down
         descentspeedDesired < 0 && // we WANT to go up
         airspeedError < 0 && // we are too fast already
-                        fixedwingpathfollowerSettings.Safetymargins.fields.Pitchcontrol > 0.5f) { // alarm switched on
+        fixedwingpathfollowerSettings.Safetymargins.fields.Pitchcontrol > 0.5f) { // alarm switched on
         fixedwingpathfollowerStatus.Errors.fields.Pitchcontrol = 1;
         result = 0;
     }
@@ -614,9 +614,9 @@ static uint8_t updateFixedDesiredAttitude()
     courseCommand  = (courseError * fixedwingpathfollowerSettings.CoursePI.fields.Kp +
                       courseIntegral);
 
-    fixedwingpathfollowerStatus.Error.fields.Course = courseError;
+    fixedwingpathfollowerStatus.Error.fields.Course    = courseError;
     fixedwingpathfollowerStatus.ErrorInt.fields.Course = courseIntegral;
-    fixedwingpathfollowerStatus.Command.fields.Course = courseCommand;
+    fixedwingpathfollowerStatus.Command.fields.Course  = courseCommand;
 
     stabDesired.Roll = bound(fixedwingpathfollowerSettings.RollLimit.fields.Neutral +
                              courseCommand,

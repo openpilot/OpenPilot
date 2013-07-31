@@ -125,12 +125,12 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
         // Append field
         // Check if it a named set and creates structures accordingly
         if (info->fields[n]->numElements > 1) {
-            if(info->fields[n]->elementNames[0].compare(QString("0")) != 0){
+            if (info->fields[n]->elementNames[0].compare(QString("0")) != 0) {
                 QString unionTypeName = QString("%1%2Data").arg(info->name).arg(info->fields[n]->name);
-                QString unionType = QString("typedef union {\n");
+                QString unionType     = QString("typedef union {\n");
                 unionType.append(QString("    %1 data[%2];\n").arg(type).arg(info->fields[n]->numElements));
                 unionType.append(QString("    struct __attribute__ ((__packed__)) {\n"));
-                for(int f =0; f < info->fields[n]->elementNames.count(); f++){
+                for (int f = 0; f < info->fields[n]->elementNames.count(); f++) {
                     unionType.append(QString("        %1 %2;\n").arg(type).arg(info->fields[n]->elementNames[f]));
                 }
                 unionType.append(QString("    } fields;\n"));
@@ -140,10 +140,9 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
 
                 fields.append(QString("    %1 %2;\n").arg(unionTypeName)
                               .arg(info->fields[n]->name));
-
             } else {
-            fields.append(QString("    %1 %2[%3];\n").arg(type)
-                          .arg(info->fields[n]->name).arg(info->fields[n]->numElements));
+                fields.append(QString("    %1 %2[%3];\n").arg(type)
+                              .arg(info->fields[n]->name).arg(info->fields[n]->numElements));
             }
         } else {
             fields.append(QString("    %1 %2;\n").arg(type).arg(info->fields[n]->name));
@@ -227,7 +226,7 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
                 // Initialize all fields in the array
                 for (int idx = 0; idx < info->fields[n]->numElements; ++idx) {
                     QString optIdentifier;
-                    if(info->fields[n]->elementNames[0].compare(QString("0")) != 0){
+                    if (info->fields[n]->elementNames[0].compare(QString("0")) != 0) {
                         optIdentifier = QString(".data");
                     }
 

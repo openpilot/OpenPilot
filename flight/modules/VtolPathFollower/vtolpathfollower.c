@@ -673,7 +673,7 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
         stabDesired.Throttle = manualControl.Throttle;
     }
 
-    stabDesired.StabilizationMode.fields.Roll = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.StabilizationMode.fields.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     stabDesired.StabilizationMode.fields.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     if (yaw_attitude) {
         stabDesired.StabilizationMode.fields.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;

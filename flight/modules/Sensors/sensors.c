@@ -446,14 +446,14 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     AttitudeSettingsGet(&attitudeSettings);
 
     // Indicates not to expend cycles on rotation
-    if (attitudeSettings.BoardRotation.fields.Roll== 0 && attitudeSettings.BoardRotation.fields.Pitch == 0 &&
+    if (attitudeSettings.BoardRotation.fields.Roll == 0 && attitudeSettings.BoardRotation.fields.Pitch == 0 &&
         attitudeSettings.BoardRotation.fields.Yaw == 0) {
         rotate = 0;
     } else {
         float rotationQuat[4];
         const float rpy[3] = { attitudeSettings.BoardRotation.fields.Roll,
-                               attitudeSettings.BoardRotation.fields.Pitch ,
-                               attitudeSettings.BoardRotation.fields.Yaw};
+                               attitudeSettings.BoardRotation.fields.Pitch,
+                               attitudeSettings.BoardRotation.fields.Yaw };
         RPY2Quaternion(rpy, rotationQuat);
         Quaternion2R(rotationQuat, R);
         rotate = 1;

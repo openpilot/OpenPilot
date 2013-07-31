@@ -70,9 +70,9 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
 
     // On first run initialize estimates to something reasonable
     if (reinit) {
-        rateRelayRunning[axis] = false;
-        relay.Period.data[axis]     = 200;
-        relay.Gain.data[axis] = 0;
+        rateRelayRunning[axis]  = false;
+        relay.Period.data[axis] = 200;
+        relay.Gain.data[axis]   = 0;
 
         accum_sin   = 0;
         accum_cos   = 0;
@@ -124,9 +124,9 @@ int stabilization_relay_rate(float error, float *output, int axis, bool reinit)
         accum_cos   = 0;
 
         if (rateRelayRunning[axis] == false) {
-            rateRelayRunning[axis] = true;
-            relay.Period.data[axis]     = 200;
-            relay.Gain.data[axis] = 0;
+            rateRelayRunning[axis]  = true;
+            relay.Period.data[axis] = 200;
+            relay.Gain.data[axis]   = 0;
         } else {
             // Low pass filter each amplitude and period
             relay.Gain.data[axis]   = relay.Gain.data[axis] * AMPLITUDE_ALPHA + this_gain * (1 - AMPLITUDE_ALPHA);

@@ -227,9 +227,9 @@ void updatePathDesired(__attribute__((unused)) UAVObjEvent *ev)
     WaypointInstGet(waypointActiveData.Index, &waypointData);
     PathActionInstGet(waypointData.Action, &pathActionData);
 
-    pathDesired.End.fields.North = waypointData.Position.fields.North;
-    pathDesired.End.fields.East  = waypointData.Position.fields.East;
-    pathDesired.End.fields.Down  = waypointData.Position.fields.Down;
+    pathDesired.End.fields.North  = waypointData.Position.fields.North;
+    pathDesired.End.fields.East   = waypointData.Position.fields.East;
+    pathDesired.End.fields.Down   = waypointData.Position.fields.Down;
     pathDesired.EndingVelocity    = waypointData.Velocity;
     pathDesired.Mode = pathActionData.Mode;
     pathDesired.ModeParameters[0] = pathActionData.ModeParameters[0];
@@ -247,18 +247,18 @@ void updatePathDesired(__attribute__((unused)) UAVObjEvent *ev)
            pathDesired.Start[PATHDESIRED_START_EAST] =  waypoint.Position[WAYPOINT_POSITION_EAST];
            pathDesired.Start[PATHDESIRED_START_DOWN] =  waypoint.Position[WAYPOINT_POSITION_DOWN];*/
         pathDesired.Start.fields.North = positionState.North;
-        pathDesired.Start.fields.East = positionState.East;
-        pathDesired.Start.fields.Down = positionState.Down;
-        pathDesired.StartingVelocity = pathDesired.EndingVelocity;
+        pathDesired.Start.fields.East  = positionState.East;
+        pathDesired.Start.fields.Down  = positionState.Down;
+        pathDesired.StartingVelocity   = pathDesired.EndingVelocity;
     } else {
         // Get previous waypoint as start point
         WaypointData waypointPrev;
         WaypointInstGet(waypointActive.Index - 1, &waypointPrev);
 
         pathDesired.Start.fields.North = waypointPrev.Position.fields.North;
-        pathDesired.Start.fields.East = waypointPrev.Position.fields.East;
-        pathDesired.Start.fields.Down = waypointPrev.Position.fields.Down;
-        pathDesired.StartingVelocity = waypointPrev.Velocity;
+        pathDesired.Start.fields.East  = waypointPrev.Position.fields.East;
+        pathDesired.Start.fields.Down  = waypointPrev.Position.fields.Down;
+        pathDesired.StartingVelocity   = waypointPrev.Velocity;
     }
     PathDesiredSet(&pathDesired);
 }

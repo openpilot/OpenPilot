@@ -503,7 +503,7 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     lowThrottleZeroIntegral    = settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE;
 
     // Whether to suppress (zero) the StabilizationDesired output for each axis while disarmed or throttle is low
-    lowThrottleZeroAxis[ROLL]  = settings.LowThrottleZeroAxis.fields.Roll== STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
+    lowThrottleZeroAxis[ROLL]  = settings.LowThrottleZeroAxis.fields.Roll == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
     lowThrottleZeroAxis[PITCH] = settings.LowThrottleZeroAxis.fields.Pitch == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
     lowThrottleZeroAxis[YAW]   = settings.LowThrottleZeroAxis.fields.Yaw == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
 

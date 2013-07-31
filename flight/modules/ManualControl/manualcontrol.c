@@ -686,17 +686,17 @@ static void updateStabilizationDesired(ManualControlCommandData *cmd, ManualCont
     }
 
     // TOOD: Add assumption about order of stabilization desired and manual control stabilization mode fields having same order
-    stabilization.StabilizationMode.fields.Roll = stab_settings[0];
+    stabilization.StabilizationMode.fields.Roll  = stab_settings[0];
     stabilization.StabilizationMode.fields.Pitch = stab_settings[1];
-    stabilization.StabilizationMode.fields.Yaw = stab_settings[2];
+    stabilization.StabilizationMode.fields.Yaw   = stab_settings[2];
 
     stabilization.Roll =
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_NONE) ? cmd->Roll :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Roll * stabSettings.ManualRate.fields.Roll:
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RATE) ? cmd->Roll * stabSettings.ManualRate.fields.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_WEAKLEVELING) ?
         cmd->Roll * stabSettings.ManualRate.fields.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) ? cmd->Roll * stabSettings.RollMax :
-        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Roll * stabSettings.ManualRate.fields.Roll:
+        (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK) ? cmd->Roll * stabSettings.ManualRate.fields.Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_VIRTUALBAR) ? cmd->Roll :
         (stab_settings[0] == STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE) ?
         cmd->Roll * stabSettings.ManualRate.fields.Roll :
@@ -757,11 +757,11 @@ static void updatePathDesired(__attribute__((unused)) ManualControlCommandData *
         pathDesired.Start.fields.North = 0;
         pathDesired.Start.fields.East  = 0;
         pathDesired.Start.fields.Down  = positionState.Down - settings.ReturnToHomeAltitudeOffset;
-        pathDesired.End.fields.North      = 0;
-        pathDesired.End.fields.East = 0;
-        pathDesired.End.fields.Down = positionState.Down - settings.ReturnToHomeAltitudeOffset;
-        pathDesired.StartingVelocity = 1;
-        pathDesired.EndingVelocity   = 0;
+        pathDesired.End.fields.North   = 0;
+        pathDesired.End.fields.East    = 0;
+        pathDesired.End.fields.Down    = positionState.Down - settings.ReturnToHomeAltitudeOffset;
+        pathDesired.StartingVelocity   = 1;
+        pathDesired.EndingVelocity     = 0;
         pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
         PathDesiredSet(&pathDesired);
     } else if (changed) {
@@ -772,13 +772,13 @@ static void updatePathDesired(__attribute__((unused)) ManualControlCommandData *
         PathDesiredData pathDesired;
         PathDesiredGet(&pathDesired);
         pathDesired.Start.fields.North = positionState.North;
-        pathDesired.Start.fields.East = positionState.East;
-        pathDesired.Start.fields.Down = positionState.Down;
-        pathDesired.End.fields.North = positionState.North;
-        pathDesired.End.fields.East = positionState.East;
-        pathDesired.End.fields.Down = positionState.Down;
-        pathDesired.StartingVelocity = 1;
-        pathDesired.EndingVelocity   = 0;
+        pathDesired.Start.fields.East  = positionState.East;
+        pathDesired.Start.fields.Down  = positionState.Down;
+        pathDesired.End.fields.North   = positionState.North;
+        pathDesired.End.fields.East    = positionState.East;
+        pathDesired.End.fields.Down    = positionState.Down;
+        pathDesired.StartingVelocity   = 1;
+        pathDesired.EndingVelocity     = 0;
         pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
         PathDesiredSet(&pathDesired);
         /* Disable this section, until such time as proper discussion can be had about how to implement it for all types of crafts.
@@ -816,11 +816,11 @@ static void updateLandDesired(__attribute__((unused)) ManualControlCommandData *
         pathDesired.Start.fields.North = positionState.North;
         pathDesired.Start.fields.East  = positionState.East;
         pathDesired.Start.fields.Down  = positionState.Down;
-        pathDesired.End.fields.North     = positionState.North;
-        pathDesired.End.fields.East = positionState.East;
-        pathDesired.End.fields.Down = positionState.Down;
-        pathDesired.StartingVelocity = 1;
-        pathDesired.EndingVelocity   = 0;
+        pathDesired.End.fields.North   = positionState.North;
+        pathDesired.End.fields.East    = positionState.East;
+        pathDesired.End.fields.Down    = positionState.Down;
+        pathDesired.StartingVelocity   = 1;
+        pathDesired.EndingVelocity     = 0;
         pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
     }
     pathDesired.End.fields.Down = positionState.Down + 5;

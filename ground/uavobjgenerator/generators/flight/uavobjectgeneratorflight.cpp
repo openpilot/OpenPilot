@@ -118,19 +118,39 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
     // Replace the $(DATAFIELDS) tag
     QString type;
     QString fields;
+    QString dataStructures;
     for (int n = 0; n < info->fields.length(); ++n) {
         // Determine type
         type = fieldTypeStrC[info->fields[n]->type];
         // Append field
+        // Check if it a named set and creates structures accordingly
         if (info->fields[n]->numElements > 1) {
+            if(info->fields[n]->elementNames[0].compare(QString("0")) != 0){
+                QString unionTypeName = QString("%1%2Data").arg(info->name).arg(info->fields[n]->name);
+                QString unionType = QString("typedef union {\n");
+                unionType.append(QString("    %1 data[%2];\n").arg(type).arg(info->fields[n]->numElements));
+                unionType.append(QString("    struct __attribute__ ((__packed__)) {\n"));
+                for(int f =0; f < info->fields[n]->elementNames.count(); f++){
+                    unionType.append(QString("        %1 %2;\n").arg(type).arg(info->fields[n]->elementNames[f]));
+                }
+                unionType.append(QString("    } fields;\n"));
+                unionType.append(QString("}  %1 ;\n\n").arg(unionTypeName));
+
+                dataStructures.append(unionType);
+
+                fields.append(QString("    %1 %2;\n").arg(unionTypeName)
+                              .arg(info->fields[n]->name));
+
+            } else {
             fields.append(QString("    %1 %2[%3];\n").arg(type)
                           .arg(info->fields[n]->name).arg(info->fields[n]->numElements));
+            }
         } else {
             fields.append(QString("    %1 %2;\n").arg(type).arg(info->fields[n]->name));
         }
     }
     outInclude.replace(QString("$(DATAFIELDS)"), fields);
-
+    outInclude.replace(QString("$(DATASTRUCTURES)"), dataStructures);
     // Replace the $(DATAFIELDINFO) tag
     QString enums;
     for (int n = 0; n < info->fields.length(); ++n) {
@@ -206,19 +226,27 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
             } else {
                 // Initialize all fields in the array
                 for (int idx = 0; idx < info->fields[n]->numElements; ++idx) {
+                    QString optIdentifier;
+                    if(info->fields[n]->elementNames[0].compare(QString("0")) != 0){
+                        optIdentifier = QString(".data");
+                    }
+
                     if (info->fields[n]->type == FIELDTYPE_ENUM) {
-                        initfields.append(QString("    data.%1[%2] = %3;\n")
+                        initfields.append(QString("    data.%1%2[%3] = %4;\n")
                                           .arg(info->fields[n]->name)
+                                          .arg(optIdentifier)
                                           .arg(idx)
                                           .arg(info->fields[n]->options.indexOf(info->fields[n]->defaultValues[idx])));
                     } else if (info->fields[n]->type == FIELDTYPE_FLOAT32) {
-                        initfields.append(QString("    data.%1[%2] = %3f;\n")
+                        initfields.append(QString("    data.%1%2[%3] = %4f;\n")
                                           .arg(info->fields[n]->name)
+                                          .arg(optIdentifier)
                                           .arg(idx)
                                           .arg(info->fields[n]->defaultValues[idx].toFloat(), 0, 'e', 6));
                     } else {
-                        initfields.append(QString("    data.%1[%2] = %3;\n")
+                        initfields.append(QString("    data.%1%2[%3] = %4;\n")
                                           .arg(info->fields[n]->name)
+                                          .arg(optIdentifier)
                                           .arg(idx)
                                           .arg(info->fields[n]->defaultValues[idx].toInt()));
                     }

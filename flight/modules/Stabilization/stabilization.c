@@ -192,19 +192,19 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         float local_error[3];
 
         // Essentially zero errors for anything in rate or none
-        if (stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
+        if (stabDesired.StabilizationMode.fields.Roll == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
             rpy_desired[0] = stabDesired.Roll;
         } else {
             rpy_desired[0] = attitudeState.Roll;
         }
 
-        if (stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
+        if (stabDesired.StabilizationMode.fields.Pitch == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
             rpy_desired[1] = stabDesired.Pitch;
         } else {
             rpy_desired[1] = attitudeState.Pitch;
         }
 
-        if (stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
+        if (stabDesired.StabilizationMode.fields.Yaw == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
             rpy_desired[2] = stabDesired.Yaw;
         } else {
             rpy_desired[2] = attitudeState.Yaw;

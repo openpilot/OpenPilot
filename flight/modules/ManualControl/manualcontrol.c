@@ -453,8 +453,8 @@ static void manualControlTask(__attribute__((unused)) void *parameters)
             if (pios_usb_rctx_id) {
                 PIOS_USB_RCTX_Update(pios_usb_rctx_id,
                                      cmd.Channel,
-                                     settings.ChannelMin,
-                                     settings.ChannelMax,
+                                     settings.ChannelMin.data,
+                                     settings.ChannelMax.data,
                                      NELEMENTS(cmd.Channel));
             }
 #endif /* PIOS_INCLUDE_USB_RCTX */

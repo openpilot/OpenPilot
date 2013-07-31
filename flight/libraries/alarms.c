@@ -74,8 +74,8 @@ int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity
 
     // Read alarm and update its severity only if it was changed
     SystemAlarmsGet(&alarms);
-    if (alarms.Alarm[alarm] != severity) {
-        alarms.Alarm[alarm] = severity;
+    if (alarms.Alarm.data[alarm] != severity) {
+        alarms.Alarm.data[alarm] = severity;
         SystemAlarmsSet(&alarms);
     }
 
@@ -109,10 +109,10 @@ int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm,
 
     // Read alarm and update its severity only if it was changed
     SystemAlarmsGet(&alarms);
-    if (alarms.Alarm[alarm] != severity) {
-        alarms.ExtendedAlarmStatus[alarm]    = status;
-        alarms.ExtendedAlarmSubStatus[alarm] = subStatus;
-        alarms.Alarm[alarm] = severity;
+    if (alarms.Alarm.data[alarm] != severity) {
+        alarms.ExtendedAlarmStatus.data[alarm]    = status;
+        alarms.ExtendedAlarmSubStatus.data[alarm] = subStatus;
+        alarms.Alarm.data[alarm] = severity;
         SystemAlarmsSet(&alarms);
     }
 
@@ -137,7 +137,7 @@ SystemAlarmsAlarmOptions AlarmsGet(SystemAlarmsAlarmElem alarm)
 
     // Read alarm
     SystemAlarmsGet(&alarms);
-    return alarms.Alarm[alarm];
+    return alarms.Alarm.data[alarm];
 }
 
 /**
@@ -229,7 +229,7 @@ static int32_t hasSeverity(SystemAlarmsAlarmOptions severity)
 
     // Go through alarms and check if any are of the given severity or higher
     for (uint32_t n = 0; n < SYSTEMALARMS_ALARM_NUMELEM; ++n) {
-        if (alarms.Alarm[n] >= severity) {
+        if (alarms.Alarm.data[n] >= severity) {
             xSemaphoreGiveRecursive(lock);
             return 1;
         }

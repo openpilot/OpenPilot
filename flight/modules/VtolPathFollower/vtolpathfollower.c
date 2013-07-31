@@ -337,8 +337,8 @@ static void updatePOIBearing()
     // don't try to move any closer
     if (poiRadius >= 3.0f || changeRadius > 0) {
         if (fabsf(pathAngle) > 0.0f || fabsf(changeRadius) > 0.0f) {
-            pathDesired.End[PATHDESIRED_END_NORTH] = poi.North + (poiRadius * cosf(DEG2RAD(pathAngle + yaw - 180.0f)));
-            pathDesired.End[PATHDESIRED_END_EAST]  = poi.East + (poiRadius * sinf(DEG2RAD(pathAngle + yaw - 180.0f)));
+            pathDesired.End.fields.North = poi.North + (poiRadius * cosf(DEG2RAD(pathAngle + yaw - 180.0f)));
+            pathDesired.End.fields.East  = poi.East + (poiRadius * sinf(DEG2RAD(pathAngle + yaw - 180.0f)));
             pathDesired.StartingVelocity = 1.0f;
             pathDesired.EndingVelocity   = 0.0f;
             pathDesired.Mode = PATHDESIRED_MODE_FLYENDPOINT;
@@ -351,7 +351,7 @@ static void updatePOIBearing()
         /*elevation = RAD2DEG(atan2f(dLoc[2],distance));*/
 
         stabDesired.Yaw = yaw + (pathAngle / 2.0f);
-        stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+        stabDesired.StabilizationMode.fields.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
 
         // cameraDesired.Yaw=yaw;
         // cameraDesired.PitchOrServo2=elevation;
@@ -382,7 +382,7 @@ static void updatePathVelocity()
     { positionState.North, positionState.East, positionState.Down };
     struct path_status progress;
 
-    path_progress(pathDesired.Start, pathDesired.End, cur, &progress, pathDesired.Mode);
+    path_progress(pathDesired.Start.data, pathDesired.End.data, cur, &progress, pathDesired.Mode);
 
     float groundspeed;
     switch (pathDesired.Mode) {
@@ -414,7 +414,7 @@ static void updatePathVelocity()
     velocityDesired.North = progress.path_direction[0] * groundspeed;
     velocityDesired.East  = progress.path_direction[1] * groundspeed;
 
-    float error_speed = progress.error * vtolpathfollowerSettings.HorizontalPosPI[VTOLPATHFOLLOWERSETTINGS_HORIZONTALPOSPI_KP];
+    float error_speed = progress.error * vtolpathfollowerSettings.HorizontalPosPI.fields.Kp;
     float correction_velocity[2] =
     { progress.correction_direction[0] * error_speed, progress.correction_direction[1] * error_speed };
 
@@ -427,13 +427,13 @@ static void updatePathVelocity()
     velocityDesired.North += progress.correction_direction[0] * error_speed * scale;
     velocityDesired.East  += progress.correction_direction[1] * error_speed * scale;
 
-    float altitudeSetpoint = pathDesired.Start[2] + (pathDesired.End[2] - pathDesired.Start[2]) * bound(progress.fractional_progress, 0, 1);
+    float altitudeSetpoint = pathDesired.Start.fields.Down + (pathDesired.End.fields.Down - pathDesired.Start.fields.Down) * bound(progress.fractional_progress, 0, 1);
 
     float downError = altitudeSetpoint - positionState.Down;
-    downPosIntegral = bound(downPosIntegral + downError * dT * vtolpathfollowerSettings.VerticalPosPI[VTOLPATHFOLLOWERSETTINGS_VERTICALPOSPI_KI],
-                            -vtolpathfollowerSettings.VerticalPosPI[VTOLPATHFOLLOWERSETTINGS_VERTICALPOSPI_ILIMIT],
-                            vtolpathfollowerSettings.VerticalPosPI[VTOLPATHFOLLOWERSETTINGS_VERTICALPOSPI_ILIMIT]);
-    downCommand     = (downError * vtolpathfollowerSettings.VerticalPosPI[VTOLPATHFOLLOWERSETTINGS_VERTICALPOSPI_KP] + downPosIntegral);
+    downPosIntegral = bound(downPosIntegral + downError * dT * vtolpathfollowerSettings.VerticalPosPI.fields.Ki,
+                            -vtolpathfollowerSettings.VerticalPosPI.fields.ILimit,
+                            vtolpathfollowerSettings.VerticalPosPI.fields.ILimit);
+    downCommand     = (downError * vtolpathfollowerSettings.VerticalPosPI.fields.Kp + downPosIntegral);
     velocityDesired.Down = bound(downCommand, -vtolpathfollowerSettings.VerticalVelMax, vtolpathfollowerSettings.VerticalVelMax);
 
     // update pathstatus
@@ -505,17 +505,17 @@ void updateEndpointVelocity()
     }
 
     // Compute desired north command
-    northError = pathDesired.End[PATHDESIRED_END_NORTH] - northPos;
-    northPosIntegral = bound(northPosIntegral + northError * dT * vtolpathfollowerSettings.HorizontalPosPI[VTOLPATHFOLLOWERSETTINGS_HORIZONTALPOSPI_KI],
-                             -vtolpathfollowerSettings.HorizontalPosPI[VTOLPATHFOLLOWERSETTINGS_HORIZONTALPOSPI_ILIMIT],
-                             vtolpathfollowerSettings.HorizontalPosPI[VTOLPATHFOLLOWERSETTINGS_HORIZONTALPOSPI_ILIMIT]);
-    northCommand     = (northError * vtolpathfollowerSettings.HorizontalPosPI[VTOLPATHFOLLOWERSETTINGS_HORIZONTALPOSPI_KP] + northPosIntegral);
+    northError = pathDesired.End.fields.North - northPos;
+    northPosIntegral = bound(northPosIntegral + northError * dT * vtolpathfollowerSettings.HorizontalPosPI.fields.Ki,
+                             -vtolpathfollowerSettings.HorizontalPosPI.fields.ILimit,
+                             vtolpathfollowerSettings.HorizontalPosPI.fields.ILimit);
+    northCommand     = (northError * vtolpathfollowerSettings.HorizontalPosPI.fields.Kp + northPosIntegral);
 
-    eastError = pathDesired.End[PATHDESIRED_END_EAST] - eastPos;
-    eastPosIntegral  = bound(eastPosIntegral + eastError * dT * vtolpathfollowerSettings.HorizontalPosPI[VTOLPATHFOLLOWERSETTINGS_HORIZONTALPOSPI_KI],
-                             -vtolpathfollowerSettings.HorizontalPosPI[VTOLPATHFOLLOWERSETTINGS_HORIZONTALPOSPI_ILIMIT],
-                             vtolpathfollowerSettings.HorizontalPosPI[VTOLPATHFOLLOWERSETTINGS_HORIZONTALPOSPI_ILIMIT]);
-    eastCommand = (eastError * vtolpathfollowerSettings.HorizontalPosPI[VTOLPATHFOLLOWERSETTINGS_HORIZONTALPOSPI_KP] + eastPosIntegral);
+    eastError = pathDesired.End.fields.East - eastPos;
+    eastPosIntegral  = bound(eastPosIntegral + eastError * dT * vtolpathfollowerSettings.HorizontalPosPI.fields.Ki,
+                             -vtolpathfollowerSettings.HorizontalPosPI.fields.ILimit,
+                             vtolpathfollowerSettings.HorizontalPosPI.fields.ILimit);
+    eastCommand = (eastError * vtolpathfollowerSettings.HorizontalPosPI.fields.Kp + eastPosIntegral);
 
     // Limit the maximum velocity
     float total_vel = sqrtf(powf(northCommand, 2) + powf(eastCommand, 2));
@@ -527,11 +527,11 @@ void updateEndpointVelocity()
     velocityDesired.North = northCommand * scale;
     velocityDesired.East  = eastCommand * scale;
 
-    downError = pathDesired.End[PATHDESIRED_END_DOWN] - downPos;
-    downPosIntegral = bound(downPosIntegral + downError * dT * vtolpathfollowerSettings.VerticalPosPI[VTOLPATHFOLLOWERSETTINGS_VERTICALPOSPI_KI],
-                            -vtolpathfollowerSettings.VerticalPosPI[VTOLPATHFOLLOWERSETTINGS_VERTICALPOSPI_ILIMIT],
-                            vtolpathfollowerSettings.VerticalPosPI[VTOLPATHFOLLOWERSETTINGS_VERTICALPOSPI_ILIMIT]);
-    downCommand     = (downError * vtolpathfollowerSettings.VerticalPosPI[VTOLPATHFOLLOWERSETTINGS_VERTICALPOSPI_KP] + downPosIntegral);
+    downError = pathDesired.End.fields.Down - downPos;
+    downPosIntegral = bound(downPosIntegral + downError * dT * vtolpathfollowerSettings.VerticalPosPI.fields.Ki,
+                            -vtolpathfollowerSettings.VerticalPosPI.fields.ILimit,
+                            vtolpathfollowerSettings.VerticalPosPI.fields.ILimit);
+    downCommand     = (downError * vtolpathfollowerSettings.VerticalPosPI.fields.Kp + downPosIntegral);
     velocityDesired.Down = bound(downCommand, -vtolpathfollowerSettings.VerticalVelMax, vtolpathfollowerSettings.VerticalVelMax);
 
     VelocityDesiredSet(&velocityDesired);
@@ -550,9 +550,9 @@ static void updateFixedAttitude(float *attitude)
     stabDesired.Pitch    = attitude[1];
     stabDesired.Yaw      = attitude[2];
     stabDesired.Throttle = attitude[3];
-    stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL]  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-    stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-    stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW]   = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
+    stabDesired.StabilizationMode.fields.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.StabilizationMode.fields.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.StabilizationMode.fields.Yaw   = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
     StabilizationDesiredSet(&stabDesired);
 }
 
@@ -629,31 +629,31 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
 
     // Compute desired north command
     northError = velocityDesired.North - northVel;
-    northVelIntegral = bound(northVelIntegral + northError * dT * vtolpathfollowerSettings.HorizontalVelPID[VTOLPATHFOLLOWERSETTINGS_HORIZONTALVELPID_KI],
-                             -vtolpathfollowerSettings.HorizontalVelPID[VTOLPATHFOLLOWERSETTINGS_HORIZONTALVELPID_ILIMIT],
-                             vtolpathfollowerSettings.HorizontalVelPID[VTOLPATHFOLLOWERSETTINGS_HORIZONTALVELPID_ILIMIT]);
-    northCommand     = (northError * vtolpathfollowerSettings.HorizontalVelPID[VTOLPATHFOLLOWERSETTINGS_HORIZONTALVELPID_KP] + northVelIntegral
-                        - nedAccel.North * vtolpathfollowerSettings.HorizontalVelPID[VTOLPATHFOLLOWERSETTINGS_HORIZONTALVELPID_KD]
+    northVelIntegral = bound(northVelIntegral + northError * dT * vtolpathfollowerSettings.HorizontalVelPID.fields.Ki,
+                             -vtolpathfollowerSettings.HorizontalVelPID.fields.ILimit,
+                             vtolpathfollowerSettings.HorizontalVelPID.fields.ILimit);
+    northCommand     = (northError * vtolpathfollowerSettings.HorizontalVelPID.fields.Kp + northVelIntegral
+                        - nedAccel.North * vtolpathfollowerSettings.HorizontalVelPID.fields.Kd
                         + velocityDesired.North * vtolpathfollowerSettings.VelocityFeedforward);
 
     // Compute desired east command
     eastError = velocityDesired.East - eastVel;
-    eastVelIntegral = bound(eastVelIntegral + eastError * dT * vtolpathfollowerSettings.HorizontalVelPID[VTOLPATHFOLLOWERSETTINGS_HORIZONTALVELPID_KI],
-                            -vtolpathfollowerSettings.HorizontalVelPID[VTOLPATHFOLLOWERSETTINGS_HORIZONTALVELPID_ILIMIT],
-                            vtolpathfollowerSettings.HorizontalVelPID[VTOLPATHFOLLOWERSETTINGS_HORIZONTALVELPID_ILIMIT]);
-    eastCommand     = (eastError * vtolpathfollowerSettings.HorizontalVelPID[VTOLPATHFOLLOWERSETTINGS_HORIZONTALVELPID_KP] + eastVelIntegral
-                       - nedAccel.East * vtolpathfollowerSettings.HorizontalVelPID[VTOLPATHFOLLOWERSETTINGS_HORIZONTALVELPID_KD]
+    eastVelIntegral = bound(eastVelIntegral + eastError * dT * vtolpathfollowerSettings.HorizontalVelPID.fields.Ki,
+                            -vtolpathfollowerSettings.HorizontalVelPID.fields.ILimit,
+                            vtolpathfollowerSettings.HorizontalVelPID.fields.ILimit);
+    eastCommand     = (eastError * vtolpathfollowerSettings.HorizontalVelPID.fields.Kp + eastVelIntegral
+                       - nedAccel.East * vtolpathfollowerSettings.HorizontalVelPID.fields.Kd
                        + velocityDesired.East * vtolpathfollowerSettings.VelocityFeedforward);
 
     // Compute desired down command
     downError = velocityDesired.Down - downVel;
     // Must flip this sign
     downError = -downError;
-    downVelIntegral = bound(downVelIntegral + downError * dT * vtolpathfollowerSettings.VerticalVelPID[VTOLPATHFOLLOWERSETTINGS_VERTICALVELPID_KI],
-                            -vtolpathfollowerSettings.VerticalVelPID[VTOLPATHFOLLOWERSETTINGS_VERTICALVELPID_ILIMIT],
-                            vtolpathfollowerSettings.VerticalVelPID[VTOLPATHFOLLOWERSETTINGS_VERTICALVELPID_ILIMIT]);
-    downCommand     = (downError * vtolpathfollowerSettings.VerticalVelPID[VTOLPATHFOLLOWERSETTINGS_VERTICALVELPID_KP] + downVelIntegral
-                       - nedAccel.Down * vtolpathfollowerSettings.VerticalVelPID[VTOLPATHFOLLOWERSETTINGS_VERTICALVELPID_KD]);
+    downVelIntegral = bound(downVelIntegral + downError * dT * vtolpathfollowerSettings.VerticalVelPID.fields.Ki,
+                            -vtolpathfollowerSettings.VerticalVelPID.fields.ILimit,
+                            vtolpathfollowerSettings.VerticalVelPID.fields.ILimit);
+    downCommand     = (downError * vtolpathfollowerSettings.VerticalVelPID.fields.Kp + downVelIntegral
+                       - nedAccel.Down * vtolpathfollowerSettings.VerticalVelPID.fields.Kd);
 
     stabDesired.Throttle = bound(downCommand + throttleOffset, 0, 1);
 
@@ -673,13 +673,13 @@ static void updateVtolDesiredAttitude(bool yaw_attitude)
         stabDesired.Throttle = manualControl.Throttle;
     }
 
-    stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL]  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-    stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.StabilizationMode.fields.Roll = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+    stabDesired.StabilizationMode.fields.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     if (yaw_attitude) {
-        stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+        stabDesired.StabilizationMode.fields.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
     } else {
-        stabDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW] = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
-        stabDesired.Yaw = stabSettings.MaximumRate[STABILIZATIONSETTINGS_MAXIMUMRATE_YAW] * manualControlData.Yaw;
+        stabDesired.StabilizationMode.fields.Yaw = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
+        stabDesired.Yaw = stabSettings.MaximumRate.fields.Yaw * manualControlData.Yaw;
     }
     StabilizationDesiredSet(&stabDesired);
 }

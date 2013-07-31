@@ -171,17 +171,17 @@ static void attitudeUpdated(UAVObjEvent *ev)
     // process axes
     for (uint8_t i = 0; i < CAMERASTABSETTINGS_INPUT_NUMELEM; i++) {
         // read and process control input
-        if (cameraStab.Input[i] != CAMERASTABSETTINGS_INPUT_NONE) {
-            if (AccessoryDesiredInstGet(cameraStab.Input[i] - CAMERASTABSETTINGS_INPUT_ACCESSORY0, &accessory) == 0) {
+        if (cameraStab.Input.data[i] != CAMERASTABSETTINGS_INPUT_NONE) {
+            if (AccessoryDesiredInstGet(cameraStab.Input.data[i] - CAMERASTABSETTINGS_INPUT_ACCESSORY0, &accessory) == 0) {
                 float input_rate;
-                switch (cameraStab.StabilizationMode[i]) {
+                switch (cameraStab.StabilizationMode.data[i]) {
                 case CAMERASTABSETTINGS_STABILIZATIONMODE_ATTITUDE:
-                    csd->inputs[i] = accessory.AccessoryVal * cameraStab.InputRange[i];
+                    csd->inputs[i] = accessory.AccessoryVal * cameraStab.InputRange.data[i];
                     break;
                 case CAMERASTABSETTINGS_STABILIZATIONMODE_AXISLOCK:
-                    input_rate     = accessory.AccessoryVal * cameraStab.InputRate[i];
+                    input_rate     = accessory.AccessoryVal * cameraStab.InputRate.data[i];
                     if (fabsf(input_rate) > cameraStab.MaxAxisLockRate) {
-                        csd->inputs[i] = bound(csd->inputs[i] + input_rate * 0.001f * dT_millis, cameraStab.InputRange[i]);
+                        csd->inputs[i] = bound(csd->inputs[i] + input_rate * 0.001f * dT_millis, cameraStab.InputRange.data[i]);
                     }
                     break;
                 default:
@@ -208,14 +208,14 @@ static void attitudeUpdated(UAVObjEvent *ev)
         }
 
 #ifdef USE_GIMBAL_LPF
-        if (cameraStab.ResponseTime) {
-            float rt = (float)cameraStab.ResponseTime[i];
+        if (cameraStab.ResponseTime.data) {
+            float rt = (float)cameraStab.ResponseTime.data[i];
             attitude = csd->attitudeFiltered[i] = ((rt * csd->attitudeFiltered[i]) + (dT_millis * attitude)) / (rt + dT_millis);
         }
 #endif
 
 #ifdef USE_GIMBAL_FF
-        if (cameraStab.FeedForward[i]) {
+        if (cameraStab.FeedForward.data[i]) {
             applyFeedForward(i, dT_millis, &attitude, &cameraStab);
         }
 #endif
@@ -223,7 +223,7 @@ static void attitudeUpdated(UAVObjEvent *ev)
         // bounding for elevon mixing occurs on the unmixed output
         // to limit the range of the mixed output you must limit the range
         // of both the unmixed pitch and unmixed roll
-        float output = bound((attitude + csd->inputs[i]) / cameraStab.OutputRange[i], 1.0f);
+        float output = bound((attitude + csd->inputs[i]) / cameraStab.OutputRange.data[i], 1.0f);
 
         // set output channels
         switch (i) {
@@ -298,16 +298,16 @@ void applyFeedForward(uint8_t index, float dT_millis, float *attitude, CameraSta
         if (index == CAMERASTABSETTINGS_INPUT_ROLL) {
             float pitch;
             AttitudeStatePitchGet(&pitch);
-            gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH] - fabsf(pitch))
-                                   / cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_PITCH];
+            gimbalTypeCorrection = (cameraStab->OutputRange.fields.Pitch - fabsf(pitch))
+                                   / cameraStab->OutputRange.fields.Pitch;
         }
         break;
     case CAMERASTABSETTINGS_GIMBALTYPE_YAWPITCHROLL:
         if (index == CAMERASTABSETTINGS_INPUT_PITCH) {
             float roll;
             AttitudeStateRollGet(&roll);
-            gimbalTypeCorrection = (cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL] - fabsf(roll))
-                                   / cameraStab->OutputRange[CAMERASTABSETTINGS_OUTPUTRANGE_ROLL];
+            gimbalTypeCorrection = (cameraStab->OutputRange.fields.Roll - fabsf(roll))
+                                   / cameraStab->OutputRange.fields.Roll;
         }
         break;
     default:
@@ -316,11 +316,11 @@ void applyFeedForward(uint8_t index, float dT_millis, float *attitude, CameraSta
 
     // apply feed forward
     float accumulator = csd->ffFilterAccumulator[index];
-    accumulator += (*attitude - csd->ffLastAttitude[index]) * (float)cameraStab->FeedForward[index] * gimbalTypeCorrection;
+    accumulator += (*attitude - csd->ffLastAttitude[index]) * (float)cameraStab->FeedForward.data[index] * gimbalTypeCorrection;
     csd->ffLastAttitude[index] = *attitude;
     *attitude   += accumulator;
 
-    float filter = (float)((accumulator > 0.0f) ? cameraStab->AccelTime[index] : cameraStab->DecelTime[index]) / dT_millis;
+    float filter = (float)((accumulator > 0.0f) ? cameraStab->AccelTime.data[index] : cameraStab->DecelTime.data[index]) / dT_millis;
     if (filter < 1.0f) {
         filter = 1.0f;
     }

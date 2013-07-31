@@ -426,9 +426,9 @@ static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_
     // By convention, there is a direct mapping between task monitor task_id's and members
     // of the TaskInfoXXXXElem enums
     PIOS_DEBUG_Assert(task_id < TASKINFO_RUNNING_NUMELEM);
-    taskData->Running[task_id]        = task_info->is_running ? TASKINFO_RUNNING_TRUE : TASKINFO_RUNNING_FALSE;
-    taskData->StackRemaining[task_id] = task_info->stack_remaining;
-    taskData->RunningTime[task_id]    = task_info->running_time_percentage;
+    taskData->Running.data[task_id]        = task_info->is_running ? TASKINFO_RUNNING_TRUE : TASKINFO_RUNNING_FALSE;
+    taskData->StackRemaining.data[task_id] = task_info->stack_remaining;
+    taskData->RunningTime.data[task_id]    = task_info->running_time_percentage;
 }
 #endif
 

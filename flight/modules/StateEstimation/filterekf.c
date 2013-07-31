@@ -163,17 +163,17 @@ static int32_t maininit(stateFilter *self)
     int t;
     // plausibility check
     for (t = 0; t < EKFCONFIGURATION_P_NUMELEM; t++) {
-        if (invalid_var(this->ekfConfiguration.P[t])) {
+        if (invalid_var(this->ekfConfiguration.P.data[t])) {
             return 2;
         }
     }
     for (t = 0; t < EKFCONFIGURATION_Q_NUMELEM; t++) {
-        if (invalid_var(this->ekfConfiguration.Q[t])) {
+        if (invalid_var(this->ekfConfiguration.Q.data[t])) {
             return 2;
         }
     }
     for (t = 0; t < EKFCONFIGURATION_R_NUMELEM; t++) {
-        if (invalid_var(this->ekfConfiguration.R[t])) {
+        if (invalid_var(this->ekfConfiguration.R.data[t])) {
             return 2;
         }
     }
@@ -242,23 +242,23 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
             INSGPSInit();
             // variance is measured in mGaus, but internally the EKF works with a normalized  vector. Scale down by Be^2
             float Be2 = this->homeLocation.Be[0] * this->homeLocation.Be[0] + this->homeLocation.Be[1] * this->homeLocation.Be[1] + this->homeLocation.Be[2] * this->homeLocation.Be[2];
-            INSSetMagVar((float[3]) { this->ekfConfiguration.R[EKFCONFIGURATION_R_MAGX] / Be2,
-                                      this->ekfConfiguration.R[EKFCONFIGURATION_R_MAGY] / Be2,
-                                      this->ekfConfiguration.R[EKFCONFIGURATION_R_MAGZ] / Be2 }
+            INSSetMagVar((float[3]) { this->ekfConfiguration.R.fields.MagX / Be2,
+                                      this->ekfConfiguration.R.fields.MagY / Be2,
+                                      this->ekfConfiguration.R.fields.MagZ / Be2 }
                          );
-            INSSetAccelVar((float[3]) { this->ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELX],
-                                        this->ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELY],
-                                        this->ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELZ] }
+            INSSetAccelVar((float[3]) { this->ekfConfiguration.Q.fields.AccelX,
+                                        this->ekfConfiguration.Q.fields.AccelY,
+                                        this->ekfConfiguration.Q.fields.AccelZ }
                            );
-            INSSetGyroVar((float[3]) { this->ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROX],
-                                       this->ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROY],
-                                       this->ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROZ] }
+            INSSetGyroVar((float[3]) { this->ekfConfiguration.Q.fields.GyroX,
+                                       this->ekfConfiguration.Q.fields.GyroY,
+                                       this->ekfConfiguration.Q.fields.GyroZ }
                           );
-            INSSetGyroBiasVar((float[3]) { this->ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTX],
-                                           this->ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTY],
-                                           this->ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTZ] }
+            INSSetGyroBiasVar((float[3]) { this->ekfConfiguration.Q.fields.GyroDriftX,
+                                           this->ekfConfiguration.Q.fields.GyroDriftY,
+                                           this->ekfConfiguration.Q.fields.GyroDriftZ }
                               );
-            INSSetBaroVar(this->ekfConfiguration.R[EKFCONFIGURATION_R_BAROZ]);
+            INSSetBaroVar(this->ekfConfiguration.R.fields.BaroZ);
 
             // Initialize the gyro bias
             float gyro_bias[3] = { 0.0f, 0.0f, 0.0f };
@@ -294,7 +294,7 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 
             INSSetState(this->work.pos, (float *)zeros, this->work.attitude, (float *)zeros, (float *)zeros);
 
-            INSResetP(this->ekfConfiguration.P);
+            INSResetP(this->ekfConfiguration.P.data);
         } else {
             // Run prediction a bit before any corrections
 
@@ -368,21 +368,21 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 
     if (!this->usePos) {
         // position and velocity variance used in indoor mode
-        INSSetPosVelVar((float[3]) { this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
-                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
-                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR] },
-                        (float[3]) { this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR],
-                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR],
-                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR] }
+        INSSetPosVelVar((float[3]) { this->ekfConfiguration.FakeR.fields.FakeGPSPosIndoor,
+                                     this->ekfConfiguration.FakeR.fields.FakeGPSPosIndoor,
+                                     this->ekfConfiguration.FakeR.fields.FakeGPSPosIndoor },
+                        (float[3]) { this->ekfConfiguration.FakeR.fields.FakeGPSVelIndoor,
+                                     this->ekfConfiguration.FakeR.fields.FakeGPSVelIndoor,
+                                     this->ekfConfiguration.FakeR.fields.FakeGPSVelIndoor }
                         );
     } else {
         // position and velocity variance used in outdoor mode
-        INSSetPosVelVar((float[3]) { this->ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSNORTH],
-                                     this->ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSEAST],
-                                     this->ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSDOWN] },
-                        (float[3]) { this->ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELNORTH],
-                                     this->ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELEAST],
-                                     this->ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELDOWN] }
+        INSSetPosVelVar((float[3]) { this->ekfConfiguration.R.fields.GPSPosNorth,
+                                     this->ekfConfiguration.R.fields.GPSPosEast,
+                                     this->ekfConfiguration.R.fields.GPSPosDown },
+                        (float[3]) { this->ekfConfiguration.R.fields.GPSVelNorth,
+                                     this->ekfConfiguration.R.fields.GPSVelEast,
+                                     this->ekfConfiguration.R.fields.GPSVelDown }
                         );
     }
 
@@ -397,12 +397,12 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
     if (IS_SET(this->work.updated, SENSORUPDATES_airspeed) && ((!IS_SET(this->work.updated, SENSORUPDATES_vel) && !IS_SET(this->work.updated, SENSORUPDATES_pos)) | !this->usePos)) {
         // HACK: feed airspeed into EKF as velocity, treat wind as 1e2 variance
         sensors |= HORIZ_SENSORS | VERT_SENSORS;
-        INSSetPosVelVar((float[3]) { this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
-                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
-                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR] },
-                        (float[3]) { this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED],
-                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED],
-                                     this->ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED] }
+        INSSetPosVelVar((float[3]) { this->ekfConfiguration.FakeR.fields.FakeGPSPosIndoor,
+                                     this->ekfConfiguration.FakeR.fields.FakeGPSPosIndoor,
+                                     this->ekfConfiguration.FakeR.fields.FakeGPSPosIndoor },
+                        (float[3]) { this->ekfConfiguration.FakeR.fields.FakeGPSVelAirspeed,
+                                     this->ekfConfiguration.FakeR.fields.FakeGPSVelAirspeed,
+                                     this->ekfConfiguration.FakeR.fields.FakeGPSVelAirspeed }
                         );
         // rotate airspeed vector into NED frame - airspeed is measured in X axis only
         float R[3][3];
@@ -421,12 +421,12 @@ static int32_t filter(stateFilter *self, stateEstimation *state)
 
     EKFStateVarianceData vardata;
     EKFStateVarianceGet(&vardata);
-    INSGetP(vardata.P);
+    INSGetP(vardata.P.data);
     EKFStateVarianceSet(&vardata);
     int t;
     for (t = 0; t < EKFSTATEVARIANCE_P_NUMELEM; t++) {
-        if (!IS_REAL(vardata.P[t]) || vardata.P[t] <= 0.0f) {
-            INSResetP(this->ekfConfiguration.P);
+        if (!IS_REAL(vardata.P.data[t]) || vardata.P.data[t] <= 0.0f) {
+            INSResetP(this->ekfConfiguration.P.data);
             this->init_stage = -1;
             break;
         }

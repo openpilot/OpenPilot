@@ -64,23 +64,23 @@ int stabilization_virtual_flybar(float gyro, float command, float *output, float
     // Get the settings for the correct axis
     switch (axis) {
     case ROLL:
-        kp = settings->VbarRollPI[STABILIZATIONSETTINGS_VBARROLLPI_KP];
-        ki = settings->VbarRollPI[STABILIZATIONSETTINGS_VBARROLLPI_KI];
+        kp = settings->VbarRollPI.fields.Kp;
+        ki = settings->VbarRollPI.fields.Ki;
         break;
     case PITCH:
-        kp = settings->VbarPitchPI[STABILIZATIONSETTINGS_VBARROLLPI_KP];
-        ki = settings->VbarPitchPI[STABILIZATIONSETTINGS_VBARROLLPI_KI];
+        kp = settings->VbarPitchPI.fields.Kp;
+        ki = settings->VbarPitchPI.fields.Ki;;
         break;
     case YAW:
-        kp = settings->VbarYawPI[STABILIZATIONSETTINGS_VBARROLLPI_KP];
-        ki = settings->VbarYawPI[STABILIZATIONSETTINGS_VBARROLLPI_KI];
+        kp = settings->VbarYawPI.fields.Kp;
+        ki = settings->VbarYawPI.fields.Ki;
         break;
     default:
         PIOS_DEBUG_Assert(0);
     }
 
     // Command signal is composed of stick input added to the gyro and virtual flybar
-    *output = command * settings->VbarSensitivity[axis] -
+    *output = command * settings->VbarSensitivity.data[axis] -
               gyro_gain * (vbar_integral[axis] * ki + gyro * kp);
 
     return 0;

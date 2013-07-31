@@ -392,9 +392,9 @@ static void altitudeHoldTask(__attribute__((unused)) void *parameters)
                 // shutdown motors
                 stabilizationDesired.Throttle = -1;
             }
-            stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_ROLL]  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-            stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_PITCH] = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
-            stabilizationDesired.StabilizationMode[STABILIZATIONDESIRED_STABILIZATIONMODE_YAW]   = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
+            stabilizationDesired.StabilizationMode.fields.Roll  = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+            stabilizationDesired.StabilizationMode.fields.Pitch = STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE;
+            stabilizationDesired.StabilizationMode.fields.Yaw   = STABILIZATIONDESIRED_STABILIZATIONMODE_AXISLOCK;
             stabilizationDesired.Roll  = altitudeHoldDesired.Roll;
             stabilizationDesired.Pitch = altitudeHoldDesired.Pitch;
             stabilizationDesired.Yaw   = altitudeHoldDesired.Yaw;

@@ -171,111 +171,111 @@ static void updatePIDs(UAVObjEvent *ev)
 
     // Loop through every enabled instance
     for (uint8_t i = 0; i < TXPIDSETTINGS_PIDS_NUMELEM; i++) {
-        if (inst.PIDs[i] != TXPIDSETTINGS_PIDS_DISABLED) {
+        if (inst.PIDs.data[i] != TXPIDSETTINGS_PIDS_DISABLED) {
             float value;
-            if (inst.Inputs[i] == TXPIDSETTINGS_INPUTS_THROTTLE) {
+            if (inst.Inputs.data[i] == TXPIDSETTINGS_INPUTS_THROTTLE) {
                 ManualControlCommandThrottleGet(&value);
                 value = scale(value,
-                              inst.ThrottleRange[TXPIDSETTINGS_THROTTLERANGE_MIN],
-                              inst.ThrottleRange[TXPIDSETTINGS_THROTTLERANGE_MAX],
-                              inst.MinPID[i], inst.MaxPID[i]);
-            } else if (AccessoryDesiredInstGet(inst.Inputs[i] - TXPIDSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0) {
-                value = scale(accessory.AccessoryVal, -1.0f, 1.0f, inst.MinPID[i], inst.MaxPID[i]);
+                              inst.ThrottleRange.fields.Min,
+                              inst.ThrottleRange.fields.Max,
+                              inst.MinPID.data[i], inst.MaxPID.data[i]);
+            } else if (AccessoryDesiredInstGet(inst.Inputs.data[i] - TXPIDSETTINGS_INPUTS_ACCESSORY0, &accessory) == 0) {
+                value = scale(accessory.AccessoryVal, -1.0f, 1.0f, inst.MinPID.data[i], inst.MaxPID.data[i]);
             } else {
                 continue;
             }
 
-            switch (inst.PIDs[i]) {
+            switch (inst.PIDs.data[i]) {
             case TXPIDSETTINGS_PIDS_ROLLRATEKP:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP], value);
+                needsUpdate |= update(&stab.RollRatePID.fields.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLRATEKI:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI], value);
+                needsUpdate |= update(&stab.RollRatePID.fields.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLRATEKD:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD], value);
+                needsUpdate |= update(&stab.RollRatePID.fields.Kd, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLRATEILIMIT:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ILIMIT], value);
+                needsUpdate |= update(&stab.RollRatePID.fields.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDEKP:
-                needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP], value);
+                needsUpdate |= update(&stab.RollPI.fields.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDEKI:
-                needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI], value);
+                needsUpdate |= update(&stab.RollPI.fields.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLATTITUDEILIMIT:
-                needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_ILIMIT], value);
+                needsUpdate |= update(&stab.RollPI.fields.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEKP:
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP], value);
+                needsUpdate |= update(&stab.PitchRatePID.fields.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEKI:
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI], value);
+                needsUpdate |= update(&stab.PitchRatePID.fields.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEKD:
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD], value);
+                needsUpdate |= update(&stab.PitchRatePID.fields.Kd, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHRATEILIMIT:
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ILIMIT], value);
+                needsUpdate |= update(&stab.PitchRatePID.fields.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDEKP:
-                needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP], value);
+                needsUpdate |= update(&stab.PitchPI.fields.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDEKI:
-                needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI], value);
+                needsUpdate |= update(&stab.PitchPI.fields.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_PITCHATTITUDEILIMIT:
-                needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_ILIMIT], value);
+                needsUpdate |= update(&stab.PitchPI.fields.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKP:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KP], value);
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KP], value);
+                needsUpdate |= update(&stab.RollRatePID.fields.Kp, value);
+                needsUpdate |= update(&stab.PitchRatePID.fields.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKI:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KI], value);
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KI], value);
+                needsUpdate |= update(&stab.RollRatePID.fields.Ki, value);
+                needsUpdate |= update(&stab.PitchRatePID.fields.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEKD:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_KD], value);
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_KD], value);
+                needsUpdate |= update(&stab.RollRatePID.fields.Kd, value);
+                needsUpdate |= update(&stab.PitchRatePID.fields.Kd, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHRATEILIMIT:
-                needsUpdate |= update(&stab.RollRatePID[STABILIZATIONSETTINGS_ROLLRATEPID_ILIMIT], value);
-                needsUpdate |= update(&stab.PitchRatePID[STABILIZATIONSETTINGS_PITCHRATEPID_ILIMIT], value);
+                needsUpdate |= update(&stab.RollRatePID.fields.ILimit, value);
+                needsUpdate |= update(&stab.PitchRatePID.fields.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKP:
-                needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KP], value);
-                needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KP], value);
+                needsUpdate |= update(&stab.RollPI.fields.Kp, value);
+                needsUpdate |= update(&stab.PitchPI.fields.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEKI:
-                needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_KI], value);
-                needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_KI], value);
+                needsUpdate |= update(&stab.RollPI.fields.Ki, value);
+                needsUpdate |= update(&stab.PitchPI.fields.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_ROLLPITCHATTITUDEILIMIT:
-                needsUpdate |= update(&stab.RollPI[STABILIZATIONSETTINGS_ROLLPI_ILIMIT], value);
-                needsUpdate |= update(&stab.PitchPI[STABILIZATIONSETTINGS_PITCHPI_ILIMIT], value);
+                needsUpdate |= update(&stab.RollPI.fields.ILimit, value);
+                needsUpdate |= update(&stab.PitchPI.fields.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEKP:
-                needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KP], value);
+                needsUpdate |= update(&stab.YawRatePID.fields.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEKI:
-                needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KI], value);
+                needsUpdate |= update(&stab.YawRatePID.fields.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEKD:
-                needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_KD], value);
+                needsUpdate |= update(&stab.YawRatePID.fields.Kd, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWRATEILIMIT:
-                needsUpdate |= update(&stab.YawRatePID[STABILIZATIONSETTINGS_YAWRATEPID_ILIMIT], value);
+                needsUpdate |= update(&stab.YawRatePID.fields.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWATTITUDEKP:
-                needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_KP], value);
+                needsUpdate |= update(&stab.YawPI.fields.Kp, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWATTITUDEKI:
-                needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_KI], value);
+                needsUpdate |= update(&stab.YawPI.fields.Ki, value);
                 break;
             case TXPIDSETTINGS_PIDS_YAWATTITUDEILIMIT:
-                needsUpdate |= update(&stab.YawPI[STABILIZATIONSETTINGS_YAWPI_ILIMIT], value);
+                needsUpdate |= update(&stab.YawPI.fields.ILimit, value);
                 break;
             case TXPIDSETTINGS_PIDS_GYROTAU:
                 needsUpdate |= update(&stab.GyroTau, value);

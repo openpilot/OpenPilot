@@ -84,7 +84,7 @@ DFUObject::DFUObject(bool _debug, bool _use_serial, QString portname) :
         QList<USBPortInfo> devices;
         devices = USBMonitor::instance()->availableDevices(0x20a0, -1, -1, USBMonitor::Bootloader);
         if (devices.length() == 1) {
-            if (hidHandle.open(1, devices.first().vendorID, devices.first().productID, 0, 0) == 1) {
+            if (hidHandle.open(1, devices.first().vendorID, devices.first().productID, 0, 0, NULL) == 1) {
                 mready = true;
                 QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
                 m_eventloop.exec();
@@ -108,7 +108,7 @@ DFUObject::DFUObject(bool _debug, bool _use_serial, QString portname) :
                 qDebug() << "Devices length: " << devices.length();
                 if (devices.length() == 1) {
                     qDebug() << "Opening device";
-                    if (hidHandle.open(1, devices.first().vendorID, devices.first().productID, 0, 0) == 1) {
+                    if (hidHandle.open(1, devices.first().vendorID, devices.first().productID, 0, 0, NULL) == 1) {
                         QTimer::singleShot(200, &m_eventloop, SLOT(quit()));
                         m_eventloop.exec();
                         qDebug() << "OP_DFU detected after delay";

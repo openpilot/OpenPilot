@@ -82,6 +82,8 @@ opHID_hidapi::~opHID_hidapi()
  */
 int opHID_hidapi::enumerate(struct hid_device_info * *current_device_pptr, int *devices_found)
 {
+    QString serial_number;
+
     int retry = 5;
 
     *devices_found = 0;
@@ -103,6 +105,8 @@ int opHID_hidapi::enumerate(struct hid_device_info * *current_device_pptr, int *
             OPHID_DEBUG("  path:............%s", current_device_ptr->path);
             OPHID_DEBUG("  Release:.........%hx", current_device_ptr->release_number);
             OPHID_DEBUG("  Interface:.......%d", current_device_ptr->interface_number);
+            serial_number = QString::fromWCharArray(current_device_ptr->serial_number);
+            OPHID_DEBUG("  Serial Number:...%s", qPrintable(serial_number));
             current_device_ptr = current_device_ptr->next;
             (*devices_found)++;
         }
@@ -124,11 +128,15 @@ int opHID_hidapi::enumerate(struct hid_device_info * *current_device_pptr, int *
  *
  * \param[in] vid USB vendor id of the device to open (-1 for any).
  * \param[in] pid USB product id of the device to open (-1 for any).
+ * \param[in] usage_page deprecated but here for compatibility with caller.
+ * \param[in] usage deprecated but here for compatibility with caller.
+ * \param[in] serial_number of the device to open (0 for any).
  * \return Number of opened device.
  * \retval 0 or 1.
  */
-int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
+int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage, const QString &serial_number)
 {
+    QString tmp_serial_number;
     int devices_found = false;
     struct hid_device_info *current_device_ptr    = NULL;
     struct hid_device_info *tmp_device_ptr        = NULL;
@@ -185,6 +193,14 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
                                   tmp_device_ptr->product_id,
                                   NULL);
 
+                if (serial_number.isNull()) {
+                    tmp_serial_number = QString::fromWCharArray(tmp_device_ptr->serial_number);
+
+                    if (serial_number != tmp_serial_number) {
+                        handle = NULL;
+                    }
+                }
+                        
                 if (handle) {
                     devices_found = 1;
                     break;
@@ -204,7 +220,7 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
         }
     }
 
-    OPHID_DEBUG("Found %d devices", devices_found);
+    OPHID_DEBUG("Found %d device(s)", devices_found);
 
     OPHID_TRACE("OUT");
 

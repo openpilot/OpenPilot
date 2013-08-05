@@ -74,10 +74,10 @@ void USBMonitor::deviceEventReceived()
         QString action  = QString(udev_device_get_action(dev));
         QString devtype = QString(udev_device_get_devtype(dev));
         qDebug() << "[DEBUG] Action: " << action << " device: " << devtype;
-        if (action == "add" && devtype == "usb_device") {
+        if (action == "add" /*&& devtype == "usb_device"*/) {
             printPortInfo(dev);
             emit deviceDiscovered(makePortInfo(dev));
-        } else if (action == "remove" && devtype == "usb_device") {
+        } else if (action == "remove" /*&& devtype == "usb_device"*/) {
             printPortInfo(dev);
             emit deviceRemoved(makePortInfo(dev));
         }
@@ -122,8 +122,7 @@ USBMonitor::USBMonitor(QObject *parent) : QThread(parent)
 
     this->monitor = udev_monitor_new_from_netlink(this->context, "udev");
     udev_monitor_filter_add_match_subsystem_devtype(
-        this->monitor, "usb", NULL);
-    // udev_monitor_filter_add_match_tag(this->monitor, "openpilot");
+        this->monitor, "usb", "usb_device");
     udev_monitor_enable_receiving(this->monitor);
     this->monitorNotifier = new QSocketNotifier(
         udev_monitor_get_fd(this->monitor), QSocketNotifier::Read, this);

@@ -44,7 +44,6 @@
  */
 RawHIDConnection::RawHIDConnection()
 {
-    RawHidHandle  = NULL;
     enablePolling = true;
 
     m_usbMonitor  = USBMonitor::instance();
@@ -67,11 +66,7 @@ RawHIDConnection::RawHIDConnection()
  */
 RawHIDConnection::~RawHIDConnection()
 {
-    if (RawHidHandle) {
-        if (RawHidHandle->isOpen()) {
-            RawHidHandle->close();
-        }
-    }
+
 }
 
 
@@ -134,21 +129,37 @@ QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
 {
     OPHID_TRACE("IN");
 
-    if (RawHidHandle) {
-        closeDevice(deviceName);
-    }
+    ophidHandle = new opHID();
 
-    RawHidHandle = new RawHID(deviceName);
+    deviceHandle = new opHID_hidapi();
 
-    if (!RawHidHandle) {
-        OPHID_ERROR("Could not instentiate HID device");
+    nb_of_devices_opened = deviceHandle->open(USB_MAX_DEVICES, 
+                                      USB_VID, 
+                                      USB_PID_ANY, 
+                                      USB_USAGE_PAGE, 
+                                      USB_USAGE, 
+                                      deviceName);
+
+    if (nb_of_devices_opened == 1) {
+        ophidHandle->deviceBind(deviceHandle);
     }
 
     OPHID_TRACE("OUT");
 
-    return RawHidHandle;
+    return ophidHandle;
 }
 
+/**
+ * \brief device opened
+ *
+ * \return status of the device (opened (1) or not (0)).
+ */
+/*
+bool RawHIDConnection::deviceOpened()
+{
+    return RawHidHandle->isOpen();
+}
+*/
 
 /**
  * \brief Close device
@@ -161,13 +172,14 @@ void RawHIDConnection::closeDevice(const QString &deviceName)
 
     Q_UNUSED(deviceName);
 
-    if (RawHidHandle) {
-        OPHID_DEBUG("Closing device");
-        RawHidHandle->close();
-        delete RawHidHandle;
-        RawHidHandle = NULL;
-    }
+    ophidHandle->deviceUnbind();
 
+    deviceHandle->close(0);
+
+    delete deviceHandle;
+
+    delete ophidHandle;
+    
     OPHID_TRACE("OUT");
 }
 

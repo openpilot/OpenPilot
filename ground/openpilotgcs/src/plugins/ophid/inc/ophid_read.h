@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       ophid_hidapi.h
+ * @file       ophid_read.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -25,55 +25,61 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OPHID_HIDAPI_H
-#define OPHID_HIDAPI_H
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <QDebug>
-#include <QString>
-#include <QMutex>
-#if defined(Q_OS_LINUX)
-#include <usb.h>
-#endif
-#include "../hidapi/hidapi.h"
+#ifndef OPHID_READ_H
+#define OPHID_READ_H
+
+
+#include "ophid.h"
 #include "ophid_const.h"
-#include "ophid_global.h"
+#include "coreplugin/connectionmanager.h"
+#include <extensionsystem/pluginmanager.h>
+#include <QtGlobal>
+#include <QList>
+#include <QMutexLocker>
+#include <QSemaphore>
+#include <QWaitCondition>
 
 
-class OPHID_EXPORT opHID_hidapi : public QObject {
+class opHID;
+
+
+class opHIDReadWorker : public QObject {
     Q_OBJECT
 
 public:
 
-    opHID_hidapi();
+    opHIDReadWorker(opHID *hid);
+    virtual ~opHIDReadWorker();
 
-    ~opHID_hidapi();
+    // Return the data read so far without waiting
+    int getReadData(char *data, int size);
 
-    int open(int max, int vid, int pid, int usage_page, int usage, const QString &serial_number);
+    // Return the bytes buffered
+    qint64 getBytesAvailable();
 
-    int receive(int, void *buf, int len, int timeout);
+public slots:
 
-    void close(int num);
+    void process();
 
-    int send(int num, void *buf, int len, int timeout);
+    void stop();
 
-    QString getserial(int num);
+signals:
 
-private:
+    void finished();
 
-    int enumerate(struct hid_device_info * *current_device_pptr, int *devices_found);
+protected:
 
-    hid_device *handle;
+    QByteArray m_readBuffer;
 
-    /** A mutex to protect hid write */
-    QMutex hid_write_Mtx;
+    QMutex m_readBufMtx;
 
-    /** A mutex to protect hid read */
-    QMutex hid_read_Mtx;
+    QMutex m_leaveSigMtx; 
 
-//signals:
-//    void deviceUnplugged(int);
+    opHID *m_hid;
+
+    // Flag to leave thread.
+    bool m_terminate;
+
 };
 
-#endif // ifndef OPHID_HIDAPI_H
+#endif // ifndef OPHID_READ_H

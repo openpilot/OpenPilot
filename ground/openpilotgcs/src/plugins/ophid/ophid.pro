@@ -11,11 +11,15 @@ HEADERS += inc/ophid_global.h \
            inc/ophid_const.h \
            inc/ophid_usbmon.h \
            inc/ophid_usbsignal.h \
+           inc/ophid_read.h \
+           inc/ophid_write.h \
            hidapi/hidapi.h
 SOURCES += src/ophid_plugin.cpp \
            src/ophid.cpp \
            src/ophid_usbsignal.cpp \
-           src/ophid_hidapi.cpp
+           src/ophid_hidapi.cpp \
+           src/ophid_read.cpp \
+           src/ophid_write.cpp
 FORMS += 
 RESOURCES += 
 DEFINES += OPHID_LIBRARY

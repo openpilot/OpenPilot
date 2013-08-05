@@ -62,23 +62,21 @@ public:
     virtual void suspendPolling();
     virtual void resumePolling();
 
-    bool deviceOpened()
-    {
-        return RawHidHandle != NULL;
-    } // Pip
+    bool deviceOpened();
 
 protected slots:
     void onDeviceConnected();
     void onDeviceDisconnected();
 
 private:
-    RawHID *RawHidHandle;
+    opHID_hidapi *deviceHandle;
+    opHID *ophidHandle;
     bool enablePolling;
 
 protected:
     QMutex m_enumMutex;
     USBMonitor *m_usbMonitor;
-    bool m_deviceOpened;
+    uint32_t nb_of_devices_opened;
 };
 
 class OPHID_EXPORT RawHIDPlugin

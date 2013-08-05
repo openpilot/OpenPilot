@@ -36,34 +36,36 @@
 #include <QByteArray>
 #include "ophid_hidapi.h"
 #include "ophid_usbmon.h"
+#include "ophid_read.h"
+#include "ophid_write.h"
 
-class RawHIDReadThread;
-class RawHIDWriteThread;
+class opHIDReadWorker;
+class opHIDWriteWorker;
 
 /**
  *   The actual IO device that will be used to communicate
- *   with the board.
+ *   with the board/device.
  */
-class OPHID_EXPORT RawHID : public QIODevice {
+class OPHID_EXPORT opHID : public QIODevice {
     Q_OBJECT
 
-    friend class RawHIDReadThread;
-    friend class RawHIDWriteThread;
-
 public:
-    RawHID();
-    RawHID(const QString &deviceName);
-    virtual ~RawHID();
-
+    opHID();
+    virtual ~opHID();
     virtual bool open(OpenMode mode);
     virtual void close();
     virtual bool isSequential() const;
+    
+    void deviceBind(opHID_hidapi *deviceHandle);
+    bool deviceUnbind(void);
 
+    opHID_hidapi *deviceInstanceGet(void);
+    void readyRead(void);
+
+   
 signals:
     void closed();
-
-public slots:
-    void onDeviceUnplugged(int num);
+    void deviceAvailable(bool);
 
 protected:
     virtual qint64 readData(char *data, qint64 maxSize);
@@ -71,23 +73,14 @@ protected:
     virtual qint64 bytesAvailable() const;
     virtual qint64 bytesToWrite() const;
 
-    // Callback from the read thread to open the device
-    bool openDevice();
+    opHID_hidapi *m_deviceHandle;
+    opHIDReadWorker *readWorker;
+    opHIDWriteWorker *writeWorker;
 
-    // Callback from teh read thread to close the device
-    bool closeDevice();
-
-    QString serialNumber;
-
-    int m_deviceNo;
-    opHID_hidapi dev;
-    bool device_open;
-
-    RawHIDReadThread *m_readThread;
-    RawHIDWriteThread *m_writeThread;
+    QThread writeThread;
+    QThread readThread;
 
     QMutex *m_mutex;
-    QMutex *m_startedMutex;
 };
 
 #endif // OPHID_H

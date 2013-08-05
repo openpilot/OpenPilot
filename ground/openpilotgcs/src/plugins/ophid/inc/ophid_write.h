@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       ophid_hidapi.h
+ * @file       ophid_write.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -25,55 +25,64 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef OPHID_HIDAPI_H
-#define OPHID_HIDAPI_H
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <QDebug>
-#include <QString>
-#include <QMutex>
-#if defined(Q_OS_LINUX)
-#include <usb.h>
-#endif
-#include "../hidapi/hidapi.h"
+#ifndef OPHID_WRITE_H
+#define OPHID_WRITE_H
+
+#include "ophid.h"
 #include "ophid_const.h"
-#include "ophid_global.h"
+#include "coreplugin/connectionmanager.h"
+#include <extensionsystem/pluginmanager.h>
+#include <QtGlobal>
+#include <QList>
+#include <QMutexLocker>
+#include <QSemaphore>
+#include <QWaitCondition>
 
 
-class OPHID_EXPORT opHID_hidapi : public QObject {
+class opHID;
+
+
+class opHIDWriteWorker : public QObject {
     Q_OBJECT
 
 public:
 
-    opHID_hidapi();
+    opHIDWriteWorker(opHID *hid);
+    virtual ~opHIDWriteWorker();
 
-    ~opHID_hidapi();
+    // Add some data to be written without waiting
+    int pushDataToWrite(const char *data, int size);
 
-    int open(int max, int vid, int pid, int usage_page, int usage, const QString &serial_number);
+    // Return the number of bytes buffered
+    qint64 getBytesToWrite();
 
-    int receive(int, void *buf, int len, int timeout);
+public slots:
 
-    void close(int num);
+    void process();
 
-    int send(int num, void *buf, int len, int timeout);
+    void stop();
 
-    QString getserial(int num);
+signals:
 
-private:
+    void finished();
 
-    int enumerate(struct hid_device_info * *current_device_pptr, int *devices_found);
+    qint64 bytesSent(qint64 bytes);
 
-    hid_device *handle;
+protected:
 
-    /** A mutex to protect hid write */
-    QMutex hid_write_Mtx;
+    QByteArray m_writeBuffer;
 
-    /** A mutex to protect hid read */
-    QMutex hid_read_Mtx;
+    QMutex m_writeBufMtx;
 
-//signals:
-//    void deviceUnplugged(int);
+    QMutex m_leaveSigMtx; 
+
+    QSemaphore m_msg_sem;
+
+    opHID *m_hid;
+
+    // Flag to leave thread.
+    bool m_terminate;
+
 };
 
-#endif // ifndef OPHID_HIDAPI_H
+#endif // ifndef OPHID_WRITE_H

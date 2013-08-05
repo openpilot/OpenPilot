@@ -65,9 +65,7 @@ RawHIDConnection::RawHIDConnection()
  *
  */
 RawHIDConnection::~RawHIDConnection()
-{
-
-}
+{}
 
 
 /**
@@ -129,16 +127,16 @@ QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
 {
     OPHID_TRACE("IN");
 
-    ophidHandle = new opHID();
+    ophidHandle  = new opHID();
 
     deviceHandle = new opHID_hidapi();
 
-    nb_of_devices_opened = deviceHandle->open(USB_MAX_DEVICES, 
-                                      USB_VID, 
-                                      USB_PID_ANY, 
-                                      USB_USAGE_PAGE, 
-                                      USB_USAGE, 
-                                      deviceName);
+    nb_of_devices_opened = deviceHandle->open(USB_MAX_DEVICES,
+                                              USB_VID,
+                                              USB_PID_ANY,
+                                              USB_USAGE_PAGE,
+                                              USB_USAGE,
+                                              deviceName);
 
     if (nb_of_devices_opened == 1) {
         ophidHandle->deviceBind(deviceHandle);
@@ -155,11 +153,11 @@ QIODevice *RawHIDConnection::openDevice(const QString &deviceName)
  * \return status of the device (opened (1) or not (0)).
  */
 /*
-bool RawHIDConnection::deviceOpened()
-{
+   bool RawHIDConnection::deviceOpened()
+   {
     return RawHidHandle->isOpen();
-}
-*/
+   }
+ */
 
 /**
  * \brief Close device
@@ -179,7 +177,7 @@ void RawHIDConnection::closeDevice(const QString &deviceName)
     delete deviceHandle;
 
     delete ophidHandle;
-    
+
     OPHID_TRACE("OUT");
 }
 

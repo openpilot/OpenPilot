@@ -73,13 +73,12 @@ protected:
 
     QMutex m_readBufMtx;
 
-    QMutex m_leaveSigMtx; 
+    QMutex m_leaveSigMtx;
 
     opHID *m_hid;
 
     // Flag to leave thread.
     bool m_terminate;
-
 };
 
 #endif // ifndef OPHID_READ_H

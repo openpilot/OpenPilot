@@ -72,8 +72,8 @@ private:
     /** A mutex to protect hid read */
     QMutex hid_read_Mtx;
 
-//signals:
-//    void deviceUnplugged(int);
+// signals:
+// void deviceUnplugged(int);
 };
 
 #endif // ifndef OPHID_HIDAPI_H

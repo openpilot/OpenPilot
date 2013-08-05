@@ -30,9 +30,9 @@
 class IConnection;
 
 #define OPHID_USB_INT_DEVICE_WRITE_TIMEOUT 1000
-#define OPHID_USB_INT_BUFFER_SIZE    64
-#define OPHID_USB_INT_HEADER_SIZE   2
-#define OPHID_USB_INT_DATA_SIZE_MAX (OPHID_USB_INT_BUFFER_SIZE - OPHID_USB_INT_HEADER_SIZE)
+#define OPHID_USB_INT_BUFFER_SIZE          64
+#define OPHID_USB_INT_HEADER_SIZE          2
+#define OPHID_USB_INT_DATA_SIZE_MAX        (OPHID_USB_INT_BUFFER_SIZE - OPHID_USB_INT_HEADER_SIZE)
 
 
 /**
@@ -69,7 +69,7 @@ void opHIDWriteWorker::stop()
     m_terminate = true;
 
     m_writeBufMtx.unlock();
-    
+
     m_msg_sem.release();
 
     m_leaveSigMtx.lock();
@@ -89,13 +89,13 @@ void opHIDWriteWorker::process()
 {
     int size;
     int ret;
+
     OPHID_TRACE("IN");
 
     // Do not delete the device under our feet please.
     m_leaveSigMtx.lock();
 
     while (1) {
-
         // Wait until there is something to send.
         m_msg_sem.acquire();
 
@@ -110,16 +110,16 @@ void opHIDWriteWorker::process()
         size = *(m_writeBuffer.constData() + 1);
 
         // Send buffer to the device.
-        ret = m_hid->deviceInstanceGet()->send(0, 
-                                               (void*)m_writeBuffer.constData(), 
-                                               size, 
-                                               OPHID_USB_INT_DEVICE_WRITE_TIMEOUT);
-       
-        if (ret == size) { 
+        ret  = m_hid->deviceInstanceGet()->send(0,
+                                                (void *)m_writeBuffer.constData(),
+                                                size,
+                                                OPHID_USB_INT_DEVICE_WRITE_TIMEOUT);
+
+        if (ret == size) {
             m_writeBufMtx.lock();
             m_writeBuffer.remove(0, size);
             m_writeBufMtx.unlock();
-            //OPHID_ERROR("Devices sent %d from %d", ret, size);
+            // OPHID_ERROR("Devices sent %d from %d", ret, size);
             // emit m_hid->bytesWritten(ret - 2);
             emit bytesSent(ret - 2);
         } else if (ret < 0) {
@@ -145,12 +145,11 @@ int opHIDWriteWorker::pushDataToWrite(const char *data, int size)
 {
     QMutexLocker lock(&m_writeBufMtx);
     const char usb_report_id = 2;
-    char usb_report_size = 0;
+    char usb_report_size     = 0;
 
-    if (size > OPHID_USB_INT_DATA_SIZE_MAX)
-    {
-       OPHID_ERROR("[Discarding packet] Wrong data size: expected to send %d or less but %d are requested to be sent to the device!", OPHID_USB_INT_DATA_SIZE_MAX, size);
-       return 0;
+    if (size > OPHID_USB_INT_DATA_SIZE_MAX) {
+        OPHID_ERROR("[Discarding packet] Wrong data size: expected to send %d or less but %d are requested to be sent to the device!", OPHID_USB_INT_DATA_SIZE_MAX, size);
+        return 0;
     }
 
     // Add buffer to be sent.
@@ -171,7 +170,6 @@ int opHIDWriteWorker::pushDataToWrite(const char *data, int size)
 qint64 opHIDWriteWorker::getBytesToWrite()
 {
     QMutexLocker lock(&m_writeBufMtx);
+
     return m_writeBuffer.size();
 }
-
-

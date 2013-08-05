@@ -37,12 +37,11 @@
 
 class IConnection;
 
-opHID::opHID(): QIODevice()
+opHID::opHID() : QIODevice()
 {
     OPHID_TRACE("IN");
 
     m_mutex = new QMutex(QMutex::Recursive);
-
 
 
     // Move workers to thread
@@ -50,9 +49,9 @@ opHID::opHID(): QIODevice()
 
     // Bind worker to thread
     writeWorker->moveToThread(&writeThread);
-    
-    // 
-    //connect(writeWorker, SIGNAL(&opHIDWriteWorker::bytesSent(qint64)), this, SLOT(&QIODevice::bytesWritten(qint64)));
+
+    //
+    // connect(writeWorker, SIGNAL(&opHIDWriteWorker::bytesSent(qint64)), this, SLOT(&QIODevice::bytesWritten(qint64)));
 
     // Connect the Thread's started() signal to the process slot in the writeWorker
     connect(&writeThread, SIGNAL(started()), writeWorker, SLOT(process()));
@@ -67,10 +66,9 @@ opHID::opHID(): QIODevice()
     connect(&writeThread, SIGNAL(finished()), &writeThread, SLOT(deleteLater()));
 
 
-
     // READ thread (read from USB device)
     readWorker = new opHIDReadWorker(this);
- 
+
     // Bind worker to thread
     readWorker->moveToThread(&readThread);
 
@@ -159,11 +157,11 @@ bool opHID::deviceUnbind(void)
 bool opHID::open(OpenMode mode)
 {
     OPHID_TRACE("IN");
-    
+
     QMutexLocker locker(m_mutex);
 
     QIODevice::open(mode);
-    
+
     OPHID_TRACE("OUT");
 
     return true;
@@ -171,7 +169,7 @@ bool opHID::open(OpenMode mode)
 
 
 /**
- * @brief Used from the read thread to trigger the event on the QIODevice 
+ * @brief Used from the read thread to trigger the event on the QIODevice
  *        to tell there is something ready to be read (this will unblock blocking read)
  */
 void opHID::readyRead(void)
@@ -269,4 +267,3 @@ qint64 opHID::writeData(const char *data, qint64 maxSize)
 
     return writeWorker->pushDataToWrite(data, maxSize);
 }
-

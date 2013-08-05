@@ -74,7 +74,7 @@ protected:
 
     QMutex m_writeBufMtx;
 
-    QMutex m_leaveSigMtx; 
+    QMutex m_leaveSigMtx;
 
     QSemaphore m_msg_sem;
 
@@ -82,7 +82,6 @@ protected:
 
     // Flag to leave thread.
     bool m_terminate;
-
 };
 
 #endif // ifndef OPHID_WRITE_H

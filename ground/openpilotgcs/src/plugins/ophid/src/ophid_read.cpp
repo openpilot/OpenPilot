@@ -31,8 +31,8 @@ class IConnection;
 
 
 #define OPHID_USB_INT_DEVICE_READ_TIMEOUT 200
-#define OPHID_USB_INT_BUFFER_SIZE    64
-#define OPHID_USB_INT_HEADER_SIZE   2
+#define OPHID_USB_INT_BUFFER_SIZE         64
+#define OPHID_USB_INT_HEADER_SIZE         2
 
 /**
  * @brief Constructor
@@ -94,19 +94,18 @@ void opHIDReadWorker::process()
     m_leaveSigMtx.lock();
 
     while (1) {
-
         // Quiting the thread properly.
         if (m_terminate) {
             OPHID_DEBUG("Ready to leave.");
             m_leaveSigMtx.unlock();
             break;
         }
-        
+
         // Request MAX bytes since mecanism to know is not implemented yet.
-        ret = m_hid->deviceInstanceGet()->receive(0, 
-                                                 buffer, 
-                                                 OPHID_USB_INT_BUFFER_SIZE, 
-                                                 OPHID_USB_INT_DEVICE_READ_TIMEOUT);
+        ret = m_hid->deviceInstanceGet()->receive(0,
+                                                  buffer,
+                                                  OPHID_USB_INT_BUFFER_SIZE,
+                                                  OPHID_USB_INT_DEVICE_READ_TIMEOUT);
 
         // Append received frame in fifo if applicable.
         if (ret > 0) {
@@ -117,8 +116,8 @@ void opHIDReadWorker::process()
             emit m_hid->readyRead();
         } else if (ret == 0) {
             OPHID_DEBUG("HID receive nothing.");
-        } else { 
-            OPHID_ERROR("HID receive failed (%d).",ret);
+        } else {
+            OPHID_ERROR("HID receive failed (%d).", ret);
         }
     }
 
@@ -138,8 +137,9 @@ int opHIDReadWorker::getReadData(char *data, int size)
     int received_data_size = m_readBuffer.constData()[1];
     int current_size = qMin(size, received_data_size);
 
-    if (received_data_size > size)
+    if (received_data_size > size) {
         OPHID_DEBUG("Wrong data size: requested %d but received %d from device (min: %d)", size, received_data_size, current_size);
+    }
 
     memcpy(data, &m_readBuffer.constData()[2], current_size);
     m_readBuffer.remove(0, received_data_size + OPHID_USB_INT_HEADER_SIZE);
@@ -157,5 +157,3 @@ qint64 opHIDReadWorker::getBytesAvailable()
 
     return m_readBuffer.size();
 }
-
-

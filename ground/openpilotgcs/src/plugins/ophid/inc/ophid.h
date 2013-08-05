@@ -55,14 +55,14 @@ public:
     virtual bool open(OpenMode mode);
     virtual void close();
     virtual bool isSequential() const;
-    
+
     void deviceBind(opHID_hidapi *deviceHandle);
     bool deviceUnbind(void);
 
     opHID_hidapi *deviceInstanceGet(void);
     void readyRead(void);
 
-   
+
 signals:
     void closed();
     void deviceAvailable(bool);

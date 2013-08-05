@@ -200,7 +200,7 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage, con
                         handle = NULL;
                     }
                 }
-                        
+
                 if (handle) {
                     devices_found = 1;
                     break;

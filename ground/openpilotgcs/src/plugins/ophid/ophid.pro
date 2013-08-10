@@ -39,9 +39,9 @@ macx {
            -arch ppc \
            -arch i386
     LIBS += $(ARCH) \
-            -Wl,-syslibroot,$(SDK) \
-            -framework IOKit \
-            -framework CoreFoundation
+			-framework IOKit \
+			-framework CoreFoundation \
+			-Wl -syslibroot $(SDK)
 }
 
 linux-g++ {

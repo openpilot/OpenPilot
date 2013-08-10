@@ -253,51 +253,58 @@ static void systemTask(__attribute__((unused)) void *parameters)
         int delayTime = SYSTEM_UPDATE_PERIOD_MS / portTICK_RATE_MS / (LED_BLINK_RATE_HZ * 2);
 
 #if defined(PIOS_INCLUDE_RFM22B)
+
         // Update the OPLinkStatus UAVO
         OPLinkStatusData oplinkStatus;
         OPLinkStatusGet(&oplinkStatus);
 
-        // Get the other device stats.
-        PIOS_RFM2B_GetPairStats(pios_rfm22b_id, oplinkStatus.PairIDs, oplinkStatus.PairSignalStrengths, OPLINKSTATUS_PAIRIDS_NUMELEM);
+        if (pios_rfm22b_id) {
+            // Get the other device stats.
+            PIOS_RFM2B_GetPairStats(pios_rfm22b_id, oplinkStatus.PairIDs, oplinkStatus.PairSignalStrengths, OPLINKSTATUS_PAIRIDS_NUMELEM);
 
-        // Get the stats from the radio device
-        struct rfm22b_stats radio_stats;
-        PIOS_RFM22B_GetStats(pios_rfm22b_id, &radio_stats);
+            // Get the stats from the radio device
+            struct rfm22b_stats radio_stats;
+            PIOS_RFM22B_GetStats(pios_rfm22b_id, &radio_stats);
 
-        // Update the OPLInk status
-        static bool first_time = true;
-        static uint16_t prev_tx_count = 0;
-        static uint16_t prev_rx_count = 0;
-        oplinkStatus.HeapRemaining = xPortGetFreeHeapSize();
-        oplinkStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
-        oplinkStatus.RxGood = radio_stats.rx_good;
-        oplinkStatus.RxCorrected   = radio_stats.rx_corrected;
-        oplinkStatus.RxErrors = radio_stats.rx_error;
-        oplinkStatus.RxMissed = radio_stats.rx_missed;
-        oplinkStatus.RxFailure     = radio_stats.rx_failure;
-        oplinkStatus.TxDropped     = radio_stats.tx_dropped;
-        oplinkStatus.TxResent = radio_stats.tx_resent;
-        oplinkStatus.TxFailure     = radio_stats.tx_failure;
-        oplinkStatus.Resets      = radio_stats.resets;
-        oplinkStatus.Timeouts    = radio_stats.timeouts;
-        oplinkStatus.RSSI        = radio_stats.rssi;
-        oplinkStatus.LinkQuality = radio_stats.link_quality;
-        if (first_time) {
-            first_time = false;
+            // Update the OPLInk status
+            static bool first_time = true;
+            static uint16_t prev_tx_count = 0;
+            static uint16_t prev_rx_count = 0;
+            oplinkStatus.HeapRemaining = xPortGetFreeHeapSize();
+            oplinkStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
+            oplinkStatus.RxGood = radio_stats.rx_good;
+            oplinkStatus.RxCorrected   = radio_stats.rx_corrected;
+            oplinkStatus.RxErrors = radio_stats.rx_error;
+            oplinkStatus.RxMissed = radio_stats.rx_missed;
+            oplinkStatus.RxFailure     = radio_stats.rx_failure;
+            oplinkStatus.TxDropped     = radio_stats.tx_dropped;
+            oplinkStatus.TxResent = radio_stats.tx_resent;
+            oplinkStatus.TxFailure     = radio_stats.tx_failure;
+            oplinkStatus.Resets      = radio_stats.resets;
+            oplinkStatus.Timeouts    = radio_stats.timeouts;
+            oplinkStatus.RSSI        = radio_stats.rssi;
+            oplinkStatus.LinkQuality = radio_stats.link_quality;
+            if (first_time) {
+                first_time = false;
+            } else {
+                uint16_t tx_count = radio_stats.tx_byte_count;
+                uint16_t rx_count = radio_stats.rx_byte_count;
+                uint16_t tx_bytes = (tx_count < prev_tx_count) ? (0xffff - prev_tx_count + tx_count) : (tx_count - prev_tx_count);
+                uint16_t rx_bytes = (rx_count < prev_rx_count) ? (0xffff - prev_rx_count + rx_count) : (rx_count - prev_rx_count);
+                oplinkStatus.TXRate = (uint16_t)((float)(tx_bytes * 1000) / SYSTEM_UPDATE_PERIOD_MS);
+                oplinkStatus.RXRate = (uint16_t)((float)(rx_bytes * 1000) / SYSTEM_UPDATE_PERIOD_MS);
+                prev_tx_count = tx_count;
+                prev_rx_count = rx_count;
+            }
+            oplinkStatus.TXSeq     = radio_stats.tx_seq;
+            oplinkStatus.RXSeq     = radio_stats.rx_seq;
+
+            oplinkStatus.LinkState = radio_stats.link_state;
         } else {
-            uint16_t tx_count = radio_stats.tx_byte_count;
-            uint16_t rx_count = radio_stats.rx_byte_count;
-            uint16_t tx_bytes = (tx_count < prev_tx_count) ? (0xffff - prev_tx_count + tx_count) : (tx_count - prev_tx_count);
-            uint16_t rx_bytes = (rx_count < prev_rx_count) ? (0xffff - prev_rx_count + rx_count) : (rx_count - prev_rx_count);
-            oplinkStatus.TXRate = (uint16_t)((float)(tx_bytes * 1000) / SYSTEM_UPDATE_PERIOD_MS);
-            oplinkStatus.RXRate = (uint16_t)((float)(rx_bytes * 1000) / SYSTEM_UPDATE_PERIOD_MS);
-            prev_tx_count = tx_count;
-            prev_rx_count = rx_count;
+            oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_DISABLED;
         }
-        oplinkStatus.TXSeq     = radio_stats.tx_seq;
-        oplinkStatus.RXSeq     = radio_stats.rx_seq;
-        oplinkStatus.LinkState = radio_stats.link_state;
         OPLinkStatusSet(&oplinkStatus);
+
 #endif /* if defined(PIOS_INCLUDE_RFM22B) */
 
         if (xQueueReceive(objectPersistenceQueue, &ev, delayTime) == pdTRUE) {

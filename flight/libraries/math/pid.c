@@ -78,7 +78,7 @@ float pid_apply(struct pid *pid, const float err, float dT)
  * This version of apply uses setpoint weighting for the derivative component so the gain
  * on the gyro derivative can be different than the gain on the setpoint derivative
  */
-float pid_apply_setpoint_scaled(struct pid *pid, const float factor, const float setpoint, const float measured, float dT)
+float pid_apply_setpoint(struct pid *pid, const float factor, const float setpoint, const float measured, float dT)
 {
     float err = setpoint - measured;
 

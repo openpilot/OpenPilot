@@ -581,9 +581,13 @@ void ConfigRevoWidget::doStartSixPointCalibration()
 #endif
 
     // Calibration mag
-    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] = 1;
-    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] = 1;
-    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] = 1;
+    // Reset the transformation matrix to identity
+    for(int i = 0; i < RevoCalibration::MAG_TRANSFORM_R2C2; i++){
+        revoCalibrationData.mag_transform[i] = 0;
+    }
+    revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0] = 1;
+    revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1] = 1;
+    revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2] = 1;
     revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X]   = 0;
     revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y]   = 0;
     revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Z]   = 0;
@@ -797,9 +801,9 @@ void ConfigRevoWidget::computeScaleBias()
     // Calibration mag
     Be_length = sqrt(pow(homeLocationData.Be[0], 2) + pow(homeLocationData.Be[1], 2) + pow(homeLocationData.Be[2], 2));
     SixPointInConstFieldCal(Be_length, mag_data_x, mag_data_y, mag_data_z, S, b);
-    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] = fabs(S[0]);
-    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] = fabs(S[1]);
-    revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] = fabs(S[2]);
+    revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0] = fabs(S[0]);
+    revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1] = fabs(S[1]);
+    revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2] = fabs(S[2]);
 
     revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X]   = -sign(S[0]) * b[0];
     revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y]   = -sign(S[1]) * b[1];
@@ -812,12 +816,12 @@ void ConfigRevoWidget::computeScaleBias()
     bool good_calibration = true;
 
     // Check the mag calibration is good
-    good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X] ==
-                        revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_X];
-    good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y] ==
-                        revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Y];
-    good_calibration &= revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z] ==
-                        revoCalibrationData.mag_scale[RevoCalibration::MAG_SCALE_Z];
+    good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0] ==
+                        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R0C0];
+    good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1] ==
+                        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R1C1];
+    good_calibration &= revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2] ==
+                        revoCalibrationData.mag_transform[RevoCalibration::MAG_TRANSFORM_R2C2];
     good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X] ==
                         revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_X];
     good_calibration &= revoCalibrationData.mag_bias[RevoCalibration::MAG_BIAS_Y] ==

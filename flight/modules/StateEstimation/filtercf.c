@@ -271,9 +271,9 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         this->accels_filtered[0] = 0.0f;
         this->accels_filtered[1] = 0.0f;
         this->accels_filtered[2] = 0.0f;
-        this->grot_filtered[0] = 0.0f;
-        this->grot_filtered[1] = 0.0f;
-        this->grot_filtered[2] = 0.0f;
+        this->grot_filtered[0]   = 0.0f;
+        this->grot_filtered[1]   = 0.0f;
+        this->grot_filtered[2]   = 0.0f;
         this->timeval   = PIOS_DELAY_GetRaw();
         this->starttime = this->timeval;
 

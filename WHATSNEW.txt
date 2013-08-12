@@ -1,3 +1,12 @@
+--- RELEASE-13.06.03 ---
+
+This maintenance release addresses the following issues:
+- FIxed CC3D attitude estimation failure after multiple settings changes and reboots.
+- Fixed OPLink crashes when erasing settings
+
+JIRA issues addressed in this maintenance release:
+OP-1049, OP-1050
+
 --- RELEASE-13.06.02 ---
 
 Refactoring of OPLink radio driver.  Auto-configuration was removed, and a

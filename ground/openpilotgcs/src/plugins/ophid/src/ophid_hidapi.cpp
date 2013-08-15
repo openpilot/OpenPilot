@@ -294,7 +294,6 @@ int opHID_hidapi::send(int num, void *buf, int len, int timeout)
     Q_UNUSED(timeout);
 
     int bytes_written = 0;
-    int retry = 5;
 
     if (!buf) {
         OPHID_ERROR("Unexpected parameter value (ptr).");
@@ -311,15 +310,10 @@ int opHID_hidapi::send(int num, void *buf, int len, int timeout)
         return OPHID_ERROR_HANDLE;
     }
 
-    // hidapi has a timeout hardcoded to 1000ms, retry 5 times
-    while (retry--) {
-        hid_write_Mtx.lock();
-        bytes_written = hid_write(handle, (const unsigned char *)buf, len);
-        hid_write_Mtx.unlock();
-        if (bytes_written >= 0) {
-            break;
-        }
-    }
+    // hidapi has a timeout hardcoded to 1000ms
+    hid_write_Mtx.lock();
+    bytes_written = hid_write(handle, (const unsigned char *)buf, len);
+    hid_write_Mtx.unlock();
 
     // hidapi lib does not expose the libusb errors.
     if (bytes_written < 0) {

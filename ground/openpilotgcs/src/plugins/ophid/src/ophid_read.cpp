@@ -31,7 +31,7 @@ class IConnection;
 
 
 #define OPHID_USB_INT_DEVICE_READ_TIMEOUT 200
-#define OPHID_USB_INT_BUFFER_SIZE         64
+#define OPHID_USB_INT_BUFFER_SIZE         1024
 #define OPHID_USB_INT_HEADER_SIZE         2
 
 /**
@@ -133,9 +133,15 @@ void opHIDReadWorker::process()
 int opHIDReadWorker::getReadData(char *data, int size)
 {
     QMutexLocker lock(&m_readBufMtx);
+    static int log_size_max = 0;
 
     int received_data_size = m_readBuffer.constData()[1];
     int current_size = qMin(size, received_data_size);
+
+    if (received_data_size > log_size_max) {
+        log_size_max = received_data_size;
+        OPHID_DEBUG("The biggest packet received from the device is now %d Bytes.", log_size_max);
+    }
 
     if (received_data_size > size) {
         OPHID_DEBUG("Wrong data size: requested %d but received %d from device (min: %d)", size, received_data_size, current_size);

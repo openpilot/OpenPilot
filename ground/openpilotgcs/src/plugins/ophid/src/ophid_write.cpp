@@ -107,7 +107,7 @@ void opHIDWriteWorker::process()
         }
 
         // Get the size of the buffer to send.
-        size = *(m_writeBuffer.constData() + 1);
+        size = *(m_writeBuffer.constData() + 1) + OPHID_USB_INT_HEADER_SIZE;
 
         // Send buffer to the device.
         ret  = m_hid->deviceInstanceGet()->send(0,
@@ -145,21 +145,29 @@ int opHIDWriteWorker::pushDataToWrite(const char *data, int size)
 {
     QMutexLocker lock(&m_writeBufMtx);
     const char usb_report_id = 2;
-    char usb_report_size     = 0;
-
-    if (size > OPHID_USB_INT_DATA_SIZE_MAX) {
-        OPHID_ERROR("[Discarding packet] Wrong data size: expected to send %d or less but %d are requested to be sent to the device!", OPHID_USB_INT_DATA_SIZE_MAX, size);
-        return 0;
+    char usb_report_data_size = 0;
+    int remaining_data_to_push = 0;
+    static int log_size_max  = 0;
+    int offset = 0;
+ 
+    // Log max packet size 
+    if (size > log_size_max) {
+       log_size_max = size;
+       OPHID_DEBUG("The biggest packet sent to the device is now %d Bytes.", log_size_max);
     }
 
     // Add buffer to be sent.
-    usb_report_size = size + OPHID_USB_INT_HEADER_SIZE;
-    m_writeBuffer.append(&usb_report_id, 1);
-    m_writeBuffer.append(&usb_report_size, 1);
-    m_writeBuffer.append(data, size);
-
-    m_msg_sem.release();
-
+    remaining_data_to_push = size;
+    while (remaining_data_to_push)
+    {
+        usb_report_data_size = qMin(OPHID_USB_INT_DATA_SIZE_MAX, remaining_data_to_push);
+        m_writeBuffer.append(&usb_report_id, 1);
+        m_writeBuffer.append(&usb_report_data_size, 1);
+        m_writeBuffer.append(data + offset, usb_report_data_size);
+        offset += usb_report_data_size;
+        remaining_data_to_push = remaining_data_to_push - usb_report_data_size;
+        m_msg_sem.release();
+    }
     return size;
 }
 

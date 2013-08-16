@@ -46,7 +46,7 @@ equals(copydata, 1) {
         for(dll, QT_IMAGEFORMAT_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/imageformats/$$dll\") $$targetPath(\"$$GCS_APP_PATH/imageformats/$$dll\") $$addNewline()
         }
-
+        
         # copy phonon_backend
         QT_PHONON_BACKEND_DLLS = phonon_ds94.dll
         data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/phonon_backend\") $$addNewline()
@@ -74,9 +74,11 @@ equals(copydata, 1) {
         #   xcopy /s /e <SDL>\bin\SDL.dll   C:\QtSDK\Desktop\Qt\4.7.3\mingw\bin\SDL.dll
         #   xcopy /s /e <SDL>\include\SDL\* C:\QtSDK\Desktop\Qt\4.7.3\mingw\include\SDL
         #   xcopy /s /e <SDL>\lib\*         C:\QtSDK\Desktop\Qt\4.7.3\mingw\lib
-        SDL_DLL = SDL.dll
-        data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$SDL_DLL\") $$targetPath(\"$$GCS_APP_PATH/$$SDL_DLL\") $$addNewline()
-
+        3PARTYDLL_DLLS = SDL.dll ssleay32.dll libeay32.dll
+        for(dll, 3PARTYDLL_DLLS) {
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
+        }
+        
         data_copy.target = FORCE
         QMAKE_EXTRA_TARGETS += data_copy
     }

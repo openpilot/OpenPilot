@@ -100,40 +100,40 @@ void OPMapWidget::SetUavPic(QString UAVPic)
     }
 }
 
-WayPointLine *OPMapWidget::WPLineCreate(WayPointItem *from, WayPointItem *to, QColor color)
+WayPointLine *OPMapWidget::WPLineCreate(WayPointItem *from, WayPointItem *to, QColor color, bool dashed, int width)
 {
     if (!from | !to) {
         return NULL;
     }
-    WayPointLine *ret = new WayPointLine(from, to, map, color);
+    WayPointLine *ret = new WayPointLine(from, to, map, color, dashed, width);
     ret->setOpacity(overlayOpacity);
     return ret;
 }
-WayPointLine *OPMapWidget::WPLineCreate(HomeItem *from, WayPointItem *to, QColor color)
+WayPointLine *OPMapWidget::WPLineCreate(HomeItem *from, WayPointItem *to, QColor color, bool dashed, int width)
 {
     if (!from | !to) {
         return NULL;
     }
-    WayPointLine *ret = new WayPointLine(from, to, map, color);
+    WayPointLine *ret = new WayPointLine(from, to, map, color, dashed, width);
     ret->setOpacity(overlayOpacity);
     return ret;
 }
-WayPointCircle *OPMapWidget::WPCircleCreate(WayPointItem *center, WayPointItem *radius, bool clockwise, QColor color)
+WayPointCircle *OPMapWidget::WPCircleCreate(WayPointItem *center, WayPointItem *radius, bool clockwise, QColor color, bool dashed, int width)
 {
     if (!center | !radius) {
         return NULL;
     }
-    WayPointCircle *ret = new WayPointCircle(center, radius, clockwise, map, color);
+    WayPointCircle *ret = new WayPointCircle(center, radius, clockwise, map, color, dashed, width);
     ret->setOpacity(overlayOpacity);
     return ret;
 }
 
-WayPointCircle *OPMapWidget::WPCircleCreate(HomeItem *center, WayPointItem *radius, bool clockwise, QColor color)
+WayPointCircle *OPMapWidget::WPCircleCreate(HomeItem *center, WayPointItem *radius, bool clockwise, QColor color, bool dashed, int width)
 {
     if (!center | !radius) {
         return NULL;
     }
-    WayPointCircle *ret = new WayPointCircle(center, radius, clockwise, map, color);
+    WayPointCircle *ret = new WayPointCircle(center, radius, clockwise, map, color, dashed, width);
     ret->setOpacity(overlayOpacity);
     return ret;
 }

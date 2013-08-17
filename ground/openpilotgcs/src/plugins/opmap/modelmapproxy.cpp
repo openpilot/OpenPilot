@@ -108,39 +108,39 @@ modelMapProxy::overlayType modelMapProxy::overlayTranslate(int type)
     }
 }
 
-void modelMapProxy::createOverlay(WayPointItem *from, WayPointItem *to, modelMapProxy::overlayType type, QColor color)
+void modelMapProxy::createOverlay(WayPointItem *from, WayPointItem *to, modelMapProxy::overlayType type, QColor color, bool dashed, int width)
 {
     if (from == NULL || to == NULL || from == to) {
         return;
     }
     switch (type) {
     case OVERLAY_LINE:
-        myMap->WPLineCreate(from, to, color);
+        myMap->WPLineCreate(from, to, color, dashed, width);
         break;
     case OVERLAY_CIRCLE_RIGHT:
-        myMap->WPCircleCreate(to, from, true, color);
+        myMap->WPCircleCreate(to, from, true, color, dashed, width);
         break;
     case OVERLAY_CIRCLE_LEFT:
-        myMap->WPCircleCreate(to, from, false, color);
+        myMap->WPCircleCreate(to, from, false, color, dashed, width);
         break;
     default:
         break;
     }
 }
-void modelMapProxy::createOverlay(WayPointItem *from, HomeItem *to, modelMapProxy::overlayType type, QColor color)
+void modelMapProxy::createOverlay(WayPointItem *from, HomeItem *to, modelMapProxy::overlayType type, QColor color, bool dashed, int width)
 {
     if (from == NULL || to == NULL) {
         return;
     }
     switch (type) {
     case OVERLAY_LINE:
-        myMap->WPLineCreate(to, from, color);
+        myMap->WPLineCreate(to, from, color, dashed, width);
         break;
     case OVERLAY_CIRCLE_RIGHT:
-        myMap->WPCircleCreate(to, from, true, color);
+        myMap->WPCircleCreate(to, from, true, color, dashed, width);
         break;
     case OVERLAY_CIRCLE_LEFT:
-        myMap->WPCircleCreate(to, from, false, color);
+        myMap->WPCircleCreate(to, from, false, color, dashed, width);
         break;
     default:
         break;
@@ -169,7 +169,7 @@ void modelMapProxy::refreshOverlays()
         wp_next_overlay  = overlayTranslate(model->data(model->index(x + 1, flightDataModel::MODE)).toInt());
         wp_jump_overlay  = overlayTranslate(model->data(model->index(wp_jump, flightDataModel::MODE)).toInt());
         wp_error_overlay = overlayTranslate(model->data(model->index(wp_error, flightDataModel::MODE)).toInt());
-        createOverlay(wp_current, findWayPointNumber(wp_error), wp_error_overlay, Qt::red);
+        createOverlay(wp_current, findWayPointNumber(wp_error), wp_error_overlay, Qt::red, true, 1);
         switch (model->data(model->index(x, flightDataModel::COMMAND)).toInt()) {
         case MapDataDelegate::COMMAND_ONCONDITIONNEXTWAYPOINT:
             wp_next = findWayPointNumber(x + 1);

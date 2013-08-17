@@ -29,8 +29,8 @@
 #include "homeitem.h"
 
 namespace mapcontrol {
-WayPointLine::WayPointLine(WayPointItem *from, WayPointItem *to, MapGraphicItem *map, QColor color) : source(from),
-    destination(to), my_map(map), QGraphicsLineItem(map), myColor(color)
+WayPointLine::WayPointLine(WayPointItem *from, WayPointItem *to, MapGraphicItem *map, QColor color, bool dashed, int width) : source(from),
+    destination(to), my_map(map), QGraphicsLineItem(map), myColor(color), dashed(dashed), lineWidth(width)
 {
     this->setLine(to->pos().x(), to->pos().y(), from->pos().x(), from->pos().y());
     connect(from, SIGNAL(localPositionChanged(QPointF, WayPointItem *)), this, SLOT(refreshLocations()));
@@ -47,8 +47,8 @@ WayPointLine::WayPointLine(WayPointItem *from, WayPointItem *to, MapGraphicItem 
     connect(map, SIGNAL(childSetOpacity(qreal)), this, SLOT(setOpacitySlot(qreal)));
 }
 
-WayPointLine::WayPointLine(HomeItem *from, WayPointItem *to, MapGraphicItem *map, QColor color) : source(from),
-    destination(to), my_map(map), QGraphicsLineItem(map), myColor(color)
+WayPointLine::WayPointLine(HomeItem *from, WayPointItem *to, MapGraphicItem *map, QColor color, bool dashed, int width) : source(from),
+    destination(to), my_map(map), QGraphicsLineItem(map), myColor(color), dashed(dashed), lineWidth(width)
 {
     this->setLine(to->pos().x(), to->pos().y(), from->pos().x(), from->pos().y());
     connect(from, SIGNAL(homePositionChanged(internals::PointLatLng, float)), this, SLOT(refreshLocations()));
@@ -98,12 +98,25 @@ void WayPointLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *opti
     arrowHead.clear();
     arrowHead << line().pointAt(0.5) << arrowP1 << arrowP2;
     painter->drawPolygon(arrowHead);
-    if (myColor == Qt::red) {
-        myPen.setWidth(3);
-    } else if (myColor == Qt::yellow) {
-        myPen.setWidth(2);
-    } else if (myColor == Qt::green) {
-        myPen.setWidth(1);
+
+    if(dashed)
+    {
+        QVector<qreal> dashes;
+        dashes << 4 << 8;
+        myPen.setDashPattern(dashes);
+    }
+
+    if(lineWidth == -1) {
+        if (myColor == Qt::red) {
+            myPen.setWidth(3);
+        } else if (myColor == Qt::yellow) {
+            myPen.setWidth(2);
+        } else if (myColor == Qt::green) {
+            myPen.setWidth(1);
+        }
+    }
+    else {
+      myPen.setWidth(lineWidth);
     }
     painter->setPen(myPen);
     painter->drawLine(line());

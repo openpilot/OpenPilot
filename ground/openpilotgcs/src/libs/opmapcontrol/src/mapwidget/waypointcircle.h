@@ -40,8 +40,8 @@ class WayPointCircle : public QObject, public QGraphicsEllipseItem {
     Q_OBJECT Q_INTERFACES(QGraphicsItem)
 public:
     enum { Type = UserType + 9 };
-    WayPointCircle(WayPointItem *center, WayPointItem *radius, bool clockwise, MapGraphicItem *map, QColor color = Qt::green);
-    WayPointCircle(HomeItem *center, WayPointItem *radius, bool clockwise, MapGraphicItem *map, QColor color = Qt::green);
+    WayPointCircle(WayPointItem *center, WayPointItem *radius, bool clockwise, MapGraphicItem *map, QColor color = Qt::green, bool dashed = false, int width = -1);
+    WayPointCircle(HomeItem *center, WayPointItem *radius, bool clockwise, MapGraphicItem *map, QColor color = Qt::green, bool dashed = false, int width = -1);
     int type() const;
     void setColor(const QColor &color)
     {
@@ -55,6 +55,8 @@ private:
     QColor myColor;
     bool myClockWise;
     QLineF line;
+    bool dashed;
+    int width;
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 public slots:

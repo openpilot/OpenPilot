@@ -41,7 +41,7 @@ WayPointCircle::WayPointCircle(WayPointItem *center, WayPointItem *radius, bool 
 }
 
 WayPointCircle::WayPointCircle(HomeItem *radius, WayPointItem *center, bool clockwise, MapGraphicItem *map, QColor color, bool dashed, int width) : my_center(center),
-    my_radius(radius), my_map(map), QGraphicsEllipseItem(map), myColor(color), myClockWise(clockwise)
+    my_radius(radius), my_map(map), QGraphicsEllipseItem(map), myColor(color), myClockWise(clockwise), dashed(dashed), width(width)
 {
     connect(radius, SIGNAL(homePositionChanged(internals::PointLatLng, float)), this, SLOT(refreshLocations()));
     connect(center, SIGNAL(localPositionChanged(QPointF)), this, SLOT(refreshLocations()));
@@ -67,6 +67,14 @@ void WayPointCircle::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     p2 = QPointF(line.p1().x(), line.p1().y() - line.length());
     QPen myPen = pen();
     myPen.setColor(myColor);
+    if(width > 0) {
+        myPen.setWidth(width);
+    }
+    if(dashed){
+        QVector<qreal> dashes;
+        dashes << 4 << 8;
+        myPen.setDashPattern(dashes);
+    }
     qreal arrowSize = 10;
     painter->setPen(myPen);
     QBrush brush    = painter->brush();

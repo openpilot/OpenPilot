@@ -238,7 +238,7 @@ SectionEnd
 ; Copy driver files
 Section "-Drivers" InSecDrivers
   SetOutPath "$INSTDIR\drivers"
-  File "${PROJECT_ROOT}\flight\Project\Windows USB\OpenPilot-CDC.inf"
+  File /r "${PROJECT_ROOT}\flight\Project\Windows USB\*"
 SectionEnd
 
 ; Preinstall OpenPilot CDC driver

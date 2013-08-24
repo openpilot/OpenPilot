@@ -1,5 +1,5 @@
 --- RELEASE-13.06.04 ---
-This maintenance release includes the following fixes missing in the previously not released to public RELEASE-13.06.03.
+This maintenance release includes the following fixes missing in (previously not released to public) RELEASE-13.06.03.
 - Fixed issues with Google Maps;
 - Includes new signed version of CDC drivers for Windows platforms;
 

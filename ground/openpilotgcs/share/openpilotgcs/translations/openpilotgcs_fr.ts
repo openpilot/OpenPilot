@@ -2456,7 +2456,7 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>Move to WP</source>
-        <translation type="unfinished">Déplacer au Waypoint</translation>
+        <translation>Déplacer au Waypoint</translation>
     </message>
     <message>
         <location/>
@@ -14468,11 +14468,6 @@ or power cycle to force a board reset.</source>
     </message>
     <message>
         <location line="+16"/>
-        <source>OpenPilot Uploader</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+0"/>
         <source>No board connection was detected!</source>
         <translation type="unfinished"></translation>
     </message>

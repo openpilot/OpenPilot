@@ -284,7 +284,7 @@ int opHID_hidapi::receive(int num, void *buf, int len, int timeout)
  * \param[in] num Id of the device to receive packet (NOT supported).
  * \param[in] buf Pointer to the bufer to send.
  * \param[in] len Size of the buffer.
- * \param[in] timeout (not supported).
+ * \param[in] timeout (in ms).
  * \return Number of bytes received, or -1 on error.
  * \retval -1 for error or bytes received.
  */
@@ -293,7 +293,8 @@ int opHID_hidapi::send(int num, void *buf, int len, int timeout)
     Q_UNUSED(num);
     Q_UNUSED(timeout);
 
-    int bytes_written = 0;
+    int tmp_timeout;
+    int bytes_written = -1;
 
     if (!buf) {
         OPHID_ERROR("Unexpected parameter value (ptr).");
@@ -312,7 +313,14 @@ int opHID_hidapi::send(int num, void *buf, int len, int timeout)
 
     // hidapi has a timeout hardcoded to 1000ms
     hid_write_Mtx.lock();
-    bytes_written = hid_write(handle, (const unsigned char *)buf, len);
+    tmp_timeout = timeout / HIDAPI_TIMEOUT;
+    if (tmp_timeout == 0) {
+        tmp_timeout = 1;
+    }
+    while (tmp_timeout-- && bytes_written < 0) {
+        //OPHID_ERROR("Timeout %d", tmp_timeout);
+        bytes_written = hid_write(handle, (const unsigned char *)buf, len);
+    }
     hid_write_Mtx.unlock();
 
     // hidapi lib does not expose the libusb errors.

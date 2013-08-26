@@ -40,6 +40,7 @@
 #include "ophid_const.h"
 #include "ophid_global.h"
 
+#define HIDAPI_TIMEOUT 1000
 
 class OPHID_EXPORT opHID_hidapi : public QObject {
     Q_OBJECT

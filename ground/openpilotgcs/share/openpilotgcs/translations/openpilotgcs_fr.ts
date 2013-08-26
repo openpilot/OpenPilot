@@ -94,12 +94,12 @@
     <message>
         <location/>
         <source>Automatically connect an OpenPilot USB device:</source>
-        <translation>Connecter automatiquement un appareil OpenPilot USB :</translation>
+        <translation>Connecter automatiquement un périphérique OpenPilot USB :</translation>
     </message>
     <message>
         <location/>
         <source>Automatically select an OpenPilot USB device:</source>
-        <translation>Sélectionner automatiquement un appareil OpenPilot USB :</translation>
+        <translation>Sélectionner automatiquement un périphérique OpenPilot USB :</translation>
     </message>
     <message>
         <location/>
@@ -219,7 +219,7 @@
     <message>
         <location line="+12"/>
         <source>Full Screen</source>
-        <translation>Plein écran</translation>
+        <translation>Plein Écran</translation>
     </message>
     <message>
         <location line="+19"/>
@@ -409,7 +409,7 @@
     <message>
         <location line="+5"/>
         <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public Licence publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la Licence, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
@@ -481,8 +481,7 @@
     <message>
         <location line="+5"/>
         <source>Unexpected output from helper program.</source>
-        <translatorcomment>[Platypus]Helper = externe ?</translatorcomment>
-        <translation type="unfinished">Arrêt imprévu du logiciel externe.</translation>
+        <translation>Arrêt imprévu du programme d&apos;assistance.</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1008,7 +1007,7 @@
     <message>
         <location line="+1"/>
         <source>Plugin was shut down</source>
-        <translation type="unfinished">Module complémentaire c&apos;est arrêté</translation>
+        <translation>Arrêt du module complémentaire</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1019,7 +1018,7 @@
         <location line="+1"/>
         <source>Plugin ended its life cycle and was deleted</source>
         <translatorcomment>[Platypus]Je pense qu&apos;il existe une meilleur traduction de cycle de vie</translatorcomment>
-        <translation type="unfinished">Le module complémentaire a terminé son cycle de vie et a été supprimé</translation>
+        <translation>Le module complémentaire a terminé son cycle de vie et a été supprimé</translation>
     </message>
 </context>
 <context>
@@ -1772,7 +1771,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Refresh rate:</source>
-        <translation>Intervale d&apos;actualisation :</translation>
+        <translation type="unfinished">Intervalle d&apos;actualisation :</translation>
     </message>
     <message>
         <location/>
@@ -1787,12 +1786,12 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Spatial Data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Données Spatiales</translation>
     </message>
     <message>
         <location/>
         <source>Ground truth position and velocity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Position au sol et vitesse</translation>
     </message>
     <message>
         <location/>
@@ -2064,7 +2063,7 @@ Cela améliore les performances, mais c&apos;est à utiliser à vos risques et p
     <message>
         <location line="+1"/>
         <source>In range</source>
-        <translation type="unfinished">Dans l&apos;intervale</translation>
+        <translation type="unfinished">Dans l&apos;intervalle</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
@@ -2122,12 +2121,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>DataObject</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>ObjectField</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.cpp" line="+20"/>
@@ -2196,7 +2195,7 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelMapPos</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -2208,13 +2207,13 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelMousePos</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
@@ -2224,17 +2223,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>london</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>new york</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>paris</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -2244,7 +2243,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>New Item</source>
-        <translation type="unfinished">Nouvel Item</translation>
+        <translation>Nouvel Item</translation>
     </message>
     <message>
         <location/>
@@ -2349,7 +2348,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Next WP</source>
-        <translatorcomment>Abbrégé : bouton</translatorcomment>
+        <translatorcomment>Abbrégé : bouton. Ignorer le Warning sur le point à la fin.</translatorcomment>
         <translation type="unfinished">WP Suiv.</translation>
     </message>
     <message>
@@ -2372,13 +2371,13 @@ p, li { white-space: pre-wrap; }
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelUAVPos</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/plugins/opmap/opmap_widget_complete-post10.ui"/>
         <source>labelMapZoom</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -2652,7 +2651,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/scope/scopegadgetoptionspage.ui"/>
         <source>Check this to have the curve drawn antialiased.</source>
-        <translation type="unfinished">Cocher ceci pour avoir un tracé de courbe anticrénelé.</translation>
+        <translation type="unfinished">Cocher ici pour avoir un tracé de courbe anticrénelé.</translation>
     </message>
     <message>
         <location/>
@@ -2662,7 +2661,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Add / Update</source>
-        <translation type="unfinished">Ajouter / Actualiser</translation>
+        <translation>Ajouter / Actualiser</translation>
     </message>
     <message>
         <location/>
@@ -6030,7 +6029,7 @@ uniquement lorsque les valeurs changent</translation>
         <location filename="../../../src/plugins/coreplugin/uavgadgetmanager/uavgadgetview.cpp" line="+121"/>
         <source>Active</source>
         <translatorcomment>Activé ?</translatorcomment>
-        <translation type="unfinished">Actif</translation>
+        <translation>Actif</translation>
     </message>
 </context>
 <context>
@@ -6059,7 +6058,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+1"/>
         <source>Maybe you first have to choose Edit Gadgets Mode in the Window menu.</source>
-        <translation>Peut-être avez-vous besoin de d&apos;abord cocher Editer Gadgets Mode dans le menu Fenêtre.</translation>
+        <translation type="unfinished">Peut-être avez-vous besoin de d&apos;abord cocher Éditer Gadgets Mode dans le menu Fenêtre.</translation>
     </message>
 </context>
 <context>
@@ -6067,7 +6066,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location filename="../../../src/plugins/hitl/hitlfactory.cpp" line="+35"/>
         <source>HITL Simulation</source>
-        <translation type="unfinished">Simulation HITL</translation>
+        <translation>Simulation HITL</translation>
     </message>
 </context>
 <context>
@@ -6240,7 +6239,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+10"/>
         <source>&amp;Waypoint editor</source>
-        <translation>Editeur &amp;Waypoint</translation>
+        <translation type="unfinished">diteur &amp;Waypoint</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -6490,7 +6489,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+1"/>
         <source>Ctrl+D</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ctrl+S</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6505,7 +6504,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+1"/>
         <source>Ctrl+C</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ctrl+F</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -6709,7 +6708,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location filename="../../../src/plugins/uavtalk/telemetry.cpp" line="+298"/>
         <source>Telemetry: priority event queue is full, event lost (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Télémétrie : la file d&apos;attente d&apos;événements prioritaires est pleine, événement perdu (%1)</translation>
     </message>
 </context>
 <context>
@@ -6735,12 +6734,12 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location/>
         <source>BackgroundID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>ForegroundID</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7107,7 +7106,7 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>0</source>
-        <translation type="unfinished">0</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7262,7 +7261,7 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>Downloading tile</source>
-        <translation>Téléchargement dalle</translation>
+        <translation>Téléchargement de la dalle</translation>
     </message>
     <message>
         <location/>
@@ -7333,7 +7332,7 @@ its target speed.</source>
     <message>
         <location/>
         <source>1000</source>
-        <translation type="unfinished">1000</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7354,7 +7353,7 @@ In &apos;units per second&apos;, a sound default is 1000.</source>
     <message>
         <location/>
         <source>000</source>
-        <translation type="unfinished">000</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7434,7 +7433,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Armed</source>
-        <translation type="unfinished">Armé</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -8943,12 +8942,12 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>100%</source>
-        <translation type="unfinished">100%</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>0%</source>
-        <translation type="unfinished">0%</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9459,7 +9458,7 @@ et même conduire au crash. A utiliser avec prudence.</translation>
         <location/>
         <source>RT</source>
         <translatorcomment>Temps de Réponse : TR ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9846,7 +9845,7 @@ Astuce : Faites-le avec le moteur en vitesse de croisière.</translation>
     <message>
         <location/>
         <source>#3: Accelerometer Bias calibration</source>
-        <translation>#3 : Calibration ajustement accéléromètres</translation>
+        <translation>#3 : Calibration Ajustement Accéléromètres</translation>
     </message>
     <message>
         <location/>
@@ -9856,7 +9855,7 @@ Astuce : Faites-le avec le moteur en vitesse de croisière.</translation>
     <message>
         <location/>
         <source>Six Point Calibration instructions</source>
-        <translation type="unfinished"></translation>
+        <translation>Instructions de Calibration par Six Points</translation>
     </message>
     <message>
         <location/>
@@ -9884,7 +9883,7 @@ Astuce : Faites-le avec le moteur en vitesse de croisière.</translation>
 
 This does not save the calibration settings, this is done using the
 specific calibration button on top of the screen.</source>
-        <translatorcomment>Bouton en haut ou simplement enregistrer à coté ?</translatorcomment>
+        <translatorcomment>Bouton en haut ou simplement bouton enregistrer à coté ?</translatorcomment>
         <translation type="unfinished">Envoi des paramètres sur la carte (uniquement en mémoire).
 
 Cela n&apos;enregistre pas les paramètres de calibration qui seront effectifs 
@@ -9925,7 +9924,24 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#3: Accelerometer bias calibration:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;This step will ensure that accelerometer bias is accurate. Place your airframe as horizontally as possible (use a spirit level if necessary), then press Start below and do not move your airframe at all until the end of the calibration.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:600;&quot;&gt;Aide&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Les étapes #1 et #2 sont réellement nécessaires. L&apos;étape #3 vous aidera à atteindre les meilleurs résultats possibles.&lt;/span&gt;&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#1: Calibration Multi-Points :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette calibration va calculer l&apos;amplitude de tous les capteurs de la carte. Appuyez sur &amp;quot;Démarrer&amp;quot; pour commencer l&apos;étalonnage puis suivez les instructions qui sont affichées ici. Veuillez noter que votre position Home doit être définie en premier, ainsi que le vecteur de champ magnétique (Be) et l&apos;accélération due à la gravité (g_e).&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#2: Calibration du bruit des capteurs :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette calibration calcule les variations des capteurs dans des conditions normales. Vous pouvez laisser les moteurs tourner au mini ou à mi-gaz pour tenir compte de leurs vibrations avant d&apos;appuyer sur &amp;quot;Démarrer&amp;quot;.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;#3: Calibration de l&apos;ajustement des Accéléromètres :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Cette étape fera en sorte que l&apos;ajustement des accéléromètres soit parfait. Veuillez placer l&apos;appareil le plus horizontalement possible (utilisez un niveau à bulle si nécessaire), puis appuyez sur Démarrer ci-dessus et ne bougez pas du tout votre appareil jusqu&apos;à la fin de l&apos;étalonnage.&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -9950,7 +9966,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Filtering</source>
-        <translation type="unfinished">Filtrage</translation>
+        <translation>Filtrage</translation>
     </message>
     <message>
         <location/>
@@ -9983,12 +9999,12 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>Attitude Estimation Algorithm</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Algorithme d&apos;Evaluation de l&apos;Attitude</translation>
     </message>
     <message>
         <location/>
         <source>Selects the sensor integration algorithm to be used by the Revolution board.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sélectionnez l&apos;algorithme d&apos;intégration du capteur utilisé par la carte Revolution.</translation>
     </message>
     <message>
         <location/>
@@ -9998,7 +10014,7 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>Gravity acceleration:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Accélération pesanteur : </translation>
     </message>
     <message>
         <location/>
@@ -10008,17 +10024,20 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>objname:HomeLocation</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:g_e</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Latitude</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10028,22 +10047,24 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>fieldname:Altitude</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Magnetic field vector:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vecteur champ magnétique : </translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This information must be set to enable calibration the Revolution controllers sensors. &lt;br/&gt;Set home location using context menu in the map widget.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette information doit être définie pour permettre la calibration des capteurs du contrôleur Revolution. &lt;br/&gt;Indiquez la position du home en utilisant le menu contextuel sur la carte.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Longitude</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10053,7 +10074,8 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>fieldname:Set</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10063,7 +10085,8 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>button:help</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10073,12 +10096,14 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>button:apply</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>button:save</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -10594,7 +10619,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Responsiveness</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Réactivité</translation>
     </message>
     <message>
         <location/>
@@ -10604,12 +10629,12 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>This thing really can preform, it is a lot more responsive this way</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Peut vraiment réaliser des choses, il est beaucoup plus sensible de cette façon</translation>
     </message>
     <message>
         <location/>
         <source>Snappy</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Dynamique</translation>
     </message>
     <message>
         <location/>
@@ -10619,22 +10644,22 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Lazy Sunday afternoon flying, fly&apos;s nice and stable</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vol tranquille du Dimanche, stable et agréable</translation>
     </message>
     <message>
         <location/>
         <source>Moderate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Modérée</translation>
     </message>
     <message>
         <location/>
         <source>Damn this is insane how quick it moves. Mostly used by the Pro&apos;s</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Saperlipopète c&apos;est fou comment il se déplace rapidement. Principalement utilisé par les pros</translation>
     </message>
     <message>
         <location/>
         <source>Insane</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Démentielle</translation>
     </message>
     <message>
         <location/>
@@ -10694,7 +10719,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Instant Update</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Actualisation Instantanée</translation>
     </message>
     <message>
         <location/>
@@ -10704,7 +10729,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Update flight controller in real time</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mettre à jour le contrôleur de vol en temps réel</translation>
     </message>
     <message>
         <location/>
@@ -11381,27 +11406,27 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Add Leg</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ajout Étape</translation>
     </message>
     <message>
         <location/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">...</translation>
     </message>
     <message>
         <location/>
         <source>Delete Leg</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Efface Étape</translation>
     </message>
     <message>
         <location/>
         <source>Insert Leg</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Insère Étape</translation>
     </message>
     <message>
         <location/>
         <source>Read from file</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lire depuis un fichier</translation>
     </message>
     <message>
         <location/>
@@ -11411,17 +11436,17 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Send to UAV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Envoi vers UAV</translation>
     </message>
     <message>
         <location/>
         <source>Fetch from UAV</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Récupération depuis UAV</translation>
     </message>
     <message>
         <location/>
         <source>Open Details</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ouvre Détails</translation>
     </message>
 </context>
 <context>
@@ -11607,7 +11632,7 @@ les données en cache</translation>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/autoupdatepage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -11659,7 +11684,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/controllerpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -11690,8 +11715,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Connection device:</source>
-        <translatorcomment>device moyen  de connexion... bof à corriger si besoin dans le texte ci-dessus.</translatorcomment>
-        <translation>Moyen de connexion :</translation>
+        <translation>Périphérique de connection :</translation>
     </message>
     <message>
         <location/>
@@ -11740,7 +11764,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/endpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -11785,7 +11809,7 @@ Configuration n&apos;est pas chargé dans l&apos;espace de travail actuel.</tran
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/fixedwingpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -11808,7 +11832,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/helipage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -11831,7 +11855,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/inputpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -11900,7 +11924,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/multipage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -11978,7 +12002,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/notyetimplementedpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12001,7 +12025,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputcalibrationpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12081,7 +12105,7 @@ Soyez certain d&apos;utiliser la bonne version de firmware puis redémarrer l&ap
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/outputpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12134,7 +12158,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/rebootpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12183,7 +12207,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/savepage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12244,7 +12268,7 @@ Connectez votre carte OpenPilot et essayez à nouveau.</translation>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/startpage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12287,7 +12311,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/summarypage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12328,7 +12352,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/surfacepage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12351,7 +12375,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/vehiclepage.ui"/>
         <source>WizardPage</source>
-        <translation></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -12492,7 +12516,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>Device Information</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Information Périphérique</translation>
     </message>
     <message>
         <location/>
@@ -12665,7 +12689,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>Device Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Information Périphérique</translation>
     </message>
     <message>
         <location/>
@@ -12696,12 +12720,13 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
 to bootloader mode.
 (Only enabled if telemetry link is established, either
 through serial or USB)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Indique à la carte principale de passer en mode bootloader.
+(Disponible uniquement si le lien de télémétrie est établi, soit par port série ou USB)</translation>
     </message>
     <message>
         <location/>
         <source>Halt</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Arrêt</translation>
     </message>
     <message>
         <location/>
@@ -12711,12 +12736,16 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Boote le système.
+Utile seulement si le système est arrêté
+(LED blue de la carte qui clignote lentement, LED verte allumée)
+
+Si la télémétrie n&apos;est pas en marche, sélectionner la connection en utilisant le menu déroulant de droite.</translation>
     </message>
     <message>
         <location/>
         <source>Boot</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Boot</translation>
     </message>
     <message>
         <location/>
@@ -12726,19 +12755,25 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Boote le système en mode sans échec (c.-à-d. Paramètres Matériels par défaut).
+Seulement utile si le système est arrêté
+(LED blue de la carte qui clignote lentement, LED verte allumée)
+
+Si la télémétrie n&apos;est pas en marche, sélectionner la connection en utilisant le 
+menu déroulant de droite. </translation>
     </message>
     <message>
         <location/>
         <source>Safe Boot</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Boot Sans Échec</translation>
     </message>
     <message>
         <location/>
         <source>Reset the system.
 (Only enabled if telemetry link is established, either
 through serial or USB)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Remise à zéro du système.
+(Disponible uniquement si le lien de télémétrie est établi, soit par port série ou USB)</translation>
     </message>
     <message>
         <location/>
@@ -12751,12 +12786,15 @@ through serial or USB)</source>
 recover a system which does not boot.
 
 Rescue is possible in USB mode only.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Débuter une procédure assistée pour récupérer 
+manuellement un système qui ne boote pas.
+
+Le Sauvetage n&apos;est possible qu&apos;en mode USB seulement.</translation>
     </message>
     <message>
         <location/>
         <source>Rescue</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sauvetage</translation>
     </message>
     <message>
         <location/>
@@ -12766,17 +12804,22 @@ method using this combo box.
 You can use this to force a communication channel when doing
 a &quot;Boot&quot; (button on the left). It is updated automatically when
 halting a running board.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Lorsque la télémétrie n&apos;est pas connectée, sélectionnez la 
+méthode de communication en utilisant cette liste déroulante.
+
+Vous pouvez l&apos;utiliser pour forcer un canal de communication lorsque
+vous faites un &quot;Boot&quot; (bouton situé à gauche). Il est actualisé 
+automatiquement lorsque vous arrêtez une carte en fonctionnement. </translation>
     </message>
     <message>
         <location/>
         <source>Refresh the list of serial ports</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Actualise la liste des ports série</translation>
     </message>
     <message>
         <location/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">...</translation>
     </message>
     <message>
         <location/>
@@ -12786,37 +12829,42 @@ halting a running board.</source>
     <message>
         <location/>
         <source>Mainboard</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Carte Principale</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and earlier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;
+&lt;p&gt;Redémarre la carte et efface ses paramètres en mémoire.&lt;/p&gt;
+&lt;p&gt;Utile si la carte n&apos;arrive pas à booter correctement.&lt;/p&gt;
+&lt;p&gt;La led Bleue clignote rapidement pendant 20-30 secondes lorsque la carte démarre normalement&lt;/p&gt;
+&lt;p&gt;Si la télémétrie ne fonctionne pas, sélectionnez la connection dans la liste déroulante à droite.&lt;/p&gt;
+&lt;p&gt;A NOTER : Supporté par les versions 4 de bootloader et supérieurs&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Erase settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Effacer Paramètres </translation>
     </message>
     <message>
         <location/>
         <source>Auto Update</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maj Auto</translation>
     </message>
     <message>
         <location/>
         <source>Auto update</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Maj auto</translation>
     </message>
     <message>
         <location/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Progress</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Progression</translation>
     </message>
     <message>
         <location/>
@@ -12834,7 +12882,20 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- You will get a list of devices.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- You can then upload/download to/from each board as you wish&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- You can resume operations by pressing &amp;quot;Boot&amp;quot;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;Pour actualiser le firmware sur vos cartes,&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;appuyez sur Maj Auto et suivez les instructions&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;ou&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;procédez comme suit :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Connecter la télémétrie&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Une fois que la télémétrie est en marche, appuyez sur &amp;quot;Arrêt&amp;quot; ci-dessus&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Vous obtiendrez une liste des périphériques.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Vous pourrez alors envoyer / récupérer vers / depuis chaque carte comme vous le voudrez&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- Vous pouvez reprendre les opérations en appuyant sur &amp;quot;Boot&amp;quot;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -12843,7 +12904,11 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -13099,7 +13164,7 @@ Bougez le manche du Collectif de tangage.</translation>
         <source>Please toggle the Flight Mode switch.
 
 For switches you may have to repeat this rapidly.</source>
-        <translation type="unfinished">Veuillez activer l&apos;interrupteur de Mode de Vol.
+        <translation>Veuillez activer l&apos;interrupteur de Mode de Vol.
 
 Pour les interrupteurs vous pourriez avoir à répéter l&apos;opération rapidement.</translation>
     </message>
@@ -13118,14 +13183,14 @@ Bougez le manche des Gaz.</translation>
         <source>Please move each control one at a time according to the instructions and picture below.
 
 Move the %1 stick.</source>
-        <translation type="unfinished">Veuillez bouger chaque organe de contrôle, un seul à la fois, en fonction des instructions et de l&apos;image ci-dessous.
+        <translation>Veuillez bouger chaque organe de contrôle, un seul à la fois, en fonction des instructions et de l&apos;image ci-dessous.
 
 Bougez le manche %1.</translation>
     </message>
     <message>
         <location line="+7"/>
         <source> Alternatively, click Next to skip this channel.</source>
-        <translation type="unfinished"> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
+        <translation> Vous avez la possibilité d&apos;appuyer sur Suivant pour ignorer ce canal.</translation>
     </message>
     <message>
         <location line="+614"/>
@@ -13148,7 +13213,7 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+2"/>
         <source>&lt;h3&gt;OpenPilot Ground Control Station&lt;/h3&gt;GCS Revision: &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;UAVO Hash: &lt;b&gt;%2&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Built from %3&lt;br/&gt;Built on %4 at %5&lt;br/&gt;Based on Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. All rights reserved.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;This program is free software; you can redistribute it and/or modify&lt;br/&gt;it under the terms of the GNU General Public License as published by&lt;br/&gt;the Free Software Foundation; either version 3 of the License, or&lt;br/&gt;(at your option) any later version.&lt;br/&gt;&lt;br/&gt;The program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/small&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;h3&gt;Station de Contrôle au Sol OpenPilot (GCS)&lt;/h3&gt;Révision de GCS : &lt;b&gt;%1&lt;/b&gt;&lt;br/&gt;Hash UAVO : %2&lt;br/&gt;&lt;br/&gt;Compilé depuis %3&lt;br/&gt;Compilé le %4 à  %5&lt;br/&gt;Basé sur Qt %6 (%7 bit)&lt;br/&gt;&lt;br/&gt;&amp;copy; %8, 2010-%9. Tout droits réservés.&lt;br/&gt;&lt;br/&gt;&lt;small&gt;Ce programme est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier&lt;br/&gt;dans le cadre des termes de la licence GNU General Public Licence publiée par&lt;br/&gt;la Free Software Foundation; soit à la version 3 de la Licence, ou&lt;br/&gt;(en option) à une version ultérieure.&lt;br/&gt;&lt;br/&gt;Le programme est fourni EN L&apos;ÉTAT sans AUCUNE GARANTIE D&apos;UN QUELCONQUE TYPE, COMPRENANT LA GARANTIE DE DESIGN, DE COMMERCIALISATION ET D&apos;ERGONOMIE POUR UN USAGE PARTICULIER.&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
@@ -13284,7 +13349,7 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/magicwaypoint/magicwaypointgadgetfactory.cpp" line="+35"/>
         <source>Magic Waypoint</source>
-        <translation type="unfinished">Waypoint Magique </translation>
+        <translation>Waypoint Magique </translation>
     </message>
 </context>
 <context>
@@ -13418,7 +13483,7 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+231"/>
         <source>Click legend to show/hide scope trace</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cliquer sur la légende pour afficher / cacher la tracé du graphique</translation>
     </message>
 </context>
 <context>
@@ -13659,12 +13724,12 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+153"/>
         <source>Preparing mixer settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Préparation des paramètres de mixage</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Preparing vehicle settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Préparation des paramètres du véhicule</translation>
     </message>
 </context>
 <context>
@@ -14299,7 +14364,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location filename="../../../src/plugins/config/airframe_fixedwing.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -14394,7 +14459,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>50</source>
-        <translation type="unfinished">50</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -14409,7 +14474,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Mixer OK</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -14417,7 +14482,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location filename="../../../src/plugins/config/airframe_ground.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -14512,7 +14577,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>50</source>
-        <translation type="unfinished">50</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -14532,7 +14597,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Mixer OK</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -14571,7 +14636,7 @@ Typical values are 100% for + configuration and 50% for X configuration on quads
     <message>
         <location/>
         <source>50</source>
-        <translation type="unfinished">50</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -14768,11 +14833,13 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>button:help</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher !</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/dACrAQ</source>
+        <translatorcomment>Lien wiki FR ?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -14803,7 +14870,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>12345678</source>
-        <translation type="unfinished">12345678</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -14838,7 +14905,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>Device ID</source>
-        <translation>ID Appareil</translation>
+        <translation>ID Périphérique</translation>
     </message>
     <message>
         <location/>
@@ -14853,7 +14920,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>The number of packets that were unable to be transmitted</source>
-        <translation type="unfinished"></translation>
+        <translation>Le nombre de paquets qu&apos;il n&apos;a pas été possible de transmettre</translation>
     </message>
     <message>
         <location/>
@@ -14878,52 +14945,52 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>RX Good</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rx Corrects</translation>
     </message>
     <message>
         <location/>
         <source>The percentage of packets that were corrected with error correction</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Le pourcentage de paquets corrigés par la correction d&apos;erreurs</translation>
     </message>
     <message>
         <location/>
         <source>RX Corrected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rx Corrigés</translation>
     </message>
     <message>
         <location/>
         <source>RX Errors</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Erreurs RX</translation>
     </message>
     <message>
         <location/>
         <source>The percentage of packets that could not be corrected with error correction</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Le pourcentage de paquets qui n&apos;ont pu être corrigés par la correction d&apos;erreurs</translation>
     </message>
     <message>
         <location/>
         <source>RX Missed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Rx Perdus</translation>
     </message>
     <message>
         <location/>
         <source>The percentage of packets that were not received at all</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Le pourcentage de paquets qui n&apos;ont pas été reçus du tout</translation>
     </message>
     <message>
         <location/>
         <source>TX Dropped</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tx Perdus</translation>
     </message>
     <message>
         <location/>
         <source>TX Resent</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TX Renvoyés</translation>
     </message>
     <message>
         <location/>
         <source>Tx Failure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TX Défaillants</translation>
     </message>
     <message>
         <location/>
@@ -14958,12 +15025,12 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>-100dB</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>%v dBm</source>
-        <translation type="unfinished">%v dBm</translation>
+        <translation>%v dBm</translation>
     </message>
     <message>
         <location/>
@@ -15098,7 +15165,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>PPM</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -15114,12 +15181,12 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location filename="../../../src/plugins/osgearthview/osgearthviewgadgetoptionspage.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>PFD SVG: </source>
-        <translation>QVG PFD :</translation>
+        <translation>SVG PFD :</translation>
     </message>
     <message>
         <location/>
@@ -15142,27 +15209,27 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location filename="../../../src/plugins/pathactioneditor/pathactioneditor.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>New PathAction</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Nouveau PathAction</translation>
     </message>
     <message>
         <location/>
         <source>New Waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau Waypoint</translation>
     </message>
     <message>
         <location/>
         <source>Save to File</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistre dans un fichier</translation>
     </message>
     <message>
         <location/>
         <source>Load from File</source>
-        <translation type="unfinished"></translation>
+        <translation>Charger depuis un Fichier</translation>
     </message>
 </context>
 <context>
@@ -15170,7 +15237,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/biascalibrationpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -15226,7 +15293,7 @@ Connectez votre carte OpenPilot et essayez à nouveau.</translation>
     <message>
         <location filename="../../../src/plugins/setupwizard/pages/revocalibrationpage.ui"/>
         <source>WizardPage</source>
-        <translation type="unfinished"></translation>
+        <translation>Page d&apos;Assistant</translation>
     </message>
     <message>
         <location/>
@@ -15239,7 +15306,15 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;The calibration procedure for the OpenPilot Revolution controller is not yet implemented in this setup wizard. To calibrate your OpenPilot Revolution controller please use the calibration utility found in the configuration plugin after you have finished this wizard.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Future versions of will have an easy to use calibration procedure implemented.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600;&quot;&gt;Procédure calibration capteurs sur carte OpenPilot Revolution&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-weight:600;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;La procédure de calibration pour le contrôleur OpenPilot Revolution n&apos;est pas encore implémentée dans cet assistant  de configuration.Pour calibrer votre contrôleur OpenPilot Revolution veuillez utiliser l&apos;utilitaire de calibration que vous trouverez dans l&apos;onglet Configuration à la fin de cet assistant.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;Les futures versions de cet assistant possèderont une procédure de calibration simplifiée.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -15265,7 +15340,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/app/main.cpp" line="-59"/>
         <source>Application starting...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Démarrage application...</translation>
     </message>
 </context>
 <context>
@@ -15273,12 +15348,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+139"/>
         <source>The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Le module actionneur est en erreur. Cela peut aussi arriver lorsque il n&apos;y a pas d&apos;entrées (Rx radiocommande). Veuiller corriger cela avant de tester les sorties.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>This option will start your motors by the amount selected on the sliders regardless of transmitter. It is recommended to remove any blades from motors. Are you sure you want to do this?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Cette option démarre vos moteurs avec la valeur sélectionnée sur les curseurs, indépendamment de l&apos;émetteur. Il est recommandé d&apos;enlever les hélices des moteurs. Êtes-vous sûr de vouloir faire ça ?</translation>
     </message>
 </context>
 <context>
@@ -15286,7 +15361,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configrevohwwidget.cpp" line="+88"/>
         <source>Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Désactivé</translation>
     </message>
 </context>
 <context>
@@ -15295,7 +15370,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+529"/>
         <location line="+380"/>
         <source>&lt;p&gt;HomeLocation not SET.&lt;/p&gt;&lt;p&gt;Please set your HomeLocation and try again. Aborting calibration!&lt;/p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;p&gt;Position Home non définie.&lt;/p&gt;&lt;p&gt;Veuillez définir votre position Home et essayez à nouveau. Calibration abandonnée !&lt;/p&gt;</translation>
     </message>
 </context>
 <context>
@@ -15303,22 +15378,22 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/coreplugin/uavgadgetoptionspagedecorator.cpp" line="+97"/>
         <source>Delete this configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer cette configuration</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Cannot delete a configuration currently in use</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;effacer une configuration utilisée actuellement</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Cannot delete the last configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d&apos;effacer la dernière configuration</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>DON&apos;T KNOW !</source>
-        <translation type="unfinished"></translation>
+        <translation>JE NE SAIS PAS !</translation>
     </message>
 </context>
 <context>
@@ -15334,7 +15409,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/pathactioneditor/pathactioneditorgadgetfactory.cpp" line="+34"/>
         <source>PathAction Editor</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Éditeur PathAction</translation>
     </message>
 </context>
 <context>
@@ -15342,17 +15417,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/pathactioneditor/pathactioneditortreemodel.cpp" line="+74"/>
         <source>Property</source>
-        <translation type="unfinished">Propriété</translation>
+        <translation>Propriété</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Value</source>
-        <translation type="unfinished">Valeur</translation>
+        <translation>Valeur</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Unit</source>
-        <translation type="unfinished"></translation>
+        <translation>Unité</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -15408,7 +15483,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+72"/>
         <source>Can&apos;t calculate, file too big for device</source>
-        <translation>Ne peut calculer, fichier trop gros pour l&apos;appareil</translation>
+        <translation>Ne peut calculer, fichier trop gros pour le périphérique</translation>
     </message>
     <message>
         <location line="+11"/>

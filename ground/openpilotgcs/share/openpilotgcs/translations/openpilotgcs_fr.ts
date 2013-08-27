@@ -6,23 +6,23 @@
     <message>
         <location filename="../../../src/app/main.cpp" line="+202"/>
         <source>Failed to load core plug-in, reason is: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Echec du chargement du module complémentaire core, la raison est : %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Unable to send command line arguments to the already running instance. It appears to be not responding.</source>
-        <translation type="unfinished">Impossible de passer les arguments de la ligne de commande à l&apos;instance en cours d&apos;exécution. Elle semble ne pas répondre.</translation>
+        <translation>Impossible de passer les arguments de la ligne de commande à l&apos;instance en cours d&apos;exécution. Elle semble ne pas répondre.</translation>
     </message>
     <message>
         <location line="+310"/>
         <source>Could not find &apos;Core.pluginspec&apos; in %1</source>
         <translatorcomment>[Platypus]Ajout de &quot;est&quot;</translatorcomment>
-        <translation type="unfinished">&apos;Core.pluginspec&apos; est introuvable dans %1</translation>
+        <translation>&apos;Core.pluginspec&apos; est introuvable dans %1</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>OpenPilot GCS - Plugin loader messages</source>
-        <translation type="unfinished">OpenPilot GCS - Messages du chargeur de modules complémentaires</translation>
+        <translation>OpenPilot GCS - Messages du chargeur de modules complémentaires</translation>
     </message>
 </context>
 <context>
@@ -2063,7 +2063,7 @@ Cela améliore les performances, mais c&apos;est à utiliser à vos risques et p
     <message>
         <location line="+1"/>
         <source>In range</source>
-        <translation type="unfinished">Dans l&apos;intervalle</translation>
+        <translation>Dans l&apos;intervalle</translation>
     </message>
     <message>
         <location filename="../../../src/plugins/notify/notifypluginoptionspage.ui"/>
@@ -6058,7 +6058,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+1"/>
         <source>Maybe you first have to choose Edit Gadgets Mode in the Window menu.</source>
-        <translation type="unfinished">Peut-être avez-vous besoin de d&apos;abord cocher Éditer Gadgets Mode dans le menu Fenêtre.</translation>
+        <translation>Peut-être avez-vous besoin de d&apos;abord cocher Éditer Gadgets Mode dans le menu Fenêtre.</translation>
     </message>
 </context>
 <context>
@@ -6239,7 +6239,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+10"/>
         <source>&amp;Waypoint editor</source>
-        <translation type="unfinished">diteur &amp;Waypoint</translation>
+        <translation>Éditeur &amp;Waypoint</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -6605,7 +6605,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+0"/>
         <source>Unit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unité</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -6708,7 +6708,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location filename="../../../src/plugins/uavtalk/telemetry.cpp" line="+298"/>
         <source>Telemetry: priority event queue is full, event lost (%1)</source>
-        <translation type="unfinished">Télémétrie : la file d&apos;attente d&apos;événements prioritaires est pleine, événement perdu (%1)</translation>
+        <translation>Télémétrie : la file d&apos;attente d&apos;événements prioritaires est pleine, événement perdu (%1)</translation>
     </message>
 </context>
 <context>
@@ -6716,7 +6716,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location filename="../../../src/plugins/uavtalk/telemetrymonitor.cpp" line="+101"/>
         <source>Starting to retrieve meta and settings objects from the autopilot (%1 objects)</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrage de la récupération des objets meta et paramètres depuis l&apos;autopilote (%1 objets)</translation>
     </message>
 </context>
 <context>
@@ -7036,7 +7036,7 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>Number </source>
-        <translation type="unfinished">Nombre </translation>
+        <translation>Numéro </translation>
     </message>
     <message>
         <location/>
@@ -10367,7 +10367,7 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>Max rate attitude (deg/s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vitesse maxi Attitude (deg/s)</translation>
     </message>
     <message>
         <location/>
@@ -10639,7 +10639,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Rate Mode slider can be adjusted to value ranges whose responsivness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Rate Mode slider peut être ajusté dans des plages dont la réactivité est représentée par les zones Modérée / Dynamique / Démentielle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -10664,32 +10664,32 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Attitude mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode Attitude</translation>
     </message>
     <message>
         <location/>
         <source>Rate mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode Rate</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Attitude Mode slider can be adjusted to value ranges whose responsivness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Attitude Mode peut être ajusté dans des plages dont la réactivité est représentée par les zones Modérée / Dynamique / Démentielle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Rate mode Yaw slider can be adjusted to value ranges whose responsivness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Rate Mode Yaw peut être ajusté dans des plages dont la réactivité est représentée par les zones Modérée / Dynamique / Démentielle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Rate mode yaw</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mode Rate yaw</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link roll &amp;amp; pitch sliders to move together, thus giving same value for both roll &amp;amp; pitch when setting up a symetrical vehicle that requires both to be the same&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lie les curseurs roll &amp;amp; pitch pour se déplacer ensemble, ce qui donne la même valeur en roll &amp;amp; pitch lors du paramétrage d&apos;un appareil symétrique qui nécessite la même chose sur les deux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -10704,7 +10704,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link roll &amp;amp; pitch sliders to move together, thus giving same value for both roll &amp;amp; pitch when setting up a symetrical vehicle that requires both to be the same.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lie les curseurs roll &amp;amp; pitch pour se déplacer ensemble, ce qui donne la même valeur en roll &amp;amp; pitch lors du paramétrage d&apos;un appareil symétrique qui nécessite la même chose sur les deux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -10734,32 +10734,32 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum deg your vehicle will tilt at full stick input when in Attitude mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Règle l&apos;angle maximal de l&apos;appareil en degrés pour un ordre manche en butée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum rotation rate in degress per second on an axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci règle la vitesse maximale sur un axe, en degrés par seconde.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the degress per second the your vehcle will tilt/rotate at full stick input when in all modes except Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Règle la vitesse à laquelle votre appareil s&apos;incline / tourne pour un ordre manche en butée, dans tous les modes sauf Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Attitude mode response (deg)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Réponse mode Attitude (deg)</translation>
     </message>
     <message>
         <location/>
         <source>Rate mode response (deg/s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vitesse mode Rate (deg/s)</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link roll &amp;amp; pitch values together, thus giving the same value for each when setting up a symetrical vehicle that requires both to be the same.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lie les valeurs roll &amp;amp; pitch ensemble, ce qui donne la même valeur en roll &amp;amp; pitch lors du paramétrage d&apos;un appareil symétrique qui nécessite la même chose sur les deux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -10899,12 +10899,12 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Max Vertical Velocity</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Vitesse Max Verticale</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum allowed vertical velocity in m/s.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Vitesse verticale maximale autorisée en m/s.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -11406,47 +11406,47 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Add Leg</source>
-        <translation type="unfinished">Ajout Étape</translation>
+        <translation>Ajout Étape</translation>
     </message>
     <message>
         <location/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
     <message>
         <location/>
         <source>Delete Leg</source>
-        <translation type="unfinished">Efface Étape</translation>
+        <translation>Efface Étape</translation>
     </message>
     <message>
         <location/>
         <source>Insert Leg</source>
-        <translation type="unfinished">Insère Étape</translation>
+        <translation>Insère Étape</translation>
     </message>
     <message>
         <location/>
         <source>Read from file</source>
-        <translation type="unfinished">Lire depuis un fichier</translation>
+        <translation>Lire depuis un fichier</translation>
     </message>
     <message>
         <location/>
         <source>Save to file</source>
-        <translation type="unfinished">Enregistre dans un fichier</translation>
+        <translation>Enregistre dans un fichier</translation>
     </message>
     <message>
         <location/>
         <source>Send to UAV</source>
-        <translation type="unfinished">Envoi vers UAV</translation>
+        <translation>Envoi vers UAV</translation>
     </message>
     <message>
         <location/>
         <source>Fetch from UAV</source>
-        <translation type="unfinished">Récupération depuis UAV</translation>
+        <translation>Récupération depuis UAV</translation>
     </message>
     <message>
         <location/>
         <source>Open Details</source>
-        <translation type="unfinished">Ouvre Détails</translation>
+        <translation>Ouvre Détails</translation>
     </message>
 </context>
 <context>
@@ -12720,13 +12720,13 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
 to bootloader mode.
 (Only enabled if telemetry link is established, either
 through serial or USB)</source>
-        <translation type="unfinished">Indique à la carte principale de passer en mode bootloader.
+        <translation>Indique à la carte principale de passer en mode bootloader.
 (Disponible uniquement si le lien de télémétrie est établi, soit par port série ou USB)</translation>
     </message>
     <message>
         <location/>
         <source>Halt</source>
-        <translation type="unfinished">Arrêt</translation>
+        <translation>Arrêt</translation>
     </message>
     <message>
         <location/>
@@ -12736,7 +12736,7 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation type="unfinished">Boote le système.
+        <translation>Boote le système.
 Utile seulement si le système est arrêté
 (LED blue de la carte qui clignote lentement, LED verte allumée)
 
@@ -12745,7 +12745,7 @@ Si la télémétrie n&apos;est pas en marche, sélectionner la connection en uti
     <message>
         <location/>
         <source>Boot</source>
-        <translation type="unfinished">Boot</translation>
+        <translation>Boot</translation>
     </message>
     <message>
         <location/>
@@ -12755,7 +12755,7 @@ Only useful if the system is halted
 
 If telemetry is not running, select the link using the dropdown
 menu on the right.</source>
-        <translation type="unfinished">Boote le système en mode sans échec (c.-à-d. Paramètres Matériels par défaut).
+        <translation>Boote le système en mode sans échec (c.-à-d. Paramètres Matériels par défaut).
 Seulement utile si le système est arrêté
 (LED blue de la carte qui clignote lentement, LED verte allumée)
 
@@ -12765,20 +12765,20 @@ menu déroulant de droite. </translation>
     <message>
         <location/>
         <source>Safe Boot</source>
-        <translation type="unfinished">Boot Sans Échec</translation>
+        <translation>Boot Sans Échec</translation>
     </message>
     <message>
         <location/>
         <source>Reset the system.
 (Only enabled if telemetry link is established, either
 through serial or USB)</source>
-        <translation type="unfinished">Remise à zéro du système.
+        <translation>Remise à zéro du système.
 (Disponible uniquement si le lien de télémétrie est établi, soit par port série ou USB)</translation>
     </message>
     <message>
         <location/>
         <source>Reset</source>
-        <translation type="unfinished">Réinitialiser</translation>
+        <translation>Réinitialiser</translation>
     </message>
     <message>
         <location/>
@@ -12786,7 +12786,7 @@ through serial or USB)</source>
 recover a system which does not boot.
 
 Rescue is possible in USB mode only.</source>
-        <translation type="unfinished">Débuter une procédure assistée pour récupérer 
+        <translation>Débuter une procédure assistée pour récupérer 
 manuellement un système qui ne boote pas.
 
 Le Sauvetage n&apos;est possible qu&apos;en mode USB seulement.</translation>
@@ -12794,7 +12794,7 @@ Le Sauvetage n&apos;est possible qu&apos;en mode USB seulement.</translation>
     <message>
         <location/>
         <source>Rescue</source>
-        <translation type="unfinished">Sauvetage</translation>
+        <translation>Sauvetage</translation>
     </message>
     <message>
         <location/>
@@ -12804,7 +12804,7 @@ method using this combo box.
 You can use this to force a communication channel when doing
 a &quot;Boot&quot; (button on the left). It is updated automatically when
 halting a running board.</source>
-        <translation type="unfinished">Lorsque la télémétrie n&apos;est pas connectée, sélectionnez la 
+        <translation>Lorsque la télémétrie n&apos;est pas connectée, sélectionnez la 
 méthode de communication en utilisant cette liste déroulante.
 
 Vous pouvez l&apos;utiliser pour forcer un canal de communication lorsque
@@ -12814,47 +12814,48 @@ automatiquement lorsque vous arrêtez une carte en fonctionnement. </translation
     <message>
         <location/>
         <source>Refresh the list of serial ports</source>
-        <translation type="unfinished">Actualise la liste des ports série</translation>
+        <translation>Actualise la liste des ports série</translation>
     </message>
     <message>
         <location/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
     <message>
         <location/>
         <source>Running</source>
-        <translation type="unfinished">En cours d&apos;exécution</translation>
+        <translation>En cours d&apos;exécution</translation>
     </message>
     <message>
         <location/>
         <source>Mainboard</source>
+        <translatorcomment>Carte mère ?</translatorcomment>
         <translation type="unfinished">Carte Principale</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reboot the board and clear its settings memory.&lt;/p&gt;&lt;p&gt;        Useful if the board cannot boot properly.&lt;/p&gt;&lt;p&gt;        Blue led starts blinking quick for 20-30 seconds than the board will start normally&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If telemetry is not running, select the link using the dropdown&lt;/p&gt;&lt;p&gt;menu on the right.&lt;/p&gt;&lt;p&gt;PLEASE NOTE: Supported with bootloader versions 4.0 and earlier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;
 &lt;p&gt;Redémarre la carte et efface ses paramètres en mémoire.&lt;/p&gt;
 &lt;p&gt;Utile si la carte n&apos;arrive pas à booter correctement.&lt;/p&gt;
 &lt;p&gt;La led Bleue clignote rapidement pendant 20-30 secondes lorsque la carte démarre normalement&lt;/p&gt;
 &lt;p&gt;Si la télémétrie ne fonctionne pas, sélectionnez la connection dans la liste déroulante à droite.&lt;/p&gt;
-&lt;p&gt;A NOTER : Supporté par les versions 4 de bootloader et supérieurs&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p&gt;A NOTER : Supporté par les bootloaders version 4 et supérieurs&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Erase settings</source>
-        <translation type="unfinished">Effacer Paramètres </translation>
+        <translation>Effacer Paramètres </translation>
     </message>
     <message>
         <location/>
         <source>Auto Update</source>
-        <translation type="unfinished">Maj Auto</translation>
+        <translation>Maj Auto</translation>
     </message>
     <message>
         <location/>
         <source>Auto update</source>
-        <translation type="unfinished">Maj auto</translation>
+        <translation>Maj auto</translation>
     </message>
     <message>
         <location/>
@@ -12864,7 +12865,7 @@ automatiquement lorsque vous arrêtez une carte en fonctionnement. </translation
     <message>
         <location/>
         <source>Progress</source>
-        <translation type="unfinished">Progression</translation>
+        <translation>Progression</translation>
     </message>
     <message>
         <location/>
@@ -12882,7 +12883,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- You will get a list of devices.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- You can then upload/download to/from each board as you wish&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;- You can resume operations by pressing &amp;quot;Boot&amp;quot;&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -13313,7 +13314,7 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+157"/>
         <source>Logging: retrieve settings objects from the autopilot (%1 objects)</source>
-        <translation type="unfinished">Journalisation : récupération des objets de configuration de l&apos;autopilote (%1 objets)</translation>
+        <translation>Journalisation : récupération des objets de configuration de l&apos;autopilote (%1 objets)</translation>
     </message>
 </context>
 <context>

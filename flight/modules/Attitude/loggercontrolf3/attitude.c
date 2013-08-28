@@ -74,7 +74,6 @@
 
 // Private types
 
-
 // Private variables
 static xTaskHandle taskHandle;
 
@@ -84,8 +83,8 @@ static void AttitudeTask(void *parameters);
 static float gyro_correct_int[3] = { 0, 0, 0 };
 static xQueueHandle gyro_queue;
 
-static int32_t updateSensorsCC3D(AccelsData *accelsData, GyrosData *gyrosData);
-static void updateAttitude(AccelsData *, GyrosData *);
+static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *gyrosData);
+static void updateAttitude(AccelStateData *, GyroStateData *);
 static void settingsUpdatedCb(UAVObjEvent *objEv);
 
 static float accelKi     = 0;
@@ -136,8 +135,8 @@ int32_t AttitudeInitialize(void)
 {
     AttitudeStateInitialize();
     AttitudeSettingsInitialize();
-    AccelsInitialize();
-    GyrosInitialize();
+    AccelStateInitialize();
+    GyroStateInitialize();
 
     // Initialize quaternion
     AttitudeStateData attitude;
@@ -170,12 +169,14 @@ int32_t AttitudeInitialize(void)
     return 0;
 }
 
-MODULE_INITCALL(AttitudeInitialize, AttitudeStart)
+MODULE_INITCALL(AttitudeInitialize, AttitudeStart);
 
 /**
  * Module thread, should not return.
  */
 
+int32_t accel_test;
+int32_t gyro_test;
 static void AttitudeTask(__attribute__((unused)) void *parameters)
 {
     uint8_t init = 0;
@@ -219,11 +220,11 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
 
         PIOS_WDG_UpdateFlag(PIOS_WDG_ATTITUDE);
 
-        AccelsData accels;
-        GyrosData gyros;
+        AccelStateData accelState;
+        GyroStateData gyros;
         int32_t retval = 0;
 
-        retval = updateSensorsCC3D(&accels, &gyros);
+            retval = updateSensorsCC3D(&accelState, &gyros);
 
         // Only update attitude when sensor data is good
         if (retval != 0) {
@@ -231,7 +232,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
         } else {
             // Do not update attitude data in simulation mode
             if (!AttitudeStateReadOnly()) {
-                updateAttitude(&accels, &gyros);
+                updateAttitude(&accelState, &gyros);
             }
 
             AlarmsClear(SYSTEMALARMS_ALARM_ATTITUDE);
@@ -240,6 +241,7 @@ static void AttitudeTask(__attribute__((unused)) void *parameters)
 }
 
 float gyros_passed[3];
+
 
 
 /**
@@ -253,7 +255,8 @@ struct pios_mpu6000_data mpu6000_data;
 #if defined(PIOS_INCLUDE_MPU6050)
 struct pios_mpu6050_data mpu6050_data;
 #endif
-static int32_t updateSensorsCC3D(AccelsData *accelsData, GyrosData *gyrosData)
+
+static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *gyrosData)
 {
     float accels[3], gyros[3];
 
@@ -265,7 +268,7 @@ static int32_t updateSensorsCC3D(AccelsData *accelsData, GyrosData *gyrosData)
         return -1; // Error, no data
     }
     // Do not read raw sensor data in simulation mode
-    if (GyrosReadOnly() || AccelsReadOnly()) {
+    if (GyroStateReadOnly() || AccelStateReadOnly()) {
         return 0;
     }
 
@@ -277,8 +280,8 @@ static int32_t updateSensorsCC3D(AccelsData *accelsData, GyrosData *gyrosData)
     accels[1] = mpu6000_data.accel_y * PIOS_MPU6000_GetAccelScale();
     accels[2] = mpu6000_data.accel_z * PIOS_MPU6000_GetAccelScale();
 
-    gyrosData->temperature  = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
-    accelsData->temperature = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
+    // gyrosData->temperature  = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
+    // accelsData->temperature = 35.0f + ((float)mpu6000_data.temperature + 512.0f) / 340.0f;
 #endif /* if defined(PIOS_INCLUDE_MPU6000) */
 #if defined(PIOS_INCLUDE_MPU6050)
 
@@ -300,8 +303,8 @@ static int32_t updateSensorsCC3D(AccelsData *accelsData, GyrosData *gyrosData)
     accels[1] = mpu6050_data.accel_y * PIOS_MPU6050_GetAccelScale();
     accels[2] = mpu6050_data.accel_z * PIOS_MPU6050_GetAccelScale();
 
-    gyrosData->temperature  = 35.0f + ((float)mpu6050_data.temperature + 512.0f) / 340.0f;
-    accelsData->temperature = 35.0f + ((float)mpu6050_data.temperature + 512.0f) / 340.0f;
+    //gyrosData->temperature  = 35.0f + ((float)mpu6050_data.temperature + 512.0f) / 340.0f;
+    //accelsData->temperature = 35.0f + ((float)mpu6050_data.temperature + 512.0f) / 340.0f;
 #endif /* if defined(PIOS_INCLUDE_MPU6050) */
 
     if (rotate) {
@@ -317,13 +320,13 @@ static int32_t updateSensorsCC3D(AccelsData *accelsData, GyrosData *gyrosData)
         gyros[2]  = vec_out[2];
     }
 
-    accelsData->x = accels[0] - accelbias[0] * ACCEL_SCALE; // Applying arbitrary scale here to match CC v1
-    accelsData->y = accels[1] - accelbias[1] * ACCEL_SCALE;
-    accelsData->z = accels[2] - accelbias[2] * ACCEL_SCALE;
+    accelStateData->x = accels[0] - accelbias[0] * ACCEL_SCALE; // Applying arbitrary scale here to match CC v1
+    accelStateData->y = accels[1] - accelbias[1] * ACCEL_SCALE;
+    accelStateData->z = accels[2] - accelbias[2] * ACCEL_SCALE;
 
-    gyrosData->x  = gyros[0];
-    gyrosData->y  = gyros[1];
-    gyrosData->z  = gyros[2];
+    gyrosData->x = gyros[0];
+    gyrosData->y = gyros[1];
+    gyrosData->z = gyros[2];
 
     if (bias_correct_gyro) {
         // Applying integral component here so it can be seen on the gyros and correct bias
@@ -340,8 +343,8 @@ static int32_t updateSensorsCC3D(AccelsData *accelsData, GyrosData *gyrosData)
     // and make it average zero (weakly)
     gyro_correct_int[2] += -gyrosData->z * yawBiasRate;
 
-    GyrosSet(gyrosData);
-    AccelsSet(accelsData);
+    GyroStateSet(gyrosData);
+    AccelStateSet(accelStateData);
 
     return 0;
 }
@@ -359,7 +362,7 @@ static inline void apply_accel_filter(const float *raw, float *filtered)
     }
 }
 
-static void updateAttitude(AccelsData *accelsData, GyrosData *gyrosData)
+static void updateAttitude(AccelStateData *accelStateData, GyroStateData *gyrosData)
 {
     float dT;
     portTickType thisSysTime = xTaskGetTickCount();
@@ -370,7 +373,7 @@ static void updateAttitude(AccelsData *accelsData, GyrosData *gyrosData)
 
     // Bad practice to assume structure order, but saves memory
     float *gyros  = &gyrosData->x;
-    float *accels = &accelsData->x;
+    float *accels = &accelStateData->x;
 
     float grot[3];
     float accel_err[3];
@@ -461,15 +464,15 @@ static void updateAttitude(AccelsData *accelsData, GyrosData *gyrosData)
         q[3] = q[3] / qmag;
     }
 
-    AttitudeStateData attitudeActual;
-    AttitudeStateGet(&attitudeActual);
+    AttitudeStateData attitudeState;
+    AttitudeStateGet(&attitudeState);
 
-    quat_copy(q, &attitudeActual.q1);
+    quat_copy(q, &attitudeState.q1);
 
     // Convert into eueler degrees (makes assumptions about RPY order)
-    Quaternion2RPY(&attitudeActual.q1, &attitudeActual.Roll);
+    Quaternion2RPY(&attitudeState.q1, &attitudeState.Roll);
 
-    AttitudeStateSet(&attitudeActual);
+    AttitudeStateSet(&attitudeState);
 }
 
 static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)

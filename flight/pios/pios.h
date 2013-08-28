@@ -53,6 +53,8 @@
 /* STM32 Std Peripherals Lib */
 #if defined(STM32F10X)
 #include <stm32f10x.h>
+#elif defined(STM32F30X)
+#include <stm32f30x.h>
 #elif defined(STM32F4XX)
 #include <stm32f4xx.h>
 #include <stm32f4xx_rcc.h>
@@ -186,6 +188,12 @@
 /* MPU6000 3-Axis Gyro/Accelerometer */
 /* #define PIOS_MPU6000_ACCEL */
 #include <pios_mpu6000.h>
+#endif
+
+#ifdef PIOS_INCLUDE_MPU6050
+/* MPU6050 3-Axis Gyro/Accelerometer */
+/* #define PIOS_MPU6050_ACCEL */
+#include <pios_mpu6050.h>
 #endif
 
 #ifdef PIOS_INCLUDE_HMC5843

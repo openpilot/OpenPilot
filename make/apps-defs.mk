@@ -48,7 +48,11 @@ OPTESTS		= $(TOPDIR)/Tests
 ifeq ($(MCU),cortex-m3)
     include $(PIOS)/stm32f10x/library.mk
 else ifeq ($(MCU),cortex-m4)
-    include $(PIOS)/stm32f4xx/library.mk
+	ifeq ($(CHIP),STM32F303CCT)
+		include $(PIOS)/stm32f30x/library.mk
+	else
+		include $(PIOS)/stm32f4xx/library.mk
+	endif
 else
     $(error Unsupported MCU: $(MCU))
 endif
@@ -68,6 +72,7 @@ SRC += $(PIOSCOMMON)/pios_hmc5883.c
 SRC += $(PIOSCOMMON)/pios_i2c_esc.c
 SRC += $(PIOSCOMMON)/pios_l3gd20.c
 SRC += $(PIOSCOMMON)/pios_mpu6000.c
+SRC += $(PIOSCOMMON)/pios_mpu6050.c
 SRC += $(PIOSCOMMON)/pios_mpxv.c
 SRC += $(PIOSCOMMON)/pios_ms5611.c
 SRC += $(PIOSCOMMON)/pios_oplinkrcvr.c

@@ -2,8 +2,8 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @defgroup   PIOS_GPIO GPIO Functions
- * @brief GPIO hardware code for STM32F4xx
+ * @addtogroup PIOS_GPIO GPIO Functions
+ * @brief STM32 Hardware GPIO handling code
  * @{
  *
  * @file       pios_gpio.c
@@ -12,89 +12,168 @@
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
-/* 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License as published by 
- * the Free Software Foundation; either version 3 of the License, or 
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
- * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License 
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
  * for more details.
- * 
- * You should have received a copy of the GNU General Public License along 
- * with this program; if not, write to the Free Software Foundation, Inc., 
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/* Project Includes */
 #include "pios.h"
 
-#if defined(PIOS_INCLUDE_GPIO)
+#ifdef PIOS_INCLUDE_GPIO
 
-/* Private Function Prototypes */
-
-/* Local Variables */
-static GPIO_TypeDef *GPIO_PORT[PIOS_GPIO_NUM] = PIOS_GPIO_PORTS;
-static const uint32_t GPIO_PIN[PIOS_GPIO_NUM] = PIOS_GPIO_PINS;
+#include <pios_gpio_priv.h>
 
 /**
-* Initialises all the GPIO's
-*/
-void PIOS_GPIO_Init(void)
+ * Initialises all the GPIO's
+ */
+int32_t PIOS_GPIO_Init(uint32_t *gpios_dev_id, const struct pios_gpio_cfg *cfg)
 {
-	/* Do nothing */
+    PIOS_Assert(cfg);
+    *gpios_dev_id = (uint32_t)cfg;
+
+    for (uint8_t i = 0; i < cfg->num_gpios; i++) {
+        const struct pios_gpio *gpio = &(cfg->gpios[i]);
+
+        /* Enable the peripheral clock for the GPIO */
+       /* switch ((uint32_t)gpio->pin.gpio) {
+        case (uint32_t)GPIOA:
+            RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+            break;
+        case (uint32_t)GPIOB:
+            RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+            break;
+        case (uint32_t)GPIOC:
+            RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOC, ENABLE);
+            break;
+        case (uint32_t)GPIOD:
+            RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+            break;
+        case (uint32_t)GPIOE:
+            RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+            break;
+        case (uint32_t)GPIOF:
+            RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOF, ENABLE);
+            break;
+        case (uint32_t)GPIOG:
+            RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE);
+            break;
+        case (uint32_t)GPIOH:
+            RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOH, ENABLE);
+            break;
+        case (uint32_t)GPIOI:
+            RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOI, ENABLE);
+            break;
+        default:
+            PIOS_Assert(0);
+            break;
+        }*/
+
+        if (gpio->remap) {
+            GPIO_PinAFConfig(gpio->pin.gpio, gpio->pin.init.GPIO_Pin, gpio->remap);
+        }
+
+        GPIO_Init(gpio->pin.gpio, &gpio->pin.init);
+
+        PIOS_GPIO_Off(*gpios_dev_id, i);
+    }
+
+    return 0;
 }
 
 /**
-* Enable a GPIO Pin
-* \param[in] Pin Pin Number
-*/
-void PIOS_GPIO_Enable(uint8_t Pin)
+ * Turn on GPIO
+ * \param[in] GPIO GPIO id
+ */
+void PIOS_GPIO_On(uint32_t gpios_dev_id, uint8_t gpio_id)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-	GPIO_InitStructure.GPIO_Pin = GPIO_PIN[Pin];
-	GPIO_Init(GPIO_PORT[Pin], &GPIO_InitStructure);
+    const struct pios_gpio_cfg *gpio_cfg = (const struct pios_gpio_cfg *)gpios_dev_id;
 
-	/* GPIO's Off */
-	PIOS_GPIO_Off(Pin);
+    PIOS_Assert(gpio_cfg);
+
+    if (gpio_id >= gpio_cfg->num_gpios) {
+        /* GPIO index out of range */
+        return;
+    }
+
+    const struct pios_gpio *gpio = &(gpio_cfg->gpios[gpio_id]);
+
+    if (gpio->active_low) {
+        GPIO_ResetBits(gpio->pin.gpio, gpio->pin.init.GPIO_Pin);
+    } else {
+        GPIO_SetBits(gpio->pin.gpio, gpio->pin.init.GPIO_Pin);
+    }
 }
 
 /**
-* Turn on Pin
-* \param[in] Pin Pin Number
-*/
-void PIOS_GPIO_On(uint8_t Pin)
+ * Turn off GPIO
+ * \param[in] GPIO GPIO id
+ */
+void PIOS_GPIO_Off(uint32_t gpios_dev_id, uint8_t gpio_id)
 {
-	GPIO_ResetBits(GPIO_PORT[Pin], GPIO_PIN[Pin]);
+    const struct pios_gpio_cfg *gpio_cfg = (const struct pios_gpio_cfg *)gpios_dev_id;
+
+    PIOS_Assert(gpio_cfg);
+
+    if (gpio_id >= gpio_cfg->num_gpios) {
+        /* GPIO index out of range */
+        return;
+    }
+
+    const struct pios_gpio *gpio = &(gpio_cfg->gpios[gpio_id]);
+
+    if (gpio->active_low) {
+        GPIO_SetBits(gpio->pin.gpio, gpio->pin.init.GPIO_Pin);
+    } else {
+        GPIO_ResetBits(gpio->pin.gpio, gpio->pin.init.GPIO_Pin);
+    }
 }
 
 /**
-* Turn off Pin
-* \param[in] Pin Pin Number
-*/
-void PIOS_GPIO_Off(uint8_t Pin)
+ * Toggle GPIO on/off
+ * \param[in] GPIO GPIO id
+ */
+void PIOS_GPIO_Toggle(uint32_t gpios_dev_id, uint8_t gpio_id)
 {
-	GPIO_SetBits(GPIO_PORT[Pin], GPIO_PIN[Pin]);
+    const struct pios_gpio_cfg *gpio_cfg = (const struct pios_gpio_cfg *)gpios_dev_id;
+
+    PIOS_Assert(gpio_cfg);
+
+    if (gpio_id >= gpio_cfg->num_gpios) {
+        /* GPIO index out of range */
+        return;
+    }
+
+    const struct pios_gpio *gpio = &(gpio_cfg->gpios[gpio_id]);
+
+    if (GPIO_ReadOutputDataBit(gpio->pin.gpio, gpio->pin.init.GPIO_Pin) == Bit_SET) {
+        if (gpio->active_low) {
+            PIOS_GPIO_On(gpios_dev_id, gpio_id);
+        } else {
+            PIOS_GPIO_Off(gpios_dev_id, gpio_id);
+        }
+    } else {
+        if (gpio->active_low) {
+            PIOS_GPIO_Off(gpios_dev_id, gpio_id);
+        } else {
+            PIOS_GPIO_On(gpios_dev_id, gpio_id);
+        }
+    }
 }
 
-/**
-* Toggle Pin on/off
-* \param[in] Pin Pin Number
-*/
-void PIOS_GPIO_Toggle(uint8_t Pin)
-{
-	GPIO_ToggleBits(GPIO_PORT[Pin], GPIO_PIN[Pin]);
-}
-
-#endif
+#endif /* PIOS_INCLUDE_GPIO */
 
 /**
-  * @}
-  * @}
-  */
+ * @}
+ * @}
+ */

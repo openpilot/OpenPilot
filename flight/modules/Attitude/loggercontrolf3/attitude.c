@@ -175,8 +175,6 @@ MODULE_INITCALL(AttitudeInitialize, AttitudeStart);
  * Module thread, should not return.
  */
 
-int32_t accel_test;
-int32_t gyro_test;
 static void AttitudeTask(__attribute__((unused)) void *parameters)
 {
     uint8_t init = 0;
@@ -291,9 +289,9 @@ static int32_t updateSensorsCC3D(AccelStateData *accelStateData, GyroStateData *
         return -1; // Error, no data
     }
     // Do not read raw sensor data in simulation mode
-    if (GyrosReadOnly() || AccelsReadOnly()) {
+   /* if (GyrosReadOnly() || AccelsReadOnly()) {
         return 0;
-    }
+    }*/
 
     gyros[0]  = mpu6050_data.gyro_x * PIOS_MPU6050_GetScale();
     gyros[1]  = mpu6050_data.gyro_y * PIOS_MPU6050_GetScale();

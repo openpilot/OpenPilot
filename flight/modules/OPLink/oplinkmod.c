@@ -149,6 +149,7 @@ static void systemTask(__attribute__((unused)) void *parameters)
         struct rfm22b_stats radio_stats;
         PIOS_RFM22B_GetStats(pios_rfm22b_id, &radio_stats);
 
+        if (pios_rfm22b_id) {
         // Update the status
         oplinkStatus.HeapRemaining = xPortGetFreeHeapSize();
         oplinkStatus.DeviceID = PIOS_RFM22B_DeviceID(pios_rfm22b_id);
@@ -179,6 +180,11 @@ static void systemTask(__attribute__((unused)) void *parameters)
         oplinkStatus.TXSeq     = radio_stats.tx_seq;
         oplinkStatus.RXSeq     = radio_stats.rx_seq;
         oplinkStatus.LinkState = radio_stats.link_state;
+
+        } else {
+            oplinkStatus.LinkState = OPLINKSTATUS_LINKSTATE_DISABLED;
+        }
+
         if (radio_stats.link_state == OPLINKSTATUS_LINKSTATE_CONNECTED) {
             LINK_LED_ON;
         } else {

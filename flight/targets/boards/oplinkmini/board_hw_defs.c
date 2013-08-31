@@ -27,7 +27,7 @@
 #if defined(PIOS_INCLUDE_LED)
 
 #include <pios_led_priv.h>
-static const struct pios_led pios_leds[] = {
+static const struct pios_gpio pios_leds[] = {
     [PIOS_LED_USB] =  {
         .pin                =        {
             .gpio = GPIOA,
@@ -37,6 +37,7 @@ static const struct pios_led pios_leds[] = {
                 .GPIO_Speed = GPIO_Speed_50MHz,
             },
         },
+        .active_low         = true
     },
     [PIOS_LED_LINK] = {
         .pin                =        {
@@ -47,6 +48,7 @@ static const struct pios_led pios_leds[] = {
                 .GPIO_Speed = GPIO_Speed_50MHz,
             },
         },
+        .active_low         = true
     },
     [PIOS_LED_RX] =   {
         .pin                =        {
@@ -57,6 +59,7 @@ static const struct pios_led pios_leds[] = {
                 .GPIO_Speed = GPIO_Speed_50MHz,
             },
         },
+        .active_low         = true
     },
     [PIOS_LED_TX] =   {
         .pin                =        {
@@ -67,6 +70,7 @@ static const struct pios_led pios_leds[] = {
                 .GPIO_Speed = GPIO_Speed_50MHz,
             },
         },
+        .active_low         = true
     },
 #ifdef PIOS_RFM22B_DEBUG_ON_TELEM
     [PIOS_LED_D1] =   {
@@ -112,12 +116,12 @@ static const struct pios_led pios_leds[] = {
 #endif /* ifdef PIOS_RFM22B_DEBUG_ON_TELEM */
 };
 
-static const struct pios_led_cfg pios_led_cfg = {
-    .leds     = pios_leds,
-    .num_leds = NELEMENTS(pios_leds),
+static const struct pios_gpio_cfg pios_led_cfg = {
+    .gpios     = pios_leds,
+    .num_gpios = NELEMENTS(pios_leds),
 };
 
-const struct pios_led_cfg *PIOS_BOARD_HW_DEFS_GetLedCfg(__attribute__((unused)) uint32_t board_revision)
+const struct pios_gpio_cfg *PIOS_BOARD_HW_DEFS_GetLedCfg(__attribute__((unused)) uint32_t board_revision)
 {
     return &pios_led_cfg;
 }

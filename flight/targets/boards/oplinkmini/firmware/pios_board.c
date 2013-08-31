@@ -485,7 +485,6 @@ void PIOS_Board_Init(void)
 #ifdef PIOS_INCLUDE_ADC
     PIOS_ADC_Init();
 #endif
-    PIOS_GPIO_Init();
 }
 
 static void PIOS_Board_PPM_callback(const int16_t *channels)

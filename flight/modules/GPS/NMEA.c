@@ -249,6 +249,7 @@ static bool NMEA_parse_real(int32_t *whole, uint32_t *fract, uint8_t *fract_unit
     PIOS_DEBUG_Assert(whole);
     PIOS_DEBUG_Assert(fract);
     PIOS_DEBUG_Assert(fract_units);
+    PIOS_DEBUG_Assert(field);
 
     field_w = strsep(&s, ".");
     field_f = s;
@@ -273,9 +274,6 @@ static float NMEA_real_to_float(char *nmea_real)
     int32_t whole;
     uint32_t fract;
     uint8_t fract_units;
-
-    /* Sanity checks */
-    PIOS_DEBUG_Assert(nmea_real);
 
     if (!NMEA_parse_real(&whole, &fract, &fract_units, nmea_real)) {
         return false;

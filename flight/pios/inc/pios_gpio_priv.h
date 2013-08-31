@@ -2,13 +2,13 @@
  ******************************************************************************
  * @addtogroup PIOS PIOS Core hardware abstraction layer
  * @{
- * @addtogroup   PIOS_LED LED Functions
- * @brief PIOS interface for LEDs
+ * @addtogroup   PIOS_GPIO GPIO Functions
+ * @brief PIOS interface for GPIOss
  * @{
  *
- * @file       pios_led_priv.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @brief      LED private definitions.
+ * @file       pios_gpio_priv.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
+ * @brief      GPIO private definitions.
  * @see        The GNU Public License (GPL) Version 3
  *
  *****************************************************************************/
@@ -28,14 +28,26 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef PIOS_LED_PRIV_H
-#define PIOS_LED_PRIV_H
+#ifndef PIOS_GPIO_PRIV_H
+#define PIOS_GPIO_PRIV_H
 
-#include <pios_gpio_priv.h>
+#include <pios.h>
+#include <pios_stm32.h>
 
-extern int32_t PIOS_LED_Init(const struct pios_gpio_cfg *cfg);
+struct pios_gpio {
+    struct stm32_gpio pin;
+    uint32_t remap;
+    bool active_low;
+};
 
-#endif /* PIOS_LED_PRIV_H */
+struct pios_gpio_cfg {
+    const struct pios_gpio *gpios;
+    uint8_t num_gpios;
+};
+
+extern int32_t PIOS_GPIO_Init(uint32_t *gpios_dev_id, const struct pios_gpio_cfg *cfg);
+
+#endif /* PIOS_GPIO_PRIV_H */
 
 /**
  * @}

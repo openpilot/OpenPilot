@@ -609,17 +609,17 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
     zero_during_arming = attitudeSettings.ZeroDuringArming == ATTITUDESETTINGS_ZERODURINGARMING_TRUE;
     bias_correct_gyro  = attitudeSettings.BiasCorrectGyro == ATTITUDESETTINGS_BIASCORRECTGYRO_TRUE;
 
-    accelbias[0] = attitudeSettings.AccelBias.fields.X;
-    accelbias[1] = attitudeSettings.AccelBias.fields.Y;
-    accelbias[2] = attitudeSettings.AccelBias.fields.Z;
+    accelbias[0] = attitudeSettings.AccelBias.X;
+    accelbias[1] = attitudeSettings.AccelBias.Y;
+    accelbias[2] = attitudeSettings.AccelBias.Z;
 
-    gyro_correct_int[0] = attitudeSettings.GyroBias.fields.X / 100.0f;
-    gyro_correct_int[1] = attitudeSettings.GyroBias.fields.Y / 100.0f;
-    gyro_correct_int[2] = attitudeSettings.GyroBias.fields.Z / 100.0f;
+    gyro_correct_int[0] = attitudeSettings.GyroBias.X / 100.0f;
+    gyro_correct_int[1] = attitudeSettings.GyroBias.Y / 100.0f;
+    gyro_correct_int[2] = attitudeSettings.GyroBias.Z / 100.0f;
 
     // Indicates not to expend cycles on rotation
-    if (attitudeSettings.BoardRotation.fields.Pitch == 0 && attitudeSettings.BoardRotation.fields.Roll == 0 &&
-        attitudeSettings.BoardRotation.fields.Yaw == 0) {
+    if (attitudeSettings.BoardRotation.Pitch == 0 && attitudeSettings.BoardRotation.Roll == 0 &&
+        attitudeSettings.BoardRotation.Yaw == 0) {
         rotate = 0;
 
         // Shouldn't be used but to be safe
@@ -627,9 +627,9 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         Quaternion2R(rotationQuat, R);
     } else {
         float rotationQuat[4];
-        const float rpy[3] = { attitudeSettings.BoardRotation.fields.Roll,
-                               attitudeSettings.BoardRotation.fields.Pitch,
-                               attitudeSettings.BoardRotation.fields.Yaw };
+        const float rpy[3] = { attitudeSettings.BoardRotation.Roll,
+                               attitudeSettings.BoardRotation.Pitch,
+                               attitudeSettings.BoardRotation.Yaw };
         RPY2Quaternion(rpy, rotationQuat);
         Quaternion2R(rotationQuat, R);
         rotate = 1;
@@ -643,10 +643,10 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         trim_requested = true;
     } else if (attitudeSettings.TrimFlight == ATTITUDESETTINGS_TRIMFLIGHT_LOAD) {
         trim_requested = false;
-        attitudeSettings.AccelBias.fields.X = trim_accels[0] / trim_samples;
-        attitudeSettings.AccelBias.fields.Y = trim_accels[1] / trim_samples;
+        attitudeSettings.AccelBias.X = trim_accels[0] / trim_samples;
+        attitudeSettings.AccelBias.Y = trim_accels[1] / trim_samples;
         // Z should average -grav
-        attitudeSettings.AccelBias.fields.Z = trim_accels[2] / trim_samples + GRAV / ACCEL_SCALE;
+        attitudeSettings.AccelBias.Z = trim_accels[2] / trim_samples + GRAV / ACCEL_SCALE;
         attitudeSettings.TrimFlight = ATTITUDESETTINGS_TRIMFLIGHT_NORMAL;
         AttitudeSettingsSet(&attitudeSettings);
     } else {

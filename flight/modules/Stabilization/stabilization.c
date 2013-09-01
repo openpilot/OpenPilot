@@ -32,7 +32,7 @@
  */
 
 #include <openpilot.h>
-
+#include <pios_struct_helper.h>
 #include "stabilization.h"
 #include "stabilizationsettings.h"
 #include "actuatordesired.h"
@@ -201,11 +201,11 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         } else {
             // scale the factor to be 1.0 at the specified airspeed (for example 10m/s) but scaled by 1/speed^2
             speedScaleFactor = (settings.ScaleToAirspeed * settings.ScaleToAirspeed) / (airspeedState.CalibratedAirspeed * airspeedState.CalibratedAirspeed);
-            if (speedScaleFactor < settings.ScaleToAirspeedLimits[STABILIZATIONSETTINGS_SCALETOAIRSPEEDLIMITS_MIN]) {
-                speedScaleFactor = settings.ScaleToAirspeedLimits[STABILIZATIONSETTINGS_SCALETOAIRSPEEDLIMITS_MIN];
+            if (speedScaleFactor < settings.ScaleToAirspeedLimits.Min) {
+                speedScaleFactor = settings.ScaleToAirspeedLimits.Min;
             }
-            if (speedScaleFactor > settings.ScaleToAirspeedLimits[STABILIZATIONSETTINGS_SCALETOAIRSPEEDLIMITS_MAX]) {
-                speedScaleFactor = settings.ScaleToAirspeedLimits[STABILIZATIONSETTINGS_SCALETOAIRSPEEDLIMITS_MAX];
+            if (speedScaleFactor > settings.ScaleToAirspeedLimits.Max) {
+                speedScaleFactor = settings.ScaleToAirspeedLimits.Max;
             }
         }
 #else
@@ -220,19 +220,19 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         float local_error[3];
 
         // Essentially zero errors for anything in rate or none
-        if (stabDesired.StabilizationMode.fields.Roll == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
+        if (stabDesired.StabilizationMode.Roll == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
             rpy_desired[0] = stabDesired.Roll;
         } else {
             rpy_desired[0] = attitudeState.Roll;
         }
 
-        if (stabDesired.StabilizationMode.fields.Pitch == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
+        if (stabDesired.StabilizationMode.Pitch == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
             rpy_desired[1] = stabDesired.Pitch;
         } else {
             rpy_desired[1] = attitudeState.Pitch;
         }
 
-        if (stabDesired.StabilizationMode.fields.Yaw == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
+        if (stabDesired.StabilizationMode.Yaw == STABILIZATIONDESIRED_STABILIZATIONMODE_ATTITUDE) {
             rpy_desired[2] = stabDesired.Yaw;
         } else {
             rpy_desired[2] = attitudeState.Yaw;
@@ -276,18 +276,19 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
         // Run the selected stabilization algorithm on each axis:
         for (uint8_t i = 0; i < MAX_AXES; i++) {
             // Check whether this axis mode needs to be reinitialized
-            bool reinit = (stabDesired.StabilizationMode.data[i] != previous_mode[i]);
-            previous_mode[i] = stabDesired.StabilizationMode.data[i];
+            bool reinit = (cast_struct_to_array(stabDesired.StabilizationMode, stabDesired.StabilizationMode.Roll)[i] != previous_mode[i]);
+            previous_mode[i] = cast_struct_to_array(stabDesired.StabilizationMode, stabDesired.StabilizationMode.Roll)[i];
 
             // Apply the selected control law
-            switch (stabDesired.StabilizationMode.data[i]) {
+            switch (cast_struct_to_array(stabDesired.StabilizationMode, stabDesired.StabilizationMode.Roll)[i]) {
             case STABILIZATIONDESIRED_STABILIZATIONMODE_RATE:
                 if (reinit) {
                     pids[PID_RATE_ROLL + i].iAccumulator = 0;
                 }
 
                 // Store to rate desired variable for storing to UAVO
-                rateDesiredAxis[i]     = bound(attitudeDesiredAxis[i], settings.ManualRate.data[i]);
+                rateDesiredAxis[i] =
+                    bound(attitudeDesiredAxis[i], cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
 
                 // Compute the inner loop
                 actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
@@ -302,8 +303,9 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                 }
 
                 // Compute the outer loop
-                rateDesiredAxis[i]     = pid_apply(&pids[PID_ROLL + i], local_error[i], dT);
-                rateDesiredAxis[i]     = bound(rateDesiredAxis[i], settings.MaximumRate.data[i]);
+                rateDesiredAxis[i] = pid_apply(&pids[PID_ROLL + i], local_error[i], dT);
+                rateDesiredAxis[i] = bound(rateDesiredAxis[i],
+                                           cast_struct_to_array(settings.MaximumRate, settings.MaximumRate.Roll)[i]);
 
                 // Compute the inner loop
                 actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
@@ -354,7 +356,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
                     rateDesiredAxis[i]  = pid_apply(&pids[PID_ROLL + i], axis_lock_accum[i], dT);
                 }
 
-                rateDesiredAxis[i]     = bound(rateDesiredAxis[i], settings.ManualRate.data[i]);
+                rateDesiredAxis[i]     = bound(rateDesiredAxis[i],
+                                               cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
 
                 actuatorDesiredAxis[i] = pid_apply_setpoint(&pids[PID_RATE_ROLL + i], speedScaleFactor, rateDesiredAxis[i], gyro_filtered[i], dT);
                 actuatorDesiredAxis[i] = bound(actuatorDesiredAxis[i], 1.0f);
@@ -363,7 +366,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
             case STABILIZATIONDESIRED_STABILIZATIONMODE_RELAYRATE:
                 // Store to rate desired variable for storing to UAVO
-                rateDesiredAxis[i] = bound(attitudeDesiredAxis[i], settings.ManualRate.data[i]);
+                rateDesiredAxis[i] = bound(attitudeDesiredAxis[i],
+                                           cast_struct_to_array(settings.ManualRate, settings.ManualRate.Roll)[i]);
 
                 // Run the relay controller which also estimates the oscillation parameters
                 stabilization_relay_rate(rateDesiredAxis[i] - gyro_filtered[i], &actuatorDesiredAxis[i], i, reinit);
@@ -378,7 +382,8 @@ static void stabilizationTask(__attribute__((unused)) void *parameters)
 
                 // Compute the outer loop like attitude mode
                 rateDesiredAxis[i] = pid_apply(&pids[PID_ROLL + i], local_error[i], dT);
-                rateDesiredAxis[i] = bound(rateDesiredAxis[i], settings.MaximumRate.data[i]);
+                rateDesiredAxis[i] = bound(rateDesiredAxis[i],
+                                           cast_struct_to_array(settings.MaximumRate, settings.MaximumRate.Roll)[i]);
 
                 // Run the relay controller which also estimates the oscillation parameters
                 stabilization_relay_rate(rateDesiredAxis[i] - gyro_filtered[i], &actuatorDesiredAxis[i], i, reinit);
@@ -484,37 +489,37 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     StabilizationSettingsGet(&settings);
 
     // Set the roll rate PID constants
-    pid_configure(&pids[PID_RATE_ROLL], settings.RollRatePID.fields.Kp,
-                  settings.RollRatePID.fields.Ki,
-                  pids[PID_RATE_ROLL].d = settings.RollRatePID.fields.Kd,
-                  pids[PID_RATE_ROLL].iLim = settings.RollRatePID.fields.ILimit);
+    pid_configure(&pids[PID_RATE_ROLL], settings.RollRatePID.Kp,
+                  settings.RollRatePID.Ki,
+                  pids[PID_RATE_ROLL].d = settings.RollRatePID.Kd,
+                  pids[PID_RATE_ROLL].iLim = settings.RollRatePID.ILimit);
 
     // Set the pitch rate PID constants
-    pid_configure(&pids[PID_RATE_PITCH], settings.PitchRatePID.fields.Kp,
-                  pids[PID_RATE_PITCH].i = settings.PitchRatePID.fields.Ki,
-                  pids[PID_RATE_PITCH].d = settings.PitchRatePID.fields.Kd,
-                  pids[PID_RATE_PITCH].iLim = settings.PitchRatePID.fields.ILimit);
+    pid_configure(&pids[PID_RATE_PITCH], settings.PitchRatePID.Kp,
+                  pids[PID_RATE_PITCH].i = settings.PitchRatePID.Ki,
+                  pids[PID_RATE_PITCH].d = settings.PitchRatePID.Kd,
+                  pids[PID_RATE_PITCH].iLim = settings.PitchRatePID.ILimit);
 
     // Set the yaw rate PID constants
-    pid_configure(&pids[PID_RATE_YAW], settings.YawRatePID.fields.Kp,
-                  pids[PID_RATE_YAW].i = settings.YawRatePID.fields.Ki,
-                  pids[PID_RATE_YAW].d = settings.YawRatePID.fields.Kd,
-                  pids[PID_RATE_YAW].iLim = settings.YawRatePID.fields.ILimit);
+    pid_configure(&pids[PID_RATE_YAW], settings.YawRatePID.Kp,
+                  pids[PID_RATE_YAW].i = settings.YawRatePID.Ki,
+                  pids[PID_RATE_YAW].d = settings.YawRatePID.Kd,
+                  pids[PID_RATE_YAW].iLim = settings.YawRatePID.ILimit);
 
     // Set the roll attitude PI constants
-    pid_configure(&pids[PID_ROLL], settings.RollPI.fields.Kp,
-                  settings.RollPI.fields.Ki, 0,
-                  pids[PID_ROLL].iLim = settings.RollPI.fields.ILimit);
+    pid_configure(&pids[PID_ROLL], settings.RollPI.Kp,
+                  settings.RollPI.Ki, 0,
+                  pids[PID_ROLL].iLim = settings.RollPI.ILimit);
 
     // Set the pitch attitude PI constants
-    pid_configure(&pids[PID_PITCH], settings.PitchPI.fields.Kp,
-                  pids[PID_PITCH].i = settings.PitchPI.fields.Ki, 0,
-                  settings.PitchPI.fields.ILimit);
+    pid_configure(&pids[PID_PITCH], settings.PitchPI.Kp,
+                  pids[PID_PITCH].i = settings.PitchPI.Ki, 0,
+                  settings.PitchPI.ILimit);
 
     // Set the yaw attitude PI constants
-    pid_configure(&pids[PID_YAW], settings.YawPI.fields.Kp,
-                  settings.YawPI.fields.Ki, 0,
-                  settings.YawPI.fields.ILimit);
+    pid_configure(&pids[PID_YAW], settings.YawPI.Kp,
+                  settings.YawPI.Ki, 0,
+                  settings.YawPI.ILimit);
 
     // Set up the derivative term
     pid_configure_derivative(settings.DerivativeCutoff, settings.DerivativeGamma);
@@ -531,9 +536,9 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
     lowThrottleZeroIntegral    = settings.LowThrottleZeroIntegral == STABILIZATIONSETTINGS_LOWTHROTTLEZEROINTEGRAL_TRUE;
 
     // Whether to suppress (zero) the StabilizationDesired output for each axis while disarmed or throttle is low
-    lowThrottleZeroAxis[ROLL]  = settings.LowThrottleZeroAxis.fields.Roll == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
-    lowThrottleZeroAxis[PITCH] = settings.LowThrottleZeroAxis.fields.Pitch == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
-    lowThrottleZeroAxis[YAW]   = settings.LowThrottleZeroAxis.fields.Yaw == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
+    lowThrottleZeroAxis[ROLL]  = settings.LowThrottleZeroAxis.Roll == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
+    lowThrottleZeroAxis[PITCH] = settings.LowThrottleZeroAxis.Pitch == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
+    lowThrottleZeroAxis[YAW]   = settings.LowThrottleZeroAxis.Yaw == STABILIZATIONSETTINGS_LOWTHROTTLEZEROAXIS_TRUE;
 
     // The dT has some jitter iteration to iteration that we don't want to
     // make thie result unpredictable.  Still, it's nicer to specify the constant

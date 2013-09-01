@@ -2219,8 +2219,8 @@ void updateGraphics()
 
         /* Draw Attitude Indicator */
         if (OsdSettings.Attitude == OSDSETTINGS_ATTITUDE_ENABLED) {
-            drawAttitude(APPLY_HDEADBAND(OsdSettings.AttitudeSetup.fields.X),
-                         APPLY_VDEADBAND(OsdSettings.AttitudeSetup.fields.Y), attitude.Pitch, attitude.Roll, 96);
+            drawAttitude(APPLY_HDEADBAND(OsdSettings.AttitudeSetup.X),
+                         APPLY_VDEADBAND(OsdSettings.AttitudeSetup.Y), attitude.Pitch, attitude.Roll, 96);
         }
         // write_string("Hello OP-OSD", 60, 12, 1, 0, TEXT_VA_TOP, TEXT_HA_LEFT, 0, 0);
         // printText16( 60, 12,"Hello OP-OSD");
@@ -2239,7 +2239,7 @@ void updateGraphics()
 
         /* Print RTC time */
         if (OsdSettings.Time == OSDSETTINGS_TIME_ENABLED) {
-            printTime(APPLY_HDEADBAND(OsdSettings.TimeSetup.fields.X), APPLY_VDEADBAND(OsdSettings.TimeSetup.fields.Y));
+            printTime(APPLY_HDEADBAND(OsdSettings.TimeSetup.X), APPLY_VDEADBAND(OsdSettings.TimeSetup.Y));
         }
 
         /* Print Number of detected video Lines */
@@ -2292,22 +2292,22 @@ void updateGraphics()
         // drawArrow(96,GRAPHICS_HEIGHT_REAL/2,angleB,32);
         // Draw airspeed (left side.)
         if (OsdSettings.Speed == OSDSETTINGS_SPEED_ENABLED) {
-            hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, APPLY_HDEADBAND(OsdSettings.SpeedSetup.fields.X),
-                                    APPLY_VDEADBAND(OsdSettings.SpeedSetup.fields.Y), 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
+            hud_draw_vertical_scale((int)gpsData.Groundspeed, 100, -1, APPLY_HDEADBAND(OsdSettings.SpeedSetup.X),
+                                    APPLY_VDEADBAND(OsdSettings.SpeedSetup.Y), 100, 10, 20, 7, 12, 15, 1000, HUD_VSCALE_FLAG_NO_NEGATIVE);
         }
         // Draw altimeter (right side.)
         if (OsdSettings.Altitude == OSDSETTINGS_ALTITUDE_ENABLED) {
-            hud_draw_vertical_scale((int)gpsData.Altitude, 200, +1, APPLY_HDEADBAND(OsdSettings.AltitudeSetup.fields.X),
-                                    APPLY_VDEADBAND(OsdSettings.AltitudeSetup.fields.Y), 100, 20, 100, 7, 12, 15, 500, 0);
+            hud_draw_vertical_scale((int)gpsData.Altitude, 200, +1, APPLY_HDEADBAND(OsdSettings.AltitudeSetup.X),
+                                    APPLY_VDEADBAND(OsdSettings.AltitudeSetup.Y), 100, 20, 100, 7, 12, 15, 500, 0);
         }
         // Draw compass.
         if (OsdSettings.Heading == OSDSETTINGS_HEADING_ENABLED) {
             if (attitude.Yaw < 0) {
-                hud_draw_linear_compass(360 + attitude.Yaw, 150, 120, APPLY_HDEADBAND(OsdSettings.HeadingSetup.fields.X),
-                                        APPLY_VDEADBAND(OsdSettings.HeadingSetup.fields.Y), 15, 30, 7, 12, 0);
+                hud_draw_linear_compass(360 + attitude.Yaw, 150, 120, APPLY_HDEADBAND(OsdSettings.HeadingSetup.X),
+                                        APPLY_VDEADBAND(OsdSettings.HeadingSetup.Y), 15, 30, 7, 12, 0);
             } else {
-                hud_draw_linear_compass(attitude.Yaw, 150, 120, APPLY_HDEADBAND(OsdSettings.HeadingSetup.fields.X),
-                                        APPLY_VDEADBAND(OsdSettings.HeadingSetup.fields.Y), 15, 30, 7, 12, 0);
+                hud_draw_linear_compass(attitude.Yaw, 150, 120, APPLY_HDEADBAND(OsdSettings.HeadingSetup.X),
+                                        APPLY_VDEADBAND(OsdSettings.HeadingSetup.Y), 15, 30, 7, 12, 0);
             }
         }
     }

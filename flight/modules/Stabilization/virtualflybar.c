@@ -32,6 +32,7 @@
 
 #include "openpilot.h"
 #include <pios_math.h>
+#include <pios_struct_helper.h>
 #include "stabilization.h"
 #include "stabilizationsettings.h"
 
@@ -64,23 +65,23 @@ int stabilization_virtual_flybar(float gyro, float command, float *output, float
     // Get the settings for the correct axis
     switch (axis) {
     case ROLL:
-        kp = settings->VbarRollPI.fields.Kp;
-        ki = settings->VbarRollPI.fields.Ki;
+        kp = settings->VbarRollPI.Kp;
+        ki = settings->VbarRollPI.Ki;
         break;
     case PITCH:
-        kp = settings->VbarPitchPI.fields.Kp;
-        ki = settings->VbarPitchPI.fields.Ki;;
+        kp = settings->VbarPitchPI.Kp;
+        ki = settings->VbarPitchPI.Ki;;
         break;
     case YAW:
-        kp = settings->VbarYawPI.fields.Kp;
-        ki = settings->VbarYawPI.fields.Ki;
+        kp = settings->VbarYawPI.Kp;
+        ki = settings->VbarYawPI.Ki;
         break;
     default:
         PIOS_DEBUG_Assert(0);
     }
 
     // Command signal is composed of stick input added to the gyro and virtual flybar
-    *output = command * settings->VbarSensitivity.data[axis] -
+    *output = command * cast_struct_to_array(settings->VbarSensitivity, settings->VbarSensitivity.Roll)[axis] -
               gyro_gain * (vbar_integral[axis] * ki + gyro * kp);
 
     return 0;

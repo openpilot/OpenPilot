@@ -39,9 +39,10 @@
  */
 
 #include <openpilot.h>
-
+#include <pios_struct_helper.h>
 // private includes
 #include "inc/systemmod.h"
+
 
 // UAVOs
 #include <objectpersistence.h>
@@ -433,9 +434,9 @@ static void taskMonitorForEachCallback(uint16_t task_id, const struct pios_task_
     // By convention, there is a direct mapping between task monitor task_id's and members
     // of the TaskInfoXXXXElem enums
     PIOS_DEBUG_Assert(task_id < TASKINFO_RUNNING_NUMELEM);
-    taskData->Running.data[task_id]        = task_info->is_running ? TASKINFO_RUNNING_TRUE : TASKINFO_RUNNING_FALSE;
-    taskData->StackRemaining.data[task_id] = task_info->stack_remaining;
-    taskData->RunningTime.data[task_id]    = task_info->running_time_percentage;
+    cast_struct_to_array(taskData->Running, taskData->Running.System)[task_id] = task_info->is_running ? TASKINFO_RUNNING_TRUE : TASKINFO_RUNNING_FALSE;
+    ((uint16_t *)&taskData->StackRemaining)[task_id] = task_info->stack_remaining;
+    ((uint8_t *)&taskData->RunningTime)[task_id]     = task_info->running_time_percentage;
 }
 #endif
 

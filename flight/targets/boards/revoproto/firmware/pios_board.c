@@ -866,7 +866,7 @@ void PIOS_Board_Init(void)
     {
         HwSettingsData hwSettings;
         HwSettingsGet(&hwSettings);
-        if (hwSettings.OptionalModules.fields.Overo == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+        if (hwSettings.OptionalModules.Overo == HWSETTINGS_OPTIONALMODULES_ENABLED) {
             if (PIOS_OVERO_Init(&pios_overo_id, &pios_overo_cfg)) {
                 PIOS_DEBUG_Assert(0);
             }

@@ -422,38 +422,38 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
 {
     RevoCalibrationGet(&cal);
 
-    mag_bias[0]        = cal.mag_bias.fields.X;
-    mag_bias[1]        = cal.mag_bias.fields.Y;
-    mag_bias[2]        = cal.mag_bias.fields.Z;
-    mag_scale[0]       = cal.mag_scale.fields.X;
-    mag_scale[1]       = cal.mag_scale.fields.Y;
-    mag_scale[2]       = cal.mag_scale.fields.Z;
-    accel_bias[0]      = cal.accel_bias.fields.X;
-    accel_bias[1]      = cal.accel_bias.fields.Y;
-    accel_bias[2]      = cal.accel_bias.fields.Z;
-    accel_scale[0]     = cal.accel_scale.fields.X;
-    accel_scale[1]     = cal.accel_scale.fields.Y;
-    accel_scale[2]     = cal.accel_scale.fields.Z;
-    gyro_staticbias[0] = cal.gyro_bias.fields.X;
-    gyro_staticbias[1] = cal.gyro_bias.fields.Y;
-    gyro_staticbias[2] = cal.gyro_bias.fields.Z;
-    gyro_scale[0]      = cal.gyro_scale.fields.X;
-    gyro_scale[1]      = cal.gyro_scale.fields.Y;
-    gyro_scale[2]      = cal.gyro_scale.fields.Z;
+    mag_bias[0]        = cal.mag_bias.X;
+    mag_bias[1]        = cal.mag_bias.Y;
+    mag_bias[2]        = cal.mag_bias.Z;
+    mag_scale[0]       = cal.mag_scale.X;
+    mag_scale[1]       = cal.mag_scale.Y;
+    mag_scale[2]       = cal.mag_scale.Z;
+    accel_bias[0]      = cal.accel_bias.X;
+    accel_bias[1]      = cal.accel_bias.Y;
+    accel_bias[2]      = cal.accel_bias.Z;
+    accel_scale[0]     = cal.accel_scale.X;
+    accel_scale[1]     = cal.accel_scale.Y;
+    accel_scale[2]     = cal.accel_scale.Z;
+    gyro_staticbias[0] = cal.gyro_bias.X;
+    gyro_staticbias[1] = cal.gyro_bias.Y;
+    gyro_staticbias[2] = cal.gyro_bias.Z;
+    gyro_scale[0]      = cal.gyro_scale.X;
+    gyro_scale[1]      = cal.gyro_scale.Y;
+    gyro_scale[2]      = cal.gyro_scale.Z;
 
 
     AttitudeSettingsData attitudeSettings;
     AttitudeSettingsGet(&attitudeSettings);
 
     // Indicates not to expend cycles on rotation
-    if (attitudeSettings.BoardRotation.fields.Roll == 0 && attitudeSettings.BoardRotation.fields.Pitch == 0 &&
-        attitudeSettings.BoardRotation.fields.Yaw == 0) {
+    if (attitudeSettings.BoardRotation.Roll == 0 && attitudeSettings.BoardRotation.Pitch == 0 &&
+        attitudeSettings.BoardRotation.Yaw == 0) {
         rotate = 0;
     } else {
         float rotationQuat[4];
-        const float rpy[3] = { attitudeSettings.BoardRotation.fields.Roll,
-                               attitudeSettings.BoardRotation.fields.Pitch,
-                               attitudeSettings.BoardRotation.fields.Yaw };
+        const float rpy[3] = { attitudeSettings.BoardRotation.Roll,
+                               attitudeSettings.BoardRotation.Pitch,
+                               attitudeSettings.BoardRotation.Yaw };
         RPY2Quaternion(rpy, rotationQuat);
         Quaternion2R(rotationQuat, R);
         rotate = 1;

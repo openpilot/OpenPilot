@@ -41,7 +41,7 @@
 #include "waypoint.h"
 #include "waypointactive.h"
 #include "taskinfo.h"
-
+#include <pios_struct_helper.h>
 #include "paths.h"
 
 // Private constants
@@ -227,9 +227,9 @@ void updatePathDesired(__attribute__((unused)) UAVObjEvent *ev)
     WaypointInstGet(waypointActiveData.Index, &waypointData);
     PathActionInstGet(waypointData.Action, &pathActionData);
 
-    pathDesired.End.fields.North  = waypointData.Position.fields.North;
-    pathDesired.End.fields.East   = waypointData.Position.fields.East;
-    pathDesired.End.fields.Down   = waypointData.Position.fields.Down;
+    pathDesired.End.North = waypointData.Position.North;
+    pathDesired.End.East  = waypointData.Position.East;
+    pathDesired.End.Down  = waypointData.Position.Down;
     pathDesired.EndingVelocity    = waypointData.Velocity;
     pathDesired.Mode = pathActionData.Mode;
     pathDesired.ModeParameters[0] = pathActionData.ModeParameters[0];
@@ -246,19 +246,19 @@ void updatePathDesired(__attribute__((unused)) UAVObjEvent *ev)
         /*pathDesired.Start[PATHDESIRED_START_NORTH] =  waypoint.Position[WAYPOINT_POSITION_NORTH];
            pathDesired.Start[PATHDESIRED_START_EAST] =  waypoint.Position[WAYPOINT_POSITION_EAST];
            pathDesired.Start[PATHDESIRED_START_DOWN] =  waypoint.Position[WAYPOINT_POSITION_DOWN];*/
-        pathDesired.Start.fields.North = positionState.North;
-        pathDesired.Start.fields.East  = positionState.East;
-        pathDesired.Start.fields.Down  = positionState.Down;
-        pathDesired.StartingVelocity   = pathDesired.EndingVelocity;
+        pathDesired.Start.North = positionState.North;
+        pathDesired.Start.East  = positionState.East;
+        pathDesired.Start.Down  = positionState.Down;
+        pathDesired.StartingVelocity = pathDesired.EndingVelocity;
     } else {
         // Get previous waypoint as start point
         WaypointData waypointPrev;
         WaypointInstGet(waypointActive.Index - 1, &waypointPrev);
 
-        pathDesired.Start.fields.North = waypointPrev.Position.fields.North;
-        pathDesired.Start.fields.East  = waypointPrev.Position.fields.East;
-        pathDesired.Start.fields.Down  = waypointPrev.Position.fields.Down;
-        pathDesired.StartingVelocity   = waypointPrev.Velocity;
+        pathDesired.Start.North = waypointPrev.Position.North;
+        pathDesired.Start.East  = waypointPrev.Position.East;
+        pathDesired.Start.Down  = waypointPrev.Position.Down;
+        pathDesired.StartingVelocity = waypointPrev.Velocity;
     }
     PathDesiredSet(&pathDesired);
 }
@@ -369,12 +369,12 @@ static uint8_t conditionDistanceToTarget()
 
     PositionStateGet(&positionState);
     if (pathAction.ConditionParameters[1] > 0.5f) {
-        distance = sqrtf(powf(waypoint.Position.fields.North - positionState.North, 2)
-                         + powf(waypoint.Position.fields.East - positionState.East, 2)
-                         + powf(waypoint.Position.fields.Down - positionState.Down, 2));
+        distance = sqrtf(powf(waypoint.Position.North - positionState.North, 2)
+                         + powf(waypoint.Position.East - positionState.East, 2)
+                         + powf(waypoint.Position.Down - positionState.Down, 2));
     } else {
-        distance = sqrtf(powf(waypoint.Position.fields.North - positionState.North, 2)
-                         + powf(waypoint.Position.fields.East - positionState.East, 2));
+        distance = sqrtf(powf(waypoint.Position.North - positionState.North, 2)
+                         + powf(waypoint.Position.East - positionState.East, 2));
     }
 
     if (distance <= pathAction.ConditionParameters[0]) {
@@ -400,7 +400,9 @@ static uint8_t conditionLegRemaining()
     float cur[3] = { positionState.North, positionState.East, positionState.Down };
     struct path_status progress;
 
-    path_progress(pathDesired.Start.data, pathDesired.End.data, cur, &progress, pathDesired.Mode);
+    path_progress(cast_struct_to_array(pathDesired.Start, pathDesired.Start.North),
+                  cast_struct_to_array(pathDesired.End, pathDesired.End.North),
+                  cur, &progress, pathDesired.Mode);
     if (progress.fractional_progress >= 1.0f - pathAction.ConditionParameters[0]) {
         return true;
     }
@@ -423,7 +425,9 @@ static uint8_t conditionBelowError()
     float cur[3] = { positionState.North, positionState.East, positionState.Down };
     struct path_status progress;
 
-    path_progress(pathDesired.Start.data, pathDesired.End.data, cur, &progress, pathDesired.Mode);
+    path_progress(cast_struct_to_array(pathDesired.Start, pathDesired.Start.North),
+                  cast_struct_to_array(pathDesired.End, pathDesired.End.North),
+                  cur, &progress, pathDesired.Mode);
     if (progress.error <= pathAction.ConditionParameters[0]) {
         return true;
     }
@@ -492,7 +496,7 @@ static uint8_t conditionPointingTowardsNext()
     WaypointData nextWaypoint;
     WaypointInstGet(nextWaypointId, &nextWaypoint);
 
-    float angle1 = atan2f((nextWaypoint.Position.fields.North - waypoint.Position.fields.North), (nextWaypoint.Position.fields.East - waypoint.Position.fields.East));
+    float angle1 = atan2f((nextWaypoint.Position.North - waypoint.Position.North), (nextWaypoint.Position.East - waypoint.Position.East));
 
     VelocityStateData velocity;
     VelocityStateGet(&velocity);

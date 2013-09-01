@@ -110,9 +110,9 @@ int32_t FixedWingPathFollowerStart()
 int32_t FixedWingPathFollowerInitialize()
 {
     HwSettingsInitialize();
-    uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
-    HwSettingsOptionalModulesGet(optionalModules);
-    if (optionalModules[HWSETTINGS_OPTIONALMODULES_FIXEDWINGPATHFOLLOWER] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+    HwSettingsOptionalModulesData optionalModules;
+    HwSettingsOptionalModulesGet(&optionalModules);
+    if (optionalModules.FixedWingPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) {
         followerEnabled = true;
         FixedWingPathFollowerSettingsInitialize();
         FixedWingPathFollowerStatusInitialize();

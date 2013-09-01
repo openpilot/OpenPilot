@@ -125,11 +125,11 @@ int32_t VtolPathFollowerStart()
  */
 int32_t VtolPathFollowerInitialize()
 {
-    uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+    HwSettingsOptionalModulesData optionalModules;
 
-    HwSettingsOptionalModulesGet(optionalModules);
+    HwSettingsOptionalModulesGet(&optionalModules);
 
-    if (optionalModules[HWSETTINGS_OPTIONALMODULES_VTOLPATHFOLLOWER] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+    if (optionalModules.VtolPathFollower == HWSETTINGS_OPTIONALMODULES_ENABLED) {
         VtolPathFollowerSettingsInitialize();
         NedAccelInitialize();
         PathDesiredInitialize();

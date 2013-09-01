@@ -647,7 +647,7 @@ static void settingsUpdatedCb(__attribute__((unused)) UAVObjEvent *objEv)
         attitudeSettings.AccelBias.Y = trim_accels[1] / trim_samples;
         // Z should average -grav
         attitudeSettings.AccelBias.Z = trim_accels[2] / trim_samples + GRAV / ACCEL_SCALE;
-        attitudeSettings.TrimFlight = ATTITUDESETTINGS_TRIMFLIGHT_NORMAL;
+        attitudeSettings.TrimFlight  = ATTITUDESETTINGS_TRIMFLIGHT_NORMAL;
         AttitudeSettingsSet(&attitudeSettings);
     } else {
         trim_requested = false;

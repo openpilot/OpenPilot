@@ -366,7 +366,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
         magData.z = 0.0f;
 #endif
         float magBias[3];
-        RevoCalibrationmag_biasGet(magBias);
+        RevoCalibrationmag_biasArrayGet(magBias);
         // don't trust Mag for initial orientation if it has not been calibrated
         if (magBias[0] < 1e-6f && magBias[1] < 1e-6f && magBias[2] < 1e-6f) {
             magCalibrated = false;

@@ -88,12 +88,12 @@ static float scale(float val, float inMin, float inMax, float outMin, float outM
 int32_t TxPIDInitialize(void)
 {
     bool txPIDEnabled;
-    uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+    HwSettingsOptionalModulesData optionalModules;
 
     HwSettingsInitialize();
-    HwSettingsOptionalModulesGet(optionalModules);
+    HwSettingsOptionalModulesGet(&optionalModules);
 
-    if (optionalModules[HWSETTINGS_OPTIONALMODULES_TXPID] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+    if (optionalModules.TxPID == HWSETTINGS_OPTIONALMODULES_ENABLED) {
         txPIDEnabled = true;
     } else {
         txPIDEnabled = false;

@@ -63,15 +63,17 @@ opHIDReadWorker::~opHIDReadWorker()
  */
 void opHIDReadWorker::stop()
 {
+    bool lock_obtained;
+
     OPHID_TRACE("IN");
 
     m_terminate = true;
 
     m_readBufMtx.unlock();
 
-    m_leaveSigMtx.lock();
+    lock_obtained = m_leaveSigMtx.tryLock(5000);
 
-    OPHID_DEBUG("Stopping the thread.");
+    OPHID_DEBUG("Stopping the thread (%d)", lock_obtained);
 
     emit finished();
 
@@ -93,13 +95,7 @@ void opHIDReadWorker::process()
     // Do not delete the device under our feet please.
     m_leaveSigMtx.lock();
 
-    while (1) {
-        // Quiting the thread properly.
-        if (m_terminate) {
-            OPHID_DEBUG("Ready to leave.");
-            m_leaveSigMtx.unlock();
-            break;
-        }
+    while (!m_terminate) {
 
         // Request MAX bytes since mecanism to know is not implemented yet.
         ret = m_hid->deviceInstanceGet()->receive(0,
@@ -115,14 +111,17 @@ void opHIDReadWorker::process()
             m_readBufMtx.unlock();
             emit m_hid->readyRead();
         } else if (ret == 0) {
-            OPHID_DEBUG("HID receive nothing.");
+            OPHID_DEBUG("Timeout!");
         } else {
-            OPHID_ERROR("HID receive failed (%d).", ret);
+            OPHID_ERROR("Device might be disconnected (%d).", ret);
+            m_terminate = true;
         }
     }
 
-    emit finished();
-
+    OPHID_DEBUG("Ready to leave.");
+    
+    m_leaveSigMtx.unlock();
+        
     OPHID_TRACE("OUT");
 }
 

@@ -317,8 +317,7 @@ int opHID_hidapi::send(int num, void *buf, int len, int timeout)
     if (tmp_timeout == 0) {
         tmp_timeout = 1;
     }
-    while (tmp_timeout-- && bytes_written < 0) {
-        //OPHID_ERROR("Timeout %d", tmp_timeout);
+    while (tmp_timeout-- && bytes_written <= 0) {
         bytes_written = hid_write(handle, (const unsigned char *)buf, len);
     }
     hid_write_Mtx.unlock();

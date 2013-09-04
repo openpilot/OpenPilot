@@ -135,7 +135,7 @@ bool opHID::deviceUnbind(void)
 
     // Stop reading from device Thread
     if (readWorker) {
-        readWorker->stop();
+        emit readWorker->stop();
         if (!readThread.wait(5000)) {
             OPHID_ERROR("Deadlock detected trying to stop read Thread!");
             readThread.terminate();
@@ -216,7 +216,7 @@ qint64 opHID::bytesAvailable() const
 {
     QMutexLocker locker(m_mutex);
 
-    if (!readWorker) {
+    if (!readWorker || !m_deviceHandle) {
         return -1;
     }
 
@@ -231,7 +231,7 @@ qint64 opHID::bytesToWrite() const
 {
     QMutexLocker locker(m_mutex);
 
-    if (!writeWorker) {
+    if (!writeWorker || !m_deviceHandle) {
         return -1;
     }
 
@@ -246,7 +246,7 @@ qint64 opHID::readData(char *data, qint64 maxSize)
 {
     QMutexLocker locker(m_mutex);
 
-    if (!readWorker || !data) {
+    if (!readWorker || !data || !m_deviceHandle) {
         return -1;
     }
 
@@ -261,7 +261,7 @@ qint64 opHID::writeData(const char *data, qint64 maxSize)
 {
     QMutexLocker locker(m_mutex);
 
-    if (!writeWorker || !data) {
+    if (!writeWorker || !data || !m_deviceHandle) {
         return -1;
     }
 

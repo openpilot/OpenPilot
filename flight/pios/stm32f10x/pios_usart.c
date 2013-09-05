@@ -331,7 +331,7 @@ static void PIOS_USART_generic_irq_handler(uint32_t usart_id)
 
 #if defined(PIOS_INCLUDE_FREERTOS)
     if (rx_need_yield || tx_need_yield) {
-        vPortYieldFromISR();
+        vPortYield();
     }
 #endif /* PIOS_INCLUDE_FREERTOS */
 }

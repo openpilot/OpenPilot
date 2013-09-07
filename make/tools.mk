@@ -27,6 +27,8 @@
 #    stm32flash_install
 #    dfuutil_install
 #    android_sdk_install
+#    marble_install
+#    gstreamer_install
 #
 # TODO:
 #    help in the top Makefile
@@ -95,8 +97,6 @@ else ifeq ($(UNAME), Windows)
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
     GSTREAMER_URL  := http://wiki.openpilot.org/download/attachments/18612236/gstreamer-sdk-x86-2013.6.msi
-    MESAWIN_URL    := http://wiki.openpilot.org/download/attachments/18612236/mesawin.tar.gz
-    GSTREAMER_URL  := http://wiki.openpilot.org/download/attachments/18612236/gstreamer-sdk-x86-2013.6.msi
 endif
 
 GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0.zip
@@ -119,7 +119,8 @@ else ifeq ($(UNAME), Windows)
     SDL_DIR     := $(TOOLS_DIR)/SDL-1.2.15
     OPENSSL_DIR := $(TOOLS_DIR)/openssl-1.0.1e-win32
     MESAWIN_DIR := $(TOOLS_DIR)/mesawin
-    GSTREAMER_SDK_DIR := $(TOOLS_DIR)/gstreamer-sdk-x86-2013.6/0.10/x86
+    #GSTREAMER_SDK_DIR := $(TOOLS_DIR)/gstreamer-sdk-x86-2013.6/0.10/x86
+	GSTREAMER_SDK_DIR := $(TOOLS_DIR)/gstreamer-sdk/0.10/x86
 endif
 
 QT_SDK_PREFIX := $(QT_SDK_DIR)
@@ -320,6 +321,10 @@ $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
 	)
 
 	$(6)
+
+#		$(if $(filter $(suffix $(4)), .msi),
+#		@$(ECHO) $(MSG_INSTALLING) $$(call toprel, $(2))
+#		$(V1) msiexec /passive INSTALLDIR=$(OPENPILOT_TOOLS_DIR) /i $$(call toprel, $(DL_DIR)/$(4))
 
 $(1)_clean:
 	@$(ECHO) $(MSG_CLEANING) $$(call toprel, $(2))
@@ -931,6 +936,35 @@ gtest_version:
 
 
 
+##############################
+#
+# gstreamer
+#
+##############################
+
+ifeq ($(UNAME), Windows)
+
+$(eval $(call TOOL_INSTALL_TEMPLATE,gstreamer,$(GSTREAMER_SDK_DIR),$(GSTREAMER_URL),$(notdir $(GSTREAMER_URL))))
+
+else # Linux or Mac
+
+all_sdk_version: gstreamer_version
+
+endif
+
+ifeq ($(shell [ -d "$(GSTREAMER_SDK_DIR)" ] && $(ECHO) "exists"), exists)
+	export GSTREAMER_SDK_DIR
+    export GSTREAMER := $(GSTREAMER_SDK_DIR)/bin/gst-launch-0.10
+    export PATH := $(GSTREAMER_SDK_DIR/bin):$(PATH)
+else
+    # not installed, hope it's in the path...
+    # $(info $(EMPTY) WARNING     $(call toprel, $(GSTREAMER_SDK_DIR)) not found (make gstreamer_install), using system PATH)
+    export GSTREAMER := gst-launch-0.10
+endif
+
+.PHONY: gstreamer_version
+gstreamer_version:
+	-$(V1) $(GSTREAMER) --version
 
 
 ##############################

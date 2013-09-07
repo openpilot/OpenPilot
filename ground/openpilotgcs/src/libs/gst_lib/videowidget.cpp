@@ -28,27 +28,27 @@
 #include <QTextDocument>
 #include <QApplication>
 
-#include <string>
 #include <gst/gst.h>
-#include <gst/interfaces/xoverlay.h>
+#include <gst/video/videooverlay.h>
+#include <string>
 
 #include "overlay.h"
 #include "pipelineevent.h"
 
 class GstOverlayImpl: public Overlay {
 public:
-    GstOverlayImpl(GstXOverlay *gst_overlay) :
+    GstOverlayImpl(GstVideoOverlay *gst_overlay) :
             gst_overlay(gst_overlay)
     {
     }
     void expose()
     {
         if (gst_overlay) {
-            gst_x_overlay_expose(gst_overlay);
+            gst_video_overlay_expose(gst_overlay);
         }
     }
 private:
-    GstXOverlay *gst_overlay;
+    GstVideoOverlay *gst_overlay;
 };
 
 class BusSyncHandler {
@@ -178,7 +178,7 @@ void VideoWidget::init()
 
     // register bus synchronous handler
     GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline));
-    gst_bus_set_sync_handler(bus, (GstBusSyncHandler) gst_bus_sync_handler, handler);
+    gst_bus_set_sync_handler(bus, (GstBusSyncHandler) gst_bus_sync_handler, handler, NULL);
     gst_object_unref(bus);
 }
 
@@ -458,14 +458,14 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
     // and as such is not necessarily called on the QT event handling thread
     switch (GST_MESSAGE_TYPE(message)) {
     case GST_MESSAGE_ELEMENT:
-        if (gst_structure_has_name(message->structure, "prepare-xwindow-id")) {
+        if (gst_is_video_overlay_prepare_window_handle_message(message)) {
             qDebug()
                     << QString("Element %0 prepare window with window #%1").arg(GST_OBJECT_NAME(message->src)).arg(
                             (gulong) wId);
             // prepare-xwindow-id must be handled synchronously in order to have gstreamer use our window
-            GstXOverlay *gst_video_overlay = GST_X_OVERLAY(GST_MESSAGE_SRC(message));
+            GstVideoOverlay *gst_video_overlay = GST_VIDEO_OVERLAY(GST_MESSAGE_SRC(message));
             //imagesink.set_property("force-aspect-ratio", True)
-            gst_x_overlay_set_xwindow_id(gst_video_overlay, (gulong) wId);
+            gst_video_overlay_set_window_handle(gst_video_overlay, (guintptr) wId);
             // and now post event asynchronously
             Overlay *overlay = new GstOverlayImpl(gst_video_overlay);
             QString name = GST_OBJECT_NAME(message->src);
@@ -520,10 +520,10 @@ bool BusSyncHandler::handleMessage(GstMessage *message)
 
 static GstBusSyncReply gst_bus_sync_handler(GstBus *bus, GstMessage *message, BusSyncHandler *handler)
 {
-    qDebug()
-            << QString("bus_sync_handler (%0) : %1 : %2 (%3)").arg((long) QThread::currentThreadId()).arg(
-                    GST_OBJECT_NAME(message->src)).arg(GST_MESSAGE_TYPE_NAME(message)).arg(
-                    message->structure != NULL ? gst_structure_get_name(message->structure) : "null");
+//    qDebug()
+//            << QString("bus_sync_handler (%0) : %1 : %2 (%3)").arg((long) QThread::currentThreadId()).arg(
+//                    GST_OBJECT_NAME(message->src)).arg(GST_MESSAGE_TYPE_NAME(message)).arg(
+//                    message->structure != NULL ? gst_structure_get_name(message->structure) : "null");
 
     if (handler->handleMessage(message)) {
         gst_message_unref(message);

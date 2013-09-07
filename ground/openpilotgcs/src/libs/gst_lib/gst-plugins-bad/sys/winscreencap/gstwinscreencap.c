@@ -80,7 +80,6 @@ register_plugin2 (void)
 	);
 }
 
-
 GST_PLUGIN_DEFINE (GST_VERSION_MAJOR,
     GST_VERSION_MINOR,
     "winscreencap",

@@ -130,11 +130,11 @@ int32_t GPSInitialize(void)
     gpsEnabled = true;
 #else
     HwSettingsInitialize();
-    uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
+    HwSettingsOptionalModulesData optionalModules;
 
-    HwSettingsOptionalModulesGet(optionalModules);
+    HwSettingsOptionalModulesGet(&optionalModules);
 
-    if (optionalModules[HWSETTINGS_OPTIONALMODULES_GPS] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+    if (optionalModules.GPS == HWSETTINGS_OPTIONALMODULES_ENABLED) {
         gpsEnabled = true;
     } else {
         gpsEnabled = false;

@@ -118,19 +118,35 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
     // Replace the $(DATAFIELDS) tag
     QString type;
     QString fields;
+    QString dataStructures;
     for (int n = 0; n < info->fields.length(); ++n) {
         // Determine type
         type = fieldTypeStrC[info->fields[n]->type];
         // Append field
+        // Check if it a named set and creates structures accordingly
         if (info->fields[n]->numElements > 1) {
-            fields.append(QString("    %1 %2[%3];\n").arg(type)
-                          .arg(info->fields[n]->name).arg(info->fields[n]->numElements));
+            if (info->fields[n]->elementNames[0].compare(QString("0")) != 0) {
+                QString structTypeName = QString("%1%2Data").arg(info->name).arg(info->fields[n]->name);
+                QString structType     = QString("typedef struct __attribute__ ((__packed__)) {\n");
+                for (int f = 0; f < info->fields[n]->elementNames.count(); f++) {
+                    structType.append(QString("    %1 %2;\n").arg(type).arg(info->fields[n]->elementNames[f]));
+                }
+                structType.append(QString("}  %1 ;\n\n").arg(structTypeName));
+
+                dataStructures.append(structType);
+
+                fields.append(QString("    %1 %2;\n").arg(structTypeName)
+                              .arg(info->fields[n]->name));
+            } else {
+                fields.append(QString("    %1 %2[%3];\n").arg(type)
+                              .arg(info->fields[n]->name).arg(info->fields[n]->numElements));
+            }
         } else {
             fields.append(QString("    %1 %2;\n").arg(type).arg(info->fields[n]->name));
         }
     }
     outInclude.replace(QString("$(DATAFIELDS)"), fields);
-
+    outInclude.replace(QString("$(DATASTRUCTURES)"), dataStructures);
     // Replace the $(DATAFIELDINFO) tag
     QString enums;
     for (int n = 0; n < info->fields.length(); ++n) {
@@ -206,20 +222,25 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
             } else {
                 // Initialize all fields in the array
                 for (int idx = 0; idx < info->fields[n]->numElements; ++idx) {
-                    if (info->fields[n]->type == FIELDTYPE_ENUM) {
-                        initfields.append(QString("    data.%1[%2] = %3;\n")
+                    if (info->fields[n]->elementNames[0].compare(QString("0")) == 0) {
+                        initfields.append(QString("    data.%1[%2] = ")
                                           .arg(info->fields[n]->name)
-                                          .arg(idx)
+                                          .arg(idx));
+                    } else {
+                        initfields.append(QString("    data.%1.%2 = ")
+                                          .arg(info->fields[n]->name)
+                                          .arg(info->fields[n]->elementNames[idx]));
+                    }
+
+
+                    if (info->fields[n]->type == FIELDTYPE_ENUM) {
+                        initfields.append(QString("%1;\n")
                                           .arg(info->fields[n]->options.indexOf(info->fields[n]->defaultValues[idx])));
                     } else if (info->fields[n]->type == FIELDTYPE_FLOAT32) {
-                        initfields.append(QString("    data.%1[%2] = %3f;\n")
-                                          .arg(info->fields[n]->name)
-                                          .arg(idx)
+                        initfields.append(QString("%1f;\n")
                                           .arg(info->fields[n]->defaultValues[idx].toFloat(), 0, 'e', 6));
                     } else {
-                        initfields.append(QString("    data.%1[%2] = %3;\n")
-                                          .arg(info->fields[n]->name)
-                                          .arg(idx)
+                        initfields.append(QString("%1;\n")
                                           .arg(info->fields[n]->defaultValues[idx].toInt()));
                     }
                 }
@@ -259,11 +280,49 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
                                     .arg(fieldTypeStrC[info->fields[n]->type]));
                 setgetfields.append(QString("}\n"));
             } else {
+                // When no struct accessor is available for a field array accessor is the default.
+                QString suffix = QString("");
+
+                if (info->fields[n]->elementNames[0].compare(QString("0")) != 0) {
+                    // struct based field accessor
+                    QString structTypeName = QString("%1%2Data").arg(info->name).arg(info->fields[n]->name);
+                    /* SET */
+                    setgetfields.append(QString("void %2%3Set( %1 *New%3 )\n")
+                                        .arg(structTypeName)
+                                        .arg(info->name)
+                                        .arg(info->fields[n]->name));
+                    setgetfields.append(QString("{\n"));
+                    setgetfields.append(QString("    UAVObjSetDataField(%1Handle(), (void *)New%2, offsetof(%1Data, %2), %3*sizeof(%4));\n")
+                                        .arg(info->name)
+                                        .arg(info->fields[n]->name)
+                                        .arg(info->fields[n]->numElements)
+                                        .arg(fieldTypeStrC[info->fields[n]->type]));
+                    setgetfields.append(QString("}\n"));
+
+                    /* GET */
+                    setgetfields.append(QString("void %2%3Get( %1 *New%3 )\n")
+                                        .arg(structTypeName)
+                                        .arg(info->name)
+                                        .arg(info->fields[n]->name));
+                    setgetfields.append(QString("{\n"));
+                    setgetfields.append(QString("    UAVObjGetDataField(%1Handle(), (void *)New%2, offsetof(%1Data, %2), %3*sizeof(%4));\n")
+                                        .arg(info->name)
+                                        .arg(info->fields[n]->name)
+                                        .arg(info->fields[n]->numElements)
+                                        .arg(fieldTypeStrC[info->fields[n]->type]));
+                    setgetfields.append(QString("}\n"));
+
+                    // Append array suffix to array accessors
+                    suffix = QString("Array");
+                }
+
+                // array based field accessor
                 /* SET */
-                setgetfields.append(QString("void %2%3Set( %1 *New%3 )\n")
+                setgetfields.append(QString("void %2%3%4Set( %1 *New%3 )\n")
                                     .arg(fieldTypeStrC[info->fields[n]->type])
                                     .arg(info->name)
-                                    .arg(info->fields[n]->name));
+                                    .arg(info->fields[n]->name)
+                                    .arg(suffix));
                 setgetfields.append(QString("{\n"));
                 setgetfields.append(QString("    UAVObjSetDataField(%1Handle(), (void *)New%2, offsetof(%1Data, %2), %3*sizeof(%4));\n")
                                     .arg(info->name)
@@ -273,10 +332,11 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
                 setgetfields.append(QString("}\n"));
 
                 /* GET */
-                setgetfields.append(QString("void %2%3Get( %1 *New%3 )\n")
+                setgetfields.append(QString("void %2%3%4Get( %1 *New%3 )\n")
                                     .arg(fieldTypeStrC[info->fields[n]->type])
                                     .arg(info->name)
-                                    .arg(info->fields[n]->name));
+                                    .arg(info->fields[n]->name)
+                                    .arg(suffix));
                 setgetfields.append(QString("{\n"));
                 setgetfields.append(QString("    UAVObjGetDataField(%1Handle(), (void *)New%2, offsetof(%1Data, %2), %3*sizeof(%4));\n")
                                     .arg(info->name)
@@ -294,17 +354,37 @@ bool UAVObjectGeneratorFlight::process_object(ObjectInfo *info)
     for (int n = 0; n < info->fields.length(); ++n) {
         // if (!info->fields[n]->defaultValues.isEmpty() )
         {
+            QString suffix = QString("");
+            if (info->fields[n]->elementNames[0].compare(QString("0")) != 0) {
+                // struct based field accessor
+                QString structTypeName = QString("%1%2Data").arg(info->name).arg(info->fields[n]->name);
+
+                /* SET */
+                setgetfieldsextern.append(QString("extern void %2%3Set(%1 *New%3);\n")
+                                          .arg(structTypeName)
+                                          .arg(info->name)
+                                          .arg(info->fields[n]->name));
+
+                /* GET */
+                setgetfieldsextern.append(QString("extern void %2%3Get(%1 *New%3);\n")
+                                          .arg(structTypeName)
+                                          .arg(info->name)
+                                          .arg(info->fields[n]->name));
+                suffix = QString("Array");
+            }
             /* SET */
-            setgetfieldsextern.append(QString("extern void %2%3Set(%1 *New%3);\n")
+            setgetfieldsextern.append(QString("extern void %2%3%4Set(%1 *New%3);\n")
                                       .arg(fieldTypeStrC[info->fields[n]->type])
                                       .arg(info->name)
-                                      .arg(info->fields[n]->name));
+                                      .arg(info->fields[n]->name)
+                                      .arg(suffix));
 
             /* GET */
-            setgetfieldsextern.append(QString("extern void %2%3Get(%1 *New%3);\n")
+            setgetfieldsextern.append(QString("extern void %2%3%4Get(%1 *New%3);\n")
                                       .arg(fieldTypeStrC[info->fields[n]->type])
                                       .arg(info->name)
-                                      .arg(info->fields[n]->name));
+                                      .arg(info->fields[n]->name)
+                                      .arg(suffix));
         }
     }
     outInclude.replace(QString("$(SETGETFIELDSEXTERN)"), setgetfieldsextern);

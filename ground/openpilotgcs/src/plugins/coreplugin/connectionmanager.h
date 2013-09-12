@@ -29,11 +29,11 @@
 #ifndef CONNECTIONMANAGER_H
 #define CONNECTIONMANAGER_H
 
-#include <QWidget>
 #include "mainwindow.h"
 #include "generalsettings.h"
 #include "telemetrymonitorwidget.h"
 #include <coreplugin/iconnection.h>
+#include <QWidget>
 #include <QtCore/QVector>
 #include <QtCore/QIODevice>
 #include <QtCore/QLinkedList>
@@ -43,19 +43,13 @@
 #include "core_global.h"
 #include <QTimer>
 
-QT_BEGIN_NAMESPACE
-class QTabWidget;
-QT_END_NAMESPACE
-
 namespace Core {
+
 class IConnection;
 
 namespace Internal {
-class FancyTabWidget;
-class FancyActionBar;
-class MainWindow;
+    class MainWindow;
 } // namespace Internal
-
 
 class DevListItem {
 public:
@@ -86,7 +80,7 @@ class CORE_EXPORT ConnectionManager : public QWidget {
     Q_OBJECT
 
 public:
-    ConnectionManager(Internal::MainWindow *mainWindow, QTabWidget *modeStack);
+    ConnectionManager(Internal::MainWindow *mainWindow);
     virtual ~ConnectionManager();
 
     void init();

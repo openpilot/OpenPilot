@@ -49,7 +49,7 @@
  */
 
 #include <openpilot.h>
-
+#include <pios_struct_helper.h>
 #include "attitude.h"
 #include "accelsensor.h"
 #include "accelstate.h"
@@ -366,7 +366,7 @@ static int32_t updateAttitudeComplementary(bool first_run)
         magData.z = 0.0f;
 #endif
         float magBias[3];
-        RevoCalibrationmag_biasGet(magBias);
+        RevoCalibrationmag_biasArrayGet(magBias);
         // don't trust Mag for initial orientation if it has not been calibrated
         if (magBias[0] < 1e-6f && magBias[1] < 1e-6f && magBias[2] < 1e-6f) {
             magCalibrated = false;
@@ -834,12 +834,12 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
         value_error = true;
     }
 
-    if (invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSNORTH]) ||
-        invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSEAST]) ||
-        invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSDOWN]) ||
-        invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELNORTH]) ||
-        invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELEAST]) ||
-        invalid_var(ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELDOWN])) {
+    if (invalid_var(ekfConfiguration.R.GPSPosNorth) ||
+        invalid_var(ekfConfiguration.R.GPSPosEast) ||
+        invalid_var(ekfConfiguration.R.GPSPosDown) ||
+        invalid_var(ekfConfiguration.R.GPSVelNorth) ||
+        invalid_var(ekfConfiguration.R.GPSVelEast) ||
+        invalid_var(ekfConfiguration.R.GPSVelDown)) {
         gps_updated = false;
         value_error = true;
     }
@@ -892,23 +892,23 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
         if (init_stage == 0) {
             // Reset the INS algorithm
             INSGPSInit();
-            INSSetMagVar((float[3]) { ekfConfiguration.R[EKFCONFIGURATION_R_MAGX],
-                                      ekfConfiguration.R[EKFCONFIGURATION_R_MAGY],
-                                      ekfConfiguration.R[EKFCONFIGURATION_R_MAGZ] }
+            INSSetMagVar((float[3]) { ekfConfiguration.R.MagX,
+                                      ekfConfiguration.R.MagY,
+                                      ekfConfiguration.R.MagZ }
                          );
-            INSSetAccelVar((float[3]) { ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELX],
-                                        ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELY],
-                                        ekfConfiguration.Q[EKFCONFIGURATION_Q_ACCELZ] }
+            INSSetAccelVar((float[3]) { ekfConfiguration.Q.AccelX,
+                                        ekfConfiguration.Q.AccelY,
+                                        ekfConfiguration.Q.AccelZ }
                            );
-            INSSetGyroVar((float[3]) { ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROX],
-                                       ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROY],
-                                       ekfConfiguration.Q[EKFCONFIGURATION_Q_GYROZ] }
+            INSSetGyroVar((float[3]) { ekfConfiguration.Q.GyroX,
+                                       ekfConfiguration.Q.GyroY,
+                                       ekfConfiguration.Q.GyroZ }
                           );
-            INSSetGyroBiasVar((float[3]) { ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTX],
-                                           ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTY],
-                                           ekfConfiguration.Q[EKFCONFIGURATION_Q_GYRODRIFTZ] }
+            INSSetGyroBiasVar((float[3]) { ekfConfiguration.Q.GyroDriftX,
+                                           ekfConfiguration.Q.GyroDriftY,
+                                           ekfConfiguration.Q.GyroDriftZ }
                               );
-            INSSetBaroVar(ekfConfiguration.R[EKFCONFIGURATION_R_BAROZ]);
+            INSSetBaroVar(ekfConfiguration.R.BaroZ);
 
             // Initialize the gyro bias
             float gyro_bias[3] = { 0.0f, 0.0f, 0.0f };
@@ -966,7 +966,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
             float q[4] = { attitudeState.q1, attitudeState.q2, attitudeState.q3, attitudeState.q4 };
             INSSetState(pos, zeros, q, zeros, zeros);
 
-            INSResetP(ekfConfiguration.P);
+            INSResetP(cast_struct_to_array(ekfConfiguration.P, ekfConfiguration.P.AttitudeQ1));
         } else {
             // Run prediction a bit before any corrections
 
@@ -1028,12 +1028,12 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
     INSSetMagNorth(homeLocation.Be);
 
     if (gps_updated && outdoor_mode) {
-        INSSetPosVelVar((float[3]) { ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSNORTH],
-                                     ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSEAST],
-                                     ekfConfiguration.R[EKFCONFIGURATION_R_GPSPOSDOWN] },
-                        (float[3]) { ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELNORTH],
-                                     ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELEAST],
-                                     ekfConfiguration.R[EKFCONFIGURATION_R_GPSVELDOWN] }
+        INSSetPosVelVar((float[3]) { ekfConfiguration.R.GPSPosNorth,
+                                     ekfConfiguration.R.GPSPosEast,
+                                     ekfConfiguration.R.GPSPosDown },
+                        (float[3]) { ekfConfiguration.R.GPSVelNorth,
+                                     ekfConfiguration.R.GPSVelEast,
+                                     ekfConfiguration.R.GPSVelDown }
                         );
         sensors |= POS_SENSORS;
 
@@ -1051,12 +1051,12 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
                      (1.0f - BARO_OFFSET_LOWPASS_ALPHA)
                      * (-NED[2] - baroData.Altitude);
     } else if (!outdoor_mode) {
-        INSSetPosVelVar((float[3]) { ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
-                                     ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
-                                     ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR] },
-                        (float[3]) { ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR],
-                                     ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR],
-                                     ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELINDOOR] }
+        INSSetPosVelVar((float[3]) { ekfConfiguration.FakeR.FakeGPSPosIndoor,
+                                     ekfConfiguration.FakeR.FakeGPSPosIndoor,
+                                     ekfConfiguration.FakeR.FakeGPSPosIndoor },
+                        (float[3]) { ekfConfiguration.FakeR.FakeGPSVelIndoor,
+                                     ekfConfiguration.FakeR.FakeGPSVelIndoor,
+                                     ekfConfiguration.FakeR.FakeGPSVelIndoor }
                         );
         vel[0]   = vel[1] = vel[2] = 0.0f;
         NED[0]   = NED[1] = 0.0f;
@@ -1084,12 +1084,12 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
         if (!gps_vel_updated && !gps_updated) {
             // feed airspeed into EKF, treat wind as 1e2 variance
             sensors |= HORIZ_SENSORS | VERT_SENSORS;
-            INSSetPosVelVar((float[3]) { ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
-                                         ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR],
-                                         ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSPOSINDOOR] },
-                            (float[3]) { ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED],
-                                         ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED],
-                                         ekfConfiguration.FakeR[EKFCONFIGURATION_FAKER_FAKEGPSVELAIRSPEED] }
+            INSSetPosVelVar((float[3]) { ekfConfiguration.FakeR.FakeGPSPosIndoor,
+                                         ekfConfiguration.FakeR.FakeGPSPosIndoor,
+                                         ekfConfiguration.FakeR.FakeGPSPosIndoor },
+                            (float[3]) { ekfConfiguration.FakeR.FakeGPSVelAirspeed,
+                                         ekfConfiguration.FakeR.FakeGPSVelAirspeed,
+                                         ekfConfiguration.FakeR.FakeGPSVelAirspeed }
                             );
             // rotate airspeed vector into NED frame - airspeed is measured in X axis only
             float R[3][3];
@@ -1130,7 +1130,7 @@ static int32_t updateAttitudeINSGPS(bool first_run, bool outdoor_mode)
 
     EKFStateVarianceData vardata;
     EKFStateVarianceGet(&vardata);
-    INSGetP(vardata.P);
+    INSGetP(cast_struct_to_array(vardata.P, vardata.P.AttitudeQ1));
     EKFStateVarianceSet(&vardata);
 
     return 0;
@@ -1180,17 +1180,17 @@ static void settingsUpdatedCb(UAVObjEvent *ev)
         EKFConfigurationGet(&ekfConfiguration);
         int t;
         for (t = 0; t < EKFCONFIGURATION_P_NUMELEM; t++) {
-            if (invalid_var(ekfConfiguration.P[t])) {
+            if (invalid_var(cast_struct_to_array(ekfConfiguration.P, ekfConfiguration.P.AttitudeQ1)[t])) {
                 error = true;
             }
         }
         for (t = 0; t < EKFCONFIGURATION_Q_NUMELEM; t++) {
-            if (invalid_var(ekfConfiguration.Q[t])) {
+            if (invalid_var(cast_struct_to_array(ekfConfiguration.Q, ekfConfiguration.Q.AccelX)[t])) {
                 error = true;
             }
         }
         for (t = 0; t < EKFCONFIGURATION_R_NUMELEM; t++) {
-            if (invalid_var(ekfConfiguration.R[t])) {
+            if (invalid_var(cast_struct_to_array(ekfConfiguration.R, ekfConfiguration.R.BaroZ)[t])) {
                 error = true;
             }
         }

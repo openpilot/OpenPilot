@@ -17,4 +17,13 @@
          (type *)((char *)__mptr - offsetof(type, member)); } \
     )
 
+/**
+ * cast_struct_to_array casts an homogeneous structure instance to an array
+ * of typeof(struct_field). struct_field need to be any of the fields
+ * containing inside the struct
+ * @instance: homogeneous structure to cast
+ * @struct_field: a field contained inside the structure
+ */
+#define cast_struct_to_array(instance, struct_field) \
+    ((typeof(struct_field) *) & (instance))
 #endif /* PIOS_STRUCT_HELPER_H */

@@ -209,6 +209,34 @@ inline QString msgSendArgumentFailed()
                                        "Unable to send command line arguments to the already running instance. It appears to be not responding.");
 }
 
+void mainMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    QFile file(QDir::tempPath() + "/gcs.log");
+
+    if (file.open(QIODevice::Append | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << QTime::currentTime().toString("hh:mm:ss.zzz ");
+
+        switch (type) {
+        case QtDebugMsg:
+            out << "DBG: ";
+            break;
+        case QtWarningMsg:
+            out << "WRN: ";
+            break;
+        case QtCriticalMsg:
+            out << "CRT: ";
+            break;
+        case QtFatalMsg:
+            out << "FTL: ";
+            break;
+        }
+
+        out << msg << '\n';
+        out.flush();
+    }
+}
+
 // Prepare a remote argument: If it is a relative file, add the current directory
 // since the the central instance might be running in a different directory.
 inline QString prepareRemoteArgument(const QString &arg)
@@ -414,34 +442,6 @@ void loadTranslators(QString language, QTranslator &translator, QTranslator &qtT
             // unload()
             translator.load(QString());
         }
-    }
-}
-
-void mainMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
-{
-    QFile file(QDir::tempPath() + "/gcs.log");
-
-    if (file.open(QIODevice::Append | QIODevice::Text)) {
-        QTextStream out(&file);
-        out << QTime::currentTime().toString("hh:mm:ss.zzz ");
-
-        switch (type) {
-        case QtDebugMsg:
-            out << "DBG: ";
-            break;
-        case QtWarningMsg:
-            out << "WRN: ";
-            break;
-        case QtCriticalMsg:
-            out << "CRT: ";
-            break;
-        case QtFatalMsg:
-            out << "FTL: ";
-            break;
-        }
-
-        out << msg << '\n';
-        out.flush();
     }
 }
 

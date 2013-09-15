@@ -133,3 +133,9 @@ linux-g++-* {
     QMAKE_LFLAGS += -Wl,--allow-shlib-undefined -Wl,--no-undefined
 }
 
+win32 {
+    # Fix ((packed)) pragma handling issue introduced when upgrading MinGW from 4.4 to 4.8
+    # See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=52991
+    # The ((packet)) pragma is used in uav metadata struct and other places
+    QMAKE_CXXFLAGS += -mno-ms-bitfields
+}

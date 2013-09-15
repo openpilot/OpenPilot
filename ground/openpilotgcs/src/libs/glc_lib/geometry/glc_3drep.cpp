@@ -60,7 +60,7 @@ GLC_3DRep& GLC_3DRep::operator=(const GLC_Rep& rep)
 	Q_ASSERT(NULL != p3DRep);
 	if (this != &rep)
 	{
-		clear();
+        clear3DRepGeom();
 		GLC_Rep::operator=(rep);
 		m_pGeomList= p3DRep->m_pGeomList;
 		m_pType= p3DRep->m_pType;
@@ -91,7 +91,16 @@ GLC_Rep* GLC_3DRep::deepCopy() const
 
 GLC_3DRep::~GLC_3DRep()
 {
-	clear();
+    if (isTheLast())
+    {
+        clear3DRepGeom();
+
+        delete m_pGeomList;
+        m_pGeomList= NULL;
+
+        delete m_pType;
+        m_pType= NULL;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -274,6 +283,9 @@ void GLC_3DRep::replace(GLC_Rep* pRep)
 	GLC_3DRep* p3DRep= dynamic_cast<GLC_3DRep*>(pRep);
 	Q_ASSERT(NULL != p3DRep);
 
+    (*m_pType)= *(p3DRep->m_pType);
+
+    clear3DRepGeom();
 	setFileName(p3DRep->fileName());
 	setName(p3DRep->name());
 
@@ -404,22 +416,16 @@ bool GLC_3DRep::unload()
 // private services functions
 //////////////////////////////////////////////////////////////////////
 
-void GLC_3DRep::clear()
+void GLC_3DRep::clear3DRepGeom()
 {
-	if (isTheLast())
-	{
-		const int size= m_pGeomList->size();
-		for (int i= 0; i < size; ++i)
-		{
-			delete (*m_pGeomList)[i];
-		}
-		delete m_pGeomList;
-		m_pGeomList= NULL;
-
-		delete m_pType;
-		m_pType= NULL;
-	}
+    const int size= m_pGeomList->size();
+    for (int i= 0; i < size; ++i)
+    {
+        delete (*m_pGeomList)[i];
+    }
+    m_pGeomList->clear();
 }
+
 // Non Member methods
 QDataStream &operator<<(QDataStream & stream, const GLC_3DRep & rep)
 {

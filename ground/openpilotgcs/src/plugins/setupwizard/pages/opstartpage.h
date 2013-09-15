@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       startpage.cpp
+ * @file       opstartpage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -24,24 +24,24 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#ifndef STARTPAGE_H
-#define STARTPAGE_H
+#ifndef OPSTARTPAGE_H
+#define OPSTARTPAGE_H
 
 #include "abstractwizardpage.h"
 
 namespace Ui {
-class StartPage;
+class OPStartPage;
 }
 
-class StartPage : public AbstractWizardPage {
+class OPStartPage : public AbstractWizardPage {
     Q_OBJECT
 
 public:
-    explicit StartPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~StartPage();
+    explicit OPStartPage(SetupWizard *wizard, QWidget *parent = 0);
+    ~OPStartPage();
 
 private:
-    Ui::StartPage *ui;
+    Ui::OPStartPage *ui;
 };
 
-#endif // STARTPAGE_H
+#endif // OPSTARTPAGE_H

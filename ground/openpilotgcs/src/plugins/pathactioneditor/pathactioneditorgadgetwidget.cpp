@@ -29,10 +29,10 @@
 #include <QDebug>
 #include <QString>
 #include <QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QTextEdit>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
+#include <QWidget>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QPushButton>
 #include "browseritemdelegate.h"
 
 #include "extensionsystem/pluginmanager.h"

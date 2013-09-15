@@ -25,7 +25,7 @@ bool LogFile::open(OpenMode mode)
         return true;
     }
 
-    if (file.open(mode) == FALSE) {
+    if (file.open(mode) == false) {
         qDebug() << "Unable to open " << file.fileName() << " for logging";
         return false;
     }

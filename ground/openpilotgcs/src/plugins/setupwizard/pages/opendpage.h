@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       endpage.h
+ * @file       opendpage.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup
  * @{
@@ -25,27 +25,27 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef ENDPAGE_H
-#define ENDPAGE_H
+#ifndef OPENDPAGE_H
+#define OPENDPAGE_H
 
 #include "abstractwizardpage.h"
 
 namespace Ui {
-class EndPage;
+class OPEndPage;
 }
 
-class EndPage : public AbstractWizardPage {
+class OPEndPage : public AbstractWizardPage {
     Q_OBJECT
 
 public:
-    explicit EndPage(SetupWizard *wizard, QWidget *parent = 0);
-    ~EndPage();
+    explicit OPEndPage(SetupWizard *wizard, QWidget *parent = 0);
+    ~OPEndPage();
 
 private slots:
     void openInputWizard();
 
 private:
-    Ui::EndPage *ui;
+    Ui::OPEndPage *ui;
 };
 
-#endif // ENDPAGE_H
+#endif // OPENDPAGE_H

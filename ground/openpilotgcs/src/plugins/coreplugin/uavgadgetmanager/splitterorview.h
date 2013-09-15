@@ -30,7 +30,7 @@
 #define SPLITTERORVIEW_H
 
 #include <QWidget>
-#include <QtGui/QMouseEvent>
+#include <QMouseEvent>
 #include "uavgadgetmanager.h"
 #include "uavgadgetview.h"
 

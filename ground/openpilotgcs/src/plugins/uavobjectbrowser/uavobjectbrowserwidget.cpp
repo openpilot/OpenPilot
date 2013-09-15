@@ -32,12 +32,12 @@
 #include "ui_viewoptions.h"
 #include "uavobjectmanager.h"
 #include <QStringList>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QComboBox>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QComboBox>
 #include <QtCore/QDebug>
-#include <QtGui/QItemEditorFactory>
+#include <QItemEditorFactory>
 #include "extensionsystem/pluginmanager.h"
 
 UAVObjectBrowserWidget::UAVObjectBrowserWidget(QWidget *parent) : QWidget(parent)

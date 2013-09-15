@@ -182,10 +182,10 @@ plugin_gcscontrol.depends += plugin_uavobjects
 SUBDIRS += plugin_gcscontrol
 
 # Antenna tracker
-#plugin_antennatrack.subdir = antennatrack
-#plugin_antennatrack.depends = plugin_coreplugin
-#plugin_antennatrack.depends += plugin_uavobjects
-#SUBDIRS += plugin_antennatrack
+plugin_antennatrack.subdir = antennatrack
+plugin_antennatrack.depends = plugin_coreplugin
+plugin_antennatrack.depends += plugin_uavobjects
+SUBDIRS += plugin_antennatrack
 
 # Scope OpenGL Gadget
 #plugin_scopeogl.subdir = scopeogl

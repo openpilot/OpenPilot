@@ -49,11 +49,11 @@
 #include <QtCore/QObject>
 #include <QtCore/QDebug>
 #include <QtCore/QSignalMapper>
-#include <QtGui/QShortcut>
+#include <QShortcut>
 
-#include <QtGui/QAction>
-#include <QtGui/QTabWidget>
-#include <QtGui/QVBoxLayout>
+#include <QAction>
+#include <QTabWidget>
+#include <QVBoxLayout>
 
 using namespace Core;
 using namespace Core::Internal;

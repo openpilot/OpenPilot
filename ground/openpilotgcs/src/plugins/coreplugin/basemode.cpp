@@ -30,7 +30,7 @@
 
 #include <extensionsystem/pluginmanager.h>
 
-#include <QtGui/QWidget>
+#include <QWidget>
 
 using namespace Core;
 

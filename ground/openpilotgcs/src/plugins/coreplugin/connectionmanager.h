@@ -37,8 +37,8 @@
 #include <QtCore/QVector>
 #include <QtCore/QIODevice>
 #include <QtCore/QLinkedList>
-#include <QtGui/QPushButton>
-#include <QtGui/QComboBox>
+#include <QPushButton>
+#include <QComboBox>
 
 #include "core_global.h"
 #include <QTimer>

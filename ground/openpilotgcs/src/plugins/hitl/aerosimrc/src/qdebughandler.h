@@ -32,6 +32,6 @@
 #include <QFile>
 #include <QTime>
 
-void myQDebugHandler(QtMsgType type, const char *msg);
+void myQDebugHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
 #endif // QDEBUGHANDLER_H

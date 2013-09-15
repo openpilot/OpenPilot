@@ -36,7 +36,7 @@
 #include <QString>
 #include <QStringList>
 #include <QDebug>
-#include <QtGui/QColorDialog>
+#include <QColorDialog>
 
 namespace Core {
 class IUAVGadgetConfiguration;

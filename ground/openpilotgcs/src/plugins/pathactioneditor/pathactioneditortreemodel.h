@@ -31,7 +31,7 @@
 #include "treeitem.h"
 #include <QAbstractItemModel>
 #include <QtCore/QMap>
-#include <QtGui/QColor>
+#include <QColor>
 
 class TopTreeItem;
 class ObjectTreeItem;

@@ -164,7 +164,7 @@ void USBMonitor::setUpNotifications()
     dbh.dbcc_size = sizeof(dbh);
     dbh.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
     CopyMemory(&dbh.dbcc_classguid, &guid_hid, sizeof(GUID));
-    if (RegisterDeviceNotification(notificationWidget->winId(), &dbh, DEVICE_NOTIFY_WINDOW_HANDLE) == NULL) {
+    if (::RegisterDeviceNotification((HWND)notificationWidget->winId(), &dbh, DEVICE_NOTIFY_WINDOW_HANDLE) == NULL) {
         qWarning() << "RegisterDeviceNotification failed:" << GetLastError();
     }
     // discover the devices curently connected
@@ -210,9 +210,16 @@ LRESULT USBMonitor::onDeviceChangeWin(WPARAM wParam, LPARAM lParam)
  * \retval device handled or not
  */
 #ifdef QT_GUI_LIB
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 bool USBRegistrationWidget::winEvent(MSG *message, long *result)
 {
-    bool ret = false;
+#else
+bool USBRegistrationWidget::nativeEvent(const QByteArray & /*eventType*/, void *msg, long *result)
+{
+    MSG *message = static_cast<MSG *>(msg);
+
+#endif
+    bool ret     = false;
 
     if (message->message == WM_DEVICECHANGE) {
         OPHID_TRACE("IN");
@@ -224,7 +231,7 @@ bool USBRegistrationWidget::winEvent(MSG *message, long *result)
 
     return ret;
 }
-#endif
+#endif // ifdef QT_GUI_LIB
 
 
 /**

@@ -61,7 +61,6 @@
 #include <coreplugin/icore.h>
 #include <coreplugin/threadmanager.h>
 #include <math.h>
-#include <qxtlogger.h>
 
 void TraceBuf(const char *buf, int len);
 
@@ -220,7 +219,7 @@ void XplaneSimulator::processUpdate(const QByteArray & dataBuf)
     if (data.left(4) == "DATA") { // check type of packet
         buf.remove(0, 5);
         if (dataBuf.size() % 36) {
-            qxtLog->info("incorrect length of UDP packet: ", buf);
+            qDebug() << ("incorrect length of UDP packet: " + buf);
             return; // incorrect length of struct
         }
         // check correctness of data length, length must be multiple of (id_size+8*float_size)=4+8*4=36

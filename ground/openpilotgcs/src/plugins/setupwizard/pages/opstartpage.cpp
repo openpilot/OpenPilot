@@ -1,7 +1,7 @@
 /**
  ******************************************************************************
  *
- * @file       endpage.cpp
+ * @file       opstartpage.cpp
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
  * @addtogroup GCSPlugins GCS Plugins
  * @{
@@ -24,41 +24,18 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-#include "endpage.h"
-#include "ui_endpage.h"
-#include <coreplugin/modemanager.h>
-#include <extensionsystem/pluginmanager.h>
-#include <configgadgetfactory.h>
-#include <QMessageBox>
+#include "opstartpage.h"
+#include "ui_opstartpage.h"
 
-EndPage::EndPage(SetupWizard *wizard, QWidget *parent) :
+OPStartPage::OPStartPage(SetupWizard *wizard, QWidget *parent) :
     AbstractWizardPage(wizard, parent),
-    ui(new Ui::EndPage)
+    ui(new Ui::OPStartPage)
 {
     ui->setupUi(this);
-    setFinalPage(true);
-    connect(ui->inputWizardButton, SIGNAL(clicked()), this, SLOT(openInputWizard()));
+    setFont(QFont("Ubuntu", 2));
 }
 
-EndPage::~EndPage()
+OPStartPage::~OPStartPage()
 {
     delete ui;
-}
-
-void EndPage::openInputWizard()
-{
-    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
-    ConfigGadgetFactory *configGadgetFactory = pm->getObject<ConfigGadgetFactory>();
-
-    if (configGadgetFactory) {
-        // Core::ModeManager::instance()->activateModeByWorkspaceName("Configuration");
-        getWizard()->close();
-        configGadgetFactory->startInputWizard();
-    } else {
-        QMessageBox msgBox;
-        msgBox.setText(tr("Unable to open Input Wizard since the Config Plugin is not\nloaded in the current workspace."));
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.setDefaultButton(QMessageBox::Ok);
-        msgBox.exec();
-    }
 }

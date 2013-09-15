@@ -32,7 +32,7 @@
 #include <coreplugin/core_global.h>
 
 #include <QtCore/QObject>
-#include <QtGui/QIcon>
+#include <QIcon>
 
 QT_BEGIN_NAMESPACE
 class QWidget;

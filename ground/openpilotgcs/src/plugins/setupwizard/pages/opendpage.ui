@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>EndPage</class>
- <widget class="QWizardPage" name="EndPage">
+ <class>OPEndPage</class>
+ <widget class="QWizardPage" name="OPEndPage">
   <property name="geometry">
    <rect>
     <x>0</x>

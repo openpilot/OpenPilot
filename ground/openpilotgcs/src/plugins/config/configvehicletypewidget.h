@@ -38,6 +38,12 @@
 #include <QStringList>
 #include <QWidget>
 
+#include <QWidget>
+#include <QList>
+#include <QItemDelegate>
+
+class Ui_Widget;
+
 /*
  * This class derives from ConfigTaskWidget and overrides its default "binding" mechanism.
  * This widget bypasses automatic synchronization of UAVObjects and UI by providing its own implementations of

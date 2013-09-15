@@ -31,24 +31,18 @@
 
 #include "core_global.h"
 
-#include <QtGui/QWindowsStyle>
-
-QT_BEGIN_NAMESPACE
-class QLinearGradient;
-class QBrush;
-QT_END_NAMESPACE
+#include <QProxyStyle>
 
 class ManhattanStylePrivate;
 
-class CORE_EXPORT ManhattanStyle : public QWindowsStyle {
+class CORE_EXPORT ManhattanStyle : public QProxyStyle
+{
     Q_OBJECT
 
 public:
-    ManhattanStyle(const QString &);
+    explicit ManhattanStyle(const QString &baseStyleName);
 
     ~ManhattanStyle();
-
-    QStyle *systemStyle() const;
 
     void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const;
     void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const;
@@ -75,20 +69,13 @@ public:
     void unpolish(QWidget *widget);
     void unpolish(QApplication *app);
 
-protected:
-    bool event(QEvent *e);
-
-protected Q_SLOTS:
+protected slots:
     QIcon standardIconImplementation(StandardPixmap standardIcon, const QStyleOption *option, const QWidget *widget) const;
-    int layoutSpacingImplementation(QSizePolicy::ControlType control1,
-                                    QSizePolicy::ControlType control2,
-                                    Qt::Orientation orientation,
-                                    const QStyleOption *option = 0,
-                                    const QWidget *widget = 0) const;
 
 private:
+    void drawButtonSeparator(QPainter *painter, const QRect &rect, bool reverse) const;
+
     ManhattanStylePrivate *d;
-    Q_DISABLE_COPY(ManhattanStyle)
 };
 
 #endif // MANHATTANSTYLE_H

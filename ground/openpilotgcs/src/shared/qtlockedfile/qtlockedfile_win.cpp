@@ -31,6 +31,10 @@
 #include <qt_windows.h>
 #include <QtCore/QFileInfo>
 
+#if QT_VERSION >= 0x050000
+#define QT_WA(unicode, ansi) unicode
+#endif
+
 namespace SharedTools {
 #define SEMAPHORE_PREFIX "QtLockedFile semaphore "
 #define MUTEX_PREFIX     "QtLockedFile mutex "

@@ -21,6 +21,9 @@ class QPixmap;
 
 /*!
   \brief Canvas of a QwtPlot.
+  
+   Canvas is the widget where all plot items are displayed
+
   \sa QwtPlot
 */
 class QWT_EXPORT QwtPlotCanvas : public QFrame
@@ -99,26 +102,26 @@ public:
 
     /*!
       \brief Focus indicator
-
-      - NoFocusIndicator\n
-        Don't paint a focus indicator
-
-      - CanvasFocusIndicator\n
-        The focus is related to the complete canvas.
-        Paint the focus indicator using paintFocus()
-
-      - ItemFocusIndicator\n
-        The focus is related to an item (curve, point, ...) on
-        the canvas. It is up to the application to display a
-        focus indication using f.e. highlighting.
-
+      The default setting is NoFocusIndicator
       \sa setFocusIndicator(), focusIndicator(), paintFocus()
     */
 
     enum FocusIndicator
     {
+        //! Don't paint a focus indicator
         NoFocusIndicator,
+
+        /*!
+          The focus is related to the complete canvas.
+          Paint the focus indicator using paintFocus()
+         */
         CanvasFocusIndicator,
+
+        /*!
+          The focus is related to an item (curve, point, ...) on
+          the canvas. It is up to the application to display a
+          focus indication using f.e. highlighting.
+         */
         ItemFocusIndicator
     };
 

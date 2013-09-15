@@ -36,7 +36,7 @@ static inline QRectF qwtBoundingRect( const QwtSetSample &sample )
     double minX = sample.set[0];
     double maxX = sample.set[0];
 
-    for ( int i = 1; i < ( int )sample.set.size(); i++ )
+    for ( int i = 1; i < sample.set.size(); i++ )
     {
         if ( sample.set[i] < minX )
             minX = sample.set[i];
@@ -63,7 +63,7 @@ static inline QRectF qwtBoundingRect( const QwtSetSample &sample )
 */
 
 template <class T>
-QRectF qwtBoundingRectT( 
+QRectF qwtBoundingRectT(
     const QwtSeriesData<T>& series, int from, int to )
 {
     QRectF boundingRect( 1.0, 1.0, -2.0, -2.0 ); // invalid;
@@ -115,7 +115,7 @@ QRectF qwtBoundingRectT(
 
   \return Bounding rectangle
 */
-QRectF qwtBoundingRect( 
+QRectF qwtBoundingRect(
     const QwtSeriesData<QPointF> &series, int from, int to )
 {
     return qwtBoundingRectT<QPointF>( series, from, to );
@@ -132,7 +132,7 @@ QRectF qwtBoundingRect(
 
   \return Bounding rectangle
 */
-QRectF qwtBoundingRect( 
+QRectF qwtBoundingRect(
     const QwtSeriesData<QwtPoint3D> &series, int from, int to )
 {
     return qwtBoundingRectT<QwtPoint3D>( series, from, to );
@@ -152,7 +152,7 @@ QRectF qwtBoundingRect(
 
   \return Bounding rectangle
 */
-QRectF qwtBoundingRect( 
+QRectF qwtBoundingRect(
     const QwtSeriesData<QwtPointPolar> &series, int from, int to )
 {
     return qwtBoundingRectT<QwtPointPolar>( series, from, to );
@@ -169,7 +169,7 @@ QRectF qwtBoundingRect(
 
   \return Bounding rectangle
 */
-QRectF qwtBoundingRect( 
+QRectF qwtBoundingRect(
     const QwtSeriesData<QwtIntervalSample>& series, int from, int to )
 {
     return qwtBoundingRectT<QwtIntervalSample>( series, from, to );
@@ -186,7 +186,7 @@ QRectF qwtBoundingRect(
 
   \return Bounding rectangle
 */
-QRectF qwtBoundingRect( 
+QRectF qwtBoundingRect(
     const QwtSeriesData<QwtSetSample>& series, int from, int to )
 {
     return qwtBoundingRectT<QwtSetSample>( series, from, to );
@@ -323,10 +323,10 @@ QwtPointArrayData::QwtPointArrayData( const double *x,
         const double *y, size_t size )
 {
     d_x.resize( size );
-    qMemCopy( d_x.data(), x, size * sizeof( double ) );
+    memcpy( d_x.data(), x, size * sizeof( double ) );
 
     d_y.resize( size );
-    qMemCopy( d_y.data(), y, size * sizeof( double ) );
+    memcpy( d_y.data(), y, size * sizeof( double ) );
 }
 
 /*!
@@ -535,10 +535,10 @@ QRectF QwtSyntheticPointData::rectOfInterest() const
 */
 QRectF QwtSyntheticPointData::boundingRect() const
 {
-    if ( d_size == 0 || 
+    if ( d_size == 0 ||
         !( d_interval.isValid() || d_intervalOfInterest.isValid() ) )
     {
-        return QRectF(1.0, 1.0, -2.0, -2.0); // something invalid
+        return QRectF( 1.0, 1.0, -2.0, -2.0 ); // something invalid
     }
 
     return qwtBoundingRect( *this );

@@ -279,7 +279,7 @@ void QwtCompass::setLabelMap( const QMap<double, QString> &map )
 
 QwtText QwtCompass::scaleLabel( double value ) const
 {
-    if ( qFuzzyCompare( value, 0.0 ) )
+    if ( qFuzzyCompare( value + 1.0, 1.0 ) )
         value = 0.0;
 
     if ( value < 0.0 )

@@ -86,6 +86,7 @@
 #include <extensionsystem/iplugin.h>
 
 #include <QtCore/QDir>
+#include <QtCore/QFile>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QTextStream>
 #include <QtCore/QFileInfo>
@@ -96,10 +97,10 @@
 #include <QtCore/QSettings>
 #include <QtCore/QVariant>
 
-#include <QtGui/QMessageBox>
-#include <QtGui/QApplication>
-#include <QtGui/QMainWindow>
-#include <QtGui/QSplashScreen>
+#include <QMessageBox>
+#include <QtWidgets/QApplication>
+#include <QMainWindow>
+#include <QSplashScreen>
 
 namespace {
 typedef QList<ExtensionSystem::PluginSpec *> PluginSpecSet;

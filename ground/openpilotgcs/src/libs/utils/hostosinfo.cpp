@@ -1,14 +1,14 @@
 /**
  ******************************************************************************
  *
- * @file       mylistwidget.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
+ * @file       hostosinfo.cpp
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2013.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @brief
- * @see        The GNU Public License (GPL) Version 3
- * @defgroup
+ * @addtogroup GCSPlugins GCS Plugins
  * @{
- *
+ * @addtogroup CorePlugin Core Plugin
+ * @{
+ * @brief The Core GCS plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -26,30 +26,33 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef MYLISTWIDGET_H
-#define MYLISTWIDGET_H
+#include "hostosinfo.h"
 
-#include "utils_global.h"
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
 
-#include <QtGui/QListWidget>
+using namespace Utils;
 
-/*
- * MyListWidget is a plain QListWidget but with the added option
- * to place the icon above the label in ListMode. This is achieved
- * the easiest by subclassing QListWidget and overriding viewOptions().
- */
-class QTCREATOR_UTILS_EXPORT MyListWidget : public QListWidget {
-    Q_OBJECT
-public:
-    MyListWidget(QWidget *parent) : QListWidget(parent), m_iconAbove(false) {}
-    void setIconAbove(bool iconAbove)
-    {
-        m_iconAbove = iconAbove;
+HostOsInfo::HostArchitecture HostOsInfo::hostArchitecture()
+{
+#ifdef Q_OS_WIN
+    SYSTEM_INFO info;
+    GetNativeSystemInfo(&info);
+    switch (info.wProcessorArchitecture) {
+    case PROCESSOR_ARCHITECTURE_AMD64:
+        return HostOsInfo::HostArchitectureAMD64;
+    case PROCESSOR_ARCHITECTURE_INTEL:
+        return HostOsInfo::HostArchitectureX86;
+    case PROCESSOR_ARCHITECTURE_IA64:
+        return HostOsInfo::HostArchitectureItanium;
+    case PROCESSOR_ARCHITECTURE_ARM:
+        return HostOsInfo::HostArchitectureArm;
+    default:
+        return HostOsInfo::HostArchitectureUnknown;
     }
-protected:
-    QStyleOptionViewItem viewOptions() const;
-private:
-    bool m_iconAbove;
-};
+#else
+    return HostOsInfo::HostArchitectureUnknown;
+#endif
+}
 
-#endif // MYLISTWIDGET_H

@@ -31,8 +31,8 @@
 
 #include "utils_global.h"
 
-#include <QtGui/QWidget>
-#include <QtGui/QAbstractItemView>
+#include <QWidget>
+#include <QAbstractItemView>
 
 QT_BEGIN_NAMESPACE
 class QTextEdit;

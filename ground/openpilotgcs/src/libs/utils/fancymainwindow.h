@@ -31,46 +31,63 @@
 
 #include "utils_global.h"
 
-#include <QtCore/QList>
-#include <QtCore/QHash>
-
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
 class QSettings;
 QT_END_NAMESPACE
 
 namespace Utils {
-class QTCREATOR_UTILS_EXPORT FancyMainWindow : public QMainWindow {
+
+struct FancyMainWindowPrivate;
+
+class QTCREATOR_UTILS_EXPORT FancyMainWindow : public QMainWindow
+{
     Q_OBJECT
 
 public:
-    FancyMainWindow(QWidget *parent = 0);
+    explicit FancyMainWindow(QWidget *parent = 0);
+    virtual ~FancyMainWindow();
 
+    /* The widget passed in should have an objectname set
+     * which will then be used as key for QSettings. */
     QDockWidget *addDockForWidget(QWidget *widget);
-    QList<QDockWidget *> dockWidgets() const
-    {
-        return m_dockWidgets;
-    }
+    QList<QDockWidget *> dockWidgets() const;
 
     void setTrackingEnabled(bool enabled);
-    bool isLocked() const
-    {
-        return m_locked;
-    }
+    bool isLocked() const;
 
     void saveSettings(QSettings *settings) const;
-    void restoreSettings(QSettings *settings);
+    void restoreSettings(const QSettings *settings);
     QHash<QString, QVariant> saveSettings() const;
     void restoreSettings(const QHash<QString, QVariant> &settings);
 
+    // Additional context menu actions
+    QAction *menuSeparator1() const;
+    QAction *toggleLockedAction() const;
+    QAction *menuSeparator2() const;
+    QAction *resetLayoutAction() const;
+
+    // Overwritten to add locked/reset.
+    virtual QMenu *createPopupMenu();
+
+
+    QDockWidget *toolBarDockWidget() const;
+    void setToolBarDockWidget(QDockWidget *dock);
+
+signals:
+    // Emitted by resetLayoutAction(). Connect to a slot
+    // restoring the default layout.
+    void resetLayout();
+
 public slots:
     void setLocked(bool locked);
+    void setDockActionsVisible(bool v);
 
 protected:
     void hideEvent(QHideEvent *event);
     void showEvent(QShowEvent *event);
-
+    void contextMenuEvent(QContextMenuEvent *event);
 private slots:
     void onDockActionTriggered();
     void onDockVisibilityChange(bool);
@@ -80,11 +97,9 @@ private:
     void updateDockWidget(QDockWidget *dockWidget);
     void handleVisibilityChanged(bool visible);
 
-    QList<QDockWidget *> m_dockWidgets;
-    QList<bool> m_dockWidgetActiveState;
-    bool m_locked;
-    bool m_handleDockVisibilityChanges; // todo
+    FancyMainWindowPrivate *d;
 };
+
 } // namespace Utils
 
 #endif // FANCYMAINWINDOW_H

@@ -27,10 +27,10 @@
  */
 
 #include "uncommentselection.h"
-#include <QtGui/QPlainTextEdit>
-#include <QtGui/QTextCursor>
-#include <QtGui/QTextBlock>
-#include <QtGui/QTextDocument>
+#include <QPlainTextEdit>
+#include <QTextCursor>
+#include <QTextBlock>
+#include <QTextDocument>
 
 void Utils::unCommentSelection(QPlainTextEdit *edit)
 {

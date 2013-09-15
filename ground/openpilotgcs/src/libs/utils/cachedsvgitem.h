@@ -26,7 +26,8 @@
 #define CACHEDSVGITEM_H
 
 #include <QGraphicsSvgItem>
-#include <QGLContext>
+#include <QtOpenGL>
+#include <QtOpenGL/QGLContext>
 
 #include "utils_global.h"
 

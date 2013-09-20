@@ -1,18 +1,14 @@
 TEMPLATE = lib
 TARGET = GLC_lib
+#VERSION = 2.2.0
+
 DEFINES += GLC_LIB_LIBRARY
 include(../../openpilotgcslibrary.pri)
 
-# GLC_lib qmake configuration
-#TEMPLATE = lib
-QT += opengl \
-    core
+QT += core opengl
 
-
-CONFIG += exceptions \
-    warn_on
-#TARGET = GLC_lib
-#VERSION = 2.2.0
+# disable all warnings (no need for warnings as glc sources are imported)
+CONFIG += exceptions warn_off
 
 DEFINES += CREATE_GLC_LIB_DLL
 DEFINES += LIB3DS_EXPORTS

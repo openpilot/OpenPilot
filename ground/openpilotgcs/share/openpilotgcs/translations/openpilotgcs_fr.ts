@@ -371,19 +371,18 @@
     <message>
         <location line="+162"/>
         <source>Import Keyboard Mapping Scheme</source>
-        <translatorcomment>[Platypus]Je pense qu&apos;il y a meilleure traduction pour mapping</translatorcomment>
-        <translation type="unfinished">Importer le Mapping Clavier</translation>
+        <translation>Importer Schéma Config Clavier</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+37"/>
         <source>Keyboard Mapping Scheme (*.kms)</source>
-        <translation>Schéma de mapping clavier (*.kms)</translation>
+        <translation>Schéma Config Clavier (*.kms)</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Export Keyboard Mapping Scheme</source>
-        <translation>Exporter le mapping clavier</translation>
+        <translation>Exporter Schéma Config Clavier</translation>
     </message>
 </context>
 <context>
@@ -1168,25 +1167,25 @@ Raison : %3</translation>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Rotate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tourner</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Gauche</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Center</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Centré</translation>
     </message>
     <message>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Droite</translation>
     </message>
     <message>
         <location/>
@@ -1204,7 +1203,7 @@ Raison : %3</translation>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -1841,7 +1840,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Initial longitude (decimal):</source>
-        <translation type="unfinished"></translation>
+        <translation>Longitude initiale (décimal) :</translation>
     </message>
     <message>
         <location/>
@@ -2656,7 +2655,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Draw Antialiased</source>
-        <translation type="unfinished">Tracé anticrénelé </translation>
+        <translation type="unfinished">Tracé anticrénelé</translation>
     </message>
     <message>
         <location/>
@@ -4004,7 +4003,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+1"/>
         <source>Basque</source>
-        <translation type="unfinished"></translation>
+        <translation>Basque</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -4054,27 +4053,27 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+1"/>
         <source>Catalan</source>
-        <translation type="unfinished"></translation>
+        <translation>Catalan</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Chinese</source>
-        <translation type="unfinished"></translation>
+        <translation>Chinois</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Corsican</source>
-        <translation type="unfinished"></translation>
+        <translation>Corse</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Croatian</source>
-        <translation type="unfinished"></translation>
+        <translation>Croate</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Czech</source>
-        <translation type="unfinished">Tchèque</translation>
+        <translation>Tchèque</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -4099,7 +4098,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+1"/>
         <source>Estonian</source>
-        <translation type="unfinished">Estonien</translation>
+        <translation>Estonien</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -4194,7 +4193,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+1"/>
         <source>Indonesian</source>
-        <translation type="unfinished">Indonésien</translation>
+        <translation>Indonésien</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -4414,7 +4413,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+1"/>
         <source>Romanian</source>
-        <translation type="unfinished">Roumain</translation>
+        <translation>Roumain</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -4819,7 +4818,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+1"/>
         <source>Argentina</source>
-        <translation type="unfinished"></translation>
+        <translation>Argentin</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -7031,7 +7030,7 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_edit_waypoint_dialog.ui"/>
         <source>OpenPilot GCS Edit Waypoint</source>
-        <translation type="unfinished"></translation>
+        <translation>Editeur Waypoint OpenPilot GCS</translation>
     </message>
     <message>
         <location/>
@@ -7091,12 +7090,12 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>Relative to Home </source>
-        <translation type="unfinished">Relative à Home </translation>
+        <translation>Relatif à Home </translation>
     </message>
     <message>
         <location/>
         <source>Bearing </source>
-        <translation type="unfinished">Azimut </translation>
+        <translation>Azimut </translation>
     </message>
     <message>
         <location/>
@@ -7151,12 +7150,12 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>End condition</source>
-        <translation type="unfinished"></translation>
+        <translation>Condition Fin</translation>
     </message>
     <message>
         <location/>
         <source>Condition</source>
-        <translation type="unfinished"></translation>
+        <translation>Condition</translation>
     </message>
     <message>
         <location/>
@@ -8020,7 +8019,7 @@ p, li { white-space: pre-wrap; }
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation>Angle caméra en Yaw pour une valeur de sortie de 100%, degrés.
+        <translation type="unfinished">Angle caméra en Yaw pour une valeur de sortie de 100%, en degrés.
 
 Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous devez également ajuster la plage de sortie du canal dans l&apos;onglet Output.</translation>
     </message>
@@ -8066,7 +8065,7 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation>Angle caméra en Pitch pour une valeur de sortie de 100%, degrés.
+        <translation>Angle caméra en Pitch pour une valeur de sortie de 100%, en degrés.
 
 Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous devez également ajuster la plage de sortie du canal dans l&apos;onglet Output.</translation>
     </message>
@@ -8082,7 +8081,7 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
 
 This value should be tuned for particular gimbal and servo. You also
 have to define channel output range using Output configuration tab.</source>
-        <translation>Angle caméra en Roll pour une valeur de sortie de 100%, degrés.
+        <translation>Angle caméra en Roll pour une valeur de sortie de 100%, en degrés.
 
 Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous devez également ajuster la plage de sortie du canal dans l&apos;onglet Output.</translation>
     </message>
@@ -9999,22 +9998,22 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>Attitude Estimation Algorithm</source>
-        <translation type="unfinished">Algorithme d&apos;Evaluation de l&apos;Attitude</translation>
+        <translation>Algorithme d&apos;Evaluation de l&apos;Attitude</translation>
     </message>
     <message>
         <location/>
         <source>Selects the sensor integration algorithm to be used by the Revolution board.</source>
-        <translation type="unfinished">Sélectionnez l&apos;algorithme d&apos;intégration du capteur utilisé par la carte Revolution.</translation>
+        <translation>Sélectionnez l&apos;algorithme d&apos;intégration du capteur utilisé par la carte Revolution.</translation>
     </message>
     <message>
         <location/>
         <source>Home Location</source>
-        <translation type="unfinished">Position Home</translation>
+        <translation>Position Home</translation>
     </message>
     <message>
         <location/>
         <source>Gravity acceleration:</source>
-        <translation type="unfinished">Accélération pesanteur : </translation>
+        <translation>Accélération pesanteur : </translation>
     </message>
     <message>
         <location/>
@@ -10053,12 +10052,12 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>Magnetic field vector:</source>
-        <translation type="unfinished">Vecteur champ magnétique : </translation>
+        <translation>Vecteur champ magnétique : </translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This information must be set to enable calibration the Revolution controllers sensors. &lt;br/&gt;Set home location using context menu in the map widget.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette information doit être définie pour permettre la calibration des capteurs du contrôleur Revolution. &lt;br/&gt;Indiquez la position du home en utilisant le menu contextuel sur la carte.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette information doit être définie pour permettre la calibration des capteurs du contrôleur Revolution. &lt;br/&gt;Indiquez la position du home en utilisant le menu contextuel sur la carte.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -10619,7 +10618,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Responsiveness</source>
-        <translation type="unfinished">Réactivité</translation>
+        <translation>Réactivité</translation>
     </message>
     <message>
         <location/>
@@ -10629,67 +10628,67 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>This thing really can preform, it is a lot more responsive this way</source>
-        <translation type="unfinished">Peut vraiment réaliser des choses, il est beaucoup plus sensible de cette façon</translation>
+        <translation>Peut vraiment réaliser des choses, il est beaucoup plus sensible de cette façon</translation>
     </message>
     <message>
         <location/>
         <source>Snappy</source>
-        <translation type="unfinished">Dynamique</translation>
+        <translation>Dynamique</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Rate Mode slider can be adjusted to value ranges whose responsivness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Rate Mode slider peut être ajusté dans des plages dont la réactivité est représentée par les zones Modérée / Dynamique / Démentielle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Rate Mode slider peut être ajusté dans des plages dont la réactivité est représentée par les zones Modérée / Dynamique / Démentielle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Lazy Sunday afternoon flying, fly&apos;s nice and stable</source>
-        <translation type="unfinished">Vol tranquille du Dimanche, stable et agréable</translation>
+        <translation>Vol tranquille du Dimanche, stable et agréable</translation>
     </message>
     <message>
         <location/>
         <source>Moderate</source>
-        <translation type="unfinished">Modérée</translation>
+        <translation>Modérée</translation>
     </message>
     <message>
         <location/>
         <source>Damn this is insane how quick it moves. Mostly used by the Pro&apos;s</source>
-        <translation type="unfinished">Saperlipopète c&apos;est fou comment il se déplace rapidement. Principalement utilisé par les pros</translation>
+        <translation>Saperlipopète c&apos;est fou comment il se déplace rapidement. Principalement utilisé par les pros</translation>
     </message>
     <message>
         <location/>
         <source>Insane</source>
-        <translation type="unfinished">Démentielle</translation>
+        <translation>Démentielle</translation>
     </message>
     <message>
         <location/>
         <source>Attitude mode</source>
-        <translation type="unfinished">Mode Attitude</translation>
+        <translation>Mode Attitude</translation>
     </message>
     <message>
         <location/>
         <source>Rate mode</source>
-        <translation type="unfinished">Mode Rate</translation>
+        <translation>Mode Rate</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Attitude Mode slider can be adjusted to value ranges whose responsivness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Attitude Mode peut être ajusté dans des plages dont la réactivité est représentée par les zones Modérée / Dynamique / Démentielle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Attitude Mode peut être ajusté dans des plages dont la réactivité est représentée par les zones Modérée / Dynamique / Démentielle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Rate mode Yaw slider can be adjusted to value ranges whose responsivness is represented by the Moderate / Snappy / Insane bar&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Rate Mode Yaw peut être ajusté dans des plages dont la réactivité est représentée par les zones Modérée / Dynamique / Démentielle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le curseur Rate Mode Yaw peut être ajusté dans des plages dont la réactivité est représentée par les zones Modérée / Dynamique / Démentielle&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Rate mode yaw</source>
-        <translation type="unfinished">Mode Rate yaw</translation>
+        <translation>Mode Rate yaw</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link roll &amp;amp; pitch sliders to move together, thus giving same value for both roll &amp;amp; pitch when setting up a symetrical vehicle that requires both to be the same&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lie les curseurs roll &amp;amp; pitch pour se déplacer ensemble, ce qui donne la même valeur en roll &amp;amp; pitch lors du paramétrage d&apos;un appareil symétrique qui nécessite la même chose sur les deux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lie les curseurs roll &amp;amp; pitch pour se déplacer ensemble, ce qui donne la même valeur en roll &amp;amp; pitch lors du paramétrage d&apos;un appareil symétrique qui nécessite la même chose sur les deux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -10729,37 +10728,37 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Update flight controller in real time</source>
-        <translation type="unfinished">Mettre à jour le contrôleur de vol en temps réel</translation>
+        <translation>Mettre à jour le contrôleur de vol en temps réel</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the maximum deg your vehicle will tilt at full stick input when in Attitude mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Règle l&apos;angle maximal de l&apos;appareil en degrés pour un ordre manche en butée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Règle l&apos;angle maximal de l&apos;appareil en degrés pour un ordre manche en butée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum rotation rate in degress per second on an axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci règle la vitesse maximale sur un axe, en degrés par seconde.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci règle la vitesse maximale sur un axe, en degrés par seconde.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sets the degress per second the your vehcle will tilt/rotate at full stick input when in all modes except Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Règle la vitesse à laquelle votre appareil s&apos;incline / tourne pour un ordre manche en butée, dans tous les modes sauf Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Règle la vitesse à laquelle votre appareil s&apos;incline / tourne pour un ordre manche en butée, dans tous les modes sauf Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Attitude mode response (deg)</source>
-        <translation type="unfinished">Réponse mode Attitude (deg)</translation>
+        <translation>Réponse mode Attitude (deg)</translation>
     </message>
     <message>
         <location/>
         <source>Rate mode response (deg/s)</source>
-        <translation type="unfinished">Vitesse mode Rate (deg/s)</translation>
+        <translation>Vitesse mode Rate (deg/s)</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link roll &amp;amp; pitch values together, thus giving the same value for each when setting up a symetrical vehicle that requires both to be the same.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lie les valeurs roll &amp;amp; pitch ensemble, ce qui donne la même valeur en roll &amp;amp; pitch lors du paramétrage d&apos;un appareil symétrique qui nécessite la même chose sur les deux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Lie les valeurs roll &amp;amp; pitch ensemble, ce qui donne la même valeur en roll &amp;amp; pitch lors du paramétrage d&apos;un appareil symétrique qui nécessite la même chose sur les deux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -10824,7 +10823,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Altitude Hold</source>
-        <translation type="unfinished"></translation>
+        <translation>Maintien Altitude</translation>
     </message>
     <message>
         <location/>
@@ -10864,12 +10863,12 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Altitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Altitude</translation>
     </message>
     <message>
         <location/>
         <source>Vario Altitude</source>
-        <translation type="unfinished"></translation>
+        <translation>Altitude Vario</translation>
     </message>
     <message>
         <location/>
@@ -10884,7 +10883,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Exponential</source>
-        <translation type="unfinished"></translation>
+        <translation>Exponentiel</translation>
     </message>
     <message>
         <location/>
@@ -10899,17 +10898,17 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Max Vertical Velocity</source>
-        <translation type="unfinished">Vitesse Max Verticale</translation>
+        <translation>Vitesse Max Verticale</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Maximum allowed vertical velocity in m/s.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Vitesse verticale maximale autorisée en m/s.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Vitesse verticale maximale autorisée en m/s.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Throttle Stick Response</source>
-        <translation type="unfinished"></translation>
+        <translation>Réponse Manche Gaz</translation>
     </message>
 </context>
 <context>
@@ -13040,14 +13039,12 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
     <message>
         <location line="+6"/>
         <source>If selecting the Helicopter option, please engage throttle hold now.</source>
-        <translatorcomment>please engage throttle hold now... à confirmer ! [Platypus] Ca me semble bien</translatorcomment>
-        <translation type="unfinished">Si vous avez sélectionné l&apos;option Hélicoptère, veuillez enclencher et maintenir les gaz.</translation>
+        <translation>Si vous avez sélectionné l&apos;option Hélicoptère, veuillez enclencher et maintenir les gaz.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Please choose your transmitter mode:</source>
-        <translatorcomment>[Platypus] Préférence sur le mot sélectionner</translatorcomment>
-        <translation type="unfinished">Veuillez sélectionner votre mode de pilotage :</translation>
+        <translation>Veuillez sélectionner votre mode de pilotage :</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -13123,7 +13120,7 @@ Vous pouvez appuyer à tout moment sur &apos;Précédent&apos; pour revenir à l
 
 If your FlightMode switch has only two positions, leave it in either position.</source>
         <translatorcomment>compensateur (me parle pas bcp) Laisser Trim ? Répétition &apos;et&apos;.</translatorcomment>
-        <translation type="unfinished">Veuillez positionner tous les manches/trims en position centrale et appuyer sur Suivant lorsque vous êtes prêt.
+        <translation>Veuillez positionner tous les manches/trims en position centrale et appuyer sur Suivant lorsque vous êtes prêt.
 
 Si votre interrupteur de Mode de Vol a seulement deux positions, laissez-le dans n&apos;importe quelle position.</translation>
     </message>
@@ -13371,47 +13368,47 @@ Bougez le manche %1.</translation>
     <message>
         <location line="+1"/>
         <source>Before first</source>
-        <translation type="unfinished"></translation>
+        <translation>Avant premier</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Before second</source>
-        <translation type="unfinished"></translation>
+        <translation>Avant deuxième</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>After second</source>
-        <translation type="unfinished"></translation>
+        <translation>Après deuxième</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Repeat Once</source>
-        <translation type="unfinished"></translation>
+        <translation>Répéter une fois</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Repeat Once per update</source>
-        <translation type="unfinished"></translation>
+        <translation>Répéter une fois par mise à jour</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Repeat Instantly</source>
-        <translation type="unfinished"></translation>
+        <translation>Répéter Immédiatement</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Repeat 10 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Répéter 10 secondes</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Repeat 30 seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Répéter 30 secondes</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Repeat 1 minute</source>
-        <translation type="unfinished"></translation>
+        <translation>Répéter 1 minute</translation>
     </message>
 </context>
 <context>
@@ -13890,7 +13887,9 @@ Bougez le manche %1.</translation>
 
 Please make sure the board is not armed and then press halt again to proceed
 or use the rescue option to force a firmware upgrade.</source>
-        <translation type="unfinished"></translation>
+        <translation>La carte contrôleur est armée et ne peut être arrêtée.
+
+Veuillez vérifier que la carte n&apos;est pas armée et appuyez à nouveau sur arrêt pour continuer ou utilisez l&apos;option sauvetage pour forcer la mise à jour du firmware.</translation>
     </message>
     <message>
         <location line="+31"/>
@@ -13898,7 +13897,9 @@ or use the rescue option to force a firmware upgrade.</source>
 
 Please make sure the board is not armed and then press reset again to proceed
 or power cycle to force a board reset.</source>
-        <translation type="unfinished"></translation>
+        <translation>La carte contrôleur est armée et ne peut être réinitialisée.
+
+Veuillez vérifier que la carte n&apos;est pas armée et appuyez à nouveau sur réinitialiser pour continuer ou coupez/alimentez la carte pour forcer la réinitialisation.</translation>
     </message>
     <message>
         <location line="+24"/>
@@ -13910,7 +13911,7 @@ or power cycle to force a board reset.</source>
         <source>Do you want to erase all settings from the board?
 Settings cannot be recovered after this operation.
 The board will be restarted and all the setting erased</source>
-        <translation type="unfinished">Voulez-vous effacer tous les paramètres sur la carte ?
+        <translation>Voulez-vous effacer tous les paramètres sur la carte ?
 Les paramètres ne pourront être récupérés après cette opération.
 La carte sera redémarrée et tous les paramètres effacés</translation>
     </message>
@@ -14946,37 +14947,37 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>RX Good</source>
-        <translation type="unfinished">Rx Corrects</translation>
+        <translation>Rx Corrects</translation>
     </message>
     <message>
         <location/>
         <source>The percentage of packets that were corrected with error correction</source>
-        <translation type="unfinished">Le pourcentage de paquets corrigés par la correction d&apos;erreurs</translation>
+        <translation>Le pourcentage de paquets corrigés par la correction d&apos;erreurs</translation>
     </message>
     <message>
         <location/>
         <source>RX Corrected</source>
-        <translation type="unfinished">Rx Corrigés</translation>
+        <translation>Rx Corrigés</translation>
     </message>
     <message>
         <location/>
         <source>RX Errors</source>
-        <translation type="unfinished">Erreurs RX</translation>
+        <translation>Erreurs RX</translation>
     </message>
     <message>
         <location/>
         <source>The percentage of packets that could not be corrected with error correction</source>
-        <translation type="unfinished">Le pourcentage de paquets qui n&apos;ont pu être corrigés par la correction d&apos;erreurs</translation>
+        <translation>Le pourcentage de paquets qui n&apos;ont pu être corrigés par la correction d&apos;erreurs</translation>
     </message>
     <message>
         <location/>
         <source>RX Missed</source>
-        <translation type="unfinished">Rx Perdus</translation>
+        <translation>Rx Perdus</translation>
     </message>
     <message>
         <location/>
         <source>The percentage of packets that were not received at all</source>
-        <translation type="unfinished">Le pourcentage de paquets qui n&apos;ont pas été reçus du tout</translation>
+        <translation>Le pourcentage de paquets qui n&apos;ont pas été reçus du tout</translation>
     </message>
     <message>
         <location/>
@@ -15341,7 +15342,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/app/main.cpp" line="-59"/>
         <source>Application starting...</source>
-        <translation type="unfinished">Démarrage application...</translation>
+        <translation>Démarrage application...</translation>
     </message>
 </context>
 <context>
@@ -15349,12 +15350,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configoutputwidget.cpp" line="+139"/>
         <source>The actuator module is in an error state. This can also occur because there are no inputs. Please fix these before testing outputs.</source>
-        <translation type="unfinished">Le module actionneur est en erreur. Cela peut aussi arriver lorsque il n&apos;y a pas d&apos;entrées (Rx radiocommande). Veuiller corriger cela avant de tester les sorties.</translation>
+        <translation>Le module actionneur est en erreur. Cela peut aussi arriver lorsque il n&apos;y a pas d&apos;entrées (Rx radiocommande). Veuiller corriger cela avant de tester les sorties.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>This option will start your motors by the amount selected on the sliders regardless of transmitter. It is recommended to remove any blades from motors. Are you sure you want to do this?</source>
-        <translation type="unfinished">Cette option démarre vos moteurs avec la valeur sélectionnée sur les curseurs, indépendamment de l&apos;émetteur. Il est recommandé d&apos;enlever les hélices des moteurs. Êtes-vous sûr de vouloir faire ça ?</translation>
+        <translation>Cette option démarre vos moteurs avec la valeur sélectionnée sur les curseurs, indépendamment de l&apos;émetteur. Il est recommandé d&apos;enlever les hélices des moteurs. Êtes-vous sûr de vouloir faire ça ?</translation>
     </message>
 </context>
 <context>
@@ -15362,7 +15363,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/config/configrevohwwidget.cpp" line="+88"/>
         <source>Disabled</source>
-        <translation type="unfinished">Désactivé</translation>
+        <translation>Désactivé</translation>
     </message>
 </context>
 <context>
@@ -15371,7 +15372,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/plugins/config/configrevowidget.cpp" line="+529"/>
         <location line="+380"/>
         <source>&lt;p&gt;HomeLocation not SET.&lt;/p&gt;&lt;p&gt;Please set your HomeLocation and try again. Aborting calibration!&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;p&gt;Position Home non définie.&lt;/p&gt;&lt;p&gt;Veuillez définir votre position Home et essayez à nouveau. Calibration abandonnée !&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;Position Home non définie.&lt;/p&gt;&lt;p&gt;Veuillez définir votre position Home et essayez à nouveau. Calibration abandonnée !&lt;/p&gt;</translation>
     </message>
 </context>
 <context>

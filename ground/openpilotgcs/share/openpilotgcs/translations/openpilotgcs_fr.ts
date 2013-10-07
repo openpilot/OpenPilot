@@ -224,7 +224,7 @@
     <message>
         <location line="+19"/>
         <source>Edit Gadgets Mode</source>
-        <translation>Éditer Mode Gadgets</translation>
+        <translation>Mode Éditeur Gadgets</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1203,7 +1203,7 @@ Raison : %3</translation>
         <location/>
         <location filename="../../../src/experimental/finaltest/ui_mainwindow.h" line="+1"/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">-</translation>
     </message>
     <message>
         <location/>
@@ -6057,7 +6057,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location line="+1"/>
         <source>Maybe you first have to choose Edit Gadgets Mode in the Window menu.</source>
-        <translation>Peut-être avez-vous besoin de d&apos;abord cocher Éditer Gadgets Mode dans le menu Fenêtre.</translation>
+        <translation>Peut-être avez-vous besoin de d&apos;abord cocher Mode Éditeur Gadgets dans le menu Fenêtre.</translation>
     </message>
 </context>
 <context>
@@ -6352,7 +6352,12 @@ uniquement lorsque les valeurs changent</translation>
         <translation>Mode carte</translation>
     </message>
     <message>
-        <location line="+20"/>
+        <location line="+18"/>
+        <source>Safety Area definitions</source>
+        <translation type="unfinished">Zone de Sécurité</translation>
+    </message>
+    <message>
+        <location line="+2"/>
         <source>Safe Area Radius</source>
         <translation>Rayon Zone Sécurité</translation>
     </message>
@@ -7267,6 +7272,16 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
+    <message>
+        <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripform.cpp" line="+49"/>
+        <source>Currently ripping from:%1 at Zoom level %2</source>
+        <translation type="unfinished">Récupération en cours de : %1 à un niveau de Zoom %2</translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <source>Downloading tile %1 of %2</source>
+        <translation type="unfinished">Téléchargement de la dalle %1 sur %2</translation>
+    </message>
 </context>
 <context>
     <name>AircraftWidget</name>
@@ -7432,7 +7447,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Armed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Armé</translation>
     </message>
     <message>
         <location/>
@@ -8851,7 +8866,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Droite</translation>
     </message>
     <message>
         <location/>
@@ -8861,7 +8876,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gauche</translation>
     </message>
     <message>
         <location/>
@@ -9076,7 +9091,7 @@ accéléromètres dans la mémoire Flash de la carte.</translation>
     <message>
         <location/>
         <source>Motor outputs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sorties moteurs</translation>
     </message>
     <message>
         <location/>
@@ -13337,7 +13352,8 @@ Bougez le manche %1.</translation>
         <translation>Arrêter enregistrement</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="-34"/>
+        <location line="+37"/>
         <source>Start logging...</source>
         <translation>Démarrer enregistrement...</translation>
     </message>
@@ -14000,7 +14016,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Motor outputs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sorties moteurs</translation>
     </message>
     <message>
         <location/>
@@ -14035,7 +14051,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Right</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Droite</translation>
     </message>
     <message>
         <location/>
@@ -14045,7 +14061,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Left</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gauche</translation>
     </message>
     <message>
         <location/>
@@ -15560,6 +15576,56 @@ p, li { white-space: pre-wrap; }
         <location line="+10"/>
         <source>Custom Firmware Build</source>
         <translation>Version Firmware Personnelle</translation>
+    </message>
+</context>
+<context>
+    <name>mapcontrol::MapRipper</name>
+    <message>
+        <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripper.cpp" line="+49"/>
+        <location line="+2"/>
+        <source>No valid selection</source>
+        <translation type="unfinished">Sélection non-valide</translation>
+    </message>
+    <message>
+        <location line="-2"/>
+        <source>This pre-caches map data.
+
+Please first select the area of the map to rip with &lt;COMMAND&gt;+Left mouse click</source>
+        <translation type="unfinished">Ceci précharge les données de la carte.
+
+Veuillez sélectionner une zone de la carte à télécharger avec &lt;COMMAND&gt;+Clic gauche de la souris</translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>This pre-caches map data.
+
+Please first select the area of the map to rip with &lt;CTRL&gt;+Left mouse click</source>
+        <translation type="unfinished">Ceci précharge les données de la carte.
+
+Veuillez sélectionner une zone de la carte à télécharger avec &lt;CTRL&gt;+Clic gauche de la souris</translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Continue Ripping at zoom level %1?</source>
+        <translation type="unfinished">Continuer le téléchargement du niveau de zoom %1 ?</translation>
+    </message>
+</context>
+<context>
+    <name>AboutDialog</name>
+    <message>
+        <location filename="../../../src/plugins/coreplugin/qml/AboutDialog.qml" line="+52"/>
+        <source>OpenPilot GCS</source>
+        <translation type="unfinished">OpenPilot GCS</translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <source>Contributors</source>
+        <translation type="unfinished">Contributeurs</translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>&lt;h4&gt;These people have been key contributors to the OpenPilot project. Without the work of the people in this list, OpenPilot would not be what it is today.&lt;/h4&gt;&lt;p&gt;This list is sorted alphabetically by name&lt;/p&gt;</source>
+        <translation type="unfinished">&lt;h4&gt;Ces personnes ont été des contributeurs déterminants pour le projet OpenPilot. Sans le travail des personnes figurant sur cette liste, OpenPilot ne serait pas ce qu&apos;il est aujourd&apos;hui.&lt;/h4&gt;&lt;p&gt;Cette liste est triée par ordre alphabétique&lt;/p&gt;</translation>
     </message>
 </context>
 </TS>

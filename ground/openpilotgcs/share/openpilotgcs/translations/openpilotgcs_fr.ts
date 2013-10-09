@@ -1770,7 +1770,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Refresh rate:</source>
-        <translation type="unfinished">Intervalle d&apos;actualisation :</translation>
+        <translation>Intervalle d&apos;actualisation :</translation>
     </message>
     <message>
         <location/>
@@ -1790,7 +1790,7 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Ground truth position and velocity</source>
-        <translation type="unfinished">Position au sol et vitesse</translation>
+        <translation>Position au sol et vitesse</translation>
     </message>
     <message>
         <location/>
@@ -1810,32 +1810,32 @@ Raison : %3</translation>
     <message>
         <location/>
         <source>Range detection:</source>
-        <translation type="unfinished"></translation>
+        <translation>Plage de détection :</translation>
     </message>
     <message>
         <location/>
         <source>Map transmitter commands...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lier les commandes transmetteur...</translation>
     </message>
     <message>
         <location/>
         <source>from hardware to simulator (via ManualCtrl)</source>
-        <translation type="unfinished"></translation>
+        <translation>du matériel vers le simulateur (via ManualCtrl)</translation>
     </message>
     <message>
         <location/>
         <source>from simulator to hardware (via GCSReceiver)</source>
-        <translation type="unfinished"></translation>
+        <translation>du simulateur vers le matériel (via GCSReceiver)</translation>
     </message>
     <message>
         <location/>
         <source>Maximum GCS to hardware output rate:</source>
-        <translation type="unfinished"></translation>
+        <translation>Vitesse maximale d&apos;envoi de GCS vers matériel :</translation>
     </message>
     <message>
         <location/>
         <source>Set the maximum rate at which GCS sends simulator data to the hardware</source>
-        <translation type="unfinished"></translation>
+        <translation>Règle la vitesse maximale à laquelle GCS envoie les données simulateur vers le matériel</translation>
     </message>
     <message>
         <location/>
@@ -2582,7 +2582,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Update Interval:</source>
-        <translation type="unfinished">Intervalle Actualisation :</translation>
+        <translation>Intervalle Actualisation :</translation>
     </message>
     <message>
         <location/>
@@ -2593,13 +2593,13 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>Add a new curve to the scope, or update it if the UAVObject and UAVField is the same.</source>
         <translatorcomment>Oscilloscope ?</translatorcomment>
-        <translation type="unfinished">Ajoute une nouvelle courbe au graphique, ou l&apos;actualise si UAVObject et UAVField sont identiques.</translation>
+        <translation>Ajoute une nouvelle courbe au graphique, ou l&apos;actualise si UAVObject et UAVField sont identiques.</translation>
     </message>
     <message>
         <location/>
         <source>Remove the curve from the scope.</source>
         <translatorcomment>Oscilloscope ?</translatorcomment>
-        <translation type="unfinished">Retire la courbe du graphique.</translation>
+        <translation>Retire la courbe du graphique.</translation>
     </message>
     <message>
         <location/>
@@ -2650,12 +2650,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/scope/scopegadgetoptionspage.ui"/>
         <source>Check this to have the curve drawn antialiased.</source>
-        <translation type="unfinished">Cocher ici pour avoir un tracé de courbe anticrénelé.</translation>
+        <translation>Cocher ici pour avoir un tracé de courbe anticrénelé.</translation>
     </message>
     <message>
         <location/>
         <source>Draw Antialiased</source>
-        <translation type="unfinished">Tracé anticrénelé</translation>
+        <translation>Tracé anticrénelé</translation>
     </message>
     <message>
         <location/>
@@ -7255,7 +7255,7 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripform.ui"/>
         <source>MapRipper</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7275,12 +7275,12 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripform.cpp" line="+49"/>
         <source>Currently ripping from:%1 at Zoom level %2</source>
-        <translation type="unfinished">Récupération en cours de : %1 à un niveau de Zoom %2</translation>
+        <translation>Récupération en cours de : %1 à un niveau de Zoom %2</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Downloading tile %1 of %2</source>
-        <translation type="unfinished">Téléchargement de la dalle %1 sur %2</translation>
+        <translation>Téléchargement de la dalle %1 sur %2</translation>
     </message>
 </context>
 <context>
@@ -7457,7 +7457,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>UDP Control</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Contrôle UDP</translation>
     </message>
 </context>
 <context>
@@ -8313,7 +8313,8 @@ value.</source>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/display/Doc/Camera+Stabilization+Configuration</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Lien Wiki FR</translatorcomment>
+        <translation>url:http://wiki.openpilot.org/x/UoHWAQ</translation>
     </message>
     <message>
         <location/>
@@ -10083,7 +10084,7 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>Is Set</source>
-        <translation type="unfinished"></translation>
+        <translation>Est Réglé</translation>
     </message>
     <message>
         <location/>
@@ -10105,7 +10106,8 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/display/Doc/Revo+Configuration</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Wiki FR Calib Revo</translatorcomment>
+        <translation>url:http://wiki.openpilot.org/x/FQWJAQ</translation>
     </message>
     <message>
         <location/>
@@ -10135,7 +10137,7 @@ Une valeur de 0.00 désactive le filtre.</translation>
     <message>
         <location/>
         <source>Rate Stabilization (Inner Loop)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stabilisation Rate (Boucle Intérieure)</translation>
     </message>
     <message>
         <location/>
@@ -10260,7 +10262,7 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>Attitude Stabilization (Outer Loop)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Stabilisation Attitude (Boucle Extérieure)</translation>
     </message>
     <message>
         <location/>
@@ -10582,7 +10584,8 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/DAO9</source>
-        <translation></translation>
+        <translatorcomment>Wiki FR</translatorcomment>
+        <translation>url:http://wiki.openpilot.org/x/d4BqAQ</translation>
     </message>
     <message>
         <location/>
@@ -10913,7 +10916,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Max Vertical Velocity</source>
-        <translation>Vitesse Max Verticale</translation>
+        <translation type="unfinished">Vitesse Verticale Maxi</translation>
     </message>
     <message>
         <location/>
@@ -11122,7 +11125,8 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/DACiAQ</source>
-        <translation></translation>
+        <translatorcomment>Wiki FR</translatorcomment>
+        <translation>url:http://wiki.openpilot.org/x/N4DWAQ</translation>
     </message>
     <message>
         <location/>
@@ -11341,12 +11345,12 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location filename="../../../src/plugins/hitl/aerosimrc/src/udptestwidget.ui"/>
         <source>send data</source>
-        <translation type="unfinished">envoi données</translation>
+        <translation>envoi données</translation>
     </message>
     <message>
         <location/>
         <source>Flight mode</source>
-        <translation type="unfinished">Mode de vol</translation>
+        <translation>Mode de vol</translation>
     </message>
     <message>
         <location/>
@@ -11371,7 +11375,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location/>
         <source>Channels</source>
-        <translation type="unfinished">Canaux</translation>
+        <translation>Canaux</translation>
     </message>
 </context>
 <context>
@@ -11415,7 +11419,7 @@ uniquement lorsque le système est armé, sans désactiver le module.</translati
     <message>
         <location filename="../../../src/plugins/opmap/pathplanner.ui"/>
         <source>PathPlanner</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -12726,7 +12730,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location filename="../../../src/plugins/uploader/uploader.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -12844,7 +12848,7 @@ automatiquement lorsque vous arrêtez une carte en fonctionnement. </translation
         <location/>
         <source>Mainboard</source>
         <translatorcomment>Carte mère ?</translatorcomment>
-        <translation type="unfinished">Carte Principale</translation>
+        <translation>Carte Principale</translation>
     </message>
     <message>
         <location/>
@@ -12919,7 +12923,7 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Ubuntu&apos;; font-size:11pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+        <translation>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -13497,7 +13501,7 @@ Bougez le manche %1.</translation>
     <message>
         <location filename="../../../src/plugins/scope/scopegadgetwidget.cpp" line="+231"/>
         <source>Click legend to show/hide scope trace</source>
-        <translation type="unfinished">Cliquer sur la légende pour afficher / cacher la tracé du graphique</translation>
+        <translation>Cliquer sur la légende pour afficher / cacher la tracé du graphique</translation>
     </message>
 </context>
 <context>
@@ -13934,7 +13938,8 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location line="+6"/>
         <source>http://wiki.openpilot.org/display/Doc/Erase+board+settings</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Wiki FR - Uploader</translatorcomment>
+        <translation>http://wiki.openpilot.org/x/SYBqAQ</translation>
     </message>
     <message>
         <location line="+87"/>
@@ -14649,7 +14654,8 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
         <location/>
         <source>Weight of Roll mixing in percent.
 Typical values are 100% for + configuration and 50% for X configuration on quads.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Quantité de mixage Roll en pourcentage.
+Les valeurs classiques sont de 100% en configuration + et 50% en configuration X sur les quadricoptères.</translation>
     </message>
     <message>
         <location/>
@@ -14665,7 +14671,8 @@ Typical values are 100% for + configuration and 50% for X configuration on quads
         <location/>
         <source>Weight of Pitch mixing in percent.
 Typical values are 100% for + configuration and 50% for X configuration on quads.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Quantité de mixage Pitch en pourcentage.
+Les valeurs classiques sont de 100% en configuration + et 50% en configuration X sur les quadricoptères.</translation>
     </message>
     <message>
         <location/>
@@ -14676,12 +14683,13 @@ Typical values are 100% for + configuration and 50% for X configuration on quads
         <location/>
         <source>Weight of Yaw mixing in percent.
 Typical value is 50% for + or X configuration on quads.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Quantité de mixage Yaw en pourcentage.
+Les valeurs classiques sont de 50% en configuration + et X sur les quadricoptères.</translation>
     </message>
     <message>
         <location/>
         <source>Frame Type:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Type Châssis :</translation>
     </message>
     <message>
         <location/>
@@ -14691,7 +14699,7 @@ Typical value is 50% for + or X configuration on quads.</source>
     <message>
         <location/>
         <source>Mixer OK</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Mixage OK</translation>
     </message>
     <message>
         <location/>
@@ -14857,8 +14865,8 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>url:http://wiki.openpilot.org/x/dACrAQ</source>
-        <translatorcomment>Lien wiki FR ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Lien wiki FR </translatorcomment>
+        <translation>url:http://wiki.openpilot.org/x/AwCEAQ</translation>
     </message>
     <message>
         <location/>
@@ -14998,17 +15006,17 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>TX Dropped</source>
-        <translation type="unfinished">Tx Perdus</translation>
+        <translation>Tx Perdus</translation>
     </message>
     <message>
         <location/>
         <source>TX Resent</source>
-        <translation type="unfinished">TX Renvoyés</translation>
+        <translation>TX Renvoyés</translation>
     </message>
     <message>
         <location/>
         <source>Tx Failure</source>
-        <translation type="unfinished">TX Défaillants</translation>
+        <translation>TX Défaillants</translation>
     </message>
     <message>
         <location/>
@@ -15033,7 +15041,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>RX Failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Rx défaillants</translation>
     </message>
     <message>
         <location/>
@@ -15615,17 +15623,17 @@ Veuillez sélectionner une zone de la carte à télécharger avec &lt;CTRL&gt;+C
     <message>
         <location filename="../../../src/plugins/coreplugin/qml/AboutDialog.qml" line="+52"/>
         <source>OpenPilot GCS</source>
-        <translation type="unfinished">OpenPilot GCS</translation>
+        <translation>OpenPilot GCS</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Contributors</source>
-        <translation type="unfinished">Contributeurs</translation>
+        <translation>Contributeurs</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&lt;h4&gt;These people have been key contributors to the OpenPilot project. Without the work of the people in this list, OpenPilot would not be what it is today.&lt;/h4&gt;&lt;p&gt;This list is sorted alphabetically by name&lt;/p&gt;</source>
-        <translation type="unfinished">&lt;h4&gt;Ces personnes ont été des contributeurs déterminants pour le projet OpenPilot. Sans le travail des personnes figurant sur cette liste, OpenPilot ne serait pas ce qu&apos;il est aujourd&apos;hui.&lt;/h4&gt;&lt;p&gt;Cette liste est triée par ordre alphabétique&lt;/p&gt;</translation>
+        <translation>&lt;h4&gt;Ces personnes ont été des contributeurs déterminants pour le projet OpenPilot. Sans le travail des personnes figurant sur cette liste, OpenPilot ne serait pas ce qu&apos;il est aujourd&apos;hui.&lt;/h4&gt;&lt;p&gt;Cette liste est triée par ordre alphabétique&lt;/p&gt;</translation>
     </message>
 </context>
 </TS>

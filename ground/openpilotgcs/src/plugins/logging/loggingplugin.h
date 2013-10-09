@@ -53,7 +53,7 @@ class LoggingConnection
     : public Core::IConnection {
     Q_OBJECT
 public:
-    LoggingConnection();
+    LoggingConnection(LoggingPlugin *loggingPlugin);
     virtual ~LoggingConnection();
 
     virtual QList <Core::IConnection::device> availableDevices();
@@ -75,6 +75,7 @@ public:
 
 private:
     LogFile logFile;
+    LoggingPlugin *loggingPlugin;
 
 
 protected slots:
@@ -89,6 +90,8 @@ protected:
 class LoggingThread : public QThread {
     Q_OBJECT
 public:
+    virtual ~LoggingThread();
+
     bool openFile(QString file, LoggingPlugin *parent);
 
 private slots:
@@ -114,6 +117,8 @@ private:
 class LoggingPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "OpenPilot.Logging")
+
+    friend class LoggingConnection;
 
 public:
     LoggingPlugin();

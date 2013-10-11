@@ -47,6 +47,9 @@
 
 #define STACK_REQUIRED 512
 
+#define CALIBRATION_DELAY_MS 4000
+#define CALIBRATION_DURATION_MS 6000
+
 // Private types
 struct data {
     AttitudeSettingsData attitudeSettings;
@@ -229,7 +232,7 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         mag[2] = 0.0f;
 #endif
         float magBias[3];
-        RevoCalibrationmag_biasGet(magBias);
+        RevoCalibrationmag_biasArrayGet(magBias);
         // don't trust Mag for initial orientation if it has not been calibrated
         if (magBias[0] < 1e-6f && magBias[1] < 1e-6f && magBias[2] < 1e-6f) {
             this->magCalibrated = false;
@@ -274,18 +277,18 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         this->grot_filtered[0]   = 0.0f;
         this->grot_filtered[1]   = 0.0f;
         this->grot_filtered[2]   = 0.0f;
-        this->timeval   = PIOS_DELAY_GetRaw();
-        this->starttime = this->timeval;
+        this->timeval   = PIOS_DELAY_GetRaw(); // Cycle counter used for precise timing
+        this->starttime = xTaskGetTickCount(); // Tick counter used for long time intervals
 
         return 0; // must return zero on initial initialization, so attitude will init with a valid quaternion
     }
 
-    if (this->init == 0 && PIOS_DELAY_DiffuS(this->starttime) < 4000000) {
+    if (this->init == 0 && xTaskGetTickCount() - this->starttime < CALIBRATION_DELAY_MS / portTICK_RATE_MS) {
         // wait 4 seconds for the user to get his hands off in case the board was just powered
         this->timeval = PIOS_DELAY_GetRaw();
         return 1;
-    } else if (this->init == 0 && PIOS_DELAY_DiffuS(this->starttime) < 10000000) {
-        // For first 7 seconds use accels to get gyro bias
+    } else if (this->init == 0 && xTaskGetTickCount() - this->starttime < (CALIBRATION_DELAY_MS + CALIBRATION_DURATION_MS) / portTICK_RATE_MS) {
+        // For first 6 seconds use accels to get gyro bias
         this->attitudeSettings.AccelKp     = 1.0f;
         this->attitudeSettings.AccelKi     = 0.0f;
         this->attitudeSettings.YawBiasRate = 0.23f;

@@ -204,13 +204,13 @@ static int32_t check_stabilization_settings(int index, bool multirotor)
     // Get the different axis modes for this switch position
     switch (index) {
     case 1:
-        ManualControlSettingsStabilization1SettingsGet(modes);
+        ManualControlSettingsStabilization1SettingsArrayGet(modes);
         break;
     case 2:
-        ManualControlSettingsStabilization2SettingsGet(modes);
+        ManualControlSettingsStabilization2SettingsArrayGet(modes);
         break;
     case 3:
-        ManualControlSettingsStabilization3SettingsGet(modes);
+        ManualControlSettingsStabilization3SettingsArrayGet(modes);
         break;
     default:
         return SYSTEMALARMS_ALARM_ERROR;

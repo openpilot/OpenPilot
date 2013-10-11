@@ -51,6 +51,7 @@ int32_t $(NAME)Initialize();
 UAVObjHandle $(NAME)Handle();
 void $(NAME)SetDefaults(UAVObjHandle obj, uint16_t instId);
 
+$(DATASTRUCTURES)
 /*
  * Packed Object data (unaligned).
  * Should only be used where 4 byte alignment can be guaranteed

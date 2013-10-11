@@ -28,6 +28,7 @@
  */
 
 #include <openpilot.h>
+#include <pios_struct_helper.h>
 #include "inc/alarms.h"
 
 // Private constants
@@ -74,8 +75,8 @@ int32_t AlarmsSet(SystemAlarmsAlarmElem alarm, SystemAlarmsAlarmOptions severity
 
     // Read alarm and update its severity only if it was changed
     SystemAlarmsGet(&alarms);
-    if (alarms.Alarm[alarm] != severity) {
-        alarms.Alarm[alarm] = severity;
+    if (cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] != severity) {
+        cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] = severity;
         SystemAlarmsSet(&alarms);
     }
 
@@ -109,10 +110,10 @@ int32_t ExtendedAlarmsSet(SystemAlarmsAlarmElem alarm,
 
     // Read alarm and update its severity only if it was changed
     SystemAlarmsGet(&alarms);
-    if (alarms.Alarm[alarm] != severity) {
-        alarms.ExtendedAlarmStatus[alarm]    = status;
-        alarms.ExtendedAlarmSubStatus[alarm] = subStatus;
-        alarms.Alarm[alarm] = severity;
+    if (cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] != severity) {
+        cast_struct_to_array(alarms.ExtendedAlarmStatus, alarms.ExtendedAlarmStatus.BootFault)[alarm]    = status;
+        cast_struct_to_array(alarms.ExtendedAlarmSubStatus, alarms.ExtendedAlarmStatus.BootFault)[alarm] = subStatus;
+        cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm] = severity;
         SystemAlarmsSet(&alarms);
     }
 
@@ -137,7 +138,7 @@ SystemAlarmsAlarmOptions AlarmsGet(SystemAlarmsAlarmElem alarm)
 
     // Read alarm
     SystemAlarmsGet(&alarms);
-    return alarms.Alarm[alarm];
+    return cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[alarm];
 }
 
 /**
@@ -229,7 +230,7 @@ static int32_t hasSeverity(SystemAlarmsAlarmOptions severity)
 
     // Go through alarms and check if any are of the given severity or higher
     for (uint32_t n = 0; n < SYSTEMALARMS_ALARM_NUMELEM; ++n) {
-        if (alarms.Alarm[n] >= severity) {
+        if (cast_struct_to_array(alarms.Alarm, alarms.Alarm.Actuator)[n] >= severity) {
             xSemaphoreGiveRecursive(lock);
             return 1;
         }

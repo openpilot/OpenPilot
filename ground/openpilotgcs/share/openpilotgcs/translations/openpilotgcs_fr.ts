@@ -7762,32 +7762,32 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Module Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôle du Module</translation>
     </message>
     <message>
         <location/>
         <source>Enable Autotune Module</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer le module Autotune</translation>
     </message>
     <message>
         <location/>
         <source>Autotune Setup</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Paramètres Autotune</translation>
     </message>
     <message>
         <location/>
         <source>Tuning Aggressiveness</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Réglage Agressivité</translation>
     </message>
     <message>
         <location/>
         <source>Rate Tuning:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Réglage Rate :</translation>
     </message>
     <message>
         <location/>
         <source>Attitude Tuning:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Réglage Attitude :</translation>
     </message>
     <message>
         <location/>
@@ -7817,12 +7817,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Measured Properties</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Propriétés Mesurées</translation>
     </message>
     <message>
         <location/>
         <source>Roll:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Roll :</translation>
     </message>
     <message>
         <location/>
@@ -7852,12 +7852,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Period (ms)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Période (ms)</translation>
     </message>
     <message>
         <location/>
         <source>Gain (deg/s) / output</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Gain (deg/s) / sortie</translation>
     </message>
     <message>
         <location/>
@@ -7872,7 +7872,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Computed Values</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Valeurs Calculées</translation>
     </message>
     <message>
         <location/>
@@ -7902,12 +7902,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Apply Computed Values</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Utiliser les Valeurs Calculées</translation>
     </message>
     <message>
         <location/>
         <source>Step Size</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Taille Pas</translation>
     </message>
     <message>
         <location/>
@@ -7918,18 +7918,18 @@ p, li { white-space: pre-wrap; }
         <location/>
         <source>The Apply and Save buttons below save the autotuning settings which
 will alter settings for the next autotuning flight</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Les boutons Appliquer et Enregistrer ci-dessous enregistrent les paramètres de réglage automatique qui seront pris en compte pour le prochain vol en mode Autotune</translation>
     </message>
     <message>
         <location/>
         <source>Reloads the saved settings into GCS.
 Useful if you have accidentally changed some settings.</source>
-        <translation type="unfinished">Recharge les donnés enregistrées, dans GCS. Utile si vous avez accidentellement modifié des paramètres.</translation>
+        <translation>Recharge les donnés enregistrées, dans GCS. Utile si vous avez accidentellement modifié des paramètres.</translation>
     </message>
     <message>
         <location/>
         <source>Reload Board Data</source>
-        <translation type="unfinished">Recharger Données Carte</translation>
+        <translation>Recharger Données Carte</translation>
     </message>
     <message>
         <location/>
@@ -7988,7 +7988,21 @@ p, li { white-space: pre-wrap; }
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;We&apos;d recommend checking your stabilization settings before trying them out (ie: compare to what you currently use, if they are VASTLY different, probably a good indication bad things will happen).&lt;br /&gt;&lt;/li&gt;
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Test fly the new settings.&lt;/li&gt;
 &lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;If you&apos;re ready to proceed, click the &lt;span style=&quot; font-style:italic;&quot;&gt;Enable Autotune Module&lt;/span&gt; checkbox above this text, click &lt;span style=&quot; font-style:italic;&quot;&gt;save&lt;/span&gt; and go to the next tab.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:20pt; font-weight:600; color:#ff0000;&quot;&gt;ATTENTION :&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt;Ceci est un module complémentaire expérimental de GCS qui va produire des secousses sur votre appareil, etc, donc à tester avec beaucoup d&apos;espace et être &lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt; font-weight:600;&quot;&gt;très très prudent&lt;/span&gt;&lt;span style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot;&gt; sur le fait qu&apos;il puisse créer de mauvaises valeurs de réglage. Normalement il n&apos;y a aucune raison que cela ne fonctionne pas.&lt;br /&gt;&lt;br /&gt;Pour utiliser le réglage automatique, voici les étapes :&lt;br /&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Dans l&apos;onglet &lt;span style=&quot; font-style:italic;&quot;&gt;Configuration Entrées&lt;/span&gt;, &lt;span style=&quot; font-style:italic;&quot;&gt;Inter. Mode Vol&lt;/span&gt;, régler un des modes de vol sur &amp;quot;Autotune&amp;quot;.&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Décoller, changer le mode de vol sur autotune et garder l&apos;appareil en l&apos;air pendant qu&apos;il est secoué.&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Atterrir et désarmer la carte.  (remarque - vous &lt;span style=&quot; font-weight:600;&quot;&gt;DEVEZ&lt;/span&gt; rester en mode autotune à partir de ce moment, le fait de quitter autotune avant de désarmer annule la procédure&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Nous vous recommandons de vérifier vos paramètres de stabilisation avant de les essayer (ex : comparer à ce que vous utilisez actuellement, si elles sont TRES différentes, c&apos;est probablement une bonne indication d&apos;un disfonctionnement).&lt;br /&gt;&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Tester les nouveau paramètres en vol.&lt;/li&gt;
+&lt;li style=&quot; font-family:&apos;Lucida Grande&apos;; font-size:13pt;&quot; style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Si vous êtes prêt à continuer, cochez &lt;span style=&quot; font-style:italic;&quot;&gt;Activer le module Autotune&lt;/span&gt; ci-dessus, &lt;span style=&quot; font-style:italic;&quot;&gt;enregistrez&lt;/span&gt; et passez à l&apos;onglet suivant.&lt;/li&gt;&lt;/ul&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -8011,7 +8025,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location/>
         <source>Module Control</source>
-        <translation>Module de Contrôle</translation>
+        <translation>Contrôle du Module</translation>
     </message>
     <message>
         <location/>
@@ -8391,17 +8405,17 @@ Apply or Save button afterwards.</source>
     <message>
         <location/>
         <source>Output Range (Angle)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Plage Sortie (Angle)</translation>
     </message>
     <message>
         <location/>
         <source>Pitch Or Servo2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Pitch ou Servo2</translation>
     </message>
     <message>
         <location/>
         <source>Roll Or Servo1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Roll ou Servo1</translation>
     </message>
     <message>
         <location/>
@@ -14001,42 +14015,42 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location filename="../../../src/plugins/config/airframe_ccpm.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>Swashplate config:</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration plateau cyclique :</translation>
     </message>
     <message>
         <location/>
         <source>Select aircraft type here</source>
-        <translation type="unfinished">Sélectionner ici le type d&apos;appareil</translation>
+        <translation>Sélectionner ici le type d&apos;appareil</translation>
     </message>
     <message>
         <location/>
         <source>Basic settings</source>
-        <translation type="unfinished">Paramètres de base</translation>
+        <translation>Paramètres de base</translation>
     </message>
     <message>
         <location/>
         <source>Motor outputs</source>
-        <translation type="unfinished">Sorties moteurs</translation>
+        <translation>Sorties moteurs</translation>
     </message>
     <message>
         <location/>
         <source>Tail Rotor</source>
-        <translation type="unfinished">Rotor queue</translation>
+        <translation>Rotor queue</translation>
     </message>
     <message>
         <location/>
         <source>Engine</source>
-        <translation type="unfinished">Moteur</translation>
+        <translation>Moteur</translation>
     </message>
     <message>
         <location/>
         <source>Swashplate outputs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Sorties plateau cyclique</translation>
     </message>
     <message>
         <location/>
@@ -14071,7 +14085,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>1st Servo</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">1er Servo</translation>
     </message>
     <message>
         <location/>
@@ -14111,7 +14125,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Correction Angle</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Correction Angle</translation>
     </message>
     <message>
         <location/>
@@ -14126,7 +14140,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location/>
         <source>Link Roll/Pitch</source>
-        <translation type="unfinished"></translation>
+        <translation>Lier Roll/Pitch</translation>
     </message>
     <message>
         <location/>
@@ -15592,14 +15606,14 @@ p, li { white-space: pre-wrap; }
         <location filename="../../../src/libs/opmapcontrol/src/mapwidget/mapripper.cpp" line="+49"/>
         <location line="+2"/>
         <source>No valid selection</source>
-        <translation type="unfinished">Sélection non-valide</translation>
+        <translation>Sélection non-valide</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>This pre-caches map data.
 
 Please first select the area of the map to rip with &lt;COMMAND&gt;+Left mouse click</source>
-        <translation type="unfinished">Ceci précharge les données de la carte.
+        <translation>Ceci précharge les données de la carte.
 
 Veuillez sélectionner une zone de la carte à télécharger avec &lt;COMMAND&gt;+Clic gauche de la souris</translation>
     </message>
@@ -15608,14 +15622,14 @@ Veuillez sélectionner une zone de la carte à télécharger avec &lt;COMMAND&gt
         <source>This pre-caches map data.
 
 Please first select the area of the map to rip with &lt;CTRL&gt;+Left mouse click</source>
-        <translation type="unfinished">Ceci précharge les données de la carte.
+        <translation>Ceci précharge les données de la carte.
 
 Veuillez sélectionner une zone de la carte à télécharger avec &lt;CTRL&gt;+Clic gauche de la souris</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Continue Ripping at zoom level %1?</source>
-        <translation type="unfinished">Continuer le téléchargement du niveau de zoom %1 ?</translation>
+        <translation>Continuer le téléchargement du niveau de zoom %1 ?</translation>
     </message>
 </context>
 <context>

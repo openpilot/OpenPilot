@@ -66,7 +66,7 @@ void StyledBar::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
     QPainter painter(this);
     QStyleOption option;
-    option.rect = rect();
+    option.rect  = rect();
     option.state = QStyle::State_Horizontal;
     style()->drawControl(QStyle::CE_ToolBar, &option, &painter, this);
 }
@@ -82,8 +82,8 @@ void StyledSeparator::paintEvent(QPaintEvent *event)
     Q_UNUSED(event)
     QPainter painter(this);
     QStyleOption option;
-    option.rect = rect();
-    option.state = QStyle::State_Horizontal;
+    option.rect    = rect();
+    option.state   = QStyle::State_Horizontal;
     option.palette = palette();
     style()->drawPrimitive(QStyle::PE_IndicatorToolBarSeparator, &option, &painter, this);
 }

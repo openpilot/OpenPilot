@@ -40,9 +40,7 @@
 #endif // Q_OS_WIN
 
 namespace Utils {
-
-class QTCREATOR_UTILS_EXPORT HostOsInfo
-{
+class QTCREATOR_UTILS_EXPORT HostOsInfo {
 public:
     // Add more as needed.
     enum HostOs { HostOsWindows, HostOsLinux, HostOsMac, HostOsOtherUnix, HostOsOther };
@@ -52,22 +50,33 @@ public:
                             HostArchitectureArm, HostArchitectureUnknown };
     static HostArchitecture hostArchitecture();
 
-    static bool isWindowsHost() { return hostOs() == HostOsWindows; }
-    static bool isLinuxHost() { return hostOs() == HostOsLinux; }
-    static bool isMacHost() { return hostOs() == HostOsMac; }
+    static bool isWindowsHost()
+    {
+        return hostOs() == HostOsWindows;
+    }
+    static bool isLinuxHost()
+    {
+        return hostOs() == HostOsLinux;
+    }
+    static bool isMacHost()
+    {
+        return hostOs() == HostOsMac;
+    }
     static inline bool isAnyUnixHost();
 
     static QString withExecutableSuffix(const QString &executable)
     {
         QString finalName = executable;
-        if (isWindowsHost())
+
+        if (isWindowsHost()) {
             finalName += QLatin1String(QTC_HOST_EXE_SUFFIX);
+        }
         return finalName;
     }
 
     static Qt::CaseSensitivity fileNameCaseSensitivity()
     {
-        return isWindowsHost() ? Qt::CaseInsensitive: Qt::CaseSensitive;
+        return isWindowsHost() ? Qt::CaseInsensitive : Qt::CaseSensitive;
     }
 
     static QChar pathListSeparator()
@@ -85,14 +94,19 @@ HostOsInfo::HostOs HostOsInfo::hostOs()
 {
 #if defined(Q_OS_WIN)
     return HostOsWindows;
+
 #elif defined(Q_OS_LINUX)
     return HostOsLinux;
+
 #elif defined(Q_OS_MAC)
     return HostOsMac;
+
 #elif defined(Q_OS_UNIX)
     return HostOsOtherUnix;
+
 #else
     return HostOsOther;
+
 #endif
 }
 
@@ -100,11 +114,12 @@ bool HostOsInfo::isAnyUnixHost()
 {
 #ifdef Q_OS_UNIX
     return true;
+
 #else
     return false;
+
 #endif
 }
-
 } // namespace Utils
 
 #endif // HOSTOSINFO_H

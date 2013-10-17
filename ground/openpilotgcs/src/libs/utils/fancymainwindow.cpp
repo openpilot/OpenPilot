@@ -35,13 +35,12 @@
 #include <QDockWidget>
 #include <QSettings>
 
-static const char lockedKeyC[] = "Locked";
-static const char stateKeyC[] = "State";
+static const char lockedKeyC[]   = "Locked";
+static const char stateKeyC[]    = "State";
 static const int settingsVersion = 2;
 static const char dockWidgetActiveState[] = "DockWidgetActiveState";
 
 namespace Utils {
-
 /*! \class Utils::FancyMainWindow
 
     \brief MainWindow with dock widgets and additional "lock" functionality
@@ -49,14 +48,13 @@ namespace Utils {
 
     The dock actions and the additional actions should be accessible
     in a Window-menu.
-*/
+ */
 
-struct FancyMainWindowPrivate
-{
+struct FancyMainWindowPrivate {
     FancyMainWindowPrivate();
 
-    bool m_locked;
-    bool m_handleDockVisibilityChanges;
+    bool    m_locked;
+    bool    m_handleDockVisibilityChanges;
 
     QAction m_menuSeparator1;
     QAction m_toggleLockedAction;
@@ -97,15 +95,17 @@ FancyMainWindow::~FancyMainWindow()
 QDockWidget *FancyMainWindow::addDockForWidget(QWidget *widget)
 {
     QDockWidget *dockWidget = new QDockWidget(widget->windowTitle(), this);
+
     dockWidget->setWidget(widget);
     // Set an object name to be used in settings, derive from widget name
     const QString objectName = widget->objectName();
-    if (objectName.isEmpty())
+    if (objectName.isEmpty()) {
         dockWidget->setObjectName(QLatin1String("dockWidget") + QString::number(dockWidgets().size() + 1));
-    else
+    } else {
         dockWidget->setObjectName(objectName + QLatin1String("DockWidget"));
+    }
     connect(dockWidget->toggleViewAction(), SIGNAL(triggered()),
-        this, SLOT(onDockActionTriggered()), Qt::QueuedConnection);
+            this, SLOT(onDockActionTriggered()), Qt::QueuedConnection);
     connect(dockWidget, SIGNAL(visibilityChanged(bool)),
             this, SLOT(onDockVisibilityChange(bool)));
     connect(dockWidget, SIGNAL(topLevelChanged(bool)),
@@ -118,13 +118,14 @@ QDockWidget *FancyMainWindow::addDockForWidget(QWidget *widget)
 void FancyMainWindow::updateDockWidget(QDockWidget *dockWidget)
 {
     const QDockWidget::DockWidgetFeatures features =
-            (d->m_locked) ? QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable
-                       : QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable;
+        (d->m_locked) ? QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable
+        : QDockWidget::DockWidgetMovable | QDockWidget::DockWidgetClosable | QDockWidget::DockWidgetFloatable;
+
     if (dockWidget->property("managed_dockwidget").isNull()) { // for the debugger tool bar
         QWidget *titleBarWidget = dockWidget->titleBarWidget();
-        if (d->m_locked && !titleBarWidget && !dockWidget->isFloating())
+        if (d->m_locked && !titleBarWidget && !dockWidget->isFloating()) {
             titleBarWidget = new QWidget(dockWidget);
-        else if ((!d->m_locked || dockWidget->isFloating()) && titleBarWidget) {
+        } else if ((!d->m_locked || dockWidget->isFloating()) && titleBarWidget) {
             delete titleBarWidget;
             titleBarWidget = 0;
         }
@@ -136,29 +137,32 @@ void FancyMainWindow::updateDockWidget(QDockWidget *dockWidget)
 void FancyMainWindow::onDockActionTriggered()
 {
     QDockWidget *dw = qobject_cast<QDockWidget *>(sender()->parent());
+
     if (dw) {
-        if (dw->isVisible())
+        if (dw->isVisible()) {
             dw->raise();
+        }
     }
 }
 
 void FancyMainWindow::onDockVisibilityChange(bool visible)
 {
-    if (d->m_handleDockVisibilityChanges)
+    if (d->m_handleDockVisibilityChanges) {
         sender()->setProperty(dockWidgetActiveState, visible);
+    }
 }
 
 void FancyMainWindow::onTopLevelChanged()
 {
-    updateDockWidget(qobject_cast<QDockWidget*>(sender()));
+    updateDockWidget(qobject_cast<QDockWidget *>(sender()));
 }
 
 void FancyMainWindow::setTrackingEnabled(bool enabled)
 {
     if (enabled) {
         d->m_handleDockVisibilityChanges = true;
-        foreach (QDockWidget *dockWidget, dockWidgets())
-            dockWidget->setProperty(dockWidgetActiveState, dockWidget->isVisible());
+        foreach(QDockWidget * dockWidget, dockWidgets())
+        dockWidget->setProperty(dockWidgetActiveState, dockWidget->isVisible());
     } else {
         d->m_handleDockVisibilityChanges = false;
     }
@@ -167,7 +171,7 @@ void FancyMainWindow::setTrackingEnabled(bool enabled)
 void FancyMainWindow::setLocked(bool locked)
 {
     d->m_locked = locked;
-    foreach (QDockWidget *dockWidget, dockWidgets()) {
+    foreach(QDockWidget * dockWidget, dockWidgets()) {
         updateDockWidget(dockWidget);
     }
 }
@@ -187,6 +191,7 @@ void FancyMainWindow::showEvent(QShowEvent *event)
 void FancyMainWindow::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = createPopupMenu();
+
     menu->exec(event->globalPos());
     delete menu;
 }
@@ -194,14 +199,15 @@ void FancyMainWindow::contextMenuEvent(QContextMenuEvent *event)
 void FancyMainWindow::handleVisibilityChanged(bool visible)
 {
     d->m_handleDockVisibilityChanges = false;
-    foreach (QDockWidget *dockWidget, dockWidgets()) {
+    foreach(QDockWidget * dockWidget, dockWidgets()) {
         if (dockWidget->isFloating()) {
             dockWidget->setVisible(visible
-                && dockWidget->property(dockWidgetActiveState).toBool());
+                                   && dockWidget->property(dockWidgetActiveState).toBool());
         }
     }
-    if (visible)
+    if (visible) {
         d->m_handleDockVisibilityChanges = true;
+    }
 }
 
 void FancyMainWindow::saveSettings(QSettings *settings) const
@@ -217,7 +223,7 @@ void FancyMainWindow::saveSettings(QSettings *settings) const
 void FancyMainWindow::restoreSettings(const QSettings *settings)
 {
     QHash<QString, QVariant> hash;
-    foreach (const QString &key, settings->childKeys()) {
+    foreach(const QString &key, settings->childKeys()) {
         hash.insert(key, settings->value(key));
     }
     restoreSettings(hash);
@@ -228,9 +234,9 @@ QHash<QString, QVariant> FancyMainWindow::saveSettings() const
     QHash<QString, QVariant> settings;
     settings.insert(QLatin1String(stateKeyC), saveState(settingsVersion));
     settings.insert(QLatin1String(lockedKeyC), d->m_locked);
-    foreach (QDockWidget *dockWidget, dockWidgets()) {
+    foreach(QDockWidget * dockWidget, dockWidgets()) {
         settings.insert(dockWidget->objectName(),
-                dockWidget->property(dockWidgetActiveState));
+                        dockWidget->property(dockWidgetActiveState));
     }
     return settings;
 }
@@ -238,13 +244,15 @@ QHash<QString, QVariant> FancyMainWindow::saveSettings() const
 void FancyMainWindow::restoreSettings(const QHash<QString, QVariant> &settings)
 {
     QByteArray ba = settings.value(QLatin1String(stateKeyC), QByteArray()).toByteArray();
-    if (!ba.isEmpty())
+
+    if (!ba.isEmpty()) {
         restoreState(ba, settingsVersion);
+    }
     d->m_locked = settings.value(QLatin1String("Locked"), true).toBool();
     d->m_toggleLockedAction.setChecked(d->m_locked);
-    foreach (QDockWidget *widget, dockWidgets()) {
+    foreach(QDockWidget * widget, dockWidgets()) {
         widget->setProperty(dockWidgetActiveState,
-            settings.value(widget->objectName(), false));
+                            settings.value(widget->objectName(), false));
     }
 }
 
@@ -272,14 +280,14 @@ QMenu *FancyMainWindow::createPopupMenu()
     for (int i = 0; i < dockwidgets.size(); ++i) {
         QDockWidget *dockWidget = dockwidgets.at(i);
         if (dockWidget->property("managed_dockwidget").isNull()
-                && dockWidget->parentWidget() == this) {
+            && dockWidget->parentWidget() == this) {
             actions.append(dockwidgets.at(i)->toggleViewAction());
         }
     }
     qSort(actions.begin(), actions.end(), actionLessThan);
     QMenu *menu = new QMenu(this);
-    foreach (QAction *action, actions)
-        menu->addAction(action);
+    foreach(QAction * action, actions)
+    menu->addAction(action);
     menu->addAction(&d->m_menuSeparator1);
     menu->addAction(&d->m_toggleLockedAction);
     menu->addAction(&d->m_menuSeparator2);
@@ -309,8 +317,8 @@ QAction *FancyMainWindow::resetLayoutAction() const
 
 void FancyMainWindow::setDockActionsVisible(bool v)
 {
-    foreach (const QDockWidget *dockWidget, dockWidgets())
-        dockWidget->toggleViewAction()->setVisible(v);
+    foreach(const QDockWidget * dockWidget, dockWidgets())
+    dockWidget->toggleViewAction()->setVisible(v);
     d->m_toggleLockedAction.setVisible(v);
     d->m_menuSeparator1.setVisible(v);
     d->m_menuSeparator2.setVisible(v);
@@ -326,5 +334,4 @@ void FancyMainWindow::setToolBarDockWidget(QDockWidget *dock)
 {
     d->m_toolBarDockWidget = dock;
 }
-
 } // namespace Utils

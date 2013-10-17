@@ -45,29 +45,43 @@ QT_END_NAMESPACE
 // Helper class holding all custom color values
 
 namespace Utils {
-class QTCREATOR_UTILS_EXPORT StyleHelper
-{
+class QTCREATOR_UTILS_EXPORT StyleHelper {
 public:
-    static const unsigned int DEFAULT_BASE_COLOR = 0x666666;
+    static const unsigned int DEFAULT_BASE_COLOR   = 0x666666;
     static const int progressFadeAnimationDuration = 600;
 
     // Height of the project explorer navigation bar
-    static int navigationWidgetHeight() { return 24; }
+    static int navigationWidgetHeight()
+    {
+        return 24;
+    }
     static qreal sidebarFontSize();
     static QPalette sidebarFontPalette(const QPalette &original);
 
     // This is our color table, all colors derive from baseColor
-    static QColor requestedBaseColor() { return m_requestedBaseColor; }
+    static QColor requestedBaseColor()
+    {
+        return m_requestedBaseColor;
+    }
     static QColor baseColor(bool lightColored = false);
     static QColor panelTextColor(bool lightColored = false);
     static QColor highlightColor(bool lightColored = false);
     static QColor shadowColor(bool lightColored = false);
     static QColor borderColor(bool lightColored = false);
-    static QColor buttonTextColor() { return QColor(0x4c4c4c); }
+    static QColor buttonTextColor()
+    {
+        return QColor(0x4c4c4c);
+    }
     static QColor mergedColors(const QColor &colorA, const QColor &colorB, int factor = 50);
 
-    static QColor sidebarHighlight() { return QColor(255, 255, 255, 40); }
-    static QColor sidebarShadow() { return QColor(0, 0, 0, 40); }
+    static QColor sidebarHighlight()
+    {
+        return QColor(255, 255, 255, 40);
+    }
+    static QColor sidebarShadow()
+    {
+        return QColor(0, 0, 0, 40);
+    }
 
     // Sets the base color and makes sure all top level widgets are updated
     static void setBaseColor(const QColor &color);
@@ -79,13 +93,16 @@ public:
     static void horizontalGradient(QPainter *painter, const QRect &spanRect, const QRect &clipRect, bool lightColored = false);
     static void verticalGradient(QPainter *painter, const QRect &spanRect, const QRect &clipRect, bool lightColored = false);
     static void menuGradient(QPainter *painter, const QRect &spanRect, const QRect &clipRect);
-    static bool usePixmapCache() { return true; }
+    static bool usePixmapCache()
+    {
+        return true;
+    }
 
     static void drawIconWithShadow(const QIcon &icon, const QRect &rect, QPainter *p, QIcon::Mode iconMode,
                                    int dipRadius = 3, const QColor &color = QColor(0, 0, 0, 130),
                                    const QPoint &dipOffset = QPoint(1, -2));
     static void drawCornerImage(const QImage &img, QPainter *painter, QRect rect,
-                         int left = 0, int top = 0, int right = 0, int bottom = 0);
+                                int left = 0, int top = 0, int right = 0, int bottom = 0);
 
     static void tintImage(QImage &img, const QColor &tintColor);
     static QLinearGradient statusBarGradient(const QRect &statusBarRect);
@@ -94,6 +111,5 @@ private:
     static QColor m_baseColor;
     static QColor m_requestedBaseColor;
 };
-
 } // namespace Utils
 #endif // STYLEHELPER_H

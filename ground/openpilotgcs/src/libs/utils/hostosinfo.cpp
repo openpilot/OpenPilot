@@ -42,17 +42,21 @@ HostOsInfo::HostArchitecture HostOsInfo::hostArchitecture()
     switch (info.wProcessorArchitecture) {
     case PROCESSOR_ARCHITECTURE_AMD64:
         return HostOsInfo::HostArchitectureAMD64;
+
     case PROCESSOR_ARCHITECTURE_INTEL:
         return HostOsInfo::HostArchitectureX86;
+
     case PROCESSOR_ARCHITECTURE_IA64:
         return HostOsInfo::HostArchitectureItanium;
+
     case PROCESSOR_ARCHITECTURE_ARM:
         return HostOsInfo::HostArchitectureArm;
+
     default:
         return HostOsInfo::HostArchitectureUnknown;
     }
 #else
     return HostOsInfo::HostArchitectureUnknown;
-#endif
-}
 
+#endif // ifdef Q_OS_WIN
+}

@@ -444,7 +444,6 @@ void loadTranslators(QString language, QTranslator &translator, QTranslator &qtT
         }
     }
 }
-
 } // namespace anonymous
 
 int main(int argc, char * *argv)
@@ -457,7 +456,7 @@ int main(int argc, char * *argv)
     systemInit();
 
 #ifdef QT_NO_DEBUG
-//    logInit();
+// logInit();
 #endif
 
     // create application

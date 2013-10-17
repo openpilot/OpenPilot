@@ -43,18 +43,18 @@ QT_END_NAMESPACE
 
 namespace Core {
 namespace Internal {
-
-class FancyTab : public QObject
-{
-    Q_OBJECT
-
-    Q_PROPERTY(float fader READ fader WRITE setFader)
+class FancyTab : public QObject {
+    Q_OBJECT Q_PROPERTY(float fader READ fader WRITE setFader)
 public:
-    FancyTab(QWidget *tabbar) : enabled(false), tabbar(tabbar), m_fader(0) {
+    FancyTab(QWidget *tabbar) : enabled(false), tabbar(tabbar), m_fader(0)
+    {
         animator.setPropertyName("fader");
         animator.setTargetObject(this);
     }
-    float fader() { return m_fader; }
+    float fader()
+    {
+        return m_fader;
+    }
     void setFader(float value);
 
     void fadeIn();
@@ -71,8 +71,7 @@ private:
     float m_fader;
 };
 
-class FancyTabBar : public QWidget
-{
+class FancyTabBar : public QWidget {
     Q_OBJECT
 
 public:
@@ -87,7 +86,10 @@ public:
     void mouseMoveEvent(QMouseEvent *);
     void enterEvent(QEvent *);
     void leaveEvent(QEvent *);
-    bool validIndex(int index) const { return index >= 0 && index < m_tabs.count(); }
+    bool validIndex(int index) const
+    {
+        return index >= 0 && index < m_tabs.count();
+    }
 
     QSize sizeHint() const;
     QSize minimumSizeHint() const;
@@ -95,28 +97,50 @@ public:
     void setTabEnabled(int index, bool enable);
     bool isTabEnabled(int index) const;
 
-    void insertTab(int index, const QIcon &icon, const QString &label) {
+    void insertTab(int index, const QIcon &icon, const QString &label)
+    {
         FancyTab *tab = new FancyTab(this);
+
         tab->icon = icon;
         tab->text = label;
         m_tabs.insert(index, tab);
         updateGeometry();
     }
     void setEnabled(int index, bool enabled);
-    void removeTab(int index) {
+    void removeTab(int index)
+    {
         FancyTab *tab = m_tabs.takeAt(index);
+
         delete tab;
         updateGeometry();
     }
     void setCurrentIndex(int index);
-    int currentIndex() const { return m_currentIndex; }
+    int currentIndex() const
+    {
+        return m_currentIndex;
+    }
 
-    void setTabToolTip(int index, QString toolTip) { m_tabs[index]->toolTip = toolTip; }
-    QString tabToolTip(int index) const { return m_tabs.at(index)->toolTip; }
+    void setTabToolTip(int index, QString toolTip)
+    {
+        m_tabs[index]->toolTip = toolTip;
+    }
+    QString tabToolTip(int index) const
+    {
+        return m_tabs.at(index)->toolTip;
+    }
 
-    QIcon tabIcon(int index) const { return m_tabs.at(index)->icon; }
-    QString tabText(int index) const { return m_tabs.at(index)->text; }
-    int count() const {return m_tabs.count(); }
+    QIcon tabIcon(int index) const
+    {
+        return m_tabs.at(index)->icon;
+    }
+    QString tabText(int index) const
+    {
+        return m_tabs.at(index)->text;
+    }
+    int count() const
+    {
+        return m_tabs.count();
+    }
     QRect tabRect(int index) const;
 
 signals:
@@ -131,14 +155,12 @@ private:
     QRect m_hoverRect;
     int m_hoverIndex;
     int m_currentIndex;
-    QList<FancyTab*> m_tabs;
+    QList<FancyTab *> m_tabs;
     QTimer m_triggerTimer;
     QSize tabSizeHint(bool minimum = false) const;
-
 };
 
-class FancyTabWidget : public QWidget
-{
+class FancyTabWidget : public QWidget {
     Q_OBJECT
 
 public:
@@ -180,7 +202,6 @@ private:
     QWidget *m_selectionWidget;
     QStatusBar *m_statusBar;
 };
-
 } // namespace Internal
 } // namespace Core
 

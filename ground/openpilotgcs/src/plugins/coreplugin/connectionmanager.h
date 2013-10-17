@@ -44,11 +44,10 @@
 #include <QTimer>
 
 namespace Core {
-
 class IConnection;
 
 namespace Internal {
-    class MainWindow;
+class MainWindow;
 } // namespace Internal
 
 class DevListItem {

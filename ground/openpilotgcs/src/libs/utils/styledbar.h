@@ -34,9 +34,7 @@
 #include <QWidget>
 
 namespace Utils {
-
-class QTCREATOR_UTILS_EXPORT StyledBar : public QWidget
-{
+class QTCREATOR_UTILS_EXPORT StyledBar : public QWidget {
     Q_OBJECT
 public:
     StyledBar(QWidget *parent = 0);
@@ -50,15 +48,13 @@ protected:
     void paintEvent(QPaintEvent *event);
 };
 
-class QTCREATOR_UTILS_EXPORT StyledSeparator : public QWidget
-{
+class QTCREATOR_UTILS_EXPORT StyledSeparator : public QWidget {
     Q_OBJECT
 public:
     StyledSeparator(QWidget *parent = 0);
 protected:
     void paintEvent(QPaintEvent *event);
 };
-
 } // Utils
 
 #endif // STYLEDBAR_H

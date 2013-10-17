@@ -35,8 +35,7 @@
 
 class ManhattanStylePrivate;
 
-class CORE_EXPORT ManhattanStyle : public QProxyStyle
-{
+class CORE_EXPORT ManhattanStyle : public QProxyStyle {
     Q_OBJECT
 
 public:

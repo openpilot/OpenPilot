@@ -60,8 +60,6 @@ void PathActionEditorPlugin::shutdown()
 {
     // Do nothing
 }
-Q_EXPORT_PLUGIN(PathActionEditorPlugin)
-
 /**
  * @}
  * @}

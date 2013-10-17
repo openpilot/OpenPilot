@@ -69,5 +69,3 @@ void ConfigPlugin::extensionsInitialized()
 
 void ConfigPlugin::shutdown()
 {}
-
-Q_EXPORT_PLUGIN(ConfigPlugin)

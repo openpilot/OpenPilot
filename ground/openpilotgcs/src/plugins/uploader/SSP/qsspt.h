@@ -31,6 +31,7 @@
 #include <QThread>
 #include <QQueue>
 #include <QWaitCondition>
+#include <QMutex>
 class qsspt : public qssp, public QThread {
 public:
     qsspt(port *info, bool debug);

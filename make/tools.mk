@@ -9,8 +9,8 @@
 # Ready to use:
 #    arm_sdk_install
 #    qt_sdk_install
-#    mingw_install (Windows only)
-#    python_install (Windows only)
+#    mingw_install (Windows only - NOT USED for Qt-5.1.x)
+#    python_install (Windows only - NOT USED for Qt-5.1.x)
 #    nsis_install (Windows only)
 #    uncrustify_install
 #    doxygen_install
@@ -57,23 +57,21 @@ endif
 ifeq ($(UNAME), Linux)
     ifeq ($(ARCH), x86_64)
         ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-amd64.tar.bz2
-        QT_SDK_URL  := "Please install native Qt 4.8.x SDK using package manager"
+        QT_SDK_URL  := "Please install native Qt 5.1.x SDK using package manager"
     else
         ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-i686.tar.bz2
-        QT_SDK_URL  := "Please install native Qt 4.8.x SDK using package manager"
+        QT_SDK_URL  := "Please install native Qt 5.1.x SDK using package manager"
     endif
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Darwin)
     ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-mac.tar.bz2
-    QT_SDK_URL     := "Please install native Qt 4.8.x SDK using package manager"
+    QT_SDK_URL     := "Please install native Qt 5.1.x SDK using package manager"
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Windows)
     ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
-    QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-4.8.4-windows.tar.bz2
-    MINGW_URL      := http://wiki.openpilot.org/download/attachments/18612236/mingw-4.4.0.tar.bz2
-    PYTHON_URL     := http://wiki.openpilot.org/download/attachments/18612236/python-2.7.4-windows.tar.bz2
+    QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-5.1.0-windows.tar.bz2
     NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
@@ -83,9 +81,9 @@ GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0
 
 # Changing PYTHON_DIR, also update it in ground/openpilotgcs/src/python.pri
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
-QT_SDK_DIR      := $(TOOLS_DIR)/qt-4.8.4
-MINGW_DIR       := $(TOOLS_DIR)/mingw-4.4.0
-PYTHON_DIR      := $(TOOLS_DIR)/python-2.7.4
+QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.1.0
+MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw48_32
+PYTHON_DIR      := $(QT_SDK_DIR)/Tools/mingw48_32/opt/bin
 NSIS_DIR        := $(TOOLS_DIR)/nsis-2.46-unicode
 UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
@@ -308,20 +306,24 @@ endef
 
 ifeq ($(UNAME), Windows)
 
+QT_SDK_PREFIX := $(QT_SDK_DIR)/5.1.0/mingw48_32
+
 define QT_SDK_CONFIGURE_TEMPLATE
 	@$(ECHO) $(MSG_CONFIGURING) $(call toprel, $(QT_SDK_DIR))
-	$(V1) $(ECHO) $(QUOTE)[Paths]$(QUOTE) > $(QT_SDK_DIR)/bin/qt.conf
-	$(V1) $(ECHO) $(QUOTE)Prefix = $(QT_SDK_DIR)$(QUOTE) >> $(QT_SDK_DIR)/bin/qt.conf
+	$(V1) $(ECHO) $(QUOTE)[Paths]$(QUOTE) > $(QT_SDK_PREFIX)/bin/qt.conf
+	$(V1) $(ECHO) $(QUOTE)Prefix = $(QT_SDK_PREFIX)$(QUOTE) >> $(QT_SDK_PREFIX)/bin/qt.conf
 endef
 
     $(eval $(call TOOL_INSTALL_TEMPLATE,qt_sdk,$(QT_SDK_DIR),$(QT_SDK_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_CONFIGURE_TEMPLATE)))
 
 else
 
+QT_SDK_PREFIX := $(QT_SDK_DIR)
+
 .PHONY: qt_sdk_install
 qt_sdk_install:
 	@$(ECHO) $(MSG_NOTICE) --------------------------------------------------------
-	@$(ECHO) $(MSG_NOTICE) Please install native Qt 4.8.x SDK using package manager
+	@$(ECHO) $(MSG_NOTICE) Please install native Qt 5.1.x SDK using package manager
 	@$(ECHO) $(MSG_NOTICE) --------------------------------------------------------
 
 .PHONY: qt_sdk_clean
@@ -333,11 +335,11 @@ qt_sdk_distclean:
 endif
 
 ifeq ($(shell [ -d "$(QT_SDK_DIR)" ] && $(ECHO) "exists"), exists)
-    export QMAKE := $(QT_SDK_DIR)/bin/qmake
+    export QMAKE := $(QT_SDK_PREFIX)/bin/qmake
 
     # set Qt library search path
     ifeq ($(UNAME), Windows)
-        export PATH := $(QT_SDK_DIR)/bin:$(PATH)
+        export PATH := $(QT_SDK_PREFIX)/bin:$(PATH)
     else
         export LD_LIBRARY_PATH := $(QT_SDK_DIR)/lib:$(LD_LIBRARY_PATH)
     endif
@@ -359,7 +361,10 @@ qt_sdk_version:
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,mingw,$(MINGW_DIR),$(MINGW_URL),$(notdir $(MINGW_URL))))
+#$(eval $(call TOOL_INSTALL_TEMPLATE,mingw,$(MINGW_DIR),$(MINGW_URL),$(notdir $(MINGW_URL))))
+mingw_install:
+mingw_clean:
+mingw_distclean:
 
 ifeq ($(shell [ -d "$(MINGW_DIR)" ] && $(ECHO) "exists"), exists)
     # set MinGW binary and library paths (QTMINGW is used by qmake, do not rename)
@@ -395,7 +400,10 @@ endif
 
 ifeq ($(UNAME), Windows)
 
-$(eval $(call TOOL_INSTALL_TEMPLATE,python,$(PYTHON_DIR),$(PYTHON_URL),$(notdir $(PYTHON_URL))))
+#$(eval $(call TOOL_INSTALL_TEMPLATE,python,$(PYTHON_DIR),$(PYTHON_URL),$(notdir $(PYTHON_URL))))
+python_install:
+python_clean:
+python_distclean:
 
 else # Linux or Mac
 

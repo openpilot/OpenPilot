@@ -31,7 +31,7 @@
 #include <coreplugin/icore.h>
 
 #include <QtCore/QtPlugin>
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 
 #include <QDebug>
 
@@ -107,9 +107,9 @@ void SerialConnection::onEnumerationChanged()
     }
 }
 
-bool sortPorts(const QextPortInfo &s1, const QextPortInfo &s2)
+bool sortPorts(const QSerialPortInfo &s1, const QSerialPortInfo &s2)
 {
-    return s1.portName < s2.portName;
+    return s1.portName() < s2.portName();
 }
 
 QList <Core::IConnection::device> SerialConnection::availableDevices()
@@ -117,15 +117,15 @@ QList <Core::IConnection::device> SerialConnection::availableDevices()
     QList <Core::IConnection::device> list;
 
     if (enablePolling) {
-        QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
+        QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
 
         // sort the list by port number (nice idea from PT_Dreamer :))
         qSort(ports.begin(), ports.end(), sortPorts);
-        foreach(QextPortInfo port, ports) {
+        foreach(QSerialPortInfo port, ports) {
             device d;
 
-            d.displayName = port.friendName;
-            d.name = port.physName;
+            d.displayName = port.portName();
+            d.name = port.portName();
             list.append(d);
         }
     }
@@ -138,24 +138,21 @@ QIODevice *SerialConnection::openDevice(const QString &deviceName)
     if (serialHandle) {
         closeDevice(deviceName);
     }
-    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
-    foreach(QextPortInfo port, ports) {
-        if (port.physName == deviceName) {
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+    foreach(QSerialPortInfo port, ports) {
+        if (port.portName() == deviceName) {
             // we need to handle port settings here...
-            PortSettings set;
-            set.BaudRate    = stringToBaud(m_config->speed());
             qDebug() << "Serial telemetry running at " << m_config->speed();
-            set.DataBits    = DATA_8;
-            set.Parity      = PAR_NONE;
-            set.StopBits    = STOP_1;
-            set.FlowControl = FLOW_OFF;
-            set.Timeout_Millisec = 500;
-#ifdef Q_OS_WIN
-            serialHandle    = new QextSerialPort(port.portName, set);
-#else
-            serialHandle    = new QextSerialPort(port.physName, set);
-#endif
-            m_deviceOpened  = true;
+            serialHandle = new QSerialPort(port, this);
+            if (serialHandle->open(QIODevice::ReadWrite)) {
+                if (serialHandle->setBaudRate(m_config->speed().toInt())
+                    && serialHandle->setDataBits(QSerialPort::Data8)
+                    && serialHandle->setParity(QSerialPort::NoParity)
+                    && serialHandle->setStopBits(QSerialPort::OneStop)
+                    && serialHandle->setFlowControl(QSerialPort::NoFlowControl)) {
+                    m_deviceOpened = true;
+                }
+            }
             return serialHandle;
         }
     }
@@ -200,48 +197,6 @@ void SerialConnection::resumePolling()
     enablePolling = true;
 }
 
-BaudRateType SerialConnection::stringToBaud(QString str)
-{
-    if (str == "1200") {
-        return BAUD1200;
-    }
-    if (str == "1800") {
-        return BAUD1800;
-    } else if (str == "2400") {
-        return BAUD2400;
-    } else if (str == "4800") {
-        return BAUD4800;
-    } else if (str == "9600") {
-        return BAUD9600;
-    } else if (str == "14400") {
-        return BAUD14400;
-    } else if (str == "19200") {
-        return BAUD19200;
-    } else if (str == "38400") {
-        return BAUD38400;
-    } else if (str == "56000") {
-        return BAUD56000;
-    } else if (str == "57600") {
-        return BAUD57600;
-    } else if (str == "76800") {
-        return BAUD76800;
-    } else if (str == "115200") {
-        return BAUD115200;
-    } else if (str == "128000") {
-        return BAUD128000;
-    } else if (str == "230400") {
-        return BAUD230400;
-    } else if (str == "256000") {
-        return BAUD256000;
-    } else if (str == "460800") {
-        return BAUD460800;
-    } else if (str == "921600") {
-        return BAUD921600;
-    } else {
-        return BAUD57600;
-    }
-}
-
 SerialPlugin::SerialPlugin()
 {}
 
@@ -266,5 +221,3 @@ bool SerialPlugin::initialize(const QStringList &arguments, QString *errorString
     addObject(m_connection->Optionspage());
     return true;
 }
-
-Q_EXPORT_PLUGIN(SerialPlugin)

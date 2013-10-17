@@ -33,6 +33,8 @@
 class GpsDisplayGadgetFactory;
 
 class GpsDisplayPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                                 Q_PLUGIN_METADATA(IID "OpenPilot.GpsDisplay")
 public:
     GpsDisplayPlugin();
     ~GpsDisplayPlugin();

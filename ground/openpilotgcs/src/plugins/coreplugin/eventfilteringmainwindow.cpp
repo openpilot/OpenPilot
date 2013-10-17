@@ -40,8 +40,15 @@ EventFilteringMainWindow::EventFilteringMainWindow()
 {}
 
 #ifdef Q_OS_WIN
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 bool EventFilteringMainWindow::winEvent(MSG *msg, long *result)
 {
+#else
+bool EventFilteringMainWindow::nativeEvent(const QByteArray & /*eventType*/, void *message, long *result)
+{
+    MSG *msg = static_cast<MSG *>(message);
+
+#endif
     if (msg->message == WM_DEVICECHANGE) {
         emit deviceChange();
         *result = TRUE;

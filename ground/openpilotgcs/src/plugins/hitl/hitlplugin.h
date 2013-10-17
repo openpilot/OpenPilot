@@ -36,6 +36,8 @@
 class HITLFactory;
 
 class HITLPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                           Q_PLUGIN_METADATA(IID "OpenPilot.HITL")
 public:
     HITLPlugin();
     ~HITLPlugin();

@@ -36,8 +36,8 @@
 #include "modelmapproxy.h"
 #include "modeluavoproxy.h"
 
-#include <QtGui/QWidget>
-#include <QtGui/QMenu>
+#include <QWidget>
+#include <QMenu>
 #include <QStringList>
 #include <QStandardItemModel>
 #include <QList>

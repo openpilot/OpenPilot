@@ -61,8 +61,6 @@ void MagicWaypointPlugin::shutdown()
 {
     // Do nothing
 }
-Q_EXPORT_PLUGIN(MagicWaypointPlugin)
-
 /**
  * @}
  * @}

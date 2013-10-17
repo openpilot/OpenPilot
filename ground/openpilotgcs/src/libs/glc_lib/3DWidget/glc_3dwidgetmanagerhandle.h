@@ -91,6 +91,10 @@ public:
 	inline GLC_3DWidget* widget(GLC_uint id) const
 	{return m_3DWidgetHash.value(id);}
 
+	//! Return true if this 3DWidget manager is empty
+	inline bool isEmpty() const
+	{return m_3DWidgetHash.isEmpty();}
+
 //@}
 
 //////////////////////////////////////////////////////////////////////

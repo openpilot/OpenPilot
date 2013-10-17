@@ -31,8 +31,8 @@
 
 #include "utils_global.h"
 
-#include <QtGui/QTreeWidget>
-#include <QtGui/QLabel>
+#include <QTreeWidget>
+#include <QLabel>
 
 namespace Utils {
 struct WelcomeModeTreeWidgetPrivate;

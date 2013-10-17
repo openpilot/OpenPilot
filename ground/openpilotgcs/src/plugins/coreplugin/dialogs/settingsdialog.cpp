@@ -35,9 +35,9 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QSettings>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QPushButton>
+#include <QHeaderView>
+#include <QLabel>
+#include <QPushButton>
 
 using namespace Core;
 using namespace Core::Internal;

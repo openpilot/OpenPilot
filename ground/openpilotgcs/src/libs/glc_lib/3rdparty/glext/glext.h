@@ -367,7 +367,11 @@ extern "C" {
 #endif
 
 #ifndef GL_VERSION_2_0
+
+#ifndef GL_BLEND_EQUATION_RGB
 #define GL_BLEND_EQUATION_RGB             GL_BLEND_EQUATION
+#endif
+
 #define GL_VERTEX_ATTRIB_ARRAY_ENABLED    0x8622
 #define GL_VERTEX_ATTRIB_ARRAY_SIZE       0x8623
 #define GL_VERTEX_ATTRIB_ARRAY_STRIDE     0x8624

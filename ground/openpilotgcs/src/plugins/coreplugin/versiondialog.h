@@ -29,7 +29,7 @@
 #ifndef VERSIONDIALOG_H
 #define VERSIONDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 namespace Core {
 namespace Internal {

@@ -39,7 +39,6 @@ int GLC_3DViewInstance::m_GlobalDefaultLOD= 10;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-// Default constructor
 GLC_3DViewInstance::GLC_3DViewInstance()
 : GLC_Object()
 , m_3DRep()
@@ -55,11 +54,8 @@ GLC_3DViewInstance::GLC_3DViewInstance()
 	// Encode Color Id
 	glc::encodeRgbId(m_Uid, m_colorId);
 
-	//qDebug() << "GLC_3DViewInstance::GLC_3DViewInstance null instance ID = " << m_Uid;
-	//qDebug() << "Number of instance" << (*m_pNumberOfInstance);
 }
 
-// Contruct instance with a geometry
 GLC_3DViewInstance::GLC_3DViewInstance(GLC_Geometry* pGeom)
 : GLC_Object()
 , m_3DRep(pGeom)
@@ -76,15 +72,11 @@ GLC_3DViewInstance::GLC_3DViewInstance(GLC_Geometry* pGeom)
 	glc::encodeRgbId(m_Uid, m_colorId);
 
 	setName(m_3DRep.name());
-
-	//qDebug() << "GLC_3DViewInstance::GLC_3DViewInstance ID = " << m_Uid;
-	//qDebug() << "Number of instance" << (*m_pNumberOfInstance);
 }
 
-// Contruct instance with a 3DRep
-GLC_3DViewInstance::GLC_3DViewInstance(const GLC_3DRep& rep)
-: GLC_Object()
-, m_3DRep(rep)
+GLC_3DViewInstance::GLC_3DViewInstance(GLC_Geometry* pGeom, GLC_uint id)
+: GLC_Object(id)
+, m_3DRep(pGeom)
 , m_pBoundingBox(NULL)
 , m_AbsoluteMatrix()
 , m_IsBoundingBoxValid(false)
@@ -98,9 +90,40 @@ GLC_3DViewInstance::GLC_3DViewInstance(const GLC_3DRep& rep)
 	glc::encodeRgbId(m_Uid, m_colorId);
 
 	setName(m_3DRep.name());
+}
 
-	//qDebug() << "GLC_3DViewInstance::GLC_3DViewInstance ID = " << m_Uid;
-	//qDebug() << "Number of instance" << (*m_pNumberOfInstance);
+GLC_3DViewInstance::GLC_3DViewInstance(const GLC_3DRep& rep)
+: GLC_Object(rep.name())
+, m_3DRep(rep)
+, m_pBoundingBox(NULL)
+, m_AbsoluteMatrix()
+, m_IsBoundingBoxValid(false)
+, m_RenderProperties()
+, m_IsVisible(true)
+, m_DefaultLOD(m_GlobalDefaultLOD)
+, m_ViewableFlag(GLC_3DViewInstance::FullViewable)
+, m_ViewableGeomFlag()
+{
+	// Encode Color Id
+	glc::encodeRgbId(m_Uid, m_colorId);
+
+}
+
+GLC_3DViewInstance::GLC_3DViewInstance(const GLC_3DRep& rep, GLC_uint id)
+: GLC_Object(id, rep.name())
+, m_3DRep(rep)
+, m_pBoundingBox(NULL)
+, m_AbsoluteMatrix()
+, m_IsBoundingBoxValid(false)
+, m_RenderProperties()
+, m_IsVisible(true)
+, m_DefaultLOD(m_GlobalDefaultLOD)
+, m_ViewableFlag(GLC_3DViewInstance::FullViewable)
+, m_ViewableGeomFlag()
+{
+	// Encode Color Id
+	glc::encodeRgbId(m_Uid, m_colorId);
+
 }
 
 // Copy constructor

@@ -36,7 +36,7 @@
 #include <QtCore/QList>
 #include <QtCore/QEventLoop>
 #include <QtCore/QFutureWatcher>
-#include <QtCore/QtConcurrentRun>
+#include <QtConcurrent/QtConcurrentRun>
 #include <QtCore/QThreadPool>
 
 #include <QtDebug>

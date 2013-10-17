@@ -33,6 +33,8 @@
 class ModelViewGadgetFactory;
 
 class ModelViewPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                                Q_PLUGIN_METADATA(IID "Openpilot.ModelView")
 public:
     ModelViewPlugin();
     ~ModelViewPlugin();

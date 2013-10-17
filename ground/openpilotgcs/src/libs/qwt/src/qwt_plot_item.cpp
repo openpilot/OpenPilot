@@ -327,10 +327,10 @@ void QwtPlotItem::itemChanged()
 
    The item will painted according to the coordinates its Axes.
 
-   \param xAxis X Axis
-   \param yAxis Y Axis
+   \param xAxis X Axis ( QwtPlot::xBottom or QwtPlot::xTop )
+   \param yAxis Y Axis ( QwtPlot::yLeft or QwtPlot::yRight )
 
-   \sa setXAxis(), setYAxis(), xAxis(), yAxis()
+   \sa setXAxis(), setYAxis(), xAxis(), yAxis(), QwtPlot::Axis
 */
 void QwtPlotItem::setAxes( int xAxis, int yAxis )
 {
@@ -348,8 +348,8 @@ void QwtPlotItem::setAxes( int xAxis, int yAxis )
 
    The item will painted according to the coordinates its Axes.
 
-   \param axis X Axis
-   \sa setAxes(), setYAxis(), xAxis()
+   \param axis X Axis ( QwtPlot::xBottom or QwtPlot::xTop )
+   \sa setAxes(), setYAxis(), xAxis(), QwtPlot::Axis
 */
 void QwtPlotItem::setXAxis( int axis )
 {
@@ -365,8 +365,8 @@ void QwtPlotItem::setXAxis( int axis )
 
    The item will painted according to the coordinates its Axes.
 
-   \param axis Y Axis
-   \sa setAxes(), setXAxis(), yAxis()
+   \param axis Y Axis ( QwtPlot::yLeft or QwtPlot::yRight )
+   \sa setAxes(), setXAxis(), yAxis(), QwtPlot::Axis
 */
 void QwtPlotItem::setYAxis( int axis )
 {
@@ -391,6 +391,7 @@ int QwtPlotItem::yAxis() const
 
 /*!
    \return An invalid bounding rect: QRectF(1.0, 1.0, -2.0, -2.0)
+   \note A width or height < 0.0 is ignored by the autoscaler
 */
 QRectF QwtPlotItem::boundingRect() const
 {
@@ -513,9 +514,9 @@ void QwtPlotItem::updateScaleDiv( const QwtScaleDiv &xScaleDiv,
    \brief Calculate the bounding scale rect of 2 maps
 
    \param xMap X map
-   \param yMap X map
+   \param yMap Y map
 
-   \return Bounding scale rect of the scale maps, normalized
+   \return Bounding scale rect of the scale maps, not normalized
 */
 QRectF QwtPlotItem::scaleRect( const QwtScaleMap &xMap,
     const QwtScaleMap &yMap ) const
@@ -528,9 +529,9 @@ QRectF QwtPlotItem::scaleRect( const QwtScaleMap &xMap,
    \brief Calculate the bounding paint rect of 2 maps
 
    \param xMap X map
-   \param yMap X map
+   \param yMap Y map
 
-   \return Bounding paint rect of the scale maps, normalized
+   \return Bounding paint rect of the scale maps, not normalized
 */
 QRectF QwtPlotItem::paintRect( const QwtScaleMap &xMap,
     const QwtScaleMap &yMap ) const

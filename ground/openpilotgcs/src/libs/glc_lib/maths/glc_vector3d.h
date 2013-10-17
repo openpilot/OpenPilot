@@ -104,7 +104,7 @@ public:
 
 	//! Return true if this vector is null
 	inline bool isNull() const
-	{return (m_Vector[0] == 0.0f) && (m_Vector[1] == 0.0f) && (m_Vector[2] == 0.0f);}
+    {return (qAbs(m_Vector[0]) < glc::EPSILON) && (qAbs(m_Vector[1]) < glc::EPSILON) && (qAbs(m_Vector[2]) < glc::EPSILON);}
 
 	//! Return the length of this vector
 	inline double length() const
@@ -234,7 +234,7 @@ public:
 	}
 
 	//! Set vector lenght from the given scalar and return a reference of this vector
-	inline GLC_Vector3d& setLength(double);
+    inline GLC_Vector3d& setLength(double lenght);
 
 	//! Normalize this vector and return a reference to it
 	inline GLC_Vector3d& normalize()
@@ -334,8 +334,8 @@ GLC_Vector3d::GLC_Vector3d(const GLC_Vector3df &vector)
 
 GLC_Vector3d::GLC_Vector3d(const GLC_Vector2d &vector)
 {
-	m_Vector[0]= vector.getX();
-	m_Vector[1]= vector.getY();
+    m_Vector[0]= vector.x();
+    m_Vector[1]= vector.y();
 	m_Vector[2]= 0.0;
 }
 
@@ -392,13 +392,13 @@ GLC_Vector3d& GLC_Vector3d::setVect(double x, double y, double z)
 	return *this;
 }
 
-inline GLC_Vector3d& GLC_Vector3d::setLength(double norme)
+inline GLC_Vector3d& GLC_Vector3d::setLength(double lenght)
 {
-	const double normCur= sqrt( m_Vector[0] * m_Vector[0] + m_Vector[1] * m_Vector[1] + m_Vector[2] * m_Vector[2]);
+    const double currentLenght= sqrt( m_Vector[0] * m_Vector[0] + m_Vector[1] * m_Vector[1] + m_Vector[2] * m_Vector[2]);
 
-	if (normCur != 0.0f)
+    if (qAbs(currentLenght) > glc::EPSILON)
 	{
-		const double Coef = norme / normCur;
+        const double Coef = lenght / currentLenght;
 
 		m_Vector[0] = m_Vector[0] * Coef;
 		m_Vector[1] = m_Vector[1] * Coef;

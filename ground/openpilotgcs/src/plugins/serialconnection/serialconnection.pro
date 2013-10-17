@@ -2,7 +2,7 @@ TEMPLATE = lib
 TARGET = Serial
 include(../../openpilotgcsplugin.pri)
 include(serial_dependencies.pri)
-INCLUDEPATH += ../../libs/qextserialport/src
+QT += serialport
 HEADERS += serialplugin.h \
             serialpluginconfiguration.h \
             serialpluginoptionspage.h

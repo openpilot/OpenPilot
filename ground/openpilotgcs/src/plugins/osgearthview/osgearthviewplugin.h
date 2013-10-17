@@ -33,6 +33,8 @@
 class OsgEarthviewGadgetFactory;
 
 class OsgEarthviewPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                                   Q_PLUGIN_METADATA(IID "OpenPilot.OsgEarthview")
 public:
     OsgEarthviewPlugin();
     ~OsgEarthviewPlugin();

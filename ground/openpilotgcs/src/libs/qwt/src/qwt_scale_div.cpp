@@ -154,7 +154,7 @@ void QwtScaleDiv::invert()
 */
 void QwtScaleDiv::setTicks( int type, const QList<double> &ticks )
 {
-    if ( type >= 0 || type < NTickTypes )
+    if ( type >= 0 && type < NTickTypes )
         d_ticks[type] = ticks;
 }
 
@@ -165,7 +165,7 @@ void QwtScaleDiv::setTicks( int type, const QList<double> &ticks )
 */
 const QList<double> &QwtScaleDiv::ticks( int type ) const
 {
-    if ( type >= 0 || type < NTickTypes )
+    if ( type >= 0 && type < NTickTypes )
         return d_ticks[type];
 
     static QList<double> noTicks;

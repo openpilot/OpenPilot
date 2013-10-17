@@ -613,7 +613,7 @@ bool flightDataModel::writeToFile(QString fileName)
         field.setAttribute("name", "is_locked");
         waypoint.appendChild(field);
     }
-    file.write(doc.toString().toAscii());
+    file.write(doc.toString().toLatin1());
     file.close();
     return true;
 }

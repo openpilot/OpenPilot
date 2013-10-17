@@ -26,8 +26,8 @@
  */
 
 #include "setupwizard.h"
-#include "pages/startpage.h"
-#include "pages/endpage.h"
+#include "pages/opstartpage.h"
+#include "pages/opendpage.h"
 #include "pages/controllerpage.h"
 #include "pages/vehiclepage.h"
 #include "pages/multipage.h"
@@ -285,7 +285,7 @@ QString SetupWizard::getSummaryText()
 
 void SetupWizard::createPages()
 {
-    setPage(PAGE_START, new StartPage(this));
+    setPage(PAGE_START, new OPStartPage(this));
     setPage(PAGE_UPDATE, new AutoUpdatePage(this));
     setPage(PAGE_CONTROLLER, new ControllerPage(this));
     setPage(PAGE_VEHICLES, new VehiclePage(this));
@@ -302,7 +302,7 @@ void SetupWizard::createPages()
     setPage(PAGE_SAVE, new SavePage(this));
     setPage(PAGE_REBOOT, new RebootPage(this));
     setPage(PAGE_NOTYETIMPLEMENTED, new NotYetImplementedPage(this));
-    setPage(PAGE_END, new EndPage(this));
+    setPage(PAGE_END, new OPEndPage(this));
 
     setStartId(PAGE_START);
 

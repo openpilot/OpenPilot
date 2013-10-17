@@ -33,6 +33,8 @@
 class SystemHealthGadgetFactory;
 
 class SystemHealthPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                                   Q_PLUGIN_METADATA(IID "OpenPilot.SystemHealth")
 public:
     SystemHealthPlugin();
     ~SystemHealthPlugin();

@@ -9,7 +9,6 @@
 
 #include "qwt_column_symbol.h"
 #include "qwt_math.h"
-#include "qwt_text.h"
 #include "qwt_painter.h"
 #include <qpainter.h>
 #include <qpalette.h>
@@ -124,8 +123,6 @@ public:
     QwtColumnSymbol::FrameStyle frameStyle;
 
     QPalette palette;
-    QwtText label;
-
     int lineWidth;
 };
 

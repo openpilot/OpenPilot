@@ -33,7 +33,7 @@
 #include <QtCore/QString>
 #include <QtCore/QMap>
 #include <QtCore/QList>
-#include <QtGui/QKeySequence>
+#include <QKeySequence>
 
 namespace Core {
 namespace Internal {

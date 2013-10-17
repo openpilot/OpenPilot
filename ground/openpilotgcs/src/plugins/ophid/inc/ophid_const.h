@@ -27,6 +27,7 @@
 
 #ifndef OPHID_CONST_H
 #define OPHID_CONST_H
+#include "QtDebug"
 
 #define printf         qDebug
 #define OPHID_DEBUG_ON 1

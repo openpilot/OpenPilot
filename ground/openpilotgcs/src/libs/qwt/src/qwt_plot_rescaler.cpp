@@ -299,18 +299,22 @@ const QwtPlot *QwtPlotRescaler::plot() const
 }
 
 //!  Event filter for the plot canvas
-bool QwtPlotRescaler::eventFilter( QObject *o, QEvent *e )
+bool QwtPlotRescaler::eventFilter( QObject *object, QEvent *event )
 {
-    if ( o && o == canvas() )
+    if ( object && object == canvas() )
     {
-        switch ( e->type() )
+        switch ( event->type() )
         {
             case QEvent::Resize:
-                canvasResizeEvent( ( QResizeEvent * )e );
+            {
+                canvasResizeEvent( ( QResizeEvent * )event );
                 break;
+            }
             case QEvent::PolishRequest:
+            {
                 rescale();
                 break;
+            }
             default:;
         }
     }

@@ -152,7 +152,7 @@ public:
 	//! Select all occurence of this world handle
 	void selectAllWith3DViewInstance(bool allShowState);
 
-	//! Unselecte all occurence of this world handle
+    //! Unselect all occurence of this world handle
 	void unselectAll();
 
 	//! Show / Hide selected 3DViewInstance
@@ -160,7 +160,6 @@ public:
 
 	//! Set selected 3DViewInstance visibility
 	void setSelected3DViewInstanceVisibility(bool isVisible);
-
 
 //@}
 

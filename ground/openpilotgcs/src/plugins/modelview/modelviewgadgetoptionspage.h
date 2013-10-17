@@ -29,11 +29,11 @@
 #define MODELVIEWGADGETOPTIONSPAGE_H
 
 #include "coreplugin/dialogs/ioptionspage.h"
-#include <QtGui/QLabel>
-#include <QtGui/QFileDialog>
-#include <QtGui/QPushButton>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QVBoxLayout>
+#include <QLabel>
+#include <QFileDialog>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 class ModelViewGadgetConfiguration;
 class QFileDialog;

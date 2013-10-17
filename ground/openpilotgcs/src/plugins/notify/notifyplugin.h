@@ -35,22 +35,21 @@
 #include "notificationitem.h"
 
 #include <QSettings>
-#include <phonon/MediaObject>
-#include <phonon/Path>
-#include <phonon/AudioOutput>
-#include <phonon/Global>
+#include <QMediaPlaylist>
+#include <QMediaPlayer>
 
 class NotifyPluginOptionsPage;
 
 typedef struct {
-    Phonon::MediaObject *mo;
-    NotificationItem    *notify;
+    QMediaPlayer *mo;
+    NotificationItem *notify;
     bool firstPlay;
 } PhononObject, *pPhononObject;
 
 
 class SoundNotifyPlugin : public Core::IConfigurablePlugin {
     Q_OBJECT
+                                       Q_PLUGIN_METADATA(IID "Openpilot.SoundNotify")
 public:
     SoundNotifyPlugin();
     ~SoundNotifyPlugin();
@@ -96,7 +95,7 @@ private slots:
     void on_arrived_Notification(UAVObject *object);
     void on_timerRepeated_Notification(void);
     void on_expiredTimer_Notification(void);
-    void stateChanged(Phonon::State newstate, Phonon::State oldstate);
+    void stateChanged(QMediaPlayer::State newstate);
 
 private:
     bool enableSound;
@@ -112,6 +111,7 @@ private:
     PhononObject phonon;
     NotifyPluginOptionsPage *mop;
     TelemetryManager *telMngr;
+    QMediaPlaylist *playlist;
 };
 
 #endif // SOUNDNOTIFYPLUGIN_H

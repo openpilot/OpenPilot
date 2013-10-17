@@ -141,6 +141,7 @@ Item {
                             case "commented":
                             case "comment": parent.prefix = qsTr("Commented on "); break;
                             case "created": parent.prefix = qsTr("Created "); break;
+                            case "create-and-start": parent.prefix = qsTr("Created and started "); break;
                             case "complete": parent.prefix = qsTr("Completed review of "); break;
                             case "close":
                             case "closed": parent.prefix = qsTr("Closed "); break;

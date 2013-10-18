@@ -646,7 +646,7 @@ void vPortSystemTickHandler()
 	/**
 	 * call tick handler
 	 */
-	vTaskIncrementTick();
+	xTaskIncrementTick();
 
 	
 #if ( configUSE_PREEMPTION == 1 )

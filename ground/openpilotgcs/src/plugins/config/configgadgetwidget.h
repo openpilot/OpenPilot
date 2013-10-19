@@ -32,7 +32,7 @@
 #include "uavobjectmanager.h"
 #include "uavobject.h"
 #include "objectpersistence.h"
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QList>
 #include <QTextBrowser>
 #include "utils/pathutils.h"

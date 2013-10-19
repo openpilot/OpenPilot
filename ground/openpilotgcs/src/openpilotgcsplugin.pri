@@ -9,6 +9,8 @@ LIBS += -L$$DESTDIR
 INCLUDEPATH += $$GCS_SOURCE_TREE/src/plugins
 DEPENDPATH += $$GCS_SOURCE_TREE/src/plugins
 
+QT += widgets
+
 # copy the plugin spec
 isEmpty(TARGET) {
     error("qtcreatorplugin.pri: You must provide a TARGET")

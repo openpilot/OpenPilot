@@ -23,7 +23,6 @@
  */
 
 #include "cachedsvgitem.h"
-#include <QGLContext>
 #include <QDebug>
 
 #ifndef GL_CLAMP_TO_EDGE

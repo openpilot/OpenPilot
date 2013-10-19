@@ -40,14 +40,14 @@ namespace glc
 	//! Geometry rendering mode enumeration
 	enum RenderMode
 	{
-		NormalRenderMode,
-		OverwriteMaterial,
-		OverwriteTransparency,
-		OverwriteTransparencyAndMaterial,
-		PrimitiveSelected,
-		OverwritePrimitiveMaterial,
-		BodySelection,
-		PrimitiveSelection
+		NormalRenderMode= 0,
+		OverwriteMaterial= 1,
+		OverwriteTransparency= 2,
+		OverwriteTransparencyAndMaterial= 3,
+		PrimitiveSelected= 4,
+		OverwritePrimitiveMaterial= 5,
+		BodySelection= 6,
+		PrimitiveSelection= 7
 	};
 
 	//! Geometry rendring flag enumaration

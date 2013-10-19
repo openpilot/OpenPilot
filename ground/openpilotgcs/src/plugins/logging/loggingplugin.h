@@ -113,7 +113,7 @@ private:
 
 class LoggingPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
-
+                                              Q_PLUGIN_METADATA(IID "OpenPilot.Logging")
 public:
     LoggingPlugin();
     ~LoggingPlugin();

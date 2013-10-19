@@ -22,6 +22,8 @@
 class PfdQmlGadgetFactory;
 
 class PfdQmlPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                             Q_PLUGIN_METADATA(IID "OpenPilot.PfdQml")
 public:
     PfdQmlPlugin();
     ~PfdQmlPlugin();

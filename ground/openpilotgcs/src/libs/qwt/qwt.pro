@@ -11,4 +11,7 @@ include( qwtconfig.pri )
 
 TEMPLATE = subdirs
 
+# disable all warnings (no need for warnings as qwt sources are imported)
+CONFIG += warn_off
+
 SUBDIRS = src

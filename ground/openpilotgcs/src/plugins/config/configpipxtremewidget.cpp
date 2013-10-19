@@ -183,14 +183,14 @@ void ConfigPipXtremeWidget::updateStatus(UAVObject *object)
          */
         char buf[OPLinkStatus::DESCRIPTION_NUMELEM];
         for (unsigned int i = 0; i < 26; ++i) {
-            buf[i] = descField->getValue(i + 14).toChar().toAscii();
+            buf[i] = descField->getValue(i + 14).toChar().toLatin1();
         }
         buf[26] = '\0';
         QString descstr(buf);
-        quint32 gitDate = descField->getValue(11).toChar().toAscii() & 0xFF;
+        quint32 gitDate = descField->getValue(11).toChar().toLatin1() & 0xFF;
         for (int i = 1; i < 4; i++) {
             gitDate  = gitDate << 8;
-            gitDate += descField->getValue(11 - i).toChar().toAscii() & 0xFF;
+            gitDate += descField->getValue(11 - i).toChar().toLatin1() & 0xFF;
         }
         QString date = QDateTime::fromTime_t(gitDate).toUTC().toString("yyyy-MM-dd HH:mm");
         m_oplink->FirmwareVersion->setText(descstr + " " + date);

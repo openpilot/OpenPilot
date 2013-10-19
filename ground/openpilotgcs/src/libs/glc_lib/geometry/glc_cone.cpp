@@ -26,11 +26,11 @@
 // Class chunk id
 quint32 GLC_Cone::m_ChunkId= 0xA709;
 
-GLC_Cone::GLC_Cone(double dRadius, double dLength)
+GLC_Cone::GLC_Cone(double dRadius, double dLength, int discretization)
 :GLC_Mesh()
 , m_Radius(dRadius)
 , m_Length(dLength)
-, m_Discret(glc::GLC_POLYDISCRET)	// Default discretion
+, m_Discret(discretization)	// Default discretion
 {
 	Q_ASSERT((m_Radius > 0.0) && (m_Length > 0.0));
 	createMeshAndWire();

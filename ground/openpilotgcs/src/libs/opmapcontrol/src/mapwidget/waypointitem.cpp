@@ -26,6 +26,7 @@
  */
 #include "waypointitem.h"
 #include "homeitem.h"
+#include <QGraphicsSceneMouseEvent>
 
 namespace mapcontrol {
 WayPointItem::WayPointItem(const internals::PointLatLng &coord, int const & altitude, MapGraphicItem *map, wptype type) : coord(coord), reached(false), description(""), shownumber(true), isDragging(false), altitude(altitude), map(map), myType(type)

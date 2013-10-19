@@ -34,7 +34,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QFuture>
 #include <QtCore/QMap>
-#include <QtGui/QTextDocument>
+#include <QTextDocument>
 
 namespace Utils {
 class QTCREATOR_UTILS_EXPORT FileSearchResult {

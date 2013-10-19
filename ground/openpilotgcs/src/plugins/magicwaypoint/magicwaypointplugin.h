@@ -33,6 +33,8 @@
 class MagicWaypointGadgetFactory;
 
 class MagicWaypointPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                                    Q_PLUGIN_METADATA(IID "OpenPilot.MagicWaypoint")
 public:
     MagicWaypointPlugin();
     ~MagicWaypointPlugin();

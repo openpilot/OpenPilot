@@ -33,7 +33,7 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QFile>
 #include <QtCore/QFutureInterface>
-#include <QtCore/QtConcurrentRun>
+#include <QtConcurrent/QtConcurrentRun>
 #include <QtCore/QRegExp>
 #include <QtCore/QCoreApplication>
 
@@ -45,7 +45,7 @@ static inline QString msgCanceled(const QString &searchTerm, int numMatches, int
 {
     return QCoreApplication::translate("Utils::FileSearch",
                                        "%1: canceled. %n occurrences found in %2 files.",
-                                       0, QCoreApplication::CodecForTr, numMatches).
+                                       0, numMatches).
            arg(searchTerm).arg(numFilesSearched);
 }
 
@@ -53,7 +53,7 @@ static inline QString msgFound(const QString &searchTerm, int numMatches, int nu
 {
     return QCoreApplication::translate("Utils::FileSearch",
                                        "%1: %n occurrences found in %2 files.",
-                                       0, QCoreApplication::CodecForTr, numMatches).
+                                       0, numMatches).
            arg(searchTerm).arg(numFilesSearched);
 }
 
@@ -61,7 +61,7 @@ static inline QString msgFound(const QString &searchTerm, int numMatches, int nu
 {
     return QCoreApplication::translate("Utils::FileSearch",
                                        "%1: %n occurrences found in %2 of %3 files.",
-                                       0, QCoreApplication::CodecForTr, numMatches).
+                                       0, numMatches).
            arg(searchTerm).arg(numFilesSearched).arg(filesSize);
 }
 

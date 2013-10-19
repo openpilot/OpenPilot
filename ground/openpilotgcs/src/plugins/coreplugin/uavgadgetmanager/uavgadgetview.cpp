@@ -40,17 +40,17 @@
 
 #include <QtCore/QDebug>
 
-#include <QtGui/QApplication>
-#include <QtGui/QComboBox>
-#include <QtGui/QHBoxLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QStyle>
-#include <QtGui/QStyleOption>
-#include <QtGui/QToolButton>
-#include <QtGui/QMenu>
-#include <QtGui/QClipboard>
+#include <QtWidgets/QApplication>
+#include <QComboBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QMouseEvent>
+#include <QPainter>
+#include <QStyle>
+#include <QStyleOption>
+#include <QToolButton>
+#include <QMenu>
+#include <QClipboard>
 
 #ifdef Q_WS_MAC
 #include <qmacstyle_mac.h>

@@ -86,6 +86,7 @@
 #include <extensionsystem/iplugin.h>
 
 #include <QtCore/QDir>
+#include <QtCore/QFile>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QTextStream>
 #include <QtCore/QFileInfo>
@@ -96,10 +97,10 @@
 #include <QtCore/QSettings>
 #include <QtCore/QVariant>
 
-#include <QtGui/QMessageBox>
-#include <QtGui/QApplication>
-#include <QtGui/QMainWindow>
-#include <QtGui/QSplashScreen>
+#include <QMessageBox>
+#include <QtWidgets/QApplication>
+#include <QMainWindow>
+#include <QSplashScreen>
 
 namespace {
 typedef QList<ExtensionSystem::PluginSpec *> PluginSpecSet;
@@ -208,6 +209,34 @@ inline QString msgSendArgumentFailed()
                                        "Unable to send command line arguments to the already running instance. It appears to be not responding.");
 }
 
+void mainMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    QFile file(QDir::tempPath() + "/gcs.log");
+
+    if (file.open(QIODevice::Append | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << QTime::currentTime().toString("hh:mm:ss.zzz ");
+
+        switch (type) {
+        case QtDebugMsg:
+            out << "DBG: ";
+            break;
+        case QtWarningMsg:
+            out << "WRN: ";
+            break;
+        case QtCriticalMsg:
+            out << "CRT: ";
+            break;
+        case QtFatalMsg:
+            out << "FTL: ";
+            break;
+        }
+
+        out << msg << '\n';
+        out.flush();
+    }
+}
+
 // Prepare a remote argument: If it is a relative file, add the current directory
 // since the the central instance might be running in a different directory.
 inline QString prepareRemoteArgument(const QString &arg)
@@ -256,6 +285,17 @@ void systemInit()
 #ifdef Q_OS_LINUX
     QApplication::setAttribute(Qt::AA_X11InitThreads, true);
 #endif
+}
+
+void logInit()
+{
+    qInstallMessageHandler(mainMessageOutput);
+    QFile file(QDir::tempPath() + "/gcs.log");
+    if (file.exists()) {
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            // erase old log
+        }
+    }
 }
 
 inline QStringList getPluginPaths()
@@ -414,6 +454,10 @@ int main(int argc, char * *argv)
 
     // low level init
     systemInit();
+
+#ifdef QT_NO_DEBUG
+// logInit();
+#endif
 
     // create application
     SharedTools::QtSingleApplication app(APP_NAME, argc, argv);

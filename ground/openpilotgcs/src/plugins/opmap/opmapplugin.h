@@ -33,6 +33,8 @@
 class OPMapGadgetFactory;
 
 class OPMapPlugin : public ExtensionSystem::IPlugin {
+    Q_OBJECT
+                                            Q_PLUGIN_METADATA(IID "OpenPilot.OPMap")
 public:
     OPMapPlugin();
     ~OPMapPlugin();

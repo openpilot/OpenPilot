@@ -16,6 +16,11 @@
 #include <qpainter.h>
 #include <qmath.h>
 
+#if QT_VERSION < 0x040601
+#define qFastSin(x) qSin(x)
+#define qFastCos(x) qCos(x)
+#endif
+
 class QwtScaleDraw::PrivateData
 {
 public:
@@ -188,7 +193,7 @@ int QwtScaleDraw::minLabelDist( const QFont &font ) const
         return 0;
 
     const QList<double> &ticks = scaleDiv().ticks( QwtScaleDiv::MajorTick );
-    if ( ticks.count() == 0 )
+    if ( ticks.isEmpty() )
         return 0;
 
     const QFontMetrics fm( font );
@@ -199,9 +204,10 @@ int QwtScaleDraw::minLabelDist( const QFont &font ) const
     QRectF bRect2 = labelRect( font, ticks[0] );
     if ( vertical )
     {
-        bRect2.setRect( -bRect2.bottom(), 0, bRect2.height(), bRect2.width() );
+        bRect2.setRect( -bRect2.bottom(), 0.0, bRect2.height(), bRect2.width() );
     }
-    int maxDist = 0;
+
+    double maxDist = 0.0;
 
     for ( int i = 1; i < ticks.count(); i++ )
     {
@@ -209,11 +215,11 @@ int QwtScaleDraw::minLabelDist( const QFont &font ) const
         bRect2 = labelRect( font, ticks[i] );
         if ( vertical )
         {
-            bRect2.setRect( -bRect2.bottom(), 0,
+            bRect2.setRect( -bRect2.bottom(), 0.0,
                 bRect2.height(), bRect2.width() );
         }
 
-        int dist = fm.leading(); // space between the labels
+        double dist = fm.leading(); // space between the labels
         if ( bRect1.right() > 0 )
             dist += bRect1.right();
         if ( bRect2.left() < 0 )
@@ -227,8 +233,9 @@ int QwtScaleDraw::minLabelDist( const QFont &font ) const
     if ( vertical )
         angle += M_PI / 2;
 
-    if ( qSin( angle ) == 0.0 )
-        return maxDist;
+    const double sinA = qFastSin( angle ); // qreal -> double
+    if ( qFuzzyCompare( sinA + 1.0, 1.0 ) )
+        return qCeil( maxDist );
 
     const int fmHeight = fm.ascent() - 2;
 
@@ -236,12 +243,9 @@ int QwtScaleDraw::minLabelDist( const QFont &font ) const
     // the height of the label font. This height is needed
     // for the neighbour labal.
 
-    int labelDist = qFloor( fmHeight / qSin( angle ) * qCos( angle ) );
+    double labelDist = fmHeight / qFastSin( angle ) * qFastCos( angle );
     if ( labelDist < 0 )
         labelDist = -labelDist;
-
-    // The cast above floored labelDist. We want to ceil.
-    labelDist++;
 
     // For text orientations close to the scale orientation
 
@@ -254,7 +258,7 @@ int QwtScaleDraw::minLabelDist( const QFont &font ) const
     if ( labelDist < fmHeight )
         labelDist = fmHeight;
 
-    return labelDist;
+    return qCeil( labelDist );
 }
 
 /*!
@@ -846,7 +850,7 @@ Qt::Alignment QwtScaleDraw::labelAlignment() const
 */
 int QwtScaleDraw::maxLabelWidth( const QFont &font ) const
 {
-    int maxWidth = 0;
+    double maxWidth = 0.0;
 
     const QList<double> &ticks = scaleDiv().ticks( QwtScaleDiv::MajorTick );
     for ( int i = 0; i < ticks.count(); i++ )
@@ -854,13 +858,13 @@ int QwtScaleDraw::maxLabelWidth( const QFont &font ) const
         const double v = ticks[i];
         if ( scaleDiv().contains( v ) )
         {
-            const int w = labelSize( font, ticks[i] ).width();
+            const double w = labelSize( font, ticks[i] ).width();
             if ( w > maxWidth )
                 maxWidth = w;
         }
     }
 
-    return maxWidth;
+    return qCeil( maxWidth );
 }
 
 /*!
@@ -869,7 +873,7 @@ int QwtScaleDraw::maxLabelWidth( const QFont &font ) const
 */
 int QwtScaleDraw::maxLabelHeight( const QFont &font ) const
 {
-    int maxHeight = 0;
+    double maxHeight = 0.0;
 
     const QList<double> &ticks = scaleDiv().ticks( QwtScaleDiv::MajorTick );
     for ( int i = 0; i < ticks.count(); i++ )
@@ -877,13 +881,13 @@ int QwtScaleDraw::maxLabelHeight( const QFont &font ) const
         const double v = ticks[i];
         if ( scaleDiv().contains( v ) )
         {
-            const int h = labelSize( font, ticks[i] ).height();
+            const double h = labelSize( font, ticks[i] ).height();
             if ( h > maxHeight )
                 maxHeight = h;
         }
     }
 
-    return maxHeight;
+    return qCeil( maxHeight );
 }
 
 void QwtScaleDraw::updateMap()

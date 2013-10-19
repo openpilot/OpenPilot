@@ -35,6 +35,7 @@
 
 class UAVOBJECTUTIL_EXPORT UAVObjectUtilPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
+                           Q_PLUGIN_METADATA(IID "OpenPilot.UAVObjectUtil")
 
 public:
     UAVObjectUtilPlugin();
@@ -45,4 +46,4 @@ public:
     void shutdown();
 };
 
-#endif
+#endif // ifndef UAVOBJECTUTILPLUGIN_H

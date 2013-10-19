@@ -32,7 +32,7 @@
 #include <QAbstractItemModel>
 #include <QtCore/QMap>
 #include <QtCore/QList>
-#include <QtGui/QColor>
+#include <QColor>
 
 class TopTreeItem;
 class ObjectTreeItem;

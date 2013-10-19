@@ -25,18 +25,19 @@
 #define GLC_EXT_H_
 
 #include <QtOpenGL>
-#include "3rdparty/glext/glext.h"
-
-// Buffer offset used by VBO
-#define BUFFER_OFFSET(i) ((char*)NULL + (i))
 
 #if !defined(Q_OS_MAC)
 
 // GL_point_parameters Point Sprite
+#include "3rdparty/glext/glext.h"
 extern PFNGLPOINTPARAMETERFARBPROC  glPointParameterf;
 extern PFNGLPOINTPARAMETERFVARBPROC glPointParameterfv;
 
 #endif
+
+// Buffer offset used by VBO
+#define BUFFER_OFFSET(i) ((char*)NULL + (i))
+
 
 namespace glc
 {

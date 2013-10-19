@@ -16,7 +16,8 @@
 #include <QVariant>
 #include <iostream>
 #include "delay.h"
-#include <qextserialport/src/qextserialport.h>
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 #include <QTime>
 #include <QTimer>
 #include "SSP/qssp.h"

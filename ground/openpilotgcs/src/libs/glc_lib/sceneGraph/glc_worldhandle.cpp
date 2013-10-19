@@ -102,20 +102,8 @@ void GLC_WorldHandle::addOccurence(GLC_StructOccurence* pOccurence, bool isSelec
 	// Add instance representation in the collection
 	if (pOccurence->useAutomatic3DViewInstanceCreation() && pRef->representationIsLoaded())
 	{
-		//qDebug() << "GLC_WorldHandle::addOccurence with rep";
-		GLC_3DRep* p3DRep= dynamic_cast<GLC_3DRep*>(pRef->representationHandle());
-		GLC_3DViewInstance representation(*p3DRep);
-		// Force instance representation id
-		representation.setId(pOccurence->id());
-		// Force instance representation name
-		representation.setName(pOccurence->name());
-		if (0 != shaderId) m_Collection.bindShader(shaderId);
-		m_Collection.add(representation, shaderId);
-		if (isSelected)
-		{
-			//qDebug() << pOccurence->name() << "selected";
-			m_Collection.select(pOccurence->id());
-		}
+		pOccurence->create3DViewInstance(shaderId);
+		if (isSelected) select(pOccurence->id());
 	}
 }
 
@@ -209,6 +197,6 @@ void GLC_WorldHandle::setSelected3DViewInstanceVisibility(bool isVisible)
 	{
 		GLC_3DViewInstance* pCurrentInstance= selected3dviewInstance.at(i);
 		pCurrentInstance->setVisibility(isVisible);
-	}
+    }
 }
 

@@ -28,7 +28,7 @@
 #ifndef MODELVIEWGADGETWIDGET_H_
 #define MODELVIEWGADGETWIDGET_H_
 
-#include <QtOpenGL/QGLWidget>
+#include <QGLWidget>
 #include <QTimer>
 
 #include "glc_factory.h"

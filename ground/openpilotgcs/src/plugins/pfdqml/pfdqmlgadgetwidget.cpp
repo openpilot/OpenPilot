@@ -53,7 +53,8 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
     // setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
 
     QStringList objectsToExport;
-    objectsToExport << "VelocityState" <<
+    objectsToExport <<
+        "VelocityState" <<
         "PositionState" <<
         "AttitudeState" <<
         "AccelState" <<
@@ -62,6 +63,7 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
         "AltitudeHoldDesired" <<
         "GPSPositionSensor" <<
         "GCSTelemetryStats" <<
+        "SystemAlarms" <<
         "FlightBatteryState";
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();

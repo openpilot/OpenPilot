@@ -1,5 +1,4 @@
-import Qt 4.7
-import "."
+import QtQuick 1.1
 
 Rectangle {
     color: "#666666"
@@ -14,6 +13,8 @@ Rectangle {
 
         Item {
             id: sceneItem
+            property variant viewportSize : Qt.size(width, height)
+
             width: parent.paintedWidth
             height: parent.paintedHeight
             anchors.centerIn: parent
@@ -27,13 +28,13 @@ Rectangle {
 
             HorizontCenter {
                 id: horizontCenterItem
-                sceneSize: background.sceneSize
+                sceneSize: sceneItem.viewportSize
                 anchors.fill: parent
             }
 
             RollScale {
                 id: rollscale
-                sceneSize: background.sceneSize
+                sceneSize: sceneItem.viewportSize
                 horizontCenter: horizontCenterItem.horizontCenter
                 anchors.fill: parent
             }
@@ -41,7 +42,7 @@ Rectangle {
             SvgElementImage {
                 id: foreground
                 elementName: "foreground"
-                sceneSize: background.sceneSize
+                sceneSize: sceneItem.viewportSize
 
                 anchors.centerIn: parent
             }
@@ -49,7 +50,7 @@ Rectangle {
             SvgElementImage {
                 id: side_slip
                 elementName: "sideslip"
-                sceneSize: background.sceneSize
+                sceneSize: sceneItem.viewportSize
                 smooth: true
 
                 property real sideSlip: AccelState.y
@@ -70,27 +71,37 @@ Rectangle {
 
             Compass {
                 anchors.fill: parent
-                sceneSize: background.sceneSize
+                sceneSize: sceneItem.viewportSize
             }
 
             SpeedScale {
                 anchors.fill: parent
-                sceneSize: background.sceneSize
+                sceneSize: sceneItem.viewportSize
             }
 
             AltitudeScale {
                 anchors.fill: parent
-                sceneSize: background.sourceSize
+                sceneSize: sceneItem.viewportSize
             }
 
             VsiScale {
                 anchors.fill: parent
-                sceneSize: background.sourceSize
+                sceneSize: sceneItem.viewportSize
             }
 
             PfdIndicators {
                 anchors.fill: parent
-                sceneSize: background.sourceSize
+                sceneSize: sceneItem.viewportSize
+            }
+
+            Info {
+                anchors.fill: parent
+                sceneSize: sceneItem.viewportSize
+            }
+
+            Warnings {
+                anchors.fill: parent
+                sceneSize: sceneItem.viewportSize
             }
         }
     }

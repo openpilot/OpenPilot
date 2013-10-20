@@ -17,7 +17,14 @@ Image {
     sourceSize.width: Math.round(sceneSize.width*scaledBounds.width)
     sourceSize.height: Math.round(sceneSize.height*scaledBounds.height)
 
-    Component.onCompleted: {
+    x: Math.floor(scaledBounds.x * sceneSize.width)
+    y: Math.floor(scaledBounds.y * sceneSize.height)
+
+    Component.onCompleted: reloadImage()
+    onElementNameChanged: reloadImage()
+    onSceneSizeChanged: reloadImage()
+
+    function reloadImage() {
         var params = ""
         if (hSliceCount > 1)
             params += "hslice="+hSlice+":"+hSliceCount+";"
@@ -30,5 +37,6 @@ Image {
             params = "?" + params
 
         source = "image://svg/"+svgFileName+"!"+elementName+params
+        scaledBounds = svgRenderer.scaledElementBounds(svgFileName, elementName)
     }
 }

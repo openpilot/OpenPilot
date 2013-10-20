@@ -115,6 +115,9 @@ signals:
     void altitudeUnitChanged(QString arg);
     void altitudeFactorChanged(double arg);
 
+protected:
+    void mouseReleaseEvent(QMouseEvent *event);
+
 private:
     QString m_qmlFileName;
     QString m_earthFile;

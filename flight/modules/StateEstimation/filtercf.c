@@ -45,9 +45,9 @@
 
 // Private constants
 
-#define STACK_REQUIRED 512
+#define STACK_REQUIRED          512
 
-#define CALIBRATION_DELAY_MS 4000
+#define CALIBRATION_DELAY_MS    4000
 #define CALIBRATION_DURATION_MS 6000
 
 // Private types

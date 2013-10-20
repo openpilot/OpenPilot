@@ -39,13 +39,11 @@ using namespace Core::Internal;
 const int WorkspaceSettings::MAX_WORKSPACES = 10;
 
 WorkspaceSettings::WorkspaceSettings(QObject *parent) :
-        IOptionsPage(parent)
-{
-}
+    IOptionsPage(parent)
+{}
 
 WorkspaceSettings::~WorkspaceSettings()
-{
-}
+{}
 
 // IOptionsPage
 

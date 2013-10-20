@@ -27,6 +27,7 @@
 #include <QtOpenGL/QGLWidget>
 #include <QtCore/qfileinfo.h>
 #include <QtCore/qdir.h>
+#include <QMouseEvent>
 
 #include <QtDeclarative/qdeclarativeengine.h>
 #include <QtDeclarative/qdeclarativecontext.h>
@@ -93,6 +94,8 @@ void PfdQmlGadgetWidget::setQmlFile(QString fn)
     engine()->removeImageProvider("svg");
     SvgImageProvider *svgProvider = new SvgImageProvider(fn);
     engine()->addImageProvider("svg", svgProvider);
+
+    engine()->clearComponentCache();
 
     // it's necessary to allow qml side to query svg element position
     engine()->rootContext()->setContextProperty("svgRenderer", svgProvider);
@@ -182,6 +185,16 @@ void PfdQmlGadgetWidget::setActualPositionUsed(bool arg)
         m_actualPositionUsed = arg;
         emit actualPositionUsedChanged(arg);
     }
+}
+
+void PfdQmlGadgetWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    // Reload the schene on the middle mouse button click.
+    if (event->button() == Qt::MiddleButton) {
+        setQmlFile(m_qmlFileName);
+    }
+
+    QDeclarativeView::mouseReleaseEvent(event);
 }
 
 void PfdQmlGadgetWidget::setLatitude(double arg)

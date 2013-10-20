@@ -6,7 +6,7 @@ Rectangle {
 
     SvgElementImage {
         id: background
-        elementName: "background"
+        elementName: "pfd-window"
         fillMode: Image.PreserveAspectFit
         anchors.fill: parent
 
@@ -25,19 +25,17 @@ Rectangle {
                 source: qmlWidget.terrainEnabled ? "PfdTerrainView.qml" : "PfdWorldView.qml"
             }
 
-            SvgElementImage {
-                id: rollscale
-                elementName: "rollscale"
+            HorizontCenter {
+                id: horizontCenterItem
                 sceneSize: background.sceneSize
+                anchors.fill: parent
+            }
 
-                smooth: true
-                anchors.centerIn: parent
-                //rotate it around the center of scene
-                transform: Rotation {
-                    angle: -AttitudeState.Roll
-                    origin.x : sceneItem.width/2 - x
-                    origin.y : sceneItem.height/2 - y
-                }
+            RollScale {
+                id: rollscale
+                sceneSize: background.sceneSize
+                horizontCenter: horizontCenterItem.horizontCenter
+                anchors.fill: parent
             }
 
             SvgElementImage {

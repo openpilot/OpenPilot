@@ -7,8 +7,8 @@ Item {
                                                 Math.pow(VelocityState.East,2))
 
     SvgElementImage {
-        id: speed_bg
-        elementName: "speed-bg"
+        id: speed_window
+        elementName: "speed-window"
         sceneSize: sceneItem.sceneSize
         clip: true
 
@@ -31,14 +31,14 @@ Item {
 
             // speed numbers
             Column {
-                width: speed_bg.width
+                width: speed_window.width
                 anchors.right: speed_scale.right
 
                 Repeater {
                     model: 7
                     Item {
                         height: speed_scale.height / 6
-                        width: speed_bg.width
+                        width: speed_window.width
 
                         Text {
                             //don't show negative numbers
@@ -59,10 +59,10 @@ Item {
     }
 
     SvgElementImage {
-        id: speed_window
+        id: speed_box
         clip: true
 
-        elementName: "speed-window"
+        elementName: "speed-box"
         sceneSize: sceneItem.sceneSize
 
         x: scaledBounds.x * sceneItem.width
@@ -76,30 +76,22 @@ Item {
             color: "white"
             font {
                 family: "Arial"
-                pixelSize: parent.height * 0.6
+                pixelSize: parent.height * 0.4
             }
             anchors.centerIn: parent
         }
     }
 
-    SvgElementImage {
-        id: speed_unit
-        elementName: "speed-unit"
-        sceneSize: sceneItem.sceneSize
-        clip: true
-
-        x: Math.floor(scaledBounds.x * sceneItem.width)
-        y: Math.floor(scaledBounds.y * sceneItem.height)
-
-        Text {
-            id: speed_unit_text
-            text: qmlWidget.speedUnit
-            color: "white"
-            font {
-                family: "Arial"
-                pixelSize: parent.height
-            }
-            anchors.right: parent.right
+    Text {
+        id: speed_unit_text
+        text: qmlWidget.speedUnit
+        color: "white"
+        font {
+            family: "Arial"
+            pixelSize: sceneSize.height * 0.025
         }
+        anchors.top: speed_window.bottom
+        anchors.right: speed_window.right
+        anchors.margins: font.pixelSize * 0.3
     }
 }

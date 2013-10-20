@@ -5,12 +5,12 @@ Item {
     property variant sceneSize
 
     SvgElementImage {
-        id: altitude_bg
-        elementName: "altitude-bg"
+        id: altitude_window
+        elementName: "altitude-window"
         sceneSize: sceneItem.sceneSize
         clip: true
 
-        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "altitude-bg")
+        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "altitude-window")
 
         x: Math.floor(scaledBounds.x * sceneItem.width)
         y: Math.floor(scaledBounds.y * sceneItem.height)
@@ -35,7 +35,7 @@ Item {
                     model: 7
                     Item {
                         height: altitude_scale.height / 6
-                        width: altitude_bg.width
+                        width: altitude_window.width
 
                         Text {
                             text: altitude_scale.topNumber - index*5
@@ -53,13 +53,13 @@ Item {
     }
 
     SvgElementImage {
-        id: altitude_window
+        id: altitude_box
         clip: true
 
-        elementName: "altitude-window"
+        elementName: "altitude-box"
         sceneSize: sceneItem.sceneSize
 
-        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "altitude-window")
+        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "altitude-box")
 
         x: scaledBounds.x * sceneItem.width
         y: scaledBounds.y * sceneItem.height
@@ -72,31 +72,22 @@ Item {
             color: "white"
             font {
                 family: "Arial"
-                pixelSize: parent.height * 0.6
+                pixelSize: parent.height * 0.4
             }
             anchors.centerIn: parent
         }
     }
 
-    SvgElementImage {
-        id: altitude_unit
-        elementName: "altitude-unit"
-        sceneSize: sceneItem.sceneSize
-        clip: true
-
-        x: Math.floor(scaledBounds.x * sceneItem.width)
-        y: Math.floor(scaledBounds.y * sceneItem.height)
-
-        Text {
-            id: altitude_unit_text
-            text: qmlWidget.altitudeUnit
-            color: "white"
-            font {
-                family: "Arial"
-                pixelSize: parent.height
-            }
-            anchors.right: parent.right
+    Text {
+        id: altitude_unit_text
+        text: qmlWidget.altitudeUnit
+        color: "white"
+        font {
+            family: "Arial"
+            pixelSize: sceneSize.height * 0.025
         }
+        anchors.top: altitude_window.bottom
+        anchors.right: altitude_window.right
+        anchors.margins: font.pixelSize * 0.3
     }
-
 }

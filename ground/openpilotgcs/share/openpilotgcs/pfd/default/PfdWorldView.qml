@@ -2,28 +2,35 @@ import Qt 4.7
 
 Item {
     id: worldView
+    property real horizontCenter : horizontCenterItem.horizontCenter
 
     Rectangle {
+        // using rectange instead of svg rendered to pixmap
+        // as it's much more memory efficient
         id: world
         smooth: true
 
-        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "world")
+        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "horizon")
         width: Math.round(sceneItem.width*scaledBounds.width/2)*2
         height: Math.round(sceneItem.height*scaledBounds.height/2)*2
 
+        property double pitch1DegScaledHeight: (svgRenderer.scaledElementBounds("pfd.svg", "pitch-90").y -
+                                                svgRenderer.scaledElementBounds("pfd.svg", "pitch90").y)/180.0
+
+        property double pitch1DegHeight: sceneItem.height*pitch1DegScaledHeight
+
         gradient: Gradient {
-            GradientStop { position: 0.3;    color: "#6589E2" }
-            GradientStop { position: 0.4999; color: "#AFC2F0" }
-            GradientStop { position: 0.5;    color: "#A46933" }
-            GradientStop { position: 0.8;    color: "black" }
+            GradientStop { position: 0.4999;   color: "#0164CC" }
+            GradientStop { position: 0.5001;   color: "#653300" }
         }
 
         transform: [
             Translate {
                 id: pitchTranslate
                 x: Math.round((world.parent.width - world.width)/2)
-                y: Math.round((world.parent.height - world.height)/2 +
-                              AttitudeState.Pitch*world.parent.height/94)
+                // y is centered around world_center element
+                y: Math.round(horizontCenter - world.height/2 +
+                              AttitudeState.Pitch*world.pitch1DegHeight)
             },
             Rotation {
                 angle: -AttitudeState.Roll
@@ -33,19 +40,10 @@ Item {
         ]
 
         SvgElementImage {
-            id: pitch_scale
-            elementName: "pitch_scale"
-            //worldView is loaded with Loader, so background element is visible
-            sceneSize: background.sceneSize
-            anchors.centerIn: parent
-            border: 64 //sometimes numbers are excluded from bounding rect
-
-            smooth: true
-        }
-
-        SvgElementImage {
             id: horizont_line
-            elementName: "world-centerline"
+            //elementName: "world-centerline"
+            // TODO: rename the centerline element in svg file
+            elementName: "path4731"
             //worldView is loaded with Loader, so background element is visible
             sceneSize: background.sceneSize
             anchors.centerIn: parent
@@ -53,4 +51,34 @@ Item {
             smooth: true
         }
     }
+
+    Item {
+        id: pitch_window
+        property variant scaledBounds: svgRenderer.scaledElementBounds("pfd.svg", "pitch-window")
+
+        x: Math.floor(scaledBounds.x * sceneItem.width)
+        y: Math.floor(scaledBounds.y * sceneItem.height)
+        width: Math.floor(scaledBounds.width * sceneItem.width)
+        height: Math.floor(scaledBounds.height * sceneItem.height)
+
+        rotation: -AttitudeState.Roll
+        transformOrigin: Item.Center
+
+        smooth: true
+        clip: true
+
+        SvgElementImage {
+            id: pitch_scale
+            elementName: "pitch-scale"
+            //worldView is loaded with Loader, so background element is visible
+            sceneSize: background.sceneSize
+            anchors.centerIn: parent
+            //see comment for world transform
+            anchors.verticalCenterOffset: AttitudeState.Pitch*world.pitch1DegHeight
+            border: 64 //sometimes numbers are excluded from bounding rect
+
+            smooth: true
+        }
+    }
+
 }

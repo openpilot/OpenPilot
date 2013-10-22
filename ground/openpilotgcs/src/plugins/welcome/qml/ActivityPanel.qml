@@ -59,7 +59,7 @@ Item {
                                 declare namespace activity='http://activitystrea.ms/spec/1.0/';
                                 declare namespace media='http://purl.org/syndication/atommedia';"
 
-         XmlRole { name: "author"; query: "author/name/string()" }
+        XmlRole { name: "author"; query: "author/name/string()" }
         XmlRole { name: "authorLink"; query: "author/uri/string()" }
         XmlRole { name: "authorPhoto"; query: "author/link[@rel = 'photo' and @media:height='16']/@href/string()" }
 
@@ -140,14 +140,16 @@ Item {
                             switch(action) {
                             case "commented":
                             case "comment": parent.prefix = qsTr("Commented on "); break;
+                            case "post":
                             case "created": parent.prefix = qsTr("Created "); break;
                             case "create-and-start": parent.prefix = qsTr("Created and started "); break;
-                            case "complete": parent.prefix = qsTr("Completed review of "); break;
+                            case "complete": parent.prefix = qsTr("Completed "); break;
                             case "close":
                             case "closed": parent.prefix = qsTr("Closed "); break;
                             case "abandon": parent.prefix = qsTr("Abandoned "); break;
                             case "commit": parent.prefix = qsTr("Committed "); break;
                             case "resolved": parent.prefix = qsTr("Resolved "); break;
+                            case "start": parent.prefix = qsTr("Started "); break;
                             case "started": parent.prefix = qsTr("Started working on "); break;
                             case "stopped": parent.prefix = qsTr("Stopped working on "); break;
                             case "Code Review": parent.prefix = qsTr("Requested code review on "); break;

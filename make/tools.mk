@@ -177,13 +177,18 @@ MSG_NOTICE           = $(QUOTE) NOTE       $(QUOTE)
 
 # Verbosity level
 ifeq ($(V), 1)
-    CURL_OPTIONS  :=
     MAKE_SILENT   :=
     UNZIP_SILENT  :=
 else
-    CURL_OPTIONS  := --silent
     MAKE_SILENT   := --silent
     UNZIP_SILENT  := -q
+endif
+
+# Batch mode
+ifeq ($(BATCH), 1)
+    CURL_OPTIONS  := --silent
+else
+    CURL_OPTIONS  :=
 endif
 
 # MSYS tar workaround
@@ -201,6 +206,7 @@ ifneq ($(strip $(filter $(addsuffix _install,all_sdk $(ALL_SDK_TARGETS)),$(MAKEC
     $(info $(EMPTY) NOTE        Use 'make all_sdk_distclean' to remove installation files)
     $(info $(EMPTY) NOTE        Use 'make all_sdk_version' to check toolchain versions)
     $(info $(EMPTY) NOTE        Add 'V=1' to make command line to diagnose make problems)
+    $(info $(EMPTY) NOTE        Add 'BATCH=1' to make command line to disable progress reporting during downloads)
 endif
 
 ##############################

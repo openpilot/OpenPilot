@@ -35,20 +35,20 @@
 #include <extensionsystem/iplugin.h>
 // #include <QtCore/QSettings>
 
-
 class QAbstractSocket;
 class QTcpSocket;
 class QUdpSocket;
 
 class IConnection;
+
 /**
  *   Define a connection via the IConnection interface
  *   Plugin will add a instance of this class to the pool,
  *   so the connection manager can use it.
  */
-class IPconnection_EXPORT IPconnectionConnection
-    : public Core::IConnection {
+class IPconnection_EXPORT IPconnectionConnection : public Core::IConnection {
     Q_OBJECT
+
 public:
     IPconnectionConnection();
     virtual ~IPconnectionConnection();
@@ -69,7 +69,6 @@ public:
         return m_optionspage;
     }
 
-
 protected slots:
     void onEnumerationChanged();
 
@@ -84,11 +83,10 @@ private:
     // QSettings* settings;
 };
 
-
-class IPconnection_EXPORT IPconnectionPlugin
-    : public ExtensionSystem::IPlugin {
+class IPconnection_EXPORT IPconnectionPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
-                          Q_PLUGIN_METADATA(IID "OpenPilot.IPconnection")
+    Q_PLUGIN_METADATA(IID "OpenPilot.IPconnection")
+
 public:
     IPconnectionPlugin();
     ~IPconnectionPlugin();
@@ -99,6 +97,5 @@ public:
 private:
     IPconnectionConnection *m_connection;
 };
-
 
 #endif // IPconnectionPLUGIN_H

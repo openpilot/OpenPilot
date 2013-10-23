@@ -35,7 +35,8 @@ class GCSControlGadgetFactory;
 
 class GCSControlPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
-                                                 Q_PLUGIN_METADATA(IID "OpenPilot.GCSControl")
+    Q_PLUGIN_METADATA(IID "OpenPilot.GCSControl")
+
 public:
     GCSControlPlugin();
     ~GCSControlPlugin();
@@ -48,4 +49,5 @@ public:
 private:
     GCSControlGadgetFactory *mf;
 };
+
 #endif /* GCSControlPLUGIN_H_ */

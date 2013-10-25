@@ -49,7 +49,7 @@
 		width: 640; height: 480
 		// This  tab is for the GCS version information
 		Rectangle {
-			property string title: "OpenPilot GCS"
+			property string title: qsTr("OpenPilot GCS")
 			anchors.fill: parent
 			color: "#e3e3e3"
 			
@@ -79,14 +79,14 @@
         }
 		//  This tab is for the authors/contributors/credits
         Rectangle {
-			property string title: "Contributors"
+			property string title: qsTr("Contributors")
 			anchors.fill: parent; color: "#e3e3e3"
 			Rectangle {
 				anchors.fill: parent; anchors.margins: 20
 				color: "#e3e3e3"
 				Text {
 					id: description
-					text: "<h4>These people have been key contributors to the OpenPilot project. Without the work of the people in this list, OpenPilot would not be what it is today.</h4><p>This list is sorted alphabetically by name</p>"
+					text: qsTr("<h4>These people have been key contributors to the OpenPilot project. Without the work of the people in this list, OpenPilot would not be what it is today.</h4><p>This list is sorted alphabetically by name</p>")
 					width: 600
 					wrapMode: Text.WordWrap
 					

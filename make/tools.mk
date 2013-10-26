@@ -57,7 +57,7 @@ endif
 ifeq ($(UNAME), Linux)
     ifeq ($(ARCH), x86_64)
         ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-amd64.tar.bz2
-        QT_SDK_URL  := http://files.linux-addicted.net/qtproject/official_releases/qt/5.1/5.1.1/qt-linux-opensource-5.1.1-x86_64-offline.run
+        QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.1/5.1.1/qt-linux-opensource-5.1.1-x86_64-offline.run
         QT_SDK_MD5_URL := http://www.alessiomorale.com/download/qt-linux-opensource-5.1.1-x86_64-offline.run.md5
         QT_SDK_ARCH := gcc_64
     else
@@ -196,9 +196,9 @@ endif
 
 # Batch mode
 ifeq ($(BATCH), 1)
-    CURL_OPTIONS  := --silent
+    CURL_OPTIONS  := --silent -L
 else
-    CURL_OPTIONS  :=
+    CURL_OPTIONS  := -L
 endif
 
 # MSYS tar workaround

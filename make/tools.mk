@@ -320,6 +320,7 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 # Explode .run file into install packages
 	@$(ECHO) $(MSG_EXTRACTING) $$(call toprel, $(1))
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(1)))
+	$(V1) chmod +x $(DL_DIR)/$(5) 
 	$(V1) $(DL_DIR)/$(5) --dump-binary-data -o  $(1)
 # Extract packages under tool directory
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))

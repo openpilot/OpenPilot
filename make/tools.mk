@@ -240,7 +240,7 @@ $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
 	@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(4))
 	$(V1) ( \
 		cd "$(DL_DIR)" && \
-		$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4).md5" "$(3).md5" && \
+		$(CURL) $(CURL_OPTIONS) --silent -o "$(DL_DIR)/$(4).md5" "$(3).md5" && \
 		if [ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(4),!=) ]; then \
 			$(ECHO) $(MSG_DOWNLOADING) $(3) && \
 			$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4)" "$(3)" && \

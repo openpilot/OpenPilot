@@ -26,6 +26,7 @@
  */
 #include "QtDebug"
 
+#include "OpenGL/OpenGL.h"
 #include "modelviewgadgetwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "glc_context.h"

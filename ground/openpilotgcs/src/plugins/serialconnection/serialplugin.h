@@ -116,10 +116,9 @@ protected:
 
 
 // class SERIAL_EXPORT SerialPlugin
-class SerialPlugin
-    : public ExtensionSystem::IPlugin {
+class SerialPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
-                              Q_PLUGIN_METADATA(IID "OpenPilot.Serial")
+    Q_PLUGIN_METADATA(IID "OpenPilot.Serial")
 
 public:
     SerialPlugin();
@@ -130,6 +129,5 @@ public:
 private:
     SerialConnection *m_connection;
 };
-
 
 #endif // SERIALPLUGIN_H

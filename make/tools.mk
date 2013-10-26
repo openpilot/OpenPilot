@@ -71,7 +71,7 @@ else ifeq ($(UNAME), Darwin)
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1.src.tar.gz
 else ifeq ($(UNAME), Windows)
     ARM_SDK_URL    := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-windows.tar.bz2
-    QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-5.1.0-windows.tar.bz2
+    QT_SDK_URL     := http://wiki.openpilot.org/download/attachments/18612236/qt-5.1.1-windows.tar.bz2
     NSIS_URL       := http://wiki.openpilot.org/download/attachments/18612236/nsis-2.46-unicode.tar.bz2
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60-windows.tar.bz2
     DOXYGEN_URL    := http://wiki.openpilot.org/download/attachments/18612236/doxygen-1.8.3.1-windows.tar.bz2
@@ -81,7 +81,7 @@ GTEST_URL := http://wiki.openpilot.org/download/attachments/18612236/gtest-1.6.0
 
 # Changing PYTHON_DIR, also update it in ground/openpilotgcs/src/python.pri
 ARM_SDK_DIR     := $(TOOLS_DIR)/gcc-arm-none-eabi-4_7-2013q1
-QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.1.0
+QT_SDK_DIR      := $(TOOLS_DIR)/qt-5.1.1
 MINGW_DIR       := $(QT_SDK_DIR)/Tools/mingw48_32
 PYTHON_DIR      := $(QT_SDK_DIR)/Tools/mingw48_32/opt/bin
 NSIS_DIR        := $(TOOLS_DIR)/nsis-2.46-unicode
@@ -177,13 +177,18 @@ MSG_NOTICE           = $(QUOTE) NOTE       $(QUOTE)
 
 # Verbosity level
 ifeq ($(V), 1)
-    CURL_OPTIONS  :=
     MAKE_SILENT   :=
     UNZIP_SILENT  :=
 else
-    CURL_OPTIONS  := --silent
     MAKE_SILENT   := --silent
     UNZIP_SILENT  := -q
+endif
+
+# Batch mode
+ifeq ($(BATCH), 1)
+    CURL_OPTIONS  := --silent
+else
+    CURL_OPTIONS  :=
 endif
 
 # MSYS tar workaround
@@ -201,6 +206,7 @@ ifneq ($(strip $(filter $(addsuffix _install,all_sdk $(ALL_SDK_TARGETS)),$(MAKEC
     $(info $(EMPTY) NOTE        Use 'make all_sdk_distclean' to remove installation files)
     $(info $(EMPTY) NOTE        Use 'make all_sdk_version' to check toolchain versions)
     $(info $(EMPTY) NOTE        Add 'V=1' to make command line to diagnose make problems)
+    $(info $(EMPTY) NOTE        Add 'BATCH=1' to make command line to disable progress reporting during downloads)
 endif
 
 ##############################
@@ -234,7 +240,7 @@ $(1)_install: $(1)_clean | $(DL_DIR) $(TOOLS_DIR)
 	@$(ECHO) $(MSG_VERIFYING) $$(call toprel, $(DL_DIR)/$(4))
 	$(V1) ( \
 		cd "$(DL_DIR)" && \
-		$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4).md5" "$(3).md5" && \
+		$(CURL) $(CURL_OPTIONS) --silent -o "$(DL_DIR)/$(4).md5" "$(3).md5" && \
 		if [ $(call MD5_CHECK_TEMPLATE,$(DL_DIR)/$(4),!=) ]; then \
 			$(ECHO) $(MSG_DOWNLOADING) $(3) && \
 			$(CURL) $(CURL_OPTIONS) -o "$(DL_DIR)/$(4)" "$(3)" && \
@@ -306,7 +312,7 @@ endef
 
 ifeq ($(UNAME), Windows)
 
-QT_SDK_PREFIX := $(QT_SDK_DIR)/5.1.0/mingw48_32
+QT_SDK_PREFIX := $(QT_SDK_DIR)/5.1.1/mingw48_32
 
 define QT_SDK_CONFIGURE_TEMPLATE
 	@$(ECHO) $(MSG_CONFIGURING) $(call toprel, $(QT_SDK_DIR))

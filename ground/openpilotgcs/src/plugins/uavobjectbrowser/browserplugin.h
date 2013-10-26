@@ -34,7 +34,8 @@ class UAVObjectBrowserFactory;
 
 class BrowserPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
-                                              Q_PLUGIN_METADATA(IID "OpenPilot.Browser")
+    Q_PLUGIN_METADATA(IID "OpenPilot.Browser")
+
 public:
     BrowserPlugin();
     ~BrowserPlugin();
@@ -45,4 +46,5 @@ public:
 private:
     UAVObjectBrowserFactory *mf;
 };
+
 #endif /* UAVOBJECTBROWSERPLUGIN_H_ */

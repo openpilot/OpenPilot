@@ -63,7 +63,7 @@ ifeq ($(UNAME), Linux)
     else
         ARM_SDK_URL := http://wiki.openpilot.org/download/attachments/18612236/gcc-arm-none-eabi-4_7-2013q1-20130313-linux-i686.tar.bz2
         QT_SDK_URL  := http://download.qt-project.org/official_releases/qt/5.1/5.1.1/qt-linux-opensource-5.1.1-x86-offline.run
-        QT_SDK_MD5_URL := xxxxxxx
+        QT_SDK_MD5_URL := http://www.alessiomorale.com/download/qt-linux-opensource-5.1.1-x86-offline.run.md5
         QT_SDK_ARCH := gcc
     endif
     UNCRUSTIFY_URL := http://wiki.openpilot.org/download/attachments/18612236/uncrustify-0.60.tar.gz
@@ -327,8 +327,8 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.readme/1.0.0qt-project-url.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.readme/1.0.0readme.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.511.$(6).essentials/5.1.1$(6)_qt5_essentials.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.511.$(6).essentials/5.1.1$(6)_qt5_essentials.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_64.7z" | grep -v Extracting
+	$(V1) if [ -f "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_64.7z" ]; then $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_64.7z" | grep -v Extracting; fi
+	$(V1) if [ -f "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_32.7z" ]; then $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_32.7z" | grep -v Extracting; fi	
 	$(V1) $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.511.$(6).essentials/5.1.1icu_path_patcher.sh.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.511.$(6).addons/5.1.1$(6)_qt5_addons.7z" | grep -v Extracting
 # go to OpenPilot/tools/5.1.1/gcc_64 and call patcher.sh

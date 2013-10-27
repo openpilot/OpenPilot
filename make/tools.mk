@@ -93,9 +93,6 @@ UNCRUSTIFY_DIR  := $(TOOLS_DIR)/uncrustify-0.60
 DOXYGEN_DIR     := $(TOOLS_DIR)/doxygen-1.8.3.1
 GTEST_DIR       := $(TOOLS_DIR)/gtest-1.6.0
 
-ifeq ($(UNAME), Linux)
-		QT_SDK_DIR    := $(TOOLS_DIR)/5.1.1
-endif
 QT_SDK_PREFIX := $(QT_SDK_DIR)
 ##############################
 #
@@ -324,22 +321,22 @@ qt_sdk_install: qt_sdk_clean | $(DL_DIR) $(TOOLS_DIR)
 	$(V1) $(DL_DIR)/$(5) --dump-binary-data -o  $(1)
 # Extract packages under tool directory
 	$(V1) $(MKDIR) -p $$(call toprel, $(dir $(2)))
-	$(V1) $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.readme/1.0.0qt-project-url.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt/1.0.0ThirdPartySoftware_Listing.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0qt-project-url.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt/1.0.0ThirdPartySoftware_Listing.7z" | grep -v Extracting
 	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.readme/1.0.0readme.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.511.$(6).essentials/5.1.1$(6)_qt5_essentials.7z" | grep -v Extracting
-	$(V1) if [ -f "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_64.7z" ]; then $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_64.7z" | grep -v Extracting; fi
-	$(V1) if [ -f "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_32.7z" ]; then $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_32.7z" | grep -v Extracting; fi	
-	$(V1) $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.511.$(6).essentials/5.1.1icu_path_patcher.sh.7z" | grep -v Extracting
-	$(V1) $(SEVENZIP) -y -o$(TOOLS_DIR) x "$(1)/qt.511.$(6).addons/5.1.1$(6)_qt5_addons.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).essentials/5.1.1$(6)_qt5_essentials.7z" | grep -v Extracting
+	$(V1) if [ -f "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_64.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_64.7z" | grep -v Extracting; fi
+	$(V1) if [ -f "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_32.7z" ]; then $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).essentials/5.1.1icu_51_1_ubuntu_11_10_32.7z" | grep -v Extracting; fi	
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).essentials/5.1.1icu_path_patcher.sh.7z" | grep -v Extracting
+	$(V1) $(SEVENZIP) -y -o$(2) x "$(1)/qt.511.$(6).addons/5.1.1$(6)_qt5_addons.7z" | grep -v Extracting
 # go to OpenPilot/tools/5.1.1/gcc_64 and call patcher.sh
 	@$(ECHO)
-	@$(ECHO) "Running patcher in" $$(call toprel, "$(2)/$(6)")
-	$(V1) $(CD) "$(2)/$(6)"
-	$(V1) "$(2)/$(6)/patcher.sh" "$(2)/$(6)"
+	@$(ECHO) "Running patcher in" $$(call toprel, $(QT_SDK_PREFIX))
+	$(V1) $(CD) $(QT_SDK_PREFIX)
+	$(V1) "$(QT_SDK_PREFIX)/patcher.sh" $(QT_SDK_PREFIX)
 # call qmake patcher
-	@$(ECHO) "Executing QtPatch in" $$(call toprel, "$(2)/$(6)")
-	$(V1) $(DL_DIR)/$(5) --runoperation QtPatch linux "$(2)/$(6)" qt5
+	@$(ECHO) "Executing QtPatch in" $$(call toprel, $(QT_SDK_PREFIX))
+	$(V1) $(DL_DIR)/$(5) --runoperation QtPatch linux $(QT_SDK_PREFIX) qt5
 
 # Execute post build templates
 	$(7)
@@ -415,7 +412,7 @@ endef
     $(eval $(call TOOL_INSTALL_TEMPLATE,qt_sdk,$(QT_SDK_DIR),$(QT_SDK_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_CONFIGURE_TEMPLATE)))
 
 else ifeq ($(UNAME), Linux)
-QT_SDK_PREFIX := "$(QT_SDK_DIR)/$(QT_SDK_ARCH)"
+QT_SDK_PREFIX := "$(QT_SDK_DIR)/5.1.1/$(QT_SDK_ARCH)"
 QT_BUILD_DIR := $(BUILD_DIR)/QT_BUILD
     $(eval $(call LINUX_QT_INSTALL_TEMPLATE,$(QT_BUILD_DIR),$(QT_SDK_DIR),$(QT_SDK_URL),$(QT_SDK_MD5_URL),$(notdir $(QT_SDK_URL)),$(QT_SDK_ARCH)))
 

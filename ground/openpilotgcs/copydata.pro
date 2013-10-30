@@ -67,54 +67,12 @@ equals(copydata, 1) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
-<<<<<<< HEAD
         # copy MinGW DLLs
         MINGW_DLLS = SDL.dll
         for(dll, MINGW_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
-=======
-        # copy imageformats
-        QT_IMAGEFORMAT_DLLS = qgif4.dll qico4.dll qjpeg4.dll qmng4.dll qsvg4.dll qtiff4.dll
-        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/imageformats\") $$addNewline()
-        for(dll, QT_IMAGEFORMAT_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/imageformats/$$dll\") $$targetPath(\"$$GCS_APP_PATH/imageformats/$$dll\") $$addNewline()
-        }
-        
-        # copy phonon_backend
-        QT_PHONON_BACKEND_DLLS = phonon_ds94.dll
-        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/phonon_backend\") $$addNewline()
-        for(dll, QT_PHONON_BACKEND_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/phonon_backend/$$dll\") $$targetPath(\"$$GCS_APP_PATH/phonon_backend/$$dll\") $$addNewline()
-        }
-
-        # copy sqldrivers
-        QT_SQLDRIVERS_DLLS = qsqlite4.dll
-        data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/sqldrivers\") $$addNewline()
-        for(dll, QT_SQLDRIVERS_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/sqldrivers/$$dll\") $$targetPath(\"$$GCS_APP_PATH/sqldrivers/$$dll\") $$addNewline()
-        }
-
-        # copy SDL - Simple DirectMedia Layer (www.libsdl.org)
-        # Check the wiki for SDL installation, it should be copied first
-        # (make sure that the Qt installation path below is correct)
-        #
-        # - For qt-sdk-win-opensource-2010.05.exe:
-        #   xcopy /s /e <SDL>\bin\SDL.dll   C:\Qt\2010.05\mingw\bin\SDL.dll
-        #   xcopy /s /e <SDL>\include\SDL\* C:\Qt\2010.05\mingw\include\SDL
-        #   xcopy /s /e <SDL>\lib\*         C:\Qt\2010.05\mingw\lib
-        #
-        # - For Qt_SDK_Win_offline_v1_1_1_en.exe:
-        #   xcopy /s /e <SDL>\bin\SDL.dll   C:\QtSDK\Desktop\Qt\4.7.3\mingw\bin\SDL.dll
-        #   xcopy /s /e <SDL>\include\SDL\* C:\QtSDK\Desktop\Qt\4.7.3\mingw\include\SDL
-        #   xcopy /s /e <SDL>\lib\*         C:\QtSDK\Desktop\Qt\4.7.3\mingw\lib
-        3PARTYDLL_DLLS = SDL.dll ssleay32.dll libeay32.dll
-        for(dll, 3PARTYDLL_DLLS) {
-            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$(QTMINGW)/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
-        }
-        
->>>>>>> master
         data_copy.target = FORCE
         QMAKE_EXTRA_TARGETS += data_copy
     }

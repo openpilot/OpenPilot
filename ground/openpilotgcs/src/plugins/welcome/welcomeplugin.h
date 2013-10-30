@@ -32,13 +32,15 @@
 #include <extensionsystem/iplugin.h>
 
 namespace Welcome {
+
 class WelcomeMode;
 
 namespace Internal {
+
 class WelcomePlugin
     : public ExtensionSystem::IPlugin {
     Q_OBJECT
-                              Q_PLUGIN_METADATA(IID "OpenPilot.Welcome")
+    Q_PLUGIN_METADATA(IID "OpenPilot.Welcome")
 
 public:
     WelcomePlugin();
@@ -51,6 +53,7 @@ public:
 private:
     WelcomeMode *m_welcomeMode;
 };
+
 } // namespace Welcome
 } // namespace Internal
 

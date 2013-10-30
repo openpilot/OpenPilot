@@ -34,7 +34,8 @@ class EmptyGadgetFactory;
 
 class EmptyPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
-                                            Q_PLUGIN_METADATA(IID "OpenPilot.Empty")
+    Q_PLUGIN_METADATA(IID "OpenPilot.Empty")
+
 public:
     EmptyPlugin();
     ~EmptyPlugin();
@@ -45,4 +46,5 @@ public:
 private:
     EmptyGadgetFactory *mf;
 };
+
 #endif /* EMPTYPLUGIN_H_ */

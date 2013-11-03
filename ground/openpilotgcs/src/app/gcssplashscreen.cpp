@@ -35,7 +35,7 @@ GCSSplashScreen::GCSSplashScreen() :
     QSplashScreen(), m_pixmap(0), m_painter(0)
 {
     setWindowFlags(windowFlags());
-    m_pixmap  = new QPixmap(":/app/splash.png");
+    m_pixmap  = new QPixmap(":/app/resources/splash.png");
 
     m_painter = new QPainter(m_pixmap);
     m_painter->setPen(Qt::lightGray);

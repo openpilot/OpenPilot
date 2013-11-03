@@ -101,6 +101,8 @@
 #include <QtWidgets/QApplication>
 #include <QMainWindow>
 #include <QSplashScreen>
+#include <QFontDatabase>
+#include <QFont>
 
 namespace {
 typedef QList<ExtensionSystem::PluginSpec *> PluginSpecSet;
@@ -461,6 +463,11 @@ int main(int argc, char * *argv)
 
     // create application
     SharedTools::QtSingleApplication app(APP_NAME, argc, argv);
+
+    // Add custom font to font database and set it as application font
+    QFontDatabase::addApplicationFont(":/app/resources/DejaVuSansCondensed-Bold.ttf");
+    QFont appFont = QFont("DejaVu Sans Condensed");
+    app.setFont(appFont);
 
     // initialize the plugin manager
     ExtensionSystem::PluginManager pluginManager;

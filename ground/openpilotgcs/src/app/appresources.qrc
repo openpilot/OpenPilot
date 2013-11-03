@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/app">
-        <file>splash.png</file>
+        <file>resources/splash.png</file>
+        <file>resources/DejaVuSans.ttf</file>
+        <file>resources/DejaVuSansCondensed.ttf</file>
+        <file>resources/DejaVuSansCondensed-Bold.ttf</file>
     </qresource>
 </RCC>

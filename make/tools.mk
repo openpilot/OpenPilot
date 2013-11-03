@@ -419,12 +419,12 @@ QT_BUILD_DIR := $(BUILD_DIR)/QT_BUILD
 else
 
 QT_SDK_PREFIX := $(QT_SDK_DIR)
- 
+
 .PHONY: qt_sdk_install
 qt_sdk_install:
-       @$(ECHO) $(MSG_NOTICE) --------------------------------------------------------
-       @$(ECHO) $(MSG_NOTICE) Please install native Qt 5.1.x SDK using package manager
-       @$(ECHO) $(MSG_NOTICE) --------------------------------------------------------
+	@$(ECHO) $(MSG_NOTICE) --------------------------------------------------------
+	@$(ECHO) $(MSG_NOTICE) Please install native Qt 5.1.x SDK using package manager
+	@$(ECHO) $(MSG_NOTICE) --------------------------------------------------------
 
 .PHONY: qt_sdk_clean
 qt_sdk_clean:

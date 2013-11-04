@@ -25,6 +25,7 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <assert.h>
 #include "ophid.h"
 #include "ophid_const.h"
 #include "coreplugin/connectionmanager.h"
@@ -64,6 +65,7 @@ public slots:
     void terminate()
     {
         m_running = false;
+        wait();
     }
 
 protected:
@@ -105,6 +107,7 @@ public slots:
     void terminate()
     {
         m_running = false;
+        wait();
     }
 
 protected:
@@ -143,11 +146,7 @@ RawHIDReadThread::RawHIDReadThread(RawHID *hid)
 
 RawHIDReadThread::~RawHIDReadThread()
 {
-    m_running = false;
-    // wait for the thread to terminate
-    if (wait(10000) == false) {
-        qDebug() << "Cannot terminate RawHIDReadThread";
-    }
+    assert(!m_running);
 }
 
 void RawHIDReadThread::run()
@@ -216,11 +215,7 @@ RawHIDWriteThread::RawHIDWriteThread(RawHID *hid)
 
 RawHIDWriteThread::~RawHIDWriteThread()
 {
-    m_running = false;
-    // wait for the thread to terminate
-    if (wait(10000) == false) {
-        qDebug() << "Cannot terminate RawHIDReadThread";
-    }
+    assert(!m_running);
 }
 
 void RawHIDWriteThread::run()

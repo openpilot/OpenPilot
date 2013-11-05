@@ -2786,7 +2786,7 @@ uniquement lorsque les valeurs changent</translation>
     <message>
         <location filename="../../../src/plugins/config/configgadgetfactory.cpp" line="+36"/>
         <source>Config</source>
-        <translation type="unfinished"></translation>
+        <translation>Config</translation>
     </message>
     <message>
         <location line="+17"/>
@@ -3945,22 +3945,22 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location/>
         <source>param1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>param2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>param3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>param4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -4003,17 +4003,19 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_overlay_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>labelStatus</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4021,17 +4023,19 @@ Le SNR du satellite est affiche au-dessus (en dBHz)</translation>
     <message>
         <location filename="../../../src/plugins/opmap/opmap_statusbar_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
         <source>labelStatus</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>%v</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -9281,7 +9285,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>Device Information</source>
-        <translation type="unfinished">Information Périphérique</translation>
+        <translation>Information Périphérique</translation>
     </message>
     <message>
         <location/>
@@ -9291,6 +9295,7 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>DeviceID</source>
+        <translatorcomment>Champs. Pas toucher ?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11031,7 +11036,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location filename="../../../src/plugins/config/airframe_custom.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -11375,7 +11380,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
     <message>
         <location filename="../../../src/plugins/config/airframe_multirotor.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -11401,7 +11406,7 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
         <location/>
         <source>Weight of Roll mixing in percent.
 Typical values are 100% for + configuration and 50% for X configuration on quads.</source>
-        <translation type="unfinished">Quantité de mixage Roll en pourcentage.
+        <translation>Quantité de mixage Roll en pourcentage.
 Les valeurs classiques sont de 100% en configuration + et 50% en configuration X sur les quadricoptères.</translation>
     </message>
     <message>
@@ -11418,7 +11423,7 @@ Les valeurs classiques sont de 100% en configuration + et 50% en configuration X
         <location/>
         <source>Weight of Pitch mixing in percent.
 Typical values are 100% for + configuration and 50% for X configuration on quads.</source>
-        <translation type="unfinished">Quantité de mixage Pitch en pourcentage.
+        <translation>Quantité de mixage Pitch en pourcentage.
 Les valeurs classiques sont de 100% en configuration + et 50% en configuration X sur les quadricoptères.</translation>
     </message>
     <message>
@@ -11430,13 +11435,13 @@ Les valeurs classiques sont de 100% en configuration + et 50% en configuration X
         <location/>
         <source>Weight of Yaw mixing in percent.
 Typical value is 50% for + or X configuration on quads.</source>
-        <translation type="unfinished">Quantité de mixage Yaw en pourcentage.
+        <translation>Quantité de mixage Yaw en pourcentage.
 Les valeurs classiques sont de 50% en configuration + et X sur les quadricoptères.</translation>
     </message>
     <message>
         <location/>
         <source>Frame Type:</source>
-        <translation type="unfinished">Type Châssis :</translation>
+        <translation>Type Châssis :</translation>
     </message>
     <message>
         <location/>
@@ -11446,7 +11451,7 @@ Les valeurs classiques sont de 50% en configuration + et X sur les quadricoptèr
     <message>
         <location/>
         <source>Mixer OK</source>
-        <translation type="unfinished">Mixage OK</translation>
+        <translation>Mixage OK</translation>
     </message>
     <message>
         <location/>
@@ -11456,7 +11461,7 @@ Les valeurs classiques sont de 50% en configuration + et X sur les quadricoptèr
     <message>
         <location/>
         <source>1</source>
-        <translation type="unfinished">1</translation>
+        <translation>1</translation>
     </message>
     <message>
         <location/>
@@ -11466,37 +11471,37 @@ Les valeurs classiques sont de 50% en configuration + et X sur les quadricoptèr
     <message>
         <location/>
         <source>2</source>
-        <translation type="unfinished">2</translation>
+        <translation>2</translation>
     </message>
     <message>
         <location/>
         <source>3</source>
-        <translation type="unfinished">3</translation>
+        <translation>3</translation>
     </message>
     <message>
         <location/>
         <source>4</source>
-        <translation type="unfinished">4</translation>
+        <translation>4</translation>
     </message>
     <message>
         <location/>
         <source>5</source>
-        <translation type="unfinished">5</translation>
+        <translation>5</translation>
     </message>
     <message>
         <location/>
         <source>6</source>
-        <translation type="unfinished">6</translation>
+        <translation>6</translation>
     </message>
     <message>
         <location/>
         <source>7</source>
-        <translation type="unfinished">7</translation>
+        <translation>7</translation>
     </message>
     <message>
         <location/>
         <source>8</source>
-        <translation type="unfinished">8</translation>
+        <translation>8</translation>
     </message>
     <message>
         <location/>
@@ -11519,7 +11524,7 @@ Les valeurs classiques sont de 50% en configuration + et X sur les quadricoptèr
     <message>
         <location filename="../../../src/plugins/config/configrevohwwidget.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -11601,7 +11606,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location filename="../../../src/plugins/config/pipxtreme.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
     <message>
         <location/>
@@ -11893,7 +11898,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>One-Way Link</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Liaison Unidirectionnelle</translation>
     </message>
     <message>
         <location/>
@@ -11946,7 +11951,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location filename="../../../src/plugins/osgearthview/osgearthview.ui"/>
         <source>Form</source>
-        <translation type="unfinished">Formulaire</translation>
+        <translation>Formulaire</translation>
     </message>
 </context>
 <context>
@@ -11987,6 +11992,7 @@ Méfiez-vous de ne pas vous verrouiller l&apos;accès !</translation>
     <message>
         <location/>
         <source>New PathAction</source>
+        <translatorcomment>PathAction ? à définir en Fr</translatorcomment>
         <translation type="unfinished">Nouveau PathAction</translation>
     </message>
     <message>
@@ -12182,6 +12188,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/plugins/pathactioneditor/pathactioneditorgadgetfactory.cpp" line="+34"/>
         <source>PathAction Editor</source>
+        <translatorcomment>PathAction ? à définir en Fr</translatorcomment>
         <translation type="unfinished">Éditeur PathAction</translation>
     </message>
 </context>
@@ -12205,12 +12212,13 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+3"/>
         <source>PathActions</source>
+        <translatorcomment>PathAction ? à définir en Fr</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Waypoints</source>
-        <translation type="unfinished">Waypoints</translation>
+        <translation>Waypoints</translation>
     </message>
 </context>
 <context>
@@ -12481,7 +12489,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+128"/>
         <source>Commented on </source>
-        <translation type="unfinished">Commenté le </translation>
+        <translation type="unfinished">Commenté sur </translation>
     </message>
     <message>
         <location line="+2"/>
@@ -12511,8 +12519,8 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>Committed </source>
-        <translatorcomment>Traduction FR ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Traduction FR ? http://fr.wikipedia.org/wiki/Commit</translatorcomment>
+        <translation type="unfinished">Liste des modifications effectuées</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -12527,12 +12535,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>Started working on </source>
-        <translation type="unfinished">Débuté travaux le </translation>
+        <translation type="unfinished">Débuté travaux sur </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stopped working on </source>
-        <translation type="unfinished">Arrêté travaux le </translation>
+        <translation type="unfinished">Arrêté travaux sur </translation>
     </message>
     <message>
         <location line="+1"/>
@@ -12542,7 +12550,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location line="+1"/>
         <source>Requested testing of </source>
-        <translation type="unfinished">Demandé phase tests le </translation>
+        <translation type="unfinished">Demandé phase de tests sur </translation>
     </message>
     <message>
         <location line="+1"/>
@@ -12555,12 +12563,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../../src/libs/utils/fancymainwindow.cpp" line="+70"/>
         <source>Locked</source>
-        <translation type="unfinished">Vérrouillé</translation>
+        <translation>Vérrouillé</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Reset to Default Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Retour à l&apos;agencement par défaut</translation>
     </message>
 </context>
 </TS>

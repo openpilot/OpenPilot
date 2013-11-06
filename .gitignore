@@ -53,6 +53,7 @@ openpilotgcs-build-desktop
 
 # Ignore Eclipse Projects and Metadata
 /.cproject
+/.pydevproject
 /.project
 /.metadata
 

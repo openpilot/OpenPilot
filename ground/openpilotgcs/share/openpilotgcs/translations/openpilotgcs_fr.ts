@@ -6986,13 +6986,13 @@ Une valeur de 0.00 désactive le filtre.</translation>
         <location/>
         <source>button:default</source>
         <translatorcomment>pas toucher ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:1</source>
         <translatorcomment>pas toucher ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7025,49 +7025,49 @@ oscillations claires en vol. Baissez ensuite la valeur de 5 ou plus.</translatio
         <location/>
         <source>objname:StabilizationSettings</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:RollRatePID</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Kp</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:yes</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:0.0001</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:1,10</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:PitchRatePID</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:YawRatePID</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7085,7 +7085,7 @@ value as the Kp.</source>
         <location/>
         <source>element:Ki</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7096,37 +7096,37 @@ value as the Kp.</source>
         <location/>
         <source>buttongroup:2</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:RollPI</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:0.1</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:2,10</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:PitchPI</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:YawPI</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7137,7 +7137,7 @@ value as the Kp.</source>
         <location/>
         <source>fieldname:LowThrottleZeroIntegral</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7148,31 +7148,31 @@ value as the Kp.</source>
         <location/>
         <source>buttongroup:4</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Kd</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>haslimits:no</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:1</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:4,20</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7183,30 +7183,30 @@ value as the Kp.</source>
         <location/>
         <source>buttongroup:5</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:5,20</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:6</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:PitchMax</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:6,20</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7217,43 +7217,43 @@ value as the Kp.</source>
         <location/>
         <source>fieldname:MaximumRate</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Roll</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:ManualRate</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Yaw</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:YawMax</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:Pitch</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:RollMax</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7269,7 +7269,7 @@ value as the Kp.</source>
         <location/>
         <source>buttongroup:10</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7295,25 +7295,25 @@ value as the Kp.</source>
         <location/>
         <source>fieldname:WeakLevelingKp</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxWeakLevelingRate</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxAxisLock</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:MaxAxisLockRate</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7323,25 +7323,25 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>buttongroup:13</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>element:ILimit</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>ILimit Attitude</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>ILimit Rate</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7352,25 +7352,25 @@ value as the Kp.</source>
         <location/>
         <source>buttongroup:8</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>objname:AttitudeSettings</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:AccelKp</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:8,10</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7386,7 +7386,7 @@ value as the Kp.</source>
         <location/>
         <source>fieldname:GyroTau</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7397,7 +7397,7 @@ value as the Kp.</source>
         <location/>
         <source>fieldname:AccelKi</source>
         <translatorcomment>pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7407,7 +7407,8 @@ value as the Kp.</source>
     <message>
         <location/>
         <source>button:help</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7429,7 +7430,8 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>button:reload</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7444,7 +7446,8 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>button:apply</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7459,7 +7462,8 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>button:save</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7469,7 +7473,8 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>QGroupBox{border: 0px;}</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7529,7 +7534,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Rate mode (inner loop). Too much will make your vehicle oscillate in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci règle le niveau de stabilité utilisé en mode Rate (boucle interne). Une valeur trop élevée va produire des oscillations en mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7539,7 +7544,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much leveling stability is set into Attitude mode (outer loop). Too much will make your vehicle oscillate in Attitude Mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci règle le niveau de stabilité utilisé en mode Attitude (boucle externe). Une valeur trop élevée va produire des oscillations en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7549,7 +7554,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>Instant Update</source>
-        <translation type="unfinished">Actualisation Instantanée</translation>
+        <translation>Actualisation Instantanée</translation>
     </message>
     <message>
         <location/>
@@ -7624,32 +7629,37 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>objname:AltitudeHoldSettings</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:99</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas toucher</translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Kp</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:0.001</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Ki</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>fieldname:Kd</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7664,12 +7674,14 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>fieldname:ThrottleRate</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>scale:0.5</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7684,12 +7696,13 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>fieldname:ThrottleExp</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Max Vertical Velocity</source>
-        <translation type="unfinished">Vitesse Verticale Maxi</translation>
+        <translation>Vitesse Verticale Maxi</translation>
     </message>
     <message>
         <location/>
@@ -12520,7 +12533,7 @@ p, li { white-space: pre-wrap; }
         <location line="+1"/>
         <source>Committed </source>
         <translatorcomment>Traduction FR ? http://fr.wikipedia.org/wiki/Commit</translatorcomment>
-        <translation type="unfinished">Liste des modifications effectuées</translation>
+        <translation type="unfinished">Liste des modifications effectuées </translation>
     </message>
     <message>
         <location line="+1"/>

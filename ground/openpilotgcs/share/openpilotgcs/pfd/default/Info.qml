@@ -25,14 +25,16 @@ Item {
         }
     }
 
-    Text {
-        text: ["No GPS", "No Fix", "Fix2D", "Fix3D"][GPSPositionSensor.Status]
+    SvgElementPositionItem {
+        sceneSize: info.sceneSize
+        elementName: "gps-mode-text"
 
-        // TODO: get coords from svg file, as soon as "gps-mode-text" text is converted to path
-        x: info.sceneSize.width * 0.05
-        y: info.sceneSize.height * 0.006
+        Text {
+            text: ["No GPS", "No Fix", "Fix2D", "Fix3D"][GPSPositionSensor.Status]
 
-        font.pixelSize: info.sceneSize.height * 0.02
-        color: "white"
+            anchors.centerIn: parent
+            font.pixelSize: parent.height*1.2
+            color: "white"
+        }
     }
 }

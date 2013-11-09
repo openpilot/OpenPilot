@@ -64,6 +64,7 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
         "GPSPositionSensor" <<
         "GCSTelemetryStats" <<
         "SystemAlarms" <<
+        "NedAccel" <<
         "FlightBatteryState";
 
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();

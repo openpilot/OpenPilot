@@ -50,6 +50,18 @@ Item {
                 }
             }
         }
+
+        SvgElementImage {
+            id: altitude_waypoint
+            elementName: "altitude-waypoint"
+            sceneSize: sceneItem.sceneSize
+            visible: PathDesired.End_Down !== 0.0
+
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+
+            anchors.verticalCenterOffset: -altitude_scale.height/30 * (PositionState.Down - PathDesired.End_Down)
+        }
     }
 
     SvgElementImage {

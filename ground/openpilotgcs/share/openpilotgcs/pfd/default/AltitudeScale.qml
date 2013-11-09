@@ -52,6 +52,17 @@ Item {
         }
 
         SvgElementImage {
+            id: altitude_vector
+            elementName: "altitude-vector"
+            sceneSize: sceneItem.sceneSize
+
+            height: -NedAccel.Down * altitude_scale.height/30
+
+            anchors.left: parent.left
+            anchors.bottom: parent.verticalCenter
+        }
+
+        SvgElementImage {
             id: altitude_waypoint
             elementName: "altitude-waypoint"
             sceneSize: sceneItem.sceneSize

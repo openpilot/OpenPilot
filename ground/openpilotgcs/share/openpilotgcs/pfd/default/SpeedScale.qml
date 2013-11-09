@@ -56,6 +56,18 @@ Item {
                 }
             }
         }
+
+        SvgElementImage {
+            id: speed_waypoint
+            elementName: "speed-waypoint"
+            sceneSize: sceneItem.sceneSize
+            visible: PathDesired.EndingVelocity !== 0.0
+
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+
+            anchors.verticalCenterOffset: speed_scale.height/30 * (sceneItem.groundSpeed - PathDesired.EndingVelocity)
+        }
     }
 
     SvgElementImage {

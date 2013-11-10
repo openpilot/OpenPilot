@@ -4748,12 +4748,14 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>button:reload</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher </translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>buttongroup:10</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher </translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -4900,7 +4902,7 @@ Cette valeur doit être ajustée en fonction de la nacelle et du servo. Vous dev
         <location/>
         <source>buttongroup:1</source>
         <translatorcomment>Pas toucher !</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -7635,7 +7637,8 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>buttongroup:99</source>
-        <translation>Pas toucher</translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9303,33 +9306,38 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>lblDevName</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>DeviceID</source>
         <translatorcomment>Champs. Pas toucher ?</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblHWRev</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>RW</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>BL Version</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>MaxCodeSize</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9409,32 +9417,38 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>lblBrdName</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblDescription</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblBuildDate</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblGitTag</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblCRC</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblCertified</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -9444,12 +9458,14 @@ persistant de la carte, et ensuite ferme la boite de dialogue.</translation>
     <message>
         <location/>
         <source>lblDescritpionL</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>lblCertifiedL</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Pas toucher</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -10759,6 +10775,36 @@ La carte sera redémarrée et tous les paramètres effacés</translation>
         <location filename="../../../src/plugins/welcome/qml/SitesPanel.qml" line="+13"/>
         <source>OpenPilot Websites</source>
         <translation>Sites Web OpenPilot</translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Home</source>
+        <translation type="unfinished">Site Principal</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Wiki</source>
+        <translation type="unfinished">Wiki</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Store</source>
+        <translation type="unfinished">Boutique</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Forums</source>
+        <translation type="unfinished">Forums</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Code Reviews</source>
+        <translation type="unfinished">Changements Code</translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Progress Tracker</source>
+        <translation type="unfinished">Suivi Progression</translation>
     </message>
 </context>
 <context>
@@ -12582,6 +12628,39 @@ p, li { white-space: pre-wrap; }
         <location line="+2"/>
         <source>Reset to Default Layout</source>
         <translation>Retour à l&apos;agencement par défaut</translation>
+    </message>
+</context>
+<context>
+    <name>main</name>
+    <message>
+        <location filename="../../../src/plugins/welcome/qml/main.qml" line="+62"/>
+        <source>Flight Data</source>
+        <translation type="unfinished">Données de Vol</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Configuration</source>
+        <translation type="unfinished">Configuration</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>System</source>
+        <translation type="unfinished">Système</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Scopes</source>
+        <translation type="unfinished">Graphiques</translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>HITL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Firmware</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

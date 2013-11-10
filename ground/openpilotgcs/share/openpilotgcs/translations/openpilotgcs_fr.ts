@@ -7559,7 +7559,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this feature mean that any changes made to the sliders will be instantly sent and used by the Flight Controller, useful for two person tuning where one normally flies and ones changes the GCS.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;L&apos;activation de cette option signifie que toutes les modifications apportées aux curseurs seront immédiatement envoyées et utilisées par le Contrôleur de Vol, utile lorsque deux personnes font les réglages où un vole normalement et l&apos;autre effectue des modifications dans GCS.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7584,37 +7584,37 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In Weak Leveling mode, this setting acts like Attitude Kp. If you make this setting too high, it can cause oscillations.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;En mode Weak Leveling, ce paramètre se comporte comme Kp en mode Attitude. Si vous mettez une valeur trop haute, elle peut provoquer des oscillations.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In Weak Leveling mode, this is the maximum number of degrees per second that weak leveling will move the vehicle.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;En mode Weak Leveling, correspond à la vitesse de rotation maximale en degrés par seconde de l&apos;appareil.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In AxisLock mode, this is the maximum number of degrees of correction. If movement by outside forces (eg Wind) are less than the set value your vehicle will return to centre. More than set amount and will only move your vehicle the set amount back to centre.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;En mode AxisLock, cela correspond à la valeur maximale de correction en degrés. Si le mouvement provoqué par des forces extérieures (ex. Vent) est inférieure à la valeur indiquée, votre appareil reviendra à la position centrale. Si la valeur du mouvement dépasse la valeur indiquée, la correction se limitera à la valeur indiquée en direction de la position centrale.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In AxisLock mode, this setting controls how many degrees per second you can request with the stick before OpenPilot stops trying to gently hold its position and goes into normal rate mode. This setting works almost like a dead band. Default value should work fine.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;En mode AxisLock, ce paramètre contrôle combien de degrés par seconde vous pouvez demander avec le manche avant qu&apos;OpenPilot cesse d&apos;essayer de tenir doucement sa position et passe en mode rate normal. Ce paramètre fonctionne presque comme une zone morte. La valeur par défaut devrait fonctionner correctement.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The proportional term for the accelerometer, the higher this term the more weight the accel is given.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le terme proportionnel pour l&apos;accéléromètre, plus il est élevé et plus l&apos;accéléromètre aura de l&apos;importance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;In effect, a vibrations filter for the gyro.  Default 0.005 - Max .020.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dans les faits, un filtre de vibrations pour le gyroscope. Valeur par défaut 0.005 - 0.020 Maxi.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The intergral term for the accelerometer within the filter.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le terme intégral de l&apos;accéléromètre dans le filtre.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7691,7 +7691,7 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Throttle exponential value.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Valeur exponentielle du manche des gaz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
@@ -7727,58 +7727,58 @@ Useful if you have accidentally changed some settings.</source>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avancant) en mode Rate. Un bon point de départ pour l&apos;Intégrale est la même valeur qu&apos;en Proportionnel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum deg your vehicle will tilt at full stick input when in Attitude mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci fixe l&apos;inclinaison maximale de l&apos;appareil en degrés pour une entrée manche à fond lorsqu&apos;il est en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum rotation rate in degrees per second on an axis.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci fixe la vitesse maximale en degrés par seconde sur un axe.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the degrees per second that your vehicle will tilt/rotate at full stick input when in all modes except Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci fixe la vitesse en degrés par seconde que votre appareil aura pour une entrée manche à fond dans tous les modes, excepté en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This
                     makes the control output respond faster with fast stick movements or external disturbance like wind gusts. It also acts like a dampener, thus allowing higher KP settings. Only affects Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci rend la réponse du contrôle de sortie plus rapide lors de mouvements de manches rapides ou de perturbations externes comme des rafales de vent. Il agit également comme un amortisseur, permettant ainsi les paramètres Kp plus élevés. Ne concerne que le mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Rate mode. A good starting point for Integral is the same as Proportional.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avancant) en mode Rate. Un bon point de départ pour l&apos;Intégrale est la même valeur qu&apos;en Proportionnel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This makes the control output respond faster with fast stick movements or external disturbance like wind gusts. It also acts like a dampener, thus allowing higher KP settings. Only affects Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci rend la réponse du contrôle de sortie plus rapide lors de mouvements de manches rapides ou de perturbations externes comme des rafales de vent. Il agit également comme un amortisseur, permettant ainsi les paramètres Kp plus élevés. Ne concerne que le mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This makes the control output respond faster with fast stick movements or external disturbance like wind gusts.It also acts like a dampener, thus allowing higher KP settings. Only affects Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci rend la réponse du contrôle de sortie plus rapide lors de mouvements de manches rapides ou de perturbations externes comme des rafales de vent. Il agit également comme un amortisseur, permettant ainsi les paramètres Kp plus élevés. Ne concerne que le mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This adjusts how much stability your vehicle will have when flying tilted (ie forward flight) in Attitude Mode. Adding Ki in Attitude when Ki is present in Rate is not recommended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci ajuste le niveau de stabilité que votre véhicule aura en vol incliné (ex. vol en avancant) en mode Attitude. Ajouter une valeur d&apos;intégrale en mode Attitude lorsque une intégrale est présente en mode Rate n&apos;est pas recommandé.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KP) that is used in Rate mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Rate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This sets the maximum value of the integral (KP) that is used in AttitudeMode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ceci limite la valeur maximale de l&apos;intégrale (KP) qui est utilisée en mode Attitude.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>

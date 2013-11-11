@@ -1,14 +1,9 @@
 /**
  ******************************************************************************
  *
- * @file       versiondialog.cpp
+ * @file       aboutdialog.h
  * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
  *             Parts by Nokia Corporation (qt-info@nokia.com) Copyright (C) 2009.
- * @addtogroup GCSPlugins GCS Plugins
- * @{
- * @addtogroup CorePlugin Core Plugin
- * @{
- * @brief The Core GCS plugin
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -26,38 +21,46 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "versiondialog.h"
+#include "aboutdialog.h"
+#include "ui_aboutdialog.h"
+
 #include "version_info/version_info.h"
 #include "coreconstants.h"
 #include "icore.h"
-
-#include <utils/qtcassert.h>
 
 #include <QtCore/QDate>
 #include <QtCore/QFile>
 #include <QtCore/QSysInfo>
 
-#include <QDialogButtonBox>
-#include <QGridLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QTextBrowser>
+#include <QtQuick/QQuickView>
+#include <QQmlContext>
 
-using namespace Core;
-using namespace Core::Internal;
 using namespace Core::Constants;
 
-VersionDialog::VersionDialog(QWidget *parent)
-    : QDialog(parent)
+AboutDialog::AboutDialog(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::AboutDialog)
 {
-    // We need to set the window icon explicitly here since for some reason the
-    // application icon isn't used when the size of the dialog is fixed (at least not on X11/GNOME)
-    setWindowIcon(QIcon(":/core/images/openpilot_logo_32.png"));
+    ui->setupUi(this);
 
-    setWindowTitle(tr("About OpenPilot GCS"));
+    setWindowIcon(QIcon(":/core/images/openpilot_logo_32.png"));
+    setWindowTitle(tr("About OpenPilot"));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    QGridLayout *layout = new QGridLayout(this);
-    layout->setSizeConstraint(QLayout::SetFixedSize);
+
+    // This loads a QML doc
+    QQuickView *view = new QQuickView();
+    QWidget *container = QWidget::createWindowContainer(view, this);
+    view->setSource(QUrl("qrc:/core/qml/AboutDialog.qml"));
+
+    ui->verticalLayout->addWidget(container);
+
+    QString version = QLatin1String(GCS_VERSION_LONG);
+    version += QDate(2007, 25, 10).toString(Qt::SystemLocaleDate);
+
+    QString ideRev;
+
+    // : This gets conditionally inserted as argument %8 into the description string.
+    ideRev = tr("From revision %1<br/>").arg(VersionInfo::revision().left(10));
 
     const QString description = tr(
         "<h3>OpenPilot Ground Control Station</h3>"
@@ -89,21 +92,11 @@ VersionDialog::VersionDialog(QWidget *parent)
         QLatin1String(GCS_AUTHOR), // %8
         VersionInfo::year() // %9
         );
+    // Expose the version description to the QML doc
+    view->rootContext()->setContextProperty("version", description);
+}
 
-    QLabel *copyRightLabel = new QLabel(description);
-    copyRightLabel->setWordWrap(true);
-    copyRightLabel->setOpenExternalLinks(true);
-    copyRightLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Close);
-    QPushButton *closeButton    = buttonBox->button(QDialogButtonBox::Close);
-    QTC_ASSERT(closeButton, /**/);
-    buttonBox->addButton(closeButton, QDialogButtonBox::ButtonRole(QDialogButtonBox::RejectRole | QDialogButtonBox::AcceptRole));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-
-    QLabel *logoLabel = new QLabel;
-    logoLabel->setPixmap(QPixmap(QLatin1String(":/core/images/openpilot_logo_128.png")));
-    layout->addWidget(logoLabel, 0, 0, 1, 1);
-    layout->addWidget(copyRightLabel, 0, 1, 4, 4);
-    layout->addWidget(buttonBox, 4, 0, 1, 5);
+AboutDialog::~AboutDialog()
+{
+    delete ui;
 }

@@ -239,7 +239,7 @@ extern "C" {
 				This function returns the actual number of bytes read and
 				-1 on error.
 		*/
-		int  HID_API_EXPORT HID_API_CALL hid_read(hid_device *device, unsigned char *data, size_t length);
+		int  HID_API_EXPORT HID_API_CALL hid_read(hid_device *device, unsigned char *data, size_t length, int timeout);
 
 		/** @brief Set the device handle to be non-blocking.
 

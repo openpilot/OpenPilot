@@ -228,7 +228,6 @@ int opHID_hidapi::open(int max, int vid, int pid, int usage_page, int usage)
 int opHID_hidapi::receive(int num, void *buf, int len, int timeout)
 {
     Q_UNUSED(num);
-    Q_UNUSED(timeout);
 
     int bytes_read = 0;
 
@@ -248,7 +247,7 @@ int opHID_hidapi::receive(int num, void *buf, int len, int timeout)
     }
 
     hid_read_Mtx.lock();
-    bytes_read = hid_read(handle, (unsigned char *)buf, len);
+    bytes_read = hid_read(handle, (unsigned char *)buf, len, timeout);
     hid_read_Mtx.unlock();
 
     // hidapi lib does not expose the libusb errors.

@@ -188,8 +188,9 @@ void UAVTalk::cancelTransaction(UAVObject *obj)
     }
     QMap<quint32, Transaction *>::iterator itr = transMap.find(objId);
     if (itr != transMap.end()) {
+        Transaction *transaction = itr.value();
         transMap.remove(objId);
-        delete itr.value();
+        delete transaction;
     }
 }
 
@@ -610,10 +611,13 @@ void UAVTalk::updateNack(UAVObject *obj)
     }
     quint32 objId = obj->getObjID();
     QMap<quint32, Transaction *>::iterator itr = transMap.find(objId);
-    if (itr != transMap.end() && (itr.value()->obj->getInstID() == obj->getInstID() || itr.value()->allInstances)) {
-        transMap.remove(objId);
-        delete itr.value();
-        emit transactionCompleted(obj, false);
+    if (itr != transMap.end()) {
+        Transaction *transaction = itr.value();
+        if (transaction->obj->getInstID() == obj->getInstID() || transaction->allInstances) {
+            transMap.remove(objId);
+            delete transaction;
+            emit transactionCompleted(obj, false);
+        }
     }
 }
 
@@ -626,10 +630,13 @@ void UAVTalk::updateAck(UAVObject *obj)
     quint32 objId = obj->getObjID();
 
     QMap<quint32, Transaction *>::iterator itr = transMap.find(objId);
-    if (itr != transMap.end() && (itr.value()->obj->getInstID() == obj->getInstID() || itr.value()->allInstances)) {
-        transMap.remove(objId);
-        delete itr.value();
-        emit transactionCompleted(obj, true);
+    if (itr != transMap.end()) {
+        Transaction *transaction = itr.value();
+        if (itr.value()->obj->getInstID() == obj->getInstID() || itr.value()->allInstances) {
+            transMap.remove(objId);
+            delete transaction;
+            emit transactionCompleted(obj, true);
+        }
     }
 }
 

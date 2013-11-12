@@ -36,20 +36,20 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
     m_vertical(isVertical),
     m_iconAbove(iconAbove)
 {
-    m_listWidget  = new QListWidget(this);
+    m_listWidget  = new QListWidget();
     m_stackWidget = new QStackedWidget();
     m_stackWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
     QBoxLayout *toplevelLayout;
     if (m_vertical) {
-        toplevelLayout = new QHBoxLayout;
+        toplevelLayout = new QHBoxLayout();
         toplevelLayout->addWidget(m_listWidget);
         toplevelLayout->addWidget(m_stackWidget);
         m_listWidget->setFlow(QListView::TopToBottom);
         m_listWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
         m_listWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     } else {
-        toplevelLayout = new QVBoxLayout;
+        toplevelLayout = new QVBoxLayout();
         toplevelLayout->addWidget(m_stackWidget);
         toplevelLayout->addWidget(m_listWidget);
         m_listWidget->setFlow(QListView::LeftToRight);
@@ -59,6 +59,7 @@ MyTabbedStackWidget::MyTabbedStackWidget(QWidget *parent, bool isVertical, bool 
 
     if (m_iconAbove && m_vertical) {
         m_listWidget->setFixedWidth(80); // this should be computed instead
+        m_listWidget->setWrapping(false);
     }
 
     toplevelLayout->setSpacing(0);

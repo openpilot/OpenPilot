@@ -20,7 +20,6 @@ HEADERS += configplugin.h \
     configpipxtremewidget.h \
     configstabilizationwidget.h \
     assertions.h \
-    #calibration.h \
     defaultattitudewidget.h \
     defaulthwsettingswidget.h \
     inputchannelform.h \
@@ -51,10 +50,7 @@ SOURCES += configplugin.cpp \
     configccattitudewidget.cpp \
     configstabilizationwidget.cpp \
     configpipxtremewidget.cpp \
-    #twostep.cpp \
     legacy-calibration.cpp \
-    #gyro-calibration.cpp \
-    #alignment-calibration.cpp \
     defaultattitudewidget.cpp \
     defaulthwsettingswidget.cpp \
     inputchannelform.cpp \

@@ -39,51 +39,6 @@ do
     done
 done
 
-#echo "Copying other libraries that were missed"
-# should be redundant but some libs missed by main app and macdeployqt
-#for f in ${QT_LIBS}
-#do
-    #echo "Copying ${f}"
-    #cp -a "${QT_FRAMEWORKS}/${f}.framework" "${APP}/Contents/Frameworks/"
-
-    #echo "Changing package identification of ${f}"
-    #install_name_tool -id \
-        #@executable_path/../Frameworks/${f}.framework/Versions/5/${f} \
-        #"${APP}/Contents/Frameworks/${f}.framework/Versions/5/${f}"
-
-    #rm "${APP}/Contents/Frameworks/${f}.framework/${f}"
-
-    #echo "Changing package linkages"
-    #for g in $QT_LIBS
-    #do
-        #install_name_tool -change \
-            #"${QT_DIR}${g}.framework/Versions/5/${g}" \
-            #@executable_path/../Frameworks/${g}.framework/Versions/5/${g} \
-            #"${APP}/Contents/Frameworks/${f}.framework/Versions/5/${f}"
-    #done
-#done
-
-#for f in ${QT_EXTRA}
-#do
-    #echo "Copying package ${f}"
-    #d=$(dirname ${f})
-    #[ ! -d "${APP}/Contents/Plugins/${d}" ] && mkdir "${APP}/Contents/Plugins/${d}"
-    #cp "${QT_PLUGINS}/${f}" "${APP}/Contents/Plugins/${f}"
-    #echo "Changing package identification of ${f}"
-    #install_name_tool -id \
-        #@executable_path/../Plugins/${f} \
-        #"${PLUGINS}/${f}"
-
-    #echo "Changing package linkages"
-    #for g in $QT_LIBS
-    #do
-        #install_name_tool -change \
-            #"${QT_DIR}${g}.framework/Versions/5/${g}" \
-            #@executable_path/../Frameworks/${g}.framework/Versions/5/${g} \
-            #"${APP}/Contents/Plugins/${f}"
-    #done
-#done
-
 echo "Copying SDL"
 cp -a "/Library/Frameworks/SDL.framework" "${APP}/Contents/Frameworks/"
 
@@ -96,19 +51,6 @@ install_name_tool -change \
     "@executable_path/../Frameworks/SDL.framework/SDL" \
     "${APP}/Contents/Plugins/libsdlgamepad.1.dylib"
 
-# echo "Copying OSG libraries"
-# for f in ${OSG_EXTRA}
-# do
-#    echo "Copying library ${f}"
-#    cp /usr/local/lib/{$f} "${APP}/Contents/Plugins/${f}"
-#    echo "Changing package identification of ${f}
-#    install_name_tool -id \
-#        @executable_path/../Frameworks/SDL.framework/Versions/A/SDL \
-#        "${APP}/Contents/Frameworks/SDL.framework/Versions/A/SDL"
-#done
-
 # deleting unnecessary files
 echo "Deleting unnecessary files"
-# find "${APP}/Contents/Frameworks" -iname "current" -exec rm -rf \{\} \;
-# find "${APP}/Contents/Frameworks" -iname "4.0" -exec rm -rf \{\} \;
 find "${APP}/Contents/Frameworks" -iname "*_debug" -exec rm -rf \{\} \;

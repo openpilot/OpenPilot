@@ -44,10 +44,10 @@
 #include <QPushButton>
 #include <QTextBrowser>
 
-#include <QtDeclarative/qdeclarative.h>
-#include <QtDeclarative/qdeclarativeview.h>
-#include <QtDeclarative/qdeclarativeengine.h>
-#include <QtDeclarative/qdeclarativecontext.h>
+#include <QtQuick>
+#include <QQuickView>
+#include <QQmlEngine>
+#include <QQmlContext>
 
 using namespace Core;
 using namespace Core::Internal;
@@ -63,9 +63,7 @@ AuthorsDialog::AuthorsDialog(QWidget *parent)
     setWindowTitle(tr("About OpenPilot"));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     // This loads a QML doc containing a Tabbed view
-    QDeclarativeView *view = new QDeclarativeView(this);
-    view->setSource(QUrl("qrc:/core/qml/AboutDialog.qml"));
-
+    QQuickView *view = new QQuickView();
 
     QString version = QLatin1String(GCS_VERSION_LONG);
     version += QDate(2007, 25, 10).toString(Qt::SystemLocaleDate);
@@ -107,4 +105,8 @@ AuthorsDialog::AuthorsDialog(QWidget *parent)
         );
     // Expose the version description to the QML doc
     view->rootContext()->setContextProperty("version", description);
+    view->setSource(QUrl("qrc:/core/qml/AboutDialog.qml"));
+    view->setResizeMode(QQuickView::SizeRootObjectToView);
+    QWidget * container = QWidget::createWindowContainer(view,this);
+    container->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 }

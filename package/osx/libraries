@@ -3,9 +3,9 @@
 APP="${1?}"
 PLUGINS="${APP}/Contents/Plugins"
 OP_PLUGINS="${APP}/Contents/Plugins/OpenPilot"
-QT_LIBS="QtDeclarative QtXmlPatterns QtGui QtTest QtCore QtSvg QtSql QtOpenGL QtNetwork QtXml QtDBus QtScript phonon"
+QT_LIBS="QtDeclarative QtXmlPatterns QtGui QtTest QtCore QtSvg QtSql QtOpenGL QtNetwork QtXml QtScript"
 QT_DIR=$(otool -L "${APP}/Contents/MacOS/OpenPilot GCS" | sed -n -e 's/\/QtCore\.framework.*//p' | sed -n -E 's:^.::p')
-QT_EXTRA="accessible/libqtaccessiblewidgets.dylib bearer/libqgenericbearer.dylib codecs/libqcncodecs.dylib codecs/libqjpcodecs.dylib codecs/libqkrcodecs.dylib codecs/libqtwcodecs.dylib graphicssystems/libqtracegraphicssystem.dylib imageformats/libqgif.dylib imageformats/libqico.dylib imageformats/libqjpeg.dylib imageformats/libqmng.dylib imageformats/libqtiff.dylib imageformats/libqsvg.dylib qmltooling/libqmldbg_inspector.dylib qmltooling/libqmldbg_tcp.dylib graphicssystems/libqglgraphicssystem.dylib sqldrivers/libqsqlodbc.dylib sqldrivers/libqsqlpsql.dylib sqldrivers/libqsqlite.dylib imageformats/libqtga.dylib iconengines/libqsvgicon.dylib"
+QT_EXTRA="accessible/libqtaccessiblewidgets.dylib bearer/libqgenericbearer.dylib imageformats/libqgif.dylib imageformats/libqico.dylib imageformats/libqjpeg.dylib imageformats/libqmng.dylib imageformats/libqtiff.dylib imageformats/libqsvg.dylib qmltooling/libqmldbg_tcp.dylib sqldrivers/libqsqlodbc.dylib sqldrivers/libqsqlpsql.dylib sqldrivers/libqsqlite.dylib imageformats/libqtga.dylib iconengines/libqsvgicon.dylib"
 
 OSG_EXTRA="libosgViewer.90.dylib"
 
@@ -24,7 +24,7 @@ fi
 echo "Qt library directory is \"${QT_DIR}\""
 
 echo "Running macdeployqt"
-macdeployqt "${APP}"
+macdeployqt "${APP}" -no-strip 
 
 echo "Processing Qt libraries in ${APP}"
 for f in "${PLUGINS}/"*.dylib "${OP_PLUGINS}/"*.dylib
@@ -33,54 +33,9 @@ do
     [ ! -L "${f}" ] && for g in $QT_LIBS
     do
         install_name_tool -change \
-            "${QT_DIR}${g}.framework/Versions/4/${g}" \
-            @executable_path/../Frameworks/${g}.framework/Versions/4/${g} \
+            "${QT_DIR}${g}.framework/Versions/5/${g}" \
+            @executable_path/../Frameworks/${g}.framework/Versions/5/${g} \
             "${f}"
-    done
-done
-
-echo "Copying other libraries that were missed"
-# should be redundant but some libs missed by main app and macdeployqt
-for f in ${QT_LIBS}
-do
-    echo "Copying ${f}"
-    cp -a "${QT_FRAMEWORKS}/${f}.framework" "${APP}/Contents/Frameworks/"
-
-    echo "Changing package identification of ${f}"
-    install_name_tool -id \
-        @executable_path/../Frameworks/${f}.framework/Versions/4/${f} \
-        "${APP}/Contents/Frameworks/${f}.framework/Versions/4/${f}"
-
-    rm "${APP}/Contents/Frameworks/${f}.framework/${f}"
-
-    echo "Changing package linkages"
-    for g in $QT_LIBS
-    do
-        install_name_tool -change \
-            "${QT_DIR}${g}.framework/Versions/4/${g}" \
-            @executable_path/../Frameworks/${g}.framework/Versions/4/${g} \
-            "${APP}/Contents/Frameworks/${f}.framework/Versions/4/${f}"
-    done
-done
-
-for f in ${QT_EXTRA}
-do
-    echo "Copying package ${f}"
-    d=$(dirname ${f})
-    [ ! -d "${APP}/Contents/Plugins/${d}" ] && mkdir "${APP}/Contents/Plugins/${d}"
-    cp "${QT_PLUGINS}/${f}" "${APP}/Contents/Plugins/${f}"
-    echo "Changing package identification of ${f}"
-    install_name_tool -id \
-        @executable_path/../Plugins/${f} \
-        "${PLUGINS}/${f}"
-
-    echo "Changing package linkages"
-    for g in $QT_LIBS
-    do
-        install_name_tool -change \
-            "${QT_DIR}${g}.framework/Versions/4/${g}" \
-            @executable_path/../Frameworks/${g}.framework/Versions/4/${g} \
-            "${APP}/Contents/Plugins/${f}"
     done
 done
 
@@ -96,19 +51,6 @@ install_name_tool -change \
     "@executable_path/../Frameworks/SDL.framework/SDL" \
     "${APP}/Contents/Plugins/libsdlgamepad.1.dylib"
 
-# echo "Copying OSG libraries"
-# for f in ${OSG_EXTRA}
-# do
-#    echo "Copying library ${f}"
-#    cp /usr/local/lib/{$f} "${APP}/Contents/Plugins/${f}"
-#    echo "Changing package identification of ${f}
-#    install_name_tool -id \
-#        @executable_path/../Frameworks/SDL.framework/Versions/A/SDL \
-#        "${APP}/Contents/Frameworks/SDL.framework/Versions/A/SDL"
-#done
-
 # deleting unnecessary files
 echo "Deleting unnecessary files"
-# find "${APP}/Contents/Frameworks" -iname "current" -exec rm -rf \{\} \;
-# find "${APP}/Contents/Frameworks" -iname "4.0" -exec rm -rf \{\} \;
 find "${APP}/Contents/Frameworks" -iname "*_debug" -exec rm -rf \{\} \;

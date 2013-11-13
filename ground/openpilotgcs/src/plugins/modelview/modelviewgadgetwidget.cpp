@@ -25,7 +25,9 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "QtDebug"
-
+#ifdef __APPLE__
+    #include "OpenGL/OpenGL.h"
+#endif
 #include "modelviewgadgetwidget.h"
 #include "extensionsystem/pluginmanager.h"
 #include "glc_context.h"

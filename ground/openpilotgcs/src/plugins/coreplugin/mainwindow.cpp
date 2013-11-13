@@ -171,9 +171,6 @@ MainWindow::MainWindow() :
     m_modeStack->setMovable(false);
     m_modeStack->setMinimumWidth(512);
     m_modeStack->setElideMode(Qt::ElideRight);
-#ifndef Q_WS_MAC
-    m_modeStack->setDocumentMode(true);
-#endif
     m_modeManager = new ModeManager(this, m_modeStack);
 
     m_connectionManager = new ConnectionManager(this);

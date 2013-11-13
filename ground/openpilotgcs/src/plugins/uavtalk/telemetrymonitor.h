@@ -37,6 +37,7 @@
 #include "uavobjectmanager.h"
 #include "gcstelemetrystats.h"
 #include "flighttelemetrystats.h"
+#include "firmwareiapobj.h"
 #include "systemstats.h"
 #include "telemetry.h"
 
@@ -56,6 +57,7 @@ public slots:
     void transactionCompleted(UAVObject *obj, bool success);
     void processStatsUpdates();
     void flightStatsUpdated(UAVObject *obj);
+    void firmwareIAPUpdated(UAVObject *obj);
 
 private:
     static const int STATS_UPDATE_PERIOD_MS  = 4000;
@@ -67,6 +69,7 @@ private:
     QQueue<UAVObject *> queue;
     GCSTelemetryStats *gcsStatsObj;
     FlightTelemetryStats *flightStatsObj;
+    FirmwareIAPObj* firmwareIAPObj;
     QTimer *statsTimer;
     UAVObject *objPending;
     QMutex *mutex;

@@ -46,7 +46,7 @@ export ROOT_DIR    := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 export DL_DIR      := $(if $(OPENPILOT_DL_DIR),$(call slashfix,$(OPENPILOT_DL_DIR)),$(ROOT_DIR)/downloads)
 export TOOLS_DIR   := $(if $(OPENPILOT_TOOLS_DIR),$(call slashfix,$(OPENPILOT_TOOLS_DIR)),$(ROOT_DIR)/tools)
 export BUILD_DIR   := $(ROOT_DIR)/build
-export PACKAGE_DIR := $(ROOT_DIR)/build/package
+export PACKAGE_DIR := $(BUILD_DIR)/package
 
 # Set up default build configurations (debug | release)
 GCS_BUILD_CONF		:= release
@@ -690,12 +690,11 @@ PACKAGE_ELF_TARGETS := $(filter     fw_simposix, $(FW_TARGETS))
 # They are used later by the vehicle setup wizard to update board firmware.
 # To open a firmware image use ":/firmware/fw_coptercontrol.opfw"
 OPFW_RESOURCE := $(OPGCSSYNTHDIR)/opfw_resource.qrc
-OPFW_RESOURCE_PREFIX := ../../
 OPFW_FILES := $(foreach fw_targ, $(PACKAGE_FW_TARGETS), $(call toprel, $(BUILD_DIR)/$(fw_targ)/$(fw_targ).opfw))
 OPFW_CONTENTS := \
 <!DOCTYPE RCC><RCC version="1.0"> \
     <qresource prefix="/firmware"> \
-        $(foreach fw_file, $(OPFW_FILES), <file alias="$(notdir $(fw_file))">$(OPFW_RESOURCE_PREFIX)$(fw_file)</file>) \
+        $(foreach fw_file, $(OPFW_FILES), <file alias="$(notdir $(fw_file))">$(abspath $(fw_file))</file>) \
     </qresource> \
 </RCC>
 

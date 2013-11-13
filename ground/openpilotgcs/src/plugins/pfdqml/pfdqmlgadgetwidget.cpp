@@ -29,12 +29,11 @@
 #include <QtCore/qdir.h>
 #include <QMouseEvent>
 
-#include <QtDeclarative/qdeclarativeengine.h>
-#include <QtDeclarative/qdeclarativecontext.h>
-#include <QtDeclarative/qdeclarativeengine.h>
+#include <QQmlEngine>
+#include <QQmlContext>
 
-PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
-    QDeclarativeView(parent),
+PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWindow *parent) :
+    QQuickView(parent),
     m_openGLEnabled(false),
     m_terrainEnabled(false),
     m_actualPositionUsed(false),
@@ -46,8 +45,6 @@ PfdQmlGadgetWidget::PfdQmlGadgetWidget(QWidget *parent) :
     m_altitudeUnit("m"),
     m_altitudeFactor(1.0)
 {
-    setMinimumSize(64, 64);
-    setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
     setResizeMode(SizeRootObjectToView);
 
     // setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
@@ -107,7 +104,7 @@ void PfdQmlGadgetWidget::setQmlFile(QString fn)
     qDebug() << Q_FUNC_INFO << fn;
     setSource(QUrl::fromLocalFile(fn));
 
-    foreach(const QDeclarativeError &error, errors()) {
+    foreach(const QQmlError &error, errors()) {
         qDebug() << error.description();
     }
 }
@@ -165,19 +162,7 @@ void PfdQmlGadgetWidget::setAltitudeFactor(double factor)
 
 void PfdQmlGadgetWidget::setOpenGLEnabled(bool arg)
 {
-    if (m_openGLEnabled != arg) {
-        m_openGLEnabled = arg;
-
-        qDebug() << Q_FUNC_INFO << "Set OPENGL" << m_openGLEnabled;
-        if (m_openGLEnabled) {
-            setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
-        } else {
-            setViewport(new QWidget);
-        }
-
-        // update terrainEnabled status with opengl status chaged
         setTerrainEnabled(m_terrainEnabled);
-    }
 }
 
 // Switch between PositionState UAVObject position
@@ -197,7 +182,7 @@ void PfdQmlGadgetWidget::mouseReleaseEvent(QMouseEvent *event)
         setQmlFile(m_qmlFileName);
     }
 
-    QDeclarativeView::mouseReleaseEvent(event);
+    QQuickView::mouseReleaseEvent(event);
 }
 
 void PfdQmlGadgetWidget::setLatitude(double arg)

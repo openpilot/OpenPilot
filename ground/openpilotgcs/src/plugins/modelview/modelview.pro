@@ -4,6 +4,7 @@ include(../../openpilotgcsplugin.pri)
 include(../../plugins/coreplugin/coreplugin.pri)
 include(../../libs/glc_lib/glc_lib.pri)
 include(modelview_dependencies.pri)
+
 INCLUDEPATH += ../../libs/glc_lib
 HEADERS += modelviewplugin.h \
     modelviewgadgetconfiguration.h \

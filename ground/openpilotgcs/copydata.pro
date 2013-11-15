@@ -72,7 +72,7 @@ equals(copydata, 1) {
 
         # create QtQuick2 plugin directories
         QT_QUICK2_DIRS = qtquick \
-                         qtquick2 \
+                         qtquick.2 \
                          qtquick/controls \
                          qtquick/dialogs \
                          qtquick/layouts \
@@ -83,6 +83,14 @@ equals(copydata, 1) {
                          qtquick/xmllistmodel
         for(dir, QT_QUICK2_DIRS) {
             data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/$$dir\") $$addNewline()
+        }
+
+        # copy QtQuick plugin DLLs
+        QT_QUICK2_DLLS = QtQuick.2/qtquick2plugin$${DS}.dll \
+                         QtQuick.2/plugins.qmltypes \
+                         QtQuick.2/qmldir
+        for(dll, QT_QUICK2_DLLS) {
+            data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_QML]/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
         # copy MinGW DLLs

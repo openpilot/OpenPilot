@@ -281,6 +281,7 @@ void systemInit()
     getrlimit(RLIMIT_NOFILE, &rl);
     rl.rlim_cur = rl.rlim_max;
     setrlimit(RLIMIT_NOFILE, &rl);
+    QApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings, true);
 #endif
 #ifdef Q_OS_LINUX
     QApplication::setAttribute(Qt::AA_X11InitThreads, true);

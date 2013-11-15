@@ -22,7 +22,6 @@
  */
 
 #include "aboutdialog.h"
-#include "ui_aboutdialog.h"
 
 #include "version_info/version_info.h"
 #include "coreconstants.h"

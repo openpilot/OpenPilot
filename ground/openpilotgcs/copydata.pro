@@ -74,6 +74,7 @@ equals(copydata, 1) {
         QT_QUICK2_DIRS = qtquick \
                          qtquick.2 \
                          qtquick/controls \
+                         qtquick/controls/private \
                          qtquick/dialogs \
                          qtquick/layouts \
                          qtquick/localstorage \
@@ -92,6 +93,8 @@ equals(copydata, 1) {
         qtquick/controls/qtquickcontrolsplugin$${DS}.dll \
         qtquick/controls/plugins.qmltypes \
         qtquick/controls/qmldir \
+        qtquick/controls/private/qtquickcontrolsprivateplugin$${DS}.dll \
+        qtquick/controls/private/qmldir \
         qtquick/dialogs/dialogplugin$${DS}.dll \
         qtquick/dialogs/plugins.qmltypes \
         qtquick/dialogs/qmldir \

@@ -77,7 +77,6 @@ equals(copydata, 1) {
                          qtquick/dialogs \
                          qtquick/layouts \
                          qtquick/localstorage \
-                         qtquick/controls \
                          qtquick/particles.2 \
                          qtquick/privatewidgets \
                          qtquick/window.2 \

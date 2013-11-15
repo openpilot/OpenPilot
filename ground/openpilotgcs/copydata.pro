@@ -70,6 +70,22 @@ equals(copydata, 1) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_PLUGINS]/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }
 
+        # create QtQuick2 plugin directories
+        QT_QUICK2_DIRS = qtquick \
+                         qtquick2 \
+                         qtquick/controls \
+                         qtquick/dialogs \
+                         qtquick/layouts \
+                         qtquick/localstorage \
+                         qtquick/controls \
+                         qtquick/particles.2 \
+                         qtquick/privatewidgets \
+                         qtquick/window.2 \
+                         qtquick/xmllistmodel
+        for(dir, QT_QUICK2_DIRS) {
+            data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/$$dir\") $$addNewline()
+        }
+
         # copy MinGW DLLs
         MINGW_DLLS = SDL.dll
         for(dll, MINGW_DLLS) {

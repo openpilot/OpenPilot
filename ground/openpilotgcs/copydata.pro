@@ -88,7 +88,32 @@ equals(copydata, 1) {
         # copy QtQuick plugin DLLs
         QT_QUICK2_DLLS = QtQuick.2/qtquick2plugin$${DS}.dll \
                          QtQuick.2/plugins.qmltypes \
-                         QtQuick.2/qmldir
+                         QtQuick.2/qmldir \
+        qtquick/controls/qtquickcontrolsplugin$${DS}.dll \
+        qtquick/controls/plugins.qmltypes \
+        qtquick/controls/qmldir \
+        qtquick/dialogs/dialogplugin$${DS}.dll \
+        qtquick/dialogs/plugins.qmltypes \
+        qtquick/dialogs/qmldir \
+        qtquick/layouts/qquicklayoutsplugin$${DS}.dll \
+        qtquick/layouts/plugins.qmltypes \
+        qtquick/layouts/qmldir \
+        qtquick/localstorage/qmllocalstorageplugin$${DS}.dll \
+        qtquick/localstorage/plugins.qmltypes \
+        qtquick/localstorage/qmldir \
+        qtquick/particles.2/particlesplugin$${DS}.dll \
+        qtquick/particles.2/plugins.qmltypes \
+        qtquick/particles.2/qmldir \
+        qtquick/privatewidgets/widgetsplugin$${DS}.dll  \
+        qtquick/privatewidgets/plugins.qmltypes \
+        qtquick/privatewidgets/qmldir \
+        qtquick/window.2/windowplugin$${DS}.dll \
+        qtquick/window.2/plugins.qmltypes \
+        qtquick/window.2/qmldir \
+        qtquick/XmlListModel/qmlxmllistmodelplugin$${DS}.dll \
+        qtquick/XmlListModel/plugins.qmltypes \
+        qtquick/XmlListModel/qmldir
+
         for(dll, QT_QUICK2_DLLS) {
             data_copy.commands += $(COPY_FILE) $$targetPath(\"$$[QT_INSTALL_QML]/$$dll\") $$targetPath(\"$$GCS_APP_PATH/$$dll\") $$addNewline()
         }

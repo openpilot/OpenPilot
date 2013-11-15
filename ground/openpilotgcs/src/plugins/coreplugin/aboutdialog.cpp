@@ -31,56 +31,33 @@
 #include <QtCore/QDate>
 #include <QtCore/QFile>
 #include <QtCore/QSysInfo>
+#include <QDesktopServices>
 
-#include <QtQuick/QQuickView>
+#include <QtQuick>
+#include <QQuickView>
+#include <QQmlEngine>
 #include <QQmlContext>
 
 using namespace Core::Constants;
 
 AboutDialog::AboutDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::AboutDialog)
+    QDialog(parent)
 {
-    ui->setupUi(this);
-
     setWindowIcon(QIcon(":/core/images/openpilot_logo_32.png"));
     setWindowTitle(tr("About OpenPilot"));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-
-    // This loads a QML doc
-    QQuickView *view = new QQuickView();
-    QWidget *container = QWidget::createWindowContainer(view, this);
-    view->setSource(QUrl("qrc:/core/qml/AboutDialog.qml"));
-
-    ui->verticalLayout->addWidget(container);
-
-    QString version = QLatin1String(GCS_VERSION_LONG);
-    version += QDate(2007, 25, 10).toString(Qt::SystemLocaleDate);
-
-    QString ideRev;
-
-    // : This gets conditionally inserted as argument %8 into the description string.
-    ideRev = tr("From revision %1<br/>").arg(VersionInfo::revision().left(10));
+    setMinimumSize(600, 400);
+    setMaximumSize(800, 600);
 
     const QString description = tr(
-        "<h3>OpenPilot Ground Control Station</h3>"
-        "GCS Revision: <b>%1</b><br/>"
+        "Revision: <b>%1</b><br/>"
         "UAVO Hash: <b>%2</b><br/>"
         "<br/>"
         "Built from %3<br/>"
         "Built on %4 at %5<br/>"
         "Based on Qt %6 (%7 bit)<br/>"
         "<br/>"
-        "&copy; %8, 2010-%9. All rights reserved.<br/>"
-        "<br/>"
-        "<small>This program is free software; you can redistribute it and/or modify<br/>"
-        "it under the terms of the GNU General Public License as published by<br/>"
-        "the Free Software Foundation; either version 3 of the License, or<br/>"
-        "(at your option) any later version.<br/>"
-        "<br/>"
-        "The program is provided AS IS with NO WARRANTY OF ANY KIND, "
-        "INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A "
-        "PARTICULAR PURPOSE.</small>"
+        "&copy; %8, 2010-%9. All rights reserved.<br/>"       
         ).arg(
         VersionInfo::revision().left(60), // %1
         VersionInfo::uavoHash().left(8), // %2
@@ -92,11 +69,28 @@ AboutDialog::AboutDialog(QWidget *parent) :
         QLatin1String(GCS_AUTHOR), // %8
         VersionInfo::year() // %9
         );
-    // Expose the version description to the QML doc
+
+    QQuickView *view = new QQuickView();
+    view->rootContext()->setContextProperty("dialog", this);
     view->rootContext()->setContextProperty("version", description);
+    view->setResizeMode(QQuickView::SizeRootObjectToView);
+    view->setSource(QUrl("qrc:/core/qml/AboutDialog.qml"));
+
+    QWidget * container = QWidget::createWindowContainer(view);
+    container->setMinimumSize(600, 400);
+    container->setMaximumSize(800, 600);
+    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QVBoxLayout *lay = new QVBoxLayout();
+    lay->setContentsMargins(0,0,0,0);
+    setLayout(lay);
+    layout()->addWidget(container);
+}
+
+void AboutDialog::openUrl(const QString &url)
+{
+    QDesktopServices::openUrl(QUrl(url));
 }
 
 AboutDialog::~AboutDialog()
 {
-    delete ui;
 }

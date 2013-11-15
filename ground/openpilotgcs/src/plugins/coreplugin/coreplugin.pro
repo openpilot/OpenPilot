@@ -2,7 +2,8 @@ TEMPLATE = lib
 TARGET = Core
 DEFINES += CORE_LIBRARY
 
-QT += quick \
+QT += qml \
+    quick \
     xml \
     network \
     script \
@@ -137,8 +138,7 @@ FORMS += dialogs/settingsdialog.ui \
     dialogs/shortcutsettings.ui \
     generalsettings.ui \
     uavgadgetoptionspage.ui \
-    workspacesettings.ui \
-    aboutdialog.ui
+    workspacesettings.ui
 
 RESOURCES += core.qrc \
     fancyactionbar.qrc

@@ -31,6 +31,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QSysInfo>
 #include <QDesktopServices>
+#include <QLayout>
 
 #include <QtQuick>
 #include <QQuickView>

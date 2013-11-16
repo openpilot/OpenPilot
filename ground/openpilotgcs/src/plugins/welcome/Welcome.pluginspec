@@ -4,7 +4,7 @@
     <license>The GNU Public License (GPL) Version 3</license>
         <description>Default Welcome Screen Plugin</description>
     <url>http://www.openpilot.org</url>
-<dependencyList>
+    <dependencyList>
         <dependency name="Core" version="1.0.0"/>
     </dependencyList>
 </plugin>    

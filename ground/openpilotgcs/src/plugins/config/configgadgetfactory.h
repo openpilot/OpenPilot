@@ -44,7 +44,7 @@ public:
     ConfigGadgetFactory(QObject *parent = 0);
     ~ConfigGadgetFactory();
 
-    IUAVGadget *createGadget(QWidget *parent);
+    Core::IUAVGadget *createGadget(QWidget *parent);
 
 public slots:
     void startInputWizard();

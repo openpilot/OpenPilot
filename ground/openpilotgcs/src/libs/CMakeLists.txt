@@ -1,0 +1,14 @@
+set(BUILD_SHARED_LIBS ON)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/lib)
+
+set(GCSLIBS_VERSION_MAJOR 1)
+set(GCSLIBS_VERSION_STRING ${GCSLIBS_VERSION_MAJOR}) 
+                                          
+add_subdirectory(aggregation)
+add_subdirectory(extensionsystem)
+add_subdirectory(glc_lib)
+add_subdirectory(opmapcontrol)
+add_subdirectory(qwt)
+add_subdirectory(sdlgamepad)
+add_subdirectory(utils)
+add_subdirectory(version_info)

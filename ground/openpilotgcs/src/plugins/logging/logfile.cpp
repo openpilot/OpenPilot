@@ -152,8 +152,8 @@ bool LogFile::startReplay()
 {
     dataBuffer.clear();
     myTime.restart();
-    timeOffset    = 0;
-    lastPlayed    = 0;
+    timeOffset = 0;
+    lastPlayed = 0;
     file.read((char *)&lastTimeStamp, sizeof(lastTimeStamp));
     timer.setInterval(10);
     timer.start();

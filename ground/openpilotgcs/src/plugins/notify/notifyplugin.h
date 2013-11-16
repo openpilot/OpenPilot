@@ -49,7 +49,7 @@ typedef struct {
 
 class SoundNotifyPlugin : public Core::IConfigurablePlugin {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "Openpilot.SoundNotify")
+                                       Q_PLUGIN_METADATA(IID "Openpilot.SoundNotify")
 
 public:
     SoundNotifyPlugin();

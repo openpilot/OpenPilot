@@ -69,7 +69,7 @@ private:
     QQueue<UAVObject *> queue;
     GCSTelemetryStats *gcsStatsObj;
     FlightTelemetryStats *flightStatsObj;
-    FirmwareIAPObj* firmwareIAPObj;
+    FirmwareIAPObj *firmwareIAPObj;
     QTimer *statsTimer;
     UAVObject *objPending;
     QMutex *mutex;

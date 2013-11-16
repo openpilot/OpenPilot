@@ -33,12 +33,11 @@
 
 namespace Core {
 namespace Internal {
-
 class MainWindow;
 
 class CorePlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "OpenPilot.Core")
+                                           Q_PLUGIN_METADATA(IID "OpenPilot.Core")
 
 public:
     CorePlugin();
@@ -54,7 +53,6 @@ public slots:
 private:
     MainWindow *m_mainWindow;
 };
-
 } // namespace Internal
 } // namespace Core
 

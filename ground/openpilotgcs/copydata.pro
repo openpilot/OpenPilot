@@ -73,9 +73,6 @@ equals(copydata, 1) {
         # create QtQuick2 plugin directories
         QT_QUICK2_DIRS = qtquick \
                          qtquick.2 \
-                         qtquick/controls \
-                         qtquick/controls/private \
-                         qtquick/dialogs \
                          qtquick/layouts \
                          qtquick/localstorage \
                          qtquick/particles.2 \
@@ -86,18 +83,19 @@ equals(copydata, 1) {
             data_copy.commands += -@$(MKDIR) $$targetPath(\"$$GCS_APP_PATH/$$dir\") $$addNewline()
         }
 
+        # Copy QtQuick2 complete directories
+        # These directories have a lot of files
+        # Easier to copy everything
+        QTQ_WHOLE_DIRS = qtquick/controls \
+                         qtquick/dialogs
+        for(dir, QTQ_WHOLE_DIRS) {
+            data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_APP_PATH/$$dir\") $$addNewline()
+        }
+
         # copy QtQuick plugin DLLs
         QT_QUICK2_DLLS = QtQuick.2/qtquick2plugin$${DS}.dll \
                          QtQuick.2/plugins.qmltypes \
                          QtQuick.2/qmldir \
-        qtquick/controls/qtquickcontrolsplugin$${DS}.dll \
-        qtquick/controls/plugins.qmltypes \
-        qtquick/controls/qmldir \
-        qtquick/controls/private/qtquickcontrolsprivateplugin$${DS}.dll \
-        qtquick/controls/private/qmldir \
-        qtquick/dialogs/dialogplugin$${DS}.dll \
-        qtquick/dialogs/plugins.qmltypes \
-        qtquick/dialogs/qmldir \
         qtquick/layouts/qquicklayoutsplugin$${DS}.dll \
         qtquick/layouts/plugins.qmltypes \
         qtquick/layouts/qmldir \

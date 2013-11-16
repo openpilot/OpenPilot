@@ -74,7 +74,7 @@ SerialConnection::SerialConnection() :
     m_enumerateThread(this),
     m_deviceOpened(false)
 {
-    m_config      = new SerialPluginConfiguration("Serial Telemetry", NULL, this);
+    m_config = new SerialPluginConfiguration("Serial Telemetry", NULL, this);
     m_config->restoresettings();
 
     m_optionspage = new SerialPluginOptionsPage(m_config, this);

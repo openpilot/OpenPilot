@@ -80,6 +80,8 @@ extern void PIOS_LED_Init(void);
 #include <pios_debug.h>
 #include <pios_crc.h>
 #include <pios_rcvr.h>
+#include <pios_flash.h>
+#include <pios_flashfs.h>
 
 #if defined(PIOS_INCLUDE_IAP)
 #include <pios_iap.h>

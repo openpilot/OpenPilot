@@ -69,3 +69,7 @@ const struct pios_udp_cfg pios_udp_aux_cfg = {
 #include <pios_com_priv.h>
 
 #endif /* PIOS_INCLUDE_COM */
+
+#if defined(PIOS_INCLUDE_FLASH)
+#include "pios_flashfs_logfs_priv.h"
+#endif

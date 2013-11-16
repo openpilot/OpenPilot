@@ -44,9 +44,9 @@
 #include "uavobjectmanager.h"
 
 
-LoggingConnection::LoggingConnection(LoggingPlugin *loggingPlugin):
-loggingPlugin(loggingPlugin),
-m_deviceOpened(false)
+LoggingConnection::LoggingConnection(LoggingPlugin *loggingPlugin) :
+    loggingPlugin(loggingPlugin),
+    m_deviceOpened(false)
 {}
 
 LoggingConnection::~LoggingConnection()
@@ -288,14 +288,12 @@ void LoggingThread::transactionCompleted(UAVObject *obj, bool success)
 
 
 LoggingPlugin::LoggingPlugin() :
-state(IDLE),
-loggingThread(NULL),
-logConnection(new LoggingConnection(this)),
-mf(NULL),
-cmd(NULL)
-{
-
-}
+    state(IDLE),
+    loggingThread(NULL),
+    logConnection(new LoggingConnection(this)),
+    mf(NULL),
+    cmd(NULL)
+{}
 
 LoggingPlugin::~LoggingPlugin()
 {

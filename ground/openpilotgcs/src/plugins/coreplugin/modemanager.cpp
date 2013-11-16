@@ -94,10 +94,12 @@ void ModeManager::addWidget(QWidget *widget)
 
 IMode *ModeManager::currentMode() const
 {
-    if (m_modes.count() > m_modeStack->currentIndex()) {
-        return m_modes.at(m_modeStack->currentIndex());
-    } else {
-        m_modeStack->setCurrentIndex(0); // Fix illegal Index.
+    if (m_modes.count() > 0) {
+        if (m_modes.count() > m_modeStack->currentIndex()) {
+            return m_modes.at(m_modeStack->currentIndex());
+        } else {
+            m_modeStack->setCurrentIndex(0); // Fix illegal Index.
+        }
     }
     return 0;
 }

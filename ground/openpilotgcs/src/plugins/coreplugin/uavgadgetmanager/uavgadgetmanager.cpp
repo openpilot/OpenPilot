@@ -141,7 +141,10 @@ void UAVGadgetManager::modeChanged(Core::IMode *mode)
         return;
     }
 
-    m_currentGadget->widget()->setFocus();
+    if (m_currentGadget) {
+        m_currentGadget->widget()->setFocus();
+    }
+
     showToolbars(toolbarsShown());
 }
 

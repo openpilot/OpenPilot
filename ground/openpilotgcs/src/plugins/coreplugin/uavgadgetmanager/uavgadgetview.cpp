@@ -283,9 +283,11 @@ void UAVGadgetView::restoreState(QSettings *qSettings)
     UAVGadgetInstanceManager *im = ICore::instance()->uavGadgetInstanceManager();
     if (qSettings->childGroups().contains("gadget")) {
         newGadget = im->createGadget(classId, this, false);
-        qSettings->beginGroup("gadget");
-        newGadget->restoreState(qSettings);
-        qSettings->endGroup();
+        if (newGadget) {
+            qSettings->beginGroup("gadget");
+            newGadget->restoreState(qSettings);
+            qSettings->endGroup();
+        }
     } else {
         newGadget = im->createGadget(classId, this);
     }

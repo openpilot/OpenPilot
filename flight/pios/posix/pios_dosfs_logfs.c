@@ -57,7 +57,8 @@ static void customSPrintf(uint8_t *buffer, uint8_t *format, ...)
  */
 static void objectFilename(uint32_t obj_id, uint16_t obj_inst_id, uint8_t *filename)
 {
-    uint32_t prefix = obj_id + (obj_inst_id / 256);
+    uint32_t prefix = obj_id + (obj_inst_id / 256) * 16; // put upper 8 bit of instance id into object id modification,
+                                                         // skip least sig nibble since that is used for meta object id
     uint8_t suffix  = obj_inst_id & 0xff;
 
     customSPrintf(filename, (uint8_t *)"%08X.o%02X", prefix, suffix);

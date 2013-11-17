@@ -44,6 +44,7 @@ UAVOBJSRCFILENAMES += airspeedsettings
 UAVOBJSRCFILENAMES += airspeedstate
 UAVOBJSRCFILENAMES += debuglogsettings
 UAVOBJSRCFILENAMES += debuglogcontrol
+UAVOBJSRCFILENAMES += debuglogstatus
 UAVOBJSRCFILENAMES += debuglogentry
 UAVOBJSRCFILENAMES += flightbatterysettings
 UAVOBJSRCFILENAMES += firmwareiapobj

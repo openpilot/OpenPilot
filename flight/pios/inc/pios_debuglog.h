@@ -77,10 +77,17 @@ int32_t PIOS_DEBUGLOG_Read(void *buffer, uint16_t flight, uint16_t inst);
 
 /**
  * @brief Retrieve run time info of logging system
- * @param[out] buffer where to store the uavobject
- * @param[in] log entry from which flight
+ * @param[out] current flight number
+ * @param[out] next entry number
+ * @param[out] free slots in filesystem
+ * @param[out] used slots in filesystem
  */
-void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry);
+void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry, uint16_t *free, uint16_t *used);
+
+/**
+ * @brief Format entire flash memory!!!
+ */
+void PIOS_DEBUGLOG_Format(void);
 
 #endif // ifndef PIOS_DEBUGLOG_H
 

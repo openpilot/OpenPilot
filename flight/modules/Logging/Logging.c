@@ -33,22 +33,28 @@
 #include "openpilot.h"
 #include "debuglogsettings.h"
 #include "debuglogcontrol.h"
+#include "debuglogstatus.h"
 #include "debuglogentry.h"
+#include "flightstatus.h"
 
 // private variables
 static DebugLogSettingsData settings;
 static DebugLogControlData control;
+static DebugLogStatusData status;
 static DebugLogEntryData *entry; // would be better on stack but event dispatcher stack might be insufficient
 
 // private functions
 static void SettingsUpdatedCb(UAVObjEvent *ev);
 static void ControlUpdatedCb(UAVObjEvent *ev);
+static void StatusUpdatedCb(UAVObjEvent *ev);
 
 int32_t LoggingInitialize(void)
 {
     DebugLogSettingsInitialize();
     DebugLogControlInitialize();
+    DebugLogStatusInitialize();
     DebugLogEntryInitialize();
+    FlightStatusInitialize();
     PIOS_DEBUGLOG_Initialize();
     entry = pvPortMalloc(sizeof(DebugLogEntryData));
     if (!entry) {
@@ -63,10 +69,21 @@ int32_t LoggingStart(void)
     DebugLogSettingsConnectCallback(SettingsUpdatedCb);
     DebugLogControlConnectCallback(ControlUpdatedCb);
     SettingsUpdatedCb(DebugLogSettingsHandle());
+
+    UAVObjEvent ev = { .obj = DebugLogSettingsHandle(), .instId = 0, .event = EV_UPDATED_PERIODIC };
+    EventPeriodicCallbackCreate(&ev, StatusUpdatedCb, 1000);
+    // invoke a periodic dispatcher callback - the event struct is a dummy, it could be filled with anything!
+    StatusUpdatedCb(&ev);
+
     return 0;
 }
 MODULE_INITCALL(LoggingInitialize, LoggingStart);
 
+static void StatusUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
+{
+    PIOS_DEBUGLOG_Info(&status.Flight, &status.Entry, &status.FreeSlots, &status.UsedSlots);
+    DebugLogStatusSet(&status);
+}
 
 static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
@@ -77,26 +94,24 @@ static void SettingsUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 
 static void ControlUpdatedCb(__attribute__((unused)) UAVObjEvent *ev)
 {
-    static bool ignore = 0; // this little hack allows us to set our own uavobject in the callback
-
-    if (ignore) {
-        ignore = 0;
-        return;
-    }
-
     DebugLogControlGet(&control);
-    if (PIOS_DEBUGLOG_Read(entry, control.Flight, control.Entry) != 0) {
-        // reading from log failed, mark as non existent in output
+    if (control.Operation == DEBUGLOGCONTROL_OPERATION_RETRIEVE) {
         memset(entry, 0, sizeof(DebugLogEntryData));
-        entry->Flight = control.Flight;
-        entry->Entry  = control.Entry;
-        entry->Type   = DEBUGLOGENTRY_TYPE_EMPTY;
+        if (PIOS_DEBUGLOG_Read(entry, control.Flight, control.Entry) != 0) {
+            // reading from log failed, mark as non existent in output
+            entry->Flight = control.Flight;
+            entry->Entry  = control.Entry;
+            entry->Type   = DEBUGLOGENTRY_TYPE_EMPTY;
+        }
+        DebugLogEntrySet(entry);
+    } else if (control.Operation == DEBUGLOGCONTROL_OPERATION_FORMATFLASH) {
+        uint8_t armed;
+        FlightStatusArmedGet(&armed);
+        if (armed == FLIGHTSTATUS_ARMED_DISARMED) {
+            PIOS_DEBUGLOG_Format();
+        }
     }
-    PIOS_DEBUGLOG_Info(&control.Flight, &control.Entry);
-
-    ignore = 1; // set ignore flag before setting object - creates loop otherwise!!!
-    DebugLogEntrySet(entry);
-    DebugLogControlSet(&control);
+    StatusUpdatedCb(ev);
 }
 
 

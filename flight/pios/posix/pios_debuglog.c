@@ -120,6 +120,7 @@ void PIOS_DEBUGLOG_UAVObject(uint32_t objid, uint16_t instid, size_t size, uint8
         size = sizeof(buffer->Data);
     }
     buffer->Size = size;
+    memset(buffer->Data, 0, sizeof(buffer->Data));
     memcpy(buffer->Data, data, size);
 
     if (PIOS_FLASHFS_ObjSave(pios_user_fs_id, flightnum * 256, lognum, (uint8_t *)buffer, sizeof(DebugLogEntryData)) == 0) {
@@ -141,6 +142,7 @@ void PIOS_DEBUGLOG_Printf(char *format, ...)
     va_list args;
     va_start(args, format);
     mutexlock();
+    memset(buffer->Data, 0, sizeof(buffer->Data));
     vsnprintf((char *)buffer->Data, sizeof(buffer->Data), (char *)format, args);
     buffer->Flight     = flightnum;
 #if defined(PIOS_INCLUDE_FREERTOS)
@@ -183,8 +185,10 @@ int32_t PIOS_DEBUGLOG_Read(void *mybuffer, uint16_t flight, uint16_t inst)
  * @brief Retrieve run time info of logging system
  * @param[out] current flight number
  * @param[out] next entry number
+ * @param[out] free slots in filesystem
+ * @param[out] used slots in filesystem
  */
-void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry)
+void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry, uint16_t *free, uint16_t *used)
 {
     if (flight) {
         *flight = flightnum;
@@ -192,8 +196,27 @@ void PIOS_DEBUGLOG_Info(uint16_t *flight, uint16_t *entry)
     if (entry) {
         *entry = lognum;
     }
+    struct PIOS_FLASHFS_Stats stats = { 0, 0 };
+    PIOS_FLASHFS_GetStats(pios_user_fs_id, &stats);
+    if (free) {
+        *free = stats.num_free_slots;
+    }
+    if (used) {
+        *used = stats.num_active_slots;
+    }
 }
 
+/**
+ * @brief Format entire flash memory!!!
+ */
+void PIOS_DEBUGLOG_Format(void)
+{
+    mutexlock();
+    PIOS_FLASHFS_Format(pios_user_fs_id);
+    lognum    = 0;
+    flightnum = 0;
+    mutexunlock();
+}
 
 /**
  * @}

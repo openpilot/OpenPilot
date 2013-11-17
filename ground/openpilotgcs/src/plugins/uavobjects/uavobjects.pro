@@ -36,6 +36,7 @@ HEADERS += $$UAVOBJECT_SYNTHETICS/accessorydesired.h \
     $$UAVOBJECT_SYNTHETICS/altitudefiltersettings.h \
     $$UAVOBJECT_SYNTHETICS/debuglogsettings.h \
     $$UAVOBJECT_SYNTHETICS/debuglogcontrol.h \
+    $$UAVOBJECT_SYNTHETICS/debuglogstatus.h \
     $$UAVOBJECT_SYNTHETICS/debuglogentry.h \
     $$UAVOBJECT_SYNTHETICS/ekfconfiguration.h \
     $$UAVOBJECT_SYNTHETICS/ekfstatevariance.h \
@@ -125,6 +126,7 @@ SOURCES += $$UAVOBJECT_SYNTHETICS/accessorydesired.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudeholdsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/debuglogsettings.cpp \
     $$UAVOBJECT_SYNTHETICS/debuglogcontrol.cpp \
+    $$UAVOBJECT_SYNTHETICS/debuglogstatus.cpp \
     $$UAVOBJECT_SYNTHETICS/debuglogentry.cpp \
     $$UAVOBJECT_SYNTHETICS/altitudefiltersettings.cpp \
     $$UAVOBJECT_SYNTHETICS/ekfconfiguration.cpp \

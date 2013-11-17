@@ -1,6 +1,7 @@
 <xml>
     <object name="DebugLogControl" singleinstance="true" settings="false" category="System">
         <description>Log Control Object</description>
+	<field name="Operation" units="" type="enum" elements="1" options="None, Retrieve, FormatFlash" />
 	<field name="Flight" units="" type="uint16" elements="1" />
 	<field name="Entry" units="" type="uint16" elements="1" />
         <access gcs="readwrite" flight="readwrite"/>

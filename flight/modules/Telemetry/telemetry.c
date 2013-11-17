@@ -191,9 +191,12 @@ static void registerObject(UAVObjHandle obj)
         UAVObjEvent ev = {
             .obj    = obj,
             .instId = UAVOBJ_ALL_INSTANCES,
-            .event  = (updateMode == UPDATEMODE_PERIODIC || updateMode == UPDATEMODE_THROTTLED) ? EV_UPDATED_PERIODIC : 0 | (loggingMode == UPDATEMODE_PERIODIC || loggingMode == UPDATEMODE_THROTTLED) ? EV_LOGGING_PERIODIC : 0,
+            .event  = EV_UPDATED_PERIODIC,
         };
         EventPeriodicQueueCreate(&ev, queue, 0);
+        ev.event = EV_LOGGING_PERIODIC;
+        EventPeriodicQueueCreate(&ev, queue, 0);
+
 
         // Setup object for telemetry updates
         updateObject(obj, EV_NONE);

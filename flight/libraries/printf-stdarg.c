@@ -246,6 +246,12 @@ int snprintf(char *buf, size_t count, const char *format, ...)
     return print(count, &buf, format, args);
 }
 
+// TK: added for alternative parameter passing
+int vsnprintf(char *buf, size_t count, const char *format, va_list args)
+{
+    return print(count, &buf, format, args);
+}
+
 /**
  * @}
  */

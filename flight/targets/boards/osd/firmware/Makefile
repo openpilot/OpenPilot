@@ -68,7 +68,7 @@ ifndef TESTAPP
     #endif
 
     ## Misc library functions
-    SRC += $(FLIGHTLIB)/printf2.c
+    #SRC += $(FLIGHTLIB)/printf2.c
     SRC += $(FLIGHTLIB)/WorldMagModel.c
 
     ## UAVObjects

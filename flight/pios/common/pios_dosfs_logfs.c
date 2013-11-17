@@ -30,30 +30,17 @@
 #include <openpilot.h>
 
 #if defined(PIOS_INCLUDE_FREERTOS)
-static xSemaphoreHandle mutex;
+static xSemaphoreHandle mutex = 0;
 #endif
 
 struct flashfs_logfs_cfg;
 
 
 /**
- * Wrapper for the unimplemented sprintf function
- * warning, no buffer length boundary checks, use with caution!
- */
-static void customSPrintf(uint8_t *buffer, uint8_t *format, ...)
-{
-    va_list args;
-
-    va_start(args, format);
-    vsprintf((char *)buffer, (char *)format, args);
-}
-
-
-/**
  * Get an 8 character (plus extension) filename for the object.
  * @param[in] obj The object handle.
  * @param[in] instId The instance ID
- * @param[in] file Filename string pointer WARNING, must be 14 bytes long and allocated, no checks!
+ * @param[in] file Filename string pointer -- must be 14 bytes long and allocated
  */
 static void objectFilename(uint32_t obj_id, uint16_t obj_inst_id, uint8_t *filename)
 {
@@ -61,7 +48,7 @@ static void objectFilename(uint32_t obj_id, uint16_t obj_inst_id, uint8_t *filen
                                                          // skip least sig nibble since that is used for meta object id
     uint8_t suffix  = obj_inst_id & 0xff;
 
-    customSPrintf(filename, (uint8_t *)"%08X.o%02X", prefix, suffix);
+    snprintf((char *)filename, 13, "%08X.o%02X", prefix, suffix);
 }
 
 

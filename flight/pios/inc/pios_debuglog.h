@@ -41,7 +41,7 @@ void PIOS_DEBUGLOG_Initialize();
  * @brief Enables or Disables logging globally
  * @param[in] enable or disable logging
  */
-void PIOS_DEBUGLOG_Enable(bool enabled);
+void PIOS_DEBUGLOG_Enable(uint8_t enabled);
 
 /**
  * @brief Write a debug log entry with a uavobject

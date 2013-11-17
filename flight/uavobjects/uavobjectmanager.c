@@ -706,16 +706,52 @@ unlock_exit:
 
 
 /**
+ * Actually write the object's data to the logfile
+ * \param[in] obj The object handle
+ * \param[in] instId The object instance ID
+ */
+void UAVObjInstanceWriteToLog(UAVObjHandle obj_handle, uint16_t instId)
+{
+    PIOS_Assert(obj_handle);
+
+    // Lock
+    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+
+    if (UAVObjIsMetaobject(obj_handle)) {
+        if (instId != 0) {
+            goto unlock_exit;
+        }
+        PIOS_DEBUGLOG_UAVObject(UAVObjGetID(obj_handle), instId, MetaNumBytes, (uint8_t *)MetaDataPtr((struct UAVOMeta *)obj_handle));
+    } else {
+        struct UAVOData *obj;
+        InstanceHandle instEntry;
+
+        // Cast handle to object
+        obj = (struct UAVOData *)obj_handle;
+
+        // Get the instance
+        instEntry = getInstance(obj, instId);
+        if (instEntry == NULL) {
+            goto unlock_exit;
+        }
+        // Pack data
+        PIOS_DEBUGLOG_UAVObject(UAVObjGetID(obj_handle), instId, obj->instance_size, (uint8_t *)InstanceData(instEntry));
+    }
+
+unlock_exit:
+    xSemaphoreGiveRecursive(mutex);
+}
+
+/**
  * Save the data of the specified object to the file system (SD card).
  * If the object contains multiple instances, all of them will be saved.
  * A new file with the name of the object will be created.
  * The object data can be restored using the UAVObjLoad function.
  * @param[in] obj The object handle.
  * @param[in] instId The instance ID
- * @param[in] file File to append to
  * @return 0 if success or -1 if failure
  */
-int32_t UAVObjSave(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t instId)
+int32_t UAVObjSave(UAVObjHandle obj_handle, uint16_t instId)
 {
     PIOS_Assert(obj_handle);
 
@@ -754,7 +790,7 @@ int32_t UAVObjSave(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t ins
  * @param[in] instId The object instance
  * @return 0 if success or -1 if failure
  */
-int32_t UAVObjLoad(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t instId)
+int32_t UAVObjLoad(UAVObjHandle obj_handle, uint16_t instId)
 {
     PIOS_Assert(obj_handle);
 
@@ -794,7 +830,7 @@ int32_t UAVObjLoad(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t ins
  * @param[in] instId The object instance
  * @return 0 if success or -1 if failure
  */
-int32_t UAVObjDelete(UAVObjHandle obj_handle, __attribute__((unused)) uint16_t instId)
+int32_t UAVObjDelete(UAVObjHandle obj_handle, uint16_t instId)
 {
     PIOS_Assert(obj_handle);
     PIOS_FLASHFS_ObjDelete(pios_uavo_settings_fs_id, UAVObjGetID(obj_handle), instId);

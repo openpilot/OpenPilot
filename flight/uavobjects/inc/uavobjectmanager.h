@@ -208,6 +208,7 @@ void UAVObjInstanceUpdated(UAVObjHandle obj_handle, uint16_t instId);
 void UAVObjLogging(UAVObjHandle obj);
 void UAVObjInstanceLogging(UAVObjHandle obj_handle, uint16_t instId);
 void UAVObjIterate(void (*iterator)(UAVObjHandle obj));
+void UAVObjInstanceWriteToLog(UAVObjHandle obj_handle, uint16_t instId);
 
 #endif // UAVOBJECTMANAGER_H
 

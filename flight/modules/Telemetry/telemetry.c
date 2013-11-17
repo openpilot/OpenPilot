@@ -181,12 +181,6 @@ static void registerObject(UAVObjHandle obj)
         UAVObjConnectQueue(obj, priorityQueue, EV_MASK_ALL_UPDATES);
         return;
     } else {
-        UAVObjMetadata metadata;
-        UAVObjUpdateMode updateMode, loggingMode;
-        UAVObjGetMetadata(obj, &metadata);
-        updateMode  = UAVObjGetTelemetryUpdateMode(&metadata);
-        loggingMode = UAVObjGetLoggingUpdateMode(&metadata);
-
         // Setup object for periodic updates
         UAVObjEvent ev = {
             .obj    = obj,

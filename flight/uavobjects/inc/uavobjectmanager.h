@@ -194,6 +194,8 @@ UAVObjUpdateMode UAVObjGetTelemetryUpdateMode(const UAVObjMetadata *dataOut);
 void UAVObjSetTelemetryUpdateMode(UAVObjMetadata *dataOut, UAVObjUpdateMode val);
 UAVObjUpdateMode UAVObjGetGcsTelemetryUpdateMode(const UAVObjMetadata *dataOut);
 void UAVObjSetTelemetryGcsUpdateMode(UAVObjMetadata *dataOut, UAVObjUpdateMode val);
+UAVObjUpdateMode UAVObjGetLoggingUpdateMode(const UAVObjMetadata *dataOut);
+void UAVObjSetLoggingUpdateMode(UAVObjMetadata *dataOut, UAVObjUpdateMode val);
 int8_t UAVObjReadOnly(UAVObjHandle obj);
 int32_t UAVObjConnectQueue(UAVObjHandle obj_handle, xQueueHandle queue, uint8_t eventMask);
 int32_t UAVObjDisconnectQueue(UAVObjHandle obj_handle, xQueueHandle queue);
@@ -203,6 +205,8 @@ void UAVObjRequestUpdate(UAVObjHandle obj);
 void UAVObjRequestInstanceUpdate(UAVObjHandle obj_handle, uint16_t instId);
 void UAVObjUpdated(UAVObjHandle obj);
 void UAVObjInstanceUpdated(UAVObjHandle obj_handle, uint16_t instId);
+void UAVObjLogging(UAVObjHandle obj);
+void UAVObjInstanceLogging(UAVObjHandle obj_handle, uint16_t instId);
 void UAVObjIterate(void (*iterator)(UAVObjHandle obj));
 
 #endif // UAVOBJECTMANAGER_H

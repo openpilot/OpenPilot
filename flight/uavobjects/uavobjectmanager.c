@@ -1423,6 +1423,28 @@ void UAVObjSetGcsTelemetryUpdateMode(UAVObjMetadata *metadata, UAVObjUpdateMode 
     SET_BITS(metadata->flags, UAVOBJ_GCS_TELEMETRY_UPDATE_MODE_SHIFT, val, UAVOBJ_UPDATE_MODE_MASK);
 }
 
+/**
+ * Get the UAVObject metadata logging update mode
+ * \param[in] metadata The metadata object
+ * \return the GCS telemetry update mode
+ */
+UAVObjUpdateMode UAVObjGetLoggingUpdateMode(const UAVObjMetadata *metadata)
+{
+    PIOS_Assert(metadata);
+    return (metadata->flags >> UAVOBJ_LOGGING_UPDATE_MODE_SHIFT) & UAVOBJ_UPDATE_MODE_MASK;
+}
+
+/**
+ * Set the UAVObject metadata logging update mode member
+ * \param[in] metadata The metadata object
+ * \param[in] val The GCS telemetry update mode
+ */
+void UAVObjSetLoggingUpdateMode(UAVObjMetadata *metadata, UAVObjUpdateMode val)
+{
+    PIOS_Assert(metadata);
+    SET_BITS(metadata->flags, UAVOBJ_LOGGING_UPDATE_MODE_SHIFT, val, UAVOBJ_UPDATE_MODE_MASK);
+}
+
 
 /**
  * Check if an object is read only
@@ -1556,6 +1578,28 @@ void UAVObjInstanceUpdated(UAVObjHandle obj_handle, uint16_t instId)
     PIOS_Assert(obj_handle);
     xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
     sendEvent((struct UAVOBase *)obj_handle, instId, EV_UPDATED_MANUAL);
+    xSemaphoreGiveRecursive(mutex);
+}
+
+/**
+ * Log the object's data (triggers a EV_LOGGING_MANUAL event on this object).
+ * \param[in] obj The object handle
+ */
+void UAVObjLogging(UAVObjHandle obj_handle)
+{
+    UAVObjInstanceLogging(obj_handle, UAVOBJ_ALL_INSTANCES);
+}
+
+/**
+ * Log the object's data (triggers a EV_LOGGING_MANUAL event on this object).
+ * \param[in] obj The object handle
+ * \param[in] instId The object instance ID
+ */
+void UAVObjInstanceLogging(UAVObjHandle obj_handle, uint16_t instId)
+{
+    PIOS_Assert(obj_handle);
+    xSemaphoreTakeRecursive(mutex, portMAX_DELAY);
+    sendEvent((struct UAVOBase *)obj_handle, instId, EV_LOGGING_MANUAL);
     xSemaphoreGiveRecursive(mutex);
 }
 

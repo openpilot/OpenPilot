@@ -521,17 +521,17 @@ static const struct pios_usb_cfg pios_usb_main_cfg = {
 
 #endif /* PIOS_INCLUDE_COM_MSG */
 
-#if defined(PIOS_INCLUDE_USB_HID)
+#if defined(PIOS_INCLUDE_USB_HID) && !defined(PIOS_INCLUDE_USB_CDC)
 #include <pios_usb_hid_priv.h>
 
 const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
-    .data_if    = 2,
+    .data_if    = 0,
     .data_rx_ep = 1,
     .data_tx_ep = 1,
 };
-#endif /* PIOS_INCLUDE_USB_HID */
+#endif /* PIOS_INCLUDE_USB_HID && !PIOS_INCLUDE_USB_CDC */
 
-#if defined(PIOS_INCLUDE_USB_CDC)
+#if defined(PIOS_INCLUDE_USB_HID) && defined(PIOS_INCLUDE_USB_CDC)
 #include <pios_usb_cdc_priv.h>
 
 const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
@@ -542,7 +542,15 @@ const struct pios_usb_cdc_cfg pios_usb_cdc_cfg = {
     .data_rx_ep = 3,
     .data_tx_ep = 3,
 };
-#endif /* PIOS_INCLUDE_USB_CDC */
+
+#include <pios_usb_hid_priv.h>
+
+const struct pios_usb_hid_cfg pios_usb_hid_cfg = {
+    .data_if    = 2,
+    .data_rx_ep = 1,
+    .data_tx_ep = 1,
+};
+#endif /* PIOS_INCLUDE_USB_HID && PIOS_INCLUDE_USB_CDC */
 
 #if defined(PIOS_INCLUDE_VIDEO)
 

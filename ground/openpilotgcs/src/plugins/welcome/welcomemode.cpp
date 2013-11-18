@@ -74,6 +74,7 @@ WelcomeMode::WelcomeMode() :
     m_d->quickView->setResizeMode(QQuickView::SizeRootObjectToView);
     m_d->quickView->engine()->rootContext()->setContextProperty("welcomePlugin", this);
     m_d->quickView->setSource(QUrl("qrc:/welcome/qml/main.qml"));
+    m_container = NULL;
 }
 
 WelcomeMode::~WelcomeMode()

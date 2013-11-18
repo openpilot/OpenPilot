@@ -37,6 +37,7 @@ MODULES += FixedWingPathFollower
 MODULES += VtolPathFollower
 MODULES += CameraStab
 MODULES += Telemetry
+MODULES += Logging
 MODULES += FirmwareIAP
 MODULES += StateEstimation
 #MODULES += Sensors/simulated/Sensors

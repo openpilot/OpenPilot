@@ -238,3 +238,8 @@ plugin_setupwizard.depends += plugin_config
 plugin_setupwizard.depends += plugin_uploader
 SUBDIRS += plugin_setupwizard
 
+# Flight Logs plugin
+plugin_flightlog.subdir = flightlog
+plugin_setupwizard.depends = plugin_coreplugin
+SUBDIRS += plugin_flightlog
+

@@ -92,7 +92,23 @@ equals(copydata, 1) {
             data_copy.commands += $(COPY_DIR) $$targetPath(\"$$[QT_INSTALL_QML]/$$dir\") $$targetPath(\"$$GCS_APP_PATH/$$dir\") $$addNewline()
         }
 
-        # copy QtQuick plugin DLLs
+        # Remove the few unwanted DDLs after whole dir copy
+        QT_QUICK2_DELS = qtquick/controls/qtquickcontrolsplugin \
+        qtquick/controls/private/qtquickcontrolsprivateplugin \
+        qtquick/dialogs/dialogplugin
+
+        CONFIG(debug, debug|release) {
+            for(delfile, QT_QUICK2_DELS) {
+            data_copy.commands += $(DEL_FILE) $$targetPath(\"$$GCS_APP_PATH/$${delfile}.dll\") $$addNewline()
+            } 
+        }
+        CONFIG(release, debug|release) {
+            for(delfile, QT_QUICK2_DELS) {
+            data_copy.commands += $(DEL_FILE) $$targetPath(\"$$GCS_APP_PATH/$${delfile}d.dll\") $$addNewline()
+            }
+        }
+
+        # Remianing QtQuick plugin DLLs
         QT_QUICK2_DLLS = QtQuick.2/qtquick2plugin$${DS}.dll \
                          QtQuick.2/plugins.qmltypes \
                          QtQuick.2/qmldir \

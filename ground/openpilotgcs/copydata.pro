@@ -108,7 +108,7 @@ equals(copydata, 1) {
             }
         }
 
-        # Remianing QtQuick plugin DLLs
+        # Remaining QtQuick plugin DLLs
         QT_QUICK2_DLLS = QtQuick.2/qtquick2plugin$${DS}.dll \
                          QtQuick.2/plugins.qmltypes \
                          QtQuick.2/qmldir \

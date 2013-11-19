@@ -30,7 +30,7 @@
 
 #include "qmlviewgadgetconfiguration.h"
 
-#include <QtDeclarative/qdeclarativeview.h>
+#include <QQuickView>
 
 #include <QtSvg/QSvgRenderer>
 #include <QtSvg/QGraphicsSvgItem>
@@ -40,11 +40,11 @@
 
 class UAVObject;
 
-class QmlViewGadgetWidget : public QDeclarativeView {
+class QmlViewGadgetWidget : public QQuickView {
     Q_OBJECT
 
 public:
-    QmlViewGadgetWidget(QWidget *parent = 0);
+    QmlViewGadgetWidget(QWindow *parent = 0);
     ~QmlViewGadgetWidget();
     void setQmlFile(QString fn);
 

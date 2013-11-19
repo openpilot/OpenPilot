@@ -1,7 +1,7 @@
 <xml>
     <object name="DebugLogSettings" singleinstance="true" settings="true" category="System">
         <description>Configure On Board Logging Facilities</description>
-        <field name="LoggingEnabled" units="bool" type="enum" elements="1" options="False,True" defaultvalue="False" />
+        <field name="LoggingEnabled" units="" type="enum" elements="1" options="Disabled,OnlyWhenArmed,Always" defaultvalue="Disabled" />
 
         <access gcs="readwrite" flight="readwrite"/>
         <telemetrygcs acked="true" updatemode="onchange" period="0"/>

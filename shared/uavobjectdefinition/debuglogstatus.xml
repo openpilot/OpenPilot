@@ -1,6 +1,6 @@
 <xml>
     <object name="DebugLogStatus" singleinstance="true" settings="false" category="System">
-        <description>Log Control Object</description>
+        <description>Log Status Object, contains log partition status information</description>
 	<field name="Flight" units="" type="uint16" elements="1" />
 	<field name="Entry" units="" type="uint16" elements="1" />
 	<field name="UsedSlots" units="" type="uint16" elements="1" />

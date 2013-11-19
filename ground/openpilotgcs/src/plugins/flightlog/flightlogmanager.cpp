@@ -30,4 +30,10 @@
 FlightLogManager::FlightLogManager(QObject *parent) :
     QObject(parent)
 {
+
+}
+
+FlightLogManager::~FlightLogManager()
+{
+
 }

@@ -35,6 +35,7 @@ class FlightLogManager : public QObject
     Q_OBJECT
 public:
     explicit FlightLogManager(QObject *parent = 0);
+    ~FlightLogManager();
 
 signals:
 

@@ -190,7 +190,8 @@ MainWindow::MainWindow() :
 
 MainWindow::~MainWindow()
 {
-    if (m_connectionManager) { // Pip
+    if (m_connectionManager) {
+        // Pip
         m_connectionManager->disconnectDevice();
         m_connectionManager->suspendPolling();
     }
@@ -353,6 +354,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
         saveSettings(m_settings);
         m_uavGadgetInstanceManager->saveSettings(m_settings);
     }
+
+    qApp->closeAllWindows();
+
     event->accept();
 }
 

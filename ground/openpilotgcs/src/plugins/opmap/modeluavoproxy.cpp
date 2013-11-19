@@ -82,6 +82,7 @@ void ModelUavoProxy::modelToObjects()
 
             // send action update to UAV
             action->setData(actionData);
+            action->updated();
             qDebug() << "ModelUAVProxy::modelToObjects - sent action instance :" << action->getInstID();
         }
         else {
@@ -105,6 +106,7 @@ void ModelUavoProxy::modelToObjects()
 
         // send waypoint update to UAV
         waypoint->setData(waypointData);
+        waypoint->updated();
         qDebug() << "ModelUAVProxy::modelToObjects - sent waypoint instance :" << waypoint->getInstID();
     }
 }
@@ -136,7 +138,7 @@ Waypoint *ModelUavoProxy::createWaypoint(int index, Waypoint *newWaypoint) {
 
 PathAction *ModelUavoProxy::createPathAction(int index, PathAction *newAction) {
     PathAction *action = NULL;
-    int count = objManager->getNumInstances(waypointObj->getObjID());
+    int count = objManager->getNumInstances(actionObj->getObjID());
     if (index < count) {
         // reuse object
         qDebug() << "ModelUAVProxy::createPathAction - reused action instance :" << index << "/" << count;

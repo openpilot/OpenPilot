@@ -41,7 +41,7 @@ defineReplace(stripSrcDir) {
         !contains(1, ^/.*):1 = $$OUT_PWD/$$1
     }
     out = $$cleanPath($$1)
-    out ~= s|^$$re_escape($$PWD/)||$$i_flag
+    out ~= s|^$$re_escape($$_PRO_FILE_PWD_/)||$$i_flag
     return($$out)
 }
 
@@ -133,3 +133,9 @@ linux-g++-* {
     QMAKE_LFLAGS += -Wl,--allow-shlib-undefined -Wl,--no-undefined
 }
 
+win32 {
+    # Fix ((packed)) pragma handling issue introduced when upgrading MinGW from 4.4 to 4.8
+    # See http://gcc.gnu.org/bugzilla/show_bug.cgi?id=52991
+    # The ((packet)) pragma is used in uav metadata struct and other places
+    QMAKE_CXXFLAGS += -mno-ms-bitfields
+}

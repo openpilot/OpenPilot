@@ -32,7 +32,8 @@ Rectangle {
         // top - 48% - Icons - 27% - CommunityWidget - 25% - bottom
         y: (parent.height - buttons.height - communityPanel.height) * 0.48
         width: parent.width
-        spacing: (parent.height - buttons.height - communityPanel.height) * 0.27
+        height: 600
+        spacing: (parent.height - buttons.height - communityPanel.height) * 0.1
 
         Row {
             //if the buttons grid overlaps vertically with the wizard buttons,
@@ -106,7 +107,7 @@ Rectangle {
             id: communityPanel
             anchors.horizontalCenter: parent.horizontalCenter
             width: Math.min(sourceSize.width, container.width)
-            height: Math.min(300, container.height*0.5)
+            height: Math.min(450, container.height*0.5)
         }
     }
 }

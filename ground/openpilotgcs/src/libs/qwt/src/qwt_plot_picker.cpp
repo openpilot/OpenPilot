@@ -9,6 +9,7 @@
 
 #include "qwt_plot_picker.h"
 #include "qwt_plot.h"
+#include "qwt_plot_canvas.h"
 #include "qwt_scale_div.h"
 #include "qwt_painter.h"
 #include "qwt_scale_map.h"
@@ -277,8 +278,8 @@ bool QwtPlotPicker::end( bool ok )
     if ( !plot )
         return false;
 
-    const QPolygon pa = selection();
-    if ( pa.count() == 0 )
+    const QPolygon points = selection();
+    if ( points.count() == 0 )
         return false;
 
     QwtPickerMachine::SelectionType selectionType =
@@ -291,16 +292,16 @@ bool QwtPlotPicker::end( bool ok )
     {
         case QwtPickerMachine::PointSelection:
         {
-            const QPointF pos = invTransform( pa[0] );
+            const QPointF pos = invTransform( points.first() );
             Q_EMIT selected( pos );
             break;
         }
         case QwtPickerMachine::RectSelection:
         {
-            if ( pa.count() >= 2 )
+            if ( points.count() >= 2 )
             {
-                const QPoint p1 = pa[0];
-                const QPoint p2 = pa[int( pa.count() - 1 )];
+                const QPoint p1 = points.first();
+                const QPoint p2 = points.last();
 
                 const QRect rect = QRect( p1, p2 ).normalized();
                 Q_EMIT selected( invTransform( rect ) );
@@ -309,9 +310,9 @@ bool QwtPlotPicker::end( bool ok )
         }
         case QwtPickerMachine::PolygonSelection:
         {
-            QVector<QPointF> dpa( pa.count() );
-            for ( int i = 0; i < int( pa.count() ); i++ )
-                dpa[i] = invTransform( pa[i] );
+            QVector<QPointF> dpa( points.count() );
+            for ( int i = 0; i < points.count(); i++ )
+                dpa[i] = invTransform( points[i] );
 
             Q_EMIT selected( dpa );
         }

@@ -405,7 +405,19 @@ void GLC_WorldTo3dxml::exportAssemblyFromOccurence(const GLC_StructOccurence* pO
 		GLC_3DViewInstance* pInstance= m_World.collection()->instanceHandle(pOccurence->id());
 		Q_ASSERT(NULL != pInstance);
 		const bool isVisible= pInstance->isVisible();
-		const bool isOverload= !isVisible || !pInstance->renderPropertiesHandle()->isDefault() || pOccurence->isFlexible();
+
+		// Test if render properties are overloaded
+		GLC_RenderProperties* pRenderProperties= pInstance->renderPropertiesHandle();
+		bool RenderOverloaded= !pRenderProperties->isDefault();
+		if (RenderOverloaded)
+		{
+			RenderOverloaded= false;
+			RenderOverloaded= (pRenderProperties->renderingMode() == glc::OverwriteMaterial);
+			RenderOverloaded= RenderOverloaded || (pRenderProperties->renderingMode() == glc::OverwriteTransparency);
+			RenderOverloaded= RenderOverloaded || (pRenderProperties->renderingMode() == glc::OverwriteTransparencyAndMaterial);
+		}
+
+		const bool isOverload= !isVisible || RenderOverloaded || pOccurence->isFlexible();
 		if (isOverload)
 		{
 			m_ListOfOverLoadedOccurence.append(pOccurence);
@@ -773,8 +785,14 @@ void GLC_WorldTo3dxml::writeMaterial(const GLC_Material* pMaterial)
 	else
 	{
 		materialName= symplifyName(pMaterial->name());
-	}
 
+		// If the materialName is already uses append material id to the name
+		QSet<QString> materialsName= QSet<QString>::fromList(m_MaterialIdToMaterialName.values());
+		while (materialsName.contains(materialName))
+		{
+			materialName= materialName + '_' + QString::number(materialId);
+		}
+	}
 
 	m_MaterialIdToMaterialName.insert(materialId, materialName);
 
@@ -1085,7 +1103,7 @@ void GLC_WorldTo3dxml::addImageTextureTo3dxml(const QImage& image, const QString
 		success= m_pCurrentZipFile->open(QIODevice::WriteOnly, quazipNewInfo);
 		if (success)
 		{
-			image.save(m_pCurrentZipFile, QFileInfo(fileName).suffix().toAscii().constData());
+			image.save(m_pCurrentZipFile, QFileInfo(fileName).suffix().toLatin1().constData());
 			m_pCurrentZipFile->close();
 			delete m_pCurrentZipFile;
 			m_pCurrentZipFile= NULL;
@@ -1098,7 +1116,7 @@ void GLC_WorldTo3dxml::addImageTextureTo3dxml(const QImage& image, const QString
 		success= m_pCurrentFile->open(QIODevice::WriteOnly);
 		if (success)
 		{
-			image.save(m_pCurrentFile, QFileInfo(fileName).suffix().toAscii().constData());
+			image.save(m_pCurrentFile, QFileInfo(fileName).suffix().toLatin1().constData());
 			delete m_pCurrentFile;
 			m_pCurrentFile= NULL;
 		}
@@ -1114,9 +1132,10 @@ QString GLC_WorldTo3dxml::xmlFileName(QString fileName)
 		fileName.remove(prefix);
 	}
 
-	fileName= symplifyName(fileName);
-
-
+    if (m_ExportType != StructureOnly)
+    {
+        fileName= symplifyName(fileName);
+    }
 
 	QString newName;
 	if (!m_3dxmlFileSet.contains(prefix + fileName))
@@ -1257,7 +1276,10 @@ QString GLC_WorldTo3dxml::symplifyName(QString name)
 	const int nameSize= name.size();
 	for (int i= 0; i < nameSize; ++i)
 	{
-		if (!name.at(i).isLetterOrNumber() && (name.at(i) != '.'))
+        const QChar curChar= name.at(i);
+        bool simplifyCharacter= !curChar.isLetterOrNumber() && (curChar != '.');
+        simplifyCharacter= simplifyCharacter && (curChar != '/') && (curChar != '\\');
+        if (simplifyCharacter)
 		{
 			name.replace(i, 1, '_');
 		}

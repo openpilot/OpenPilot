@@ -32,7 +32,7 @@
 #include "uavdataobject.h"
 
 
-#include <QtGui/qpalette.h>
+#include <qpalette.h>
 
 
 ScopeGadgetOptionsPage::ScopeGadgetOptionsPage(ScopeGadgetConfiguration *config, QObject *parent) :

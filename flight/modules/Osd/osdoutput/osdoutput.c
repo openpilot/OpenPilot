@@ -276,9 +276,9 @@ static int32_t osdoutputInitialize(void)
     osdoutputEnabled = 1;
 #else
     HwSettingsInitialize();
-    uint8_t optionalModules[HWSETTINGS_OPTIONALMODULES_NUMELEM];
-    HwSettingsOptionalModulesGet(optionalModules);
-    if (optionalModules[HWSETTINGS_OPTIONALMODULES_OSDHK] == HWSETTINGS_OPTIONALMODULES_ENABLED) {
+    HwSettingsOptionalModulesData optionalModules;
+    HwSettingsOptionalModulesGet(&optionalModules);
+    if (optionalModules.OsdHk == HWSETTINGS_OPTIONALMODULES_ENABLED) {
         osdoutputEnabled = 1;
     } else {
         osdoutputEnabled = 0;

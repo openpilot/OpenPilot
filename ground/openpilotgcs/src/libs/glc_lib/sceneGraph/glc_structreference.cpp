@@ -241,37 +241,32 @@ bool GLC_StructReference::unloadRepresentation()
 	else return false;
 }
 
-bool GLC_StructReference::addChild(GLC_StructOccurence* pOccurence)
+QList<GLC_StructOccurence*> GLC_StructReference::addChild(GLC_StructOccurence* pOccurence)
 {
+	QList<GLC_StructOccurence*> subject;
 	if (hasStructInstance() && firstInstanceHandle()->hasStructOccurence())
 	{
-		GLC_StructOccurence* pCurrentChildOccurence= pOccurence;
-
-		QSet<GLC_StructInstance*>::iterator iInstance= m_SetOfInstance.begin();
-		while (m_SetOfInstance.constEnd() != iInstance)
+		QList<GLC_StructOccurence*> parentOccurences= listOfStructOccurence();
+		const int parentCount= parentOccurences.count();
+		GLC_StructInstance* pNewInstance= NULL;
+		for (int i= 0; i < parentCount; ++i)
 		{
-			GLC_StructInstance* pCurrentInstance= *iInstance;
-			QList<GLC_StructOccurence*> occurenceList= pCurrentInstance->listOfStructOccurences();
-			const int occurenceCount= occurenceList.count();
-			for (int i= 0; i < occurenceCount; ++i)
+			GLC_StructOccurence* pCurrentParent= parentOccurences.at(i);
+			GLC_StructOccurence* pNewChild= NULL;
+			if (NULL == pNewInstance)
 			{
-				GLC_StructOccurence* pCurrentOccurence= occurenceList.at(i);
-
-				if ((i != 0) || (NULL == pCurrentChildOccurence))
-				{
-					pCurrentChildOccurence= pOccurence->clone(pCurrentOccurence->worldHandle(), true);
-				}
-
-				pCurrentOccurence->addChild(pCurrentChildOccurence);
+				pNewChild= pOccurence;
+				pNewInstance= pNewChild->structInstance();
+				pCurrentParent->addChild(pNewChild);
 			}
-			pCurrentChildOccurence= NULL;
-			++iInstance;
+			else
+			{
+				pNewChild= pCurrentParent->addChild(pNewInstance);
+			}
+			subject.append(pNewChild);
 		}
-		return true;
 	}
-	else
-	{
-		return false;
-	}
+
+	return subject;
 }
 

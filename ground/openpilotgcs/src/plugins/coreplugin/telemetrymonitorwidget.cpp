@@ -2,7 +2,7 @@
 
 #include <QObject>
 #include <QtGui>
-#include <QtGui/QFont>
+#include <QFont>
 #include <QDebug>
 
 TelemetryMonitorWidget::TelemetryMonitorWidget(QWidget *parent) : QGraphicsView(parent)

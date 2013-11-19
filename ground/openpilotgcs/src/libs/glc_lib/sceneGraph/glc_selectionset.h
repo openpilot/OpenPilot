@@ -72,15 +72,6 @@ public:
 	//! Return the list of selected occurences
 	QList<GLC_StructOccurence*> occurencesList() const;
 
-	//! Return the list of occurences with selected primitive
-	QList<GLC_StructOccurence*> occurencesListWithSelectedPrimitive() const;
-
-	//! Return the set of primitive id of the given GLC_StructOccurence/GLC_3DviewInstance id
-	QSet<GLC_uint> selectedPrimitivesId(GLC_uint instanceId) const;
-
-	//! Return true if the given GLC_StructOccurence/GLC_3DviewInstance id has selected primitives
-	bool hasPrimitiveSelected(GLC_uint instanceId) const;
-
 	//! Return true if this selection set contains the given occurence
 	bool contains(const GLC_StructOccurence* pOccurence) const
 	{return contains(pOccurence->id());}
@@ -114,37 +105,6 @@ public:
 	//! Clear this selection set
 	void clear();
 
-	//! Insert the given primitive id to the given Occurence return true on success
-	/*! The given occurence must belongs to this selection set's world*/
-	bool insertPrimitiveId(GLC_StructOccurence* pOccurence, GLC_uint primitiveId);
-
-	//! Insert the given primitive id to the given Occurence id return true on success
-	/*! The given occurence id must belongs to this selection set's world*/
-	bool insertPrimitiveId(GLC_uint occurenceId, GLC_uint primitiveId);
-
-	//! Insert the given set of primitive id to the given Occurence
-	/*! The given occurence must belongs to this selection set's world*/
-	void insertSetOfPrimitivesId(GLC_StructOccurence* pOccurence, const QSet<GLC_uint>& setOfPrimitivesId);
-
-	//! Insert the given set of primitive id to the given Occurence id
-	/*! The given occurence id must belongs to this selection set's world*/
-	void insertSetOfPrimitivesId(GLC_uint occurenceId, const QSet<GLC_uint>& setOfPrimitivesId);
-
-	//! Remove the given primitive id to the given Occurence return true on success
-	/*! The given occurence must belongs to this selection set's world
-	 *  If the set of primitive only contains the given primitive ID
-	 *  the given occurence is removed from this selection set
-	 */
-	bool removePrimitiveId(GLC_StructOccurence* pOccurence, GLC_uint primitiveId);
-
-	//! Remove the given primitive id to the given Occurence return true on success
-	/*! The given occurence must belongs to this selection set's world
-	 *  If the set of primitive only contains the given primitive ID
-	 *  the given occurence is removed from this selection set
-	 */
-	bool removePrimitiveId(GLC_uint occurenceId, GLC_uint primitiveId);
-
-
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -156,9 +116,6 @@ private:
 
 	//! Hash table of selected occurence
 	QHash<GLC_uint, GLC_StructOccurence*> m_OccurenceHash;
-
-	//! Hash table of instance id to set of primitive id
-	QHash<GLC_uint, QSet<GLC_uint> > m_InstanceToPrimitiveId;
 
 };
 

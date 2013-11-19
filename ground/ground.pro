@@ -30,6 +30,8 @@
 # qt-creator users. Top level Makefile handles all dependencies itself
 # and does not use ground.pro.
 
+cache()
+
 message("Make sure you have shadow build path set as noted in ground.pro. Build will fail otherwise")
 
 TEMPLATE  = subdirs

@@ -28,11 +28,12 @@
 #include "antennatrackgadget.h"
 #include "antennatrackwidget.h"
 #include "antennatrackgadgetconfiguration.h"
+#include <QtSerialPort/QSerialPortInfo>
 
 AntennaTrackGadget::AntennaTrackGadget(QString classId, AntennaTrackWidget *widget, QWidget *parent) :
     IUAVGadget(classId, parent),
     m_widget(widget),
-    connected(FALSE)
+    connected(false)
 {
     connect(m_widget->connectButton, SIGNAL(clicked(bool)), this, SLOT(onConnect()));
     connect(m_widget->disconnectButton, SIGNAL(clicked(bool)), this, SLOT(onDisconnect()));
@@ -61,29 +62,23 @@ void AntennaTrackGadget::loadConfiguration(IUAVGadgetConfiguration *config)
 
     AntennaTrackGadgetConfiguration *AntennaTrackConfig = qobject_cast< AntennaTrackGadgetConfiguration *>(config);
 
-    PortSettings portsettings;
-    portsettings.BaudRate    = AntennaTrackConfig->speed();
-    portsettings.DataBits    = AntennaTrackConfig->dataBits();
-    portsettings.FlowControl = AntennaTrackConfig->flow();
-    portsettings.Parity = AntennaTrackConfig->parity();
-    portsettings.StopBits    = AntennaTrackConfig->stopBits();
-    portsettings.Timeout_Millisec = AntennaTrackConfig->timeOut();
+    m_portsettings.BaudRate    = AntennaTrackConfig->speed();
+    m_portsettings.DataBits    = AntennaTrackConfig->dataBits();
+    m_portsettings.FlowControl = AntennaTrackConfig->flow();
+    m_portsettings.Parity = AntennaTrackConfig->parity();
+    m_portsettings.StopBits    = AntennaTrackConfig->stopBits();
+    m_portsettings.Timeout_Millisec = AntennaTrackConfig->timeOut();
 
     // In case we find no port, buttons disabled
     m_widget->connectButton->setEnabled(false);
     m_widget->disconnectButton->setEnabled(false);
 
-    QList<QextPortInfo> ports = QextSerialEnumerator::getPorts();
-    foreach(QextPortInfo nport, ports) {
-        if (nport.friendName == AntennaTrackConfig->port()) {
+    QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
+    foreach(QSerialPortInfo nport, ports) {
+        if (nport.portName() == AntennaTrackConfig->port()) {
             qDebug() << "Using Serial port";
             // parser = new NMEAParser();
-
-#ifdef Q_OS_WIN
-            port = new QextSerialPort(nport.portName, portsettings, QextSerialPort::EventDriven);
-#else
-            port = new QextSerialPort(nport.physName, portsettings, QextSerialPort::EventDriven);
-#endif
+            port = new QSerialPort(nport);
             m_widget->setPort(port);
             m_widget->connectButton->setEnabled(true);
             m_widget->disconnectButton->setEnabled(false);
@@ -112,8 +107,14 @@ void AntennaTrackGadget::onConnect()
         bool isOpen = port->open(QIODevice::ReadWrite);
         qDebug() << "Open: " << isOpen;
         if (isOpen) {
-            m_widget->connectButton->setEnabled(false);
-            m_widget->disconnectButton->setEnabled(true);
+            if (port->setBaudRate(m_portsettings.BaudRate)
+                && port->setDataBits(m_portsettings.DataBits)
+                && port->setParity(m_portsettings.Parity)
+                && port->setStopBits(m_portsettings.StopBits)
+                && port->setFlowControl(m_portsettings.FlowControl)) {
+                m_widget->connectButton->setEnabled(false);
+                m_widget->disconnectButton->setEnabled(true);
+            }
         }
     } else {
         qDebug() << "Port undefined or invalid.";

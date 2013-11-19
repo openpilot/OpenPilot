@@ -26,6 +26,9 @@
 #define GLC_MATRIX4X4_H_
 
 #include <QVector>
+#include <QQuaternion>
+#include <QPair>
+
 #include "glc_vector3d.h"
 
 #include "../glc_config.h"
@@ -176,6 +179,16 @@ public:
 	//! Return true if this matrix is direct
 	inline bool isDirect() const
 	{return (m_Type & Direct);}
+
+	//! Return this matrix trace
+	inline double trace() const
+	{return (m_Matrix[0] + m_Matrix[5] + m_Matrix[10] + m_Matrix[15]);}
+
+	//! Return the quaternion of this matrix
+	QQuaternion quaternion() const;
+
+	//! Return the rotation vector and angle of this matrix
+	QPair<GLC_Vector3d, double> rotationVectorAndAngle() const;
 
 //@}
 
@@ -402,7 +415,7 @@ bool GLC_Matrix4x4::operator==(const GLC_Matrix4x4& mat) const
 	int i= 0;
 	while (result && (i < TAILLEMAT4X4))
 	{
-		result= (qFuzzyCompare(m_Matrix[i], mat.m_Matrix[i]));
+		result= (qAbs(m_Matrix[i] - mat.m_Matrix[i]) <= glc::EPSILON);
 		++i;
 	}
 	return result;
@@ -502,16 +515,31 @@ GLC_Matrix4x4& GLC_Matrix4x4::setMatRot(const GLC_Vector3d &Vect, const double &
 	return *this;
 }
 
-GLC_Matrix4x4& GLC_Matrix4x4::setMatRot(const GLC_Vector3d &Vect1, const GLC_Vector3d &Vect2)
+GLC_Matrix4x4& GLC_Matrix4x4::setMatRot(const GLC_Vector3d &v1, const GLC_Vector3d &v2)
 {
 
-	// Compute rotation matrix
-	const GLC_Vector3d VectAxeRot(Vect1 ^ Vect2);
-	// Check if rotation vector axis is not null
-	if (!VectAxeRot.isNull())
-	{  // Ok, vector not null
-		const double Angle= acos(Vect1 * Vect2);
-		setMatRot(VectAxeRot, Angle);
+	if ((v1 != v2) && !v1.isNull() && !v2.isNull())
+	{
+		if (v1 != -v2)
+		{
+			const GLC_Vector3d rotationAxis(v1 ^ v2);
+			if (!rotationAxis.isNull())
+			{
+				const double Angle= acos(v1 * v2);
+				setMatRot(rotationAxis, Angle);
+			}
+		}
+		else
+		{
+			// v1 == -v2
+			GLC_Vector3d otherVector(glc::Z_AXIS);
+			if ((otherVector == v1) || (otherVector == -v2))
+			{
+				otherVector= glc::Y_AXIS;
+			}
+			const GLC_Vector3d rotationVector((v1 ^ otherVector).normalize());
+			setMatRot(rotationVector, glc::PI);
+		}
 	}
 
 	return *this;

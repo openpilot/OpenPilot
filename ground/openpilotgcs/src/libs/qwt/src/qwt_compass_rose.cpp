@@ -59,13 +59,8 @@ QwtSimpleCompassRose::QwtSimpleCompassRose(
     const QColor light( 192, 255, 255 );
 
     QPalette palette;
-    for ( int i = 0; i < QPalette::NColorGroups; i++ )
-    {
-        palette.setColor( ( QPalette::ColorGroup )i,
-            QPalette::Dark, dark );
-        palette.setColor( ( QPalette::ColorGroup )i,
-            QPalette::Light, light );
-    }
+    palette.setColor( QPalette::Dark, dark );
+    palette.setColor( QPalette::Light, light );
 
     setPalette( palette );
 }

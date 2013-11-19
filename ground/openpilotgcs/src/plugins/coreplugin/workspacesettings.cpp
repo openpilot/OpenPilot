@@ -33,7 +33,6 @@
 
 #include "ui_workspacesettings.h"
 
-
 using namespace Core;
 using namespace Core::Internal;
 
@@ -84,7 +83,6 @@ QWidget *WorkspaceSettings::createPage(QWidget *parent)
     m_page->iconPathChooser->setPromptDialogFilter(tr("Images (*.png *.jpg *.bmp *.xpm)"));
     m_page->iconPathChooser->setPromptDialogTitle(tr("Choose icon"));
 
-
     connect(m_page->workspaceComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectWorkspace(int)));
     connect(m_page->numberOfWorkspacesSpinBox, SIGNAL(valueChanged(int)), this, SLOT(numberOfWorkspacesChanged(int)));
     connect(m_page->nameEdit, SIGNAL(textEdited(QString)), this, SLOT(textEdited(QString)));
@@ -97,6 +95,7 @@ QWidget *WorkspaceSettings::createPage(QWidget *parent)
         m_page->comboBoxTabBarPlacement->setCurrentIndex(m_tabBarPlacementIndex);
     }
     m_page->checkBoxAllowTabMovement->setChecked(m_allowTabBarMovement);
+    m_page->checkBoxRestoreSelectedOnStartup->setChecked(m_restoreSelectedOnStartup);
 
     return w;
 }
@@ -120,9 +119,12 @@ void WorkspaceSettings::readSettings(QSettings *qs)
         m_iconNames.append(iconName);
         m_modeNames.append(QString("Mode") + QString::number(i));
     }
-    m_tabBarPlacementIndex = qs->value(QLatin1String("TabBarPlacementIndex"), 1).toInt(); // 1 == "Bottom"
-    m_allowTabBarMovement  = qs->value(QLatin1String("AllowTabBarMovement"), false).toBool();
+    m_tabBarPlacementIndex     = qs->value(QLatin1String("TabBarPlacementIndex"), 1).toInt(); // 1 == "Bottom"
+    m_allowTabBarMovement      = qs->value(QLatin1String("AllowTabBarMovement"), false).toBool();
+    m_restoreSelectedOnStartup = qs->value(QLatin1String("RestoreSelectedOnStartup"), false).toBool();
+
     qs->endGroup();
+
     QTabWidget::TabPosition pos = m_tabBarPlacementIndex == 0 ? QTabWidget::North : QTabWidget::South;
     emit tabBarSettingsApplied(pos, m_allowTabBarMovement);
 }
@@ -142,6 +144,7 @@ void WorkspaceSettings::saveSettings(QSettings *qs)
     }
     qs->setValue(QLatin1String("TabBarPlacementIndex"), m_tabBarPlacementIndex);
     qs->setValue(QLatin1String("AllowTabBarMovement"), m_allowTabBarMovement);
+    qs->setValue(QLatin1String("RestoreSelectedOnStartup"), m_restoreSelectedOnStartup);
     qs->endGroup();
 }
 
@@ -164,8 +167,10 @@ void WorkspaceSettings::apply()
             modeManager->updateModeNameIcon(mode, QIcon(iconName(i)), name(i));
         }
     }
-    m_tabBarPlacementIndex = m_page->comboBoxTabBarPlacement->currentIndex();
-    m_allowTabBarMovement  = m_page->checkBoxAllowTabMovement->isChecked();
+    m_tabBarPlacementIndex     = m_page->comboBoxTabBarPlacement->currentIndex();
+    m_allowTabBarMovement      = m_page->checkBoxAllowTabMovement->isChecked();
+    m_restoreSelectedOnStartup = m_page->checkBoxRestoreSelectedOnStartup->isChecked();
+
     QTabWidget::TabPosition pos = m_tabBarPlacementIndex == 0 ? QTabWidget::North : QTabWidget::South;
     emit tabBarSettingsApplied(pos, m_allowTabBarMovement);
 }

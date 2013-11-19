@@ -23,10 +23,10 @@
 
 #include "glc_disc.h"
 
-GLC_Disc::GLC_Disc(double radius, double angle)
+GLC_Disc::GLC_Disc(double radius, double angle, int discretization)
 : GLC_Mesh()
 , m_Radius(radius)
-, m_Discret(glc::GLC_POLYDISCRET)
+, m_Discret(discretization)
 , m_Angle(angle)
 , m_Step(0)
 {

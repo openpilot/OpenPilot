@@ -62,4 +62,3 @@ void GpsDisplayPlugin::shutdown()
 {
     // Do nothing
 }
-Q_EXPORT_PLUGIN(GpsDisplayPlugin)

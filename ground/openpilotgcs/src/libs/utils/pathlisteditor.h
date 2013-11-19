@@ -31,7 +31,7 @@
 
 #include "utils_global.h"
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <QtCore/QStringList>
 
 QT_BEGIN_NAMESPACE

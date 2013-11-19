@@ -81,9 +81,9 @@ protected:
     bool m_deviceOpened;
 };
 
-class OPHID_EXPORT RawHIDPlugin
-    : public ExtensionSystem::IPlugin {
+class OPHID_EXPORT RawHIDPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
+                   Q_PLUGIN_METADATA(IID "OpenPilot.RawHID")
 
 public:
     RawHIDPlugin();

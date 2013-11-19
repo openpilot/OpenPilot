@@ -29,8 +29,8 @@
 #define SERIALPLUGIN_H
 
 // #include "serial_global.h"
-#include <qextserialport.h>
-#include <qextserialenumerator.h>
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
 #include "coreplugin/iconnection.h"
 #include <extensionsystem/iplugin.h>
 #include "serialpluginconfiguration.h"
@@ -38,7 +38,7 @@
 #include <QThread>
 
 class IConnection;
-class QextSerialEnumerator;
+class QSerialPortInfo;
 class SerialConnection;
 
 /**
@@ -101,11 +101,10 @@ public:
 
 
 private:
-    QextSerialPort *serialHandle;
+    QSerialPort *serialHandle;
     bool enablePolling;
     SerialPluginConfiguration *m_config;
     SerialPluginOptionsPage *m_optionspage;
-    BaudRateType stringToBaud(QString str);
 
 protected slots:
     void onEnumerationChanged();
@@ -117,9 +116,9 @@ protected:
 
 
 // class SERIAL_EXPORT SerialPlugin
-class SerialPlugin
-    : public ExtensionSystem::IPlugin {
+class SerialPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
+                                             Q_PLUGIN_METADATA(IID "OpenPilot.Serial")
 
 public:
     SerialPlugin();
@@ -130,6 +129,5 @@ public:
 private:
     SerialConnection *m_connection;
 };
-
 
 #endif // SERIALPLUGIN_H

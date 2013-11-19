@@ -30,11 +30,11 @@
 
 #include "treeitem.h"
 #include <QtCore/QStringList>
-#include <QtGui/QWidget>
-#include <QtGui/QSpinBox>
-#include <QtGui/QDoubleSpinBox>
+#include <QWidget>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <qscispinbox/QScienceSpinBox.h>
-#include <QtGui/QComboBox>
+#include <QComboBox>
 #include <limits>
 
 #define QINT8MIN   std::numeric_limits<qint8>::min()

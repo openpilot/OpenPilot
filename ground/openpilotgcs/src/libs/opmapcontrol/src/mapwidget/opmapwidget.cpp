@@ -224,7 +224,7 @@ internals::PointLatLng OPMapWidget::currentMousePosition()
 void OPMapWidget::mouseMoveEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseMoveEvent(event);
-    QPointF p = event->posF();
+    QPointF p = event->pos();
 
     p = map->mapFromParent(p);
     currentmouseposition = map->FromLocalToLatLng(p.x(), p.y());

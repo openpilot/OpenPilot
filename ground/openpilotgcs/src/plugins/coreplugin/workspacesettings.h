@@ -31,7 +31,7 @@
 #include <coreplugin/dialogs/ioptionspage.h>
 #include <QtCore/QObject>
 #include <QtCore/QStringList>
-#include <QtGui/QTabWidget>
+#include <QTabWidget>
 
 class QSettings;
 
@@ -77,6 +77,10 @@ public:
     {
         return m_modeNames.at(i);
     }
+    bool restoreSelectedOnStartup() const
+    {
+        return m_restoreSelectedOnStartup;
+    }
 
 signals:
     void tabBarSettingsApplied(QTabWidget::TabPosition pos, bool movable);
@@ -98,6 +102,7 @@ private:
     int m_numberOfWorkspaces;
     int m_tabBarPlacementIndex;
     bool m_allowTabBarMovement;
+    bool m_restoreSelectedOnStartup;
     static const int MAX_WORKSPACES;
 };
 } // namespace Internal

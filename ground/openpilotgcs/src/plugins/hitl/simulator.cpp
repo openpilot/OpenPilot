@@ -27,7 +27,6 @@
 
 
 #include "simulator.h"
-#include "qxtlogger.h"
 #include "extensionsystem/pluginmanager.h"
 #include "coreplugin/icore.h"
 #include "coreplugin/threadmanager.h"
@@ -182,7 +181,7 @@ void Simulator::onStart()
                        "inputPort: " + QString::number(settings.inPort) + "\n" + \
                        "outputPort: " + QString::number(settings.outPort) + "\n");
 
-    qxtLog->info("\nLocal interface: " + settings.hostAddress + "\n" + \
+    qDebug() << ("\nLocal interface: " + settings.hostAddress + "\n" + \
                  "Remote interface: " + settings.remoteAddress + "\n" + \
                  "inputPort: " + QString::number(settings.inPort) + "\n" + \
                  "outputPort: " + QString::number(settings.outPort) + "\n");

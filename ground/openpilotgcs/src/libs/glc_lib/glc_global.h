@@ -120,7 +120,7 @@ namespace glc
 	GLC_LIB_EXPORT QString archiveEntryFileName(const QString& archiveString);
 
 	// GLC_Lib version
-	const QString version("2.2.0");
+    const QString version("2.5.0");
 	const QString description("GLC_lib is a Open Source C++ class library that enables the quick creation of an OpenGL application based on QT4.");
 
 };

@@ -109,7 +109,7 @@ int32_t AirspeedInitialize()
 #endif
 
     uint8_t adcRouting[HWSETTINGS_ADCROUTING_NUMELEM];
-    HwSettingsADCRoutingGet(adcRouting);
+    HwSettingsADCRoutingArrayGet(adcRouting);
 
     // Determine if the barometric airspeed sensor is routed to an ADC pin
     for (int i = 0; i < HWSETTINGS_ADCROUTING_NUMELEM; i++) {

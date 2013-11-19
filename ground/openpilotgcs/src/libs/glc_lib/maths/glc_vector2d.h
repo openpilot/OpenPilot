@@ -41,8 +41,7 @@
 //! \class GLC_Vector2d
 /*! \brief GLC_Vector2d is a 2 dimensions Vector*/
 
-/*! GLC_Vector2d is used to represent 2D position and vectors.
- * */
+/*! GLC_Vector2d is used to represent 2D position and vectors.*/
 //////////////////////////////////////////////////////////////////////
 
 class GLC_LIB_EXPORT GLC_Vector2d
@@ -80,12 +79,7 @@ public:
 		m_Vector[1]= dY;
 	}
 
-	/*! Recopy constructor
-	 * Sample use
-	 * \code
-	 * NewVect = new GLC_Vector2d(OldVect);
-	 * \endcode
-	 */
+    //! Copy constructor
 	inline GLC_Vector2d(const GLC_Vector2d &Vect)
 	{
 		m_Vector[0]= Vect.m_Vector[0];
@@ -165,18 +159,29 @@ public:
 		return m_Vector[0] * Vect.m_Vector[0] + m_Vector[1] * Vect.m_Vector[1];
 	}
 
+    /*! Overload scalar division "/" operator between 2 vector*/
+    inline double operator / (const GLC_Vector2d &Vect) const
+    {
+        return m_Vector[0] / Vect.m_Vector[0] + m_Vector[1] / Vect.m_Vector[1];
+    }
+
 	/*! Overload scalar product "*" operator between 1 vector and one scalar*/
-	inline GLC_Vector2d operator * (double Scalaire) const
+    inline GLC_Vector2d operator * (double Scalaire) const
 	{
 		return GLC_Vector2d(m_Vector[0] * Scalaire, m_Vector[1] * Scalaire);;
 	}
 
+    /*! Overload scalar division "/" operator between 1 vector and one scalar*/
+    inline GLC_Vector2d operator / (double Scalaire) const
+    {
+        return GLC_Vector2d(m_Vector[0] / Scalaire, m_Vector[1] / Scalaire);;
+    }
 
 	/*! Overload equality "==" operator*/
 	inline bool operator == (const GLC_Vector2d &Vect) const
 	{
-		bool bResult= qFuzzyCompare(m_Vector[0], Vect.m_Vector[0]);
-		bResult= bResult && qFuzzyCompare(m_Vector[1], Vect.m_Vector[1]);
+        bool bResult= (qAbs(m_Vector[0]) - qAbs(Vect.m_Vector[0])) < glc::EPSILON;
+        bResult= bResult && ((qAbs(m_Vector[1]) - qAbs(Vect.m_Vector[1])) < glc::EPSILON);
 
 		return bResult;
 	}
@@ -238,36 +243,34 @@ public:
 //@{
 //////////////////////////////////////////////////////////////////////
 public:
-	/*! X Composante*/
-	inline double getX(void) const
-	{
-		return m_Vector[0];
-	}
-	/*! Y Composante*/
-	inline double getY(void) const
-	{
-		return m_Vector[1];
-	}
+    /*! X Component*/
+    inline double x(void) const
+	{return m_Vector[0];}
+
+    /*! Y Component*/
+    inline double y(void) const
+	{return m_Vector[1];}
+
 	/*! retourne un pointeur constant vers le tableau du vecteur.*/
 	inline const double *return_dVect(void) const
-	{
-		return m_Vector;
-	}
+	{return m_Vector;}
+
 	/*! Return true if the vector is null*/
 	inline bool isNull(void) const
-	{
-		return qFuzzyCompare(m_Vector[0], 0.0) && qFuzzyCompare(m_Vector[1], 0.0);
-	}
+    {return (qAbs(m_Vector[0]) < glc::EPSILON) && (qAbs(m_Vector[1]) < glc::EPSILON);}
+
 	//! return the string representation of vector
 	inline QString toString() const
-	{
-		return QString("[") + QString::number(m_Vector[0]) + QString(" , ") + QString::number(m_Vector[1]) + QString("]");
-	}
-	//! return a vector perpendicular to this
+	{return QString("[") + QString::number(m_Vector[0]) + QString(" , ") + QString::number(m_Vector[1]) + QString("]");}
+
+    //! Return a vector perpendicular to this
 	inline GLC_Vector2d perp() const
-	{
-		return GLC_Vector2d(-m_Vector[1], m_Vector[0]);
-	}
+	{return GLC_Vector2d(-m_Vector[1], m_Vector[0]);}
+
+    //! Return the length of this vector
+    inline double length() const
+    {return sqrt(m_Vector[0] * m_Vector[0] + m_Vector[1] * m_Vector[1]);}
+
 //@}
 
 //////////////////////////////////////////////////////////////////////
@@ -285,13 +288,13 @@ private:
 //! Define GLC_Point2D
 typedef GLC_Vector2d GLC_Point2d;
 
-inline GLC_Vector2d& GLC_Vector2d::setLength(double norme)
+inline GLC_Vector2d& GLC_Vector2d::setLength(double lenght)
 {
-	const double normCur= sqrt( m_Vector[0] * m_Vector[0] + m_Vector[1] * m_Vector[1]);
+    const double currentLenght= sqrt( m_Vector[0] * m_Vector[0] + m_Vector[1] * m_Vector[1]);
 
-	if (normCur != 0.0f)
+    if (currentLenght != 0.0f)
 	{
-		const double Coef = norme / normCur;
+        const double Coef = lenght / currentLenght;
 
 		m_Vector[0] = m_Vector[0] * Coef;
 		m_Vector[1] = m_Vector[1] * Coef;

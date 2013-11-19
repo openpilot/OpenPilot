@@ -45,7 +45,10 @@
 
 // Private constants
 
-#define STACK_REQUIRED 512
+#define STACK_REQUIRED          512
+
+#define CALIBRATION_DELAY_MS    4000
+#define CALIBRATION_DURATION_MS 6000
 
 // Private types
 struct data {
@@ -55,6 +58,8 @@ struct data {
     bool    useMag;
     float   currentAccel[3];
     float   currentMag[3];
+    float   accels_filtered[3];
+    float   grot_filtered[3];
     float   gyroBias[3];
     bool    accelUpdated;
     bool    magUpdated;
@@ -227,7 +232,7 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         mag[2] = 0.0f;
 #endif
         float magBias[3];
-        RevoCalibrationmag_biasGet(magBias);
+        RevoCalibrationmag_biasArrayGet(magBias);
         // don't trust Mag for initial orientation if it has not been calibrated
         if (magBias[0] < 1e-6f && magBias[1] < 1e-6f && magBias[2] < 1e-6f) {
             this->magCalibrated = false;
@@ -266,19 +271,24 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
         RPY2Quaternion(&attitudeState.Roll, attitude);
 
         this->first_run = 0;
-
-        this->timeval   = PIOS_DELAY_GetRaw();
-        this->starttime = this->timeval;
+        this->accels_filtered[0] = 0.0f;
+        this->accels_filtered[1] = 0.0f;
+        this->accels_filtered[2] = 0.0f;
+        this->grot_filtered[0]   = 0.0f;
+        this->grot_filtered[1]   = 0.0f;
+        this->grot_filtered[2]   = 0.0f;
+        this->timeval   = PIOS_DELAY_GetRaw(); // Cycle counter used for precise timing
+        this->starttime = xTaskGetTickCount(); // Tick counter used for long time intervals
 
         return 0; // must return zero on initial initialization, so attitude will init with a valid quaternion
     }
 
-    if (this->init == 0 && PIOS_DELAY_DiffuS(this->starttime) < 4000000) {
+    if (this->init == 0 && xTaskGetTickCount() - this->starttime < CALIBRATION_DELAY_MS / portTICK_RATE_MS) {
         // wait 4 seconds for the user to get his hands off in case the board was just powered
         this->timeval = PIOS_DELAY_GetRaw();
         return 1;
-    } else if (this->init == 0 && PIOS_DELAY_DiffuS(this->starttime) < 10000000) {
-        // For first 7 seconds use accels to get gyro bias
+    } else if (this->init == 0 && xTaskGetTickCount() - this->starttime < (CALIBRATION_DELAY_MS + CALIBRATION_DURATION_MS) / portTICK_RATE_MS) {
+        // For first 6 seconds use accels to get gyro bias
         this->attitudeSettings.AccelKp     = 1.0f;
         this->attitudeSettings.AccelKi     = 0.0f;
         this->attitudeSettings.YawBiasRate = 0.23f;
@@ -316,9 +326,8 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
     // Get the current attitude estimate
     quat_copy(&attitudeState.q1, attitude);
 
-    float accels_filtered[3];
     // Apply smoothing to accel values, to reduce vibration noise before main calculations.
-    apply_accel_filter(this, accel, accels_filtered);
+    apply_accel_filter(this, accel, this->accels_filtered);
 
     // Rotate gravity to body frame and cross with accels
     float grot[3];
@@ -326,13 +335,13 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
     grot[1] = -(2.0f * (attitude[2] * attitude[3] + attitude[0] * attitude[1]));
     grot[2] = -(attitude[0] * attitude[0] - attitude[1] * attitude[1] - attitude[2] * attitude[2] + attitude[3] * attitude[3]);
 
-    float grot_filtered[3];
     float accel_err[3];
-    apply_accel_filter(this, grot, grot_filtered);
-    CrossProduct((const float *)accels_filtered, (const float *)grot_filtered, accel_err);
+    apply_accel_filter(this, grot, this->grot_filtered);
+
+    CrossProduct((const float *)this->accels_filtered, (const float *)this->grot_filtered, accel_err);
 
     // Account for accel magnitude
-    float accel_mag = sqrtf(accels_filtered[0] * accels_filtered[0] + accels_filtered[1] * accels_filtered[1] + accels_filtered[2] * accels_filtered[2]);
+    float accel_mag = sqrtf(this->accels_filtered[0] * this->accels_filtered[0] + this->accels_filtered[1] * this->accels_filtered[1] + this->accels_filtered[2] * this->accels_filtered[2]);
     if (accel_mag < 1.0e-3f) {
         return 2; // safety feature copied from CC
     }
@@ -340,7 +349,7 @@ static int32_t complementaryFilter(struct data *this, float gyro[3], float accel
     // Account for filtered gravity vector magnitude
     float grot_mag;
     if (this->accel_filter_enabled) {
-        grot_mag = sqrtf(grot_filtered[0] * grot_filtered[0] + grot_filtered[1] * grot_filtered[1] + grot_filtered[2] * grot_filtered[2]);
+        grot_mag = sqrtf(this->grot_filtered[0] * this->grot_filtered[0] + this->grot_filtered[1] * this->grot_filtered[1] + this->grot_filtered[2] * this->grot_filtered[2]);
     } else {
         grot_mag = 1.0f;
     }

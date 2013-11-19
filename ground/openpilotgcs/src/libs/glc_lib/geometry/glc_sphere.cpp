@@ -27,14 +27,28 @@
 // Class chunk id
 quint32 GLC_Sphere::m_ChunkId= 0xA710;
 
-GLC_Sphere::GLC_Sphere(double radius)
+GLC_Sphere::GLC_Sphere(double radius, int discretization)
 : GLC_Mesh()
 , m_Radius (radius)
-, m_Discret(glc::GLC_POLYDISCRET)
+, m_Discret(discretization)
 , m_ThetaMin (0.0)
 , m_ThetaMax(2 * glc::PI)
 , m_PhiMin(-glc::PI / 2.0)
 , m_PhiMax(glc::PI / 2.0)
+, m_Center()
+{
+	createMesh();
+}
+
+GLC_Sphere::GLC_Sphere(double radius, const GLC_Point3d& center, int discretization)
+: GLC_Mesh()
+, m_Radius (radius)
+, m_Discret(discretization)
+, m_ThetaMin (0.0)
+, m_ThetaMax(2 * glc::PI)
+, m_PhiMin(-glc::PI / 2.0)
+, m_PhiMax(glc::PI / 2.0)
+, m_Center(center)
 {
 	createMesh();
 }
@@ -48,8 +62,9 @@ GLC_Sphere::GLC_Sphere(const GLC_Sphere & sphere)
 , m_ThetaMax(sphere.m_ThetaMax)
 , m_PhiMin(sphere.m_PhiMin)
 , m_PhiMax(sphere.m_PhiMax)
+, m_Center(sphere.m_Center)
 {
-	createMesh();
+    if (isEmpty()) createMesh();
 }
 
 GLC_Sphere::~GLC_Sphere()
@@ -87,6 +102,16 @@ void GLC_Sphere::setDiscretion(int TargetDiscret)
 	{
 		m_Discret= TargetDiscret;
 		if (m_Discret < 6) m_Discret= 6;
+
+		GLC_Mesh::clearMeshWireAndBoundingBox();
+	}
+}
+
+void GLC_Sphere::setCenter(const GLC_Point3d& pos)
+{
+	if (pos != m_Center)
+	{
+		m_Center= pos;
 
 		GLC_Mesh::clearMeshWireAndBoundingBox();
 	}
@@ -139,6 +164,10 @@ void GLC_Sphere::createMesh()
 	else
 		pMaterial= new GLC_Material();
 
+	const double dx= m_Center.x();
+	const double dy= m_Center.y();
+	const double dz= m_Center.z();
+
 	// shaded face
 	for (int p= 0; p < nbPhiSteps; ++p)
 	{
@@ -164,7 +193,7 @@ void GLC_Sphere::createMesh()
 			xf= m_Radius * cost * cospp;
 			yf= m_Radius * sint * cospp;
 
-			verticeFloat << xf << yf << zf << xi << yi << zi;
+			verticeFloat << (xf + dx) << (yf + dy) << (zf + dz) << (xi + dx) << (yi + dy) << (zi + dz);
 			normalsFloat << cost * cospp << sint * cospp << sinpp << cost * cosp << sint * cosp << sinp;
  			texelVector << static_cast<double>(t) * 1.0 / static_cast<double>(nbThetaSteps)
 						<< static_cast<double>(p) * 1.0 / static_cast<double>(nbPhiSteps)

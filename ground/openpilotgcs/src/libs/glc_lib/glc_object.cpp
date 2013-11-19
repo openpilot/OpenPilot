@@ -31,6 +31,15 @@
 GLC_Object::GLC_Object(const QString& name)
 : m_Uid(glc::GLC_GenID())	// Object ID
 , m_Name(name)			// Object Name
+, m_Mutex()
+{
+
+}
+
+GLC_Object::GLC_Object(GLC_uint id, const QString& name)
+: m_Uid(id)
+, m_Name(name)
+, m_Mutex()
 {
 
 }
@@ -38,6 +47,7 @@ GLC_Object::GLC_Object(const QString& name)
 GLC_Object::GLC_Object(const GLC_Object& sourceObject)
 : m_Uid(sourceObject.m_Uid)
 , m_Name(sourceObject.m_Name)
+, m_Mutex()
 {
 }
 

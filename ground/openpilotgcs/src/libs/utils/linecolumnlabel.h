@@ -30,7 +30,7 @@
 #define LINECOLUMNLABEL_H
 
 #include "utils_global.h"
-#include <QtGui/QLabel>
+#include <QLabel>
 
 namespace Utils {
 /* A label suitable for displaying cursor positions, etc. with a fixed

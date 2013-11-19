@@ -31,7 +31,7 @@
 #include "core_global.h"
 
 #include <QtCore/QObject>
-#include <QtGui/QIcon>
+#include <QIcon>
 #include <QSettings>
 #include "uavconfiginfo.h"
 

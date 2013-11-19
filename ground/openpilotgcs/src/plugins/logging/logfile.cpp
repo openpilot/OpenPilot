@@ -3,7 +3,11 @@
 #include <QtGlobal>
 
 LogFile::LogFile(QObject *parent) :
-    QIODevice(parent)
+    QIODevice(parent),
+    lastTimeStamp(0),
+    lastPlayed(0),
+    timeOffset(0),
+    playbackSpeed(1.0)
 {
     connect(&timer, SIGNAL(timeout()), this, SLOT(timerFired()));
 }
@@ -25,7 +29,7 @@ bool LogFile::open(OpenMode mode)
         return true;
     }
 
-    if (file.open(mode) == FALSE) {
+    if (file.open(mode) == false) {
         qDebug() << "Unable to open " << file.fileName() << " for logging";
         return false;
     }
@@ -97,7 +101,7 @@ void LogFile::timerFired()
         // TODO: going back in time will be a problem
         while ((lastPlayed + ((time - timeOffset) * playbackSpeed) > lastTimeStamp)) {
             lastPlayed += ((time - timeOffset) * playbackSpeed);
-            if (file.bytesAvailable() < 4) {
+            if (file.bytesAvailable() < sizeof(dataSize)) {
                 stopReplay();
                 return;
             }
@@ -109,6 +113,7 @@ void LogFile::timerFired()
                 stopReplay();
                 return;
             }
+
             if (file.bytesAvailable() < dataSize) {
                 stopReplay();
                 return;
@@ -117,9 +122,10 @@ void LogFile::timerFired()
             mutex.lock();
             dataBuffer.append(file.read(dataSize));
             mutex.unlock();
+
             emit readyRead();
 
-            if (file.bytesAvailable() < 4) {
+            if (file.bytesAvailable() < sizeof(lastTimeStamp)) {
                 stopReplay();
                 return;
             }
@@ -127,7 +133,7 @@ void LogFile::timerFired()
             int save = lastTimeStamp;
             file.read((char *)&lastTimeStamp, sizeof(lastTimeStamp));
             // some validity checks
-            if (lastTimeStamp < save // logfile goies back in time
+            if (lastTimeStamp < save // logfile goes back in time
                 || (lastTimeStamp - save) > (60 * 60 * 1000)) { // gap of more than 60 minutes)
                 qDebug() << "Error: Logfile corrupted! Unlikely timestamp " << lastTimeStamp << " after " << save << "\n";
                 stopReplay();
@@ -146,9 +152,8 @@ bool LogFile::startReplay()
 {
     dataBuffer.clear();
     myTime.restart();
-    timeOffset    = 0;
-    lastPlayed    = 0;
-    playbackSpeed = 1;
+    timeOffset = 0;
+    lastPlayed = 0;
     file.read((char *)&lastTimeStamp, sizeof(lastTimeStamp));
     timer.setInterval(10);
     timer.start();

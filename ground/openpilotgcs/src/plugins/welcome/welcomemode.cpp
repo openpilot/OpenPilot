@@ -39,7 +39,7 @@
 #include <utils/welcomemodetreewidget.h>
 #include <utils/iwelcomepage.h>
 
-#include <QtGui/QDesktopServices>
+#include <QDesktopServices>
 
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>

@@ -357,7 +357,7 @@ void UAVSettingsImportExportFactory::exportUAVSettings()
     // save file
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly) &&
-        (file.write(xml.toAscii()) != -1)) {
+        (file.write(xml.toLatin1()) != -1)) {
         file.close();
     } else {
         QMessageBox::critical(0,
@@ -408,7 +408,7 @@ void UAVSettingsImportExportFactory::exportUAVData()
     // save file
     QFile file(fileName);
     if (file.open(QIODevice::WriteOnly) &&
-        (file.write(xml.toAscii()) != -1)) {
+        (file.write(xml.toLatin1()) != -1)) {
         file.close();
     } else {
         QMessageBox::critical(0,

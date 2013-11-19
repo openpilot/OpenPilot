@@ -29,7 +29,7 @@
 #ifndef AUTHORSDIALOG_H
 #define AUTHORSDIALOG_H
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 namespace Core {
 namespace Internal {

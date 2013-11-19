@@ -403,6 +403,9 @@ void PIOS_Board_Init(void)
         PIOS_Assert(0);
     }
 
+    /* Initialize the delayed callback library */
+    CallbackSchedulerInitialize();
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -414,9 +417,6 @@ void PIOS_Board_Init(void)
 
     /* Initialize the alarms library */
     AlarmsInitialize();
-
-    /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
 
     /* Set up pulse timers */
     PIOS_TIM_InitClock(&tim_1_cfg);

@@ -1,5 +1,7 @@
 include_directories(actionmanager dialogs uavgadgetmanager)
 
+add_definitions(-DCORE_LIBRARY)
+
 set(Core_SRCS
     mainwindow.cpp
     tabpositionindicator.cpp
@@ -76,7 +78,7 @@ qt5_add_resources(Core_SRCS
 
 add_library(Core ${Core_SRCS} ${Core_ITFS})
 
-target_link_libraries(Core gcsutils opmapcontrol Aggregation UAVObjects)
+target_link_libraries(Core utils opmapcontrol Aggregation UAVObjects version_info)
 
 qt5_use_modules(Core Widgets Xml)
 

@@ -416,7 +416,7 @@ int USBMonitor::infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO &
         ret = OPHID_ERROR_RET;
         goto leave;
     }
-    qDevicePath = QString().fromWCharArray(details->DevicePath).toUpper();
+    qDevicePath = QString().fromWCharArray((wchar_t *)details->DevicePath).toUpper();
 
     // Exclude any non-openpilot devices
     if (!qDevicePath.contains("VID_20A0")) {
@@ -450,7 +450,7 @@ int USBMonitor::infoFromHandle(const GUID & guid, USBPortInfo & info, HDEVINFO &
         }
 
         qDebug() << "Problem opening handle, path: "
-                 << QString().fromWCharArray(details->DevicePath);
+                 << QString().fromWCharArray((wchar_t *)details->DevicePath);
 
         free(details);
         ret = OPHID_ERROR_RET;

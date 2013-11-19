@@ -21,8 +21,6 @@ add_library(ModelViewGadget ${ModelViewGadget_SRCS})
 
 target_link_libraries(ModelViewGadget Core glc)
 
-add_dependencies(ModelViewGadget uavobject-synthetics)
-
 qt5_use_modules(ModelViewGadget Widgets Svg OpenGL)
 
 configure_file(ModelViewGadget.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)

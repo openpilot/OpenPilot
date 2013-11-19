@@ -8,10 +8,11 @@ foreach(uavobjxml ${uavobjgcs_XMLS})
     set(uavobjgcs_SRCS ${uavobjgcs_SRCS} ${uavobjsrc})
 endforeach(uavobjxml)
 
-set(uavobjgcs_SRCS ${uavobjgcs_SRCS} ${PROJECT_BINARY_DIR}/uavobject-synthetics/gcs/uavobjectsinit.cpp) 
+set(uavobjgcs_SRCS ${uavobjgcs_SRCS} ${PROJECT_BINARY_DIR}/uavobject-synthetics/gcs/uavobjectsinit.cpp)
 
-add_custom_command (
+add_custom_command(
     OUTPUT ${uavobjgcs_SRCS}
-    COMMAND mkdir -p ${PROJECT_BINARY_DIR}/uavobject-synthetics
-    COMMAND cd ${PROJECT_BINARY_DIR}/uavobject-synthetics && ${PROJECT_BINARY_DIR}/ground/uavobjgenerator/uavobjgenerator ${PROJECT_SOURCE_DIR}/shared/uavobjectdefinition ${PROJECT_SOURCE_DIR} # ${PROJECT_BINARY_DIR}/uavobject-synthetics
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/uavobject-synthetics
+    COMMAND cd ${PROJECT_BINARY_DIR}/uavobject-synthetics && $<TARGET_FILE:uavobjgenerator> ${PROJECT_SOURCE_DIR}/shared/uavobjectdefinition ${PROJECT_SOURCE_DIR}
+    DEPENDS uavobjgenerator
 )

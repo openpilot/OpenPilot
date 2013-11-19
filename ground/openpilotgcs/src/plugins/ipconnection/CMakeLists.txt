@@ -15,5 +15,7 @@ target_link_libraries(IPconnection Core)
 
 qt5_use_modules(IPconnection Widgets)
 
+add_definitions(-DIPconnection_LIBRARY)
+
 configure_file(IPconnection.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
 

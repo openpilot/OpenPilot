@@ -14,9 +14,9 @@ add_library(UAVObjectWidgetUtils ${UAVObjectWidgetUtils_SRCS} ${uavobjsynthetics
 
 target_link_libraries(UAVObjectWidgetUtils Core UAVSettingsImportExport UAVTalk)
 
-add_dependencies(UAVObjectWidgetUtils uavobject-synthetics)
-
 qt5_use_modules(UAVObjectWidgetUtils Core Widgets)
+
+add_definitions(-DUAVOBJECTWIDGETUTILS_LIBRARY)
 
 configure_file(UAVObjectWidgetUtils.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
 

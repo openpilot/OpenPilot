@@ -1,5 +1,7 @@
 include_directories(3rdparty 3rdparty/zlib)
 
+add_definitions(-DGLC_LIB_LIBRARY -DCREATE_GLC_LIB_DLL -DLIB3DS_EXPORTS)
+
 set(glc_SRCS
     3rdparty/zlib/adler32.c
     3rdparty/zlib/compress.c
@@ -143,5 +145,9 @@ set(glc_SRCS
 )
 
 add_library(glc ${glc_SRCS})
+
+if(WIN32)
+    target_link_libraries(glc opengl32)
+endif()
 
 qt5_use_modules(glc Core Widgets OpenGL)

@@ -82,7 +82,7 @@ bool QtLockedFile::lock(LockMode mode, bool block)
 
         QT_WA({
                   m_semaphore_hnd = CreateSemaphoreW(0, SEMAPHORE_MAX, SEMAPHORE_MAX,
-                                                     (TCHAR *)sem_name.utf16());
+                                                     (LPCWSTR)sem_name.utf16());
               }, {
                   m_semaphore_hnd = CreateSemaphoreA(0, SEMAPHORE_MAX, SEMAPHORE_MAX,
                                                      sem_name.toLocal8Bit().constData());
@@ -107,7 +107,7 @@ bool QtLockedFile::lock(LockMode mode, bool block)
             QString mut_name = QString::fromLatin1(MUTEX_PREFIX)
                                + fi.absoluteFilePath().toLower();
             QT_WA({
-                      m_mutex_hnd = CreateMutexW(NULL, FALSE, (TCHAR *)mut_name.utf16());
+                      m_mutex_hnd = CreateMutexW(NULL, FALSE, (LPCWSTR)mut_name.utf16());
                   }, {
                       m_mutex_hnd = CreateMutexA(NULL, FALSE, mut_name.toLocal8Bit().constData());
                   }

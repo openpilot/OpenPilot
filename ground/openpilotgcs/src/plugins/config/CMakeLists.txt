@@ -70,4 +70,6 @@ target_link_libraries(Config Core UAVObjectWidgetUtils)
 
 qt5_use_modules(Config Widgets Xml)
 
+add_definitions(-DCONFIG_LIBRARY)
+
 configure_file(Config.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)

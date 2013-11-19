@@ -65,4 +65,6 @@ qt5_add_resources(opmapcontrol_SRCS
 
 add_library(opmapcontrol ${opmapcontrol_SRCS} ${opmapcontrol_ITFS})
 
-qt5_use_modules(opmapcontrol Widgets)
+qt5_use_modules(opmapcontrol Core Widgets Network Sql OpenGL Svg)
+
+target_link_libraries(opmapcontrol utils)

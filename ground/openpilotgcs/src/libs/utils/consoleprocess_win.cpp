@@ -115,7 +115,7 @@ bool ConsoleProcess::start(const QString &program, const QStringList &args)
     bool success = CreateProcessW(0, (WCHAR *)cmdLine.utf16(),
                                   0, 0, FALSE, CREATE_NEW_CONSOLE,
                                   0, 0,
-                                  &si, m_pid);
+                                  (LPSTARTUPINFOW)&si, m_pid);
 
     if (!success) {
         delete m_pid;

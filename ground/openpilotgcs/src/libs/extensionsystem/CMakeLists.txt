@@ -1,5 +1,6 @@
 include_directories(..)
 
+add_definitions(-DEXTENSIONSYSTEM_LIBRARY)
 add_definitions(-DGCS_TEST_DIR="${PROJECT_SOURCE_DIR}")
 
 set(extensionsystem_SRCS

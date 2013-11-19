@@ -26,7 +26,7 @@ add_library(GpsDisplayGadget ${GpsDisplayGadget_SRCS})
 
 target_link_libraries(GpsDisplayGadget Core)
 
-qt5_use_modules(GpsDisplayGadget Widgets)
+qt5_use_modules(GpsDisplayGadget Widgets SerialPort)
 
 configure_file(GpsDisplayGadget.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
 

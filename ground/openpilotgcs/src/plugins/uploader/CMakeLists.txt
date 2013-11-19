@@ -30,4 +30,6 @@ qt5_use_modules(Uploader Widgets SerialPort)
 
 target_link_libraries(Uploader Core UAVObjects UAVObjectUtil UAVTalk opHID)
 
+add_definitions(-DUPLOADER_LIBRARY)
+
 configure_file(Uploader.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)

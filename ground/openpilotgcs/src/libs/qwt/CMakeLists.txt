@@ -63,4 +63,4 @@ set(qwt_SRCS
 
 add_library(qwt ${qwt_SRCS})
 
-qt5_use_modules(qwt Core Widgets)
+qt5_use_modules(qwt Core Widgets PrintSupport)

@@ -13,9 +13,7 @@ qt5_wrap_ui(PfdQml_SRCS
 
 add_library(PfdQml ${PfdQml_SRCS})
 
-target_link_libraries(PfdQml Core UAVObjects)
-
-add_dependencies(PfdQml uavobject-synthetics)
+target_link_libraries(PfdQml Core)
 
 qt5_use_modules(PfdQml Widgets Svg)
 

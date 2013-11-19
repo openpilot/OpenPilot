@@ -6,6 +6,10 @@ include_directories(
     ${PROJECT_BINARY_DIR}/uavobject-synthetics/gcs
 )
 
+if(MINGW)
+    include_directories(${PROJECT_BINARY_DIR}/tools/qt-5.1.1/Tools/mingw48_32/i686-w64-mingw32/include)
+endif()
+
 set(BUILD_SHARED_LIBS ON)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins)
 

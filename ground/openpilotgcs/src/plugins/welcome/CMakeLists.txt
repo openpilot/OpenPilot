@@ -11,5 +11,7 @@ qt5_use_modules(Welcome Widgets)
 
 target_link_libraries(Welcome Core)
 
+add_definitions(-DWELCOME_LIBRARY)
+
 configure_file(Welcome.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
 

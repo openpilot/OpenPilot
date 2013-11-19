@@ -88,13 +88,13 @@ QTCREATOR_UTILS_EXPORT QString winGetDLLVersion(WinDLLVersionType t,
     }
     QByteArray dataV(infoSize + 1, '\0');
     char *data = dataV.data();
-    if (!(*getFileVersionInfoW)(fileName, dummy, infoSize, data)) {
+    if (!(*getFileVersionInfoW)((LPCWSTR)fileName, dummy, infoSize, data)) {
         *errorMessage = QString::fromLatin1("Unable to determine the version information of %1: %2").arg(name, winErrorMessage(GetLastError()));
         return QString();
     }
     VS_FIXEDFILEINFO *versionInfo;
     UINT len = 0;
-    if (!(*verQueryValueW)(data, TEXT("\\"), &versionInfo, &len)) {
+    if (!(*verQueryValueW)(data, (LPWSTR)TEXT("\\"), &versionInfo, &len)) {
         *errorMessage = QString::fromLatin1("Unable to determine version string of %1: %2").arg(name, winErrorMessage(GetLastError()));
         return QString();
     }

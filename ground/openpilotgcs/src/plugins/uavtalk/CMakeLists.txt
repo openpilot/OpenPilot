@@ -14,5 +14,7 @@ qt5_use_modules(UAVTalk Widgets)
 
 target_link_libraries(UAVTalk Core UAVObjectBrowser)
 
+add_definitions(-DUAVTALK_LIBRARY)
+
 configure_file(UAVTalk.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
 

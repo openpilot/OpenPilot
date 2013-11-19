@@ -18,7 +18,7 @@ qt5_add_resources(gcs_SRCS
 
 add_executable(openpilotgcs ${gcs_SRCS})
 
-target_link_libraries(openpilotgcs ExtensionSystem sharedtools version_info gcsutils)
+target_link_libraries(openpilotgcs ExtensionSystem sharedtools version_info utils)
 
 qt5_use_modules(openpilotgcs Widgets Xml)
 

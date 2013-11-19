@@ -23,11 +23,9 @@ qt5_add_resources(UAVObjectBrowser_SRCS uavobjectbrowser.qrc)
 
 add_library(UAVObjectBrowser ${UAVObjectBrowser_SRCS})
 
-add_dependencies(UAVObjectBrowser Core uavobject-synthetics)
-
 qt5_use_modules(UAVObjectBrowser Widgets)
 
-target_link_libraries(UAVObjectBrowser Core UAVObjects)
+target_link_libraries(UAVObjectBrowser Core QScienceSpinBox)
 
 configure_file(UAVObjectBrowser.pluginspec ${PROJECT_BINARY_DIR}/ground/openpilotgcs/src/plugins/ COPYONLY)
 

@@ -27,7 +27,8 @@
 #include "modeluavoproxy.h"
 #include "extensionsystem/pluginmanager.h"
 #include <math.h>
-modelUavoProxy::modelUavoProxy(QObject *parent, flightDataModel *model) : QObject(parent), myModel(model)
+
+ModelUavoProxy::ModelUavoProxy(QObject *parent, flightDataModel *model) : QObject(parent), myModel(model)
 {
     ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
 
@@ -39,86 +40,152 @@ modelUavoProxy::modelUavoProxy(QObject *parent, flightDataModel *model) : QObjec
     pathactionObj = PathAction::GetInstance(objManager);
     Q_ASSERT(pathactionObj != NULL);
 }
-void modelUavoProxy::modelToObjects()
+
+void ModelUavoProxy::modelToObjects()
 {
-    PathAction *act = NULL;
-    Waypoint *wp    = NULL;
-    QModelIndex index;
-    double distance;
-    double bearing;
-    double altitude;
-    int lastaction = -1;
+    qDebug() << "ModelUAVProxy::modelToObjects";
+    // update waypoint and path actions UAV objects
+    // waypoints are unique and each waypoint has an entry in the UAV waypoint list
+    // a path action can be referenced by multiple waypoints
+    // waypoints reference path action by their index in the UAV path action list
+    // the factoring of path actions (to remove duplicates) happens here...
 
-    for (int x = 0; x < myModel->rowCount(); ++x) {
-        int instances = objManager->getNumInstances(waypointObj->getObjID());
-        if (x > instances - 1) {
-            wp = new Waypoint;
-            wp->initialize(x, wp->getMetaObject());
-            objManager->registerObject(wp);
-        } else {
-            wp = Waypoint::GetInstance(objManager, x);
+    // the UAV waypoint list and path action list are probably not empty
+    // so we try to reuse existing instances
+
+    // track number of path actions
+    int actionCount = 0;
+
+    // iterate over waypoints
+    for (int i = 0; i < myModel->rowCount(); ++i) {
+
+        // Path Actions
+
+        // create action to use as a search criteria
+        // this object does not need to be deleted as it will either be added to the managed list or deleted later
+        PathAction *action = new PathAction;
+
+        // get model data
+        PathAction::DataFields actionData = action->getData();
+        modelToPathAction(i, actionData);
+
+        // see if that path action has already been added in this run
+        PathAction *foundAction = findPathAction(actionData, actionCount);
+        // TODO this test needs a consistency check as it is unsafe.
+        // if the find method is buggy and returns false positives then the flight plan sent to the uav is broken!
+        // the find method should do a "binary" compare instead of a field by field compare
+        // if a field is added everywhere and not in the compare method then you can start having false positives
+        if (!foundAction) {
+            // create or reuse an action instance
+            action = createPathAction(actionCount, action);
+            actionCount++;
+
+            // send action update to UAV
+            action->setData(actionData);
+            qDebug() << "ModelUAVProxy::modelToObjects - sent action instance :" << action->getInstID();
         }
-        act = new PathAction;
-        Q_ASSERT(act);
-        Q_ASSERT(wp);
-        Waypoint::DataFields waypoint = wp->getData();
-        PathAction::DataFields action = act->getData();
-
-        ///Waypoint object data
-        index    = myModel->index(x, flightDataModel::DISRELATIVE);
-        distance = myModel->data(index).toDouble();
-        index    = myModel->index(x, flightDataModel::BEARELATIVE);
-        bearing  = myModel->data(index).toDouble();
-        index    = myModel->index(x, flightDataModel::ALTITUDERELATIVE);
-        altitude = myModel->data(index).toFloat();
-        index    = myModel->index(x, flightDataModel::VELOCITY);
-        waypoint.Velocity = myModel->data(index).toFloat();
-
-        waypoint.Position[Waypoint::POSITION_NORTH] = distance * cos(bearing / 180 * M_PI);
-        waypoint.Position[Waypoint::POSITION_EAST]  = distance * sin(bearing / 180 * M_PI);
-        waypoint.Position[Waypoint::POSITION_DOWN]  = (-1.0f) * altitude;
-
-        ///PathAction object data
-        index = myModel->index(x, flightDataModel::MODE);
-        action.Mode = myModel->data(index).toInt();
-        index = myModel->index(x, flightDataModel::MODE_PARAMS0);
-        action.ModeParameters[0] = myModel->data(index).toFloat();
-        index = myModel->index(x, flightDataModel::MODE_PARAMS1);
-        action.ModeParameters[1] = myModel->data(index).toFloat();
-        index = myModel->index(x, flightDataModel::MODE_PARAMS2);
-        action.ModeParameters[2] = myModel->data(index).toFloat();
-        index = myModel->index(x, flightDataModel::MODE_PARAMS3);
-        action.ModeParameters[3] = myModel->data(index).toFloat();
-
-        index = myModel->index(x, flightDataModel::CONDITION);
-        action.EndCondition = myModel->data(index).toInt();
-        index = myModel->index(x, flightDataModel::CONDITION_PARAMS0);
-        action.ConditionParameters[0] = myModel->data(index).toFloat();
-        index = myModel->index(x, flightDataModel::CONDITION_PARAMS1);
-        action.ConditionParameters[1] = myModel->data(index).toFloat();
-        index = myModel->index(x, flightDataModel::CONDITION_PARAMS2);
-        action.ConditionParameters[2] = myModel->data(index).toFloat();
-        index = myModel->index(x, flightDataModel::CONDITION_PARAMS3);
-        action.ConditionParameters[3] = myModel->data(index).toFloat();
-
-        index = myModel->index(x, flightDataModel::COMMAND);
-        action.Command = myModel->data(index).toInt();
-        index = myModel->index(x, flightDataModel::JUMPDESTINATION);
-        action.JumpDestination = myModel->data(index).toInt() - 1;
-        index = myModel->index(x, flightDataModel::ERRORDESTINATION);
-        action.ErrorDestination = myModel->data(index).toInt() - 1;
-
-        int actionNumber = addAction(act, action, lastaction);
-        if (actionNumber > lastaction) {
-            lastaction = actionNumber;
+        else {
+            action->deleteLater();
+            action = foundAction;
+            qDebug() << "ModelUAVProxy::modelToObjects - found action instance :" << action->getInstID();
         }
-        waypoint.Action = actionNumber;
-        wp->setData(waypoint);
-        wp->updated();
+
+        // Waypoints
+
+        // create or reuse a waypoint instance
+        Waypoint *waypoint = createWaypoint(i, NULL);
+        Q_ASSERT(waypoint);
+
+        // get model data
+        Waypoint::DataFields waypointData = waypoint->getData();
+        modelToWaypoint(i, waypointData);
+
+        // connect waypoint to path action
+        waypointData.Action = action->getInstID();
+
+        // send waypoint update to UAV
+        waypoint->setData(waypointData);
+        qDebug() << "ModelUAVProxy::modelToObjects - sent waypoint instance :" << waypoint->getInstID();
     }
 }
 
-void modelUavoProxy::objectsToModel()
+Waypoint *ModelUavoProxy::createWaypoint(int index, Waypoint *newWaypoint) {
+    Waypoint *waypoint = NULL;
+    int count = objManager->getNumInstances(waypointObj->getObjID());
+    if (index < count) {
+        // reuse object
+        qDebug() << "ModelUAVProxy::createWaypoint - reused waypoint instance :" << index << "/" << count;
+        waypoint = Waypoint::GetInstance(objManager, index);
+        if (newWaypoint) {
+            newWaypoint->deleteLater();
+        }
+    } else if (index < count + 1) {
+        // create "next" object
+        qDebug() << "ModelUAVProxy::createWaypoint - created waypoint instance :" << index;
+        // TODO is there a limit to the number of wp?
+        waypoint = newWaypoint ? newWaypoint : new Waypoint;
+        waypoint->initialize(index, waypoint->getMetaObject());
+        objManager->registerObject(waypoint);
+    }
+    else {
+        // we can only create the "next" object
+        // TODO fail in a clean way :(
+    }
+    return waypoint;
+}
+
+PathAction *ModelUavoProxy::createPathAction(int index, PathAction *newAction) {
+    PathAction *action = NULL;
+    int count = objManager->getNumInstances(waypointObj->getObjID());
+    if (index < count) {
+        // reuse object
+        qDebug() << "ModelUAVProxy::createPathAction - reused action instance :" << index << "/" << count;
+        action = PathAction::GetInstance(objManager, index);
+        if (newAction) {
+            newAction->deleteLater();
+        }
+    } else if (index < count + 1) {
+        // create "next" object
+        qDebug() << "ModelUAVProxy::createPathAction - created action instance :" << index;
+        // TODO is there a limit to the number of path actions?
+        action = newAction ? newAction : new PathAction;
+        action->initialize(index, action->getMetaObject());
+        objManager->registerObject(action);
+    }
+    else {
+        // we can only create the "next" object
+        // TODO fail in a clean way :(
+    }
+    return action;
+}
+
+PathAction *ModelUavoProxy::findPathAction(const PathAction::DataFields& actionData, int actionCount) {
+    int instancesCount = objManager->getNumInstances(pathactionObj->getObjID());
+    int count = actionCount <= instancesCount ? actionCount : instancesCount;
+    for (int i = 0; i < count; ++i) {
+        PathAction *action = PathAction::GetInstance(objManager, i);
+        Q_ASSERT(action);
+        if (!action) {
+            continue;
+        }
+        PathAction::DataFields fields = action->getData();
+        if (fields.Command == actionData.Command
+                && fields.ConditionParameters[0] == actionData.ConditionParameters[0]
+                && fields.ConditionParameters[1] == actionData.ConditionParameters[1]
+                && fields.ConditionParameters[2] == actionData.ConditionParameters[2]
+                && fields.EndCondition == actionData.EndCondition
+                && fields.ErrorDestination == actionData.ErrorDestination
+                && fields.JumpDestination == actionData.JumpDestination && fields.Mode == actionData.Mode
+                && fields.ModeParameters[0] == actionData.ModeParameters[0]
+                && fields.ModeParameters[1] == actionData.ModeParameters[1]
+                && fields.ModeParameters[2] == actionData.ModeParameters[2]) {
+            return action;
+        }
+    }
+    return NULL;
+}
+
+void ModelUavoProxy::objectsToModel()
 {
     Waypoint *wp;
     Waypoint::DataFields wpfields;
@@ -152,7 +219,7 @@ void modelUavoProxy::objectsToModel()
         index  = myModel->index(x, flightDataModel::BEARELATIVE);
         myModel->setData(index, bearing);
         index  = myModel->index(x, flightDataModel::ALTITUDERELATIVE);
-        myModel->setData(index, (-1.0f) * wpfields.Position[Waypoint::POSITION_DOWN]);
+        myModel->setData(index, -wpfields.Position[Waypoint::POSITION_DOWN]);
 
         action = PathAction::GetInstance(objManager, wpfields.Action);
         Q_ASSERT(action);
@@ -198,50 +265,51 @@ void modelUavoProxy::objectsToModel()
         myModel->setData(index, actionfields.ModeParameters[3]);
     }
 }
-int modelUavoProxy::addAction(PathAction *actionObj, PathAction::DataFields actionFields, int lastaction)
-{
-    // check if a similar action already exhists
-    int instances = objManager->getNumInstances(pathactionObj->getObjID());
 
-    for (int x = 0; x < lastaction + 1; ++x) {
-        PathAction *action = PathAction::GetInstance(objManager, x);
-        Q_ASSERT(action);
-        if (!action) {
-            continue;
-        }
-        PathAction::DataFields fields = action->getData();
-        if (fields.Command == actionFields.Command
-            && fields.ConditionParameters[0] == actionFields.ConditionParameters[0]
-            && fields.ConditionParameters[1] == actionFields.ConditionParameters[1]
-            && fields.ConditionParameters[2] == actionFields.ConditionParameters[2]
-            && fields.EndCondition == actionFields.EndCondition
-            && fields.ErrorDestination == actionFields.ErrorDestination
-            && fields.JumpDestination == actionFields.JumpDestination
-            && fields.Mode == actionFields.Mode
-            && fields.ModeParameters[0] == actionFields.ModeParameters[0]
-            && fields.ModeParameters[1] == actionFields.ModeParameters[1]
-            && fields.ModeParameters[2] == actionFields.ModeParameters[2]) {
-            qDebug() << "ModelUAVProxy:" << "found similar action instance:" << x;
-            actionObj->deleteLater();
-            return x;
-        }
-    }
-    // if we get here it means no similar action was found, we have to create it
-    if (instances < lastaction + 2) {
-        actionObj->initialize(instances, actionObj->getMetaObject());
-        objManager->registerObject(actionObj);
-        actionObj->setData(actionFields);
-        actionObj->updated();
-        qDebug() << "ModelUAVProxy:" << "created new action instance:" << instances;
-        return lastaction + 1;
-    } else {
-        PathAction *action = PathAction::GetInstance(objManager, lastaction + 1);
-        Q_ASSERT(action);
-        action->setData(actionFields);
-        action->updated();
-        actionObj->deleteLater();
-        qDebug() << "ModelUAVProxy:" << "reused action instance:" << lastaction + 1;
-        return lastaction + 1;
-    }
-    return -1; // error we should never get here
+void ModelUavoProxy::modelToPathAction(int i, PathAction::DataFields &data) {
+    QModelIndex index = myModel->index(i, flightDataModel::MODE);
+    data.Mode = myModel->data(index).toInt();
+    index = myModel->index(i, flightDataModel::MODE_PARAMS0);
+    data.ModeParameters[0] = myModel->data(index).toFloat();
+    index = myModel->index(i, flightDataModel::MODE_PARAMS1);
+    data.ModeParameters[1] = myModel->data(index).toFloat();
+    index = myModel->index(i, flightDataModel::MODE_PARAMS2);
+    data.ModeParameters[2] = myModel->data(index).toFloat();
+    index = myModel->index(i, flightDataModel::MODE_PARAMS3);
+    data.ModeParameters[3] = myModel->data(index).toFloat();
+    index = myModel->index(i, flightDataModel::CONDITION);
+    data.EndCondition = myModel->data(index).toInt();
+    index = myModel->index(i, flightDataModel::CONDITION_PARAMS0);
+    data.ConditionParameters[0] = myModel->data(index).toFloat();
+    index = myModel->index(i, flightDataModel::CONDITION_PARAMS1);
+    data.ConditionParameters[1] = myModel->data(index).toFloat();
+    index = myModel->index(i, flightDataModel::CONDITION_PARAMS2);
+    data.ConditionParameters[2] = myModel->data(index).toFloat();
+    index = myModel->index(i, flightDataModel::CONDITION_PARAMS3);
+    data.ConditionParameters[3] = myModel->data(index).toFloat();
+    index = myModel->index(i, flightDataModel::COMMAND);
+    data.Command = myModel->data(index).toInt();
+    index = myModel->index(i, flightDataModel::JUMPDESTINATION);
+    data.JumpDestination = myModel->data(index).toInt() - 1;
+    index = myModel->index(i, flightDataModel::ERRORDESTINATION);
+    data.ErrorDestination = myModel->data(index).toInt() - 1;
 }
+
+void ModelUavoProxy::modelToWaypoint(int i, Waypoint::DataFields &data) {
+    double distance, bearing, altitude, velocity;
+
+    QModelIndex index = myModel->index(i, flightDataModel::DISRELATIVE);
+    distance = myModel->data(index).toDouble();
+    index    = myModel->index(i, flightDataModel::BEARELATIVE);
+    bearing  = myModel->data(index).toDouble();
+    index    = myModel->index(i, flightDataModel::ALTITUDERELATIVE);
+    altitude = myModel->data(index).toFloat();
+    index    = myModel->index(i, flightDataModel::VELOCITY);
+    velocity = myModel->data(index).toFloat();
+
+    data.Position[Waypoint::POSITION_NORTH] = distance * cos(bearing / 180 * M_PI);
+    data.Position[Waypoint::POSITION_EAST]  = distance * sin(bearing / 180 * M_PI);
+    data.Position[Waypoint::POSITION_DOWN]  = -altitude;
+    data.Velocity = velocity;
+}
+

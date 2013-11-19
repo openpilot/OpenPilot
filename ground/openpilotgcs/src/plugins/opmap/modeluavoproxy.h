@@ -32,19 +32,28 @@
 #include "pathaction.h"
 #include "waypoint.h"
 
-class modelUavoProxy : public QObject {
+class ModelUavoProxy : public QObject {
     Q_OBJECT
+
 public:
-    explicit modelUavoProxy(QObject *parent, flightDataModel *model);
-    int addAction(PathAction *actionObj, PathAction::DataFields actionFields, int lastaction);
+    explicit ModelUavoProxy(QObject *parent, flightDataModel *model);
+
 public slots:
     void modelToObjects();
     void objectsToModel();
+
 private:
     UAVObjectManager *objManager;
     Waypoint *waypointObj;
     PathAction *pathactionObj;
     flightDataModel *myModel;
+
+    Waypoint *createWaypoint(int index, Waypoint *newWaypoint);
+    void modelToWaypoint(int i, Waypoint::DataFields &waypointData);
+
+    PathAction *findPathAction(const PathAction::DataFields& actionFields, int actionCount);
+    PathAction *createPathAction(int index, PathAction *newAction);
+    void modelToPathAction(int i, PathAction::DataFields &actionData);
 };
 
 #endif // MODELUAVOPROXY_H

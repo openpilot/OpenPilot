@@ -225,7 +225,7 @@ OPMapGadgetWidget::OPMapGadgetWidget(QWidget *parent) : QWidget(parent)
     mapProxy = new modelMapProxy(this, m_map, model, selectionModel);
     table->setModel(model, selectionModel);
     waypoint_edit_dialog = new opmap_edit_waypoint_dialog(this, model, selectionModel);
-    UAVProxy = new modelUavoProxy(this, model);
+    UAVProxy = new ModelUavoProxy(this, model);
     connect(table, SIGNAL(sendPathPlanToUAV()), UAVProxy, SLOT(modelToObjects()));
     connect(table, SIGNAL(receivePathPlanFromUAV()), UAVProxy, SLOT(objectsToModel()));
 #endif

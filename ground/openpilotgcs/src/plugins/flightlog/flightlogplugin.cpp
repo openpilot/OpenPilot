@@ -35,10 +35,13 @@
 
 FlightLogPlugin::FlightLogPlugin()
 {
+    m_manager = new FlightLogManager();
 }
 
 FlightLogPlugin::~FlightLogPlugin()
 {
+    delete m_manager;
+    m_manager = 0;
 }
 
 bool FlightLogPlugin::initialize(const QStringList & args, QString *errMsg)
@@ -51,17 +54,17 @@ bool FlightLogPlugin::initialize(const QStringList & args, QString *errMsg)
     Core::ActionContainer *ac = am->actionContainer(Core::Constants::M_TOOLS);
 
     Core::Command *cmd = am->registerAction(new QAction(this),
-                                            "FlightLogPlugin.ShowLogManagementDialog",
+                                            "FlightLogPlugin.ShowFlightLogDialog",
                                             QList<int>() <<
                                             Core::Constants::C_GLOBAL_ID);
     cmd->setDefaultKeySequence(QKeySequence("Ctrl+F"));
-    cmd->action()->setText(tr("Manage flight side logs"));
+    cmd->action()->setText(tr("Manage flight side logs..."));
 
     Core::ModeManager::instance()->addAction(cmd, 1);
 
     ac->menu()->addSeparator();
-    ac->appendGroup("Logs");
-    ac->addAction(cmd, "Logs");
+    ac->appendGroup("FlightLogs");
+    ac->addAction(cmd, "FlightLogs");
 
     connect(cmd->action(), SIGNAL(triggered(bool)), this, SLOT(ShowLogManagementDialog()));
     return true;

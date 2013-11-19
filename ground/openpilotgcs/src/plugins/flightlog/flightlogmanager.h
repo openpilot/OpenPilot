@@ -1,11 +1,13 @@
 /**
  ******************************************************************************
  *
- * @file       flightlogplugin.h
- * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2010.
- * @addtogroup GCSPlugins GCS Plugins
+ * @file       flightlogmanager.h
+ * @author     The OpenPilot Team, http://www.openpilot.org Copyright (C) 2012.
+ * @addtogroup [Group]
  * @{
- * @brief A plugin to view and download flight side logs.
+ * @addtogroup FlightLogManager
+ * @{
+ * @brief [Brief]
  *****************************************************************************/
 /*
  * This program is free software; you can redistribute it and/or modify
@@ -23,31 +25,21 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef FLIGHTLOGPLUGIN_H_
-#define FLIGHTLOGPLUGIN_H_
+#ifndef FLIGHTLOGMANAGER_H
+#define FLIGHTLOGMANAGER_H
 
-#include <extensionsystem/iplugin.h>
-#include "flightlogmanager.h"
+#include <QObject>
 
-class FlightLogPlugin : public ExtensionSystem::IPlugin {
+class FlightLogManager : public QObject
+{
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "OpenPilot.FlightLog")
-
 public:
-    FlightLogPlugin();
-    ~FlightLogPlugin();
+    explicit FlightLogManager(QObject *parent = 0);
 
-    void extensionsInitialized();
-    bool initialize(const QStringList & arguments, QString *errorString);
-    void shutdown();
+signals:
 
-private:
-    FlightLogManager* m_manager;
+public slots:
 
-private slots:
-    void ShowLogManagementDialog();
-
-private:
 };
 
-#endif /* FLIGHTLOGPLUGIN_H_ */
+#endif // FLIGHTLOGMANAGER_H

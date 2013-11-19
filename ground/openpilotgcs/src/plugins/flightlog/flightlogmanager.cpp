@@ -27,13 +27,30 @@
 
 #include "flightlogmanager.h"
 
-FlightLogManager::FlightLogManager(QObject *parent) :
+FlightLogEntry::FlightLogEntry(QObject *parent) :
     QObject(parent)
 {
 
 }
 
-FlightLogManager::~FlightLogManager()
+FlightLogEntry::~FlightLogEntry()
 {
+
+}
+
+FlightLogManager::FlightLogManager(QObject *parent) :
+    QObject(parent) {
+
+}
+
+FlightLogManager::~FlightLogManager() {
+
+}
+
+void FlightLogManager::clearAllLogs() {
+
+}
+
+void FlightLogManager::retrieveLogs(int flight) {
 
 }

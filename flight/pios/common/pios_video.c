@@ -186,7 +186,8 @@ static void reset_hsync_timers()
         }
     }
 
-    dev_cfg->pixel_timer.timer->CNT = 0xFFFF - 100; // dc;
+    dev_cfg->pixel_timer.timer->CNT = dc;
+
 
     // Listen to Channel1 (HSYNC)
     switch (dev_cfg->hsync_capture.timer_chan) {

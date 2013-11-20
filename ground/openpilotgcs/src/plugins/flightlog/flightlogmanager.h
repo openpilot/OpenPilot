@@ -29,7 +29,8 @@
 #define FLIGHTLOGMANAGER_H
 
 #include <QObject>
-#include <QtDeclarative/QDeclarativeListProperty>
+#include <QList>
+#include <QQmlListProperty>
 
 #include "uavobjectmanager.h"
 #include "debuglogentry.h"
@@ -37,21 +38,18 @@
 
 class FlightLogManager : public QObject {
     Q_OBJECT
-    Q_PROPERTY(DebugLogStatus * flightLogStatus READ flightLogStatus)
-    Q_PROPERTY(QDeclarativeListProperty<DebugLogEntry *> *logEntries READ logEntries)
+    Q_PROPERTY(DebugLogStatus *flightLogStatus READ flightLogStatus)
+    Q_PROPERTY(QQmlListProperty<DebugLogEntry> logEntries READ logEntries CONSTANT)
 
 public:
     explicit FlightLogManager(QObject *parent = 0);
     ~FlightLogManager();
 
+    QQmlListProperty<DebugLogEntry> logEntries();
+
     DebugLogStatus* flightLogStatus() const
     {
         return m_flightLogStatus;
-    }
-
-    QDeclarativeListProperty<DebugLogEntry *>* logEntries() const
-    {
-        return m_records;
     }
 
 signals:
@@ -63,7 +61,8 @@ public slots:
 private:
     UAVObjectManager *m_objectManager;
     DebugLogStatus *m_flightLogStatus;
-    QDeclarativeListProperty<DebugLogEntry *> *m_records;
+    QList<DebugLogEntry *> m_logEntries;
+
 };
 
 #endif // FLIGHTLOGMANAGER_H

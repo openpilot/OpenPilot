@@ -41,6 +41,7 @@ FlightLogPlugin::FlightLogPlugin() : m_logDialog(0)
 
 FlightLogPlugin::~FlightLogPlugin()
 {
+    shutdown();
 }
 
 bool FlightLogPlugin::initialize(const QStringList & args, QString *errMsg)
@@ -81,6 +82,7 @@ void FlightLogPlugin::ShowLogManagementDialog()
 void FlightLogPlugin::LogManagementDialogClosed()
 {
     if(m_logDialog) {
+        m_logDialog->deleteLater();
         m_logDialog = 0;
     }
 }
@@ -91,4 +93,8 @@ void FlightLogPlugin::extensionsInitialized()
 
 void FlightLogPlugin::shutdown()
 {
+    if(m_logDialog) {
+        m_logDialog->close();
+        LogManagementDialogClosed();
+    }
 }

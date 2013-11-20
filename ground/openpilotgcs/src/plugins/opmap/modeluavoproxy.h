@@ -49,11 +49,13 @@ private:
     flightDataModel *myModel;
 
     Waypoint *createWaypoint(int index, Waypoint *newWaypoint);
-    void modelToWaypoint(int i, Waypoint::DataFields &waypointData);
+    void modelToWaypoint(int i, Waypoint::DataFields &data);
+    void waypointToModel(int i, Waypoint::DataFields &data);
 
     PathAction *findPathAction(const PathAction::DataFields& actionFields, int actionCount);
     PathAction *createPathAction(int index, PathAction *newAction);
-    void modelToPathAction(int i, PathAction::DataFields &actionData);
+    void modelToPathAction(int i, PathAction::DataFields &data);
+    void pathActionToModel(int i, PathAction::DataFields &data);
 };
 
 #endif // MODELUAVOPROXY_H

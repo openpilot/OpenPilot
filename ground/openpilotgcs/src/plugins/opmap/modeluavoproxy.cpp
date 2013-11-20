@@ -138,7 +138,7 @@ Waypoint *ModelUavoProxy::createWaypoint(int index, Waypoint *newWaypoint) {
 
 PathAction *ModelUavoProxy::createPathAction(int index, PathAction *newAction) {
     PathAction *action = NULL;
-    int count = objManager->getNumInstances(actionObj->getObjID());
+    int count = objManager->getNumInstances(pathactionObj->getObjID());
     if (index < count) {
         // reuse object
         qDebug() << "ModelUAVProxy::createPathAction - reused action instance :" << index << "/" << count;
@@ -161,7 +161,7 @@ PathAction *ModelUavoProxy::createPathAction(int index, PathAction *newAction) {
     return action;
 }
 
-PathAction *ModelUavoProxy::findPathAction(const PathAction::DataFields& actionData, int actionCount) {
+PathAction *ModelUavoProxy::findPathAction(const PathAction::DataFields &actionData, int actionCount) {
     int instancesCount = objManager->getNumInstances(pathactionObj->getObjID());
     int count = actionCount <= instancesCount ? actionCount : instancesCount;
     for (int i = 0; i < count; ++i) {
@@ -189,83 +189,69 @@ PathAction *ModelUavoProxy::findPathAction(const PathAction::DataFields& actionD
 
 void ModelUavoProxy::objectsToModel()
 {
-    Waypoint *wp;
-    Waypoint::DataFields wpfields;
-    PathAction *action;
-    QModelIndex index;
-    double distance;
-    double bearing;
-
-    PathAction::DataFields actionfields;
-
     myModel->removeRows(0, myModel->rowCount());
-    for (int x = 0; x < objManager->getNumInstances(waypointObj->getObjID()); ++x) {
-        wp = Waypoint::GetInstance(objManager, x);
-        Q_ASSERT(wp);
-        if (!wp) {
+
+    int instanceCount = objManager->getNumInstances(waypointObj->getObjID());
+    for (int i = 0; i < instanceCount; ++i) {
+        Waypoint *waypoint = Waypoint::GetInstance(objManager, i);
+        Q_ASSERT(waypoint);
+        if (!waypoint) {
             continue;
         }
-        wpfields = wp->getData();
-        myModel->insertRow(x);
-        index    = myModel->index(x, flightDataModel::VELOCITY);
-        myModel->setData(index, wpfields.Velocity);
-        distance = sqrt(wpfields.Position[Waypoint::POSITION_NORTH] * wpfields.Position[Waypoint::POSITION_NORTH] +
-                        wpfields.Position[Waypoint::POSITION_EAST] * wpfields.Position[Waypoint::POSITION_EAST]);
-        bearing  = atan2(wpfields.Position[Waypoint::POSITION_EAST], wpfields.Position[Waypoint::POSITION_NORTH]) * 180 / M_PI;
+        myModel->insertRow(i);
 
-        if (bearing != bearing) {
-            bearing = 0;
-        }
-        index  = myModel->index(x, flightDataModel::DISRELATIVE);
-        myModel->setData(index, distance);
-        index  = myModel->index(x, flightDataModel::BEARELATIVE);
-        myModel->setData(index, bearing);
-        index  = myModel->index(x, flightDataModel::ALTITUDERELATIVE);
-        myModel->setData(index, -wpfields.Position[Waypoint::POSITION_DOWN]);
+        Waypoint::DataFields waypointData = waypoint->getData();
+        waypointToModel(i, waypointData);
 
-        action = PathAction::GetInstance(objManager, wpfields.Action);
+        PathAction *action = PathAction::GetInstance(objManager, waypointData.Action);
         Q_ASSERT(action);
         if (!action) {
             continue;
         }
-        actionfields = action->getData();
 
-        index = myModel->index(x, flightDataModel::ISRELATIVE);
-        myModel->setData(index, true);
-
-        index = myModel->index(x, flightDataModel::COMMAND);
-        myModel->setData(index, actionfields.Command);
-
-        index = myModel->index(x, flightDataModel::CONDITION_PARAMS0);
-        myModel->setData(index, actionfields.ConditionParameters[0]);
-        index = myModel->index(x, flightDataModel::CONDITION_PARAMS1);
-        myModel->setData(index, actionfields.ConditionParameters[1]);
-        index = myModel->index(x, flightDataModel::CONDITION_PARAMS2);
-        myModel->setData(index, actionfields.ConditionParameters[2]);
-        index = myModel->index(x, flightDataModel::CONDITION_PARAMS3);
-        myModel->setData(index, actionfields.ConditionParameters[3]);
-
-        index = myModel->index(x, flightDataModel::CONDITION);
-        myModel->setData(index, actionfields.EndCondition);
-
-        index = myModel->index(x, flightDataModel::ERRORDESTINATION);
-        myModel->setData(index, actionfields.ErrorDestination + 1);
-
-        index = myModel->index(x, flightDataModel::JUMPDESTINATION);
-        myModel->setData(index, actionfields.JumpDestination + 1);
-
-        index = myModel->index(x, flightDataModel::MODE);
-        myModel->setData(index, actionfields.Mode);
-
-        index = myModel->index(x, flightDataModel::MODE_PARAMS0);
-        myModel->setData(index, actionfields.ModeParameters[0]);
-        index = myModel->index(x, flightDataModel::MODE_PARAMS1);
-        myModel->setData(index, actionfields.ModeParameters[1]);
-        index = myModel->index(x, flightDataModel::MODE_PARAMS2);
-        myModel->setData(index, actionfields.ModeParameters[2]);
-        index = myModel->index(x, flightDataModel::MODE_PARAMS3);
-        myModel->setData(index, actionfields.ModeParameters[3]);
+        PathAction::DataFields actionData = action->getData();
+        pathActionToModel(i, actionData);
     }
+}
+
+void ModelUavoProxy::modelToWaypoint(int i, Waypoint::DataFields &data) {
+    double distance, bearing, altitude, velocity;
+
+    QModelIndex index = myModel->index(i, flightDataModel::DISRELATIVE);
+    distance = myModel->data(index).toDouble();
+    index    = myModel->index(i, flightDataModel::BEARELATIVE);
+    bearing  = myModel->data(index).toDouble();
+    index    = myModel->index(i, flightDataModel::ALTITUDERELATIVE);
+    altitude = myModel->data(index).toFloat();
+    index    = myModel->index(i, flightDataModel::VELOCITY);
+    velocity = myModel->data(index).toFloat();
+
+    data.Position[Waypoint::POSITION_NORTH] = distance * cos(bearing / (180 * M_PI));
+    data.Position[Waypoint::POSITION_EAST]  = distance * sin(bearing / (180 * M_PI));
+    data.Position[Waypoint::POSITION_DOWN]  = -altitude;
+    data.Velocity = velocity;
+}
+
+void ModelUavoProxy::waypointToModel(int i, Waypoint::DataFields &data) {
+
+    double distance = sqrt(data.Position[Waypoint::POSITION_NORTH] * data.Position[Waypoint::POSITION_NORTH] +
+                    data.Position[Waypoint::POSITION_EAST] * data.Position[Waypoint::POSITION_EAST]);
+
+    double bearing  = atan2(data.Position[Waypoint::POSITION_EAST], data.Position[Waypoint::POSITION_NORTH]) * (180 / M_PI);
+    if (bearing != bearing) {
+        bearing = 0;
+    }
+
+    double altitude = -data.Position[Waypoint::POSITION_DOWN];
+
+    QModelIndex index = myModel->index(i, flightDataModel::VELOCITY);
+    myModel->setData(index, data.Velocity);
+    index  = myModel->index(i, flightDataModel::DISRELATIVE);
+    myModel->setData(index, distance);
+    index  = myModel->index(i, flightDataModel::BEARELATIVE);
+    myModel->setData(index, bearing);
+    index  = myModel->index(i, flightDataModel::ALTITUDERELATIVE);
+    myModel->setData(index, altitude);
 }
 
 void ModelUavoProxy::modelToPathAction(int i, PathAction::DataFields &data) {
@@ -297,21 +283,40 @@ void ModelUavoProxy::modelToPathAction(int i, PathAction::DataFields &data) {
     data.ErrorDestination = myModel->data(index).toInt() - 1;
 }
 
-void ModelUavoProxy::modelToWaypoint(int i, Waypoint::DataFields &data) {
-    double distance, bearing, altitude, velocity;
+void ModelUavoProxy::pathActionToModel(int i, PathAction::DataFields &data) {
+    QModelIndex index = myModel->index(i, flightDataModel::ISRELATIVE);
+    myModel->setData(index, true);
 
-    QModelIndex index = myModel->index(i, flightDataModel::DISRELATIVE);
-    distance = myModel->data(index).toDouble();
-    index    = myModel->index(i, flightDataModel::BEARELATIVE);
-    bearing  = myModel->data(index).toDouble();
-    index    = myModel->index(i, flightDataModel::ALTITUDERELATIVE);
-    altitude = myModel->data(index).toFloat();
-    index    = myModel->index(i, flightDataModel::VELOCITY);
-    velocity = myModel->data(index).toFloat();
+    index = myModel->index(i, flightDataModel::COMMAND);
+    myModel->setData(index, data.Command);
 
-    data.Position[Waypoint::POSITION_NORTH] = distance * cos(bearing / 180 * M_PI);
-    data.Position[Waypoint::POSITION_EAST]  = distance * sin(bearing / 180 * M_PI);
-    data.Position[Waypoint::POSITION_DOWN]  = -altitude;
-    data.Velocity = velocity;
+    index = myModel->index(i, flightDataModel::CONDITION_PARAMS0);
+    myModel->setData(index, data.ConditionParameters[0]);
+    index = myModel->index(i, flightDataModel::CONDITION_PARAMS1);
+    myModel->setData(index, data.ConditionParameters[1]);
+    index = myModel->index(i, flightDataModel::CONDITION_PARAMS2);
+    myModel->setData(index, data.ConditionParameters[2]);
+    index = myModel->index(i, flightDataModel::CONDITION_PARAMS3);
+    myModel->setData(index, data.ConditionParameters[3]);
+
+    index = myModel->index(i, flightDataModel::CONDITION);
+    myModel->setData(index, data.EndCondition);
+
+    index = myModel->index(i, flightDataModel::ERRORDESTINATION);
+    myModel->setData(index, data.ErrorDestination + 1);
+
+    index = myModel->index(i, flightDataModel::JUMPDESTINATION);
+    myModel->setData(index, data.JumpDestination + 1);
+
+    index = myModel->index(i, flightDataModel::MODE);
+    myModel->setData(index, data.Mode);
+
+    index = myModel->index(i, flightDataModel::MODE_PARAMS0);
+    myModel->setData(index, data.ModeParameters[0]);
+    index = myModel->index(i, flightDataModel::MODE_PARAMS1);
+    myModel->setData(index, data.ModeParameters[1]);
+    index = myModel->index(i, flightDataModel::MODE_PARAMS2);
+    myModel->setData(index, data.ModeParameters[2]);
+    index = myModel->index(i, flightDataModel::MODE_PARAMS3);
+    myModel->setData(index, data.ModeParameters[3]);
 }
-

@@ -11,7 +11,6 @@ class FlightLogDialog : public QDialog
 public:
     explicit FlightLogDialog(QWidget *parent, FlightLogManager *flightLogManager);
     ~FlightLogDialog();
-
 };
 
 #endif // FLIGHTLOGDIALOG_H

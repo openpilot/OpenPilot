@@ -57,6 +57,7 @@ signals:
 public slots:
     void clearAllLogs();
     void retrieveLogs(int flight = -1);
+    void exportLogs();
 
 private:
     UAVObjectManager *m_objectManager;

@@ -10,6 +10,7 @@ Rectangle {
 
     ColumnLayout {
         anchors.fill: parent
+        anchors.margins: 10
         spacing: 10
         RowLayout {
             Layout.fillWidth: true
@@ -20,15 +21,18 @@ Rectangle {
                 height: 40
                 Text {
                     id: totalFlights
+                    font.pixelSize: 12
                     text: "<b>" + qsTr("Flights recorded: ") + "</b>" + logStatus.Flight
                 }
                 Text {
                     id: totalEntries
-                    text: "<b>" + qsTr("Logs recorded: ") + "</b>" + logStatus.UsedSlots
+                    font.pixelSize: 12
+                    text: "<b>" + qsTr("Logs slots used: ") + "</b>" + logStatus.UsedSlots
                 }
                 Text {
                     id: freeEntries
-                    text: "<b>" + qsTr("Logs left: ") + "</b>" + logStatus.FreeSlots
+                    font.pixelSize: 12
+                    text: "<b>" + qsTr("Logs slots left: ") + "</b>" + logStatus.FreeSlots
                 }
             }
         }
@@ -50,16 +54,24 @@ Rectangle {
             }
         }
 
-        Rectangle {
+        RowLayout {
             Layout.fillWidth: true
             height: 40
             Button {
-                id: button1
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 10
-                anchors.right: parent.right
-                anchors.rightMargin: 10
+                id: exportButton
+                text: qsTr("Export...")
+                activeFocusOnPress: true
+                onClicked: logManager.exportLogs()
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+            }
+
+            Button {
+                id: okButton
                 text: qsTr("OK")
+                activeFocusOnPress: true
                 onClicked: dialog.close()
             }
         }

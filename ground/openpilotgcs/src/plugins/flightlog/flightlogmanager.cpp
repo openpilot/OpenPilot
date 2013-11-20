@@ -104,3 +104,8 @@ void FlightLogManager::clearAllLogs() {
 void FlightLogManager::retrieveLogs(int flight) {
     //Get logs from flight side
 }
+
+void FlightLogManager::exportLogs()
+{
+
+}

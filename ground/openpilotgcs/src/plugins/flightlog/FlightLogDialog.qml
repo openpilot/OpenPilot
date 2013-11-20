@@ -11,11 +11,26 @@ Rectangle {
     ColumnLayout {
         anchors.fill: parent
         spacing: 10
-
-        Text {
-            id:flights
-            height: 40
-            text: logStatus.Flight
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 10
+            ColumnLayout {
+                Layout.fillWidth: true
+                spacing: 10
+                height: 40
+                Text {
+                    id: totalFlights
+                    text: "<b>" + qsTr("Flights recorded: ") + "</b>" + logStatus.Flight
+                }
+                Text {
+                    id: totalEntries
+                    text: "<b>" + qsTr("Logs recorded: ") + "</b>" + logStatus.UsedSlots
+                }
+                Text {
+                    id: freeEntries
+                    text: "<b>" + qsTr("Logs left: ") + "</b>" + logStatus.FreeSlots
+                }
+            }
         }
 
         ScrollView {
@@ -25,7 +40,6 @@ Rectangle {
             ListView {
                 id: authorsView
                 anchors.fill: parent
-
                 spacing: 3
                 model: logManager.logEntries
                 delegate: Text {

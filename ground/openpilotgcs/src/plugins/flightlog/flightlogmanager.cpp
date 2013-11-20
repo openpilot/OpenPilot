@@ -26,20 +26,19 @@
  */
 
 #include "flightlogmanager.h"
+#include "extensionsystem/pluginmanager.h"
 
-FlightLogEntry::FlightLogEntry(QObject *parent) :
-    QObject(parent)
-{
-
-}
-
-FlightLogEntry::~FlightLogEntry()
-{
-
-}
+#include "debuglogcontrol.h"
 
 FlightLogManager::FlightLogManager(QObject *parent) :
     QObject(parent) {
+
+    ExtensionSystem::PluginManager *pm = ExtensionSystem::PluginManager::instance();
+    m_objectManager = pm->getObject<UAVObjectManager>();
+    Q_ASSERT(m_objectManager);
+
+    m_flightLogStatus = DebugLogStatus::GetInstance(m_objectManager);
+    Q_ASSERT(m_flightLogStatus);
 
 }
 

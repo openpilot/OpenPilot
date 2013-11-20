@@ -33,15 +33,14 @@
 #include <QKeySequence>
 #include <coreplugin/modemanager.h>
 
-FlightLogPlugin::FlightLogPlugin()
+#include "flightlogdialog.h"
+
+FlightLogPlugin::FlightLogPlugin() : m_logDialog(0)
 {
-    m_manager = new FlightLogManager();
 }
 
 FlightLogPlugin::~FlightLogPlugin()
 {
-    delete m_manager;
-    m_manager = 0;
 }
 
 bool FlightLogPlugin::initialize(const QStringList & args, QString *errMsg)
@@ -72,7 +71,18 @@ bool FlightLogPlugin::initialize(const QStringList & args, QString *errMsg)
 
 void FlightLogPlugin::ShowLogManagementDialog()
 {
+    if(!m_logDialog) {
+        m_logDialog = new FlightLogDialog(0, new FlightLogManager());
+        connect(m_logDialog, SIGNAL(finished(int)), this, SLOT(LogManagementDialogClosed()));
+        m_logDialog->show();
+    }
+}
 
+void FlightLogPlugin::LogManagementDialogClosed()
+{
+    if(m_logDialog) {
+        m_logDialog = 0;
+    }
 }
 
 void FlightLogPlugin::extensionsInitialized()

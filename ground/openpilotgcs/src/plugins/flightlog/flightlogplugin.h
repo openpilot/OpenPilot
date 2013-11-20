@@ -28,6 +28,7 @@
 
 #include <extensionsystem/iplugin.h>
 #include "flightlogmanager.h"
+#include "flightlogdialog.h"
 
 class FlightLogPlugin : public ExtensionSystem::IPlugin {
     Q_OBJECT
@@ -41,13 +42,12 @@ public:
     bool initialize(const QStringList & arguments, QString *errorString);
     void shutdown();
 
-private:
-    FlightLogManager* m_manager;
-
 private slots:
     void ShowLogManagementDialog();
+    void LogManagementDialogClosed();
 
 private:
+    FlightLogDialog* m_logDialog;
 };
 
 #endif /* FLIGHTLOGPLUGIN_H_ */

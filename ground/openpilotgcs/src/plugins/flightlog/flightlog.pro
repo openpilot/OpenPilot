@@ -8,8 +8,16 @@ include(../../plugins/coreplugin/coreplugin.pri)
 include(../../plugins/uavobjects/uavobjects.pri)
 
 HEADERS += flightlogplugin.h \
-    flightlogmanager.h
+    flightlogmanager.h \
+    flightlogdialog.h
 SOURCES += flightlogplugin.cpp \
-    flightlogmanager.cpp
+    flightlogmanager.cpp \
+    flightlogdialog.cpp
 
-OTHER_FILES += Flightlog.pluginspec
+OTHER_FILES += Flightlog.pluginspec \
+    FlightLogDialog.qml
+
+FORMS +=
+
+RESOURCES += \
+    flightLog.qrc

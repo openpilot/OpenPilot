@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/flightlog">
+        <file>FlightLogDialog.qml</file>
+    </qresource>
+</RCC>

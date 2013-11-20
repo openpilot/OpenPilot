@@ -157,40 +157,42 @@ bool UAVObjectGeneratorGCS::process_object(ObjectInfo *info)
                 QString("    void %1Changed(quint32 index, %2 value);\n")
                 .arg(field->name).arg(type);
 
-            for (int elementIndex = 0; elementIndex < field->numElements; elementIndex++) {
-                QString elementName = field->elementNames[elementIndex];
-                properties += QString("    Q_PROPERTY(%1 %2 READ get%2 WRITE set%2 NOTIFY %2Changed);\n")
-                        .arg(type).arg(field->name+"_"+elementName);
-                propertyGetters +=
-                        QString("    Q_INVOKABLE %1 get%2_%3() const;\n")
-                        .arg(type).arg(field->name).arg(elementName);
-                propertiesImpl +=
-                        QString("%1 %2::get%3_%4() const\n"
-                                "{\n"
-                                "   QMutexLocker locker(mutex);\n"
-                                "   return data.%3[%5];\n"
-                                "}\n")
-                        .arg(type).arg(info->name).arg(field->name).arg(elementName).arg(elementIndex);
-                propertySetters +=
-                        QString("    void set%1_%2(%3 value);\n")
-                        .arg(field->name).arg(elementName).arg(type);
-                propertiesImpl +=
-                        QString("void %1::set%2_%3(%4 value)\n"
-                                "{\n"
-                                "   mutex->lock();\n"
-                                "   bool changed = data.%2[%5] != value;\n"
-                                "   data.%2[%5] = value;\n"
-                                "   mutex->unlock();\n"
-                                "   if (changed) emit %2_%3Changed(value);\n"
-                                "}\n\n")
-                        .arg(info->name).arg(field->name).arg(elementName).arg(type).arg(elementIndex);
-                propertyNotifications +=
-                        QString("    void %1_%2Changed(%3 value);\n")
-                        .arg(field->name).arg(elementName).arg(type);
-                propertyNotificationsImpl +=
-                        QString("        //if (data.%1[%2] != oldData.%1[%2])\n"
-                                "            emit %1_%3Changed(data.%1[%2]);\n")
-                        .arg(field->name).arg(elementIndex).arg(elementName);
+            if(!field->defaultElementNames) {
+                for (int elementIndex = 0; elementIndex < field->numElements; elementIndex++) {
+                    QString elementName = field->elementNames[elementIndex];
+                    properties += QString("    Q_PROPERTY(%1 %2 READ get%2 WRITE set%2 NOTIFY %2Changed);\n")
+                            .arg(type).arg(field->name+"_"+elementName);
+                    propertyGetters +=
+                            QString("    Q_INVOKABLE %1 get%2_%3() const;\n")
+                            .arg(type).arg(field->name).arg(elementName);
+                    propertiesImpl +=
+                            QString("%1 %2::get%3_%4() const\n"
+                                    "{\n"
+                                    "   QMutexLocker locker(mutex);\n"
+                                    "   return data.%3[%5];\n"
+                                    "}\n")
+                            .arg(type).arg(info->name).arg(field->name).arg(elementName).arg(elementIndex);
+                    propertySetters +=
+                            QString("    void set%1_%2(%3 value);\n")
+                            .arg(field->name).arg(elementName).arg(type);
+                    propertiesImpl +=
+                            QString("void %1::set%2_%3(%4 value)\n"
+                                    "{\n"
+                                    "   mutex->lock();\n"
+                                    "   bool changed = data.%2[%5] != value;\n"
+                                    "   data.%2[%5] = value;\n"
+                                    "   mutex->unlock();\n"
+                                    "   if (changed) emit %2_%3Changed(value);\n"
+                                    "}\n\n")
+                            .arg(info->name).arg(field->name).arg(elementName).arg(type).arg(elementIndex);
+                    propertyNotifications +=
+                            QString("    void %1_%2Changed(%3 value);\n")
+                            .arg(field->name).arg(elementName).arg(type);
+                    propertyNotificationsImpl +=
+                            QString("        //if (data.%1[%2] != oldData.%1[%2])\n"
+                                    "            emit %1_%3Changed(data.%1[%2]);\n")
+                            .arg(field->name).arg(elementIndex).arg(elementName);
+                }
             }
         } else {
             properties += QString("    Q_PROPERTY(%1 %2 READ get%2 WRITE set%2 NOTIFY %2Changed);\n")

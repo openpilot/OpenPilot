@@ -75,8 +75,6 @@ FlightLogManager::~FlightLogManager() {
 }
 
 void addEntries(QQmlListProperty<DebugLogEntry> *list, DebugLogEntry *entry) {
-    Q_UNUSED(list);
-    Q_UNUSED(entry);
 }
 
 int countEntries(QQmlListProperty<DebugLogEntry> *list) {

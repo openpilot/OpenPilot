@@ -45,7 +45,6 @@ FlightLogDialog::FlightLogDialog(QWidget *parent, FlightLogManager *flightLogMan
     setWindowTitle(tr("Manage flight side logs"));
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setMinimumSize(600, 400);
-    setMaximumSize(800, 600);
 
     QQuickView *view = new QQuickView();
     view->rootContext()->setContextProperty("dialog", this);
@@ -56,7 +55,6 @@ FlightLogDialog::FlightLogDialog(QWidget *parent, FlightLogManager *flightLogMan
 
     QWidget * container = QWidget::createWindowContainer(view);
     container->setMinimumSize(600, 400);
-    container->setMaximumSize(800, 600);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QVBoxLayout *lay = new QVBoxLayout();
     lay->setContentsMargins(0,0,0,0);

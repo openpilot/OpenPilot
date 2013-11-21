@@ -13,94 +13,87 @@ Rectangle {
         anchors.margins: 10
         spacing: 10
 
-        ScrollView {
+        Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            frameVisible: true
-            ListView {
-                id: authorsView
+            border.width: 1
+            radius: 4
+            ColumnLayout {
+                anchors.margins: 10
                 anchors.fill: parent
-                spacing: 3
-                model: logManager.logEntries
-                delegate: Text {
+                Text {
+                    Layout.fillWidth: true
+                    text: "<b>" + qsTr("Log entries") + "</b>"
                     font.pixelSize: 12
-                    text: Flight
                 }
-                clip: true
-            }
-        }
+                TableView {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    model: logManager.logEntries
+                    TableViewColumn { role: "Flight"; title: "Flight"; width: 50; horizontalAlignment: Text.AlignRight}
+                    TableViewColumn { role: "FlightTime"; title: "Time";width: 50; horizontalAlignment: Text.AlignRight}
+                    TableViewColumn { role: "Entry"; title: "#"; width: 50; horizontalAlignment: Text.AlignRight}
+                    TableViewColumn { role: "Type"; title: "Contents"; width: 100}
+                }
 
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 10
-            ColumnLayout {
-                spacing: 10
-                height: 40
-                Text {
-                    id: totalFlights
-                    font.pixelSize: 12
-                    text: "<b>" + qsTr("Flights recorded: ") + "</b>" + (logStatus.Flight + 1)
-                }
-                Text {
-                    id: totalEntries
-                    font.pixelSize: 12
-                    text: "<b>" + qsTr("Logs slots used: ") + "</b>" + logStatus.UsedSlots
-                }
-                Text {
-                    id: freeEntries
-                    font.pixelSize: 12
-                    text: "<b>" + qsTr("Logs slots left: ") + "</b>" + logStatus.FreeSlots
-                }
-            }
-            Rectangle {
-                Layout.fillWidth: true
-            }
-            ColumnLayout {
-                spacing: 10
-                height: 40
                 RowLayout {
+                    anchors.margins: 10
+                    spacing: 10
+                    ColumnLayout {
+                        spacing: 10
+                        Text {
+                            id: totalFlights
+                            font.pixelSize: 12
+                            text: "<b>" + qsTr("Flights recorded: ") + "</b>" + (logStatus.Flight + 1)
+                        }
+                        Text {
+                            id: totalEntries
+                            font.pixelSize: 12
+                            text: "<b>" + qsTr("Entries logged (free): ") + "</b>" +
+                                  logStatus.UsedSlots + " (" + logStatus.FreeSlots + ")"
+                        }
+                    }
                     Rectangle {
                         Layout.fillWidth: true
                     }
-                    Text {
-                        font.pixelSize: 12
-                        text: "<b>" + qsTr("Flight to download:") + "</b>"
-                    }
+                    ColumnLayout {
+                        spacing: 10
+                        RowLayout {
+                            Rectangle {
+                                Layout.fillWidth: true
+                            }
+                            Text {
+                                font.pixelSize: 12
+                                text: "<b>" + qsTr("Flight to download:") + "</b>"
+                            }
 
-                    ComboBox {
-                        id: flightCombo
-                        property ListModel dataModel: ListModel {}
-                        model: dataModel
-                        Component.onCompleted: {
-                            dataModel.append({"value": "All"})
-                            for (var a = 0; a <= logStatus.Flight ; a++) {
-                                dataModel.append({"value": (a + 1).toString()})
+                            ComboBox {
+                                id: flightCombo
+                                property ListModel dataModel: ListModel {}
+                                model: dataModel
+                                Component.onCompleted: {
+                                    dataModel.append({"value": "All"})
+                                    for (var a = 0; a <= logStatus.Flight ; a++) {
+                                        dataModel.append({"value": (a + 1).toString()})
+                                    }
+                                }
+                            }
+                        }
+                        RowLayout {
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Rectangle {
+                                Layout.fillWidth: true
+                            }
+                            Button {
+                                text: qsTr("Download logs")
+                                activeFocusOnPress: true
+                                onClicked: logManager.retrieveLogs(flightCombo.currentIndex - 1)
                             }
                         }
                     }
                 }
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Rectangle {
-                        Layout.fillWidth: true
-                    }
-                    Button {
-                        text: qsTr("Download logs")
-                        activeFocusOnPress: true
-                        onClicked: logManager.retrieveLogs(flightCombo.currentIndex - 1)
-                    }
-                }
             }
-        }
-
-        Rectangle {
-            border.width: 1
-            height: 2
-            width: parent.width
-            anchors.margins: 20
-            anchors.horizontalCenter: parent.horizontalCenter
-            border.color: "#adadad"
         }
 
         RowLayout {

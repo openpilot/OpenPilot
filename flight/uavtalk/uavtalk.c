@@ -676,54 +676,6 @@ int32_t UAVTalkReceiveObject(UAVTalkConnection connectionHandle)
 }
 
 /**
- * Send a ACK through the telemetry link.
- * \param[in] connectionHandle UAVTalkConnection to be used
- * \param[in] objId Object ID to send a NACK for
- * \return 0 Success
- * \return -1 Failure
- */
-int32_t UAVTalkSendAck(UAVTalkConnection connectionHandle, UAVObjHandle obj, uint16_t instId)
-{
-    UAVTalkConnectionData *connection;
-
-    CHECKCONHANDLE(connectionHandle, connection, return -1);
-
-    // Lock
-    xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
-
-    int32_t ret = sendObject(connection, obj, instId, UAVTALK_TYPE_ACK);
-
-    // Release lock
-    xSemaphoreGiveRecursive(connection->lock);
-
-    return ret;
-}
-
-/**
- * Send a NACK through the telemetry link.
- * \param[in] connectionHandle UAVTalkConnection to be used
- * \param[in] objId Object ID to send a NACK for
- * \return 0 Success
- * \return -1 Failure
- */
-int32_t UAVTalkSendNack(UAVTalkConnection connectionHandle, uint32_t objId)
-{
-    UAVTalkConnectionData *connection;
-
-    CHECKCONHANDLE(connectionHandle, connection, return -1);
-
-    // Lock
-    xSemaphoreTakeRecursive(connection->lock, portMAX_DELAY);
-
-    int32_t ret = sendNack(connection, objId);
-
-    // Release lock
-    xSemaphoreGiveRecursive(connection->lock);
-
-    return ret;
-}
-
-/**
  * Get the object ID of the current packet.
  * \param[in] connectionHandle UAVTalkConnection to be used
  * \param[in] objId Object ID to send a NACK for
@@ -798,6 +750,7 @@ static int32_t receiveObject(UAVTalkConnectionData *connection,
     case UAVTALK_TYPE_OBJ_REQ:
         // Send requested object if message is of type OBJ_REQ
         if (obj == 0) {
+            // Transmit NACK
             sendNack(connection, objId);
         } else {
             sendObject(connection, obj, instId, UAVTALK_TYPE_OBJ);

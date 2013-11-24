@@ -120,7 +120,7 @@ void PIOS_DEBUGLOG_UAVObject(uint32_t objid, uint16_t instid, size_t size, uint8
         size = sizeof(buffer->Data);
     }
     buffer->Size = size;
-    memset(buffer->Data, 0, sizeof(buffer->Data));
+    memset(buffer->Data, 0xff, sizeof(buffer->Data));
     memcpy(buffer->Data, data, size);
 
     if (PIOS_FLASHFS_ObjSave(pios_user_fs_id, flightnum * 256, lognum, (uint8_t *)buffer, sizeof(DebugLogEntryData)) == 0) {
@@ -142,7 +142,7 @@ void PIOS_DEBUGLOG_Printf(char *format, ...)
     va_list args;
     va_start(args, format);
     mutexlock();
-    memset(buffer->Data, 0, sizeof(buffer->Data));
+    memset(buffer->Data, 0xff, sizeof(buffer->Data));
     vsnprintf((char *)buffer->Data, sizeof(buffer->Data), (char *)format, args);
     buffer->Flight     = flightnum;
 #if defined(PIOS_INCLUDE_FREERTOS)

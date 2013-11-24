@@ -131,6 +131,9 @@ void PIOS_Board_Init(void)
     /* Delay system */
     PIOS_DELAY_Init();
 
+    /* Initialize the delayed callback library */
+    CallbackSchedulerInitialize();
+
     /* Initialize UAVObject libraries */
     EventDispatcherInitialize();
     UAVObjInitialize();
@@ -149,9 +152,6 @@ void PIOS_Board_Init(void)
     if (PIOS_TASK_MONITOR_Initialize(TASKINFO_RUNNING_NUMELEM)) {
         PIOS_Assert(0);
     }
-
-    /* Initialize the delayed callback library */
-    CallbackSchedulerInitialize();
 
 #if defined(PIOS_INCLUDE_COM)
 #if defined(PIOS_INCLUDE_TELEMETRY_RF) && 1
